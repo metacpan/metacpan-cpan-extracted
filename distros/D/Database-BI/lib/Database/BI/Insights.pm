@@ -3,7 +3,7 @@ package Database::BI::Insights;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 use Database::BI::Util  qw(urlencode);
 use List::Util          qw(sum min max);
@@ -168,13 +168,7 @@ sub _is_numeric_col {
 }
 
 sub _to_num {
-	my $v = shift;
-	return undef unless defined $v && length $v;
-	my $is_acct = ($v =~ /\A\s*\(/);
-	(my $n = $v) =~ s/[^\d.-]//g;
-	$n = "-$n" if $is_acct && $n =~ /\A\d/;
-	return undef unless $n =~ /\A-?\d+(?:\.\d+)?\z/;
-	return $n + 0;
+	return Database::BI::Util::parse_number($_[0]);
 }
 
 # _quartiles(\@sorted_nums) -> ($q1, $median, $q3)
@@ -189,7 +183,7 @@ sub _quartiles {
 
 	my $mid  = int($n / 2);
 	my @lo   = @{$s}[0 .. $mid - 1];
-	my @hi   = @{$s}[$n % 2 ? $mid + 1 : $mid .. $n - 1];
+	my @hi   = @{$s}[($n % 2 ? $mid + 1 : $mid) .. $n - 1];
 
 	my $q1 = _median(\@lo);
 	my $q2 = _median($s);
@@ -277,7 +271,7 @@ sub _find_outliers {
 				: "Unusual $num_col value: " . _fmt_num($val) . " is unusually $dir";
 
 			my $detail = sprintf(
-				'Expected range %s \x2013 %s (IQR fence on %d values)',
+				"Expected range %s \x{2013} %s (IQR fence on %d values)",
 				_fmt_num($lo_fence), _fmt_num($hi_fence), scalar @nums
 			);
 

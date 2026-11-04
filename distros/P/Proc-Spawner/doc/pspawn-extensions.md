@@ -100,7 +100,7 @@ To reject one of these, say which. D1 falls back to B1's stop-gap by removing th
   - two strings the parser rejects: `$((y=2, 3))`, and settings before `export`;
   - `$0` is `sh` by the spec, while dash names itself;
   - a builtin left to sh, named only at run time, stops with status 2 (A4).
-- **The older batteries, with the large grammar:**
+- **The older batteries, with the large grammar** (pre-0.01; the counts of 0.03 are in `pspawn-spawner.md`, section 5):
   - `battery.txt` 42/43 (was 41: `wait` now works);
   - `sigenv.txt` 12/12 (was 11: `umask`);
   - `t1.txt` 39/45 (was 35);
@@ -111,7 +111,7 @@ To reject one of these, say which. D1 falls back to B1's stop-gap by removing th
   - `sigprobe/mem-large.pl`: 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of `claude/pspawn-known-issues.md`.
   - `sigprobe/exec-stress.pl`: passes.
   - `large-subset-difffuzz.pl` (the ShellSubsetLarge session's random strings, run under dash and the executor): 1,800 strings, 1,636 in the subset, 7 differ. Five differ only in the order of lines from parallel pipeline elements (X13), one only in a message prefix in the middle of a line (the script strips prefixes only at line starts), and one is X2 (`$!` of a job that starts no process).
-  - Parser tests: 222/0, 612/0, 142/0.
+  - Parser tests (pre-0.01): 222/0, 612/0, 142/0.
 
 ## 8. Not done, limits
 

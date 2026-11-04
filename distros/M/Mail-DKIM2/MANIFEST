@@ -56,6 +56,7 @@ t/data/keys/ed25519._domainkey.test4.dkim2.com.pem
 t/data/keys/ed25519._domainkey.test5.dkim2.com.pem
 t/data/keys/rsa1024._domainkey.test1.dkim2.com.pem
 t/data/keys/rsa1024._domainkey.test2.dkim2.com.pem
+t/data/keys/rsa512._domainkey.test1.dkim2.com.pem
 t/data/keys/sel1._domainkey.test1.dkim2.com.pem
 t/data/keys/sel1._domainkey.test2.dkim2.com.pem
 t/data/keys/sel1._domainkey.test3.dkim2.com.pem
@@ -137,6 +138,7 @@ t/spec07.t
 t/spec08-algebra.t
 t/spec08-provisional.t
 t/spec08-review.t
+t/spec09.t
 t/split-lmtp.t
 t/split.t
 t/stream-from-handle.t

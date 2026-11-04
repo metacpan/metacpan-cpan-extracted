@@ -1,5 +1,10 @@
 Revision history for YATT::Lite
 
+0.201 2026-11-04
+    * GH-309 - `SiteApp` now loads `URI` by itself and `URI` is declared in cpanfile. With CGI.pm older than 4.62 (which does not load `URI`), `URI->new` died in CGI mode
+    * GH-310 - Plack 1.0053 is excluded in cpanfile: its `Plack::App::File` calls the undefined `return_405` for anything but GET/HEAD (fixed in 1.0054). t/psgi.t now sets `REQUEST_METHOD` in its GET envs
+    * `Sub::Inspector` and `Test::Requires` are dropped from cpanfile recommends: FindBin-libs v5.1.5, pulled in via `Project::Libs`, fails to build on perl < 5.40. `entity_inspector` still works when `Sub::Inspector` is installed
+
 0.200 2026-10-31
 
     Security fixes. Found by a Claude Security scan of Lite/ (2026-10-24); each one comes with a test. Upgrade notes are at the end of this section.

@@ -64,4 +64,43 @@ utime time + 10, time + 10, File::Spec->catfile($d, 'Makefile');
 ok(!$b->needs_configure, 'a fresh Makefile needs nothing');
 is($b->configure, 0, 'and configure returns without running');
 
+$d = dist('Foo-Bar-*', 'Makefile');
+utime 1000000000, 1000000000, File::Spec->catfile($d, 'Makefile');
+$b = Devel::XSCover::Build->new(dir => "$d", dry => 1, silent => 1);
+@warn = ();
+{
+    local $SIG{__WARN__} = sub { push @warn, @_ };
+    is($b->configure, 0, 'a stale Makefile whose glob matches no archive configures');
+}
+is(scalar @warn, 0, 'without a warning');
+
+$d = dist('Foo-Bar-* *.tar.gz', 'Foo-Bar-0.01.tar.gz');
+$b = Devel::XSCover::Build->new(dir => "$d", dry => 1, silent => 1);
+is_deeply([map { (File::Spec->splitpath($_))[2] } $b->tarballs_at_risk],
+    ['Foo-Bar-0.01.tar.gz'], 'an archive two globs match is named once');
+
+$d = dist('Foo-Bar-*');
+mkdir File::Spec->catfile($d, 'Foo-Bar-0.01.tar.gz') or die;
+$b = Devel::XSCover::Build->new(dir => "$d", dry => 1, silent => 1);
+is_deeply([$b->tarballs_at_risk], [], 'a directory named like an archive is not one');
+
+$d = File::Temp->newdir;
+open my $fh, '>', File::Spec->catfile($d, 'Makefile.PL') or die;
+print $fh "use ExtUtils::MakeMaker;\nWriteMakefile(\n    clean => { FILES => 'Foo-Bar-* \$(DISTNAME)-*' },\n);\n";
+close $fh;
+open $fh, '>', File::Spec->catfile($d, 'Foo-Bar-0.01.tar.gz') or die;
+close $fh;
+$b = Devel::XSCover::Build->new(dir => "$d", dry => 1, silent => 1);
+is_deeply([$b->clean_globs], ['Foo-Bar-*', '-*'], 'without a NAME the distribution name is empty');
+is_deeply([map { (File::Spec->splitpath($_))[2] } $b->tarballs_at_risk],
+    ['Foo-Bar-0.01.tar.gz'], 'and the plain glob still finds the archive');
+
+$d = File::Temp->newdir;
+open $fh, '>', File::Spec->catfile($d, 'Makefile') or die;
+close $fh;
+$b = Devel::XSCover::Build->new(dir => "$d", dry => 1, silent => 1);
+is($b->needs_configure, 1, 'a Makefile without a Makefile.PL still needs configure');
+is_deeply([$b->clean_globs], [], 'no Makefile.PL gives no globs');
+is_deeply([$b->tarballs_at_risk], [], 'and nothing at risk');
+
 done_testing;

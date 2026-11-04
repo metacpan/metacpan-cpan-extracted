@@ -1,0 +1,38 @@
+alias ll="echo L"@Nll x
+alias e="echo " x=X@Ne x
+alias ls=ls@Nls -d /
+alias ll="echo L"@Nf() { ll; }; f
+alias ll="echo L"@Neval "ll e"
+alias ll="echo L"@Necho $(ll s)
+alias a=b c="d e"; alias; echo st=$?
+alias a=b; alias a; alias zz; echo st=$?
+alias a=b; unalias a; alias; echo st=$?
+unalias zz; echo st=$?
+alias a=b c=d; unalias -a; alias | wc -l
+alias ll="echo L"@Nunalias ll@Nll; echo st=$?
+alias q="echo 'x y'"@Nq; alias q
+jobs; echo st=$?
+sleep 1 & jobs; echo st=$?
+bg; echo st=$?
+fg; echo st=$?
+sleep 1 & fg %1; echo st=$?
+hash ls; echo st=$?
+hash nosuch; echo st=$?
+hash; echo st=$?
+ls >/dev/null; hash
+hash -r; hash; echo st=$?
+type ls cd exit if nosuch; echo st=$?
+f(){ :; }; type f
+alias ll=ls@Ntype ll
+ls >/dev/null; type ls
+type ./x; echo st=$?
+ulimit -n; ulimit -Hn; ulimit -Sn
+ulimit; ulimit -f
+ulimit -s; ulimit -c; ulimit -t; ulimit -v; ulimit -l; ulimit -m; ulimit -d
+set -o vi; set -o emacs; echo st=$?
+command -v alias; command -v jobs
+alias q="'a''b'"; alias q
+kill -HUP 999999 2>/dev/null; echo st=$?
+echo a\
+find /dev/null -exec echo \{} \
+[ "<" = "<" ]; echo st=$?

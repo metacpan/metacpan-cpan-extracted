@@ -73,6 +73,7 @@ sub default_default_app () {'YATT::Lite::WebMVC0::DirApp'}
 sub default_ext_public_action {'ydo'}
 
 use File::Basename;
+use URI;
 
 sub after_new {
   (my MY $self) = @_;

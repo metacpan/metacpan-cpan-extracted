@@ -16,7 +16,7 @@ use Devel::XSCover::XS ();
 use Devel::XSCover::Gcov ();
 use Devel::XSCover::DB ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 our (%DEFAULTS);
 
@@ -121,7 +121,7 @@ sub run {
     $status = $test->run;
     warn "xs_cover: the tests failed with status $status, reporting what ran\n" if $status;
     my @maps   = Devel::XSCover::XS->new(dir => $self->{dir}, skip => $self->skip_dirs)->read;
-    my $reader = Devel::XSCover::Gcov->new(%common, gcov => $build->gcov_command, conditions => $build->conditions, ignore => $self->{ignore},
+    my $reader = Devel::XSCover::Gcov->new(%common, gcov => $build->gcov_command, conditions => $build->conditions, flow => $build->flow_kind, ignore => $self->{ignore},
         generated => [ map { $_->{c} } @maps ], skip => $self->skip_dirs, save => $self->gcov_dir($test->db_path));
     my @objects = $reader->read;
     my $writer  = Devel::XSCover::DB->new(%common, db => $test->db_path);
@@ -246,10 +246,24 @@ The header is in, perl's are out, every function and XSUB has a subroutine entry
 under its Perl name (an alias gives it two), and every arm of the C<switch> is a
 branch. With gcc 14 or later the C files have a condition column too, from the
 compiler's own condition coverage: for every term of a decision, whether its true
-and its false outcome each decided the result. Other compilers give gcov nothing
-of the kind, and the column stays empty for C. A branch inside a macro, as C<GvSVn> or C<SvTRUE> expand to on a line with
-no decision of its own, is left out, since nothing in the source can take its other
-arm.
+and its false outcome each decided the result. gcc counts the terms after the
+preprocessor, so a decision with more terms than its source holds has a macro's own
+among them and is left out, as a line with no decision in its text is. Other
+compilers give gcov nothing of the kind, and the column stays empty for C.
+
+A branch of a C file is a decision of its source, an C<if>, C<while>, C<for> or
+C<switch>, with one arm per way out of it, read from the flow graph the compiler
+wrote beside the counters (C<llvm-cov gcov --dump>, or C<gcov --json-format> from
+gcc 9). gcov's text alone lists every block on the line, and on a line such as
+C<if (!stash || !HvNAME_get(stash))> most of them are the macro's own: its inner
+tests jump within the line and nothing in the source can take their other arm. The
+arcs that leave the decision's lines are its outcomes, and those that stay on them
+are not, so the macro's tests vanish and the C<if> has two arms, the one into its
+body first. A conditional expression inside a statement, C<x ? y : z> or C<return
+a && b>, is not a branch, since its outcomes merge on its own line: under gcc 14 its
+terms are in the condition column. An older gcov, which has no flow graph, gives
+every block with two or more arms as a branch, leaving out the blocks on lines
+with no decision in their text.
 
 =head2 The report
 

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Interactive;
 # ABSTRACT: Review and correct an isolated import before publishing it
-$Finance::Tiller2QIF::Interactive::VERSION = '1.20';
+$Finance::Tiller2QIF::Interactive::VERSION = '1.21';
 use 5.036;
 use utf8;
 use warnings FATAL => 'utf8';
@@ -39,7 +39,7 @@ are reported within the session so the user can repair files and retry.
 
 {
   package Finance::Tiller2QIF::Interactive::_DatabaseGuard;
-$Finance::Tiller2QIF::Interactive::_DatabaseGuard::VERSION = '1.20';
+$Finance::Tiller2QIF::Interactive::_DatabaseGuard::VERSION = '1.21';
   sub DESTROY ($self) {
     local $@;
     eval {
@@ -59,6 +59,9 @@ sub _digest ($file) {
 sub _same ($a, $b) { return ($a // '') eq ($b // '') }
 
 sub _sync ($file) {
+  # Windows uses normal OS buffering; power-loss durability is not required.
+  # This also bypasses directory fsync, which Windows does not support here.
+  return if $^O eq 'MSWin32';
   my $fh = path($file)->openr_raw;
   $fh->sync or die "Cannot sync $file: $!\n";
   close $fh or die "Cannot close $file: $!\n";
@@ -239,9 +242,14 @@ sub _view ($session) {
     my @files = ($review ? ($review->{preview}) : (),
       $session->{options}{mapfile} ? ($session->{options}{mapfile}) : (),
       $session->{options}{corrections});
-    my $cmd = join ' ', $viewer,
-      map { Finance::Tiller2QIF::WriteQIF::_shell_quote($_) } @files;
-    die "preview viewer '$viewer' failed\n" if system($cmd);
+    if ($^O eq 'MSWin32') {
+      Finance::Tiller2QIF::WriteQIF::_launch_windows_viewer($viewer, @files);
+    }
+    else {
+      my $cmd = join ' ', $viewer,
+        map { Finance::Tiller2QIF::WriteQIF::_shell_quote($_) } @files;
+      die "preview viewer '$viewer' failed\n" if system($cmd);
+    }
   }
   say "$review->{count} transaction(s) in last successful preview." if $review;
 }
@@ -342,6 +350,9 @@ SQL
       $options{verbose}, $options{qifdate});
     chmod((stat($options{output}))[2] & 0777, $export_qif)
       or die "Cannot preserve output permissions: $!\n" if -e $options{output};
+    # Windows cannot replace a database while SQLite has it open. The session
+    # lock remains held, and _publish rechecks the original file digests.
+    $guard->disconnect if $^O eq 'MSWin32';
     _publish($session, $export_db, $export_qif);
     say "QIF written: $options{output}, $count records emitted! Session committed.";
     return 1;

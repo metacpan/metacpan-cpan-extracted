@@ -262,9 +262,22 @@ if ($ENABLE_CHECK_PERL_MODULES) {
         printf "  %-35s %s\n", $mod, $ok ? 'ok' : 'MISSING';
         $all_ok = 0 unless $ok;
     }
-    die "\nERROR: One or more required Perl modules are missing.\n"
-      . "       Install them from CPAN, then re-run perl Makefile.PL\n"
-      unless $all_ok;
+    unless ($all_ok) {
+        # Under a CPAN client, go on and write the Makefile: the client
+        # reads PREREQ_PM from MYMETA and installs the missing modules.
+        if ($ENV{PERL5_CPAN_IS_RUNNING}
+            || $ENV{PERL5_CPANPLUS_IS_RUNNING}
+            || $ENV{PERL5_CPANM_IS_RUNNING}) {
+            warn "\nWARNING: One or more required Perl modules are missing.\n"
+               . "         They are listed as prerequisites and will be\n"
+               . "         installed by the CPAN client.\n";
+        } else {
+            die "\nERROR: One or more required Perl modules are missing.\n"
+              . "       Install them from CPAN (e.g. 'cpanm .' or 'cpan .' in this\n"
+              . "       directory), then re-run perl Makefile.PL, or skip this\n"
+              . "       check with ENABLE_CHECK_PERL_MODULES=0\n";
+        }
+    }
 
     # Syslog: need at least one
     print "\nChecking syslog Perl module (need one of):\n";
@@ -373,6 +386,10 @@ print "\nclock_gettime(CLOCK_MONOTONIC): " . ($HAVE_CLOCK_MONOTONIC ? 'yes' : 'n
 my $HAVE_INET_NTOP = probe_inet_ntop();
 print "inet_ntop             : " . ($HAVE_INET_NTOP ? 'yes' : 'no') . "\n";
 
+# --- C dialect probe -------------------------------------------------------
+my $C_STD = probe_c_std();
+print "C dialect             : " . ($C_STD eq '' ? 'compiler default' : $C_STD) . "\n";
+
 # --- socklen probe --------------------------------------------------------
 my $HAVE_SOCKLEN_T = probe_socklen();
 print "socklen_t             : " . ($HAVE_SOCKLEN_T ? 'yes' : 'no') . "\n";
@@ -391,11 +408,12 @@ if ($ENABLE_EMBEDDED_PERL) {
     print "Embedded Perl        : disabled\n";
 }
 
-# Base CFLAGS: use the compiler's defaults plus mandatory defines
+# Base CFLAGS: pre-C23 C dialect (see probe_c_std) plus mandatory defines
 my $CFLAGS = join(' ',
     '-I.',
     "-I$MILTERINC",
-    "-std=c89 -D_BSD_SOURCE -D_DEFAULT_SOURCE",
+    ($C_STD ne ''              ? $C_STD                   : ()),
+    '-D_DEFAULT_SOURCE',
     ($ENABLE_DEBUGGING         ? '-DENABLE_DEBUGGING'    : ()),
     ($ENABLE_POLL              ? '-DUSE_POLL'             : ()),
     ($ENABLE_PTHREAD_FLAG      ? '-pthread'               : ()),
@@ -1042,6 +1060,37 @@ C
     my $rc = system("$CC -o $exe $src 2>/dev/null") == 0;
     unlink $src, $exe;
     return $rc ? 1 : 0;
+}
+
+# libmilter's mfapi.h does "typedef int bool;", which breaks with C23 where
+# 'bool' is a keyword.  If the compiler defaults to C23, pick a GNU pre-C23
+# dialect: unlike -std=cXX it does not define __STRICT_ANSI__, which would
+# hide POSIX/extension prototypes (e.g. on Solaris).
+# Returns '' when the compiler default is fine.
+sub probe_c_std {
+    my $tmpdir = File::Spec->tmpdir();
+    my $src    = File::Spec->catfile($tmpdir, "conftest_std_$$.c");
+    my $obj    = File::Spec->catfile($tmpdir, "conftest_std_$$.o");
+    open my $fh, '>', $src or die "Cannot write $src: $!\n";
+    print $fh <<'C';
+typedef int bool;
+int main(void) {
+    bool b = 0;
+    return b;
+}
+C
+    close $fh;
+    my $found;
+    foreach my $std ('', '-std=gnu17', '-std=gnu11', '-std=gnu99') {
+        if (system("$CC $std -c -o $obj $src 2>/dev/null") == 0) {
+            $found = $std;
+            last;
+        }
+    }
+    unlink $src, $obj;
+    die "No pre-C23 C dialect found; libmilter headers are not C23 compatible.\n"
+      unless defined $found;
+    return $found;
 }
 
 sub probe_milter {

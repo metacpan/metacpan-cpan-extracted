@@ -38,8 +38,10 @@ my $json = slurp("$ex/authentication_milter.json.fragment");
 my $cfg = eval { decode_json("{$json}") };
 ok($cfg, 'authentication_milter fragment is a valid JSON object body') or diag($@);
 is($cfg->{DKIM2Sign}{sign_local}, 1, 'the sign handler signs mail from local listeners');
-is($cfg->{DKIM2Sign}{allow_null_body_recipe}, 1,
-   'the sign handler signs a list manager\'s null body Recipe, as the outbound milter unit does');
+ok(!exists $cfg->{DKIM2Sign}{allow_null_body_recipe},
+   'the sign handler sets no deprecated allow_null_body_recipe (0.29 always signs our own null)');
+unlike(slurp("$ex/dkim2-milter-outbound.service"), qr/--allow-null-body-recipe/,
+   'the outbound unit passes no deprecated --allow-null-body-recipe');
 is($cfg->{DKIM2Verify}{hide_none}, 0, 'the verify handler reports dkim2=none on inbound mail (its instance never sees list copies)');
 is($cfg->{DKIM2Sign}{snapshot_directory}, $cfg->{DKIM2Verify}{snapshot_directory},
    'both handlers share one snapshot directory');

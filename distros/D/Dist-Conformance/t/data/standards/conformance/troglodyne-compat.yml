@@ -1,0 +1,15 @@
+# For code that runs on whatever perl is already installed: use 5.014, and the
+# profile that keeps the policies a newer perl makes redundant.
+name: troglodyne-compat
+description: A troglodyne distribution that runs on the installed perl, from 5.014
+extends:
+  - troglodyne
+variables:
+  PERL_FLOOR: '5.014'
+checks:
+  CriticProfile:
+    file: .perlcriticrc
+    template: templates/perlcriticrc.compat
+    outdated:
+      - '# Troglodyne perlcritic policy'
+    replace: false

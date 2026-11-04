@@ -121,8 +121,8 @@ sub cte_stmts {
         push @tmp, $sf->__stmt_fold( $term_w, $used_for, sprintf( '%s AS (%s),', $cte->{full_name}, $cte->{query} ), $indent1 );
     }
     $tmp[-1] =~ s/,\z//;
-    push @tmp, " ";
-    return join "\n", @tmp;
+    return join( "\n", @tmp ) . "\n";
+
 }
 
 
@@ -139,7 +139,15 @@ sub get_stmt {
     if ( defined $ctes ) {
         push @tmp, $ctes;
     }
-    if ( $stmt_type eq 'Drop_Table' ) {
+    if ( $stmt_type eq 'Cte_Only' ) {
+        if ( ! @tmp ) {
+            push @tmp, 'WITH';
+        }
+        else {
+            $tmp[-1] =~ s/\n\z//;
+        }
+    }
+    elsif ( $stmt_type eq 'Drop_Table' ) {
         @tmp = ( $sf->__stmt_fold( $term_w, $used_for, "DROP TABLE $table", $indent0 ) );
     }
     elsif ( $stmt_type eq 'Drop_View' ) {
@@ -258,7 +266,7 @@ sub get_stmt {
             $stmt =~ s/(^|\n)/$1$sq_indent/gs;
             $stmt = $sf->{d}{main_info} . "\n" . $stmt;
         }
-        $stmt .= "\n" ;
+        $stmt .= "\n";
     }
     return $stmt;
 }

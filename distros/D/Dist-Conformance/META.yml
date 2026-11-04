@@ -1,0 +1,121 @@
+---
+abstract: 'Whether the development harness of a repository conforms to its standards, and bringing it up to date'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  FindBin::libs: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Pod::Simple::SimpleTree: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Conformance
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Dist::Conformance:
+    file: lib/Dist/Conformance.pm
+    version: '0.001'
+  Dist::Conformance::Check:
+    file: lib/Dist/Conformance/Check.pm
+    version: '0.001'
+  Dist::Conformance::Check::ClaudeMd:
+    file: lib/Dist/Conformance/Check/ClaudeMd.pm
+    version: '0.001'
+  Dist::Conformance::Check::ClaudeSettings:
+    file: lib/Dist/Conformance/Check/ClaudeSettings.pm
+    version: '0.001'
+  Dist::Conformance::Check::CriticProfile:
+    file: lib/Dist/Conformance/Check/CriticProfile.pm
+    version: '0.001'
+  Dist::Conformance::Check::DataSchema:
+    file: lib/Dist/Conformance/Check/DataSchema.pm
+    version: '0.001'
+  Dist::Conformance::Check::DistFiles:
+    file: lib/Dist/Conformance/Check/DistFiles.pm
+    version: '0.001'
+  Dist::Conformance::Check::GitHooks:
+    file: lib/Dist/Conformance/Check/GitHooks.pm
+    version: '0.001'
+  Dist::Conformance::Check::ToolConfiguration:
+    file: lib/Dist/Conformance/Check/ToolConfiguration.pm
+    version: '0.001'
+  Dist::Conformance::Check::Workflows:
+    file: lib/Dist/Conformance/Check/Workflows.pm
+    version: '0.001'
+  Dist::Conformance::Config:
+    file: lib/Dist/Conformance/Config.pm
+    version: '0.001'
+  Dist::Conformance::Flavor:
+    file: lib/Dist/Conformance/Flavor.pm
+    version: '0.001'
+  Dist::Conformance::Schema:
+    file: lib/Dist/Conformance/Schema.pm
+    version: '0.001'
+  Dist::Conformance::Snapshot:
+    file: lib/Dist/Conformance/Snapshot.pm
+    version: '0.001'
+  Dist::Conformance::Snapshot::Directory:
+    file: lib/Dist/Conformance/Snapshot/Directory.pm
+    version: '0.001'
+  Dist::Conformance::Snapshot::Tree:
+    file: lib/Dist/Conformance/Snapshot/Tree.pm
+    version: '0.001'
+  Dist::Conformance::Source:
+    file: lib/Dist/Conformance/Source.pm
+    version: '0.001'
+  Dist::Conformance::Source::Directory:
+    file: lib/Dist/Conformance/Source/Directory.pm
+    version: '0.001'
+  Dist::Conformance::Source::Git:
+    file: lib/Dist/Conformance/Source/Git.pm
+    version: '0.001'
+  Dist::Conformance::Update:
+    file: lib/Dist/Conformance/Update.pm
+    version: '0.001'
+requires:
+  Clone: '0'
+  Cpanel::JSON::XS: '0'
+  Digest::SHA: '0'
+  File::Find: '0'
+  File::Slurper::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Run3: '0'
+  JSON::Validator::Schema::Troglodyne: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Mojo::Base: '0'
+  Mojo::File: '0'
+  Pod::Usage: '0'
+  YAML::XS: '0'
+  perl: '5.040'
+  re: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Dist-Conformance/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Dist-Conformance
+  repository: https://github.com/Troglodyne-Internet-Widgets/Dist-Conformance.git
+version: '0.001'
+x_contributors:
+  - 'troglodyne-bot <morpheus@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT

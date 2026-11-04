@@ -1,0 +1,4 @@
+# Troglodyne perlcritic policy, for a distribution that runs on whatever perl is
+# already installed: use 5.014, and never lower.
+severity = 1
+[TestingAndDebugging::RequireUseStrict]

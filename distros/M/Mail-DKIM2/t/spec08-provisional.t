@@ -5,7 +5,7 @@ use Test::More;
 use lib 'lib', 't/lib';
 use Spec07Fixture;
 
-# -08 section 13.2: a message is Provisionally Verified when the top
+# -09 section 13.2: a message is Provisionally Verified when the top
 # DKIM2-Signature and the top Message-Instance pass five checks: (1) the
 # signature's m= is the top instance's; (2) its s= passes; (3) the
 # instance's h= passes; (4) MAIL FROM and RCPT TO match its mf= and rt=

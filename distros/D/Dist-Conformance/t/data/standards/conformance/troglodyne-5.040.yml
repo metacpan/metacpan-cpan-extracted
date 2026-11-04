@@ -1,0 +1,14 @@
+# For code that runs on a perl you control: use 5.040, and the strict profile.
+name: troglodyne-5.040
+description: A troglodyne distribution that declares use 5.040 or later
+extends:
+  - troglodyne
+variables:
+  PERL_FLOOR: '5.040'
+checks:
+  CriticProfile:
+    file: .perlcriticrc
+    template: templates/perlcriticrc
+    outdated:
+      - '# Troglodyne perlcritic policy'
+    replace: false

@@ -34,7 +34,7 @@
    "provides" : {
       "BioX::Tax::Kraken" : {
          "file" : "lib/BioX/Tax/Kraken.pm",
-         "version" : "0.002001"
+         "version" : "0.002002"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "url" : "https://github.com/jvolkening/p5-BioX-Tax-Kraken"
       }
    },
-   "version" : "0.002001",
+   "version" : "0.002002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

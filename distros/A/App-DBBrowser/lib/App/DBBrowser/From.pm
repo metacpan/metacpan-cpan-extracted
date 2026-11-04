@@ -21,12 +21,12 @@ sub new {
 sub from_sql {
     my ( $sf, $table_key ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my ( $table, $table_alias, $columns, $aliases );
+    my ( $table, $table_alias, $join_columns, $aliases );
     if ( $table_key eq 'Join' ) {
         require App::DBBrowser::From::Join;
         my $new_j = App::DBBrowser::From::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
         $sf->{d}{table_origin} = 'join';
-        if ( ! eval { ( $table, $columns, $aliases ) = $new_j->join_tables(); 1 } ) {
+        if ( ! eval { ( $table, $join_columns, $aliases ) = $new_j->join_tables(); 1 } ) {
             $ax->print_error_message( $@ );
             return;
         }
@@ -77,17 +77,20 @@ sub from_sql {
     if ( ! defined $column_names ) {
         return;
     }
-    if ( $sf->{d}{table_origin} ne 'join' ) {
-        # not with join otherwise possible qualifications of the column names will be lost
-        $columns = $column_names;
-    }
-    my $data_types = {};
-    @{$data_types}{@$columns} = @$column_types; ##
     my $sql = {};
     $ax->reset_sql( $sql );
     $sql->{table} = $table;
     $sql->{table_alias} = $table_alias;
-    $sql->{columns} = $columns;
+    my $data_types = {};
+    if ( $sf->{d}{table_origin} eq 'join' ) {
+        # join: use qualified column names.
+        $sql->{columns} = $join_columns;
+        @{$data_types}{@$join_columns} = @$column_types;
+    }
+    else {
+        $sql->{columns} = $column_names;
+        @{$data_types}{@$column_names} = @$column_types;
+    }
     $sql->{data_types} = $data_types;
     $sql->{alias} = $aliases // {};
     return $sql;

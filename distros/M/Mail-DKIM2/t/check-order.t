@@ -12,7 +12,7 @@ use Spec07Fixture;
 # Contract C9 (interop docs/superpowers/specs/2026-10-18-dkim2-spec-07-design.md):
 # when a message has more than one fault, every verifier reports the same
 # primary error. Each case here has exactly two faults, and pins which one
-# is primary: within -08 section 14.2, structure (the fields' names and
+# is primary: within -09 section 14.2, structure (the fields' names and
 # m=/i= numbers) before content, in the contract's fixed sequence; within
 # section 14.7, every header hash before any body hash.
 
@@ -91,19 +91,19 @@ primary(copy_field("Message-Instance: h=sha256:AAAA:BBBB;\r\n" . one_hop(), $SIG
         'b before e: an instance with no m= before a signature i= given twice');
 
 primary(copy_field("DKIM2-Signature: m=1; d=example.com;\r\n" . one_hop(), $MI1, 'after'),
-        'PERMERROR: Message-Instance m=1 appears more than once',
+        'PERMERROR: Message-Instance m=1 is duplicated',
         'c before d: an instance m= given twice before a signature with no i=');
 
 primary(copy_field(copy_field(two_hop(), $MI2, 'top'), $MI1, 'after'),
-        'PERMERROR: Message-Instance m=1 appears more than once',
+        'PERMERROR: Message-Instance m=1 is duplicated',
         'c: the lowest m= given twice, not the first met');
 
 primary(copy_field(copy_field(two_hop(), ['DKIM2-Signature', 'i', 2], 'top'), $SIG1, 'after'),
-        'PERMERROR: DKIM2-Signature i=1 appears more than once',
+        'PERMERROR: DKIM2-Signature i=1 is duplicated',
         'e: the lowest i= given twice, not the first met');
 
 primary("DKIM2-Signature: i=1;\r\n" . copy_field(one_hop(), $MI1, 'after'),
-        'PERMERROR: Message-Instance m=1 appears more than once',
+        'PERMERROR: Message-Instance m=1 is duplicated',
         'a..e: structure before a gap: an instance m= given twice');
 
 # A message with no signature: "none" only when there is no DKIM2 field at

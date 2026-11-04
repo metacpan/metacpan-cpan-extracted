@@ -1,5 +1,81 @@
 Revision history for Mail::DKIM2
 
+0.30    2026-11-03
+        - Signers no longer look the Domain Policy Record up by default
+          (contract E3.4, revised). A d= below the From domain signs only
+          when the new Signer option ParentFromCallback ($from_domain,
+          $signer) says so; with no callback it is refused, with the
+          plain "From header field is not Authentic for d=..." (0.29's
+          ": <reason>" suffix is gone). PolicyCallback/Resolver on the
+          Signer remain as an explicit opt-in to the lookup.
+          dkim2-milter --parent-from (single domain) or a parent-from file
+          in a keydir domain's directory; DKIM2Sign per-domain
+          parent_from_domains; dkim2sign --parent-from. Each matches
+          its list through the new Common::parent_from_matcher (A-labels,
+          case, one trailing dot).
+        - The Verifier prefetches the Domain Policy Records its From check
+          will need (d= below the From domain), in the background with the
+          keys, under the same conditions (_can_prefetch, PREFETCH_MAX,
+          not with a PolicyCallback). fetch_domain_policy reads that
+          answer first.
+
+0.29    2026-11-03
+        draft-ietf-dkim-dkim2-spec-09 and draft-ietf-dkim-dkim2-dns-03.
+        Nothing changes on the wire: what is hashed and signed is as in
+        0.28. Verification results change as below.
+
+        - A null body Recipe is a PERMERROR: "Message-Instance m=<x> has a
+          null recipe", naming the instance that holds it (sections 13,
+          14.2). It used to be a pass with fully_verified() false.
+          fully_verified() is deprecated and now true exactly for a pass
+          (still false under HeadersOnly/InstancesOnly).
+        - Signers sign over their own (unsigned) null body Recipe: the
+          message PERMERRORs downstream, but the hop's header changes are
+          signed. Gate's AllowNullBodyRecipe, dkim2-milter's and
+          dkim2sign's --allow-null-body-recipe and DKIM2Sign's
+          allow_null_body_recipe are deprecated: still accepted, they
+          do nothing, and a true value warns once. A caller passing
+          AllowNullBodyRecipe => 0 now signs its own null where it used
+          to refuse it. The gate no longer gives reason
+          "null-body-recipe". A null that arrived already signed fails the
+          upstream verification and is refused (upstream-chain).
+        - Authentic From, upwards (sections 3.8, 7.1 item 4, 11.1, 14.8):
+          a d= below the From domain makes the From Authentic unless that
+          domain's Domain Policy Record (TXT at _domainkey.<domain>,
+          v=DKIM1; f=strict) forbids it. Looked up only in that case, once
+          per domain per message, never prefetched. New Verifier option
+          PolicyCallback (and set_policy_callback, fetch_domain_policy);
+          without it the lookup goes through Resolver with query(). A
+          PubkeyCallback-only caller should add a PolicyCallback, or the
+          lookup uses a default resolver. A record beginning v=DKIM1 that
+          does not parse counts as f=strict.
+        - The Signer may sign with a d= below the From domain too, after
+          the same policy lookup (Signer options PolicyCallback and
+          Resolver, fetch_domain_policy); strict, multiple or unavailable
+          refuses, with the reason after "From header field is not
+          Authentic for d=...: ". dkim2-milter, dkim2sign and DKIM2Sign
+          pass their dns.json or resolver. New Common::from_pair_error,
+          query_domain_policy, policy_from_source.
+        - New section 14.8 strings: "From <dom> forbids subdomain signing",
+          "From has more than one address", "From uses a domain literal",
+          "policy for <dom> unavailable" (TEMPERROR), "multiple records
+          for <dom> policy" (PERMERROR).
+        - Key records: TXT records at the selector that begin with a v=
+          other than DKIM1 are ignored before "has multiple records" is
+          judged (section 3.7). New Common::key_records, domain_policy,
+          from_mailbox.
+        - An RSA key under 1024 bits is "public key <s> too short" (was
+          "is malformed"); still refused.
+        - Strings: "<field> m=/i=<n> is duplicated" (was "appears more than
+          once"); "recipe <path> is invalid" (lower case); "mf= and d= do
+          not match" (was "MAIL FROM and d="); no DKIM2 header fields at
+          all: details "NONE: No DKIM2 header fields found".
+        - New check: "PERMERROR: DKIM2-Signature i=1 has an exploded flag",
+          before any key is fetched.
+        - X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09 (debug-header-03).
+        - Key and policy record parsing trims white space in linear time
+          (a TXT record is whatever the signer's DNS serves).
+
 0.28    2026-10-28
         draft-ietf-dkim-dkim2-spec-08. Changes what is hashed and what
         verifies, so every signer and verifier must move together:

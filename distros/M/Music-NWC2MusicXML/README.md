@@ -4,7 +4,7 @@ Music::NWC2MusicXML - Convert NoteWorthy Composer 2 `.nwc` score files to MusicX
 
 ## Version
 
-0.002.3
+0.002.4
 
 ## Synopsis
 

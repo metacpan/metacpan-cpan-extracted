@@ -114,7 +114,6 @@ SpamAssassin/spamassassin.cf
 syslog-fac.c
 systemd-units/mimedefang-multiplexor.service
 systemd-units/mimedefang.service
-t/c_unit.t
 t/actions.t
 t/antispam.t
 t/arc.t
@@ -122,6 +121,7 @@ t/async.t
 t/authres.t
 t/autoscale.t
 t/bimi.t
+t/c_unit.t
 t/core.t
 t/critic.t
 t/data/arc1.eml
@@ -135,11 +135,13 @@ t/data/dkim.pem
 t/data/dkim_sig2a.txt
 t/data/dkim_sig2.txt
 t/data/dkim_sig.txt
+t/data/enc.7z
 t/data/exe.eml
 t/data/gtube.eml
 t/data/md.conf
 t/data/mimedefang-async-filter
 t/data/mimedefang-test-filter
+t/data/multi.7z
 t/data/multipart.eml
 t/data/rspamd.conf
 t/data/spf1.eml
@@ -153,12 +155,13 @@ t/docker/docker-compose-postfix.yml
 t/docker/docker-compose-sendmail.yml
 t/docker/dockerPostfix.sh
 t/docker/dockerSendmail.sh
+t/test_pidfile.c
 t/test_safe_append_header.c
+t/test_sanitize_header.c
 t/dkim.t
 t/graphdefang.t
 t/headers.t
 t/helo.t
-t/Makefile
 t/mime.t
 t/net.t
 t/relay.t

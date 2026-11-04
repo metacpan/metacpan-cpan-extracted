@@ -37,10 +37,12 @@ package BgResolver {
             return $p;
         }
         my ($sel, $dom) = $fqdn =~ /\A(.*)\._domainkey\.(.*)\z/;
-        my $e = $self->{dns}{$dom}{"${sel}._domainkey"};
+        my $e = $sel ? $self->{dns}{$dom}{"${sel}._domainkey"}
+              : $fqdn =~ /\A_domainkey\.(.*)\z/ ? $self->{dns}{$1}{_domainkey} : undef;
         if ($e && $e->[0]) {
+            # Every record: a Domain Policy Record's set is counted.
             $p->push(answer => Net::DNS::RR->new(
-                name => $fqdn, type => 'TXT', txtdata => [unpack '(a255)*', $e->[0][1]]));
+                name => $fqdn, type => 'TXT', txtdata => [unpack '(a255)*', $_->[1]])) for @$e;
         } else {
             $p->header->rcode('NXDOMAIN');
         }
@@ -239,6 +241,40 @@ package QueryOnlyResolver {
     my ($v2) = run(resolver => { timeout => 1, rcode => { $first => 'NXDOMAIN' } });
     is($v->result_detail, $v2->result_detail, 'NXDOMAIN in the background: the verdict of NXDOMAIN');
     is_deeply($res->calls('query'), [], '... without asking again');
+}
+
+# 0.30: the Domain Policy Record a From check will need is asked for in the
+# background with the keys -- only for a d= below the From domain -- and
+# its answer read when From is checked.
+{
+    use DKIM2SignedFixture;
+    my $sub = sub { my ($parent) = @_; DKIM2SignedFixture::signed(domain => "mail.$parent",
+        key_domain => 'test2.dkim2.com', from => "a\@$parent") };
+    for my $c (['strict.dkim2.com', 'fail', 'forbids subdomain signing'],
+               ['open.dkim2.com', 'pass', undef]) {
+        my ($parent, $want, $why) = @$c;
+        my $res = BgResolver->new(dns => $dns);
+        my $v = Mail::DKIM2::Verifier->new(Resolver => $res);
+        $v->load($sub->($parent));
+        is($v->result, $want, "policy prefetch, $parent: $want");
+        like($v->details, qr/\Q$why\E/, '... saying why') if $why;
+        ok((grep { $_ eq "_domainkey.$parent" } @{ $res->calls('bgsend') }),
+           '... the policy record asked for in the background');
+        is_deeply([ grep { /\A_domainkey\./ } @{ $res->calls('query') } ], [],
+                  '... and not asked again');
+    }
+    my $res = BgResolver->new(dns => $dns);
+    my $v = Mail::DKIM2::Verifier->new(Resolver => $res);
+    $v->load(DKIM2SignedFixture::signed());
+    is($v->result, 'pass', 'From at d=: pass');
+    is_deeply([ grep { /\A_domainkey\./ } @{ $res->calls('bgsend') } ], [],
+              '... with no policy record asked for');
+    $res = BgResolver->new(dns => $dns);
+    $v = Mail::DKIM2::Verifier->new(Resolver => $res, PolicyCallback => DKIM2TestKeys::policy_callback());
+    $v->load($sub->('strict.dkim2.com'));
+    is($v->result, 'fail', 'a PolicyCallback answers instead');
+    is_deeply([ grep { /\A_domainkey\./ } @{ $res->calls('bgsend') } ], [],
+              '... and nothing is prefetched');
 }
 
 done_testing;

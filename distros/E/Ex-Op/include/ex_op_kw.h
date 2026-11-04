@@ -13,7 +13,7 @@ static bool
 eo_kw_in_scope(pTHX)
 {
     HV *hints = GvHV(PL_hintgv);
-    SV **ent = hints ? hv_fetchs(hints, EO_KW_KEY, 0) : NULL;
+    SV **ent = hints ? hv_fetchs(hints, EO_KW_KEY, 0) : NULL; /* # uncoverable condition right count:1 */
     return ent && SvTRUE(*ent);
 }
 
@@ -35,7 +35,7 @@ eo_kw_ident(pTHX_ bool qualified)
     char *end   = PL_parser->bufend;
     bool utf8   = lex_bufutf8() ? TRUE : FALSE;
 
-    if (s >= end || !eo_kw_word_char(*s, utf8, TRUE))
+    if (s >= end || !eo_kw_word_char(*s, utf8, TRUE)) /* # uncoverable condition left count:1 */
         return NULL;
     while (s < end) {
         if (eo_kw_word_char(*s, utf8, FALSE)) {
@@ -125,7 +125,7 @@ eo_kw_parse(pTHX_ SV *name)
     body  = parse_block(0);
     cv    = newATTRSUB(floor, newSVOP(OP_CONST, 0, newSVsv(name)), NULL, NULL, body);
 
-    if (cv && !PL_parser->error_count) {
+    if (cv && !PL_parser->error_count) { /* # uncoverable condition right count:2 */
         eo_op_t *e = eo_register(aTHX_ cv);
         if (!e->accepted && eo_strict_on(aTHX))
             croak("%" SVf " cannot be an op: %s", SVfARG(name), e->why);

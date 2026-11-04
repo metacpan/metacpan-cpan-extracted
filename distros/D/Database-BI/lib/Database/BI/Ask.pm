@@ -3,7 +3,7 @@ package Database::BI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 use Carp                qw(croak);
 use Database::BI::Util  qw(urlencode);
@@ -181,8 +181,12 @@ sub _parse_visual {
 	my ($text) = @_;
 	require JSON::PP;
 
+	# The reply has already been decoded from the wire, so it is characters, and
+	# decode_json (which takes UTF-8 bytes) would refuse any non-ASCII title.
+	my $json = JSON::PP->new;
+
 	# Try the full text first (clean LLM response).
-	my $v = eval { JSON::PP::decode_json($text) };
+	my $v = eval { $json->decode($text) };
 
 	# Fall back: LLM added preamble/suffix text around the JSON object.
 	# A bracket-depth counter locates the first complete balanced {..} block.
@@ -190,13 +194,21 @@ sub _parse_visual {
 	# first '{' all the way to the LAST '}' in the string -- if the LLM
 	# produced multiple JSON-like constructs the greedy form spans them all
 	# and returns unparseable input.  The depth counter handles nested objects
-	# and stops exactly at the matching brace.
+	# and stops exactly at the matching brace.  A brace inside a string is text,
+	# so strings are stepped over, with a backslash escaping what follows it.
 	if (!ref $v) {
 		my $start = index($text, '{');
 		if ($start >= 0) {
-			my ($depth, $end) = (0, -1);
+			my ($depth, $end, $in_string, $escaped) = (0, -1, 0, 0);
 			for my $i ($start .. length($text) - 1) {
 				my $ch = substr($text, $i, 1);
+				if ($in_string) {
+					if ($escaped)         { $escaped = 0 }
+					elsif ($ch eq '\\')   { $escaped = 1 }
+					elsif ($ch eq '"')    { $in_string = 0 }
+					next;
+				}
+				if ($ch eq '"') { $in_string = 1; next }
 				$depth++ if $ch eq '{';
 				if ($ch eq '}') {
 					$depth--;
@@ -204,15 +216,13 @@ sub _parse_visual {
 				}
 			}
 			if ($end >= 0) {
-				$v = eval { JSON::PP::decode_json(
-					substr($text, $start, $end - $start + 1)
-				) };
+				$v = eval { $json->decode(substr($text, $start, $end - $start + 1)) };
 			}
 		}
 	}
 
 	return undef unless ref $v eq 'HASH';
-	return undef unless exists $v->{kind} && $SUPPORTED_KINDS{ $v->{kind} };
+	return undef unless defined $v->{kind} && $SUPPORTED_KINDS{ $v->{kind} };
 	return undef if defined $v->{encode} && ref $v->{encode} ne 'HASH';
 	$v->{encode} //= {};
 	return $v;
@@ -238,7 +248,7 @@ sub _build_url {
 
 	if ($kind eq 'table') {
 		if ($spec_key =~ /\Atable:(.+)\z/) {
-			return "/view/$1";
+			return '/view/' . urlencode($1);
 		}
 		(my $path = $spec_key) =~ s/\Apath://;
 		return '/open?path=' . urlencode($path);

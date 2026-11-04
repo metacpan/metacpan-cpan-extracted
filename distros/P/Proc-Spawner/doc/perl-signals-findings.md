@@ -101,7 +101,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - This session's tests: `when.pl` (S1), `stress.pl` (S2), `window2.pl` (S3), `facts.pl` (S4, S5, S6, C1, C3), `checks2.pl` (S5, C1, and `select` on fd 1100, which works), `exec-stress.pl` (S2 in the executor), `chandler.pl` and `rate.pl` (the C handler of S3 (a)), `pidfd.pl` (a pidfd from `pidfd_spawn` becomes readable when the child exits: `select` returned after 0.30 s for `sleep 0.3`, with no signal handler).
 - The chat "Overriding waitpid in Perl" (2026-10-30) and its page "unwaitpid Design" (https://claude.ai/artifact/BsyqPKCyFpYSCH2aiZvFHw): C2, C3, S7, and the `waitid`/`WNOWAIT` technique. Its planned docs (`claude/unwaitpid-investigation.md`, `claude/unwaitpid-upstream-reports.md`) were never written; their Perl findings are here now.
 - The page "Run Graph API" (https://claude.ai/artifact/NGmE3geAjdC6bfTaGn3Kv3), items R4, R11, L4, L5, L6: S5, S6, C1, C2.
-- `claude/pspawn-run-shortcomings.md`, section 3, and `claude/pspawn-design.md`, sections 2 and 9: I1, I2, C1.
+- `claude/pspawn-run-shortcomings.md` (in Proc-Spawner 0.03), section 3, and `claude/pspawn-design.md`, sections 2 and 9: I1, I2, C1.
 
 ## 5. Candidates for reports to Perl (perlbug), none filed yet
 

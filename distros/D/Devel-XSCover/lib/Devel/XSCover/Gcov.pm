@@ -8,8 +8,12 @@ use Cwd ();
 use File::Find ();
 use File::Path ();
 use File::Spec ();
+use IPC::Open3 ();
+use Symbol ();
 
-our $VERSION = '0.02';
+use Devel::XSCover::Flow ();
+
+our $VERSION = '0.06';
 
 sub new {
     my ($class, %args) = @_;
@@ -21,6 +25,7 @@ sub new {
         skip      => [qw(blib cover_db .git)],
         save      => undef,
         conditions => 0,
+        flow      => '',
         dry       => 0,
         silent    => 0,
     }, $class;
@@ -31,16 +36,17 @@ sub new {
 sub find_gcda {
     my ($self) = @_;
     my %skip = map { $_ => 1 } @{ $self->{skip} };
+    my $top  = _slashes($self->{dir});
     my @found;
     File::Find::find({
         no_chdir => 1,
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $self->{dir};
+                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
                 return;
             }
-            push @found, File::Spec->abs2rel($_, $self->{dir}) if /\.gcda\z/;
+            push @found, _slashes(File::Spec->abs2rel($_, $self->{dir})) if /\.gcda\z/;
         },
     }, $self->{dir});
     return sort @found;
@@ -67,6 +73,50 @@ sub run_gcov {
         close $fh;
     }
     return $text;
+}
+
+sub run_flow {
+    my ($self, $gcda) = @_;
+    my $kind = $self->{flow} or return '';
+    (my $stem = $gcda) =~ s/\.gcda\z//;
+    my $name = (File::Spec->splitpath($stem))[2];
+    my @cmd  = $kind eq 'llvm'
+        ? (@{ $self->{gcov} }, '--dump', '-n', '-o', $gcda, $name)
+        : (@{ $self->{gcov} }, '-abct', '--json-format', ($self->{conditions} ? '--conditions' : ()), '-o', $gcda, $name);
+    $self->_say("xs_cover: running @cmd");
+    return '' if $self->{dry};
+    my $here = Cwd::getcwd();
+    chdir $self->{dir} or die "xs_cover: cannot chdir to $self->{dir}: $!\n";
+    my $text = $kind eq 'llvm' ? $self->_capture_stderr(@cmd) : $self->_capture(@cmd);
+    chdir $here;
+    unless (defined $text && length $text) {
+        warn "xs_cover: @cmd produced no flow graph in $self->{dir}, branches come from gcov's blocks alone\n";
+        return '';
+    }
+    if ($self->{save}) {
+        File::Path::make_path($self->{save});
+        (my $flat = $stem) =~ s{[/\\]}{#}g;
+        my $path = File::Spec->catfile($self->{save}, "$flat.flow." . ($kind eq 'llvm' ? 'txt' : 'json'));
+        open my $fh, '>', $path or die "xs_cover: cannot write $path: $!\n";
+        print $fh $text;
+        close $fh;
+    }
+    return $text;
+}
+
+sub attach_decisions {
+    my ($self, $parsed, $text) = @_;
+    return 0 unless defined $text && length $text;
+    my $flow  = Devel::XSCover::Flow->new(dir => $self->{dir}, silent => $self->{silent});
+    my $graph = $self->{flow} eq 'llvm' ? $flow->parse_llvm($text, $parsed) : $flow->parse_gcc($text);
+    my $decisions = $flow->decisions($graph);
+    my $n = 0;
+    for my $file (keys %$decisions) {
+        next unless $parsed->{$file};
+        $parsed->{$file}{decisions} = $decisions->{$file};
+        $n++;
+    }
+    return $n;
 }
 
 sub parse {
@@ -138,19 +188,23 @@ sub parse {
 
 sub filter {
     my ($self, $files) = @_;
-    my $root = Cwd::abs_path($self->{dir}) // File::Spec->rel2abs($self->{dir});
+    my $root = Cwd::abs_path($self->{dir});
+    $root = File::Spec->rel2abs($self->{dir}) unless defined $root;
+    $root = _slashes($root);
     my %generated = map { $_ => 1 } @{ $self->{generated} };
     my @ignore    = map { qr/$_/ } @{ $self->{ignore} };
     my (%kept, %aside);
     for my $name (sort keys %$files) {
         my $rel = $name;
         if (File::Spec->file_name_is_absolute($rel)) {
-            my $abs = Cwd::abs_path($rel) // $rel;
+            my $abs = Cwd::abs_path($rel);
+            $abs = $rel unless defined $abs;
+            $abs = _slashes($abs);
             next unless index($abs, "$root/") == 0;
             $rel = File::Spec->abs2rel($abs, $root);
         }
         $rel =~ s{^\./+}{};
-        $rel = File::Spec->canonpath($rel);
+        $rel = _slashes(File::Spec->canonpath($rel));
         next if (File::Spec->splitpath($rel))[2] eq 'ppport.h';
         if ($generated{$rel}) {
             $aside{$rel} = $files->{$name};
@@ -168,7 +222,9 @@ sub read {
     for my $gcda ($self->find_gcda) {
         my $text = $self->run_gcov($gcda);
         next unless length $text;
-        my ($files, $generated) = $self->filter($self->parse($text));
+        my $parsed = $self->parse($text);
+        $self->attach_decisions($parsed, $self->run_flow($gcda));
+        my ($files, $generated) = $self->filter($parsed);
         push @objects, { object => $gcda, files => $files, generated => $generated };
     }
     $self->_say(sprintf 'xs_cover: read %d object%s', scalar @objects, @objects == 1 ? '' : 's');
@@ -177,15 +233,33 @@ sub read {
 
 sub _capture {
     my ($self, @cmd) = @_;
-    my $pid = open my $fh, '-|';
-    return undef unless defined $pid;
-    if (!$pid) {
-        open STDERR, '>', File::Spec->devnull;
-        exec @cmd or exit 127;
-    }
-    my $out = do { local $/; <$fh> };
+    return $self->_run_capture(0, @cmd);
+}
+
+sub _capture_stderr {
+    my ($self, @cmd) = @_;
+    return $self->_run_capture(1, @cmd);
+}
+
+sub _run_capture {
+    my ($self, $stderr, @cmd) = @_;
+    local *NULL;
+    open NULL, '>', File::Spec->devnull;
+    my ($in, $out, $err) = (undef, Symbol::gensym(), Symbol::gensym());
+    my $pid = eval { IPC::Open3::open3($in, $stderr ? '>&NULL' : $out, $stderr ? $err : '>&NULL', @cmd) };
+    return undef unless $pid;
+    close $in;
+    my $fh   = $stderr ? $err : $out;
+    my $text = do { local $/; <$fh> };
     close $fh;
-    return $out;
+    waitpid $pid, 0;
+    return $text;
+}
+
+sub _slashes {
+    my ($path) = @_;
+    $path =~ s{\\}{/}g if $^O eq 'MSWin32';
+    return $path;
 }
 
 sub _say {
@@ -213,7 +287,8 @@ Finds every counter file the instrumented objects wrote, runs gcov on each from 
 distribution directory, and parses its text into one structure per object that
 knows nothing of Devel::Cover: the executable lines with their counts, the functions
 with their first line and call count, and the blocks that end in a jump with the
-count of each arm.
+count of each arm. Where the tool can also give the flow graph, the decisions of
+each source are read from it too, through L<Devel::XSCover::Flow>.
 
 =head1 METHODS
 
@@ -222,10 +297,11 @@ count of each arm.
     my $reader = Devel::XSCover::Gcov->new(%options);
 
 Options: C<dir>, C<gcov> (the tool as a list of words), C<conditions> (ask gcov for
-condition coverage, gcc 14 and later), C<ignore> (patterns on the relative path),
-C<generated> (the generated C files to keep aside), C<skip>
-(directories not searched, C<blib>, C<cover_db> and C<.git> by default), C<save> (a
-directory to keep each object's gcov text in), C<dry> and C<silent>.
+condition coverage, gcc 14 and later), C<flow> (C<llvm> or C<gcc> to ask the tool
+for the flow graph too, as L<Devel::XSCover::Build> detects it, or empty), C<ignore>
+(patterns on the relative path), C<generated> (the generated C files to keep aside),
+C<skip> (directories not searched, C<blib>, C<cover_db> and C<.git> by default),
+C<save> (a directory to keep each object's gcov text in), C<dry> and C<silent>.
 
 =head2 find_gcda
 
@@ -238,6 +314,25 @@ Every F<.gcda> under the directory, relative to it, sorted.
 Runs the tool from the distribution directory with C<-abct> and the counter file,
 and returns the text. The source paths gcov records are relative to the directory
 the object was compiled in, so it must run there.
+
+=head2 run_flow
+
+    my $graph = $reader->run_flow('src/helper.gcda');
+
+The flow graph of the same object as text: C<llvm-cov gcov --dump> for C<llvm>, which
+prints it on its error stream, and C<gcov --json-format> for C<gcc>. Nothing when
+C<flow> is empty, and a warning and nothing when the tool gives nothing, in which case
+the branches of that object come from gcov's blocks alone. Saved beside the gcov text
+as F<NAME.flow.txt> or F<NAME.flow.json>.
+
+=head2 attach_decisions
+
+    my $files_with = $reader->attach_decisions($parsed, $graph);
+
+Reads the decisions of every source in the graph and puts them under C<decisions> in
+the parsed structure of that file, a list of C<{ line, arms }>. A file with that key
+gets its branches from it, with or without entries, and one without gets them from its
+blocks.
 
 =head2 parse
 
@@ -271,8 +366,9 @@ for the XS map. Absolute paths under the directory become relative.
 
 =head2 read
 
-Runs the three steps for every counter file and returns a list of hashes with
-C<object> (the counter file), C<files> and C<generated>.
+Runs the steps for every counter file, gcov, the flow graph when there is one, the
+parse and the filter, and returns a list of hashes with C<object> (the counter
+file), C<files> and C<generated>.
 
 =head1 SEE ALSO
 

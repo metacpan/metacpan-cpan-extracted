@@ -8,7 +8,7 @@
     min-width: 100%;
   }
   .pivot-table th, .pivot-table td {
-    border: 1px solid #d0d4de;
+    border: 1px solid var(--border, #d0d4de);
     padding: 0.35rem 0.55rem;
     white-space: nowrap;
   }
@@ -32,7 +32,7 @@
   }
   .pivot-table td.row-dim {
     font-weight: 500;
-    background: #f8f9fc;
+    background: var(--row-alt, #f8f9fc);
   }
   .pivot-table td.cell-val {
     text-align: right;
@@ -40,41 +40,41 @@
   }
   .pivot-table td.cell-empty {
     text-align: center;
-    color: #999;
+    color: var(--text-faint, #999);
   }
   .pivot-table tr.totals-row td, .pivot-table tr.totals-row th {
-    background: #e8ecf7;
+    background: var(--hover-bg, #e8ecf7);
     font-weight: 600;
   }
   .pivot-export { margin: 0.75rem 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
   .btn-pexport {
     padding: 0.3rem 0.75rem;
-    border: 1px solid #8899cc;
+    border: 1px solid var(--accent-border, #8899cc);
     border-radius: 4px;
-    background: #f0f3fc;
-    color: #2c3e7a;
+    background: var(--hover-bg, #f0f3fc);
+    color: var(--accent-text, #2c3e7a);
     cursor: pointer;
     font-size: 0.85rem;
     text-decoration: none;
   }
-  .btn-pexport:hover { background: #dde3f0; }
-  .pivot-meta { font-size: 0.82rem; color: #666; }
-  .scheme-min { color: #0055aa; }
-  .scheme-max { color: #cc2200; }
+  .btn-pexport:hover { background: var(--hover-bg, #dde3f0); }
+  .pivot-meta { font-size: 0.82rem; color: var(--muted, #666); }
+  .scheme-min { color: var(--info-fg, #0055aa); }
+  .scheme-max { color: var(--danger-fg, #cc2200); }
   .piv-pagination { display: flex; align-items: center; gap: 0.5rem; margin: 0.75rem 0; flex-wrap: wrap; }
   .piv-page-btn {
     padding: 0.3rem 0.7rem;
-    border: 1px solid #8899cc;
+    border: 1px solid var(--accent-border, #8899cc);
     border-radius: 4px;
-    background: #f0f3fc;
-    color: #2c3e7a;
+    background: var(--hover-bg, #f0f3fc);
+    color: var(--accent-text, #2c3e7a);
     text-decoration: none;
     font-size: 0.85rem;
   }
-  .piv-page-btn:hover { background: #dde3f0; }
-  .piv-page-btn-dis { background: #f8f9fc; color: #aaa; border-color: #ccc; cursor: default; }
-  .piv-page-btn-cur { background: #2c3e7a; color: #fff; border-color: #2c3e7a; cursor: default; }
-  .piv-page-info { font-size: 0.82rem; color: #555; }
+  .piv-page-btn:hover { background: var(--hover-bg, #dde3f0); }
+  .piv-page-btn-dis { background: var(--row-alt, #f8f9fc); color: var(--text-faint, #aaa); border-color: var(--border, #ccc); cursor: default; }
+  .piv-page-btn-cur { background: #2c3e7a; color: #fff; border-color: var(--accent-border, #2c3e7a); cursor: default; }
+  .piv-page-info { font-size: 0.82rem; color: var(--text-secondary, #555); }
 </style>
 
 <nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
@@ -193,7 +193,7 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
 
 [%- SET pnum = page ? page : 0 -%]
 [%- IF pnum > 1 OR has_next -%]
-[%- SET sep = (page_base_url.search('\?') >= 0) ? '&amp;' : '?' -%]
+[%- SET sep = page_base_url.search('\?') ? '&amp;' : '?' -%]
 <nav class="piv-pagination" aria-label="Pivot page navigation">
   [%- IF pnum > 1 -%]
   <a class="piv-page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>

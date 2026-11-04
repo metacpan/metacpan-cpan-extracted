@@ -19,7 +19,16 @@ is_deeply([Devel::XSCover::Gcov->new(dir => "$dir", silent => 1)->find_gcda],
     ['Op.gcda', 'lib/Math/Basic/XS.gcda', 'src/a.gcda', 'src/b.gcda', 't/no.gcda'],
     'the counter files at the top, under src and under lib, not under blib, cover_db or .git');
 
-my $r = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1, dry => 1, gcov => ['llvm-cov', 'gcov']);
+my $blib = File::Spec->catdir($dir, 'blib');
+is_deeply([Devel::XSCover::Gcov->new(dir => $blib, silent => 1)->find_gcda], ['arch/y.gcda'],
+    'a dist directory itself named blib is searched, only a blib inside it is skipped');
+{
+    local $^O = 'MSWin32';
+    is_deeply([Devel::XSCover::Gcov->new(dir => $blib, silent => 1)->find_gcda], ['arch/y.gcda'],
+        'and on Windows too, where File::Find spells the directory with slashes');
+}
+
+my $r =Devel::XSCover::Gcov->new(dir => "$dir", silent => 1, dry => 1, gcov => ['llvm-cov', 'gcov']);
 my $out = '';
 {
     open my $fh, '>', \$out or die;

@@ -1,7 +1,7 @@
 {
    "abstract" : "RSS/Atom feed reader and aggregator",
    "author" : [
-      "Samuel Young <samyoung12788@gmail.com>"
+      "Samuel Young <samyoung@posteo.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -71,6 +71,6 @@
          "web" : "https://codeberg.org/1-1sam/noss"
       }
    },
-   "version" : "2.04",
+   "version" : "2.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

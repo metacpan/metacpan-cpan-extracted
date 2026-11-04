@@ -63,6 +63,6 @@
          "web" : "https://github.com/p5sagit/Web-Simple"
       }
    },
-   "version" : "0.035",
+   "version" : "0.036",
    "x_serialization_backend" : "JSON::MaybeXS version 1.004008"
 }

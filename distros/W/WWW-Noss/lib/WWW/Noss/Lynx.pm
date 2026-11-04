@@ -2,7 +2,7 @@ package WWW::Noss::Lynx;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(lynx_dump);
@@ -74,7 +74,7 @@ Line width to use for formatted text dump. Defaults to C<80>.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

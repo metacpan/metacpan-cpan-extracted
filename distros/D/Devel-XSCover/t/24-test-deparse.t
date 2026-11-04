@@ -39,6 +39,32 @@ my $deparser = bless {}, 'B::Deparse';
     my $out = B::Deparse::AUTOLOAD($deparser, $plain, 0);
     is($out, 'XXX', 'an op that is not custom still goes to the original fallback');
     like($warn[0] // '', qr/unexpected OP_NOSUCHOP/, 'which warns as it did');
+
+    my $typeless = Fake::Op->new(name => 'frob', kids => [Fake::Op->new(name => 'const', type => B::opnumber('const'))]);
+    $B::Deparse::AUTOLOAD = 'B::Deparse::pp_frob';
+    my $sub = sub { 'from the original' };
+    {
+        local $Devel::XSCover::Deparse::ORIGINAL = $sub;
+        is(B::Deparse::AUTOLOAD($deparser, Fake::Thing->new, 0), 'from the original', 'an argument with no type method goes to the original');
+        is(B::Deparse::AUTOLOAD($deparser, 'frob', 0), 'from the original', 'a plain string argument goes to the original');
+        is(B::Deparse::AUTOLOAD($deparser), 'from the original', 'a call with no op goes to the original');
+        $B::Deparse::AUTOLOAD = 'B::Deparse::not_a_pp_method';
+        is(B::Deparse::AUTOLOAD($deparser, $bare, 0), 'from the original', 'a method that is not a pp_ one goes to the original, custom op or not');
+    }
+
+    my $unsiblinged = Fake::Op->new(name => 'const', type => B::opnumber('const'), next => 0);
+    my $short = Fake::Op->new(name => 'frob', flags => B::OPf_KIDS(), kids => [$unsiblinged]);
+    is(Devel::XSCover::Deparse::custom($deparser, $short, 0), 'frob(<const>)', 'a kid list that ends in a non reference ends there');
+
+    my $firstless = Fake::Firstless->new(name => 'frob', flags => B::OPf_KIDS());
+    is(Devel::XSCover::Deparse::custom($deparser, $firstless, 0), 'frob()', 'an op class without a first method has no kids to deparse');
+}
+
+package Fake::Thing { sub new { bless {}, shift } }
+package Fake::Firstless {
+    sub new { my ($class, %f) = @_; bless {%f}, $class }
+    sub name { $_[0]{name} }
+    sub flags { $_[0]{flags} }
 }
 
 ok(B::Deparse->can('pp_const'), 'B::Deparse is loaded and intact');

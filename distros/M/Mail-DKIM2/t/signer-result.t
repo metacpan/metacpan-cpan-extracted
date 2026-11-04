@@ -77,7 +77,7 @@ like($@, qr/Domain required/, '  ... naming the option');
     my $dup = "DKIM2-Signature: i=1; d=x.example; s=a:rsa-sha256:AA;$CRLF" x 2 . $body;
     my $s = signer()->load($dup);
     is($s->result, 'fail', 'a repeated i= is fail');
-    like($s->details, qr/i=1 appears more than once/, '  ... and says which');
+    like($s->details, qr/i=1 is duplicated/, '  ... and says which');
 }
 
 done_testing;

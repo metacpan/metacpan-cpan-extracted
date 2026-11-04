@@ -1,0 +1,3 @@
+#!/bin/sh
+# The fixture pre-commit hook.
+exit 0

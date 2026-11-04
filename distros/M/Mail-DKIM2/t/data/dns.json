@@ -1,4 +1,128 @@
 {
+   "broken.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; f=strict; f=foo"
+         ]
+      ]
+   },
+   "foreign.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=spf1 -all"
+         ],
+         [
+            "txt",
+            "f=strict"
+         ]
+      ]
+   },
+   "mail.broken.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.foreign.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ],
+         [
+            "txt",
+            "v=spf1 -all"
+         ]
+      ]
+   },
+   "mail.multi.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.noflag.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.open.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.strict.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.strictlist.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "mail.test2.dkim2.com" : {
+      "sel1._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
+         ]
+      ]
+   },
+   "multi.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=DKIM1"
+         ],
+         [
+            "txt",
+            "v=DKIM1; f=strict"
+         ]
+      ]
+   },
+   "noflag.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; f=foo"
+         ]
+      ]
+   },
+   "strict.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; f=strict"
+         ]
+      ]
+   },
+   "strictlist.dkim2.com" : {
+      "_domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; f=foo : strict"
+         ]
+      ]
+   },
    "test1.dkim2.com" : {
       "dkim2test._domainkey" : [
          [
@@ -12,10 +136,22 @@
             "v=DKIM1; k=ed25519; p=hwjviTXyzUXSCWayBqE17s/4NSynQKxw58jayHudRAI="
          ]
       ],
+      "ed25519spki._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=ed25519; p=MCowBQYDK2VwAyEAhwjviTXyzUXSCWayBqE17s/4NSynQKxw58jayHudRAI="
+         ]
+      ],
       "rsa1024._domainkey" : [
          [
             "txt",
             "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDIubB7x1q3rNGDWgObuKSOyYVtVKmcJpIvtWdRzg71iGRGqMdEE18GAOk+6j+GAcHTppkh4qR1d9vOl4S1L8ClAvSFUz0azi31fLQcMpZbagyseSq9FnF4nHL/7MAA2brAXkVCQ1rZLKNHMwkXGggkA9kg+LloNfSML+utkhN3gQIDAQAB"
+         ]
+      ],
+      "rsa512._domainkey" : [
+         [
+            "txt",
+            "v=DKIM1; k=rsa; p=MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMWNtG9jaKRAnj4S+mgiG+UzoogHAA/aBipKn/bKH7xEFUrHtAhTumVc2zKGRpPMrombKLGX0ukrDab7AhIw4pUCAwEAAQ=="
          ]
       ],
       "sel1._domainkey" : [
@@ -146,14 +282,5 @@
             "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsU7LuV9aZv8jiNflYQBEpGjGjzKF+PBBFSezLBkRsYQ8IKcmCa0v/BI2hC0h0DGqtOb4dz640F3oZFRyUcX5PsKinm6SChl1qOog4+3oNFs7bhe3NJm7MRgTCSKomEWKXJei303wy/iDKtm+KUL8mSFNlAr3FnVTxXq2LY+rUG786Ha7xvK7NeLN4+R22061QVf+rqWhMgZB0fEGzIAVx2C7P2dCMT1sZoPPXHajXmw36LbOUDp151tfH7LQ9qdPL+08FYjM4xoJdLy3kgHATb0bnebq0Mfxym2x14nI6YoOzqE+fcL4xJXqfVISC1Uyvx0ndNO6jajsBIbr2ihKewIDAQAB"
          ]
       ]
-   },
-   "mail.test2.dkim2.com" : {
-      "sel1._domainkey" : [
-         [
-            "txt",
-            "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAolQDA1kFcPW13OQNJv7zEGhf18S+PU8oGUOSScVYRJELDUxZzv0i1OsyNW5T2hZlmTDFRszoxstj1o8JBn9nYm6zfdvr4w8JS5SrAEx8MzI4N/SghA334hbXtXQZ3br179XVgTMGJL0OMWw2Qp0c9HQAtQNF3ckeMiPncWp8e58in5YCjvHhezl8/VGrBx+CsDKxT8JFs/0QluC6AFQuM9ZIsm3RPwf4BsPE0/ADpuA5GUUdYUzhNt2Uq9Wr82BJLt8cy1a9FVEGKxdMhgJ7Gx4hx8GpM/oaiQYMO9VmNZVz8n87BkNOnjlpYFCtfb9FH8/mYPwqaSa0DmcahfeHVQIDAQAB"
-         ]
-      ]
    }
 }
-

@@ -1,5 +1,9 @@
 Revision history for Web-Simple
 
+0.036 - 2026-11-03
+  [Security]
+  - Properly escape interpolated strings (CVE-2026-114627)
+
 0.035 - 2026-10-23
   [Security]
   - A urlencoded body is read in chunks (CVE-2026-114629)

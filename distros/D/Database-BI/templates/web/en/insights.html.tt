@@ -1,24 +1,14 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 
 <style>
-  .insights-meta { font-size: 0.82rem; color: #666; margin-bottom: 1rem; }
+  .insights-meta { font-size: 0.82rem; color: var(--muted, #666); margin-bottom: 1rem; }
   .insights-list { list-style: none; margin: 0; padding: 0; }
   .insight-card {
-    border: 1px solid #d0d4de;
+    border: 1px solid var(--border, #d0d4de);
     border-radius: 6px;
     padding: 0.75rem 1rem;
     margin-bottom: 0.65rem;
-    background: #fff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .insight-card {
-      background: #1e2128;
-      border-color: #3a3f50;
-    }
-  }
-  :root[data-theme="dark"] .insight-card {
-    background: #1e2128;
-    border-color: #3a3f50;
+    background: var(--card-bg, #fff);
   }
   .insight-kind {
     display: inline-block;
@@ -31,31 +21,17 @@
     margin-right: 0.4rem;
     vertical-align: middle;
   }
-  .kind-outlier    { background: #fde8e8; color: #b92020; }
-  .kind-top_mover  { background: #e8f4fd; color: #1a6fa0; }
-  .kind-period_delta { background: #e8fde8; color: #1a7a30; }
-  .kind-seasonality  { background: #fdf5e8; color: #8a5a00; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .kind-outlier    { background: #4a1010; color: #f4a0a0; }
-    :root:not([data-theme="light"]) .kind-top_mover  { background: #0e2a40; color: #7ecbf0; }
-    :root:not([data-theme="light"]) .kind-period_delta { background: #0e3318; color: #7ad898; }
-    :root:not([data-theme="light"]) .kind-seasonality  { background: #3a2800; color: #f0c060; }
-  }
-  :root[data-theme="dark"] .kind-outlier    { background: #4a1010; color: #f4a0a0; }
-  :root[data-theme="dark"] .kind-top_mover  { background: #0e2a40; color: #7ecbf0; }
-  :root[data-theme="dark"] .kind-period_delta { background: #0e3318; color: #7ad898; }
-  :root[data-theme="dark"] .kind-seasonality  { background: #3a2800; color: #f0c060; }
+  .kind-outlier    { background: var(--danger-bg, #fde8e8); color: var(--danger-fg, #b92020); }
+  .kind-top_mover  { background: var(--info-bg, #e8f4fd); color: var(--info-fg, #1a6fa0); }
+  .kind-period_delta { background: var(--success-bg, #e8fde8); color: var(--success-fg, #1a7a30); }
+  .kind-seasonality  { background: var(--warning-bg, #fdf5e8); color: var(--warning-fg, #8a5a00); }
   .insight-headline { font-weight: 600; font-size: 0.95rem; vertical-align: middle; }
-  .insight-detail   { font-size: 0.82rem; color: #555; margin-top: 0.25rem; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .insight-detail { color: #aab; }
-  }
-  :root[data-theme="dark"] .insight-detail { color: #aab; }
+  .insight-detail   { font-size: 0.82rem; color: var(--text-secondary, #555); margin-top: 0.25rem; }
   .insight-view-link {
     display: inline-block;
     margin-top: 0.35rem;
     font-size: 0.8rem;
-    color: #0066aa;
+    color: var(--info-fg, #0066aa);
     text-decoration: none;
   }
   .insight-view-link:hover { text-decoration: underline; }
@@ -64,26 +40,20 @@
     margin-top: 0.35rem;
     margin-left: 0.8rem;
     font-size: 0.8rem;
-    color: #555;
+    color: var(--text-secondary, #555);
     text-decoration: none;
   }
-  .insight-drill-link:hover { text-decoration: underline; color: #222; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .insight-drill-link { color: #aab; }
-    :root:not([data-theme="light"]) .insight-drill-link:hover { color: #eee; }
-  }
-  :root[data-theme="dark"] .insight-drill-link { color: #aab; }
-  :root[data-theme="dark"] .insight-drill-link:hover { color: #eee; }
+  .insight-drill-link:hover { text-decoration: underline; color: var(--body-color, #222); }
   .insight-method {
     display: inline-block;
     font-size: 0.72rem;
-    color: #999;
+    color: var(--text-faint, #999);
     margin-left: 0.6rem;
     vertical-align: middle;
     cursor: help;
   }
   .insights-empty {
-    color: #666;
+    color: var(--muted, #666);
     font-style: italic;
     margin-top: 1.5rem;
   }
@@ -96,43 +66,25 @@
   }
   .btn-summarize {
     padding: 0.4rem 0.85rem;
-    border: 1px solid #bbb;
+    border: 1px solid var(--border-strong, #bbb);
     border-radius: 4px;
-    background: #f5f5f5;
+    background: var(--row-alt, #f5f5f5);
     cursor: pointer;
     font-size: 0.88rem;
   }
-  .btn-summarize:hover { background: #e8e8e8; }
+  .btn-summarize:hover { background: var(--hover-bg, #e8e8e8); }
   .btn-summarize:disabled { opacity: 0.55; cursor: not-allowed; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .btn-summarize { background: #2a2f3a; border-color: #55607a; color: #ccd; }
-    :root:not([data-theme="light"]) .btn-summarize:hover { background: #353c4a; }
-  }
-  :root[data-theme="dark"] .btn-summarize { background: #2a2f3a; border-color: #55607a; color: #ccd; }
-  :root[data-theme="dark"] .btn-summarize:hover { background: #353c4a; }
-  .summary-ai-label { font-size: 0.82rem; color: #666; cursor: pointer; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .summary-ai-label { color: #aab; }
-  }
-  :root[data-theme="dark"] .summary-ai-label { color: #aab; }
+  .summary-ai-label { font-size: 0.82rem; color: var(--muted, #666); cursor: pointer; }
   #summary-box {
     display: none;
     margin-top: 1rem;
     padding: 0.85rem 1rem;
-    border: 1px solid #c8d0e0;
+    border: 1px solid var(--border, #c8d0e0);
     border-radius: 6px;
-    background: #f0f4fc;
+    background: var(--hover-bg, #f0f4fc);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) #summary-box { background: #1a2035; border-color: #334; }
-  }
-  :root[data-theme="dark"] #summary-box { background: #1a2035; border-color: #334; }
   .summary-text { margin: 0 0 0.4rem; font-size: 0.93rem; line-height: 1.5; }
-  .summary-source { font-size: 0.72rem; color: #888; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .summary-source { color: #778; }
-  }
-  :root[data-theme="dark"] .summary-source { color: #778; }
+  .summary-source { font-size: 0.72rem; color: var(--muted, #888); }
 </style>
 
 <nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>

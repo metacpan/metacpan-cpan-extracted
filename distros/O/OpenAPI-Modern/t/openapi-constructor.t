@@ -110,6 +110,113 @@ subtest 'constructor arguments' => sub {
   );
 };
 
+subtest 'construction with explicit document list' => sub {
+  die_result(
+    sub { OpenAPI::Modern->new(documents => $_) },
+    qr/^"documents" must be a non-empty array/,
+    '"documents" is invalid: '.$::dumper->encode($_),
+  ) foreach undef, 'not an array', {}, [];
+
+  die_result(
+    sub { OpenAPI::Modern->new(documents => [ $_ ]) },
+    qr/^the first document must be a JSON::Schema::Modern::Document::OpenAPI object/,
+    'first document must be a blessed OpenAPI document',
+  ) foreach undef, 'string', false, true, {}, [], JSON::Schema::Modern::Document->new(schema => {});
+
+  die_result(
+    sub {
+      OpenAPI::Modern->new(documents => [
+        JSON::Schema::Modern::Document::OpenAPI->new(schema => decode_yaml(OPENAPI_PREAMBLE."\npaths: {}\n")),
+        $_,
+      ])
+    },
+    qr/all "documents" must be JSON::Schema::Modern::Document::OpenAPI or JSON::Schema::Modern::Document objects/,
+    'all "documents" values must be valid documents',
+  ) foreach undef, 'string', false, true, {}, [];
+
+
+  my $evaluator = JSON::Schema::Modern->new;
+
+  my $doc1 = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => $evaluator,
+    schema => my $schema1 = decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+$self: http://example.com/main_api
+components:
+  responses:
+    response0:
+      $ref: 'http://example.com/external_doc#/components/responses/foo'
+  schemas:
+    schema0:
+      $ref: 'http://example.com/schemas#/$defs/my_schema0'
+YAML
+
+  my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
+    evaluator => $evaluator,
+    schema => my $schema2 = decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+$self: http://example.com/secondary_api
+components:
+  responses:
+    response1:
+      $ref: 'http://example.com/external_doc#/components/responses/bar'
+  schemas:
+    schema1:
+      $ref: 'http://example.com/schemas#/$defs/my_schema1'
+YAML
+
+  cmp_result(
+    [ $doc1->_deferred_references, $doc2->_deferred_references ],
+    [
+      [
+        [ '$ref', '/components/responses/response0', str('http://example.com/external_doc#/components/responses/foo'), 'response' ],
+        [ '$ref', '/components/schemas/schema0', str('http://example.com/schemas#/$defs/my_schema0'), 'schema' ],
+      ],
+      [
+        [ '$ref', '/components/responses/response1', str('http://example.com/external_doc#/components/responses/bar'), 'response' ],
+        [ '$ref', '/components/schemas/schema1', str('http://example.com/schemas#/$defs/my_schema1'), 'schema' ],
+      ],
+    ],
+    'references to external docs that cannot be verified are identified for each document',
+  );
+
+  my $openapi = OpenAPI::Modern->new(documents => [ $doc1, $doc2,
+    my $doc3 = JSON::Schema::Modern::Document::OpenAPI->new(
+      evaluator => $evaluator,
+      schema => my $schema3 = decode_yaml(OPENAPI_PREAMBLE.<<'YAML')),
+$self: http://example.com/external_doc
+components:
+  responses:
+    foo: {}
+    bar: {}
+YAML
+    my $doc4 = JSON::Schema::Modern::Document->new(
+      evaluator => $evaluator,
+      schema => my $schema4 = decode_yaml(<<'YAML')),
+$id: http://example.com/schemas
+$defs:
+  my_schema0: {}
+  my_schema1: {}
+YAML
+  ]);
+
+  is_equal(
+    [ map $_->_deferred_references, $doc1, $doc2, $doc3, $doc4 ],
+    [ ([])x4 ],
+    'deferred references are now removed, as they resolve to the third doc now added',
+  );
+
+  $openapi = OpenAPI::Modern->new(documents => my $documents = [
+    (map +JSON::Schema::Modern::Document::OpenAPI->new(evaluator => $evaluator, schema => $_),
+      $schema1, $schema2, $schema3),
+    JSON::Schema::Modern::Document->new(evaluator => $evaluator, schema => $schema4),
+  ]);
+
+  is_equal(
+    [ map $_->_deferred_references, $documents->@* ],
+    [ ([])x4 ],
+    'deferred references are resolved automatically when all documents are added at once',
+  );
+};
+
 subtest 'custom dialects' => sub {
   my $js = JSON::Schema::Modern->new;
   my $my_custom_dialect_doc = $js->add_schema({

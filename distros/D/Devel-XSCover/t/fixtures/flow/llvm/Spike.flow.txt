@@ -1,0 +1,784 @@
+===== boot_Spike (0) @ Spike.c:444
+Block : 0 Counter : 3
+	Source Edges : 1 (3), 
+	Destination Edges : 2 (3), 
+Block : 1 Counter : 0
+	Source Edges : 2 (3), 
+	Destination Edges : *0 (3), 
+Block : 2 Counter : 3
+	Source Edges : 0 (3), 
+	Destination Edges : *1 (3), 
+	File: 0: 444,449,454,468,469,470,471,472,473,474,475,476,477,478,479,480,481,489,491,
+===== XS_Spike_add (1) @ Spike.c:178
+Block : 0 Counter : 2
+	Source Edges : 1 (2), 
+	Destination Edges : *2 (2), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (2), 
+	Destination Edges : *0 (2), 
+Block : 2 Counter : 2
+	Source Edges : 0 (2), 
+	Destination Edges : *4 (2), *3 (0), 
+	File: 0: 178,180,181,182,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 183,
+Block : 4 Counter : 2
+	Source Edges : 2 (2), 
+	Destination Edges : *5 (2), *6 (0), 
+	File: 0: 185,187,190,
+Block : 5 Counter : 2
+	Source Edges : 4 (2), 
+	Destination Edges : 7 (2), 
+	File: 0: 190,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 190,
+Block : 7 Counter : 2
+	Source Edges : 5 (2), 6 (0), 
+	Destination Edges : *8 (2), 
+	File: 0: 190,
+	File: 1: 27,
+	File: 0: 195,
+Block : 8 Counter : 2
+	Source Edges : 7 (2), 
+	Destination Edges : *9 (0), *10 (2), 
+	File: 0: 195,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 195,
+Block : 10 Counter : 2
+	Source Edges : 8 (2), 
+	Destination Edges : 11 (2), 
+	File: 0: 195,
+Block : 11 Counter : 2
+	Source Edges : 9 (0), 10 (2), 
+	Destination Edges : *12 (2), 
+	File: 0: 195,
+Block : 12 Counter : 2
+	Source Edges : 11 (2), 
+	Destination Edges : *13 (2), 
+	File: 0: 196,198,
+Block : 13 Counter : 2
+	Source Edges : 12 (2), 
+	Destination Edges : *14 (2), 
+	File: 0: 198,
+Block : 14 Counter : 2
+	Source Edges : 13 (2), 
+	Destination Edges : *1 (2), 
+	File: 0: 199,
+===== XS_Spike_both (2) @ Spike.c:203
+Block : 0 Counter : 3
+	Source Edges : 1 (3), 
+	Destination Edges : *2 (3), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 18 (3), 
+	Destination Edges : *0 (3), 
+Block : 2 Counter : 3
+	Source Edges : 0 (3), 
+	Destination Edges : *4 (3), *3 (0), 
+	File: 0: 203,205,206,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 207,
+Block : 4 Counter : 3
+	Source Edges : 2 (3), 
+	Destination Edges : *5 (3), *6 (0), 
+	File: 0: 209,211,214,
+Block : 5 Counter : 3
+	Source Edges : 4 (3), 
+	Destination Edges : 7 (3), 
+	File: 0: 214,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 214,
+Block : 7 Counter : 3
+	Source Edges : 5 (3), 6 (0), 
+	Destination Edges : 8 (2), *10 (1), 
+	File: 0: 214,
+	File: 1: 36,
+Block : 8 Counter : 2
+	Source Edges : 7 (2), 
+	Destination Edges : *10 (1), *9 (1), 
+	File: 1: 36,
+Block : 9 Counter : 1
+	Source Edges : 8 (1), 
+	Destination Edges : 11 (1), 
+	File: 1: 37,
+Block : 10 Counter : 2
+	Source Edges : 7 (1), 8 (1), 
+	Destination Edges : *11 (2), 
+	File: 1: 39,
+Block : 11 Counter : 3
+	Source Edges : 9 (1), 10 (2), 
+	Destination Edges : *12 (3), 
+	File: 0: 221,
+Block : 12 Counter : 3
+	Source Edges : 11 (3), 
+	Destination Edges : *13 (0), *14 (3), 
+	File: 0: 221,
+Block : 13 Counter : 0
+	Source Edges : 12 (0), 
+	Destination Edges : *15 (0), 
+	File: 0: 221,
+Block : 14 Counter : 3
+	Source Edges : 12 (3), 
+	Destination Edges : 15 (3), 
+	File: 0: 221,
+Block : 15 Counter : 3
+	Source Edges : 13 (0), 14 (3), 
+	Destination Edges : *16 (3), 
+	File: 0: 221,
+Block : 16 Counter : 3
+	Source Edges : 15 (3), 
+	Destination Edges : *17 (3), 
+	File: 0: 222,224,
+Block : 17 Counter : 3
+	Source Edges : 16 (3), 
+	Destination Edges : *18 (3), 
+	File: 0: 224,
+Block : 18 Counter : 3
+	Source Edges : 17 (3), 
+	Destination Edges : *1 (3), 
+	File: 0: 225,
+===== XS_Spike_kind (3) @ Spike.c:229
+Block : 0 Counter : 4
+	Source Edges : 1 (4), 
+	Destination Edges : *2 (4), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 15 (4), 
+	Destination Edges : *0 (4), 
+Block : 2 Counter : 4
+	Source Edges : 0 (4), 
+	Destination Edges : *4 (4), *3 (0), 
+	File: 0: 229,231,232,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 233,
+Block : 4 Counter : 4
+	Source Edges : 2 (4), 
+	Destination Edges : *5 (4), *6 (0), 
+	File: 0: 235,238,
+Block : 5 Counter : 4
+	Source Edges : 4 (4), 
+	Destination Edges : *7 (4), 
+	File: 0: 238,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 238,
+Block : 7 Counter : 4
+	Source Edges : 5 (4), 6 (0), 
+	Destination Edges : *12 (1), *8 (1), *9 (1), *10 (0), *11 (1), 
+	File: 0: 238,
+	File: 1: 47,
+Block : 8 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : 13 (1), 
+	File: 1: 49,50,
+Block : 9 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : 13 (1), 
+	File: 1: 52,53,
+Block : 10 Counter : 0
+	Source Edges : 7 (0), 
+	Destination Edges : 13 (0), 
+	File: 1: 55,56,
+Block : 11 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : 13 (1), 
+	File: 1: 58,59,
+Block : 12 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : 13 (1), 
+	File: 1: 61,62,
+Block : 13 Counter : 4
+	Source Edges : 8 (1), 9 (1), 10 (0), 11 (1), 12 (1), 
+	Destination Edges : *14 (4), 
+	File: 0: 258,259,261,
+Block : 14 Counter : 4
+	Source Edges : 13 (4), 
+	Destination Edges : *15 (4), 
+	File: 0: 261,
+Block : 15 Counter : 4
+	Source Edges : 14 (4), 
+	Destination Edges : *1 (4), 
+	File: 0: 262,
+===== XS_Spike_twice_big (4) @ Spike.c:266
+Block : 0 Counter : 2
+	Source Edges : 1 (2), 
+	Destination Edges : *2 (2), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (2), 
+	Destination Edges : *0 (2), 
+Block : 2 Counter : 2
+	Source Edges : 0 (2), 
+	Destination Edges : *4 (2), *3 (0), 
+	File: 0: 266,268,269,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 270,
+Block : 4 Counter : 2
+	Source Edges : 2 (2), 
+	Destination Edges : *5 (2), *6 (0), 
+	File: 0: 272,275,
+Block : 5 Counter : 2
+	Source Edges : 4 (2), 
+	Destination Edges : 7 (2), 
+	File: 0: 275,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 275,
+Block : 7 Counter : 2
+	Source Edges : 5 (2), 6 (0), 
+	Destination Edges : *8 (2), 
+	File: 0: 275,
+	File: 1: 71,
+	File: 0: 279,
+Block : 8 Counter : 2
+	Source Edges : 7 (2), 
+	Destination Edges : *9 (0), *10 (2), 
+	File: 0: 279,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 279,
+Block : 10 Counter : 2
+	Source Edges : 8 (2), 
+	Destination Edges : 11 (2), 
+	File: 0: 279,
+Block : 11 Counter : 2
+	Source Edges : 9 (0), 10 (2), 
+	Destination Edges : *12 (2), 
+	File: 0: 279,
+Block : 12 Counter : 2
+	Source Edges : 11 (2), 
+	Destination Edges : *13 (2), 
+	File: 0: 280,282,
+Block : 13 Counter : 2
+	Source Edges : 12 (2), 
+	Destination Edges : *14 (2), 
+	File: 0: 282,
+Block : 14 Counter : 2
+	Source Edges : 13 (2), 
+	Destination Edges : *1 (2), 
+	File: 0: 283,
+===== XS_Spike_inline_sq (5) @ Spike.c:287
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : *2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (1), *3 (0), 
+	File: 0: 287,289,290,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 291,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *5 (1), *6 (0), 
+	File: 0: 293,296,
+Block : 5 Counter : 1
+	Source Edges : 4 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 296,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 296,
+Block : 7 Counter : 1
+	Source Edges : 5 (1), 6 (0), 
+	Destination Edges : *8 (1), 
+	File: 0: 296,
+	File: 1: 79,
+	File: 0: 300,
+Block : 8 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : *9 (0), *10 (1), 
+	File: 0: 300,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 300,
+Block : 10 Counter : 1
+	Source Edges : 8 (1), 
+	Destination Edges : 11 (1), 
+	File: 0: 300,
+Block : 11 Counter : 1
+	Source Edges : 9 (0), 10 (1), 
+	Destination Edges : *12 (1), 
+	File: 0: 300,
+Block : 12 Counter : 1
+	Source Edges : 11 (1), 
+	Destination Edges : *13 (1), 
+	File: 0: 301,303,
+Block : 13 Counter : 1
+	Source Edges : 12 (1), 
+	Destination Edges : *14 (1), 
+	File: 0: 303,
+Block : 14 Counter : 1
+	Source Edges : 13 (1), 
+	Destination Edges : *1 (1), 
+	File: 0: 304,
+===== XS_Spike_helper_kind (6) @ Spike.c:308
+Block : 0 Counter : 3
+	Source Edges : 1 (3), 
+	Destination Edges : *2 (3), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (3), 
+	Destination Edges : *0 (3), 
+Block : 2 Counter : 3
+	Source Edges : 0 (3), 
+	Destination Edges : *4 (3), *3 (0), 
+	File: 0: 308,310,311,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 312,
+Block : 4 Counter : 3
+	Source Edges : 2 (3), 
+	Destination Edges : *5 (3), *6 (0), 
+	File: 0: 314,317,
+Block : 5 Counter : 3
+	Source Edges : 4 (3), 
+	Destination Edges : 7 (3), 
+	File: 0: 317,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 317,
+Block : 7 Counter : 3
+	Source Edges : 5 (3), 6 (0), 
+	Destination Edges : *8 (3), 
+	File: 0: 317,
+	File: 1: 87,
+	File: 0: 321,
+Block : 8 Counter : 3
+	Source Edges : 7 (3), 
+	Destination Edges : *9 (0), *10 (3), 
+	File: 0: 321,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 321,
+Block : 10 Counter : 3
+	Source Edges : 8 (3), 
+	Destination Edges : 11 (3), 
+	File: 0: 321,
+Block : 11 Counter : 3
+	Source Edges : 9 (0), 10 (3), 
+	Destination Edges : *12 (3), 
+	File: 0: 321,
+Block : 12 Counter : 3
+	Source Edges : 11 (3), 
+	Destination Edges : *13 (3), 
+	File: 0: 322,324,
+Block : 13 Counter : 3
+	Source Edges : 12 (3), 
+	Destination Edges : *14 (3), 
+	File: 0: 324,
+Block : 14 Counter : 3
+	Source Edges : 13 (3), 
+	Destination Edges : *1 (3), 
+	File: 0: 325,
+===== XS_Spike_guard (7) @ Spike.c:329
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : *2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 8 (0), 16 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (1), *3 (0), 
+	File: 0: 329,331,332,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 333,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *5 (1), *6 (0), 
+	File: 0: 335,338,
+Block : 5 Counter : 1
+	Source Edges : 4 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 338,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 338,
+Block : 7 Counter : 1
+	Source Edges : 5 (1), 6 (0), 
+	Destination Edges : *9 (1), *8 (0), 
+	File: 0: 338,
+	File: 1: 95,
+Block : 8 Counter : 0
+	Source Edges : 7 (0), 
+	Destination Edges : 1 (0), 
+	File: 1: 96,
+Block : 9 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : *10 (1), 
+	File: 1: 97,
+	File: 0: 344,
+Block : 10 Counter : 1
+	Source Edges : 9 (1), 
+	Destination Edges : *11 (0), *12 (1), 
+	File: 0: 344,
+Block : 11 Counter : 0
+	Source Edges : 10 (0), 
+	Destination Edges : *13 (0), 
+	File: 0: 344,
+Block : 12 Counter : 1
+	Source Edges : 10 (1), 
+	Destination Edges : 13 (1), 
+	File: 0: 344,
+Block : 13 Counter : 1
+	Source Edges : 11 (0), 12 (1), 
+	Destination Edges : *14 (1), 
+	File: 0: 344,
+Block : 14 Counter : 1
+	Source Edges : 13 (1), 
+	Destination Edges : *15 (1), 
+	File: 0: 345,347,
+Block : 15 Counter : 1
+	Source Edges : 14 (1), 
+	Destination Edges : *16 (1), 
+	File: 0: 347,
+Block : 16 Counter : 1
+	Source Edges : 15 (1), 
+	Destination Edges : *1 (1), 
+	File: 0: 348,
+===== XS_Spike__More_triple (8) @ Spike.c:355
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : *2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (1), *3 (0), 
+	File: 0: 355,357,358,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 359,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *5 (1), *6 (0), 
+	File: 0: 361,364,
+Block : 5 Counter : 1
+	Source Edges : 4 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 364,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 364,
+Block : 7 Counter : 1
+	Source Edges : 5 (1), 6 (0), 
+	Destination Edges : *8 (1), 
+	File: 0: 364,
+	File: 2: 7,
+	File: 0: 368,
+Block : 8 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : *9 (0), *10 (1), 
+	File: 0: 368,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 368,
+Block : 10 Counter : 1
+	Source Edges : 8 (1), 
+	Destination Edges : 11 (1), 
+	File: 0: 368,
+Block : 11 Counter : 1
+	Source Edges : 9 (0), 10 (1), 
+	Destination Edges : *12 (1), 
+	File: 0: 368,
+Block : 12 Counter : 1
+	Source Edges : 11 (1), 
+	Destination Edges : *13 (1), 
+	File: 0: 369,371,
+Block : 13 Counter : 1
+	Source Edges : 12 (1), 
+	Destination Edges : *14 (1), 
+	File: 0: 371,
+Block : 14 Counter : 1
+	Source Edges : 13 (1), 
+	Destination Edges : *1 (1), 
+	File: 0: 372,
+===== XS_Spike__More_child_only (9) @ Spike.c:376
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : *2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (1), *3 (0), 
+	File: 0: 376,378,379,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 380,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *5 (1), *6 (0), 
+	File: 0: 382,385,
+Block : 5 Counter : 1
+	Source Edges : 4 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 385,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 385,
+Block : 7 Counter : 1
+	Source Edges : 5 (1), 6 (0), 
+	Destination Edges : *8 (1), 
+	File: 0: 385,
+	File: 2: 15,
+	File: 0: 389,
+Block : 8 Counter : 1
+	Source Edges : 7 (1), 
+	Destination Edges : *9 (0), *10 (1), 
+	File: 0: 389,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 389,
+Block : 10 Counter : 1
+	Source Edges : 8 (1), 
+	Destination Edges : 11 (1), 
+	File: 0: 389,
+Block : 11 Counter : 1
+	Source Edges : 9 (0), 10 (1), 
+	Destination Edges : *12 (1), 
+	File: 0: 389,
+Block : 12 Counter : 1
+	Source Edges : 11 (1), 
+	Destination Edges : *13 (1), 
+	File: 0: 390,392,
+Block : 13 Counter : 1
+	Source Edges : 12 (1), 
+	Destination Edges : *14 (1), 
+	File: 0: 392,
+Block : 14 Counter : 1
+	Source Edges : 13 (1), 
+	Destination Edges : *1 (1), 
+	File: 0: 393,
+===== XS_Spike__More_exit_only (10) @ Spike.c:397
+Block : 0 Counter : 0
+	Source Edges : 1 (0), 
+	Destination Edges : *2 (0), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (0), 
+	Destination Edges : *0 (0), 
+Block : 2 Counter : 0
+	Source Edges : 0 (0), 
+	Destination Edges : *4 (0), *3 (0), 
+	File: 0: 397,399,400,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 401,
+Block : 4 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : *5 (0), *6 (0), 
+	File: 0: 403,406,
+Block : 5 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 406,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 406,
+Block : 7 Counter : 0
+	Source Edges : 5 (0), 6 (0), 
+	Destination Edges : *8 (0), 
+	File: 0: 406,
+	File: 2: 23,
+	File: 0: 410,
+Block : 8 Counter : 0
+	Source Edges : 7 (0), 
+	Destination Edges : *9 (0), *10 (0), 
+	File: 0: 410,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 410,
+Block : 10 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : 11 (0), 
+	File: 0: 410,
+Block : 11 Counter : 0
+	Source Edges : 9 (0), 10 (0), 
+	Destination Edges : *12 (0), 
+	File: 0: 410,
+Block : 12 Counter : 0
+	Source Edges : 11 (0), 
+	Destination Edges : *13 (0), 
+	File: 0: 411,413,
+Block : 13 Counter : 0
+	Source Edges : 12 (0), 
+	Destination Edges : *14 (0), 
+	File: 0: 413,
+Block : 14 Counter : 0
+	Source Edges : 13 (0), 
+	Destination Edges : *1 (0), 
+	File: 0: 414,
+===== XS_Spike__More_never (11) @ Spike.c:418
+Block : 0 Counter : 0
+	Source Edges : 1 (0), 
+	Destination Edges : *2 (0), 
+Block : 1 Counter : 0
+	Source Edges : 3 (0), 14 (0), 
+	Destination Edges : *0 (0), 
+Block : 2 Counter : 0
+	Source Edges : 0 (0), 
+	Destination Edges : *4 (0), *3 (0), 
+	File: 0: 418,420,421,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 1 (0), 
+	File: 0: 422,
+Block : 4 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : *5 (0), *6 (0), 
+	File: 0: 424,427,
+Block : 5 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 427,
+Block : 6 Counter : 0
+	Source Edges : 4 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 427,
+Block : 7 Counter : 0
+	Source Edges : 5 (0), 6 (0), 
+	Destination Edges : *8 (0), 
+	File: 0: 427,
+	File: 2: 31,
+	File: 0: 431,
+Block : 8 Counter : 0
+	Source Edges : 7 (0), 
+	Destination Edges : *9 (0), *10 (0), 
+	File: 0: 431,
+Block : 9 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : *11 (0), 
+	File: 0: 431,
+Block : 10 Counter : 0
+	Source Edges : 8 (0), 
+	Destination Edges : 11 (0), 
+	File: 0: 431,
+Block : 11 Counter : 0
+	Source Edges : 9 (0), 10 (0), 
+	Destination Edges : *12 (0), 
+	File: 0: 431,
+Block : 12 Counter : 0
+	Source Edges : 11 (0), 
+	Destination Edges : *13 (0), 
+	File: 0: 432,434,
+Block : 13 Counter : 0
+	Source Edges : 12 (0), 
+	Destination Edges : *14 (0), 
+	File: 0: 434,
+Block : 14 Counter : 0
+	Source Edges : 13 (0), 
+	Destination Edges : *1 (0), 
+	File: 0: 435,
+===== Perl_POPMARK (12) @ /opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/inline.h:375
+Block : 0 Counter : 18
+	Source Edges : 1 (18), 
+	Destination Edges : 2 (18), 
+Block : 1 Counter : 0
+	Source Edges : 2 (18), 
+	Destination Edges : *0 (18), 
+Block : 2 Counter : 18
+	Source Edges : 0 (18), 
+	Destination Edges : *1 (18), 
+	File: 3: 375,382,
+===== Perl_SvIV (13) @ /opt/homebrew/opt/perl/lib/perl5/5.42/darwin-thread-multi-2level/CORE/sv_inline.h:818
+Block : 0 Counter : 23
+	Source Edges : 1 (23), 
+	Destination Edges : *2 (23), 
+Block : 1 Counter : 0
+	Source Edges : 5 (23), 
+	Destination Edges : *0 (23), 
+Block : 2 Counter : 23
+	Source Edges : 0 (23), 
+	Destination Edges : 3 (23), *4 (0), 
+	File: 4: 818,821,
+Block : 3 Counter : 23
+	Source Edges : 2 (23), 
+	Destination Edges : *5 (23), 
+	File: 4: 822,
+Block : 4 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 5 (0), 
+	File: 4: 823,
+Block : 5 Counter : 23
+	Source Edges : 3 (23), 4 (0), 
+	Destination Edges : *1 (23), 
+	File: 4: 824,
+===== only_from_one (14) @ Spike.xs:8
+Block : 0 Counter : 2
+	Source Edges : 1 (2), 
+	Destination Edges : *2 (2), 
+Block : 1 Counter : 0
+	Source Edges : 5 (2), 
+	Destination Edges : *0 (2), 
+Block : 2 Counter : 2
+	Source Edges : 0 (2), 
+	Destination Edges : 3 (1), *4 (1), 
+	File: 1: 8,10,
+Block : 3 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *5 (1), 
+	File: 1: 11,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : 5 (1), 
+	File: 1: 12,
+Block : 5 Counter : 2
+	Source Edges : 3 (1), 4 (1), 
+	Destination Edges : *1 (2), 
+	File: 1: 13,
+===== spike_square (15) @ include/spike.h:4
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : 2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 4 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (0), *3 (1), 
+	File: 5: 4,6,
+Block : 3 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : 4 (1), 
+	File: 5: 7,
+Block : 4 Counter : 1
+	Source Edges : 2 (0), 3 (1), 
+	Destination Edges : *1 (1), 
+	File: 5: 8,

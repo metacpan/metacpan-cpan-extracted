@@ -29,6 +29,7 @@ share/versions/0.03/clarid-codebook.yaml
 share/versions/0.04/clarid-codebook-schema.json
 share/versions/0.04/clarid-codebook.yaml
 t/bulk.t
+t/bulk_optional_fields.t
 t/code.t
 t/data/bad_codebook.yaml
 t/data/biosample_conds.csv

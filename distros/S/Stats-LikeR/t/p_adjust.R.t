@@ -106,6 +106,19 @@ my %SETS = (
 	nan_all  => [ $NaN, $NaN ],
 );
 
+# Out-of-domain p-values, kept out of %SETS because the [raw, 1] property loop
+# below does not hold for them.  R's cummax() has no floor (Holm gives -3 for
+# c(-1, 0.5, 2); p_adjust() seeded it with 0 up to 0.3413) and R's hommel has
+# no pmin(1, .), so it returns 2 and 3 where the others clamp.  Frozen by
+# t/p_adjust.R.R under R 4.6.1 (2026-11-03); R's own material has no such case,
+# so these come from the generator alone.
+my %OOD = (
+	ood_neg   => [ -1, 0.5, 2 ],
+	ood_neg2  => [ -0.5, -0.2, 0.3, 0.4 ],
+	ood_big   => [ 1.5, 2, 3, 0.5 ],
+	ood_mixed => [ -2, 0, 1, 3, 0.2, 5 ],
+);
+
 my ($rows, $values, $worst, $worst_at) = (0, 0, 0, '');
 my %seen_method;
 
@@ -118,7 +131,7 @@ while (my $line = <DATA>) {
 	# label is <set>.<method>, and a method name may itself contain no dot.
 	my ($set, $method) = $label =~ /\A(.+)\.([^.]+)\z/
 		or do { fail("unparseable label '$label'"); next };
-	my $in = $SETS{$set} or do { fail("no input set '$set'"); next };
+	my $in = $SETS{$set} || $OOD{$set} or do { fail("no input set '$set'"); next };
 	$seen_method{$method} = 1;
 	$rows++;
 
@@ -390,3 +403,35 @@ nan_all.BH	NaN,NaN
 nan_all.BY	NaN,NaN
 nan_all.fdr	NaN,NaN
 nan_all.none	NaN,NaN
+ood_neg.holm	-3,1,1
+ood_neg.hochberg	-3,1,1
+ood_neg.hommel	-1,1,2
+ood_neg.bonferroni	-3,1,1
+ood_neg.BH	-3,0.75,1
+ood_neg.BY	-5.5,1,1
+ood_neg.fdr	-3,0.75,1
+ood_neg.none	-1,0.5,2
+ood_neg2.holm	-2,-0.60000000000000009,0.59999999999999998,0.59999999999999998
+ood_neg2.hochberg	-2,-0.60000000000000009,0.40000000000000002,0.40000000000000002
+ood_neg2.hommel	-0.5,-0.20000000000000001,0.40000000000000002,0.40000000000000002
+ood_neg2.bonferroni	-2,-0.80000000000000004,1,1
+ood_neg2.BH	-2,-0.40000000000000002,0.39999999999999997,0.40000000000000002
+ood_neg2.BY	-4.166666666666667,-0.83333333333333348,0.83333333333333337,0.83333333333333348
+ood_neg2.fdr	-2,-0.40000000000000002,0.39999999999999997,0.40000000000000002
+ood_neg2.none	-0.5,-0.20000000000000001,0.29999999999999999,0.40000000000000002
+ood_big.holm	1,1,1,1
+ood_big.hochberg	1,1,1,1
+ood_big.hommel	3,3,3,2
+ood_big.bonferroni	1,1,1,1
+ood_big.BH	1,1,1,1
+ood_big.BY	1,1,1,1
+ood_big.fdr	1,1,1,1
+ood_big.none	1.5,2,3,0.5
+ood_mixed.holm	-12,0,1,1,0.80000000000000004,1
+ood_mixed.hochberg	-12,0,1,1,0.80000000000000004,1
+ood_mixed.hommel	-2,0,3,5,0.80000000000000004,5
+ood_mixed.bonferroni	-12,0,1,1,1,1
+ood_mixed.BH	-12,0,1,1,0.40000000000000002,1
+ood_mixed.BY	-29.400000000000002,0,1,1,0.98000000000000009,1
+ood_mixed.fdr	-12,0,1,1,0.40000000000000002,1
+ood_mixed.none	-2,0,1,3,0.20000000000000001,5

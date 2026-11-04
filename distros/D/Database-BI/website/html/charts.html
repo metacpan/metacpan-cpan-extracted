@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Charts &mdash; Database::BI</title>
+<meta name="description" content="The nine D3 chart pages, maps and word clouds in Database::BI, with their parameters and exports.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="charts.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="Charts &mdash; Database::BI">
+<meta property="og:description" content="The nine D3 chart pages, maps and word clouds in Database::BI, with their parameters and exports.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="charts.html" aria-current="page">Charts</a>
+			<a href="canvas.html">Canvases</a>
+			<a href="data.html">Data</a>
+			<a href="api.html">API</a>
+			<a href="install.html">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">Nine D3 chart types, a map and a cloud</p>
+	<h1>Charts</h1>
+	<p class="lead">
+		Each chart is a page of its own, addressed by URL, drawing from the same
+		pipeline as the table it came from. A chart page takes the view it was
+		opened from &mdash; the source, joins, filters, calculated fields and time
+		range &mdash; so the chart and the table behind it always agree.
+	</p>
+</div>
+
+<h2>The chart pages</h2>
+<div class="table-wrap">
+<table>
+	<caption>Every page takes the pipeline parameters described under <a href="#common">Common parameters</a>.</caption>
+	<thead>
+		<tr><th>Route</th><th>Draws</th><th>Its own parameters</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>/graph</code><br><code>/line</code></td>
+			<td>
+				Zoomable line chart with brush-to-zoom, reference lines for the
+				minimum, average and maximum, and a multi-series legend.
+			</td>
+			<td><code>x</code>, <code>y</code>, <code>series</code>, <code>span</code>, <code>agg</code></td>
+		</tr>
+		<tr>
+			<td><code>/bar</code></td>
+			<td>Bar chart, horizontal or vertical, sorted by value or label, with a top-N tail merged into one bar.</td>
+			<td><code>cat</code>, <code>val</code>, <code>orient=h</code>, <code>sort</code>, <code>max</code></td>
+		</tr>
+		<tr>
+			<td><code>/pie</code></td>
+			<td>A pie or donut; clicking a slice or legend entry opens the rows behind it.</td>
+			<td><code>cat</code>, <code>val</code>, <code>donut=1</code></td>
+		</tr>
+		<tr>
+			<td><code>/scatter</code></td>
+			<td>Scatter plot, with bubbles sized by a numeric column and coloured by a category.</td>
+			<td><code>x</code>, <code>y</code>, <code>series</code>, <code>size</code>, <code>scheme</code></td>
+		</tr>
+		<tr>
+			<td><code>/heatmap</code></td>
+			<td>Grid with two categorical axes; each cell is a sum or a row count, in a named colour scheme.</td>
+			<td><code>x</code>, <code>y</code>, <code>val</code>, <code>scheme</code>, <code>show_val=1</code></td>
+		</tr>
+		<tr>
+			<td><code>/stacked</code></td>
+			<td>Stacked bars: one bar per category, split by a series column.</td>
+			<td><code>cat</code>, <code>series</code>, <code>val</code>, <code>scheme</code></td>
+		</tr>
+		<tr>
+			<td><code>/combo</code></td>
+			<td>Bars and a line on one pair of axes, each with its own measure column.</td>
+			<td><code>cat</code>, <code>bar_val</code>, <code>line_val</code></td>
+		</tr>
+		<tr>
+			<td><code>/treemap</code></td>
+			<td>Tiles sized by a measure, grouped by a label column, with a top-N tail merged.</td>
+			<td><code>group</code>, <code>size</code>, <code>topn</code>, <code>scheme</code></td>
+		</tr>
+		<tr>
+			<td><code>/histogram</code></td>
+			<td>Histogram with server-side binning, so the counts are the data's counts rather than a client's sample.</td>
+			<td><code>col</code>, <code>bins</code> (1&ndash;200, default 10)</td>
+		</tr>
+		<tr>
+			<td><code>/wordcloud</code></td>
+			<td>Word cloud of a text column. Each row contributes its words once, so a word's size is the number of rows using it, not the times one row repeats it.</td>
+			<td><code>col</code>, <code>topn</code>, <code>minlen</code>, <code>stop</code></td>
+		</tr>
+		<tr>
+			<td><code>/map</code></td>
+			<td>OpenStreetMap map with clustered markers, an optional heat layer, bubbles and colour rules.</td>
+			<td>see <a href="#maps">Maps</a></td>
+		</tr>
+		<tr>
+			<td><code>/pivot</code></td>
+			<td>Crosstab of rows against columns with one or more measures, subtotals and a grand total.</td>
+			<td>see <a href="data.html#pivot">Pivot</a></td>
+		</tr>
+		<tr>
+			<td><code>/stats</code></td>
+			<td>One row per column: count, nulls, distinct values, first, last and, for numeric columns, min, max, range, mean, median, a chosen percentile and the sample standard deviation.</td>
+			<td><code>l</code>, <code>f</code>, <code>p</code></td>
+		</tr>
+		<tr>
+			<td><code>/insights</code></td>
+			<td>Automatic observations: outliers by the Tukey fences, period-over-period deltas, top movers and seasonality. No model and no network call.</td>
+			<td><code>l</code>, <code>f</code></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2 id="common">Common parameters</h2>
+<p>
+	Every data page and chart takes the same selection of the pipeline:
+</p>
+<dl class="spec">
+	<dt><code>l=&lt;spec&gt;</code></dt>
+	<dd>
+		The left source: <code>table:name</code> from the data directory,
+		<code>path:/absolute/file.csv</code>, a remote path
+		<code>/../host/dir/file.csv</code>, <code>url:</code>,
+		<code>redis:tablename|redis://host:port</code>, or
+		<code>mariadb:server/table</code>.
+	</dd>
+	<dt><code>j=&lt;spec&gt;|&lt;leftkey&gt;|&lt;rightkey&gt;</code></dt>
+	<dd>A left join, repeatable and chainable.</dd>
+	<dt><code>c=name:expression</code></dt>
+	<dd>A calculated field, added as a virtual column before any aggregation.</dd>
+	<dt><code>f=&lt;col&gt;:&lt;op&gt;:&lt;value&gt;</code></dt>
+	<dd>A filter, repeatable, applied after joins and before the chart aggregates.</dd>
+	<dt><code>span=1h&amp;tcol=at</code></dt>
+	<dd>Bucket the dimension into time buckets before drawing.</dd>
+	<dt><code>range=last_30_days&amp;rcol=date</code></dt>
+	<dd>
+		A window resolved when the request arrives, so a link keeps its meaning
+		tomorrow. See <a href="data.html#ranges">relative time ranges</a>.
+	</dd>
+	<dt><code>cs=</code>, <code>by=</code>, <code>order=</code></dt>
+	<dd>
+		A cross-row plan: a running total, rank, z-score and so on, written beside
+		each row. See <a href="data.html#cross-row">cross-row columns</a>.
+	</dd>
+	<dt><code>back=</code>, <code>back2=</code></dt>
+	<dd>
+		Where the breadcrumb goes. Only a same-site path or an
+		<code>http(s)://</code> URL is followed.
+	</dd>
+</dl>
+
+<h2 id="maps">Maps</h2>
+<p>
+	<code>GET /map</code> plots the filtered view with
+	<code>HTML::OSM</code> and Leaflet. A row's position comes from a place column
+	that is geocoded locally (<code>loc=</code>, one lookup per distinct value,
+	remembered in the model store and shared by every dataset that names it) or
+	from coordinate columns (<code>lat=</code> and <code>lon=</code>). Rows
+	sharing a position become one marker.
+</p>
+<dl class="spec">
+	<dt><code>popup=&lt;col&gt;</code></dt>
+	<dd>A column shown in the marker popup; repeatable.</dd>
+	<dt><code>max=N</code>, <code>zoom=N</code></dt>
+	<dd>How many markers to draw (default 2,000) and the initial zoom; by default the map fits its markers.</dd>
+	<dt><code>tiles=name</code></dt>
+	<dd>A named tile source from the <code>tile_sources</code> configuration key, for a tile server on your own network.</dd>
+	<dt><code>heat=1</code>, <code>weight=&lt;col&gt;</code></dt>
+	<dd>A heat layer over the markers, optionally weighted by a numeric column.</dd>
+	<dt><code>size=&lt;col&gt;</code></dt>
+	<dd>Markers become circles with a radius from a numeric column.</dd>
+	<dt><code>color=&lt;col&gt;</code> with <code>color_rule=op:value:colour</code></dt>
+	<dd>
+		Colour markers by thresholds, tried in order, first match wins; the
+		operators are <code>gt</code>, <code>ge</code>, <code>lt</code>,
+		<code>le</code>, <code>eq</code> and <code>ne</code>. Unmatched values
+		take <code>color_default=</code>, shown in the legend as "Other".
+	</dd>
+	<dt><code>series=&lt;col&gt;</code> with <code>scheme=</code></dt>
+	<dd>Colour by category from a named palette instead of by rules.</dd>
+</dl>
+<p>
+	Markers are clustered, always, so a dense map draws a count at low zoom and
+	splits it as it is zoomed in. The Nominatim search box is switched off on
+	every map page, so nothing typed on a map is sent anywhere. An unknown
+	<code>tiles=</code>, an unknown <code>scheme=</code>, an unknown column,
+	<code>color=</code> together with <code>series=</code>, or a transposed
+	latitude and longitude pair is a 400 rather than a silently different map.
+</p>
+
+<h2>Resizing and exporting</h2>
+<p>
+	Every chart can be resized by dragging its bottom-right grip, or from the
+	keyboard: the grip takes focus, the arrow keys resize the chart, Shift takes
+	bigger steps, Home and End go to the narrowest and widest it can be, and the
+	size is announced as it changes.
+</p>
+<p>
+	Each chart page carries Copy link and Export SVG, Export PNG and Export PDF.
+	The PDF is a one-page document the size of the chart, holding a
+	high-resolution picture, so it needs no PDF library on the server. Saved
+	files carry "Database::BI" at the bottom right, and use the light colours even
+	when the reader has chosen the <a href="index.html#preferences">dark theme</a>.
+</p>
+
+<div class="note">
+	<p>
+		A chart is drawn in the browser, so what an export contains can only be
+		seen in a browser. That is also why a chart on a canvas can be filtered
+		again: it is a live snippet rather than a picture.
+	</p>
+</div>
+
+<h2>Time buckets</h2>
+<p>
+	The aggregating routes bucket the dimension they already take, so a daily
+	series is a request rather than a calculated field:
+</p>
+<pre><code>GET /bar?l=table:sales&amp;cat=at&amp;val=amount&amp;span=1h
+GET /graph?l=table:sales&amp;x=at&amp;y=amount&amp;span=1h&amp;agg=sum&amp;series=region
+GET /pivot?l=table:sales&amp;rows=at&amp;m=amount:sum:total&amp;span=1mon</code></pre>
+<p>
+	<code>span=</code> takes a count and
+	<code>s</code>, <code>m</code>, <code>h</code>, <code>d</code>,
+	<code>w</code>, <code>mon</code>, <code>q</code> or <code>y</code>. Labels
+	are ISO at the bucket's own resolution, so they sort chronologically as
+	strings. A value that cannot be read as a time lands in one visible
+	"(unparseable)" bucket rather than disappearing.
+</p>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

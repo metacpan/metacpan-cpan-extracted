@@ -2,7 +2,8 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.445';
+
+our $VERSION = '2.447';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +47,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.445
+Version 2.447
 
 =head1 SYNOPSIS
 
@@ -848,16 +849,22 @@ In the C<%%> menu are also available parentheses.
 
 =item
 
-Column Aliases (C<SELECT>)
+Rearrange columns (C<SELECT>)
 
-Selecting C<alias> allows the user to add, change or remove aliases for the selected columns. It is also possible to
-change the table alias and rearrange the selected columns.
+Selecting C<rac> allows the user to rearrange the selected columns.
 
 =item
 
-distinct (C<SELECT>)
+Column Aliases (C<SELECT>)
 
-Add C<DISTINCT> to a select statement.
+Selecting C<alias> allows the user to add, change or remove aliases for the selected columns. It is also possible to
+change the table alias.
+
+=item
+
+Select Distinct (C<SELECT>)
+
+C<distinct> adds C<DISTINCT> to the select statement.
 
 =back
 

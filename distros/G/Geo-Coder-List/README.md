@@ -4,7 +4,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 ## Version
 
-Version 0.39
+Version 0.40
 
 ## Synopsis
 

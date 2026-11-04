@@ -11,7 +11,7 @@ use Mail::DKIM2::Verifier;
 use DKIM2TestKeys;
 
 # A transient DNS failure (timeout / SERVFAIL / network unreachable) MUST be
-# reported as TEMPERROR (retryable), per draft-ietf-dkim-dkim2-spec-08 §13 —
+# reported as TEMPERROR (retryable), per draft-ietf-dkim-dkim2-spec-09 §13 —
 # NOT as a permanent "does not exist". Only an answer that
 # positively says the name has no TXT record (NXDOMAIN, NOERROR, NODATA) is
 # permanent and returns undef (no key). Anything else -- including an error

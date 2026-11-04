@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+# bi-extract -- build the extracts of accelerated datasets (Database::BI, Phase 7.5)
+#
+# An accelerated dataset is read from a SQLite copy of itself, an extract, for
+# as long as the extract still matches the file it was built from.  This script
+# marks a dataset accelerated and builds its extract, rebuilds every accelerated
+# dataset's extract, or stops accelerating one.  It prints what it did.
+#
+# An extract is a cache under <model_dir>/extracts/.  Deleting that directory
+# loses nothing: the application reads each file again until this is rerun.
+# Nothing is ever written under data_dir.
+#
+# Usage:
+#   bi-extract --spec <l-spec> [--spec <l-spec> ...]
+#   bi-extract --all
+#   bi-extract --remove --spec <l-spec>
+#   bi-extract --list
+#   options: [--data-dir <dir>] [--model-dir <dir>]
+#
+# Exit codes:  0 = ok
+#              1 = an extract could not be built (the others still are)
+#              2 = bad arguments
+#
+# Suitable for cron, after the data files are refreshed:
+#   15 2 * * * cd /opt/myapp && ./script/bi-extract --all
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Getopt::Long qw(GetOptions :config no_ignore_case);
+use POSIX qw(strftime);
+
+my (@opt_spec, $opt_all, $opt_remove, $opt_list, $opt_data_dir, $opt_model_dir, $opt_help);
+
+GetOptions(
+	'spec|s=s'      => \@opt_spec,
+	'all|a'         => \$opt_all,
+	'remove|r'      => \$opt_remove,
+	'list|l'        => \$opt_list,
+	'data-dir|d=s'  => \$opt_data_dir,
+	'model-dir|m=s' => \$opt_model_dir,
+	'help|h'        => \$opt_help,
+) or do { _usage(); exit 2 };
+
+if ($opt_help) { _usage(); exit 0 }
+
+my $modes = grep { $_ } (scalar(@opt_spec) && !$opt_remove), $opt_all, $opt_remove, $opt_list;
+if ($modes != 1 || ($opt_remove && !@opt_spec) || ($opt_all && @opt_spec)) {
+	print STDERR "bi-extract: give --spec, --all, --remove --spec or --list\n";
+	_usage();
+	exit 2;
+}
+if (@ARGV) {
+	print STDERR "bi-extract: unexpected argument '$ARGV[0]'\n";
+	exit 2;
+}
+
+# The application itself, so a dataset is read exactly as the pages read it.
+require Mojo::Server;
+my $app = Mojo::Server->new->build_app('Database::BI');
+$app->log->level('fatal');
+$app->config->{data_dir}  = $opt_data_dir  if defined $opt_data_dir;
+$app->config->{model_dir} = $opt_model_dir if defined $opt_model_dir;
+
+require Database::BI::Controller::Dashboard;
+# A controller holds its transaction weakly, so this file keeps it.
+require Mojo::Transaction::HTTP;
+my $tx = Mojo::Transaction::HTTP->new;
+my $c  = Database::BI::Controller::Dashboard->new(app => $app, tx => $tx);
+
+if ($opt_list) {
+	my @specs = Database::BI::Controller::Dashboard::accelerated_specs($c);
+	print "No dataset is accelerated.\n" unless @specs;
+	print "$_\n" for @specs;
+	exit 0;
+}
+
+if ($opt_remove) {
+	for my $spec (@opt_spec) {
+		my $was = Database::BI::Controller::Dashboard::unaccelerate($c, $spec);
+		print $was ? "$spec: no longer accelerated; its extract is removed\n"
+		           : "$spec: was not accelerated\n";
+	}
+	exit 0;
+}
+
+my @specs = $opt_all ? Database::BI::Controller::Dashboard::accelerated_specs($c) : @opt_spec;
+unless (@specs) {
+	print "No dataset is accelerated; name one with --spec.\n";
+	exit 0;
+}
+
+my $failed = 0;
+for my $spec (@specs) {
+	my $built = eval { Database::BI::Controller::Dashboard::accelerate($c, $spec) };
+	if ($built) {
+		printf "%s: %d row%s, %d column%s -> %s (built %s)\n",
+			$spec, $built->{rows}, ($built->{rows} == 1 ? '' : 's'),
+			$built->{columns}, ($built->{columns} == 1 ? '' : 's'),
+			$built->{path}, strftime('%Y-%m-%d %H:%M', localtime $built->{built});
+	} else {
+		(my $e = $@ // 'unknown error') =~ s/(?:\s+at \S.*? line \d+\.?)+\s*\z//;
+		print STDERR "bi-extract: $e\n";
+		$failed = 1;
+	}
+}
+exit $failed;
+
+sub _usage {
+	print STDERR <<'USAGE';
+Usage: bi-extract --spec <spec> [--spec <spec> ...] | --all | --remove --spec <spec> | --list
+
+  --spec,   -s <spec>   Accelerate a dataset and build its extract: table:<name>
+                        in data_dir, or path:</abs/file>.  Repeatable.
+  --all,    -a          Rebuild the extract of every accelerated dataset
+  --remove, -r          With --spec: stop accelerating it, and remove its extract
+  --list,   -l          Print the accelerated datasets
+
+Options:
+  --data-dir,  -d <dir>   Data directory (default: the application's, usually data)
+  --model-dir, -m <dir>   Model store directory (default: the application's, usually .bi)
+  --help,      -h         Show this message
+
+Exit codes:
+  0 = success
+  1 = an extract could not be built
+  2 = bad arguments
+USAGE
+}

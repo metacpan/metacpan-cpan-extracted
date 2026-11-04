@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Recipe literals that are not UTF-8 travel as {"u": ["<base64>", ...]}
-# steps (draft -08 section 5); UTF-8 literals, ASCII included, stay
+# steps (draft -09 section 5); UTF-8 literals, ASCII included, stay
 # {"d": [...]}.
 #
 # A Recipe literal is the raw octets of a header value or body line, and
@@ -160,8 +160,8 @@ sub with_recipe {
 }
 
 # --- reject: bad steps make the instance fail, never throw out of the Verifier ---
-# -08 §14.2, contract D6: one bad step is "Recipe <path> is invalid".
-sub invalid { my ($path) = @_; qr/\APERMERROR: Message-Instance m=2 Recipe \Q$path\E is invalid\z/ }
+# -09 §14.2, contract D6: one bad step is "Recipe <path> is invalid".
+sub invalid { my ($path) = @_; qr/\APERMERROR: Message-Instance m=2 recipe \Q$path\E is invalid\z/ }
 my @bad = (
     [ { b => [ { u => ['not base64!'] } ] },              'characters outside the alphabet' ],
     [ { b => [ { u => ['QUJD='] } ] },                    'wrong padding' ],
@@ -175,7 +175,7 @@ my @bad = (
     [ { h => { comments => [ { u => [ encode_base64("x\ry", '') ] } ] } },
       'bare CR in a header literal' ],
     [ { b => [ { b => [ encode_base64("\xe9", '') ] } ] }, 'the old "b" step' ],
-    # -08 sections 5.1/5.2: "d" text MUST NOT contain CR or LF either
+    # -09 sections 5.1/5.2: "d" text MUST NOT contain CR or LF either
     [ { b => [ { d => [ "a\r\nb" ] } ] },                 'CRLF in a "d" body line' ],
     [ { b => [ { d => [ "a\nb" ] } ] },                   'bare LF in a "d" body line' ],
     [ { h => { comments => [ { d => [ "x\ry" ] } ] } },   'bare CR in a "d" header value' ],

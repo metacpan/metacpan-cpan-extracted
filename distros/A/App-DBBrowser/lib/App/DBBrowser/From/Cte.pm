@@ -27,7 +27,7 @@ sub new {
 sub cte_as_main_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    $sf->{d}{stmt_types} = [ 'Select' ];
+    $sf->{d}{stmt_types} = [ 'Cte_Only' ];
     my $sql = {};
     $ax->reset_sql( $sql );
     $ax->print_sql_info( $ax->get_sql_info( $sql ) ); ##

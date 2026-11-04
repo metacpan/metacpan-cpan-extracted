@@ -68,7 +68,14 @@ SETS <- list(
 	nan_tied = c(0.05, NaN, 0.05, 0.05),
 	nan_two  = c(0.02, NaN, 0.03),
 	nan_one  = c(NaN, 0.7),
-	nan_all  = c(NaN, NaN)
+	nan_all  = c(NaN, NaN),
+	# Out of [0, 1], where R's cummax() has no floor and hommel has no
+	# pmin(1, .): added 0.3414 after p_adjust() seeded Holm's running maximum
+	# with 0 (c(-1, 0.5, 2) gave 0 1 1, R gives -3 1 1) and clamped hommel.
+	ood_neg   = c(-1, 0.5, 2),
+	ood_neg2  = c(-0.5, -0.2, 0.3, 0.4),
+	ood_big   = c(1.5, 2, 3, 0.5),
+	ood_mixed = c(-2, 0, 1, 3, 0.2, 5)
 )
 
 cat(sprintf("# p.adjust.Rd example vector: %s\n",

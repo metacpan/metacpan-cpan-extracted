@@ -79,28 +79,28 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     is_pass(add_sig($n2, %HOP2), 'U2: the UTF-8 body line undoes byte-exactly');
 }
 
-# --- U3, U4, U5, K2: malformed Recipes (-08 §14.2, contract D6) ----------------
+# --- U3, U4, U5, K2: malformed Recipes (-09 §14.2, contract D6) ----------------
 # A bad step is "Recipe <path> is invalid"; a fault of the document as a
 # whole is "contains invalid JSON".
 {
     my $JSON = 'contains invalid JSON';
     my %bad = (
-        'U3 u not canonical (pad bits)' => ['{"b":[{"u":["QR=="]}]}', 'Recipe b[0] is invalid'],
-        'U4 the old b step'             => ['{"b":[{"b":["eA=="]}]}', 'Recipe b[0] is invalid'],
-        'U4 two keys in a step'         => ['{"b":[{"c":[1,1],"d":["x"]}]}', 'Recipe b[0] is invalid'],
-        'U4 an empty step'              => ['{"b":[{}]}', 'Recipe b[0] is invalid'],
-        'U5 u decodes to a CR'          => ['{"b":[{"u":["YQ1i"]}]}', 'Recipe b[0] is invalid'],
+        'U3 u not canonical (pad bits)' => ['{"b":[{"u":["QR=="]}]}', 'recipe b[0] is invalid'],
+        'U4 the old b step'             => ['{"b":[{"b":["eA=="]}]}', 'recipe b[0] is invalid'],
+        'U4 two keys in a step'         => ['{"b":[{"c":[1,1],"d":["x"]}]}', 'recipe b[0] is invalid'],
+        'U4 an empty step'              => ['{"b":[{}]}', 'recipe b[0] is invalid'],
+        'U5 u decodes to a CR'          => ['{"b":[{"u":["YQ1i"]}]}', 'recipe b[0] is invalid'],
         'U5 h with no properties'       => ['{"h":{}}', $JSON],
         'U5 neither h nor b'            => ['{"x":1}', $JSON],
         'K2 header name twice (case)'   => ['{"h":{"Subject":[],"subject":[]}}', $JSON],
         'K2 step key twice (case)'      => ['{"b":[{"c":[1,1],"C":[1,1]}]}', $JSON],
-        'c is not two integers'         => ['{"b":[{"c":["1",1]}]}', 'Recipe b[0] is invalid'],
-        'c starts at 0'                 => ['{"b":[{"c":[0,1]}]}', 'Recipe b[0] is invalid'],
-        'u not padded'                  => ['{"b":[{"u":["eA"]}]}', 'Recipe b[0] is invalid'],
+        'c is not two integers'         => ['{"b":[{"c":["1",1]}]}', 'recipe b[0] is invalid'],
+        'c starts at 0'                 => ['{"b":[{"c":[0,1]}]}', 'recipe b[0] is invalid'],
+        'u not padded'                  => ['{"b":[{"u":["eA"]}]}', 'recipe b[0] is invalid'],
         'd is not UTF-8'                => [qq({"b":[{"d":["caf\xE9"]}]}), $JSON],
-        'a header Recipe is not array'  => ['{"h":{"subject":{"c":[1,1]}}}', 'Recipe h.subject is invalid'],
+        'a header Recipe is not array'  => ['{"h":{"subject":{"c":[1,1]}}}', 'recipe h.subject is invalid'],
         'a step in the second header'   => ['{"h":{"subject":[{"c":[1,1]}],"to":[{"c":[1]}]}}',
-                                            'Recipe h.to[0] is invalid'],
+                                            'recipe h.to[0] is invalid'],
     );
     for my $name (sort keys %bad) {
         my ($json, $want) = @{ $bad{$name} };
@@ -109,7 +109,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     }
 }
 
-# --- K1: keys are lowercase (-08 §5, contract D10) -------------------------------
+# --- K1: keys are lowercase (-09 §5, contract D10) -------------------------------
 {
     my $t = add_sig(mi_with_recipe($HOP1_TEXT, '{"h":{"subject":[{"c":[1,1]}]}}'), %HOP2);
     is_pass($t, 'K1: {"h":{"subject":[{"c":[1,1]}]}} verifies');
@@ -121,7 +121,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     }
 }
 
-# --- No r= at m=2: no change (-08 sections 9 and 12.1) ---------------------------
+# --- No r= at m=2: no change (-09 sections 9 and 12.1) ---------------------------
 {
     (my $no_r = mi_with_recipe($HOP1_TEXT, '{}')) =~ s/; r=[^;]*;/;/;
     unlike($no_r, qr/^Message-Instance: m=2;[^\r\n]*r=/m, 'no-change MI: no r= tag');
@@ -189,7 +189,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
 
     my $c2 = add_sig($HOP1_TEXT, d => 'other.net', mf => '<>', rt => ['<a@example.com>']);
     is_error($c2, 'fail', 'FAIL: DKIM2-Signature i=2 d= does not match the rt= of i=1', 'C2');
-    # -08 section 13.2: the top signature and top instance are fine, so it
+    # -09 section 13.2: the top signature and top instance are fine, so it
     # is Provisionally Verified all the same.
     my $pv = verify($c2);
     ok($pv->provisionally_verified, 'C2: still Provisionally Verified');
@@ -220,12 +220,12 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     my ($r5, $d5) = verdict(add_sig($lit, d => 'example.org', mf => '<y@[192.0.2.1]>',
                                     rt => ['<c@dest.example>']));
     is($r5, 'fail', 'C5: a domain literal never matches');
-    like($d5, qr/\AFAIL: DKIM2-Signature i=2 (?:mf= does not match the rt= of i=1|MAIL FROM and d= do not match)\z/,
+    like($d5, qr/\AFAIL: DKIM2-Signature i=2 (?:mf= does not match the rt= of i=1|mf= and d= do not match)\z/,
         'C5: details') or diag($d5);
 
     my $c6 = add_sig(add_mi(message()), d => 'example.com', mf => '<a@example.net>',
                      rt => ['<list@lists.example.org>']);
-    is_error($c6, 'fail', 'FAIL: DKIM2-Signature i=1 MAIL FROM and d= do not match', 'C6');
+    is_error($c6, 'fail', 'FAIL: DKIM2-Signature i=1 mf= and d= do not match', 'C6');
 }
 
 # --- A1..A4: From must be Authentic -----------------------------------------------
@@ -242,14 +242,19 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
         'A1: commas inside a quoted name and a comment');
     # The last: display text with no angle brackets is not one mailbox
     # (final review T3); all five implementations agree.
-    for my $from ('a@example.com, b@example.com', 'a@[192.0.2.1]', 'group: a@example.com;',
-                  '"A" <a@example.com>, <b@example.com>', 'A a@example.com') {
+    # -09 section 14.8 names two of the reasons (contract E3.1).
+    for my $c (['a@example.com, b@example.com', 'From has more than one address'],
+               ['a@[192.0.2.1]', 'From uses a domain literal'],
+               ['group: a@example.com;', 'matching From is not authentic'],
+               ['"A" <a@example.com>, <b@example.com>', 'From has more than one address'],
+               ['A a@example.com', 'matching From is not authentic']) {
+        my ($from, $why) = @$c;
         is_error(add_sig(add_mi(message(from => $from)), %HOP1), 'fail',
-            'FAIL: DKIM2-Signature i=1 matching From is not authentic', "A1: From: $from");
+            "FAIL: DKIM2-Signature i=1 $why", "A1: From: $from");
     }
     my $two = message(extra => "From: a\@example.com\r\n");
     is_error(add_sig(add_mi($two), %HOP1), 'fail',
-        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A1: two From fields');
+        'FAIL: DKIM2-Signature i=1 From has more than one address', 'A1: two From fields');
     my $none = "To: b\@example.net\r\nSubject: no from\r\n\r\nbody\r\n";
     is_error(add_sig(add_mi($none), %HOP1), 'fail',
         'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A1: no From field');
@@ -310,7 +315,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
 
 # --- D1: no DSN for a null top mf= ----------------------------------------------------
 {
-    # The DSN's d= is a recipient domain of the reported hop (-08 section 16.2).
+    # The DSN's d= is a recipient domain of the reported hop (-09 section 16.2).
     my %dsn = (Signer => Mail::DKIM2::Signer->new(Domain => 'example.org', Selector => 'sel1',
                    Key => Spec07Fixture::key(), MailFrom => '<>'),
                ReportingMTA => 'lists.example.org', PubkeyCallback => Spec07Fixture::pubkey_cb());
@@ -422,7 +427,7 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
         'fail', 'FAIL: DKIM2-Signature i=1 signature expired',
         'C9: expired and a top nd= (14.3 before 14.4)');
     is_error($corrupt->(add_sig(add_mi(message()), %HOP1, mf => '<a@example.net>'), 1),
-        'fail', 'FAIL: DKIM2-Signature i=1 MAIL FROM and d= do not match',
+        'fail', 'FAIL: DKIM2-Signature i=1 mf= and d= do not match',
         'C9: custody and a bad signature (14.4 before 14.6)');
 
     # The Message-Instances before the signatures: a header or body hash that

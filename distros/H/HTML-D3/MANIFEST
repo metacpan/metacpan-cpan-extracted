@@ -62,6 +62,7 @@ t/snippet_scatter.t
 t/snippet_stacked_bar.t
 t/snippet_table.t
 t/snippet_treemap.t
+t/tooltip-escaping.t
 t/tooltip.t
 t/unit.t
 t/zoomable.t

@@ -12,3 +12,11 @@
 ~$
 \.swp$
 \.bak$
+
+# Avoid Devel::Cover databases
+\bcover_db\b
+
+# Avoid gcov output and counters
+\.gcov$
+\.gcda$
+\.gcno$

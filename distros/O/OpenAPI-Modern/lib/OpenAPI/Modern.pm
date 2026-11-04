@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.150-7-g92ffb1dc
+package OpenAPI::Modern; # git description: v0.151-8-g59a8302e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 
 use 5.020;
 use utf8;
@@ -100,8 +100,16 @@ around BUILDARGS => sub ($orig, $class, @args) {
 
   $args->{documents} = [ delete $args->{openapi_document} ] if exists $args->{openapi_document};
 
+  croak '"documents" must be a non-empty array'
+    if exists $args->{documents} and (ref $args->{documents} ne 'ARRAY' or not $args->{documents}->@*);
+
   croak 'the first document must be a JSON::Schema::Modern::Document::OpenAPI object'
-    if exists $args->{documents} and not $args->{documents}[0]->isa('JSON::Schema::Modern::Document::OpenAPI');
+    if exists $args->{documents} and (not blessed $args->{documents}[0] or not $args->{documents}[0]->isa('JSON::Schema::Modern::Document::OpenAPI'));
+
+  croak 'all "documents" must be JSON::Schema::Modern::Document::OpenAPI or JSON::Schema::Modern::Document objects'
+    if exists $args->{documents} and any {
+        not blessed $_ or not $_->isa('JSON::Schema::Modern::Document')
+      } $args->{documents}->@*;
 
   my $extra_args = { %$args };
   delete $extra_args->@{qw(documents openapi_schema openapi_uri evaluator debug)};
@@ -127,6 +135,17 @@ around BUILDARGS => sub ($orig, $class, @args) {
 
   # if there were errors, this will die with a JSON::Schema::Modern::Result object
   $args->{evaluator}->add_document($_) foreach $args->{documents}->@*;
+
+  foreach my $doc ($args->{documents}->@*) {
+    if ($doc->_deferred_references->@*) {
+      my @refs = $doc->verify_references($args->{evaluator});
+      croak JSON::Schema::Modern::Result->new(
+        output_format => $args->{evaluator}->output_format,
+        errors => [ $doc->errors ],
+        exception => 1,
+      ) if $doc->errors;
+    }
+  }
 
   $args->{openapi_documents} = [ grep $_->isa('JSON::Schema::Modern::Document::OpenAPI'), $args->{documents}->@* ];
   delete $args->{documents};  # no need to save non-OpenAPI documents; they are in the evaluator
@@ -2494,7 +2513,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.151
+version 0.152
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

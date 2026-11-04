@@ -803,6 +803,7 @@ t/scripts/render.ytmpl/4/index.html
 t/scripts/render.ytmpl/4/index.yatt
 t/scripts/render.ytmpl/4/index.yatt.in
 t/site_facade.t
+t/siteapp_uri_load.t
 t/subroutes.t
 t/t_lib.pl
 t/t_preload.pm

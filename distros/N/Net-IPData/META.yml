@@ -23,7 +23,7 @@ recommends:
   Net::SSLeay: '1.49'
 requires:
   Carp: '0'
-  HTTP::Tiny: '0.034'
+  HTTP::Tiny: '0.049'
   JSON::PP: '2.27'
   Scalar::Util: '0'
   perl: '5.010001'
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/ipdata/perl/issues
   homepage: https://ipdata.co/
   repository: https://github.com/ipdata/perl.git
-version: v1.0.0
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

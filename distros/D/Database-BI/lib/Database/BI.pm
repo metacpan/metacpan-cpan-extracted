@@ -13,7 +13,7 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-use version; our $VERSION = version->declare('0.018.0');
+use version; our $VERSION = version->declare('0.019.0');
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -40,7 +40,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.018.0
+0.019.0
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,9 @@ the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: C<eq>,
 C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<empty>,
-C<notempty>.  Filters are applied server-side after all joins.
+C<notempty>.  Filters are applied server-side after all joins.  C<lt>, C<le>,
+C<gt> and C<ge> compare numbers, reading C<$1,234.56> and C<(1,234.56)> as
+numbers too; a blank or a word in the cell matches none of them.
 
 =item *
 
@@ -116,7 +118,7 @@ histogram (server-side binning, C<?bins=N>).  All charts can be resized
 by dragging the bottom-right corner grip, or from the keyboard: the grip
 takes focus, the arrow keys resize the chart (Shift takes bigger steps,
 Home and End go to the narrowest and widest it can be) and the size is announced
-as it changes.  All chart pages include Copy-link and Export SVG/PNG buttons.
+as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons.
 
 =item *
 
@@ -176,7 +178,11 @@ that menu, so a width the corner grip left it at reads without the menu being
 opened.  Each move is announced -- the column and row the
 card landed in, and any card the move pushed down -- and saved as you go.  The whole position and size is
 saved with the canvas, so a card put in row 4 stays in row 4 rather than
-being packed up the page.  B<Add current view> in the toolbar appends another
+being packed up the page.  B<Add text> in the toolbar adds a card of plain
+text, for a title or an explanation, with a font, a size in points, colours and
+an alignment of its own; it can hide its frame and header until it is pointed
+at, and a row holding only one-row text cards is as tall as its text.  Double-click the text, or use B<Edit text>, to change it or
+to remove the card.  B<Add current view> in the toolbar appends another
 table, chart or map without leaving the canvas, and a status region announces
 the card and the new visual count; when the card's script has drawn it, the
 region says the chart or map has finished drawing, and if D3 or Leaflet could
@@ -187,7 +193,7 @@ Median, Std dev, First, Last, Range or a Percentile with its level, so a card
 can show a median, a spread or a percentile where the chart pages behind it
 could only sum.  Canvases support
 cross-filtering, drill-through hierarchies, parameterisation, bookmarks
-with undo/redo, per-visual PNG download, and print to PDF/paper.
+with undo/redo, per-visual SVG, PNG and PDF download, and print to PDF/paper.
 
 =item *
 
@@ -215,6 +221,11 @@ join/combine panel.  Redis keys must follow the C<tablename:entry> convention
 used by L<Database::Abstraction>.  Because C<Redis> is an optional dependency,
 the application works fully without it; Redis support activates automatically
 when the module is available.
+
+B<MariaDB and MySQL data source> (optional) -- a table on a server named in the
+C<mariadb_servers> configuration opens as C<mariadb:server/table>, read-only, with
+the columns in the table's own order and a page read with C<LIMIT>.  See
+L</MariaDB and MySQL servers>.
 
 =back
 
@@ -248,9 +259,30 @@ C<script/database-bi daemon> starts a plain server with no file watcher; any
 other Mojolicious command word (C<routes>, C<get>, ...) is passed to the
 application.
 
+B<Start it showing one database:>
+
+    script/database-bi data/store.db
+
+The home address then shows that database, and its Home link leads to the usual
+list.  Only one can be named: more than one is an error (exit status 2), because
+a join cannot be given on the command line, so open one and use Merge or Combine
+in the browser.  A file that is missing, cannot be read or is of an unsupported
+type is the same error, before the server starts.  A remote path, Redis spec or
+MariaDB spec is accepted as it would be by C</open>, and is checked when it is first shown.
+Use C<MOJO_LISTEN> to choose the port.  A plain server does the same with
+C<BI_OPEN=/full/path/store.db script/database-bi daemon>; a file named after
+C<daemon> is ignored.
+
 B<Start the production server:>
 
-    hypnotoad script/database-bi
+    hypnotoad script/database-bi      # start, or restart with no downtime
+    hypnotoad -s script/database-bi   # stop
+
+It listens on port 8080 and ignores C<MOJO_LISTEN>; set the port and anything
+else in C<database_bi.conf>, under C<< hypnotoad => { listen => ['http://*:3000'] } >>.
+It keeps its process id in F<script/hypnotoad.pid> unless C<pid_file> says
+otherwise.  It takes no database on its command line: use
+C<BI_OPEN=/full/path/store.db hypnotoad script/database-bi>.
 
 B<Use a different data directory:>
 
@@ -279,10 +311,22 @@ B<Generate the Makefile for the first time or after editing Makefile.PL:>
 
 Scans C<data_dir>, renders a card grid of available tables.
 
+When the server was started with the name of a database (see L</SYNOPSIS>), a
+request from outside the application is redirected to C</open> for that
+database.  A request whose C<Referer> is this server, such as the Home link, gets
+the card grid, so a browser that withholds C<Referer> always sees the database.
+
 =item C<GET /tutorial>
 
 Renders the tutorial that is part of the application.  The chapters are data
 in L<Database::BI::Tutorial>, not in this POD.
+
+=item C<GET /preferences>
+
+Sets the reader's preferences: the theme, one of light, dark or the same as the
+device (the default).  They are kept in the browser's C<localStorage>, not on
+the server, and apply to every page.  Saved charts, printed pages and embedded
+canvases stay light.
 
 =item C<GET /view/:table>
 
@@ -323,6 +367,8 @@ Spec formats:
   path:/abs/path/to/file.csv         absolute local path
   /../hostname/dir/file.csv          remote file via SFTP
   redis:tablename|redis://host:port  Redis hash store (requires Redis module)
+  mariadb:server/table               a table on a server in mariadb_servers
+  mariadb:server                     lists that server's tables
 
 =item C<GET /api/columns>
 
@@ -631,6 +677,14 @@ renderer; an older optional install still returns the page with a warning.
 
 Alias for C<GET /graph>.  All C</graph> parameters accepted.
 
+=item C<GET /canvases>
+
+Lists the saved canvases, as cards that open them, with Import canvas.  It is
+the main navigation's Canvases link; the home page shows the same list,
+without Import canvas.  With
+no canvases, the page says how to make one.  A canvas's breadcrumb leads back
+here unless its C<back=> names another page.
+
 =item C<GET /a/:id>
 
 Renders a saved canvas (analysis) as a full multi-visual page.  Accepts
@@ -648,7 +702,8 @@ Returns C<{ analyses: [{id, name, datasets, updated}] }>.
 
 Creates a new analysis from a JSON request body.  Required fields: C<name>
 and C<datasets> (array; each entry must have a C<spec> starting with
-C<table:>, C<path:>, C<url:>, or C<redis:>).  Returns C<201 { id, created: 1 }>.
+C<table:>, C<path:>, C<url:> or C<redis:>, or being C<mariadb:server/table>).
+Returns C<201 { id, created: 1 }>.
 
 =item C<GET /api/analyses/:id>
 
@@ -675,7 +730,12 @@ alone.
 Appends one visual to a saved canvas.  Body: C<{ kind, encode, options,
 title, query }>, with C<kind> one of C<table>, C<bar>, C<pie>, C<line>,
 C<graph>, C<scatter>, C<heatmap>, C<stacked>, C<combo>, C<treemap>,
-C<histogram>, C<wordcloud> or C<map>.  A map's C<encode> names either C<loc> (a place column
+C<histogram>, C<wordcloud>, C<map> or C<text>.  A C<text> card reads no data, and
+its C<options> are C<text> (required, up to 20,000 characters), C<font>
+(C<arial>, C<georgia>, C<times>, C<verdana>, C<trebuchet> or C<courier>), C<size>
+(8 to 96 points), C<colour> and C<background> (C<#rrggbb>; leaving out C<colour>
+follows the theme), C<align> (C<left>, C<center> or C<right>), C<bold>, C<italic>
+and C<plain>.  The text is shown as plain text, never as markup.  A map's C<encode> names either C<loc> (a place column
 to geocode) or C<lat> and C<lon>.  A C<wordcloud> card's C<encode> names the
 text column to read in C<col>, and its C<options> take the same C<topn>,
 C<minlen> and C<stop> the C<GET /wordcloud> page takes, so the two count and
@@ -720,6 +780,11 @@ page's plan.  The plan is checked against the canvas's columns on every render,
 not only here, so a saved spec that no longer names a column is that card's
 error while a bad page-level C<cs> is the page's C<400>.
 
+=item C<DELETE /api/analyses/:id/visuals/:visual>
+
+Removes a text card; any other kind answers C<400>.  Later cards move down one
+index, and the layout and any C<cv=> saved in a bookmark move with them.
+
 =item C<PATCH /api/analyses/:id/visuals/:visual>
 
 Changes the columns of one stored visual without removing it.  Body:
@@ -744,7 +809,10 @@ Downloads the analysis document as a C<.json> file.
 
 Creates an analysis from an uploaded C<.json> file (multipart C<file>
 field) or a raw JSON request body.  Caller-supplied C<id>, C<created>,
-and C<updated> are stripped.
+and C<updated> are stripped.  "Import canvas", on C</canvases>, sends the file
+that a canvas's Share panel downloads; that panel also makes the read-only
+C</share/:id> link (C<POST /api/analyses/:id/share>) and its C</embed/:id>
+code.
 
 =item C<GET /calc/list>
 
@@ -770,7 +838,9 @@ a column.  Accepts C<?l=E<lt>specE<gt>&col=E<lt>colE<gt>>.
 =item C<POST /groups/save>
 
 Saves a named value group.  Body: C<l=&col=&group=&values=> (values
-is a newline-separated list of raw cell values).
+is a newline-separated list of raw cell values).  The group column,
+C<E<lt>colE<gt>_group>, appears in the table page as well as in its charts and
+exports.
 
 =item C<POST /groups/delete>
 
@@ -800,6 +870,39 @@ string, unchanged, so no existing store needs migrating.
 Removes a date-normalisation pattern.  Body: C<l=&col=>.
 Omit C<col=> to clear all patterns for the spec.
 
+=item C<GET /lookups/list>
+
+Returns C<{ lookups: { name: { file, key, col, fields, default } } }> for the
+stored lookups of C<?l=E<lt>specE<gt>>; C<col>, C<fields> and C<default> appear
+only when they were given.  See L</Stored lookups>.
+
+=item C<POST /lookups/save>
+
+Saves a lookup.  Body: C<l=&name=&file=&key=>, plus optional C<col=>,
+C<fields=> and C<default=>.  The file is read when it is saved, so a bad one is
+a 400 at once.
+
+=item C<POST /lookups/delete>
+
+Removes a lookup.  Body: C<l=&name=>.  Omit C<name=> to remove every lookup of
+the spec.
+
+=item C<GET /extract/list>
+
+Returns C<{ extractions: { name: { col, pattern, fields } } }> for the stored
+field extractions of C<?l=E<lt>specE<gt>>.  See L</Field extraction>.
+
+=item C<POST /extract/save>
+
+Saves an extraction.  Body: C<l=&name=&col=&pattern=>, plus optional
+C<fields=>.  The pattern is compiled when it is saved, so a bad one is a 400 at
+once.  The reply names the columns it will add: C<{ ok: 1, fields: [...] }>.
+
+=item C<POST /extract/delete>
+
+Removes an extraction.  Body: C<l=&name=>.  Omit C<name=> to remove every
+extraction of the spec.
+
 =item C<GET /geo/list>
 
 Returns C<{ columns: { col: { kind: "lat"|"lon"|"location" } } }> for the
@@ -808,7 +911,11 @@ saved coordinate-column preferences of the given C<l=> spec.
 =item C<POST /geo/save>
 
 Saves a coordinate-column preference.  Body: C<l=&col=&kind=>,
-where C<kind> is C<lat>, C<lon>, or C<location>.
+where C<kind> is C<lat>, C<lon>, or C<location>.  C<col=> and C<kind=> may
+repeat in pairs, so a latitude and a longitude are saved in one request, and
+C<replace=1> forgets the spec's saved columns first.  The map panel's
+"Remember columns" sends both, so a new choice replaces the old one; its
+"Forget remembered columns" calls C</geo/delete>.
 
 =item C<POST /geo/delete>
 
@@ -858,6 +965,24 @@ An address that matches no route, a missing table (C</view/:table>) and a
 missing canvas (C</a/:id>) answer C<404> with an HTML page that keeps the
 breadcrumb and the site navigation.  The JSON API (C</api/...>) still answers
 a C<404> with a JSON body.
+
+A request that is refused -- a chart of a column the view does not have, a
+calculated field that does not compile -- answers C<400> with the reason as
+plain text.  When a browser asked for the page (a C<GET> whose C<Accept> names
+C<text/html>), the reason is shown on the same page as a missing one instead,
+with the breadcrumb back to the table and a Back button.  Scripts, C<fetch()>
+and C</api/...> routes still get plain text or JSON.
+
+=head2 Saved columns that cannot be applied
+
+Calculated fields, lookups and extractions are saved for a dataset and applied
+to every page of it.  When the file changes under one -- a lookup file is
+deleted, a column an extraction reads is dropped -- its charts and exports
+refuse with the reason.  The table page (C</view>, C</open>, C</join>,
+C</combine>) is still drawn: without that dataset's saved calculated fields,
+lookups and extractions, with a note that names the one at fault and buttons
+that open the panels to correct or delete it.  A mistake in the request's own
+C<c=> is still a C<400>.
 
 =head2 Relative time ranges
 
@@ -960,8 +1085,95 @@ C<delta> and C<pct_change> need C<order=>; only C<window_sum> and
 C<window_avg> take the C<count>, the width of the window.  The pass runs after
 the filters and before pagination, so page 2 continues page 1's running total.
 An unknown function or column, or a parameter where none is taken, is a 400.
+A calculated field can read the new column, as in
+C<c=half:ytd/2>, and C<cs=> can read a calculated field or a time bucket, as in
+C<span=1mon&tcol=at&order=at_span&cs=amount:running_total:ytd>.  A filter runs
+before the pass, so a window is over the rows it leaves, unless it names a
+column the pass writes: C<f=ytd:gt:50> runs last, and selects rows without
+changing their totals.  On a canvas, a card's own filters and a cross-filter
+follow the same rule.
 The table page's Cross-row panel builds the same parameters.  See
 L<Database::BI::Controller::Dashboard/Cross-row columns> for the full rules.
+
+=head2 Stored lookups
+
+A lookup adds columns to every row of a dataset from a second file, matched on
+one key: a shop code in the orders gains the shop's city and region.
+
+  POST /lookups/save  l=table:orders&name=shops&file=lookups/shops.csv
+                      &key=code&col=shop&fields=city,region&default=unknown
+
+C<file=> is a data file under C<data_dir> (a relative path is read from there),
+of at most 8 MiB; a file outside it, a symlink that leads outside it, a URL and
+a remote path are refused.  C<key=> is the lookup file's key column and C<col=>
+the dataset's (default: the same name).  C<fields=> lists the columns to add
+(default: all but the key).  Keys are compared as text after trimming spaces,
+and case matters.  When the file has a key twice, the first row is used and the
+log says so.  A row whose key is not in the file gets C<default=>, or nothing.
+
+A field keeps its own name unless the dataset already has a column of that
+name; it is then called C<E<lt>nameE<gt>_E<lt>fieldE<gt>> (C<shops_region>).  A
+source column is never overwritten.
+
+The table page's Lookups panel saves, lists and deletes them, and can skip one
+in the current view.  Stored lookups apply on every route, a canvas and
+C</export>, before calculated fields and filters, so either can read the new
+columns.  A total
+grouped or filtered by one is worked out in Perl, never sent to SQL.  For one request,
+C<nolk=E<lt>nameE<gt>> skips a stored lookup, and C<lk=E<lt>nameE<gt>> applies
+a lookup stored for another dataset.  Both repeat, and the panels carry them on.
+A lookup is not a join: for more than one key, or rows that match many rows,
+use Merge.
+
+=head2 Accelerated datasets
+
+A large CSV, TSV, PSV, XLSX or XML file can be read from a SQLite copy of
+itself, an I<extract>, which is faster to page through and lets totals be
+worked out in SQL.  C<script/bi-extract --spec table:sales> marks the dataset
+accelerated and builds the extract under C<E<lt>model_dirE<gt>/extracts/>.
+
+An extract is used only while it matches the file: its name is a fingerprint
+of the spec and the file's modification time and size.  Once the file changes,
+the file itself is read, and the table page says the extract is stale and how
+to rebuild it.  Stale numbers are never shown.  The table page also says when
+a dataset is read from its extract, and when that was built.
+
+An extract is a cache.  Deleting C<extracts/> loses nothing: each accelerated
+dataset reads its file until the next build.  Nothing is written under
+C<data_dir>, and a C<model_dir> inside it is refused.  Only a C<table:> or
+C<path:> spec naming a local file can be accelerated; a SQLite file is one
+already.  C<table:sales> and C<path:/data/sales.csv> are separate datasets, each
+accelerated on its own.
+
+=head2 Field extraction
+
+A regular expression can pull values out of a column.  For one value, use
+C<rx()> in a calculated field:
+
+  c=country:rx(ref,'^([A-Z]{2})-','1')
+
+To make several columns from one pattern, store an extraction.  Each named
+group, C<(?E<lt>nameE<gt>...)>, becomes a column:
+
+  POST /extract/save  l=table:invoices&name=parts&col=ref
+                      &pattern=^(?<country>[A-Z]{2})-(?<year>\d{4})-
+
+C<fields=country> keeps only the groups it names.  The table page's Extract
+fields panel saves, lists and deletes them.  Stored extractions apply on
+every route, a canvas and C</export>, after the lookups and before calculated
+fields and filters, so either can read the new columns.  A row the pattern does
+not match gets C<(unparseable)> in each column, as a calculated field's row
+does, so those rows group visibly instead of vanishing; they are not blank.  A
+group that took no part in a match is empty.  Columns are named as a lookup's
+are: the group's own name, or C<E<lt>nameE<gt>_E<lt>groupE<gt>> when the
+dataset has a column of that name.  A capture is cut to 200 characters.
+
+A pattern is refused when it is over 200 characters, when it does not compile,
+or when it uses C<(?{>, C<(??{>, C<(?p> or C<(*>, which run code or steer the
+engine.  These checks are not a sandbox.  Perl's regular expressions have no
+timeout, so a pathological pattern such as C<(a+)+$> stalls the request that
+uses it.  Patterns are entered by whoever runs the server, never by a remote
+party.  See L<Database::BI::Calc/Regular expressions>.
 
 =head1 CONFIGURATION
 
@@ -989,12 +1201,46 @@ application directory is read-only can stage uploads somewhere writable:
 
     { uploads_dir => '/var/tmp/database-bi-uploads' }
 
+=head2 MariaDB and MySQL servers
+
+A server is opened by name.  Each entry of C<mariadb_servers> is one database:
+
+    {
+        mariadb_servers => {
+            shop => {
+                host     => 'db.example.com',  # default: localhost
+                port     => 3306,              # optional
+                database => 'shop',            # required
+                username => 'bi_reader',
+                password => 'secret',
+            },
+        },
+    }
+
+The home page then has a card for each name, leading to the list of its tables.
+C<mariadb:shop/orders> opens one anywhere a source is taken: the path field, C<l=>,
+C<j=>, C<c=> and a canvas's C<datasets>.  C<mariadb:shop> lists them.
+
+The spec holds a name and no more, because a spec travels in URLs, bookmarks,
+shared links, saved canvases and server logs.  So the password stays in the
+configuration file, which should be readable only by the account that runs the
+application, and no request can point the application at another server.
+
+L<DBD::MariaDB> is recommended; L<DBD::mysql> serves if it is the one installed.
+Without either, opening a server says so and the rest of the application is
+unaffected.  Rows are read from the server each time, and never cached.  The tests
+are C<t/mariadb.t>, which mocks the server, and C<t/mariadb_live.t>, which runs when
+C<MARIADB_SERVER> is set, for example to C<mariadb://user:pass@host/test>, and which
+creates its own tables and drops them.
+
 =head2 Compression and the page cache
 
 Every response goes through L<Mojolicious::Plugin::Buffer>: it is compressed
 (gzip or Brotli, as the browser accepts), HTML whitespace is minified (inline
 scripts and styles are left alone), and a C<200> to C<GET> or C<HEAD> carries
-an C<ETag>, so a repeat request can be answered C<304 Not Modified>.  File
+an C<ETag>, so a repeat request can be answered C<304 Not Modified>.  There
+is no C<Last-Modified>: the plugin would date a page by the code, not the data,
+which lets a browser reuse a stale reply without asking.  File
 downloads (C</export> as CSV, SQLite or JSON, the pivot as XLSX, and a canvas
 card's data from C</a/:id/visual/:n/:fmt>) opt out and are sent as they are.
 
@@ -1122,6 +1368,21 @@ It is idempotent: a second run against a warm cache resolves nothing and says
 so.  Exit status is 0 on success, 1 when the column is missing or no rows load,
 and 2 on bad arguments or an unopenable source.
 
+=head2 script/bi-extract
+
+Builds the extracts of accelerated datasets (see L</Accelerated datasets>):
+
+    ./script/bi-extract --spec table:sales [--spec ...]   # accelerate, and build
+    ./script/bi-extract --all                             # rebuild every one
+    ./script/bi-extract --remove --spec table:sales       # stop, and remove its extract
+    ./script/bi-extract --list
+                        [--data-dir DIR] [--model-dir DIR]
+
+It prints a line for each extract it builds: the rows, the columns, the file
+and the time.  Exit status is 0 on success, 1 when an extract could not be built
+(the others still are), and 2 on bad arguments.  Run C<--all> from cron after
+the data files are refreshed.
+
 =head2 script/bi-alert
 
 Reports one or more saved analyses, and turns a crossed threshold into a
@@ -1208,8 +1469,8 @@ not recorded, so the next run announces them again rather than the alert being
 lost for the rest of the period.
 
 C<script/database-bi> is the web application launcher: run with no arguments it
-starts the reloading development server, with a command word it runs that
-command, and C<hypnotoad script/database-bi> starts a preforking server (see
+starts the reloading development server, with the name of one database it does
+the same and shows that database, with a command word it runs that command, and C<hypnotoad script/database-bi> starts a preforking server (see
 L</SYNOPSIS>).
 
 =head1 COMMON PITFALLS
@@ -1225,6 +1486,14 @@ morbo: the chain grew a process a second, kept the listening port, and only
 stopped when the environment copied to each child was too large for C<exec>
 (F<Argument list too long>).  The shebang is perl and the script starts the
 server itself when it is given no arguments.
+
+=item B<The launcher's last statement must be its call to start_app>
+
+C<hypnotoad> loads the launcher instead of running it, with no arguments, and
+takes the value of its last statement as the application.  So the launcher must
+start the development server only when C<MOJO_APP_LOADER> is not set, and must
+not end in C<1;>.  Otherwise C<hypnotoad script/database-bi> hangs in a
+development server or refuses to start.
 
 =item B<The configuration file is optional but must be valid Perl if present>
 
@@ -1274,7 +1543,8 @@ The application recognises C<.csv>, C<.db>, C<.sql>, C<.sqlite>, C<.sqlite3>,
 C<.xml>, C<.psv>, C<.tsv>, and C<.xlsx> files.  All three SQLite extensions
 (C<.sql>, C<.sqlite>, C<.sqlite3>) are treated identically -- C<inventory.sqlite>
 and C<inventory.sqlite3> are both opened as SQLite databases without renaming.
-Excel C<.xlsx> files are read directly via C<Spreadsheet::ParseXLSX>.
+Excel C<.xlsx> files are read by L<Database::Abstraction>, using
+C<Spreadsheet::ParseXLSX>.
 
 URLs will work.
 For example enter
@@ -1321,6 +1591,24 @@ implemented.
 
 =item *
 
+A MariaDB table is read, never written, but the application does not enforce
+that on the server: give it an account with only C<SELECT>.  Anyone who can reach
+the application can open any table that account can read.
+
+=item *
+
+Only a page of an unfiltered table is read with C<LIMIT>.  A filter, Merge, Combine
+or an export reads the whole MariaDB table into memory, so a very large table is
+better opened through a view that narrows it.
+
+=item *
+
+A MariaDB table or view whose name holds anything but letters, digits and
+underscores cannot be opened.  C</tables> shows it with a C<CREATE VIEW> statement
+that gives it a usable name.
+
+=item *
+
 A relative time range is resolved against the server's clock and compares the
 column as a string, like every other filter.  A column holding a time zone
 offset or a non-ISO timestamp is read as far as its C<YYYY-MM-DD> prefix, so
@@ -1356,7 +1644,7 @@ works correctly in production without any special workarounds.
 
 =head1 ROADMAP
 
-Features planned for future releases (post-0.018.0).  Items are ordered by
+Features planned for future releases (post-0.019.0).  Items are ordered by
 priority.  Items shipped before this release (XLSX export, the copy-link
 button, the column statistics panel, folder filter/join propagation and the
 aggregate/measure layer) are no longer listed.
@@ -1517,8 +1805,13 @@ sub startup ($self) {
 			namespace => 'Database::BI::Pages',
 		);
 	}
+	# No Last-Modified: the plugin's date is that of the code and templates, not
+	# of the data, and with it and no Cache-Control a browser may reuse a reply
+	# without asking.  A panel that reopened after a save then listed what was
+	# saved before it.  The ETag alone makes every reuse a revalidation.
 	$self->plugin('Buffer', {
 		optimise_content => 1,
+		last_modified    => 0,
 		vary_by          => ['accept-language'],
 		($page_chi ? (
 			cache          => $page_chi,
@@ -1564,8 +1857,13 @@ sub startup ($self) {
 		$c->stash(
 			view_join_type => ($jtype =~ /\A(?:left|inner|outer)\z/ ? $jtype : ''),
 			view_filters   => [ grep { length } @{ $c->every_param('f') } ],
-			view_combines  => [ grep { /\A(?:path|table|url|redis):/i } @{ $c->every_param('c') } ],
+			view_combines  => [ grep { /\A(?:path|table|url|redis|mariadb):/i } @{ $c->every_param('c') } ],
 			view_dedup     => ($c->param('d') ? 1 : 0),
+			# lk=/nolk= turn a stored lookup on or off for this view, as name=value
+			# pairs so the macro can write them back in the order they came.
+			view_lookups   => [ map { my $k = $_; map { { name => $k, value => $_ } } grep { length } @{ $c->every_param($k) } } qw(lk nolk) ],
+			# Names only: the rest of an entry is credentials.
+			mariadb_server_names => [ sort keys %{ $c->app->config('mariadb_servers') // {} } ],
 		);
 	});
 
@@ -1576,6 +1874,47 @@ sub startup ($self) {
 	# map in Database::BI::Tutorial, and t/tutorial.t checks it is there.
 	$self->hook(before_render => sub {
 		my ($c, $args) = @_;
+
+		# The language is the one the action already chose, if it got that far
+		# (_resolve_template is protected, so it cannot be asked from here).
+		my $page_template = sub {
+			my ($name) = @_;
+			my $conf     = $c->app->config;
+			my $platform = $conf->{platform} // 'web';
+			my $language = $c->stash('language') // '';
+			$language = $conf->{language} // 'en'
+				unless $language =~ /\A[a-z]{2}(?:[-_][A-Za-z]{2})?\z/
+					&& -d $c->app->home->child("templates/$platform/$language");
+			$c->stash(language => $language);
+			return "$platform/$language/$name";
+		};
+
+		# A request refused in plain text is a dead end in a browser: no
+		# navigation, and no way back but the Back button.  A page the browser
+		# navigated to -- a GET whose Accept names text/html, which fetch() and
+		# scripts do not send -- gets the error page instead: the trail back to
+		# the table, and the reason, escaped by the template.  Everything else
+		# keeps the plain text below.
+		if (defined $args->{text} && ($args->{status} // 0) == 400
+			&& $c->req->method eq 'GET'
+			&& ($c->req->headers->accept // '') =~ m{\btext/html\b}
+			&& $c->req->url->path->to_string !~ m{\A/api/}) {
+			$c->stash(
+				title     => 'This page cannot be drawn',
+				error_msg => delete $args->{text},
+				error_400 => 1,
+			);
+			$args->{template} = $page_template->('not_found');
+			$args->{handler}  = 'tt';
+			$args->{format}   = 'html';
+		}
+
+		# Mojolicious sends render(text => ...) as text/html.  The error replies
+		# that use it repeat what was asked for (a column, a range), so as HTML a
+		# crafted link would run script on this site.  A template or JSON escapes
+		# for itself; plain text only has to say that it is plain text.
+		$args->{format} //= 'txt'
+			if defined $args->{text} && !defined $c->stash('format');
 
 		# AI availability flag used by dashboard and insights templates.
 		$c->stash(ai_available => (length($c->app->config('ai_api_key') // '') ? 1 : 0))
@@ -1593,19 +1932,11 @@ sub startup ($self) {
 		# HTML one is drawn from our not_found template instead.  Its first
 		# try is "not_found.<mode>", so that is the one replaced.  JSON
 		# replies and exceptions keep the defaults.
-		# The language is the one the action already chose, if it got that far
-		# (_resolve_template is protected, so it cannot be asked from here).
 		if (($args->{template} // '') =~ /\Anot_found\.\w+\z/
 			&& ($args->{format} // $c->stash('format') // 'html') eq 'html') {
-			my $conf     = $c->app->config;
-			my $platform = $conf->{platform} // 'web';
-			my $language = $c->stash('language') // '';
-			$language = $conf->{language} // 'en'
-				unless $language =~ /\A[a-z]{2}(?:[-_][A-Za-z]{2})?\z/
-					&& -d $c->app->home->child("templates/$platform/$language");
-			$args->{template} = "$platform/$language/not_found";
+			$args->{template} = $page_template->('not_found');
 			$args->{handler}  = 'tt';
-			$c->stash(title => 'Page not found', language => $language);
+			$c->stash(title => 'Page not found');
 		}
 
 		# The breadcrumb trail (layouts/breadcrumb.html.tt), worked out from the
@@ -1680,6 +2011,14 @@ sub startup ($self) {
 				cache_ttl_url => $cache_ttl_url,
 			);
 		}
+		# MariaDB mode: connect to an entry of the mariadb_servers configuration.
+		if (exists $opts{mariadb}) {
+			return Database::BI::Model::DataSource->new(
+				table   => $table,
+				server  => $opts{mariadb},
+				mariadb => ($c->app->config('mariadb_servers') // {})->{ $opts{mariadb} },
+			);
+		}
 		my $dir = exists $opts{directory} ? $opts{directory} : $data_dir;
 		Database::BI::Model::DataSource->new(
 			directory      => $dir,
@@ -1689,12 +2028,14 @@ sub startup ($self) {
 			exists $opts{host}           ? (host           => $opts{host})           : (),
 			exists $opts{file_ext}       ? (file_ext       => $opts{file_ext})       : (),
 			exists $opts{internal_table} ? (internal_table => $opts{internal_table}) : (),
+			exists $opts{column_order}   ? (column_order   => $opts{column_order})   : (),
 		);
 	});
 
 	my $r = $self->routes();
 	$r->get('/')->to('Dashboard#index');
 	$r->get('/tutorial')->to('Dashboard#tutorial');
+	$r->get('/preferences')->to('Dashboard#preferences');
 	$r->get('/view/:table')->to('Dashboard#view');
 	$r->get('/browse')->to('Dashboard#browse');
 	$r->get('/open')->to('Dashboard#open_file');
@@ -1726,6 +2067,12 @@ sub startup ($self) {
 	$r->post('/dates/save')   ->to('Dashboard#dates_save');
 	$r->post('/dates/delete') ->to('Dashboard#dates_delete');
 	$r->get('/dates/list')    ->to('Dashboard#dates_list');
+	$r->post('/lookups/save')  ->to('Dashboard#lookups_save');
+	$r->post('/lookups/delete')->to('Dashboard#lookups_delete');
+	$r->get('/lookups/list')   ->to('Dashboard#lookups_list');
+	$r->post('/extract/save')  ->to('Dashboard#extract_save');
+	$r->post('/extract/delete')->to('Dashboard#extract_delete');
+	$r->get('/extract/list')   ->to('Dashboard#extract_list');
 	$r->post('/geo/save')     ->to('Dashboard#geo_save');
 	$r->post('/geo/delete')   ->to('Dashboard#geo_delete');
 	$r->get('/geo/list')      ->to('Dashboard#geo_list');
@@ -1753,9 +2100,11 @@ sub startup ($self) {
 	$r->patch('/api/analyses/:id')      ->to('Dashboard#analyses_patch');	$r->delete('/api/analyses/:id')      ->to('Dashboard#analyses_delete');
 	$r->post('/api/analyses/:id/visuals')->to('Dashboard#analyses_add_visual');
 	$r->patch('/api/analyses/:id/visuals/:visual')->to('Dashboard#analyses_update_visual');
+	$r->delete('/api/analyses/:id/visuals/:visual')->to('Dashboard#analyses_delete_visual');
 	$r->get('/api/analyses/:id/export') ->to('Dashboard#analyses_export');
 
 	# extracts, catalog, sharing, embedding, per-visual downloads
+	$r->get('/canvases')                      ->to('Dashboard#canvases_view');
 	$r->get('/catalog')                       ->to('Dashboard#catalog_view');
 	$r->get('/share/:id')                     ->to('Dashboard#share_view');
 	$r->get('/embed/:id')                     ->to('Dashboard#embed_view');

@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Dancer2::Plugin::Feed;
-$Dancer2::Plugin::Feed::VERSION = '1.263060';
+$Dancer2::Plugin::Feed::VERSION = '1.263070';
 use strict;
 use warnings;
 
@@ -143,7 +143,7 @@ Dancer2::Plugin::Feed - Easy to generate feed (RSS or atom) for Dancer2 applicat
 
 =head1 VERSION
 
-version 1.263060
+version 1.263070
 
 =head1 SYNOPSIS
 

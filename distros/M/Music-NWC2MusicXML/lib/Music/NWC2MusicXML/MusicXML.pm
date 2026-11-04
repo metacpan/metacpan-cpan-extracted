@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.3';
+our $VERSION = '0.002.4';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -163,7 +163,7 @@ Music::NWC2MusicXML::MusicXML - Convert an internal Score object to a MusicXML 4
 
 =head1 VERSION
 
-0.002.3
+0.002.4
 
 =head1 SYNOPSIS
 
@@ -278,6 +278,19 @@ C<< <slur> >> and C<< <tied> >> elements.
 Tie detection uses the raw NWC position string as a key.  A C<^> suffix on a
 position string (e.g. C<Pos:-7^>) means the note is tied forward; the
 generator strips the suffix to match the tied-to note.
+
+=head2 Dynamic variance (text markings)
+
+NWC C<DynVariance> (also exported as C<DynamicVariance> by some NWC versions)
+records represent written-out dynamic variance text — not hairpins.
+C<Style:Crescendo> produces C<< <words font-style="italic">cresc.</words> >>;
+C<Style:Diminuendo> produces C<< <words font-style="italic">dim.</words> >>;
+C<Style:crescOff> (the end-of-phrase marker for an extended text cresc.) emits
+nothing, since MusicXML text directions require no explicit stop element.
+
+Do not confuse these with hairpin crescendo/diminuendo wedges: those come from
+C<Opts:Crescendo> / C<Opts:Diminuendo> attached to individual note or rest
+events (see L</Hairpins (wedges)> below).
 
 =head2 Hairpins (wedges)
 
@@ -1166,7 +1179,7 @@ sub _emit_measure {
 
 		} elsif ($type eq 'DynVariance') {
 			my $d = $event->data // {};
-			push @out, $self->_emit_wedge(
+			push @out, $self->_emit_dyn_variance(
 				$d->{style}, $d->{placement}, $pad . $i);
 
 		} elsif ($type eq 'TempoVariance') {
@@ -1715,7 +1728,8 @@ sub _emit_dynamic {
 	return @out;
 }
 
-# Map NWC DynVariance style -> MusicXML wedge type
+# Map hairpin-annotation style -> MusicXML wedge type (used by _annotate_wedges output on notes,
+# NOT for standalone DynVariance events -- those are text markings handled by _emit_dyn_variance).
 Readonly::Hash my %WEDGE_MAP => (
 	Crescendo  => 'crescendo',
 	Diminuendo => 'diminuendo',
@@ -1736,6 +1750,31 @@ sub _emit_wedge {
 	push @out, "${pad}<direction placement=\"$place\">";
 	push @out, "${pad}${i}<direction-type>";
 	push @out, "${pad}${i}${i}<wedge type=\"$wedge_type\" number=\"1\"/>";
+	push @out, "${pad}${i}</direction-type>";
+	push @out, "${pad}</direction>";
+	return @out;
+}
+
+# Map NWC DynVariance style -> display text. crescOff has no text representation.
+Readonly::Hash my %DYN_VARIANCE_TEXT => (
+	Crescendo  => 'cresc.',
+	Diminuendo => 'dim.',
+);
+
+sub _emit_dyn_variance {
+	my ($self, $style, $placement, $pad) = @_;
+	$style     //= '';
+	$placement //= 'below';
+	my $i = $self->{_indent};
+
+	my $text = $DYN_VARIANCE_TEXT{$style};
+	return () unless defined $text;
+
+	my $place = (lc($placement) eq 'above') ? 'above' : 'below';
+	my @out;
+	push @out, "${pad}<direction placement=\"$place\">";
+	push @out, "${pad}${i}<direction-type>";
+	push @out, "${pad}${i}${i}<words font-style=\"italic\">$text</words>";
 	push @out, "${pad}${i}</direction-type>";
 	push @out, "${pad}</direction>";
 	return @out;

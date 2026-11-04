@@ -8,13 +8,28 @@ static XOP eo_xop_call;
 static CV *
 eo_cv_on_stack(pTHX_ SV *sv)
 {
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (SvTYPE(sv) == SVt_PVGV)
         return GvCVu((GV *)sv);
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1..2
+     # uncoverable condition right count:1..2 */
     if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVCV)
-        return (CV *)SvRV(sv);
+        return (CV *)SvRV(sv); /* # uncoverable statement */
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     if (SvTYPE(sv) == SVt_PVCV)
-        return (CV *)sv;
-    return NULL;
+        return (CV *)sv; /* # uncoverable statement */
+    return NULL; /* # uncoverable statement */
 }
 
 static I32
@@ -113,8 +128,11 @@ eo_unwind(pTHX_ void *p)
     /* A context the call changed is put back only while it is still the
      * same one. Before 5.24 a die pops contexts before the save stack is
      * run, and its slot may be gone by now. */
-    if (rp->cxix >= 0 && rp->cxix <= cxstack_ix)
+    if (rp->cxix >= 0 && rp->cxix <= cxstack_ix) /* # uncoverable condition right count:2 */
         cxstack[rp->cxix].blk_gimme = rp->oldgimme;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (rp->spcx <= cxstack_ix)
         cxstack[rp->spcx].blk_oldsp = rp->oldsp;
     if (rp->runcx >= 0 && rp->runcx <= cxstack_ix
@@ -137,7 +155,7 @@ eo_unwind(pTHX_ void *p)
     }
 #endif
     PL_comppad    = rp->oldpad;
-    PL_curpad     = rp->oldpad ? AvARRAY(rp->oldpad) : NULL;
+    PL_curpad     = rp->oldpad ? AvARRAY(rp->oldpad) : NULL; /* # uncoverable condition right count:1 */
     PL_curcop     = rp->oldcop;
     PL_curpm      = rp->oldpm;
     PL_tmps_floor = rp->oldfloor;
@@ -162,14 +180,17 @@ eo_pp_call(pTHX)
     U8 gimme;
     U16 i;
 
-    if (!cv || CvDEPTH(cv) || !(e = eo_op_live(aTHX_ cv))
+    if (!cv || CvDEPTH(cv) || !(e = eo_op_live(aTHX_ cv)) /* # uncoverable condition right count:5 */
         || (PERLDB_SUB && PL_DBsub))
         return PL_ppaddr[OP_ENTERSUB](aTHX);
 
     gimme = GIMME_V;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (cxstack_ix < 0)
-        return PL_ppaddr[OP_ENTERSUB](aTHX);
+        return PL_ppaddr[OP_ENTERSUB](aTHX); /* # uncoverable statement */
 
     /* The usual caller is a plain sub: then it is the context both searches
      * below would find, and it is not an eval. */
@@ -252,9 +273,8 @@ eo_pp_call(pTHX)
     return e->entry;
 }
 
-/* The record of the frameless call this leave or return ends, or NULL for
- * a real call. A leave or a return in an op runs at the body's top level
- * (a return inside a loop or a block is declined), where the innermost
+/* The record of the frameless call this leave ends, or NULL for a real
+ * call. A leave in an op runs at the body's top level, where the innermost
  * context is the one the call found. A real call has pushed its own. */
 static eo_ret_t *
 eo_frameless(pTHX_ my_cxt_t *cxt)
@@ -266,10 +286,45 @@ eo_frameless(pTHX_ my_cxt_t *cxt)
     return cxstack_ix == r->spcx ? r : NULL;
 }
 
+/* Whether a context is one a return may unwind through: a block or a loop.
+ * The macro reads a variable named cx. */
+static bool
+eo_cx_unwinds(const PERL_CONTEXT *cx)
+{
+#ifdef CxTYPE_is_LOOP
+    return CxTYPE(cx) == CXt_BLOCK || CxTYPE_is_LOOP(cx);
+#else
+    return CxTYPE(cx) == CXt_BLOCK || CxTYPE(cx) == CXt_LOOP;
+#endif
+}
+
+/* The record of the frameless call this return ends, or NULL. A return in
+ * an op's body may sit inside blocks and loops, which it unwinds as
+ * pp_return does. A sub, a format or an eval between it and the call
+ * makes it theirs. */
+static eo_ret_t *
+eo_frameless_return(pTHX_ my_cxt_t *cxt)
+{
+    eo_ret_t *r;
+    I32 i;
+    if (!cxt->ret_top)
+        return NULL;
+    r = &cxt->ret[cxt->ret_top - 1];
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
+    if (cxstack_ix < r->spcx)
+        return NULL; /* # uncoverable statement */
+    for (i = cxstack_ix; i > r->spcx; i--)
+        if (!eo_cx_unwinds(&cxstack[i]))
+            return NULL;
+    return r;
+}
+
 static bool
 eo_passes(SV *sv)
 {
-    return SvTEMP(sv) && SvREFCNT(sv) == 1 && !SvMAGICAL(sv);
+    return SvTEMP(sv) && SvREFCNT(sv) == 1 && !SvMAGICAL(sv); /* # uncoverable condition right count:2..3 */
 }
 
 /* Leave the call's scope. When the body left nothing on the save stack
@@ -310,7 +365,7 @@ eo_finish(pTHX_ eo_ret_t *r, I32 ri, SV **sp)
             result = sv;
             FREETMPS;
         }
-        else if (r->targ && !SvROK(sv) && SvTYPE(sv) <= SVt_PVMG && !eo_passes(sv)) {
+        else if (r->targ && !SvROK(sv) && SvTYPE(sv) <= SVt_PVMG && !eo_passes(sv)) { /* # uncoverable condition right count:1 */
             result = AvARRAY(r->oldpad)[r->targ];
             sv_setsv(result, sv);
             SvPADTMP_on(result);
@@ -320,9 +375,12 @@ eo_finish(pTHX_ eo_ret_t *r, I32 ri, SV **sp)
         else {
             SvREFCNT_inc_simple_void_NN(sv);
             FREETMPS;
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 */
             if (eo_passes(sv)) {
-                result = sv;
-            }
+                result = sv; /* # uncoverable statement */
+            } /* # uncoverable statement */
             else {
                 result = newSVsv(sv);
                 SvREFCNT_dec(sv);
@@ -385,19 +443,21 @@ eo_pp_leave(pTHX)
     dMY_CXT;
     eo_ret_t *r = eo_frameless(aTHX_ &MY_CXT);
 
-    if (!r || CvROOT(r->cv) != PL_op)
+    if (!r || CvROOT(r->cv) != PL_op) /* # uncoverable condition left count:2 */
         return PL_ppaddr[OP_LEAVESUB](aTHX);
     return eo_finish(aTHX_ r, MY_CXT.ret_top - 1, PL_stack_sp);
 }
 
 /* A return in an op's body. Its values are above its own mark, and move
- * down to the call's. */
+ * down to the call's. From inside blocks or loops, the values are first
+ * made safe from what unwinding frees (a loop's variable, a block's
+ * lexical), then the contexts above the call's are unwound. */
 static OP *
 eo_pp_return(pTHX)
 {
     dMY_CXT;
-    eo_ret_t *r = eo_frameless(aTHX_ &MY_CXT);
-    SV **from, **to, **sp;
+    eo_ret_t *r = eo_frameless_return(aTHX_ &MY_CXT);
+    SV **from, **to, **sp, **p;
 
     if (!r)
         return PL_ppaddr[OP_RETURN](aTHX);
@@ -405,6 +465,12 @@ eo_pp_return(pTHX)
     from = PL_stack_base + POPMARK;
     to   = PL_stack_base + r->markix;
     sp   = PL_stack_sp;
+    if (cxstack_ix > r->spcx) {
+        for (p = from + 1; p <= sp; p++)
+            if (!SvIMMORTAL(*p) && !eo_passes(*p))
+                *p = sv_mortalcopy(*p);
+        dounwind(r->spcx);
+    }
     if (from != to) {
         while (from < sp)
             *++to = *++from;
@@ -429,12 +495,18 @@ eo_arm_returns(pTHX_ OP *o)
 static OP *
 eo_convert_call(pTHX_ OP *o, CV *cv)
 {
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1..4 */
     if (o->op_type == OP_ENTERSUB
         && !(o->op_private & OPpENTERSUB_AMPER)
         && cv && eo_op_live(aTHX_ cv)) {
         o->op_type   = OP_CUSTOM;
         o->op_ppaddr = eo_pp_call;
 #if PERL_VERSION_GE(5,16,0)
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 */
         if (!o->op_targ)
             o->op_targ = pad_alloc(OP_ENTERSUB, SVs_PADTMP);
 #endif

@@ -312,7 +312,7 @@ subtest 'browse path IP-File: regular file path fails -d check -- 404' => sub {
 # Operator names are CASE-SENSITIVE; only lowercase forms are recognised.
 # String ops (eq, ne, contains, starts): VALUE comparison is case-insensitive
 #   (both cell and val are lowercased before comparison).
-# Numeric ops (lt, le, gt, ge): Perl numeric coercion (<, <=, >, >=).
+# Numeric ops (lt, le, gt, ge): compare parsed numbers; a blank or word matches none.
 # Unary ops (empty, notempty): ignore val entirely.
 # Unknown / uppercase operators: default case 1 -> all rows pass (no-op).
 #
@@ -337,6 +337,29 @@ subtest 'filter EP-ne: case-insensitive value exclusion filters rows' => sub {
 	is scalar(@$result), 4, 'ne: 4 non-North records';
 	ok !(grep { lc($_->{region}) eq 'north' } @$result),
 		'ne: no returned row has excluded region';
+};
+
+subtest 'filter order ops: only numbers match, and nothing warns' => sub {
+	my @rows = (
+		{ id => 'blank',    v => '' },
+		{ id => 'null',     v => undef },
+		{ id => 'word',     v => 'none' },
+		{ id => 'zero',     v => '0' },
+		{ id => 'nine',     v => '9' },
+		{ id => 'currency', v => '$1,234.56' },
+		{ id => 'negative', v => '(5.00)' },
+	);
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $ids = sub { [ sort map { $_->{id} } @{ $FILTER->(\@rows, $_[0]) } ] };
+	is_deeply $ids->('v:lt:9'), [qw(negative zero)],         'lt: a blank and a word are not less than 9';
+	is_deeply $ids->('v:le:9'), [qw(negative nine zero)],    'le: includes the bound';
+	is_deeply $ids->('v:gt:0'), [qw(currency nine)],         'gt: a blank is not above 0, currency is read';
+	is_deeply $ids->('v:ge:0'), [qw(currency nine zero)],    'ge: includes zero itself but not a blank';
+	is_deeply $ids->('v:lt:0'), [qw(negative)],              'accounting brackets are negative';
+	is_deeply $ids->('v:gt:$1,000'), [qw(currency)],         'the value may be written as currency too';
+	is_deeply $ids->('v:gt:many'), [],                       'a value that is not a number matches nothing';
+	is_deeply \@warnings, [],                                'no warning about a non-numeric argument';
 };
 
 subtest 'filter EP-contains: substring match is case-insensitive' => sub {

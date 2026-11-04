@@ -1,5 +1,28 @@
 Revision history for Devel-XSCover
 
+0.06    2026-11-04
+	- Expect the Windows switches test's path as File::Spec joins it, since Cygwin's turns a backslash into a slash
+	- Write every relative file name with forward slashes on Windows, as Devel::Cover does, and compare a walked directory the way File::Find spells it
+	- Run a tool through IPC::Open3 rather than a forked pipe, which Windows has not
+	- End a run past its timeout by its pid where there are no process groups
+
+0.05    2026-11-04
+	- Leave a C line of nothing but braces out of the statement criterion
+	- Ignore the Install/Files.pm ExtUtils::Depends generates on the Perl side
+
+0.04    2026-11-03
+	- skip pod tests when Pod::Coverage is not installed
+
+0.03    2026-11-03
+	- Read each C branch as the decision of the source from the compiler's flow graph, so a macro's inner tests no longer count as arms
+	- Leave an XSUB the build compiled out, under a preprocessor condition, out of the subroutine criterion
+	- Leave out a C condition with more terms than its source holds, the rest being a macro's, and one on a line with no decision
+	- Run the rest of the suite without Devel::Cover under -no_perl when only plain files are named
+	- Take a compiler banner that cannot be read as empty
+	- Cover every Perl module of the dist in full, the report module measured under cover -test too
+	- Leave the C that xsubpp wrote untouched by the touch, so the build regenerates it from the XS
+	- Improve test coverage to 100%
+
 0.02    2026-11-03
 	- Hide the method put into B::Deparse from the CPAN indexer, which read it as a claim on that namespace
 

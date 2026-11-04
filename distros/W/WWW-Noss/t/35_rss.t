@@ -31,7 +31,7 @@ subtest 'RSS channel ok' => sub {
     );
     is(
         $channel->{ rights },
-        'Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)',
+        'Copyright (C) 2025 Samuel Young (samyoung at posteo dot com)',
         'rights ok'
     );
     is($channel->{ updated }, 1750017793, 'updated ok');
@@ -62,7 +62,7 @@ subtest 'RSS entries ok' => sub {
         is($e->{ summary }, 'A text description.', 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
@@ -81,7 +81,7 @@ subtest 'RSS entries ok' => sub {
         is($e->{ summary }, '<p>Some HTML text.</p>', 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
@@ -100,7 +100,7 @@ subtest 'RSS entries ok' => sub {
         is($e->{ summary }, '<p>Some more HTML.</p>', 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');
@@ -128,7 +128,7 @@ subtest 'MRSS ok' => sub {
         is($e->{ summary }, 'A text description.', 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(phony sample test) ], 'category ok');
@@ -144,7 +144,7 @@ subtest 'MRSS ok' => sub {
         is($e->{ summary }, '<p>An HTML description.</p>', 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(elpmas tset ynohp test sample phony) ], 'category ok');
@@ -160,7 +160,7 @@ subtest 'MRSS ok' => sub {
         like($e->{ summary }, qr{<p>Another text description.</p>}, 'summary ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is_deeply($e->{ category }, [ qw(test sample phony) ], 'category ok');

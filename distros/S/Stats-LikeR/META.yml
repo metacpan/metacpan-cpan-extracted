@@ -17,14 +17,12 @@ meta-spec:
 name: Stats-LikeR
 no_index:
   package:
+    - Stats::LikeR::Usage
     - Stats::LikeR::col
 provides:
   Stats::LikeR:
     file: lib/Stats/LikeR.pm
-    version: '0.3413'
-  Stats::LikeR::Usage:
-    file: lib/Stats/LikeR/Usage.pm
-    version: '0.3413'
+    version: '0.3414'
 requires:
   Compress::Raw::Bzip2: '0'
   Compress::Raw::Zlib: '0'
@@ -34,9 +32,9 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/hhg7/stats/issues
-  homepage: https://metacpan.org/dist/stats
+  homepage: https://metacpan.org/dist/Stats-LikeR
   repository: https://github.com/hhg7/stats.git
-version: '0.3413'
+version: '0.3414'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

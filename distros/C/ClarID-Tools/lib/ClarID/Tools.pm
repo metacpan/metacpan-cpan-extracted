@@ -8,7 +8,7 @@ use File::ShareDir::ProjectDistDir qw(dist_dir);
 use App::Cmd::Setup -app;
 
 # Central version for your entire CLI suite
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @SUPPORTED_CODEBOOK_VERSIONS = qw(0.02 0.03 0.04);
 
 # Share dir

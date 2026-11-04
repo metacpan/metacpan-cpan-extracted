@@ -1,0 +1,105 @@
+# The large subset: the state of the union (0.04, 2026-11-03)
+
+This document summarises where `Proc::ShellSubset::Large` (the large parser) stands against dash and bash. Section 1 gives the rules, section 2 the order in which the rules apply, section 3 the figures, section 4 the work list (forms the shells agree on that the parser still rejects), and sections 5 and 6 the subtle and the blatant differences. It replaces the yardsticks of `large-subset-ceiling.md` (in Proc-Spawner 0.03), section 6, which sorted our parser's own rejection messages and so measured the parser against itself.
+
+Every figure here is of 0.04 (since 0.03: item P6, `pwd`, rule E and its first choices, more forms both shells run alike, X19 fixed, detector fixes; `../../Changes`) unless it names another version (the labels: `../README.md`, last section). Shells: dash 0.5.12 and `bash --posix` 5.2.21. "The manual" means the Bash Reference Manual of bash 5.2.21, section 6.11 "Bash POSIX Mode", taken from the Debian package `bash-doc`; "M:N" names its item N. Where this document cites a probe ("P:ID"), the probe's ID is in `dialect-cases/cases.txt` or `dialect-cases/large-subset-dialect-probes2.txt`.
+
+## 1. The rules (the user's, 2026-11-02)
+
+- **R-agree.** Where dash and bash agree, the subset must accept the form and behave as they do.
+- **R-refuse.** Where both shells refuse a form, the subset refuses it too. "Refuse" covers both a syntax error (`-n`) and an error when the form runs. Forms both shells refuse count as blatant, where the detector can see them (it cannot see errors that happen only at run time, such as `${foo$n}`).
+- **R-blatant.** A difference is **blatant** when "either one of them fails or does not match the docs; or they behave in blatantly different ways". Any other difference in how dash and bash behave is **subtle**.
+- **R-program.** For the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`, `pwd`, and `true`, `false`, where the shells agree anyway; `pwd` runs as `/bin/pwd -L`, which prints what both shells print, known issue X23; the base parser's specification, `doc/parsers/shell-subset-spec.md`, section 4), the program beats any difference between the shells' builtins. "`test` beats blatant" was decided under item P5 of "Shell Corpus Gaps"; the user extended it to this list on 2026-11-02. In the measurement files these differences are class **X**, together with the differences that a decision of the user settles: the interactive-only builtins (`history`, `fc`, `bind`, `help`, `compopt`, `logout`, `set -o history`) do nothing, by decision B2.
+- **The yardsticks.** **Upper** ("nothing bogus found"): both shells parse the sample (`dash -n`, `bash --posix -n`), and it uses no blatant difference. **Lower** ("compatible"): within the upper yardstick, and it uses no subtle difference either. A class-X difference excludes nothing.
+- **Who decided.** Every verdict names its basis: P:ID (a probe), M:N (the manual), SC:CODE (ShellCheck says dash lacks the construct, so dash fails), J (Claude's judgement, not yet reviewed), or "user". J verdicts are kept as postponed text, so they count as open. Postponed verdicts are free-form text in `tools/large-subset-verdicts.txt` and count as **open** (O): outside the lower yardstick, inside the upper one. They can be rewritten in short form later without a rescan.
+
+## 2. Which rule beats which
+
+Proposed order, highest first. Items marked **(question)** need the user's decision.
+
+1. **R-refuse beats R-program** (the user, 2026-11-03: "refusing is better"; Q1 of "Shell Corpus Gaps"). `kill -SIGHUP PID`, `kill -s SIGHUP PID`, `kill -l SIGHUP` and `kill -sighup PID`: both shells refuse the `SIG` prefix (dash: "Illegal option -S"; bash as its manual says, M:38), while the program `/usr/bin/kill` accepts it. The parser rejects them (tests LS:246–250).
+2. **R-agree against R-program: a caller's option decides.** `[ a \< b ]`: both shells answer 0, but the coreutils program fails ("binary operator expected"). Item R1 of "Shell Corpus Gaps" settled this: a caller's option decides, and without the option the form stays rejected.
+3. **R-program beats R-blatant and subtle differences.** `echo 'a\nb'`: dash prints two lines; bash and `/bin/echo` print `a\nb`. The subset accepts it and prints `a\nb`.
+4. **A program result that is itself bogus (question Q2 of "Shell Corpus Gaps").** `printf -v x %s hi`: bash sets `x`, and dash fails. The coreutils program prints `-v` and a warning about excess arguments, which matches neither shell and serves no purpose. Open (Q2): the user asked what the shells do; the answer, with the choice between rejecting it and keeping it, is under Q2 on the page. Also `[ -v NAME ]` and unary `[ -a FILE ]`: bash answers, while dash and coreutils fail with different messages. Under R-program the subset fails like coreutils; no change is proposed for these.
+5. **Rule E** (the user, 2026-11-03; it replaces R-blatant): where the shells differ, the subset takes the plainly logical behaviour, and rejects the form only where there is none. Each choice names a category (info, error, posix, same, harm, platform, meaning, effect, or none): `large-subset-logical.md`. The detector counts a difference settled by rule E as class X (basis `E:CATEGORY`).
+6. **Subtle differences:** the subset follows the choices of the page "Shell Dialect Choices" (default: dash's behaviour where it is cheap to give, otherwise reject).
+
+**Windows.** R-program assumes the programs exist: coreutils `[`, `/bin/echo`, `printf`, `kill`. A Windows port of `Proc::ShellSpawn` would lack them. It would then have to give the same answers itself (emulate the coreutils behaviour in Perl) or reject these commands. Until then, the rule ties the subset to POSIX systems with coreutils; this is recorded as known issue X21 in `doc/pspawn-known-issues.md`.
+
+## 3. The figures
+
+Measured with 0.04 over the pinned corpora (`doc/test-pools.md`): 41,966 samples after leaving out 2,719 duplicates, the make book (578, a noisy extraction), 163 tldr lines made only of keystrokes, 59 tldr lines with keystrokes next to other text (Y3), and 16 ShellCheck test strings that are wrong where they stand (`return`, `local`, `break` outside their function or loop, which ShellCheck's own tests mark as errors). They were taken on the unreleased post4-0.03 and checked again on 0.04 (the same per-sample results). The figures of 0.03 itself are in this document as shipped in the Proc-Spawner-0.03 distribution.
+
+| Source | Samples | Accepted | Lower | Upper | Rejected within lower | Rejected, subtle or open | Accepted outside upper |
+|---|---|---|---|---|---|---|---|
+| tldr | 29,450 | 99.3% | 99.3% | 99.3% | 19 | 5 | 1 |
+| NL2Bash | 10,624 | 94.4% | 94.6% | 94.9% | 28 | 23 | 1 |
+| bash Cookbook | 81 | 32.1% | 30.9% | 35.8% | 0 | 3 | 0 |
+| pure-sh-bible | 44 | 97.7% | 97.7% | 100.0% | 0 | 1 | 0 |
+| pure-bash-bible | 122 | 40.2% | 41.8% | 41.8% | 2 | 0 | 0 |
+| ShellCheck, clean | 879 | 61.9% | 64.4% | 65.8% | 24 | 10 | 0 |
+| ShellCheck, warned | 766 | 59.7% | 62.4% | 62.5% | 22 | 1 | 1 |
+
+The samples rejected within the lower yardstick: 304 with early-post-0.02 (2026-11-02), 163 with 0.03, 117 with post-0.03, 106 with post3-0.03, 95 now. Rule E settles more samples as class X (the choices of `large-subset-logical.md`; detector basis `E:CATEGORY`), and the detector now sees three blatant differences it missed in 0.03 (`set -euo pipefail`, `cd a b`, `jobs` in a pipeline: the last two now settled by rule E). The parser accepts 331 samples whose only differences are class X (programs, the interactive builtins of B2, and rule E).
+
+The 3 samples **accepted outside the upper yardstick** are misreadings by the detector, not parser errors: `$(( ((1+1)) ))` taken for the command `((`, an assignment `source=…`, and `time read` (the program `time` running the program `read`).
+
+With the pinned corpora and these shells, the figures depend only on the parsers, the measurement scripts and the verdicts. The sha256 of those files, concatenated (`cat lib/Proc/ShellSubset.pm lib/Proc/ShellSubset/*.pm doc/large-subset/tools/large-subset-{extract,scan,drops,features,yardsticks}.pl doc/large-subset/tools/large-subset-verdicts.txt | sha256sum`), is `ecde8b9b9610680560a69e56313f01687f29e51688bcd029c6cef837fa03eeac`. While it is unchanged, the figures hold without measuring again.
+
+## 4. Still rejected although the shells agree (the work list)
+
+There are 95 samples: 91 with no difference found, and 4 whose only differences are class X. By the parser's message:
+
+| Count | What | Where it is decided |
+|---|---|---|
+| 20 | `alias` with a value or name from an expansion (`alias foo="echo $PWD"`), or options of zsh (`alias -g`) (16); `alias` or `unalias` inside a compound command or an and-or list (4) | rejected by the plan of B1 (the alias cannot be known when parsing) |
+| 15 | `${foo$n}`, `${{var}` and the like | both shells parse them but fail when they run: right by R-refuse; the detector cannot see run-time failures |
+| 8 | `read` with a name from an expansion (`read $var`, `read "$var"`), an array element, `''`, or zsh's `NAME?prompt` | not POSIX names |
+| 5 | `[ a \< b ]` and the like | R1: the caller's option `test_lt_gt` |
+| 4 | `set -o` alone (it lists), `set -o history -o histexpand` (because of `histexpand`), and the `set` of other programs (tmux's `set -g`, fish's `set -U`) | stay rejected |
+| 4 | `ulimit` setting a limit, or `-a` | B3 reads limits only |
+| 3 | here-documents cut off by NL2Bash (`ssh host <<'EOF'` with no body) | both read an empty body; bash also warns on standard error |
+| 4 | `export` of an array element or a quoted name with `=`; `jobs %N`; `pwd --help` | one by one (`pwd --help`: both shells fail when it runs) |
+| the rest (32) | tldr placeholders (`exit exit_code`, `wait process_id`, `shift n`), a function named `cd` (both shells allow it), `continue` in a subshell in a loop (dash ends the subshell, bash goes on: a difference the detector does not see), `NAME[` as a command, … | one by one |
+
+## 5. Subtle differences and open verdicts
+
+**Between the shells** (0.04: 58 samples have a subtle difference as their worst one, 4 an open verdict). The counts per feature below include samples that also have a blatant difference, so they add up to more:
+- listings (`set`, `export -p`, `trap` alone), also the order of the `alias` listing: 33;
+- `local x` without a value: 18;
+- traces (`set -x`): 7;
+- `${x:?}` statuses, `command -v` statuses, `$PS1`: a few each.
+
+Open verdicts (postponed, free-form in `tools/large-subset-verdicts.txt`): `$-` (rule E: no plainly logical choice) and `$LINENO` (rule E: as bash, not implemented yet). The other two of Q3 are settled by rule E: `return` outside a function is an error (as bash), and settings with a redirection are redirected first (as dash); `local` outside a function stays rejected, as both shells fail.
+
+**Between the shells and the programs or decisions (class X):**
+- `echo`: like bash.
+- `[ -v ]`, unary `[ -a ]`: coreutils fails like dash, unlike bash.
+- `[ a \< b ]`: coreutils fails, unlike both shells (R1: the option `test_lt_gt`).
+- `printf %q`: coreutils quotes as `'a b'`, bash as `a\ b`, and dash fails.
+- `printf -v`: open (Q2).
+- Rule E (`large-subset-logical.md`): `jobs` in a pipeline or `$( )`, `return` outside a function, `cd` with extra operands or without `HOME`, descriptors above 9, `[^…]`, patterns that never match `.` or `..`, settings with a redirection, `getopts` leaving `OPTARG` unset.
+- `time`: the program `/usr/bin/time`. It is not installed in Claude's workspace, so `time cmd` fails there with "not found", as in dash, which has no `time` builtin either.
+- `history` and the other interactive-only builtins (B2): nothing, as bash mostly does; dash has none of them ("not found"). The caller can choose dash's behaviour (`interactive => 'dash'`) or rejection (`interactive => 'reject'`).
+
+## 6. Blatant differences
+
+With 0.04, 1,455 samples are outside the upper yardstick (0.03: 1,463): 520 because a shell refuses to parse them, the rest because of a blatant difference. Except for the 3 detector misreadings of section 3, the parser rejects them all. The most frequent features:
+- bash-only builtins (`source`, `declare`, `let`, …);
+- process substitution;
+- arrays;
+- `[[ … ]]`;
+- options of `read`, `local` and `type` that dash lacks;
+- `$'…'`;
+- brace expansion;
+- `(( … ))`.
+
+**❰BUG❱ bash 5.2.21:** M:24 says "If a POSIX special builtin returns an error status, a non-interactive shell exits". In `bash --posix -c`, `shift 3` with fewer arguments and `export "1x=2"` print an error, return 1, and the shell goes on. `set -o nosuch` and `unset -x` do exit (status 2). This is a blatant difference by the definition ("does not match the docs"); known issue X22 in `doc/pspawn-known-issues.md`. The subset rejects these forms at parse time where it can see them; where it cannot, the executor follows dash and stops.
+
+## Files
+
+- `tools/large-subset-features.pl`: the detector (features of a text) and the mapping of ShellCheck codes, each with verdict and basis; `-n TESTFILE…` prints the per-test record (redirect it to `t/parser/large-subset-shells.tsv`).
+- `tools/large-subset-verdicts.txt`: verdicts kept by hand, including the postponed free-form ones.
+- `tools/large-subset-yardsticks.pl`: the figures of section 3. `-o` writes one line per sample; `-c` caches ShellCheck's messages, so later runs need no ShellCheck.
+- `large-subset-dialect-features.md`: the feature list with every probe result.
+- `../test-pools.md`: how to rebuild every test pool and measurement.

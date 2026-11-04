@@ -479,7 +479,12 @@ sub _run_bulk {
             # stash for the encoder
             $self->{_conds} = \@conds;
 
-            my @args = map { $row->{$_} } $self->_encode_fields;
+            my @args = map {
+                my $value = $row->{$_};
+                # Empty optional CSV cells are absent, like omitted CLI options.
+                ( ( $_ eq 'batch' || $_ eq 'replicate' )
+                    && defined $value && $value =~ /^\s*$/ ) ? undef : $value;
+            } $self->_encode_fields;
             my $meth = sprintf '_encode_%s_%s', $self->format, $self->entity;
             my $out  = $self->$meth( $cb, @args );
             $csv_out->print( $out_fh, [ ( map { $row->{$_} // '' } @$hdr ), $out ] )
@@ -899,10 +904,17 @@ sub _decode_stub_biosample {
     my $spec_w = _species_stub_width( $cb->{species} );
     croak "Stub too short to contain species" unless length($head) >= $spec_w;
     my $spec_stub = substr( $head, 0, $spec_w );
-    substr( $head, 0, $spec_w ) = '';
     my %sp_by = map { $cb->{species}{$_}{stub_code} => $_ }
       keys %{ $cb->{species} };
+    # The global Not Available token is exempt from the species-width rule.
+    my $nav = $cb->{species}{'Not Available'}{stub_code};
+    if ( !exists $sp_by{$spec_stub} && defined $nav && length $nav
+        && substr( $head, 0, length $nav ) eq $nav ) {
+        $spec_stub = $nav;
+        $spec_w   = length $nav;
+    }
     croak "Unknown species stub '$spec_stub'" unless exists $sp_by{$spec_stub};
+    substr( $head, 0, $spec_w ) = '';
     my $species = $sp_by{$spec_stub};
 
     # 7) subject_id (base-62 width)

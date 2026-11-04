@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctionsStricter",
   "PREREQ_PM" => {
     "List::Util" => 0,
+    "PPI::Statement" => 0,
     "Perl::Critic::Distribution" => 0,
     "Perl::Critic::Document" => 0,
     "Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Perl::Critic" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => 0,
+  "PPI::Statement" => 0,
   "Perl::Critic" => 0,
   "Perl::Critic::Distribution" => 0,
   "Perl::Critic::Document" => 0,

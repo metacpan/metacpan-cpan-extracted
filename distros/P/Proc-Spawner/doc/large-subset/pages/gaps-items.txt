@@ -1,13 +1,16 @@
-%% GROUP Recorded from your messages
-Your decisions of 2026-11-02 in chat. R3 is done (the table at the top uses it); R1 and R2 wait for the work they belong to.
+%% GROUP R Recorded Recorded from your messages
+Your decisions of 2026-11-02 in chat. R3 is done, in its second form (the table at the top uses it); R1 and R2 wait for the work they belong to.
 
-%% GROUP Yardsticks and corpus
-How the corpus figures are computed. Y1 is a set of judgements for you to check; Y2 and Y3 clean the corpus. Nothing here changes the parser.
+%% GROUP Y Yardsticks Yardsticks and corpus
+How the corpus figures are computed. Y1 (rewritten on the evening of 2026-11-02) now sorts the shells' differences without our parser; Y2 was rewritten from your note; Y3 cleans the corpus.
 
-%% GROUP Parser additions
-P1âP4: forms that dash and bash run alike but `ShellSubsetLarge` rejects today; P5 settles forms where they differ. Each is a change to the large grammar, with tests; P2 and P4 also need the executor (the posix_spawn session's code that runs the parsed strings).
+%% GROUP P Parser Parser additions
+P1–P4 are done in 0.03 (your ruling in chat: what both shells run alike must be accepted). P5 settles `[` and `test`. P6 (new) lists more forms that both shells run alike, found by the new yardsticks.
 
-%% GROUP Builtins left to sh
+%% GROUP Q Questions Questions for you
+New on the evening of 2026-11-02. Q1 and Q2: two of the rules conflict, and the order of the rules (`doc/large-subset/large-subset-state.md`, section 2) needs your choice. Q3: four verdicts that no probe and no manual settles.
+
+%% GROUP B Builtins Builtins left to sh
 Your idea: model `alias` like functions (B1), and let the interactive builtins do nothing, by a caller's choice (B2); B3 runs the non-interactive ones as dash does. These need both the parser and the executor. Together they are the largest group of rejections within the lower yardstick.
 
 @@ R1 | Recorded from your messages | test | Leave `[ a \< b ]` and `[ b \> a ]` to the caller, by an option
@@ -38,53 +41,55 @@ Not applicable: this is your decision.
 ## refs
 All `large-subset-*` files; `ShellSubsetLarge.pm`.
 
-@@ R3 | Recorded from your messages | yardsticks | Measure against two yardsticks: upper ("nothing bogus found") and lower ("compatible")
+@@ R3 | Recorded from your messages | yardsticks | Measure against two yardsticks decided by the shells, not by our parser: upper ("nothing bogus found") and lower ("compatible")
 ## now
-Your messages: we need two yardsticks, one for "both accept" and one that also leaves out what is incompatible in subtler ways (between the shells, or in `test`); and "both accept" means both parse the string **and** "we have not found out that one of them produces bogus results", bogus meaning blatantly not matching its docs or the other shell.
+Your messages of 2026-11-02:
+- A difference between dash and bash is **blatant** when "either one of them fails or does not match the docs; or they behave in blatantly different ways".
+- "Other mismatches in how dash/bash behave are subtle."
+- The yardsticks measure features of the shells, never our parser.
+- Where both shells refuse a form, we refuse it too.
+- For the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`; also `pwd`, `true`, `false`, where the shells agree anyway), the program beats the shells' difference.
 
 ## plan
-Done, in `large-subset-yardsticks.pl`. A sample is within the **upper yardstick** when `dash -n` and `bash --posix -n` both accept it, ShellCheck (`shellcheck -s dash`) finds no construct dash lacks (its warnings SC3xxx), and our parser did not reject it for a form where one shell errors or gives a blatantly different result. It is within the **lower yardstick** when, in addition, our parser did not reject it for a subtle difference either. Which rejections count as blatant and which as subtle is item Y1. The figures are in the table at the top of this page.
+Done, in a second version that replaces the first (which sorted our parser's messages; see Y1). A sample is within the **upper yardstick** when `dash -n` and `bash --posix -n` both accept it, and it uses no blatant difference. It is within the **lower yardstick** when, in addition, it uses no subtle difference. The differences are found in the sample's text and in ShellCheck's warnings about constructs dash lacks. Each comes with a verdict and with who decided it (Y1). Our parser plays no part. The figures are in the table at the top of this page; the full account is in `doc/large-subset/large-subset-state.md`.
 
 ## nogo
-Not applicable: this is your decision.
+This records your decision. Go: the record above is right. No-go: say in a note what is wrong.
 
 ## refs
-`claude/large-subset-ceiling.md` (to be updated with the two yardsticks); `large-subset-yardsticks.pl` (new).
+`doc/large-subset/large-subset-state.md`; `doc/large-subset/tools/large-subset-yardsticks.pl`; `doc/large-subset/tools/large-subset-features.pl`.
 
-@@ Y1 | Yardsticks and corpus | judgement | Count these rejections as "blatant" (outside both yardsticks) or "subtle" (outside the lower one only)
+@@ Y1 | Yardsticks and corpus | judgement | Keep the new sorting of dash/bash differences, made from the shells and bash's manual, not from our parser
 ## now
-Each rejection by our parser has a message. For the yardsticks (R3) I sorted the messages that name a difference between the shells into two kinds. **Blatant**: one shell errors, or the result is clearly different. **Subtle**: both run it, and the difference shows only in details. My sorting, with the number of samples, counted over all sources, including samples outside the yardsticks:
+The first version of this item sorted our parser's rejection messages into blatant and subtle, so the yardsticks measured the parser against itself. It is withdrawn. Now every difference between the shells is a feature with a verdict and a basis, that is, who or what decided it:
+- a probe run in both shells (148 probes);
+- the bash manual's section "Bash POSIX Mode" (bash 5.2.21). For example, its item 38 says that `kill` refuses signal names with a `SIG` prefix, so `kill -SIGHUP` failing in bash is as documented;
+- ShellCheck's statement that dash lacks a construct (so dash fails);
+- or, in four cases, Claude's judgement, which stays open until you decide (Q3).
 
-- Blatant: arrays such as `${#a[*]}` (124; dash: `Bad substitution`); `((` at the start of a command (50; dash runs a nested subshell); `set` options dash does not have, such as `-o history`, `-o pipefail`, `-B`, `-H` (30; dash errors; `-o vi` and `-o emacs` work in both and are no difference); an input redirection without a command, as in `$(<file)` (21; dash gives nothing, bash the file's text); signal names such as `SIGINT` or `ERR` in `trap` (18; dash: `trap: SIGINT: bad trap`, status 1); `NAME[1]=x` (12; dash runs a command of that name); `cmd &>f` (10; dash runs `cmd` in the background); `return` and `local` outside a function (9; `return`: dash ends the string quietly, bash prints an error and goes on; `local`: both print an error, but only dash stops). `break` and `continue` outside a loop do the same in both (nothing, status 0) and are no difference; `>& file` (5; dash errors).
-- Subtle: arguments of `read` other than plain names, mostly `read -p PROMPT` (112; the item G18 of "Shell Dialect Choices"); listing forms such as `set` or `export` alone (26; the text of the listing differs); `[^…]` in a pattern (15; G14); `.*` (8; G2); `set -x`, `set -v` (5; the trace text differs, G9); `local x` without a value (4; G1); `.` with arguments (4; bash passes them, dash ignores them); a function named like a builtin (4; G17); `$@` joined (3; G3, G4); an assignment with a redirection and a `$` (2): `x=$(echo e >&2; echo v) 2>/dev/null` hides the `e` in dash, which redirects first, and shows it in bash, which expands first.
+Found on the way: bash 5.2.21 does not match its manual's item 24, "If a POSIX special builtin returns an error status, a non-interactive shell exits". Example: `bash --posix -c 'shift 3; echo after'` prints `after`. By your definition this is blatant. It is recorded as known issue X22 in `doc/pspawn-known-issues.md`.
 
 ## plan
-Keep this sorting. Move any message by writing it in a note ("`read -p` is blatant"); I then recompute and update the table at the top.
+Keep this sorting. Any verdict can be changed in `doc/large-subset/tools/large-subset-verdicts.txt`, also as free-form text when a decision is postponed. The figures are then recomputed in seconds, without a rescan. Tell me in a note which verdict to change.
 
 ## nogo
-Tell me in a note which sorting you want instead, or that the split should not depend on my judgement: then I count every difference our parser names as blatant, and the two yardsticks coincide.
+Tell me in a note what should decide the verdicts instead.
 
 ## refs
-`large-subset-yardsticks.pl` (the lists `@BLATANT` and `@SUBTLE`); `claude/large-subset-ceiling.md`.
+`doc/large-subset/large-subset-dialect-features.md` (every feature with its verdict and basis); `doc/large-subset/tools/large-subset-verdicts.txt`.
 
-@@ Y2 | Yardsticks and corpus | NL2Bash | Leave out NL2Bash commands cut after a continuation backslash
+@@ Y2 | Yardsticks and corpus | NL2Bash | Accept a final backslash as a literal `\`, as both shells do
 ## now
-NL2Bash (a collection of one-line commands taken from scripts) has 15 commands that end in a backslash: the line was cut where the original continued it on the next line. Example:
-
-```
-find . -inum $inum -exec rm {} \
-```
-
-Both shells parse it (a backslash at the very end stays a literal `\`: `echo a\` prints `a\`), but the command is incomplete: here `find` gets `\` in place of the `;` that ends `-exec`. Our parser rejects it with `final backslash`.
+NL2Bash (a collection of one-line commands taken from scripts) has 15 commands that end in a backslash. The original command went on in the next line, and the collection cut it there. Example: `find . -inum $inum -exec rm {} \`. Both shells read a backslash at the very end as a literal `\`: `echo a\` prints `a\` in both. Our parser rejects these strings with the message `final backslash`.
 
 ## plan
-Leave them out of the measurement, with the reason "NL2Bash: cut after a continuation backslash" recorded in `drops.tsv` (the list of left-out samples with their reasons), as for duplicates and tldr's key notation.
+Rewritten from your note on this item ("If they match, we have no choice"). Accept a final backslash as a literal `\`, as both shells do, and keep these samples in the measurement. Tests, checked in both shells.
 
 ## nogo
-They stay in, counted as rejected samples within the lower yardstick.
+They stay rejected, and stay counted as rejected within the lower yardstick.
 
 ## refs
-`large-subset-drops.pl`; `claude/large-subset-ceiling.md`, section 2.
+`Proc::ShellSubset::Large`; `t/parser/large-subset-tests.pl`.
 
 @@ Y3 | Yardsticks and corpus | tldr | Turn tldr's `<Enter>` in here-documents into newlines, and leave out other lines with keystrokes
 ## now
@@ -106,7 +111,7 @@ These lines stay as they are, counted as rejected.
 A `{` or `}` inside a word is literal text in both shells unless it forms a brace expansion (bash only; with a comma or `..` between the braces). Example: `echo @{-1} x{a}y {} {.}.png \{}` prints `@{-1} x{a}y {} {.}.png {}` in dash and in `bash --posix`. Our parser rejects it: `unquoted '{'` (26 samples within the lower yardstick, e.g. `git check-ref-format --branch @{-1}`, `parallel convert {} {.}.png ::: *.jpg`, `find … -exec cmd \{} \;`).
 
 ## plan
-Accept `{` and `}` inside a word, and as a word of their own after the command name, when no unquoted `,` and no `..` lies between a `{` and its `}`. `{` and `}` as the first word of a command keep their meaning (a group), and brace expansion stays rejected. Tests with the examples above, checked in both shells.
+**Done in 0.03** (your ruling in chat). Accept `{` and `}` inside a word, and as a word of their own after the command name, when no unquoted `,` and no `..` lies between a `{` and its `}`. `{` and `}` as the first word of a command keep their meaning (a group), and brace expansion stays rejected. Tests with the examples above, checked in both shells.
 
 ## nogo
 They stay rejected; `/bin/sh -c` runs these strings.
@@ -119,7 +124,7 @@ They stay rejected; `/bin/sh -c` runs these strings.
 Example: `echo $(($(date +%s) / 60))` and `echo $((${#HOME} > 0))`. Both shells expand the inner part first and then compute (`echo $(($(echo 6) / 2))` prints `3` in both). Our parser rejects them: `bad arithmetic expression` (7 samples).
 
 ## plan
-Accept command substitutions and the `${…}` forms already allowed elsewhere inside `$(( ))`; the executor expands them before it computes, as it already does for `$x`. Tests in both shells. Needs a check that the executor's arithmetic accepts the tree (posix_spawn session; I test it on its bundle first).
+**Done in 0.03** (your ruling in chat). Accept command substitutions and the `${…}` forms already allowed elsewhere inside `$(( ))`; the executor expands them before it computes, as it already does for `$x`. Tests in both shells. Needs a check that the executor's arithmetic accepts the tree (posix_spawn session; I test it on its bundle first).
 
 ## nogo
 They stay rejected.
@@ -134,7 +139,7 @@ Our parser rejects every assignment to a name the shell sets itself (rule U5 of 
 For three other names the shells differ, and they stay rejected: `_=x; echo "[$_]"` (dash `[x]`, bash `[]`), `LINENO=5` (bash keeps counting lines), `PPID=1` (bash: `PPID: readonly variable`, status 127).
 
 ## plan
-Take the five names off the list of rule U5. Tests for both kinds.
+**Done in 0.03** (your ruling in chat). Take the five names off the list of rule U5. Tests for both kinds.
 
 ## nogo
 All stay rejected.
@@ -154,7 +159,7 @@ Our parser accepts these builtins only with literal names and plain forms. These
 These that look alike differ and stay rejected: `exit -1` (dash: `Illegal number`, 2; bash: 255), `local -r x=1` (dash: `bad variable name`), `unset -n`, `wait -n` (dash: `Illegal option`), `export -p` and `readonly -p` (listings).
 
 ## plan
-Accept the four forms. `export $v=…` needs the executor to split the name from the expanded word at run time; `exit N` the status modulo 256; `umask -S` the symbolic output; `command -p` a default `PATH`. Parser and executor work, tested in both shells.
+**Done in 0.03** (your ruling in chat). Accept the four forms. `export $v=…` needs the executor to split the name from the expanded word at run time; `exit N` the status modulo 256; `umask -S` the symbolic output; `command -p` a default `PATH`. Parser and executor work, tested in both shells.
 
 ## nogo
 They stay rejected.
@@ -181,6 +186,24 @@ Write this down as a rule: `[` and `test` are the program; the subset accepts th
 
 ## refs
 Large spec, section 2; `ShellSubsetLarge.pm`; `large-subset-yardsticks.pl`.
+
+@@ P6 | Parser additions | agree | Accept more forms that both shells run alike: `read -p`, `cd -P`, `cd -L`, a pattern as a redirection target, shared `set -o` options, `trap` with lower-case signal names or numbers
+## now
+The new yardsticks list the samples that our parser rejects although both shells parse them and no difference between the shells is known: 304 samples. Besides the builtins of items B1–B3 and the cut commands of item Y2 (both on this page), these forms stand out:
+- `read -p PROMPT NAME` (30 samples): dash 0.5.12 has `-p` too.
+- `cd -P DIR` and `cd -L DIR` (7): both shells have both options.
+- a pattern as a redirection target, as in `ls >*.log` (4): bash in POSIX mode does not expand it either (its manual, "Bash POSIX Mode", item 13), so both write to a file named `*.log`.
+- `set -o OPTION` for an option both shells have, such as `set -o nounset` (12 samples, together with `set -o` alone; that one lists the options and stays rejected).
+- `trap ACTION int` (a lower-case signal name) and `trap ACTION 8` (a signal number): 6 samples together.
+
+## plan
+Probe each form in both shells first. Then accept those where both agree, with tests. A form where the probe shows a difference instead gets a verdict in `doc/large-subset/tools/large-subset-verdicts.txt` for you to rule on, or an item on the page "Shell Dialect Choices".
+
+## nogo
+They stay rejected.
+
+## refs
+`Proc::ShellSubset::Large`; `doc/large-subset/large-subset-state.md`, section 4.
 
 @@ B1 | Builtins left to sh | alias | Run `alias` and `unalias`, with aliases expanded like the shells do
 ## now
@@ -220,3 +243,54 @@ They stay rejected.
 
 ## refs
 The builtins module (new); `lib/ShellSpawn/Large.pm`; large spec, sections 3 and 5; `large-subset-upstream-reports.md` (L10).
+
+@@ Q1 | Questions for you | rules | Keep `kill -SIGHUP` working through the program `kill` (the program's rule first)
+## now
+Two of your rules meet here:
+- Where both shells refuse a form, the subset refuses it too.
+- For the commands the subset runs as programs, the program decides.
+
+Example: `kill -SIGHUP PID`. dash refuses it (`kill: Illegal option -S`). bash refuses it too, as its manual says ("Bash POSIX Mode", item 38). The subset runs the program `/usr/bin/kill`, which accepts the `SIG` prefix, so today the signal is sent.
+
+Claude suggests No-go here, so that "both shells refuse" comes first.
+
+## plan
+The program's rule comes first: `kill -SIGHUP PID` keeps working, as today. `doc/large-subset/large-subset-state.md` records this order.
+
+## nogo
+"Both shells refuse" comes first: the parser rejects `kill` with an argument that starts with `-SIG`, with a test checked in both shells.
+
+## refs
+`doc/large-subset/large-subset-state.md`, section 2; `Proc::ShellSubset::Large`.
+
+@@ Q2 | Questions for you | rules | Keep `printf -v` accepted, with what the program `printf` makes of it
+## now
+`printf -v x %s hi`: bash sets the variable `x` to `hi`; dash fails (`Illegal option -v`). The subset runs the coreutils program `printf`, which prints `-v`, warns about excess arguments, and sets nothing. Under the rule "the program decides", the subset accepts this today, although the result matches neither shell and serves no purpose.
+
+Claude suggests No-go here.
+
+## plan
+`printf -v` stays accepted, with the program's output.
+
+## nogo
+The parser rejects `printf -v`, as dash does, with a test. Only this form changes. Forms where the program fails like dash and only bash differs, such as `[ -v NAME ]`, stay as the program makes them. `printf %q` stays too: the program and bash both quote, only differently (`'a b'` and `a\ b`), and dash fails.
+
+## refs
+`doc/large-subset/large-subset-state.md`, section 2.
+
+@@ Q3 | Questions for you | verdicts | Adopt Claude's readings of the four open verdicts
+## now
+For these four differences, no probe and no manual decides between blatant and subtle. They count as open (outside the lower yardstick, inside the upper one) until you decide:
+- **A.** `local` outside a function: both shells print an error; then dash stops, and bash goes on with the rest. `return` outside a function: dash ends quietly with status 0; bash prints an error and exits with status 2. Claude's reading: blatant. For `local`, because the rest of the string runs in bash only; but since both shells print an error, you may prefer the rule "both shells refuse: we refuse too", which gives the same result for the subset (it rejects the form). For `return`, because the statuses (0 and 2) and the error message differ.
+- **B.** `$-` (the letters of the shell's options): empty in `dash -c`, `hBc` in bash. A test for `*i*` (is the shell interactive?) gives the same answer in both. Claude's reading: blatant for every use of `$-`, because the detector cannot tell the printing from the test.
+- **C.** `$LINENO`: empty in `dash -c` strings, `1` in bash. Whether dash's manual promises a value there was not checked: its manual page is not installed in Claude's workspace. Claude's reading: blatant.
+- **D.** `x=$(cmd) 2>/dev/null`, an assignment with a command substitution plus a redirection: dash redirects before it runs `cmd`, bash after. The outputs differ only when `cmd` writes to the redirected descriptor. Claude's reading: subtle.
+
+## plan
+Record the four readings in `doc/large-subset/tools/large-subset-verdicts.txt` (A, B and C blatant; D subtle), and recompute the figures. To change one, write its letter and your verdict in a note.
+
+## nogo
+They stay open.
+
+## refs
+`doc/large-subset/tools/large-subset-verdicts.txt`.

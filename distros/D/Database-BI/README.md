@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.018.0
+0.019.0
 
 ## Description
 
@@ -43,7 +43,9 @@ the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: `eq`,
 `ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `empty`,
-`notempty`.  Filters are applied server-side after all joins.
+`notempty`.  Filters are applied server-side after all joins.  `lt`, `le`,
+`gt` and `ge` compare numbers, reading `$1,234.56` and `(1,234.56)` as
+numbers too; a blank or a word in the cell matches none of them.
 - **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
 second (or further) file beneath the current rows, using a unified column
 set and leaving blanks where a source file lacks a column.
@@ -58,7 +60,7 @@ histogram (server-side binning, `?bins=N`).  All charts can be resized
 by dragging the bottom-right corner grip, or from the keyboard: the grip
 takes focus, the arrow keys resize the chart (Shift takes bigger steps,
 Home and End go to the narrowest and widest it can be) and the size is announced
-as it changes.  All chart pages include Copy-link and Export SVG/PNG buttons.
+as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons.
 - **Maps** -- `GET /map` plots the filtered view on an OpenStreetMap map, either
 from latitude and longitude columns or from a place column geocoded locally
 with [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree) (one lookup per distinct place, remembered in the
@@ -100,7 +102,11 @@ that menu, so a width the corner grip left it at reads without the menu being
 opened.  Each move is announced -- the column and row the
 card landed in, and any card the move pushed down -- and saved as you go.  The whole position and size is
 saved with the canvas, so a card put in row 4 stays in row 4 rather than
-being packed up the page.  **Add current view** in the toolbar appends another
+being packed up the page.  **Add text** in the toolbar adds a card of plain
+text, for a title or an explanation, with a font, a size in points, colours and
+an alignment of its own; it can hide its frame and header until it is pointed
+at, and a row holding only one-row text cards is as tall as its text.  Double-click the text, or use **Edit text**, to change it or
+to remove the card.  **Add current view** in the toolbar appends another
 table, chart or map without leaving the canvas, and a status region announces
 the card and the new visual count; when the card's script has drawn it, the
 region says the chart or map has finished drawing, and if D3 or Leaflet could
@@ -111,7 +117,7 @@ Median, Std dev, First, Last, Range or a Percentile with its level, so a card
 can show a median, a spread or a percentile where the chart pages behind it
 could only sum.  Canvases support
 cross-filtering, drill-through hierarchies, parameterisation, bookmarks
-with undo/redo, per-visual PNG download, and print to PDF/paper.
+with undo/redo, per-visual SVG, PNG and PDF download, and print to PDF/paper.
 - **Drag-and-drop upload** -- any supported data file can be dropped directly
 onto the application.  The file is opened immediately; when the "Combine
 data" panel is open the dropped file populates the right-table path field.
@@ -127,6 +133,11 @@ join/combine panel.  Redis keys must follow the `tablename:entry` convention
 used by [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction).  Because `Redis` is an optional dependency,
 the application works fully without it; Redis support activates automatically
 when the module is available.
+
+    **MariaDB and MySQL data source** (optional) -- a table on a server named in the
+    `mariadb_servers` configuration opens as `mariadb:server/table`, read-only, with
+    the columns in the table's own order and a page read with `LIMIT`.  See
+    ["MariaDB and MySQL servers"](#mariadb-and-mysql-servers).
 
 ### UTF-8 and Encoding
 
@@ -160,11 +171,34 @@ script/database-bi
 other Mojolicious command word (`routes`, `get`, ...) is passed to the
 application.
 
+**Start it showing one database:**
+
+```
+script/database-bi data/store.db
+```
+
+The home address then shows that database, and its Home link leads to the usual
+list.  Only one can be named: more than one is an error (exit status 2), because
+a join cannot be given on the command line, so open one and use Merge or Combine
+in the browser.  A file that is missing, cannot be read or is of an unsupported
+type is the same error, before the server starts.  A remote path, Redis spec or
+MariaDB spec is accepted as it would be by `/open`, and is checked when it is first shown.
+Use `MOJO_LISTEN` to choose the port.  A plain server does the same with
+`BI_OPEN=/full/path/store.db script/database-bi daemon`; a file named after
+`daemon` is ignored.
+
 **Start the production server:**
 
 ```
-hypnotoad script/database-bi
+hypnotoad script/database-bi      # start, or restart with no downtime
+hypnotoad -s script/database-bi   # stop
 ```
+
+It listens on port 8080 and ignores `MOJO_LISTEN`; set the port and anything
+else in `database_bi.conf`, under `hypnotoad => { listen => ['http://*:3000'] }`.
+It keeps its process id in `script/hypnotoad.pid` unless `pid_file` says
+otherwise.  It takes no database on its command line: use
+`BI_OPEN=/full/path/store.db hypnotoad script/database-bi`.
 
 **Use a different data directory:**
 
@@ -199,10 +233,22 @@ perl Makefile.PL
 
     Scans `data_dir`, renders a card grid of available tables.
 
+    When the server was started with the name of a database (see ["SYNOPSIS"](#synopsis)), a
+    request from outside the application is redirected to `/open` for that
+    database.  A request whose `Referer` is this server, such as the Home link, gets
+    the card grid, so a browser that withholds `Referer` always sees the database.
+
 - `GET /tutorial`
 
     Renders the tutorial that is part of the application.  The chapters are data
     in [Database::BI::Tutorial](https://metacpan.org/pod/Database%3A%3ABI%3A%3ATutorial), not in this POD.
+
+- `GET /preferences`
+
+    Sets the reader's preferences: the theme, one of light, dark or the same as the
+    device (the default).  They are kept in the browser's `localStorage`, not on
+    the server, and apply to every page.  Saved charts, printed pages and embedded
+    canvases stay light.
 
 - `GET /view/:table`
 
@@ -246,6 +292,8 @@ perl Makefile.PL
     path:/abs/path/to/file.csv         absolute local path
     /../hostname/dir/file.csv          remote file via SFTP
     redis:tablename|redis://host:port  Redis hash store (requires Redis module)
+    mariadb:server/table               a table on a server in mariadb_servers
+    mariadb:server                     lists that server's tables
     ```
 
 - `GET /api/columns`
@@ -585,6 +633,14 @@ perl Makefile.PL
 
     Alias for `GET /graph`.  All `/graph` parameters accepted.
 
+- `GET /canvases`
+
+    Lists the saved canvases, as cards that open them, with Import canvas.  It is
+    the main navigation's Canvases link; the home page shows the same list,
+    without Import canvas.  With
+    no canvases, the page says how to make one.  A canvas's breadcrumb leads back
+    here unless its `back=` names another page.
+
 - `GET /a/:id`
 
     Renders a saved canvas (analysis) as a full multi-visual page.  Accepts
@@ -602,7 +658,8 @@ perl Makefile.PL
 
     Creates a new analysis from a JSON request body.  Required fields: `name`
     and `datasets` (array; each entry must have a `spec` starting with
-    `table:`, `path:`, `url:`, or `redis:`).  Returns `201 { id, created: 1 }`.
+    `table:`, `path:`, `url:` or `redis:`, or being `mariadb:server/table`).
+    Returns `201 { id, created: 1 }`.
 
 - `GET /api/analyses/:id`
 
@@ -629,7 +686,12 @@ perl Makefile.PL
     Appends one visual to a saved canvas.  Body: `{ kind, encode, options,
     title, query }`, with `kind` one of `table`, `bar`, `pie`, `line`,
     `graph`, `scatter`, `heatmap`, `stacked`, `combo`, `treemap`,
-    `histogram`, `wordcloud` or `map`.  A map's `encode` names either `loc` (a place column
+    `histogram`, `wordcloud`, `map` or `text`.  A `text` card reads no data, and
+    its `options` are `text` (required, up to 20,000 characters), `font`
+    (`arial`, `georgia`, `times`, `verdana`, `trebuchet` or `courier`), `size`
+    (8 to 96 points), `colour` and `background` (`#rrggbb`; leaving out `colour`
+    follows the theme), `align` (`left`, `center` or `right`), `bold`, `italic`
+    and `plain`.  The text is shown as plain text, never as markup.  A map's `encode` names either `loc` (a place column
     to geocode) or `lat` and `lon`.  A `wordcloud` card's `encode` names the
     text column to read in `col`, and its `options` take the same `topn`,
     `minlen` and `stop` the `GET /wordcloud` page takes, so the two count and
@@ -674,6 +736,11 @@ perl Makefile.PL
     not only here, so a saved spec that no longer names a column is that card's
     error while a bad page-level `cs` is the page's `400`.
 
+- `DELETE /api/analyses/:id/visuals/:visual`
+
+    Removes a text card; any other kind answers `400`.  Later cards move down one
+    index, and the layout and any `cv=` saved in a bookmark move with them.
+
 - `PATCH /api/analyses/:id/visuals/:visual`
 
     Changes the columns of one stored visual without removing it.  Body:
@@ -698,7 +765,10 @@ perl Makefile.PL
 
     Creates an analysis from an uploaded `.json` file (multipart `file`
     field) or a raw JSON request body.  Caller-supplied `id`, `created`,
-    and `updated` are stripped.
+    and `updated` are stripped.  "Import canvas", on `/canvases`, sends the file
+    that a canvas's Share panel downloads; that panel also makes the read-only
+    `/share/:id` link (`POST /api/analyses/:id/share`) and its `/embed/:id`
+    code.
 
 - `GET /calc/list`
 
@@ -724,7 +794,9 @@ perl Makefile.PL
 - `POST /groups/save`
 
     Saves a named value group.  Body: `l=&col=&group=&values=` (values
-    is a newline-separated list of raw cell values).
+    is a newline-separated list of raw cell values).  The group column,
+    `<col>_group`, appears in the table page as well as in its charts and
+    exports.
 
 - `POST /groups/delete`
 
@@ -754,6 +826,39 @@ perl Makefile.PL
     Removes a date-normalisation pattern.  Body: `l=&col=`.
     Omit `col=` to clear all patterns for the spec.
 
+- `GET /lookups/list`
+
+    Returns `{ lookups: { name: { file, key, col, fields, default } } }` for the
+    stored lookups of `?l=<spec>`; `col`, `fields` and `default` appear
+    only when they were given.  See ["Stored lookups"](#stored-lookups).
+
+- `POST /lookups/save`
+
+    Saves a lookup.  Body: `l=&name=&file=&key=`, plus optional `col=`,
+    `fields=` and `default=`.  The file is read when it is saved, so a bad one is
+    a 400 at once.
+
+- `POST /lookups/delete`
+
+    Removes a lookup.  Body: `l=&name=`.  Omit `name=` to remove every lookup of
+    the spec.
+
+- `GET /extract/list`
+
+    Returns `{ extractions: { name: { col, pattern, fields } } }` for the stored
+    field extractions of `?l=<spec>`.  See ["Field extraction"](#field-extraction).
+
+- `POST /extract/save`
+
+    Saves an extraction.  Body: `l=&name=&col=&pattern=`, plus optional
+    `fields=`.  The pattern is compiled when it is saved, so a bad one is a 400 at
+    once.  The reply names the columns it will add: `{ ok: 1, fields: [...] }`.
+
+- `POST /extract/delete`
+
+    Removes an extraction.  Body: `l=&name=`.  Omit `name=` to remove every
+    extraction of the spec.
+
 - `GET /geo/list`
 
     Returns `{ columns: { col: { kind: "lat"|"lon"|"location" } } }` for the
@@ -762,7 +867,11 @@ perl Makefile.PL
 - `POST /geo/save`
 
     Saves a coordinate-column preference.  Body: `l=&col=&kind=`,
-    where `kind` is `lat`, `lon`, or `location`.
+    where `kind` is `lat`, `lon`, or `location`.  `col=` and `kind=` may
+    repeat in pairs, so a latitude and a longitude are saved in one request, and
+    `replace=1` forgets the spec's saved columns first.  The map panel's
+    "Remember columns" sends both, so a new choice replaces the old one; its
+    "Forget remembered columns" calls `/geo/delete`.
 
 - `POST /geo/delete`
 
@@ -810,6 +919,24 @@ An address that matches no route, a missing table (`/view/:table`) and a
 missing canvas (`/a/:id`) answer `404` with an HTML page that keeps the
 breadcrumb and the site navigation.  The JSON API (`/api/...`) still answers
 a `404` with a JSON body.
+
+A request that is refused -- a chart of a column the view does not have, a
+calculated field that does not compile -- answers `400` with the reason as
+plain text.  When a browser asked for the page (a `GET` whose `Accept` names
+`text/html`), the reason is shown on the same page as a missing one instead,
+with the breadcrumb back to the table and a Back button.  Scripts, `fetch()`
+and `/api/...` routes still get plain text or JSON.
+
+### Saved Columns That Cannot Be Applied
+
+Calculated fields, lookups and extractions are saved for a dataset and applied
+to every page of it.  When the file changes under one -- a lookup file is
+deleted, a column an extraction reads is dropped -- its charts and exports
+refuse with the reason.  The table page (`/view`, `/open`, `/join`,
+`/combine`) is still drawn: without that dataset's saved calculated fields,
+lookups and extractions, with a note that names the one at fault and buttons
+that open the panels to correct or delete it.  A mistake in the request's own
+`c=` is still a `400`.
 
 ### Relative Time Ranges
 
@@ -920,8 +1047,101 @@ order=<column>[:asc|desc]                  the order the rows are read in
 `window_avg` take the `count`, the width of the window.  The pass runs after
 the filters and before pagination, so page 2 continues page 1's running total.
 An unknown function or column, or a parameter where none is taken, is a 400.
+A calculated field can read the new column, as in
+`c=half:ytd/2`, and `cs=` can read a calculated field or a time bucket, as in
+`span=1mon&tcol=at&order=at_span&cs=amount:running_total:ytd`.  A filter runs
+before the pass, so a window is over the rows it leaves, unless it names a
+column the pass writes: `f=ytd:gt:50` runs last, and selects rows without
+changing their totals.  On a canvas, a card's own filters and a cross-filter
+follow the same rule.
 The table page's Cross-row panel builds the same parameters.  See
 ["Cross-row columns" in Database::BI::Controller::Dashboard](https://metacpan.org/pod/Database%3A%3ABI%3A%3AController%3A%3ADashboard#Cross-row-columns) for the full rules.
+
+### Stored Lookups
+
+A lookup adds columns to every row of a dataset from a second file, matched on
+one key: a shop code in the orders gains the shop's city and region.
+
+```
+POST /lookups/save  l=table:orders&name=shops&file=lookups/shops.csv
+                    &key=code&col=shop&fields=city,region&default=unknown
+```
+
+`file=` is a data file under `data_dir` (a relative path is read from there),
+of at most 8 MiB; a file outside it, a symlink that leads outside it, a URL and
+a remote path are refused.  `key=` is the lookup file's key column and `col=`
+the dataset's (default: the same name).  `fields=` lists the columns to add
+(default: all but the key).  Keys are compared as text after trimming spaces,
+and case matters.  When the file has a key twice, the first row is used and the
+log says so.  A row whose key is not in the file gets `default=`, or nothing.
+
+A field keeps its own name unless the dataset already has a column of that
+name; it is then called `<name>_<field>` (`shops_region`).  A
+source column is never overwritten.
+
+The table page's Lookups panel saves, lists and deletes them, and can skip one
+in the current view.  Stored lookups apply on every route, a canvas and
+`/export`, before calculated fields and filters, so either can read the new
+columns.  A total
+grouped or filtered by one is worked out in Perl, never sent to SQL.  For one request,
+`nolk=<name>` skips a stored lookup, and `lk=<name>` applies
+a lookup stored for another dataset.  Both repeat, and the panels carry them on.
+A lookup is not a join: for more than one key, or rows that match many rows,
+use Merge.
+
+### Accelerated Datasets
+
+A large CSV, TSV, PSV, XLSX or XML file can be read from a SQLite copy of
+itself, an _extract_, which is faster to page through and lets totals be
+worked out in SQL.  `script/bi-extract --spec table:sales` marks the dataset
+accelerated and builds the extract under `<model_dir>/extracts/`.
+
+An extract is used only while it matches the file: its name is a fingerprint
+of the spec and the file's modification time and size.  Once the file changes,
+the file itself is read, and the table page says the extract is stale and how
+to rebuild it.  Stale numbers are never shown.  The table page also says when
+a dataset is read from its extract, and when that was built.
+
+An extract is a cache.  Deleting `extracts/` loses nothing: each accelerated
+dataset reads its file until the next build.  Nothing is written under
+`data_dir`, and a `model_dir` inside it is refused.  Only a `table:` or
+`path:` spec naming a local file can be accelerated; a SQLite file is one
+already.  `table:sales` and `path:/data/sales.csv` are separate datasets, each
+accelerated on its own.
+
+### Field Extraction
+
+A regular expression can pull values out of a column.  For one value, use
+`rx()` in a calculated field:
+
+```
+c=country:rx(ref,'^([A-Z]{2})-','1')
+```
+
+To make several columns from one pattern, store an extraction.  Each named
+group, `(?<name>...)`, becomes a column:
+
+```
+POST /extract/save  l=table:invoices&name=parts&col=ref
+                    &pattern=^(?<country>[A-Z]{2})-(?<year>\d{4})-
+```
+
+`fields=country` keeps only the groups it names.  The table page's Extract
+fields panel saves, lists and deletes them.  Stored extractions apply on
+every route, a canvas and `/export`, after the lookups and before calculated
+fields and filters, so either can read the new columns.  A row the pattern does
+not match gets `(unparseable)` in each column, as a calculated field's row
+does, so those rows group visibly instead of vanishing; they are not blank.  A
+group that took no part in a match is empty.  Columns are named as a lookup's
+are: the group's own name, or `<name>_<group>` when the
+dataset has a column of that name.  A capture is cut to 200 characters.
+
+A pattern is refused when it is over 200 characters, when it does not compile,
+or when it uses `(?{`, `(??{`, `(?p` or `(*`, which run code or steer the
+engine.  These checks are not a sandbox.  Perl's regular expressions have no
+timeout, so a pathological pattern such as `(a+)+$` stalls the request that
+uses it.  Patterns are entered by whoever runs the server, never by a remote
+party.  See ["Regular expressions" in Database::BI::Calc](https://metacpan.org/pod/Database%3A%3ABI%3A%3ACalc#Regular-expressions).
 
 ## Configuration
 
@@ -953,12 +1173,48 @@ application directory is read-only can stage uploads somewhere writable:
 { uploads_dir => '/var/tmp/database-bi-uploads' }
 ```
 
+### MariaDB and MySQL Servers
+
+A server is opened by name.  Each entry of `mariadb_servers` is one database:
+
+```perl
+{
+    mariadb_servers => {
+        shop => {
+            host     => 'db.example.com',  # default: localhost
+            port     => 3306,              # optional
+            database => 'shop',            # required
+            username => 'bi_reader',
+            password => 'secret',
+        },
+    },
+}
+```
+
+The home page then has a card for each name, leading to the list of its tables.
+`mariadb:shop/orders` opens one anywhere a source is taken: the path field, `l=`,
+`j=`, `c=` and a canvas's `datasets`.  `mariadb:shop` lists them.
+
+The spec holds a name and no more, because a spec travels in URLs, bookmarks,
+shared links, saved canvases and server logs.  So the password stays in the
+configuration file, which should be readable only by the account that runs the
+application, and no request can point the application at another server.
+
+[DBD::MariaDB](https://metacpan.org/pod/DBD%3A%3AMariaDB) is recommended; [DBD::mysql](https://metacpan.org/pod/DBD%3A%3Amysql) serves if it is the one installed.
+Without either, opening a server says so and the rest of the application is
+unaffected.  Rows are read from the server each time, and never cached.  The tests
+are `t/mariadb.t`, which mocks the server, and `t/mariadb_live.t`, which runs when
+`MARIADB_SERVER` is set, for example to `mariadb://user:pass@host/test`, and which
+creates its own tables and drops them.
+
 ### Compression and the Page Cache
 
 Every response goes through [Mojolicious::Plugin::Buffer](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ABuffer): it is compressed
 (gzip or Brotli, as the browser accepts), HTML whitespace is minified (inline
 scripts and styles are left alone), and a `200` to `GET` or `HEAD` carries
-an `ETag`, so a repeat request can be answered `304 Not Modified`.  File
+an `ETag`, so a repeat request can be answered `304 Not Modified`.  There
+is no `Last-Modified`: the plugin would date a page by the code, not the data,
+which lets a browser reuse a stale reply without asking.  File
 downloads (`/export` as CSV, SQLite or JSON, the pivot as XLSX, and a canvas
 card's data from `/a/:id/visual/:n/:fmt`) opt out and are sent as they are.
 
@@ -1086,6 +1342,23 @@ It is idempotent: a second run against a warm cache resolves nothing and says
 so.  Exit status is 0 on success, 1 when the column is missing or no rows load,
 and 2 on bad arguments or an unopenable source.
 
+### Script/Bi-Extract
+
+Builds the extracts of accelerated datasets (see ["Accelerated datasets"](#accelerated-datasets)):
+
+```
+./script/bi-extract --spec table:sales [--spec ...]   # accelerate, and build
+./script/bi-extract --all                             # rebuild every one
+./script/bi-extract --remove --spec table:sales       # stop, and remove its extract
+./script/bi-extract --list
+                    [--data-dir DIR] [--model-dir DIR]
+```
+
+It prints a line for each extract it builds: the rows, the columns, the file
+and the time.  Exit status is 0 on success, 1 when an extract could not be built
+(the others still are), and 2 on bad arguments.  Run `--all` from cron after
+the data files are refreshed.
+
 ### Script/Bi-Alert
 
 Reports one or more saved analyses, and turns a crossed threshold into a
@@ -1178,8 +1451,8 @@ not recorded, so the next run announces them again rather than the alert being
 lost for the rest of the period.
 
 `script/database-bi` is the web application launcher: run with no arguments it
-starts the reloading development server, with a command word it runs that
-command, and `hypnotoad script/database-bi` starts a preforking server (see
+starts the reloading development server, with the name of one database it does
+the same and shows that database, with a command word it runs that command, and `hypnotoad script/database-bi` starts a preforking server (see
 ["SYNOPSIS"](#synopsis)).
 
 ## Common Pitfalls
@@ -1193,6 +1466,14 @@ command, and `hypnotoad script/database-bi` starts a preforking server (see
     stopped when the environment copied to each child was too large for `exec`
     (`Argument list too long`).  The shebang is perl and the script starts the
     server itself when it is given no arguments.
+
+- **The launcher's last statement must be its call to start\_app**
+
+    `hypnotoad` loads the launcher instead of running it, with no arguments, and
+    takes the value of its last statement as the application.  So the launcher must
+    start the development server only when `MOJO_APP_LOADER` is not set, and must
+    not end in `1;`.  Otherwise `hypnotoad script/database-bi` hangs in a
+    development server or refuses to start.
 
 - **The configuration file is optional but must be valid Perl if present**
 
@@ -1248,7 +1529,8 @@ command, and `hypnotoad script/database-bi` starts a preforking server (see
     `.xml`, `.psv`, `.tsv`, and `.xlsx` files.  All three SQLite extensions
     (`.sql`, `.sqlite`, `.sqlite3`) are treated identically -- `inventory.sqlite`
     and `inventory.sqlite3` are both opened as SQLite databases without renaming.
-    Excel `.xlsx` files are read directly via `Spreadsheet::ParseXLSX`.
+    Excel `.xlsx` files are read by [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction), using
+    `Spreadsheet::ParseXLSX`.
 
     URLs will work.
     For example enter
@@ -1290,6 +1572,15 @@ command, and `hypnotoad script/database-bi` starts a preforking server (see
 - Only read operations on data files are supported.  Write-back (editing
 cell values in the browser and saving them to the data file) is not
 implemented.
+- A MariaDB table is read, never written, but the application does not enforce
+that on the server: give it an account with only `SELECT`.  Anyone who can reach
+the application can open any table that account can read.
+- Only a page of an unfiltered table is read with `LIMIT`.  A filter, Merge, Combine
+or an export reads the whole MariaDB table into memory, so a very large table is
+better opened through a view that narrows it.
+- A MariaDB table or view whose name holds anything but letters, digits and
+underscores cannot be opened.  `/tables` shows it with a `CREATE VIEW` statement
+that gives it a usable name.
 - A relative time range is resolved against the server's clock and compares the
 column as a string, like every other filter.  A column holding a time zone
 offset or a non-ISO timestamp is read as far as its `YYYY-MM-DD` prefix, so
@@ -1314,7 +1605,7 @@ works correctly in production without any special workarounds.
 
 ## Roadmap
 
-Features planned for future releases (post-0.018.0).  Items are ordered by
+Features planned for future releases (post-0.019.0).  Items are ordered by
 priority.  Items shipped before this release (XLSX export, the copy-link
 button, the column statistics panel, folder filter/join propagation and the
 aggregate/measure layer) are no longer listed.

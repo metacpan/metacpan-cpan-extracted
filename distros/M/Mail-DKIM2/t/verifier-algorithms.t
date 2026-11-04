@@ -8,7 +8,7 @@ use DKIM2SignedFixture;
 use DKIM2TestKeys;
 use Mail::DKIM2::Verifier;
 
-# -08 §14.6: an algorithm a Verifier does not implement is a PERMERROR item,
+# -09 §14.6: an algorithm a Verifier does not implement is a PERMERROR item,
 # so it passes only beside a "|" alternative that does. Only the exact names
 # rsa-sha256 and ed25519-sha256 are implemented (names are case-sensitive,
 # §2.14); anything else gets no key lookup, and is never verified as RSA.
@@ -47,7 +47,7 @@ run('unknown algorithm, value not base64: a syntax error all the same',
     'sel2:future-alg:!!x!!|sel1:rsa-sha256:SIG',
     qr/^permerror \(PERMERROR: DKIM2-Signature i=1 syntax error\)$/, 0);
 
-# -08 §14.5, §14.6: an absent key is a PERMERROR item, overridden only by
+# -09 §14.5, §14.6: an absent key is a PERMERROR item, overridden only by
 # a "|" alternative that passes.
 {
     my $absent = sub { $calls++; return undef };
@@ -71,7 +71,7 @@ run('unknown algorithm, value not base64: a syntax error all the same',
     like($v->result_detail, qr/^pass/, 'one key absent "|" one that verifies: pass');
 }
 
-# -08 section 14.6: every signature is checked; one failing in a "," group
+# -09 section 14.6: every signature is checked; one failing in a "," group
 # fails the group, naming its selector.
 # (sel2's key is test1's sel2 key; the fixture signs every item with sel1's.)
 {

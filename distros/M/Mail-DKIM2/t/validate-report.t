@@ -141,7 +141,7 @@ my %ropt = (PubkeyCallback=>$cb, SkipTimestampCheck=>1);
 }
 
 # 1c) top-level nd=: the highest-numbered DKIM2-Signature carries nd= instead
-# of mf=/rt=. Local policy (-08 §13.2, §14.4, stricter than the letter of the draft;
+# of mf=/rt=. Local policy (-09 §13.2, §14.4, stricter than the letter of the draft;
 # matches the Verifier.pm permerror added for Task 2.1) rejects this: the
 # report must surface a failing level whose detail matches the same message
 # as the Verifier's permerror.
@@ -280,7 +280,8 @@ sub signed_input_nd {
     my $in = signed_input("From: a\@test1.dkim2.com\r\nTo: reflector-redacted\@test2.dkim2.com\r\nSubject: hi\r\n\r\nsecret\r\n");
     my $r2 = Mail::DKIM2::Reflector::reflect(%common, mode=>'redacted', message=>$in);
     my $rep = Mail::DKIM2::Validate::report($r2->{message}, %ropt);
-    is($rep->{overall}, 'pass', 'redacted overall pass (current content valid)');
+    is($rep->{overall}, 'fail', 'redacted: overall fail (-09: a null recipe is a PERMERROR)');
+    like($rep->{summary}, qr/has a null recipe/, 'redacted: the summary says why');
     my ($top) = grep { $_->{kind} eq 'mi' && $_->{m}==2 } @{$rep->{levels}};
     is($top->{recipe}, 'null', 'redacted top MI recipe=null');
     is($top->{undo}, 'unrecoverable', 'redacted top MI undo=unrecoverable');
@@ -332,10 +333,10 @@ sub signed_input_nd {
     is(Mail::DKIM2::Validate::report($good, %ropt)->{overall}, 'pass', 'clean reflected verifies');
 
     # a folded Received-SPF prepended by the receiver does not pollute the
-    # header hash at all: it verifies cleanly (-08 §4).
+    # header hash at all: it verifies cleanly (-09 §4).
     my $polluted = "Received-SPF: pass\r\n (test.example: 1.2.3.4 authorized)\r\n" . $good;
     my $rep = Mail::DKIM2::Validate::report($polluted, %ropt);
-    is($rep->{overall}, 'pass', 'a Received-SPF prepended by the receiver verifies cleanly (-08 §4)');
+    is($rep->{overall}, 'pass', 'a Received-SPF prepended by the receiver verifies cleanly (-09 §4)');
 
     # a genuinely broken message must still fail even with Received-SPF present
     my $broken = $good; $broken =~ s/orig body/evil body/;

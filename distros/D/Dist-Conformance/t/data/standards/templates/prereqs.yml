@@ -1,0 +1,3 @@
+runtime:
+  requires:
+    perl: '{{PERL_FLOOR}}'

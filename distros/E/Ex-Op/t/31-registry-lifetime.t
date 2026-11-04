@@ -6,6 +6,8 @@ use Test::More;
 use Config;
 use Ex::Op ();
 
+plan skip_all => 'threads: Devel::Cover does not work with them' if $INC{'Devel/Cover.pm'};
+
 no strict 'refs';
 
 {
@@ -53,15 +55,19 @@ no strict 'refs';
 }
 
 SKIP: {
-    skip 'no threads', 3 unless $Config{useithreads};
-    skip 'threads will not load', 3 unless eval { require threads; 1 };
+    skip 'no threads', 5 unless $Config{useithreads};
+    skip 'threads will not load', 5 unless eval { require threads; 1 };
     Ex::Op::make(threaded => sub { my ($x) = @_; $x * 3 });
-    my ($is, $why, $val) = @{ threads->create(sub {
-        [ Ex::Op::is_op(\&threaded) ? 1 : 0, Ex::Op::why_not(\&threaded), threaded(2) ];
+    Ex::Op::make(threaded_none => sub { 7 });
+    Ex::Op::make(threaded_bad => sub { shift });
+    my ($is, $why, $val, $none, $bad) = @{ threads->create(sub {
+        [ Ex::Op::is_op(\&threaded) ? 1 : 0, Ex::Op::why_not(\&threaded), threaded(2), Ex::Op::is_op(\&threaded_none) ? threaded_none() : 0, Ex::Op::why_not(\&threaded_bad) ];
     })->join };
     is( $is, 1, 'an op in a new thread is still an op' );
     is( $why, undef, '... with no reason not to be' );
     is( $val, 6, '... and runs' );
+    is( $none, 7, '... and so does one with no parameters' );
+    is( $bad, 'it reads @_ after its parameters', '... and a declined sub keeps its reason' );
 }
 
 done_testing;

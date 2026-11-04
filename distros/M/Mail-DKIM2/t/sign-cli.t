@@ -182,22 +182,20 @@ isnt($rc4, 0, 'missing --selector is an error');
     is($out, '', 'gate: nothing written for a broken MI chain');
     like($err, qr/not signing:/, 'gate: MI refusal explains itself');
 
-    ($out, $rc, $err) = $run->($null_top->());
-    isnt($rc, 0, 'gate: null body Recipe refused by default');
-    is($out, '', 'gate: nothing written for null body Recipe');
-    like($err, qr/null body Recipe/, 'gate: reason names the null body Recipe');
-    like($err, qr/--allow-null-body-recipe not set/, 'gate: CLI message names its own flag');
-    like($err, qr/unsigned top Message-Instance m=2/, 'gate: and says the null top is unsigned');
-
-    ($out, $rc) = $run->($null_top->(), '--allow-null-body-recipe');
-    is($rc, 0, 'gate: null body Recipe signed with --allow-null-body-recipe');
+    # This hop's own (unsigned) null body Recipe is signed (0.29).
+    ($out, $rc) = $run->($null_top->());
+    is($rc, 0, 'gate: our own null body Recipe is signed');
     like($out, qr/^DKIM2-Signature: i=2;/m, 'gate: and the signature is i=2');
 
-    ($out, $rc) = $run->($null_top->(forge => 1), '--allow-null-body-recipe');
-    isnt($rc, 0, 'gate: forged null-top refused even with the option');
+    ($out, $rc, $err) = $run->($null_top->(), '--allow-null-body-recipe');
+    is($rc, 0, 'gate: --allow-null-body-recipe is accepted');
+    like($err, qr/--allow-null-body-recipe is deprecated and does nothing/, '... and warned about');
 
-    # The list domain test2 signed its own null m=2 (i=2, m=2); test3 forwards
-    # it unchanged and signs i=3 without the option.
+    ($out, $rc) = $run->($null_top->(forge => 1));
+    isnt($rc, 0, 'gate: forged null-top refused');
+
+    # The list domain test2 signed its own null m=2 (i=2, m=2); test3 is
+    # refused: that null is upstream's, and does not verify.
     {
         my $s = Mail::DKIM2::Signer->new(
             Domain => 'test2.dkim2.com', Selector => 'sel1',
@@ -214,9 +212,8 @@ isnt($rc4, 0, 'missing --selector is an error');
             '--mailfrom', '<fwd@test3.dkim2.com>', '--rcptto', '<user@test4.dkim2.com>', "$f");
         open my $fh, '-|', "@{[map { quotemeta } @cmd]} 2>$e" or die $!;
         binmode $fh; my $o = do { local $/; <$fh> }; close $fh;
-        is($? >> 8, 0, 'gate: a null top the list already signed is extended without the option')
-            or diag($e->slurp);
-        like($o, qr/^DKIM2-Signature: i=3; m=2;/m, 'gate: forwarder signs i=3 over the signed m=2');
+        isnt($? >> 8, 0, 'gate: a null top the list already signed is refused');
+        like($e->slurp, qr/has a null recipe/, 'gate: ... saying why');
     }
 
     # nd= bridge: a top signature carrying nd= may be extended only by the
@@ -239,7 +236,7 @@ isnt($rc4, 0, 'missing --selector is an error');
         or die 'no nd=';
     ($out, $rc) = $run->($ws, '--ignore-timestamps');
     is($rc, 0, 'gate: "nd = x" with whitespace around "=" is recognised and signed');
-    # Not a tampering hole: -08 §12.8 canonicalises a DKIM2-Signature field by
+    # Not a tampering hole: -09 §12.8 canonicalises a DKIM2-Signature field by
     # removing all whitespace before hashing it, so adding FWS around "=" does
     # not change what i=1's b= covers. The countersigned chain verifies, while
     # changing the domain really does break i=1 (next test).
@@ -277,7 +274,7 @@ isnt($rc4, 0, 'missing --selector is an error');
     is($rc, 0, 'gate: --ignore-timestamps accepted');
 }
 
-# --exploded (-08 section 12.5): f=exploded from i=2 on, never at i=1.
+# --exploded (-09 section 12.5): f=exploded from i=2 on, never at i=1.
 {
     my $f = sub { my ($sig) = Email::MIME->new($_[0])->header_raw('DKIM2-Signature');
                   $sig =~ /\bf=([^;]*)/ ? $1 =~ s/\s+//gr : '' };
@@ -292,6 +289,23 @@ isnt($rc4, 0, 'missing --selector is an error');
     is($rc2, 0, 'exploded at i=2: signs');
     my ($top) = sort { $b cmp $a } Email::MIME->new($hop2)->header_raw('DKIM2-Signature');
     like($top, qr/\bf=exploded\b/, 'exploded at i=2: f=exploded');
+}
+
+# -09 contract E3.4: --parent-from lets d= sign for a parent's From.
+{
+    my $msg = "From: a\@open.dkim2.com\r\nTo: b\@test2.dkim2.com\r\nSubject: x\r\n\r\nbody\r\n";
+    my $tmp = Path::Tiny->tempdir;
+    my $f = $tmp->child("parent.eml");
+    $f->spew_raw($msg);
+    my @cmd = ($^X, '-Ilib', 'bin/dkim2sign', '-s', 'sel1', '-d', 'mail.open.dkim2.com',
+        '-k', 't/data/keys/sel1._domainkey.test2.dkim2.com.pem',
+        '--mailfrom', '<a@mail.open.dkim2.com>', '--rcptto', '<b@test2.dkim2.com>');
+    my $out = `@{[map { quotemeta } @cmd, "$f"]} 2>&1`;
+    isnt($? >> 8, 0, 'dkim2sign: parent From without --parent-from: refused');
+    like($out, qr/From header field is not Authentic for d=mail\.open\.dkim2\.com/, '... saying why');
+    $out = `@{[map { quotemeta } @cmd, '--parent-from', 'open.dkim2.com', "$f"]} 2>&1`;
+    is($? >> 8, 0, 'dkim2sign --parent-from open.dkim2.com: signed') or diag $out;
+    like($out, qr/^DKIM2-Signature: i=1;.*\bd=mail\.open\.dkim2\.com;/ms, '... as the subdomain');
 }
 
 done_testing();

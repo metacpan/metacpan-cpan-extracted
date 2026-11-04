@@ -26,7 +26,7 @@ my $entries = $writer->entries($files, $generated, @maps);
 
 is_deeply([sort keys %$entries], ['Spike.xs', 'include/spike.h', 'src/helper.c', 'xs/more.xs'], 'four files, no Spike.c');
 my $xse = $entries->{'Spike.xs'};
-is(scalar @{ $xse->{statement} }, 26, '26 statements in Spike.xs');
+is(scalar @{ $xse->{statement} }, 25, '25 statements in Spike.xs, the closing brace on line 63 none');
 is_deeply([ grep { $_->[0] == 47 } @{ $xse->{branch} } ], [
     [47, 'arm 1 of 5', [1, 3]], [47, 'arm 2 of 5', [1, 3]], [47, 'arm 3 of 5', [1, 3]], [47, 'arm 4 of 5', [0, 4]], [47, 'arm 5 of 5', [1, 3]],
 ], 'the switch is five branches, each arm against the rest');
@@ -38,7 +38,7 @@ is_deeply([ map { $_->[1] } @{ $entries->{'include/spike.h'}{statement} } ], [2,
 
 my $run = $writer->write($entries);
 is($run->{files}, 4, 'four files written');
-is($run->{statement}, 26 + 4 + 6 + 7, 'the statements');
+is($run->{statement}, 25 + 4 + 6 + 6, 'the statements');
 is($run->{subroutine}, 9 + 4 + 2 + 1, 'the subroutines: seven XSUBs, the alias and the C helper, four, two, one');
 ok(-d $run->{run}, 'the run directory exists');
 

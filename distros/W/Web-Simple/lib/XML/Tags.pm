@@ -107,7 +107,7 @@ sub stringify {
     '',
     ((our $IN_GLOBBERY)
       ? XML::Tags::to_xml_string(@{$_[0]})
-      : (map +(ref $_ ? $$_ : $_), @{$_[0]})
+      : (map +(ref $_ ? $$_ : XML::Tags::to_xml_string($_) ), @{$_[0]})
     )
   );
 }

@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.28
+Version 0.29
 
 ## Synopsis
 
@@ -1042,7 +1042,7 @@ reference with a `name` (string) and a `data` array reference of
     ```
 
     Series need not share labels: the X domain is the union of every series' labels,
-    in first-seen order.  One line and one set of dots is drawn per series, and a
+    in the order `x_order` gives.  One line and one set of dots is drawn per series, and a
     clickable legend toggles each series on and off.
 
 - `\%opts` - Optional hash reference:
@@ -1055,6 +1055,16 @@ reference with a `name` (string) and a `data` array reference of
     - `animated` (boolean, default 0) - If true each line draws itself left
     to right by animating its stroke dash offset.  Respects
     `prefers-reduced-motion`.
+    - `x_order` (`'auto'`, `'data'` or `'sort'`, default `'auto'`) - the
+    order of the X domain.  `'data'` takes the labels in the order they are met,
+    series by series, as before 0.29.  `'sort'` sorts them: numerically when every
+    label is a number, otherwise as strings.  `'auto'` sorts them when every label
+    is a number or an ISO 8601 date or date-time (`2026-01-15`, `2026-01`,
+    `2026-01-15T09:30`), and otherwise keeps the order they are met in, so that
+    `Jan`, `Feb`, `Mar` stay in the caller's order.  Taken as met, two series of
+    dates gave an axis such as `15, 19, 16, 17`.  Whenever the labels are sorted,
+    each line's points are drawn in the axis order.  The caller's series are not
+    changed.
     - `responsive` (boolean, optional) - SVG responsive sizing override.
     - `id` (string, default `'chart'`) - `id` of the `<svg`> element.
 
@@ -1067,6 +1077,8 @@ ARRAY reference.
 - Throws `Each series must be a hashref with name and data` when a
 series is not a hashref, has no `name`, or has a `data` that is not an ARRAY
 reference.
+- Throws `Unknown x_order: <value>` when `x_order` is not
+`auto`, `data` or `sort`.
 
 #### Api Specification
 
@@ -1082,6 +1094,7 @@ reference.
             scheme     => { type => 'string',  optional => 1, default => 'tableau10' },
             x_label    => { type => 'string',  optional => 1, default => '' },
             y_label    => { type => 'string',  optional => 1, default => '' },
+            x_order    => { type => 'string',  optional => 1, default => 'auto' },
             animated   => { type => 'boolean', optional => 1, default => 0 },
             responsive => { type => 'boolean', optional => 1 },
             id         => { type => 'string',  optional => 1, default => 'chart' },
@@ -1346,6 +1359,11 @@ A value holding anything a CSS colour cannot, such as a quote or `<`, is
 ignored and the default used.
 - `line_color` (string, optional CSS colour, default `'#e15759'`) - line stroke.
 Checked as `bar_color` is.
+- `scheme` (string, optional) - a categorical scheme, as
+`categorical_schemes()` lists them.  The bars take its first colour and the
+line its second, as `colour_at($scheme, 0)` and `colour_at($scheme, 1)`.
+`bar_color` and `line_color` still win when given.  Any other name is
+ignored and the defaults used.
 - `id` (string, optional) - override the default `svg_id` value.
 - `responsive` (boolean, optional) - SVG responsive sizing override.
 
@@ -1376,6 +1394,7 @@ Returns `{ svg_id => 'combo_chart', html => Str }`.
             line_label => { type => 'string',  optional => 1, default => 'Line' },
             bar_color  => { type => 'string',  optional => 1, default => 'steelblue' },
             line_color => { type => 'string',  optional => 1, default => '#e15759' },
+            scheme     => { type => 'string',  optional => 1 },
             id         => { type => 'string',  optional => 1, default => 'combo_chart' },
             responsive => { type => 'boolean', optional => 1 },
         },
@@ -1408,6 +1427,23 @@ to a D3 stratify hierarchy in JS.  Override the path separator with
 with `name`/`children`/`value` structure.  Passed directly to
 `d3.hierarchy()`.
 
+**Colour by value.**  A flat row, or a node of the tree, may also carry
+`color_value`, a second number that colours its tile: the area says how much
+and the colour says how well -- sales sized by revenue and coloured by margin.
+As soon as one tile has one, every tile is shaded from the sequential
+`color_scheme` over the smallest to the largest `color_value`, in place of
+its top-level group's colour; a tile without one is grey.  The tooltip gives
+the value under `color_label`, a legend at the foot of the chart gives the
+range, and labels on light tiles are drawn dark.  When every tile has the same
+value they all take the middle of the scheme.
+
+```perl
+->render_treemap_snippet([
+    { path => 'All/North', value => 1200, color_value => 0.18 },
+    { path => 'All/South', value =>  800, color_value => 0.05 },
+], { color_scheme => 'Blues', color_label => 'Margin' });
+```
+
 Accepted `\%opts` keys:
 
 - `path_sep` (string, default `'/'`)  - path separator (flat format only).
@@ -1416,6 +1452,12 @@ Supported: `tableau10`, `category10`, `set2`, `set3`, `paired` - the names
 `categorical_schemes()` returns, whose colours `palette()` makes available to
 Perl.
 - `label` (boolean, default `1`) - show node labels inside cells.
+- `color_scheme` (string, default `'YlOrRd'`) - the sequential scheme
+tiles are coloured from when they carry `color_value`: `YlOrRd`, `Blues`,
+`Greens`, `Purples`, `RdPu` or `YlGnBu`, as for `render_heatmap_snippet`.
+Not read when no tile has a `color_value`.
+- `color_label` (string, default `'Colour'`) - what `color_value`
+measures, for the tooltip and the legend.
 - `id` (string, optional) - override the default `svg_id` value.
 - `responsive` (boolean, optional) - SVG responsive sizing override.
 
@@ -1428,6 +1470,12 @@ when `$data` is neither an ARRAY nor a HASH reference.
 - Throws `Each flat row must be a hash reference` when a flat row is not a hashref.
 - Throws `Each flat row must have a 'path' key` when a flat row lacks `path`.
 - Throws `Each flat row must have a numeric 'value' key` when a value is not numeric.
+- Throws `Each flat row's 'color_value' must be numeric` when a flat
+row's `color_value` is defined but not a finite number.
+- Throws `Each node's 'color_value' must be numeric` when a node of the
+tree has a `color_value` that is defined but not a finite number.
+- Throws `Unknown color_scheme: <name>` when a tile has a
+`color_value` and `color_scheme` is not one of the sequential schemes.
 
 #### Api Specification
 
@@ -1443,6 +1491,8 @@ when `$data` is neither an ARRAY nor a HASH reference.
             path_sep => { type => 'string',  optional => 1, default => '/' },
             scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
             label    => { type => 'boolean', optional => 1, default => 1 },
+            color_scheme => { type => 'string', optional => 1, default => 'YlOrRd' },
+            color_label  => { type => 'string', optional => 1, default => 'Colour' },
             id       => { type => 'string',  optional => 1, default => 'treemap' },
             responsive => { type => 'boolean', optional => 1 },
         },
@@ -1778,9 +1828,20 @@ pre  ref(data) ≠ 'ARRAY'        ⇒ die "Data must be an array of series"
 pre  ∃ s ∈ data . ref(s) ≠ 'HASH'
                                 ⇒ die "Each series must be a hashref with name and data"
 pre  ∃ s ∈ data . ¬defined(s.name) ∨ ref(s.data) ≠ 'ARRAY'
+pre  opts.x_order ∉ {undef, 'auto', 'data', 'sort'}
+                                ⇒ die "Unknown x_order: <x_order>"
                                 ⇒ die "Each series must be a hashref with name and data"
 post result ∈ HashRef
 post result.svg_id = opts.id // "chart"
+post L = the labels of every series, first-seen order, as strings
+post opts.x_order ≠ 'data' ∧ ∀ l ∈ L . numeric(l)
+                                ⇒ the X domain is L sorted numerically
+post opts.x_order = 'auto' ∧ ∀ l ∈ L . iso_date(l)
+                                ⇒ the X domain is L sorted as strings
+post opts.x_order = 'sort' ∧ ∃ l ∈ L . ¬numeric(l)
+                                ⇒ the X domain is L sorted as strings
+post otherwise                  ⇒ the X domain is L
+post the X domain is sorted     ⇒ each series' points are in domain order
 post result.html ∈ Str
 post "<!DOCTYPE" ∉ result.html
 post "d3.scalePoint" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
@@ -1895,6 +1956,10 @@ post result.html ∈ Str
 post "<!DOCTYPE" ∉ result.html
 post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
 post "axisRight" ⊆ result.html
+post opts.bar_color = undef ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                ⇒ colour_at(S, 0) is the bar fill
+post opts.line_color = undef ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                ⇒ colour_at(S, 1) is the line stroke
 post "</b>" ∉ result.html ∧ "<\/b>" ∈ result.html
 ```
 
@@ -1912,6 +1977,13 @@ pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬exists(row.path)
                                 ⇒ die "Each flat row must have a 'path' key"
 pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬numeric(row.value)
                                 ⇒ die "Each flat row must have a numeric 'value' key"
+pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . defined(row.color_value) ∧ ¬finite(row.color_value)
+                                ⇒ die "Each flat row's 'color_value' must be numeric"
+pre  ref(data) = 'HASH' ∧ ∃ node ∈ tree . defined(node.color_value) ∧ ¬finite(node.color_value)
+                                ⇒ die "Each node's 'color_value' must be numeric"
+pre  BV ∧ opts.color_scheme ∉ sequential schemes
+                                ⇒ die "Unknown color_scheme: <color_scheme>"
+    where BV ≡ ∃ tile . defined(tile.color_value)
 post result ∈ HashRef
 post result.svg_id = opts.id // "treemap"
 post result.html ∈ Str
@@ -1921,6 +1993,8 @@ post ref(data) = 'ARRAY' ⇒ "d3.stratify()" ⊆ result.html
 post ref(data) = 'HASH'  ⇒ "d3.hierarchy(" ⊆ result.html
 post opts.scheme = S ∧ S ∈ categorical_schemes()
                                 ⇒ the D3 expression of S ⊆ result.html
+post BV                         ⇒ "d3.scaleSequential(" ⊆ result.html ∧ "tm-legend" ⊆ result.html
+post ¬BV                        ⇒ "scaleSequential" ∉ result.html
 post opts.scheme ∉ categorical_schemes()
                                 ⇒ the default scheme's expression ⊆ result.html
 ```

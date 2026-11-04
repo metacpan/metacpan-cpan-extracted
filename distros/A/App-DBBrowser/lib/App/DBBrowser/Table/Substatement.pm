@@ -142,6 +142,8 @@ sub select {
                 elsif ( exists $complex_col->{distinct} ) {
                     $sf->__distinct( $sql );
                 }
+                #elsif ( exists $complex_col->{rearrange} ) {
+                #}
             }
             else {
                 my $alias = $ax->alias( $sql, 'complex_cols_select', $complex_col );

@@ -27,6 +27,17 @@ like( compile_err('op f ($x, $x) { 1 }'),
 like( compile_err('op f ($x $y) { 1 }'),
       qr/^Ex::Op: expected , or \) in the parameters of op f at kw\.pl line 10\b/,
       'a missing comma' );
+{
+    require File::Temp;
+    my $fh = File::Temp->new(SUFFIX => '.pl');
+    print $fh "package EO::KwEof;\nuse Ex::Op;\nop nothing_after";
+    close $fh;
+    local $@;
+    do "$fh";
+    like( $@, qr/^Ex::Op: op nothing_after needs a block\b/, 'a name at the very end of the source, with nothing after it' );
+    eval "package EO::KwEof2;\nuse Ex::Op;\nop nothing_after";
+    like( $@, qr/^Ex::Op: op nothing_after needs a block\b/, '... and at the end of a string eval' );
+}
 like( compile_err('op f ($x);'),
       qr/^Ex::Op: op f needs a block at kw\.pl line 10\b/,
       'no block' );

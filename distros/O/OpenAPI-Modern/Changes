@@ -1,5 +1,14 @@
 Revision history for OpenAPI-Modern
 
+0.152     2026-11-03 22:16:17Z
+          - now checking for invalid references after adding all documents to
+            the OpenAPI object at construction time (references to unknown
+            documents are still allowed, for now)
+          - fix load-time syntax checks of the "xml" keyword, and
+            "defaultMapping" in the "discriminator" keyword
+          - allow "openapi-validate" to run when the local directory is an
+            arbitrary git repository
+
 0.151     2026-10-30 03:43:50Z
           - fixed some edge cases with how server urls are matched, especially
             when multiple OpenAPI documents are used and cross-referenced

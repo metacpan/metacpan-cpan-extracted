@@ -34,7 +34,7 @@ subtest 'Atom channel ok' => sub {
     is($channel->{ updated }, 1750010821, 'updated ok');
     is(
         $channel->{ author },
-        'samyoung12788 at gmail dot com (Samuel Young)',
+        'samyoung at posteo dot com (Samuel Young)',
         'author ok'
     );
     is_deeply($channel->{ category }, [ qw(test sample phony) ], 'category ok');
@@ -42,7 +42,7 @@ subtest 'Atom channel ok' => sub {
     is($channel->{ image }, '/logo.png', 'image ok');
     is(
         $channel->{ rights },
-        'Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)',
+        'Copyright (C) 2025 Samuel Young (samyoung at posteo dot com)',
         'rights ok'
     );
     is($channel->{ skiphours }, undef, 'skiphours ok');
@@ -61,7 +61,7 @@ subtest 'Atom entries ok' => sub {
         is($e->{ updated }, 1750011361, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         like(
@@ -86,7 +86,7 @@ subtest 'Atom entries ok' => sub {
         is($e->{ updated }, 1750011661, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is($e->{ summary }, '<p>Post with HTML content.</p>', 'content ok');
@@ -106,7 +106,7 @@ subtest 'Atom entries ok' => sub {
         is($e->{ updated }, 1750016941, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is(
@@ -130,7 +130,7 @@ subtest 'Atom entries ok' => sub {
         is($e->{ updated }, 1750017241, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         is(
@@ -154,7 +154,7 @@ subtest 'Atom entries ok' => sub {
         is($e->{ updated }, 1750017301, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         like(
@@ -186,7 +186,7 @@ subtest 'MRSS ok' => sub {
         is($e->{ updated }, 1750011361, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         like(
@@ -207,7 +207,7 @@ subtest 'MRSS ok' => sub {
         is($e->{ updated }, 1750011661, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         like(
@@ -228,7 +228,7 @@ subtest 'MRSS ok' => sub {
         is($e->{ updated }, 1750016941, 'updated ok');
         is(
             $e->{ author },
-            'samyoung12788 at gmail dot com (Samuel Young)',
+            'samyoung at posteo dot com (Samuel Young)',
             'author ok'
         );
         like(

@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>[% title | html %]</title>
+<script src="[% d3_url | html %]"></script>
+[% card_head %]
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 body {
@@ -23,10 +25,13 @@ body {
 .embed-grid {
 	display: grid;
 	grid-template-columns: repeat(12, 1fr);
-	grid-auto-rows: minmax(15rem, auto);
+	grid-auto-rows: auto;
 	gap: 0.75rem;
 }
+/* The height is on the card rather than the row, so a row of text is as tall as
+ * its text.  Nothing on this page spans rows. */
 .visual-card {
+	min-height: 15rem;
 	background: #fff;
 	border: 1px solid #dee2e6;
 	border-radius: 4px;
@@ -35,6 +40,10 @@ body {
 	flex-direction: column;
 	grid-column: span 6;
 }
+.text-card { min-height: 0; grid-column: 1 / -1; }
+.text-card-plain { border-color: transparent; background: transparent; }
+.text-card .visual-card-body { display: flex; padding: 0; }
+.text-card-text { flex: 1; min-width: 0; padding: 0.5rem 0.75rem; line-height: 1.3; overflow-wrap: anywhere; }
 .visual-card-title {
 	font-weight: 600;
 	font-size: 0.85rem;
@@ -56,10 +65,10 @@ body {
 [% IF visuals.size %]
 <div class="embed-grid" id="embed-grid">
 [% FOREACH v IN visuals %]
-	<div class="visual-card"
+	<div class="visual-card[% v.kind == 'text' ? ' text-card' : '' %][% v.plain ? ' text-card-plain' : '' %]"
 	     id="visual-[% v.id %]"
 	     [% IF v.style.length %]style="[% v.style | html %]"[% END %]>
-		[% IF v.title.length %]
+		[% IF v.title.length && v.kind != 'text' %]
 		<div class="visual-card-title">[% v.title | html %]</div>
 		[% END %]
 		<div class="visual-card-body">

@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Feed
 
+1.263070  2026-11-03 16:18:00+01:00 Europe/Berlin
+
+    * Removed accidentally introduced postfix dereferencing (https://codeberg.org/demiguise/Dancer2-Plugin-Feed/issues/6).
+
 1.263060  2026-11-02 07:01:14+01:00 Europe/Berlin
 
     * Added package indexing as recommended by Kwalitee

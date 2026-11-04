@@ -36,7 +36,7 @@ $NO_NOSSUI //= $^O eq 'MSWin32' ? 1 : 0;
 
 my %WriteMakefileArgs = (
     NAME             => 'WWW::Noss',
-    AUTHOR           => q{Samuel Young <samyoung12788@gmail.com>},
+    AUTHOR           => q{Samuel Young <samyoung@posteo.com>},
     VERSION_FROM     => 'lib/WWW/Noss.pm',
     ABSTRACT_FROM    => 'lib/WWW/Noss.pm',
     LICENSE          => 'gpl_3',

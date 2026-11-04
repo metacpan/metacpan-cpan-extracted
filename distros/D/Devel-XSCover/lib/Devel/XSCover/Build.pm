@@ -7,8 +7,10 @@ use warnings;
 use Config ();
 use File::Find ();
 use File::Spec ();
+use IPC::Open3 ();
+use Symbol ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 our (%SOURCE_EXT, $COVERAGE);
 
@@ -26,6 +28,7 @@ sub new {
         cc      => $Config::Config{cc},
         gcov    => undef,
         conditions => undef,
+        flow    => undef,
         dry     => 0,
         silent  => 0,
         skip    => [qw(blib cover_db .git)],
@@ -39,8 +42,8 @@ sub dir { $_[0]{dir} }
 sub compiler {
     my ($self) = @_;
     return $self->{compiler} if $self->{compiler};
-    my $banner = $self->_capture($self->{cc}, '--version');
-    my ($first) = split /\n/, $banner // '';
+    my $banner = $self->_capture($self->{cc}, '--version') // '';
+    my ($first) = split /\n/, $banner;
     $first //= '';
     my %c = (cc => $self->{cc}, name => 'unknown', major => 0, banner => $first);
     if ($first =~ /clang version (\d+)/) {
@@ -86,6 +89,15 @@ sub conditions {
     return $self->{conditions} ? 1 : 0 if defined $self->{conditions};
     my $c = $self->compiler;
     return $c->{name} eq 'gcc' && $c->{major} >= 14 ? 1 : 0;
+}
+
+sub flow_kind {
+    my ($self) = @_;
+    return $self->{flow} if defined $self->{flow};
+    my $banner = $self->_capture(@{ $self->gcov_command }, '--version') // '';
+    return $self->{flow} = 'llvm' if $banner =~ /LLVM/;
+    return $self->{flow} = 'gcc' if $banner =~ /\b(\d+)\.\d+(?:\.\d+)?\b/ && $1 >= 9;
+    return $self->{flow} = '';
 }
 
 sub flags {
@@ -154,17 +166,19 @@ sub configure {
 sub touch {
     my ($self) = @_;
     my %skip = map { $_ => 1 } @{ $self->{skip} };
-    my $now = time;
+    my $top  = _slashes($self->{dir});
+    my $now  = time;
     my @touched;
     File::Find::find({
         no_chdir => 1,
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $self->{dir};
+                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
                 return;
             }
             return unless /\.([A-Za-z]+)\z/ && $SOURCE_EXT{ lc $1 };
+            return if lc $1 eq 'c' && -f substr($_, 0, -1) . 'xs';
             push @touched, $_;
             utime $now, $now, $_ unless $self->{dry};
         },
@@ -211,15 +225,22 @@ sub _say {
 
 sub _capture {
     my ($self, @cmd) = @_;
-    my $pid = open my $fh, '-|';
-    return undef unless defined $pid;
-    if (!$pid) {
-        open STDERR, '>', File::Spec->devnull;
-        exec @cmd or exit 127;
-    }
-    my $out = do { local $/; <$fh> };
-    close $fh;
-    return $out;
+    local *NULL;
+    open NULL, '>', File::Spec->devnull;
+    my ($in, $out) = (undef, Symbol::gensym());
+    my $pid = eval { IPC::Open3::open3($in, $out, '>&NULL', @cmd) };
+    return undef unless $pid;
+    close $in;
+    my $text = do { local $/; <$out> };
+    close $out;
+    waitpid $pid, 0;
+    return $text;
+}
+
+sub _slashes {
+    my ($path) = @_;
+    $path =~ s{\\}{/}g if $^O eq 'MSWin32';
+    return $path;
 }
 
 sub _which {
@@ -261,7 +282,7 @@ object. C<make clean> is never run.
 
 Options: C<dir> (the distribution directory), C<make>,
 C<perl>, C<cc> (the compiler, from perl's configuration by default), C<gcov> (a
-tool overriding the detection), C<conditions> (condition coverage on or off,
+tool overriding the detection), C<flow> (the flow graph's kind overriding the detection), C<conditions> (condition coverage on or off,
 decided by the compiler when not given), C<dry>, C<silent> and C<skip> (directory
 names not touched, C<blib>, C<cover_db> and C<.git> by default).
 
@@ -272,6 +293,13 @@ have C<-fcondition-coverage>, which records for every term of a decision whether
 its true and its false outcome each decided the result, and C<gcov --conditions>
 reports it. Other compilers have nothing of the kind in gcov's output, so the
 condition column stays empty for C with them.
+
+=head2 flow_kind
+
+How the gcov tool can give the flow graph beside its text: C<llvm> when it is
+LLVM's, which has C<--dump>, C<gcc> when it is gcc 9 or later, which has
+C<--json-format>, and empty for an older gcov, whose branches then come from the
+blocks in its text alone. The C<flow> option overrides the detection.
 
 =head2 compiler
 
@@ -319,8 +347,10 @@ Returns the exit status.
 =head2 touch
 
 Sets the modification time of every C<.xs>, C<.c>, C<.cc>, C<.cpp>, C<.cxx>, C<.h>,
-C<.hh> and C<.hpp> under the directory to now, skipping the directories in C<skip>.
-Returns the files touched.
+C<.hh> and C<.hpp> under the directory to now, skipping the directories in C<skip>,
+and leaving alone a C<.c> beside a C<.xs> of the same name, which xsubpp writes:
+touched with its source, it would be as new as it and never written again, and the
+build would compile the C of the last run. Returns the files touched.
 
 =head2 build
 

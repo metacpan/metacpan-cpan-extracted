@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use List::Util qw(all any max none);
 
@@ -1254,7 +1254,7 @@ B<WWW::Noss::DB> object is destroyed.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

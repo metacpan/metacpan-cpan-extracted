@@ -46,4 +46,31 @@ is($loc->[0]->text, 'term 1 of if (a && (b || c))', 'and the text');
 ok($loc->[0]->error, 'a missing outcome is an error');
 ok(!$cover->file('cond.c')->condition->location(5)->[0]->error, 'a complete one is not');
 
+my $mdir = File::Temp->newdir;
+open my $mfh, '>', File::Spec->catfile($mdir, 'mac.c') or die;
+print $mfh <<'C';
+int g(SV *sv, int a, int b)
+{
+    if (!SvOK(GvSVn(gv)))
+        return 1;
+    sv_setiv(GvSVn(gv), 0);
+    if (a
+        && b)
+        return 2;
+    return a ? 3 : 4;
+}
+C
+close $mfh;
+my $term = sub { { true => 1, false => 0 } };
+my $mac = { 'mac.c' => { lines => {}, functions => [], blocks => [], conditions => [
+    { line => 3, covered => 1, total => 6, terms => [ $term->(), $term->(), $term->() ] },
+    { line => 5, covered => 1, total => 2, terms => [ $term->() ] },
+    { line => 6, covered => 2, total => 4, terms => [ $term->(), $term->() ] },
+    { line => 9, covered => 1, total => 2, terms => [ $term->() ] },
+] } };
+my $mw = Devel::XSCover::DB->new(dir => "$mdir", silent => 1, db => 'unused');
+is_deeply([ map { $_->[0] } @{ $mw->entries($mac, {})->{'mac.c'}{condition} } ], [6, 6, 9],
+    'kept: the two-line && and the ?:, whose terms are all in the source; dropped: the if with a macro inside (three terms for one) and the macro line');
+is(scalar @{ Devel::XSCover::DB->new(dir => "$mdir", silent => 1, db => 'unused', macro_branches => 1)->entries($mac, {})->{'mac.c'}{condition} }, 7, 'macro_branches keeps every term');
+
 done_testing;

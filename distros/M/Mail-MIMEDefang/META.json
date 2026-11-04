@@ -4,7 +4,7 @@
       "The McGrail Foundation <https://mimedefang.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "keywords" : [
       "email",
       "milter",
@@ -91,6 +91,6 @@
          "web" : "https://mimedefang.org"
       }
    },
-   "version" : "v3.7.1",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v3.7.3",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

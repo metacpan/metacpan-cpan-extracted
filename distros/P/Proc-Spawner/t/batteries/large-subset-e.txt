@@ -1,0 +1,10 @@
+sleep 1 & jobs | wc -l
+sleep 1 & x=$(jobs -p); [ "$x" = "$!" ] && echo same
+sleep 1 & (jobs); echo .
+echo a; return; echo b
+x=$(echo e >&2; echo v) 2>/dev/null; echo "[$x]"
+mkdir a b; cd a b; echo "st=$?"
+echo hi 10>/dev/null
+mkdir -p .h; echo .*
+case b in [^a]) echo neg;; *) echo lit;; esac
+n=HOME; unset $n; cd; echo st=$?

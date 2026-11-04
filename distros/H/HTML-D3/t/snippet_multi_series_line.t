@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 40;
+use Test::Most tests => 44;
 use_ok('HTML::D3');
 
 my $chart = HTML::D3->new(width => 800, height => 600, title => 'Multi Series Test');
@@ -45,8 +45,8 @@ like($html, qr/"value":1000/, 'First series value present in JSON');
 like($html, qr/d3\.scalePoint/, 'Uses d3.scalePoint for the X axis');
 like($html, qr/d3\.line\(\)/,   'Uses d3.line() for the paths');
 like($html, qr/msl-line/,       'Line class present');
-like($html, qr/Array\.from\(new Set\(series\.flatMap/,
-	'X domain is the union of every series\' labels');
+like($html, qr/var allLabels = \["January","February","March"\];/,
+	'X domain is the union of every series\' labels, in first-seen order');
 like($html, qr/scaleOrdinal\(\['#4e79a7', '#f28e2c'/, 'Default scheme is tableau10');
 unlike($html, qr/<!DOCTYPE/i, 'No DOCTYPE (snippet)');
 unlike($html, qr/<html/i,     'No <html> wrapper');
@@ -95,3 +95,60 @@ throws_ok { $chart->render_multi_series_line_chart_snippet([{ name => 'A' }]) }
 	qr/Each series must be a hashref with name and data/, 'Series without data dies';
 throws_ok { $chart->render_multi_series_line_chart_snippet([{ data => [] }]) }
 	qr/Each series must be a hashref with name and data/, 'Series without name dies';
+
+# ── x_order (0.29) ────────────────────────────────────────────────────────────
+sub domain_of {
+	my ($h) = @_;
+	my ($json) = $h =~ /var allLabels = (\[.*?\]);/;
+	return defined $json ? JSON::PP->new->decode($json) : undef;
+}
+sub points_of {
+	my ($h, $name) = @_;
+	my ($json) = $h =~ /var series = (\[.*\]);/;
+	my ($s) = grep { $_->{name} eq $name } @{ JSON::PP->new->decode($json) };
+	return [ map { $_->{label} } @{ $s->{data} } ];
+}
+use JSON::PP ();
+
+my @dated = (
+	{ name => 'North', data => [ { label => '2025-01-19', value => 2 }, { label => '2025-01-15', value => 1 } ] },
+	{ name => 'South', data => [ { label => '2025-01-16', value => 3 } ] },
+	{ name => 'East',  data => [ { label => '2025-01-20', value => 4 }, { label => '2025-01-17', value => 5 } ] },
+);
+
+subtest 'auto sorts ISO dates, and each line follows the axis' => sub {
+	my $h = $chart->render_multi_series_line_chart_snippet(\@dated)->{html};
+	is_deeply(domain_of($h), [qw(2025-01-15 2025-01-16 2025-01-17 2025-01-19 2025-01-20)], 'dates in order');
+	is_deeply(points_of($h, 'North'), [qw(2025-01-15 2025-01-19)], 'North drawn left to right');
+	is_deeply(points_of($h, 'East'),  [qw(2025-01-17 2025-01-20)], 'East drawn left to right');
+	is($dated[0]{data}[0]{label}, '2025-01-19', 'the caller\'s series are not reordered');
+	like($h, qr/xScale\(d\.label == null \? "" : String\(d\.label\)\)/, 'labels looked up as strings');
+};
+
+subtest 'auto sorts numbers numerically' => sub {
+	my $h = $chart->render_multi_series_line_chart_snippet([
+		{ name => 'A', data => [ { label => 10, value => 1 }, { label => 9, value => 2 } ] },
+		{ name => 'B', data => [ { label => '1.5', value => 3 }, { label => 100, value => 4 } ] },
+	])->{html};
+	is_deeply(domain_of($h), [ '1.5', '9', '10', '100' ], 'numeric order, as strings');
+};
+
+subtest 'auto keeps other labels in the order they are met' => sub {
+	my $h = $chart->render_multi_series_line_chart_snippet(\@series)->{html};
+	is_deeply(domain_of($h), [qw(January February March)], 'months in the caller\'s order');
+	my $mixed = $chart->render_multi_series_line_chart_snippet([
+		{ name => 'A', data => [ { label => '2025-01-02', value => 1 }, { label => 'later', value => 2 }, { label => '2025-01-01', value => 3 } ] },
+	])->{html};
+	is_deeply(domain_of($mixed), [qw(2025-01-02 later 2025-01-01)], 'one non-date label: no sorting');
+	is_deeply(points_of($mixed, 'A'), [qw(2025-01-02 later 2025-01-01)], 'and no reordering of points');
+};
+
+subtest 'x_order data and sort' => sub {
+	my $h = $chart->render_multi_series_line_chart_snippet(\@dated, { x_order => 'data' })->{html};
+	is_deeply(domain_of($h), [qw(2025-01-19 2025-01-15 2025-01-16 2025-01-20 2025-01-17)], 'data: as met');
+	is_deeply(points_of($h, 'North'), [qw(2025-01-19 2025-01-15)], 'data: points as given');
+	$h = $chart->render_multi_series_line_chart_snippet(\@series, { x_order => 'sort' })->{html};
+	is_deeply(domain_of($h), [qw(February January March)], 'sort: strings sorted');
+	throws_ok { $chart->render_multi_series_line_chart_snippet(\@series, { x_order => 'random' }) }
+		qr/Unknown x_order: random/, 'anything else dies';
+};

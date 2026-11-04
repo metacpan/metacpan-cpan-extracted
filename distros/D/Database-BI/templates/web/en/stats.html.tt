@@ -8,7 +8,7 @@
     min-width: 100%;
   }
   .stats-table th, .stats-table td {
-    border: 1px solid #d0d4de;
+    border: 1px solid var(--border, #d0d4de);
     padding: 0.35rem 0.65rem;
     white-space: nowrap;
   }
@@ -22,8 +22,8 @@
   }
   .stats-table td.col-name { font-weight: 500; }
   .stats-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .stats-table td.na { text-align: center; color: #bbb; }
-  .stats-meta { font-size: 0.82rem; color: #666; margin-bottom: 0.75rem; }
+  .stats-table td.na { text-align: center; color: var(--text-faint, #bbb); }
+  .stats-meta { font-size: 0.82rem; color: var(--muted, #666); margin-bottom: 0.75rem; }
   .stats-pctl {
     display: flex;
     align-items: center;
@@ -39,7 +39,7 @@
   }
   .stats-table td.drill a:hover {
     text-decoration: underline;
-    color: #0066aa;
+    color: var(--info-fg, #0066aa);
   }
 </style>
 

@@ -26,7 +26,8 @@ my %WriteMakefileArgs = (
     "DateTime::Format::Flexible" => 0,
     "Getopt::Long::Descriptive" => 0,
     "Path::Tiny" => 0,
-    "Text::CSV" => 0
+    "Text::CSV" => 0,
+    "Win32::ShellQuote" => "0.003001"
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Exception" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "1.20",
+  "VERSION" => "1.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +53,8 @@ my %FallbackPrereqs = (
   "Test2::Bundle::More" => 0,
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,
-  "Text::CSV" => 0
+  "Text::CSV" => 0,
+  "Win32::ShellQuote" => "0.003001"
 );
 
 

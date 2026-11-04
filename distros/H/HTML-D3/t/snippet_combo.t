@@ -3,7 +3,7 @@
 use warnings;
 use strict;
 
-use Test::Most tests => 32;
+use Test::Most tests => 36;
 use_ok('HTML::D3');
 
 my $chart = HTML::D3->new(width => 900, height => 500, title => 'Combo Chart Test');
@@ -80,3 +80,36 @@ throws_ok { $chart->render_combo_snippet([ { x => 'Q1', bar_val => 'abc', line_v
 	qr/Bar value must be numeric/, 'Dies on non-numeric bar value';
 throws_ok { $chart->render_combo_snippet([ { x => 'Q1', bar_val => 1, line_val => 'abc' } ]) }
 	qr/Line value must be numeric/, 'Dies on non-numeric line value';
+
+# ── scheme (0.29) ─────────────────────────────────────────────────────────────
+subtest 'scheme gives the bars its first colour and the line its second' => sub {
+	my $h = $chart->render_combo_snippet(\@data, { scheme => 'set2' })->{html};
+	is(HTML::D3->colour_at('set2', 0), '#66c2a5', 'set2 first colour');
+	like($h, qr/var barColor\s*=\s*"#66c2a5"/,  'bars take colour_at(set2, 0)');
+	like($h, qr/var lineColor\s*=\s*"#fc8d62"/, 'line takes colour_at(set2, 1)');
+};
+
+subtest 'an explicit colour beats the scheme' => sub {
+	my $h = $chart->render_combo_snippet(\@data, { scheme => 'set2', bar_color => 'black' })->{html};
+	like($h, qr/var barColor\s*=\s*"black"/,    'bar_color wins');
+	like($h, qr/var lineColor\s*=\s*"#fc8d62"/, 'the line still takes the scheme');
+	$h = $chart->render_combo_snippet(\@data, { scheme => 'set2', line_color => '#123456' })->{html};
+	like($h, qr/var barColor\s*=\s*"#66c2a5"/,  'the bars still take the scheme');
+	like($h, qr/var lineColor\s*=\s*"#123456"/, 'line_color wins');
+};
+
+subtest 'a name that is not a scheme leaves the defaults' => sub {
+	for my $bad ('Blues', 'nope', q{set2"];alert(1)//}, ['set2']) {
+		my $h = $chart->render_combo_snippet(\@data, { scheme => $bad })->{html};
+		like($h, qr/var barColor\s*=\s*"steelblue"/, 'bars steelblue');
+		like($h, qr/var lineColor\s*=\s*"#e15759"/,  'line #e15759');
+		unlike($h, qr/alert\(1\)/, 'the name is nowhere in the page');
+	}
+};
+
+subtest 'tooltip text is escaped' => sub {
+	my $h = $chart->render_combo_snippet(\@data)->{html};
+	like($h, qr/function esc\(s\)/, 'esc() defined');
+	is(() = $h =~ /\.html\("<b>"\+esc\(d\.x\)\+[^;]*esc\(barLabel\)[^;]*esc\(lineLabel\)/g, 2,
+		'both tooltips escape the category and the labels');
+};

@@ -19,11 +19,11 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
@@ -199,6 +199,26 @@ my $DEFAULT_CATEGORICAL_SCHEME = 'tableau10';
 # written out again here, so that a chart with no choice and a chart told which
 # scheme to use are the same palette and not two copies of it.
 my $CATEGORY10_JS = _scheme_colours_js('category10');
+
+# The sequential schemes a chart shades a number with -- the heatmap's cells and
+# a treemap coloured by a measure -- and the d3 interpolator each one names.
+# Only these names reach a script.
+my %SEQUENTIAL_SCHEMES = (
+	YlOrRd  => 'd3.interpolateYlOrRd',
+	Blues   => 'd3.interpolateBlues',
+	Greens  => 'd3.interpolateGreens',
+	Purples => 'd3.interpolatePurples',
+	RdPu    => 'd3.interpolateRdPu',
+	YlGnBu  => 'd3.interpolateYlGnBu',
+);
+
+# The function a chart's script escapes text with before handing it to
+# .html(): a tooltip or legend entry is markup, for its bold and its line
+# breaks, and the text in it is the caller's -- labels, series names and data
+# from a file -- so "<img onerror=...>" in a cell would otherwise run when the
+# entry is drawn or hovered.  .text() needs none of this.  Written once here
+# for the scripts that had no esc() of their own.
+my $ESC_JS = q{function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }};
 
 =head2 categorical_schemes
 
@@ -1340,7 +1360,9 @@ DONUT
         .html((d, i) => {
             const pct = (d.data.value / total * 100).toFixed(1);
             const sw = '<span class="bi-pie-swatch" style="background:' + color(d.data.label) + '"></span>';
-            return sw + ' ' + d.data.label + ' $separator ' + fmt(d.data.value) + ' (' + pct + '%)';
+            // The entry is markup, for the swatch, so the label and the
+            // separator are escaped: both are the caller's text.
+            return sw + ' ' + esc(d.data.label) + ' ' + esc('$separator') + ' ' + fmt(d.data.value) + ' (' + pct + '%)';
         });
 LEGEND_JS
 
@@ -1576,19 +1598,10 @@ sub render_heatmap_snippet {
 	my $data = $raw->{data};
 	my $opts = {%$raw}; delete $opts->{data};
 
-	my %color_scheme_map = (
-		YlOrRd  => 'd3.interpolateYlOrRd',
-		Blues   => 'd3.interpolateBlues',
-		Greens  => 'd3.interpolateGreens',
-		Purples => 'd3.interpolatePurples',
-		RdPu    => 'd3.interpolateRdPu',
-		YlGnBu  => 'd3.interpolateYlGnBu',
-	);
-
 	my $color_scheme = $opts->{color_scheme} // 'YlOrRd';
 	die "Unknown color_scheme: $color_scheme"
-		unless exists $color_scheme_map{$color_scheme};
-	my $d3_interpolator = $color_scheme_map{$color_scheme};
+		unless exists $SEQUENTIAL_SCHEMES{$color_scheme};
+	my $d3_interpolator = $SEQUENTIAL_SCHEMES{$color_scheme};
 
 	my $cell_padding = defined($opts->{cell_padding}) ? int($opts->{cell_padding}) : 2;
 	die 'cell_padding must be between 0 and 8'
@@ -2352,6 +2365,7 @@ sub render_line_chart_with_tooltips
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
+	$ESC_JS
 
 	const svg = d3.select("#chart");
 	const tooltip = d3.select("#tooltip");
@@ -2393,7 +2407,7 @@ sub render_line_chart_with_tooltips
 	    .attr("fill", "steelblue")
 	    .on("mouseover", (event, d) => {
 		tooltip.style("opacity", 1)
-		       .html(`Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>`)
+		       .html(`Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>`)
 		       .style("left", (event.pageX + 10) + "px")
 		       .style("top", (event.pageY - 30) + "px");
 	    })
@@ -2554,6 +2568,7 @@ sub render_line_chart_snippet
 <div class="tooltip" id="$tip_id"></div>
 <script>
     const data = $json_data;
+    $ESC_JS
 
     const svg = d3.select("#$svg_id");
     const tooltip = d3.select("#$tip_id");
@@ -2592,10 +2607,10 @@ sub render_line_chart_snippet
 	.attr("r", 4)
 	.attr("fill", "steelblue")
 	.on("mouseover", (event, d) => {
-	    let ttHtml = `Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>`;
+	    let ttHtml = `Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>`;
 	    if (d.extra) {
 		Object.entries(d.extra).forEach(([k, v]) => {
-		    ttHtml += `<br>\${k}: <b>\${v}<\\/b>`;
+		    ttHtml += `<br>\${esc(k)}: <b>\${esc(v)}<\\/b>`;
 		});
 	    }
 	    tooltip.style("opacity", 1)
@@ -2717,10 +2732,10 @@ sub render_zoomable_line_chart_snippet
 	# double-quote would require <\\/b> to survive Perl interpolation.
 	my $circle_handlers = <<'HANDLERS';
 		.on("mouseover", (event, d) => {
-		    let ttHtml = `Label: <b>${d.label}<\/b><br>Value: <b>${d.value}<\/b>`;
+		    let ttHtml = `Label: <b>${esc(d.label)}<\/b><br>Value: <b>${esc(d.value)}<\/b>`;
 		    if (d.extra) {
 			Object.entries(d.extra).forEach(([k, v]) => {
-			    ttHtml += `<br>${k}: <b>${v}<\/b>`;
+			    ttHtml += `<br>${esc(k)}: <b>${esc(v)}<\/b>`;
 			});
 		    }
 		    tooltip.style("opacity", 1)
@@ -2840,6 +2855,7 @@ PLAIN
 <div class="tooltip" id="$tip_id"></div>
 <script>
     const allData     = $json_data;
+    $ESC_JS
     let   currentData = allData.slice();
 
     const svg      = d3.select("#$svg_id");
@@ -3010,6 +3026,7 @@ sub render_multi_series_line_chart_with_tooltips
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
+	$ESC_JS
 
 	const svg = d3.select("#chart");
 	const tooltip = d3.select("#tooltip");
@@ -3071,7 +3088,7 @@ sub render_multi_series_line_chart_with_tooltips
 		.attr("fill", color(i))
 		.on("mouseover", (event, d) => {
 		    tooltip.style("opacity", 1)
-			   .html(\`Series: <b>\${series.name}<\\/b><br>Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>\`)
+			   .html(\`Series: <b>\${esc(series.name)}<\\/b><br>Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>\`)
 			   .style("left", (event.pageX + 10) + "px")
 			   .style("top", (event.pageY - 30) + "px");
 		})
@@ -3179,6 +3196,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
     <div class="tooltip" id="tooltip"></div>
     <script>
 	const data = $json_data;
+	$ESC_JS
 
 	const svg = d3.select("#chart");
 	const tooltip = d3.select("#tooltip");
@@ -3241,7 +3259,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
 		.on("mouseover", (event, d) => {
 		    tooltip.style("opacity", 1)
 			   .style("transform", "translateY(0)")
-			   .html(\`Series: <b>\${series.name}<\\/b><br>Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>\`)
+			   .html(\`Series: <b>\${esc(series.name)}<\\/b><br>Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>\`)
 			   .style("left", (event.pageX + 10) + "px")
 			   .style("top", (event.pageY - 30) + "px");
 		})
@@ -3358,6 +3376,7 @@ sub render_multi_series_line_chart_with_legends {
     <div class="tooltip" id="tooltip"></div>
     <script>
         const data = $json_data;
+        $ESC_JS
 
         const svg = d3.select("#chart");
         const tooltip = d3.select("#tooltip");
@@ -3424,7 +3443,7 @@ sub render_multi_series_line_chart_with_legends {
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1)
                            .style("transform", "translateY(0)")
-                           .html(\`Series: <b>\${series.name}<\\/b><br>Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>\`)
+                           .html(\`Series: <b>\${esc(series.name)}<\\/b><br>Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>\`)
                            .style("left", (event.pageX + 10) + "px")
                            .style("top", (event.pageY - 30) + "px");
                 })
@@ -3568,6 +3587,7 @@ sub render_multi_series_line_chart_with_interactive_legends
     <div class="tooltip" id="tooltip"></div>
     <script>
         const data = $json_data;
+        $ESC_JS
 
         const svg = d3.select("#chart");
         const tooltip = d3.select("#tooltip");
@@ -3634,7 +3654,7 @@ sub render_multi_series_line_chart_with_interactive_legends
                 .on("mouseover", (event, d) => {
                     tooltip.style("opacity", 1)
                            .style("transform", "translateY(0)")
-                           .html(\`Series: <b>\${series.name}<\\/b><br>Label: <b>\${d.label}<\\/b><br>Value: <b>\${d.value}<\\/b>\`)
+                           .html(\`Series: <b>\${esc(series.name)}<\\/b><br>Label: <b>\${esc(d.label)}<\\/b><br>Value: <b>\${esc(d.value)}<\\/b>\`)
                            .style("left", (event.pageX + 10) + "px")
                            .style("top", (event.pageY - 30) + "px");
                 })
@@ -3709,7 +3729,7 @@ C<< { label => Str, value => Num } >> points:
     ]
 
 Series need not share labels: the X domain is the union of every series' labels,
-in first-seen order.  One line and one set of dots is drawn per series, and a
+in the order C<x_order> gives.  One line and one set of dots is drawn per series, and a
 clickable legend toggles each series on and off.
 
 =item * C<\%opts> - Optional hash reference:
@@ -3728,6 +3748,17 @@ the colours of one.
 =item * C<animated> (boolean, default 0) - If true each line draws itself left
 to right by animating its stroke dash offset.  Respects
 C<prefers-reduced-motion>.
+
+=item * C<x_order> (C<'auto'>, C<'data'> or C<'sort'>, default C<'auto'>) - the
+order of the X domain.  C<'data'> takes the labels in the order they are met,
+series by series, as before 0.29.  C<'sort'> sorts them: numerically when every
+label is a number, otherwise as strings.  C<'auto'> sorts them when every label
+is a number or an ISO 8601 date or date-time (C<2026-01-15>, C<2026-01>,
+C<2026-01-15T09:30>), and otherwise keeps the order they are met in, so that
+C<Jan>, C<Feb>, C<Mar> stay in the caller's order.  Taken as met, two series of
+dates gave an axis such as C<15, 19, 16, 17>.  Whenever the labels are sorted,
+each line's points are drawn in the axis order.  The caller's series are not
+changed.
 
 =item * C<responsive> (boolean, optional) - SVG responsive sizing override.
 
@@ -3750,6 +3781,9 @@ ARRAY reference.
 series is not a hashref, has no C<name>, or has a C<data> that is not an ARRAY
 reference.
 
+=item * Throws C<Unknown x_order: E<lt>valueE<gt>> when C<x_order> is not
+C<auto>, C<data> or C<sort>.
+
 =back
 
 =head3 API SPECIFICATION
@@ -3765,6 +3799,7 @@ reference.
                 scheme     => { type => 'string',  optional => 1, default => 'tableau10' },
                 x_label    => { type => 'string',  optional => 1, default => '' },
                 y_label    => { type => 'string',  optional => 1, default => '' },
+                x_order    => { type => 'string',  optional => 1, default => 'auto' },
                 animated   => { type => 'boolean', optional => 1, default => 0 },
                 responsive => { type => 'boolean', optional => 1 },
                 id         => { type => 'string',  optional => 1, default => 'chart' },
@@ -3795,7 +3830,47 @@ sub render_multi_series_line_chart_snippet
 			unless ref($s) eq 'HASH' && defined $s->{name} && ref($s->{data}) eq 'ARRAY';
 	}
 
-	my $json_data = _script_json($series_data);
+	my $x_order = $opts->{x_order} // 'auto';
+	die "Unknown x_order: $x_order" unless $x_order =~ /\A(?:auto|data|sort)\z/;
+
+	# The x axis is every series' labels.  Taken as they are met, one series
+	# after another, two series of dates give an axis that runs 15, 19, 16, 17:
+	# so labels that order themselves -- all numbers, or all ISO dates and
+	# times -- are sorted, and the points of each line follow the axis.
+	# Anything else keeps the order it is met in, which is the order a caller
+	# chose (Jan, Feb, Mar).  The labels are strings in the script, so a 1 in
+	# one series and a "1" in another are one point, as they are here.
+	my $label_of = sub { my $p = shift; ref($p) eq 'HASH' && defined($p->{label}) ? "$p->{label}" : '' };
+	my (@labels, %seen);
+	for my $s (@$series_data) {
+		for my $p (@{ $s->{data} }) {
+			my $l = $label_of->($p);
+			push @labels, $l unless $seen{$l}++;
+		}
+	}
+	my $all_numeric = @labels && !grep { !looks_like_number($_) || /\A\s*[-+]?(?:nan|inf)/i } @labels;
+	my $all_dates   = @labels && !grep {
+		!/\A\d{4}-\d{2}(?:-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[-+]\d{2}:?\d{2})?)?)?\z/
+	} @labels;
+	my $sorted = 1;
+	if ($x_order ne 'data' && $all_numeric) {
+		@labels = sort { $a <=> $b } @labels;
+	} elsif ($x_order eq 'sort' || ($x_order eq 'auto' && $all_dates)) {
+		@labels = sort @labels;
+	} else {
+		$sorted = 0;
+	}
+	my %position;
+	@position{@labels} = (0 .. $#labels);
+	# Copies: the caller's series are not reordered.  Unsorted, each line keeps
+	# its points in the order given, as it always has.
+	my @drawn = !$sorted ? @$series_data : map {
+		my $s = $_;
+		+{ %$s, data => [ sort { $position{ $label_of->($a) } <=> $position{ $label_of->($b) } } @{ $s->{data} } ] };
+	} @$series_data;
+
+	my $json_data   = _script_json(\@drawn);
+	my $labels_json = _script_json(\@labels);
 
 	my $scheme   = $opts->{scheme}   // $DEFAULT_CATEGORICAL_SCHEME;
 	my $x_label  = $opts->{x_label} // '';
@@ -3886,7 +3961,7 @@ ANIM
         return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    var allLabels = Array.from(new Set(series.flatMap(function(s){return s.data.map(function(d){return d.label;});})));
+    var allLabels = $labels_json;
     var allVals   = series.flatMap(function(s){return s.data.map(function(d){return d.value;});});
 
     var xScale = d3.scalePoint().domain(allLabels).range([0,innerW]);
@@ -3905,7 +3980,7 @@ ANIM
     $y_label_block
 
     var lineGen = d3.line()
-        .x(function(d){return xScale(d.label);})
+        .x(function(d){return xScale(d.label == null ? "" : String(d.label));})
         .y(function(d){return yScale(d.value);});
 
     series.forEach(function(s,i){
@@ -3918,13 +3993,13 @@ ANIM
         g.selectAll(".msl-dot-"+i)
             .data(s.data).join("circle")
             .attr("class","msl-dot msl-dot-"+i)
-            .attr("cx",function(d){return xScale(d.label);})
+            .attr("cx",function(d){return xScale(d.label == null ? "" : String(d.label));})
             .attr("cy",function(d){return yScale(d.value);})
             .attr("r",4)
             .attr("fill",color(s.name))
             .on("mouseover",function(event,d){
                 tip.style("display","block")
-                   .html("<b>"+esc(d.label)+"<\\/b><br\/>"+esc(s.name)+": <b>"+d.value+"<\\/b>");
+                   .html("<b>"+esc(d.label)+"<\\/b><br\/>"+esc(s.name)+": <b>"+esc(d.value)+"<\\/b>");
             })
             .on("mousemove",function(event){
                 tip.style("left",(event.pageX+12)+"px").style("top",(event.pageY-24)+"px");
@@ -4779,6 +4854,7 @@ RECTS
 <script>
 (function(){
     var data = $json_data;
+    $ESC_JS
     var segs = $json_segs;
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
     var innerW = $inner_w;
@@ -4807,7 +4883,7 @@ RECTS
             .on("mouseover",function(event,d){
                 var seg = d3.select(this.parentNode).datum().key;
                 tip.style("display","block")
-                   .html("<b>"+d.data.cat+"<\\/b><br\/>"+seg+": "+(d[1]-d[0]));
+                   .html("<b>"+esc(d.data.cat)+"<\\/b><br\/>"+esc(seg)+": "+(d[1]-d[0]));
             })
             .on("mousemove",function(event){
                 tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
@@ -4871,6 +4947,12 @@ ignored and the default used.
 =item * C<line_color> (string, optional CSS colour, default C<'#e15759'>) - line stroke.
 Checked as C<bar_color> is.
 
+=item * C<scheme> (string, optional) - a categorical scheme, as
+C<categorical_schemes()> lists them.  The bars take its first colour and the
+line its second, as C<colour_at($scheme, 0)> and C<colour_at($scheme, 1)>.
+C<bar_color> and C<line_color> still win when given.  Any other name is
+ignored and the defaults used.
+
 =item * C<id> (string, optional) - override the default C<svg_id> value.
 
 =item * C<responsive> (boolean, optional) - SVG responsive sizing override.
@@ -4910,6 +4992,7 @@ Returns C<{ svg_id =E<gt> 'combo_chart', html =E<gt> Str }>.
                 line_label => { type => 'string',  optional => 1, default => 'Line' },
                 bar_color  => { type => 'string',  optional => 1, default => 'steelblue' },
                 line_color => { type => 'string',  optional => 1, default => '#e15759' },
+                scheme     => { type => 'string',  optional => 1 },
                 id         => { type => 'string',  optional => 1, default => 'combo_chart' },
                 responsive => { type => 'boolean', optional => 1 },
             },
@@ -4940,8 +5023,16 @@ sub render_combo_snippet
 	my $line_col   = $opts->{line_col}    // 'line_val';
 	my $bar_label  = $opts->{bar_label}   // 'Bar';
 	my $line_label = $opts->{line_label}  // 'Line';
-	my $bar_color  = _css_colour($opts->{bar_color})  // 'steelblue';
-	my $line_color = _css_colour($opts->{line_color}) // '#e15759';
+	# A scheme gives both colours at once -- its first for the bars, its second
+	# for the line -- so a combo matches the other charts of a page drawn with
+	# the same scheme.  An explicit colour still wins, and a name that is not a
+	# scheme leaves the defaults, as an unknown colour does.
+	my $scheme = $opts->{scheme};
+	my ($scheme_bar, $scheme_line) = (defined($scheme) && !ref($scheme) && exists($CATEGORICAL_SCHEMES{$scheme}))
+		? @{ $CATEGORICAL_SCHEMES{$scheme}{colours} }[0, 1]
+		: ('steelblue', '#e15759');
+	my $bar_color  = _css_colour($opts->{bar_color})  // $scheme_bar;
+	my $line_color = _css_colour($opts->{line_color}) // $scheme_line;
 
 	my @points;
 	for my $row (@$data) {
@@ -4994,6 +5085,7 @@ sub render_combo_snippet
 <script>
 (function(){
     var data = $json_data;
+    $ESC_JS
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
     var innerW = $inner_w;
     var innerH = $inner_h;
@@ -5046,7 +5138,7 @@ sub render_combo_snippet
         .attr("fill",barColor).attr("opacity",0.8)
         .on("mouseover",function(event,d){
             tip.style("display","block")
-               .html("<b>"+d.x+"<\\/b><br\/>"+barLabel+": "+d.bar+"<br\/>"+lineLabel+": "+d.line);
+               .html("<b>"+esc(d.x)+"<\\/b><br\/>"+esc(barLabel)+": "+d.bar+"<br\/>"+esc(lineLabel)+": "+d.line);
         })
         .on("mousemove",function(event){
             tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
@@ -5069,7 +5161,7 @@ sub render_combo_snippet
         .attr("r",4).attr("fill",lineColor).attr("stroke","#fff").attr("stroke-width",1.5)
         .on("mouseover",function(event,d){
             tip.style("display","block")
-               .html("<b>"+d.x+"<\\/b><br\/>"+barLabel+": "+d.bar+"<br\/>"+lineLabel+": "+d.line);
+               .html("<b>"+esc(d.x)+"<\\/b><br\/>"+esc(barLabel)+": "+d.bar+"<br\/>"+esc(lineLabel)+": "+d.line);
         })
         .on("mousemove",function(event){
             tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
@@ -5114,6 +5206,21 @@ C<d3.hierarchy()>.
 
 =back
 
+B<Colour by value.>  A flat row, or a node of the tree, may also carry
+C<color_value>, a second number that colours its tile: the area says how much
+and the colour says how well -- sales sized by revenue and coloured by margin.
+As soon as one tile has one, every tile is shaded from the sequential
+C<color_scheme> over the smallest to the largest C<color_value>, in place of
+its top-level group's colour; a tile without one is grey.  The tooltip gives
+the value under C<color_label>, a legend at the foot of the chart gives the
+range, and labels on light tiles are drawn dark.  When every tile has the same
+value they all take the middle of the scheme.
+
+    ->render_treemap_snippet([
+        { path => 'All/North', value => 1200, color_value => 0.18 },
+        { path => 'All/South', value =>  800, color_value => 0.05 },
+    ], { color_scheme => 'Blues', color_label => 'Margin' });
+
 Accepted C<\%opts> keys:
 
 =over 4
@@ -5126,6 +5233,14 @@ C<categorical_schemes()> returns, whose colours C<palette()> makes available to
 Perl.
 
 =item * C<label> (boolean, default C<1>) - show node labels inside cells.
+
+=item * C<color_scheme> (string, default C<'YlOrRd'>) - the sequential scheme
+tiles are coloured from when they carry C<color_value>: C<YlOrRd>, C<Blues>,
+C<Greens>, C<Purples>, C<RdPu> or C<YlGnBu>, as for C<render_heatmap_snippet>.
+Not read when no tile has a C<color_value>.
+
+=item * C<color_label> (string, default C<'Colour'>) - what C<color_value>
+measures, for the tooltip and the legend.
 
 =item * C<id> (string, optional) - override the default C<svg_id> value.
 
@@ -5148,6 +5263,15 @@ when C<$data> is neither an ARRAY nor a HASH reference.
 
 =item * Throws C<Each flat row must have a numeric 'value' key> when a value is not numeric.
 
+=item * Throws C<Each flat row's 'color_value' must be numeric> when a flat
+row's C<color_value> is defined but not a finite number.
+
+=item * Throws C<Each node's 'color_value' must be numeric> when a node of the
+tree has a C<color_value> that is defined but not a finite number.
+
+=item * Throws C<Unknown color_scheme: E<lt>nameE<gt>> when a tile has a
+C<color_value> and C<color_scheme> is not one of the sequential schemes.
+
 =back
 
 =head3 API SPECIFICATION
@@ -5163,6 +5287,8 @@ when C<$data> is neither an ARRAY nor a HASH reference.
                 path_sep => { type => 'string',  optional => 1, default => '/' },
                 scheme   => { type => 'string',  optional => 1, default => 'tableau10' },
                 label    => { type => 'boolean', optional => 1, default => 1 },
+                color_scheme => { type => 'string', optional => 1, default => 'YlOrRd' },
+                color_label  => { type => 'string', optional => 1, default => 'Colour' },
                 id       => { type => 'string',  optional => 1, default => 'treemap' },
                 responsive => { type => 'boolean', optional => 1 },
             },
@@ -5204,6 +5330,19 @@ sub render_treemap_snippet
 
 	my $js_esc = \&_js_string;
 
+	# A tile may carry a second measure, color_value, which shades it instead of
+	# the colour of its top-level group: the area says how much, the colour how
+	# well (sales sized by revenue, coloured by margin).  It is on as soon as one
+	# tile has one; a tile without one is grey.
+	my $by_value = 0;
+	my $check_cv = sub {
+		my ($node, $what) = @_;
+		return unless defined $node->{color_value};
+		die "Each ${what}'s 'color_value' must be numeric"
+			unless looks_like_number($node->{color_value}) && $node->{color_value} !~ /\A\s*[-+]?(?:nan|inf)/i;
+		$by_value = 1;
+	};
+
 	my ($json_data, $build_js);
 	if (ref($data) eq 'ARRAY') {
 		for my $row (@$data) {
@@ -5211,8 +5350,12 @@ sub render_treemap_snippet
 			die "Each flat row must have a 'path' key"  unless exists $row->{path};
 			die "Each flat row must have a numeric 'value' key"
 				unless looks_like_number($row->{value} // 'x');
+			$check_cv->($row, 'flat row');
 		}
-		my @flat = map { { path => "$_->{path}", value => $_->{value} + 0 } } @$data;
+		my @flat = map {
+			+{ path => "$_->{path}", value => $_->{value} + 0,
+			   (defined $_->{color_value} ? (color_value => $_->{color_value} + 0) : ()) }
+		} @$data;
 		$json_data = _script_json(\@flat);
 		my $sep_esc = $js_esc->($path_sep);
 		$build_js = <<"BUILDJS";
@@ -5221,7 +5364,7 @@ sub render_treemap_snippet
     rawData.forEach(function(r){
         var parts = r.path.split(sep);
         var id = r.path;
-        if(!nodeMap[id]){ nodeMap[id] = {id:id, value:r.value}; }
+        if(!nodeMap[id]){ nodeMap[id] = {id:id, value:r.value, color_value:r.color_value}; }
         for(var i = parts.length-1; i >= 1; i--){
             var pid = parts.slice(0,i).join(sep);
             if(!nodeMap[pid]){ nodeMap[pid] = {id:pid, value:0}; }
@@ -5231,7 +5374,7 @@ sub render_treemap_snippet
     });
     var nodes = Object.values(nodeMap).map(function(n){
         var parts = n.id.split(sep);
-        return {id:n.id, parentId: parts.length>1 ? parts.slice(0,parts.length-1).join(sep) : null, value:n.value};
+        return {id:n.id, parentId: parts.length>1 ? parts.slice(0,parts.length-1).join(sep) : null, value:n.value, color_value:n.color_value};
     });
     var root = d3.stratify().id(function(d){return d.id;})
         .parentId(function(d){return d.parentId;})(nodes)
@@ -5239,6 +5382,14 @@ sub render_treemap_snippet
         .sort(function(a,b){return b.value - a.value;});
 BUILDJS
 	} else {
+		# The tree's leaves are what is drawn, but any node's colour value is
+		# checked: a bad one is the caller's mistake wherever it is.
+		my @todo = ($data);
+		while (my $node = shift @todo) {
+			next unless ref($node) eq 'HASH';
+			$check_cv->($node, 'node');
+			push @todo, @{ $node->{children} } if ref($node->{children}) eq 'ARRAY';
+		}
 		$json_data = _script_json($data);
 		$build_js = <<'BUILDJS';
     var root = d3.hierarchy(rawData)
@@ -5255,11 +5406,74 @@ BUILDJS
 		? qq{viewBox="0 0 $width $height" width="100%"}
 		: qq{width="$width" height="$height"};
 
+	# Coloured by value: the tiles leave room at the foot for a legend that
+	# says which colour is which number.
+	my ($fill_js, $cv_tip_js, $legend_js, $layout_h) = (<<'FILL', '', '', $height);
+    function fillOf(d){
+        var anc = d; while(anc.depth > 1){ anc = anc.parent; }
+        return color(anc.id || anc.data.name || "");
+    }
+FILL
+	if ($by_value) {
+		my $color_scheme = $opts->{color_scheme} // 'YlOrRd';
+		die "Unknown color_scheme: $color_scheme"
+			unless exists $SEQUENTIAL_SCHEMES{$color_scheme};
+		my $interp    = $SEQUENTIAL_SCHEMES{$color_scheme};
+		my $cv_label  = $js_esc->($opts->{color_label} // 'Colour');
+		my $grad_id   = "${svg_id}_cgrad";
+		my $legend_h  = 34;
+		$layout_h     = $height - $legend_h;
+		my $leg_y     = $height - $legend_h + 10;
+		my $leg_x     = $width - 190;
+		$fill_js = <<"FILL";
+    var colorLabel = "$cv_label";
+    function cvOf(d){
+        var v = d.data ? d.data.color_value : undefined;
+        return (v === null || v === undefined || !isFinite(v)) ? null : +v;
+    }
+    var cvals = root.leaves().map(cvOf).filter(function(v){ return v !== null; });
+    var cext  = cvals.length ? d3.extent(cvals) : [0, 1];
+    // One value shades every tile alike, from the middle of the scheme.
+    if (cext[0] === cext[1]) { cext = [cext[0] - 1, cext[1] + 1]; }
+    var cscale = d3.scaleSequential($interp).domain(cext);
+    function fillOf(d){
+        var v = cvOf(d);
+        return v === null ? "#ccc" : cscale(v);
+    }
+FILL
+		$cv_tip_js = '(cvOf(d) !== null ? "<br\/>"+esc(colorLabel)+": "+esc(cvOf(d)) : "")';
+		$legend_js = <<"LEGEND";
+    var defs = svg.append("defs");
+    var grad = defs.append("linearGradient").attr("id","$grad_id");
+    d3.range(0, 1.0001, 0.1).forEach(function(t){
+        grad.append("stop").attr("offset",(t*100)+"%")
+            .attr("stop-color",cscale(cext[0] + t*(cext[1]-cext[0])));
+    });
+    var leg = svg.append("g").attr("class","tm-legend")
+        .attr("transform","translate($leg_x,$leg_y)");
+    leg.append("text").attr("x",-6).attr("y",9).attr("text-anchor","end")
+        .attr("font-size","11px").attr("fill","#555").text(colorLabel);
+    leg.append("rect").attr("width",180).attr("height",10)
+        .attr("fill","url(#$grad_id)");
+    var fmt = d3.format("~g");
+    leg.append("text").attr("x",0).attr("y",22).attr("font-size","10px")
+        .attr("fill","#555").text(fmt(cext[0]));
+    leg.append("text").attr("x",180).attr("y",22).attr("text-anchor","end")
+        .attr("font-size","10px").attr("fill","#555").text(fmt(cext[1]));
+LEGEND
+	}
+
+	# Labels are white.  Coloured by value they are dark on the light tiles a
+	# sequential scheme starts from, where white cannot be read.
+	my $label_fill = $by_value
+		? q{function(d){ return d3.lab(fillOf(d)).l > 65 ? "#333" : "#fff"; }}
+		: q{"#fff"};
 	my $label_block = $label ? <<"LBLJS" : '';
         cell.append("text")
             .attr("class","tm-label")
             .attr("x",4).attr("y",14)
-            .attr("font-size","11px").attr("fill","#fff")
+            .attr("font-size","11px")
+            .attr("fill",$label_fill)
             .text(function(d){
                 var w = d.x1 - d.x0, h = d.y1 - d.y0;
                 if(w < 24 || h < 14){ return ""; }
@@ -5292,14 +5506,16 @@ LBLJS
 <script>
 (function(){
     var rawData = $json_data;
+    $ESC_JS
     $schemes_js
     var color = d3.scaleOrdinal(SCHEMES['$scheme'] || $default_js);
     var sep = "${\$js_esc->($path_sep)}";
     var svg = d3.select("#$svg_id");
     var tip = d3.select("#$tip_id");
     $build_js
+    $fill_js
     var layout = d3.treemap().tile(d3.treemapSquarify)
-        .size([$width, $height]).paddingOuter(2).paddingInner(1)(root);
+        .size([$width, $layout_h]).paddingOuter(2).paddingInner(1)(root);
     var leaves = root.leaves();
     var cell = svg.selectAll(".tm-cell-g")
         .data(leaves).join("g").attr("class","tm-cell-g")
@@ -5308,20 +5524,18 @@ LBLJS
         .attr("class","tm-cell")
         .attr("width",function(d){return Math.max(0,d.x1-d.x0);})
         .attr("height",function(d){return Math.max(0,d.y1-d.y0);})
-        .attr("fill",function(d){
-            var anc = d; while(anc.depth > 1){ anc = anc.parent; }
-            return color(anc.id || anc.data.name || "");
-        })
+        .attr("fill",fillOf)
         .on("mouseover",function(event,d){
             var name = d.id ? d.id.split(sep).pop() : (d.data.name||"");
             tip.style("display","block")
-               .html("<b>"+name+"<\\/b><br\/>"+d.value);
+               .html("<b>"+esc(name)+"<\\/b><br\/>"+d.value${\ ($cv_tip_js ? "+$cv_tip_js" : '')});
         })
         .on("mousemove",function(event){
             tip.style("left",(event.offsetX+12)+"px").style("top",(event.offsetY-28)+"px");
         })
         .on("mouseout",function(){tip.style("display","none");});
     $label_block
+    $legend_js
 })();
 </script>
 HTML
@@ -6143,9 +6357,20 @@ Nigel Horne <njh@nigelhorne.com>
     pre  ∃ s ∈ data . ref(s) ≠ 'HASH'
                                     ⇒ die "Each series must be a hashref with name and data"
     pre  ∃ s ∈ data . ¬defined(s.name) ∨ ref(s.data) ≠ 'ARRAY'
+    pre  opts.x_order ∉ {undef, 'auto', 'data', 'sort'}
+                                    ⇒ die "Unknown x_order: <x_order>"
                                     ⇒ die "Each series must be a hashref with name and data"
     post result ∈ HashRef
     post result.svg_id = opts.id // "chart"
+    post L = the labels of every series, first-seen order, as strings
+    post opts.x_order ≠ 'data' ∧ ∀ l ∈ L . numeric(l)
+                                    ⇒ the X domain is L sorted numerically
+    post opts.x_order = 'auto' ∧ ∀ l ∈ L . iso_date(l)
+                                    ⇒ the X domain is L sorted as strings
+    post opts.x_order = 'sort' ∧ ∃ l ∈ L . ¬numeric(l)
+                                    ⇒ the X domain is L sorted as strings
+    post otherwise                  ⇒ the X domain is L
+    post the X domain is sorted     ⇒ each series' points are in domain order
     post result.html ∈ Str
     post "<!DOCTYPE" ∉ result.html
     post "d3.scalePoint" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
@@ -6252,6 +6477,10 @@ Nigel Horne <njh@nigelhorne.com>
     post "<!DOCTYPE" ∉ result.html
     post "d3.scaleBand" ⊆ result.html ∧ "d3.scaleLinear" ⊆ result.html
     post "axisRight" ⊆ result.html
+    post opts.bar_color = undef ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ colour_at(S, 0) is the bar fill
+    post opts.line_color = undef ∧ opts.scheme = S ∧ S ∈ categorical_schemes()
+                                    ⇒ colour_at(S, 1) is the line stroke
     post "</b>" ∉ result.html ∧ "<\/b>" ∈ result.html
 
 =head2 render_treemap_snippet
@@ -6267,6 +6496,13 @@ Nigel Horne <njh@nigelhorne.com>
                                     ⇒ die "Each flat row must have a 'path' key"
     pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . ¬numeric(row.value)
                                     ⇒ die "Each flat row must have a numeric 'value' key"
+    pre  ref(data) = 'ARRAY' ∧ ∃ row ∈ data . defined(row.color_value) ∧ ¬finite(row.color_value)
+                                    ⇒ die "Each flat row's 'color_value' must be numeric"
+    pre  ref(data) = 'HASH' ∧ ∃ node ∈ tree . defined(node.color_value) ∧ ¬finite(node.color_value)
+                                    ⇒ die "Each node's 'color_value' must be numeric"
+    pre  BV ∧ opts.color_scheme ∉ sequential schemes
+                                    ⇒ die "Unknown color_scheme: <color_scheme>"
+        where BV ≡ ∃ tile . defined(tile.color_value)
     post result ∈ HashRef
     post result.svg_id = opts.id // "treemap"
     post result.html ∈ Str
@@ -6276,6 +6512,8 @@ Nigel Horne <njh@nigelhorne.com>
     post ref(data) = 'HASH'  ⇒ "d3.hierarchy(" ⊆ result.html
     post opts.scheme = S ∧ S ∈ categorical_schemes()
                                     ⇒ the D3 expression of S ⊆ result.html
+    post BV                         ⇒ "d3.scaleSequential(" ⊆ result.html ∧ "tm-legend" ⊆ result.html
+    post ¬BV                        ⇒ "scaleSequential" ∉ result.html
     post opts.scheme ∉ categorical_schemes()
                                     ⇒ the default scheme's expression ⊆ result.html
 

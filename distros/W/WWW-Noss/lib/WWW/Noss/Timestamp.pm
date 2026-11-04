@@ -2,7 +2,7 @@ package WWW::Noss::Timestamp;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Time::Piece;
 
@@ -169,7 +169,7 @@ Parse RFC3339 timestamps, used by Atom feeds.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

@@ -1,6 +1,157 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
-0.02  unreleased (2026-11-02)
+0.04  2026-11-03
+      - The documents of only historical interest are no longer shipped; they
+        are in Proc-Spawner 0.03 on CPAN: doc/large-subset/large-subset-
+        {ceiling,investigation,marks,upstream-reports}.md, doc/pspawn-run-
+        shortcomings.md, doc/pspawn-upstream-reports.md, doc/parsers/shell-
+        subset-corpus-stats.md.  References to them say so.
+      - The figures of post4-0.03 were checked again on 0.04: the same per-sample
+        results; they are labelled 0.04.  Digest of the code they depend on:
+        ecde8b9b9610680560a69e56313f01687f29e51688bcd029c6cef837fa03eeac.
+      The documents label the unreleased states between 0.03 and 0.04 post-0.03
+      to post4-0.03; their entries follow, newest first.
+
+    post4-0.03:
+      - Rule E (the user, 2026-11-03), replacing A3: where dash and bash
+        differ, the subset takes the plainly logical behaviour, and rejects the
+        form only where there is none.  doc/large-subset/large-subset-logical.md
+        lists every difference with its category (info, error, posix, same,
+        harm, platform, meaning, effect, none) and checks the earlier decisions
+        against the rule.  Done so far: jobs, jobs -p, jobs -l list the jobs also
+        in a pipeline and in $( ) (as bash; this replaces the rejection of
+        post3-0.03); return outside a function is an error (as bash); cd with
+        extra operands or without HOME is an error (as bash); descriptors above 9
+        (option fdmulti now on by default); [^...] negates; patterns never match
+        . or ..; settings with a redirection are redirected before their values
+        are expanded (as dash).  getopts leaves OPTARG unset when it finds no option, or
+        an option without an argument (POSIX; as bash; dash keeps or empties it).  Battery t/batteries/large-subset-e.txt (the
+        differences from dash are listed in t/dash-known.txt as rule E).
+      - Forms both shells run alike, now accepted: reading $PPID (assigning it
+        stays rejected), export "$name", symbolic umask modes, redirections on
+        cd, and the top-level jobs -p.
+      - X19 fixed: a trap's action now runs before the next command of the list
+        (it could run after it, about 1 run in 30).  New known issue X24.
+      - The detector: the choices of rule E are class X with basis E:CATEGORY;
+        ShellCheck's SC3023 and SC3026 likewise; local and return outside a
+        function are separate features; local=... is no longer taken for local.
+      - Figures: 95 samples rejected within the lower yardstick (post3-0.03:
+        106); digest 84245e1d9a2ad88da10b320f8d2e94ddeb0b12bd888925555b920d985026e10a.
+
+    post3-0.03:
+      - Proc::ShellSubset::Large rejects jobs in a pipeline, a command
+        substitution or a compound command: there dash lists nothing and bash
+        the jobs (probes jobspipe, jobsppipe, jobspsubst).  Tests LS:288-292.
+      - The detector has two more blatant features: jobs in a pipeline or $( )
+        (jobsctx), and cd with extra operands (cdargs: dash ignores them, bash
+        fails).  Its word pattern now keeps $( ), backquotes, ${ } and
+        backslash-escapes in one word.  11 new probes (jobs, cd, the P6 forms) in
+        doc/large-subset/dialect-cases/large-subset-dialect-probes2.txt.
+      - Figures: 106 samples rejected within the lower yardstick (post-0.03:
+        117); digest 64810b85d9f4cc777ef7d41f3cc3f9f4262c1c56cf877ba00489dbce07b117e8.
+
+    post2-0.03:
+      - pwd runs as the program /bin/pwd -L, with PWD set to the shell's own
+        directory, and its operands dropped (known issue X23; the user's choice C,
+        2026-11-03): after cd through a symbolic link it prints the directory as
+        reached, as both shells (before: the physical path).  Two more lines in
+        t/batteries/large-subset-p6.txt (21 of 21 agree with dash).  The parsers
+        did not change, so the figures of post-0.03 hold.
+
+    post-0.03:
+      - Proc::ShellSubset::Large accepts more forms both shells run alike (item P6
+        of "Shell Corpus Gaps"; probes in doc/large-subset/dialect-cases):
+        read -p PROMPT (also -rp; the executor writes the prompt to fd 2 only
+        when fd 0 is a terminal, as both shells); cd -P and cd -L (the last one
+        counts; the tree gets cd_p => 1, and the executor resolves symbolic
+        links); a pattern in a redirection target is literal (echo a >*.log
+        writes the file '*.log', as dash and bash in POSIX mode); set -o
+        ignoreeof, notify, nolog, set -b and set +m (nothing to do); trap with
+        signal names in any case and signal numbers, also FPE, and KILL and STOP
+        (cannot be caught: nothing to do, status 0).  Tests LS:273-287 (LS:114
+        now accepted), and t/batteries/large-subset-p6.txt (19 of 19 agree with
+        dash).
+      - pwd with an option both shells refuse (pwd -x, pwd --help) is rejected
+        (rule Q1; test LS:111 changed).  Known issue X23: a bare pwd after cd
+        through a symbolic link differs from both shells (the program /bin/pwd,
+        decision B2 of the base parser's checklist) - a question to the user.
+      - The detector (tools/large-subset-features.pl): a read -p prompt with
+        quotes no longer hides the options after it (read -p "`echo -e x`" m
+        was taken for read -e), read -p PROMPT without a name is the bash-only
+        REPLY form, and set -o pipefail and the like are seen after other
+        options (set -euo pipefail).
+      - Figures (doc/large-subset/large-subset-state.md): the samples rejected
+        within the lower yardstick went from 163 (0.03) to 117.  They depend on
+        the parsers, the measurement scripts and the verdicts, whose sha256
+        (the command: doc/large-subset/large-subset-state.md, section 3) is
+        4921dfbd1b838bc48dabe234a5111ad69d8fbb7d43c8278c72dcf74a5ad9b7bf.
+
+0.03  2026-11-03
+      - Proc::ShellSubset::Large accepts forms dash and bash run alike (items
+        P1-P4 of "Shell Corpus Gaps"): '{' and '}' inside words where no brace
+        expansion can start; $( ), `...`, ${#NAME} and $((...)) inside $((...));
+        setting PS1, PS4, HOSTNAME, PIPESTATUS and BASH; export $v[=value];
+        exit N above 255; umask -S; command -p PROGRAM.  '{' or '}' as a
+        command name, and '{NAME}' right before a redirection (bash: a named
+        descriptor), stay rejected (tests LS:212-245).
+      - Proc::ShellSpawn, Proc::ShellSpawn::Large: run those forms ($( ) inside
+        $(( )) expanded first; exit N modulo 256; umask -S; command -p with
+        /usr/bin:/bin; export with a name from an expansion, checked at run time).
+      - The borrowed test pool: the scripts that made
+        t/parser/shell-subset-corpus-tests.pl are now in doc/parsers/tools/
+        (extract, run, group, gentests, prov, verify and the reports), with
+        the grouping of 2026-10-29 (groups.tsv); doc/test-pools.md says how to
+        rebuild every pool and measurement from the pinned sources (checked:
+        all 612 snippet IDs restore their texts exactly).
+      - Measuring against dash and bash by the shells alone:
+        doc/large-subset/large-subset-state.md (the rules, which beats which,
+        the figures, the work list); large-subset-dialect-features.md (every
+        probed feature, blatant or subtle, with who decided it);
+        tools/large-subset-features.pl (the detector, and the per-test record
+        t/parser/large-subset-shells.tsv), tools/large-subset-verdicts.txt
+        (verdicts kept by hand, postponed ones as free text), and a new
+        tools/large-subset-yardsticks.pl (the old one sorted our parser's
+        own messages).
+      - doc/pspawn-known-issues.md: X21 (the programs echo, [, printf, kill on
+        Windows), X22 (bash 5.2.21 goes on after some special-builtin errors,
+        against its manual).
+      - Items the user agreed to on "Shell Corpus Gaps" (2026-11-03):
+        B1 alias and unalias (the parser expands aliases in the lines after a
+        top-level definition, as both shells do; the executor keeps the table
+        for eval and . text); B2 history, fc, bind, help, compopt, logout and
+        set -o history do nothing by default (parser and run() option
+        interactive => reject|nop|dash), and the executor looks command names
+        up in a list of tables, @Proc::ShellSpawn::CMDS, which other modules can
+        extend; B3 jobs, bg, fg, hash, type, times and reading ulimit, with
+        dash's texts and statuses, in the new module Proc::ShellSpawn::Builtins;
+        P5 and R1 [ and test are the program, and '<' or '>' between two
+        operands need the parser option test_lt_gt; Y2 a backslash at the very
+        end is a literal \; Y3 tldr's <Enter> in one-line here-documents, and
+        lines with keystrokes left out of the measurement; Q1 kill with a SIG
+        signal name is rejected (both shells refuse it).
+      - Every measured figure in doc/ names the version it was measured on
+        (pre-0.01, 0.01, 0.02, early-post-0.02, 0.03; the table is in
+        doc/README.md).  The figures of 0.03 were measured again on the release:
+        the corpus yardsticks, the work list and the totals over the tests came
+        out the same.  Corrected: spec section 8's ShellCheck figures (now as in
+        the ceiling document), test-pools.md's size of the per-test record
+        (1,066 lines), and the count of samples accepted only thanks to class X
+        (258, not 259); test-pools.md's regrouping count is of 0.03 (577 groups,
+        checked).
+      - doc/checklists/corpus-gaps.html is the page "Shell Corpus Gaps" as
+        published (its third version, with the figures of 0.03), and
+        doc/large-subset/pages/gaps-items.txt.lede its lede (the lede had been
+        edited only in the published page).  t/dash-known.txt no longer lists the
+        line of largebattery.txt with an alias as a known difference: since B1 it
+        agrees with dash, so a change there now fails t/dash.t.
+      - lib/Proc/Spawner/Docs.pod: a map of the Markdown documents in doc/;
+        doc/large-subset/large-subset-state.md.html: the same text as the .md,
+        with a Markdeep footer (an experiment in how MetaCPAN shows them).
+      - Proc::ShellSubset::Large no longer claims the package name
+        Proc::ShellSubset for the PAUSE indexer (MetaCPAN showed it as the
+        home of Proc::ShellSubset).
+
+0.02  2026-11-02
       - Documentation: POD for Proc::ShellSubset, Proc::ShellSubset::Small and
         Proc::ShellSubset::Large; doc/large-subset/ (the large parser's
         specification, how its corpus coverage is measured, with the scripts in
@@ -13,6 +164,9 @@ Revision history for Proc-Spawner (EXPERIMENTAL)
         need dash and bash are skipped without them (they used to fail).
       - The message for a construct outside the subset found at run time
         (status 248) now names Proc::ShellSubset::Large, not ShellSubsetLarge.
+      - README: the aim is matching dash/bash (what both do alike), not dash
+        alone; also portable shell scripts; every started program is a child of
+        the Perl process.  Proc::ShellSpawn's header says the same.
       - Every module has $VERSION.
       - t/dash.t: each run has its own tmp/ for the battery strings that wrote fixed
         files in /tmp, and ignores the length of process IDs turned into N.

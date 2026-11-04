@@ -1282,7 +1282,7 @@ subtest '3.3: a card is never filtered by its own cross-filter' => sub {
 	my $canvas = _sub_code($src, 'canvas_render');
 	ok($canvas, 'the canvas renderer is there to read');
 
-	my $applied =	_lines_like($canvas, qr/_apply_filter_spec\(\$vis_recs, \$cfs\)/);
+	my $applied =	_lines_like($canvas, qr/_canvas_cross_filter\(/);
 	is scalar @$applied, 1, 'a card is narrowed by the cross-filter on one line';
 	if (@$applied) {
 		like _guard_of($canvas, $applied->[0]),
@@ -1336,7 +1336,7 @@ subtest '3.3: a card is never filtered by its own cross-filter' => sub {
 	my $patch = _sub_code($src, 'analyses_update_visual');
 	ok($patch, 'the endpoint that draws a single card is there to read');
 
-	my $patch_applied =	_lines_like($patch, qr/_apply_filter_spec\(\$records, \$spec\)/);
+	my $patch_applied =	_lines_like($patch, qr/_canvas_cross_filter\(/);
 	is scalar @$patch_applied, 1, 'it narrows a card in one place too';
 	my ($guard_at) = grep {$patch->[$_] =~ /\$ctx->\{cf_source\}\s*!=\s*\$index\b/}
 		0 .. $#$patch;

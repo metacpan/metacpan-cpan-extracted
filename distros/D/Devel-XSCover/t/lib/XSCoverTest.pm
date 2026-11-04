@@ -84,19 +84,30 @@ sub report_db {
     File::Copy::copy(File::Spec->catfile(qw(t fixtures perl run.pl)), File::Spec->catfile($perl, 'run.pl')) or die "copy: $!";
     my $here = Cwd::getcwd();
     chdir $dir or die;
-    system($^X, "-MDevel::Cover=-db,$db,-silent,1,-ignore,run\\.pl", "-I$perl/lib", "$perl/run.pl") == 0 or die "the Perl fixture failed: $?";
+    {
+        delete local @ENV{qw(HARNESS_PERL_SWITCHES PERL5OPT)};
+        system($^X, "-MDevel::Cover=-db,$db,-silent,1,-ignore,run\\.pl", "-I$perl/lib", "$perl/run.pl") == 0 or die "the Perl fixture failed: $?";
+    }
     chdir $here;
     return ($tmp, $db, $dir, $perl_tmp, $perl);
 }
 
-sub run_report {
-    my ($db, $dir, @extra) = @_;
+sub run_cover {
+    my ($db, $dir, @args) = @_;
     require Cwd;
     my $cover = cover_script() or return;
-    my $lib   = Cwd::abs_path('lib');
     my $here  = Cwd::getcwd();
+    my $lib   = Cwd::abs_path(-d 'blib/lib' ? 'blib/lib' : 'lib');
     chdir $dir or die;
-    my $out = `"$^X" "-I$lib" "$cover" -nogcov -silent -report XSCover @extra "$db" 2>&1`;
+    local $ENV{DEVEL_COVER_SELF}    = 1;
+    local $ENV{DEVEL_COVER_OPTIONS} = "-dir,$here,+select,/Devel/Cover/Report/XSCover,+ignore,.";
+    local $ENV{PERL5OPT} = "$ENV{PERL5OPT} -MDevel::Cover::Report::XSCover" if ($ENV{PERL5OPT} // '') =~ /Devel::Cover/;
+    my $out = `"$^X" "-I$lib" "$cover" @{[ map { qq{"$_"} } @args ]} "$db" 2>&1`;
     chdir $here;
     return $out;
+}
+
+sub run_report {
+    my ($db, $dir, @extra) = @_;
+    return run_cover($db, $dir, '-nogcov', '-silent', '-report', 'XSCover', @extra);
 }

@@ -40,5 +40,6 @@ t/testcase/missing_header.csv
 t/testcase/wrong_sheet.csv
 t/tiller2qif.t
 t/util.t
+t/windows_viewer.t
 t/writeqif.t
 xt/author/no-debug.t

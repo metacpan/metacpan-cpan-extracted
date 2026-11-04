@@ -4,7 +4,9 @@ use Test::Most;
 use Test::Mockingbird;
 use Test::Returns qw(returns_is returns_isnt);
 use Test::Memory::Cycle;
+use File::Basename ();
 use File::Spec   ();
+use POSIX ();
 use File::Temp   qw(tempdir);
 use Mojo::File   ();
 use Mojo::JSON   qw(decode_json);
@@ -361,7 +363,7 @@ subtest '_detect_file_info -- sniffs separator and column order' => sub {
 	};
 
 	# Full round-trip: DataSource built on a header-less CSV returns rows with
-	# synthesized keys, bypassing Database::Abstraction entirely.
+	# synthesized keys, read by Database::Abstraction from a copy with a header.
 	subtest '_detect_file_info -- headerless CSV full fetch round-trip' => sub {
 		# Descriptions contain spaces so no first-row value is a $SAFE_IDENTIFIER,
 		# forcing the headerless-detection path.
@@ -371,10 +373,11 @@ subtest '_detect_file_info -- sniffs separator and column order' => sub {
 			"2026-09-03,1200.00,SALARY CREDIT\n"
 		);
 		my $info = $fn->($dir, 'bank');
-		ok exists $info->{_headerless_data},          'headerless sentinel returned';
-		is scalar @{ $info->{_headerless_data} }, 3,  'all three rows parsed';
-		is $info->{_headerless_data}[2]{Amount}, '1200.00', 'positive Amount on row 3';
-		is $info->{_headerless_data}[0]{Description}, 'SUPER MARKET', 'Description on row 1';
+		ok exists $info->{_headerless},               'headerless marker returned';
+		my $rows = $DS->new(directory => $dir, table => 'bank')->fetch_all;
+		is scalar @{$rows}, 3,                        'all three rows parsed';
+		is $rows->[2]{Amount}, '1200.00',             'positive Amount on row 3';
+		is $rows->[0]{Description}, 'SUPER MARKET',   'Description on row 1';
 	};
 
 	# CRLF line endings (Windows exports) must not bleed \r into column names.
@@ -1030,7 +1033,7 @@ subtest 'graph_view Y-strip -- accounting negatives plotted as negative values' 
 		$file->spew(
 			"month,amount\n" .
 			"Jan,\$1200.00\n" .    # plain positive
-			"Feb,(\$450.00)\n" .   # accounting negative — was plotted as +450
+			"Feb,(\$450.00)\n" .   # accounting negative - was plotted as +450
 			"Mar,(\$75.50)\n" .    # accounting negative, decimal
 			"Apr,-30.00\n"         # dash negative
 		);
@@ -1176,10 +1179,9 @@ subtest 'DataSource::_cache_key -- file path that does not exist returns undef' 
 # ---------------------------------------------------------------------------
 # Subtest: selectall_arrayref -- fast-path and delegation
 #
-# Three fast-paths are exercised before the backend delegation:
+# Two fast-paths are exercised before the backend delegation:
 #   1. _file_is_empty -- always returns []
-#   2. _file_data     -- returns pre-loaded rows without touching _db
-#   3. Cache hit      -- returns cached rows without touching _db
+#   2. Cache hit      -- returns cached rows without touching _db
 # ---------------------------------------------------------------------------
 subtest 'DataSource::selectall_arrayref -- _file_is_empty fast-path returns []' => sub {
 	# Construct a real DataSource then force the empty-file sentinel to verify
@@ -1191,14 +1193,133 @@ subtest 'DataSource::selectall_arrayref -- _file_is_empty fast-path returns []' 
 	is_deeply $result, [], 'selectall_arrayref returns [] when _file_is_empty is set';
 };
 
-subtest 'DataSource::selectall_arrayref -- _file_data fast-path returns pre-loaded rows' => sub {
-	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
-	my $fake_rows = [{ col => 'val1' }, { col => 'val2' }];
-	$src->{_file_data} = $fake_rows;
+subtest 'DataSource: a file with no header row is read by Database::Abstraction' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/hl.csv")->spew(join "\n",
+		'2026-01-02,"1,234.56",Rent paid',
+		'2026-01-03,5.00,"Tea, ""best"" C:\\x"',
+		'',
+		'2026-01-01,,Short row',
+		'2026-01-04,7.00,No quotes, then a comma',
+		',8.00,No date here',
+		'',
+	);
+	my $src = $DS->new(directory => $dir, table => 'hl');
+	isa_ok $src->{_db}, 'Database::Abstraction', 'the backend';
+	is_deeply $src->columns, [qw(Date Amount Description)],
+		'a quoted separator does not make a column';
+	is $src->{_id_col}, 'Description', 'the id has no empty values, or D::A would drop the row';
 
-	my $result = $src->selectall_arrayref;
-	is $result, $fake_rows,
-		'selectall_arrayref returns _file_data reference unchanged (no copy)';
+	my $rows = $src->fetch_all;
+	is scalar @{$rows}, 5, 'every row, blank lines apart';
+	is $rows->[0]{Amount}, '1,234.56', 'a quoted separator stays in its value';
+	is $rows->[0]{Description}, 'Rent paid', 'and the next value stays in its column';
+	is $rows->[1]{Description}, 'Tea, "best" C:\\x', 'quotes and backslashes survive the copy';
+	ok !length($rows->[2]{Amount} // ''), 'an empty field stays in place';
+	is $rows->[2]{Description}, 'Short row', 'so the next one does not move';
+	is $rows->[3]{Description}, 'No quotes, then a comma', 'extra fields go back into the last';
+	is $rows->[4]{Amount}, '8.00', 'a row with no date is kept';
+	is $src->count, 5, 'count agrees';
+	is $src->updated, (stat "$dir/hl.csv")[9], 'updated is the real file, not the copy';
+
+	# A first line with a middle field empty keeps its columns in place too.
+	Mojo::File->new("$dir/gap.csv")->spew("2026-01-02,,Rent paid\n2026-01-03,5.00,Tea bought\n");
+	my $gap = $DS->new(directory => $dir, table => 'gap');
+	is_deeply $gap->columns, [qw(Date Description Description2)], 'an empty first-row field is a column';
+	is $gap->fetch_all->[1]{Description}, '5.00', 'and its values line up';
+
+	# A quoted separator does not make the file look as if it has a header.
+	Mojo::File->new("$dir/word.csv")->spew(qq{2026-01-02,-5.00,"Tea, bought"\n});
+	is_deeply $DS->new(directory => $dir, table => 'word')->columns, [qw(Date Amount Description)],
+		'"Tea, bought" is not a column called Tea';
+
+	# A name D::A refuses reaches it through a symlink to the copy.
+	Mojo::File->new("$dir/my bank-file.csv")->spew(qq{2026-01-02,"1,234.56",Rent paid\n});
+	my $spaced = $DS->new(directory => $dir, table => 'my bank-file');
+	is $spaced->fetch_all->[0]{Amount}, '1,234.56', 'a file name with spaces';
+	is $spaced->{_file_path}, File::Spec->rel2abs("$dir/my bank-file.csv"), 'the real file is still the one watched';
+
+	# Unterminated quoting is an error, not a table cut short.
+	Mojo::File->new("$dir/bad.csv")->spew(qq{2026-01-02,-5.00,Rent paid\n2026-01-03,"-1.00,oops\n});
+	throws_ok { $DS->new(directory => $dir, table => 'bad') } qr/cannot parse/, 'a file that does not parse';
+
+	# Sorting goes to D::A: this was the bug.
+	my $sorted = $src->selectall_arrayref(sort_by => ['Date', 'DESC']);
+	is $sorted->[0]{Date}, '2026-01-04', 'sort_by descending';
+	is $sorted->[-1]{Date} // '', '', 'an empty value sorts last going down';
+	is scalar @{ $src->selectall_arrayref(sort_by => ['Date', 'ASC'], limit => 2, offset => 1) }, 2, 'limit and offset';
+};
+
+subtest 'DataSource: /join sorts a file with no header row' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/page.csv")->spew("2026-01-02,-1.00,Rent paid\n2026-01-03,-2.00,Tea bought\n");
+	my $tm = Test::Mojo->new('Database::BI');
+	$tm->app->config->{model_dir} = tempdir(CLEANUP => 1);
+	my $body = $tm->get_ok('/join?l=' . Mojo::Util::url_escape("path:$dir/page.csv") . '&sort=Date&dir=desc')
+		->status_is(200)->tx->res->body;
+	my @dates = $body =~ m{<td[^>]*>(2026-01-0\d)</td>}g;
+	is_deeply \@dates, ['2026-01-03', '2026-01-02'], 'in the order asked for';
+};
+
+subtest 'DataSource: XLSX and Berkeley DB are read by Database::Abstraction' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	SKIP: {
+		skip 'Excel::Writer::XLSX and Spreadsheet::ParseXLSX are needed', 11
+			unless eval { require Excel::Writer::XLSX; require Spreadsheet::ParseXLSX; 1 };
+		my $wb = Excel::Writer::XLSX->new("$dir/book.xlsx");
+		my $first = $wb->add_worksheet('Other');
+		$first->write_row(0, 0, ['Wrong']);
+		my $ws = $wb->add_worksheet('book');
+		$ws->write_col(0, 0, [['Zed', 'First Name', 'Age'], ['z', 'Bob', 3], ['y', 'Cy', 20], ['x', 'Al', 9]]);
+		$wb->close;
+
+		my $src = $DS->new(directory => $dir, table => 'book');
+		isa_ok $src->{_db}, 'Database::Abstraction', 'the XLSX backend';
+		is_deeply $src->columns, ['Zed', 'First Name', 'Age'],
+			'the columns are those of the sheet D::A reads, in the sheet\'s order';
+		is scalar @{ $src->fetch_all }, 3, 'all the rows';
+		is $src->count, 3, 'count agrees';
+		is $src->selectall_arrayref(sort_by => ['Zed', 'ASC'])->[0]{Zed}, 'x', 'sorts';
+		is $src->selectall_arrayref(sort_by => ['Zed', 'ASC'], limit => 1, offset => 1)->[0]{Zed}, 'y', 'pages';
+
+		# D::A ignores a sort column like this one, so DataSource does it.
+		my @warned;
+		local $SIG{__WARN__} = sub { push @warned, @_ };
+		my $by_name = $src->selectall_arrayref(sort_by => ['First Name', 'DESC']);
+		is_deeply [ map { $_->{'First Name'} } @{$by_name} ], [qw(Cy Bob Al)], 'an unsafe column sorts';
+		my $paged = $src->selectall_arrayref({ sort_by => ['First Name', 'ASC'], limit => 1, offset => 1 });
+		is_deeply [ map { $_->{'First Name'} } @{$paged} ], ['Bob'], 'and pages, given a hashref';
+		is_deeply [ map { $_->{'First Name'} } @{ $src->selectall_arrayref(sort_by => 'No Such') } ],
+			[qw(Bob Cy Al)], 'an unknown one leaves the order alone';
+		is scalar(@{ $src->fetch_all }), 3, 'and the sort did not disturb the cached list';
+		is_deeply \@warned, [], 'and D::A did not have to refuse any of them';
+	}
+	SKIP: {
+		skip 'DB_File is needed', 4 unless eval { require DB_File; require Fcntl; 1 };
+		my %bdb;
+		tie(%bdb, 'DB_File', "$dir/kv.db", Fcntl::O_CREAT() | Fcntl::O_RDWR(), 0644, $DB_File::DB_HASH)
+			or skip "cannot create a Berkeley DB file: $!", 4;
+		%bdb = (b => 2, a => 1, c => 3);
+		untie %bdb;
+		my $src = $DS->new(directory => $dir, table => 'kv');
+		isa_ok $src->{_db}, 'Database::Abstraction', 'the Berkeley DB backend';
+		is_deeply $src->columns, [qw(entry value)], 'columns';
+		is scalar @{ $src->fetch_all }, 3, 'all the rows';
+		is $src->selectall_arrayref(sort_by => ['entry', 'DESC'])->[0]{entry}, 'c', 'sorts';
+	}
+};
+
+subtest 'DataSource: a SQLite column with an unsafe name sorts and pages' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	require DBI;
+	my $dbh = DBI->connect("dbi:SQLite:dbname=$dir/uns.sql", '', '', { RaiseError => 1 });
+	$dbh->do('CREATE TABLE uns (id TEXT, "Full Name" TEXT)');
+	$dbh->do('INSERT INTO uns VALUES (?, ?)', undef, @{$_}) for ['1', 'Bob'], ['2', 'Al'], ['3', 'Cy'];
+	$dbh->disconnect;
+	my $src = $DS->new(directory => $dir, table => 'uns');
+	my $rows = $src->selectall_arrayref(sort_by => ['Full Name', 'ASC'], limit => 2);
+	is_deeply [ map { $_->{'Full Name'} } @{$rows} ], [qw(Al Bob)], 'sorted, then limited';
+	lives_ok { $src->selectall_arrayref(sort_by => 'No Such') } 'a locked row without the column does not croak';
 };
 
 subtest 'DataSource::selectall_arrayref -- cache hit skips backend, returns cached data' => sub {
@@ -2077,7 +2198,7 @@ subtest '_sniff_data_ext -- comma-delimited or unknown content falls back to csv
 #   3. Neither -> return undef
 # ============================================================================
 
-subtest 'DataSource::updated -- delegates to _db->updated() when available' => sub {
+subtest 'DataSource::updated -- the file comes first, then _db->updated()' => sub {
 	my $src = $DS->new(directory => $DATA_DIR, table => $SALES_CSV);
 
 	# Inject a mock backend whose updated() returns a sentinel mtime.
@@ -2090,8 +2211,14 @@ subtest 'DataSource::updated -- delegates to _db->updated() when available' => s
 	}
 	$src->{_db} = $mock_db;
 
+	# Why: the backend only learns an mtime when it opens the file, so it answers
+	# undef before the first read, and the time of that read after it.
+	is $src->updated, (stat($src->{_file_path}))[9],
+		'updated() trusts the file over what the backend remembers';
+
+	delete $src->{_file_path};
 	is $src->updated, $FAKE_MTIME,
-		'updated() returns value from _db->updated() when _db implements it';
+		'updated() asks _db->updated() when there is no file to stat';
 };
 
 subtest 'DataSource::updated -- stat fallback when _db absent' => sub {
@@ -5216,6 +5343,3686 @@ subtest '_visual_measure -- a function that needs a column says so' => sub {
 		ok !defined $m->{fn}, 'with no measure to aggregate with';
 	}
 };
+
+# ============================================================================
+# PART U: helpers shared by the module-by-module parts that follow
+#
+# Each module below gets its own block so its constants cannot leak into the
+# next.  At least 60% of the assertions are hostile: the question is whether a
+# function can be broken, not whether it works on the input it was written for.
+# ============================================================================
+
+use_ok('Database::BI::Util');
+use_ok('Database::BI::Summary');
+use_ok('Database::BI::Tutorial');
+use_ok('Database::BI::Extract');
+use_ok('Database::BI::Ask');
+use_ok('Database::BI::Insights');
+use_ok('Database::BI::Calc');
+
+require HTTP::Response;
+require LWP::UserAgent;
+
+# A helper that assigns to a global it did not localise corrupts its caller, and
+# the damage shows up far away.  Every global a helper might plausibly touch is
+# given a sentinel and read back afterwards.
+sub keeps_globals_ok {
+	my ($name, $code) = @_;
+
+	my @after;
+	{
+		local $_ = 'sentinel';
+		local $, = 'ofs';
+		local $\ = 'ors';
+		local $" = 'lsep';
+		local $/ = 'irs';
+		# Nothing may print while the test output's own separators are changed;
+		# the checks run after the block, so only the values are captured here.
+		$code->();
+		@after = ($_, $,, $\, $", $/);
+	}
+	is_deeply \@after, [ 'sentinel', 'ofs', 'ors', 'lsep', 'irs' ],
+		"$name leaves \$_, \$, \$\\ \$\" and \$/ as it found them";
+	return;
+}
+
+# A provider reply as LWP would hand it back, so the module's own status and
+# decoding code runs rather than a stand-in for it.
+sub fake_response {
+	my ($code, $body) = @_;
+	return HTTP::Response->new($code, ($code == 200 ? 'OK' : 'Boom'),
+		[ 'Content-Type' => 'application/json' ], $body);
+}
+
+# Runs $code with the network replaced.  The request is captured so a test can
+# read what would have left the machine, and unmocking here means a failing
+# assertion cannot leave the next subtest talking to the stub.
+sub with_fake_network {
+	my ($response, $code) = @_;
+	my @requests;
+	Test::Mockingbird::mock('LWP::UserAgent::request', sub {
+		push @requests, $_[1];
+		return $response;
+	});
+	my $ok  = eval { $code->(\@requests); 1 };
+	my $err = $@;
+	Test::Mockingbird::unmock('LWP::UserAgent::request');
+	croak_rethrow($err) unless $ok;
+	return \@requests;
+}
+
+sub croak_rethrow {
+	my ($err) = @_;
+	require Carp;
+	Carp::croak($err);
+}
+
+# ============================================================================
+# PART U1: Database::BI::Util
+# ============================================================================
+{
+	my $fn = \&Database::BI::Util::urlencode;
+
+	# Strategy: the unreserved set must pass untouched, because over-encoding
+	# breaks the URLs Insights and Ask compare and link to.
+	subtest 'Util::urlencode -- unreserved characters pass through' => sub {
+		is $fn->('AZaz09-._~'), 'AZaz09-._~', 'the RFC 3986 unreserved set is left alone';
+		is $fn->(''), '', 'an empty string stays empty';
+		is $fn->('0'), '0', 'a false but defined value is not treated as missing';
+		returns_is $fn->('x'), { type => 'string' }, 'always a plain string';
+	};
+
+	# Strategy: everything that could end a value or start a parameter, a path or
+	# a script has to come out inert.
+	subtest 'Util::urlencode -- hostile input cannot escape the query value' => sub {
+		is $fn->(undef), '', 'undef becomes an empty string, not a warning';
+		is $fn->('a b&c=d'), 'a%20b%26c%3Dd', 'separators cannot start a new parameter';
+		is $fn->('%41'), '%2541', 'an encoded value is encoded again, never passed through';
+		is $fn->('../../etc'), '..%2F..%2Fetc', 'slashes cannot walk a path';
+		is $fn->(qq{"><script>}), '%22%3E%3Cscript%3E', 'markup cannot leave an attribute';
+		is $fn->("a\r\nb"), 'a%0D%0Ab', 'CRLF cannot split a header';
+		is $fn->("\0"), '%00', 'a NUL byte cannot truncate the value';
+		is $fn->('#frag?q'), '%23frag%3Fq', 'nor can a fragment or a query mark';
+	};
+
+	# Why: a decoded column name reaches this function from Insights.  The code
+	# point 0x263A printed as "%263A" would decode to "&3A", a different value.
+	subtest 'Util::urlencode -- a wide character is encoded as its UTF-8 bytes' => sub {
+		is $fn->("\x{263A}"), '%E2%98%BA', 'three UTF-8 bytes, not one over-long escape';
+		is $fn->("a\x{263A}b"), 'a%E2%98%BAb', 'inside a longer value too';
+		is $fn->("\xC3\xA9"), '%C3%A9', 'bytes that are already UTF-8 are not encoded twice';
+	};
+
+	subtest 'Util::urlencode -- the caller keeps its value and its globals' => sub {
+		my $input = 'a b';
+		$fn->($input);
+		is $input, 'a b', 'the argument is not modified in place';
+		keeps_globals_ok('urlencode', sub { $fn->('a b') });
+	};
+
+	my $number = \&Database::BI::Util::parse_number;
+
+	subtest 'Util::parse_number -- the ways a number is dressed' => sub {
+		my %reads = (
+			'12' => 12, '-1.5' => -1.5, '0' => 0, '$1,234.56' => 1234.56, '(1,234.56)' => -1234.56,
+			'($5)' => -5, '50%' => 50, '1 234' => 1234, '1e3' => 1000, '2.5E-1' => 0.25,
+			'USD 100' => 100, '100 EUR' => 100, 'GBP100' => 100, '100GBP' => 100, '(USD 100)' => -100,
+			"\xC2\xA35" => 5, "\x{20AC}7" => 7, ' 7 ' => 7,
+		);
+		is $number->($_), $reads{$_}, "'$_' is read" for sort grep { !/[^\x00-\x7F]/ } keys %reads;
+		is $number->("\xC2\xA35"), 5, 'a pound sign as UTF-8 bytes';
+		is $number->("\x{20AC}7"), 7, 'a decoded euro sign';
+	};
+
+	# Why: this is the test of what a chart will total.  A code column read as numbers
+	# is a meaningless measure, and an unknown code must not pass for a currency.
+	subtest 'Util::parse_number -- text that merely holds digits' => sub {
+		is $number->($_), undef, "'$_' is not a number" for
+			'', 'abc', 'SKU123', 'SKU 100', '100 SKU', 'A1', 'AB-100', 'R2D2', 'v1.2', '12/25/2025', '2026-05-20',
+			'10:30', '1.2.3', '--5', '-', '.', '()', 'USD', 'USD USD', 'Widget 2', '1e', 'e5', '0x10', 'Inf', 'NaN';
+		is $number->(undef), undef, 'nor is nothing';
+		is $number->('1e999'), undef, 'nor is what would be infinity';
+		is $number->('-1e999'), undef, 'in either direction';
+		is $number->('9' x 400), undef, 'however it is spelled';
+		keeps_globals_ok('parse_number', sub { $number->('$5') });
+	};
+}
+
+# ============================================================================
+# PART U2: Database::BI::Summary
+#
+# The cache is a lexical in the module, so each subtest uses its own label to
+# start from a miss.  LWP is replaced throughout: nothing here reaches a network.
+# ============================================================================
+{
+	Readonly my $SUM     => 'Database::BI::Summary';
+	Readonly my $API_KEY => 'test-key';
+	Readonly my $SECRET  => 'path:/private/secret-file.csv';
+
+	my $tmpl = \&Database::BI::Summary::_template_summary;
+	my $fp   = \&Database::BI::Summary::_fingerprint;
+	my $llm  = \&Database::BI::Summary::_llm_summary;
+	my $call = \&Database::BI::Summary::_call_anthropic;
+
+	my %outlier = (kind => 'outlier',      headline => 'Odd value',  detail => 'd1');
+	my %period  = (kind => 'period_delta', headline => 'Up 5',       detail => 'd2');
+	my %mover   = (kind => 'top_mover',    headline => 'North rose', detail => 'd3');
+	my %season  = (kind => 'seasonality',  headline => 'Repeats',    detail => 'd4');
+
+	subtest 'Summary::_fingerprint -- every input that changes the text changes the key' => sub {
+		my $base = $fp->([ \%period ], 0, 'L', 1);
+		like $base, qr/\A[0-9a-f]{32}\z/, 'an md5 hex digest';
+		is $fp->([ \%period ], 0, 'L', 1), $base, 'the same input gives the same key';
+		isnt $fp->([ \%period ], 1, 'L', 1), $base, 'a polished summary is not a template one';
+		isnt $fp->([ \%period ], 0, 'M', 1), $base, 'nor another dataset';
+		isnt $fp->([ \%period ], 0, 'L', 2), $base, 'nor another row count';
+		isnt $fp->([ \%mover ], 0, 'L', 1), $base, 'nor another insight';
+		isnt $fp->([ { %period, headline => 'Up 6' } ], 0, 'L', 1), $base, 'nor another headline';
+
+		# Why: the summary prints the detail, and two period deltas can share a
+		# headline while their figures differ.  A key without it serves one
+		# dataset's numbers to the other for an hour.
+		isnt $fp->([ { %period, detail => 'other figures' } ], 0, 'L', 1), $base,
+			'nor another detail, since the template prints it';
+	};
+
+	subtest 'Summary::_fingerprint -- text outside Latin-1 does not kill the request' => sub {
+		my $key;
+		lives_ok { $key = $fp->([ { %period, headline => "Up \x{20AC}5" } ], 0, "L\x{263A}", 1) }
+			'md5_hex is given bytes, so a wide character cannot make it croak';
+		like $key, qr/\A[0-9a-f]{32}\z/, 'and the key is still a digest';
+		lives_ok { $fp->([], 0, 'L', 0) } 'no insights at all is still a key';
+	};
+
+	subtest 'Summary::_template_summary -- sentences per insight kind' => sub {
+		like $tmpl->([], 'Sales', 1), qr/\ASales: 1 row analysed\. /, 'one row is singular';
+		like $tmpl->([], 'Sales', 2), qr/\ASales: 2 rows analysed\. /, 'two are plural';
+		like $tmpl->([], 'Sales', 0), qr/0 rows analysed/, 'zero reads as plural';
+		like $tmpl->([], 'S', 1), qr/No significant patterns were detected\.\z/,
+			'no insights says so rather than ending abruptly';
+		like $tmpl->([ \%outlier ], 'S', 1), qr/An unusual value was detected: Odd value\./, 'one outlier';
+		like $tmpl->([ \%outlier, \%outlier, \%outlier ], 'S', 1),
+			qr/3 outliers detected, including: Odd value\./, 'several outliers are counted';
+		like $tmpl->([ \%period ], 'S', 1), qr/Up 5\. d2\./, 'a period delta gives its figures';
+		like $tmpl->([ \%mover ], 'S', 1), qr/Top movement: North rose\./, 'a top mover';
+		like $tmpl->([ \%season ], 'S', 1), qr/seasonal pattern was detected: Repeats\./, 'seasonality';
+	};
+
+	subtest 'Summary::_template_summary -- order is fixed and odd input is harmless' => sub {
+		my $text = $tmpl->([ \%season, \%mover, \%period, \%outlier ], 'S', 1);
+		like $text, qr/unusual.*Up 5.*Top movement.*seasonal/s,
+			'the order is by importance, not the order the insights arrived in';
+
+		like $tmpl->([ { kind => 'made_up', headline => 'x', detail => 'y' } ], 'S', 1),
+			qr/No significant patterns/, 'an unknown kind counts as nothing';
+		unlike $tmpl->([ { kind => 'made_up', headline => 'SECRET', detail => 'y' } ], 'S', 1),
+			qr/SECRET/, 'and its text is not repeated';
+		keeps_globals_ok('_template_summary', sub { $tmpl->([ \%outlier ], 'S', 1) });
+	};
+
+	subtest 'Summary::_llm_summary -- refuses a provider it cannot call' => sub {
+		throws_ok { $llm->([], 'S', 1, { provider => 'openai', api_key => $API_KEY }) }
+			qr/\AUnsupported AI provider: openai at /, 'exact message, naming the provider';
+		throws_ok { $llm->([], 'S', 1, { provider => '../../x', api_key => $API_KEY }) }
+			qr/\AUnsupported AI provider: \.\.\/\.\.\/x at /, 'a hostile name goes nowhere';
+	};
+
+	subtest 'Summary::_llm_summary -- the prompt carries only the facts' => sub {
+		my @prompts;
+		Test::Mockingbird::mock("${SUM}::_call_anthropic", sub { push @prompts, $_[0]; "  polished \n" });
+
+		my @got = $llm->([ (\%outlier) x 9 ], 'Sales', 12, { api_key => $API_KEY, provider => 'ANTHROPIC' });
+
+		Test::Mockingbird::unmock("${SUM}::_call_anthropic");
+
+		is_deeply \@got, [ 'polished', 'llm' ], 'surrounding whitespace is trimmed; the provider name is case-blind';
+		my $facts = () = $prompts[0] =~ /^- \[outlier\]/mg;
+		is $facts, 5, 'the list is capped, so a large result cannot run up the bill';
+		like $prompts[0], qr/"Sales" \(12 rows\)/, 'the label and count are there';
+	};
+
+	subtest 'Summary::_call_anthropic -- a provider failure is an exact croak' => sub {
+		with_fake_network(fake_response(500, 'x'), sub {
+			throws_ok { $call->('p', { api_key => $API_KEY }) }
+				qr/\AProvider error: 500 Boom at /, 'status line in the message';
+		});
+		with_fake_network(fake_response(200, 'not json'), sub {
+			dies_ok { $call->('p', { api_key => $API_KEY }) } 'a reply that is not JSON is an error';
+		});
+		for my $body ('{}', '{"content":[]}', '{"content":[{"text":""}]}', '{"content":[{}]}') {
+			with_fake_network(fake_response(200, $body), sub {
+				throws_ok { $call->('p', { api_key => $API_KEY }) }
+					qr/\ANo text in provider response at /, "no usable text in $body";
+			});
+		}
+		with_fake_network(fake_response(200, '{"content":"oops"}'), sub {
+			throws_ok { $call->('p', { api_key => $API_KEY }) }
+				qr/\ANo text in provider response at /, 'a reply of the wrong shape is the same error';
+		});
+	};
+
+	subtest 'Summary::_call_anthropic -- what is sent' => sub {
+		my $text;
+		my $sent = with_fake_network(fake_response(200, '{"content":[{"text":"hello"}]}'), sub {
+			$text = $call->('the prompt', { api_key => $API_KEY });
+		});
+		is $text, 'hello', 'the text of the first block is returned';
+		is $sent->[0]->header('x-api-key'), $API_KEY, 'the key goes in a header';
+		is $sent->[0]->method, 'POST', 'by POST';
+		my $body = decode_json($sent->[0]->content);
+		is $body->{model}, 'claude-haiku-5-5', 'the default model';
+		is $body->{messages}[0]{content}, 'the prompt', 'and the prompt';
+		unlike $sent->[0]->uri, qr/\Q$API_KEY\E/, 'the key is never in the URL, where logs would keep it';
+	};
+
+	subtest 'Summary::generate -- the template path never touches the network' => sub {
+		my $calls = 0;
+		Test::Mockingbird::mock("${SUM}::_call_anthropic", sub { $calls++; 'x' });
+
+		my $none  = $SUM->can('generate')->(insights => [], label => 'gen-none', row_count => 1);
+		my $nokey = $SUM->can('generate')->(insights => [], label => 'gen-nokey', row_count => 1,
+			use_ai => 1, ai_config => { api_key => '' });
+		my $notasked = $SUM->can('generate')->(insights => [], label => 'gen-notasked', row_count => 1,
+			use_ai => 0, ai_config => { api_key => $API_KEY });
+
+		Test::Mockingbird::unmock("${SUM}::_call_anthropic");
+
+		is $calls, 0, 'no key, or a key not asked to be used, sends nothing';
+		is $_->{source}, 'template', 'and each is a template summary' for $none, $nokey, $notasked;
+		returns_is $none, { type => 'hashref' }, 'a hashref comes back';
+		memory_cycle_ok($none, 'and it holds no cycle');
+	};
+
+	subtest 'Summary::generate -- defaults survive having no arguments at all' => sub {
+		my $got;
+		lives_ok { $got = Database::BI::Summary::generate() } 'no arguments is not a crash';
+		like $got->{text}, qr/\Adataset: 0 rows analysed\./, 'the defaults read sensibly';
+	};
+
+	subtest 'Summary::generate -- a provider failure falls back to the template' => sub {
+		Test::Mockingbird::mock("${SUM}::_llm_summary", sub { require Carp; Carp::croak('provider down') });
+		my $got = Database::BI::Summary::generate(insights => [ \%mover ], label => 'gen-fallback',
+			row_count => 1, use_ai => 1, ai_config => { api_key => $API_KEY });
+		Test::Mockingbird::unmock("${SUM}::_llm_summary");
+
+		is $got->{source}, 'template_fallback', 'the reader still gets a summary';
+		like $got->{text}, qr/Top movement: North rose/, 'made from the same insights';
+		unlike $got->{text}, qr/provider down/, 'and the provider error is not shown to them';
+	};
+
+	subtest 'Summary::generate -- the provider is asked once and never given the spec' => sub {
+		my @prompts;
+		Test::Mockingbird::mock("${SUM}::_call_anthropic", sub { push @prompts, $_[0]; 'polished' });
+		my %args = (insights => [ \%mover ], spec_key => $SECRET, label => 'gen-cache',
+			row_count => 3, use_ai => 1, ai_config => { api_key => $API_KEY });
+		my $first  = Database::BI::Summary::generate(%args);
+		my $second = Database::BI::Summary::generate(%args);
+		Test::Mockingbird::unmock("${SUM}::_call_anthropic");
+
+		is $first->{source}, 'llm', 'the first call used the provider';
+		is $first->{cached}, 0, 'and is not cached';
+		is $second->{cached}, 1, 'the second is';
+		is $second->{text}, 'polished', 'with the same text';
+		is scalar @prompts, 1, 'so the provider was asked once';
+		unlike $prompts[0], qr/secret-file|private/, 'the spec key, which holds a path, never leaves';
+		keeps_globals_ok('generate', sub { Database::BI::Summary::generate(%args) });
+	};
+}
+
+# ============================================================================
+# PART U3: Database::BI::Tutorial
+#
+# The content is data; what can go wrong is its wiring -- a route, action or part
+# that points at nothing, or a caller able to damage the shared tables.
+# ============================================================================
+{
+	Readonly my $TUT => 'Database::BI::Tutorial';
+
+	subtest 'Tutorial -- the content accessors' => sub {
+		returns_is $TUT->$_(), { type => 'arrayref' }, "$_ returns an arrayref" for qw(intro chapters faq glossary);
+		ok scalar @{ $TUT->$_() }, "$_ is not empty" for qw(intro chapters faq glossary);
+		my %seen;
+		my @dups = grep { $seen{ $_->{id} }++ } @{ $TUT->chapters };
+		is_deeply \@dups, [], 'no two chapters share an id, or a link would land on the wrong one';
+		ok !(grep { !length($_->{id} // '') || !length($_->{part} // '') } @{ $TUT->chapters }),
+			'every chapter has an id and a part';
+	};
+
+	subtest 'Tutorial::parts -- groups neighbouring chapters' => sub {
+		my $parts = $TUT->parts;
+		returns_is $parts, { type => 'arrayref' }, 'an arrayref';
+		my $count = 0;
+		$count += @{ $_->{chapters} } for @$parts;
+		is $count, scalar @{ $TUT->chapters }, 'no chapter is lost or repeated';
+		for my $part (@$parts) {
+			like $part->{id}, qr/\A[a-z0-9-]+\z/, "the id of '$part->{name}' is safe in a URL";
+			ok !(grep { $_->{part} ne $part->{name} } @{ $part->{chapters} }), 'it holds only its own chapters';
+		}
+		memory_cycle_ok($parts, 'and it holds no cycle');
+	};
+
+	subtest 'Tutorial::covered_routes and exempt_routes -- nothing points at nothing' => sub {
+		my %ids = map { $_->{id} => 1 } @{ $TUT->chapters };
+		my $covered = $TUT->covered_routes;
+		returns_is $covered, { type => 'hashref' }, 'covered routes are a hashref';
+		ok !(grep { !$ids{$_} } values %$covered), 'each names a chapter that exists';
+
+		my $exempt = $TUT->exempt_routes;
+		ok !(grep { !length $exempt->{$_} } keys %$exempt), 'each exemption gives its reason';
+		ok !(grep { exists $covered->{$_} } keys %$exempt), 'a route is covered or exempt, not both';
+
+		# Why: this table decides what t/tutorial.t demands; a caller's edit must
+		# not change the next caller's answer.
+		$exempt->{'/injected'} = 'x';
+		delete $exempt->{'/tutorial'};
+		ok !exists $TUT->exempt_routes->{'/injected'}, 'a caller cannot add an exemption';
+		ok exists $TUT->exempt_routes->{'/tutorial'}, 'or remove one';
+	};
+
+	subtest 'Tutorial::chapter_for_action -- known and unknown actions' => sub {
+		is $TUT->chapter_for_action('map_view')->{id}, 'map-chart', 'an action finds its chapter';
+		is $TUT->chapter_for_action('catalog_view')->{id}, 'catalog', 'another does too';
+		is_deeply [ $TUT->chapter_for_action(undef) ], [], 'undef finds nothing';
+		is_deeply [ $TUT->chapter_for_action('') ], [], 'an empty name finds nothing';
+		is_deeply [ $TUT->chapter_for_action('no_such_action') ], [], 'nor does an unknown one';
+		is_deeply [ $TUT->chapter_for_action('__proto__') ], [], 'or a hostile one';
+		is_deeply [ $TUT->chapter_for_action('MAP_VIEW') ], [], 'action names are exact';
+	};
+
+	subtest 'Tutorial::_slug -- URL-safe whatever it is given' => sub {
+		my $fn = \&Database::BI::Tutorial::_slug;
+		is $fn->('Part One: Getting Started'), 'part-one-getting-started', 'spaces and punctuation become one hyphen';
+		is $fn->('--a--'), 'a', 'no hyphen at either end';
+		is $fn->('!!!'), '', 'nothing usable gives an empty slug';
+		is $fn->(''), '', 'an empty name stays empty';
+		is $fn->(qq{"><script>}), 'script', 'markup cannot reach an id attribute';
+		is $fn->('../../x'), 'x', 'and a path cannot survive';
+		like $fn->("caf\xE9 au lait"), qr/\A[a-z0-9-]+\z/, 'accented text still yields only safe characters';
+		keeps_globals_ok('_slug', sub { $fn->('A b') });
+	};
+}
+
+# ============================================================================
+# PART U4: Database::BI::Extract
+#
+# A real filesystem in a temp directory: a cache is only as good as what it does
+# on disk.  Failures are forced with a plain file where a directory has to be,
+# which works for any user on any platform, unlike taking permissions away.
+# ============================================================================
+{
+	Readonly my $EX    => 'Database::BI::Extract';
+	Readonly my $SPEC  => 'table:sales';
+	Readonly my $MTIME => 1_700_000_000;
+	Readonly my $SIZE  => 42;
+	Readonly my $BYTES => "SQLite format 3\0\xFF\n";
+
+	my $fp = \&Database::BI::Extract::_fingerprint;
+
+	subtest 'Extract::new -- a store needs somewhere to live' => sub {
+		throws_ok { $EX->new() } qr/\Amodel_dir is required at /, 'none given';
+		throws_ok { $EX->new(model_dir => undef) } qr/\Amodel_dir is required at /, 'undef given';
+
+		# Why: an empty name resolves against the working directory, so the cache
+		# would land in whatever directory the server was started from.
+		throws_ok { $EX->new(model_dir => '') } qr/\Amodel_dir is required at /, 'an empty name is not a place';
+
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		isa_ok $ex, $EX;
+		memory_cycle_ok($ex, 'the object holds no cycle');
+	};
+
+	subtest 'Extract::_fingerprint -- what makes two extracts different' => sub {
+		my $base = $fp->($SPEC, $MTIME, $SIZE);
+		like $base, qr/\A[0-9a-f]{32}\z/, 'an md5 hex digest';
+		is $fp->($SPEC, $MTIME, $SIZE), $base, 'stable for the same input';
+		isnt $fp->('table:other', $MTIME, $SIZE), $base, 'another source differs';
+		isnt $fp->($SPEC, $MTIME + 1, $SIZE), $base, 'a touched file differs';
+		isnt $fp->($SPEC, $MTIME, $SIZE + 1), $base, 'a resized file differs';
+		is $fp->($SPEC, undef, undef), $fp->($SPEC, 0, 0), 'unknown mtime and size count as zero';
+		isnt $fp->('a', '1', '23'), $fp->('a', '12', '3'), 'fields cannot run into each other';
+		lives_ok { $fp->("path:/caf\x{263A}.csv", 1, 2) } 'a wide character in a path cannot make md5_hex croak';
+	};
+
+	subtest 'Extract::path and _extract_dir -- addresses, not actions' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $ex  = $EX->new(model_dir => $dir);
+		like $ex->_extract_dir, qr{\Q$dir\E.extracts\z}, 'the store is under model_dir';
+		my $p = $ex->path($SPEC, $MTIME, $SIZE);
+		like $p, qr{extracts.[0-9a-f]{32}\.db\z}, 'a digest with .db';
+		ok !-e $p, 'asking for the path creates nothing';
+		ok !-d $ex->_extract_dir, 'not even the directory';
+
+		like $ex->path('../../../etc/passwd', 0, 0), qr{\Q$dir\E.extracts.[0-9a-f]{32}\.db\z},
+			'a hostile spec is hashed, so it cannot walk out of the store';
+	};
+
+	subtest 'Extract::get and put -- the round trip' => sub {
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		is $ex->get($SPEC, $MTIME, $SIZE), undef, 'a miss before anything is stored';
+
+		my $written;
+		warnings_are { $written = $ex->put($SPEC, $MTIME, $SIZE, $BYTES) } [], 'storing is quiet';
+		is $ex->get($SPEC, $MTIME, $SIZE), $written, 'then a hit, at the same path';
+		is(Mojo::File->new($written)->slurp, $BYTES, 'the bytes come back exactly, NUL and high bytes included');
+
+		is $ex->get($SPEC, $MTIME + 1, $SIZE), undef, 'a changed file is a miss, so stale data is never served';
+
+		$ex->put($SPEC, $MTIME, $SIZE, 'newer');
+		is(Mojo::File->new($written)->slurp, 'newer', 'storing again replaces the old copy');
+		returns_is $written, { type => 'string' }, 'put returns the path';
+	};
+
+	subtest 'Extract::put -- refuses to store nothing' => sub {
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		throws_ok { $ex->put($SPEC, $MTIME, $SIZE, undef) } qr/\Asqlite_bytes are required at /, 'undef';
+		throws_ok { $ex->put($SPEC, $MTIME, $SIZE, '') } qr/\Asqlite_bytes are required at /, 'empty';
+		ok !-d $ex->_extract_dir, 'and a refused store leaves nothing on disk';
+	};
+
+	subtest 'Extract::put -- failures mid-write are reported' => sub {
+		# A file where the store's directory has to go.
+		my $base = tempdir(CLEANUP => 1);
+		Mojo::File->new($base, 'extracts')->spew('in the way');
+		my $blocked = $EX->new(model_dir => $base);
+		throws_ok { $blocked->put($SPEC, $MTIME, $SIZE, 'x') } qr/\ACannot create extract dir /,
+			'the directory cannot be made';
+
+		# A directory where the file has to go.
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		Mojo::File->new($ex->path($SPEC, $MTIME, $SIZE))->make_path;
+		throws_ok { $ex->put($SPEC, $MTIME, $SIZE, 'x') } qr/\ACannot write extract /,
+			'the file cannot be written';
+	};
+
+	subtest 'Extract::evict -- removes what it stored and nothing else' => sub {
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		is $ex->evict($SPEC), 0, 'no store yet, so nothing to do';
+
+		$ex->put($SPEC, 1, 1, 'a');
+		$ex->put($SPEC, 2, 2, 'b');
+		my $keep = Mojo::File->new($ex->_extract_dir, 'notes.txt');
+		$keep->spew('mine');
+
+		is $ex->evict($SPEC), 2, 'both extracts are counted';
+		is $ex->get($SPEC, 1, 1), undef, 'and gone';
+		ok -f $keep, 'a file that is not an extract is left alone';
+		is $ex->evict($SPEC), 0, 'a second eviction finds nothing';
+	};
+
+	# Why: glob() splits its pattern on spaces and reads brackets as a class, so a
+	# home directory with either one in its name would never be cleared.
+	subtest 'Extract::evict -- the name of the store cannot defeat it' => sub {
+		# Windows does not allow a '*' in a file name.
+		for my $name ('with space', 'with[bracket]', ($^O eq 'MSWin32' ? () : 'with*star')) {
+			my $dir = File::Spec->catdir(tempdir(CLEANUP => 1), $name);
+			my $ex  = $EX->new(model_dir => $dir);
+			$ex->put($SPEC, 1, 1, 'a');
+			is $ex->evict($SPEC), 1, "a model_dir called '$name' is cleared";
+			is $ex->get($SPEC, 1, 1), undef, 'and the extract has gone';
+		}
+		my $ex = $EX->new(model_dir => tempdir(CLEANUP => 1));
+		$ex->put($SPEC, 1, 1, 'a');
+		keeps_globals_ok('evict', sub { $ex->evict($SPEC) });
+	};
+}
+
+# ============================================================================
+# PART U5: Database::BI::Ask
+#
+# The reply being parsed comes from a language model, so it is treated as what it
+# is: untrusted text that may be wrong, malformed or actively hostile.
+# ============================================================================
+{
+	Readonly my $ASK     => 'Database::BI::Ask';
+	Readonly my $API_KEY => 'test-key';
+	Readonly my $SPEC    => 'table:sales';
+	Readonly my @COLUMNS => ({ name => 'region', type => 'string' }, { name => 'amount', type => 'number' });
+
+	my $parse = \&Database::BI::Ask::_parse_visual;
+	my $infer = \&Database::BI::Ask::_infer_type;
+	my $url   = \&Database::BI::Ask::_build_url;
+
+	subtest 'Ask::ask -- refusals come back as codes, never as a croak' => sub {
+		is_deeply Database::BI::Ask::ask(), { error => 'ask_no_question' }, 'nothing given';
+		is_deeply Database::BI::Ask::ask(question => ''), { error => 'ask_no_question' }, 'an empty question';
+		is_deeply Database::BI::Ask::ask(question => 'q'), { error => 'ask_unavailable' }, 'no key';
+		is_deeply Database::BI::Ask::ask(question => 'q', ai_config => { api_key => '' }),
+			{ error => 'ask_unavailable' }, 'an empty key';
+	};
+
+	subtest 'Ask::ask -- each stage of a failed request has its own code' => sub {
+		my %cfg = (question => 'q', spec_key => $SPEC, columns => [ @COLUMNS ], ai_config => { api_key => $API_KEY });
+
+		Test::Mockingbird::mock("${ASK}::_call_llm", sub { require Carp; Carp::croak('down') });
+		is_deeply Database::BI::Ask::ask(%cfg), { error => 'ask_provider_error' }, 'the provider failed';
+		Test::Mockingbird::unmock("${ASK}::_call_llm");
+
+		Test::Mockingbird::mock("${ASK}::_call_llm", sub { 'I would rather not' });
+		is_deeply Database::BI::Ask::ask(%cfg), { error => 'ask_unparseable' }, 'the reply was not a visual';
+		Test::Mockingbird::unmock("${ASK}::_call_llm");
+
+		Test::Mockingbird::mock("${ASK}::_call_llm", sub { '{"kind":"bar","encode":{"cat":"password"}}' });
+		is_deeply Database::BI::Ask::ask(%cfg), { error => 'ask_invalid_spec:password' },
+			'a column that does not exist is refused, and named';
+		Test::Mockingbird::unmock("${ASK}::_call_llm");
+	};
+
+	subtest 'Ask::ask -- a good reply' => sub {
+		Test::Mockingbird::mock("${ASK}::_call_llm", sub {
+			'{"kind":"bar","title":"T","encode":{"cat":"region","val":"amount"}}';
+		});
+		my $got = Database::BI::Ask::ask(question => 'q', spec_key => $SPEC, label => 'Sales',
+			columns => [ @COLUMNS ], ai_config => { api_key => $API_KEY });
+		Test::Mockingbird::unmock("${ASK}::_call_llm");
+
+		is $got->{valid}, 1, 'it is marked valid';
+		is $got->{url}, '/bar?l=table%3Asales&cat=region&val=amount', 'with a working URL';
+		is $got->{spec}{visuals}[0]{kind}, 'bar', 'and a spec to save';
+		memory_cycle_ok($got, 'holding no cycle');
+	};
+
+	subtest 'Ask::infer_column_types -- input it cannot use' => sub {
+		my $fn = \&Database::BI::Ask::infer_column_types;
+		is_deeply $fn->(undef, undef), [], 'nothing at all';
+		is_deeply $fn->('x', ['a']), [], 'records that are not a list';
+		is_deeply $fn->([], 'x'), [], 'columns that are not a list';
+		is_deeply $fn->([], ['a']), [ { name => 'a', type => 'string' } ], 'no rows reads as text';
+		is_deeply $fn->([ { a => undef }, { a => '' }, {} ], ['a']), [ { name => 'a', type => 'string' } ],
+			'all-empty cells read as text, not number';
+		is_deeply $fn->([ { a => 1, b => 'x', c => '2026-01-01' } ], [qw(a b c)]),
+			[ { name => 'a', type => 'number' }, { name => 'b', type => 'string' }, { name => 'c', type => 'date' } ],
+			'each column is judged alone, in the order asked';
+		keeps_globals_ok('infer_column_types', sub { $fn->([ { a => 1 } ], ['a']) });
+	};
+
+	subtest 'Ask::_infer_type -- the majority decides' => sub {
+		is $infer->([]), 'string', 'nothing to go on';
+		is $infer->([ 1, 2, 'x' ]), 'number', 'two in three numbers';
+		is $infer->([ 1, 'x' ]), 'string', 'exactly half is not a majority';
+		is $infer->([ '2026-01-02', '1/2/2026', 'x' ]), 'date', 'two in three dates, either form';
+		is $infer->([ '2026-01-02', 'x' ]), 'string', 'half again is not enough';
+		is $infer->([ '2026-1-2x' ]), 'string', 'something merely shaped like a date is not one';
+	};
+
+	subtest 'Ask::_call_llm -- what leaves the machine' => sub {
+		my $text;
+		my $sent = with_fake_network(fake_response(200, '{"content":[{"text":"reply"}]}'), sub {
+			$text = Database::BI::Ask::_call_llm('Which region?', 'Sales', [ @COLUMNS ], { api_key => $API_KEY });
+		});
+		is $text, 'reply', 'the text comes back';
+		my $body   = decode_json($sent->[0]->content);
+		my $prompt = $body->{messages}[0]{content};
+		like $prompt, qr/- region \(string\)/, 'names and types go';
+		like $prompt, qr/Which region\?/, 'and the question';
+		is $body->{model}, 'claude-haiku-5-5', 'the default model is used';
+		is $sent->[0]->header('x-api-key'), $API_KEY, 'the key is a header';
+	};
+
+	subtest 'Ask::_call_llm -- provider failures' => sub {
+		with_fake_network(fake_response(503, 'x'), sub {
+			throws_ok { Database::BI::Ask::_call_llm('q', 'L', [], { api_key => $API_KEY }) }
+				qr/\AProvider error: 503 Boom at /, 'the status line';
+		});
+		for my $body ('{}', '{"content":[{"text":""}]}') {
+			with_fake_network(fake_response(200, $body), sub {
+				throws_ok { Database::BI::Ask::_call_llm('q', 'L', [], { api_key => $API_KEY }) }
+					qr/\ANo text in provider response at /, "no text in $body";
+			});
+		}
+		with_fake_network(fake_response(200, '<html>'), sub {
+			dies_ok { Database::BI::Ask::_call_llm('q', 'L', [], { api_key => $API_KEY }) } 'and a reply that is not JSON';
+		});
+	};
+
+	subtest 'Ask::_parse_visual -- finding the JSON in a chatty reply' => sub {
+		is $parse->('{"kind":"bar"}')->{kind}, 'bar', 'a clean reply';
+		is_deeply $parse->('{"kind":"bar"}')->{encode}, {}, 'a missing encode becomes empty, so callers need not check';
+		is $parse->("Sure!\n{\"kind\":\"pie\",\"encode\":{\"cat\":\"a\"}}\nHope that helps")->{kind}, 'pie',
+			'prose either side';
+		is $parse->('{"kind":"bar"} and {"kind":"pie"}')->{kind}, 'bar', 'two objects: the first, not a span of both';
+	};
+
+	# Why: JSON read by a byte-oriented parser rejects any reply with a non-ASCII
+	# title, so a question asked in French always came back unparseable.
+	subtest 'Ask::_parse_visual -- text outside ASCII' => sub {
+		is $parse->(qq({"kind":"bar","title":"caf\x{e9}"}))->{title}, "caf\x{e9}", 'an accented title';
+		is $parse->(qq({"kind":"bar","title":"\x{263A}"}))->{title}, "\x{263A}", 'a wide character';
+		is $parse->(qq(Voil\x{e0}: {"kind":"bar","title":"\x{263A}"}))->{title}, "\x{263A}", 'and with prose around it';
+	};
+
+	# Why: a depth counter that ignores strings stops at a brace inside a title.
+	subtest 'Ask::_parse_visual -- braces and quotes inside strings' => sub {
+		is $parse->('Here: {"kind":"bar","title":"a } b"} done')->{title}, 'a } b', 'a closing brace in a string';
+		is $parse->('Here: {"kind":"bar","title":"a { b"} done')->{title}, 'a { b', 'an opening one';
+		is $parse->('Here: {"kind":"bar","title":"say \"}\" now"} done')->{title}, 'say "}" now', 'an escaped quote';
+	};
+
+	subtest 'Ask::_parse_visual -- replies that must be refused' => sub {
+		for my $case (
+			[ '',                                  'an empty reply' ],
+			[ 'no json here',                      'prose alone' ],
+			[ '{',                                 'an unbalanced brace' ],
+			[ '}{',                                'braces the wrong way round' ],
+			[ '[1,2,3]',                           'JSON that is not an object' ],
+			[ '"bar"',                             'a bare string' ],
+			[ '{}',                                'no kind' ],
+			[ '{"kind":"evil"}',                   'a kind that does not exist' ],
+			[ '{"kind":"../../etc"}',              'a kind that is a path' ],
+			[ '{"kind":{"a":1}}',                  'a kind that is an object' ],
+			[ '{"kind":"bar","encode":"x"}',       'an encode that is a string' ],
+			[ '{"kind":"bar","encode":["x"]}',     'an encode that is a list' ],
+		) {
+			my ($text, $name) = @$case;
+			is $parse->($text), undef, "$name is refused";
+		}
+		lives_ok { $parse->('{' x 5_000) } 'a flood of braces is survived';
+		keeps_globals_ok('_parse_visual', sub { $parse->('x {"kind":"bar"} y') });
+	};
+
+	subtest 'Ask::_validate_encode -- only real columns' => sub {
+		my $fn = \&Database::BI::Ask::_validate_encode;
+		my %cols = (a => 1, b => 1);
+		is $fn->({ encode => {} }, \%cols), undef, 'nothing to check';
+		is $fn->({ encode => { x => 'a', y => 'b' } }, \%cols), undef, 'all known';
+		is $fn->({ encode => { x => 'zz' } }, \%cols), 'zz', 'an unknown one is returned by name';
+		is $fn->({ encode => { x => undef, y => '' } }, \%cols), undef, 'blanks are not columns';
+		is $fn->({ encode => { b => 'second', a => 'first' } }, \%cols), 'first', 'the report is deterministic';
+		ok defined $fn->({ encode => { x => [ 'a' ] } }, \%cols), 'a list where a name should be is refused';
+	};
+
+	subtest 'Ask::_build_url -- routes and encoding' => sub {
+		is $url->({ kind => 'pie', encode => { cat => 'a' } }, $SPEC), '/pie?l=table%3Asales&cat=a', 'the pie route';
+		is $url->({ kind => 'line', encode => {} }, $SPEC), '/graph?l=table%3Asales', 'a line chart is /graph';
+		is $url->({ kind => 'bar', encode => { a => '', b => undef, c => 'x' } }, $SPEC),
+			'/bar?l=table%3Asales&c=x', 'empty encodings are left out';
+		is $url->({ kind => 'table' }, $SPEC), '/view/sales', 'a table of a table';
+		is $url->({ kind => 'table' }, 'path:/a b.csv'), '/open?path=%2Fa%20b.csv', 'a table of a path';
+	};
+
+	subtest 'Ask::_build_url -- a hostile value cannot change the URL' => sub {
+		like $url->({ kind => 'bar', encode => { cat => 'x&admin=1' } }, $SPEC), qr/cat=x%26admin%3D1\z/,
+			'a value cannot add a parameter';
+		like $url->({ kind => 'bar', encode => {} }, 'table:x&y=1'), qr/\A\/bar\?l=table%3Ax%26y%3D1\z/,
+			'nor can the spec';
+		is $url->({ kind => 'table' }, 'table:x"><script>'), '/view/x%22%3E%3Cscript%3E',
+			'a table name cannot leave the link it is put in';
+		is $url->({ kind => 'table' }, 'table:../../admin'), '/view/..%2F..%2Fadmin', 'or walk to another route';
+	};
+
+	subtest 'Ask::_build_spec -- a saveable canvas' => sub {
+		my $fn = \&Database::BI::Ask::_build_spec;
+		my $titled = $fn->({ kind => 'bar', title => 'T', encode => { cat => 'a' } }, 'L', $SPEC);
+		is $titled->{name}, 'T', 'the title names it';
+		is $titled->{version}, 1, 'it has a version';
+		is_deeply $titled->{datasets}, [ { spec => $SPEC } ], 'and its dataset';
+		is $fn->({ kind => 'bar' }, 'L', $SPEC)->{name}, 'L analysis', 'the label stands in for a missing title';
+		is_deeply $fn->({ kind => 'bar' }, 'L', $SPEC)->{visuals}[0]{encode}, {}, 'a missing encode is empty';
+		is $fn->({ kind => 'bar' }, 'L', $SPEC)->{visuals}[0]{title}, '', 'and a missing title is too';
+		memory_cycle_ok($titled, 'no cycle');
+	};
+}
+
+# ============================================================================
+# PART U6: Database::BI::Insights
+#
+# Arithmetic with no outside calls, so nothing is mocked here but the module's own
+# helpers.  What matters is that the numbers are right and every value that goes
+# into a URL comes out inert.
+# ============================================================================
+{
+	Readonly my $INS  => 'Database::BI::Insights';
+	Readonly my $SPEC => 'table:sales';
+	Readonly my $BASE => '/insights?l=table:sales';
+
+	my $qt = \&Database::BI::Insights::_quartiles;
+	my $to = \&Database::BI::Insights::_to_num;
+
+	# A group of nine whose fences are easy to work out by hand: Q1 2.5, Q3 7.5,
+	# so anything outside -5 .. 15 is an outlier.
+	my @OUTLIER_VALUES = (1 .. 8, 1000);
+
+	subtest 'Insights::method_note -- known and unknown keys' => sub {
+		my $fn = \&Database::BI::Insights::method_note;
+		like $fn->($_), qr/\S/, "$_ has a note" for qw(iqr_fence pop_delta top_mover autocorr);
+		isnt $fn->('iqr_fence'), 'iqr_fence', 'which is not just the key';
+		is $fn->('no_such'), 'no_such', 'an unknown key comes back unchanged rather than as nothing';
+	};
+
+	subtest 'Insights::_looks_like_date -- what counts' => sub {
+		my $fn = \&Database::BI::Insights::_looks_like_date;
+		ok $fn->($_), "'$_' is a date" for '2026-01-02', '1/2/2026', '12/22/2025', '22-Oct-2026';
+		ok !$fn->($_), "'$_' is not" for '', '2026', '2026-1-2', '1/2/26', '22-October-2026', "2026-01-02\n", '2026-01-02x', 'x2026-01-02';
+		ok !$fn->(undef), 'undef is not';
+	};
+
+	subtest 'Insights::_is_date_col and _is_numeric_col -- one bad value decides' => sub {
+		my ($date, $num) = (\&Database::BI::Insights::_is_date_col, \&Database::BI::Insights::_is_numeric_col);
+		is $date->([ '2026-01-02', '2026-01-03' ]), 1, 'all dates';
+		is $date->([ '2026-01-02', 'x' ]), 0, 'one that is not';
+		is $date->([]), 0, 'an empty column is not a date column';
+		is $num->([ 1, '2.5', '$3' ]), 1, 'all numbers';
+		is $num->([ 1, 'x' ]), 0, 'one that is not';
+		is $num->([]), 0, 'an empty column is not numeric';
+		is $num->([ '12/22/2025' ]), 0, 'a slash date is not 12222025';
+		is $date->([ ('2026-01-02') x 20, 'x' ]), 1, 'only a sample of twenty is read, by design';
+	};
+
+	subtest 'Insights::_to_num -- money and accounting forms' => sub {
+		is $to->('12'), 12, 'an integer';
+		is $to->('-1.5'), -1.5, 'a negative decimal';
+		is $to->('$1,234.50'), 1234.5, 'currency and thousands';
+		is $to->('(1,234.56)'), -1234.56, 'brackets mean negative';
+		is $to->(' (5) '), -5, 'with spaces around them';
+		is $to->('50%'), 50, 'a percentage';
+		is $to->('1e3'), 1000, 'scientific notation is its value, not 13';
+		is $to->("\xC2\xA35"), 5, 'a pound sign in UTF-8';
+	};
+
+	# Why: stripping everything but digits reads a part code as a measure, and
+	# then its "outliers" are reported to the reader as findings.
+	subtest 'Insights::_to_num -- text that merely holds digits is not a number' => sub {
+		is $to->($_), undef, "'$_' is not a number" for
+			'', 'abc', 'SKU123', 'A1', 'AB-100', 'R2D2', 'v1.2', '1.2.3', '12-34', '--5', '.', '-', '(', '()', '1 2 3 x';
+		is $to->(undef), undef, 'nor is undef';
+		keeps_globals_ok('_to_num', sub { $to->('$5') });
+	};
+
+	# Why: `$n % 2 ? $mid + 1 : $mid .. $n - 1` binds as a ternary around a range,
+	# so an odd-sized group took a single value as its upper half and every odd
+	# group's Q3 was too low, flagging ordinary values as outliers.
+	subtest 'Insights::_quartiles -- both halves are medians' => sub {
+		is_deeply [ $qt->([ 1 .. 4 ]) ], [ 1.5, 2.5, 3.5 ], 'even count';
+		is_deeply [ $qt->([ 1 .. 5 ]) ], [ 1.5, 3, 4.5 ], 'five: the upper half is two values';
+		is_deeply [ $qt->([ 1 .. 7 ]) ], [ 2, 4, 6 ], 'seven: the upper half is three';
+		is_deeply [ $qt->([ 1 .. 9 ]) ], [ 2.5, 5, 7.5 ], 'nine: the upper half is four';
+		is_deeply [ $qt->([]) ], [ undef, undef, undef ], 'no values';
+		is_deeply [ $qt->([ 1 .. 3 ]) ], [ undef, undef, undef ], 'too few to have quartiles';
+	};
+
+	subtest 'Insights::_median' => sub {
+		my $fn = \&Database::BI::Insights::_median;
+		is $fn->([]), undef, 'of nothing';
+		is $fn->([ 7 ]), 7, 'of one';
+		is $fn->([ 1, 3 ]), 2, 'of an even count';
+		is $fn->([ 1, 2, 9 ]), 2, 'of an odd count, unmoved by a large value';
+	};
+
+	subtest 'Insights::_fence_distance' => sub {
+		my $fn = \&Database::BI::Insights::_fence_distance;
+		is $fn->(20, 0, 10), 10, 'above';
+		is $fn->(-5, 0, 10), 5, 'below';
+		is $fn->(5, 0, 10), 0, 'inside';
+		is $fn->(10, 0, 10), 0, 'on the fence is inside';
+	};
+
+	subtest 'Insights::_find_outliers -- finds the value and describes it' => sub {
+		my @rows = map { { amount => $_ } } @OUTLIER_VALUES;
+		my @got = Database::BI::Insights::_find_outliers(\@rows, 'amount', [], $SPEC, $BASE);
+		is scalar @got, 1, 'exactly one';
+		is $got[0]{kind}, 'outlier', 'of the right kind';
+		is $got[0]{method}, 'iqr_fence', 'citing its method';
+		like $got[0]{headline}, qr/1000 is unusually high/, 'the headline gives the value';
+		is $got[0]{view_url}, '/stats?l=table%3Asales', 'with no category it links to stats';
+		ok !exists $got[0]{drill_url}, 'and has no group to drill into';
+
+		my @low = Database::BI::Insights::_find_outliers(
+			[ map { { amount => $_ } } (-1000, 1 .. 8) ], 'amount', [], $SPEC, $BASE);
+		like $low[0]{headline}, qr/unusually low/, 'a low one says low';
+	};
+
+	# Why: this text is shown to the reader.  A single-quoted \x2013 is not a dash
+	# but six literal characters on the page.
+	subtest 'Insights::_find_outliers -- the range reads as a range' => sub {
+		my @got = Database::BI::Insights::_find_outliers(
+			[ map { { amount => $_ } } @OUTLIER_VALUES ], 'amount', [], $SPEC, $BASE);
+		unlike $got[0]{detail}, qr/\\x/, 'no escape sequence reaches the reader';
+		like $got[0]{detail}, qr/-5 \x{2013} 15 \(IQR fence on 9 values\)/, 'the fences, an en dash and the count';
+	};
+
+	subtest 'Insights::_find_outliers -- what it must not report' => sub {
+		is_deeply [ Database::BI::Insights::_find_outliers([ map { { a => $_ } } 1, 2, 1000 ], 'a', [], $SPEC, $BASE) ], [],
+			'fewer than four values is too few to judge';
+		is_deeply [ Database::BI::Insights::_find_outliers([ map { { a => $_ } } 1 .. 20 ], 'a', [], $SPEC, $BASE) ], [],
+			'an even spread has none';
+		is_deeply [ Database::BI::Insights::_find_outliers([ map { { a => 'x' } } 1 .. 9 ], 'a', [], $SPEC, $BASE) ], [],
+			'text has none';
+		is_deeply [ Database::BI::Insights::_find_outliers([], 'a', [], $SPEC, $BASE) ], [], 'no rows has none';
+		is_deeply [ Database::BI::Insights::_find_outliers([ map { { a => 5 } } 1 .. 9 ], 'a', [], $SPEC, $BASE) ], [],
+			'identical values have none, though their IQR is zero';
+
+		my @rows = (map({ { g => 'small', a => $_ } } 1, 2, 1000), map({ { g => 'big', a => $_ } } @OUTLIER_VALUES));
+		my @got = Database::BI::Insights::_find_outliers(\@rows, 'a', ['g'], $SPEC, $BASE);
+		is scalar @got, 1, 'groups are judged apart, so the small one is skipped';
+		like $got[0]{headline}, qr/g=big/, 'and the finding names its group';
+	};
+
+	subtest 'Insights::_find_outliers -- capped, and worst first' => sub {
+		my @rows = map { { a => $_ } } ((1) x 40, 100, 200, 300, 400, 500, 600, 700);
+		my @got = Database::BI::Insights::_find_outliers(\@rows, 'a', [], $SPEC, $BASE);
+		is scalar @got, 5, 'the panel stays readable';
+		like $got[0]{headline}, qr/\b700\b/, 'the furthest out comes first';
+	};
+
+	subtest 'Insights::_find_outliers -- hostile names stay inside their URL' => sub {
+		my $evil = q{"><script>&x=1};
+		my @rows = map { { $evil => 'North', a => $_ } } @OUTLIER_VALUES;
+		my @got = Database::BI::Insights::_find_outliers(\@rows, 'a', [$evil], $SPEC, $BASE);
+		unlike $got[0]{view_url}, qr/[<>"]/, 'the view link holds no markup';
+		unlike $got[0]{drill_url}, qr/[<>"]/, 'nor does the drill link';
+		like $got[0]{drill_url}, qr/\A\/view\/sales\?f=/, 'which opens the table';
+		like $got[0]{drill_url}, qr/hl_op=gt&hl_val=15/, 'and picks out the row, by the fence it passed';
+		like $got[0]{drill_url}, qr/back2=/, 'with a way back, through back2 as a drill must';
+		keeps_globals_ok('_find_outliers', sub {
+			Database::BI::Insights::_find_outliers(\@rows, 'a', [$evil], $SPEC, $BASE);
+		});
+	};
+
+	subtest 'Insights::_period_over_period' => sub {
+		my $fn = \&Database::BI::Insights::_period_over_period;
+		my @rows = ({ d => '2026-01-05', v => 100 }, { d => '2026-01-20', v => 50 }, { d => '2026-02-01', v => 300 });
+		my ($got) = $fn->(\@rows, 'd', 'v', $SPEC, $BASE);
+		is $got->{kind}, 'period_delta', 'the kind';
+		like $got->{headline}, qr/v is up 150 vs prior period \(2026-01\)/, 'months are summed before comparing';
+		like $got->{detail}, qr/2026-01: 150  2026-02: 300  \(\+100\.0%\)/, 'with the percentage';
+		is $got->{view_url}, '/graph?l=table%3Asales&x=d&y=v', 'linking to the chart';
+		like $got->{drill_url}, qr/f=d:starts:2026-02/, 'and drilling into the latest month';
+
+		my ($down) = $fn->([ { d => '2026-01-01', v => 10 }, { d => '2026-02-01', v => 4 } ], 'd', 'v', $SPEC, $BASE);
+		like $down->{headline}, qr/is down 6 /, 'a fall says down';
+		like $down->{detail}, qr/-60\.0%/, 'with a negative percentage';
+	};
+
+	subtest 'Insights::_period_over_period -- cannot be fooled' => sub {
+		my $fn = \&Database::BI::Insights::_period_over_period;
+		is_deeply [ $fn->([ { d => '2026-01-01', v => 1 } ], 'd', 'v', $SPEC, $BASE) ], [], 'one period is no comparison';
+		is_deeply [ $fn->([ { d => 'junk', v => 1 }, { d => 'more', v => 2 } ], 'd', 'v', $SPEC, $BASE) ], [], 'nor are unreadable dates';
+		is_deeply [ $fn->([ { d => '2026-01-01', v => 'x' }, { d => '2026-02-01', v => 'y' } ], 'd', 'v', $SPEC, $BASE) ], [],
+			'nor are values that are not numbers';
+		is_deeply [ $fn->([], 'd', 'v', $SPEC, $BASE) ], [], 'nor no rows';
+
+		my ($zero) = $fn->([ { d => '2026-01-01', v => 0 }, { d => '2026-02-01', v => 5 } ], 'd', 'v', $SPEC, $BASE);
+		unlike $zero->{detail}, qr/%/, 'growth from zero has no percentage rather than a division by it';
+
+		my ($url) = $fn->([ { d => '2026-01-01', v => 1 }, { d => '2026-02-01', v => 2 } ], 'd', 'v', 'url:http://x/', $BASE);
+		ok !exists $url->{drill_url}, 'a source with no table page offers no drill';
+	};
+
+	subtest 'Insights::_top_movers' => sub {
+		my $fn = \&Database::BI::Insights::_top_movers;
+		my @rows = (
+			{ d => '2026-01-01', r => 'N', v => 10 }, { d => '2026-02-01', r => 'N', v => 15 },
+			{ d => '2026-01-01', r => 'S', v => 90 }, { d => '2026-02-01', r => 'S', v => 10 },
+			{ d => '2026-02-01', r => 'New', v => 7 },
+		);
+		my @got = $fn->(\@rows, 'd', 'v', ['r'], $SPEC, $BASE);
+		is scalar @got, 3, 'one for each member';
+		like $got[0]{headline}, qr/\AS v down by 80 from 2026-01 to 2026-02/, 'the largest change first, whichever way';
+		like $got[1]{headline}, qr/\ANew v up by 7/, 'a member new this period counts from zero';
+		is $got[0]{method}, 'top_mover', 'it cites its method';
+		like $got[0]{view_url}, qr/&f=r:eq:S\z/, 'and filters to the member';
+		like $got[0]{drill_url}, qr/f=d:starts:2026-02&f=r:eq:S/, 'as its drill does';
+	};
+
+	subtest 'Insights::_top_movers -- limits and refusals' => sub {
+		my $fn = \&Database::BI::Insights::_top_movers;
+		is_deeply [ $fn->([ { d => '2026-01-01', v => 1 } ], 'd', 'v', [], $SPEC, $BASE) ], [], 'no category, no movers';
+		is_deeply [ $fn->([ { d => '2026-01-01', r => 'N', v => 1 } ], 'd', 'v', ['r'], $SPEC, $BASE) ], [], 'one period, no movers';
+		is_deeply [ $fn->([ { d => 'junk', r => 'N', v => 1 } ], 'd', 'v', ['r'], $SPEC, $BASE) ], [], 'no readable date, no movers';
+
+		my @many = map { my $i = $_; map { { d => "2026-0$_-01", r => "m$i", v => $_ * $i } } 1, 2 } 1 .. 12;
+		is scalar(my @got = $fn->(\@many, 'd', 'v', ['r'], $SPEC, $BASE)), 5, 'capped however many members there are';
+		like $got[0]{headline}, qr/\Am12 /, 'keeping the largest';
+	};
+
+	subtest 'Insights::_seasonality' => sub {
+		my $fn = \&Database::BI::Insights::_seasonality;
+		my @trend = map { { d => sprintf('2025-%02d-01', $_), v => $_ * 10 } } 1 .. 12;
+		my ($got) = $fn->(\@trend, 'd', 'v', $SPEC, $BASE);
+		is $got->{kind}, 'seasonality', 'a smooth series is flagged';
+		like $got->{detail}, qr/across 12 periods \(2025-01 to 2025-12\)/, 'naming its extent';
+		is $got->{method}, 'autocorr', 'and its method';
+
+		is_deeply [ $fn->([ @trend[0 .. 6] ], 'd', 'v', $SPEC, $BASE) ], [], 'seven periods are too few';
+		is_deeply [ $fn->([ map { { d => sprintf('2025-%02d-01', $_), v => 5 } } 1 .. 12 ], 'd', 'v', $SPEC, $BASE) ], [],
+			'a flat series is not seasonal, and does not divide by zero';
+		is_deeply [ $fn->([ map { { d => sprintf('2025-%02d-01', $_), v => $_ % 2 ? 100 : -100 } } 1 .. 12 ], 'd', 'v', $SPEC, $BASE) ], [],
+			'a see-saw has a negative lag-1 correlation, so it is not flagged';
+		is_deeply [ $fn->([], 'd', 'v', $SPEC, $BASE) ], [], 'no rows';
+	};
+
+	subtest 'Insights::_fmt_num' => sub {
+		my $fn = \&Database::BI::Insights::_fmt_num;
+		is $fn->(undef), 'N/A', 'undef';
+		is $fn->(0), '0', 'zero';
+		is $fn->(-5), '-5', 'an integer stays whole';
+		is $fn->(123456789), '123456789', 'however long';
+		is $fn->(1234.5678), '1235', 'a fraction goes to four figures';
+		is $fn->(0.00012345), '0.0001234', 'at either end of the scale';
+		is $fn->(2.5), '2.5', 'with no trailing zeros';
+	};
+
+	subtest 'Insights::_spec_to_data_url' => sub {
+		my $fn = \&Database::BI::Insights::_spec_to_data_url;
+		is $fn->('table:sales'), '/view/sales', 'a table';
+		is $fn->('path:/a b.csv'), '/open?path=%2Fa%20b.csv', 'a path, encoded';
+		is $fn->('table:a/../b'), '/view/a%2F..%2Fb', 'a hostile table name cannot walk';
+		is $fn->('path:/x"><y'), '/open?path=%2Fx%22%3E%3Cy', 'or leave its attribute';
+		is $fn->($_), undef, "'$_' has no page" for 'url:http://x/', 'redis:a', 'junk', '', 'table:', 'path:';
+		is $fn->(undef), undef, 'nor does undef';
+	};
+
+	subtest 'Insights::compute -- no data, no findings' => sub {
+		my $fn = \&Database::BI::Insights::compute;
+		is_deeply $fn->(), [], 'no arguments';
+		is_deeply $fn->(records => [], columns => ['a']), [], 'no rows';
+		is_deeply $fn->(records => [ { a => 1 } ], columns => []), [], 'no columns';
+		is_deeply $fn->(records => [ { a => undef }, { a => '' } ], columns => ['a']), [], 'only blank cells';
+		is_deeply $fn->(records => [ { a => 'x' }, { a => 'y' } ], columns => ['a']), [], 'only text';
+	};
+
+	subtest 'Insights::compute -- every kind, and each can be clicked' => sub {
+		my @rows;
+		for my $m (1 .. 12) {
+			push @rows, { when => sprintf('2025-%02d-01', $m), region => 'N', amt => $m * 10 };
+		}
+		push @rows, { when => '2025-12-02', region => 'N', amt => 100_000 };
+
+		my $got = Database::BI::Insights::compute(records => \@rows, columns => [qw(when region amt)], spec_key => $SPEC);
+		returns_is $got, { type => 'arrayref' }, 'a list';
+		my %kinds = map { $_->{kind} => 1 } @$got;
+		ok $kinds{$_}, "it holds a $_" for qw(outlier period_delta top_mover);
+		ok !(grep { !length($_->{view_url} // '') } @$got), 'an insight with no link is a bug, so all have one';
+		ok !(grep { !length($_->{headline} // '') || !length($_->{detail} // '') } @$got), 'and all have text';
+		memory_cycle_ok($got, 'no cycle');
+		keeps_globals_ok('compute', sub {
+			Database::BI::Insights::compute(records => \@rows, columns => [qw(when region amt)], spec_key => $SPEC);
+		});
+	};
+
+	subtest 'Insights::compute -- each stage is called, and a date is never a measure' => sub {
+		my %called;
+		for my $name (qw(_find_outliers _period_over_period _top_movers _seasonality)) {
+			# The outlier pass takes the measure second; the others take it third.
+			my $at = $name eq '_find_outliers' ? 1 : 2;
+			Test::Mockingbird::mock("${INS}::$name", sub { $called{$name}{ $_[$at] // '' }++; () });
+		}
+		Database::BI::Insights::compute(
+			records => [ { d => '2026-01-01', v => 1, n => 'x' } ],
+			columns => [qw(d v n)],
+			spec_key => $SPEC,
+		);
+		Test::Mockingbird::restore_all();
+
+		ok $called{$_}, "$_ ran" for qw(_find_outliers _period_over_period _top_movers _seasonality);
+		is_deeply [ keys %{ $called{_period_over_period} } ], ['v'], 'with the numeric column as the measure';
+		is_deeply [ keys %{ $called{_find_outliers} } ], ['v'], 'and the date is not scanned for outliers';
+	};
+}
+
+# ============================================================================
+# PART U7: Database::BI::Calc
+#
+# Expressions arrive in a URL (?c=name:expr), so the language is an attack surface:
+# nothing in it may run code, exhaust the server, or leak a path through an error.
+# Times are read in UTC here so the bucket labels below do not depend on the
+# zone of the machine running the tests.
+# ============================================================================
+{
+	require POSIX;
+
+	Readonly my $MAX_EXPR_LEN => 512;
+	Readonly my $MAX_DEPTH    => 20;
+
+	my %row = (a => 10, b => 4, s => 'Hello', d => '2026-05-20', blank => undef);
+
+	# Compiles and runs one expression, so each case below reads as a pair of
+	# expression and answer.
+	sub calc_value {
+		my ($expr, $row, @params) = @_;
+		$row //= {};
+		my $c = Database::BI::Calc->new(expr => $expr, columns => [ keys %$row ], @params);
+		Test::More::fail("'$expr' should compile: " . $c->error) if $c->has_error;
+		return $c->evaluate($row);
+	}
+
+	sub calc_error {
+		my ($expr, @cols) = @_;
+		return Database::BI::Calc->new(expr => $expr, columns => \@cols)->error;
+	}
+
+	# Runs $code in UTC, and puts the machine's zone back however it ends.
+	sub in_utc {
+		my ($code) = @_;
+		my $saved = $ENV{TZ};
+		$ENV{TZ} = 'UTC';
+		# Windows perls croak "not implemented on this architecture", and
+		# without tzset a change to TZ need not take effect.
+		unless (eval { POSIX::tzset(); 1 }) {
+			if (defined $saved) { $ENV{TZ} = $saved } else { delete $ENV{TZ} }
+			plan skip_all => 'POSIX::tzset is not available here';
+		}
+		my $ok  = eval { $code->(); 1 };
+		my $err = $@;
+		if (defined $saved) { $ENV{TZ} = $saved } else { delete $ENV{TZ} }
+		POSIX::tzset();
+		croak_rethrow($err) unless $ok;
+		return;
+	}
+
+	subtest 'Calc::_fmt -- builds the message' => sub {
+		is Database::BI::Calc::_fmt('error_unknown_fn', 'x'), "Unknown function 'x'", 'interpolated';
+		is Database::BI::Calc::_fmt('error_expr_too_long', $MAX_EXPR_LEN), "Expression too long (max $MAX_EXPR_LEN characters)", 'a number too';
+	};
+
+	subtest 'Calc::_fmt_body -- turns a pattern into a regex' => sub {
+		my ($body, $tokens) = Database::BI::Calc::_fmt_body('%Y.%m');
+		is_deeply $tokens, [qw(Y m)], 'the tokens in order';
+		like '2026.05', qr/\A$body\z/, 'it matches its own shape';
+		unlike '2026x05', qr/\A$body\z/, 'a dot in a pattern is a dot, not any character';
+		is_deeply [ (Database::BI::Calc::_fmt_body(''))[1] ], [ [] ], 'an empty pattern has no tokens';
+	};
+
+	subtest 'Calc::_fmt_body -- a token it does not know is an error, not a skip' => sub {
+		throws_ok { Database::BI::Calc::_fmt_body('%Q') } qr/\AUnsupported time format token %Q at /, 'an unknown token';
+		throws_ok { Database::BI::Calc::_fmt_body('%%') } qr/\AUnsupported time format token %% at /, 'a literal percent is not offered';
+		throws_ok { Database::BI::Calc::_fmt_body('%Y-%') } qr/\AUnsupported time format token %Y-% at /, 'a pattern ending in a bare percent';
+		lives_ok { Database::BI::Calc::_fmt_body('(.*)+[a-z]{9}\\') } 'regex syntax in a pattern is only ever literal text';
+		my ($body) = Database::BI::Calc::_fmt_body('(.*)');
+		unlike 'anything', qr/\A$body\z/, 'so it matches only itself';
+		like '(.*)', qr/\A$body\z/, 'exactly';
+	};
+
+	subtest 'Calc::_fmt_has_date and _fmt_compile -- a pattern must name a date' => sub {
+		my $has = \&Database::BI::Calc::_fmt_has_date;
+		is $has->([qw(Y m d)]), 1, 'year, month and day';
+		is $has->([qw(Y b d)]), 1, 'a month name does as well';
+		is $has->([qw(Y m)]), 0, 'no day';
+		is $has->([qw(m d)]), 0, 'no year';
+		is $has->([qw(Y d)]), 0, 'no month';
+		is $has->([]), 0, 'nothing';
+
+		throws_ok { Database::BI::Calc::_fmt_compile('%H:%M') }
+			qr/\ATime format '%H:%M' must name a date, with a year, a month and a day token at /, 'a time alone';
+		my $c = Database::BI::Calc::_fmt_compile('%Y-%m-%d');
+		is_deeply $c->{tokens}, [qw(Y m d)], 'the tokens are kept';
+		ok '2026-05-20' =~ $c->{re}, 'the regex matches';
+		ok "2026-05-20\n" !~ $c->{re}, 'and is anchored, so a trailing newline is refused';
+	};
+
+	subtest 'Calc::_fmt_compile_pair -- two patterns, one value' => sub {
+		my $c = Database::BI::Calc::_fmt_compile_pair('%Y-%m-%d', '%H:%M');
+		is_deeply $c->{tokens}, [qw(Y m d H M)], 'date tokens then time tokens';
+		ok '2026-05-20T10:30' =~ $c->{re}, 'a T between them';
+		ok '2026-05-20 10:30' =~ $c->{re}, 'or a space';
+		ok '2026-05-2010:30' =~ $c->{re}, 'or nothing';
+		ok '2026-05-20x10:30' !~ $c->{re}, 'but nothing else';
+		throws_ok { Database::BI::Calc::_fmt_compile_pair('%H', '%M') } qr/\ATime format '%H' must name a date/, 'the date half must be one';
+		throws_ok { Database::BI::Calc::_fmt_compile_pair('%Y-%m-%d', '%Q') } qr/\AUnsupported time format token %Q/, 'and the time half must parse';
+	};
+
+	subtest 'Calc::_fmt_parts' => sub {
+		my $c = Database::BI::Calc::_fmt_compile('%d/%m/%Y');
+		is_deeply Database::BI::Calc::_fmt_parts('20/05/2026', $c), { d => 20, m => '05', Y => 2026 }, 'each token gets its capture';
+		is Database::BI::Calc::_fmt_parts('nope', $c), undef, 'no match, no parts';
+	};
+
+	subtest 'Calc::_epoch_of -- a date that does not exist is not quietly another' => sub {
+		my $fn = \&Database::BI::Calc::_epoch_of;
+		is $fn->(2026, 5, 20, 12, 0, 0), POSIX::mktime(0, 0, 12, 20, 4, 126), 'a real date';
+		is $fn->(2024, 2, 29, 0, 0, 0), POSIX::mktime(0, 0, 0, 29, 1, 124), 'a leap day';
+		is $fn->(2026, 2, 29, 0, 0, 0), undef, 'not a leap year';
+		is $fn->(2026, 2, 31, 0, 0, 0), undef, 'the 31st of February';
+		is $fn->(2026, 13, 1, 0, 0, 0), undef, 'month 13';
+		is $fn->(2026, 0, 1, 0, 0, 0), undef, 'month 0';
+		is $fn->(2026, 1, 0, 0, 0, 0), undef, 'day 0';
+		is $fn->(2026, 1, 1, 25, 0, 0), undef, 'hour 25 rolls to the next day, so it is refused';
+	};
+
+	subtest 'Calc::_parse_time -- the three shapes' => sub {
+		my $fn = \&Database::BI::Calc::_parse_time;
+		is_deeply $fn->('2026-05-20'), { epoch => POSIX::mktime(0, 0, 0, 20, 4, 126), has_time => 0 }, 'a date has no time';
+		is_deeply $fn->('2026-05-20T10:30:15'), { epoch => POSIX::mktime(15, 30, 10, 20, 4, 126), has_time => 1 }, 'an ISO timestamp';
+		is_deeply $fn->('2026-05-20 10:30'), { epoch => POSIX::mktime(0, 30, 10, 20, 4, 126), has_time => 1 }, 'a space and no seconds';
+		is_deeply $fn->(' 2026-05-20 '), { epoch => POSIX::mktime(0, 0, 0, 20, 4, 126), has_time => 0 }, 'surrounding space is trimmed';
+		is_deeply $fn->('1700000000'), { epoch => 1_700_000_000, has_time => 1 }, 'ten digits are seconds';
+		is_deeply $fn->('1700000000123'), { epoch => 1_700_000_000, has_time => 1 }, 'thirteen are milliseconds';
+	};
+
+	subtest 'Calc::_parse_time -- what it refuses' => sub {
+		my $fn = \&Database::BI::Calc::_parse_time;
+		is $fn->($_), undef, "'$_' is not a time" for
+			'', '   ', 'junk', '2026-02-31', '2026-13-01', '123456789', '12345678901', '1234567890123456',
+			'2026-05-20T25:00', '2026-05-20X10:00', '-1700000000', '2026-5-20';
+		is $fn->(undef), undef, 'undef is not';
+		is $fn->([]), undef, 'a reference is not';
+		keeps_globals_ok('_parse_time', sub { $fn->('2026-05-20') });
+	};
+
+	subtest 'Calc::_time_from_format' => sub {
+		my $fn = \&Database::BI::Calc::_time_from_format;
+		my $c  = Database::BI::Calc::_fmt_compile('%d-%b-%Y');
+		is $fn->('20-May-2026', $c)->{epoch}, POSIX::mktime(0, 0, 0, 20, 4, 126), 'a month name';
+		is $fn->('20-MAY-2026', $c)->{has_time}, 0, 'in any case, and no time';
+		is $fn->('20-Foo-2026', $c), undef, 'a month that does not exist';
+		is $fn->('31-Feb-2026', $c), undef, 'a day that does not exist';
+		is $fn->(undef, $c), undef, 'undef';
+		is $fn->([], $c), undef, 'a reference';
+
+		my $n = Database::BI::Calc::_fmt_compile('%m/%d/%Y');
+		is $fn->('13/01/2026', $n), undef, 'month 13 by number';
+		is $fn->('00/01/2026', $n), undef, 'month 0 by number';
+
+		my $t = Database::BI::Calc::_fmt_compile_pair('%Y-%m-%d', '%H:%M');
+		is $fn->('2026-05-20T10:30', $t)->{has_time}, 1, 'an hour token means it has a time';
+	};
+
+	subtest 'Calc::_iso_second_label, _iso_day_label' => sub {
+		my $epoch = POSIX::mktime(5, 4, 3, 2, 0, 126);
+		is Database::BI::Calc::_iso_second_label($epoch), '2026-01-02T03:04:05', 'padded and local';
+		is Database::BI::Calc::_iso_day_label($epoch), '2026-01-02', 'to the day';
+	};
+
+	subtest 'Calc::_civil_day, _shift_days -- calendar arithmetic' => sub {
+		my $civil = \&Database::BI::Calc::_civil_day;
+		is $civil->(1970, 1, 1), 0, 'the origin';
+		is $civil->(1970, 1, 2), 1, 'the day after';
+		is $civil->(1969, 12, 31), -1, 'and before it';
+		is $civil->(2000, 3, 1), 11_017, 'a century leap year is counted';
+		is $civil->(2024, 3, 1) - $civil->(2024, 2, 28), 2, 'a leap day exists';
+		is $civil->(2026, 3, 1) - $civil->(2026, 2, 28), 1, 'and an ordinary year has none';
+
+		my $shift = \&Database::BI::Calc::_shift_days;
+		is_deeply [ $shift->(2026, 5, 20, 0) ], [ 2026, 5, 20 ], 'no move';
+		is_deeply [ $shift->(2026, 3, 1, -1) ], [ 2026, 2, 28 ], 'back over a month end';
+		is_deeply [ $shift->(2024, 3, 1, -1) ], [ 2024, 2, 29 ], 'and a leap day';
+		is_deeply [ $shift->(2025, 12, 31, 1) ], [ 2026, 1, 1 ], 'forward over a year end';
+	};
+
+	subtest 'Calc::span_interval -- the vocabulary' => sub {
+		my $fn = \&Database::BI::Calc::span_interval;
+		is_deeply $fn->('15m'), { n => 15, unit => 'm', secs => 60 }, 'minutes are seconds under the hood';
+		is_deeply $fn->('1h'), { n => 1, unit => 'h', secs => 3_600 }, 'hours too';
+		is_deeply $fn->('30s'), { n => 30, unit => 's', secs => 1 }, 'and seconds';
+		is_deeply $fn->("$_->[0]$_->[1]"), { n => $_->[0], unit => $_->[1] }, "$_->[1] counts calendar units"
+			for [ 1, 'd' ], [ 2, 'w' ], [ 3, 'mon' ], [ 1, 'q' ], [ 5, 'y' ];
+	};
+
+	subtest 'Calc::span_interval -- anything else is refused' => sub {
+		my $fn = \&Database::BI::Calc::span_interval;
+		is $fn->($_), undef, "'$_' is refused" for
+			'', '0h', '00m', 'h', '1', '1x', '-1h', '1.5h', '1 h', '1H', '1mo', '1months', "1h\n", '1h;drop', ' 1h';
+		is $fn->(undef), undef, 'undef';
+		is $fn->({}), undef, 'a reference';
+		lives_ok { $fn->(('9' x 400) . 'd') } 'an absurd count does not crash';
+	};
+
+	subtest 'Calc::_span_label -- buckets are ISO at their own resolution' => sub {
+		in_utc(sub {
+			my $fn = \&Database::BI::Calc::_span_label;
+			my $iv = \&Database::BI::Calc::span_interval;
+			is $fn->('2026-05-20T10:37:42', $iv->('15m')), '2026-05-20T10:30:00', 'floored to the quarter hour';
+			is $fn->('2026-05-20T10:37:42', $iv->('1h')), '2026-05-20T10:00:00', 'to the hour';
+			is $fn->('2026-05-20T10:37:42', $iv->('10s')), '2026-05-20T10:37:40', 'to ten seconds';
+			is $fn->('2026-05-20T10:37:42', $iv->('1d')), '2026-05-20', 'to the day';
+			is $fn->('2026-05-20', $iv->('1w')), '2026-05-18', 'a week starts on the Monday';
+			is $fn->('2026-05-18', $iv->('1w')), '2026-05-18', 'which is its own bucket';
+			is $fn->('2026-05-24', $iv->('1w')), '2026-05-18', 'and takes in the Sunday';
+			is $fn->('2026-05-20', $iv->('1mon')), '2026-05-01', 'a month';
+			is $fn->('2026-02-15', $iv->('2mon')), '2026-01-01', 'two months line up with January';
+			is $fn->('2026-05-20', $iv->('1q')), '2026-04-01', 'a quarter';
+			is $fn->('2026-12-31', $iv->('2q')), '2026-07-01', 'two quarters';
+			is $fn->('2026-05-20', $iv->('1y')), '2026-01-01', 'a year';
+			is $fn->('2026-05-20', $iv->('5y')), '2025-01-01', 'five years';
+			is $fn->('1969-12-31', $iv->('1mon')), '1969-12-01', 'before the origin too';
+			is $fn->('1969-12-31', $iv->('1q')), '1969-10-01', 'for quarters as well';
+
+			# Whatever the width, a bucket holds its own start.
+			for my $i ('2d', '7d', '2w', '3mon', '3q') {
+				my $start = $fn->('2026-05-20', $iv->($i));
+				is $fn->($start, $iv->($i)), $start, "a $i bucket's start falls in that bucket";
+			}
+		});
+	};
+
+	subtest 'Calc::_span_label -- a value that is not a time has no bucket' => sub {
+		my $fn = \&Database::BI::Calc::_span_label;
+		my $iv = Database::BI::Calc::span_interval('1d');
+		is $fn->($_, $iv), undef, "'$_' has none" for 'junk', '', '2026-02-31';
+		is $fn->(undef, $iv), undef, 'undef has none';
+	};
+
+	subtest 'Calc::new -- the guards' => sub {
+		my $long = Database::BI::Calc->new(expr => '1' x ($MAX_EXPR_LEN + 1));
+		is $long->error, "Expression too long (max $MAX_EXPR_LEN characters)", 'one over the limit';
+		ok !Database::BI::Calc->new(expr => '1' x $MAX_EXPR_LEN)->has_error, 'exactly at the limit is allowed';
+
+		my $clash = Database::BI::Calc->new(expr => 'a', columns => ['a'], params => { a => 1 });
+		is $clash->error, "Parameter 'a' conflicts with a column of the same name", 'an ambiguous name';
+		is $clash->evaluate({ a => 1 }), undef, 'and a failed compile evaluates to nothing';
+
+		ok(Database::BI::Calc->new()->has_error, 'no expression at all is an error');
+		ok(Database::BI::Calc->new(expr => '   ')->has_error, 'nor is whitespace an expression');
+		ok !Database::BI::Calc->new(expr => '1')->has_error, 'a good one has no error';
+		is(Database::BI::Calc->new(expr => '1')->error, undef, 'and error() is then undef');
+		memory_cycle_ok(Database::BI::Calc->new(expr => 'a + 1', columns => ['a']), 'a compiled expression holds no cycle');
+	};
+
+	# Why: this text reaches the reader.  An install path with a space in it would
+	# otherwise leave the where-it-happened tail on, and name a server path.
+	subtest 'Calc::new -- an error never carries a file path' => sub {
+		my $err = eval qq{#line 1 "/opt/my apps/caller.pl"\nDatabase::BI::Calc->new(expr => 'nope')->error};
+		is $err, "Unknown column 'nope'", 'a path with a space in it is taken off too';
+
+		my $bad = eval qq{#line 1 "/opt/my apps/caller.pl"\nDatabase::BI::Calc->new(expr => '\@')->error};
+		is $bad, "Unexpected character '\@' at position 0", 'from the tokenizer as well';
+
+		is calc_error('x_at_y_line_5'), "Unknown column 'x_at_y_line_5'", 'and the name in the message is left whole';
+	};
+
+	subtest 'Calc::evaluate -- never dies, whatever the row' => sub {
+		my $c = Database::BI::Calc->new(expr => 'a + 1', columns => ['a']);
+		is $c->evaluate({ a => 1 }), 2, 'the ordinary case';
+		is $c->evaluate({}), undef, 'a missing cell';
+		is $c->evaluate({ a => 'x' }), undef, 'a cell that is not a number';
+		lives_ok { $c->evaluate(undef) } 'no row';
+
+		my $p = Database::BI::Calc->new(expr => 'a + rate', columns => ['a'], params => { rate => 2 });
+		is $p->evaluate({ a => 1 }), 3, 'a parameter is in scope';
+		is $p->evaluate({ a => 1, rate => 99 }), 3, 'and beats a column added since compile time';
+		lives_ok { is $p->evaluate(undef), undef, 'undef gives undef' } 'no row, with parameters';
+		lives_ok { is $p->evaluate('oops'), undef, 'a string gives undef' } 'a row that is not a hash';
+
+		# A locked row (SQL-backed sources) raises on an unknown key; that must
+		# come back as nothing, not a 500.
+		require Hash::Util;
+		my %locked = (b => 1);
+		Hash::Util::lock_ref_keys(\%locked);
+		is $c->evaluate(\%locked), undef, 'a locked row without the column';
+		ok !exists $locked{a}, 'and the row is not changed by asking';
+		keeps_globals_ok('evaluate', sub { $c->evaluate({ a => 1 }) });
+	};
+
+	subtest 'Calc::_tokenize -- token types and positions' => sub {
+		my $toks = Database::BI::Calc::_tokenize(q{a1 + 2.5e3 'x' "y" <= != >= < > = ( ) , - * /});
+		is_deeply [ map { $_->{type} } @$toks ],
+			[ qw(IDENT PLUS NUM STR STR LE NEQ GE LT GT EQ LPAREN RPAREN COMMA MINUS STAR SLASH EOF) ], 'every token type';
+		is $toks->[2]{val}, '2.5e3', 'a number keeps its text';
+		is $toks->[3]{val}, 'x', 'a string loses its quotes';
+		is $toks->[1]{pos}, 3, 'and positions are character offsets';
+		is_deeply [ map { $_->{type} } @{ Database::BI::Calc::_tokenize('') } ], ['EOF'], 'an empty expression is just the end';
+	};
+
+	subtest 'Calc::_tokenize -- exact errors' => sub {
+		throws_ok { Database::BI::Calc::_tokenize(q{'abc}) } qr/\AUnterminated string at position 0 at /, 'a single quote';
+		throws_ok { Database::BI::Calc::_tokenize(q{1 + "abc}) } qr/\AUnterminated string at position 4 at /, 'a double quote';
+		throws_ok { Database::BI::Calc::_tokenize('a == 1') } qr/\AUse = not == for equality comparison at position 2 at /, 'a C habit';
+		for my $ch (qw(@ $ ; ` ! % & | ^ ~ { } [ ] \\)) {
+			throws_ok { Database::BI::Calc::_tokenize("1 $ch") } qr/\AUnexpected character '\Q$ch\E' at position 2 at /, "'$ch' is not in the language";
+		}
+	};
+
+	subtest 'Calc::_check_depth and _expect' => sub {
+		my $d = $MAX_DEPTH - 1;
+		lives_ok { Database::BI::Calc::_check_depth(\$d) } 'one under the limit';
+		$d = $MAX_DEPTH;
+		throws_ok { Database::BI::Calc::_check_depth(\$d) } qr/\AExpression nesting too deep \(max $MAX_DEPTH levels\) at /, 'at the limit';
+
+		my $toks = [ { type => 'NUM', val => '7', pos => 3 } ];
+		my $pos = 0;
+		lives_ok { Database::BI::Calc::_expect($toks, \$pos, 'NUM') } 'the token it wants';
+		is $pos, 1, 'and it moves on';
+		$pos = 0;
+		throws_ok { Database::BI::Calc::_expect($toks, \$pos, 'RPAREN') } qr/\AExpected 'RPAREN' at position 3, got '7' at /, 'one it does not';
+		is $pos, 0, 'and it stays put';
+	};
+
+	# Each of the parser's levels is reached through the compiler, since a level
+	# on its own only builds a closure; what matters is what the closure does.
+	subtest 'Calc::_parse_add, _parse_term, _parse_factor -- arithmetic' => sub {
+		is calc_value('a + b', \%row), 14, 'add';
+		is calc_value('a - b', \%row), 6, 'subtract';
+		is calc_value('a * b', \%row), 40, 'multiply';
+		is calc_value('a / b', \%row), 2.5, 'divide';
+		is calc_value('1 + 2 * 3'), 7, 'precedence';
+		is calc_value('(1 + 2) * 3'), 9, 'brackets';
+		is calc_value('2 - 3 - 4'), -5, 'left associative';
+		is calc_value('-a', \%row), -10, 'unary minus';
+		is calc_value('+a', \%row), 10, 'unary plus';
+		is calc_value('--a', \%row), 10, 'twice';
+		is calc_value('1e3'), 1000, 'scientific';
+	};
+
+	subtest 'Calc arithmetic -- nothing dies on bad cells' => sub {
+		is calc_value('a / 0', \%row), undef, 'division by zero is nothing';
+		is calc_value('a / (b - 4)', \%row), undef, 'however it was reached';
+		is calc_value('s + 1', \%row), undef, 'text plus a number';
+		is calc_value('1 - s', \%row), undef, 'minus';
+		is calc_value('s * 2', \%row), undef, 'times';
+		is calc_value('2 / s', \%row), undef, 'divide';
+		is calc_value('-s', \%row), undef, 'negated';
+		is calc_value('blank + 1', \%row), undef, 'an empty cell';
+		is calc_value('blank * 1', \%row), undef, 'multiplied';
+	};
+
+	subtest 'Calc::_parse_cmp -- comparisons' => sub {
+		is calc_value('a > b', \%row), 1, 'true is 1';
+		is calc_value('a < b', \%row), 0, 'false is 0';
+		is calc_value('a = 10', \%row), 1, 'equal';
+		is calc_value('a != 10', \%row), 0, 'not equal';
+		is calc_value('a <= 10', \%row), 1, 'at most';
+		is calc_value('a >= 11', \%row), 0, 'at least';
+		is calc_value(q{'10' > '9'}), 1, 'numbers in quotes compare as numbers';
+		is calc_value(q{s = 'HELLO'}, \%row), 1, 'text is case-blind';
+		is calc_value(q{s != 'hello'}, \%row), 0, 'either way round';
+		is calc_value(q{s < 'z'}, \%row), 1, 'and ordered';
+		is calc_value(q{s > 'z'}, \%row), 0, 'both ways';
+		is calc_value(q{s <= 'hello'}, \%row), 1, 'to the boundary';
+		is calc_value(q{s >= 'hello'}, \%row), 1, 'from the boundary';
+		is calc_value('blank = 1', \%row), undef, 'an empty cell compares to nothing';
+		is calc_value('1 = blank', \%row), undef, 'on either side';
+		like calc_error('1 < 2 < 3'), qr/\AUnexpected token '<' at position 6\z/, 'comparisons do not chain';
+	};
+
+	subtest 'Calc::_parse_colref -- names' => sub {
+		my %r = ('Per Unit Price' => 3, plain => 1);
+		is calc_value('plain', \%r), 1, 'exact';
+		is calc_value('per_unit_price', \%r), 3, 'underscores stand for spaces, whatever the case';
+		is calc_value('PLAIN', \%r), 1, 'case-blind';
+		is calc_error('secret', 'plain'), "Unknown column 'secret'", 'a column that is not offered';
+		is calc_error('a_b', 'a_c'), "Unknown column 'a_b'", 'and no partial match';
+	};
+
+	subtest 'Calc::_parse_call -- the language runs no code' => sub {
+		for my $fn (qw(system exec open eval require unlink kill print sprintf)) {
+			is calc_error("$fn('x')"), "Unknown function '$fn'", "$fn is not a function here";
+		}
+		is calc_error('__PACKAGE__'), "Unknown column '__PACKAGE__'", 'a Perl token is just a missing column';
+		is calc_error(q{CORE::system('x')}), "Unexpected character ':' at position 4", 'nor can a package be named';
+		is calc_value(q{'; system("x"); '}), q{; system("x"); }, 'a string holding code is only a string';
+		is calc_value(q{concat('$ENV{HOME}', '@INC')}), '$ENV{HOME}@INC', 'and is not interpolated';
+	};
+
+	subtest 'Calc::_parse_call -- malformed calls' => sub {
+		is calc_error('upper(a', 'a'), "Expected 'RPAREN' at position 7, got ''", 'an unclosed call';
+		is calc_error('(1 + 2'), "Expected 'RPAREN' at position 6, got ''", 'an unclosed bracket';
+		is calc_error('1 +'), "Unexpected token '' at position 3", 'a missing operand';
+		is calc_error('1 2'), "Unexpected token '2' at position 2", 'two values';
+		is calc_error(')'), "Unexpected token ')' at position 0", 'a stray bracket';
+		is calc_error('epoch(1, 2)'), 'The second argument of epoch() must be a quoted literal', 'a format that is not a literal';
+		is calc_error('span(1, a)', 'a'), 'The second argument of span() must be a quoted literal', 'an interval that is not one';
+		is calc_error(q{epoch(1, '%Q')}), 'Unsupported time format token %Q', 'a bad format is found at compile time';
+		like calc_error(q{span(1, 'x')}), qr/\AUnknown time bucket 'x'; use a count/, 'and a bad interval';
+		like calc_error('span(1)'), qr/\AUnknown time bucket ''/, 'and none at all';
+		is calc_value('if(1)'), undef, 'if with no branches comes to nothing rather than a crash';
+		is calc_value('if()'), undef, 'nor with no condition';
+	};
+
+	# Why: every nesting route must count towards the limit.  Unary operators
+	# recurse in the parser too, and a URL can hold 500 of them.
+	subtest 'Calc -- nesting cannot exhaust the parser' => sub {
+		my $too_deep = "Expression nesting too deep (max $MAX_DEPTH levels)";
+		is calc_error(('(' x 100) . '1' . (')' x 100)), $too_deep, 'brackets';
+		is calc_error(('upper(' x 60) . '1' . (')' x 60)), $too_deep, 'calls';
+		warnings_are {
+			is calc_error(('-' x ($MAX_EXPR_LEN - 1)) . '1'), $too_deep, 'unary minus';
+			is calc_error(('+' x ($MAX_EXPR_LEN - 1)) . '1'), $too_deep, 'unary plus';
+		} [], 'without a deep-recursion warning first';
+		is calc_value('-(-(1))'), 1, 'modest nesting is still fine';
+		is calc_value('---1'), -1, 'modest unary too';
+		is calc_value(join('+', (1) x 200)), 200, 'a long flat sum is not nesting';
+	};
+
+	subtest 'Calc functions -- strings' => sub {
+		is calc_value('upper(s)', \%row), 'HELLO', 'upper';
+		is calc_value('lower(s)', \%row), 'hello', 'lower';
+		is calc_value(q{trim('  x ')}), 'x', 'trim';
+		is calc_value('len(s)', \%row), 5, 'len';
+		is calc_value(q{concat(s, '!', 1)}, \%row), 'Hello!1', 'concat';
+		is calc_value('concat(blank, s)', \%row), 'Hello', 'concat treats empty as nothing';
+		is calc_value('substr(s, 1, 2)', \%row), 'el', 'substr with a length';
+		is calc_value('substr(s, 3)', \%row), 'lo', 'and without';
+		is calc_value($_, \%row), undef, "$_ of an empty cell is nothing"
+			for 'upper(blank)', 'lower(blank)', 'trim(blank)', 'len(blank)', 'substr(blank, 1)';
+	};
+
+	# Why: a start past the end returns undef and warns.  A column of short values
+	# would write one warning per row to the log.
+	subtest 'Calc functions -- substr past the end is quiet' => sub {
+		warnings_are { is calc_value('substr(s, 99)', \%row), undef, 'nothing there' } [], 'no warning';
+		warnings_are { is calc_value('substr(s, 99, 1)', \%row), undef, 'with a length' } [], 'no warning';
+		warnings_are { is calc_value('substr(s, -99, 1)', \%row), undef, 'from the far end' } [], 'no warning';
+	};
+
+	subtest 'Calc functions -- numbers' => sub {
+		is calc_value('round(2.567, 2)'), 2.57, 'round to places';
+		is calc_value('round(2.5)'), 2, 'to whole numbers, by default';
+		is calc_value('floor(2.9)'), 2, 'floor';
+		is calc_value('floor(-2.1)'), -3, 'floor of a negative';
+		is calc_value('ceil(2.1)'), 3, 'ceil';
+		is calc_value('abs(-2)'), 2, 'abs';
+		is calc_value($_, \%row), undef, "$_ is nothing" for qw(round(s) floor(s) ceil(s) abs(s) round(blank) floor(blank));
+		is calc_value(q{round(2.5, 'x')}), 2, 'a non-numeric place count means none';
+	};
+
+	# Why: "%.-2f" is not a format, so a negative place count returned 0 and a
+	# warning; and a huge one asked sprintf for that many digits, from a URL.
+	subtest 'Calc functions -- round cannot be abused' => sub {
+		warnings_are { is calc_value('round(1234, -2)'), 1200, 'negative places round to the left' } [], 'quietly';
+		warnings_are { is calc_value('round(1250.5, -1)'), 1250, 'to the ten' } [], 'quietly';
+		warnings_are { is calc_value('round(1.5, 2000000000)'), 1.5, 'an absurd count is held to what a double can show' } [], 'quickly';
+		warnings_are { is calc_value('round(1234, -2000000000)'), 0, 'and an absurd negative one' } [], 'and quietly';
+	};
+
+	subtest 'Calc functions -- null handling and if' => sub {
+		is calc_value('isnull(blank, 7)', \%row), 7, 'isnull fills a gap';
+		is calc_value('isnull(a, 7)', \%row), 10, 'and leaves a value';
+		is calc_value('coalesce(blank, blank, 3)', \%row), 3, 'coalesce takes the first value';
+		is calc_value('coalesce(blank)', \%row), undef, 'or nothing';
+		is calc_value('coalesce()'), undef, 'with nothing to choose from';
+		is calc_value('if(a > 1, 1, 2)', \%row), 1, 'if, true';
+		is calc_value('if(a < 1, 1, 2)', \%row), 2, 'if, false';
+		is calc_value('IF(blank, 1, 2)', \%row), 2, 'nothing counts as false, in either case of name';
+		is calc_value(q{if(1, 'y', bad_fn_not_reached)}, { bad_fn_not_reached => 1 }), 'y', 'a branch not taken is not run';
+	};
+
+	# week() is worked out in Perl, because strftime('%V') is '' on Windows.
+	# Where %V works, the two must agree, above all around the new year.
+	subtest 'Calc::_iso_week -- agrees with strftime %V' => sub {
+		require Time::Local;
+		plan skip_all => "strftime has no %V here"
+			unless (POSIX::strftime('%V', gmtime(0)) // '') =~ /\A\d+\z/;
+		my $bad = 0;
+		for my $year (1999 .. 2030) {
+			for my $k (1 .. 7) {
+				for my $md ([1, $k], [12, 32 - $k]) {
+					my @g = gmtime Time::Local::timegm(0, 0, 12, $md->[1], $md->[0] - 1, $year);
+					my $want = POSIX::strftime('%V', @g) + 0;
+					my $got  = Database::BI::Calc::_iso_week($g[5] + 1900, $g[6], $g[7]);
+					next if $got == $want;
+					$bad++;
+					diag("$year-$md->[0]-$md->[1]: $got, not $want");
+				}
+			}
+		}
+		is $bad, 0, 'the first and last seven days of 1999 to 2030';
+	};
+
+	subtest 'Calc functions -- dates' => sub {
+		is calc_value('year(d)', \%row), 2026, 'year';
+		is calc_value('month(d)', \%row), 5, 'month';
+		is calc_value('day(d)', \%row), 20, 'day';
+		is calc_value('quarter(d)', \%row), 2, 'quarter';
+		is calc_value('month_name(d)', \%row), 'May', 'month name';
+		is calc_value('weekday(d)', \%row), 3, 'a Wednesday';
+		is calc_value(q{weekday('2026-05-24')}), 7, 'a Sunday is 7, not 0';
+		is calc_value(q{week('2026-01-01')}), 1, 'ISO week one';
+		is calc_value(q{week('2020-12-31')}), 53, 'a fifty-third week';
+		like calc_value('now()'), qr/\A\d{4}-\d{2}-\d{2}\z/, 'now is a date';
+		is calc_value($_, \%row), undef, "$_ is nothing"
+			for map { "$_(s)" } qw(year month day quarter month_name weekday week);
+		is calc_value($_, \%row), undef, "$_ is nothing"
+			for map { "$_(blank)" } qw(year month day quarter month_name weekday week);
+	};
+
+	# Why: the rule stated at the top of the function table is that a value which
+	# is not a date gives nothing.  Month 00 used to read $M[-1], so it was named
+	# December; month 13 was quarter 5; and 31 February was a Tuesday in March.
+	subtest 'Calc functions -- a date that does not exist is not read as one' => sub {
+		for my $bad ('2026-00-15', '2026-13-15') {
+			is calc_value("$_('$bad')"), undef, "$_('$bad') is nothing" for qw(month quarter month_name);
+		}
+		is calc_value(q{day('2026-01-32')}), undef, 'day 32';
+		is calc_value(q{day('2026-01-00')}), undef, 'day 0';
+		is calc_value(q{weekday('2026-02-31')}), undef, 'the weekday of 31 February';
+		is calc_value(q{week('2026-02-31')}), undef, 'its week';
+		is calc_value(q{week('2026-13-01')}), undef, 'the week of month 13';
+		is calc_value(q{weekday('2026-13-01')}), undef, 'its weekday';
+	};
+
+	subtest 'Calc functions -- time of day' => sub {
+		is calc_value(q{hour('2026-05-20T10:37:42')}), 10, 'hour';
+		is calc_value(q{minute('2026-05-20T10:37:42')}), 37, 'minute';
+		is calc_value(q{second('2026-05-20T10:37:42')}), 42, 'second';
+		is calc_value(q{hour('2026-05-20')}), undef, 'a date alone has no hour, rather than midnight';
+		is calc_value("$_('junk')"), undef, "$_ of junk" for qw(hour minute second);
+		is calc_value("$_(blank)", \%row), undef, "$_ of an empty cell" for qw(hour minute second);
+	};
+
+	subtest 'Calc functions -- epoch and span' => sub {
+		is calc_value(q{epoch('2026-05-20')}), POSIX::mktime(0, 0, 0, 20, 4, 126), 'epoch of a date';
+		is calc_value(q{epoch('20/05/2026', '%d/%m/%Y')}), POSIX::mktime(0, 0, 0, 20, 4, 126), 'with a format';
+		is calc_value(q{epoch('junk')}), undef, 'of junk';
+		is calc_value(q{epoch('junk', '%d/%m/%Y')}), undef, 'with a format, of junk';
+		is calc_value(q{span('2026-05-20', '1mon')}), '2026-05-01', 'span';
+		is calc_value(q{span('junk', '1mon')}), undef, 'of junk';
+	};
+
+	subtest 'Calc functions -- bin' => sub {
+		is calc_value('bin(15, 10)'), '[10,20)', 'an integer width';
+		is calc_value('bin(10, 10)'), '[10,20)', 'the lower bound is inside';
+		is calc_value('bin(-1, 10)'), '[-10,0)', 'a negative';
+		is calc_value('bin(0.25, 0.1)'), '[0.2,0.3)', 'a fractional width';
+		is calc_value('bin(0.3, 0.1)'), '[0.3,0.4)', 'binary fractions do not slip a bin left';
+		is calc_value($_, \%row), undef, "$_ is nothing" for 'bin(s, 10)', 'bin(1, s)', 'bin(1, 0)', 'bin(1, -5)', 'bin(blank, 1)', 'bin(1, blank)';
+		lives_ok { calc_value(q{bin('inf', 1)}) } 'infinity is survived';
+	};
+
+	subtest 'Calc::date_normalise -- the three named patterns' => sub {
+		my $fn = \&Database::BI::Calc::date_normalise;
+		is $fn->('1/15/2026', '%m/%d/%Y'), '2026-01-15', 'US';
+		is $fn->('15/1/2026', '%d/%m/%Y'), '2026-01-15', 'EU';
+		is $fn->('15-jan-2026', '%d-%b-%Y'), '2026-01-15', 'a month name in any case';
+		is $fn->('junk', $_), undef, "junk does not match $_" for '%m/%d/%Y', '%d/%m/%Y', '%d-%b-%Y';
+		is $fn->('15-Foo-2026', '%d-%b-%Y'), undef, 'a month that does not exist';
+		is $fn->('1/1/2026', '%Q'), undef, 'an unknown pattern';
+		is $fn->(undef, '%m/%d/%Y'), undef, 'no value';
+		is $fn->('', '%m/%d/%Y'), undef, 'an empty value';
+		is $fn->('1/1/2026', undef), undef, 'no pattern';
+		keeps_globals_ok('date_normalise', sub { $fn->('1/15/2026', '%m/%d/%Y') });
+	};
+
+	# Why: this is what sends a misread column to the '(unparseable)' bucket, where
+	# someone can see it.  A UK file read as US used to come back as "2026-15-01",
+	# a value that looks like a date and sorts among the real ones.
+	subtest 'Calc::date_normalise -- a date that does not exist is not produced' => sub {
+		my $fn = \&Database::BI::Calc::date_normalise;
+		is $fn->('15/01/2026', '%m/%d/%Y'), undef, 'a UK date read as US has no month 15';
+		is $fn->('01/15/2026', '%d/%m/%Y'), undef, 'and a US date read as UK';
+		is $fn->('02/31/2026', '%m/%d/%Y'), undef, '31 February';
+		is $fn->('31/02/2026', '%d/%m/%Y'), undef, 'either way round';
+		is $fn->('00/10/2026', '%m/%d/%Y'), undef, 'month 0';
+		is $fn->('31-Feb-2026', '%d-%b-%Y'), undef, 'with a month name';
+		is $fn->('29/02/2024', '%d/%m/%Y'), '2024-02-29', 'but a true leap day is fine';
+	};
+
+	subtest 'Calc::_normalise_with_format -- stored patterns' => sub {
+		my $fn = \&Database::BI::Calc::date_normalise;
+		is $fn->('2026.05.20', { date => '%Y.%m.%d' }), '2026-05-20', 'a date';
+		is $fn->('2026.05.20', { date => '%Y.%m.%d', as => 'timestamp' }), '2026-05-20T00:00:00', 'as a timestamp at midnight';
+		is $fn->('2026.05.20 10:30', { date => '%Y.%m.%d', time => '%H:%M' }), '2026-05-20T10:30:00', 'with a time';
+		is $fn->('junk', { date => '%Y.%m.%d' }), undef, 'junk';
+		is $fn->('junk', { date => '%Y.%m.%d', time => '%H:%M' }), undef, 'junk with a time';
+		is $fn->('2026.02.31', { date => '%Y.%m.%d' }), undef, 'a date that does not exist';
+		is $fn->('x', {}), undef, 'a pattern with no date';
+		is $fn->('x', { date => '' }), undef, 'or an empty one';
+	};
+
+	# Why: its documented contract is undef for an unknown pattern, and the caller
+	# runs it over stored JSON with no eval.  One edited or stale models.json must
+	# not turn every page that reads the column into a 500.
+	subtest 'Calc::date_normalise -- a corrupt stored pattern does not take the page down' => sub {
+		my $fn = \&Database::BI::Calc::date_normalise;
+		my $got = 'unset';
+		lives_ok { $got = $fn->('2026-01-01', { date => '%Q' }) } 'an unknown token';
+		is $got, undef, 'gives nothing';
+		lives_ok { $got = $fn->('2026-01-01', { date => '%H' }) } 'a pattern with no date in it';
+		is $got, undef, 'gives nothing';
+		lives_ok { $got = $fn->('2026-01-01', { date => '%Y-%m-%d', time => '%Q' }) } 'a bad time token';
+		is $got, undef, 'gives nothing';
+	};
+}
+
+# ============================================================================
+# PART U8: Database::BI::Model::Geocode -- the functions the earlier part misses
+# ============================================================================
+{
+	Readonly my $SHARED => 'shared';
+
+	subtest 'Geocode::_resolve -- one pass over one column' => sub {
+		my $point = Stub::GeoPoint->new({ latitude => $GOOD_LAT, longitude => $GOOD_LON, database => 'osm' });
+		my $stub  = Stub::Geocoder->new(results => { $GOOD_PLACE => $point });
+		my $geo   = $GEO->new(geocoder => $stub);
+
+		my $got = $geo->_resolve([ $GOOD_PLACE, $GOOD_PLACE, 'Nowhere', '', undef, '123' ], { max => 10 });
+
+		returns_is $got, { type => 'hashref' }, 'a hashref';
+		is $got->{counts}{distinct}, 4, 'a repeat is one value, and undef and empty are one';
+		is $got->{counts}{resolved}, 1, 'one found';
+		is $got->{counts}{unresolved}, 1, 'one not found';
+		is $got->{counts}{skipped}, 2, 'the blank and the bare number are refused';
+		is $got->{counts}{lookups}, 2, 'only two reach the geocoder';
+		is_deeply $got->{points}{$GOOD_PLACE}, { lat => $GOOD_LAT, lon => $GOOD_LON, backend => 'osm' }, 'with its position';
+		is $got->{cache}{Nowhere}, 0, 'a miss is remembered, so it is not asked again';
+		is $got->{backend}, 'osm', 'the backend is named';
+		memory_cycle_ok($got, 'no cycle');
+	};
+
+	subtest 'Geocode::_resolve -- the cap and the cache' => sub {
+		my $stub = Stub::Geocoder->new();
+		my $geo  = $GEO->new(geocoder => $stub);
+
+		my $capped = $geo->_resolve([qw(aa bb cc)], { max => 2 });
+		is $capped->{capped}, 1, 'more wanted than allowed';
+		is $capped->{counts}{attempted}, 2, 'only the allowance is tried';
+		is_deeply $capped->{not_attempted}, ['cc'], 'the rest are held back';
+		ok !exists $capped->{cache}{cc}, 'and not cached, so the next request picks them up';
+
+		my $cache = { kept => [ 1, 2 ], missed => 0 };
+		my $calls = @{ $stub->{calls} };
+		my $hit = $geo->_resolve([qw(kept missed)], { max => 5, cache => $cache });
+		is scalar @{ $stub->{calls} }, $calls, 'remembered answers ask nothing';
+		is_deeply $hit->{points}{kept}, { lat => 1, lon => 2 }, 'a remembered place still plots';
+		is_deeply $hit->{unresolved}, ['missed'], 'a remembered miss stays a miss';
+
+		$hit->{cache}{tampered} = 1;
+		ok !exists $cache->{tampered}, "the caller's cache is never written to";
+	};
+
+	subtest 'Geocode::_resolve -- a geocoder that misbehaves' => sub {
+		my $weird = bless {}, 'Stub::Function::WeirdGeocoder';
+		{
+			no warnings 'once';
+			*Stub::Function::WeirdGeocoder::valid_location = sub { 1 };
+			*Stub::Function::WeirdGeocoder::geocode_many   = sub { return 'not a hash' };
+		}
+		my $got = $GEO->new(geocoder => $weird)->_resolve(['x'], { max => 5 });
+		is $got->{counts}{unresolved}, 1, 'a reply of the wrong shape is a miss, not a crash';
+		is $got->{counts}{lookups}, 1, 'and the lookup is still counted';
+	};
+
+	subtest 'Geocode::_resolve -- never repeats a location in its messages' => sub {
+		my $got = $GEO->new(geocoder => Stub::Geocoder->new())->_resolve([qw(Private_Home_Address another)], { max => 1 });
+		my $all = join ' ', map { $_->{text} // '' } @{ $got->{messages} };
+		unlike $all, qr/Private_Home_Address|another/, 'a place in a personal dataset is personal data';
+	};
+
+	subtest 'Geocode::shared_cache_from_models' => sub {
+		my $places = { Ramsgate => [ 1, 2 ] };
+		is_deeply $GEO->shared_cache_from_models({ geo => { $SHARED => { places => $places } } }), $places, 'the shared places';
+		my $copy = $GEO->shared_cache_from_models({ geo => { $SHARED => { places => $places } } });
+		$copy->{added} = 1;
+		ok !exists $places->{added}, 'as a copy, so editing it changes nothing';
+
+		is_deeply $GEO->shared_cache_from_models($_), {}, 'junk gives an empty cache'
+			for undef, 'x', [], {}, { geo => {} }, { geo => { $SHARED => 'x' } }, { geo => { $SHARED => { places => 'x' } } };
+	};
+
+	# Why: reading models.json must not change it.  A nested rvalue autovivifies,
+	# and the next write would save a "geo" the user never had.
+	subtest 'Geocode::shared_cache_from_models -- reading leaves the store alone' => sub {
+		my %models = (other => 1);
+		$GEO->shared_cache_from_models(\%models);
+		ok !exists $models{geo}, 'no empty geo section appears';
+
+		for my $corrupt ('oops', [ 1 ], 42) {
+			my $got;
+			lives_ok { $got = $GEO->shared_cache_from_models({ geo => $corrupt }) } 'a corrupt geo section is survived';
+			is_deeply $got, {}, 'and reads as nothing';
+		}
+	};
+
+	subtest 'Geocode::models_with_shared_cache' => sub {
+		my %models = (other => 1, geo => { 'file:x' => { lat => 'a' }, $SHARED => { places => { old => [ 1, 2 ] }, backend => 'first' } });
+		my $got = $GEO->models_with_shared_cache(\%models, { new => [ 3, 4 ] }, backend => 'second', built => 'today');
+
+		is_deeply $got->{geo}{$SHARED}{places}, { old => [ 1, 2 ], new => [ 3, 4 ] }, 'merged, so another request is not lost';
+		is $got->{geo}{$SHARED}{backend}, 'second', 'the metadata is updated';
+		is $got->{geo}{$SHARED}{built}, 'today', 'all of it';
+		is $got->{other}, 1, 'the rest of the store is kept';
+		is_deeply $got->{geo}{'file:x'}, { lat => 'a' }, 'and so are other datasets';
+
+		is_deeply $models{geo}{$SHARED}{places}, { old => [ 1, 2 ] }, "the caller's copy is not changed";
+		is $models{geo}{$SHARED}{backend}, 'first', 'in any part';
+
+		my $newer = $GEO->models_with_shared_cache({ geo => { $SHARED => { places => { p => [ 1, 1 ] } } } }, { p => [ 2, 2 ] });
+		is_deeply $newer->{geo}{$SHARED}{places}{p}, [ 2, 2 ], 'the newer answer wins';
+		memory_cycle_ok($got, 'no cycle');
+	};
+
+	subtest 'Geocode::models_with_shared_cache -- junk in, a valid store out' => sub {
+		for my $models (undef, 'x', []) {
+			my $got = $GEO->models_with_shared_cache($models, { a => [ 1, 2 ] });
+			is_deeply $got->{geo}{$SHARED}{places}, { a => [ 1, 2 ] }, 'store that is not a store is replaced';
+		}
+		is_deeply $GEO->models_with_shared_cache({}, 'x')->{geo}{$SHARED}{places}, {}, 'a cache that is not a hash adds nothing';
+
+		my %empty;
+		$GEO->models_with_shared_cache(\%empty, {});
+		ok !exists $empty{geo}, 'the caller is not given a geo section';
+
+		for my $corrupt ('oops', [ 1 ]) {
+			my $got;
+			lives_ok { $got = $GEO->models_with_shared_cache({ geo => $corrupt }, { a => [ 1, 2 ] }) } 'a corrupt geo section is survived';
+			is_deeply $got->{geo}{$SHARED}{places}, { a => [ 1, 2 ] }, 'and is rebuilt';
+		}
+	};
+}
+
+# ============================================================================
+# PART U9: Database::BI::Model::DataSource -- the functions the earlier part misses
+#
+# Database::Abstraction is replaced where a real connection would be needed, so
+# these run with no network and no Redis.
+# ============================================================================
+{
+	Readonly my $REDIS_URL => 'redis://localhost:6379';
+	Readonly my $HTML_URL  => 'http://example.com/t.html';
+
+	subtest 'DataSource::_safe_table_name' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_safe_table_name;
+		is $fn->('sales'), 'sales', 'a safe name is unchanged';
+		is $fn->('_x'), '_x', 'a leading underscore is allowed';
+		is $fn->('chi_CGI::Info'), 'chi_CGI__Info', 'each illegal character becomes an underscore';
+		is $fn->('2026'), '_2026', 'a leading digit gets one';
+		is $fn->(''), '_', 'nothing at all still names something';
+		is $fn->('a;DROP TABLE b'), 'a_DROP_TABLE_b', 'SQL does not survive';
+		is $fn->('../../x'), '______x', 'nor does a path';
+		is $fn->("a\nb"), 'a_b', 'nor a newline';
+		like $fn->("caf\x{e9}\x{263A}"), qr/\A[A-Za-z_][A-Za-z0-9_]*\z/, 'non-ASCII text ends up safe';
+		keeps_globals_ok('_safe_table_name', sub { $fn->('a b') });
+	};
+
+	subtest 'DataSource::_new_from_redis -- every refusal is exact' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_new_from_redis;
+		throws_ok { $fn->($DS, {}) } qr/\ADataSource: Redis URL "" must begin with redis:\/\/ at /, 'no URL';
+		throws_ok { $fn->($DS, { redis => 'http://x', table => 't' }) } qr/\ADataSource: Redis URL "http:\/\/x" must begin with redis:\/\/ at /, 'another scheme';
+		throws_ok { $fn->($DS, { redis => " $REDIS_URL", table => 't' }) } qr/must begin with redis:\/\//, 'a leading space';
+		throws_ok { $fn->($DS, { redis => $REDIS_URL }) } qr/\ADataSource: argument "table" is required at /, 'no table';
+		for my $table ('', 'a/b', 'a\\b', "a\0b") {
+			(my $shown = $table) =~ s/\0/NUL/;
+			throws_ok { $fn->($DS, { redis => $REDIS_URL, table => $table }) } qr/\ADataSource: table name ".*" contains illegal characters/s, "the table '$shown'";
+		}
+	};
+
+	subtest 'DataSource::_new_from_redis -- builds the object without connecting' => sub {
+		Test::Mockingbird::mock("${DS}::_init_redis_backend", sub { $_[0]{_db} = 'stub' });
+		my $src = Database::BI::Model::DataSource::_new_from_redis($DS, { redis => $REDIS_URL, table => 'a:b-c' });
+		my $dig = Database::BI::Model::DataSource::_new_from_redis($DS, { redis => uc($REDIS_URL), table => '9lives' });
+		Test::Mockingbird::unmock("${DS}::_init_redis_backend");
+
+		is $src->{_table}, 'a_b_c', 'the identifier is sanitised';
+		is $src->{_raw_table}, 'a:b-c', 'and the real key name kept for the lookups';
+		is $src->{_cache_ttl_url}, '15 min', 'the default TTL';
+		is $src->{_db}, 'stub', 'the backend step ran';
+		is $dig->{_table}, '_9lives', 'a leading digit is made safe';
+		is $dig->{_redis_url}, uc($REDIS_URL), 'and the scheme check does not mind case';
+		memory_cycle_ok($src, 'no cycle');
+	};
+
+	subtest 'DataSource::_init_redis_backend' => sub {
+		my $self = bless { _table => 'fn_redis', _raw_table => 'fn:redis', _redis_url => $REDIS_URL }, $DS;
+		my %got;
+		Test::Mockingbird::mock('Database::Abstraction::new', sub { my ($c, %a) = @_; %got = %a; bless {}, $c });
+		$self->_init_redis_backend();
+		Test::Mockingbird::unmock('Database::Abstraction::new');
+		isa_ok $self->{_db}, 'Database::BI::_DB::Fn_redis';
+		is $got{redis_key}, 'fn:redis', 'lookups use the real key';
+		is $got{table}, 'fn_redis', 'the identifier uses the safe one';
+
+		Test::Mockingbird::mock('Database::Abstraction::new', sub { require Carp; Carp::croak('connection refused') });
+		throws_ok { $self->_init_redis_backend() }
+			qr/\ADataSource: failed to initialise database backend for table "fn_redis": connection refused/, 'a failure names the table and the cause';
+		Test::Mockingbird::unmock('Database::Abstraction::new');
+	};
+
+	subtest 'DataSource::_init_url_backend' => sub {
+		my $self = bless { _url => $HTML_URL }, $DS;
+		my @args;
+		Test::Mockingbird::mock('Database::Abstraction::new', sub { @args = @_; bless {}, $_[0] });
+		$self->_init_url_backend(2);
+		Test::Mockingbird::unmock('Database::Abstraction::new');
+		isa_ok $self->{_db}, 'Database::BI::_DB::HtmlUrl';
+		is $args[1]{url}, $HTML_URL, 'the URL is passed';
+		is $args[1]{html_table_index}, 2, 'and which table on the page';
+		is $args[1]{no_entry}, 1, 'and there is no id column to demand';
+
+		Test::Mockingbird::mock('Database::Abstraction::new', sub { require Carp; Carp::croak('404') });
+		throws_ok { $self->_init_url_backend(0) }
+			qr/\ADataSource: failed to open HTML table at "\Q$HTML_URL\E": 404/, 'a failed fetch names the URL';
+		Test::Mockingbird::unmock('Database::Abstraction::new');
+	};
+
+	subtest 'DataSource::schema -- never lets a backend failure out' => sub {
+		{
+			package Stub::Function::SchemaDB;
+			sub new    { bless { reply => $_[1] }, $_[0] }
+			sub schema { my $r = $_[0]{reply}; ref $r eq 'CODE' ? $r->() : $r }
+		}
+		my $with = sub { bless { _db => $_[0] }, $DS };
+		is_deeply $with->(undef)->schema, {}, 'no backend';
+		is_deeply $with->(bless {}, 'Stub::Function::NoSchema')->schema, {}, 'a backend with no schema method';
+		is_deeply $with->(Stub::Function::SchemaDB->new({ a => { type => 'integer' } }))->schema, { a => { type => 'integer' } }, 'what the backend reports';
+		is_deeply $with->(Stub::Function::SchemaDB->new(sub { require Carp; Carp::croak('boom') }))->schema, {}, 'a backend that dies';
+		is_deeply $with->(Stub::Function::SchemaDB->new([ 1 ]))->schema, {}, 'an answer of the wrong shape';
+		is_deeply $with->(Stub::Function::SchemaDB->new(undef))->schema, {}, 'no answer';
+	};
+}
+
+# ============================================================================
+# PART U10: Database::BI -- the functions the earlier part misses
+# ============================================================================
+{
+	subtest 'BI::_uploads_dir -- the one place that decides' => sub {
+		my $app  = Test::Mojo->new('Database::BI')->app;
+		my $home = $app->home;
+
+		delete $app->config->{uploads_dir};
+		is $app->_uploads_dir->to_string, $home->child('.uploads')->to_string, 'the default is under home';
+		isa_ok $app->_uploads_dir, 'Mojo::File';
+
+		$app->config->{uploads_dir} = 'staging';
+		is $app->_uploads_dir->to_string, $home->child('staging')->to_string, 'a relative name is under home';
+
+		my $abs = File::Spec->rel2abs(File::Spec->catdir(File::Spec->tmpdir, 'bi-staging'));
+		$app->config->{uploads_dir} = $abs;
+		is $app->_uploads_dir->to_string, $abs, 'an absolute name is used as it is';
+
+		for my $junk ('', [], {}) {
+			$app->config->{uploads_dir} = $junk;
+			is $app->_uploads_dir->to_string, $home->child('.uploads')->to_string, 'an unusable setting means the default';
+		}
+		ok !-e $abs, 'and working it out creates nothing';
+	};
+
+	subtest 'BI::startup -- what a request can rely on' => sub {
+		my $t2  = Test::Mojo->new('Database::BI');
+		my $app = $t2->app;
+		$app->config->{model_dir} = tempdir(CLEANUP => 1);
+
+		ok $app->max_request_size > 0, 'request bodies are capped';
+		ok length($app->config->{data_dir} // ''), 'a data directory is configured';
+		ok defined $app->renderer->handlers->{tt}, 'templates render through the tt handler';
+		ok length($app->defaults->{download_dir} // ''), 'a download directory is chosen';
+
+		my @routes;
+		my @queue = @{ $app->routes->children };
+		while (my $r = shift @queue) { push @routes, $r; push @queue, @{ $r->children } }
+		ok scalar @routes, 'routes are registered';
+
+		$t2->get_ok('/no/such/page')->status_is(404)->content_like(qr/not found/i, 'a 404 is our own page');
+		$t2->get_ok('/view/sales?range=not_a_range')->status_is(400);
+	};
+}
+
+
+# ============================================================================
+# PART U11: Database::BI::Controller::Dashboard -- the functions the earlier parts
+# miss.  Pure helpers are called directly; those that read a request are given a
+# controller holding that request; the route actions go through Test::Mojo, since
+# what they promise is an HTTP answer.  Every route is then driven with hostile
+# input: a 5xx or a Perl warning there is a bug, whatever else the page says.
+# ============================================================================
+{
+	Readonly my $DASH     => 'Database::BI::Controller::Dashboard';
+	Readonly my $SALES    => 'table:sales';
+	# A fixed moment (Wed 20 May 2026, noon local) so date arithmetic is checkable.
+	Readonly my $NOW      => POSIX::mktime(0, 0, 12, 20, 4, 126);
+	Readonly my $PER_PAGE => 200;
+	Readonly my $XSS_PROBE => '<script>alert(1)</script>';
+	Readonly my $LONG_PARAM => 5000;
+	Readonly my $REPLY_TIMEOUT => 5;
+	# Each request costs real time, so an ordinary run tries one at a time only those
+	# parameters that are parsed or reach a script; EXTENDED_TESTING tries them all.
+	Readonly my @RISKIEST_PARAMS => qw(bins topn minlen page per_page scheme range cs span tcol f c format);
+	# Each of these is a case nobody considered, whatever the page went on to do.
+	Readonly my $PERL_INTERNAL_WARNING => qr/uninitialized|isn't numeric|substr outside|Deep recursion|Odd number|Wide character|filename containing newline|masks earlier|Invalid \\0/;
+
+	no strict 'refs';
+	my %F = map { $_ => \&{"${DASH}::$_"} } qw(
+		_pagination _breadcrumb_trail _crumb_local _crumb_parent _crumb_label _crumb_spec_name
+		_crumb_view_suffix _crumb_chart_subject _template_languages _has_templates _data_dir_for
+		_tidy_error _schema_type_name _is_iso_date _to_iso_date _date_key _iso_day _iso_second
+		_midday _time_range_bounds _time_range_specs _time_range_preset _time_range_presets
+		_apply_time_range _trim _dedup_requested _filter_specs_to_criteria _measure _numeric_cell
+		_column_is_numeric _card_plan _cross_row_ui_state _cross_row_values _cross_row_cmp
+		_extend_row _canonical_path _inside_dir _chart_orientation _vis_cf_col _decode_cell
+		_percent_encode _word_tokens _wordcloud_option _wordcloud_link _map_popup _map_size_range
+		_map_radius _map_limit _parse_color _parse_color_rules _apply_color_rule _marker_icon
+		_color_hex _iso8601_utc _scope_card_scripts _wrap_card_script
+	);
+	use strict 'refs';
+
+	# A controller holding one request, for helpers that read their parameters.
+	sub dash_controller {
+		my ($app, $url) = @_;
+		my $tx = Mojo::Transaction::HTTP->new;
+		$tx->req->method('GET');
+		$tx->req->url->parse($url // '/');
+		$tx->req->url->base->parse('http://localhost:3000');
+		# A controller's hold on its transaction is weak, so something else must keep it.
+		our @LIVE_TX;
+		push @LIVE_TX, $tx;
+		return Database::BI::Controller::Dashboard->new(app => $app, tx => $tx);
+	}
+
+	# An application with its own stores, for a subtest that writes to them or
+	# changes what the configuration says.
+	sub isolated_app {
+		my $tm = Test::Mojo->new('Database::BI');
+		$tm->app->config->{model_dir}   = tempdir(CLEANUP => 1);
+		$tm->app->config->{uploads_dir} = tempdir(CLEANUP => 1);
+		return $tm;
+	}
+
+	require Mojo::Transaction::HTTP;
+	require Mojo::Parameters;
+	require Mojo::URL;
+	require Mojo::Util;
+	my $app = $t->app;
+
+	subtest 'Dashboard::_pagination -- sane whatever is asked for' => sub {
+		is_deeply [ $F{_pagination}->(dash_controller($app, '/')) ], [ 1, $PER_PAGE, 0 ], 'the defaults';
+		is_deeply [ $F{_pagination}->(dash_controller($app, '/?page=3&per_page=10')) ], [ 3, 10, 20 ], 'as asked';
+		is_deeply [ $F{_pagination}->(dash_controller($app, '/?page=-5&per_page=-5')) ], [ 1, 1, 0 ], 'a negative is clamped up';
+		my ($p, $n) = $F{_pagination}->(dash_controller($app, '/?per_page=99999999'));
+		ok $n < 99999999, 'a huge page size is clamped down';
+	};
+
+	# Why: int('abc') warns and is 0, and a per_page of 0 is clamped to one row, so
+	# a stray parameter showed a single-row table.  1e400 is Inf, and an infinite
+	# OFFSET is not something a database can be asked for.
+	subtest 'Dashboard::_pagination -- input that is not a number' => sub {
+		for my $junk ('abc', '1x', '1e400', '9' x 400, 'Inf', 'NaN', '', '0x10', "1\n") {
+			(my $shown = substr($junk, 0, 8)) =~ s/\n/NL/;
+			my @got;
+			warnings_are {
+				@got = $F{_pagination}->(dash_controller($app, '/?page=' . Mojo::Util::url_escape($junk) . '&per_page=' . Mojo::Util::url_escape($junk)));
+			} [], "'$shown' raises no warning";
+			is_deeply \@got, [ 1, $PER_PAGE, 0 ], "and means the defaults, not one row";
+		}
+	};
+
+	subtest 'Dashboard::_crumb_spec_name' => sub {
+		is $F{_crumb_spec_name}->($SALES), 'sales', 'a table';
+		is $F{_crumb_spec_name}->('table:store/orders'), 'store: orders', 'an internal table';
+		is $F{_crumb_spec_name}->('path:/a/b/c.csv'), 'c.csv', 'a path shows only its file name';
+		is $F{_crumb_spec_name}->('url:http://example.com/x.html'), 'example.com', 'a web page its host';
+		is $F{_crumb_spec_name}->('URL:http://example.com/'), 'example.com', 'in any case';
+		is $F{_crumb_spec_name}->('redis://secret-host:6379/0'), 'Redis', 'a Redis URL is not shown';
+		is $F{_crumb_spec_name}->(undef), '', 'nothing';
+		is $F{_crumb_spec_name}->('junk'), 'junk', 'anything else as it is';
+	};
+
+	subtest 'Dashboard::_crumb_view_suffix' => sub {
+		my $q = sub { Mojo::Parameters->new($_[0]) };
+		is $F{_crumb_view_suffix}->($q->('')), '', 'no filters';
+		is $F{_crumb_view_suffix}->($q->('f=region:empty')), ' (region is empty)', 'a unary operator has no value'
+			if $F{_crumb_view_suffix}->($q->('f=region:empty')) =~ /is empty/;
+		like $F{_crumb_view_suffix}->($q->('f=region:eq:East')), qr/\A \(region .+ East\)\z/, 'a filter';
+		like $F{_crumb_view_suffix}->($q->('f=a:eq:1&f=b:eq:2&f=c:eq:3&f=d:eq:4')), qr/\+2 more\)\z/, 'more than two are counted';
+		like $F{_crumb_view_suffix}->($q->('range=last_30_days')), qr/\A \(last 30 days\)\z/i, 'a range';
+		is $F{_crumb_view_suffix}->($q->('range=nonsense')), '', 'an unknown range';
+		is $F{_crumb_view_suffix}->($q->('f=:eq:x&f=col')), '', 'malformed filters are left out';
+		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('<b>:eq:x'))), '', 'markup in a column is not repeated';
+		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('a:eq:<b>'))), '', 'nor in a value';
+		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape(('x' x 65) . ':eq:y'))), '', 'nor a value too long to be a label';
+	};
+
+	subtest 'Dashboard::_crumb_chart_subject' => sub {
+		my $s = sub { $F{_crumb_chart_subject}->($_[0], Mojo::Parameters->new($_[1])) };
+		is $s->('graph', 'x=when&y=amount'), 'amount by when', 'a line';
+		is $s->('scatter', 'x=a&y=b'), 'b by a', 'a scatter';
+		is $s->('heatmap', 'x=a&y=b'), 'a by b', 'a heatmap';
+		is $s->('stacked', 'cat=a&seg=b'), 'a by b', 'a stacked bar';
+		is $s->('pivot', 'rows=a,b'), 'a, b', 'a pivot';
+		is $s->('map', 'loc=town'), 'town', 'a map by place';
+		is $s->('map', 'lat=a&lon=b'), 'a, b', 'a map by position';
+		is $s->('map', ''), '', 'a map of nothing';
+		is $s->('bar', 'cat=region&val=amount'), 'amount by region', 'a bar';
+		is $s->('bar', 'cat=region'), 'Count by region', 'a bar with no measure counts';
+		is $s->('pie', 'cat=region&val=__count__'), 'Count by region', 'the count marker has a name';
+		is $s->('histogram', 'col=amount'), 'amount', 'a histogram';
+		is $s->('stats', ''), '', 'a page about the whole table has none';
+		is $s->('bar', 'cat=' . Mojo::Util::url_escape('<script>') . '&val=a'), '', 'markup is dropped, and a measure alone says nothing';
+	};
+
+	subtest 'Dashboard::_crumb_local -- a parent link has to be on this site' => sub {
+		my $c = dash_controller($app, '/bar');
+		is $F{_crumb_local}->($c, '/view/sales?x=1')->to_string, '/view/sales?x=1', 'a local link';
+		is $F{_crumb_local}->($c, 'http://localhost:3000/view/sales')->to_string, '/view/sales', 'an absolute one here is reduced';
+		is $F{_crumb_local}->($c, $_), undef, "'$_' is not followed" for
+			'', '/', 'http://evil.example/x', 'javascript:alert(1)', 'data:text/html,x', '//evil.example/x', 'view/sales';
+		is $F{_crumb_local}->($c, undef), undef, 'nor is nothing';
+	};
+
+	subtest 'Dashboard::_crumb_parent -- each kind of page' => sub {
+		my $c = dash_controller($app, '/');
+		my $p = sub { my $u = $F{_crumb_parent}->($c, Mojo::URL->new($_[0])); $u ? $u->to_string : undef };
+		is $p->('/bar?back=%2Fview%2Fsales'), '/view/sales', 'a chart follows back=';
+		like $p->('/bar?l=table:sales'), qr{\A/view/sales}, 'or falls back to its source';
+		is $p->('/view/sales?back2=%2Fbar%3Fcat%3Da'), '/bar?cat=a', 'a drill-down follows back2=';
+		is $p->('/view/sales'), undef, 'a table in data_dir has no parent';
+		is $p->('/import'), undef, 'nor an import with no link';
+		like $p->('/open?path=/a/b/c.csv'), qr{\A/browse\?path=%2Fa%2Fb}, 'a file has its folder';
+		is $p->('/open?path='), undef, 'no file, no folder';
+		is $p->('/open?path=/../host/x.csv'), undef, 'a remote file has no local folder';
+		like $p->('/tables?l=path:/a/b.db'), qr{\A/browse\?path=%2Fa}, 'a schema page has its folder';
+		is $p->('/tables?l=table:store'), undef, 'unless it has no path';
+		is $p->('/a/abc?back=%2Fcatalog'), '/catalog', 'a canvas follows back=';
+		is $p->('/nothing'), undef, 'anything else has none';
+		is $p->('/bar?back=http://evil.example/&l=nonsense'), undef, 'an outside link is never followed';
+	};
+
+	subtest 'Dashboard::_crumb_label -- each kind of page' => sub {
+		my $c = dash_controller($app, '/');
+		my $l = sub { $F{_crumb_label}->($c, Mojo::URL->new($_[0])) };
+		is $l->('/view/sales'), 'sales', 'a table';
+		is $l->('/open?path=/a/b.csv'), 'b.csv', 'a file';
+		is $l->('/open?path=/a/b.db&it=orders'), 'b.db: orders', 'a table in a file';
+		is $l->('/open'), undef, 'no file';
+		is $l->('/join?l=table:a&j=table:b|x|y'), 'a + b', 'a merge';
+		is $l->('/combine?l=table:a&c=table:b'), 'a + b', 'a combine';
+		is $l->('/join'), undef, 'a merge of nothing';
+		is $l->('/import?url=http://example.com/x'), 'example.com', 'an import';
+		is $l->('/import'), undef, 'of nowhere';
+		like $l->('/bar?cat=a&val=b'), qr/b by a\z/, 'a chart';
+		is $l->('/tables?l=table:store'), 'store schema', 'a schema';
+		is $l->('/tables'), undef, 'of nothing';
+		is $l->('/browse'), 'Files', 'browsing';
+		is $l->('/browse?path=/a/b'), 'Files: b', 'a folder';
+		is $l->('/catalog'), 'Catalog', 'the catalog';
+		is $l->('/tutorial'), 'Tutorial', 'the tutorial';
+		is $l->('/a/nosuchcanvas'), 'Canvas', 'an unknown canvas';
+		is $l->('/unknown'), undef, 'a page with no place in a trail';
+	};
+
+	subtest 'Dashboard::_breadcrumb_trail -- short, never endless' => sub {
+		is_deeply $F{_breadcrumb_trail}->(undef), [], 'no controller';
+		is_deeply $F{_breadcrumb_trail}->('x'), [], 'not a controller';
+		is_deeply $F{_breadcrumb_trail}->(dash_controller($app, '/')), [], 'Home is not in its own trail';
+
+		my $trail = $F{_breadcrumb_trail}->(dash_controller($app, '/bar?cat=a&back=%2Fview%2Fsales'));
+		is_deeply [ map { $_->{url} } @$trail ], [ '/view/sales', '/bar?cat=a&back=%2Fview%2Fsales' ], 'parent first, this page last';
+
+		my $self_loop = '/bar?back=' . Mojo::Util::url_escape('/bar?back=x');
+		lives_ok { $F{_breadcrumb_trail}->(dash_controller($app, $self_loop)) } 'a chain that goes nowhere';
+
+		# A URL naming itself as its own parent, and one nested very deep.
+		my $deep = '/view/sales';
+		$deep = '/bar?back=' . Mojo::Util::url_escape($deep) for 1 .. 40;
+		ok scalar(@{ $F{_breadcrumb_trail}->(dash_controller($app, $deep)) }) <= 10, 'a very deep chain is capped';
+		memory_cycle_ok($trail, 'no cycle');
+	};
+
+	subtest 'Dashboard::_template_languages, _has_templates, _data_dir_for' => sub {
+		my $home = Mojo::File->new(tempdir(CLEANUP => 1));
+		is_deeply [ $F{_template_languages}->($home, 'web') ], [], 'no templates directory';
+		is $F{_has_templates}->($home, 'web', 'en'), 0, 'so no language';
+
+		$home->child("templates/web/$_")->make_path for qw(fr en);
+		$home->child('templates/web/stray.txt')->spew('x');
+		is_deeply [ $F{_template_languages}->($home, 'web') ], [qw(en fr)], 'sorted, and only directories';
+		is $F{_has_templates}->($home, 'web', 'en'), 1, 'a language with a directory';
+		is $F{_has_templates}->($home, 'web', 'de'), 0, 'one without';
+		is $F{_has_templates}->($home, 'web', undef), 0, 'undef';
+		is $F{_has_templates}->($home, 'web', ''), 0, 'empty';
+
+		my $tm = isolated_app();
+		$tm->app->config->{data_dir} = 'relative';
+		is $F{_data_dir_for}->($tm->app)->to_string, $tm->app->home->child('relative')->to_string, 'a relative data_dir is under home';
+		my $abs = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir} = $abs;
+		is $F{_data_dir_for}->($tm->app)->to_string, $abs, 'an absolute one is used as given';
+		delete $tm->app->config->{data_dir};
+		is $F{_data_dir_for}->($tm->app)->to_string, $tm->app->home->child('data')->to_string, 'the default';
+	};
+
+	subtest 'Dashboard::_scan_join_tables' => sub {
+		my $tm  = isolated_app();
+		my $c   = dash_controller($tm->app, '/');
+		my $got = Database::BI::Controller::Dashboard::_scan_join_tables($c);
+		returns_is $got, { type => 'arrayref' }, 'a list';
+		ok((grep { $_->{spec} eq $SALES } @$got), 'each file has a spec');
+
+		$tm->app->config->{data_dir} = File::Spec->catdir(tempdir(CLEANUP => 1), 'absent');
+		is_deeply Database::BI::Controller::Dashboard::_scan_join_tables(dash_controller($tm->app, '/')), [], 'no data directory, no tables';
+	};
+
+	subtest 'Dashboard::_tidy_error' => sub {
+		is $F{_tidy_error}->('Bad thing at /a/b.pm line 3.'), 'Bad thing', 'one location';
+		is $F{_tidy_error}->("Bad at /a.pm line 3.\n at /b.pm line 4.\n"), 'Bad', 'one for each level it was passed up';
+		is $F{_tidy_error}->('Bad at /my dir/b.pm line 3.'), 'Bad', 'a path with a space in it';
+		is $F{_tidy_error}->('Look at this'), 'Look at this', 'text with no location is unchanged';
+		is $F{_tidy_error}->(undef), '', 'nothing';
+	};
+
+	subtest 'Dashboard::_schema_type_name and _schema_type_warnings' => sub {
+		is $F{_schema_type_name}->({ type => 'integer' }), 'INTEGER', 'from a hash';
+		is $F{_schema_type_name}->('text'), 'TEXT', 'from a string';
+		is $F{_schema_type_name}->($_), '', 'nothing to read' for undef, '', {}, { type => undef }, { type => [] }, { type => '' };
+
+		{
+			package Stub::Function::SchemaSource;
+			sub new    { bless { s => $_[1] }, $_[0] }
+			sub schema { my $s = $_[0]{s}; if (!ref $s) { require Carp; Carp::croak($s) } $s }
+		}
+		my $fn = \&Database::BI::Controller::Dashboard::_schema_type_warnings;
+		my $c  = dash_controller($app, '/');
+		my $sc = sub { Stub::Function::SchemaSource->new($_[0]) };
+
+		my @w = $fn->($c, $sc->({ a => 'INT', id => 'INT' }), $sc->({ a => 'TEXT', id => 'TEXT' }), 'L', 'R', 'id', 'id');
+		is scalar @w, 1, 'one column disagrees; the key is free to';
+		like $w[0], qr/\ba\b.*INT.*L.*TEXT.*R/, 'and the message says how';
+
+		is_deeply [ $fn->($c, $sc->({ a => 'INT' }), $sc->({ a => 'INT' }), 'L', 'R', '', '') ], [], 'agreement';
+		is_deeply [ $fn->($c, $sc->({ a => 'INT' }), $sc->({ b => 'TEXT' }), 'L', 'R', '', '') ], [], 'no column in common';
+		is_deeply [ $fn->($c, $sc->({ a => '' }), $sc->({ a => 'TEXT' }), 'L', 'R', '', '') ], [], 'an undeclared type';
+		is_deeply [ $fn->($c, $sc->({}), $sc->({ a => 'TEXT' }), 'L', 'R', '', '') ], [], 'no schema on one side';
+		lives_ok { $fn->($c, $sc->('boom'), $sc->({ a => 'TEXT' }), 'L', 'R', '', '') } 'a backend that dies';
+	};
+
+	subtest 'Dashboard::_is_iso_date, _to_iso_date, _date_key' => sub {
+		ok $F{_is_iso_date}->($_), "'$_' is ISO" for '2026-05-20', '2026-05-20T10:30', '2026-05-20 10:30:15';
+		ok !$F{_is_iso_date}->($_), "'$_' is not" for '', '5/20/2026', '2026-5-20', '2026-05-20T', "2026-05-20\n", 'x';
+		warnings_are { ok !$F{_is_iso_date}->(undef), 'undef is not' } [], 'and says so quietly';
+
+		is $F{_to_iso_date}->('2026-05-20'), '2026-05-20', 'ISO is unchanged';
+		is $F{_to_iso_date}->('2026-05-20T10:30:15'), '2026-05-20T10:30:15', 'with its time';
+		is $F{_to_iso_date}->('5/2/2026'), '2026-05-02', 'a US date';
+		is_deeply [ $F{_to_iso_date}->('junk') ], [], 'junk';
+		warnings_are { is_deeply [ $F{_to_iso_date}->(undef) ], [], 'nothing' } [], 'quietly';
+
+		is $F{_date_key}->('2026-05-20T10:30:15', 10), '2026-05-20', 'to the day';
+		is $F{_date_key}->('2026-05-20', 19), '2026-05-20T00:00:00', 'a day at second precision is its midnight';
+		is $F{_date_key}->('2026-05-20 10:30', 19), '2026-05-20T10:30:00', 'with no seconds';
+		is $F{_date_key}->('junk', 19), undef, 'junk';
+		is $F{_date_key}->(undef, 10), undef, 'nothing';
+	};
+
+	subtest 'Dashboard::_iso_day, _iso_second, _midday, _iso8601_utc' => sub {
+		is $F{_iso_day}->($NOW), '2026-05-20', 'a day';
+		is $F{_iso_second}->($NOW), '2026-05-20T12:00:00', 'a second';
+		is $F{_iso_day}->($F{_midday}->(0, 2, 126)), '2026-02-28', 'day 0 is the last of the month before';
+		is $F{_iso_day}->($F{_midday}->(1, -1, 126)), '2025-12-01', 'month -1 is December';
+		like $F{_iso8601_utc}->(), qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, 'a UTC stamp';
+	};
+
+	subtest 'Dashboard::_time_range_bounds -- every preset, on a known day' => sub {
+		my $b = sub { [ $F{_time_range_bounds}->($F{_time_range_preset}->($_[0]), $NOW) ] };
+		is_deeply $b->('today'), [ '2026-05-20', '2026-05-20' ], 'today';
+		is_deeply $b->('yesterday'), [ '2026-05-19', '2026-05-19' ], 'yesterday';
+		is_deeply $b->('last_7_days'), [ '2026-05-14', '2026-05-20' ], 'seven days, today included';
+		is_deeply $b->('this_month'), [ '2026-05-01', '2026-05-20' ], 'this month ends today';
+		is_deeply $b->('last_month'), [ '2026-04-01', '2026-04-30' ], 'last month is whole';
+		is_deeply $b->('this_quarter'), [ '2026-04-01', '2026-05-20' ], 'this quarter';
+		is_deeply $b->('last_quarter'), [ '2026-01-01', '2026-03-31' ], 'last quarter';
+		is_deeply $b->('this_year'), [ '2026-01-01', '2026-05-20' ], 'this year';
+		is_deeply $b->('last_year'), [ '2025-01-01', '2025-12-31' ], 'last year';
+		is_deeply $b->('last_24_hours'), [ '2026-05-19T12:00:00', '2026-05-20T12:00:00' ], 'hours are to the second';
+		is_deeply [ $F{_time_range_bounds}->({}, $NOW) ], [], 'a preset with no window has none';
+
+		# Across a year boundary: January's last month and first quarter's last quarter.
+		my $jan = POSIX::mktime(0, 0, 12, 15, 0, 126);
+		is_deeply [ $F{_time_range_bounds}->($F{_time_range_preset}->('last_month'), $jan) ], [ '2025-12-01', '2025-12-31' ], 'last month from January';
+		is_deeply [ $F{_time_range_bounds}->($F{_time_range_preset}->('last_quarter'), $jan) ], [ '2025-10-01', '2025-12-31' ], 'last quarter from January';
+	};
+
+	subtest 'Dashboard::_time_range_specs, _preset, _presets' => sub {
+		is_deeply $F{_time_range_specs}->('d', '2026-01-01', '2026-02-01'), [ 'd:ge:2026-01-01', 'd:le:2026-02-01' ], 'two bounds';
+		is_deeply $F{_time_range_specs}->(@$_), [], 'missing a part' for [ '', 'a', 'b' ], [ 'd', '', 'b' ], [ 'd', 'a', '' ], [ undef, 'a', 'b' ];
+		is $F{_time_range_preset}->($_), undef, 'an unknown name is nothing, not a croak' for undef, '', 'nope', '../x';
+		ok $F{_time_range_preset}->('today'), 'a known one';
+		my $presets = $F{_time_range_presets}->($NOW);
+		returns_is $presets, { type => 'arrayref' }, 'the menu is a list';
+		ok !(grep { !length($_->{name} // '') || !length($_->{label} // '') || !length($_->{lo} // '') } @$presets), 'each entry is complete';
+	};
+
+	subtest 'Dashboard::_apply_time_range -- a stale bookmark shows everything' => sub {
+		my $today = $F{_iso_day}->(time());
+		my @rows = ({ d => $today, n => 1 }, { d => '1999-01-01', n => 2 });
+		is_deeply [ map { $_->{n} } @{ $F{_apply_time_range}->(\@rows, 'last_7_days', 'd') } ], [1], 'a real range filters';
+		is $F{_apply_time_range}->(\@rows, $_, 'd'), \@rows, 'an unknown name leaves the rows' for undef, '', 'nope';
+		is $F{_apply_time_range}->(\@rows, 'today', $_), \@rows, 'an unusable column leaves them' for undef, '', 'a:b';
+	};
+
+	subtest 'Dashboard::_trim' => sub {
+		is $F{_trim}->("  a b \n"), 'a b', 'both ends';
+		is $F{_trim}->(undef), '', 'nothing';
+		is $F{_trim}->('   '), '', 'only space';
+		keeps_globals_ok('_trim', sub { $F{_trim}->(' x ') });
+	};
+
+	subtest 'Dashboard::_dedup_requested' => sub {
+		is $F{_dedup_requested}->(dash_controller($app, '/?d=1')), 1, 'd=1';
+		is $F{_dedup_requested}->(dash_controller($app, '/?d=0')), 0, 'd=0';
+		is $F{_dedup_requested}->(dash_controller($app, '/')), 0, 'none';
+	};
+
+	subtest 'Dashboard::_filter_specs_to_criteria -- only a SQL backend is pushed to' => sub {
+		{
+			package Stub::Function::SqlSource;
+			sub dbi_source { 1 }
+			package Stub::Function::CsvSource;
+			sub dbi_source { undef }
+			package Stub::Function::NoDbi;
+			sub new { bless {}, shift }
+		}
+		my $sql = bless {}, 'Stub::Function::SqlSource';
+		my @specs = ('a:eq:1');
+		for my $src (undef, bless({}, 'Stub::Function::CsvSource'), Stub::Function::NoDbi->new) {
+			my ($crit, $res) = $F{_filter_specs_to_criteria}->(\@specs, $src);
+			is_deeply $crit, {}, 'nothing pushed without SQL';
+			is_deeply $res, \@specs, 'it all stays in Perl';
+		}
+
+		my %want = (
+			'a:eq:x'       => { a => { -like => 'x' } },
+			'a:ne:x'       => { a => { -not_like => 'x' } },
+			'a:contains:x' => { a => { -like => '%x%' } },
+			'a:starts:x'   => { a => { -like => 'x%' } },
+			'a:lt:1'       => { a => { '<' => 1 } },
+			'a:le:1'       => { a => { '<=' => 1 } },
+			'a:gt:1'       => { a => { '>' => 1 } },
+			'a:ge:1'       => { a => { '>=' => 1 } },
+		);
+		for my $spec (sort keys %want) {
+			my ($crit, $res) = $F{_filter_specs_to_criteria}->([$spec], $sql);
+			is_deeply $crit, $want{$spec}, "$spec is pushed";
+			is_deeply $res, [], 'and not repeated';
+		}
+	};
+
+	subtest 'Dashboard::_filter_specs_to_criteria -- what must not reach SQL' => sub {
+		my $sql = bless {}, 'Stub::Function::SqlSource';
+		for my $spec ('a:eq:50%', 'a:eq:a_b', 'a:ne:%', 'a:contains:%', 'a:starts:_', 'a:lt:abc', 'a:le:$5', 'a:gt:1,000', 'a:ge:',
+			'a:empty', 'a:notempty', 'a:between:1:2', 'a:nosuchop:1') {
+			my ($crit, $res) = $F{_filter_specs_to_criteria}->([$spec], $sql);
+			is_deeply $crit, {}, "$spec is not pushed";
+			is_deeply $res, [$spec], 'it is filtered in Perl instead';
+		}
+		my ($crit, $res) = $F{_filter_specs_to_criteria}->([ 'a:gt:1', 'a:lt:9' ], $sql);
+		is_deeply $crit, { a => { '>' => 1 } }, 'the first condition on a column is pushed';
+		is_deeply $res, ['a:lt:9'], 'the second stays, so the AND holds';
+		($crit, $res) = $F{_filter_specs_to_criteria}->([ '', ':eq:x', 'col', 'col:' ], $sql);
+		is_deeply [ $crit, $res ], [ {}, [] ], 'malformed specs are dropped';
+	};
+
+	subtest 'Dashboard::_measure' => sub {
+		is_deeply $F{_measure}->('sum', 'a', 'v'), { fn => 'sum', col => 'a', as => 'v' }, 'with a column';
+		is_deeply $F{_measure}->('count', undef, 'v'), { fn => 'count', as => 'v' }, 'COUNT(*) has none';
+	};
+
+	subtest 'Dashboard::_numeric_cell -- what is a number' => sub {
+		is $F{_numeric_cell}->('12'), 12, 'an integer';
+		is $F{_numeric_cell}->('-1.5'), -1.5, 'a negative';
+		is $F{_numeric_cell}->('$1,234.56'), 1234.56, 'currency and thousands';
+		is $F{_numeric_cell}->('(1,234.56)'), -1234.56, 'accounting brackets';
+		is $F{_numeric_cell}->('USD 100'), 100, 'a currency code before';
+		is $F{_numeric_cell}->('100 EUR'), 100, 'or after';
+		is $F{_numeric_cell}->('50%'), 50, 'a percentage';
+		is $F{_numeric_cell}->('1e3'), 1000, 'scientific notation is its value, not 13';
+		is $F{_numeric_cell}->("\xC2\xA35"), 5, 'a pound sign in UTF-8';
+	};
+
+	# Why: its contract is undef for non-numeric input.  Stripping everything but
+	# digits read 'SKU123' as 123, 12/25/2025 as 12252025, and made any code column
+	# a chartable measure with a total nobody asked for.
+	subtest 'Dashboard::_numeric_cell -- text that merely holds digits is not' => sub {
+		is $F{_numeric_cell}->($_), undef, "'$_' is not a number" for
+			'', 'abc', 'SKU123', 'A1', 'AB-100', 'R2D2', 'v1.2', '12/25/2025', '2026-05-20', '10:30', '1.2.3', '--5', '-', '.', '()', 'Widget 2';
+		is $F{_numeric_cell}->(undef), undef, 'nor is nothing';
+		keeps_globals_ok('_numeric_cell', sub { $F{_numeric_cell}->('$5') });
+	};
+
+	subtest 'Dashboard::_column_is_numeric' => sub {
+		my $r = sub { [ map { { a => $_ } } @_ ] };
+		is $F{_column_is_numeric}->($r->(1, 2, '$3'), 'a'), 1, 'all numbers';
+		is $F{_column_is_numeric}->($r->(1, 'x'), 'a'), 0, 'one that is not';
+		is $F{_column_is_numeric}->($r->('', undef, 5), 'a'), 1, 'blanks are passed over';
+		is $F{_column_is_numeric}->($r->('', undef), 'a'), 0, 'only blanks is not numeric';
+		is $F{_column_is_numeric}->($r->('SKU1', 'SKU2'), 'a'), 0, 'product codes are not a measure';
+		is $F{_column_is_numeric}->($r->('12/25/2025'), 'a'), 0, 'nor are dates';
+		is $F{_column_is_numeric}->(undef, 'a'), 0, 'no rows';
+		is $F{_column_is_numeric}->([ { b => 1 } ], 'a'), 0, 'a column that is not there';
+		is $F{_column_is_numeric}->($r->((1) x 20, 'x'), 'a'), 1, 'only the first twenty are read, by design';
+	};
+
+	subtest 'Dashboard::_cross_row_values -- the arithmetic' => sub {
+		my $v = sub { [ $F{_cross_row_values}->(@_) ] };
+		is_deeply $v->('running_total', [ 1, 2, 3 ]), [ 1, 3, 6 ], 'running total';
+		is_deeply $v->('running_total', [ 1, undef, 3 ]), [ 1, undef, 4 ], 'a gap stays a gap';
+		is_deeply $v->('running_count', [ undef, undef ]), [ 1, 2 ], 'running count counts rows';
+		is_deeply $v->('running_pct', [ 1, 3 ]), [ 0.25, 1 ], 'running percent';
+		is_deeply $v->('running_pct', [ 0, 0 ]), [ undef, undef ], 'of a zero total is nothing, not a division by it';
+		is_deeply $v->('window_sum', [ 1, 2, 3 ], 2), [ 1, 3, 5 ], 'window sum';
+		is_deeply $v->('window_avg', [ 1, 3, undef ], 2), [ 1, 2, 3 ], 'window average of what is there';
+		is_deeply $v->('window_sum', [ undef, undef ], 2), [ undef, undef ], 'an empty window is nothing';
+		is_deeply $v->('window_sum', [ 1, 2 ], 9_999_999), [ 1, 3 ], 'a window larger than the data';
+		is_deeply $v->('lag', [ 1, 2, 3 ]), [ undef, 1, 2 ], 'lag';
+		is_deeply $v->('delta', [ 1, 4, undef, 5 ]), [ undef, 3, undef, undef ], 'delta needs both';
+		is_deeply $v->('pct_change', [ 2, 3, 0, 5 ]), [ undef, 0.5, -1, undef ], 'percent change, never from zero';
+		is_deeply $v->('pct_of_total', [ 1, 3, undef ]), [ 0.25, 0.75, undef ], 'percent of total';
+		is_deeply $v->('pct_of_total', [ 0, undef ]), [ undef, undef ], 'of nothing';
+		is_deeply $v->('rank', [ 10, 30, 30, 5, undef ]), [ 3, 1, 1, 4, undef ], 'rank, with ties sharing and skipping';
+		is_deeply $v->('zscore', [ 5 ]), [ undef ], 'zscore of one value';
+		is_deeply $v->('zscore', [ 5, 5 ]), [ undef, undef ], 'of no spread';
+		my $z = $v->('zscore', [ 1, 3 ]);
+		cmp_ok $z->[0], '<', 0, 'below the mean is negative';
+		cmp_ok $z->[1], '>', 0, 'above it positive';
+		is_deeply $v->('running_total', []), [], 'no rows';
+		throws_ok { $F{_cross_row_values}->('nosuch', [ 1 ]) } qr/\AUnknown cross-row function 'nosuch' at /, 'an unknown function';
+	};
+
+	subtest 'Dashboard::_cross_row_cmp' => sub {
+		is $F{_cross_row_cmp}->('20', '100'), -1, 'numbers as numbers';
+		is $F{_cross_row_cmp}->('$20', '$3'), 1, 'with currency';
+		is $F{_cross_row_cmp}->('a', 'b'), -1, 'text as text';
+		is $F{_cross_row_cmp}->('a', 'A'), 1, 'case matters, so it is total';
+		is $F{_cross_row_cmp}->(undef, undef), 0, 'nothing and nothing';
+		is $F{_cross_row_cmp}->(undef, 'a'), -1, 'nothing sorts first';
+		is $F{_cross_row_cmp}->('10', 'a'), -1, 'a mix falls back to text';
+	};
+
+	subtest 'Dashboard::_cross_row_specs_from -- a plan, or why not' => sub {
+		my $c = dash_controller($app, '/');
+		my $fn = \&Database::BI::Controller::Dashboard::_cross_row_specs_from;
+		my @cols = qw(a b d);
+		my $err = sub { $fn->($c, \@cols, $_[0])->{error} };
+
+		is $fn->($c, \@cols, {}), undef, 'no plan';
+		is $fn->($c, \@cols, { cs => [ '', undef, [] ] }), undef, 'nothing usable in it';
+
+		my $ok = $fn->($c, \@cols, { cs => ['a:running_total:t'], by => ' b , ', order => [ 'd:DESC', ' a ' ] });
+		is_deeply $ok->{specs}, [ { col => 'a', fn => 'running_total', as => 't', arg => undef } ], 'the spec';
+		is_deeply $ok->{by}, ['b'], 'the partition, trimmed';
+		is_deeply $ok->{order}, [ { col => 'd', dir => 'desc' }, { col => 'a', dir => 'asc' } ], 'the order, with its default';
+
+		like $err->({ cs => ['a'] }), qr/must be <column>:<function>:<alias>/, 'too few parts';
+		like $err->({ cs => ['nope:rank:r'] }), qr/nope/, 'a column that does not exist';
+		like $err->({ cs => ['a:system:r'] }), qr/Unknown cross-row function "system"/, 'a function that does not exist';
+		like $err->({ cs => ['a:rank:1bad'] }), qr/1bad/, 'an alias that is not an identifier';
+		like $err->({ cs => ['a:rank:b'] }), qr/\bb\b/, 'an alias that is already a column';
+		like $err->({ cs => [ 'a:rank:r', 'b:rank:r' ] }), qr/\br\b/, 'an alias used twice';
+		like $err->({ cs => ['a:window_sum:w'], order => ['d'] }), qr/window_sum/, 'a window with no size';
+		like $err->({ cs => ['a:window_sum:w:0'], order => ['d'] }), qr/window_sum/, 'a window of none';
+		like $err->({ cs => ['a:window_sum:w:x'], order => ['d'] }), qr/window_sum/, 'a window of text';
+		like $err->({ cs => ['a:rank:r:5'] }), qr/rank/, 'a size for a function that takes none';
+		like $err->({ cs => ['a:rank:r'], by => 'nope' }), qr/nope/, 'a partition that does not exist';
+		like $err->({ cs => ['a:rank:r'], order => ['nope'] }), qr/nope/, 'an order that does not exist';
+		like $err->({ cs => ['a:rank:r'], order => ['a:sideways'] }), qr/sideways/, 'a direction that does not';
+		like $err->({ cs => ['a:running_total:t'] }), qr/running_total/, 'a running total with no order is refused by name';
+	};
+
+	subtest 'Dashboard::_cross_row_specs and _apply_cross_row' => sub {
+		my $c = dash_controller($app, '/?cs=a:running_total:t&by=g&order=a');
+		my @rows = ({ g => 'x', a => 2 }, { g => 'y', a => 5 }, { g => 'x', a => 1 });
+		my ($got, $cols) = Database::BI::Controller::Dashboard::_apply_cross_row($c, \@rows, [qw(g a)]);
+		is_deeply [ map { $_->{t} } @$got ], [ 3, 5, 1 ], 'each partition keeps its own total, read along order=';
+		is_deeply [ map { $_->{a} } @$got ], [ 2, 5, 1 ], 'and the rows stay where they were';
+		is_deeply $cols, [qw(g a t)], 'the new column is added';
+		is $c->stash('_virtual_columns')->{t}, 1, 'and marked virtual, so it is not pushed to SQL';
+
+		my $none = dash_controller($app, '/');
+		my ($same, $same_cols) = Database::BI::Controller::Dashboard::_apply_cross_row($none, \@rows, [qw(g a)]);
+		is $same, \@rows, 'no plan leaves the rows alone';
+
+		my $bad = dash_controller($app, '/?cs=nope:rank:r');
+		throws_ok { Database::BI::Controller::Dashboard::_apply_cross_row($bad, \@rows, [qw(g a)]) } qr/nope/, 'a bad plan croaks for the route to answer';
+
+		# A locked row, as SQL-backed sources return.
+		require Hash::Util;
+		my %locked = (g => 'x', a => 1);
+		Hash::Util::lock_ref_keys(\%locked);
+		my ($ext) = Database::BI::Controller::Dashboard::_apply_cross_row(dash_controller($app, '/?cs=a:rank:r'), [ \%locked ], [qw(g a)]);
+		is $ext->[0]{r}, 1, 'a locked row is extended by copying';
+		ok !exists $locked{r}, 'and the original is not touched';
+
+		my ($derived, $dc) = Database::BI::Controller::Dashboard::_apply_cross_row(dash_controller($app, '/?cs=a:rank:r'), [ { a => 1 } ], undef);
+		is_deeply $dc, [qw(a r)], 'with no column list, the first row gives one';
+	};
+
+	subtest 'Dashboard::_card_plan' => sub {
+		is_deeply $F{_card_plan}->({}), { cs => [], by => '', order => [] }, 'an empty plan';
+		is_deeply $F{_card_plan}->({ cs => [ 'a', '', undef ], by => 'b', order => ['c'] }), { cs => ['a'], by => 'b', order => ['c'] }, 'blanks dropped';
+		is $F{_card_plan}->({ cs => 'x' })->{error}, 'cross_row.cs must be a list', 'cs of the wrong kind';
+		is $F{_card_plan}->({ order => {} })->{error}, 'cross_row.order must be a list', 'order too';
+		is $F{_card_plan}->({ cs => [ [] ] })->{error}, 'cross_row.cs must be a list of strings', 'a list of the wrong things';
+		is $F{_card_plan}->({ by => [] })->{error}, 'cross_row.by must be a column name', 'by of the wrong kind';
+	};
+
+	subtest 'Dashboard::_cross_row_ui_state' => sub {
+		my %got = $F{_cross_row_ui_state}->(dash_controller($app, '/?cs=a:rank:r&by=g&order=d&l=x&f=1&f=2'));
+		is_deeply $got{cross_row_specs}, ['a:rank:r'], 'the specs';
+		is $got{cross_row_by}, 'g', 'the partition';
+		is_deeply $got{cross_row_order}, ['d'], 'the order';
+		is_deeply [ sort map { "$_->{name}=$_->{value}" } @{ $got{cross_row_hidden} } ], [qw(f=1 f=2 l=x)],
+			'the rest are carried, and its own three are not, or a second by= would win';
+		my %empty = $F{_cross_row_ui_state}->(dash_controller($app, '/'));
+		is_deeply $empty{cross_row_specs}, [], 'nothing asked';
+		is $empty{cross_row_by}, '', 'nothing asked';
+	};
+
+	subtest 'Dashboard::_calc_spec_key' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_calc_spec_key;
+		is $fn->(dash_controller($app, '/?l=path:/x.csv')), 'path:/x.csv', 'l= first';
+		my $c = dash_controller($app, '/');
+		is $fn->($c), '', 'nothing to go on';
+		$c->stash(table => 'sales');
+		is $fn->($c), $SALES, 'or the table of a /view';
+		$c->stash(table => '../evil');
+		is $fn->($c), '', 'a name that is not safe is not a key';
+	};
+
+	subtest 'Dashboard::_span_calc_spec' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_span_calc_spec;
+		my $at = sub { dash_controller($app, $_[0]) };
+		my @cols = ('at', 'my col', 'region');
+
+		is $fn->($at->('/'), \@cols, 'cat'), undef, 'no bucket asked for';
+		like $fn->($at->('/?tcol=at'), \@cols, 'cat')->{error}, qr/\bat\b/, 'a column with no interval';
+		like $fn->($at->('/?span=nonsense&cat=at'), \@cols, 'cat')->{error}, qr/nonsense/, 'a bad interval';
+		like $fn->($at->('/?span=1d&tcol=nope'), \@cols, 'cat')->{error}, qr/nope/, 'an unknown column';
+		ok $fn->($at->('/?span=1d'), \@cols, 'cat')->{error}, 'nothing to bucket';
+		ok $fn->($at->('/?span=1d&rows=at,region'), \@cols, 'rows')->{error}, 'two candidates are refused rather than guessed';
+		like $fn->($at->('/?span=1d&tcol=at&as=1bad'), \@cols, 'cat')->{error}, qr/1bad/, 'a name that is not an identifier';
+		like $fn->($at->('/?span=1d&tcol=at&as=region'), \@cols, 'cat')->{error}, qr/region/, 'a name already taken';
+		like $fn->($at->('/?span=1d&tcol=at&as=z&c=z:1'), \@cols, 'cat')->{error}, qr/\bz\b/, 'or taken by a calculated field';
+
+		my $inject = $fn->($at->('/?span=1d&tcol=at&as=' . Mojo::Util::url_escape("x'); system('y")), \@cols, 'cat');
+		ok $inject->{error}, 'a name holding code is refused';
+
+		is_deeply $fn->($at->('/?span=1mon&cat=at'), \@cols, 'cat'), { src => 'at', col => 'at_span', calc => ["at_span:span(at,'1mon')"] }, 'the expression a reader could type';
+		is $fn->($at->('/?span=1d&tcol=my%20col'), \@cols, 'cat')->{col}, 'my_col_span', 'spaces become underscores';
+		is $fn->($at->('/?span=1d&tcol=at&as=bucket'), \@cols, 'cat')->{col}, 'bucket', 'a chosen name';
+	};
+
+	subtest 'Dashboard::_extend_row' => sub {
+		my %plain = (a => 1);
+		is $F{_extend_row}->(\%plain, 'b', 2), \%plain, 'a writable row is written to';
+		is $plain{b}, 2, 'in place';
+		is $F{_extend_row}->('x', 'b', 2), 'x', 'something that is not a row is passed along';
+		is $F{_extend_row}->(undef, 'b', 2), undef, 'nothing too';
+
+		require Hash::Util;
+		my %locked = (a => 1);
+		Hash::Util::lock_ref_keys(\%locked);
+		my $copy;
+		lives_ok { $copy = $F{_extend_row}->(\%locked, 'b', 2) } 'a locked row does not raise';
+		is_deeply $copy, { a => 1, b => 2 }, 'the copy has both';
+		ok !exists $locked{b}, 'the original is as it was';
+		$copy->{c} = 3;
+		is $copy->{c}, 3, 'and the copy can take another';
+	};
+
+	subtest 'Dashboard::_canonical_path and _inside_dir' => sub {
+		my $base = Mojo::File->new(tempdir(CLEANUP => 1))->realpath;
+		is $F{_canonical_path}->($base), File::Spec->canonpath($base->to_string), 'a directory that exists';
+		is $F{_canonical_path}->($base->child('a/b/c')), File::Spec->canonpath($base->child('a/b/c')->to_string), 'one that does not yet';
+
+		SKIP: {
+			skip 'no symlinks here', 2 unless eval { symlink($base->to_string, "$base.link") };
+			is $F{_canonical_path}->(Mojo::File->new("$base.link")), File::Spec->canonpath($base->to_string), 'a symlink is resolved';
+			is $F{_canonical_path}->(Mojo::File->new("$base.link/new/dir")), File::Spec->canonpath($base->child('new/dir')->to_string), 'even with names below it that do not exist';
+			unlink "$base.link";
+		}
+
+		is $F{_inside_dir}->('/a/b', '/a/b'), 1, 'itself';
+		is $F{_inside_dir}->('/a/b/c', '/a/b'), 1, 'below it';
+		is $F{_inside_dir}->('/a/b-archive', '/a/b'), 0, 'a textual prefix is not inside';
+		is $F{_inside_dir}->('/a', '/a/b'), 0, 'above it';
+		is $F{_inside_dir}->('/x', '/a'), 0, 'elsewhere';
+		is $F{_inside_dir}->('/a/..b', '/a'), 1, 'a name that starts with two dots is a name';
+		is $F{_inside_dir}->('', '/a'), 0, 'no path';
+		is $F{_inside_dir}->('/a', ''), 0, 'no directory';
+	};
+
+	# Windows' realpath leaves symlinks alone, so _canonical_path follows them
+	# there with _follow_links.  It is written for any platform, so it is
+	# checked here against realpath wherever there are symlinks.
+	subtest 'Dashboard::_follow_links -- agrees with realpath' => sub {
+		my $fn   = \&Database::BI::Controller::Dashboard::_follow_links;
+		my $base = Mojo::File->new(tempdir(CLEANUP => 1))->realpath;
+		$base->child('real', 'deep')->make_path;
+		$base->child('real', 'deep', 'f.csv')->spew("a\n1\n");
+		plan skip_all => 'no symlinks here'
+			unless eval { symlink($base->child('real')->to_string, $base->child('abs')->to_string) };
+		symlink('real/deep', $base->child('rel')->to_string);           # relative
+		symlink('../rel', $base->child('real', 'up')->to_string);        # .. in the target
+		symlink('abs', $base->child('chain')->to_string);                # a link to a link
+		# The NT form some Windows perls' readlink gives; here just a name.
+		symlink('\\??\\' . $base->child('real')->to_string, $base->child('nt')->to_string);
+		symlink('loop2', $base->child('loop1')->to_string);
+		symlink('loop1', $base->child('loop2')->to_string);
+
+		# Not compared with realpath: on Windows that gives undef for a path
+		# through a link, which is why this function exists.
+		my %where = (
+			'abs'                     => 'real',
+			'abs/deep/f.csv'          => 'real/deep/f.csv',
+			'rel'                     => 'real/deep',
+			'rel/f.csv'               => 'real/deep/f.csv',
+			'real/up'                 => 'real/deep',
+			'real/up/f.csv'           => 'real/deep/f.csv',
+			'chain/deep'              => 'real/deep',
+			'real/deep/../deep/f.csv' => 'real/deep/f.csv',
+			'real'                    => 'real',
+			'abs/not/yet'             => 'real/not/yet',
+			'nt/deep'                 => 'real/deep',
+		);
+		for my $p (sort keys %where) {
+			my $got = $fn->($base->child(split m{/}, $p)->to_string);
+			is(defined $got ? File::Spec->canonpath($got) : undef,
+				File::Spec->canonpath($base->child(split m{/}, $where{$p})->to_string), $p);
+		}
+		is $fn->($base->child('loop1')->to_string), undef, 'a loop gives up';
+
+		# As on Windows: realpath gives undef for a path through a link, and
+		# tidies any other.  _canonical_path, and so every data_dir guard, must
+		# still see where the link goes.
+		{
+			no warnings 'redefine';
+			local $^O = 'MSWin32';
+			local *Database::BI::Controller::Dashboard::realpath = sub {
+				my $abs = File::Spec->rel2abs($_[0]);
+				my @parts = File::Spec->splitdir($abs);
+				for my $i (1 .. $#parts) {
+					return undef if -l File::Spec->catdir(@parts[0 .. $i]);
+				}
+				return $abs;
+			};
+			is $F{_canonical_path}->($base->child('abs', 'deep')), $base->child('real', 'deep')->to_string,
+				'_canonical_path follows a link where realpath does not';
+			is $F{_canonical_path}->($base->child('rel', 'new')), $base->child('real', 'deep', 'new')->to_string,
+				'and a relative one, below which names do not exist yet';
+			is $F{_inside_dir}->($F{_canonical_path}->($base->child('abs', 'deep')), $base->child('abs')->to_string), 0,
+				'so a link cannot make the outside look inside';
+		}
+	};
+
+	subtest 'Dashboard::_calc_models_path -- never inside the data' => sub {
+		my $tm = isolated_app();
+		my $fn = \&Database::BI::Controller::Dashboard::_calc_models_path;
+		my $c  = dash_controller($tm->app, '/');
+		my $store = Mojo::File->new($tm->app->config->{model_dir});
+		is $fn->($c), $store->child('models.json')->to_string, 'under model_dir';
+
+		my $fresh = $store->child('fresh');
+		$tm->app->config->{model_dir} = $fresh->to_string;
+		$fn->($c);
+		ok -d $fresh, 'made on first call';
+
+		my $data = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir}  = $data;
+		$tm->app->config->{model_dir} = File::Spec->catdir($data, '.bi');
+		my $got = 'unset';
+		warning_like { $got = $fn->($c) } qr/model_dir is inside data_dir/, 'a store in the data is refused, loudly';
+		is $got, undef, 'with no path';
+		ok !-e File::Spec->catdir($data, '.bi'), 'and nothing is made there';
+
+		# A file where the directory should go.
+		my $plain = $store->child('in-the-way');
+		$plain->spew('x');
+		$tm->app->config->{data_dir}  = tempdir(CLEANUP => 1);
+		$tm->app->config->{model_dir} = $plain->child('sub')->to_string;
+		is $fn->($c), undef, 'a store that cannot be made is no path, not a crash';
+	};
+
+	# Why: Mojo::File->child appends an absolute path instead of replacing the base,
+	# so this guard compared against <home>/<abs> and let a store through into the
+	# very directory it exists to protect.  _data_dir_for's comment says as much.
+	subtest 'Dashboard::_analyses_path -- never inside the data, however it is spelled' => sub {
+		my $tm = isolated_app();
+		my $fn = \&Database::BI::Controller::Dashboard::_analyses_path;
+		my $c  = dash_controller($tm->app, '/');
+		is $fn->($c), Mojo::File->new($tm->app->config->{model_dir})->child('analyses.json')->to_string, 'under model_dir';
+
+		my $data = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir}  = $data;
+		$tm->app->config->{model_dir} = File::Spec->catdir($data, '.bi');
+		my $got = 'unset';
+		warning_like { $got = $fn->($c) } qr/model_dir is inside data_dir/, 'an absolute data_dir is honoured';
+		is $got, undef, 'with no path';
+		ok !-e File::Spec->catdir($data, '.bi'), 'and nothing is made there';
+	};
+
+	subtest 'Dashboard::_read_models and _write_models' => sub {
+		my $tm = isolated_app();
+		my $c  = dash_controller($tm->app, '/');
+		my $rd = \&Database::BI::Controller::Dashboard::_read_models;
+		my $wr = \&Database::BI::Controller::Dashboard::_write_models;
+		my $file = Mojo::File->new($tm->app->config->{model_dir})->child('models.json');
+
+		is_deeply $rd->($c), { version => 1, fields => {}, groups => {}, date_patterns => {}, lookups => {}, extractions => {}, accelerated => {} }, 'an empty scaffold';
+		is $wr->($c, { version => 1, fields => { x => { a => 'b' } } }), 1, 'writing says so';
+		is $rd->($c)->{fields}{x}{a}, 'b', 'and it comes back';
+		is_deeply $rd->($c)->{groups}, {}, 'with the missing sections filled in';
+		is_deeply $rd->($c)->{lookups}, {}, 'the lookups too';
+		memory_cycle_ok($rd->($c), 'no cycle');
+
+		for my $junk ('', 'not json', '[1,2]', '"x"', '{') {
+			$file->spew($junk);
+			is_deeply $rd->($c), { version => 1, fields => {}, groups => {}, date_patterns => {}, lookups => {}, extractions => {}, accelerated => {} }, "'$junk' reads as empty";
+		}
+
+		# Why: callers go straight to ->{fields}{$key}.  A hand-edited section of the
+		# wrong shape must not be a strict-refs crash on every page of the site.
+		$file->spew('{"fields":"oops","groups":[1],"date_patterns":7}');
+		my $got;
+		lives_ok { $got = $rd->($c) } 'sections of the wrong shape';
+		is ref $got->{$_}, 'HASH', "$_ comes back a hash" for qw(fields groups date_patterns);
+
+		$file->remove;
+		$file->make_path;
+		is $wr->($c, {}), 0, 'a write that fails says so';
+	};
+
+	subtest 'Dashboard::_read_analyses and _write_analyses' => sub {
+		my $tm  = isolated_app();
+		my $c   = dash_controller($tm->app, '/');
+		my $rd  = \&Database::BI::Controller::Dashboard::_read_analyses;
+		my $wr  = \&Database::BI::Controller::Dashboard::_write_analyses;
+		my $dir = Mojo::File->new($tm->app->config->{model_dir});
+		my $file = $dir->child('analyses.json');
+
+		is_deeply $rd->($c), {}, 'none yet';
+		$wr->($c, { abc => { name => 'n' } });
+		is $rd->($c)->{abc}{name}, 'n', 'a round trip';
+		for my $junk ('', 'not json', '[1]') {
+			$file->spew($junk);
+			is_deeply $rd->($c), {}, "'$junk' reads as none";
+		}
+
+		# Why: the temp-and-rename is there so a failed save leaves things as they
+		# were.  A rename that fails has to be noticed, or the temp file stays
+		# behind on every save and the caller is told nothing went wrong.
+		$file->remove;
+		$file->make_path;
+		my @logged;
+		$tm->app->log->level('warn');
+		my $sub = $tm->app->log->on(message => sub { push @logged, $_[2] if $_[1] eq 'warn' });
+		lives_ok { $wr->($c, { a => {} }) } 'a save that cannot complete does not die';
+		$tm->app->log->unsubscribe(message => $sub);
+		ok((grep { /Cannot write/ } @logged), 'it says so in the log');
+		is_deeply [ map { $_->basename } grep { $_->basename ne 'analyses.json' } @{ $dir->list({ dir => 1 }) } ], [], 'and leaves no temp file behind';
+	};
+
+	subtest 'Dashboard::_gen_analysis_id' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_gen_analysis_id;
+		my $c  = dash_controller($app, '/');
+		my %seen;
+		for (1 .. 200) {
+			my $id = $fn->($c);
+			$seen{$id}++;
+			like $id, qr/\A[A-Za-z0-9]{10}\z/, 'ten safe characters' if $_ == 1;
+		}
+		is scalar keys %seen, 200, 'and they do not repeat';
+		ok !(grep { !/\A[A-Za-z0-9]+\z/ } keys %seen), 'so a URL can always hold one';
+	};
+
+	subtest 'Dashboard::_validate_layout' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_validate_layout;
+		my $c  = dash_controller($app, '/');
+		my $e  = sub { $fn->($c, $_[0]) };
+		my %good = (visual => 0, x => 1, y => 1, w => 3, h => 2);
+		is $e->(undef), undef, 'none';
+		is $e->([]), undef, 'empty';
+		is $e->([ \%good, { %good, visual => 1, x => 4 } ]), undef, 'two side by side';
+		is $e->('x'), 'layout must be an array', 'not a list';
+		is $e->([ 'x' ]), 'layout entry 1 must be a hash', 'an entry that is not a hash';
+		is $e->([ { %good, x => undef } ]), 'layout entry 1 is missing x', 'a missing field';
+		is $e->([ { %good, w => 'a' } ]), 'layout entry 1: w must be a whole number', 'text';
+		is $e->([ { %good, h => -1 } ]), 'layout entry 1: h must be a whole number', 'a negative';
+		is $e->([ { %good, h => 1.5 } ]), 'layout entry 1: h must be a whole number', 'a fraction';
+		is $e->([ { %good, x => [] } ]), 'layout entry 1: x must be a whole number', 'a list';
+		like $e->([ { %good, x => 0 } ]), qr/\Alayout entry 1: x must be between 1 and \d+\z/, 'x of 0';
+		like $e->([ { %good, x => 999 } ]), qr/\Alayout entry 1: x must be between/, 'x off the grid';
+		is $e->([ { %good, y => 0 } ]), 'layout entry 1: y must be at least 1', 'y of 0';
+		like $e->([ { %good, w => 0 } ]), qr/\Alayout entry 1: w must be between/, 'w of 0';
+		like $e->([ { %good, h => 0 } ]), qr/\Alayout entry 1: h must be between/, 'h of 0';
+		like $e->([ { %good, h => 99_999 } ]), qr/\Alayout entry 1: h must be between/, 'h too tall';
+		like $e->([ { %good, x => 12, w => 3 } ]), qr/\Alayout entry 1: x \+ w - 1 must not exceed/, 'off the right edge';
+		is $e->([ \%good, { %good, visual => 1, x => 2 } ]), 'layout entry 2 overlaps an earlier entry', 'an overlap';
+		is $e->([ \%good, \%good ]), 'layout entry 2 overlaps an earlier entry', 'the same cell twice';
+	};
+
+	subtest 'Dashboard::_validate_analysis -- every refusal is exact' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_validate_analysis;
+		my $c  = dash_controller($app, '/');
+		my %good = (name => 'n', datasets => [ { spec => $SALES } ]);
+		my $e = sub { $fn->($c, { %good, @_ }) };
+
+		is $e->(), undef, 'a minimal document';
+		is $e->(name => undef), 'Missing required field: name', 'no name';
+		is $e->(name => ''), 'Missing required field: name', 'an empty name';
+		is $e->(datasets => undef), 'Missing required field: datasets', 'no datasets';
+		is $e->(datasets => []), 'Missing required field: datasets', 'an empty list';
+		is $e->(datasets => 'x'), 'Missing required field: datasets', 'not a list';
+		is $e->(datasets => [ {} ]), 'Each dataset entry must have a spec field', 'no spec';
+		like $e->(datasets => [ { spec => 'ftp://x' } ]), qr/"ftp:\/\/x" is not a valid spec/, 'an unknown scheme';
+		like $e->(version => 2), qr/\AUnsupported analysis version 2/, 'a newer version';
+		like $e->(version => 'x'), qr/\AUnsupported analysis version x/, 'a version that is not one';
+		is $e->($_ => 'x'), "$_ must be an array", "$_ of the wrong kind" for qw(visuals joins measures combines bookmarks layout hierarchies);
+		is $e->(fields => []), 'fields must be a hash', 'fields';
+		is $e->(params => []), 'params must be a hash', 'params';
+		is $e->(layout => [ 'x' ]), 'layout entry 1 must be a hash', 'the layout is checked too';
+	};
+
+	# Why: this body is whatever a client POSTs.  An element that is not a hash used
+	# to be a strict-refs crash, which is a 500 and a stack trace in the log for a
+	# request that deserves a 400.
+	subtest 'Dashboard::_validate_analysis -- hostile shapes are refused, not crashed on' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_validate_analysis;
+		my $c  = dash_controller($app, '/');
+		for my $ds ('x', 5, [ 1 ], undef) {
+			my $got;
+			lives_ok { $got = $fn->($c, { name => 'n', datasets => [ $ds ] }) } 'a dataset that is not a hash';
+			is $got, 'Each dataset entry must have a spec field', 'is refused';
+		}
+		is $fn->($c, { name => {}, datasets => [ { spec => $SALES } ] }), 'Missing required field: name', 'a name that is an object';
+		is $fn->($c, { name => [ 1 ], datasets => [ { spec => $SALES } ] }), 'Missing required field: name', 'or a list';
+		is $fn->($c, { name => 'n', datasets => [ { spec => [ 1 ] } ] }), 'Each dataset entry must have a spec field', 'a spec that is a list';
+		like $fn->($c, { name => 'n', version => [ 1 ], datasets => [ { spec => $SALES } ] }), qr/Unsupported analysis version/, 'a version that is a list';
+	};
+
+	subtest 'Dashboard::_whole_number' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_whole_number;
+		is $fn->('12'), 12, 'digits';
+		is $fn->('-3'), -3, 'a negative';
+		is $fn->('0'), 0, 'zero';
+		is $fn->($_), undef, 'not a whole number' for undef, '', 'abc', '1x', '1.5', '1e3', "5\n", ' 5', '+5', '--5', 'Inf', 'NaN', '0x10', '9' x 16;
+		keeps_globals_ok('_whole_number', sub { $fn->('5') });
+	};
+
+	# Why: everything reads a stored document blindly, so this is what stands between
+	# a hand-edit and a 500.  An index must survive it: a visual's place in the list is
+	# what the layout and /a/:id/visual/:n refer to.
+	subtest 'Dashboard::_tidy_analysis and _tidy_visual' => sub {
+		my $tidy = \&Database::BI::Controller::Dashboard::_tidy_analysis;
+		my %good = (
+			name     => 'n',
+			updated  => 5,
+			datasets => [ { spec => $SALES, filters => ['a:eq:1'] } ],
+			visuals  => [ { kind => 'bar', title => 't', encode => { cat => 'a' }, options => { o => 1 }, filters => ['f'] } ],
+			joins    => [ { right => 'r' } ],
+			layout   => [ { visual => 0 } ],
+			fields   => { f => 'x' },
+			params   => { p => { type => 'number' } },
+		);
+		is_deeply $tidy->({ %good }), \%good, 'a good document is untouched';
+		is_deeply $tidy->({}), {}, 'an empty one gains nothing';
+
+		my $got = $tidy->({ map { $_ => 'x' } qw(datasets visuals joins measures combines bookmarks layout hierarchies fields params) });
+		is_deeply $got, {}, 'sections of the wrong shape are as if absent';
+		is_deeply $tidy->({ name => [ 1 ], updated => {} }), {}, 'as are a name and a time that are not values';
+
+		$got = $tidy->({ datasets => [ 'x', {}, { spec => [ 1 ] }, { spec => $SALES, filters => 'x' } ] });
+		is_deeply $got->{datasets}, [ { spec => $SALES } ], 'only a usable dataset is kept';
+		$got = $tidy->({ visuals => [ 'x', [ 1 ], { kind => 'bar' } ] });
+		is_deeply $got->{visuals}, [ {}, {}, { kind => 'bar' } ], 'a bad visual keeps its place, so the next keeps its index';
+		$got = $tidy->({ visuals => [ { kind => [ 1 ], title => {}, encode => 'x', options => [ 1 ], filters => 'x' } ] });
+		is_deeply $got->{visuals}, [ {} ], 'and its parts are checked';
+		is_deeply $tidy->({ joins => [ 'x', { right => 'r' } ], layout => [ 1 ] }), { joins => [ { right => 'r' } ], layout => [] }, 'joins and layout entries';
+		is_deeply $tidy->({ params => { a => 'oops', b => { type => 'number' } } })->{params}, { a => {}, b => { type => 'number' } }, 'a parameter is kept, with no definition';
+		memory_cycle_ok($got, 'no cycle');
+	};
+
+	# Why: the validators used to see only a whole document, so a PATCH could store
+	# what a PUT would refuse.
+	subtest 'Dashboard::_validate_analysis_parts -- only the keys that are present' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_validate_analysis_parts;
+		my $c  = dash_controller($app, '/');
+		is $fn->($c, {}), undef, 'nothing to judge';
+		is $fn->($c, { bookmarks => [] }), undef, 'a section alone';
+		is $fn->($c, { name => '' }), 'Missing required field: name', 'an empty name';
+		is $fn->($c, { datasets => [] }), 'Missing required field: datasets', 'no datasets';
+		is $fn->($c, { visuals => 'x' }), 'visuals must be an array', 'a section of the wrong shape';
+		is $fn->($c, { visuals => [ 'x' ] }), 'Each entry in visuals must be an object', 'a visual that is not one';
+		is $fn->($c, { joins => [ 1 ] }), 'Each entry in joins must be an object', 'a join that is not one';
+		is $fn->($c, { params => 'x' }), 'params must be a hash', 'params';
+	};
+
+	# Why: HTML::D3 writes a categorical name straight into its script, so this check
+	# is the only thing between scheme= and script on the page; and it dies on an
+	# unknown sequential name, which was a 500 for any bad link to a heatmap.
+	subtest 'Dashboard::_categorical_scheme and _sequential_scheme' => sub {
+		my $cat = \&Database::BI::Controller::Dashboard::_categorical_scheme;
+		my $seq = \&Database::BI::Controller::Dashboard::_sequential_scheme;
+		is $cat->('tableau10'), 'tableau10', 'a known palette';
+		is $seq->('Blues'), 'Blues', 'a known scale';
+		for my $evil (undef, '', 'nope', "'];alert(1);//", $XSS_PROBE, [ 1 ], 'constructor') {
+			is $cat->($evil), 'tableau10', 'anything else is the default palette';
+			is $seq->($evil), 'YlOrRd', 'or the default scale';
+		}
+	};
+
+	# Why: a link anyone can send.  These errors repeat the parameter, and Mojolicious
+	# sends render(text => ...) as HTML unless told otherwise.
+	subtest 'hostile parameters cannot put script on a page' => sub {
+		my $tm = isolated_app();
+		my $e  = Mojo::Util::url_escape($XSS_PROBE);
+		for my $url ("/bar?l=$SALES&range=$e", "/pie?l=$SALES&cat=$e&val=amount", "/bar?l=$SALES&cs=$e", "/bar?l=$SALES&cat=region&span=$e") {
+			$tm->get_ok($url)->status_is(400)->content_type_like(qr{\Atext/plain}, "$url is not HTML");
+		}
+		for my $route ('/pie?l=table:sales&cat=region&val=amount', '/bar?l=table:sales&cat=region&val=amount',
+			'/histogram?l=table:sales&col=amount', '/treemap?l=table:sales&group=region&size=amount') {
+			$tm->get_ok("$route&scheme=$e")->status_is(200)->content_unlike(qr/<script>alert/, "$route does not write scheme= into its script");
+		}
+		$tm->get_ok("/heatmap?l=$SALES&x=region&y=product&val=amount&scheme=$e")->status_is(200, 'an unknown scale is not a 500');
+		is $tm->tx->res->body =~ /<script>alert/ ? 1 : 0, 0, 'and is not repeated';
+		$tm->get_ok("/heatmap?l=$SALES&x=region&y=product&val=amount&scheme=nope")->status_is(200);
+
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'n', datasets => [ { spec => $SALES } ],
+			visuals => [
+				{ kind => 'pie', encode => { cat => 'region', value => 'amount' }, options => { scheme => $XSS_PROBE } },
+				{ kind => 'heatmap', encode => { x => 'region', y => 'product', value => 'amount' }, options => { scheme => 'nope' } },
+			],
+		})->tx->res->json->{id};
+		$tm->get_ok("/a/$id")->status_is(200)->content_unlike(qr/<script>alert/, 'nor can a saved card, which a share link serves to strangers');
+	};
+
+	subtest 'Dashboard::_analysis_to_url' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_analysis_to_url;
+		my $c  = dash_controller($app, '/');
+		is $fn->($c, {}), undef, 'no datasets';
+		is $fn->($c, { datasets => [ {} ] }), undef, 'a dataset with no spec';
+		is $fn->($c, { datasets => [ { spec => $SALES } ] }), '/join?l=table%3Asales', 'just the source';
+
+		my $url = $fn->($c, {
+			datasets => [ { spec => $SALES, alias => 'l', filters => ['a:eq:1'] }, { spec => 'table:b', alias => 'r' } ],
+			joins    => [ { right => 'r', left_key => 'x', right_key => 'y' }, { right => 'nosuch' } ],
+		});
+		like $url, qr/&j=table%3Ab%7Cx%7Cy/, 'the join, encoded';
+		like $url, qr/&f=a%3Aeq%3A1\z/, 'the filter, encoded';
+		unlike $url, qr/nosuch/, 'and a join to nothing is left out';
+
+		like $fn->($c, { datasets => [ { spec => 'table:a&admin=1' } ] }), qr/\A\/join\?l=table%3Aa%26admin%3D1\z/, 'a hostile spec stays one value';
+
+		# A stored document can be anything; _validate_analysis does not look this deep.
+		for my $doc (
+			{ datasets => [ { spec => $SALES, filters => 'x' } ] },
+			{ datasets => [ { spec => $SALES } ], joins => [ 'x' ] },
+		) {
+			lives_ok { $fn->($c, $doc) } 'a document of the wrong shape does not crash';
+		}
+	};
+
+	subtest 'Dashboard::_chart_orientation and _vis_cf_col' => sub {
+		is $F{_chart_orientation}->({ orientation => $_ }), 'horizontal', "$_ is horizontal" for qw(h H horizontal);
+		is $F{_chart_orientation}->({ orient => 'h' }), 'horizontal', 'the older spelling';
+		is $F{_chart_orientation}->({ orientation => $_ }), 'vertical', "$_ is vertical" for qw(v vertical nonsense);
+		is $F{_chart_orientation}->({}), 'vertical', 'the default';
+
+		is $F{_vis_cf_col}->({ encode => { x => 'b', cat => 'a' } }), 'a', 'cat comes first';
+		is $F{_vis_cf_col}->({ encode => { x => 'b' } }), 'b', 'then x';
+		is $F{_vis_cf_col}->({ encode => { val => 'v' } }), undef, 'a measure is not a dimension';
+		is $F{_vis_cf_col}->({}), undef, 'no encoding';
+		is $F{_vis_cf_col}->({ encode => { cat => '', x => 'b' } }), 'b', 'an empty one is passed over';
+	};
+
+	subtest 'Dashboard::_bound_canvas_params' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_bound_canvas_params;
+		my $c  = dash_controller($app, '/');
+		my $none = sub { undef };
+
+		my ($b, $e) = $fn->($c, {}, $none);
+		is_deeply [ $b, $e ], [ {}, [] ], 'no parameters';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number', default => 5 }, s => {} } }, $none);
+		is_deeply $b, { a => 5, s => '' }, 'the defaults';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number' } } }, sub { '7' });
+		is $b->{a}, 7, 'a URL value is coerced';
+		($b, $e) = $fn->($c, { params => { s => { default => 'd' } } }, sub { '<x>' });
+		is $b->{s}, '<x>', 'a string is taken as it is';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number' } } }, sub { 'x' });
+		is_deeply $e, ["Parameter 'a' must be a number"], 'text for a number';
+		ok !exists $b->{a}, 'is not bound';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number', min => 1, max => 5 } } }, sub { 9 });
+		is_deeply $e, ["Parameter 'a' is out of range (min 1, max 5)"], 'over the top';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number', min => 1 } } }, sub { 0 });
+		is_deeply $e, ["Parameter 'a' is out of range (min 1, max +inf)"], 'under the bottom, with no top';
+		($b, $e) = $fn->($c, { params => { a => { type => 'number', max => 1 } } }, sub { 2 });
+		is_deeply $e, ["Parameter 'a' is out of range (min -inf, max 1)"], 'over the top, with no bottom';
+	};
+
+	# Why: every comparison with NaN is false, so "nan" walked straight past min and
+	# max; looks_like_number says yes to all of these.
+	subtest 'Dashboard::_bound_canvas_params -- cannot be talked round' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_bound_canvas_params;
+		my $c  = dash_controller($app, '/');
+		for my $evil (qw(nan NaN inf -inf Infinity)) {
+			my ($b, $e) = $fn->($c, { params => { a => { type => 'number', min => 1, max => 5 } } }, sub { $evil });
+			ok !exists $b->{a}, "$evil is not bound";
+			is scalar @$e, 1, 'and is reported';
+		}
+		for my $bad ('oops', 5, [ 1 ]) {
+			my ($b, $e);
+			lives_ok { ($b, $e) = $fn->($c, { params => { a => $bad } }, sub { undef }) } 'a stored definition that is not a hash';
+			is $b->{a}, '', 'is a plain string parameter';
+		}
+	};
+
+	subtest 'Dashboard::_decode_cell and _percent_encode' => sub {
+		is $F{_decode_cell}->(undef), undef, 'nothing';
+		is $F{_decode_cell}->("caf\xC3\xA9"), "caf\x{e9}", 'UTF-8 bytes become a character';
+		is $F{_decode_cell}->("\xFF\xFE"), "\xFF\xFE", 'invalid UTF-8 is left, not lost';
+		is $F{_decode_cell}->("\x{263A}"), "\x{263A}", 'a decoded string is unchanged';
+
+		is $F{_percent_encode}->("a b&c"), 'a%20b%26c', 'separators';
+		is $F{_percent_encode}->("caf\x{e9}\x{263A}"), 'caf%C3%A9%E2%98%BA', 'characters as UTF-8';
+		is $F{_percent_encode}->(undef), '', 'nothing';
+	};
+
+	subtest 'Dashboard::_word_tokens' => sub {
+		is_deeply [ $F{_word_tokens}->('Hello, big World!', 2) ], [qw(hello big world)], 'lower-cased and split';
+		is_deeply [ $F{_word_tokens}->('a big one', 3) ], [qw(big one)], 'the shortest kept';
+		is_deeply [ $F{_word_tokens}->("O'Brien's 'quoted'", 2) ], [ "o'brien's", 'quoted' ], 'an apostrophe stays inside';
+		is_deeply [ $F{_word_tokens}->("caf\xC3\xA9 ole", 2) ], [ "caf\x{e9}", 'ole' ], 'bytes are decoded first';
+		is_deeply [ $F{_word_tokens}->('!!! ???', 1) ], [], 'punctuation is no word';
+		is_deeply [ $F{_word_tokens}->($_, 1) ], [], 'nothing' for undef, '';
+		keeps_globals_ok('_word_tokens', sub { $F{_word_tokens}->('a b', 1) });
+	};
+
+	subtest 'Dashboard::_wordcloud_option' => sub {
+		is $F{_wordcloud_option}->('50', 10, 1, 100), 50, 'in range';
+		is $F{_wordcloud_option}->('0', 10, 1, 100), 1, 'below';
+		is $F{_wordcloud_option}->('9999', 10, 1, 100), 100, 'above';
+		is $F{_wordcloud_option}->($_, 10, 1, 100), 10, 'unreadable means the default' for undef, '', 'x', '-5', '1.5', "5\n", [];
+		is $F{_wordcloud_option}->('9' x 400, 10, 1, 100), 100, 'an absurd count is held';
+	};
+
+	subtest 'Dashboard::_wordcloud_link' => sub {
+		is $F{_wordcloud_link}->('/view/sales', 'c', 'w', '/cloud'),
+			'/view/sales?f=c%3Acontains%3Aw&back2=%2Fcloud&back2_label=Back%20to%20word%20cloud', 'a drill-down';
+		like $F{_wordcloud_link}->('/open?path=x', 'c', 'w', '/cloud'), qr/\A\/open\?path=x&f=/, 'added to a query';
+		like $F{_wordcloud_link}->('/v', 'c', q{"><s&x=1}, '/cloud'), qr/f=c%3Acontains%3A%22%3E%3Cs%26x%3D1&/, 'a hostile word stays inert';
+	};
+
+	subtest 'Dashboard::_map_popup -- a place name is not markup' => sub {
+		is $F{_map_popup}->('Town', 1, []), '<strong>Town</strong>', 'one row';
+		is $F{_map_popup}->('Town', 3, []), '<strong>Town</strong><br>3 rows', 'several';
+		is $F{_map_popup}->(undef, 1, undef), '<strong></strong>', 'nothing';
+		is $F{_map_popup}->('T', 1, [ [ 'a', 'b' ], [ 'c', undef ], [ 'd', '' ] ]), '<strong>T</strong><br>a: b', 'empty extras are left out';
+		my $html = $F{_map_popup}->('<script>x</script>', 1, [ [ '<img>', q{"'&} ] ]);
+		unlike $html, qr/<script|<img/, 'markup is escaped everywhere';
+		like $html, qr/&lt;script&gt;/, 'and shown as text';
+	};
+
+	subtest 'Dashboard::_map_size_range, _map_radius, _map_limit' => sub {
+		my @recs = ({ s => 5 }, { s => 'x' }, { s => 20 }, {});
+		my @marks = map { { first_row => $_ } } 0 .. 4;
+		is_deeply [ $F{_map_size_range}->(\@recs, \@marks, 's') ], [ 5, 20 ], 'the range, skipping what is not a number';
+		is_deeply [ $F{_map_size_range}->(\@recs, \@marks, $_) ], [], 'no column' for undef, '';
+		is_deeply [ $F{_map_size_range}->([ { s => 'x' } ], [ { first_row => 0 } ], 's') ], [ undef, undef ], 'nothing numeric';
+
+		is $F{_map_radius}->(5, 5, 20), 6, 'the smallest';
+		is $F{_map_radius}->(20, 5, 20), 30, 'the largest';
+		is $F{_map_radius}->(undef, 5, 20), 10, 'no value is the midpoint';
+		is $F{_map_radius}->(5, 5, 5), 10, 'a constant column does not divide by zero';
+		is $F{_map_radius}->(5, undef, undef), 10, 'no range';
+		is $F{_map_radius}->(-100, 5, 20), 6, 'held at the bottom';
+		is $F{_map_radius}->(100, 5, 20), 30, 'and the top';
+
+		is $F{_map_limit}->('5', 3), 5, 'a limit';
+		is $F{_map_limit}->($_, 3), 3, 'a nonsense one is the default' for undef, '', '0', '-1', 'x', '1.5', "5\n";
+
+		# Why: every digit, but 1e400 to Perl.  An infinite limit is no limit.
+		is $F{_map_limit}->('9' x 400, 3), 3, 'an absurd number is nonsense too';
+	};
+
+	subtest 'Dashboard::_parse_color and _color_hex' => sub {
+		is $F{_parse_color}->('RED'), 'red', 'a name, lower-cased';
+		is $F{_parse_color}->('#ABC'), '#abc', 'three digits';
+		is $F{_parse_color}->('#a1b2c3'), '#a1b2c3', 'six digits';
+		is $F{_parse_color}->($_), undef, "'$_' is refused" for
+			'', 'notacolor', '#12', '#1234', '#12345', '#1234567', '#ggg', 'red;x', 'url(x)', 'javascript:x', "red\n", "'><script>";
+		is $F{_parse_color}->(undef), undef, 'nothing';
+
+		is $F{_color_hex}->('#abc'), '#abc', 'hex is unchanged';
+		like $F{_color_hex}->('red'), qr/\A#[0-9a-f]{6}\z/, 'a name is translated';
+		my $default = $F{_color_hex}->(undef);
+		like $default, qr/\A#/, 'nothing is the default';
+		is $F{_color_hex}->('notacolor'), $default, 'as is an unknown name';
+		is $F{_color_hex}->(''), $default, 'or an empty one';
+	};
+
+	subtest 'Dashboard::_parse_color_rules and _apply_color_rule' => sub {
+		my ($rules, $def) = $F{_parse_color_rules}->([ 'gt:5:red', 'EQ:a:#abc' ], 'blue');
+		is_deeply $rules, [ { op => 'gt', val => 5, color => 'red' }, { op => 'eq', val => 'a', color => '#abc' } ], 'the rules';
+		is $def, 'blue', 'and the default';
+		($rules, $def) = $F{_parse_color_rules}->([ 'gt:5', 'x:1:red', 'gt:1:nocolor', 'gt:1:url(x)', '' ], 'nocolor');
+		is_deeply $rules, [], 'invalid rules are dropped';
+		like $def, qr/\S/, 'and a bad default gives the standard one';
+		lives_ok { $F{_parse_color_rules}->(undef, undef) } 'nothing at all';
+
+		my $rule = sub { [ { op => $_[0], val => $_[1], color => 'hit' } ] };
+		is $F{_apply_color_rule}->(6, $rule->('gt', 5), 'miss'), 'hit', 'gt';
+		is $F{_apply_color_rule}->(5, $rule->('gt', 5), 'miss'), 'miss', 'gt is strict';
+		is $F{_apply_color_rule}->(5, $rule->('ge', 5), 'miss'), 'hit', 'ge';
+		is $F{_apply_color_rule}->(4, $rule->('lt', 5), 'miss'), 'hit', 'lt';
+		is $F{_apply_color_rule}->(5, $rule->('le', 5), 'miss'), 'hit', 'le';
+		is $F{_apply_color_rule}->(5, $rule->('eq', '5.0'), 'miss'), 'hit', 'eq is numeric between numbers';
+		is $F{_apply_color_rule}->(6, $rule->('ne', 5), 'miss'), 'hit', 'ne';
+		is $F{_apply_color_rule}->('A', $rule->('eq', 'a'), 'miss'), 'hit', 'eq is case-blind for text';
+		is $F{_apply_color_rule}->('b', $rule->('ne', 'a'), 'miss'), 'hit', 'ne';
+		is $F{_apply_color_rule}->('x', $rule->('gt', 5), 'miss'), 'miss', 'text is not greater than a number';
+		is $F{_apply_color_rule}->(undef, $rule->('gt', 5), 'miss'), 'miss', 'nor is nothing';
+		is $F{_apply_color_rule}->(1, [], 'miss'), 'miss', 'no rules';
+		is $F{_apply_color_rule}->(9, [ @{ $rule->('gt', 5) }, { op => 'gt', val => 1, color => 'later' } ], 'miss'), 'hit', 'the first match wins';
+	};
+
+	subtest 'Dashboard::_marker_icon' => sub {
+		my $icon = $F{_marker_icon}->('#abc');
+		like $icon, qr/\Adata:image\/svg\+xml,/, 'a data URI';
+		like $icon, qr/fill='%23abc'/, 'with the colour, encoded';
+		unlike $icon, qr/[<> ]/, 'and nothing a data URI cannot hold';
+		like $F{_marker_icon}->(undef), qr/\Adata:image/, 'nothing is the default colour';
+	};
+
+	subtest 'Dashboard::_scope_card_scripts and _wrap_card_script' => sub {
+		my $wrap = "\n(function () {\n";
+		is $F{_scope_card_scripts}->($_), '', 'nothing to scope' for undef, '';
+		is $F{_scope_card_scripts}->('<p>x</p>'), '<p>x</p>', 'no script';
+		like $F{_scope_card_scripts}->('<script>const a=1;</script>'), qr/<script>\Q$wrap\Econst a=1;\n\}\)\(\);\n<\/script>/, 'an inline script is closed over';
+
+		my $src = '<script src="x.js"></script>';
+		is $F{_scope_card_scripts}->($src), $src, 'one with a src is left';
+		my $typed = '<script type="application/json">{}</script>';
+		is $F{_scope_card_scripts}->($typed), $typed, 'a data block is left';
+
+		my $once = $F{_scope_card_scripts}->('<script>const a=1;</script>');
+		is $F{_scope_card_scripts}->($once), $once, 'scoping twice is scoping once';
+		my $two = $F{_scope_card_scripts}->('<script>a</script><p>b</p><SCRIPT>c</SCRIPT>');
+		is scalar(() = $two =~ /\(function \(\) \{/g), 1, 'lower-case script tags are what the charts write';
+
+		is $F{_wrap_card_script}->('<script>', 'x', '</script>'), "<script>\n(function () {\nx\n})();\n</script>", 'the wrapper';
+		is $F{_wrap_card_script}->('<script>', '  (function () { }', '</script>'), '<script>  (function () { }</script>', 'already wrapped';
+	};
+
+	subtest 'Dashboard::_map_renderer_version' => sub {
+		my $fn = \&Database::BI::Controller::Dashboard::_map_renderer_version;
+		my ($ok, $version);
+		lives_ok { ($ok, $version) = $fn->(dash_controller($app, '/')) } 'whether or not the module is there';
+		ok $ok == 0 || $ok == 1, 'a clear answer';
+		ok defined $version || !$ok, 'no version means not usable';
+	};
+
+	subtest 'Dashboard::_apply_date_normalization' => sub {
+		my $tm = isolated_app();
+		my $c  = dash_controller($tm->app, '/');
+		my $fn = \&Database::BI::Controller::Dashboard::_apply_date_normalization;
+		Database::BI::Controller::Dashboard::_write_models($c, { date_patterns => { s => { d => '%m/%d/%Y' } } });
+
+		my @rows = ({ d => '5/20/2026' }, { d => 'junk' }, { d => '' }, { d => undef }, { d => '15/20/2026' });
+		$fn->($c, \@rows, ['d'], 's');
+		is $rows[0]{d}, '2026-05-20', 'a good value is normalised';
+		is $rows[1]{d}, 'junk', 'a bad one is left, for the (unparseable) bucket';
+		is $rows[2]{d}, '', 'an empty one';
+		is $rows[3]{d}, undef, 'a missing one';
+		is $rows[4]{d}, '15/20/2026', 'a date with no such month is left too';
+
+		my @same = ({ d => '5/20/2026' });
+		$fn->($c, \@same, ['other'], 's');
+		is $same[0]{d}, '5/20/2026', 'a pattern for a column not in this view is ignored';
+		$fn->($c, \@same, ['d'], $_) for undef, '', 'nosuch';
+		is $same[0]{d}, '5/20/2026', 'no key, or an unknown one, changes nothing';
+
+		# Stored JSON can be anything.
+		Database::BI::Controller::Dashboard::_write_models($c, { date_patterns => { s => 'oops', t => { d => { date => '%Q' } } } });
+		lives_ok { $fn->($c, \@same, ['d'], 's') } 'patterns of the wrong shape';
+		lives_ok { $fn->($c, \@same, ['d'], 't') } 'a pattern that cannot compile';
+		is $same[0]{d}, '5/20/2026', 'change nothing';
+	};
+
+	subtest 'Dashboard::_apply_calc_fields' => sub {
+		my $tm = isolated_app();
+		my $fn = \&Database::BI::Controller::Dashboard::_apply_calc_fields;
+		my $at = sub { dash_controller($tm->app, $_[0]) };
+		my @rows = ({ a => 2 }, { a => 'x' });
+
+		my ($got, $cols) = $fn->($at->('/'), \@rows, ['a']);
+		is_deeply $cols, ['a'], 'no calculated field';
+
+		my $c = $at->('/?c=' . Mojo::Util::url_escape('b:a*2'));
+		($got, $cols) = $fn->($c, [ map { {%$_} } @rows ], ['a']);
+		is_deeply $cols, [qw(a b)], 'the column is added';
+		is $got->[0]{b}, 4, 'and worked out';
+		is $got->[1]{b}, '(unparseable)', 'a row it cannot read stays visible';
+		is $c->stash('_virtual_columns')->{b}, 1, 'marked virtual';
+
+		($got, $cols) = $fn->($at->('/?c=' . Mojo::Util::url_escape('b:a*2') . '&c=' . Mojo::Util::url_escape('d:b+1')), [ { a => 1 } ], ['a']);
+		is $got->[0]{d}, 3, 'a later field can read an earlier one';
+
+		throws_ok { $fn->($at->('/?c=' . Mojo::Util::url_escape('b:nope')), [ { a => 1 } ], ['a']) } qr/nope/, 'an expression that cannot compile';
+
+		($got, $cols) = $fn->($at->('/?c=path:/x.csv&c=table:y&c=junk&c=1bad:1'), [ { a => 1 } ], ['a']);
+		is_deeply $cols, ['a'], 'source specs and malformed entries are not fields';
+
+		($got) = $fn->($at->('/'), [ { a => 1 } ], ['a'], { params => { rate => 3 }, calc => ['z:a+rate'] });
+		is $got->[0]{z}, 4, 'parameters and extra specs from a canvas';
+
+		Database::BI::Controller::Dashboard::_write_models($at->('/'), { fields => { s => { st => 'a+10', ov => '1' } } });
+		($got, $cols) = $fn->($at->('/?l=s&c=' . Mojo::Util::url_escape('ov:2')), [ { a => 1 } ], ['a']);
+		is $got->[0]{st}, 11, 'a stored field';
+		is $got->[0]{ov}, 2, 'and the URL overrides it';
+
+		Database::BI::Controller::Dashboard::_write_models($at->('/'), { groups => { s => { a => { low => [ 1 ], high => [ 9 ] } } } });
+		($got, $cols) = $fn->($at->('/?l=s'), [ { a => 1 }, { a => 5 } ], ['a']);
+		is $got->[0]{a_group}, 'low', 'a value in a group';
+		is $got->[1]{a_group}, '(other)', 'and one in none';
+
+		require Hash::Util;
+		my %locked = (a => 1);
+		Hash::Util::lock_ref_keys(\%locked);
+		($got) = $fn->($at->('/?c=' . Mojo::Util::url_escape('b:a+1')), [ \%locked ], ['a']);
+		is $got->[0]{b}, 2, 'a locked row is extended';
+	};
+
+	subtest 'Dashboard::_share_secret, _make_share_token, _verify_share_token' => sub {
+		my $tm = isolated_app();
+		$tm->app->config->{share_secret} = 'test-secret';
+		my $c  = dash_controller($tm->app, '/');
+		my $mk = \&Database::BI::Controller::Dashboard::_make_share_token;
+		my $vf = \&Database::BI::Controller::Dashboard::_verify_share_token;
+		my $later = time() + 1000;
+
+		is Database::BI::Controller::Dashboard::_share_secret($c), 'test-secret', 'the configured secret';
+		my $tok = $mk->($c, 'abc', $later);
+		is $vf->($c, 'abc', $tok), 1, 'a token proves itself';
+		unlike $tok, qr/[+\/=]/, 'and fits in a URL unescaped';
+
+		is $vf->($c, 'other', $tok), undef, 'not for another canvas';
+		is $vf->($c, 'abc', $mk->($c, 'abc', time() - 1)), undef, 'not once it has expired';
+		is $vf->($c, 'abc', $_), undef, 'junk is not a token' for undef, '', 'x', '!!!!', 'YWJj';
+
+		require MIME::Base64;
+		my ($id, $exp, $sig) = split /\|/, MIME::Base64::decode_base64url($tok);
+		my $forge = sub { MIME::Base64::encode_base64url($_[0]) };
+		is $vf->($c, 'abc', $forge->("abc|" . ($later + 9) . "|$sig")), undef, 'an extended expiry fails the signature';
+		is $vf->($c, 'abc', $forge->("abc|$later|" . ('0' x 64))), undef, 'a made-up signature';
+		is $vf->($c, 'abc', $forge->("abc|$later|")), undef, 'no signature';
+		is $vf->($c, 'abc', $forge->("abc|never|$sig")), undef, 'an expiry that is not a number';
+		is $vf->($c, 'abc', $forge->('abc')), undef, 'too few parts';
+
+		my $other = isolated_app();
+		$other->app->config->{share_secret} = 'different';
+		is $vf->(dash_controller($other->app, '/'), 'abc', $tok), undef, 'signed with another secret';
+
+		delete $tm->app->config->{share_secret};
+		warning_like { Database::BI::Controller::Dashboard::_share_secret($c) } qr/share_secret not configured/, 'running with no secret is announced';
+	};
+
+	# ------------------------------------------------------------------------
+	# Route actions.  Each uses an application of its own, so stores written here
+	# cannot be read by, or disturb, anything else in this file.
+	# ------------------------------------------------------------------------
+
+	subtest 'analyses_* -- the life of a saved canvas' => sub {
+		my $tm  = isolated_app();
+		my %doc = (name => 'First', datasets => [ { spec => $SALES } ]);
+
+		$tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses', []);
+		my $id = $tm->post_ok('/api/analyses' => json => \%doc)->status_is(201)->tx->res->json->{id};
+		like $id, qr/\A[A-Za-z0-9]+\z/, 'an id comes back';
+
+		$tm->get_ok("/api/analyses/$id")->status_is(200)->json_is('/name', 'First');
+		$tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses/0/id', $id);
+
+		$tm->put_ok("/api/analyses/$id" => json => { %doc, name => 'Second' })->status_is(200);
+		$tm->get_ok("/api/analyses/$id")->json_is('/name', 'Second');
+
+		$tm->patch_ok("/api/analyses/$id" => json => { name => 'Third' })->status_is(200);
+		$tm->get_ok("/api/analyses/$id")->json_is('/name', 'Third');
+
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', encode => { cat => 'region', value => 'amount' }, title => 'T' });
+		ok $tm->tx->res->code < 300, 'a visual is added';
+		$tm->get_ok("/api/analyses/$id")->json_is('/visuals/0/kind', 'bar');
+
+		$tm->patch_ok("/api/analyses/$id/visuals/0" => json => { encode => { cat => 'product', value => 'amount' } })->status_is(200);
+		$tm->get_ok("/api/analyses/$id")->json_is('/visuals/0/encode/cat', 'product');
+
+		my $exported = $tm->get_ok("/api/analyses/$id/export")->status_is(200)->tx->res->json;
+		is $exported->{name}, 'Third', 'it exports';
+		my $copy = $tm->post_ok('/api/analyses/import' => json => $exported)->status_is(201)->tx->res->json->{id};
+		isnt $copy, $id, 'and imports as a new canvas';
+
+		$tm->delete_ok("/api/analyses/$id")->status_is(200);
+		$tm->get_ok("/api/analyses/$id")->status_is(404);
+		$tm->delete_ok("/api/analyses/$id")->status_is(404);
+	};
+
+	subtest 'analyses_* -- bad ids and bad bodies' => sub {
+		my $tm = isolated_app();
+		my %doc = (name => 'n', datasets => [ { spec => $SALES } ]);
+		my $id = $tm->post_ok('/api/analyses' => json => \%doc)->tx->res->json->{id};
+
+		for my $bad ('a-b', 'a_b') {
+			$tm->get_ok("/api/analyses/$bad")->status_is(400);
+			$tm->put_ok("/api/analyses/$bad" => json => \%doc)->status_is(400);
+			$tm->patch_ok("/api/analyses/$bad" => json => {})->status_is(400);
+			$tm->delete_ok("/api/analyses/$bad")->status_is(400);
+			$tm->post_ok("/api/analyses/$bad/visuals" => json => {})->status_is(400);
+			$tm->post_ok("/api/analyses/$bad/share")->status_is(400);
+			$tm->get_ok("/api/analyses/$bad/export")->status_is(400);
+		}
+		for my $missing ('nosuchcanvas') {
+			$tm->get_ok("/api/analyses/$missing")->status_is(404);
+			$tm->put_ok("/api/analyses/$missing" => json => \%doc)->status_is(404);
+			$tm->patch_ok("/api/analyses/$missing" => json => {})->status_is(404);
+			$tm->post_ok("/api/analyses/$missing/visuals" => json => { kind => 'bar' })->status_is(404);
+			$tm->post_ok("/api/analyses/$missing/share")->status_is(404);
+			$tm->get_ok("/api/analyses/$missing/export")->status_is(404);
+			$tm->get_ok("/a/$missing")->status_is(404);
+		}
+		for my $body ('', 'not json', '[1,2]', '"x"', '5', 'null', '{"name":"n","datasets":["x"]}',
+			'{"name":{},"datasets":[{"spec":"table:sales"}]}', '{"name":"n","datasets":[{"spec":["x"]}]}') {
+			for my $req ([ post => '/api/analyses' ], [ post => '/api/analyses/import' ], [ put => "/api/analyses/$id" ]) {
+				my ($method, $url) = @$req;
+				my $call = "${method}_ok";
+				$tm->$call($url => { 'Content-Type' => 'application/json' } => $body)->status_is(400, "$method $url refuses '$body'");
+			}
+		}
+		for my $patch ('{"layout":"x"}', '{"visuals":"x"}', '{"layout":[{"x":0}]}') {
+			$tm->patch_ok("/api/analyses/$id" => { 'Content-Type' => 'application/json' } => $patch)->status_is(400, "PATCH refuses $patch");
+		}
+		$tm->patch_ok("/api/analyses/$id" => { 'Content-Type' => 'application/json' } => '[1]')->status_is(400, 'a PATCH that is not an object');
+		$tm->post_ok("/api/analyses/$id/visuals" => { 'Content-Type' => 'application/json' } => '[1]')->status_is(400, 'nor a visual');
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', cross_row => { cs => 'x' } })->status_is(400, 'a plan of the wrong shape');
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', cross_row => 'x' });
+		ok $tm->tx->res->code < 500, 'a plan that is not even a hash is not a 500';
+	};
+
+	# Why: validation looks at the top of a document, but what is stored can be
+	# anything that passed, and could have been edited by hand.  A page reading it
+	# has to survive: a 500 here takes the whole canvas away from its reader.
+	subtest 'canvas_render and friends -- a stored document of any shape' => sub {
+		my $tm = isolated_app();
+		my $c  = dash_controller($tm->app, '/');
+		my $id = 'hostile';
+		my @docs = (
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ 'x' ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ {} ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ { kind => 'nosuch' } ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ { kind => 'bar', encode => 'x' } ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ { kind => 'bar', encode => { cat => 'nope' } } ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => [ { kind => 'bar', encode => { cat => 'region' }, options => 'x' } ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], params => { a => 'oops' }, visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ] },
+			{ name => 'n', datasets => [ { spec => $SALES, filters => 'x' } ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], joins => [ 'x' ] },
+			{ name => 'n', datasets => [ { spec => $SALES } ], visuals => 'x' },
+			{ name => 'n', datasets => 'x' },
+			{ name => 'n' },
+			{},
+			'x',
+			[ 1 ],
+		);
+		my $n = 0;
+		for my $doc (@docs) {
+			$n++;
+			Database::BI::Controller::Dashboard::_write_analyses($c, { $id => $doc });
+			my $tok = Database::BI::Controller::Dashboard::_make_share_token($c, $id, time() + 100);
+			for my $url ("/a/$id", "/api/analyses/$id", "/api/analyses/$id/export", "/a/$id/visual/0/csv",
+				"/share/$id?token=$tok", "/embed/$id?token=$tok") {
+				$tm->get_ok($url);
+				ok $tm->tx->res->code < 500, "document $n at $url is not a 500" or diag $tm->tx->res->dom->at('title') // '';
+			}
+			$tm->get_ok('/api/analyses');
+			ok $tm->tx->res->code < 500, "document $n does not break the list";
+			$tm->get_ok('/catalog');
+			ok $tm->tx->res->code < 500, "document $n does not break the catalog";
+		}
+	};
+
+	subtest 'analyses_share, share_view, embed_view' => sub {
+		my $tm = isolated_app();
+		$tm->app->config->{share_secret} = 'test-secret';
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'n', datasets => [ { spec => $SALES } ],
+			visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ],
+		})->tx->res->json->{id};
+
+		my $share = $tm->post_ok("/api/analyses/$id/share")->status_is(200)->tx->res->json;
+		ok $share->{expires} > time(), 'a token that lasts';
+		like $share->{url}, qr{/share/\Q$id\E\?token=}, 'and a link';
+
+		$tm->get_ok("/share/$id?token=$share->{token}")->status_is(200);
+		$tm->get_ok("/embed/$id?token=$share->{token}")->status_is(200);
+
+		for my $route ('share', 'embed') {
+			$tm->get_ok("/$route/$id")->status_is(401, "$route with no token");
+			$tm->get_ok("/$route/$id?token=junk")->status_is(403, "$route with a bad one");
+			$tm->get_ok("/$route/nosuchcanvas?token=$share->{token}")->status_is(403, "$route of another canvas");
+			$tm->get_ok("/$route/a-b?token=x")->status_is(400, "$route with a bad id");
+		}
+	};
+
+	subtest 'visual_download' => sub {
+		my $tm = isolated_app();
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'n', datasets => [ { spec => $SALES } ],
+			visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ],
+		})->tx->res->json->{id};
+
+		# Why: this called a plain function as a method and read l= from the URL, so
+		# a card's CSV was a 500 with l= and a 422 without.  The canvas names its data.
+		$tm->get_ok("/a/$id/visual/0/csv")->status_is(200)->content_like(qr/\Aid,product,region/)
+			->header_like('Content-Disposition', qr/visual-0\.csv/);
+		$tm->get_ok("/a/$id/visual/0/csv?l=table:nosuch")->status_is(200, 'and l= cannot point it elsewhere')->content_like(qr/\Aid,product,region/);
+		$tm->get_ok("/a/$id/visual/0/png")->status_is(501);
+		$tm->get_ok("/a/$id/visual/9/csv")->status_is(404);
+		$tm->get_ok("/a/$id/visual/-1/csv")->status_is(400);
+		$tm->get_ok("/a/$id/visual/x/csv")->status_is(400);
+		$tm->get_ok("/a/$id/visual/0/exe")->status_is(400);
+		$tm->get_ok('/a/nosuchcanvas/visual/0/csv')->status_is(404);
+		$tm->get_ok('/a/a-b/visual/0/csv')->status_is(400);
+	};
+
+	subtest 'geo_save, geo_list, geo_delete' => sub {
+		my $tm = isolated_app();
+		$tm->get_ok('/geo/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/geo/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/geo/delete')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok("/geo/save?l=$SALES")->status_is(400)->json_is('/error', 'col= required');
+		$tm->post_ok("/geo/save?l=$SALES&col=region")->status_is(400)->json_is('/error', 'kind must be lat, lon, or location');
+		$tm->post_ok("/geo/save?l=$SALES&col=region&kind=evil")->status_is(400);
+
+		$tm->post_ok("/geo/save?l=$SALES&col=region&kind=location")->status_is(200);
+		$tm->get_ok("/geo/list?l=$SALES")->status_is(200)->content_like(qr/region/);
+		$tm->post_ok("/geo/delete?l=$SALES&col=region")->status_is(200);
+		$tm->get_ok("/geo/list?l=$SALES")->status_is(200)->content_unlike(qr/region/);
+		$tm->post_ok("/geo/delete?l=$SALES&col=nosuch")->status_is(200);
+	};
+
+	subtest 'columns_api, range_api, dirs_api, stat_api' => sub {
+		my $tm = isolated_app();
+		$tm->get_ok('/api/columns?table=sales')->status_is(200);
+		ok scalar(grep { $_ eq 'region' } @{ $tm->tx->res->json->{columns} // $tm->tx->res->json }), 'the columns of a table';
+		$tm->get_ok('/api/columns?table=nosuchtable')->status_is(404);
+		$tm->get_ok('/api/columns?path=/no/such/file.csv')->status_is(404);
+		$tm->get_ok('/api/columns')->status_is(404);
+
+		$tm->get_ok('/api/range')->status_is(400)->json_is('/error', 'l required');
+		$tm->get_ok("/api/range?l=$SALES")->status_is(400)->json_is('/error', 'col required');
+		$tm->get_ok("/api/range?l=$SALES&col=sale_date")->status_is(200);
+
+		# The range is of the view: joins and the join type count.
+		my $jdir = tempdir(CLEANUP => 1);
+		Mojo::File->new($jdir, 'rangeleft.csv')->spew("id,opened\n1,2020-01-01\n2,2021-06-15\n");
+		Mojo::File->new($jdir, 'rangeright.csv')->spew("id,shipped\n1,2022-03-04\n1,2022-03-04\n");
+		Mojo::File->new($jdir, 'rangemore.csv')->spew("id,opened\n9,2024-02-02\n");
+		my $left  = Mojo::Util::url_escape("path:$jdir/rangeleft.csv");
+		my $right = Mojo::Util::url_escape("path:$jdir/rangeright.csv|id|id");
+		my $more  = Mojo::Util::url_escape("path:$jdir/rangemore.csv");
+		$tm->get_ok("/api/range?l=$left&col=shipped")->status_is(200)
+			->json_is('/min', undef, 'without j= the right-hand column is unknown');
+		$tm->get_ok("/api/range?l=$left&j=$right&col=shipped")->status_is(200)
+			->json_is('/min', '2022-03-04', 'a column from the joined table')
+			->json_is('/max', '2022-03-04');
+		$tm->get_ok("/api/range?l=$left&j=$right&col=opened")->status_is(200)
+			->json_is('/max', '2021-06-15', 'a left join keeps the unmatched row');
+		$tm->get_ok("/api/range?l=$left&j=$right&jtype=inner&col=opened")->status_is(200)
+			->json_is('/max', '2020-01-01', 'an inner join drops it');
+		$tm->get_ok("/api/range?l=$left&c=$more&col=opened")->status_is(200)
+			->json_is('/max', '2024-02-02', 'stacked rows count');
+		$tm->get_ok("/api/range?l=$left&col=nosuch")->status_is(200)->json_is('/min', undef);
+		$tm->get_ok("/join?l=$left&j=$right&jtype=inner")->status_is(200)
+			->content_like(qr/data-range-qs="&amp;j=[^"]*rangeright[^"]*&amp;jtype=inner"/,
+				'the dashboard hands the view to its range requests');
+		$tm->get_ok("/api/range?l=nosuch:x&col=opened")->status_is(200)->json_is('/min', undef);
+
+		my $dir = tempdir(CLEANUP => 1);
+		Mojo::File->new($dir, 'sub')->make_path;
+		$tm->get_ok('/api/dirs?path=' . Mojo::Util::url_escape($dir))->status_is(200)->content_like(qr/sub/);
+		$tm->get_ok('/api/dirs?path=/no/such/dir')->status_is(404)->json_is('/error', 'Not a directory');
+
+		$tm->get_ok('/api/stat')->status_is(400);
+		$tm->get_ok('/api/stat?path=' . Mojo::Util::url_escape('/no/such/file'));
+		ok $tm->tx->res->code < 500, 'a file that is not there';
+		warnings_are { $tm->get_ok('/api/stat?path=' . Mojo::Util::url_escape("a\nb")) } [], 'a name with a newline';
+		ok $tm->tx->res->code < 500, 'answers';
+	};
+
+	subtest 'open_file, import_url, join_tables, combine_tables' => sub {
+		my $tm = isolated_app();
+		my $csv = $tm->app->home->child('data/sales.csv')->to_string;
+		$tm->get_ok('/open?path=' . Mojo::Util::url_escape($csv))->status_is(200)->content_like(qr/Widget A/);
+		$tm->get_ok('/open?path=/no/such/file.csv')->status_is(404);
+		$tm->get_ok('/open?path=' . Mojo::Util::url_escape($tm->app->home->child('Makefile.PL')->to_string))->status_is(404, 'a file of an unsupported type');
+		warnings_are { $tm->get_ok('/open?path=' . Mojo::Util::url_escape("/a\nb.csv"))->status_is(404) } [], 'a name with a newline, quietly';
+		$tm->get_ok('/open?path=' . Mojo::Util::url_escape("/etc/passwd\0.csv"));
+		ok $tm->tx->res->code < 500, 'a NUL in a name';
+
+		$tm->get_ok('/import');
+		ok $tm->tx->res->code < 500, 'an import of nothing';
+		# Refusals here are shown on the home page, which is an ordinary 200.
+		$tm->get_ok('/import?url=' . Mojo::Util::url_escape('file:///etc/passwd'))->status_is(200);
+		unlike $tm->tx->res->body, qr/root:[^:]*:0:0/, 'a file: URL does not read a file';
+		with_fake_network(fake_response(200, 'a,b'), sub {
+			my ($requests) = @_;
+			$tm->get_ok('/import?url=' . Mojo::Util::url_escape('http://127.0.0.1/x'))->status_is(200);
+			is scalar @$requests, 0, 'and a loopback address is never fetched';
+		});
+
+		$tm->get_ok("/join?l=$SALES&j=" . Mojo::Util::url_escape('table:sales|id|id'))->status_is(200);
+		$tm->get_ok("/join?l=$SALES&j=" . Mojo::Util::url_escape('table:nosuch|id|id'));
+		ok $tm->tx->res->code < 500, 'a join to nothing';
+		$tm->get_ok("/join?l=$SALES&j=junk");
+		ok $tm->tx->res->code < 500, 'a malformed join';
+		$tm->get_ok('/join');
+		ok $tm->tx->res->code < 500, 'no source';
+
+		$tm->get_ok("/combine?l=$SALES&c=$SALES")->status_is(200);
+		$tm->get_ok("/combine?l=$SALES&c=table:nosuch");
+		ok $tm->tx->res->code < 500, 'combining nothing';
+		$tm->get_ok('/combine');
+		ok $tm->tx->res->code < 500, 'no source';
+	};
+
+	subtest 'export_data and the _render_* functions' => sub {
+		my $tm = isolated_app();
+		my $csv = $tm->get_ok("/export?l=$SALES&format=csv")->status_is(200)->tx->res->body;
+		like $csv, qr/\Aid,product,region/, 'CSV starts with the header';
+		my $json = $tm->get_ok("/export?l=$SALES&format=json")->status_is(200)->tx->res->json;
+		returns_is $json, { type => 'arrayref' }, 'JSON is a list of rows';
+		is $json->[0]{region}, 'North', 'with the columns';
+		my $db = $tm->get_ok("/export?l=$SALES&format=sqlite")->status_is(200)->tx->res->body;
+		like $db, qr/\ASQLite format 3\0/, 'SQLite is a database file';
+
+		like $tm->get_ok("/export?l=$SALES&format=exe")->status_is(200)->tx->res->body, qr/\Aid,product,region/, 'an unknown format downloads as CSV';
+		$tm->get_ok('/export?l=table:nosuch&format=csv');
+		ok $tm->tx->res->code >= 400 && $tm->tx->res->code < 500, 'a source that is not there';
+		$tm->get_ok('/export');
+		ok $tm->tx->res->code < 500, 'no source at all';
+
+		my $filtered = $tm->get_ok("/export?l=$SALES&format=json&f=region:eq:East")->tx->res->json;
+		ok !(grep { $_->{region} ne 'East' } @$filtered), 'an export honours its filters';
+		ok scalar(@$filtered), 'and holds something';
+	};
+
+	# Why: these paths rendered their error and then returned the same empty list as a
+	# missing table, so the caller rendered again and the connection was left hanging
+	# until it timed out.  An inactivity limit makes a regression fail fast here.
+	subtest '_run_export_pipeline -- a bad request is answered, once' => sub {
+		my $tm = isolated_app();
+		$tm->ua->inactivity_timeout($REPLY_TIMEOUT);
+		my $bad_calc = Mojo::Util::url_escape('b:nope');
+		for my $q ('span=abc', "tcol=region&span=1d&as=1bad", "c=$bad_calc") {
+			$tm->get_ok("/export?l=$SALES&cat=region&$q")->status_is(400, "/export with $q")->content_type_like(qr{\Atext/plain});
+			$tm->get_ok("/folder?l=$SALES&cat=region&$q")->status_is(400, "/folder with $q");
+			$tm->post_ok("/export?l=$SALES&cat=region&$q&dir=" . Mojo::Util::url_escape(tempdir(CLEANUP => 1)) . '&filename=x.csv')->status_is(400, "POST /export with $q");
+		}
+	};
+
+	subtest 'export_write -- where a file may be written' => sub {
+		my $tm  = isolated_app();
+		my $dir = tempdir(CLEANUP => 1);
+		my $d   = Mojo::Util::url_escape($dir);
+		my $q   = "l=$SALES&format=csv&dir=$d";
+
+		$tm->post_ok("/export?$q&filename=out.csv");
+		ok $tm->tx->res->code < 300, 'a good export is written' or diag $tm->tx->res->body;
+		ok -f File::Spec->catfile($dir, 'out.csv'), 'and is there';
+
+		for my $evil ('../evil.csv', '/tmp/evil.csv', "a\0b.csv", '..', '.', '', "a/b.csv") {
+			$tm->post_ok("/export?$q&filename=" . Mojo::Util::url_escape($evil));
+			(my $shown = $evil) =~ s/\0/NUL/;
+			ok $tm->tx->res->code >= 400 || !-e File::Spec->catfile(File::Spec->updir, 'evil.csv'), "the name '$shown' goes nowhere it should not";
+			ok $tm->tx->res->code < 500 || $evil !~ /\.\./, "and '$shown' is not a crash";
+		}
+		ok !-e File::Spec->catfile(File::Basename::dirname($dir), 'evil.csv'), 'nothing escaped the directory';
+
+		warnings_are { $tm->post_ok("/export?$q&filename=" . Mojo::Util::url_escape("a\0b.csv"))->status_is(415, 'a NUL in the name') } [], 'is refused before it reaches the filesystem';
+		$tm->post_ok("/export?l=$SALES&format=exe&dir=$d&filename=x.exe")->status_is(415, 'an unknown format');
+		$tm->post_ok("/export?l=table:nosuch&format=csv&dir=$d&filename=y.csv")->status_is(404)->json_is('/error', 'Table not found');
+		$tm->post_ok("/export?l=$SALES&format=csv&dir=/no/such/dir&filename=y.csv");
+		ok $tm->tx->res->code >= 400, 'a directory that is not there';
+	};
+
+	subtest 'upload_file and clear_uploads' => sub {
+		my $tm = isolated_app();
+		my $dir = Mojo::File->new($tm->app->config->{uploads_dir});
+
+		$tm->post_ok('/upload')->status_is(400, 'nothing uploaded');
+		$tm->post_ok('/upload' => form => { file => { content => "a,b\n1,2\n", filename => 'x.exe' } })->status_is(415, 'a type that is refused');
+		$tm->post_ok('/upload' => form => { file => { content => "a,b\n1,2\n", filename => 'ok.csv' } });
+		ok $tm->tx->res->code < 400, 'a good one is taken';
+		ok scalar @{ $dir->list_tree }, 'and is on disk';
+
+		$tm->post_ok('/upload' => form => { file => { content => "a,b\n1,2\n", filename => '../../evil.csv' } });
+		ok $tm->tx->res->code < 500, 'a path in the name';
+		ok !-e $dir->dirname->dirname->child('evil.csv'), 'cannot leave the staging directory';
+
+		$tm->post_ok('/uploads/clear');
+		ok $tm->tx->res->code < 400, 'clearing works';
+		is scalar @{ $dir->list_tree }, 0, 'and clears';
+		$tm->post_ok('/uploads/clear');
+		ok $tm->tx->res->code < 400, 'clearing twice is fine';
+	};
+
+	subtest 'ask_api and summary_api' => sub {
+		my $tm = isolated_app();
+		delete $tm->app->config->{ai_api_key};
+		$tm->post_ok('/api/ask')->status_is(503, 'no key: nothing else about the request matters');
+		$tm->post_ok('/api/summary')->status_is(400)->json_is('/error', 'Missing required parameter: l');
+		$tm->post_ok("/api/ask?l=$SALES&q=hello");
+		ok $tm->tx->res->code >= 400 && $tm->tx->res->code < 500 || $tm->tx->res->code == 503, 'no key, no answer';
+		$tm->post_ok('/api/ask?l=table:nosuch&q=hello');
+		ok $tm->tx->res->code >= 400, 'nothing to ask about';
+		$tm->post_ok("/api/summary?l=$SALES")->status_is(200)->json_is('/source', 'template');
+		$tm->post_ok('/api/summary?l=table:nosuch')->status_is(404)->json_is('/error', 'Could not open data source');
+
+		# With a key: the provider is replaced, and the prompt is read.
+		$tm->app->config->{ai_api_key} = 'k';
+		$tm->post_ok('/api/ask')->status_is(400)->json_is('/error', 'Missing required parameter: l');
+		my $sent = with_fake_network(fake_response(200, '{"content":[{"text":"{\"kind\":\"bar\",\"title\":\"T\",\"encode\":{\"cat\":\"region\"}}"}]}'), sub {
+			$tm->post_ok("/api/ask?l=$SALES&q=by+region")->status_is(200)->json_is('/valid', 1);
+		});
+		my $prompt = decode_json($sent->[0]->content)->{messages}[0]{content};
+		unlike $prompt, qr/Widget A|Alice Smith/, 'no row data leaves the machine';
+		like $prompt, qr/region/, 'only the names of the columns';
+	};
+
+	subtest 'folder_view, heatmap_view, pivot_view, stats_view, insights_view' => sub {
+		my $tm = isolated_app();
+		$tm->get_ok("/heatmap?l=$SALES&x=region&y=product&val=amount")->status_is(200);
+		$tm->get_ok("/heatmap?l=$SALES");
+		ok $tm->tx->res->code < 500, 'a heatmap with no axes';
+		$tm->get_ok("/heatmap?l=$SALES&x=nope&y=nope");
+		ok $tm->tx->res->code < 500, 'with axes that are not there';
+		$tm->get_ok('/heatmap?l=table:nosuch&x=a&y=b')->status_is(404);
+
+		$tm->get_ok("/pivot?l=$SALES&rows=region&m=amount:sum:total")->status_is(200)->content_like(qr/North/);
+		$tm->get_ok("/pivot?l=$SALES&rows=region&m=amount:sum:total&format=csv")->status_is(200);
+		$tm->get_ok("/pivot?l=$SALES&rows=nope&m=amount:sum:total");
+		ok $tm->tx->res->code < 500, 'a pivot on nothing';
+		$tm->get_ok("/pivot?l=$SALES&rows=region&m=amount:evil:x")->status_is(400, 'a function that is not there');
+		$tm->get_ok('/pivot?l=table:nosuch&rows=a&m=a:sum:b')->status_is(404);
+
+		$tm->get_ok("/stats?l=$SALES")->status_is(200)->content_like(qr/amount/);
+		$tm->get_ok('/stats?l=table:nosuch')->status_is(404);
+		$tm->get_ok('/stats')->status_is(400);
+
+		$tm->get_ok("/insights?l=$SALES")->status_is(200);
+		$tm->get_ok('/insights?l=table:nosuch')->status_is(404);
+		$tm->get_ok('/insights')->status_is(400);
+
+		$tm->get_ok("/folder?l=$SALES&col=region")->status_is(200);
+		$tm->get_ok("/folder?l=$SALES&col=region&prefix=N")->status_is(200);
+		$tm->get_ok("/folder?l=$SALES")->status_is(200, 'a key column is found if none is named');
+		$tm->get_ok("/folder?col=region")->status_is(400)->content_is('Missing l= parameter');
+		$tm->get_ok("/folder?l=$SALES&prefix=" . ('A' x 5000))->status_is(400)->content_is('Prefix too long');
+		$tm->get_ok('/folder?l=table:nosuch&col=a')->status_is(404);
+	};
+
+	subtest 'wordcloud_view and map_view' => sub {
+		my $tm = isolated_app();
+		$tm->get_ok("/wordcloud?l=$SALES&col=product")->status_is(200);
+		$tm->get_ok("/wordcloud?l=$SALES");
+		ok $tm->tx->res->code >= 400 && $tm->tx->res->code < 500, 'a cloud of no column';
+		$tm->get_ok('/wordcloud?l=table:nosuch&col=a')->status_is(404);
+		for my $evil ('topn=abc', 'topn=-1', 'topn=' . ('9' x 50), 'minlen=abc', 'stop=' . Mojo::Util::url_escape('<script>')) {
+			warnings_are { $tm->get_ok("/wordcloud?l=$SALES&col=product&$evil") } [], "$evil raises no warning";
+			ok $tm->tx->res->code < 500, 'and is not a crash';
+		}
+
+		$tm->get_ok("/map?l=$SALES");
+		ok $tm->tx->res->code < 500, 'a map with no location';
+		$tm->get_ok("/map?l=$SALES&lat=id&lon=amount");
+		ok $tm->tx->res->code < 500, 'with columns that are not positions';
+		$tm->get_ok('/map?l=table:nosuch&lat=a&lon=b');
+		ok $tm->tx->res->code >= 400 && $tm->tx->res->code < 500, 'of a source that is not there';
+	};
+
+	subtest 'catalog_view, tutorial, _catalog_entry' => sub {
+		my $tm = isolated_app();
+		$tm->get_ok('/tutorial')->status_is(200);
+		$tm->get_ok('/catalog')->status_is(200);
+		my $fn = \&Database::BI::Controller::Dashboard::_catalog_entry;
+		my $mf = $tm->app->home->child('data/sales.csv');
+		my $c  = dash_controller($tm->app, '/');
+		my $entry;
+		lives_ok { $entry = $fn->($c, $mf, { x => { name => 'Mine', datasets => [ { spec => $SALES } ] }, y => { name => 'Other', datasets => [ { spec => 'table:nope' } ] } }) } 'an entry is built';
+		returns_is $entry, { type => 'hashref' }, 'as a hashref';
+		is $entry->{type}, 'CSV file', 'with a readable type';
+		is_deeply $entry->{analyses}, [ { id => 'x', name => 'Mine' } ], 'naming only the canvases that use it';
+		lives_ok { $fn->($c, $mf, {}) } 'with no canvases';
+	};
+
+	# Why: a route that a stranger can reach has one job above all, which is not to
+	# fall over.  Every GET is given the same hostile values for every parameter it
+	# might read: nothing may be a 5xx, and nothing may trip a Perl warning, since a
+	# warning is an unconsidered case that happens to be survivable today.
+	subtest 'every GET route -- hostile parameters' => sub {
+		my $tm = isolated_app();
+		my @routes = (qw(/ /tutorial /browse /open /join /api/columns /api/range /import /combine /export /api/dirs /api/stat
+			/graph /line /pie /heatmap /bar /folder /tables /pivot /stats /calc/list /groups/list /dates/list /lookups/list /extract/list /geo/list
+			/scatter /stacked /combo /treemap /histogram /wordcloud /map /insights /api/analyses /catalog), '/view/sales');
+		my @params = (qw(l x y cat val seg col rows cols m bar line size group bins page per_page topn minlen
+			f c j jtype range rcol cs by order span tcol as lk nolk path table format back back2 scheme sort lat lon loc));
+		my @evil = ('', '0', '-1', 'abc', '1e400', '9' x 40, "a\nb", "a\0b", $XSS_PROBE, q{"'}, '../../etc/passwd',
+			'nan', 'inf', 'table:sales', 'table:nosuch', 'path:/etc/passwd', "\xFF\xFE", ':::', '%');
+		my %no_data_needed = map { $_ => 1 } qw(/tutorial /calc/list /groups/list /dates/list /lookups/list /extract/list /geo/list /api/analyses /api/dirs /api/stat /catalog);
+		my %bad_in_bulk = map { $_ => 1 } ('', 'abc', '9' x 40, "a\nb", $XSS_PROBE, "\xFF\xFE");
+
+		$tm->ua->inactivity_timeout($REPLY_TIMEOUT);
+		my (@crashes, @noisy, @echoed);
+		local $SIG{__WARN__} = sub {
+			my $w = shift;
+			push @noisy, $w if $w =~ $PERL_INTERNAL_WARNING;
+		};
+		my $probe = sub {
+			my ($url) = @_;
+			my $res  = $tm->ua->get($url)->res;
+			my $code = $res->code // 0;
+			push @crashes, "no reply: $url" unless $code;
+			push @crashes, "$code $url" if $code >= 500 && $code != 501 && $code != 503;
+			# As plain text or JSON it is only words.  Only a page can run it.
+			push @echoed, $url if index($res->body, $XSS_PROBE) >= 0 && ($res->headers->content_type // '') =~ /html/;
+		};
+
+		# All of them at once finds interactions.  Then one at a time, with a usable
+		# source, gets past the guard a missing parameter would stop at; each pairing
+		# takes the next hostile value, so that the whole set is covered across a few
+		# columns without this one subtest taking minutes.
+		my $next = 0;
+		for my $route (@routes) {
+			for my $value (sort keys %bad_in_bulk) {
+				my $e = Mojo::Util::url_escape($value);
+				$probe->("$route?" . join('&', map { "$_=$e" } @params));
+			}
+			$probe->("$route?l=" . ('x' x $LONG_PARAM));
+			next if $no_data_needed{$route};
+			for my $param ($ENV{EXTENDED_TESTING} ? @params : @RISKIEST_PARAMS) {
+				my $e = Mojo::Util::url_escape($evil[$next++ % @evil]);
+				$probe->("$route?l=$SALES&col=amount&cat=region&x=region&y=amount&$param=$e");
+			}
+		}
+		my %crash = map { (substr($_, 0, 160)) => 1 } @crashes;
+		my %noise = map { (s/ at .*//sr) => 1 } @noisy;
+		is_deeply [ sort keys %crash ], [], 'no parameter crashes a route';
+		is_deeply [ sort keys %noise ], [], 'and none raises a Perl warning';
+		is_deeply [ @echoed[ 0 .. ($#echoed < 4 ? $#echoed : 4) ] ], [], 'and markup is never sent back as markup';
+	};
+}
 
 done_testing();
 

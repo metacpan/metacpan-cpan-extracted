@@ -1,5 +1,8 @@
 Revision history for BioX-Tax-Kraken
 
+0.002002 2026-11-03
+         Fix new children() implementation
+         Require 5.26 for needed core functions
 0.002001 2026-11-01
          Store children during load: slightly slower load but
             orders-of-magntiude faster children()

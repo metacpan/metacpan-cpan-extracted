@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 # Recipe copy ranges must ascend: across the "c" steps of one Recipe, each
-# start is greater than the previous end (-08 section 5.1 says so for
+# start is greater than the previous end (-09 section 5.1 says so for
 # header Recipes; the agreed extension applies the same rule to body
 # Recipes). Together with 1 <= start <= end <= count, that is the whole
 # well-formedness rule for "c". A Recipe that breaks it is malformed and
@@ -112,11 +112,11 @@ sub with_recipe {
 # {"b":[{"c":[1,3]}]}. Each case below replaces it with a malformed one.
 my $append_footer = sub { $_[0]->body_set($_[0]->body_raw . "-- \r\nfooter\r\n") };
 
-# -08 §14.2 (contract D6): a bad step is "Recipe <path> is invalid"; a
+# -09 §14.2 (contract D6): a bad step is "recipe <path> is invalid" (-09 lower case); a
 # fraction or exponent anywhere is the document's fault ("contains invalid
 # JSON"); a range past the end is found applying the Recipe, as before.
 my $JSON = 'PERMERROR: Message-Instance m=2 contains invalid JSON';
-sub step { "PERMERROR: Message-Instance m=2 Recipe $_[0] is invalid" }
+sub step { "PERMERROR: Message-Instance m=2 recipe $_[0] is invalid" }
 my @bad = (
     [ '{"b":[{"c":[3,3]},{"c":[1,2]}]}',   step('b[1]'), 'descending ranges' ],
     [ '{"b":[{"c":[1,2]},{"c":[2,3]}]}',   step('b[1]'), 'overlapping ranges' ],

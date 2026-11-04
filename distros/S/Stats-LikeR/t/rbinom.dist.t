@@ -34,6 +34,7 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use Test::More;
+use Config;
 use Time::HiRes qw(time);
 use Stats::LikeR qw(rbinom pbinom pchisq mean var);
 
@@ -141,13 +142,52 @@ for my $c (@CASES) {
 	is_deeply(rbinom(n => 0, size => 5, prob => 0.5), [], 'n = 0 returns nothing');
 }
 
-# Not exercised here, and cannot be: `binom_draw()` keeps the old Bernoulli
-# loop for a `size` past IV_MAX, which BTPE's index type cannot carry.  On a
-# 64-bit-IV perl that is unreachable -- `sv_count_arg()` refuses anything above
-# 2^48 and IV_MAX is 2^63 -- and on the one 32-bit-IV build in the matrix
-# (5.44.0-i686, ivsize 4) reaching it means a size between 2^31 and 2^32, i.e.
-# two billion Bernoulli trials for a single variate.  A test that took half a
-# minute to draw one number would say nothing the sizes above do not.
+# ------------------------------------------------- size is a count of trials
+#
+# `size` is not an element count, so the 2^48 sanity bound on n does not apply
+# to it: R's rbinom(3, 1e15, 0.3) draws, and so must this (up to 0.3413 it
+# croaked "size is too large").  The one limit is what binom_draw() carries a
+# variate in, an IV, so size may be anything up to IV_MAX.  Expectations are
+# keyed off $Config{ivsize}, as t/seq.R.t does: 5.44.0-i686 has IV_MAX 2**31-1,
+# which an NV holds exactly; where ivsize is 8, 2**63-1 is not an NV, so the
+# largest accepted size is the double just below 2**63, 2**63-1024.  No R
+# reference exists for the bound itself (R falls back to qbinom() past INT_MAX);
+# the distribution checks use the same moments the cases above do.
+{
+	my $iv8 = $Config{ivsize} >= 8;
+	my $max = $iv8 ? 2**63 - 1024 : 2**31 - 1;
+	my $over = $iv8 ? 2**63 : 2**31;
+	my $x;
+	if ($iv8) {
+		$x = eval { rbinom(n => 3, size => 1e15, prob => 0.3) };
+		ok($x && @$x == 3, 'size = 1e15 is accepted') or diag($@);
+		for my $v (@{ $x || [] }) {
+			cmp_ok(abs($v - 3e14), '<', 6 * sqrt(1e15 * 0.3 * 0.7) * 3,
+			       "size = 1e15: variate $v is within a few SD of n*p");
+		}
+	} else {
+		#R's own case is past IV_MAX here, where a variate cannot be carried
+		eval { rbinom(n => 3, size => 1e15, prob => 0.3) };
+		like($@, qr/size is too large/, 'size = 1e15 is past IV_MAX on this perl, and croaks');
+	}
+	$x = eval { rbinom(n => 3, size => $max, prob => 0.5) };
+	ok($x && @$x == 3, "the largest size ($max) is accepted") or diag($@);
+	for my $v (@{ $x || [] }) {
+		cmp_ok(abs($v - $max / 2), '<', 8 * sqrt($max * 0.25),
+		       "size = $max: variate is within 8 SD of n*p");
+	}
+	# Numeric ==, not is_deeply: $max prints as an NV, the result is a UV.
+	my $one = rbinom(n => 2, size => $max, prob => 1);
+	ok($one->[0] == $max && $one->[1] == $max,
+	   'prob = 1 returns the largest size itself');
+	eval { rbinom(n => 3, size => $over, prob => 0.5) };
+	like($@, qr/rbinom: error: size is too large: /,
+	     "size = $over, past IV_MAX, croaks");
+	eval { rbinom(n => 3, size => 1e30, prob => 0.5) };
+	like($@, qr/size is too large/, 'size = 1e30 croaks');
+	eval { rbinom(n => 2**49, size => 5, prob => 0.5) };
+	like($@, qr/n is too large/, 'n keeps its 2^48 bound');
+}
 
 # ------------------------------------------------------------ reproducible
 #

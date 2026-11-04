@@ -1,6 +1,6 @@
 [
     {
-        "description": "bad syntax (validated against metaschema)",
+        "description": "v3.1: bad syntax (validated against metaschema)",
         "schema": {
             "$ref": "https://spec.openapis.org/oas/3.1/dialect/latest"
         },
@@ -29,7 +29,7 @@
                 "valid": false
             },
             {
-                "description": "missing oneOf, anyOf, allOf",
+                "description": "missing oneOf, anyOf, allOf is still valid",
                 "data": {
                      "discriminator": {
                          "propertyName": "petType"
@@ -68,7 +68,7 @@
         ]
     },
     {
-        "description": "discriminator value is not an object (traverse error)",
+        "description": "v3.1: discriminator value is not an object (traverse error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": "not an object"
@@ -82,7 +82,7 @@
         ]
     },
     {
-        "description": "missing required property propertyName (traverse error)",
+        "description": "v3.1: missing required property propertyName (traverse error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {}
@@ -96,7 +96,7 @@
         ]
     },
     {
-        "description": "discriminator propertyName is not a string (traverse error)",
+        "description": "v3.1: discriminator propertyName is not a string (traverse error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
@@ -112,7 +112,39 @@
         ]
     },
     {
-        "description": "missing discriminator property (evaluation error)",
+        "description": "v3.1: defaultMapping in discriminator is not permitted (traverse error)",
+        "schema": {
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
+            "discriminator": {
+              "defaultMapping": "foo"
+            }
+        },
+        "tests": [
+            {
+                "description": "additional properties are not permitted",
+                "data": {},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "v3.1: additional properties in discriminator are not permitted (traverse error)",
+        "schema": {
+            "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
+            "discriminator": {
+              "bloop": "foo"
+            }
+        },
+        "tests": [
+            {
+                "description": "additional properties",
+                "data": {},
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "v3.1: missing discriminator property (evaluation error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
@@ -128,7 +160,7 @@
         ]
     },
     {
-        "description": "discriminator mapping is not an object (traverse error)",
+        "description": "v3.1: discriminator mapping is not an object (traverse error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {
@@ -148,7 +180,7 @@
         ]
     },
     {
-        "description": "discriminator mapping value is not a string (traverse error)",
+        "description": "v3.1: discriminator mapping value is not a string (traverse error)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/latest",
             "discriminator": {

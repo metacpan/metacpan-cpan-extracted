@@ -47,8 +47,6 @@ recommends:
   Coro::AIO: '0'
   Devel::StackTrace::WithLexicals: '0.08'
   IO::AIO: '0'
-  Sub::Inspector: '0'
-  Test::Requires: '0'
   Time::Piece: '0'
 requires:
   CGI: '4.40'
@@ -64,11 +62,12 @@ requires:
   List::Util: '0'
   Locale::PO: '0'
   MOP4Import::Declare: '0.052'
-  Plack: '0'
+  Plack: '!= 1.0053'
   Sub::Identify: '0'
   Text::Glob: '0'
   Tie::IxHash: '0'
   Try::Tiny: '0'
+  URI: '0'
   URI::Escape: '0'
   autodie: '0'
   parent: '0'
@@ -77,5 +76,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/yatt_lite
-version: '0.200'
+version: '0.201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

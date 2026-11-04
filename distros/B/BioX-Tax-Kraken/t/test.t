@@ -146,13 +146,9 @@ ok(
 
 # Test children() method
 my @children = $tax->children(2759);
-ok(
-    @children > 1,
-    'children() returns at least two children'
-);
-ok(
-    grep { $_ eq '33154' } @children,
-    'children() includes expected child (33154)'
+is(
+    [sort {$a <=> $b} @children] => [sort {$a <=> $b} 33090, 33154],
+    'children() returns the two expected children'
 );
 is(
     $tax->children(99999) => undef,

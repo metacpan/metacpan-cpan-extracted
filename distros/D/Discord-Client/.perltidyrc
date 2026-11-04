@@ -1,0 +1,12 @@
+# Fixed indentation without aligning operators, declarations or comments.
+--indent-columns=4
+--continuation-indentation=4
+--extended-continuation-indentation
+--maximum-line-length=120
+--novalign
+--noline-up-parentheses
+
+# Produce stable formatting without changing Perl statements.
+--converge
+--noadd-semicolons
+--nodelete-semicolons

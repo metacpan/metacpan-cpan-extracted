@@ -1,4 +1,41 @@
 Revision history for Perl-Critic-Policy-ControlStructures-ProhibitMutatingListFunctionsStricter
 
+0.003 2026-11-03 TEODESIAN
+    - An inner anonymous sub with a signature, a prototype or attributes,
+      as sub ($x) { }, sub ($) { } or sub :lvalue { }, now counts as an
+      inner sub, as one without them already did.  A sub that changes $_
+      only in such an inner sub is no longer reported, nor is a call inside
+      one in the block with report_unresolved_calls or
+      report_postfix_for_calls.
+    - The default rule no longer reports a call, in a list function block,
+      of a sub that changes $_ where $_ is not the caller's element: inside
+      an inner sub, inside the block of a nested list function, inside the
+      body of a foreach with no loop variable, and before a postfix for.  A
+      nested block that calls it is reported once, for itself.  A call in
+      the body of a for my loop is still reported.
+    - The list of a foreach with no loop variable, and of a postfix for, is
+      now taken as the caller's, since perl evaluates it before it aliases
+      $_.  A sub that changes $_ there is reported, and so is a call there
+      with report_unresolved_calls.
+    - map EXPR, LIST and grep EXPR, LIST are now judged as a block is, by
+      the default rule: a change to $_ in the expression, or a call there of
+      a sub that changes $_, is reported against that map or grep.  Inside
+      an outer block, or in a sub that one calls, it is no longer counted
+      against the outer block, whose list it does not change.
+
+0.002 2026-11-03 TEODESIAN
+    - A sub called after a local $_ at the top of a list function block is
+      no longer reported, since it changes the block's copy of $_.
+    - New report_unresolved_calls, off by default: report a call in a list
+      function block, or in map EXPR and grep EXPR, to a sub or method that
+      the policy cannot read.  With it, the bare names of the List::Util,
+      List::MoreUtils, List::SomeUtils and List::UtilsBy functions that
+      alias $_ count as list functions too.
+    - New report_postfix_for_calls, off by default: report a call in a
+      statement with a postfix for, to a sub that changes $_ or one that the
+      policy cannot read.
+    - New allow_calls, for those two: callees taken as not writing $_.  The
+      default is the methods of UNIVERSAL.
+
 0.001 2026-10-09 TEODESIAN
     - Initial Release

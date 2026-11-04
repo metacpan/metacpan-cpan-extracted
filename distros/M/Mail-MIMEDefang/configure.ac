@@ -11,8 +11,29 @@ dnl the default to other than ${prefix}/etc
 echo $* | fgrep -e '--sysconfdir' > /dev/null 2>&1 || sysconfdir='/etc'
 
 AC_PROG_CC
-# Enforce C89 standard
-CFLAGS="$CFLAGS -std=c89 -D_BSD_SOURCE -D_DEFAULT_SOURCE"
+AC_USE_SYSTEM_EXTENSIONS
+
+dnl libmilter's mfapi.h does "typedef int bool;", which breaks with C23
+dnl where 'bool' is a keyword.  If the compiler defaults to C23, pick a
+dnl GNU pre-C23 dialect: unlike -std=cXX it does not define __STRICT_ANSI__,
+dnl which would hide POSIX/extension prototypes (e.g. on Solaris).
+AC_MSG_CHECKING(for a C dialect compatible with libmilter)
+md_c_std=none
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[typedef int bool;]], [[bool b = 0; (void)b;]])],
+  [md_c_std="default"],
+  [OLD_CFLAGS="$CFLAGS"
+   for md_std in gnu17 gnu11 gnu99; do
+     CFLAGS="$OLD_CFLAGS -std=$md_std"
+     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[typedef int bool;]], [[bool b = 0; (void)b;]])],
+       [md_c_std="-std=$md_std"; break])
+   done
+   CFLAGS="$OLD_CFLAGS"])
+AC_MSG_RESULT($md_c_std)
+case "$md_c_std" in
+  none)    AC_MSG_ERROR([no pre-C23 C dialect found; libmilter headers are not C23 compatible]) ;;
+  default) ;;
+  *)       CFLAGS="$CFLAGS $md_c_std" ;;
+esac
 
 AC_CHECK_PROGS(AR, ar, no)
 AC_CONFIG_HEADERS([config.h])
@@ -214,13 +235,13 @@ if test "$ac_cv_perlmodcheck" = "no" ; then
    dnl for installation of spamassassin.cf
    HAVE_SPAM_ASSASSIN=yes
 else
-    for module in 'IO::Socket' 'MIME::Tools 5.410 ()' 'MIME::WordDecoder' 'Digest::SHA' 'FindBin' ; do
+    for module in 'IO::Socket' 'MIME::Tools 5.412 ()' 'MIME::WordDecoder' 'Digest::SHA' 'FindBin' ; do
 	AC_MSG_CHECKING([for Perl module $module])
 	(echo "use lib '$PERLINSTALLSITELIB'; use $module;" ; echo "exit(0);") | $PERL > /dev/null 2>&1
 	if test $? != 0 ; then
 	    AC_MSG_WARN([*** Error trying to use Perl module $module])
 	    AC_MSG_WARN([*** Make sure the following Perl modules are installed:])
-	    AC_MSG_WARN([*** MIME::Tools version 5.410 or higher (5.411a recommended)])
+	    AC_MSG_WARN([*** MIME::Tools version 5.412 or higher])
 	    AC_MSG_WARN([*** MIME::WordDecoder])
 	    AC_MSG_WARN([*** Digest::SHA])
 	    AC_MSG_WARN([*** FindBin])

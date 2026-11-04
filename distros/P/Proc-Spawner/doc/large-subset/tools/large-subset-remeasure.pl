@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# large-subset-remeasure.pl (version of 2026-11-02; see doc/large-subset/large-subset-ceiling.md). Reads large-scan.jsonl of
+# large-subset-remeasure.pl (version of 2026-11-02; see doc/large-subset/large-subset-ceiling.md (in Proc-Spawner 0.03)). Reads large-scan.jsonl of
 # large-subset-scan.pl and prints, per source: acceptance by Proc::ShellSubset (all options) and Proc::ShellSubset::Large, and the
 # POSIX ceiling: dash -n and bash --posix -n accept the sample and ShellCheck (-s dash) gives no SC3xxx warning.
 # Cross-checks: the ceiling by the regex scan instead of ShellCheck, where the two detectors disagree, and how

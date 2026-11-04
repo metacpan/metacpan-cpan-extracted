@@ -23,63 +23,68 @@
 #
 # On tolerances
 #
-# lm() solves the normal equations: it forms X'X and sweeps it.  R and
-# statsmodels both factor X directly (Householder QR) and never form X'X.
-# Forming X'X squares the condition number, so the relative accuracy available
-# to lm() is bounded by eps * kappa(X'X), not by eps * kappa(X).  Each case
-# carries kappa(X'X) as `cond` to record where that bound sits -- for
-# `BodyFat ~ .` it is 2.1e9, which permits 4.6e-7.
+# Through 0.3413 lm() solved the normal equations: it formed X'X and swept it,
+# which squares the condition number, so the relative accuracy available to it
+# was bounded by eps * kappa(X'X).  It now factors X itself, by AS 274 Givens
+# rotations and one step of iterative refinement, as R and statsmodels factor X
+# by Householder QR, and the bound is eps * kappa(X), its square root.  Each
+# case carries kappa(X'X) as `cond` to record where the old bound sat -- for
+# `BodyFat ~ .` it is 2.1e9, which permitted 4.6e-7.
 #
 # That bound is only a ceiling, and using it as the tolerance would accept far
 # more error than lm() actually makes.  Each case instead carries a `tol` derived
-# from the deviation from R measured when this file was generated, times 200 for
-# headroom on other builds (a long-double NV perl rounds the literals below
-# differently, and its libm tails differ in the last bits).  The result is tight
-# where lm() is accurate and honest where it cannot be:
+# from the deviation from R measured when this file was generated, under the
+# normal equations, times 200 for headroom on other builds (a long-double NV
+# perl rounds the literals below differently, and its libm tails differ in the
+# last bits).  Those tolerances were kept when the solver changed.  Every case
+# was re-measured on 2026-11-03, against the 0.3413 code and the new, and
+# each is nearer R than it was except wide_dot, whose worst quantity went from
+# 1.2e-13 to 3.3e-13, still far inside its tol.
 #
 #   13 of the 42 generated cases hold to the 1e-11 floor.
-#   For the other 29, worst last -- `on` is the quantity that
-#   deviates most, and `permits` is eps * kappa(X'X) for that design:
+#   For the other 29, worst last -- `on` is the quantity that deviated most
+#   under the normal equations, `permits` is eps * kappa(X'X) for that design,
+#   and `now` is the worst deviation of any quantity on 2026-11-03:
 #
-#     warp_fac_inter  5.6e-14  on t_value       permits  2.2e-14
-#     tooth_noint_mixed 7.6e-14  on p_value       permits  5.5e-15
-#     nasfac_drop     8.7e-14  on p_value       permits  8.2e-14
-#     tooth_two       9.9e-14  on p_value       permits  5.3e-15
-#     aliased_x3      1.3e-13  on p_value       permits  9.0e+02
-#     tooth_interact  1.6e-13  on p_value       permits  2.7e-14
-#     mt_two          1.7e-13  on p_value       permits  7.9e-11
-#     mt_simple       2.0e-13  on f_pvalue      permits  3.7e-14
-#     mt_hp_resp      2.6e-13  on p_value       permits  1.8e-10
-#     iris_factor     6.7e-13  on p_value       permits  3.2e-15
-#     wide_dot        7.2e-13  on t_value       permits  3.4e-15
-#     nasfac_inter    8.2e-13  on t_value       permits  3.4e-13
-#     three_way_noint 8.7e-13  on estimate      permits  1.0e-14
-#     air_dot         1.0e-12  on p_value       permits  1.6e-09
-#     mt_five         1.1e-12  on p_value       permits  1.3e-08
-#     mt_colon        1.1e-12  on p_value       permits  9.3e-09
-#     mt_star         1.1e-12  on p_value       permits  9.3e-09
-#     air_three       1.3e-12  on fitted        permits  1.4e-09
-#     mt_dot          2.7e-12  on f_pvalue      permits  3.4e-08
-#     mt_quad         2.9e-12  on p_value       permits  4.6e-12
-#     bigscale_three  4.4e-12  on p_value       permits  2.5e+04
-#     iris_dotted     4.9e-12  on f_pvalue      permits  1.5e-13
-#     iris_mixed      5.3e-12  on f_pvalue      permits  6.7e-13
-#     three_way       7.2e-12  on estimate      permits  2.1e-12
-#     bf_three        1.8e-11  on f_pvalue      permits  5.9e-09
-#     mt_cubic        1.0e-10  on t_value       permits  1.8e-09
-#     iris_fac_inter  1.6e-10  on f_pvalue      permits  7.2e-12
-#     bf_dot          1.1e-08  on residuals     permits  4.8e-07
-#     bf_star         1.3e-08  on estimate      permits  6.2e-05
+#     warp_fac_inter  5.6e-14  on t_value       permits  2.2e-14  now 2.4e-14
+#     tooth_noint_mixed 7.6e-14  on p_value       permits  5.5e-15  now 3.2e-14
+#     nasfac_drop     8.7e-14  on p_value       permits  8.2e-14  now 2.2e-14
+#     tooth_two       9.9e-14  on p_value       permits  5.3e-15  now 2.5e-14
+#     aliased_x3      1.3e-13  on p_value       permits  9.0e+02  now 2.4e-14
+#     tooth_interact  1.6e-13  on p_value       permits  2.7e-14  now 3.7e-14
+#     mt_two          1.7e-13  on p_value       permits  7.9e-11  now 3.4e-14
+#     mt_simple       2.0e-13  on f_pvalue      permits  3.7e-14  now 3.2e-14
+#     mt_hp_resp      2.6e-13  on p_value       permits  1.8e-10  now 2.4e-14
+#     iris_factor     6.7e-13  on p_value       permits  3.2e-15  now 7.8e-14
+#     wide_dot        7.2e-13  on t_value       permits  3.4e-15  now 3.3e-13
+#     nasfac_inter    8.2e-13  on t_value       permits  3.4e-13  now 1.1e-13
+#     three_way_noint 8.7e-13  on estimate      permits  1.0e-14  now 3.8e-14
+#     air_dot         1.0e-12  on p_value       permits  1.6e-09  now 4.5e-14
+#     mt_five         1.1e-12  on p_value       permits  1.3e-08  now 9.5e-15
+#     mt_colon        1.1e-12  on p_value       permits  9.3e-09  now 2.0e-14
+#     mt_star         1.1e-12  on p_value       permits  9.3e-09  now 2.0e-14
+#     air_three       1.3e-12  on fitted        permits  1.4e-09  now 2.8e-14
+#     mt_dot          2.7e-12  on f_pvalue      permits  3.4e-08  now 6.7e-14
+#     mt_quad         2.9e-12  on p_value       permits  4.6e-12  now 2.8e-14
+#     bigscale_three  4.4e-12  on p_value       permits  2.5e+04  now 5.3e-14
+#     iris_dotted     4.9e-12  on f_pvalue      permits  1.5e-13  now 6.7e-14
+#     iris_mixed      5.3e-12  on f_pvalue      permits  6.7e-13  now 1.0e-13
+#     three_way       7.2e-12  on estimate      permits  2.1e-12  now 1.5e-12
+#     bf_three        1.8e-11  on f_pvalue      permits  5.9e-09  now 5.0e-13
+#     mt_cubic        1.0e-10  on t_value       permits  1.8e-09  now 2.4e-13
+#     iris_fac_inter  1.6e-10  on f_pvalue      permits  7.2e-12  now 8.5e-14
+#     bf_dot          1.1e-08  on residuals     permits  4.8e-07  now 2.3e-12
+#     bf_star         1.3e-08  on estimate      permits  6.2e-05  now 6.9e-12
 #
 # Two independent things move those numbers, which is the reason the tolerance is
 # measured rather than predicted:
 #
-#   * The linear solve, bounded by eps * kappa(X'X).  This is what dominates the
-#     two ill-conditioned bodyfat models -- and even they stay well inside the
-#     bound, bf_dot by two orders of magnitude and bf_star by four.  Note that
-#     bigscale, whose kappa(X'X) of 1.1e20 formally guarantees nothing at all,
-#     still agrees with R to 4.4e-12, and on a p-value at that: its estimates
-#     agree better still.
+#   * The linear solve.  Under the normal equations it dominated the two
+#     ill-conditioned bodyfat models, which still stayed well inside their
+#     eps * kappa(X'X), bf_dot by two orders of magnitude and bf_star by four;
+#     factoring X took both to about 5e-12.  Note that bigscale, whose
+#     kappa(X'X) of 1.1e20 formally guaranteed nothing at all, agreed with R to
+#     4.4e-12 then and agrees to 5.3e-14 now.
 #   * The special functions behind Pr(>|t|) and f_pvalue.  lm()'s incomplete beta
 #     and R's pt/pf agree only to a few ulp of each other, and that difference is
 #     independent of the design matrix.  It is why several well-conditioned cases
@@ -2728,7 +2733,7 @@ for my $c (@CASES) {
 		is($bare->{rank}, 6,
 			'coding: the full cross plus an intercept is rank deficient by one');
 		is($bare->{'df_residual'}, 48, 'coding: bare interaction df_residual');
-		# The sweep pivots left to right, as R's pivoted QR does, so the column
+		# lm() tests the columns left to right, as R's pivoted QR does, so the column
 		# that ends up aliased is the last one -- woolB:tensionM here.
 		ok(is_nanish($bare->{coefficients}{'woolB:tensionM'}),
 			'coding: the aliased column is the last one, as in R');

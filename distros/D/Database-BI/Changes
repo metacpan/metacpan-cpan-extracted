@@ -1,5 +1,93 @@
 Revision history for Database-BI
 
+0.019.0	Tue Nov  3 11:46:08 AM EST 2026
+	[ Enhancements ]
+	- Stored lookups: POST /lookups/save adds the columns of another file under
+	  data_dir to every matching row, on every page, chart, export and canvas.
+	  nolk= skips one for a view; lk= applies one stored for another dataset.
+	- Field extraction: rx() in a calculated field takes a value out of a column
+	  with a regular expression, and POST /extract/save stores a pattern whose
+	  named groups become columns everywhere.
+	- Accelerated datasets: script/bi-extract builds a SQLite copy of a large
+	  file under <model_dir>/extracts/, which the pages read while the file is
+	  unchanged.  Once it changes, the file is read and the page says so.
+	- A calculated field can read a cross-row column (cs=).
+	- MariaDB and MySQL: mariadb:server/table opens a table of a server named in
+	  mariadb_servers, anywhere a source is taken.  The spec holds only the name.
+	- Export PDF on every chart page.
+	- Canvas: text cards, for titles and explanations.  Cards save as SVG, PNG
+	  and PDF, showing the whole chart and a pie's legend.
+	- Saved charts carry "Database::BI" at the bottom right.
+	- A website, in website/html/.
+	- script/database-bi FILE starts the server showing that database.
+	- Dark mode, chosen on a new Preferences page.  Saved charts, printed pages
+	  and embedded canvases stay light.
+	- Every feature can be reached from the pages: Lookups and Extract fields
+	  panels, a canvas Share panel (link, embed code, JSON download) with Import
+	  canvas to read it back, and Forget remembered columns on the map panel.
+	- A refused request in a browser shows the reason on a page with a way back.
+	- POST /geo/save takes repeated col=/kind= pairs, and replace=1.
+	- Canvases in the main navigation opens a new /canvases page.
+	- Database::Abstraction 0.54, File::Temp 0.2308 and HTML::D3 0.27 are now
+	  required.
+	[ Bug Fixes ]
+	- Security: error replies that repeat a parameter were sent as HTML, so a
+	  crafted link such as /bar?range=<script> ran script on this site.
+	  scheme= reached a chart's script unchecked.  A cell holding
+	  </script><script> ran on /bar, /pie, /stacked and /graph.
+	- On Windows, a symlink was not followed when checking that a file is under
+	  data_dir, so a link could point a lookup outside it.
+	- Saved definitions for a path: dataset reached through a symlink were not
+	  found by its /open page.
+	- week() was 0 on Windows.
+	- A saved definition that could no longer be applied made every page of its
+	  dataset a 400, so the panel that mends it could not be reached.  The table
+	  page is now drawn without it, with a note saying what is wrong.
+	- A saved group's column was missing from the table page and canvas cards,
+	  and groups saved from the panel never matched a row.
+	- The map panel's Remember columns added to the saved columns rather than
+	  replacing them.
+	- A panel reopened after a save could list what was there before.
+	- A SQLite .db file holding a table named after the file was read as text.
+	- A SQLite file could not be opened when its first table's name had
+	  characters other than letters, digits and underscores.
+	- /open, /join and /combine left out calculated fields and span= time
+	  buckets.  cs= on the table page could not read them.
+	- A filter on a cross-row column, a calculated column or a time bucket found
+	  no rows.
+	- lt, le, gt and ge treated a blank or a word as zero; they now compare
+	  numbers only, and read $1,234.56 and (1,234.56).
+	- A column of codes (SKU123) or dates was read as numbers; 1e3 was read as 13.
+	- Merge hung on BSDs with the File::Temp that Perl 5.28 ships.
+	- hypnotoad script/database-bi never served the application.
+	- Page links on a table opened with no other query were broken.
+	- A file with no header row split quoted fields and dropped empty ones.
+	  Sorting did nothing on such files, on XLSX and Berkeley DB, and on columns
+	  such as "First Name".  XLSX and Berkeley DB are now read by
+	  Database::Abstraction.
+	- /api/range ignored joins and combines.
+	- DataSource->updated() now gives the file's mtime.
+	- /embed/:id drew no charts.  A canvas card's CSV download always failed.
+	- Writes to analyses.json reported success when nothing was saved; they now
+	  answer 503.  A store that could not be parsed was replaced by the next
+	  save; it is now kept as <file>.corrupt.<time>.
+	- A canvas or models.json of the wrong shape was a 500.  PUT, PATCH and
+	  import now refuse or drop what POST does.
+	- /export and /folder hung on a bad span= or calculated field.
+	- 500s and exception pages now give a message instead: an unreadable data
+	  or staging directory, SQLite export without a driver, a JSON URL that
+	  holds no rows, a failing map renderer, a sorted export or a page on a
+	  read-only backend, an unknown heatmap scheme.
+	- Errors no longer show readers Perl source paths, line numbers or @INC.
+	- An absolute data_dir defeated the check that keeps analyses.json out of it.
+	- Non-numeric page=, per_page=, topn= and bins= are ignored.
+	- Line chart exports cut off rotated labels, and saved charts lost their
+	  fonts.
+	- Smaller fixes in Insights, calculated fields, Summary, Ask, the map and
+	  links built from non-ASCII text.
+	- Tutorial: new chapters on navigation, Ask, bi-geocode and the settings
+	  file, and the existing ones brought up to date.
+
 0.018.0	Wed Oct 28 08:41:28 PM EDT 2026
 	[ Enhancements ]
 	- Cross-row columns: cs=<col>:<fn>:<alias>[:<arg>] with by= and order=

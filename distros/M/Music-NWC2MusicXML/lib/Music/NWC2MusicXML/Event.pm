@@ -3,7 +3,7 @@ package Music::NWC2MusicXML::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.002.3';
+our $VERSION = '0.002.4';
 
 use Carp qw(croak carp);
 use Readonly;
@@ -76,7 +76,7 @@ or score metadata record.
 
 =head1 VERSION
 
-0.002.3
+0.002.4
 
 =head1 SYNOPSIS
 

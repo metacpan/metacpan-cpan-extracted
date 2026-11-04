@@ -1,0 +1,6 @@
+# Enforce the repository's formatter profile.
+only = 1
+severity = 1
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = .perltidyrc

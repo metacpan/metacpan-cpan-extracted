@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data &mdash; Database::BI</title>
+<meta name="description" content="How Database::BI reads data files, and the pipeline every table, chart and canvas shares: joins, combine, filters, ranges, calculated fields, groups, lookups, field extraction, cross-row columns.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="data.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="Data &mdash; Database::BI">
+<meta property="og:description" content="How Database::BI reads data files, and the pipeline every table, chart and canvas shares: joins, combine, filters, ranges, calculated fields, groups, lookups, field extraction, cross-row columns.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="charts.html">Charts</a>
+			<a href="canvas.html">Canvases</a>
+			<a href="data.html" aria-current="page">Data</a>
+			<a href="api.html">API</a>
+			<a href="install.html">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">Files in, answers out</p>
+	<h1>Data</h1>
+	<p class="lead">
+		There is no import step. A data file is opened, read and turned into rows
+		on each request, through one pipeline that every table, chart, pivot and
+		canvas shares. Nothing is ever written back to the file.
+	</p>
+</div>
+
+<h2 id="sources">Where data can come from</h2>
+<div class="table-wrap">
+<table>
+	<thead>
+		<tr><th>Source</th><th>Opened with</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Files in the data directory</td>
+			<td>The home page, or <code>l=table:name</code>. A card per file.</td>
+		</tr>
+		<tr>
+			<td>Any file on disc</td>
+			<td><code>/browse</code> to walk the filesystem, <code>/open?path=/abs/path</code> to open one by path, or <a href="install.html#run"><code>script/database-bi FILE</code></a> to show one at the home address.</td>
+		</tr>
+		<tr>
+			<td>A file on another host</td>
+			<td><code>/../[user@]host/dir/file.csv</code>, fetched over SFTP.</td>
+		</tr>
+		<tr>
+			<td>A table in a multi-table SQLite file</td>
+			<td><code>?it=&lt;table&gt;</code>, or <code>/tables?l=</code> to browse the schema first.</td>
+		</tr>
+		<tr>
+			<td>A table on a web page</td>
+			<td><code>/import?url=&amp;t=N</code> fetches an HTML table and renders it without saving it to disc.</td>
+		</tr>
+		<tr>
+			<td>A Redis hash store</td>
+			<td><code>redis:tablename|redis://host:port</code>, when the Redis module is installed. Keys follow the <code>tablename:entry</code> convention.</td>
+		</tr>
+		<tr>
+			<td>A table on a MariaDB or MySQL server</td>
+			<td><code>mariadb:server/table</code>, where <code>server</code> is a name <a href="#mariadb">set up in the configuration</a>. <code>mariadb:server</code> lists its tables.</td>
+		</tr>
+		<tr>
+			<td>A file you drag onto the page</td>
+			<td>Uploaded to the staging directory and opened immediately. Uploads older than 24 hours are evicted at startup.</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+<p>
+	Recognised extensions are <code>csv</code>, <code>psv</code>, <code>tsv</code>,
+	<code>sql</code>, <code>sqlite</code>, <code>sqlite3</code>, <code>db</code>,
+	<code>xml</code>, <code>xlsx</code> and JSON. A file whose columns cannot be
+	identified is read as header-less and given synthetic column names rather
+	than silently losing its first row.
+</p>
+<p id="mariadb">
+	A <strong>MariaDB or MySQL server</strong> is opened by name. Add it to
+	<code>database_bi.conf</code>; the home page then has a card that lists its
+	tables, and <code>mariadb:shop/orders</code> opens one anywhere a source is taken.
+</p>
+<pre><code>{
+    mariadb_servers =&gt; {
+        shop =&gt; {
+            host     =&gt; 'db.example.com',  # default: localhost
+            port     =&gt; 3306,              # optional
+            database =&gt; 'shop',            # required
+            username =&gt; 'bi_reader',
+            password =&gt; 'secret',
+        },
+    },
+}</code></pre>
+<p>
+	The spec holds only the name, because a spec travels in URLs, shared links and
+	saved canvases. The password stays in the configuration file, so keep that
+	readable only by the account that runs the application. Give the server an account
+	with only <code>SELECT</code>: anyone who can reach the application can open any
+	table that account can read.
+</p>
+
+<h2 id="pipeline">The pipeline</h2>
+<p class="section-intro">
+	The stages run in a fixed order, so every view over the same parameters sees
+	the same rows.
+</p>
+<ol class="steps">
+	<li>
+		<strong>Open and join.</strong> The left source is read; each
+		<code>j=&lt;spec&gt;|&lt;leftkey&gt;|&lt;rightkey&gt;</code> appends
+		columns from another table, keeping every left row. <code>c=&lt;spec&gt;</code>
+		stacks further files under the result on a unified column set.
+	</li>
+	<li>
+		<strong>Normalise dates, look up and compute fields.</strong> A stored date pattern
+		turns a column into ISO-8601; a stored lookup adds columns from a second
+		file, matched on one key; a stored extraction pulls columns out of another
+		with a regular expression; calculated fields
+		(<code>c=name:expression</code>) become virtual columns; named groups become
+		virtual <code>&lt;col&gt;_group</code> columns.
+	</li>
+	<li>
+		<strong>Narrow.</strong> Filters (<code>f=col:op:value</code>) and a
+		relative time range (<code>range=</code>, <code>rcol=</code>) are applied
+		after the joins and before anything is aggregated.
+	</li>
+	<li>
+		<strong>Add cross-row columns.</strong> A running total, rank or z-score is
+		written beside each row, after filtering and before pagination &mdash; so
+		page two continues page one's running total.
+	</li>
+	<li>
+		<strong>Aggregate and draw.</strong> The chart, pivot, statistic or table
+		sees the finished rows; SQL aggregation is used where the source can do it,
+		and Perl otherwise.
+	</li>
+</ol>
+
+<h2 id="filters">Filters</h2>
+<pre><code>GET /view/sales?f=region:eq:North&amp;f=amount:gt:100</code></pre>
+<dl class="spec">
+	<dt>Operators</dt>
+	<dd>
+		<code>eq</code>, <code>ne</code>, <code>contains</code>,
+		<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
+		<code>ge</code>, <code>empty</code>, <code>notempty</code>. String
+		comparisons are case-insensitive. The four order operators compare numbers,
+		reading <code>$1,234.56</code> and <code>(1,234.56)</code> as numbers too; a
+		blank or a word in the cell matches none of them.
+	</dd>
+	<dt>Dates</dt>
+	<dd>
+		When the filter value is an ISO <code>YYYY-MM-DD</code> date, a cell
+		written <code>M/D/YYYY</code> is normalised before the comparison, so a
+		link works against either spelling.
+	</dd>
+	<dt>Chips</dt>
+	<dd>
+		Each active condition is a chip in the toolbar with its own remove button,
+		so conditions can be dropped one at a time. A relative range is one chip,
+		not two frozen dates.
+	</dd>
+</dl>
+
+<h2 id="ranges">Relative time ranges</h2>
+<p>
+	Any data view, chart, pivot or canvas can be limited to a named window worked
+	out from today rather than from dates typed into a link:
+</p>
+<pre><code>GET /view/sales?range=last_30_days&amp;rcol=sale_date
+GET /a/mycanvas?range=this_quarter&amp;rcol=order_date</code></pre>
+<p>The vocabulary is:</p>
+<pre><code>last_24_hours
+today, yesterday
+last_7_days, last_30_days, last_90_days
+this_month, last_month
+this_quarter, last_quarter
+this_year, last_year</code></pre>
+<p>
+	The window is resolved when the request arrives and applied as two ordinary
+	filters on that column, <code>col:ge:lo</code> and <code>col:le:hi</code>, so
+	the table, every chart, the pivot, the statistics, the insights, the exports
+	and a saved canvas all show the same rows. Filters you wrote are untouched.
+	Entries whose window falls entirely outside the data are disabled in the
+	filter bar, with the column's earliest and latest value in the tooltip.
+</p>
+<p>
+	An unknown <code>range=</code> is a 400 rather than a silently unfiltered
+	view, and so is a range with no <code>rcol=</code>.
+</p>
+
+<h2 id="calc">Calculated fields</h2>
+<p>
+	A virtual column defined by an expression, either inline
+	(<code>?c=name:expr</code>) or stored against the dataset with
+	<code>POST /calc/save</code>. Expressions support arithmetic, comparison,
+	<code>IF</code>, string, numeric and date functions, plus
+	<code>bin(value,width)</code> for histogram grouping.
+</p>
+<p>
+	The timestamp functions &mdash; <code>epoch(v[,fmt])</code>, <code>hour(v)</code>,
+	<code>minute(v)</code>, <code>second(v)</code> and
+	<code>span(v, interval)</code> &mdash; are how a time bucket can be written
+	by hand when the URL has no single dimension for <code>span=</code> to use.
+</p>
+
+<h2 id="groups">Named groups and date patterns</h2>
+<p>
+	A named group maps many raw values onto one label for a column, producing a
+	virtual <code>&lt;col&gt;_group</code> column that charts and pivots can group
+	by. A date pattern tells the application how a column's dates are written
+	&mdash; <code>%m/%d/%Y</code>, <code>%d/%m/%Y</code> or
+	<code>%d-%b-%Y</code> &mdash; and, with a time part, normalises the column to
+	a timestamp that <code>epoch()</code>, <code>span()</code> and
+	<code>last_24_hours</code> can read. Both are stored per dataset in
+	<code>models.json</code> and managed from panels on the data pages. The
+	group column appears in the table as well as in its charts and exports.
+</p>
+
+<h2 id="lookups">Stored lookups</h2>
+<p>
+	A lookup adds columns to every row from a second file, matched on one key: a
+	shop code in the orders gains the shop's city and region. It is stored per
+	dataset and applied on every route, the export and a canvas, before
+	calculated fields and filters, so both can read the new columns.
+</p>
+<pre><code>POST /lookups/save  l=table:orders&amp;name=shops&amp;file=lookups/shops.csv
+                    &amp;key=code&amp;col=shop&amp;fields=city,region&amp;default=unknown</code></pre>
+<p>
+	The file must be a data file under <code>data_dir</code>, of at most 8&nbsp;MiB;
+	a URL, a remote path and a symlink leading outside are refused.
+	<code>key</code> is the lookup file's column and <code>col</code> the
+	dataset's (the same name when left out). Keys are compared as text after
+	trimming spaces, and case matters. The first row with a key wins, and the log
+	says when a key repeats. A key that is not in the file gets
+	<code>default</code>, or nothing. A field whose name the dataset already has
+	is added as <code>&lt;name&gt;_&lt;field&gt;</code>, so a source column is
+	never overwritten.
+</p>
+<p>
+	<code>nolk=&lt;name&gt;</code> skips a stored lookup for one request, and
+	<code>lk=&lt;name&gt;</code> applies one stored for another dataset. A lookup
+	is not a join: for more than one key, or a row that matches many rows, use Merge.
+	The table page's <b>Lookups</b> panel saves, lists and deletes them, and its
+	<b>Skip in this view</b> adds the <code>nolk=</code>.
+</p>
+
+<h2 id="extract">Field extraction</h2>
+<p>
+	A regular expression can pull values out of a column. For one value, use
+	<code>rx()</code> in a calculated field:
+	<code>c=country:rx(ref,'^([A-Z]{2})-','1')</code>. To make several columns
+	from one pattern, store an extraction; each named group becomes a column:
+</p>
+<pre><code>POST /extract/save  l=table:invoices&amp;name=parts&amp;col=ref
+                    &amp;pattern=^(?&lt;country&gt;[A-Z]{2})-(?&lt;year&gt;\d{4})-</code></pre>
+<p>
+	It applies everywhere a lookup does, after the lookups. A row the pattern
+	does not match gets <code>(unparseable)</code>, so it groups visibly instead
+	of vanishing. A pattern over 200 characters, one that does not compile, and
+	one using <code>(?{</code>, <code>(??{</code>, <code>(?p</code> or
+	<code>(*</code> are refused. That is not a sandbox: regular expressions have
+	no timeout, so a pathological pattern stalls its own request. Patterns are
+	entered by whoever runs the server. The table page's <b>Extract fields</b>
+	panel saves, lists and deletes them.
+</p>
+
+<h2 id="stored-faults">When a saved column cannot be worked out</h2>
+<p>
+	A file can change under the definitions saved for it: a lookup file is
+	deleted, or a column an extraction or a calculated field reads is dropped.
+	The charts and exports of that dataset then refuse, with the reason. The
+	table page is still drawn, without the dataset's saved calculated fields,
+	lookups and extractions, and with a note that names the one at fault and
+	opens the panel that corrects or deletes it. A mistake in the request's own
+	<code>c=</code> is still a 400.
+</p>
+<p>
+	A refused request is answered with a 400 and the reason in plain text. When a
+	browser asked for the page, the reason is shown on a page with the breadcrumb
+	back to the table and a Back button instead; scripts and the JSON API still
+	get plain text or JSON.
+</p>
+
+<h2 id="cross-row">Cross-row columns</h2>
+<p>
+	A cross-row column is worked out from many rows and written beside each one.
+	Every data route, the export and a saved canvas accept the same plan:
+</p>
+<pre><code>cs=&lt;column&gt;:&lt;function&gt;:&lt;alias&gt;[:&lt;count&gt;]   repeatable
+by=&lt;column&gt;[,&lt;column&gt;...]                  partition (optional)
+order=&lt;column&gt;[:asc|desc]                  the order rows are read in</code></pre>
+<div class="table-wrap">
+<table>
+	<thead>
+		<tr><th>Function</th><th>Needs <code>order=</code></th><th>Gives</th></tr>
+	</thead>
+	<tbody>
+		<tr><td><code>pct_of_total</code>, <code>rank</code>, <code>zscore</code></td><td>no</td><td>A row's share of its partition's total, its rank, its standard score.</td></tr>
+		<tr><td><code>running_total</code>, <code>running_count</code>, <code>running_pct</code></td><td>yes</td><td>A total, count or percentage accumulated down the order.</td></tr>
+		<tr><td><code>window_sum</code>, <code>window_avg</code></td><td>yes, plus a count</td><td>A sum or average over a sliding window of rows.</td></tr>
+		<tr><td><code>lag</code>, <code>delta</code>, <code>pct_change</code></td><td>yes</td><td>The previous row's value, the change, and the change as a percentage.</td></tr>
+	</tbody>
+</table>
+</div>
+<p>
+	An unknown function or column, or a parameter where none is taken, is a 400.
+</p>
+<p>
+	Cross-row columns and calculated fields can build on each other. A calculated field can read
+	the new column, as in <code>c=half:ytd/2</code>, and <code>cs=</code> can read a calculated field or a
+	time bucket, as in <code>span=1mon&amp;tcol=at&amp;order=at_span&amp;cs=amount:running_total:ytd</code>.
+	Filters run before the pass, so a window is over the rows they leave. A filter that names a
+	column the pass writes runs last instead: <code>f=ytd:gt:50</code> selects rows without changing their totals.
+</p>
+
+<h2 id="pivot">Pivot and statistics</h2>
+<p>
+	<code>/pivot</code> builds a crosstab from row dimensions, column dimensions
+	and one or more measures:
+</p>
+<pre><code>GET /pivot?l=table:sales&amp;rows=region,rep&amp;cols=quarter \
+           &amp;m=amount:sum:total&amp;m=amount:median:typical&amp;totals=1</code></pre>
+<dl class="spec">
+	<dt>Measures</dt>
+	<dd>
+		<code>sum</code>, <code>avg</code>, <code>min</code>, <code>max</code>,
+		<code>count</code>, <code>count_distinct</code>, <code>median</code>,
+		<code>stdev</code>, <code>first</code>, <code>last</code>,
+		<code>range</code>, and <code>p&lt;N&gt;</code> from <code>p1</code> to
+		<code>p100</code> for a percentile.
+	</dd>
+	<dt>Totals and limits</dt>
+	<dd>
+		<code>totals=1</code> adds subtotals and a grand total;
+		<code>topn=</code> with <code>topn_col=</code> keeps the top row groups;
+		<code>max_cols=</code> collapses the tail of column combinations into
+		"Other".
+	</dd>
+	<dt>Exports</dt>
+	<dd><code>format=csv|sqlite|json|xlsx</code> streams the table as a download.</dd>
+</dl>
+<p>
+	<code>/stats</code> reports the same measures per column &mdash; count, nulls,
+	distinct, first, last, and for numeric columns min, max, range, mean, median,
+	a percentile and the sample standard deviation &mdash; computed by the same
+	functions the pivot uses, because a median is not the sum of the medians of
+	its parts.
+</p>
+
+<h2 id="exports">Getting data out</h2>
+<pre><code>GET  /export?...&amp;format=csv        # RFC 4180, UTF-8, CRLF
+GET  /export?...&amp;format=sqlite     # one table, named "data"
+POST /export  l=...&amp;dir=/tmp&amp;filename=out.csv</code></pre>
+<p>
+	The export is the current logical view, after joins, filters and
+	deduplication, not the raw file. The download's name comes from the left
+	table's label. JSON is available from the pivot and from a canvas card, and
+	XLSX from the pivot.
+</p>
+
+<h2>Limits worth knowing</h2>
+<ul class="plain">
+	<li>Read-only: cell editing and write-back are not implemented.</li>
+	<li>
+		Only a page of an unfiltered MariaDB table is read with <code>LIMIT</code>. A
+		filter, Merge, Combine or an export reads the whole table into memory, so open
+		a very large one through a view that narrows it.
+	</li>
+	<li>
+		A MariaDB table or view named with anything but letters, digits and underscores
+		cannot be opened. Its card shows a <code>CREATE VIEW</code> that gives it a
+		usable name.
+	</li>
+	<li>
+		Joins happen in memory, with a spill to a temporary SQLite file when the
+		result is large; a join of files that do not fit in memory is not the use
+		this is built for.
+	</li>
+	<li>
+		A relative range compares the column as a string, like every other filter.
+		A timestamp with an offset is read as far as its <code>YYYY-MM-DD</code>
+		prefix, so <code>last_24_hours</code> is exact on an ISO
+		<code>YYYY-MM-DDTHH:MM:SS</code> column.
+	</li>
+	<li>
+		Upload staging is managed: subdirectories older than 24 hours are evicted
+		at startup, and "Clear upload cache" empties it immediately.
+	</li>
+	<li>
+		Only the first worksheet of an XLSX workbook is read.
+	</li>
+</ul>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

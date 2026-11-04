@@ -48,19 +48,19 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.151'
+    version: '0.152'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.151'
+    version: '0.152'
   JSON::Schema::Modern::Vocabulary::OpenAPI_3_0:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm
-    version: '0.151'
+    version: '0.152'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.151'
+    version: '0.152'
   OpenAPI::Modern::Utilities:
     file: lib/OpenAPI/Modern/Utilities.pm
-    version: '0.151'
+    version: '0.152'
 requires:
   Clone: '0'
   Encode: '2.89'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/OpenAPI-Modern/issues
   homepage: https://github.com/karenetheridge/OpenAPI-Modern
   repository: https://github.com/karenetheridge/OpenAPI-Modern.git
-version: '0.151'
+version: '0.152'
 x_Dist_Zilla:
   perl:
     version: '5.045004'
@@ -140,6 +140,7 @@ x_Dist_Zilla:
             - README.pod
             - TODO
             - pull_request_template.md
+            - share/ether_was_here
           exclude_match: []
           include_dotfiles: 0
           prefix: ''
@@ -773,7 +774,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.151
+          tag: v0.152
           tag_format: v%V
           tag_message: v%v%t%n%n%c
         Dist::Zilla::Role::Git::Repo:

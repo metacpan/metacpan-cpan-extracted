@@ -88,7 +88,7 @@ One loop, `loop_until(DONE)` (since 2026-11-02 `Proc::Spawner::wait_until`): run
   - the order of two stderr lines from parallel pipeline elements, which varies in dash too.
 - Found by these tests in the parser: item P1 of `claude/pspawn-known-issues.md`, fixed in the project's parser on 2026-11-01.
 - `compare.pl sigenv.txt`: signal dispositions, environment and identity of children (section 9).
-- Rerun on 2026-11-01 after the graph objects went in: the same counts (battery 41/43 in 21 of 22 runs, see X13), `hyg.pl` clean, `mem.pl` and `xs.pl` flat. Hand-written graphs: `sgraph/run-graph.pl`, 17 of 17 processes as drawn (`claude/pspawn-graph.md`, section 5).
+- Rerun on 2026-11-01 (pre-0.01) after the graph objects went in: the same counts (battery 41/43 in 21 of 22 runs, see X13), `hyg.pl` clean, `mem.pl` and `xs.pl` flat. Hand-written graphs: `sgraph/run-graph.pl`, 17 of 17 processes as drawn (`claude/pspawn-graph.md`, section 5).
 
 ## 8. Not done, or different (the current list: `claude/pspawn-known-issues.md`)
 

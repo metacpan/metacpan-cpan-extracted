@@ -7,6 +7,7 @@ use Mojo::DOM  ();
 use Mojo::File ();
 use File::Temp ();
 use Mojo::Util qw(url_escape);
+use DBI ();
 
 use Database::BI::Controller::Dashboard ();
 
@@ -241,6 +242,19 @@ subtest 'order= sorts stably, and numbers sort as numbers' => sub {
 		'so each row carries the total reading 30, then 20, then 10');
 };
 
+subtest 'page links join their query correctly, with or without one' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	$t->get_ok('/view/orders?per_page=2')->status_is(200)
+	  ->content_like(qr{href="/view/orders\?page=2&amp;per_page=2"}, 'a bare URL starts its query with ?');
+	$t->get_ok('/view/orders?order=day:asc&per_page=2')->status_is(200)
+	  ->content_like(qr{href="/view/orders\?order=[^"]*&amp;page=2&amp;per_page=2"}, 'a URL with a query goes on with &');
+	$t->get_ok('/view/orders?per_page=2&page=2')->status_is(200)
+	  ->content_like(qr{href="/view/orders\?page=3&amp;per_page=2"}, 'and the next link can be followed');
+	$t->get_ok('/view/orders?page=3&per_page=2')->status_is(200);
+	is_deeply(\@warnings, [], 'no warning about a non-numeric argument');
+};
+
 subtest 'the functions reach /view, page after page' => sub {
 	$t->get_ok('/view/orders?cs=amount:running_total:ytd&order=day:asc&per_page=2')
 		->status_is(200);
@@ -382,6 +396,339 @@ subtest 'what a run refuses, and with which status' => sub {
 			. '&cs=' . url_escape('amount:window_avg:x'))
 		->status_is(400)
 		->content_like(qr/takes a whole number/, 'and the export keeps its 400 rather than turning it into a 404');
+};
+
+# --- stage 7: a calculated field over a cross-row column ---------------------
+
+# _csv($body) -> list of { column => value } rows
+sub _csv {
+	my @lines = split /\r?\n/, $_[0];
+	my @names = split /,/, shift(@lines) // '';
+	return map { my %r; @r{@names} = split /,/, $_, -1; \%r } @lines;
+}
+
+# The running totals, in day order, are 10, 30, 60, 100, 150.
+my $YTD = 'cs=' . url_escape('amount:running_total:ytd') . '&order=day:asc';
+my $ORDERS = 'l=' . url_escape('table:orders');
+
+subtest 'a calculated field can read a cross-row column' => sub {
+	my $half = 'c=' . url_escape('half:ytd/2');
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&$half")->status_is(200);
+	is_deeply [ map { $_->{half} } _csv($t->tx->res->body) ], [ 5, 15, 30, 50, 75 ],
+		'half of each running total';
+
+	my $quarter = 'c=' . url_escape('quarter_of:half/2');
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&$half&$quarter")->status_is(200);
+	is_deeply [ map { $_->{quarter_of} } _csv($t->tx->res->body) ], [ 2.5, 7.5, 15, 25, 37.5 ],
+		'and one field can build on another that had to wait';
+
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&$half&f=" . url_escape('region:eq:North'))->status_is(200);
+	is_deeply [ map { $_->{half} } _csv($t->tx->res->body) ], [ 5, 15, 35 ],
+		'over the rows the filters left: 10, 30 and 70 halved';
+
+	# North's halves are 5, 15, 50 and South's 30, 75.
+	$t->get_ok("/bar?$ORDERS&cat=region&val=half&$YTD&$half")->status_is(200);
+	my $body = $t->tx->res->body;
+	like $body, qr/(?:"value":70,"label":"North"|"label":"North","value":70)/, 'a chart can plot it';
+	like $body, qr/(?:"value":105,"label":"South"|"label":"South","value":105)/, 'for each group';
+
+	$t->get_ok("/pivot?$ORDERS&rows=region&m=" . url_escape('half:sum:total') . "&$YTD&$half")->status_is(200)
+		->content_like(qr{<td[^>]*>\s*105\s*</td>}, 'and a pivot can total it');
+
+	$t->get_ok("/view/orders?$YTD&$half&per_page=2&page=2")->status_is(200);
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'half') ] } @{ $page->{rows} } ], [ 30, 50 ],
+		'the second page of the table goes on from the first';
+};
+
+subtest 'holding a field back does not hide a mistake' => sub {
+	$t->get_ok("/export?$ORDERS&format=csv&c=" . url_escape('half:ytd/2'))->status_is(400)
+		->content_like(qr/Unknown column 'ytd'/, 'with no cs= it is the error it always was');
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&c=" . url_escape('half:ytdd/2'))->status_is(400)
+		->content_like(qr/Unknown column 'ytdd'/, 'a mistyped name is still an error with cs=');
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&c=" . url_escape('half:ytd/'))->status_is(400)
+		->content_like(qr/Calculated field "half"/, 'and so is a syntax error');
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&c=" . url_escape('half:nosuch(ytd)'))->status_is(400)
+		->content_like(qr/Calculated field "half"/, 'and an unknown function');
+};
+
+subtest 'nothing is held without a reason' => sub {
+	my $c = _controller($t, '/export?c=' . url_escape('twice:amount*2'));
+	my $rows = [ { day => '2026-01-01', amount => 10 } ];
+	$c->_apply_calc_fields($rows, [qw(day amount)]);
+	is_deeply $c->stash('_held_calc_fields'), [], 'no cs=, nothing held';
+	is $rows->[0]{twice}, 20, 'and the field ran at once';
+
+	$c = _controller($t, "/export?$YTD&c=" . url_escape('twice:amount*2') . '&c=' . url_escape('half:ytd/2'));
+	$rows = [ { day => '2026-01-01', amount => 10 } ];
+	$c->_apply_calc_fields($rows, [qw(day amount)]);
+	is_deeply [ map { $_->{name} } @{ $c->stash('_held_calc_fields') } ], ['half'],
+		'with cs=, only the field that needs its column waits';
+	is $rows->[0]{twice}, 20, 'and the other still runs at stage 4';
+	ok !exists $rows->[0]{half}, 'the held one has not run';
+};
+
+subtest 'on the table page, a cross-row column can read a calculated column' => sub {
+	$t->get_ok('/view/orders?cs=' . url_escape('twice:rank:place') . '&c=' . url_escape('twice:amount*2'))
+		->status_is(200);
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'place') ] } @{ $page->{rows} } ], [ 5, 4, 3, 2, 1 ],
+		'a rank of the doubled amounts';
+	is_deeply [ map { $_->[ _col($page, 'twice') ] } @{ $page->{rows} } ], [ 20, 40, 60, 80, 100 ],
+		'and the column it read';
+
+	$t->get_ok('/view/orders?cs=' . url_escape('twice:rank:place') . '&c=' . url_escape('twice:nosuch*2'))
+		->status_is(400)->content_like(qr/Unknown column 'nosuch'/, 'a field that cannot run says so');
+	$t->get_ok('/view/orders?span=1x&tcol=day&cs=' . url_escape('amount:rank:place'))
+		->status_is(400)->content_unlike(qr/<table/, 'and so does a bucket');
+};
+
+# --- the monthly-revenue example, worked by hand ------------------------------
+#
+#   id  at          product amount  month       ytd  share  rank
+#   1   2026-02-03  A       30      2026-02-01   60  1/2    1
+#   2   2026-01-20  A       20      2026-01-01   20  1/3    2
+#   3   2026-01-05  A       10      2026-01-01   30  1/6    3
+#   4   2026-03-01  B       15      2026-03-01   20  3/4    1
+#   5   2026-01-10  B        5      2026-01-01    5  1/4    2
+#
+# The window is read in month order, so product A's February row closes its
+# total though it comes first in the file; rows 2 and 3 tie on the month and
+# keep file order, which is why 20 is added before 10.
+subtest 'the monthly revenue example' => sub {
+	Mojo::File->new($data_dir)->child('revenue.csv')->spew(join("\n",
+		'id,at,product,amount',
+		'1,2026-02-03,A,30',
+		'2,2026-01-20,A,20',
+		'3,2026-01-05,A,10',
+		'4,2026-03-01,B,15',
+		'5,2026-01-10,B,5',
+	) . "\n");
+	my $plan = 'span=1mon&tcol=at&by=product&order=at_span:asc'
+		. '&cs=' . url_escape('amount:running_total:ytd')
+		. '&cs=' . url_escape('amount:pct_of_total:share')
+		. '&cs=' . url_escape('amount:rank:place');
+	my %want = (
+		at_span => [ qw(2026-02-01 2026-01-01 2026-01-01 2026-03-01 2026-01-01) ],
+		ytd     => [ 60, 20, 30, 20, 5 ],
+		place   => [ 1, 2, 3, 1, 2 ],
+	);
+	my @shares = (1/2, 1/3, 1/6, 3/4, 1/4);
+
+	$t->get_ok('/export?l=' . url_escape('table:revenue') . "&format=csv&$plan")->status_is(200);
+	my @rows = _csv($t->tx->res->body);
+	for my $name (sort keys %want) {
+		is_deeply [ map { $_->{$name} } @rows ], $want{$name}, "export: $name";
+	}
+	_is($rows[$_]{share}, $shares[$_], "export: share of row $_") for 0 .. $#shares;
+
+	$t->get_ok("/view/revenue?$plan")->status_is(200);
+	my $page = _table($t->tx->res->body);
+	for my $name (sort keys %want) {
+		is_deeply [ map { $_->[ _col($page, $name) ] } @{ $page->{rows} } ], $want{$name},
+			"table page: $name, the same as the export";
+	}
+};
+
+# --- a SQL backend ------------------------------------------------------------
+
+subtest 'on a SQLite source, a cross-row column folds in Perl' => sub {
+	plan skip_all => 'DBD::SQLite is not available' unless eval { require DBD::SQLite; 1 };
+	my $dbh = DBI->connect('dbi:SQLite:dbname=' . Mojo::File->new($data_dir)->child('ledger.sqlite'),
+		'', '', { RaiseError => 1, PrintError => 0 });
+	$dbh->do('CREATE TABLE ledger (id INTEGER PRIMARY KEY, day TEXT, region TEXT, amount REAL)');
+	$dbh->do('INSERT INTO ledger VALUES (?,?,?,?)', undef, @$_) for
+		[ 1, '2026-01-01', 'North', 10 ], [ 2, '2026-01-02', 'North', 20 ],
+		[ 3, '2026-01-03', 'South', 30 ], [ 4, '2026-01-04', 'North', 40 ],
+		[ 5, '2026-01-05', 'South', 50 ];
+	$dbh->disconnect;
+
+	my $l = 'l=' . url_escape('table:ledger');
+	my $cells = sub {
+		my ($url) = @_;
+		$t->get_ok($url)->status_is(200);
+		return [ map { $_->all_text =~ s/\s+//gr }
+			@{ Mojo::DOM->new($t->tx->res->body)->find('table tbody td')->to_array } ];
+	};
+
+	# Count what reaches the backend's aggregate, so "never pushed" is observed.
+	require Database::BI::Model::DataSource;
+	my $pushed = 0;
+	my $real = \&Database::BI::Model::DataSource::aggregate;
+	no warnings 'redefine';
+	local *Database::BI::Model::DataSource::aggregate = sub { $pushed++; return $real->(@_) };
+
+	$cells->("/pivot?$l&rows=region&m=" . url_escape('amount:sum:total'));
+	cmp_ok $pushed, '>', 0, 'a source column is pushed, so the count can see a push';
+
+	for my $case (
+		[ 'a window column as the measure', "rows=region&m=" . url_escape('ytd:sum:total') ],
+		[ 'a window column as the group',   "rows=ytd&m=" . url_escape('amount:sum:total') ],
+		[ 'a field over a window column',   "rows=region&m=" . url_escape('half:sum:total') . '&c=' . url_escape('half:ytd/2') ],
+	) {
+		my ($name, $query) = @$case;
+		$pushed = 0;
+		my $page = $cells->("/pivot?$l&$query&$YTD");
+		is $pushed, 0, "$name never reaches aggregate()";
+		ok scalar(@$page), "$name gives a table";
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		is_deeply $cells->("/pivot?$l&$query&$YTD"), $page, "$name: the same with the fold forced";
+	}
+
+	$t->get_ok("/export?$l&format=csv&$YTD&c=" . url_escape('half:ytd/2'))->status_is(200);
+	is_deeply [ map { $_->{half} } _csv($t->tx->res->body) ], [ 5, 15, 30, 50, 75 ],
+		'and the locked rows of a SQL source take the new columns';
+
+	# Only the filter names a column SQL has never heard of, and it must not get there.
+	$pushed = 0;
+	my $page_of = $cells->("/pivot?$l&rows=region&m=" . url_escape('amount:sum:total') . "&$YTD&f=" . url_escape('ytd:gt:50'));
+	is $pushed, 0, 'a filter on a window column keeps the aggregate from being pushed';
+	is_deeply $page_of, [ 'North', 40, 'South', 80 ], 'and the totals are of the rows it left';
+	$pushed = 0;
+	is_deeply $cells->("/pivot?$l&rows=region&m=" . url_escape('amount:sum:total') . '&c=' . url_escape('dbl:amount*2') . '&f=' . url_escape('dbl:gt:70')),
+		[ 'North', 40, 'South', 50 ], 'and so does one on a calculated column';
+	is $pushed, 0, 'which is not pushed either';
+
+	$t->get_ok('/view/ledger?c=' . url_escape('dbl:amount*2') . '&f=' . url_escape('dbl:gt:70'))->status_is(200);
+	my $kept = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($kept, 'dbl') ] } @{ $kept->{rows} } ], [ 80, 100 ],
+		'the table page filters a calculated column of a SQL source';
+
+	$t->get_ok("/view/ledger?$YTD&per_page=2&page=2&cs=" . url_escape('amount:rank:place') . '&c=' . url_escape('twice:amount*2'))
+		->status_is(200);
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'ytd') ] } @{ $page->{rows} } ], [ 60, 100 ],
+		'the table page works from them too';
+};
+
+# --- a filter on a column the pass writes -------------------------------------
+
+subtest 'a filter on a cross-row column selects rows and leaves their totals alone' => sub {
+	my $over = sub { 'f=' . url_escape($_[0]) };
+
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&" . $over->('ytd:gt:50'))->status_is(200);
+	is_deeply [ map { $_->{ytd} } _csv($t->tx->res->body) ], [ 60, 100, 150 ],
+		'the rows past 50, and their totals are the ones they always had';
+
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&" . $over->('region:eq:North') . '&' . $over->('ytd:gt:40'))->status_is(200);
+	is_deeply [ map { $_->{ytd} } _csv($t->tx->res->body) ], [ 70 ],
+		'a filter on a source column still narrows the window: North is 10, 30, 70';
+
+	$t->get_ok("/export?$ORDERS&format=csv&$YTD&c=" . url_escape('half:ytd/2') . '&' . $over->('half:gt:20'))->status_is(200);
+	is_deeply [ map { $_->{half} } _csv($t->tx->res->body) ], [ 30, 50, 75 ],
+		'a field that waited for the pass can be filtered on too';
+
+	$t->get_ok("/bar?$ORDERS&cat=region&val=amount&$YTD&" . $over->('ytd:gt:50'))->status_is(200);
+	my $body = $t->tx->res->body;
+	like $body, qr/(?:"value":40,"label":"North"|"label":"North","value":40)/, 'a chart draws the rows that are left';
+	like $body, qr/(?:"value":80,"label":"South"|"label":"South","value":80)/, 'in each group';
+
+	$t->get_ok("/view/orders?$YTD&" . $over->('ytd:gt:50') . '&per_page=2')->status_is(200)
+		->content_like(qr{href="/view/orders\?[^"]*page=2}, 'the table page knows there is another page');
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'ytd') ] } @{ $page->{rows} } ], [ 60, 100 ], 'the first page of the rows left';
+	$t->get_ok("/view/orders?$YTD&" . $over->('ytd:gt:50') . '&per_page=2&page=2')->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'ytd') ] } @{ $page->{rows} } ], [ 150 ], 'and the second';
+
+	$t->get_ok("/view/orders?$YTD&c=" . url_escape('half:ytd/2') . '&' . $over->('half:gt:40'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'half') ] } @{ $page->{rows} } ], [ 50, 75 ],
+		'and the table page can filter on a field over the column';
+
+	$t->get_ok('/view/orders?' . $over->('ytd:gt:50'))->status_is(200);
+	is_deeply _table($t->tx->res->body)->{rows}, [], 'with no cs= the name is an unknown column, and matches nothing';
+};
+
+# --- calculated fields on every table page ------------------------------------
+
+subtest 'the table page can filter on a calculated column' => sub {
+	my $dbl = 'c=' . url_escape('dbl:amount*2');
+	$t->get_ok("/view/orders?$dbl&f=" . url_escape('dbl:gt:50') . '&per_page=2')->status_is(200);
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ], [ 60, 80 ], 'the first page of the rows it selects';
+	$t->content_like(qr{<a[^>]+href="/view/orders\?[^"]*page=2}, 'with a link to the next');
+
+	$t->get_ok('/view/orders?span=1mon&tcol=day&f=' . url_escape('day_span:eq:2026-01-01'))->status_is(200);
+	is scalar @{ _table($t->tx->res->body)->{rows} }, 5, 'so can a bucket, with all of January';
+	$t->get_ok('/view/orders?span=1mon&tcol=day&f=' . url_escape('day_span:eq:2026-02-01'))->status_is(200);
+	is scalar @{ _table($t->tx->res->body)->{rows} }, 0, 'and none of February';
+
+	$t->post_ok('/calc/save' => form => { l => 'table:ties', name => 'stored', expr => 'amount+1' })->status_is(200);
+	$t->get_ok('/view/ties?f=' . url_escape('stored:gt:25'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'id') ] } @{ $page->{rows} } ], [qw(b c)], 'and a saved field';
+	$t->post_ok('/calc/delete' => form => { l => 'table:ties', name => 'stored' });
+
+	$t->get_ok("/view/orders?$dbl")->status_is(200)
+		->element_exists('input[type="hidden"][name="c"][value="dbl:amount*2"]', 'the panels carry the field, so a chart can read it');
+};
+
+subtest '/open draws calculated fields' => sub {
+	my $path = url_escape(Mojo::File->new($data_dir)->child('orders.csv')->to_string);
+	my $dbl  = 'c=' . url_escape('dbl:amount*2');
+
+	$t->get_ok("/open?path=$path&$dbl")->status_is(200);
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ], [ 20, 40, 60, 80, 100 ], 'the column is there';
+	$t->element_exists('input[type="hidden"][name="c"][value="dbl:amount*2"]', 'and the panels carry it');
+
+	$t->get_ok("/open?path=$path&$dbl&f=" . url_escape('dbl:gt:70'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ], [ 80, 100 ], 'it can be filtered on';
+
+	$t->get_ok("/open?path=$path&$dbl&cs=" . url_escape('dbl:rank:place'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'place') ] } @{ $page->{rows} } ], [ 5, 4, 3, 2, 1 ], 'a window can read it';
+
+	$t->get_ok("/open?path=$path&$YTD&c=" . url_escape('half:ytd/2'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'half') ] } @{ $page->{rows} } ], [ 5, 15, 30, 50, 75 ], 'and it can read a window';
+
+	$t->get_ok("/open?path=$path&span=1mon&tcol=day")->status_is(200);
+	$page = _table($t->tx->res->body);
+	is $page->{rows}[0][ _col($page, 'day_span') ], '2026-01-01', 'a bucket is a column here too';
+
+	my $spec = 'path:' . Mojo::File->new($data_dir)->child('orders.csv')->realpath->to_string;
+	$t->post_ok('/calc/save' => form => { l => $spec, name => 'saved_one', expr => 'amount+1' })->status_is(200);
+	$t->get_ok("/open?path=$path")->status_is(200);
+	$page = _table($t->tx->res->body);
+	is $page->{rows}[0][ _col($page, 'saved_one') ], 11, 'and a field saved for this file appears';
+	$t->post_ok('/calc/delete' => form => { l => $spec, name => 'saved_one' });
+
+	$t->get_ok("/open?path=$path&c=" . url_escape('bad:nosuch*2'))->status_is(400)
+		->content_like(qr/Unknown column 'nosuch'/, 'a field that cannot run is the 400 it is elsewhere');
+	$t->get_ok("/open?path=$path&c=" . url_escape('bad:nosuch*2') . '&f=' . url_escape('amount:gt:1'))->status_is(400)
+		->content_like(qr/Unknown column 'nosuch'/, 'with a filter as well');
+};
+
+subtest '/join and /combine draw calculated fields' => sub {
+	my $orders = url_escape('table:orders');
+	my $self_join = 'j=' . url_escape('table:orders|day|day');
+	my $dbl = 'c=' . url_escape('dbl:amount*2');
+
+	$t->get_ok("/join?l=$orders&$self_join&$dbl")->status_is(200)
+		->element_exists('#bi-table[data-table^="join:"], [data-table^="join:"]', 'a field does not turn a Merge into a Combine');
+	my $page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ], [ 20, 40, 60, 80, 100 ], 'the column is there';
+
+	$t->get_ok("/join?l=$orders&$self_join&$dbl&f=" . url_escape('dbl:gt:70'))->status_is(200);
+	$page = _table($t->tx->res->body);
+	is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ], [ 80, 100 ], 'it can be filtered on';
+
+	$t->get_ok("/join?l=$orders&$self_join&c=" . url_escape('bad:nosuch*2'))->status_is(400)
+		->content_like(qr/Unknown column 'nosuch'/, 'a field that cannot run is a 400');
+
+	# A file stacked in and a field, in the same parameter.
+	my $stack = 'c=' . url_escape('table:orders');
+	for my $route ('join', 'combine') {
+		$t->get_ok("/$route?l=$orders&$stack&$dbl")->status_is(200);
+		$page = _table($t->tx->res->body);
+		is_deeply [ map { $_->[ _col($page, 'dbl') ] } @{ $page->{rows} } ],
+			[ 20, 40, 60, 80, 100, 20, 40, 60, 80, 100 ], "/$route stacks the file and draws the field";
+		$t->get_ok("/$route?l=$orders&$stack&$dbl&f=" . url_escape('dbl:gt:70'))->status_is(200);
+		is scalar @{ _table($t->tx->res->body)->{rows} }, 4, 'and filters on it';
+	}
 };
 
 done_testing;

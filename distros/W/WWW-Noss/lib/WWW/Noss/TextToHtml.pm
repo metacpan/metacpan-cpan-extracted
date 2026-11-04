@@ -2,7 +2,7 @@ package WWW::Noss::TextToHtml;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(text2html escape_html unescape_html strip_tags);
@@ -450,7 +450,7 @@ Strips HTML tags from the given text.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

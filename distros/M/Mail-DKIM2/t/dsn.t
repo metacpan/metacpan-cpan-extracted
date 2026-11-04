@@ -32,7 +32,7 @@ my $CB = DKIM2TestKeys::pubkey_callback();
 # done already. The fixtures below exist to exercise the rebuild machinery,
 # not the authentication -- so they pass SkipAuthentication and the
 # authentication itself is tested separately. signed_inbound's mf= is in its
-# d= domain: -08 section 13.2 step 5 makes that part of being Provisionally
+# d= domain: -09 section 13.2 step 5 makes that part of being Provisionally
 # Verified, which generate() requires.
 my %NO_AUTH = (SkipAuthentication => 1);
 
@@ -239,7 +239,7 @@ sub forwarded_unchanged {
 # === generate: reflector-dsn behaviour ===
 {
     my $inbound = signed_inbound();
-    # -08 section 16.2: the DSN's d= matches the reported message's rt=
+    # -09 section 16.2: the DSN's d= matches the reported message's rt=
     # (user@test1.dkim2.com); a bouncer at test2 may not report on it.
     my $stranger = mk_signer(domain => 'test2.dkim2.com');
     ok(!eval { Mail::DKIM2::DSN->generate(Message => $inbound, Signer => $stranger,
@@ -272,7 +272,7 @@ sub forwarded_unchanged {
     is($v->result, 'pass', 'generated DSN verifies (pass)');
 }
 
-# === generate: never for a message that is not Provisionally Verified (-08 §16.2) ===
+# === generate: never for a message that is not Provisionally Verified (-09 §16.2) ===
 {
     my $inbound = "From: nobody\@origin.example\r\nTo: user\@test1.dkim2.com\r\n"
                 . "Subject: unsigned\r\n\r\nhi\r\n";
@@ -283,7 +283,7 @@ sub forwarded_unchanged {
     ) };
     ok(!$out, 'unsigned mail: no DSN');
     like($@, qr/not sending a DSN: .*not Provisionally Verified/, '... and generate says why');
-    # -08 section 13.2: timestamps are not a Provisionally Verified check,
+    # -09 section 13.2: timestamps are not a Provisionally Verified check,
     # so a DSN may report on a message too old to be Fully Verified.
     my ($ok, $why) = Mail::DKIM2::DSN->may_generate(Message => signed_inbound(), PubkeyCallback => $CB);
     ok($ok, 'an expired top signature is still Provisionally Verified') or diag $why;
@@ -395,7 +395,7 @@ sub dsn_around {
                               body => $embedded);
     return Email::MIME->create(
         attributes => { content_type => 'multipart/report', encoding => '7bit' },
-        # From the domain that signs it (-08 section 11).
+        # From the domain that signs it (-09 section 11).
         header_str => [ From => 'postmaster@' . ($o{domain} // 'test3.dkim2.com'),
                         To => 'user@test2.dkim2.com',
                         Subject => 'failure' ],

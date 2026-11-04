@@ -37,7 +37,7 @@ use Scalar::Util		qw(blessed);
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -504,8 +504,8 @@ sub _check_interface {
 # _load_geocoder() -> geocoder object, or undef when there is not one to be had
 #
 # The real geocoder, loaded on demand so the application installs, starts and
-# tests without it.  Returns nothing when the module is absent or older than the
-# floor, and records which of the two it was for the message.
+# tests without it.  Returns nothing when the module is absent, older than the
+# floor, will not load, or builds nothing, and records which it was for the message.
 sub _load_geocoder {
 	my $self = shift;
 
@@ -526,9 +526,14 @@ sub _load_geocoder {
 		return;
 	}
 
-	return Geo::Coder::Free->new(
+	my $geocoder = Geo::Coder::Free->new(
 		$self->{'openaddr'} ? (openaddr => $self->{'openaddr'}) : ()
 	);
+
+	# It is installed, so the message must not fall back on saying that it is not.
+	$self->{'_unavailable'} = 'it could not be started' unless $geocoder;
+
+	return $geocoder;
 }
 
 # _geocoder() -> geocoder object or undef
@@ -1187,7 +1192,10 @@ entry, or for a C<\%models> argument that is not a hashref.  Never croaks.
 sub shared_cache_from_models {
 	my ($class, $models) = @_;
 
-	my $entry = (ref($models) eq 'HASH') ? $models->{'geo'}{$SHARED_CACHE_KEY} : undef;
+	# One level at a time: a nested read would add an empty 'geo' to the caller's
+	# store, and the next write would save it.
+	my $geo   = (ref($models) eq 'HASH') ? $models->{'geo'} : undef;
+	my $entry = (ref($geo) eq 'HASH') ? $geo->{$SHARED_CACHE_KEY} : undef;
 
 	return {} unless ref($entry) eq 'HASH' && (ref($entry->{'places'}) eq 'HASH');
 
@@ -1261,7 +1269,10 @@ sub models_with_shared_cache {
 		%{ (ref($cache) eq 'HASH') ? $cache : {} },
 	);
 
-	my $spec = { %{ (ref($models) eq 'HASH') ? ($models->{'geo'}{$SHARED_CACHE_KEY} // {}) : {} } };
+	# A section of the wrong shape (a hand-edited store) is rebuilt, not dereferenced.
+	my $geo   = (ref($models) eq 'HASH' && ref($models->{'geo'}) eq 'HASH') ? $models->{'geo'} : {};
+	my $entry = $geo->{$SHARED_CACHE_KEY};
+	my $spec  = { %{ (ref($entry) eq 'HASH') ? $entry : {} } };
 
 	$spec->{'places'} = \%places;
 
@@ -1271,7 +1282,7 @@ sub models_with_shared_cache {
 
 	my %updated = %{ (ref($models) eq 'HASH') ? $models : {} };
 
-	$updated{'geo'} = { %{ $updated{'geo'} // {} }, $SHARED_CACHE_KEY => $spec };
+	$updated{'geo'} = { %$geo, $SHARED_CACHE_KEY => $spec };
 
 	return \%updated;
 }
@@ -1413,7 +1424,7 @@ method to your stub.
     Geocode: option "max" must be a positive integer, not "%s"
 
 The C<max> option was supplied but is not a positive integer string.  Passing
-C<max => 0> and C<max => 'all'> both trigger this error.
+C<< max => 0 >> and C<< max => 'all' >> both trigger this error.
 
 =item C<error_values_arrayref>
 
@@ -1458,7 +1469,7 @@ in the cache, so the next request picks them up.
 The geocoder was loaded successfully but C<OPENADDR_HOME> is not set and
 C<openaddr> was not passed to C<new()>.  Resolution will succeed for broad
 place names (cities, countries) but will fail for street-level addresses.
-Set the environment variable or pass C<openaddr => $path> to C<new()>.
+Set the environment variable or pass C<< openaddr => $path >> to C<new()>.
 
 =back
 
@@ -1570,10 +1581,16 @@ returned.
 
 =head1 STATE DIAGRAM
 
-The object transitions through three states based on whether the geocoder
-has been loaded yet.
+The object is in one of three states, according to whether it has a geocoder yet.
+A geocoder given to C<new> is one straight away; otherwise one is looked for on
+the first call that needs it.
 
     new()
+      |
+      +--[bad arguments, or a geocoder lacking
+      |   valid_location or geocode_many]-----> croaks; no object
+      |
+      +--[geocoder => $g]---------------------> READY
       |
       v
   +-------------------+
@@ -1583,8 +1600,8 @@ has been loaded yet.
   +-------------------+
        |          |
   first call,     first call,
-  module OK       module absent or too old
-       |          |
+  module OK       module absent, too old or will not
+       |          load, or its new() answers nothing
        v          v
   +---------+  +------------+
   |  READY  |  | UNAVAILABLE|
@@ -1606,11 +1623,31 @@ has been loaded yet.
   | change) |  | change)    |
   +---------+  +------------+
 
-Resolution itself is stateless: the object's geocoder-load state does not
-change after the first load attempt.  All state is in the result hashref and
-the cache the caller manages.
+Once the object is READY or UNAVAILABLE that does not change: neither a module
+that appears nor one that goes away moves it, and the module is looked for once.
 
-Value-level state transitions within a single resolve_* call:
+There are two ways for a call to croak and leave the state as it was.  Arguments a
+resolve_*() call refuses are refused before any load is attempted.  A module that
+loads and whose new() dies sends that exception to the caller and remembers
+nothing, so the object stays CONSTRUCTED and the next call tries again.
+
+Resolution itself is stateless: all state is in the result hashref and the cache
+the caller manages.
+
+    Valid state transitions summary:
+
+    [START]          -> CONSTRUCTED      (new() with no geocoder)
+    [START]          -> READY            (new() given a geocoder)
+    [START]          -> ERROR            (new() refuses its arguments; croaks, no object)
+    CONSTRUCTED      -> READY            (first call, module OK)
+    CONSTRUCTED      -> UNAVAILABLE      (first call, no module that can be used)
+    CONSTRUCTED      -> CONSTRUCTED      (arguments refused, or the module's new() dies; croaks)
+    READY            -> READY            (resolve_*(), or arguments refused)
+    UNAVAILABLE      -> UNAVAILABLE      (resolve_*(), or arguments refused)
+
+Value-level state transitions within a single resolve_* call.  Each distinct value
+takes the first of these that applies, from the top.  CACHE is the C<cache> in the
+result, a copy: the cache the caller passed in is never modified.
 
     RECEIVED
        |
@@ -1622,15 +1659,22 @@ Value-level state transitions within a single resolve_* call:
        |
        +--[geocoder unavailable]-----------> NOT_ATTEMPTED
        |
+       +--[valid_location() throws]--------> EXCEPTION
+       |
        +--[valid_location() = false]-------> SKIPPED
        |
        +--[within cap]--------------------> ATTEMPT
        |                                        |
        |                                        +--[geocoder returns position]--> RESOLVED_NEW --> POINTS, CACHE==[lat,lon]
        |                                        |
-       |                                        +--[geocoder returns undef]-----> UNRESOLVED_NEW, CACHE==0
+       |                                        +--[geocoder returns no position]--> UNRESOLVED_NEW, CACHE==0
+       |                                        |
+       |                                        +--[geocoder throws]--> EXCEPTION
        |
        +--[beyond cap]-------------------> NOT_ATTEMPTED
+
+EXCEPTION is the whole request failing, on purpose: it goes to the caller, who has
+no result and a cache exactly as it was, so nothing can be half-written.
 
 =head1 AUTHOR
 

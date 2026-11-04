@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # Collect shell samples from the corpora into samples.jsonl. large-subset-extract.pl: extract.pl of corpus-run.tar.gz
-# with the two tldr rules of 2026-11-02 below.
+# with the two tldr rules of 2026-11-02 and the rule Y3 of 2026-11-03 below.
 # Each record: {src, kind (line|script), id, tag, text, loc}. For one-line samples `id` is the snippet ID
 # (see PROVENANCE.md); for scripts `loc` = {pre, line0} lets later stages build the ID of a piece:
 # "<pre>:<line0 + lines before the piece>[c<column>][-<end line>]".
@@ -11,10 +11,14 @@ sub put { my %h = @_; return unless $h{text} =~ /\S/; $n{"$h{src}/$h{kind}"}++; 
 sub slurp { local (@ARGV, $/) = @_; my $s = <>; $s // '' }
 sub lineno { my ($s, $off) = @_; 1 + (substr($s, 0, $off) =~ tr/\n//) }
 
-# TL  tldr: `command` lines; {{[-a|--all]}} -> -a, {{text}} -> text. Since 2026-11-02 (doc/large-subset/large-subset-ceiling.md):
+# TL  tldr: `command` lines; {{[-a|--all]}} -> -a, {{text}} -> text. Since 2026-11-02 (doc/large-subset/large-subset-ceiling.md (in Proc-Spawner 0.03)):
 # a line of key notation only (<q>, <Ctrl c>, <ArrowLeft>|<ArrowRight>) is not a command: kept, with drop => REASON;
 # an argument or pipeline element "..." ("and so on") is dropped from the text, which then keeps the original as orig.
 my $KEYS = qr/^\s*(?:<[^<>]+>(?:\s*[|+,]?\s*|\s+))+\s*\z/;
+# Y3 (2026-11-03): a keystroke inside a program (<Enter>, <Esc>, <Ctrl c>, <ArrowUp>, <F5>, or one or two characters as
+# in <q>, <:>) next to other text: the line is not a shell command. Lines with a here-document get their <Enter> turned
+# into newlines first (the original kept as orig).
+my $KEY = qr/<(?:Enter|Return|Esc|Escape|Tab|Space|Backspace|Delete|Del|Insert|Home|End|PageUp|PageDown|Arrow\w+|Up|Down|Left|Right|F\d{1,2}|(?:Ctrl|Alt|Shift|Cmd|Meta|Super|Option)\b[^<>]*|[^<>\s]{1,2})>/;
 sub tldr_fix { my $t = shift; $t =~ s/\{\{\[([^|\]]*)\|[^\]]*\]\}\}/$1/g; $t =~ s/\{\{(.*?)\}\}/$1/g; $t }
 sub tldr_dots { my $t = shift; $t =~ s/\s*\|\s*\.\.\.(?=\s*\|)//g; $t =~ s/(?:\s+|;\s*)\.\.\.(?=[\s;}]|\z)//g; $t }
 for my $dir (qw(common linux)) {
@@ -22,8 +26,10 @@ for my $dir (qw(common linux)) {
     (my $p = $f) =~ s{.*/pages/}{};
     open my $h, '<', $f or next;
     while (<$h>) { next unless /^`(.+)`\s*$/; my $o = tldr_fix($1); my $t = tldr_dots($o);
+      $t =~ s/[ \t]*<Enter>[ \t]*/\n/g if $t =~ /<<-?\s*\S/ && $t =~ /<Enter>/;   # Y3: a here-document written on one line
       put(src => 'tldr', kind => 'line', id => "TL:$p:$.", text => $t, $t ne $o ? (orig => $o) : (),
-          $t =~ $KEYS ? (drop => 'tldr: key notation, not a command') : ()) } } }
+          $t =~ $KEYS ? (drop => 'tldr: key notation, not a command')
+          : $t =~ $KEY ? (drop => 'tldr: keystrokes next to other text, not a command') : ()) } } }
 
 # NB  NL2Bash: data/bash/all.cm, one command per line
 { open my $h, '<', "$C/nl2bash/data/bash/all.cm" or die $!;

@@ -1,0 +1,612 @@
+ok	33050	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	cmd:c	TL:common/abduco.md:8	abduco
+ok	957	cookbook,makebook,nl2bash,shellcheck,tldr	cmd:c |	TL:common/mpc.md:29	mpc +n|-n
+ok	676	cookbook,makebook,nl2bash,shellcheck,tldr	cmd:c redir:>w	SC:Analytics.hs:prop_checkRedirectionToNumber2:1	foo 1>2
+ok	645	nl2bash,tldr	cmd:c cmd:c+ |	TL:linux/free.md:12	free -b|k|m|g
+ok	571	cookbook,makebook,nl2bash,shellcheck,tldr	cmd:c word:*	TL:common/dot.md:25	dot -?
+ok	259	makebook,nl2bash,shellcheck,tldr	cmd:c cmd:echo |	NB:1499	echo 798|rev
+ok	219	cookbook,nl2bash,shellcheck,tldr	cmd:c word:$	SC:Analytics.hs:prop_checkUuoc4:1	cat $var
+ok	178	nl2bash,shellcheck,tldr	cmd:c word:* |	NB:8379	grep foo * | nl
+ok	176	nl2bash,shellcheck,tldr	( cmd:c cmd:w word:$(	NB:5602	mv `ls` /foo
+ok	157	cookbook,nl2bash,pure-bash-bible,shellcheck,tldr	cmd:c word:"$	NB:3308	find "$dir"
+ok	156	makebook,nl2bash,shellcheck,tldr	cmd:c redir:>w |	SC:Analytics.hs:prop_checkRedirectedNowhere5:1	foo | grep bar > baz
+ok	144	makebook,nl2bash,tldr	cmd:c word:~	NB:5103	find ~
+ok	85	cookbook,makebook,pure-bash-bible,shellcheck,tldr	cmd:echo	BC:ch17/func_shift_by:25	echo ''
+ok	78	makebook,nl2bash,shellcheck,tldr	cmd:c redir:<w	TL:common/yj.md:8	yj <file.yml -y
+ok	66	nl2bash,shellcheck,tldr	( cmd:c word:$(	SC:Analytics.hs:prop_checkUnquotedExpansions1a:1	rm `ls`
+ok	65	nl2bash,shellcheck	cmd:c word:$ |	NB:995	cat $i | wc -l
+ok	55	nl2bash,tldr	cmd:c redir:N>w	TL:common/cppcheck.md:9	cppcheck . 2>cppcheck.log
+ok	55	cookbook,makebook,pure-bash-bible,shellcheck,tldr	cmd:printf	BC:ch07/hist.awk:27e23	printf "#";
+ok	52	nl2bash,shellcheck,tldr	E cmd:E	SC:Analytics.hs:prop_checkAssignAteCommand1:1	A=ls -l
+ok	49	nl2bash,shellcheck	cmd:c word:"$ |	SC:Analytics.hs:prop_checkUuoc3:1	cat "$var" | grep bar
+ok	48	nl2bash,tldr	( cmd:c cmd:w word:"$(	NB:5237	tree -dfi "$(pwd)"
+ok	45	shellcheck,tldr	cmd:[	SC:Analytics.hs:prop_checkConstantNullary6:1	[ 1 ]
+ok	43	cookbook,pure-bash-bible,pure-sh-bible,shellcheck,tldr	cmd:printf word:"$	SC:Checks/Commands.hs:prop_checkPrintfVar1:1	printf "Lol: $s"
+ok	39	nl2bash,tldr	cmd:c redir:<w>w	TL:common/suspend.md:8	bash <Enter> suspend
+ok	37	nl2bash,tldr	cmd:c word:~ |	NB:8127	cat ~/.bashrc | pbcopy
+ok	30	nl2bash,shellcheck,tldr	( cmd:c cmd:w word:$( |	NB:6441	getent passwd `whoami` | cut -d : -f 5
+ok	30	nl2bash	cmd:c cmd:echo word:"$ |	NB:5903	echo "$DIREC" | od -c
+ok	28	tldr	cmd:c cmd:c+ redir:>w |	TL:common/ppmcie.md:12	ppmcie -cie|ebu|hdtv|ntsc|smpte >path/to/output.ppm
+ok	28	nl2bash,tldr	cmd:c+	TL:common/cb.md:28	cb | cat
+ok	26	cookbook,shellcheck,tldr	cmd:echo word:"$	SC:Analytics.hs:prop_subshellAssignmentCheck15:3	echo "$a"
+ok	25	nl2bash	( cmd:c cmd:| word:$( |	NB:6148	cat `which java` | file -
+ok	24	nl2bash,shellcheck,tldr	&& cmd:c	TL:common/qmake.md:20	qmake && make
+ok	24	nl2bash,shellcheck	( cmd:echo word:$(	SC:Analytics.hs:prop_checkBackticks1:1	echo `foo`
+ok	24	cookbook,nl2bash,pure-bash-bible,shellcheck,tldr	cmd:exit	NB:1862	exit 1
+ok	22	nl2bash,tldr	& cmd:c redir:N>&d |	NB:5722	make 2>&1 | less
+ok	22	makebook,nl2bash,shellcheck,tldr	cd cmd:cd	NB:4739	cd "~"
+ok	21	makebook,nl2bash,shellcheck,tldr	& cmd:c	TL:common/picom.md:8	picom &
+ok	21	cookbook,shellcheck,tldr	cmd:echo word:$	SC:Analytics.hs:prop_subshellAssignmentCheck11:2	echo $n
+ok	19	nl2bash	cmd:c cmd:echo word:$ |	NB:4771	echo $c | crontab
+ok	19	nl2bash,tldr	cmd:c cmd:printf |	NB:5902	printf Aa | od -t x1
+ok	18	nl2bash,shellcheck	( cmd:echo word:"$(	SC:Analytics.hs:prop_checkUseBeforeDefinition7:3	echo "$(f)"
+ok	17	makebook,nl2bash,tldr	cmd:c cmd:echo redir:>w |	MK:recipe:206.3	echo 'MAKEVAR' | sed 's/;/ /g' > /dev/null
+ok	17	nl2bash,tldr	cmd:kill	NB:9048	kill %1
+ok	16	shellcheck	cmd:[ word:$	SC:Analytics.hs:prop_checkLiteralBreakingTest2:1	[ $foo=3 ]
+ok	14	nl2bash,tldr	cmd:c redir:N>w |	NB:691	yes 2>/dev/null | ./MyScript.sh
+ok	14	nl2bash	cmd:c word:"$ word:$	NB:389	chown $FUID:$FGID "$FILE2"
+ok	13	nl2bash,shellcheck	( cmd:echo cmd:w word:$(	NB:6445	echo -n $(pwd)
+ok	13	nl2bash,tldr	cmd:c cmd:false |	NB:8240	false | tee /dev/null
+ok	12	nl2bash,tldr	cmd:c redir:>w word:*	NB:4119	find . -name \*\\?\* > output.txt
+ok	12	makebook,nl2bash,shellcheck,tldr	cmd:time	TL:common/time.md:14	time read
+ok	11	nl2bash	( cmd:kill cmd:w word:$(	NB:9464	kill -9 $(pgrep amarok)
+ok	11	nl2bash,tldr	( cmd:kill word:$(	TL:linux/pidof.md:21	kill $(pidof name)
+ok	11	cookbook,makebook,pure-bash-bible,shellcheck,tldr	cmd::	TL:common/colon.md:8	:
+ok	10	nl2bash,shellcheck	( cmd:c word:"$(	NB:6386	basename "`pwd`"
+ok	10	shellcheck,tldr	cmd:[ word:"$	SC:Checks/ShellSupport.hs:prop_checkBashisms6:1	[ "$a" == 42 ]
+ok	10	nl2bash,shellcheck,tldr	cmd:c redir:<w |	SC:Analytics.hs:prop_checkPipeToNowhere11:1	ls | grep foo < file
+ok	9	makebook,nl2bash,tldr	&& cd cmd:c cmd:cd	MK:recipe:116.8	cd src && \@Nctags --recurse
+ok	9	nl2bash	( cmd:echo cmd:w word:"$(	NB:5971	echo -ne "Welcome `whoami`!\n"
+ok	9	nl2bash	cmd:c cmd:pwd |	NB:843	pwd | xsel -i
+ok	9	nl2bash,shellcheck,tldr	cmd:true	TL:common/true.md:9	true
+ok	8	nl2bash,shellcheck	( cmd:[ cmd:w word:$(	SC:Analytics.hs:prop_checkUnquotedExpansions3a:1	[ ! $(foo) ]
+ok	8	nl2bash,shellcheck,tldr	E cmd:E cmd:c |	NB:86	v=5 env|less
+ok	8	tldr	cmd:c redir:>>~	TL:common/npm-completion.md:16	npm completion >>~/.zshrc
+ok	8	nl2bash	cmd:c word:"$ word:$ |	NB:6694	yes "$OPTARG" | head -$opt
+ok	8	nl2bash,shellcheck	cmd:c word:$*	NB:5510	sort -m *.$suffix
+ok	8	nl2bash	cmd:c word:* word:~	NB:8960	find ~ -name *.txt
+ok	8	makebook,shellcheck,tldr	cmd:test	SC:Checks/ShellSupport.hs:prop_checkBashisms21b:1	test -a foo
+ok	7	cookbook,nl2bash,tldr	cmd:c redir:>>w	TL:linux/genfstab.md:8	genfstab -U /mnt >>/mnt/etc/fstab
+ok	7	makebook,pure-bash-bible,shellcheck,tldr	cmd:echo redir:>w	PB:README.md:1031	echo -n >file
+ok	6	cookbook,makebook,tldr	& cmd:echo redir:>&d	TL:common/greater-than.md:36	echo text >&3
+ok	6	cookbook,pure-bash-bible	& cmd:printf redir:>&d	BC:ch05/check_arg_count:13	printf "%b" "Error. Too many arguments.\n" >&2
+ok	6	shellcheck	&& cmd:[ word:$	SC:Analytics.hs:prop_checkAndEq6:1	[ $a = a ] && [ $a = b ]
+ok	6	nl2bash,shellcheck,tldr	&& cmd:c cmd:echo ||	SC:Analytics.hs:prop_checkShorthandIf3:1	foo && bar || echo baz
+ok	6	shellcheck	cmd:[ word:*	SC:Analytics.hs:prop_checkTestArgumentSplitting12:1	[ *.png ]
+ok	6	tldr	cmd:c cmd:c+ cmd:echo |	TL:common/boxes.md:24	echo "string" | boxes -a hl|c|r
+ok	6	nl2bash,shellcheck,tldr	cmd:c cmd:time |	SC:Checks/Commands.hs:prop_checkTimedCommand1:2	time -p foo | bar
+ok	5	nl2bash	( ) cmd:(c cmd:c |	NB:4466	( find ./ -name '*.php' -print0 | xargs -0 cat ) | wc -l
+ok	5	nl2bash	( cmd:c cmd:w word:$ word:$(	NB:1129	ln -s $file `basename $file`
+ok	5	nl2bash	( cmd:c word:$( |	NB:9216	ipcs -a | grep `whoami`
+ok	5	nl2bash,shellcheck	( cmd:c word:$(*	NB:4952	ls `pwd`/*
+ok	5	shellcheck	( cmd:echo word:$((	SC:Analytics.hs:prop_checkDollarBrackets2:1	echo $((1+2))
+ok	5	nl2bash	cmd:c redir:N>w>w	NB:11777	find . 2>/dev/null > some_file
+ok	5	shellcheck,tldr	cmd:x:c x:	SC:Analytics.hs:prop_checkSpuriousExec1:1e9	exec foo;
+ok	4	nl2bash,shellcheck,tldr	& cmd:c redir:>w	SC:Analytics.hs:prop_checkPipeToNowhere14:1e10	ls > foo &
+ok	4	nl2bash	( cmd:c cmd:echo cmd:w word:$( |	NB:6915	echo -n $(pwd) | pbcopy
+ok	4	nl2bash	( cmd:c cmd:w word:"$ word:"$(	NB:1117	ln -s "$(which bam2)" "$tmpdir"/bam
+ok	4	nl2bash	( cmd:echo cmd:| word:"$( |	NB:12419	echo "* * * * * touch $(pwd)/washere1" | crontab
+ok	4	nl2bash,shellcheck	( cmd:printf cmd:w word:$(	SC:Checks/Commands.hs:prop_checkPrintfVar3:1	printf -v cow $(cmd)
+ok	4	tldr	cmd:c cmd:c+ cmd:test |	TL:common/bacon.md:20	bacon run|test|clippy|doc|...
+ok	4	nl2bash,tldr	cmd:c cmd:echo word:* |	NB:638	echo *.txt | xargs gzip -9
+ok	4	nl2bash,tldr	cmd:c cmd:true |	NB:1850	true | sleep 10
+ok	4	nl2bash	cmd:c redir:>>w |	NB:2969	find dir -type f | xargs md5sum >> file.txt
+ok	4	nl2bash	cmd:c redir:N>>w	NB:10553	find -name "*.txt" 2>>/dev/null
+ok	4	nl2bash	cmd:c redir:N>w word:*	NB:2113	find / -name *.jpg 2>/dev/null
+ok	4	cookbook,nl2bash	cmd:c word:$ word:*	NB:7359	find $HOME/. -name *.txt -ok rm {} \;
+ok	4	nl2bash	cmd:c word:$ word:~	NB:2831	find ~ ! -user ${USER}
+ok	4	cookbook,shellcheck	cmd:printf word:*	SC:Analytics.hs:prop_checkGlobsAsOptions6:1	printf '%s\n' *
+ok	4	nl2bash,tldr	cmd:pwd	TL:common/pwd.md:12	pwd -P
+ok	3	cookbook,pure-sh-bible	&& cmd:[ cmd:printf word:"$	PS:README.md:426	[ -n "$line" ] && printf %s "$line"
+ok	3	nl2bash,tldr	&& cmd:c redir:>w	NB:1400	grep -v "pattern" file > temp && mv temp file
+ok	3	shellcheck	( ) cmd:(c	SC:Analytics.hs:prop_checkSubshellAsTest1:1	( -e file )
+ok	3	nl2bash	( cmd:>w cmd:c redir:>w word:$(	NB:10617	cat `find . -type f` > out.txt
+ok	3	shellcheck	( cmd:[ cmd:w word:"$(	SC:Analytics.hs:prop_checkLiteralBreakingTest4:1	[ "$(ls) " ]
+ok	3	nl2bash	( cmd:c cmd:w redir:>w word:$(	NB:9954	tar cvf - `find . -print` > backup.tar
+ok	3	nl2bash	( cmd:c cmd:w word:"$( |	NB:6741	cal -h|sed -r "s/\b$(date|cut -d' ' -f3)\b/*/"
+ok	3	nl2bash	( cmd:c cmd:w word:$( word:~	NB:7059	sudo chown -R `whoami` ~/.npm
+ok	3	nl2bash	( cmd:echo cmd:| word:$( |	NB:6757	echo `date +%s`/86400 | bc
+ok	3	nl2bash,tldr	cmd:c cmd:c+ word:* |	TL:common/egrep.md:38	egrep [[:alnum:|:alpha:|:space:|...]] path/to/file
+ok	3	nl2bash,tldr	cmd:c redir:<w redir:>w |	NB:9699	head -16482 < file.in | tail -259 > file.out
+ok	3	cookbook	cmd:c redir:<w word:$	BC:ch13/dbiniter:21	mysql $DB < ourInit.sql
+ok	3	nl2bash	cmd:c redir:<w>w |	NB:7539	find <directory> -type f -size -1M -print0  | xargs -0 rm
+ok	3	nl2bash	cmd:c redir:>w word:"$ |	NB:1929	find . -name "$i" -type f -print | xargs egrep -n "$SrchStr" >/dev/null
+ok	3	tldr	cmd:c redir:>~	TL:linux/conky.md:12	conky -C >~/.conkyrc
+ok	3	nl2bash	cmd:c word:$ word:$*	NB:2034	find $parentdir -name $tofind*
+ok	3	nl2bash	cmd:c word:$ word:* |	NB:5252	cut -f $FIELD * | sort| uniq -c |sort -nr
+ok	3	nl2bash	cmd:c word:* word:~ |	NB:896	find ~music -type f -iname *.mp3 | wc -l
+ok	3	nl2bash	cmd:c word:*~	NB:191	rsync -vaut ~/.env* ~/.bash* app1:
+ok	3	nl2bash,shellcheck	cmd:false cmd:true |	NB:8218	false | true
+ok	3	nl2bash	cmd:kill word:$	NB:9627	kill $PID
+ok	3	shellcheck,tldr	cmd:test word:"$	SC:Checks/ShellSupport.hs:prop_checkBashisms6b:1	test "$a" == 42
+ok	2	shellcheck	! cmd:! cmd:[ word:$ |	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest3:1	! [ -x $var ]
+ok	2	shellcheck	! cmd:! cmd:true |	SC:Analytics.hs:prop_checkUselessBang10:3	! true
+ok	2	nl2bash	& ; cmd:; cmd:c word:* |	NB:11515	find /tmp -type f -name ‘*.txt*’ | sed -e ‘s/.*/\”&\”/’ |xargs -n 1 grep -l hello|sed -e ‘s/.*/\”&\”/’
+ok	2	nl2bash	& cmd:c cmd:echo redir:>&d |	NB:9678	echo "error" 1>&2 | tee -a log
+ok	2	shellcheck	& cmd:c redir:>&d	SC:Checks/ShellSupport.hs:prop_checkBashisms52:2	cmd >&2
+ok	2	nl2bash	& cmd:c redir:>w redir:N>&d |	NB:10916	find . 2>&1 | grep -v 'Permission denied' > some_file
+ok	2	nl2bash	& cmd:c redir:>w |	NB:4364	find . -type d -print0 | xargs -0 -n1 du -sk | sort -rn > dir-sizes.txt&
+ok	2	nl2bash,tldr	&& ( cmd:c cmd:w redir:>w word:$(	TL:linux/unzipsfx.md:8	cat $(which unzipsfx) path/to/archive.zip >filename && chmod 755 filename
+ok	2	nl2bash,tldr	&& cmd:c cmd:echo	TL:common/gh-run.md:24	gh run view workflow_run_number --exit-status && echo "run pending or passed"
+ok	2	nl2bash	( cmd:c word:"$ word:$(	NB:587	chown $(stat -c%u:%g "$srcdir") "$dstdir"
+ok	2	makebook,shellcheck	; cd cmd:c cmd:cd	SC:Analytics.hs:prop_checkCdAndBack5:1	cd ..; foo; cd ..
+ok	2	nl2bash	; cmd:c	NB:851	mkdir dir2; tar cvf - dir1/ --exclude "*/exclude" | tar xvf - -C dir2
+ok	2	tldr	; cmd:c cmd:c} cmd:{echo { | }	TL:linux/ttyplot.md:8	{ echo 1 2 3; cat; } | ttyplot
+ok	2	nl2bash,tldr	; cmd:c cmd:echo |	TL:linux/sync.md:16	sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+ok	2	cookbook	; cmd:c cmd:exit cmd:{echo word:"$ word:{ { || }	BC:ch12/oodiff:54	mkdir "$PRIV1" || { echo "Unable to mkdir '$PRIV1'" ; exit 4; }
+ok	2	nl2bash	; cmd:c cmd:printf	NB:10991	find -s . -mindepth 1 -type f -print0; printf '\0';
+ok	2	nl2bash	; cmd:c redir:>w	NB:7682	grep -v "pattern" filename > filename2; mv filename2 filename
+ok	2	pure-bash-bible,pure-sh-bible	cmd:: redir:>w	PS:README.md:510	:>file
+ok	2	shellcheck	cmd:[ word:$ word:*	SC:Analytics.hs:prop_checkComparisonAgainstGlob6:1	[ $f != /* ]
+ok	2	shellcheck	cmd:[ word:$ ||	SC:Analytics.hs:prop_checkOrNeq6:1	[ $a != a ] || [ $a != b ]
+ok	2	tldr	cmd:c cmd:c+ cmd:false cmd:true |	TL:linux/setsebool.md:17	sudo setsebool -P container_use_devices 1|true|on|0|false|off
+ok	2	nl2bash	cmd:c cmd:c+ word:~ |	NB:5884	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' | sort | uniq | tr -d '\n'
+ok	2	nl2bash	cmd:c cmd:x:c word:$ x: |	NB:1756	exec 1 | tee ${LOG_FILE}
+ok	2	nl2bash	cmd:c cmd:{c { | }	NB:9021	{ yes yes | sed 4q; yes no | sed 1q; } | ./script
+ok	2	nl2bash,shellcheck	cmd:c redir:>w word:"$	SC:Checks/Commands.hs:prop_checkExpr14:2	expr "$x" >=  "$y"
+ok	2	nl2bash	cmd:c redir:>w word:* |	NB:195	find ./* | cpio -o > arch.cpio
+ok	2	nl2bash	cmd:c redir:>w word:~	NB:8172	find ~ -name 'Foto*' > results.txt
+ok	2	nl2bash	cmd:c redir:N>w word:~	NB:1166	find ~ -type d -exec mkdir junk {} \; 2> /dev/null
+ok	2	nl2bash	cmd:c word:"$ word:~	NB:1106	ln -s "$source" -t ~/newlinks
+ok	2	nl2bash	cmd:c word:$~	NB:3668	find ~/$folder -name "*@*" -type f
+ok	2	tldr	cmd:echo redir:>>~	TL:common/gh-copilot.md:25	echo 'eval "$(gh copilot alias -- zsh)"' >>~/.zshrc
+ok	2	shellcheck	cmd:echo word:*	SC:Analytics.hs:prop_checkGlobAsCommand3:1	echo foo*
+ok	2	nl2bash,tldr	cmd:false	TL:common/false.md:9	false
+ok	2	cookbook,pure-bash-bible	cmd:printf redir:>w	PB:README.md:1032	printf '' >file
+ok	2	cookbook	cmd:printf word:$	BC:ch12/load_mp3:71	printf "loaded %d songs (%d blocks)" $COUNT $SUM
+ok	2	shellcheck	cmd:test word:$	SC:Analytics.hs:prop_checkComparisonWithLeadingX4:1	test $foo = xbar
+ok	2	nl2bash	cmd:{time redir:N>w}N>w { }	NB:7296	{ time find / 2>/dev/null; } 2>time.txt
+ok	1	shellcheck	! && ( ) cmd:! cmd:([ cmd:[ cmd:c | ||	SC:Analytics.hs:prop_checkSubshelledTests1:1	a && ( [ b ] || ! [ c ] )
+ok	1	shellcheck	! ( ) cmd:(! cmd:c |	SC:Analytics.hs:prop_checkSubshellAsTest7:1	( ! -d file )
+ok	1	shellcheck	! ( ) cmd:(! cmd:true cmd:true) |	SC:Checks/ShellSupport.hs:prop_checkBangAfterPipe2:1	true | ( ! true )
+ok	1	shellcheck	! ; cmd:! cmd:c cmd:true |	SC:Analytics.hs:prop_checkUselessBang2:1	! true; rest
+ok	1	shellcheck	! cmd:! cmd:[ |	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps4:1	! [ -o braceexpand ]
+ok	1	makebook	! cmd:! cmd:c redir:<w |	MK:recipe:114.29	! grep --line-number '"debug:' MAKEVAR < /dev/null
+ok	1	makebook	! cmd:! cmd:c |	MK:recipe:114.20	! grep --line-number '"debug:' MAKEVAR
+ok	1	nl2bash	& ( ) cmd:&) cmd:(c word:$(	NB:9423	(chromium --user-data-dir=$(mktemp -d) &)
+ok	1	nl2bash	& ( ) cmd:(c cmd:c redir:N>&d>&dN>&d |	NB:10193	(find /boot | sed s'/^/STDOUT:/' ) 3>&1 1>&2 2>&3 | sed 's/^/STDERR:/'
+ok	1	nl2bash	& ( ) cmd:(time redir:>wN>&d	NB:8214	(time ls) > outfile 2>&1
+ok	1	tldr	& ( cmd:c cmd:w redir:N>&d word:$( |	TL:common/tqdm.md:20	tar vzcf path/to/archive.tar.gz path/to/directory 2>&1 | tqdm --total $(find path/to/directory | wc -l) --unit files --null
+ok	1	shellcheck	& ; cmd:; cmd:[	SC:Analytics.hs:prop_checkBadTestAndOr1:1	[ x ] & [ y ]
+ok	1	tldr	& ; cmd:; cmd:c cmd:echo redir:>w	TL:linux/mopac.md:12	touch test.out; echo "PM7\n#comment\n\nH 0.95506 0.05781 -0.03133\nF 1.89426 0.05781 -0.03133" >test.mop; mopac test.mop & tail -f test.out
+ok	1	nl2bash	& ; cmd:; cmd:c word:*	NB:3666	find . -type f -exec sed -i ‘s/.*abc.*/#&/’ {} \;
+ok	1	shellcheck	& ; cmd:; cmd:test	SC:Analytics.hs:prop_checkBadTestAndOr2:1	test -e foo & [ y ]
+ok	1	cookbook	& ; cmd:[ cmd:exit cmd:{echo redir:>&d word:$ word:{ { || }	BC:ch15/email_sample_css:8	[ -x $MAIL ] || { echo 'Cannot find a mailer!' >&2; exit 1; }
+ok	1	shellcheck	& cmd:c cmd:test redir:N>&d>w |	SC:Analytics.hs:prop_checkStderrRedirect3:1	test 2>&1 > file | grep stderr
+ok	1	nl2bash	& cmd:c cmd:x:c redir:N>&d word:$ x: |	NB:1757	exec 1 2>&1 | tee ${LOG_FILE}
+ok	1	nl2bash	& cmd:c cmd:{c redir:N<&d word:{ { | }	NB:6335	zcat number.txt.gz | { zcat xxx.txt.gz | comm -12 /dev/fd/3 - ; } 3<&0
+ok	1	nl2bash	& cmd:c cmd:{time redir:>w redir:N>&d { | }	NB:8208	{ time ls; } 2>&1 |  cat > time.txt
+ok	1	nl2bash	& cmd:c cmd:{time redir:N>&d { | }	NB:4440	{ time sleep 1; } 2>&1 | grep real
+ok	1	shellcheck	& cmd:c redir:>&dN>&dN>&d |	SC:Analytics.hs:prop_checkPipeToNowhere18:1	ls 1>&3 3>&1 3>&- | wc -l
+ok	1	tldr	& cmd:c redir:>wN>&d	TL:linux/setsid.md:13	setsid program >/dev/null 2>&1
+ok	1	shellcheck	& cmd:c redir:N>&d	SC:Checks/ShellSupport.hs:prop_checkBashisms51:2	cmd 2>&1
+ok	1	shellcheck	& cmd:c redir:N>&d>w |	SC:Analytics.hs:prop_checkStderrRedirect6:1	foo | bar 2>&1 > /dev/null
+ok	1	nl2bash	& cmd:c word:"$ word:$	NB:12009	su $USER -c "$WEB --quiet" &
+ok	1	nl2bash	& cmd:c word:$ |	NB:9067	ping -W 1 -c 1 10.0.0.$i | grep 'from' &
+ok	1	nl2bash	& cmd:c word:*~	NB:9420	nohup vlc -I dummy --quiet ~/mp3_directory/* &
+ok	1	nl2bash	& cmd:c |	NB:8015	nohup cmd1 | cmd2 &
+ok	1	shellcheck	& cmd:echo	SC:Checks/ShellSupport.hs:prop_checkBashisms108:2e12	echo magic &
+ok	1	tldr	& cmd:echo redir:>w	TL:common/mkfifo.md:12	echo "Hello World" >path/to/pipe &
+ok	1	cookbook	& cmd:printf redir:>&d word:"$	BC:ch03/func_choice.2:4	printf "%b" "This package's date is $THISPACKAGE\n" >&2
+ok	1	shellcheck	& cmd:test redir:>wN>&d	SC:Analytics.hs:prop_checkStderrRedirect2:1	test > cow 2>&1
+ok	1	shellcheck	& cmd:test redir:N>&d>w	SC:Analytics.hs:prop_checkStderrRedirect:1	test 2>&1 > cow
+ok	1	shellcheck	& cmd:{c redir:>w}N>&d { }	SC:Analytics.hs:prop_checkStderrRedirect7:1	{ cmd > file; } 2>&1
+ok	1	nl2bash	&& ( ) cd cmd:(cd cmd:c redir:>w	NB:9796	(cd A && find .) > tmp.txt
+ok	1	pure-bash-bible	&& ( ) cmd:(:+)	PB:README.md:2121	(:;:) && (:;:) && (:;:) && (:;:) && (:;:)
+ok	1	shellcheck	&& ( ) cmd:([ cmd:[ cmd:test ||	SC:Analytics.hs:prop_checkSubshelledTests3:1	( [ a ] && [ b ] || test c )
+ok	1	shellcheck	&& ( ) cmd:([ cmd:[ cmd:{[ word:{ { }	SC:Analytics.hs:prop_checkSubshelledTests4:1	( [ a ] && { [ b ] && [ c ]; } )
+ok	1	shellcheck	&& ( ) cmd:(c cmd:c	SC:Analytics.hs:prop_checkSubshellAsTest5:1	( -e file && -x file )
+ok	1	nl2bash	&& ( ) cmd:(c cmd:c cmd:c+ word:$ |	NB:5179	(find . -type f -ctime $FTIME && find . -type f -atime $FTIME && find . -type f -mtime $FTIME) | sort | uniq
+ok	1	nl2bash	&& ( ) cmd:(c cmd:c cmd:c+ |	NB:1093	(rsync -rcn --out-format="%n" old/ new/ && rsync -rcn --out-format="%n" new/ old/) | sort | uniq
+ok	1	shellcheck	&& ( ) cmd:(c cmd:c ||	SC:Analytics.hs:prop_checkSubshellAsTest6:1	( -e file || -x file && -t 1 )
+ok	1	nl2bash	&& ( cmd:[ cmd:echo cmd:w word:"$(	NB:5834	[ -z "$(find aaa/ -maxdepth 1 -type f)" ] && echo "empty"
+ok	1	nl2bash	&& ( cmd:[ cmd:echo cmd:w word:$( ||	NB:550	[ `md5sum $(which c++) | cut -d' ' -f1` == `md5sum $(which g++) | cut -d' ' -f1` ] && echo Yes, equal content || echo No, unequal content
+ok	1	tldr	&& ( cmd:c cmd:w word:$(	TL:linux/sport.md:8	sudo mkdir -p /usr/ports && sudo rsync -av rsync://slackbuilds.org /slackbuilds/$(awk '{print $2}' /etc/slackware-version)/ /usr/ports/
+ok	1	nl2bash	&& cd cmd:c cmd:cd redir:>>w	NB:9797	cd B && find . >> ../tmp.txt
+ok	1	shellcheck	&& cmd:[ cmd:c	SC:Analytics.hs:prop_checkConditionalAndOrs1:1	[ foo && bar ]
+ok	1	shellcheck	&& cmd:[ cmd:c word:$	SC:Analytics.hs:prop_checkAndEq4:1	[ a = $cow && b = $foo ]
+ok	1	shellcheck	&& cmd:[ cmd:c ||	SC:Analytics.hs:prop_checkShorthandIf9:1	foo && [ -x /file ] || bar
+ok	1	shellcheck	&& cmd:[ cmd:true word:$ ||	SC:Analytics.hs:prop_checkAndEq7:1	[ $a = a ] && [ $a = b ] || true
+ok	1	nl2bash	&& cmd:c cmd:echo word:$ word:* ||	NB:532	ssh -q $HOST [[ -f $FILE_PATH ]] && echo "File exists" || echo "File does not exist";
+ok	1	shellcheck	&& cmd:c cmd:false ||	SC:Analytics.hs:prop_checkShorthandIf11:1	foo && bar || false
+ok	1	shellcheck	&& cmd:c cmd:printf ||	SC:Analytics.hs:prop_checkShorthandIf5:1	foo && rm || printf b
+ok	1	shellcheck	&& cmd:c cmd:true ||	SC:Analytics.hs:prop_checkShorthandIf10:1	foo && bar || true
+ok	1	nl2bash	&& cmd:c redir:>"$ word:"$	NB:1471	tail -n +2 "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
+ok	1	shellcheck	&& cmd:c redir:>w |	SC:Analytics.hs:prop_checkRedirectToSame3:1	cat lol | sed -e 's/a/b/g' > foo.bar && mv foo.bar lol
+ok	1	tldr	&& cmd:c word:$	TL:linux/nixos-container.md:24	sudo $EDITOR /var/lib/container/container_name/etc/nixos/configuration.nix && sudo nixos-container update container_name
+ok	1	tldr	&& cmd:c word:*	TL:linux/rename.util.md:30	rename prefix prefix00 prefix? && rename prefix prefix0 prefix??
+ok	1	tldr	&& cmd:c |	TL:common/dvc-checkout.md:16	git checkout commit_hash|tag|branch target && dvc checkout target
+ok	1	shellcheck	&& cmd:c ||	SC:Analytics.hs:prop_checkTrailingBracket3:1	a || b ] && thing
+ok	1	tldr	&& cmd:echo cmd:test ||	TL:common/test.md:26	test condition && echo "true" || echo "false"
+ok	1	nl2bash	( ) ; cd cmd:(cd cmd:c |	NB:11071	find . -maxdepth 1 -type d -print0 | (cd /SomeWhere/Else; xargs -0 mkdir)
+ok	1	nl2bash	( ) ; cd cmd:(cd cmd:c)	NB:7995	( cd /tmp; mycommand )
+ok	1	nl2bash	( ) ; cmd:(c cmd:c cmd:c) |	NB:1305	(ls -t|head -n X;ls)|sort|uniq -u|xargs rm
+ok	1	shellcheck	( ) ; cmd:(c cmd:echo word:$	SC:Analytics.hs:prop_subshellAssignmentCheck41:1	( run true; ); echo $status
+ok	1	tldr	( ) ; cmd:(echo cmd:c cmd:echo |	TL:linux/zenity.md:25	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
+ok	1	shellcheck	( ) cmd:([	SC:Analytics.hs:prop_checkSubshelledTests2:1	( [ a ] )
+ok	1	shellcheck	( ) cmd:(c redir:>w)	SC:Analytics.hs:prop_checkRedirectionToNumber1:1	( 1 > 2 )
+ok	1	nl2bash	( ) cmd:(time redir:>wN>w	NB:8207	(time ls) > ls_results 2> time_results
+ok	1	shellcheck	( E cmd:E word:$(	SC:Analytics.hs:prop_checkExtraMaskedReturns38:1	x=$(time time time false) time $(time false)
+ok	1	nl2bash	( cmd:$ cmd:echo word:"$( word:$	NB:6424	echo "$(date): " $line
+ok	1	nl2bash	( cmd:$( cmd:echo word:"$( word:$(	NB:6858	echo `ls` "`cal`"
+ok	1	nl2bash	( cmd:* cmd:c word:$( word:*	NB:34	find /lib/modules/`uname -r` -regex .*perf.*
+ok	1	nl2bash	( cmd:* cmd:echo word:$( word:*	NB:5791	echo -n *Checking Partition Permission* Hostname=$(hostname) LastChecked=$(date)
+ok	1	nl2bash	( cmd:c cmd:echo cmd:w word:"$( word:$( |	NB:1916	echo -e "$(TZ=GMT+30 date +%Y-%m-%d)\n$(TZ=GMT+20 date +%Y-%m-%d)" | grep -v $(date +%Y-%m-%d) | tail -1
+ok	1	shellcheck	( cmd:c cmd:echo word:$( |	SC:Analytics.hs:prop_checkPipeToNowhere6:1	ls | echo $(cat)
+ok	1	nl2bash	( cmd:c cmd:w redir:N>w word:$(	NB:3829	find $(/usr/ucb/ps auwwx | grep weblogic | tr ' ' '\n' | grep security.policy | grep domain | awk -F'=' '{print $2}' | sed -e 's/weblogic.policy//' -e 's/security\///' -e 's/dep\///' | awk -F'/' '{print "/"$2"/"$3"/"$4"/somefile.cf"}' | sort | uniq) 2> /dev/null -exec ls {} \; -exec cat {} \;
+ok	1	nl2bash	( cmd:c cmd:w word:"$ word:"$( |	NB:9062	cat mail.tmp | mail -r "noreply@$(hostname)" -s "Config done!" "${MAIL}"
+ok	1	nl2bash	( cmd:c cmd:w word:"$( word:~	NB:8001	sed -i "s#\(export\ PATH=\"\)\(.*\)#\1/home/$(whoami)/bin:~/\.local/bin:\2#" ~/.zshrc
+ok	1	nl2bash	( cmd:c cmd:w word:$ word:$( |	NB:2167	find ${INPUT_LOCATION}/ -name "*.pdf.marker" | xargs -I file mv file $(basename file .marker) ${OUTPUT_LOCATION}/.
+ok	1	tldr	( cmd:c cmd:w word:$((	TL:common/fpsync.md:24	fpsync -v -n 4 -f 1000 -s $((100 * 1024 * 1024)) /path/to/source/ /path/to/destination/
+ok	1	nl2bash	( cmd:c cmd:w+ word:$(( |	NB:9623	yes | tr \\n x | head -c $((1024*1024*1024)) | pv -L $((1024*1024)) | grep n
+ok	1	nl2bash	( cmd:c cmd:|| word:$ word:$( ||	NB:475	chown ${JBOSS_USER}: $(dirname $JBOSS_PIDFILE) || true
+ok	1	nl2bash	( cmd:c word:"$ word:"$(	NB:743	cp "${FILE}" "COLLECT/$(mktemp job_XXXXXXXXX)"
+ok	1	nl2bash	( cmd:c word:"$( |	NB:5099	who | grep "$(tty | sed 's:/dev/::')"
+ok	1	nl2bash	( cmd:c word:"$(*	NB:4523	rm -rf "$(pwd -P)"/*
+ok	1	nl2bash	( cmd:c word:$ word:$(	NB:7701	mv $file $(echo $file | rev | cut -f2- -d- | rev).pkg
+ok	1	cookbook	( cmd:c word:$$(	BC:ch16/run_screen:48	-S $USER.$(date '+%Y-%m-%d_%H:%M:%S%z')
+ok	1	nl2bash	( cmd:echo cmd:true word:$( |	NB:8023	true | echo `tty | sed 's:/dev/::'`
+ok	1	cookbook	( cmd:echo word:$ word:$(	BC:ch13/pluralize:20	echo $num $(plural "$name" $num)
+ok	1	nl2bash	( cmd:echo word:$$(	NB:11879	echo $(pwd)/$filename
+ok	1	nl2bash	( cmd:echo word:$( |	NB:5814	echo "hello world" | echo test=$(cat)
+ok	1	nl2bash	( cmd:printf cmd:| word:$( |	NB:6916	printf $(pwd) | pbcopy
+ok	1	nl2bash	( cmd:printf word:"$(	NB:5813	printf "operator: `finger ${USER} | grep Name: | cut -f3 -d:` \n"
+ok	1	shellcheck	( cmd:time word:$(	SC:Analytics.hs:prop_checkExtraMaskedReturns37:1	time $(time false)
+ok	1	shellcheck	( cmd:true word:"$(	SC:Analytics.hs:prop_checkExtraMaskedReturns41:1	true "$(false || cat)"
+ok	1	shellcheck	( cmd:true word:$(	SC:Analytics.hs:prop_checkExtraMaskedReturns7:1	true $(false)
+ok	1	tldr	; E cmd:E cmd:c	TL:common/sccache.md:17	sccache --stop-server; SCCACHE_LOG=trace SCCACHE_START_SERVER=1 SCCACHE_NO_DAEMON=1 sccache
+ok	1	makebook	; cd cmd:c cmd:cd redir:>w	MK:recipe:93.14	cd MAKEVAR; \@Ngenerate-myfile MAKEVAR > MAKEVAR
+ok	1	makebook	; cd cmd:cd cmd:echo word:*	MK:recipe:256.36	cd i-dont-exist; \@Necho *.c
+ok	1	tldr	; cmd:c cmd:c+	TL:common/monodevelop.md:16	monodevelop path/to/file;line_number;column_number
+ok	1	shellcheck	; cmd:c cmd:c+ cmd:exit	SC:Analytics.hs:prop_checkCommandIsUnreachable1:1	foo; bar; exit; baz
+ok	1	makebook	; cmd:c cmd:echo	MK:recipe:115.28	rm rm-fails; echo But the next command executes anyway
+ok	1	tldr	; cmd:c cmd:echo redir:>~ word:~	TL:common/nix.md:11	mkdir -p ~/.config/nix; echo 'experimental-features = nix-command flakes' >~/.config/nix/nix.conf
+ok	1	shellcheck	; cmd:c cmd:echo word:"$	SC:Analytics.hs:prop_checkUnused42:1	DEFINE_string foo '' ''; echo "${FLAGS_foo}"
+ok	1	shellcheck	; cmd:c cmd:exit	SC:Checks/Commands.hs:prop_checkInteractiveSu2:1	su foo; something; exit
+ok	1	shellcheck	; cmd:c cmd:exit ||	SC:Analytics.hs:prop_checkCommandIsUnreachable3:1	foo; bar || exit; baz
+ok	1	nl2bash	; cmd:c cmd:{c word:* { | }	NB:3467	{ find . -name '*my key phrase*'; grep -rl 'my key phrase' *; } | sed "s/^\.\///" | sort -u
+ok	1	nl2bash	; cmd:c cmd:{echo redir:>w { | }	NB:5776	{ echo foo; cat bar; } | tee bar > /dev/null
+ok	1	shellcheck	; cmd:c redir:>>w |	SC:Analytics.hs:prop_checkMultipleAppends2:1	foo >> file; bar | grep f >> file; baz >> file;
+ok	1	shellcheck	; cmd:c word:$	SC:Checks/Commands.hs:prop_checkInteractiveSu1:1	su; rm file; su $USER
+ok	1	tldr	; cmd:c word:~	TL:common/fisher.md:17	editor ~/.config/fish/fishfile; fisher
+ok	1	nl2bash	; cmd:c |	NB:283	find path/to/folder -type f -print0  | sort -z | xargs -0 sha1sum; find path/to/folder \( -type f -o -type d \) -print0 | sort -z | xargs -0 stat -c '%n %a' | sha1sum
+ok	1	shellcheck	; cmd:echo cmd:printf word:$	SC:Analytics.hs:prop_checkUnassignedReferences20:1	printf -v foo bar; echo $foo
+ok	1	shellcheck	; cmd:echo cmd:x:c x:	SC:Analytics.hs:prop_checkSpuriousExec3:1	echo cow; exec foo
+ok	1	nl2bash	E cmd:E cmd:c word:$ |	NB:9675	t=$(tty) echo ee | tee $t | foo
+ok	1	shellcheck	E cmd:E cmd:echo |	SC:Analytics.hs:prop_checkPipeToNowhere7:1	echo foo | var=$(cat) ls
+ok	1	shellcheck	E cmd:E word:$	SC:Analytics.hs:prop_checkPrefixAssign1:1	var=foo echo $var
+ok	1	nl2bash	cd cmd:c cmd:cd |	NB:501	cd foo | cat
+ok	1	nl2bash	cd cmd:cd cmd:true |	NB:1848	true | cd /
+ok	1	shellcheck	cmd::} cmd:true cmd:{false { | || }	SC:Analytics.hs:prop_checkExtraMaskedReturns34:1	{ false || :; } | true
+ok	1	tldr	cmd:[ cmd:c cmd:c+ word:"$ |	TL:common/[.md:18	[ "$variable" -eq|ne|gt|lt|ge|le integer ]
+ok	1	shellcheck	cmd:[ cmd:c word:$ ||	SC:Analytics.hs:prop_checkOrNeq4:1	[ a != $cow || b != $foo ]
+ok	1	makebook	cmd:[ cmd:c ||	MK:shell:208.6#1	[ -d MAKEVAR ] || mkdir -p MAKEVAR
+ok	1	shellcheck	cmd:[ cmd:true word:$ ||	SC:Analytics.hs:prop_checkOrNeq7:1	[ $a != a ] || [ $a != b ] || true
+ok	1	shellcheck	cmd:[ redir:<w	SC:Analytics.hs:prop_checkNumberComparisons8:1	[ foo <= bar ]
+ok	1	tldr	cmd:c cmd:c+ cmd:printf |	TL:linux/chpasswd.md:21	printf "username:new_password" | sudo chpasswd -c NONE|DES|MD5|SHA256|SHA512
+ok	1	tldr	cmd:c cmd:c+ cmd:time |	TL:linux/lsns.md:20	lsns -t mnt|net|ipc|user|pid|uts|cgroup|time
+ok	1	nl2bash	cmd:c cmd:c+ redir:>~ word:~ |	NB:4365	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' |sort |uniq |tr -d '\n' > ~/.codepath
+ok	1	nl2bash	cmd:c cmd:c+ redir:N>w |	NB:2074	find / -name \*.dbf -print0 2>/dev/null | xargs -0 -n1 dirname | sort | uniq
+ok	1	tldr	cmd:c cmd:echo redir:>>w |	TL:linux/systemd-creds.md:20	echo -n text | systemd-creds encrypt --name name --pretty - - >>service
+ok	1	nl2bash	cmd:c cmd:echo word:"$ word:$ |	NB:5795	echo " RDBMS exit code : $RC  "     | tee -a ${LOG_FILE}
+ok	1	nl2bash	cmd:c cmd:echo word:"$ word:$ | ||	NB:2214	find /directory/whatever -name '*.tar.gz' -mtime +$DAYS | grep 'tar.gz' || echo "You don't have files older than $DAYS days"
+ok	1	nl2bash	cmd:c cmd:echo word:~ |	NB:1087	echo -e  'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa
+ok	1	shellcheck	cmd:c cmd:false ||	SC:Analytics.hs:prop_checkUseBeforeDefinition5:1e15	false || mycmd;
+ok	1	tldr	cmd:c cmd:kill |	TL:linux/scrun.md:32	scrun create|start|kill|delete container_id --debug
+ok	1	nl2bash	cmd:c cmd:printf word:"$ |	NB:11622	printf '%s' "$pass" | md5
+ok	1	nl2bash	cmd:c cmd:true ||	NB:8352	find MyApp.app -name Headers -type d -exec rm -rf "{}" \; || true
+ok	1	nl2bash	cmd:c cmd:{c word:{ { | }	NB:685	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
+ok	1	cookbook	cmd:c redir:<"$>>"$	BC:ch06/checkfile:15	doscience < "$INFILE" >> "$OUTFILE"
+ok	1	nl2bash	cmd:c redir:<w word:"$ word:$	NB:1763	ssh $USER@$SERVER "cd ${REMOTE_PATH}; mkdir -p $i" < /dev/null
+ok	1	shellcheck	cmd:c redir:<w+	SC:Analytics.hs:prop_checkMultipleAppends3:1	foo < file; bar < file; baz < file;
+ok	1	nl2bash	cmd:c redir:<w>w word:*	NB:4876	find <path> -xdev -type f -name *.txt -exec ls -l {} \;
+ok	1	tldr	cmd:c redir:<~>~	TL:common/antibody.md:8	antibody <~/.zsh_plugins.txt bundle >~/.zsh_plugins.sh
+ok	1	nl2bash	cmd:c redir:>>w word:$*	NB:12045	find $DBA/$ORACLE_SID/bdump/*.trc -mtime -1 -print >> /tmp/trace_list.lst
+ok	1	nl2bash	cmd:c redir:>>w word:* |	NB:3440	find /mnt/naspath -mtime 0  -name .snapshot -prune -o \( \! -name *~ -print0 \) | du --files0-from=- -hc | tail -n1 >> /tmp/size.log
+ok	1	shellcheck	cmd:c redir:>>w+	SC:Analytics.hs:prop_checkMultipleAppends1:1	foo >> file; bar >> file; baz >> file;
+ok	1	nl2bash	cmd:c redir:>w word:$	NB:10576	find $HOME/projects/ -name ".*" -ls > foo.txt
+ok	1	nl2bash	cmd:c redir:>w word:$ word:*	NB:2356	find $HOME/. -name *.txt -exec head -n 1 -v {} \; > report.txt
+ok	1	nl2bash	cmd:c redir:>w word:~ |	NB:10817	find ~/lpi103-2/ -depth -print0 | cpio --null -o > ../lpicpio.2
+ok	1	shellcheck	cmd:c redir:>w>w	SC:Analytics.hs:prop_checkPipeToNowhere12:1	ls > foo > bar
+ok	1	shellcheck	cmd:c redir:>wN>w	SC:Analytics.hs:prop_checkRedirectToSame5:1	foo > bar 2> bar
+ok	1	shellcheck	cmd:c redir:>wN>w>w	SC:Analytics.hs:prop_checkPipeToNowhere13:1	ls > foo 2> bar > baz
+ok	1	nl2bash	cmd:c redir:>~ |	NB:3299	find . -mtime +2 | perl -pe 's{^}{\"};s{$}{\"}' > ~/output.file
+ok	1	nl2bash	cmd:c redir:N>w word:$ |	NB:1925	crontab -u $user -l 2>/dev/null | grep -v '^#'
+ok	1	nl2bash	cmd:c redir:N>w+	NB:8597	find /etc -type f -print0 2>/dev/null | xargs -0 grep --color=AUTO -Hn 'nameserver' 2>/dev/null
+ok	1	nl2bash	cmd:c word:"$ word:"$* |	NB:2966	find "${searchpath}" -type f -print0 | xargs -0 grep -l -E "${string1}".*"${string2}".*"${string3}"
+ok	1	nl2bash	cmd:c word:"$ word:$*	NB:2044	find "$source_dir" -name *.$input_file_type
+ok	1	nl2bash	cmd:c word:"$ word:*	NB:7137	rsync --recursive --exclude 'foo' * "$other"
+ok	1	nl2bash	cmd:c word:"$ word:* |	NB:8569	find /var/log/apache2/access*.gz -type f -newer ./tmpoldfile ! -newer ./tmpnewfile \ | xargs zcat | grep -E "$MONTH\/$YEAR.*GET.*ad=$ADVERTISER HTTP\/1" -c
+ok	1	shellcheck	cmd:c word:"$*	SC:Checks/Commands.hs:prop_checkCatastrophicRmB:1	rm -rf "$STEAMROOT/"*
+ok	1	nl2bash	cmd:c word:$* word:*	NB:7353	find $backup_path/* -name *.sql -mtime +30 -exec rm {} \;
+ok	1	nl2bash	cmd:c word:*~ |	NB:6367	find ~/bin/FilesDvorak/.* -maxdepth 0 | awk -F"/" '{ print $6 }'
+ok	1	tldr	cmd:c+ cmd:echo word:$ |	TL:common/$.md:24	echo $PS0|PS1|PS2|PS3|PS4
+ok	1	tldr	cmd:c+ cmd:kill |	TL:linux/kill.md:13	kill -l|-L|--table
+ok	1	shellcheck	cmd:echo cmd:false |	SC:Analytics.hs:prop_checkExtraMaskedReturns14:1	echo asdf | false
+ok	1	nl2bash	cmd:echo cmd:true word:"$ |	NB:1849	true | echo "$ret"
+ok	1	tldr	cmd:echo redir:>>"$	TL:common/newsboat.md:12	echo http://example.com/path/to/feed >>"${HOME}/.newsboat/urls"
+ok	1	tldr	cmd:echo redir:>>w	TL:common/echo.md:21	echo "Hello World" >>file.txt
+ok	1	makebook	cmd:echo redir:>w word:$	MK:shell:97.39#1	echo $i has no value > /dev/stderr
+ok	1	nl2bash	cmd:false cmd:true cmd:true+ |	NB:8216	true | true | false | true | false
+ok	1	shellcheck	cmd:false cmd:true | ||	SC:Analytics.hs:prop_checkExtraMaskedReturns6:1	false | true || true
+ok	1	shellcheck	cmd:test redir:>w	SC:Analytics.hs:prop_checkTestRedirects1:1	test 3 > 1
+ok	1	shellcheck	cmd:test redir:N>w	SC:Analytics.hs:prop_checkTestRedirects4:1	test 1 -eq 2 2> file
+ok	1	nl2bash	cmd:time redir:>w	NB:1578	time find . -type f -exec stat {} + > /dev/null
+ok	1	shellcheck	cmd:true cmd:true} cmd:{false { | || }	SC:Analytics.hs:prop_checkExtraMaskedReturns33:1	{ false || true; } | true
+ok	1	shellcheck	cmd:x:c redir:>w x:	SC:Analytics.hs:prop_checkSpuriousExec6:1e16	exec foo > file;
+ok	1	cookbook	cmd:x:c word:$ x:	BC:ch16/run_screen:57	exec screen -r $USER/$screen_to_use
+ok	1	nl2bash	cmd:{time redir:N>w { }	NB:7890	{ time sleep 1 ; } 2> time.txt
+rej	1240	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	builtin *	BC:ch16/builtin_tty.c:26c17	break;
+rej	755	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	keyword *	BC:ch13/getopts_custom:28c9	esac >&2
+rej	321	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	no command name  @ a	BC:ch10/func_max.1:13c5	HIDN=5
+rej	241	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	command name not literal	SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex2:1	a[1+1]=n
+rej	239	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck	unsupported parameter form  @ $9	NB:6272	seq $1
+rej	166	nl2bash,shellcheck,tldr	missing word  @ (a	SC:Analytics.hs:prop_checkExtraMaskedReturns3:1	ls >(cat)
+rej	165	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	unsupported parameter form  @ ${a	SC:Analytics.hs:prop_checkDollarStar9:1	ls ${arr[*]}
+rej	155	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,tldr	'$' starting no expansion  @ $	TL:common/regex.md:18	world$
+rej	138	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	no command name  @ a=	PS:README.md:636	end=50
+rej	132	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	unquoted '}'  @ }	NB:2614	find . -type d -exec /path/to/script.sh \{} \;
+rej	127	cookbook,pure-bash-bible,pure-sh-bible,shellcheck,tldr	unexpected '('  @ ()	PB:README.md:2102	bar() {
+rej	126	nl2bash,tldr	missing word  @ 	TL:common/ex.md:13	wq<Enter>
+rej	107	cookbook,nl2bash,pure-bash-bible,shellcheck,tldr	bash-only $ form  @ $	SC:Analytics.hs:prop_checkSuspiciousIFS2:1	IFS=$'\t'
+rej	89	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	shell-set variable *	SC:Analytics.hs:prop_checkSpacefulnessCfg19:1	echo $PWD
+rej	83	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,tldr	missing command	BC:ch15/command_substitution:10	result=$(
+rej	76	cookbook,makebook,nl2bash,shellcheck,tldr	unsupported cd form	NB:356	cd -L ..
+rej	74	cookbook,nl2bash,shellcheck,tldr	unquoted '{'  @ {	TL:common/}.md:7	tldr {
+rej	59	nl2bash,shellcheck	unquoted '{'  @ {}	SC:Checks/Commands.hs:prop_checkXargsDashi2:1	xargs -I{} echo {}
+rej	54	cookbook,pure-bash-bible,shellcheck,tldr	'((' at the start of a command	SC:Analytics.hs:prop_checkArithmeticDeref5:1	(($1))
+rej	50	cookbook,makebook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck	unsupported parameter form  @ $@	SC:Analytics.hs:prop_checkConcatenatedDollarAt4:1	echo $@
+rej	43	cookbook,makebook,nl2bash,shellcheck,tldr	here-document	SC:Checks/ShellSupport.hs:prop_checkBashisms139:1	cat <<< foo
+rej	40	cookbook,makebook,nl2bash,pure-bash-bible	unexpected ')'  @ )	BC:ch14/MakeTemp:23c9	file )
+rej	33	tldr	missing word  @ <a>	TL:common/vimdiff.md:21	<]><c>
+rej	31	cookbook,nl2bash,pure-bash-bible,shellcheck	bad arithmetic expression	SC:Checks/ShellSupport.hs:prop_checkBashisms3:1	echo $((i++))
+rej	31	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck	unsupported parameter form  @ $*	SC:Checks/Commands.hs:prop_checkEvalArray5:1	eval "$*"
+rej	26	makebook,tldr	empty command	MK:recipe:90.13	#
+rej	26	nl2bash	unquoted '{'  @ {}.a	NB:9976	find -name "*.txt" cp {} {}.bkup \;
+rej	25	cookbook,nl2bash,pure-bash-bible,pure-sh-bible,shellcheck,tldr	no command name  @ a9=	SC:Analytics.hs:prop_checkPS18:1	PS1='\[\e\]'
+rej	21	nl2bash,pure-sh-bible,shellcheck	no command name  @ a=$(	NB:7925	a=$(false)
+rej	21	shellcheck	no command name  @ a=9;	SC:Analytics.hs:prop_checkPlusEqualsNumber7:1	n=4; x+=n
+rej	21	nl2bash,pure-bash-bible,shellcheck,tldr	unquoted '{'  @ {9..	SC:Analytics.hs:prop_checkArrayAsString4:1	a={1..10}
+rej	21	cookbook,nl2bash,shellcheck,tldr	unsupported parameter form  @ $?	TL:common/echo.md:29	echo $?
+rej	20	tldr	missing word  @ <a	TL:common/wuzz.md:16	<Ctrl j><Tab>
+rej	20	cookbook,nl2bash,pure-bash-bible,pure-sh-bible	unsupported parameter form  @ ${9:	BC:ch06/dashes:18c16	CHAR=${1:--}
+rej	19	makebook,nl2bash	final backslash	MK:recipe:164.49	MAKEVAR          \
+rej	19	nl2bash,pure-sh-bible	unsupported parameter form  @ $$	NB:6082	ps -p $$
+rej	19	nl2bash,shellcheck,tldr	unterminated quote	NB:2325	find -name '*.jpg
+rej	18	makebook,nl2bash,tldr	unquoted '^'  @ ^a	TL:common/git-alias.md:17	git alias ^name
+rej	16	nl2bash,pure-bash-bible,shellcheck,tldr	unquoted '{'  @ {a	PB:README.md:1979	exec {sleep_fd}<> <(:)
+rej	15	cookbook,nl2bash,pure-bash-bible,shellcheck,tldr	bracket expression with a quote, expansion or slash	BC:ch07/hist.awk:17c5	user[$3]++
+rej	15	cookbook,nl2bash,shellcheck,tldr	unsupported exit status	NB:1863	exit N
+rej	14	shellcheck	no command name  @ a=(	SC:Analytics.hs:prop_checkSplittingInArrays8:1	a=( * )
+rej	14	shellcheck	no command name  @ a=a	SC:Analytics.hs:prop_checkPlusEqualsNumber6:1	n=foo; x+=n
+rej	14	cookbook,makebook,shellcheck,tldr	unexpected '('  @ (a	BC:ch16/builtin_tty.c:12	tty_builtin (list)
+rej	13	cookbook,makebook,nl2bash,shellcheck	unexpected '('  @ (	BC:ch16/builtin_tty.c:28c17	builtin_usage ( );
+rej	13	nl2bash,shellcheck	unexpected '|'  @ |&	SC:Checks/ShellSupport.hs:prop_checkBashisms142:1	make |& less
+rej	13	pure-bash-bible,shellcheck,tldr	unsupported parameter form  @ ${!a	SC:Analytics.hs:prop_checkUnassignedReferences22:1	echo ${!os*}
+rej	12	nl2bash,shellcheck,tldr	unquoted expansion in a redirection target  @ $a	NB:1012	wc -l < $FILE
+rej	11	nl2bash	no command name  @ a=$	NB:8202	me=$(whoami)
+rej	11	cookbook,nl2bash,pure-bash-bible	unsupported parameter form  @ ${9}	BC:ch13/pluralize:12c9	echo ${1}
+rej	10	nl2bash,shellcheck	no command name  @ a=`a	NB:1229	f=`mktemp -p .`
+rej	10	cookbook,pure-bash-bible,pure-sh-bible	unsupported parameter form  @ ${9#	BC:ch13/getopts_custom:21c13	printf "Usage: %s: [-a] [-b value] args\n" ${0##*/}
+rej	10	nl2bash	unterminated double quote	NB:3526	find . -type f -name ".*
+rej	9	nl2bash	'$' starting no expansion  @ $//	NB:7622	find dir -type f -print0 | xargs -0 sed -i .bak -E "s/[[:space:]]*$//"
+rej	9	nl2bash,pure-bash-bible,shellcheck	'NAME+='	SC:Analytics.hs:prop_checkPlusEqualsNumber5:1	x+='1'
+rej	8	nl2bash,shellcheck	missing word  @ <(a	SC:Analytics.hs:prop_checkExtraMaskedReturns1:1	cat < <(ls)
+rej	8	nl2bash,shellcheck,tldr	no command name  @ <a	NB:7673	rm $(<xaa)
+rej	8	shellcheck,tldr	pattern in a redirection target	SC:Checks/ShellSupport.hs:prop_checkBashisms19:1	foo > file*.txt
+rej	8	makebook,nl2bash,tldr	unquoted '^'  @ ^	TL:common/git-paste.md:13	git paste @^
+rej	8	nl2bash,shellcheck	unquoted '{'  @ {9,9	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars2:1	echo {1,3,$n}
+rej	8	cookbook	unsupported parameter form  @ $9:$	BC:ch16/func_pathmunge:10c13	PATH="$1:$PATH"
+rej	8	cookbook,pure-bash-bible,pure-sh-bible	unsupported parameter form  @ ${9%	BC:ch12/mkalbum:33c5	LASTPH="${5%.*}.html"
+rej	7	nl2bash,shellcheck,tldr	'exec' without a command	TL:common/less-than-more-than.md:16	exec 3<>-
+rej	7	tldr	missing word  @ <a>|	TL:common/herdr.md:38	<Ctrl b><v>|<->
+rej	7	nl2bash,shellcheck	no command name  @ >	SC:Analytics.hs:prop_checkRedirectedNowhere3:1	grep foo | > bar
+rej	7	cookbook,nl2bash,pure-bash-bible,shellcheck,tldr	unsupported parameter form  @ $#	TL:common/$.md:32	echo $#
+rej	7	cookbook,nl2bash	unsupported parameter form  @ $9)	NB:6911	pushd $(dirname $0)
+rej	7	nl2bash	unsupported parameter form  @ $9`	NB:8133	DIR=`pwd`/`dirname $0`
+rej	6	cookbook,nl2bash,shellcheck,tldr	'>&' takes one digit or '-'	BC:ch15/fpmath:13c5	echo "scale=5" >& ${bcin}
+rej	6	shellcheck	no command name  @ a=(9	SC:Analytics.hs:prop_checkCommarrays7:1	a=(1,2)
+rej	6	nl2bash	no command name  @ a=`	NB:9193	OS=`uname -s`
+rej	6	nl2bash	unquoted '{'  @ {}\;	NB:3376	find -exec <script> {}\;
+rej	6	nl2bash	unquoted '{'  @ {}’	NB:2602	find folder_name -type d -exec chmod 775 ‘{}’ \;
+rej	6	shellcheck	unsupported parameter form  @ ${	SC:Analytics.hs:prop_checkExpansionWithRedirection3:1	var=${ foo >> bar; }
+rej	6	cookbook,pure-bash-bible,shellcheck,tldr	unsupported parameter form  @ ${#a	SC:Analytics.hs:prop_checkUnassignedReferences21:1	echo ${#foo}
+rej	5	tldr	no command name  @ </>a	TL:common/zmore.md:16	</>regex
+rej	5	cookbook,nl2bash	no command name  @ a9	BC:ch06/strvsnum:7	VAR2="5"
+rej	5	nl2bash,pure-bash-bible,tldr	unquoted '{'  @ {a..	PB:README.md:1330	echo {A..Z}
+rej	5	shellcheck,tldr	unsupported 'exec' form	SC:Checks/ShellSupport.hs:prop_checkBashisms13:1	exec -c env
+rej	5	nl2bash	unsupported parameter form  @ $$/a	NB:6664	echo $(cat /proc/$$/cmdline)
+rej	5	nl2bash	unsupported parameter form  @ $9))	NB:370	cd $(dirname $(readlink -f $0))
+rej	5	pure-bash-bible	unsupported parameter form  @ ${9/	PB:README.md:558c5-559	# Usage: urldecode "string"@N    : "${1//+/ }"
+rej	5	shellcheck	unsupported parameter form  @ ${a:	SC:Analytics.hs:prop_checkSpacefulnessCfg27:1	echo ${a:+'foo'}
+rej	4	nl2bash	'$' starting no expansion  @ $//a	NB:7577	find /home -type f -name "*.ext" -exec sed -i -e "s/\r$//g" {} \;
+rej	4	cookbook,nl2bash	missing word  @ (	NB:5213	more <( ls /usr/bin )
+rej	4	tldr	missing word  @ <a><	TL:linux/minicom.md:25	<Ctrl a><x><Enter>
+rej	4	nl2bash	missing word  @ |	NB:1033	grep "OK" <filename> | wc -l
+rej	4	shellcheck	no command name  @ a=9	SC:Analytics.hs:prop_checkUnused37:1	fd=2; exec {fd}>&-
+rej	4	nl2bash,shellcheck,tldr	unquoted '{'  @ {a,a	SC:Checks/ShellSupport.hs:prop_checkBashisms137a:1	echo {a,b}
+rej	4	cookbook,pure-sh-bible,shellcheck	unsupported parameter form  @ $-	PS:README.md:1003	"$-"
+rej	4	nl2bash,shellcheck	unsupported parameter form  @ $9/$	SC:Checks/Commands.hs:prop_checkCatastrophicRm1:1	rm -r $1/$2
+rej	4	pure-bash-bible,shellcheck	unsupported parameter form  @ ${a/	PB:README.md:428c5	printf '%s\n' "${_//\"}"
+rej	3	nl2bash	missing word  @ (./a	NB:1563	diff <(./a) <(./b)
+rej	3	nl2bash,shellcheck	missing word  @ (a)	SC:Analytics.hs:prop_checkExtraMaskedReturns2:1	read -ra arr <(ls)
+rej	3	pure-bash-bible,shellcheck	no command name  @ <	SC:Analytics.hs:prop_checkRedirectedNowhere8:1	var=`< file`
+rej	3	tldr	no command name  @ <:>a	TL:common/vimdiff.md:33	<:>diffupdate
+rej	3	pure-bash-bible,pure-sh-bible,tldr	no command name  @ >a	TL:common/greater-than.md:24	>path/to/file
+rej	3	pure-bash-bible,shellcheck	unexpected '('  @ (){	SC:Analytics.hs:prop_checkSetESuppressed2:1	f(){ :; }; x=$(f)
+rej	3	tldr	unquoted '^'  @ ^9	TL:common/set-nodeversion.md:13	Set-NodeVersion ^20
+rej	3	nl2bash	unquoted '{'  @ {,}	NB:1793	awk -f script.awk file{,} | column -t
+rej	3	shellcheck	unquoted '{'  @ {a}>	SC:Checks/ShellSupport.hs:prop_checkBashisms28:1	exec {n}>&2
+rej	3	nl2bash	unquoted '{'  @ {}-a	NB:3686	find . -name "sample*" | xargs -i echo program {}-out {}
+rej	3	nl2bash	unquoted expansion in a redirection target  @ $$	NB:11405	find . -name ‘*.mp4’ >> /tmp/$$
+rej	3	makebook	unquoted expansion in a redirection target  @ $$;	MK:recipe:53.2	MAKEVAR -M MAKEVAR MAKEVAR > MAKEVAR.$$;                  \@Nsed 's,\(MAKEVAR\)\.o[ :]*,\1.o MAKEVAR : ,g' < MAKEVAR.$$ > MAKEVAR; \@Nrm -f MAKEVAR.$$
+rej	3	nl2bash	unsupported parameter form  @ $9*	NB:5084	find /usr /bin /sbin /opt -name "$1*" -type f -ls
+rej	3	nl2bash	unsupported parameter form  @ $9/a	NB:1113	ln -s "`pwd`" $1/link
+rej	3	cookbook,nl2bash	unsupported parameter form  @ $9:a	NB:7049	chown -R $1:httpd *
+rej	3	makebook,nl2bash	unsupported parameter form  @ $@)	NB:6944	read -r -p "$(echo $@) ? [y/N] " YESNO
+rej	3	shellcheck,tldr	unsupported ~ form	TL:common/~.md:16	ls ~-
+rej	2	shellcheck	'! !'	SC:Checks/ShellSupport.hs:prop_checkMultipleBangs1:1	! ! true
+rej	2	nl2bash	'$' starting no expansion  @ $/.a	NB:7741	find . -name "*.andnav" | rename "s/\.andnav$/.tile/"
+rej	2	nl2bash	'$' starting no expansion  @ $//;	NB:1437	sed -n "s/^$//;t;p;"
+rej	2	nl2bash	'$' starting no expansion  @ $/\9	NB:6595	mount | tail -1 | sed -e "s/^[^/]*\(.*\) type .*$/\1/g"
+rej	2	nl2bash	'$' starting no expansion  @ $|\.	NB:4245	find . -type f | grep -P "\.dll$|\.exe$"
+rej	2	nl2bash	'$' starting no expansion  @ $|a	NB:1041	git ls-files | sed 's/ /\\ /g' | grep -E "\.*(swift$|mm$)" | xargs wc -l
+rej	2	shellcheck	backslash-newline in a word	SC:Checks/Commands.hs:prop_checkUnquotedEchoSpaces6:1c9-2	echo foo\@N        bar
+rej	2	tldr	missing word  @ <9>|	TL:common/gpg-tui.md:28	<1>|<2>|<3>
+rej	2	tldr	missing word  @ <:>a	TL:common/vimtutor.md:13	<Esc><:>q<Enter>
+rej	2	tldr	missing word  @ <?>	TL:common/htop.md:34	<F1>|<?>
+rej	2	nl2bash	missing word  @ >(a	NB:7292	exec > >(tee -a $HOME/logfile) 2>&1
+rej	2	tldr	no command name  @ <a>a	TL:common/clifm.md:29	<r>sel
+rej	2	shellcheck	no command name  @ a=([	SC:Analytics.hs:prop_checkCommarrays5:1	a=([a]=b, [c]=d)
+rej	2	shellcheck	no command name  @ a=(a	SC:Checks/ShellSupport.hs:prop_checkBashisms143:1	a=(foo bar)
+rej	2	makebook	unexpected '('  @ ($9,	MK:recipe:185.44	{ print substr($1, 1, length($1)-1) }' $1 |      \@Nsort |                                                    \@Npr -T -w 80 -4
+rej	2	pure-bash-bible	unexpected '('  @ ()(a	PB:README.md:653c5	f()(printf '%s\n' "${BASH_ARGV[@]}"); f "$@"
+rej	2	pure-bash-bible	unexpected '('  @ ()a	PB:README.md:1889	f()for i in "$@"; do echo "$i"; done
+rej	2	makebook	unexpected ')'  @ ))	MK:recipe:89.23	MAKEVAR))
+rej	2	makebook	unexpected ')'  @ ))))	MK:recipe:94.37	MAKEVAR))))))
+rej	2	nl2bash	unquoted '^'  @ ^#	NB:1926	cd /var/cron/tabs && grep -vH ^# *
+rej	2	nl2bash	unquoted '^'  @ ^$	NB:1030	cat fileName | grep -v ^$ | wc -l
+rej	2	nl2bash	unquoted '^'  @ ^$a	NB:5600	ls -1 | grep -v ^$EXCLUDE | xargs -I{} mv {} $TARGET
+rej	2	nl2bash	unquoted '^'  @ ^@	NB:922	diff -U 0 file1 file2 | grep ^@ | wc -l
+rej	2	tldr	unquoted '{'  @ {*}	TL:linux/csplit.md:17	csplit path/to/file 5 {*}
+rej	2	nl2bash,shellcheck	unquoted '{'  @ {,a	SC:Checks/Commands.hs:prop_checkMvArguments3:1	mv 'foo bar'{,bak}
+rej	2	nl2bash	unquoted '{'  @ {.}	NB:11642	find . -type f -wholename \*.mbox | parallel mv {} {.}
+rej	2	nl2bash,shellcheck	unquoted '{'  @ {9	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars3:1	eval echo DSC{0001..$n}.jpg
+rej	2	tldr	unquoted '{'  @ {9a9	TL:common/roll.md:20	roll --verbose 2{2d12}
+rej	2	nl2bash	unquoted '{'  @ {9}	NB:4687	ifconfig en0 | grep -Eo ..\(\:..\){5}
+rej	2	nl2bash	unquoted '{'  @ {{a.	NB:4580	echo -e {{a..n},ñ,{o..z}}"\n" | nl
+rej	2	nl2bash	unquoted '{'  @ {}\	NB:12345	find "Test Folder" -type d -name .dummy -exec rm -rf \"{}\" \;
+rej	2	nl2bash	unquoted '{'  @ {}a	NB:6577	find . -exec echo xx{}xx \;
+rej	2	cookbook	unquoted '}'  @ };	BC:ch16/builtin_tty.c:46	};
+rej	2	shellcheck	unquoted expansion in a redirection target  @ $((a	SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection1:1	ls > $((i++))
+rej	2	cookbook	unsupported parameter form  @ $$a9	BC:ch12/oodiff:32	PRIV2="/tmp/${BAS2}.$$_2"
+rej	2	nl2bash	unsupported parameter form  @ $9*.	NB:11427	find "/path/to/pdfs/" -type f -name "$1*.pdf" -exec stat -f "%10Dm %SN" {}\;  | sort -k1,1n -k2,2
+rej	2	cookbook,makebook	unsupported parameter form  @ $9:	BC:ch16/func_tweak_path:105c5	local pattern=":$1:"
+rej	2	makebook,shellcheck	unsupported parameter form  @ $9;	SC:Analytics.hs:prop_checkSpacefulnessCfg32:1	var=$1; [ -v var ]
+rej	2	nl2bash,shellcheck	unsupported parameter form  @ $9\	SC:Analytics.hs:prop_checkSpacefulnessCfg31:1	echo "`echo \"$1\"`"
+rej	2	nl2bash	unsupported parameter form  @ $9\a	NB:8155	ver=`echo -ne "$1\n$2" |sort -Vr |head -n1`
+rej	2	cookbook	unsupported parameter form  @ ${#9	BC:ch16/func_cd:20c9-21	# We are using special syntax@N        length=${#1}  # Assume that $1 has nothing but dots and count them
+rej	2	cookbook,nl2bash	unterminated backquote	NB:11450	find . -maxdepth 1 -type f -name 'image*png' `
+rej	1	tldr	'$' starting no expansion  @ $%	TL:linux/fcrackzip.md:12	fcrackzip -v -b -l 3 -c a:$% archive
+rej	1	nl2bash	'$' starting no expansion  @ $)	NB:7251	find . | grep -E "(__pycache__|\.pyc|\.pyo$)" | xargs rm -rf
+rej	1	nl2bash	'$' starting no expansion  @ $.	NB:11644	find . -type f  -name "your_pattern" -exec du -ch {} + 2>/dev/null | grep total$.
+rej	1	nl2bash	'$' starting no expansion  @ $/,/	NB:8129	subj="$(date) - $(hostname) - $(echo "$changes" | sed "s/$/,/" | tr "\n" " ")"
+rej	1	nl2bash	'$' starting no expansion  @ $::	NB:8058	JAVA_HOME="$( readlink -f "$( which java )" | sed "s:bin/.*$::" )"
+rej	1	makebook	'$' starting no expansion  @ $<	MK:recipe:165.27	MAKEVAR MAKEVAR MAKEVAR MAKEVAR -M $< | \@NMAKEVAR 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
+rej	1	cookbook	'$' starting no expansion  @ $\a-	BC:ch16/inputrc:41c3-43	# Edit variable on current line.@N    #"\M-\C-v": "\C-a\C-k$\C-y\M-\C-e\C-a\C-y="@N    "\C-xe": "\C-a\C-k$\C-y\M-\C-e\C-a\C-y="
+rej	1	nl2bash	'$' starting no expansion  @ $\|^	NB:3993	find -regex "^.*~$\|^.*#$"
+rej	1	nl2bash	'$' starting no expansion  @ $`	NB:6200	wc `find | grep .php$`
+rej	1	nl2bash	'$' starting no expansion  @ $|.a	NB:11379	find . -name “*.jar” -print -exec jar tvf {} \; |grep -E “jar$|.class”
+rej	1	tldr	'<&' takes one digit or '-'	TL:common/coproc.md:20	read <&"${name[0]}" variable
+rej	1	shellcheck	bash-only $ form  @ $[9	SC:Checks/ShellSupport.hs:prop_checkBashisms135:1	var=$[1 + 2]
+rej	1	shellcheck	bash-only $ form  @ $[9+	SC:Analytics.hs:prop_checkDollarBrackets1:1	echo $[1+2]
+rej	1	nl2bash	bash-only $ form  @ $[9/	NB:4769	echo $[4/0] || exit $?
+rej	1	nl2bash	missing word  @ (a))	NB:4469	USERS=$(awk '/\/X/ {print $1}' <(w))
+rej	1	nl2bash	missing word  @ <(	NB:8321	read -t 3 variable < <( tail -f logfile.log | grep "something" )
+rej	1	tldr	missing word  @ </>a	TL:common/nvim.md:26	<Esc></>search_pattern<Enter>
+rej	1	tldr	missing word  @ <:>%	TL:common/nvim.md:30	<Esc><:>%s/regex/replacement/g<Enter>
+rej	1	tldr	missing word  @ <~><	TL:common/ssh.md:37	<Enter><~><.>
+rej	1	tldr	missing word  @ |>	TL:common/scim.md:29	<|>
+rej	1	shellcheck	multi-digit descriptor	SC:Checks/ShellSupport.hs:prop_checkBashisms47:1-2	#!/bin/dash@Necho foo 42>/dev/null
+rej	1	tldr	no command name  @ <+|-	TL:common/gource.md:37	<+|-|<|>>
+rej	1	nl2bash	no command name  @ >/a	NB:7294	{ time find / &>/dev/null; } 2>&1 | grep real
+rej	1	nl2bash	no command name  @ >>	NB:11457	find ./ -type f -name '*.c*' -print0 | xargs -0 rm -rf &>> log_del.txt
+rej	1	nl2bash	no command name  @ a9=$	NB:7894	t1=$(date -u -d "1970.01.01-$string1" +"%s")
+rej	1	shellcheck	no command name  @ a=$a	SC:Analytics.hs:prop_checkAssignToSelf1:1	x=$x
+rej	1	shellcheck	no command name  @ a=${	SC:Analytics.hs:prop_checkAssignToSelf2:1	x=${x}
+rej	1	shellcheck	no command name  @ a=($	SC:Analytics.hs:prop_checkUnassignedReferences53:1	x=($foo)
+rej	1	shellcheck	no command name  @ a=*.	SC:Analytics.hs:prop_checkArrayAsString3:1	a=*.png
+rej	1	shellcheck	no command name  @ a=;	SC:Analytics.hs:prop_checkSpacefulnessCfg38:1	a=; echo $a
+rej	1	shellcheck	no command name  @ a=a+	SC:Analytics.hs:prop_checkWrongArit:1	i=i+1
+rej	1	pure-bash-bible	unexpected '('  @ ()((	PB:README.md:1880-1884	# Using arithmetic@N# This can be used to assign integer values.@N# Example: f a=1@N#          f a++@Nf()(($1))
+rej	1	tldr	unexpected '('  @ ();	TL:common/yacas.md:16	Example();
+rej	1	nl2bash	unexpected '('  @ (*.[	NB:5260	ls -d !(*.[ch])
+rej	1	shellcheck	unexpected '('  @ (*.a	SC:Checks/ShellSupport.hs:prop_checkBashisms4:1	rm !(*.hs)
+rej	1	nl2bash	unexpected '('  @ (*@(	NB:5261	ls -d !(*@(.c|.h))
+rej	1	nl2bash	unexpected '('  @ (*a	NB:5265	ls !(*foo)
+rej	1	tldr	unexpected '('  @ (-9.	TL:common/pnmnlfilt.md:16	pnmnlfilt -0.9..(-0.1) radius path/to/image.pnm >path/to/output.pnm
+rej	1	cookbook	unexpected '('  @ (9);	BC:ch16/builtin_tty.c:34c5	t = ttyname (0);
+rej	1	tldr	unexpected '('  @ (a)a	TL:common/yacas.md:12	Integrate(x)Cos(x);
+rej	1	nl2bash	unexpected '('  @ (a*)	NB:5266	ls !(b*)
+rej	1	nl2bash	unexpected '('  @ (‘	NB:2307	find -iname “*.c” -exec grep -l ‘main(‘ {} \; -a -exec cp {} test1/ \;
+rej	1	makebook	unexpected ')'  @ )))	MK:recipe:185.21	MAKEVAR)))
+rej	1	cookbook	unexpected 'N'  @ a	BC:ch16/builtin_tty.c:45c5	(char *)NULL
+rej	1	makebook	unexpected 'c'  @ a	MK:recipe:194.14	(/usr/java/toplink-2.5/TopLinkX.jar) cannot be found
+rej	1	nl2bash	unexpected end  @ 	NB:10760	(find $DIR/tmp/daily/ -name *.tar.gz | sort -n | head -2
+rej	1	tldr	unquoted '^'  @ ^!	TL:common/git-range-diff.md:8	git range-diff commit_1^! commit_2^!
+rej	1	nl2bash	unquoted '^'  @ ^-	NB:5935	diff -dbU0 a b | tail -n +4 | grep ^- | cut -c2-
+rej	1	nl2bash	unquoted '^'  @ ^.*	NB:902	find /home/my_dir -name '*.txt' | xargs grep -c ^.*
+rej	1	nl2bash	unquoted '^'  @ ^.*a	NB:1404	find ./ -type f -name \*.php -exec sed -i ’s/^.*iframe bla bla bla.*$//g’ {} \;
+rej	1	tldr	unquoted '^'  @ ^9|9	TL:common/qalc.md:21	qalc 66+99|2^4|6 feet to cm|1 bitcoin to USD|20 kmph to mph|...
+rej	1	nl2bash	unquoted '^'  @ ^[\>	NB:924	diff file1 file2 | grep ^[\>\<] | wc -l
+rej	1	nl2bash	unquoted '^'  @ ^[a-	NB:9012	apropos -s 3 . | grep ^[a-z]
+rej	1	shellcheck	unquoted '^'  @ ^a.*	SC:Analytics.hs:prop_checkGlobbedRegex4:1	[[ $foo =~ ^c.* ]]
+rej	1	tldr	unquoted '^'  @ ^|!$	TL:common/!.md:25	command !^|!$|!*
+rej	1	shellcheck	unquoted '{'  @ {$a.	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars4:1	echo {$i..100}
+rej	1	nl2bash	unquoted '{'  @ {*.a	NB:9967	tar --exclude={*.png,*.mp3,*.wav,.git,node_modules} -Jcf ${target_tarball}  ${source_dirname}
+rej	1	tldr	unquoted '{'  @ {-9}	TL:common/git-check-ref-format.md:12	git check-ref-format --branch @{-1}
+rej	1	nl2bash	unquoted '{'  @ {.,}	NB:5620	mv /path/subfolder/{.,}* /path/
+rej	1	nl2bash	unquoted '{'  @ {.[!	NB:5619	mv /source/path/{.[!.],}* /destination/path
+rej	1	shellcheck	unquoted '{'  @ {.a	SC:Checks/Commands.hs:prop_checkCatastrophicRm10:1	rm -r "${DIR}"/{.gitignore,.gitattributes,ci}
+rej	1	tldr	unquoted '{'  @ {.}.	TL:common/parallel.md:17	parallel convert {} {.}.png ::: *.jpg
+rej	1	pure-bash-bible	unquoted '{'  @ {9.	PB:README.md:1335-1337	# Print zero-padded numbers.@N# CAVEAT: bash 4+@Necho {01..100}
+rej	1	tldr	unquoted '{'  @ {9.a	TL:common/git-guilt.md:29	git guilt @{3.weeks.ago}
+rej	1	tldr	unquoted '{'  @ {9}-	TL:common/immich-go.md:25	immich-go -server=server_url -key=server_key tool album delete \d{4}-\d{2}-\d{2}
+rej	1	nl2bash	unquoted '{'  @ {9}\	NB:4690	ifconfig eth0 | grep -Eoi [:0-9A-F:]{2}\(\:[:0-9A-F:]{2}\){5}
+rej	1	nl2bash	unquoted '{'  @ {?,[	NB:8907	find /path/to/directory/folder{?,[1-4]?,50} -name '*.txt'
+rej	1	nl2bash	unquoted '{'  @ {a9	NB:8022	mpv --no-audio \`ls ~/Down/other/*.{mp4,flv} --color=never\`
+rej	1	cookbook	unquoted '{'  @ {a?	BC:ch10/ad:103c9	rm -fv {ch??,app?}.{pdf,xml,html} book.xml docbook-xsl.css     # <12>
+rej	1	shellcheck	unquoted '{'  @ {{a	SC:Checks/Commands.hs:prop_checkCatastrophicRm12:1	rm -r /{{usr,},{bin,sbin}}/$exec
+rej	1	shellcheck	unquoted '{'  @ {{a,	SC:Checks/Commands.hs:prop_checkCatastrophicRm13:1	rm -r /{{a,b},{c,d}}/$exec
+rej	1	nl2bash	unquoted '{'  @ {},	NB:5274	ls | xargs -I {} echo {}, | xargs echo
+rej	1	nl2bash	unquoted '{'  @ {}/*	NB:2643	find  . -type d -mindepth 1 -print -exec chmod 755 {}/* \;
+rej	1	nl2bash	unquoted '{'  @ {}/a	NB:1159	find . -type d -exec touch {}/index.html \;
+rej	1	nl2bash	unquoted '{'  @ {}[9	NB:1208	find /path/to/dir -name '*.pdf' -exec convert -thumbnail x80 {}[0] {}-thumb.png \;
+rej	1	nl2bash	unquoted '}'  @ }.a	NB:2178	find $STARTDIR -name '*.ps' -print | sed -e 's/.ps$//' | xargs -l -i  ps2pdf \{}.ps
+rej	1	makebook	unquoted expansion in a redirection target  @ $@	MK:recipe:219.15	printf "#! /bin/bash -x\nmake\n" > $@
+rej	1	nl2bash	unquoted expansion in a redirection target  @ $a.	NB:10303	find $x -type d -wholename '*' ! -wholename */@eaDir* > /tmp/mediaindex/$nn.dir
+rej	1	nl2bash	unquoted expansion in a redirection target  @ ${a	NB:10611	find src/js -type f -name "*.js" -exec cat {} >> ${jsbuild}$@ \;
+rej	1	nl2bash	unsupported parameter form  @ $!	NB:9049	kill $!
+rej	1	tldr	unsupported parameter form  @ $!|$	TL:common/$.md:16	echo $!|$?
+rej	1	shellcheck	unsupported parameter form  @ $#;	SC:Analytics.hs:prop_checkSpacefulnessCfg36:1	arg=$#; echo $arg
+rej	1	cookbook	unsupported parameter form  @ $$.a	BC:ch12/cdscript:17	ISOIMAGE=/tmp/cd$$.iso                                # <1>
+rej	1	nl2bash	unsupported parameter form  @ $$`	NB:4624	ps | grep `echo $$` | awk '{ print $4 }'
+rej	1	shellcheck	unsupported parameter form  @ $*;	SC:Analytics.hs:prop_checkDollarStar:1	for f in $*; do ..; done
+rej	1	nl2bash	unsupported parameter form  @ $9$	NB:9875	screen -list | awk '{print $1}' | grep -q "$1$"
+rej	1	nl2bash	unsupported parameter form  @ $9).	NB:1251	mktemp -dt "$(basename $0).XXXXXXXXXX"
+rej	1	nl2bash	unsupported parameter form  @ $9)/	NB:9348	source $(dirname $0)/incl.sh
+rej	1	pure-bash-bible	unsupported parameter form  @ $9)a	PB:README.md:2021c5-2023	# Usage: date "format"@N    # See: 'man strftime' for format.@N    printf "%($1)T\\n" "-1"
+rej	1	nl2bash	unsupported parameter form  @ $9,	NB:12450	alias logspace="find /apps/ /opt/ -type f -size +100M -exec ls -lh {} \; | awk '{print $5, $9 }'"
+rej	1	nl2bash	unsupported parameter form  @ $9.a	NB:6017	cat $1.tmp | sort -u
+rej	1	nl2bash	unsupported parameter form  @ $9/.	NB:2558	find $1/.hg -type d -exec chmod g+s {} \;
+rej	1	cookbook	unsupported parameter form  @ $9;;	BC:ch12/dash:20c9	CHAR=$1;;
+rej	1	shellcheck	unsupported parameter form  @ $9=	SC:Checks/Commands.hs:prop_checkAliasesUsesArgs2:1	alias $1='foo'
+rej	1	nl2bash	unsupported parameter form  @ $9\`	NB:9947	ln -s `cd \`dirname $2\`; pwd`/`basename $2` $1/link
+rej	1	nl2bash	unsupported parameter form  @ $9`,	NB:6820	echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
+rej	1	nl2bash	unsupported parameter form  @ $9}	NB:3080	find -type f -printf "%s %p\n" | sort -nr | head -n 4 | awk "{print $2}"
+rej	1	shellcheck	unsupported parameter form  @ $?;	SC:Analytics.hs:prop_checkSpuriousExec10:1c12	r=$?; printf >&2 'failed
+rej	1	nl2bash	unsupported parameter form  @ $@*	NB:10197	find . -iname "*$@*" -or -iname ".*$@*"
+rej	1	makebook	unsupported parameter form  @ $@,	MK:recipe:186.37	$(call add-manifest, $@, $($1_name), $($1_manifest))
+rej	1	makebook	unsupported parameter form  @ $@.a	MK:recipe:165.29	MAKEVAR $@.tmp $@
+rej	1	nl2bash	unsupported parameter form  @ $@`)	NB:6906	pushd $(dirname `which $@`)
+rej	1	shellcheck	unsupported parameter form  @ ${##	SC:Checks/ShellSupport.hs:prop_checkBashisms56:1-2	#!/bin/sh@Necho ${##}
+rej	1	shellcheck	unsupported parameter form  @ ${#*	SC:Analytics.hs:prop_checkDollarStar8:1	ls ${#*}
+rej	1	shellcheck	unsupported parameter form  @ ${#@	SC:Analytics.hs:prop_checkUnquotedDollarAt1:1	ls ${#@}
+rej	1	shellcheck	unsupported parameter form  @ ${$#	SC:Analytics.hs:prop_checkBadParameterSubstitution3:1	${$#}
+rej	1	shellcheck	unsupported parameter form  @ ${$(	SC:Analytics.hs:prop_checkBadParameterSubstitution8:1	${$(x)//x/y}
+rej	1	shellcheck	unsupported parameter form  @ ${${	SC:Analytics.hs:prop_checkBadParameterSubstitution11:1	${${x%.*}##*/}
+rej	1	shellcheck	unsupported parameter form  @ ${*/	SC:Analytics.hs:prop_checkDollarStar5:1	ls ${*//foo/bar}
+rej	1	shellcheck	unsupported parameter form  @ ${*}	SC:Analytics.hs:prop_checkDollarStar7:1	ls ${*}
+rej	1	shellcheck	unsupported parameter form  @ ${.a	SC:Analytics.hs:prop_checkUnassignedReferences28:1-2	#!/bin/ksh@Necho "${.sh.version}"
+rej	1	shellcheck	unsupported parameter form  @ ${9	SC:Analytics.hs:prop_checkSpacefulnessCfg11:1	rm ${10//foo/bar}
+rej	1	shellcheck	unsupported parameter form  @ ${9+	SC:Analytics.hs:prop_checkSpacefulnessCfg35:1	echo ${1+"$1"}
+rej	1	pure-bash-bible	unsupported parameter form  @ ${9,	PB:README.md:350c5-351	# Usage: lower "string"@N    printf '%s\n' "${1,,}"
+rej	1	pure-bash-bible	unsupported parameter form  @ ${9^	PB:README.md:376c5-377	# Usage: upper "string"@N    printf '%s\n' "${1^^}"
+rej	1	pure-bash-bible	unsupported parameter form  @ ${9~	PB:README.md:402c5-403	# Usage: reverse_case "string"@N    printf '%s\n' "${1~~}"
+rej	1	shellcheck	unsupported parameter form  @ ${@%	SC:Checks/ShellSupport.hs:prop_checkBashisms55:1-2	#!/bin/sh@Necho ${@%foo}
+rej	1	shellcheck	unsupported parameter form  @ ${@+	SC:Analytics.hs:prop_checkUnquotedDollarAt10:1	echo ${@+"$@"}
+rej	1	nl2bash	unsupported parameter form  @ ${@:	NB:6087	diff "${@:3}" <(sort "$1") <(sort "$2")
+rej	1	pure-bash-bible	unsupported parameter form  @ ${a%	PB:README.md:197c5	: "${_%"${_##*[![:space:]]}"}"
+rej	1	shellcheck	unsupported parameter form  @ ${a+	SC:Analytics.hs:prop_checkInexplicablyUnquoted10:1	cmd ${x+--name="$x" --output="$x.out"}
+rej	1	shellcheck	unsupported parameter form  @ ${a[	SC:Checks/ShellSupport.hs:prop_checkBashisms116:3	${x[1]}
+rej	1	shellcheck	unsupported parameter form  @ ${a^	SC:Checks/ShellSupport.hs:prop_checkBashisms119:3	${x^^[t]}
+rej	1	shellcheck	unsupported parameter form  @ ${{a	SC:Analytics.hs:prop_checkBadParameterSubstitution7:1	${{var}

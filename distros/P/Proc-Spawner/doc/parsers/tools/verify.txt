@@ -1,0 +1,36 @@
+bash: DIFFERENT                          2
+bash: same                               235
+dash: DIFFERENT                          3
+dash: same                               234
+skipped: arithmetic                      3
+skipped: cd                              11
+skipped: command name with a slash       5
+skipped: dup of a closed descriptor      3
+skipped: input redirection               11
+skipped: kill                            6
+skipped: pattern that may match outside the test directory 7
+skipped: pwd prints the directory        11
+skipped: status of [ or test decides     17
+skipped: string starts with - (read as an option by sh -c) 1
+skipped: target outside the test directory 13
+skipped: time keyword in bash            12
+
+--- dash: find ./* | cpio -o > arch.cpio
+  expected: ["cpio","-o"] ["find","./*"]
+  got:      ["cpio","-o"] ["find","./arch.cpio"]
+
+--- bash: find ./* | cpio -o > arch.cpio
+  expected: ["cpio","-o"] ["find","./*"]
+  got:      ["cpio","-o"] ["find","./arch.cpio"]
+
+--- dash: (echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
+  expected: ["sleep","1"] ["sleep","1"] ["zenity","--progress"]
+  got:      ["sleep","1"] ["zenity","--progress"]
+
+--- bash: (echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
+  expected: ["sleep","1"] ["sleep","1"] ["zenity","--progress"]
+  got:      ["sleep","1"] ["zenity","--progress"]
+
+--- dash: find "${searchpath}" -type f -print0 | xargs -0 grep -l -E "${string1}".*"${string2}".*"${string3}"
+  expected: ["find","","-type","f","-print0"] ["xargs","-0","grep","-l","-E",".*.*"]
+  got:      ["find","","-type","f","-print0"] ["xargs","-0","grep","-l","-E",".."]

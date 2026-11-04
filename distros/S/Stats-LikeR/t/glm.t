@@ -229,7 +229,7 @@ no_leaks_ok {
 # The standard errors of a glm come from the information matrix of the
 # penultimate IRLS iterate -- in R because summary.glm inverts the QR that
 # glm.fit kept from its last weighted least squares call, and here because
-# sweep_matrix_ols leaves that same inverse in XtWX. Agreeing with R therefore
+# as274_solve() leaves that same inverse in XtWX. Agreeing with R therefore
 # means stopping on the same iteration as R, and glm() used not to: its
 # step-halving guard treated any increase in deviance as divergence, but the
 # standard IRLS start puts mu at y + 0.1, essentially on the data, so the first

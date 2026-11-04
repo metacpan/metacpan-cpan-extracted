@@ -11,7 +11,7 @@ waitpid $p, 0;
 my $top = abs_path('.'); my %known;
 open my $k, '<', 't/dash-known.txt' or die "t/dash-known.txt: $!";
 while (<$k>) { next if /^#/; chomp; my ($f, $why, $c) = split /\t/, $_, 3; $known{"$f\t$c"} = $why }
-my @files = map "$_.txt", qw(largebattery battery fdbattery sigenv t1 t2 t3 pspawn-d2 pspawn-l10);
+my @files = map "$_.txt", qw(largebattery battery fdbattery sigenv t1 t2 t3 pspawn-d2 pspawn-l10 large-subset-b13 large-subset-p6 large-subset-e);
 my @lines = map { my $f = $_; open my $in, '<', "t/batteries/$f" or die "$f: $!"; [$f, grep length, map { chomp; $_ } <$in>] } @files;
 my $dir = tempdir(CLEANUP => 1); mkdir "$dir/tmp" or die "$dir/tmp: $!"; copy('t/fds', "$dir/fds") && chmod 0755, "$dir/fds"; chdir $dir or die;
 for (@lines) {

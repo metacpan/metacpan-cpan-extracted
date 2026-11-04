@@ -8,7 +8,9 @@ use Cwd ();
 use File::Path ();
 use File::Spec ();
 
-our $VERSION = '0.02';
+use Devel::XSCover::Flow ();
+
+our $VERSION = '0.06';
 
 our (@CRITERIA);
 
@@ -71,6 +73,23 @@ sub _merge_into {
                 push @{ $have{ $b->{line} } }, $copy;
             }
         }
+        if ($src->{decisions}) {
+            my (%dseen, %dhave);
+            $dst->{decisions} //= [];
+            push @{ $dhave{ $_->{line} } }, $_ for @{ $dst->{decisions} };
+            for my $d (@{ $src->{decisions} }) {
+                my $n    = $dseen{ $d->{line} }++;
+                my $peer = $dhave{ $d->{line} }[$n];
+                if ($peer && @{ $peer->{arms} } == @{ $d->{arms} }) {
+                    $peer->{arms}[$_] += $d->{arms}[$_] for 0 .. $#{ $d->{arms} };
+                }
+                else {
+                    my $copy = { line => $d->{line}, arms => [ @{ $d->{arms} } ] };
+                    push @{ $dst->{decisions} }, $copy;
+                    push @{ $dhave{ $d->{line} } }, $copy;
+                }
+            }
+        }
         my (%cseen, %chave);
         push @{ $chave{ $_->{line} } }, $_ for @{ $dst->{conditions} };
         for my $d (@{ $src->{conditions} || [] }) {
@@ -97,12 +116,14 @@ sub entries {
         my $f = $files->{$file};
         my $e = $out{$file} = { statement => [], branch => [], subroutine => [], condition => [] };
         for my $line (sort { $a <=> $b } keys %{ $f->{lines} }) {
+            next if $self->_braces_only($file, $line);
             push @{ $e->{statement} }, [ $line, $f->{lines}{$line} ];
         }
-        for my $b (sort { $a->{line} <=> $b->{line} } @{ $f->{blocks} }) {
+        my @branches = $f->{decisions} && !$self->{macro_branches}
+            ? @{ $f->{decisions} }
+            : grep { @{ $_->{arms} } >= 2 && ($self->{macro_branches} || $self->_decides($file, $_->{line})) } @{ $f->{blocks} };
+        for my $b (sort { $a->{line} <=> $b->{line} } @branches) {
             my @arms = @{ $b->{arms} };
-            next if @arms < 2;
-            next if $self->{macro_branches} ? 0 : !$self->_decides($file, $b->{line});
             if (@arms == 2) {
                 push @{ $e->{branch} }, [ $b->{line}, $self->_source_text($file, $b->{line}), [@arms] ];
                 next;
@@ -114,13 +135,14 @@ sub entries {
             }
         }
         for my $d (sort { $a->{line} <=> $b->{line} } @{ $f->{conditions} || [] }) {
+            next unless $self->{macro_branches} || $self->_terms($file, $d->{line}) == @{ $d->{terms} };
             my $text = $self->_source_text($file, $d->{line});
             for my $k (0 .. $#{ $d->{terms} }) {
                 my $term = $d->{terms}[$k];
                 push @{ $e->{condition} }, [ $d->{line}, { type => 'and_2', left => 'term ' . ($k + 1), op => 'of', right => $text }, [ $term->{true} ? 1 : 0, $term->{false} ? 1 : 0 ] ];
             }
         }
-        for my $fn (sort { $a->{line} <=> $b->{line} || $a->{name} cmp $b->{name} } @{ $f->{functions} }) {
+        for my $fn (sort { $a->{line} <=> $b->{line} } sort { $a->{name} cmp $b->{name} } @{ $f->{functions} }) {
             push @{ $e->{subroutine} }, [ $fn->{line}, $fn->{name}, $fn->{count} ];
         }
     }
@@ -129,6 +151,7 @@ sub entries {
         for my $c_name (sort keys %{ $map->{xsubs} }) {
             my $x = $map->{xsubs}{$c_name};
             next unless defined $x->{line} && @{ $x->{names} };
+            next if %count && !exists $count{$c_name};
             my $e = $out{ $x->{file} } //= { statement => [], branch => [], subroutine => [], condition => [] };
             for my $name (@{ $x->{names} }) {
                 push @{ $e->{subroutine} }, [ $x->{line}, $name, $count{$c_name} // 0 ];
@@ -136,7 +159,7 @@ sub entries {
         }
     }
     for my $e (values %out) {
-        @{ $e->{subroutine} } = sort { $a->[0] <=> $b->[0] || $a->[1] cmp $b->[1] } @{ $e->{subroutine} };
+        @{ $e->{subroutine} } = sort { $a->[0] <=> $b->[0] } sort { $a->[1] cmp $b->[1] } @{ $e->{subroutine} };
     }
     return \%out;
 }
@@ -205,19 +228,52 @@ sub _decides {
     return $text =~ /\b(?:if|else|while|for|do|switch)\b|\?|&&|\|\|/ ? 1 : 0;
 }
 
+sub _braces_only {
+    my ($self, $file, $line) = @_;
+    my $src = $self->_clean_source($file)->{lines}[$line - 1];
+    return defined $src && $src =~ /\}/ && $src =~ /^[\s{}]*(?:else[\s{}]*)?$/ ? 1 : 0;
+}
+
+
+sub _terms {
+    my ($self, $file, $line) = @_;
+    my $clean = $self->_clean_source($file);
+    my ($from, $to) = ($line, $line);
+    for my $r (@{ $clean->{ranges} }) {
+        next unless $r->{line} <= $line && $line <= $r->{end};
+        ($from, $to) = ($r->{line}, $r->{end});
+        last;
+    }
+    my $text = join ' ', map { $clean->{lines}[$_ - 1] // '' } $from .. $to;
+    my $ops = () = $text =~ /&&|\|\|/g;
+    return $ops + 1 if $ops || $from < $to || $text =~ /\b(?:if|while|for|switch)\s*\(|\?/;
+    return 0;
+}
+
+sub _clean_source {
+    my ($self, $file) = @_;
+    return $self->{clean}{$file} if $self->{clean}{$file};
+    my $flow = Devel::XSCover::Flow->new(dir => $self->{dir});
+    my @raw  = map { "$_\n" } @{ $self->_source_lines($file) };
+    return $self->{clean}{$file} = { lines => [ $flow->clean(\@raw) ], ranges => [ $flow->ranges(\@raw) ] };
+}
+
+sub _source_lines {
+    my ($self, $file) = @_;
+    return $self->{source}{$file} if $self->{source}{$file};
+    my $path = File::Spec->catfile($self->{dir}, $file);
+    my @l;
+    if (open my $fh, '<', $path) {
+        @l = <$fh>;
+        close $fh;
+        chomp @l;
+    }
+    return $self->{source}{$file} = \@l;
+}
+
 sub _source_text {
     my ($self, $file, $line) = @_;
-    my $lines = $self->{source}{$file} //= do {
-        my $path = File::Spec->catfile($self->{dir}, $file);
-        my @l;
-        if (open my $fh, '<', $path) {
-            @l = <$fh>;
-            close $fh;
-            chomp @l;
-        }
-        \@l;
-    };
-    my $text = $lines->[ $line - 1 ] // '';
+    my $text = $self->_source_lines($file)->[ $line - 1 ] // '';
     $text =~ s/^\s+|\s+$//g;
     $text =~ s/\s+/ /g;
     return $text;
@@ -257,8 +313,8 @@ C<cover> then reads it beside the Perl runs of the same test run.
 
     my $writer = Devel::XSCover::DB->new(%options);
 
-Options: C<dir>, C<db> (relative to C<dir> unless absolute), C<macro_branches> (keep
-the branches of macros, see C<entries>), C<dry> and C<silent>.
+Options: C<dir>, C<db> (relative to C<dir> unless absolute), C<macro_branches>
+(every gcov block as a branch, see C<entries>), C<dry> and C<silent>.
 
 =head2 merge
 
@@ -273,18 +329,32 @@ and line, and the arms of its blocks summed where the same block was seen twice.
 
     my $entries = $writer->entries($files, $generated, @maps);
 
-The criteria per file. Every executable line is a statement. A block of two arms is
-one branch with the source line as its text, the arms in gcov's order. A block of
-more arms is one branch per arm, C<arm k of N>, each the arm against the sum of
-the others. A block on a line whose text holds no decision (no C<if>, C<else>,
-C<while>, C<for>, C<do>, C<switch>, C<?>, C<&&> or C<||> outside comments) is a
-macro's own, as C<GvSVn> or C<SvTRUE> expand to, and is left out unless
-C<macro_branches> is set: nothing in the source can take its other arm. Every C function is a subroutine on its first line under its C name. An
+The criteria per file. Every executable line is a statement, but a line of nothing
+but braces (and perhaps C<else>), which clang credits with the code after a C<return>
+inside a macro, is not. A branch is a decision
+of the source, an C<if>, C<while>, C<for> or C<switch>, with one arm per way out of
+it, as L<Devel::XSCover::Flow> read them from the flow graph: a decision of two arms
+is one branch with the source line as its text, the arm into the body first, and one
+of more arms is one branch per arm, C<arm k of N>, each the arm against the sum of
+the others. A file the flow graph did not cover, as with a gcov older than 9, gets
+its branches from gcov's blocks instead, one per block with two or more arms in
+gcov's order, leaving out a block on a line whose text holds no decision (no C<if>,
+C<else>, C<while>, C<for>, C<do>, C<switch>, C<?>, C<&&> or C<||> outside comments),
+which is a macro's own, as C<GvSVn> or C<SvTRUE> expand to: nothing in the source
+can take its other arm. C<macro_branches> keeps every block of every file that way
+instead. Every C function is a subroutine on its first line under its C name. An
 XSUB is a subroutine on its declaration line in the XS under each of its Perl
-names, with the count of its wrapper from the generated C. A decision that gcc 14's
+names, with the count of its wrapper from the generated C, and an XSUB whose wrapper the
+compiler never saw, under a preprocessor condition the build left out, is not a
+subroutine of this build. A decision that gcc 14's
 condition coverage reported becomes one condition per term, C<term k of> the
 source line, with two counts: whether the term's true outcome and whether its
-false outcome each decided the result at least once.
+false outcome each decided the result at least once. gcc counts the terms of the
+expression as the preprocessor left it, so a decision with more terms than its source
+holds (one more than the C<&&> and C<||> over the lines its parentheses span, one for
+a plain C<if> or a C<?>) has a macro's own among them, as C<HvNAME_get> expands to, and
+is left out: nothing in the source tells its terms from the macro's. A line with no
+decision in its text is a macro's altogether. C<macro_branches> keeps them all.
 
 =head2 write
 

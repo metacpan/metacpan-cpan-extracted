@@ -23,6 +23,7 @@ my %BASE_PARAM = (
     default_update  => 0,
     hidden          => 1,
     open            => 'lynx',
+    user_agent      => 'abrowser 1.1',
 );
 
 my $DEFAULT = WWW::Noss::GroupConfig->new(
@@ -72,6 +73,8 @@ sub base_ok {
     ok($base->hidden, 'hidden ok');
 
     is($base->open_cmd, 'lynx', 'open ok');
+
+    is($base->user_agent, 'abrowser 1.1', 'user_agent ok');
 
 }
 
@@ -130,6 +133,7 @@ subtest 'FeedConfig ok' => sub {
                 default_update => 1,
                 hidden => 1,
                 open => 'lynx',
+                user_agent => 'abrowser 1.1',
             ),
             WWW::Noss::GroupConfig->new(
                 name => 'g2',
@@ -146,6 +150,7 @@ subtest 'FeedConfig ok' => sub {
                 default_update => 0,
                 hidden => 0,
                 open => 'links',
+                user_agent => 'bbrowser 2.2',
             ),
             WWW::Noss::GroupConfig->new(
                 name => 'g3',
@@ -162,6 +167,7 @@ subtest 'FeedConfig ok' => sub {
                 default_update => 0,
                 hidden => 0,
                 open => 'elinks',
+                user_agent => 'cbrowser 3.3',
             ),
         ],
         limit => 4,
@@ -175,6 +181,7 @@ subtest 'FeedConfig ok' => sub {
         default_update => 1,
         hidden => 1,
         open => 'w3m',
+        user_agent => 'dbrowser 4.4',
         retry_cache => do {
             my ($h, $p) = tempfile(UNLINK => 1);
             close $h;
@@ -241,6 +248,8 @@ subtest 'FeedConfig ok' => sub {
     ok($o->can_we_retry, 'can_we_retry ok');
 
     is($o->open_cmd, 'w3m', 'open ok');
+
+    is($o->user_agent, 'dbrowser 4.4', 'user_agent ok');
 
 };
 

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API &mdash; Database::BI</title>
+<meta name="description" content="The JSON API behind Database::BI: saved canvases, their visuals, and the endpoints for columns, directories, statistics, questions and stored fields.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="api.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="API &mdash; Database::BI">
+<meta property="og:description" content="The JSON API behind Database::BI: saved canvases, their visuals, and the endpoints for columns, directories, statistics, questions and stored fields.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="charts.html">Charts</a>
+			<a href="canvas.html">Canvases</a>
+			<a href="data.html">Data</a>
+			<a href="api.html" aria-current="page">API</a>
+			<a href="install.html">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">JSON, same process, same files</p>
+	<h1>API</h1>
+	<p class="lead">
+		Every page is built from the same pipeline, and the interesting parts are
+		available as JSON: saved canvases, their cards, the columns of a source,
+		the filesystem, stored calculated fields and the optional question and
+		summary endpoints.
+	</p>
+</div>
+
+<h2 id="canvases">Saved canvases</h2>
+<div class="table-wrap">
+<table>
+	<thead>
+		<tr><th>Method and path</th><th>Does</th><th>Answers</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>GET /api/analyses</code></td>
+			<td>Lists every saved canvas.</td>
+			<td><code>{ analyses: [{ id, name, datasets, updated }] }</code></td>
+		</tr>
+		<tr>
+			<td><code>POST /api/analyses</code></td>
+			<td>Creates one. Needs <code>name</code> and <code>datasets</code>; each dataset needs a <code>spec</code> starting <code>table:</code>, <code>path:</code>, <code>url:</code> or <code>redis:</code>, or being <code>mariadb:server/table</code>.</td>
+			<td><code>201 { id, created: 1 }</code></td>
+		</tr>
+		<tr>
+			<td><code>GET /api/analyses/:id</code></td>
+			<td>Returns the whole document.</td>
+			<td>The canvas</td>
+		</tr>
+		<tr>
+			<td><code>PUT /api/analyses/:id</code></td>
+			<td>Replaces the document.</td>
+			<td>The saved canvas</td>
+		</tr>
+		<tr>
+			<td><code>PATCH /api/analyses/:id</code></td>
+			<td>Merges the supplied top-level keys. <code>id</code> and <code>created</code> are immutable; unknown keys are dropped.</td>
+			<td>The saved canvas</td>
+		</tr>
+		<tr>
+			<td><code>DELETE /api/analyses/:id</code></td>
+			<td>Removes it.</td>
+			<td><code>{ deleted: 1 }</code></td>
+		</tr>
+		<tr>
+			<td><code>GET /api/analyses/:id/export</code></td>
+			<td>Downloads the document.</td>
+			<td>A <code>.json</code> file</td>
+		</tr>
+		<tr>
+			<td><code>POST /api/analyses/import</code></td>
+			<td>Creates one from an uploaded <code>.json</code> file or a raw JSON body. Caller-supplied <code>id</code>, <code>created</code> and <code>updated</code> are stripped.</td>
+			<td>The new canvas</td>
+		</tr>
+		<tr>
+			<td><code>POST /api/analyses/:id/share</code></td>
+			<td>Issues a share token for the canvas.</td>
+			<td>A share link</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2 id="layout">The layout</h2>
+<p>
+	<code>layout</code> is an array of <code>{ visual, x, y, w, h }</code>, where
+	<code>visual</code> indexes the <code>visuals</code> array and the rest are
+	1-based grid cells. The grid is twelve columns wide,
+	<code>x + w - 1</code> cannot exceed twelve, and one visual may span at most
+	six rows. Positions are stored as given &mdash; a gap is a gap &mdash; but two
+	visuals may not share a cell: an overlapping set is a 400 and the stored
+	layout is left alone. A canvas has a single grid, so the layout moves as a
+	whole and is only checked when the new set is complete.
+</p>
+
+<h2 id="visuals">Appending a card</h2>
+<pre><code>POST /api/analyses/:id/visuals
+Content-Type: application/json
+
+{
+  "kind":    "bar",
+  "encode":  { "cat": "region", "val": "amount", "agg": "median" },
+  "options": {},
+  "title":   "Median amount by region",
+  "query":   "cf=year&amp;cv=2025"
+}</code></pre>
+<p>
+	<code>kind</code> is one of <code>table</code>, <code>bar</code>,
+	<code>pie</code>, <code>line</code>, <code>graph</code>,
+	<code>scatter</code>, <code>heatmap</code>, <code>stacked</code>,
+	<code>combo</code>, <code>treemap</code>, <code>histogram</code>,
+	<code>wordcloud</code>, <code>map</code> or <a href="#text-cards"><code>text</code></a>.
+	The optional <code>query</code> is
+	the canvas page's own query string: <code>cf</code> (cross-filter),
+	<code>c</code> (calculated columns), <code>p.&lt;name&gt;</code> (bound
+	parameters) and <code>range</code>/<code>rcol</code> are read from it, so a
+	card added while the canvas is filtered is drawn through the same state as the
+	cards already on screen.
+</p>
+<p>
+	The card is rendered against the canvas's datasets, joins and calculated
+	fields before it is stored, so an unknown column or an undrawable visual is a
+	400 and nothing is appended. The answer is:
+</p>
+<pre><code>201 { id, visual, kind, title, html, head, cf_col }</code></pre>
+<p>
+	<code>visual</code> is the new card's index, <code>head</code> is any
+	stylesheet or script the page must add once to draw it (Leaflet, for a map),
+	and <code>cf_col</code> is the column its marks cross-filter by. The card is
+	left unplaced until the reader moves it.
+</p>
+
+<h3 id="aggregation">The measure a card aggregates with</h3>
+<p>
+	A kind that aggregates a value column &mdash; <code>bar</code>,
+	<code>pie</code>, <code>stacked</code>, <code>treemap</code>,
+	<code>heatmap</code> and <code>combo</code> &mdash; reads an optional
+	<code>encode.agg</code>: <code>sum</code> (the default), <code>avg</code>,
+	<code>min</code>, <code>max</code>, <code>count</code>,
+	<code>count_distinct</code>, <code>median</code>, <code>stdev</code>,
+	<code>first</code>, <code>last</code>, <code>range</code>, or
+	<code>p&lt;N&gt;</code> from <code>p1</code> to <code>p100</code> &mdash; the
+	same vocabulary and spelling a pivot's <code>m=</code> uses.
+</p>
+<p>
+	The function is checked whatever the kind is, so a misspelt one is a 400
+	rather than a chart drawn some other way. So is a function that needs a column
+	(<code>median</code>, unlike <code>count</code>) when the card names no value
+	column. A combo aggregates both its series with the one function.
+</p>
+
+<h3 id="cross-row">A card's own cross-row plan</h3>
+<p>
+	A card may bring a <code>cross_row</code> plan in the spelling the canvas
+	page's <code>cs</code>, <code>by</code> and <code>order</code> use:
+	<code>{ cs: [ "col:fn:name[:arg]" ], by: "col", order: [ "col:dir" ] }</code>.
+	The card then runs that plan instead of the page's, so one card can show a
+	running total while its neighbours show raw rows; <code>{ cs: [] }</code> is a
+	card that runs no cross-row pass at all. A card that sends no
+	<code>cross_row</code> inherits the page's plan.
+</p>
+
+<h2 id="redraw">Redrawing one card</h2>
+<pre><code>PATCH /api/analyses/:id/visuals/:visual
+{ "encode": { "loc": "city" }, "query": "cf=region&amp;cv=North" }</code></pre>
+<p>
+	This replaces a stored visual's encoding in place; the optional
+	<code>query</code> is read the same way as above. The visual keeps its index,
+	so its position, size and title are unchanged. The replacement is rendered
+	before it is stored, so an unknown column or an undrawable map is a 400 and
+	the saved visual is left alone. The answer is the same shape as the append.
+</p>
+<p>
+	A card's data can be downloaded as
+	<code>GET /a/:id/visual/:n/:fmt</code>, which uses the canvas's own rows and
+	does not accept an <code>l=</code> pointing anywhere else.
+</p>
+
+<h2 id="text-cards">Text cards</h2>
+<pre><code>POST /api/analyses/:id/visuals
+Content-Type: application/json
+
+{
+  "kind":    "text",
+  "options": {
+    "text":   "Quarterly sales",
+    "font":   "georgia",
+    "size":   24,
+    "align":  "center",
+    "bold":   1,
+    "plain":  1
+  }
+}</code></pre>
+<p>
+	A text card reads no data, so it has no <code>encode</code>, <code>query</code>
+	or <code>cross_row</code>, and <code>/a/:id/visual/:n/csv</code> answers 404 for
+	it. A setting outside these is dropped; one with a bad value is a 400 and nothing
+	is stored.
+</p>
+<dl class="spec">
+	<dt><code>text</code></dt>
+	<dd>Required, up to 20,000 characters. It is shown as plain text, never as markup.</dd>
+	<dt><code>font</code></dt>
+	<dd><code>arial</code>, <code>georgia</code>, <code>times</code>, <code>verdana</code>, <code>trebuchet</code> or <code>courier</code>. Left out, the card uses the page's font.</dd>
+	<dt><code>size</code></dt>
+	<dd>A whole number of points from 8 to 96.</dd>
+	<dt><code>colour</code>, <code>background</code></dt>
+	<dd>Written <code>#rrggbb</code>. Left out, the text follows the theme and the card has no fill of its own.</dd>
+	<dt><code>align</code></dt>
+	<dd><code>left</code>, <code>center</code> or <code>right</code>.</dd>
+	<dt><code>bold</code>, <code>italic</code>, <code>plain</code></dt>
+	<dd>True to turn on. <code>plain</code> hides the frame and header until the card is pointed at.</dd>
+</dl>
+<pre><code>PATCH  /api/analyses/:id/visuals/:visual     { "options": { ... } }
+DELETE /api/analyses/:id/visuals/:visual</code></pre>
+<p>
+	PATCH replaces all the options, keeping the card's place and size. DELETE answers
+	<code>{ "deleted": 1 }</code>; it accepts only text cards, and any other kind is a
+	400. Later cards move down one index, and the layout and any <code>cv</code> in a
+	bookmark move with them.
+</p>
+
+<h2 id="data">Data and filesystem</h2>
+<dl class="spec">
+	<dt><code>GET /api/columns?table=&hellip;</code> or <code>?path=&hellip;</code></dt>
+	<dd>The column names of a source, used to populate the join panel without a page reload.</dd>
+	<dt><code>GET /api/dirs?path=&hellip;</code></dt>
+	<dd>Subdirectories of a path, for the export panel's inline browser.</dd>
+	<dt><code>GET /api/stat?path=&hellip;</code></dt>
+	<dd><code>{ exists, path, mtime, size }</code>, plus <code>table_count</code> for a valid SQLite file.</dd>
+	<dt><code>GET /api/range?l=&hellip;</code></dt>
+	<dd>The earliest and latest value of a date column, so the filter bar can disable a window the data cannot answer.</dd>
+	<dt><code>POST /api/ask</code></dt>
+	<dd>
+		A question in words, answered with an analysis spec and a URL. The model
+		sees column names and types only &mdash; never rows or file paths. 503 when
+		no key is configured, 422 when the question cannot be mapped to valid
+		columns.
+	</dd>
+	<dt><code>POST /api/summary</code></dt>
+	<dd>
+		A narrative summary from deterministic sentences, works offline, with an
+		optional polished version when <code>ai=1</code> and a key is set. Cached
+		for an hour.
+	</dd>
+</dl>
+
+<h2 id="stored">Stored fields</h2>
+<p>
+	The definitions saved beside the data &mdash; calculated fields, value groups,
+	date patterns, lookups, extractions and coordinate columns &mdash; have a list, a save and a delete
+	endpoint each, all keyed by <code>l=&lt;spec&gt;</code>:
+</p>
+<div class="table-wrap">
+<table>
+	<thead>
+		<tr><th>Area</th><th>List</th><th>Save</th><th>Delete</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Calculated fields</td>
+			<td><code>GET /calc/list</code></td>
+			<td><code>POST /calc/save</code> (<code>name</code>, <code>expr</code>)</td>
+			<td><code>POST /calc/delete</code></td>
+		</tr>
+		<tr>
+			<td>Value groups</td>
+			<td><code>GET /groups/list</code></td>
+			<td><code>POST /groups/save</code> (<code>group</code>, <code>values</code>)</td>
+			<td><code>POST /groups/delete</code></td>
+		</tr>
+		<tr>
+			<td>Date patterns</td>
+			<td><code>GET /dates/list</code></td>
+			<td><code>POST /dates/save</code> (<code>pattern</code>, optional <code>time</code>, <code>as</code>)</td>
+			<td><code>POST /dates/delete</code></td>
+		</tr>
+		<tr>
+			<td>Lookups (<a href="data.html#lookups">how they apply</a>)</td>
+			<td><code>GET /lookups/list</code></td>
+			<td><code>POST /lookups/save</code> (<code>name</code>, <code>file</code>, <code>key</code>, optional <code>col</code>, <code>fields</code>, <code>default</code>)</td>
+			<td><code>POST /lookups/delete</code></td>
+		</tr>
+		<tr>
+			<td>Field extractions (<a href="data.html#extract">how they apply</a>)</td>
+			<td><code>GET /extract/list</code></td>
+			<td><code>POST /extract/save</code> (<code>name</code>, <code>col</code>, <code>pattern</code>, optional <code>fields</code>)</td>
+			<td><code>POST /extract/delete</code></td>
+		</tr>
+		<tr>
+			<td>Coordinate columns</td>
+			<td><code>GET /geo/list</code></td>
+			<td><code>POST /geo/save</code> (<code>col</code>, <code>kind</code>, repeatable in pairs; <code>replace=1</code> forgets the old ones first)</td>
+			<td><code>POST /geo/delete</code></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2>Behaviour to rely on</h2>
+<ul class="plain">
+	<li>
+		A missing canvas, table or route answers 404: HTML for a page, JSON for
+		anything under <code>/api/</code>.
+	</li>
+	<li>
+		Error replies that quote a parameter are sent as plain text, not HTML, so a
+		crafted link cannot run script on the site through an error message.
+	</li>
+	<li>
+		A write to <code>analyses.json</code> that cannot be saved answers 503
+		rather than reporting a success that did not happen.
+	</li>
+	<li>
+		A canvas document of the wrong shape &mdash; hand-edited or otherwise
+		&mdash; is refused by POST, PUT and PATCH, and its bad part is treated as
+		absent when it is read.
+	</li>
+</ul>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

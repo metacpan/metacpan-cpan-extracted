@@ -1,5 +1,33 @@
 Revision history for Geo-Coder-List
 
+0.40	Tue Nov  3 07:50:51 PM EST 2026
+	[ Tests ]
+	- .github/workflows/actionlint.yml lints every workflow on push and pull
+	  request: actionlint reads each expression with the contexts available where
+	  it stands, which is how Database-BI's browser.yml was refused whole -
+	  "Unrecognized named-value: 'runner'" for ${{ runner.temp }} in a job-level
+	  env, with none of its four jobs run - and shellcheck checks the shell inside
+	  every run: block.  Both are downloaded from a pinned release with a
+	  verified checksum, and the workflows are found rather than listed, so one
+	  added later is covered without being added here as well.  The file is the
+	  one the distributions that share these workflows carry unchanged - the
+	  contract job's four callers, the siblings it checks out and the eight the
+	  location-predicate fuzz assembles - so the copies here are held to the same
+	  rules.
+	- The findings it reported in .github/workflows/perl-ci.yml are fixed rather
+	  than silenced: the documented `eval "$(perl -Mlocal::lib)"` idiom is quoted
+	  (SC2046), and `find lib -name '*.pm' | xargs` is -print0 and -0 now
+	  (SC2038), so a module path holding a space is no longer split into two.
+	- The other copies in this repository are fixed too: alpine.yml quotes the
+	  $RUNNER_WORKSPACE and $GITHUB_WORKSPACE directories it changes into and the
+	  $GITHUB_SERVER_URL and $GITHUB_REPOSITORY it clones (SC2086), fuzz.yml's
+	  `while read` is `IFS= read -r` (SC2162), which is what stops a
+	  configuration file name holding a backslash from being read as the name it
+	  never had, and dashboard.yml and mutate.yml quote their writes to
+	  $GITHUB_ENV and $GITHUB_PATH (SC2086).  mutate.yml's `find xt ... | xargs
+	  git add` is -print0 and -0 (SC2038), so a mutant whose name holds a space is
+	  one path rather than two.
+
 0.39	Mon Oct 19 12:54:37 PM EDT 2026
 	[ Enhancements ]
 	- reverse_geocode(): croak on a latlng that is not a numeric pair written in

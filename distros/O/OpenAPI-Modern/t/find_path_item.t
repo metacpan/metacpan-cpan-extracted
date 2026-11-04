@@ -3463,6 +3463,57 @@ YAML
     },
     'url-escaped characters in the URI can still be matched, and are reported unescaped',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    debug => 1,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo/.+:  # will match "/foo/1" iff the template is not properly escaped
+    get: {}
+YAML
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/foo/1') }),
+    to_str(@request).': lookup failed');
+
+  cmp_result(
+    $options->{debug}{uri_patterns},
+    [
+     '\/foo\/\.\+\z',
+    ],
+    'the path template is properly escaped when used as a regular expression',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example.com/foo/.+') }),
+    to_str(@request).': lookup succeeded when matching against a literal regex in path template');
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    debug => 1,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get:
+      servers:
+        - url: http://example2+.com  # will match example2.com iff the template is not properly escaped
+YAML
+
+  ok(!$openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2.com/foo') }),
+    to_str(@request).': lookup failed');
+
+  cmp_result(
+    $options->{debug}{uri_patterns},
+    [
+      '\/foo\z',
+      '^http\:\/\/example2\+\.com'
+    ],
+    'the server url is properly escaped when used as a regular expression',
+  );
+
+  ok($openapi->find_path_item($options = { @request = (method => 'GET', uri => 'http://example2+.com/foo') }),
+    to_str(@request).': lookup succeeded when matching against a literal regex in server url');
 };
 
 subtest 'no uri is provided: other values are relied on as the sole source of truth' => sub {

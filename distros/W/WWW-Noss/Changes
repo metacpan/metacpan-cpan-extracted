@@ -1,5 +1,15 @@
 Revision history for noss (WWW::Noss)
 
+2.05  Nov 03 2026
+  - Add "user_agent" feed configuration setting: specifies a specific user agent
+    to use for fetching a feed.
+  - Change how noss handles the NO_COLOR environment variable:
+    - The -c|--color options now override the NO_COLOR environment variable.
+    - noss ignores NO_COLOR if it is set to an empty string.
+  - Fix error reporting for various actions in nossui.
+  - Add "Version" menu under the "Extra" menu in nossui.
+  - Update email.
+
 2.04  Sep 05 2026
   - Performance improvements.
   - Remove Parallel::ForkManager dependency, forking is now handled by noss

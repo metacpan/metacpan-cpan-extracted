@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Critic-Policy-ControlStructures-ProhibitMutatingListFunctionsStricter,
-version 0.001:
+version 0.003:
 
   Do not change $_ in a list function, directly or through a sub that the block calls.
 

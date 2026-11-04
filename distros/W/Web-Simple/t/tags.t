@@ -128,3 +128,13 @@ is(
   $globbery,
   'real glob re-installed ok'
 );
+
+{
+    use XML::Tags qw(p);
+    my $i = '<script>alert(1)</script>';
+    is(
+        join('', HTML::Tags::to_html_string( <p>, "Hello $i", </p> )),
+        '<p>Hello &lt;script&gt;alert(1)&lt;/script&gt;</p>',
+        'Escaping interpolated strings'
+    );
+}

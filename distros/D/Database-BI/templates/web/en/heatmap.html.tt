@@ -7,7 +7,7 @@
   .chart-source {
     margin: 0.25rem 0 0;
     font-size: 0.82rem;
-    color: #666;
+    color: var(--muted, #666);
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
@@ -21,6 +21,7 @@
 <div class="graph-export-bar">
   <button class="btn-graph-export" onclick="biHeatmapExportSVG()">Export SVG</button>
   <button class="btn-graph-export" onclick="biHeatmapExportPNG()">Export PNG</button>
+  <button class="btn-graph-export" onclick="biHeatmapExportPDF()">Export PDF</button>
   <button class="btn-graph-export" id="btn-copy-chart-link" onclick="navigator.clipboard.writeText(window.location.href).then(function(){var b=document.getElementById('btn-copy-chart-link');var t=b.textContent;b.textContent='Copied!';setTimeout(function(){b.textContent=t;},1500)}).catch(function(){})">&#x1F517; Copy link</button>
   <span class="graph-point-count">[% cell_count %] cell[% IF cell_count != 1 %]s[% END %]</span>
 </div>
@@ -62,8 +63,9 @@
   function biHeatmapExportSVG() {
     var svg = document.getElementById('heatmap');
     if (!svg) return;
-    var clone = svg.cloneNode(true);
+    var clone = biChartExportClone(svg);
     _addAttrToSVG(clone, _getAttribution());
+    biBrandSvg(clone);
     var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
             + new XMLSerializer().serializeToString(clone);
     var a = document.createElement('a');
@@ -72,7 +74,7 @@
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  function biHeatmapExportPNG() {
+  function drawExportCanvas(scale, done) {
     var svg = document.getElementById('heatmap');
     if (!svg) return;
     var attr   = _getAttribution();
@@ -80,9 +82,10 @@
     var h      = parseInt(svg.getAttribute('height'), 10) || 500;
     var extraH = attr ? ATTR_H : 0;
     var canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h + extraH;
+    canvas.width = w * scale; canvas.height = (h + extraH) * scale;
     var ctx = canvas.getContext('2d');
-    var src = new XMLSerializer().serializeToString(svg);
+    ctx.scale(scale, scale);
+    var src = new XMLSerializer().serializeToString(biChartExportClone(svg));
     var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
     var img = new Image();
     img.onload = function () {
@@ -99,17 +102,27 @@
         ctx.fillText('Source: ' + urlText,       10, h + 16);
         ctx.fillText('Accessed on ' + attr.date,  10, h + 30);
       }
-      var a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = 'heatmap.png';
-      a.click();
+      done(canvas);
     };
     img.src = url;
   }
+  function biHeatmapExportPNG() {
+    drawExportCanvas(1, function (canvas) {
+      var a = document.createElement('a');
+      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
+      a.download = 'heatmap.png';
+      a.click();
+    });
+  }
+  function biHeatmapExportPDF() {
+    biSaveChartPDF(drawExportCanvas, 'heatmap.pdf');
+  }
   window.biHeatmapExportSVG = biHeatmapExportSVG;
   window.biHeatmapExportPNG = biHeatmapExportPNG;
+  window.biHeatmapExportPDF = biHeatmapExportPDF;
 }());
 </script>
+[% PROCESS "web/en/layouts/chart_export.html.tt" %]
 
 [% IF source_url %]
 <div id="chart-attribution" data-url="[% source_url | html %]" data-date="[% source_accessed | html %]" hidden></div>

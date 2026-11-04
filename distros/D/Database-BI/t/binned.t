@@ -205,8 +205,7 @@ subtest '?bins clamps to 1..200 and never returns 500' => sub {
 	my $only = $bins->[0];
 	is $only && $only->{count}, 12, 'all twelve values fall in it';
 
-	# A non-numeric ?bins= is coerced by int() (which warns) and then clamped;
-	# that warning is pre-existing controller behaviour, not a test failure.
+	# A non-numeric ?bins= is treated as the smallest number of bins.
 	my $abc = fetch_histogram(lspec => $LSPEC, col => 'value', bins => 'abc');
 	like $abc, qr/12 values in 1 bins/, 'bins=abc clamps to a single bin';
 

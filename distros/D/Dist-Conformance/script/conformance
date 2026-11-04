@@ -1,0 +1,275 @@
+#!/usr/bin/env perl
+package Dist::Conformance::Program 0.001;
+
+use 5.040;
+use warnings FATAL => 'all';
+use re '/aasx';
+
+# PODNAME: conformance
+# ABSTRACT: Check a repository against its flavor of the standards, and bring it up to date
+
+use Cpanel::JSON::XS();
+use Getopt::Long();
+use List::Util();
+use Pod::Usage();
+
+use Dist::Conformance();
+use Dist::Conformance::Schema();
+
+
+
+sub main (@arguments) {
+    my $command = shift @arguments // 'help';
+    my %options = ( root => q{.} );
+    my $parsed  = Getopt::Long::GetOptionsFromArray( \@arguments, \%options, qw{root=s json dry-run offline cache=s standards=s} );
+    return show_synopsis(2) if !$parsed || @arguments;
+    return show_synopsis(0) if $command eq 'help';
+    return show_synopsis(2) if $command ne 'check' && $command ne 'update';
+
+    my $conformance = Dist::Conformance->new(
+        root    => $options{root},
+        offline => $options{offline} // 0,
+        ( map { defined $options{$_} ? ( $_ => $options{$_} ) : () } qw{cache standards} ),
+    );
+    my ( $output, $status ) = eval { $command eq 'check' ? report_check( $conformance, \%options ) : report_update( $conformance, \%options ) };
+    if ( !defined $output ) {
+        warn "conformance: $@";
+        return 2;
+    }
+    print {*STDOUT} $output or return 2;
+    return $status;
+}
+
+
+sub report_check ( $conformance, $options ) {
+    my $results = $conformance->check;
+    my $failed  = Dist::Conformance::failed($results) ? 1 : 0;
+    if ( $options->{json} ) {
+        return ( json_of( $conformance, command => 'check', results => $results, failed => $failed ? Cpanel::JSON::XS::true() : Cpanel::JSON::XS::false() ), $failed );
+    }
+    my $width = List::Util::max( map { length $_->{check} } @$results ) // 0;
+    my %count;
+    my $text = heading($conformance);
+    for my $result (@$results) {
+        $count{ $result->{status} }++;
+        $text .= sprintf "%-4s  %-*s  %s\n", $result->{status}, $width, $result->{check}, $result->{detail};
+    }
+    $text .= join( ', ', map { "$count{$_} $_" } grep { $count{$_} } qw{pass fail info skip} ) . "\n";
+    return ( $text, $failed );
+}
+
+
+sub report_update ( $conformance, $options ) {
+    my $dry_run = $options->{'dry-run'} ? 1 : 0;
+    my $results = $conformance->update( dry_run => $dry_run );
+    if ( $options->{json} ) {
+        return ( json_of( $conformance, command => 'update', results => $results, dry_run => $dry_run ? Cpanel::JSON::XS::true() : Cpanel::JSON::XS::false() ), 0 );
+    }
+    my $text = heading($conformance);
+    my $done = 0;
+    for my $result (@$results) {
+        for my $change ( @{ $result->{changes} } ) {
+            my $action = $dry_run ? "would $change->{action}" : $change->{action};
+            $text .= sprintf "%-15s  %s  (%s)\n", $action, $change->{path}, $result->{check};
+            $done++;
+        }
+        $text .= "by hand          $result->{check}: $_\n" for @{ $result->{manual} };
+    }
+    $text .= $dry_run ? "Nothing would change.\n" : "Nothing changed.\n" if !$done;
+    return ( $text, 0 );
+}
+
+
+sub heading ($conformance) {
+    return 'Flavor ' . $conformance->flavor->name . ' from ' . $conformance->source->describe . "\n";
+}
+
+
+sub json_of ( $conformance, %fields ) {
+    return Dist::Conformance::Schema::encode_json( { flavor => $conformance->flavor->name, source => $conformance->source->describe, %fields } );
+}
+
+
+sub show_synopsis ($status) {
+    Pod::Usage::pod2usage( -exitval => 'NOEXIT', -verbose => $status ? 0 : 1, -output => $status ? \*STDERR : \*STDOUT, -input => __FILE__ );
+    return $status;
+}
+
+exit main(@ARGV) if !caller;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+conformance - Check a repository against its flavor of the standards, and bring it up to date
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    conformance check  [--root DIR] [--json] [--offline] [--cache DIR] [--standards DIR]
+    conformance update [--root DIR] [--dry-run] [--json] [--offline] [--cache DIR] [--standards DIR]
+    conformance help
+
+=head1 DESCRIPTION
+
+Reads F<.conformance.yml> at the root of a checkout, fetches the standards
+that it names, and runs the checks of its flavor.  L<Dist::Conformance> says
+what the pieces are, L<Dist::Conformance::Config> what F<.conformance.yml>
+holds, and L<Dist::Conformance::Check> what each check looks at.
+
+=head1 FUNCTIONS
+
+=head2 main
+
+C<(@arguments)>.  Runs the program, and returns its exit status.
+
+=head2 report_check
+
+C<($conformance, \%options)>.  The output of C<check>, and the exit status.
+
+=head2 report_update
+
+C<($conformance, \%options)>.  The output of C<update>, and the exit status.
+
+=head2 heading
+
+C<($conformance)>.  The first line of a report: the flavor and the source.
+
+=head2 json_of
+
+C<($conformance, %fields)>.  The JSON of a report.
+
+=head2 show_synopsis
+
+C<($status)>.  Prints the synopsis, to standard output for C<help> and to
+standard error otherwise, and returns C<$status>.
+
+=head1 COMMANDS
+
+=over
+
+=item check
+
+Prints one line for each check of the flavor: its status, its name and the
+detail, then a count of each status.  Exits 1 when a check fails, and 0
+otherwise, so C<info> and C<skip> do not fail a run.
+
+=item update
+
+Fetches the latest standards, and applies every automatic fix: it writes the
+files that the checks can write, and installs the git hooks.  Prints one line
+for each change, and each thing that only a person can do.  With C<--dry-run>
+it changes nothing, and prints what it would change.  Exits 0 when it ran,
+whatever it left for a person; run C<check> afterwards to see what still fails.
+
+=item help
+
+Prints this.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --root DIR
+
+The checkout.  Default the current directory.
+
+=item --json
+
+Prints the results as one JSON object instead: C<command>, C<flavor>,
+C<source>, and C<results>, which is the array that
+L<Dist::Conformance/check> or L<Dist::Conformance/update> returns.  For
+C<check> it has C<failed> too, and for C<update>, C<dry_run>.
+
+=item --dry-run
+
+For C<update>: write nothing.
+
+=item --offline
+
+Do not fetch a git source; use the copy in the cache, and fail when there is
+none.
+
+=item --cache DIR
+
+The directory of the cached clones.  Default F<dist-conformance> under
+C<$XDG_CACHE_HOME>, or F<~/.cache>.
+
+=item --standards DIR
+
+Read the standards from DIR instead of the C<git> or C<directory> that
+F<.conformance.yml> names, keeping its C<path>.  For trying a change to the
+standards before you push it.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when it ran and nothing failed, 1 when C<check> found a failure, and 2 when
+it could not run: a bad option, a missing or invalid F<.conformance.yml> or
+flavor, or a fetch that failed.  The reason goes to standard error.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Dist::Conformance|Dist::Conformance>
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/Troglodyne-Internet-Widgets/Dist-Conformance/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHORS
+
+Current Maintainers:
+
+=over 4
+
+=item *
+
+George S. Baugh <george@troglodyne.net>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Troglodyne LLC
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

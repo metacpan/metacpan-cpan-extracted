@@ -21,17 +21,17 @@ use DKIM2TestKeys;
 # bin/dkim2sign verifies an upstream chain before extending it.
 $ENV{DKIM2_DNS_JSON} = DKIM2TestKeys::dns_json();
 
-# -08 §3: both hashing algorithms must be implemented
+# -09 §3: both hashing algorithms must be implemented
 my $algs = Mail::DKIM2::MessageInstance::hash_algs();
-is_deeply([sort keys %$algs], ['sha256', 'sha512'], '-08 §3: both hash algorithms present');
+is_deeply([sort keys %$algs], ['sha256', 'sha512'], '-09 §3: both hash algorithms present');
 
-# -08 §9.3: h= is a comma-separated list of hash-sets
+# -09 §9.3: h= is a comma-separated list of hash-sets
 my $sets = Mail::DKIM2::MessageInstance::parse_hash_sets('sha256:AAAA:BBBB,sha512:CCCC:DDDD');
 is(scalar @$sets, 2, 'two hash-sets parsed');
 is_deeply($sets->[0], ['sha256', 'AAAA', 'BBBB'], 'first hash-set');
 is_deeply($sets->[1], ['sha512', 'CCCC', 'DDDD'], 'second hash-set');
 
-# -08 §2.14: hash names are case-sensitive
+# -09 §2.14: hash names are case-sensitive
 my $upper = Mail::DKIM2::MessageInstance::parse_hash_sets('SHA512:AAAA:BBBB');
 is($upper->[0][0], 'SHA512', 'hash-name keeps its case');
 

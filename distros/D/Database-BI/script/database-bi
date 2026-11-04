@@ -19,19 +19,76 @@ use File::Spec ();
 use FindBin;
 BEGIN { unshift @INC, "$FindBin::Bin/../lib" }
 
+require Mojo::Loader;
 require Mojolicious::Commands;
+
+# True when an argument names something to open, not a Mojolicious command.  A
+# command word always wins, even over a file of that name in the current
+# directory: morbo restarts the server as "perl <this script> daemon".  A word
+# that is neither is left for Mojolicious, which says the command is unknown.
+sub _names_a_database {
+	my ($arg) = @_;
+
+	return 0 if $arg =~ /\A-/;
+	(my $name = $arg) =~ s/-/_/g;
+	for my $namespace (@{ Mojolicious::Commands->new->namespaces }) {
+		my $class = "${namespace}::$name";
+		return 0 if $name =~ /\A\w+\z/ && !Mojo::Loader::load_class($class);
+	}
+	return -e $arg || $arg !~ /\A\w[\w-]*\z/;
+}
+
+sub _refuse {
+	my ($message) = @_;
+
+	print STDERR "database-bi: $message\n";
+	exit 2;
+}
+
+# Hands the one database named to the server through the environment, because
+# morbo restarts the application with its own arguments.  GET / reads BI_OPEN.
+# A remote path, Redis spec or MariaDB spec cannot be checked from here, so /open
+# reports it.
+sub _open_on_start {
+	my ($database, @others) = @_;
+
+	_refuse('only one database can be opened from the command line.  To bring '
+		. 'several together, open one and use Merge or Combine in the browser.')
+		if @others;
+
+	if ($database !~ m{\A(?:/\.\./|redis:|mariadb:)}i) {
+		require Database::BI::Controller::Dashboard;
+		_refuse("cannot open $database: no such file") unless -e $database;
+		_refuse("cannot open $database: not a file") unless -f _;
+		_refuse("cannot open $database: permission denied") unless -r _;
+		_refuse("cannot open $database: not a supported file type")
+			unless Database::BI::Controller::Dashboard::is_supported_file($database);
+		$database = File::Spec->rel2abs($database);
+	}
+
+	$ENV{BI_OPEN} = $database;
+	return;
+}
+
+if (@ARGV && _names_a_database($ARGV[0])) {
+	_open_on_start(@ARGV);
+	@ARGV = ();
+}
 
 # With no arguments this is the development server, restarting when a file
 # changes - what "morbo script/database-bi" does.  A command word (daemon,
 # routes, get, ...) goes to the application's command line interface, so the
 # script can still start a plain server or be used from a test.
-if (@ARGV) {
-	Mojolicious::Commands->start_app('Database::BI');
-}
-else {
+#
+# A server that loads this file instead of running it (hypnotoad) also leaves
+# @ARGV empty, and sets MOJO_APP_LOADER.  It must not get the development server,
+# which never returns.  Morbo's run exits, so start_app is reached only otherwise.
+if (!@ARGV && !defined $ENV{MOJO_APP_LOADER}) {
 	require Mojo::Server::Morbo;
 	Mojo::Server::Morbo->new(silent => 1)
 		->run(File::Spec->catfile($FindBin::RealBin, $FindBin::Script));
 }
 
-1;
+# This must stay the last statement: a loading server takes the file's value as
+# the application, and refuses anything else.
+Mojolicious::Commands->start_app('Database::BI');

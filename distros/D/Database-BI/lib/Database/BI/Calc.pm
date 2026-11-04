@@ -8,10 +8,27 @@ use POSIX	qw(floor ceil);
 use Readonly;
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
+
+# A double holds about 15 significant digits, so round() has nothing to say past
+# that, and the count reaches sprintf from a URL: it must not be able to ask for
+# two thousand million of them.
+Readonly my $MAX_ROUND_PLACES => 15;
+
+# A pattern, and what one capture may hold.  A capture becomes a group key, so an
+# unbounded one is a performance and a layout problem; Perl's regex engine has no
+# timeout, so the length cap is the only bound a pattern itself can be given.
+Readonly my $MAX_PATTERN_LEN => 200;
+Readonly my $MAX_CAPTURE_LEN => 200;
+
+# The constructs that run code or steer the engine: (?{ }) and (??{ }) run Perl,
+# (?p is the old preserve flag, and (* opens a backtracking verb.
+# A paren after an even number of backslashes is a real one, after an odd number
+# a literal.
+Readonly my $REFUSED_PATTERN_RE => qr/(?:\A|[^\\])(?:\\\\)*\K(\((?:\?\??\{|\?p|\*))/;
 
 # --- token type constants ---
 Readonly my $T_NUM    => 'NUM';
@@ -50,6 +67,10 @@ our %MESSAGES = (
 	error_time_format_date  => "Time format '%s' must name a date, with a year, a month and a day token",
 	error_const_arg         => "The second argument of %s() must be a quoted literal",
 	error_span_interval     => "Unknown time bucket '%s'; use a count and one of s, m, h, d, w, mon, q or y, for example 1h or 15m",
+	error_pattern_too_long  => "Pattern '%s' is longer than %d characters",
+	error_pattern_construct => "Pattern '%s' uses %s, which is not allowed",
+	error_pattern_invalid   => "Pattern '%s' does not compile: %s",
+	error_rx_args           => 'rx() takes a column, a quoted pattern and an optional quoted group',
 );
 
 sub _fmt {
@@ -104,6 +125,9 @@ my %FUNCTIONS = (
 		my ($s, $start, $len) = @_;
 		return undef unless defined $s;
 		$start //= 0;
+		# A start past the end is undef, the empty-cell result; it is not worth one
+		# log line per row.
+		no warnings 'substr';
 		defined $len ? CORE::substr($s, $start, $len)
 		             : CORE::substr($s, $start);
 	},
@@ -113,7 +137,13 @@ my %FUNCTIONS = (
 		my ($n, $d) = @_;
 		return undef unless defined $n && looks_like_number($n);
 		$d = (defined $d && looks_like_number($d)) ? int($d) : 0;
-		sprintf("%.${d}f", $n) + 0;
+		$d = $MAX_ROUND_PLACES  if $d >  $MAX_ROUND_PLACES;
+		$d = -$MAX_ROUND_PLACES if $d < -$MAX_ROUND_PLACES;
+		return sprintf("%.${d}f", $n) + 0 if $d >= 0;
+
+		# Negative places round to the left of the point: round(1234, -2) is 1200.
+		my $unit = 10 ** -$d;
+		sprintf('%.0f', $n / $unit) * $unit;
 	},
 	floor    => sub {
 		defined $_[0] && looks_like_number($_[0]) ? POSIX::floor($_[0]) : undef;
@@ -138,38 +168,40 @@ my %FUNCTIONS = (
 		$1 + 0;
 	},
 	month => sub {
-		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(\d\d)-\d\d/;
+		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(0[1-9]|1[0-2])-\d\d/;
 		$1 + 0;
 	},
 	day => sub {
-		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-\d\d-(\d\d)/;
+		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-\d\d-(0[1-9]|[12]\d|3[01])/;
 		$1 + 0;
 	},
 	quarter => sub {
-		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(\d\d)-/;
+		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(0[1-9]|1[0-2])-/;
 		int(($1 - 1) / 3) + 1;
 	},
 	week => sub {
 		# Returns ISO 8601 week number (1-53); week containing the first
 		# Thursday of the year is week 1.
 		return undef unless defined $_[0] && $_[0] =~ /\A(\d{4})-(\d\d)-(\d\d)/;
-		my ($yr, $mo, $dy) = ($1 + 0, $2 + 0, $3 + 0);
-		my $t  = POSIX::mktime(0, 0, 12, $dy, $mo - 1, $yr - 1900);
+		my $t = _epoch_of($1 + 0, $2 + 0, $3 + 0, 12, 0, 0);
+		return undef unless defined $t;
 		my @lt = localtime($t);
-		POSIX::strftime('%V', @lt) + 0;
+		# Not strftime('%V'): the Windows C runtime does not have it, and
+		# gives ''.
+		_iso_week($lt[5] + 1900, $lt[6], $lt[7]);
 	},
 	month_name => sub {
 		# Returns full English month name, e.g. 'January'.
 		my @M = qw(January February March April May June
 		           July August September October November December);
-		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(\d\d)-/;
-		$M[$1 - 1] // undef;
+		return undef unless defined $_[0] && $_[0] =~ /\A\d{4}-(0[1-9]|1[0-2])-/;
+		$M[$1 - 1];
 	},
 	weekday => sub {
 		# Returns ISO 8601 weekday: 1 = Monday, 7 = Sunday.
 		return undef unless defined $_[0] && $_[0] =~ /\A(\d{4})-(\d\d)-(\d\d)/;
-		my ($yr, $mo, $dy) = ($1 + 0, $2 + 0, $3 + 0);
-		my $t  = POSIX::mktime(0, 0, 12, $dy, $mo - 1, $yr - 1900);
+		my $t = _epoch_of($1 + 0, $2 + 0, $3 + 0, 12, 0, 0);
+		return undef unless defined $t;
 		my $wd = (localtime($t))[6];	# 0 = Sunday
 		$wd == 0 ? 7 : $wd;
 	},
@@ -317,6 +349,32 @@ sub _fmt_parts {
 #          exist is unparseable rather than quietly a different date.  The
 #          clock time is allowed two hours of slack, because the hour a
 #          daylight-saving change skips does not exist and mktime moves it.
+# _iso_week($year, $wday, $yday) -> 1..53
+#
+# The ISO 8601 week of a day, from localtime's weekday (0 = Sunday) and day of
+# the year (0 = 1 January).  Week 1 holds the year's first Thursday, so the
+# first days of January can be in the last week of the year before, and the
+# last days of December in week 1 of the next.
+sub _iso_week {
+	my ($year, $wday, $yday) = @_;
+	my $leap  = sub { my $y = shift; ($y % 4 == 0 && $y % 100 != 0) || $y % 400 == 0 };
+	# Monday is 1 and Sunday 7, as ISO counts.
+	my $iso_wday = $wday || 7;
+	my $week     = int(($yday + 1 - $iso_wday + 10) / 7);
+	# The weekday of 1 January, 0 = Sunday.
+	my $jan1  = ($wday - $yday) % 7;
+	my $weeks = sub {
+		my ($y, $j1) = @_;
+		return ($j1 == 4 || ($leap->($y) && $j1 == 3)) ? 53 : 52;
+	};
+	if ($week < 1) {
+		my $prev_jan1 = ($jan1 - ($leap->($year - 1) ? 366 : 365)) % 7;
+		return $weeks->($year - 1, $prev_jan1);
+	}
+	return 1 if $week > $weeks->($year, $jan1);
+	return $week;
+}
+
 sub _epoch_of {
 	my ($y, $mon, $day, $h, $mi, $s) = @_;
 	require POSIX;
@@ -438,6 +496,77 @@ sub span_interval {
 	return { n => $n, unit => $unit, (defined $secs ? (secs => $secs) : ()) };
 }
 
+# compile_pattern($pattern) -> \%compiled
+#
+# Purpose: The one place a reader's regular expression is checked and compiled,
+#          for rx() and for the stored extractions, so both refuse the same
+#          things with the same words.
+# Entry:   $pattern is a string.
+# Exit:    { re => qr//, groups => N, names => [ named groups, in order ] }.
+#          Croaks error_pattern_too_long, error_pattern_construct or
+#          error_pattern_invalid.
+# Notes:   A pattern is checked, not sandboxed: the engine has no timeout, so a
+#          pathological one stalls the request that uses it.  Patterns are typed
+#          by the reader who owns the machine, never taken from a remote party.
+sub compile_pattern {
+	my ($pattern) = @_;
+	local $@;
+	$pattern = '' unless defined $pattern && !ref $pattern;
+	croak _fmt('error_pattern_too_long', substr($pattern, 0, 40) . (length($pattern) > 40 ? '...' : ''), $MAX_PATTERN_LEN)
+		if length($pattern) > $MAX_PATTERN_LEN;
+	if ($pattern =~ $REFUSED_PATTERN_RE) {
+		croak _fmt('error_pattern_construct', $pattern, $1);
+	}
+
+	my $re = eval { qr/$pattern/ };
+	unless ($re) {
+		(my $why = $@ // '') =~ s/ at \S+ line \d+\.?\n?\z//;
+		$why =~ s/\s+\z//;
+		croak _fmt('error_pattern_invalid', $pattern, $why);
+	}
+
+	# An optional match of the empty string always succeeds, and leaves behind
+	# how many groups the pattern has and every name it declares.
+	'' =~ /(?:$re)?/;
+	my $groups = $#+;
+	require re;
+	my %known = map { $_ => 1 } re::regnames(1);
+	# The names in the order they are written, which is the order a reader
+	# expects the columns in; regnames() itself has no order.
+	my (@names, %seen);
+	while ($pattern =~ /(?<!\\)\(\?(?:P?<([A-Za-z_]\w*)>|'([A-Za-z_]\w*)')/g) {
+		my $n = defined $1 ? $1 : $2;
+		push @names, $n if $known{$n} && !$seen{$n}++;
+	}
+	push @names, grep { !$seen{$_}++ } sort keys %known;
+
+	return { re => $re, groups => $groups, names => \@names };
+}
+
+# capture_of(\%compiled, $value, $group) -> $capture | undef
+#
+# Purpose: One capture of a compiled pattern against a value: $group is a
+#          number (1 is the first group) or a group's name.
+# Exit:    The capture, cut to $MAX_CAPTURE_LEN characters; '' when the pattern
+#          matched but the group took no part; undef when the value is undefined,
+#          the pattern does not match, or there is no such group.
+sub capture_of {
+	my ($compiled, $value, $group) = @_;
+	return undef unless defined $value && !ref $value && defined $group;
+	# Which group is asked for is settled first: a match of its own here would
+	# replace the captures of the one that matters.
+	my $number = $group =~ /\A[0-9]+\z/ ? $group + 0 : undef;
+	if (defined $number) {
+		return undef if $number < 1 || $number > $compiled->{groups};
+	} else {
+		return undef unless grep { $_ eq $group } @{ $compiled->{names} };
+	}
+	return undef unless $value =~ $compiled->{re};
+	my $got = defined $number ? ${^CAPTURE}[$number - 1] : $+{$group};
+	return '' unless defined $got;
+	return length($got) > $MAX_CAPTURE_LEN ? substr($got, 0, $MAX_CAPTURE_LEN) : $got;
+}
+
 # _span_label($value, \%interval) -> bucket label | undef
 #
 # Purpose: The ISO label of the bucket a value falls in -- the half-open
@@ -509,6 +638,18 @@ sub _span_label {
 
 sub new {
 	my ($class, %args) = @_;
+	# A bad expression is an answer here, not an exception, so nothing of the
+	# compile may reach the caller's $@.
+	local $@;
+	# Takes off the where-it-happened tail that croak adds.  A path can hold spaces,
+	# and this text reaches the reader, so the tail is everything from the last
+	# " at " on rather than one word.
+	my $tidy = sub {
+		my ($err) = @_;
+		$err =~ s/\A(.*) at .+? line \d+\.?\n?\z/$1/s;
+		return $err;
+	};
+
 	my $self = bless {
 		_error   => undef,
 		_code    => undef,
@@ -544,8 +685,7 @@ sub new {
 	my $tokens;
 	my $ok = eval { $tokens = _tokenize($expr); 1 };
 	unless ($ok) {
-		my $err = $@; $err =~ s/ at \S+ line \d+\.?\n?$//;
-		$self->{_error} = $err;
+		$self->{_error} = $tidy->($@);
 		return $self;
 	}
 
@@ -554,8 +694,7 @@ sub new {
 	my $code;
 	$ok = eval { $code = _parse_cmp($tokens, \$pos, \$depth, $self->{_columns}); 1 };
 	unless ($ok) {
-		my $err = $@; $err =~ s/ at \S+ line \d+\.?\n?$//;
-		$self->{_error} = $err;
+		$self->{_error} = $tidy->($@);
 		return $self;
 	}
 
@@ -579,6 +718,9 @@ sub has_error { defined $_[0]->{_error} }
 sub evaluate {
 	my ($self, $row) = @_;
 	return undef unless defined $self->{_code};
+	$row //= {};
+	return undef unless ref $row eq 'HASH';
+	local $@;	# a failed row is undef, and the caller's $@ is its own
 	# Merge bound parameters into the evaluation context.  Parameters take
 	# precedence over same-named columns: the clash check in new() ensures this
 	# never happens legitimately, but a column added to the data after compile
@@ -840,7 +982,10 @@ sub _parse_factor {
 	# unary minus
 	if ($tok->{type} eq $T_MINUS) {
 		$$pos_ref++;
+		_check_depth($depth_ref);
+		$$depth_ref++;
 		my $inner = _parse_factor($tokens, $pos_ref, $depth_ref, $cols);
+		$$depth_ref--;
 		return sub {
 			my $v = $inner->($_[0]);
 			return undef unless defined $v && looks_like_number($v);
@@ -851,7 +996,11 @@ sub _parse_factor {
 	# unary plus (no-op)
 	if ($tok->{type} eq $T_PLUS) {
 		$$pos_ref++;
-		return _parse_factor($tokens, $pos_ref, $depth_ref, $cols);
+		_check_depth($depth_ref);
+		$$depth_ref++;
+		my $inner = _parse_factor($tokens, $pos_ref, $depth_ref, $cols);
+		$$depth_ref--;
+		return $inner;
 	}
 
 	# parenthesized sub-expression: allow full cmp_expr so (qty > 0) works
@@ -895,7 +1044,29 @@ sub _parse_call {
 	my $lc = lc($name);
 
 	croak _fmt('error_unknown_fn', $name)
-		unless exists $FUNCTIONS{$lc} || $lc eq 'if' || $TIME_CONST_FNS{$lc};
+		unless exists $FUNCTIONS{$lc} || $lc eq 'if' || $lc eq 'rx' || $TIME_CONST_FNS{$lc};
+
+	# rx(v, 'pattern' [, 'group']): the pattern and the group are constants,
+	# so the pattern is checked and compiled once, here.  A group the pattern
+	# does not have is undef on every row rather than an error, as the POD says.
+	if ($lc eq 'rx') {
+		$$pos_ref++;	# consume '('
+		my $value_fn = _parse_cmp($tokens, $pos_ref, $depth_ref, $cols);
+		my @const;
+		while ($tokens->[$$pos_ref]{type} eq $T_COMMA) {
+			$$pos_ref++;
+			my $tok = $tokens->[$$pos_ref];
+			croak _fmt('error_rx_args')
+				unless $tok->{type} eq $T_STR || $tok->{type} eq $T_NUM;
+			push @const, $tok->{val};
+			$$pos_ref++;
+		}
+		_expect($tokens, $pos_ref, $T_RPAREN);
+		croak _fmt('error_rx_args') unless @const == 1 || @const == 2;
+		my $compiled = compile_pattern($const[0]);
+		my $group    = defined $const[1] ? $const[1] : 1;
+		return sub { capture_of($compiled, $value_fn->($_[0]), $group) };
+	}
 
 	# epoch(v [, fmt]) and span(v, interval) take a constant second argument:
 	# a format or an interval.  It is checked here, once per column rather than
@@ -1003,18 +1174,33 @@ sub _normalise_with_format {
 	my ($val, $pattern) = @_;
 	return undef unless defined $pattern->{date} && length $pattern->{date};
 
+	# The pattern is stored JSON and the caller has no eval: one that cannot be
+	# compiled is an unknown pattern, which is undef, not a 500 on every page.
 	my $time_fmt = $pattern->{time};
 	if (defined $time_fmt && length $time_fmt) {
-		my $t = _time_from_format($val, _fmt_compile_pair($pattern->{date}, $time_fmt));
+		my $compiled = eval { _fmt_compile_pair($pattern->{date}, $time_fmt) } or return undef;
+		my $t = _time_from_format($val, $compiled);
 		return undef unless $t;
 		return _iso_second_label($t->{epoch});
 	}
 
-	my $t = _time_from_format($val, _fmt_compile($pattern->{date}));
+	my $compiled = eval { _fmt_compile($pattern->{date}) } or return undef;
+	my $t = _time_from_format($val, $compiled);
 	return undef unless $t;
 	return ($pattern->{as} // '') eq 'timestamp'
 		? _iso_second_label($t->{epoch})
 		: _iso_day_label($t->{epoch});
+}
+
+# _iso_date_if_real($y, $mon, $day) -> 'YYYY-MM-DD' or undef
+#
+# A UK file read with the US pattern has "months" up to 31.  Undef sends it to the
+# '(unparseable)' bucket, where it can be seen; "2026-15-01" looks like a date and
+# sorts among the real ones.
+sub _iso_date_if_real {
+	my ($y, $mon, $day) = @_;
+	return undef unless defined _epoch_of($y + 0, $mon + 0, $day + 0, 12, 0, 0);
+	return sprintf('%04d-%02d-%02d', $y, $mon, $day);
 }
 
 # date_normalise($value, $pattern) -> ISO string or undef
@@ -1037,15 +1223,15 @@ sub date_normalise {
 	return _normalise_with_format($val, $pattern) if ref $pattern eq 'HASH';
 	if ($pattern eq '%m/%d/%Y') {
 		return undef unless $val =~ /\A(\d{1,2})\/(\d{1,2})\/(\d{4})\z/;
-		return sprintf('%04d-%02d-%02d', $3, $1, $2);
+		return _iso_date_if_real($3, $1, $2);
 	} elsif ($pattern eq '%d/%m/%Y') {
 		return undef unless $val =~ /\A(\d{1,2})\/(\d{1,2})\/(\d{4})\z/;
-		return sprintf('%04d-%02d-%02d', $3, $2, $1);
+		return _iso_date_if_real($3, $2, $1);
 	} elsif ($pattern eq '%d-%b-%Y') {
 		return undef unless $val =~ /\A(\d{1,2})-([A-Za-z]{3})-(\d{4})\z/;
 		my $mon = $_MONTH_NAME_TO_NUM{lc($2)};
 		return undef unless defined $mon;
-		return sprintf('%04d-%02d-%02d', $3, $mon, $1);
+		return _iso_date_if_real($3, $mon, $1);
 	}
 	return undef;
 }
@@ -1193,6 +1379,16 @@ Use C<=> for equality, not C<==>. Writing C<==> is a compile-time error.
     concat(a, b, ...)        join('', ...), undef treated as ''
     substr(s, start)         0-based start, to end of string
     substr(s, start, len)    0-based start, len characters
+    rx(s, 'pattern')         the first capture of a regular expression
+    rx(s, 'pattern', 'g')    capture g: a number (1 is the first) or a group's name
+
+C<rx(ref,'^([A-Z]{2})-','1')> is C<GB> for C<GB-2026-001>.  The pattern and
+the group are quoted constants, and the pattern is checked once, when the
+expression is compiled (see L</Regular expressions>).  A value it does not
+match, an undefined value and a group the pattern does not have are all
+C<undef>, not an error; a group that took no part in the match is C<''>.  One
+C<rx()> gives one value: a stored extraction is what makes several columns from
+one pattern.
 
 =head2 Numeric
 
@@ -1305,6 +1501,42 @@ The interval rule is also a function:
 C<secs> is present only for C<s>, C<m> and C<h>, whose buckets are floored from
 the epoch.  Anything else, including a reference, is C<undef>.
 
+=head2 Regular expressions
+
+    compile_pattern($pattern)              -> { re, groups, names }
+    capture_of($compiled, $value, $group)  -> capture | '' | undef
+
+C<rx()> and the stored extractions both compile through C<compile_pattern>, so
+they refuse the same patterns: one over 200 characters; one that uses C<(?{>,
+C<(??{>, C<(?p> or C<(*>, which run code or steer the engine (an escaped paren
+is a literal and is allowed); and one that does not compile, with perl's reason.
+C<names> lists the named groups, C<(?E<lt>nameE<gt>...)>, in the order they are
+written.  C<capture_of> cuts a capture to 200 characters, because a capture
+becomes a group key.
+
+Perl's regular-expression engine has no timeout, so these checks are not a
+sandbox: a pathological pattern, such as C<(a+)+$> against a long string of
+C<a>s, stalls the request that uses it.  Patterns are typed by the reader who
+owns the server, never accepted from a remote party, which is the only reason
+this is acceptable.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	compile_pattern: $pattern   # string, at most 200 characters
+	capture_of:      $compiled  # from compile_pattern
+	                 $value     # string | undef
+	                 $group     # integer >= 1 | named group
+
+=head4 OUTPUT
+
+	compile_pattern: { re => 'Regexp', groups => 'integer', names => [ 'string', ... ] }
+	                 croaks error_pattern_too_long | error_pattern_construct | error_pattern_invalid
+	capture_of:      'string' (at most 200 characters) | '' | undef
+
+C<compile_pattern> keeps the caller's C<$@>.
+
 =head2 Date normalisation (standalone helper)
 
     date_normalise($value, $pattern) -> ISO string or undef
@@ -1368,6 +1600,12 @@ C<"Per Unit Price"> automatically.
 =item *
 
 No C<eval> of user-supplied strings is performed anywhere in this module.
+
+=item *
+
+A regular expression from C<rx()> is compiled with C<qr//>, never C<eval>, and
+the constructs that run code are refused before that.  It has no timeout; see
+L</Regular expressions>.
 
 =item *
 

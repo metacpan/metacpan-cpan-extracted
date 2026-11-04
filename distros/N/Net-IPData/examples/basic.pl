@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use lib '../lib';
+use FindBin qw($Bin);
+use lib "$Bin/../lib";    # the module next to this script, whatever the current directory
 use Net::IPData;
 
 my $api_key = $ENV{IPDATA_API_KEY} or die "Set IPDATA_API_KEY environment variable\n";
@@ -21,6 +22,8 @@ printf "Timezone:  %s\n", $result->{time_zone}{name};
 printf "Currency:  %s (%s)\n", $result->{currency}{name}, $result->{currency}{code};
 printf "EU:        %s\n", $result->{is_eu} ? 'Yes' : 'No';
 printf "Threat:    %s\n", $result->{threat}{is_threat} ? 'Yes' : 'No';
+printf "Satellite: %s\n", $result->{is_satellite} ? 'Yes' : 'No';   # key present only when true
+printf "Anycast:   %s\n", $result->{is_anycast} ? 'Yes' : 'No';     # key present only when true
 
 print "\n--- Bulk lookup ---\n";
 my $bulk = $ipdata->bulk(['8.8.8.8', '1.1.1.1', '9.9.9.9']);

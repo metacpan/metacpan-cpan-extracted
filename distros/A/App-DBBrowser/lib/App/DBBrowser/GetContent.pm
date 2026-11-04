@@ -1,5 +1,6 @@
 package # hide from PAUSE
 App::DBBrowser::GetContent;
+
 use warnings;
 use strict;
 use 5.016;

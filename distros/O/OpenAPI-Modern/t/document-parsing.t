@@ -1102,12 +1102,14 @@ components:
     schema2:
       $ref: '#/paths/~1foo~1%7Bfoo_id%7D~1bar!bloop'  # exists, but wrong entity
     schema3:
-      $ref: 'https://example.com/unknown-schema'      # target is not local
+      $ref: 'https://example.com/other_schema'        # target is not local
   responses:
     response0:
       $ref: '#/components/responses/does_not_exist'   # does not exist
     response1:
       $ref: '#/components'                            # exists, but not a referencable entity
+    response2:
+      $ref: 'https://example.com/other_api#/components/responses/response0' # target is not local
 paths:
   /foo/{foo_id}/bar!bloop:
     $ref: '#/components/pathItems/bloop'              # does not exist
@@ -1144,6 +1146,41 @@ YAML
     ],
     'bad references to local destinations are identified',
   );
+
+  cmp_result(
+    $doc->_deferred_references,
+    [
+      # keyword, path_location, abs_target, expected_entity
+      [ '$ref', '/components/responses/response2', str('https://example.com/other_api#/components/responses/response0'), 'response' ],
+      [ '$ref', '/components/schemas/schema3', str('https://example.com/other_schema'), 'schema' ],
+    ],
+    'unresolved references to unknown documents are set aside',
+  );
+
+  my $doc2 = JSON::Schema::Modern::Document->new(
+    canonical_uri => 'https://example.com/other_schema',
+    schema => { type => 'string' },
+  );
+
+  $js->add_document($doc2);
+  is_equal([ map $_->TO_JSON, $doc2->errors ], [], 'no errors when checking this document');
+
+  my $doc3 = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'https://example.com/other_api',
+    evaluator => $js,
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  responses:
+    response0:
+      content:
+        application/json: {}
+YAML
+
+  $js->add_document($doc3);
+  is_equal([ map $_->TO_JSON, $doc3->errors ], [], 'no errors when checking this document');
+
+  $doc->verify_references($js);
+  is_equal($doc->_deferred_references, [], 'deferred references are now all undeferred');
 };
 
 subtest '3.0 document' => sub {

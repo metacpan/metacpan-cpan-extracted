@@ -21,7 +21,7 @@ for my $f ('Spike.xs', 'include/spike.h', 'src/helper.c', 'xs/more.xs') {
     (my $p = $f) =~ s/\W/-/g;
     like($summary, qr/<a href="$p\.html">\Q$f\E<\/a>/, "$f is linked");
 }
-like($summary, qr/<td class="pc c\d st" data-v="88\.4" title="statements: 23 of 26"><meter min="0" max="100" value="88\.4"><\/meter><span>88\.4<\/span><\/td>/, 'the Spike.xs statement cell with its bar and ratio');
+like($summary, qr/<td class="pc c\d st" data-v="88\.0" title="statements: 22 of 25"><meter min="0" max="100" value="88\.0"><\/meter><span>88\.0<\/span><\/td>/, 'the Spike.xs statement cell with its bar and ratio');
 like($summary, qr/lib\/Spike\.pm<\/a> <a class="xs" href="Spike-xs\.html"/, 'the .pm row links to its .xs');
 like($summary, qr/<tfoot><tr><td class="f">Total<\/td>/, 'the total row');
 like($summary, qr/class="pc na cd" data-v="-1">n\/a</, 'n/a for a criterion a file has not got');
@@ -45,7 +45,7 @@ like($guard, qr/<b class="un">A 1<\/b><b class="c0">B 0<\/b>/, 'C arms are A and
 my ($why95) = $xs =~ /<tr id="L95".*?<\/tr>\n(<tr class="why">.*?<\/tr>)/s;
 like($why95, qr/arm B of the branch if \(!p\) .* was never taken, arm A taken 1/, 'the words for a C branch');
 like($xs, qr/<details class="legend"><summary>What the marks mean<\/summary>/, 'the legend');
-like($xs, qr/A and B in the order the compiler laid them out/, 'which for a C file explains A and B');
+like($xs, qr/A and B, the arm into the body first/, 'which for a C file explains A and B');
 my ($helper) = $xs =~ /(<tr id="L8".*?<\/tr>)/s;
 like($helper, qr/<span class="sub c3" title="only_from_one: called 2">only_from_one<\/span>/, 'the C helper under its name');
 like($xs, qr/<td class="st"><span class="c3" title="statements: 353062">353062<\/span><\/td>/, 'a statement count');

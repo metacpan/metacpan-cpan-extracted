@@ -1,5 +1,10 @@
 Revision history for ClarID-Tools
 
+0.05 2026-11-04T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Added BFF individuals and biosamples preprocessing utilities
+ - Fixed optional biosample CSV fields and missing-species stub decoding
+
 0.04 2026-08-14T00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Migrated project documentation from MkDocs to Docusaurus

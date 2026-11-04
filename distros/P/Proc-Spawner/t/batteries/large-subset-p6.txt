@@ -1,0 +1,25 @@
+echo hi | { read -p 'P> ' x; echo "[$x] $?"; }
+read -p 'P> ' x </dev/null; echo "st=$? [$x]"
+printf 'a b\n' | { read -r -p q x y; echo "[$x][$y]"; }
+mkdir -p d/real && ln -sf real d/link && cd -P d/link && pwd -L && echo "$PWD"
+mkdir -p d/real && ln -sf real d/link && cd -L d/link && pwd -L && echo "$PWD" && pwd -P
+mkdir -p d/real && ln -sf real d/link && cd d/link && cd -P .. && pwd -L
+mkdir -p d/real && ln -sf real d/link && cd -PL d/link; pwd -L; pwd -LP
+cd -P /nosuch; echo st=$?
+echo a > '*.t1'; echo b > *.t1; cat '*.t1'; rm -f '*.t1'
+touch q1.t2; echo c > *.t2; ls *.t2; rm -f '*.t2' q1.t2
+set -o nounset; echo ${zz-ok}
+set -o noglob; echo /*
+set -o ignoreeof; set -o notify; set -o nolog; set -b; set +m; echo ok
+trap 'echo caught' int; kill -INT $$; echo after
+trap 'echo caught' 2; kill -INT $$; echo after
+trap 'echo e' exit; echo body
+trap 'echo x' 9; trap 'echo x' stop; echo st=$?
+trap 'echo c' 10 12; kill -USR1 $$; kill -USR2 $$; echo after
+trap 'echo c' fpe; kill -FPE $$; echo after
+mkdir -p d/real && ln -sf real d/link && cd d/link && pwd && pwd x && pwd -P && command pwd && x=$(pwd) && echo "${x##*/}"
+mkdir -p d/real && ln -sf real d/link && cd d/link && PWD=/ && pwd && cd .. && pwd | sed 's|.*/||'
+[ "$PPID" -gt 0 ] && echo ppid
+umask 077; umask g+w,o=rx; umask; umask 022; umask u-w; umask; umask go=; umask
+mkdir -p d && cd d && cd - >/dev/null && echo "${PWD##*/}"
+sleep 1 & jobs -p >f; wc -l <f

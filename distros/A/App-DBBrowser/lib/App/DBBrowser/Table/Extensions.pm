@@ -16,6 +16,7 @@ use App::DBBrowser::Table::Extensions::Maths;
 use App::DBBrowser::Table::Extensions::Case;
 use App::DBBrowser::Table::Extensions::ColAliases;
 use App::DBBrowser::Table::Extensions::Columns;
+use App::DBBrowser::Table::Extensions::RearrangeColumns;
 use App::DBBrowser::Table::Extensions::ScalarFunctions;
 use App::DBBrowser::Table::Extensions::WindowFunctions;
 use App::DBBrowser::Table::Substatement::Aggregate;
@@ -32,9 +33,10 @@ my $e_null = 'NULL';
 my $e_close_IN = ')end';
 my $e_par_open = '(';
 my $e_par_close = ')';
-my $e_col_aliases = 'alias';
 my $e_skip_col = ''; # no length
 my $e_multi_col = 'mc'; ##
+my $e_rearrange_cols = 'rac';
+my $e_col_aliases = 'alias';
 my $e_distinct = 'distinct';
 
 
@@ -57,6 +59,7 @@ sub column {
         # Window functions are permitted only in SELECT and ORDER BY
         $extensions = [ $e_subquery, $e_scalar_func, $e_window_func, $e_case, $e_math ];
         if ( $clause eq 'select' && ! @$r_data ) {
+            push @$extensions, $e_rearrange_cols;
             push @$extensions, $e_col_aliases;
             push @$extensions, $e_distinct;
         }
@@ -335,6 +338,15 @@ sub __choose_extension {
         }
         elsif ( $extension eq $e_skip_col  ) {
             return '';
+        }
+        elsif ( $extension eq $e_rearrange_cols  ) {
+            my $new_rc = App::DBBrowser::Table::Extensions::RearrangeColumns->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $ok = $new_rc->rearrange_columns( $sql );
+            if ( ! defined $ok ) {
+                return if @$extensions == 1;
+                next EXTENSION;
+            }
+            return { rearrange => 1 };
         }
         elsif ( $extension eq $e_col_aliases  ) {
             my $new_ca = App::DBBrowser::Table::Extensions::ColAliases->new( $sf->{i}, $sf->{o}, $sf->{d} );

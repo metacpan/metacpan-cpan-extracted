@@ -1,7 +1,7 @@
 ---
 abstract: 'RSS/Atom feed reader and aggregator'
 author:
-  - 'Samuel Young <samyoung12788@gmail.com>'
+  - 'Samuel Young <samyoung@posteo.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/1-1sam/noss/issues
   repository: https://codeberg.org/1-1sam/noss.git
-version: '2.04'
+version: '2.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

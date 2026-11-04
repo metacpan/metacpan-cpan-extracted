@@ -1279,4 +1279,93 @@ subtest 'MusicXML::generate -- unsupported articulation emits carp' => sub {
 	ok $warned > 0, 'carp invoked for unsupported articulation token';
 };
 
+# ---------------------------------------------------------------------------
+# Parser::_handle_text -- placement inferred from Pos when Placement absent
+# ---------------------------------------------------------------------------
+
+subtest 'Parser::_handle_text -- positive Pos infers Above placement' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse(
+		$MINIMAL_NWCTXT . "|Text|Text:\"Slightly faster\"|Font:StaffItalic|Pos:7\n"
+	);
+	my ($ev) = grep { $_->type eq 'Text' } @{ $score->staves->[0]->events };
+	ok defined $ev, 'Text event parsed';
+	is lc($ev->data->{placement}), 'above', 'Pos:7 infers placement above';
+};
+
+subtest 'Parser::_handle_text -- negative Pos infers Below placement' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse(
+		$MINIMAL_NWCTXT . "|Text|Text:\"slower\"|Font:StaffItalic|Pos:-5\n"
+	);
+	my ($ev) = grep { $_->type eq 'Text' } @{ $score->staves->[0]->events };
+	is lc($ev->data->{placement}), 'below', 'Pos:-5 infers placement below';
+};
+
+subtest 'Parser::_handle_text -- Pos:0 infers Above placement' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse(
+		$MINIMAL_NWCTXT . "|Text|Text:\"middle\"|Pos:0\n"
+	);
+	my ($ev) = grep { $_->type eq 'Text' } @{ $score->staves->[0]->events };
+	is lc($ev->data->{placement}), 'above', 'Pos:0 infers placement above';
+};
+
+subtest 'Parser::_handle_text -- explicit Placement overrides Pos' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse(
+		$MINIMAL_NWCTXT . "|Text|Text:\"override\"|Placement:Below|Pos:9\n"
+	);
+	my ($ev) = grep { $_->type eq 'Text' } @{ $score->staves->[0]->events };
+	is lc($ev->data->{placement}), 'below', 'explicit Placement:Below preserved even with positive Pos';
+};
+
+subtest 'Parser::_handle_text -- no Pos and no Placement gives empty placement' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse(
+		$MINIMAL_NWCTXT . "|Text|Text:\"bare\"\n"
+	);
+	my ($ev) = grep { $_->type eq 'Text' } @{ $score->staves->[0]->events };
+	is $ev->data->{placement}, '', 'no Pos and no Placement gives empty string';
+};
+
+# ---------------------------------------------------------------------------
+# Parser::_handle_staff_properties -- EndingBar normalisation
+# ---------------------------------------------------------------------------
+
+subtest 'Parser::_handle_staff_properties -- EndingBar spaces stripped' => sub {
+	my $score = Music::NWC2MusicXML::Parser->new->parse($MINIMAL_NWCTXT);
+	my $staff = $score->staves->[0];
+	is $staff->{_ending_bar}, 'SectionClose',
+		'EndingBar:"Section Close" normalised to "SectionClose"';
+};
+
+subtest 'Parser::_handle_staff_properties -- second record does not clobber EndingBar' => sub {
+	my $nwc = "!NoteWorthyComposer(2.75)\n"
+		. "|SongInfo|Title:\"T\"\n"
+		. "|AddStaff|Name:\"S\"\n"
+		. "|StaffProperties|EndingBar:Section Close|Visible:Y|Lines:5\n"
+		. "|StaffProperties|Muted:N|Volume:127|Channel:1\n"
+		. "|Clef|Type:Treble\n"
+		. "|Key|Signature:C\n"
+		. "|TimeSig|Signature:4/4\n"
+		. "|Note|Dur:4th|Pos:0\n";
+	my $score = Music::NWC2MusicXML::Parser->new->parse($nwc);
+	is $score->staves->[0]{_ending_bar}, 'SectionClose',
+		'_ending_bar survives a second StaffProperties record without EndingBar field';
+};
+
+subtest 'Parser + MusicXML -- EndingBar:Section Close produces light-heavy barline' => sub {
+	# File must end with a note (no trailing Bar record) so @pending is non-empty
+	# after the main loop and _emit_part applies _ending_bar to the final measure.
+	my $nwc = "!NoteWorthyComposer(2.75)\n"
+		. "|SongInfo|Title:\"T\"\n"
+		. "|AddStaff|Name:\"S\"\n"
+		. "|StaffProperties|EndingBar:Section Close|Visible:Y|Lines:5\n"
+		. "|Clef|Type:Treble\n"
+		. "|Key|Signature:C\n"
+		. "|TimeSig|Signature:4/4\n"
+		. "|Note|Dur:4th|Pos:0\n";
+	my $xml = Music::NWC2MusicXML::MusicXML->new->generate(
+		Music::NWC2MusicXML::Parser->new->parse($nwc)
+	);
+	like $xml, qr/<bar-style>light-heavy<\/bar-style>/,
+		'Section Close ending bar emits light-heavy barline in XML';
+};
+
 done_testing();

@@ -1,5 +1,5 @@
 package Proc::ShellSubset;  # Parser for the Bourne-shell subset of doc/parsers/shell-subset-spec.md
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 use strict; use warnings; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::parse($string, %opt) returns a List, or { error => '...', pos => N, last => N, tree => List }:
@@ -16,6 +16,7 @@ use strict; use warnings; use List::Util qw(pairs pairvalues);
 # Pipeline = [ '!' (only if negated), Command, ... ]
 # Command  = { argv => [Word, ...], env => [NAME, Word, ...], redir => [Redir, ...], exec => 1 }
 #          | { sub => List, redir => [...] } | { group => List, redir => [...] } | { cd => Word | undef }
+#          (Proc::ShellSubset::Large adds cd_p => 1 for 'cd -P')
 #          | { set => [NAME, Word, NAME, Word, ...] }   (option assign)
 #          | { if => [Cond, Then, Cond, Then, ..., Else (if present)] }   (Cond, Then, Else: Lists; option if)
 #          | { while => Cond, do => List } | { until => Cond, do => List }   (option while)
@@ -31,9 +32,10 @@ use strict; use warnings; use List::Util qw(pairs pairvalues);
 #          | [ '~', 'user' or '' ] | [ '*', 'pattern text' ]
 #          | [ '{', Word, Word, ... ] | [ '{..', from, to ]
 
-our (%O, $M, @OPEN, $ATT, $LAST, $LOOP, $FORALL);   # options; position map of a backquote's inside;
+our (%O, $M, @OPEN, $ATT, $LAST, $LOOP, $FORALL, $RLIT);   # options; position map of a backquote's inside;
     # arrays being filled (for the partial tree); how many of them are in the tree; end of the last top-level chain;
-    # depth of the loops around the current command in its shell; Proc::ShellSubset::Large: 'for NAME' loops over "$@"
+    # depth of the loops around the current command in its shell; Proc::ShellSubset::Large: 'for NAME' loops over "$@",
+    # and a pattern in a redirection target is literal text (P6: dash, and bash in POSIX mode, do not expand it)
 our %KW = map +($_ => 1), qw(if then else elif fi case esac for while until do done in [[ ]] function select coproc !);
 our %BI = map +($_ => 1), qw(. break continue eval export readonly return set shift times trap unset alias
   unalias read wait umask ulimit jobs fg bg command getopts hash type fc chdir local source let declare
@@ -105,7 +107,7 @@ sub body {   # a loop's 'do' list up to 'done', one loop deeper for break and co
   my ($c, $p) = @_; local $LOOP = $LOOP + 1;
   list('done', $c->{do}); @{$c->{do}} or E('empty loop body', $p); kw('done') }
 sub vname {   # a variable the string sets: by assignment (C5), for or read
-  my ($n, $p) = @_; E("assignment to '$n'", $p) if $n =~ /^(?:HOME|CDPATH)\z/; name($n, $p) }
+  my ($n, $p) = @_; E("assignment to '$n'", $p) if $n =~ /^(?:HOME|CDPATH|PPID)\z/; name($n, $p) }   # PPID: read-only in bash
 
 sub compound {   # if, while, until, for, case (each with its option); pushes the node onto @$pl
   my ($pl, $p) = @_; my $c;
@@ -214,10 +216,12 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
     dq  => sub { push @s, [q => '']; dq(\@s, $p) },
     bs  => sub { $_[0] eq "\n" ? E('backslash-newline in a word', $p) : push @s, [q => shift] },
     ex  => sub { push @s, [x => $EX{$_[0]}->('', $p)] },   # also in redirection targets (Q1)
-    gl  => sub { E('pattern in a redirection target', $p) if $x eq 'r'; push @s, [$x eq 'e' ? 'u' : 'g', shift] },
+    gl  => sub { $x eq 'r' and return $RLIT ? push(@s, [q => shift]) : E('pattern in a redirection target', $p);
+      push @s, [$x eq 'e' ? 'u' : 'g', shift] },
     br  => sub {
-      E('pattern in a redirection target', $p) if $x eq 'r';
+      $x eq 'r' and return $RLIT ? push(@s, [q => '[']) : E('pattern in a redirection target', $p);
       push @s, $x eq 'e' ? [u => '['] : /\G(!?\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[$1"]
+        : $RLIT && /\G\^(\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[!$1"]   # Large: [^...] negates (rule E)
         : /\G(?:\\.|'[^']*'|"(?:[^"\\]|\\.)*"|[^ \t\n;&|()<>\\'"])*?\]/s   # a ] later in the word, past quotes
           ? E('bracket expression with a quote, expansion or slash', $p) : [g => '['] },
     cb  => sub {   # a '{' not followed by '}'
@@ -244,7 +248,7 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
   my $k = join '', map $$_[0], @s; my @v;    # kinds: u(nquoted) q(uoted) g(lob char) x(pansion)
   push @v, defined $1 ? ['*', join '', map $$_[1], splice @s, 0, length $1] : (shift @s)->[1]
     while $k =~ /([ug]*g[ug]*)|./g;           # unquoted text next to a pattern character joins it
-  dots(@v) and E("pattern that may match '.' or '..'", $p0);   # dash: yes, bash 5.2: no (U2)
+  dots(@v) and E("pattern that may match '.' or '..'", $p0) unless $RLIT;   # dash: yes, bash 5.2: no (U2); Large: never (rule E)
   mkword(@v) }
 
 sub dots {   # can a pattern in these Parts match a whole file name component '.' or '..'? (U2)

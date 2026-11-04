@@ -1,5 +1,26 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.29	Tue Nov  3 01:29:31 PM EST 2026
+	[ New Features ]
+	- render_treemap_snippet colours tiles by a second measure: a row or node
+	  may carry color_value, and the tiles are then shaded from a sequential
+	  color_scheme (the heatmap's names, default YlOrRd) with a legend, the
+	  value in the tooltip under color_label, and dark labels on light tiles
+	- render_combo_snippet takes scheme: the bars take its first colour and
+	  the line its second.  bar_color and line_color still win
+	- render_multi_series_line_chart_snippet takes x_order.  The default,
+	  auto, sorts labels that are all numbers or all ISO dates, and draws each
+	  line in that order; two series of dates used to give an axis such as
+	  15, 19, 16, 17.  data keeps the old order; sort sorts any labels
+	[ Bug Fixes ]
+	- Tooltips and the pie snippet's legend set text from the caller's data
+	  with .html() unescaped, so a label holding <img src=x onerror=...> ran
+	  when the chart was hovered or drawn.  The stacked bar, combo, treemap,
+	  line, zoomable line and multi-series line snippets, the full-page line
+	  charts with tooltips and the pie legend now escape it.
+	  t/tooltip-escaping.t checks each one
+	- The heatmap and the treemap share one list of sequential schemes
+
 0.28	Mon Nov  2 09:15:12 PM EST 2026
 	[ Bug Fixes ]
 	- A responsive chart's <svg> had height="auto", which is not a valid value

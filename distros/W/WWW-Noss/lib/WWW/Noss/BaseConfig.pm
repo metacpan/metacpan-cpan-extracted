@@ -2,7 +2,7 @@ package WWW::Noss::BaseConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use List::Util qw(any all);
 
@@ -34,6 +34,7 @@ sub initialize {
     $self->set_default_update($param{ default_update } // 1);
     $self->set_hidden($param{ hidden } // 0);
     $self->set_open_cmd($param{ open });
+    $self->set_user_agent($param{ user_agent });
 
     return 1;
 
@@ -339,6 +340,22 @@ sub set_open_cmd {
 
 }
 
+sub user_agent {
+
+    my ($self) = @_;
+
+    return $self->{ UserAgent };
+
+}
+
+sub set_user_agent {
+
+    my ($self, $new) = @_;
+
+    $self->{ UserAgent } = $new;
+
+}
+
 =head1 NAME
 
 WWW::Noss::BaseConfig - Base class for feed configuration classes
@@ -419,6 +436,14 @@ not.
 Boolean determining whether a feed should be omitted from the C<list> command's
 default listing.
 
+=item open
+
+Command to use for opening URLs in this feed.
+
+=item user_agent
+
+String to use as user agent when fetching URLs for this feed.
+
 =back
 
 =item $limit = $conf->limit()
@@ -487,6 +512,12 @@ Getter/setter for the C<hidden> attribute.
 
 Getter/setter for the C<open> attribute.
 
+=item $agent = $conf->user_agent()
+
+=item $conf->set_user_agent($agent)
+
+Getter/setter for the C<user_agent> attribute.
+
 =item $ok = $conf->title_ok($title)
 
 =item $ok = $conf->content_ok($content)
@@ -500,7 +531,7 @@ acceptable according to their respective include and exclude attributes.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

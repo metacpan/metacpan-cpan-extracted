@@ -1,7 +1,7 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Email::MIME;
 use List::Util qw(max);
@@ -10,7 +10,7 @@ use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
 
-# i= / m= of a field value; tag-names are case-sensitive (-08 §8, D10).
+# i= / m= of a field value; tag-names are case-sensitive (-09 §8, D10).
 sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/ ? 0 + $1 : 0 }
 sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/ ? 0 + $1 : 0 }
 
@@ -73,7 +73,7 @@ sub _mi_tags {
     return [] unless $mi;
     my @t;
     push @t, { tag => 'm', label => 'instance', value => ($mi->get_tag('m') // '') };
-    # -08 §9.3: h= may carry a hash-set per algorithm -- show each one
+    # -09 §9.3: h= may carry a hash-set per algorithm -- show each one
     # under its own name rather than assuming sha256.
     my $hashes = $mi->get_tag('hashes') || {};
     for my $alg (sort keys %$hashes) {
@@ -97,23 +97,46 @@ sub _mi_tags {
 # Default pubkey callback: LIVE DNS. A dns.json override applies only when a
 # readable $dns_path is passed in (offline testing) — production passes none,
 # so the validator uses real DNS and never masks a broken key record.
-sub _default_cb {
+our $POLICY_CB;
+
+# The records of a dns.json file (util's interop key format), or undef.
+sub _dns_json {
     my ($dns_path) = @_;
-    my $dns;
-    if ($dns_path && -r $dns_path) {
-        require JSON;
-        if (open my $fh, '<', $dns_path) {
-            $dns = eval { JSON::decode_json(do { local $/; <$fh> }) };
-            die $@ if ref $@;
-            close $fh;
-        }
-    }
+    return unless $dns_path && -r $dns_path;
+    require JSON;
+    open my $fh, '<', $dns_path or return;
+    my $dns = eval { JSON::decode_json(do { local $/; <$fh> }) };
+    die $@ if ref $@;
+    return $dns;
+}
+
+# A PolicyCallback answering from DnsPath's records for the domains it
+# lists, else from DNS.
+sub _default_policy_cb {
+    my $dns = _dns_json(@_);
+    return sub {
+        my ($dom, $verifier) = @_;
+        return [ map { $_->[1] } @{ $dns->{$dom}{_domainkey} || [] } ]
+            if $dns && $dns->{$dom};
+        return $verifier->fetch_domain_policy($dom);
+    };
+}
+
+sub _default_cb {
+    my $dns = _dns_json(@_);
     return sub {
         my ($sig, $idx, $verifier) = @_; $idx //= 0;
         my $sel = $sig->selector($idx); my $dom = $sig->domain;
-        if ($dns && $dom && $sel) {
-            my $t = $dns->{$dom}{"$sel._domainkey"}[0][1];
-            return parse_dkim_pubkey($t) if $t;
+        if ($dns && $dom && $sel && (my $rr = $dns->{$dom}{"$sel._domainkey"})) {
+            # As the Verifier's own fetch: non-DKIM1 records ignored, then
+            # one record or an error (-09 section 3.7).
+            my @t = Mail::DKIM2::Common::key_records(map { $_->[1] } @$rr);
+            die "PERMERROR: has multiple records\n" if @t > 1;
+            if (@t) {
+                my ($key, $why) = Mail::DKIM2::Common::parse_dkim_key_record($t[0]);
+                die "PERMERROR: $why\n" unless $key;
+                return $key;
+            }
         }
         # Real DNS. Not eval'd: a transient failure must stay a TEMPERROR,
         # which the verifier classifies; swallowing it here read as "no key".
@@ -125,7 +148,7 @@ sub _default_cb {
 #
 # Prior to spec-06, a receiving MTA's Received-SPF header (Fastmail adds one)
 # was covered by the Message-Instance header hash and could break
-# verification; this used to retry once with it stripped. -08 §4 excludes
+# verification; this used to retry once with it stripped. -09 §4 excludes
 # Received-SPF from the hash via the "received-" prefix rule (should_skip()),
 # so stripping it can no longer change h_digest()/b_digest() or any verdict —
 # the retry was provably a no-op. Removed rather than kept as a "safety net":
@@ -135,7 +158,7 @@ sub _default_cb {
 sub report {
     my ($text, %opts) = @_;
     Mail::DKIM2::Common::_check_options('Mail::DKIM2::Validate::report', \%opts,
-        qw(DnsPath PubkeyCallback SkipTimestampCheck));
+        qw(DnsPath PubkeyCallback PolicyCallback SkipTimestampCheck));
     $text //= '';
 
     return _report_once($text, %opts);
@@ -146,6 +169,9 @@ sub _report_once {
     $text //= '';
     $text =~ s/\r?\n/\r\n/g;
     my $cb = $opts{PubkeyCallback} || _default_cb($opts{DnsPath});
+    # The Domain Policy Record source every Verifier here uses (-09 section
+    # 3.8): the caller's, else DnsPath's records, else DNS.
+    local $POLICY_CB = $opts{PolicyCallback} || _default_policy_cb($opts{DnsPath});
     my $skip_ts = $opts{SkipTimestampCheck} ? 1 : 0;
 
     my %res = (overall => 'none', summary => '',
@@ -159,7 +185,7 @@ sub _report_once {
     my @sig_hdrs = $msg->header('DKIM2-Signature');
     my @mi_hdrs  = $msg->header('Message-Instance');
     $res{counts} = { signatures => scalar @sig_hdrs, instances => scalar @mi_hdrs };
-    # A Message-Instance with no signature anywhere is -08 §14's
+    # A Message-Instance with no signature anywhere is -09 §14's
     # "PERMERROR: Message-Instance m=<x> is not signed", not an absence of
     # DKIM2. Reporting it as 'none' is exactly the answer someone pasting such
     # a message here does not need: it says "nothing to see" about a message
@@ -173,13 +199,13 @@ sub _report_once {
                  summary => "PERMERROR: Message-Instance m=$top_mi is not signed" };
     }
 
-    return { %res, overall => 'none', summary => 'no DKIM2-Signature headers found' }
+    return { %res, overall => 'none', summary => 'NONE: No DKIM2 header fields found' }
         unless @sig_hdrs;
 
     # Overall verdict from the full verifier (includes the §14.7 deep MI walk).
     # Timestamp age is graded per-signature as a soft 'warn' below, so it must
     # not hard-fail the crypto verdict here.
-    my $v = Mail::DKIM2::Verifier->new;
+    my $v = Mail::DKIM2::Verifier->new(PolicyCallback => $POLICY_CB);
     $v->skip_timestamp_check(1);
     $v->set_pubkey_callback($cb);
     eval { $v->PRINT($text); $v->CLOSE; 1 };
@@ -187,11 +213,9 @@ sub _report_once {
     my $ov = $v->result // 'fail';
     $res{summary} = $v->result_detail // '';
     $res{overall} = $ov eq 'pass' ? 'pass' : ($ov eq 'none' ? 'none' : 'fail');
-    # -08 section 13 (contract D9): a pass over a null body Recipe is not a
-    # Fully Verified DKIM2 Message -- the body below it went unchecked.
+    # Deprecated (0.29): a null body Recipe is now a PERMERROR (-09 contract
+    # E2), so this is true exactly for a pass.
     $res{fully_verified} = $v->fully_verified;
-    $res{summary} .= '; not fully verified: a null body Recipe hides the body below it'
-        if $ov eq 'pass' && !$res{fully_verified};
 
     my %sig_by_i = map { _i($_) => $_ } @sig_hdrs;
 
@@ -276,7 +300,7 @@ sub _mi_level {
 
     $lvl{tags} = _mi_tags($mi);
 
-    # -08 §3.5/§9.3: mirror MessageInstance::verify()'s semantics here --
+    # -09 §3.5/§9.3: mirror MessageInstance::verify()'s semantics here --
     # every implemented hash-set must match; an MI naming no implemented
     # algorithm displays as a mismatch (fail-closed), not silently as a
     # sha256-only "no hash".
@@ -365,7 +389,7 @@ sub _sig_level {
             my $prev = eval { Mail::DKIM2::Signature->parse($sig_by_i->{$num-1}) };
             die $@ if ref $@;
             if ($prev) {
-                # -08 section 7.1 item 1, as Verifier.pm checks it, so the
+                # -09 section 7.1 item 1, as Verifier.pm checks it, so the
                 # report and the verdict cannot disagree.
                 my $p = $num - 1;
                 my $cur_d = $sig->domain // '';
@@ -403,7 +427,7 @@ sub _sig_level {
     # not necessarily the true top of the whole chain. Verifier.pm's top-nd=
     # rejection must not fire here; the real top-of-chain check is done
     # separately below against $sig_by_i (the full, original signature set).
-    my $vv = Mail::DKIM2::Verifier->new;
+    my $vv = Mail::DKIM2::Verifier->new(PolicyCallback => $POLICY_CB);
     $vv->skip_timestamp_check(1);
     $vv->mid_process(1);
     $vv->headers_only(1) if $hdr_only;   # body lost below a null Recipe
@@ -418,7 +442,7 @@ sub _sig_level {
     $lvl{result} = 'warn' if $crypto eq 'pass' && !$lvl{timestamp}{ok};
     $_->{result} = $crypto for @{$lvl{items}};
 
-    # Local policy (-08 section 14.4 allows a top nd= only by arrangement): the
+    # Local policy (-09 section 14.4 allows a top nd= only by arrangement): the
     # highest-numbered DKIM2-Signature in the *whole* chain MUST NOT carry
     # nd= (mirrors the Verifier.pm permerror from Task 2.1). $sig_by_i is the
     # original, unmodified full signature set for every call in this walk,
@@ -456,7 +480,7 @@ Mail::DKIM2::Validate - structured per-level DKIM2 and Message-Instance report
         SkipTimestampCheck => 1,
     );
     # $report->{overall}, $report->{summary}, $report->{counts},
-    # $report->{fully_verified} (-08 section 13: false over a null body Recipe),
+    # $report->{fully_verified} (deprecated: true exactly for a pass),
     # $report->{levels}: one hashref per DKIM2-Signature and Message-Instance
 
 =head1 DESCRIPTION

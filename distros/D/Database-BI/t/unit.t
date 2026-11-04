@@ -4,6 +4,8 @@ use warnings;
 use Test::Most;
 use Test::Mojo;
 use Test::Mockingbird qw(mock restore_all);
+use Test::Returns qw(returns_is);
+use Mojo::JSON ();
 use Readonly;
 use File::Spec;
 use File::Temp qw(tempdir tempfile);
@@ -279,10 +281,52 @@ my %ledger = (
 );
 
 # ---------------------------------------------------------------------------
+# The ledger also holds every message the modules can raise, read from their own
+# dictionaries, so that a message added later fails this file until it is tested.
+# A key that no code refers to cannot be raised, and is left out by the same
+# reading, so it joins the ledger the moment something starts to use it.
+# ---------------------------------------------------------------------------
+Readonly my %MESSAGE_FILES => (
+	Dashboard  => 'lib/Database/BI/Controller/Dashboard.pm',
+	DataSource => 'lib/Database/BI/Model/DataSource.pm',
+	Geocode    => 'lib/Database/BI/Model/Geocode.pm',
+);
+my %DICTIONARY;
+for my $module (sort keys %MESSAGE_FILES) {
+	# A Windows checkout has CRLF line ends, which would leave the POD in below.
+	(my $source = Mojo::File->new($MESSAGE_FILES{$module})->slurp) =~ s/\r\n/\n/g;
+	my ($block) = $source =~ /%MESSAGES => \((.*?)^\);/ms or BAIL_OUT("no %MESSAGES in $module");
+	my %messages = eval "($block)";	## no critic (ProhibitStringyEval): the module's own constant data
+	$source =~ s/%MESSAGES => \(.*?^\);//ms;
+	$source =~ s/^=\w.*?^=cut\n//msg;
+	$DICTIONARY{$module} = \%messages;
+	for my $key (grep { $source =~ /\b$_\b/ } keys %messages) {
+		$ledger{"msg.$module.$key"} = "$module raises $key";
+	}
+}
+
+# Those the POD documents that are not messages.
+$ledger{"api.$_"} = "documented behaviour: $_" for qw(
+	Util.parse_number Calc.new Calc.error Calc.has_error Calc.evaluate Calc.span_interval Calc.date_normalise Calc.compile_pattern Calc.capture_of
+	Extract.new Extract.path Extract.get Extract.put Extract.evict
+	Tutorial.intro Tutorial.chapters Tutorial.faq Tutorial.glossary Tutorial.parts
+	Tutorial.covered_routes Tutorial.exempt_routes Tutorial.chapter_for_action
+	DataSource.sqlite_tables DataSource.dbi_source DataSource.aggregate DataSource.updated DataSource.schema DataSource.count
+	Geocode.shared_cache_from_models Geocode.models_with_shared_cache
+	BI.startup Globals
+	analyses.list analyses.create analyses.get analyses.update analyses.patch analyses.delete
+	analyses.add_visual analyses.update_visual analyses.export analyses.import analyses.storage_503 analyses.unknown_keys
+	share.share share.embed share.visual_download
+	crud.calc crud.groups crud.dates crud.lookups crud.extract crud.geo
+	accel.accelerate accel.unaccelerate accel.specs DataSource.column_order
+	route.range route.tables route.wordcloud route.catalog route.tutorial route.index route.stats_percentile
+);
+
+# ---------------------------------------------------------------------------
 # Bootstrap the Mojolicious app first so that Test::Mojo dynamically
 # requires all app modules at runtime (after the CHECK phase).
 # Sub::Private's namespace::clean runs at CHECK time, so modules loaded
-# via 'use' at compile-time lose their :Private stash entries — including
+# via 'use' at compile-time lose their :Private stash entries -- including
 # _init_backend, which new() calls.  Loading via Test::Mojo->new (which
 # uses require at runtime) bypasses CHECK and preserves the full stash.
 # Only AFTER the app is started do we require DataSource so we get the
@@ -297,7 +341,7 @@ require Database::BI::Model::DataSource;	# no-op: already in %INC; stash intact
 $t->app->config->{model_dir} = tempdir(CLEANUP => 1);
 
 # ---------------------------------------------------------------------------
-# DataSource — direct constructor and accessor tests
+# DataSource -- direct constructor and accessor tests
 # ---------------------------------------------------------------------------
 subtest 'DataSource.new -- valid directory and table' => sub {
 	my $ds;
@@ -2202,8 +2246,1162 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 	};
 }
 
+# ============================================================================
+# The rest of the documented API, and every message.  Strategy: expected text
+# comes from each module's own dictionary, so an assertion is on the exact string
+# with only the parameters filled in.  Where a state cannot be reached from
+# outside, its collaborator is mocked; all network and geocoding is replaced.
+# ============================================================================
+{
+	Readonly my $SPEC       => 'table:sales';
+	Readonly my $EPOCH      => 1_700_000_000;
+	Readonly my $CAPPED     => 1;
+	Readonly my $ALARM_SECS => 1000;
+	Readonly my $BDB_MAGIC_AT => 12;
+
+	require Database::BI::Calc;
+	require Database::BI::Extract;
+	require Database::BI::Tutorial;
+	require Database::BI::Model::Geocode;
+	require HTTP::Response;
+
+	sub unit_app {
+		my $tm = Test::Mojo->new('Database::BI');
+		$tm->app->config->{model_dir}   = tempdir(CLEANUP => 1);
+		$tm->app->config->{uploads_dir} = tempdir(CLEANUP => 1);
+		$tm->app->config->{share_secret} = 'unit-secret';
+		$tm->app->log->level('fatal');
+		return $tm;
+	}
+
+	sub unit_csv {
+		my ($name, $text) = @_;
+		my $path = File::Spec->catfile(tempdir(CLEANUP => 1), $name);
+		Mojo::File->new($path)->spew($text);
+		return $path;
+	}
+
+	sub unit_sqlite {
+		my ($name, @statements) = @_;
+		require DBI;
+		my $path = File::Spec->catfile(tempdir(CLEANUP => 1), $name);
+		my $dbh = DBI->connect("dbi:SQLite:dbname=$path", '', '', { RaiseError => 1, PrintError => 0 });
+		$dbh->do($_) for @statements;
+		$dbh->disconnect;
+		return $path;
+	}
+
+	# The template with its parameters filled in.  An undef parameter is one the test
+	# cannot know in advance, such as the text of a backend's error, and matches anything.
+	sub message_re {
+		my ($module, $key, $args, $escape) = @_;
+		my $template = $DICTIONARY{$module}{$key} // BAIL_OUT("no message $module/$key");
+		my @args = @{ $args // [] };
+		my $text = '';
+		for my $piece (split /(%[sd])/, $template) {
+			my $literal = $piece;
+			if ($piece =~ /\A%[sd]\z/) {
+				my $value = shift @args;
+				if (!defined $value) { $text .= '.*'; next; }
+				$literal = $value;
+			}
+			$literal =~ s/%%/%/g;
+			$literal = Mojo::Util::xml_escape($literal) if $escape;
+			$text .= quotemeta $literal;
+		}
+		return $escape ? qr/$text/s : qr/\A$text\z/s;
+	}
+
+	# Marks a message as raised, once it has been seen exactly.
+	sub message_ok {
+		my ($module, $key, $got, $args, $escape) = @_;
+		diag("$module/$key: " . ($got // '<undef>')) if $ENV{TEST_VERBOSE};
+		like $got // '', message_re($module, $key, $args, $escape), "$module message $key";
+		delete $ledger{"msg.$module.$key"} if ($got // '') =~ message_re($module, $key, $args, $escape);
+	}
+
+	sub without_location {
+		my ($e) = @_;
+		$e =~ s/ at \S+ line \d+\.?\s*\z//;
+		return $e;
+	}
+
+	subtest 'Util.parse_number' => sub {
+		my $fn = \&Database::BI::Util::parse_number;
+		is $fn->('$1,234.56'), 1234.56, 'the POD example with a currency sign';
+		is $fn->('(1,234.56)'), -1234.56, 'an accounting negative';
+		is $fn->('USD 100'), 100, 'a currency code';
+		is $fn->('SKU123'), undef, 'text holding digits';
+		is $fn->(undef), undef, 'missing';
+		is $fn->(''), undef, 'empty';
+		is $fn->('1e999'), undef, 'too large to be finite';
+		returns_is $fn->('5'), { type => 'number' }, 'a number comes back';
+		delete $ledger{'api.Util.parse_number'};
+	};
+
+	subtest 'Calc -- the documented constructor, accessors and evaluate' => sub {
+		my $good = Database::BI::Calc->new(expr => 'amount * 2', columns => ['amount']);
+		isa_ok $good, 'Database::BI::Calc';
+		is $good->error, undef, 'error() is undef after a clean compile';
+		ok !$good->has_error, 'and has_error() false';
+		is $good->evaluate({ amount => 21 }), 42, 'evaluate() computes';
+		is $good->evaluate({ amount => undef }), undef, 'an undef operand is undef, not a croak';
+
+		my $zero = Database::BI::Calc->new(expr => 'amount / 0', columns => ['amount']);
+		is $zero->evaluate({ amount => 1 }), undef, 'division by zero is undef';
+
+		for my $case (
+			[ 'nope', ['amount'], 'an unknown identifier' ],
+			[ 'amount == 1', ['amount'], 'the == operator' ],
+			[ 'x' x 513, [], 'an expression over 512 characters' ],
+			[ "span(amount, '1x')", ['amount'], 'a bad span interval' ],
+		) {
+			my ($expr, $cols, $why) = @$case;
+			my $bad;
+			lives_ok { $bad = Database::BI::Calc->new(expr => $expr, columns => $cols) } "$why does not croak";
+			ok $bad->has_error, 'has_error() says so';
+			returns_is $bad->error, { type => 'string' }, 'error() gives the reason';
+			is $bad->evaluate({ amount => 1 }), undef, 'and it evaluates nothing';
+		}
+		ok(Database::BI::Calc->new(expr => 'a', columns => ['a'], params => { a => 1 })->has_error, 'a parameter named like a column');
+		is(Database::BI::Calc->new(expr => 'rate * 2', params => { rate => 3 })->evaluate({ rate => 100 }), 6, 'a bound parameter is read in place of a row key');
+		delete @ledger{qw(api.Calc.new api.Calc.error api.Calc.has_error api.Calc.evaluate)};
+	};
+
+	subtest 'Calc.span_interval' => sub {
+		my $fn = \&Database::BI::Calc::span_interval;
+		is_deeply $fn->('1mon'), { n => 1, unit => 'mon' }, 'months have no secs';
+		is_deeply $fn->('15m'), { n => 15, unit => 'm', secs => 60 }, 'minutes do';
+		is_deeply $fn->('2h'), { n => 2, unit => 'h', secs => 3600 }, 'hours';
+		is_deeply $fn->('1s'), { n => 1, unit => 's', secs => 1 }, 'seconds';
+		is_deeply $fn->("1$_"), { n => 1, unit => $_ }, "unit $_" for qw(d w q y);
+		is $fn->($_), undef, 'not an interval' for undef, '', '0h', '-1d', '1x', 'h', [ 1 ];
+		delete $ledger{'api.Calc.span_interval'};
+	};
+
+	subtest 'Calc.date_normalise' => sub {
+		my $fn = \&Database::BI::Calc::date_normalise;
+		is $fn->('01/15/2026', '%m/%d/%Y'), '2026-01-15', 'US';
+		is $fn->('15/01/2026', '%d/%m/%Y'), '2026-01-15', 'EU';
+		is $fn->('15-jan-2026', '%d-%b-%Y'), '2026-01-15', 'a month name in any case';
+		is $fn->('27/10/2026 14:05', { date => '%d/%m/%Y', time => '%H:%M' }), '2026-10-27T14:05:00', 'with a time';
+		is $fn->('27/10/2026 14:05:32', { date => '%d/%m/%Y', time => '%H:%M:%S' }), '2026-10-27T14:05:32', 'with seconds';
+		is $fn->('27/10/2026', { date => '%d/%m/%Y', as => 'timestamp' }), '2026-10-27T00:00:00', 'as a timestamp';
+		is $fn->(undef, '%m/%d/%Y'), undef, 'undefined value';
+		is $fn->('', '%m/%d/%Y'), undef, 'empty value';
+		is $fn->('01/15/2026', '%Q'), undef, 'unknown pattern';
+		is $fn->('junk', '%m/%d/%Y'), undef, 'no match';
+		delete $ledger{'api.Calc.date_normalise'};
+	};
+
+	subtest 'Extract -- the whole documented life of a cache file' => sub {
+		throws_ok { Database::BI::Extract->new() } qr/\Amodel_dir is required at /, 'new() without model_dir';
+		my $dir = tempdir(CLEANUP => 1);
+		my $ex  = Database::BI::Extract->new(model_dir => $dir);
+		isa_ok $ex, 'Database::BI::Extract';
+		ok !-e File::Spec->catdir($dir, 'extracts'), 'nothing is created until put';
+		delete $ledger{'api.Extract.new'};
+
+		my @key = ($SPEC, $EPOCH, 10);
+		my $path = $ex->path(@key);
+		like $path, qr{extracts[/\\][0-9a-f]{32}\.db\z}, 'path() is <md5>.db under extracts/';
+		ok !-e $path, 'and need not exist';
+		is $ex->path($SPEC), $ex->path($SPEC, 0, 0), 'undef mtime and size are 0';
+		delete $ledger{'api.Extract.path'};
+
+		is $ex->get(@key), undef, 'get() misses before a put';
+		is $ex->evict($SPEC), 0, 'evict() with no extracts/ is 0';
+		throws_ok { $ex->put(@key, undef) } qr/\Asqlite_bytes are required at /, 'put() undefined bytes';
+		throws_ok { $ex->put(@key, '') } qr/\Asqlite_bytes are required at /, 'put() empty bytes';
+
+		is $ex->put(@key, 'bytes'), $path, 'put() returns the path written';
+		is $ex->get(@key), $path, 'get() now finds it';
+		is $ex->get($SPEC, $EPOCH + 1, 10), undef, 'a changed mtime is a miss';
+		is $ex->get($SPEC, $EPOCH, 11), undef, 'a changed size is a miss';
+		delete @ledger{qw(api.Extract.get api.Extract.put)};
+
+		$ex->put('table:other', 1, 1, 'more');
+		is $ex->evict($SPEC), 2, 'evict() removes every file, not only that spec';
+		is $ex->get(@key), undef, 'and it is gone';
+		delete $ledger{'api.Extract.evict'};
+
+		# A file where the directory should be: no permissions involved, so this
+		# holds on every platform and for root.
+		my $blocked = Database::BI::Extract->new(model_dir => unit_csv('file-not-dir', 'x'));
+		throws_ok { $blocked->put(@key, 'x') } qr/extracts/, 'put() croaks naming the path when it cannot write';
+	};
+
+	subtest 'Tutorial -- the documented data shapes' => sub {
+		my $T = 'Database::BI::Tutorial';
+		returns_is $T->intro, { type => 'arrayref' }, 'intro() is a list';
+		ok !(grep { ref } @{ $T->intro }), 'of sentences';
+		my $chapters = $T->chapters;
+		returns_is $chapters, { type => 'arrayref' }, 'chapters()';
+		returns_is $T->faq, { type => 'arrayref' }, 'faq()';
+		returns_is $T->glossary, { type => 'arrayref' }, 'glossary()';
+		returns_is $T->parts, { type => 'arrayref' }, 'parts()';
+		returns_is $T->covered_routes, { type => 'hashref' }, 'covered_routes()';
+		ok scalar keys %{ $T->covered_routes }, 'and it names some';
+		returns_is $T->exempt_routes, { type => 'hashref' }, 'exempt_routes()';
+
+		my $hit = $T->chapter_for_action('bar_view');
+		returns_is $hit, { type => 'hashref' }, 'chapter_for_action() finds a chapter';
+		is_deeply [ $T->chapter_for_action('no_such_action') ], [], 'an unknown action is an empty list';
+		is_deeply [ $T->chapter_for_action(undef) ], [], 'as is undef';
+		delete @ledger{ map { "api.Tutorial.$_" } qw(intro chapters faq glossary parts covered_routes exempt_routes chapter_for_action) };
+	};
+
+	subtest 'DataSource -- the accessors t/unit.t had not reached' => sub {
+		my $csv = Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE);
+		is $csv->sqlite_tables, undef, 'sqlite_tables() is undef for a CSV';
+		my $mtime = (stat $SALES_CSV)[9];
+		is $csv->updated, $mtime, 'updated() is the file mtime';
+		is $csv->count, scalar @{ $csv->fetch_all }, 'count() is the number of rows';
+		returns_is $csv->schema, { type => 'hashref' }, 'schema() is a hashref';
+
+		my $db = unit_sqlite('shop.sqlite', 'CREATE TABLE alpha (id INTEGER, n INTEGER)', 'CREATE TABLE beta (id INTEGER)',
+			'INSERT INTO alpha VALUES (1, 5)', 'INSERT INTO alpha VALUES (2, 7)');
+		my ($dir) = $db =~ m{\A(.*)[/\\]};
+		my $src = Database::BI::Model::DataSource->new(directory => $dir, table => 'shop');
+		is_deeply $src->sqlite_tables, [qw(alpha beta)], 'sqlite_tables() names them, alphabetically';
+		ok defined $src->dbi_source, 'dbi_source() is defined for SQLite';
+		is $src->count, 2, 'count() on SQL';
+		is $src->schema->{n}{type} // '', 'INTEGER', 'schema() reports the declared type';
+		my $agg = $src->aggregate(by => ['id'], measures => [ { fn => 'sum', col => 'n', as => 't' } ], sort_by => 'id');
+		is_deeply [ map { $_->{t} } @$agg ], [ 5, 7 ], 'aggregate() is one row a group';
+
+		my $empty_path = unit_csv('blank.csv', '');
+		my ($edir) = $empty_path =~ m{\A(.*)[/\\]};
+		my $blank = Database::BI::Model::DataSource->new(directory => $edir, table => 'blank');
+		is $blank->count, 0, 'count() on an empty file is 0';
+		is_deeply $blank->aggregate(by => ['x'], measures => []), [], 'aggregate() on an empty file is []';
+		is $blank->dbi_source, undef, 'dbi_source() on an empty file is undef';
+		delete @ledger{ map { "api.DataSource.$_" } qw(sqlite_tables dbi_source aggregate updated schema count) };
+	};
+
+	sub UnitFakeMariaDbh::prepare { Carp::croak('no such table') }
+	sub UnitFakeMariaDbh::disconnect { return 1 }
+
+	subtest 'DataSource -- every message' => sub {
+		my $DS  = 'Database::BI::Model::DataSource';
+		my $err = sub { my %a = @_; my $ok = eval { $DS->new(%a); 1 }; return $ok ? '' : without_location("$@") };
+
+		message_ok(DataSource => 'error_table_required', $err->(directory => $DATA_DIR));
+		message_ok(DataSource => 'error_directory_missing', $err->(directory => '/no/such/dir', table => 'x'), ['/no/such/dir']);
+		message_ok(DataSource => 'error_table_name_invalid', $err->(directory => $DATA_DIR, table => 'a/b'), ['a/b']);
+		message_ok(DataSource => 'error_url_invalid', $err->(url => 'ftp://x/y'), ['ftp://x/y']);
+		message_ok(DataSource => 'error_redis_invalid', $err->(redis => 'http://x', table => 't'), ['http://x']);
+
+		my $maria = sub { $err->(table => 't', server => 's', mariadb => $_[0]) };
+		message_ok(DataSource => 'error_mariadb_unknown_server', $maria->(undef), ['s']);
+		message_ok(DataSource => 'error_mariadb_settings', $maria->({ database => 'a;host=evil' }), ['s', 'database']);
+		{
+			# With neither driver to be found, whatever this machine has installed.
+			local @INC = ();
+			local %INC = %INC;
+			delete @INC{qw(DBD/MariaDB.pm DBD/mysql.pm)};
+			message_ok(DataSource => 'error_mariadb_no_driver', $maria->({ database => 'd' }), ['s']);
+		}
+		{
+			# A driver that seems to be there, and a server that refuses or has no table.
+			local $INC{'DBD/MariaDB.pm'} = __FILE__;
+			require DBI;
+			no warnings qw(redefine once);
+			local *DBI::connect = sub { return };
+			message_ok(DataSource => 'error_mariadb_connect', $maria->({ database => 'd' }), ['s', undef]);
+			local *DBI::connect = sub { return bless {}, 'UnitFakeMariaDbh' };
+			message_ok(DataSource => 'error_mariadb_table', $maria->({ database => 'd' }), ['t', 's', undef]);
+		}
+
+		my $dir_of = sub { my ($d) = $_[0] =~ m{\A(.*)[/\\]}; $d };
+		my $no_id = unit_csv('noid.csv', "a b,c d\nhello,world\n");
+		message_ok(DataSource => 'error_no_safe_id', $err->(directory => $dir_of->($no_id), table => 'noid'), ['noid']);
+
+		my $none = unit_sqlite('none.sqlite', 'CREATE TABLE gone (id INTEGER)', 'DROP TABLE gone');
+		message_ok(DataSource => 'error_no_tables', $err->(directory => $dir_of->($none), table => 'none'), [undef]);
+
+		my $two = unit_sqlite('two.sqlite', 'CREATE TABLE alpha (id INTEGER)', 'CREATE TABLE beta (id INTEGER)');
+		message_ok(DataSource => 'error_table_not_found', $err->(directory => $dir_of->($two), table => 'two', internal_table => 'gamma'), [undef, 'gamma']);
+
+		my $odd = unit_sqlite('odd.sqlite', 'CREATE TABLE "bad name" (id INTEGER)', 'CREATE TABLE good (id INTEGER)');
+		my $unsafe = $err->(directory => $dir_of->($odd), table => 'odd', internal_table => 'bad name');
+		like $unsafe, qr/\AThe table "bad name" in /, 'error_table_name_unsafe says which table';
+		delete $ledger{'msg.DataSource.error_table_name_unsafe'} if $unsafe =~ /\AThe table "bad name" in /;
+		like $unsafe, qr/\QOpen another table in the file instead: good.\E/, 'and error_table_name_others offers another';
+		delete $ledger{'msg.DataSource.error_table_name_others'} if $unsafe =~ /instead: good\./;
+
+		my $only = unit_sqlite('only.sqlite', 'CREATE TABLE "bad name" (id INTEGER)');
+		my $unusable = $err->(directory => $dir_of->($only), table => 'only');
+		like $unusable, qr/\ANo table in /, 'error_no_usable_tables';
+		delete $ledger{'msg.DataSource.error_no_usable_tables'} if $unusable =~ /\ANo table in /;
+
+		# Berkeley DB's magic number is at byte 12; what follows it is no database.
+		my $bdb = unit_csv('junk.db', ('x' x $BDB_MAGIC_AT) . "\x61\x15\x06\x00" . ('x' x $BDB_MAGIC_AT));
+		message_ok(DataSource => 'error_unsupported_db', $err->(directory => $dir_of->($bdb), table => 'junk'), ['junk']);
+
+		# The backend is what fails here, and only a mock can make it fail on demand.
+		mock('Database::Abstraction::new' => sub { require Carp; Carp::croak('backend down') });
+		my $big = unit_csv('fine.csv', "id,v\n1,2\n");
+		message_ok(DataSource => 'error_backend_init', $err->(directory => $dir_of->($big), table => 'fine'), ['fine', undef]);
+		restore_all();
+
+		mock('Database::Abstraction::new' => sub { require Carp; Carp::croak('no such page') });
+		message_ok(DataSource => 'error_url_fetch', $err->(url => 'http://example.invalid/t.html'), ['http://example.invalid/t.html', undef]);
+		restore_all();
+
+		my $source = $DS->new(directory => $DATA_DIR, table => $SALES_TABLE);
+		{
+			mock('Database::Abstraction::selectall_hashref' => sub { require Carp; Carp::croak('read failed') });
+			my $ok = eval { $source->fetch_all; 1 };
+			restore_all();
+			message_ok(DataSource => 'error_fetch_failed', $ok ? '' : without_location("$@"), [$SALES_TABLE, undef]);
+		}
+		my @warned;
+		{
+			local $SIG{__WARN__} = sub { push @warned, without_location($_[0]) };
+			mock('Database::Abstraction::selectall_hashref' => sub { [] });
+			$source->fetch_all;
+			restore_all();
+			mock('Database::Abstraction::selectall_hashref' => sub { { 1 => { a => 1 } } });
+			$source->fetch_all;
+			restore_all();
+		}
+		my ($empty) = grep { /no records/ } @warned;
+		message_ok(DataSource => 'warn_empty_result', $empty, [$SALES_TABLE]);
+		my ($normal) = grep { /hashref/ } @warned;
+		message_ok(DataSource => 'warn_data_normalised', $normal, [$SALES_TABLE]);
+	};
+
+	subtest 'Geocode -- every message, and the shared cache' => sub {
+		my $G    = 'Database::BI::Model::Geocode';
+		my $good = Unit::Geocoder->new(results => { Paris => Unit::GeoPoint->new({ latitude => 48, longitude => 2, database => 'x' }) });
+		my $geo  = $G->new(geocoder => $good);
+		my $err  = sub { my ($code) = @_; my $ok = eval { $code->(); 1 }; $ok ? '' : without_location("$@") };
+
+		message_ok(Geocode => 'error_geocoder_interface', $err->(sub { $G->new(geocoder => Unit::GeoBroken->new) }), ['geocode_many()', undef]);
+		message_ok(Geocode => 'error_values_arrayref', $err->(sub { $geo->resolve_values('x') }), ['x']);
+		message_ok(Geocode => 'error_rows_arrayref', $err->(sub { $geo->resolve_column('x', 'c') }), ['x']);
+		message_ok(Geocode => 'error_column_required', $err->(sub { $geo->resolve_column([], '') }));
+		message_ok(Geocode => 'error_map_loc_column', $err->(sub { $geo->resolve_column([ { a => 1 } ], 'nope') }), ['nope']);
+		message_ok(Geocode => 'error_max_invalid', $err->(sub { $geo->resolve_values(['Paris'], max => 0) }), ['0']);
+		message_ok(Geocode => 'error_max_invalid', $err->(sub { $geo->resolve_values(['Paris'], max => 'all') }), ['all']);
+
+		my $missing = $G->new(min_geocoder_version => '9999');
+		my (undef, $why) = $missing->geocoder_available;
+		message_ok(Geocode => 'error_map_geocoder_missing', ref $why ? $why->{text} : $why, ['9999', undef]);
+
+		my $messages = sub {
+			my ($result) = @_;
+			return join "\n", map { ref $_ ? $_->{text} : $_ } @{ $result->{messages} // [] };
+		};
+		my $res = $geo->resolve_column([ { c => 'Paris' }, { c => '' }, { c => '12' } ], 'c');
+		my %by  = map { $_->{key} => $_->{text} } grep { ref } @{ $res->{messages} // [] };
+		message_ok(Geocode => 'warn_map_rows_skipped', $by{warn_map_rows_skipped}, [1, 3, 2]);
+
+		my $many = Unit::Geocoder->new;
+		my $capped = $G->new(geocoder => $many)->resolve_values([qw(A B)], max => $CAPPED);
+		%by = map { $_->{key} => $_->{text} } grep { ref } @{ $capped->{messages} // [] };
+		message_ok(Geocode => 'warn_map_geocode_capped', $by{warn_map_geocode_capped}, [1, 2]);
+
+		{
+			local $ENV{OPENADDR_HOME};
+			delete $ENV{OPENADDR_HOME};
+			my $text = '';
+			mock('Database::BI::Model::Geocode::_load_geocoder' => sub { Unit::Geocoder->new }) if $G->can('_load_geocoder');
+			my $nodata = $G->new;
+			my $r = eval { $nodata->resolve_values(['Paris']) };
+			restore_all();
+			%by = map { $_->{key} => $_->{text} } grep { ref } @{ ($r // {})->{messages} // [] };
+			message_ok(Geocode => 'warn_map_geocoder_unavailable_data', $by{warn_map_geocoder_unavailable_data}, []) if $by{warn_map_geocoder_unavailable_data};
+		}
+
+		is_deeply $G->shared_cache_from_models({ geo => { '_shared' => {} } }) // {}, {}, 'an empty store';
+		is_deeply $G->shared_cache_from_models('x'), {}, 'a store that is not a hash';
+		is_deeply $G->shared_cache_from_models(undef), {}, 'no store';
+		my $merged = $G->models_with_shared_cache({ other => 1 }, { Paris => [ 48, 2 ] });
+		is $merged->{other}, 1, 'models_with_shared_cache keeps what was there';
+		is_deeply $G->shared_cache_from_models($merged), { Paris => [ 48, 2 ] }, 'and the cache comes back out';
+		delete @ledger{qw(api.Geocode.shared_cache_from_models api.Geocode.models_with_shared_cache)};
+	};
+
+	subtest 'Database::BI.startup -- what it documents having done' => sub {
+		my $tm = unit_app();
+		is $tm->app->max_request_size, 50 * 1024 * 1024, 'a 50 MiB limit on request bodies';
+		ok $tm->app->renderer->handlers->{tt}, 'Template Toolkit is registered as tt';
+		my $fresh = Test::Mojo->new('Database::BI', { model_dir => tempdir(CLEANUP => 1) });
+		is $fresh->app->config('platform') // 'web', 'web', 'platform defaults to web';
+		is $fresh->app->config('language') // 'en', 'en', 'language defaults to en';
+		like $fresh->get_ok('/tutorial')->tx->res->body, qr/<html/i, 'and routes are in place';
+		delete $ledger{'api.BI.startup'};
+	};
+
+	# Why: every function here is called from inside request handling and from scripts
+	# that may hold a timer or be reading $@ and $! themselves.
+	subtest 'public functions leave the caller its globals and its alarm' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my @calls = (
+			[ 'Util::urlencode'      => sub { Database::BI::Util::urlencode('a b') } ],
+			[ 'Util::parse_number'   => sub { Database::BI::Util::parse_number('$5') } ],
+			[ 'Calc::new'            => sub { Database::BI::Calc->new(expr => 'a+1', columns => ['a']) } ],
+			[ 'Calc::new (bad)'      => sub { Database::BI::Calc->new(expr => 'nope', columns => []) } ],
+			[ 'Calc::evaluate'       => sub { Database::BI::Calc->new(expr => 'a/0', columns => ['a'])->evaluate({ a => 1 }) } ],
+			[ 'Calc::span_interval'  => sub { Database::BI::Calc::span_interval('1h') } ],
+			[ 'Calc::date_normalise' => sub { Database::BI::Calc::date_normalise('01/15/2026', '%m/%d/%Y') } ],
+			[ 'Extract::get'         => sub { Database::BI::Extract->new(model_dir => $dir)->get($SPEC, 1, 1) } ],
+			[ 'Extract::put'         => sub { Database::BI::Extract->new(model_dir => $dir)->put($SPEC, 1, 1, 'x') } ],
+			[ 'Extract::evict'       => sub { Database::BI::Extract->new(model_dir => $dir)->evict } ],
+			[ 'Ask::infer_column_types' => sub { Database::BI::Ask::infer_column_types([ { a => 1 } ], ['a']) } ],
+			[ 'Ask::ask (no key)'    => sub { Database::BI::Ask::ask(question => 'q') } ],
+			[ 'Insights::compute'    => sub { Database::BI::Insights::compute(records => [ map { { a => $_ } } 1 .. 9, 500 ], columns => ['a']) } ],
+			[ 'Insights::method_note' => sub { Database::BI::Insights::method_note('iqr_fence') } ],
+			[ 'Summary::generate'    => sub { Database::BI::Summary::generate(insights => [], label => 'x') } ],
+			[ 'Tutorial::chapters'   => sub { Database::BI::Tutorial->chapters } ],
+			[ 'Geocode::cache_from_models' => sub { Database::BI::Model::Geocode->cache_from_models({}, $SPEC) } ],
+			[ 'Geocode::resolve_values' => sub { Database::BI::Model::Geocode->new(geocoder => Unit::Geocoder->new)->resolve_values(['Paris']) } ],
+			[ 'DataSource::new'       => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE) } ],
+			[ 'DataSource::fetch_all' => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->fetch_all } ],
+			[ 'DataSource::count'     => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->count } ],
+			[ 'DataSource::columns'   => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->columns } ],
+			[ 'DataSource::schema'    => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->schema } ],
+			[ 'DataSource::updated'   => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->updated } ],
+		);
+		# Windows runs an alarm, but alarm(0) there always answers 0.
+		alarm($ALARM_SECS);
+		my $alarm_reports = alarm(0) > 0;
+		for my $case (@calls) {
+			my ($name, $code) = @$case;
+			local $_  = 'caller topic';
+			local $@  = 'caller error';
+			local $! = 2;
+			my $errno = $! + 0;
+			alarm($ALARM_SECS);
+			$code->();
+			my $left = alarm(0);
+			is $_, 'caller topic', "$name keeps \$_";
+			is $@, 'caller error', "$name keeps \$\@";
+			is $! + 0, $errno, "$name keeps \$!";
+			cmp_ok $left, '>', $ALARM_SECS - 10, "$name leaves the alarm running" if $alarm_reports;
+		}
+		delete $ledger{'api.Globals'};
+	};
+
+	subtest 'analyses_* -- the documented bodies and codes' => sub {
+		my $tm  = unit_app();
+		my %doc = (name => 'First', datasets => [ { spec => $SPEC } ]);
+
+		$tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses', []);
+		delete $ledger{'api.analyses.list'};
+
+		$tm->post_ok('/api/analyses' => json => \%doc)->status_is(201)->json_is('/created', 1);
+		my $id = $tm->tx->res->json->{id};
+		like $id, qr/\A[A-Za-z0-9]+\z/, 'an id';
+		$tm->post_ok('/api/analyses' => { 'Content-Type' => 'application/json' } => 'not json')->status_is(400);
+		message_ok(Dashboard => 'error_analysis_json', $tm->tx->res->json->{error}, [undef]);
+		$tm->post_ok('/api/analyses' => json => { name => 'n' })->status_is(400);
+		message_ok(Dashboard => 'error_analysis_invalid', $tm->tx->res->json->{error}, ['Missing required field: datasets']);
+		$tm->post_ok('/api/analyses' => json => { %doc, version => 2 })->status_is(400);
+		like $tm->tx->res->json->{error}, qr/\QUnsupported analysis version 2; please upgrade the application\E/, 'a newer version';
+		delete $ledger{'msg.Dashboard.error_analysis_version'};
+		delete $ledger{'api.analyses.create'};
+
+		$tm->get_ok("/api/analyses/$id")->status_is(200)->json_is('/name', 'First');
+		$tm->get_ok('/api/analyses/a-b')->status_is(400);
+		message_ok(Dashboard => 'error_analysis_id_invalid', $tm->tx->res->json->{error});
+		$tm->get_ok('/api/analyses/nosuch')->status_is(404);
+		message_ok(Dashboard => 'error_analysis_not_found', $tm->tx->res->json->{error}, ['nosuch']);
+		delete $ledger{'api.analyses.get'};
+
+		$tm->put_ok("/api/analyses/$id" => json => { %doc, name => 'Second' })->status_is(200)->json_is('/id', $id)->json_is('/updated', 1);
+		$tm->put_ok('/api/analyses/nosuch' => json => \%doc)->status_is(404);
+		$tm->put_ok('/api/analyses/a-b' => json => \%doc)->status_is(400);
+		$tm->put_ok("/api/analyses/$id" => json => {})->status_is(400);
+		delete $ledger{'api.analyses.update'};
+
+		$tm->patch_ok("/api/analyses/$id" => json => { name => 'Third' })->status_is(200)->json_is('/updated', 1);
+		$tm->get_ok("/api/analyses/$id")->json_is('/name', 'Third')->json_is('/datasets/0/spec', $SPEC);
+		$tm->patch_ok('/api/analyses/nosuch' => json => {})->status_is(404);
+		$tm->patch_ok('/api/analyses/a-b' => json => {})->status_is(400);
+		$tm->patch_ok("/api/analyses/$id" => json => { visuals => 'x' })->status_is(400);
+		delete $ledger{'api.analyses.patch'};
+
+		# The POD says unknown keys are dropped on write, with no exception for any verb.
+		$tm->post_ok('/api/analyses' => json => { %doc, junk => 1 });
+		my $with_junk = $tm->tx->res->json->{id};
+		$tm->get_ok("/api/analyses/$with_junk")->json_hasnt('/junk', 'POST drops an unknown key');
+		$tm->put_ok("/api/analyses/$with_junk" => json => { %doc, junk => 1 });
+		$tm->get_ok("/api/analyses/$with_junk")->json_hasnt('/junk', 'PUT drops it');
+		$tm->patch_ok("/api/analyses/$with_junk" => json => { junk => 1 });
+		$tm->get_ok("/api/analyses/$with_junk")->json_hasnt('/junk', 'PATCH drops it');
+		$tm->post_ok('/api/analyses/import' => json => { %doc, junk => 1 });
+		$tm->get_ok('/api/analyses/' . $tm->tx->res->json->{id})->json_hasnt('/junk', 'import drops it');
+		delete $ledger{'api.analyses.unknown_keys'};
+
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', encode => { cat => 'region', value => 'amount' } })->status_is(201);
+		ok defined $tm->tx->res->json->{visual}, 'the new visual index';
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'nosuch' })->status_is(400)->json_is('/error', 'Unsupported visual kind');
+		$tm->post_ok('/api/analyses/nosuch/visuals' => json => { kind => 'bar' })->status_is(404);
+		$tm->post_ok('/api/analyses/a-b/visuals' => json => { kind => 'bar' })->status_is(400);
+		delete $ledger{'api.analyses.add_visual'};
+
+		# A text card, whose settings are all that can go wrong with it.
+		my $text_error = sub {
+			$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'text', options => { @_ } })->status_is(400);
+			return $tm->tx->res->json->{error};
+		};
+		message_ok(Dashboard => 'error_text_card_empty', $text_error->(text => ' '));
+		message_ok(Dashboard => 'error_text_card_long', $text_error->(text => 'x' x 20_001), [20_000]);
+		message_ok(Dashboard => 'error_text_card_font', $text_error->(text => 'x', font => 'nosuch'));
+		message_ok(Dashboard => 'error_text_card_size', $text_error->(text => 'x', size => 1), [8, 96]);
+		message_ok(Dashboard => 'error_text_card_colour', $text_error->(text => 'x', colour => 'red'));
+		message_ok(Dashboard => 'error_text_card_align', $text_error->(text => 'x', align => 'up'));
+
+		$tm->delete_ok("/api/analyses/$id/visuals/0")->status_is(400);
+		message_ok(Dashboard => 'error_visual_not_text', $tm->tx->res->json->{error});
+
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'text', options => { text => 'x' } })->status_is(201);
+		my $text_at = $tm->tx->res->json->{visual};
+		$tm->patch_ok("/api/analyses/$id/visuals/$text_at" => json => {})->status_is(400);
+		message_ok(Dashboard => 'error_text_card_options', $tm->tx->res->json->{error});
+		$tm->patch_ok("/api/analyses/$id/visuals/$text_at" => json => { encode => {} })->status_is(400);
+		message_ok(Dashboard => 'error_text_card_columns', $tm->tx->res->json->{error});
+		$tm->get_ok("/a/$id/visual/$text_at/csv")->status_is(404);
+		message_ok(Dashboard => 'error_text_card_no_data', $tm->tx->res->body);
+		$tm->delete_ok("/api/analyses/$id/visuals/$text_at")->status_is(200);
+
+		$tm->patch_ok("/api/analyses/$id/visuals/0" => json => { encode => { cat => 'product', value => 'amount' } })->status_is(200);
+		$tm->patch_ok("/api/analyses/$id/visuals/9" => json => { encode => {} })->status_is(404)->json_is('/error', 'No visual at index 9');
+		$tm->patch_ok("/api/analyses/$id/visuals/x" => json => { encode => {} })->status_is(400)->json_is('/error', 'Visual index must be a number');
+		$tm->patch_ok("/api/analyses/$id/visuals/0" => json => {})->status_is(400)->json_is('/error', 'encode or cross_row must be given');
+		$tm->patch_ok('/api/analyses/nosuch/visuals/0' => json => {})->status_is(404);
+		delete $ledger{'api.analyses.update_visual'};
+
+		my $export = $tm->get_ok("/api/analyses/$id/export")->status_is(200)
+			->header_like('Content-Disposition', qr/analysis-\Q$id\E\.json/)->tx->res->json;
+		is $export->{name}, 'Third', 'the export is the document';
+		$tm->get_ok('/api/analyses/a-b/export')->status_is(400);
+		$tm->get_ok('/api/analyses/nosuch/export')->status_is(404);
+		delete $ledger{'api.analyses.export'};
+
+		$tm->post_ok('/api/analyses/import' => json => $export)->status_is(201)->json_is('/imported', 1);
+		isnt $tm->tx->res->json->{id}, $id, 'import creates a new id';
+		$tm->post_ok('/api/analyses/import' => { 'Content-Type' => 'application/json' } => '[1]')->status_is(400);
+		delete $ledger{'api.analyses.import'};
+
+		# A parameter's checks surface through the same route, and are reported as such.
+		$tm->post_ok('/api/analyses' => json => { %doc, params => { a => { type => 'number', min => 1, max => 5, default => 2 } } });
+		my $with_param = $tm->tx->res->json->{id};
+		my %card = (kind => 'bar', encode => { cat => 'region', value => 'amount' });
+		$tm->post_ok("/api/analyses/$with_param/visuals" => json => { %card, query => 'p.a=x' })->status_is(400);
+		message_ok(Dashboard => 'error_param_type', $tm->tx->res->json->{error}, ['a']);
+		$tm->post_ok("/api/analyses/$with_param/visuals" => json => { %card, query => 'p.a=9' })->status_is(400);
+		message_ok(Dashboard => 'error_param_range', $tm->tx->res->json->{error}, ['a', 1, 5]);
+
+		$tm->delete_ok("/api/analyses/$id")->status_is(200)->json_is('/deleted', 1);
+		$tm->delete_ok("/api/analyses/$id")->status_is(404);
+		$tm->delete_ok('/api/analyses/a-b')->status_is(400);
+		delete $ledger{'api.analyses.delete'};
+	};
+
+	# Why: the POD says every write answers 503 when the store is not writable.  The
+	# routes that only checked at the top used to say "saved" over a failed write.
+	subtest 'analyses_* -- every write answers 503 when the store cannot take it' => sub {
+		my $tm  = unit_app();
+		my %doc = (name => 'n', datasets => [ { spec => $SPEC } ], visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ]);
+		my $id  = $tm->post_ok('/api/analyses' => json => \%doc)->tx->res->json->{id};
+
+		mock('Database::BI::Controller::Dashboard::_write_analyses' => sub { 0 });
+		my %card = (kind => 'bar', encode => { cat => 'product', value => 'amount' });
+		for my $call (
+			[ put_ok    => "/api/analyses/$id", json => \%doc ],
+			[ patch_ok  => "/api/analyses/$id", json => { name => 'x' } ],
+			[ post_ok   => "/api/analyses/$id/visuals", json => \%card ],
+			[ patch_ok  => "/api/analyses/$id/visuals/0", json => { encode => $card{encode} } ],
+			[ post_ok   => '/api/analyses', json => \%doc ],
+			[ post_ok   => '/api/analyses/import', json => \%doc ],
+			[ delete_ok => "/api/analyses/$id" ],
+		) {
+			my ($method, @args) = @$call;
+			$tm->$method(@args)->status_is(503, "$method $args[0]");
+			message_ok(Dashboard => 'error_analysis_storage', $tm->tx->res->json->{error});
+		}
+		restore_all();
+		$tm->get_ok("/api/analyses/$id")->status_is(200, 'and the document is still there');
+		delete $ledger{'api.analyses.storage_503'};
+	};
+
+	subtest 'share, embed, visual download' => sub {
+		my $tm = unit_app();
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'Shared', datasets => [ { spec => $SPEC } ],
+			visuals => [ { kind => 'bar', title => 'By region', encode => { cat => 'region', value => 'amount' } } ],
+		})->tx->res->json->{id};
+		my $none = $tm->post_ok('/api/analyses' => json => { name => 'Empty', datasets => [ { spec => $SPEC } ] })->tx->res->json->{id};
+
+		my $share = $tm->post_ok("/api/analyses/$id/share")->status_is(200)->tx->res->json;
+		returns_is $share->{token}, { type => 'string' }, 'a token';
+		cmp_ok $share->{expires}, '>', time(), 'that lasts';
+		like $share->{url}, qr{/share/\Q$id\E\?token=}, 'and a link';
+		$tm->post_ok('/api/analyses/a-b/share')->status_is(400);
+		$tm->post_ok('/api/analyses/nosuch/share')->status_is(404);
+
+		my $none_token = $tm->post_ok("/api/analyses/$none/share")->tx->res->json->{token};
+		for my $route (qw(share embed)) {
+			$tm->get_ok("/$route/$id?token=$share->{token}")->status_is(200)->content_type_like(qr{\Atext/html});
+			$tm->get_ok("/$route/a-b?token=x")->status_is(400);
+			$tm->get_ok("/$route/$id")->status_is(401);
+			message_ok(Dashboard => 'error_token_missing', $tm->tx->res->body);
+			$tm->get_ok("/$route/$id?token=junk")->status_is(403);
+			message_ok(Dashboard => 'error_token_invalid', $tm->tx->res->body);
+			$tm->get_ok("/$route/$none?token=$none_token")->status_is(404)->content_is('This shared analysis has no visuals');
+		}
+		delete $ledger{'api.share.share'} ;
+
+		# Why: an embed is a page of charts in an iframe.  This drew the frame and threw
+		# the charts away, so what it documents is what has to be on the page.
+		my $embed = $tm->get_ok("/embed/$id?token=$share->{token}")->tx->res;
+		like $embed->body, qr/id="vis-0|<svg|d3\./, 'the embed draws the chart';
+		like $embed->body, qr/By region/, 'under its title';
+		like $embed->body, qr/<script src="[^"]*d3/, 'and loads what draws it';
+		unlike $embed->body, qr/No visuals to display/, 'rather than saying there is nothing';
+		is $embed->headers->header('X-Frame-Options'), 'SAMEORIGIN', 'embedding is opt-in';
+		delete $ledger{'api.share.embed'};
+
+		$tm->get_ok("/a/$id/visual/0/csv")->status_is(200)->content_like(qr/\Aid,product,region/)
+			->header_like('Content-Disposition', qr/visual-0\.csv/);
+		$tm->get_ok("/a/$id/visual/0/png")->status_is(501);
+		$tm->get_ok("/a/$id/visual/0/exe")->status_is(400)->content_is('Format must be csv or png');
+		$tm->get_ok("/a/$id/visual/x/csv")->status_is(400)->content_is('Visual index must be a non-negative integer');
+		$tm->get_ok("/a/$id/visual/9/csv")->status_is(404)->content_is('Visual 9 not found');
+		$tm->get_ok('/a/nosuch/visual/0/csv')->status_is(404);
+		delete $ledger{'api.share.visual_download'};
+	};
+
+	subtest 'calc, groups, dates and geo stores' => sub {
+		my $tm = unit_app();
+		my $l  = "l=$SPEC";
+
+		$tm->get_ok('/calc/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/calc/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/calc/delete')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok("/calc/save?$l&name=1bad&expr=1")->status_is(400);
+		message_ok(Dashboard => 'error_calc_name', $tm->tx->res->json->{error}, ['1bad']);
+		$tm->post_ok("/calc/save?$l&name=x")->status_is(400)->json_is('/error', 'expr= required');
+		$tm->post_ok("/calc/save?$l&name=x&expr=1")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/calc/list?$l")->status_is(200)->json_is('/fields/x', '1');
+		$tm->post_ok("/calc/delete?$l&name=x")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/calc/list?$l")->json_is('/fields', {});
+		delete $ledger{'api.crud.calc'};
+
+		$tm->get_ok('/groups/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/groups/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/groups/delete')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok("/groups/save?$l")->status_is(400)->json_is('/error', 'col= required');
+		$tm->post_ok("/groups/save?$l&col=region")->status_is(400)->json_is('/error', 'group= required');
+
+		# Why: this is the form the panel posts and the POD documents, one values= with a
+		# line for each.  Stored whole, it was a single value that no row could ever equal.
+		$tm->post_ok("/groups/save?$l&col=region" => form => { group => 'Top', values => "North\nSouth" })->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/groups/list?$l")->json_is('/groups/region/Top', [qw(North South)]);
+		$tm->post_ok("/groups/save?$l&col=region&group=Rep&values=East&values=West")->status_is(200);
+		$tm->get_ok("/groups/list?$l")->json_is('/groups/region/Rep', [qw(East West)], 'a repeated parameter too');
+		my $rows = $tm->get_ok("/export?$l&format=json")->tx->res->json;
+		my ($north) = grep { $_->{region} eq 'North' } @$rows;
+		is $north->{region_group}, 'Top', 'and a row really lands in its group';
+		$tm->post_ok("/groups/delete?$l&col=region&group=Top")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/groups/list?$l")->json_hasnt('/groups/region/Top');
+		$tm->post_ok("/groups/delete?$l&col=region")->status_is(200);
+		$tm->get_ok("/groups/list?$l")->json_hasnt('/groups/region');
+		$tm->post_ok("/groups/delete?$l")->status_is(200);
+		delete $ledger{'api.crud.groups'};
+
+		$tm->get_ok('/dates/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/dates/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/dates/delete')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok("/dates/save?$l")->status_is(400)->json_is('/error', 'col= required');
+		$tm->post_ok("/dates/save?$l&col=d&pattern=nope")->status_is(400);
+		message_ok(Dashboard => 'error_date_pattern', $tm->tx->res->json->{error}, ['nope']);
+		my $us = Mojo::Util::url_escape('%m/%d/%Y');
+		$tm->post_ok("/dates/save?$l&col=d&pattern=$us&time=nope")->status_is(400);
+		message_ok(Dashboard => 'error_date_time_pattern', $tm->tx->res->json->{error}, ['nope']);
+		$tm->post_ok("/dates/save?$l&col=d&pattern=$us&as=nope")->status_is(400);
+		message_ok(Dashboard => 'error_date_as', $tm->tx->res->json->{error}, ['nope']);
+		$tm->post_ok("/dates/save?$l&col=d&pattern=$us")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/dates/list?$l")->json_is('/patterns/d', '%m/%d/%Y');
+		$tm->post_ok("/dates/save?$l&col=t&pattern=$us&as=timestamp")->status_is(200);
+		$tm->get_ok("/dates/list?$l")->json_is('/patterns/t/as', 'timestamp');
+		$tm->post_ok("/dates/delete?$l&col=d")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/dates/list?$l")->json_hasnt('/patterns/d');
+		$tm->post_ok("/dates/delete?$l")->status_is(200);
+		$tm->get_ok("/dates/list?$l")->json_is('/patterns', {});
+		delete $ledger{'api.crud.dates'};
+
+		$tm->get_ok('/geo/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/geo/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/geo/delete')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok("/geo/save?$l")->status_is(400)->json_is('/error', 'col= required');
+		$tm->post_ok("/geo/save?$l&col=c&kind=evil")->status_is(400)->json_is('/error', 'kind must be lat, lon, or location');
+		$tm->post_ok("/geo/save?$l&col=c&kind=$_")->status_is(200)->json_is('/ok', 1) for qw(lat lon location);
+		$tm->get_ok("/geo/list?$l")->json_is('/columns/c/kind', 'location');
+		$tm->post_ok("/geo/delete?$l&col=c")->status_is(200)->json_is('/ok', 1);
+		$tm->post_ok("/geo/save?$l&col=d&kind=lat");
+		$tm->post_ok("/geo/delete?$l")->status_is(200);
+		$tm->get_ok("/geo/list?$l")->json_is('/columns', {});
+		delete $ledger{'api.crud.geo'};
+	};
+
+	subtest 'the routes t/unit.t had not reached' => sub {
+		my $tm = unit_app();
+		$tm->get_ok('/')->status_is(200);
+		delete $ledger{'api.route.index'};
+		$tm->get_ok('/tutorial')->status_is(200)->content_type_like(qr{\Atext/html});
+		delete $ledger{'api.route.tutorial'};
+		$tm->get_ok('/catalog')->status_is(200)->content_like(qr/sales\.csv/);
+		delete $ledger{'api.route.catalog'};
+
+		$tm->get_ok('/api/range')->status_is(400)->json_is('/error', 'l required');
+		$tm->get_ok("/api/range?l=$SPEC")->status_is(400)->json_is('/error', 'col required');
+		$tm->get_ok("/api/range?l=$SPEC&col=sale_date")->status_is(200)->json_like('/min', qr/\A\d{4}-\d{2}-\d{2}\z/)->json_like('/max', qr/\A\d{4}-\d{2}-\d{2}\z/);
+		$tm->get_ok("/api/range?l=$SPEC&col=region")->status_is(200)->json_is('/min', undef)->json_is('/max', undef);
+		delete $ledger{'api.route.range'};
+
+		my $db = unit_sqlite('many.sqlite', 'CREATE TABLE alpha (id INTEGER)', 'CREATE TABLE beta (id INTEGER)');
+		$tm->get_ok('/tables?l=' . Mojo::Util::url_escape("path:$db"))->status_is(200)->content_like(qr/alpha/)->content_like(qr/beta/);
+		delete $ledger{'api.route.tables'};
+
+		$tm->get_ok("/wordcloud?l=$SPEC&col=product")->status_is(200)->content_like(qr/Widget|widget/);
+		$tm->get_ok("/wordcloud?l=$SPEC")->status_is(400);
+		delete $ledger{'api.route.wordcloud'};
+
+		$tm->get_ok("/stats?l=$SPEC&p=abc")->status_is(400);
+		message_ok(Dashboard => 'error_stats_percentile', $tm->tx->res->body, ['abc']);
+		$tm->get_ok("/stats?l=$SPEC&p=101")->status_is(400);
+		message_ok(Dashboard => 'error_stats_percentile', $tm->tx->res->body, ['101']);
+		$tm->get_ok("/stats?l=$SPEC&p=50")->status_is(200);
+		delete $ledger{'api.route.stats_percentile'};
+	};
+
+	# Each row is one message: the request that must raise it, the code it must be
+	# answered with, and the parameters that fill in the template.
+	subtest 'every message a plain request can raise' => sub {
+		my $tm = unit_app();
+		my $e  = \&Mojo::Util::url_escape;
+		my @table = (
+			[ error_range_name   => "/export?l=$SPEC&range=nope", ['nope', undef] ],
+			[ error_range_column => "/export?l=$SPEC&range=today" ],
+			[ error_span_interval     => "/export?l=$SPEC&span=nope&tcol=region", ['nope'] ],
+			[ error_span_no_column    => "/export?l=$SPEC&span=1d" ],
+			[ error_span_tcol_orphan  => "/export?l=$SPEC&tcol=region", ['region'] ],
+			[ error_span_tcol_unknown => "/export?l=$SPEC&span=1d&tcol=nope", ['nope'] ],
+			[ error_span_conflict     => "/export?l=$SPEC&span=1d&tcol=region&as=z&c=z:1", ['z'] ],
+			[ error_span_name         => "/export?l=$SPEC&span=1d&tcol=region&as=1bad", ['1bad'] ],
+			[ error_cs_spec      => "/export?l=$SPEC&cs=x", ['x'] ],
+			[ error_cs_column    => "/export?l=$SPEC&cs=nope:rank:r", ['nope:rank:r', 'nope'] ],
+			[ error_cs_fn        => "/export?l=$SPEC&cs=amount:evil:r", ['evil', undef] ],
+			[ error_cs_alias     => "/export?l=$SPEC&cs=amount:rank:1bad", ['1bad'] ],
+			[ error_cs_conflict  => "/export?l=$SPEC&cs=amount:rank:region", ['region'] ],
+			[ error_cs_arg       => "/export?l=$SPEC&cs=amount:window_sum:w&order=id", ['amount:window_sum:w', 'window_sum', 'amount', 'window_sum'] ],
+			[ error_cs_no_arg    => "/export?l=$SPEC&cs=amount:rank:r:5", ['amount:rank:r:5', 'rank'] ],
+			[ error_cs_by        => "/export?l=$SPEC&cs=amount:rank:r&by=nope", ['nope', 'nope'] ],
+			[ error_cs_order     => "/export?l=$SPEC&cs=amount:rank:r&order=id:sideways", ['id:sideways'] ],
+			[ error_cs_order_col => "/export?l=$SPEC&cs=amount:rank:r&order=nope", ['nope', 'nope'] ],
+			[ error_cs_order_need => "/export?l=$SPEC&cs=amount:running_total:t", ['amount:running_total:t', 'running_total'] ],
+			[ error_calc_compile => "/export?l=$SPEC&c=" . $e->('z:nope'), ['z', undef] ],
+			[ error_agg_fn       => "/graph?l=$SPEC&x=sale_date&y=amount&agg=evil", ['evil', undef] ],
+			[ error_pivot_rows_required   => "/pivot?l=$SPEC" ],
+			[ error_pivot_measure_req     => "/pivot?l=$SPEC&rows=region" ],
+			[ error_pivot_measure_invalid => "/pivot?l=$SPEC&rows=region&m=bad", ['bad', undef] ],
+			[ error_measure_column        => "/pivot?l=$SPEC&rows=region&m=nope:sum:t", ['nope'] ],
+			[ error_pivot_dim_not_found   => "/pivot?l=$SPEC&rows=nope&m=amount:sum:t", ['nope'] ],
+			[ error_topn_col => "/pivot?l=$SPEC&rows=region&m=amount:sum:t&topn=1&topn_col=nope", ['nope'] ],
+			[ error_map_source      => "/map?l=$SPEC" ],
+			[ error_map_coordinates => "/map?l=$SPEC&lat=id" ],
+			[ error_map_tiles_unknown => "/map?l=$SPEC&lat=id&lon=id&tiles=nope", ['nope'] ],
+			[ error_map_coordinate_numeric => "/map?l=$SPEC&lat=region&lon=product", ['region', 'product'] ],
+		);
+		for my $row (@table) {
+			my ($key, $url, $args) = @$row;
+			$tm->get_ok($url)->status_is(400, $key);
+			my $body = $tm->tx->res->body;
+			$body = without_location($body);
+			message_ok(Dashboard => $key, $body, $args);
+		}
+
+		# Reached with data of a particular shape.
+		my $out = unit_csv('out.csv', "id,lat,lon\n1,200,10\n2,300,20\n");
+		$tm->get_ok('/map?l=' . $e->("path:$out") . '&lat=lat&lon=lon')->status_is(400);
+		message_ok(Dashboard => 'error_map_coordinate_range', $tm->tx->res->body, ['lat', 'latitude']);
+
+		$tm->get_ok('/view/nosuch_table')->status_is(404);
+		message_ok(Dashboard => 'error_table_missing', $tm->tx->res->body, ['nosuch_table'], 1);
+
+		$tm->get_ok('/api/stat')->status_is(400);
+		message_ok(Dashboard => 'error_path_required', $tm->tx->res->json->{error});
+		$tm->post_ok("/export?l=$SPEC&dir=/no/such/dir&filename=x.csv")->status_is(404);
+		message_ok(Dashboard => 'error_dir_not_found', $tm->tx->res->json->{error}, ['/no/such/dir']);
+		my $outdir = tempdir(CLEANUP => 1);
+		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.txt')->status_is(415);
+		message_ok(Dashboard => 'error_ext_required', $tm->tx->res->json->{error});
+
+		$tm->get_ok('/import')->status_is(200);
+		message_ok(Dashboard => 'error_url_required', $tm->tx->res->body, [], 1);
+		$tm->get_ok('/import?url=' . $e->('ftp://x/y'))->status_is(200);
+		message_ok(Dashboard => 'error_url_invalid', $tm->tx->res->body, ['ftp://x/y'], 1);
+		$tm->get_ok('/import?url=' . $e->('http://192.168.1.1/'))->status_is(200);
+		message_ok(Dashboard => 'error_url_ssrf', $tm->tx->res->body, ['http://192.168.1.1/'], 1);
+
+		$tm->post_ok('/upload')->status_is(400);
+		message_ok(Dashboard => 'error_upload_none', $tm->tx->res->json->{error});
+		$tm->post_ok('/upload' => form => { file => { content => 'x', filename => 'x.exe' } })->status_is(415);
+		message_ok(Dashboard => 'error_upload_ext', $tm->tx->res->json->{error});
+		# The size is what is mocked, not the body.  A really oversized body has the
+		# server answer and close while the client still writes, which on Windows can
+		# lose the answer; the subtest for POST /upload above sends a real one.
+		mock('Mojo::Upload::size' => sub { 51 * 1024 * 1024 });
+		$tm->post_ok('/upload' => form => { file => { content => 'x', filename => 'x.csv' } })->status_is(413);
+		restore_all();
+		message_ok(Dashboard => 'error_upload_too_large', $tm->tx->res->json->{error}, [undef]);
+	};
+
+	subtest 'the lookup store and its messages' => sub {
+		my $tm   = unit_app();
+		my $data = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir} = $data;
+		my $put = sub { Mojo::File->new($data, $_[0])->spew($_[1]) };
+		$put->('orders.csv', "id,shop,region,shops_region\n1,A,x,y\n");
+		$put->('shops.csv', "code,city,region\nA,Here,North\nA,There,South\n");
+		$put->('odd.csv', "a b,c d\nx y,z w\n");
+		my $outside = unit_csv('far.csv', "code,city\nA,Far\n");
+		open my $fh, '>', "$data/huge.csv" or BAIL_OUT("huge.csv: $!");
+		truncate $fh, 9 * 1_048_576;
+		close $fh;
+
+		my $l    = 'l=table:orders';
+		my $save = sub {
+			$tm->post_ok('/lookups/save' => form => { l => 'table:orders', @_ });
+			return $tm->tx->res->json->{error};
+		};
+
+		$tm->get_ok('/lookups/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/lookups/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/lookups/delete')->status_is(400)->json_is('/error', 'l= required');
+		message_ok(Dashboard => 'error_lookup_name', $save->(name => '9x', file => 'shops.csv', key => 'code'), ['9x']);
+		is $save->(name => 's', file => 'shops.csv'), 'key= required', 'key= is required';
+		message_ok(Dashboard => 'error_lookup_remote', $save->(name => 's', file => 'http://x/y.csv', key => 'code'),
+			['s', 'http://x/y.csv']);
+		message_ok(Dashboard => 'error_lookup_outside', $save->(name => 's', file => $outside, key => 'code'),
+			['s', $outside]);
+		message_ok(Dashboard => 'error_lookup_not_found', $save->(name => 's', file => 'nope.csv', key => 'code'),
+			['s', 'nope.csv']);
+		message_ok(Dashboard => 'error_lookup_too_large', $save->(name => 's', file => 'huge.csv', key => 'code'),
+			['s', 'huge.csv', 9 * 1_048_576, 8 * 1_048_576]);
+		message_ok(Dashboard => 'error_lookup_unreadable', $save->(name => 's', file => 'odd.csv', key => 'code'),
+			['s', 'odd.csv', undef]);
+		message_ok(Dashboard => 'error_lookup_key_unknown', $save->(name => 's', file => 'shops.csv', key => 'nope'),
+			['s', 'nope', 'shops.csv']);
+		message_ok(Dashboard => 'error_lookup_field_unknown',
+			$save->(name => 's', file => 'shops.csv', key => 'code', fields => 'nope'), ['s', 'nope', 'shops.csv']);
+
+		$tm->get_ok("/export?$l&format=json&lk=ghost")->status_is(400);
+		message_ok(Dashboard => 'error_lookup_unknown', $tm->tx->res->text, ['ghost']);
+
+		is $save->(name => 'bycode', file => 'shops.csv', key => 'code', fields => 'city'), undef, 'a lookup saves';
+		$tm->get_ok("/export?$l&format=json")->status_is(400);
+		message_ok(Dashboard => 'error_lookup_col_unknown', $tm->tx->res->text, ['bycode', 'code', 'bycode']);
+		$tm->post_ok("/lookups/delete?$l&name=bycode")->status_is(200)->json_is('/ok', 1);
+
+		# region is the orders' own, and shops_region too, so there is nowhere to put it.
+		is $save->(name => 'shops', file => 'shops.csv', key => 'code', col => 'shop', fields => 'region'), undef,
+			'a lookup whose field has no free name still saves';
+		$tm->get_ok("/export?$l&format=json")->status_is(400);
+		message_ok(Dashboard => 'error_lookup_name_taken', $tm->tx->res->text, ['shops', 'region', 'shops_region']);
+
+		is $save->(name => 'shops', file => 'shops.csv', key => 'code', col => 'shop', fields => 'city'), undef,
+			'and saving it again replaces it';
+		$tm->get_ok("/lookups/list?$l")->json_is('/lookups/shops/fields', ['city']);
+		my @logged;
+		$tm->app->log->level('warn');
+		my $sub = $tm->app->log->on(message => sub { push @logged, $_[2] if $_[1] eq 'warn' });
+		$tm->get_ok("/export?$l&format=json")->status_is(200)->json_is('/0/city', 'Here');
+		$tm->app->log->unsubscribe(message => $sub);
+		$tm->app->log->level('fatal');
+		my ($dup) = grep { /duplicate key/ } @logged;
+		message_ok(Dashboard => 'warn_lookup_duplicate_key', $dup, ['shops', 1, 'shops.csv']);
+
+		$tm->post_ok("/lookups/delete?$l")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/lookups/list?$l")->json_is('/lookups', {});
+		delete $ledger{'api.crud.lookups'};
+	};
+
+	subtest 'Calc.compile_pattern and Calc.capture_of' => sub {
+		my $c = Database::BI::Calc::compile_pattern('^(?<cc>[A-Z]{2})-(\d+)');
+		returns_is $c, { type => 'hashref' }, 'a compiled pattern is a hashref';
+		is_deeply [ $c->{groups}, $c->{names} ], [ 2, ['cc'] ], 'with its group count and names';
+		ok !eval { Database::BI::Calc::compile_pattern('(*FAIL)'); 1 }, 'a refused construct croaks';
+		is Database::BI::Calc::capture_of($c, 'GB-1', 'cc'), 'GB', 'capture_of by name';
+		is Database::BI::Calc::capture_of($c, 'GB-1', 2), '1', 'and by number';
+		is Database::BI::Calc::capture_of($c, 'nope', 1), undef, 'undef on no match';
+		delete $ledger{'api.Calc.compile_pattern'};
+		delete $ledger{'api.Calc.capture_of'};
+	};
+
+	subtest 'the extraction store and its messages' => sub {
+		my $tm   = unit_app();
+		my $data = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir} = $data;
+		Mojo::File->new($data, 'refs.csv')->spew("id,ref,cc\n1,GB-1,x\n");
+		my $l    = 'l=table:refs';
+		my $save = sub {
+			$tm->post_ok('/extract/save' => form => { l => 'table:refs', @_ });
+			return $tm->tx->res->json->{error};
+		};
+
+		$tm->get_ok('/extract/list')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/extract/save')->status_is(400)->json_is('/error', 'l= required');
+		$tm->post_ok('/extract/delete')->status_is(400)->json_is('/error', 'l= required');
+		message_ok(Dashboard => 'error_extract_name', $save->(name => '9x', col => 'ref', pattern => '(?<a>.)'), ['9x']);
+		is $save->(name => 'p', pattern => '(?<a>.)'), 'col= required', 'col= is required';
+		is $save->(name => 'p', col => 'ref'), 'pattern= required', 'pattern= is required';
+		message_ok(Dashboard => 'error_extract_pattern', $save->(name => 'p', col => 'ref', pattern => '(a'), ['p', undef]);
+		message_ok(Dashboard => 'error_extract_no_names', $save->(name => 'p', col => 'ref', pattern => '(a)'), ['p']);
+		message_ok(Dashboard => 'error_extract_field', $save->(name => 'p', col => 'ref', pattern => '(?<a>.)', fields => 'b'),
+			['p', 'b']);
+
+		is $save->(name => 'p', col => 'nope', pattern => '(?<a>.)'), undef, 'an extraction saves';
+		$tm->get_ok("/export?$l&format=json")->status_is(400);
+		message_ok(Dashboard => 'error_extract_col_unknown', $tm->tx->res->text, ['p', 'nope']);
+
+		# cc is a source column, and so is the prefixed name x_cc would need to be:
+		# here it is the extraction's own name that collides.
+		Mojo::File->new($data, 'refs.csv')->spew("id,ref,cc,p_cc\n1,GB-1,x,y\n");
+		is $save->(name => 'p', col => 'ref', pattern => '^(?<cc>[A-Z]+)'), undef, 'and again';
+		$tm->get_ok("/export?$l&format=json")->status_is(400);
+		message_ok(Dashboard => 'error_extract_name_taken', $tm->tx->res->text, ['p', 'cc', 'p_cc']);
+
+		is $save->(name => 'p', col => 'ref', pattern => '^(?<code>[A-Z]+)'), undef, 'a free name';
+		$tm->get_ok("/extract/list?$l")->json_is('/extractions/p/fields', ['code']);
+		$tm->get_ok("/export?$l&format=json")->status_is(200)->json_is('/0/code', 'GB');
+		$tm->post_ok("/extract/delete?$l&name=p")->status_is(200)->json_is('/ok', 1);
+		$tm->post_ok("/extract/delete?$l")->status_is(200)->json_is('/ok', 1);
+		$tm->get_ok("/extract/list?$l")->json_is('/extractions', {});
+		delete $ledger{'api.crud.extract'};
+	};
+
+	subtest 'accelerated datasets and their messages' => sub {
+		plan skip_all => 'DBD::SQLite is not available' unless eval { require DBD::SQLite; 1 };
+		my $tm   = unit_app();
+		my $data = tempdir(CLEANUP => 1);
+		$tm->app->config->{data_dir} = $data;
+		Mojo::File->new($data, 'sales.csv')->spew("id,region,amount\n1,North,10\n");
+		Mojo::File->new($data, 'odd.csv')->spew("a b,c d\nx y,z w\n");
+		my $db = unit_sqlite('lite.sqlite', 'CREATE TABLE lite (id INTEGER)');
+		my $tx  = Mojo::Transaction::HTTP->new;
+		my $c   = Database::BI::Controller::Dashboard->new(app => $tm->app, tx => $tx);
+		my $acc = \&Database::BI::Controller::Dashboard::accelerate;
+		my $err = sub { my ($spec) = @_; eval { $acc->($c, $spec); 1 } ? undef : $@ };
+
+		message_ok(Dashboard => 'error_accel_spec', without_location($err->('url:http://x/y.csv')), ['url:http://x/y.csv']);
+		message_ok(Dashboard => 'error_accel_sqlite', without_location($err->("path:$db")), ["path:$db"]);
+		message_ok(Dashboard => 'error_accel_open', without_location($err->('table:odd')), ['table:odd', undef]);
+
+		my $built = $acc->($c, 'table:sales');
+		returns_is $built, { type => 'hashref' }, 'accelerate returns what it built';
+		is_deeply [ @{$built}{qw(spec rows columns)} ], [ 'table:sales', 1, 3 ], 'the spec, rows and columns';
+		ok -f $built->{path}, 'and the extract is on disc';
+		is_deeply [ Database::BI::Controller::Dashboard::accelerated_specs($c) ], ['table:sales'], 'accelerated_specs lists it';
+		delete $ledger{'api.accel.specs'};
+		delete $ledger{'api.accel.accelerate'};
+
+		my $src = $tm->app->build_controller->open_table(
+			Mojo::File->new($built->{path})->basename =~ s/\.db\z//r,
+			directory => Mojo::File->new($built->{path})->dirname->to_string, column_order => [qw(id region amount)]);
+		is_deeply $src->columns, [qw(id region amount)], 'DataSource gives the column_order it was given';
+		delete $ledger{'api.DataSource.column_order'};
+
+		ok Database::BI::Controller::Dashboard::unaccelerate($c, 'table:sales'), 'unaccelerate says it was';
+		ok !-f $built->{path}, 'and removes the extract';
+		ok !Database::BI::Controller::Dashboard::unaccelerate($c, 'table:sales'), 'and is false the second time';
+		delete $ledger{'api.accel.unaccelerate'};
+
+		$tm->app->config->{model_dir} = File::Spec->catdir($data, 'models');
+		message_ok(Dashboard => 'error_accel_store', without_location($err->('table:sales')), ['table:sales']);
+
+		# A file with nothing in it opens, but has no columns for a SQLite table.
+		$tm->app->config->{model_dir} = tempdir(CLEANUP => 1);
+		Mojo::File->new($data, 'blank.csv')->spew('');
+		message_ok(Dashboard => 'error_accel_build', without_location($err->('table:blank')), ['table:blank', undef]);
+	};
+
+	subtest 'messages that need a collaborator to fail' => sub {
+		my $tm = unit_app();
+		my $e  = \&Mojo::Util::url_escape;
+		my $boom = sub { require Carp; Carp::croak('backend down') };
+
+		mock('Database::BI::Model::DataSource::new' => $boom);
+		$tm->get_ok('/view/sales')->status_is(200);
+		message_ok(Dashboard => 'error_table_open', $tm->tx->res->body, ['sales', undef], 1);
+		$tm->get_ok('/open?path=' . $e->($SALES_CSV))->status_is(200);
+		message_ok(Dashboard => 'error_file_open', $tm->tx->res->body, [undef, undef], 1);
+		restore_all();
+
+		mock('Database::BI::Model::DataSource::new' => $boom);
+		$tm->get_ok('/import?url=' . $e->('http://example.invalid/t.html'))->status_is(200);
+		message_ok(Dashboard => 'error_url_fetch', $tm->tx->res->body, ['http://example.invalid/t.html', undef], 1);
+		restore_all();
+
+		mock('Mojo::File::spurt' => $boom);
+		my $outdir = tempdir(CLEANUP => 1);
+		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.csv')->status_is(500);
+		message_ok(Dashboard => 'error_write_failed', $tm->tx->res->json->{error}, [undef]);
+		restore_all();
+
+		mock('Mojo::Upload::move_to' => $boom);
+		$tm->post_ok('/upload' => form => { file => { content => "a,b\n1,2\n", filename => 'x.csv' } })->status_is(500);
+		message_ok(Dashboard => 'error_upload_save', $tm->tx->res->json->{error});
+		restore_all();
+
+		mock('Mojo::File::list' => $boom);
+		$tm->post_ok('/uploads/clear')->status_is(500);
+		message_ok(Dashboard => 'error_uploads_clear', $tm->tx->res->json->{error});
+		restore_all();
+
+		mock('Database::BI::Controller::Dashboard::_write_sqlite_db' => $boom);
+		$tm->get_ok("/export?l=$SPEC&format=sqlite")->status_is(500);
+		message_ok(Dashboard => 'error_export_sqlite', $tm->tx->res->body);
+		restore_all();
+
+		require LWP::UserAgent;
+		mock('LWP::UserAgent::get' => sub {
+			require HTTP::Response;
+			return HTTP::Response->new(200, 'OK', [ 'Content-Type' => 'application/json' ], '[1,2,3]');
+		});
+		$tm->get_ok('/import?url=' . $e->('http://example.invalid/scalars.json'))->status_is(200);
+		message_ok(DataSource => 'error_rows_not_records', $tm->tx->res->body, [], 1);
+		restore_all();
+
+		my $geo = unit_csv('geo.csv', "id,lat,lon,place\n1,10,20,Paris\n2,x,y,Rome\n3,30,40,Oslo\n");
+		my $l   = 'l=' . $e->("path:$geo");
+		$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
+		message_ok(Dashboard => 'warn_map_coordinate_rows', $tm->tx->res->body, [2, 3, 1], 1);
+		$tm->get_ok("/map?$l&lat=lat&lon=lon&max=$CAPPED")->status_is(200);
+		message_ok(Dashboard => 'warn_map_markers_capped', $tm->tx->res->body, [$CAPPED, 2], 1);
+
+		mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (0, undef) });
+		$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
+		message_ok(Dashboard => 'error_map_renderer_missing', $tm->tx->res->body, [], 1);
+		restore_all();
+		mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (0, '0.01') });
+		$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
+		message_ok(Dashboard => 'error_map_renderer_old', $tm->tx->res->body, ['0.01'], 1);
+		restore_all();
+		{
+			# With the renderer said to be there and failing, whether or not this
+			# machine has it: HTML::OSM is only recommended, and this key is in the ledger.
+			mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (1, '0.12') });
+			no warnings qw(redefine once);
+			local *HTML::OSM::new = $boom;
+			$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
+			message_ok(Dashboard => 'error_map_renderer_failed', $tm->tx->res->body, [], 1);
+			restore_all();
+		}
+
+		$tm->app->config->{geocoder} = Unit::Geocoder->new;
+		$tm->get_ok("/map?$l&loc=place")->status_is(200);
+		message_ok(Dashboard => 'error_map_no_markers', $tm->tx->res->body, [], 1);
+		$tm->get_ok("/map?$l&loc=nope")->status_is(400);
+		message_ok(Dashboard => 'error_map_loc_column', $tm->tx->res->body, ['nope']);
+		delete $tm->app->config->{geocoder};
+
+		# A store of its own: the warning is about a new lookup, and a place the
+		# requests above have asked about is one already answered.
+		my $fresh = unit_app();
+		$fresh->app->config->{geocoder} = Unit::Geocoder->new(results => {
+			Paris => Unit::GeoPoint->new({ latitude => 48, longitude => 2, database => 'x' }),
+		});
+		mock('Database::BI::Controller::Dashboard::_write_models' => sub { 0 });
+		$fresh->get_ok("/map?$l&loc=place")->status_is(200);
+		message_ok(Dashboard => 'warn_map_cache_unwritten', $fresh->tx->res->body, [], 1);
+		restore_all();
+
+		# The AI routes: the provider is the only thing replaced.
+		require HTTP::Response;
+		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(503);
+		message_ok(Dashboard => 'ask_unavailable', $tm->tx->res->json->{error});
+		$tm->app->config->{ai_api_key} = 'k';
+		$tm->post_ok("/api/ask?l=$SPEC")->status_is(400);
+		message_ok(Dashboard => 'ask_no_question', $tm->tx->res->json->{error});
+		my $reply = sub {
+			my ($code, $text) = @_;
+			my $body = Mojo::JSON::encode_json({ content => [ { text => $text } ] });
+			return sub { HTTP::Response->new($code, 'x', ['Content-Type' => 'application/json'], $body) };
+		};
+		mock('LWP::UserAgent::request' => $reply->(500, ''));
+		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(502);
+		message_ok(Dashboard => 'ask_provider_error', $tm->tx->res->json->{error});
+		restore_all();
+		mock('LWP::UserAgent::request' => $reply->(200, 'no json here'));
+		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(422);
+		message_ok(Dashboard => 'ask_unparseable', $tm->tx->res->json->{error});
+		restore_all();
+		mock('LWP::UserAgent::request' => $reply->(200, '{"kind":"bar","title":"T","encode":{"cat":"nope"}}'));
+		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(422);
+		message_ok(Dashboard => 'ask_invalid_spec', $tm->tx->res->json->{error}, ['nope']);
+		restore_all();
+		delete $tm->app->config->{ai_api_key};
+
+		# A canvas older than its data says so.
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'Old', datasets => [ { spec => $SPEC } ],
+			visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ],
+		})->tx->res->json->{id};
+		my $store = Mojo::File->new($tm->app->config->{model_dir})->child('analyses.json');
+		my $all = Mojo::JSON::decode_json($store->slurp);
+		$all->{$id}{updated} = 1;
+		$store->spew(Mojo::JSON::encode_json($all));
+		$tm->get_ok("/a/$id")->status_is(200);
+		message_ok(Dashboard => 'freshness_stale_msg', $tm->tx->res->body, [], 1);
+	};
+
+	# These do not reach the reader: they are said to the operator, as warnings or in
+	# the log, and each must still say exactly what it documents.
+	subtest 'messages said to the operator' => sub {
+		my $tm = unit_app();
+		my $e  = \&Mojo::Util::url_escape;
+		my @warned;
+		local $SIG{__WARN__} = sub { push @warned, without_location($_[0]) };
+
+		$tm->get_ok("/combine?l=$SPEC&sort=amount")->status_is(200);
+		$tm->get_ok("/export?l=$SPEC&sort=nope")->status_is(200);
+		my ($combine) = grep { /Sorting is applied/ } @warned;
+		message_ok(Dashboard => 'warn_combine_sort', $combine);
+		my ($sort) = grep { /Unknown sort column/ } @warned;
+		message_ok(Dashboard => 'error_sort_column', $sort, ['nope']);
+
+		my $db = unit_sqlite('mixed.sqlite', 'CREATE TABLE mixed (id INTEGER, g TEXT, v TEXT)',
+			q{INSERT INTO mixed VALUES (1, 'a', '5')}, q{INSERT INTO mixed VALUES (2, 'a', 'x')});
+		@warned = ();
+		$tm->get_ok('/bar?l=' . $e->("path:$db") . '&cat=g&val=v')->status_is(200);
+		my ($fallback) = grep { /not uniformly numeric/ } @warned;
+		message_ok(Dashboard => 'warn_measure_fallback', $fallback, ['sum', 'v']);
+
+		my @logged;
+		$tm->app->log->level('warn');
+		my $sub = $tm->app->log->on(message => sub { push @logged, $_[2] if $_[1] eq 'warn' });
+		$tm->get_ok("/export?l=$SPEC&c=" . $e->('z:amount/0'))->status_is(200);
+		$tm->app->log->unsubscribe(message => $sub);
+		$tm->app->log->level('fatal');
+		my ($undef_rows) = grep { /returned undef/ } @logged;
+		message_ok(Dashboard => 'warn_calc_undef', $undef_rows, ['z', undef]);
+
+		my $left  = unit_sqlite('lefty.sqlite', 'CREATE TABLE lefty (id INTEGER, v INTEGER)', 'INSERT INTO lefty VALUES (1, 2)');
+		my $right = unit_sqlite('righty.sqlite', 'CREATE TABLE righty (id INTEGER, v TEXT)', q{INSERT INTO righty VALUES (1, 'x')});
+		$tm->get_ok('/export?l=' . $e->("path:$left") . '&j=' . $e->("path:$right|id|id"))->status_is(200);
+		my $hdr = $tm->tx->res->headers->header('X-BI-Warnings') // '';
+		message_ok(Dashboard => 'warn_join_schema_mismatch', $hdr, ['v', 'INTEGER', undef, 'TEXT', undef]);
+	};
+}
+
 # ---------------------------------------------------------------------------
-# Ledger assertion — every documented state must have been exercised.
+# Ledger assertion -- every documented state must have been exercised.
 # ---------------------------------------------------------------------------
 if(my @untested = sort keys %ledger) {
 	for my $key (@untested) {

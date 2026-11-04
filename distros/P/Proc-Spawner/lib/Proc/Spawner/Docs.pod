@@ -1,0 +1,155 @@
+=encoding utf8
+
+=head1 NAME
+
+Proc::Spawner::Docs - a map of the design documents shipped in F<doc/> (EXPERIMENTAL)
+
+=head1 DESCRIPTION
+
+Besides the POD of its modules, the distribution ships its design notes as Markdown files under F<doc/>.
+CPAN tools do not show those files as documentation, so this page lists them, says who wrote each one
+and what it is for, and links to them on MetaCPAN's source browser. The links go to the newest release;
+a C<?raw=1> link shows the file as it is stored.
+
+The notes were written with Claude, at first by two working sessions with their own file prefixes: the
+I<executor session> (prefix C<pspawn->: L<Proc::Spawner>, L<Proc::Spawner::Graph>, L<Proc::ShellSpawn>)
+and the I<parser session> (prefix C<large-subset->: L<Proc::ShellSubset::Large>). Since 2026-11-02 one
+session maintains everything. The base parser's notes (F<doc/parsers/>) come from an earlier session.
+
+B<Status> words used below: I<current> (describes the code of this release), I<reference> (a rule set or
+a procedure that stays valid), I<history> (kept for the record; may use the module names of its day:
+C<ShellSpawn> is now L<Proc::ShellSpawn>, C<ShellSubsetLarge> is now L<Proc::ShellSubset::Large>, and so on).
+
+=head2 An experiment: the same document in two forms
+
+=over 4
+
+=item F<doc/large-subset/large-subset-state.md> and F<doc/large-subset/large-subset-state.md.html>
+
+The same text twice. The F<.md.html> copy is the Markdown with a I<Markdeep> footer (and a C<charset>
+line at the top): a browser that opens it renders the Markdown itself, by a script loaded from
+L<https://casual-effects.com/markdeep/>. The pair is here to see which form reads better on MetaCPAN.
+L<.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-state.md>,
+L<.md.html|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-state.md.html>,
+L<.md.html, raw|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-state.md.html?raw=1>.
+
+=back
+
+=head2 Historical documents
+
+The working documents of only historical interest (the investigation that started the large parser, the first
+corpus statistics, the ceiling measurements, the reports between the sessions, the marks, why Run was replaced) are
+in the Proc-Spawner 0.03 distribution on CPAN; this one no longer ships them.
+
+=head2 Which version a figure belongs to
+
+Every measured figure in these documents names the code it was measured on: I<pre-0.01> (the modules
+under their former names, before the first distribution), I<0.01>, I<0.02> (the parsers of 0.01),
+I<early-post-0.02> (0.02 plus items P1-P4 of the page "Shell Corpus Gaps", the evening of 2026-11-02;
+that code was not kept), and I<0.03>.  The table is at the end of F<doc/README.md>.
+
+=head2 Start here
+
+=over 4
+
+=item L<doc/README.md|https://metacpan.org/dist/Proc-Spawner/source/doc/README.md>
+
+The index of the design notes, with the rename table of the modules. I<Current.>
+
+=item L<doc/test-pools.md|https://metacpan.org/dist/Proc-Spawner/source/doc/test-pools.md>
+
+How to rebuild every test pool taken from public collections (tldr, NL2Bash, ShellCheck's tests, three
+books of examples) from pinned sources, and the per-test record of how dash and bash differ. I<Reference.>
+
+=back
+
+=head2 The executor: Proc::Spawner, Proc::Spawner::Graph, Proc::ShellSpawn (prefix C<pspawn->)
+
+=over 4
+
+=item L<pspawn-spawner.md|https://metacpan.org/dist/Proc-Spawner/source/doc/pspawn-spawner.md>
+
+The architecture: how L<Proc::Spawner> (posix_spawn and the one event loop), its graph and
+L<Proc::ShellSpawn> (running parse trees) fit together; what is not done yet. I<Current.>
+
+=item L<pspawn-known-issues.md|https://metacpan.org/dist/Proc-Spawner/source/doc/pspawn-known-issues.md>
+
+Every known issue, open and fixed, of the executor and the parsers, with its ID (X…, L…, E…). I<Current.>
+
+=item L<pspawn-design.md|https://metacpan.org/dist/Proc-Spawner/source/doc/pspawn-design.md>
+
+The executor's internals: file actions, the event loop, which posix_spawn features are used and why.
+I<Reference> (older names).
+
+=item L<pspawn-graph.md|https://metacpan.org/dist/Proc-Spawner/source/doc/pspawn-graph.md>
+
+The spawn-graph notation, its pictures, and the hand-written graphs used in the tests. I<Reference.>
+
+=item L<pspawn-extensions.md|https://metacpan.org/dist/Proc-Spawner/source/doc/pspawn-extensions.md>
+
+The extension points (handlers named by sub names, the tables of command kinds and command names) and
+the decisions behind them. I<Reference.>
+
+=item L<perl-signals-findings.md|https://metacpan.org/dist/Proc-Spawner/source/doc/perl-signals-findings.md>
+
+Perl's signal and child-process model and its defects, met while writing the event loop; candidate
+reports for Perl itself. I<Reference.>
+
+=back
+
+=head2 The base parser: Proc::ShellSubset, Proc::ShellSubset::Small (F<doc/parsers/>)
+
+=over 4
+
+=item L<shell-subset-spec.md|https://metacpan.org/dist/Proc-Spawner/source/doc/parsers/shell-subset-spec.md>
+
+The grammar of L<Proc::ShellSubset> (L<Proc::ShellSubset::Small> is the same with its options frozen),
+the decided rules, and the parse tree. I<Reference> (older names).
+
+=item L<shell-subset-test-provenance.md|https://metacpan.org/dist/Proc-Spawner/source/doc/parsers/shell-subset-test-provenance.md>
+
+Where each borrowed test comes from: the snippet IDs, the pinned sources and their licences, how the
+tests were chosen. The scripts are in F<doc/parsers/tools/>. I<Reference.>
+
+=back
+
+=head2 The large parser: Proc::ShellSubset::Large (F<doc/large-subset/>, prefix C<large-subset->)
+
+=over 4
+
+=item L<README.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/README.md>
+
+The index of this directory. I<Current.>
+
+=item L<large-subset-state.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-state.md>
+
+The state of the union: the rules for matching dash and bash and which rule beats which, the corpus
+figures, the work list, the open questions. I<Current> (also as F<.md.html>, see above).
+
+=item L<large-subset-spec.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-spec.md>
+
+What the large grammar accepts beyond L<Proc::ShellSubset>, its tree additions, and the run-time rules of
+the executor. I<Current.>
+
+=item L<large-subset-logical.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-logical.md>
+
+Rule E: where dash and bash differ, the plainly logical behaviour, by category, item by item. I<Current.>
+
+=item L<large-subset-dialect-features.md|https://metacpan.org/dist/Proc-Spawner/source/doc/large-subset/large-subset-dialect-features.md>
+
+Every probed difference between dash and bash, blatant or subtle, with who or what decided the verdict
+(a probe, bash's manual, ShellCheck, or a judgement still open). I<Current.>
+
+=back
+
+=head2 Not Markdown
+
+F<doc/checklists/*.html> are the decision pages (items, plans, and Claude's answers; the marks lived in the
+published pages and show empty here). F<doc/large-subset/tools/> and F<doc/parsers/tools/> hold the
+measurement and test-pool scripts; F<doc/large-subset/dialect-cases/> the probes run in both shells.
+
+=head1 SEE ALSO
+
+L<Proc::Spawner>, L<Proc::ShellSpawn>, L<Proc::ShellSpawn::Builtins>, L<Proc::ShellSubset>, L<Proc::ShellSubset::Large>.
+
+=cut

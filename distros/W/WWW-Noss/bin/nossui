@@ -287,7 +287,6 @@ wdialog() {
     dialog "$@" 2>"$wdialog_err"
     wdialog_code="$?"
     if [ "$wdialog_code" = "$DIALOG_ERROR" ]; then
-        # TODO: properly clean up temporary files in calling function
         die "error running dialog: $(sed '1q' "$wdialog_err"; rm "$wdialog_err")"
     fi
 
@@ -314,7 +313,7 @@ dialog_open_post() {
 
 dialog_update() {
 
-    wnoss update "$@" 3>&1 | wdialog \
+    wnoss update "$@" 2>&1 | wdialog \
         --title 'Updating' \
         --programbox 'Updating...' -1 -1
 
@@ -322,7 +321,7 @@ dialog_update() {
 
 dialog_reload() {
 
-    wnoss reload "$@" 3>&1 | wdialog \
+    wnoss reload "$@" 2>&1 | wdialog \
         --title 'Reloading' \
         --programbox 'Reloading...' -1 -1
 
@@ -609,7 +608,7 @@ dialog_open_feed() {
 
     dialog_open_feed_err="$(nossui_tmpfile)"
 
-    wnoss open "$1" 3> "$dialog_open_feed_err"
+    wnoss open "$1" 2> "$dialog_open_feed_err"
 
     if [ "$?" != '0' ]
     then
@@ -864,7 +863,7 @@ dialog_edit_config() {
 
     while true; do
         "$dialog_edit_config_editor" "$dialog_edit_config_file"
-        verify_json "$dialog_edit_config_file" 3>"$dialog_edit_config_err"
+        verify_json "$dialog_edit_config_file" 2>"$dialog_edit_config_err"
         if [ "$?" = "0" ]; then
             break
         fi
@@ -885,6 +884,14 @@ dialog_clean() {
 
 }
 
+dialog_version() {
+
+    wdialog \
+        --no-collapse \
+        --msgbox "$(print_version)" 0 0
+
+}
+
 dialog_extra() {
 
     dialog_extra_tmpsel="$(nossui_tmpfile)"
@@ -897,6 +904,7 @@ dialog_extra() {
             'Edit Config' 'Edit configuration flie' \
             'Reload' 'Reload feed cache' \
             'Clean' 'Clean up feed cache and database' \
+            'Version' 'Show nossui version' \
             3> "$dialog_extra_tmpsel"
 
         if [ "$?" != "$DIALOG_OK" ]
@@ -919,6 +927,9 @@ dialog_extra() {
             ;;
             'Clean')
                 dialog_clean
+            ;;
+            'Version')
+                dialog_version
             ;;
         esac
     done

@@ -8,7 +8,7 @@ use DKIM2TestKeys;
 use Mail::DKIM2::Common qw(parse_mime);
 use Mail::DKIM2::MessageInstance;
 
-# -08 sections 9.3, 10.9, 14.6 and 14.7: h= and s= are "," (all must pass)
+# -09 sections 9.3, 10.9, 14.6 and 14.7: h= and s= are "," (all must pass)
 # groups joined by "|" (any group may pass), and the results combine as the
 # -08 contract's D2-D4 say -- including which string is reported.
 
@@ -126,7 +126,7 @@ for my $c (@hash_cases) {
     like(detail(mi => "m=1; h=$h;"), $want, "h=$short" . ($name ? ": $name" : ''));
 }
 
-# Headers only (no body to hand: -08 section 16.4, and below a null body
+# Headers only (no body to hand: -09 section 16.4, and below a null body
 # Recipe): a set passes on its header hash alone.
 {
     my $mi = Mail::DKIM2::MessageInstance->parse("m=1; h=sha256:$H{sha256}:XXXX|foo:AAAA:AAAA;");

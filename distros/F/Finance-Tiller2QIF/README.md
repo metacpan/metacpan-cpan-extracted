@@ -244,6 +244,9 @@ confirmation before writing the QIF file. When used with `--checkpoint`, adds
 a revert option (press `r`) to restore the database to its checkpoint state,
 useful if you want to undo changes made during ingest or mapping.
 - **--viewer** A program to display preview output instead of the default, `console`. The command may include arguments if given as a quoted string, for example `less`, `gedit`, or `"code --wait"`. The preview is written to a read-only temporary file named `tiller2qif-preview-*.t2qpv`, the command is run with that file's path appended.
+
+    On Windows, the command runs through `cmd.exe`. Use double quotes around program paths containing spaces. Preview, mapping and SQL file arguments are quoted for Windows automatically.
+
 - **--multipreview** Opens the mapping file in the preview along with the preview , so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires `--viewer` and `--mapfile`.
 - **--verbose** Print detailed progress information during each phase.  Also
 runs `checkconfig` automatically before any operations begin.

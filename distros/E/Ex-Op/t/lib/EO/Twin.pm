@@ -68,7 +68,7 @@ sub _norm {
     return undef unless defined $err;
     $err =~ s/(EO::\w+?)X\b/$1/g;
     $err =~ s/EO::T\d+\b/EO::T/g;
-    $err =~ s/ at (?:\(eval \d+\)|\S+) line \d+\.?\n?/ at FILE line N.\n/g;
+    $err =~ s/ at (?:\(eval \d+\)(?:\[[^\]]*\])?|\S+) line \d+\.?\n?/ at FILE line N.\n/g;
     my @lines = split /\n/, $err;
     s/^\s+(?=")// for @lines;
     my @bad = sort grep { /is not (?:exported|implemented)/ } @lines;

@@ -1,5 +1,306 @@
 Revision history for Stats-LikeR
 
+0.3414 2026-11-02 CST (Claude Opus 5.5 helped)
+
+ [Distribution metadata]
+
+ - The META homepage is https://metacpan.org/dist/Stats-LikeR. It pointed
+   at https://metacpan.org/dist/stats, the GitHub repository's name rather
+   than the distribution's, which is not a page on MetaCPAN.
+
+ - Stats::LikeR::Usage is no longer indexed. It holds the help screens
+   printed above a calling error, has no POD and no interface of its own,
+   and MetaCPAN listed it beside Stats::LikeR as a module with no abstract.
+
+ [Documentation]
+
+ - The Synopsis is now a runnable example: read a table, summarize it, take
+   a mean and sd, compare two groups with t_test() and fit lm(). The prose
+   that was there moves to a new Description, which now says where these
+   functions follow R rather than List::Util: min(), max(), sum(), mean(),
+   median(), sd() and var() croak when called with no arguments, where
+   List::Util returns undef, and a NaN in the input makes the result NaN.
+
+ - add_data()'s resulting structures are written as Perl data rather than
+   JSON, and the mixed-hash example now shows the target it starts from.
+
+ - age_standardize() documents an example value for se, 114.4. R gives the
+   same value for the example's data from sqrt(sum(w^2 * count / pop^2)),
+   with w the standard population's weights, scaled by per.
+
+ [rank()]
+
+ - ties_method => 'random' seeds the generator before drawing, as runif()
+   and sample() do. It called Drand01() without AUTO_SEED_PRNG(), so a
+   process that never called srand() drew from an unseeded generator, and
+   every run broke ties in the same order.
+
+ - A tied array, a tied element and a tied scalar argument are ranked by
+   their values. Elements were tested with SvOK() before their get magic
+   ran, so every element of a tied array read as undef: a tied (3, 1, 2)
+   ranked as 1 2 3, the ranks of three NAs. Each is now fetched once.
+
+ - An array that grows while it is read, through a FETCH that pushes onto
+   it, is read only as far as it was counted. The gather loop took each
+   array's length again, so a growing array could write past the end of
+   the work buffers.
+
+ - The work buffers are on the save stack, so a croak part-way through,
+   from an overloaded value or a FETCH that dies, no longer leaks them.
+   They were freed by hand at the end. t/rank.tied_random.t covers all
+   four.
+
+ [lm() and glm()]
+
+ - A predictor is aliased by R's rule: when what the columns before it
+   leave of it has a norm below 1e-7 of its own (lm.fit()'s tol), or
+   min(1e-7, epsilon/1000) for glm(), as glm.fit() has it. The test was
+   1e-10 on a squared pivot of X'X, which is 1e-5 on the norm, so a
+   predictor such as x = 1e4 + noise of sd 0.05, which R fits, came back
+   NaN from lm() and from gaussian and poisson glm() alike. vif() asks the
+   same question and gets the same answer.
+
+ - Both fit by factoring X, with AS 274 Givens rotations as anova() and
+   aov() already did and one step of refinement on the residuals, rather
+   than by solving the normal equations, which square the condition
+   number. On R's longley data (kappa 2.4e7) the estimates were 2.7e-8
+   from R's and are now within 3e-12; across t/lm.R.scipy.t's 42 designs
+   the worst disagreement with R fell from 1.3e-8 to 6.9e-12.
+
+ - lm() is 6 to 14 times faster on a wide design: 0.36 s, against 5.1 s,
+   for y ~ x + g on 2e5 rows with 50 levels of g, and 0.46 s against 3.0
+   s for 40 numeric columns. It built X'X with a column-strided walk for
+   every pair of columns. glm()'s iterations do more work per row than
+   X'X did, and the same poisson fit takes 0.97 s against 0.72 s.
+
+ - t/lm.collinear.R.t has R's longley and PR#2776 cases, SciPy's
+   test_regress_against_R data shifted by 1e7, and Wilkinson's NASTY
+   regressions.
+
+ [cor_test()]
+
+ - continuity => 1 corrects Spearman's asymptotic t as R does, adding 1 to
+   n(n^2 - 1)/6 before rho is formed from S, and takes the two-sided tail
+   S lies in. It was ignored, with a warning that R ignores it too, which
+   R does not: on R's own case, x = 1:5 against y = (8, 6, 7, 5, 3), R's
+   two-sided p is 0.0969 and cor_test() gave the uncorrected 0.0374.
+   t/cor_test.spearman_continuity.R.t crosses every case with both
+   settings.
+
+ [Values with get magic]
+
+ - pt(), qt(), pchisq(), qchisq(), pf(), qf() and pbinom() read a capture
+   variable or a tied scalar passed positionally: after "10" =~ /(\d+)/,
+   pt(2.5, $1) croaked "'(undef)' was given with no value", because the
+   argument was tested with SvOK() before its magic had run.
+
+ - The same order made p_adjust() read a tied p-value in a flat list as
+   undef, which it counts as 1; kruskal_test() drop a tied cell in either
+   input form; friedman_test() drop a block with a tied cell; and aov()
+   without a formula leave a tied cell out. t/tied_cell.magic_order.t
+   covers each.
+
+ [Tied cells that change the data being read]
+
+ - A FETCH that frees, grows or empties the container being read no longer
+   makes these read freed memory, which valgrind showed for each and which
+   segfaulted or panicked several: median() of two arrays (a FETCH that
+   grew the second wrote past the buffer; it now croaks), kruskal_test()'s
+   x and g form (a FETCH that emptied g), hoa2aoh(), hoa2hoh(),
+   add_data(), vals(), avals(), sample() of an array and of a hash,
+   scale() of a matrix, and prcomp(). Each now holds the rows and columns
+   it reads, or re-reads an array's block after every FETCH.
+   t/tied_cell.free_mid_read.t covers each.
+
+ - A FETCH that dies no longer leaks: cor()'s buffers (310 kB a call for
+   two vectors of 20000, 145 kB for a 300 x 60 matrix), matrix()'s half-
+   built result (20004 SVs for 2 x 10000), friedman_test()'s buffers,
+   vals() and avals()'s copies, and sample()'s entry table for a hash.
+   Each is on the save stack or mortal from the start.
+
+ [Croaks that leaked or exited]
+
+ - A formula crossing more than 16 terms with '*' croaks without leaking
+   the term lists it had built, 0.66 kB a call, in lm(), glm() and every
+   function that reads a formula through lm_formula_terms().
+
+ - runif(), rnorm() and rbinom() croak on an n there is no memory for, as
+   matrix() already did, and add_data() on a numeric key that would extend
+   an array past it. runif(1e11) took the interpreter down with "Out of
+   memory in perl:util:safesysmalloc", which eval cannot catch.
+
+ [Distribution functions]
+
+ - pt(), pf(), qt() and qf() on the log scale were wrong, or NaN, in the
+   far tail when one shape of the incomplete beta was at least 1000 and the
+   other at most 1, as at large df. incbeta_xy_core() sent such cases to
+   bgrat(), whose expansion is poor for a tiny variable; it now chooses the
+   method as R's bratio() does, which for a tiny variable is TOMS 708's
+   power series, bpser(). Up to 0.3413 pt(-3000, 5000, log => 1) was NaN,
+   pt(-960, 2508.3, log => 1) was -7415.88159 for -7415.88469, and
+   qt(-7500, 2500, log => 1) was -1001.09374 for -1001.09067.
+   t/pt.log_tail.R.t pins the four functions against R 4.6.1; in 14 rows
+   R's own qt() and qf() are off, and those take mpmath's value at 60
+   digits, solved by bisection.
+
+ [Model frames]
+
+ - lm(), glm(), anova(), aov() and the formula readers behind zerotrunc(),
+   hurdle(), svyglm(), ivreg(), lmer(), coxph() and vif() took the data's
+   shape and row count from whichever hash entry perl returned first, so
+   the result depended on hash order. A row-name column that came first and
+   was shorter or longer than the data made every data column fail the
+   length check ("HoA columns have unequal lengths"), and a plain scalar
+   entry such as note => 'meta' croaked "Hash values must be ArrayRefs"
+   when it came first and was ignored otherwise. The shape is now decided
+   from the whole hash and n from the data columns, and a scalar entry in a
+   hash of arrays is always ignored, as assign() ignores it and as R's
+   model.frame() ignores a variable the formula does not name.
+   t/lm_read_rows.order.t runs each case under 24 hash seeds.
+
+ [glm()]
+
+ - The fitted mean is clamped as R's own family objects clamp it:
+   pmax(exp(eta), .Machine$double.eps) for poisson and negbin, and for the
+   logit R's logit_linkinv(), which clamps eta at +-30, with mu.eta a
+   function of eta. The poisson and negbin mean and variance were floored
+   at 1e-10 and the binomial mean at 10 * DBL_EPSILON, so a fit with fitted
+   rates far below 1e-10 was off by up to 4e-10 in its coefficients (slope
+   1.0734182285526 where R gives 1.0734182281786); it now agrees with R to
+   rounding. t/glm_mu_floor.R.t has the cases, and t/model_pvalue_tails.t's
+   huge-z binomial case moves with it.
+
+ - Multiway clustering numbers each intersection of the cluster variables
+   by packing their integer labels into one key, rather than building a
+   Perl hash per intersection, in glm() and ivreg(). The partition, its
+   numbering and every result are bit for bit unchanged; a poisson fit on
+   1e6 rows with three cluster variables went from 3.25 s to 1.22 s, and
+   with two from 1.64 s to 1.03 s.
+
+ [Count models]
+
+ - The digamma and trigamma behind glm(family => 'negbin')'s theta and
+   zerotrunc() and hurdle() were good to only 2e-10 and 1.7e-8: the
+   recurrence stopped at x = 6 and the series was cut after B_8. They now
+   take a 12-term series from x = 7 (9 on long double, 50 on __float128)
+   and agree with mpmath to a few ulp, and the standard error of theta
+   agrees with R to 2.4e-13, where it was 6.7e-9 out. nb_theta_ml() also
+   computes them once per Newton step rather than once per row.
+
+ [lmer()]
+
+ - The criterion no longer passes over all n rows each time the optimizer
+   evaluates it: X'X, X'y and the least-squares residual terms are formed
+   once per fit, so an evaluation costs only the per-block factorizations.
+   A random-slope fit with 50 groups at n = 200,000 went from 2.5 s to 0.12
+   s, a random intercept from 0.51 s to 0.09 s, and two grouping factors
+   from 1.3 s to 0.19 s. The residual sum of squares is expanded about the
+   least-squares fit rather than from y'y, so it does not cancel when y has
+   a large mean, and the reported fit still takes an exact residual pass;
+   theta, sigma and the coefficients agree with the previous code to about
+   1e-9.
+
+ - lmer()'s deviance and glm()'s gaussian AIC use pi at the NV's width
+   rather than the double M_PI, which put a constant offset of about n *
+   4e-17 into both on long-double and quadmath perls.
+
+ [interpolate()]
+
+ - A NaN cell is a gap, as pandas treats it, for every method and every
+   limit, limit_direction and limit_area. Only undef was, and a NaN was
+   taken for an anchor, so [1, undef, 3, NaN, 5, undef, 7, 8, 9]
+   interpolated with method => 'cubic' came back 1 NaN 3 NaN 5 NaN 7 8 9
+   where pandas gives 1 to 9, and under any method that fits the whole
+   column one NaN made every gap NaN. A NaN in the x coordinates croaks, as
+   pandas refuses a NaN index; it used to pass the increasing check, since
+   every comparison with NaN is false. t/interpolate.nan.pandas.t pins
+   about 1,700 cases against pandas 3.0.4 over the whole limit space.
+
+ - limit is applied in O(n), not O(n * limit): each gap rescanned its whole
+   window, so one 200,000-cell gap with limit_direction => 'both' took 4.1
+   s at limit 100000 and now takes 0.03 s. The cells filled are unchanged
+   on 12,000 random frames.
+
+ [qcut()]
+
+ - NaN is missing, as it is to pandas, as well as undef: it is left out of
+   the cutpoints and its code comes back undef. A NaN was binned as a
+   number, and every edge it touched came back NaN. t/qcut.nan.pandas.t has
+   pandas' test_qcut_nas and test_qcut_nullable_integer cases.
+
+ [p_adjust()]
+
+ - Holm's running maximum started at 0, where R's cummax() has no floor,
+   and hommel was clamped to 1, which R's is not, so p-values outside [0,
+   1] came back differently from R: p_adjust([-1, 0.5, 2], 'holm') was 0 1
+   1 for R's -3 1 1. Values in [0, 1] are unchanged.
+
+ - The p-values are sorted with an inlined sort rather than qsort() and a
+   comparator, with the same order: 1,000,000 of them take 0.11 s, against
+   0.22 s.
+
+ [rbinom()]
+
+ - size is a trial count, bounded by what the generator can carry, IV_MAX
+   of the running perl, rather than by the 2^48 meant for element counts:
+   rbinom(n => 3, size => 1e15, prob => 0.3) draws, as R does, where it
+   croaked "size is too large". On a perl with 32-bit integers a size
+   between 2^31 and 2^32 croaks instead of running billions of Bernoulli
+   trials.
+
+ [predict()]
+
+ - An interaction term was copied into a 512-byte buffer to find its factor
+   components, so an interaction of long names lost the factor and every
+   row came back NaN; it is scanned in place now. The unseen-level error no
+   longer cuts the factor's name and level at 256 bytes.
+   t/predict.long_names.t compares predict() with lm()'s fitted values for
+   names up to 1200 bytes.
+
+ [filter()]
+
+ - A compiled predicate held borrowed pointers to every cell of a row while
+   it tested them, so a tied cell whose FETCH cleared the row left the next
+   test reading a freed scalar. A row with a tied cell now holds its cells
+   for the test. t/tied_cell.filter_clears_row.t has the case; valgrind
+   cannot show the old read, because perl frees scalars into its own
+   arenas.
+
+ [csort()]
+
+ - A numeric column sorts about twice as fast, 0.21 s against 0.40 s for a
+   million doubles: each cell is read once into a (value, row) pair and the
+   pairs are sorted with an inlined comparison, ties broken by row, so the
+   order is the one the stable merge sort gave, with undef, missing and NaN
+   last in their original order.
+
+ - Sorting an array of hashes into "hoa" or "aoa" no longer makes a mortal
+   SV for every input cell: the key-union passes look each key up by its
+   stored bytes and make an SV only for a new name, as merge() does. On
+   200,000 rows of 22 columns the peak fell from +355 MB to +170 MB ("hoa")
+   and from +377 MB to +192 MB ("aoa"), and the call is about 30% faster.
+   The column names are ordered with qsort() rather than an insertion sort;
+   two names with the same bytes, one UTF-8 and one not, are now ordered by
+   that flag rather than by hash order.
+
+ [oneway_test()]
+
+ - The formula form made a mortal key for every row, which lived until the
+   call returned: a million-row call peaked 71 MB above its baseline. One
+   key is reused, and the peak is 24 MB.
+
+ [write_table()]
+
+ - An .xlsx is checksummed eight bytes at a time (slicing-by-8, byte loads
+   only), so a 100000 x 20 mixed table, 101 MB, writes in 0.5 s rather than
+   0.7 s, byte for byte the same file.
+
+ [Portability]
+
+ - LikeR.xs uses NV_NAN and NV_INF throughout in place of the C99 NAN and
+   INFINITY, and formats row numbers with perl's UVuf rather than a C
+   "%lu", which is 32 bits wide on Windows.
+
 0.3413 2026-10-29 CDT (Claude Opus 5.5 helped)
 
  [Build: gcc 13 and 14 at -O3]

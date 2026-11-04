@@ -4,7 +4,7 @@ use 5.020;
 use Path::Tiny;
 use Email::MIME;
 use lib 'lib';
-use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey parse_mime
+use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_key_record parse_mime
                            valid_sequence chain_number_error mi_version_tag unkeyable_signature_error);
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
@@ -38,6 +38,7 @@ my $dns = decode_json(path($dns_json)->slurp);
   my $verifier = Mail::DKIM2::Verifier->new();
   $verifier->skip_timestamp_check(1) if $ignore_ts;
   $verifier->set_pubkey_callback(sub { find_key(@_) });
+  $verifier->set_policy_callback(sub { find_policy(@_) });
   $verifier->PRINT($msg1->as_string());
   $verifier->CLOSE;
   unless ($verifier->result =~ /\A(?:pass|none)\z/) {
@@ -73,7 +74,7 @@ my $instance = %mimap ? max(keys %mimap) : 0;
 # which the locally-highest i= is not the real top -- see mid_process below.
 my $top_i = $num;
 
-# -08 §14: "there MUST NOT be a Message-Instance field with a higher m=
+# -09 §14: "there MUST NOT be a Message-Instance field with a higher m=
 # value than occurs in any DKIM2-Signature field" -- reported as "PERMERROR
 # Message-Instance m=<x> is not signed". Checked up front because the walk
 # below happily verifies and reports "OK Message-Instance" for an instance
@@ -127,6 +128,7 @@ while (1) {
   $verifier->mid_process(1) if $num < $top_i;
   $verifier->headers_only(1) if $hdr_only;
   $verifier->set_pubkey_callback(sub { find_key(@_) });
+  $verifier->set_policy_callback(sub { find_policy(@_) });
   $verifier->PRINT($msg1->as_string());
   $verifier->CLOSE;
 
@@ -155,11 +157,26 @@ sub _sigtag {
   return (defined $v && $v =~ /\A[0-9]+\z/) ? 0 + $v : 0;
 }
 
+# The Domain Policy Record (-09 section 3.8) from the same dns.json: the TXT
+# strings at _domainkey.<domain>, none for a domain it does not list.
+sub find_policy {
+  my ($dom) = @_;
+  return [ map { $_->[1] } @{ $dns->{$dom} && $dns->{$dom}{_domainkey} || [] } ];
+}
+
 sub find_key {
   my ($signature, $idx) = @_;
   $idx //= 0;
   my $sel = $signature->selector($idx);
   my $dom = $signature->domain;
-  my $key_txt = $dns->{$dom}{"$sel._domainkey"}[0][1];
-  return parse_dkim_pubkey($key_txt);
+  my $records = $dns->{$dom}{"$sel._domainkey"} or return;
+  # As the Verifier's own DNS fetch does (-09 sections 3.7, 14.5): records
+  # beginning v= other than DKIM1 are ignored; no record is "does not
+  # exist"; one that is there but unusable is a PERMERROR with its reason
+  # ("is malformed", "has been revoked", ...).
+  my @txt = Mail::DKIM2::Common::key_records(map { $_->[1] } @$records) or return;
+  die "PERMERROR: has multiple records\n" if @txt > 1;
+  my ($key, $why) = parse_dkim_key_record($txt[0]);
+  die "PERMERROR: $why\n" unless $key;
+  return $key;
 }

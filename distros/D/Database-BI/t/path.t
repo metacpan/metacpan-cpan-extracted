@@ -385,37 +385,33 @@ subtest '_detect_file_info path-K2: file_size absent for non-CSV/PSV (empty hash
 # Paths L-N cover header-less CSV/PSV detection added so that bank exports
 # with no header row (first line is data) are opened transparently.
 
-subtest '_detect_file_info path-L: header-less CSV (date+amount+desc) -> _headerless_data' => sub {
+subtest '_detect_file_info path-L: header-less CSV (date+amount+desc) -> _headerless' => sub {
 	# All three first-row values fail $SAFE_IDENTIFIER; a date and a signed
 	# number trigger _values_are_data_like.  Expect synthesized column names
-	# and a _headerless_data arrayref of pre-parsed rows.
+	# and a _headerless marker; _init_backend gives D::A a copy with a header.
 	Mojo::File->new("$TMPDIR/ltest.csv")->spew(
 		"2026-09-09,-75.13,ACME RESTAURANT\n" .
 		"2026-09-10,-2.25,FRGN FEE\n"
 	);
 	my $result = $DETECT->($TMPDIR, 'ltest');
-	ok  exists  $result->{_headerless_data},         'path L: _headerless_data key present';
+	ok  exists  $result->{_headerless},              'path L: _headerless key present';
 	ok  defined $result->{id},                       'path L: id is defined (synthesized)';
 	is  $result->{id},       'Date',                 'path L: first synthesized id is "Date"';
 	is_deeply $result->{columns}, [qw(Date Amount Description)],
 		'path L: synthesized column names: Date, Amount, Description';
-	is scalar @{ $result->{_headerless_data} }, 2,   'path L: both data rows returned';
-	is $result->{_headerless_data}[0]{Date},   '2026-09-09', 'path L: row 0 Date correct';
-	is $result->{_headerless_data}[0]{Amount}, '-75.13',      'path L: row 0 Amount correct';
-	is $result->{_headerless_data}[1]{Amount}, '-2.25',        'path L: row 1 Amount correct';
+	is $result->{_headerless}{ext}, 'csv',           'path L: the extension is kept';
 };
 
-subtest '_detect_file_info path-M: header-less PSV (date+amount) -> _headerless_data' => sub {
+subtest '_detect_file_info path-M: header-less PSV (date+amount) -> _headerless' => sub {
 	# Same logic applied to pipe-separated files.
 	Mojo::File->new("$TMPDIR/mtest.psv")->spew(
 		"2026-01-15|-99.00\n" .
 		"2026-01-16|-1.50\n"
 	);
 	my $result = $DETECT->($TMPDIR, 'mtest');
-	ok  exists  $result->{_headerless_data},         'path M: _headerless_data key present for PSV';
+	ok  exists  $result->{_headerless},              'path M: _headerless key present for PSV';
 	is  $result->{sep_char}, '|',                    'path M: separator correctly detected as pipe';
 	is_deeply $result->{columns}, [qw(Date Amount)], 'path M: two synthesized columns';
-	is scalar @{ $result->{_headerless_data} }, 2,   'path M: two rows returned';
 };
 
 subtest '_detect_file_info path-N: unsafe names that are NOT data-like -> id undef (no headerless)' => sub {
@@ -424,7 +420,7 @@ subtest '_detect_file_info path-N: unsafe names that are NOT data-like -> id und
 	# The existing error_no_safe_id path must be preserved.
 	Mojo::File->new("$TMPDIR/ntest.csv")->spew("first-name,last-name\nAlice,Smith\n");
 	my $result = $DETECT->($TMPDIR, 'ntest');
-	ok !exists  $result->{_headerless_data}, 'path N: no _headerless_data for hyphenated headers';
+	ok !exists  $result->{_headerless}, 'path N: no _headerless for hyphenated headers';
 	ok !defined $result->{id},              'path N: id is undef (all names unsafe, not data-like)';
 };
 

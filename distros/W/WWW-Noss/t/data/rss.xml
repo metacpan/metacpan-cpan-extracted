@@ -4,7 +4,7 @@
     <title>Test RSS Feed</title>
     <link>https://phonysite.com</link>
     <description>An RSS feed for testing purposes.</description>
-    <copyright>Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)</copyright>
+    <copyright>Copyright (C) 2025 Samuel Young (samyoung at posteo dot com)</copyright>
     <lastBuildDate>Sun, 15 Jun 2025 20:03:13 +0000</lastBuildDate>
     <category>test</category>
     <category>sample</category>
@@ -31,7 +31,7 @@
         <title>Test post #1</title>
         <link>https://phonysite.com/r1</link>
         <description>A text description.</description>
-        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <author>samyoung at posteo dot com (Samuel Young)</author>
         <category>test</category>
         <category>sample</category>
         <category>phony</category>
@@ -42,7 +42,7 @@
         <title>Test post #2</title>
         <link>https://phonysite.com/r2</link>
         <description>&lt;p&gt;Some HTML text.&lt;/p&gt;</description>
-        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <author>samyoung at posteo dot com (Samuel Young)</author>
         <category>test</category>
         <category>sample</category>
         <category>phony</category>
@@ -53,7 +53,7 @@
         <title>Test post #3</title>
         <link>https://phonysite.com/r3</link>
         <description>&lt;p&gt;Some more HTML.&lt;/p&gt;</description>
-        <author>samyoung12788 at gmail dot com (Samuel Young)</author>
+        <author>samyoung at posteo dot com (Samuel Young)</author>
         <category>test</category>
         <category>sample</category>
         <category>phony</category>

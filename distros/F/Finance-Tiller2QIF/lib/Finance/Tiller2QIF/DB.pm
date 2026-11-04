@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::DB;
 # ABSTRACT: SQLite connection helper
-$Finance::Tiller2QIF::DB::VERSION = '1.20';
+$Finance::Tiller2QIF::DB::VERSION = '1.21';
 use 5.036;
 
 use DBI;

@@ -68,6 +68,15 @@ like(detail(s => 'sel1:rsa-sha256:SIG|x:foo:@@!!'),
          'a non-base64 unknown hash-set');
 }
 
+# 5b. Within one field: syntax (every value base64) before a duplicate,
+# a duplicate before the item limit (contract D2/D3).
+like(detail(s => 'sel1:rsa-sha256:SIG|sel1:rsa-sha256:@@@@'),
+     qr/^permerror \(PERMERROR: DKIM2-Signature i=1 syntax error\)$/,
+     'a bad value outranks a duplicate selector');
+like(detail(s => join('|', map { "s$_:rsa-sha256:AAAA" } 1 .. 8) . '|s1:rsa-sha256:AAAA'),
+     qr/^permerror \(PERMERROR: DKIM2-Signature i=1 has a duplicate selector\)$/,
+     'a duplicate selector outranks the item limit');
+
 # 6. No fold between base64 padding and the ":" after it (§9.3 ABNF).
 ok(!Mail::DKIM2::Common::_dkim2_fold_ok({ name => 'h', colons => 1 }, '=', ':'),
    'no fold between "=" and ":" in h=');

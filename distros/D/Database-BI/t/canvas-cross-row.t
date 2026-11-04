@@ -915,4 +915,111 @@ subtest 'the canvas refuses a spec it cannot honour' => sub {
 		->content_like(qr/id="visual-0"/, 'a window over a partition still renders');
 };
 
+subtest 'a calculated field can read the column a card\'s pass adds' => sub {
+	my $cid = $t->post_ok('/api/analyses', { 'Content-Type' => 'application/json' }, encode_json({
+		name     => 'Composed canvas',
+		datasets => [ { spec => 'table:orders', alias => 'left' } ],
+		visuals  => [
+			{ kind => 'table', title => 'Everything',
+			  encode => { columns => [qw(day half)] } },
+			{ kind => 'table', title => 'North',
+			  encode => { columns => [qw(day half)] }, filters => ['region:eq:North'] },
+			{ kind => 'table', title => 'Its own plan',
+			  encode => { columns => [qw(day half)] },
+			  cross_row => { cs => ['amount:rank:place'] } },
+			{ kind => 'table', title => 'Another plan',
+			  encode => { columns => [qw(day half)] },
+			  cross_row => { cs => ['amount:rank:rt'] } },
+		],
+	}))->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid?cs=amount:running_total:rt&order=day&c=half:rt/2")->status_is(200);
+	my $dom = Mojo::DOM->new($t->tx->res->body);
+
+	is_deeply _column(_card($dom, 0), 1), [ 5, 15, 65, 165 ], 'half of each running total';
+	is_deeply _column(_card($dom, 1), 1), [ 5, 15 ], 'a card halves its own totals';
+	like _error(_card($dom, 2)), qr/half/,
+		'a card whose plan has no such column cannot show the field';
+	is_deeply _column(_card($dom, 3), 1), [ 2, 1.5, 1, 0.5 ],
+		'and a card whose plan gives the name another meaning uses its own';
+
+	$t->get_ok("/a/$cid?cs=amount:running_total:rt&order=day&c=half:rtt/2")->status_is(400)
+		->content_like(qr/Unknown column 'rtt'/, 'a mistyped name is the page\'s 400');
+};
+
+subtest 'a card or a cross-filter can select on a column the pass writes' => sub {
+	my $cid = $t->post_ok('/api/analyses', { 'Content-Type' => 'application/json' }, encode_json({
+		name     => 'Filtered windows',
+		datasets => [ { spec => 'table:orders', alias => 'left' } ],
+		visuals  => [
+			{ kind => 'table', title => 'Past 100',
+			  encode => { columns => [qw(day rt)] }, filters => ['rt:gt:100'],
+			  cross_row => { cs => ['amount:running_total:rt'], order => ['day'] } },
+			{ kind => 'table', title => 'North, past 20',
+			  encode => { columns => [qw(day rt)] }, filters => ['region:eq:North', 'rt:gt:20'],
+			  cross_row => { cs => ['amount:running_total:rt'], order => ['day'] } },
+			{ kind => 'table', title => 'A plan with no such column',
+			  encode => { columns => [qw(day amount)] }, cross_row => { cs => [] } },
+		],
+	}))->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $dom = Mojo::DOM->new($t->tx->res->body);
+	is_deeply _column(_card($dom, 0), 1), [ 130, 330 ], 'a card filter keeps the totals the rows had';
+	is_deeply _column(_card($dom, 1), 1), [ 30 ], 'a filter on a source column narrows the window first';
+
+	$t->get_ok("/a/$cid?cf=rt:gt:100&cv=1")->status_is(200);
+	$dom = Mojo::DOM->new($t->tx->res->body);
+	is_deeply _column(_card($dom, 0), 1), [ 130, 330 ], 'a cross-filter on the column reaches a card that has it';
+	is_deeply _column(_card($dom, 1), 1), [ 30 ], 'the card that made it is left as it is';
+	is_deeply _column(_card($dom, 2), 1), [ 10, 20, 100, 200 ], 'and a card without the column keeps its rows';
+};
+
+subtest 'adding or repairing a card whose plan the page\'s field needs' => sub {
+	my $cid = $t->post_ok('/api/analyses', { 'Content-Type' => 'application/json' }, encode_json({
+		name     => 'A plan arrives with the card',
+		datasets => [ { spec => 'table:orders', alias => 'left' } ],
+		visuals  => [ { kind => 'table', title => 'Plain', encode => { columns => [qw(day amount)] } } ],
+	}))->status_is(201)->tx->res->json->{id};
+
+	my $half = 'c=half:total/2';
+	my $card = {
+		kind      => 'table',
+		title     => 'Halves',
+		encode    => { columns => [qw(day total half)] },
+		cross_row => { cs => ['amount:running_total:total'], order => ['day'] },
+		query     => $half,
+	};
+
+	# No card on the canvas has "total" yet: only the one being added brings it.
+	my $json = { 'Content-Type' => 'application/json' };
+	$t->post_ok("/api/analyses/$cid/visuals", $json, encode_json($card))->status_is(201);
+	my $html = Mojo::DOM->new($t->tx->res->json->{html});
+	is_deeply _column($html, 2), [ 5, 15, 65, 165 ], 'the new card draws the field over its own column';
+
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	is scalar @{ $t->tx->res->json->{visuals} }, 2, 'and it is saved';
+
+	$t->get_ok("/a/$cid?$half")->status_is(200);
+	my $dom = Mojo::DOM->new($t->tx->res->body);
+	is_deeply _column(_card($dom, 1), 2), [ 5, 15, 65, 165 ], 'a reload of the page draws the same';
+	is_deeply _column(_card($dom, 0), 1), [ 10, 20, 100, 200 ], 'and the other card is left alone';
+
+	$t->post_ok("/api/analyses/$cid/visuals", $json, encode_json({ %$card, query => 'c=half:totl/2' }))
+		->status_is(400)->json_like('/error', qr/Unknown column 'totl'/, 'a mistyped name is refused');
+	$t->post_ok("/api/analyses/$cid/visuals", $json, encode_json({ %$card, cross_row => { cs => [] } }))
+		->status_is(400)->json_like('/error', qr/total/, 'so is a card that plots a column its own plan no longer adds');
+	$t->get_ok("/api/analyses/$cid")->status_is(200);
+	is scalar @{ $t->tx->res->json->{visuals} }, 2, 'and neither is stored';
+
+	# The plain card takes a plan of its own, and the field with it.
+	$t->patch_ok("/api/analyses/$cid/visuals/0", $json, encode_json({
+		encode    => { columns => [qw(day half2)] },
+		cross_row => { cs => ['amount:rank:place'] },
+		query     => 'c=half2:place/2',
+	}))->status_is(200);
+	$html = Mojo::DOM->new($t->tx->res->json->{html});
+	is_deeply _column($html, 1), [ 2, 1.5, 1, 0.5 ], 'a repair can bring the plan the field needs';
+};
+
 done_testing();

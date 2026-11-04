@@ -25,9 +25,9 @@ eo_cxt_init(pTHX_ my_cxt_t *cxt)
     cxt->ret_max        = 0;
     cxt->level_gv       = gv_fetchpvs("Ex::Op::ExportLevel", GV_ADDMULTI, SVt_PV);
     cxt->verbose_gv     = gv_fetchpvs("Ex::Op::Verbose", GV_ADDMULTI, SVt_PV);
-    if (!SvOK(GvSVn(cxt->level_gv)))
+    if (!SvOK(GvSVn(cxt->level_gv))) /* # uncoverable condition right count:1 */
         sv_setiv(GvSVn(cxt->level_gv), 0);
-    if (!SvOK(GvSVn(cxt->verbose_gv)))
+    if (!SvOK(GvSVn(cxt->verbose_gv))) /* # uncoverable condition right count:1 */
         sv_setiv(GvSVn(cxt->verbose_gv), 0);
     cxt->import_cv      = get_cvs("Ex::Op::import", 0);
     cxt->export_cv      = get_cvs("Ex::Op::export", 0);
@@ -80,7 +80,7 @@ static GV *
 eo_stash_gv(pTHX_ HV *stash, const char *name, STRLEN len, bool utf8)
 {
     SV **svp;
-    if (!stash || utf8 || !len || memchr(name, ':', len) || memchr(name, '\'', len))
+    if (!stash || utf8 || !len || memchr(name, ':', len) || memchr(name, '\'', len)) /* # uncoverable condition left count:2 */
         return NULL;
     svp = hv_fetch(stash, name, (I32)len, 0);
     return (svp && isGV_with_GP(*svp)) ? (GV *)*svp : NULL;
@@ -96,15 +96,22 @@ eo_stash_gv_add(pTHX_ HV *stash, const char *name, STRLEN len, bool utf8)
     GV *gv = eo_stash_gv(aTHX_ stash, name, len, utf8);
     STRLEN i;
     SV **svp;
+    /*
+     # uncoverable condition left count:2
+     # uncoverable condition left count:3
+     # uncoverable condition right count:6 */
     if (gv || !stash || utf8 || len < 2 || !(isLOWER(*name) || *name == '_'))
         return gv;
     for (i = 1; i < len; i++)
         if (!isWORDCHAR(name[i]))
             return NULL;
     svp = hv_fetch(stash, name, (I32)len, 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!svp)
-        return NULL;
-    if (!isGV_with_GP(*svp))
+        return NULL; /* # uncoverable statement */
+    if (!isGV_with_GP(*svp)) /* # uncoverable branch false */
         gv_init((GV *)*svp, stash, name, len, TRUE);
     return isGV_with_GP(*svp) ? (GV *)*svp : NULL;
 }
@@ -138,10 +145,15 @@ eo_strip_amp(pTHX_ SV *sv)
 {
     STRLEN len;
     const char *s = SvPV_const(sv, len);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1
+     # uncoverable condition left count:2 */
     if (len && *s == '&') {
-        s++;
-        len--;
-    }
+        s++; /* # uncoverable statement */
+        len--; /* # uncoverable statement */
+    } /* # uncoverable statement */
     return newSVpvn_flags(s, len, SVs_TEMP | (SvUTF8(sv) ? SVf_UTF8 : 0));
 }
 
@@ -152,8 +164,11 @@ static void
 eo_add_names(pTHX_ HV *set, AV *av)
 {
     SSize_t i, top;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!av)
-        return;
+        return; /* # uncoverable statement */
     top = av_len(av);
     for (i = 0; i <= top; i++) {
         SV **svp = av_fetch(av, i, 0);
@@ -172,8 +187,11 @@ static void
 eo_av_append(pTHX_ AV *to, AV *from)
 {
     SSize_t i, top;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!from)
-        return;
+        return; /* # uncoverable statement */
     top = av_len(from);
     for (i = 0; i <= top; i++) {
         SV **svp = av_fetch(from, i, 0);
@@ -198,6 +216,9 @@ eo_join(pTHX_ AV *av, const char *sep)
         SV **svp = av_fetch(av, i, 0);
         if (i)
             sv_catpv(out, sep);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 */
         if (svp)
             sv_catsv(out, *svp);
     }
@@ -217,10 +238,10 @@ eo_cache_build(pTHX_ SV *pkg, AV *exp, AV *ok)
     eo_add_names(aTHX_ set, exp);
     eo_add_names(aTHX_ set, ok);
     av_store(entry, EO_CACHE_SET,  newRV_noinc((SV *)set));
-    av_store(entry, EO_CACHE_EXP,  exp ? newRV_inc((SV *)exp) : newSV(0));
-    av_store(entry, EO_CACHE_OK,   ok  ? newRV_inc((SV *)ok)  : newSV(0));
-    av_store(entry, EO_CACHE_NEXP, newSViv(exp ? av_len(exp) : -2));
-    av_store(entry, EO_CACHE_NOK,  newSViv(ok  ? av_len(ok)  : -2));
+    av_store(entry, EO_CACHE_EXP,  exp ? newRV_inc((SV *)exp) : newSV(0)); /* # uncoverable condition right count:1 */
+    av_store(entry, EO_CACHE_OK,   ok  ? newRV_inc((SV *)ok)  : newSV(0)); /* # uncoverable condition right count:1 */
+    av_store(entry, EO_CACHE_NEXP, newSViv(exp ? av_len(exp) : -2)); /* # uncoverable condition right count:1 */
+    av_store(entry, EO_CACHE_NOK,  newSViv(ok  ? av_len(ok)  : -2)); /* # uncoverable condition right count:1 */
     (void)hv_store_ent(MY_CXT.exports, pkg, newRV_noinc((SV *)entry), 0);
     return set;
 }
@@ -231,12 +252,16 @@ eo_cache_same(pTHX_ AV *entry, I32 slot, I32 nslot, AV *av)
     SV **ref = av_fetch(entry, slot, 0);
     SV **n   = av_fetch(entry, nslot, 0);
     AV *had;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     if (!ref || !n)
-        return FALSE;
-    had = SvROK(*ref) ? (AV *)SvRV(*ref) : NULL;
+        return FALSE; /* # uncoverable statement */
+    had = SvROK(*ref) ? (AV *)SvRV(*ref) : NULL; /* # uncoverable condition right count:1 */
     if (had != av)
         return FALSE;
-    return SvIV(*n) == (av ? av_len(av) : -2);
+    return SvIV(*n) == (av ? av_len(av) : -2); /* # uncoverable condition right count:1 */
 }
 
 static HV *
@@ -244,7 +269,7 @@ eo_cache_get(pTHX_ SV *pkg, AV *exp, AV *ok, bool *built)
 {
     dMY_CXT;
     HE *he = hv_fetch_ent(MY_CXT.exports, pkg, 0, 0);
-    if (he && SvROK(HeVAL(he))) {
+    if (he && SvROK(HeVAL(he))) { /* # uncoverable condition right count:2 */
         AV *entry = (AV *)SvRV(HeVAL(he));
         if (eo_cache_same(aTHX_ entry, EO_CACHE_EXP, EO_CACHE_NEXP, exp)
          && eo_cache_same(aTHX_ entry, EO_CACHE_OK, EO_CACHE_NOK, ok)) {
@@ -318,7 +343,7 @@ eo_install_one(pTHX_ SV *pkg, SV *callpkg, HV *srcstash, HV *dststash, SV *name)
     ref = newRV_inc(thing);
     sv_setsv_mg((SV *)dgv, ref);
     SvREFCNT_dec(ref);
-    switch (type) {
+    switch (type) { /* # uncoverable branch true count:5 */
     case '&': GvIMPORTED_CV_on(dgv); break;
     case '$': GvIMPORTED_SV_on(dgv); break;
     case '@': GvIMPORTED_AV_on(dgv); break;
@@ -375,7 +400,7 @@ eo_install_slow(pTHX_ SV *pkg, SV *callpkg, SV *name)
     dgv = gv_fetchsv(dst, GV_ADDMULTI, SVt_PVGV);
     sv_setsv_mg((SV *)dgv, ref);
 
-    switch (type) {
+    switch (type) { /* # uncoverable branch true count:6 class:ignore_covered_err */
     case '&': GvIMPORTED_CV_on(dgv); break;
     case '$': GvIMPORTED_SV_on(dgv); break;
     case '@': GvIMPORTED_AV_on(dgv); break;
@@ -402,6 +427,9 @@ eo_install_list(pTHX_ SV *pkg, SV *callpkg, HV *srcstash, SV **list, SSize_t n)
     {
         HV *dststash = gv_stashsv(callpkg, GV_ADD);
         for (i = 0; i < n; i++)
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (list[i])
                 eo_install_one(aTHX_ pkg, callpkg, srcstash, dststash, list[i]);
     }
@@ -487,8 +515,11 @@ eo_all_exports(pTHX_ AV *exp, AV *ok)
     lists[1] = ok;
     for (l = 0; l < 2; l++) {
         SSize_t i, top;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
         if (!lists[l])
-            continue;
+            continue; /* # uncoverable statement */
         top = av_len(lists[l]);
         for (i = 0; i <= top; i++) {
             SV **svp = av_fetch(lists[l], i, 0);
@@ -544,6 +575,9 @@ eo_walk_specs(pTHX_ SV *pkg, AV *specs, AV *exp, AV *ok, bool verbose, I32 *oops
     p.order = (AV *)sv_2mortal((SV *)newAV());
     p.at    = (HV *)sv_2mortal((SV *)newHV());
 
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (av_len(specs) >= 0) {
         STRLEN len;
         const char *s = SvPV_const(*av_fetch(specs, 0, 0), len);
@@ -573,7 +607,7 @@ eo_walk_specs(pTHX_ SV *pkg, AV *specs, AV *exp, AV *ok, bool verbose, I32 *oops
             if (len - 1 == 7 && memEQ(s + 1, "DEFAULT", 7)) {
                 eo_av_append(aTHX_ names, exp);
             }
-            else if (tags && (he = hv_fetch_ent(tags, tag, 0, 0)) && SvTRUE(HeVAL(he))) {
+            else if (tags && (he = hv_fetch_ent(tags, tag, 0, 0)) && SvTRUE(HeVAL(he))) { /* # uncoverable condition right count:1 */
                 SV *val = HeVAL(he);
                 if (!SvROK(val) || SvTYPE(SvRV(val)) != SVt_PVAV)
                     Perl_croak(aTHX_ "Not an ARRAY reference");
@@ -614,7 +648,7 @@ eo_call_export_fail(pTHX_ SV *pkg, AV *failed)
 {
     dMY_CXT;
     HV *stash = gv_stashsv(pkg, 0);
-    GV *meth = stash ? gv_fetchmethod_autoload(stash, "export_fail", FALSE) : NULL;
+    GV *meth = stash ? gv_fetchmethod_autoload(stash, "export_fail", FALSE) : NULL; /* # uncoverable condition right count:1 */
     CV *fcv = (meth && isGV_with_GP(meth)) ? GvCV(meth) : NULL;
     AV *out = (AV *)sv_2mortal((SV *)newAV());
     SSize_t i, top;
@@ -731,7 +765,7 @@ static bool
 eo_would_be_heavy(pTHX_ SV *pkg, AV *list, bool args, HV *set, bool verbose)
 {
     HV *stash = gv_stashsv(pkg, 0);
-    SV **failgv = stash ? hv_fetchs(stash, "EXPORT_FAIL", 0) : NULL;
+    SV **failgv = stash ? hv_fetchs(stash, "EXPORT_FAIL", 0) : NULL; /* # uncoverable condition right count:1 */
     AV *fail = failgv ? eo_pkg_av(aTHX_ pkg, STR_WITH_LEN("EXPORT_FAIL")) : NULL;
     SV *first = NULL;
     SSize_t i, top;
@@ -745,17 +779,20 @@ eo_would_be_heavy(pTHX_ SV *pkg, AV *list, bool args, HV *set, bool verbose)
         first = svp ? *svp : NULL;
     }
 
-    top = list ? av_len(list) : -1;
+    top = list ? av_len(list) : -1; /* # uncoverable condition right count:1 */
     for (i = 0; i <= top; i++) {
         SV **svp = av_fetch(list, i, 0);
         STRLEN len;
         const char *s;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
         if (!svp)
-            continue;
+            continue; /* # uncoverable statement */
         s = SvPV_const(*svp, len);
         if (eo_has_nonword(s, len, SvUTF8(*svp) ? TRUE : FALSE))
             return TRUE;
-        if (args && set && !hv_exists_ent(set, *svp, 0))
+        if (args && set && !hv_exists_ent(set, *svp, 0)) /* # uncoverable condition right count:2 */
             return TRUE;
         if (first && sv_eq(*svp, first))
             return TRUE;
@@ -768,7 +805,7 @@ eo_export(pTHX_ SV *pkg, SV *callpkg, SV **items, I32 n, const COP *errcop, bool
 {
     dMY_CXT;
     AV *exp, *names;
-    bool verbose = SvTRUE(GvSVn(MY_CXT.verbose_gv)) ? TRUE : FALSE;
+    bool verbose = SvTRUE(GvSVn(MY_CXT.verbose_gv)) ? TRUE : FALSE; /* # uncoverable condition right count:1 */
 
     ENTER;
     if (errcop && errcop != PL_curcop) {
@@ -783,7 +820,7 @@ eo_export(pTHX_ SV *pkg, SV *callpkg, SV **items, I32 n, const COP *errcop, bool
         HV *stash = gv_stashsv(pkg, 0);
         GV *expgv = eo_stash_gv(aTHX_ stash, STR_WITH_LEN("EXPORT"), FALSE);
         GV *okgv  = eo_stash_gv(aTHX_ stash, STR_WITH_LEN("EXPORT_OK"), FALSE);
-        SV **failp = stash ? hv_fetchs(stash, "EXPORT_FAIL", 0) : NULL;
+        SV **failp = stash ? hv_fetchs(stash, "EXPORT_FAIL", 0) : NULL; /* # uncoverable condition right count:1 */
         AV *fail = (failp && isGV_with_GP(*failp)) ? GvAV((GV *)*failp) : NULL;
         if (expgv && GvAV(expgv) && okgv && GvAV(okgv)
             && (!failp || (isGV_with_GP(*failp) && (!fail || av_len(fail) < 0)))) {
@@ -925,6 +962,9 @@ eo_setup(pTHX_ SV **items, I32 n)
             SV **v;
             PL_hints |= HINT_LOCALIZE_HH;
             v = hv_stores(GvHVn(PL_hintgv), EO_STRICT_KEY, newSViv(1));
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 */
             if (v)
                 SvSETMAGIC(*v);
             continue;
@@ -943,6 +983,9 @@ eo_setup(pTHX_ SV **items, I32 n)
         SV **v;
         PL_hints |= HINT_LOCALIZE_HH;
         v = hv_stores(GvHVn(PL_hintgv), EO_KW_KEY, newSViv(1));
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 */
         if (v)
             SvSETMAGIC(*v);
     }
@@ -952,7 +995,7 @@ eo_setup(pTHX_ SV **items, I32 n)
         SV *dst = eo_qualify(aTHX_ callpkg, STR_WITH_LEN("import"), FALSE);
         GV *gv = gv_fetchsv(dst, 0, SVt_PVCV);
         CV *have = (gv && isGV_with_GP(gv)) ? GvCVu(gv) : NULL;
-        if (!have || !(CvROOT(have) || CvXSUB(have))) {
+        if (!have || !(CvROOT(have) || CvXSUB(have))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             gv = gv_fetchsv(dst, GV_ADDMULTI, SVt_PVGV);
             sv_setsv_mg((SV *)gv, sv_2mortal(newRV_inc((SV *)MY_CXT.import_cv)));
             GvIMPORTED_CV_on(gv);
@@ -1123,7 +1166,7 @@ require_version(self, wanted)
 CODE:
 {
     SV *pkg = SvROK(self) && SvOBJECT(SvRV(self))
-            ? newSVpv(HvNAME_get(SvSTASH(SvRV(self))), 0)
+            ? newSVpv(HvNAME_get(SvSTASH(SvRV(self))), 0) /* # uncoverable condition left count:1 */
             : newSVsv(self);
     I32 count;
     sv_2mortal(pkg);
@@ -1133,7 +1176,7 @@ CODE:
     PUTBACK;
     count = call_method("VERSION", G_SCALAR);
     SPAGAIN;
-    RETVAL = count ? newSVsv(POPs) : newSV(0);
+    RETVAL = count ? newSVsv(POPs) : newSV(0); /* # uncoverable condition right count:1 */
     PUTBACK;
 }
 OUTPUT:

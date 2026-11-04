@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::WriteQIF;
 # ABSTRACT: Write transactions to QIF format
-$Finance::Tiller2QIF::WriteQIF::VERSION = '1.20';
+$Finance::Tiller2QIF::WriteQIF::VERSION = '1.21';
 =encoding utf8
 
 =head1 DESCRIPTION
@@ -26,6 +26,8 @@ Display all unexported, non-skipped transactions as labeled blocks. The first li
 C<$viewer> selects where the table goes. The default, C<console>, prints to STDOUT. Any other value is used as-is as a shell command line (optionally with arguments, e.g. C<code --wait>); the table is written to a read-only temporary file with a C<.t2qpv> suffix, and the command is run with that file's path (shell-quoted) appended, then the path is printed. Because the whole line goes to the shell, ordinary shell quoting works — a program path containing spaces can be double- or single-quoted within C<$viewer> itself. The temporary file is left in place for the viewer to read. An undefined or blank viewer is fatal, and so is anything other than a normal, successful run of the command — there is no silent fallback to the console, and no attempt to report why it failed beyond that.
 
 Any further arguments are additional files to open alongside the preview, in the same viewer invocation; the CLI passes the mapping file here for C<--multipreview>. They require a real viewer (not C<console>) and must be readable, or the call dies.
+
+On Windows, the command runs through C<cmd.exe> with Windows quoting for the file arguments. Use double quotes around program paths containing spaces. Delayed environment-variable expansion is disabled so file names containing C<!> remain literal.
 
 =head1 AUTHOR
 
@@ -180,6 +182,18 @@ sub _shell_quote ($str) {
   return "'$str'";
 }
 
+sub _launch_windows_viewer ($viewer, @files) {
+  require Win32::ShellQuote;
+  my $cmd = join ' ', $viewer, Win32::ShellQuote::quote_cmd(@files);
+  my $shell = $ENV{COMSPEC} // 'cmd.exe';
+  # Force cmd.exe so quoting does not depend on Perl's shell autodetection.
+  # Disable AutoRun and delayed expansion so file names containing ! survive.
+  # Perl adds the outer quotes for /c; adding another pair breaks viewers
+  # whose executable path is already quoted.
+  die "preview viewer '$viewer' failed\n"
+    if system { $shell } $shell, '/d', '/v:off', '/s', '/c', $cmd;
+}
+
 sub _launch_viewer ( $viewer, $text, @also ) {
   for my $extra (@also) {
     die "preview cannot open '$extra': it does not exist or can't be read\n"
@@ -199,8 +213,13 @@ sub _launch_viewer ( $viewer, $text, @also ) {
 
   say "Preview written to $file";
   say "Also opening: $_" for @also;
-  my $cmd = join ' ', $viewer, map { _shell_quote($_) } $file, @also;
-  die "preview viewer '$viewer' failed\n" if system($cmd);
+  if ($^O eq 'MSWin32') {
+    _launch_windows_viewer($viewer, $file, @also);
+  }
+  else {
+    my $cmd = join ' ', $viewer, map { _shell_quote($_) } $file, @also;
+    die "preview viewer '$viewer' failed\n" if system($cmd);
+  }
   return $file;
 }
 

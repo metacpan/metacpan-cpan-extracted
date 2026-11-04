@@ -83,7 +83,7 @@ sub verify_text {
     );
     my $v = verify_text($msg->as_string);
     is($v->result, 'fail', 'd=/mf= domain mismatch fails');
-    like($v->result_detail, qr/\QDKIM2-Signature i=1 MAIL FROM and d= do not match\E/,
+    like($v->result_detail, qr/\QDKIM2-Signature i=1 mf= and d= do not match\E/,
         'canonical d=/mf= mismatch detail');
 }
 
@@ -192,7 +192,7 @@ sub verify_text {
 }
 
 # ------------------------------------------------------------------
-# -08 sections 14.2 to 14.8: the exact strings, one message each (built
+# -09 sections 14.2 to 14.8: the exact strings, one message each (built
 # with t/lib/Spec07Fixture.pm, which signs whatever it is asked to).
 # ------------------------------------------------------------------
 {
@@ -209,7 +209,7 @@ sub verify_text {
 
     my @cases = (
         [ 'no DKIM2 header fields',
-          Spec07Fixture::message(), ['none', 'no DKIM2-Signature headers found'] ],
+          Spec07Fixture::message(), ['none', 'NONE: No DKIM2 header fields found'] ],
         [ 'instances but no signature', $m1,
           ['permerror', 'PERMERROR: Message-Instance m=1 is not signed'] ],
         [ 'an instance above the top signature',

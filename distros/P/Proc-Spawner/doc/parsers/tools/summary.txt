@@ -1,0 +1,1386 @@
+
+=== cookbook: 81 samples; accepted 167 pieces (248 lines), rejected 1224 pieces (1330 lines)
+    211 lines   195 pieces  unsupported parameter form
+               | \nresult=$1\n
+               | ALBUM="$1"\n
+               |     SIZE=$5\n
+    109 lines   106 pieces  no command name
+               | bflag=\n
+               | bflag=\n
+               | CHAR='-'\n
+     88 lines    88 pieces  keyword 'fi'
+               | fi\n
+               | fi\n
+               | fi\n
+     66 lines     4 pieces  here-document
+               |         Output "$(cat <<- EoF\n			.A Table\n			[options="header"]\n			|=======\n			|head|h|h\n			|ce
+               |         Output "$(cat <<- EoF                                          # <8>\n			[[$id]]\n			=== $te
+               | cat <<EOF                                       # <7>\n<HTML>\n<HEAD><TITLE>$THISPH</TITLE></HEAD>\n
+     64 lines    63 pieces  keyword 'if'
+               |     if [ $DB ]\n
+               | if [ "$bflag" ]\n
+               | if [ "$bflag" ]\n
+     62 lines    62 pieces  unquoted '}'
+               | }\n
+               | }\n
+               | }\n
+     60 lines    59 pieces  command name not literal
+               | $endif\n
+               | \n[...]\n
+               | \n$endif\n
+     59 lines    54 pieces  builtin 'alias'
+               | alias ll="ls $LS_OPTIONS -l"\n
+               | alias la="ls $LS_OPTIONS -la"\n
+               | alias lrt="ls $LS_OPTIONS -alrt"\n
+     59 lines    59 pieces  missing command
+               | )\n
+               |     ;;\n
+               |     ;;\n
+     48 lines    48 pieces  keyword 'done'
+               | done\n
+               | done\n
+               | done\n
+     45 lines    45 pieces  keyword 'then'
+               | then\n
+               | then\n
+               | then\n
+     41 lines    41 pieces  keyword 'else'
+               | else\n
+               | else\n
+               | else\n
+     34 lines    34 pieces  builtin 'export'
+               | export FZ\n
+               | export FREE\n
+               |         export USING_SCREEN=YES\n
+     34 lines    34 pieces  unexpected ')'
+               |     'Linux')\n
+               |     'SunOS')\n
+               | \n    restore )\n
+     34 lines    34 pieces  unquoted '{'
+               | END {\n
+               | END {\n
+               | \nNF > 7 {\n
+     23 lines    23 pieces  keyword 'esac'
+               | esac\n
+               | esac\n
+               | esac\n
+     23 lines    18 pieces  keyword 'for'
+               |     for (i in user) {\n
+               |     for (i in user) {\n
+               | for ((i=0; i<LEN; i++))\n
+     20 lines    20 pieces  keyword 'do'
+               | do\n
+               | do\n
+               | do\n
+     18 lines    17 pieces  builtin 'local'
+               |     local i\n
+               |     local cur\n
+               | {\n    local HIDN\n
+     18 lines    14 pieces  unexpected '('
+               | \ntty_builtin (list)\n
+               | \n\n    t = ttyname (0);\n
+               |     {\n        switch (opt)\n
+     17 lines    16 pieces  keyword 'case'
+               |     case $FOUND in\n
+               | \ncase "$action" in\n
+               |     case $OPTION in\n
+     13 lines    13 pieces  keyword 'while'
+               | \nwhile [ 1 ]; do\n
+               | \nwhile read PHOTO\n
+               | \nwhile read aline\n
+     12 lines    12 pieces  builtin 'return'
+               |     return big\n
+               |         return 1\n
+               |         return 1\n
+     12 lines    11 pieces  builtin 'set'
+               |   # Set bell to audible\n    set bell-style audible\n
+               |   # List ls -F for completion\n    set visible-stats on\n
+               | #!/usr/bin/env bash\n# cookbook filename: buggy\n#\n\nset -x\n
+     12 lines    12 pieces  keyword 'function'
+               | \n#\n# compute the free space on the mp3 player\n#\nfunction FREESPACE\n
+               | # cookbook filename: func_max.1\n\n# define the function:\nfunction max ()\n
+               | # cookbook filename: func_max.2\n\n# define the function:\nfunction max ()\n
+     10 lines    10 pieces  builtin 'trap'
+               | trap "trapped HUP"  HUP\n
+               | trap "trapped INT"  INT\n
+               | trap "trapped EXIT" EXIT\n
+     10 lines    10 pieces  unsupported cd form
+               | \ncd "$HERE"\n
+               | cd "$ALBUM"\n
+               | \ncd "$PRIV1"\n
+      9 lines     9 pieces  bad arithmetic expression
+               | shift $(($OPTIND - 1))\n
+               | shift $(($OPTIND - 1))\n
+               | \nANS=$(($1 ${3//x/*} $2))\n
+      9 lines     9 pieces  builtin 'break'
+               |         break\n
+               |         break\n
+               |         break\n
+      9 lines     9 pieces  keyword 'elif'
+               | elif (( $# > 3 ))\n
+               |     elif [ "$selection" ]; then\n
+               |     elif [ "$CHOICE" != "y" ]; then\n
+      8 lines     8 pieces  builtin 'shift'
+               | shift 3\n
+               |     shift\n
+               |     shift\n
+      7 lines     7 pieces  '((' at the start of a command
+               |         (( i -= 3 ))\n
+               |         (( exit_code++ ))\n
+               |     (( i = ${#bdot} - 1 ))\n
+      7 lines     5 pieces  shell-set variable 'HOSTNAME'
+               | \n\n# Do site- or host-specific things here\ncase $HOSTNAME in\n
+               | [ -r "$HOME/.keychain/${HOSTNAME}-sh-gpg" ] \\n  && source "$HOME/.keychain/${HOSTNAME}-sh-gpg"\n
+               | # cookbook filename: email_sample\n\n# Define some mail settings. Use a case statement with uname or
+      7 lines     7 pieces  unsupported exit status
+               |     exit -1\n
+               |     exit -2\n
+               | exit $exit_code\n
+      6 lines     5 pieces  '$' starting no expansion
+               | \n# IPv6 Using Perl, just for fun\n$ /sbin/ifconfig -a | perl -ne 'if\n
+               | \n# IPv4 Using Perl, just for fun\n$ /sbin/ifconfig -a | perl -ne 'if ( m/^\s*inet (?:addr:)?([\d.]+
+               |   # Edit variable on current line.\n    #"\M-\C-v": "\C-a\C-k$\C-y\M-\C-e\C-a\C-y="\n    "\C-xe": "\
+      6 lines     6 pieces  builtin 'builtin'
+               |     builtin cd "$newdir"         # No matter what, cd into it\n
+               |     builtin cd "$newdir"         # No matter what, cd into it\n
+               | \n        # Actually do the cd\n        builtin cd $option "$cdpath"\n
+      5 lines     5 pieces  keyword 'select'
+               | select DB in $DBLIST\n
+               | \nselect DB in $DBLIST\n
+               | select DB in $DBLIST "new..."\n
+      5 lines     5 pieces  keyword 'until'
+               | until [ "$CHOICE" = "y" ]; do\n
+               | until [ "$directory" == "Finished" ]; do\n
+               | \nuntil [ -n "$temp_dir" -a ! -d "$temp_dir" ]; do\n
+      4 lines     4 pieces  builtin 'let'
+               | let COUNT=0\n
+               |                 let SUM+=FZ\n
+               |                 let COUNT++\n
+      4 lines     4 pieces  builtin 'read'
+               |     read answer\n
+               |         read DB rest\n
+               | \n    read -p "$prompt" answer\n
+      4 lines     4 pieces  builtin 'shopt'
+               | shopt -q -s checkwinsize      # Update the values of LINES and COLUMNS\n
+               | shopt -q -s cmdhist           # Make multiline commands 1 line in history\n
+               | shopt -q -s cdspell           # Auto-fix minor typos in interactive use of 'cd'\n
+      4 lines     4 pieces  shell-set variable 'BASH_VERSION'
+               | # cookbook filename: add_to_bash_profile\n# Add this code to your ~/.bash_profile\n\n# If we're runn
+               | # cookbook filename: bashrc\n\n# settings/bash_profile: subshell environment settings\n# To reread (
+               | # cookbook filename: add_to_bashrc\n# Add this code to your ~/.bashrc\n\n# If we're running in bash,
+      3 lines     2 pieces  shell-set variable 'PS1'
+               | # cookbook filename: bash_logout\n\n# settings/bash_logout: execute on shell logout\n\n# Clear the s
+               | \n\n# Do this last because we basically fork off from here.  If we exit screen\n# we return to a ful
+      3 lines     3 pieces  shell-set variable 'RANDOM'
+               |     temp_dir="/tmp/meaningful_prefix.${RANDOM}${RANDOM}${RANDOM}"\n
+               |     temp_dir="/$TMP/meaningful_prefix.${RANDOM}${RANDOM}${RANDOM}"\n
+               | \n# Make a "good enough" random temp file in the temp dir\ntemp_file="$temp_dir/meaningful_prefix.${
+      2 lines     2 pieces  bash-only $ form
+               |     if [[ "$CDTRACK" =~ "([[:alpha:][:blank:]]*)- ([[:digit:]]*) - (.*)$" ]]\n
+               | \n# Set a sane/secure IFS (note this is bash & ksh93 syntax only--not portable!)\nIFS=$' \t\n'\n
+      2 lines     2 pieces  bracket expression with a quote, expansion or slash
+               |     user[$3]++\n
+               |     user[$3]++\n
+      2 lines     2 pieces  builtin '.'
+               |       . /etc/bash_completion\n
+               |       . /usr/share/bash-completion/bash_completion\n
+      2 lines     1 pieces  builtin 'eval'
+               |     [ -r "$path/dircolors" ] && eval "$(dircolors)" \\n      && LS_OPTIONS='--color=auto' && break\n
+      2 lines     2 pieces  builtin 'source'
+               |     source "$SETTINGS/bashrc"\n
+               |     source "$SETTINGS/bash_profile"\n
+      2 lines     2 pieces  builtin 'ulimit'
+               | \n# Set the hard limit to 0 to turn off core dumps\nulimit -H -c 0 --\n
+               | \n# No core files by default\n# See also /etc/security/limits.conf on many Linux systems.\nulimit -S
+      2 lines     1 pieces  keyword 'coproc'
+               | {\n    coproc /usr/bin/bc\n
+      2 lines     2 pieces  shell-set variable 'PWD'
+               | \n# make absolute\nHERE=$PWD\n
+               |     # Temp variable for PWD\n    local myPWD=$PWD\n
+      1 lines     1 pieces  '>&' takes one digit or '-'
+               |     echo "scale=5" >& ${bcin}\n
+      1 lines     1 pieces  builtin 'continue'
+               |         continue\n
+      1 lines     1 pieces  builtin 'declare'
+               | \ndeclare -a MYRA\n
+      1 lines     1 pieces  builtin 'hash'
+               | \n# Clear the command path hash\nhash -r\n
+      1 lines     1 pieces  builtin 'typeset'
+               | \n    typeset i commified\n
+      1 lines     1 pieces  builtin 'umask'
+               | umask $UMASK\n
+      1 lines     1 pieces  builtin 'unalias'
+               | \n# Clear all aliases. Important: leading \ inhibits alias expansion.\n\unalias -a\n
+      1 lines     1 pieces  missing word
+               | > ( m/^\s*(?:inet6)? \s*addr(?:ess)?: ([0-9A-Fa-f:]+)/ ) { print qq($1\n);\n
+      1 lines     1 pieces  shell-set variable 'BASH_COMPLETION_COMPAT_DIR'
+               | # Note that the '.' in $CDPATH is needed so that cd will work under POSIX mode\n# but this will also
+      1 lines     1 pieces  shell-set variable '_'
+               | \n    # From _Perl_Cookbook_1 2.17, pg 64, or _Perl_Cookbook_2 2.16, pg 84\n    my $text = reverse $
+      1 lines     1 pieces  unexpected 'N'
+               |     (char *)NULL\n
+      1 lines     1 pieces  unterminated backquote
+               |     "input to standard output. If the `-s' option is supplied, nothing",\n
+
+=== makebook: 330 samples; accepted 236 pieces (236 lines), rejected 94 pieces (94 lines)
+     25 lines    25 pieces  empty command
+               | #
+               | # goal
+               | # MAKEVAR
+     15 lines    15 pieces  unsupported parameter form
+               | MAKEVAR $@
+               | MAKEVAR $@ $<
+               | cygpath -m "$1"
+     11 lines    11 pieces  keyword 'for'
+               | for d in logic ui
+               | for f in $SOURCES; \\ndo                 \\n…               \\ndone
+               | for d in MAKEVAR; \\ndo                        \\nMAKEVAR $d/*.java; \\ndone
+      6 lines     6 pieces  unexpected ')'
+               | MAKEVAR)
+               | MAKEVAR))
+               | MAKEVAR)))
+      5 lines     5 pieces  '$' starting no expansion
+               | $ make
+               | $ make QUIET= hairy_script
+               | $ make CFLAGS=-g CPPFLAGS='-DBSD -DDEBUG'
+      5 lines     5 pieces  unexpected '('
+               | 'XERCES_142_JAR' ( ) cannot be found
+               | most urgent circumstances (unless you just want to irritate your users).
+               | value of the variable (or heaven forbid, the variable itself) contains spaces, the
+      4 lines     4 pieces  builtin 'shopt'
+               | shopt -s nullglob; \\nprintf "%s\n" MAKEVAR > MAKEVAR
+               | cd i-dont-exist &&   \\nshopt -s nullglob && \\necho *.c
+               | shopt -s nullglob;       \\nfor d in MAKEVAR; \\ndo                       \\necho $d/*.java;     \\n
+      4 lines     4 pieces  keyword 'if'
+               | if [ ! -d MAKEVAR ];         \\nthen                           \\nMAKEVAR MAKEVAR;         \\nfi
+               | if [ ! -d MAKEVAR ];         \\nthen                           \\nMAKEVAR MAKEVAR;          \\n\n
+               | if ( $0 !~ /RM: Done/ )                           \\nprintf "%s:%s: %s\n", FILENAME, NR, $0         
+      4 lines     4 pieces  unquoted '^'
+               | make -p | grep ^ls
+               | make --print-database | grep ^ls
+               | /^ *RM:/ {                                                   \\nif ( $0 !~ /RM: Done/ )             
+      4 lines     4 pieces  unquoted expansion in a redirection target
+               | printf "#! /bin/bash -x\nmake\n" > $@
+               | MAKEVAR -M MAKEVAR MAKEVAR > MAKEVAR.$$;                  \\nsed 's,\(MAKEVAR\)\.o[ :]*,\1.o MAKEVAR
+               | MAKEVAR -M MAKEVAR MAKEVAR > MAKEVAR.$$;                           \\nsed 's,\(MAKEVAR\)\.o[ :]*,\1.
+      2 lines     2 pieces  here-document
+               | make -f- FOO=bar -k goal <<< 'goal:;# $(MAKECMDGOALS)'
+               | make -f- <<< 'x:;@echo =$(sort         d   b s   d       t   )='
+      2 lines     2 pieces  unsupported cd form
+               | cd ~/work/mp3_player_out
+               | cd src \\nctags --recurse
+      1 lines     1 pieces  builtin 'command'
+               | command
+      1 lines     1 pieces  builtin 'eval'
+               | eval $(make classpath)
+      1 lines     1 pieces  builtin 'export'
+               | export DISTCC_HOSTS='localhost wasatch oops'
+      1 lines     1 pieces  command name not literal
+               | [[ -d MAKEVAR ]] || MAKEVAR MAKEVAR
+      1 lines     1 pieces  keyword 'do'
+               | do                               \\n[[ -d $d ]] || mkdir -p $d; \\ndone)
+      1 lines     1 pieces  missing command
+               | $(call assert,                              \\n\n
+      1 lines     1 pieces  unexpected 'c'
+               | (/usr/java/toplink-2.5/TopLinkX.jar) cannot be found
+
+=== nl2bash: 10624 samples; accepted 8896 pieces (8896 lines), rejected 1728 pieces (1728 lines)
+    269 lines   269 pieces  no command name
+               | rm $(<xaa)
+               | a=$(false)
+               | x=$(whoami)
+    242 lines   242 pieces  unsupported parameter form
+               | seq $1
+               | kill $!
+               | ps -p $$
+    184 lines   184 pieces  missing word
+               | echo <(yes)
+               | du -s <file>
+               | ps -fp <pid>
+    152 lines   152 pieces  unquoted '{'
+               | mkdir -p path2/{a..z}
+               | find -exec <script> {}\;
+               | find . -empty -ok rm {}\;
+     86 lines    86 pieces  bash-only $ form
+               | touch $'Icon\r'
+               | read -r -d $'\0'
+               | read -r -d $'\0' f2
+     86 lines    86 pieces  builtin 'read'
+               | read
+               | read -e
+               | read dir
+     74 lines    74 pieces  builtin 'alias'
+               | alias
+               | alias no=ls -f
+               | alias ..='cd ..'
+     63 lines    63 pieces  keyword 'while'
+               | while read line; do mkdir -p "${line%/*}"; done < infile
+               | find -name '*spaces*' | while read text; do cat "$text"; done
+               | find . -type f | while read f; do g=`md5sum $f` > $f.md5; done
+     54 lines    54 pieces  '$' starting no expansion
+               | $ ls
+               | $ cat 1
+               | $ ls -Fltr
+     52 lines    52 pieces  unsupported cd form
+               | cd
+               | cd -
+               | cd -L ..
+     51 lines    51 pieces  builtin 'set'
+               | set
+               | set -e
+               | set +e
+     49 lines    49 pieces  builtin 'shopt'
+               | shopt extglob
+               | shopt dotglob
+               | shopt globstar
+     44 lines    44 pieces  builtin 'history'
+               | history
+               | history -a
+               | history -c
+     29 lines    29 pieces  shell-set variable 'PWD'
+               | pushd $PWD
+               | df -i $PWD
+               | ls -d $PWD/*
+     25 lines    25 pieces  unquoted '^'
+               | env | grep ^PATH
+               | sort file -o !#^
+               | git grep ^ | wc -l
+     20 lines    20 pieces  builtin 'jobs'
+               | jobs
+               | jobs -l
+               | jobs -lp
+     18 lines    18 pieces  builtin 'bind'
+               | bind -P
+               | bind -r '\e'
+               | bind -q complete
+     18 lines    18 pieces  builtin 'unset'
+               | unset z
+               | unset -f z
+               | unset DISPLAY
+     18 lines    18 pieces  keyword 'for'
+               | for h in $(seq 1006 1008 | tac); do history -d $h; done
+               | for FILENAME in *; do mv $FILENAME Unix_$FILENAME; done
+               | for f in *; do [[ -f "$f" ]] && mv "$f" "unix_$f"; done
+     15 lines    15 pieces  final backslash
+               | nl -ba long-file \
+               | cat f.html | grep -o \
+               | find -inum 804180 -exec rm {} \
+     15 lines    15 pieces  unterminated quote
+               | find -name '*.jpg
+               | find . -name '*.txt
+               | find /home -name '*.jpg
+     14 lines    14 pieces  unquoted expansion in a redirection target
+               | wc -l < $FILE
+               | find $dirname -type f  > $tempfile
+               | find . -name ‘*.mp4’ >> /tmp/$$
+     12 lines    12 pieces  builtin 'export'
+               | export git=$(which git)
+               | export value=$(uname -r)
+               | export PS1='$(whoami)@$(hostname):'
+     12 lines    12 pieces  command name not literal
+               | $(cat myfile)
+               | $sudo chown root file.sh
+               | arr=$( $line | tr " " "\n")
+     12 lines    12 pieces  unexpected '('
+               | ls !(b*)
+               | ls !(*foo)
+               | ls -d !(*.[ch])
+     11 lines    11 pieces  builtin 'command'
+               | yes | command
+               | command | less
+               | command | more
+     10 lines    10 pieces  here-document
+               | read -a to_sort <<< "$1"
+               | ssh user@server /bin/bash <<'EOT'
+               | grep -q "tar archive" <<<$filetype
+     10 lines    10 pieces  unterminated double quote
+               | find . -type f -name ".*
+               | egrep -R "word-1|word-2” directory-path
+               | find . -name "*.txt -exec process_one {} ";"
+      9 lines     9 pieces  unexpected '|'
+               | ls |& tee files.txt
+               | xxx |& tee /dev/null
+               | ./a.out |& tee output
+      8 lines     8 pieces  bad arithmetic expression
+               | shift $(($#-1))
+               | echo $(( $(... | paste -sd+ -) ))
+               | echo $(($(date +%s) / 60 / 60 / 24))
+      8 lines     8 pieces  builtin 'pushd'
+               | pushd
+               | pushd .
+               | pushd -2
+      7 lines     7 pieces  builtin 'source'
+               | source "$file"
+               | source ~/.profile
+               | source "$DIR/incl.sh"
+      6 lines     6 pieces  unquoted '}'
+               | find . -type d -exec /path/to/script.sh \{} \;
+               | find / -name '*.py' -exec cat \{} \; | tqdm --unit loc --unit_scale True | wc -l
+               | find $STARTDIR -name '*.ps' -print | sed -e 's/.ps$//' | xargs -l -i  ps2pdf \{}.ps
+      5 lines     5 pieces  bracket expression with a quote, expansion or slash
+               | chmod g+w .[^.]* ..?*
+               | unset array[$RANDOM%4]
+               | mv /mnt/usbdisk/[^l]* /home/user/stuff/.
+      5 lines     5 pieces  shell-set variable 'BASH_SOURCE'
+               | echo this dir: `dirname $BASH_SOURCE`
+               | $(dirname $(readlink -f $BASH_SOURCE))
+               | dir=$(dirname $(readlink -m $BASH_SOURCE))
+      4 lines     4 pieces  builtin 'bg'
+               | bg
+               | bg %
+               | bg %  so it wont die when you logoff
+      3 lines     3 pieces  builtin 'fg'
+               | fg
+               | fg 1
+               | fg 2
+      3 lines     3 pieces  keyword 'if'
+               | if find /some/dir/ -maxdepth 0 -empty | read v; then echo "Empty dir"; fi
+               | if find "`echo "$some_dir"`" -maxdepth 0 -empty | read v; then echo "Empty dir"; fi
+               | if find "`echo "$some_dir"`" -maxdepth 0 -empty | read v; then echo "Empty dir"; else "Dir is NOT em
+      2 lines     2 pieces  builtin 'shift'
+               | shift
+               | shift [n]
+      2 lines     2 pieces  builtin 'unalias'
+               | unalias sudo
+               | unalias python
+      2 lines     2 pieces  shell-set variable 'IFS'
+               | find $directory -type l -printf "%p$IFS"
+               | saveIFS=$IFS; IFS=$'\n'; for dir in $(find -depth -type d ); do [[ ! $prev =~ $dir ]] && echo "${dir
+      2 lines     2 pieces  unsupported exit status
+               | exit N
+               | exit -1
+      1 lines     1 pieces  '>&' takes one digit or '-'
+               | find / -name grub.conf >& /dev/null
+      1 lines     1 pieces  'KEY+='
+               | KEY+=`date -r "$arg" +\ %s`
+      1 lines     1 pieces  'LBUFFER+='
+               | LBUFFER+="$(date)"
+      1 lines     1 pieces  'exec' without a command
+               | echo "hey hey, we're the monkees" | (exec 1>&3 && tee /proc/self/fd/3 | gzip --stdout > my_log.gz)
+      1 lines     1 pieces  builtin 'eval'
+               | eval "`find -type f -name "*.htm" |awk -F/ '{print "cp " $0 " " $2 "-" $3 "-" $4 "-" substr($5,5) ";
+      1 lines     1 pieces  builtin 'local'
+               | local pingResults=$(LANG=C ping -q -c10 "$gateway")
+      1 lines     1 pieces  builtin 'logout'
+               | logout
+      1 lines     1 pieces  builtin 'mapfile'
+               | find . | grep "FooBar" | (mapfile -t; cp "${MAPFILE[@]}" ~/foobar)
+      1 lines     1 pieces  builtin 'popd'
+               | popd
+      1 lines     1 pieces  builtin 'type'
+               | file $(readlink -f $(type -p rename))
+      1 lines     1 pieces  keyword 'do'
+               | find . -type f -wholename \*.mbox -print0 | \     while read I ; do         mv $I $(echo $I | sed 's
+      1 lines     1 pieces  missing command
+               | find -type d -empty -exec rmdir -vp --ignore-fail-on-non-empty {} `;`
+      1 lines     1 pieces  shell-set variable 'HOSTNAME'
+               | ssh -l ${USERNAME} ${HOSTNAME} "${SCRIPT}"
+      1 lines     1 pieces  shell-set variable 'PPID'
+               | ps -o pid= --ppid $PPID | xargs kill -9
+      1 lines     1 pieces  unexpected ')'
+               | find /storage -type f \( -name '*.mp4' -o -name '*.flv' \) -printf '%T@ %p\0' | sort -zn)
+      1 lines     1 pieces  unexpected end
+               | (find $DIR/tmp/daily/ -name *.tar.gz | sort -n | head -2
+      1 lines     1 pieces  unterminated backquote
+               | find . -maxdepth 1 -type f -name 'image*png' `
+
+=== pure-bash-bible: 122 samples; accepted 100 pieces (133 lines), rejected 434 pieces (434 lines)
+     83 lines    83 pieces  '$' starting no expansion
+               | $ uuid\n
+               | $ : \\u\n
+               | $ var="world"\n
+     70 lines    70 pieces  unsupported parameter form
+               |     set -- $*\n
+               |     done < "$1"\n
+               |     done < "$1"\n
+     47 lines    47 pieces  unexpected '('
+               | bar() {\n
+               | bkr() {\n
+               | head() {\n
+     45 lines    45 pieces  unquoted '}'
+               | }\n
+               | }\n
+               | }\n
+     18 lines    18 pieces  command name not literal
+               | \n    *)\n
+               | \n    *)\n
+               |     "darwin"*)\n
+     17 lines    17 pieces  keyword 'done'
+               | done\n
+               | done\n
+               | done\n
+     14 lines    14 pieces  no command name
+               | LANG=C\n
+               | \nfoo="bar"\n
+               | arr=(a b c d)\n
+     14 lines    14 pieces  unquoted '{'
+               | echo {A..Z}\n
+               | exec {sleep_fd}<> <(:)\n
+               | \n# Nesting.\necho {A..Z}{0..9}\n
+     12 lines    12 pieces  '((' at the start of a command
+               | ((var--))\n
+               | ((var+=1))\n
+               | ((var-=1))\n
+     12 lines    12 pieces  keyword 'for'
+               | for ((i=0;i<=VAR;i++)); do\n
+               | for ((i=0;i<=100;i++)); do\n
+               | \n    for ((N=0;N<16;++N)); do\n
+     12 lines    12 pieces  missing command
+               |     ;;\n
+               |     ;;\n
+               |     ;;\n
+     11 lines    11 pieces  keyword 'fi'
+               | fi\n
+               | fi\n
+               | fi\n
+      9 lines     9 pieces  keyword 'if'
+               | if [[ $var == sub_string* ]]; then\n
+               | if [[ $var == *sub_string ]]; then\n
+               | if [[ $var == *sub_string* ]]; then\n
+      5 lines     5 pieces  bash-only $ form
+               |     # Usage: get_cursor_pos\n    IFS='[;' read -p $'\e[6n' -d R -rs _ y x _\n
+               | # Bash <4 (discarding empty lines).\nIFS=$'\n' read -d "" -ra file_data < "file"\n
+               |     # Usage: get_functions\n    IFS=$'\n' read -d "" -ra functions < <(declare -F)\n
+      5 lines     5 pieces  builtin 'command'
+               | \n# command\ncommand ls\n
+               | \n# Wrong.\nvar=`command`\n
+               | # Right.\nvar="$(command)"\n
+      5 lines     5 pieces  builtin 'shopt'
+               | shopt -u globstar\n
+               |     shopt -u extdebug\n
+               | \n# Iterate recursively.\nshopt -s globstar\n
+      5 lines     5 pieces  builtin 'trap'
+               | trap '' INT\n
+               | trap 'code_here' DEBUG\n
+               | trap 'code_here' RETURN\n
+      5 lines     5 pieces  keyword 'while'
+               | while read -r line; do\n
+               | while some_quick_test; do\n
+               |     while IFS= read -r _; do\n
+      5 lines     5 pieces  shell-set variable '_'
+               |         case "$_" in\n
+               |     printf '%s\n' "$_"\n
+               |                 printf '%s' "$_"\n
+      4 lines     4 pieces  keyword 'esac'
+               | esac\n
+               | esac\n
+               |         esac\n
+      4 lines     4 pieces  unexpected ')'
+               | \n            3|5|7|9)\n
+               | \n    "cygwin" | "msys" | "win32")\n
+               |             6)  printf '4%x' "$((B%16))" ;;\n
+      3 lines     3 pieces  builtin 'local'
+               |     # Usage: urlencode "string"\n    local LC_ALL=C\n
+               |     # Usage: basename "path" ["suffix"]\n    local tmp\n
+               |     # Usage: random_array_element "array"\n    local arr=("$@")\n
+      3 lines     3 pieces  builtin 'read'
+               | \nread -r color\n
+               |     IFS=';t' read -d t -t 0.05 -sra term_size\n
+               |     # equivalent of sleep 0.001\n    read -t 0.001 -u $sleep_fd\n
+      3 lines     3 pieces  builtin 'return'
+               |         return\n
+               |         return\n
+               |         return 1\n
+      2 lines     2 pieces  builtin 'set'
+               |     set +f\n
+               |     # Usage: trim_all "   example   string    "\n    set -f\n
+      2 lines     2 pieces  keyword 'case'
+               | case "$var" in\n
+               | \n        case "$N" in\n
+      2 lines     2 pieces  shell-set variable 'OSTYPE'
+               | "$OSTYPE"\n
+               | # Modified snippet from Neofetch.\ncase "$OSTYPE" in\n
+      2 lines     2 pieces  shell-set variable 'RANDOM'
+               | "$RANDOM"\n
+               |         B="$((RANDOM%256))"\n
+      1 lines     1 pieces  'file_data+='
+               |     file_data+=("$line")\n
+      1 lines     1 pieces  bad arithmetic expression
+               |     printf -v total "%$(($2-elapsed))s"\n
+      1 lines     1 pieces  bracket expression with a quote, expansion or slash
+               | \n    [[ $tmp != *[!/]* ]] && {\n
+      1 lines     1 pieces  builtin 'declare'
+               |     # Usage: remove_array_dups "array"\n    declare -A tmp_array\n
+      1 lines     1 pieces  builtin 'hash'
+               | hash executable_name &>/dev/null\n
+      1 lines     1 pieces  builtin 'mapfile'
+               | \n# Bash 4+\nmapfile -t file_data < "file"\n
+      1 lines     1 pieces  builtin 'type'
+               | # There are 3 ways to do this and either one can be used.\ntype -p executable_name &>/dev/null\n
+      1 lines     1 pieces  keyword 'else'
+               |     else\n
+      1 lines     1 pieces  keyword 'function'
+               | \n# Wrong.\nfunction do_something() {\n
+      1 lines     1 pieces  shell-set variable 'BASH'
+               | "$BASH"\n
+      1 lines     1 pieces  shell-set variable 'BASH_VERSION'
+               | # As a string.\n"$BASH_VERSION"\n
+      1 lines     1 pieces  shell-set variable 'HOSTNAME'
+               | "$HOSTNAME"\n
+      1 lines     1 pieces  shell-set variable 'HOSTTYPE'
+               | "$HOSTTYPE"\n
+      1 lines     1 pieces  shell-set variable 'PWD'
+               | "$PWD"\n
+      1 lines     1 pieces  shell-set variable 'SECONDS'
+               | "$SECONDS"\n
+
+=== pure-sh-bible: 44 samples; accepted 31 pieces (38 lines), rejected 163 pieces (165 lines)
+     34 lines    34 pieces  '$' starting no expansion
+               | $\n
+               | $\n
+               | $ true\n
+     34 lines    32 pieces  unsupported parameter form
+               | "$$"\n
+               | "$-"\n
+               |     done < "$2"\n
+     13 lines    13 pieces  unexpected '('
+               | head() {\n
+               | split() {\n
+               | lines() {\n
+     13 lines    13 pieces  unquoted '}'
+               | }\n
+               | }\n
+               | }\n
+     12 lines    12 pieces  no command name
+               | end=50\n
+               |         i=$((i+1))\n
+               | # Prompt\nPS1='➜ '\n
+     10 lines    10 pieces  command name not literal
+               | \n    *)\n
+               | \n    *)\n
+               | \n    *)\n
+      9 lines     9 pieces  missing command
+               |         # Else\n    ;;\n
+               |         # Else\n    ;;\n
+               |         # Else\n    ;;\n
+      7 lines     7 pieces  keyword 'done'
+               | done\n
+               | done\n
+               | done\n
+      6 lines     6 pieces  builtin 'set'
+               | \n    # Re-enable globbing.\n    set +f\n
+               | \n    # Re-enable globbing.\n    set +f\n
+               | \n    # Re-enable globbing.\n    set +f\n
+      5 lines     5 pieces  keyword 'while'
+               | \nwhile [ "$start" -le "$end" ]; do\n
+               | while IFS= read -r line || [ -n "$line" ]; do\n
+               |     # Usage: head "n" "file"\n    while IFS= read -r line; do\n
+      4 lines     4 pieces  keyword 'for'
+               | # Greedy example.\nfor file in *; do\n
+               | # Loop from 0-10.\nfor i in 0 1 2 3 4 5 6 7 8 9 10; do\n
+               | \n# PNG files in dir.\nfor file in ~/Pictures/*.png; do\n
+      3 lines     3 pieces  builtin 'command'
+               | \n# Wrong.\nvar=`command`\n
+               | # Right.\nvar="$(command)"\n
+               | \n# $() can easily be nested whereas `` cannot.\nvar="$(command "$(command)")"\n
+      3 lines     3 pieces  builtin 'continue'
+               |     [ -d "$dir" ] || continue\n
+               |     [ -f "$file" ] || continue\n
+               |     [ -e "$file" ] || [ -L "$file" ] || continue\n
+      3 lines     3 pieces  builtin 'trap'
+               | trap '' INT\n
+               | # Clear screen on script exit.\ntrap 'printf \\033[2J\\033[H\\033[m' EXIT\n
+               | \n# Run a function on script exit.\n# 'clean_up' is the name of a function.\ntrap clean_up EXIT\n
+      3 lines     3 pieces  keyword 'case'
+               | case $var in\n
+               | case $var in\n
+               | case $var in\n
+      3 lines     3 pieces  keyword 'esac'
+               | esac\n
+               | esac\n
+               | esac\n
+      2 lines     2 pieces  shell-set variable 'IFS'
+               | \n    # Store the current value of 'IFS' so we\n    # can restore it later.\n    old_ifs=$IFS\n
+               | \n    # Store the current value of 'IFS' so we\n    # can restore it later.\n    old_ifs=$IFS\n
+      1 lines     1 pieces  shell-set variable 'PWD'
+               | "$PWD"\n
+
+=== shellcheck:clean: 884 samples; accepted 300 pieces (306 lines), rejected 621 pieces (635 lines)
+    118 lines   118 pieces  no command name
+               | _a=1
+               | A=foo
+               | foo=bar
+     87 lines    87 pieces  unsupported parameter form
+               | a=$*
+               | a=$@
+               | ls "$@"
+     62 lines    62 pieces  command name not literal
+               | /*
+               | *.txt
+               | $(cmd)
+     45 lines    45 pieces  unexpected '('
+               | f() { true; }
+               | f() { true; }\n
+               | f() { true; }; f
+     44 lines    44 pieces  builtin 'set'
+               | set
+               | set 'a=5'
+               | set -f; ls *
+     27 lines    27 pieces  unquoted '{'
+               | echo {1,3,$n}
+               | @test 'foo' {\n
+               | @test 'status' {\n
+     22 lines    22 pieces  keyword 'while'
+               | while read foo\n
+               | while true; do break; done
+               | while true; do ssh host uptime; done
+     20 lines    20 pieces  '((' at the start of a command
+               | (($1))
+               | (( $$ ))
+               | (( $! ))
+     19 lines    19 pieces  builtin 'declare'
+               | declare -F foo
+               | declare -x -f foo
+               | declare "foo"="bar"
+     19 lines    19 pieces  builtin 'read'
+               | read ''
+               | read foo
+               | read -t 0
+     17 lines     7 pieces  here-document
+               | cat << foo\n$(ls)\nfoo
+               | mplayer foo.ogv << EOF\nq\nEOF\n
+               | ssh host << 'foo'\necho $PATH\nfoo
+     15 lines    15 pieces  keyword 'if'
+               | if a; then exec b; fi
+               | if popd; then rm foo; fi
+               | if cd foo; then rm foo; fi
+     10 lines    10 pieces  keyword 'for'
+               | for i in $var; do true; done
+               | for i in 1 2 3; do echo $i; done
+               | for f in *.mp3; do echo foo; done
+      9 lines     7 pieces  builtin 'alias'
+               | alias -p
+               | alias x=y\n
+               | alias x=z\n
+      9 lines     9 pieces  builtin 'trap'
+               | trap f 0
+               | trap f 14
+               | trap 'stop' int
+      7 lines     7 pieces  bash-only $ form
+               | $".."
+               | IFS=$'\t'
+               | echo $"$1"
+      6 lines     6 pieces  missing word
+               | false < <(set -e)
+               | read < <(test 2>&1 > file)
+               | false < <(shopt -s cdspell)
+      5 lines     5 pieces  builtin 'mapfile'
+               | mapfile -t foo <foo
+               | mapfile -C a b; echo ${b[@]}
+               | mapfile files -t; echo "${files[@]}"
+      5 lines     5 pieces  builtin 'return'
+               | return
+               | return\n
+               | return 1
+      5 lines     5 pieces  keyword 'case'
+               | case foo in *$bar*) foo;; esac
+               | case $f in ?*) true;; *) false;; esac
+               | case $f in x) true;;& x) false;; esac
+      5 lines     5 pieces  unquoted '}'
+               | }
+               | }
+               | }
+      5 lines     5 pieces  unsupported cd form
+               | #!/bin/sh\ncd -P .
+               | cd() { builtin cd $1; }
+               | cd() { something; cd $1; }
+      4 lines     2 pieces  backslash-newline in a word
+               |   'foo'\\n  'bar'
+               |         echo foo\\n        bar
+      4 lines     4 pieces  bad arithmetic expression
+               | x=$(( $? > 0 ))
+               | x=$(( $(date +%s) ))
+               | ( [[ $((i++)) = 10 ]] )
+      4 lines     4 pieces  builtin 'pushd'
+               | pushd ..
+               | pushd -n foo
+               | #!/bin/bash -e\npushd foo\n
+      3 lines     3 pieces  builtin '.'
+               | . foo.sh
+               | #!/bin/sh\n. script
+               | #!/bin/bash\n. script arg
+      3 lines     3 pieces  builtin 'export'
+               | export foo
+               | #!/bin/sh\nexport -p
+               | ( export foo ); echo $foo
+      3 lines     3 pieces  builtin 'popd'
+               | popd -n foo
+               | #!/bin/bash -e\npopd\n
+               | popd || exit; rm -r foo
+      3 lines     3 pieces  builtin 'readonly'
+               | readonly x=$(false)
+               | #!/bin/sh\nreadonly -p
+               | readonly foo=bar; echo $foo
+      3 lines     3 pieces  builtin 'unset'
+               | unset foo
+               | unset foo][
+               | #!/bin/sh\nunset -f namevar
+      2 lines     2 pieces  'exec' with something after it
+               |  :
+               |  exit 3
+      2 lines     2 pieces  builtin 'command'
+               | command jq '$__loc__'
+               | command time -f lol sleep 10
+      2 lines     2 pieces  builtin 'eval'
+               | eval 'echo $1'
+               | eval "$(false || echo exit 42)"
+      2 lines     2 pieces  builtin 'hash'
+               | #!/bin/sh\nhash -r
+               | #!/bin/dash\nhash -v
+      2 lines     2 pieces  builtin 'jobs'
+               | #!/bin/sh\njobs -p
+               | #!/bin/sh\njobs -lp
+      2 lines     2 pieces  builtin 'let'
+               | let i=$i+1
+               | let 'foo = 1'; echo $foo
+      2 lines     2 pieces  builtin 'shopt'
+               | #!/bin/bash\nshopt -s lastpipe; echo a | read -r b; echo "$b"
+               | #!/bin/bash\nshopt -s execfail; exec foo; exec bar; echo 'Error'; exit 1;
+      2 lines     2 pieces  builtin 'type'
+               | #!/bin/sh\ntype ls
+               | #!/bin/busybox sh\ntype -p test
+      2 lines     2 pieces  builtin 'wait'
+               | wait -p pid; echo $pid
+               | wait -zzx -p foo; echo $foo
+      2 lines     2 pieces  unexpected '|'
+               | #!/bin/bash\nfoo |& bar
+               | ls > foo 2> bar |& grep 'No space left'
+      2 lines     2 pieces  unsupported exit status
+               | exit $var
+               | exit $((a|b))
+      2 lines     2 pieces  unsupported ~ form
+               | [[ ~ == ~+ ]]
+               | [[ ~me == ~+ ]]
+      1 lines     1 pieces  '! !'
+               | ! ! true | true
+      1 lines     1 pieces  '>&' takes one digit or '-'
+               | #!/bin/sh\ncmd >& $var
+      1 lines     1 pieces  'exec' without a command
+               | exec > file; cmd
+      1 lines     1 pieces  'n+='
+               | n+='foo bar'
+      1 lines     1 pieces  'x+='
+               | x+='1'
+      1 lines     1 pieces  builtin 'builtin'
+               | builtin export var=4; echo $var
+      1 lines     1 pieces  builtin 'getopts'
+               | getopts ':h' foo; echo $foo
+      1 lines     1 pieces  builtin 'local'
+               | #!/bin/dash\nlocal foo
+      1 lines     1 pieces  builtin 'readarray'
+               | readarray foo; echo ${foo[@]}
+      1 lines     1 pieces  builtin 'source'
+               | #!/bin/busybox sh\nsource /dev/null
+      1 lines     1 pieces  builtin 'typeset'
+               | typeset -a foo; echo "${foo[@]}"
+      1 lines     1 pieces  builtin 'ulimit'
+               | #!/bin/dash\nulimit -m unlimited
+      1 lines     1 pieces  builtin 'umask'
+               | #!/bin/sh\numask -S
+      1 lines     1 pieces  keyword 'do'
+               | do\n
+      1 lines     1 pieces  keyword 'done'
+               | done
+      1 lines     1 pieces  keyword 'select'
+               | select foo in $bar; do true; done
+      1 lines     1 pieces  shell-set variable 'LINENO'
+               | #!/bin/sh\necho $LINENO
+      1 lines     1 pieces  shell-set variable 'PWD'
+               | while [[ $PWD != / ]]; do cd ..; done
+      1 lines     1 pieces  shell-set variable '_'
+               | #!/bin/dash\necho $_
+      1 lines     1 pieces  unquoted '^'
+               | [[ $foo =~ ^c.* ]]
+      1 lines     1 pieces  unquoted expansion in a redirection target
+               | #!/bin/dash\nls > $((i=i+1))
+      1 lines     1 pieces  unsupported 'exec' form
+               | exec -c -a foo jq '$__loc__'
+      1 lines     1 pieces  unterminated quote
+               | '; return $r
+
+=== shellcheck:warned: 783 samples; accepted 269 pieces (273 lines), rejected 543 pieces (553 lines)
+    accepted but rejected by dash bash: 1
+     96 lines    96 pieces  no command name
+               | x=$x
+               | i=i+1
+               | run=1
+     79 lines    79 pieces  unsupported parameter form
+               | a=$@
+               | ls $@
+               | ${$#}
+     59 lines    59 pieces  command name not literal
+               | foo*
+               | [[ $a ]]
+               | [[ cmd ]]
+     29 lines    29 pieces  builtin 'set'
+               | set -e\n
+               | set foo 42
+               | set foo=42
+     28 lines    28 pieces  keyword 'for'
+               | for f in ls; do true; done
+               | for f; do ( break; ); done
+               | for ((;;)); do break; done
+     24 lines    24 pieces  unexpected '('
+               | f() { f; }
+               | rm !(*.hs)
+               | f() { true; }
+     23 lines    13 pieces  here-document
+               | cat <<< foo
+               | cat <<< $((i++))
+               | true <<<$(false)
+     23 lines    23 pieces  unquoted '{'
+               | a={1..10}
+               | echo {a,b}
+               | exec {n}>&2
+     16 lines    16 pieces  keyword 'while'
+               | while read a; do :; done < <(a)
+               | while read foo; do ssh $foo cmd & done
+               | while true; do true | { break; }; done
+     14 lines    14 pieces  '((' at the start of a command
+               | ((var))
+               | (( $? ))
+               | (( (x) ))
+     13 lines    13 pieces  builtin 'trap'
+               | trap f 8
+               | trap f 9
+               | trap f stop
+     12 lines    12 pieces  keyword 'if'
+               | if [ ]; then ..; fi
+               | if true; then popd; fi
+               | if true; then break; fi
+     11 lines    11 pieces  builtin 'read'
+               | read
+               | read -r
+               | read $var
+      9 lines     9 pieces  bad arithmetic expression
+               | $((i++))
+               | echo $((i++))
+               | echo $((3+$foo))
+      9 lines     9 pieces  keyword 'case'
+               | case foo in bar) true; esac
+               | case foo in foo) true; esac
+               | case foo in lol$n) foo;; esac
+      8 lines     8 pieces  bash-only $ form
+               | $"(foo)"
+               | $"{foo}"
+               | echo $[1+2]
+      7 lines     7 pieces  builtin 'declare'
+               | declare -a foo; foo=bar;
+               | declare -A foo; foo=(bar)
+               | declare -a foo; foo[bar]=42;
+      7 lines     7 pieces  builtin 'export'
+               | export $foo
+               | export "$foo"
+               | #!/bin/sh\nexport -f foo
+      5 lines     5 pieces  bracket expression with a quote, expansion or slash
+               | a[$foo]=wee
+               | echo *[^0-9]*
+               | unset foo[$i]
+      4 lines     4 pieces  builtin 'alias'
+               | alias x=y; x
+               | { alias x=y\n
+               | alias a='cp $1 /a'
+      4 lines     4 pieces  builtin 'let'
+               | let a=1
+               | let n++
+               | let 'a=1'
+      4 lines     4 pieces  missing word
+               | ls >(cat)
+               | cat < <(ls)
+               | read -ra arr <(ls)
+      4 lines     4 pieces  unsupported cd form
+               | cd $tmp; foo; cd -
+               | cd ~/src; rm -r foo
+               | #!/bin/sh\ncd -P -e .
+      3 lines     3 pieces  builtin 'readonly'
+               | readonly foo=bar
+               | readonly foo=(bar)
+               | #!/bin/sh\nreadonly -a
+      3 lines     3 pieces  builtin 'return'
+               | return -1
+               | return 1000
+               | return 'hello world'
+      3 lines     3 pieces  shell-set variable 'RANDOM'
+               | echo $RANDOM
+               | echo $((RANDOM%6+1))
+               | x=$RANDOM; [ $x > $z ]
+      3 lines     3 pieces  unquoted '}'
+               | }
+               | }
+               | }
+      3 lines     3 pieces  unquoted expansion in a redirection target
+               | ls > $((i++))
+               | [ $foo > $bar ]
+               | /usr/bin/test $var > $foo
+      3 lines     3 pieces  unsupported exit status
+               | exit -1
+               | exit 1000
+               | exit 'hello world'
+      2 lines     2 pieces  '>&' takes one digit or '-'
+               | #!/bin/sh\ncmd >& file
+               | #!/bin/sh\ncmd >& $dir/$var
+      2 lines     2 pieces  'exec' with something after it
+               |  cmd
+               |  true
+      2 lines     2 pieces  'x+='
+               | x+=1
+               | x+=42
+      2 lines     2 pieces  builtin 'local'
+               | local i=0
+               | local foo=3
+      2 lines     2 pieces  builtin 'popd'
+               | popd
+               | popd; rm -r foo
+      2 lines     2 pieces  builtin 'type'
+               | #!/bin/sh\ntype -a ls
+               | #!/bin/dash\ntype -p test
+      2 lines     2 pieces  builtin 'typeset'
+               | typeset -A foo; foo+=(bar)
+               | ( typeset -a lol=a; ); echo $lol;
+      2 lines     2 pieces  builtin 'unset'
+               | unset foo[1]
+               | #!/bin/sh\nunset -n namevar
+      2 lines     2 pieces  keyword 'coproc'
+               | coproc tail -f log; echo $COPROC
+               | coproc foo while true; do echo cow; done; echo $foo
+      2 lines     2 pieces  shell-set variable 'PWD'
+               | echo $PWD
+               | alias foo="echo $PWD"
+      2 lines     2 pieces  unexpected '|'
+               | make |& less
+               | #!/bin/ksh\nfoo |& bar
+      1 lines     1 pieces  '! !'
+               | ! ! true
+      1 lines     1 pieces  'a+='
+               | a+=(1,2,3)
+      1 lines     1 pieces  'foo+='
+               | #!/bin/sh\nfoo+=bar
+      1 lines     1 pieces  builtin '.'
+               | #!/bin/sh\n. script arg
+      1 lines     1 pieces  builtin 'builtin'
+               | builtin cd ~/src; rm -r foo
+      1 lines     1 pieces  builtin 'continue'
+               | continue 2
+      1 lines     1 pieces  builtin 'hash'
+               | #!/bin/sh\nhash -l
+      1 lines     1 pieces  builtin 'jobs'
+               | #!/bin/sh\njobs -s
+      1 lines     1 pieces  builtin 'pushd'
+               | pushd ~/src; rm -r foo
+      1 lines     1 pieces  builtin 'readarray'
+               | readarray < file
+      1 lines     1 pieces  builtin 'shopt'
+               | #!/bin/dash\nshopt -s execfail; exec foo; exec bar; echo 'Error'; exit 1;
+      1 lines     1 pieces  builtin 'source'
+               | source file
+      1 lines     1 pieces  builtin 'ulimit'
+               | #!/bin/sh\nulimit -x unlimited
+      1 lines     1 pieces  builtin 'umask'
+               | #!/bin/sh\numask -p
+      1 lines     1 pieces  builtin 'wait'
+               | #!/bin/sh\nwait -n
+      1 lines     1 pieces  keyword '!'
+               | true | ! true
+      1 lines     1 pieces  keyword 'function'
+               | #!/bin/ksh\nfunction foo() { command foo --lol "$@"; }
+      1 lines     1 pieces  keyword 'select'
+               | select x; do :; done
+      1 lines     1 pieces  multi-digit descriptor
+               | #!/bin/dash\necho foo 42>/dev/null
+      1 lines     1 pieces  pattern in a redirection target
+               | foo > file*.txt
+      1 lines     1 pieces  shell-set variable 'MACHTYPE'
+               | #!/bin/dash\necho $MACHTYPE
+      1 lines     1 pieces  shell-set variable 'PIPESTATUS'
+               | echo $PIPESTATUS
+      1 lines     1 pieces  shell-set variable 'PS1'
+               | ssh host "echo $PS1"
+      1 lines     1 pieces  shell-set variable '_'
+               | #!/bin/sh\necho $_
+      1 lines     1 pieces  unsupported 'exec' form
+               | exec -c env
+
+=== tldr: 29672 samples; accepted 28943 pieces (28943 lines), rejected 729 pieces (729 lines)
+    197 lines   197 pieces  missing word
+               | <p>
+               | <r>
+               | <q>
+     88 lines    88 pieces  builtin 'command'
+               | command
+               | $(command)
+               | command ls
+     27 lines    27 pieces  no command name
+               | <r>sel
+               | IFS=":"
+               | OPTIND=1
+     22 lines    22 pieces  unquoted '{'
+               | tldr {
+               | roll --verbose 2{2d12}
+               | fping 192.168.1.{1..254}
+     20 lines    20 pieces  command name not literal
+               | *
+               | ?
+               | a*
+     18 lines    18 pieces  builtin 'help'
+               | help
+               | help [[
+               | help \(
+     16 lines    16 pieces  unquoted '^'
+               | ^hello
+               | ^string1^
+               | git paste @^
+     14 lines    14 pieces  unexpected '('
+               | Example();
+               | Integrate(x)Cos(x);
+               | salloc -C (amd|intel)&gpu
+     12 lines    12 pieces  builtin 'set'
+               | set
+               | set -a
+               | set -b
+     11 lines    11 pieces  unsupported parameter form
+               | echo $#
+               | echo $?
+               | echo $!|$?
+     10 lines    10 pieces  builtin 'eval'
+               | eval "echo foo"
+               | eval $(ssh-agent)
+               | eval "$(thefuck --alias)"
+     10 lines    10 pieces  builtin 'source'
+               | source file
+               | source path/to/file
+               | ssh host_name abbr -s | source
+      9 lines     9 pieces  builtin 'export'
+               | export -p
+               | export -n VARIABLE
+               | export VARIABLE=value
+      9 lines     9 pieces  builtin 'trap'
+               | trap
+               | trap -l
+               | trap '' 2
+      9 lines     9 pieces  keyword 'if'
+               | if selinuxenabled; then echo "SELinux is running"; fi
+               | if condition_command; then echo "Condition is true"; fi
+               | if ! condition_command; then echo "Condition is true"; fi
+      9 lines     9 pieces  keyword 'while'
+               | while :; do break; done
+               | while command; do :; done
+               | while :; do command; sleep 1; done
+      8 lines     8 pieces  builtin 'compgen'
+               | compgen -c
+               | compgen -a
+               | compgen -k
+      8 lines     8 pieces  builtin 'declare'
+               | declare variable="value"
+               | declare -f function_name
+               | declare -p variable_name
+      8 lines     8 pieces  builtin 'fc'
+               | fc
+               | fc -l
+               | fc -l -r
+      7 lines     7 pieces  '$' starting no expansion
+               | world$
+               | fzf -q "^core go$ | rb$ | py$"
+               | fcrackzip -v -b -l 3 -c a:$% archive
+      7 lines     7 pieces  builtin 'complete'
+               | complete -p
+               | complete -b command
+               | complete -p command
+      7 lines     7 pieces  builtin 'dirs'
+               | dirs
+               | dirs -p
+               | dirs -v
+      7 lines     7 pieces  builtin 'history'
+               | history
+               | history 20
+               | history -c
+      7 lines     7 pieces  builtin 'jobs'
+               | jobs
+               | jobs -l
+               | jobs -p
+      7 lines     7 pieces  builtin 'local'
+               | local --help
+               | local variable="value"
+               | local -i variable="value"
+      7 lines     7 pieces  builtin 'read'
+               | read -a array
+               | read -r variable
+               | read -s variable
+      7 lines     7 pieces  builtin 'wait'
+               | wait
+               | wait -n
+               | wait --help
+      7 lines     7 pieces  here-document
+               | <<>|<>>
+               | command <<<string
+               | dnsx <<<example.com -recon -re
+      7 lines     7 pieces  keyword 'for'
+               | for variable; do echo $variable; done
+               | for ((i=0; i<10; i++)); do echo $i; done
+               | for variable in item1 item2 ...; do echo "Loop is executed"; done
+      7 lines     7 pieces  pattern in a redirection target
+               | <?>
+               | <[>
+               | <[><c>
+      6 lines     6 pieces  builtin 'alias'
+               | alias
+               | alias word
+               | alias la="ls --all"
+      6 lines     6 pieces  builtin 'readarray'
+               | readarray array_name
+               | readarray <path/to/file.txt array_name
+               | readarray <path/to/file.txt -t array_name
+      6 lines     6 pieces  builtin 'shift'
+               | shift
+               | shift n
+               | ppmfade -f path/to/image.ppm -mix|spread|shift|relief|oil|...
+      6 lines     6 pieces  builtin 'type'
+               | type command
+               | type -a command
+               | type -p command
+      5 lines     5 pieces  'exec' without a command
+               | exec 3<>-
+               | exec 3>path/to/file
+               | exec 3<path/to/file
+      5 lines     5 pieces  builtin '.'
+               | .
+               | . path/to/file
+               | . torsocks on|off
+      5 lines     5 pieces  builtin 'disown'
+               | disown
+               | disown -a
+               | disown %job_number
+      5 lines     5 pieces  builtin 'enable'
+               | enable
+               | enable command
+               | enable -n command
+      5 lines     5 pieces  builtin 'hash'
+               | hash
+               | hash -r
+               | hash --help
+      5 lines     5 pieces  builtin 'ulimit'
+               | ulimit -a
+               | ulimit -H -n
+               | ulimit -S -n
+      4 lines     4 pieces  builtin 'bind'
+               | bind -X
+               | bind -p|-P
+               | bind -q command
+      4 lines     4 pieces  builtin 'let'
+               | let "x++"
+               | let --help
+               | let "result = a + b"
+      4 lines     4 pieces  builtin 'popd'
+               | popd
+               | popd +N
+               | popd -N
+      4 lines     4 pieces  builtin 'pushd'
+               | pushd
+               | pushd +4
+               | pushd -n +4
+      4 lines     4 pieces  builtin 'shopt'
+               | shopt
+               | shopt -p
+               | shopt -s option_name
+      4 lines     4 pieces  builtin 'umask'
+               | umask
+               | umask -S
+               | umask a+r
+      4 lines     4 pieces  builtin 'unalias'
+               | unalias -a
+               | unalias word
+               | unalias alias_name
+      4 lines     4 pieces  keyword 'case'
+               | case $COUNTRULE in words) wc --words README ;; lines) wc --lines README ;; esac
+               | case $COUNTRULE in [wW]|words) wc --words README ;; [lL]|lines) wc --lines README ;; *) echo "what?"
+               | case $ANIMAL in cat) echo "It's a cat" ;;& cat|dog) echo "It's a cat or a dog" ;;& *) echo "Fallback
+      4 lines     4 pieces  keyword 'fi'
+               | loadkeys -m en|de|fi|...
+               | loadkeys -b en|de|fi|...
+               | loadkeys -p en|de|fi|...
+      3 lines     3 pieces  builtin 'caller'
+               | caller
+               | caller 0
+               | caller n
+      3 lines     3 pieces  builtin 'compopt'
+               | compopt
+               | compopt command
+               | compopt -o|+o option1 -o|+o option2 command
+      3 lines     3 pieces  builtin 'getopts'
+               | getopts x opt; echo $opt
+               | getopts x: opt; echo $opt $OPTARG
+               | getopts x opt "string text"; echo $opt
+      3 lines     3 pieces  builtin 'logout'
+               | logout
+               | logout exit_code
+               | exit|quit|logout|q
+      3 lines     3 pieces  builtin 'readonly'
+               | readonly -p
+               | readonly existing_variable
+               | readonly variable_name=value
+      3 lines     3 pieces  builtin 'suspend'
+               | suspend -f
+               | sudo virsh start|reboot|reset|shutdown|destroy|suspend|resume domain
+               | timekpra --setlockouttype username lock|suspend|suspendwake|terminate|kill|shutdown
+      3 lines     3 pieces  builtin 'unset'
+               | unset variable
+               | unset -v variable1 variable2 ...
+               | unset -f function_name1 function_name2
+      3 lines     3 pieces  keyword 'until'
+               | until command; do :; done
+               | until ssh username@host; do sleep 2; done
+               | until systemctl is-active -q nginx; do echo "Waiting..."; sleep 1; done; echo "Launched!"
+      3 lines     3 pieces  unsupported 'exec' form
+               | exec -c command -with -flags
+               | exec -l command -with -flags
+               | exec -a name command -with -flags
+      3 lines     3 pieces  unsupported cd form
+               | cd
+               | cd -
+               | cd ~username
+      3 lines     3 pieces  unterminated quote
+               | exo storage list -O '\{\{ .Name \}\}
+               | mu find 'mime:image/* size:2k..2m date:20210101..20211231 from:sam
+               | lwp-request -H 'User-Agent: user_agent -m METHOD http://example.com/some/path
+      2 lines     2 pieces  bash-only $ form
+               | IFS=$' \t\n'
+               | kubectl patch secrets secret_name -p $'metadata:\n finalizers: []' --type merge
+      2 lines     2 pieces  bracket expression with a quote, expansion or slash
+               | [^a]
+               | du -ah -t 1G|1024M|1048576K .[^.]* *
+      2 lines     2 pieces  builtin 'bg'
+               | bg
+               | bg %job_number
+      2 lines     2 pieces  builtin 'fg'
+               | fg
+               | fg %job_number
+      2 lines     2 pieces  keyword 'select'
+               | select /dev/sdX
+               | select word in apple orange pear banana; do echo $word; done
+      1 lines     1 pieces  '((' at the start of a command
+               | ((RANDOM%4096 == 0)) && pokeget random --shiny || pokeget random
+      1 lines     1 pieces  '<&' takes one digit or '-'
+               | read <&"${name[0]}" variable
+      1 lines     1 pieces  '>&' takes one digit or '-'
+               | echo "input" >&"${name[1]}"
+      1 lines     1 pieces  builtin 'builtin'
+               | builtin command
+      1 lines     1 pieces  builtin 'times'
+               | times
+      1 lines     1 pieces  empty command
+               | #!/path/to/tcc -run
+      1 lines     1 pieces  missing command
+               | datashader_cli points path/to/input.parquet --x pickup_x --y pickup_y path/to/output.png --backgroun
+      1 lines     1 pieces  shell-set variable 'HOSTNAME'
+               | mail <path/to/file.txt --subject "$HOSTNAME filename.txt" to_user@example.com
+      1 lines     1 pieces  shell-set variable 'IFS'
+               | echo "$IFS"
+      1 lines     1 pieces  shell-set variable 'RANDOM'
+               | echo $RANDOM
+      1 lines     1 pieces  unquoted '}'
+               | { command1; command2; ... } | another_command
+      1 lines     1 pieces  unquoted expansion in a redirection target
+               | kubectl completion powershell >>$PROFILE
+      1 lines     1 pieces  unsupported exit status
+               | exit exit_code
+      1 lines     1 pieces  unsupported ~ form
+               | ls ~-

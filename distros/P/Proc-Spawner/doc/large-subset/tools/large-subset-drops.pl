@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# large-subset-drops.pl (2026-11-02; see doc/large-subset/large-subset-ceiling.md): every sample of samples.jsonl that the
+# large-subset-drops.pl (2026-11-02; see doc/large-subset/large-subset-ceiling.md (in Proc-Spawner 0.03)): every sample of samples.jsonl that the
 # measurement leaves out, with the reason, as drops.tsv (source, ID, reason). large-subset-remeasure.pl -d drops.tsv
 # leaves them out and counts them by reason. Reasons:
 #   make book: noisy extraction          the whole source (prose and make syntax in the PDF's text)

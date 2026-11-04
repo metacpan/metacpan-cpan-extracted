@@ -1,5 +1,20 @@
 Revision history for Object-Proto
 
+1.03	2026-11-04
+	- Find the import library for the C API test by path, since ExtUtils::Depends before 0.8002 has a different find_extra_libs and returned nothing on Strawberry
+
+1.02	2026-11-04
+	- Link the C API test module against Object::Proto the way ExtUtils::Depends links a consumer, which Windows, Cygwin and Android need
+	- Silence five gcc warnings: four unused variables and a comparison of the address HvNAME returns
+
+1.01	2026-11-04
+	- import_accessors takes an undef package as the caller's, as it does an undef prefix, instead of warning and using the empty one
+	- Fix the cross-package import test, which passed four arguments to import_accessors and hid the warning
+	- Fix a crash when an inherited attribute without a type gains one by +attr or redefinition
+	- Fix the before, after and around error for an undefined class, which read the class name after freeing it
+	- Fix the lazy builder reader on a slot never allocated, which wrote into a null pointer
+	- Test every slot modifier, the function-style accessors, the C type API and the error paths, to 100% C coverage under Devel::XSCover
+
 0.23	2026-09-23
 	- Fix build on perl below 5.20: XopENTRYCUSTOM is not there
 	- Fix build with MSVC: PERL_CALLCONV is dllimport outside the perl DLL

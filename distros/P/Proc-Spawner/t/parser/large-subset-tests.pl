@@ -37,7 +37,7 @@ while (<DATA>) {
   chomp; next unless /\S/ && !/^#/;
   my ($exp, $opt, $id, $s) = /^(ok|rej)\s+(\S+)\s+(\S+)\s+(.*)$/ or die "bad line $_";
   $s =~ s/\@N/\n/g; $s =~ s/\@T/\t/g; $s =~ s/\@R/\r/g;
-  my %o = map +($_ => 1), grep length && $_ ne '-', split /,/, $opt;
+  my %o = map { /=/ ? split(/=/, $_, 2) : ($_ => 1) } grep length && $_ ne '-', split /,/, $opt;   # NAME or NAME=VALUE
   my $t = Proc::ShellSubset::Large::parse($s, %o); my $ok = ref $t eq 'ARRAY'; $n++;
   my $m = $ok eq ($exp eq 'ok') && (!$ok || !exists $tree{$id} || Dumper($t) eq $tree{$id})
     && (!$ok || !$SYN || syn($s, 'dash') && syn($s, qw(bash --posix))) ? '  ' : '!!';
@@ -59,7 +59,7 @@ rej -  LS:8  export() { :; }
 ok  -  LS:9  f(){ local x=1 y=$2; return 3; }
 rej -  LS:10  f(){ local x; }
 rej -  LS:11  local x=1
-rej -  LS:12  return
+ok  -  LS:12  return
 ok  -  LS:13  f(){ while :; do return 1; done; }
 rej -  LS:14  while :; do f(){ break; }; done
 ok  -  LS:15  echo $1 ${10} $# $@ "$*" $0
@@ -131,7 +131,7 @@ ok  -  LS:99  trap "$cmd" INT
 ok  -  LS:100  wait; wait $! 123
 rej -  LS:101  wait %1
 ok  -  LS:102  umask; umask 022
-rej -  LS:103  umask -S
+ok  -  LS:103  umask -S
 ok  -  LS:104  command -v ls; command ls -l
 rej -  LS:105  command -V ls
 ok  -  LS:106  command; command | cat; command >f
@@ -139,15 +139,15 @@ rej -  LS:107  command alias x
 ok  -  LS:108  getopts ab: o -b x
 rej -  LS:109  getopts ab:
 rej -  LS:110  getopts ab: PPID
-ok  -  LS:111  pwd; pwd -P; pwd -x
+rej -  LS:111  pwd; pwd -P; pwd -x
 ok  -  LS:113  cd -
-rej -  LS:114  cd -P /
+ok  -  LS:114  cd -P /
 ok  -  LS:115  . ./lib.sh; eval "echo \$((1+2))"
 rej -  LS:116  . a b
 rej -  LS:117  source x
-rej -  LS:118  alias e=echo
+ok  -  LS:118  alias e=echo
 rej -  LS:119  shopt -s x
-rej -  LS:120  type ls
+ok  -  LS:120  type ls
 ok  -  LS:121  IFS=: read -r a b; read x; for IFS in a; do b; done
 rej -  LS:122  CDPATH=x
 rej -  LS:123  break
@@ -158,7 +158,7 @@ rej -  LS:132  echo $((1=2))
 rej -  LS:133  echo $((PPID=1))
 ok  -  LS:134  echo $((x==1)) $((x<=1)) $((x!=1))
 # patterns that may match . or .. (U2), strings sh reads as options (U1)
-rej -  LS:140  ls -d .* | cat
+ok  -  LS:140  ls -d .* | cat
 ok  -  LS:141  echo .*perf.* .[!.]* ./* x/.git
 rej -  LS:142  -x foo; true
 rej -  LS:143    +x foo | cat
@@ -211,9 +211,9 @@ rej -  LS:191  echo "$(cat <<E)"@Nb@NE
 ok  -  LS:192  >f
 ok  -  LS:193  > f | grep foo
 ok  -  LS:194  x=1 y=2 >f 2>&1
-rej -  LS:195  x=$(v) 2>/dev/null
-rej -  LS:196  x=$y >f
-rej -  LS:197  x=1 <<E@Nb@NE
+ok  -  LS:195  x=$(v) 2>/dev/null
+ok  -  LS:196  x=$y >f
+ok  -  LS:197  x=1 <<E@Nb@NE
 ok  -  LS:198  echo foo\@N   bar
 ok  -  LS:199  'foo'\@N  'bar'
 ok  -  LS:200  ec\@Nho hi
@@ -228,3 +228,100 @@ rej -  LS:208  x=$(<f)
 rej -  LS:209  echo `<f`
 rej -  LS:210  cat </dev/tcp/host/80
 ok  -  LS:211  a &&>g
+# P1-P4 of "Shell Corpus Gaps" (2026-11-02): forms that dash and bash run alike are accepted
+ok  -  LS:212  echo @{-1} x{a}y {} {.}.png \{} a} {b
+ok  -  LS:213  git log @{u}..HEAD
+ok  -  LS:214  find . -exec echo \{} \;
+ok  -  LS:215  case x{a} in x{a}) echo m;; esac
+rej -  LS:216  echo {a,b}
+rej -  LS:217  echo {1..3}
+rej -  LS:218  echo {x{a,b}}
+rej -  LS:219  { echo a }
+ok  -  LS:220  echo $(($(echo 6) / 2)) $((${#HOME} > 0)) $((`echo 2` * 3)) $(( $((1+2)) * 2 ))
+ok  -  LS:221  x=4; echo "$(( $(echo $x) * 2 ))"
+rej -  LS:222  echo $(( ${x:-1} ))
+rej -  LS:223  echo $(( $(echo 1)++ ))
+ok  -  LS:224  PS1='> '; PS4='+ '; HOSTNAME=h PIPESTATUS=1 BASH=x
+rej -  LS:225  export PS1
+rej -  LS:226  echo "$PS1"
+rej -  LS:227  LINENO=5
+ok  -  LS:228  v=x; export $v="$y" ${v}; export $v
+rej -  LS:229  export $v=$y
+rej -  LS:230  export $v=~/q
+ok  -  LS:231  exit 1000
+rej -  LS:232  exit 4294967296
+rej -  LS:233  f() { return 1000; }
+ok  -  LS:234  umask 022; umask -S
+rej -  LS:235  umask -S 077
+ok  -  LS:236  command -p ls /
+rej -  LS:237  command -p cd /
+rej -  LS:238  {a; }
+rej -  LS:239  echo a; }
+ok  -  LS:240  { echo }; }
+rej -  LS:241  bar() {
+rej -  LS:242  {
+rej -  LS:243  exec {n}>&2
+rej -  LS:244  echo {fd}>f
+ok  -  LS:245  echo {fd} >f
+# Q1 of "Shell Corpus Gaps" (2026-11-03): kill with a SIG signal name; both shells refuse it
+rej -  LS:246  kill -SIGHUP 1
+rej -  LS:247  kill -s SIGHUP 1
+rej -  LS:248  kill -l SIGHUP
+rej -  LS:249  kill -sighup 1
+ok  -  LS:250  kill -HUP 1; kill -s TERM 1; kill -l
+# Y2 of "Shell Corpus Gaps" (2026-11-03): a backslash at the very end is a literal \, as in both shells
+ok  -  LS:251  echo a\
+ok  -  LS:252  find . -inum 5 -exec rm {} \
+rej -  LS:253  echo "a\
+# P5 and R1 of "Shell Corpus Gaps" (2026-11-03): [ and test are the program; < and > between operands need the option
+ok  -  LS:254  [ a == a ]; [ -v x ]; test -a f; [ -N f ]
+rej -  LS:255  [ a \< b ]
+rej -  LS:256  test "$x" '>' b -a c
+ok  test_lt_gt  LS:257  [ a \< b ]
+ok  -  LS:258  [ "<" = "<" ]; test ">" != x
+# B1-B3 of "Shell Corpus Gaps" (2026-11-03): alias (expanded in the lines after its definition), the job builtins as dash,
+# the interactive ones as nothing (option interactive)
+ok  -  LS:259  alias ll="echo L"@Nll x
+ok  -  LS:260  alias ll="echo L"; ll x
+ok  -  LS:261  alias e="echo " x=X@Ne x
+ok  -  LS:262  alias a=b; unalias a; alias | wc -l; alias a
+rej -  LS:263  if true; then alias a=b; fi
+rej -  LS:264  x && alias a=b
+rej -  LS:265  alias a=b &
+rej -  LS:266  alias x=if@Nx true; then :; fi
+rej -  LS:267  alias $n=v
+ok  -  LS:268  jobs; times; hash ls; hash -r; hash; type ls cd; ulimit -n; ulimit -Hn; ulimit; bg; fg %1
+rej -  LS:269  ulimit -n 10
+ok  -  LS:270  jobs -l
+ok  -  LS:271  history; fc -l; bind -l; set -o vi; set -o emacs; set -o history
+rej interactive=reject  LS:272  history
+# P6 of "Shell Corpus Gaps" (post-0.03): forms both shells run alike
+ok  -  LS:273  read -p 'Name: ' x; read -rp q x y; read -p q -r x; read -p "$p" x
+rej -  LS:274  read -p
+ok  -  LS:275  cd -P /tmp; cd -L ..; cd -LP x; cd -PL x; cd -P; cd -P -- x
+rej -  LS:276  cd -P -
+rej -  LS:277  cd -x y
+ok  -  LS:278  echo a >*.log; cat <[ab].txt; echo b >>x?y
+ok  -  LS:279  set -o nounset; set -o errexit -o noglob; set +o noclobber; set -o allexport; set -o ignoreeof; set -o notify; set -o nolog; set -b; set +m
+rej -  LS:280  set -m
+rej -  LS:281  set -o monitor
+ok  -  LS:282  trap 'echo c' int; trap f 2 hup 15; trap - int; trap f fpe 8 9 stop usr1; trap f exit 0
+rej -  LS:283  trap f sigint
+rej -  LS:284  trap f 65
+rej -  LS:285  trap f chld
+ok  -  LS:286  pwd; pwd -L; pwd -P; pwd -LP; pwd -- x
+rej -  LS:287  pwd -x
+# post3-0.03: jobs where dash lists nothing (a pipeline, $( ), a compound command)
+ok  -  LS:288  jobs; jobs >f; jobs || echo; sleep 1 & jobs && echo
+ok  -  LS:289  jobs | wc -l
+ok  -  LS:290  x=$(jobs)
+ok  -  LS:291  echo | jobs
+ok  -  LS:292  if true; then jobs; fi
+# rule E (the user, 2026-11-03): where the shells differ, the plainly logical behaviour (doc/large-subset/large-subset-logical.md)
+ok  -  LS:293  cd a b; echo hi 10>/dev/null; case b in [^a]) echo n;; esac; echo .*; x=$(f) 2>/dev/null
+rej -  LS:294  local x
+rej -  LS:295  echo $LINENO
+# post4-0.03: more forms both shells run alike
+ok  -  LS:296  echo $PPID; export "$foo" "${bar}"; umask a+r; umask g+w,o=rx; umask =rx; cd - >/dev/null; jobs -p; jobs -lp
+rej -  LS:297  PPID=3
+rej -  LS:298  umask -S a=

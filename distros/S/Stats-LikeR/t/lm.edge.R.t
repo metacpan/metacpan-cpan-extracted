@@ -25,10 +25,13 @@
 # used to fit it, return every coefficient NaN, and report each with t = -Inf
 # and p = 0.
 #
-# exact_inf and exact_neg_inf: x = (0, 0, 1, 1) makes every step of lm()'s
-# sweep exact in binary -- pivots 4 and 1, multipliers 1/2 -- so the estimates
-# are exact, the residuals exactly 0, and every standard error exactly 0 at
-# every NV width.  summary.lm() defines t as Estimate / Std. Error, so a nonzero
+# exact_inf and exact_neg_inf: x = (0, 0, 1, 1) and y = 2x or -3 - 2x, so the
+# fit is perfect.  lm()'s AS 274 rotations bring in 1/3 and 2/3, which are not
+# exact in binary, but here the rounding falls on the triangle and on Q'y
+# alike and cancels in the back-substitution: the estimates come out exact,
+# the residuals exactly 0, and every standard error exactly 0, on every NV
+# width in the matrix (./test.all.perls.pl, 2026-11-03).  Through 0.3413 the
+# reason was simpler -- every step of the sweep on X'X was exact in binary.  summary.lm() defines t as Estimate / Std. Error, so a nonzero
 # estimate has t = +-Inf and p = 0, a zero one t = NaN, and F = Inf.  R 4.6.1
 # itself does NOT report those numbers: its Householder QR leaves 9.9e-32 of
 # rounding in the residual sum of squares for both cases, and so reports
@@ -39,10 +42,11 @@
 # t/rownames.utf8.t.)
 #
 # On tolerances: kappa(X'X) is 6.5e8 for disp_1_5, the worst of the three
-# mtcars designs (R's kappa(crossprod(X), exact = TRUE)), so the normal
-# equations lm() solves permit a relative error of about 1.4e-7 there.  The
-# worst disagreement with R actually measured on the double perl was 3.3e-13.
-# The 1e-10 relative tolerance leaves 300 times that as headroom for
+# mtcars designs (R's kappa(crossprod(X), exact = TRUE)), so kappa(X) is about
+# 2.5e4 and a QR solver such as lm()'s permits a relative error of about
+# epsilon * 2.5e4 = 5.7e-12 there.  The worst disagreement with R measured on
+# the double perl was 1.2e-14 (3.3e-13 through 0.3413, when lm() solved the
+# normal equations).  The 1e-10 relative tolerance leaves a wide margin for
 # long-double and quadmath builds, whose literals and incomplete-beta tails
 # differ in the last bits.
 # zero_x is exact arithmetic -- y is all zeros, so X'y, the estimates and the

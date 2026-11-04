@@ -3,12 +3,18 @@ use strict;
 use warnings;
 use Test::More;
 use Cwd ();
+use File::Path ();
 use File::Spec ();
 use File::Temp ();
 use Devel::XSCover::Gcov ();
 
 my $dir = File::Temp->newdir;
 my $abs = Cwd::abs_path("$dir");
+File::Path::make_path(File::Spec->catdir($dir, 'src'));
+{
+    open my $fh, '>', File::Spec->catfile($dir, 'src', 'helper.c') or die "$dir/src/helper.c: $!";
+    close $fh;
+}
 my %entry = (lines => { 1 => 1 }, functions => [], blocks => []);
 my $files = {
     'Spike.xs'                      => { %entry },
@@ -32,5 +38,25 @@ is_deeply([sort keys %$aside], ['Spike.c'], 'the generated c kept aside');
 is_deeply([sort keys %$kept], ['Spike.c', 'Spike.xs', 'src/helper.c', 'vendor/zlib.c', 'xs/more.xs'],
     'without generated and ignore: the c is a file, vendor stays, ppport.h and the outside never');
 is_deeply($aside, {}, 'nothing aside');
+
+my $gone = File::Spec->catdir($dir, 'gone', 'deeper');
+($kept, $aside) = Devel::XSCover::Gcov->new(dir => $gone, silent => 1)->filter({
+    'Spike.xs'               => { %entry },
+    "$gone/src/helper.c"     => { %entry },
+    "$dir/src/other.c"       => { %entry },
+});
+is_deeply([sort keys %$kept], ['Spike.xs', 'src/helper.c'],
+    'a directory that is not there yet is still the root: relative paths kept, absolute ones measured against it as written');
+
+{
+    local $^O = 'MSWin32';
+    ($kept, $aside) = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1)->filter({
+        'Spike.xs'           => { %entry },
+        'src\\helper.c'      => { %entry },
+        "$abs\\xs\\more.xs"  => { %entry },
+    });
+    is_deeply([sort keys %$kept], ['Spike.xs', 'src/helper.c', 'xs/more.xs'],
+        'on Windows a name the compiler wrote with backslashes is kept with slashes, as Devel::Cover spells its own');
+}
 
 done_testing;

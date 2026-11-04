@@ -28,54 +28,67 @@
   }
   .dash-f-range-sep {
     font-size: 0.82rem;
-    color: #666;
+    color: var(--muted, #666);
   }
   .btn-dash-filter-apply {
     padding: 0.28rem 0.75rem;
-    border: 1px solid #888;
+    border: 1px solid var(--border-strong, #888);
     border-radius: 6px;
     background: transparent;
-    color: #444;
+    color: var(--text-secondary, #444);
     font-size: 0.82rem;
     cursor: pointer;
     transition: background 0.12s;
   }
-  .btn-dash-filter-apply:hover { background: #f0f0f0; }
+  .btn-dash-filter-apply:hover { background: var(--hover-bg, #f0f0f0); }
   /* x-button inside active filter chips */
   .chip-remove {
     background: none;
     border: none;
     cursor: pointer;
-    color: #7a5800;
+    color: var(--warning-fg, #7a5800);
     font-size: 0.75rem;
     padding: 0 0 0 0.3em;
     line-height: 1;
     vertical-align: middle;
   }
-  .chip-remove:hover { color: #c00; }
+  .chip-remove:hover { color: var(--danger-fg, #c00); }
   /* Schema-type-mismatch warnings from Database::Join */
   .schema-warnings {
     list-style: none;
     margin: 0.4rem 0 0.6rem;
     padding: 0.5rem 0.8rem;
-    background: #fffbe6;
-    border-left: 3px solid #f0a000;
+    background: var(--warning-bg, #fffbe6);
+    border-left: 3px solid var(--warning-border, #f0a000);
     border-radius: 4px;
     font-size: 0.85rem;
-    color: #5a4000;
+    color: var(--body-color, #5a4000);
   }
   .schema-warnings li + li { margin-top: 0.25rem; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .schema-warnings {
-      background: #3a2e00;
-      border-left-color: #f0c040;
-      color: #f0d890;
-    }
+  /* Accelerated datasets: where the rows came from (Phase 7.5) */
+  .accel-note {
+    margin: 0.4rem 0 0.6rem;
+    padding: 0.4rem 0.8rem;
+    background: var(--info-bg, #eaf4fb);
+    border-left: 3px solid var(--info-border, #2980b9);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--info-fg, #1a5276);
   }
-  :root[data-theme="dark"] .schema-warnings {
-    background: #3a2e00;
-    border-left-color: #f0c040;
-    color: #f0d890;
+  .accel-note.accel-stale {
+    background: var(--warning-bg, #fffbe6);
+    border-left-color: var(--warning-border, #f0a000);
+    color: var(--body-color, #5a4000);
+  }
+  /* A button in a sentence that opens a toolbar panel. */
+  .link-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--link, #1a5fb4);
+    text-decoration: underline;
+    cursor: pointer;
   }
   /* Pagination bar */
   .pagination {
@@ -88,38 +101,24 @@
   .page-btn {
     display: inline-block;
     padding: 0.3rem 0.65rem;
-    border: 1px solid #bbb;
+    border: 1px solid var(--border-strong, #bbb);
     border-radius: 4px;
     font-size: 0.85rem;
-    color: #333;
-    background: #fff;
+    color: var(--body-color, #333);
+    background: var(--card-bg, #fff);
     text-decoration: none;
     cursor: pointer;
   }
-  a.page-btn:hover { background: #f0f0f0; border-color: #888; }
+  a.page-btn:hover { background: var(--hover-bg, #f0f0f0); border-color: var(--border-strong, #888); }
   .page-btn-cur {
     background: #0066cc;
     color: #fff;
-    border-color: #0055aa;
+    border-color: var(--info-border, #0055aa);
     font-weight: 600;
     cursor: default;
   }
-  .page-btn-dis { color: #aaa; background: #f8f8f8; cursor: default; }
-  .page-info { font-size: 0.82rem; color: #555; margin-left: 0.5rem; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .page-btn {
-      background: #1e1e1e; color: #ccc; border-color: #555;
-    }
-    :root:not([data-theme="light"]) a.page-btn:hover { background: #2a2a2a; }
-    :root:not([data-theme="light"]) .page-btn-cur { background: #1a6bbf; color: #fff; }
-    :root:not([data-theme="light"]) .page-btn-dis { background: #1a1a1a; color: #666; }
-    :root:not([data-theme="light"]) .page-info { color: #999; }
-  }
-  :root[data-theme="dark"] .page-btn { background: #1e1e1e; color: #ccc; border-color: #555; }
-  :root[data-theme="dark"] a.page-btn:hover { background: #2a2a2a; }
-  :root[data-theme="dark"] .page-btn-cur { background: #1a6bbf; color: #fff; }
-  :root[data-theme="dark"] .page-btn-dis { background: #1a1a1a; color: #666; }
-  :root[data-theme="dark"] .page-info { color: #999; }
+  .page-btn-dis { color: var(--text-faint, #aaa); background: var(--row-alt, #f8f8f8); cursor: default; }
+  .page-info { font-size: 0.82rem; color: var(--text-secondary, #555); margin-left: 0.5rem; }
   /* Pivot table panel */
   .pivot-config {
     display: flex;
@@ -138,13 +137,13 @@
   .pivot-section-head {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #555;
+    color: var(--text-secondary, #555);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 0.1rem;
   }
-  .pivot-req { color: #c00; font-weight: 700; text-transform: none; letter-spacing: 0; }
-  .pivot-opt { color: #888; font-weight: 400; text-transform: none; letter-spacing: 0; }
+  .pivot-req { color: var(--danger-fg, #c00); font-weight: 700; text-transform: none; letter-spacing: 0; }
+  .pivot-opt { color: var(--muted, #888); font-weight: 400; text-transform: none; letter-spacing: 0; }
   .pivot-dim-row, .pivot-measure-row {
     display: flex;
     align-items: center;
@@ -176,27 +175,29 @@
   }
   .btn-remove-pivot {
     background: none;
-    border: 1px solid #bbb;
+    border: 1px solid var(--border-strong, #bbb);
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.75rem;
     padding: 0.2rem 0.45rem;
-    color: #666;
+    color: var(--muted, #666);
     line-height: 1;
   }
-  .btn-remove-pivot:hover { border-color: #c00; color: #c00; }
-  .pivot-alias-label { font-size: 0.75rem; color: #888; white-space: nowrap; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .pivot-section-head { color: #999; }
-    :root:not([data-theme="light"]) .btn-remove-pivot { border-color: #555; color: #aaa; }
-    :root:not([data-theme="light"]) .pivot-alias-label { color: #888; }
-  }
-  :root[data-theme="dark"] .pivot-section-head { color: #999; }
-  :root[data-theme="dark"] .btn-remove-pivot { border-color: #555; color: #aaa; }
-  :root[data-theme="dark"] .pivot-alias-label { color: #888; }
+  .btn-remove-pivot:hover { border-color: var(--danger-border, #c00); color: var(--danger-fg, #c00); }
+  .pivot-alias-label { font-size: 0.75rem; color: var(--muted, #888); white-space: nowrap; }
 </style>
 
 <nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %][%- IF left_spec -%]<span class="record-count">[% records.size %] record[% records.size != 1 ? 's' : '' %][%- IF join_summaries.size -%]&ensp;[%- FOREACH s IN join_summaries -%]<span class="join-chip">&#x2b; [% s.label | html %][% IF s.left_key %] <span class="join-chip-key">(on [% s.left_key | html %] = [% s.right_key | html %])</span>[% END %]</span>[%- END -%][%- END -%]</span>[%- END -%]</nav>
+[%- IF acceleration -%]
+[%- IF acceleration.state == 'fresh' -%]
+<p class="accel-note" id="accel-note" data-state="fresh">&#x26A1; Accelerated: read from an extract built [% acceleration.built_text | html %].</p>
+[%- ELSE -%]
+<p class="accel-note accel-stale" id="accel-note" data-state="stale" role="status">&#9888; Accelerated, but the file has changed since its extract was built[% IF acceleration.built_text.length %] ([% acceleration.built_text | html %])[% END %], so the file itself was read.  Rebuild it with <code>script/bi-extract --spec [% acceleration.spec | html %]</code>.</p>
+[%- END -%]
+[%- END -%]
+[%- IF stored_error.length -%]
+<p class="accel-note accel-stale" id="stored-error-note" role="alert">&#9888; The columns saved for this data could not be added: [% stored_error.replace('\.\s*$', '') | html %].  The table is shown without its saved calculated fields, lookups and extractions, and its charts and exports will refuse until this is mended.  Correct or delete the one at fault with <button type="button" class="link-btn" data-open="btn-calc">Calc fields</button>, <button type="button" class="link-btn" data-open="btn-lookups">Lookups</button> or <button type="button" class="link-btn" data-open="btn-extract">Extract fields</button>.</p>
+[%- END -%]
 [%- IF schema_warnings.size -%]
 <ul class="schema-warnings" role="alert">
   [%- FOREACH w IN schema_warnings -%]
@@ -243,6 +244,7 @@
 [%- range_hidden -%]
 [%- cross_row_params -%]
 [%- IF dedup -%]<input type="hidden" name="d" value="1">[%- END -%]
+[%- FOREACH lkp IN view_lookups -%]<input type="hidden" name="[% lkp.name | html %]" value="[% lkp.value | html %]">[%- END -%]
 [%- END -%]
 
 [%- IF left_spec -%]
@@ -317,6 +319,10 @@
           title="Map column values to group labels (e.g. North+East = Northern). The virtual col_group column can then be used in charts and pivots.">&#x25BC; Group values&hellip;</button>
   <button class="btn-tool btn-dates" id="btn-dates" type="button"
           title="Tell the app how date columns are formatted so YEAR(), MONTH() and date sorting work correctly. Saved patterns apply automatically.">&#x1F4C5; Date format&hellip;</button>
+  <button class="btn-tool btn-lookups" id="btn-lookups" type="button"
+          title="Add columns from another file in the data directory by matching a key (e.g. a region code to its manager). Saved lookups apply automatically.">&#x1F50E; Lookups&hellip;</button>
+  <button class="btn-tool btn-extract" id="btn-extract" type="button"
+          title="Split a text column into new columns with a pattern (e.g. the domain of an e-mail address). Saved extractions apply automatically.">&#x2702; Extract fields&hellip;</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <button class="btn-tool btn-save-analysis" id="btn-save-analysis" type="button"
           title="A canvas is a dashboard where you can arrange multiple charts and data views side by side. Click to create one and add the current view.">&#x1F4BE; New canvas&hellip;</button>
@@ -332,7 +338,7 @@
 </div>
 
 [%- IF left_spec -%]
-<div class="dash-add-filter" id="dash-add-filter" data-spec="[% left_spec | html %]">
+<div class="dash-add-filter" id="dash-add-filter" data-spec="[% left_spec | html %]" data-range-qs="[% FOREACH jspec IN current_joins %]&amp;j=[% jspec | uri | html %][% END %][% IF current_joins.size && view_join_type.length %]&amp;jtype=[% view_join_type | uri | html %][% END %][% FOREACH cspec IN combine_specs %]&amp;c=[% cspec | uri | html %][% END %]">
   <select id="dash-f-col" aria-label="Column to filter">
     <option value="">&#x2014; filter column &#x2014;</option>
     [%- FOREACH col IN columns -%]
@@ -462,7 +468,7 @@
       <div class="join-or">or</div>
 
       <div class="join-field">
-        <label for="right-path-inp">File path <span style="font-weight:400;color:#999;font-size:.78rem;">(browser or drag &amp; drop)</span></label>
+        <label for="right-path-inp">File path <span style="font-weight:400;color:var(--text-faint, #999);font-size:.78rem;">(browser or drag &amp; drop)</span></label>
         <div class="with-tooltip">
           <input type="text" id="right-path-inp" placeholder="/path/to/file.csv"
                  autocomplete="off" spellcheck="false">
@@ -475,8 +481,10 @@
             <code>redis:tablename|redis://host:port</code><br>
             Or enter a bare URL to browse available keys:<br>
             <code>redis://host:port</code><br><br>
+            For a table on a configured MariaDB server:<br>
+            <code>mariadb:server/table</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML, Redis.
+            .sqlite3), Berkeley DB (.db), XML, Redis, MariaDB.
           </div>
         </div>
       </div>
@@ -558,7 +566,7 @@
       <div class="join-or">or</div>
 
       <div class="join-field">
-        <label for="combine-path-inp">File path <span style="font-weight:400;color:#999;font-size:.78rem;">(browse or drag &amp; drop)</span></label>
+        <label for="combine-path-inp">File path <span style="font-weight:400;color:var(--text-faint, #999);font-size:.78rem;">(browse or drag &amp; drop)</span></label>
         <div class="with-tooltip">
           <input type="text" id="combine-path-inp" placeholder="/path/to/file.csv"
                  autocomplete="off" spellcheck="false">
@@ -571,8 +579,10 @@
             <code>redis:tablename|redis://host:port</code><br>
             Or enter a bare URL to browse available keys:<br>
             <code>redis://host:port</code><br><br>
+            For a table on a configured MariaDB server:<br>
+            <code>mariadb:server/table</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML, Redis.
+            .sqlite3), Berkeley DB (.db), XML, Redis, MariaDB.
           </div>
         </div>
       </div>
@@ -1356,6 +1366,8 @@
           <input type="checkbox" id="map-remember-chk">
           Remember columns
         </label>
+        <button type="button" id="btn-map-forget" class="link-btn" hidden
+                title="Forget the columns remembered for this data; the panel guesses them again">Forget remembered columns</button>
         <div class="graph-btn-row">
           <button type="submit" id="btn-do-map" class="btn-primary" disabled>Open map</button>
           <button type="button" id="btn-cancel-map" class="btn-secondary">Cancel</button>
@@ -1399,7 +1411,7 @@
       </div>
     </div>
     <div id="map-color-rules" hidden>
-      <div class="filter-section-head" style="margin:0.4rem 0 0.2rem;font-size:0.85rem;font-weight:600;color:#555">Colour rules &mdash; first match wins</div>
+      <div class="filter-section-head" style="margin:0.4rem 0 0.2rem;font-size:0.85rem;font-weight:600;color:var(--text-secondary, #555)">Colour rules &mdash; first match wins</div>
       <div id="map-rule-rows"></div>
       <button type="button" id="btn-add-map-rule" class="btn-add-filter">&#x2b; Add rule</button>
     </div>
@@ -1448,14 +1460,14 @@
   </div>
   <div id="ask-result" hidden style="margin-top:0.85rem">
     <div id="ask-result-title" style="font-weight:600;font-size:0.95rem;margin-bottom:0.25rem"></div>
-    <div id="ask-result-kind" style="font-size:0.82rem;color:#666;margin-bottom:0.65rem"></div>
+    <div id="ask-result-kind" style="font-size:0.82rem;color:var(--muted, #666);margin-bottom:0.65rem"></div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
       <a id="ask-run-link" href="#" class="btn-primary">&#x25B6; Run it</a>
       <button id="btn-ask-save" class="btn-secondary">&#x1F4BE; Save to canvas</button>
     </div>
     <div id="ask-save-msg" style="margin-top:0.5rem;font-size:0.82rem"></div>
   </div>
-  <div id="ask-error" hidden style="margin-top:0.7rem;color:#b00;font-size:0.88rem"></div>
+  <div id="ask-error" hidden style="margin-top:0.7rem;color:var(--danger-fg, #b00);font-size:0.88rem"></div>
 </div>
 [%- END -%]
 
@@ -1622,7 +1634,7 @@
       <button type="button" id="btn-save-date" class="btn-primary" disabled>Save &amp; apply</button>
     </div>
   </div>
-  <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #d0d8f0">
+  <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border, #d0d8f0)">
     <div class="filter-section-label" style="margin-bottom:0.45rem">Quick date filters (uses selected column)</div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
       <button type="button" id="btn-dates-ytd"  class="btn-secondary" disabled>This year</button>
@@ -1632,6 +1644,97 @@
   </div>
   <div class="join-actions" style="margin-top:0.75rem">
     <button type="button" id="btn-cancel-dates" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<div class="graph-panel" id="lookups-panel" hidden>
+  <h3 class="graph-panel-title">&#x1F50E; Lookups</h3>
+  <p class="graph-panel-desc">Add columns from another file in the data directory. Each row's value in the match column is looked up in the file's key column, and the file's other columns are added beside it; a value the file does not have gets the default. Saved lookups are applied automatically when this data source is opened, and can be skipped for one view.</p>
+  <div id="lookups-list" style="margin-bottom:0.5rem"></div>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+    <div class="join-field" style="flex:0 0 auto;min-width:8rem">
+      <label for="lookups-name-inp">Name</label>
+      <input type="text" id="lookups-name-inp" placeholder="e.g. managers"
+             title="Identifier: letters, digits, underscore; must start with a letter or _">
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:10rem">
+      <label for="lookups-file-sel">Lookup file</label>
+      <select id="lookups-file-sel">
+        <option value="">&#x2014; select &#x2014;</option>
+        [%- FOREACH t IN available_tables -%]
+        [%- NEXT IF t.internal.length -%]
+        <option value="[% t.file | html %]" data-table="[% t.name | html %]">[% t.file | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:9rem">
+      <label for="lookups-key-sel" title="The column of the lookup file that holds the values to match">Key in that file</label>
+      <select id="lookups-key-sel" disabled>
+        <option value="">&#x2014; select a file &#x2014;</option>
+      </select>
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:9rem">
+      <label for="lookups-col-sel" title="The column of this table to match against the key; leave it to use the column named like the key">Match column here</label>
+      <select id="lookups-col-sel">
+        <option value="">Same name as the key</option>
+        [%- FOREACH col IN columns -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+  </div>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem">
+    <div class="join-field" style="flex:1 1 12rem">
+      <label for="lookups-fields-sel" title="Ctrl+click to pick several; pick none to add every column but the key">Columns to add <span style="font-weight:400">(none picked = all)</span></label>
+      <select id="lookups-fields-sel" multiple size="4" disabled></select>
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:8rem">
+      <label for="lookups-default-inp">Default</label>
+      <input type="text" id="lookups-default-inp" placeholder="(blank)"
+             title="What a row whose value the file does not have gets">
+    </div>
+    <div style="padding-bottom:0.2rem">
+      <button type="button" id="btn-save-lookup" class="btn-primary" disabled>Save &amp; apply</button>
+    </div>
+  </div>
+  <p class="graph-panel-desc" id="lookups-error" role="alert" hidden style="color:var(--danger-fg, #c0392b)"></p>
+  <div class="join-actions" style="margin-top:0.75rem">
+    <button type="button" id="btn-cancel-lookups" class="btn-secondary">Close</button>
+  </div>
+</div>
+
+<div class="graph-panel" id="extract-panel" hidden>
+  <h3 class="graph-panel-title">&#x2702; Extract fields</h3>
+  <p class="graph-panel-desc">Split a text column into new columns with a pattern. Each named group, written <code>(?&lt;name&gt;...)</code>, becomes a column; a cell the pattern does not match becomes <em>(unparseable)</em>. For one value in a calculated column, use rx() instead. Saved extractions are applied automatically when this data source is opened.</p>
+  <div id="extract-list" style="margin-bottom:0.5rem"></div>
+  <div class="graph-fields-row" style="align-items:flex-end;gap:0.5rem;flex-wrap:wrap">
+    <div class="join-field" style="flex:0 0 auto;min-width:8rem">
+      <label for="extract-name-inp">Name</label>
+      <input type="text" id="extract-name-inp" placeholder="e.g. email"
+             title="Identifier: letters, digits, underscore; must start with a letter or _">
+    </div>
+    <div class="join-field" style="flex:0 0 auto;min-width:10rem">
+      <label for="extract-col-sel">Column</label>
+      <select id="extract-col-sel">
+        <option value="">&#x2014; select &#x2014;</option>
+        [%- FOREACH col IN columns -%]
+        <option value="[% col | html %]">[% col | html %]</option>
+        [%- END -%]
+      </select>
+    </div>
+    <div class="join-field" style="flex:1 1 14rem">
+      <label for="extract-pattern-inp">Pattern</label>
+      <input type="text" id="extract-pattern-inp" spellcheck="false" autocomplete="off"
+             placeholder="e.g. @(?&lt;domain&gt;[\w.-]+)"
+             style="font-family:monospace">
+    </div>
+    <div style="padding-bottom:0.2rem">
+      <button type="button" id="btn-save-extract" class="btn-primary" disabled>Save &amp; apply</button>
+    </div>
+  </div>
+  <p class="graph-panel-desc" id="extract-error" role="alert" hidden style="color:var(--danger-fg, #c0392b)"></p>
+  <div class="join-actions" style="margin-top:0.75rem">
+    <button type="button" id="btn-cancel-extract" class="btn-secondary">Close</button>
   </div>
 </div>
 
@@ -1677,7 +1780,7 @@ dragging it moves it.</p>
 
 [% SET pnum = page ? page : 0 %]
 [% IF pnum > 1 OR has_next %]
-[% SET sep = (page_base_url.search('\?') >= 0) ? '&amp;' : '?' %]
+[% SET sep = page_base_url.search('\?') ? '&amp;' : '?' %]
 <nav class="pagination" aria-label="Page navigation">
   [% IF pnum > 1 %]
   <a class="page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>
@@ -1710,8 +1813,8 @@ var BI_PANELS = ['ask-panel', 'join-panel', 'combine-panel', 'export-panel',
   'graph-panel', 'pie-panel', 'heatmap-panel', 'bar-panel', 'stacked-panel',
   'scatter-panel', 'combo-panel', 'treemap-panel', 'histogram-panel',
   'cross-row-panel', 'wordcloud-panel', 'folder-panel', 'pivot-panel',
-  'calc-panel', 'groups-panel', 'dates-panel', 'save-analysis-panel',
-  'map-panel'];
+  'calc-panel', 'groups-panel', 'dates-panel', 'lookups-panel',
+  'extract-panel', 'save-analysis-panel', 'map-panel'];
 var BI_PANEL_OPENERS = { 'join-panel': 'btn-add-db', 'combine-panel': 'btn-combine',
   'export-panel': 'btn-export-open' };
 function biClosePanels(keep) {
@@ -1787,12 +1890,13 @@ function biSetDateRange(colName, inputs) {
   var domRange = biDateRangeDOM(colName);
   var spec = (document.getElementById('dash-add-filter') || {}).dataset;
   var lSpec = spec ? (spec.spec || '') : '';
+  var viewQs = spec ? (spec.rangeQs || '') : '';
   if (!lSpec || !colName) {
     biApplyRange(inputs, domRange);
     return;
   }
   inputs.forEach(function (inp) { inp.disabled = true; inp.title = 'Loading date range\u2026'; });
-  fetch('/api/range?l=' + encodeURIComponent(lSpec) + '&col=' + encodeURIComponent(colName))
+  fetch('/api/range?l=' + encodeURIComponent(lSpec) + '&col=' + encodeURIComponent(colName) + viewQs)
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       biApplyRange(inputs, (d && d.min && d.max) ? d : domRange);
@@ -2427,7 +2531,7 @@ function biDetectColType(colName) {
     var sepSpan = document.createElement('span');
     sepSpan.textContent = '\u2014';
     sepSpan.className = 'filter-range-sep';
-    sepSpan.style.cssText = 'display:none;font-size:0.82rem;color:#666';
+    sepSpan.style.cssText = 'display:none;font-size:0.82rem;color:var(--muted, #666)';
 
     var toInp = document.createElement('input');
     toInp.type = 'date';
@@ -2501,7 +2605,7 @@ function biDetectColType(colName) {
       url = '/api/columns?table=' + encodeURIComponent(spec.slice(6));
     } else if (spec.indexOf('path:') === 0) {
       url = '/api/columns?path=' + encodeURIComponent(spec.slice(5));
-    } else if (spec.indexOf('redis:') === 0) {
+    } else if (spec.indexOf('redis:') === 0 || spec.indexOf('mariadb:') === 0) {
       url = '/api/columns?spec=' + encodeURIComponent(spec);
     } else { return; }
 
@@ -2543,8 +2647,9 @@ function biDetectColType(colName) {
     if (!val) { rightSpec = ''; rightLabel = ''; updateJoinDesc(); return; }
     pathTimer = setTimeout(function () {
       var isRedis = val.indexOf('redis:') === 0;
-      var spec  = isRedis ? val : 'path:' + val;
-      var fname = isRedis
+      var isMariadb = val.indexOf('mariadb:') === 0;
+      var spec  = (isRedis || isMariadb) ? val : 'path:' + val;
+      var fname = isMariadb ? val.replace(/^.*\//, '') : isRedis
         ? val.replace(/\|.*/, '').replace(/^redis:/, '')
         : (val.replace(/.*[/\\]/, '').replace(/\.[^.]+$/, '') || val);
       loadRightColumns(spec, fname);
@@ -2877,6 +2982,7 @@ function biDetectColType(colName) {
 
   var addPanel = document.getElementById('dash-add-filter');
   var spec     = addPanel ? addPanel.getAttribute('data-spec') : '';
+  var viewQs   = addPanel ? (addPanel.getAttribute('data-range-qs') || '') : '';
 
   function go(name, col) {
     var u = new URL(location.href);
@@ -2908,7 +3014,7 @@ function biDetectColType(colName) {
     var col = colSel.value;
     if (!col || !spec) return;
 
-    fetch('/api/range?l=' + encodeURIComponent(spec) + '&col=' + encodeURIComponent(col))
+    fetch('/api/range?l=' + encodeURIComponent(spec) + '&col=' + encodeURIComponent(col) + viewQs)
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (!d || !d.min || !d.max) return;
@@ -3026,7 +3132,7 @@ function biDetectColType(colName) {
     clearTimeout(pathTimer);
     if (!val) { combineSpec = ''; checkApply(); return; }
     pathTimer = setTimeout(function () {
-      combineSpec = 'path:' + val;
+      combineSpec = val.indexOf('mariadb:') === 0 ? val : 'path:' + val;
       checkApply();
     }, 300);
   });
@@ -4174,11 +4280,13 @@ function biDetectColType(colName) {
       fetch('/geo/list?l=' + encodeURIComponent(lSpec))
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
-          if (data && data.columns && Object.keys(data.columns).length) {
+          var saved = !!(data && data.columns && Object.keys(data.columns).length);
+          if (saved) {
             applyGeoPrefs(data.columns);
           } else {
             guessColumns();
           }
+          if (forgetBtn) forgetBtn.hidden = !saved;
           checkMap();
         })
         .catch(function () { guessColumns(); checkMap(); });
@@ -4189,6 +4297,22 @@ function biDetectColType(colName) {
 
   btnCancel && btnCancel.addEventListener('click', function () {
     panel.hidden = true;
+  });
+
+  var forgetBtn = document.getElementById('btn-map-forget');
+  forgetBtn && forgetBtn.addEventListener('click', function () {
+    var lSpec = mapForm ? (mapForm.querySelector('input[name="l"]') || {}).value || '' : '';
+    if (!lSpec) return;
+    fetch('/geo/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'l=' + encodeURIComponent(lSpec)
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.ok) return;
+      forgetBtn.hidden = true;
+      guessColumns();
+      checkMap();
+    }).catch(function () {});
   });
 
   modeSel.addEventListener('change', syncMode);
@@ -4312,15 +4436,18 @@ function biDetectColType(colName) {
           saves.push({ col: lonSel.value, kind: 'lon' });
         if (byLocation() && locSel.value)
           saves.push({ col: locSel.value, kind: 'location' });
-        saves.forEach(function (s) {
+        // One request, which replaces what was saved before; keepalive lets it
+        // finish while the form takes the page to the map.
+        if (saves.length) {
           fetch('/geo/save', {
             method: 'POST',
+            keepalive: true,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'l=' + encodeURIComponent(lVal) +
-                  '&col=' + encodeURIComponent(s.col) +
-                  '&kind=' + encodeURIComponent(s.kind),
+            body: 'l=' + encodeURIComponent(lVal) + '&replace=1' + saves.map(function (s) {
+              return '&col=' + encodeURIComponent(s.col) + '&kind=' + encodeURIComponent(s.kind);
+            }).join(''),
           });
-        });
+        }
       }
     }
 
@@ -5169,6 +5296,279 @@ function biDetectColType(colName) {
 </script>
 
 <script>
+// A button in a note that names a toolbar panel opens it, as its toolbar button does.
+document.querySelectorAll('button[data-open]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var target = document.getElementById(b.getAttribute('data-open'));
+    if (target) { target.click(); target.scrollIntoView({ block: 'nearest' }); }
+  });
+});
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Shared by the Lookups and Extract fields panels: a saved definition's row
+// in the panel's list, and a POST to the model store that reports a refusal
+// on the panel instead of in an alert.
+// ---------------------------------------------------------------------------
+function biModelRow(text, title) {
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;font-size:0.87rem;flex-wrap:wrap';
+  var badge = document.createElement('code');
+  badge.style.cssText = 'flex:0 1 auto;background:var(--badge-bg,#e8eef5);padding:0.1rem 0.4rem;border-radius:3px;overflow-wrap:anywhere';
+  badge.textContent = text;
+  if (title) badge.title = title;
+  row.appendChild(badge);
+  return row;
+}
+function biModelButton(label, title, onClick) {
+  var b = document.createElement('button');
+  b.type = 'button'; b.className = 'btn-secondary'; b.textContent = label;
+  b.style.cssText = 'flex:0 0 auto;padding:0.1rem 0.5rem;font-size:0.8rem';
+  b.title = title;
+  b.addEventListener('click', onClick);
+  return b;
+}
+function biModelPost(url, body, errEl, done) {
+  if (errEl) { errEl.hidden = true; errEl.textContent = ''; }
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body
+  }).then(function (r) { return r.json(); }).then(function (j) {
+    if (j.ok) { done(j); return; }
+    var msg = 'Not saved: ' + (j.error || 'unknown error');
+    if (errEl) { errEl.textContent = msg; errEl.hidden = false; } else { alert(msg); }
+  }).catch(function () {
+    var msg = 'Not saved: the server could not be reached.';
+    if (errEl) { errEl.textContent = msg; errEl.hidden = false; } else { alert(msg); }
+  });
+}
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Lookups panel -- /lookups/list, /lookups/save, /lookups/delete
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen = document.getElementById('btn-lookups');
+  var panel   = document.getElementById('lookups-panel');
+  if (!btnOpen || !panel) return;
+
+  var nameInp  = document.getElementById('lookups-name-inp');
+  var fileSel  = document.getElementById('lookups-file-sel');
+  var keySel   = document.getElementById('lookups-key-sel');
+  var colSel   = document.getElementById('lookups-col-sel');
+  var fieldSel = document.getElementById('lookups-fields-sel');
+  var defInp   = document.getElementById('lookups-default-inp');
+  var btnSave  = document.getElementById('btn-save-lookup');
+  var btnClose = document.getElementById('btn-cancel-lookups');
+  var listEl   = document.getElementById('lookups-list');
+  var errEl    = document.getElementById('lookups-error');
+
+  var lspec   = '[% left_spec | html %]';
+  var NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+  var fileCols = [];
+
+  function checkSaveEnabled() {
+    btnSave.disabled = !(NAME_RE.test(nameInp.value.trim()) && fileSel.value && keySel.value);
+  }
+
+  function fillFields() {
+    var key = keySel.value;
+    fieldSel.innerHTML = '';
+    fileCols.forEach(function (c) {
+      if (c === key) return;
+      var o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      fieldSel.appendChild(o);
+    });
+    fieldSel.disabled = !key;
+    // A key named like a column here is the likely match, as the server assumes.
+    if (key && !colSel.value) {
+      for (var i = 0; i < colSel.options.length; i++) {
+        if (colSel.options[i].value === key) { colSel.value = key; break; }
+      }
+    }
+  }
+
+  fileSel.addEventListener('change', function () {
+    var opt = fileSel.options[fileSel.selectedIndex];
+    var table = opt && opt.getAttribute('data-table');
+    fileCols = [];
+    keySel.innerHTML = '<option value="">' + (table ? 'Loading\u2026' : '\u2014 select a file \u2014') + '</option>';
+    keySel.disabled = true;
+    fillFields();
+    checkSaveEnabled();
+    if (!table) return;
+    if (!nameInp.value.trim()) {
+      var stem = table.replace(/[^A-Za-z0-9_]/g, '_');
+      if (NAME_RE.test(stem)) nameInp.value = stem;
+    }
+    fetch('/api/columns?table=' + encodeURIComponent(table))
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        fileCols = j.columns || [];
+        keySel.innerHTML = '<option value="">\u2014 select \u2014</option>';
+        fileCols.forEach(function (c) {
+          var o = document.createElement('option');
+          o.value = c; o.textContent = c;
+          keySel.appendChild(o);
+        });
+        keySel.disabled = !fileCols.length;
+        checkSaveEnabled();
+      })
+      .catch(function () { keySel.innerHTML = '<option value="">Cannot read that file</option>'; });
+  });
+  keySel.addEventListener('change', function () { fillFields(); checkSaveEnabled(); });
+  nameInp.addEventListener('input', checkSaveEnabled);
+
+  // The names this view skips with nolk=; a link toggles one and reloads.
+  function skipped() {
+    return new URLSearchParams(location.search).getAll('nolk');
+  }
+  function toggleSkip(name) {
+    var u  = new URL(location.href);
+    var sp = u.searchParams;
+    var keep = sp.getAll('nolk').filter(function (n) { return n !== name; });
+    var was  = keep.length !== sp.getAll('nolk').length;
+    sp.delete('nolk');
+    keep.forEach(function (n) { sp.append('nolk', n); });
+    if (!was) sp.append('nolk', name);
+    sp.delete('page');
+    location.href = u.toString();
+  }
+
+  function renderList(lookups) {
+    listEl.innerHTML = '';
+    var names = Object.keys(lookups || {}).sort();
+    if (!names.length) {
+      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No lookups saved yet.</p>';
+      return;
+    }
+    var skip = skipped();
+    names.forEach(function (n) {
+      var d = lookups[n] || {};
+      var off = skip.indexOf(n) >= 0;
+      var text = n + ': ' + (d.col || d.key) + ' \u2192 ' + d.file + ' (' + d.key + ')'
+               + (d.fields && d.fields.length ? ' adds ' + d.fields.join(', ') : ' adds every column')
+               + (off ? ' \u2014 skipped in this view' : '');
+      var row = biModelRow(text, d.default != null ? 'Default: ' + d.default : '');
+      row.appendChild(biModelButton(off ? 'Use in this view' : 'Skip in this view',
+        off ? 'Apply this lookup to this view again' : 'Leave this lookup out of this view only; it stays saved',
+        function () { toggleSkip(n); }));
+      row.appendChild(biModelButton('\u00D7', 'Delete ' + n, function () {
+        if (!confirm('Delete the lookup ' + n + '? The columns it adds go from every view of this data.')) return;
+        biModelPost('/lookups/delete', 'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n),
+          errEl, function () { location.reload(); });
+      }));
+      listEl.appendChild(row);
+    });
+  }
+
+  function loadList() {
+    if (!lspec) return;
+    fetch('/lookups/list?l=' + encodeURIComponent(lspec))
+      .then(function (r) { return r.json(); })
+      .then(function (j) { renderList(j.lookups || {}); })
+      .catch(function () { renderList({}); });
+  }
+
+  btnSave.addEventListener('click', function () {
+    var n = nameInp.value.trim();
+    if (!NAME_RE.test(n) || !fileSel.value || !keySel.value) return;
+    var body = 'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n)
+             + '&file=' + encodeURIComponent(fileSel.value) + '&key=' + encodeURIComponent(keySel.value);
+    if (colSel.value) body += '&col=' + encodeURIComponent(colSel.value);
+    Array.prototype.forEach.call(fieldSel.selectedOptions || [], function (o) {
+      body += '&fields=' + encodeURIComponent(o.value);
+    });
+    if (defInp.value.length) body += '&default=' + encodeURIComponent(defInp.value);
+    biModelPost('/lookups/save', body, errEl, function () { location.reload(); });
+  });
+
+  btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) loadList();
+  });
+  btnClose && btnClose.addEventListener('click', function () { panel.hidden = true; });
+}());
+</script>
+
+<script>
+// ---------------------------------------------------------------------------
+// Extract fields panel -- /extract/list, /extract/save, /extract/delete
+// ---------------------------------------------------------------------------
+(function () {
+  var btnOpen = document.getElementById('btn-extract');
+  var panel   = document.getElementById('extract-panel');
+  if (!btnOpen || !panel) return;
+
+  var nameInp  = document.getElementById('extract-name-inp');
+  var colSel   = document.getElementById('extract-col-sel');
+  var patInp   = document.getElementById('extract-pattern-inp');
+  var btnSave  = document.getElementById('btn-save-extract');
+  var btnClose = document.getElementById('btn-cancel-extract');
+  var listEl   = document.getElementById('extract-list');
+  var errEl    = document.getElementById('extract-error');
+
+  var lspec   = '[% left_spec | html %]';
+  var NAME_RE = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+  function checkSaveEnabled() {
+    btnSave.disabled = !(NAME_RE.test(nameInp.value.trim()) && colSel.value && patInp.value.length);
+  }
+  [nameInp, patInp].forEach(function (el) { el.addEventListener('input', checkSaveEnabled); });
+  colSel.addEventListener('change', checkSaveEnabled);
+
+  function renderList(ex) {
+    listEl.innerHTML = '';
+    var names = Object.keys(ex || {}).sort();
+    if (!names.length) {
+      listEl.innerHTML = '<p class="graph-panel-desc" style="margin:0 0 0.4rem">No extractions saved yet.</p>';
+      return;
+    }
+    names.forEach(function (n) {
+      var d = ex[n] || {};
+      var row = biModelRow(n + ': ' + d.col + ' ~ ' + d.pattern
+        + (d.fields && d.fields.length ? ' \u2192 ' + d.fields.join(', ') : ''));
+      row.appendChild(biModelButton('\u00D7', 'Delete ' + n, function () {
+        if (!confirm('Delete the extraction ' + n + '? The columns it adds go from every view of this data.')) return;
+        biModelPost('/extract/delete', 'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n),
+          errEl, function () { location.reload(); });
+      }));
+      listEl.appendChild(row);
+    });
+  }
+
+  function loadList() {
+    if (!lspec) return;
+    fetch('/extract/list?l=' + encodeURIComponent(lspec))
+      .then(function (r) { return r.json(); })
+      .then(function (j) { renderList(j.extractions || {}); })
+      .catch(function () { renderList({}); });
+  }
+
+  btnSave.addEventListener('click', function () {
+    var n = nameInp.value.trim();
+    if (!NAME_RE.test(n) || !colSel.value || !patInp.value.length) return;
+    biModelPost('/extract/save',
+      'l=' + encodeURIComponent(lspec) + '&name=' + encodeURIComponent(n)
+      + '&col=' + encodeURIComponent(colSel.value) + '&pattern=' + encodeURIComponent(patInp.value),
+      errEl, function () { location.reload(); });
+  });
+
+  btnOpen.addEventListener('click', function () {
+    biClosePanels(panel);
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) loadList();
+  });
+  btnClose && btnClose.addEventListener('click', function () { panel.hidden = true; });
+}());
+</script>
+
+<script>
 // ---------------------------------------------------------------------------
 // Save-analysis panel -- POST /api/analyses and redirect to /a/:id
 // ---------------------------------------------------------------------------
@@ -5451,7 +5851,8 @@ function biDetectColType(colName) {
     // A cross-row column is part of the view too, so the file holds the column
     // the table is showing rather than the rows it was worked out from.  All
     // three repeat (several columns, one order each), so they travel as lists.
-    ['cs', 'order', 'by'].forEach(function (k) {
+    // So is a lookup turned on or off for this view (lk=, nolk=).
+    ['cs', 'order', 'by', 'lk', 'nolk'].forEach(function (k) {
       urlP.getAll(k).forEach(function (v) { params.append(k, v); });
     });
 

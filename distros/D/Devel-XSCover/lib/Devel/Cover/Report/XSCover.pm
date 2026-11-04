@@ -8,7 +8,7 @@ use File::Spec ();
 use Getopt::Long ();
 use POSIX ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 our (%LABEL, %SHORT, %COLUMN, $THRESHOLD);
 
@@ -92,7 +92,6 @@ sub _pc {
 
 sub _escape {
     my ($text) = @_;
-    $text //= '';
     $text =~ s/&/&amp;/g;
     $text =~ s/</&lt;/g;
     $text =~ s/>/&gt;/g;
@@ -103,13 +102,13 @@ sub _escape {
 
 sub _summary_cell {
     my ($db, $file, $criterion, $extra) = @_;
-    my $s = $db->{summary}{$file}{$criterion};
-    return qq{<td class="pc na $COLUMN{$criterion}" data-v="-1">n/a</td>} unless $s && defined $s->{percentage};
+    my $s   = $db->{summary}{$file}{$criterion};
+    my $col = $COLUMN{$criterion} // 'tt';
+    return qq{<td class="pc na $col" data-v="-1">n/a</td>} unless $s;
     my $pc    = _pc($s->{percentage});
     my $class = _pclass($s->{percentage}, $s->{error});
     my $title = sprintf '%s: %d of %d', $LABEL{$criterion}, $s->{covered} || 0, $s->{total} || 0;
     $title = $LABEL{$criterion} if $criterion eq 'time';
-    my $col = $COLUMN{$criterion} // 'tt';
     return qq{<td class="pc $class $col" data-v="$pc" title="} . _escape($title) . qq{"><meter min="0" max="100" value="$pc"></meter><span>$pc</span></td>};
 }
 
@@ -140,9 +139,9 @@ sub _write_summary_page {
     print $fh qq{<section class="tiles">\n};
     for my $c (@$show, 'total') {
         my $s = $total->{$c};
-        next unless $s && defined $s->{percentage};
+        next unless $s;
         my $class = _pclass($s->{percentage}, $s->{error});
-        my $ratio = $c eq 'time' ? '' : sprintf('%d of %d', $s->{covered} || 0, $s->{total} || 0);
+        my $ratio = $c eq 'time' ? '' : sprintf('%d of %d', $s->{covered} || 0, $s->{total});
         printf $fh qq{<div class="tile $class"><span class="name">%s</span><span class="value">%s%%</span><span class="ratio">%s</span></div>\n}, _escape($LABEL{$c}), _pc($s->{percentage}), _escape($ratio);
     }
     print $fh qq{</section>\n};
@@ -177,10 +176,10 @@ sub _write_file_page {
     chomp @lines;
     my $out = File::Spec->catfile($opt->{outputdir}, $page->{$file});
     open my $fh, '>', $out or do { warn "Can't open file '$out' [$!]\n"; return };
-    my $summary = $db->{summary}{$file} || {};
+    my $summary = $db->{summary}{$file};
     my $tot     = $summary->{total} || {};
     my $c_file  = $file =~ /\.(?:xs|c|cc|cpp|cxx|h|hh|hpp)\z/ ? 1 : 0;
-    my @shown   = grep { $data && $data->$_() } @$show;
+    my @shown   = grep { $data->$_() } @$show;
     print $fh _head($file, 'file');
     print $fh qq{<header><div><p class="crumb"><a href="} . ($opt->{option}{outputfile} // 'coverage.html') . qq{">summary</a>};
     print $fh qq{ · <a href="$page->{$_}">} . _escape($_) . qq{</a>} for @{ $xs->{$file} || [] };
@@ -189,8 +188,7 @@ sub _write_file_page {
     push @meta, 'total ' . _pc($tot->{percentage}) . '%' if defined $tot->{percentage};
     for my $c (@shown) {
         my $s = $summary->{$c};
-        next unless $s && defined $s->{percentage};
-        push @meta, $c eq 'time' ? 'time' : sprintf('%s %s%% (%d of %d)', $SHORT{$c}, _pc($s->{percentage}), $s->{covered} || 0, $s->{total} || 0);
+        push @meta, $c eq 'time' ? 'time' : sprintf('%s %s%% (%d of %d)', $SHORT{$c}, _pc($s->{percentage}), $s->{covered} || 0, $s->{total});
     }
     print $fh _escape(join ' · ', @meta) . qq{</p></div>} . _theme_button() . qq{</header>\n<main>\n};
     print $fh qq{<nav class="toggles">};
@@ -232,7 +230,7 @@ sub _write_file_page {
 sub _cell {
     my ($criterion, $items, $c_file) = @_;
     my $col = $COLUMN{$criterion};
-    return (qq{<td class="$col"></td>}, 0) unless $items && @$items;
+    return (qq{<td class="$col"></td>}, 0) unless $items;
     my ($html, $err, @why) = ('', 0);
     if ($criterion eq 'statement' || $criterion eq 'pod') {
         for my $i (@$items) {
@@ -276,32 +274,33 @@ sub _cell {
             if ($e) {
                 my @missing = grep { !$v[$_] && !$i->uncoverable($_) } 0 .. 1;
                 my @taken   = grep { $v[$_] } 0 .. 1;
-                my $what    = $c_file
-                    ? sprintf('%s of the branch %s %s never taken, %s taken %s', join(' and ', map { "arm $label[$_]" } @missing), _short($text), (@missing > 1 ? 'were' : 'was'), join(' and ', map { "arm $label[$_]" } @taken) || 'neither', join(' and ', map { $v[$_] } @taken) || 'at all')
-                    : sprintf('%s: %s', _short($text), join(', ', map { $_ ? 'the true branch never taken' : 'the false branch never taken' } map { $_ == 0 ? 1 : 0 } @missing));
-                $what =~ s/,\s+neither taken at all$/ and the other never run either/;
-                push @why, $what;
+                my $name    = length $text ? _short($text) : 'on this line';
+                my $rest    = @taken ? sprintf(', %s taken %s', join(' and ', map { "arm $label[$_]" } @taken), join(' and ', map { $v[$_] } @taken))
+                            : @missing > 1 ? '' : ' and the other never run either';
+                push @why, $c_file
+                    ? sprintf('%s of the branch %s %s never taken%s', join(' and ', map { "arm $label[$_]" } @missing), $name, (@missing > 1 ? 'were' : 'was'), $rest)
+                    : sprintf('%s: %s', $name, join(', ', map { $_ ? 'the true branch never taken' : 'the false branch never taken' } map { $_ == 0 ? 1 : 0 } @missing));
             }
         }
     }
-    elsif ($criterion eq 'condition') {
+    else {
         my @tables = eval { Devel::Cover::Report::XSCover::_truth_tables($items) };
         for my $t (@tables) {
             my ($tt, $expr) = @$t;
-            my $e = $tt->error;
-            $err ||= $e;
+            my $e = $tt->percentage < 100 ? 1 : 0;
             $html .= qq{<details class="cond"><summary class="} . _pclass($tt->percentage, $e) . qq{" title="} . _escape($expr) . qq{">} . sprintf('%.0f%%', $tt->percentage) . qq{</summary>} . $tt->html('c0', 'c3') . qq{<p class="expr">} . _escape($expr) . qq{</p></details>};
         }
         for my $i (@$items) {
             next unless $i->error;
+            $err = 1;
             my $info = $i->[1];
-            if (($info->{left} // '') =~ /^term \d+$/ && ($info->{op} // '') eq 'of') {
+            if ($info->{op} eq 'of') {
                 my @v = @{ $i->[0] };
                 my @missing = grep { !$v[$_] } 0 .. 1;
                 push @why, sprintf('%s of the condition %s never decided the result with its %s outcome', $info->{left}, _short($info->{right}), join(' or ', map { $_ ? 'false' : 'true' } @missing));
             }
             else {
-                push @why, sprintf('the condition %s has combinations never seen, open its table', join(' ', grep { defined } @{$info}{qw(left op right)}));
+                push @why, sprintf('the condition %s has combinations never seen%s', join(' ', grep { defined } @{$info}{qw(left op right)}), @tables ? ', open its table' : '');
             }
         }
     }
@@ -321,7 +320,7 @@ sub _legend {
     my @items;
     push @items, 'a green count is a line that ran, a red one a line that never ran' if $has{statement};
     push @items, $c_file
-        ? 'a branch shows its arms with the times each was taken, A and B in the order the compiler laid them out, or one chip per arm of a switch, red when never'
+        ? 'a branch shows its arms with the times each was taken, A and B, the arm into the body first, or one chip per arm of a switch, red when never'
         : 'a branch shows T and F with the times each was taken, red when never'
         if $has{branch};
     push @items, $c_file
@@ -340,7 +339,7 @@ sub _truth_tables {
     my @lops;
     for my $c (@$items) {
         my $op  = $c->[1]{type};
-        my @hit = map { defined() && $_ > 0 ? 1 : 0 } @{ $c->[0] };
+        my @hit = map { $_ > 0 ? 1 : 0 } @{ $c->[0] };
         @hit = reverse @hit if $op =~ /^or_[23]$/;
         push @lops, {
             tt   => Devel::Cover::Truth_Table->new_primitive($op, @hit),
@@ -534,8 +533,8 @@ search box. A module whose XS file is in the report has a link to it on its row.
 
 A file page shows the source with the coverage drawn beside each line: the
 statement count, each branch as chips with the times each arm was taken (T and
-F for a Perl branch, A and B for a C branch in the order the compiler laid the
-arms out, one chip per arm of a C<switch>), each condition as a percentage that
+F for a Perl branch, A and B for a C branch, the arm into the body first, one chip per arm of a
+C<switch>), each condition as a percentage that
 opens into its truth table (for C under gcc 14 and later, one per term of a
 decision, with its true and false outcomes), each subroutine as a chip with its name, and the pod
 and time columns where they exist. Lines with an uncovered item are marked, and

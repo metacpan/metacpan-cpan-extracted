@@ -1,9 +1,9 @@
 #!/usr/bin/perl
-# -08 section 13: a message is a Fully Verified DKIM2 Message only if every
-# instance's hashes are checked against the message rebuilt for it. Below a
-# null body Recipe the body cannot be rebuilt, so those body hashes cannot
-# be checked: the result stays pass, but fully_verified() is false
-# (contract D9).
+# -09 sections 13 and 14.2: below a null body Recipe the body cannot be
+# rebuilt, so the checks cannot all be completed: a PERMERROR naming the
+# instance that holds the null (contract E2; it replaces -08 D9's "pass,
+# not fully verified"). fully_verified() is deprecated: true exactly for a
+# pass, and never in HeadersOnly mode.
 use strict;
 use warnings;
 use Test::More;
@@ -66,8 +66,33 @@ sub verify {
 }
 {
     my $v = verify(list_post(1));
-    is($v->result, 'pass', 'a null body Recipe: still pass') or diag $v->details;
-    ok(!$v->fully_verified, '... but not fully verified: m=1 body unchecked');
+    is($v->result_detail, 'permerror (PERMERROR: Message-Instance m=2 has a null recipe)',
+       'a null body Recipe: PERMERROR, naming m=2');
+    ok(!$v->fully_verified, '... and not fully verified');
+}
+{
+    # A §14.2 check: it comes before the signatures are checked (contract
+    # C9), so a broken i=2 signature over the null still reports the null.
+    (my $bad = list_post(1)) =~ s/(DKIM2-Signature: i=2;.*?s=sel1:rsa-sha256:)([A-Za-z])/$1 . ($2 eq 'A' ? 'B' : 'A')/se
+        or die 'fixture';
+    is(verify($bad)->result_detail, 'permerror (PERMERROR: Message-Instance m=2 has a null recipe)',
+       'the null is reported ahead of a bad signature');
+    # ... but after the structure: a duplicated instance comes first.
+    (my $dup = list_post(1)) =~ s/^(Message-Instance: m=1;.*?\015\012)(?![ \t])/$1$1/ms or die 'fixture';
+    is(verify($dup)->result_detail, 'permerror (PERMERROR: Message-Instance m=1 is duplicated)',
+       'structure before the null');
+}
+{
+    # Two nulls: the lowest m= is named, the instances being checked in
+    # ascending m= with their other Recipe faults (contract E2).
+    my $two = list_post(1);
+    my $mod = $two . "more$EOL";
+    my $mi3 = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($mod), Email::MIME->new($two));
+    $mi3->set_null_body_recipe;
+    my $three = sign_as("Message-Instance: " . $mi3->as_string . $EOL . $mod,
+        'test3.dkim2.com', 'user@test3.dkim2.com', 'user@test4.dkim2.com');
+    is(verify($three)->result_detail, 'permerror (PERMERROR: Message-Instance m=2 has a null recipe)',
+       'two nulls: the lowest is named');
 }
 {
     my $v = verify(list_post(0), HeadersOnly => 1);

@@ -70,7 +70,10 @@ sub resolver {
     sub query {
         my ($self, $name) = @_;
         $self->{err} = 'NXDOMAIN';
-        my ($sel, $dom) = $name =~ /\A(.+?\._domainkey)\.(.+)\z/ or return;
+        my ($sel, $dom) = $name =~ /\A(.+?\._domainkey)\.(.+)\z/;
+        # A Domain Policy Record lives at _domainkey.<domain> itself.
+        ($sel, $dom) = ('_domainkey', $1) if !$sel && $name =~ /\A_domainkey\.(.+)\z/;
+        return unless $sel;
         my $entry = $self->{dns}{$dom}{$sel} or return;
         $self->{err} = 'NOERROR';
         return bless { rr => [ map { bless { txt => $_->[1] },
@@ -82,6 +85,17 @@ sub resolver {
     package DKIM2TestKeys::RR;
     sub type { 'TXT' }
     sub txtdata { $_[0]{txt} }
+}
+
+# A Verifier PolicyCallback answering Domain Policy Record lookups from the
+# shared dns.json: the TXT strings at _domainkey.<domain>, [] when none.
+sub policy_callback {
+    my $dns = decode_json($DNS_JSON->slurp);
+    return sub {
+        my ($domain) = @_;
+        my $entry = $dns->{lc $domain}{_domainkey} or return [];
+        return [ map { $_->[1] } @$entry ];
+    };
 }
 
 # The TXT record text for $selector at $domain in the shared dns.json.

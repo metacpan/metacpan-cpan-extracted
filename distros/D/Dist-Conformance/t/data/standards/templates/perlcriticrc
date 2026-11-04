@@ -1,0 +1,3 @@
+# Troglodyne perlcritic policy, for a distribution that declares use 5.040 or
+# later.
+severity = 1

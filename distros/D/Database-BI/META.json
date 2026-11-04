@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "DBD::MariaDB" : "0",
             "Geo::Coder::Free" : "0.48",
             "HTML::OSM" : "0.12"
          },
@@ -43,15 +44,15 @@
             "Cwd" : "0",
             "DBI" : "0",
             "DB_File" : "0",
-            "Database::Abstraction" : "0.51",
+            "Database::Abstraction" : "0.54",
             "Database::Join" : "v0.9.0",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "Excel::Writer::XLSX" : "1.07",
             "File::Path" : "2.07",
             "File::Spec" : "3.40",
-            "File::Temp" : "0.22",
-            "HTML::D3" : "0.23",
+            "File::Temp" : "0.2308",
+            "HTML::D3" : "0.27",
             "HTML::TableExtract" : "0",
             "HTML::TagCloud" : "0.38",
             "HTTP::Request" : "0",
@@ -81,6 +82,7 @@
       },
       "test" : {
          "recommends" : {
+            "DBD::MariaDB" : "0",
             "Redis" : "0"
          },
          "requires" : {
@@ -112,6 +114,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.018.0",
+   "version" : "0.019.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

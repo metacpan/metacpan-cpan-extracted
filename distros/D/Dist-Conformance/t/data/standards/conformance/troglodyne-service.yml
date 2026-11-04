@@ -1,0 +1,17 @@
+# A repository that is deployed rather than released to CPAN: the 5.040
+# standards and CI, but no dist files, and no POD stopwords because nothing
+# spell-checks its POD for a release.  Claude Code must load the plugin.
+name: troglodyne-service
+description: A troglodyne service, deployed and not released to CPAN
+extends:
+  - troglodyne-5.040
+  - github-ci
+checks:
+  DistFiles: ~
+  ToolConfiguration:
+    files:
+      .perltidyrc: templates/perltidyrc
+      .preferred_modules.ini: templates/preferred_modules.ini
+      .tests-covering-map.pl: templates/tests-covering-map
+  ClaudeSettings:
+    missing: fail

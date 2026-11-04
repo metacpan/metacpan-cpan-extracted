@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>e2f929fc-b25d-4cbe-95bd-b32a94ff135c</MessageSerialNumber>
-  <MessageDate>Sat, 31 Oct 2026 09:55:57 UTC</MessageDate>
+  <MessageSerialNumber>8772d193-d60b-4ae6-aac6-bb6a90609f65</MessageSerialNumber>
+  <MessageDate>Tue, 3 Nov 2026 11:17:29 UTC</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -5305,11 +5305,11 @@
       <Agency>Cambodia</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-2799999</Range>
+          <Range>0000000-2599999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>2800000-3999999</Range>
+          <Range>2600000-3999999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
@@ -5317,15 +5317,15 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6599999</Range>
+          <Range>5000000-6699999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>6600000-8949999</Range>
+          <Range>6700000-8899999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>8950000-9999999</Range>
+          <Range>8900000-9999999</Range>
           <Length>4</Length>
         </Rule>
       </Rules>

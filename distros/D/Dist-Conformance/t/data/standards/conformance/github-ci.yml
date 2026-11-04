@@ -1,0 +1,9 @@
+# Not about perl at all: a repository that runs its tests in CI.  It extends
+# nothing, so another flavor mixes it in.
+name: github-ci
+description: Runs its tests in a GitHub Actions workflow
+checks:
+  Workflows:
+    directory: .github/workflows
+    required:
+      ci.yml: templates/workflows/ci.yml

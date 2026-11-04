@@ -68,11 +68,11 @@ like($neg->{html}, qr/"value":20/, 'Negative value converted to absolute');
 # ── separator option ──────────────────────────────────────────────────────────
 # The separator is interpolated into a JavaScript string literal in the D3
 # legend builder.  Verify the JS source contains the right string literal.
-like($html, qr/d\.data\.label \+ ' \/ '/, 'Default separator / present in legend JS');
+like($html, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'Default separator / present in legend JS');
 
 my $colon_frag = $chart->render_pie_chart_snippet(\@data, { separator => ':' });
-like($colon_frag->{html}, qr/d\.data\.label \+ ' : '/, 'Custom separator : present in legend JS');
-unlike($colon_frag->{html}, qr/d\.data\.label \+ ' \/ '/, 'Default separator / absent when overridden');
+like($colon_frag->{html}, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\(':'\)/, 'Custom separator : present in legend JS');
+unlike($colon_frag->{html}, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'Default separator / absent when overridden');
 
 # ── error handling ────────────────────────────────────────────────────────────
 throws_ok {

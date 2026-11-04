@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -58,6 +58,24 @@ my @CHAPTERS = (
 		routes => [ '/' ],
 	},
 	{
+		id    => 'find-your-way',
+		part  => 'First steps',
+		title => 'Find your way around',
+		lead  => 'Every page shows where you are and how you got there.',
+		steps => [
+			'The links at the top of every page are Home, Canvases, Catalog, Open file..., Preferences and Tutorial.',
+			'The Help link beside Tutorial opens the chapter for the page that you are on. F1 does the same.',
+			'Below the title, the breadcrumb lists each page between Home and this one. Click a step to go back to it.',
+			'Each step is named after what it shows, for example Bar chart: amount by region.',
+			'A chart, pivot, statistics or insights page shows a Drawn from: strip under the breadcrumb.',
+			'The strip lists the filters, the time range and the other changes that the page uses.',
+			'Click Change... in the strip to go back to the page that they came from and change them.',
+			'If an address is wrong, you see Page not found. Click Go to Home or Open a file.',
+		],
+		tip   => 'A chart opened from a chart keeps the whole trail, so you can always find the table that you started from.',
+		routes => [],
+	},
+	{
 		id    => 'other-files',
 		part  => 'First steps',
 		title => 'Open a file from another place',
@@ -68,6 +86,9 @@ my @CHAPTERS = (
 			'To use a full path, type it in the box that shows /path/to/file.csv and click Open.',
 			'To open a file from your computer, drop it on the page. The program keeps a copy in a temporary folder.',
 			'A database file can hold more than one table. The program shows the table list first. Click one table.',
+			'To see a file as soon as the program starts, name it when you start the program: script/database-bi data/store.db.',
+			'The home address then shows that file. Click Home in the breadcrumb to see the usual list.',
+			'You can name only one file this way. To bring files together, open one and use Merge or Combine.',
 		],
 		tip   => 'A dropped file is a copy. Changes in the view do not change your original file.',
 		routes => [ '/browse', '/open', '/tables' ],
@@ -149,7 +170,7 @@ my @CHAPTERS = (
 			'The table now shows one copy of each row.',
 			'Click Show duplicates to see every row again.',
 		],
-		tip   => 'Export uses the same rows that you see. Check this button before you export.',
+		tip   => 'Export uses the same rows that you see. Check this button before you export. Charts, the pivot table and the statistics also use one copy of each row.',
 		routes => [],
 	},
 	{
@@ -191,6 +212,7 @@ my @CHAPTERS = (
 			'Click Combine data...',
 			'Choose the second table or type its path.',
 			'Click Combine.',
+			'You can merge a table and then combine another, in either order. The table keeps both, and so do its charts.',
 		],
 		tip   => 'The files do not need the same columns. A missing value is left blank.',
 		routes => [ '/combine' ],
@@ -233,7 +255,7 @@ my @CHAPTERS = (
 			'Choose the column that says which order to read the rows in, for example the date.',
 			'Type a name for the new column and click Add column.',
 		],
-		tip   => 'The new column is in the table and in every chart list. The Cross-row chip removes it. Restart for each groups the rows before counting. On a canvas, a card can hold cross-row columns of its own. Choose Has a column of its own in Add current view, then Add this column once for each. Each one is listed there and can be taken out before the card is added.',
+		tip   => 'The new column is in the table and in every chart list. The Cross-row chip removes it. A calculated column can read it by name. Restart for each groups the rows before counting. On a canvas, a card can hold cross-row columns of its own. Choose Has a column of its own in Add current view, then Add this column once for each. Each one is listed there and can be taken out before the card is added.',
 		walkthrough => {
 			title => 'Walk through: a running total per region',
 			intro => 'This example adds a running total to the sales table.',
@@ -259,7 +281,7 @@ my @CHAPTERS = (
 			'Choose the source column.',
 			'Click Add group. Type a label, for example Northern.',
 			'Type the values for this group, one on each line. Click Save group.',
-			'Use the new col_group column in a chart or pivot table.',
+			'The table gains a column named after the source column, for example region_group. Use it in a chart or pivot table.',
 		],
 		tip   => 'A value that is not in a group becomes (other).',
 		routes => [],
@@ -277,6 +299,37 @@ my @CHAPTERS = (
 			'Click Save & apply.',
 		],
 		tip   => 'After you set the format, This year, This quarter and This month work in the date panel.',
+		routes => [],
+	},
+	{
+		id    => 'lookups',
+		part  => 'Work with a table',
+		title => 'Add columns from another file',
+		lead  => 'A lookup adds columns from a second file, matched on one value, such as a region to its manager.',
+		steps => [
+			'Put the second file in the data folder.',
+			'Open the table and click Lookups...',
+			'Type a name, then choose the Lookup file.',
+			'Choose its Key in that file, and the Match column here that holds the same values.',
+			'Pick the Columns to add, or pick none to add them all. Type a Default for values the file does not have.',
+			'Click Save & apply.',
+		],
+		tip   => 'Click Skip in this view to see one view without a lookup. It stays saved for the others.',
+		routes => [],
+	},
+	{
+		id    => 'extract',
+		part  => 'Work with a table',
+		title => 'Split a column into new columns',
+		lead  => 'An extraction pulls parts out of a text column with a pattern, such as the domain of an email address.',
+		steps => [
+			'Open the table and click Extract fields...',
+			'Type a name and choose the column.',
+			'Type a pattern. Each named part, written (?<name>...), becomes a column.',
+			'For example, @(?<domain>[\\w.-]+) makes a domain column from an email address.',
+			'Click Save & apply.',
+		],
+		tip   => 'A row that the pattern does not match shows (unparseable), so you can count those rows.',
 		routes => [],
 	},
 	{
@@ -307,7 +360,7 @@ my @CHAPTERS = (
 			'Click a chart button in the toolbar. Bar chart... is a good first choice.',
 			'Choose a category column and a number column.',
 			'Click Plot.',
-			'Use Export SVG or Export PNG to save the chart. Use Copy link to share the page.',
+			'Use Export SVG, Export PNG or Export PDF to save the chart. Use Copy link to share the page.',
 		],
 		tip   => 'If the chart is empty, check that you chose a number column for the value.',
 		routes => [],
@@ -365,7 +418,7 @@ my @CHAPTERS = (
 			'For a total per period, set Time bucket and then set Aggregate to Sum.',
 			'Click Plot.',
 		],
-		tip   => 'Use Copy link to share the chart. Use Export SVG or Export PNG to save the picture.',
+		tip   => 'Use Copy link to share the chart. Use Export SVG, Export PNG or Export PDF to save the picture.',
 		routes => [ '/graph', '/line' ],
 	},
 	{
@@ -541,9 +594,14 @@ my @CHAPTERS = (
 			'Open the table and click Map...',
 			'Keep Coordinate columns, then choose the latitude and longitude columns.',
 			'If your table has places instead, choose Place-name column and pick that column.',
+			'Tick Remember columns. Next time, the panel chooses the same columns for this table. Click Forget remembered columns to stop this.',
+			'Tick Heatmap layer to colour the busy areas. Choose a Heat weight column to make some rows count for more.',
+			'Type an Initial zoom from 0 to 19 to start closer in. Leave it empty to fit every marker.',
+			'To colour the markers, choose Colour by column, then click Add rule. The first rule that matches gives the colour.',
+			'Type a Default colour for the markers that match no rule.',
 			'Click Open map.',
 		],
-		tip   => 'Rows at one place become one marker. Click a marker to see what it stands for.',
+		tip   => 'Rows at one place become one marker. Click a marker to see what it stands for. To size each marker by a number, add &size= and a column name to the map address. To give each category its own colour and a legend, add &series= and a column name instead.',
 		walkthrough => {
 			title => 'Walk through: Virginia counties on a map',
 			intro => 'This example uses the virginia_counties table in the data folder.',
@@ -651,9 +709,25 @@ my @CHAPTERS = (
 			'A top mover is the category that changed the most between two periods.',
 			'Seasonality means the same pattern repeats from one period to the next.',
 			'Click View in chart on any card to open the chart that shows it.',
+			'Click Summarize to read the findings as a few plain sentences.',
+			'If the program has an AI key, tick Use AI for better prose first. Only the findings are sent, never your rows.',
 		],
 		tip   => 'Insights need a date column and a number column to detect period changes and top movers.',
 		routes => [ '/insights' ],
+	},
+	{
+		id    => 'ask',
+		part  => 'Charts and summaries',
+		title => 'Ask for a chart in plain English',
+		lead  => 'Ask turns a question such as "sales by region as a pie chart" into a chart.',
+		steps => [
+			'Open a table and click Ask...',
+			'Type what you want to see, for example: show me sales by region as a pie chart.',
+			'Click Ask. The panel names the chart that it suggests.',
+			'Click Run it to open that chart.',
+			'Click Save to canvas to keep it as a card on a new canvas.',
+		],
+		tip   => 'Ask appears only when the person who runs the program has set an AI key. Only the column names and their types are sent, never your rows.',
 	},
 
 	# ---------------------------------------------------------------
@@ -702,9 +776,11 @@ my @CHAPTERS = (
 			'Click Add visual... to add another view from a data file.',
 			'In that panel, choose the Aggregate a chart works out: Sum, Average, Median, Std dev, or a percentile.',
 			'Drag a card by its header to move it. Use the Size menu to change its width and height.',
+			'Click Add text to put a title or an explanation on the canvas. The next chapter shows how.',
+			'To show only a recent window on every card, choose a Time range and its column above the cards. Then click Apply range.',
 			'Click Edit cross-row in a card header to see that card\'s cross-row columns, and to change or remove one.',
 		],
-		tip   => 'The home page lists your saved canvases under Saved canvases. A banner appears if a data file has changed since the canvas was saved.',
+		tip   => 'Click Canvases at the top of any page to see all your saved canvases. The home page lists them too. A banner appears if a data file has changed since the canvas was saved.',
 		walkthrough => {
 			title => 'Walk through: arrange and filter a canvas',
 			intro => 'This example starts from a canvas with at least two visuals. Open one from the home page.',
@@ -715,10 +791,57 @@ my @CHAPTERS = (
 				{ do => 'Click Edit cross-row in a card header and click one of its columns.', see => 'The chip puts its column, function and name back in the fields, ready to change.' },
 				{ do => 'Click Bookmarks, type a name and click Save.', see => 'A link to this exact view appears under the button.' },
 				{ do => 'Click Print.', see => 'The browser print window opens with the canvas ready for paper or PDF.' },
+				{ do => 'To save just one chart, use the SVG, PNG or PDF button in its card header.', see => 'The chart downloads as a file named after the card.' },
 			],
 			result => 'You filtered and arranged one dashboard, and saved a named view without changing any data file.',
 		},
-		routes => [ '/a/:id' ],
+		routes => [ '/a/:id', '/canvases' ],
+	},
+	{
+		id    => 'canvas-text',
+		part  => 'Save and share',
+		title => 'Add a title or an explanation to a canvas',
+		lead  => 'A text card puts your own words on a canvas, in the font, size and colours that you choose.',
+		steps => [
+			'Open a saved canvas.',
+			'Click Add text in the toolbar.',
+			'Type your words in the Text box. Press Enter to start a new line.',
+			'Choose how the text looks. The preview under the box changes as you choose.',
+			'Click Add to canvas. The card appears at the end of the canvas, across its full width.',
+			'Drag the card by its header to where you want it. The cards in the way move down.',
+			'Use the Size menu in the header to make the card narrower, or to make it taller.',
+			'To change the words or the look, double-click the text. You can also click Edit text in the header.',
+			'Change what you want and click Save text. The card shows each change as you make it, and Cancel puts it back.',
+			'To remove the card, double-click the text, click Remove card and confirm.',
+		],
+		tip   => 'Text is shown exactly as you type it, so HTML tags and Markdown appear as ordinary characters. A filter never changes a text card, because a text card reads no data.',
+		table => {
+			caption => 'What you can choose for a text card',
+			head    => [ 'Setting', 'What it does' ],
+			rows    => [
+				[ 'Font', 'Same as the page, Arial, Georgia, Times New Roman, Verdana, Trebuchet MS or Courier New.' ],
+				[ 'Size (points)', 'Any whole number from 8 to 96. A new card starts at 14.' ],
+				[ 'Alignment', 'Left, Centre or Right.' ],
+				[ 'Text colour', 'Pick a colour, or tick Follow the theme to match the light or dark page.' ],
+				[ 'Background', 'Pick a colour to fill the card, or tick None to leave it clear.' ],
+				[ 'Bold and Italic', 'Tick either one, or both.' ],
+				[ 'Hide the frame until pointed at', 'The card shows only its words until you point at it. This is ticked for a new card.' ],
+			],
+		},
+		walkthrough => {
+			title => 'Walk through: put a heading on a canvas',
+			intro => 'This example starts from a canvas with at least one chart. Open one from the home page.',
+			steps => [
+				{ do => 'Click Add text and type Quarterly sales in the Text box.', see => 'The words appear in the preview under the box.' },
+				{ do => 'Choose Georgia, type 24 for the size, choose Centre and tick Bold.', see => 'The preview shows large, bold, centred text.' },
+				{ do => 'Click Add to canvas.', see => 'The heading appears below the other cards, with no frame around it.' },
+				{ do => 'Point at the heading.', see => 'A frame appears, with a header above the words.' },
+				{ do => 'Drag the header to the top of the canvas.', see => 'The heading moves to the top row, and the charts move down below it.' },
+				{ do => 'Reload the page.', see => 'The heading is still at the top, in a row only as tall as its text.' },
+			],
+			result => 'You gave the canvas a heading that is saved with it and does not depend on any data file.',
+		},
+		routes => [],
 	},
 	{
 		id    => 'share',
@@ -740,12 +863,13 @@ my @CHAPTERS = (
 		lead  => 'A canvas share link lets anyone with the link view the canvas for 30 days.',
 		steps => [
 			'Open a saved canvas.',
-			'Click Share in the canvas toolbar.',
-			'Click Copy share link. The link is now on your clipboard.',
+			'Click Share... in the canvas toolbar.',
+			'Click Make a link, then Copy link. The link is now on your clipboard.',
 			'Send the link by email or in a message.',
-			'The link stops working after 30 days. Click Share again to create a new one.',
+			'To show the canvas inside another page of this site, click Copy embed code instead.',
+			'The link stops working after 30 days. Click Make a new link to create another.',
 		],
-		tip   => 'The link gives read-only access. The person can see every visual but cannot change the canvas or the data.',
+		tip   => 'The link gives read-only access. To keep a copy of the canvas, click Download as JSON. Import canvas on the Canvases page reads it back.',
 		routes => [],
 	},
 
@@ -767,6 +891,23 @@ my @CHAPTERS = (
 		tip   => 'The page says each change out loud for screen readers.',
 		routes => [],
 	},
+	{
+		id    => 'preferences',
+		part  => 'Help',
+		title => 'Set your preferences',
+		lead  => 'The Preferences page chooses how the program looks to you. It has one setting: the theme.',
+		steps => [
+			'Click Preferences at the top of any page.',
+			'Under Theme, choose Same as this device, Light or Dark.',
+			'Same as this device is the choice until you change it. The program follows the light or dark setting on your computer or phone, even while a page is open.',
+			'The page changes as soon as you choose. There is no Save button.',
+			'Every other page follows, including pages that are open in other tabs.',
+			'Tables and charts change with the page. A map keeps its usual colours.',
+		],
+		tip   => 'The choice is saved in this browser, so another browser or computer keeps its own. Saved charts and printed pages always use the light colours.',
+		try   => { href => '/preferences', label => 'Open your preferences' },
+		routes => [ '/preferences' ],
+	},
 
 	# ---------------------------------------------------------------
 	# For maintainers
@@ -783,7 +924,7 @@ my @CHAPTERS = (
 			'For example: bi-alert --analysis abc123 --threshold count:gt:0 exits with code 1 when count is above 0.',
 			'Pass --analysis or --threshold more than once to check several in the same run.',
 			'Prefix a threshold with an analysis id, such as abc123:count:gt:10, to check a second canvas.',
-			'Pass --dry-run to print what would be checked without running the check.',
+			'Pass --dry-run to run the check and print the result without sending anything. A dry run does not count towards --suppress.',
 			'A threshold that stays crossed is only worth hearing about once, so pass --suppress 1h to be told at most hourly.',
 			'The script remembers the last alert in a small state file, and forgets it when the crossing ends.',
 			'Pass --recovery to be told when the crossing ends as well as when it starts.',
@@ -792,6 +933,39 @@ my @CHAPTERS = (
 			'Wire the script into a cron job or a monitoring system to get automatic alerts.',
 		],
 		tip   => 'Exit code 0 means no alert: the threshold was not crossed, or it was crossed and already reported in this period. Exit code 1 means it was crossed and reported now. Exit code 3 means a crossing that was reported has ended, which is what --recovery asks for. Exit code 2 means an error. When one run reports a crossing and a recovery together, exit code 1 wins.',
+		routes => [],
+	},
+	{
+		id    => 'geocode',
+		part  => 'For maintainers',
+		title => 'Look up place names before anyone opens the map',
+		lead  => 'The bi-geocode script finds the coordinates of every place in a column and keeps them for the map.',
+		steps => [
+			'Find the script at script/bi-geocode in the application folder.',
+			'Pass --spec with the table, and --col with the column that holds the place names.',
+			'For example: bi-geocode --spec table:virginia_counties --col county --region US.',
+			'Pass --region with a country code, such as GB or US, when the names could be in several countries.',
+			'Pass --dry-run to look the places up without keeping the result.',
+			'Run it again at any time. Places that it already knows are not looked up twice.',
+		],
+		tip   => 'The map with a Place-name column then opens at once, because no place has to be looked up. The script needs the Geo::Coder::Free module. Exit code 0 means success.',
+		routes => [],
+	},
+	{
+		id    => 'settings',
+		part  => 'For maintainers',
+		title => 'Change the program settings',
+		lead  => 'A file called database_bi.conf in the application folder changes how the program runs.',
+		steps => [
+			'Create database_bi.conf next to the script folder. It holds one Perl hash, such as { data_dir => \'/srv/data\' }.',
+			'data_dir is the folder that the home page lists. It can be a full path or a path inside the application folder.',
+			'uploads_dir is where dropped files are kept. Set it when the application folder cannot be written.',
+			'model_dir holds the saved canvases and settings. It must not be inside data_dir.',
+			'Set page_cache_dir to keep a copy of the Catalog and Tutorial pages on disc. page_cache_duration says for how long.',
+			'Set ai_api_key to show the Ask button and the AI choice on the insights page.',
+			'Restart the program after you change the file.',
+		],
+		tip   => 'Every setting is optional. Without the file, the program lists the data folder and keeps its own files in .bi and .uploads.',
 		routes => [],
 	},
 	{
@@ -818,8 +992,69 @@ my @FAQ = (
 		answer   => 'Put the file in the data folder, or open it from Browse your files. The program only lists files that it can read.',
 	},
 	{
+		question => 'The home address shows one file, not the list.',
+		answer   => 'The program was started with the name of that file. Click Home in the breadcrumb to see the list. To stop this, start the program without a file name.',
+	},
+	{
+		question => 'The program says that only one database can be opened.',
+		answer   => 'You named more than one file when you started the program. Name one, then use Merge or Combine on its page to add the others.',
+	},
+	{
+		question => 'The table says its extract is stale.',
+		answer   => 'The file has changed since its fast copy was made, so the file itself was read. Run script/bi-extract --all to make the copy again.',
+	},
+	{
+		question => 'An extracted column says (unparseable).',
+		answer   => 'The pattern did not match the value in that row. Those rows are kept and grouped together, so you can see how many there are.',
+	},
+	{
+		question => 'New columns appeared that are not in my file.',
+		answer   => 'A lookup or an extraction adds them. Open the Lookups or Extract fields panel to see them. Delete one there, or skip a lookup in this view.',
+	},
+	{
+		question => 'The table says its saved columns could not be added.',
+		answer   => 'The file has changed, and a saved column can no longer be worked out. The note names it. Click the panel the note names, then correct or delete it.',
+	},
+	{
+		question => 'A chart says it cannot be drawn.',
+		answer   => 'The page says why, for example a column that the view does not have. Click Back, then choose other columns.',
+	},
+	{
 		question => 'The program will not open my file.',
 		answer   => 'Check the end of the file name. The program reads CSV, TSV, PSV, XLSX, XML, SQLite and Berkeley DB files.',
+	},
+	{
+		question => 'The page is dark, but my saved chart is white.',
+		answer   => 'This is on purpose. Saved charts and printed pages always use the light colours, so that they look the same to whoever receives them.',
+	},
+	{
+		question => 'My text on a canvas is hard to read in the dark theme.',
+		answer   => 'A colour that you pick stays the same in both themes. Tick Follow the theme, or give the card a background colour too.',
+	},
+	{
+		question => 'I cannot find the controls on my text card.',
+		answer   => 'The card hides its frame and header until you point at it. Point at the text, or double-click it to open its settings.',
+	},
+	{
+		question => 'My text card is too tall or too short.',
+		answer   => 'A card one row high is as tall as its text when its row holds only text. Next to a chart, it is as tall as the chart. Choose 2 rows high in the Size menu for a taller card.',
+	},
+	{
+		question => 'Undo did not bring back my text card.',
+		answer   => 'Undo and Redo step through filters and other page state. They do not undo a change to a card, so a removed text card has to be added again.',
+	},
+	{
+		question => 'Can I open a MariaDB or MySQL database?',
+		answer   => 'Yes, once the server has been added to mariadb_servers in the configuration file. The home page then has a card for it, which lists its tables. Choose a table to open it. You can also type mariadb:shop/orders in the path box, or in Merge and Combine. Only a page of the table is read at a time, until you filter it.',
+		link     => { text => 'the configuration file', href => 'https://github.com/nigelhorne/Database-BI#configuration' },
+	},
+	{
+		question => 'A number filter leaves out my blank cells.',
+		answer   => 'This is on purpose. Less than and greater than compare numbers, so a blank or a word in the cell does not match. Use the empty filter to find blank cells.',
+	},
+	{
+		question => 'The program does not remember my theme.',
+		answer   => 'The choice is saved in this browser. A private window forgets it when you close the window. If the browser will not save it, the Preferences page says so.',
 	},
 	{
 		question => 'My chart is empty.',
@@ -833,16 +1068,26 @@ my @FAQ = (
 		question => 'My changes disappeared.',
 		answer   => 'A filter or a join lives in the page address. Save the view as a canvas, or copy the link before you close the page.',
 	},
+	{
+		question => 'A table in my SQLite file says Cannot be opened.',
+		answer   => 'The name of that table has characters other than letters, digits and underscores, such as a colon or a space. The other tables in the file still open. To open this one, rename it in a copy of the file. The message shows the command to use.',
+	},
+	{
+		question => 'The page says Page not found.',
+		answer   => 'The address names a table, a canvas or a page that is not there. Use the breadcrumb or Go to Home to find it again.',
+	},
 );
 
 my @GLOSSARY = (
 	{ term => 'Berkeley DB', meaning => 'A database file that ends in .db.' },
+	{ term => 'Breadcrumb',  meaning => 'The row of links that shows each page between Home and this one.' },
 	{ term => 'Browser',     meaning => 'The program that shows web pages, for example Firefox or Chrome.' },
 	{ term => 'Canvas',      meaning => 'A saved page with several tables and charts.' },
 	{ term => 'Cell',        meaning => 'One value in a table, at one row and one column.' },
 	{ term => 'Chart',       meaning => 'A picture of numbers, for example a bar chart.' },
 	{ term => 'Column',      meaning => 'One kind of value in a table, for example the price column.' },
 	{ term => 'Combine',     meaning => 'Put the rows of one file under the rows of another file.' },
+	{ term => 'Cross-row column', meaning => 'A column worked out from several rows, for example a running total.' },
 	{ term => 'CSV',         meaning => 'A text file with values separated by commas.' },
 	{ term => 'Data file',   meaning => 'A file with rows and columns that the program can read.' },
 	{ term => 'Duplicate',   meaning => 'A row that is exactly the same as another row.' },
@@ -856,6 +1101,8 @@ my @GLOSSARY = (
 	{ term => 'Row',         meaning => 'One record in a table.' },
 	{ term => 'Server',      meaning => 'The program on a computer that sends pages to your browser.' },
 	{ term => 'SQLite',      meaning => 'A database file that can hold more than one table.' },
+	{ term => 'Time bucket', meaning => 'One group for each hour, day, month or other period.' },
+	{ term => 'Time range',  meaning => 'A recent window, such as the last 30 days, worked out from today.' },
 	{ term => 'TSV',         meaning => 'A text file with values separated by tab characters.' },
 	{ term => 'URL',         meaning => 'The address of a web page, shown in the address bar.' },
 	{ term => 'XLSX',        meaning => 'An Excel spreadsheet file.' },
@@ -896,6 +1143,8 @@ my %ACTION_CHAPTERS = (
 	map_view       => 'map-chart',
 	canvas_render  => 'canvas',
 	catalog_view   => 'catalog',
+	canvases_view  => 'canvas',
+	preferences    => 'preferences',
 );
 
 my %EXEMPT_ROUTES = (
@@ -912,6 +1161,8 @@ my %EXEMPT_ROUTES = (
 	'/geo/list'                => 'JSON list of saved coordinate column preferences for the Map panel',
 	'/embed/:id'               => 'chrome-less embed view; requires a share token and is not a standalone page',
 	'/groups/list'             => 'JSON list of value groups for the Group panel',
+	'/extract/list'            => 'JSON list of the stored field extractions of a dataset',
+	'/lookups/list'            => 'JSON list of the stored lookups of a dataset',
 	'/share/:id'               => 'shared read-only canvas view; requires a signed token and cannot be navigated to directly',
 	'/tutorial'                => 'this page',
 );
@@ -1060,7 +1311,9 @@ In the order the page shows them.
 
 =head4 OUTPUT
 
-	[ { question => 'string', answer => 'string' }, ... ]
+	[ { question => 'string', answer => 'string', link => { text, href }? }, ... ]
+
+C<link> makes the words C<text>, which occur once in C<answer>, a link to C<href>.
 
 =head2 glossary
 

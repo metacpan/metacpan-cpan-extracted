@@ -1,0 +1,162 @@
+[%# The theme: light or dark, chosen on /preferences and kept in this browser.
+
+    Every themed colour in the templates is written var(--token, #light).  The
+    tokens are defined only here, only for dark, so light is the fallback and a
+    page cannot be half-themed by a token that is missing in one theme.
+
+    The script runs before the page is drawn, so a dark page never flashes
+    light.  It sets data-theme on the root element to "light" or "dark"; the
+    stylesheets read nothing else.  "system" is resolved here and followed if
+    the device changes while the page is open.
+
+    The key is not bi:<name>: the dashboard keeps a table's layout under
+    bi:<table>, so a table called "theme" would overwrite the preference.
+
+    @media screen keeps printing on the light colours: a browser leaves page
+    backgrounds out of a print by default, which would leave pale text on white
+    paper.  embed.html.tt does not use this file: an embedded canvas sits on
+    someone else's page, whose colours it cannot know. -%]
+<script>
+(function () {
+  var KEY  = 'bi-pref:theme';
+  var root = document.documentElement;
+  var mq   = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function stored() {
+    try {
+      var value = window.localStorage.getItem(KEY);
+      return value === 'light' || value === 'dark' ? value : 'system';
+    } catch (e) {
+      return 'system';
+    }
+  }
+
+  function resolve(choice) {
+    return choice === 'system' ? (mq && mq.matches ? 'dark' : 'light') : choice;
+  }
+
+  function apply() {
+    root.setAttribute('data-theme', resolve(stored()));
+  }
+
+  window.biTheme = {
+    get: stored,
+    /* Returns false when the browser refused to store it.  The page still
+     * changes, but the next page will not remember. */
+    set: function (choice) {
+      var saved = true;
+      try {
+        window.localStorage.setItem(KEY, choice);
+      } catch (e) {
+        saved = false;
+      }
+      root.setAttribute('data-theme', resolve(choice));
+      return saved;
+    },
+    /* Run fn with the page's styles as they are in light, for code that reads
+     * computed colours to save a chart.  It is synchronous, so nothing is
+     * painted in between and the reader sees no flicker. */
+    asLight: function (fn) {
+      var current = root.getAttribute('data-theme');
+      root.setAttribute('data-theme', 'light');
+      try {
+        return fn();
+      } finally {
+        root.setAttribute('data-theme', current);
+      }
+    }
+  };
+
+  apply();
+
+  /* Safari before 14 has only addListener. */
+  if (mq && mq.addEventListener) {
+    mq.addEventListener('change', apply);
+  } else if (mq && mq.addListener) {
+    mq.addListener(apply);
+  }
+
+  /* Another tab changed the preference. */
+  window.addEventListener('storage', function (e) {
+    if (e.key === KEY || e.key === null) apply();
+  });
+}());
+</script>
+<style>
+  @media screen {
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+
+      --page-bg: #11141c;
+      --card-bg: #1a1e2b;
+      --row-alt: #20253a;
+      --header-bg: #20253a;
+      --hover-bg: #2b3148;
+      --badge-bg: #2b3148;
+
+      --body-color: #e4e7f0;
+      --text-secondary: #c4cad8;
+      --muted: #a3abc0;
+      --text-faint: #8a92a8;
+      --link: #7fb0ff;
+      --accent-text: #a8b8f0;
+
+      --border: #3a4058;
+      --border-strong: #5a6280;
+      --accent-border: #7388d8;
+
+      --field-bg: #12151f;
+      --field-border: #4a5270;
+
+      --danger-bg: #3a1a1e;
+      --danger-fg: #f4a0a0;
+      --danger-border: #a04848;
+      --warning-bg: #33290a;
+      --warning-fg: #f0c860;
+      --warning-border: #8a6d10;
+      --success-bg: #12301e;
+      --success-fg: #8ad8a0;
+      --success-border: #3a8a50;
+      --info-bg: #0e2a40;
+      --info-fg: #8ccbf0;
+      --info-border: #2a6a9a;
+
+      /* Names older rules already use, for the same things. */
+      --color-surface: var(--card-bg);
+      --color-border: var(--border);
+      --color-muted: var(--muted);
+      --color-danger: var(--danger-fg);
+    }
+
+    /* Links with no colour of their own.  Zero specificity, so any component's
+       rule still wins. */
+    :where(:root[data-theme="dark"] a) { color: var(--link); }
+
+    /* An always-dark tooltip needs an edge on a dark page. */
+    :root[data-theme="dark"] .file-tooltip { outline: 1px solid var(--border); }
+
+    /* HTML::D3 writes its colours for a white page, into the chart itself, so
+       these rules recolour its output.  Labels drawn on a coloured cell keep
+       theirs: they are chosen against the cell, not the page.  A saved chart
+       does not get these rules: see biChartExportClone. */
+    :root[data-theme="dark"] svg text:not(.hm-cell-text):not(.tm-label):not([fill="white"]):not([fill="#fff"]) {
+      fill: var(--body-color);
+    }
+    /* The same for the legends that set it as a style: only !important beats that. */
+    :root[data-theme="dark"] svg text[style*="fill: rgb(68, 68, 68)"] {
+      fill: var(--body-color) !important;
+    }
+    :root[data-theme="dark"] svg[style*="border"] { border-color: var(--border) !important; }
+
+    /* Its tooltips set a white background and leave the text to inherit, which
+       here would be pale on white.  !important: one kind sets it inline. */
+    :root[data-theme="dark"] .tooltip,
+    :root[data-theme="dark"] .bi-pie-tooltip,
+    :root[data-theme="dark"] [id$="_tip"],
+    :root[data-theme="dark"] [id$="_tooltip"] {
+      background: var(--row-alt) !important;
+      border-color: var(--border-strong) !important;
+      color: var(--body-color);
+    }
+  }
+</style>

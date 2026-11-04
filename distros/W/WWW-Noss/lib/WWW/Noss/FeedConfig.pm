@@ -2,7 +2,7 @@ package WWW::Noss::FeedConfig;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use parent 'WWW::Noss::BaseConfig';
 
@@ -47,6 +47,7 @@ sub initialize {
         $self->set_default_update($default->default_update);
         $self->set_hidden($default->hidden);
         $self->set_open_cmd($default->open_cmd);
+        $self->set_user_agent($default->user_agent);
     }
 
     $self->set_groups($param{ groups } // []);
@@ -102,6 +103,14 @@ sub initialize {
             $self->set_open_cmd($cmd);
         }
 
+        my $ua = first { defined }
+                 map { $_->user_agent }
+                 sort { $a->name cmp $b->name }
+                 @{ $self->groups };
+        if (defined $ua) {
+            $self->set_user_agent($ua);
+        }
+
     }
 
     if (defined $param{ limit }) {
@@ -139,6 +148,9 @@ sub initialize {
     }
     if (defined $param{ open }) {
         $self->set_open_cmd($param{ open });
+    }
+    if (defined $param{ user_agent }) {
+        $self->set_user_agent($param{ user_agent });
     }
 
     return 1;
@@ -430,6 +442,8 @@ The following fields from L<WWW::Noss::BaseConfig> are also available:
 
 =item open
 
+=item user_agent
+
 =back
 
 =item $name = $feed->name()
@@ -486,7 +500,7 @@ Getter/setter for the feed's retry time.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

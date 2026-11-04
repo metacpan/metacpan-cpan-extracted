@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>[% title | html %] &#x2014; Database::BI</title>
+  [% PROCESS "web/en/layouts/theme.html.tt" %]
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      background: #f4f6f9;
-      color: #1a1a2e;
+      background: var(--page-bg, #f4f6f9);
+      color: var(--body-color, #1a1a2e);
       padding: 2rem;
     }
 
@@ -43,7 +44,7 @@
     header h1 {
       font-size: 1.75rem;
       font-weight: 600;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
     }
 
     /* The tutorial is part of the application, so every page can reach it. */
@@ -56,7 +57,7 @@
     }
 
     .site-nav a {
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       text-decoration: none;
       font-weight: 600;
     }
@@ -65,12 +66,12 @@
 
     /* The chapter that helps with the page that is open. */
     .site-nav-help {
-      border-left: 1px solid #cfd6e6;
+      border-left: 1px solid var(--border, #cfd6e6);
       padding-left: 1rem;
     }
 
     main {
-      background: #ffffff;
+      background: var(--card-bg, #ffffff);
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,.08);
       padding: 1.5rem;
@@ -133,12 +134,12 @@
     thead th[aria-sort="ascending"]::after  { content: '\25B2'; opacity: 1; }
     thead th[aria-sort="descending"]::after { content: '\25BC'; opacity: 1; }
 
-    tbody tr:nth-child(even) { background: #f8f9fc; }
-    tbody tr:hover           { background: #eef1fb; }
+    tbody tr:nth-child(even) { background: var(--row-alt, #f8f9fc); }
+    tbody tr:hover           { background: var(--hover-bg, #eef1fb); }
 
     tbody td {
       padding: 0.6rem 1rem;
-      border-bottom: 1px solid #e4e8f0;
+      border-bottom: 1px solid var(--border, #e4e8f0);
     }
 
     tfoot tr {
@@ -159,37 +160,37 @@
       align-items: center;
       gap: 0.4em;
       padding: 0.3rem 0.9rem;
-      border: 1px solid #888;
+      border: 1px solid var(--border-strong, #888);
       border-radius: 6px;
       background: transparent;
-      color: #444;
+      color: var(--text-secondary, #444);
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s;
       user-select: none;
     }
-    .lbl-totals:hover { background: #f0f0f0; }
+    .lbl-totals:hover { background: var(--hover-bg, #f0f0f0); }
     .lbl-totals input[type="checkbox"] { cursor: pointer; accent-color: #2c3e7a; }
 
     .empty-state {
       text-align: center;
-      color: #888;
+      color: var(--muted, #888);
       padding: 3rem 1rem;
       font-style: italic;
     }
 
     .error {
-      background: #fdecea;
-      border-left: 4px solid #c0392b;
-      color: #922b21;
+      background: var(--danger-bg, #fdecea);
+      border-left: 4px solid var(--danger-border, #c0392b);
+      color: var(--danger-fg, #922b21);
       padding: 0.75rem 1rem;
       border-radius: 4px;
       margin-bottom: 1.25rem;
     }
     .hint {
-      background: #eaf4fb;
-      border-left: 4px solid #2980b9;
-      color: #1a5276;
+      background: var(--info-bg, #eaf4fb);
+      border-left: 4px solid var(--info-border, #2980b9);
+      color: var(--info-fg, #1a5276);
       padding: 0.75rem 1rem;
       border-radius: 4px;
       margin-top: -0.75rem;
@@ -205,12 +206,12 @@
       gap: 1rem;
       flex-wrap: wrap;
     }
-    .back-link a { color: #2c3e7a; text-decoration: none; }
+    .back-link a { color: var(--accent-text, #2c3e7a); text-decoration: none; }
     .back-link a:hover { text-decoration: underline; }
     .back-link .record-count {
       margin-left: auto;
       flex: 0 0 auto;
-      color: #666;
+      color: var(--muted, #666);
       font-size: 0.8rem;
       white-space: nowrap;
     }
@@ -252,53 +253,53 @@
 
     .record-count {
       font-size: 0.8rem;
-      color: #666;
+      color: var(--muted, #666);
       flex: 1;
     }
 
     /* Chips that summarise active joins */
     .join-chip {
       display: inline-block;
-      background: #e8edf8;
+      background: var(--hover-bg, #e8edf8);
       border-radius: 10px;
       padding: 0.15em 0.55em;
       font-size: 0.75rem;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       margin-left: 0.35em;
     }
-    .join-chip-key { color: #888; font-size: 0.7rem; }
+    .join-chip-key { color: var(--muted, #888); font-size: 0.7rem; }
 
     /* "Merge data" button */
     .btn-add-db {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
-      border: 1px solid #2c3e7a;
+      border: 1px solid var(--accent-border, #2c3e7a);
       border-radius: 6px;
       background: transparent;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-add-db:hover:not(:disabled) { background: #eef1fb; }
+    .btn-add-db:hover:not(:disabled) { background: var(--hover-bg, #eef1fb); }
     .btn-add-db:disabled { opacity: 0.4; cursor: default; }
 
     /* "Hide / Show duplicates" toggle button */
     .btn-dedup {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
-      border: 1px solid #888;
+      border: 1px solid var(--border-strong, #888);
       border-radius: 6px;
       background: transparent;
-      color: #444;
+      color: var(--text-secondary, #444);
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-dedup:hover { background: #f0f0f0; }
+    .btn-dedup:hover { background: var(--hover-bg, #f0f0f0); }
     .btn-dedup--active {
       background: #2c3e7a;
-      border-color: #2c3e7a;
+      border-color: var(--accent-border, #2c3e7a);
       color: #fff;
     }
     .btn-dedup--active:hover { background: #3a50a0; }
@@ -313,7 +314,7 @@
       user-select: none;
     }
     .sel-th { background: #2c3e7a; }
-    .sel-td { border-bottom: 1px solid #e4e8f0; }
+    .sel-td { border-bottom: 1px solid var(--border, #e4e8f0); }
     .sel-th input[type="checkbox"],
     .sel-td input[type="checkbox"] {
       cursor: pointer;
@@ -326,7 +327,7 @@
     /* Selected row highlight */
     tbody tr.row-selected > td,
     tbody tr.row-selected > .sel-td {
-      background: #fdf0f0 !important;
+      background: var(--danger-bg, #fdf0f0) !important;
       outline: 1px solid #e07070;
       outline-offset: -1px;
     }
@@ -343,35 +344,35 @@
     .btn-delete-sel {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
-      border: 1px solid #c0392b;
+      border: 1px solid var(--danger-border, #c0392b);
       border-radius: 6px;
       background: transparent;
-      color: #c0392b;
+      color: var(--danger-fg, #c0392b);
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-delete-sel:hover { background: #fdecea; }
+    .btn-delete-sel:hover { background: var(--danger-bg, #fdecea); }
 
     /* "Combine data" button -- same shape as Merge, teal accent */
     .btn-combine {
       flex-shrink: 0;
       padding: 0.3rem 0.9rem;
-      border: 1px solid #2a6a5a;
+      border: 1px solid var(--success-border, #2a6a5a);
       border-radius: 6px;
       background: transparent;
-      color: #1a4a3a;
+      color: var(--body-color, #1a4a3a);
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s;
     }
-    .btn-combine:hover:not(:disabled) { background: #e6f4f0; }
+    .btn-combine:hover:not(:disabled) { background: var(--success-bg, #e6f4f0); }
     .btn-combine:disabled { opacity: 0.4; cursor: default; }
 
     /* Combine-data panel -- teal-tinted background to distinguish from merge */
     .combine-panel {
-      background: #f0f8f5;
-      border: 1px solid #a8d0c0;
+      background: var(--success-bg, #f0f8f5);
+      border: 1px solid var(--success-border, #a8d0c0);
       border-radius: 8px;
       padding: 1.25rem;
       margin-bottom: 1rem;
@@ -380,21 +381,21 @@
     .combine-panel-title {
       font-size: 1rem;
       font-weight: 600;
-      color: #1a4a3a;
+      color: var(--body-color, #1a4a3a);
       margin-bottom: 0.6rem;
     }
 
     .combine-desc-static {
       font-size: 0.85rem;
-      color: #2a4a3a;
+      color: var(--success-fg, #2a4a3a);
       margin-bottom: 1rem;
       line-height: 1.45;
     }
 
     /* Join configuration panel */
     .join-panel {
-      background: #f0f3fb;
-      border: 1px solid #c8d0e8;
+      background: var(--hover-bg, #f0f3fb);
+      border: 1px solid var(--border, #c8d0e8);
       border-radius: 8px;
       padding: 1.25rem;
       margin-bottom: 1rem;
@@ -403,7 +404,7 @@
     .join-panel-title {
       font-size: 1rem;
       font-weight: 600;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       margin-bottom: 1rem;
     }
 
@@ -433,7 +434,7 @@
     .join-field label {
       font-size: 0.8rem;
       font-weight: 600;
-      color: #444;
+      color: var(--text-secondary, #444);
     }
 
     .join-field select,
@@ -450,16 +451,16 @@
 
     .join-or {
       font-size: 0.8rem;
-      color: #888;
+      color: var(--muted, #888);
       text-align: center;
       padding-bottom: 0.4rem;
     }
 
     .join-desc {
       font-size: 0.85rem;
-      color: #1a3a2a;
-      background: #e8f5e9;
-      border-left: 3px solid #4caf50;
+      color: var(--body-color, #1a3a2a);
+      background: var(--success-bg, #e8f5e9);
+      border-left: 3px solid var(--success-border, #4caf50);
       padding: 0.6rem 0.9rem;
       border-radius: 4px;
       margin-bottom: 1rem;
@@ -482,16 +483,16 @@
     .btn-primary {
       background: #2c3e7a;
       color: #fff;
-      border-color: #2c3e7a;
+      border-color: var(--accent-border, #2c3e7a);
     }
     .btn-primary:hover:not(:disabled) { background: #1a2558; }
     .btn-primary:disabled { opacity: 0.4; cursor: default; }
     .btn-secondary {
       background: transparent;
-      color: #555;
-      border-color: #bbb;
+      color: var(--text-secondary, #555);
+      border-color: var(--border-strong, #bbb);
     }
-    .btn-secondary:hover { background: #eee; }
+    .btn-secondary:hover { background: var(--hover-bg, #eee); }
 
     /* Path-field tooltip
        Usage: wrap <input> in <div class="with-tooltip"> and add a sibling
@@ -506,7 +507,7 @@
       z-index: 200;
       background: #1a2040;
       color: #e8ecf8;
-      border: 1px solid #3a50a0;
+      border: 1px solid var(--accent-border, #3a50a0);
       border-radius: 6px;
       padding: 0.65rem 0.85rem;
       font-size: 0.78rem;
@@ -527,8 +528,8 @@
       width: 10px;
       height: 10px;
       background: #1a2040;
-      border-right: 1px solid #3a50a0;
-      border-bottom: 1px solid #3a50a0;
+      border-right: 1px solid var(--accent-border, #3a50a0);
+      border-bottom: 1px solid var(--accent-border, #3a50a0);
       transform: rotate(45deg);
     }
     .tip-box code {
@@ -559,14 +560,14 @@
       align-items: center;
       gap: 0.4rem;
       padding: 1.25rem 1rem;
-      border: 1px solid #dde2f0;
+      border: 1px solid var(--border, #dde2f0);
       border-radius: 8px;
       text-decoration: none;
-      color: #1a1a2e;
+      color: var(--body-color, #1a1a2e);
       transition: background 0.15s, box-shadow 0.15s;
     }
     .db-card:hover {
-      background: #eef1fb;
+      background: var(--hover-bg, #eef1fb);
       box-shadow: 0 2px 6px rgba(44,62,122,.12);
     }
     .db-card--missing {
@@ -595,7 +596,7 @@
     .db-unavail-badge {
       display: block;
       font-size: 0.72rem;
-      color: #b04000;
+      color: var(--warning-fg, #b04000);
       margin-top: 0.2rem;
       font-weight: bold;
     }
@@ -605,18 +606,18 @@
     .db-name {
       font-weight: 600;
       font-size: 1rem;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
     }
 
     .db-file {
       font-size: 0.75rem;
-      color: #888;
+      color: var(--muted, #888);
     }
 
     footer {
       margin-top: 1.5rem;
       font-size: 0.75rem;
-      color: #999;
+      color: var(--text-faint, #999);
       text-align: right;
     }
 
@@ -630,7 +631,7 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      color: #888;
+      color: var(--muted, #888);
       margin-bottom: 0.75rem;
     }
 
@@ -643,7 +644,7 @@
       border: none;
       cursor: pointer;
       font-size: 0.8rem;
-      color: #888;
+      color: var(--muted, #888);
       opacity: 0;
       padding: 0.15rem 0.3rem;
       border-radius: 4px;
@@ -660,14 +661,14 @@
     .recent-remove:focus-visible {
       opacity: 1;
       background: rgba(192, 57, 43, 0.12);
-      color: #c0392b;
+      color: var(--danger-fg, #c0392b);
       outline: 2px solid #c0392b;
       outline-offset: 1px;
     }
     .recent-remove:hover {
       opacity: 1 !important;
       background: rgba(192, 57, 43, 0.12);
-      color: #c0392b;
+      color: var(--danger-fg, #c0392b);
     }
 
     /* ---- canvas multi-select ---- */
@@ -691,13 +692,13 @@
       font-weight: normal;
       text-transform: none;
       letter-spacing: 0;
-      color: #aaa;
+      color: var(--text-faint, #aaa);
     }
 
     /* rubber-band selection rectangle */
     .cv-rubber {
       position: fixed;
-      border: 1.5px solid #3a6eca;
+      border: 1.5px solid var(--accent-border, #3a6eca);
       background: rgba(58, 110, 202, 0.08);
       border-radius: 2px;
       pointer-events: none;
@@ -736,47 +737,43 @@
     .cv-sel-del:hover { background: rgba(192, 57, 43, 0.7); border-color: transparent; }
     .cv-sel-clr:hover { background: rgba(255,255,255,0.15); }
 
-    @media (prefers-color-scheme: dark) {
-      li.cv-sel > a.db-card      { background: rgba(58, 110, 202, 0.18); }
-      li.cv-drag-over > a.db-card { background: rgba(58, 110, 202, 0.12); }
-    }
 
     /* Export button in the toolbar */
     .btn-export-open {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
-      border: 1px solid #5a7a3a;
+      border: 1px solid var(--success-border, #5a7a3a);
       border-radius: 6px;
       background: transparent;
-      color: #3a5a1a;
+      color: var(--success-fg, #3a5a1a);
       font-size: 0.82rem;
       white-space: nowrap;
       cursor: pointer;
       transition: background 0.12s;
     }
-    .btn-export-open:hover:not(:disabled) { background: #eef5e8; }
+    .btn-export-open:hover:not(:disabled) { background: var(--success-bg, #eef5e8); }
     .btn-export-open:disabled { opacity: 0.4; cursor: default; }
 
     /* Refresh button in the toolbar */
     .btn-refresh {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
-      border: 1px solid #888;
+      border: 1px solid var(--border-strong, #888);
       border-radius: 6px;
       background: transparent;
-      color: #444;
+      color: var(--text-secondary, #444);
       font-size: 0.82rem;
       white-space: nowrap;
       cursor: pointer;
       transition: background 0.12s;
     }
-    .btn-refresh:hover { background: #f0f0f0; }
+    .btn-refresh:hover { background: var(--hover-bg, #f0f0f0); }
 
     /* Graph page layout */
     .graph-title {
       font-size: 1.2rem;
       font-weight: 600;
-      color: #1a2a5a;
+      color: var(--accent-text, #1a2a5a);
       margin: 0.75rem 0 0.5rem;
     }
     .graph-export-bar {
@@ -787,18 +784,18 @@
     }
     .btn-graph-export {
       padding: 0.28rem 0.75rem;
-      border: 1px solid #888;
+      border: 1px solid var(--border-strong, #888);
       border-radius: 6px;
       background: transparent;
-      color: #444;
+      color: var(--text-secondary, #444);
       font-size: 0.82rem;
       cursor: pointer;
       transition: background 0.12s;
     }
-    .btn-graph-export:hover { background: #f0f0f0; }
+    .btn-graph-export:hover { background: var(--hover-bg, #f0f0f0); }
     .graph-point-count {
       font-size: 0.82rem;
-      color: #666;
+      color: var(--muted, #666);
       margin-left: 0.25rem;
     }
     .graph-container {
@@ -813,10 +810,10 @@
     .btn-tool {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
-      border: 1px solid #888;
+      border: 1px solid var(--border-strong, #888);
       border-radius: 6px;
       background: transparent;
-      color: #444;
+      color: var(--text-secondary, #444);
       font-size: 0.82rem;
       white-space: nowrap;
       cursor: pointer;
@@ -825,7 +822,7 @@
       display: inline-flex;
       align-items: center;
     }
-    .btn-tool:hover:not(:disabled) { background: #f0f0f0; }
+    .btn-tool:hover:not(:disabled) { background: var(--hover-bg, #f0f0f0); }
     .btn-tool:disabled {
       opacity: 0.45;
       cursor: not-allowed;
@@ -834,27 +831,11 @@
 
     /* Row highlight: used by dashboard.html.tt when ?hl_col=&hl_op=&hl_val= is set */
     tr.hl-row > td {
-      background-color: #fffde0;
-      border-top: 1px solid #f0d060;
-      border-bottom: 1px solid #f0d060;
+      background-color: var(--warning-bg, #fffde0);
+      border-top: 1px solid var(--warning-border, #f0d060);
+      border-bottom: 1px solid var(--warning-border, #f0d060);
     }
-    tr.hl-row > td:first-child { border-left: 3px solid #f59e0b; }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) tr.hl-row > td {
-        background-color: #3d3900;
-        border-color: #806000;
-      }
-      :root:not([data-theme="light"]) tr.hl-row > td:first-child {
-        border-left-color: #f59e0b;
-      }
-    }
-    :root[data-theme="dark"] tr.hl-row > td {
-      background-color: #3d3900;
-      border-color: #806000;
-    }
-    :root[data-theme="dark"] tr.hl-row > td:first-child {
-      border-left-color: #f59e0b;
-    }
+    tr.hl-row > td:first-child { border-left: 3px solid var(--warning-border, #f59e0b); }
 
     /* Graph panel: selects + buttons on one row */
     .graph-fields-row {
@@ -887,8 +868,8 @@
 
     /* Export save-to-disc panel */
     .export-panel {
-      background: #f5f8f0;
-      border: 1px solid #b8d0a0;
+      background: var(--success-bg, #f5f8f0);
+      border: 1px solid var(--success-border, #b8d0a0);
       border-radius: 8px;
       padding: 1.25rem;
       margin-bottom: 1rem;
@@ -897,7 +878,7 @@
     .export-panel-title {
       font-size: 1rem;
       font-weight: 600;
-      color: #2a4a1a;
+      color: var(--body-color, #2a4a1a);
       margin-bottom: 1rem;
     }
 
@@ -911,32 +892,32 @@
     .export-dir-bar input[type="text"] {
       flex: 1;
       padding: 0.4rem 0.6rem;
-      border: 1px solid #b0c8a0;
+      border: 1px solid var(--success-border, #b0c8a0);
       border-radius: 5px;
       font-size: 0.875rem;
-      background: #fff;
+      background: var(--card-bg, #fff);
       font-family: monospace;
     }
 
     .btn-dir-up {
       padding: 0.35rem 0.7rem;
-      border: 1px solid #b0c8a0;
+      border: 1px solid var(--success-border, #b0c8a0);
       border-radius: 5px;
       background: transparent;
-      color: #3a5a1a;
+      color: var(--success-fg, #3a5a1a);
       font-size: 0.82rem;
       cursor: pointer;
       white-space: nowrap;
     }
-    .btn-dir-up:hover:not(:disabled) { background: #e4f0d8; }
+    .btn-dir-up:hover:not(:disabled) { background: var(--success-bg, #e4f0d8); }
     .btn-dir-up:disabled { opacity: 0.35; cursor: default; }
 
     .export-dir-browser {
       max-height: 9rem;
       overflow-y: auto;
-      border: 1px solid #c8dab8;
+      border: 1px solid var(--success-border, #c8dab8);
       border-radius: 5px;
-      background: #fff;
+      background: var(--card-bg, #fff);
       padding: 0.35rem;
       margin-bottom: 0.9rem;
       display: flex;
@@ -950,19 +931,19 @@
       align-items: center;
       gap: 0.25rem;
       padding: 0.25rem 0.6rem;
-      border: 1px solid #c8dab8;
+      border: 1px solid var(--success-border, #c8dab8);
       border-radius: 5px;
       background: transparent;
       font-size: 0.8rem;
-      color: #2a4a1a;
+      color: var(--body-color, #2a4a1a);
       cursor: pointer;
       white-space: nowrap;
     }
-    .export-dir-entry:hover { background: #e4f0d8; border-color: #8ab87a; }
+    .export-dir-entry:hover { background: var(--success-bg, #e4f0d8); border-color: var(--success-border, #8ab87a); }
 
     .export-dir-msg {
       font-size: 0.8rem;
-      color: #888;
+      color: var(--muted, #888);
       padding: 0.3rem;
     }
 
@@ -977,7 +958,7 @@
     .export-filename-row label {
       font-size: 0.8rem;
       font-weight: 600;
-      color: #444;
+      color: var(--text-secondary, #444);
       white-space: nowrap;
     }
 
@@ -985,10 +966,10 @@
       flex: 1;
       min-width: 12rem;
       padding: 0.4rem 0.6rem;
-      border: 1px solid #b0c8a0;
+      border: 1px solid var(--success-border, #b0c8a0);
       border-radius: 5px;
       font-size: 0.875rem;
-      background: #fff;
+      background: var(--card-bg, #fff);
       font-family: monospace;
     }
 
@@ -999,9 +980,9 @@
       border-radius: 4px;
       white-space: nowrap;
     }
-    .export-format-badge.csv     { background: #dff5d0; color: #2a5a10; }
-    .export-format-badge.sqlite  { background: #d0e8f5; color: #103a5a; }
-    .export-format-badge.unknown { background: #f0e8d0; color: #6a4a10; }
+    .export-format-badge.csv     { background: var(--success-bg, #dff5d0); color: var(--success-fg, #2a5a10); }
+    .export-format-badge.sqlite  { background: var(--info-bg, #d0e8f5); color: var(--info-fg, #103a5a); }
+    .export-format-badge.unknown { background: var(--warning-bg, #f0e8d0); color: var(--warning-fg, #6a4a10); }
 
     .export-result {
       margin-top: 0.75rem;
@@ -1012,21 +993,21 @@
       word-break: break-all;
     }
     .export-result.success {
-      background: #e4f5d8;
-      border-left: 3px solid #5a9a2a;
-      color: #2a5a0a;
+      background: var(--success-bg, #e4f5d8);
+      border-left: 3px solid var(--success-border, #5a9a2a);
+      color: var(--body-color, #2a5a0a);
     }
     .export-result.error {
-      background: #fdecea;
-      border-left: 3px solid #c0392b;
-      color: #922b21;
+      background: var(--danger-bg, #fdecea);
+      border-left: 3px solid var(--danger-border, #c0392b);
+      color: var(--danger-fg, #922b21);
     }
 
     /* Filter section inside the join panel */
     .filter-section {
       margin-top: 1rem;
       padding-top: 0.9rem;
-      border-top: 1px solid #d0d8f0;
+      border-top: 1px solid var(--border, #d0d8f0);
     }
 
     .filter-section-header {
@@ -1039,21 +1020,21 @@
     .filter-section-label {
       font-size: 0.78rem;
       font-weight: 600;
-      color: #555;
+      color: var(--text-secondary, #555);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
     .btn-add-filter {
       padding: 0.18rem 0.65rem;
-      border: 1px dashed #2c3e7a;
+      border: 1px dashed var(--accent-border, #2c3e7a);
       border-radius: 5px;
       background: transparent;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       font-size: 0.8rem;
       cursor: pointer;
     }
-    .btn-add-filter:hover { background: #eef1fb; }
+    .btn-add-filter:hover { background: var(--hover-bg, #eef1fb); }
 
     .filter-row {
       display: flex;
@@ -1079,14 +1060,14 @@
     .btn-remove-filter {
       background: none;
       border: none;
-      color: #aaa;
+      color: var(--text-faint, #aaa);
       cursor: pointer;
       font-size: 1rem;
       line-height: 1;
       padding: 0.2rem 0.4rem;
       border-radius: 3px;
     }
-    .btn-remove-filter:hover { background: #fde8e8; color: #c00; }
+    .btn-remove-filter:hover { background: var(--danger-bg, #fde8e8); color: var(--danger-fg, #c00); }
 
     /* Filter chips in the toolbar */
     .filter-chips {
@@ -1098,12 +1079,12 @@
 
     .filter-chip {
       display: inline-block;
-      background: #fff8e1;
-      border: 1px solid #f0c040;
+      background: var(--warning-bg, #fff8e1);
+      border: 1px solid var(--warning-border, #f0c040);
       border-radius: 10px;
       padding: 0.1em 0.55em;
       font-size: 0.75rem;
-      color: #7a5800;
+      color: var(--warning-fg, #7a5800);
       font-family: monospace;
     }
 
@@ -1116,33 +1097,33 @@
       gap: 0.3rem;
       margin: -0.5rem 0 1rem;
       font-size: 0.8rem;
-      color: #666;
+      color: var(--muted, #666);
     }
-    .view-context-change { color: #2c3e7a; font-size: 0.75rem; }
+    .view-context-change { color: var(--accent-text, #2c3e7a); font-size: 0.75rem; }
 
     .btn-clear-filters {
       font-size: 0.75rem;
-      color: #888;
+      color: var(--muted, #888);
       text-decoration: none;
       white-space: nowrap;
       flex-shrink: 0;
     }
-    .btn-clear-filters:hover { color: #c00; text-decoration: underline; }
+    .btn-clear-filters:hover { color: var(--danger-fg, #c00); text-decoration: underline; }
 
     .btn-copy-link {
       flex-shrink: 0;
       padding: 0.28rem 0.75rem;
-      border: 1px solid #aac;
+      border: 1px solid var(--accent-border, #aac);
       border-radius: 6px;
       background: transparent;
-      color: #446;
+      color: var(--accent-text, #446);
       font-size: 0.82rem;
       white-space: nowrap;
       cursor: pointer;
       transition: background 0.12s, color 0.12s;
     }
-    .btn-copy-link:hover { background: #eef; }
-    .btn-copy-link--copied { background: #d4edda; color: #155724; border-color: #6aaf80; }
+    .btn-copy-link:hover { background: var(--hover-bg, #eef); }
+    .btn-copy-link--copied { background: var(--success-bg, #d4edda); color: var(--success-fg, #155724); border-color: var(--success-border, #6aaf80); }
 
     /* Recently-opened file tooltip */
     .file-tooltip {
@@ -1190,14 +1171,14 @@
       padding-bottom: 0.3rem;
     }
     .tip-path {
-      color: #9a9ab8;
+      color: var(--text-faint, #9a9ab8);
       font-family: monospace;
       font-size: 0.75rem;
       white-space: normal;
       word-break: break-all;
       max-width: 340px;
     }
-    .tip-muted { color: #6a6a88; font-size: 0.74rem; }
+    .tip-muted { color: var(--muted, #6a6a88); font-size: 0.74rem; }
 
     /* Full-window drop overlay */
     #drop-overlay {
@@ -1237,24 +1218,24 @@
       align-items: center;
       justify-content: center;
       gap: .75rem;
-      border: 2px dashed #d0d8f0;
+      border: 2px dashed var(--border, #d0d8f0);
       border-radius: 8px;
       padding: 1.25rem 1.5rem;
       margin: 1.5rem 0 .5rem;
-      color: #aab;
+      color: var(--text-faint, #aab);
       font-size: .9rem;
-      background: #fafbfd;
+      background: var(--row-alt, #fafbfd);
       transition: border-color .12s, background .12s, color .12s;
       user-select: none;
     }
     .home-drop-zone.drag-active {
-      border-color: #2c3e7a;
-      background: #eef1fb;
-      color: #2c3e7a;
+      border-color: var(--accent-border, #2c3e7a);
+      background: var(--hover-bg, #eef1fb);
+      color: var(--accent-text, #2c3e7a);
     }
     .home-drop-zone-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .home-drop-hint { font-size: .78rem; color: #bbc; }
-    .home-drop-zone.drag-active .home-drop-hint { color: #5a7ab8; }
+    .home-drop-hint { font-size: .78rem; color: var(--text-faint, #bbc); }
+    .home-drop-zone.drag-active .home-drop-hint { color: var(--accent-text, #5a7ab8); }
 
     /* Home-page action cards: Browse + URL import */
     .home-action-cards {
@@ -1269,9 +1250,9 @@
       flex-direction: column;
       gap: 0.5rem;
       padding: 1.25rem 1.4rem;
-      border: 1px solid #d6daf0;
+      border: 1px solid var(--border, #d6daf0);
       border-radius: 10px;
-      background: #fafbfd;
+      background: var(--row-alt, #fafbfd);
     }
 
     .action-card-icon {
@@ -1283,13 +1264,13 @@
       margin: 0;
       font-size: 1rem;
       font-weight: 600;
-      color: #1a2550;
+      color: var(--accent-text, #1a2550);
     }
 
     .action-card-desc {
       margin: 0;
       font-size: 0.85rem;
-      color: #666;
+      color: var(--muted, #666);
       line-height: 1.45;
       flex: 1;
     }
@@ -1299,9 +1280,9 @@
       align-self: flex-start;
       margin-top: 0.25rem;
       padding: 0.45rem 1.1rem;
-      border: 1px solid #2c3e7a;
+      border: 1px solid var(--accent-border, #2c3e7a);
       border-radius: 6px;
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       text-decoration: none;
       font-size: 0.88rem;
       cursor: pointer;
@@ -1309,7 +1290,7 @@
       transition: background 0.15s;
       white-space: nowrap;
     }
-    .btn-action:hover { background: #eef1fb; }
+    .btn-action:hover { background: var(--hover-bg, #eef1fb); }
 
     /* URL import form inside card */
     .action-url-form {
@@ -1339,7 +1320,7 @@
     }
     .action-idx-label {
       font-size: 0.82rem;
-      color: #666;
+      color: var(--muted, #666);
       white-space: nowrap;
     }
     .action-idx-input {
@@ -1360,22 +1341,22 @@
       gap: 0.2rem;
       margin-bottom: 1rem;
       font-size: 0.85rem;
-      color: #555;
+      color: var(--text-secondary, #555);
       overflow-x: auto;
     }
 
     .breadcrumb-link {
-      color: #2c3e7a;
+      color: var(--accent-text, #2c3e7a);
       text-decoration: none;
       white-space: nowrap;
     }
     .breadcrumb-link:hover { text-decoration: underline; }
 
-    .breadcrumb-sep { color: #999; }
+    .breadcrumb-sep { color: var(--text-faint, #999); }
 
     .breadcrumb-current {
       font-weight: 600;
-      color: #1a1a2e;
+      color: var(--body-color, #1a1a2e);
       white-space: nowrap;
     }
 
@@ -1392,13 +1373,13 @@
       padding: 0.55rem 0.75rem;
       border-radius: 6px;
       text-decoration: none;
-      color: #1a1a2e;
+      color: var(--body-color, #1a1a2e);
       transition: background 0.12s;
     }
-    .browser-entry:hover { background: #eef1fb; }
+    .browser-entry:hover { background: var(--hover-bg, #eef1fb); }
 
-    .browser-dir  { color: #2c3e7a; }
-    .browser-file { color: #1a3a2a; }
+    .browser-dir  { color: var(--accent-text, #2c3e7a); }
+    .browser-file { color: var(--body-color, #1a3a2a); }
 
     .browser-icon { font-size: 1.1rem; flex-shrink: 0; }
 
@@ -1416,9 +1397,10 @@
     <h1>[% title | html %]</h1>
     <nav class="site-nav" aria-label="Main">
       <a href="/">Home</a>
-      <a id="site-nav-canvases" href="/#bi-canvases" title="Your saved canvases">Canvases</a>
+      <a id="site-nav-canvases" href="/canvases" title="Your saved canvases">Canvases</a>
       <a id="site-nav-catalog" href="/catalog" title="Every data file, and the canvases that use it">Catalog</a>
       <a id="site-nav-open" href="/browse" title="Open a data file from anywhere on the server">Open file&hellip;</a>
+      <a id="site-nav-preferences" href="/preferences" title="Choose light or dark, and other settings">Preferences</a>
       <a id="site-nav-tutorial" href="/tutorial" target="_blank" rel="noopener"
          title="Open the tutorial in a new tab (F1)">Tutorial</a>
       [%- IF tutorial_chapter %]
@@ -1638,8 +1620,8 @@
   bottom: 4rem;
   right: 1.25rem;
   z-index: 901;
-  background: #fff;
-  border: 1px solid #dee2e6;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #dee2e6);
   border-radius: 8px;
   padding: 1rem;
   min-width: 260px;
@@ -1648,7 +1630,7 @@
 }
 #add-to-canvas-panel h4, #new-canvas-panel h4 { margin: 0 0 0.75rem; font-size: 0.95rem; }
 #atc-analysis-sel, #new-canvas-name { width: 100%; margin-bottom: 0.6rem; }
-#atc-status, #new-canvas-status { font-size: 0.8rem; color: #6c757d; margin-top: 0.4rem; min-height: 1.2em; }
+#atc-status, #new-canvas-status { font-size: 0.8rem; color: var(--muted, #6c757d); margin-top: 0.4rem; min-height: 1.2em; }
 #new-canvas-link { font-size: 0.85rem; margin-left: 0.5rem; }
 /* Resize handle for chart SVGs */
 .chart-svg-wrap {
@@ -1678,7 +1660,7 @@
   right: 3px;
   border-style: solid;
   border-width: 0 0 14px 14px;
-  border-color: transparent transparent #666 transparent;
+  border-color: transparent transparent var(--border-strong, #666) transparent;
 }
 .chart-resize-handle:hover,
 .chart-svg-wrap:hover .chart-resize-handle { opacity: 0.85; }

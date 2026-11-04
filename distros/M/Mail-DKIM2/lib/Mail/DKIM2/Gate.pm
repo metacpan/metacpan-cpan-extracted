@@ -2,8 +2,9 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
+use Carp ();
 use Email::MIME;
 use Scalar::Util qw(blessed);
 use Mail::DKIM2::HeaderParser;
@@ -45,8 +46,9 @@ Options:
 C<PubkeyCallback>, C<Resolver> and C<SkipTimestampCheck> are passed to the
 Verifier, C<IgnorePrefixes> to both the Verifier and the Message-Instance
 chain check (the caller's own header fields, hashed by neither end),
-C<AllowNullBodyRecipe> permits an I<unsigned> Message-Instance whose body
-Recipe is null (see L</Null body Recipes>),
+C<PolicyCallback> is passed to the Verifier too,
+C<AllowNullBodyRecipe> is deprecated and does nothing (see
+L</Null body Recipes>),
 C<SigningDomain> is the C<d=> the caller will sign with: when the top
 upstream signature carries C<nd=> the gate passes only if it equals that
 domain (case-insensitive) and refuses otherwise ("top signature nd=X names
@@ -58,7 +60,7 @@ The upstream DKIM2-Signatures are verified with a Verifier that allows an
 unsigned Message-Instance above the top signature (the one the caller is about
 to sign), and the Message-Instance chain must match the content and undo
 cleanly down to m=1, including the header history below a null body Recipe.
-Every From the signed instances have had must be Authentic (-08 section
+Every From the signed instances have had must be Authentic (-09 section
 11); a From changed in an instance no upstream signature covers is not
 checked here but by L<Mail::DKIM2::Signer>, against the C<d=> it signs with.
 
@@ -71,27 +73,28 @@ counts, and the Verifier reports it as a C<permerror>), C<top_signed> (the
 top Message-Instance is among them), C<unsigned_null> (the C<m=> of the
 highest Message-Instance above C<covered_m> with a null body Recipe -- the
 top or one under it -- or 0) and, when refusing, C<reason>
-(C<upstream-chain>, C<broken-mi-chain> or C<null-body-recipe>) and a
-human-readable C<message>. C<top_signed>, C<covered_m> and C<unsigned_null>
+(C<upstream-chain> or C<broken-mi-chain>; C<null-body-recipe> is no longer
+given since 0.29) and a human-readable C<message>. C<top_signed>, C<covered_m> and C<unsigned_null>
 are new in 0.16; C<top_null> is as in 0.15.
 
 =head2 Null body Recipes
 
-A null body Recipe (C<"b": null>) says the previous body cannot be recreated.
-A DKIM2-Signature with C<m=k> covers Message-Instances 1 to I<k>, so every
-instance above the highest C<m=> of the valid upstream signatures is
-unsigned: whoever signs next is the first to vouch for it. The gate refuses
-(C<null-body-recipe>) when any of those unsigned instances has a null body
-Recipe -- the top one, or one with another unsigned instance added over it.
-That is a null I<this> hop is introducing, typically a list manager that
-rewrote the body and added an unsigned instance for the outbound signer to
-sign. Signing it is the host's choice, made with C<AllowNullBodyRecipe>.
+A null body Recipe (C<"b": null>) says the previous body cannot be recreated,
+and a verifier reports a message carrying one as a PERMERROR (-09 sections 13
+and 14.2: "has a null recipe"). A DKIM2-Signature with C<m=k> covers
+Message-Instances 1 to I<k>, so every instance above the highest C<m=> of the
+valid upstream signatures is unsigned, and this hop's own: typically a list
+manager that rewrote the body beyond what a Recipe can record and added an
+unsigned instance for the outbound signer.
 
-A null that already arrived signed (a list host's post, forwarded unchanged,
-whether or not a later hop added an ordinary instance over it) was declared
-and signed by the upstream domain; the gate extends it without the option.
-Either way the upstream signatures must verify and the header history below
-the null must check out.
+Since 0.29 the gate passes such a null: the message will not verify
+downstream whatever this hop does, but signing records and vouches for the
+header changes this hop made. C<AllowNullBodyRecipe>, which used to be
+needed for that, is deprecated and does nothing.
+
+A null that arrived already signed fails the upstream verification, and is
+refused as C<upstream-chain> like any other broken upstream chain. The header
+history below this hop's own null must still check out.
 
 =cut
 
@@ -123,11 +126,24 @@ sub _top_has_nd {
     return $top_nd;
 }
 
+# AllowNullBodyRecipe is retired (0.29, -09 contract E2): this hop's own
+# null is always signed. Still accepted, so an existing caller does not
+# croak; a true value is warned about once per process.
+my $warned_allow_null;
+sub _deprecated_allow_null {
+    return if $warned_allow_null++;
+    Carp::carp('Mail::DKIM2::Gate: AllowNullBodyRecipe is deprecated and does nothing; '
+        . 'an unsigned null body Recipe is always signed (0.29)');
+}
+
 sub check {
     my ($class, $message, %o) = @_;
     Mail::DKIM2::Common::_check_options("$class->check", \%o,
         qw(SigningDomain AllowNullBodyRecipe SkipTimestampCheck IgnorePrefixes
-           PubkeyCallback Resolver VerifyResult));
+           PubkeyCallback PolicyCallback Resolver VerifyResult));
+    # Only a true value asks for the retired behaviour: hm's handler passes
+    # AllowNullBodyRecipe => 0 on every call.
+    _deprecated_allow_null() if $o{AllowNullBodyRecipe};
 
     # A filehandle is read a piece at a time: the header fields here, the body
     # straight into the Verifier below, so the message is never held whole.
@@ -162,6 +178,7 @@ sub check {
             SkipTimestampCheck => $o{SkipTimestampCheck} ? 1 : 0,
             InstancesOnly      => $instances_only ? 1 : 0,
             ($o{PubkeyCallback} ? (PubkeyCallback => $o{PubkeyCallback}) : ()),
+            ($o{PolicyCallback} ? (PolicyCallback => $o{PolicyCallback}) : ()),
             ($o{Resolver} ? (Resolver => $o{Resolver}) : ()),
             ($o{IgnorePrefixes} ? (IgnorePrefixes => $o{IgnorePrefixes}) : ()));
         $v->allow_unsigned_mi(1);
@@ -193,7 +210,7 @@ sub check {
     } keys %by_v;
     my $top_null = ($top && $null{$top}) ? 1 : 0;
     # How far up the upstream signatures reach: a DKIM2-Signature with m=k
-    # covers instances 1..k (-08 §10.2), so the highest m= of any of them
+    # covers instances 1..k (-09 §10.2), so the highest m= of any of them
     # is the top covered instance, and every instance above it is unsigned --
     # this hop will be the first to vouch for it. Only a signature with a
     # valid i= counts: one the Verifier cannot key is a PERMERROR there (so
@@ -226,11 +243,6 @@ sub check {
     } elsif (!$chain_ok) {
         @r{qw(reason message)} = ('broken-mi-chain',
             "Message-Instance chain does not undo cleanly: $chain_why");
-    } elsif ($unsigned_null && !$o{AllowNullBodyRecipe}) {
-        my $where = $unsigned_null == $top ? 'top ' : '';
-        @r{qw(reason message)} = ('null-body-recipe',
-            "unsigned ${where}Message-Instance m=$unsigned_null has a null body "
-            . 'Recipe (AllowNullBodyRecipe not set)');
     } else {
         $r{ok} = 1;
     }

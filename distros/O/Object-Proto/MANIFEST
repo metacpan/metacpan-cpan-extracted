@@ -1,20 +1,20 @@
+Changes
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+Makefile.PL
+README
 bench/get_set.pl
 bench/new.pl
 bench/new_get_set.pl
 bench/object.pl
-Changes
 ignore.txt
 include/object_compat.h
 include/object_types.h
 include/xop_compat.h
 lib/Object/Proto.pm
-Makefile.PL
-MANIFEST
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 object.c
 ppport.h
-README
 t/001-load.t
 t/002-object-load.t
 t/003-object-basic.t
@@ -72,12 +72,26 @@ t/054-import-accessors-prefix.t
 t/055-lazy-reader-func-accessor.t
 t/056-private-accessor.t
 t/057-simple-custom-op.t
+t/058-type-edges.t
+t/059-spec-parse-edges.t
+t/060-function-accessors.t
+t/061-plus-attr-modifiers.t
+t/062-role-slot-kinds.t
+t/063-slot-shapes.t
+t/064-lazy-defaults-and-builders.t
+t/065-introspection-edges.t
+t/066-modifier-and-destroy-edges.t
+t/067-define-twice.t
+t/068-c-api.t
+t/069-outcome-edges.t
 t/099-bugs.t
 t/fix_subtests.pl
+t/lib/LoadedRole.pm
 t/lib/NeuralNet/Activation.pm
 t/lib/NeuralNet/Layer.pm
 t/lib/NeuralNet/Loss.pm
 t/lib/NeuralNet/Network.pm
+t/lib/NotARole.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

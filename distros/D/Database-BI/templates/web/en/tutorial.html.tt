@@ -7,7 +7,7 @@
 
   .tutorial-version {
     font-size: 0.82rem;
-    color: #667;
+    color: var(--muted, #667);
     margin-bottom: 1rem;
   }
 
@@ -16,8 +16,8 @@
   }
 
   .tutorial-toc {
-    background: #f8f9fc;
-    border: 1px solid #dce3f0;
+    background: var(--row-alt, #f8f9fc);
+    border: 1px solid var(--border, #dce3f0);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     margin: 1.5rem 0 2.5rem;
@@ -25,7 +25,7 @@
 
   .tutorial-toc h2 {
     font-size: 1rem;
-    color: #2c3e7a;
+    color: var(--accent-text, #2c3e7a);
     margin-bottom: 0.5rem;
   }
 
@@ -39,7 +39,7 @@
   }
 
   .tutorial-toc a {
-    color: #2c3e7a;
+    color: var(--accent-text, #2c3e7a);
   }
 
   .tutorial-part {
@@ -48,8 +48,8 @@
 
   .tutorial-part > h2 {
     font-size: 1.35rem;
-    color: #2c3e7a;
-    border-bottom: 2px solid #dce3f0;
+    color: var(--accent-text, #2c3e7a);
+    border-bottom: 2px solid var(--border, #dce3f0);
     padding-bottom: 0.35rem;
     margin-bottom: 1.25rem;
   }
@@ -60,22 +60,22 @@
 
   .tutorial-chapter h3 {
     font-size: 1.1rem;
-    color: #1a1a2e;
+    color: var(--body-color, #1a1a2e);
     margin-bottom: 0.35rem;
   }
 
   /* A Help link lands on a chapter, so say which one was reached. */
   .tutorial-chapter:target {
     scroll-margin-top: 1rem;
-    background: #fffdf3;
-    border-left: 4px solid #c9a227;
+    background: var(--warning-bg, #fffdf3);
+    border-left: 4px solid var(--warning-border, #c9a227);
     padding-left: 1rem;
     margin-left: -1rem;
   }
 
   .tutorial-lead {
     font-weight: 600;
-    color: #333;
+    color: var(--body-color, #333);
     margin-bottom: 0.6rem;
   }
 
@@ -89,9 +89,9 @@
   }
 
   .tutorial-tip {
-    border-left: 4px solid #c9a227;
-    background: #fdf8e6;
-    color: #5c4a11;
+    border-left: 4px solid var(--warning-border, #c9a227);
+    background: var(--warning-bg, #fdf8e6);
+    color: var(--warning-fg, #5c4a11);
     padding: 0.6rem 0.85rem;
     margin-top: 0.9rem;
     font-size: 0.92rem;
@@ -106,15 +106,15 @@
   .tutorial-walkthrough {
     margin-top: 1rem;
     padding: 0.8rem 1rem;
-    border: 1px solid #dce3f0;
+    border: 1px solid var(--border, #dce3f0);
     border-radius: 6px;
-    background: #f7f9fe;
+    background: var(--hover-bg, #f7f9fe);
   }
 
   .tutorial-walkthrough h4 {
     margin: 0 0 0.35rem;
     font-size: 1rem;
-    color: #1a1a2e;
+    color: var(--body-color, #1a1a2e);
   }
 
   .tutorial-walkthrough-intro {
@@ -137,23 +137,23 @@
   }
 
   .tutorial-walkthrough .tutorial-see {
-    color: #444;
+    color: var(--text-secondary, #444);
   }
 
   .tutorial-walkthrough-result {
     margin: 0;
     padding-top: 0.55rem;
-    border-top: 1px solid #dce3f0;
+    border-top: 1px solid var(--border, #dce3f0);
     font-size: 0.92rem;
   }
 
   .tutorial-toc-tag {
     margin-left: 0.3rem;
     padding: 0 0.3rem;
-    border: 1px solid #e7d9a8;
+    border: 1px solid var(--warning-border, #e7d9a8);
     border-radius: 3px;
-    background: #fdf8e6;
-    color: #5c4a11;
+    background: var(--warning-bg, #fdf8e6);
+    color: var(--warning-fg, #5c4a11);
     font-size: 0.75rem;
   }
 
@@ -167,13 +167,13 @@
   .tutorial-table caption {
     text-align: left;
     font-weight: 600;
-    color: #333;
+    color: var(--body-color, #333);
     padding-bottom: 0.4rem;
   }
 
   .tutorial-table th,
   .tutorial-table td {
-    border: 1px solid #dce3f0;
+    border: 1px solid var(--border, #dce3f0);
     padding: 0.45rem 0.6rem;
     text-align: left;
     vertical-align: top;
@@ -186,7 +186,7 @@
   }
 
   .tutorial-table tbody tr:nth-child(even) {
-    background: #f8f9fc;
+    background: var(--row-alt, #f8f9fc);
   }
 
   .tutorial-faq,
@@ -208,16 +208,16 @@
   .tutorial-note {
     margin-top: 2.5rem;
     padding-top: 1rem;
-    border-top: 1px solid #dce3f0;
+    border-top: 1px solid var(--border, #dce3f0);
     font-size: 0.85rem;
-    color: #667;
+    color: var(--muted, #667);
   }
 
   .tutorial-top {
     display: inline-block;
     margin-top: 0.75rem;
     font-size: 0.85rem;
-    color: #2c3e7a;
+    color: var(--accent-text, #2c3e7a);
   }
 </style>
 
@@ -324,7 +324,12 @@
     <dl class="tutorial-faq">
       [%- FOREACH item IN faq %]
       <dt>[% item.question | html %]</dt>
+      [%- IF item.link %]
+      [%- SET parts = item.answer.split(item.link.text, 2) %]
+      <dd>[% parts.0 | html %]<a href="[% item.link.href | html %]" target="_blank" rel="noopener">[% item.link.text | html %]</a>[% parts.1 | html %]</dd>
+      [%- ELSE %]
       <dd>[% item.answer | html %]</dd>
+      [%- END %]
       [%- END %]
     </dl>
   </section>

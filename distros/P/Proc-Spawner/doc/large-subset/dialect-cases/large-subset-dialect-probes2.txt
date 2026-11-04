@@ -1,0 +1,95 @@
+echobs	echo 'a\nb'
+echoe	echo -e 'a\tb'
+echon	echo -n a; echo b
+echoE	echo -E 'a\nb'
+testeqeq	[ a == a ] && echo y
+testlt	[ a \< b ] && echo y
+testaun	: >f; [ -a f ] && echo y
+testparen	[ \( a = a \) -o a = b ] && echo y
+testv	x=1; [ -v x ] && echo y
+printfq	printf '%q\n' 'a b'
+printfv	printf -v x %s hi; echo "[$x]"
+printfb	printf '%b\n' 'a\tb'
+printfT	printf '%(%Y)T\n' 0
+killl	kill -l 2
+killsig	sleep 5 & kill -SIGHUP $!; echo $?
+trapnum	trap 'echo t' 2; echo $?
+trapsigint	trap 'echo t' SIGINT; echo $?
+traperr	trap 'echo t' ERR; echo $?
+trapdebug	trap 'echo t' DEBUG; echo $?
+trap0	trap 'echo bye' 0; echo a
+typep	type -p ls
+typet	type -t ls
+waitn	sleep 0 & wait -n; echo $?
+cddash	cd /tmp; cd /; cd - >/dev/null; pwd
+umaskS	umask 022; umask -S
+readr	printf 'a\\b\n' | { read -r v; echo "[$v]"; }
+readn	printf 'abc' | { read -n 1 v; echo "[$v]"; }
+reads	echo x | { read -s v; echo "[$v]"; }
+readt	echo x | { read -t 1 v; echo "[$v]"; }
+reada	echo x y | { read -a v; echo "[$v]"; }
+readreply	echo x | { read; echo "[$REPLY]"; }
+localr	f(){ local -r x=1; echo "[$x]"; }; f
+localout	local x=1; echo "[$x]"
+localval	f(){ local x=2; echo "[$x]"; }; x=1; f; echo "[$x]"
+underscore	true foo; echo "[$_]"
+bashvar	echo "[${BASH_VERSION:+set}] [${EUID:+set}] [${HOSTNAME:+set}]"
+seconds	echo "[${SECONDS:+set}] [${OSTYPE:+set}]"
+casefall	case a in a) echo 1;& b) echo 2;; esac
+caselower	x=AB; echo ${x,,}
+clobber	set -C; echo a>f; echo b>|f; cat f
+rw	echo hi >f; cat <>f
+appendboth	echo hi &>>f; echo st=$?; cat f
+closefd	echo hi 2>&-; echo $?
+fdvar	exec {fd}>f; echo "[$fd]"
+dollarlt	echo hi >f; echo "[$(<f)]"
+fnparen	function f() { echo f; }; f
+pow	echo $((2**3))
+base	echo $((16#ff))
+assignop	x=1; echo $((x+=2)) $x
+arithcmd	echo $(( $(echo 1) + 1 ))
+arithlen	x=abc; echo $((${#x}+1))
+atslice	set -- a b c; echo ${@:2}
+dotargs	echo 'echo "[$1]"' >s; . ./s arg
+exportf	f(){ :; }; export -f f; echo $?
+exportn	export X=1; export -n X; echo $?
+setposix	set -o posix; echo $?
+setvi	set -o vi; echo $?
+setemacs	set -o emacs; echo $?
+setB	set -B; echo $?
+setH	set -H; echo $?
+sethist	set -o history; echo $?
+setm	set -m; echo $?
+aliasline	alias e=echo; e hi
+elemassign	a[1]=x; echo $?
+forarith	for ((i=0;i<2;i++)); do echo $i; done
+caseamp	case a in a) echo 1;;& *) echo 2;; esac
+atQ	x='a b'; echo ${x@Q}
+prefixstar	ab=1; echo ${!a*}
+typeset	typeset -i n=1+2; echo $n
+mapfile	printf 'a\nb\n' | { mapfile v; echo $?; }
+octal	echo $((010))
+break	break; echo after
+continue	continue; echo after
+dupin	echo hi >f; cat <&f
+dupnum	echo hi >&3; echo st=$?
+herestrq	cat <<< "a b"
+printff	printf '%.2f\n' 1.5
+echodd	echo -- a
+echonen	echo -ne 'a\n'
+cmdp	command -p ls / >/dev/null; echo $?
+hashl	hash ls; echo $?
+execa	exec -a foo true; echo $?
+ulimitn	ulimit -n >/dev/null; echo $?
+pwdP	cd /tmp && pwd -P
+jobspipe	sleep 1 & jobs | wc -l
+jobsppipe	sleep 1 & jobs -p | wc -l
+jobspsubst	sleep 1 & x=$(jobs -p); echo "[${x:+set}]"
+jobsptop	sleep 1 & jobs -p >f; wc -l <f
+cdargs	mkdir a b; cd a b; echo "st=$? ${PWD##*/}"
+cdPL	mkdir r; ln -s r l; cd -P l; echo "${PWD##*/}"; cd ..; cd -L l; echo "${PWD##*/}"
+redirpat	touch q.x; echo c > *.x; ls
+trapint	trap 'echo c' int; kill -INT $$; echo after
+trapnum2	trap 'echo c' 2; kill -INT $$; echo after
+trapkill	trap 'echo c' 9; echo st=$?
+setnop	set -o ignoreeof; set -o notify; set -o nolog; set -b; set +m; echo st=$?

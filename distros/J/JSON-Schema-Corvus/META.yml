@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/corvus-dotnet/Corvus.JsonSchema/issues
   homepage: https://corvus-oss.org/Corvus.JsonSchema/
   repository: https://github.com/corvus-dotnet/Corvus.JsonSchema.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

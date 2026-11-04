@@ -28,7 +28,7 @@ my %module_build_args = (
     "Stefan H\x{e4}rter"
   ],
   "dist_name" => "Dancer2-Plugin-Feed",
-  "dist_version" => "1.263060",
+  "dist_version" => "1.263070",
   "license" => "perl",
   "module_name" => "Dancer2::Plugin::Feed",
   "recursive_test_files" => 1,

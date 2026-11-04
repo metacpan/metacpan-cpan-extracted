@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# large-subset-scan.pl (version of 2026-11-02; see doc/large-subset/large-subset-ceiling.md). For each unique sample of
+# large-subset-scan.pl (version of 2026-11-02; see doc/large-subset/large-subset-ceiling.md (in Proc-Spawner 0.03)). For each unique sample of
 # samples.jsonl (from large-subset-extract.pl; the make book is skipped): does Proc::ShellSubset (all options) accept it,
 # does Proc::ShellSubset::Large; do dash -n, bash --posix -n and bash -n accept it; which bash-only constructs three
 # independent detectors see in it:

@@ -150,7 +150,8 @@ sub parse_nwctxt {
 }
 
 # ---------------------------------------------------------------------------
-# MusicXML output: DynVariance rendered as <wedge>
+# MusicXML output: DynVariance:Crescendo rendered as italic text <words>cresc.</words>
+# (not a wedge -- DynVariance is a text marking; hairpins come from Opts:Crescendo on notes)
 # ---------------------------------------------------------------------------
 {
 	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
@@ -166,7 +167,46 @@ sub parse_nwctxt {
 	$score->add_staff($staff);
 
 	my $xml = Music::NWC2MusicXML::MusicXML->new->generate($score);
-	like $xml, qr/wedge type="crescendo"/,  'crescendo wedge in output';
+	like   $xml, qr/font-style="italic"[^>]*>cresc\.<\/words>/, 'DynVariance:Crescendo emits italic cresc. text';
+	unlike $xml, qr/wedge/,  'DynVariance:Crescendo does not emit a wedge';
+}
+
+# MusicXML output: DynVariance:Diminuendo renders as italic "dim." text
+{
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'DynVariance',
+		data => { style => 'Diminuendo', placement => 'Below' },
+	));
+
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+
+	my $xml = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	like   $xml, qr/font-style="italic"[^>]*>dim\.<\/words>/, 'DynVariance:Diminuendo emits italic dim. text';
+	unlike $xml, qr/wedge/, 'DynVariance:Diminuendo does not emit a wedge';
+}
+
+# MusicXML output: DynVariance:crescOff emits nothing (no stop marker needed for text cresc.)
+{
+	my $staff = Music::NWC2MusicXML::Staff->new(name => 'Test');
+	$staff->set_initial_clef('Treble');
+	$staff->set_initial_key({ signature => 'C', tonic => 'C', fifths => 0 });
+	$staff->set_initial_timesig({ beats => 4, beat_type => 4 });
+	$staff->add_event(Music::NWC2MusicXML::Event->new(
+		type => 'DynVariance',
+		data => { style => 'crescOff', placement => 'Below' },
+	));
+
+	my $score = Music::NWC2MusicXML::Score->new;
+	$score->add_staff($staff);
+
+	my $xml = Music::NWC2MusicXML::MusicXML->new->generate($score);
+	unlike $xml, qr/wedge/, 'DynVariance:crescOff does not emit a wedge';
+	unlike $xml, qr/words/, 'DynVariance:crescOff emits no text direction';
 }
 
 # ---------------------------------------------------------------------------

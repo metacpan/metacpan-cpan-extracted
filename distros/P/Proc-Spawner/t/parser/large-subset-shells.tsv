@@ -1,0 +1,1093 @@
+file	id	expected	parse	verdict	features	note
+large-subset-tests.pl	LS:1	ok	both	-		
+large-subset-tests.pl	LS:2	ok	both	-		
+large-subset-tests.pl	LS:3	ok	both	-		
+large-subset-tests.pl	LS:4	ok	both	-		
+large-subset-tests.pl	LS:5	ok	both	-		
+large-subset-tests.pl	LS:6	rej	dash	B	parse:B:P:-n	
+large-subset-tests.pl	LS:7	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:8	rej	bash	B	parse:B:P:-n,fnreserved:B:P:fnlocal	
+large-subset-tests.pl	LS:9	ok	both	-		
+large-subset-tests.pl	LS:10	rej	both	S	localnoval:S:P:local	
+large-subset-tests.pl	LS:11	rej	both	B	scope:B:P:local	
+large-subset-tests.pl	LS:12	ok	both	X	returnout:X:E:error	
+large-subset-tests.pl	LS:13	ok	both	-		
+large-subset-tests.pl	LS:14	rej	both	-		
+large-subset-tests.pl	LS:15	ok	both	-		
+large-subset-tests.pl	LS:16	ok	both	-		
+large-subset-tests.pl	LS:17	rej	both	-		
+large-subset-tests.pl	LS:18	ok	both	-		
+large-subset-tests.pl	LS:19	ok	both	X	assignredir:X:E:effect	
+large-subset-tests.pl	LS:20	ok	both	-		
+large-subset-tests.pl	LS:21	ok	both	S	qmark:S:P:qmark	
+large-subset-tests.pl	LS:22	rej	both	-		
+large-subset-tests.pl	LS:23	ok	both	-		
+large-subset-tests.pl	LS:24	rej	both	B	bashparam:B:P:substr	
+large-subset-tests.pl	LS:25	rej	both	B	bashparam:B:P:substr	
+large-subset-tests.pl	LS:26	rej	both	B	bashparam:B:P:substr	
+large-subset-tests.pl	LS:27	rej	both	-		
+large-subset-tests.pl	LS:28	ok	both	-		
+large-subset-tests.pl	LS:29	ok	both	-		
+large-subset-tests.pl	LS:30	rej	both	O	dashflags:O:open	
+large-subset-tests.pl	LS:31	rej	both	-		
+large-subset-tests.pl	LS:32	rej	both	B	bashparam:B:P:substr	
+large-subset-tests.pl	LS:33	ok	both	-		
+large-subset-tests.pl	LS:40	ok	both	-		
+large-subset-tests.pl	LS:41	ok	both	-		
+large-subset-tests.pl	LS:42	ok	both	-		
+large-subset-tests.pl	LS:43	ok	both	-		
+large-subset-tests.pl	LS:44	rej	both	-		
+large-subset-tests.pl	LS:45	rej	both	B	execopt:B:P:execa	
+large-subset-tests.pl	LS:46	rej	both	-		
+large-subset-tests.pl	LS:47	ok	both	-		
+large-subset-tests.pl	LS:48	rej	both	B	array:B:P:array	
+large-subset-tests.pl	LS:49	rej	both	B	dbracket:B:P:dbracket	
+large-subset-tests.pl	LS:50	ok	both	-		
+large-subset-tests.pl	LS:51	rej	bash	B	parse:B:P:-n,function:B:P:function	
+large-subset-tests.pl	LS:52	rej	both	B	dparen:B:P:dparen	
+large-subset-tests.pl	LS:60	ok	both	-		
+large-subset-tests.pl	LS:61	ok	both	-		
+large-subset-tests.pl	LS:62	ok	both	-		
+large-subset-tests.pl	LS:63	ok	both	-		
+large-subset-tests.pl	LS:64	rej	both	-		
+large-subset-tests.pl	LS:65	rej	both	-		
+large-subset-tests.pl	LS:66	rej	bash	B	parse:B:P:-n,herestr:B:P:herestr	
+large-subset-tests.pl	LS:67	ok	both	-		
+large-subset-tests.pl	LS:68	ok	both	-		
+large-subset-tests.pl	LS:69	ok	both	-		
+large-subset-tests.pl	LS:80	ok	both	-		
+large-subset-tests.pl	LS:81	rej	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:82	rej	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:83	rej	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:84	ok	both	-		
+large-subset-tests.pl	LS:85	rej	both	-		
+large-subset-tests.pl	LS:86	rej	both	-		
+large-subset-tests.pl	LS:87	ok	both	-		
+large-subset-tests.pl	LS:88	rej	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:89	rej	both	S	trace:S:P:setx	
+large-subset-tests.pl	LS:90	rej	both	B	setbash:B:P:setposix	
+large-subset-tests.pl	LS:91	rej	both	-		
+large-subset-tests.pl	LS:92	rej	both	S	trace:S:P:setx	
+large-subset-tests.pl	LS:93	ok	both	-		
+large-subset-tests.pl	LS:94	rej	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:95	rej	both	-		
+large-subset-tests.pl	LS:96	rej	both	-		
+large-subset-tests.pl	LS:97	rej	both	B	trapsig:B:P:trapsigint	
+large-subset-tests.pl	LS:98	rej	both	-		
+large-subset-tests.pl	LS:99	ok	both	-		
+large-subset-tests.pl	LS:100	ok	both	-		
+large-subset-tests.pl	LS:101	rej	both	X	jobspec:X:P:job	
+large-subset-tests.pl	LS:102	ok	both	-		
+large-subset-tests.pl	LS:103	ok	both	-		
+large-subset-tests.pl	LS:104	ok	both	S	cmdv:S:P:cmdvst	
+large-subset-tests.pl	LS:105	rej	both	-		
+large-subset-tests.pl	LS:106	ok	both	-		
+large-subset-tests.pl	LS:107	rej	both	-		
+large-subset-tests.pl	LS:108	ok	both	X	getopts:X:E:posix	
+large-subset-tests.pl	LS:109	rej	both	X	getopts:X:E:posix	
+large-subset-tests.pl	LS:110	rej	both	X	getopts:X:E:posix	
+large-subset-tests.pl	LS:111	rej	both	-		
+large-subset-tests.pl	LS:113	ok	both	-		
+large-subset-tests.pl	LS:114	ok	both	-		
+large-subset-tests.pl	LS:115	ok	both	-		
+large-subset-tests.pl	LS:116	rej	both	B	dotargs:B:P:dotargs	
+large-subset-tests.pl	LS:117	rej	both	B	bashbuiltin:B:P:source	
+large-subset-tests.pl	LS:118	ok	both	-		
+large-subset-tests.pl	LS:119	rej	both	B	bashbuiltin:B:P:source	
+large-subset-tests.pl	LS:120	ok	both	-		
+large-subset-tests.pl	LS:121	ok	both	-		
+large-subset-tests.pl	LS:122	rej	both	-		
+large-subset-tests.pl	LS:123	rej	both	-		
+large-subset-tests.pl	LS:130	ok	both	-		
+large-subset-tests.pl	LS:131	rej	both	B	arithop:B:P:pow	
+large-subset-tests.pl	LS:132	rej	both	-		
+large-subset-tests.pl	LS:133	rej	both	-		
+large-subset-tests.pl	LS:134	ok	both	-		
+large-subset-tests.pl	LS:140	ok	both	X	dotstar:X:E:harm	
+large-subset-tests.pl	LS:141	ok	both	-		
+large-subset-tests.pl	LS:142	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:143	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:144	ok	both	-		
+large-subset-tests.pl	LS:150	rej	both	-		
+large-subset-tests.pl	LS:151	rej	both	X	assignredir:X:E:effect	
+large-subset-tests.pl	LS:152	rej	both	-		
+large-subset-tests.pl	LS:153	ok	both	-		
+large-subset-tests.pl	LS:154	rej	both	S	trace:S:P:setx	
+large-subset-tests.pl	LS:155	rej	both	S	localnoval:S:P:local	
+large-subset-tests.pl	LS:156	ok	both	-		
+large-subset-tests.pl	LS:157	rej	both	-		
+large-subset-tests.pl	LS:158	rej	dash	B	parse:B:P:-n	
+large-subset-tests.pl	LS:159	rej	both	-		
+large-subset-tests.pl	LS:160	rej	both	-		
+large-subset-tests.pl	LS:161	rej	both	B	atpat:B:P:atpat	
+large-subset-tests.pl	LS:162	rej	both	S	atassign:S:P:atjoin	
+large-subset-tests.pl	LS:163	rej	both	S	atassign:S:P:atjoin	
+large-subset-tests.pl	LS:164	rej	both	-		
+large-subset-tests.pl	LS:165	rej	both	S	atassign:S:P:atjoin	
+large-subset-tests.pl	LS:166	rej	both	-		
+large-subset-tests.pl	LS:167	rej	both	B	bqdq:B:P:bqdq	
+large-subset-tests.pl	LS:168	ok	both	-		
+large-subset-tests.pl	LS:169	rej	both	S	nohome:S:P:tildehome	
+large-subset-tests.pl	LS:170	rej	both	-		
+large-subset-tests.pl	LS:171	rej	both	-		
+large-subset-tests.pl	LS:172	rej	both	B	roassign:B:P:uidset	
+large-subset-tests.pl	LS:173	rej	bash	B	parse:B:P:-n,fnreserved:B:P:fnlocal	
+large-subset-tests.pl	LS:174	rej	both	B	bashbuiltin:B:P:source,fnreserved:B:P:fnlocal	
+large-subset-tests.pl	LS:175	rej	both	-		
+large-subset-tests.pl	LS:176	rej	both	-		
+large-subset-tests.pl	LS:177	rej	both	X	getopts:X:E:posix	
+large-subset-tests.pl	LS:178	rej	both	-		
+large-subset-tests.pl	LS:179	rej	both	-		
+large-subset-tests.pl	LS:180	ok	both	-		
+large-subset-tests.pl	LS:181	rej	both	-		
+large-subset-tests.pl	LS:182	ok	both	-		
+large-subset-tests.pl	LS:183	ok	both	-		
+large-subset-tests.pl	LS:184	ok	both	-		
+large-subset-tests.pl	LS:185	ok	both	-		
+large-subset-tests.pl	LS:186	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:187	ok	both	X	assignredir:X:E:effect	
+large-subset-tests.pl	LS:188	ok	both	-		
+large-subset-tests.pl	LS:189	ok	both	-		
+large-subset-tests.pl	LS:190	ok	both	-		
+large-subset-tests.pl	LS:191	rej	both	-		
+large-subset-tests.pl	LS:192	ok	both	-		
+large-subset-tests.pl	LS:193	ok	both	-		
+large-subset-tests.pl	LS:194	ok	both	-		
+large-subset-tests.pl	LS:195	ok	both	X	assignredir:X:E:effect	
+large-subset-tests.pl	LS:196	ok	both	X	assignredir:X:E:effect	
+large-subset-tests.pl	LS:197	ok	both	-		
+large-subset-tests.pl	LS:198	ok	both	-		
+large-subset-tests.pl	LS:199	ok	both	-		
+large-subset-tests.pl	LS:200	ok	both	-		
+large-subset-tests.pl	LS:201	ok	both	-		
+large-subset-tests.pl	LS:202	ok	both	-		
+large-subset-tests.pl	LS:203	ok	both	-		
+large-subset-tests.pl	LS:204	ok	both	-		
+large-subset-tests.pl	LS:205	ok	both	-		
+large-subset-tests.pl	LS:206	rej	both	B	ampgt:B:P:ampgt	
+large-subset-tests.pl	LS:207	ok	both	-		
+large-subset-tests.pl	LS:208	rej	both	B	dollarlt:B:P:dollarlt	
+large-subset-tests.pl	LS:209	rej	both	B	dollarlt:B:P:dollarlt	
+large-subset-tests.pl	LS:210	rej	both	-		
+large-subset-tests.pl	LS:211	ok	both	-		
+large-subset-tests.pl	LS:212	ok	both	-		
+large-subset-tests.pl	LS:213	ok	both	-		
+large-subset-tests.pl	LS:214	ok	both	-		
+large-subset-tests.pl	LS:215	ok	both	-		
+large-subset-tests.pl	LS:216	rej	both	B	brace:B:P:brace	
+large-subset-tests.pl	LS:217	rej	both	B	brace:B:P:brace	
+large-subset-tests.pl	LS:218	rej	both	B	brace:B:P:brace	
+large-subset-tests.pl	LS:219	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:220	ok	both	-		
+large-subset-tests.pl	LS:221	ok	both	-		
+large-subset-tests.pl	LS:222	rej	both	-		
+large-subset-tests.pl	LS:223	rej	both	B	arithop:B:P:pow	
+large-subset-tests.pl	LS:224	ok	both	-		
+large-subset-tests.pl	LS:225	rej	both	-		
+large-subset-tests.pl	LS:226	rej	both	S	ps1:S:P:ps1	
+large-subset-tests.pl	LS:227	rej	both	-		
+large-subset-tests.pl	LS:228	ok	both	-		
+large-subset-tests.pl	LS:229	rej	both	-		
+large-subset-tests.pl	LS:230	rej	both	-		
+large-subset-tests.pl	LS:231	ok	both	-		
+large-subset-tests.pl	LS:232	rej	both	-		
+large-subset-tests.pl	LS:233	rej	both	-		
+large-subset-tests.pl	LS:234	ok	both	-		
+large-subset-tests.pl	LS:235	rej	both	-		
+large-subset-tests.pl	LS:236	ok	both	-		
+large-subset-tests.pl	LS:237	rej	both	-		
+large-subset-tests.pl	LS:238	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:239	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:240	ok	both	-		
+large-subset-tests.pl	LS:241	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:242	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:243	rej	both	B	fdvar:B:P:fdvar	
+large-subset-tests.pl	LS:244	rej	both	B	fdvar:B:P:fdvar	
+large-subset-tests.pl	LS:245	ok	both	-		
+large-subset-tests.pl	LS:246	rej	both	B	killsig:B:M:38	
+large-subset-tests.pl	LS:247	rej	both	-		
+large-subset-tests.pl	LS:248	rej	both	-		
+large-subset-tests.pl	LS:249	rej	both	-		
+large-subset-tests.pl	LS:250	ok	both	-		
+large-subset-tests.pl	LS:251	ok	both	-		
+large-subset-tests.pl	LS:252	ok	both	-		
+large-subset-tests.pl	LS:253	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:254	ok	both	X	testext:X:P:testeqeq	
+large-subset-tests.pl	LS:255	rej	both	-		
+large-subset-tests.pl	LS:256	rej	both	-		
+large-subset-tests.pl	LS:257	ok	both	-		
+large-subset-tests.pl	LS:258	ok	both	-		
+large-subset-tests.pl	LS:259	ok	both	-		
+large-subset-tests.pl	LS:260	ok	both	-		
+large-subset-tests.pl	LS:261	ok	both	-		
+large-subset-tests.pl	LS:262	ok	both	S	listing:S:P:listset	
+large-subset-tests.pl	LS:263	rej	both	-		
+large-subset-tests.pl	LS:264	rej	both	-		
+large-subset-tests.pl	LS:265	rej	both	-		
+large-subset-tests.pl	LS:266	rej	none	B	parse:B:P:-n	
+large-subset-tests.pl	LS:267	rej	both	-		
+large-subset-tests.pl	LS:268	ok	both	X	jobspec:X:P:job	
+large-subset-tests.pl	LS:269	rej	both	-		
+large-subset-tests.pl	LS:270	ok	both	-		
+large-subset-tests.pl	LS:271	ok	both	X	interactive:X:user:B2	
+large-subset-tests.pl	LS:272	rej	both	X	interactive:X:user:B2	
+large-subset-tests.pl	LS:273	ok	both	-		
+large-subset-tests.pl	LS:274	rej	both	-		
+large-subset-tests.pl	LS:275	ok	both	-		
+large-subset-tests.pl	LS:276	rej	both	-		
+large-subset-tests.pl	LS:277	rej	both	X	cdargs:X:E:error	
+large-subset-tests.pl	LS:278	ok	both	-		
+large-subset-tests.pl	LS:279	ok	both	-		
+large-subset-tests.pl	LS:280	rej	both	S	setm:S:P:setm	
+large-subset-tests.pl	LS:281	rej	both	-		
+large-subset-tests.pl	LS:282	ok	both	-		
+large-subset-tests.pl	LS:283	rej	both	-		
+large-subset-tests.pl	LS:284	rej	both	-		
+large-subset-tests.pl	LS:285	rej	both	-		
+large-subset-tests.pl	LS:286	ok	both	-		
+large-subset-tests.pl	LS:287	rej	both	-		
+large-subset-tests.pl	LS:288	ok	both	-		
+large-subset-tests.pl	LS:289	ok	both	X	jobsctx:X:E:info	
+large-subset-tests.pl	LS:290	ok	both	X	jobsctx:X:E:info	
+large-subset-tests.pl	LS:291	ok	both	-		
+large-subset-tests.pl	LS:292	ok	both	-		
+large-subset-tests.pl	LS:293	ok	both	X	cdargs:X:E:error,fdmulti:X:E:same,dotstar:X:E:harm,caret:X:E:platform,assignredir:X:E:effect	
+large-subset-tests.pl	LS:294	rej	both	B	scope:B:P:local,localnoval:S:P:local	
+large-subset-tests.pl	LS:295	rej	both	O	lineno:O:open	
+large-subset-tests.pl	LS:296	ok	both	-		
+large-subset-tests.pl	LS:297	rej	both	B	roassign:B:P:uidset	
+large-subset-tests.pl	LS:298	rej	both	-		
+shell-subset-tests.pl	OWN:1	ok	both	-		
+shell-subset-tests.pl	OWN:2	ok	both	-		
+shell-subset-tests.pl	OWN:3	ok	both	-		
+shell-subset-tests.pl	OWN:4	rej	bash	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:5	ok	both	-		
+shell-subset-tests.pl	OWN:6	rej	both	-		
+shell-subset-tests.pl	OWN:7	ok	both	-		
+shell-subset-tests.pl	OWN:8	rej	both	-		
+shell-subset-tests.pl	OWN:9	ok	both	-		
+shell-subset-tests.pl	OWN:10	ok	both	-		
+shell-subset-tests.pl	OWN:11	ok	both	-		
+shell-subset-tests.pl	OWN:12	rej	both	-		
+shell-subset-tests.pl	OWN:13	rej	both	-		
+shell-subset-tests.pl	OWN:14	ok	both	-		
+shell-subset-tests.pl	OWN:15	rej	both	B	dparen:B:P:dparen	
+shell-subset-tests.pl	OWN:16	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:17	ok	both	-		
+shell-subset-tests.pl	OWN:18	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:19	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:20	ok	both	-		
+shell-subset-tests.pl	OWN:21	rej	both	-		
+shell-subset-tests.pl	OWN:22	rej	both	-		
+shell-subset-tests.pl	OWN:23	ok	both	-		
+shell-subset-tests.pl	OWN:24	rej	both	-		
+shell-subset-tests.pl	OWN:25	ok	both	-		
+shell-subset-tests.pl	OWN:26	rej	both	-		
+shell-subset-tests.pl	OWN:27	rej	both	-		
+shell-subset-tests.pl	OWN:28	rej	both	B	execopt:B:P:execa	
+shell-subset-tests.pl	OWN:29	rej	both	-		
+shell-subset-tests.pl	OWN:30	ok	both	-		
+shell-subset-tests.pl	OWN:31	ok	both	-		
+shell-subset-tests.pl	OWN:32	ok	both	-		
+shell-subset-tests.pl	OWN:33	ok	both	-		
+shell-subset-tests.pl	OWN:34	rej	both	-		
+shell-subset-tests.pl	OWN:35	rej	both	-		
+shell-subset-tests.pl	OWN:36	ok	both	-		
+shell-subset-tests.pl	OWN:37	ok	both	-		
+shell-subset-tests.pl	OWN:38	rej	both	-		
+shell-subset-tests.pl	OWN:39	rej	both	-		
+shell-subset-tests.pl	OWN:40	rej	both	-		
+shell-subset-tests.pl	OWN:41	ok	both	-		
+shell-subset-tests.pl	OWN:42	rej	both	-		
+shell-subset-tests.pl	OWN:43	ok	both	-		
+shell-subset-tests.pl	OWN:44	ok	both	-		
+shell-subset-tests.pl	OWN:45	rej	both	-		
+shell-subset-tests.pl	OWN:46	rej	both	-		
+shell-subset-tests.pl	OWN:47	rej	both	-		
+shell-subset-tests.pl	OWN:48	ok	both	-		
+shell-subset-tests.pl	OWN:49	ok	both	-		
+shell-subset-tests.pl	OWN:50	rej	both	-		
+shell-subset-tests.pl	OWN:51	rej	both	-		
+shell-subset-tests.pl	OWN:52	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:53	ok	both	-		
+shell-subset-tests.pl	OWN:54	ok	both	-		
+shell-subset-tests.pl	OWN:55	rej	both	-		
+shell-subset-tests.pl	OWN:56	rej	both	-		
+shell-subset-tests.pl	OWN:57	ok	both	-		
+shell-subset-tests.pl	OWN:58	rej	both	-		
+shell-subset-tests.pl	OWN:59	ok	both	-		
+shell-subset-tests.pl	OWN:60	rej	both	-		
+shell-subset-tests.pl	OWN:61	rej	both	-		
+shell-subset-tests.pl	OWN:62	rej	both	B	bashvar:B:P:bashvar	
+shell-subset-tests.pl	OWN:63	ok	both	-		
+shell-subset-tests.pl	OWN:64	rej	both	B	ansic:B:P:ansi	
+shell-subset-tests.pl	OWN:65	ok	both	-		
+shell-subset-tests.pl	OWN:66	rej	both	-		
+shell-subset-tests.pl	OWN:67	rej	both	B	arithop:B:P:pow	
+shell-subset-tests.pl	OWN:68	rej	both	B	arithop:B:P:pow	
+shell-subset-tests.pl	OWN:69	rej	both	B	arithop:B:P:pow	
+shell-subset-tests.pl	OWN:70	rej	both	B	arithop:B:P:pow	
+shell-subset-tests.pl	OWN:71	rej	both	-		
+shell-subset-tests.pl	OWN:72	rej	both	-		
+shell-subset-tests.pl	OWN:73	rej	both	-		
+shell-subset-tests.pl	OWN:74	ok	both	-		
+shell-subset-tests.pl	OWN:75	ok	both	-		
+shell-subset-tests.pl	OWN:76	ok	both	-		
+shell-subset-tests.pl	OWN:77	ok	both	-		
+shell-subset-tests.pl	OWN:78	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:79	rej	both	-		
+shell-subset-tests.pl	OWN:80	ok	both	-		
+shell-subset-tests.pl	OWN:81	ok	both	-		
+shell-subset-tests.pl	OWN:82	ok	both	-		
+shell-subset-tests.pl	OWN:83	rej	both	-		
+shell-subset-tests.pl	OWN:84	rej	both	-		
+shell-subset-tests.pl	OWN:85	ok	both	-		
+shell-subset-tests.pl	OWN:86	ok	both	-		
+shell-subset-tests.pl	OWN:87	ok	both	-		
+shell-subset-tests.pl	OWN:88	ok	both	-		
+shell-subset-tests.pl	OWN:89	ok	both	-		
+shell-subset-tests.pl	OWN:90	rej	both	-		
+shell-subset-tests.pl	OWN:91	ok	both	-		
+shell-subset-tests.pl	OWN:92	ok	both	-		
+shell-subset-tests.pl	OWN:93	rej	both	B	brace:B:P:brace	
+shell-subset-tests.pl	OWN:94	ok	both	B	brace:B:P:brace	
+shell-subset-tests.pl	OWN:95	rej	both	-		
+shell-subset-tests.pl	OWN:96	rej	both	B	brace:B:P:brace	
+shell-subset-tests.pl	OWN:97	rej	both	B	brace:B:P:brace	
+shell-subset-tests.pl	OWN:98	ok	both	-		
+shell-subset-tests.pl	OWN:99	ok	both	-		
+shell-subset-tests.pl	OWN:100	rej	both	X	caret:X:E:platform	
+shell-subset-tests.pl	OWN:101	ok	both	-		
+shell-subset-tests.pl	OWN:102	rej	both	-		
+shell-subset-tests.pl	OWN:103	ok	both	-		
+shell-subset-tests.pl	OWN:104	ok	both	-		
+shell-subset-tests.pl	OWN:105	ok	both	-		
+shell-subset-tests.pl	OWN:106	rej	both	B	ampgt:B:P:ampgt	
+shell-subset-tests.pl	OWN:107	rej	bash	B	parse:B:P:-n,pipeamp:B:P:pipeamp	
+shell-subset-tests.pl	OWN:108	rej	both	X	fdmulti:X:E:same	
+shell-subset-tests.pl	OWN:109	ok	both	X	fdmulti:X:E:same	
+shell-subset-tests.pl	OWN:110	rej	both	B	dupfile:B:P:dupfile	
+shell-subset-tests.pl	OWN:111	ok	both	-		
+shell-subset-tests.pl	OWN:112	rej	both	-		
+shell-subset-tests.pl	OWN:113	ok	both	-		
+shell-subset-tests.pl	OWN:114	ok	both	-		
+shell-subset-tests.pl	OWN:115	rej	both	-		
+shell-subset-tests.pl	OWN:116	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:117	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:118	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:119	ok	both	-		
+shell-subset-tests.pl	OWN:120	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:121	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:122	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:123	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:124	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:125	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:126	ok	both	-		
+shell-subset-tests.pl	OWN:127	ok	both	-		
+shell-subset-tests.pl	OWN:128	rej	both	-		
+shell-subset-tests.pl	OWN:129	ok	both	-		
+shell-subset-tests.pl	OWN:130	rej	both	-		
+shell-subset-tests.pl	OWN:131	rej	both	-		
+shell-subset-tests.pl	OWN:132	ok	both	-		
+shell-subset-tests.pl	OWN:133	rej	both	B	dollarbr:B:P:dollarbr	
+shell-subset-tests.pl	OWN:134	ok	both	-		
+shell-subset-tests.pl	OWN:135	rej	both	-		
+shell-subset-tests.pl	OWN:136	rej	both	X	cdargs:X:E:error	
+shell-subset-tests.pl	OWN:137	ok	both	-		
+shell-subset-tests.pl	OWN:138	ok	both	-		
+shell-subset-tests.pl	OWN:139	rej	both	-		
+shell-subset-tests.pl	OWN:140	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-tests.pl	OWN:141	ok	both	-		
+shell-subset-tests.pl	OWN:142	rej	both	-		
+shell-subset-tests.pl	OWN:143	ok	both	-		
+shell-subset-tests.pl	OWN:144	rej	both	-		
+shell-subset-tests.pl	OWN:145	ok	both	-		
+shell-subset-tests.pl	OWN:146	ok	both	-		
+shell-subset-tests.pl	OWN:147	rej	both	-		
+shell-subset-tests.pl	OWN:148	ok	both	-		
+shell-subset-tests.pl	OWN:149	ok	both	-		
+shell-subset-tests.pl	OWN:150	ok	both	-		
+shell-subset-tests.pl	OWN:151	rej	both	-		
+shell-subset-tests.pl	OWN:152	ok	both	-		
+shell-subset-tests.pl	OWN:153	rej	both	-		
+shell-subset-tests.pl	OWN:154	rej	both	-		
+shell-subset-tests.pl	OWN:155	ok	both	-		
+shell-subset-tests.pl	OWN:156	ok	both	-		
+shell-subset-tests.pl	OWN:157	rej	both	-		
+shell-subset-tests.pl	OWN:158	rej	both	-		
+shell-subset-tests.pl	OWN:159	rej	both	-		
+shell-subset-tests.pl	OWN:160	rej	both	-		
+shell-subset-tests.pl	OWN:161	rej	both	-		
+shell-subset-tests.pl	OWN:162	ok	both	-		
+shell-subset-tests.pl	OWN:163	ok	both	-		
+shell-subset-tests.pl	OWN:164	rej	both	-		
+shell-subset-tests.pl	OWN:165	rej	both	-		
+shell-subset-tests.pl	OWN:166	rej	both	-		
+shell-subset-tests.pl	OWN:167	rej	both	-		
+shell-subset-tests.pl	OWN:168	rej	both	-		
+shell-subset-tests.pl	OWN:169	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:170	rej	both	-		
+shell-subset-tests.pl	OWN:171	ok	both	-		
+shell-subset-tests.pl	OWN:172	ok	both	-		
+shell-subset-tests.pl	OWN:173	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:174	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:175	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:176	ok	both	-		
+shell-subset-tests.pl	OWN:177	rej	both	-		
+shell-subset-tests.pl	OWN:178	ok	both	-		
+shell-subset-tests.pl	OWN:179	ok	both	-		
+shell-subset-tests.pl	OWN:180	ok	both	-		
+shell-subset-tests.pl	OWN:181	rej	both	-		
+shell-subset-tests.pl	OWN:182	rej	both	-		
+shell-subset-tests.pl	OWN:183	rej	both	-		
+shell-subset-tests.pl	OWN:184	rej	both	-		
+shell-subset-tests.pl	OWN:185	rej	both	-		
+shell-subset-tests.pl	OWN:186	rej	both	-		
+shell-subset-tests.pl	OWN:187	ok	both	-		
+shell-subset-tests.pl	OWN:188	ok	both	-		
+shell-subset-tests.pl	OWN:189	rej	both	-		
+shell-subset-tests.pl	OWN:190	rej	both	-		
+shell-subset-tests.pl	OWN:191	rej	bash	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:192	ok	both	-		
+shell-subset-tests.pl	OWN:193	ok	both	-		
+shell-subset-tests.pl	OWN:194	ok	both	-		
+shell-subset-tests.pl	OWN:195	ok	both	-		
+shell-subset-tests.pl	OWN:196	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:197	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:198	rej	both	-		
+shell-subset-tests.pl	OWN:199	ok	both	-		
+shell-subset-tests.pl	OWN:200	rej	both	B	readnoname:B:P:readreply	
+shell-subset-tests.pl	OWN:201	rej	both	-		
+shell-subset-tests.pl	OWN:202	rej	both	-		
+shell-subset-tests.pl	OWN:203	ok	both	-		
+shell-subset-tests.pl	OWN:204	ok	both	-		
+shell-subset-tests.pl	OWN:205	ok	both	-		
+shell-subset-tests.pl	OWN:206	ok	both	-		
+shell-subset-tests.pl	OWN:207	ok	both	-		
+shell-subset-tests.pl	OWN:208	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:209	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:210	ok	both	-		
+shell-subset-tests.pl	OWN:211	rej	both	X	dotstar:X:E:harm	
+shell-subset-tests.pl	OWN:212	rej	both	X	dotstar:X:E:harm	
+shell-subset-tests.pl	OWN:213	ok	both	-		
+shell-subset-tests.pl	OWN:214	ok	both	-		
+shell-subset-tests.pl	OWN:215	rej	both	-		
+shell-subset-tests.pl	OWN:216	rej	both	-		
+shell-subset-tests.pl	OWN:217	rej	both	B	roassign:B:P:uidset	
+shell-subset-tests.pl	OWN:218	rej	both	B	bqdq:B:P:bqdq	
+shell-subset-tests.pl	OWN:219	ok	both	-		
+shell-subset-tests.pl	OWN:220	rej	bash	B	parse:B:P:-n,redirdigit:B:P:redirdigit	
+shell-subset-tests.pl	OWN:221	rej	none	B	parse:B:P:-n	
+shell-subset-tests.pl	OWN:222	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/abduco.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/mpc.md:29	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectionToNumber2:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/free.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/dot.md:25	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1499	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUuoc4:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8379	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5602	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3308	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectedNowhere5:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5103	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch17/func_shift_by:25	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/yj.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnquotedExpansions1a:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:995	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/cppcheck.md:9	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch07/hist.awk:27e23	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAssignAteCommand1:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUuoc3:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5237	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkConstantNullary6:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkPrintfVar1:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/suspend.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8127	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6441	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5903	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/ppmcie.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/cb.md:28	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_subshellAssignmentCheck15:3	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6148	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/qmake.md:20	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBackticks1:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1862	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5722	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4739	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/picom.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_subshellAssignmentCheck11:2	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4771	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5902	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUseBeforeDefinition7:3	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:206.3	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9048	ok	both	X	jobspec:X:P:job	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkLiteralBreakingTest2:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:691	ok	both	-		
+shell-subset-corpus-tests.pl	NB:389	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6445	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8240	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4119	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/time.md:14	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	NB:9464	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/pidof.md:21	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/colon.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6386	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms6:1	ok	both	X	testext:X:P:testeqeq	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere11:1	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:116.8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5971	ok	both	X	echobs:X:P:echobs,echoopt:X:P:echoe	
+shell-subset-corpus-tests.pl	NB:843	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/true.md:9	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnquotedExpansions3a:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:86	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/npm-completion.md:16	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6694	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5510	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8960	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms21b:1	ok	both	X	testext:X:P:testeqeq	
+shell-subset-corpus-tests.pl	TL:linux/genfstab.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1031	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/greater-than.md:36	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch05/check_arg_count:13	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAndEq6:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkShorthandIf3:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkTestArgumentSplitting12:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/boxes.md:24	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkTimedCommand1:2	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	NB:4466	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1129	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9216	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4952	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarBrackets2:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11777	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpuriousExec1:1e9	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere14:1e10	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6915	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1117	ok	both	-		
+shell-subset-corpus-tests.pl	NB:12419	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkPrintfVar3:1	ok	both	X	printfext:X:P:printfq	
+shell-subset-corpus-tests.pl	TL:common/bacon.md:20	ok	both	-		
+shell-subset-corpus-tests.pl	NB:638	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1850	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2969	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10553	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2113	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7359	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2831	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkGlobsAsOptions6:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/pwd.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	PS:README.md:426	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1400	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshellAsTest1:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10617	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkLiteralBreakingTest4:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9954	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6741	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7059	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6757	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/egrep.md:38	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9699	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch13/dbiniter:21	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7539	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1929	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/conky.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2034	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5252	ok	both	-		
+shell-subset-corpus-tests.pl	NB:896	ok	both	-		
+shell-subset-corpus-tests.pl	NB:191	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8218	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9627	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms6b:1	ok	both	X	testext:X:P:testeqeq	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest3:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUselessBang10:3	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11515	rej	both	X	dotstar:X:E:harm	
+shell-subset-corpus-tests.pl	NB:9678	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms52:2	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10916	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4364	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/unzipsfx.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/gh-run.md:24	ok	both	-		
+shell-subset-corpus-tests.pl	NB:587	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkCdAndBack5:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:851	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/ttyplot.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/sync.md:16	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch12/oodiff:54	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10991	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7682	ok	both	-		
+shell-subset-corpus-tests.pl	PS:README.md:510	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkComparisonAgainstGlob6:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkOrNeq6:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/setsebool.md:17	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5884	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1756	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9021	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkExpr14:2	ok	both	-		
+shell-subset-corpus-tests.pl	NB:195	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8172	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1166	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1106	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3668	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/gh-copilot.md:25	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkGlobAsCommand3:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/false.md:9	ok	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1032	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch12/load_mp3:71	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkComparisonWithLeadingX4:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7296	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshelledTests1:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshellAsTest7:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBangAfterPipe2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUselessBang2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps4:1	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:114.29	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:114.20	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9423	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10193	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8214	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	TL:common/tqdm.md:20	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadTestAndOr1:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/mopac.md:12	ok	both	X	echobs:X:P:echobs	
+shell-subset-corpus-tests.pl	NB:3666	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadTestAndOr2:1	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch15/email_sample_css:8	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkStderrRedirect3:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1757	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6335	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8208	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	NB:4440	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere18:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/setsid.md:13	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms51:2	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkStderrRedirect6:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:12009	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9067	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9420	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8015	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms108:2e12	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/mkfifo.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch03/func_choice.2:4	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkStderrRedirect2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkStderrRedirect:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkStderrRedirect7:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9796	ok	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:2121	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshelledTests3:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshelledTests4:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshellAsTest5:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5179	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1093	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshellAsTest6:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5834	ok	both	-		
+shell-subset-corpus-tests.pl	NB:550	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/sport.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9797	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkConditionalAndOrs1:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAndEq4:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkShorthandIf9:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAndEq7:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:532	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkShorthandIf11:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkShorthandIf5:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkShorthandIf10:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1471	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectToSame3:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/nixos-container.md:24	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/rename.util.md:30	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/dvc-checkout.md:16	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkTrailingBracket3:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/test.md:26	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11071	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7995	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1305	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_subshellAssignmentCheck41:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/zenity.md:25	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSubshelledTests2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectionToNumber1:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8207	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns38:1	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	NB:6424	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6858	ok	both	-		
+shell-subset-corpus-tests.pl	NB:34	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5791	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1916	ok	both	X	echobs:X:P:echobs,echoopt:X:P:echoe	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere6:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3829	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9062	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8001	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2167	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/fpsync.md:24	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9623	ok	both	-		
+shell-subset-corpus-tests.pl	NB:475	ok	both	-		
+shell-subset-corpus-tests.pl	NB:743	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5099	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4523	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7701	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/run_screen:48	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:8023	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch13/pluralize:20	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11879	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5814	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6916	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5813	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns37:1	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns41:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns7:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/sccache.md:17	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:93.14	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:256.36	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/monodevelop.md:16	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkCommandIsUnreachable1:1	ok	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:115.28	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/nix.md:11	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnused42:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkInteractiveSu2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkCommandIsUnreachable3:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3467	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5776	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkMultipleAppends2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkInteractiveSu1:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/fisher.md:17	ok	both	-		
+shell-subset-corpus-tests.pl	NB:283	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnassignedReferences20:1	ok	both	X	printfext:X:P:printfq	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpuriousExec3:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:9675	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere7:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPrefixAssign1:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:501	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1848	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns34:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/[.md:18	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkOrNeq4:1	ok	both	-		
+shell-subset-corpus-tests.pl	MK:shell:208.6#1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkOrNeq7:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkNumberComparisons8:1	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/chpasswd.md:21	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/lsns.md:20	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	NB:4365	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2074	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/systemd-creds.md:20	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5795	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2214	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1087	ok	both	X	echobs:X:P:echobs,echoopt:X:P:echoe	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUseBeforeDefinition5:1e15	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/scrun.md:32	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11622	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8352	ok	both	-		
+shell-subset-corpus-tests.pl	NB:685	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch06/checkfile:15	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1763	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkMultipleAppends3:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4876	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/antibody.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:12045	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3440	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkMultipleAppends1:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10576	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2356	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10817	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere12:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectToSame5:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPipeToNowhere13:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3299	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1925	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8597	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2966	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2044	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7137	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8569	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkCatastrophicRmB:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7353	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6367	rej	both	X	dotstar:X:E:harm	
+shell-subset-corpus-tests.pl	TL:common/$.md:24	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/kill.md:13	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns14:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1849	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/newsboat.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/echo.md:21	ok	both	-		
+shell-subset-corpus-tests.pl	MK:shell:97.39#1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8216	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns6:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkTestRedirects1:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkTestRedirects4:1	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1578	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns33:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpuriousExec6:1e16	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/run_screen:57	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7890	ok	both	X	time:X:P:time	
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:26c17	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch13/getopts_custom:28c9	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch10/func_max.1:13c5	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnnecessaryArithmeticExpansionIndex2:1	rej	both	B	array:B:P:array	
+shell-subset-corpus-tests.pl	NB:6272	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns3:1	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarStar9:1	rej	both	B	array:B:P:array	
+shell-subset-corpus-tests.pl	TL:common/regex.md:18	ok	both	-		
+shell-subset-corpus-tests.pl	PS:README.md:636	rej	both	-		
+shell-subset-corpus-tests.pl	NB:2614	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:2102	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/ex.md:13	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSuspiciousIFS2:1	rej	both	B	ansic:B:P:ansi	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg19:1	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch15/command_substitution:10	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:356	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/}.md:7	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkXargsDashi2:1	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkArithmeticDeref5:1	rej	both	B	dparen:B:P:dparen	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkConcatenatedDollarAt4:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms139:1	rej	bash	B	parse:B:P:-n,herestr:B:P:herestr	
+shell-subset-corpus-tests.pl	BC:ch14/MakeTemp:23c9	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/vimdiff.md:21	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms3:1	rej	both	B	arithop:B:P:pow	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkEvalArray5:1	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:90.13	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9976	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPS18:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:7925	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPlusEqualsNumber7:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkArrayAsString4:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	TL:common/echo.md:29	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/wuzz.md:16	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch06/dashes:18c16	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:164.49	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6082	rej	both	-		
+shell-subset-corpus-tests.pl	NB:2325	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/git-alias.md:17	ok	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1979	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub,fdvar:B:P:fdvar	
+shell-subset-corpus-tests.pl	BC:ch07/hist.awk:17c5	rej	both	-		
+shell-subset-corpus-tests.pl	NB:1863	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSplittingInArrays8:1	rej	bash	B	parse:B:P:-n,array:B:P:array	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPlusEqualsNumber6:1	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:12	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:28c17	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms142:1	rej	bash	B	parse:B:P:-n,pipeamp:B:P:pipeamp	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnassignedReferences22:1	rej	both	B	bashparam:B:P:substr	
+shell-subset-corpus-tests.pl	NB:1012	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8202	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch13/pluralize:12c9	rej	both	-		
+shell-subset-corpus-tests.pl	NB:1229	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch13/getopts_custom:21c13	rej	both	-		
+shell-subset-corpus-tests.pl	NB:3526	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:7622	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkPlusEqualsNumber5:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns1:1	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	NB:7673	rej	both	B	dollarlt:B:P:dollarlt	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms19:1	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/git-paste.md:13	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars2:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	BC:ch16/func_pathmunge:10c13	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch12/mkalbum:33c5	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/less-than-more-than.md:16	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/herdr.md:38	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectedNowhere3:1	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/$.md:32	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6911	rej	both	B	bashbuiltin:B:P:source	
+shell-subset-corpus-tests.pl	NB:8133	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch15/fpmath:13c5	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkCommarrays7:1	rej	bash	B	parse:B:P:-n,array:B:P:array	
+shell-subset-corpus-tests.pl	NB:9193	rej	both	-		
+shell-subset-corpus-tests.pl	NB:3376	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2602	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExpansionWithRedirection3:1	rej	both	X	assignredir:X:E:effect	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnassignedReferences21:1	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/zmore.md:16	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch06/strvsnum:7	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1330	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms13:1	rej	both	B	execopt:B:P:execa	
+shell-subset-corpus-tests.pl	NB:6664	rej	both	-		
+shell-subset-corpus-tests.pl	NB:370	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:558c5-559	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg27:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:7577	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5213	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	TL:linux/minicom.md:25	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:1033	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnused37:1	rej	both	B	fdvar:B:P:fdvar	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms137a:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	PS:README.md:1003	rej	both	O	dashflags:O:open	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkCatastrophicRm1:1	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:428c5	rej	both	B	bashparam:B:P:substr	
+shell-subset-corpus-tests.pl	NB:1563	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkExtraMaskedReturns2:1	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub,readopt:B:P:readn	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkRedirectedNowhere8:1	rej	both	B	dollarlt:B:P:dollarlt	
+shell-subset-corpus-tests.pl	TL:common/vimdiff.md:33	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/greater-than.md:24	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSetESuppressed2:1	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/set-nodeversion.md:13	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1793	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms28:1	rej	both	B	fdvar:B:P:fdvar	
+shell-subset-corpus-tests.pl	NB:3686	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11405	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:53.2	rej	both	-		
+shell-subset-corpus-tests.pl	NB:5084	rej	both	-		
+shell-subset-corpus-tests.pl	NB:1113	rej	both	-		
+shell-subset-corpus-tests.pl	NB:7049	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6944	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/~.md:16	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkMultipleBangs1:1	rej	bash	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:7741	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1437	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6595	ok	both	-		
+shell-subset-corpus-tests.pl	NB:4245	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1041	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkUnquotedEchoSpaces6:1c9-2	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/gpg-tui.md:28	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/vimtutor.md:13	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/htop.md:34	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:7292	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	TL:common/clifm.md:29	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkCommarrays5:1	rej	bash	B	parse:B:P:-n,array:B:P:array	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms143:1	rej	bash	B	parse:B:P:-n,array:B:P:array	
+shell-subset-corpus-tests.pl	MK:recipe:185.44	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	PB:README.md:653c5	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1889	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:89.23	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	MK:recipe:94.37	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:1926	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1030	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5600	ok	both	-		
+shell-subset-corpus-tests.pl	NB:922	ok	both	-		
+shell-subset-corpus-tests.pl	TL:linux/csplit.md:17	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkMvArguments3:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:11642	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars3:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	TL:common/roll.md:20	rej	both	-		
+shell-subset-corpus-tests.pl	NB:4687	rej	both	-		
+shell-subset-corpus-tests.pl	NB:4580	rej	both	B	echobs:X:P:echobs,echoopt:X:P:echoe,brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:12345	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6577	ok	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:46	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection1:1	rej	both	B	arithop:B:P:pow	
+shell-subset-corpus-tests.pl	BC:ch12/oodiff:32	rej	both	-		
+shell-subset-corpus-tests.pl	NB:11427	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/func_tweak_path:105c5	rej	both	B	scope:B:P:local	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg32:1	rej	both	X	testext:X:P:testeqeq	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg31:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:8155	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch16/func_cd:20c9-21	rej	both	-		
+shell-subset-corpus-tests.pl	NB:11450	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:linux/fcrackzip.md:12	ok	both	-		
+shell-subset-corpus-tests.pl	NB:7251	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11644	ok	both	-		
+shell-subset-corpus-tests.pl	NB:8129	rej	both	-		
+shell-subset-corpus-tests.pl	NB:8058	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:165.27	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch16/inputrc:41c3-43	ok	both	-		
+shell-subset-corpus-tests.pl	NB:3993	ok	both	-		
+shell-subset-corpus-tests.pl	NB:6200	ok	both	-		
+shell-subset-corpus-tests.pl	NB:11379	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/coproc.md:20	rej	both	B	dupfile:B:P:dupfile,readnoname:B:P:readreply	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms135:1	rej	both	B	dollarbr:B:P:dollarbr	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarBrackets1:1	rej	both	B	dollarbr:B:P:dollarbr	
+shell-subset-corpus-tests.pl	NB:4769	rej	both	B	dollarbr:B:P:dollarbr	
+shell-subset-corpus-tests.pl	NB:4469	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub,assignredir:X:E:effect	
+shell-subset-corpus-tests.pl	NB:8321	rej	bash	B	parse:B:P:-n,procsub:B:P:procsub,readopt:B:P:readn	
+shell-subset-corpus-tests.pl	TL:common/nvim.md:26	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/nvim.md:30	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/ssh.md:37	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/scim.md:29	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms47:1-2	rej	both	X	fdmulti:X:E:same	
+shell-subset-corpus-tests.pl	TL:common/gource.md:37	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:7294	rej	both	B	time:X:P:time,ampgt:B:P:ampgt	
+shell-subset-corpus-tests.pl	NB:11457	rej	both	B	ampgt:B:P:ampgt	
+shell-subset-corpus-tests.pl	NB:7894	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAssignToSelf1:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkAssignToSelf2:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnassignedReferences53:1	rej	bash	B	parse:B:P:-n,array:B:P:array	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkArrayAsString3:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg38:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkWrongArit:1	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1880-1884	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/yacas.md:16	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:5260	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms4:1	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:5261	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:5265	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/pnmnlfilt.md:16	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:34c5	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/yacas.md:12	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:5266	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:2307	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	MK:recipe:185.21	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	BC:ch16/builtin_tty.c:45c5	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	MK:recipe:194.14	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:10760	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	TL:common/git-range-diff.md:8	ok	both	-		
+shell-subset-corpus-tests.pl	NB:5935	ok	both	-		
+shell-subset-corpus-tests.pl	NB:902	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1404	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/qalc.md:21	ok	both	-		
+shell-subset-corpus-tests.pl	NB:924	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9012	ok	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkGlobbedRegex4:1	rej	both	B	dbracket:B:P:dbracket	
+shell-subset-corpus-tests.pl	TL:common/!.md:25	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBraceExpansionVars4:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:9967	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	TL:common/git-check-ref-format.md:12	rej	both	-		
+shell-subset-corpus-tests.pl	NB:5620	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:5619	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkCatastrophicRm10:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	TL:common/parallel.md:17	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:1335-1337	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	TL:common/git-guilt.md:29	rej	both	-		
+shell-subset-corpus-tests.pl	TL:common/immich-go.md:25	rej	both	-		
+shell-subset-corpus-tests.pl	NB:4690	rej	both	-		
+shell-subset-corpus-tests.pl	NB:8907	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:8022	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	BC:ch10/ad:103c9	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkCatastrophicRm12:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkCatastrophicRm13:1	rej	both	B	brace:B:P:brace	
+shell-subset-corpus-tests.pl	NB:5274	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2643	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1159	ok	both	-		
+shell-subset-corpus-tests.pl	NB:1208	ok	both	-		
+shell-subset-corpus-tests.pl	NB:2178	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:219.15	rej	both	-		
+shell-subset-corpus-tests.pl	NB:10303	ok	both	-		
+shell-subset-corpus-tests.pl	NB:10611	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9049	ok	both	-		
+shell-subset-corpus-tests.pl	TL:common/$.md:16	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg36:1	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch12/cdscript:17	rej	both	X	assignredir:X:E:effect	
+shell-subset-corpus-tests.pl	NB:4624	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarStar:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9875	rej	both	-		
+shell-subset-corpus-tests.pl	NB:1251	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9348	rej	both	B	bashbuiltin:B:P:source	
+shell-subset-corpus-tests.pl	PB:README.md:2021c5-2023	rej	both	X	printfext:X:P:printfq	
+shell-subset-corpus-tests.pl	NB:12450	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6017	rej	both	-		
+shell-subset-corpus-tests.pl	NB:2558	rej	both	-		
+shell-subset-corpus-tests.pl	BC:ch12/dash:20c9	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	SC:Checks/Commands.hs:prop_checkAliasesUsesArgs2:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:9947	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6820	rej	both	-		
+shell-subset-corpus-tests.pl	NB:3080	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpuriousExec10:1c12	rej	none	B	parse:B:P:-n	
+shell-subset-corpus-tests.pl	NB:10197	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:186.37	rej	both	-		
+shell-subset-corpus-tests.pl	MK:recipe:165.29	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6906	rej	both	B	bashbuiltin:B:P:source	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms56:1-2	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarStar8:1	rej	both	B	atlen:B:P:atlen	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnquotedDollarAt1:1	rej	both	B	atlen:B:P:atlen	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadParameterSubstitution3:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadParameterSubstitution8:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadParameterSubstitution11:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarStar5:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkDollarStar7:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnassignedReferences28:1-2	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg11:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg35:1	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:350c5-351	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:376c5-377	rej	both	-		
+shell-subset-corpus-tests.pl	PB:README.md:402c5-403	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms55:1-2	rej	both	B	atpat:B:P:atpat	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnquotedDollarAt10:1	rej	both	-		
+shell-subset-corpus-tests.pl	NB:6087	rej	bash	B	parse:B:P:-n,bashparam:B:P:substr,procsub:B:P:procsub	
+shell-subset-corpus-tests.pl	PB:README.md:197c5	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkInexplicablyUnquoted10:1	rej	both	-		
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms116:3	rej	both	B	array:B:P:array	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms119:3	rej	both	B	bashparam:B:P:substr	
+shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkBadParameterSubstitution7:1	rej	both	-		

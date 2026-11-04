@@ -1379,10 +1379,8 @@ subtest '_synthesize_col_names -- type_count per-type (DD check: no stale counts
 #
 # Bug (fixed): When an XLSX file has column headers that are all unsafe SQL
 # identifiers (e.g. "First Name", "Account Number"), _detect_file_info returns
-# { columns => [...], id => undef, _headerless_data => [...] }.
-# The OLD _init_backend checked error_no_safe_id BEFORE _headerless_data and
-# would croak even though the data was pre-loaded.
-# The FIX: _headerless_data check now precedes error_no_safe_id.
+# no safe id.  D::A does not need one for a workbook read with no_entry, so
+# _detect_file_info gives its default and error_no_safe_id must not fire.
 # ======================================================================
 
 subtest 'XLSX all-unsafe column headers -- opens without error_no_safe_id croak' => sub {

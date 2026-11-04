@@ -30,7 +30,7 @@ eval { require TOML::Parser; 1 }
 
 # Upstream vectors we knowingly diverge from, with the reason (not gated).
 # (dkim2tests a382236 fixed tags_whitespace (it had an empty s= value at 9c48edf).)
-# The vectors treat tag-names as case-insensitive; -08 section 8 makes them
+# The vectors treat tag-names as case-insensitive; -09 section 8 makes them
 # case-sensitive, and under the -08 contract (D10) a tag-name that is not
 # lowercase is an unknown tag. So "d=x; D=x" is no duplicate (the D= is
 # ignored, and signed as it stands), and an all-uppercase list has no
@@ -39,7 +39,7 @@ my $CASE = '-08 D10: an uppercase tag-name is an unknown tag, not a duplicate';
 my %KNOWN_DIVERGENCE = (
     (map { ("d2_duplicate_${_}_tag" => $CASE) } qw(d f i m mf n rt t)),
     tags_mixed_case => '-08 D10: tag-names are case-sensitive, so mixed case is missing tags',
-    algorithm_with_future => '-08 §14.6: an unknown algorithm joined by "," is a PERMERROR; '
+    algorithm_with_future => '-09 §14.6: an unknown algorithm joined by "," is a PERMERROR; '
                            . 'a new algorithm offered beside a known one needs "|"',
 );
 

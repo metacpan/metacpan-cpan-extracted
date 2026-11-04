@@ -21,7 +21,7 @@ my $dir = XSCoverTest::copy_spike();
 is(Devel::XSCover::Build->new(dir => "$dir", silent => 1)->run, 0, 'the spike builds');
 is(Devel::XSCover::Test->new(dir => "$dir", silent => 1, plain => ['t/04-threads.t'])->run, 0, 'and its tests pass');
 
-my $reader = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1, gcov => $build->gcov_command,
+my $reader = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1, gcov => $build->gcov_command, flow => $build->flow_kind,
     generated => ['Spike.c'], save => File::Spec->catdir($dir, 'cover_db', 'gcov'));
 is_deeply([$reader->find_gcda], ['Spike.gcda', 'src/helper.gcda'], 'two counter files');
 my @objects = $reader->read;
@@ -36,5 +36,13 @@ is($spike->{files}{'xs/more.xs'}{lines}{23}, 0, 'the _exit child not');
 is_deeply([sort keys %{ $helper->{files} }], ['include/spike.h', 'src/helper.c'], 'the helper object');
 ok(-f File::Spec->catfile($dir, 'cover_db', 'gcov', 'Spike.gcov.txt'), 'the gcov text saved');
 ok(-f File::Spec->catfile($dir, 'cover_db', 'gcov', 'src#helper.gcov.txt'), 'with the path flattened');
+SKIP: {
+    skip 'this gcov has no flow graph', 4 unless $build->flow_kind;
+    ok(-f File::Spec->catfile($dir, 'cover_db', 'gcov', $build->flow_kind eq 'llvm' ? 'Spike.flow.txt' : 'Spike.flow.json'), 'the flow graph saved too');
+    my %at = map { $_->{line} => $_->{arms} } @{ $spike->{files}{'Spike.xs'}{decisions} || [] };
+    is(scalar @{ $at{36} || [] }, 2, 'the && if is a decision of two arms');
+    is(scalar @{ $at{47} || [] }, 5, 'the switch one of five');
+    is_deeply($helper->{files}{'src/helper.c'}{decisions}, [ { line => 5, arms => [1, 1, 0, 1] } ], 'the helper switch read from the graph');
+}
 
 done_testing;

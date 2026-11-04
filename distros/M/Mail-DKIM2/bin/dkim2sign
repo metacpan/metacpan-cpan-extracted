@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-08).
+# Standalone DKIM2 signer CLI (draft-ietf-dkim-dkim2-spec-09).
 #
 # Reads a message, computes a Message-Instance when the content has changed
 # since the top instance, signs, and writes the result to stdout. The
@@ -9,15 +9,16 @@
 #
 #   dkim2sign -s SELECTOR -d DOMAIN -k KEYFILE [--mailfrom '<a@b>']
 #                [--rcptto '<c@d>']... [--timestamp N] [--next-domain D]
-#                [--flag F]... [--exploded] [--allow-null-body-recipe]
+#                [--flag F]... [--exploded] [--parent-from D]... [--allow-null-body-recipe]
 #                [--ignore-timestamps] [--dns-json PATH] [MESSAGE|-]
 #
 # Before extending an existing DKIM2 chain it runs the same verify-before-sign
 # gate as dkim2-milter (Mail::DKIM2::Gate): the upstream signatures must
-# verify, the Message-Instance chain must undo cleanly, and a null body Recipe
-# on an UNSIGNED Message-Instance (m= above every signature's m=, top or not)
-# is refused unless --allow-null-body-recipe; a null an upstream domain
-# already signed is extended without it. A top signature carrying
+# verify and the Message-Instance chain must undo cleanly. A null body Recipe
+# on an UNSIGNED Message-Instance (m= above every signature's m=, top or not:
+# this hop's own) is signed; a null an upstream domain already signed fails
+# the upstream verification. --allow-null-body-recipe is deprecated and does
+# nothing (0.29). A top signature carrying
 # nd= is extended only when nd= equals DOMAIN. On refusal it prints the reason
 # on stderr and exits 1 with nothing on stdout.
 #
@@ -41,7 +42,7 @@ use Mail::DKIM2::Signer;
 my ($selector, $domain, $keyfile, $timestamp, $next_domain);
 my $mailfrom = '<>';
 my $hash_algs = 'sha256';
-my (@rcptto, @flags);
+my (@rcptto, @flags, @parent_from);
 my ($allow_null, $ignore_ts, $dns_json, $exploded);
 $dns_json = $ENV{DKIM2_DNS_JSON} if defined $ENV{DKIM2_DNS_JSON} && length $ENV{DKIM2_DNS_JSON};
 
@@ -55,6 +56,7 @@ GetOptions(
     'next-domain=s'   => \$next_domain,
     'flag=s'          => \@flags,
     'exploded'        => \$exploded,
+    'parent-from=s'   => \@parent_from,
     'hash=s'          => \$hash_algs,
     'allow-null-body-recipe' => \$allow_null,
     'ignore-timestamps'      => \$ignore_ts,
@@ -63,7 +65,7 @@ GetOptions(
 
 die _usage() unless defined $selector && defined $domain && defined $keyfile;
 
-# -08 §3.1: signer chooses one or both hash algorithms for the
+# -09 §3.1: signer chooses one or both hash algorithms for the
 # Message-Instance h= tag. Default MUST remain sha256 (byte-identical to
 # pre-spec-06 output).
 my %HASH_ALG_SETS = (
@@ -87,11 +89,11 @@ $raw =~ s/\n/\r\n/g;
 
 # Gate (shared with dkim2-milter, Mail::DKIM2::Gate): before extending an
 # existing DKIM2 chain, verify it -- an unsigned top Message-Instance is the one
-# we are about to cover, so it is allowed -- and refuse a null body Recipe on
-# an unsigned instance unless --allow-null-body-recipe. A message with no
-# chain is signed as before.
-my %gate_opts = (AllowNullBodyRecipe => $allow_null, SkipTimestampCheck => $ignore_ts,
-                 SigningDomain => $domain);
+# we are about to cover, so it is allowed. A message with no chain is signed
+# as before.
+warn "dkim2sign: --allow-null-body-recipe is deprecated and does nothing (0.29)\n"
+    if $allow_null;
+my %gate_opts = (SkipTimestampCheck => $ignore_ts, SigningDomain => $domain);
 if ($dns_json) {
     require JSON;
     my $dns = do {
@@ -106,10 +108,17 @@ if ($dns_json) {
         return parse_dkim_pubkey($txt) if $txt;
         return $verifier->fetch_public_key($sig, $idx);
     };
+    # The Domain Policy Record (-09 section 3.8) from the same file, for the
+    # gate's upstream verification.
+    $gate_opts{PolicyCallback} = sub {
+        my ($dom, $who) = @_;
+        my $entry = $dns->{$dom} && $dns->{$dom}{_domainkey};
+        return [ map { $_->[1] } @$entry ] if $entry;
+        return $dns->{$dom} ? [] : $who->fetch_domain_policy($dom);
+    };
 }
 my $gate = Mail::DKIM2::Gate->check($raw, %gate_opts);
 unless ($gate->{ok}) {
-    $gate->{message} =~ s/AllowNullBodyRecipe not set/--allow-null-body-recipe not set/;
     print STDERR "dkim2sign: not signing: $gate->{message}\n";
     exit 1;
 }
@@ -137,6 +146,9 @@ my $signer = Mail::DKIM2::Signer->new(
     (defined $timestamp ? (Timestamp => $timestamp) : ()),
     (@flags ? (Flags => \@flags) : ()),
     ($exploded ? (Exploded => 1) : ()),
+    # -09 contract E3.4: a d= below the From domain signs only for a
+    # --parent-from domain; no DNS lookup.
+    ParentFromCallback => Mail::DKIM2::Common::parent_from_matcher(@parent_from),
 );
 $signer->PRINT($msg->as_string);
 $signer->CLOSE;
@@ -167,10 +179,11 @@ usage: $0 -s SELECTOR -d DOMAIN -k KEYFILE [options] [MESSAGE|-]
       --next-domain D  emit nd= for an imaginary forwarding hop, omitting mf=/rt=
       --flag F       f= flag; repeatable
       --exploded     this hop sends the message to more than one address: f=exploded
-                     (-08 section 12.5; also set when --rcptto is given twice; never at i=1)
-      --allow-null-body-recipe  sign even if a Message-Instance has a null body
-                     Recipe that no upstream signature covers (its m= is above
-                     every signature's m=; a signed null needs no option)
+                     (-09 section 12.5; also set when --rcptto is given twice; never at i=1)
+      --parent-from D  a parent domain whose From this d= may make Authentic
+                     (-09 sections 7.1 item 4, 11.1); repeatable; no DNS lookup
+      --allow-null-body-recipe  deprecated (0.29), does nothing: this hop's own
+                     null body Recipe is always signed
       --ignore-timestamps  do not fail an upstream signature for its t= age
       --dns-json PATH  answer key lookups from an interop dns.json (default \$DKIM2_DNS_JSON)
       --hash A       hash algorithm(s) for Message-Instance h=: sha256|sha512|both (default sha256)

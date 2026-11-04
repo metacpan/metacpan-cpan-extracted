@@ -2,9 +2,9 @@ package Mail::DKIM2::TagValueList;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
-# Simple tag=value list as defined in draft-ietf-dkim-dkim2-spec-08 Section 8.
+# Simple tag=value list as defined in draft-ietf-dkim-dkim2-spec-09 Section 8.
 # Preserves insertion order for serialization.
 
 sub new {
@@ -12,7 +12,7 @@ sub new {
     return bless { tags => {}, order => [] }, $class;
 }
 
-# The tag-list grammar shared by every DKIM2 field (-08 §8): a tag
+# The tag-list grammar shared by every DKIM2 field (-09 §8): a tag
 # name is ALPHA *(ALPHA / DIGIT / "_"), and a value is printable ASCII other
 # than ";" with FWS only between characters (x-tag-value). The known tags'
 # own grammars are all narrower than that, so a field that fails it is
@@ -31,7 +31,7 @@ sub split_tag_list {
     my ($string) = @_;
     my (@pairs, $bad);
     my @specs = split /;/, $string, -1;
-    # -08 section 8: one ";" may end the list; an empty spec anywhere else
+    # -09 section 8: one ";" may end the list; an empty spec anywhere else
     # (";;", a leading ";") is a syntax error.
     pop @specs if @specs && $specs[-1] =~ /\A[ \t\r\n]*\z/;
     for my $spec (@specs) {
@@ -54,7 +54,7 @@ sub parse {
     # internal whitespace; as_string() writes "name=value" joined by "; ",
     # so the whitespace around "=" and ";" and a trailing ";" are not kept.
     # That is harmless for signing input: §12.8 deletes all WSP from these
-    # fields before hashing. Tag-names are case-sensitive (-08 §8, and the
+    # fields before hashing. Tag-names are case-sensitive (-09 §8, and the
     # -08 contract D10): "M=" is a tag of its own, which DKIM2 does not
     # know, never another spelling of "m=". A spec that is not a tag is never silently
     # dropped from what is verified: it makes the whole field a syntax
@@ -73,13 +73,13 @@ sub parse {
     return $self;
 }
 
-# -08 §8: tag-names are case-sensitive, so the lookup is exact.
+# -09 §8: tag-names are case-sensitive, so the lookup is exact.
 sub get_tag {
     my ($self, $name) = @_;
     return $self->{tags}{$name};
 }
 
-# The tag name that appeared more than once, if any (-08 §8).
+# The tag name that appeared more than once, if any (-09 §8).
 sub duplicate_tag { return $_[0]->{_duplicate} }
 
 # True if the parsed field did not match the tag-list grammar.
@@ -120,12 +120,12 @@ Mail::DKIM2::TagValueList - The tag=value list a DKIM2 header is made of
 
 =head1 DESCRIPTION
 
-A semicolon-separated list of C<tag=value> pairs (-08 section 2.12 and
+A semicolon-separated list of C<tag=value> pairs (-09 section 2.12 and
 8). Tag names keep their original case and order, and values their
 internal whitespace; serialisation joins C<name=value> pairs with C<; >, so
 the whitespace around C<=> and C<;> and a trailing C<;> are normalised
-(harmless for signing input, which -08 section 12.8 strips of all whitespace).
-Tag-names are case-sensitive (-08 section 8), so lookups are exact.
+(harmless for signing input, which -09 section 12.8 strips of all whitespace).
+Tag-names are case-sensitive (-09 section 8), so lookups are exact.
 L<Mail::DKIM2::Signature> is a subclass.
 
 =head1 CONSTRUCTORS
@@ -159,7 +159,7 @@ repeat as a permerror.
 
 =head2 syntax_error()
 
-True if the parsed input did not match the tag-list grammar (-08 section
+True if the parsed input did not match the tag-list grammar (-09 section
 8): an empty fragment before the end (C<;;>; one trailing C<;> is fine), a
 fragment that is not C<name=value>, a name not starting
 with a letter, or a value with a character outside printable ASCII or a

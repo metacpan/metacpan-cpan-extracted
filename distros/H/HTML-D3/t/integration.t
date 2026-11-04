@@ -800,7 +800,7 @@ subtest 'separator option propagates consistently across all three pie methods' 
 
 	like($pie_html,  qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'pie: default / in SVG legend JS');
 	like($anim_html, qr/d\.data\.label} \/ \$\{d\.data\.value}/, 'animated pie: default / in SVG legend JS');
-	like($snip_html, qr/d\.data\.label \+ ' \/ '/,               'snippet: default / in HTML legend JS');
+	like($snip_html, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/,               'snippet: default / in HTML legend JS');
 
 	# Custom separator '|' must replace the default across all three.
 	my $pie_bar  = $chart->render_pie_chart(\@SIMPLE_DATA,          { separator => '|' });
@@ -809,11 +809,11 @@ subtest 'separator option propagates consistently across all three pie methods' 
 
 	like($pie_bar,  qr/d\.data\.label} \| \$\{d\.data\.value}/, 'pie: custom | in SVG legend JS');
 	like($anim_bar, qr/d\.data\.label} \| \$\{d\.data\.value}/, 'animated pie: custom | in SVG legend JS');
-	like($snip_bar, qr/d\.data\.label \+ ' \| '/,               'snippet: custom | in HTML legend JS');
+	like($snip_bar, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\|'\)/,               'snippet: custom | in HTML legend JS');
 
 	unlike($pie_bar,  qr/d\.data\.label} \/ /, 'pie: default / absent when overridden with |');
 	unlike($anim_bar, qr/d\.data\.label} \/ /, 'animated pie: default / absent when overridden');
-	unlike($snip_bar, qr/d\.data\.label \+ ' \/ '/, 'snippet: default / absent when overridden');
+	unlike($snip_bar, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'snippet: default / absent when overridden');
 
 	# Object independence: simultaneous objects with different separators must
 	# not leak state into each other's output.
@@ -832,10 +832,10 @@ subtest 'separator option propagates consistently across all three pie methods' 
 	my $s1 = $c1->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => '/' })->{html};
 	my $s2 = $c2->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => ':' })->{html};
 
-	like($s1,   qr/d\.data\.label \+ ' \/ '/, 'c1 snippet: / in legend JS');
-	unlike($s1, qr/d\.data\.label \+ ' : '/, 'c1 snippet: no : bleed from c2');
-	like($s2,   qr/d\.data\.label \+ ' : '/, 'c2 snippet: : in legend JS');
-	unlike($s2, qr/d\.data\.label \+ ' \/ '/, 'c2 snippet: no / bleed from c1');
+	like($s1,   qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'c1 snippet: / in legend JS');
+	unlike($s1, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\(':'\)/, 'c1 snippet: no : bleed from c2');
+	like($s2,   qr/esc\(d\.data\.label\) \+ ' ' \+ esc\(':'\)/, 'c2 snippet: : in legend JS');
+	unlike($s2, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'c2 snippet: no / bleed from c1');
 
 	# The separator opt must not affect any other output: pie/arc/scheme markers
 	# must still be present regardless of which separator is chosen.
@@ -918,7 +918,7 @@ subtest 'render_pie_chart_snippet opts combine without interference' => sub {
 
 	like($combo, qr/attrTween/,              'combo: animation present');
 	like($combo, qr/innerRadius/,            'combo: donut inner radius present');
-	like($combo, qr/d\.data\.label \+ ' : '/, 'combo: custom : separator in legend JS');
+	like($combo, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\(':'\)/, 'combo: custom : separator in legend JS');
 	my @combo_labels = ($combo =~ /"label":"([^"]+)"/g);
 	is(scalar @combo_labels, 2, 'combo: max_slices collapses to 2 slices in JSON');
 	ok((grep { $_ eq 'Other' } @combo_labels), 'combo: "Other" slice present');

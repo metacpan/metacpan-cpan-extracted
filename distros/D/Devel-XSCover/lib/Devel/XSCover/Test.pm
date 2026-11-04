@@ -8,7 +8,7 @@ use Cwd ();
 use File::Path ();
 use File::Spec ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 sub new {
     my ($class, %args) = @_;
@@ -41,7 +41,7 @@ sub switches {
     my $db = $self->db_path;
     $db =~ s/\\/\\\\/g if $^O eq 'MSWin32';
     $db =~ s/ /\\ /g;
-    my $cover = "-MDevel::Cover=-db,$db,-ignore," . ($^O eq 'MSWin32' ? '^[A-Za-z]:' : '^/');
+    my $cover = "-MDevel::Cover=-db,$db,-ignore," . ($^O eq 'MSWin32' ? '^[A-Za-z]:' : '^/') . ',-ignore,/Install/Files\.pm$';
     $cover .= ',-silent,1' if $self->{silent};
     return join ' ', grep { defined && length } $ENV{DEVEL_COVER_TEST_OPTS}, $self->deparse_switch, $cover;
 }
@@ -108,7 +108,7 @@ sub commands {
     }
     my @covered = grep { !$plain{$_} } @test;
     my @commands;
-    push @commands, [ [ $self->{prove}, '-b', '-j1', @covered ], 1 ] if @covered;
+    push @commands, [ [ $self->{prove}, '-b', '-j1', @covered ], $covered ] if @covered;
     push @commands, [ [ $self->{prove}, '-b', '-j1', @plain ], 0 ] if @plain;
     return @commands;
 }
@@ -158,9 +158,10 @@ sub _run {
     if ($timed_out) {
         alarm 0;
         warn "xs_cover: the test run passed $self->{timeout} seconds, ending process group $pid\n";
-        kill 'TERM', -$pid;
+        my $group = $^O eq 'MSWin32' ? $pid : -$pid;
+        kill 'TERM', $group;
         sleep 2;
-        kill 'KILL', -$pid;
+        kill 'KILL', $group;
         waitpid $pid, 0;
         $status = 124 << 8;
     }
@@ -197,7 +198,10 @@ one run. The environment is the one C<cover -test> sets: C<HARNESS_PERL_SWITCHES
 and C<PERL5OPT> both carry C<-MDevel::Cover=-db,DIR>, after anything in
 C<DEVEL_COVER_TEST_OPTS>, plus an ignore of every absolute path: C<PERL5OPT> covers
 every perl that runs, C<prove> itself and the scripts a test writes under the
-temporary directory included, and none of those is the distribution's code. C<RELEASE_TESTING> and the rest of the environment pass
+temporary directory included, and none of those is the distribution's code, and an
+ignore of C<Install/Files.pm>, the file ExtUtils::Depends generates at configure time
+for a distribution that exports a C API, which a test linking against that API loads
+and which has no POD of its own. C<RELEASE_TESTING> and the rest of the environment pass
 through untouched.
 
 A process that ends by C<POSIX::_exit> or by a signal writes no C counters, since

@@ -1,12 +1,10 @@
 #!/usr/bin/perl
-# Mail::DKIM2::Gate: a null body Recipe on a Message-Instance is refused
-# (without AllowNullBodyRecipe) only when no DKIM2-Signature covers that
-# instance.  A signature with m=k covers instances 1..k, so an instance is
-# uncovered when its m= is above the highest m= of every valid signature --
-# the top, or one under another unsigned instance.  That is a null THIS hop
-# would be the first to sign.  A null that the upstream domain declared and
-# signed (a list host's signed post, forwarded unchanged) is extended
-# normally.
+# Mail::DKIM2::Gate and null body Recipes (0.29, -09 contract E2). A
+# signature with m=k covers instances 1..k, so an instance is uncovered when
+# its m= is above the highest m= of every valid signature: a null THIS hop
+# is introducing, which is always signed (it PERMERRORs downstream anyway,
+# but our header changes are signed). A null that the upstream domain
+# declared and signed fails upstream verification and is refused.
 use strict;
 use warnings;
 use Test::More;
@@ -86,76 +84,68 @@ my %cb = (PubkeyCallback => DKIM2TestKeys::pubkey_callback());
 {
     my $msg = null_list_post();
     my $g = Mail::DKIM2::Gate->check($msg, %cb);
-    ok(!$g->{ok}, 'unsigned null top: refused by default');
-    is($g->{reason}, 'null-body-recipe', 'unsigned null top: reason null-body-recipe');
-    like($g->{message}, qr/unsigned top Message-Instance m=2 has a null body Recipe/,
-        'unsigned null top: message says the null top is unsigned');
-    like($g->{message}, qr/\(AllowNullBodyRecipe not set\)/, 'library message names the library option');
-    unlike($g->{message}, qr/--allow/, 'library message has no CLI flag');
+    ok($g->{ok}, 'unsigned null top: signed (0.29: our own null is always signed)')
+        or diag($g->{message});
+    is($g->{reason}, undef, 'unsigned null top: no refusal');
     is($g->{top_null}, 1, 'unsigned null top: top_null');
     is($g->{top_signed}, 0, 'unsigned null top: top_signed is 0 (i=1 covers only m=1)');
-    $g = Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
-    ok($g->{ok}, 'unsigned null top: signed with AllowNullBodyRecipe');
+    my @warn;
+    {
+        local $SIG{__WARN__} = sub { push @warn, @_ };
+        $g = Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 0);
+        is(scalar @warn, 0, 'AllowNullBodyRecipe => 0 (as hm passes it) does not warn');
+        Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
+        Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
+    }
+    ok($g->{ok}, 'AllowNullBodyRecipe => 0 no longer refuses');
+    is(scalar @warn, 1, 'AllowNullBodyRecipe => 1 warns, once per process');
+    like($warn[0] // '', qr/AllowNullBodyRecipe is deprecated and does nothing/, '... saying so');
 }
 
 {
     my $msg = signed_null_list_post();
     like($msg, qr/^DKIM2-Signature: i=2; m=2;/m, 'fixture: the list signed m=2');
     my $g = Mail::DKIM2::Gate->check($msg, %cb, SigningDomain => 'test3.dkim2.com');
-    ok($g->{ok}, 'signed null top: extended without the option')
-        or diag($g->{message});
+    ok(!$g->{ok}, 'signed null top: refused (only our own nulls are signed)');
+    is($g->{reason}, 'upstream-chain', 'signed null top: for the upstream chain');
+    is($g->{verify_result}, 'permerror (PERMERROR: Message-Instance m=2 has a null recipe)',
+       'signed null top: the verifier says why');
     is($g->{top_null}, 1, 'signed null top: top_null still reported');
     is($g->{top_signed}, 1, 'signed null top: top_signed');
-    $g = Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
-    ok($g->{ok}, 'signed null top: and with the option');
 }
 
 {
-    # Signed or not, the header history below the null must still check out.
-    my $g = Mail::DKIM2::Gate->check(signed_null_list_post(forge => 1), %cb);
-    ok(!$g->{ok}, 'signed forged null top: refused');
-    isnt($g->{reason} // '', 'null-body-recipe', 'signed forged null top: for the chain, not the null');
-    $g = Mail::DKIM2::Gate->check(signed_null_list_post(forge => 1), %cb,
-        AllowNullBodyRecipe => 1);
-    ok(!$g->{ok}, 'signed forged null top: refused even with the option');
+    # The header history below our own null must still check out.
+    my $g = Mail::DKIM2::Gate->check(null_list_post(forge => 1), %cb);
+    ok(!$g->{ok}, 'forged unsigned null top: refused');
+    isnt($g->{reason} // '', 'null-body-recipe', 'forged unsigned null top: for the chain');
 }
 
 {
-    # Unsigned null m=2 under an unsigned ordinary m=3: the null is not the
-    # top, but i=1 covers only m=1, so nothing vouches for it yet.
+    # Unsigned null m=2 under an unsigned ordinary m=3: both ours.
     my $msg = ordinary_on_top(null_list_post());
     like($msg, qr/^Message-Instance: m=3;/m, 'fixture: an unsigned m=3 on top');
     my $g = Mail::DKIM2::Gate->check($msg, %cb);
-    ok(!$g->{ok}, 'null below unsigned top: refused by default');
-    is($g->{reason}, 'null-body-recipe', 'null below unsigned top: reason null-body-recipe');
-    like($g->{message}, qr/^unsigned Message-Instance m=2 has a null body Recipe/,
-        'null below unsigned top: message names the unsigned null m=2');
+    ok($g->{ok}, 'null below unsigned top: signed') or diag($g->{message});
     is($g->{top_null}, 0, 'null below unsigned top: top_null is 0 (m=3 is ordinary)');
     is($g->{top_signed}, 0, 'null below unsigned top: top_signed is 0');
     is($g->{covered_m}, 1, 'null below unsigned top: covered_m is 1');
     is($g->{unsigned_null}, 2, 'null below unsigned top: unsigned_null is 2');
-    $g = Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
-    ok($g->{ok}, 'null below unsigned top: signed with AllowNullBodyRecipe')
-        or diag($g->{message});
 
     # The history under both unsigned instances is still checked.
-    $g = Mail::DKIM2::Gate->check(ordinary_on_top(null_list_post(forge => 1)), %cb,
-        AllowNullBodyRecipe => 1);
-    ok(!$g->{ok}, 'forged null below unsigned top: refused even with the option');
+    $g = Mail::DKIM2::Gate->check(ordinary_on_top(null_list_post(forge => 1)), %cb);
+    ok(!$g->{ok}, 'forged null below unsigned top: refused');
 }
 
 {
-    # The null m=2 is covered by the list's valid i=2/m=2; only an ordinary
-    # m=3 is unsigned on top of it.
+    # The null m=2 is covered by the list's i=2/m=2; an ordinary m=3 is
+    # unsigned on top of it. The null is upstream's: refused.
     my $msg = ordinary_on_top(signed_null_list_post());
     my $g = Mail::DKIM2::Gate->check($msg, %cb, SigningDomain => 'test3.dkim2.com');
-    ok($g->{ok}, 'null below signed: extended without the option')
-        or diag($g->{message});
+    ok(!$g->{ok}, 'null below signed: refused');
+    is($g->{reason}, 'upstream-chain', 'null below signed: for the upstream chain');
     is($g->{covered_m}, 2, 'null below signed: covered_m is 2');
     is($g->{unsigned_null}, 0, 'null below signed: no unsigned null');
-    is($g->{top_null}, 0, 'null below signed: top_null is 0');
-    $g = Mail::DKIM2::Gate->check($msg, %cb, AllowNullBodyRecipe => 1);
-    ok($g->{ok}, 'null below signed: and with the option');
 }
 
 {
@@ -188,19 +178,16 @@ my %cb = (PubkeyCallback => DKIM2TestKeys::pubkey_callback());
         my $msg = $fake{$name} . $base;
         my @warn;
         local $SIG{__WARN__} = sub { push @warn, @_ };
-        for my $allow (0, 1) {
-            my $g = Mail::DKIM2::Gate->check($msg, %cb,
-                ($allow ? (AllowNullBodyRecipe => 1) : ()));
-            ok(!$g->{ok}, "fake coverage ($name, allow=$allow): refused");
-            is($g->{reason}, 'upstream-chain',
-                "fake coverage ($name, allow=$allow): for the chain");
-            like($g->{verify_result}, qr/^permerror/,
-                "fake coverage ($name, allow=$allow): verifier permerror");
-            is($g->{top_signed}, 0, "fake coverage ($name, allow=$allow): not top_signed");
+        {
+            my $g = Mail::DKIM2::Gate->check($msg, %cb);
+            ok(!$g->{ok}, "fake coverage ($name): refused");
+            is($g->{reason}, 'upstream-chain', "fake coverage ($name): for the chain");
+            like($g->{verify_result}, qr/^permerror/, "fake coverage ($name): verifier permerror");
+            is($g->{top_signed}, 0, "fake coverage ($name): not top_signed");
         }
         my $g = Mail::DKIM2::Gate->check($msg, %cb, VerifyResult => 'pass');
         is($g->{top_signed}, 0, "fake coverage ($name): not coverage even given 'pass'");
-        is($g->{reason}, 'null-body-recipe', "fake coverage ($name): null refused given 'pass'");
+        ok($g->{ok}, "fake coverage ($name): given 'pass', the null counts as ours and is signed");
         is_deeply(\@warn, [], "fake coverage ($name): no warnings");
     }
 }

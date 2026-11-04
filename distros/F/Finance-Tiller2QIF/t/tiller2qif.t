@@ -7,6 +7,7 @@ use Test2::V0;
 use Test2::Bundle::More;
 use Test2::Tools::Exception qw/dies lives/;
 use Path::Tiny;
+use Cpanel::JSON::XS;
 use Finance::Tiller2QIF;
 use Finance::Tiller2QIF::Util;
 use feature qw/signatures postderef/;
@@ -560,7 +561,7 @@ open my \$out, '>:encoding(UTF-8)', '$marker' or die "stub viewer: \$!";
 print {\$out} "\$ARGV[0]\\n";
 STUB
   path($cfgfile)->spew_utf8(
-    qq|{ "db": "$db_path", "viewer": "$^X $script" }| );
+    Cpanel::JSON::XS->new->encode({ db => $db_path, viewer => "$^X $script" }) );
 
   my $out = '';
   {

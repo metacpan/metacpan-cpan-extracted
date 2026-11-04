@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 use Carp ();
 use B ();
@@ -40,12 +40,15 @@ our @EXPORT_OK = qw(
     domain_of
     to_alabel
     from_domain
+    from_mailbox
     from_authentic
     from_refusal_note
     to_rfc5321_path
     relaxed_domain_match
     parse_dkim_pubkey
     parse_dkim_key_record
+    key_records
+    domain_policy
     load_private_key
     load_private_key_data
     DKIM2_DRAFT
@@ -71,11 +74,11 @@ our @EXPORT_OK = qw(
 # the date this implementation's DKIM2 behaviour last changed (a software
 # version stamp, not the draft's date) -- bump it on any change to what we
 # emit, not only on a spec bump. See ../spec/draft-gondwana-dkim2-debug-header.
-use constant DKIM2_DRAFT => 'ietf-dkim-dkim2-spec-08';
+use constant DKIM2_DRAFT => 'ietf-dkim-dkim2-spec-09';
 use constant DKIM2_REPO  => 'github.com/dkim2wg/interop';
-use constant DKIM2_DATE  => '2026-10-28';
+use constant DKIM2_DATE  => '2026-11-03';
 
-# -08 section 14.3: a DKIM2-Signature whose t= is more than a day after
+# -09 section 14.3: a DKIM2-Signature whose t= is more than a day after
 # delivery is "from the future", and one made more than 14 days before it
 # has "expired". Seconds.
 use constant FUTURE_LIMIT => 86400;
@@ -101,7 +104,7 @@ use constant MAX_CHAIN_NUMBER => 100;
 # prefetch's; refused before any key is fetched.
 use constant MAX_SIGNATURE_ITEMS => 8;
 
-# Headers excluded from hashing per draft-ietf-dkim-dkim2-spec-08 Section 4.
+# Headers excluded from hashing per draft-ietf-dkim-dkim2-spec-09 Section 4.
 # spec-05 narrowed the old /^arc-/ prefix to the three RFC 8617 field names and
 # added a /^received-/ prefix rule so future trace fields of that form need no
 # change here. spec-08 took auto-submitted and vbr-info off the list.
@@ -239,10 +242,10 @@ sub duplicate_number_error {
     $count{$_ + 0}++ for grep { defined } @numbers;
     # The lowest number given twice (interop contract C9), not the first met.
     my ($n) = sort { $a <=> $b } grep { $count{$_} > 1 } keys %count;
-    return defined $n ? "PERMERROR: $field $tag=$n appears more than once" : undef;
+    return defined $n ? "PERMERROR: $field $tag=$n is duplicated" : undef;
 }
 
-# The groups of an h= or s= value (-08 sections 9.3, 10.9): any-of groups
+# The groups of an h= or s= value (-09 sections 9.3, 10.9): any-of groups
 # split by "|", each an all-of list split by ",", as [[item, ...], ...] with
 # each item's text untrimmed (its own parser trims the FWS around it). Undef
 # when a member is empty -- a leading, trailing or doubled "|" or "," -- which
@@ -259,7 +262,7 @@ sub split_any_all {
 }
 
 # combine_sets(\@groups, $none_passed) -> ($state, $text): the result of an
-# h= or s= value from its members' own (-08 sections 14.6, 14.7). @groups is
+# h= or s= value from its members' own (-09 sections 14.6, 14.7). @groups is
 # [[[$state, $text], ...], ...] -- the "|" groups of "," lists, in the
 # order the value gives them -- with each $state one of pass, fail,
 # temperror, permerror and $text the member's own error. An all-of list
@@ -343,7 +346,7 @@ sub encode_tag_json {
 }
 
 # Decode a base64 JSON tag value. The JSON text must be UTF-8 (RFC 8259
-# section 8.1; -08 section 5): anything else dies. Every string in the
+# section 8.1; -09 section 5): anything else dies. Every string in the
 # result, object keys included, is UTF-8 octets, as the message's own
 # header values and body lines are, so a literal compares and hashes
 # byte for byte; a string holding a lone surrogate (a "\ud800" escape) is
@@ -358,7 +361,7 @@ sub decode_tag_json {
     # A key given twice in one object is invalid here: JSON parsers disagree
     # on which value wins (first or last), so {"b":[...],"b":null} would be a
     # null body Recipe to some verifiers and signers and a real one to others.
-    # A key that is not lowercase is invalid too (-08 §5).
+    # A key that is not lowercase is invalid too (-09 §5).
     if (defined(my $error = _json_lexical_error($text))) {
         die $error;
     }
@@ -399,7 +402,7 @@ sub _is_utf8_octets {
 # be valid JSON), or undef: a key that is not lowercase (has an ASCII
 # capital), a key that appears twice in one object, compared after
 # unescaping, or a number with a fraction or
-# an exponent. Every number in a Recipe is an integer (-08 section 5), and
+# an exponent. Every number in a Recipe is an integer (-09 section 5), and
 # whether 1e0 decodes as an integer depends on the JSON backend -- JSON::XS
 # gives an NV, JSON::PP an IV -- so it is refused here, from the text.
 sub _json_lexical_error {
@@ -418,7 +421,7 @@ sub _json_lexical_error {
         if ($text =~ /\G("(?:[^"\\]|\\.)*")/gcs) {
             if ($want_key && ref $stack[-1]) {
                 my $k = $json->decode($1);
-                # -08 §5: keys MUST be lowercase (the -08 contract, D10).
+                # -09 §5: keys MUST be lowercase (the -08 contract, D10).
                 return "JSON object key is not lowercase\n" if $k =~ /[A-Z]/;
                 return "duplicate JSON object key\n" if $stack[-1]{$k}++;
                 $want_key = 0;
@@ -590,13 +593,13 @@ sub _dkim2_fold_feed {
 }
 
 # May the field fold between $prev and $next, in state $st (_dkim2_fold_feed,
-# fed up to and including $prev)? The grammars (-08 §9, §10) allow FWS
+# fed up to and including $prev)? The grammars (-09 §9, §10) allow FWS
 # inside a base64string (§2.13) and in a few list positions, and nowhere in
 # a Domain, selector, algorithm or hash name, so only these are offered:
 #   - between two base64 characters of mf=, rt=, r=, of an h= digest (after
 #     the hash name's ":"), or of an s= signature value (after both ":"s);
 #   - on either side of a ":" in s= and h=, and of a "," or "|" joining
-#     their members (-08 §9.3, §10.9);
+#     their members (-09 §9.3, §10.9);
 #   - after a "," in any other list: f= allows FWS around commas, a
 #     base64string (rt=) may start with FWS, and an unknown tag's
 #     x-tag-value allows FWS between characters (X-DKIM2-Info's hn= list
@@ -644,7 +647,7 @@ sub mi_version_tag {
     $header = $$header if ref($header);
     return unless defined $header;
     for my $part (split /;/, $header) {
-        next unless $part =~ /\A\s*m\s*=(.*)\z/s;    # tag-names are case-sensitive (-08 §8)
+        next unless $part =~ /\A\s*m\s*=(.*)\z/s;    # tag-names are case-sensitive (-09 §8)
         (my $v = $1) =~ s/\s//g;
         return $v;
     }
@@ -730,7 +733,7 @@ sub to_rfc5321_path {
 # The text between the last "@" and the closing ">" (or the end),
 # lowercased, with one trailing dot taken off: Postfix hands on
 # "<A@Example.COM.>" as it was given. A domain literal ("[192.0.2.1]") is
-# returned with $is_literal true; it never matches anything (-08 section
+# returned with $is_literal true; it never matches anything (-09 section
 # 7.2).
 sub domain_of {
     my ($addr) = @_;
@@ -748,7 +751,7 @@ sub domain_of {
 
 # to_alabel($domain): $domain with each label that is not ASCII lowercased
 # and written as its A-label, "xn--" and the RFC 3492 Punycode of the label
-# (-08 section 18). ASCII labels are left as they are. The input is UTF-8
+# (-09 section 18). ASCII labels are left as they are. The input is UTF-8
 # octets, as a header field or a decoded mf=/rt= carries it (a character
 # string is taken as it is); a label that is not valid UTF-8 is left alone.
 # This is the label mapping only, not UTS 46.
@@ -769,7 +772,7 @@ sub to_alabel {
 }
 
 # from_domain(@values): the domain a From header field is Authentic for
-# (-08 section 11), from the values of every From field in one version of
+# (-09 section 11), from the values of every From field in one version of
 # the header (each as header_raw gives it, folded or not): the lowercased
 # A-label domain of its one mailbox, or undef when there is none -- no From
 # field or more than one, a field that is not exactly one mailbox (a list
@@ -778,14 +781,33 @@ sub to_alabel {
 # mailbox is "Name <addr>" or a bare addr-spec ("Name addr", display text
 # with no angle brackets, is not one).
 sub from_domain {
+    my ($state, $dom) = from_mailbox(@_);
+    return $state eq 'ok' ? $dom : undef;
+}
+
+# from_mailbox(@values): from_domain's reading of the From field(s), with the
+# reason when there is no domain (-09 section 14.8 names them): ('ok',
+# $domain); ('multiple') for more than one mailbox -- two From fields, or a
+# list of addresses; ('literal') for a domain literal; ('none') for no From
+# field, or a value that is not one mailbox (a group, no "@", bad syntax).
+sub from_mailbox {
     my (@values) = @_;
-    return undef unless @values == 1 && defined $values[0];
+    return 'multiple' if @values > 1;
+    return 'none' unless @values == 1 && defined $values[0];
     (my $v = $values[0]) =~ s/\r?\n(?=[ \t])//g;
     # One pass: comments dropped, quoted strings kept whole, and the
     # structure outside them ($skel) and the angle brackets found.
-    my ($out, $skel, $depth, $inq, @lt, @gt) = ('', '', 0, 0);
+    my ($out, $skel, $depth, $inq, $inlit, @lt, @gt) = ('', '', 0, 0, 0);
     for (my $i = 0; $i < length $v; $i++) {
         my $c = substr($v, $i, 1);
+        # A domain literal's ":"s (IPv6) are not a group: "[...]" is kept
+        # whole, out of the structure.
+        if ($inlit) {
+            if ($c eq '\\') { $out .= substr($v, $i++, 2); next }
+            $inlit = 0 if $c eq ']';
+            $out .= $c;
+            next;
+        }
         if ($inq) {
             if ($c eq '\\') { $out .= substr($v, $i++, 2); next }
             $inq = 0 if $c eq '"';
@@ -800,33 +822,36 @@ sub from_domain {
         }
         if ($c eq '(') { $depth = 1; $out .= ' '; next }
         if ($c eq '"') { $inq = 1; $out .= $c; next }
+        if ($c eq '[') { $inlit = 1; $out .= $c; next }
         push @lt, length $out if $c eq '<';
         push @gt, length $out if $c eq '>';
         $skel .= $c;
         $out  .= $c;
     }
-    return undef if $inq || $depth;
+    return 'none' if $inq || $depth || $inlit;
     # A "," is a second mailbox; a ":" or ";" a group (or an obsolete route).
-    return undef if $skel =~ /[,:;]/;
+    return 'multiple' if $skel =~ /,/;
+    return 'none' if $skel =~ /[:;]/;
     my $addr = $out;
     if (@lt || @gt) {
-        return undef unless @lt == 1 && @gt == 1 && $lt[0] < $gt[0]
-                         && substr($out, $gt[0] + 1) !~ /\S/;
+        return 'none' unless @lt == 1 && @gt == 1 && $lt[0] < $gt[0]
+                          && substr($out, $gt[0] + 1) !~ /\S/;
         $addr = substr($out, $lt[0] + 1, $gt[0] - $lt[0] - 1);
     }
     $addr =~ s/\A\s+|\s+\z//g;
     # White space (or a comment) between two parts of the address: "Name
     # a@b", display text with no angle brackets, is not one mailbox.
-    return undef if ($addr =~ s/"(?:[^"\\]|\\.)*"/""/gr) =~ /\s/;
-    return undef unless index($addr, '@') > 0;
+    return 'none' if ($addr =~ s/"(?:[^"\\]|\\.)*"/""/gr) =~ /\s/;
+    return 'none' unless index($addr, '@') > 0;
     my ($dom, $literal) = domain_of($addr);
-    return undef if !$dom || $literal || $dom =~ /\s/;
-    return to_alabel($dom) =~ tr/A-Z/a-z/r;
+    return 'none' if !$dom || $dom =~ /\s/;
+    return 'literal' if $literal;
+    return ('ok', to_alabel($dom) =~ tr/A-Z/a-z/r);
 }
 
 # from_authentic($d, @values): true if the From field(s) of one version of
 # the header, as from_domain takes them, are Authentic for signing domain
-# $d: from_domain gives a domain and it relaxed-matches $d (-08 section 11).
+# $d: from_domain gives a domain and it relaxed-matches $d (-09 section 11).
 sub from_authentic {
     my ($d, @values) = @_;
     my $dom = from_domain(@values);
@@ -854,7 +879,7 @@ sub from_refusal_note {
          . "list's posting address must be in the domain this milter signs with";
 }
 
-# relaxed_domain_match($p1, $p2): the relaxed domain match of -08 section
+# relaxed_domain_match($p1, $p2): the relaxed domain match of -09 section
 # 7.2. Both are compared as A-labels, without regard to case, and without
 # one trailing dot. A domain literal on either side never matches. Otherwise
 # labels come off the LEFT of $p1 only, until it equals $p2 (a match) or
@@ -878,7 +903,7 @@ sub relaxed_domain_match {
 #   signature   => the Signature object for the entry being signed/verified
 #   signing_header => optional folded header string (signer path)
 #
-# Per draft-ietf-dkim-dkim2-spec-08 Section 10.5:
+# Per draft-ietf-dkim-dkim2-spec-09 Section 10.5:
 #   1. All Message-Instance headers in ascending v= order
 #   2. All prior DKIM2-Signature headers in ascending i= order
 #   3. The incomplete DKIM2-Signature (with empty s=) being signed/verified
@@ -917,7 +942,7 @@ sub build_signing_input {
 # its deadline. That includes Reflector, Split and Validate, so the promise
 # in Mail::DKIM2's CONVENTIONS holds without exceptions (review R16).
 
-# A base64string (-08 §2.13), FWS already removed: base64 characters,
+# A base64string (-09 §2.13), FWS already removed: base64 characters,
 # padded with "=" to a multiple of four ("MUST be padded"). Internal.
 sub _is_base64string {
     my ($s) = @_;
@@ -940,7 +965,7 @@ sub _check_options {
 }
 
 # Parse and validate a key record (draft-ietf-dkim-dkim2-dns §3.2, §3.4.1;
-# -08 §14.5 says a Verifier MUST NOT use a malformed one). Returns the
+# -09 §14.5 says a Verifier MUST NOT use a malformed one). Returns the
 # key object, or (undef, $why) where $why completes "public key <selector>
 # ...": "has a syntax error", "has been revoked" or "has an unsupported key
 # type". The whole record is checked, not searched: a repeated tag (an empty
@@ -951,24 +976,10 @@ sub _check_options {
 sub parse_dkim_key_record {
     my ($txt) = @_;
     my $syntax = 'has a syntax error';
-    return (undef, $syntax) unless defined $txt;
-    my (%tag, @order);
-    for my $spec (split /;/, $txt, -1) {
-        next if $spec =~ /\A[ \t\r\n]*\z/;    # empty spec, e.g. after a trailing ";"
-        my ($name, $value) = $spec =~ /\A[ \t\r\n]*([A-Za-z][A-Za-z0-9_]*)[ \t\r\n]*=(.*)\z/s
-            or return (undef, $syntax);
-        return (undef, $syntax) if exists $tag{$name};
-        $value =~ s/\A[ \t\r\n]+|[ \t\r\n]+\z//g;
-        # Every value, unknown tags' included, must fit the tag-list grammar
-        # (RFC 6376 §3.2 VALCHAR): ignoring a tag comes after parsing it
-        # (follow-up review F5).
-        return (undef, $syntax) unless $value =~ /\A$Mail::DKIM2::TagValueList::TAG_VALUE\z/;
-        $tag{$name} = $value;
-        push @order, $name;
-    }
-    return (undef, $syntax) unless @order;
+    my ($tag, $order) = _parse_dns_tag_list($txt) or return (undef, $syntax);
+    my %tag = %$tag;
     if (exists $tag{v}) {
-        return (undef, $syntax) unless $order[0] eq 'v' && $tag{v} eq 'DKIM1';
+        return (undef, $syntax) unless $order->[0] eq 'v' && $tag{v} eq 'DKIM1';
     }
     return (undef, $syntax) unless exists $tag{p};
     (my $p = $tag{p}) =~ s/[ \t\r\n]//g;
@@ -977,8 +988,151 @@ sub parse_dkim_key_record {
     my $k = $tag{k} // 'rsa';
     my $key = _key_from_p($k, $p);
     return $key if $key;
-    # -08 §14.5 (contract D7): base64 that is not a usable key of its type.
+    # -09 section 14.6 (contract E5): an RSA key this verifier regards as
+    # too short.
+    return (undef, 'too short') if $k eq 'rsa' && _rsa_bits($p);
+    # -09 §14.5 (contract D7): base64 that is not a usable key of its type.
     return (undef, $k eq 'rsa' || $k eq 'ed25519' ? 'is malformed' : 'has an unsupported key type');
+}
+
+# A TXT record as a DNS tag=value list (DKIMKEYS -03 section 2.6: the
+# Tag=Value rules of the spec's section 8): (\%tags, \@names_in_order), or
+# the empty list for a syntax error -- a repeated tag, a spec that is not
+# name=value, a value outside the tag-list grammar, or no tag at all. Tag
+# names are case sensitive.
+sub _parse_dns_tag_list {
+    my ($txt) = @_;
+    return unless defined $txt;
+    my (%tag, @order);
+    for my $spec (split /;/, $txt, -1) {
+        next if $spec =~ /\A[ \t\r\n]*\z/;    # empty spec, e.g. after a trailing ";"
+        my ($name, $value) = $spec =~ /\A[ \t\r\n]*([A-Za-z][A-Za-z0-9_]*)[ \t\r\n]*=(.*)\z/s
+            or return;
+        return if exists $tag{$name};
+        $value = _trim_wsp($value);
+        # Every value, unknown tags' included, must fit the tag-list grammar
+        # (RFC 6376 §3.2 VALCHAR): ignoring a tag comes after parsing it
+        # (follow-up review F5).
+        return unless $value =~ /\A$Mail::DKIM2::TagValueList::TAG_VALUE\z/;
+        $tag{$name} = $value;
+        push @order, $name;
+    }
+    return unless @order;
+    return (\%tag, \@order);
+}
+
+# parent_from_matcher(@domains): a Signer ParentFromCallback (-09 contract
+# E3.4) that is true for a From domain in @domains, each compared as the
+# callback gets it: an A-label, lowercased, without one trailing dot.
+sub parent_from_matcher {
+    my %ok = map { (to_alabel($_) =~ tr/A-Z/a-z/r) =~ s/\.\z//r => 1 }
+             grep { defined && length } @_;
+    return sub { $ok{ $_[0] // '' } ? 1 : 0 };
+}
+
+# from_pair_error($d, $policy, @from): -09 section 14.8 for one signing
+# domain $d and the From field values it must make Authentic (contract
+# E3.1), for the Verifier and the Signer alike: undef when Authentic, else
+# [$state, $text] -- 'fail', 'permerror' or 'temperror', and the text after
+# "DKIM2-Signature i=<x> ". $policy->($domain) gives that domain's Domain
+# Policy Record as domain_policy does, or 'temperror'; it is called only
+# when d= is below the From domain.
+sub from_pair_error {
+    my ($d, $policy, @from) = @_;
+    my ($state, $dom) = from_mailbox(@from);
+    return ['fail', 'From has more than one address'] if $state eq 'multiple';
+    return ['fail', 'From uses a domain literal']     if $state eq 'literal';
+    return ['fail', 'matching From is not authentic']
+        unless $state eq 'ok' && defined $d && length $d;
+    return undef if relaxed_domain_match($dom, $d);
+    return ['fail', 'matching From is not authentic'] unless relaxed_domain_match($d, $dom);
+    my $p = $policy->($dom);
+    return undef if $p eq 'open';
+    return ['fail', "From $dom forbids subdomain signing"] if $p eq 'strict';
+    return ['permerror', "multiple records for $dom policy"] if $p eq 'multiple';
+    return ['temperror', "policy for $dom unavailable"];
+}
+
+# query_domain_policy($resolver, $domain): the TXT records at
+# _domainkey.$domain (each RR's strings joined) through $resolver's query(),
+# as an arrayref; [] for NXDOMAIN or no TXT. Dies "TEMPERROR: ..." for any
+# other failure.
+sub query_domain_policy {
+    my ($resolver, $dom) = @_;
+    my $fqdn = "_domainkey.$dom";
+    my $reply = $resolver->query($fqdn, 'TXT');
+    unless ($reply) {
+        my $err = $resolver->errorstring // '';
+        return [] if $err =~ /^(?:NXDOMAIN|NOERROR|NODATA)\s*$/i;
+        die "TEMPERROR: DNS lookup for $fqdn failed: $err\n";
+    }
+    return [ map { join '', $_->txtdata } grep { $_->type eq 'TXT' } $reply->answer ];
+}
+
+# policy_from_source($dom, $callback, $resolver_sub, @cb_args): the Domain
+# Policy Record of $dom ('open', 'strict', 'multiple' or 'temperror') from
+# $callback->($dom, @cb_args) when given, else query_domain_policy through
+# $resolver_sub->(); a die (a TEMPERROR) is 'temperror', with the reason
+# returned second.
+sub policy_from_source {
+    my ($dom, $callback, $resolver_sub, @cb_args) = @_;
+    my $txt = eval {
+        $callback ? $callback->($dom, @cb_args) : query_domain_policy($resolver_sub->(), $dom);
+    };
+    if (my $err = $@) {
+        die $err if ref $err;
+        (my $why = $err) =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*\z//;
+        return ('temperror', $why =~ s/\s+\z//r);
+    }
+    return domain_policy(@{ $txt || [] });
+}
+
+# $s without leading or trailing WSP, in linear time: a TXT record is
+# whatever the signer's DNS serves (up to 64 KB), and a trailing-WSP match
+# tried at every position of a long inner run of spaces is quadratic. The
+# lookbehind starts it only at the beginning of a run.
+sub _trim_wsp {
+    my ($s) = @_;
+    $s =~ s/\A[ \t\r\n]+//;
+    $s =~ s/(?<![ \t\r\n])[ \t\r\n]+\z//;
+    return $s;
+}
+
+# The value of a TXT record's first tag when that tag is "v", else undef:
+# read without parsing the rest, since -09 section 3.7 sorts records on it
+# before any is used.
+sub _leading_v {
+    my ($txt) = @_;
+    return unless defined $txt;
+    $txt =~ /\A[ \t\r\n]*v[ \t\r\n]*=[ \t\r\n]*([^;]*?)[ \t\r\n]*(?:;|\z)/ or return;
+    return $1;
+}
+
+# key_records(@txt): the TXT records at a selector that are candidate key
+# records (-09 section 3.7, DKIMKEYS -03 section 3): each one but those that
+# begin with a "v=" tag whose value is not DKIM1. More than one left is the
+# caller's "has multiple records".
+sub key_records {
+    return grep { my $v = _leading_v($_); !defined $v || $v eq 'DKIM1' } @_;
+}
+
+# domain_policy(@txt): the Domain Policy Record held by the TXT records at
+# _domainkey.<domain> (-09 section 3.8, DKIMKEYS -03 section 6): 'strict'
+# when subdomains are not authorized to make that domain's From Authentic,
+# 'open' when they are (no record, no f=, or no "strict" flag), or
+# 'multiple' for more than one record. Only records beginning with the tag
+# v=DKIM1 count. A record that does so but does not parse is 'strict': the
+# spec gives it no outcome, so it fails closed (contract E3.2).
+sub domain_policy {
+    my @dpr = grep { (_leading_v($_) // '') eq 'DKIM1' } @_;
+    return 'open' unless @dpr;
+    return 'multiple' if @dpr > 1;
+    my ($tag) = _parse_dns_tag_list($dpr[0]) or return 'strict';
+    my $f = $tag->{f};
+    return 'open' unless defined $f && length $f;
+    my @flags = map { _trim_wsp($_) } split /:/, $f, -1;
+    return 'strict' if grep { !/\A[A-Za-z](?:[A-Za-z0-9-]*[A-Za-z0-9])?\z/ } @flags;
+    return (grep { $_ eq 'strict' } @flags) ? 'strict' : 'open';
 }
 
 # A key object from a valid record: the key, or nothing (a key type this
@@ -992,7 +1146,7 @@ sub parse_dkim_pubkey {
 sub _key_from_p {
     my ($k, $p) = @_;
     if ($k eq 'ed25519') {
-        # -08 §14.5: an Ed25519 key is exactly 32 octets (RFC 8032), the
+        # -09 §14.5: an Ed25519 key is exactly 32 octets (RFC 8032), the
         # raw key; anything else -- a DER SubjectPublicKeyInfo included --
         # is malformed. Never die on one: return undef so the verifier
         # reports a clean permerror instead of aborting the whole operation
@@ -1009,13 +1163,24 @@ sub _key_from_p {
     }
     # Any other key type is unrecognised, and ignored: never read as RSA.
     return unless $k eq 'rsa';
-    # RSA: p= is base64-encoded SubjectPublicKeyInfo DER. -08 §3.2: a
-    # Verifier MUST NOT validate with a key of less than 1024 bits.
+    # RSA: p= is base64-encoded SubjectPublicKeyInfo DER. A key under
+    # 1024 bits is too short: -09 section 3.2 leaves it to the Verifier, and
+    # we refuse it (contract E5).
     my $der = decode_base64($p);
     my $rsa = eval { Crypt::PK::RSA->new(\$der) };
     die $@ if ref $@;
     return unless $rsa && $rsa->size * 8 >= 1024;
     return $rsa;
+}
+
+# True when $p (base64) loads as an RSA key, of whatever size: tells a key
+# that is too short from one that is malformed.
+sub _rsa_bits {
+    my ($p) = @_;
+    my $der = decode_base64($p);
+    my $rsa = eval { Crypt::PK::RSA->new(\$der) };
+    die $@ if ref $@;
+    return $rsa ? $rsa->size * 8 : 0;
 }
 
 # Load a private key from a PEM file.
@@ -1093,7 +1258,7 @@ Those under L</CANONICALIZATION> and L</SIGNING INPUT> define bytes the
 spec defines and are of interest to anyone checking this implementation
 against another; the rest are conveniences.
 
-This module implements draft-ietf-dkim-dkim2-spec-08; see L<Mail::DKIM2/STATUS>
+This module implements draft-ietf-dkim-dkim2-spec-09; see L<Mail::DKIM2/STATUS>
 for what that means for the wire format and the API, and
 L<Mail::DKIM2/CONVENTIONS> for the option, input and error conventions every
 module here follows.
@@ -1102,7 +1267,7 @@ module here follows.
 
 =head2 DKIM2_DRAFT, DKIM2_REPO, DKIM2_DATE
 
-The spec revision implemented (C<ietf-dkim-dkim2-spec-08>), where the
+The spec revision implemented (C<ietf-dkim-dkim2-spec-09>), where the
 code lives, and the date this implementation's DKIM2 behaviour last
 changed. Emitted in X-DKIM2-Info debug headers
 (draft-gondwana-dkim2-debug-header).
@@ -1129,7 +1294,7 @@ as "has more than 8 signatures". New in 0.28.
 
 =head2 should_skip($header_name, [\@prefixes])
 
-True if the field is excluded from the header hash: the -08 section 4
+True if the field is excluded from the header hash: the -09 section 4
 list (C<Received>, C<Return-Path>, C<Message-Instance>,
 C<DKIM2-Signature>, C<DKIM-Signature>, C<Authentication-Results>, the ARC
 fields and others), any C<X-*> or C<Received-*> field, or a field whose
@@ -1225,7 +1390,7 @@ caller). The field is named by its own number as written, C<$ident>
 (default C<$n>): a DKIM2-Signature by C<i=>, a Message-Instance by C<m=>.
 A value that is not 1*DIGIT in ASCII, or is zero, is
 C<"PERMERROR: $field i=$ident syntax error"> (C<m=> for a
-Message-Instance; -08 section 14.2). More than three digits or above
+Message-Instance; -09 section 14.2). More than three digits or above
 L</MAX_CHAIN_NUMBER> is C<"PERMERROR: DKIM2-Signature i=$ident exceeds the
 maximum chain number of 100">, with C<" m=$n"> after C<$ident> for a
 signature's C<m=>. Above L</MAX_CHAIN_LENGTH>, likewise C<"... exceeds the
@@ -1240,7 +1405,7 @@ The PERMERROR string for the first number that appears twice, or undef.
 
 =head2 split_any_all($value)
 
-The groups of an C<h=> or C<s=> value (-08 sections 9.3 and 10.9): an
+The groups of an C<h=> or C<s=> value (-09 sections 9.3 and 10.9): an
 arrayref of C<|>-separated groups, each an arrayref of its C<,>-separated
 members, untrimmed. Undef if any member is empty (a leading, trailing or
 doubled C<|> or C<,>), which is a syntax error.
@@ -1248,7 +1413,7 @@ doubled C<|> or C<,>), which is a syntax error.
 =head2 combine_sets(\@groups, $none_passed)
 
 The overall C<($state, $text)> of an C<h=> or C<s=> value from its
-members' results (-08 sections 14.6 and 14.7). C<@groups> holds one
+members' results (-09 sections 14.6 and 14.7). C<@groups> holds one
 arrayref per C<|> group, of C<[$state, $text]> per member, C<$state> being
 C<pass>, C<fail>, C<temperror> or C<permerror>. A group passes if every
 member does; is a temperror if every member that does not pass is one; else
@@ -1278,14 +1443,14 @@ empty list when there is no domain, as for C<< <> >>. New in 0.23.
 =head2 to_alabel($domain)
 
 The domain with each non-ASCII label lowercased and written as its A-label
-(C<xn--> and the RFC 3492 Punycode), as -08 section 18 has mf=, rt= and
+(C<xn--> and the RFC 3492 Punycode), as -09 section 18 has mf=, rt= and
 From domains compared: C<b\x{fc}cher.example>, as UTF-8 octets, gives
 C<xn--bcher-kva.example>. ASCII labels are unchanged; a label that is not
 valid UTF-8 is left as it is. No UTS 46 mapping. New in 0.23.
 
 =head2 from_domain(@values)
 
-The domain a From header field is Authentic for (-08 section 11), given the
+The domain a From header field is Authentic for (-09 section 11), given the
 values of every From field in one version of the header: the lowercased
 A-label domain of its one mailbox, or undef when there is no From field,
 more than one, a field holding other than exactly one mailbox (a list, a
@@ -1293,10 +1458,21 @@ group), or a domain literal. Display names (quoted or RFC 2047) and
 comments are skipped; C<< Name <addr> >> and a bare C<addr> both work. New in
 0.23.
 
+=head2 from_mailbox(@values)
+
+C<from_domain>'s reading with the reason when there is no domain, as -09
+section 14.8 names them (new in 0.29): C<('ok', $domain)>; C<('multiple')>
+for more than one mailbox (two From fields, or a list of addresses);
+C<('literal')> for a domain literal; C<('none')> for no From field or a
+value that is not one mailbox (a group, no C<@>, bad syntax).
+
 =head2 from_authentic($d, @values)
 
 True if C<from_domain(@values)> gives a domain and it relaxed-matches the
-signing domain C<$d>. New in 0.23.
+signing domain C<$d>: the "downwards" match only, with no DNS lookup, which
+is what the signers use (-09 section 12.4 permits a subdomain C<d=> too,
+when the From domain's Domain Policy Record allows it; the Verifier checks
+that). New in 0.23.
 
 =head2 from_refusal_note($d, @values)
 
@@ -1307,7 +1483,7 @@ in the domain the milter signs with. Both milters log it. New in 0.23.
 
 =head2 relaxed_domain_match($p1, $p2)
 
-The relaxed domain match of -08 section 7.2: true if C<$p1> is C<$p2> or a
+The relaxed domain match of -09 section 7.2: true if C<$p1> is C<$p2> or a
 subdomain of it. Labels come off the left of C<$p1> only. Both are compared
 as A-labels (C<to_alabel>), without regard to case and without a trailing
 dot. A domain literal on either side never matches (new in 0.23).
@@ -1363,7 +1539,7 @@ can log and carry on.
 Validates a whole key record (draft-ietf-dkim-dkim2-dns sections 3.2 and
 3.4.1) and returns the public key object: a C<Crypt::PK::RSA> for C<k=rsa>
 (the default) or a C<Crypt::PK::Ed25519> for C<k=ed25519>, the raw 32
-octets of RFC 8463 (-08 section 14.5). Otherwise returns C<(undef, $why)>,
+octets of RFC 8463 (-09 section 14.5). Otherwise returns C<(undef, $why)>,
 where C<$why> completes "public key E<lt>selectorE<gt> ...":
 
 =over
@@ -1375,9 +1551,14 @@ not exactly C<DKIM1>; no C<p=>; C<p=> not base64.
 
 =item C<is malformed>
 
-C<p=> is base64 but not a usable key of its type (-08 section 14.5): an
-Ed25519 key that is not exactly 32 octets (DER included), an RSA key of
-fewer than 1024 bits (section 3.2), or one that does not load.
+C<p=> is base64 but not a usable key of its type (-09 section 14.5): an
+Ed25519 key that is not exactly 32 octets (DER included), or one that does
+not load.
+
+=item C<too short>
+
+An RSA key of fewer than 1024 bits: -09 sections 3.2 and 14.6 leave it to
+the Verifier, and this one refuses it (new in 0.29; it was C<is malformed>).
 
 =item C<has been revoked>
 
@@ -1391,6 +1572,54 @@ A C<k=> other than C<rsa> or C<ed25519>.
 
 Unknown tags and the retired C<h=>, C<n=>, C<s=> and C<t=> are ignored.
 Tag names are case sensitive, as in DKIM1.
+
+=head2 from_pair_error($d, $policy, @from_values)
+
+-09 section 14.8 for one signing domain and the From field values it must
+make Authentic (new in 0.29; the Verifier and the Signer share it): undef
+when Authentic, else C<[$state, $text]>, the state C<fail>, C<permerror> or
+C<temperror> and the text that follows C<< DKIM2-Signature i=<x> >>.
+C<< $policy->($domain) >> returns that domain's Domain Policy Record as
+L</domain_policy> does, or C<temperror>; it is called only when C<$d> is
+below the From domain.
+
+=head2 parent_from_matcher(@domains)
+
+A L<Mail::DKIM2::Signer> C<ParentFromCallback> that is true for a From
+domain in C<@domains>, each compared as the callback receives it: an
+A-label (so C<bücher.example> matches C<xn--bcher-kva.example>), lowercased,
+without one trailing dot. The milters and C<dkim2sign> build theirs with it.
+New in 0.30.
+
+=head2 query_domain_policy($resolver, $domain)
+
+The TXT records at C<< _domainkey.<domain> >> through C<< $resolver->query >>,
+each RR's strings joined, as an arrayref: empty for NXDOMAIN, NOERROR or
+NODATA; dies with C<TEMPERROR:> otherwise. New in 0.29.
+
+=head2 policy_from_source($domain, $callback, $resolver_sub, @callback_args)
+
+The Domain Policy Record state of C<$domain> (C<open>, C<strict>,
+C<multiple> or C<temperror>, with the reason second for C<temperror>), from
+C<< $callback->($domain, @callback_args) >> when given, else
+L</query_domain_policy> through C<< $resolver_sub->() >>. New in 0.29.
+
+=head2 key_records(@txt)
+
+The TXT records at a selector that are candidate key records (-09 section
+3.7, draft-ietf-dkim-dkim2-dns-03 section 3): all but those that begin with
+a C<v=> tag whose value is not C<DKIM1>. More than one left is the caller's
+C<has multiple records>. New in 0.29.
+
+=head2 domain_policy(@txt)
+
+The Domain Policy Record held by the TXT records at
+C<< _domainkey.<domain> >> (-09 section 3.8, draft-ietf-dkim-dkim2-dns-03
+section 6): C<strict> when subdomains are not authorized to make that
+domain's From Authentic, C<open> when they are (no record, no C<f=>, or no
+C<strict> flag; unknown flags are ignored), C<multiple> for more than one
+record. Only records whose first tag is C<v=DKIM1> count; one that does but
+does not parse is C<strict> (it fails closed). New in 0.29.
 
 =head2 parse_dkim_pubkey($txt_record)
 

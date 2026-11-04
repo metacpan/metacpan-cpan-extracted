@@ -229,6 +229,11 @@ listing (the list shown when ran with no arguments). Defaults to C<false>.
 Specify command to use for opening feed's URLs. Overrides global C<open>
 command.
 
+=item "B<user_agent>": "I<string>"
+
+Specify the user agent to use for fetching this feed's URL. Overrides global
+C<user_agent> setting.
+
 =back
 
 A feed's specific configuration takes priority over the configuration it may
@@ -1293,6 +1298,11 @@ Default pager to use for the C<read> command.
 
 Default browser to use for opening URLs.
 
+=item NO_COLOR
+
+Disables color output when set to a non-empty string. Can be overriden by the
+C<-c>|C<--color> option.
+
 =back
 
 =head1 CAVEATS
@@ -1305,7 +1315,7 @@ the C<--unconditional> option without a good reason.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

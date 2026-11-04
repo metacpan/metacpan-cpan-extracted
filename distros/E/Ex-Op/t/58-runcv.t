@@ -26,7 +26,7 @@ sub twin_warn {
         my @w;
         local $SIG{__WARN__} = sub { push @w, $_[0] };
         my $r = eval { $f->(@args) };
-        s/\(eval \d+\)/(eval)/g for @w;
+        s/\(eval \d+\)(?:\[[^\]]*\])?/(eval)/g for @w;
         $got{$kind} = [$r, \@w, $@];
     }
     return \%got;

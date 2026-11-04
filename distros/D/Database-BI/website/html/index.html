@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Database::BI &mdash; business intelligence for data files</title>
+<meta name="description" content="Database::BI is a self-contained Mojolicious web application that reads CSV, SQLite, XLSX, JSON and XML files and turns them into tables, charts, maps and shareable canvases.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="Database::BI &mdash; business intelligence for data files">
+<meta property="og:description" content="Database::BI is a self-contained Mojolicious web application that reads CSV, SQLite, XLSX, JSON and XML files and turns them into tables, charts, maps and shareable canvases.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	"name": "Database::BI",
+	"description": "Database::BI is a self-contained Mojolicious web application that reads CSV, SQLite, XLSX, JSON and XML files and turns them into tables, charts, maps and shareable canvases.",
+	"applicationCategory": "DeveloperApplication",
+	"operatingSystem": "Linux, macOS, Windows",
+	"programmingLanguage": "Perl",
+	"softwareVersion": "0.019.0",
+	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+	"url": "https://metacpan.org/dist/Database-BI",
+	"sameAs": [
+		"https://github.com/nigelhorne/Database-BI",
+		"https://nigelhorne.github.io/Database-BI/coverage/"
+	],
+	"author": { "@type": "Person", "name": "Nigel Horne" },
+	"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html" aria-current="page">Overview</a>
+			<a href="charts.html">Charts</a>
+			<a href="canvas.html">Canvases</a>
+			<a href="data.html">Data</a>
+			<a href="api.html">API</a>
+			<a href="install.html">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">Perl &middot; Mojolicious &middot; no database required</p>
+	<h1>Database::BI - Web-based Business Intelligence viewer for data files</h1>
+	<p class="lead">
+		Database::BI is a self-contained web application that reads the data files
+		you already have &mdash; CSV, PSV, TSV, SQLite, JSON, XML and XLSX &mdash; and
+		presents them as sortable tables, nine kinds of D3 chart, maps, word clouds,
+		pivots and saved canvases. There is no database to load and no import step:
+		each request reads the file as it is now.
+	</p>
+	<ul class="facts">
+		<li>Perl 5.28+</li>
+		<li>Reads files in place</li>
+		<li>No build step</li>
+		<li>Runs offline</li>
+		<li>GPL2</li>
+	</ul>
+</div>
+
+<h2>What you get</h2>
+<p class="section-intro">
+	Everything below is served from the same application, against the same data
+	pipeline, so a filter you add on a table is the filter the chart behind it
+	draws from.
+</p>
+
+<div class="grid">
+	<article class="card">
+		<span class="tag">Tables</span>
+		<h3>Open anything, anywhere</h3>
+		<p>
+			The home page scans a data directory; <code>/browse</code> walks the whole
+			filesystem and opens any supported file, including a table inside a
+			multi-table SQLite database, a file on another host over SFTP, or a table
+			scraped from a public web page. Files can also be dropped onto the page.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Tables</span>
+		<h3>Sort, reorder, filter</h3>
+		<p>
+			Click a header to sort, drag headers to reorder &mdash; both remembered by
+			column name in the browser. The quick-filter bar builds server-side
+			conditions with <code>eq</code>, <code>ne</code>, <code>contains</code>,
+			<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
+			<code>ge</code>, <code>empty</code> and <code>notempty</code>.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Shape</span>
+		<h3>Join and combine</h3>
+		<p>
+			A left join appends columns from another table on a shared key, and joins
+			chain. Combine stacks one file under another on a unified column set,
+			leaving blanks where a source has no such column.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Charts</span>
+		<h3>Nine D3 chart types</h3>
+		<p>
+			Line, bar, pie, scatter/bubble, heatmap, stacked bar, combo bar and line,
+			treemap and histogram. Each page exports SVG, PNG and PDF, takes a
+			relative time range, and accepts calculated fields.
+			<a href="charts.html">See the chart pages</a>.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Charts</span>
+		<h3>Maps and word clouds</h3>
+		<p>
+			Plot latitude and longitude columns, or geocode a place column locally,
+			with clustered markers, heat layers and colour rules. A word cloud counts
+			the words of a text column, one vote per row.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Analysis</span>
+		<h3>Pivot and statistics</h3>
+		<p>
+			A crosstab with row and column dimensions and a shared measure vocabulary
+			(<code>sum</code>, <code>avg</code>, <code>median</code>, <code>stdev</code>,
+			<code>p&lt;N&gt;</code> and more), plus per-column statistics computed the
+			same way.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Analysis</span>
+		<h3>Calculated fields and groups</h3>
+		<p>
+			Virtual columns from an expression, named value groups that map many raw
+			values onto one label, date patterns that normalise a column to ISO, and
+			cross-row columns such as running totals, ranks and z-scores.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Canvases</span>
+		<h3>Dashboards you can share</h3>
+		<p>
+			Save a configuration as a canvas of cards on a 12-column grid, arrange
+			them by dragging or with the keyboard, add titles and explanations of your
+			own, and let readers cross-filter and drill through. Canvases have bookmarks with undo, parameters, share links
+			and an embed route. <a href="canvas.html">How canvases work</a>.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Data out</span>
+		<h3>Export what you see</h3>
+		<p>
+			The current logical view &mdash; after joins, filters and deduplication &mdash;
+			goes out as CSV, SQLite, JSON or XLSX, and every chart saves as SVG, PNG
+			or a one-page PDF.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Preferences</span>
+		<h3>Light or dark</h3>
+		<p>
+			Every page, table and chart comes in a light and a dark theme. Each reader
+			chooses on the Preferences page, or follows the device.
+			<a href="#preferences">How preferences work</a>.
+		</p>
+	</article>
+</div>
+
+<h2>How it fits together</h2>
+<ol class="steps">
+	<li>
+		<strong>A file is a table.</strong> A small adapter reads CSV, SQLite,
+		JSON, XML or XLSX through <code>Database::Abstraction</code> and hands back
+		rows and columns. Nothing is written back to the file.
+	</li>
+	<li>
+		<strong>One pipeline, many views.</strong> Joins, combines, date
+		normalisation, calculated fields, named groups, filters, relative ranges
+		and cross-row passes happen in a fixed order, so a table, a chart, a pivot
+		and a canvas card over the same parameters see the same rows.
+	</li>
+	<li>
+		<strong>Charts are snippets, not images.</strong> Each chart page renders a
+		D3 script into the page, which is why a chart can be resized, exported as a
+		file and cross-filter another card on a canvas.
+	</li>
+	<li>
+		<strong>A canvas is a saved configuration.</strong> The document holds the
+		datasets, the joins, the visuals and their grid positions; opening it
+		re-renders every card against today's data.
+	</li>
+</ol>
+
+<h2>Quick start</h2>
+<pre><code>cpanm Database::BI          # or: cpanm --installdeps .  in a checkout
+script/database-bi          # development server, reloads on edit
+script/database-bi data/store.db   # the same, showing that one database
+hypnotoad script/database-bi   # preforking server for real use</code></pre>
+<p>
+	Then put your data files in <code>data/</code> beside the launcher, or point
+	<code>data_dir</code> at a directory of your own, and open the home page.
+	<a href="install.html#run">Naming one database</a> shows it there instead.
+	The application ships a tutorial in plain English at <code>/tutorial</code>;
+	it assumes no Perl and is the place to start.
+</p>
+
+<div class="note">
+	<p>
+		<strong>Your rows stay put.</strong> The application reads files from the
+		machine it runs on and keeps no database of its own. The optional AI
+		features are off unless a key is configured, and even then prompts carry
+		column names and types or aggregate text &mdash; never row data or file paths.
+		Map pages never send what you type anywhere: there is no place-search box.
+	</p>
+</div>
+
+<h2 id="preferences">Preferences</h2>
+<p>
+	The Preferences link at the top of every page opens <code>/preferences</code>,
+	where a reader chooses how the application looks to them. It has one setting
+	so far, the theme:
+</p>
+<dl class="spec">
+	<dt>Same as this device</dt>
+	<dd>The default. Light or dark, following the setting on the computer or phone, even if that changes while a page is open.</dd>
+	<dt>Light</dt>
+	<dd>Dark text on a pale background.</dd>
+	<dt>Dark</dt>
+	<dd>Pale text on a dark background, for the tables and the charts as well as the pages around them. Map tiles keep their usual colours.</dd>
+</dl>
+<p>
+	A choice takes effect at once, with no Save button, and pages open in other
+	tabs follow it. Saved charts and printed pages always use the light colours,
+	so they look the same to whoever receives them, and so does a canvas embedded
+	in another site, whose colours it cannot know.
+</p>
+
+<div class="note">
+	<p>
+		<strong>Preferences belong to the browser.</strong> They are kept in its
+		<code>localStorage</code> and never reach the server, so there is nothing to
+		configure and no account to sign in to, and another browser or computer keeps
+		its own. If the browser refuses to store a choice, the page says so and the
+		choice lasts only until the next page.
+	</p>
+</div>
+
+<h2>Where to go next</h2>
+<ul class="plain">
+	<li><a href="charts.html">Charts</a> &mdash; the nine chart pages, maps and word clouds.</li>
+	<li><a href="canvas.html">Canvases</a> &mdash; cards, layout, cross-filtering, sharing.</li>
+	<li><a href="data.html">Data</a> &mdash; sources, joins, filters, ranges, calculated fields.</li>
+	<li><a href="api.html">API</a> &mdash; the JSON endpoints behind every page.</li>
+	<li><a href="install.html">Install</a> &mdash; requirements, configuration, command-line tools.</li>
+</ul>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a> &middot;
+			<a href="https://nigelhorne.github.io/Database-BI/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

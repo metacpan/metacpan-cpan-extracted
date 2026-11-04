@@ -1,0 +1,52 @@
+# The base flavor: what every troglodyne repository has, whatever perl it runs
+# on.  It names no perlcritic profile, because which profile is right depends
+# on the perl, so a repository picks troglodyne-5.040 or troglodyne-compat.
+name: troglodyne
+description: The agent harness and tools of every troglodyne repository
+checks:
+  ClaudeMd:
+    file: CLAUDE.md
+    template: templates/CLAUDE.md
+    mentions:
+      - perl-slop:reading-perl
+  ToolConfiguration:
+    files:
+      .perltidyrc: templates/perltidyrc
+      .preferred_modules.ini: templates/preferred_modules.ini
+      .pod_stopwords: templates/pod_stopwords
+      .tests-covering-map.pl: templates/tests-covering-map
+  GitHooks:
+    directory: git-hooks
+    hooks:
+      pre-commit: templates/pre-commit
+      post-commit: templates/post-commit
+    differ: info
+    replace: false
+    install: true
+  DistFiles:
+    marker: dist.ini
+    absent: info
+    files:
+      weaver.ini: templates/weaver.ini
+      Changes: templates/Changes
+      prereqs.yml: templates/prereqs.yml
+  PerlSlopConfig:
+    module: DataSchema
+    file: .perl-slop.json
+    missing: info
+    schema:
+      type: object
+      additionalProperties: false
+      properties:
+        before_edit:
+          type: object
+        before_commit:
+          type: object
+  ClaudeSettings:
+    file: .claude/settings.json
+    missing: info
+    plugins:
+      - perl-slop@troglodyne-marketplace
+  Workflows:
+    directory: .github/workflows
+    required: {}

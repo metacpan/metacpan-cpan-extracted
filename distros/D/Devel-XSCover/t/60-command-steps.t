@@ -11,6 +11,7 @@ use XSCoverTest ();
 use Devel::XSCover ();
 
 plan skip_all => 'shell scripts stand in for make and cover here' if $^O eq 'MSWin32';
+delete local @ENV{qw(HARNESS_PERL_SWITCHES PERL5OPT)};
 
 my $dir = File::Temp->newdir;
 my $abs = Cwd::abs_path("$dir");
@@ -47,7 +48,7 @@ my @log = <$lf>;
 chomp @log;
 like($log[0], qr/^fake-make OPTIMIZE=-O0 -g -fprofile-arcs -ftest-coverage -fprofile-update=atomic(?: -fcondition-coverage)? OTHERLDFLAGS=-fprofile-arcs -ftest-coverage \[\]$/, 'first the build, without the switches');
 is($log[1], 'stale', 'the build step still saw the stale counter file, since the build comes first');
-like($log[2], qr/^fake-make test \[(?:-I\S+ )?-MDevel::XSCover::Deparse -MDevel::Cover=-db,\Q$abs\E\/cover_db,-ignore,\^\/\]$/, 'then the tests under Devel::Cover with the deparse module first, the stale counter file gone by then');
+like($log[2], qr/^fake-make test \[(?:-I\S+ )?-MDevel::XSCover::Deparse -MDevel::Cover=-db,\Q$abs\E\/cover_db,-ignore,\^\/,-ignore,\/Install\/Files\\\.pm\$\]$/, 'then the tests under Devel::Cover with the deparse module first, the stale counter file gone by then');
 like($log[3], qr/^fake-cover -x -nogcov -report XSCover \Q$abs\E\/cover_db \[\]$/, 'then cover on the database, with its own gcov pass off');
 is(scalar @log, 4, 'and nothing else ran');
 like($out, qr/removed 1 stale counter file left by an earlier run/, 'which is said');

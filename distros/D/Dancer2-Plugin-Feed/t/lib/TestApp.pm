@@ -43,16 +43,15 @@ get '/other/feed/atom' => sub {
 sub _get_entries {
     my $entries = [ map { { title => "entry $_", category => [ ('a') x $_ ] } }
           ( 0 .. 4 ) ];
-    push $entries->@*,
-      { title => "entry 10: scalar category", category => 'a' };
-    push $entries->@*,
+    push @{$entries}, { title => "entry 10: scalar category", category => 'a' };
+    push @{$entries},
       { title => "entry 11: scalar empty category", category => '' };
-    push $entries->@*,
+    push @{$entries},
       {
         title    => "entry 12: array category with one empty item",
         category => ['']
       };
-    push $entries->@*,
+    push @{$entries},
       {
         title    => "entry 13: array category with empty item inbetween",
         category => [ 'a', '', 'b' ]

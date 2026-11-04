@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -13,6 +13,7 @@ use List::Util		qw(min max sum);
 use CGI::Info;
 use CGI::Lingua;
 use Database::BI::Tutorial;
+use Database::BI::Util;
 use Mojo::File;
 use Mojo::JSON		qw(encode_json decode_json);
 use Mojo::Parameters;
@@ -32,6 +33,36 @@ use version ();
 
 # File extensions that Database::Abstraction can probe, in probe order.
 # .sql, .sqlite, and .sqlite3 are all SQLite databases; .db is Berkeley DB.
+# As many digits as a request parameter may have and still be exact in a Perl
+# number.  More than this is not a page number or a limit, it is someone probing.
+Readonly my $MAX_WHOLE_NUMBER_DIGITS => 15;
+Readonly my %ANALYSIS_KEYS => map { $_ => 1 } qw(id version created updated name datasets joins combines fields measures params visuals layout bookmarks hierarchies);
+Readonly my $MAX_HISTOGRAM_BINS      => 200;
+
+# What a text card on a canvas may be styled with.  The fonts are ones browsers
+# already have, so a card needs no CDN, and a stored card names a font by its
+# key: only the CSS written here ever reaches a style attribute.
+Readonly my @TEXT_FONTS => (
+	{ value => '',          label => 'Same as the page', css => '' },
+	{ value => 'arial',     label => 'Arial',            css => 'Arial, Helvetica, sans-serif' },
+	{ value => 'georgia',   label => 'Georgia',          css => 'Georgia, "Times New Roman", serif' },
+	{ value => 'times',     label => 'Times New Roman',  css => '"Times New Roman", Times, serif' },
+	{ value => 'verdana',   label => 'Verdana',          css => 'Verdana, Geneva, sans-serif' },
+	{ value => 'trebuchet', label => 'Trebuchet MS',     css => '"Trebuchet MS", Helvetica, sans-serif' },
+	{ value => 'courier',   label => 'Courier New',      css => '"Courier New", Courier, monospace' },
+);
+Readonly my %TEXT_FONT_CSS  => map { $_->{value} => $_->{css} } grep { length $_->{value} } @TEXT_FONTS;
+Readonly my %TEXT_ALIGNS    => map { $_ => 1 } qw(left center right);
+Readonly my $MIN_TEXT_POINTS => 8;
+Readonly my $MAX_TEXT_POINTS => 96;
+Readonly my $MAX_TEXT_CHARS  => 20_000;
+Readonly my $TEXT_TITLE_CHARS => 60;
+
+# What HTML::D3 calls its heatmap colour scales.
+Readonly my %SEQUENTIAL_SCHEMES => map { $_ => 1 } qw(YlOrRd Blues Greens Purples RdPu YlGnBu);
+Readonly my $DEFAULT_SEQUENTIAL_SCHEME  => 'YlOrRd';
+Readonly my $DEFAULT_CATEGORICAL_SCHEME => 'tableau10';
+
 Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx );
 # Use \z (absolute end-of-string) not $ (which permits a trailing \n before \z).
 # A query param decoded from "file.csv%0A" has basename "sales.csv\n"; without \z
@@ -58,6 +89,15 @@ Readonly my $REDIS_SPEC_RE => qr{\Aredis:([^|]+)\|(redis://.+)\z}si;
 # Bare Redis URL -- no table name -- used to list available keys.
 # Excludes '|' so it cannot match the redis:table|redis://... full spec.
 Readonly my $REDIS_URL_RE  => qr{\Aredis://[^\s|]+\z}si;
+
+# MariaDB spec: mariadb:server/table, where server names an entry in the
+# mariadb_servers configuration.  A spec travels in URLs, links and saved
+# canvases, so it holds no address or password.  It has no '|', which also lets
+# it be the right side of a j= join.
+Readonly my $MARIADB_SPEC_RE   => qr{\Amariadb:([A-Za-z_][A-Za-z0-9_]*)/([A-Za-z_][A-Za-z0-9_]*)\z};
+
+# A server with no table: lists its tables.
+Readonly my $MARIADB_SERVER_RE => qr{\Amariadb:([A-Za-z_][A-Za-z0-9_]*)\z};
 
 # Hostname pattern accepted in /../hostname/... remote paths.
 # Mirrors Database::Abstraction's own host validation regex.
@@ -99,6 +139,8 @@ Readonly my %MESSAGES => (
 	error_upload_ext       => 'Unsupported file type. Accepted: CSV, TSV, PSV, XML, SQLite (.sql, .sqlite, .sqlite3), Berkeley DB (.db), XLSX',
 	error_upload_too_large => 'File too large (maximum %s MiB)',
 	error_upload_save      => 'Could not save uploaded file',
+	error_uploads_clear    => 'Could not clear the uploaded files',
+	error_export_sqlite    => 'Could not build the SQLite export; the server log has the reason',
 	error_path_required    => '"path" parameter is required',
 	error_url_required     => 'Please enter a URL',
 	error_url_invalid      => '"%s" is not a valid http:// or https:// URL',
@@ -121,12 +163,45 @@ Readonly my %MESSAGES => (
 	error_date_pattern          => 'Unsupported date format pattern "%s"; allowed: %%m/%%d/%%Y, %%d/%%m/%%Y, %%d-%%b-%%Y',
 	error_date_time_pattern     => 'Unsupported time format pattern "%s"; allowed: %%H:%%M, %%H:%%M:%%S',
 	error_date_as               => 'as= must be "timestamp" or absent; "%s" is neither',
+	error_lookup_name           => 'Lookup name "%s" is not a valid identifier',
+	error_lookup_unknown        => 'Lookup "%s" is not stored for any dataset',
+	error_lookup_remote         => 'Lookup "%s": "%s" is not a file; a lookup reads a file under data_dir (use Import for a URL)',
+	error_lookup_outside        => 'Lookup "%s": "%s" is not under data_dir',
+	error_lookup_not_found      => 'Lookup "%s": file "%s" not found, or not a supported data file',
+	error_lookup_too_large      => 'Lookup "%s": "%s" is %d bytes, more than a lookup may be (%d)',
+	error_lookup_unreadable     => 'Lookup "%s": cannot read "%s": %s',
+	error_lookup_key_unknown    => 'Lookup "%s": key column "%s" is not in "%s"',
+	error_lookup_field_unknown  => 'Lookup "%s": field "%s" is not in "%s"',
+	error_lookup_col_unknown    => 'Lookup "%s": column "%s" is not in this dataset (nolk=%s skips the lookup)',
+	error_lookup_name_taken     => 'Lookup "%s": field "%s" cannot be added, because "%s" is a column already',
+	warn_lookup_duplicate_key   => 'Lookup "%s": %d duplicate key(s) in "%s"; the first row of each is used',
+	error_extract_name          => 'Extraction name "%s" is not a valid identifier',
+	error_extract_pattern       => 'Extraction "%s": %s',
+	error_extract_no_names      => 'Extraction "%s": the pattern names no group; write one as (?<name>...) for each column',
+	error_extract_field         => 'Extraction "%s": the pattern has no group named "%s"',
+	error_extract_col_unknown   => 'Extraction "%s": column "%s" is not in this dataset',
+	error_extract_name_taken    => 'Extraction "%s": group "%s" cannot be added, because "%s" is a column already',
+	error_accel_spec            => 'Cannot accelerate "%s": it must be a table: or path: spec naming a local file that exists',
+	error_accel_sqlite          => 'Cannot accelerate "%s": it is a SQLite database already',
+	error_accel_open            => 'Cannot accelerate "%s": the file cannot be opened: %s',
+	error_accel_store           => 'Cannot accelerate "%s": the model store cannot be written (model_dir inside data_dir, or not writable)',
+	error_accel_build           => 'Cannot accelerate "%s": %s',
 	error_analysis_not_found    => 'Analysis "%s" not found',
 	error_analysis_invalid      => 'Invalid analysis spec: %s',
 	error_analysis_version      => 'Unsupported analysis version %s; please upgrade the application',
 	error_analysis_storage      => 'Analysis storage is not writable; use import/export instead',
 	error_analysis_json         => 'Invalid JSON body: %s',
 	error_analysis_id_invalid   => 'Invalid analysis id',
+	error_text_card_empty       => 'A text card needs some text',
+	error_text_card_long        => 'A text card can hold at most %d characters',
+	error_text_card_font        => 'That font is not one of the choices',
+	error_text_card_size        => 'The size must be a whole number of points from %d to %d',
+	error_text_card_colour      => 'A colour must be written #rrggbb',
+	error_text_card_align       => 'The alignment must be left, center or right',
+	error_text_card_options     => 'options must be given as an object',
+	error_text_card_columns     => 'A text card has no columns to change',
+	error_text_card_no_data     => 'A text card has no data to download',
+	error_visual_not_text       => 'Only a text card can be removed',
 	error_param_range           => "Parameter '%s' is out of range (min %s, max %s)",
 	error_param_type            => "Parameter '%s' must be a number",
 	error_map_source            => 'A map needs loc=<column> to geocode, or both lat= and lon= coordinate columns',
@@ -136,6 +211,7 @@ Readonly my %MESSAGES => (
 	error_map_coordinate_numeric => 'Columns "%s" and "%s" hold no numeric coordinate pairs; a map needs numbers, or loc=<column> to geocode places',
 	error_map_no_markers        => 'No row has a location that could be plotted',
 	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.12 or later, and it is not installed',
+	error_map_renderer_failed   => 'The map could not be drawn; the server log has the reason',
 	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.12 or later, but the installed HTML::OSM is %s',
 	warn_join_schema_mismatch   => 'Column "%s" has type %s in %s but %s in %s; the join keeps both columns, so check which one a calculation uses',
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
@@ -183,6 +259,8 @@ Readonly my %MESSAGES => (
 Readonly my $MAX_UPLOAD_MIB      => 50;
 Readonly my $MAX_UPLOAD_BYTES    => $MAX_UPLOAD_MIB * 1_048_576;
 Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
+Readonly my $LOOKUP_MAX_BYTES      => 8 * 1_048_576;	# a bigger file is a join, not a lookup
+Readonly my $LOOKUP_NAME_RE        => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 Readonly my $DEFAULT_MAP_GEOCODE_MAX => 500;   # new lookups per request (map_geocode_max)
 Readonly my $DEFAULT_MAP_MAX_MARKERS => 2_000; # markers drawn per request (map_max_markers)
 Readonly my $DEFAULT_MARKER_COLOR  => '#3388ff'; # Leaflet default blue
@@ -324,6 +402,34 @@ Readonly my $SHARE_TOKEN_TTL => 30 * 86_400;
 # Protected helpers
 # ---------------------------------------------------------------------------
 
+# _whole_number($value) -> $integer | undef
+#
+# A request parameter as an integer, or undef if it does not spell one.  int()
+# on the raw text warns on 'abc' and turns it into 0, and reads a long run of
+# digits or '1e400' as infinity, which no LIMIT or OFFSET can use.
+sub _whole_number {
+	my $value = $_[0];
+	return undef unless defined($value) && $value =~ /\A-?\d{1,$MAX_WHOLE_NUMBER_DIGITS}\z/;
+	return $value + 0;
+}
+
+# _categorical_scheme($name) -> $name
+# _sequential_scheme($name) -> $name
+#
+# A colour scheme the chart can use, or the default.  These must be checked here:
+# HTML::D3 writes a categorical name into its script as SCHEMES['name'], so an
+# unchecked value is script on the page, and it dies on a sequential name it does
+# not know, which is a 500.  An unknown name has always drawn the default colours.
+sub _categorical_scheme {
+	my $name = $_[0];
+	return (defined($name) && !ref($name) && $SCATTER_SCHEMES{$name}) ? $name : $DEFAULT_CATEGORICAL_SCHEME;
+}
+
+sub _sequential_scheme {
+	my $name = $_[0];
+	return (defined($name) && !ref($name) && $SEQUENTIAL_SCHEMES{$name}) ? $name : $DEFAULT_SEQUENTIAL_SCHEME;
+}
+
 # _pagination($self) -> ($page, $per_page, $offset)
 #
 # Reads ?page= and ?per_page= from the current request, clamps them to sane
@@ -333,10 +439,10 @@ Readonly my $SHARE_TOKEN_TTL => 30 * 86_400;
 sub _pagination {
 	my $self = $_[0];
 
-	my $per_page = int($self->param('per_page') || $DEFAULT_PER_PAGE);
+	my $per_page = _whole_number($self->param('per_page')) || $DEFAULT_PER_PAGE;
 	$per_page = 1         if $per_page < 1;
 	$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
-	my $page = int($self->param('page') || 1);
+	my $page = _whole_number($self->param('page')) || 1;
 	$page = 1 if $page < 1;
 	my $offset = ($page - 1) * $per_page;
 	return ($page, $per_page, $offset);
@@ -547,8 +653,9 @@ sub _crumb_parent :Protected ($self, $url) {
 		return undef unless $spec =~ /\Apath:(.+)\z/;
 		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($1)->dirname->to_string));
 	}
+	# A canvas came from where its back= says, else from the list of canvases.
 	if ($path =~ m{\A/a/}) {
-		return $self->_crumb_local($q->param('back'));
+		return $self->_crumb_local($q->param('back')) // Mojo::URL->new('/canvases');
 	}
 	return undef;
 }
@@ -565,14 +672,16 @@ sub _crumb_label :Protected ($self, $url) {
 	return _crumb_spec_name("table:$1") . $view if $path =~ m{\A/view/([^/]+)\z};
 
 	if ($path eq '/open') {
-		my $name = Mojo::File->new($q->param('path') // '')->basename;
+		my $file = $q->param('path') // '';
+		return undef unless length $file;
+		my $name = Mojo::File->new($file)->basename;
 		my $it   = $q->param('it');
 		$name .= ": $it" if defined $it && length $it;
 		return length $name ? "$name$view" : undef;
 	}
 	# Either route takes both joins and combined files.
 	if ($path eq '/join' || $path eq '/combine') {
-		my @names = map { _crumb_spec_name($_) } grep { /\A(?:table|path|url|redis):/i }
+		my @names = map { _crumb_spec_name($_) } grep { /\A(?:table|path|url|redis|mariadb):/i }
 			($q->param('l') // ''),
 			(map { (split /\|/, $_, 2)[0] // '' } @{ $q->every_param('j') }),
 			@{ $q->every_param('c') };
@@ -595,7 +704,9 @@ sub _crumb_label :Protected ($self, $url) {
 		return length $dir ? 'Files: ' . Mojo::File->new($dir)->basename : 'Files';
 	}
 	return 'Catalog'  if $path eq '/catalog';
+	return 'Canvases' if $path eq '/canvases';
 	return 'Tutorial' if $path eq '/tutorial';
+	return 'Preferences' if $path eq '/preferences';
 	if ($path =~ m{\A/a/([A-Za-z0-9_-]+)}) {
 		my $a = $self->_read_analyses->{$1};
 		return (ref $a eq 'HASH' && length($a->{name} // '')) ? $a->{name} : 'Canvas';
@@ -619,6 +730,8 @@ sub _crumb_spec_name {
 		return $host // $1;
 	}
 	return 'Redis' if $spec =~ /\Aredis:/i;
+	return "$1: $2" if $spec =~ $MARIADB_SPEC_RE;
+	return $1       if $spec =~ $MARIADB_SERVER_RE;
 	return $spec;
 }
 
@@ -830,7 +943,15 @@ sub _data_dir_for ($app) {
 sub _scan_data_dir :Protected ($self) {
 	my $dir = _data_dir_for($self->app);
 	return [] unless -d $dir;
-	return $dir->list->map(sub {
+
+	# A directory that exists but may not be read holds nothing this application
+	# can show, and must not take the home page with it.
+	my $files = eval { $dir->list };
+	unless ($files) {
+		$self->app->log->error("Cannot read data_dir $dir: " . _tidy_error($@));
+		return [];
+	}
+	return $files->map(sub {
 		my $base = $_->basename;
 		return unless $base =~ $EXT_RE;
 		(my $name = $base) =~ s/\.[^.]+\z//;
@@ -879,6 +1000,203 @@ sub _scan_join_tables :Protected ($self) {
 	return \@all;
 }
 
+# _tidy_error($error) -> $string
+#
+# Purpose: A backend error as a reader should see it: without the "at FILE line N"
+#          that croak adds each time the error is passed up, or the list of
+#          library directories perl adds when a module is missing.
+sub _tidy_error {
+	my $error = $_[0] // '';
+	$error =~ s/\s*\(\@INC (?:contains|entries checked):.*?\)(?=\s+at\s|\s*\z)//sg;
+	$error =~ s/(?:\s+at \S.*? line \d+\.?)+\s*\z//;
+	return $error;
+}
+
+# _analysis_json_error($error) -> $string
+#
+# Purpose: The message for a canvas request whose body is not a JSON object.
+#          Entry: the error from decode_json, which is empty when the body parsed
+#          but was an array or a scalar, and otherwise ends in a library's path.
+sub _analysis_json_error {
+	my $reason = _tidy_error($_[0]);
+	return sprintf($MESSAGES{error_analysis_json}, length($reason) ? $reason : 'expected a JSON object');
+}
+
+# ---------------------------------------------------------------------------
+# Accelerated views (Phase 7 item 7.5)
+#
+# A dataset marked in models.json accelerated.<spec> is read from a SQLite copy
+# of itself, built by script/bi-extract through Database::BI::Extract, as long
+# as the copy's fingerprint (the spec, and the file's mtime and size) still
+# matches the file.  When it does not, the file itself is read and the table
+# page says the extract is stale: stale numbers are never served.  An extract is
+# a cache.  Deleting <model_dir>/extracts/ only makes every accelerated dataset
+# read its file again, and nothing is ever written under data_dir.
+# ---------------------------------------------------------------------------
+
+# _model_dir_of($app) -> Mojo::File
+#
+# Purpose: model_dir as a path: absolute as configured, or under the app home.
+#          Nothing is created and nothing is checked; the writers check.
+sub _model_dir_of {
+	my ($app) = @_;
+	my $cfg = Mojo::File->new($app->config('model_dir') // '.bi');
+	return $cfg->is_abs ? $cfg : $app->home->child($cfg->to_string);
+}
+
+# _accel_file($self, $spec) -> $path | undef
+#
+# Purpose: The local file a spec can be accelerated from: table:<name> in
+#          data_dir, or path:<file>.  An internal table, a remote path and
+#          every other kind of spec have none.
+sub _accel_file :Protected ($self, $spec) {
+	$spec //= '';
+	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)\z}) {
+		my $data_dir = _data_dir_for($self->app);
+		my ($file) = grep { -f } map { $data_dir->child(lc($1) . ".$_")->to_string } @SUPPORTED_EXT;
+		return $file;
+	}
+	if ($spec =~ m{\Apath:(?!/\.\./)(.+)\z}) {
+		my $file = eval { Mojo::File->new($1)->realpath };
+		return (defined $file && -f $file && $file->basename =~ $EXT_RE) ? $file->to_string : undef;
+	}
+	return undef;
+}
+
+# _accelerated_source($self, $spec) -> $DataSource | undef
+#
+# Purpose: The extract of an accelerated dataset, when it still matches the file.
+# Exit:    The extract opened as a source, or undef: the spec is not accelerated,
+#          or its extract is missing or stale, and the caller reads the file.
+#          The first call in a request stashes acceleration => { state =>
+#          'fresh' | 'stale', built => epoch, spec => $spec } for the table page.
+sub _accelerated_source :Protected ($self, $spec) {
+	return undef if $self->stash('_no_acceleration');
+	return undef unless defined $spec && length $spec;
+	# Only this application's controller has a model store; a bare controller
+	# (a test's, calling _open_spec as a function) has nothing accelerated.
+	return undef unless $self->isa(__PACKAGE__);
+	$spec = canonical_spec($spec);
+	my $entry = $self->_read_models->{accelerated}{$spec};
+	return undef unless ref $entry eq 'HASH';
+	my $file = $self->_accel_file($spec) // return undef;
+
+	my @st = stat $file;
+	require Database::BI::Extract;
+	my $cache = Database::BI::Extract->new(model_dir => _model_dir_of($self->app)->to_string);
+	my $path  = $cache->get($spec, $st[9], $st[7]);
+	my $src;
+	if (defined $path) {
+		my $x = Mojo::File->new($path);
+		$src = eval { $self->open_table($x->basename =~ s/\.db\z//r, directory => $x->dirname->to_string,
+			(ref $entry->{columns} eq 'ARRAY' ? (column_order => $entry->{columns}) : ())) };
+	}
+	require POSIX;
+	my $built = $src ? (stat $path)[9] : $entry->{built};
+	$self->stash(acceleration => {
+		spec       => $spec,
+		state      => ($src ? 'fresh' : 'stale'),
+		built      => $built,
+		built_text => (defined $built && $built =~ /\A\d+\z/ ? POSIX::strftime('%Y-%m-%d %H:%M', localtime $built) : ''),
+	}) unless $self->stash('acceleration');
+	return $src;
+}
+
+# _is_sqlite_file($path) -> $bool
+#
+# Purpose: True for a SQLite database, whatever its extension (a .db may be one).
+sub _is_sqlite_file {
+	my ($path) = @_;
+	open my $fh, '<:raw', $path or return 0;
+	my $n = read $fh, my $head, 16;
+	close $fh;
+	return ($n && $head eq "SQLite format 3\0") ? 1 : 0;
+}
+
+# accelerate($c, $spec) -> \%built
+#
+# Purpose: Mark a dataset accelerated and build its extract: the rows its file
+#          gives, in a SQLite file under <model_dir>/extracts/.  Called by
+#          script/bi-extract; not a route.
+# Entry:   $c is a controller of the application (Mojolicious build_controller);
+#          $spec is a table: or path: spec naming a local, non-SQLite file.
+# Exit:    { spec, path, rows, columns, built } -- the extract written and when.
+#          The model store records accelerated.<spec> = { built, file, rows }.
+#          Croaks error_accel_spec, error_accel_sqlite, error_accel_open,
+#          error_accel_store or error_accel_build.
+# Side Effects: Writes the extract, removes the one it replaces, and writes
+#          models.json.
+sub accelerate {
+	my ($c, $spec) = @_;
+	croak 'accelerate() needs a controller and a spec' unless ref $c && defined $spec;
+	# Filed under the resolved spec, which is what the file's page asks for;
+	# messages name the spec as the caller wrote it.
+	my $key = canonical_spec($spec);
+	my $file = $c->_accel_file($spec)
+		// croak $c->_i18n('error_accel_spec', $spec);
+	croak $c->_i18n('error_accel_sqlite', $spec) if $file =~ /\.(?:sql|sqlite3?)\z/i || _is_sqlite_file($file);
+	defined $c->_calc_models_path or croak $c->_i18n('error_accel_store', $spec);
+
+	# Read the file itself, not the extract being replaced.
+	local $c->stash->{_no_acceleration} = 1;
+	my @st = stat $file;
+	my ($src) = $c->_open_spec($spec);
+	croak $c->_i18n('error_accel_open', $spec, _tidy_error($c->stash('open_spec_error') // 'unreadable')) unless $src;
+	my ($records, @columns);
+	my $ok = eval {
+		$records = $src->fetch_all;
+		@columns = _get_columns($src, $records);
+		1;
+	};
+	croak $c->_i18n('error_accel_open', $spec, _tidy_error($@)) unless $ok;
+	my $bytes = eval { $c->_write_sqlite_db($records, \@columns, 'extract') };
+	croak $c->_i18n('error_accel_build', $spec, _tidy_error($@)) unless defined $bytes;
+
+	require Database::BI::Extract;
+	my $cache = Database::BI::Extract->new(model_dir => _model_dir_of($c->app)->to_string);
+	my $path  = eval { $cache->put($key, $st[9], $st[7], $bytes) };
+	croak $c->_i18n('error_accel_build', $spec, _tidy_error($@)) unless defined $path;
+
+	my $models = $c->_read_models;
+	my $old    = $models->{accelerated}{$key};
+	my $name   = Mojo::File->new($path)->basename;
+	if (ref $old eq 'HASH' && defined $old->{file} && $old->{file} ne $name && $old->{file} =~ /\A[0-9a-f]{32}\.db\z/) {
+		unlink Mojo::File->new($path)->dirname->child($old->{file})->to_string;
+	}
+	my $built = time;
+	# The file's own column order: the extract would list its columns alphabetically.
+	$models->{accelerated}{$key} = { built => $built, file => $name, rows => scalar(@$records), columns => \@columns };
+	$c->_write_models($models) or croak $c->_i18n('error_accel_store', $spec);
+	return { spec => $key, path => $path, rows => scalar(@$records), columns => scalar(@columns), built => $built };
+}
+
+# unaccelerate($c, $spec) -> $bool
+#
+# Purpose: Stop reading a dataset from an extract, and remove its extract.
+# Exit:    True when the spec was accelerated.
+sub unaccelerate {
+	my ($c, $spec) = @_;
+	croak 'unaccelerate() needs a controller and a spec' unless ref $c && defined $spec;
+	$spec = canonical_spec($spec);	# unaccelerate names no spec in a message
+	my $models = $c->_read_models;
+	my $entry  = delete $models->{accelerated}{$spec};
+	return 0 unless ref $entry eq 'HASH';
+	if (defined $entry->{file} && $entry->{file} =~ /\A[0-9a-f]{32}\.db\z/) {
+		unlink _model_dir_of($c->app)->child('extracts', $entry->{file})->to_string;
+	}
+	$c->_write_models($models);
+	return 1;
+}
+
+# accelerated_specs($c) -> @specs
+#
+# Purpose: Every spec marked accelerated, sorted, for script/bi-extract --all.
+sub accelerated_specs {
+	my ($c) = @_;
+	croak 'accelerated_specs() needs a controller' unless ref $c;
+	return sort keys %{ $c->_read_models->{accelerated} };
+}
+
 # _open_spec($self, $spec) -> ($DataSource, $label) or ()
 #
 # Purpose: Parse a "table:name", "table:file/table" or "path:/abs/path" spec,
@@ -890,6 +1208,12 @@ sub _scan_join_tables :Protected ($self) {
 #          (invalid spec format, file missing, DataSource init error).
 # Side Effects: Filesystem stat; DataSource construction (reads file header).
 sub _open_spec :Protected ($self, $spec) {
+	# An accelerated dataset whose extract still matches its file is read from
+	# the extract, under the file's own label.
+	if (my $fast = _accelerated_source($self, $spec)) {
+		my $label = $spec =~ m{\Atable:(.+)\z} ? lc $1 : Mojo::File->new($spec =~ s/\Apath://r)->basename;
+		return ($fast, $label);
+	}
 	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
 		my ($table, $internal) = ($1, $2);
 		$table = lc $table;
@@ -931,6 +1255,12 @@ sub _open_spec :Protected ($self, $spec) {
 		my ($table, $redis_url) = ($1, $2);
 		my $src = eval { $self->open_table($table, redis => $redis_url) };
 		return ($src, $table) if $src && !$@;
+	} elsif($spec =~ $MARIADB_SPEC_RE) {
+		my ($server, $table) = ($1, $2);
+		my $src = eval { $self->open_table($table, mariadb => $server) };
+		return ($src, $table) if $src;
+		# A server has more ways to fail than a file has; /open says which.
+		$self->stash(open_spec_error => _tidy_error($@));
 	}
 	return ();
 }
@@ -1013,6 +1343,7 @@ sub _spec_to_url :Protected ($self, $spec) {
 	return '/open?path=' . url_escape($1) if $spec =~ /\Apath:(.+)\z/;
 	return '/import?url=' . url_escape($1) if $spec =~ $URL_SPEC_RE;
 	return '/' if $spec =~ $REDIS_SPEC_RE;
+	return '/open?path=' . url_escape($spec) if $spec =~ $MARIADB_SPEC_RE;
 	return '/';
 }
 
@@ -1103,7 +1434,7 @@ sub _get_columns {
 #          timestamp (YYYY-MM-DDTHH:MM:SS) or the same with a space separator,
 #          which is what CSV exports and SQLite text columns usually hold.
 sub _is_iso_date {
-	return $_[0] =~ /\A\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\z/;
+	return defined($_[0]) && $_[0] =~ /\A\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\z/;
 }
 
 # Convert M/D/YYYY or YYYY-MM-DD to YYYY-MM-DD; returns undef for other formats.
@@ -1111,6 +1442,7 @@ sub _is_iso_date {
 # timestamp cell is the caller's to compare, not this sub's to truncate.
 sub _to_iso_date {
 	my ($v) = @_;
+	return unless defined $v;
 	return $v if _is_iso_date($v);
 	if (my ($m, $d, $y) = $v =~ m{\A(\d{1,2})/(\d{1,2})/(\d{4})\z}) {
 		return sprintf '%04d-%02d-%02d', $y, $m, $d;
@@ -1354,8 +1686,14 @@ sub _apply_filter_spec {
 	# bound and "2026-10-27T09:15:00" sorts after "2026-10-27".
 	my $prec = ($is_date && $val =~ /\A\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/) ? 19 : 10;
 	my $nval = $is_date ? (_date_key($val, $prec) // $val) : $val;
+	# An order is a statement about numbers.  A blank or a word has no place in
+	# one, so it matches none of the four, rather than counting as zero.
+	my $by_number = !$is_date && $op =~ /\A(?:lt|le|gt|ge)\z/;
+	my $num_val   = $by_number ? _numeric_cell($val) : undef;
 	return [grep {
 		my $cell  = $_->{$col} // '';
+		my $num   = $by_number ? _numeric_cell($cell) : undef;
+		my $both  = defined $num && defined $num_val;
 		# Normalise M/D/YYYY cells to ISO for date comparisons so that the
 		# ISO values produced by <input type="date"> match against either format.
 		my $ncell = $is_date
@@ -1365,10 +1703,10 @@ sub _apply_filter_spec {
 		$op eq 'ne'       ? ($is_date ? $ncell ne $nval  : lc($cell) ne $lval) :
 		$op eq 'contains' ? index(lc($cell), $lval) != -1                      :
 		$op eq 'starts'   ? index(lc($cell), $lval) == 0                       :
-		$op eq 'lt'       ? ($is_date ? $ncell lt $nval  : $cell <  $val)      :
-		$op eq 'le'       ? ($is_date ? $ncell le $nval  : $cell <= $val)      :
-		$op eq 'gt'       ? ($is_date ? $ncell gt $nval  : $cell >  $val)      :
-		$op eq 'ge'       ? ($is_date ? $ncell ge $nval  : $cell >= $val)      :
+		$op eq 'lt'       ? ($is_date ? $ncell lt $nval  : $both && $num <  $num_val) :
+		$op eq 'le'       ? ($is_date ? $ncell le $nval  : $both && $num <= $num_val) :
+		$op eq 'gt'       ? ($is_date ? $ncell gt $nval  : $both && $num >  $num_val) :
+		$op eq 'ge'       ? ($is_date ? $ncell ge $nval  : $both && $num >= $num_val) :
 		$op eq 'empty'    ? $cell eq ''                                         :
 		$op eq 'notempty' ? $cell ne ''                                         :
 		$op eq 'between'  ? do {
@@ -1908,7 +2246,17 @@ sub _reduce_records {
 	# these rows a second time.
 	return ($records, $columns) if $opts && $opts->{chips_only};
 
+	# A filter on a column stage 6 or 7 will write has to wait for it: f=ytd:gt:50
+	# selects rows by their running total, and must not change those totals.  So
+	# every filter that can run first does, and the rest run last.
+	my $crossing = (!$opts || !$opts->{no_cross_row}) && length($self->param('cs') // '');
+	my %written  = $crossing ? map { $_ => 1 } _cross_row_written($self) : ();
+	my @late;
 	for my $s (@{ _filter_specs($self) }) {
+		if ($written{ (split /:/, $s, 2)[0] // '' }) {
+			push @late, $s;
+			next;
+		}
 		$records = _apply_filter_spec($records, $s);
 	}
 
@@ -1923,9 +2271,11 @@ sub _reduce_records {
 	# has to see filtered rows -- a window is over what the filters left -- and it
 	# has to run before anything paginates, which is why the routes that slice
 	# their own page call it again (once) inside _fetch_page.
-	if (!$opts || !$opts->{no_cross_row}) {
-		($records, $columns) = $self->_apply_cross_row($records, $columns)
-			if length($self->param('cs') // '');
+	if ($crossing) {
+		($records, $columns) = $self->_apply_cross_row($records, $columns);
+		# Stage 7: the calculated fields stage 4 held back for these columns.
+		($records, $columns) = $self->_apply_held_calc_fields($records, $columns);
+		$records = _apply_filter_spec($records, $_) for @late;
 	}
 
 	return ($records, $columns);
@@ -2165,13 +2515,7 @@ sub _measure {
 # Used by the Perl fold path of _grouped_totals so all four chart routes
 # share one extraction function.
 sub _numeric_cell {
-	my $v = shift;
-	return undef unless defined $v && length($v);
-	my $is_acct_neg = ($v =~ /\A\s*\(/);
-	(my $n = $v) =~ s/[^\d.-]//g;
-	$n = "-$n" if $is_acct_neg && $n =~ /\A\d/;
-	return undef unless $n =~ /\A-?\d+(?:\.\d+)?\z/;
-	return $n + 0;
+	return Database::BI::Util::parse_number($_[0]);
 }
 
 # _percentile_of(\@sorted, $level) -> $number | undef
@@ -2402,7 +2746,7 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	# the backend and would cause a "No such column" SQL error before the fold fallback.
 	my $virt        = $self->stash('_virtual_columns') // {};
 	my $has_virtual = grep { $virt->{$_} }
-		(@$by, (defined $val_col ? $val_col : ()));
+		(@$by, (defined $val_col ? $val_col : ()), map { (split /:/, $_, 2)[0] // () } @f_specs);
 
 	unless ($ENV{BI_FORCE_PERL_AGG} || _dedup_requested($self) || $has_virtual || !$can_push_filters || $has_null_by_key || !$source
 		|| !_measure_pushable($source, $fn, $val_col, $records)) {
@@ -2513,6 +2857,18 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	return \@result;
 }
 
+# _rows_of_page(\@rows, $offset, $per_page) -> \@page
+#
+# One page of rows, in an array of its own.  The rows may be a backend's own
+# read-only array, as they are from a DBI handle that is not SQLite, so they are
+# copied and never spliced.
+sub _rows_of_page {
+	my ($rows, $offset, $per_page) = @_;
+	my $last = $offset + $per_page - 1;
+	$last = $#$rows if $last > $#$rows;
+	return [ @{$rows}[$offset .. $last] ];
+}
+
 # _fetch_page( $self, $source, \%params ) -> ( $records, $has_next )
 #   params: per_page  -- page size (required)
 #           offset    -- 0-based row offset (required)
@@ -2562,7 +2918,8 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# approach.  Avoid the noise by only using the N+1 fast path for SQL-backed
 	# sources.  For non-SQL sources (CSV, XLSX, in-memory) the reduction path
 	# below materialises the full set and paginates in Perl.
-	my $is_sql = $source->can('dbi_source') && $source->dbi_source;
+	my $is_sql = ($source->can('dbi_source') && $source->dbi_source)
+		|| ($source->can('pages_on_server') && $source->pages_on_server);
 
 	# A cross-row column is a column of the whole filtered set, so a request that
 	# names one cannot take the N+1 fast path: it would see one page of rows and
@@ -2583,8 +2940,7 @@ sub _fetch_page :Protected ($self, $source, $params) {
 		# Non-SQL fast path: fetch all, sort in Perl, then paginate.
 		my $all = $source->selectall_arrayref(@sort_args) // [];
 		my $has_next = (@$all > $offset + $per_page) ? 1 : 0;
-		my @page = splice(@$all, $offset, $per_page);
-		return (\@page, $has_next);
+		return (_rows_of_page($all, $offset, $per_page), $has_next);
 	}
 
 	# Always fetch all rows in Perl and filter with _apply_filter_spec.
@@ -2605,7 +2961,45 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	$self->_apply_date_normalization($all, [_get_columns($source, $all)],
 		$self->_calc_spec_key);
 
-	$all = _apply_filter_spec($all, $_) for @f_specs;
+	# A failure below is a 400 about the request.  It is rendered here, and the
+	# caller sees the stash and returns rather than drawing a page over it.
+	my $refuse = sub {
+		my ($why) = @_;
+		$why =~ s/ at \S+ line \d+\.?\n?$//;
+		$self->render(text => $why, status => 400);
+		$self->stash('_cross_row_error' => $why);
+		return;
+	};
+
+	# Stage 4.  The page's own fields run on the sliced page (_page_columns), which
+	# is enough to show them, but a filter or a window that reads one needs it on
+	# every row, and before them.  That pass then only repeats these, on one page.
+	$all = [ @$all ];	# the backend's own array can be read-only
+	my @cols_so_far;
+	if (defined $params->{calc_spec_key}) {
+		my @before = _get_columns($source, $all);
+		my $span   = @before ? $self->_span_calc_spec(\@before, ()) : undef;
+		if ($span && $span->{error}) {
+			$refuse->($span->{error});
+			return ();
+		}
+		my ($r, $c) = eval {
+			$self->_calc_for_page($all, \@before, {
+				spec_key => $params->{calc_spec_key},
+				($span ? (calc => $span->{calc}) : ()),
+			})
+		};
+		unless ($r) {
+			$refuse->($@);
+			return ();
+		}
+		($all, @cols_so_far) = ($r, @$c);
+	}
+
+	# A filter on a column stages 6 and 7 write waits for them.  See _reduce_records.
+	my %written = $cross ? map { $_ => 1 } _cross_row_written($self) : ();
+	my @late    = grep { $written{ (split /:/, $_, 2)[0] } } @f_specs;
+	$all = _apply_filter_spec($all, $_) for grep { !$written{ (split /:/, $_, 2)[0] } } @f_specs;
 
 	if ($dedup) {
 		my $cols = $source->columns;
@@ -2613,25 +3007,27 @@ sub _fetch_page :Protected ($self, $source, $params) {
 		$all = _dedup_records($all, \@dcols);
 	}
 
-	# Stage 6, and before the slice: a running total has to see every filtered
-	# row, or page 2 would start again from zero.  A spec that cannot be honoured
-	# renders its 400 here; the caller returns rather than drawing a page over it.
+	# Stages 6 and 7, before the slice: a running total has to see every filtered
+	# row, or page 2 would start again from zero.
 	if ($cross) {
 		my $cols  = $source->columns;
-		my @xcols = $cols ? @$cols : (sort keys %{ $all->[0] // {} });
-		my ($crossed) = eval { $self->_apply_cross_row($all, \@xcols) };
-		if ($@) {
-			(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
-			$self->render(text => $e, status => 400);
-			$self->stash('_cross_row_error' => $e);
+		my @xcols = @cols_so_far ? @cols_so_far
+			: $cols ? @$cols : (sort keys %{ $all->[0] // {} });
+		my $done = eval {
+			my ($r, $c) = $self->_apply_cross_row($all, \@xcols);
+			($all) = $self->_apply_held_calc_fields($r, $c);
+			1;
+		};
+		unless ($done) {
+			$refuse->($@);
 			return ();
 		}
-		$all = $crossed;
+		$all = _apply_filter_spec($all, $_) for @late;
 	}
 
 	my $total    = scalar @$all;
 	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
-	my @page     = splice(@$all, $offset, $per_page);
+	my @page     = @{ _rows_of_page($all, $offset, $per_page) };
 
 	return (\@page, $has_next);
 }
@@ -2753,10 +3149,13 @@ sub _list_dir :Protected ($self, $dir, $want_files) {
 #          The temporary file is created, written, read, and then unlinked in
 #          one synchronous sequence.  Used by both _render_sqlite (HTTP download)
 #          and export_write (filesystem write) to eliminate code duplication.
-# Entry:   $records is an arrayref of hashrefs; $columns is an arrayref of names.
+# Entry:   $records is an arrayref of hashrefs; $columns is an arrayref of names;
+#          $table names the table, "data" unless given.  An extract passes
+#          "extract", which Database::Abstraction before 0.54 needed (it could
+#          not read a table called "data"); extracts already built use it.
 # Exit:    Returns scalar binary string.  Croaks on any DBI error.
 # Side Effects: Creates and unlinks one temporary file under system tmpdir.
-sub _write_sqlite_db :Protected ($self, $records, $columns) {
+sub _write_sqlite_db :Protected ($self, $records, $columns, $table = 'data') {
 	# D~ fix: an empty column list produces "CREATE TABLE data ()" which is
 	# invalid SQLite syntax.  Croak before touching the filesystem.
 	croak 'Cannot export SQLite: result set has no columns'
@@ -2779,11 +3178,12 @@ sub _write_sqlite_db :Protected ($self, $records, $columns) {
 	# triggers cleanup (disconnect + unlink) before the error propagates.
 	eval {
 		my @quoted = map { (my $c = $_) =~ s/"/""/g; qq{"$c"} } @$columns;
-		$dbh->do('CREATE TABLE "data" (' . join(', ', map { "$_ TEXT" } @quoted) . ')');
+		(my $t = $table) =~ s/"/""/g;
+		$dbh->do(qq{CREATE TABLE "$t" (} . join(', ', map { "$_ TEXT" } @quoted) . ')');
 		if (@$records) {
 			my $ph  = join(', ', ('?') x scalar @$columns);
 			my $sth = $dbh->prepare(
-				'INSERT INTO "data" (' . join(', ', @quoted) . ") VALUES ($ph)"
+				qq{INSERT INTO "$t" (} . join(', ', @quoted) . ") VALUES ($ph)"
 			);
 			for my $row (@$records) {
 				$sth->execute(map { $row->{$_} } @$columns);
@@ -2900,7 +3300,7 @@ sub _run_pipeline_source :Protected ($self) {
 #          addressed by, which names its spec explicitly because it has no l=.
 sub _calc_spec_key :Protected ($self) {
 	my $l = $self->param('l') // '';
-	return $l if length $l;
+	return canonical_spec($l) if length $l;
 	my $table = $self->stash('table');
 	return (defined $table && $table =~ /$TABLE_NAME_RE/) ? "table:$table" : '';
 }
@@ -2968,7 +3368,7 @@ sub _span_calc_spec :Protected ($self, $columns, @dimension_params) {
 		my $stored = length($sk) ? (($self->_read_models)->{fields}{$sk} // {}) : {};
 		$found = 1 if $stored->{$name};
 		for my $spec (@{ $self->every_param('c') // [] }) {
-			next if $spec =~ /\A(?:path:|table:|url:|redis:)/i;
+			next if $spec =~ /\A(?:path:|table:|url:|redis:|mariadb:)/i;
 			my ($n) = $spec =~ /\A([A-Za-z_][A-Za-z0-9_]*):/;
 			$found = 1 if defined $n && $n eq $name;
 		}
@@ -3012,6 +3412,276 @@ sub _apply_date_normalization :Protected ($self, $records, $columns, $spec_key) 
 	}
 }
 
+# _lookups_of_request($self, $spec_key) -> @lookups
+#
+# Purpose: The lookups this request applies, in order: those stored for
+#          $spec_key, by name, then each lk=<name> stored for another dataset,
+#          less every nolk=<name>.
+# Entry:   $spec_key files the stored lookups (the l= spec, or a canvas's).
+# Exit:    A list of { name => $name, %definition }.  Croaks error_lookup_unknown
+#          for an lk= that names no stored lookup, and error_lookup_name for one
+#          that is not an identifier.
+sub _lookups_of_request :Protected ($self, $spec_key) {
+	my $all  = $self->_read_models->{lookups};
+	my %skip = map { $_ => 1 } @{ $self->every_param('nolk') // [] };
+	my $own  = (length($spec_key // '') && ref $all->{$spec_key} eq 'HASH') ? $all->{$spec_key} : {};
+
+	my (@lookups, %seen);
+	for my $name (sort keys %$own) {
+		next if $skip{$name} || ref $own->{$name} ne 'HASH';
+		push @lookups, { %{ $own->{$name} }, name => $name };
+		$seen{$name} = 1;
+	}
+	for my $name (@{ $self->every_param('lk') // [] }) {
+		next if $seen{$name}++ || $skip{$name};
+		croak $self->_i18n('error_lookup_name', $name) unless $name =~ $LOOKUP_NAME_RE;
+		# Another dataset's lookup, the first by the order of the specs, so the
+		# choice does not depend on how the store happens to be read.
+		my ($def) = grep { ref $_ eq 'HASH' }
+			map { $all->{$_}{$name} } sort keys %$all;
+		croak $self->_i18n('error_lookup_unknown', $name) unless $def;
+		push @lookups, { %$def, name => $name };
+	}
+	return @lookups;
+}
+
+# _lookup_file($self, $name, $file) -> $path
+#
+# Purpose: Resolve a lookup's file= to the file it reads.  A relative path is
+#          under data_dir; an absolute one must be, after symlinks are resolved,
+#          so a link inside data_dir cannot reach outside it.
+# Entry:   $name names the lookup in the messages.
+# Exit:    The resolved path as a string.  Croaks error_lookup_remote (a URL or
+#          another source spec, or a remote /../host/ path), error_lookup_outside,
+#          error_lookup_not_found (missing, or not a supported extension) or
+#          error_lookup_too_large (over $LOOKUP_MAX_BYTES).
+sub _lookup_file :Protected ($self, $name, $file) {
+	$file //= '';
+	# Two letters at least before the colon, so C:\data is still a path.
+	croak $self->_i18n('error_lookup_remote', $name, $file)
+		if $file =~ m{\A(?:[A-Za-z][A-Za-z0-9+.-]+:|/\.\./)};
+	croak $self->_i18n('error_lookup_not_found', $name, $file) unless length $file;
+
+	my $data_dir = _data_dir_for($self->app);
+	my $given    = Mojo::File->new($file);
+	my $path     = $given->is_abs ? $given : $data_dir->child($file);
+	croak $self->_i18n('error_lookup_outside', $name, $file)
+		unless _inside_dir(_canonical_path($path), _canonical_path($data_dir));
+	croak $self->_i18n('error_lookup_not_found', $name, $file)
+		unless -f $path && $path->basename =~ $EXT_RE;
+	my $size = -s $path // 0;
+	croak $self->_i18n('error_lookup_too_large', $name, $file, $size, $LOOKUP_MAX_BYTES)
+		if $size > $LOOKUP_MAX_BYTES;
+	return _canonical_path($path);
+}
+
+# _load_lookup($self, $lookup) -> \%entry
+#
+# Purpose: Read a lookup's file into a map from key to row, once per request.
+# Entry:   $lookup is one entry of _lookups_of_request.
+# Exit:    { map => { key => \%row }, fields => \@names, file => $basename }.
+#          Keys are compared as strings after trimming, case-sensitively; a
+#          duplicate key keeps its first row and is logged once.  Croaks one of
+#          _lookup_file's errors, error_lookup_unreadable, error_lookup_key_unknown
+#          or error_lookup_field_unknown.
+# Side Effects: Caches the entry in the stash, keyed by name, path and mtime.
+sub _load_lookup :Protected ($self, $lookup) {
+	my $name = $lookup->{name};
+	my $path = $self->_lookup_file($name, $lookup->{file});
+	my $file = Mojo::File->new($path)->basename;
+	my $memo = $self->stash('_lookup_maps') // {};
+	my $tag  = join "\0", $name, $path, (stat $path)[9] // 0,
+		$lookup->{key} // '', @{ ref $lookup->{fields} eq 'ARRAY' ? $lookup->{fields} : [] };
+	return $memo->{$tag} if $memo->{$tag};
+
+	(my $table = $file) =~ s/\.[^.]+\z//;
+	my ($src, $rows);
+	my $ok = eval {
+		$src  = $self->open_table($table, directory => Mojo::File->new($path)->dirname->to_string);
+		$rows = $src->fetch_all;
+		1;
+	};
+	croak $self->_i18n('error_lookup_unreadable', $name, $file, _tidy_error($@)) unless $ok;
+
+	my @columns = _get_columns($src, $rows);
+	my %has     = map { $_ => 1 } @columns;
+	my $key     = $lookup->{key} // '';
+	croak $self->_i18n('error_lookup_key_unknown', $name, $key, $file) unless $has{$key};
+
+	my @fields = ref $lookup->{fields} eq 'ARRAY' && @{ $lookup->{fields} }
+		? @{ $lookup->{fields} }
+		: grep { $_ ne $key } @columns;
+	for my $f (@fields) {
+		croak $self->_i18n('error_lookup_field_unknown', $name, $f, $file) unless $has{$f};
+	}
+
+	my (%map, $duplicates);
+	for my $row (@$rows) {
+		my $k = _lookup_key($row->{$key});
+		next unless defined $k && length $k;
+		if (exists $map{$k}) {
+			$duplicates++;
+			next;
+		}
+		$map{$k} = { map { $_ => $row->{$_} } @fields };
+	}
+	$self->app->log->warn($self->_i18n('warn_lookup_duplicate_key', $name, $duplicates, $file))
+		if $duplicates;
+
+	$memo->{$tag} = { map => \%map, fields => \@fields, file => $file };
+	$self->stash('_lookup_maps' => $memo);
+	return $memo->{$tag};
+}
+
+# _lookup_key($value) -> $key | undef
+#
+# Purpose: The form in which a lookup compares a key: the string, trimmed.  Case
+#          and everything else are left as they are, so "ab" and "AB" are two keys.
+sub _lookup_key {
+	my ($v) = @_;
+	return undef unless defined $v && !ref $v;
+	(my $k = $v) =~ s/\A\s+|\s+\z//g;
+	return $k;
+}
+
+# _apply_lookups($self, $records, \@cols, $spec_key) -> void
+#
+# Purpose: Stage 3 of the pipeline: each lookup the request applies adds its
+#          fields to every row, read from the lookup file's row whose key equals
+#          the row's own (col=, which defaults to the key's name).  A row whose
+#          key is missing gets the lookup's default, or undef.
+# Entry:   \@cols is the column list so far; it gains the new columns.
+# Exit:    Rows are replaced through _extend_row where they must be.  The new
+#          columns are virtual, so an aggregate that groups by one is folded in
+#          Perl.  Croaks with a message for a bad lookup or a missing column.
+# Notes:   A field lands under its own name unless a column has it, and then
+#          under <lookup>_<field>; a source column is never overwritten.  The
+#          columns this pass wrote do not count as taken when it runs again in
+#          the same request, so the names a page gets do not depend on how
+#          many times the stage has run over it.
+sub _apply_lookups :Protected ($self, $records, $cols, $spec_key) {
+	my @lookups = $self->_lookups_of_request($spec_key);
+	return unless @lookups;
+
+	my $written = $self->stash('_lookup_written') // {};
+	my %taken   = map { $_ => 1 } grep { !$written->{$_} } @$cols;
+	for my $lookup (@lookups) {
+		my $name  = $lookup->{name};
+		my $entry = $self->_load_lookup($lookup);
+		my $col   = length($lookup->{col} // '') ? $lookup->{col} : $lookup->{key};
+		croak $self->_i18n('error_lookup_col_unknown', $name, $col, $name)
+			unless $taken{$col} || $written->{$col};
+
+		my @out;
+		for my $f (@{ $entry->{fields} }) {
+			my $as = $taken{$f} ? "${name}_$f" : $f;
+			croak $self->_i18n('error_lookup_name_taken', $name, $f, $as) if $taken{$as};
+			$taken{$as} = 1;
+			push @out, [ $f, $as ];
+		}
+
+		my $default = $lookup->{default};
+		my $map     = $entry->{map};
+		for my $i (0 .. $#$records) {
+			my $k   = _lookup_key($records->[$i]{$col});
+			my $hit = defined $k ? $map->{$k} : undef;
+			for my $pair (@out) {
+				$records->[$i] = _extend_row($records->[$i], $pair->[1],
+					$hit ? $hit->{ $pair->[0] } : $default);
+			}
+		}
+
+		my %have = map { $_ => 1 } @$cols;
+		push @$cols, grep { !$have{$_} } map { $_->[1] } @out;
+		$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+		for my $pair (@out) {
+			$self->stash('_virtual_columns')->{ $pair->[1] } = 1;
+			$written->{ $pair->[1] } = 1;
+		}
+	}
+	$self->stash('_lookup_written' => $written);
+	return;
+}
+
+# _compile_extraction($self, $name, \%definition) -> (\%compiled, \@fields)
+#
+# Purpose: Check a stored extraction and compile its pattern, the same way on
+#          save and on every request.
+# Exit:    The compiled pattern (Calc::compile_pattern) and the named groups it
+#          writes: fields= when it was given, else every named group, in order.
+#          Croaks error_extract_pattern (wrapping Calc's reason),
+#          error_extract_no_names or error_extract_field.
+sub _compile_extraction :Protected ($self, $name, $def) {
+	require Database::BI::Calc;
+	my $compiled = eval { Database::BI::Calc::compile_pattern($def->{pattern}) };
+	croak $self->_i18n('error_extract_pattern', $name, _tidy_error($@)) unless $compiled;
+	my @names = @{ $compiled->{names} };
+	croak $self->_i18n('error_extract_no_names', $name) unless @names;
+	my %named  = map { $_ => 1 } @names;
+	my @fields = ref $def->{fields} eq 'ARRAY' && @{ $def->{fields} } ? @{ $def->{fields} } : @names;
+	for my $f (@fields) {
+		croak $self->_i18n('error_extract_field', $name, $f) unless $named{$f};
+	}
+	return ($compiled, \@fields);
+}
+
+# _apply_extractions($self, $records, \@cols, $spec_key) -> void
+#
+# Purpose: The stored extractions of $spec_key, after the lookups in stage 3:
+#          each named group of a pattern becomes a column, read from the column
+#          the extraction names.  A row the pattern does not match, or whose
+#          cell is empty, gets '(unparseable)', so it groups visibly rather than
+#          vanishing; a group that took no part in a match is ''.
+# Entry:   \@cols is the column list so far; it gains the new columns.
+# Exit:    Croaks with a message for a bad pattern or a missing column.
+# Notes:   Columns are named as a lookup's are: the group's own name unless a
+#          column has it, then <extraction>_<group>.  A capture is cut to 200
+#          characters (Calc::capture_of).
+sub _apply_extractions :Protected ($self, $records, $cols, $spec_key) {
+	return unless length($spec_key // '');
+	my $stored = $self->_read_models->{extractions}{$spec_key};
+	return unless ref $stored eq 'HASH' && %$stored;
+
+	my $written = $self->stash('_extract_written') // {};
+	my %taken   = map { $_ => 1 } grep { !$written->{$_} } @$cols;
+	for my $name (sort keys %$stored) {
+		my $def = $stored->{$name};
+		next unless ref $def eq 'HASH';
+		my ($compiled, $fields) = $self->_compile_extraction($name, $def);
+		my $col = $def->{col} // '';
+		croak $self->_i18n('error_extract_col_unknown', $name, $col)
+			unless $taken{$col} || $written->{$col};
+
+		my @out;
+		for my $f (@$fields) {
+			my $as = $taken{$f} ? "${name}_$f" : $f;
+			croak $self->_i18n('error_extract_name_taken', $name, $f, $as) if $taken{$as};
+			$taken{$as} = 1;
+			push @out, [ $f, $as ];
+		}
+
+		# The groups were checked against the pattern, so undef is a row it
+		# does not match, and a group that took no part is ''.
+		for my $i (0 .. $#$records) {
+			my $v = $records->[$i]{$col};
+			for my $pair (@out) {
+				my $got = Database::BI::Calc::capture_of($compiled, $v, $pair->[0]);
+				$records->[$i] = _extend_row($records->[$i], $pair->[1], $got // '(unparseable)');
+			}
+		}
+
+		my %have = map { $_ => 1 } @$cols;
+		push @$cols, grep { !$have{$_} } map { $_->[1] } @out;
+		$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+		for my $pair (@out) {
+			$self->stash('_virtual_columns')->{ $pair->[1] } = 1;
+			$written->{ $pair->[1] } = 1;
+		}
+	}
+	$self->stash('_extract_written' => $written);
+	return;
+}
+
 # _extend_row($row, $name, $value) -> $row | \%copy
 #
 # Purpose: Write a virtual column into a row that came out of a source.  A row
@@ -3038,9 +3708,230 @@ sub _extend_row {
 	return { %$row, $name => $value };
 }
 
+# _write_calc_column($self, $records, \@cols, $name, $calc)
+#
+# Purpose: Evaluate one compiled calculated field over the rows and write it as
+#          a column, recording it as virtual so _grouped_totals skips the SQL
+#          push path.  \@cols gains the name if it is new.
+sub _write_calc_column :Protected ($self, $records, $cols, $name, $calc) {
+	my $undef_count = 0;
+	for my $i (0 .. $#$records) {
+		my $row = $records->[$i];
+		my $val = $calc->evaluate($row);
+		$undef_count++ unless defined $val;
+		# Store '(unparseable)' rather than undef so that pivot/bar
+		# grouping (which skips empty-string keys) keeps these rows in a
+		# visible '(unparseable)' bucket rather than silently dropping them.
+		# See _extend_row for why the row may have to be replaced.
+		$records->[$i] = _extend_row($row, $name,
+			defined $val ? $val : '(unparseable)');
+	}
+	if ($undef_count) {
+		$self->app->log->warn($self->_i18n('warn_calc_undef', $name, $undef_count));
+	}
+	push @$cols, $name unless grep { $_ eq $name } @$cols;
+	$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
+	$self->stash('_virtual_columns')->{$name} = 1;
+	return;
+}
+
+# _apply_held_calc_fields($self, $records, \@columns, $card) -> ($records, \@columns)
+#
+# Purpose: Stage 7 of the pipeline: the calculated fields stage 4 held back,
+#          now that the cross-row columns they name exist.  Each was checked
+#          against those names when it was held, so a failure here is reported
+#          as any other compile failure is.
+# Entry:   $card is true for a canvas card.  A canvas holds a field for any
+#          card's plan, so a field that does not compile against this card's
+#          columns belongs to another card, and this card goes without it.
+# Exit:    The rows and columns, extended.  The list is a new array, and both
+#          come back as they arrived when nothing is held.
+sub _apply_held_calc_fields :Protected ($self, $records, $columns, $card = 0) {
+	my $held = $self->stash('_held_calc_fields');
+	return ($records, $columns) unless $held && @$held;
+
+	require Database::BI::Calc;
+	my @cols = @{ $columns // [ sort keys %{ $records->[0] // {} } ] };
+	for my $cs (@$held) {
+		my $calc = Database::BI::Calc->new(
+			expr    => $cs->{expr},
+			columns => \@cols,
+			params  => $cs->{params},
+		);
+		if ($calc->has_error) {
+			next if $card;
+			croak $self->_i18n('error_calc_compile', $cs->{name}, $calc->error);
+		}
+		$self->_write_calc_column($records, \@cols, $cs->{name}, $calc);
+	}
+	return ($records, \@cols);
+}
+
+# _cross_row_aliases(@specs) -> @names
+#
+# Purpose: The columns a list of cs= specs will add: the third field of each.
+#          Only names are wanted, so a malformed spec simply has none; refusing
+#          it is the work of _cross_row_specs_from.
+sub _cross_row_aliases {
+	return map { (split /:/, $_, 4)[2] // () } grep { defined && !ref && length } @_;
+}
+
+# _cross_row_written($self) -> @names
+#
+# Purpose: The columns this request writes at stages 6 and 7: the cs= aliases and
+#          the calculated fields held back for them.  A filter on one of these
+#          has to run after them.
+sub _cross_row_written {
+	my ($self) = @_;
+	return (
+		_cross_row_aliases(@{ $self->every_param('cs') // [] }),
+		map { $_->{name} } @{ $self->stash('_held_calc_fields') // [] },
+	);
+}
+
+# _canvas_window_columns($analysis, $params, \@more) -> \@names
+#
+# Purpose: Every column a cross-row plan may add on this canvas: the page's cs=,
+#          read from $params, and each card's own plan.  \@more holds cards that
+#          are not on the canvas yet: one being added, or being given a new plan.
+sub _canvas_window_columns {
+	my ($analysis, $params, $more) = @_;
+	my @specs = @{ $params->every_param('cs') // [] };
+	for my $vis (@{ $analysis->{visuals} // [] }, @{ $more // [] }) {
+		next unless ref $vis eq 'HASH' && ref $vis->{cross_row} eq 'HASH'
+			&& ref $vis->{cross_row}{cs} eq 'ARRAY';
+		push @specs, @{ $vis->{cross_row}{cs} };
+	}
+	return [ _cross_row_aliases(@specs) ];
+}
+
+# _canvas_cross_filter($self, $records, \@columns, \@specs) -> ($records, \@late)
+#
+# Purpose: Apply a canvas's cross-filter to a card's rows, except any spec on a
+#          column a cross-row plan writes.  That column does not exist yet, so
+#          the spec comes back for _render_visual_html to apply after the pass.
+sub _canvas_cross_filter :Protected ($self, $records, $columns, $specs) {
+	my %written = map { $_ => 1 }
+		@{ $self->stash('_canvas_window_names') // [] },
+		map { $_->{name} } @{ $self->stash('_held_calc_fields') // [] };
+	delete @written{ @$columns };
+	my @late;
+	for my $spec (@$specs) {
+		if ($written{ (split /:/, $spec, 2)[0] // '' }) {
+			push @late, $spec;
+			next;
+		}
+		$records = _apply_filter_spec($records, $spec);
+	}
+	return ($records, \@late);
+}
+
+# _calc_specs_of_request($self) -> @specs
+#
+# Purpose: The calculated fields among the request's c= params, leaving out the
+#          files it stacks, which share that parameter.
+sub _calc_specs_of_request :Protected ($self) {
+	return grep { !/\A(?:path|table|url|redis|mariadb):/i } @{ $self->every_param('c') // [] };
+}
+
+# _page_columns($self, $source, $records, $spec_key) -> ($records, \@columns) | ()
+#
+# Purpose: The columns of a table page from _fetch_page, with the calculated
+#          fields and any span= bucket drawn on its rows.  A page is one slice,
+#          so _fetch_page has already run them over the whole set if a filter or
+#          a window needed them; this pass is what puts them on the page.
+# Entry:   $spec_key files the stored fields: the page's left_spec.
+# Exit:    The rows and columns; or the empty list after rendering a 400, and the
+#          caller returns.
+sub _page_columns :Protected ($self, $source, $records, $spec_key) {
+	my @columns  = _get_columns($source, $records);
+	my %seen_col = map { $_ => 1 } @columns;
+	# Stage 6 wrote its columns onto the rows before the page was sliced, so the
+	# list is what makes the table show them, and lets a field below read one.
+	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+	# Nothing to draw a field from: a source with no declared columns and no rows.
+	return ($records, \@columns) unless @columns;
+
+	# span= adds a bucket column to the table rather than grouping it: a table has
+	# no dimension to bucket *into*, so the reader gets the column and the raw
+	# value beside it.  See _span_calc_spec.
+	my $span = $self->_span_calc_spec(\@columns, ());
+	if ($span && $span->{error}) {
+		$self->render(text => $span->{error}, status => 400);
+		return ();
+	}
+
+	my ($calc_records, $calc_columns) = eval {
+		$self->_calc_for_page($records, \@columns, {
+			spec_key => $spec_key,
+			($span ? (calc => $span->{calc}) : ()),
+		})
+	};
+	unless ($calc_records) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		$self->render(text => $e, status => 400);
+		return ();
+	}
+	return ($calc_records, $calc_columns);
+}
+
+# _calc_for_page($self, $records, \@columns, \%extra) -> ($records, \@columns)
+#
+# Purpose: _apply_calc_fields for a table page, which must still be drawn when a
+#          definition saved for its data cannot be applied -- a lookup file that
+#          is gone, a column an extraction or a field reads that the file no
+#          longer has.  Every chart and export of that data refuses with the
+#          reason, and the panels that mend a definition are on the table page,
+#          so a page that refused too would leave the reader no way back.
+# Entry:   As _apply_calc_fields; $extra->{spec_key} files the definitions.
+# Exit:    As _apply_calc_fields.  When the first pass croaks and a second one
+#          without the saved fields, lookups and extractions succeeds, returns
+#          that, with stash stored_error holding the first pass's reason and
+#          _skip_stored set for the rest of the request.  Otherwise croaks with
+#          the first pass's error, so a mistake in the request's own c= is the
+#          400 it always was.
+# Side Effects: The first pass runs on a copy of the rows when anything is
+#          saved, so a pass that failed half way leaves nothing on them.
+sub _calc_for_page :Protected ($self, $records, $columns, $extra) {
+	my $stored = !$self->stash('_skip_stored') && $self->_has_stored_columns($extra->{spec_key});
+	my $rows   = $stored ? [ map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$records ] : $records;
+	my @got    = eval { $self->_apply_calc_fields($rows, $columns, $extra) };
+	return @got if @got && $got[0];
+	my $error = $@;
+	croak $error unless $stored;
+
+	$self->stash('_skip_stored' => 1);
+	@got = eval { $self->_apply_calc_fields($records, $columns, $extra) };
+	unless (@got && $got[0]) {
+		$self->stash('_skip_stored' => 0);
+		croak $error;
+	}
+	$self->stash(stored_error => _tidy_error($error));
+	return @got;
+}
+
+# _has_stored_columns($self, $spec_key) -> $bool
+#
+# Purpose: Whether anything saved for $spec_key adds columns that can fail: a
+#          calculated field, a lookup (its own, or another's through lk=) or an
+#          extraction.
+# Entry:   $spec_key may be undef, when the request's l= is the key.
+# Exit:    True or false.
+sub _has_stored_columns :Protected ($self, $spec_key) {
+	$spec_key = canonical_spec($spec_key // $self->param('l') // '');
+	return 1 if @{ $self->every_param('lk') // [] };
+	return 0 unless length $spec_key;
+	my $models = $self->_read_models;
+	for my $kind (qw(fields lookups extractions)) {
+		my $set = $models->{$kind}{$spec_key};
+		return 1 if ref $set eq 'HASH' && %$set;
+	}
+	return 0;
+}
+
 # _apply_calc_fields($self, $records, \@columns, \%extra) -> ($records, \@columns)
 #
-# Reads ?c=<name>:<expression> params (those NOT matching a path:/table:/url:/redis:
+# Reads ?c=<name>:<expression> params (those NOT matching a path:/table:/url:/redis:/mariadb:
 # source spec) and compiles each via Database::BI::Calc.  Evaluates per row,
 # appending the virtual column to each row hashref.  Croaks on compile error
 # (caller renders 400); runtime undef values are logged at warn level.
@@ -3054,6 +3945,14 @@ sub _extend_row {
 #   calc     => \@specs -- additional ?c=-style specs, for a canvas whose query
 #                          string arrived with the request rather than as the
 #                          request's own parameters.
+#   window_columns => \@names -- the columns the cross-row pass will add, for a
+#                          canvas, whose plans are not the request's own cs=.
+#
+# A field that needs a cross-row column cannot run yet: stage 6 comes after the
+# filters this stage feeds.  So a field that fails to compile, and would compile
+# once those columns exist, is held back for _apply_held_calc_fields.  Any other
+# failure is still the error it always was, a mistyped name included, so holding
+# cannot hide a mistake, and with no cs= nothing is ever held.
 sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 	my $bound_params     = ($extra // {})->{params}   // {};
 	my $spec_key_override = ($extra // {})->{spec_key};
@@ -3064,16 +3963,29 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 	# file uses a non-ISO format (e.g. M/D/YYYY).
 	my $date_spec = defined $spec_key_override
 		? $spec_key_override : ($self->param('l') // '');
+	# A canvas dataset's spec comes from the stored canvas, not the request,
+	# so the hook that spells the request's specs one way has not seen it.
+	$date_spec = canonical_spec($date_spec);
 	$self->_apply_date_normalization($records, $columns, $date_spec);
+
+	# Stage 3: the stored lookups, so that a field, a filter, a bucket or a window
+	# can read a looked-up column.  They join the column list from here on.
+	# _skip_stored is set by _calc_for_page when one of them cannot be applied:
+	# the table page is drawn without them, so its panels can mend them.
+	my $skip_stored = $self->stash('_skip_stored');
+	my @cols = @{$columns};
+	unless ($skip_stored) {
+		$self->_apply_lookups($records, \@cols, $date_spec);
+		$self->_apply_extractions($records, \@cols, $date_spec);
+	}
 
 	# Build calc spec list: stored fields from models.json first (lower priority),
 	# then URL ?c= params (higher priority -- they override stored fields of the
 	# same name so the user can test a new expression without permanently saving).
 	my (@calc_specs, %seen_calc);
 	{
-		my $sk = defined $spec_key_override
-			? $spec_key_override : ($self->param('l') // '');
-		if (length $sk) {
+		my $sk = $date_spec;
+		if (length $sk && !$skip_stored) {
 			my $stored = ($self->_read_models)->{fields}{$sk} // {};
 			for my $n (sort keys %{$stored}) {
 				push @calc_specs, { name => $n, expr => $stored->{$n} };
@@ -3083,7 +3995,7 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 	}
 	for my $spec (@{ $self->every_param('c') // [] }, @$extra_calc) {
 		# Skip source specs handled by _run_pipeline_source.
-		next if $spec =~ /\A(?:path:|table:|url:|redis:)/i;
+		next if $spec =~ /\A(?:path:|table:|url:|redis:|mariadb:)/i;
 		my ($name, $expr) = ($spec =~ /\A([A-Za-z_][A-Za-z0-9_]*):(.+)\z/s);
 		next unless defined $name && defined $expr;
 		if (exists $seen_calc{$name}) {
@@ -3094,7 +4006,10 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 		}
 	}
 
-	my @cols = @{$columns};
+	my @window = $extra && $extra->{window_columns}
+		? @{ $extra->{window_columns} }
+		: _cross_row_aliases(@{ $self->every_param('cs') // [] });
+	my @held;
 
 	if (@calc_specs) {
 		require Database::BI::Calc;
@@ -3105,39 +4020,34 @@ sub _apply_calc_fields :Protected ($self, $records, $columns, $extra = undef) {
 				columns => \@cols,
 				params  => $bound_params,
 			);
-			croak $self->_i18n('error_calc_compile', $name, $calc->error)
-				if $calc->has_error;
-
-			my $undef_count = 0;
-			for my $i (0 .. $#$records) {
-				my $row = $records->[$i];
-				my $val = $calc->evaluate($row);
-				$undef_count++ unless defined $val;
-				# Store '(unparseable)' rather than undef so that pivot/bar
-				# grouping (which skips empty-string keys) keeps these rows in a
-				# visible '(unparseable)' bucket rather than silently dropping them.
-				# See _extend_row for why the row may have to be replaced.
-				$records->[$i] = _extend_row($row, $name,
-					defined $val ? $val : '(unparseable)');
-			}
-			if ($undef_count) {
-				$self->app->log->warn(
-					$self->_i18n('warn_calc_undef', $name, $undef_count)
+			if ($calc->has_error) {
+				# The names of fields already held count too, so that a field
+				# can build on one that is waiting.
+				my $later = @window && Database::BI::Calc->new(
+					expr    => $cs->{expr},
+					columns => [ @cols, @window, map { $_->{name} } @held ],
+					params  => $bound_params,
 				);
+				if ($later && !$later->has_error) {
+					push @held, { %$cs, params => $bound_params };
+					next;
+				}
+				croak $self->_i18n('error_calc_compile', $name, $calc->error);
 			}
-			push @cols, $name unless grep { $_ eq $name } @cols;
-		# Record as virtual so _grouped_totals can skip the SQL push path.
-		$self->stash('_virtual_columns' => {}) unless $self->stash('_virtual_columns');
-		$self->stash('_virtual_columns')->{$name} = 1;
+
+			$self->_write_calc_column($records, \@cols, $name, $calc);
 		}
 	}
+	$self->stash('_held_calc_fields' => \@held);
 
 	# Apply named value groups from models.json.
 	# For each source column that has groups registered under the current l=
 	# spec, add a virtual "${col}_group" column to every row.  Each row's value
 	# is mapped to its group label; values not in any group become '(other)'.
+	# The spec is the one the stored fields use, so a table page, which names
+	# its spec rather than taking l=, shows the column its charts can draw.
 	{
-		my $spec_key = $self->param('l') // '';
+		my $spec_key = $date_spec;
 		if (length $spec_key) {
 			my $models = $self->_read_models;
 			my $grps   = $models->{groups}{$spec_key};
@@ -3189,6 +4099,13 @@ sub _canonical_path {
 	my ($path) = @_;
 
 	my $abs = eval { $path->to_abs } // $path;
+	# Cwd::realpath on Windows does not follow symlinks: it gives undef for a
+	# path through one, which would send the loop below to the link's parent
+	# and keep the link's own name.  So the links are followed first.
+	if ($^O eq 'MSWin32') {
+		my $followed = _follow_links($abs->to_string);
+		$abs = Mojo::File->new($followed) if defined $followed;
+	}
 	my @tail;
 	my $probe = $abs;
 	while (1) {
@@ -3208,6 +4125,64 @@ sub _canonical_path {
 	# Nothing on the path exists at all, so the lexical absolute form is all
 	# there is to compare.
 	return File::Spec->canonpath($abs->to_string);
+}
+
+# _follow_links($path) -> $path | undef
+#
+# Purpose: $path with every symlink in it replaced by what it points at, one
+#          component at a time, as realpath does where it can.  For Windows,
+#          whose realpath leaves links alone; it works the same anywhere, which
+#          is how it is tested.
+# Entry:   An absolute path.
+# Exit:    The resolved absolute path; undef after 40 links, which is a loop.
+sub _follow_links {
+	my ($path) = @_;
+	my ($vol, $dirs, $file) = File::Spec->splitpath($path);
+	my @todo = grep { length } File::Spec->splitdir($dirs), $file;
+	my @done;
+	my $hops = 0;
+	while (@todo) {
+		my $part = shift @todo;
+		next if $part eq '.';
+		if ($part eq '..') { pop @done; next }
+		my $here = File::Spec->catpath($vol, File::Spec->catdir(File::Spec->rootdir, @done, $part), '');
+		if (-l $here) {
+			return undef if ++$hops > 40;
+			my $target = readlink $here;
+			return undef unless defined $target && length $target;
+			# Windows perls can give the NT form of an absolute target,
+			# \??\C:\dir, or the long-path form \\?\C:\dir.
+			$target =~ s{\A(?:\\\?\?\\|\\\\\?\\)}{};
+			my ($tvol, $tdirs, $tfile) = File::Spec->splitpath($target);
+			if (File::Spec->file_name_is_absolute($target)) {
+				$vol  = $tvol if length $tvol;
+				@done = ();
+			}
+			unshift @todo, grep { length } File::Spec->splitdir($tdirs), $tfile;
+			next;
+		}
+		push @done, $part;
+	}
+	return File::Spec->catpath($vol, File::Spec->catdir(File::Spec->rootdir, @done), '');
+}
+
+# canonical_spec($spec) -> $spec
+#
+# Purpose: The one spelling of a path: spec that the model store files things
+#          under.  /open names its file by its realpath, so a definition saved,
+#          or an extract built, under a path reached through a symlink (macOS's
+#          /var is /private/var) would never be found by the page it is for.
+# Entry:   Any spec, or undef.
+# Exit:    path:<realpath> when the spec is path:<file> and the file exists
+#          locally; anything else -- another kind of spec, a remote /../host
+#          path, a file that is not there, a name with a newline -- unchanged.
+sub canonical_spec {
+	my ($spec) = @_;
+	return $spec unless defined $spec && $spec =~ m{\Apath:(?!/\.\./)([^\n]+)\z};
+	my $path = $1;
+	return $spec unless -e $path;
+	my $real = eval { Mojo::File->new($path)->realpath->to_string };
+	return (defined $real && length $real) ? "path:$real" : $spec;
 }
 
 # _inside_dir($path, $dir) -> $bool
@@ -3262,16 +4237,43 @@ sub _calc_models_path :Protected ($self) {
 # Returns the parsed models hashref from .bi/models.json, or an empty scaffold.
 sub _read_models :Protected ($self) {
 	my $path = $self->_calc_models_path;
-	my $scaffold = { version => 1, fields => {}, groups => {}, date_patterns => {} };
+	my $scaffold = { version => 1, fields => {}, groups => {}, date_patterns => {}, lookups => {}, extractions => {}, accelerated => {} };
 	return $scaffold unless defined $path && -f $path;
 	my $json = eval { Mojo::File->new($path)->slurp };
 	return $scaffold unless $json && !$@;
 	my $data = eval { decode_json($json) };
 	return $scaffold unless ref $data eq 'HASH';
-	$data->{fields}        //= {};
-	$data->{groups}        //= {};
-	$data->{date_patterns} //= {};
+	# Callers go straight to ->{fields}{$spec}{$name}, so a hand-edited section of
+	# the wrong shape would otherwise be a strict-refs crash on every page.
+	for my $section (qw(fields groups date_patterns lookups extractions accelerated)) {
+		$data->{$section} = {} unless ref $data->{$section} eq 'HASH';
+		my $by_spec = $data->{$section};
+		delete @{$by_spec}{ grep { ref $by_spec->{$_} ne 'HASH' } keys %$by_spec };
+	}
+	_canonical_store_keys($data->{$_}) for grep { ref $data->{$_} eq 'HASH' }
+		qw(fields groups date_patterns lookups extractions accelerated geo);
 	return $data;
+}
+
+# _canonical_store_keys(\%by_spec) -> void
+#
+# Purpose: File every path: entry of one section of the model store under
+#          canonical_spec of its key, so that a reader asking with the resolved
+#          spec finds an entry written under a symlinked spelling, by a version
+#          before specs were resolved or by hand.  The next write persists it.
+# Notes:   A geo key is <spec>|loc=<column>; only the spec part is resolved.
+#          When both spellings are present the resolved one's names win.
+sub _canonical_store_keys {
+	my ($by_spec) = @_;
+	for my $key (grep { /\Apath:/ } keys %$by_spec) {
+		my ($spec, $rest) = split /\|/, $key, 2;
+		my $new = canonical_spec($spec) . (defined $rest ? "|$rest" : '');
+		next if $new eq $key;
+		my $old = delete $by_spec->{$key};
+		my $cur = $by_spec->{$new};
+		$by_spec->{$new} = (ref $cur eq 'HASH' && ref $old eq 'HASH') ? { %$old, %$cur } : ($cur // $old);
+	}
+	return;
 }
 
 # _write_models($self, \%models) -> $bool
@@ -3283,9 +4285,35 @@ sub _read_models :Protected ($self) {
 sub _write_models :Protected ($self, $models) {
 	my $path = $self->_calc_models_path;
 	return 0 unless defined $path;
+	$self->_set_aside_corrupt_store($path);
 	my $ok = eval { Mojo::File->new($path)->spurt(encode_json($models)); 1 };
 	$self->app->log->warn("Cannot write $path: $@") if !$ok && $@;
 	return $ok ? 1 : 0;
+}
+
+# _set_aside_corrupt_store($self, $path) -> void
+#
+# Purpose: Keep a store that cannot be parsed from being overwritten.  A reader
+#          treats such a file as empty, so without this the next save would
+#          replace every saved canvas or model with the one change it carries.
+# Entry:   $path is the store about to be written; it need not exist.
+# Exit:    A file holding anything but a JSON object is renamed to
+#          <path>.corrupt.<time>, for its owner to repair.
+# Side Effects: Renames the file and logs where it went.
+sub _set_aside_corrupt_store :Protected ($self, $path) {
+	return unless -s $path;
+
+	my $json = eval { Mojo::File->new($path)->slurp };
+	return unless defined $json;
+	return if ref(eval { decode_json($json) }) eq 'HASH';
+
+	my $aside = "$path.corrupt." . time();
+	if (rename $path, $aside) {
+		$self->app->log->error("$path could not be parsed; kept it as $aside");
+	} else {
+		$self->app->log->error("$path could not be parsed, and could not be kept as $aside: $!");
+	}
+	return;
 }
 
 # _analyses_path($self) -> $path_string_or_undef
@@ -3299,7 +4327,7 @@ sub _analyses_path :Protected ($self) {
 	my $bi_dir   = Mojo::File->new($cfg_dir)->is_abs
 	                ? Mojo::File->new($cfg_dir)
 	                : $home->child($cfg_dir);
-	my $data_dir = $home->child($app->config('data_dir') // 'data');
+	my $data_dir = _data_dir_for($app);
 
 	# The same refusal as the model store, with its own message: see
 	# _canonical_path for why the comparison is on resolved paths.
@@ -3326,13 +4354,63 @@ sub _read_analyses :Protected ($self) {
 	return {} unless $json && !$@;
 	my $data = eval { decode_json($json) };
 	return {} unless ref $data eq 'HASH';
-	return $data;
+	return { map { $_ => _tidy_analysis($data->{$_}) } grep { ref $data->{$_} eq 'HASH' } keys %$data };
 }
 
-# _write_analyses($self, \%analyses) -- atomic write (temp + rename)
+# _tidy_analysis(\%doc) -> \%doc
+#
+# A stored canvas can hold anything: it may be hand-edited or older than a rule.
+# Every page that reads one goes straight to ->{visuals}[0]{encode}{cat}, so the
+# shape is put right here, once, and a part of the wrong shape is treated as
+# absent: a canvas with one bad part still shows the rest, not a 500.  A visual
+# of the wrong shape becomes an empty one rather than going away, because a
+# visual's index is its identity in the layout and in /a/:id/visual/:n.
+sub _tidy_analysis {
+	my $doc = $_[0];
+
+	delete $doc->{$_} for grep { ref $doc->{$_} ne 'ARRAY' } qw(datasets visuals joins measures combines bookmarks layout hierarchies);
+	delete $doc->{$_} for grep { ref $doc->{$_} ne 'HASH' } qw(fields params);
+	delete $doc->{$_} for grep { ref $doc->{$_} } qw(name updated);
+
+	if ($doc->{datasets}) {
+		$doc->{datasets} = [ grep { ref $_ eq 'HASH' && defined $_->{spec} && !ref $_->{spec} } @{ $doc->{datasets} } ];
+		for my $ds (@{ $doc->{datasets} }) {
+			delete $ds->{filters} if ref $ds->{filters} ne 'ARRAY';
+		}
+	}
+	for my $key (grep { $doc->{$_} } qw(joins layout)) {
+		$doc->{$key} = [ grep { ref $_ eq 'HASH' } @{ $doc->{$key} } ];
+	}
+	if ($doc->{visuals}) {
+		$doc->{visuals} = [ map { ref $_ eq 'HASH' ? $_ : {} } @{ $doc->{visuals} } ];
+		_tidy_visual($_) for @{ $doc->{visuals} };
+	}
+	if ($doc->{params}) {
+		for my $def (values %{ $doc->{params} }) {
+			$def = {} unless ref $def eq 'HASH';
+		}
+	}
+	return $doc;
+}
+
+# _tidy_visual(\%visual) -> \%visual
+#
+# The same for one card, whose parts are read as blindly as the document's.
+sub _tidy_visual {
+	my $vis = $_[0];
+
+	delete $vis->{$_} for grep { ref $vis->{$_} ne 'HASH' } qw(encode options);
+	delete $vis->{filters} if ref $vis->{filters} ne 'ARRAY';
+	delete $vis->{$_} for grep { ref $vis->{$_} } qw(kind title);
+	return $vis;
+}
+
+# _write_analyses($self, \%analyses) -> 1 | 0 | nothing -- atomic write (temp + rename)
+# Nothing means the store is switched off (see _analyses_path).
 sub _write_analyses :Protected ($self, $analyses) {
 	my $path = $self->_analyses_path;
 	return unless defined $path;
+	$self->_set_aside_corrupt_store($path);
 	my $dir = Mojo::File->new($path)->dirname->to_string;
 	my ($fh, $tmpfile) = eval { tempfile(DIR => $dir, UNLINK => 0) };
 	if ($@ || !$fh) {
@@ -3340,15 +4418,17 @@ sub _write_analyses :Protected ($self, $analyses) {
 		return;
 	}
 	my $ok = eval {
-		print {$fh} encode_json($analyses);
-		close $fh;
-		rename($tmpfile, $path);
+		print {$fh} encode_json($analyses) or croak "print: $!";
+		close $fh or croak "close: $!";
+		rename($tmpfile, $path) or croak "rename: $!";
 		1;
 	};
 	unless ($ok) {
 		$self->app->log->warn("Cannot write $path: $@");
 		unlink $tmpfile;
+		return 0;
 	}
+	return 1;
 }
 
 # _gen_analysis_id($self) -> $id_string
@@ -3370,6 +4450,17 @@ Readonly my $GRID_COLUMNS => 12;
 # grid-auto-rows in templates/web/en/canvas.html.tt), so this is also a cap on
 # how tall a single visual can be made from the canvas.
 Readonly my $MAX_ROW_SPAN => 6;
+
+# _save_analyses_or_503($self, \%analyses) -> $bool
+#
+# Writes the store, or answers 503 and returns false, so that no route tells a
+# client something was saved when it was not.
+sub _save_analyses_or_503 :Protected ($self, $analyses) {
+	return 1 if $self->_write_analyses($analyses);
+
+	$self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+	return 0;
+}
 
 # _validate_layout($self, $layout_or_undef) -> $error_string_or_undef
 #
@@ -3425,25 +4516,55 @@ sub _validate_layout :Protected ($self, $layout) {
 # so that a PATCH of one field cannot fail because of another field it never
 # read.
 sub _validate_analysis :Protected ($self, $doc) {
-	return 'Missing required field: name'
-		unless defined $doc->{name} && length $doc->{name};
-	return 'Missing required field: datasets'
-		unless ref $doc->{datasets} eq 'ARRAY' && @{ $doc->{datasets} };
-	for my $ds (@{ $doc->{datasets} }) {
-		return 'Each dataset entry must have a spec field'
-			unless defined $ds->{spec} && length $ds->{spec};
-		return qq{"$ds->{spec}" is not a valid spec (must start with table:, path:, url:, or redis:)}
-			unless $ds->{spec} =~ m{\A(?:table:|path:|url:|redis:)};
+	for my $required (qw(name datasets)) {
+		return "Missing required field: $required" unless defined $doc->{$required};
+	}
+	return $self->_validate_analysis_parts($doc);
+}
+
+# _drop_unknown_keys(\%doc) -> void
+#
+# Only these keys are ever read back, so anything else a client sends is not kept
+# on any write: the POD promises this, and a store should not grow what nothing uses.
+sub _drop_unknown_keys {
+	my $doc = $_[0];
+
+	delete @{$doc}{ grep { !$ANALYSIS_KEYS{$_} } keys %$doc };
+}
+
+# _validate_analysis_parts($self, \%doc) -> $error_string_or_undef
+#
+# Checks only the keys present, which is all a PATCH may be judged on.  This body
+# is whatever a client sent, so nothing about the shape of a value is assumed.
+sub _validate_analysis_parts :Protected ($self, $doc) {
+	if (exists $doc->{name}) {
+		return 'Missing required field: name'
+			unless defined $doc->{name} && !ref $doc->{name} && length $doc->{name};
+	}
+	if (exists $doc->{datasets}) {
+		return 'Missing required field: datasets'
+			unless ref $doc->{datasets} eq 'ARRAY' && @{ $doc->{datasets} };
+		for my $ds (@{ $doc->{datasets} }) {
+			return 'Each dataset entry must have a spec field'
+				unless ref $ds eq 'HASH' && defined $ds->{spec} && !ref $ds->{spec} && length $ds->{spec};
+			return qq{"$ds->{spec}" is not a valid spec (must start with table:, path:, url:, or redis:, or be mariadb:server/table)}
+				unless $ds->{spec} =~ m{\A(?:table:|path:|url:|redis:)} || $ds->{spec} =~ $MARIADB_SPEC_RE;
+		}
 	}
 	if (defined $doc->{version}) {
 		return sprintf($MESSAGES{error_analysis_version}, $doc->{version})
-			unless $doc->{version} =~ /\A\d+\z/ && $doc->{version} <= 1;
+			unless !ref $doc->{version} && $doc->{version} =~ /\A\d+\z/ && $doc->{version} <= 1;
 	}
 	for my $key (qw( visuals joins measures combines bookmarks layout hierarchies )) {
 		if (defined $doc->{$key}) {
 			return "$key must be an array"
 				unless ref $doc->{$key} eq 'ARRAY';
 		}
+	}
+	for my $key (qw( visuals joins )) {
+		next unless defined $doc->{$key};
+		return "Each entry in $key must be an object"
+			if grep { ref $_ ne 'HASH' } @{ $doc->{$key} };
 	}
 	my $lerr = $self->_validate_layout($doc->{layout});
 	return $lerr if $lerr;
@@ -3476,6 +4597,7 @@ sub _analysis_to_url :Protected ($self, $a) {
 	}
 
 	for my $j (@{ $a->{joins} // [] }) {
+		next unless ref $j eq 'HASH';
 		my $right_spec = $spec_by_alias{ $j->{right} // '' } // '';
 		next unless $right_spec;
 		push @params, 'j=' . url_escape(
@@ -3485,7 +4607,8 @@ sub _analysis_to_url :Protected ($self, $a) {
 
 	# Filters from all datasets
 	for my $ds (@datasets) {
-		for my $f (@{ $ds->{filters} // [] }) {
+		next unless ref $ds->{filters} eq 'ARRAY';
+		for my $f (@{ $ds->{filters} }) {
 			push @params, 'f=' . url_escape($f);
 		}
 	}
@@ -3507,7 +4630,7 @@ sub analyses_list ($self) {
 # POST /api/analyses
 sub analyses_create ($self) {
 	my $body = eval { decode_json($self->req->body) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
 
 	my $err = $self->_validate_analysis($body);
@@ -3530,10 +4653,10 @@ sub analyses_create ($self) {
 	$body->{updated} = time();
 
 	# Strip caller-supplied immutable fields except id/version/created/updated
-	delete $body->{$_} for grep { !m/\A(?:id|version|created|updated|name|datasets|joins|combines|fields|measures|params|visuals|layout|bookmarks|hierarchies)\z/ } keys %$body;
+	_drop_unknown_keys($body);
 
 	$analyses->{$id} = $body;
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	$self->res->headers->location("/api/analyses/$id");
 	$self->render(json => { id => $id, created => 1 }, status => 201);
@@ -3563,20 +4686,21 @@ sub analyses_update ($self) {
 		unless exists $analyses->{$id};
 
 	my $body = eval { decode_json($self->req->body) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
 
 	my $err = $self->_validate_analysis($body);
 	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
 		if $err;
 
+	_drop_unknown_keys($body);
 	$body->{id}      = $id;
 	$body->{version} //= 1;
 	$body->{created} = $analyses->{$id}{created} // time();
 	$body->{updated} = time();
 
 	$analyses->{$id} = $body;
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	$self->render(json => { id => $id, updated => 1 });
 }
@@ -3592,18 +4716,17 @@ sub analyses_patch ($self) {
 		unless exists $analyses->{$id};
 
 	my $body = eval { decode_json($self->req->body) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
 
 	# Only the keys actually supplied are validated here: the canvas PATCHes
 	# nothing but the layout (a drag) or the bookmarks, and a document that
 	# fails on some other field it never mentioned is not this request's fault.
-	if (exists $body->{layout}) {
-		my $lerr = $self->_validate_layout($body->{layout});
-		return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $lerr) }, status => 400)
-			if $lerr;
-	}
+	my $perr = $self->_validate_analysis_parts($body);
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $perr) }, status => 400)
+		if $perr;
 
+	_drop_unknown_keys($body);
 	my $existing = { %{ $analyses->{$id} } };
 	for my $key (keys %$body) {
 		next if $key eq 'id' || $key eq 'created';  # immutable
@@ -3612,7 +4735,7 @@ sub analyses_patch ($self) {
 	$existing->{updated} = time();
 
 	$analyses->{$id} = $existing;
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	$self->render(json => { id => $id, updated => 1 });
 }
@@ -3628,7 +4751,7 @@ sub analyses_delete ($self) {
 		unless exists $analyses->{$id};
 
 	delete $analyses->{$id};
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	$self->render(json => { deleted => 1 });
 }
@@ -3656,18 +4779,36 @@ sub analyses_add_visual ($self) {
 	my $a = $analyses->{$id};
 
 	my $body = eval { decode_json($self->req->body) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
 
 	my $kind = $body->{kind} // '';
 	my %supported = map { $_ => 1 }
-		qw( table bar pie line graph scatter heatmap stacked combo treemap histogram map wordcloud );
+		qw( table bar pie line graph scatter heatmap stacked combo treemap histogram map wordcloud text );
 	return $self->render(json => { error => 'Unsupported visual kind' }, status => 400)
 		unless $supported{$kind};
 
 	for my $key (qw( encode options cross_row )) {
 		return $self->render(json => { error => "$key must be an object" }, status => 400)
 			if defined $body->{$key} && ref $body->{$key} ne 'HASH';
+	}
+
+	# A text card reads no data, so it can be added whatever state the canvas's
+	# source is in.
+	if ($kind eq 'text') {
+		my ($options, $errors) = _text_card_options($body->{options});
+		return $self->render(json => { error => $errors->[0] }, status => 400) if @$errors;
+
+		my $vis = { kind => 'text', encode => {}, options => $options };
+		$vis->{title} = $body->{title}
+			if defined $body->{title} && !ref $body->{title} && length $body->{title};
+
+		my $index = scalar @{ $a->{visuals} // [] };
+		push @{ $a->{visuals} //= [] }, $vis;
+		$a->{updated} = time();
+		$self->_save_analyses_or_503($analyses) or return;
+
+		return $self->render(json => _text_card_reply($id, $index, $vis), status => 201);
 	}
 
 	my $vis = {
@@ -3697,17 +4838,14 @@ sub analyses_add_visual ($self) {
 	# cross-filtering the canvas, with calculated columns on the URL, or with a
 	# what-if parameter set, gets a card drawn like the ones beside it rather
 	# than against the unfiltered table.
-	my $ctx = $self->_canvas_render_context($a, $body->{query});
+	my $ctx = $self->_canvas_render_context($a, $body->{query}, [$vis]);
 	return $self->render(json => { error => $ctx->{error} }, status => $ctx->{status})
 		if $ctx->{error};
 
 	# The new card is never the cross-filter source: it did not exist when the
 	# filter was made, so every cf applies to it, as it does to every card but
 	# the source.
-	my $records = $ctx->{records};
-	for my $spec (@{ $ctx->{cf_specs} }) {
-		$records = _apply_filter_spec($records, $spec);
-	}
+	my ($records, $late_cf) = $self->_canvas_cross_filter($ctx->{records}, $ctx->{columns}, $ctx->{cf_specs});
 
 	# The index is known before the render, so the card's SVG and Leaflet ids
 	# match the ones a later page load will give it.
@@ -3717,13 +4855,14 @@ sub analyses_add_visual ($self) {
 		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
 		(@{ $ctx->{cf_specs} } ? 1 : 0),
 		$ctx->{cross_row},
+		$late_cf,
 	);
 	return $self->render(json => { error => $rendered->{error} }, status => 400)
 		if $rendered->{error};
 
 	push @{ $a->{visuals} //= [] }, $vis;
 	$a->{updated} = time();
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	return $self->render(
 		json   => {
@@ -3779,8 +4918,26 @@ sub analyses_update_visual ($self) {
 		unless $index < scalar @{ $a->{visuals} // [] };
 
 	my $body = eval { decode_json($self->req->body) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
+
+	# A text card's only settings are its options, and it reads no data.
+	if (($a->{visuals}[$index]{kind} // '') eq 'text') {
+		return $self->render(json => { error => $MESSAGES{error_text_card_columns} }, status => 400)
+			if exists $body->{encode} || exists $body->{cross_row};
+		return $self->render(json => { error => $MESSAGES{error_text_card_options} }, status => 400)
+			unless ref $body->{options} eq 'HASH';
+
+		my ($options, $errors) = _text_card_options($body->{options});
+		return $self->render(json => { error => $errors->[0] }, status => 400) if @$errors;
+
+		my $vis = { %{ $a->{visuals}[$index] }, options => $options };
+		$a->{visuals}[$index] = $vis;
+		$a->{updated} = time();
+		$self->_save_analyses_or_503($analyses) or return;
+
+		return $self->render(json => _text_card_reply($id, $index, $vis));
+	}
 
 	my $has_encode = exists $body->{encode};
 	my $has_plan   = exists $body->{cross_row};
@@ -3809,7 +4966,7 @@ sub analyses_update_visual ($self) {
 		}
 	}
 
-	my $ctx = $self->_canvas_render_context($a, $body->{query});
+	my $ctx = $self->_canvas_render_context($a, $body->{query}, [$vis]);
 	return $self->render(json => { error => $ctx->{error} }, status => $ctx->{status})
 		if $ctx->{error};
 
@@ -3817,10 +4974,9 @@ sub analyses_update_visual ($self) {
 	# card but the one that made it, and this card may be that one.
 	my $records      = $ctx->{records};
 	my $prefiltered  = 0;
+	my $late_cf      = [];
 	if (@{ $ctx->{cf_specs} } && $ctx->{cf_source} != $index) {
-		for my $spec (@{ $ctx->{cf_specs} }) {
-			$records = _apply_filter_spec($records, $spec);
-		}
+		($records, $late_cf) = $self->_canvas_cross_filter($records, $ctx->{columns}, $ctx->{cf_specs});
 		$prefiltered = 1;
 	}
 
@@ -3828,13 +4984,14 @@ sub analyses_update_visual ($self) {
 		$vis, $records, $ctx->{columns}, $ctx->{src}, $index, $ctx->{spec_key},
 		$prefiltered,
 		$ctx->{cross_row},
+		$late_cf,
 	);
 	return $self->render(json => { error => $rendered->{error} }, status => 400)
 		if $rendered->{error};
 
 	$a->{visuals}[$index] = $vis;
 	$a->{updated} = time();
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	return $self->render(
 		json => {
@@ -3847,6 +5004,190 @@ sub analyses_update_visual ($self) {
 			cf_col => (_vis_cf_col($vis) // ''),
 		},
 	);
+}
+
+# DELETE /api/analyses/:id/visuals/:visual  (remove a text card)
+#
+# A visual's index is its identity in the layout and in a cross-filter's cv=, so
+# everything that names a later card moves down by one with it.  The page reloads
+# afterwards, because the cards on screen carry the old numbers.
+sub analyses_delete_visual ($self) {
+	my $id = $self->stash('id') // '';
+	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+		unless $id =~ /\A[A-Za-z0-9]+\z/;
+
+	my $analyses = $self->_read_analyses;
+	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+		unless exists $analyses->{$id};
+	my $a = $analyses->{$id};
+
+	my $index = $self->stash('visual') // '';
+	return $self->render(json => { error => 'Visual index must be a number' }, status => 400)
+		unless $index =~ /\A\d+\z/;
+	$index += 0;
+	return $self->render(json => { error => "No visual at index $index" }, status => 404)
+		unless $index < scalar @{ $a->{visuals} // [] };
+	return $self->render(json => { error => $MESSAGES{error_visual_not_text} }, status => 400)
+		unless ($a->{visuals}[$index]{kind} // '') eq 'text';
+
+	$a->{visuals} = [ @{ $a->{visuals} }[ grep { $_ != $index } 0 .. $#{ $a->{visuals} } ] ];
+
+	my @layout;
+	for my $entry (@{ $a->{layout} // [] }) {
+		my $n = $entry->{visual} // '';
+		if ($n =~ /\A\d+\z/) {
+			next if $n == $index;
+			$entry = { %$entry, visual => $n - 1 } if $n > $index;
+		}
+		push @layout, $entry;
+	}
+	$a->{layout} = \@layout if $a->{layout};
+
+	for my $bm (grep { ref $_ eq 'HASH' && defined $_->{state} && !ref $_->{state} } @{ $a->{bookmarks} // [] }) {
+		$bm->{state} = _shift_card_param($bm->{state}, $index);
+	}
+
+	$a->{updated} = time();
+	$self->_save_analyses_or_503($analyses) or return;
+
+	return $self->render(json => { deleted => 1 });
+}
+
+# _shift_card_param($search, $removed) -> $search
+#
+# A saved query string with its cv= moved down if the card it names came after
+# the one removed.  A text card is never a cross-filter's source, so cv= cannot
+# name the removed card itself.
+sub _shift_card_param {
+	my ($search, $removed) = @_;
+	$search =~ s{(?<![^?&])cv=(\d+)}{ 'cv=' . ($1 > $removed ? $1 - 1 : $1) }ge;
+	return $search;
+}
+
+# _text_card_options($raw) -> (\%options, \@errors)
+#
+# Purpose: The one reader of a text card's settings.
+# Entry:   Whatever is stored or was sent; it may be any shape.
+# Exit:    The settings that are allowed, each in its one spelling, and a message
+#          for each that was not.  Settings not asked for are absent.
+# Notes:   A write refuses a card with errors.  A render ignores them and draws
+#          what is left, because PUT, PATCH and import can store a card that
+#          never came through here, and nothing else stands between a stored
+#          value and a style attribute.
+sub _text_card_options {
+	my ($raw) = @_;
+	$raw = {} unless ref $raw eq 'HASH';
+
+	my (%clean, @errors);
+
+	my $text = (defined $raw->{text} && !ref $raw->{text}) ? $raw->{text} : '';
+	$text =~ s/\r\n?/\n/g;
+	if ($text !~ /\S/) {
+		push @errors, $MESSAGES{error_text_card_empty};
+	}
+	elsif (length($text) > $MAX_TEXT_CHARS) {
+		push @errors, sprintf($MESSAGES{error_text_card_long}, $MAX_TEXT_CHARS);
+	}
+	$clean{text} = $text;
+
+	if (length(my $font = $raw->{font} // '')) {
+		if (!ref $font && exists $TEXT_FONT_CSS{$font}) { $clean{font} = $font }
+		else { push @errors, $MESSAGES{error_text_card_font} }
+	}
+
+	if (length(my $size = $raw->{size} // '')) {
+		if (!ref $size && $size =~ /\A\d{1,3}\z/ && $size >= $MIN_TEXT_POINTS && $size <= $MAX_TEXT_POINTS) {
+			$clean{size} = $size + 0;
+		}
+		else {
+			push @errors, sprintf($MESSAGES{error_text_card_size}, $MIN_TEXT_POINTS, $MAX_TEXT_POINTS);
+		}
+	}
+
+	for my $key (qw(colour background)) {
+		my $value = $raw->{$key} // '';
+		next unless length $value;
+		if (!ref $value && $value =~ /\A#[0-9a-fA-F]{6}\z/) { $clean{$key} = lc $value }
+		else { push @errors, $MESSAGES{error_text_card_colour} }
+	}
+
+	if (length(my $align = $raw->{align} // '')) {
+		if (!ref $align && $TEXT_ALIGNS{$align}) { $clean{align} = $align }
+		else { push @errors, $MESSAGES{error_text_card_align} }
+	}
+
+	for my $key (qw(bold italic plain)) {
+		$clean{$key} = 1 if $raw->{$key};
+	}
+
+	return (\%clean, \@errors);
+}
+
+# _text_card_markup(\%visual) -> $html
+#
+# The body of a text card.  The text is escaped and the style holds only values
+# _text_card_options has checked.  Spaces and line ends are written as entities
+# and <br>, not left to CSS, because the response minifier collapses whitespace
+# and the embed page has none of this page's styles.
+sub _text_card_markup {
+	my ($vis) = @_;
+	my ($o) = _text_card_options($vis->{options});
+
+	my @style;
+	push @style, "font-family:$TEXT_FONT_CSS{$o->{font}}" if $o->{font};
+	push @style, "font-size:$o->{size}pt"                 if $o->{size};
+	push @style, "color:$o->{colour}"                     if $o->{colour};
+	push @style, "background-color:$o->{background}"      if $o->{background};
+	push @style, 'font-weight:bold'                       if $o->{bold};
+	push @style, 'font-style:italic'                      if $o->{italic};
+	push @style, "text-align:$o->{align}"                 if $o->{align};
+	my $style = @style ? ' style="' . xml_escape(join ';', @style) . '"' : '';
+
+	my $text = xml_escape($o->{text});
+	$text =~ s/\t/    /g;
+	$text =~ s/^ /&#160;/mg;
+	$text =~ s/ (?= )/&#160;/g;
+	$text =~ s/\n/<br>/g;
+
+	return qq{<div class="text-card-text"$style>$text</div>};
+}
+
+# _text_card_title(\%visual) -> $title
+#
+# What names a text card to the controls on it and to a screen reader: the start
+# of its first line that has anything on it.
+sub _text_card_title {
+	my ($vis) = @_;
+	my ($o) = _text_card_options($vis->{options});
+	my ($line) = $o->{text} =~ /^[ \t]*(\S[^\n]*)/m;
+	return 'Text' unless defined $line;
+	$line =~ s/\s+\z//;
+	return length($line) > $TEXT_TITLE_CHARS ? substr($line, 0, $TEXT_TITLE_CHARS) . '...' : $line;
+}
+
+# _text_card_plain(\%visual) -> $bool
+#
+# Whether the card hides its frame and header until it is pointed at.
+sub _text_card_plain {
+	my ($vis) = @_;
+	return 0 unless ($vis->{kind} // '') eq 'text';
+	my ($o) = _text_card_options($vis->{options});
+	return $o->{plain} ? 1 : 0;
+}
+
+# _text_card_reply($id, $index, \%visual) -> \%json
+sub _text_card_reply {
+	my ($id, $index, $vis) = @_;
+	return {
+		id     => $id,
+		visual => $index,
+		kind   => 'text',
+		title  => ($vis->{title} // _text_card_title($vis)),
+		html   => _text_card_markup($vis),
+		head   => '',
+		cf_col => '',
+		plain  => _text_card_plain($vis),
+	};
 }
 
 # GET /api/analyses/:id/export
@@ -3870,11 +5211,12 @@ sub analyses_import ($self) {
 	my $body_json = $upload ? $upload->slurp : $self->req->body;
 
 	my $body = eval { decode_json($body_json) };
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_json}, $@) }, status => 400)
+	return $self->render(json => { error => _analysis_json_error($@) }, status => 400)
 		unless ref $body eq 'HASH';
 
 	# Strip any id/timestamps from imported document; assign fresh ones below
 	delete @{$body}{qw( id created updated )};
+	_drop_unknown_keys($body);
 
 	my $err = $self->_validate_analysis($body);
 	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
@@ -3897,7 +5239,7 @@ sub analyses_import ($self) {
 	$body->{updated} = time();
 
 	$analyses->{$id} = $body;
-	$self->_write_analyses($analyses);
+	$self->_save_analyses_or_503($analyses) or return;
 
 	$self->res->headers->location("/api/analyses/$id");
 	$self->render(json => { id => $id, imported => 1 }, status => 201);
@@ -3920,7 +5262,7 @@ sub analyses_import ($self) {
 # C<cv>, C<c>, C<cs>, C<by>, C<order>, C<range>, C<rcol> and C<p.<name>> are read
 # from C<$query> - the same keys canvas_render reads from its own URL - so a
 # page's state is not a way to reach anything else.
-sub _canvas_render_context :Protected ($self, $a, $query) {
+sub _canvas_render_context :Protected ($self, $a, $query, $more_cards = undef) {
 	my $params;
 	if (defined $query) {
 		return { error => 'query must be a string', status => 400 }
@@ -3940,6 +5282,9 @@ sub _canvas_render_context :Protected ($self, $a, $query) {
 		if @$p_errors;
 	my %param_values = %$bound_ref;
 
+	my $window_names = _canvas_window_columns($a, $params || Mojo::Parameters->new, $more_cards);
+	$self->stash('_canvas_window_names' => $window_names);
+
 	eval {
 		($records, $columns) = $self->_apply_calc_fields(
 			$records, $columns,
@@ -3947,6 +5292,7 @@ sub _canvas_render_context :Protected ($self, $a, $query) {
 				params   => \%param_values,
 				spec_key => ($a->{datasets}[0]{spec} // ''),
 				calc     => [ $params ? @{ $params->every_param('c') // [] } : () ],
+				window_columns => $window_names,
 			}
 		);
 	};
@@ -4111,9 +5457,9 @@ sub _visual_measure {
 # caller wants the same thing: a card's script and the page's are separate
 # programs, whether the card is drawn on a canvas of its own kind or returned
 # to a page that is about to insert it.
-sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef) {
+sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef, $late_cf = undef) {
 	my $rendered = $self->_render_visual_markup(
-		$vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row,
+		$vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row, $late_cf,
 	);
 	return $rendered unless defined $rendered->{html};
 
@@ -4132,9 +5478,14 @@ sub _render_visual_html :Protected ($self, $vis, $records, $columns, $src, $vis_
 # geocode entry may still be read while the shared cache is migrated.
 # $cross_row is the canvas's validated cs= plan, run here so that each card's
 # window is over that card's own rows: see the note at the pass below.  A card
-# that saved a plan of its own uses that one instead.
-sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef) {
+# that saved a plan of its own uses that one instead.  $late_cf holds the
+# cross-filter specs on columns a plan writes (_canvas_cross_filter); a card
+# whose plan does not write the column has nothing to filter by, and ignores it.
+sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vis_id, $spec_key, $prefiltered, $cross_row = undef, $late_cf = undef) {
 	my $kind    = $vis->{kind}    // '';
+	return { html => _text_card_markup($vis), title => _text_card_title($vis) }
+		if $kind eq 'text';
+
 	my $encode  = $vis->{encode}  // {};
 	my $options = $vis->{options} // {};
 	my $filters = $vis->{filters} // [];
@@ -4148,21 +5499,6 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 	# HTML::D3's default.
 	my $svg_id = 'vis-' . (defined($vis_id) ? $vis_id : 'chart');
 
-	# Apply per-visual filters on top of the base pipeline records.
-	my $vis_recs = $records;
-	for my $f (@$filters) {
-		$vis_recs = _apply_filter_spec($vis_recs, $f);
-	}
-
-	# Stage 6, per card.  A canvas names cs= once, but by the time the pass runs
-	# the card has already been narrowed by its own filters and by the page's
-	# cross-filter, so a running total is over the rows that card is drawn from:
-	# two cards showing different regions show different running totals.  The
-	# pass therefore cannot be hoisted above the card loop -- one shared pass
-	# would give every card the same numbers, and those are the numbers of
-	# neither card.  A fault is this card's error, not the page's: the plan was
-	# validated once, and only the arithmetic can still fail here.
-	#
 	# A card that carries a cross-row plan of its own (visual.cross_row) runs that
 	# plan instead of the page's: putting a running total on one card is not a
 	# request to put one on every card, and a card whose plan is empty has none
@@ -4177,6 +5513,30 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			if $plan && $plan->{error};
 	}
 
+	# Apply per-visual filters on top of the base pipeline records.  One on a column
+	# this card's plan writes waits for the pass, as it does on a table page.
+	my %written = $plan
+		? (map({ $_->{as} => 1 } @{ $plan->{specs} }),
+			map({ $_->{name} => 1 } @{ $self->stash('_held_calc_fields') // [] }))
+		: ();
+	my $vis_recs = $records;
+	my @late_filters;
+	for my $f (@$filters) {
+		if ($written{ (split /:/, $f, 2)[0] // '' }) {
+			push @late_filters, $f;
+			next;
+		}
+		$vis_recs = _apply_filter_spec($vis_recs, $f);
+	}
+
+	# Stage 6, per card.  A canvas names cs= once, but by the time the pass runs
+	# the card has already been narrowed by its own filters and by the page's
+	# cross-filter, so a running total is over the rows that card is drawn from:
+	# two cards showing different regions show different running totals.  The
+	# pass therefore cannot be hoisted above the card loop -- one shared pass
+	# would give every card the same numbers, and those are the numbers of
+	# neither card.  A fault is this card's error, not the page's: the plan was
+	# validated once, and only the arithmetic can still fail here.
 	if ($plan) {
 		# The pass writes its column onto the rows it is handed, and a card is
 		# handed the canvas's rows -- the same hashrefs every card draws from.  The
@@ -4185,7 +5545,8 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		# card that asked for no plan at all reads a column it never asked for.
 		my $own = [ map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$vis_recs ];
 		my ($crossed, $crossed_cols) = eval {
-			$self->_apply_cross_row($own, $columns, $plan)
+			my ($r, $c) = $self->_apply_cross_row($own, $columns, $plan);
+			$self->_apply_held_calc_fields($r, $c, 1);
 		};
 		if (my $e = $@) {
 			$e =~ s/ at \S+ line \d+\.?\n?$//;
@@ -4195,6 +5556,9 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 	}
 
 	my %col_set = map { $_ => 1 } @$columns;
+
+	$vis_recs = _apply_filter_spec($vis_recs, $_)
+		for @late_filters, grep { $col_set{ (split /:/, $_, 2)[0] // '' } } @{ $late_cf // [] };
 
 	# The aggregate function this card picked for itself, if any (encode.agg).
 	# It is read and checked here, before the dispatch, so a misspelt function
@@ -4282,7 +5646,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 
 		$title ||= "$m->{label} by $cat_col";
 		my @slices = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
-		my $scheme = $options->{scheme} // 'tableau10';
+		my $scheme = _categorical_scheme($options->{scheme});
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_pie_chart_snippet(\@slices, {
 				donut        => $options->{donut} ? 1 : 0,
@@ -4407,7 +5771,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => 'No plottable data' } unless @triples;
 
 		$title ||= "$m->{label} by $x_col and $y_col";
-		my $scheme = $options->{scheme} // 'YlOrRd';
+		my $scheme = _sequential_scheme($options->{scheme});
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_heatmap_snippet(\@triples, {
 				x_label      => $x_col,
@@ -4454,7 +5818,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => 'No plottable data' } unless @data;
 
 		$title ||= "$m->{label} by $cat_col and $seg_col";
-		my $scheme = $options->{scheme} // 'tableau10';
+		my $scheme = _categorical_scheme($options->{scheme});
 		my $orient = (_chart_orientation($options) eq 'horizontal') ? 'h' : 'v';
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
 			->render_stacked_bar_snippet(\@data, {
@@ -4551,7 +5915,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => 'No plottable data' } unless @$agg;
 
 		$title ||= "$m->{label} by $cat_col";
-		my $scheme = $options->{scheme} // 'tableau10';
+		my $scheme = _categorical_scheme($options->{scheme});
 		# The snippet takes one row per tile as { path, value }, the shape the
 		# treemap page builds; a [label, value] pair is not a path and croaks.
 		my @tiles = map {
@@ -4577,9 +5941,9 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		}
 		return { error => 'No plottable data' } unless @values;
 
-		my $bins = int($options->{bins} // 10);
+		my $bins = _whole_number($options->{bins}) // 10;
 		$bins = 1   if $bins < 1;
-		$bins = 200 if $bins > 200;
+		$bins = $MAX_HISTOGRAM_BINS if $bins > $MAX_HISTOGRAM_BINS;
 		my $min_v = min(@values);
 		my $max_v = max(@values);
 		my @bin_data;
@@ -4822,7 +6186,7 @@ sub _bound_canvas_params :Protected ($self, $a, $lookup) {
 	my (%bound_params, @errors);
 
 	for my $pname (sort keys %param_defs) {
-		my $def     = $param_defs{$pname};
+		my $def     = ref $param_defs{$pname} eq 'HASH' ? $param_defs{$pname} : {};
 		my $type    = $def->{type}    // 'string';
 		my $default = $def->{default} // '';
 		my $raw     = $lookup->("p.$pname");
@@ -4830,7 +6194,9 @@ sub _bound_canvas_params :Protected ($self, $a, $lookup) {
 
 		if ($type eq 'number') {
 			require Scalar::Util;
-			unless (Scalar::Util::looks_like_number($val)) {
+			# looks_like_number accepts these, and every comparison with NaN is
+			# false, so it would walk straight past min and max below.
+			unless (Scalar::Util::looks_like_number($val) && $val !~ /\A\s*[-+]?(?:nan|inf)/i) {
 				push @errors, sprintf($MESSAGES{error_param_type}, $pname);
 				next;
 			}
@@ -4977,10 +6343,16 @@ sub canvas_render ($self) {
 
 		# Apply calc fields with bound params so expressions may reference them.
 		my $canvas_spec_key = ($a->{datasets}[0]{spec} // '');
+		my $window_names    = _canvas_window_columns($a, $self);
+		$self->stash('_canvas_window_names' => $window_names);
 		eval {
 			($records, $columns) = $self->_apply_calc_fields(
 				$records, $columns,
-				{ params => \%bound_params, spec_key => $canvas_spec_key }
+				{
+					params         => \%bound_params,
+					spec_key       => $canvas_spec_key,
+					window_columns => $window_names,
+				}
 			);
 		};
 		if ($@) {
@@ -5154,16 +6526,16 @@ sub canvas_render ($self) {
 
 			# Apply cross-filter to every visual except the source (self-highlighting).
 			my $vis_recs = $records;
+			my $late_cf  = [];
 			if ($cf_active && $i != $cf_source) {
-				for my $cfs (@cf_specs) {
-					$vis_recs = _apply_filter_spec($vis_recs, $cfs);
-				}
+				($vis_recs, $late_cf) = $self->_canvas_cross_filter($records, $columns, \@cf_specs);
 			}
 
 			my $result = $self->_render_visual_html(
 				$vis, $vis_recs, $columns, $src, $i, $canvas_spec_key,
 				($cf_active && $i != $cf_source ? 1 : 0),
 				$cross_row,
+				$late_cf,
 			);
 			$canvas_map_head ||= $result->{head} // '';
 			push @rendered, {
@@ -5172,6 +6544,7 @@ sub canvas_render ($self) {
 				html      => $result->{html}  // '',
 				error     => $result->{error} // '',
 				kind      => $vis->{kind}     // '',
+				plain     => _text_card_plain($vis),
 				style     => $layout_pos{$i}  // '',
 				# The saved spans, or nothing: a card with no saved position is
 				# placed by the browser, and only the script can measure that.
@@ -5219,6 +6592,10 @@ sub canvas_render ($self) {
 			# The same menu the table page's cross-row panel renders, so a card
 			# can offer the functions the pass actually knows.
 			cross_row_menu => \@CROSS_ROW_MENU,
+			text_font_menu => \@TEXT_FONTS,
+			text_min_points => $MIN_TEXT_POINTS,
+			text_max_points => $MAX_TEXT_POINTS,
+			text_max_chars  => $MAX_TEXT_CHARS,
 			visuals      => \@rendered,
 			canvas_params    => \@canvas_params,
 			canvas_bookmarks => \@canvas_bookmarks,
@@ -5282,7 +6659,11 @@ sub _run_export_pipeline :Protected ($self) {
 	# dimension params of the aggregating routes so a chart's own URL can be
 	# pasted into /export and mean the same thing.
 	my $span = $self->_span_calc_spec($columns, 'cat', 'x', 'rows', 'group');
+	# The stash says the reply has gone.  Without it the caller takes the empty list
+	# for "no such table" and renders a second time, and the client is left hanging
+	# on a reply that never finishes.
 	if ($span && $span->{error}) {
+		$self->stash('_reduce_error' => 1);
 		$self->render(text => $span->{error}, status => 400);
 		return ();
 	}
@@ -5291,6 +6672,7 @@ sub _run_export_pipeline :Protected ($self) {
 		($span ? { calc => $span->{calc} } : undef)) };
 	if ($@) {
 		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		$self->stash('_reduce_error' => 1);
 		$self->render(text => $e, status => 400);
 		return ();
 	}
@@ -5305,8 +6687,9 @@ sub _run_export_pipeline :Protected ($self) {
 	my $sort = $self->param('sort');
 	my $dir  = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
 	if (defined $sort && grep { $_ eq $sort } @columns) {
-		@$records = sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records;
-		@$records = reverse @$records if $dir eq 'desc';
+		# A new array: the backend's own can be read-only, as a SQLite one is.
+		$records = [ sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records ];
+		$records = [ reverse @$records ] if $dir eq 'desc';
 	} elsif (defined $sort) {
 		carp $self->_i18n('error_sort_column', $sort);
 	}
@@ -5316,7 +6699,7 @@ sub _run_export_pipeline :Protected ($self) {
 		my ($page, $per_page, $offset) = $self->_pagination;
 		my $total    = scalar @$records;
 		my $has_next = ($total > $offset + $per_page) ? 1 : 0;
-		my @page_recs = splice(@$records, $offset, $per_page);
+		my @page_recs = @{ _rows_of_page($records, $offset, $per_page) };
 		$records = \@page_recs;
 		$self->stash(export_has_next => $has_next, export_page => $page, export_per_page => $per_page);
 	}
@@ -5388,7 +6771,11 @@ sub _render_csv :Protected ($self, $records, $columns, $name) {
 # Side Effects: Creates and unlinks a temporary file; writes HTTP response.
 sub _render_sqlite :Protected ($self, $records, $columns, $name) {
 	$self->stash(buffer => 0);
-	my $data = $self->_write_sqlite_db($records, $columns);
+	my $data = eval { $self->_write_sqlite_db($records, $columns) };
+	unless (defined $data) {
+		$self->app->log->error('SQLite export failed: ' . _tidy_error($@));
+		return $self->render(text => $self->_i18n('error_export_sqlite'), status => 500);
+	}
 	$self->res->headers->content_type('application/vnd.sqlite3');
 	$self->res->headers->content_disposition(qq{attachment; filename="${name}.db"});
 	$self->render(data => $data);
@@ -5422,11 +6809,13 @@ C<GET /> -- Scan C<data_dir> and present a card grid of available tables.
 
 =head4 INPUT
 
-None (reads C<data_dir> from application config).
+None (reads C<data_dir> from application config, and C<BI_OPEN> and the
+C<Referer> header).
 
 =head4 OUTPUT
 
-Renders C<home.html.tt> with:
+When C<BI_OPEN> is set and the request has no C<Referer> from this server,
+redirects to C</open> for that path.  Otherwise renders C<home.html.tt> with:
 
   tables     ARRAYREF of { name => $stem, file => $basename }
   title      'Choose a Database'
@@ -5447,9 +6836,23 @@ None produced by this action; any file-scan errors are silently ignored
 
   GET / -> 200 text/html containing a card for each file in data/
 
+  With BI_OPEN=/data/store.db and no Referer from this server:
+  GET / -> 302 /open?path=%2Fdata%2Fstore.db
+
 =cut
 
 sub index ($self) {
+	# A database named when the server was started is what a reader arriving
+	# from outside sees first.  A Home link within the application carries this
+	# server as its Referer and gets the list, so that stays reachable.  The
+	# check needs no state, so it survives morbo restarting the application.
+	if (defined $ENV{BI_OPEN} && length $ENV{BI_OPEN}) {
+		my $from = $self->req->headers->referrer;
+		my $here = $self->req->url->to_abs->host_port;
+		return $self->redirect_to('/open?path=' . url_escape($ENV{BI_OPEN}))
+			unless defined $from && (Mojo::URL->new($from)->host_port // '') eq $here;
+	}
+
 	my ($platform, $language) = $self->_resolve_template;
 
 	# The layout writes the resolved language into <html lang>, so every action
@@ -5466,6 +6869,80 @@ sub index ($self) {
 	);
 }
 
+=head2 is_supported_file
+
+Say whether a file's name has an extension C</open> will read.  C<script/database-bi>
+asks this to refuse a file before the server starts, rather than show a 404.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  $path  string, a file name or path; undef is allowed
+
+=head4 OUTPUT
+
+  1 when the name ends in a supported extension (any case), otherwise 0
+
+=head3 MESSAGES
+
+None.
+
+=head3 FORMAL SPECIFICATION
+
+  is_supported_file == lambda path . path =~ EXT_RE
+
+=head3 EXAMPLE
+
+  is_supported_file('data/store.db')   # 1
+  is_supported_file('LICENSE')         # 0
+
+=cut
+
+sub is_supported_file ($path) {
+	return (defined $path && $path =~ $EXT_RE) ? 1 : 0;
+}
+
+=head2 preferences
+
+C<GET /preferences> -- Render the page where a reader sets their preferences:
+for now, the light or dark theme.
+
+Preferences belong to the browser, in C<localStorage>, not to the server, so
+this action only renders the form.  The script that stores and applies them is
+in C<layouts/theme.html.tt>, which every page loads.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+  200 text/html   The preferences page.
+
+=head3 FORMAL SPECIFICATION
+
+  preferences
+    response! : HTTP
+    ──────────
+    response!.status = 200
+
+=cut
+
+sub preferences ($self) {
+	my ($platform, $language) = $self->_resolve_template;
+
+	$self->render(
+		template => "$platform/$language/preferences",
+		handler  => 'tt',
+		format   => 'html',
+		title    => 'Preferences',
+		language => $language,
+	);
+}
+
 =head2 tutorial
 
 C<GET /tutorial> -- Render the tutorial that is part of the application.
@@ -5473,6 +6950,23 @@ C<GET /tutorial> -- Render the tutorial that is part of the application.
 The chapters, questions and glossary are data in L<Database::BI::Tutorial>.
 They are not in this module's POD, so adding a feature means adding a chapter
 there and no change to this action or to the template.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+  200 text/html   The tutorial page.  It is cached when page_cache_dir is set.
+
+=head3 FORMAL SPECIFICATION
+
+  tutorial
+    response! : HTTP
+    ──────────
+    response!.status = 200
 
 =cut
 
@@ -5572,7 +7066,7 @@ sub view ($self) {
 	my $dedup = $self->param('d') ? 1 : 0;
 	my ($source, $records, $has_next, $is_multi);
 	eval {
-		$source = $self->open_table($table);
+		$source = $self->_accelerated_source("table:$table") // $self->open_table($table);
 		# Multi-table SQLite: flag redirect without fetching data.
 		if ($source && $source->sqlite_tables && @{ $source->sqlite_tables } > 1) {
 			$is_multi = 1;
@@ -5580,15 +7074,20 @@ sub view ($self) {
 			# _fetch_page applies reduce-before-paginate: full-fetch + filter + dedup
 			# + Perl paginate when f= or d=1 are set; N+1 trick otherwise.
 			($records, $has_next) = $self->_fetch_page($source,
-				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+				{ per_page => $per_page, offset => $offset, dedup => $dedup,
+				  calc_spec_key => "table:$table" });
 		}
 	};
 	if ($@) {
 		# No file by that name: a 404 that names the table, with the trail
 		# and the navigation, rather than the home page and the backend's
 		# message (which gives away the data directory).
+		# A directory that may not be read has no file by that name to offer either.
+		my $error   = $@;
 		my $stem_of = sub { lc($_[0]->basename =~ s/\.[^.]+\z//r) };
-		unless (grep { $stem_of->($_) eq lc $table } _data_dir_for($self->app)->list->each) {
+		my $listing = eval { _data_dir_for($self->app)->list };
+		$@ = $error;
+		unless ($listing && grep { $stem_of->($_) eq lc $table } $listing->each) {
 			return $self->render(
 				template  => "$platform/$language/not_found",
 				handler   => 'tt',
@@ -5605,7 +7104,7 @@ sub view ($self) {
 			format   => 'html',
 			tables   => [],
 			title    => 'Choose a Database',
-			error    => $self->_i18n('error_table_open', $table, $@),
+			error    => $self->_i18n('error_table_open', $table, _tidy_error($@)),
 			language => $language,
 		);
 	}
@@ -5619,12 +7118,6 @@ sub view ($self) {
 	return if $self->stash('_cross_row_error');
 
 	$records //= [];
-	my @columns = _get_columns($source, $records);
-	# Stage 6 wrote its columns onto the rows before the page was sliced, so the
-	# list is what makes the table show them -- and what lets a calculated field
-	# below name one of them.
-	my %seen_col = map { $_ => 1 } @columns;
-	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
 	# The page from _fetch_page is already reduced; this call is here for the chip
 	# list only -- filter_specs (for export URLs) and filters_json (for the UI).
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
@@ -5633,24 +7126,10 @@ sub view ($self) {
 	# action is addressed by :table rather than l=, so name the spec explicitly
 	# when looking up the fields saved for it; otherwise a saved column would
 	# appear in every chart and not in the table it was made from.
-	# span= adds a bucket column to the table rather than grouping it: a table has
-	# no dimension to bucket *into*, so the reader gets the column and the raw
-	# value beside it.  See _span_calc_spec.
-	my $span = $self->_span_calc_spec(\@columns, ());
-	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
-
-	my ($calc_records, $calc_columns) = eval {
-		$self->_apply_calc_fields($records, \@columns, {
-			spec_key => "table:$table",
-			($span ? (calc => $span->{calc}) : ()),
-		})
-	};
-	if ($@) {
-		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
-		return $self->render(text => $e, status => 400);
-	}
-	$records = $calc_records;
-	@columns = @$calc_columns;
+	my $page_columns;
+	($records, $page_columns) = $self->_page_columns($source, $records, "table:$table");
+	return unless $page_columns;
+	my @columns = @$page_columns;
 
 	my $page_url = $self->req->url->clone;
 	$page_url->query->remove('page')->remove('per_page');
@@ -5665,7 +7144,7 @@ sub view ($self) {
 		table            => $table,
 		title            => ucfirst($table),
 		left_spec        => "table:$table",
-		combine_specs    => [],
+		combine_specs    => [ $self->_calc_specs_of_request ],
 		current_joins    => [],
 		available_tables => $self->_scan_join_tables,
 		join_summaries   => [],
@@ -5862,17 +7341,37 @@ sub open_file ($self) {
 		return $self->redirect_to('/tables?l=' . url_escape($file_path));
 	}
 
+	# A MariaDB server with no table named: list its tables.
+	if ($file_path =~ $MARIADB_SERVER_RE) {
+		return $self->redirect_to('/tables?l=' . url_escape($file_path));
+	}
+
 	# Redis spec: redis:tablename|redis://host:port -- delegate to _open_spec.
-	if ($file_path =~ $REDIS_SPEC_RE) {
+	# MariaDB spec: mariadb:server/table -- likewise.
+	if ($file_path =~ $REDIS_SPEC_RE || $file_path =~ $MARIADB_SPEC_RE) {
 		my $lspec = $file_path;
 		my ($source, $label) = $self->_open_spec($lspec);
-		return $self->reply->not_found unless $source;
+		unless ($source) {
+			my $why = $self->stash('open_spec_error');
+			return $self->reply->not_found unless defined $why;
+			return $self->render(
+				template   => "$platform/$language/home",
+				handler    => 'tt',
+				format     => 'html',
+				tables     => [],
+				title      => 'Error',
+				error      => $self->_i18n('error_file_open', $lspec, $why),
+				back_url   => '/',
+				back_label => 'Home',
+				language   => $language,
+			);
+		}
 		my $table = $label;
 		my $dedup = $self->param('d') ? 1 : 0;
 		my ($records, $has_next);
 		eval {
 			($records, $has_next) = $self->_fetch_page($source,
-				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+				{ per_page => $per_page, offset => $offset, dedup => $dedup, calc_spec_key => $lspec });
 		};
 		if ($@) {
 			return $self->render(
@@ -5881,7 +7380,7 @@ sub open_file ($self) {
 				format     => 'html',
 				tables     => [],
 				title      => 'Error',
-				error      => $self->_i18n('error_file_open', $label, $@),
+				error      => $self->_i18n('error_file_open', $label, _tidy_error($@)),
 				back_url   => '/',
 				back_label => 'Home',
 				language   => $language,
@@ -5892,10 +7391,11 @@ sub open_file ($self) {
 		return if $self->stash('_cross_row_error');
 
 		$records //= [];
-		my @columns  = _get_columns($source, $records);
-		my %seen_col = map { $_ => 1 } @columns;
-		push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
 		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
+		my $page_columns;
+		($records, $page_columns) = $self->_page_columns($source, $records, $lspec);
+		return unless $page_columns;
+		my @columns = @$page_columns;
 		my $rpage_url = $self->req->url->clone;
 		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
@@ -5912,7 +7412,7 @@ sub open_file ($self) {
 			back2_label      => $self->param('back2_label') // 'Back',
 			file_path        => $file_path,
 			left_spec        => $lspec,
-			combine_specs    => [],
+			combine_specs    => [ $self->_calc_specs_of_request ],
 			current_joins    => [],
 			available_tables => $self->_scan_join_tables,
 			join_summaries   => [],
@@ -5940,7 +7440,7 @@ sub open_file ($self) {
 		my ($records, $has_next);
 		eval {
 			($records, $has_next) = $self->_fetch_page($source,
-				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+				{ per_page => $per_page, offset => $offset, dedup => $dedup, calc_spec_key => $lspec });
 		};
 		if ($@) {
 			return $self->render(
@@ -5949,7 +7449,7 @@ sub open_file ($self) {
 				format     => 'html',
 				tables     => [],
 				title      => 'Error',
-				error      => $self->_i18n('error_file_open', $filename, $@),
+				error      => $self->_i18n('error_file_open', $filename, _tidy_error($@)),
 				back_url   => '/',
 				back_label => 'Home',
 				language   => $language,
@@ -5960,10 +7460,11 @@ sub open_file ($self) {
 		return if $self->stash('_cross_row_error');
 
 		$records //= [];
-		my @columns  = _get_columns($source, $records);
-		my %seen_col = map { $_ => 1 } @columns;
-		push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
 		my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
+		my $page_columns;
+		($records, $page_columns) = $self->_page_columns($source, $records, $lspec);
+		return unless $page_columns;
+		my @columns = @$page_columns;
 		my $rpage_url = $self->req->url->clone;
 		$rpage_url->query->remove('page')->remove('per_page');
 		return $self->render(
@@ -5980,7 +7481,7 @@ sub open_file ($self) {
 			back2_label      => $self->param('back2_label') // 'Back',
 			file_path        => $file_path,
 			left_spec        => $lspec,
-			combine_specs    => [],
+			combine_specs    => [ $self->_calc_specs_of_request ],
 			current_joins    => [],
 			available_tables => $self->_scan_join_tables,
 			join_summaries   => [],
@@ -6027,25 +7528,27 @@ sub open_file ($self) {
 	my $dedup = $self->param('d') ? 1 : 0;
 	my ($source, $records, $has_next, $is_multi_local);
 	eval {
-		$source = $self->open_table($table, directory => $dir->to_string,
-			defined $it ? (internal_table => $it) : ());
+		$source = (defined $it ? undef : $self->_accelerated_source($lspec))
+			// $self->open_table($table, directory => $dir->to_string,
+				defined $it ? (internal_table => $it) : ());
 		# Multi-table SQLite without it=: flag redirect without fetching data.
 		if (!defined $it && $source && $source->sqlite_tables
 				&& @{ $source->sqlite_tables } > 1) {
 			$is_multi_local = 1;
 		} else {
 			($records, $has_next) = $self->_fetch_page($source,
-				{ per_page => $per_page, offset => $offset, dedup => $dedup });
+				{ per_page => $per_page, offset => $offset, dedup => $dedup, calc_spec_key => $lspec });
 		}
 	};
 	if ($@) {
 		# Provide a SQLite-specific hint when the error looks like a table-name
-		# mismatch or a missing-tables failure so the user knows what to do.
+		# mismatch or a missing-tables failure so the user knows what to do.  A
+		# table whose name cannot be used has its own advice in the message.
 		my $hint;
-		if ($filename =~ /\.(?:sql|db)\z/i) {
+		if ($filename =~ /\.(?:sql|sqlite|sqlite3|db)\z/i && $@ !~ /cannot be opened|can be opened/) {
 			$hint = 'SQLite files must contain at least one user-defined table. '
 				. 'The table name inside the database does not need to match the '
-				. 'filename -- the application auto-detects and uses the first table found.';
+				. 'filename -- the application auto-detects and uses the first table it can open.';
 		}
 		return $self->render(
 			template    => "$platform/$language/home",
@@ -6053,7 +7556,7 @@ sub open_file ($self) {
 			format      => 'html',
 			tables      => [],
 			title       => 'Error',
-			error       => $self->_i18n('error_file_open', $filename, $@),
+			error       => $self->_i18n('error_file_open', $filename, _tidy_error($@)),
 			hint        => $hint,
 			back_url    => $back,
 			back_label  => $back_label_default,
@@ -6072,10 +7575,11 @@ sub open_file ($self) {
 	return if $self->stash('_cross_row_error');
 
 	$records //= [];
-	my @columns  = _get_columns($source, $records);
-	my %seen_col = map { $_ => 1 } @columns;
-	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
+	my $page_columns;
+	($records, $page_columns) = $self->_page_columns($source, $records, $lspec);
+	return unless $page_columns;
+	my @columns = @$page_columns;
 
 	my $lpage_url = $self->req->url->clone;
 	$lpage_url->query->remove('page')->remove('per_page');
@@ -6094,7 +7598,7 @@ sub open_file ($self) {
 		back2_label      => $self->param('back2_label') // 'Back',
 		file_path        => $file->to_string,
 		left_spec        => $lspec,
-		combine_specs    => [],
+		combine_specs    => [ $self->_calc_specs_of_request ],
 		current_joins    => [],
 		available_tables => $self->_scan_join_tables,
 		join_summaries   => [],
@@ -6172,11 +7676,13 @@ sub import_url ($self) {
 	return $err_home->('error_url_ssrf', $url)
 		unless _is_safe_url($url);
 
-	my $source = eval { $self->open_table('', url => $url, html_table_index => $idx) };
-	return $err_home->('error_url_fetch', $url, $@ // 'unknown error') if $@ || !$source;
-
-	my $records = eval { $source->fetch_all };
-	return $err_home->('error_url_fetch', $url, $@ // 'empty result') if $@;
+	my ($source, $records);
+	my $ok = eval {
+		$source  = $self->open_table('', url => $url, html_table_index => $idx);
+		$records = $source->fetch_all;
+		1;
+	};
+	return $err_home->('error_url_fetch', $url, _tidy_error($@)) unless $ok;
 
 	my $label   = $source->table_name;
 	my $lspec   = "url:$url";
@@ -6276,7 +7782,10 @@ sub columns_api ($self) {
 	}
 
 	my $source;
-	if (defined $table_name && $table_name =~ m{\A([A-Za-z_][A-Za-z0-9_]*)(?:/([A-Za-z_][A-Za-z0-9_]*))?\z}) {
+	if (($self->param('spec') // '') =~ $MARIADB_SPEC_RE) {
+		($source) = $self->_open_spec($self->param('spec'));
+	}
+	elsif (defined $table_name && $table_name =~ m{\A([A-Za-z_][A-Za-z0-9_]*)(?:/([A-Za-z_][A-Za-z0-9_]*))?\z}) {
 		my ($table, $internal) = ($1, $2);
 		my $data_dir = _data_dir_for($self->app);
 		return $self->render(json => { error => 'not found' }, status => 404)
@@ -6316,7 +7825,10 @@ sub columns_api ($self) {
 
 =head2 range_api
 
-C<GET /api/range> -- Return the min and max ISO date values for one column.
+C<GET /api/range> -- Return the min and max ISO date values for one column of
+a view.  The view is the left source with any joins and combines applied, so
+the column may come from a joined table, and an inner join's dropped rows do not
+count.  Filters are not applied.
 
 =head3 API SPECIFICATION
 
@@ -6324,6 +7836,9 @@ C<GET /api/range> -- Return the min and max ISO date values for one column.
 
   ?l=    string   Required. Data source spec ("table:name", "path:/abs/path", etc.).
   ?col=  string   Required. Column name to compute the range for.
+  ?j=    string   Optional, repeatable. Join spec "<spec>|<lkey>|<rkey>".
+  ?jtype= string  Optional. left (default), inner or outer.
+  ?c=    string   Optional, repeatable. Source spec to stack under the view.
 
 =head4 OUTPUT
 
@@ -6334,9 +7849,9 @@ C<GET /api/range> -- Return the min and max ISO date values for one column.
 =head3 FORMAL SPECIFICATION
 
   range_api == lambda self .
-    let src = _open_spec(param('l')) in
-    pre  src /= undef /\ col /= ''
-    post render_json({ min: min_date(src, col), max: max_date(src, col) })
+    let recs = _run_pipeline_source().records in
+    pre  param('l') /= '' /\ col /= ''
+    post render_json({ min: min_date(recs, col), max: max_date(recs, col) })
 
 =cut
 
@@ -6346,10 +7861,11 @@ sub range_api ($self) {
 	return $self->render(json => { error => 'l required'   }, status => 400) unless length $spec_str;
 	return $self->render(json => { error => 'col required' }, status => 400) unless length $col;
 
-	my ($source) = $self->_open_spec($spec_str);
-	return $self->render(json => { min => undef, max => undef }) unless $source;
-
-	my $records = eval { $source->fetch_all } // [];
+	# The pipeline, so that the range is of the rows the page shows.  A join
+	# that cannot be built croaks; this route answers "no range" instead.
+	my (undef, $records, $columns) = eval { $self->_run_pipeline_source };
+	return $self->render(json => { min => undef, max => undef })
+		unless $records && grep { $_ eq $col } @$columns;
 
 	my $iso_re = qr/\A\d{4}-\d{2}-\d{2}\z/;
 	my $mdy_re = qr|\A(\d{1,2})/(\d{1,2})/(\d{4})\z|;
@@ -6422,8 +7938,10 @@ Renders C<dashboard.html.tt> with the merged/filtered result set.
 
 sub join_tables ($self) {
 	# Rows stacked from other files cannot be paged from one backend; the
-	# combine route runs joins and combines together.
-	return $self->combine_tables if @{ $self->every_param('c') };
+	# combine route runs joins and combines together.  c= also carries calculated
+	# fields, which do not stack anything and stay on this page.
+	return $self->combine_tables
+		if @{ $self->every_param('c') } > $self->_calc_specs_of_request;
 
 	my ($platform, $language) = $self->_resolve_template;
 
@@ -6486,7 +8004,7 @@ sub join_tables ($self) {
 		($records, $has_next) = $self->_fetch_page($src,
 			{ per_page  => $per_page, offset   => $offset,
 			  dedup     => $dedup,    sort_col => $sort,
-			  sort_dir  => $dir });
+			  sort_dir  => $dir,      calc_spec_key => $left_spec });
 	};
 	if ($@) {
 		return $self->render(
@@ -6495,7 +8013,7 @@ sub join_tables ($self) {
 			format   => 'html',
 			tables   => [],
 			title    => 'Error',
-			error    => $self->_i18n('error_table_open', $left_label, $@),
+			error    => $self->_i18n('error_table_open', $left_label, _tidy_error($@)),
 			language => $language,
 		);
 	}
@@ -6504,9 +8022,10 @@ sub join_tables ($self) {
 	return if $self->stash('_cross_row_error');
 
 	$records //= [];
-	my @columns = _get_columns($src, $records);
-	my %seen_col = map { $_ => 1 } @columns;
-	push @columns, grep { !$seen_col{$_}++ } @{ $self->stash('_cross_row_columns') // [] };
+	my $page_columns;
+	($records, $page_columns) = $self->_page_columns($src, $records, $left_spec);
+	return unless $page_columns;
+	my @columns = @$page_columns;
 
 	if (defined $sort && !grep { $_ eq $sort } @columns) {
 		carp $self->_i18n('error_sort_column', $sort);
@@ -6535,7 +8054,7 @@ sub join_tables ($self) {
 		back2_url        => _safe_back_url($self->param('back2')),
 		back2_label      => $self->param('back2_label') // 'Back',
 		left_spec        => $left_spec,
-		combine_specs    => [],
+		combine_specs    => [ $self->_calc_specs_of_request ],
 		current_joins    => \@join_specs,
 		available_tables => $self->_scan_join_tables,
 		join_summaries   => \@summaries,
@@ -6629,6 +8148,18 @@ sub combine_tables ($self) {
 	my @summaries     = (@{ $self->stash('pipeline_joined') // [] },
 		@{ $self->stash('pipeline_combined') // [] });
 
+	# Stage 4, for a table of stacked rows as for any other.
+	my $span = $self->_span_calc_spec($cols_ref, ());
+	return $self->render(text => $span->{error}, status => 400) if $span && $span->{error};
+	my ($calc_records, $calc_columns) = eval {
+		$self->_apply_calc_fields($records, $cols_ref, ($span ? { calc => $span->{calc} } : undef))
+	};
+	unless ($calc_records) {
+		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
+		return $self->render(text => $e, status => 400);
+	}
+	($records, $cols_ref) = ($calc_records, $calc_columns);
+
 	# Apply the filters in memory before paginating (reduce-before-paginate).
 	my @columns;
 	return unless $self->_reduce_or_render(\$records, \$cols_ref);
@@ -6641,8 +8172,9 @@ sub combine_tables ($self) {
 	my $dir  = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
 	if (defined $sort && grep { $_ eq $sort } @columns) {
 		carp $self->_i18n('warn_combine_sort');
-		@$records = sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records;
-		@$records = reverse @$records if $dir eq 'desc';
+		# A new array: the backend's own can be read-only, as a SQLite one is.
+		$records = [ sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records ];
+		$records = [ reverse @$records ] if $dir eq 'desc';
 	} elsif (defined $sort) {
 		carp $self->_i18n('error_sort_column', $sort);
 	}
@@ -6652,7 +8184,7 @@ sub combine_tables ($self) {
 	my ($page, $per_page, $offset) = $self->_pagination;
 	my $total    = scalar @$records;
 	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
-	my @page_recs = splice(@$records, $offset, $per_page);
+	my @page_recs = @{ _rows_of_page($records, $offset, $per_page) };
 	$records = \@page_recs;
 
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
@@ -6731,10 +8263,12 @@ Any value not in the valid set (e.g. C<SQLITE>, C<Json>).
   200 application/vnd.sqlite3   Content-Disposition: attachment; filename=<name>.db
   200 application/json          Content-Disposition: attachment; filename=<name>.json
   404 application/json          { "error": "Table not found" }
+  500 text/plain                The SQLite file could not be built (no driver, no
+                                temporary space); the reason goes to the log.
 
 =head3 MESSAGES
 
-None beyond the 404 response.
+  error_export_sqlite -- the SQLite file could not be built.
 
 =head3 FORMAL SPECIFICATION
 
@@ -6858,6 +8392,9 @@ sub export_write ($self) {
 		);
 	}
 
+	# A NUL is not part of any file name, only a way of hiding the real extension.
+	$filename = '' if $filename =~ /\0/;
+
 	# Strip any path separators the browser might include.
 	($filename) = $filename =~ m{([^/\\]+)\z};
 	my $format;
@@ -6889,7 +8426,7 @@ sub export_write ($self) {
 		}
 	};
 	return $self->render(
-		json   => { error => $self->_i18n('error_write_failed', $@) },
+		json   => { error => $self->_i18n('error_write_failed', _tidy_error($@)) },
 		status => 500,
 	) if $@;
 
@@ -7148,8 +8685,17 @@ sub upload_file ($self) {
 	# the table name from the file stem, so "sales.csv" must stay "sales.csv".
 	# The random subdirectory prevents collisions from concurrent same-name uploads.
 	my $uploads_base = $self->app->_uploads_dir;
-	$uploads_base->make_path unless -d $uploads_base;
-	my $sub_dir = tempdir(DIR => $uploads_base->to_string, CLEANUP => 0);
+	my $sub_dir = eval {
+		$uploads_base->make_path unless -d $uploads_base;
+		tempdir(DIR => $uploads_base->to_string, CLEANUP => 0);
+	};
+	unless (defined $sub_dir) {
+		$self->app->log->error("Cannot stage an upload in $uploads_base: " . _tidy_error($@));
+		return $self->render(
+			json   => { error => $self->_i18n('error_upload_save') },
+			status => 500,
+		);
+	}
 	my $dest    = Mojo::File->new($sub_dir)->child($filename)->to_string;
 
 	# move_to returns the destination Mojo::File on success; croaks on I/O
@@ -7183,22 +8729,29 @@ sub clear_uploads ($self) {
 
 	# Each upload lands in <uploads_dir>/<random_subdir>/<filename>.
 	# Iterate the subdirs, tally file sizes, then remove each subdir tree.
-	$uploads_dir->list({ dir => 1 })->each(sub {
-		my ($entry) = @_;
-		if (-d $entry) {
-			$entry->list->each(sub {
-				my ($file) = @_;
-				return unless -f $file;
-				$freed += (-s $file) // 0;
+	my $ok = eval {
+		$uploads_dir->list({ dir => 1 })->each(sub {
+			my ($entry) = @_;
+			if (-d $entry) {
+				$entry->list->each(sub {
+					my ($file) = @_;
+					return unless -f $file;
+					$freed += (-s $file) // 0;
+					$count++;
+				});
+				$entry->remove_tree;
+			} elsif (-f $entry) {
+				$freed += (-s $entry) // 0;
 				$count++;
-			});
-			$entry->remove_tree;
-		} elsif (-f $entry) {
-			$freed += (-s $entry) // 0;
-			$count++;
-			unlink $entry->to_string;
-		}
-	});
+				unlink $entry->to_string;
+			}
+		});
+		1;
+	};
+	unless ($ok) {
+		$self->app->log->error("Cannot clear $uploads_dir: " . _tidy_error($@));
+		return $self->render(json => { error => $self->_i18n('error_uploads_clear') }, status => 500);
+	}
 
 	$self->render(json => { freed => $freed, count => $count });
 }
@@ -7571,7 +9124,7 @@ sub pie_view ($self) {
 	);
 
 	# Top-N: keep the highest-N slices, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') || 0);
+	my $topn_n = _whole_number($self->param('topn')) // 0;
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -7601,7 +9154,7 @@ sub pie_view ($self) {
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
 	require HTML::D3;
-	my $scheme  = $self->param('scheme') // 'tableau10';
+	my $scheme  = _categorical_scheme($self->param('scheme'));
 	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
 	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500)
 		->render_pie_chart_snippet(\@slices, {
@@ -7702,7 +9255,7 @@ sub heatmap_view ($self) {
 	my $x_col     = $self->param('x')        // '';
 	my $y_col     = $self->param('y')        // '';
 	my $val_col   = $self->param('val')      // '';
-	my $scheme    = $self->param('scheme')   // 'YlOrRd';
+	my $scheme    = _sequential_scheme($self->param('scheme'));
 	my $show_v    = $self->param('show_val') ? 1 : 0;
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
@@ -7927,7 +9480,7 @@ sub bar_view ($self) {
 	);
 
 	# Top-N: keep the highest-N categories, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') || 0);
+	my $topn_n = _whole_number($self->param('topn')) // 0;
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -8331,6 +9884,42 @@ sub tables_view ($self) {
 			}
 		};
 		return $self->reply->not_found if $@;
+	} elsif ($spec =~ $MARIADB_SERVER_RE) {
+		my $server = $1;
+		$db_label   = $server;
+		$back_url   = '/';
+		$back_label = 'Home';
+		my $found = eval {
+			Database::BI::Model::DataSource->mariadb_tables($server,
+				($self->app->config('mariadb_servers') // {})->{$server});
+		};
+		unless ($found) {
+			return $self->render(
+				template   => "$platform/$language/home",
+				handler    => 'tt',
+				format     => 'html',
+				tables     => [],
+				title      => 'Error',
+				error      => $self->_i18n('error_file_open', $spec, _tidy_error($@)),
+				back_url   => '/',
+				back_label => 'Home',
+				language   => $language,
+			);
+		}
+		for my $found_table (@{$found}) {
+			my ($name, $cols) = @{$found_table}{qw(name columns)};
+			# Database::Abstraction refuses this name, so the card says so.
+			if ($name !~ $TABLE_NAME_RE) {
+				(my $safe = $name) =~ s/[^A-Za-z0-9_]/_/g;
+				$safe = "_$safe" unless $safe =~ /\A[A-Za-z_]/;
+				push @tables, { name => $name, columns => $cols, unusable => 1, safe_name => $safe, on_server => 1 };
+				next;
+			}
+			my $open_url = '/open?path=' . url_escape("mariadb:$server/$name")
+				. '&back=' . url_escape('/tables?l=' . $spec)
+				. '&back_label=' . url_escape(ucfirst($db_label) . ' schema');
+			push @tables, { name => $name, columns => $cols, href => $open_url };
+		}
 	} else {
 		return $self->reply->not_found;
 	}
@@ -8352,6 +9941,14 @@ sub tables_view ($self) {
 				while (my $row = $sth->fetchrow_hashref) {
 					push @cols, $row->{name};
 				}
+			}
+			# Database::Abstraction refuses this name, so the card says so
+			# rather than linking to an error.
+			if ($tname !~ $TABLE_NAME_RE) {
+				(my $safe = $tname) =~ s/[^A-Za-z0-9_]/_/g;
+				$safe = "_$safe" unless $safe =~ /\A[A-Za-z_]/;
+				push @tables, { name => $tname, columns => \@cols, unusable => 1, safe_name => $safe };
+				next;
 			}
 			my $open_url = '/open?path=' . url_escape($file_path)
 				. '&it=' . url_escape($tname)
@@ -8391,6 +9988,29 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
   max_cols=<n>           Collapse column headers beyond top-N into "Other"
   page= / per_page=      Pagination over row groups
   format=csv|sqlite|json Export the pivot grid
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+The query parameters above, with C<l=> required as well.
+
+=head4 OUTPUT
+
+  200 text/html (or the export format)   The grid.
+  400 text/plain   'Missing l= parameter', error_pivot_rows_required,
+                   error_pivot_measure_req, error_pivot_measure_invalid,
+                   error_measure_column, error_pivot_dim_not_found or error_topn_col.
+  404 text/plain   The source cannot be opened.
+
+=head3 FORMAL SPECIFICATION
+
+  pivot_view
+    l?, rows?, m? : seq Char
+    response! : HTTP
+    ──────────
+    l? = ⟨⟩ ∨ rows? = ⟨⟩ ∨ m? = ⟨⟩ ⇒ response!.status = 400
+    l? ≠ ⟨⟩ ∧ ¬ opens(l?) ⇒ response!.status = 404
 
 =cut
 
@@ -8543,7 +10163,7 @@ sub pivot_view ($self) {
 	# across all col combos); aggregate the remaining rows as an "Other" row.
 	# -----------------------------------------------------------------------
 	{
-		my $topn_n   = int($self->param('topn') || 0);
+		my $topn_n   = _whole_number($self->param('topn')) // 0;
 		my $topn_col = $self->param('topn_col') // '';
 
 		if ($topn_n > 0 && @row_key_order > $topn_n) {
@@ -8817,6 +10437,28 @@ values, through the same C<_percentile_of>, C<_median_of>, C<_stdev_of> and
 C<_range_of> arithmetic the pivot's C<median>, C<pN>, C<stdev> and C<range>
 measures use -- so a median here and a median measure there are the same number.
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+The query parameters above, with C<l=> required.
+
+=head4 OUTPUT
+
+  200 text/html    The statistics.
+  400 text/plain   'Missing l= parameter', or error_stats_percentile when p= is
+                   not a whole number from 1 to 100.
+  404 text/plain   The source cannot be opened.
+
+=head3 FORMAL SPECIFICATION
+
+  stats_view
+    l?, p? : seq Char
+    response! : HTTP
+    ──────────
+    l? = ⟨⟩ ⇒ response!.status = 400
+    p? ≠ ⟨⟩ ∧ p? ∉ { "1" .. "100" } ⇒ response!.status = 400
+
 =cut
 
 sub stats_view ($self) {
@@ -8938,7 +10580,7 @@ sub stats_view ($self) {
 # ---------------------------------------------------------------------------
 
 sub calc_save ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	my $name = $self->param('name') // '';
 	my $expr = $self->param('expr') // '';
 
@@ -8958,7 +10600,7 @@ sub calc_save ($self) {
 }
 
 sub calc_delete ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	my $name = $self->param('name') // '';
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
@@ -8971,7 +10613,7 @@ sub calc_delete ($self) {
 }
 
 sub calc_list ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 
@@ -8984,10 +10626,13 @@ sub calc_list ($self) {
 # ---------------------------------------------------------------------------
 
 sub groups_save ($self) {
-	my $spec       = $self->param('l')     // '';
+	my $spec       = canonical_spec($self->param('l')     // '');
 	my $col        = $self->param('col')   // '';
 	my $group_name = $self->param('group') // '';
-	my @values     = @{ $self->every_param('values') // [] };
+
+	# The panel sends one values= holding a line for each value; a script may just
+	# as well repeat the parameter.
+	my @values = map { split /\r?\n/ } @{ $self->every_param('values') // [] };
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
@@ -9003,7 +10648,7 @@ sub groups_save ($self) {
 }
 
 sub groups_delete ($self) {
-	my $spec       = $self->param('l')     // '';
+	my $spec       = canonical_spec($self->param('l')     // '');
 	my $col        = $self->param('col')   // '';
 	my $group_name = $self->param('group') // '';
 
@@ -9023,7 +10668,7 @@ sub groups_delete ($self) {
 }
 
 sub groups_list ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 
@@ -9047,7 +10692,7 @@ sub groups_list ($self) {
 # comparisons already read to the second, so a last_24_hours window filters on
 # a column that has a pattern of this kind.
 sub dates_save ($self) {
-	my $spec    = $self->param('l')       // '';
+	my $spec    = canonical_spec($self->param('l')       // '');
 	my $col     = $self->param('col')     // '';
 	my $pattern = $self->param('pattern') // '';
 	my $time    = $self->param('time')    // '';
@@ -9083,7 +10728,7 @@ sub dates_save ($self) {
 # dates_delete: POST /dates/delete?l=<spec>&col=<col>
 # Removes the pattern for $col (or all patterns for $spec when col is absent).
 sub dates_delete ($self) {
-	my $spec = $self->param('l')   // '';
+	my $spec = canonical_spec($self->param('l')   // '');
 	my $col  = $self->param('col') // '';
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
@@ -9104,12 +10749,150 @@ sub dates_delete ($self) {
 # date-format string it has always been or, for a column that also holds a time,
 # { date =>, time =>, as => }.
 sub dates_list ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 
 	my $models = $self->_read_models;
 	$self->render(json => { patterns => $models->{date_patterns}{$spec} // {} });
+}
+
+# ---------------------------------------------------------------------------
+# Stored-lookup CRUD  (POST /lookups/save, POST /lookups/delete, GET /lookups/list)
+# ---------------------------------------------------------------------------
+
+# lookups_save: POST /lookups/save?l=<spec>&name=<ident>&file=<path>&key=<col>
+#               [&col=<col>][&fields=<col>[,<col>...]][&default=<value>]
+# Stores models.json lookups.<spec>.<name>.  The file is read now, so a file
+# outside data_dir, a missing one, one too large, and a key or field it does not
+# have are all 400s here rather than on the next page.  fields= may repeat or
+# hold a comma-separated list; without it every column but the key is added.
+sub lookups_save ($self) {
+	my $spec = canonical_spec($self->param('l')    // '');
+	my $name = $self->param('name') // '';
+	my $key  = $self->param('key')  // '';
+	my $col  = $self->param('col')  // '';
+	my @fields = grep { length } map { split /,/ } @{ $self->every_param('fields') // [] };
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(json => { error => $self->_i18n('error_lookup_name', $name) }, status => 400)
+		unless $name =~ $LOOKUP_NAME_RE;
+	return $self->render(json => { error => 'key= required' }, status => 400)
+		unless length $key;
+
+	my %def = (
+		file => $self->param('file') // '',
+		key  => $key,
+		(length $col ? (col => $col) : ()),
+		(@fields ? (fields => \@fields) : ()),
+		(defined $self->param('default') ? (default => $self->param('default')) : ()),
+	);
+	my $ok = eval { $self->_load_lookup({ %def, name => $name }); 1 };
+	return $self->render(json => { error => _tidy_error($@) }, status => 400) unless $ok;
+
+	my $models = $self->_read_models;
+	$models->{lookups}{$spec}{$name} = \%def;
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# lookups_delete: POST /lookups/delete?l=<spec>[&name=<ident>]
+# Removes one lookup, or every lookup of $spec when name= is absent.
+sub lookups_delete ($self) {
+	my $spec = canonical_spec($self->param('l')    // '');
+	my $name = $self->param('name') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	if (length $name) {
+		delete $models->{lookups}{$spec}{$name};
+	} else {
+		delete $models->{lookups}{$spec};
+	}
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# lookups_list: GET /lookups/list?l=<spec>
+# Returns { lookups: { name: { file, key, col?, fields?, default? }, ... } }.
+sub lookups_list ($self) {
+	my $spec = canonical_spec($self->param('l') // '');
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { lookups => $models->{lookups}{$spec} // {} });
+}
+
+# ---------------------------------------------------------------------------
+# Stored-extraction CRUD  (POST /extract/save, POST /extract/delete, GET /extract/list)
+# ---------------------------------------------------------------------------
+
+# extract_save: POST /extract/save?l=<spec>&name=<ident>&col=<col>&pattern=<re>
+#               [&fields=<group>[,<group>...]]
+# Stores models.json extractions.<spec>.<name> = { col, pattern, fields }.  The
+# pattern is compiled now, so one that is too long, uses a refused construct,
+# does not compile or names no group is a 400 here.  fields= picks some of the
+# named groups; without it every named group becomes a column.
+sub extract_save ($self) {
+	my $spec    = canonical_spec($self->param('l')       // '');
+	my $name    = $self->param('name')    // '';
+	my $col     = $self->param('col')     // '';
+	my $pattern = $self->param('pattern') // '';
+	my @fields  = grep { length } map { split /,/ } @{ $self->every_param('fields') // [] };
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+	return $self->render(json => { error => $self->_i18n('error_extract_name', $name) }, status => 400)
+		unless $name =~ $LOOKUP_NAME_RE;
+	return $self->render(json => { error => 'col= required' }, status => 400)
+		unless length $col;
+	return $self->render(json => { error => 'pattern= required' }, status => 400)
+		unless length $pattern;
+
+	my %def = (col => $col, pattern => $pattern, (@fields ? (fields => \@fields) : ()));
+	my $fields;
+	my $ok = eval { (undef, $fields) = $self->_compile_extraction($name, \%def); 1 };
+	return $self->render(json => { error => _tidy_error($@) }, status => 400) unless $ok;
+	$def{fields} = $fields;
+
+	my $models = $self->_read_models;
+	$models->{extractions}{$spec}{$name} = \%def;
+	$self->_write_models($models);
+	$self->render(json => { ok => 1, fields => $fields });
+}
+
+# extract_delete: POST /extract/delete?l=<spec>[&name=<ident>]
+# Removes one extraction, or every extraction of $spec when name= is absent.
+sub extract_delete ($self) {
+	my $spec = canonical_spec($self->param('l')    // '');
+	my $name = $self->param('name') // '';
+
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	if (length $name) {
+		delete $models->{extractions}{$spec}{$name};
+	} else {
+		delete $models->{extractions}{$spec};
+	}
+	$self->_write_models($models);
+	$self->render(json => { ok => 1 });
+}
+
+# extract_list: GET /extract/list?l=<spec>
+# Returns { extractions: { name: { col, pattern, fields }, ... } }.
+sub extract_list ($self) {
+	my $spec = canonical_spec($self->param('l') // '');
+	return $self->render(json => { error => 'l= required' }, status => 400)
+		unless length $spec;
+
+	my $models = $self->_read_models;
+	$self->render(json => { extractions => $models->{extractions}{$spec} // {} });
 }
 
 # ---------------------------------------------------------------------------
@@ -9120,21 +10903,26 @@ sub dates_list ($self) {
 # geo.<spec>.places and is written by _map_data independently.
 # ---------------------------------------------------------------------------
 
-# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location
+# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location[&replace=1]
+# col= and kind= may repeat, in pairs, so a latitude and a longitude are saved
+# in one request.  replace=1 forgets the spec's saved columns first: the map
+# panel's "Remember" sends it, so a new choice replaces the old one rather than
+# leaving, say, a place-name column beside the latitude chosen after it.
 sub geo_save ($self) {
-	my $spec = $self->param('l')    // '';
-	my $col  = $self->param('col')  // '';
-	my $kind = $self->param('kind') // '';
+	my $spec  = canonical_spec($self->param('l') // '');
+	my @cols  = @{ $self->every_param('col')  // [] };
+	my @kinds = @{ $self->every_param('kind') // [] };
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 	return $self->render(json => { error => 'col= required' }, status => 400)
-		unless length $col;
+		unless @cols && !grep { !length } @cols;
 	return $self->render(json => { error => 'kind must be lat, lon, or location' }, status => 400)
-		unless $kind =~ /\A(?:lat|lon|location)\z/;
+		unless @kinds == @cols && !grep { !/\A(?:lat|lon|location)\z/ } @kinds;
 
 	my $models = $self->_read_models;
-	$models->{geo}{$spec}{columns}{$col} = { kind => $kind };
+	delete $models->{geo}{$spec}{columns} if $self->param('replace');
+	$models->{geo}{$spec}{columns}{ $cols[$_] } = { kind => $kinds[$_] } for 0 .. $#cols;
 	$self->_write_models($models);
 	$self->render(json => { ok => 1 });
 }
@@ -9142,7 +10930,7 @@ sub geo_save ($self) {
 # geo_delete: POST /geo/delete?l=<spec>&col=<col>
 # Omit col= to clear all column preferences for the spec.
 sub geo_delete ($self) {
-	my $spec = $self->param('l')   // '';
+	my $spec = canonical_spec($self->param('l')   // '');
 	my $col  = $self->param('col') // '';
 
 	return $self->render(json => { error => 'l= required' }, status => 400)
@@ -9161,7 +10949,7 @@ sub geo_delete ($self) {
 # geo_list: GET /geo/list?l=<spec>
 # Returns { columns: { col: { kind: "lat"|"lon"|"location" }, ... } }.
 sub geo_list ($self) {
-	my $spec = $self->param('l') // '';
+	my $spec = canonical_spec($self->param('l') // '');
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 
@@ -9288,7 +11076,7 @@ sub stacked_view ($self) {
 	my $seg_col   = $self->param('series') // $self->param('seg') // '';
 	my $val_col   = $self->param('val')    // '';
 	my $orient    = $self->param('orient') // 'v';
-	my $scheme    = $self->param('scheme') // 'tableau10';
+	my $scheme    = _categorical_scheme($self->param('scheme'));
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
@@ -9512,7 +11300,7 @@ sub treemap_view ($self) {
 	my $cat_col   = $self->param('group') // $self->param('cat') // '';
 	# ?size= is the canonical spec name; ?val= is the legacy alias (keep both).
 	my $val_col   = $self->param('size')  // $self->param('val') // '';
-	my $scheme    = $self->param('scheme') // 'tableau10';
+	my $scheme    = _categorical_scheme($self->param('scheme'));
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
@@ -9554,7 +11342,7 @@ sub treemap_view ($self) {
 	);
 
 	# Top-N: keep the highest-N tiles, aggregate the rest as "Other".
-	my $topn_n = int($self->param('topn') || 0);
+	my $topn_n = _whole_number($self->param('topn')) // 0;
 	if ($topn_n > 0 && @$agg_rows > $topn_n) {
 		my @sorted   = sort { ($b->{value} // 0) <=> ($a->{value} // 0) } @$agg_rows;
 		my @top_agg  = @sorted[0 .. $topn_n - 1];
@@ -9658,9 +11446,9 @@ sub histogram_view ($self) {
 		status => 200,
 	) unless @values;
 
-	$bins = int($bins);
+	$bins = _whole_number($bins) // ($bins =~ /\A\d+\z/ ? $MAX_HISTOGRAM_BINS : 1);	# more digits than a number holds is a lot of bins
 	$bins = 1   if $bins < 1;
-	$bins = 200 if $bins > 200;
+	$bins = $MAX_HISTOGRAM_BINS if $bins > $MAX_HISTOGRAM_BINS;
 
 	# Server-side binning: compute equal-width bins over the data range.
 	# Values equal to $max land in the highest bin (no overflow bar).
@@ -10018,6 +11806,7 @@ sub wordcloud_view ($self) {
 # Leaflet element ids unique when several maps share one page; undef leaves the
 # map page's own ids alone.
 sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_key, $id_suffix) {
+	$spec_key = canonical_spec($spec_key);
 	$encode  //= {};
 	$options //= {};
 
@@ -10027,7 +11816,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	my $by_location = length $loc_col;
 
 	return { error => $self->_i18n('error_map_source'), status => 400 }
-		unless $by_location || (length($lat_col) && length($lon_col));
+		unless $by_location || length($lat_col) || length($lon_col);
 	return { error => $self->_i18n('error_map_coordinates'), status => 400 }
 		if !$by_location && (!length($lat_col) || !length($lon_col));
 
@@ -10270,73 +12059,86 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 				(defined($options->{max_zoom})  ? (max_zoom => $options->{max_zoom}) : ()),
 				%leaflet_assets,
 			);
-			my $map = HTML::OSM->new(%osm_args);
-			my $color_col     = $options->{color_col} // '';
-			my $color_rules   = $options->{color_rules}   // [];
-			my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
-			my $size_col      = $options->{size} // '';
+			# The renderer is a third-party module: whatever it does, the page
+			# reports it and survives, as it does when the module is absent.
+			my $drawn = eval {
+				my $map = HTML::OSM->new(%osm_args);
+				my $color_col     = $options->{color_col} // '';
+				my $color_rules   = $options->{color_rules}   // [];
+				my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
+				my $size_col      = $options->{size} // '';
 
-			# Bubble maps: one radius per marker, scaled across the plotted
-			# values.  Circle markers keep their pixel size as the reader
-			# zooms, which is what makes them comparable.
-			my ($size_min, $size_max) = _map_size_range($records, \@markers, $size_col);
+				# Bubble maps: one radius per marker, scaled across the plotted
+				# values.  Circle markers keep their pixel size as the reader
+				# zooms, which is what makes them comparable.
+				my ($size_min, $size_max) = _map_size_range($records, \@markers, $size_col);
 
-			for my $marker (@markers) {
-				my $row = $records->[ $marker->{first_row} ];
-				my $color;
-				if (length $color_col) {
-					my $cval = (defined($row) ? $row->{$color_col} : undef) // '';
-					$color = _apply_color_rule($cval, $color_rules, $color_default);
-				}
-				if (length $size_col) {
-					my $sv = defined($row)
-						? _numeric_cell($row->{$size_col} // '') : undef;
-					$map->add_circle_marker(
-						[ $marker->{lat}, $marker->{lon} ],
-						html   => $marker->{label},
-						radius => _map_radius($sv, $size_min, $size_max),
-						(defined($color) ? (colour => _color_hex($color)) : ()),
-					);
-				} else {
-					$map->add_marker(
-						[ $marker->{lat}, $marker->{lon} ],
-						html => $marker->{label},
-						(defined($color) ? (icon => _marker_icon($color)) : ()),
-					);
-				}
-			}
-
-			# Heat map overlay: when heat=1 is requested, plot a density
-			# heatmap in addition to the regular markers.  The weight column
-			# (weight=<col>) drives the intensity of each point; absent the
-			# column every point has equal weight 1.0.  Normalisation to [0,1]
-			# ensures the heatmap library gets values in the expected range.
-			if ($options->{heat}) {
-				my $weight_col  = $options->{weight} // '';
-				my @heat_pts;
 				for my $marker (@markers) {
 					my $row = $records->[ $marker->{first_row} ];
-					my $w;
-					if (length $weight_col && defined $row) {
-						$w = _numeric_cell($row->{$weight_col} // '');
+					my $color;
+					if (length $color_col) {
+						my $cval = (defined($row) ? $row->{$color_col} : undef) // '';
+						$color = _apply_color_rule($cval, $color_rules, $color_default);
 					}
-					push @heat_pts, [ $marker->{lat}, $marker->{lon},
-						(defined($w) ? $w : 1) ];
-				}
-				# Normalise weights to [0,1] when a weight column was used.
-				if (length $weight_col && @heat_pts) {
-					my $max_w = 0;
-					$max_w = $_->[2] > $max_w ? $_->[2] : $max_w for @heat_pts;
-					if ($max_w > 0) {
-						$_->[2] = $_->[2] / $max_w for @heat_pts;
+					if (length $size_col) {
+						my $sv = defined($row)
+							? _numeric_cell($row->{$size_col} // '') : undef;
+						$map->add_circle_marker(
+							[ $marker->{lat}, $marker->{lon} ],
+							html   => $marker->{label},
+							radius => _map_radius($sv, $size_min, $size_max),
+							(defined($color) ? (colour => _color_hex($color)) : ()),
+						);
+					} else {
+						$map->add_marker(
+							[ $marker->{lat}, $marker->{lon} ],
+							html => $marker->{label},
+							(defined($color) ? (icon => _marker_icon($color)) : ()),
+						);
 					}
 				}
-				eval { $map->add_heatmap(\@heat_pts) };
-			}
 
-			($map_head, $map_body) = $map->onload_render();
-			($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
-				if defined($id_suffix) && length($id_suffix);
+				# Heat map overlay: when heat=1 is requested, plot a density
+				# heatmap in addition to the regular markers.  The weight column
+				# (weight=<col>) drives the intensity of each point; absent the
+				# column every point has equal weight 1.0.  Normalisation to [0,1]
+				# ensures the heatmap library gets values in the expected range.
+				if ($options->{heat}) {
+					my $weight_col  = $options->{weight} // '';
+					my @heat_pts;
+					for my $marker (@markers) {
+						my $row = $records->[ $marker->{first_row} ];
+						my $w;
+						if (length $weight_col && defined $row) {
+							$w = _numeric_cell($row->{$weight_col} // '');
+						}
+						push @heat_pts, [ $marker->{lat}, $marker->{lon},
+							(defined($w) ? $w : 1) ];
+					}
+					# Normalise weights to [0,1] when a weight column was used.
+					if (length $weight_col && @heat_pts) {
+						my $max_w = 0;
+						$max_w = $_->[2] > $max_w ? $_->[2] : $max_w for @heat_pts;
+						if ($max_w > 0) {
+							$_->[2] = $_->[2] / $max_w for @heat_pts;
+						}
+					}
+					eval { $map->add_heatmap(\@heat_pts) };
+				}
+
+				($map_head, $map_body) = $map->onload_render();
+				($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
+					if defined($id_suffix) && length($id_suffix);
+				1;
+			};
+			unless ($drawn) {
+				$self->app->log->error('The map could not be drawn: ' . _tidy_error($@));
+				($map_head, $map_body) = ();
+				push @messages, {
+					key  => 'error_map_renderer_failed',
+					text => $self->_i18n('error_map_renderer_failed'),
+				};
+			}
 		} elsif (defined $osm_version) {
 			push @messages, {
 				key  => 'error_map_renderer_old',
@@ -10555,7 +12357,7 @@ sub map_view ($self) {
 	my $by_location = length $loc_col;
 
 	return $self->render(text => $self->_i18n('error_map_source'), status => 400)
-		unless $by_location || (length($lat_col) && length($lon_col));
+		unless $by_location || length($lat_col) || length($lon_col);
 	return $self->render(text => $self->_i18n('error_map_coordinates'), status => 400)
 		if !$by_location && (!length($lat_col) || !length($lon_col));
 
@@ -10769,7 +12571,7 @@ sub _map_radius {
 sub _map_limit {
 	my ($value, $default) = @_;
 
-	return $default unless defined($value) && ($value =~ /\A\d+\z/) && ($value > 0);
+	return $default unless defined($value) && ($value =~ /\A\d{1,$MAX_WHOLE_NUMBER_DIGITS}\z/) && ($value > 0);
 
 	return $value + 0;
 }
@@ -10974,6 +12776,38 @@ sub catalog_view ($self) {
 	);
 }
 
+=head2 canvases_view
+
+C<GET /canvases> -- The saved canvases, as cards that open, select and delete,
+with Import canvas.  The main navigation's Canvases link.  The list is the one
+the home page shows (C<layouts/canvas_list.html.tt>); here it also says when
+there are none, and how to make one.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+C<200> with the HTML page.  The cards are drawn by the page from
+C<GET /api/analyses>.
+
+=cut
+
+sub canvases_view ($self) {
+	my ($platform, $language) = $self->_resolve_template;
+	$self->render(
+		handler        => 'tt',
+		template       => "$platform/$language/canvases",
+		format         => 'html',
+		title          => 'Canvases',
+		canvases_empty => 'There are no saved canvases yet. To make one, open a table and click New canvas..., or import a canvas from a file.',
+		language       => $language,
+	);
+}
+
 # _share_secret($self) -> $secret_string
 sub _share_secret :Protected ($self) {
 	my $s = $self->app->config('share_secret') // '';
@@ -11084,22 +12918,31 @@ sub embed_view ($self) {
 		return $self->render(text => 'This shared analysis has no visuals', status => 404);
 	}
 
-	# Build a minimal context for the embed template.
-	# Reuse the canvas pipeline helper to render visuals.
-	my ($src, $records, $columns) = $self->_build_canvas_pipeline($a);
-	return $self->render(text => 'Cannot open data source', status => 422)
-		unless defined $records;
+	# Drawn as on the canvas page, each card through its own failure: one card that
+	# cannot be drawn says so, and leaves the others.
+	my $ctx = $self->_canvas_render_context($a, $self->req->url->query->to_string);
+	return $self->render(text => $ctx->{error}, status => $ctx->{status})
+		if $ctx->{error};
 
-	my @rendered;
+	my (@rendered, $head);
 	for my $i (0 .. $#visuals) {
-		my $vis = $visuals[$i];
-		my $ctx = eval { $self->_canvas_render_context($a, $self->req->url->query->to_string) };
-		next unless $ctx && ref $ctx eq 'HASH' && !$ctx->{error};
-		push @rendered, $ctx;
+		my $vis  = $visuals[$i];
+		my $card = eval {
+			$self->_render_visual_html(
+				$vis, $ctx->{records}, $ctx->{columns}, $ctx->{src}, $i, $ctx->{spec_key}, 0, $ctx->{cross_row},
+			);
+		} // { error => _tidy_error($@) };
+		$head //= $card->{head} if length($card->{head} // '');
+		push @rendered, {
+			id    => $i,
+			title => ($vis->{title} // $card->{title} // ''),
+			html  => $card->{html},
+			error => $card->{error},
+			kind  => ($vis->{kind} // ''),
+			plain => _text_card_plain($vis),
+		};
 	}
 
-	# Simpler: delegate to canvas_render and let it handle the heavy lifting.
-	# Just set a flag so the embed template is selected.
 	$self->stash(embed_mode => 1, sharing_mode => 1);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -11110,6 +12953,7 @@ sub embed_view ($self) {
 		canvas_id   => $id,
 		canvas_name => $a->{name},
 		visuals     => \@rendered,
+		card_head   => ($head // ''),
 		language    => $language,
 	);
 }
@@ -11135,24 +12979,29 @@ sub visual_download ($self) {
 	my @visuals = @{ $a->{visuals} // [] };
 	return $self->render(text => "Visual $n not found", status => 404)
 		unless $n < scalar @visuals;
+	return $self->render(text => $MESSAGES{error_text_card_no_data}, status => 404)
+		if ($visuals[$n]{kind} // '') eq 'text';
 
 	if ($format eq 'csv') {
 		$self->stash(buffer => 0);
-		# Run the pipeline and return CSV for this visual's data.
-		my (undef, $records, $columns) = $self->_run_pipeline_source;
-		return $self->render(text => 'Cannot open data source', status => 422)
-			unless defined $records;
-		my $csv = $self->_serialize_csv($records, $columns);
+		# The canvas names its own source: l= on this URL is no way to reach another.
+		my $ctx = $self->_canvas_render_context($a, $self->req->url->query->to_string);
+		return $self->render(text => $ctx->{error}, status => $ctx->{status})
+			if $ctx->{error};
+		my $records = $ctx->{records};
+		for my $spec (@{ $visuals[$n]{filters} // [] }) {
+			$records = _apply_filter_spec($records, $spec);
+		}
 		$self->res->headers->content_disposition(
 			"attachment; filename=\"visual-$n.csv\""
 		);
-		return $self->render(data => encode('UTF-8', $csv), format => 'txt');
+		return $self->render(data => _serialize_csv($records, $ctx->{columns}), format => 'txt');
 	}
 
 	# PNG: not implemented in the server (canvas/SVG rendering is client-side).
 	# Return 501 with a descriptive message.
 	return $self->render(
-		text   => 'PNG download requires the browser SVG renderer; use the in-page Save Image button',
+		text   => 'PNG download requires the browser SVG renderer; use the PNG button on the card',
 		status => 501,
 	);
 }
@@ -11255,7 +13104,7 @@ sub summary_api ($self) {
 	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my $row_count = scalar @$records;
-	(my $label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
+	(my $label = $left_spec) =~ s/\A(?:table:|path:|url:|mariadb:|redis:[^|]+\|)//;
 
 	require Database::BI::Insights;
 	my $insights = Database::BI::Insights::compute(
@@ -11318,7 +13167,7 @@ sub insights_view ($self) {
 	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my $row_count = scalar @$records;
-	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:|redis:[^|]+\|)//;
+	(my $left_label = $left_spec) =~ s/\A(?:table:|path:|url:|mariadb:|redis:[^|]+\|)//;
 
 	require Database::BI::Insights;
 	my $insights = Database::BI::Insights::compute(
@@ -11562,7 +13411,7 @@ into the data behind a slice without leaving the application.
 
   200 text/html   TT-rendered pie chart page containing:
                   - Two-level breadcrumb (Home > Back to table).
-                  - Export buttons for SVG and PNG (legend is composited in).
+                  - Export buttons for SVG, PNG and PDF (legend is composited in).
                   - An animated D3.js pie or donut chart with a colour-coded
                     legend.  Each slice and legend entry is clickable and
                     navigates to the filtered table view.
@@ -11645,8 +13494,10 @@ key is not set.
 =head4 OUTPUT
 
   200 application/json   { "freed": <bytes>, "count": <n> }
+  500 application/json   { "error": "Could not clear the uploaded files" }
 
-C<freed> is the total number of bytes removed.  C<count> is the number of
+The 500 is for a staging directory the application may not read or change; the
+reason goes to the log.  C<freed> is the total number of bytes removed.  C<count> is the number of
 files deleted.  Both are 0 when the directory is absent or already empty.
 
 =cut
@@ -12074,50 +13925,64 @@ over the rows that card draws.
   404 text/plain   Unknown analysis.
   422 text/plain   Stored document fails validation.
 
-=head2 analyses_list / analyses_create / analyses_get / analyses_update / analyses_patch / analyses_delete / analyses_import / analyses_export / analyses_add_visual / analyses_update_visual
+=head2 analyses_list / analyses_create / analyses_get / analyses_update / analyses_patch / analyses_delete / analyses_import / analyses_export / analyses_add_visual / analyses_update_visual / analyses_delete_visual
 
 C</api/analyses> -- CRUD and import/export for saved analyses.  Documents are
 validated on write: unknown top-level keys are dropped and a document that is
 not a JSON object is refused.  Import accepts a document exported by
-C<GET /api/analyses/:id/export> and creates a new id.
+C<GET /api/analyses/:id/export> and creates a new id.  A document on disc that
+has been edited into the wrong shape is read with the bad parts treated as
+absent, so it is still served.
 
 =head3 API SPECIFICATION
 
 =head4 INPUT / OUTPUT
 
   GET    /api/analyses                 -> 200 { analyses: [ { id, name, datasets, updated }, ... ] }
-  POST   /api/analyses                 <- JSON document; 201 { id } or 400 { error }
-  POST   /api/analyses/import          <- JSON document; 201 { id } or 400 { error }
+  POST   /api/analyses                 <- JSON document; 201 { id, created: 1 } or 400 { error }
+  POST   /api/analyses/import          <- JSON document, or upload "file"; 201 { id, imported: 1 } or 400 { error }
   GET    /api/analyses/:id             -> 200 document, 400 invalid id, 404 unknown
-  PUT    /api/analyses/:id             <- JSON document; 200 { saved: 1 }, 400, 404
-  PATCH  /api/analyses/:id             <- partial JSON document; 200 { saved: 1 }, 400, 404
+  PUT    /api/analyses/:id             <- JSON document; 200 { id, updated: 1 }, 400, 404
+  PATCH  /api/analyses/:id             <- partial JSON document; 200 { id, updated: 1 }, 400, 404
   DELETE /api/analyses/:id             -> 200 { deleted: 1 }, 400, 404
   GET    /api/analyses/:id/export      -> 200 JSON document, 400, 404
-  POST   /api/analyses/:id/visuals     <- JSON visual; 201 { visual }, 400, 404
-  PATCH  /api/analyses/:id/visuals/:visual  <- partial JSON visual; 200, 400, 404
+  POST   /api/analyses/:id/visuals     <- JSON visual { kind, encode, options, title, cross_row, query };
+                                       201 { visual, html, head, title, ... }, 400, 404, 422
+  PATCH  /api/analyses/:id/visuals/:visual  <- { encode, cross_row, query }; 200, 400, 404, 422
+                                       a text card takes { options } instead
+  DELETE /api/analyses/:id/visuals/:visual  -> 200 { deleted: 1 }; 400 unless a text card, 404
 
-Writes return 503 when the model store is not writable.
+A C<text> card reads no data.  Its C<options> are C<text> (required), C<font>,
+C<size> (points), C<colour> and C<background> (C<#rrggbb>; absent follows the
+theme), C<align>, C<bold>, C<italic> and C<plain> (hide the frame and header
+until the card is pointed at).  Only a text card can be removed.
+
+PATCH checks only the keys it is given.  Every write answers 503 with
+C<error_analysis_storage> when the model store is not writable, and then nothing
+has been saved.
 
 =head2 analyses_share / share_view / embed_view / visual_download
 
-C<POST /api/analyses/:id/share> issues a signed, expiring read-only token;
-C<GET /share/:id?token=...> renders the canvas without edit controls, and
-C<GET /embed/:id?token=...> renders it without page chrome for an iframe.
-C<GET /a/:id/visual/:n/csv> downloads one visual's rows as CSV; the C<png>
-form is not rendered server-side and returns 501, because the chart pages
+C<POST /api/analyses/:id/share> issues a signed read-only token that lasts a
+fixed time; C<GET /share/:id?token=...> renders the canvas without edit controls,
+and C<GET /embed/:id?token=...> renders its cards without page chrome for an
+iframe.  C<GET /a/:id/visual/:n/csv> downloads the rows behind one visual as CSV,
+always from the canvas's own dataset, with that card's filters applied; the
+C<png> form is not rendered server-side and returns 501, because the chart pages
 rasterise their own SVG in the browser.
 
 =head3 API SPECIFICATION
 
 =head4 INPUT / OUTPUT
 
-  POST /api/analyses/:id/share   <- expires=<seconds> (optional)
-                                 -> 200 { token, expires }, 400, 404
-  GET  /share/:id?token=...      -> 200 text/html, 400 missing token,
-                                    401/403 bad or expired token, 404 unknown
-  GET  /embed/:id?token=...      -> as /share/:id, plus 422 invalid document
+  POST /api/analyses/:id/share   -> 200 { token, url, expires }, 400 invalid id, 404 unknown
+  GET  /share/:id?token=...      -> 200 text/html, 400 invalid id, 401 missing token,
+                                    403 bad or expired token, 404 unknown or no visuals
+  GET  /embed/:id?token=...      -> as /share/:id, plus 422 when the data cannot be opened;
+                                    a card that cannot be drawn shows its error in place
   GET  /a/:id/visual/:n/:fmt     -> 200 text/csv for fmt=csv; 501 for fmt=png;
-                                    400 bad visual index; 404 unknown analysis
+                                    400 bad format or visual index; 404 unknown analysis or visual;
+                                    422 when the data cannot be opened
 
 =head2 catalog_view
 
@@ -12209,9 +14074,9 @@ open and pre-populates its column selects.
   GET  /geo/list?l=<spec>   -> 200 { columns: { <col>: { kind: lat|lon|location } } }
                                400 { error }
   POST /geo/save            <- l=, col=, kind=lat|lon|location
-                            -> 200 { saved: 1 }, 400 { error }
+                            -> 200 { ok: 1 }, 400 { error }
   POST /geo/delete          <- l=, col= (omit col to clear the spec)
-                            -> 200 { deleted: 1 }, 400 { error }
+                            -> 200 { ok: 1 }, 400 { error }
 
 =head2 calc_list / calc_save / calc_delete
 
@@ -12234,20 +14099,20 @@ C<Database::BI::Calc> and appended as virtual columns before any aggregation.
   INPUT:  l=<spec>   (required)
           name=<id>  (required; must match /\A[A-Za-z_][A-Za-z0-9_]*\z/)
           expr=<expression>  (required; max 512 chars; hostile patterns rejected)
-  OUTPUT: 200 application/json  { "saved": 1 }
+  OUTPUT: 200 application/json  { "ok": 1 }
           400 application/json  { "error": "..." }  (compile error or hostile input)
 
 =head4 calc_delete (POST /calc/delete)
 
   INPUT:  l=<spec>   (required)
           name=<id>  (required)
-  OUTPUT: 200 application/json  { "deleted": 1 }
+  OUTPUT: 200 application/json  { "ok": 1 }
           400 application/json  { "error": "l= required" }
 
 =head3 EXAMPLE
 
   POST /calc/save  l=path:/data/sales.csv&name=margin&expr=amount-cost
-    -> 200 { "saved": 1 }
+    -> 200 { "ok": 1 }
   GET /calc/list?l=path:/data/sales.csv
     -> 200 { "fields": { "margin": "amount-cost" } }
 
@@ -12262,26 +14127,26 @@ named value groups that produce virtual C<${col}_group> columns.
 
 =head4 groups_list (GET /groups/list)
 
-  INPUT:  l=<spec>  (required), col=<col>  (required)
-  OUTPUT: 200 application/json  { "groups": { "<label>": ["<val>", ...], ... } }
+  INPUT:  l=<spec>  (required)
+  OUTPUT: 200 application/json  { "groups": { "<col>": { "<label>": ["<val>", ...], ... }, ... } }
           400 application/json  { "error": "l= required" } or "col= required"
 
 =head4 groups_save (POST /groups/save)
 
-  INPUT:  l=<spec>, col=<col>, group=<label>, values=<newline-separated values>
-  OUTPUT: 200 application/json  { "saved": 1 }
+  INPUT:  l=<spec>, col=<col>, group=<label>, values=<newline-separated values, and/or repeated>
+  OUTPUT: 200 application/json  { "ok": 1 }
           400 application/json  { "error": "..." }
 
 =head4 groups_delete (POST /groups/delete)
 
-  INPUT:  l=<spec>, col=<col>, group=<label>  (omit group= to delete all groups for col)
-  OUTPUT: 200 application/json  { "deleted": 1 }
+  INPUT:  l=<spec>, col=<col>, group=<label>  (omit group= for all of col's groups, and col= as well for all of the spec's)
+  OUTPUT: 200 application/json  { "ok": 1 }
           400 application/json  { "error": "l= required" }
 
 =head3 EXAMPLE
 
   POST /groups/save  l=path:/data/sales.csv&col=region&group=North&values=MN%0AWI%0AIA
-    -> 200 { "saved": 1 }
+    -> 200 { "ok": 1 }
   GET /groups/list?l=path:/data/sales.csv&col=region
     -> 200 { "groups": { "North": ["MN","WI","IA"] } }
 
@@ -12311,7 +14176,7 @@ date-normalisation patterns that convert non-ISO date columns to ISO-8601
 =head4 dates_delete (POST /dates/delete)
 
   INPUT:  l=<spec>, col=<col>  (omit col= to delete all patterns for the spec)
-  OUTPUT: 200 application/json  { "deleted": 1 }
+  OUTPUT: 200 application/json  { "ok": 1 }
           400 application/json  { "error": "l= required" }
 
 =head3 EXAMPLE
@@ -12320,6 +14185,176 @@ date-normalisation patterns that convert non-ISO date columns to ISO-8601
     -> 200 { "ok": 1 }
   GET /dates/list?l=path:/data/sales.csv
     -> 200 { "patterns": { "sale_date": "%m/%d/%Y" } }
+
+=cut
+
+=head2 lookups_list / lookups_save / lookups_delete
+
+C<GET /lookups/list>, C<POST /lookups/save>, C<POST /lookups/delete> -- Manage
+the stored lookups of a dataset: C<models.json> C<lookups.E<lt>specE<gt>.E<lt>nameE<gt>>.
+Each is applied at stage 3 of the pipeline by C<_apply_lookups>, after dates
+are normalised and before calculated fields, so every later stage can read the
+columns it adds.  C<lk=> and C<nolk=> on any data route add or skip one for a
+single request.
+
+=head3 API SPECIFICATION
+
+=head4 lookups_list (GET /lookups/list)
+
+  INPUT:  l=<spec>  (required)
+  OUTPUT: 200 application/json
+            { "lookups": { "<name>": { "file": "<path>", "key": "<col>",
+                                       "col": "<col>", "fields": ["<col>", ...],
+                                       "default": "<value>" }, ... } }
+          400 application/json  { "error": "l= required" }
+
+=head4 lookups_save (POST /lookups/save)
+
+  INPUT:  l=<spec>, name=<identifier>, file=<path under data_dir>, key=<col>
+          optional: col=<dataset column, default key>,
+                    fields=<col>[,<col>...] (repeatable; default every column but key),
+                    default=<value for a key not in the file>
+  OUTPUT: 200 application/json  { "ok": 1 }
+          400 application/json  { "error": "..." } -- l=, name= or key= missing or
+              invalid; the file remote, outside data_dir, missing, unsupported,
+              over 8 MiB or unreadable; key= or a field not in the file
+
+=head4 lookups_delete (POST /lookups/delete)
+
+  INPUT:  l=<spec>, name=<identifier>  (omit name= to delete every lookup of the spec)
+  OUTPUT: 200 application/json  { "ok": 1 }
+          400 application/json  { "error": "l= required" }
+
+=head3 EXAMPLE
+
+  POST /lookups/save  l=table:orders&name=shops&file=shops.csv&key=code&col=shop
+    -> 200 { "ok": 1 }
+  GET /export?l=table:orders&format=json
+    -> 200 [ { "shop": "LDN", "city": "London", ... }, ... ]
+  GET /export?l=table:orders&format=json&nolk=shops
+    -> 200 [ { "shop": "LDN", ... }, ... ]
+
+=head3 NOTES
+
+Keys are compared as strings after trimming, case-sensitively.  A duplicate key
+keeps the first row and is logged once per request
+(C<warn_lookup_duplicate_key>).  A field whose name the dataset already has is
+written as C<E<lt>nameE<gt>_E<lt>fieldE<gt>>; when that is taken too, the request
+is a 400.  The file is read once per request, through the same loader as any
+data file.
+
+=cut
+
+=head2 accelerate / unaccelerate / accelerated_specs
+
+Package functions, not routes, called by C<script/bi-extract> with a
+controller of the application.  An accelerated dataset is
+C<models.json> C<accelerated.E<lt>specE<gt> = { built, file, rows, columns }>;
+the page reads its extract (C<_accelerated_source>, from C<_open_spec>,
+C<view> and C<open_file>) while L<Database::BI::Extract>'s fingerprint still
+matches the file, and the file otherwise, stashing C<acceleration> for the
+table page's note either way.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	accelerate:        ($c, $spec)   # $spec: table:<name> or path:<local file>, not SQLite
+	unaccelerate:      ($c, $spec)
+	accelerated_specs: ($c)
+
+=head4 OUTPUT
+
+	accelerate:        { spec => 'string', path => 'string', rows => 'integer',
+	                     columns => 'integer', built => 'integer (epoch)' }
+	                   croaks error_accel_spec | error_accel_sqlite | error_accel_open
+	                        | error_accel_store | error_accel_build
+	unaccelerate:      1 when the spec was accelerated (its extract is removed), else 0
+	accelerated_specs: the accelerated specs, sorted
+
+C<accelerate> reads the file itself, never the extract it replaces, and removes
+the extract it replaces.  The extract's table is C<extract>, not C<data>:
+L<Database::Abstraction> cannot read a table called C<data>.  The file's column
+order is stored with it and passed back as C<column_order>, because a SQLite
+backend lists columns alphabetically.
+
+=cut
+
+=head2 canonical_spec
+
+The one spelling of a C<path:> spec in the model store: C<path:> followed by the
+realpath of its file, the name C<open_file> gives it.  The request is left as
+the reader wrote it, so pages, forms and messages show their own spelling; only
+the store key is resolved.  The store routes (C</calc>, C</groups>, C</dates>,
+C</lookups>, C</extract>, C</geo>) and the readers (C<_calc_spec_key>,
+C<_apply_calc_fields>, C<_has_stored_columns>, C<_map_data>,
+C<_accelerated_source>, C<accelerate>, C<unaccelerate>) pass their key through
+it.  C<_read_models> files an entry written under another spelling under the
+resolved one, so an older store is still read.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	$spec   # any spec string, or undef
+
+=head4 OUTPUT
+
+	'path:<realpath>' when $spec is path:<file> and the file exists locally;
+	otherwise $spec unchanged (other kinds of spec, remote /../host paths,
+	missing files, a name holding a newline, undef)
+
+=cut
+
+=head2 extract_list / extract_save / extract_delete
+
+C<GET /extract/list>, C<POST /extract/save>, C<POST /extract/delete> -- Manage
+the stored field extractions of a dataset: C<models.json>
+C<extractions.E<lt>specE<gt>.E<lt>nameE<gt>>.  Each is applied by
+C<_apply_extractions> straight after the lookups, so every later stage can read
+the columns it adds.
+
+=head3 API SPECIFICATION
+
+=head4 extract_list (GET /extract/list)
+
+  INPUT:  l=<spec>  (required)
+  OUTPUT: 200 application/json
+            { "extractions": { "<name>": { "col": "<col>", "pattern": "<re>",
+                                           "fields": ["<group>", ...] }, ... } }
+          400 application/json  { "error": "l= required" }
+
+=head4 extract_save (POST /extract/save)
+
+  INPUT:  l=<spec>, name=<identifier>, col=<col>, pattern=<regular expression>
+          optional: fields=<group>[,<group>...] (repeatable; default every named group)
+  OUTPUT: 200 application/json  { "ok": 1, "fields": ["<group>", ...] }
+          400 application/json  { "error": "..." } -- l=, name=, col= or pattern=
+              missing or invalid; the pattern too long, using a refused
+              construct, not compiling or naming no group; a field not a group
+
+=head4 extract_delete (POST /extract/delete)
+
+  INPUT:  l=<spec>, name=<identifier>  (omit name= to delete every extraction of the spec)
+  OUTPUT: 200 application/json  { "ok": 1 }
+          400 application/json  { "error": "l= required" }
+
+=head3 EXAMPLE
+
+  POST /extract/save  l=table:invoices&name=parts&col=ref
+                      &pattern=^(?<country>[A-Z]{2})-(?<year>\d{4})-
+    -> 200 { "ok": 1, "fields": ["country", "year"] }
+  GET /export?l=table:invoices&format=json
+    -> 200 [ { "ref": "GB-2026-001", "country": "GB", "year": "2026", ... },
+             { "ref": "unknown", "country": "(unparseable)", "year": "(unparseable)", ... } ]
+
+=head3 NOTES
+
+The column the extraction reads is checked on every request; one the dataset
+does not have is a 400 (C<error_extract_col_unknown>).  A row that does not
+match is C<(unparseable)> in every column; a group that took no part is C<''>.
+The pattern is compiled by L<Database::BI::Calc/Regular expressions>, which
+has no timeout.
 
 =cut
 
@@ -12415,6 +14450,23 @@ stages and carries the same column.  A spec that cannot be honoured -- an
 unknown function, an unknown column, a parameter on a function that takes
 none, a parameter that is not a positive whole number, a missing C<order=>
 for an accumulating function -- is a 400 naming the parameter.
+
+A calculated field runs before the filters, so it can feed the pass:
+C<cs=> can read a C<?c=> field, a stored field or a C<span=> bucket.  One that
+names a cross-row column cannot run that early, so it waits and runs straight
+after the pass: C<cs=amount:running_total:ytd&order=day&c=half:ytd/2>.  This is
+stage 7, and it needs a C<cs=> that adds the column.  Without one the name is
+unknown, the 400 it always was, and any other fault in the field is reported at
+once.  A field cannot be both: C<cs=> cannot read a field that is itself waiting
+for a cross-row column.  On a canvas each card runs the waiting fields after its
+own pass, and a card whose plan lacks the column goes without the field.
+
+The filters come first, so a window is over the rows they leave, with one
+exception.  A filter naming a column stage 6 or 7 writes runs after them:
+C<f=ytd:gt:50> selects rows by their running total and does not change it.  The
+same goes for a card's own filters on a canvas and for a cross-filter, which a
+card whose plan does not write the column ignores.  Such a filter also keeps an
+aggregate from being pushed to SQL, as any filter on a virtual column does.
 
 =head1 COMMON PITFALLS
 

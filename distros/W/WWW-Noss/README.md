@@ -16,7 +16,6 @@ Perl.
   - `apt install noss`
 * Alpine: <https://pkgs.alpinelinux.org/package/edge/community/x86_64/perl-www-noss>
   - `apk add perl-www-noss`
-* Slackware Linux (SBo): <https://slackbuilds.org/repository/15.0/network/noss/>
 
 If you cannot install **noss** through any of the above repositories, you can
 try building **noss** from source by following the instructions provided in
@@ -67,7 +66,7 @@ A huge thanks to the [newsraft](https://codeberg.org/newsraft/newsraft) and
 program and are also where I got many ideas for this project from.
 
 ## Author
-This program was written by Samuel Young, *\<samyoung12788 at gmail dot com\>*.
+This program was written by Samuel Young, *\<samyoung at posteo dot com\>*.
 
 This project's source can be found on its
 [Codeberg page](https://codeberg.org/1-1sam/noss). Comments and pull

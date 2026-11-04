@@ -1,6 +1,14 @@
 Revision history for App-DBBrowser
 
 
+2.447   2026-11-03
+    - Removed "rearrange columns" from the alias menu.
+
+2.446   2026-11-03
+    - Added separate menu item for "rearrange columns".
+    - Update CTE info output.
+    - Code refactoring.
+
 2.445   2026-10-28
     - Added DuckDB plugin.
     - DB2: decode column names.

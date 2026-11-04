@@ -1,0 +1,54 @@
+---
+abstract: 'Discord client for Perl using IO::Async and Future'
+author:
+  - 'Takuya Oshima'
+build_requires:
+  CPAN::Meta: '2.120351'
+  ExtUtils::MakeMaker: '0'
+  IO::Socket::SSL::Utils: '0'
+  Net::Async::WebSocket::Server: '0.14'
+  Test2::V1: '1.302217'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Discord-Client
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+  package:
+    - Discord::Client::Gateway::Session
+    - Discord::Client::Gateway::IdentifyLimiter
+    - Discord::Client::Gateway::IdentifyLimiter::Permit
+    - Discord::Client::Gateway::WebSocket
+    - Discord::Client::Gateway::WebSocket::Client
+    - Discord::Client::REST::RateLimiter
+requires:
+  Crypt::PK::Ed25519: '0.067'
+  Digest::SHA: '0'
+  Future: '0.49'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  IO::Async: '0.802'
+  IO::Async::SSL: '0.24'
+  JSON::PP: '0'
+  Math::BigInt: '0'
+  Net::Async::HTTP: '0.48'
+  Net::Async::WebSocket::Client: '0.14'
+  Protocol::WebSocket: '0.26'
+  Protocol::WebSocket::Frame: '0'
+  Time::HiRes: '1.9764'
+  URI: '0'
+  perl: '5.026'
+resources:
+  bugtracker: https://github.com/viasnake/Discord-Client/issues
+  homepage: https://github.com/viasnake/Discord-Client
+  repository: https://github.com/viasnake/Discord-Client.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

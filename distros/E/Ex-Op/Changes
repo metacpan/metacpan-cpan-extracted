@@ -1,5 +1,12 @@
 Revision history for Ex-Op
 
+0.04    2026-11-03
+        - Accept a return inside a block or a loop, unwinding as perl's return does
+        - Decline an anon sub for what it captures, not for the clone flag the debugger sets on every one
+        - Normalise a string eval location with its file and line in the oracle tests, as under Devel::Cover
+        - Skip the thread test under Devel::Cover, which refuses threads
+	- Improve test coverage to 100%
+
 0.03    2026-10-22
         - Fix a sub with a signature being made an op on perl 5.44
 

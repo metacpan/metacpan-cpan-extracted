@@ -102,7 +102,8 @@ subtest 'a saved canvas is named' => sub {
 			visuals  => [ { kind => 'table', title => 'All', encode => { columns => [qw(code region amount)] } } ],
 		})
 	)->status_is(201)->tx->res->json->{id};
-	is_deeply(names(crumbs("/a/$id")), ["\x{2190} Home", 'Quarterly'], 'Home > Quarterly');
+	is_deeply(names(crumbs("/a/$id")), ["\x{2190} Home", 'Canvases', 'Quarterly'], 'Home > Canvases > Quarterly');
+	is_deeply(names(crumbs('/canvases')), ["\x{2190} Home", 'Canvases'], 'the list of canvases is Home > Canvases');
 };
 
 subtest 'a missing canvas is a page with a breadcrumb, not plain text' => sub {

@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.151';
+our $VERSION = '0.152';
 
 use 5.020;
 use utf8;
@@ -19,6 +19,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use JSON::Schema::Modern::Utilities qw(assert_keyword_type annotate_self E is_type jsonp);
+use OpenAPI::Modern::Utilities 'elem';
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -35,21 +36,39 @@ sub keywords {
 sub _traverse_keyword_discriminator ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
+  my $valid = 1;
+
   # "the discriminator field MUST be a required field"
-  return E($state, 'missing required property "propertyName"')
+  $valid = E($state, 'missing required property "propertyName"')
     if not exists $schema->{discriminator}{propertyName};
-  return E({ %$state, _keyword_path_suffix => 'propertyName' }, 'discriminator propertyName is not a string')
+
+  $valid = E({ %$state, _keyword_path_suffix => 'propertyName' }, 'discriminator propertyName is not a string')
     if not is_type('string', $schema->{discriminator}{propertyName});
 
-  my $valid = 1;
+  # defaultMapping was added in 3.2.0
+  $valid = E({ %$state, _keyword_path_suffix => 'defaultMapping' }, 'discriminator defaultMapping is not a string')
+    if exists $schema->{discriminator}{defaultMapping}
+      and not is_type('string', $schema->{discriminator}{defaultMapping});
+
   if (exists $schema->{discriminator}{mapping}) {
     return if not assert_keyword_type({ %$state, _keyword_path_suffix => 'mapping' }, $schema, 'object');
     return E({ %$state, _keyword_path_suffix => 'mapping' }, 'discriminator mapping is not an object ')
       if not is_type('object', $schema->{discriminator}{mapping});
+
     foreach my $mapping_key (sort keys $schema->{discriminator}{mapping}->%*) {
       my $uri = $schema->{discriminator}{mapping}{$mapping_key};
-      $valid = E({ %$state, _keyword_path_suffix => [ 'mapping', $mapping_key ] }, 'discriminator mapping value for "%s" is not a string', $mapping_key), next if not is_type('string', $uri);
+      $valid = E({ %$state, _keyword_path_suffix => [ 'mapping', $mapping_key ] }, 'discriminator mapping value for "%s" is not a string', $mapping_key)
+        if not is_type('string', $uri);
     }
+  }
+
+  # do our best to figure out what OAS version we're checking against
+  my ($oas_version) = $state->{metaschema_uri} =~ m{/oas/(\d+\.\d+)/}a;
+
+  foreach my $keyword (keys $schema->{discriminator}->%*) {
+    next if $keyword =~ /^x-/
+      or elem($keyword, [qw(propertyName mapping), ($oas_version//3.999) >= '3.2' ? 'defaultMapping' : ()]);
+    $valid = E({ %$state, _keyword_path_suffix => $keyword }, 'unevaluated property is not permitted');
   }
 
   return $valid;
@@ -111,15 +130,21 @@ sub _traverse_keyword_externalDocs ($self, $schema, $state) {
 sub _traverse_keyword_xml ($self, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
+  my $valid = 1;
+
   foreach my $field (qw(nodeType name namespace prefix)) {
-    ()= E($state, '%s is not a string', $field)
+    next if not exists $schema->{$state->{keyword}}{$field};
+    $valid = E($state, '%s is not a string', $field)
       if not is_type('string', $schema->{$state->{keyword}}{$field});
   }
 
   foreach my $field (qw(attribute wrapped)) {
-    ()= E($state, '%s is not a boolean', $field)
+    next if not exists $schema->{$state->{keyword}}{$field};
+    $valid = E($state, '%s is not a boolean', $field)
       if not is_type('boolean', $schema->{$state->{keyword}}{$field});
   }
+
+  return $valid;
 }
 
 1;
@@ -136,7 +161,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.151
+version 0.152
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

@@ -39,7 +39,7 @@ option the libc lacks fails with ENOTSUP, or is dropped, as
 or later); without it t/dash.t is skipped.
 
 Tests: t/spawner.t (Proc::Spawner and the graph), t/graph.t (hand-written
-graphs), t/parsers.t (about 1,000 strings through the parsers), and t/dash.t
+graphs), t/parsers.t (1,092 strings through the parsers), and t/dash.t
 (every battery string run by dash and by the shell layer; skipped without
 dash; t/dash-known.txt lists the known differences).  Their fixtures are
 in t/: t/batteries/, t/parser/, t/sgraph/, t/try.pl (runs one string: perl t/try.pl 'STRING').

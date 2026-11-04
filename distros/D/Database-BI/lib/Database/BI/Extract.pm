@@ -3,10 +3,11 @@ package Database::BI::Extract;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 use Carp		qw(croak carp);
 use Digest::MD5		qw(md5_hex);
+use Encode		qw(encode_utf8);
 use File::Path		qw(make_path remove_tree);
 use Mojo::File;
 
@@ -18,16 +19,16 @@ use Mojo::File;
 # It is a pure cache: deleting the extracts/ directory at any time leaves
 # the application fully functional.  No file under data_dir is created.
 #
-# This is a standalone cache class: the web application does not call it (the
-# routes read their sources directly), and the tests cover the class itself.
-# A caller decides whether to build a new extract; Extract only stores and
-# retrieves bytes.
+# The web application reads an accelerated dataset's extract through get(), and
+# script/bi-extract builds one through put() (Dashboard::accelerate).  A caller
+# decides whether to build a new extract; Extract only stores and retrieves
+# bytes.
 # ---------------------------------------------------------------------------
 
 # new( model_dir => $dir ) -> $self
 sub new {
 	my ($class, %args) = @_;
-	croak 'model_dir is required' unless defined $args{model_dir};
+	croak 'model_dir is required' unless defined $args{model_dir} && length $args{model_dir};
 	return bless { model_dir => $args{model_dir} }, $class;
 }
 
@@ -36,7 +37,7 @@ sub _fingerprint {
 	my ($spec, $mtime, $size) = @_;
 	$mtime //= 0;
 	$size  //= 0;
-	return md5_hex(join("\0", $spec, $mtime, $size));
+	return md5_hex(encode_utf8(join("\0", $spec, $mtime, $size)));
 }
 
 # _extract_dir( $self ) -> $path_string
@@ -73,6 +74,9 @@ sub put {
 	my ($self, $spec, $mtime, $size, $bytes) = @_;
 	croak 'sqlite_bytes are required' unless defined $bytes && length $bytes;
 
+	# A caller's $@ and $! are its own: the writes below use both on the way.
+	local ($@, $!);
+
 	my $dir = $self->_extract_dir;
 	unless (-d $dir) {
 		eval { make_path($dir) };
@@ -101,7 +105,9 @@ sub evict {
 	return 0 unless -d $dir;
 
 	my $count = 0;
-	for my $f (glob "$dir/*.db") {
+	# Listed rather than globbed: glob() splits its pattern on spaces and reads
+	# brackets as a class, so the name of the directory could defeat it.
+	for my $f (grep { /\.db\z/ } @{ Mojo::File->new($dir)->list->map('to_string') }) {
 		if (unlink $f) {
 			$count++;
 		}
@@ -136,9 +142,10 @@ Stores SQLite materialisation files (extracts) under C<model_dir/extracts/>.
 The cache key is an MD5 of the dataset spec, its source mtime, and its size.
 Deleting the extracts directory leaves the application fully functional.
 
-This is a standalone cache class.  The web application does not call it; the
-caller decides when to build an extract, and the class only stores and finds
-the bytes.
+The application reads the extract of an accelerated dataset through C<get>,
+and C<script/bi-extract> builds one through C<put>; see
+L<Database::BI/Accelerated datasets>.  The caller decides when to build an
+extract, and the class only stores and finds the bytes.
 
 =head1 METHODS
 

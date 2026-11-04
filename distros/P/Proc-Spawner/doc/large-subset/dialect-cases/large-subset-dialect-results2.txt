@@ -1,0 +1,95 @@
+echobs	DASH: a|b|<0>|	BASH: a\nb|<0>|
+echoe	DASH: -e a	b|<0>|	BASH: a	b|<0>|
+echon	DASH: ab|<0>|	BASH: ab|<0>|
+echoE	DASH: -E a|b|<0>|	BASH: a\nb|<0>|
+testeqeq	DASH: dash: 1: [: a: unexpected operator|<2>|	BASH: y|<0>|
+testlt	DASH: y|<0>|	BASH: y|<0>|
+testaun	DASH: dash: 1: [: -a: unexpected operator|<2>|	BASH: y|<0>|
+testparen	DASH: y|<0>|	BASH: y|<0>|
+testv	DASH: dash: 1: [: -v: unexpected operator|<2>|	BASH: y|<0>|
+printfq	DASH: dash: 1: printf: %q: invalid directive|<2>|	BASH: a\ b|<0>|
+printfv	DASH: dash: 1: printf: Illegal option -v|[]|<0>|	BASH: [hi]|<0>|
+printfb	DASH: a	b|<0>|	BASH: a	b|<0>|
+printfT	DASH: dash: 1: printf: %(: invalid directive|<2>|	BASH: 1969|<0>|
+killl	DASH: INT|<0>|	BASH: INT|<0>|
+killsig	DASH: dash: 1: kill: Illegal option -S|2|<0>|	BASH: bash: line 1: kill: SIGHUP: invalid signal specification|1|<0>|
+trapnum	DASH: 0|<0>|	BASH: 0|<0>|
+trapsigint	DASH: trap: SIGINT: bad trap|1|<0>|	BASH: 0|<0>|
+traperr	DASH: trap: ERR: bad trap|1|<0>|	BASH: 0|<0>|
+trapdebug	DASH: trap: DEBUG: bad trap|1|<0>|	BASH: t|0|<0>|
+trap0	DASH: a|bye|<0>|	BASH: a|bye|<0>|
+typep	DASH: -p: not found|ls is /usr/bin/ls|<127>|	BASH: /usr/bin/ls|<0>|
+typet	DASH: -t: not found|ls is /usr/bin/ls|<127>|	BASH: file|<0>|
+waitn	DASH: dash: 1: wait: Illegal option -n|2|<0>|	BASH: 0|<0>|
+cddash	DASH: /tmp|<0>|	BASH: /tmp|<0>|
+umaskS	DASH: u=rwx,g=rx,o=rx|<0>|	BASH: u=rwx,g=rx,o=rx|<0>|
+readr	DASH: [a]|<0>|	BASH: [a\b]|<0>|
+readn	DASH: dash: 1: read: Illegal option -n|[]|<0>|	BASH: [a]|<0>|
+reads	DASH: dash: 1: read: Illegal option -s|[]|<0>|	BASH: [x]|<0>|
+readt	DASH: dash: 1: read: Illegal option -t|[]|<0>|	BASH: [x]|<0>|
+reada	DASH: dash: 1: read: Illegal option -a|[]|<0>|	BASH: [x]|<0>|
+readreply	DASH: dash: 1: read: arg count|[]|<0>|	BASH: [x]|<0>|
+localr	DASH: dash: 1: local: -r: bad variable name|<2>|	BASH: [1]|<0>|
+localout	DASH: dash: 1: local: not in a function|<2>|	BASH: bash: line 1: local: can only be used in a function|[]|<0>|
+localval	DASH: [2]|[1]|<0>|	BASH: [2]|[1]|<0>|
+underscore	DASH: [/usr/bin/timeout]|<0>|	BASH: [foo]|<0>|
+bashvar	DASH: [] [] []|<0>|	BASH: [set] [set] [set]|<0>|
+seconds	DASH: [] []|<0>|	BASH: [set] [set]|<0>|
+casefall	DASH: dash: 1: Syntax error: "&" unexpected|<2>|	BASH: 1|2|<0>|
+caselower	DASH: dash: 1: Bad substitution|<2>|	BASH: ab|<0>|
+clobber	DASH: b|<0>|	BASH: b|<0>|
+rw	DASH: hi|<0>|	BASH: hi|<0>|
+appendboth	DASH: st=0|hi|<0>|	BASH: st=0|hi|<0>|
+closefd	DASH: hi|0|<0>|	BASH: hi|0|<0>|
+fdvar	DASH: dash: 1: exec: {fd}: not found|<127>|	BASH: [10]|<0>|
+dollarlt	DASH: []|<0>|	BASH: [hi]|<0>|
+fnparen	DASH: dash: 1: Syntax error: "(" unexpected|<2>|	BASH: f|<0>|
+pow	DASH: dash: 1: arithmetic expression: expecting primary: "2**3"|<2>|	BASH: 8|<0>|
+base	DASH: dash: 1: arithmetic expression: expecting EOF: "16#ff"|<2>|	BASH: 255|<0>|
+assignop	DASH: 3 3|<0>|	BASH: 3 3|<0>|
+arithcmd	DASH: 2|<0>|	BASH: 2|<0>|
+arithlen	DASH: 4|<0>|	BASH: 4|<0>|
+atslice	DASH: dash: 1: Bad substitution|<2>|	BASH: b c|<0>|
+dotargs	DASH: []|<0>|	BASH: [arg]|<0>|
+exportf	DASH: dash: 1: export: Illegal option -f|<2>|	BASH: 0|<0>|
+exportn	DASH: dash: 1: export: Illegal option -n|<2>|	BASH: 0|<0>|
+setposix	DASH: dash: 1: set: Illegal option -o posix|<2>|	BASH: 0|<0>|
+setvi	DASH: 0|<0>|	BASH: 0|<0>|
+setemacs	DASH: 0|<0>|	BASH: 0|<0>|
+setB	DASH: dash: 1: set: Illegal option -B|<2>|	BASH: 0|<0>|
+setH	DASH: dash: 1: set: Illegal option -H|<2>|	BASH: 0|<0>|
+sethist	DASH: dash: 1: set: Illegal option -o history|<2>|	BASH: 0|<0>|
+setm	DASH: dash: 1: set: can't access tty; job control turned off|0|<0>|	BASH: 0|<0>|
+aliasline	DASH: dash: 1: e: not found|<127>|	BASH: bash: line 1: e: command not found|<127>|
+elemassign	DASH: dash: 1: a[1]=x: not found|127|<0>|	BASH: 0|<0>|
+forarith	DASH: dash: 1: Syntax error: Bad for loop variable|<2>|	BASH: 0|1|<0>|
+caseamp	DASH: dash: 1: Syntax error: word unexpected (expecting ")")|<2>|	BASH: 1|2|<0>|
+atQ	DASH: dash: 1: Bad substitution|<2>|	BASH: 'a b'|<0>|
+prefixstar	DASH: dash: 1: Bad substitution|<2>|	BASH: ab|<0>|
+typeset	DASH: dash: 1: typeset: not found||<0>|	BASH: 3|<0>|
+mapfile	DASH: dash: 1: mapfile: not found|127|<0>|	BASH: 0|<0>|
+octal	DASH: 8|<0>|	BASH: 8|<0>|
+break	DASH: after|<0>|	BASH: after|<0>|
+continue	DASH: after|<0>|	BASH: after|<0>|
+dupin	DASH: dash: 1: Syntax error: Bad fd number|<2>|	BASH: bash: line 1: f: ambiguous redirect|<1>|
+dupnum	DASH: dash: 1: 3: Bad file descriptor|st=2|<0>|	BASH: bash: line 1: 3: Bad file descriptor|st=1|<0>|
+herestrq	DASH: dash: 1: Syntax error: redirection unexpected|<2>|	BASH: a b|<0>|
+printff	DASH: 1.50|<0>|	BASH: 1.50|<0>|
+echodd	DASH: -- a|<0>|	BASH: -- a|<0>|
+echonen	DASH: -ne a||<0>|	BASH: a|<0>|
+cmdp	DASH: 0|<0>|	BASH: 0|<0>|
+hashl	DASH: 0|<0>|	BASH: 0|<0>|
+execa	DASH: dash: 1: exec: -a: not found|<127>|	BASH: <0>|
+ulimitn	DASH: 0|<0>|	BASH: 0|<0>|
+pwdP	DASH: /tmp|<0>|	BASH: /tmp|<0>|
+jobspipe	DASH: 0|<0>|	BASH: 1|<0>|
+jobsppipe	DASH: 0|<0>|	BASH: 1|<0>|
+jobspsubst	DASH: []|<0>|	BASH: [set]|<0>|
+jobsptop	DASH: 1|<0>|	BASH: 1|<0>|
+cdargs	DASH: st=0 a|<0>|	BASH: bash: line 1: cd: too many arguments|st=1 tmp.dpqblRZR8z|<0>|
+cdPL	DASH: r|l|<0>|	BASH: r|l|<0>|
+redirpat	DASH: *.x|q.x|<0>|	BASH: *.x|q.x|<0>|
+trapint	DASH: c|after|<0>|	BASH: c|after|<0>|
+trapnum2	DASH: c|after|<0>|	BASH: c|after|<0>|
+trapkill	DASH: st=0|<0>|	BASH: st=0|<0>|
+setnop	DASH: st=0|<0>|	BASH: st=0|<0>|

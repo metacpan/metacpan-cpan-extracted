@@ -159,24 +159,24 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
     my $lookups;
     ($v, $lookups) = verify($sig . $short);
     is($v->result, 'permerror', 'a repeated i= is a permerror');
-    is($v->details, 'PERMERROR: DKIM2-Signature i=2 appears more than once',
+    is($v->details, 'PERMERROR: DKIM2-Signature i=2 is duplicated',
         '... naming the number');
     is($lookups, 0, '... with no key fetched');
 
     my $signer = signer();
     $signer->PRINT($sig . $short); $signer->CLOSE;
     is($signer->result, 'fail', 'the signer will not extend a chain with a repeated i=');
-    like($signer->details, qr/^PERMERROR: DKIM2-Signature i=2 appears more than once/,
+    like($signer->details, qr/^PERMERROR: DKIM2-Signature i=2 is duplicated/,
         '... and says why');
 
     my $twice = $mi . $short;
     ($v, $lookups) = verify($twice);
-    is($v->details, 'PERMERROR: Message-Instance m=2 appears more than once',
+    is($v->details, 'PERMERROR: Message-Instance m=2 is duplicated',
         'a repeated m= is a permerror');
     is($lookups, 0, '... with no key fetched');
 
     my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($twice);
-    is($why, 'PERMERROR: Message-Instance m=2 appears more than once',
+    is($why, 'PERMERROR: Message-Instance m=2 is duplicated',
         'chain_verifies refuses it');
     ok(!Mail::DKIM2::MessageInstance->verify($twice), 'verify refuses it');
     ok(!eval { Mail::DKIM2::MessageInstance->undo($twice); 1 },
@@ -185,7 +185,7 @@ my ($top_mi)  = $text =~ /^(Message-Instance:.*?\r\n)(?=\S)/ms;
     # The same number with different content is no better.
     (my $other = $mi) =~ s/\bm=2\b/m=1/;
     ($v) = verify($other . $short);
-    is($v->details, 'PERMERROR: Message-Instance m=1 appears more than once',
+    is($v->details, 'PERMERROR: Message-Instance m=1 is duplicated',
         'a second m=1 with other content is refused too');
 }
 

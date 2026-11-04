@@ -136,7 +136,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
     eval q{
         package TargetClass2;
-        main::Object::Proto::import_accessors('DataPoint', undef, undef, 'TargetClass2');
+        main::Object::Proto::import_accessors('DataPoint', undef, 'TargetClass2');
         1;
     };
     die $@ if $@;

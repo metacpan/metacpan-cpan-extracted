@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 # A null body Recipe ("b": null) loses the previous body, not the header
-# history: Validate must report the chain as passing when the header history
-# below it checks out, evaluate the lower levels on the header-only-undone
-# message, and still fail a history forged below the null.
+# history. -09 makes the message a PERMERROR ("has a null recipe", contract
+# E2), but Validate still evaluates the lower levels on the header-only-undone
+# message, so a forged history below the null shows as the level that fails.
 use strict;
 use warnings;
 use Test::More;
@@ -55,9 +55,10 @@ sub mi_lvl { my ($r, $m) = @_; (grep { $_->{kind} eq 'mi' && $_->{m} == $m } @{$
 
 {
     my $r = rep(list_hop($m1));
-    is($r->{overall}, 'pass', 'null body over signed m=1: overall pass') or diag $r->{summary};
-    ok(!$r->{fully_verified}, '... but not fully verified (-08 section 13)');
-    like($r->{summary}, qr/not fully verified/, '... and the summary says so');
+    is($r->{overall}, 'fail', 'null body over signed m=1: overall fail') or diag $r->{summary};
+    is($r->{summary}, 'permerror (PERMERROR: Message-Instance m=2 has a null recipe)',
+       '... the -09 PERMERROR');
+    ok(!$r->{fully_verified}, '... and not fully verified');
     my $l2 = mi_lvl($r, 2);
     is($l2->{body_recipe}, 'null', 'm=2 body recipe null');
     is($l2->{undo}, 'unrecoverable', 'm=2 undo unrecoverable');

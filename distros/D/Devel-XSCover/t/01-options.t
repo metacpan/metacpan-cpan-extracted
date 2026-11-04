@@ -3,6 +3,10 @@ use 5.020;
 use strict;
 use warnings;
 use Test::More;
+use Config ();
+use File::Path ();
+use File::Spec ();
+use File::Temp ();
 use Devel::XSCover ();
 
 my $default = Devel::XSCover->new;
@@ -44,9 +48,30 @@ ok($argv->threads_covered, '-threads_covered');
 ok($argv->dry, '-dry');
 ok($argv->silent, '-silent');
 
-my $one = Devel::XSCover->new(test => 't/one.t', ignore => 'x');
+my $one = Devel::XSCover->new(test => 't/one.t', ignore => 'x', plain => 't/two.t');
 is_deeply([$one->tests], ['t/one.t'], 'a single test file as a string');
 is_deeply([$one->ignores], ['x'], 'a single ignore as a string');
+is_deeply([$one->plains], ['t/two.t'], 'a single plain file as a string');
+
+my $tmp = File::Temp->newdir;
+my $sbin = File::Spec->catdir($tmp, 'sbin');
+File::Path::make_path($sbin);
+{
+    local $^X = File::Spec->catfile($tmp, 'bin', 'perl');
+    local %Config::Config = (installsitescript => undef, installsitebin => '', installscript => $sbin);
+    is_deeply(Devel::XSCover->new->cover_command, ['cover'], 'no cover beside perl nor in the install directories, so the bare name for the path to find');
+    is_deeply(Devel::XSCover->new(cover => '')->cover_command, ['cover'], 'an empty -cover is no override');
+    open my $fh, '>', File::Spec->catfile($sbin, 'cover') or die;
+    close $fh;
+    my @inc = Devel::XSCover->report_inc;
+    is_deeply(Devel::XSCover->new->cover_command, [$^X, @inc, File::Spec->catfile($sbin, 'cover')], 'the cover in an install directory runs under the same perl');
+}
+{
+    delete local $INC{'Devel/XSCover.pm'};
+    is_deeply([Devel::XSCover->report_inc], [], 'no -I when the module was not loaded from a file');
+    local $INC{'Devel/XSCover.pm'} = File::Spec->catfile($tmp, 'Devel', 'XSCover.pm');
+    is_deeply([Devel::XSCover->report_inc], [], 'and none when the report module is not beside it');
+}
 
 
 done_testing;

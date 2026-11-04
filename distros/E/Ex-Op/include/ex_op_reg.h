@@ -9,6 +9,9 @@ eo_mg_free(pTHX_ SV *sv, MAGIC *mg)
 {
     eo_op_t *e = (eo_op_t *)mg->mg_ptr;
     PERL_UNUSED_ARG(sv);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (e) {
         Safefree(e->params);
         Safefree(e->why);
@@ -25,8 +28,11 @@ eo_mg_dup(pTHX_ MAGIC *mg, CLONE_PARAMS *param)
     eo_op_t *from = (eo_op_t *)mg->mg_ptr;
     eo_op_t *to;
     PERL_UNUSED_ARG(param);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!from)
-        return 0;
+        return 0; /* # uncoverable statement */
     Newx(to, 1, eo_op_t);
     StructCopy(from, to, eo_op_t);
     to->params = NULL;
@@ -63,7 +69,7 @@ static eo_op_t *
 eo_op_live(pTHX_ CV *cv)
 {
     eo_op_t *e = eo_op_find(aTHX_ cv);
-    if (!e || !e->accepted || CvISXSUB(cv) || CvROOT(cv) != e->root)
+    if (!e || !e->accepted || CvISXSUB(cv) || CvROOT(cv) != e->root) /* # uncoverable condition left count:3 */
         return NULL;
     return e;
 }
@@ -71,19 +77,19 @@ eo_op_live(pTHX_ CV *cv)
 static OP *
 eo_kid(OP *o)
 {
-    return (o && (o->op_flags & OPf_KIDS)) ? cUNOPx(o)->op_first : NULL;
+    return (o && (o->op_flags & OPf_KIDS)) ? cUNOPx(o)->op_first : NULL; /* # uncoverable condition right count:1 */
 }
 
 static bool
 eo_is_type(OP *o, OPCODE type)
 {
-    return o && (o->op_type == type || (o->op_type == OP_NULL && o->op_targ == type));
+    return o && (o->op_type == type || (o->op_type == OP_NULL && o->op_targ == type)); /* # uncoverable condition right count:1 */
 }
 
 static bool
 eo_is_defgv(pTHX_ OP *o)
 {
-    return o && o->op_type == OP_GV && cGVOPx_gv(o) == PL_defgv;
+    return o && o->op_type == OP_GV && cGVOPx_gv(o) == PL_defgv; /* # uncoverable condition right count:1 */
 }
 
 typedef struct {
@@ -113,6 +119,41 @@ eo_cop_warns_uninit(pTHX_ COP *cop)
     on = ckWARN(WARN_UNINITIALIZED) ? TRUE : FALSE;
     PL_curcop = was;
     return on;
+}
+
+/* Whether an anon sub's pad has a name taken from an outer pad. */
+static bool
+eo_captures(pTHX_ CV *proto)
+{
+    PADLIST *padlist = CvPADLIST(proto);
+    I32 i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
+    if (!padlist)
+        return FALSE; /* # uncoverable statement */
+#if PERL_VERSION_GE(5,22,0)
+    {
+        PADNAMELIST *names = PadlistNAMES(padlist);
+        PADNAME **pn = PadnamelistARRAY(names);
+        for (i = 1; i <= PadnamelistMAX(names); i++)
+            if (pn[i] && PadnameLEN(pn[i]) && PadnameOUTER(pn[i])) /* # uncoverable condition right count:1 */
+                return TRUE;
+    }
+#else
+    {
+#  if PERL_VERSION_GE(5,18,0)
+        AV *names = PadlistNAMES(padlist);
+#  else
+        AV *names = (AV *)AvARRAY((AV *)padlist)[0];
+#  endif
+        SV **pn = AvARRAY(names);
+        for (i = 1; i <= av_len(names); i++)
+            if (pn[i] && pn[i] != &PL_sv_undef && SvPOK(pn[i]) && SvCUR(pn[i]) && SvFAKE(pn[i]))
+                return TRUE;
+    }
+#endif
+    return FALSE;
 }
 
 static bool
@@ -188,9 +229,15 @@ eo_walk_one(pTHX_ eo_walk_t *w, OP *o)
         break;
     case OP_ANONCODE: {
         /* A closure is cloned with find_runcv, which reads the context
-         * stack, so a frameless call would hand it the caller's pad. */
+         * stack, so a frameless call would hand it the caller's pad. One
+         * that captures nothing never looks there, and with the optimiser
+         * off (the debugger, Devel::Cover) every anon sub is marked for
+         * cloning, so the pad is asked, not the flag. */
         CV *proto = (CV *)PAD_SVl(o->op_targ);
-        if (proto && SvTYPE((SV *)proto) == SVt_PVCV && CvCLONE(proto)) {
+        /*
+         # uncoverable condition right count:1..2
+         # uncoverable condition right count:3 class:ignore_covered_err */
+        if (proto && SvTYPE((SV *)proto) == SVt_PVCV && CvCLONE(proto) && eo_captures(aTHX_ proto)) {
             w->why = "it makes a closure over its own variables";
             return;
         }
@@ -235,7 +282,7 @@ eo_walk_one(pTHX_ eo_walk_t *w, OP *o)
         break;
     case OP_RETURN:
         if (w->unwind) {
-            w->why = "it returns from inside a loop or a block";
+            w->why = "it returns from inside an eval, grep, map or sort block";
             return;
         }
         w->has_return = TRUE;
@@ -259,7 +306,7 @@ eo_walk_one(pTHX_ eo_walk_t *w, OP *o)
     }
 
     if (o->op_flags & OPf_KIDS) {
-        bool ctx  = eo_is_context_op(o);
+        bool ctx  = eo_is_context_op(o) && o->op_type != OP_LEAVE && o->op_type != OP_LEAVELOOP;
         bool loop = o->op_type == OP_LEAVELOOP;
         if (ctx)
             w->unwind++;
@@ -296,7 +343,7 @@ eo_tail_dep(OP *o)
 {
     OP *k, *last;
 
-    if (!o || (o->op_flags & OPf_WANT))
+    if (!o || (o->op_flags & OPf_WANT)) /* # uncoverable condition left count:1 */
         return FALSE;
 
     switch (o->op_type) {
@@ -313,14 +360,29 @@ eo_tail_dep(OP *o)
                 last = k;
         return eo_tail_dep(last);
     case OP_NULL:
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1..3 */
         if (o->op_targ == OP_LINESEQ || o->op_targ == OP_SCOPE || o->op_targ == OP_LEAVE) {
-            last = NULL;
+            last = NULL; /* # uncoverable statement */
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1..2
+             # uncoverable condition right count:1..2 */
             for (k = eo_kid(o); k; k = OpSIBLING(k))
+                /*
+                 # uncoverable statement
+                 # uncoverable branch true
+                 # uncoverable branch false
+                 # uncoverable condition left count:1..2
+                 # uncoverable condition right count:1..2 */
                 if (!eo_is_stmt(k) && k->op_type != OP_ENTER)
-                    last = k;
-            return eo_tail_dep(last);
+                    last = k; /* # uncoverable statement */
+            return eo_tail_dep(last); /* # uncoverable statement */
         }
-        for (k = eo_kid(o); k; k = OpSIBLING(k))
+        for (k = eo_kid(o); k; k = OpSIBLING(k)) /* # uncoverable condition left count:1 */
             if (eo_tail_dep(k))
                 return TRUE;
         return FALSE;
@@ -358,26 +420,35 @@ eo_find_binding(pTHX_ OP *body, PADOFFSET **params, U16 *nparams, const char **w
     aassign = stmt;
 
     rhs = eo_kid(aassign);
-    lhs = rhs ? OpSIBLING(rhs) : NULL;
+    lhs = rhs ? OpSIBLING(rhs) : NULL; /* # uncoverable condition right count:1..2 */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1..2 */
     if (!eo_is_type(rhs, OP_LIST) || !eo_is_type(lhs, OP_LIST))
-        return NULL;
+        return NULL; /* # uncoverable statement */
 
     k = eo_kid(rhs);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1..3 */
     if (!k || !(k->op_type == OP_PUSHMARK
 #if PERL_VERSION_GE(5,18,0)
                 || k->op_type == OP_PADRANGE
 #endif
        ))
-        return NULL;
+        return NULL; /* # uncoverable statement */
     k = OpSIBLING(k);
     if (!k || k->op_type != OP_RV2AV || !eo_is_defgv(aTHX_ eo_kid(k)) || OpSIBLING(k))
         return NULL;
 
     k = eo_kid(lhs);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1..2 */
     if (!k || k->op_type != OP_PUSHMARK)
-        return NULL;
-    for (k = OpSIBLING(k); k; k = OpSIBLING(k)) {
-        if (k->op_type == OP_PADSV && (k->op_private & OPpLVAL_INTRO)
+        return NULL; /* # uncoverable statement */
+    for (k = OpSIBLING(k); k; k = OpSIBLING(k)) { /* # uncoverable condition right count:1 */
+        if (k->op_type == OP_PADSV && (k->op_private & OPpLVAL_INTRO) /* # uncoverable condition right count:3 */
 #ifdef OPpPAD_STATE
             && !(k->op_private & OPpPAD_STATE)
 #endif
@@ -391,12 +462,15 @@ eo_find_binding(pTHX_ OP *body, PADOFFSET **params, U16 *nparams, const char **w
             *why = "its first statement assigns @_ to something other than new scalars";
         return NULL;
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!n)
-        return NULL;
+        return NULL; /* # uncoverable statement */
 
     Newx(*params, n, PADOFFSET);
     n = 0;
-    for (k = OpSIBLING(eo_kid(lhs)); k; k = OpSIBLING(k))
+    for (k = OpSIBLING(eo_kid(lhs)); k; k = OpSIBLING(k)) /* # uncoverable condition right count:1 */
         (*params)[n++] = k->op_targ;
     *nparams = n;
     return aassign;
@@ -411,7 +485,7 @@ eo_register(pTHX_ CV *cv)
     MAGIC *mg = mg_findext((SV *)cv, PERL_MAGIC_ext, &eo_op_vtbl);
     const char *why = NULL;
 
-    if (mg && mg->mg_ptr) {
+    if (mg && mg->mg_ptr) { /* # uncoverable condition right count:2 */
         e = (eo_op_t *)mg->mg_ptr;
         Safefree(e->params);
         Safefree(e->why);
@@ -425,8 +499,11 @@ eo_register(pTHX_ CV *cv)
         why = "it is not a Perl sub with a body";
     else if (CvLVALUE(cv))
         why = "it is an lvalue sub";
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     else if (CvROOT(cv)->op_type != OP_LEAVESUB)
-        why = "its body does not end in an ordinary sub return";
+        why = "its body does not end in an ordinary sub return"; /* # uncoverable statement */
 
     if (!why) {
         OP *body = eo_kid(CvROOT(cv));
@@ -475,7 +552,7 @@ eo_strict_on(pTHX)
 {
 #if PERL_VERSION_GE(5,13,7)
     SV *v = cop_hints_fetch_pvs(PL_curcop, EO_STRICT_KEY, 0);
-    return v && v != &PL_sv_placeholder && SvTRUE(v);
+    return v && v != &PL_sv_placeholder && SvTRUE(v); /* # uncoverable condition right count:1 */
 #else
     HV *hh = GvHV(PL_hintgv);
     SV **v = hh ? hv_fetchs(hh, EO_STRICT_KEY, 0) : NULL;

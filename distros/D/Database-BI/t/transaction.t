@@ -1763,8 +1763,8 @@ subtest 'Transaction 27 -- filename with spaces opens without unsafe-dbname erro
 
 subtest 'Transaction 28 -- XLSX file open lifecycle (including spaced filename)' => sub {
 	# Covers two issues that were fixed simultaneously:
-	#   1. DBD::Excel 0.07 only handles .xls -- _detect_file_info now reads
-	#      .xlsx directly via Spreadsheet::ParseXLSX, bypassing D::A.
+	#   1. DBD::Excel 0.07 only handles .xls -- D::A reads .xlsx itself, using
+	#      Spreadsheet::ParseXLSX.
 	#   2. A file named "my sales data.xlsx" (spaces) must also work after the
 	#      sanitized symlink fix and the direct-parse fix together.
 	SKIP: {

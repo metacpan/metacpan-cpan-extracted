@@ -165,7 +165,7 @@ sub malformed_body_below_null {
 {
     my ($ok, $why, $detail) = $MI->chain_verifies(malformed_body_below_null($m1));
     ok(!$ok, 'malformed body Recipe below a null body Recipe is caught');
-    is($why, 'PERMERROR: Message-Instance m=2 Recipe b[1] is invalid',
+    is($why, 'PERMERROR: Message-Instance m=2 recipe b[1] is invalid',
         'reason names the out-of-order step (-08 D6)');
 }
 
@@ -180,7 +180,7 @@ for my $range ([0, 2], [3, 1]) {
     my ($ok, $why, $detail) = $MI->chain_verifies(list_hop(with_mi($mi2, $cur2), 'list'));
     my $r = "[@$range]";
     ok(!$ok, "body Recipe $r below a null is caught");
-    is($why, 'PERMERROR: Message-Instance m=2 Recipe b[0] is invalid', "$r: reason names the step");
+    is($why, 'PERMERROR: Message-Instance m=2 recipe b[0] is invalid', "$r: reason names the step");
     is_deeply(\@warn, [], "$r: no warnings") or diag @warn;
 }
 

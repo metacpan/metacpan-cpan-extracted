@@ -9,13 +9,14 @@ requires 'perl' => '>= 5.10.1, != 5.17, != 5.19.3';
 
 requires 'List::Util';
 requires 'List::MoreUtils';
-requires 'Plack';
+requires 'Plack', '!= 1.0053'; # 1.0053 calls undefined return_405 in Plack::App::File
 requires 'Hash::MultiValue';
 requires 'version' => 0.77;
 requires 'parent';
 requires 'autodie';
 requires 'File::Path';
 
+requires 'URI';
 requires 'URI::Escape';
 requires 'Tie::IxHash'; # For nested_query
 requires 'Devel::StackTrace';
@@ -40,9 +41,6 @@ requires 'HTML::Entities';
 requires 'Sub::Identify'; # For LanguageServer
 
 recommends 'Devel::StackTrace::WithLexicals' => 0.08;
-
-recommends 'Test::Requires'; # which is required by Sub::Inspector
-recommends 'Sub::Inspector';
 
 recommends 'B::Utils' => '!= 0.26';
 

@@ -94,7 +94,9 @@ Proc::Spawner::Graph::release($w);
 
 Nothing else changed: on every battery the old and the new executor print the same output, messages and status for all 234 command lines (only pid lengths differ).
 
-## 5. Tested (2026-11-02)
+## 5. Tested
+
+In 0.03 (2026-11-03), `t/dash.t` gives: `largebattery.txt` 111 of 114 agree with dash, `battery.txt` 42/43, `fdbattery.txt` 14/14, `sigenv.txt` 12/12, `t1.txt` 39/45, `t2.txt` 42/44 (one line's order varies, as in dash), `t3.txt` 16/17, `pspawn-d2.txt` 9/10, `pspawn-l10.txt` 6/9, `large-subset-b13.txt` 37/38; every other line is a known difference (`t/dash-known.txt`). Post-0.03 adds `large-subset-p6.txt`: 19 of 19 (21 of 21 in post2-0.03); the other batteries, run again on post-0.03, give the same counts as 0.03. In 0.04: `largebattery.txt` 108 of 114 (three lines more now differ from dash on purpose: `getopts` leaves `OPTARG` unset, rule E), `large-subset-p6.txt` 25 of 25, and the new `large-subset-e.txt` 2 of 10 (the other 8 are rule-E choices listed in `t/dash-known.txt`); the rest as in 0.03. The counts below are pre-0.01 (2026-11-02).
 
 - `t/spawner.t`: 20 tests (32 since 2026-11-02, 08:00: every posix_spawn setting, and the raw `spawn`) of `Proc::Spawner` and the graph: fd tables (including colliding fd numbers), closed fds, `chdir`, `umask`, ignored signals and `sigdefault`, exit and signal statuses, a 1 MB write by Perl without blocking, R1 (reactions never interleave), D2, "nothing left to wait for", a status taken by other code, a handler starting the next process. All pass, with the C handler and with the fallback.
 - Against dash, as before the split: `largebattery.txt` 99/103 (106/110 after the 7 lines added for L6–L8, see the known issues), `battery.txt` 42/43, `fdbattery.txt` 14/14, `sigenv.txt` 12/12, `t1.txt` 39/45, `t2.txt` 43/44, `t3.txt` 16/17. The same numbers as before also with `PARSER=small` and `PARSER=base`.

@@ -1,0 +1,61 @@
+===== spike_helper_switch (0) @ src/helper.c:3
+Block : 0 Counter : 3
+	Source Edges : 1 (3), 
+	Destination Edges : *2 (3), 
+Block : 1 Counter : 0
+	Source Edges : 7 (3), 
+	Destination Edges : *0 (3), 
+Block : 2 Counter : 3
+	Source Edges : 0 (3), 
+	Destination Edges : 4 (1), *6 (1), *3 (1), *5 (0), 
+	File: 0: 3,5,
+Block : 3 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 7,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : *7 (1), 
+	File: 0: 9,
+Block : 5 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 7 (0), 
+	File: 0: 11,
+Block : 6 Counter : 1
+	Source Edges : 2 (1), 
+	Destination Edges : 7 (1), 
+	File: 0: 13,
+Block : 7 Counter : 3
+	Source Edges : 3 (1), 4 (1), 5 (0), 6 (1), 
+	Destination Edges : *1 (3), 
+	File: 0: 15,
+===== spike_only_helper (1) @ include/spike.h:11
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : 2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 2 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *1 (1), 
+	File: 1: 11,13,
+===== spike_square (2) @ include/spike.h:4
+Block : 0 Counter : 1
+	Source Edges : 1 (1), 
+	Destination Edges : 2 (1), 
+Block : 1 Counter : 0
+	Source Edges : 4 (1), 
+	Destination Edges : *0 (1), 
+Block : 2 Counter : 1
+	Source Edges : 0 (1), 
+	Destination Edges : *4 (1), *3 (0), 
+	File: 1: 4,6,
+Block : 3 Counter : 0
+	Source Edges : 2 (0), 
+	Destination Edges : 4 (0), 
+	File: 1: 7,
+Block : 4 Counter : 1
+	Source Edges : 2 (1), 3 (0), 
+	Destination Edges : *1 (1), 
+	File: 1: 8,

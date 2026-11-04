@@ -11,9 +11,9 @@
     margin-bottom: 1.25rem;
     font-size: 0.9rem;
   }
-  .folder-breadcrumb a { color: #2c3e7a; text-decoration: none; }
+  .folder-breadcrumb a { color: var(--accent-text, #2c3e7a); text-decoration: none; }
   .folder-breadcrumb a:hover { text-decoration: underline; }
-  .folder-breadcrumb .bc-sep { color: #888; }
+  .folder-breadcrumb .bc-sep { color: var(--muted, #888); }
   .folder-breadcrumb .bc-current { font-weight: 600; }
 
   /* Grid of folder cards */
@@ -29,16 +29,16 @@
     flex-direction: column;
     align-items: center;
     padding: 0.85rem 0.5rem 0.65rem;
-    background: #f9fafc;
-    border: 1px solid #dde2ef;
+    background: var(--row-alt, #f9fafc);
+    border: 1px solid var(--border, #dde2ef);
     border-radius: 6px;
     text-decoration: none;
-    color: #1a1a2e;
+    color: var(--body-color, #1a1a2e);
     transition: background 0.12s, box-shadow 0.12s;
     cursor: pointer;
   }
   .folder-card:hover {
-    background: #e8ecf7;
+    background: var(--hover-bg, #e8ecf7);
     box-shadow: 0 2px 6px rgba(44,62,122,.15);
   }
   .folder-card .fc-icon { font-size: 2.2rem; line-height: 1; }
@@ -51,14 +51,14 @@
   .folder-card .fc-count {
     margin-top: 0.15rem;
     font-size: 0.75rem;
-    color: #666;
+    color: var(--muted, #666);
   }
 
   /* Items table */
   .folder-items-heading {
     font-size: 1rem;
     font-weight: 600;
-    color: #2c3e7a;
+    color: var(--accent-text, #2c3e7a);
     margin-bottom: 0.6rem;
   }
 
@@ -72,14 +72,14 @@
   .folder-table th, .folder-table td {
     padding: 0.55rem 0.9rem;
     text-align: left;
-    border-bottom: 1px solid #e0e4ef;
+    border-bottom: 1px solid var(--border, #e0e4ef);
     white-space: nowrap;
   }
-  .folder-table tbody tr:nth-child(even) { background: #f4f6fb; }
-  .folder-table tbody tr:hover { background: #e8ecf7; }
+  .folder-table tbody tr:nth-child(even) { background: var(--hover-bg, #f4f6fb); }
+  .folder-table tbody tr:hover { background: var(--hover-bg, #e8ecf7); }
 
   /* "No items" message */
-  .folder-empty { color: #666; font-style: italic; margin-top: 0.5rem; }
+  .folder-empty { color: var(--muted, #666); font-style: italic; margin-top: 0.5rem; }
 </style>
 
 <nav class="back-link folder-back" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" trail_tail = breadcrumb %]</nav>

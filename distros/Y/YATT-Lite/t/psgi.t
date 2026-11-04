@@ -226,6 +226,7 @@ END
     };
     my $tuple = do {
       my Env $env = Env->psgi_simple_env;
+      $env->{REQUEST_METHOD} = "GET";
       $env->{PATH_INFO} = $path;
       $env->{SCRIPT_NAME} = '';
       $app->($env);
@@ -298,6 +299,7 @@ END
     my $get_env = sub {
       my ($path) = @_;
       my Env $env = Env->psgi_simple_env;
+      $env->{REQUEST_METHOD} = "GET";
       $env->{PATH_INFO} = $path;
       $env->{SCRIPT_NAME} = '';
       $env;

@@ -691,14 +691,14 @@ subtest 'render_pie_chart_snippet - separator default is /' => sub {
 	# The literal ' / ' must appear between d.data.label and fmt() in the source.
 	my $html = HTML::D3->new(width => 800, height => 600)
 		->render_pie_chart_snippet(\@SIMPLE_DATA)->{html};
-	like($html, qr/d\.data\.label \+ ' \/ '/, 'default separator / in snippet legend JS');
+	like($html, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'default separator / in snippet legend JS');
 };
 
 subtest 'render_pie_chart_snippet - custom separator appears in legend entry' => sub {
 	my $html = HTML::D3->new(width => 800, height => 600)
 		->render_pie_chart_snippet(\@SIMPLE_DATA, { separator => '|' })->{html};
-	like($html,   qr/d\.data\.label \+ ' \| '/, 'custom separator | in snippet legend JS');
-	unlike($html, qr/d\.data\.label \+ ' \/ '/, 'default / absent when overridden');
+	like($html,   qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\|'\)/, 'custom separator | in snippet legend JS');
+	unlike($html, qr/esc\(d\.data\.label\) \+ ' ' \+ esc\('\/'\)/, 'default / absent when overridden');
 };
 
 # ---------------------------------------------------------------------------

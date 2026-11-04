@@ -2,7 +2,7 @@ package WWW::Noss;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Cwd;
 use Getopt::Long qw(GetOptionsFromArray);
@@ -706,6 +706,10 @@ sub _feed_params {
         $params{ open } = $ref->{ open };
     }
 
+    if (defined $ref->{ user_agent }) {
+        $params{ user_agent } = $ref->{ user_agent };
+    }
+
     return %params;
 
 }
@@ -978,7 +982,7 @@ sub _get_feed {
             remote_time => 1,
             etag_save => $feed->etag,
             limit_rate => $self->{ RateLimit },
-            user_agent => $self->{ UserAgent },
+            user_agent => $feed->user_agent // $self->{ UserAgent },
             timeout => $self->{ Timeout },
             fail => 1,
             proxy => $self->{ Proxy },
@@ -1922,6 +1926,14 @@ sub init {
 
     my ($class, @argv) = @_;
 
+    # Handle NO_COLOR ourselves instead of Term::ANSIColor so that it can be
+    # overridden by -C|--color.
+    my $color_default = undef;
+    if (exists $ENV{ NO_COLOR }) {
+        $color_default = $ENV{ NO_COLOR } ne '' ? 0 : undef;
+        delete $ENV{ NO_COLOR };
+    }
+
     my $self = {
         Cmd           => undef,
         Args          => [],
@@ -1936,7 +1948,7 @@ sub init {
         DB            => undef,
         AutoClean     => undef,
         TimeFmt       => undef,
-        UseColor      => undef,
+        UseColor      => $color_default,
         ColorMap      => { %COLOR_CODES },
         RetryDir      => undef,
         # update
@@ -2336,7 +2348,7 @@ Method implementing the C<help> command.
 
 =head1 AUTHOR
 
-Written by Samuel Young, E<lt>samyoung12788@gmail.comE<gt>.
+Written by Samuel Young, E<lt>samyoung@posteo.comE<gt>.
 
 This project's source can be found on its
 L<Codeberg page|https://codeberg.org/1-1sam/noss.git>. Comments and pull

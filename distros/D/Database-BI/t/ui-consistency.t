@@ -19,6 +19,7 @@ use Test::More;
 use Test::Mojo;
 use Mojo::DOM;
 use Mojo::File;
+use Mojo::JSON ();
 use Mojo::Util qw(url_escape);
 use File::Temp ();
 
@@ -216,7 +217,7 @@ subtest 'every dropdown and text field shares one colour' => sub {
 subtest 'the main navigation reaches canvases, the catalog and the browser' => sub {
 	for my $page ('/', '/view/sales', '/bar?l=table:sales&cat=region&val=amount', '/catalog') {
 		my $dom = Mojo::DOM->new($t->get_ok($page)->status_is(200)->tx->res->body);
-		for my $href ('/#bi-canvases', '/catalog', '/browse') {
+		for my $href ('/canvases', '/catalog', '/browse') {
 			ok($dom->at(qq{nav.site-nav a[href="$href"]}), "$page links to $href");
 		}
 	}
@@ -237,6 +238,64 @@ subtest 'a view joins and combines at once, whichever came first' => sub {
 			is($has{c}, $more, "/$route: $id carries c=");
 		}
 	}
+};
+
+subtest 'every chart page that exports SVG and PNG exports PDF too' => sub {
+	for my $page (
+		[ 'line',      '/graph?l=table:sales&x=region&y=amount',           'chart.pdf' ],
+		[ 'bar',       '/bar?l=table:sales&cat=region&val=amount',         'bar_chart.pdf' ],
+		[ 'pie',       '/pie?l=table:sales&cat=region&val=amount',         'pie.pdf' ],
+		[ 'heatmap',   '/heatmap?l=table:sales&x=region&y=id&val=amount',  'heatmap.pdf' ],
+		[ 'scatter',   '/scatter?l=table:sales&x=id&y=amount',             'scatter_chart.pdf' ],
+		[ 'stacked',   '/stacked?l=table:sales&cat=region&seg=id',         'stacked_bar.pdf' ],
+		[ 'combo',     '/combo?l=table:sales&x=region&bar=amount&line=id', 'combo_chart.pdf' ],
+		[ 'treemap',   '/treemap?l=table:sales&group=region&size=amount',  'treemap.pdf' ],
+		[ 'histogram', '/histogram?l=table:sales&col=amount',              'histogram.pdf' ],
+	) {
+		my ($name, $url, $file) = @{$page};
+		my $b = $t->get_ok($url)->status_is(200)->tx->res->body;
+		like($b, qr/>Export SVG</, "$name: SVG button");
+		like($b, qr/>Export PNG</, "$name: PNG button");
+		like($b, qr/>Export PDF</, "$name: PDF button");
+		like($b, qr/biSaveChartPDF\(drawExportCanvas, '\Q$file\E'\)/, "$name: the PDF is named $file");
+		like($b, qr/window\.biSaveChartPDF = /, "$name: the shared PDF writer is on the page");
+		like($b, qr/biChartExportClone\(svg\)/, "$name: saved copies keep the fonts on screen");
+		unlike($b, qr/serializeToString\(svg\)/, "$name: nothing saves the chart without them");
+		like($b, qr/biBrandSvg\((?:clone|root)\)/, "$name: a saved SVG names the program");
+		like($b, qr/biBrandCanvas\(canvas, 1\)\.toDataURL/, "$name: so does a saved PNG");
+		like($b, qr/buildPDF\(window\.biBrandCanvas\(canvas, PDF_SCALE\)\)/, "$name: so does a saved PDF");
+		like($b, qr{/URI \(' \+ BRAND_URL}, "$name: the PDF links to the distribution");
+		like($b, qr{BRAND_URL\s+= 'https://metacpan\.org/dist/Database-BI'}, "$name: on MetaCPAN");
+	}
+};
+
+subtest 'a canvas card saves its chart as SVG, PNG and PDF' => sub {
+	my $id = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		Mojo::JSON::encode_json({
+			name     => 'Exports',
+			datasets => [ { spec => 'table:sales', alias => 'left' } ],
+			visuals  => [ { kind => 'bar', encode => { cat => 'region', val => 'amount' }, title => 'T' } ],
+		})
+	)->status_is(201)->tx->res->json->{id};
+	my $b = $t->get_ok("/a/$id")->status_is(200)->tx->res->body;
+	for my $fmt (qw(svg png pdf)) {
+		like($b, qr/class="visual-dl-btn" data-fmt="$fmt"/, "the card has a $fmt button");
+	}
+	like($b, qr/window\.biSaveChartPDF = /, 'the shared PDF writer is on the page');
+	like($b, qr/\['svg', 'png', 'pdf'\]/, 'a card added without a reload gets the same buttons');
+	unlike($b, qr/Save image/, 'the old button has gone');
+	like($b, qr/biBrandSvg\(cardExportClone\(svg\)\)/, 'a saved SVG names the program');
+	like($b, qr/biBrandCanvas\(canv, 1\)\.toDataURL/, 'so does a saved PNG');
+	like($b, qr/addCardLegend\(svg\.closest\('\.visual-card'\), clone, box\)/,
+		'every saved format carries a pie card its legend');
+};
+
+subtest 'the line chart makes room for its rotated labels' => sub {
+	my $b = $t->get_ok('/graph?l=table:sales&x=region&y=amount')->status_is(200)->tx->res->body;
+	like($b, qr/_drawn = _svg\.getBBox\(\)/, 'the viewport is sized from what was drawn');
+	like($b, qr/_svg\.setAttribute\('height',\s+_h\)/, 'and grows downwards for the labels');
+	like($b, qr/removeProperty\('border'\)/, "exports leave out the page's frame");
 };
 
 done_testing();

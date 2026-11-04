@@ -1,0 +1,15 @@
+# Verdicts kept by hand, read by large-subset-yardsticks.pl (and large-subset-features.pl -n): they override the
+# detector's verdict of a feature ("feature:ID", ID as in large-subset-features.pl), a whole corpus sample
+# ("sample:SOURCE:ID", for large-subset-yardsticks.pl) or a whole parser test ("test:ID", its snippet ID, for the
+# record t/parser/large-subset-shells.tsv), without a rescan.  Format: KEY, a tab, then either a short verdict -- B (blatant), S (subtle),
+# X (we run a program, which beats the shells' difference, or rule E chose one behaviour: ../large-subset-logical.md) or - (no difference), optionally followed by its basis --
+# or free-form text: a postponed decision, counted as open (outside the lower yardstick, inside the upper one) until
+# someone rewrites it in short form.  A free-form verdict may continue on lines that start with a tab.
+# Who decides: the user; Claude may write short verdicts only where a probe (P:ID) or the manual (M:N) settles them,
+# or where rule E (the user, 2026-11-03) and a category of ../large-subset-logical.md settle them (basis E:CATEGORY).
+feature:dashflags	`$-`: empty in dash -c, "hBc" in bash; a test for *i* (interactive) gives the same answer in both.
+	Claude's reading: blatant for printing it, no difference for the usual test; the detector cannot tell the two.
+	Rule E: no plainly logical choice (each shell lists its own options); stays rejected.
+feature:lineno	`$LINENO`: empty in dash -c, 1 in bash. Whether dash's manual promises it in -c strings: not checked
+	(dash's manual page is not installed here).  Rule E: as bash (the line number: category info); not implemented yet,
+	so it stays rejected.

@@ -6,6 +6,7 @@ requires 'Text::CSV';
 requires 'DateTime::Format::Flexible';
 requires 'Cpanel::JSON::XS';
 requires 'Getopt::Long::Descriptive';
+requires 'Win32::ShellQuote', '0.003001';
 
 on 'test' => sub {
   requires 'Test2::V0';

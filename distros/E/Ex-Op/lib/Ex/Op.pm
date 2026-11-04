@@ -4,10 +4,12 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
+
+*B::Deparse::pp_exop_call = sub { $_[0]->pp_entersub($_[1], $_[2]) };
 
 1;
 
@@ -135,8 +137,8 @@ C<__SUB__> in a closure
 
 =item * makes a closure over its own variables, or a C<qr> with a code block
 
-=item * returns from inside a loop, an C<eval> block, a C<sort>, C<grep> or
-C<map> block, or a block with its own C<my> variables
+=item * returns from inside an C<eval> block, a C<sort>, C<grep> or
+C<map> block
 
 =item * uses C<next>, C<last> or C<redo> with a label, or outside a loop of
 its own

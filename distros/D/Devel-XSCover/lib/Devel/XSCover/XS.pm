@@ -7,7 +7,7 @@ use warnings;
 use File::Find ();
 use File::Spec ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 our ($KEYWORDS);
 
@@ -40,18 +40,19 @@ sub generated_files {
         }
     }
     my %skip = map { $_ => 1 } @{ $self->{skip} };
+    my $top  = _slashes($self->{dir});
     File::Find::find({
         no_chdir => 1,
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $self->{dir};
+                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
                 return;
             }
             return unless /\.xs\z/;
-            my $rel = File::Spec->abs2rel($_, $self->{dir});
+            my $rel = _slashes(File::Spec->abs2rel($_, $self->{dir}));
             (my $c = $rel) =~ s/\.xs\z/.c/;
-            $pair{$rel} //= $c;
+            $pair{$rel} = $c unless defined $pair{$rel};
         },
     }, $self->{dir});
     return map { [ $_, $pair{$_} ] }
@@ -207,7 +208,13 @@ sub _lines {
 sub _canon {
     my ($self, $name) = @_;
     $name =~ s{^\./+}{};
-    return File::Spec->canonpath($name);
+    return _slashes(File::Spec->canonpath($name));
+}
+
+sub _slashes {
+    my ($path) = @_;
+    $path =~ s{\\}{/}g if $^O eq 'MSWin32';
+    return $path;
 }
 
 1;

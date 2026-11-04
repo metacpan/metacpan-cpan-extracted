@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvases &mdash; Database::BI</title>
+<meta name="description" content="Saved multi-visual canvases in Database::BI: grid layout, cross-filtering, drill-through, parameters, bookmarks, exports and embedding.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="canvas.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="Canvases &mdash; Database::BI">
+<meta property="og:description" content="Saved multi-visual canvases in Database::BI: grid layout, cross-filtering, drill-through, parameters, bookmarks, exports and embedding.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="charts.html">Charts</a>
+			<a href="canvas.html" aria-current="page">Canvases</a>
+			<a href="data.html">Data</a>
+			<a href="api.html">API</a>
+			<a href="install.html">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">A dashboard is a saved document</p>
+	<h1>Canvases</h1>
+	<p class="lead">
+		A canvas is a named collection of visuals over one or more datasets, laid
+		out on a grid and saved as a document. Opening <code>/a/:id</code>
+		re-renders every card against the files as they are today, so a canvas is a
+		question rather than a snapshot.
+	</p>
+</div>
+
+<h2>What a card can be</h2>
+<p class="section-intro">
+	Anything a chart page can draw can be a card: a table, a bar, pie, line,
+	scatter, heatmap, stacked, combo, treemap or histogram, a map, or a word
+	cloud. A card added to a filtered or parameterised canvas is drawn through
+	that same state, so it lands on screen already narrowed like its neighbours.
+	A card can also be <a href="#text">your own words</a>: a title, an explanation
+	or a label.
+</p>
+
+<div class="grid">
+	<article class="card">
+		<span class="tag">Layout</span>
+		<h3>A 12-column grid</h3>
+		<p>
+			Every card has an <code>x</code>, <code>y</code>, <code>w</code> and
+			<code>h</code> on a grid twelve columns wide. A card spans at most six
+			rows, and <code>x + w - 1</code> cannot exceed twelve. Positions are
+			stored as given &mdash; a gap is a gap &mdash; and two cards may not share
+			a cell.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Layout</span>
+		<h3>Drag, or use the keyboard</h3>
+		<p>
+			Drag a card by its header to any free cell, or focus the header and use
+			the arrow keys, with Shift going to the edge. Each move is announced:
+			the column and row the card landed in, and any card the move pushed
+			down. The position is saved as you go.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Layout</span>
+		<h3>Sizes without a drag</h3>
+		<p>
+			A card's Size menu sets full, half, a third or a quarter of the width,
+			and one, two, three or six rows high. The size the card currently is
+			sits on the card itself, beside the menu, so a width left by the corner
+			grip reads without opening anything.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Adding</span>
+		<h3>Add current view</h3>
+		<p>
+			The toolbar appends another table, chart or map without leaving the
+			canvas, and a status region announces the card and the new count. When a
+			card's script has drawn, the region says so &mdash; and if D3 or Leaflet
+			could not be loaded, it names the missing library instead of failing
+			silently.
+		</p>
+	</article>
+</div>
+
+<h2 id="text">Titles and explanations</h2>
+<p class="section-intro">
+	<strong>Add text</strong> in the toolbar puts a card of plain text on the
+	canvas. It reads no data, so a filter or a time range leaves its words alone,
+	and it moves and resizes like any other card.
+</p>
+
+<div class="grid">
+	<article class="card">
+		<span class="tag">Text</span>
+		<h3>How it looks</h3>
+		<p>
+			Each card has its own font (the page's, Arial, Georgia, Times New Roman,
+			Verdana, Trebuchet MS or Courier New), a size from 8 to 96 points, an
+			alignment, bold and italic, a text colour and a background. The fonts are
+			ones browsers already have, so a canvas loads nothing extra for them.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Text</span>
+		<h3>A heading, not a box</h3>
+		<p>
+			A card can hide its frame and header until it is pointed at or has
+			keyboard focus, so a title reads as a heading. On a printed or
+			<a href="#sharing">shared</a> canvas the header stays hidden.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Text</span>
+		<h3>Rows that fit</h3>
+		<p>
+			A new card starts full width. A row holding only one-row text cards is as
+			tall as its text, rather than the usual 15rem. Beside a chart, the card is
+			as tall as the chart, and a text card two rows high or more keeps full
+			rows, so the Size menu is how to ask for a taller one.
+		</p>
+	</article>
+
+	<article class="card">
+		<span class="tag">Text</span>
+		<h3>Editing and removing</h3>
+		<p>
+			Double-click the text, or use <strong>Edit text</strong> in its header. The
+			card shows each change as it is made, and Cancel or Escape puts it back.
+			<strong>Remove card</strong> is in the same panel. Undo and redo cover the
+			canvas's filters, not its cards, so removing one cannot be undone.
+		</p>
+	</article>
+</div>
+
+<div class="note">
+	<p>
+		Text is plain text: HTML tags and Markdown show as the characters typed. A
+		colour left unset follows the light or dark
+		<a href="index.html#preferences">theme</a>. A chosen colour stays the same in
+		both, so give it a background it can be read against. Text cards have no
+		chart or data to save, so they carry no download buttons; they appear in the
+		printed canvas. They are also the only cards that can be removed.
+	</p>
+</div>
+
+<h2 id="aggregation">A card picks its own measure</h2>
+<p>
+	A card that shows an aggregated value chooses the function in its own panel,
+	from the vocabulary the pivot uses and with the same names: Sum, Average,
+	Min, Max, Count distinct, Median, Std dev, First, Last, Range, or a percentile
+	with its level. That is what lets one card show a median where the chart page
+	it came from could only sum. A card's derived title says which function it
+	used &mdash; <code>median(amount) by region</code> &mdash; while a plain sum
+	keeps the title it has always had.
+</p>
+
+<h2 id="cross-filter">Cross-filtering</h2>
+<p>
+	Cards share the page. Clicking a mark cross-filters the canvas to the value
+	behind it, and the card that was clicked is marked as the source rather than
+	narrowed by its own click. The remaining cards re-render against the narrowed
+	rows, each through its own filters, the page's cross-filter and its own
+	options &mdash; which is why a word cloud card narrowed to one region shows the
+	words of that region.
+</p>
+<p>
+	The source is drawn as the source, not as a card that failed to narrow, so a
+	reader can always see which mark the page is answering. A page-wide relative
+	time range narrows every card, the source included, because it is the page's
+	range rather than a card's click.
+</p>
+
+<h2 id="drill">Drill-through</h2>
+<p>
+	A canvas can carry drill hierarchies: <code>?dd=&lt;column&gt;&amp;dl=&lt;level&gt;</code>
+	opens a card at a deeper level of the hierarchy, with the cards around it
+	still showing the level the reader is looking at. A visit that filters the
+	data &mdash; a cross-filter or a drill path &mdash; leaves the arrangement
+	alone: the card you put in row four stays in row four.
+</p>
+
+<h2 id="parameters">Parameters</h2>
+<p>
+	A visual's fields can be bound to named parameters, overridden per visit with
+	<code>?p.&lt;name&gt;=&lt;value&gt;</code>. A bookmark that carries
+	<code>p.region=North</code> is one URL, and the same canvas answers the same
+	question for a different reader by changing that one value.
+</p>
+
+<h2 id="cross-row">Per-card cross-row plans</h2>
+<p>
+	The page's cross-row plan applies to every card unless a card brings one of
+	its own. That is what lets one card show a running total while the cards
+	beside it show raw rows, and a card with an empty plan
+	(<code>{ "cs": [] }</code>) runs no cross-row pass at all &mdash; which is how
+	a card opts out of the page's.
+</p>
+<p>
+	The plan is checked against the canvas's columns on every render, not only
+	when it is saved, so a stored plan that no longer names a column is that
+	card's error, while a bad page-level plan is the page's 400.
+</p>
+
+<h2>Bookmarks and undo</h2>
+<p>
+	Bookmarks record the canvas's state, including parameters, and undo and redo
+	step through them. Because the state lives in the URL as well as in the
+	document, a bookmark is a link that can be sent; because the range inside it
+	is relative, the link still means the same thing when it is opened next month.
+</p>
+
+<h2 id="sharing">Sharing and embedding</h2>
+<dl class="spec">
+	<dt><code>/a/:id</code></dt>
+	<dd>The canvas itself, with cross-filter, drill, parameter and range parameters.</dd>
+	<dt><code>/share/:id</code></dt>
+	<dd>A share link, signed with an HMAC-SHA256 token, for handing a canvas to someone who should not need an account. The canvas toolbar's <b>Share&hellip;</b> panel makes one, valid for 30 days.</dd>
+	<dt><code>/embed/:id</code></dt>
+	<dd>A page with no navigation, for putting the canvas inside another page; the Share panel gives its <code>&lt;iframe&gt;</code> code. It is sent with <code>X-Frame-Options: SAMEORIGIN</code>, so only pages served from the same site can frame it. Each card is drawn through its own failure: one card that cannot be drawn says so and leaves the others. It stays in the light colours, because it sits on a page whose colours it cannot know.</dd>
+	<dt><code>/catalog</code></dt>
+	<dd>Every saved canvas in one place, as cards that open.</dd>
+</dl>
+
+<h2>Exporting from a canvas</h2>
+<p>
+	Each card can save itself whole &mdash; SVG, PNG or a one-page PDF &mdash; including
+	the parts that hang outside the viewBox, such as rotated axis labels. A pie's
+	HTML legend is drawn into the saved copy, and a map or table card keeps the
+	image buttons hidden because there is no chart to save. A card's data can
+	also be downloaded as CSV, from the canvas's own rows rather than from any
+	other source. The whole canvas prints to paper or PDF. Saved cards and printed
+	canvases use the light colours, whichever <a href="index.html#preferences">theme</a>
+	the reader has chosen.
+</p>
+<p>
+	The canvas itself can be kept as a file: the Share panel's <b>Download as
+	JSON</b> saves it, and <b>Import canvas</b> on the Canvases page (<code>/canvases</code>, the
+	main navigation's Canvases link) makes a new canvas
+	from that file, on this server or another.
+</p>
+
+<div class="note">
+	<p>
+		Canvases live in <code>analyses.json</code> under the model directory, not
+		in a database. The JSON API can list, create, patch, import and export them,
+		and can append a visual without a browser &mdash; see
+		<a href="api.html#visuals">the visuals endpoint</a>.
+	</p>
+</div>
+
+<h2>Where the numbers come from</h2>
+<p>
+	A canvas stores datasets, joins, calculated fields and visuals, not rows. Each
+	card runs the same pipeline as the page it was saved from
+	(<a href="data.html">Data</a> describes the stages), which is why a canvas
+	over a file that changed overnight shows this morning's figures, and why the
+	same canvas can be narrowed by a range without storing the dates it resolved
+	to.
+</p>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

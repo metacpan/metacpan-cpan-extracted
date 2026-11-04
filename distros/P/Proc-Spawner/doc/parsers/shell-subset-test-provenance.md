@@ -88,7 +88,7 @@ pdftotext -layout make3.pdf make3.txt
 sha256sum make3.txt          # 866d44b8…24d6 with poppler 24.02.0
 ```
 
-Then, with the scripts of `corpus-run.tar.gz`:
+Then, with the scripts in `doc/parsers/tools/` (formerly `corpus-run.tar.gz`; how to rerun them: `doc/test-pools.md`):
 
 ```sh
 perl prov.pl CORPORA_DIR TL:common/abduco.md:8      # print one snippet
@@ -99,7 +99,7 @@ The NL2Bash repository is large (about 220 MB, mostly other data); only `data/ba
 
 ## 5. How the samples were taken and the tests chosen
 
-The scripts, in order (all in `corpus-run.tar.gz`):
+The scripts, in order (all in `doc/parsers/tools/`, formerly `corpus-run.tar.gz`):
 
 1. `extract.pl CORPORA_DIR samples.jsonl` collects samples:
    - TL: every line of `pages/common/*.md` and `pages/linux/*.md` that is a command in backquotes. Placeholders are filled in: `{{[-a|--all]}}` becomes `-a` (the first alternative), `{{text}}` becomes `text`.

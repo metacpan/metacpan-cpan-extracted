@@ -8,6 +8,10 @@ use warnings;
 # Database::BI::Controller::Dashboard (HTTP actions), and
 # Database::BI::Model::DataSource (data access) all interact.
 #
+# Sections 60 onward hold the workflows that cross every layer, independent
+# objects in one process, every combination of the optional modules, permissions
+# revoked under a running app, and upstreams that fail.
+#
 # What is NOT here (covered by dedicated suites):
 #   - Individual filter operators             -> t/filter.t
 #   - Single-endpoint status codes            -> t/unit.t
@@ -18,14 +22,31 @@ use warnings;
 use Test::Most;
 use Test::Mojo;
 use Test::Without::Module;
+use Test::Mockingbird qw(mock_scoped spy restore_all);
+use Test::Permissions qw(can_revoke_create can_revoke_search with_revoked);
+use Test::Returns;
 use Readonly;
+use File::Basename ();
 use File::Spec     ();
 use File::Temp     qw(tempdir tempfile);
+use HTTP::Response ();
+use LWP::UserAgent ();
 use Mojo::File     ();
-use Mojo::JSON     qw(decode_json);
+use Mojo::JSON     qw(decode_json encode_json);
+use Mojo::Promise  ();
 use Mojo::Util     qw(url_escape);
 use Scalar::Util   qw(reftype refaddr);
 use DBI            ();
+
+# Mojolicious dispatches under a __DIE__ handler that throws an object.  When
+# Test::Without::Module's @INC hook croaks under it, perl goes on through @INC and
+# loads the module after all, so a test that hides a module and then makes a
+# request sees it installed.  The hook has to die with no handler in the way.
+{
+	no warnings 'redefine';
+	my $hook = \&Test::Without::Module::fake_module;
+	*Test::Without::Module::fake_module = sub { local $SIG{__DIE__}; return $hook->(@_) };
+}
 
 # ---------------------------------------------------------------------------
 # Constants derived from known sample data (sales.csv, products.psv).
@@ -85,18 +106,18 @@ require Database::BI::Model::DataSource;    # already in %INC; stash intact
 }
 
 # ===========================================================================
-# SECTION 1: App config → DataSource → HTTP response pipeline
+# SECTION 1: App config -> DataSource -> HTTP response pipeline
 #
 # Strategy: Verify that the app's open_table helper correctly passes the
 # data_dir config to DataSource, and that DataSource in turn feeds the
-# controller with the expected data — a full config-to-HTML round-trip.
+# controller with the expected data -- a full config-to-HTML round-trip.
 # ===========================================================================
 
-subtest 'Config → open_table helper → DataSource → HTML response (sales)' => sub {
+subtest 'Config -> open_table helper -> DataSource -> HTML response (sales)' => sub {
 	# The app config sets data_dir='data'.  GET /view/sales must:
 	#   1. Use the open_table helper with data_dir from config
 	#   2. DataSource opens data/sales.csv via Database::Abstraction
-	#   3. Controller renders rows → HTML contains known sample values
+	#   3. Controller renders rows -> HTML contains known sample values
 	$t->get_ok('/view/sales')
 	  ->status_is(200)
 	  ->content_like(qr/Widget A/,   'known product in HTML output')
@@ -104,7 +125,7 @@ subtest 'Config → open_table helper → DataSource → HTML response (sales)' 
 	  ->content_like(qr/North/,       'known region in HTML output');
 
 	# Verify DataSource is in fact delivering the right column set by
-	# checking the columns API (which calls open_table → DataSource.columns).
+	# checking the columns API (which calls open_table -> DataSource.columns).
 	my $cols = $t->get_ok('/api/columns?table=sales')
 	             ->status_is(200)
 	             ->json_has('/columns')
@@ -114,8 +135,8 @@ subtest 'Config → open_table helper → DataSource → HTML response (sales)' 
 	}
 };
 
-subtest 'Config → open_table(directory=>) → DataSource → HTML (custom path)' => sub {
-	# /open uses open_table(directory => $dir_of_file) — the directory override
+subtest 'Config -> open_table(directory=>) -> DataSource -> HTML (custom path)' => sub {
+	# /open uses open_table(directory => $dir_of_file) -- the directory override
 	# path in the helper.  This exercises a distinct code path from /view/:table.
 	my $enc = url_escape($SALES_CSV);
 	$t->get_ok("/open?path=$enc")
@@ -125,7 +146,7 @@ subtest 'Config → open_table(directory=>) → DataSource → HTML (custom path
 };
 
 # ===========================================================================
-# SECTION 2: Multi-step HTTP workflow — upload → open → filter pipeline
+# SECTION 2: Multi-step HTTP workflow -- upload -> open -> filter pipeline
 #
 # Strategy: Simulate a complete user session: upload a fresh CSV, then
 # immediately open it and apply a filter.  Verifies that the upload path
@@ -133,7 +154,7 @@ subtest 'Config → open_table(directory=>) → DataSource → HTML (custom path
 # correctly across two independent HTTP requests.
 # ===========================================================================
 
-subtest 'Upload → open → filter end-to-end pipeline' => sub {
+subtest 'Upload -> open -> filter end-to-end pipeline' => sub {
 	# Step 1: Upload a custom CSV that we control precisely.
 	my $csv_content = join("\n",
 		'id,label,tier,score',
@@ -153,7 +174,7 @@ subtest 'Upload → open → filter end-to-end pipeline' => sub {
 	my $upload_path = $t->tx->res->json('/path');
 	ok -f $upload_path, 'uploaded file physically exists on disk';
 
-	# Step 2: Open the uploaded file — exercises the open_table path arg.
+	# Step 2: Open the uploaded file -- exercises the open_table path arg.
 	my $enc = url_escape($upload_path);
 	$t->get_ok("/open?path=$enc")
 	  ->status_is(200)
@@ -161,32 +182,32 @@ subtest 'Upload → open → filter end-to-end pipeline' => sub {
 	  ->content_like(qr/Beta/,    'Beta row present before filtering')
 	  ->content_like(qr/premium/, 'tier column data visible');
 
-	# Step 3: Open with an eq filter — only premium tier rows should appear.
+	# Step 3: Open with an eq filter -- only premium tier rows should appear.
 	$t->get_ok("/open?path=$enc&f=" . url_escape('tier:eq:premium'))
 	  ->status_is(200)
-	  ->content_like(qr/Alpha/,   'Alpha is premium — present in filtered view')
-	  ->content_like(qr/Gamma/,   'Gamma is premium — present in filtered view')
-	  ->content_unlike(qr/Beta/,  'Beta is standard — absent from filtered view')
-	  ->content_unlike(qr/Delta/, 'Delta is standard — absent from filtered view');
+	  ->content_like(qr/Alpha/,   'Alpha is premium -- present in filtered view')
+	  ->content_like(qr/Gamma/,   'Gamma is premium -- present in filtered view')
+	  ->content_unlike(qr/Beta/,  'Beta is standard -- absent from filtered view')
+	  ->content_unlike(qr/Delta/, 'Delta is standard -- absent from filtered view');
 
-	# Step 4: Open with a gt filter — only score > 70.
+	# Step 4: Open with a gt filter -- only score > 70.
 	$t->get_ok("/open?path=$enc&f=" . url_escape('score:gt:70'))
 	  ->status_is(200)
-	  ->content_like(qr/Alpha/,   'Alpha score 90 > 70 — present')
-	  ->content_like(qr/Gamma/,   'Gamma score 80 > 70 — present')
-	  ->content_unlike(qr/Beta/,  'Beta score 60 not > 70 — absent')
-	  ->content_unlike(qr/Delta/, 'Delta score 40 not > 70 — absent');
+	  ->content_like(qr/Alpha/,   'Alpha score 90 > 70 -- present')
+	  ->content_like(qr/Gamma/,   'Gamma score 80 > 70 -- present')
+	  ->content_unlike(qr/Beta/,  'Beta score 60 not > 70 -- absent')
+	  ->content_unlike(qr/Delta/, 'Delta score 40 not > 70 -- absent');
 };
 
 # ===========================================================================
-# SECTION 3: Browse → open → export pipeline
+# SECTION 3: Browse -> open -> export pipeline
 #
 # Strategy: Navigate the filesystem to a temp directory containing a fresh
 # CSV, open the file, and write it out to a second location.  Tests the
 # browse, open_file, and export_write actions composing correctly.
 # ===========================================================================
 
-subtest 'Browse → open → export_write end-to-end pipeline' => sub {
+subtest 'Browse -> open -> export_write end-to-end pipeline' => sub {
 	# Arrange: a temp dir with a known CSV.
 	my $dir  = tempdir(CLEANUP => 1);
 	my $file = File::Spec->catfile($dir, 'inventory.csv');
@@ -233,7 +254,7 @@ subtest 'Browse → open → export_write end-to-end pipeline' => sub {
 # across all three data-access layers.
 # ===========================================================================
 
-subtest 'CSV + PSV join → filter → export_write complete pipeline' => sub {
+subtest 'CSV + PSV join -> filter -> export_write complete pipeline' => sub {
 	plan skip_all => 'data/products.psv not found' unless -f $PRODUCTS_PSV;
 
 	my $out_dir = tempdir(CLEANUP => 1);
@@ -245,7 +266,7 @@ subtest 'CSV + PSV join → filter → export_write complete pipeline' => sub {
 	  ->status_is(200)
 	  ->content_like(qr/product|category/i, 'merged columns from PSV visible in joined view');
 
-	# Step 2: Join + filter — only North region rows.
+	# Step 2: Join + filter -- only North region rows.
 	$t->get_ok(
 		'/join?l=' . url_escape($l_spec) .
 		'&j=' . $j_spec .
@@ -354,7 +375,7 @@ subtest 'Two DataSource instances on the same table are independent objects' => 
 #
 # Strategy: Pass a mock Locale::Maketext-compatible object to DataSource and
 # trigger an error condition.  Verify that the i18n object's maketext() is
-# called with the expected message key, confirming the DataSource↔i18n
+# called with the expected message key, confirming the DataSource<->i18n
 # integration path.
 # ===========================================================================
 
@@ -388,23 +409,23 @@ subtest 'DataSource uses supplied i18n object for error messages' => sub {
 };
 
 # ===========================================================================
-# SECTION 7: Export → re-open roundtrip (SQLite)
+# SECTION 7: Export -> re-open roundtrip (SQLite)
 #
 # Strategy: Export the sales table to a SQLite file, then re-open that file
-# via the HTTP API.  This confirms that the SQLite write path (Dashboard →
-# _write_sqlite_db → DBI) and the SQLite read path (DataSource →
-# Database::Abstraction → DBD::SQLite) compose correctly.
+# via the HTTP API.  This confirms that the SQLite write path (Dashboard ->
+# _write_sqlite_db -> DBI) and the SQLite read path (DataSource ->
+# Database::Abstraction -> DBD::SQLite) compose correctly.
 # ===========================================================================
 
-subtest 'SQLite read→filter pipeline (DBI-created file re-opened via /open)' => sub {
+subtest 'SQLite read->filter pipeline (DBI-created file re-opened via /open)' => sub {
 	eval { require DBI; DBI->install_driver('SQLite') }
 		or plan skip_all => 'DBD::SQLite not available';
 
 	# Strategy: create the SQLite file ourselves with a table whose name
 	# matches the filename stem.  This tests the DataSource SQLite read path
-	# and the filter pipeline without depending on the export→re-open naming
+	# and the filter pipeline without depending on the export->re-open naming
 	# alignment (which requires the internal export table name "data" to match
-	# the filename stem — a separate concern tested in export_write subtests).
+	# the filename stem -- a separate concern tested in export_write subtests).
 	my $tmpdir   = tempdir(CLEANUP => 1);
 	my $sqlfile  = File::Spec->catfile($tmpdir, 'regions.sql');
 
@@ -420,14 +441,14 @@ subtest 'SQLite read→filter pipeline (DBI-created file re-opened via /open)' =
 
 	ok -f $sqlfile, 'SQLite file created by DBI';
 
-	# Open via the HTTP API — exercises DataSource → D::A → DBD::SQLite.
+	# Open via the HTTP API -- exercises DataSource -> D::A -> DBD::SQLite.
 	$t->get_ok('/open?path=' . url_escape($sqlfile))
 	  ->status_is(200)
 	  ->content_like(qr/London/, 'London row visible in SQLite view')
 	  ->content_like(qr/Paris/,  'Paris row visible in SQLite view')
 	  ->content_like(qr/Berlin/, 'Berlin row visible in SQLite view');
 
-	# Filter — only UK rows.
+	# Filter -- only UK rows.
 	$t->get_ok(
 		'/open?path=' . url_escape($sqlfile) . '&f=' . url_escape('country:eq:UK')
 	)->status_is(200)
@@ -454,15 +475,15 @@ subtest 'SQLite read→filter pipeline (DBI-created file re-opened via /open)' =
 #
 # Strategy: Apply two filters whose intersection is a strict subset of either
 # filter applied alone.  This proves the filters compose with AND semantics
-# and that _apply_filters iterates all specs — not just the first matching one.
+# and that _apply_filters iterates all specs -- not just the first matching one.
 # ===========================================================================
 
 subtest 'Multiple filters compose with AND semantics (join pipeline)' => sub {
 	# sales.csv: regions are North, South, East, West.
 	# Amount range: 725.25 to 2100.00.
 	#
-	# Filter A: region eq North  → rows with id 1 (1250.00) and id 5 (1875.00)
-	# Filter B: amount gt 1000   → ids 1 (1250), 3 (2100), 5 (1875)
+	# Filter A: region eq North  -> rows with id 1 (1250.00) and id 5 (1875.00)
+	# Filter B: amount gt 1000   -> ids 1 (1250), 3 (2100), 5 (1875)
 	# Intersection: id 1 and id 5 (region=North AND amount>1000)
 	# Excluded: id 3 (East, not North), ids 2/4/6 (amount<=1000 or wrong region)
 
@@ -485,11 +506,10 @@ subtest 'Multiple filters compose with AND semantics (join pipeline)' => sub {
 };
 
 # ===========================================================================
-# SECTION 9: XML format integration (optional — XML::Simple)
+# SECTION 9: XML format integration (optional -- XML::Simple)
 #
-# Strategy: Verify the full XML data path (DataSource → Database::Abstraction
-# → XML::Simple → HTTP response), then verify graceful failure when XML::Simple
-# is blocked by Test::Without::Module.
+# Strategy: Verify the full XML data path (DataSource -> Database::Abstraction
+# -> XML::Simple -> HTTP response).  Failure without it is in SECTION 63.
 # ===========================================================================
 
 subtest 'XML data path: catalog.xml with XML::Simple present' => sub {
@@ -516,59 +536,12 @@ subtest 'XML data path: catalog.xml with XML::Simple present' => sub {
 	  ->content_like(qr/Widget A/, 'CSV export of XML table contains Widget A');
 };
 
-subtest 'XML data path: graceful failure when XML::Simple is absent' => sub {
-	plan skip_all => 'data/catalog.xml not found' unless -f $CATALOG_XML;
-	plan skip_all => 'XML::Simple already loaded; cannot simulate absence in this process'
-		if exists $INC{'XML/Simple.pm'};
-
-	# Block XML::Simple from loading and try to open the catalog table.
-	# The controller must return the home page with an error (not a 500 crash).
-	{
-		local @INC = @INC;
-		Test::Without::Module->import('XML::Simple');
-		$t->get_ok('/view/catalog')
-		  ->status_is(200)		# home page with error message, not 500
-		  ->content_unlike(qr/Widget A/, 'no data visible when XML::Simple absent');
-		Test::Without::Module->unimport('XML::Simple');
-	}
-};
-
 # ===========================================================================
-# SECTION 10: Optional dependency — DBD::SQLite graceful degradation
-#
-# Strategy: Verify that the /export SQLite path works when DBD::SQLite is
-# present.  Without DBD::SQLite the export_write action must return a 500
-# JSON error, not crash the process.
-# ===========================================================================
-
-subtest 'SQLite export: graceful failure when DBD::SQLite absent' => sub {
-	plan skip_all => 'DBD::SQLite already loaded; cannot simulate absence in this process'
-		if exists $INC{'DBD/SQLite.pm'};
-
-	my $out_dir = tempdir(CLEANUP => 1);
-
-	{
-		local @INC = @INC;
-		Test::Without::Module->import('DBD::SQLite');
-		$t->post_ok('/export', form => {
-			l        => 'table:sales',
-			dir      => $out_dir,
-			filename => 'no_sqlite.sql',
-		})->status_is(500)
-		  ->json_has('/error', 'error key present when DBD::SQLite absent');
-		Test::Without::Module->unimport('DBD::SQLite');
-	}
-
-	ok !-f File::Spec->catfile($out_dir, 'no_sqlite.sql'),
-		'no SQLite file written to disk on failure';
-};
-
-# ===========================================================================
-# SECTION 11: Concurrent HTTP requests — no shared controller state
+# SECTION 11: Concurrent HTTP requests -- no shared controller state
 #
 # Strategy: Issue multiple overlapping requests against the same Test::Mojo
 # instance (sequentially, since Test::Mojo is synchronous) and verify that
-# each request's stash is isolated — no filter, column order, or table name
+# each request's stash is isolated -- no filter, column order, or table name
 # bleeds from one request into the next.
 # ===========================================================================
 
@@ -578,13 +551,13 @@ subtest 'Sequential requests have isolated stash / no state bleed' => sub {
 	  ->status_is(200)
 	  ->content_like(qr/North/);
 
-	# Request B: products (no filter) — must NOT inherit the North filter.
+	# Request B: products (no filter) -- must NOT inherit the North filter.
 	$t->get_ok('/view/products')
 	  ->status_is(200)
 	  ->content_like(qr/Hammer/,      'products table visible without North filter')
-	  ->content_like(qr/Screwdriver/, 'all products visible — no stale filter');
+	  ->content_like(qr/Screwdriver/, 'all products visible -- no stale filter');
 
-	# Request C: sales again with South filter — must not show North.
+	# Request C: sales again with South filter -- must not show North.
 	$t->get_ok('/view/sales?f=' . url_escape('region:eq:South'))
 	  ->status_is(200)
 	  ->content_like(qr/Bob Jones/,    'South row visible')
@@ -596,7 +569,7 @@ subtest 'Sequential requests have isolated stash / no state bleed' => sub {
 #
 # Strategy: Write a fresh CSV to a temp directory at test time, open it via
 # DataSource directly, and verify the returned rows and column names exactly
-# match what was written.  This confirms the full write→read pipeline across
+# match what was written.  This confirms the full write->read pipeline across
 # the OS filesystem and the Database::Abstraction CSV parser.
 # ===========================================================================
 
@@ -629,7 +602,7 @@ subtest 'DataSource reads a dynamically-created CSV exactly' => sub {
 };
 
 # ===========================================================================
-# SECTION 13: /api/stat ↔ filesystem truthfulness
+# SECTION 13: /api/stat <-> filesystem truthfulness
 #
 # Strategy: Create a file, stat it, delete it, stat again.  Verifies that
 # stat_api reflects real filesystem state and does not cache stale metadata
@@ -651,7 +624,7 @@ subtest '/api/stat reflects live filesystem state (no cross-request cache)' => s
 	my $size1 = $t->tx->res->json('/size');
 	ok $size1 > 0, 'size is positive while file exists';
 
-	# Delete the file and stat again — must now report exists:false.
+	# Delete the file and stat again -- must now report exists:false.
 	unlink $tmpfile;
 	$t->get_ok("/api/stat?path=$enc")
 	  ->status_is(200)
@@ -667,11 +640,11 @@ subtest '/api/stat reflects live filesystem state (no cross-request cache)' => s
 # drill-down JS.
 # ===========================================================================
 
-subtest '/pie full pipeline: CSV → aggregation → HTML with metadata' => sub {
+subtest '/pie full pipeline: CSV -> aggregation -> HTML with metadata' => sub {
 	eval { require HTML::D3 }
 		or plan skip_all => 'HTML::D3 not available';
 
-	# The sales table has region (cat) and amount (val) — four distinct regions.
+	# The sales table has region (cat) and amount (val) -- four distinct regions.
 	$t->get_ok('/pie?l=table:sales&cat=region&val=amount&back=/view/sales')
 	  ->status_is(200)
 	  ->content_like(qr/North/,         'North slice present in pie output')
@@ -720,7 +693,7 @@ subtest '/pie count mode: __count__ aggregates rows per category' => sub {
 # third breadcrumb segment "... > Back to pie chart".
 #
 # The pie page URL used as back2 in the tests below is deliberately a plausible
-# value — the exact URL is not reachable from Test::Mojo but the controller only
+# value -- the exact URL is not reachable from Test::Mojo but the controller only
 # reads it as a string and forwards it into the stash, so any value works.
 # ===========================================================================
 
@@ -816,7 +789,7 @@ subtest 'back2 absent: no third breadcrumb segment rendered' => sub {
 # and a back link pointing at the ?back= param.
 # ===========================================================================
 
-subtest '/graph full pipeline: CSV → D3 snippet → HTML with reference lines' => sub {
+subtest '/graph full pipeline: CSV -> D3 snippet -> HTML with reference lines' => sub {
 	eval { require HTML::D3 }
 		or plan skip_all => 'HTML::D3 not available';
 
@@ -1594,103 +1567,103 @@ subtest '/pivot ?topn=N: top-N row groups with "Other" row' => sub {
 # ===========================================================================
 
 subtest 'Push-vs-fold equivalence: /bar' => sub {
-    SKIP: {
-        my $dir = tempdir(CLEANUP => 1);
-        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_bar.sql", '', '', { RaiseError => 1 }) };
-        skip 'DBD::SQLite not available', 2 unless $dbh;
-        $dbh->do('CREATE TABLE eq_bar (region TEXT, amount INTEGER)');
-        for my $row (['North', 100], ['South', 200], ['North', 50]) {
-            $dbh->do('INSERT INTO eq_bar VALUES (?,?)', {}, @$row);
-        }
-        $dbh->disconnect;
-        my $l = url_escape("path:$dir/eq_bar.sql");
+	SKIP: {
+		my $dir = tempdir(CLEANUP => 1);
+		my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_bar.sql", '', '', { RaiseError => 1 }) };
+		skip 'DBD::SQLite not available', 2 unless $dbh;
+		$dbh->do('CREATE TABLE eq_bar (region TEXT, amount INTEGER)');
+		for my $row (['North', 100], ['South', 200], ['North', 50]) {
+			$dbh->do('INSERT INTO eq_bar VALUES (?,?)', {}, @$row);
+		}
+		$dbh->disconnect;
+		my $l = url_escape("path:$dir/eq_bar.sql");
 
-        my $push_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
-                           ->status_is(200)->tx->res->body;
+		my $push_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
+						   ->status_is(200)->tx->res->body;
 
-        local $ENV{BI_FORCE_PERL_AGG} = 1;
-        my $fold_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
-                           ->status_is(200)->tx->res->body;
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		my $fold_body = $t->get_ok("/bar?l=$l&cat=region&val=amount")
+						   ->status_is(200)->tx->res->body;
 
-        my @push_vals = sort ($push_body =~ /"value":(\d+)/g);
-        my @fold_vals = sort ($fold_body =~ /"value":(\d+)/g);
-        is_deeply(\@push_vals, \@fold_vals, '/bar push and fold produce same values');
-    }
+		my @push_vals = sort ($push_body =~ /"value":(\d+)/g);
+		my @fold_vals = sort ($fold_body =~ /"value":(\d+)/g);
+		is_deeply(\@push_vals, \@fold_vals, '/bar push and fold produce same values');
+	}
 };
 
 subtest 'Push-vs-fold equivalence: /stacked' => sub {
-    SKIP: {
-        my $dir = tempdir(CLEANUP => 1);
-        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_stacked.sql", '', '', { RaiseError => 1 }) };
-        skip 'DBD::SQLite not available', 2 unless $dbh;
-        $dbh->do('CREATE TABLE eq_stacked (cat TEXT, seg TEXT, val INTEGER)');
-        for my $row (['A','X',10],['A','Y',20],['B','X',30],['B','Y',40]) {
-            $dbh->do('INSERT INTO eq_stacked VALUES (?,?,?)', {}, @$row);
-        }
-        $dbh->disconnect;
-        my $l = url_escape("path:$dir/eq_stacked.sql");
+	SKIP: {
+		my $dir = tempdir(CLEANUP => 1);
+		my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_stacked.sql", '', '', { RaiseError => 1 }) };
+		skip 'DBD::SQLite not available', 2 unless $dbh;
+		$dbh->do('CREATE TABLE eq_stacked (cat TEXT, seg TEXT, val INTEGER)');
+		for my $row (['A','X',10],['A','Y',20],['B','X',30],['B','Y',40]) {
+			$dbh->do('INSERT INTO eq_stacked VALUES (?,?,?)', {}, @$row);
+		}
+		$dbh->disconnect;
+		my $l = url_escape("path:$dir/eq_stacked.sql");
 
-        my $push_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
-                           ->status_is(200)->tx->res->body;
+		my $push_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+						   ->status_is(200)->tx->res->body;
 
-        local $ENV{BI_FORCE_PERL_AGG} = 1;
-        my $fold_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
-                           ->status_is(200)->tx->res->body;
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		my $fold_body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+						   ->status_is(200)->tx->res->body;
 
-        my @push_vals = sort ($push_body =~ /"val":(\d+)/g);
-        my @fold_vals = sort ($fold_body =~ /"val":(\d+)/g);
-        is_deeply(\@push_vals, \@fold_vals, '/stacked push and fold produce same values');
-    }
+		my @push_vals = sort ($push_body =~ /"val":(\d+)/g);
+		my @fold_vals = sort ($fold_body =~ /"val":(\d+)/g);
+		is_deeply(\@push_vals, \@fold_vals, '/stacked push and fold produce same values');
+	}
 };
 
 subtest 'Push-vs-fold equivalence: /heatmap' => sub {
-    SKIP: {
-        my $dir = tempdir(CLEANUP => 1);
-        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_heatmap.sql", '', '', { RaiseError => 1 }) };
-        skip 'DBD::SQLite not available', 2 unless $dbh;
-        $dbh->do('CREATE TABLE eq_heatmap (x TEXT, y TEXT, v REAL)');
-        for my $row (['P','Q',1.0],['P','R',2.0],['S','Q',3.0]) {
-            $dbh->do('INSERT INTO eq_heatmap VALUES (?,?,?)', {}, @$row);
-        }
-        $dbh->disconnect;
-        my $l = url_escape("path:$dir/eq_heatmap.sql");
+	SKIP: {
+		my $dir = tempdir(CLEANUP => 1);
+		my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_heatmap.sql", '', '', { RaiseError => 1 }) };
+		skip 'DBD::SQLite not available', 2 unless $dbh;
+		$dbh->do('CREATE TABLE eq_heatmap (x TEXT, y TEXT, v REAL)');
+		for my $row (['P','Q',1.0],['P','R',2.0],['S','Q',3.0]) {
+			$dbh->do('INSERT INTO eq_heatmap VALUES (?,?,?)', {}, @$row);
+		}
+		$dbh->disconnect;
+		my $l = url_escape("path:$dir/eq_heatmap.sql");
 
-        my $push_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
-                           ->status_is(200)->tx->res->body;
+		my $push_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
+						   ->status_is(200)->tx->res->body;
 
-        local $ENV{BI_FORCE_PERL_AGG} = 1;
-        my $fold_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
-                           ->status_is(200)->tx->res->body;
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		my $fold_body = $t->get_ok("/heatmap?l=$l&x=x&y=y&val=v")
+						   ->status_is(200)->tx->res->body;
 
-        my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
-        my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
-        is_deeply(\@push_vals, \@fold_vals, '/heatmap push and fold produce same values');
-    }
+		my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
+		my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
+		is_deeply(\@push_vals, \@fold_vals, '/heatmap push and fold produce same values');
+	}
 };
 
 subtest 'Push-vs-fold equivalence: /treemap' => sub {
-    SKIP: {
-        my $dir = tempdir(CLEANUP => 1);
-        my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_treemap.sql", '', '', { RaiseError => 1 }) };
-        skip 'DBD::SQLite not available', 2 unless $dbh;
-        $dbh->do('CREATE TABLE eq_treemap (cat TEXT, val INTEGER)');
-        for my $row (['Alpha', 100], ['Beta', 200], ['Alpha', 50]) {
-            $dbh->do('INSERT INTO eq_treemap VALUES (?,?)', {}, @$row);
-        }
-        $dbh->disconnect;
-        my $l = url_escape("path:$dir/eq_treemap.sql");
+	SKIP: {
+		my $dir = tempdir(CLEANUP => 1);
+		my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$dir/eq_treemap.sql", '', '', { RaiseError => 1 }) };
+		skip 'DBD::SQLite not available', 2 unless $dbh;
+		$dbh->do('CREATE TABLE eq_treemap (cat TEXT, val INTEGER)');
+		for my $row (['Alpha', 100], ['Beta', 200], ['Alpha', 50]) {
+			$dbh->do('INSERT INTO eq_treemap VALUES (?,?)', {}, @$row);
+		}
+		$dbh->disconnect;
+		my $l = url_escape("path:$dir/eq_treemap.sql");
 
-        my $push_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
-                           ->status_is(200)->tx->res->body;
+		my $push_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
+						   ->status_is(200)->tx->res->body;
 
-        local $ENV{BI_FORCE_PERL_AGG} = 1;
-        my $fold_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
-                           ->status_is(200)->tx->res->body;
+		local $ENV{BI_FORCE_PERL_AGG} = 1;
+		my $fold_body = $t->get_ok("/treemap?l=$l&group=cat&size=val")
+						   ->status_is(200)->tx->res->body;
 
-        my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
-        my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
-        is_deeply(\@push_vals, \@fold_vals, '/treemap push and fold produce same values');
-    }
+		my @push_vals = sort ($push_body =~ /"value":([\d.]+)/g);
+		my @fold_vals = sort ($fold_body =~ /"value":([\d.]+)/g);
+		is_deeply(\@push_vals, \@fold_vals, '/treemap push and fold produce same values');
+	}
 };
 
 # ===========================================================================
@@ -1701,53 +1674,53 @@ subtest 'Push-vs-fold equivalence: /treemap' => sub {
 # ===========================================================================
 
 subtest 'XLSX export parity with CSV export (/pivot?format=xlsx)' => sub {
-    SKIP: {
-        skip 'data/sales.csv not found', 4 unless -f 'data/sales.csv';
-        eval { require Spreadsheet::ParseXLSX }
-            or skip 'Spreadsheet::ParseXLSX not available', 4;
-        eval { require Excel::Writer::XLSX }
-            or skip 'Excel::Writer::XLSX not available', 4;
-        eval { require Text::CSV }
-            or skip 'Text::CSV not available', 4;
+	SKIP: {
+		skip 'data/sales.csv not found', 4 unless -f 'data/sales.csv';
+		eval { require Spreadsheet::ParseXLSX }
+			or skip 'Spreadsheet::ParseXLSX not available', 4;
+		eval { require Excel::Writer::XLSX }
+			or skip 'Excel::Writer::XLSX not available', 4;
+		eval { require Text::CSV }
+			or skip 'Text::CSV not available', 4;
 
-        my $l = url_escape("path:$SALES_CSV");
+		my $l = url_escape("path:$SALES_CSV");
 
-        # CSV export of the same pivot (rows=product, m=amount:sum:total)
-        my $csv_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=csv")
-                          ->status_is(200)->tx->res->body;
+		# CSV export of the same pivot (rows=product, m=amount:sum:total)
+		my $csv_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=csv")
+						  ->status_is(200)->tx->res->body;
 
-        # XLSX export of the same pivot
-        my $xlsx_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=xlsx")
-                           ->status_is(200)->tx->res->body;
+		# XLSX export of the same pivot
+		my $xlsx_body = $t->get_ok("/pivot?l=$l&rows=product&m=amount:sum:total&format=xlsx")
+						   ->status_is(200)->tx->res->body;
 
-        # Parse CSV rows (skip the header row for cell comparison)
-        my $csv_parser = Text::CSV->new({ binary => 1 });
-        open my $fh, '<', \$csv_body or die "open: $!";
-        my @csv_rows;
-        while (my $row = $csv_parser->getline($fh)) { push @csv_rows, $row }
-        close $fh;
+		# Parse CSV rows (skip the header row for cell comparison)
+		my $csv_parser = Text::CSV->new({ binary => 1 });
+		open my $fh, '<', \$csv_body or die "open: $!";
+		my @csv_rows;
+		while (my $row = $csv_parser->getline($fh)) { push @csv_rows, $row }
+		close $fh;
 
-        # Write XLSX to temp file and parse
-        my $tmpdir = tempdir(CLEANUP => 1);
-        my $xlsx_file = "$tmpdir/export.xlsx";
-        Mojo::File->new($xlsx_file)->spurt($xlsx_body);
-        my $wb  = Spreadsheet::ParseXLSX->new->parse($xlsx_file);
-        skip 'Spreadsheet::ParseXLSX could not parse output', 2 unless $wb;
-        my $ws  = $wb->worksheet(0);
-        my ($row_min, $row_max) = $ws->row_range;
-        my ($col_min, $col_max) = $ws->col_range;
+		# Write XLSX to temp file and parse
+		my $tmpdir = tempdir(CLEANUP => 1);
+		my $xlsx_file = "$tmpdir/export.xlsx";
+		Mojo::File->new($xlsx_file)->spurt($xlsx_body);
+		my $wb  = Spreadsheet::ParseXLSX->new->parse($xlsx_file);
+		skip 'Spreadsheet::ParseXLSX could not parse output', 2 unless $wb;
+		my $ws  = $wb->worksheet(0);
+		my ($row_min, $row_max) = $ws->row_range;
+		my ($col_min, $col_max) = $ws->col_range;
 
-        my @xlsx_rows;
-        for my $r ($row_min .. $row_max) {
-            push @xlsx_rows, [
-                map { my $c = $ws->get_cell($r, $_); $c ? $c->value : '' }
-                    $col_min .. $col_max
-            ];
-        }
+		my @xlsx_rows;
+		for my $r ($row_min .. $row_max) {
+			push @xlsx_rows, [
+				map { my $c = $ws->get_cell($r, $_); $c ? $c->value : '' }
+					$col_min .. $col_max
+			];
+		}
 
-        is(scalar @xlsx_rows, scalar @csv_rows, 'XLSX and CSV have same row count');
-        is_deeply(\@xlsx_rows, \@csv_rows, 'XLSX and CSV cells are identical');
-    }
+		is(scalar @xlsx_rows, scalar @csv_rows, 'XLSX and CSV have same row count');
+		is_deeply(\@xlsx_rows, \@csv_rows, 'XLSX and CSV cells are identical');
+	}
 };
 
 # ===========================================================================
@@ -1759,38 +1732,38 @@ subtest 'XLSX export parity with CSV export (/pivot?format=xlsx)' => sub {
 # ===========================================================================
 
 subtest '/stacked: correct category count and totals (no row inflation)' => sub {
-    my $dir = tempdir(CLEANUP => 1);
-    my $csv = "$dir/sparse.csv";
-    Mojo::File->new($csv)->spurt(
-        "cat,seg,val\n"
-        . "A,X,10\n"
-        . "A,X,5\n"   # two rows for A/X: total should be 15, not 10
-        . "B,Y,20\n"
-    );
-    my $l = url_escape("path:$csv");
+	my $dir = tempdir(CLEANUP => 1);
+	my $csv = "$dir/sparse.csv";
+	Mojo::File->new($csv)->spurt(
+		"cat,seg,val\n"
+		. "A,X,10\n"
+		. "A,X,5\n"   # two rows for A/X: total should be 15, not 10
+		. "B,Y,20\n"
+	);
+	my $l = url_escape("path:$csv");
 
-    my $body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
-                 ->status_is(200)->tx->res->body;
+	my $body = $t->get_ok("/stacked?l=$l&cat=cat&series=seg&val=val")
+				 ->status_is(200)->tx->res->body;
 
-    # The JSON should contain 2 unique categories (A and B).
-    my @cats = ($body =~ /"cat"\s*:\s*"([^"]+)"/g);
-    is(scalar @cats, 2, 'exactly 2 categories after aggregation');
+	# The JSON should contain 2 unique categories (A and B).
+	my @cats = ($body =~ /"cat"\s*:\s*"([^"]+)"/g);
+	is(scalar @cats, 2, 'exactly 2 categories after aggregation');
 
-    # A/X sum should be 15 (not 10 -- two rows summed)
-    like $body, qr/"X"\s*:\s*15/, 'A/X aggregated to 15 (two rows summed)';
+	# A/X sum should be 15 (not 10 -- two rows summed)
+	like $body, qr/"X"\s*:\s*15/, 'A/X aggregated to 15 (two rows summed)';
 
-    # B/Y should be 20
-    like $body, qr/"Y"\s*:\s*20/, 'B/Y is 20';
+	# B/Y should be 20
+	like $body, qr/"Y"\s*:\s*20/, 'B/Y is 20';
 };
 
 # ===========================================================================
-# SECTION 53: Geocode.pm ↔ map_view end-to-end integration
+# SECTION 53: Geocode.pm <-> map_view end-to-end integration
 #
 # Strategy:
 #   - Inject stub geocoders through app->config->{geocoder} so every test
 #     runs without Geo::Coder::Free installed.
-#   - Cover the full cross-module pipeline: HTTP request → map_view →
-#     Geocode->resolve_column → models_with_cache → _write_models.
+#   - Cover the full cross-module pipeline: HTTP request -> map_view ->
+#     Geocode->resolve_column -> models_with_cache -> _write_models.
 #   - Verify cache round-trips: a second request over the same column must
 #     not call the geocoder for values already resolved in the first.
 #   - Verify count arithmetic invariants hold across the pipeline.
@@ -1975,8 +1948,8 @@ subtest '/map loc= count invariants: skipped+cached+attempted+not_attempted==dis
 	# cached = 0 on first request
 	# not_attempted = 0 (2 <= DEFAULT_MAX)
 	# resolved = 2, unresolved = 0 (42 was skipped, not attempted)
-	# => skipped(2) + cached(0) + attempted(2) + not_attempted(0) == distinct(4) ✓
-	# => resolved(2) + unresolved(0) == cached(0) + attempted(2) ✓
+	# => skipped(2) + cached(0) + attempted(2) + not_attempted(0) == distinct(4) ok
+	# => resolved(2) + unresolved(0) == cached(0) + attempted(2) ok
 
 	# Read the written models and count places to verify attempted == resolved.
 	my $json = Mojo::File->new("$model_dir/models.json")->slurp;
@@ -2148,12 +2121,12 @@ subtest 'Geocode resolve_values cap: warn_map_geocode_capped emitted' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# Subtest 53.9: models_with_cache ↔ cache_from_models round-trip
+# Subtest 53.9: models_with_cache <-> cache_from_models round-trip
 #
 # Writes a cache, reads it back through cache_from_models, passes it to a
 # second resolve_values call, and confirms no geocoder calls are made.
 # ---------------------------------------------------------------------------
-subtest 'Geocode cache round-trip: models_with_cache → cache_from_models → no geocoder calls' => sub {
+subtest 'Geocode cache round-trip: models_with_cache -> cache_from_models -> no geocoder calls' => sub {
 	my $stub  = _stub_geocoder();
 	my $g     = Database::BI::Model::Geocode->new(geocoder => $stub, openaddr => 'test');
 	my $spec  = 'table:test|loc=city';
@@ -2282,7 +2255,7 @@ subtest 'Geocode resolve_column: skipped and unusable counts add up correctly' =
 };
 
 # ===========================================================================
-# SECTION 54: /map → HTML::OSM graceful degradation
+# SECTION 54: /map -> HTML::OSM graceful degradation
 #
 # When HTML::OSM is missing, or older than the floor the controller passes
 # options for, map_view must still return 200 with the matching warning in the
@@ -2664,6 +2637,1684 @@ subtest 'Pivot: the Perl-computed measures need no backend, so a SQL source work
 			[ [ 'North', '5.6' ], [ 'South', '27.2' ] ],
 			'a percentile over a SQL-backed source';
 	}
+};
+
+# ===========================================================================
+# SECTION 60: Shared helpers for the workflow, concurrency, permission and
+# sabotage sections below.
+#
+# These sections build their own apps and fixtures rather than sharing $t, so a
+# revoked directory or a sabotaged upstream cannot leak into another subtest,
+# and each one can look at what its own app logged.
+# ===========================================================================
+Readonly my %CONFIG => (
+	# How long any one sabotaged workflow may take.  Nothing here should get
+	# near it; it exists so that a hang fails the test rather than the run.
+	deadline_s        => 20,
+	# The delay injected to stand in for a slow upstream.
+	latency_s         => 1,
+	# The longest client timeout, in seconds, an upstream call may be given.
+	max_timeout_s     => 30,
+	# Spawned at most at once by the optional-dependency matrix.
+	matrix_children   => 4,
+	# Enough failed requests in a row to show that they do not accumulate.
+	repeated_failures => 10,
+	api_key           => 'integration-test-key',
+	# Text that only ever appears in a row, to prove rows are kept from the LLM.
+	row_only_text     => 'Alice Smith',
+	join_max_rows     => 7,
+	log_level         => 'warn',
+	sqlite_magic      => 'SQLite format 3',
+);
+
+Readonly my @LEDGER_ROWS => (
+	{ id => '1', region => 'North', amount => '100' },
+	{ id => '2', region => 'South', amount => '20' },
+	{ id => '3', region => 'East',  amount => '3' },
+);
+Readonly my @LEDGER_COLUMNS => qw(id region amount);
+
+# Answers that say a reader was shown Perl's internals rather than a message.
+Readonly my $INTERNALS_RE => qr/ at \S+ line \d+|\@INC (?:contains|entries)|CODE\(0x/;
+
+# A page that Mojolicious rendered for an exception nobody caught.
+Readonly my $UNCAUGHT_RE => qr/<h2>Server Error<\/h2>|Page temporarily unavailable/;
+
+sub _verbose {
+	diag(@_) if $ENV{TEST_VERBOSE};
+	return;
+}
+
+# _isolated_app(%config) -> $test_mojo
+#
+# An app of its own, with stores nothing else writes to.
+sub _isolated_app {
+	my (%config) = @_;
+
+	return Test::Mojo->new('Database::BI', {
+		model_dir   => tempdir(CLEANUP => 1),
+		uploads_dir => tempdir(CLEANUP => 1),
+		%config,
+	});
+}
+
+# _capture_logs($test_mojo, $code) -> \@lines
+#
+# Runs $code and returns what the app logged at warn or above and what it carped.
+sub _capture_logs {
+	my ($tm, $code) = @_;
+
+	my @lines;
+	local $SIG{__WARN__} = sub { push @lines, "[carp] $_[0]" };
+	my $log = $tm->app->log;
+	my $level = $log->level;
+	$log->level($CONFIG{log_level});
+	my $sub = $log->on(message => sub {
+		my ($self, $level, @text) = @_;
+		push @lines, "[$level] @text";
+	});
+	my @others = @{ $log->subscribers('message') };
+	$log->unsubscribe(message => $_) for grep { $_ != $sub } @others;
+	my $ok = eval { $code->(); 1 };
+	my $error = $@;
+	$log->unsubscribe(message => $sub);
+	$log->on(message => $_) for grep { $_ != $sub } @others;
+	$log->level($level);
+	die $error unless $ok;
+
+	_verbose("log: $_") for @lines;
+	return \@lines;
+}
+
+# _within_deadline($name, $code)
+#
+# Fails, rather than hangs, when a workflow does not come back.
+sub _within_deadline {
+	my ($name, $code) = @_;
+
+	my $started = time();
+	my $ok = eval {
+		local $SIG{ALRM} = sub { die "deadline\n" };
+		alarm $CONFIG{deadline_s};
+		$code->();
+		alarm 0;
+		1;
+	};
+	my $error = $@;
+	alarm 0;
+	my $elapsed = time() - $started;
+	_verbose("$name took ${elapsed}s");
+	ok($ok, "$name came back within the deadline") or diag($error);
+	return $elapsed;
+}
+
+# _app_is_alive($test_mojo, $why)
+#
+# The check that a failure did not spread: an unrelated page still works.
+sub _app_is_alive {
+	my ($tm, $why) = @_;
+
+	$tm->get_ok('/view/sales')
+	  ->status_is(200)
+	  ->content_like(qr/Widget A/, "the rest of the application still works after $why");
+	return;
+}
+
+# _no_internals($body, $what)
+sub _no_internals {
+	my ($body, $what) = @_;
+
+	unlike($body // '', $INTERNALS_RE, "$what shows the reader no Perl internals");
+	unlike($body // '', $UNCAUGHT_RE, "$what is not an uncaught exception page");
+	return;
+}
+
+sub _csv_file {
+	my ($dir, $name, @lines) = @_;
+
+	my $path = File::Spec->catfile($dir, $name);
+	Mojo::File->new($path)->spurt(join("\n", @lines) . "\n");
+	return $path;
+}
+
+sub _ledger_csv_lines {
+	my ($sep) = @_;
+
+	return (
+		join($sep, @LEDGER_COLUMNS),
+		map { my $row = $_; join($sep, map { $row->{$_} } @LEDGER_COLUMNS) } @LEDGER_ROWS,
+	);
+}
+
+# _ledger_files() -> { csv => $path, psv => $path, xlsx => $path, sql => $path }
+#
+# One dataset, in every format that can hold it, under the same table name.  Each
+# has a directory of its own, because the name is all that tells them apart.
+sub _ledger_files {
+	my %path;
+	for my $fmt ([csv => ','], [psv => '|']) {
+		my ($ext, $sep) = @{$fmt};
+		$path{$ext} = _csv_file(tempdir(CLEANUP => 1), "ledger.$ext", _ledger_csv_lines($sep));
+	}
+
+	if (eval { require Excel::Writer::XLSX; require Spreadsheet::ParseXLSX; 1 }) {
+		my $file = File::Spec->catfile(tempdir(CLEANUP => 1), 'ledger.xlsx');
+		my $book = Excel::Writer::XLSX->new($file);
+		my $sheet = $book->add_worksheet('ledger');
+		$sheet->write_row(0, 0, [ @LEDGER_COLUMNS ]);
+		my $n = 0;
+		$sheet->write_row(++$n, 0, [ @{$_}{@LEDGER_COLUMNS} ]) for @LEDGER_ROWS;
+		$book->close;
+		$path{xlsx} = $file;
+	}
+
+	if (my $sql = _ledger_sqlite(tempdir(CLEANUP => 1))) {
+		$path{sql} = $sql;
+	}
+	return \%path;
+}
+
+sub _ledger_sqlite {
+	my ($dir) = @_;
+
+	my $file = File::Spec->catfile($dir, 'ledger.sql');
+	my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$file", '', '', { RaiseError => 1 }) };
+	return unless $dbh;
+	$dbh->do('CREATE TABLE ledger (id TEXT, region TEXT, amount TEXT)');
+	$dbh->do('INSERT INTO ledger VALUES (?, ?, ?)', {}, @{$_}{@LEDGER_COLUMNS}) for @LEDGER_ROWS;
+	$dbh->disconnect;
+	return $file;
+}
+
+sub _open_ledger {
+	my ($file) = @_;
+
+	my ($name, $dir) = File::Basename::fileparse($file, qr/\.[^.]+/);
+	return Database::BI::Model::DataSource->new(directory => $dir, table => $name);
+}
+
+sub _rows_by_id {
+	my ($rows) = @_;
+
+	return [ map {
+		my $row = $_;
+		+{ map { $_ => "$row->{$_}" } @LEDGER_COLUMNS };
+	} sort { $a->{id} <=> $b->{id} } @{$rows} ];
+}
+
+# The body cells that are one of the ledger's regions, in the order on the page.
+sub _regions_on_page {
+	my ($body) = @_;
+
+	return [ $body =~ m{<td[^>]*>\s*(North|South|East)\s*</td>}g ];
+}
+
+sub _response {
+	my ($code, $message, $type, $body) = @_;
+
+	return HTTP::Response->new($code, $message, [ 'Content-Type' => $type ], $body);
+}
+
+sub _provider_text {
+	my ($text) = @_;
+
+	return _response(200, 'OK', 'application/json', encode_json({ content => [ { text => $text } ] }));
+}
+
+Readonly my $CANVAS_VISUAL_JSON => '{"kind":"bar","title":"By region","encode":{"cat":"region"}}';
+
+sub _canvas_doc {
+	my (@visuals) = @_;
+
+	@visuals = ({ kind => 'bar', title => 'By region', encode => { cat => 'region' } }) unless @visuals;
+	return {
+		name     => 'Integration canvas',
+		datasets => [ { alias => 'main', spec => 'table:sales' } ],
+		visuals  => \@visuals,
+	};
+}
+
+# ===========================================================================
+# SECTION 61: The layered read path, Database::BI -> Database::Join ->
+# Database::Abstraction -> driver
+#
+# Strategy: one dataset is written in every format and read through the public
+# API and over HTTP.  Whatever the format, a reader must get the same rows, and
+# sorting, joining and exporting must behave the same way.
+# ===========================================================================
+subtest 'Every format gives the same rows through the public DataSource API' => sub {
+	my $files = _ledger_files();
+
+	for my $ext (sort keys %{$files}) {
+		my $src = new_ok('Database::BI::Model::DataSource' => [
+			directory => File::Basename::dirname($files->{$ext}), table => 'ledger',
+		], "$ext source");
+		isa_ok($src->{_db}, 'Database::Abstraction', "the $ext backend");
+
+		my $columns = $src->columns;
+		returns_ok($columns, { type => 'arrayref' }, "$ext: columns() matches its POD");
+		is_deeply([ sort @{$columns} ], [ sort @LEDGER_COLUMNS ], "$ext: the columns");
+
+		returns_ok($src->table_name, { type => 'string' }, "$ext: table_name() matches its POD");
+		is($src->table_name, 'ledger', "$ext: the table name");
+
+		my $rows = $src->fetch_all;
+		returns_ok($rows, { type => 'arrayref' }, "$ext: fetch_all() matches its POD");
+		is_deeply(_rows_by_id($rows), [ @LEDGER_ROWS ], "$ext: the rows");
+
+		my $count = $src->count;
+		returns_ok($count, { type => 'integer', min => 0 }, "$ext: count() matches its POD");
+		is($count, scalar @LEDGER_ROWS, "$ext: the count agrees with the rows");
+	}
+};
+
+subtest 'Sorting works on every format, through the API and over HTTP' => sub {
+	my $files = _ledger_files();
+	my $tm = _isolated_app();
+	my @descending = qw(South North East);
+
+	for my $ext (sort keys %{$files}) {
+		my $src = _open_ledger($files->{$ext});
+		my $rows = $src->selectall_arrayref(sort_by => [ 'region', 'desc' ]);
+		is_deeply([ map { $_->{region} } @{$rows} ], \@descending, "$ext: sort_by is honoured");
+
+		my $l = url_escape("path:$files->{$ext}");
+		$tm->get_ok("/join?l=$l&sort=region&dir=desc")->status_is(200);
+		is_deeply(_regions_on_page($tm->tx->res->body), \@descending, "$ext: /join shows them sorted");
+
+		$tm->get_ok("/export?l=$l&format=json&sort=region&dir=desc")->status_is(200);
+		is_deeply([ map { $_->{region} } @{ $tm->tx->res->json // [] } ], \@descending, "$ext: and /export writes them sorted");
+	}
+};
+
+subtest 'A join goes through Database::Join, with the documented limits, between formats' => sub {
+	my $files = _ledger_files();
+	plan skip_all => 'needs both XLSX and SQLite' unless $files->{xlsx} && $files->{sql};
+
+	my $dir = tempdir(CLEANUP => 1);
+	my $managers = _csv_file($dir, 'managers.csv', 'id,manager', '1,Ann', '2,Bob', '3,Cy');
+	my $tm = _isolated_app(join_max_rows => $CONFIG{join_max_rows});
+
+	require Database::Join;
+	my $joins = spy('Database::Join::new');
+	my $l = url_escape("path:$files->{xlsx}");
+	my $j = url_escape("path:$managers|id|id");
+	$tm->get_ok("/export?l=$l&j=$j&format=json&f=" . url_escape('region:ne:East'))->status_is(200);
+	my @calls = $joins->();
+	restore_all();
+
+	my $rows = $tm->tx->res->json // [];
+	is_deeply([ sort map { $_->{manager} } @{$rows} ], [qw(Ann Bob)], 'the join and the filter both applied');
+	is(scalar(@calls), 1, 'Database::Join built the join once');
+	my (undef, undef, %args) = @{ $calls[0] };
+	_verbose('Database::Join->new: ' . join(', ', map { "$_=" . ($args{$_} // '') } sort keys %args));
+	is($args{backend}, 'auto', 'a large join may spill to disc');
+	is($args{max_array_rows}, $CONFIG{join_max_rows}, 'at the limit in the configuration');
+	is($args{join_column}, 'id', 'on the column the reader chose');
+
+	# The same request with SQLite on the left must make no difference.
+	my $from_sql = url_escape("path:$files->{sql}");
+	$tm->get_ok("/export?l=$from_sql&j=$j&format=json&f=" . url_escape('region:ne:East'))->status_is(200);
+	is_deeply([ sort map { $_->{manager} } @{ $tm->tx->res->json // [] } ], [qw(Ann Bob)], 'and from SQLite too');
+};
+
+subtest 'A header-less file: open, name the columns, sort, export and open again' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	my $file = _csv_file($dir, 'bank.csv',
+		'2026-01-02,"1,234.56",Rent paid',
+		'2026-01-03,5.00,Tea bought',
+	);
+	my $tm = _isolated_app();
+	my $l = url_escape("path:$file");
+
+	$tm->get_ok('/api/columns?path=' . url_escape($file))->status_is(200);
+	is_deeply($tm->tx->res->json('/columns'), [qw(Date Amount Description)], 'the columns are named from the values');
+
+	$tm->get_ok("/export?l=$l&format=json&sort=Date&dir=desc")->status_is(200);
+	my $rows = $tm->tx->res->json // [];
+	is_deeply([ map { $_->{Date} } @{$rows} ], [qw(2026-01-03 2026-01-02)], 'and can be sorted by');
+	is($rows->[1]{Amount}, '1,234.56', 'a quoted separator stays inside its value');
+	is($rows->[1]{Description}, 'Rent paid', 'and the fields after it stay in their columns');
+
+	$tm->post_ok("/export?l=$l&dir=" . url_escape($dir) . '&filename=copy.csv')->status_is(200);
+	my $again = Database::BI::Model::DataSource->new(directory => $dir, table => 'copy');
+	is_deeply([ sort @{ $again->columns } ], [ sort qw(Date Amount Description) ], 'the copy has a header row');
+	is_deeply(
+		[ map { $_->{Amount} } sort { $a->{Date} cmp $b->{Date} } @{ $again->fetch_all } ],
+		[ '1,234.56', '5.00' ],
+		'and the same values',
+	);
+	is(Mojo::File->new($file)->slurp =~ tr/\n//, 2, 'the original is left as it was');
+};
+
+subtest '/api/range reads the joined view, as its POD says' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	my $people = _csv_file($dir, 'people.csv', 'id,name', '1,Ann', '2,Bob');
+	my $orders = _csv_file($dir, 'orders.csv', 'id,placed', '1,2026-03-01', '2,2026-05-09');
+	my $tm = _isolated_app();
+
+	$tm->get_ok('/api/range?col=placed&l=' . url_escape("path:$people") . '&j=' . url_escape("path:$orders|id|id"))
+	   ->status_is(200)
+	   ->json_is('/min', '2026-03-01')
+	   ->json_is('/max', '2026-05-09');
+
+	$tm->get_ok('/api/range?col=placed&l=' . url_escape("path:$people"))
+	   ->status_is(200)
+	   ->json_is('/min', undef, 'without the join the column holds no dates');
+};
+
+# Strategy: follow one canvas through its whole life, each step reading what the
+# last one stored, across the controller, the store and the token signing.
+subtest 'A canvas from creation to deletion: store, render, share, embed, download' => sub {
+	my $tm = _isolated_app();
+
+	$tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201);
+	my $id = $tm->tx->res->json('/id');
+	ok(length $id, 'it has an id');
+	is($tm->tx->res->headers->location, "/api/analyses/$id", 'and says where it is');
+
+	$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', title => 'By product', encode => { cat => 'product' } })
+	   ->status_is(201);
+	$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', encode => { cat => 'no_such_column' } })
+	   ->status_is(400, 'a card on a missing column is refused before it is stored');
+
+	$tm->get_ok("/api/analyses/$id")->status_is(200);
+	is(scalar @{ $tm->tx->res->json('/visuals') // [] }, 2, 'the two good cards were stored');
+
+	$tm->get_ok("/a/$id")->status_is(200)->content_like(qr/By region/, 'the canvas page shows its cards');
+
+	$tm->post_ok("/api/analyses/$id/share")->status_is(200);
+	my $token = $tm->tx->res->json('/token');
+	$tm->get_ok("/share/$id?token=" . url_escape($token))->status_is(200, 'the signed link opens');
+	$tm->get_ok("/embed/$id?token=" . url_escape($token))->status_is(200, 'the embed opens');
+	$tm->get_ok("/share/$id")->status_is(401, 'no token, no page');
+	$tm->get_ok("/share/$id?token=" . url_escape($token . 'x'))->status_is(403, 'nor with one altered');
+
+	$tm->get_ok("/a/$id/visual/0/csv")->status_is(200)->content_like(qr/Widget A/, 'a card downloads its data');
+	$tm->get_ok("/a/$id/visual/9/csv")->status_is(404, 'a card that is not there does not');
+
+	$tm->get_ok("/api/analyses/$id/export")->status_is(200);
+	my $exported = $tm->tx->res->body;
+	$tm->post_ok('/api/analyses/import' => { 'Content-Type' => 'application/json' } => $exported)->status_is(201);
+	my $copy = $tm->tx->res->json('/id');
+	isnt($copy, $id, 'an import is a new canvas');
+
+	$tm->delete_ok("/api/analyses/$id")->status_is(200);
+	$tm->get_ok("/api/analyses/$id")->status_is(404, 'the deleted canvas is gone');
+	$tm->get_ok("/share/$id?token=" . url_escape($token))->status_is(404, 'and so is its link');
+	$tm->get_ok("/api/analyses/$copy")->status_is(200, 'the copy is not');
+};
+
+subtest 'Ask and summary keep rows and paths from the provider' => sub {
+	my $tm = _isolated_app(ai_api_key => $CONFIG{api_key});
+	my @sent;
+	my $guard = mock_scoped('LWP::UserAgent', request => sub {
+		my ($ua, $req) = @_;
+		push @sent, $req->content;
+		return _provider_text($CANVAS_VISUAL_JSON);
+	});
+
+	require Database::BI::Ask;
+	my $asked = spy('Database::BI::Ask::ask');
+	$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => 'Amount by region?' })
+	   ->status_is(200)
+	   ->json_is('/valid', 1)
+	   ->json_is('/spec/visuals/0/encode/cat', 'region');
+	my @calls = $asked->();
+	restore_all();
+	is(scalar @calls, 1, 'the controller handed the question over once');
+	my (undef, %args) = @{ $calls[0] };
+	ok(!exists $args{records}, 'and gave Ask no rows to send');
+	is($args{spec_key}, 'table:sales', 'only the spec, to build the link');
+
+	$tm->post_ok('/api/summary' => form => { l => 'table:sales', ai => 1 })->status_is(200);
+	my $summary = $tm->tx->res->json;
+	returns_ok($summary, {
+		type   => 'hashref',
+		schema => {
+			text   => { type => 'string' },
+			source => { type => 'string', memberof => [qw(template template_fallback llm)] },
+			cached => { type => 'integer', min => 0, max => 1 },
+		},
+	}, 'the summary is the shape its POD gives');
+
+	ok(scalar @sent, 'the provider was asked');
+	for my $body (@sent) {
+		unlike($body, qr/\Q$CONFIG{row_only_text}\E/, 'a provider request holds no row data');
+		unlike($body, qr/\Q$SALES_CSV\E|table:sales/, 'nor the path or the spec');
+	}
+};
+
+# ===========================================================================
+# SECTION 62: Independent objects in one process
+#
+# Strategy: build several objects with new(), use them in turn, and confirm that
+# each still answers as it did on its own.
+# ===========================================================================
+subtest 'DataSource objects of different formats, used in turn, do not interfere' => sub {
+	my $files = _ledger_files();
+	my $dir = tempdir(CLEANUP => 1);
+	my $other = _csv_file($dir, 'ledger.csv', 'code,label', 'a,Alpha');
+	my $bank = _csv_file(tempdir(CLEANUP => 1), 'bank.csv', '2026-01-02,1.00,Rent paid');
+
+	my %src = map { $_ => _open_ledger($files->{$_}) } keys %{$files};
+	my $same_name = _open_ledger($other);
+	my $headerless = _open_ledger($bank);
+
+	for my $round (1, 2) {
+		for my $ext (sort keys %src) {
+			is_deeply(_rows_by_id($src{$ext}->fetch_all), [ @LEDGER_ROWS ], "round $round: $ext has its own rows");
+			my $sorted = $src{$ext}->selectall_arrayref(sort_by => [ 'region', 'asc' ]);
+			is($sorted->[0]{region}, 'East', "round $round: and its own sort");
+		}
+		is_deeply($same_name->columns, [qw(code label)], "round $round: same table name, other directory, other columns");
+		is($same_name->fetch_all->[0]{label}, 'Alpha', "round $round: and other rows");
+		is_deeply($headerless->columns, [qw(Date Amount Description)], "round $round: a header-less source keeps its names");
+		is($headerless->count, 1, "round $round: and its one row");
+	}
+};
+
+subtest 'One object dropping its temporary copy leaves the others working' => sub {
+	my $file = _csv_file(tempdir(CLEANUP => 1), 'bank.csv', '2026-01-02,1.00,Rent paid', '2026-01-03,2.00,Tea bought');
+	my $first  = _open_ledger($file);
+	my $second = _open_ledger($file);
+
+	undef $first;
+	is($second->count, 2, 'the second still reads its own copy');
+	is($second->fetch_all->[0]{Description}, 'Rent paid', 'with the values intact');
+};
+
+subtest 'Two apps with different stores share nothing' => sub {
+	my $data_a = tempdir(CLEANUP => 1);
+	my $data_b = tempdir(CLEANUP => 1);
+	_csv_file($data_a, 'shared.csv', 'id,who', '1,from_a');
+	_csv_file($data_b, 'shared.csv', 'id,who', '1,from_b');
+	my $app_a = _isolated_app(data_dir => $data_a);
+	my $app_b = _isolated_app(data_dir => $data_b);
+
+	for my $round (1, 2) {
+		$app_a->get_ok('/view/shared')->status_is(200)->content_like(qr/from_a/, "round $round: the first app reads its directory");
+		$app_b->get_ok('/view/shared')->status_is(200)->content_like(qr/from_b/, "round $round: the second reads its own");
+	}
+
+	my $l = 'table:shared';
+	$app_a->post_ok('/calc/save' => form => { l => $l, name => 'doubled', expr => 'id * 2' })->status_is(200);
+	$app_a->get_ok('/calc/list?l=' . url_escape($l))->json_is('/fields/doubled', 'id * 2');
+	$app_b->get_ok('/calc/list?l=' . url_escape($l))->json_is('/fields', {}, 'a saved field stays in its own store');
+
+	$app_a->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201);
+	my $id = $app_a->tx->res->json('/id');
+	$app_a->post_ok("/api/analyses/$id/share")->status_is(200);
+	my $token = $app_a->tx->res->json('/token');
+	$app_b->get_ok("/api/analyses/$id")->status_is(404, 'a canvas stays in its own store');
+	$app_b->get_ok("/share/$id?token=" . url_escape($token))->status_isnt(200, 'and is not reachable from the other app');
+};
+
+subtest 'Calc, Extract and Geocode objects keep their own state' => sub {
+	require Database::BI::Calc;
+	my $good = new_ok('Database::BI::Calc' => [ expr => 'a + 1', columns => ['a'] ]);
+	my $bad  = new_ok('Database::BI::Calc' => [ expr => 'no_such + 1', columns => ['a'] ]);
+	ok($bad->has_error, 'the bad expression reports it');
+	returns_ok($bad->error, { type => 'string' }, 'error() is a string, as its POD says');
+	ok(!$good->has_error, 'the good one does not catch it');
+	is($good->evaluate({ a => 2 }), 3, 'and still evaluates');
+	is($good->evaluate({ a => 40 }), 41, 'with no memory of the last row');
+
+	require Database::BI::Extract;
+	my ($dir_a, $dir_b) = (tempdir(CLEANUP => 1), tempdir(CLEANUP => 1));
+	my $ext_a = new_ok('Database::BI::Extract' => [ model_dir => $dir_a ]);
+	my $ext_b = new_ok('Database::BI::Extract' => [ model_dir => $dir_b ]);
+	my @key = ('table:sales', 1, 2);
+	my $written = $ext_a->put(@key, 'bytes');
+	returns_ok($written, { type => 'string' }, 'put() returns the path');
+	is($ext_a->get(@key), $written, 'the first has the extract');
+	is($ext_b->get(@key), undef, 'the second, in another directory, does not');
+	$ext_b->evict('table:sales');
+	is($ext_a->get(@key), $written, 'and clearing the second leaves the first');
+
+	require Database::BI::Model::Geocode;
+	my $with    = Integ::Geocoder->new(results => {});
+	my $geo_on  = new_ok('Database::BI::Model::Geocode' => [ geocoder => $with ]);
+	my $geo_off = new_ok('Database::BI::Model::Geocode' => [ geocoder => Integ::Geocoder->new(results => {}) ]);
+	my ($on) = $geo_on->geocoder_available;
+	my ($off) = $geo_off->geocoder_available;
+	ok($on && $off, 'each has the geocoder it was given');
+	throws_ok { Database::BI::Model::Geocode->new(geocoder => bless {}, 'Integ::NotAGeocoder') }
+		qr/geocoder/i, 'a third with a useless geocoder is refused';
+	($on) = $geo_on->geocoder_available;
+	ok($on, 'without touching the others');
+};
+
+subtest 'Requests in flight together each get their own answer' => sub {
+	my $tm = _isolated_app();
+	my %wanted = (
+		'/view/sales'                 => qr/Widget A/,
+		'/view/products'              => qr/\S/,
+		'/api/columns?table=sales'    => qr/sale_date/,
+		'/api/columns?table=products' => qr/\S/,
+		'/bar?l=table:sales&cat=region&val=amount' => qr/North/,
+	);
+	my %got;
+	my @promises = map {
+		my $url = $_;
+		$tm->ua->get_p($url)->then(sub { $got{$url} = $_[0]->res });
+	} sort keys %wanted;
+	Mojo::Promise->all(@promises)->wait;
+
+	for my $url (sort keys %wanted) {
+		is($got{$url}->code, 200, "$url answered");
+		like($got{$url}->body, $wanted{$url}, 'with its own content');
+	}
+	unlike($got{'/api/columns?table=products'}->body, qr/sale_date/, 'and not the content of another request');
+};
+
+# ===========================================================================
+# SECTION 63: Optional dependencies, in every combination
+#
+# Strategy: a module can only be hidden from a process that has not loaded it,
+# and this file has loaded most of them, so a driver is run in a process of its
+# own.  It loads the app once and forks for each combination; each child hides
+# its modules, makes the same requests and writes what it saw, and this file
+# holds that to the outcome the combination should give.  The features do not
+# depend on each other, so a module's absence must change its own feature and
+# nothing else.
+# ===========================================================================
+Readonly my @OPTIONAL_GROUPS => (
+	[ geocoder => 'Geo::Coder::Free' ],
+	[ osm      => 'HTML::OSM' ],
+	[ redis    => 'Redis', 'Redis::Fast' ],
+	[ xml      => 'XML::Simple' ],
+	[ sqlite   => 'DBD::SQLite' ],
+	[ sftp     => 'Net::SFTP::Foreign' ],
+	[ xlsx     => 'Spreadsheet::ParseXLSX' ],
+);
+
+Readonly my $MATRIX_DRIVER => <<'DRIVER';
+use strict;
+use warnings;
+
+use POSIX ();
+use File::Spec ();
+use File::Temp qw(tempdir);
+use Mojo::File ();
+use Mojo::JSON qw(decode_json encode_json);
+use Mojo::Util qw(url_escape);
+use Test::Mojo;
+use Test::Without::Module ();
+
+# Mojolicious dispatches under a __DIE__ handler that throws an object, and when
+# Test::Without::Module's @INC hook croaks under it, perl goes on to the rest of
+# @INC and loads the module after all.  The hook must die with no handler in the
+# way, and with what perl itself says when a module is not there, less the list
+# of directories that the application is expected to keep from a reader anyway.
+{
+	no warnings 'redefine';
+	*Test::Without::Module::fake_module = sub {
+		my (undef, $file) = @_;
+		return unless exists Test::Without::Module::get_forbidden_list()->{$file};
+		local $SIG{__DIE__};
+		die "Can't locate $file in \@INC\n";
+	};
+}
+
+my $input = decode_json(Mojo::File->new($ARGV[0])->slurp);
+my ($fx, $groups) = @{$input}{qw(fixtures groups)};
+
+local $SIG{__WARN__} = sub { };
+
+my $t = Test::Mojo->new('Database::BI', {
+	data_dir  => $fx->{data_dir},
+	model_dir => tempdir(CLEANUP => 1),
+});
+
+# Everything no group depends on, loaded here so that no child loads it again.
+require Database::Abstraction;
+require Database::Join;
+require DBI;
+require HTML::D3;
+require Text::CSV;
+require Database::BI::Model::DataSource;
+require Database::BI::Model::Geocode;
+for my $url ('/', '/view/sales', '/join?l=table:sales', '/export?l=table:sales', '/open?path=' . url_escape($fx->{places})) {
+	$t->ua->get($url);
+}
+
+# A module already loaded cannot be hidden: its driver and its symbols stay behind.
+for my $group (@{$groups}) {
+	my (undef, @modules) = @{$group};
+	for my $module (@modules) {
+		(my $file = "$module.pm") =~ s{::}{/}g;
+		die "$module was loaded before any child ran\n" if $INC{$file};
+	}
+}
+
+sub probe {
+	my ($url, %marker) = @_;
+
+	my $res = $t->ua->get($url)->res;
+	my $body = $res->body // '';
+	return {
+		code  => $res->code,
+		leak  => ($body =~ / at \S+ line \d+|\@INC (?:contains|entries)|CODE\(0x/ ? 1 : 0),
+		crash => ($body =~ /<h2>Server Error<\/h2>/ ? 1 : 0),
+		map { $_ => (index($body, $marker{$_}) >= 0 ? 1 : 0) } keys %marker,
+	};
+}
+
+my $active = 0;
+for my $mask (0 .. (2 ** @{$groups}) - 1) {
+	if ($active >= $input->{children}) {
+		wait;
+		$active--;
+	}
+	my $pid = fork() // die "fork: $!";
+	if ($pid) {
+		$active++;
+		next;
+	}
+
+	my %hidden;
+	my @modules;
+	for my $bit (0 .. $#{$groups}) {
+		next unless $mask & (1 << $bit);
+		my ($name, @mods) = @{ $groups->[$bit] };
+		$hidden{$name} = 1;
+		push @modules, @mods;
+	}
+	Test::Without::Module->import(@modules);
+
+	my %seen;
+	my $places = url_escape("path:$fx->{places}");
+
+	# Exports where a page would do: a child makes these requests 128 times over,
+	# and it is the page that takes the time.
+	$seen{view} = probe('/export?l=table:sales', data => 'Widget A');
+	$seen{join} = probe('/export?l=table:sales&j=' . url_escape('table:sales|id|id'), data => 'Widget A');
+	$seen{map}  = probe("/map?l=$places&lat=lat&lon=lon",
+		renderer_missing => 'error_map_renderer_missing', drawn => 'L.map');
+	my ($geocoder) = Database::BI::Model::Geocode->new->geocoder_available;
+	$seen{geocoder} = $geocoder ? 1 : 0;
+	my %value = (xml => 'Widget A', sql => 'sql_value', xlsx => 'xlsx_value');
+	for my $format (sort keys %value) {
+		$seen{$format} = probe('/export?l=' . url_escape("path:$fx->{$format}"), data => $value{$format});
+		next if $seen{$format}{data};
+		$seen{"${format}_page"} = probe('/open?path=' . url_escape($fx->{$format}), cannot => 'Could not open &quot;');
+	}
+	$seen{export} = probe('/export?l=table:sales&format=sqlite', file => 'SQLite format 3');
+	$seen{redis}  = probe('/tables?l=' . url_escape('redis://127.0.0.1:1'));
+	if ($hidden{sftp}) {
+		my $source = eval {
+			Database::BI::Model::DataSource->new(host => 'nohost.invalid', directory => '/d', table => 'f');
+		};
+		$seen{sftp_error} = "$@";
+	}
+
+	Mojo::File->new(File::Spec->catfile($input->{out}, "$mask.json"))
+		->spurt(encode_json({ hidden => \%hidden, seen => \%seen }));
+	POSIX::_exit(0);
+}
+1 while wait() != -1;
+DRIVER
+
+# _module_is_installed($module) -> bool, without loading it.
+sub _module_is_installed {
+	my ($module) = @_;
+
+	(my $file = "$module.pm") =~ s{::}{/}g;
+	return scalar grep { !ref($_) && -f File::Spec->catfile($_, $file) } @INC;
+}
+
+subtest 'Optional modules: every combination degrades only its own feature' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	my $sql = _ledger_sqlite($dir);
+	plan skip_all => 'the fixtures need DBD::SQLite' unless $sql;
+	plan skip_all => 'the fixtures need Excel::Writer::XLSX' unless eval { require Excel::Writer::XLSX; 1 };
+	plan skip_all => 'data/catalog.xml not found' unless -f $CATALOG_XML;
+	plan skip_all => 'fork is not usable here' if $^O eq 'MSWin32';
+
+	my $sql_file = File::Spec->catfile($dir, 'matrix.sql');
+	my $dbh = DBI->connect("dbi:SQLite:dbname=$sql_file", '', '', { RaiseError => 1 });
+	$dbh->do('CREATE TABLE matrix (id TEXT, v TEXT)');
+	$dbh->do(q{INSERT INTO matrix VALUES ('1', 'sql_value')});
+	$dbh->disconnect;
+
+	# Not named as the SQLite file is: a stem is all a table name holds.
+	my $xlsx_file = File::Spec->catfile($dir, 'matrix_book.xlsx');
+	my $book = Excel::Writer::XLSX->new($xlsx_file);
+	my $sheet = $book->add_worksheet('matrix_book');
+	$sheet->write_row(0, 0, [qw(id v)]);
+	$sheet->write_row(1, 0, [ 1, 'xlsx_value' ]);
+	$book->close;
+
+	# A data directory of its own: the shipped one holds SQLite files, and the app
+	# looks inside them on every table page, which would load DBD::SQLite up front.
+	my $data_dir = tempdir(CLEANUP => 1);
+	Mojo::File->new($SALES_CSV)->copy_to(File::Spec->catfile($data_dir, 'sales.csv'));
+
+	my $out = tempdir(CLEANUP => 1);
+	my $input = File::Spec->catfile($dir, 'input.json');
+	Mojo::File->new($input)->spurt(encode_json({
+		children => $CONFIG{matrix_children},
+		groups   => [ map { [ @{$_} ] } @OPTIONAL_GROUPS ],
+		out      => $out,
+		fixtures => {
+			data_dir => $data_dir,
+			places => _csv_file($dir, 'places.csv', 'id,place,lat,lon', '1,Ramsgate,51.3,1.4'),
+			xml    => $CATALOG_XML,
+			sql    => $sql_file,
+			xlsx   => $xlsx_file,
+		},
+	}));
+	my $driver = File::Spec->catfile($dir, 'driver.pl');
+	Mojo::File->new($driver)->spurt($MATRIX_DRIVER);
+
+	my @include = map { "-I$_" } grep { !ref } @INC;
+	my $status = system($^X, @include, $driver, $input);
+	is($status, 0, 'the driver ran to the end');
+
+	my %installed = map {
+		my ($name, @mods) = @{$_};
+		$name => (scalar grep { _module_is_installed($_) } @mods) ? 1 : 0;
+	} @OPTIONAL_GROUPS;
+
+	for my $mask (0 .. (2 ** @OPTIONAL_GROUPS) - 1) {
+		my $file = File::Spec->catfile($out, "$mask.json");
+		unless (-f $file) {
+			fail("combination $mask reported");
+			next;
+		}
+		my $result = decode_json(Mojo::File->new($file)->slurp);
+		my $hidden = $result->{hidden};
+		my $seen   = $result->{seen};
+		my $label  = join(', ', sort keys %{$hidden}) || 'nothing';
+		my %has    = map { $_ => ($installed{$_} && !$hidden->{$_}) ? 1 : 0 } keys %installed;
+		_verbose("without $label: " . encode_json($seen));
+
+		my @wrong;
+		my $expect = sub {
+			my ($what, $got, $want) = @_;
+			push @wrong, "$what: got " . ($got // 'undef') . ", wanted $want" if ($got // '') ne $want;
+		};
+
+		# Plain tables, alone and joined, read through DBD::CSV, which no group affects.
+		for my $page (qw(view join)) {
+			$expect->("$page status", $seen->{$page}{code}, 200);
+			$expect->("$page data", $seen->{$page}{data}, 1);
+		}
+
+		$expect->('map status', $seen->{map}{code}, 200);
+		$expect->('map renderer warning', $seen->{map}{renderer_missing}, $has{osm} ? 0 : 1);
+		$expect->('geocoder available', $seen->{geocoder}, $has{geocoder});
+
+		for my $format (qw(xml sql xlsx)) {
+			my $feature = $format eq 'sql' ? 'sqlite' : $format;
+			my $export = $seen->{$format};
+			$expect->("$format data", $export->{data}, $has{$feature});
+			$expect->("$format crash", $export->{crash}, 0);
+			next if $has{$feature};
+
+			my $page = $seen->{"${format}_page"} // {};
+			$expect->("$format page status", $page->{code}, 200);
+			$expect->("$format says it cannot", $page->{cannot}, 1);
+			$expect->("$format leak", $page->{leak}, 0);
+			$expect->("$format page crash", $page->{crash}, 0);
+		}
+
+		$expect->('export status', $seen->{export}{code}, $has{sqlite} ? 200 : 500);
+		$expect->('export file', $seen->{export}{file}, $has{sqlite});
+		$expect->('export crash', $seen->{export}{crash}, 0);
+		$expect->('export leak', $seen->{export}{leak}, 0);
+
+		# Installed but refused, or not installed: the key picker has nothing to show.
+		$expect->('redis status', $seen->{redis}{code}, 404);
+		$expect->('redis crash', $seen->{redis}{crash}, 0);
+
+		if ($hidden->{sftp}) {
+			$expect->('sftp names the module', ($seen->{sftp_error} =~ /Net::SFTP::Foreign is not installed/ ? 1 : 0), 1);
+		}
+
+		ok(!@wrong, "without $label: each feature does what it should") or diag(join("\n", @wrong));
+	}
+};
+
+# Also held to the same bar in a process that has them loaded: hiding them again
+# in one subtest must restore cleanly for the next.
+subtest 'Hiding a module for a moment leaves it usable afterwards' => sub {
+	my $file = File::Spec->catfile(tempdir(CLEANUP => 1), 'hide.csv');
+	Mojo::File->new($file)->spurt("id,v\n1,kept\n");
+	my $tm = _isolated_app();
+
+	Test::Without::Module->import('Net::SFTP::Foreign');
+	throws_ok {
+		Database::BI::Model::DataSource->new(host => 'nohost.invalid', directory => '/d', table => 'f');
+	} qr/Net::SFTP::Foreign is not installed/, 'a remote source says what is missing';
+	$tm->get_ok('/open?path=' . url_escape($file))->status_is(200)->content_like(qr/kept/, 'a local one still opens');
+	Test::Without::Module->unimport('Net::SFTP::Foreign');
+
+	ok(eval { require Net::SFTP::Foreign; 1 }, 'the module loads again afterwards')
+		or diag($@);
+};
+
+# ===========================================================================
+# SECTION 64: Permissions dropped underneath a running app
+#
+# Strategy: revoke access to a directory the pipeline depends on, while the app
+# is running.  The request that needs it must fail with a message and leave a
+# reason in the log; nothing else may break; and when access comes back so must
+# the feature, with no restart.
+# ===========================================================================
+subtest 'Uploads: no create permission on the staging directory' => sub {
+	my $tm = _isolated_app();
+	my $dir = $tm->app->config->{uploads_dir};
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+
+	my $form = sub { return { file => { content => "id,v\n1,uploaded\n", filename => 'up.csv' } } };
+	my $logs = _capture_logs($tm, sub {
+		with_revoked('create', $dir, sub {
+			$tm->post_ok('/upload' => form => $form->())
+			   ->status_is(500)
+			   ->json_like('/error', qr/Could not save uploaded file/, 'the documented error');
+			_no_internals($tm->tx->res->body, 'the refused upload');
+			_app_is_alive($tm, 'a refused upload');
+		});
+	});
+	ok(scalar(grep { /Cannot stage an upload/ } @{$logs}), 'the log says why');
+
+	$tm->post_ok('/upload' => form => $form->())->status_is(200, 'with access back, an upload works');
+	$tm->get_ok($tm->tx->res->json('/url'))->status_is(200)->content_like(qr/uploaded/, 'and opens');
+};
+
+subtest 'Uploads: no search permission on the staging directory' => sub {
+	my $tm = _isolated_app();
+	my $dir = $tm->app->config->{uploads_dir};
+	plan skip_all => 'cannot revoke search here' unless can_revoke_search($dir);
+
+	$tm->post_ok('/upload' => form => { file => { content => "id,v\n1,kept\n", filename => 'keep.csv' } })->status_is(200);
+	my $url = $tm->tx->res->json('/url');
+
+	my $logs = _capture_logs($tm, sub {
+		with_revoked('search', $dir, sub {
+			$tm->post_ok('/uploads/clear')
+			   ->status_is(500)
+			   ->json_like('/error', qr/Could not clear the uploaded files/, 'clearing says it could not');
+			_no_internals($tm->tx->res->body, 'the refused clear');
+			$tm->get_ok($url)->status_is(404, 'a file in there cannot be opened');
+			_no_internals($tm->tx->res->body, 'the refused open');
+			_app_is_alive($tm, 'a staging directory that cannot be searched');
+		});
+	});
+	ok(scalar(grep { /Cannot clear/ } @{$logs}), 'the log says why');
+
+	$tm->get_ok($url)->status_is(200)->content_like(qr/kept/, 'with access back, the file is still there');
+	$tm->post_ok('/uploads/clear')->status_is(200)->json_is('/count', 1, 'and can be cleared');
+};
+
+subtest 'Model store: no create permission' => sub {
+	my $tm = _isolated_app();
+	my $dir = $tm->app->config->{model_dir};
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+
+	my $logs = _capture_logs($tm, sub {
+		with_revoked('create', $dir, sub {
+			$tm->post_ok('/api/analyses' => json => _canvas_doc())
+			   ->status_is(503)
+			   ->json_like('/error', qr/not writable/, 'a canvas cannot be saved, and it says so');
+			$tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses', [], 'the list is still served');
+
+			# t/data-dir-invariant.t holds these routes to 200 when the store refuses.
+			$tm->post_ok('/calc/save' => form => { l => 'table:sales', name => 'lost', expr => 'amount * 2' })
+			   ->status_is(200);
+			$tm->get_ok('/calc/list?l=table:sales')->status_is(200)->json_is('/fields', {}, 'nothing was stored');
+			$tm->get_ok('/pivot?l=table:sales&rows=region&m=' . url_escape('amount:sum:total'))
+			   ->status_is(200, 'a page that only reads the store is unaffected');
+			_app_is_alive($tm, 'a store that refuses writes');
+		});
+	});
+	ok(scalar(@{$logs}), 'the refused writes were reported') or diag('nothing logged');
+	ok(scalar(grep { /Cannot write|not writable/ } @{$logs}), 'and say what they could not do');
+
+	$tm->post_ok('/calc/save' => form => { l => 'table:sales', name => 'kept', expr => 'amount * 2' })->status_is(200);
+	$tm->get_ok('/calc/list?l=table:sales')->json_is('/fields/kept', 'amount * 2', 'with access back, it stores again');
+	$tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201, 'canvases too');
+};
+
+subtest 'Model store: no search permission, once something is stored' => sub {
+	my $tm = _isolated_app();
+	my $dir = $tm->app->config->{model_dir};
+	plan skip_all => 'cannot revoke search here' unless can_revoke_search($dir);
+
+	$tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201);
+	my $id = $tm->tx->res->json('/id');
+
+	_capture_logs($tm, sub {
+		with_revoked('search', $dir, sub {
+			$tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(503, 'a new canvas is refused');
+			$tm->get_ok('/calc/list?l=table:sales')->status_is(200, 'the read routes still answer');
+			$tm->get_ok('/view/sales')->status_is(200)->content_like(qr/Widget A/, 'and a data page does not depend on the store');
+		});
+	});
+
+	$tm->get_ok("/api/analyses/$id")->status_is(200, 'with access back, the stored canvas is unharmed');
+	is($tm->tx->res->json('/name'), _canvas_doc()->{name}, 'whole');
+};
+
+subtest 'A data directory that cannot be searched' => sub {
+	my $data = tempdir(CLEANUP => 1);
+	_csv_file($data, 'locked.csv', 'id,v', '1,locked_value');
+	my $tm = _isolated_app(data_dir => $data);
+	plan skip_all => 'cannot revoke search here' unless can_revoke_search($data);
+
+	_capture_logs($tm, sub {
+		with_revoked('search', $data, sub {
+			$tm->get_ok('/')->status_is(200, 'the home page still draws');
+			_no_internals($tm->tx->res->body, 'the home page');
+			$tm->get_ok('/view/locked');
+			cmp_ok($tm->tx->res->code, '<', 500, 'a table in there is refused, not a crash');
+			$tm->content_unlike(qr/locked_value/, 'and shows no data');
+			$tm->get_ok('/api/columns?table=locked')->status_is(404);
+			$tm->get_ok('/bar?l=table:locked&cat=v')->status_is(404);
+		});
+	});
+
+	$tm->get_ok('/view/locked')->status_is(200)->content_like(qr/locked_value/, 'with access back, the table opens');
+};
+
+subtest 'A directory holding one source cannot be searched: its siblings carry on' => sub {
+	my $root = tempdir(CLEANUP => 1);
+	my $locked = File::Spec->catdir($root, 'locked');
+	mkdir $locked or die "mkdir: $!";
+	my $inside = _csv_file($locked, 'inside.csv', 'id,right_value', '1,locked_value');
+	my $outside = _csv_file($root, 'outside.csv', 'id,left_value', '1,open_value');
+	plan skip_all => 'cannot revoke search here' unless can_revoke_search($locked);
+
+	my $tm = _isolated_app();
+	with_revoked('search', $locked, sub {
+		$tm->get_ok('/open?path=' . url_escape($inside))->status_is(404, 'the source inside cannot be opened');
+		_no_internals($tm->tx->res->body, 'the refused open');
+		$tm->get_ok('/bar?cat=right_value&l=' . url_escape("path:$inside"))->status_is(404, 'nor charted');
+		$tm->get_ok('/browse?path=' . url_escape($locked))->status_is(200, 'browsing to it is not an error');
+		$tm->get_ok('/api/stat?path=' . url_escape($inside))->status_is(200)->json_is('/exists', Mojo::JSON::false, 'and it reports as absent');
+		$tm->get_ok('/open?path=' . url_escape($outside))->status_is(200)->content_like(qr/open_value/, 'the source beside it opens');
+
+		# The POD of /join: a step that cannot be opened is skipped.
+		$tm->get_ok('/join?l=' . url_escape("path:$outside") . '&j=' . url_escape("path:$inside|id|id"))
+		   ->status_is(200)
+		   ->content_like(qr/open_value/, 'a join to it keeps the left side')
+		   ->content_unlike(qr/locked_value/, 'without anything from the right');
+	});
+};
+
+subtest 'An export to a directory that refuses new files' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+	my $tm = _isolated_app();
+	my $url = '/export?l=table:sales&dir=' . url_escape($dir) . '&filename=';
+
+	with_revoked('create', $dir, sub {
+		for my $name (qw(out.csv out.json out.sql)) {
+			$tm->post_ok($url . $name)->status_is(500)->json_has('/error', "$name: the refusal is reported");
+			_no_internals($tm->tx->res->json('/error'), "the refused $name");
+		}
+		_app_is_alive($tm, 'a refused export');
+	});
+	$tm->post_ok($url . 'out.csv')->status_is(200, 'with access back, the export is written');
+	ok(-s File::Spec->catfile($dir, 'out.csv'), 'with something in it');
+};
+
+# On a BSD, File::Temp before 0.2308 opens a new file with O_EXLOCK, and SQLite then
+# cannot write to it: every Merge that spills waits out the busy timeout and fails
+# with "database is locked".  Other systems have no O_EXLOCK, so there the second half
+# always passes, and the declared minimum is what holds this.
+subtest 'A temporary file from File::Temp can be written by SQLite' => sub {
+	Readonly my $FLOOR    => '0.2308';
+	Readonly my $QUICK_MS => 100;
+
+	for my $file (qw(Makefile.PL cpanfile)) {
+		next unless -r $file;
+		my ($declared) = Mojo::File->new($file)->slurp =~ /'File::Temp'\s*(?:=>|,)\s*'([\d.]+)'/;
+		cmp_ok($declared // 0, '>=', $FLOOR, "$file asks for a File::Temp that does not lock its files");
+	}
+
+	plan skip_all => 'DBD::SQLite is not available' unless eval { DBI->install_driver('SQLite'); 1 };
+	my $tmp = File::Temp->new(SUFFIX => '.db', UNLINK => 1);
+	my $dbh = DBI->connect('dbi:SQLite:dbname=' . $tmp->filename, '', '', { RaiseError => 1, PrintError => 0 });
+	$dbh->sqlite_busy_timeout($QUICK_MS);
+	ok(eval { $dbh->do('CREATE TABLE t (a TEXT)'); 1 }, 'a table can be made in it') or diag($@);
+	$dbh->disconnect;
+};
+
+# HTML::D3 writes a chart's labels into a script.  Before 0.27 it left "</" as it was,
+# so a cell could end that script and start its own.
+subtest 'A cell holding a script tag cannot end the script of a chart' => sub {
+	Readonly my $FLOOR  => '0.27';
+	Readonly my $ATTACK => '</script><script>alert(1)//';
+
+	for my $file (qw(Makefile.PL cpanfile)) {
+		next unless -r $file;
+		my ($declared) = Mojo::File->new($file)->slurp =~ /'HTML::D3'\s*(?:=>|,)\s*'([\d.]+)'/;
+		cmp_ok($declared // 0, '>=', $FLOOR, "$file asks for an HTML::D3 that escapes its labels");
+	}
+
+	my $csv = _csv_file(tempdir(CLEANUP => 1), 'labels.csv', 'id,label,seg,amount,day', "1,$ATTACK,$ATTACK,5,$ATTACK", '2,Plain,Other,7,Plain');
+	my $source = 'l=' . url_escape("path:$csv");
+	for my $query ('bar?cat=label&val=amount', 'pie?cat=label&val=amount', 'stacked?cat=label&seg=seg&val=amount', 'graph?x=day&y=amount') {
+		$t->get_ok("/$query&$source")->status_is(200)
+		  ->content_like(qr/alert\(1\)/, "$query draws the cell")
+		  ->content_unlike(qr{</script>\s*<script>\s*alert}i, "$query keeps it inside the script");
+	}
+};
+
+# Database::Abstraction reads any .db file as CSV, so DataSource shows it a SQLite
+# one under a .sql name.  That used to happen only when the table was named after
+# something other than the file, so orders.db holding a table called orders was
+# read as text, and reported as if there were no such file.
+subtest 'A SQLite .db file opens when its table is named after the file' => sub {
+	plan skip_all => 'DBD::SQLite is not available' unless eval { DBI->install_driver('SQLite'); 1 };
+
+	my $make = sub {
+		my ($dir, $file, @tables) = @_;
+		my $path = File::Spec->catfile($dir, $file);
+		my $dbh = DBI->connect("dbi:SQLite:dbname=$path", '', '', { RaiseError => 1, PrintError => 0 });
+		for my $table (@tables) {
+			$dbh->do("CREATE TABLE $table (id INTEGER PRIMARY KEY, label TEXT)");
+			$dbh->do("INSERT INTO $table VALUES (1, 'row_of_$table')");
+		}
+		$dbh->disconnect;
+		return $path;
+	};
+
+	my $path = $make->(tempdir(CLEANUP => 1), 'orders.db', 'orders');
+	my $before = Mojo::File->new($path)->slurp;
+	my $l = 'l=' . url_escape("path:$path");
+
+	$t->get_ok("/export?$l&format=csv")->status_is(200)->content_like(qr/row_of_orders/, '/export reads it');
+	$t->get_ok("/bar?$l&cat=label&val=__count__")->status_is(200)->content_like(qr/row_of_orders/, 'a chart reads it');
+	$t->get_ok('/open?path=' . url_escape($path))->status_is(200)->content_like(qr/row_of_orders/, '/open reads it');
+
+	my $two = $make->(tempdir(CLEANUP => 1), 'shop.db', 'orders', 'shop');
+	$t->get_ok('/export?format=csv&l=' . url_escape("path:$two"))->status_is(200)
+		->content_like(qr/row_of_shop/, 'the table named after the file is the one chosen from several');
+
+	my $tm = Test::Mojo->new('Database::BI', { data_dir => File::Basename::dirname($path), model_dir => tempdir(CLEANUP => 1) });
+	$tm->get_ok('/view/orders')->status_is(200)->content_like(qr/row_of_orders/, 'so does a table in the data directory');
+	$tm->get_ok('/export?format=csv&l=' . url_escape('table:orders'))->status_is(200)
+		->content_like(qr/row_of_orders/, 'and table: names it');
+
+	is(Mojo::File->new($path)->slurp, $before, 'the file itself is left as it was');
+};
+
+subtest 'A temporary directory that refuses new files' => sub {
+	my $tmp = tempdir(CLEANUP => 1);
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($tmp);
+
+	my $bank = _csv_file(tempdir(CLEANUP => 1), 'bank.csv', '2026-01-02,1.00,Rent paid');
+	my $plain = _csv_file(tempdir(CLEANUP => 1), 'plain.csv', 'id,v', '1,plain_value');
+	my $tm = _isolated_app();
+
+	# The test's own client keeps a reply over 256 KB in a file, and this page is
+	# about that size, more on a machine with long temporary paths.  Without this it
+	# would have nowhere to put it, and the reply would read as empty.
+	local $ENV{MOJO_TMPDIR} = tempdir(CLEANUP => 1);
+	local $ENV{TMPDIR} = $tmp;
+	File::Spec->tmpdir;	# remembered, as it would be on a server where it was fine at first
+	with_revoked('create', $tmp, sub {
+		$tm->get_ok('/open?path=' . url_escape($bank))
+		   ->status_is(200)
+		   ->content_like(qr/Could not open/, 'a file needing a temporary copy says it cannot be opened');
+		_no_internals($tm->tx->res->body, 'the refused copy');
+		$tm->get_ok('/open?path=' . url_escape($plain))
+		   ->status_is(200)
+		   ->content_like(qr/plain_value/, 'a file that needs none is unaffected');
+	});
+	$tm->get_ok('/open?path=' . url_escape($bank))->status_is(200)->content_like(qr/Rent paid/, 'with access back, it opens');
+};
+
+subtest 'The extract cache: no create permission' => sub {
+	require Database::BI::Extract;
+	my $dir = tempdir(CLEANUP => 1);
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+	my $extract = new_ok('Database::BI::Extract' => [ model_dir => $dir ]);
+	my @key = ('table:sales', 1, 2);
+
+	with_revoked('create', $dir, sub {
+		throws_ok { $extract->put(@key, 'bytes') } qr/Cannot create extract dir/, 'put croaks naming the directory, as its POD says';
+		is($extract->get(@key), undef, 'and a read is a plain miss');
+	});
+	ok(length $extract->put(@key, 'bytes'), 'with access back, the same object writes');
+};
+
+subtest 'The page cache: a directory that refuses writes does not take the page down' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	plan skip_all => 'cannot revoke create here' unless can_revoke_create($dir);
+	my $tm = Test::Mojo->new('Database::BI', { page_cache_dir => $dir, model_dir => tempdir(CLEANUP => 1) });
+
+	_capture_logs($tm, sub {
+		with_revoked('create', $dir, sub {
+			$tm->get_ok('/tutorial')->status_is(200, 'the cached page is still served');
+			_no_internals($tm->tx->res->body, 'the page');
+		});
+	});
+	$tm->get_ok('/tutorial')->status_is(200, 'and afterwards');
+};
+
+# ===========================================================================
+# SECTION 65: Sabotaged upstreams
+#
+# Strategy: each upstream's client is replaced, at the outermost call only, by
+# one that fails in a way a real one does: an error status, a timeout, a dropped
+# connection, a delay, or a success holding something malformed.  The request
+# must answer quickly with a message, and the next must be unaffected.
+# ===========================================================================
+Readonly my @PROVIDER_FAILURES => (
+	[ 'an error status',   502, sub { _response(500, 'Internal Server Error', 'text/plain', 'boom') } ],
+	[ 'rate limiting',     502, sub { _response(429, 'Too Many Requests', 'application/json', '{}') } ],
+	[ 'an LWP timeout',    502, sub { _response(500, 'read timeout', 'text/plain', '') } ],
+	[ 'a dropped connection', 502, sub { die "Connection reset by peer\n" } ],
+	[ 'a body not JSON',   502, sub { _response(200, 'OK', 'text/html', '<html>Bad gateway</html>') } ],
+	[ 'truncated JSON',    502, sub { _response(200, 'OK', 'application/json', '{"content":[{"text":"{') } ],
+	[ 'an empty body',     502, sub { _response(200, 'OK', 'application/json', '') } ],
+	[ 'a JSON array',      502, sub { _response(200, 'OK', 'application/json', '[1,2]') } ],
+	[ 'no content',        502, sub { _response(200, 'OK', 'application/json', '{"content":[]}') } ],
+	[ 'content of a wrong shape', 502, sub { _response(200, 'OK', 'application/json', '{"content":"x"}') } ],
+	[ 'prose, not a spec', 422, sub { _provider_text('I am sorry, I cannot do that') } ],
+	[ 'a spec of the wrong shape', 422, sub { _provider_text('[1,2,3]') } ],
+	[ 'an unknown chart',  422, sub { _provider_text('{"kind":"hologram","title":"t","encode":{}}') } ],
+	[ 'an unknown column', 422, sub { _provider_text('{"kind":"bar","title":"t","encode":{"cat":"no_such"}}') } ],
+);
+
+subtest '/api/ask: every kind of provider failure is a clean error' => sub {
+	my $tm = _isolated_app(ai_api_key => $CONFIG{api_key});
+
+	for my $case (@PROVIDER_FAILURES) {
+		my ($what, $status, $reply) = @{$case};
+		my $guard = mock_scoped('LWP::UserAgent', request => $reply);
+		_within_deadline($what, sub {
+			$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => 'by region?' })
+			   ->status_is($status, "$what is a $status")
+			   ->json_has('/error', 'with a message');
+		});
+		_no_internals($tm->tx->res->body, $what);
+		unlike($tm->tx->res->body, qr/\Q$CONFIG{api_key}\E/, "$what does not show the key");
+		undef $guard;
+		_app_is_alive($tm, $what);
+	}
+
+	my $guard = mock_scoped('LWP::UserAgent', request => sub { _provider_text($CANVAS_VISUAL_JSON) });
+	$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => 'by region?' })
+	   ->status_is(200, 'the next good answer is used: no failure was remembered');
+};
+
+subtest 'A slow provider does not outlive the timeout given to its client' => sub {
+	my $tm = _isolated_app(ai_api_key => $CONFIG{api_key});
+
+	my $ua_new = spy('LWP::UserAgent::new');
+	my $guard = mock_scoped('LWP::UserAgent', request => sub {
+		sleep $CONFIG{latency_s};
+		return _response(500, 'read timeout', 'text/plain', '');
+	});
+	my $elapsed = _within_deadline('a provider that times out', sub {
+		$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => 'by region?' })->status_is(502);
+	});
+	my @calls = $ua_new->();
+	undef $guard;
+	restore_all();
+
+	cmp_ok($elapsed, '>=', $CONFIG{latency_s}, 'the delay really was injected');
+	my @bounded = grep {
+		my (undef, undef, %args) = @{$_};
+		defined $args{timeout} && $args{timeout} <= $CONFIG{max_timeout_s};
+	} @calls;
+	ok(scalar @bounded, "the provider's client has a timeout of at most $CONFIG{max_timeout_s}s")
+		or diag(scalar(@calls) . ' clients built');
+
+	# A slow provider that does answer is simply slow.
+	my $slow = mock_scoped('LWP::UserAgent', request => sub {
+		sleep $CONFIG{latency_s};
+		return _provider_text($CANVAS_VISUAL_JSON);
+	});
+	$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => 'by region?' })->status_is(200, 'a slow answer is still an answer');
+};
+
+subtest '/api/summary: a provider outage falls back, once per summary' => sub {
+	my $tm = _isolated_app(ai_api_key => $CONFIG{api_key});
+	my $calls = 0;
+	my $n = 0;
+	my $dir = tempdir(CLEANUP => 1);
+
+	for my $case (@PROVIDER_FAILURES[0 .. 9]) {
+		my ($what, undef, $reply) = @{$case};
+		$calls = 0;
+		$n++;
+		my $guard = mock_scoped('LWP::UserAgent', request => sub { $calls++; return $reply->(@_) });
+
+		# The cache is keyed on the label and the insights, so each case has a file
+		# of its own, or the first failure would answer for all the rest.
+		my $file = _csv_file($dir, "outage$n.csv", 'id,v', '1,x');
+		my $form = { l => "path:$file", ai => 1 };
+
+		$tm->post_ok('/api/summary' => form => $form)
+		   ->status_is(200, "$what still gives a summary")
+		   ->json_is('/source', 'template_fallback', 'from the template');
+		_no_internals($tm->tx->res->json('/text'), $what);
+		is($calls, 1, 'after one attempt');
+
+		# The POD: the same insights within the hour are the cached text, so an
+		# outage is not hit again by everyone who opens the same page.
+		$tm->post_ok('/api/summary' => form => $form)->status_is(200)->json_is('/cached', 1, 'the next reader gets it from the cache');
+		is($calls, 1, 'without another attempt');
+	}
+	_app_is_alive($tm, 'a provider outage');
+};
+
+Readonly my @URL_FAILURES => (
+	[ 'an error status',  sub { _response(500, 'Internal Server Error', 'text/html', 'boom') } ],
+	[ 'not found',        sub { _response(404, 'Not Found', 'text/html', 'gone') } ],
+	[ 'an LWP timeout',   sub { _response(500, 'read timeout', 'text/plain', '') } ],
+	[ 'a dropped connection', sub { die "Connection reset by peer\n" } ],
+	[ 'a page with no table', sub { _response(200, 'OK', 'text/html', '<html><p>No tables here</p></html>') } ],
+	[ 'an empty table',   sub { _response(200, 'OK', 'text/html', '<table></table>') } ],
+	[ 'truncated JSON',   sub { _response(200, 'OK', 'application/json', '[{"a":') } ],
+	[ 'a JSON scalar',    sub { _response(200, 'OK', 'application/json', '3') } ],
+	[ 'a JSON array of scalars', sub { _response(200, 'OK', 'application/json', '[1,2,3]') } ],
+	[ 'rows mixed with scalars', sub { _response(200, 'OK', 'application/json', '[{"a":1},2]') } ],
+);
+
+subtest 'A URL source: every kind of failure is a message, on every kind of page' => sub {
+	my $tm = _isolated_app();
+	my $n = 0;
+	local $SIG{__WARN__} = sub { };
+
+	for my $case (@URL_FAILURES) {
+		my ($what, $reply) = @{$case};
+		$n++;
+		my $url = "http://example.com/sabotage$n";
+		my $guard = mock_scoped('LWP::UserAgent', get => $reply);
+
+		_within_deadline($what, sub {
+			$tm->get_ok('/import?url=' . url_escape($url))
+			   ->status_is(200, "$what: /import draws the home page")
+			   ->content_like(qr/Could not load HTML table/, 'with the reason');
+			_no_internals($tm->tx->res->body, "$what on /import");
+
+			$tm->get_ok('/bar?cat=a&l=' . url_escape("url:$url"))->status_is(404, "$what: a chart has no source");
+			_no_internals($tm->tx->res->body, "$what on /bar");
+
+			# The POD of /join: a step that cannot be opened is skipped.
+			$tm->get_ok('/join?l=table:sales&j=' . url_escape("url:$url|id|a"))
+			   ->status_is(200, "$what: a join to it")
+			   ->content_like(qr/Widget A/, 'keeps the left side');
+		});
+		undef $guard;
+		_app_is_alive($tm, $what);
+	}
+};
+
+subtest 'A URL source: a failure is not cached, so the source can recover' => sub {
+	my $tm = _isolated_app();
+	my $url = 'http://example.com/recovers';
+	local $SIG{__WARN__} = sub { };
+
+	my $down = mock_scoped('LWP::UserAgent', get => sub { _response(503, 'Service Unavailable', 'text/html', '') });
+	$tm->get_ok('/import?url=' . url_escape($url))->status_is(200)->content_like(qr/Could not load/, 'while it is down');
+	undef $down;
+
+	my $up = mock_scoped('LWP::UserAgent', get => sub {
+		_response(200, 'OK', 'text/html', '<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>recovered</td></tr></table>');
+	});
+	$tm->get_ok('/import?url=' . url_escape($url))->status_is(200)->content_like(qr/recovered/, 'and as soon as it is back');
+};
+
+subtest 'A URL source: the client is given a timeout, and is asked once' => sub {
+	my $tm = _isolated_app();
+	require LWP::UserAgent::Cached;
+	my $ua_new = spy('LWP::UserAgent::Cached::new');
+	my $gets = 0;
+	my $guard = mock_scoped('LWP::UserAgent', get => sub {
+		$gets++;
+		sleep $CONFIG{latency_s};
+		return _response(500, 'read timeout', 'text/plain', '');
+	});
+	local $SIG{__WARN__} = sub { };
+
+	_within_deadline('a URL that times out', sub {
+		$tm->get_ok('/import?url=' . url_escape('http://example.com/slow'))->status_is(200);
+	});
+	my @calls = $ua_new->();
+	undef $guard;
+	restore_all();
+
+	is($gets, 1, 'a timeout is not retried while the reader waits');
+	ok(scalar @calls, 'the client came from the library that caches');
+	my (undef, undef, %args) = @{ $calls[0] // [] };
+	cmp_ok($args{timeout} // 0, '>', 0, 'and has a timeout');
+	cmp_ok($args{timeout} // 0, '<=', $CONFIG{max_timeout_s}, "of at most $CONFIG{max_timeout_s}s");
+};
+
+subtest 'SFTP: an unreachable or misbehaving host is a message' => sub {
+	plan skip_all => 'needs Net::SFTP::Foreign' unless eval { require Net::SFTP::Foreign; 1 };
+	my $tm = _isolated_app();
+	my $path = '/../nohost.invalid/remote/file.csv';
+
+	my @failures = (
+		[ 'a connection that dies', sub { die "ssh: connect: Connection timed out\n" } ],
+		[ 'a connection in error',  sub { bless { error => 'Connection to remote server is broken' }, 'Integ::SFTP' } ],
+		[ 'a host with no file',    sub { bless { get_error => 'No such file' }, 'Integ::SFTP' } ],
+	);
+
+	for my $case (@failures) {
+		my ($what, $connect) = @{$case};
+		my $connects = 0;
+		my $guard = mock_scoped('Net::SFTP::Foreign', new => sub { $connects++; return $connect->(@_) });
+
+		_within_deadline($what, sub {
+			throws_ok {
+				Database::BI::Model::DataSource->new(host => 'nohost.invalid', directory => '/remote', table => 'file');
+			} qr/nohost\.invalid/, "$what: the constructor croaks naming the host";
+
+			$tm->get_ok('/open?path=' . url_escape($path));
+			cmp_ok($tm->tx->res->code, '<', 500, "$what: /open answers without a crash");
+			_no_internals($tm->tx->res->body, "$what on /open");
+		});
+		cmp_ok($connects, '>=', 1, 'the connection was attempted');
+		undef $guard;
+		_app_is_alive($tm, $what);
+	}
+
+	my @args;
+	my $capture = mock_scoped('Net::SFTP::Foreign', new => sub { @args = @_; die "refused\n" });
+	eval { Database::BI::Model::DataSource->new(host => 'someone@nohost.invalid', directory => '/remote', table => 'file') };
+	undef $capture;
+	my (undef, $host, %opts) = @args;
+	is($host, 'nohost.invalid', 'the host is passed apart from the user');
+	is($opts{user}, 'someone', 'the user is passed as its own option');
+	cmp_ok($opts{timeout} // 0, '>', 0, 'the connection has a timeout');
+	cmp_ok($opts{timeout} // 0, '<=', $CONFIG{max_timeout_s}, "of at most $CONFIG{max_timeout_s}s");
+};
+
+subtest 'Redis: an unreachable server is a message, and is given timeouts' => sub {
+	plan skip_all => 'needs Redis' unless eval { require Redis; 1 };
+	my $tm = _isolated_app();
+	my $server = 'redis://127.0.0.1:1';
+	my @built;
+	my $guard = mock_scoped('Redis', new => sub {
+		my ($class, %args) = @_;
+		push @built, \%args;
+		die "Could not connect to Redis server at 127.0.0.1:1: Connection refused\n";
+	});
+	local $SIG{__WARN__} = sub { };
+
+	_within_deadline('a refused Redis', sub {
+		$tm->get_ok('/tables?l=' . url_escape($server));
+		cmp_ok($tm->tx->res->code, '<', 500, 'the key picker answers without a crash');
+		_no_internals($tm->tx->res->body, 'the key picker');
+
+		$tm->get_ok('/bar?cat=a&l=' . url_escape("redis:$server|k"))->status_is(404, 'a chart has no source');
+		_no_internals($tm->tx->res->body, 'the chart');
+
+		$tm->get_ok('/join?l=table:sales&j=' . url_escape("redis:$server|k|id|id"))
+		   ->status_is(200)
+		   ->content_like(qr/Widget A/, 'a join to it keeps the left side, as the POD of /join says');
+	});
+	undef $guard;
+	_app_is_alive($tm, 'a refused Redis');
+
+	my ($picker) = grep { exists $_->{cnx_timeout} } @built;
+	ok($picker, 'the key picker gave its client a connection timeout');
+	cmp_ok($picker->{cnx_timeout} // 0, '<=', $CONFIG{max_timeout_s}, 'a short one');
+	cmp_ok($picker->{read_timeout} // 0, '>', 0, 'and a read timeout');
+};
+
+{
+	package Integ::SFTP;
+
+	sub error { return $_[0]{error} // $_[0]{get_error_now} }
+
+	# As the real client does: a failed get sets error and writes no file.
+	sub get {
+		my ($self) = @_;
+		$self->{get_error_now} = $self->{get_error};
+		return;
+	}
+
+	package Integ::Geocoder::Dies;
+
+	sub new { return bless {}, shift }
+	sub valid_location { return 1 }
+	sub geocode_many { die "geocoder database is corrupt\n" }
+}
+
+# The POD of Database::BI::Model::Geocode: a backend that throws an exception
+# breaks the request rather than being read as a place it could not find, and
+# leaves nothing half-written.  So the request fails, and that is all that does.
+subtest 'A geocoder that throws: the request fails, and leaves nothing behind' => sub {
+	my $tm = _isolated_app(geocoder => Integ::Geocoder::Dies->new, openaddr => 'test');
+	my $places = _csv_file(tempdir(CLEANUP => 1), 'places.csv', 'id,city', '1,Ramsgate', '2,Margate');
+	my $l = url_escape("path:$places");
+
+	throws_ok {
+		Database::BI::Model::Geocode->new(geocoder => Integ::Geocoder::Dies->new)
+			->resolve_column([ { city => 'Ramsgate' } ], 'city', cache => {});
+	} qr/geocoder database is corrupt/, 'the exception reaches the caller of the model';
+
+	local $SIG{__WARN__} = sub { };
+	_within_deadline('a throwing geocoder', sub {
+		$tm->get_ok("/map?loc=city&l=$l")->status_is(500, 'and breaks the request');
+	});
+	$tm->get_ok("/geo/list?l=$l")->status_is(200)->json_is('/columns', {}, 'with nothing stored');
+	ok(!-e File::Spec->catfile($tm->app->config->{model_dir}, 'models.json'), 'and no model store started');
+	_app_is_alive($tm, 'a throwing geocoder');
+
+	$tm->app->config->{geocoder} = _stub_geocoder();
+	$tm->get_ok("/map?loc=city&l=$l")->status_is(200, 'a working geocoder is used on the next request');
+};
+
+subtest 'A map renderer that fails mid-request is not a crash' => sub {
+	plan skip_all => 'needs HTML::OSM 0.12 or later' unless eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
+	my $tm = _isolated_app();
+	my $places = _csv_file(tempdir(CLEANUP => 1), 'coords.csv', 'id,lat,lon', '1,51.3,1.4');
+	my $guard = mock_scoped('HTML::OSM', new => sub { die "tile server unreachable\n" });
+
+	$tm->get_ok('/map?lat=lat&lon=lon&l=' . url_escape("path:$places"));
+	cmp_ok($tm->tx->res->code, '<', 500, 'the page is served');
+	_no_internals($tm->tx->res->body, 'the page');
+	undef $guard;
+	_app_is_alive($tm, 'a failing renderer');
+};
+
+# Strategy: files on disc are an upstream too.  Each is broken in the way a real
+# one is, and opening it must not stop the file beside it from opening.
+subtest 'Data files that are not what they say: a message, and the next file opens' => sub {
+	my $dir = tempdir(CLEANUP => 1);
+	my $good = _csv_file($dir, 'good.csv', 'id,v', '1,good_value');
+	my $tm = _isolated_app();
+	local $SIG{__WARN__} = sub { };
+
+	my %broken = (
+		'not_really.xlsx'  => 'This is not a zip archive',
+		'not_really.sql'   => 'This is not an SQLite database, whatever it may be called',
+		'not_really.db'    => "\x00\x01\x02 neither SQLite nor Berkeley DB",
+		'not_really.xml'   => '<rows><row>never closed',
+		'quote_open.csv'   => qq{2026-01-02,"1.00,Rent paid\n2026-01-03,5.00,Tea\n},
+	);
+	for my $name (sort keys %broken) {
+		my $path = File::Spec->catfile($dir, $name);
+		Mojo::File->new($path)->spurt($broken{$name});
+		_within_deadline($name, sub {
+			$tm->get_ok('/open?path=' . url_escape($path));
+		});
+		cmp_ok($tm->tx->res->code, '<', 500, "$name: answered without a crash");
+		_no_internals($tm->tx->res->body, $name);
+		$tm->get_ok('/open?path=' . url_escape($good))->status_is(200)->content_like(qr/good_value/, "after $name, a good file opens");
+	}
+};
+
+Readonly my @MALFORMED_BODIES => (
+	[ 'truncated JSON', '{"name":', qr/Invalid JSON body: \S/ ],
+	[ 'not JSON',       'name=x',   qr/Invalid JSON body: \S/ ],
+	[ 'an empty body',  '',         qr/Invalid JSON body: \S/ ],
+	[ 'a JSON array',   '[1,2,3]',  qr/Invalid JSON body: expected a JSON object/ ],
+	[ 'a JSON string',  '"text"',   qr/Invalid JSON body: expected a JSON object/ ],
+	[ 'JSON null',      'null',     qr/Invalid JSON body: expected a JSON object/ ],
+);
+
+subtest 'Malformed canvas documents are refused, with a reason, on every write route' => sub {
+	my $tm = _isolated_app();
+	$tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201);
+	my $id = $tm->tx->res->json('/id');
+	$tm->get_ok("/api/analyses/$id");
+	my $stored = $tm->tx->res->json;
+
+	for my $case (@MALFORMED_BODIES) {
+		my ($what, $body, $reason) = @{$case};
+		my @routes = (
+			[ POST  => '/api/analyses' ],
+			[ POST  => '/api/analyses/import' ],
+			[ PUT   => "/api/analyses/$id" ],
+			[ PATCH => "/api/analyses/$id" ],
+			[ POST  => "/api/analyses/$id/visuals" ],
+		);
+		for my $route (@routes) {
+			my ($method, $path) = @{$route};
+			my $tx = $tm->ua->build_tx($method => $path => { 'Content-Type' => 'application/json' } => $body);
+			$tm->request_ok($tx)->status_is(400, "$what: $method $path is refused");
+			like($tm->tx->res->json('/error') // '', $reason, 'saying why');
+			_no_internals($tm->tx->res->json('/error'), "$what: $method $path");
+		}
+	}
+
+	$tm->get_ok("/api/analyses/$id")->status_is(200);
+	is_deeply($tm->tx->res->json, $stored, 'the stored canvas is exactly as it was');
+};
+
+subtest 'A store corrupted on disc: reads are empty, and a save keeps the old file' => sub {
+	my $tm = _isolated_app();
+	my $dir = $tm->app->config->{model_dir};
+
+	my %store = (
+		'analyses.json' => {
+			read => sub { $tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses', [], 'canvases read as none') },
+			save => sub { $tm->post_ok('/api/analyses' => json => _canvas_doc())->status_is(201, 'a new canvas is accepted') },
+			check => sub { $tm->get_ok('/api/analyses')->status_is(200); is(scalar @{ $tm->tx->res->json('/analyses') // [] }, 1, 'and is there') },
+		},
+		'models.json' => {
+			read => sub { $tm->get_ok('/calc/list?l=table:sales')->status_is(200)->json_is('/fields', {}, 'fields read as none') },
+			save => sub { $tm->post_ok('/calc/save' => form => { l => 'table:sales', name => 'twice', expr => 'amount * 2' })->status_is(200) },
+			check => sub { $tm->get_ok('/calc/list?l=table:sales')->json_is('/fields/twice', 'amount * 2', 'and the new field is there') },
+		},
+	);
+
+	for my $name (sort keys %store) {
+		for my $damage ('{"half a file', '[1,2,3]') {
+			my $path = File::Spec->catfile($dir, $name);
+			unlink $path, glob("$path.corrupt.*");
+			Mojo::File->new($path)->spurt($damage);
+
+			my $logs = _capture_logs($tm, sub {
+				$store{$name}{read}->();
+				$store{$name}{save}->();
+			});
+			$store{$name}{check}->();
+
+			my @kept = glob("$path.corrupt.*");
+			is(scalar @kept, 1, "$name holding <$damage>: it was set aside, not overwritten");
+			is(Mojo::File->new($kept[0])->slurp, $damage, 'with every byte kept') if @kept;
+			ok(scalar(grep { /could not be parsed/ } @{$logs}), 'and the log says where it went');
+			_app_is_alive($tm, "a corrupt $name");
+		}
+	}
+
+	# A good store is only ever replaced, never set aside.
+	my $path = File::Spec->catfile($dir, 'models.json');
+	unlink glob("$path.corrupt.*");
+	$tm->post_ok('/calc/save' => form => { l => 'table:sales', name => 'thrice', expr => 'amount * 3' })->status_is(200);
+	is(scalar(() = glob("$path.corrupt.*")), 0, 'a healthy store is not set aside');
+};
+
+# Strategy: the failures that do most damage are the ones that spread.  One bad
+# card, or a stream of failed requests, must leave everything else working.
+subtest 'One bad card does not take down the rest of the canvas' => sub {
+	my $tm = _isolated_app();
+	my $doc = _canvas_doc(
+		{ kind => 'bar', title => 'Good card', encode => { cat => 'region' } },
+		{ kind => 'bar', title => 'Bad card', encode => { cat => 'no_such_column' } },
+	);
+	$tm->post_ok('/api/analyses' => json => $doc);
+	my $id = $tm->tx->res->json('/id');
+	plan skip_all => 'the store refused the canvas up front' unless defined $id;
+
+	$tm->get_ok("/a/$id")
+	   ->status_is(200, 'the canvas page is served')
+	   ->content_like(qr/Good card/, 'with the good card')
+	   ->content_like(qr/no_such_column/, 'and the reason for the bad one');
+	_no_internals($tm->tx->res->body =~ s/<script.*?<\/script>//sgr, 'the canvas');
+};
+
+subtest 'A canvas whose source has gone is reported, and the store is left alone' => sub {
+	my $data = tempdir(CLEANUP => 1);
+	my $file = _csv_file($data, 'vanishing.csv', 'id,region', '1,North');
+	my $tm = _isolated_app();
+	my $doc = {
+		name     => 'Vanishing',
+		datasets => [ { alias => 'main', spec => "path:$file" } ],
+		visuals  => [ { kind => 'bar', title => 'By region', encode => { cat => 'region' } } ],
+	};
+	$tm->post_ok('/api/analyses' => json => $doc)->status_is(201);
+	my $id = $tm->tx->res->json('/id');
+	$tm->get_ok("/a/$id")->status_is(200, 'while the file is there');
+
+	unlink $file or die "unlink: $!";
+	$tm->get_ok("/a/$id");
+	cmp_ok($tm->tx->res->code, '<', 500, 'once it has gone the page does not crash');
+	$tm->get_ok("/a/$id/visual/0/csv");
+	cmp_ok($tm->tx->res->code, '<', 500, 'nor does the download');
+	_no_internals($tm->tx->res->body, 'the download');
+	$tm->get_ok("/api/analyses/$id")->status_is(200, 'and the canvas itself is kept');
+
+	_csv_file($data, 'vanishing.csv', 'id,region', '1,North');
+	$tm->get_ok("/a/$id")->status_is(200, 'when the file returns, so does the page');
+};
+
+subtest 'A stream of failures leaves nothing behind' => sub {
+	my $tm = _isolated_app(ai_api_key => $CONFIG{api_key});
+	my $guard = mock_scoped('LWP::UserAgent',
+		get     => sub { die "Connection refused\n" },
+		request => sub { die "Connection refused\n" },
+	);
+	local $SIG{__WARN__} = sub { };
+
+	my $elapsed = _within_deadline('repeated failures', sub {
+		for my $n (1 .. $CONFIG{repeated_failures}) {
+			$tm->get_ok('/import?url=' . url_escape("http://example.com/down$n"))->status_is(200);
+			$tm->post_ok('/api/ask' => form => { l => 'table:sales', q => "question $n" })->status_is(502);
+		}
+	});
+	undef $guard;
+
+	_app_is_alive($tm, "$CONFIG{repeated_failures} failures in a row");
+	$tm->get_ok('/api/analyses')->status_is(200)->json_is('/analyses', [], 'no store was touched');
+};
+
+# Export > SQLite names its table "data", and Database::Abstraction before 0.54
+# kept the DBI handle in the object under the table's name -- the slot its
+# slurped rows use -- so no file this application exported could be opened by it.
+# 0.54 is the minimum now, so this always runs.
+subtest 'A SQLite export opens again' => sub {
+	plan skip_all => 'DBD::SQLite is not available' unless eval { require DBD::SQLite; 1 };
+	my $tm  = _isolated_app();
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	$tm->get_ok('/export?l=table:sales&format=sqlite')->status_is(200);
+	my $file = File::Spec->catfile($dir, 'round.db');
+	Mojo::File->new($file)->spew($tm->tx->res->body);
+	$tm->get_ok('/open?path=' . url_escape($file))->status_is(200);
+	my @cells = map { $_->text } @{ Mojo::DOM->new($tm->tx->res->body)->find('#bi-table tbody td')->to_array };
+	ok(scalar(@cells), 'the table has rows');
+	# As records: a SQLite source lists its columns alphabetically, so the
+	# columns come back in another order.
+	my $rows = sub {
+		$tm->get_ok("/export?l=$_[0]&format=json")->status_is(200);
+		return [ sort { $a->{id} <=> $b->{id} } @{ $tm->tx->res->json } ];
+	};
+	is_deeply($rows->(url_escape("path:$file")), $rows->('table:sales'), 'and the same rows as the table it came from');
 };
 
 done_testing();

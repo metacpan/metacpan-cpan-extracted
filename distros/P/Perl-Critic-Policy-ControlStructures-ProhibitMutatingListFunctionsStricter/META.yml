@@ -27,9 +27,10 @@ no_index:
 provides:
   Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctionsStricter:
     file: lib/Perl/Critic/Policy/ControlStructures/ProhibitMutatingListFunctionsStricter.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   List::Util: '0'
+  PPI::Statement: '0'
   Perl::Critic::Distribution: '0'
   Perl::Critic::Document: '0'
   Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions: '0'
@@ -45,7 +46,9 @@ resources:
   bugtracker: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter/issues
   homepage: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter
   repository: https://github.com/teodesian/perl-critic-policy-prohibitmutatinglistfunctionsstricter.git
-version: '0.001'
+version: '0.003'
+x_contributors:
+  - 'troglodyne-bot <morpheus@troglodyne.net>'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

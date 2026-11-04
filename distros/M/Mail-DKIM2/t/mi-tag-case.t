@@ -7,7 +7,7 @@ use DKIM2SignedFixture;
 use Mail::DKIM2::Common qw(mi_version_tag extract_mi_version);
 use Mail::DKIM2::MessageInstance;
 
-# -08 §9: Message-Instance tag-names MUST be lowercase, and §8 makes them
+# -09 §9: Message-Instance tag-names MUST be lowercase, and §8 makes them
 # case-sensitive. Under the -08 contract (decision 4, D10) a tag-name that
 # is not lowercase is an unknown tag: ignored, so "M=1" alone is a missing
 # m=, and "m=1; M=2" is not a duplicate. There MUST be only one of each kind.

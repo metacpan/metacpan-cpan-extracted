@@ -1,5 +1,5 @@
 package Proc::Spawner::Graph;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 # EXPERIMENTAL.  The companion of Proc::Spawner: the spawn graph, which is what gets executed.  It says,
 # for the current moment, which of our children and which of our own reads and writes use which open
 # file, and carries on each process what to do when it ends.  That reaction may start new processes,

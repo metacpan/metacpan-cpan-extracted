@@ -4,7 +4,7 @@
     <updated>2025-06-15T18:07:01Z</updated>
     <author>
         <name>Samuel Young</name>
-        <email>samyoung12788 at gmail dot com</email>
+        <email>samyoung at posteo dot com</email>
         <uri>https://1-1sam.codeberg.page/</uri>
     </author>
     <category term="test"/>
@@ -12,7 +12,7 @@
     <category term="phony"/>
     <generator>VIM 9.0</generator>
     <logo>/logo.png</logo>
-    <rights>Copyright (C) 2025 Samuel Young (samyoung12788 at gmail dot com)</rights>
+    <rights>Copyright (C) 2025 Samuel Young (samyoung at posteo dot com)</rights>
     <subtitle>An Atom feed for testing purposes</subtitle>
     <link rel="alternate" href="https://phonysite.com"/>
     <entry>
@@ -22,7 +22,7 @@
         <updated>2025-06-15T18:16:01Z</updated>
         <author>
             <name>Samuel Young</name>
-            <email>samyoung12788 at gmail dot com</email>
+            <email>samyoung at posteo dot com</email>
             <uri>https://1-1sam.codeberg.page/</uri>
         </author>
         <content>Just a plain-text post.</content>
@@ -40,7 +40,7 @@
         <updated>2025-06-15T18:21:01Z</updated>
         <author>
             <name>Samuel Young</name>
-            <email>samyoung12788 at gmail dot com</email>
+            <email>samyoung at posteo dot com</email>
             <uri>https://1-1sam.codeberg.page/</uri>
         </author>
         <media:content url="https://phonysite.com/a2">
@@ -58,7 +58,7 @@
         <updated>2025-06-15T19:49:01Z</updated>
         <author>
             <name>Samuel Young</name>
-            <email>samyoung12788 at gmail dot com</email>
+            <email>samyoung at posteo dot com</email>
             <uri>https://1-1sam.codeberg.page/</uri>
         </author>
         <media:content url="https://phonysite.com/a3"/>

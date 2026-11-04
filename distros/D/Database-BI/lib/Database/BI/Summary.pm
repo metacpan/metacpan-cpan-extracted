@@ -3,10 +3,11 @@ package Database::BI::Summary;
 use strict;
 use warnings;
 
-our $VERSION = '0.018.0';
+our $VERSION = '0.019.0';
 
 use Carp        qw(croak);
 use Digest::MD5 qw(md5_hex);
+use Encode      qw(encode_utf8);
 use Readonly;
 
 Readonly my $MAX_SUMMARY_INSIGHTS => 5;
@@ -60,14 +61,18 @@ sub generate {
 }
 
 # ---------------------------------------------------------------------------
-# _fingerprint(\@insights, $use_ai) -> $hex
+# _fingerprint(\@insights, $use_ai, $label, $row_count) -> $hex
+#
+# Holds everything the text is made from.  The detail counts: two period deltas
+# can share a headline while their figures differ.  md5_hex takes bytes only, and
+# croaks on a wide character, so the string is encoded first.
 # ---------------------------------------------------------------------------
 sub _fingerprint {
 	my ($insights, $use_ai, $label, $row_count) = @_;
 	my $str = ($use_ai ? 'ai:' : 'tmpl:')
 	        . "L:${label}:R:${row_count}:"
-	        . join('|', map { "$_->{kind}:$_->{headline}" } @$insights);
-	return md5_hex($str);
+	        . join('|', map { "$_->{kind}:$_->{headline}:" . ($_->{detail} // '') } @$insights);
+	return md5_hex(encode_utf8($str));
 }
 
 # ---------------------------------------------------------------------------

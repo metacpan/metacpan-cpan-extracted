@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install &mdash; Database::BI</title>
+<meta name="description" content="Requirements, installation, configuration and command-line tools for Database::BI.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="install.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Database::BI">
+<meta property="og:title" content="Install &mdash; Database::BI">
+<meta property="og:description" content="Requirements, installation, configuration and command-line tools for Database::BI.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">Database::BI</span>
+			<span class="brand-tag">business intelligence for data files</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="charts.html">Charts</a>
+			<a href="canvas.html">Canvases</a>
+			<a href="data.html">Data</a>
+			<a href="api.html">API</a>
+			<a href="install.html" aria-current="page">Install</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+
+<div class="hero">
+	<p class="eyebrow">Get it running</p>
+	<h1>Install and configure</h1>
+	<p class="lead">
+		Database::BI is a normal Perl distribution with a Mojolicious application
+		inside it. Install it with <code>cpanm</code>, point it at a directory of
+		data, and start the server.
+	</p>
+</div>
+
+<h2>Requirements</h2>
+<div class="table-wrap">
+<table>
+	<caption>The two version floors that matter; the rest are ordinary CPAN modules.</caption>
+	<thead>
+		<tr><th>Requirement</th><th>Version</th><th>Why</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Perl</td>
+			<td>5.28</td>
+			<td>Subroutine attributes have to precede a signature, which older perls cannot parse.</td>
+		</tr>
+		<tr>
+			<td>Mojolicious</td>
+			<td>9.49</td>
+			<td>The web framework the application is built on.</td>
+		</tr>
+		<tr>
+			<td>Database::Abstraction</td>
+			<td>0.54</td>
+			<td>Reads the data files; 0.54 reads a table named <code>data</code>, so a file from Export &gt; SQLite opens again.</td>
+		</tr>
+		<tr>
+			<td>Database::Join</td>
+			<td>0.009.0</td>
+			<td>Left joins, with spill-to-SQLite for large results.</td>
+		</tr>
+		<tr>
+			<td>HTML::D3</td>
+			<td>0.27</td>
+			<td>The chart snippets. 0.27 stops a label ending the script it is written into.</td>
+		</tr>
+		<tr>
+			<td>HTML::TagCloud</td>
+			<td>0.38</td>
+			<td>Word clouds.</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<p>
+	Two modules are recommended rather than required, so the application installs,
+	starts and tests without them: <strong>HTML::OSM</strong> (0.12 or later) draws
+	maps, and <strong>Geo::Coder::Free</strong> (0.48 or later) turns a place column
+	into coordinates from a local database. Without them the map pages are hidden
+	and the rest of the application is unaffected. <strong>Redis</strong> (or
+	<strong>Redis::Fast</strong>) is optional too, and switches on the
+	<code>redis:</code> data source when installed.
+</p>
+<p>
+	<strong>DBD::MariaDB</strong> (or <strong>DBD::mysql</strong>) is optional too, and is
+	what <a href="data.html#mariadb">a <code>mariadb:</code> source</a> connects with.
+	<code>t/mariadb.t</code> runs without a server; <code>t/mariadb_live.t</code> runs when
+	<code>MARIADB_SERVER</code> is set, and creates its own tables and drops them.
+</p>
+<pre><code>MARIADB_SERVER=mariadb://user:pass@host/test prove -lv t/mariadb_live.t</code></pre>
+
+<h2>Install</h2>
+<pre><code># from CPAN
+cpanm Database::BI
+
+# or from a checkout
+cpanm --installdeps .
+perl Makefile.PL
+make
+make test</code></pre>
+
+<h2 id="run">Run it</h2>
+<pre><code># development: restarts when a source file is edited
+script/database-bi
+
+# the same thing, spelled out
+morbo script/database-bi
+
+# the same, showing one database at the home address
+script/database-bi data/store.db
+
+# production: a preforking server; start, or restart with no downtime
+hypnotoad script/database-bi
+
+# stop it
+hypnotoad -s script/database-bi</code></pre>
+<p>
+	With no arguments the launcher starts the development server itself; any other
+	Mojolicious command word (<code>routes</code>, <code>get</code>, &hellip;) is
+	passed through to the application. The preforking server is the one to put
+	behind a reverse proxy for long-running use. It listens on port 8080 and ignores
+	<code>MOJO_LISTEN</code>; set the port in <code>database_bi.conf</code>, as
+	<code>hypnotoad =&gt; { listen =&gt; ['http://*:3000'] }</code>. It keeps its
+	process id in <code>script/hypnotoad.pid</code> unless <code>pid_file</code> says
+	otherwise.
+</p>
+<p>
+	Given the name of a database, the launcher starts the same development server,
+	and the home address shows that database. The Home link in its breadcrumb leads
+	to the usual list. It takes a data file, a remote path, a Redis spec or a MariaDB
+	spec, as
+	<code>/open</code> does.
+</p>
+<p>
+	Only one can be named, because a join cannot be given on the command line: open
+	one and use Merge or Combine in the browser. Naming more than one, or a file
+	that is missing, cannot be read or is of an unsupported type, prints the reason
+	and exits with status 2 before any server starts.
+</p>
+<p>
+	<code>MOJO_LISTEN</code> chooses the port. <code>script/database-bi daemon</code>
+	ignores a file named after it, and so does <code>hypnotoad</code>; to show a
+	database from either, set <code>BI_OPEN</code>:
+</p>
+<pre><code>BI_OPEN=/full/path/store.db script/database-bi daemon
+BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
+
+<div class="note">
+	<p>
+		The launcher's <code>#!</code> line must name <code>perl</code>, not
+		<code>morbo</code>. morbo starts the application as
+		<code>perl script/database-bi daemon</code>, and perl hands a script whose
+		shebang names another interpreter to that interpreter &mdash; so a
+		<code>morbo</code> shebang starts a morbo inside a morbo, one process per
+		second, until <code>exec</code> runs out of argument space.
+	</p>
+	<p>
+		The launcher's last statement must be its call to <code>start_app</code>.
+		hypnotoad loads the file instead of running it, and takes the value of that
+		statement as the application.
+	</p>
+</div>
+
+<h2>Configuration</h2>
+<p>
+	This is for whoever runs the application. A reader's own choices, such as
+	light or dark, are not set here: see <a href="index.html#preferences">Preferences</a>.
+</p>
+<p>
+	Create <code>database_bi.conf</code> in the application root next to
+	<code>script/</code>. It is optional, but if it exists it must be valid Perl
+	and must return a hashref:
+</p>
+<pre><code>{
+    data_dir  => 'data',          # scanned by the home page
+    model_dir => '.bi',           # analyses.json, models.json
+    language  => 'en',            # template directory under templates/web/
+    platform  => 'web',
+}</code></pre>
+
+<div class="table-wrap">
+<table>
+	<caption>Keys you are most likely to set. Unset keys fall back to the defaults shown.</caption>
+	<thead>
+		<tr><th>Key</th><th>Default</th><th>Effect</th></tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>data_dir</code></td>
+			<td><code>data</code></td>
+			<td>
+				Directory of files the home page offers. A relative path is resolved
+				against the application home, not the process working directory.
+			</td>
+		</tr>
+		<tr>
+			<td><code>model_dir</code></td>
+			<td><code>.bi</code></td>
+			<td>
+				Where saved canvases, calculated fields, groups, date patterns and
+				geocoded places live. It may be absolute, but it may not be equal to
+				or inside <code>data_dir</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>uploads_dir</code></td>
+			<td><code>.uploads</code></td>
+			<td>
+				Staging directory for files dropped on the page. Point it somewhere
+				writable if the application directory is read-only.
+			</td>
+		</tr>
+		<tr>
+			<td><code>language</code></td>
+			<td><code>en</code></td>
+			<td>
+				Template language. Adding one means adding
+				<code>templates/web/&lt;lang&gt;/</code>, not just changing the key.
+			</td>
+		</tr>
+		<tr>
+			<td><code>page_cache_dir</code></td>
+			<td>unset</td>
+			<td>
+				Keeps <code>/catalog</code> and <code>/tutorial</code> on disc. Data
+				pages are never cached, because the files behind them change.
+			</td>
+		</tr>
+		<tr>
+			<td><code>ai_api_key</code></td>
+			<td>unset</td>
+			<td>
+				Enables the natural-language question and summary endpoints. Off
+				unless you set it; prompts carry column names and aggregate text only.
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<h2>Serving your own D3 and Leaflet</h2>
+<p>
+	Chart pages load D3 from a CDN and map pages load Leaflet from unpkg by default.
+	A deployment with no outbound network access, or one that prefers its own
+	assets, points the keys at local copies under <code>public/</code>:
+</p>
+<pre><code>{
+    d3_url                 => '/static/d3/d3.min.js',
+    leaflet_js_url         => '/static/leaflet/leaflet.js',
+    leaflet_css_url        => '/static/leaflet/leaflet.css',
+    leaflet_cluster_js_url => '/static/leaflet/leaflet.markercluster.js',
+    tile_url               => 'https://tiles.internal/{z}/{x}/{y}.png',
+}</code></pre>
+<p>
+	That is <code>public/static/d3/d3.min.js</code> and so on. The versions to copy
+	are the ones the defaults name: D3 7.9.0, Leaflet 1.9.4 and
+	leaflet.markercluster 1.5.3. With <code>tile_url</code> set, every request
+	needed to draw a map can stay on the local network.
+</p>
+
+<h2>Command-line tools</h2>
+
+<h3><code>script/bi-geocode</code></h3>
+<p>
+	Warms the shared geocode cache for one column, so later map requests make no
+	lookups:
+</p>
+<pre><code>./script/bi-geocode --spec table:customers --col city \
+                    [--data-dir DIR] [--model-dir DIR] \
+                    [--openaddr PATH] [--region CC] [--dry-run] [--verbose]</code></pre>
+<p>
+	It is idempotent: a second run against a warm cache resolves nothing and says
+	so. Exit status is 0 on success, 1 when the column is missing or no rows load,
+	and 2 on bad arguments or an unopenable source.
+</p>
+
+<h3 id="bi-extract"><code>script/bi-extract</code></h3>
+<p>
+	Accelerates a large file: builds a SQLite copy of it, an extract, which the
+	pages read for as long as the file is unchanged. Once the file changes, the
+	file itself is read and the table page says the extract is stale.
+</p>
+<pre><code>./script/bi-extract --spec table:sales [--spec ...]   # accelerate, and build
+./script/bi-extract --all                             # rebuild every one
+./script/bi-extract --remove --spec table:sales       # stop, and remove its extract
+./script/bi-extract --list
+                    [--data-dir DIR] [--model-dir DIR]</code></pre>
+<p>
+	Extracts live in <code>&lt;model_dir&gt;/extracts/</code>, never under
+	<code>data_dir</code>, and deleting that directory loses nothing. Exit status
+	is 0 on success, 1 when an extract could not be built, and 2 on bad
+	arguments. Run <code>--all</code> from cron after the files are refreshed.
+</p>
+
+<h3><code>script/bi-alert</code></h3>
+<p>
+	Reports saved analyses and turns a crossed threshold into a non-zero exit
+	status, so cron can act on it:
+</p>
+<pre><code>./script/bi-alert --analysis ID [--analysis ID ...] \
+                  [--threshold MEASURE:OP:VALUE] \
+                  [--suppress 1h] [--recovery] \
+                  [--notify-cmd 'mail -s "$BI_ALERT_SUBJECT" oncall@example.com']</code></pre>
+<p>
+	Exit status is 0 when nothing is announced, 1 when a threshold is crossed and
+	announced, 2 on error, and 3 when a crossing that was announced has ended and
+	<code>--recovery</code> asked for that to be announced. <code>--suppress</code>
+	takes a duration and stops a condition that is still true from being reported
+	as news again; the throttle is one small JSON file in the model directory.
+	The digest goes to standard output and nothing leaves the machine unless
+	<code>--notify-cmd</code> says where.
+</p>
+
+<h2>Staying up to date</h2>
+<p>
+	The distribution ships a test suite that covers the routes, the pipeline, the
+	renderer invariants and the templates; run it before upgrading:
+</p>
+<pre><code>prove -l t/</code></pre>
+<p>
+	The release notes in <code>Changes</code> list every behaviour change, and the
+	test dashboard is published at
+	<a href="https://nigelhorne.github.io/Database-BI/coverage/">nigelhorne.github.io/Database-BI/coverage</a>.
+</p>
+
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>Database::BI by Nigel Horne. Released under the GPL2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/Database-BI">MetaCPAN</a> &middot;
+			<a href="https://github.com/nigelhorne/Database-BI">GitHub</a>
+		</p>
+	</div>
+</footer>
+
+</body>
+</html>

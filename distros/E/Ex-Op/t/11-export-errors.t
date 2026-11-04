@@ -49,7 +49,7 @@ sub use_err {
 
 {
     my $e = imp('EO::Basic', fresh(), 'nope');
-    like( $e, qr/^"nope" is not exported by the EO::Basic module\nCan't continue after import errors at \(eval \d+\) line 1\.\n\z/,
+    like( $e, qr/^"nope" is not exported by the EO::Basic module\nCan't continue after import errors at \(eval \d+\)(?:\[[^\]]*\])? line 1\.\n\z/,
           'a run-time import croaks at its caller' );
 }
 

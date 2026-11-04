@@ -39,7 +39,7 @@ sub norm {
     return undef unless defined $s;
     $s =~ s/\Q$from\E\b/PKG/g;
     $s =~ s/\Q$to\E\b/TGT/g;
-    $s =~ s/ at (?:\(eval \d+\)|\S+) line \d+\.?\n?/ at FILE line N.\n/g;
+    $s =~ s/ at (?:\(eval \d+\)(?:\[[^\]]*\])?|\S+) line \d+\.?\n?/ at FILE line N.\n/g;
     my @lines = split /\n/, $s;
     s/^\s+(?=")// for @lines;
     my @bad = sort grep { /is not (?:exported|implemented)/ } @lines;

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.20';
+$Finance::Tiller2QIF::VERSION = '1.21';
 use 5.036;
 use strict;
 use warnings;
@@ -293,6 +293,8 @@ a revert option (press C<r>) to restore the database to its checkpoint state,
 useful if you want to undo changes made during ingest or mapping.
 
 =item B<--viewer> A program to display preview output instead of the default, C<console>. The command may include arguments if given as a quoted string, for example C<less>, C<gedit>, or C<"code --wait">. The preview is written to a read-only temporary file named C<tiller2qif-preview-*.t2qpv>, the command is run with that file's path appended.
+
+On Windows, the command runs through C<cmd.exe>. Use double quotes around program paths containing spaces. Preview, mapping and SQL file arguments are quoted for Windows automatically.
 
 =item B<--multipreview> Opens the mapping file in the preview along with the preview , so you can read the pending transactions and edit the rules that produced them side by side. Both files are passed to a single invocation of the viewer. This requires C<--viewer> and C<--mapfile>.
 

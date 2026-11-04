@@ -429,4 +429,29 @@ subtest 'The tutorial keeps its sentences short' => sub {
 	}
 };
 
+subtest 'a link in an answer sits on its own words, which stay in the answer' => sub {
+	my @linked = grep { $_->{link} } @$faq;
+	ok(scalar @linked, 'at least one answer has a link');
+
+	my $dom = $t->get_ok('/tutorial')->status_is(200)->tx->res->dom;
+	my @answers = $dom->find('#questions dd')->each;
+	for my $i (grep { $faq->[$_]{link} } 0 .. $#$faq) {
+		my $item = $faq->[$i];
+		my $name = $item->{question};
+		my @found = $item->{answer} =~ /\Q$item->{link}{text}\E/g;
+		is(scalar @found, 1, "$name: the linked words occur once in the answer");
+		like($item->{link}{href}, qr{\Ahttps://}, "$name: the link leaves the application, so it is absolute");
+
+		my $a = $answers[$i]->at('a');
+		is($a->text, $item->{link}{text}, "$name: the link is on those words");
+		is($a->{href}, $item->{link}{href}, "$name: and goes where it says");
+		is($a->{target}, '_blank', "$name: in a new tab, as other links from here do");
+		is($a->{rel}, 'noopener', "$name: which cannot reach back into this page");
+		is($answers[$i]->all_text, $item->{answer}, "$name: the answer reads the same");
+	}
+
+	like($faq->[ (grep { $faq->[$_]{question} =~ /MariaDB/ } 0 .. $#$faq)[0] ]{link}{href},
+		qr/#configuration\z/, 'the MariaDB answer leads to the configuration documentation');
+};
+
 done_testing();

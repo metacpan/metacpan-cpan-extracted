@@ -25,18 +25,18 @@ WriteMakefile(
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
-		'Database::Abstraction'	=> '0.51',	# 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
+		'Database::Abstraction'	=> '0.54',	# 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
 		'Database::Join' => '0.009.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'DBI'		=> 0,
 		'Net::SFTP::Foreign' => 0,
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
 		'File::Spec'	=> '3.40',
-		'File::Temp'	=> '0.22',
+		'File::Temp'	=> '0.2308',	# Before this, on a BSD, a new temporary file was held under an exclusive lock, so Database::Join's SQLite spill hung and failed with "database is locked"
 		'List::Util'	=> '1.40',
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
 		'Mojo::Base' => 0,
 		'Mojo::JSON' => 0,
-		'HTML::D3' => '0.23',	# 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
+		'HTML::D3' => '0.27',	# 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TagCloud' => '0.38',	# word cloud page (/wordcloud)
 		'HTML::TableExtract'	=> 0,
 		'HTTP::Request'			=> 0,		# Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
@@ -58,7 +58,7 @@ WriteMakefile(
 		'POSIX'			=> 0,		# For floor/ceil in Calc.pm (core module, listed for completeness)
 		'Spreadsheet::ParseXLSX'	=> 0,
 		'Sub::Protected' => 0.03,
-		'Text::CSV'	=> 0,		# script/bi-alert's fallback reader when Database::Abstraction cannot open the file
+		'Text::CSV'	=> 0,		# Files with no header row; script/bi-alert's fallback reader when Database::Abstraction cannot open the file
 		'version'        => '0.77',
 	}, TEST_REQUIRES => {
 		'DBD::CSV' => 0,
@@ -100,12 +100,16 @@ WriteMakefile(
 					# $MIN_GEOCODER_VERSION and in the messages that quote it;
 					# t/recommended-versions.t holds all three to this entry.
 					'Geo::Coder::Free' => '0.48',
+					# The mariadb: data source, looked for when a server is opened.
+					# DBD::mysql serves in its place.
+					'DBD::MariaDB' => 0,
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
 					'HTML::OSM' => '0.12'
 				}
 			}, test => {
 				recommends => {
+					'DBD::MariaDB' => 0,
 					'Redis' => 0
 				}
 			}

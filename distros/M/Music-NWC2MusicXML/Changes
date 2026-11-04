@@ -1,5 +1,29 @@
 Revision history for Music-NWC2MusicXML
 
+0.002.4	Tue Nov  3 04:12:32 PM EST 2026
+	[ Bug Fixes ]
+	- MusicXML: DynVariance events (Style:Crescendo / Style:Diminuendo) were
+	  incorrectly emitted as hairpin wedge elements (<wedge type="crescendo"/
+	  <wedge type="diminuendo"/>).  DynVariance records represent written text
+	  markings ("cresc.", "dim.") not hairpins; hairpins come from
+	  Opts:Crescendo/Opts:Diminuendo on individual notes.  DynVariance is now
+	  emitted as <words font-style="italic">cresc.</words> or
+	  <words font-style="italic">dim.</words>.  Style:crescOff now correctly
+	  emits nothing (no stop element needed for a text marking).
+	- Parser: Text events with a Pos field but no Placement field defaulted to
+	  placement="below" regardless of vertical position.  Placement is now
+	  inferred from the sign of Pos: Pos >= 0 gives above, Pos < 0 gives below.
+	  This fixes text directions such as "Slightly faster" (Pos:7) appearing
+	  below the stave instead of above it.
+	- Parser: StaffProperties EndingBar values such as "Section Close" were
+	  stored verbatim with spaces, but _emit_measure compared against the
+	  no-space forms ("SectionClose").  The mismatch caused the ending barline
+	  to be silently dropped.  EndingBar values are now normalised (spaces
+	  stripped) on ingestion.  Additionally, a second StaffProperties record
+	  (carrying channel/volume data) was clobbering the EndingBar already
+	  parsed from the first record; _ending_bar is now only updated when the
+	  field is present in the record.
+
 0.002.3	Mon Nov  2 02:09:55 PM EST 2026
 	[ Bug Fixes ]
 	- Parser/MusicXML: Tempo records with an optional Text field (e.g.

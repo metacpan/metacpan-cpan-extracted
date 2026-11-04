@@ -40,6 +40,7 @@ lib/App/DBBrowser/Table/Extensions/Case.pm
 lib/App/DBBrowser/Table/Extensions/ColAliases.pm
 lib/App/DBBrowser/Table/Extensions/Columns.pm
 lib/App/DBBrowser/Table/Extensions/Maths.pm
+lib/App/DBBrowser/Table/Extensions/RearrangeColumns.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions/Date.pm
 lib/App/DBBrowser/Table/Extensions/ScalarFunctions/GetArguments.pm

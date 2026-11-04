@@ -1,8 +1,8 @@
-package BioX::Tax::Kraken 0.002001;
+package BioX::Tax::Kraken 0.002002;
 
 use strict;
 use warnings;
-use 5.016;
+use 5.024;
 use autodie;
 
 use IPC::Cmd qw/can_run/;
@@ -77,10 +77,10 @@ sub children {
     return @{ $self->{_c_children}->{$tid} }
         if (defined $self->{_c_children}->{$tid});
     my @all = split "\0", $self->{tax}->{$tid};
-    return () if ($#all < 3);
-    my @c = $#all < 3
+    return () if ($#all < CHILDREN);
+    my @c = $#all < CHILDREN
         ? ()
-        : @all[3..$#all];
+        : grep {length $_} @all[CHILDREN .. $#all];
     $self->{_c_children}->{$tid} = \@c;
     return @c;
 

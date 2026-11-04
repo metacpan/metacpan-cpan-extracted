@@ -3310,7 +3310,7 @@ my $coll_data = {
 
 my $lm_coll = lm(formula => 'y ~ x1 + x2', data => $coll_data);
 
-# Ensure one of them was properly targeted and aliased by the sweep operator
+# Ensure one of them was properly targeted and aliased by the rank test
 my $x1_is_nan = (!defined $lm_coll->{coefficients}{x1} || $lm_coll->{coefficients}{x1} =~ m/nan/i);
 my $x2_is_nan = (!defined $lm_coll->{coefficients}{x2} || $lm_coll->{coefficients}{x2} =~ m/nan/i);
 

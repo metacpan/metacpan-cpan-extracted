@@ -11,23 +11,23 @@
     line-height: 2.1;
     padding: 1.5rem 1rem;
   }
-  #wordcloud #htmltagcloud a { color: #2c3e7a; text-decoration: none; }
+  #wordcloud #htmltagcloud a { color: var(--accent-text, #2c3e7a); text-decoration: none; }
   #wordcloud #htmltagcloud a:hover,
   #wordcloud #htmltagcloud a:focus-visible { text-decoration: underline; }
-  .wordcloud-help { color: #666; font-size: 0.9rem; }
+  .wordcloud-help { color: var(--muted, #666); font-size: 0.9rem; }
   .wordcloud-counts { margin: 1.5rem 0; }
-  .wordcloud-counts summary { cursor: pointer; color: #2c3e7a; }
+  .wordcloud-counts summary { cursor: pointer; color: var(--accent-text, #2c3e7a); }
   .wordcloud-counts table { border-collapse: collapse; margin-top: 0.5rem; }
   .wordcloud-counts th, .wordcloud-counts td {
     text-align: left;
     padding: 0.2rem 0.9rem 0.2rem 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border, #eee);
   }
-  .wordcloud-empty { color: #666; }
+  .wordcloud-empty { color: var(--muted, #666); }
   .chart-source {
     margin: 0.25rem 0 0;
     font-size: 0.82rem;
-    color: #666;
+    color: var(--muted, #666);
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
