@@ -13,7 +13,7 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-use version; our $VERSION = version->declare('0.019.0');
+use version; our $VERSION = version->declare('0.020.0');
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -40,7 +40,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.019.0
+0.020.0
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,9 @@ the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: C<eq>,
 C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<empty>,
-C<notempty>.  Filters are applied server-side after all joins.  C<lt>, C<le>,
+C<notempty>; and C<in>, which a link can carry but the bar does not offer: any
+value of a JSON list, as in C<f=place:in:["Paris","Rome"]>.  Filters are
+applied server-side after all joins.  C<lt>, C<le>,
 C<gt> and C<ge> compare numbers, reading C<$1,234.56> and C<(1,234.56)> as
 numbers too; a blank or a word in the cell matches none of them.
 
@@ -123,10 +125,14 @@ as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons
 =item *
 
 B<Maps> -- C<GET /map> plots the filtered view on an OpenStreetMap map, either
-from latitude and longitude columns or from a place column geocoded locally
-with L<Geo::Coder::Free> (one lookup per distinct place, remembered in the
-model store and shared by every dataset that names it).  Rows sharing a
-position become one marker.
+from latitude and longitude columns or from a place column geocoded by a
+L<Geo::Coder::List> chain: L<Geo::Coder::Free>'s local data first, then
+OpenStreetMap's Nominatim service (L<Geo::Coder::OSM>, at most one request a
+second) for the places the local data does not know.  Nominatim is asked over
+https, and what it finds is also kept for a month in
+C<E<lt>model_dirE<gt>/geocode-cache/>.  Each distinct place is
+looked up once, remembered in the model store and shared by every dataset that
+names it.  Rows sharing a position become one marker.
 
 =item *
 
@@ -186,7 +192,9 @@ to remove the card.  B<Add current view> in the toolbar appends another
 table, chart or map without leaving the canvas, and a status region announces
 the card and the new visual count; when the card's script has drawn it, the
 region says the chart or map has finished drawing, and if D3 or Leaflet could
-not be loaded it names the missing library instead.  A card that shows an
+not be loaded it names the missing library instead.  A scatter card can be
+coloured by a column and its bubbles sized by a number there, with the same
+choices as the scatter page.  A card that shows an
 aggregated value picks its own function in that panel, from the vocabulary the
 pivot uses and with the same names: Sum, Average, Min, Max, Count distinct,
 Median, Std dev, First, Last, Range or a Percentile with its level, so a card
@@ -565,7 +573,10 @@ D3.js v7 scatter/bubble plot.  Parameters:
   y=<col>       Y-axis column (required; numeric)
   series=<col>  categorical colour dimension (optional)
   size=<col>    numeric bubble-radius dimension (optional)
-  scheme=<name> colour scheme when series= is set (optional)
+  scheme=<name> colour scheme when series= is set: tableau10 (default),
+                category10, set2, set3 or paired; any other is a 400
+  min_r=N       smallest bubble radius in px with size= (1-40, default 3)
+  max_r=N       largest bubble radius in px with size= (1-40, default 15)
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=            result filters (repeatable)
 
@@ -589,6 +600,9 @@ D3.js v7 combo bar+line chart.  Parameters:
   cat=<col>      X-axis categories (required; x= is a backwards-compatible alias)
   bar_val=<col>  bar measure column (required)
   line_val=<col> line measure column (required)
+  scheme=<name>  bar and line colours: the first two of tableau10,
+                 category10, set2, set3 or paired (optional; steel blue and
+                 red without it, and for any other name)
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=             result filters (repeatable)
 
@@ -598,9 +612,16 @@ D3.js v7 treemap.  Parameters:
 
   l=<spec>      left table (required)
   group=<col>   tile label column (required; cat= is a backwards-compatible alias)
-  size=<col>    tile area column (required; val= is a backwards-compatible alias)
+  size=<col>    tile area column, summed (optional, counting rows without it;
+                val= is a backwards-compatible alias)
   topn=N        keep only the top-N tiles; remainder merged into "Other"
   scheme=<name> colour scheme (optional)
+  color=<col>   shade each tile by this column instead (optional), folded
+                over the tile's rows; "Other" is folded over the rows it holds
+  color_agg=F   how color= is folded: avg (default), sum, min, max, median or
+                any other aggregate function; an unknown one is a 400
+  color_scheme=S  scale for color=: YlOrRd (default), Blues, Greens, Purples,
+                RdPu or YlGnBu; any other name is YlOrRd
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=            result filters (repeatable)
 
@@ -611,6 +632,9 @@ D3.js v7 histogram with server-side binning.  Parameters:
   l=<spec>   left table (required)
   col=<col>  numeric column to bin (required)
   bins=N     bin count (default 10; clamped to range 1--200)
+  scheme=S   bar colour: the first colour of tableau10, category10, set2,
+             set3 or paired (optional; steelblue without it, and for any
+             other name)
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=         result filters (repeatable)
 
@@ -643,15 +667,34 @@ OpenStreetMap map of the filtered view, drawn with HTML::OSM.  A row's position
 comes from a location column that is geocoded (C<loc=>, one lookup per distinct
 value, remembered once in the model store and shared with every dataset that
 names it) or from coordinate columns (C<lat=> and C<lon=>).  Rows sharing a
-position become one marker.  Markers are clustered with
+position become one marker.  When some rows cannot be plotted, the note that
+says so counts them by reason (empty, not a place name, not found, or not looked
+up yet), links to all of them in the table, and opens onto a list of their
+places, each with its number of rows, why it was not plotted and a link to
+those rows.  Markers are clustered with
 Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
-as it is zoomed in.  Clustering is always on.  Parameters:
+as it is zoomed in.  Clustering is always on.  The map has a scale bar, opens
+on every marker unless C<zoom=> is given, and draws its key (colours, and
+bubble sizes) on the map; the colours listed are those of the markers in view,
+so the key changes as the map is zoomed and moved.
+
+Places that are not in the cache yet are looked up after the page is shown.
+The map draws what the cache already knows, and a progress bar names each
+place as it is looked up ("Looking up 5 of 10: 10 Downing St, London").  Each
+answer is saved at once, through C<POST /geo/lookup>, and the map is drawn
+again when the last one is in.  Cancel stops the lookups and draws the map with
+the places found so far.  The places left are listed as not looked up yet, with
+a link to look them up.  Without JavaScript, or for a client that is not a
+browser, the page waits for the lookups instead (C<geocode=wait>).  Parameters:
 
   l=<spec>       left table (required)
-  loc=<col>      column of places to geocode (required unless lat= and lon= are)
+  loc=<col>      column of places to geocode (required unless lat= and lon= are);
+                 repeat it for a place written across columns, which are joined
+                 with ", " in that order (loc=Address&loc=Country)
   lat=<col>      latitude column, -90..90
   lon=<col>      longitude column, -180..180
-  popup=<col>    column shown in the marker popup (repeatable)
+  popup=<col>    column shown in the marker popup (repeatable; default every
+                 column but the place or coordinates)
   max=N          markers to draw (default map_max_markers, 2000)
   zoom=N         initial zoom 0..19 (default: fit the markers)
   max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
@@ -664,14 +707,27 @@ as it is zoomed in.  Clustering is always on.  Parameters:
   color_default=<colour>  fallback colour (default #3388ff)
   series=<col>   colour markers by category (not with color=)
   scheme=<name>  palette for series=: tableau10, category10, set2, set3, paired
+  geocode=wait   look up the places not cached yet before the page is sent
+                 (the default for a client that is not a browser)
+  geocode=cached look nothing up: plot what the cache knows (where Cancel leads)
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=            result filters (repeatable)
+
+A marker stands for every row at its place, and its popup lists them all: a
+value every row shares is shown once ("Person: Valentin Puntar"), and the
+columns that differ are a small table, one line a row.  The table shows at most
+C<map_popup_rows> rows (default 10) in a box that scrolls, so a busy place does
+not cover the map; the rest are counted, with a link to them in the table the
+map came from.
 
 An unknown C<tiles=> or C<scheme=> is a 400, as is an unknown column, C<color=>
 together with C<series=>, or a transposed lat/lon pair.  The page never shows
 the L<HTML::OSM> Nominatim search box (C<search =E<gt> 0> is always passed), so
-nothing typed on the map is sent anywhere.  L<HTML::OSM> 0.12 or later is the
-renderer; an older optional install still returns the page with a warning.
+nothing typed on the map is sent anywhere.  With C<loc=>, a place the local
+data does not know is sent to Nominatim, as the place name alone; set
+C<map_geocode_online> to 0 to keep every lookup local.  L<HTML::OSM> 0.13 or
+later is the renderer; an older optional install still returns the page with a
+warning.
 
 =item C<GET /line>
 
@@ -739,7 +795,17 @@ and C<plain>.  The text is shown as plain text, never as markup.  A map's C<enco
 to geocode) or C<lat> and C<lon>.  A C<wordcloud> card's C<encode> names the
 text column to read in C<col>, and its C<options> take the same C<topn>,
 C<minlen> and C<stop> the C<GET /wordcloud> page takes, so the two count and
-rank words with one function.  The optional C<query> is the canvas page's
+rank words with one function.  A C<scatter> card's C<encode> names C<x>
+and C<y>, and optionally C<series> (colour by value) and C<size> (bubble size); its
+C<options> take C<scheme>, C<min_r> and C<max_r> as C<GET /scatter> does,
+except that an unknown C<scheme> draws the default colours.  A C<line>
+or C<graph> card's C<encode> takes an optional C<series>, one line per value.
+A C<histogram> card's C<options> take C<bins> and C<scheme> as C<GET /histogram>
+does.  A C<treemap> card's C<encode> takes an optional C<color>, with
+C<options> C<color_agg> and C<color_scheme> as C<GET /treemap>'s C<color=>,
+C<color_agg=> and C<color_scheme=>; an unknown function is the card's error.
+A C<combo> card's C<options> take C<scheme> as C<GET /combo> does.
+The optional C<query> is the canvas page's
 query string: C<cf> (cross-filter), C<c> (calculated columns) and
 C<p.E<lt>nameE<gt>> (bound parameter values) are read from it, so a card added
 while the canvas is filtered or parameterised is drawn through the same state
@@ -922,6 +988,16 @@ C<replace=1> forgets the spec's saved columns first.  The map panel's
 Removes a coordinate-column preference.  Body: C<l=&col=>.
 Omit C<col=> to clear all preferences for the spec.
 
+=item C<POST /geo/lookup>
+
+Looks up one place for the map page's progress bar, and saves the answer in
+the shared place cache at once.  Body: C<place=&sig=>, where C<sig> is the
+signature the map page gave the place (any other place is refused with 403),
+plus C<online=0> to keep the lookup on this machine.  Returns
+C<{ place, status, stored, online_failed, messages }>, where C<status> is
+C<found>, C<not_found>, C<held> (not looked up now, and not remembered) or
+C<refused>.  See L</Maps>.
+
 =item C<GET /insights>
 
 Automatic statistical insights for a dataset.  Runs the same pipeline as
@@ -1040,7 +1116,8 @@ The aggregating routes bucket the dimension they already take:
     GET /graph?l=table:sales&x=at&y=amount&span=1h&agg=sum&series=region
 
 The chart and pivot panels carry a C<Time bucket> menu for it, and the line
-graph panel an C<Aggregate> menu beside it.
+graph panel an C<Aggregate> menu beside it and a C<Lines by> menu, which
+sends C<series=>.
 
 C<span=> takes a count and one of C<s>, C<m>, C<h>, C<d>, C<w>, C<mon>, C<q>
 or C<y> -- C<15m>, C<6h>, C<2d>, C<3mon>, C<1q> -- and is refused, naming the
@@ -1281,14 +1358,21 @@ C</>, or a full URL; a path without the leading slash is relative to the page.  
 ones the defaults name: D3 7.9.0, Leaflet 1.9.4, and leaflet.markercluster 1.5.3.
 C<tile_url> points the map layer at a self-hosted tile server instead of
 OpenStreetMap.  It keeps Leaflet's C<{z}>, C<{x}> and C<{y}> placeholders, and
-C<{s}> too if the server uses subdomains.  Set it and every request needed to
-draw a map can stay on the local network.  The OpenStreetMap attribution stays
+C<{s}> too if the server uses subdomains.  Set it, and C<map_geocode_online>
+to 0, and every request needed to draw a map can stay on the local network.  The OpenStreetMap attribution stays
 on the map, since it is the usual credit for OSM-derived tiles.  There is no
 in-page place search: L<HTML::OSM> is always constructed with C<search =E<gt> 0>,
 so nothing typed on a map page is sent anywhere.
 
 Map-specific config keys: C<map_geocode_max> (new geocoder lookups per request,
-default 500), C<map_max_markers> (markers per request, default 2000),
+default 500), C<map_geocode_online> (0 keeps geocoding on this machine: a place
+the local data does not know is not sent to OpenStreetMap's Nominatim; default
+1), C<map_geocode_online_max> (places asked of Nominatim per request, default 20;
+at one a second, the rest are left for the next request or for
+C<script/bi-geocode>; the map page's progress bar asks one place a request, so
+it reaches every place), C<secrets> (a list; the first signs the places a map
+page lists for C<POST /geo/lookup>.  Without it each start makes a random one), C<map_max_markers> (markers per request, default 2000), C<map_popup_rows>
+(rows listed in one marker's popup, default 10),
 C<map_region> (a two-letter country hint for ambiguous places), C<map_max_zoom>
 (the default tile-layer maxZoom) and C<tile_sources> (a hashref of named tile
 sources, each C<< { url =E<gt> ... } >>, selected with C<tiles=>).
@@ -1761,6 +1845,15 @@ sub startup ($self) {
 		}
 	});
 
+	# The key the map page signs the places it lists with (/geo/lookup checks
+	# it).  Mojolicious would use the moniker, which anyone can read; a config
+	# secrets => [...] keeps lists valid across restarts, and without one each
+	# start makes its own.  This runs before hypnotoad forks, so every worker
+	# shares it.
+	my $secrets = $self->config('secrets');
+	$self->secrets((ref($secrets) eq 'ARRAY' && @{$secrets})
+		? $secrets : [ Mojo::Util::generate_secret() ]);
+
 	# Cap inbound request body size.  When the limit fires, Mojolicious sets
 	# req->is_limit_exceeded and still dispatches to the controller (with partial
 	# content in the upload asset).  The controller checks is_limit_exceeded and
@@ -2075,6 +2168,7 @@ sub startup ($self) {
 	$r->get('/extract/list')   ->to('Dashboard#extract_list');
 	$r->post('/geo/save')     ->to('Dashboard#geo_save');
 	$r->post('/geo/delete')   ->to('Dashboard#geo_delete');
+	$r->post('/geo/lookup')   ->to('Dashboard#geo_lookup');
 	$r->get('/geo/list')      ->to('Dashboard#geo_list');
 	$r->get('/scatter')       ->to('Dashboard#scatter_view');
 	$r->get('/stacked')       ->to('Dashboard#stacked_view');

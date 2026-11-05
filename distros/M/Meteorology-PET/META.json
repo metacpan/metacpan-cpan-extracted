@@ -1,0 +1,85 @@
+{
+   "abstract" : "Perl packages to calculate potential evapotranspiration (PET)",
+   "author" : [
+      "Adam Allgood, NOAA/NWS/NCEP/Weather Prediction Center"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.3.2",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Meteorology-PET",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Minilla" : "0",
+            "Software::License" : "0",
+            "Software::License::CC0_1_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "PDL" : "0"
+         },
+         "requires" : {
+            "Array::Compare" : "== v3.0.8",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::Open3" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Meteorology::PET" : {
+         "file" : "lib/Meteorology/PET.pm",
+         "version" : "0.01"
+      },
+      "Meteorology::PET::Thornthwaite" : {
+         "file" : "lib/Meteorology/PET/Thornthwaite.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab-community.vlab.noaa.gov/NWS/Operations/NCEP/WPC/EPD/perl-meteorology-pet.git"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Adam Allgood <adam.allgood@noaa.gov>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

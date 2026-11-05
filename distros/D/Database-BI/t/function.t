@@ -666,6 +666,32 @@ subtest '_apply_filter_spec -- eq operator (case-insensitive)' => sub {
 	is scalar(@$out2), 1, 'eq is case-insensitive';
 };
 
+subtest '_apply_filter_spec -- in operator (a JSON list, matched as eq is)' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
+	my $records = [
+		{ id => 1, place => 'Paris' },
+		{ id => 2, place => 'Rome' },
+		{ id => 3, place => '' },
+		{ id => 4 },
+		{ id => 5, place => '12345' },
+		{ id => 6, place => 'Rome, Italy' },
+	];
+	my $ids = sub { [ map { $_->{id} } @{ $fn->($records, $_[0]) } ] };
+
+	is_deeply $ids->('place:in:["paris","ROME"]'), [1, 2], 'any value of the list, case-insensitive, whole cells only';
+	is_deeply $ids->('place:in:[""]'), [3, 4], 'an empty string is the empty cell, and a missing one';
+	is_deeply $ids->('place:in:[null]'), [3, 4], 'and so is null';
+	is_deeply $ids->('place:in:[12345]'), [5], 'a number in the list is its text';
+	is_deeply $ids->('place:in:["Rome, Italy"]'), [6], 'a value may hold a comma';
+	is_deeply $ids->('place:in:[]'), [], 'an empty list matches nothing';
+	is_deeply $ids->('place:in:Paris'), [], 'a value that is not JSON matches nothing, rather than everything';
+	is_deeply $ids->('place:in:{"a":"Paris"}'), [], 'nor does JSON that is not a list';
+	is_deeply $ids->('place:in:[["Paris"]]'), [], 'and a list inside the list is not a value';
+	is_deeply $ids->("place:in:[\"\\u00c9vian\"]"), [], 'a value outside ASCII is read as characters';
+	my $accented = $fn->([ { place => "\x{c9}vian" } ], "place:in:[\"\x{e9}vian\"]");
+	is scalar(@$accented), 1, 'and matched case-insensitively';
+};
+
 subtest '_apply_filter_spec -- ne operator' => sub {
 	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
 	my $records = [
@@ -3326,13 +3352,13 @@ subtest 'treemap_view -- missing group= returns 400' => sub {
 		'missing group= yields 400');
 };
 
-subtest 'treemap_view -- ?color= returns 400 (not yet implemented)' => sub {
+subtest 'treemap_view -- ?color= naming no column returns 400' => sub {
 	SKIP: {
 		skip 'data/sales.csv not found', 2 unless -f 'data/sales.csv';
-		$t->get_ok("/treemap?l=$SALES_SPEC&group=region&color=amount")
+		$t->get_ok("/treemap?l=$SALES_SPEC&group=region&color=no_such_col")
 		  ->status_is(400)
-		  ->content_like(qr/color.*not.*supported|not.*supported.*color/i,
-			'?color= parameter yields 400 (use ?scheme= instead)');
+		  ->content_like(qr/Column not found/i,
+			'?color= naming no column yields 400');
 	}
 };
 
@@ -7346,6 +7372,10 @@ sub croak_rethrow {
 		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('<b>:eq:x'))), '', 'markup in a column is not repeated';
 		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('a:eq:<b>'))), '', 'nor in a value';
 		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape(('x' x 65) . ':eq:y'))), '', 'nor a value too long to be a label';
+		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('place:in:["<b>","Rome"]'))), ' (place is one of 2 values)',
+			'a list is counted, never repeated';
+		is $F{_crumb_view_suffix}->($q->('f=' . Mojo::Util::url_escape('place:in:nonsense'))), ' (place is one of 0 values)',
+			'and a list that is not one counts nothing';
 	};
 
 	subtest 'Dashboard::_crumb_chart_subject' => sub {
@@ -7869,8 +7899,13 @@ sub croak_rethrow {
 		symlink('real/deep', $base->child('rel')->to_string);           # relative
 		symlink('../rel', $base->child('real', 'up')->to_string);        # .. in the target
 		symlink('abs', $base->child('chain')->to_string);                # a link to a link
-		# The NT form some Windows perls' readlink gives; here just a name.
-		symlink('\\??\\' . $base->child('real')->to_string, $base->child('nt')->to_string);
+		# The NT form some Windows perls' readlink gives; here just a name.  Cygwin
+		# reads a target holding backslashes as a Windows path when the link is
+		# made, and readlink then answers that path, not this text: the case is
+		# only tried where the link holds the text it was given.
+		my $nt_target = '\\??\\' . $base->child('real')->to_string;
+		symlink($nt_target, $base->child('nt')->to_string);
+		my $nt_literal = (readlink($base->child('nt')->to_string) // '') eq $nt_target;
 		symlink('loop2', $base->child('loop1')->to_string);
 		symlink('loop1', $base->child('loop2')->to_string);
 
@@ -7887,8 +7922,10 @@ sub croak_rethrow {
 			'real/deep/../deep/f.csv' => 'real/deep/f.csv',
 			'real'                    => 'real',
 			'abs/not/yet'             => 'real/not/yet',
-			'nt/deep'                 => 'real/deep',
+			($nt_literal ? ('nt/deep' => 'real/deep') : ()),
 		);
+		note('the NT-form link is not tried: readlink does not give back its target as written')
+			unless $nt_literal;
 		for my $p (sort keys %where) {
 			my $got = $fn->($base->child(split m{/}, $p)->to_string);
 			is(defined $got ? File::Spec->canonpath($got) : undef,
@@ -8318,13 +8355,44 @@ sub croak_rethrow {
 	};
 
 	subtest 'Dashboard::_map_popup -- a place name is not markup' => sub {
-		is $F{_map_popup}->('Town', 1, []), '<strong>Town</strong>', 'one row';
-		is $F{_map_popup}->('Town', 3, []), '<strong>Town</strong><br>3 rows', 'several';
-		is $F{_map_popup}->(undef, 1, undef), '<strong></strong>', 'nothing';
-		is $F{_map_popup}->('T', 1, [ [ 'a', 'b' ], [ 'c', undef ], [ 'd', '' ] ]), '<strong>T</strong><br>a: b', 'empty extras are left out';
-		my $html = $F{_map_popup}->('<script>x</script>', 1, [ [ '<img>', q{"'&} ] ]);
+		is $F{_map_popup}->('Town', [ {} ], []), '<strong>Town</strong>', 'one row';
+		is $F{_map_popup}->('Town', [ {}, {}, {} ], []), '<strong>Town</strong><br>3 rows', 'several';
+		is $F{_map_popup}->(undef, undef, undef), '<strong></strong>', 'nothing';
+		is $F{_map_popup}->('T', [ { a => 'b', c => undef, d => '' } ], [ qw(a c d) ]), '<strong>T</strong><br>a: b', 'empty cells are left out';
+		my $html = $F{_map_popup}->('<script>x</script>', [ { '<img>' => q{"'&} } ], [ '<img>' ]);
 		unlike $html, qr/<script|<img/, 'markup is escaped everywhere';
 		like $html, qr/&lt;script&gt;/, 'and shown as text';
+	};
+
+	# A marker stands for every row at its place, so its popup lists them all:
+	# what they share once, what differs in a table that is capped and scrolls,
+	# so a place with hundreds of rows cannot cover the map.
+	subtest 'Dashboard::_map_popup -- every row at a place, without smothering the map' => sub {
+		my @rows = map { { person => 'Valentin', year => 1910 + $_, event => "E$_", note => '' } } 1 .. 3;
+		my $html = $F{_map_popup}->('Brezje', \@rows, [ qw(person year event note) ], 10, '');
+		like $html, qr{\A<strong>Brezje</strong><br>3 rows<br>person: Valentin<div class="bi-map-popup-rows"}, 'what every row shares is said once';
+		like $html, qr{<tr><th>year</th><th>event</th></tr>}, 'what differs is a table';
+		is scalar(() = $html =~ /<td>E\d<\/td>/g), 3, 'with a line for each row';
+		unlike $html, qr/note/, 'a column empty in every row is left out';
+		like $html, qr/max-height:[^;"]+;overflow:auto/, 'the box scrolls rather than growing';
+		unlike $html, qr/more/, 'nothing is left over';
+
+		my @many = map { { n => $_ } } 1 .. 25;
+		$html = $F{_map_popup}->('P', \@many, [ 'n' ], 4, '/open?path=x&f=a');
+		is scalar(() = $html =~ /<td>/g), 4, 'no more rows than the limit';
+		like $html, qr{and 21 more: <a href="/open\?path=x&amp;f=a">show all 25 in the table</a>}, 'the rest are counted and linked, the link escaped';
+		like $F{_map_popup}->('P', \@many, [ 'n' ], 4, undef), qr{and 21 more</div>\z}, 'without a link, only counted';
+		is scalar(() = $F{_map_popup}->('P', \@many, [ 'n' ], $_, '') =~ /<td>/g), 10, "a limit of '$_' is the default"
+			for ('', 0, -3, 'lots', undef);
+
+		$html = $F{_map_popup}->('P', [ { n => '<b>', x => [ 1 ] }, 'not a row', undef, { n => '&' } ], [ 'n', 'x', undef, [ 'y' ] ], 10, '');
+		like $html, qr{<td>&lt;b&gt;</td><td>&amp;</td>|<td>&lt;b&gt;</td></tr><tr><td>&amp;</td>}, 'cells are escaped';
+		like $html, qr/2 rows/, 'what is not a row is not counted';
+		unlike $html, qr/ARRAY/, 'and a cell that is a reference is empty, not its address';
+
+		$html = $F{_map_popup}->('Same', [ { a => 1 }, { a => 1 } ], [ 'a' ], 10, '/x');
+		is $html, '<strong>Same</strong><br>2 rows<br>a: 1', 'identical rows need no table';
+		keeps_globals_ok('_map_popup', sub { $F{_map_popup}->('P', \@many, [ 'n' ], 4, '') });
 	};
 
 	subtest 'Dashboard::_map_size_range, _map_radius, _map_limit' => sub {
@@ -8702,7 +8770,7 @@ sub croak_rethrow {
 		$tm->post_ok('/geo/save')->status_is(400)->json_is('/error', 'l= required');
 		$tm->post_ok('/geo/delete')->status_is(400)->json_is('/error', 'l= required');
 		$tm->post_ok("/geo/save?l=$SALES")->status_is(400)->json_is('/error', 'col= required');
-		$tm->post_ok("/geo/save?l=$SALES&col=region")->status_is(400)->json_is('/error', 'kind must be lat, lon, or location');
+		$tm->post_ok("/geo/save?l=$SALES&col=region")->status_is(400)->json_is('/error', 'kind must be lat, lon, location or location_suffix');
 		$tm->post_ok("/geo/save?l=$SALES&col=region&kind=evil")->status_is(400);
 
 		$tm->post_ok("/geo/save?l=$SALES&col=region&kind=location")->status_is(200);
@@ -9023,6 +9091,1815 @@ sub croak_rethrow {
 		is_deeply [ @echoed[ 0 .. ($#echoed < 4 ? $#echoed : 4) ] ], [], 'and markup is never sent back as markup';
 	};
 }
+
+
+# ============================================================================
+# PART U12: Database::BI::Calc -- the functions no earlier part reaches
+# ============================================================================
+{
+	# The limits and the words compile_pattern refuses with.  The messages are
+	# spelled out rather than read from the module, so that a changed message
+	# is a failure a reviewer sees, not a change that passes unnoticed.
+	Readonly my %CALC => (
+		max_pattern => 200,
+		max_capture => 200,
+		too_long    => qr/\APattern '[^']{40}\.\.\.' is longer than 200 characters/,
+		construct   => "Pattern '%s' uses %s, which is not allowed",
+		invalid     => qr/\APattern '\(' does not compile: Unmatched \( in regex/,
+	);
+	my $compile = \&Database::BI::Calc::compile_pattern;
+	my $capture = \&Database::BI::Calc::capture_of;
+	my $real    = \&Database::BI::Calc::_iso_date_if_real;
+
+	# Purpose: the pattern a reader types is the one thing in a calculated field
+	# that reaches the regex engine as code, so every guard must fire with its
+	# own words, and the summary of a good pattern must be exact: the groups and
+	# names become columns.
+	subtest 'Calc::compile_pattern -- the summary of a good pattern' => sub {
+		my $got = $compile->('(?<year>\d{4})-(\d\d)-(?P<day>\d\d)(?:x)?');
+		returns_is $got, { type => 'hashref' }, 'a hashref';
+		is ref($got->{re}), 'Regexp', 'with a compiled pattern';
+		is $got->{groups}, 3, 'counting capturing groups only, not (?:)';
+		is_deeply $got->{names}, [qw(year day)], 'names in the order written, Python spelling included';
+
+		is_deeply $compile->("(?'b'x)(?<a>y)")->{names}, [qw(b a)], 'the quoted spelling, and written order rather than sorted';
+		is_deeply $compile->('\(?<a>x\)')->{names}, [], 'an escaped paren declares nothing';
+
+		for my $empty (undef, '', [], {}) {
+			my $e = $compile->($empty);
+			is $e->{groups}, 0, 'a missing or non-string pattern is the empty one';
+			is_deeply $e->{names}, [], 'with no names';
+		}
+		is length('x' x $CALC{max_pattern}), $CALC{max_pattern}, 'the longest allowed';
+		lives_ok { $compile->('x' x $CALC{max_pattern}) } 'is accepted';
+		memory_cycle_ok $got, 'the summary holds no cycle';
+	};
+
+	# Purpose: (?{ }) and friends run Perl code inside the engine; a pattern from
+	# a stored model must never be able to do that, nor be too long to judge.
+	subtest 'Calc::compile_pattern -- hostile patterns are refused' => sub {
+		throws_ok { $compile->('x' x ($CALC{max_pattern} + 1)) } $CALC{too_long},
+			'one character over the limit, shown cut to 40';
+		for my $case ([ '(?{ 1 })', '(?{' ], [ 'a(??{ "b" })', '(??{' ], [ '(?p{1})', '(?p' ],
+				[ '(*FAIL)', '(*' ], [ 'a\\\\(?{1})', '(?{' ]) {
+			my ($pattern, $construct) = @{$case};
+			my $want = sprintf($CALC{construct}, $pattern, $construct);
+			throws_ok { $compile->($pattern) } qr/\A\Q$want\E/, "$pattern is refused by name";
+		}
+		lives_ok { $compile->('\\(?{') } 'an escaped paren is a literal, not code';
+		throws_ok { $compile->('(') } $CALC{invalid}, 'an unbalanced pattern says why';
+		throws_ok { $compile->('[z-a]') } qr/\APattern '\[z-a\]' does not compile: /, 'a bad range too';
+		eval { $compile->('(') };
+		my @lines = $@ =~ / line \d+/g;
+		is scalar(@lines), 1, 'the engine\'s own file and line are cut, so only croak\'s is left';
+	};
+
+	# Purpose: the caller's $@, $_ and match variables belong to the caller.
+	subtest 'Calc::compile_pattern -- leaves the caller alone' => sub {
+		local $@ = 'before';
+		$compile->('(a)(b)');
+		is $@, 'before', '$@ is kept on success';
+		'outer' =~ /(out)/;
+		$compile->('(?<x>y)');
+		is $1, 'out', 'the caller\'s $1 survives the empty match used to count groups';
+		keeps_globals_ok('compile_pattern', sub { $compile->('(a)') });
+	};
+
+	# Purpose: capture_of is what writes a stored extraction's cells, so a
+	# question it cannot answer must be undef (no such cell), never a wrong one.
+	subtest 'Calc::capture_of -- answers and refusals' => sub {
+		my $c = $compile->('(?<word>[a-z]+)(\d+)?(?<tail>!)?');
+		is $capture->($c, 'abc12', 1), 'abc', 'the first group by number';
+		is $capture->($c, 'abc12', 2), '12', 'the second';
+		is $capture->($c, 'abc12', 'word'), 'abc', 'a group by name';
+		is $capture->($c, 'abc', 2), '', 'a group that took no part is empty, not undef';
+		is $capture->($c, 'abc', 'tail'), '', 'by name as well';
+		is $capture->($c, '123', 1), undef, 'no match';
+		is $capture->($c, 'abc', 0), undef, 'group 0 is not a group';
+		is $capture->($c, 'abc', 4), undef, 'nor one past the last';
+		is $capture->($c, 'abc', 'nope'), undef, 'nor an unknown name';
+		is $capture->($c, 'abc', '-1'), undef, 'nor a negative number';
+		is $capture->($c, undef, 1), undef, 'an undefined cell';
+		is $capture->($c, [ 'abc' ], 1), undef, 'a reference is not a cell';
+		is $capture->($c, 'abc', undef), undef, 'no group asked for';
+		my $long = $compile->('(.*)');
+		is length($capture->($long, 'y' x ($CALC{max_capture} * 2), 1)), $CALC{max_capture},
+			'a long capture is cut to the limit';
+		returns_is $capture->($c, 'abc', 1), { type => 'string' }, 'a plain string';
+		keeps_globals_ok('capture_of', sub { $capture->($c, 'abc', 'word') });
+	};
+
+	# Purpose: a US-read UK date produces months up to 31; those must not become
+	# a date that sorts among real ones.
+	subtest 'Calc::_iso_date_if_real -- only dates that exist' => sub {
+		is $real->(2026, 1, 15), '2026-01-15', 'an ordinary date, zero-padded';
+		is $real->('2024', '2', '29'), '2024-02-29', 'a leap day in a leap year';
+		is $real->(2026, 2, 29), undef, 'not in a common year';
+		is $real->(2026, 13, 1), undef, 'month 13';
+		is $real->(2026, 15, 1), undef, 'a day read as a month';
+		is $real->(2026, 4, 31), undef, 'the 31st of a 30-day month';
+		is $real->(2026, 1, 0), undef, 'day zero';
+		{
+			local $! = 0;
+			$real->(2026, 1, 15);
+			is $! + 0, 0, 'errno is the caller\'s afterwards';
+		}
+	};
+}
+
+# ============================================================================
+# PART U13: Database::BI::Model::DataSource -- the functions no earlier part reaches
+# ============================================================================
+{
+	Readonly my %DSX => (
+		server   => 'mock',
+		table    => 'orders',
+		database => 'shop',
+		password => 'not-to-be-repeated',
+		dsn_re   => qr/\Adbi:(?:MariaDB|mysql):database=shop;host=localhost;(?:mariadb|mysql)_connect_timeout=\d+\z/,
+	);
+	my $ds = 'Database::BI::Model::DataSource';
+
+	# Stand-ins for a DBI handle and statement: enough for the three calls the
+	# module makes, with a record of what was asked, so a test can see that a
+	# handle is always disconnected, including on the way out of a failure.
+	{
+		package Stub::DBH;
+		sub new { my ($c, %a) = @_; return bless { %a, disconnected => 0 }, $c }
+		sub prepare {
+			my ($self, $sql) = @_;
+			die "Table '$self->{missing}' doesn't exist\n" if $self->{missing};
+			return Stub::STH->new(names => $self->{names});
+		}
+		sub primary_key { return @{ $_[0]{primary} // [] } }
+		sub selectall_arrayref {
+			my $self = shift;
+			die "SELECT command denied\n" if $self->{denied};
+			return $self->{rows};
+		}
+		sub disconnect { $_[0]{disconnected}++; return 1 }
+		package Stub::STH;
+		sub new { my ($c, %a) = @_; return bless { NAME => $a{names} }, $c }
+		sub execute { return 1 }
+	}
+
+	# Runs $code with DBI->connect answering $dbh (or failing when it is undef)
+	# and a driver present, so no server and no installed DBD are needed.
+	my $with_dbi = sub {
+		my ($dbh, $code) = @_;
+		require DBI;
+		local $INC{'DBD/MariaDB.pm'} = __FILE__;
+		my @calls;
+		Test::Mockingbird::mock('DBI::connect', sub { shift; push @calls, [ @_ ]; return $dbh });
+		my $ok  = eval { $code->(\@calls); 1 };
+		my $err = $@;
+		Test::Mockingbird::unmock('DBI::connect');
+		croak_rethrow($err) unless $ok;
+		return;
+	};
+
+	# Purpose: the settings come from configuration but end up in a DSN string,
+	# so each part is checked before it is spliced in; and nothing in an error
+	# may repeat the password.
+	subtest 'DataSource::_mariadb_connect -- the settings are checked first' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_mariadb_connect;
+		throws_ok { $fn->($DSX{server}, undef) }
+			qr/\ADataSource: no MariaDB server is called "mock"; add it to mariadb_servers/, 'no settings';
+		throws_ok { $fn->($DSX{server}, 'database=shop') } qr/no MariaDB server is called/, 'settings that are not a hash';
+		for my $bad ([ database => 'shop;host=evil' ], [ database => '' ], [ host => 'a b' ],
+				[ host => 'x;port=1' ], [ port => '33o6' ], [ port => '-1' ]) {
+			my ($key, $value) = @{$bad};
+			my %settings = (database => $DSX{database}, $key => $value);
+			throws_ok { $fn->($DSX{server}, \%settings) }
+				qr/\ADataSource: MariaDB server "mock" needs a valid $key in mariadb_servers/,
+				"$key '$value' cannot reach the DSN";
+		}
+		require DBI;
+		local $INC{'DBD/MariaDB.pm'} = __FILE__;
+		Test::Mockingbird::mock('DBI::connect', sub { die "Access denied for user\n" });
+		throws_ok { $fn->($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
+			qr/\ADataSource: cannot connect to MariaDB server "mock": /, 'a refused connection names the server';
+		throws_ok { $fn->($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
+			qr/\A(?!.*\Q$DSX{password}\E)/s, 'and never the password';
+		Test::Mockingbird::unmock('DBI::connect');
+	};
+
+	subtest 'DataSource::_mariadb_connect -- a connection' => sub {
+		my $fn  = \&Database::BI::Model::DataSource::_mariadb_connect;
+		my $dbh = Stub::DBH->new;
+		$with_dbi->($dbh, sub {
+			my ($calls) = @_;
+			my @got = $fn->($DSX{server}, { database => $DSX{database}, username => 'u', password => $DSX{password} });
+			is $got[0], $dbh, 'the handle';
+			like $got[1], $DSX{dsn_re}, 'a DSN built only from checked parts, with a time-out';
+			is_deeply [ @got[2, 3] ], [ 'u', $DSX{password} ], 'and the credentials it used';
+			is $calls->[0][3]{RaiseError}, 1, 'errors are raised, so none is missed';
+		});
+	};
+
+	# Purpose: the driver is optional; without one the reader is told what to
+	# install rather than seeing a Perl error.
+	subtest 'DataSource::_mariadb_connect -- no driver' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_mariadb_connect;
+		local @INC = (sub { my (undef, $file) = @_; die "hidden\n" if $file =~ m{\ADBD/(?:MariaDB|mysql)\.pm\z}; return }, @INC);
+		local $INC{'DBD/MariaDB.pm'};
+		local $INC{'DBD/mysql.pm'};
+		delete $INC{'DBD/MariaDB.pm'};
+		delete $INC{'DBD/mysql.pm'};
+		throws_ok { $fn->($DSX{server}, { database => $DSX{database} }) }
+			qr/\ADataSource: DBD::MariaDB or DBD::mysql must be installed to open MariaDB server "mock"/,
+			'says which modules';
+	};
+
+	subtest 'DataSource::mariadb_tables -- tables and their columns, in order' => sub {
+		my $dbh = Stub::DBH->new(rows => [ [ 'b', 'id' ], [ 'b', 'x' ], [ 'a', 'k' ] ]);
+		$with_dbi->($dbh, sub {
+			my $got = $ds->mariadb_tables($DSX{server}, { database => $DSX{database} });
+			is_deeply $got, [ { name => 'b', columns => [qw(id x)] }, { name => 'a', columns => ['k'] } ],
+				'one entry a table, in the order the server listed them';
+			is $dbh->{disconnected}, 1, 'the handle is closed';
+			memory_cycle_ok $got, 'and the list holds no cycle';
+		});
+		my $denied = Stub::DBH->new(denied => 1);
+		$with_dbi->($denied, sub {
+			local $@ = 'kept';
+			throws_ok { $ds->mariadb_tables($DSX{server}, { database => $DSX{database} }) }
+				qr/\ADataSource: cannot connect to MariaDB server "mock": SELECT command denied/, 'a refused query';
+			is $denied->{disconnected}, 1, 'still closes the handle';
+		});
+		throws_ok { $ds->mariadb_tables($DSX{server}, {}) } qr/needs a valid database/, 'bad settings never connect';
+	};
+
+	# Purpose: the constructor is where a bad table or server must be found,
+	# not at the first read; and a handle opened to find out is always closed.
+	subtest 'DataSource::_new_from_mariadb -- refusals' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_new_from_mariadb;
+		throws_ok { $fn->($ds, { server => $DSX{server} }) } qr/table/i, 'no table';
+		throws_ok { $fn->($ds, { server => $DSX{server}, table => 'a`b' }) } qr/\Q"a`b"\E|a`b/, 'a table name that could break out of its quotes';
+		throws_ok { $fn->($ds, { server => '../x', table => $DSX{table}, mariadb => {} }) }
+			qr/no MariaDB server is called "\.\.\/x"/, 'a server name that is not a name';
+		my $dbh = Stub::DBH->new(missing => $DSX{table});
+		$with_dbi->($dbh, sub {
+			throws_ok { $fn->($ds, { server => $DSX{server}, table => $DSX{table}, mariadb => { database => $DSX{database} } }) }
+				qr/\ADataSource: cannot read table "orders" on MariaDB server "mock": /, 'a table the server does not have';
+			is $dbh->{disconnected}, 1, 'and the handle is closed';
+		});
+		my $ok = Stub::DBH->new(names => [qw(id amount)], primary => ['id']);
+		$with_dbi->($ok, sub {
+			Test::Mockingbird::mock('Database::Abstraction::new', sub { die "no backend\n" });
+			require Database::Abstraction;
+			throws_ok { $fn->($ds, { server => $DSX{server}, table => $DSX{table}, mariadb => { database => $DSX{database} } }) }
+				qr/\ADataSource: failed to initialise database backend for table "orders": no backend/, 'D::A refusing it';
+			Test::Mockingbird::unmock('Database::Abstraction::new');
+		});
+	};
+
+	subtest 'DataSource::_new_from_mariadb -- what it keeps' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_new_from_mariadb;
+		require Database::Abstraction;
+		Test::Mockingbird::mock('Database::Abstraction::new', sub { my ($class, %a) = @_; return bless { %a }, $class });
+		for my $case ([ ['id'], 'id', 'id' ], [ [qw(a b)], undef, 'a' ], [ [], undef, 'amount' ], [ ['First Name'], undef, 'First Name' ]) {
+			my ($primary, $order, $id) = @{$case};
+			my $dbh = Stub::DBH->new(names => [qw(amount id)], primary => $primary);
+			$with_dbi->($dbh, sub {
+				my $self = $fn->($ds, { server => $DSX{server}, table => $DSX{table}, mariadb => { database => $DSX{database} } });
+				isa_ok $self, $ds;
+				is $self->{_order_col}, $order, 'pages are ordered only by a single safe key: ' . (join(',', @{$primary}) || 'none');
+				is $self->{_id_col}, $id, 'the id is the first key, else the first column';
+				is_deeply $self->{_columns}, [qw(amount id)], 'the columns in the table\'s own order';
+				is $self->pages_on_server, 1, 'and it pages on the server';
+				memory_cycle_ok $self, 'no cycle';
+			});
+		}
+		Test::Mockingbird::unmock('Database::Abstraction::new');
+	};
+
+	subtest 'DataSource::pages_on_server -- only a MariaDB source' => sub {
+		is $ds->can('pages_on_server')->(bless({}, $ds)), 0, 'a file is not paged on a server';
+		is $ds->can('pages_on_server')->(bless({ _mariadb => '' }, $ds)), 1, 'any MariaDB entry is, even an oddly named one';
+	};
+
+	# Purpose: the fallback for a sort D::A ignores must never write to the
+	# caller's rows (they may be D::A's cache) and must take hostile paging.
+	subtest 'DataSource::_unsafe_sort -- recognises only its own calls' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_unsafe_sort;
+		is_deeply [ $fn->(sort_by => 'First Name', limit => 5, offset => 10, region => 'N') ],
+			[ { region => 'N' }, 'First Name', 'ASC', 5, 10 ], 'a flat list';
+		is_deeply [ $fn->({ sort_by => [ 'First Name', 'desc' ] }) ],
+			[ {}, 'First Name', 'DESC', undef, undef ], 'a hashref, as Database::Join sends';
+		my %orig = (sort_by => 'Last Name', limit => 1);
+		$fn->(\%orig);
+		is_deeply \%orig, { sort_by => 'Last Name', limit => 1 }, 'the caller\'s hash is not changed';
+		is_deeply [ $fn->(sort_by => 'amount') ], [], 'a column D::A sorts itself';
+		is_deeply [ $fn->() ], [], 'no arguments';
+		is_deeply [ $fn->('odd') ], [], 'an odd list';
+		is_deeply [ $fn->([ sort_by => 'First Name' ]) ], [], 'an arrayref is not ours';
+		is_deeply [ $fn->(region => 'N') ], [], 'no sort at all';
+		is_deeply [ $fn->(sort_by => [ undef, 'ASC' ]) ], [], 'a sort naming no column';
+	};
+
+	subtest 'DataSource::_sorted_page -- a new, sorted, sliced array' => sub {
+		my $fn   = \&Database::BI::Model::DataSource::_sorted_page;
+		my @rows = map { { 'First Name' => $_ } } qw(c a b);
+		Internals::SvREADONLY(@rows, 1);
+		my $asc = $fn->(\@rows, 'First Name', 'ASC');
+		is_deeply [ map { $_->{'First Name'} } @{$asc} ], [qw(a b c)], 'ascending, as strings';
+		is_deeply [ map { $_->{'First Name'} } @{ $fn->(\@rows, 'First Name', 'DESC', 2) } ], [qw(c b)], 'descending, limited';
+		is_deeply [ map { $_->{'First Name'} } @{ $fn->(\@rows, 'First Name', 'ASC', 1, 1) } ], ['b'], 'a later page';
+		is_deeply [ map { $_->{'First Name'} } @{ $fn->(\@rows, 'nope', 'ASC') } ], [qw(c a b)], 'an unknown column does not sort';
+		is_deeply $fn->(\@rows, 'First Name', 'ASC', 'x', '-1'), $asc, 'paging that is not a number is ignored';
+		is_deeply $fn->(\@rows, 'First Name', 'ASC', 0), [], 'a limit of nothing is nothing';
+		is_deeply $fn->(\@rows, 'First Name', 'ASC', undef, 99), [], 'an offset past the end is empty';
+		is_deeply $fn->(undef, 'x', 'ASC'), [], 'no rows';
+		isnt $asc, \@rows, 'never the caller\'s array';
+		is_deeply [ map { $_->{'First Name'} } @rows ], [qw(c a b)], 'which is untouched';
+		my %locked = ('First Name' => 'z');
+		Hash::Util::lock_ref_keys(\%locked) if eval { require Hash::Util; 1 };
+		lives_ok { $fn->([ \%locked ], 'Last Name', 'ASC') } 'a locked row without the column is not read';
+	};
+
+	# Purpose: the sniffing of a file's shape must not split a quoted separator,
+	# and must still answer for a line it cannot parse.
+	subtest 'DataSource::_split_csv_line -- fields' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_split_csv_line;
+		is_deeply [ $fn->('a,"b,c",d', ',') ], [ 'a', 'b,c', 'd' ], 'a quoted separator stays in its field';
+		is_deeply [ $fn->('a|b||', '|') ], [ 'a', 'b', '', '' ], 'empty trailing fields are kept';
+		is_deeply [ $fn->('a,"unterminated', ',') ], [ 'a', '"unterminated' ], 'a line that does not parse is split plainly';
+		is_deeply [ $fn->('a.b', '.') ], [ 'a', 'b' ], 'a separator that is a regex character is literal';
+		is_deeply [ $fn->('', ',') ], [ '' ], 'an empty line is one empty field';
+		keeps_globals_ok('_split_csv_line', sub { $fn->('a,b', ',') });
+	};
+
+	# Purpose: a file with no header is read through a copy that has one; the
+	# copy must keep every value, and the id D::A keys on must be a column that
+	# does not drop rows.
+	subtest 'DataSource::_copy_with_header -- the copy D::A reads' => sub {
+		my $self = bless {}, $ds;
+		my $dir  = tempdir(CLEANUP => 1);
+		my $path = File::Spec->catfile($dir, 'bank.csv');
+		Mojo::File->new($path)->spew(join("\n",
+			'2026-01-02, 10 ,"Shop, the big one"',
+			'',
+			'2026-01-03,5',
+			'#2026-01-04,7,Cafe,extra,bits',
+		) . "\n");
+		my ($tmp, $id, $size) = $self->_copy_with_header({ path => $path, ext => 'csv' }, [qw(Date Amount Description)], ',', 'bank');
+		ok -d "$tmp", 'a temporary directory';
+		my $copy = File::Spec->catfile("$tmp", 'bank.csv');
+		is $size, -s $copy, 'and the size of the copy in it';
+		my @lines = split /\n/, Mojo::File->new($copy)->slurp;
+		is $lines[0], 'Date,Amount,Description', 'the header first';
+		is scalar(@lines), 4, 'the blank line is gone';
+		like $lines[1], qr/\A2026-01-02,10,"Shop, the big one"\z/, 'values trimmed, a quoted comma kept';
+		is $lines[2], '2026-01-03,5,', 'a short row is padded';
+		like $lines[3], qr/Cafe,extra,bits/, 'a long row keeps its extra fields in the last value';
+		is $id, 'Amount', 'the id is the column with no empty or #-led values';
+		throws_ok {
+			Mojo::File->new($path)->spew(qq{a,"never closed\nb,c\n});
+			$self->_copy_with_header({ path => $path, ext => 'csv' }, [qw(A B)], ',', 'bank');
+		} qr/\ADataSource: failed to initialise database backend for table "bank": cannot parse \Q$path\E: /,
+			'an unterminated quote is an error, not a short file';
+		throws_ok { $self->_copy_with_header({ path => "$dir/none.csv", ext => 'csv' }, ['A'], ',', 'none') }
+			qr/none\.csv/, 'a missing file is an error naming it';
+	};
+}
+
+# ============================================================================
+# PART U14: Database::BI::Model::Geocode -- the functions no earlier part reaches
+# ============================================================================
+{
+	Readonly my %GX => (
+		online_class => 'Stub::Online',
+		dir_error    => 'Geocode: the geocode cache needs a directory that exists, not "%s"',
+		rows_error   => qr/\AGeocode: the rows must be an arrayref, not "HASH"/,
+		col_error    => qr/\AGeocode: the column name is required/,
+	);
+
+	# A Geo::Coder::List stand-in: answers from a table, logs as the real one
+	# does (one entry per geocoder asked, 'cache' when its cache answered), and
+	# can be told that a geocoder threw.
+	{
+		package Stub::Chain;
+		sub new { my ($c, %a) = @_; return bless { answers => {}, logs => {}, asked => [], %a }, $c }
+		sub flush { $_[0]{log} = []; return $_[0] }
+		sub geocode {
+			my ($self, %a) = @_;
+			push @{ $self->{asked} }, { %a };
+			$self->{log} = $self->{logs}{ $a{location} } // [ { geocoder => 'Stub::Local' } ];
+			return $self->{answers}{ $a{location} };
+		}
+		sub log { return $_[0]{log} }
+		package Stub::Online;
+		sub new { my ($c, %a) = @_; return bless { %a }, $c }
+		sub response { return $_[0]{response} }
+		package Stub::Response;
+		sub new { my ($c, $ok, $line) = @_; return bless { ok => $ok, line => $line }, $c }
+		sub is_success { return $_[0]{ok} }
+		sub status_line { return $_[0]{line} }
+	}
+	my $point = sub { Stub::GeoPoint->new({ latitude => $_[0], longitude => $_[1], database => 'stub' }) };
+
+	# Purpose: several columns become one place; the rows themselves must not
+	# be written (SQL rows are locked), and a row that is not a row stays one.
+	subtest 'Geocode::place_rows -- columns joined into one place' => sub {
+		my @rows = ({ a => ' Brezje 8 ', c => 'Slovenia' }, { a => '', c => 'Slovenia' }, { a => undef, c => [] }, 'junk');
+		my ($places, $name) = $GEO->place_rows(\@rows, [ 'a', undef, '', 'c' ]);
+		is $name, 'a, c', 'the name lists the usable columns';
+		is_deeply $places, [ { 'a, c' => 'Brezje 8, Slovenia' }, { 'a, c' => 'Slovenia' }, { 'a, c' => '' }, undef ],
+			'trimmed, empties left out, a non-row undef';
+		is_deeply $rows[0], { a => ' Brezje 8 ', c => 'Slovenia' }, 'the rows are untouched';
+		my ($same, $one) = $GEO->place_rows(\@rows, ['a']);
+		is $same, \@rows, 'one column is the rows themselves';
+		is $one, 'a', 'under that column';
+		throws_ok { $GEO->place_rows({}, ['a']) } $GX{rows_error}, 'rows that are not a list';
+		throws_ok { $GEO->place_rows(undef, ['a']) } qr/not "undef"/, 'no rows';
+		throws_ok { $GEO->place_rows([], [ undef, '', [] ]) } $GX{col_error}, 'no usable column';
+		throws_ok { $GEO->place_rows([], 'a') } $GX{col_error}, 'a column list that is not a list';
+		keeps_globals_ok('place_rows', sub { $GEO->place_rows([ { a => 1, b => 2 } ], [qw(a b)]) });
+		memory_cycle_ok $places, 'no cycle';
+	};
+
+	subtest 'Geocode::file_cache -- only for a directory that exists' => sub {
+		my $dir   = tempdir(CLEANUP => 1);
+		my $cache = $GEO->file_cache($dir);
+		ok $cache->can('get') && $cache->can('set'), 'something Geo::Coder::List can use';
+		$cache->set(k => 'v');
+		ok -d File::Spec->catdir($dir, 'geocode-cache'), 'kept under model_dir/geocode-cache';
+		is $GEO->file_cache($dir)->get('k'), 'v', 'and found again by another object: it persists';
+		for my $bad (undef, "$dir/none", [ $dir ], File::Spec->catfile($dir, 'geocode-cache', 'x')) {
+			throws_ok { $GEO->file_cache($bad) } qr/\AGeocode: the geocode cache needs a directory that exists, not "/,
+				'refused: ' . ($bad // 'undef');
+		}
+	};
+
+	subtest 'Geocode::_default_cache -- one per process' => sub {
+		my $fn = \&Database::BI::Model::Geocode::_default_cache;
+		my $one = $fn->();
+		is $fn->(), $one, 'the same object every time, so answers outlive a request';
+		ok $one->can('get'), 'a cache';
+	};
+
+	subtest 'Geocode::_judge -- who decides what is a place' => sub {
+		my $geo = bless { _local => 'the local geocoder' }, $GEO;
+		my $own = Stub::Geocoder->new;
+		is $geo->_judge($own), $own, 'a geocoder with its own rule answers for itself';
+		is $geo->_judge(Stub::Chain->new), 'the local geocoder', 'a chain is judged by its local geocoder';
+	};
+
+	# Purpose: an injected geocoder's answer may be any shape; the batch must
+	# come back as a hash and a count whatever it says.
+	subtest 'Geocode::_lookup_batch -- whatever the geocoder replies' => sub {
+		my $fn = \&Database::BI::Model::Geocode::_lookup_batch;
+		my $stub = Stub::Geocoder->new(results => { A => $point->(1, 2) });
+		my $got = $fn->($stub, [qw(A B)], 'GB');
+		is $got->{lookups}, 2, 'the count of the values when the geocoder gives none';
+		ok exists $got->{answers}{A}, 'its answers';
+		is_deeply [ @{$got}{qw(held online)} ], [ [], 0 ], 'nothing held, nothing online';
+		is $stub->{calls}[0]{opts}{region}, 'GB', 'with the region';
+		is $stub->{calls}[0]{opts}{on_error}, 'undef', 'and asked not to croak';
+		Test::Mockingbird::mock('Stub::Geocoder::geocode_many', sub { return [ 'not a hash' ] });
+		is_deeply $fn->($stub, ['A'])->{answers}, {}, 'a reply of the wrong shape is no answers';
+		Test::Mockingbird::mock('Stub::Geocoder::geocode_many', sub { return { lookups => 7 } });
+		is $fn->($stub, ['A'])->{lookups}, 7, 'its own count when it gives one';
+		# Mockingbird stacks mocks: one unmock per mock, or the first stays.
+		Test::Mockingbird::unmock('Stub::Geocoder::geocode_many') for 1 .. 2;
+	};
+
+	# Purpose: a local lookup that threw is not an answer, so it must be held
+	# (asked again), never remembered as not found.
+	subtest 'Geocode::_lookup_local -- held, found and counted' => sub {
+		my $chain = Stub::Chain->new(
+			answers => { A => $point->(1, 2) },
+			logs    => {
+				C => [ { geocoder => 'cache' } ],
+				E => [ { geocoder => 'Stub::Local', error => 'boom' } ],
+			},
+		);
+		$chain->{answers}{C} = $point->(3, 4);
+		my $geo = bless { _local_chain => $chain }, $GEO;
+		my $got = $geo->_lookup_local([qw(A B C E)], 'SI');
+		ok $got->{answers}{A}, 'found';
+		ok exists $got->{answers}{B} && !$got->{answers}{B}, 'not found is an answer of nothing';
+		is_deeply $got->{held}, ['E'], 'a lookup that threw is held';
+		is $got->{lookups}, 3, 'an answer from the cache is not a lookup';
+		is $chain->{asked}[0]{region}, 'SI', 'the region goes to the local data';
+		my $plain = Stub::Chain->new;
+		(bless { _local_chain => $plain }, $GEO)->_lookup_local(['A']);
+		ok !exists $plain->{asked}[0]{region}, 'no region is sent when there is none';
+	};
+
+	# Purpose: OpenStreetMap is a remote service with a budget and a failure
+	# mode that looks like "not found"; neither may turn into a wrong answer.
+	subtest 'Geocode::_lookup_online -- budget and failure' => sub {
+		my $went = [ { geocoder => 'Stub::Local' }, { geocoder => $GX{online_class} } ];
+		my $chain = Stub::Chain->new(
+			answers => { A => $point->(1, 2), L => $point->(5, 6) },
+			logs    => { map { $_ => $went } qw(A B C D) },
+		);
+		$chain->{logs}{L} = [ { geocoder => 'Stub::Local' } ];
+		my $ok_res = Stub::Response->new(1, '200 OK');
+		my $geo = bless { _online => Stub::Online->new(response => $ok_res), online_max => 2, _local_chain => $chain }, $GEO;
+
+		my $got = $geo->_lookup_online($chain, [qw(A B C L)]);
+		is $got->{online}, 2, 'two places went online';
+		ok $got->{answers}{A}, 'one found there';
+		ok exists $got->{answers}{B}, 'one not found there, which is an answer';
+		is $got->{spent}, 1, 'the budget is spent';
+		is_deeply [ sort @{ $got->{held} } ], ['C'], 'past it, a place the local data does not know is held';
+		ok $got->{answers}{L}, 'and one it knows is found';
+		is $got->{failed}, undef, 'nothing failed';
+
+		my $down = bless { _online => Stub::Online->new(response => Stub::Response->new(0, '503 Service Unavailable')),
+			_local_chain => $chain }, $GEO;
+		$got = $down->_lookup_online($chain, [qw(B C)]);
+		is $got->{failed}, '503 Service Unavailable', 'a failure is its status line';
+		is_deeply [ sort @{ $got->{held} } ], [qw(B C)], 'the place that failed is held, and so is the rest';
+		is $got->{spent}, 0, 'which is a failure, not a spent budget';
+
+		my $silent = bless { _online => Stub::Online->new(response => undef), _local_chain => $chain }, $GEO;
+		is $silent->_lookup_online($chain, ['B'])->{failed}, 'no response', 'no response at all';
+
+		$chain->{logs}{T} = [ { geocoder => $GX{online_class}, error => 'secret place in the request' } ];
+		my $thrown = $geo->_lookup_online($chain, ['T']);
+		is $thrown->{failed}, 'an error in Geo::Coder::OSM', 'an exception is named, never quoted (it may hold the place)';
+	};
+
+	# Purpose: the user agent is made once, so its one-a-second gap holds for
+	# every request in the process, and Nominatim is asked over https.
+	subtest 'Geocode::_online_geocoder -- one agent, https' => sub {
+		my $fn = \&Database::BI::Model::Geocode::_online_geocoder;
+		my $have = eval { require Geo::Coder::OSM; Geo::Coder::OSM->VERSION(0.03); require LWP::UserAgent::Throttled; LWP::UserAgent::Throttled->VERSION(0.14); 1 };
+		unless ($have) {
+			is $fn->(), undef, 'without Geo::Coder::OSM 0.03 and LWP::UserAgent::Throttled 0.14 there is none';
+			return;
+		}
+		my ($one, $two) = ($fn->(), $fn->());
+		isa_ok $one, 'Geo::Coder::OSM';
+		is $one->{ua}, $two->{ua}, 'the same user agent for both';
+		like $one->{ua}->agent, qr{\ADatabase-BI/}, 'which says who is asking';
+		no warnings 'once';
+		like $Geo::Coder::OSM::SOURCES{'database-bi-https'}, qr{\Ahttps://}, 'over https';
+		{
+			local @INC = (sub { die "hidden\n" if $_[1] eq 'Geo/Coder/OSM.pm'; return }, @INC);
+			local $INC{'Geo/Coder/OSM.pm'};
+			delete $INC{'Geo/Coder/OSM.pm'};
+			is $fn->(), undef, 'and none when the module cannot be loaded';
+		}
+	};
+}
+
+
+# ============================================================================
+# PART U15: Dashboard -- pure helpers no earlier part reaches
+#
+# These take values and give values: no controller, no store.  Each is fed what
+# a stranger could put in a URL or a stored canvas, since both reach them.
+# ============================================================================
+{
+	Readonly my $D => 'Database::BI::Controller::Dashboard';
+	no strict 'refs';
+	my %H = map { $_ => \&{"${D}::$_"} } qw(
+		_analysis_json_error _is_sqlite_file is_supported_file canonical_spec _canonical_store_keys
+		_canvas_map_html _canvas_window_columns _color_rule_index _cross_row_aliases _drop_unknown_keys
+		_filter_in_values _lookup_key _model_dir_of _optional_scheme _rows_of_page _scatter_radii
+		_shift_card_param _text_card_options _text_card_markup _text_card_title _text_card_plain
+		_text_card_reply _wordcloud_counts _map_colour_entries _map_loc_columns _map_region _map_unplotted
+	);
+	use strict 'refs';
+	Readonly my %UX => (
+		text_max    => 20_000,
+		title_max   => 60,
+		pt_min      => 8,
+		pt_max      => 96,
+		json_prefix => 'Invalid JSON body: ',
+		schemes     => [qw(tableau10 category10 set2 set3 paired)],
+	);
+
+	subtest 'Dashboard::_analysis_json_error -- a reason, never a path' => sub {
+		is $H{_analysis_json_error}->(''), "$UX{json_prefix}expected a JSON object", 'a body that parsed to the wrong shape';
+		is $H{_analysis_json_error}->(undef), "$UX{json_prefix}expected a JSON object", 'no error at all';
+		is $H{_analysis_json_error}->("Malformed JSON: Expected comma at /usr/lib/perl5/Mojo/JSON.pm line 99.\n"),
+			"${UX{json_prefix}}Malformed JSON: Expected comma", 'the library\'s file and line are cut';
+		returns_is $H{_analysis_json_error}->('x'), { type => 'string' }, 'a string';
+	};
+
+	# Purpose: a .db may be SQLite or Berkeley DB, so the magic number decides;
+	# anything unreadable is simply not one.
+	subtest 'Dashboard::_is_sqlite_file -- by content, not by name' => sub {
+		my $dir = tempdir(CLEANUP => 1);
+		my $sq  = File::Spec->catfile($dir, 'a.db');
+		Mojo::File->new($sq)->spew("SQLite format 3\0" . ("\0" x 84));
+		ok $H{_is_sqlite_file}->($sq), 'the SQLite header';
+		my $fake = File::Spec->catfile($dir, 'b.sqlite');
+		Mojo::File->new($fake)->spew("SQLite format 3!");
+		ok !$H{_is_sqlite_file}->($fake), 'a near miss is not one';
+		my $short = File::Spec->catfile($dir, 'c.db');
+		Mojo::File->new($short)->spew('SQL');
+		ok !$H{_is_sqlite_file}->($short), 'a file shorter than the header';
+		ok !$H{_is_sqlite_file}->(File::Spec->catfile($dir, 'none')), 'a missing file';
+		ok !$H{_is_sqlite_file}->($dir), 'a directory';
+		{
+			local $! = 0;
+			$H{_is_sqlite_file}->(File::Spec->catfile($dir, 'none'));
+			pass 'and a failed open does not croak';
+		}
+	};
+
+	subtest 'Dashboard::is_supported_file -- by extension, whole' => sub {
+		ok $H{is_supported_file}->("/x/a.$_"), "$_ is supported" for qw(csv CSV db sql sqlite sqlite3 xml tsv psv xlsx);
+		ok !$H{is_supported_file}->($_), "'" . ($_ // 'undef') . "' is not"
+			for undef, '', 'a.csv.exe', 'a.xlsxx', 'csv', "a.csv\n", 'a.txt', '.csvx';
+		returns_is $H{is_supported_file}->('a.csv'), { type => 'integer' }, '1 or 0';
+	};
+
+	# Purpose: the model store files a path: spec by its realpath, so a symlinked
+	# spelling must resolve; anything that is not a local path must come back
+	# exactly as given, since it is a key and not a path.
+	subtest 'Dashboard::canonical_spec -- one spelling per file' => sub {
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = File::Spec->catfile($dir, 'a.csv');
+		Mojo::File->new($file)->spew("x\n1\n");
+		my $real = Mojo::File->new($file)->realpath->to_string;
+		my $link = File::Spec->catfile($dir, 'link.csv');
+		SKIP: {
+			skip 'no symlinks here', 1 unless eval { symlink($file, $link) };
+			is $H{canonical_spec}->("path:$link"), "path:$real", 'a symlink resolves to the file';
+		}
+		SKIP: {
+			# Windows' realpath does not follow links (a CI failure on Windows):
+			# with a realpath that leaves the link alone, the link must still
+			# be filed under the file's own name.
+			skip 'no symlinks here', 1 unless -l $link;
+			my $realpath = \&Mojo::File::realpath;
+			mock 'Mojo::File::realpath' => sub { my $p = shift; -l $p ? Mojo::File->new("$p") : $realpath->($p, @_) };
+			{
+				local $^O = 'MSWin32';
+				is $H{canonical_spec}->("path:$link"), "path:$real", 'the link is followed where realpath will not';
+			}
+			unmock 'Mojo::File::realpath';
+		}
+		is $H{canonical_spec}->("path:$file"), "path:$real", 'a plain path is its realpath';
+		is $H{canonical_spec}->($_), $_, "'$_' is left alone"
+			for 'table:sales', 'url:http://x/y.csv', "path:$dir/none.csv", 'path:/../host/a.csv', "path:$file\nx", 'nonsense';
+		is $H{canonical_spec}->(undef), undef, 'undef stays undef';
+	};
+
+	subtest 'Dashboard::_canonical_store_keys -- old spellings move, entries merge' => sub {
+		my $dir  = tempdir(CLEANUP => 1);
+		my $file = File::Spec->catfile($dir, 'a.csv');
+		Mojo::File->new($file)->spew("x\n");
+		my $real = Mojo::File->new($file)->realpath->to_string;
+		my $alias = "$dir/./a.csv";
+		my %store = (
+			"path:$alias"         => { old => 1, both => 'old' },
+			"path:$real"          => { both => 'new' },
+			"path:$alias|loc=x"   => { geo => 1 },
+			'table:t'             => { keep => 1 },
+			"path:$dir/gone.csv"  => { gone => 1 },
+		);
+		$H{_canonical_store_keys}->(\%store);
+		is_deeply $store{"path:$real"}, { old => 1, both => 'new' }, 'merged, the resolved spelling winning';
+		ok !exists $store{"path:$alias"}, 'the old spelling is gone';
+		is_deeply $store{"path:$real|loc=x"}, { geo => 1 }, 'a geo key keeps its suffix';
+		is_deeply $store{'table:t'}, { keep => 1 }, 'other specs are left';
+		ok exists $store{"path:$dir/gone.csv"}, 'a missing file keeps its key';
+		lives_ok { $H{_canonical_store_keys}->({}) } 'an empty section';
+	};
+
+	# Purpose: two maps on one canvas must not share element ids, and a suffix
+	# from a card id must never break out of the attribute it is written into.
+	subtest 'Dashboard::_canvas_map_html -- unique, safe ids' => sub {
+		my $body = q{<div id="map"></div><input id="search-box"><script>var m = L.map('map'); document.getElementById('reset-button');</script>};
+		my ($head, $out) = $H{_canvas_map_html}->('<link><style>#map{}</style>', $body, '3');
+		is $head, '<link>', 'the page-wide style is dropped';
+		like $out, qr{<div id="map-3" class="canvas-map"></div>}, 'the div is renamed and classed';
+		like $out, qr{L\.map\('map-3'\)}, 'so is the script\'s reference';
+		like $out, qr{getElementById\('reset-button-3'\)}, 'and the button\'s';
+		like $out, qr{id="search-box-3"}, 'and the search box';
+		my (undef, $evil) = $H{_canvas_map_html}->('', $body, q{1"><script>x</script>});
+		unlike $evil, qr/<script>x/, 'markup in the suffix is stripped';
+		like $evil, qr/id="map-1scriptxscript"/, 'leaving only safe characters';
+		my (undef, $none) = $H{_canvas_map_html}->('', $body, '!!!');
+		like $none, qr/id="map-map"/, 'a suffix with nothing safe falls back';
+		my (undef, $undef) = $H{_canvas_map_html}->('', $body, undef);
+		like $undef, qr/id="map-map"/, 'as does none';
+	};
+
+	subtest 'Dashboard::_cross_row_aliases and _canvas_window_columns' => sub {
+		is_deeply [ $H{_cross_row_aliases}->('amount:rank:r', 'x:running_total:t:5', 'bad', undef, '', [], 'a:b') ],
+			[qw(r t)], 'the third field of each spec that has one';
+		my $params = Mojo::Parameters->new('cs=amount:rank:r&cs=junk');
+		my $analysis = { visuals => [
+			{ cross_row => { cs => [ 'amount:share:s' ] } },
+			{ cross_row => 'not a hash' }, 'not a visual', { cross_row => { cs => 'not a list' } },
+		] };
+		is_deeply $H{_canvas_window_columns}->($analysis, $params, [ { cross_row => { cs => ['a:rank:new'] } } ]),
+			[qw(r s new)], 'the page, each card, and the card being added';
+		is_deeply $H{_canvas_window_columns}->({}, Mojo::Parameters->new, undef), [], 'nothing anywhere';
+	};
+
+	# Purpose: colour rules reach this from a stored canvas, unchecked; a rule
+	# that is not a rule must be passed over, never dereferenced (it was a 500).
+	subtest 'Dashboard::_color_rule_index -- the first rule that matches' => sub {
+		my @rules = ({ op => 'gt', val => 10 }, { op => 'eq', val => 'North' }, { op => 'ne', val => '5' });
+		is $H{_color_rule_index}->('11', \@rules), 0, 'numeric greater';
+		is $H{_color_rule_index}->('north', \@rules), 1, 'text equality ignores case';
+		is $H{_color_rule_index}->('3', \@rules), 2, 'numeric not-equal';
+		is $H{_color_rule_index}->('5', \@rules), undef, 'no rule matches';
+		is $H{_color_rule_index}->(undef, [ { op => 'eq', val => '' } ]), 0, 'an empty cell equals an empty value';
+		is $H{_color_rule_index}->('-1.5', [ { op => 'lt', val => '-1' } ]), 0, 'negative decimals compare as numbers';
+		is $H{_color_rule_index}->('1e3', [ { op => 'gt', val => '5' } ]), undef, 'text is not compared with gt';
+		is $H{_color_rule_index}->('11', [ 'junk', undef, [], { op => 'gt', val => 10 } ]), 3,
+			'rules that are not rules are passed over, and indexes stay the stored ones';
+		is $H{_color_rule_index}->('11', [ { val => 10 } ]), undef, 'a rule with no operator matches nothing';
+		is $H{_color_rule_index}->('11', undef), undef, 'no rules';
+		is $H{_color_rule_index}->('11', 'junk'), undef, 'rules that are not a list';
+	};
+
+	subtest 'Dashboard::_map_colour_entries -- the key\'s colours' => sub {
+		my @rules = ({ op => 'gt', val => 6, color => '#f00' }, 'junk', { op => 'evil', val => 'x', color => '#0f0' });
+		is_deeply [ $H{_map_colour_entries}->('amount', \@rules, '#00f', 0) ], [
+			{ color => '#f00', label => 'amount > 6',    group => 'rule0' },
+			{ color => '#0f0', label => 'amount evil x', group => 'rule2' },
+			{ color => '#00f', label => 'Other',         group => 'other' },
+		], 'one entry a rule, a non-rule skipped with its index kept, then Other';
+		is_deeply [ $H{_map_colour_entries}->('place', [ { val => '', color => '#1' }, { val => 'A', color => '#2' } ], '#0', 1) ],
+			[ { color => '#1', label => '(blank)', group => 'rule0' }, { color => '#2', label => 'A', group => 'rule1' } ],
+			'a series lists values, a blank one by name, and no Other';
+		is_deeply [ $H{_map_colour_entries}->('x', [], '#0', 0) ], [], 'no rules, no key, not even Other';
+		is_deeply [ $H{_map_colour_entries}->('x', undef, '#0', 0) ], [], 'rules that are not a list';
+	};
+
+	subtest 'Dashboard::_drop_unknown_keys -- only what is read back is kept' => sub {
+		my %doc = (name => 'n', visuals => [], evil => '<script>', __proto__ => 1, layout => {});
+		$H{_drop_unknown_keys}->(\%doc);
+		is_deeply [ sort keys %doc ], [qw(layout name visuals)], 'unknown keys are dropped';
+		my %empty;
+		$H{_drop_unknown_keys}->(\%empty);
+		is_deeply \%empty, {}, 'an empty document';
+	};
+
+	# Purpose: an f=col:in: filter reads JSON from a link; a damaged one must
+	# match nothing rather than everything.
+	subtest 'Dashboard::_filter_in_values -- the list, or nothing' => sub {
+		is_deeply [ $H{_filter_in_values}->('["Paris","Rome",3,null]') ], [ 'Paris', 'Rome', 3, '' ], 'scalars, null as empty';
+		is_deeply [ $H{_filter_in_values}->('["a",["nested"],{"o":1}]') ], ['a'], 'only plain values count';
+		is_deeply [ $H{_filter_in_values}->($_) ], [], "'" . ($_ // 'undef') . "' lists nothing"
+			for undef, '', 'Paris', '{"a":1}', '"str"', '[', '1';
+		{
+			local $@ = 'kept';
+			$H{_filter_in_values}->('[');
+			is $@, 'kept', 'a parse failure leaves the caller\'s $@';
+		}
+	};
+
+	subtest 'Dashboard::_lookup_key -- trimmed, case kept' => sub {
+		is $H{_lookup_key}->('  ab '), 'ab', 'trimmed';
+		is $H{_lookup_key}->('AB'), 'AB', 'case is kept';
+		is $H{_lookup_key}->(0), '0', 'zero is a key';
+		is $H{_lookup_key}->(''), '', 'empty is empty';
+		is $H{_lookup_key}->(undef), undef, 'undef has none';
+		is $H{_lookup_key}->([]), undef, 'nor a reference';
+		keeps_globals_ok('_lookup_key', sub { $H{_lookup_key}->(' x ') });
+	};
+
+	subtest 'Dashboard::_model_dir_of -- absolute or under home' => sub {
+		my $tm = isolated_app();
+		my $abs = tempdir(CLEANUP => 1);
+		$tm->app->config->{model_dir} = $abs;
+		is $H{_model_dir_of}->($tm->app)->to_string, $abs, 'an absolute directory as given';
+		$tm->app->config->{model_dir} = 'rel';
+		is $H{_model_dir_of}->($tm->app)->to_string, $tm->app->home->child('rel')->to_string, 'a relative one under the home';
+		delete $tm->app->config->{model_dir};
+		is $H{_model_dir_of}->($tm->app)->to_string, $tm->app->home->child('.bi')->to_string, 'the default';
+	};
+
+	subtest 'Dashboard::_optional_scheme and _scatter_radii' => sub {
+		is $H{_optional_scheme}->($_), $_, "$_ is a scheme" for @{ $UX{schemes} };
+		is $H{_optional_scheme}->($_), undef, "'" . ($_ // 'undef') . "' is not"
+			for undef, '', 'Tableau10', 'viridis', '__proto__';
+		is $H{_optional_scheme}->([ 'set2' ]), undef, 'nor a reference';
+		is_deeply [ $H{_scatter_radii}->(undef, undef) ], [ 3, 15 ], 'the defaults';
+		is_deeply [ $H{_scatter_radii}->(20, 5) ], [ 5, 20 ], 'put in order, not refused';
+		is_deeply [ $H{_scatter_radii}->(0, 999) ], [ 3, 40 ], 'zero is the default, too big is clamped';
+		is_deeply [ $H{_scatter_radii}->('abc', [ 9 ]) ], [ 3, 15 ], 'text and references are the defaults';
+		is_deeply [ $H{_scatter_radii}->('-4', '2.5') ], [ 1, 15 ], 'a negative is clamped to 1, a fraction is not a whole number';
+	};
+
+	subtest 'Dashboard::_rows_of_page -- a copy, in range' => sub {
+		my @rows = (1 .. 5);
+		Internals::SvREADONLY(@rows, 1);
+		is_deeply $H{_rows_of_page}->(\@rows, 0, 2), [ 1, 2 ], 'the first page';
+		is_deeply $H{_rows_of_page}->(\@rows, 4, 2), [ 5 ], 'a short last page';
+		is_deeply $H{_rows_of_page}->(\@rows, 9, 2), [], 'past the end';
+		is_deeply $H{_rows_of_page}->(\@rows, -2, 2), [ 1, 2 ], 'a negative offset is the first page, never the last rows';
+		is_deeply $H{_rows_of_page}->([], 0, 10), [], 'no rows';
+		my $page = $H{_rows_of_page}->(\@rows, 0, 5);
+		isnt $page, \@rows, 'a new array, so a read-only one is never spliced';
+	};
+
+	subtest 'Dashboard::_shift_card_param -- cv= after the removed card' => sub {
+		is $H{_shift_card_param}->('?cv=3&f=x', 1), '?cv=2&f=x', 'a later card moves down';
+		is $H{_shift_card_param}->('?cv=1', 1), '?', 'one naming the removed card is dropped, not left to name its successor';
+		is $H{_shift_card_param}->('?cv=1&cf=a:eq:b', 1), '?cf=a:eq:b', 'with the separator after it';
+		is $H{_shift_card_param}->('?cf=a:eq:b&cv=1', 1), '?cf=a:eq:b', 'or before it';
+		is $H{_shift_card_param}->('cv=1&cv=2', 1), 'cv=1', 'and its neighbour still moves down';
+		is $H{_shift_card_param}->('?cv=0', 1), '?cv=0', 'an earlier one is kept';
+		is $H{_shift_card_param}->('?a=1&cv=5&cv=2', 3), '?a=1&cv=4&cv=2', 'each one';
+		is $H{_shift_card_param}->('?xcv=5&cvx=5', 0), '?xcv=5&cvx=5', 'only cv= itself';
+		is $H{_shift_card_param}->('', 0), '', 'an empty query';
+	};
+
+	# Purpose: a text card's settings go into a style attribute, so only the
+	# values listed may get there, and every other value must say why it was
+	# refused.
+	subtest 'Dashboard::_text_card_options -- allowed values only' => sub {
+		my ($o, $e) = $H{_text_card_options}->({ text => "a\r\nb", font => 'arial', size => '12', colour => '#AABBCC',
+			background => '#000000', align => 'center', bold => 1, italic => 'yes', plain => 0, evil => 1 });
+		is_deeply $o, { text => "a\nb", font => 'arial', size => 12, colour => '#aabbcc', background => '#000000',
+			align => 'center', bold => 1, italic => 1 }, 'each in its one spelling, unknown keys gone';
+		is_deeply $e, [], 'no errors';
+		(undef, $e) = $H{_text_card_options}->({ text => ' ', font => 'comic', size => '7', colour => 'red',
+			background => '#12345', align => 'justify' });
+		is_deeply $e, [
+			'A text card needs some text',
+			'That font is not one of the choices',
+			"The size must be a whole number of points from $UX{pt_min} to $UX{pt_max}",
+			'A colour must be written #rrggbb', 'A colour must be written #rrggbb',
+			'The alignment must be left, center or right',
+		], 'each refusal in its own words';
+		(undef, $e) = $H{_text_card_options}->({ text => 'x' x ($UX{text_max} + 1) });
+		is_deeply $e, [ "A text card can hold at most $UX{text_max} characters" ], 'too long';
+		(undef, $e) = $H{_text_card_options}->({ text => 'x' x $UX{text_max} });
+		is_deeply $e, [], 'the longest allowed';
+		for my $size ('97', '1000', '12.5', '-1', '1e1', [12]) {
+			(undef, $e) = $H{_text_card_options}->({ text => 'x', size => $size });
+			is scalar(@{$e}), 1, "size '$size' is refused";
+		}
+		(my $f, $e) = $H{_text_card_options}->({ text => 'x', font => [ 'arial' ], colour => { a => 1 } });
+		is scalar(@{$e}), 2, 'references are refused, not stringified';
+		ok !exists $f->{font} && !exists $f->{colour}, 'and are not kept';
+		for my $raw (undef, 'text', [ 'x' ]) {
+			($f, $e) = $H{_text_card_options}->($raw);
+			is_deeply $e, [ 'A text card needs some text' ], 'options that are not an object are an empty card';
+		}
+		($f) = $H{_text_card_options}->({ text => [ 'x' ] });
+		is $f->{text}, '', 'text that is not a string is none';
+	};
+
+	subtest 'Dashboard::_text_card_markup -- escaped, styled from the list' => sub {
+		my $html = $H{_text_card_markup}->({ options => { text => "<b>hi</b>\n  two  spaces\tend", font => 'courier', bold => 1 } });
+		like $html, qr/&lt;b&gt;hi&lt;\/b&gt;/, 'markup is text';
+		like $html, qr/<br>&#160; two&#160; spaces&#160;&#160;&#160; end/, 'line ends, leading and double spaces, tabs kept visibly';
+		like $html, qr/style="font-family:&quot;Courier New&quot;, Courier, monospace;font-weight:bold"/, 'the font\'s CSS, escaped';
+		my $evil = $H{_text_card_markup}->({ options => { text => 'x', colour => '#fff;background:url(x)', font => 'x;y' } });
+		unlike $evil, qr/style=/, 'a value that is not allowed never reaches the style';
+		like $H{_text_card_markup}->({}), qr{\A<div class="text-card-text"></div>\z}, 'a card with no options';
+	};
+
+	subtest 'Dashboard::_text_card_title, _text_card_plain and _text_card_reply' => sub {
+		is $H{_text_card_title}->({ options => { text => "\n   \n  First line  \nsecond" } }), 'First line', 'the first line with words';
+		is $H{_text_card_title}->({ options => { text => 'y' x ($UX{title_max} + 5) } }), ('y' x $UX{title_max}) . '...', 'cut';
+		is $H{_text_card_title}->({ options => { text => " \n\t" } }), 'Text', 'a blank card';
+		is $H{_text_card_title}->({}), 'Text', 'no options';
+		is $H{_text_card_plain}->({ kind => 'text', options => { text => 'x', plain => 1 } }), 1, 'a plain text card';
+		is $H{_text_card_plain}->({ kind => 'bar', options => { plain => 1 } }), 0, 'only a text card can be plain';
+		is $H{_text_card_plain}->({}), 0, 'nothing';
+		my $reply = $H{_text_card_reply}->('abc', 2, { kind => 'text', options => { text => 'Hello <you>' } });
+		is_deeply [ @{$reply}{qw(id visual kind title head cf_col plain)} ], [ 'abc', 2, 'text', 'Hello <you>', '', '', 0 ],
+			'the reply for the card';
+		like $reply->{html}, qr/Hello &lt;you&gt;/, 'its markup escaped';
+		is $H{_text_card_reply}->('a', 0, { title => 'Mine', options => { text => 'x' } })->{title}, 'Mine', 'a given title wins';
+		memory_cycle_ok $reply, 'no cycle';
+	};
+
+	subtest 'Dashboard::_wordcloud_counts -- one count for page and card' => sub {
+		my @rows = ({ t => 'Apple apple pear' }, { t => 'pear the and' }, { t => undef }, { t => 'kiwi' });
+		my $got = $H{_wordcloud_counts}->(\@rows, 't', 2, 3, 'kiwi,  , PEAR');
+		is_deeply $got->{words}, [ { word => 'apple', count => 1 } ], 'a word counts once a row; stop words, the reader\'s too, are dropped';
+		is $got->{distinct}, 1, 'distinct before the cut';
+		is $got->{rows}, 4, 'every row is counted';
+		$got = $H{_wordcloud_counts}->(\@rows, 't', 1, 3, undef);
+		is_deeply [ map { $_->{word} } @{ $got->{words} } ], ['pear'], 'the commonest word, cut to topn';
+		is $got->{total}, 4, 'the total of every count';
+		my $none = $H{_wordcloud_counts}->([], 't', 5, 3, '');
+		is_deeply [ @{$none}{qw(words distinct total)} ], [ [], 0, 0 ], 'no rows';
+		is $H{_wordcloud_counts}->(\@rows, 'nope', 5, 3, '')->{distinct}, 0, 'a column no row has';
+	};
+
+	subtest 'Dashboard::_map_loc_columns and _map_region' => sub {
+		is_deeply [ $H{_map_loc_columns}->([ 'a', '', undef, [ 'x' ], 'b', 'a' ]) ], [qw(a b)], 'in order, once each, usable only';
+		is_deeply [ $H{_map_loc_columns}->('a') ], ['a'], 'a single name, as an old card stored it';
+		is_deeply [ $H{_map_loc_columns}->(undef) ], [], 'none';
+		is_deeply [ $H{_map_loc_columns}->({ a => 1 }) ], [], 'a hash is not a list of names';
+		is $H{_map_region}->({ map_region => 'GB' }), 'GB', 'two letters';
+		is $H{_map_region}->({ map_region => $_ }), undef, "'" . ($_ // 'undef') . "' is not a region"
+			for undef, '', 'GBR', 'G1', "GB\n", 'gb;x';
+		is $H{_map_region}->({ map_region => [ 'GB' ] }), undef, 'nor a reference';
+		is $H{_map_region}->({}), undef, 'none set';
+	};
+
+	# Purpose: the list of places a map could not plot drives links into the
+	# table; each must select exactly the rows it describes.
+	subtest 'Dashboard::_map_unplotted -- why each place is missing' => sub {
+		my @records = ({ a => 'X', c => 'UK' }, { a => '', c => '' }, { a => '42', c => 'UK' }, { a => 'Y', c => 'FR' }, { a => 'X', c => 'UK' });
+		my @places  = map { { 'a, c' => join(', ', grep { length } @{$_}{qw(a c)}) } } @records;
+		my ($entries, $all) = $H{_map_unplotted}->(\@records, \@places, 'a, c', [qw(a c)], {
+			skipped => [ '', '42, UK' ], unresolved => [ 'X, UK' ], not_attempted => [ 'Y, FR' ],
+		});
+		is_deeply [ map { [ @{$_}{qw(place rows reason)} ] } @{$entries} ],
+			[ [ 'X, UK', 2, 'not_found' ], [ '', 1, 'empty' ], [ '42, UK', 1, 'refused' ], [ 'Y, FR', 1, 'later' ] ],
+			'each place once, in the order of its first row, with its reason and rows';
+		is_deeply $entries->[1]{filters}, [ 'a:empty', 'c:empty' ], 'an empty cell is selected as empty';
+		is_deeply $entries->[0]{filters}, [ 'a:eq:X', 'c:eq:UK' ], 'a cell by its value';
+		is scalar(@{$all}), 2, 'one in: filter per column for every row at once';
+		my ($ok) = $H{_map_unplotted}->(\@records, \@places, 'a, c', [qw(a c)], {});
+		is_deeply $ok, [], 'nothing missing, nothing listed';
+		my (undef, $none) = $H{_map_unplotted}->([ { a => 'X', c => 'UK' }, { a => 'Y', c => 'FR' }, { a => 'X', c => 'FR' } ],
+			[ { 'a, c' => 'X, UK' }, { 'a, c' => 'Y, FR' }, { 'a, c' => 'X, FR' } ], 'a, c', [qw(a c)],
+			{ unresolved => [ 'X, UK', 'Y, FR' ] });
+		is_deeply $none, [], 'when the in: filters would also select a plotted row, there is no all-rows link';
+		lives_ok { $H{_map_unplotted}->([ 'junk' ], [ 'junk' ], 'a', ['a'], { unresolved => [''] }) } 'rows that are not rows';
+	};
+}
+
+
+# ============================================================================
+# PART U16: Dashboard -- controller helpers no earlier part reaches
+#
+# Each subtest builds an application of its own (its own data_dir and model
+# store), so what one writes cannot be read by another, and a controller for
+# the request the helper is meant to serve.
+# ============================================================================
+{
+	Readonly my $D => 'Database::BI::Controller::Dashboard';
+	Readonly my %CX => (
+		sales   => "id,region,amount,code,note\n1,North,10,A,Order #1001\n2,South,5,B,no number\n3,North,7,Z,Order #7\n",
+		lookup  => "code,label,tier\nA,Alpha,1\nB,Beta,2\nA,Again,3\n",
+		too_big => 8 * 1_048_576 + 1,
+	);
+
+	# An application with fixture files in a data_dir of its own.
+	my $fixture_app = sub {
+		my $tm  = isolated_app();
+		my $dir = tempdir(CLEANUP => 1);
+		Mojo::File->new($dir)->child('sales.csv')->spew($CX{sales});
+		Mojo::File->new($dir)->child('codes.csv')->spew($CX{lookup});
+		$tm->app->config->{data_dir} = $dir;
+		return ($tm, $dir);
+	};
+	my $spec_of = sub { 'path:' . Mojo::File->new($_[0])->child('sales.csv')->realpath->to_string };
+	my $rows = sub {
+		return [ map { my %r; @r{qw(id region amount code note)} = split /,/; \%r }
+			grep { !/^id,/ } split /\n/, $CX{sales} ];
+	};
+
+	subtest 'Dashboard::_calc_specs_of_request and _cross_row_written' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/?c=double:amount*2&c=path:/x.csv&c=TABLE:t&c=url:http://x&c=mariadb:s/t&cs=amount:rank:r&cs=bad');
+		is_deeply [ $c->_calc_specs_of_request ], ['double:amount*2'], 'stacked sources are not fields, whatever their case';
+		$c->stash(_held_calc_fields => [ { name => 'late' } ]);
+		is_deeply [ $D->can('_cross_row_written')->($c) ], [qw(r late)], 'the cs= aliases and the held fields';
+		is_deeply [ $D->can('_cross_row_written')->(dash_controller($tm->app, '/')) ], [], 'none';
+	};
+
+	subtest 'Dashboard::_compile_extraction -- refusals name the extraction' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		my ($compiled, $fields) = $c->_compile_extraction('ord', { pattern => '#(?<num>\d+)(?<rest>.*)', fields => ['num'] });
+		is_deeply $fields, ['num'], 'fields= when given';
+		(undef, $fields) = $c->_compile_extraction('ord', { pattern => '(?<b>x)(?<a>y)' });
+		is_deeply $fields, [qw(b a)], 'else every named group, in order';
+		throws_ok { $c->_compile_extraction('ord', { pattern => '(' }) } qr/\AExtraction "ord": Pattern '\(' does not compile/, 'a bad pattern';
+		throws_ok { $c->_compile_extraction('ord', { pattern => '(?{1})' }) } qr/\AExtraction "ord": Pattern '\(\?\{1\}\)' uses/, 'code in a pattern';
+		throws_ok { $c->_compile_extraction('ord', { pattern => '(\d+)' }) }
+			qr/\AExtraction "ord": the pattern names no group; write one as/, 'no named group';
+		throws_ok { $c->_compile_extraction('ord', { pattern => '(?<a>x)', fields => ['b'] }) }
+			qr/\AExtraction "ord": the pattern has no group named "b"/, 'a field the pattern does not name';
+		throws_ok { $c->_compile_extraction('ord', {}) } qr/names no group/, 'no pattern at all is the empty one';
+	};
+
+	# Purpose: a lookup reads a file the reader names in a stored model; it must
+	# never read outside data_dir, a remote source, or something too big.
+	subtest 'Dashboard::_lookup_file -- only files under data_dir' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		# The guard's own form: canonpath, so backslashes on Windows.
+		my $real = File::Spec->canonpath(Mojo::File->new($dir)->child('codes.csv')->realpath->to_string);
+		is $c->_lookup_file('L', 'codes.csv'), $real, 'a relative name is under data_dir';
+		is $c->_lookup_file('L', $real), $real, 'an absolute one inside it';
+		for my $remote ('http://x/a.csv', 'url:http://x', 'table:codes', '/../host/a.csv', 'redis:k') {
+			throws_ok { $c->_lookup_file('L', $remote) } qr/\ALookup "L": "\Q$remote\E" is not a file; a lookup reads a file under data_dir/,
+				"'$remote' is refused as not a file";
+		}
+		my $outside = tempdir(CLEANUP => 1);
+		Mojo::File->new($outside)->child('o.csv')->spew("a\n1\n");
+		throws_ok { $c->_lookup_file('L', "$outside/o.csv") } qr/\ALookup "L": "[^"]+" is not under data_dir/, 'a file outside';
+		throws_ok { $c->_lookup_file('L', '../' . Mojo::File->new($outside)->basename . '/o.csv') } qr/is not under data_dir/, 'reached with ..';
+		SKIP: {
+			skip 'no symlinks here', 1 unless eval { symlink("$outside/o.csv", "$dir/link.csv") };
+			throws_ok { $c->_lookup_file('L', 'link.csv') } qr/is not under data_dir/, 'a link inside pointing out';
+		}
+		throws_ok { $c->_lookup_file('L', '') } qr/\ALookup "L": file "" not found, or not a supported data file/, 'no file';
+		throws_ok { $c->_lookup_file('L', undef) } qr/file "" not found/, 'undef';
+		throws_ok { $c->_lookup_file('L', 'none.csv') } qr/file "none\.csv" not found/, 'a missing file';
+		Mojo::File->new($dir)->child('notes.txt')->spew('x');
+		throws_ok { $c->_lookup_file('L', 'notes.txt') } qr/not a supported data file/, 'an unsupported kind';
+		my $big = Mojo::File->new($dir)->child('big.csv');
+		$big->spew('x' x $CX{too_big});
+		throws_ok { $c->_lookup_file('L', 'big.csv') } qr/\ALookup "L": "big\.csv" is $CX{too_big} bytes, more than a lookup may be/, 'too large';
+	};
+
+	subtest 'Dashboard::_lookups_of_request -- own, borrowed, skipped' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $spec = $spec_of->($dir);
+		$D->can('_write_models')->(dash_controller($tm->app, '/'), { lookups => {
+			$spec          => { mine => { file => 'codes.csv', key => 'code' }, gone => 'junk' },
+			'table:other'  => { theirs => { file => 'codes.csv', key => 'code', fields => ['label'] } },
+		} });
+		my $c = dash_controller($tm->app, '/?lk=theirs');
+		is_deeply [ map { $_->{name} } $c->_lookups_of_request($spec) ], [qw(mine theirs)], 'own first, then lk=';
+		$c = dash_controller($tm->app, '/?lk=theirs&nolk=mine&lk=mine');
+		is_deeply [ map { $_->{name} } $c->_lookups_of_request($spec) ], ['theirs'], 'nolk= wins over both';
+		throws_ok { dash_controller($tm->app, '/?lk=nobody')->_lookups_of_request($spec) }
+			qr/\ALookup "nobody" is not stored for any dataset/, 'an lk= that names nothing';
+		throws_ok { dash_controller($tm->app, '/?lk=a-b')->_lookups_of_request($spec) }
+			qr/\ALookup name "a-b" is not a valid identifier/, 'an lk= that is not a name';
+		is_deeply [ dash_controller($tm->app, '/')->_lookups_of_request(undef) ], [], 'no spec, no lk=';
+	};
+
+	# Purpose: a lookup file is read once a request, keyed as the docs say, and
+	# every way the definition can disagree with the file is refused by name.
+	subtest 'Dashboard::_load_lookup and _apply_lookups' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		$tm->app->log->level('fatal');
+		my $entry = $c->_load_lookup({ name => 'L', file => 'codes.csv', key => 'code' });
+		is_deeply $entry->{map}{A}, { label => 'Alpha', tier => 1 }, 'the first row of a duplicate key wins';
+		is_deeply [ sort @{ $entry->{fields} } ], [qw(label tier)], 'every column but the key';
+		is $c->_load_lookup({ name => 'L', file => 'codes.csv', key => 'code' }), $entry, 'read once a request';
+		throws_ok { $c->_load_lookup({ name => 'L', file => 'codes.csv', key => 'nope' }) }
+			qr/\ALookup "L": key column "nope" is not in "codes\.csv"/, 'a key the file does not have';
+		throws_ok { $c->_load_lookup({ name => 'L', file => 'codes.csv', key => 'code', fields => ['x'] }) }
+			qr/\ALookup "L": field "x" is not in "codes\.csv"/, 'a field it does not have';
+
+		my $spec = $spec_of->($dir);
+		$D->can('_write_models')->($c, { lookups => { $spec => {
+			codes => { file => 'codes.csv', key => 'code', fields => ['label'], default => '?' },
+		} } });
+		my $records = $rows->();
+		my @cols = qw(id region amount code note);
+		dash_controller($tm->app, '/')->_apply_lookups($records, \@cols, $spec);
+		is_deeply [ map { $_->{label} } @{$records} ], [ 'Alpha', 'Beta', '?' ], 'each row\'s field, or the default';
+		is $cols[-1], 'label', 'the column is added';
+
+		$D->can('_write_models')->($c, { lookups => { $spec => { codes => { file => 'codes.csv', key => 'code', col => 'nope' } } } });
+		throws_ok { dash_controller($tm->app, '/')->_apply_lookups($rows->(), [qw(id code)], $spec) }
+			qr/\ALookup "codes": column "nope" is not in this dataset \(nolk=codes skips the lookup\)/, 'a column the data does not have';
+		$D->can('_write_models')->($c, { lookups => { $spec => {
+			codes => { file => 'codes.csv', key => 'code', fields => ['label'] },
+		} } });
+		my @taken = qw(id code label codes_label);
+		throws_ok { dash_controller($tm->app, '/')->_apply_lookups($rows->(), \@taken, $spec) }
+			qr/\ALookup "codes": field "label" cannot be added, because "codes_label" is a column already/, 'no name left to add it under';
+		my @renamed = qw(id code label);
+		my $r = $rows->();
+		dash_controller($tm->app, '/')->_apply_lookups($r, \@renamed, $spec);
+		is $renamed[-1], 'codes_label', 'a field whose name is taken is prefixed with the lookup';
+		lives_ok { dash_controller($tm->app, '/')->_apply_lookups($rows->(), [qw(id code)], 'table:nothing') } 'no lookups is nothing to do';
+	};
+
+	subtest 'Dashboard::_apply_extractions -- groups become columns' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $spec = $spec_of->($dir);
+		my $c = dash_controller($tm->app, '/');
+		$D->can('_write_models')->($c, { extractions => { $spec => {
+			ord => { col => 'note', pattern => '#(?<num>\d+)' },
+		} } });
+		my $records = $rows->();
+		my @cols = qw(id region amount code note);
+		$c->_apply_extractions($records, \@cols, $spec);
+		is_deeply [ map { $_->{num} } @{$records} ], [ '1001', '(unparseable)', '7' ], 'a non-match is (unparseable), not dropped';
+		is $cols[-1], 'num', 'the column is added';
+		ok $c->stash('_virtual_columns')->{num}, 'and is virtual, so no SQL groups by it';
+
+		$D->can('_write_models')->($c, { extractions => { $spec => { ord => { col => 'nope', pattern => '(?<n>x)' } } } });
+		throws_ok { dash_controller($tm->app, '/')->_apply_extractions($rows->(), [qw(id note)], $spec) }
+			qr/\AExtraction "ord": column "nope" is not in this dataset/, 'a column the data does not have';
+		$D->can('_write_models')->($c, { extractions => { $spec => { ord => { col => 'note', pattern => '(?<id>x)' } } } });
+		throws_ok { dash_controller($tm->app, '/')->_apply_extractions($rows->(), [qw(id note ord_id)], $spec) }
+			qr/\AExtraction "ord": group "id" cannot be added, because "ord_id" is a column already/, 'no name left';
+		$D->can('_write_models')->($c, { extractions => { $spec => { ord => 'not a definition' } } });
+		lives_ok { dash_controller($tm->app, '/')->_apply_extractions($rows->(), [qw(note)], $spec) } 'a stored entry of the wrong shape is skipped';
+		lives_ok { $c->_apply_extractions($rows->(), [], undef) } 'no spec';
+	};
+
+	# Purpose: stage 4 and stage 7 write a column the same way, and a card may
+	# skip what the page would refuse.
+	subtest 'Dashboard::_write_calc_column and _apply_held_calc_fields' => sub {
+		my ($tm) = $fixture_app->();
+		$tm->app->log->level('fatal');
+		my $c = dash_controller($tm->app, '/');
+		require Database::BI::Calc;
+		my $records = $rows->();
+		my @cols = qw(id amount);
+		my $calc = Database::BI::Calc->new(expr => 'amount * 2', columns => \@cols);
+		$c->_write_calc_column($records, \@cols, 'double', $calc);
+		is_deeply [ map { $_->{double} } @{$records} ], [ 20, 10, 14 ], 'every row';
+		$c->_write_calc_column($records, \@cols, 'double', $calc);
+		is scalar(grep { $_ eq 'double' } @cols), 1, 'a column is listed once';
+		my $bad = Database::BI::Calc->new(expr => 'amount / 0', columns => \@cols);
+		$c->_write_calc_column($records, \@cols, 'inf', $bad);
+		is $records->[0]{inf}, '(unparseable)', 'an undefined result is a visible bucket';
+
+		my ($same, $c2) = dash_controller($tm->app, '/')->_apply_held_calc_fields($records, \@cols);
+		is $same, $records, 'nothing held, nothing done';
+		my $hc = dash_controller($tm->app, '/');
+		$hc->stash(_held_calc_fields => [ { name => 'late', expr => 'r + 1' }, { name => 'typo', expr => 'nope + 1' } ]);
+		my $with_r = [ map { { %$_, r => 1 } } @{$records} ];
+		throws_ok { $hc->_apply_held_calc_fields($with_r, [ @cols, 'r' ]) } qr/\ACalculated field "typo": /, 'the page refuses a field that does not compile';
+		my $card = dash_controller($tm->app, '/');
+		$card->stash(_held_calc_fields => [ { name => 'late', expr => 'r + 1' }, { name => 'typo', expr => 'nope + 1' } ]);
+		my (undef, $cc) = $card->_apply_held_calc_fields($with_r, [ @cols, 'r' ], 1);
+		ok( (grep { $_ eq 'late' } @{$cc}) && !(grep { $_ eq 'typo' } @{$cc}), 'a card draws what it can');
+	};
+
+	subtest 'Dashboard::_has_stored_columns and _calc_for_page' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $spec = $spec_of->($dir);
+		my $c = dash_controller($tm->app, '/');
+		ok !$c->_has_stored_columns($spec), 'nothing saved';
+		ok dash_controller($tm->app, '/?lk=x')->_has_stored_columns($spec), 'an lk= adds columns';
+		ok !$c->_has_stored_columns(''), 'no spec';
+		$D->can('_write_models')->($c, { fields => { $spec => { broken => 'nope * 2' } } });
+		ok $c->_has_stored_columns($spec), 'a saved field';
+		ok dash_controller($tm->app, '/?l=' . Mojo::Util::url_escape($spec))->_has_stored_columns(undef), 'read from l= when not given';
+
+		my $page = dash_controller($tm->app, '/');
+		my $records = $rows->();
+		my ($got) = $page->_calc_for_page($records, [qw(id region amount code note)], { spec_key => $spec });
+		ok $got, 'a saved field that cannot be drawn does not stop the page';
+		like $page->stash('stored_error'), qr/\ACalculated field "broken"/, 'it says why, without a file and line';
+		unlike $page->stash('stored_error'), qr/ line \d+/, 'tidied';
+		is_deeply $records, $rows->(), 'and the caller\'s rows were not written by the failed pass';
+		my $strict = dash_controller($tm->app, '/?c=' . Mojo::Util::url_escape('x:nope+1'));
+		throws_ok { $strict->_calc_for_page($rows->(), [qw(id amount)], { spec_key => 'table:none' }) }
+			qr/Calculated field "x"/, 'a field in the request is still refused';
+	};
+
+	subtest 'Dashboard::_canvas_cross_filter -- late specs wait for their column' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		$c->stash(_canvas_window_names => [qw(ytd region)], _held_calc_fields => [ { name => 'held' } ]);
+		my ($got, $late) = $c->_canvas_cross_filter($rows->(), [qw(id region amount)],
+			[ 'region:eq:North', 'ytd:gt:5', 'held:eq:1', 'amount:gt:6' ]);
+		is_deeply [ map { $_->{id} } @{$got} ], [ 1, 3 ], 'filters on present columns apply now';
+		is_deeply $late, [ 'ytd:gt:5', 'held:eq:1' ], 'those on columns written later wait';
+		($got, $late) = dash_controller($tm->app, '/')->_canvas_cross_filter($rows->(), ['id'], []);
+		is scalar(@{$got}), 3, 'no specs, no change';
+		is_deeply $late, [], 'and nothing late';
+	};
+
+	# Purpose: an unparseable store is evidence; it is set aside, not replaced.
+	subtest 'Dashboard::_set_aside_corrupt_store and _save_analyses_or_503' => sub {
+		my ($tm) = $fixture_app->();
+		$tm->app->log->level('fatal');
+		my $c = dash_controller($tm->app, '/');
+		my $dir = tempdir(CLEANUP => 1);
+		my $store = "$dir/store.json";
+		Mojo::File->new($store)->spew('{ broken');
+		$c->_set_aside_corrupt_store($store);
+		ok !-e $store, 'a corrupt store is moved';
+		my @aside = glob "$dir/store.json.corrupt.*";
+		is scalar(@aside), 1, 'beside itself, named as corrupt';
+		for my $kept ('{"a":1}', '[1,2]', '') {
+			Mojo::File->new($store)->spew($kept);
+			$c->_set_aside_corrupt_store($store);
+			if ($kept eq '{"a":1}' || $kept eq '') {
+				ok -e $store, "'$kept' is left where it is";
+			} else {
+				ok !-e $store, 'a JSON array is not a store either';
+			}
+		}
+		lives_ok { $c->_set_aside_corrupt_store("$dir/none.json") } 'a store that does not exist';
+
+		my $w = dash_controller($tm->app, '/');
+		Test::Mockingbird::mock("${D}::_write_analyses", sub { 0 });
+		ok !$w->_save_analyses_or_503({}), 'a refused write is false';
+		is $w->res->code, 503, 'and answers 503';
+		is_deeply $w->res->json, { error => 'Analysis storage is not writable; use import/export instead' }, 'saying why';
+		Test::Mockingbird::mock("${D}::_write_analyses", sub { 1 });
+		ok dash_controller($tm->app, '/')->_save_analyses_or_503({}), 'a write is true';
+		# Mockingbird stacks mocks: one unmock per mock, or the first stays.
+		Test::Mockingbird::unmock("${D}::_write_analyses") for 1 .. 2;
+	};
+
+	subtest 'Dashboard::_chart_json -- inert in an attribute' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		my $json = $c->_chart_json({ title => '</script><b>x</b>', n => 1 });
+		unlike $json, qr/</, 'no < survives';
+		is_deeply decode_json($json), { title => '</script><b>x</b>', n => 1 }, 'and it still reads back exactly';
+	};
+
+	subtest 'Dashboard::_tile_colour_measure and _tile_colours' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		is $c->_tile_colour_measure(undef, 'amount')->{fn}, 'avg', 'average by default';
+		is $c->_tile_colour_measure('SUM', 'amount')->{fn}, 'sum', 'case does not matter';
+		like $c->_tile_colour_measure('evil', 'amount')->{error}, qr/\AUnknown aggregate function "evil"; expected one of: /, 'an unknown function';
+		is $c->_tile_colour_measure([ 'sum' ], 'amount')->{fn}, 'avg', 'a reference is not a function name';
+		my $m = $c->_tile_colour_measure('avg', 'amount');
+		my $colours = $c->_tile_colours(undef, $rows->(), 'region', $m);
+		is_deeply $colours, { North => 8.5, South => 5 }, 'one number a tile';
+		is_deeply $c->_tile_colours(undef, $rows->(), undef, $c->_tile_colour_measure('sum', 'amount')), { '' => 22 }, 'one total without a category';
+		is_deeply $c->_tile_colours(undef, [ { region => 'X', amount => 'abc' } ], 'region', $m), {}, 'a group with no number has no colour';
+	};
+
+	subtest 'Dashboard::_geo_lookup_sig -- one place, one key' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		my $sig = $c->_geo_lookup_sig('Ramsgate');
+		like $sig, qr/\A[0-9a-f]{40}\z/, 'a hex HMAC';
+		is $c->_geo_lookup_sig('Ramsgate'), $sig, 'the same place, the same signature';
+		isnt $c->_geo_lookup_sig('Ramsgate '), $sig, 'a different place, a different one';
+		isnt $c->_geo_lookup_sig("\x{10D}"), $c->_geo_lookup_sig("\xC4\x8D"), 'characters are signed as UTF-8, not confused with their bytes';
+		my $other = isolated_app();
+		isnt dash_controller($other->app, '/')->_geo_lookup_sig('Ramsgate'), $sig, 'another start has another secret';
+		$tm->app->secrets([ 'fixed' ]);
+		is $c->_geo_lookup_sig('x'), Mojo::Util::hmac_sha1_sum("geo-lookup\0x", 'fixed'), 'keyed by the first secret';
+	};
+
+	subtest 'Dashboard::_map_geocoder -- built from the configuration' => sub {
+		my ($tm) = $fixture_app->();
+		my $stub = Stub::Geocoder->new;
+		$tm->app->config->{geocoder} = $stub;
+		my $c = dash_controller($tm->app, '/');
+		my $g = $c->_map_geocoder(1);
+		isa_ok $g, 'Database::BI::Model::Geocode';
+		is $g->{_geocoder}, $stub, 'an injected geocoder is used';
+		is $g->{online}, 1, 'online by default';
+		is $c->_map_geocoder(0)->{online}, 0, 'a false argument keeps it local';
+		$tm->app->config->{map_geocode_online} = 0;
+		is $c->_map_geocoder(1)->{online}, 0, 'and so does the configuration, whatever is asked';
+		ok $g->{cache} && $g->{cache}->can('get'), 'answers are kept in files under the model store';
+		$tm->app->config->{geocoder} = 'not an object';
+		ok !exists $c->_map_geocoder(1)->{_geocoder}, 'a configured geocoder that is not one is ignored';
+		$tm->app->config->{map_geocode_online_max} = 'lots';
+		lives_ok { $c->_map_geocoder(1) } 'a bad online limit falls back to the default';
+	};
+
+	subtest 'Dashboard::_map_key -- what HTML::OSM is given' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		my %key = $c->_map_key('amount', [ { op => 'gt', val => 6, color => 'red' } ], '#00ff00', 0, '', []);
+		is $key{legend_title}, 'amount', 'titled with the colour column';
+		is_deeply [ map { [ @{$_}{qw(label colour group)} ] } @{ $key{legend} } ],
+			[ [ 'amount > 6', '#ff0000', 'rule0' ], [ 'Other', '#00ff00', 'other' ] ], 'colours as hex, with groups';
+		is $key{legend_empty}, 'Nothing in this view', 'what it says when nothing is in view';
+		%key = $c->_map_key('', [], '#3388ff', 0, 'amount', [ 2, 10 ]);
+		is_deeply [ map { $_->{label} } @{ $key{legend} } ], [qw(2 6 10)], 'sizes: smallest, middle, largest';
+		ok !(grep { exists $_->{group} } @{ $key{legend} }), 'sizes have no group, so they always show';
+		%key = $c->_map_key('', [], '#3388ff', 0, 'amount', [ 4, 4 ]);
+		is scalar(@{ $key{legend} }), 1, 'one size when every value is the same';
+		is_deeply [ $c->_map_key('', [], '#000', 0, '', []) ], [], 'nothing to explain, no key';
+		is_deeply [ $c->_map_key('', [], '#000', 0, 'amount', undef) ], [], 'a size column with no values';
+		is_deeply [ $c->_map_key('x', [ 'junk' ], '#000', 0, '', []) ], [], 'rules that are not rules make no key';
+	};
+
+	subtest 'Dashboard::_resolve_template -- always a directory that exists' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		is_deeply [ $c->_resolve_template ], [qw(web en)], 'the defaults';
+		my $fr = dash_controller($tm->app, '/');
+		$fr->req->headers->accept_language('xx-YY, zz');
+		$fr->req->headers->user_agent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)');
+		my ($platform, $language) = $fr->_resolve_template;
+		ok -d $tm->app->home->child("templates/$platform/$language"), "'$platform/$language' has templates";
+		$tm->app->config->{platform} = '../../etc';
+		($platform) = dash_controller($tm->app, '/')->_resolve_template;
+		ok $platform !~ m{/}, 'a configured platform cannot climb out of templates/';
+	};
+
+	subtest 'Dashboard::_render_csv, _render_json and _render_sqlite' => sub {
+		my ($tm) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/');
+		$c->_render_csv([ { a => '1,2', b => qq{say "hi"} } ], [qw(a b)], 'out');
+		like $c->res->headers->content_disposition, qr/filename="out\.csv"/, 'a CSV download';
+		is $c->res->body, qq{a,b\r\n"1,2","say ""hi"""\r\n}, 'quoted as RFC 4180 says';
+		$c = dash_controller($tm->app, '/');
+		$c->_render_json([ { a => '</script>' } ], ['a'], 'out');
+		is_deeply $c->res->json, [ { a => '</script>' } ], 'the rows as JSON';
+		like $c->res->headers->content_disposition, qr/filename="out\.json"/, 'a JSON download';
+		$c = dash_controller($tm->app, '/');
+		$c->_render_sqlite([ { a => 1 } ], ['a'], 'out');
+		is substr($c->res->body, 0, 16), "SQLite format 3\0", 'a SQLite file';
+		$c = dash_controller($tm->app, '/');
+		$tm->app->log->level('fatal');
+		Test::Mockingbird::mock("${D}::_write_sqlite_db", sub { die "disk full\n" });
+		$c->_render_sqlite([ { a => 1 } ], ['a'], 'out');
+		is $c->res->code, 500, 'a failed export is a 500';
+		unlike $c->res->body, qr/disk full/, 'whose reason stays in the log';
+		Test::Mockingbird::unmock("${D}::_write_sqlite_db");
+	};
+
+	subtest 'Dashboard::_page_columns -- the page with its fields drawn' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/?c=' . Mojo::Util::url_escape('double:amount*2'));
+		my $src = $c->open_table('sales', directory => $dir);
+		my ($records, $cols) = $c->_page_columns($src, $rows->(), 'table:none');
+		is $records->[0]{double}, 20, 'a field is drawn on the page';
+		ok( (grep { $_ eq 'double' } @{$cols}), 'and listed');
+		my $bad = dash_controller($tm->app, '/?c=' . Mojo::Util::url_escape('x:nope+1'));
+		is_deeply [ $bad->_page_columns($src, $rows->(), 'table:none') ], [], 'a field that cannot be drawn';
+		is $bad->res->code, 400, 'is a 400';
+		unlike $bad->res->body, qr/ at \S+ line \d+/, 'that does not say where in the code';
+		my $span = dash_controller($tm->app, '/?span=nope&tcol=id');
+		is_deeply [ $span->_page_columns($src, $rows->(), 'table:none') ], [], 'a bad span=';
+		is $span->res->code, 400, 'is a 400 as well';
+		my $empty = bless {}, 'Stub::NoColumns';
+		{ no strict 'refs'; *{'Stub::NoColumns::columns'} = sub { return }; }
+		is_deeply [ dash_controller($tm->app, '/')->_page_columns($empty, [], 'table:none') ], [ [], [] ], 'no columns, nothing to draw';
+	};
+
+	# Purpose: acceleration copies a file into the model store; it must only
+	# ever take a local data file, and must never serve a stale copy.
+	subtest 'Dashboard::_accel_file, accelerate, unaccelerate, accelerated_specs, _accelerated_source' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $c = $tm->app->build_controller;
+		bless $c, $D;
+		my $real = Mojo::File->new($dir)->child('sales.csv')->realpath->to_string;
+		is $c->_accel_file('table:sales'), Mojo::File->new($dir)->child('sales.csv')->to_string, 'a table in data_dir';
+		is $c->_accel_file("path:$dir/sales.csv"), $real, 'a path, resolved';
+		is $c->_accel_file($_), undef, "'" . ($_ // 'undef') . "' has no file"
+			for undef, '', 'table:a-b', 'table:none', 'url:http://x/a.csv', "path:$dir/none.csv", 'path:/../h/a.csv', "path:$dir";
+
+		throws_ok { $D->can('accelerate')->(undef, 'table:sales') } qr/\Aaccelerate\(\) needs a controller and a spec/, 'no controller';
+		throws_ok { $D->can('accelerate')->($c, 'table:none') }
+			qr/\ACannot accelerate "table:none": it must be a table: or path: spec naming a local file that exists/, 'nothing to read';
+		my $db = Mojo::File->new($dir)->child('lite.db');
+		$db->spew("SQLite format 3\0" . ("\0" x 84));
+		throws_ok { $D->can('accelerate')->($c, "path:$db") } qr/\ACannot accelerate "path:[^"]+": it is a SQLite database already/, 'already SQLite';
+
+		my $built = $D->can('accelerate')->($c, "path:$dir/sales.csv");
+		is_deeply [ @{$built}{qw(spec rows columns)} ], [ "path:$real", 3, 5 ], 'the extract: its key, rows and columns';
+		ok -f $built->{path}, 'written';
+		is_deeply [ $D->can('accelerated_specs')->($c) ], [ "path:$real" ], 'listed';
+
+		my $page = dash_controller($tm->app, '/');
+		my $src = $page->_accelerated_source("path:$dir/sales.csv");
+		ok $src, 'the extract is read while it matches';
+		is $page->stash('acceleration')->{state}, 'fresh', 'and the page says so';
+		sleep 1;
+		Mojo::File->new($dir)->child('sales.csv')->spew($CX{sales} . "4,West,1,A,x\n");
+		my $stale = dash_controller($tm->app, '/');
+		is $stale->_accelerated_source("path:$dir/sales.csv"), undef, 'a changed file is read, not its old copy';
+		is $stale->stash('acceleration')->{state}, 'stale', 'and the page says so';
+		my $off = dash_controller($tm->app, '/');
+		$off->stash(_no_acceleration => 1);
+		is $off->_accelerated_source("path:$dir/sales.csv"), undef, 'acceleration can be turned off for a request';
+		is dash_controller($tm->app, '/')->_accelerated_source('table:sales'), undef, 'a spec not accelerated';
+
+		ok $D->can('unaccelerate')->($c, "path:$dir/sales.csv"), 'unaccelerated';
+		ok !-f $built->{path}, 'and its extract removed';
+		ok !$D->can('unaccelerate')->($c, "path:$dir/sales.csv"), 'a second time there is nothing to do';
+		is_deeply [ $D->can('accelerated_specs')->($c) ], [], 'nothing is listed';
+		throws_ok { $D->can('accelerated_specs')->(undef) } qr/\Aaccelerated_specs\(\) needs a controller/, 'no controller';
+		throws_ok { $D->can('unaccelerate')->($c, undef) } qr/\Aunaccelerate\(\) needs a controller and a spec/, 'no spec';
+
+		$tm->app->config->{model_dir} = $dir;
+		throws_ok { $D->can('accelerate')->($c, 'table:sales') }
+			qr/\ACannot accelerate "table:sales": the model store cannot be written/, 'a store inside data_dir is refused';
+	};
+
+	subtest 'Dashboard::_run_pipeline_source -- the inner pipeline' => sub {
+		my ($tm, $dir) = $fixture_app->();
+		my $c = dash_controller($tm->app, '/?l=' . Mojo::Util::url_escape("path:$dir/sales.csv"));
+		my ($src, $records, $cols) = $c->_run_pipeline_source;
+		ok $src, 'a source';
+		is scalar(@{$records}), 3, 'every row';
+		is_deeply [ sort @{$cols} ], [ sort qw(id region amount code note) ], 'every column';
+		my $none = dash_controller($tm->app, '/?l=table:nosuch');
+		is_deeply [ $none->_run_pipeline_source ], [], 'nothing for a table that is not there';
+		is_deeply [ dash_controller($tm->app, '/')->_run_pipeline_source ], [], 'nor for no l=';
+		my $bad_join = dash_controller($tm->app, '/?l=' . Mojo::Util::url_escape("path:$dir/sales.csv") . '&j=' . Mojo::Util::url_escape('table:nosuch|id|id'));
+		my (undef, $kept) = $bad_join->_run_pipeline_source;
+		is scalar(@{$kept}), 3, 'a join whose right side cannot be opened is skipped, not fatal';
+		is_deeply $bad_join->stash('pipeline_joined') // [], [], 'and is not reported as joined';
+	};
+}
+
+
+# ============================================================================
+# PART U17: Dashboard -- the canvas, lookup, extraction and geocode routes, and
+# the helpers that draw a canvas card
+#
+# The routes are driven through Test::Mojo, because what they promise is a
+# status and a JSON body; most subtests send what a hostile or confused client
+# would (bad JSON, ids that are not ids, indexes past the end, forged
+# signatures) and check that the store is left as it was.  The card helpers
+# are called directly on a controller, with a real CSV under data_dir.
+# ============================================================================
+{
+	Readonly my %KX => (
+		sales     => "id,region,amount\n1,North,10\n2,South,5\n3,North,7\n",
+		codes     => "code,label\nA,Alpha\nB,Beta\n",
+		bad_id    => 'not-an-id!',
+		missing   => 'NoSuchCanvas',
+		long_len  => 4097,
+		not_found => 404,
+		bad       => 400,
+		forbidden => 403,
+		gone      => 503,
+		created   => 201,
+	);
+
+	# An application with sales.csv and codes.csv in a data_dir of its own,
+	# and a canvas over sales.csv; returns the app, the directory and the id.
+	sub canvas_app {
+		my $tm  = isolated_app();
+		my $dir = tempdir(CLEANUP => 1);
+		Mojo::File->new($dir)->child('sales.csv')->spew($KX{sales});
+		Mojo::File->new($dir)->child('codes.csv')->spew($KX{codes});
+		$tm->app->config->{data_dir} = $dir;
+		my $spec = 'path:' . Mojo::File->new($dir)->child('sales.csv')->realpath->to_string;
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name     => 'Sales',
+			datasets => [ { spec => $spec, alias => 'l' } ],
+			visuals  => [
+				{ kind => 'bar', encode => { cat => 'region', value => 'amount' }, title => 'By region' },
+				{ kind => 'text', options => { text => 'Note' } },
+			],
+		})->status_is($KX{created})->tx->res->json->{id};
+		return ($tm, $dir, $id, $spec);
+	}
+
+	# The canvas as stored, read back through the API.
+	sub canvas_doc {
+		my ($tm, $id) = @_;
+		return $tm->get_ok("/api/analyses/$id")->status_is(200)->tx->res->json;
+	}
+
+	subtest 'Dashboard::_cross_filter_source -- only a whole number names a card' => sub {
+		# int('abc') is 0, which would draw the first card unfiltered as the
+		# source of a cross-filter nobody made from it.
+		my $f = \&Database::BI::Controller::Dashboard::_cross_filter_source;
+		is $f->(undef), -1, 'no cv= is no source';
+		is $f->(''), -1, 'an empty one neither';
+		is $f->('abc'), -1, 'nor a word';
+		is $f->('-1'), -1, 'nor a negative index';
+		is $f->('1.5'), -1, 'nor a fraction';
+		is $f->("2\n"), -1, 'nor a number with a newline after it';
+		is $f->('1' x 10), -1, 'nor one too long to be an index';
+		is $f->([ 1 ]), -1, 'nor a reference';
+		is $f->('0'), 0, 'the first card';
+		is $f->('12'), 12, 'and any other';
+		warnings_are { $f->('abc') } [], 'and it warns about nothing';
+	};
+
+	subtest 'analyses_list / analyses_get -- what is stored, and nothing else' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		my $list = $tm->get_ok('/api/analyses')->status_is(200)->tx->res->json->{analyses};
+		is scalar(@$list), 1, 'one canvas listed';
+		is $list->[0]{id}, $id, 'by its id';
+		is $list->[0]{name}, 'Sales', 'and its name';
+		ok !exists $list->[0]{visuals}, 'the list does not carry every card';
+
+		$tm->get_ok("/api/analyses/$KX{missing}")->status_is($KX{not_found})
+			->json_is('/error', qq{Analysis "$KX{missing}" not found});
+		$tm->get_ok('/api/analyses/' . url_escape($KX{bad_id}))->status_is($KX{bad})
+			->json_is('/error', 'Invalid analysis id');
+		is canvas_doc($tm, $id)->{name}, 'Sales', 'a real one is returned whole';
+	};
+
+	subtest 'analyses_create -- refuses what is not a canvas' => sub {
+		my ($tm) = canvas_app();
+		$tm->post_ok('/api/analyses' => '{not json')->status_is($KX{bad})->json_has('/error');
+		$tm->post_ok('/api/analyses' => json => [ 1, 2 ])->status_is($KX{bad});
+		$tm->post_ok('/api/analyses' => json => { name => 'x' })->status_is($KX{bad})
+			->json_like('/error', qr/\AInvalid analysis spec: /);
+		$tm->post_ok('/api/analyses' => json => { name => 'x', datasets => [ 'junk' ], visuals => [] })
+			->status_is($KX{bad})->json_like('/error', qr/spec field/);
+		$tm->post_ok('/api/analyses' => json => { name => 'x', datasets => [ { spec => 'table:sales' } ], visuals => [ 'junk' ] })
+			->status_is($KX{bad})->json_like('/error', qr/must be an object/);
+		is scalar(@{ $tm->get_ok('/api/analyses')->tx->res->json->{analyses} }), 1, 'none of them was stored';
+
+		# A caller cannot choose its own id or smuggle in keys the store does not know.
+		my $id = $tm->post_ok('/api/analyses' => json => {
+			name => 'y', id => 'mine', datasets => [ { spec => 'table:sales' } ], visuals => [], evil => 1,
+		})->status_is($KX{created})->tx->res->json->{id};
+		isnt $id, 'mine', 'the server picks the id';
+		my $doc = canvas_doc($tm, $id);
+		ok !exists $doc->{evil}, 'an unknown key is dropped';
+		ok $doc->{created} && $doc->{updated}, 'times are stamped';
+	};
+
+	subtest 'analyses_create / _delete -- a store that cannot be written is a 503' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		Test::Mockingbird::mock('Database::BI::Controller::Dashboard::_write_analyses', sub { 0 });
+		$tm->post_ok('/api/analyses' => json => { name => 'z', datasets => [ { spec => 'table:sales' } ], visuals => [] })
+			->status_is($KX{gone});
+		$tm->delete_ok("/api/analyses/$id")->status_is($KX{gone});
+		Test::Mockingbird::unmock('Database::BI::Controller::Dashboard::_write_analyses');
+		is canvas_doc($tm, $id)->{name}, 'Sales', 'the canvas a refused delete named is still there';
+	};
+
+	subtest 'analyses_update -- a full replace keeps id and created' => sub {
+		my ($tm, undef, $id, $spec) = canvas_app();
+		my $before = canvas_doc($tm, $id);
+		$tm->put_ok("/api/analyses/$KX{missing}" => json => { name => 'x', datasets => [ { spec => $spec } ], visuals => [] })
+			->status_is($KX{not_found});
+		$tm->put_ok("/api/analyses/$id" => '[1]')->status_is($KX{bad});
+		$tm->put_ok("/api/analyses/$id" => json => { name => 'x', datasets => [ 'junk' ], visuals => [] })
+			->status_is($KX{bad});
+		is canvas_doc($tm, $id)->{name}, 'Sales', 'a refused replace changes nothing';
+
+		$tm->put_ok("/api/analyses/$id" => json => {
+			name => 'Renamed', id => 'other', created => 1, datasets => [ { spec => $spec } ], visuals => [],
+		})->status_is(200)->json_is('/updated', 1);
+		my $after = canvas_doc($tm, $id);
+		is $after->{name}, 'Renamed', 'replaced';
+		is $after->{id}, $id, 'the id cannot be changed';
+		is $after->{created}, $before->{created}, 'nor when it was made';
+	};
+
+	subtest 'analyses_patch -- merges only what is sent, and checks only that' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		my $created = canvas_doc($tm, $id)->{created};
+		$tm->patch_ok("/api/analyses/$KX{missing}" => json => { name => 'x' })->status_is($KX{not_found});
+		$tm->patch_ok("/api/analyses/$id" => 'nope')->status_is($KX{bad});
+		$tm->patch_ok("/api/analyses/$id" => json => { visuals => 'junk' })->status_is($KX{bad})
+			->json_like('/error', qr/\AInvalid analysis spec: /);
+		$tm->patch_ok("/api/analyses/$id" => json => { created => 1, id => 'x', name => 'Patched' })->status_is(200);
+		my $doc = canvas_doc($tm, $id);
+		is $doc->{name}, 'Patched', 'the name was merged';
+		is $doc->{created}, $created, 'created is immutable';
+		is $doc->{id}, $id, 'and so is id';
+		is scalar(@{ $doc->{visuals} }), 2, 'the cards it did not mention are kept';
+	};
+
+	subtest 'analyses_delete -- one canvas, once' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		$tm->delete_ok('/api/analyses/' . url_escape($KX{bad_id}))->status_is($KX{bad});
+		$tm->delete_ok("/api/analyses/$KX{missing}")->status_is($KX{not_found});
+		$tm->delete_ok("/api/analyses/$id")->status_is(200)->json_is('/deleted', 1);
+		$tm->delete_ok("/api/analyses/$id")->status_is($KX{not_found}, 'a second delete finds nothing');
+	};
+
+	subtest 'analyses_add_visual / _update_visual -- refused cards are not stored' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		$tm->post_ok("/api/analyses/$KX{missing}/visuals" => json => { kind => 'bar' })->status_is($KX{not_found});
+		$tm->post_ok("/api/analyses/$id/visuals" => 'x')->status_is($KX{bad});
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'teapot' })->status_is($KX{bad});
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', encode => { cat => 'nope', value => 'amount' } })
+			->status_is($KX{bad}, 'a column the data does not have');
+		is scalar(@{ canvas_doc($tm, $id)->{visuals} }), 2, 'nothing was added';
+
+		$tm->patch_ok("/api/analyses/$id/visuals/9" => json => { title => 'x' })->status_is($KX{not_found});
+		$tm->patch_ok("/api/analyses/$id/visuals/abc" => json => { title => 'x' })->status_is($KX{bad});
+		$tm->patch_ok("/api/analyses/$id/visuals/0" => '[')->status_is($KX{bad});
+		is canvas_doc($tm, $id)->{visuals}[0]{title}, 'By region', 'the card is as it was';
+
+		$tm->post_ok("/api/analyses/$id/visuals" => json => { kind => 'bar', encode => { cat => 'region', value => 'amount' }, title => 'Again' })
+			->status_is($KX{created});
+		is canvas_doc($tm, $id)->{visuals}[2]{title}, 'Again', 'a good card is appended';
+	};
+
+	subtest 'analyses_delete_visual -- only a text card, and the layout follows' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		$tm->patch_ok("/api/analyses/$id" => json => {
+			layout    => [ { visual => 0, x => 1, y => 1, w => 6, h => 1 }, { visual => 1, x => 7, y => 1, w => 6, h => 1 } ],
+			bookmarks => [ { name => 'b', state => 'cv=1&cf=region:eq:North' } ],
+		})->status_is(200);
+		$tm->delete_ok("/api/analyses/$id/visuals/0")->status_is($KX{bad})
+			->json_is('/error', 'Only a text card can be removed');
+		$tm->delete_ok("/api/analyses/$id/visuals/7")->status_is($KX{not_found})->json_is('/error', 'No visual at index 7');
+		$tm->delete_ok("/api/analyses/$id/visuals/x")->status_is($KX{bad});
+		$tm->delete_ok("/api/analyses/$KX{missing}/visuals/1")->status_is($KX{not_found});
+		is scalar(@{ canvas_doc($tm, $id)->{visuals} }), 2, 'nothing was removed';
+
+		$tm->delete_ok("/api/analyses/$id/visuals/1")->status_is(200)->json_is('/deleted', 1);
+		my $doc = canvas_doc($tm, $id);
+		is scalar(@{ $doc->{visuals} }), 1, 'the text card is gone';
+		is_deeply [ map { $_->{visual} } @{ $doc->{layout} } ], [ 0 ], 'and its place in the layout';
+		unlike $doc->{bookmarks}[0]{state}, qr/cv=1/, 'a bookmark no longer names it';
+	};
+
+	subtest 'analyses_export / analyses_import -- round trip, and junk refused' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		$tm->get_ok("/api/analyses/$KX{missing}/export")->status_is($KX{not_found});
+		my $file = $tm->get_ok("/api/analyses/$id/export")->status_is(200)->tx->res->json;
+		is $file->{name}, 'Sales', 'the export is the canvas';
+
+		$tm->post_ok('/api/analyses/import' => '{')->status_is($KX{bad});
+		$tm->post_ok('/api/analyses/import' => json => { name => 'i', datasets => [ 'junk' ], visuals => [] })->status_is($KX{bad});
+		my $new = $tm->post_ok('/api/analyses/import' => json => $file)->status_is($KX{created})->tx->res->json->{id};
+		isnt $new, $id, 'an import is a new canvas, not an overwrite';
+		is canvas_doc($tm, $new)->{name}, 'Sales', 'with the same content';
+	};
+
+	subtest 'canvas page -- a non-numeric cv= is not card 0' => sub {
+		my ($tm, undef, $id) = canvas_app();
+		my @warned;
+		local $SIG{__WARN__} = sub { push @warned, @_ };
+		$tm->get_ok("/a/$id?cv=abc&cf=region:eq:North")->status_is(200);
+		ok !(grep { /isn't numeric/ } @warned), 'no warning from int()' or diag explain \@warned;
+		$tm->get_ok("/a/$KX{missing}")->status_is($KX{not_found});
+	};
+
+	subtest 'canvases_view / preferences -- pages that read no data' => sub {
+		my ($tm) = canvas_app();
+		# The cards are drawn by the page's script from /api/analyses, so the
+		# page itself is checked for the parts that script and Import need.
+		$tm->get_ok('/canvases')->status_is(200)->element_exists('#cv-import')
+			->content_like(qr/There are no saved canvases yet/, 'the empty-list text is there for the script');
+		$tm->get_ok('/canvases?l=' . url_escape('<script>'))->status_is(200)->content_unlike(qr/<script>[^<]*<\/script>\s*\z/);
+		$tm->get_ok('/preferences')->status_is(200)->element_exists('select, input');
+		$tm->post_ok('/preferences')->status_is($KX{not_found}, 'preferences are kept by the browser, never posted');
+	};
+
+	subtest 'lookups_save / _list / _delete -- refuses before it writes' => sub {
+		my ($tm, $dir, undef, $spec) = canvas_app();
+		my $l = url_escape($spec);
+		$tm->post_ok('/lookups/save')->status_is($KX{bad})->json_is('/error', 'l= required');
+		$tm->post_ok("/lookups/save?l=$l&name=1bad&key=code")->status_is($KX{bad})
+			->json_is('/error', 'Lookup name "1bad" is not a valid identifier');
+		$tm->post_ok("/lookups/save?l=$l&name=codes")->status_is($KX{bad})->json_is('/error', 'key= required');
+		$tm->post_ok("/lookups/save?l=$l&name=codes&key=code&file=../../etc/passwd")->status_is($KX{bad});
+		$tm->post_ok("/lookups/save?l=$l&name=codes&key=code&file=nosuch.csv")->status_is($KX{bad});
+		$tm->get_ok("/lookups/list?l=$l")->status_is(200)->json_is('/lookups', {}, 'nothing refused was stored');
+		$tm->get_ok('/lookups/list')->status_is($KX{bad});
+
+		$tm->post_ok("/lookups/save?l=$l&name=codes&key=code&col=region&file=codes.csv&fields=label")->status_is(200);
+		$tm->get_ok("/lookups/list?l=$l")->json_is('/lookups/codes/file', 'codes.csv');
+		$tm->post_ok('/lookups/delete')->status_is($KX{bad});
+		$tm->post_ok("/lookups/delete?l=$l&name=other")->status_is(200);
+		$tm->get_ok("/lookups/list?l=$l")->json_has('/lookups/codes', 'deleting another name leaves this one');
+		$tm->post_ok("/lookups/delete?l=$l")->status_is(200);
+		$tm->get_ok("/lookups/list?l=$l")->json_is('/lookups', {}, 'no name= deletes them all');
+	};
+
+	subtest 'extract_save / _list / _delete -- a bad pattern is not stored' => sub {
+		my ($tm, undef, undef, $spec) = canvas_app();
+		my $l = url_escape($spec);
+		$tm->post_ok('/extract/save')->status_is($KX{bad})->json_is('/error', 'l= required');
+		$tm->post_ok("/extract/save?l=$l&name=x-y&col=region&pattern=a")->status_is($KX{bad})
+			->json_is('/error', 'Extraction name "x-y" is not a valid identifier');
+		$tm->post_ok("/extract/save?l=$l&name=n&pattern=a")->status_is($KX{bad})->json_is('/error', 'col= required');
+		$tm->post_ok("/extract/save?l=$l&name=n&col=region")->status_is($KX{bad})->json_is('/error', 'pattern= required');
+		$tm->post_ok("/extract/save?l=$l&name=n&col=region&pattern=" . url_escape('(?<a>x'))->status_is($KX{bad});
+		$tm->post_ok("/extract/save?l=$l&name=n&col=region&pattern=" . url_escape('(?{ 1 })'))->status_is($KX{bad}, 'no code in a pattern');
+		$tm->get_ok("/extract/list?l=$l")->status_is(200)->json_is('/extractions', {});
+		$tm->get_ok('/extract/list')->status_is($KX{bad});
+
+		$tm->post_ok("/extract/save?l=$l&name=n&col=region&pattern=" . url_escape('(?<first>\w)'))->status_is(200)
+			->json_is('/fields', [ 'first' ]);
+		$tm->post_ok('/extract/delete')->status_is($KX{bad});
+		$tm->post_ok("/extract/delete?l=$l&name=n")->status_is(200);
+		$tm->get_ok("/extract/list?l=$l")->json_is('/extractions', {});
+	};
+
+	subtest 'geo_lookup -- only a place a map page signed' => sub {
+		my ($tm) = canvas_app();
+		my $stub = Stub::Geocoder->new(results => {
+			$GOOD_PLACE => Stub::GeoPoint->new({ latitude => 51.3, longitude => 1.4, database => 'Test' }),
+		});
+		$tm->app->config->{geocoder} = $stub;
+		my $sig = dash_controller($tm->app, '/')->_geo_lookup_sig($GOOD_PLACE);
+
+		$tm->post_ok('/geo/lookup')->status_is($KX{bad})
+			->json_is('/error', 'A lookup needs place= and the sig= the map page gave it');
+		$tm->post_ok('/geo/lookup' => form => { place => $GOOD_PLACE })->status_is($KX{bad});
+		$tm->post_ok('/geo/lookup' => form => { place => $GOOD_PLACE, sig => 'f' x 40 })->status_is($KX{forbidden})
+			->json_like('/error', qr/\AThis place was not listed by a map page/);
+		$tm->post_ok('/geo/lookup' => form => { place => 'Elsewhere', sig => $sig })->status_is($KX{forbidden}, 'a signature is for one place');
+		is scalar(@{ $stub->{calls} }), 0, 'a refused request reaches no geocoder';
+
+		$tm->post_ok('/geo/lookup' => form => { place => $GOOD_PLACE, sig => $sig })->status_is(200)
+			->json_is('/place', $GOOD_PLACE)->json_is('/status', 'found')->json_is('/stored', 1);
+		$tm->post_ok('/geo/lookup' => form => { place => $GOOD_PLACE, sig => $sig })->status_is(200)
+			->json_is('/status', 'found');
+		is scalar(@{ $stub->{calls} }), 1, 'the second answer came from the cache';
+
+		my $none = dash_controller($tm->app, '/')->_geo_lookup_sig('Nowhere');
+		$tm->post_ok('/geo/lookup' => form => { place => 'Nowhere', sig => $none })->status_is(200)
+			->json_is('/status', 'not_found');
+	};
+
+	subtest 'Dashboard::_build_canvas_pipeline -- nothing to open is an empty list' => sub {
+		my ($tm, $dir, undef, $spec) = canvas_app();
+		my $c = dash_controller($tm->app, '/');
+		is_deeply [ $c->_build_canvas_pipeline({}) ], [], 'no datasets';
+		is_deeply [ $c->_build_canvas_pipeline({ datasets => [ {} ] }) ], [], 'a dataset with no spec';
+		is_deeply [ $c->_build_canvas_pipeline({ datasets => [ { spec => 'path:/no/such/file.csv' } ] }) ], [], 'one that cannot be opened';
+
+		my ($src, $records, $columns) = $c->_build_canvas_pipeline({ datasets => [ { spec => $spec, alias => 'l' } ] });
+		ok $src, 'a source';
+		is scalar(@$records), 3, 'every row';
+		ok((grep { $_ eq 'amount' } @$columns), 'and its columns');
+
+		my $codes = 'path:' . Mojo::File->new($dir)->child('codes.csv')->realpath->to_string;
+		lives_ok {
+			($src, $records) = $c->_build_canvas_pipeline({
+				datasets => [ { spec => $spec, alias => 'l' }, { spec => $codes, alias => 'r' } ],
+				joins    => [ { left => 'l' }, { left => 'l', right => 'r' } ],
+			});
+		} 'a join with no key is skipped, not fatal';
+		is scalar(@$records), 3, 'and the left rows are kept';
+	};
+
+	subtest 'Dashboard::_canvas_render_context -- bad state is a status, not a croak' => sub {
+		my ($tm, undef, $id, $spec) = canvas_app();
+		my $c = dash_controller($tm->app, '/');
+		my $a = { datasets => [ { spec => $spec } ], visuals => [] };
+		is_deeply $c->_canvas_render_context($a, [ 'q' ]), { error => 'query must be a string', status => $KX{bad} }, 'a reference';
+		is_deeply $c->_canvas_render_context($a, 'x' x $KX{long_len}), { error => 'query must be a string', status => $KX{bad} }, 'too long';
+		is $c->_canvas_render_context({ datasets => [] }, '')->{status}, 422, 'no data';
+		is $c->_canvas_render_context($a, '?c=' . url_escape('t:nosuchcol + 1'))->{status}, $KX{bad}, 'a calculated field that does not compile';
+
+		my $ctx = $c->_canvas_render_context($a, '?cf=region:eq:North&cv=zz');
+		is $ctx->{cf_source}, -1, 'a cv= that is not a number names no card';
+		is_deeply $ctx->{cf_specs}, [ 'region:eq:North' ], 'the cross-filter is kept';
+		is scalar(@{ $ctx->{records} }), 3, 'rows are not filtered here';
+		is $c->_canvas_render_context($a, '?cv=1')->{cf_source}, 1, 'a real index';
+		is $c->_canvas_render_context($a, undef)->{spec_key}, $spec, 'no query at all is fine';
+		memory_cycle_ok $ctx, 'the context holds no cycles';
+	};
+
+	subtest 'Dashboard::_render_visual_html / _markup -- every card is drawn or explained' => sub {
+		my ($tm, undef, undef, $spec) = canvas_app();
+		my $c = dash_controller($tm->app, '/');
+		my ($src, $records, $columns) = $c->_build_canvas_pipeline({ datasets => [ { spec => $spec } ] });
+		my $draw = sub { $c->_render_visual_html($_[0], $records, $columns, $src, 0, $spec, 0) };
+
+		my $text = $draw->({ kind => 'text', options => { text => '<b>hi</b>' } });
+		unlike $text->{html}, qr/<b>hi/, 'a text card escapes markup';
+		my $bar = $draw->({ kind => 'bar', encode => { cat => 'region', value => 'amount' } });
+		ok defined($bar->{html}) && !$bar->{error}, 'a bar card is drawn';
+		my $none = $draw->({ kind => 'bar', encode => { cat => 'nosuch', value => 'amount' } });
+		ok $none->{error} || defined $none->{html}, 'a missing column answers, rather than croaking';
+		my $odd = $draw->({ kind => 'teapot' });
+		ok ref($odd) eq 'HASH', 'an unknown kind answers too';
+		lives_ok { $draw->({ kind => 'bar', encode => 'junk', options => 'junk', filters => 'junk' }) }
+			'a card whose parts are not hashes does not take the page down';
+		lives_ok { $draw->({ kind => 'map', encode => { loc => 'region' }, options => { color_rules => 'junk' } }) }
+			'nor a map with junk rules';
+	};
+
+	subtest 'Dashboard::_map_data -- places, pending and keys from a stub geocoder' => sub {
+		my ($tm) = canvas_app();
+		$tm->app->config->{geocoder} = Stub::Geocoder->new(results => {
+			North => Stub::GeoPoint->new({ latitude => 55, longitude => -2, database => 'Test' }),
+		});
+		my $c = dash_controller($tm->app, '/');
+		my $rows = [ { region => 'North', amount => 10 }, { region => 'South', amount => 5 }, { region => '', amount => 1 } ];
+		my $cols = [ qw(region amount) ];
+
+		my $data = $c->_map_data($rows, $cols, { loc => 'region' }, {}, '', 'x');
+		ok ref($data) eq 'HASH', 'an answer';
+		diag explain [ sort keys %$data ] if $ENV{TEST_VERBOSE};
+
+		my $wait = $c->_map_data($rows, $cols, { loc => 'region' }, { lookup => 0 }, '', 'y');
+		ok ref($wait->{pending}) eq 'ARRAY', 'lookup => 0 says what is still to be looked up';
+		ok !(grep { $_ eq '' } @{ $wait->{pending} }), 'an empty cell is never pending';
+
+		lives_ok { $c->_map_data($rows, $cols, { loc => 'nosuch' }, {}, '', 'z') } 'a column that is not there';
+		lives_ok { $c->_map_data([], $cols, { loc => 'region' }, {}, '', 'w') } 'no rows at all';
+		lives_ok { $c->_map_data($rows, $cols, { loc => 'region' }, { color_rules => [ 'junk', 3 ] }, '', 'v') }
+			'rules that are not hashes are ignored';
+	};
+}
+
+# ============================================================================
+# DataSource::_best_id_column -- the id must not drop rows
+#
+# Database::Abstraction drops every row whose id cell is empty or starts with
+# '#', so the id is the safe column with the fewest such cells over the whole
+# file, not the first that happens to be filled in the first data row.
+# ============================================================================
+subtest 'DataSource::_best_id_column -- the column that drops fewest rows' => sub {
+	my $best = \&Database::BI::Model::DataSource::_best_id_column;
+	my $pick = sub {
+		my ($body, @header) = @_;
+		# CORE:: because the autodie in scope here cannot open an in-memory file.
+		CORE::open(my $fh, '<', \$body) or return 'cannot read';
+		return $best->($fh, ',', \@header);
+	};
+	is $pick->("650825,a,x\n,b,y\n,c,z\n", qw(Check Desc Status)), 'Desc',
+		'filled in the first row is not enough';
+	is $pick->("1,a\n2,b\n", qw(id name)), 'id', 'the earliest of two full columns';
+	is $pick->("1,\"a,b\",x\n2,c,y\n", qw(Check Desc Status)), 'Check', 'a quoted separator does not shift the cells';
+	is $pick->("#1,a\n#2,b\n", qw(id name)), 'name', "a cell D::A reads as a comment counts as empty";
+	is $pick->("  ,a\n\t,b\n", qw(id name)), 'name', 'so does whitespace';
+	is $pick->("\n\n1,\n", qw(id name)), 'id', 'blank lines are not rows';
+	is $pick->('', qw(id name)), 'id', 'no data: the first safe column';
+	is $pick->("1,2\n", 'Account Number', 'Post Date'), undef, 'no safe column at all';
+	is $pick->("1,2\n", '', 'b'), 'b', 'an empty header name is skipped, its index kept';
+	is $pick->(",,,x\n,,,y\n", qw(a b c d)), 'd', 'a short row is all empties before the filled cell';
+	is $pick->("a\nb\n", qw(x y)), 'x', 'a missing cell is empty in every row, so a tie keeps the earliest';
+	is $pick->("\"unterminated,1\n2,3\n", qw(a b)), 'a', 'a malformed line stops the count, not the open';
+	keeps_globals_ok('_best_id_column', sub { $pick->("1,a\n", qw(id name)) });
+};
 
 done_testing();
 

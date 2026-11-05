@@ -1,5 +1,10 @@
 Revision history for Ex-Op
 
+0.05    2026-11-04
+        - Make the empty my list case of the make test at run time, since my () does not compile before perl 5.22
+        - Skip the deparse test before perl 5.14, where a custom op has no class for B::Deparse to follow
+        - Accept "Not a CODE reference" for a call to a sub undefined after it was made an op, which is what perl before 5.16 says
+
 0.04    2026-11-03
         - Accept a return inside a block or a loop, unwinding as perl's return does
         - Decline an anon sub for what it captures, not for the clone flag the debugger sets on every one

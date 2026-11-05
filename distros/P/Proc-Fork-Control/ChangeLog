@@ -1,3 +1,26 @@
+11/04/2026 v 1.7	Version is the number 1.7. The old CVS $Revision string
+			no longer overwrites it at runtime.
+
+			A failed fork() is detected with defined(), so the parent
+			does not run the child code when fork fails.
+
+			cfork_sleep() and cfork_usleep() return the time actually
+			slept, and stop if the platform reports no progress.
+			cfork_ssleep() sleeps with select().
+
+			cfork_has_children() reports live children of this process.
+			cfork_init(0) stores a maximum of zero. cfork_wait_pid()
+			reaps while it waits. cfork_wait(seconds) returns false
+			on timeout.
+
+			A child started by cfork() drops the parent's pid list.
+			cfork_init() while children are still running keeps that
+			list and adds to the maximum.
+
+			POD matches the implementation. Distribution metadata
+			lists GPL-2 and the Artistic License. Functional tests
+			cover the public API and fail if the module warns.
+
 12/14/2015 v 1.6	cfork_wait_pid() has a bug, as a result of a deprecated
 			usage of `delete' function. This has now been corrected.
 

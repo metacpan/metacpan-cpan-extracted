@@ -36,7 +36,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
 		'Mojo::Base' => 0,
 		'Mojo::JSON' => 0,
-		'HTML::D3' => '0.27',	# 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
+		'HTML::D3' => '0.29',	# 0.29 colours treemap tiles by a measure, takes a combo scheme and escapes tooltip text; 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TagCloud' => '0.38',	# word cloud page (/wordcloud)
 		'HTML::TableExtract'	=> 0,
 		'HTTP::Request'			=> 0,		# Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
@@ -45,7 +45,7 @@ WriteMakefile(
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
 		'DB_File'			=> 0,		# Used in DataSource.pm for Berkeley DB magic-byte detection
 		'Mojolicious'	=> '9.49',
-		'Mojolicious::Plugin::Buffer'          => 0,
+		'Mojolicious::Plugin::Buffer'          => '0.001.1',
 		'Mojolicious::Plugin::TemplateToolkit' => 0,
 		'Params::Get'	=> 0.17,
 		'Params::Validate::Strict'	=> '0.41',
@@ -100,12 +100,21 @@ WriteMakefile(
 					# $MIN_GEOCODER_VERSION and in the messages that quote it;
 					# t/recommended-versions.t holds all three to this entry.
 					'Geo::Coder::Free' => '0.48',
+					# The chain the lookups go through (Geo::Coder::List; 0.39 keeps
+					# the log() that tells a place Nominatim does not know from a
+					# Nominatim that did not answer), and OpenStreetMap's Nominatim for
+					# the places Geo::Coder::Free does not know, kept to one request a
+					# second by LWP::UserAgent::Throttled.  Without the list there is no
+					# geocoding; without the other two it is local only.
+					'Geo::Coder::List' => '0.39',
+					'Geo::Coder::OSM' => '0.03',
+					'LWP::UserAgent::Throttled' => '0.14',
 					# The mariadb: data source, looked for when a server is opened.
 					# DBD::mysql serves in its place.
 					'DBD::MariaDB' => 0,
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
-					'HTML::OSM' => '0.12'
+					'HTML::OSM' => '0.13'
 				}
 			}, test => {
 				recommends => {

@@ -55,7 +55,7 @@ sub file2string {
 # range), so the call is captured to keep the TAP stream clean.
 sub gen_py {
 	my (%spec) = @_;
-	$spec{'output.file'} = File::Spec->catfile( $TMP, 'opt' . $seq++ . '.svg' );
+	$spec{output_file} = File::Spec->catfile( $TMP, 'opt' . $seq++ . '.svg' );
 	$spec{execute} = 0;
 	my ( $out, $err, $pyfile ) = capture { plt( \%spec ) };
 	return defined $pyfile && -e $pyfile ? file2string($pyfile) : '';
@@ -67,6 +67,21 @@ sub try_py {
 	my $py = '';
 	my $lived = eval { $py = gen_py(%spec); 1 };
 	return $lived ? ( 1, $py ) : ( 0, $@ );
+}
+
+# The exception's own message, without the stack trace under it.
+#
+# Devel::Confess appends a trace in which every frame prints its own arguments,
+# and one of those arguments is the options hash the call was made with, so
+# "notch" appears in "$@" whether or not the module ever mentioned it.  An
+# unlike() against the whole of "$@" therefore fails on a message that is
+# correct.  The trace begins at the first tab-indented line, as it does for
+# dies_like() in t/03.coverage.t.
+sub message_only {
+	my ($err) = @_;
+	$err = "$err";
+	$err =~ s/\n\t.*\z//s;
+	return $err;
 }
 
 # ----------------------------------------------------------------------------
@@ -88,7 +103,7 @@ my %runs = (    # replicate lines for "wide"
 
 # Deliberately incomplete: with rows and columns taken from the outer keys
 # (C, H), the cell H/C has no value, which is what exercises the undefined-cell
-# branch -- "undef.color", "mirror" and "default_undefined" all hang off it.
+# branch -- "undef_color", "mirror" and "default_undefined" all hang off it.
 my %matrix = (
 	H => { H => 432 },
 	C => { H => 411, C => 346 },
@@ -140,7 +155,7 @@ my %OPTIONS = (
 		{ opt => 'color',       val => [ 'red', 'gray' ],  data => $DATA{grouped} },
 		{ opt => 'color',       val => { A => 'red', B => 'green', C => 'blue' } },
 		{ opt => 'edgecolor',   val => 'black' },
-		{ opt => 'key.order',   val => [qw(C B A)] },
+		{ opt => 'key_order',   val => [qw(C B A)] },
 		{ opt => 'label',       val => [ 'UK', 'US' ],     data => $DATA{grouped} },
 		{ opt => 'linewidth',   val => 2, with => { edgecolor => 'black' } },
 		{ opt => 'log',         val => 'True' },
@@ -157,7 +172,7 @@ my %OPTIONS = (
 	boxplot => [
 		{ opt => 'color',       val => 'pink' },
 		{ opt => 'colors',      val => { A => 'orange', B => 'purple' } },
-		{ opt => 'key.order',   val => [qw(B A)] },
+		{ opt => 'key_order',   val => [qw(B A)] },
 		{ opt => 'logscale',    val => ['y'],   want => qr/set_yscale\("log"\)/ },
 		{ opt => 'notch',       val => 'True',  want => qr/notch = True/ },
 		{ opt => 'orientation', val => 'horizontal', want => qr/orientation = 'horizontal'/ },
@@ -168,45 +183,46 @@ my %OPTIONS = (
 	violinplot => [
 		{ opt => 'color',       val => 'red' },
 		{ opt => 'colors',      val => { A => 'yellow', B => 'purple' } },
-		{ opt => 'key.order',   val => [qw(B A)] },
+		{ opt => 'key_order',   val => [qw(B A)] },
 		{ opt => 'logscale',    val => ['y'],   want => qr/set_yscale\("log"\)/ },
 		{ opt => 'orientation', val => 'horizontal', want => qr/orientation = 'horizontal'/ },
 		{ opt => 'whiskers',    val => 0,       want_not => qr/\.vlines\(/ },
-		# read by violin_helper, but absent from its accepted-option list
-		{ opt => 'medians',     val => 0, todo => 'medians is read but not an accepted option' },
-		{ opt => 'edgecolor',   val => 'red', todo => 'edgecolor is read but not an accepted option' },
+		{ opt => 'medians',     val => 0 },
+		{ opt => 'edgecolor',   val => 'red' },
 	],
 	colored_table => [
 		{ opt => 'cb_logscale',  val => 1,      want => qr/LogNorm/ },
-		{ opt => 'cb_min',       val => 100,    want => qr/vmin = 100/ },
-		{ opt => 'cb_max',       val => 500,    want => qr/vmax = 500/ },
+		# The bounds of the one norm that colors both the cells and the
+		# colorbar, since 0.315; before that they reached only the hidden
+		# image's "vmin =" and "vmax =".
+		{ opt => 'cb_min',       val => 100,    want => qr/norm = plt\.Normalize\(100, / },
+		{ opt => 'cb_max',       val => 500,    want => qr/norm = plt\.Normalize\(\S+, 500\)/ },
 		{ opt => 'cblabel',      val => 'kJ/mol', want => qr/label = 'kJ\/mol'/ },
 		{ opt => 'cmap',         val => 'viridis', want => qr/viridis/ },
-		{ opt => 'col.labels',   val => [qw(H C)] },
-		{ opt => 'colorbar.on',  val => 0,      want_not => qr/fig\.colorbar/ },
+		{ opt => 'col_labels',   val => [qw(H C)] },
+		{ opt => 'colorbar_on',  val => 0,      want_not => qr/fig\.colorbar/ },
 		{ opt => 'mirror',       val => 1 },
-		{ opt => 'row.labels',   val => [qw(H C)] },
-		{ opt => 'show.numbers', val => 1,      want => qr/cellText/ },
-		{ opt => 'undef.color',  val => 'white', want => qr/set_bad\("white"\)/ },
-		# defaulted, but the line that consumed it is commented out
-		{ opt => 'default_undefined', val => 0, want_not => qr/np\.nan/,
-		  todo_effect => 'default_undefined never replaces the missing cells' },
+		{ opt => 'row_labels',   val => [qw(H C)] },
+		{ opt => 'show_numbers', val => 1,      want => qr/cellText/ },
+		{ opt => 'undef_color',  val => 'white', want => qr/set_bad\('white'\)/ },
+		# a cell with no value gets this instead of np.nan, so the colormap's
+		# set_bad (and with it "undef_color") never sees it
+		{ opt => 'default_undefined', val => 0, want_not => qr/np\.nan/ },
 	],
 	hexbin => [
 		{ opt => 'cb_logscale',    val => 1,    want => qr/LogNorm/ },
 		{ opt => 'cblabel',        val => 'counts', want => qr/label = cblabel/ },
 		{ opt => 'cmap',           val => 'jet', want => qr/jet/ },
-		{ opt => 'key.order',      val => [qw(Y X)] },
+		{ opt => 'key_order',      val => [qw(Y X)] },
 		{ opt => 'marginals',      val => 1,    want => qr/marginals/ },
 		{ opt => 'mincnt',         val => 2,    want => qr/mincnt/ },
 		{ opt => 'vmin',           val => 0,    want => qr/vmin/ },
 		{ opt => 'vmax',           val => 25,   want => qr/vmax/ },
 		{ opt => 'xbins',          val => 9 },
 		{ opt => 'ybins',          val => 9 },
-		{ opt => 'xscale.hexbin',  val => 'log', want => qr/xscale/ },
-		{ opt => 'yscale.hexbin',  val => 'log', want => qr/yscale/ },
-		{ opt => 'colorbar.on',    val => 0,    want_not => qr/colorbar/,
-		  todo_effect => 'hexbin draws its colorbar regardless of colorbar.on' },
+		{ opt => 'xscale_hexbin',  val => 'log', want => qr/xscale/ },
+		{ opt => 'yscale_hexbin',  val => 'log', want => qr/yscale/ },
+		{ opt => 'colorbar_on',    val => 0,    want_not => qr/colorbar/ },
 	],
 	hist => [
 		{ opt => 'alpha',       val => 0.25,   want => qr/alpha = 0\.25/ },
@@ -217,7 +233,7 @@ my %OPTIONS = (
 		{ opt => 'color',       val => 'red' },
 		{ opt => 'logscale',    val => ['y'],  want => qr/set_yscale\("log"\)/ },
 		{ opt => 'orientation', val => 'horizontal', want => qr/orientation/ },
-		{ opt => 'show.legend', val => 0,      want_not => qr/label = 'A'/ },
+		{ opt => 'show_legend', val => 0,      want_not => qr/label = 'A'/ },
 	],
 	hist2d => [
 		{ opt => 'cb_logscale',   val => 1,     want => qr/LogNorm/ },
@@ -226,9 +242,9 @@ my %OPTIONS = (
 		{ opt => 'cmin',          val => 1,     want => qr/cmin/ },
 		{ opt => 'cmax',          val => 20,    want => qr/cmax/ },
 		{ opt => 'density',       val => 'True', want => qr/density/ },
-		{ opt => 'key.order',     val => [qw(Y X)] },
+		{ opt => 'key_order',     val => [qw(Y X)] },
 		{ opt => 'logscale',      val => ['x'], want => qr/set_xscale\("log"\)/ },
-		{ opt => 'show.colorbar', val => 0,     want_not => qr/colorbar/ },
+		{ opt => 'show_colorbar', val => 0,     want_not => qr/colorbar/ },
 		{ opt => 'vmin',          val => 0 },
 		{ opt => 'vmax',          val => 20 },
 		{ opt => 'xbins',         val => 9 },
@@ -242,7 +258,7 @@ my %OPTIONS = (
 		{ opt => 'cborientation', val => 'horizontal', want => qr/orientation = 'horizontal'/ },
 		{ opt => 'cbpad',         val => 0.01,  want => qr/pad = 0\.01/ },
 		{ opt => 'cmap',          val => 'coolwarm', want => qr/coolwarm/ },
-		{ opt => 'colorbar.on',   val => 0,     want_not => qr/fig\.colorbar/ },
+		{ opt => 'colorbar_on',   val => 0,     want_not => qr/fig\.colorbar/ },
 		{ opt => 'vmin',          val => 0,     want => qr/vmin = 0/ },
 		{ opt => 'vmax',          val => 10,    want => qr/vmax = 10/ },
 		{ opt => 'stringmap',     val => { H => 'helix', T => 'turn' },
@@ -252,18 +268,16 @@ my %OPTIONS = (
 		{ opt => 'autopct',       val => '%1.1f%%', want => qr/autopct/ },
 		{ opt => 'labeldistance', val => 0.6,   want => qr/labeldistance/ },
 		{ opt => 'pctdistance',   val => 1.25,  want => qr/pctdistance/ },
-		# read by pie_helper, but absent from its accepted-option list
-		{ opt => 'key.order',     val => [qw(C B A)],
-		  todo => 'key.order is read but not an accepted option' },
+		{ opt => 'key_order',     val => [qw(C B A)] },
 	],
 	plot => [
-		{ opt => 'key.order',   val => [qw(B A)] },
+		{ opt => 'key_order',   val => [qw(B A)] },
 		{ opt => 'logscale',    val => [ 'x', 'y' ], want => qr/set_yscale\("log"\)/ },
-		{ opt => 'set.options', val => 'linewidth = 2', want => qr/linewidth = 2/ },
-		{ opt => 'set.options', val => { A => 'color = "red"' }, want => qr/color = "red"/ },
-		{ opt => 'show.legend', val => 0 },
+		{ opt => 'set_options', val => 'linewidth = 2', want => qr/linewidth = 2/ },
+		{ opt => 'set_options', val => { A => 'color = "red"' }, want => qr/color = "red"/ },
+		{ opt => 'show_legend', val => 0 },
 		{ opt => 'twinx',       val => 'B',    want => qr/twinx\(\)/ },
-		{ opt => 'twinx.args',  val => { B => { ylabel => 'other' } },
+		{ opt => 'twinx_args',  val => { B => { ylabel => 'other' } },
 		  with => { twinx => 'B' }, want => qr/twinx\(\)/ },
 	],
 	scatter => [
@@ -271,19 +285,20 @@ my %OPTIONS = (
 		{ opt => 'color_key',   val => 'Z',    want => qr/c = z/ },
 		{ opt => 'keys',        val => [qw(Y X Z)] },
 		{ opt => 'logscale',    val => ['y'], want => qr/set_yscale\("log"\)/ },
-		{ opt => 'set.options', val => 'marker = "v"', want => qr/marker = "v"/ },
+		{ opt => 'set_options', val => 'marker = "v"', want => qr/marker = "v"/ },
 		{ opt => 'cbpad',       val => 0.1,   want => qr/pad = 0\.1/ },
+		{ opt => 'tooltips',    val => [ map { "p$_" } @cx ], want => qr/urls = tooltip_urls/ },
 		{ opt => 'cbdrawedges', val => 1,     want => qr/drawedges/ },
 	],
 	venn_proportional_area => [
 		{ opt => 'alpha',      val => 0.5,    want => qr/alpha=0\.5/ },
-		{ opt => 'key.order',  val => [qw(Right Left)] },
-		{ opt => 'set_colors', val => [qw(skyblue salmon)], want => qr/set_colors=\("skyblue","salmon"\)/ },
+		{ opt => 'key_order',  val => [qw(Right Left)] },
+		{ opt => 'set_colors', val => [qw(skyblue salmon)], want => qr/set_colors=\('skyblue','salmon'\)/ },
 	],
 	wide => [
 		{ opt => 'color',       val => { A => 'blue', B => 'green' }, want => qr/'blue'/ },
 		{ opt => 'color',       val => 'red', data => $DATA{wide}{A}, want => qr/'red'/ },
-		{ opt => 'show.legend', val => 0,     want_not => qr/label = 'A'/ },
+		{ opt => 'show_legend', val => 0,     want_not => qr/label = 'A'/ },
 	],
 );
 
@@ -298,7 +313,7 @@ foreach my $type ( sort keys %OPTIONS ) {
 		$label .= ' (' . ref( $case->{val} ) . ')' if ref $case->{val};
 
 		my ( $ok, $result ) = try_py(
-			'plot.type' => $type,
+			plot_type => $type,
 			data        => $data,
 			%{ $case->{with} || {} },
 			$opt        => $case->{val},
@@ -325,40 +340,228 @@ foreach my $type ( sort keys %OPTIONS ) {
 #    Each of these has been documented for the wrong plot type at some point;
 #    the boundary is asserted so that the documentation cannot drift back.
 # ============================================================================
+# The 5th field is the plot type(s) the option does belong to, which the
+# refusal is expected to name: the whole point of refusing "notch" at a line
+# plot is to say where "notch" does work.
 my @NOT_ACCEPTED = (
-	[ 'boxplot',    'whiskers',    0,       'whiskers belongs to violin' ],
-	[ 'violinplot', 'log',         1,       'violin takes logscale, not log' ],
-	[ 'hist',       'log',         1,       'hist takes logscale, not log' ],
-	[ 'wide',       'logscale',    ['y'],   'wide has no logscale' ],
-	[ 'wide',       'key.order',   ['A'],   'wide has no key.order' ],
-	[ 'boxplot',    'bins',        5,       'bins belongs to hist' ],
-	[ 'pie',        'stacked',     1,       'stacked belongs to bar' ],
-	[ 'plot',       'notch',       'True',  'notch belongs to boxplot' ],
+	[ 'boxplot',    'whiskers',    0,       'whiskers belongs to violin', 'violin, violinplot' ],
+	[ 'violinplot', 'log',         1,       'violin takes logscale, not log', 'bar, barh' ],
+	[ 'hist',       'log',         1,       'hist takes logscale, not log', 'bar, barh' ],
+	[ 'wide',       'logscale',    ['y'],   'wide has no logscale', 'bar, barh, boxplot' ],
+	[ 'wide',       'key_order',   ['A'],   'wide has no key_order', 'bar, barh, boxplot' ],
+	[ 'boxplot',    'bins',        5,       'bins belongs to hist', 'hist' ],
+	[ 'pie',        'stacked',     1,       'stacked belongs to bar', 'bar, barh' ],
+	[ 'plot',       'notch',       'True',  'notch belongs to boxplot', 'boxplot' ],
+	[ 'plot',       'tooltips',    ['a'],   'tooltips belongs to scatter', 'scatter' ],
 );
 foreach my $case (@NOT_ACCEPTED) {
-	my ( $type, $opt, $val, $why ) = @{$case};
+	my ( $type, $opt, $val, $why, $belongs_to ) = @{$case};
 	my ( $ok, $result ) = try_py(
-		'plot.type' => $type,
+		plot_type => $type,
 		data        => $DATA{$type},
 		$opt        => $val,
 	);
 	if ($ok) {
 		ok( 0, "$type: $opt is refused ($why)" );
-	} else {
-		like( $result, qr/aren't defined|not recognized|are accepted/,
-			"$type: $opt is refused with the list of accepted options ($why)" );
+		next;
 	}
+	like( $result, qr/\Q"$opt" isn't defined for plot_type "$type"\E/,
+		"$type: $opt is refused, naming the option and the plot type ($why)" );
+	like( $result, qr/\Q"$opt" is a defined keyword, but for plot_type \E\Q$belongs_to\E/,
+		"$type: the refusal of $opt says where $opt does belong ($why)" );
+}
+
+# ============================================================================
+# 2a. A misspelled option is refused with the options it resembles.
+#
+#     The suggestions are drawn from the plot type's own list, so the same
+#     misspelling gets a different answer at a different plot type; that is
+#     the property worth asserting, since a global list would suggest options
+#     that go on to be refused by the helper.
+# ============================================================================
+my @MISSPELT = (
+	# type, what was typed, what the message must offer, why
+	[ 'bar',        'xlim',        'set_xlim',    'set_xlim is reached by its matplotlib name' ],
+	[ 'bar',        'widht',       'width',       'two characters transposed' ],
+	[ 'bar',        'keyorder',    'key_order',   'the separator dropped' ],
+	[ 'plot',       'set.xlim',    'set_xlim',    'a dot for the underscore' ],
+	[ 'hist',       'bins_',       'bins',        'a trailing underscore' ],
+	[ 'scatter',    'colorkey',    'color_key',   'the separator dropped the other way' ],
+	[ 'boxplot',    'orientaton',  'orientation', 'a dropped letter' ],
+	[ 'imshow',     'cmpa',        'cmap',        'two characters transposed' ],
+	[ 'hexbin',     'cb_label',    'cblabel',     'an underscore too many' ],
+);
+foreach my $case (@MISSPELT) {
+	my ( $type, $typed, $meant, $why ) = @{$case};
+	my ( $ok, $result ) = try_py(
+		plot_type => $type,
+		data        => $DATA{$type},
+		$typed      => 1,
+	);
+	if ($ok) {
+		ok( 0, "$type: $typed is refused ($why)" );
+		next;
+	}
+	my ($line) = grep { /\Q"$typed" isn't defined\E/ } split /\n/, $result;
+	$line = '' unless defined $line;
+	like( $line, qr/perhaps you meant one of these defined keywords: \([^)]*\b\Q$meant\E\b/,
+		"$type: \"$typed\" is refused with \"$meant\" among the suggestions ($why)" );
+}
+
+# The suggestions are per-plot-type, not one global list: "bins" is a hist
+# option, so hist offers it and boxplot must not.
+{
+	my ( undef, $at_hist ) = try_py(
+		plot_type => 'hist',
+		data        => $DATA{hist},
+		'bins_'     => 1,
+	);
+	my ( undef, $at_boxplot ) = try_py(
+		plot_type => 'boxplot',
+		data        => $DATA{boxplot},
+		'bins_'     => 1,
+	);
+	my ($hist_line)    = grep { /perhaps you meant/ } split /\n/, $at_hist;
+	my ($boxplot_line) = grep { /perhaps you meant/ } split /\n/, $at_boxplot;
+	like( $hist_line, qr/\bbins\b/, 'hist suggests "bins" for "bins_"' );
+	unlike( $boxplot_line // '', qr/\bbins\b/,
+		'boxplot does not suggest "bins", which boxplot does not take' );
+}
+
+# A keyword resembling nothing at all still dies, and says so rather than
+# offering a suggestion it does not have.
+{
+	my ( $ok, $result ) = try_py(
+		plot_type => 'bar',
+		data        => $DATA{bar},
+		'zzqqxx'    => 1,
+	);
+	ok( !$ok, 'an option resembling nothing dies' );
+	like( $result, qr/\Q"zzqqxx" isn't defined for plot_type "bar"\E/,
+		'an option resembling nothing is named in the message' );
+	unlike( message_only($result), qr/perhaps you meant/,
+		'an option resembling nothing is not given a made-up suggestion' );
 }
 
 # An option that belongs to no plot type at all must die for every type.
 foreach my $type ( sort keys %DATA ) {
 	next if $type eq 'grouped';    # not a plot type, just a data shape
 	my ( $ok, $result ) = try_py(
-		'plot.type'      => $type,
+		plot_type        => $type,
 		data             => $DATA{$type},
 		'not.an.option'  => 1,
 	);
 	ok( !$ok, "$type: an unknown option dies" );
+}
+
+# ============================================================================
+# 2b. A misspelled "plot_type" is refused with the plot types it resembles.
+#
+#     "plot_type" is the one argument to plt whose value, not its name, comes
+#     from a fixed list, so it needs the same treatment as a misspelled option
+#     name.  It is checked at four places -- a single plot, a subplot, and an
+#     "add" graph hanging off either -- and all four are asserted here, because
+#     the subplot one used to reach the dispatch table as an undefined code
+#     reference and die as "Can't use an undefined value as a subroutine
+#     reference", naming neither the type nor the subplot.
+# ============================================================================
+my @MISTYPED = (
+	# what was typed, what the message must offer, why
+	[ 'barr',      'bar',           'a doubled letter' ],
+	[ 'scattr',    'scatter',       'a dropped letter' ],
+	[ 'violn',     'violin',        'a dropped letter' ],
+	[ 'histt',     'hist',          'a doubled letter' ],
+	[ 'pye',       'pie',           'two characters transposed' ],
+	[ 'hist_2d',   'hist2d',        'a separator that does not belong' ],
+	[ 'coloredtable', 'colored_table', 'the separator dropped' ],
+	[ 'box',       'boxplot',       'the type reached for by half its name' ],
+);
+foreach my $case (@MISTYPED) {
+	my ( $typed, $meant, $why ) = @{$case};
+	my ( $ok, $result ) = try_py(
+		plot_type => $typed,
+		data        => $DATA{bar},
+	);
+	if ($ok) {
+		ok( 0, "\"$typed\" is refused as a plot_type ($why)" );
+		next;
+	}
+	like( $result, qr/\Q"$typed" isn't a defined plot_type\E, perhaps you meant one of these defined plot types: \([^)]*\b\Q$meant\E\b/,
+		"plot_type \"$typed\" is refused with \"$meant\" among the suggestions ($why)" );
+}
+
+# The same message, naming the subplot, from each of the three nested places a
+# plot_type can be given.
+{
+	my ( $ok, $result ) = try_py(
+		ncols => 2,
+		plots => [
+			{ plot_type => 'bar',   data => $DATA{bar} },
+			{ plot_type => 'violn', data => $DATA{violinplot} },
+		],
+	);
+	ok( !$ok, 'a misspelled plot_type at a subplot dies' );
+	like( $result, qr/\Q"violn" isn't a defined plot_type at subplot 1\E/,
+		'a misspelled plot_type at a subplot names the subplot' );
+	like( $result, qr/perhaps you meant one of these defined plot types: \([^)]*\bviolin\b/,
+		'a misspelled plot_type at a subplot is given suggestions' );
+}
+{
+	my ( $ok, $result ) = try_py(
+		plot_type => 'bar',
+		data        => $DATA{bar},
+		add         => [ { plot_type => 'histt', data => $DATA{hist} } ],
+	);
+	ok( !$ok, 'a misspelled plot_type in "add" dies' );
+	like( $result, qr/\Q"histt" isn't a defined plot_type for an "add" graph\E/,
+		'a misspelled plot_type in "add" says which graph it was' );
+}
+{
+	my ( $ok, $result ) = try_py(
+		ncols => 2,
+		plots => [
+			{ plot_type => 'bar', data => $DATA{bar} },
+			{
+				plot_type => 'bar',
+				data        => $DATA{bar},
+				add         => [ { plot_type => 'pye', data => $DATA{pie} } ],
+			},
+		],
+	);
+	ok( !$ok, 'a misspelled plot_type in a subplot\'s "add" dies' );
+	like( $result, qr/\Q"pye" isn't a defined plot_type for an "add" graph at subplot 1\E/,
+		'a misspelled plot_type in a subplot\'s "add" names the subplot' );
+}
+
+# A plot_type resembling nothing gets the whole list instead of a suggestion it
+# does not have, which is the same fallback a keyword resembling nothing gets.
+{
+	my ( $ok, $result ) = try_py(
+		plot_type => 'zzqqxx',
+		data        => $DATA{bar},
+	);
+	ok( !$ok, 'a plot_type resembling nothing dies' );
+	unlike( message_only($result), qr/perhaps you meant/,
+		'a plot_type resembling nothing is not given a made-up suggestion' );
+	like( $result, qr/the defined plot types are: \([^)]*\bvenn_proportional_area\b/,
+		'a plot_type resembling nothing is given the whole list' );
+}
+
+# A misspelled plot_type is reported before its options are: with no type in
+# hand plt has no per-type option list, so it falls back to the union of every
+# type's and the caller is told their options do not exist rather than that
+# their type does not.
+{
+	my ( $ok, $result ) = try_py(
+		plot_type => 'barr',
+		data        => $DATA{bar},
+		notch       => 'True',    # real, but a boxplot option
+	);
+	ok( !$ok, 'a misspelled plot_type with a foreign option dies' );
+	like( $result, qr/\Q"barr" isn't a defined plot_type\E/,
+		'the type is what the message is about' );
+	unlike( message_only($result), qr/\Qnotch\E/,
+		'the options are not reported against a type that does not exist' );
 }
 
 # ============================================================================
@@ -370,7 +573,7 @@ foreach my $type ( sort keys %DATA ) {
 # ============================================================================
 foreach my $type (qw(boxplot violinplot hist scatter plot)) {
 	my ( $ok, $result ) = try_py(
-		'plot.type' => $type,
+		plot_type => $type,
 		data        => $DATA{$type},
 		logscale    => 1,          # should be ['y']
 	);
@@ -378,7 +581,7 @@ foreach my $type (qw(boxplot violinplot hist scatter plot)) {
 }
 {
 	my ( $ok ) = try_py(
-		'plot.type' => 'bar',
+		plot_type => 'bar',
 		data        => $DATA{bar},
 		logscale    => 1,          # bar's logscale really is a scalar
 	);
@@ -406,7 +609,7 @@ my @SHAPES = (
 );
 foreach my $case (@SHAPES) {
 	my ( $type, $data, $should_live, $name ) = @{$case};
-	my ($ok) = try_py( 'plot.type' => $type, data => $data );
+	my ($ok) = try_py( plot_type => $type, data => $data );
 	is( $ok ? 1 : 0, $should_live, $name );
 }
 
@@ -419,47 +622,47 @@ foreach my $case (@SHAPES) {
 # ============================================================================
 my @MESSAGES = (
 	[   'boxplot colors missing a key',
-		{ 'plot.type' => 'boxplot', data => $DATA{boxplot}, colors => { A => 'red' } },
+		{ plot_type => 'boxplot', data => $DATA{boxplot}, colors => { A => 'red' } },
 		qr/no defined color/,
 	],
 	[   'violin colors missing a key',
-		{ 'plot.type' => 'violinplot', data => $DATA{violinplot}, colors => { A => 'red' } },
+		{ plot_type => 'violinplot', data => $DATA{violinplot}, colors => { A => 'red' } },
 		qr/no defined color/,
 	],
 	[   'scatter color_key that is not in the data',
-		{ 'plot.type' => 'scatter', data => { X => [ 1 .. 5 ], Y => [ 1 .. 5 ] },
+		{ plot_type => 'scatter', data => { X => [ 1 .. 5 ], Y => [ 1 .. 5 ] },
 		  color_key => 'Nope' },
 		qr/Nope/,
 	],
 	[   'scatter multi-set color_key that is not in every set',
-		{ 'plot.type' => 'scatter',
+		{ plot_type => 'scatter',
 		  data => { S => { A => [ 1 .. 5 ], B => [ 1 .. 5 ], C => [ 1 .. 5 ] } },
 		  color_key => 'Missing' },
 		qr/Missing/,
 	],
 	[   'imshow string data with no stringmap',
-		{ 'plot.type' => 'imshow', data => [ [ 'H', 'T' ], [ 'T', 'H' ] ] },
+		{ plot_type => 'imshow', data => [ [ 'H', 'T' ], [ 'T', 'H' ] ] },
 		qr/translate strings/,
 	],
 	[   'hist non-numeric data',
-		{ 'plot.type' => 'hist', data => { A => [ 1, 'x', 3 ] } },
+		{ plot_type => 'hist', data => { A => [ 1, 'x', 3 ] } },
 		qr/non-numeric/,
 	],
 	[   'boxplot non-numeric data',
-		{ 'plot.type' => 'boxplot', data => { A => [ 1, 'x', 3 ] } },
+		{ plot_type => 'boxplot', data => { A => [ 1, 'x', 3 ] } },
 		qr/non-numeric/,
 	],
 	[   'venn with a non-array set',
-		{ 'plot.type' => 'venn_proportional_area', data => { A => 'a', B => 'b' } },
+		{ plot_type => 'venn_proportional_area', data => { A => 'a', B => 'b' } },
 		qr/array reference/,
 	],
-	[   'key.order that does not match the data',
-		{ 'plot.type' => 'venn_proportional_area', data => $DATA{venn_proportional_area},
-		  'key.order' => ['Left'] },
-		qr/key\.order/,
+	[   'key_order that does not match the data',
+		{ plot_type => 'venn_proportional_area', data => $DATA{venn_proportional_area},
+		  key_order => ['Left'] },
+		qr/key_order/,
 	],
-	[   'unknown plot.type',
-		{ 'plot.type' => 'nonesuch', data => { A => 1 } },
+	[   'unknown plot_type',
+		{ plot_type => 'nonesuch', data => { A => 1 } },
 		qr/nonesuch/,
 	],
 );

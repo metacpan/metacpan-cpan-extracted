@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+Makefile.PL
+README.md
+lib/GoSaveTool.pm
+lib/GoSaveTool/Subtitles.pm
+lib/GoSaveTool/Text.pm
+t/subtitles.t
+t/text.t

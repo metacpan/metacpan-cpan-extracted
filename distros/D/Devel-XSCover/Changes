@@ -1,5 +1,10 @@
 Revision history for Devel-XSCover
 
+0.07    2026-11-04
+	- Count the comment lines xsubpp drops from an XSUB body, which its #line leaves out
+	- Match the top directory against the walk however File::Find spells it, an older one keeping the backslashes on Windows
+	- Expect a Windows path with slashes in the tests, and copy the spike's helper C whichever way its path is spelt
+
 0.06    2026-11-04
 	- Expect the Windows switches test's path as File::Spec joins it, since Cygwin's turns a backslash into a slash
 	- Write every relative file name with forward slashes on Windows, as Devel::Cover does, and compare a walked directory the way File::Find spells it

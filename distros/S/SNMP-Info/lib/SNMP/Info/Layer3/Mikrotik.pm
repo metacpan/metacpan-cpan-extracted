@@ -39,7 +39,7 @@ use SNMP::Info::Layer3;
 
 our ($VERSION, %GLOBALS, %MIBS, %FUNCS, %MUNGE);
 
-$VERSION = '3.985000';
+$VERSION = '3.985001';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -316,7 +316,8 @@ sub c_ip {
     my $c_id     = $mikrotik->c_id( $partial, $topo_cap )        || {};
     my $table_ip = $mikrotik->_lldp_table_ip();
     foreach my $iid ( keys %$c_id ) {
-        next if defined $c_ip->{$iid};
+        # LLDP gives 0.0.0.0 for a MAC chassis ID; the table may know better
+        next if ( $c_ip->{$iid} // '0.0.0.0' ) ne '0.0.0.0';
         $c_ip->{$iid} = $table_ip->{$iid} // '0.0.0.0';
     }
     return $c_ip;

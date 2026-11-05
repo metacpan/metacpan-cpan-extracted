@@ -1,4 +1,4 @@
-package Dist::Conformance::Source 0.001;
+package Dist::Conformance::Source 0.002;
 
 # ABSTRACT: Where the standards come from: the flavor files and the templates
 
@@ -50,7 +50,7 @@ Dist::Conformance::Source - Where the standards come from: the flavor files and 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

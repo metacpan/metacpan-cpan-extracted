@@ -10,7 +10,7 @@ use File::Spec ();
 
 use Devel::XSCover::Flow ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our (@CRITERIA);
 
@@ -112,6 +112,12 @@ sub _merge_into {
 sub entries {
     my ($self, $files, $generated, @maps) = @_;
     my %out;
+    for my $map (@maps) {
+        my $inverse = $map->{inverse} or next;
+        for my $file (keys %$inverse) {
+            $self->_relocate($files->{$file}, $inverse->{$file}) if $files->{$file};
+        }
+    }
     for my $file (sort keys %$files) {
         my $f = $files->{$file};
         my $e = $out{$file} = { statement => [], branch => [], subroutine => [], condition => [] };
@@ -218,6 +224,16 @@ sub write {
     }
     chdir $here;
     return { run => $path, %summary };
+}
+
+sub _relocate {
+    my ($self, $f, $to) = @_;
+    my %lines;
+    $lines{ $to->{$_} // $_ } += $f->{lines}{$_} for keys %{ $f->{lines} };
+    $f->{lines} = \%lines;
+    for my $list (qw(functions blocks conditions decisions)) {
+        $_->{line} = $to->{ $_->{line} } // $_->{line} for @{ $f->{$list} || [] };
+    }
 }
 
 sub _decides {
@@ -328,6 +344,10 @@ and line, and the arms of its blocks summed where the same block was seen twice.
 =head2 entries
 
     my $entries = $writer->entries($files, $generated, @maps);
+
+A map that carries an C<inverse> table first moves every record of that XS file from
+the line gcov reported to the line meant, since xsubpp drops a comment line from an
+XSUB body without a C<#line>.
 
 The criteria per file. Every executable line is a statement, but a line of nothing
 but braces (and perhaps C<else>), which clang credits with the code after a C<return>

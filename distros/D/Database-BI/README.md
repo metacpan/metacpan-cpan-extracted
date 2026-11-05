@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.019.0
+0.020.0
 
 ## Description
 
@@ -43,7 +43,9 @@ the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: `eq`,
 `ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `empty`,
-`notempty`.  Filters are applied server-side after all joins.  `lt`, `le`,
+`notempty`; and `in`, which a link can carry but the bar does not offer: any
+value of a JSON list, as in `f=place:in:["Paris","Rome"]`.  Filters are
+applied server-side after all joins.  `lt`, `le`,
 `gt` and `ge` compare numbers, reading `$1,234.56` and `(1,234.56)` as
 numbers too; a blank or a word in the cell matches none of them.
 - **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
@@ -62,10 +64,14 @@ takes focus, the arrow keys resize the chart (Shift takes bigger steps,
 Home and End go to the narrowest and widest it can be) and the size is announced
 as it changes.  All chart pages include Copy-link and Export SVG/PNG/PDF buttons.
 - **Maps** -- `GET /map` plots the filtered view on an OpenStreetMap map, either
-from latitude and longitude columns or from a place column geocoded locally
-with [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree) (one lookup per distinct place, remembered in the
-model store and shared by every dataset that names it).  Rows sharing a
-position become one marker.
+from latitude and longitude columns or from a place column geocoded by a
+[Geo::Coder::List](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AList) chain: [Geo::Coder::Free](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree)'s local data first, then
+OpenStreetMap's Nominatim service ([Geo::Coder::OSM](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AOSM), at most one request a
+second) for the places the local data does not know.  Nominatim is asked over
+https, and what it finds is also kept for a month in
+`<model_dir>/geocode-cache/`.  Each distinct place is
+looked up once, remembered in the model store and shared by every dataset that
+names it.  Rows sharing a position become one marker.
 - **Pivot table** -- the "Pivot table" panel builds a crosstab from any
 combination of row dimensions, column dimensions, and measures
 (`sum|avg|min|max|count|count_distinct|median|stdev|first|last|range`, plus
@@ -110,7 +116,9 @@ to remove the card.  **Add current view** in the toolbar appends another
 table, chart or map without leaving the canvas, and a status region announces
 the card and the new visual count; when the card's script has drawn it, the
 region says the chart or map has finished drawing, and if D3 or Leaflet could
-not be loaded it names the missing library instead.  A card that shows an
+not be loaded it names the missing library instead.  A scatter card can be
+coloured by a column and its bubbles sized by a number there, with the same
+choices as the scatter page.  A card that shows an
 aggregated value picks its own function in that panel, from the vocabulary the
 pivot uses and with the same names: Sum, Average, Min, Max, Count distinct,
 Median, Std dev, First, Last, Range or a Percentile with its level, so a card
@@ -508,7 +516,10 @@ perl Makefile.PL
     y=<col>       Y-axis column (required; numeric)
     series=<col>  categorical colour dimension (optional)
     size=<col>    numeric bubble-radius dimension (optional)
-    scheme=<name> colour scheme when series= is set (optional)
+    scheme=<name> colour scheme when series= is set: tableau10 (default),
+                  category10, set2, set3 or paired; any other is a 400
+    min_r=N       smallest bubble radius in px with size= (1-40, default 3)
+    max_r=N       largest bubble radius in px with size= (1-40, default 15)
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=            result filters (repeatable)
     ```
@@ -536,6 +547,9 @@ perl Makefile.PL
     cat=<col>      X-axis categories (required; x= is a backwards-compatible alias)
     bar_val=<col>  bar measure column (required)
     line_val=<col> line measure column (required)
+    scheme=<name>  bar and line colours: the first two of tableau10,
+                   category10, set2, set3 or paired (optional; steel blue and
+                   red without it, and for any other name)
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=             result filters (repeatable)
     ```
@@ -547,9 +561,16 @@ perl Makefile.PL
     ```
     l=<spec>      left table (required)
     group=<col>   tile label column (required; cat= is a backwards-compatible alias)
-    size=<col>    tile area column (required; val= is a backwards-compatible alias)
+    size=<col>    tile area column, summed (optional, counting rows without it;
+                  val= is a backwards-compatible alias)
     topn=N        keep only the top-N tiles; remainder merged into "Other"
     scheme=<name> colour scheme (optional)
+    color=<col>   shade each tile by this column instead (optional), folded
+                  over the tile's rows; "Other" is folded over the rows it holds
+    color_agg=F   how color= is folded: avg (default), sum, min, max, median or
+                  any other aggregate function; an unknown one is a 400
+    color_scheme=S  scale for color=: YlOrRd (default), Blues, Greens, Purples,
+                  RdPu or YlGnBu; any other name is YlOrRd
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=            result filters (repeatable)
     ```
@@ -562,6 +583,9 @@ perl Makefile.PL
     l=<spec>   left table (required)
     col=<col>  numeric column to bin (required)
     bins=N     bin count (default 10; clamped to range 1--200)
+    scheme=S   bar colour: the first colour of tableau10, category10, set2,
+               set3 or paired (optional; steelblue without it, and for any
+               other name)
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=         result filters (repeatable)
     ```
@@ -597,16 +621,35 @@ perl Makefile.PL
     comes from a location column that is geocoded (`loc=`, one lookup per distinct
     value, remembered once in the model store and shared with every dataset that
     names it) or from coordinate columns (`lat=` and `lon=`).  Rows sharing a
-    position become one marker.  Markers are clustered with
+    position become one marker.  When some rows cannot be plotted, the note that
+    says so counts them by reason (empty, not a place name, not found, or not looked
+    up yet), links to all of them in the table, and opens onto a list of their
+    places, each with its number of rows, why it was not plotted and a link to
+    those rows.  Markers are clustered with
     Leaflet.markercluster, so a dense map draws a count at low zoom and splits it
-    as it is zoomed in.  Clustering is always on.  Parameters:
+    as it is zoomed in.  Clustering is always on.  The map has a scale bar, opens
+    on every marker unless `zoom=` is given, and draws its key (colours, and
+    bubble sizes) on the map; the colours listed are those of the markers in view,
+    so the key changes as the map is zoomed and moved.
+
+    Places that are not in the cache yet are looked up after the page is shown.
+    The map draws what the cache already knows, and a progress bar names each
+    place as it is looked up ("Looking up 5 of 10: 10 Downing St, London").  Each
+    answer is saved at once, through `POST /geo/lookup`, and the map is drawn
+    again when the last one is in.  Cancel stops the lookups and draws the map with
+    the places found so far.  The places left are listed as not looked up yet, with
+    a link to look them up.  Without JavaScript, or for a client that is not a
+    browser, the page waits for the lookups instead (`geocode=wait`).  Parameters:
 
     ```
     l=<spec>       left table (required)
-    loc=<col>      column of places to geocode (required unless lat= and lon= are)
+    loc=<col>      column of places to geocode (required unless lat= and lon= are);
+                   repeat it for a place written across columns, which are joined
+                   with ", " in that order (loc=Address&loc=Country)
     lat=<col>      latitude column, -90..90
     lon=<col>      longitude column, -180..180
-    popup=<col>    column shown in the marker popup (repeatable)
+    popup=<col>    column shown in the marker popup (repeatable; default every
+                   column but the place or coordinates)
     max=N          markers to draw (default map_max_markers, 2000)
     zoom=N         initial zoom 0..19 (default: fit the markers)
     max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
@@ -619,15 +662,28 @@ perl Makefile.PL
     color_default=<colour>  fallback colour (default #3388ff)
     series=<col>   colour markers by category (not with color=)
     scheme=<name>  palette for series=: tableau10, category10, set2, set3, paired
+    geocode=wait   look up the places not cached yet before the page is sent
+                   (the default for a client that is not a browser)
+    geocode=cached look nothing up: plot what the cache knows (where Cancel leads)
     back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
     f=            result filters (repeatable)
     ```
 
+    A marker stands for every row at its place, and its popup lists them all: a
+    value every row shares is shown once ("Person: Valentin Puntar"), and the
+    columns that differ are a small table, one line a row.  The table shows at most
+    `map_popup_rows` rows (default 10) in a box that scrolls, so a busy place does
+    not cover the map; the rest are counted, with a link to them in the table the
+    map came from.
+
     An unknown `tiles=` or `scheme=` is a 400, as is an unknown column, `color=`
     together with `series=`, or a transposed lat/lon pair.  The page never shows
     the [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) Nominatim search box (`search => 0` is always passed), so
-    nothing typed on the map is sent anywhere.  [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.12 or later is the
-    renderer; an older optional install still returns the page with a warning.
+    nothing typed on the map is sent anywhere.  With `loc=`, a place the local
+    data does not know is sent to Nominatim, as the place name alone; set
+    `map_geocode_online` to 0 to keep every lookup local.  [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.13 or
+    later is the renderer; an older optional install still returns the page with a
+    warning.
 
 - `GET /line`
 
@@ -695,7 +751,17 @@ perl Makefile.PL
     to geocode) or `lat` and `lon`.  A `wordcloud` card's `encode` names the
     text column to read in `col`, and its `options` take the same `topn`,
     `minlen` and `stop` the `GET /wordcloud` page takes, so the two count and
-    rank words with one function.  The optional `query` is the canvas page's
+    rank words with one function.  A `scatter` card's `encode` names `x`
+    and `y`, and optionally `series` (colour by value) and `size` (bubble size); its
+    `options` take `scheme`, `min_r` and `max_r` as `GET /scatter` does,
+    except that an unknown `scheme` draws the default colours.  A `line`
+    or `graph` card's `encode` takes an optional `series`, one line per value.
+    A `histogram` card's `options` take `bins` and `scheme` as `GET /histogram`
+    does.  A `treemap` card's `encode` takes an optional `color`, with
+    `options` `color_agg` and `color_scheme` as `GET /treemap`'s `color=`,
+    `color_agg=` and `color_scheme=`; an unknown function is the card's error.
+    A `combo` card's `options` take `scheme` as `GET /combo` does.
+    The optional `query` is the canvas page's
     query string: `cf` (cross-filter), `c` (calculated columns) and
     `p.<name>` (bound parameter values) are read from it, so a card added
     while the canvas is filtered or parameterised is drawn through the same state
@@ -878,6 +944,16 @@ perl Makefile.PL
     Removes a coordinate-column preference.  Body: `l=&col=`.
     Omit `col=` to clear all preferences for the spec.
 
+- `POST /geo/lookup`
+
+    Looks up one place for the map page's progress bar, and saves the answer in
+    the shared place cache at once.  Body: `place=&sig=`, where `sig` is the
+    signature the map page gave the place (any other place is refused with 403),
+    plus `online=0` to keep the lookup on this machine.  Returns
+    `{ place, status, stored, online_failed, messages }`, where `status` is
+    `found`, `not_found`, `held` (not looked up now, and not remembered) or
+    `refused`.  See ["Maps"](#maps).
+
 - `GET /insights`
 
     Automatic statistical insights for a dataset.  Runs the same pipeline as
@@ -1000,7 +1076,8 @@ GET /graph?l=table:sales&x=at&y=amount&span=1h&agg=sum&series=region
 ```
 
 The chart and pivot panels carry a `Time bucket` menu for it, and the line
-graph panel an `Aggregate` menu beside it.
+graph panel an `Aggregate` menu beside it and a `Lines by` menu, which
+sends `series=`.
 
 `span=` takes a count and one of `s`, `m`, `h`, `d`, `w`, `mon`, `q`
 or `y` -- `15m`, `6h`, `2d`, `3mon`, `1q` -- and is refused, naming the
@@ -1259,14 +1336,21 @@ any left out keeps [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM)'s pinned 
 ones the defaults name: D3 7.9.0, Leaflet 1.9.4, and leaflet.markercluster 1.5.3.
 `tile_url` points the map layer at a self-hosted tile server instead of
 OpenStreetMap.  It keeps Leaflet's `{z}`, `{x}` and `{y}` placeholders, and
-`{s}` too if the server uses subdomains.  Set it and every request needed to
-draw a map can stay on the local network.  The OpenStreetMap attribution stays
+`{s}` too if the server uses subdomains.  Set it, and `map_geocode_online`
+to 0, and every request needed to draw a map can stay on the local network.  The OpenStreetMap attribution stays
 on the map, since it is the usual credit for OSM-derived tiles.  There is no
 in-page place search: [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) is always constructed with `search => 0`,
 so nothing typed on a map page is sent anywhere.
 
 Map-specific config keys: `map_geocode_max` (new geocoder lookups per request,
-default 500), `map_max_markers` (markers per request, default 2000),
+default 500), `map_geocode_online` (0 keeps geocoding on this machine: a place
+the local data does not know is not sent to OpenStreetMap's Nominatim; default
+1), `map_geocode_online_max` (places asked of Nominatim per request, default 20;
+at one a second, the rest are left for the next request or for
+`script/bi-geocode`; the map page's progress bar asks one place a request, so
+it reaches every place), `secrets` (a list; the first signs the places a map
+page lists for `POST /geo/lookup`.  Without it each start makes a random one), `map_max_markers` (markers per request, default 2000), `map_popup_rows`
+(rows listed in one marker's popup, default 10),
 `map_region` (a two-letter country hint for ambiguous places), `map_max_zoom`
 (the default tile-layer maxZoom) and `tile_sources` (a hashref of named tile
 sources, each `{ url => ... }`, selected with `tiles=`).

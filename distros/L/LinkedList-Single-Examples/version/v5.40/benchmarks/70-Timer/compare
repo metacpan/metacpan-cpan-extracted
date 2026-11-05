@@ -1,0 +1,372 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Timer::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Time::HiRes qw( time );
+
+use LinkedList::Single::Example::Bench  qw( array_bytes complexity list_bytes );
+use LinkedList::Single::Example::Timer;
+use LinkedList::Single::Example::Timer::Array;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: the memory runs fork, and a child must not inherit (and
+# then print a second copy of) output the parent has not yet written.
+
+$|  = 1;
+
+# with an argument, only the scenarios whose title matches it are run
+# (perl benchmarks/70-Timer/compare Cycle).
+
+my $only    = shift // '';
+
+my $reps    = 3;
+
+srand 20261031;
+
+my %impl
+= (
+    list    => sub { LinkedList::Single::Example::Timer->new( clock => sub { 0 } ) }
+  , array   => sub { LinkedList::Single::Example::Timer::Array->new( clock => sub { 0 } ) }
+);
+
+my @impl    = ( 'list', 'array' );
+
+########################################################################
+# utility
+########################################################################
+
+# resident memory in bytes.
+
+sub rss()
+{
+    open my $fh, '<', '/proc/self/statm'
+    or die "Botched rss: /proc/self/statm: $!\n";
+
+    my( undef, $pages ) = split ' ', scalar <$fh>;
+
+    $pages * 4096
+}
+
+# run $code in a child and return the line it prints. perl keeps the
+# heap it has freed, so memory is measured in a fresh process, before
+# any of the timing has run.
+
+sub measure( $code )
+{
+    pipe my $r, my $w
+    or die "Botched pipe: $!\n";
+
+    my $pid = fork // die "Botched fork: $!\n";
+
+    if( ! $pid )
+    {
+        close $r;
+
+        say $w $code->();
+
+        close $w;
+
+        exit 0;
+    }
+
+    close $w;
+
+    my $got = <$r>;
+
+    close $r;
+    waitpid $pid, 0;
+
+    chomp $got;
+
+    $got
+}
+
+# smallest elapsed time of $reps runs: the least disturbed by whatever
+# else the system happens to be doing.
+
+sub best_of( $code )
+{
+    my $best;
+
+    for( 1 .. $reps )
+    {
+        my $start   = time;
+
+        $code->();
+
+        my $took    = time - $start;
+
+        if( ! defined $best || $took < $best )
+        {
+            $best   = $took;
+        }
+    }
+
+    $best
+}
+
+sub wanted( $title )
+{
+    $only eq '' || $title =~ m{ $only }xi
+}
+
+sub table( $title, $head, @row )
+{
+    say "\n$title";
+
+    say sprintf '%-10s %s' => 'case', $head;
+
+    say sprintf '%-10s %s' => $_->[ 0 ], $_->[ 1 ] for @row;
+}
+
+# a queue with $n messages in start order, outside of any timing.
+
+sub filled( $name, $n, $start = 1 )
+{
+    my $queue   = $impl{ $name }->();
+
+    $queue->enqueue( $start + $_, 'job' ) for 1 .. $n;
+
+    $queue
+}
+
+########################################################################
+# memory
+########################################################################
+
+if( wanted( 'Memory' ) )
+{
+    my $n   = 200_000;
+
+    say "\nMemory: $n messages queued in start order (bytes per message)";
+
+    say sprintf '%-10s %12s %12s'
+    => qw( case per_message held_after );
+
+    for my $name ( @impl )
+    {
+        my $per = measure
+        (
+            sub
+            {
+                my $before  = rss();
+                my $queue   = filled( $name, $n );
+
+                int( ( rss() - $before ) / $n )
+            }
+        );
+
+        # after a burst has been dispatched and only 10 messages are
+        # left: the bytes of the container that holds them. perl keeps
+        # the memory an array has grown to (its capacity), where the
+        # list holds a node for each message that is left and no more.
+
+        my $held = measure
+        (
+            sub
+            {
+                my $queue   = filled( $name, $n );
+                my $batch   = $queue->take( $n - 10 );
+
+                $queue->process( $batch, sub {}, 9**9**9 );
+
+                undef $batch;
+
+                $name eq 'list'
+                ? list_bytes( $queue->{ list } )
+                : array_bytes( $queue->{ queue } )
+            }
+        );
+
+        say sprintf '%-10s %12d %12d' => $name, $per, $held;
+    }
+}
+
+########################################################################
+# enqueue
+########################################################################
+
+if( wanted( 'Enqueue' ) )
+{
+    say "\nEnqueue in start order (a fixed delay): microseconds per message";
+    say sprintf '%-10s %10s %10s %10s' => 'case', 1_000, 20_000, 200_000;
+
+    for my $name ( @impl )
+    {
+        my @us
+        = map
+          {
+              my $n = $_;
+
+              1e6 * best_of( sub { filled( $name, $n ) } ) / $n
+          }
+          1_000, 20_000, 200_000;
+
+        say sprintf '%-10s %10.2f %10.2f %10.2f' => $name, @us;
+    }
+
+    say "\nEnqueue out of start order (random starts): microseconds per message";
+    say sprintf '%-10s %10s %10s %10s' => 'case', 500, 2_000, 8_000;
+
+    for my $name ( @impl )
+    {
+        my @us
+        = map
+          {
+              my $n = $_;
+              my @start = map { int rand 1e9 } 1 .. $n;
+
+              1e6 * best_of
+              (
+                  sub
+                  {
+                      my $queue = $impl{ $name }->();
+
+                      $queue->enqueue( $_, 'job' ) for @start;
+                  }
+              ) / $n
+          }
+          500, 2_000, 8_000;
+
+        say sprintf '%-10s %10.2f %10.2f %10.2f' => $name, @us;
+    }
+}
+
+########################################################################
+# the cycle: take a batch, dispatch part of it, put the rest back.
+#
+# $n messages are queued in the future, $k are due. none are
+# dispatched, so the whole batch is put back: this is the cost of the
+# part the window cut off, $u = $k.
+########################################################################
+
+if( wanted( 'Cycle' ) )
+{
+    for my $n ( 10_000, 200_000 )
+    {
+        say "\nCycle, $n queued behind the batch: microseconds, best of $reps";
+
+        say sprintf '%-10s %6s %6s %10s %10s %10s'
+        => qw( case due unused take requeue total );
+
+        for my $k ( 10, 1_000, 10_000 )
+        {
+            for my $name ( @impl )
+            {
+                my( $take, $back ) = ( 9**9**9, 9**9**9 );
+
+                for( 1 .. $reps )
+                {
+                    my $queue   = $impl{ $name }->();
+
+                    # due: starts 1 .. $k; behind them: $n later ones.
+
+                    $queue->enqueue( $_, 'job' ) for 1 .. $k;
+                    $queue->enqueue( 1e6 + $_, 'job' ) for 1 .. $n;
+
+                    my $t0      = time;
+                    my $batch   = $queue->take( $k );
+                    my $t1      = time;
+
+                    $queue->requeue( $batch );
+
+                    my $t2      = time;
+
+                    $take = $t1 - $t0 if $t1 - $t0 < $take;
+                    $back = $t2 - $t1 if $t2 - $t1 < $back;
+                }
+
+                say sprintf '%-10s %6d %6d %10.1f %10.1f %10.1f'
+                =>  $name, $k, $k, 1e6 * $take, 1e6 * $back, 1e6 * ( $take + $back );
+            }
+        }
+    }
+
+    say "\nCycle, 200000 queued behind, 10000 due, U of them unused: requeue microseconds";
+
+    say sprintf '%-10s %8s %8s %8s %8s'
+    => 'case', 'U=0', 'U=10', 'U=1000', 'U=10000';
+
+    for my $name ( @impl )
+    {
+        my @us;
+
+        for my $u ( 0, 10, 1_000, 10_000 )
+        {
+            my $best    = 9**9**9;
+
+            for( 1 .. $reps )
+            {
+                # the clock is a counter that the handler moves, so the
+                # window closes after a number of messages, not a time.
+
+                my $clock   = 0;
+                my $queue
+                = $name eq 'list'
+                ? LinkedList::Single::Example::Timer->new( clock => sub { $clock } )
+                : LinkedList::Single::Example::Timer::Array->new( clock => sub { $clock } )
+                ;
+
+                $queue->enqueue( $_, 'job' ) for 1 .. 10_000;
+                $queue->enqueue( 1e6 + $_, 'job' ) for 1 .. 200_000;
+
+                my $batch   = $queue->take( 10_000 );
+
+                $queue->process( $batch, sub { ++$clock }, 10_000 - $u );
+
+                my $t0      = time;
+
+                $queue->requeue( $batch );
+
+                my $took    = time - $t0;
+
+                $best   = $took if $took < $best;
+            }
+
+            push @us, 1e6 * $best;
+        }
+
+        say sprintf '%-10s %8.1f %8.1f %8.1f %8.1f' => $name, @us;
+    }
+}
+
+########################################################################
+# complexity
+########################################################################
+
+if( wanted( 'Complexity' ) )
+{
+    say "\nComplexity of the methods that do the work";
+
+    say sprintf '%-22s %6s %6s %6s' => qw( method stmts branch index );
+
+    for my $pair
+    (
+        [ 'LinkedList::Single::Example::Timer',         'take'      ]
+      , [ 'LinkedList::Single::Example::Timer::Array',  'take'      ]
+      , [ 'LinkedList::Single::Example::Timer',         'requeue'   ]
+      , [ 'LinkedList::Single::Example::Timer::Array',  'requeue'   ]
+      , [ 'LinkedList::Single::Example::Timer',         '_insert'   ]
+      , [ 'LinkedList::Single::Example::Timer::Array',  '_insert'   ]
+    )
+    {
+        my( $class, $method ) = @$pair;
+
+        my $cx  = complexity( $class->can( $method ) );
+
+        say sprintf '%-22s %6d %6d %6d'
+        =>  ( $class =~ s{ \A LinkedList::Single::Example:: }{}rx ) . "::$method"
+          , $cx->{ statements }
+          , $cx->{ branches   }
+          , $cx->{ index_ops  };
+    }
+}
+
+__END__

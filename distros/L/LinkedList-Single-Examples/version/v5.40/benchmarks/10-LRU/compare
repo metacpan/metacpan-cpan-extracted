@@ -1,0 +1,287 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::LRU::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Time::HiRes qw( time );
+
+use LinkedList::Single::Example::Bench  qw( complexity );
+use LinkedList::Single::Example::LRU;
+use LinkedList::Single::Example::LRU::Array;
+use LinkedList::Single::Example::LRU::Order;
+use LinkedList::Single::Example::LRU::Lazy;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: the memory runs fork, and a child must not inherit (and
+# replay) the parent's unflushed output.
+
+$|  = 1;
+
+# with an argument, only the scenarios whose title matches it are run
+# (perl benchmarks/10-LRU/compare Memory).
+
+my $only    = shift // '';
+
+my @limit   = ( 100, 10_000, 200_000 );
+
+my %impl
+= (
+    list    => 'LinkedList::Single::Example::LRU'
+  , pairs   => 'LinkedList::Single::Example::LRU::Array'
+  , order   => 'LinkedList::Single::Example::LRU::Order'
+  , lazy    => 'LinkedList::Single::Example::LRU::Lazy'
+);
+
+my @name    = qw( list pairs order lazy );
+
+########################################################################
+# utility
+########################################################################
+
+# resident memory in bytes.
+
+sub rss()
+{
+    open my $fh, '<', '/proc/self/statm'
+    or die "Botched rss: /proc/self/statm: $!\n";
+
+    my( undef, $pages ) = split ' ', scalar <$fh>;
+
+    $pages * 4096
+}
+
+# how many operations to time. the array of pairs and the order array
+# search on every hit, so at a large limit they get fewer operations:
+# the table reports microseconds per operation, which still compares.
+
+sub ops_for( $name, $limit )
+{
+    $limit <= 100
+    ? 200_000
+    : $limit <= 10_000
+    ? 100_000
+    : $name eq 'list' || $name eq 'lazy'
+    ? 100_000
+    : 2_000
+    ;
+}
+
+########################################################################
+# workloads: the keys asked for, in order. a read-through cache: a get
+# that misses is followed by a put of the same key.
+#
+#   hot     90% of the requests go to a tenth of a limit's worth of keys
+#   uniform keys drawn evenly from twice the limit: about half hit
+#   scan    keys taken in turn from one more than the limit: all miss
+########################################################################
+
+my %workload
+= (
+    hot     => sub( $limit, $ops )
+    {
+        my $hot = int( $limit / 10 ) || 1;
+
+        [ map { rand() < 0.9 ? int rand $hot : $hot + int rand( 4 * $limit ) } 1 .. $ops ]
+    }
+
+  , uniform => sub( $limit, $ops )
+    {
+        [ map { int rand( 2 * $limit ) } 1 .. $ops ]
+    }
+
+  , scan    => sub( $limit, $ops )
+    {
+        [ map { $_ % ( $limit + 1 ) } 1 .. $ops ]
+    }
+);
+
+my @workload    = qw( hot uniform scan );
+
+# fill to the limit. every cache is filled through put, except the
+# array of pairs: put searches the whole array first, so 200,000 puts
+# would take minutes. its array is built directly, with the same
+# contents (newest first) that the puts would leave.
+
+my $fill
+= sub( $name, $cache, $n )
+{
+    if( $name eq 'pairs' )
+    {
+        $cache->{ item }    = [ map { [ $_, $_ ] } reverse 1 .. $n ];
+    }
+    else
+    {
+        $cache->put( $_, $_ ) for 1 .. $n;
+    }
+};
+
+# seconds to serve the keys, and how many were hits.
+
+my $serve
+= sub( $cache, $key )
+{
+    my $hits    = 0;
+    my $start   = time;
+
+    for my $k ( $key->@* )
+    {
+        defined $cache->get( $k )
+        ? ++$hits
+        : $cache->put( $k, $k )
+        ;
+    }
+
+    ( time - $start, $hits )
+};
+
+########################################################################
+# memory: build in a fresh process so the allocator starts clean. this
+# has to run first: perl keeps what it frees, so once the timing runs
+# below have built and dropped big caches, a child inherits that heap
+# and a new cache appears to cost nothing.
+########################################################################
+
+my $memory_title    = 'Memory';
+
+if( $memory_title =~ m{ $only }xi )
+{
+    my $n   = 200_000;
+
+    say "\nResident memory to hold $n entries (integer key, integer value)";
+    say "(the bare hash has no order and cannot evict by recency; it is the floor)";
+    say sprintf '%-12s %14s %12s', 'case', 'bytes', 'per entry';
+
+    for my $name ( 'hash', @name )
+    {
+        my $pid = open my $kid, '-|'
+        // die "Botched fork: $!\n";
+
+        if( ! $pid )
+        {
+            my $before  = rss;
+            my $keep;
+
+            if( $name eq 'hash' )
+            {
+                $keep   = {};
+
+                $keep->{ $_ } = $_ for 1 .. $n;
+            }
+            else
+            {
+                $keep   = $impl{ $name }->new( limit => $n );
+
+                $fill->( $name, $keep, $n );
+            }
+
+            say rss() - $before;
+
+            exit
+        }
+
+        my $bytes   = <$kid>;
+
+        close $kid;
+
+        chomp $bytes;
+
+        say sprintf '%-12s %14d %12.1f', $name, $bytes, $bytes / $n;
+    }
+}
+
+########################################################################
+# time
+########################################################################
+
+my $time_title  = 'Time';
+
+if( $time_title =~ m{ $only }xi )
+{
+    for my $limit ( @limit )
+    {
+        for my $kind ( @workload )
+        {
+            say "\nTime: $kind workload, limit $limit";
+            say sprintf '%-8s %9s %9s %9s %9s'
+            => qw( case ops seconds us/op hits );
+
+            for my $name ( @name )
+            {
+                srand 20261031;
+
+                my $ops     = ops_for $name, $limit;
+                my $key     = $workload{ $kind }->( $limit, $ops );
+                my $cache   = $impl{ $name }->new( limit => $limit );
+
+                $fill->( $name, $cache, $limit );
+
+                my( $secs, $hits ) = $serve->( $cache, $key );
+
+                say sprintf '%-8s %9d %9.4f %9.2f %9d'
+                =>  $name, $ops, $secs, 1e6 * $secs / $ops, $hits;
+            }
+        }
+    }
+}
+
+########################################################################
+# code complexity of the hit path and of the miss path
+########################################################################
+
+my $cx_title    = 'Complexity';
+
+if( $cx_title =~ m{ $only }xi )
+{
+    # the methods a call goes through, helpers included.
+
+    my %path
+    = (
+        list    =>
+        {
+            hit     => [ qw( LinkedList::Single::Example::LRU::get  LinkedList::Single::Example::LRU::_promote  ) ]
+          , miss    => [ qw( LinkedList::Single::Example::LRU::put  LinkedList::Single::Example::LRU::_evict    ) ]
+        }
+      , pairs   =>
+        {
+            hit     => [ qw( LinkedList::Single::Example::LRU::Array::get   LinkedList::Single::Example::LRU::Array::_find ) ]
+          , miss    => [ qw( LinkedList::Single::Example::LRU::Array::put   LinkedList::Single::Example::LRU::Array::_find ) ]
+        }
+      , order   =>
+        {
+            hit     => [ qw( LinkedList::Single::Example::LRU::Order::get   LinkedList::Single::Example::LRU::Order::_touch ) ]
+          , miss    => [ qw( LinkedList::Single::Example::LRU::Order::put ) ]
+        }
+      , lazy    =>
+        {
+            hit     => [ qw( LinkedList::Single::Example::LRU::Lazy::get    LinkedList::Single::Example::LRU::Lazy::_touch LinkedList::Single::Example::LRU::Lazy::_current ) ]
+          , miss    => [ qw( LinkedList::Single::Example::LRU::Lazy::put    LinkedList::Single::Example::LRU::Lazy::_touch LinkedList::Single::Example::LRU::Lazy::_current ) ]
+        }
+    );
+
+    say "\nComplexity of the code a call goes through (helpers included)";
+    say sprintf '%-8s %-6s %6s %6s %6s', qw( case path stmts branch index );
+
+    for my $name ( @name )
+    {
+        for my $kind ( qw( hit miss ) )
+        {
+            my %sum = ( statements => 0, branches => 0, index_ops => 0 );
+
+            for my $sub ( $path{ $name }{ $kind }->@* )
+            {
+                my $cx  = complexity \&{ $sub };
+
+                $sum{ $_ } += $cx->{ $_ } for keys %sum;
+            }
+
+            say sprintf '%-8s %-6s %6d %6d %6d'
+            =>  $name, $kind, $sum{ statements }, $sum{ branches }, $sum{ index_ops };
+        }
+    }
+}

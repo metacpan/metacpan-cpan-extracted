@@ -82,4 +82,12 @@ is_deeply($e->{condition}, [], 'and no conditions');
 $gone->{'gone.c'}{decisions} = [ { line => 3, arms => [1, 0] } ];
 is_deeply($writer->entries($gone, {})->{'gone.c'}{branch}, [ [3, '', [1, 0]] ], 'a decision the flow graph found keeps its arms, with an empty text');
 
+my ($shifted) = $writer->merge({ object => 'a.gcda', files => { 'm.c' => {
+    lines => { 10 => 1, 11 => 1 }, functions => [ { name => 'm', line => 9, count => 1 } ],
+    blocks => [ { line => 10, arms => [1, 0] } ] } } });
+$e = $writer->entries($shifted, {}, { c => 'M.c', xsubs => {}, inverse => { 'm.c' => { 10 => 11, 11 => 12 } } })->{'m.c'};
+is_deeply($e->{statement}, [[11, 1], [12, 1]], 'a map with an inverse moves the statements of its XS file from the lines gcov said to the lines meant');
+is_deeply($e->{branch}, [ [11, 'if (x) {', [1, 0]] ], 'and the branches, which then read their decision from the right line');
+is_deeply($e->{subroutine}, [[9, 'm', 1]], 'a line the inverse does not name stays');
+
 done_testing;

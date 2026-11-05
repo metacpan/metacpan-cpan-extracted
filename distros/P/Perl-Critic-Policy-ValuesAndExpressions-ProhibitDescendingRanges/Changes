@@ -1,0 +1,9 @@
+Revision history for Perl-Critic-Policy-ValuesAndExpressions-ProhibitDescendingRanges
+
+0.001 2026-11-04 TEODESIAN
+    - Initial Release.  Reports a range that counts down in list context,
+      such as 10 .. 1 or 'aa' .. 'b', because perl's .. counts only up and
+      gives an empty list for it.  Also reports a range from an expression
+      to a small number, such as $n .. 1, which is empty for every $n
+      above that number.  The flip-flop operator, which is .. in scalar
+      context, is not reported.

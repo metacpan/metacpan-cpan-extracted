@@ -9,6 +9,4 @@ checks:
   CriticProfile:
     file: .perlcriticrc
     template: templates/perlcriticrc
-    outdated:
-      - '# Troglodyne perlcritic policy'
     replace: false

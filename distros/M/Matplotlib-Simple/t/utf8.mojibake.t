@@ -24,8 +24,8 @@ my $py_filename = plt({
             $raw_bytes_label => [ 4, 5, 6 ],
         }
     },
-    'plot.type'   => 'scatter',
-    'output.file' => $temp_out->filename,
+    plot_type     => 'scatter',
+    output_file => $temp_out->filename,
     execute       => 0, # CRITICAL: Do not actually run Python in a test environment
 });
 

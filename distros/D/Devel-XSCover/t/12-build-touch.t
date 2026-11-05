@@ -56,11 +56,12 @@ $out = '';
     @touched = Devel::XSCover::Build->new(dir => $named)->touch;
     select $old;
 }
-is_deeply(\@touched, [$only], 'a distribution directory named like a skipped one is still walked');
+sub slashes { my @p = @_; s{\\}{/}g for @p; return \@p }
+is_deeply(slashes(@touched), slashes($only), 'a distribution directory named like a skipped one is still walked');
 like($out, qr/^xs_cover: touched 1 source file$/m, 'one file is said in the singular');
 {
     local $^O = 'MSWin32';
-    is_deeply([Devel::XSCover::Build->new(dir => $named, silent => 1)->touch], [$only], 'and on Windows too, where File::Find spells the directory with slashes');
+    is_deeply(slashes(Devel::XSCover::Build->new(dir => $named, silent => 1)->touch), slashes($only), 'and on Windows too, whether File::Find spells the directory with slashes or keeps the backslashes');
 }
 
 done_testing;

@@ -1,6 +1,6 @@
 package Mail::TLSRPT::Pragmas;
 # ABSTRACT: Setup system wide pragmas
-our $VERSION = '2.20210112'; # VERSION
+our $VERSION = '2.20261104'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ Mail::TLSRPT::Pragmas - Setup system wide pragmas
 
 =head1 VERSION
 
-version 2.20210112
+version 2.20261104
 
 =head1 SYNOPSIS
 
@@ -61,11 +61,11 @@ Import standard pragmas and imports into current namespace
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

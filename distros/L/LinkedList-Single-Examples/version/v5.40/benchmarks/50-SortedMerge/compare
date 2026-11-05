@@ -1,0 +1,339 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::SortedMerge::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Devel::Size qw( total_size );
+use Time::HiRes qw( time );
+
+use LinkedList::Single::Example::Bench  qw( complexity list_bytes report );
+use LinkedList::Single::Example::SortedMerge;
+use LinkedList::Single::Example::SortedMerge::Array;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered output, so a long run can be watched.
+
+$|  = 1;
+
+# with an argument, only the scenarios whose title matches it are run
+# (perl benchmarks/50-SortedMerge/compare Merge).
+
+my $only    = shift // '';
+
+my @length  = ( 1_000, 10_000, 100_000 );
+
+my %sorter
+= (
+    'list-relink'   => LinkedList::Single::Example::SortedMerge->new( how => 'relink' )
+  , 'list-copy'     => LinkedList::Single::Example::SortedMerge->new( how => 'copy'   )
+  , 'array'         => LinkedList::Single::Example::SortedMerge::Array->new
+);
+
+my @name    = ( 'list-relink', 'list-copy', 'array' );
+
+########################################################################
+# utility
+########################################################################
+
+# the best of $reps runs of $op. $setup builds fresh arguments for
+# each run, outside the timing, since the list versions consume theirs.
+
+sub timed( $reps, $setup, $op )
+{
+    my $best;
+
+    for( 1 .. $reps )
+    {
+        my @arg     = $setup->();
+        my $start   = time;
+
+        $op->( @arg );
+
+        my $took    = time - $start;
+
+        if( ! defined $best || $took < $best )
+        {
+            $best   = $took;
+        }
+    }
+
+    $best
+}
+
+# fewer repetitions where one run takes a minute.
+
+sub reps_for( $n )
+{
+    $n > 10_000
+    ? 1
+    : 3
+}
+
+sub table( $title, @row )
+{
+    say "\n$title";
+
+    say sprintf '%-14s %11s', 'case', 'seconds';
+
+    say sprintf '%-14s %11s'
+    =>  $_->{ name }
+      , defined $_->{ secs } ? sprintf( '%.4f', $_->{ secs } ) : $_->{ note }
+    for @row;
+}
+
+# a row of the table: a name and either the seconds or a note.
+
+sub row( $name, $secs, $note = undef )
+{
+    return
+    {
+        name    => $name
+      , secs    => $secs
+      , note    => $note
+    };
+}
+
+sub time_row( $name, $reps, $setup, $op )
+{
+    row $name, timed $reps, $setup, $op
+}
+
+########################################################################
+# merge sort of n random keys. items are [ $key, $seq ].
+########################################################################
+
+my $sort_title  = 'Sort n random numbers';
+
+if( $sort_title =~ m{ \Q$only\E }xi )
+{
+    my $copy        = $sorter{ 'list-copy' };
+    my $with_cmp    = LinkedList::Single::Example::SortedMerge->new( cmp => sub( $x, $y ) { $x <=> $y } );
+
+    for my $n ( @length )
+    {
+        my @item    = map { [ int rand 1_000_000, $_ ] } 1 .. $n;
+        my $reps    = reps_for $n;
+        my @row     = ();
+
+        for my $name ( @name )
+        {
+            my $sorter  = $sorter{ $name };
+
+            push @row
+            , time_row
+            (
+                $name
+              , $reps
+              , sub { $sorter->build( @item ) }
+              , sub( $list ) { $sorter->merge_sort( $list ) }
+            );
+        }
+
+        # extract, sort, rebuild: with the built-in comparison, and
+        # with a comparator sub called for every pair as the merge
+        # sorts must; then perl's sort on the array, both ways.
+
+        push @row
+        , time_row
+        (
+            'via-array(cmp)'
+          , $reps
+          , sub { $with_cmp->build( @item ) }
+          , sub( $list ) { $with_cmp->sort_via_array( $list ) }
+        );
+
+        push @row
+        , time_row
+        (
+            'perl sort(cmp)'
+          , $reps
+          , sub { \@item }
+          , sub( $item ) { my @s = sort { $with_cmp->{ cmp }->( $a->[ 0 ], $b->[ 0 ] ) } $item->@* }
+        );
+
+        push @row
+        , time_row
+        (
+            'via-array'
+          , $reps
+          , sub { $copy->build( @item ) }
+          , sub( $list ) { $copy->sort_via_array( $list ) }
+        );
+
+        push @row
+        , time_row
+        (
+            'perl sort'
+          , $reps
+          , sub { \@item }
+          , sub( $item ) { my @s = sort { $a->[ 0 ] <=> $b->[ 0 ] } $item->@* }
+        );
+
+        # the method in LinkedList::Single itself.
+
+        push @row
+        , time_row
+        (
+            'core ->sort'
+          , $reps
+          , sub { $copy->build( @item ) }
+          , sub( $list ) { $list->sort }
+        );
+
+        table "$sort_title: n = $n", @row;
+    }
+}
+
+########################################################################
+# how the core sort grows: each doubling of n should multiply a
+# quadratic sort's time by four and a merge sort's by a little over two.
+########################################################################
+
+my $growth_title    = 'Growth of the core sort';
+
+if( $growth_title =~ m{ \Q$only\E }xi )
+{
+    say "\n$growth_title (seconds; ratio is against the row above)";
+
+    say sprintf '%8s %12s %8s %12s %8s'
+    => qw( n core_sort ratio list_copy ratio );
+
+    my( $core_was, $copy_was );
+
+    for my $n ( 500, 1_000, 2_000, 4_000, 8_000 )
+    {
+        my @item    = map { [ int rand 1_000_000, $_ ] } 1 .. $n;
+        my $copy    = $sorter{ 'list-copy' };
+
+        my $core
+        = timed
+        (
+            1
+          , sub { $copy->build( @item ) }
+          , sub( $list ) { $list->sort }
+        );
+
+        my $merge
+        = timed
+        (
+            1
+          , sub { $copy->build( @item ) }
+          , sub( $list ) { $copy->merge_sort( $list ) }
+        );
+
+        say sprintf '%8d %12.4f %8s %12.4f %8s'
+        =>  $n
+          , $core,  $core_was ? sprintf( '%.1f', $core  / $core_was ) : '-'
+          , $merge, $copy_was ? sprintf( '%.1f', $merge / $copy_was ) : '-';
+
+        ( $core_was, $copy_was )    = ( $core, $merge );
+    }
+}
+
+########################################################################
+# merge two sorted lists of n/2 items each.
+########################################################################
+
+my $merge_title = 'Merge two sorted lists of n/2 items';
+
+if( $merge_title =~ m{ \Q$only\E }xi )
+{
+    for my $n ( @length )
+    {
+        my $half    = $n / 2;
+
+        # interleaved keys, so every step of the merge alternates.
+
+        my @left    = map { [ 2 * $_,     $_ ] } 1 .. $half;
+        my @right   = map { [ 2 * $_ + 1, $_ ] } 1 .. $half;
+        my $reps    = reps_for $n;
+        my @row     = ();
+
+        for my $name ( @name )
+        {
+            my $sorter  = $sorter{ $name };
+
+            push @row
+            , time_row
+            (
+                $name
+              , $reps
+              , sub { ( $sorter->build( @left ), $sorter->build( @right ) ) }
+              , sub( $x, $y ) { $sorter->merge( $x, $y ) }
+            );
+        }
+
+        table "$merge_title: n = $n", @row;
+    }
+}
+
+########################################################################
+# memory of the result of a merge of 100,000 items: the nodes or items
+# themselves, not the payload (a short integer in each).
+########################################################################
+
+my $memory_title    = 'Memory of a merged result';
+
+if( $memory_title =~ m{ \Q$only\E }xi )
+{
+    my $n       = 100_000;
+    my $half    = $n / 2;
+    my @left    = map { [ 2 * $_,     $_ ] } 1 .. $half;
+    my @right   = map { [ 2 * $_ + 1, $_ ] } 1 .. $half;
+
+    say "\n$memory_title: n = $n (bytes of the result structure)";
+
+    for my $name ( @name )
+    {
+        my $sorter  = $sorter{ $name };
+        my $merged  = $sorter->merge( $sorter->build( @left ), $sorter->build( @right ) );
+
+        my $bytes
+        = $name eq 'array'
+        ? total_size( $merged )
+        : list_bytes( $merged )
+        ;
+
+        say sprintf '%-14s %12d', $name, $bytes;
+    }
+}
+
+########################################################################
+# code complexity of the merge
+########################################################################
+
+my $cx_title    = 'Complexity of merge';
+
+if( $cx_title =~ m{ \Q$only\E }xi )
+{
+    my @row
+    = (
+        [ 'list-relink' => \&LinkedList::Single::Example::SortedMerge::_merge_relink    ]
+      , [ 'list-copy'   => \&LinkedList::Single::Example::SortedMerge::_merge_copy      ]
+      , [ 'array'       => \&LinkedList::Single::Example::SortedMerge::Array::merge     ]
+    );
+
+    report $cx_title
+    => map
+    {
+        {
+            name    => $_->[ 0 ]
+          , secs    => 0
+          , cx      => complexity $_->[ 1 ]
+        }
+    }
+    @row;
+
+    say "(the seconds column is unused here; relink also needs _move_front)";
+
+    my $move    = complexity \&LinkedList::Single::Example::SortedMerge::_move_front;
+
+    say sprintf '_move_front: %d statements, %d branches, %d index ops'
+    => $move->{ statements }, $move->{ branches }, $move->{ index_ops };
+}

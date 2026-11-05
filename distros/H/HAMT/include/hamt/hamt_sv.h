@@ -79,9 +79,19 @@ static void     *hamt_pool_owner = NULL;
 #  define HAMT_POOL_FOR(cx) ((hamt_pool *)NULL)
 #endif
 
+/* For the tests: when above zero, counts down with each allocation and
+ * the one that takes it to zero fails, as the C library would with no
+ * memory. Nothing else reads it. */
+static IV hamt_alloc_fail_in = 0;
+
 static void *hamt_xs_alloc(void *cx, size_t bytes) {
-    void *p = hamt_pool_alloc(HAMT_POOL_FOR(cx), bytes);
+    void *p;
     PERL_UNUSED_ARG(cx);
+    if (hamt_alloc_fail_in > 0 && --hamt_alloc_fail_in == 0) return NULL;
+    p = hamt_pool_alloc(HAMT_POOL_FOR(cx), bytes);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (p) hamt_live_blocks++;
     return p;
 }

@@ -1,0 +1,6 @@
+name = "Meteorology-PET"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+license = "unrestricted"
+readme_format = "markdown"

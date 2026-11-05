@@ -12,6 +12,7 @@ use File::Temp qw(tempdir tempfile);
 use Mojo::File;
 use Mojo::Util qw(url_escape);
 use Test::Permissions qw(skip_unless_can_revoke with_revoked);
+use lib 't/lib';	# BI::Test::Nominatim, for the geocoding chain
 
 # ---------------------------------------------------------------------------
 # Minimal stub geocoder and point, injected through the app config so no
@@ -1600,11 +1601,11 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		            ->status_is(200, '200 for valid loc= geocode')
 		            ->content_type_like(qr{text/html}, 'response is HTML');
 		# Place names appear only inside map_body (Leaflet popup HTML), which
-		# needs HTML::OSM 0.12 or later: below that floor the page reports the
+		# needs HTML::OSM 0.13 or later: below that floor the page reports the
 		# renderer and draws nothing.  Skip this single assertion then.
 		SKIP: {
-			eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-				or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 1;
+			eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+				or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
 			$res->content_like(qr/$MAP_PLACE/i, 'place name appears in response');
 		}
 		delete $ledger{'GET./map.200.loc'};
@@ -2590,13 +2591,81 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my (undef, $why) = $missing->geocoder_available;
 		message_ok(Geocode => 'error_map_geocoder_missing', ref $why ? $why->{text} : $why, ['9999', undef]);
 
+		message_ok(Geocode => 'error_online_max_invalid', $err->(sub { $G->new(online_max => 0) }), ['0']);
+		message_ok(Geocode => 'error_cache_interface', $err->(sub { $G->new(cache => Unit::GeoBroken->new) }), ['Unit::GeoBroken']);
+		message_ok(Geocode => 'error_cache_dir', $err->(sub { $G->file_cache('/no/such/directory') }), ['/no/such/directory']);
+
+		# Geo::Coder::Free without Geo::Coder::List: a stand-in for the first,
+		# and the second hidden, so this is raised whatever is installed.
+		{
+			no warnings qw(once redefine);
+			local $INC{'Geo/Coder/Free.pm'} = __FILE__;
+			local $Geo::Coder::Free::VERSION = '99';
+			local *Geo::Coder::Free::new = sub { return bless {}, 'Unit::GeoFree' };
+			delete local $INC{'Geo/Coder/List.pm'};
+			local @INC = (sub {
+				die "Can't locate $_[1] in \@INC (hidden by t/unit.t)\n" if $_[1] eq 'Geo/Coder/List.pm';
+				return;
+			}, @INC);
+			my (undef, $no_list) = $G->new->geocoder_available;
+			message_ok(Geocode => 'error_map_geocoder_list_missing', $no_list, ['it is not installed']);
+		}
+
+		# The chain's own messages, with the local data and Nominatim stood in
+		# for by t/lib/BI/Test/Nominatim.pm, so nothing reaches the network.  They
+		# need the real chain; where it cannot be built (CI installs no
+		# recommended modules) the two are left out of the ledger rather than
+		# failed, and t/geocode-online.t, which skips there too, is their test.
+		SKIP: {
+			my $have_chain = eval {
+				require Geo::Coder::List;          Geo::Coder::List->VERSION(0.39);
+				require Geo::Coder::OSM;           Geo::Coder::OSM->VERSION(0.03);
+				require LWP::UserAgent::Throttled; LWP::UserAgent::Throttled->VERSION(0.14);
+				require Geo::Location::Point;
+				1;
+			};
+			unless ($have_chain) {
+				delete $ledger{"msg.Geocode.$_"} for qw(warn_map_geocoder_local_only warn_map_geocoder_online_failed);
+				skip 'Geo::Coder::List 0.39, Geo::Coder::OSM 0.03 and LWP::UserAgent::Throttled 0.14 or later are needed', 2;
+			}
+			require BI::Test::Nominatim;
+			my $text = sub {
+				my ($result, $key) = @_;
+				my ($m) = grep { $_->{key} eq $key } @{ $result->{messages} };
+				return $m ? $m->{text} : undef;
+			};
+
+			BI::Test::Nominatim::with_chain(hide => ['Geo::Coder::OSM'], sub {
+				my $r = $G->new->resolve_values(['Nowhere']);
+				message_ok(Geocode => 'warn_map_geocoder_local_only', $text->($r, 'warn_map_geocoder_local_only'));
+			});
+			BI::Test::Nominatim::with_chain(online => { Nowhere => 503 }, sub {
+				my $r = $G->new->resolve_values(['Nowhere']);
+				message_ok(Geocode => 'warn_map_geocoder_online_failed',
+					$text->($r, 'warn_map_geocoder_online_failed'), ['503 Stand-in failure', 1]);
+			});
+		}
+
 		my $messages = sub {
 			my ($result) = @_;
 			return join "\n", map { ref $_ ? $_->{text} : $_ } @{ $result->{messages} // [] };
 		};
 		my $res = $geo->resolve_column([ { c => 'Paris' }, { c => '' }, { c => '12' } ], 'c');
 		my %by  = map { $_->{key} => $_->{text} } grep { ref } @{ $res->{messages} // [] };
-		message_ok(Geocode => 'warn_map_rows_skipped', $by{warn_map_rows_skipped}, [1, 3, 2]);
+		my $why = join ', ',
+			sprintf($DICTIONARY{Geocode}{warn_map_rows_why_empty}, 1),
+			sprintf($DICTIONARY{Geocode}{warn_map_rows_why_refused}, 1);
+		message_ok(Geocode => 'warn_map_rows_skipped', $by{warn_map_rows_skipped}, [1, 3, 2, $why]);
+		message_ok(Geocode => 'warn_map_rows_why_empty',   $by{warn_map_rows_skipped}, [1], 1);
+		message_ok(Geocode => 'warn_map_rows_why_refused', $by{warn_map_rows_skipped}, [1], 1);
+		{
+			# The other two reasons: a place not found, and one held back by the cap.
+			my $res2 = $G->new(geocoder => Unit::Geocoder->new)
+				->resolve_column([ { c => 'Nowhere' }, { c => 'Elsewhere' } ], 'c', max => 1);
+			my ($m) = map { $_->{text} } grep { ref && $_->{key} eq 'warn_map_rows_skipped' } @{ $res2->{messages} // [] };
+			message_ok(Geocode => 'warn_map_rows_why_not_found', $m, [1], 1);
+			message_ok(Geocode => 'warn_map_rows_why_later',     $m, [1], 1);
+		}
 
 		my $many = Unit::Geocoder->new;
 		my $capped = $G->new(geocoder => $many)->resolve_values([qw(A B)], max => $CAPPED);
@@ -2681,6 +2750,30 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 			is $@, 'caller error', "$name keeps \$\@";
 			is $! + 0, $errno, "$name keeps \$!";
 			cmp_ok $left, '>', $ALARM_SECS - 10, "$name leaves the alarm running" if $alarm_reports;
+		}
+
+		# FreeBSD's mktime runs tzset, which can leave errno set (84, EILSEQ) when
+		# it succeeds; Linux's does not, so this mktime does it on purpose.  The
+		# date functions still give the caller its $! back.
+		{
+			no warnings 'redefine';
+			my $real = \&POSIX::mktime;
+			local *POSIX::mktime = sub { my $epoch = $real->(@_); $! = 84; return $epoch };
+			for my $case (
+				[ 'Calc::date_normalise' => sub { Database::BI::Calc::date_normalise('01/15/2026', '%m/%d/%Y') } ],
+				[ 'Calc::evaluate (week, weekday)' => sub {
+					Database::BI::Calc->new(expr => 'week(d) + weekday(d)', columns => ['d'])->evaluate({ d => '2026-01-15' });
+				} ],
+				[ 'Calc::evaluate (span by week)' => sub {
+					Database::BI::Calc->new(expr => 'span(d, "1w")', columns => ['d'])->evaluate({ d => '2026-01-15' });
+				} ],
+			) {
+				my ($name, $code) = @$case;
+				local $! = 2;
+				my $value = $code->();
+				is $! + 0, 2, "$name keeps \$! where mktime sets errno";
+				ok defined($value), "$name still answers";
+			}
 		}
 		delete $ledger{'api.Globals'};
 	};
@@ -2939,9 +3032,9 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$tm->post_ok('/geo/save')->status_is(400)->json_is('/error', 'l= required');
 		$tm->post_ok('/geo/delete')->status_is(400)->json_is('/error', 'l= required');
 		$tm->post_ok("/geo/save?$l")->status_is(400)->json_is('/error', 'col= required');
-		$tm->post_ok("/geo/save?$l&col=c&kind=evil")->status_is(400)->json_is('/error', 'kind must be lat, lon, or location');
-		$tm->post_ok("/geo/save?$l&col=c&kind=$_")->status_is(200)->json_is('/ok', 1) for qw(lat lon location);
-		$tm->get_ok("/geo/list?$l")->json_is('/columns/c/kind', 'location');
+		$tm->post_ok("/geo/save?$l&col=c&kind=evil")->status_is(400)->json_is('/error', 'kind must be lat, lon, location or location_suffix');
+		$tm->post_ok("/geo/save?$l&col=c&kind=$_")->status_is(200)->json_is('/ok', 1) for qw(lat lon location location_suffix);
+		$tm->get_ok("/geo/list?$l")->json_is('/columns/c/kind', 'location_suffix');
 		$tm->post_ok("/geo/delete?$l&col=c")->status_is(200)->json_is('/ok', 1);
 		$tm->post_ok("/geo/save?$l&col=d&kind=lat");
 		$tm->post_ok("/geo/delete?$l")->status_is(200);
@@ -3016,6 +3109,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 			[ error_map_source      => "/map?l=$SPEC" ],
 			[ error_map_coordinates => "/map?l=$SPEC&lat=id" ],
 			[ error_map_tiles_unknown => "/map?l=$SPEC&lat=id&lon=id&tiles=nope", ['nope'] ],
+			[ error_map_geocode_mode  => "/map?l=$SPEC&lat=id&lon=id&geocode=nope", ['nope'] ],
 			[ error_map_coordinate_numeric => "/map?l=$SPEC&lat=region&lon=product", ['region', 'product'] ],
 		);
 		for my $row (@table) {
@@ -3285,6 +3379,18 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$tm->get_ok("/map?$l&lat=lat&lon=lon&max=$CAPPED")->status_is(200);
 		message_ok(Dashboard => 'warn_map_markers_capped', $tm->tx->res->body, [$CAPPED, 2], 1);
 
+		SKIP: {
+			# The key on the map, and what it says when nothing in it is in
+			# view, need an HTML::OSM that draws one
+			unless (eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }) {
+				delete $ledger{'msg.Dashboard.map_legend_empty'};
+				skip 'the key on a map needs HTML::OSM 0.13', 1;
+			}
+			$tm->get_ok("/map?$l&lat=lat&lon=lon&series=place")->status_is(200);
+			my ($empty) = $tm->tx->res->body =~ /var legendEmpty = '([^']*)'/;
+			message_ok(Dashboard => 'map_legend_empty', $empty);
+		}
+
 		mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (0, undef) });
 		$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
 		message_ok(Dashboard => 'error_map_renderer_missing', $tm->tx->res->body, [], 1);
@@ -3296,7 +3402,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		{
 			# With the renderer said to be there and failing, whether or not this
 			# machine has it: HTML::OSM is only recommended, and this key is in the ledger.
-			mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (1, '0.12') });
+			mock('Database::BI::Controller::Dashboard::_map_renderer_version' => sub { (1, '0.13') });
 			no warnings qw(redefine once);
 			local *HTML::OSM::new = $boom;
 			$tm->get_ok("/map?$l&lat=lat&lon=lon")->status_is(200);
@@ -3321,6 +3427,13 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$fresh->get_ok("/map?$l&loc=place")->status_is(200);
 		message_ok(Dashboard => 'warn_map_cache_unwritten', $fresh->tx->res->body, [], 1);
 		restore_all();
+
+		# The map page's progress bar looks places up one at a time, each signed
+		# by the page that listed it.
+		$tm->post_ok('/geo/lookup')->status_is(400);
+		message_ok(Dashboard => 'error_geo_lookup_place', $tm->tx->res->json->{error});
+		$tm->post_ok('/geo/lookup' => form => { place => 'Paris', sig => 'forged' })->status_is(403);
+		message_ok(Dashboard => 'error_geo_lookup_unsigned', $tm->tx->res->json->{error});
 
 		# The AI routes: the provider is the only thing replaced.
 		require HTTP::Response;

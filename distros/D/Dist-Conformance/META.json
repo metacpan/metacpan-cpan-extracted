@@ -51,6 +51,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0",
+            "Config::Tiny" : "0",
             "Cpanel::JSON::XS" : "0",
             "Digest::SHA" : "0",
             "File::Find" : "0",
@@ -90,83 +91,83 @@
    "provides" : {
       "Dist::Conformance" : {
          "file" : "lib/Dist/Conformance.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check" : {
          "file" : "lib/Dist/Conformance/Check.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::ClaudeMd" : {
          "file" : "lib/Dist/Conformance/Check/ClaudeMd.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::ClaudeSettings" : {
          "file" : "lib/Dist/Conformance/Check/ClaudeSettings.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::CriticProfile" : {
          "file" : "lib/Dist/Conformance/Check/CriticProfile.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::DataSchema" : {
          "file" : "lib/Dist/Conformance/Check/DataSchema.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::DistFiles" : {
          "file" : "lib/Dist/Conformance/Check/DistFiles.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::GitHooks" : {
          "file" : "lib/Dist/Conformance/Check/GitHooks.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::ToolConfiguration" : {
          "file" : "lib/Dist/Conformance/Check/ToolConfiguration.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Check::Workflows" : {
          "file" : "lib/Dist/Conformance/Check/Workflows.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Config" : {
          "file" : "lib/Dist/Conformance/Config.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Flavor" : {
          "file" : "lib/Dist/Conformance/Flavor.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Schema" : {
          "file" : "lib/Dist/Conformance/Schema.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Snapshot" : {
          "file" : "lib/Dist/Conformance/Snapshot.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Snapshot::Directory" : {
          "file" : "lib/Dist/Conformance/Snapshot/Directory.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Snapshot::Tree" : {
          "file" : "lib/Dist/Conformance/Snapshot/Tree.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Source" : {
          "file" : "lib/Dist/Conformance/Source.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Source::Directory" : {
          "file" : "lib/Dist/Conformance/Source/Directory.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Source::Git" : {
          "file" : "lib/Dist/Conformance/Source/Git.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "Dist::Conformance::Update" : {
          "file" : "lib/Dist/Conformance/Update.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -181,9 +182,10 @@
          "web" : "https://github.com/Troglodyne-Internet-Widgets/Dist-Conformance"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
-      "troglodyne-bot <morpheus@troglodyne.net>"
+      "troglodyne-bot <morpheus@troglodyne.net>",
+      "troglodyne-robot <trogbot@troglodyne.net>"
    ],
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",

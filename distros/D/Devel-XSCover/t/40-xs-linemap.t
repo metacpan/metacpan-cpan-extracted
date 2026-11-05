@@ -20,4 +20,11 @@ my $spike = Devel::XSCover::XS->new(dir => 't/fixtures/spike')->line_map('Spike.
 is_deeply($spike->[366], ['xs/more.xs', 7], 'an INCLUDEd file loses its leading ./');
 is_deeply($spike->[192], ['Spike.xs', 26], 'the body of add');
 
+my $dropped = Devel::XSCover::XS->new(dir => "t/fixtures/dropped")->line_map("Dropped.c");
+is_deeply($dropped->[179], ["Dropped.xs", 12], "a preprocessor line in a body is kept and counted");
+is_deeply($dropped->[180], ["Dropped.xs", 13], "and the statement after it");
+is_deeply($dropped->[181], ["Dropped.xs", 15], "the statement after a comment xsubpp dropped is where it was written, not one short");
+my $inverse = Devel::XSCover::XS->new(dir => "t/fixtures/dropped")->map("Dropped.c")->{inverse};
+is_deeply($inverse, { "Dropped.xs" => { 14 => 15 } }, "and the map says which line gcov will report it on instead");
+
 done_testing;

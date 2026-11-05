@@ -11,7 +11,7 @@ our @ACCESSORS = qw(blocks);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(@ACCESSORS);
 
-our $VERSION = '1.0.1';
+our $VERSION = '2.0.0';
 
 use parent qw(Class::Accessor::Fast);
 

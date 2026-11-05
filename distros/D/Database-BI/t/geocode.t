@@ -146,6 +146,7 @@ subtest 'a dirty column is skipped end to end' => sub {
 		'cached'        => 0,
 		'attempted'     => 2,
 		'lookups'       => 2,
+		'online'        => 0,
 		'resolved'      => 2,
 		'unresolved'    => 0,
 		'not_attempted' => 0,
@@ -156,7 +157,7 @@ subtest 'a dirty column is skipped end to end' => sub {
 		['warn_map_rows_skipped'],
 		'and the page is told that some rows could not be plotted');
 
-	like($result->{'messages'}[0]{'text'}, qr/Plotted 7 of 12 rows; 5 hold no location/,
+	like($result->{'messages'}[0]{'text'}, qr/Plotted 7 of 12 rows; 5 could not be plotted: /,
 		'with the numbers in the message');
 
 	# The crux: nothing that is not a location reached the geocoder.  One batch,
@@ -320,6 +321,32 @@ subtest 'the cap counts new lookups, and holds the rest back for the next reques
 	is($fourth->{'messages'}[0]{'key'}, 'warn_map_rows_skipped', 'and the only thing left to report is the rows');
 };
 
+subtest 'the message names only the reasons that apply, counted in rows' => sub {
+	my $geocode = Database::BI::Model::Geocode->new(geocoder => stub(), openaddr => 'test');
+	my $text = sub {
+		my ($result) = @_;
+		my ($m) = grep { $_->{'key'} eq 'warn_map_rows_skipped' } @{ $result->{'messages'} };
+		return $m ? $m->{'text'} : undef;
+	};
+
+	# Every row unplotted for one reason: the message says only that one.
+	my $lost = $geocode->resolve_column([ map { { 'place' => $_ } } qw(Atlantis Atlantis Lyonesse) ], 'place');
+	is($text->($lost), 'Plotted 0 of 3 rows; 3 could not be plotted: 3 whose place was not found',
+		'three rows naming places that were not found say so, and nothing else');
+
+	# All four reasons, in their fixed order, each counted in rows.
+	my $all = $geocode->resolve_column([ map { { 'place' => $_ } }
+		'Ramsgate, Kent', 'Atlantis', '', undef, '12', '12', 'Lyonesse', 'Avalon' ], 'place', max => 2);
+	is($text->($all), 'Plotted 1 of 8 rows; 7 could not be plotted: '
+		. '2 with no place in the row, 2 whose place is a bare number, not a place name, '
+		. '1 whose place was not found, 2 whose place has not been looked up yet',
+		'every reason, in order, with its rows');
+
+	# Rows that all plotted say nothing.
+	my $fine = $geocode->resolve_column([ { 'place' => 'Sittingbourne' } ], 'place');
+	ok(!defined $text->($fine), 'a column that plots every row has no such message');
+};
+
 subtest 'the counts add up, in every state' => sub {
 	my $geocoder = stub();
 	my $geocode  = Database::BI::Model::Geocode->new(geocoder => $geocoder);
@@ -357,7 +384,7 @@ subtest 'nothing to plot is not an error' => sub {
 	my $empty = $geocode->resolve_column([], 'place');
 	is_deeply($empty->{'counts'}, {
 		'rows' => 0, 'plotted' => 0, 'unusable' => 0, 'distinct' => 0, 'skipped' => 0,
-		'cached' => 0, 'attempted' => 0, 'lookups' => 0, 'resolved' => 0, 'unresolved' => 0,
+		'cached' => 0, 'attempted' => 0, 'lookups' => 0, 'online' => 0, 'resolved' => 0, 'unresolved' => 0,
 		'not_attempted' => 0,
 	}, 'and a dataset with no rows gives counts of zero rather than a message');
 	is_deeply($empty->{'messages'}, [], 'with nothing to say');
@@ -621,6 +648,43 @@ subtest 'the diagnostics can be rendered by the caller' => sub {
 	is($result->{'messages'}[0]{'key'}, 'warn_map_rows_skipped',
 		'and the key travels with it, so it can be re-rendered');
 	ok($seen{'warn_map_rows_skipped'}, 'the object was asked for that key');
+};
+
+subtest 'place_rows joins a place written across columns' => sub {
+	my $G = 'Database::BI::Model::Geocode';
+	my @rows = (
+		{ address => 'Brezje 8, Cerknica', country => 'Slovenia' },
+		{ address => '',                   country => 'Slovenia' },
+		{ address => "  Mahni\x{10D}i 10 ", country => "Slovenia\t" },
+		{ address => undef,                country => '' },
+		'not a row',
+	);
+	my @copy = map { ref $_ ? { %{$_} } : $_ } @rows;
+
+	my ($places, $name) = $G->place_rows(\@rows, [qw(address country)]);
+	is($name, 'address, country', 'the place is named after its columns, in order');
+	is_deeply($places, [
+		{ 'address, country' => 'Brezje 8, Cerknica, Slovenia' },
+		{ 'address, country' => 'Slovenia' },
+		{ 'address, country' => "Mahni\x{10D}i 10, Slovenia" },
+		{ 'address, country' => '' },
+		undef,
+	], 'cells are trimmed and joined with ", ", empty ones left out, one row each');
+	is_deeply(\@rows, \@copy, 'the rows given are not changed');
+
+	my ($reversed) = $G->place_rows(\@rows, [qw(country address)]);
+	is($reversed->[0]{'country, address'}, 'Slovenia, Brezje 8, Cerknica', 'the order is the one given');
+
+	my ($same, $one) = $G->place_rows(\@rows, ['address']);
+	ok($same == \@rows, 'one column hands back the rows themselves');
+	is($one, 'address', 'under that column\'s name');
+
+	my $result = $G->new(geocoder => stub())->resolve_column($places, $name);
+	is($result->{counts}{distinct}, 4, 'resolve_column reads the joined column');
+
+	throws_ok { $G->place_rows({}, ['a']) }     qr/must be an arrayref/, 'rows must be an arrayref';
+	throws_ok { $G->place_rows(\@rows, []) }    qr/column name is required/, 'and a column is needed';
+	throws_ok { $G->place_rows(\@rows, ['']) }  qr/column name is required/, 'not just an empty name';
 };
 
 done_testing();

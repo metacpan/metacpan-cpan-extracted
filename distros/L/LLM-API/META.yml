@@ -5,6 +5,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
+  HTTP::Tiny: '0.088'
+  JSON::PP: '4.16'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -22,10 +24,16 @@ no_index:
 provides:
   LLM::API:
     file: lib/LLM/API.pm
-    version: v1.0.1
+    version: v2.0.0
+  LLM::API::Anthropic:
+    file: lib/LLM/API/Anthropic.pm
+    version: v2.0.0
+  LLM::API::Bedrock:
+    file: lib/LLM/API/Bedrock.pm
+    version: v2.0.0
   LLM::API::Content:
     file: lib/LLM/API/Content.pm
-    version: v1.0.1
+    version: v2.0.0
   LLM::API::Response:
     file: lib/LLM/API/Response.pm
     version: v1.0.0
@@ -33,17 +41,21 @@ provides:
     file: lib/LLM/API/Usage.pm
     version: v1.0.0
 requires:
+  Amazon::API::BedrockRuntime: v1.43.84
+  Amazon::Credentials: v2.0.1
   CLI::Simple::Constants: v2.0.1
   CLI::Simple::Utils: v2.0.1
   Class::Accessor::Fast: '0.51'
+  File::ShareDir: '1.118'
   HTTP::Tiny: '0.088'
   JSON::PP: '4.16'
   Readonly: '2.05'
   URI::Encode: v1.1.1
+  YAML::Tiny: '1.76'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/rlauer6/LLM-API/issues
   homepage: https://github.com/rlauer6/LLM-API
   repository: https://github.com/rlauer6/LLM-API
-version: v1.0.1
+version: v2.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

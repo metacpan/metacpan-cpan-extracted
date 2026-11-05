@@ -1,0 +1,64 @@
+{
+   "abstract" : "SRT and WebVTT subtitle tools, word count, social media limits and case changes",
+   "author" : [
+      "GoSaveTool <https://www.gosavetool.com/>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "hand-written for GoSaveTool 1.000",
+   "keywords" : [
+      "subtitles",
+      "srt",
+      "webvtt",
+      "captions",
+      "word-count",
+      "character-count",
+      "title-case",
+      "slug"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GoSaveTool",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "Unicode::Normalize" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://www.gosavetool.com/contact"
+      },
+      "homepage" : "https://www.gosavetool.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mitolocya/gosavetool-perl.git",
+         "web" : "https://github.com/mitolocya/gosavetool-perl"
+      }
+   },
+   "version" : "1.000"
+}

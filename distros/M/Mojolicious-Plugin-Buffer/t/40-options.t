@@ -87,6 +87,7 @@ subtest 'every option has a schema and a message' => sub {
 		optimise_content => [-1, qr/optimise_content must be 0, 1 or 2/],
 		last_modified => [[], qr/last_modified must be 0, 1, an epoch/],
 		min_compress_size => ['big', qr/min_compress_size must be a non-negative integer/],
+		min_compress_saving => [-1, qr/min_compress_saving must be a non-negative integer/],
 		cache_duration => ['', qr/cache_duration must be a duration/],
 		cache_key => [[], qr/cache_key must be a string or a code reference/],
 		cache => [{}, qr/cache must be an object understanding get\(\), set\(\) and remove\(\)/],
@@ -219,7 +220,7 @@ subtest 'last_modified forms' => sub {
 # would drop the Cookie header from the cache key) and accepted, without a
 # warning, where it means "use the default"
 subtest 'undef is only accepted where it means the default' => sub {
-	for my $name (qw(encodings compressible_types excluded_types vary_by min_compress_size)) {
+	for my $name (qw(encodings compressible_types excluded_types vary_by min_compress_size min_compress_saving)) {
 		eval { Mojolicious->new->plugin('Buffer', $name => undef) };
 		like($@, qr/\Q$name\E must be/, "$name => undef is rejected");
 	}

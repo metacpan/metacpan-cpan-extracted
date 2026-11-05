@@ -380,7 +380,7 @@ eo_finish(pTHX_ eo_ret_t *r, I32 ri, SV **sp)
              # uncoverable condition left count:1 */
             if (eo_passes(sv)) {
                 result = sv; /* # uncoverable statement */
-            } /* # uncoverable statement */
+            }
             else {
                 result = newSVsv(sv);
                 SvREFCNT_dec(sv);

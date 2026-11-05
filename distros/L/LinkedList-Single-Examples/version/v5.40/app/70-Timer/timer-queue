@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Timer::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Timer;
+
+########################################################################
+# mail queued to go out at a given time. a dispatcher takes what is due,
+# sends what it can within its window, and puts the rest back in front of
+# the queue for the next round. the clock is a variable that the handler
+# moves, so the demonstration does not wait.
+########################################################################
+
+sub run( $class )
+{
+    my $now     = 1_000;
+
+    my $queue
+    = LinkedList::Single::Example::Timer->new
+    (
+        clock   => sub { $now }
+      , window  => 60
+    );
+
+    # ten are due; two more are queued for later.
+
+    $queue->enqueue( 900 + $_, "mail $_" ) for 1 .. 10;
+    $queue->enqueue( 1_500, 'mail later' );
+    $queue->enqueue( 1_700, 'mail much later' );
+
+    say 'queued: ', $queue->size, '; next starts at ', $queue->next_start;
+
+    my $batch   = $queue->take;
+
+    say 'due now: ', $queue->left( $batch ), '; still queued: ', $queue->size;
+
+    # sending takes 7 seconds each, so 60 seconds covers nine.
+
+    my $sent
+    = $queue->process
+    (
+        $batch
+      , sub( $start, $mail ) { say "  sent '$mail' (due $start) at $now"; $now += 7 }
+    );
+
+    say "sent $sent; the window closed at $now with ", $queue->left( $batch ), ' left';
+
+    $queue->requeue( $batch );
+
+    say 'queued again: ', join ', ' => map { "$_->[ 1 ] ($_->[ 0 ])" } $queue->contents->@*;
+
+    # a message whose start has passed arrives while a batch is out: the
+    # batch goes back around it, one message at a time.
+
+    $now        = 2_000;
+    $batch      = $queue->take;
+
+    $queue->enqueue( 1_600, 'mail urgent' );
+
+    $queue->process( $batch, sub {}, 0 );
+    $queue->requeue( $batch );
+
+    say 'after a late arrival: ', join ', ' => map { $_->[ 1 ] } $queue->contents->@*;
+    say 'merged one at a time: ', $queue->merged;
+
+    $queue
+}
+
+__PACKAGE__->run
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+timer-queue - demonstration of LinkedList::Single::Example::Timer
+
+=head1 SYNOPSIS
+
+    perl app/70-Timer/timer-queue
+
+=head1 DESCRIPTION
+
+Queues twelve messages, dispatches the ones that are due within a window
+of 60 seconds, puts the rest back in front, and shows a late arrival
+forcing the batch to be merged. See L<LinkedList::Single::Example::Timer::POD> for the design and
+the measurements.

@@ -1,7 +1,7 @@
 This archive contains the distribution Matplotlib-Simple,
-version 0.3121:
+version 0.3341:
 
-  Access Matplotlib from Perl; providing consistent user interface between different plot types
+  Plots from Perl data structures, drawn by matplotlib, gnuplot or ggplot2, with one interface for every plot type
 
 This software is copyright (c) 2025-present by David E. Condon.
 

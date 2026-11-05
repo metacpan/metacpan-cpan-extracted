@@ -1387,6 +1387,10 @@
       font-size: 0.9rem;
       word-break: break-all;
     }
+    /* A map marker's rows (_map_popup): the box scrolls, set inline. */
+    .bi-map-popup-rows { margin-top: 0.3em; }
+    .bi-map-popup-rows table { border-collapse: collapse; font-size: 90%; }
+    .bi-map-popup-rows th, .bi-map-popup-rows td { padding: 0.1em 0.6em 0.1em 0; text-align: left; vertical-align: top; white-space: nowrap; }
   </style>
   [%- IF extra_head %]
   [% extra_head %]
@@ -1766,6 +1770,9 @@
       ['x','y','cat','val','series','size','bar_val','line_val','group','col','lat','lon','loc'].forEach(function (k) {
         if (p.get(k)) encode[k] = p.get(k);
       });
+      // A place spread over columns (loc= repeated) is kept as their list.
+      var locs = p.getAll('loc').filter(Boolean);
+      if (locs.length > 1) encode.loc = locs;
       vis = { kind: kind, encode: encode, title: document.title || kind };
     }
 

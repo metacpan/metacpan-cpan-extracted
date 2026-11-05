@@ -1,0 +1,6 @@
+Revision history for Perl extension Meteorology-PET
+
+0.01 2026-11-05T01:32:29Z
+
+    - Initial release on CPAN
+    - Implemented Meteorology::PET::Thornthwaite as first submodule

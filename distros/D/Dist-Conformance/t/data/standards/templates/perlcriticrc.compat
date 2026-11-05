@@ -2,3 +2,6 @@
 # already installed: use 5.014, and never lower.
 severity = 1
 [TestingAndDebugging::RequireUseStrict]
+[RegularExpressions::RequireDefault]
+strict = 1
+[Variables::ProhibitReusedNames]

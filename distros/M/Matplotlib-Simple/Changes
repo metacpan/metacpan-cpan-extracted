@@ -1,5 +1,484 @@
 Revision history for Matplotlib-Simple
 
+0.3341 2026-11-04 CST (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - `t/16.creator.t` no longer dies after test 26 with "can't write .../gen5.svg: No such file or directory" on perls whose File::Temp is 0.22, those up to 5.16, where no Python is installed. Each test file looks for Python with `qx/$PY --version 2>&1/`, and where there is none, the forked child's "Can't exec" warning was fatal under the tests' `warnings FATAL => 'all'`. The child therefore died instead of exiting quietly and ran the `END` blocks, and File::Temp 0.22 removes every temporary directory in `END` without checking that the process exiting is the one that made it. The child removed the test's directory from under it. File::Temp 0.23, from perl 5.18, checks. The check for Python in all 14 test files that make it now turns off the `exec` warning for that one statement. A CPAN Testers report against 0.334 from perl 5.14.4 on FreeBSD 15.0 found it, as did one against 0.333 from the same smoker; it was reproduced with perl 5.12.5, and perl 5.12.5 and 5.16.3 now pass every test without Python, gnuplot or R.
+
+0.334 2026-11-01 CST (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - `t/16.creator.t` no longer dies after test 31 where `gnuplot --version` does not print "patchlevel" after the version. The test read the version with a pattern that required that word, so on such a gnuplot the version came out undefined, and the warning about it stopped the test under its fatal warnings, with exit status 25, although no test had failed. It now reads only gnuplot's major and minor version, as its gate for gnuplot 5.2 already did. Four CPAN Testers reports against 0.333 found it, from perl 5.36.3, 5.38.5, 5.40.3 and 5.44.0 on Fedora 43 Linux.
+
+0.333 2026-11-01 CST (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - Matplotlib::Simple loads again under perl 5.18. In 0.332 it could not be loaded there at all, so every test file failed before running a test. The pattern that reads Python's `\N{...}` escape wrote its braces as `\{` and `\}` inside an `s{}{}` substitution, which perl 5.18 warns is a useless escape, and under the module's `warnings FATAL => 'all'` that warning stopped it compiling. The braces are now written `[{]` and `[}]`, which match the same characters without a backslash. A CPAN Testers report against 0.332 from perl 5.18.4 on Debian Linux found it; perl 5.10.1, 5.12.5, 5.16.3, 5.32.1 and 5.44.0 loaded it.
+
+0.332 2026-10-31 CDT (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - `t/18.ggplot2.t` no longer fails tests 116, 126 and 138 where perl is built against a C library other than glibc. Two CPAN Testers reports against 0.331 failed there: perl 5.22.3 on Alpine Linux, whose libm is musl's, in the digests of the boxplot, pie and violin scripts, and perl 5.44.0 on DragonFly BSD 6.4 in those of pie and violin. Those scripts hold results of `sin`, `cos` and `**`, which those libms round a last bit away from glibc's. The module wrote each number exactly as that perl computed it; the test now checks the digests of the five scripts that hold such results -- boxplot, hist, hist2d, pie and violin -- only where the C library is glibc. Twenty-one more reports against 0.331 failed the same way, from FreeBSD, OpenBSD, NetBSD, MidnightBSD, DragonFly BSD under perl 5.24.4, Solaris, Cygwin, Haiku and Strawberry Perl under Windows, none of them on glibc.
+
+ - `t/18.ggplot2.t` no longer fails test 291 under Strawberry Perl on Windows. The test names an Rscript that does not exist in `MATPLOTLIB_SIMPLE_RSCRIPT` and expected the module to report that it "failed to start". On MSWin32 perl's `system` never says so: when it cannot find a program it runs it again through `cmd.exe`, which says the name "is not recognized" and exits 1, so the module reports "unexpectedly returned exit value 1", with `cmd.exe`'s message in the STDERR it prints. The test now expects that on MSWin32. Two reports against 0.331 found it, from Strawberry Perl 5.24.4 and 5.42.3 under Windows 10.
+
+0.33 2026-10-30 CDT (Claude Opus 5.5 helped)
+
+ [New]
+
+ - `engine => 'gnuplot'` and `engine => 'ggplot2'` draw a figure with gnuplot 5.2 or newer, or with R and its package ggplot2 3.5.0 or newer, in place of matplotlib. Both draw `bar`, `barh`, `boxplot`, `colored_table`, `hist`, `hist2d`, `imshow`, `pie`, `plot`, `scatter`, `violin` and `wide`, alone, overlaid with `add`, or in a grid with `plots` or `p`, as `.svg`, `.png` or `.pdf`. The program to run is `gnuplot` or `Rscript`, or the path in `MATPLOTLIB_SIMPLE_GNUPLOT` or `MATPLOTLIB_SIMPLE_RSCRIPT`. `execute => 0` writes the script without running it, as before.
+
+ - Whatever an engine does not draw is refused by name, with the types and keywords it does draw, rather than left out of the figure: `hexbin` and `venn_proportional_area`, Python of the caller's own such as `set_options` and `legend`, `tooltips`, `twinx`, `sharex` and `sharey`, `shared_colorbar`, `show`, and in gnuplot `edgecolor` on bars and `notch`. matplotlib, the default, draws everything it did.
+
+ - gnuplot and ggplot2 read every keyword as matplotlib would. A color is one of matplotlib's names, drawn as matplotlib draws it, since gnuplot's and R's names differ from it and from each other; a `cmap` is one of 36 of matplotlib's colormaps, or one of them reversed with `_r`; a title holding Python of the caller's own, such as `'"Counts, by book"'`, is the words inside the quotes; and `set_xlim => '0, 10'` is the range. Text followed by matplotlib's own arguments, such as `fontsize = 20`, is refused.
+
+ - `style` matches the engine by default: `style => 'native'` lets gnuplot or ggplot2 draw a figure in its own way, with its own palette and default colormap, its own boxplot quartiles, histogram bins and violin densities, and its own theme. With `style => 'matplotlib'` each draws what matplotlib draws -- the same colors, the same bins, quartiles and densities, computed as numpy and scipy compute them -- so that changing `engine` changes the renderer and not the figure. Under either style the data, key order, given colors and colormaps, labels, ranges, log scales and size are the caller's. Under matplotlib both styles draw the same figure.
+
+ - An SVG drawn by gnuplot or ggplot2 carries the same note about where it came from as one drawn by matplotlib, in `<dc:creator><cc:Agent><dc:title>`, ending with the engine's own versions, such as "with Perl 5.44.0, gnuplot 6.0.0, by con on e" or "with Perl 5.44.0, R 4.6.1, ggplot2 4.0.3, by con on e". gnuplot's `<title>Gnuplot</title>` and `<desc>Produced by GNUPLOT ...</desc>` are taken out of its SVGs, as the note is all the metadata matplotlib's have. The R script writes the note itself, so a script written with `execute => 0` and run later writes it too; gnuplot cannot, so Perl writes it when it runs gnuplot, and a gnuplot script run by hand leaves its SVG without one. PNG and PDF files from either engine have no note.
+
+ - `style` was accepted before as one of pyplot's functions, and wrote `plt.style(...)` into the script, which died there as "TypeError: 'module' object is not callable", since `plt.style` is a module. It now means only the above, and any other value than `'matplotlib'` or `'native'` is refused.
+
+ [Fixed]
+
+ - A program that seeds `rand` with a fixed value, such as `srand 7`, no longer dies after enough runs with "Error in tempfile() using template /tmp/XXXXXXXXXX.py: Have exceeded the maximum number of attempts (1000) to open temp file". The scripts are kept in the temporary directory, and their names came from `rand` alone, so every run asked for the same ones and had to step past all those the runs before it had left. A script is now named `matplotlib-simple-<process>-<time>-<count>-XXXXXX.py` (or `.gp`, or `.R`), and the caller's random numbers are as they were.
+
+ - `t/15.tooltips.t` no longer fails on perls whose numbers are not plain doubles, nor on Strawberry Perl 5.24. Test 68 gave the number `1e21` as a label and expected it to be written as `1e+21`. A quadmath or long-double perl prints it as `1000000000000000000000`, and Strawberry Perl 5.24.4 on Windows prints it as `1e+021`. Fifteen CPAN Testers reports against 0.321 and 0.322 failed on that one test: thirteen from quadmath builds on x86_64 and i686 Linux, one from `aarch64-linux-ld`, and one from Strawberry 5.24.4 under Windows 10. The module wrote each label as that perl prints it, as it should; the test now expects the same.
+
+ - `t/08.python.interpreter.t` no longer fails test 11 on perls whose File::Spec keeps the first temporary directory it finds, such as File::Spec 3.3, 3.3101 and 3.39_02 in perls 5.10.1, 5.12.5 and 5.16.3. The test sets `TMPDIR` to a directory with a space in its name and expected the script to be written there, but such a File::Spec never reads `TMPDIR` again. The test now skips that one check where File::Spec does not follow `TMPDIR`.
+
+0.322 2026-10-21 CDT (Claude Opus 5.5 helped)
+
+ [Changed]
+
+ - An SVG holds the `Creator` note in `<dc:title>` and none of the rest of matplotlib's boilerplate. The file no longer opens with `<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">`, which matplotlib writes whatever it is asked and no browser reads, and its `<metadata>` has no `<dc:date>`, `<dc:format>` or `<dc:type>`. The same holds for `.svgz`. PNG, PDF and the other formats are written as before.
+
+0.321 2026-10-15 CDT (Claude Opus 5.5 helped)
+
+ [New]
+
+ - `scatter` takes `tooltips`, a label for each point that a web browser shows when the mouse is over it in an SVG: `tooltips => [ 'Sample 1', undef, 'Sample 3' ]` for one set, or a hash of such arrays keyed by set name for several. There must be exactly one entry per point, and `undef` is a point with no label. A point that matplotlib does not draw, NaN or not above 0 on a log axis, takes its label with it, and the rest keep theirs. Eye of GNOME and other image viewers show the same file without the labels. Any `output_file` that is not `.svg` or `.svgz` is drawn without them, with a warning.
+
+0.32 2026-10-12 CDT (Claude Opus 5.5 helped)
+
+ [New]
+
+ - `plot` with a hash of sets takes a set given as its y values alone, as in `data => { '1cka' => [ 0.86, 0.85, 0.85 ], '1ckb' => [ 0.81, 0.8, 0.79 ] }`, and draws it against 0, 1, 2, ... . Each set had to be an `[ \@x, \@y ]` pair, so the x values had to be built by hand, and a set of y values died with "3 were entered for 1cka, but there must be exactly 2" -- or, for a set of exactly two numbers, with "Can't use string ("0.86") as an ARRAY ref". Pairs and sets of y values can be mixed in one hash. A set that mixes arrays with plain numbers is refused, by name. Array data is unchanged: two plain arrays are still one line, of x and y.
+
+ [Clearer messages]
+
+ - A column of `df` that is not there is refused with a message that starts by naming it and the option that named it: `plt: "ΔG (kcal/mol)", given as "x", is not a column in the dataframe "df". Its columns are: exp, iptm`. The message was `"df" has no column "ΔG (kcal/mol)"`, which did not say which of `x`, `y`, `by` and `color_key` was at fault -- easy to misread when an axis label had been given as `x` in place of `xlabel`.
+
+ - `data` of the wrong shape is refused before anything is written, naming the plot and what it should have been: `plt: "data" at subplot 1 must be a hash for pie, not an ARRAY reference`, or `each key of "data" is an array of values for boxplot, but "A" is not`. `bar`, `barh`, `pie`, `colored_table`, `hexbin` and `hist2d` died on an array as "Not a HASH reference", and `boxplot`, `violin`, `hist`, `hexbin` and `hist2d` on a hash of numbers as 'Can't use string ("1") as an ARRAY ref', at a line of the module. An `add` graph's `data` was not checked at all: `data => {}` in an `add` graph of a violin plot wrote `violinplot([])`, and the script died in matplotlib as "IndexError: too many indices for array"; it is now refused as an empty hash, and an `add` graph with no `data` as not defined.
+
+ - A `df` with no row that has a value in every column it needs is refused, naming those columns: `plt: no row of "df" has a value in both "name" and "v"`. `bar`, `barh`, `pie`, and `plot` and `hist` with `by`, made an empty `data` and died as '"data" is an empty hash', about an option the caller had never given. `scatter`, `hexbin` and `hist2d` with `by` named every column but the `by` one, even when it was the `by` column that was empty.
+
+ [Figures that were drawn incorrectly]
+
+ - `show => 'False'` does not show the figure. `show` was tested for Perl truth, in which 'False' is true, so the script called `plt.show()`, and `output_file` was not required. It is read as every other switch is since 0.319: `'True'` or `'False'` in any case, or a number, and anything else is refused by name.
+
+ - `scatter`, `hexbin` and `hist2d` keep a `set_xlabel` or `set_ylabel` given by the caller. Each labelled its axes with the names of the two data keys unless given `xlabel` or `ylabel`, and wrote the key's name over a `set_xlabel`.
+
+ - `hist2d` with `logscale` draws as many bins as `xbins` and `ybins` ask for, as it does without one. They were taken as the number of bin edges, so each axis had one bin fewer, and `xbins => 1` died in numpy as "zero-size array to reduction operation maximum". `logscale => []` is a linear plot, given the bin counts, where it took the log-scale path with no log axis.
+
+ - `colored_table`s that share a colorbar share a scale drawn from the cells they draw. A cell that `col_labels` left out of a table stretched the scale of every table sharing it, and `default_undefined` was counted in whether or not any cell was undefined.
+
+ [Text that came out wrong]
+
+ - A title or label that opens with a quote is taken for Python only if the string literal closes and is either all of the text or followed by a comma. `title => "'Tis the season"` was written as `set_title('Tis the season)` and `xlabel => '"A" vs "B"'` as `set_xlabel("A" vs "B")`, both SyntaxErrors; each is now quoted. Python of the caller's own, such as `'r"$\it{anno}$"'` or `'"a, b", fontsize = 20'`, is left alone as before.
+
+ - `supxlabel` and `supylabel` are quoted as `suptitle` is. Figure methods are written as given, so `supxlabel => 'Time'` was written as `fig.supxlabel(Time)`, a NameError.
+
+ [Documentation]
+
+ - Four examples that could not run as written are corrected: the `colored_table` figure of three subplots gave each subplot an `output_file`, which `plt` refuses; the single `boxplot` imported `barplot`, which is not exported; the `bar` figure of several subplots had two HTML `<br />` tags inside its Perl; and the options table gave `scalex => 1.4` as the example for `scaley`.
+
+0.319 2026-10-05 CDT
+
+ [Keywords are spelled with "_", not "."]
+
+ - Every keyword that was spelled with a dot is now spelled with an underscore: `col_labels`, `colorbar_on`, `key_order`, `output_file`, `plot_type`, `row_labels`, `set_options`, `shared_colorbar`, `show_colorbar`, `show_legend`, `show_numbers`, `twinx_args`, `undef_color`, `xscale_hexbin` and `yscale_hexbin`. A dotted name is not a Perl identifier, so it had to be quoted on the left of `=>`, as in `'output.file' => 'b.svg'`. The new names need no quotes, as in `output_file => 'b.svg'`, and are spelled like the keywords that already had an underscore, such as `cb_min`, `default_undefined` and `set_title`.
+
+ - The old spellings are refused, not accepted as synonyms. A script written for 0.317 or earlier dies before it writes anything, with one message that names every dotted keyword it was given, where it was given -- at the top, in a subplot, in a `p` entry or in an `add` graph -- and what it is called now: `plt: keywords are spelled with "_", not ".", since 0.319: "output.file" is now "output_file"; "plot.type" is now "plot_type"`. Without this check, `plot.type` and `output.file` would not have been named at all, because `plt` looks for `plot_type` and `output_file` before it checks any other keyword, so an old script would have died with "either "show" or "output_file" must be defined". Bringing a script up to date is a search and replace of the names above.
+
+ [Figures that were drawn incorrectly]
+
+ - `plot` with `twinx => { P => 1, H => 1 }` draws both series on one right-hand axis. Each twinned series had a twin axis of its own, with limits of its own, and their ticks were drawn over one another on the same spine. The same was true of array data with `twinx => [1, 2]`.
+
+ - A twinned series is in the legend, alongside the series on the left axis. It was in none; with `twinx_args`, it was in a second legend drawn in the same "best" place as the first, covering it.
+
+ - Subplots that share a colorbar share a color scale: one color is one value in all of them, and the colorbar is true of every one. Each subplot spread its own range over the whole colormap -- two scatters colored from 1..2 and 10..20 drew both in the same colors -- and the one colorbar, drawn from the last subplot, was true only of that one.
+
+ - Several subplots given `plot_type` and `data` at the top as well as `plots` refuse it. The top-level plot was drawn on `ax0` and the first subplot drawn on top of it, and with two subplots the script named an `ax1` that did not exist.
+
+ - A `title`, `xscale`, `ylim` or other pyplot option at the top of a figure of several subplots is refused, naming the subplot hash it belongs in and, for a title, `suptitle`. It was written as `plt.title()`, which acts on the last subplot drawn, and replaced that subplot's own title. A plot option (`color`, `cmap`), an axes method (`set_xlabel`), `add`, or `cbpad` without `shared_colorbar` at the top was accepted and dropped, and is refused too. The figure's own options -- `suptitle`, `set_figwidth`, `sharex`, `shared_colorbar` and the like -- are taken as before.
+
+ - `bar` and `barh` with a simple hash take `width`, which was read only by stacked groups, so every simple bar plot was drawn at the default 0.8 whatever it said. `barh` writes it as matplotlib's `height`.
+
+ - `bar` with a simple hash takes `edgecolor` as a hash of one color per bar, as it takes `color`. The hash was dropped without a word; a grouped plot refuses one, naming why.
+
+ - A `bar` hash of hashes whose inner keys differ only in case, such as `a` and `A`, draws its series in the same order every time. Hash order decided it, and the bars and legend changed places from run to run. `scatter`'s keys were ordered the same way, and are fixed the same way.
+
+ - `scatter` with several sets reads `show_legend`, which it accepted and ignored, so the legend could not be turned off.
+
+ - `hist` and `scatter` take `key_order`, the order their sets are drawn in, and the groups that `df` makes with `by` are in numeric order for them too, as documented for every type. Both sorted the groups as strings, 10 before 2.
+
+ [Text that came out wrong]
+
+ - A title or axis label holding an apostrophe or a comma is quoted, unless it opens as Python does, with a string literal or a keyword argument. `xlabel => "Bob's data"` was written as `set_xlabel(Bob's data)`, a SyntaxError, so prose of that kind had to carry its own quotes; text that does, and mathtext such as `'r"$\it{anno}$"'`, is left alone as before. `title => ''` was written as `set_title()`, a TypeError, and is now an empty title.
+
+ - A NUL or other control character in text is written as a Python escape. A NUL went in as it stood, and Python refused the whole script: "source code string cannot contain null bytes".
+
+ [Data and options that broke the script, or were silently dropped]
+
+ - An `imshow` of strings with a `stringmap` draws on a perl whose JSON::MaybeXS uses JSON::XS, which it does when JSON::XS is installed and Cpanel::JSON::XS is not. The script died with "TypeError: Image data of dtype <U21 cannot be converted to float", and so did test 47 of `t/10.review.fixes.0.317.t` and `t/01.all.tests.t`, which stopped the module from installing. The first category's 0 was copied from the count of an empty array, which perl keeps as a number that is also the string "0", and JSON::XS wrote it as a string; one string among the integers made numpy read the whole image as text. HitList's conda install found it on 2026-10-05 and put it down to numpy 2.5.3, which arrived at the same time, but numpy is not involved: it fails under JSON::XS 4.04 with numpy 2.4.6 and passes under Cpanel::JSON::XS and JSON::PP with numpy 2.5.3.
+
+ - A whole number with leading zeros, such as `007` from a column read from a file, is written without them. Python 3 refuses `007` ("leading zeros in decimal integer literals are not permitted"), so a bar plot of `{ A => '007' }` died when the script ran. The same went for `ncols => '02'`, and for `bins`, `cb_min`, `xmin` and the other numbers written as given.
+
+ - `inf` and `nan`, which Perl's `looks_like_number` accepts, are written as `float('inf')` and `float('nan')` in `vmin`, `vmax`, `mincnt`, `alpha`, `cb_min` and `cb_max`, where they were bare names and a NameError. Where an infinite value cannot mean anything -- `scale`, `width`, a `colored_table` scale end, a `wide` x value, a `hist2d` range end -- it is refused by name.
+
+ - Every switch -- `stacked`, `mirror`, `show_numbers`, `colorbar_on`, `show_colorbar`, `show_legend`, `cb_logscale`, `medians`, `whiskers`, `notch`, `showcaps`, `showfliers`, `showmeans` and `execute` -- takes `'True'` or `'False'` in any case, or a number, as `log` has since 0.317, and refuses anything else by name. `stacked => 'True'`, `mirror => 'True'` and `execute => 'yes'` died as 'Argument "True" isn't numeric'; `colorbar_on => 'False'` and `show_numbers => 'False'` turned the option on; `notch => 'false'` and `medians => 'yes'` were written into the script as bare names.
+
+ - `hist2d` checks `xmin`, `xmax`, `ymin` and `ymax`. Each was written as given, so `xmin => 'a'` was a NameError; a column with no finite value died as "Use of uninitialized value"; and a log axis whose data reached 0 died inside numpy as "invalid entry in coordinates array". `hexbin` and `hist2d` refuse a negative bin count, and a `cb_logscale` starting at 0, which matplotlib refused from inside itself.
+
+ - `scatter` with a `label` in a set's `set_options` uses it. A set without a color key was given `label = 'A'` as well, and the script was a SyntaxError: "keyword argument repeated".
+
+ - `boxplot` and `violin` refuse a `color` hash, pointing to `colors`; it was written into the script as `'HASH(0x...)'`.
+
+ - `hist` refuses an `orientation` hash, which was skipped as though it held a setting per set and then never read, and a `color` or `bins` hash naming a set that is not in `data`, which was ignored -- a typo, most often -- and the set drawn with the defaults.
+
+ - `scatter` refuses x, y and color axes of different lengths, and a `set_options` of the wrong shape for its data, by name. They died as "x and y must be the same size" from matplotlib, as "Can't use string as a HASH ref", or were ignored.
+
+ - `plot` with array data refuses a `twinx` or `twinx_args` index past the last line, which was ignored.
+
+ - `venn_proportional_area` refuses a `key_order` naming a set twice, which drew that set against itself and left the other out, and a `set_colors` that is not one color per set, which failed inside matplotlib_venn. Array `data`, and a string `key_order` or `set_colors`, died as Perl's own errors and are refused by name.
+
+ - Every `key_order`, `keys` and `col_labels` must be an array naming each key once. A string died as "Can't use string as an ARRAY ref", and a key named twice was drawn twice.
+
+ - `pie` refuses a negative wedge and a pie of nothing but zeros; `imshow` refuses rows of different lengths and names an undefined cell. Each was refused from inside matplotlib or numpy, naming nothing, and an undefined cell of numeric data was reported as needing a `stringmap`.
+
+ - `bar` refuses grouped data whose arrays are all empty, which died as "Can't use an undefined value as an ARRAY reference"; an `add` that holds something other than hashes, which died as "Can't use string as a HASH ref"; and `sharex` or `sharey` on a single plot is dropped with a warning, as `ncols` is, where `ax0.sharex(1)` was a TypeError.
+
+ - A `df` that is an array of arrays or of hashes may hold an undefined row, which is a row with no values, left out with the usual warning. It died as "row 0 of "df" is not an ARRAY reference". A `colored_table` frame with no columns says so, where it died as "Use of uninitialized value $x".
+
+ - `output_file => '0'` is a file name like any other, and was refused as missing.
+
+ [Documentation]
+
+ - The POD's table of which `df` column each plot type reads had its `hist`, `boxplot` and `violin` rows shifted one column left, so it said `boxplot` read its values from `x`, which the code refuses. README.md was right; `md2pod.pl` dropped every empty table cell rather than only those outside the outer pipes.
+
+ [Data Provenance]
+
+ - Provenance within svg files now prints Perl version, python version, and matplotlib version
+
+ [Plotting a data frame]
+
+ - `df` takes a data frame whole, in any of the four shapes `Stats::LikeR` uses (array of hashes, hash of arrays, hash of hashes, array of arrays), with the columns to draw named by `x`, `y` and `by`, and for `scatter` `color_key`: `bar(df => read_table('t.csv'), x => 'Method', y => 'BEDROC(32.2)', 'output.file' => 'b.svg')`. Until now a table had to be taken apart column by column with `avals` and put back together as the `data` hash of the plot type. Every plot type but `imshow`, `venn_proportional_area` and `wide` takes it, in a single plot, a subplot or an `add` graph. x goes on the x axis whatever the sorted order of the column names, the axes are labelled with the column names, bars keep the order of the rows, `plot` draws its lines in the order of x, and `by` groups are in numeric order when they are numbers. A row with no value in a column the plot uses is left out with a warning that counts it; a missing column, a repeated bar label and a grouped bar with a missing pair are refused by name. `Stats::LikeR` is not a prerequisite: the shapes are recognised by their structure.
+
+ - `hist` and `violin` given `df` without `x` or `y` draw every column of numbers, passing over columns of names or categories, as pandas' `DataFrame.hist` does; they died with 'plot_type "violin" needs "y" to name a column of "df"'. Without `by`, the columns of a hash of arrays need not be the same length, since each is a distribution of its own, so what `Stats::LikeR`'s `group_by` returns -- one column per group, as long as the group -- can be drawn whole: `violin(df => group_by($mtcars, 'mpg', 'cyl'), output_file => 'mpg.svg')` draws one violin per number of cylinders, in the order 4, 6, 8. It died with 'the columns of "df" must all have the same number of rows, but they have "4" 11, "6" 7, "8" 14'. With `by`, which reads a value and its group from the same row, the columns must still be the same length, and the column to split must still be named.
+
+0.317 2026-09-30 CDT
+
+ [Installing]
+
+ - The test suite skips its drawing checks, rather than failing them, where matplotlib is older than 3.10. `t/07.review.fixes.t` and `t/09.review.fixes.0.316.t` checked only that matplotlib could be imported, so on a machine whose `python3` is 3.6.8 with matplotlib 3.0 -- the system Python, in /usr/lib64/python3.6, of the HPC cluster where the install was attempted -- 9 of 709 tests failed with "TypeError: __init__() got an unexpected keyword argument 'layout'" and the module would not install. The other test files already required 3.10.
+
+ [Choosing the Python]
+
+ - The environment variable `MATPLOTLIB_SIMPLE_PYTHON`, when set, is the path of the Python that `plt` runs its script with, taken whole, spaces and all, in place of `python3` (or, on Windows, of the search for `python`, `py -3` and `python3`). This is for a venv, or for a cluster whose own `python3` is too old for matplotlib 3.5 and which provides a newer one through `module load` or conda. The test suite uses the same interpreter, so `MATPLOTLIB_SIMPLE_PYTHON=~/mpl/bin/python3 cpanm Matplotlib::Simple` tests the module with the Python it will be used with. When no Python is found at all, the error now names the variable.
+
+ [Figures that were drawn wrong]
+
+ - `bar` with `log => 'False'` draws a linear y axis. The option is documented as a Python bool, and was tested for Perl truth, in which the string 'False' is true, so it turned the log scale on. `log` takes 'True' or 'False', in any case, or a number; anything else is refused by name. `logscale`, documented as taking Perl truth, is unchanged.
+
+ - `colored_table` takes its rows from the outer keys of `data` and its columns from the inner keys, as documented. Both were taken from the outer keys, so a column that was only ever an inner key was dropped: the documentation's own example, `{ H => { H => 432, Cl => 427, Br => 363 }, C => { H => 413, Cl => 339, Br => 276 } }`, drew columns C and H, lost every Br and Cl value and left the C column empty. A table whose inner keys are all outer keys too, such as the bond-dissociation example, is drawn as before. With `mirror`, rows and columns are both every key, and a reflection fills only the cells left empty, where it used to overwrite a cell that was given, by hash order. A `row.labels` of the wrong length is refused by name.
+
+ - `colored_table` draws its colorbar with `cbdrawedges`, `cblocation`, `cborientation` and `cbpad`, which the documentation said worked there and which were accepted and then not written.
+
+ - `scatter` reads `colorbar.on`, `cblabel`, `cblocation`, `cborientation` and `shared.colorbar`. It accepted them all and read none: `'colorbar.on' => 0` still drew a colorbar, labelled with the color key whatever `cblabel` said, and two scatters sharing a colorbar each drew their own.
+
+ - `violin` outlines its violins in `edgecolor`, which was accepted, given a default, and ignored for a hardcoded black.
+
+ - `cb_min`, `cb_max` and `cb_logscale` set the color scale of `scatter` and `imshow`, and `cb_min` and `cb_max` that of `hexbin` and `hist2d`. All four accepted them, since they are colorbar options, and none read them. For `hexbin`, `hist2d` and `imshow`, `cb_min` and `cb_max` are the same as the `vmin` and `vmax` they already took, and giving both for one end is refused. A log scale starts at the smallest value above 0 unless told otherwise, and is refused for an `imshow` with a `stringmap`, whose colors are categories. `imshow`'s `vmin` and `vmax` must be numbers; a word was written into the script bare.
+
+ - `hist` and `violin` refuse `colorbar.on`, naming the plot types that take it. Neither draws a colorbar, and both accepted it and did nothing with it.
+
+ - `shared.colorbar` is an option of `plt`, for the whole figure, and a subplot of a type that draws no colorbar refuses it. Every plot type accepted it inside a subplot, where only `plt` reads it, so `bar` or `pie` given it there did nothing and said nothing. A single plot given it is still warned that it means nothing there.
+ - A single-set `scatter` whose `keys` name x and y of three keys is colored by the third, as the multi-set form has been since 0.316. It was drawn in one color with no colorbar.
+
+ - An `imshow` of strings with a `stringmap` and a horizontal colorbar -- `cborientation => 'horizontal'`, or `cblocation` at the top or bottom -- labels its colorbar. The script died with "ValueError: The number of FixedLocator locations (0) ... does not match the number of labels", because the labels were put on the colorbar's y axis, where a horizontal one has no ticks.
+
+ - A subplot with a `hist` overlay reports one range of bin heights, over every set in it. It printed two: the overlay's, then one that left the overlay's bins out.
+
+ - A single plot writes its `legend` once, and only when something has a label. It was drawn a second time by an unconditional `plt.legend()`, which warned "No artists with labels found to put in legend" when nothing had one.
+
+ [Text that came out wrong]
+
+ - A title or label holding a Latin-1 character that is not UTF-8, such as the degree sign of `"Temperature (\xb0C)"`, is written as that character. Every string without Perl's UTF-8 flag was decoded as UTF-8, so the degree sign became U+FFFD. Raw UTF-8 bytes are still decoded.
+
+ - Data keys in raw UTF-8 bytes -- read from a file with no decoding layer, or written in a script without `use utf8` -- are decoded wherever they are written: bar and pie labels, boxplot and violin tick labels, and legend and colorbar labels. Only axis labels were, so `bar(data => { "ρ" => 1 })` without `use utf8` labelled its bar "Ï\x81".
+
+ - An array of titles or labels, such as `set_title => ['First', 'Second']`, writes each one. The array itself was quoted, and the title read "ARRAY(0x5b95222fb660)".
+
+ [Data and options that broke the script, or were silently dropped]
+
+ - NaN and infinity in `data` are written as Python can read them, as `float('nan')` and `float('inf')`. `looks_like_number` accepts "nan", "inf" and a Perl NaN, so they passed every check and were then written as Perl prints them: `plot(data => { A => [[1,2,3], [1,"NaN"+0,3]] })` died with "NameError: name 'NaN' is not defined", and an `imshow` with a NaN died with "TypeError: Image data of dtype object cannot be converted to float". A NaN is drawn as matplotlib draws it -- a gap in a line, an empty cell -- and neither it nor an infinity counts towards a range the module works out, such as an `imshow` color scale, which had come out as "vmax = Inf". `boxplot` and `violin` leave NaN out, as they leave out undef. `hist`, `pie` and `violin` refuse an infinite value by name, since there is nothing finite to bin, size or draw a density for.
+
+ - `sharex` and `sharey` take matplotlib's words `row`, `col`, `all` and `none`, and 'True' and 'False'. A word was written bare, so `sharey => 'row'` died with a NameError.
+
+ - `bar` takes `xerr` and `yerr` as an array of one error per bar, or of two such arrays, lower then upper, as its options table said, and a hash whose value for a key is one number. An array died with "ARRAY for yerr isn't acceptable", and a hash that left out a key died dereferencing it; both are now accepted or refused by name. `linewidth` must be a number.
+
+ - `shared.colorbar` accepts only subplots that draw a colorbar -- `colored_table`, `hexbin`, `hist2d`, `imshow` and `scatter` -- and says so when it is given any other. A `plot` or `pie` in the list died from its own helper, complaining of a "colorbar.on" or "cbpad" that the caller had never passed.
+
+ - A `shared.colorbar` index past the last plot is refused. It was checked against the cells of the grid, so an index naming an empty cell passed: the other listed subplots had their colorbars turned off, the one meant to draw the shared colorbar did not exist, and no colorbar was drawn.
+
+ - A mistyped keyword inside `twinx.args`, such as `ylable`, is refused with the keywords it resembles. It was dropped without a word.
+
+ - Options written into the script as numbers are checked as numbers: `vmin`, `vmax`, `cmin` and `cmax` of `hist2d`, `labeldistance` and `pctdistance` of `pie`, `alpha` of `hist` and `venn_proportional_area`. `vmin => 'low'` wrote "vmin = low" and died as a NameError. `density` of `hist2d` takes 'True' and 'False' as well as a number.
+
+ - `ncols`, `nrows`, `ncol` and `nrow` must be whole numbers of at least 1, and each element of `plots` a hash. `ncols => 'two'` died with 'Argument "two" isn't numeric in multiplication', and `plots => [[1,2]]` with "Not a HASH reference".
+
+ [Documentation]
+
+ - The Synopsis says the script is written to the system's temporary directory, not to /tmp, which it has not been since 0.313. The `hexbin` section no longer says that `cb_logscale` cannot be combined with `vmin` and `vmax`, which it can, and describes `vmin` and `vmax` as the ends of the color scale rather than as a normalization method.
+
+0.316 2026-09-28 CDT
+
+ [New data shape]
+
+ - `scatter` takes a hash of hashes of numbers, one point per set: `catboost => { MAE => 0.41, MSE => 0.30, R2 => 0.83 }` is drawn as a single point labelled "catboost" in the legend, its keys read as x, y and color exactly as for a set of arrays. This suits one summary per group, such as the scores of several models. Such data used to die with "must be an array of numbers, not a scalar". A set that mixes numbers and arrays is still refused.
+
+ [Figures that were drawn wrong]
+
+ - A `scatter` of several sets colored by a third key draws every set on one color scale, from the smallest to the largest color value of all the sets. Each set was scaled to its own range, so the same color meant a different value in each set, the one colorbar -- drawn from the last set -- was true only of that set, and a set of one point came out in the bottom color of the map whatever its value. A set whose `set.options` give their own `vmin`, `vmax` or `norm` keeps them. This changes the picture for anyone whose sets had different color ranges.
+
+ - Sets of a `scatter` colored by a third key are each drawn with their own marker (`o`, `s`, `^`, `D`, `v`, ... in the sorted order of the set names). They were all circles, and since every set is colored from the same colormap, nothing but the legend order said which point belonged to which set; for the one-point-per-set data above, the legend could not be read at all. A set whose `set.options` name a `marker` keeps it, and that marker is not given to any other set. Sets drawn without a color key keep their distinct colors and are given no marker.
+
+ - A pyplot option given to one subplot -- `axhline`, `ylim`, `grid`, `xscale` and the others written as `plt.` calls -- is drawn on that subplot. It was drawn on whichever axes matplotlib held current, which after the subplots are made is the last one, so subplot 0's `axhline => 2` appeared on the last subplot and subplot 0 had none. A single plot with `twinx` had the same fault: its pyplot options were drawn on the twin axes.
+
+ - A single plot writes an argument list of numbers as Python. `ylim => '0, 10'` was quoted into the string `plt.ylim('0, 10')`, and the script died with "ValueError: too many values to unpack"; the same option at a subplot has always worked. A list may hold `None`, `True` and `False` as well, so `ylim => 'None, 10'` sets only the top. A lone word such as `xscale => 'log'` is still quoted, as is a list with a word in it.
+
+ - A subplot quotes its pyplot options as a single plot does. `xscale => 'log'` given to one of several subplots was written as `plt.xscale(log)`, and the script died with "NameError: name 'log' is not defined"; it is now `plt.xscale('log')`. At both, a value that is already Python is written as given: a lone `None`, `True` or `False`, one bracketed group such as `ylim => '(0, 10)'`, or one call such as `axvline => 'float(2)'`. A single plot quoted these as well, so `ylim => '(0, 10)'` died there with "ValueError: too many values to unpack".
+
+ [Data that cannot be drawn is refused, naming what is wrong]
+
+ - `imshow` draws rows of numbers held as strings, such as rows split from the lines of a file. They were written into the script as JSON strings, and the script died with "TypeError: Image data of dtype <U1 cannot be converted to float".
+
+ - A `scatter` of several sets whose `keys` name only x and y of three inner keys is colored by the third, as three inner keys are when `keys` is not given. It died with "Use of uninitialized value $keys[1] in hash element", because the y key was taken to be the color. A `keys` that leaves no key for y is refused, naming the set.
+
+ [plt no longer changes what it is given]
+
+ - `plt` called with `p` leaves the caller's overlay hashes as it was given them. An overlay -- the second hash of an inner array of `p`, or an `add` graph of a subplot -- was drawn from the caller's own hash, which came back holding a `plot.type` it had not been given and, for a `hist`, with its array `data` rewrapped as `{ A => [...] }`. 0.315 made the same promise for `plots` and for a single plot, and kept it there.
+
+ [Documentation]
+
+ - The "Speed" example makes its script file in `File::Spec->tmpdir`, as `plt` itself does. It named `DIR => '/tmp'`, so copied onto Windows, which has no `/tmp`, it died with "Parent directory (\tmp\) does not exist" before writing a plot, as `plt` itself did until 0.3121.
+
+0.315 2026-09-25 CDT
+
+ [Windows]
+
+ - On MSWin32 the module runs its script with the first of `python`, `py -3` and `python3` that reports itself as Python 3. It ran `python3`, which a standard Windows install from python.org does not have, so on Strawberry Perl every call that ran its script failed wherever Python *was* installed. It never reached a CPAN Testers report, because the Windows smokers have no Python and the tests that need it are skipped there. The version is checked rather than the name trusted, so the Microsoft Store stub that Windows 10 and 11 install as `python.exe` is passed over. Everywhere else the command is still `python3`. With no interpreter, `plt` dies naming the ones it tried; `execute => 0` still writes the script.
+
+ - A script that fails is reported under the command that actually ran it, not always as `python3`.
+
+ - The test suite asks the module which Python to use instead of naming `python3`, so a Windows smoker that does have Python now tests the module with it rather than skipping. The parser checks no longer pass double quotes on the command line, which Perl on Win32 does not escape. `t/08.python.interpreter.t` drives the Windows search on unix, with stand-in interpreters on a private `PATH`.
+
+ [Figures that were drawn wrong]
+
+ - `violin` whiskers are computed from sorted data. The whisker code, taken from matplotlib's own violin example, reads the smallest and largest values as the first and last of each group; matplotlib's example sorts its data first and this module did not, so any group not already in ascending order got the wrong whiskers. For `[10, 9, ..., 1, 100]` the lower whisker was clipped to the first quartile and not drawn at all.
+
+ - `violin` shapes are smooth again for small groups. `violinplot`'s `points` -- how many points the density curve is evaluated at -- was set to the size of the smallest group, so a group of 5 values drew every violin in the figure as a 5-sided polygon. It is now left at matplotlib's default of 100.
+
+ - `colored_table` with `cb_logscale` colors its cells on a log scale. Only the colorbar was logarithmic: the cells were colored through a linear scale whatever the option said, so a table of 1, 10, 100 and 1000 drew three of its four cells in nearly the same color beside a colorbar that said otherwise. Cells and colorbar now share one scale. A log scale starts at the smallest cell above 0, as it did when matplotlib chose it, and a `cb_min` of 0 or below is refused, since a log scale cannot start there.
+
+ - `hist` takes any matplotlib color. Only a plain name such as `red` was quoted, so `color => { A => '#ff0000' }` wrote `color = #ff0000` and python read the rest of the line as a comment -- a syntax error -- while `tab:blue` and a grayscale `'0.5'` went in as python rather than as colors.
+
+ - `hist` draws a single `color` for every set, as documented. Only the hash of one color per set was ever read, so `color => 'red'` was accepted and the bars stayed blue. An array of colors is refused with a pointer to the hash form, since `hist` has no order of sets for an array to follow.
+
+ - A backslash in a title or label reaches matplotlib as written. Text passed as `title`, `xlabel`, `ylabel`, `suptitle` and the rest was put into a python string without escaping, so the mathtext `'$\alpha$'` arrived with a bell character in it and `'C:\new'` with a newline. Text that already carries quotes of its own is still passed through untouched.
+
+ - The `suptitle` of a figure of several subplots is quoted like a single plot's. `suptitle => 'Two groups: mean.'` wrote `plt.suptitle(Two groups: mean.)`, a syntax error, and non-ASCII text given as raw bytes was not decoded.
+
+ - `wide` draws its groups in the sorted order of their names, so the legend no longer changes order from one run to the next, and groups with no `color` of their own take successive colors of matplotlib's default cycle (`C0`, `C1`, ...). They were all `b` (pure blue), so the groups could not be told apart without a `color` hash. This changes the picture for anyone relying on that default.
+
+ [plt no longer changes what it is given]
+
+ - Calling `plt({ ... })` twice with the same hash draws the same figure twice. `plt` wrote into the hash it was given: `add` was deleted once drawn, `title` renamed `set_title`, and subplots told whether to draw a colorbar, so the second figure silently lost its overlays. The wrapper functions (`bar`, `plot`, ...) already copied the top level; now every call copies the top level, each subplot and each `add` graph.
+
+ - `imshow` no longer replaces the strings in the caller's own rows with integers, and a string that `stringmap` does not name is refused rather than drawn as a blank cell.
+
+ - `bar`/`barh` no longer write 0 into the holes of the caller's grouped data, and no longer overwrite a `label` array given with a hash of hashes. A `p` subplot given as an array no longer appends its overlays to the base plot's own `add` array.
+
+ [Data that cannot be drawn is refused, naming what is wrong]
+
+ - `plot` with hash data refuses a value that is not a number, as the array form always has. `data => { A => [[1,2],['a',3]] }` wrote `y = [a,3]` and died as a `NameError` in the temporary file.
+
+ - A `colored_table` cell that is not a number (`'NA'`, say) is refused, naming the cell, instead of being written as `d.append([1,NA])`. A cell with no value is still drawn in `undef.color`.
+
+ - `scatter` refuses non-numeric values in any axis, including the color axis, which was not checked at all; only undefined x and y values were refused before.
+
+ - `hexbin` checks its data, which it never had: an undefined or non-numeric point dies naming the key and the indices. A non-numeric `vmin`, `vmax` or `mincnt` is refused.
+
+ [Bug fixes]
+
+ - A multi-set `scatter` may mix sets with and without a color axis. The color key of one set was kept for every set after it, so a set of only `x` and `y` following one with `z` died as `"z" isn't defined for set "B"`.
+
+ - `hexbin` with `cb_logscale` accepts `vmin` and `vmax`, which now go to the log scale itself. Passed beside it they made matplotlib raise `Passing a Normalize instance simultaneously with vmin/vmax is not supported`; `hist2d` has handled this since at least 0.3.
+
+ - The diagnostics printed before `hexbin`, `hist2d` and multi-set `scatter` die, and the usage examples printed when `plt` is called without enough to draw, go to STDERR instead of STDOUT, with every other diagnostic.
+
+ [Testing]
+
+ - `t/07.review.fixes.t` covers each fix above: the generated python is read as text everywhere, parsed where python3 is present, and where matplotlib is present the violin whiskers, the colored_table norm and the hexbin bounds are read back from the running script. `Storable`, which it uses to check that the caller's data is left alone, is declared as a test prerequisite; it is core.
+
+0.314 2026-09-16 CDT
+
+ [Text that is data is now escaped]
+
+ - A data key holding a double quote no longer writes a python syntax error. Keys, tick labels, table row and column headings and the members of a venn set were written into double-quoted python literals by hand, so `data => { 'say "hi"' => [1,2,3] }` emitted `ax0.set_xticks([1], ["say "hi" (3)"])` and the script would not parse. Every one of them goes through the same escaping the legend labels already used.
+
+ - A data key holding a backslash is no longer silently mangled. This was the worse half of the same bug, because the script still parsed: a key of `$\alpha$` -- mathtext, and the reason the escaping routine exists -- reached matplotlib as `$<BEL>lpha$`, since python reads the `\a` of a double-quoted literal as a bell character. The label drawn is now the label given.
+
+ - `imshow`'s `cblabel` is quoted like every other colorbar label. `cblabel => "Farmer's yield"` closed the literal early and left an unparseable script; `hist2d`, `hexbin`, `colored_table` and `scatter` had all quoted theirs for releases.
+
+ [Options that were accepted and then ignored]
+
+ - `'colorbar.on' => 0` now suppresses a `hexbin` or `hist2d` colorbar, which it never has: both read the option only when deciding where to attach a *shared* colorbar and drew their own regardless. A figure sharing one colorbar across subplots therefore drew the shared colorbar and each subplot's own, since `plt` turns the others off through this same option. `show.colorbar` is unchanged and remains a `hist2d` synonym.
+
+ - `colored_table`'s `'colorbar.on' => 0` is no longer overridden by passing `cblabel`, which used to draw the colorbar anyway -- documented rather than fixed, though nobody labels a colorbar they have just turned off.
+
+ - `colored_table`'s `default_undefined` replaces the cells that have no value, as its name says. The line that would have used it had been commented out, so the cells stayed `np.nan` whatever was passed. A cell given a value this way counts towards the color scale like any other, so `undef.color` no longer applies to it.
+
+ - `hist` accepts an array of bin edges per set, e.g. `bins => { A => [0,2,4,6,8] }`, which emitted `bins = ARRAY(0x55f0...)` and died as a `NameError` when python ran. The whole-plot `bins` has always taken an array.
+
+ - `bar`/`barh` colors given as a hash now color a hash-of-hashes grouped plot, keyed by the inner keys that name the series. Given for that shape the hash was dropped without a word. A hash of arrays has no series names to key it by and says so.
+
+ - `twinx` given the wrong shape for its data -- an array of indices against a hash of sets, or a hash against an array of lines -- is an error rather than a silent no-op that drew no second axis.
+
+ [Data that cannot be drawn is refused, naming what is wrong]
+
+ - A non-numeric `bar`, `barh` or `pie` value dies naming the key. It used to be written into the script as a bare python name: `data => { A => 'abc' }` emitted `vals = [abc,2]`, and the caller read a `NameError` about a temporary file. `hist`, `boxplot`, `plot` and `hist2d` have always checked.
+
+ - A grouped `bar`/`barh` whose keys hold different numbers of values dies naming the keys and their lengths, rather than handing matplotlib a series with more bar positions than bars.
+
+ - An ordering option -- `key.order`, `scatter`'s `keys`, `colored_table`'s `col.labels` -- that names a key `data` does not have dies naming the key and the option. Every one of them used to reach the writer as an undefined value and die as `Use of uninitialized value in join or string`.
+
+ - `logscale` is checked properly. The test only ever looked at one character, so `logscale => ['xy']` emitted `ax0.set_xyscale("log")` and `logscale => ['']` emitted `ax0.set_scale("log")`, neither of which matplotlib has; a scalar `logscale => 'y'` died inside perl as `Can't use string ("y") as an ARRAY ref`. All three now say what is wrong, in one place, for the seven plot types that take the option. `scatter` had no check at all.
+
+ - A `violin` group left with nothing in it after the undefined and non-numeric values are dropped dies naming the group, instead of `Use of uninitialized value in division` from the line that averages it.
+
+ - `imshow` with no data, and `colored_table` with no numeric cell, are refused. Their color range stayed at the strings it starts from and emitted `vmin = inf` and `plt.Normalize(inf, -inf)`, a `NameError` in python that says nothing about the data.
+
+ - `'shared.colorbar' => []`, and entries in it that are not subplot indices, are refused rather than dying as `Use of uninitialized value $max_subplot_idx in numeric gt`.
+
+ [Bug fixes]
+
+ - A single plot no longer emits its figure-wide and pyplot-wide options twice. Both the per-plot pass and the figure pass walked the same hash, so `suptitle` was written twice and the second pass ran its own quoting rules over text the first had already quoted: the documented workaround was to use double quotes, since `suptitle => "'a, b'"` came out as `plt.suptitle(''a, b'')`. Text that already carries a quote of its own is now left alone, so both forms work, and options such as `xscale => 'log'` -- which the first pass emitted unquoted, as `plt.xscale(log)` -- are written once and correctly.
+
+ - `imshow` draws a `stringmap` of one category, and of more than ten. One category divided by zero while placing the colorbar ticks (`Illegal division by zero`); an eleventh ran off the end of the ten-color property cycle and died as `Use of uninitialized value in join or string`. Past ten categories the colors come from a colormap resampled to the number of categories. Two categories used to put both ticks in the same place; each tick now sits in the middle of its own band.
+
+ - A `colored_table` with a `title` draws one instead of dying. It wrote `ax0.title('..')` of its own, on top of the `ax0.set_title('..')` that `plt` writes for every plot type, and `title` is a `Text` attribute of the axes rather than a method: the script died with `TypeError: 'Text' object is not callable`.
+
+ - `boxplot` and `violin` no longer edit the caller's data. Both drop the undefined (and, for `violin`, non-numeric) elements before plotting and wrote the shortened list back into the array that was passed in, so an array handed to `violin` came back shorter than it was written.
+
+ [Documentation]
+
+ - `pie` is documented as accepting `key.order`, which it has always read: the documentation said the wedge order "cannot be overridden" and that the option was not accepted.
+
+ - The quoting section no longer advises double quotes as a way round the duplicate `suptitle`, which is fixed; the `hist2d` options no longer say `show.colorbar` is the only thing that suppresses its colorbar; `colored_table` documents `default_undefined`; and `bar`'s `color` says which keys a color hash is keyed by.
+
+ [Testing]
+
+ - `t/06.escaping.and.validation.t` covers the above: a data key holding a double quote at every plot type that writes one, a mathtext key, an apostrophe in `imshow`'s `cblabel`, one, two and eleven `stringmap` categories, every refusal listed here, and that `boxplot` and `violin` leave the caller's arrays as they found them. Like `t/05.generated.python.t` it parses what it generates with python's own parser, and skips only that part when python3 is absent.
+
+ - Its `dies_with` matches the exception's message, not the whole exception, for the reason `t/03.coverage.t`'s `dies_like` has carried since 0.312 and `t/04.options.t` was fixed for in 0.313: `Devel::Confess` prints every frame's arguments, one of which is the pattern being matched, so an assertion of that shape matches the pattern against a copy of itself and passes whatever the code does. Its first draft did exactly that, and ten of its assertions could not fail.
+
+ - Every fix in this release was checked by reverting it in turn and confirming that the suite fails -- 30 reversions, 30 failures. That is what found the `dies_with` above: seven of the ten assertions it was meant to protect passed with the code they test taken out.
+
+ - The three `TODO` cases that had come true -- `pie`'s `key.order`, `violinplot`'s `medians` and `edgecolor` -- are ordinary assertions again, and the two that this release fixes (`default_undefined`, `hexbin`'s `colorbar.on`) are no longer marked `TODO`. The `suptitle` pair in `t/05.generated.python.t` is now asserted rather than expected to fail.
+
+ [Windows]
+
+ - `t/01.all.tests.t` no longer writes to a hardcoded `/tmp`. Around fifty `'output.file' => '/tmp/x.svg'` paths and a `File::Temp->new(DIR => '/tmp')` were generated into it by `md2pod.pl`, which is the one thing CLAUDE.md forbids outright -- it is what took 0.312 down on the Strawberry perl smokers. It never showed up in a report because this file skips without python3 and matplotlib, which a Windows smoker rarely has, but it would have failed on any Windows box that had both. The figures are written through `outfile()`, which is `File::Spec->catfile(File::Spec->tmpdir, ...)`; on unix that is still `/tmp`, so they land where they always did.
+
+ - `md2pod.pl` generates those paths rather than copying them, so it is what was fixed: it rewrites both of the spellings `mpl.examples.pl` uses -- `output.images/x.png` for the figures the documentation shows and `/tmp/x.svg` for the ones it does not -- into `outfile('x.svg')`, and writes the `@output_files` list as basenames mapped through the same sub. `mpl.examples.pl`'s own `File::Temp` call, which is copied into the test verbatim, now takes `File::Spec->tmpdir`.
+
+ [Dead code]
+
+ - `colored_table` no longer carries a `logscale` loop: `logscale` is not among the options it accepts, so the loop could never run, and both sets of ticks are emptied a few lines later anyway. The `xlim => 'set_xlim'` rename in `plt` is gone for the same reason -- no keyword list accepts `xlim`, and the documentation uses its refusal as a worked example.
+
+ [Documentation]
+
+ - The three figures in the `wide` section and the two in `venn_proportional_area` now appear on metacpan.org. Their `<img src>` was the repository-relative `output.images/wide.png`, which GitHub resolves against the repository but metacpan resolves against the POD's own URL: `https://metacpan.org/pod/output.images/wide.png` is a 404, so all five came out as empty grey boxes. They are now absolute `https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/` URLs, like every other figure in the documentation, and the two venn images carry the `width` and `height` they had always been missing.
+
+0.313 2026-09-15 CDT
+
+ [A "plot.type" that isn't defined]
+
+ - A misspelled `plot.type` now says what you wrote and which of the defined types it resembles, the way a misspelled option has since 0.313: `'plot.type' => 'barr'` dies with `"barr" isn't a defined plot.type, perhaps you meant one of these defined plot types: (bar, barh)`. It is matched by the same rules as an option name, so separators are ignored (`hist_2d` finds `hist2d`, `coloredtable` finds `colored_table`), two transposed characters count as one mistake (`pye` finds `pie`), and a type reached for by part of its name is found (`box` finds `boxplot`). When nothing resembles what was typed, all fifteen types are printed.
+
+ - A misspelled `plot.type` at a subplot no longer dies inside perl. It reached the dispatch table as an undefined code reference and came out as `Can't use an undefined value as a subroutine reference at .../Simple.pm line 2862`, which names neither the type nor the subplot; the same mistake in a single plot printed the whole arguments hash through `Data::Printer` and died `barr isn't defined`. Both now get the message above, and a subplot's says which subplot: `"violn" isn't a defined plot.type at subplot 1`.
+
+ - The type given for an `add` graph is checked the same way, and says which graph it belongs to -- `"pye" isn't a defined plot.type for an "add" graph at subplot 1` -- rather than the previous `"pye" isn't a known plot.type at ax = 1`, which offered nothing.
+
+ - Every subplot's type is checked before the figure is written rather than as each subplot is reached, so a bad type at the last subplot is reported without the earlier ones having been generated first.
+
+ - The type is checked before the options are. With an unrecognised type there is no per-type option list to check the options against, so `plt` fell back to the union of every type's, and `'plot.type' => 'barr', notch => 'True'` reported neither the type nor the option: `notch` is on some type's list, so it passed, and the caller was told the type was wrong only much later, by `Data::Printer`. The message is now about the type, which is the thing that does not exist.
+
+ [Bug fixes]
+
+ - The subplot indices reported by "The above subplot indices are missing "plot.type"" are now the indices of the subplots that are missing one. The counter was incremented only on the subplots that had already failed the test, so three subplots with the third missing its type reported index 0.
+
+ [Testing]
+
+ - `t/04.options.t` covers the above: the eight misspellings above at a single plot, the three nested places a type can be given, a type resembling nothing, and a misspelled type given together with another type's option.
+
+ - An `unlike()` in `t/04.options.t` was matching against the `Devel::Confess` stack trace as well as the message. Every frame in that trace prints its own arguments, so an option named in the call appears in `$@` whether or not the module mentioned it, and an assertion that the module did *not* name something could fail on a message that was right. The two assertions of that shape now match the message alone, as `t/03.coverage.t` has since 0.312.
+
+ [Error messages for an option that isn't defined]
+
+ - An option that no plot type accepts, or that this plot type does not accept, now says what you wrote and what it resembles: `xlim => '0, 20000'` at a bar chart dies with `"xlim" isn't defined for plot.type "bar", perhaps you meant one of these defined keywords: (clim, ylim, set_xlim)`. Previously the module printed the offending key, then dumped all 450-odd accepted keywords through `Data::Printer` and died with "The above args are accepted" -- a list long enough that the answer in it was no easier to find than in the documentation. The full list is still printed, but only when nothing resembles what was typed.
+
+ - The suggestions are drawn from the list the plot type in hand actually accepts, not from the union of every type's, so `bins_` is offered `bins` at a `hist` and is not offered it at a `boxplot`, which has no `bins`. Separators are ignored when matching, so `key_order` finds `key.order` and `show_legend` finds `show.legend`; and two transposed characters count as one mistake, so `widht` finds `width`.
+
+ - An option that is real but belongs to another plot type is named as such: `plot(..., notch => 'True')` now adds `"notch" is a defined keyword, but for plot.type boxplot`. This is the commonest way to land here -- `stacked`, `bins`, `notch` and `whiskers` are all somebody's option -- and the bare refusal read as though the documentation were wrong.
+
+ - `plt` checks a single plot's options against that plot type's list rather than against every type's, so the refusal comes with the suggestions for the type asked for. Nothing new is refused: the helper the plot dispatches to was already checking the same hash against the same list, one step later.
+
+ - `colored_table` was checking its own internal arguments (`fh`, `plot`, `ax`) against the option list, and never checking the caller's options at all. An option belonging to another plot type -- `notch`, say -- therefore passed `plt`, which accepts any type's option, and was then silently ignored rather than refused. `colored_table`'s options are now checked like every other plot type's.
+
+ [`autodie` removed from the module]
+
+ - `lib/Matplotlib/Simple.pm` no longer does `use autodie ':all'`. The two builtins it covered now check their own return values, so nothing that used to die returns false and carries on: `binmode` keeps autodie's wording, and the `system` that runs the generated script reports the same three cases autodie told apart -- failed to start, died to a signal, and a non-zero exit -- naming the script each time. `autodie` and `IPC::System::Simple` stay in the prerequisites because `t/01.all.tests.t` still uses them.
+
+ - A generated script that fails to run now prints python's own error. autodie raised the failure from inside `capture`, so the branch that prints the captured STDOUT and STDERR was never reached and the traceback was thrown away: a script that would not parse reported only `"python3" unexpectedly returned exit value 1 at .../Capture/Tiny.pm line 382`, which says nothing about which option was at fault.
+
+ - The generated script is now run as `system('python3', $file)` rather than `system("python3 $file")`. The one-argument form goes through the shell and splits on whitespace, so a temp directory with a space in its name -- ordinary under `C:\Users\<name>\AppData\Local\Temp` on MSWin32 -- ran python3 against a truncated path.
+
+ [`hist` reports how tall its bars are]
+
+ - Every subplot drawn with `plot.type => 'hist'` now says the range of its bin heights on STDOUT as it is drawn: `plot 0 hist range = [1, 12]`, over all of the sets drawn into that subplot, `plot 1` being the second subplot of the figure. The heights are matplotlib's -- this module hands it the data and the bins and is told nothing back -- so reading them off the figure by eye was the only way to have them. Nothing is passed to matplotlib to report them, and the file written to `output.file` is byte-for-byte the file that was written before.
+
+ - A successful run's STDOUT is no longer thrown away. The generated script is run inside `capture`, and what it printed was passed on only when it *failed*: `hist2d` has printed its density range since it was added, in 0.09 (commit 651c239), and nobody has ever seen one. Both ranges now reach the terminal.
+
+ [Packaging]
+
+ - `IPC::System::Simple` is no longer a prerequisite. Nothing used it directly; it was pulled in by `use autodie ':all'` in `t/01.all.tests.t`, which loads it at compile time whether or not a `system()` is ever fatalised. That test calls only `open`, `close`, `mkdir` and `unlink`, all covered by `:default`, so it now asks for `:default` and the module -- which is not core -- no longer has to be installed to use or test this distribution.
+
+ - `Test::More` and `Test::Exception` moved from the runtime prerequisites to the test prerequisites, where they belong: both are used only by `t/`, and neither is loaded by `lib/Matplotlib/Simple.pm`. Installing the module no longer asks for them. `[Prereqs]` in `dist.ini` is now exactly what the module loads, which was checked by hiding every test-only prerequisite from `@INC` and rendering a plot.
+
+ - `autodie` moved from the runtime prerequisites to the test prerequisites, which is what it now is: `lib/Matplotlib/Simple.pm` stopped using it in this release. It is still declared rather than assumed, because it is core only from perl 5.010001 and this distribution supports 5.010.
+
+ - `META.yml` and `META.json` now carry a `provides` field naming the one module the distribution installs, `Matplotlib::Simple`, and the version it installs. Both files shipped without one, which is the CPANTS `meta_yml_has_provides` failure: a tool that wants to know what this tarball claims to index had to unpack it and scan `lib/` to find out. `dist.ini` gained `[MetaProvides::Package]`, which fills the field in from the gathered `.pm` files.
+
+ [Security policy]
+
+ - The distribution now ships a `SECURITY.md`, generated by `Software::Security::Policy::Individual` and following the CPAN Security Group's guidelines, saying where to report a vulnerability and what is supported. `security.policy.pl` in the git repository regenerates it and records why each value in it was chosen; it is not part of the tarball.
+
 0.3121 2026-09-07 CDT
 
  [Portability]

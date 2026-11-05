@@ -947,17 +947,94 @@ button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decora
 				<label class="ac-field" data-for="line scatter heatmap" data-label="Y column">Y column
 					<select id="ac-y"></select>
 				</label>
+				<label class="ac-field" data-for="line" data-label="Lines by (optional)">Lines by (optional)
+					<select id="ac-line-series"></select>
+					<span class="ac-note">One line for each value of this column.</span>
+				</label>
+				[%- # The scatter options GET /scatter takes: colour by the values of a
+				    # column, and size the bubbles by a number column.  The scheme and the
+				    # radii mean nothing without them, so the script disables them until
+				    # the column they belong to is chosen.
+				-%]
+				<label class="ac-field" data-for="scatter" data-label="Colour by (optional)">Colour by (optional)
+					<select id="ac-sc-series"></select>
+				</label>
+				<label class="ac-field" data-for="scatter" data-label="Colour scheme">Colour scheme
+					<select id="ac-sc-scheme" disabled>
+						<option value="tableau10">Tableau 10</option>
+						<option value="category10">Category 10</option>
+						<option value="set2">Set 2</option>
+						<option value="set3">Set 3</option>
+						<option value="paired">Paired</option>
+					</select>
+				</label>
+				<label class="ac-field" data-for="scatter" data-label="Bubble size (optional)">Bubble size (optional)
+					<select id="ac-sc-size"></select>
+				</label>
+				<label class="ac-field" data-for="scatter" data-label="Min radius">Min radius (1&#x2013;40)
+					<input id="ac-sc-min-r" type="number" min="1" max="40" step="1" value="3" disabled>
+				</label>
+				<label class="ac-field" data-for="scatter" data-label="Max radius">Max radius (1&#x2013;40)
+					<input id="ac-sc-max-r" type="number" min="1" max="40" step="1" value="15" disabled>
+				</label>
 				<label class="ac-field" data-for="combo" data-label="Bar value">Bar value
 					<select id="ac-bar-value"></select>
 				</label>
 				<label class="ac-field" data-for="combo" data-label="Line value">Line value
 					<select id="ac-line-value"></select>
 				</label>
+				<label class="ac-field" data-for="combo" data-label="Colours">Colours
+					<select id="ac-combo-scheme">
+						<option value="">Default (blue and red)</option>
+						<option value="tableau10">Tableau 10</option>
+						<option value="category10">Category 10</option>
+						<option value="set2">Set 2</option>
+						<option value="set3">Set 3</option>
+						<option value="paired">Paired</option>
+					</select>
+					<span class="ac-note">The bars take the first colour, the line the second.</span>
+				</label>
+				[%- # A treemap may shade its tiles by a second column, as GET /treemap's
+				    # color= does.  How it is folded and the scale wait for the column.
+				-%]
+				<label class="ac-field" data-for="treemap" data-label="Colour by (optional)">Colour by (optional)
+					<select id="ac-tm-color"></select>
+				</label>
+				<label class="ac-field" data-for="treemap" data-label="Colour from">Colour from
+					<select id="ac-tm-color-agg" disabled>
+						<option value="avg">Average</option>
+						<option value="sum">Sum</option>
+						<option value="min">Min</option>
+						<option value="max">Max</option>
+						<option value="median">Median</option>
+					</select>
+				</label>
+				<label class="ac-field" data-for="treemap" data-label="Colour scale">Colour scale
+					<select id="ac-tm-color-scheme" disabled>
+						<option value="YlOrRd">Yellow&#x2013;Red</option>
+						<option value="Blues">Blues</option>
+						<option value="Greens">Greens</option>
+						<option value="Purples">Purples</option>
+						<option value="RdPu">Red&#x2013;Purple</option>
+						<option value="YlGnBu">Yellow&#x2013;Blue</option>
+					</select>
+				</label>
 				<label class="ac-field" data-for="histogram" data-label="Column">Column
 					<select id="ac-hist-col"></select>
 				</label>
 				<label class="ac-field" data-for="histogram" data-label="Bins">Bins
 					<input id="ac-bins" type="number" min="1" max="200" value="10">
+				</label>
+				<label class="ac-field" data-for="histogram" data-label="Bar colour">Bar colour
+					<select id="ac-hist-scheme">
+						<option value="">Default (steel blue)</option>
+						<option value="tableau10">Tableau 10</option>
+						<option value="category10">Category 10</option>
+						<option value="set2">Set 2</option>
+						<option value="set3">Set 3</option>
+						<option value="paired">Paired</option>
+					</select>
+					<span class="ac-note">The bars take the first colour of the scheme.</span>
 				</label>
 				<label class="ac-field" data-for="wordcloud" data-label="Text column">Text column
 					<select id="ac-wc-col"></select>
@@ -972,6 +1049,10 @@ button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decora
 				<label class="ac-field" data-for="map" data-label="Place column (optional)">Place column (optional)
 					<select id="ac-map-loc"></select>
 					<span class="ac-note">Or choose latitude and longitude below.</span>
+				</label>
+				<label class="ac-field" data-for="map" data-label="Followed by (optional)">Followed by (optional)
+					<select id="ac-map-loc2"></select>
+					<span class="ac-note">Added after the place, with a comma: an address followed by its country.</span>
 				</label>
 				<label class="ac-field" data-for="map" data-label="Latitude">Latitude
 					<select id="ac-map-lat"></select>
@@ -1057,6 +1138,10 @@ button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decora
 			<label class="ac-field">Place column (optional)
 				<select id="me-loc"></select>
 				<span class="ac-note">A place column is used when chosen; otherwise the coordinates below are.</span>
+			</label>
+			<label class="ac-field">Followed by (optional)
+				<select id="me-loc2"></select>
+				<span class="ac-note">Added after the place, with a comma: an address followed by its country.</span>
 			</label>
 			<label class="ac-field">Latitude
 				<select id="me-lat"></select>
@@ -2889,9 +2974,21 @@ menu, so it reads without the menu being opened.</p>
 		var csList     = document.getElementById('ac-cs-list');
 		var csEmpty    = document.getElementById('ac-cs-empty');
 		var mapLocSel = document.getElementById('ac-map-loc');
+		var mapLoc2Sel = document.getElementById('ac-map-loc2');
 		var mapLatSel = document.getElementById('ac-map-lat');
 		var mapLonSel = document.getElementById('ac-map-lon');
 		var binsInp  = document.getElementById('ac-bins');
+		var lineSeriesSel = document.getElementById('ac-line-series');
+		var histSchemeSel = document.getElementById('ac-hist-scheme');
+		var comboSchemeSel = document.getElementById('ac-combo-scheme');
+		var tmColorSel     = document.getElementById('ac-tm-color');
+		var tmColorAggSel  = document.getElementById('ac-tm-color-agg');
+		var tmColorSchemeSel = document.getElementById('ac-tm-color-scheme');
+		var scSeriesSel = document.getElementById('ac-sc-series');
+		var scSchemeSel = document.getElementById('ac-sc-scheme');
+		var scSizeSel   = document.getElementById('ac-sc-size');
+		var scMinRInp   = document.getElementById('ac-sc-min-r');
+		var scMaxRInp   = document.getElementById('ac-sc-max-r');
 		var titleInp = document.getElementById('ac-title-inp');
 		var errorEl  = document.getElementById('ac-error');
 		var addBtn   = document.getElementById('ac-add-btn');
@@ -2940,8 +3037,40 @@ menu, so it reads without the menu being opened.</p>
 		fill(csBySel,
 			[{ value: '', label: '\u2014 the whole view \u2014' }].concat(allCols));
 		fill(mapLocSel, choose.concat(allCols));
+		if (mapLoc2Sel) fill(mapLoc2Sel, [{ value: '', label: '\u2014 nothing \u2014' }].concat(allCols));
 		fill(mapLatSel, choose.concat(numCols));
 		fill(mapLonSel, choose.concat(numCols));
+		/* Optional columns, so each says "none" first. */
+		fill(lineSeriesSel, [{ value: '', label: '\u2014 none \u2014' }].concat(allCols));
+		fill(scSeriesSel, [{ value: '', label: '\u2014 none \u2014' }].concat(allCols));
+		fill(scSizeSel,   [{ value: '', label: '\u2014 none \u2014' }].concat(numCols));
+
+		/* The scheme colours series values and the radii size bubbles, so each
+		 * waits for its column, as on the table page's scatter panel. */
+		function syncScatter() {
+			if (scSchemeSel) scSchemeSel.disabled = !(scSeriesSel && scSeriesSel.value);
+			var hasSize = !!(scSizeSel && scSizeSel.value);
+			if (scMinRInp) scMinRInp.disabled = !hasSize;
+			if (scMaxRInp) scMaxRInp.disabled = !hasSize;
+		}
+		if (scSeriesSel) scSeriesSel.addEventListener('change', syncScatter);
+		if (scSizeSel)   scSizeSel.addEventListener('change', syncScatter);
+
+		/* A treemap's colour aggregate and scale wait for its colour column. */
+		fill(tmColorSel, [{ value: '', label: '\u2014 none \u2014' }].concat(allCols));
+		function syncTreemapColour() {
+			var on = !!(tmColorSel && tmColorSel.value);
+			if (tmColorAggSel)    tmColorAggSel.disabled = !on;
+			if (tmColorSchemeSel) tmColorSchemeSel.disabled = !on;
+		}
+		if (tmColorSel) tmColorSel.addEventListener('change', syncTreemapColour);
+
+		/* A radius as the server takes it: a whole number from 1 to 40. */
+		function scRadius(inp, dflt) {
+			var n = parseInt(inp.value, 10);
+			if (isNaN(n)) n = dflt;
+			return Math.min(40, Math.max(1, n));
+		}
 
 		/* The views whose value column is aggregated, and so the only ones that
 		 * can use an aggregate function of their own. */
@@ -3568,6 +3697,7 @@ menu, so it reads without the menu being opened.</p>
 		var editPanel  = document.getElementById('me-panel');
 		var editForm   = document.getElementById('me-form');
 		var editLoc    = document.getElementById('me-loc');
+		var editLoc2   = document.getElementById('me-loc2');
 		var editLat    = document.getElementById('me-lat');
 		var editLon    = document.getElementById('me-lon');
 		var editSave   = document.getElementById('me-save');
@@ -3577,6 +3707,9 @@ menu, so it reads without the menu being opened.</p>
 		if (editPanel && editForm && editLoc && editLat && editLon && editSave && editError) {
 			var editTarget = null;   /* { card, btn, index } */
 			var editLoaded = false;
+			/* Place columns past the second, which only a URL can give a card:
+			 * the dialog shows two, and keeps the rest when it saves. */
+			var editLocRest = [];
 
 			var editSetError = function (message) {
 				editError.textContent = message || '';
@@ -3657,6 +3790,7 @@ menu, so it reads without the menu being opened.</p>
 				editSave.disabled = true;
 				editSave.textContent = 'Save columns';
 				editLoc.innerHTML = '<option value="">Loading\u2026</option>';
+				if (editLoc2) editLoc2.innerHTML = '';
 				editLat.innerHTML = '';
 				editLon.innerHTML = '';
 				editSetError('');
@@ -3676,7 +3810,13 @@ menu, so it reads without the menu being opened.</p>
 						var numeric = canvasColumns.filter(function (c) { return c.numeric; })
 							.map(function (c) { return c.name; });
 						var all = canvasColumns.map(function (c) { return c.name; });
-						editFill(editLoc, all, enc.loc || '');
+						var locs = Array.isArray(enc.loc) ? enc.loc : (enc.loc ? [enc.loc] : []);
+						editFill(editLoc, all, locs[0] || '');
+						if (editLoc2) {
+							editFill(editLoc2, all, locs[1] || '');
+							editLoc2.options[0].textContent = '\u2014 nothing \u2014';
+						}
+						editLocRest = locs.slice(2);
 						editFill(editLat, numeric, enc.lat || '');
 						editFill(editLon, numeric, enc.lon || '');
 						editLoaded = true;
@@ -3718,7 +3858,11 @@ menu, so it reads without the menu being opened.</p>
 
 				var encode = {};
 				if (editLoc.value) {
-					encode.loc = editLoc.value;
+					var locs = [editLoc.value];
+					if (editLoc2 && editLoc2.value) locs.push(editLoc2.value);
+					if (locs.length > 1) locs = locs.concat(editLocRest);
+					locs = locs.filter(function (c, i) { return locs.indexOf(c) === i; });
+					encode.loc = locs.length > 1 ? locs : locs[0];
 				} else if (editLat.value && editLon.value) {
 					encode.lat = editLat.value;
 					encode.lon = editLon.value;
@@ -3759,7 +3903,7 @@ menu, so it reads without the menu being opened.</p>
 
 					editClose(1);
 					announce('Map columns updated: '
-						+ (encode.loc ? 'place column ' + encode.loc
+						+ (encode.loc ? (Array.isArray(encode.loc) ? 'place columns ' + encode.loc.join(', ') : 'place column ' + encode.loc)
 						              : 'latitude ' + encode.lat + ' and longitude ' + encode.lon) + '.');
 
 					var titleEl = card.querySelector('.visual-card-title');
@@ -4947,9 +5091,22 @@ menu, so it reads without the menu being opened.</p>
 			} else if (kind === 'line') {
 				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
 				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
+				/* What /graph saves from series=. */
+				if (lineSeriesSel && lineSeriesSel.value) encode.series = lineSeriesSel.value;
 			} else if (kind === 'scatter') {
 				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
 				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
+				/* What /scatter saves from series=, size=, scheme=, min_r= and
+				 * max_r=, so a card made here and one saved from the page agree. */
+				if (scSeriesSel && scSeriesSel.value) {
+					encode.series  = scSeriesSel.value;
+					options.scheme = scSchemeSel.value;
+				}
+				if (scSizeSel && scSizeSel.value) {
+					encode.size   = scSizeSel.value;
+					options.min_r = scRadius(scMinRInp, 3);
+					options.max_r = scRadius(scMaxRInp, 15);
+				}
 			} else if (kind === 'heatmap') {
 				encode.x = picked(xSel, 'X column'); if (!encode.x) return;
 				encode.y = picked(ySel, 'Y column'); if (!encode.y) return;
@@ -4962,12 +5119,22 @@ menu, so it reads without the menu being opened.</p>
 				encode.cat      = picked(xSel, 'X column'); if (!encode.cat) return;
 				encode.bar_val  = picked(barSel, 'bar value'); if (!encode.bar_val) return;
 				encode.line_val = picked(lineSel, 'line value'); if (!encode.line_val) return;
+				/* What /combo saves from scheme=; none keeps blue and red. */
+				if (comboSchemeSel && comboSchemeSel.value) options.scheme = comboSchemeSel.value;
 			} else if (kind === 'treemap') {
 				encode.group = picked(catSel, 'category'); if (!encode.group) return;
 				encode.value = valueSel.value || '__count__';
+				/* What /treemap saves from color=, color_agg= and color_scheme=. */
+				if (tmColorSel && tmColorSel.value) {
+					encode.color         = tmColorSel.value;
+					options.color_agg    = tmColorAggSel.value;
+					options.color_scheme = tmColorSchemeSel.value;
+				}
 			} else if (kind === 'histogram') {
 				encode.value = picked(histSel, 'column'); if (!encode.value) return;
 				options.bins = parseInt(binsInp.value, 10) || 10;
+				/* What /histogram saves from scheme=; none keeps steel blue. */
+				if (histSchemeSel && histSchemeSel.value) options.scheme = histSchemeSel.value;
 			} else if (kind === 'wordcloud') {
 				encode.col = picked(wcColSel, 'text column'); if (!encode.col) return;
 				/* The two counts the route takes, clamped here so the panel cannot
@@ -4976,7 +5143,9 @@ menu, so it reads without the menu being opened.</p>
 				options.minlen = Math.min(64,  Math.max(1, parseInt(wcMinlenInp.value, 10) || 3));
 			} else if (kind === 'map') {
 				if (mapLocSel.value) {
-					encode.loc = mapLocSel.value;
+					/* A second column makes the place their cells joined by ", ". */
+					encode.loc = (mapLoc2Sel && mapLoc2Sel.value && mapLoc2Sel.value !== mapLocSel.value)
+						? [mapLocSel.value, mapLoc2Sel.value] : mapLocSel.value;
 				} else {
 					encode.lat = picked(mapLatSel, 'latitude column'); if (!encode.lat) return;
 					encode.lon = picked(mapLonSel, 'longitude column'); if (!encode.lon) return;
@@ -5026,8 +5195,11 @@ menu, so it reads without the menu being opened.</p>
 				form.reset();
 				/* The reset returns the aggregate to Sum and the cross-row section
 				 * to "inherit", so the boxes and the chips they were showing have to
-				 * go with them. */
+				 * go with them.  The scatter's columns go back to none, so their
+				 * scheme and radii are disabled again. */
 				syncFields();
+				syncScatter();
+				syncTreemapColour();
 				csAliasTouched = false;
 				csSpecs = [];
 				renderCsList();

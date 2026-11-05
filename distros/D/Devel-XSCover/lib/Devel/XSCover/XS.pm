@@ -7,7 +7,7 @@ use warnings;
 use File::Find ();
 use File::Spec ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our ($KEYWORDS);
 
@@ -46,7 +46,7 @@ sub generated_files {
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
+                $File::Find::prune = 1 if $skip{$base} && _slashes($_) ne $top;
                 return;
             }
             return unless /\.xs\z/;
@@ -62,18 +62,44 @@ sub generated_files {
 sub line_map {
     my ($self, $c) = @_;
     my @map;
-    my ($file, $line) = ($self->_canon($c), 1);
+    my $own = $self->_canon($c);
+    my ($file, $line, $said, $dropped) = ($own, 1, 1, undef);
+    my %inverse;
     my $n = 0;
     for my $text ($self->_lines($c)) {
         $n++;
         if ($text =~ /^#line\s+(\d+)\s+"([^"]*)"/) {
-            $map[$n] = [ $self->_canon($c), $n ];
-            ($file, $line) = ($self->_canon($2), $1);
+            $map[$n] = [ $own, $n ];
+            ($file, $line, $said) = ($self->_canon($2), $1, $1);
+            $dropped = $file eq $own ? undef : $self->_dropped($file);
             next;
         }
+        $line++ while $dropped && $dropped->{$line};
+        $inverse{$file}{$said} //= $line if $said != $line;
         $map[$n] = [ $file, $line++ ];
+        $said++;
     }
+    $self->{inverse}{$own} = \%inverse;
     return \@map;
+}
+
+sub _dropped {
+    my ($self, $file) = @_;
+    return $self->{dropped}{$file} if exists $self->{dropped}{$file};
+    my %dropped;
+    my $path = File::Spec->file_name_is_absolute($file) ? $file : File::Spec->catfile($self->{dir}, $file);
+    if (-f $path) {
+        my $in_body = 0;
+        my $n = 0;
+        for my $text ($self->_lines($file)) {
+            $n++;
+            $in_body = 1 if !$in_body && $text =~ /^MODULE\s*=/;
+            next unless $in_body && $text =~ /^\s*#/;
+            next if $text =~ /^\s*#\s*(?:if|ifdef|ifndef|elif|else|endif|define|undef|include|line|pragma|error|warning)\b/;
+            $dropped{$n} = 1;
+        }
+    }
+    return $self->{dropped}{$file} = \%dropped;
 }
 
 sub xsubs {
@@ -176,7 +202,7 @@ sub map {
             line  => $line,
         };
     }
-    return { c => $canon, files => \@files, lines => $lines, xsubs => \%xsubs };
+    return { c => $canon, inverse => $self->{inverse}{$canon} || {}, files => \@files, lines => $lines, xsubs => \%xsubs };
 }
 
 sub subroutines {
@@ -258,6 +284,13 @@ directory. Only pairs whose F<.c> exists are returned.
 An array indexed by generated line, each entry the file and line it stands for.
 Lines before the first C<#line> and the directives themselves map to the F<.c>.
 
+xsubpp drops a comment line (one starting with C<#> that is not a preprocessor
+directive) from an XSUB's body without a C<#line> to say so, which puts every line
+after it one short in the compiler's eyes and in gcov's. The map reads the F<.xs>
+and counts those lines, so a C<# uncoverable> line in a body lands where it was
+written, and C<map> carries an C<inverse> table, per XS file, from the line gcov
+reports to the line meant.
+
 =head2 xsubs
 
     my @xsubs = $xs->xsubs('Op.c');
@@ -292,8 +325,8 @@ section, for a wrapper without a C<#line> of its own.
 
     my $map = $xs->map('Op.c');
 
-Joins the rest: C<c>, C<files> (the XS files the C was generated from), C<lines>
-and C<xsubs>, each with C<names>, C<file> and C<line>.
+Joins the rest: C<c>, C<files> (the XS files the C was generated from), C<lines>,
+C<inverse> (see C<line_map>) and C<xsubs>, each with C<names>, C<file> and C<line>.
 
 =head2 subroutines
 

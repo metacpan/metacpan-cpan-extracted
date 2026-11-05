@@ -1,0 +1,163 @@
+# Curated standard on-demand pricing in USD. Updated 2026-11-04.
+# Each token rate is [price in USD, number of tokens], expressed as a YAML sequence.
+# Cached input, batch, priority, long-context, and modality-specific rates are not modeled.
+# Sources:
+#   https://aws.amazon.com/bedrock/pricing/
+#   https://aws.amazon.com/blogs/machine-learning/prompting-for-the-best-price-performance/
+#   https://platform.claude.com/docs/en/about-claude/pricing
+# Bedrock geographic Claude profiles have a 10% premium over global profiles.
+providers:
+  bedrock:
+    class: LLM::API::Bedrock
+    models:
+      'amazon.nova-micro-v1:0':
+        input_tokens:
+          - 0.035
+          - 1000000
+        output_tokens:
+          - 0.14
+          - 1000000
+      'us.amazon.nova-micro-v1:0':
+        input_tokens:
+          - 0.035
+          - 1000000
+        output_tokens:
+          - 0.14
+          - 1000000
+
+      'amazon.nova-lite-v1:0':
+        input_tokens:
+          - 0.06
+          - 1000000
+        output_tokens:
+          - 0.24
+          - 1000000
+      'us.amazon.nova-lite-v1:0':
+        input_tokens:
+          - 0.06
+          - 1000000
+        output_tokens:
+          - 0.24
+          - 1000000
+
+      'amazon.nova-pro-v1:0':
+        input_tokens:
+          - 0.80
+          - 1000000
+        output_tokens:
+          - 3.20
+          - 1000000
+      'us.amazon.nova-pro-v1:0':
+        input_tokens:
+          - 0.80
+          - 1000000
+        output_tokens:
+          - 3.20
+          - 1000000
+
+      # Included because this model was exercised during Checkpoint 6.
+      'amazon.nova-2-lite-v1:0':
+        input_tokens:
+          - 0.30
+          - 1000000
+        output_tokens:
+          - 2.50
+          - 1000000
+      'us.amazon.nova-2-lite-v1:0':
+        input_tokens:
+          - 0.30
+          - 1000000
+        output_tokens:
+          - 2.50
+          - 1000000
+
+      'global.anthropic.claude-haiku-4-5-20251001-v1:0':
+        input_tokens:
+          - 1
+          - 1000000
+        output_tokens:
+          - 5
+          - 1000000
+      'us.anthropic.claude-haiku-4-5-20251001-v1:0':
+        input_tokens:
+          - 1.10
+          - 1000000
+        output_tokens:
+          - 5.50
+          - 1000000
+
+      'global.anthropic.claude-sonnet-4-6':
+        input_tokens:
+          - 3
+          - 1000000
+        output_tokens:
+          - 15
+          - 1000000
+      'us.anthropic.claude-sonnet-4-6':
+        input_tokens:
+          - 3.30
+          - 1000000
+        output_tokens:
+          - 16.50
+          - 1000000
+
+      'global.anthropic.claude-opus-4-5-20251101-v1:0':
+        input_tokens:
+          - 5
+          - 1000000
+        output_tokens:
+          - 25
+          - 1000000
+      'us.anthropic.claude-opus-4-5-20251101-v1:0':
+        input_tokens:
+          - 5.50
+          - 1000000
+        output_tokens:
+          - 27.50
+          - 1000000
+
+  anthropic:
+    class: LLM::API::Anthropic
+    models:
+      'claude-haiku-4-5-20251001':
+        input_tokens:
+          - 1
+          - 1000000
+        output_tokens:
+          - 5
+          - 1000000
+      'claude-sonnet-4-6':
+        input_tokens:
+          - 3
+          - 1000000
+        output_tokens:
+          - 15
+          - 1000000
+      'claude-sonnet-5':
+        input_tokens:
+          - 2
+          - 1000000
+        output_tokens:
+          - 10
+          - 1000000
+      'claude-opus-4-8':
+        input_tokens:
+          - 5
+          - 1000000
+        output_tokens:
+          - 25
+          - 1000000
+      'claude-fable-5':
+        input_tokens:
+          - 10
+          - 1000000
+        output_tokens:
+          - 50
+          - 1000000
+      'claude-mythos-5':
+        input_tokens:
+          - 10
+          - 1000000
+        output_tokens:
+          - 50
+          - 1000000

@@ -1,0 +1,366 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Ordered::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Time::HiRes qw( time );
+
+use LinkedList::Single::Example::Bench  qw( complexity );
+use LinkedList::Single::Example::Ordered;
+use LinkedList::Single::Example::Ordered::Sorted;
+use LinkedList::Single::Example::Ordered::Buckets;
+use LinkedList::Single::Example::Ordered::Hash;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: the memory runs fork, and a child must not inherit (and
+# replay) the parent's unflushed output.
+
+$|  = 1;
+
+# with an argument, only the scenarios whose title matches it are run
+# (perl benchmarks/60-Ordered/compare Memory).
+
+my $only    = shift // '';
+
+my @size    = ( 1_000, 10_000, 100_000, 200_000 );
+
+# the bucket size is given explicitly (the module's default is 3, or
+# $ENV{ LLS_BUCKET_SIZE }) so that the tables in the POD can be reproduced.
+
+my %impl
+= (
+    list    => sub { LinkedList::Single::Example::Ordered->new( bucket => 16 )          }
+  , sorted  => sub { LinkedList::Single::Example::Ordered::Sorted->new                  }
+  , buckets => sub { LinkedList::Single::Example::Ordered::Buckets->new( bucket => 16 ) }
+  , hash    => sub { LinkedList::Single::Example::Ordered::Hash->new                    }
+);
+
+my @name    = qw( list sorted buckets hash );
+
+########################################################################
+# utility
+########################################################################
+
+# resident memory in bytes.
+
+sub rss()
+{
+    open my $fh, '<', '/proc/self/statm'
+    or die "Botched rss: /proc/self/statm: $!\n";
+
+    my( undef, $pages ) = split ' ', scalar <$fh>;
+
+    $pages * 4096
+}
+
+# keys drawn from ten times as many values as the map will hold.
+
+sub keys_for( $n, $count )
+{
+    srand 20261031 + $n;
+
+    [ map { int rand( 10 * $n ) } 1 .. $count ]
+}
+
+# a map holding about n entries, built outside the timing.
+
+sub filled( $name, $n )
+{
+    my $map = $impl{ $name }->();
+
+    $map->put( $_, $_ ) for keys_for( $n, $n )->@*;
+
+    $map
+}
+
+sub timed( $code )
+{
+    my $start   = time;
+
+    my $ops     = $code->();
+
+    ( time - $start, $ops )
+}
+
+sub table( $title, $unit, @row )
+{
+    say "\n$title";
+    say sprintf '%-8s %9s %9s %12s', 'case', 'ops', 'seconds', "us/$unit";
+
+    say sprintf '%-8s %9d %9.4f %12.2f'
+    =>  $_->{ name }, $_->{ ops }, $_->{ secs }, 1e6 * $_->{ secs } / $_->{ ops }
+    for @row;
+}
+
+########################################################################
+# memory: build in a fresh process so the allocator starts clean. this
+# has to run first: perl keeps what it frees, so once the timing runs
+# below have built and dropped big maps, a child inherits that heap and
+# a new map appears to cost nothing.
+########################################################################
+
+my $memory_title    = 'Memory';
+
+if( $memory_title =~ m{ $only }xi )
+{
+    my $n   = 200_000;
+
+    say "\nResident memory to hold about $n entries (integer key, integer value)";
+    say sprintf '%-12s %14s %12s', 'case', 'bytes', 'per entry';
+
+    for my $name ( @name )
+    {
+        my $pid = open my $kid, '-|'
+        // die "Botched fork: $!\n";
+
+        if( ! $pid )
+        {
+            my $before  = rss;
+            my $keep    = filled $name, $n;
+            my $size    = $keep->size;
+
+            say( ( rss() - $before ) . " $size" );
+
+            exit
+        }
+
+        my( $bytes, $size ) = split ' ', scalar <$kid>;
+
+        close $kid;
+
+        say sprintf '%-12s %14d %12.1f', $name, $bytes, $bytes / $size;
+    }
+}
+
+########################################################################
+# time
+########################################################################
+
+my $time_title  = 'Time';
+
+if( $time_title =~ m{ $only }xi )
+{
+    for my $n ( @size )
+    {
+        # insert n keys in random order.
+
+        table "Build: $n random inserts", 'insert'
+        =>  map
+            {
+                my $name    = $_;
+                my $keys    = keys_for $n, $n;
+                my $map     = $impl{ $name }->();
+
+                my( $secs, $ops ) = timed sub { $map->put( $_, $_ ) for $keys->@*; $n };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+
+        # look up 20,000 keys, half of them present.
+
+        table "Lookup: 20,000 gets in a map of $n", 'get'
+        =>  map
+            {
+                my $name    = $_;
+                my $map     = filled $name, $n;
+                my $key     = keys_for $n + 1, 20_000;
+
+                my( $secs, $ops ) = timed sub { $map->get( $_ ) for $key->@*; scalar @$key };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+
+        # churn: half puts, half deletes, size stays about n.
+
+        table "Churn: 20,000 puts and deletes in a map of $n", 'op'
+        =>  map
+            {
+                my $name    = $_;
+                my $map     = filled $name, $n;
+                my $key     = keys_for $n + 2, 20_000;
+
+                my( $secs, $ops ) = timed sub
+                {
+                    my $i   = 0;
+
+                    $i++ % 2
+                    ? $map->delete( $_ )
+                    : $map->put( $_, $_ )
+                    for $key->@*;
+
+                    scalar @$key
+                };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+
+        # ranges of about 50 entries. the hash has to sort every key
+        # each time, so it is given fewer.
+
+        table "Range: ranges of about 50 entries in a map of $n", 'range'
+        =>  map
+            {
+                my $name    = $_;
+                my $map     = filled $name, $n;
+                my $count   = $name eq 'hash' ? 20 : 2_000;
+                my $start   = keys_for $n + 3, $count;
+                my $width   = 500;
+
+                my( $secs, $ops ) = timed sub
+                {
+                    $map->range( $_, $_ + $width ) for $start->@*;
+
+                    $count
+                };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+
+        # cut the middle tenth of the keys out.
+
+        table "Cut: the middle tenth of a map of $n", 'entry cut'
+        =>  map
+            {
+                my $name    = $_;
+                my $map     = filled $name, $n;
+
+                my( $secs, $ops ) = timed sub
+                {
+                    scalar $map->cut( 4.5 * $n, 5.5 * $n )->@*
+                };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+
+        # the whole map in key order.
+
+        table "Contents: all entries of a map of $n in key order", 'entry'
+        =>  map
+            {
+                my $name    = $_;
+                my $map     = filled $name, $n;
+
+                my( $secs, $ops ) = timed sub { scalar $map->contents->@* };
+
+                { name => $name, ops => $ops, secs => $secs }
+            }
+            @name;
+    }
+}
+
+########################################################################
+# the bucket size
+########################################################################
+
+my $bucket_title    = 'Bucket';
+
+if( $bucket_title =~ m{ $only }xi )
+{
+    my $n   = 100_000;
+
+    say "\nBucket size, map of $n: us per build insert / us per get";
+    say sprintf '%-8s %14s %14s', 'bucket', 'list', 'array buckets';
+
+    for my $size ( 4, 8, 16, 32, 64 )
+    {
+        my @cell
+        = map
+        {
+            my $class   = $_;
+            my $keys    = keys_for $n, $n;
+            my $map     = $class->new( bucket => $size );
+
+            my( $build ) = timed sub { $map->put( $_, $_ ) for $keys->@*; $n };
+
+            my $key     = keys_for $n + 1, 20_000;
+
+            my( $get )  = timed sub { $map->get( $_ ) for $key->@*; 1 };
+
+            sprintf '%5.1f /%6.1f', 1e6 * $build / $n, 1e6 * $get / 20_000
+        }
+        qw( LinkedList::Single::Example::Ordered LinkedList::Single::Example::Ordered::Buckets );
+
+        say sprintf '%-8d %14s %14s', $size, @cell;
+    }
+}
+
+########################################################################
+# code complexity
+########################################################################
+
+my $cx_title    = 'Complexity';
+
+if( $cx_title =~ m{ $only }xi )
+{
+    my %path
+    = (
+        list    =>
+        {
+            put     => [ qw( put _locate _before _split ) ]
+          , get     => [ qw( get _locate _before ) ]
+          , delete  => [ qw( delete _locate _before _remove_bucket ) ]
+          , cut     => [ qw( cut _inside _detach _cut_bucket _locate _remove_bucket ) ]
+        }
+      , sorted  =>
+        {
+            put     => [ qw( put _lower ) ]
+          , get     => [ qw( get _lower ) ]
+          , delete  => [ qw( delete _lower ) ]
+          , cut     => [ qw( cut _lower ) ]
+        }
+      , buckets =>
+        {
+            put     => [ qw( put _locate _lower ) ]
+          , get     => [ qw( get _locate _lower ) ]
+          , delete  => [ qw( delete _locate _lower ) ]
+          , cut     => [ qw( cut _locate _lower ) ]
+        }
+      , hash    =>
+        {
+            put     => [ qw( put ) ]
+          , get     => [ qw( get ) ]
+          , delete  => [ qw( delete ) ]
+          , cut     => [ qw( cut range ) ]
+        }
+    );
+
+    my %class
+    = (
+        list    => 'LinkedList::Single::Example::Ordered'
+      , sorted  => 'LinkedList::Single::Example::Ordered::Sorted'
+      , buckets => 'LinkedList::Single::Example::Ordered::Buckets'
+      , hash    => 'LinkedList::Single::Example::Ordered::Hash'
+    );
+
+    say "\nComplexity of the code a call goes through (helpers included)";
+    say sprintf '%-8s %-7s %6s %6s %6s', qw( case call stmts branch index );
+
+    for my $name ( @name )
+    {
+        for my $call ( qw( put get delete cut ) )
+        {
+            my %sum = ( statements => 0, branches => 0, index_ops => 0 );
+
+            for my $sub ( $path{ $name }{ $call }->@* )
+            {
+                my $cx  = complexity \&{ "$class{ $name }::$sub" };
+
+                $sum{ $_ } += $cx->{ $_ } for keys %sum;
+            }
+
+            say sprintf '%-8s %-7s %6d %6d %6d'
+            =>  $name, $call, $sum{ statements }, $sum{ branches }, $sum{ index_ops };
+        }
+    }
+}

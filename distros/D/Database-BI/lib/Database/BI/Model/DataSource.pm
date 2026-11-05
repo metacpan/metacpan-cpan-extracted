@@ -12,7 +12,7 @@ use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.019.0';
+our $VERSION = '0.020.0';
 
 =head1 NAME
 
@@ -483,6 +483,7 @@ sub new {
 	# Opening a file tries several drivers in turn; what they leave in $@ and $! is
 	# of no interest to a caller, who may be holding its own.
 	local ($@, $!);
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	my $raw   = Params::Get::get_params(undef, \@_) // {};
 	return $class->_new_from_url($raw)   if exists $raw->{url};
 	return $class->_new_from_redis($raw) if exists $raw->{redis};
@@ -803,6 +804,50 @@ sub _new_from_mariadb :Protected {
 # Protected initialisation
 # ---------------------------------------------------------------------------
 
+# _best_id_column($fh, $sep, \@header_fields) -> $column_name | undef
+#
+# Purpose: The column Database::Abstraction should key rows on.
+# Entry:   $fh is open just after the header line; @header_fields is the header
+#          split and stripped, in file order (empty names included, so indexes
+#          match the data).
+# Exit:    The safe-identifier column with the fewest rows D::A would drop
+#          (an empty cell, or one starting with '#', which D::A reads as a
+#          comment), the earliest on a tie; undef when no header name is safe.
+#          Reads $fh to its end.  The file is parsed as D::A's slurp parses it
+#          (escape_char '\\'), or a row like "Joe\"s Bar" would end the count
+#          there; a line that still will not parse is skipped, not the end.
+sub _best_id_column {
+	my ($fh, $sep, $fields) = @_;
+
+	my @safe = grep { defined($fields->[$_]) && $fields->[$_] =~ $TABLE_NAME_RE } 0 .. $#{$fields};
+	return undef unless @safe;
+
+	require Text::CSV;
+	my $csv = Text::CSV->new({
+		binary => 1, sep_char => $sep, escape_char => '\\',
+		allow_loose_quotes => 1, allow_whitespace => 1,
+	});
+	my %dropped = map { $_ => 0 } @safe;
+	while (1) {
+		my $at = tell($fh);
+		my $row = $csv->getline($fh);
+		if (!$row) {
+			# The end, or a line that will not parse: go on from the next one,
+			# unless nothing was read, which would loop for ever.
+			last if $csv->eof() || eof($fh) || tell($fh) == $at;
+			next;
+		}
+		next unless grep { defined($_) && length($_) } @{$row};	# a blank line is not a row
+		for my $i (@safe) {
+			my $cell = $row->[$i];
+			$dropped{$i}++ if !defined($cell) || $cell !~ /\S/ || $cell =~ /\A\s*#/;
+		}
+	}
+
+	my ($best) = sort { $dropped{$a} <=> $dropped{$b} || $a <=> $b } @safe;
+	return $fields->[$best];
+}
+
 # _detect_file_info( $dir, $table ) -> \%info
 #
 # Peek at the first header line of a CSV, TSV or PSV file and return a hashref:
@@ -934,34 +979,15 @@ sub _detect_file_info :Protected {
 		# value in the id column or D::A drops it (empty_is_undef => 1 makes
 		# truly empty cells undef).
 		#
-		# Strategy: read the first non-empty data row and find the first safe
-		# column whose value in that row is non-empty.  A simple split (same
-		# separator) is used rather than a full CSV parse; it may mis-index
-		# fields that contain the separator inside quotes, but correctly detects
-		# whether a given index position is blank -- sufficient for id selection.
-		# Fall back to the first safe column in the header if the data row
-		# check is inconclusive (e.g. file has only a header line).
-		my ($safe_id) = grep { $_ =~ $TABLE_NAME_RE } @cols;	# header-only fallback
+		# Strategy: of the safe columns, the one with the fewest empty cells
+		# across the whole file, the earliest on a tie.  Choosing by the first
+		# data row alone lost rows: a bank export whose first transaction had a
+		# cheque number made Check the id, and D::A then dropped the 358 of 362
+		# rows that had none.  D::A reads the whole file anyway (max_slurp_size
+		# is the file's size), so one more pass costs no more than that.  With
+		# no data rows, the first safe column in the header.
+		my $safe_id = _best_id_column($fh, $sep, \@fields);
 
-		my $data_line;
-		while (defined($data_line = <$fh>)) {
-			chomp $data_line;
-			$data_line =~ s/\r\z//;
-			last if length $data_line;	# skip blank lines between header and data
-		}
-		if (defined $data_line) {
-			my @vals = split /\Q$sep\E/, $data_line, -1;
-			for my $i (0 .. $#cols) {
-				next unless $cols[$i] =~ $TABLE_NAME_RE;
-				my $val = $vals[$i] // '';
-				$val =~ s/\A[\s"]+//;
-				$val =~ s/[\s"]+\z//;
-				if (length $val) {
-					$safe_id = $cols[$i];
-					last;
-				}
-			}
-		}
 		# If no safe identifier was found in the header, check whether the first
 		# row looks like data values rather than column names.  A CSV exported
 		# from a bank or accounting system often has no header row at all -- the
@@ -1736,6 +1762,7 @@ None.
 sub columns {
 	my $self = shift;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	return $self->{_columns} if defined $self->{_columns};
 	# A caller that knows the order (an extract, which records its file's) says
 	# so; a SQLite backend would otherwise list the columns alphabetically.
@@ -1852,6 +1879,7 @@ None.
 sub aggregate {
 	my ($self, @args) = @_;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	return [] if $self->{_file_is_empty};
 	return [] unless $self->{_db};
 	return [] unless $self->{_db}->can('aggregate');
@@ -1918,6 +1946,7 @@ C<error_mariadb_no_driver> or C<error_mariadb_connect>.
 sub mariadb_tables {
 	my ($class, $server, $settings) = @_;
 	local ($@, $!);
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 
 	my ($dbh) = _mariadb_connect($server, $settings);
 	my $rows = eval {
@@ -2076,6 +2105,7 @@ None.
 sub schema {
 	my $self = shift;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 
 	return {} unless $self->{_db} && $self->{_db}->can('schema');
 
@@ -2205,6 +2235,7 @@ calls in C<eval> if you need to recover.
 sub selectall_arrayref {
 	my ($self, @args) = @_;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	return [] if $self->{_file_is_empty};
 
 	# A server gives LIMIT rows in no promised order, so pages could overlap.
@@ -2252,6 +2283,7 @@ sub selectall_arrayref {
 sub fetch_all {
 	my $self  = shift;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	my $table = $self->{_table};
 
 	# 0-byte file: no backend was created; nothing to fetch.
@@ -2342,6 +2374,7 @@ None.
 sub count {
 	my ($self) = @_;
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
+	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	return 0 if $self->{_file_is_empty};
 	return $self->{_db}->count();
 }

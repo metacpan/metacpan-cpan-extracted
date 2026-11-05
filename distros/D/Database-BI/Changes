@@ -1,5 +1,169 @@
 Revision history for Database-BI
 
+0.020.0	Wed Nov  4 09:25:26 PM EST 2026
+	[ Enhancements ]
+	- The line graph panel has Lines by, which draws one line for each value of a
+	  column (series=).  It was reachable only by writing the URL.
+	- Canvas: Add current view offers Lines by for a line card.
+	- /histogram takes scheme=, which fills the bars with the first colour of a
+	  categorical scheme.  The histogram panel and Add current view offer it as
+	  Bar colour, and a canvas histogram card keeps it.
+	- Canvas: Add current view offers Colour by, Colour scheme, Bubble size and
+	  the radii for a scatter card, as the scatter panel does.
+	- /treemap takes color=, which shades each tile by a second column, with
+	  color_agg= (default avg) and color_scheme= (sequential, default YlOrRd).
+	  A legend shows the scale.  The treemap panel, Add current view and a
+	  canvas treemap card all offer it.  It was a 400 before.
+	- /combo takes scheme=: the bars take its first colour and the line its
+	  second.  The combo panel, Add current view and the card offer it.
+	- HTML::D3 0.29 is now required.  Besides the two above, it escapes the
+	  text in the stacked, combo and treemap tooltips, where a label holding
+	  markup ran when the chart was hovered.
+	- Geocoding goes through a Geo::Coder::List chain: Geo::Coder::Free's
+	  local data first, then OpenStreetMap's Nominatim (Geo::Coder::OSM) for
+	  the places it does not know.  Requests are kept to one a second by
+	  LWP::UserAgent::Throttled, from a client named Database-BI.  A map page
+	  asks Nominatim about at most map_geocode_online_max places (default 20)
+	  and leaves the rest for the next visit or script/bi-geocode.
+	  map_geocode_online => 0 keeps every lookup local.  A Nominatim that
+	  fails is not taken to mean the place does not exist: the place is
+	  tried again later.  Geo::Coder::List, Geo::Coder::OSM and
+	  LWP::UserAgent::Throttled are new recommends.
+	- Geo::Coder::List keeps the answers it finds in a cache under
+	  <model_dir>/geocode-cache, shared by /map and script/bi-geocode, so a
+	  place Nominatim found is not asked again for a month.  The local data
+	  is asked through the same cache, with or without Nominatim, and a place
+	  whose local lookup fails is left for later rather than ending the
+	  page.  Nominatim is asked over https, one request a lookup
+	  (Geo::Coder::OSM asked over http, and was redirected).
+	- /map takes loc= more than once, for a place written across columns:
+	  loc=Address&loc=Country looks up "Brezje 8, Cerknica, Slovenia".  The
+	  map panel has a Followed by column (guessed when one is called
+	  Country, and remembered with the other), canvas map cards keep the
+	  columns as a list, and script/bi-geocode takes --col more than once.
+	- script/bi-geocode takes --offline and --online-max.
+	- When a geocoded map cannot plot some rows, the note that says so opens
+	  onto a list of their places: how many rows each stands for, why (no
+	  place, not a place name, not found, or not looked up yet), and a link
+	  to those rows in the table it came from.
+	- The note that some rows of a map could not be plotted names only the
+	  reasons that apply, each with its rows ("8 whose place was not found"),
+	  rather than every reason there could be.  Beside it, one link opens
+	  all those rows in the table at once.
+	- A new filter operator, in, keeps the rows whose cell is any value of a
+	  JSON list: f=place:in:["Paris","Rome"].  It is what that link uses.
+
+	- With HTML::OSM 0.13, every map has a scale bar, and a map coloured by
+	  series=, color= rules or size= has its key drawn on the map.  The key
+	  lists only the colours of the markers in view, so it changes as the
+	  map is zoomed and moved; bubble sizes are always listed.  A map with
+	  no zoom= opens on every marker, as the map panel says; it used to open
+	  at zoom 12 on the markers' midpoint, which could show none of them.
+	  HTML::OSM 0.13 is now the recommended minimum: with an older one a map
+	  page says which version it needs, as it did below 0.12.
+	- A map no longer waits for its places to be looked up before it is
+	  shown.  It draws what the place cache knows, and a progress bar names
+	  each place as it is looked up ("Looking up 5 of 10: Brezje 8,
+	  Cerknica, Slovenia"), with a Cancel button.  Each answer is saved as
+	  it comes (POST /geo/lookup), so a run that is cancelled or interrupted
+	  keeps what it found, and the map is drawn again when the last place is
+	  in.  After Cancel the places left are listed as not looked up yet, with
+	  a link to look them up.  The progress bar asks one place at a time, so
+	  map_geocode_online_max no longer leaves places for the next visit, where
+	  each paid for a slow local lookup again.  geocode=wait keeps the old
+	  behaviour, which a client that is not a browser still gets;
+	  geocode=cached looks nothing up.
+	- The application's secret is random for each start unless the config
+	  sets secrets => [...].  Mojolicious used the application's name, which
+	  anyone can read; it now signs the places a map page lists.
+
+	[ Bug fixes ]
+	- A CSV whose first data row had a value in a column that is mostly
+	  empty showed only the rows with a value there: a bank export whose
+	  first transaction had a cheque number showed 4 of its 362 rows.  The
+	  column rows are keyed on was the first one filled in the first row,
+	  and Database::Abstraction drops a row whose key is empty.  It is now
+	  the column with the fewest empty cells in the whole file, read as
+	  Database::Abstraction reads it: a row such as "Joe\"s Bar" no longer
+	  ends the count, and a line that will not parse is skipped.
+	- DataSource read no rows when its caller had set $/ (slurp mode, or a
+	  record length): the header was read as the whole file.  The methods
+	  that read a file now use "\n" whatever the caller's $/ is.
+	- On Windows a path: spec reached through a symlink was filed in the
+	  model store under the link's name, not the file's, because realpath
+	  there leaves links alone: definitions saved through the link were not
+	  found from the file.  canonical_spec now follows the links first.
+	- Deleting a canvas card rewrote a bookmark's cv= of more than nine
+	  digits, which names no card, as cv=1e+20.  It is left alone, and a
+	  search or card index that is not one is no longer renumbered.
+	- A map marker's popup showed only the first of the rows at its place:
+	  "3 rows" and one event.  It now lists them all, a value every row
+	  shares once and the columns that differ as a small table.  Past
+	  map_popup_rows (default 10) the rest are counted, with a link to them
+	  in the table, and the table scrolls, so a busy place does not cover the
+	  map.  The same holds for rows at one coordinate.
+	- A map card on a canvas is coloured and sized as the map it was saved
+	  from.  It stores color and size in its encode, which only the map page's
+	  options were read for, so a card drew plain pins.
+	- Calc::date_normalise and the date functions in calculated fields gave
+	  the caller back a changed $!: on BSD, mktime and localtime can
+	  leave errno set when they succeed (a CPAN Testers failure in t/unit.t).
+	  Fixes https://www.cpantesters.org/cpan/report/ef94d1fc-d7aa-11f1-839c-f58cc80b69bd
+	- script/bi-geocode could not open a path: spec: it looked for a table
+	  named after the whole file name, extension included.
+	- /scatter no longer saves scheme= in the chart it hands to a canvas when
+	  series= is absent, where the scheme is ignored and unchecked.
+	- A scatter added to a canvas from /scatter kept only x and y: the card now
+	  colours by series and sizes bubbles as the page does, and the page saves
+	  min_r= and max_r= with it.  A bad saved scheme draws the default colours.
+	- A line chart added to a canvas from /graph?series= drew every row as one
+	  line through all the groups.  The card now draws one line per value.
+	- script/bi-geocode died on every run ('option "max" must be a positive
+	  integer, not "0"'), and its summary counted cache hits from a key that
+	  does not exist and compared rows with places.
+	- A canvas map card whose saved color rules held something other than a
+	  rule (PUT and import store a card as sent) was a 500; such entries are
+	  now ignored.  A card whose encode, options or filters are not of the
+	  right shape is drawn as if they were absent, rather than failing.
+	- cv=abc on a canvas was read as card 0, which was then drawn unfiltered
+	  as the source of the cross-filter (and perl warned).  Only a whole
+	  number names a card.
+	- Removing a text card left a bookmark's cv= naming the removed card,
+	  which then named the card that moved into its place.  It is dropped.
+	- A negative offset in a page of rows is read as 0, and a map's unplotted
+	  rows ignore anything in the rows that is not a row.
+	- A column-listing error on a table page lost only the last "at FILE line
+	  N" of a rethrown error; it now goes through the same tidying as every
+	  other error shown to a reader.
+	[ Tests ]
+	- t/edge_cases.t attacks the id choice (escaped quotes, unparseable and
+	  stuck reads, a read failing mid-file, 50,000 rows, 2,000 columns, a
+	  megabyte of quotes, the caller's $/, descriptor leaks and a full
+	  descriptor table), bookmark renumbering, cv= values, stored cards of the
+	  wrong shape and map popups (hostile cells, 100,000 rows at a marker).
+	- t/function.t covers the geocoding progress run, the remaining
+	  DataSource, Calc and Geocode helpers, and the Dashboard helpers and
+	  canvas, lookup, extraction and /geo/lookup routes no part reached.
+	- t/function.t tries _follow_links on an NT-form link target only where
+	  readlink gives the target back as written: Cygwin turns a target with
+	  backslashes into a Windows path (a CPAN Testers failure on Cygwin).
+	  Fixes https://www.cpantesters.org/cpan/report/4d672bda-d7ac-11f1-8016-ac2316d9a04a
+	- The geocoding tests pass without the recommended modules, as on CI:
+	  t/transition.t stands in for Geo::Coder::List, t/unit.t raises the
+	  "needs Geo::Coder::List" message with it hidden, and t/integration.t
+	  counts the geocoder as installed only with Geo::Coder::List as well.
+	- t/scatter.t: series=, scheme=, size=, min_r= and max_r= on /scatter and
+	  on a canvas scatter card, and the scatter fields of both panels.
+	- t/graph-series.t: series= on /graph, on a canvas line card and in both
+	  panels.
+	- t/histogram-scheme.t: scheme= on /histogram, on a canvas card and in both
+	  panels.
+	- t/geocode-online.t: the geocoding chain against a stand-in Nominatim
+	  (t/lib/BI/Test/Nominatim.pm), so no test reaches the network.
+	- t/treemap-combo-colour.t: color=, color_agg= and color_scheme= on
+	  /treemap, including the Other tile; scheme= on /combo; both canvas cards
+	  and all four panels.
+
 0.019.0	Tue Nov  3 11:46:08 AM EST 2026
 	[ Enhancements ]
 	- Stored lookups: POST /lookups/save adds the columns of another file under

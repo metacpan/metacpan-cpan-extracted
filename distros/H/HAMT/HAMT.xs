@@ -49,6 +49,9 @@ static void hamt_pool_atexit(pTHX_ void *arg) {
 /* The first interpreter to load the library has the pool. */
 static void hamt_pool_boot(pTHX) {
 #ifndef HAMT_NO_POOL
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (hamt_pool_one.open) return;
     hamt_pool_open(&hamt_pool_one);
     hamt_pool_owner = HAMT_CX;
@@ -74,13 +77,13 @@ _warn_filter(...)
         STRLEN len;
         const char *p;
     PPCODE:
-        msg = items ? ST(0) : &PL_sv_undef;
+        msg = items ? ST(0) : &PL_sv_undef; /* # uncoverable condition right count:1 */
         if (!SvROK(msg)) {
             p = SvPV(msg, len);
             if (len >= 17 && memEQ(p, "Exiting eval via ", 17)) XSRETURN_EMPTY;
         }
         prev = get_sv("HAMT::_warn_prev", 0);
-        if (prev && SvOK(prev)) {
+        if (prev && SvOK(prev)) { /* # uncoverable condition right count:1 */
             PUSHMARK(SP);
             XPUSHs(msg);
             PUTBACK;

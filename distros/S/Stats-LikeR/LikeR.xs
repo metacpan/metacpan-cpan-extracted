@@ -1018,8 +1018,14 @@ pointer, an SV head and an NV body each, asked of the C library's malloc()
 once and handed straight back.  It is deliberately not Newx(), which would
 abort on the failure this exists to turn into a croak.  Where the system
 overcommits without limit the probe succeeds and proves nothing, which is no
-worse than before.*/
-static bool alloc_probe_ok(size_t bytes) {
+worse than before.
+
+It takes pTHX_ although no Linux perl needs it: under PERL_IMPLICIT_SYS, which
+every Windows perl defines, XSUB.h turns malloc() and free() into
+PerlMem_malloc() and PerlMem_free(), which reach the host allocator through
+my_perl, and without the context 0.3414 did not compile on Strawberry Perl.
+That allocator returns NULL rather than aborting, so the probe still works.*/
+static bool alloc_probe_ok(pTHX_ size_t bytes) {
 	void *probe = malloc(bytes);   //not Newx(), which aborts: see above
 	if (!probe) return FALSE;
 	free(probe);
@@ -1029,7 +1035,7 @@ static bool alloc_probe_ok(size_t bytes) {
 static void sv_count_alloc_ok(pTHX_ const char *fname, size_t n) {
 	if (n > SIZE_MAX / SV_COUNT_CELL)
 		croak("%s: %" UVuf " values is too many to hold", fname, (UV)n);
-	if (!alloc_probe_ok(n * SV_COUNT_CELL))
+	if (!alloc_probe_ok(aTHX_ n * SV_COUNT_CELL))
 		croak("%s: cannot allocate %" UVuf " values", fname, (UV)n);
 }
 
@@ -37214,7 +37220,7 @@ CODE:
 	succeeds and proves nothing, which is no worse than before.*/
 	if (nrow > (size_t)SV_COUNT_MAX / ncol || nrow * ncol > SIZE_MAX / SV_COUNT_CELL)
 		croak("matrix: %" UVuf " x %" UVuf " is too many cells", (UV)nrow, (UV)ncol);
-	if (!alloc_probe_ok(nrow * ncol * SV_COUNT_CELL))
+	if (!alloc_probe_ok(aTHX_ nrow * ncol * SV_COUNT_CELL))
 		croak("matrix: cannot allocate a %" UVuf " x %" UVuf " matrix", (UV)nrow, (UV)ncol);
 	/*Create the matrix (Array of Arrays).  The result is owned by a mortal
 	reference, and row_ptrs is on the save stack, from before the first cell

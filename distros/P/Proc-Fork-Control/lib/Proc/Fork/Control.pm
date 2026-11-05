@@ -1,37 +1,38 @@
 package Proc::Fork::Control;
 
 #
-#    Copyright (C) 2014 Colin Faber
+#	 Copyright (C) 2014-2026 Colin Faber
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation version 2 of the License.
+#	 This program is free software: you can redistribute it and/or modify
+#	 it under the terms of the GNU General Public License as published by
+#	 the Free Software Foundation, version 2.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#	 This program is distributed in the hope that it will be useful,
+#	 but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	 GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#	 You should have received a copy of the GNU General Public License
+#	 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#	 A copy is included in this distribution as LICENSE.GPL.
 #
-#
-#        Original author: Colin Faber <cfaber@fpsn.net>
+#		 Original author: Colin Faber <cfaber@fpsn.net>
 # Original creation date: 10/02/2014
-#                Version: $Id: Control.pm,v 1.6 2015/12/14 16:38:54 cfaber Exp $
-# 
+#				 Version: 1.7
+#
 
-# Version number - cvs automagically updated.
-our $VERSION = $1 if('$Revision: 1.6 $' =~ /: ([\d\.]+) \$/);
-
+use 5.008;
 use strict;
-use POSIX ('WNOHANG','setsid');
-use Time::HiRes 'usleep';
+use warnings;
+
+our $VERSION = '1.7';
+
+use POSIX qw(WNOHANG setsid);
+use Time::HiRes qw(usleep);
 
 require Exporter;
 
-# Exported routines
-our @ISA = ('Exporter');
+our @ISA = qw(Exporter);
 our @EXPORT = qw(
 	cfork
 	cfork_wait
@@ -54,207 +55,231 @@ our @EXPORT = qw(
 	cfork_child_dob
 );
 
-# Defaults
-&cfork_init;
+our $HEAP = {};
+our $errstr;
 
-require 5.008;
-
-$Proc::Fork::Control::VERSION = '$Revision: 1.6 $';
+=encoding utf-8
 
 =head1 NAME
 
-Proc::Fork::Control
+Proc::Fork::Control - management front end to fork()
 
 =head1 DESCRIPTION
 
-Proc::Fork::Control is a simple to use library which functions much the same way
-as Proc::Fork. That said, Proc::Fork is not used, as fork() is accessed directly.
+Proc::Fork::Control manages C<fork()> for you. It caps how many children a
+process may run, tracks those children, and can either block until they
+exit or return as soon as they have been started.
 
-Proc::Fork::Control allows you to manage forks, control number of children
-allowed, monitor children, control blocking and nonblocking states, etc.
+The interface is a set of exported functions. Forking copies the
+interpreter, so the module keeps its state in a process-global heap
+instead of in an object.
 
 =head1 SYNOPSIS
 
- #!/usr/bin/perl 
- use Proc::Fork::Control;
- use Fcntl ':flock';
+	use strict;
+	use warnings;
+	use Proc::Fork::Control;
+	use Fcntl qw(:flock);
 
- # Initialize the system allowing 25 forks per cfork() level
- cfork_init(25);
+	# Allow 25 concurrent children of this process.
+	cfork_init(25);
 
- for(my $i = 0; $i < 50; $i++){
-	# Fork this if possible, if all avaliable fork slots are full
-	# block until one becomes avaliable.
-	cfork(sub {
-		# Initialize for children
-		cfork_init(2);
+	# Nonblocking mode is what makes the cap queue workers. In the
+	# default blocking mode, cfork() waits for the child before it
+	# returns, so only one child exists at a time.
+	cfork_nonblocking(1);
 
-		for('A' .. 'Z'){
-			cfork(sub {
-				# Lock STDOUT for writing.
-				flock(STDOUT, &LOCK_EX);
+	for my $i (1 .. 50) {
+		cfork(sub {
+			cfork_init(2);
+			cfork_nonblocking(1);
 
-				# Print out a string.
-				print STDOUT "Fork: $i: $_\n";
-	
-				# Unlock STDOUT.
-				flock(STDOUT, &LOCK_UN);
+			for my $letter ('A' .. 'Z') {
+				cfork(sub {
+					flock(STDOUT, LOCK_EX);
+					print STDOUT "Fork: $i: $letter\n";
+					flock(STDOUT, LOCK_UN);
+					cfork_exit(0);
+				});
+			}
 
-				cfork_exit();
-			});
-		}
+			cfork_nonblocking(0);
+			cfork_wait();
+			cfork_exit(0);
+		});
+	}
 
-		# Wait for sub children to exit
-		cfork_wait()
+	cfork_nonblocking(0);
+	cfork_wait();
 
-	});
- }
+=head1 REQUIREMENTS
 
- # Wait until all forks have finished.
- cfork_wait();
+Perl 5.8 or newer, L<POSIX>, and L<Time::HiRes>. C<Time::HiRes> has been
+required since version 1.3.
+
+=head1 LIMITATIONS
+
+The module installs its own C<$SIG{CHLD}> handler in each process that
+calls C<cfork_init()> and is not itself a forked child. A handler you
+installed earlier is replaced.
+
+State is one heap per process. There is no object, and the module is not
+a thread-safe work queue.
+
+C<cfork_daemonize> changes the working directory to C</>.
 
 =head1 METHODS
 
-Note - because of the nature of forking within perl. I've against objectifying this library. Rather it uses direct function calls which are exported to the global namespace Below is a list of these calls and how to access them.
+=head2 cfork(CODE, ...)
 
-=head2 cfork(code, code, code)
+Fork once, when this process is under its child cap.
 
-Provide managed forking functions.
+Each C<CODE> reference runs in the child, in order. If the child returns
+from the last reference without calling C<cfork_exit>, it exits with
+status 2. A reference that throws aborts the child with that error, and
+later references do not run.
 
-Returns nothing on error and sets the cfork_errstr error handler.
+While the cap is full, C<cfork> waits for a slot. In the default blocking
+mode it then waits for every child of this process, including the one it
+just started, before it returns the child pid. Turn on
+C<cfork_nonblocking> when the parent must keep more than one child at a
+time. In that mode C<cfork> returns the pid as soon as the child has been
+created.
 
-if cfork() is called with in an cfork()ed process the calling cfork() process will block until all children with in it die off.
+The child starts with an empty child list and must call C<cfork_init>
+itself before it calls C<cfork>. It does not inherit the parent's pids.
+
+On success the parent receives the child pid. On failure C<cfork> returns
+C<undef> and sets C<cfork_errstr>. A failed C<fork> is reported this way
+and does not run the child code in the parent.
 
 =cut
 
 sub cfork {
 	_errstr();
-	if(!$Proc::Fork::Control::HEAP->{max_children}){
-		return _errstr("cfork_init() not set");
+
+	my $heap = $Proc::Fork::Control::HEAP;
+	my $max = $heap->{max_children};
+	if (!defined $max || $max !~ /^\d+$/ || $max < 1) {
+		return _errstr('cfork_init() not set');
 	}
 
-	if(!defined $Proc::Fork::Control::HEAP->{children}){
-		$Proc::Fork::Control::HEAP->{children} = 0;
-	}
+	$heap->{children} = 0 unless defined $heap->{children};
 
-	if(!defined $Proc::Fork::Control::HEAP->{max_children}){
-		$Proc::Fork::Control::HEAP->{max_children} = 0;
-	}
+	my $i = 0;
+	my $delay = 0;
+	while (1) {
+		my $cleaned = _cleanup();
+		last if $heap->{children} < $heap->{max_children};
 
-	my ($i, $delay);
-	while(1){
-		my $cl =_cleanup();
-
-		if($Proc::Fork::Control::HEAP->{children} < $Proc::Fork::Control::HEAP->{max_children}){
-			last;
+		if ($cleaned) {
+			$i = 0;
+			$delay = 0;
+			next;
 		}
 
-		if($Proc::Fork::Control::HEAP->{children}){
-			if($cl){
-				# There are still children alive, and we've cleaned up at least 1 
-				# child on the last iteration so don't delay at all.
-				$i = 0;
-				$delay = 0;
-			} else {
-				# There are still children alive, delay based on the number of interations
-				# Minimum delay time (in micro seconds)
-				$delay ||= 5;
-
-				# iterator for delay multiplication.
-				$i++;
-
-				$delay = $delay * $i;
-
-				# Maximum delay value
-				$delay = ($delay > 5000 ? 5000 : $delay);
-
-				# sleep for a while..
-				cfork_usleep($delay);
-			}
-		}
-        }
-
-	if($Proc::Fork::Control::HEAP->{is_child}){
-		$Proc::Fork::Control::HEAP->{has_children} = 1;
+		# Back off while the cap stays full, and cap the pause at 5ms.
+		$delay ||= 5;
+		$i++;
+		$delay *= $i;
+		$delay = 5000 if $delay > 5000;
+		cfork_usleep($delay);
 	}
 
+	# fork returns undef on failure. Undef is false, so it has to be
+	# rejected before the child branch or the parent would run it.
 	my $pid = fork;
-	if($pid < 0){
+	if (!defined $pid) {
 		return _errstr('fork failed: ' . $!);
-	} elsif($pid){
-		# This probably should use CLOCK_MONOTONIC time here, but it's not a big deal.
-		$Proc::Fork::Control::HEAP->{cidlist}->{$pid} = time();
-		$Proc::Fork::Control::HEAP->{children}++;        
+	} elsif ($pid) {
+		$heap->{cidlist}->{$pid} = time();
+		$heap->{children}++;
 	} else {
-		cfork_init();
+		# Drop the inherited parent list. Those pids are not this child's.
+		cfork_init(undef, 1);
 		$Proc::Fork::Control::HEAP->{is_child} = 1;
 		$SIG{PIPE} = 'IGNORE';
-		for my $code (@_){
-			if(ref($code) eq 'CODE'){
-				&{ $code };            
-			}               
+		for my $code (@_) {
+			if (ref($code) eq 'CODE') {
+				$code->();
+			}
 		}
 
 		cfork_exit(2);
- 	} 
+	}
 
-	# Wait for children to finish (if nonblocking
 	cfork_wait();
-
-	# Return our PID for further use.
 	return $pid;
-} 
+}
 
 =head2 cfork_nonblocking(BOOL)
 
-Set the cfork() behavior to nonblocking mode if <BOOL> is true, This will result in the fork returning right away rather than waiting for any possible children to die.
+Turn nonblocking mode on when C<BOOL> is true, and off when it is false
+or omitted.
 
-Also, cfork_nonblocking() should always be turned off after the bit of code you want to run, runs.
+In nonblocking mode C<cfork>, C<cfork_wait>, and C<cfork_wait_pid> return
+without waiting for children to exit. The child cap still applies:
+C<cfork> waits for a free slot before it forks.
 
-=item EXAMPLE
+Call C<cfork_nonblocking(0)> again when that stretch of work is finished,
+then C<cfork_wait()>. The call returns the new mode, C<1> or C<0>.
 
- cfork_nonblocking(0);
+=head3 Example
 
- cfork(sub {
-	do some work;
- });
+	cfork_nonblocking(1);
 
- cfork_nonblocking(1);
+	cfork(sub {
+		# parent returns while this child is still running
+		cfork_exit(0);
+	});
+
+	cfork_nonblocking(0);
+	cfork_wait();
 
 =cut
 
 sub cfork_nonblocking {
-	$Proc::Fork::Control::HEAP->{nonblocking} = $_[0];
+	my ($bool) = @_;
+	$Proc::Fork::Control::HEAP->{nonblocking} = $bool ? 1 : 0;
+	return $Proc::Fork::Control::HEAP->{nonblocking};
 }
 
 =head2 cfork_is_child()
 
-Return true if called with in a forked enviroment, otherwise return false.
+Return C<1> when this process was started by C<cfork>, otherwise C<0>.
 
 =cut
 
 sub cfork_is_child {
-	return $Proc::Fork::Control::HEAP->{is_child};
+	return $Proc::Fork::Control::HEAP->{is_child} ? 1 : 0;
 }
 
 =head2 cfork_has_children()
 
-Return true if children exist with in a forked enviroment.
+Return C<1> when this process still has children started by C<cfork>,
+otherwise C<0>.
+
+Children that have already been reaped do not count. In blocking mode
+C<cfork> itself reaps before it returns, so call this from the parent
+while nonblocking mode is on.
 
 =cut
 
 sub cfork_has_children {
-	return $Proc::Fork::Control::HEAP->{has_children};
+	return cfork_active_children() ? 1 : 0;
 }
 
 =head2 cfork_errstr()
 
-Return the last error message.
+Return the last error string set by C<cfork>, or C<undef> if none has
+been set. A later success does not clear it.
 
 =cut
 
 sub cfork_errstr {
 	my ($err) = @_;
+	# Boolean test: an undefined argument must not warn, and must not
+	# replace a previous message.
 	$Proc::Fork::Control::errstr = $err if $err;
 	return $Proc::Fork::Control::errstr;
 }
@@ -265,48 +290,77 @@ sub _errstr {
 	return;
 }
 
-=head2 cfork_init(children)
+=head2 cfork_init(CHILDREN)
 
-Initialize the CHLD reaper with a maximum number of <children>
+Install the SIGCHLD reaper and set the maximum number of live children
+of this process to C<CHILDREN>. Call it before any C<cfork>.
 
-This should be called prior to any cfork() calls
+A later call in the parent, while children are still running, keeps
+those children and adds C<CHILDREN> to the current maximum. A value of
+C<0> does not change the maximum in that case. When no children are
+running, the call replaces this process's heap and stores C<CHILDREN>
+as the maximum, including zero. C<cfork> then fails until a positive
+maximum is set.
+
+Returns 1.
+
+The second argument is internal. C<cfork> uses it so a new child drops
+the pid list it inherited.
 
 =cut
 
 sub cfork_init {
-	my $ic = $Proc::Fork::Control::HEAP->{is_child};
+	my ($max, $reset) = @_;
+	my $heap = $Proc::Fork::Control::HEAP;
+	my $ic = ($heap && $heap->{is_child}) ? 1 : 0;
 
-	$Proc::Fork::Control::HEAP = {};
-	$Proc::Fork::Control::HEAP->{children} = 0;
-	$Proc::Fork::Control::HEAP->{cidlist}  = {};
-	$Proc::Fork::Control::HEAP->{is_child} = ($ic ? 1 : 0);
+	# A later init in the parent keeps workers that are still running.
+	# The post-fork child passes $reset and starts from an empty list.
+	if (!$reset && !$ic && $heap && $heap->{cidlist}) {
+		my $alive = grep { $heap->{cidlist}->{$_} } keys %{ $heap->{cidlist} };
+		if ($alive) {
+			$heap->{max_children} += $max if $max;
+			return 1;
+		}
+	}
+
+	$Proc::Fork::Control::HEAP = {
+		children => 0,
+		cidlist	 => {},
+		is_child => $ic,
+	};
+	$heap = $Proc::Fork::Control::HEAP;
 
 	$SIG{CHLD} = \&Proc::Fork::Control::_sigchld if !$ic;
 
-	if($_[0]){
-		$Proc::Fork::Control::HEAP->{max_children} = $_[0];
-	}
+	# Zero is a real maximum. Only an omitted value leaves it unset.
+	$heap->{max_children} = $max if defined $max;
+	return 1;
 }
 
-=head2 cfork_exit(int)
+cfork_init();
 
-Exit a process cleanly and set an exit code.
+=head2 cfork_exit(STATUS)
 
-Normally this can be easily handled with $? however, in some cases $? is not reliably delivered.
+Store C<STATUS> and exit the current process with it. An omitted status
+exits 0. This does not return.
 
-Once called, drop to END {} block and terminate.
+The stored status stays in the process that called C<cfork_exit>. The
+parent observes it as the child's exit status after C<cfork_wait>, not
+through C<cfork_exit_code>.
 
 =cut
 
 sub cfork_exit {
 	my ($exit) = @_;
 	$Proc::Fork::Control::HEAP->{exit} = $exit;
-	exit($exit);
+	exit(defined $exit ? $exit : 0);
 }
 
 =head2 cfork_exit_code()
 
-Returns the last known cfork_exit() code.
+Return the status last passed to C<cfork_exit> in this process, or
+C<undef> if this process has not called it.
 
 =cut
 
@@ -314,19 +368,34 @@ sub cfork_exit_code {
 	return $Proc::Fork::Control::HEAP->{exit};
 }
 
-=head2 cfork_maxchildren(int)
+=head2 cfork_maxchildren(COUNT)
 
-Set/Reset the maximum number of children allowed.
+Set the maximum number of children to C<COUNT> when an argument is
+given, including zero. With no argument, leave the maximum alone.
+Returns the current maximum, or C<undef> if C<cfork_init> has not set
+one.
 
 =cut
 
 sub cfork_maxchildren {
-	$Proc::Fork::Control::HEAP->{max_children} = $_[0] if $_[0];
+	my ($count) = @_;
+	if (defined $count) {
+		$Proc::Fork::Control::HEAP->{max_children} = $count;
+	}
+	return $Proc::Fork::Control::HEAP->{max_children};
 }
 
-=head2 cfork_wait()
+=head2 cfork_wait(SECONDS)
 
-Block until all cfork() children have died off unless cfork_nonblocking() is enabled.
+Block until every child started by C<cfork> has exited.
+
+C<SECONDS>, when it is a positive number, is a timeout. The call then
+returns false if any child is still running when the timeout expires,
+and C<1> if every child has exited. A missing or invalid timeout waits
+without a deadline. The timeout is measured with L<Time::HiRes>, so a
+fraction of a second is honored.
+
+In nonblocking mode the call returns C<1> immediately and does not reap.
 
 =cut
 
@@ -334,69 +403,72 @@ sub cfork_wait {
 	my ($to) = @_;
 	return 1 if $Proc::Fork::Control::HEAP->{nonblocking};
 
-	$to = time + $to if $to;
-
-	my ($i, $delay);
-	while(1){
-		my $cl =_cleanup();
-
-		if(!$Proc::Fork::Control::HEAP->{children}){
-			last;
-		} elsif($to && time >= $to){
-			last;
-		}
-
-		if($Proc::Fork::Control::HEAP->{children}){
-			if($cl){
-				# There are still children alive, and we've cleaned up at least 1 
-				# child on the last iteration so don't delay at all.
-				$i = 0;
-				$delay = 0;
-			} else {
-				# There are still children alive, delay based on the number of interations
-				# Minimum delay time (in micro seconds)
-				$delay ||= 5;
-
-				# iterator for delay multiplication.
-				$i++;
-
-				$delay = $delay * $i;
-
-				# Maximum delay value
-				$delay = ($delay > 5000 ? 5000 : $delay);
-
-				# sleep for a while..
-				cfork_usleep($delay);
-			}
-		}
+	my $deadline;
+	if (defined $to && $to =~ /^\d+(?:\.\d+)?$/ && $to > 0) {
+		$deadline = Time::HiRes::time() + $to;
 	}
 
+	my $heap = $Proc::Fork::Control::HEAP;
+	my $i = 0;
+	my $delay = 0;
+	my $timed_out = 0;
+
+	while (1) {
+		my $cleaned = _cleanup();
+
+		if (!$heap->{children}) {
+			last;
+		}
+		if (defined $deadline && Time::HiRes::time() >= $deadline) {
+			$timed_out = 1;
+			last;
+		}
+
+		if ($cleaned) {
+			$i = 0;
+			$delay = 0;
+			next;
+		}
+
+		$delay ||= 5;
+		$i++;
+		$delay *= $i;
+		$delay = 5000 if $delay > 5000;
+		cfork_usleep($delay);
+	}
+
+	return if $timed_out;
 	return 1;
 }
 
-=head2 cfork_wait_pid(PID, PID, PID, ..)
+=head2 cfork_wait_pid(PID, ...)
 
-cfork_wait_pid() functions much like cfork_wait() with the exception that it expects a list of PID's and blocks until those PID's have died off.  Like cfork_wait(), cfork_wait_pid() will NOT block if cfork_nonblocking() mode is enabled.
+Wait until every given pid has exited. Pids do not have to be children
+started by this module. A pid that is not a positive integer is ignored.
+
+In nonblocking mode the call returns C<1> immediately.
+
+Returns 1. Dead processes are reaped while the call waits, so a zombie
+child does not keep the loop running.
 
 =cut
 
 sub cfork_wait_pid {
-	my (@PID) = @_;
+	my (@pids) = @_;
 
 	return 1 if $Proc::Fork::Control::HEAP->{nonblocking};
 
-	my $block;
-	while(1){
-		my @TPID;
-		for(my $i = 0; $i < @PID; $i++){
-			if(kill(undef, $PID[$i])){
-				push @TPID, $PID[$i];
-			}
+	while (1) {
+		_cleanup();
+
+		my @alive;
+		for my $pid (@pids) {
+			next unless defined $pid && $pid =~ /^\d+$/ && $pid > 0;
+			push @alive, $pid if kill(0, $pid);
 		}
 
-		@PID = (@TPID);
-
-		last if !@PID;
+		@pids = @alive;
+		last if !@pids;
 
 		cfork_usleep(5000);
 	}
@@ -404,151 +476,136 @@ sub cfork_wait_pid {
 	return 1;
 }
 
-
 =head2 cfork_active_children()
 
-Return the total number of active children.
+Return the number of children started by C<cfork> that are still
+running. Reaps exited children first.
 
 =cut
 
 sub cfork_active_children {
 	_cleanup();
-	return ($Proc::Fork::Control::HEAP->{children} ? $Proc::Fork::Control::HEAP->{children} : 0);
+	my $n = $Proc::Fork::Control::HEAP->{children};
+	return (defined $n && $n > 0) ? $n : 0;
 }
 
 =head2 cfork_daemonize(BOOL)
 
-Daemonize the the calling script.
+Detach the calling process.
 
-If <BOOL> is true write _ALL_ output to /dev/null.
+The call changes directory to C</> and forks. The process that called
+C<cfork_daemonize> then exits with status 4. The child becomes a new
+session leader and returns C<1>.
 
-If you have termination handling, i.e. %SIG and END {} block control, cfork_daemonize triggers exit signal 2. So... $? == 4
+When C<BOOL> is false or omitted, standard input, output, and error are
+reopened on C</dev/null> before the fork. A true value leaves them
+attached to whatever they are attached to now.
+
+Failures die. This is the behavior the function has had since 1.2.
 
 =cut
 
 sub cfork_daemonize {
-	my $q = $_[0];
+	my ($keep_stdio) = @_;
+
 	chdir('/') || die "Can't chdir to /: $!\n";
-	if(!$q){
-		open STDIN,  '/dev/null'   || die "Can't read /dev/null: $!\n";
-		open STDOUT, '>/dev/null'  || die "Can't write to /dev/null: $!\n";
-		open STDERR, '>&STDOUT'    || die "Can't dup stdout: $!";
+	if (!$keep_stdio) {
+		open STDIN,	 '<', '/dev/null' or die "Can't read /dev/null: $!\n";
+		open STDOUT, '>', '/dev/null' or die "Can't write to /dev/null: $!\n";
+		open STDERR, '>&', STDOUT	  or die "Can't dup stdout: $!\n";
 	}
 
-	defined(my $pid = fork) || die "Can't fork: $!\n";
+	my $pid = fork;
+	die "Can't fork: $!\n" unless defined $pid;
 	cfork_exit(4) if $pid;
 	setsid || die "Can't start a new session: $!\n";
+	return 1;
 }
 
-=head2 cfork_sleep(int)
+=head2 cfork_sleep(SECONDS)
 
-Provides an alarm safe sleep() wrapper. Beacuse we sleep() with in this, ALRM will be issued with in the fork once the sleep cycle has completed. This function wraps sleep with in a while() block and tests to make sure that the seconds requested for the sleep were slept.
+Sleep for C<SECONDS> whole seconds. If a signal interrupts the sleep
+early, the call keeps sleeping for the rest of the interval.
+
+Returns the number of seconds slept, which is C<SECONDS> when the call
+finishes the interval. Returns C<0> when C<SECONDS> is C<0>. Returns
+C<undef> when C<SECONDS> is not a non-negative integer.
 
 =cut
 
 sub cfork_sleep {
-	my $sleep = $_[0];
-	return if $sleep !~ /^\d+$/;
-
-	my $sleeper = 0;
-	my $slept = 0;
-
-	while(1){
-		if($sleeper < 0 || $sleep <= 0){
-			last;
-		} elsif(!$sleeper) {
-			$sleeper = $sleep;
-		}
-
-		my $remain = sleep( abs($sleeper) );
-
-		if($remain ne $sleeper && $remain < $sleep){
-			$slept += $remain;
-			$sleeper = $sleeper - $remain;
-
-			next;
-		} else {
-			last;
-		}
-	}
-
-	return $slept;
+	my ($seconds) = @_;
+	return _sleep_for($seconds, sub { sleep($_[0]) });
 }
 
-=head2 cfork_usleep(int)
+=head2 cfork_usleep(MICROSECONDS)
 
-Provides an alarm safe Time::HiRes usleep() wrapper. Beacuse we sleep() with in this, ALRM will be issued with in the fork once the sleep cycle has completed. This function wraps sleep with in a while() block and tests to make sure that the seconds requested for the sleep were slept.
+Sleep for C<MICROSECONDS>. Interrupted sleeps are resumed until the
+requested interval has elapsed, the same way as C<cfork_sleep>.
 
-This function is only avaliable if Time::HiRes is avaliable otherwise it will simply return nothing at all.
+Returns the number of microseconds slept. Returns C<0> when the argument
+is C<0>. Returns C<undef> when the argument is not a non-negative
+integer.
 
 =cut
 
 sub cfork_usleep {
-	my $sleep = $_[0];
-
-	my $sleeper = 0;
-	my $slept = 0;
-
-	while(1){
-		if($sleeper < 0 || $sleep <= 0){
-			last;
-		} elsif(!$sleeper) {
-			$sleeper = $sleep;
-		}
-
-		my $remain = usleep( abs($sleeper) );
-
-		if($remain ne $sleeper && $remain < $sleep){
-			$slept += $remain;
-			$sleeper = $sleeper - $remain;
-
-			next;
-		} else {
-			last;
-		}
-	}
-
-	return $slept;
+	my ($usec) = @_;
+	return _sleep_for($usec, sub { usleep($_[0]) });
 }
 
-=head2 cfork_ssleep(int)
+=head2 cfork_ssleep(SECONDS)
 
-Preform an cfork_sleep() except rather than using standard sleep() (with interruption handling) use a select() call to sleep. This can be useful in environments where sleep() does not behave correctly, and a select() will block for the desired number of seconds properly.
+Sleep for C<SECONDS> whole seconds using C<select>, for environments
+where C<sleep> returns early or not at all. A signal that wakes
+C<select> does not end the wait; the call loops until the interval has
+passed.
+
+Returns C<SECONDS>, or C<0> when the argument is C<0>. Returns C<undef>
+when the argument is not a non-negative integer.
 
 =cut
 
 sub cfork_ssleep {
-	$Proc::Fork::Control::HEAP->{select_sleep} = 1;
-	my $r = cfork_sleep(@_);
-	$Proc::Fork::Control::HEAP->{select_sleep} = 0;
-	return $r;
+	my ($sleep) = @_;
+	return if !defined $sleep || $sleep !~ /^\d+$/;
+	return 0 if $sleep == 0;
+
+	my $end = Time::HiRes::time() + $sleep;
+	while (1) {
+		my $left = $end - Time::HiRes::time();
+		last if $left <= 0;
+		select(undef, undef, undef, $left);
+	}
+	return $sleep + 0;
 }
 
 =head2 cfork_kill_children(SIGNAL)
 
-Send all children (if any) this <SIGNAL>.
+Send C<SIGNAL> to every child still tracked by this process. The signal
+defaults to C<TERM>.
 
-If the <SIGNAL> argument is omitted kill TERM will be used.
+Returns the number of processes signaled, or C<0> when there are none.
 
 =cut
 
 sub cfork_kill_children {
-	my $sig = $_[0];
+	my ($sig) = @_;
 	_cleanup();
-	if(!$sig){
-		$sig = 'TERM';
-	}
+	$sig = 'TERM' unless defined $sig && $sig ne '';
 
-	if($Proc::Fork::Control::HEAP->{cidlist}){
-		kill($sig, keys %{ $Proc::Fork::Control::HEAP->{cidlist} });
-	}
+	my $list = $Proc::Fork::Control::HEAP->{cidlist} || {};
+	my @pids = keys %{$list};
+	return 0 unless @pids;
+	return kill($sig, @pids);
 }
 
-=head2 cfork_list_children(BOOL)
+=head2 cfork_list_children(AS_HASH)
 
-Return a list of PID's currently running under this fork.
+Return the pids of children that are still running.
 
-If BOOL is true a hash will be returned rather than a list.
+When C<AS_HASH> is true, return those pids paired with the epoch second
+each child was started, as a list suitable for assignment to a hash.
 
 =cut
 
@@ -556,81 +613,132 @@ sub cfork_list_children {
 	my ($use_hash) = @_;
 	_cleanup();
 
-	if(!$Proc::Fork::Control::HEAP->{cidlist}){
-		return;
+	my $list = $Proc::Fork::Control::HEAP->{cidlist} || {};
+	if ($use_hash) {
+		return %{$list};
 	}
-
-	if($use_hash){
-		return (%{ $Proc::Fork::Control::HEAP->{cidlist} });
-	} else {
-		return keys %{ $Proc::Fork::Control::HEAP->{cidlist} };
-	}
+	return keys %{$list};
 }
 
 =head2 cfork_child_dob(PID)
 
-Return the EPOCH Date of Birth for this childs <PID>
+Return the epoch second at which this process started C<PID> with
+C<cfork>.
 
-Returns 0 if no child exists under that PID for this fork.
+Return C<undef> when C<PID> is not a child still tracked here. Reaped
+children are forgotten.
 
 =cut
 
 sub cfork_child_dob {
-	my $pid = $_[0];
+	my ($pid) = @_;
 	_cleanup();
-	if($Proc::Fork::Control::HEAP->{cidlist}->{$pid}){
-		return $Proc::Fork::Control::HEAP->{cidlist}->{$pid};
-	} else {
-		return;
-	}
+	return if !defined $pid || $pid !~ /^\d+$/;
+
+	my $list = $Proc::Fork::Control::HEAP->{cidlist};
+	return if !$list || !exists $list->{$pid} || !$list->{$pid};
+	return $list->{$pid};
 }
 
-# Child handler
+=head1 AUTHOR
+
+Colin Faber, C<cfaber@fpsn.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2026 Colin Faber
+
+The source of this module is released under the GNU General Public
+License, version 2. The license text is in F<LICENSE.GPL>. This
+distribution also includes the Artistic License 1.0 in F<LICENSE>, as it
+has since the first public release.
+
+=head1 SUPPORT
+
+Please report bugs at
+L<https://github.com/cfaber/Proc-Fork-Control/issues>.
+
+=cut
+
+# A zero or undefined return is not proof that the interval finished.
+# Stop if the platform reports no progress, so a bad return cannot spin.
+sub _sleep_for {
+	my ($requested, $once) = @_;
+	return if !defined $requested || $requested !~ /^\d+$/;
+	return 0 if $requested == 0;
+
+	my $left = $requested + 0;
+	my $slept = 0;
+	my $stalls = 0;
+
+	while ($left > 0) {
+		my $got = $once->($left);
+		if (!defined $got || ref($got) || $got !~ /^-?\d+(?:\.\d+)?$/) {
+			return $slept + $left;
+		}
+
+		$got += 0;
+		if ($got <= 0) {
+			$stalls++;
+			return $slept if $stalls > 2;
+			next;
+		}
+
+		$stalls = 0;
+		$slept += $got;
+		last if $got >= $left;
+		$left -= $got;
+	}
+
+	return $slept;
+}
+
 sub _sigchld {
-	my $our;
-	while((my $p = waitpid(-1, WNOHANG)) > 0){
-		# Mark the process is done ONLY if it's one of our processes.
-		if($Proc::Fork::Control::HEAP->{cidlist}->{$p}){
-			$Proc::Fork::Control::HEAP->{cidlist}->{$p} = 0;
-			$our = 1;
+	my $ours;
+	my $heap = $Proc::Fork::Control::HEAP;
+	return unless $heap && $heap->{cidlist};
+
+	while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
+		if (exists $heap->{cidlist}->{$pid}) {
+			$heap->{cidlist}->{$pid} = 0;
+			$ours = 1;
 		}
 	}
 
-	# self reference only if it's one of our processes.
-	if($our){
+	if ($ours) {
 		$SIG{CHLD} = \&Proc::Fork::Control::_sigchld;
 	}
+	return;
 }
 
-
-# clean up lists - thanks to gmargo@perlmonks for this idea.
+# Drop reaped and vanished pids. Keys are copied first; deleting from a
+# hash while iterating it can skip entries.
 sub _cleanup {
-	my $i = 0;
-	my @dpid = grep { $Proc::Fork::Control::HEAP->{cidlist}->{$_} == 0 } keys %{ $Proc::Fork::Control::HEAP->{cidlist} };
-	if(@dpid){
-		for(@dpid){
-			if(exists $Proc::Fork::Control::HEAP->{cidlist}->{$_}){
-				delete $Proc::Fork::Control::HEAP->{cidlist}->{$_};
-				$i++;
+	my $heap = $Proc::Fork::Control::HEAP;
+	return 0 unless $heap && $heap->{cidlist};
 
-				$Proc::Fork::Control::HEAP->{children} -- if $Proc::Fork::Control::HEAP->{children};        
-			}
-		}
+	my $removed = 0;
+	my @done = grep {
+		defined $heap->{cidlist}->{$_} && $heap->{cidlist}->{$_} == 0
+	} keys %{ $heap->{cidlist} };
+
+	for my $pid (@done) {
+		next unless exists $heap->{cidlist}->{$pid};
+		delete $heap->{cidlist}->{$pid};
+		$removed++;
+		$heap->{children}-- if $heap->{children};
 	}
 
-	# Do some additional checks to see if these children are really alive.
-	for(keys %{ $Proc::Fork::Control::HEAP->{cidlist} }){
-		if(!kill(0, $_)){
-			if(exists $Proc::Fork::Control::HEAP->{cidlist}->{$_}){
-				delete $Proc::Fork::Control::HEAP->{cidlist}->{$_};
-				$i++;
-
-				$Proc::Fork::Control::HEAP->{children} -- if $Proc::Fork::Control::HEAP->{children};
-			}
-		}
+	my @pids = keys %{ $heap->{cidlist} };
+	for my $pid (@pids) {
+		next unless exists $heap->{cidlist}->{$pid};
+		next if kill(0, $pid);
+		delete $heap->{cidlist}->{$pid};
+		$removed++;
+		$heap->{children}-- if $heap->{children};
 	}
 
-	return $i;
+	return $removed;
 }
 
 1;

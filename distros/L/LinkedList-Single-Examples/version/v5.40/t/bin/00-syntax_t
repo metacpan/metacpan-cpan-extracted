@@ -1,0 +1,73 @@
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Testy;
+use v5.40;
+
+use File::Basename;
+use Test::More;
+
+########################################################################
+# the subject is the path in the basename of this symlink, with the
+# separator that leads it standing for '/'.
+########################################################################
+
+my $base0   = basename $0 => qw( .t );
+my $sep     = substr $base0, 0, 1;
+my $path    = $base0 =~ s{$sep}{/}gr;
+
+# the libraries are what FindBin::libs would find for the subject: every
+# lib directory above it, nearest first. in the source tree that includes
+# the lib of LinkedList::Single itself, further up.
+
+my @lib;
+
+for( my $dir = dirname $path; $dir ne '/' && $dir ne '.'; $dir = dirname $dir )
+{
+    -d "$dir/lib"
+    and push @lib, "$dir/lib";
+}
+
+########################################################################
+# tests
+########################################################################
+
+try
+{
+    for( $path )
+    {
+        -e      or die "Non-existant: '$path' ($base0)\n";
+        -r _    or die "Non-readable: '$path' ($base0)\n";
+        -s _    or die "Zero-size: '$path' ($base0)\n";
+    }
+
+    my $inc     = join ' ' => map { "-I$_" } @lib;
+    my $output  = qx{ perl -wc $inc $path 2>&1 };
+
+    $output =~ m{ syntax \s OK \s* \z }x
+    or die $output;
+
+    $output eq "$path syntax OK\n"
+    or diag $output;
+
+    pass "Usable: '$path'";
+}
+catch( $err )
+{
+    fail "Unusable: '$path'";
+    diag $err;
+}
+
+done_testing
+__END__
+
+=head1 NAME
+
+00-syntax_t - C<perl -wc> for every perl file in the examples
+
+=head1 DESCRIPTION
+
+One symlink to this file per module and program (see
+C<t/bin/install-unit>). The include path is every C<lib> directory above
+the file, as C<FindBin::libs> would find them. Any output besides
+"syntax OK" (a warning) is shown as a diagnostic.

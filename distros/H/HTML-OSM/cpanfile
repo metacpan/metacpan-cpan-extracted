@@ -24,14 +24,14 @@ on 'configure' => sub {
 on 'test' => sub {
 	requires 'File::Temp';
 	requires 'HTTP::Response';
+	requires 'IO::Socket::INET';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
 	requires 'Test::HTTPStatus';
 	requires 'Test::Memory::Cycle';
-	requires 'Test::Mockingbird';
+	requires 'Test::Mockingbird', '0.03';   # mock 'Pkg::method' => sub {...} shorthand
 	requires 'Test::Most';
 	requires 'Test::Needs';
-	requires 'Test::RequiresInternet';
 	requires 'Test::Returns';
 	requires 'Test::Which';
 	requires 'Test::Without::Module';

@@ -1,5 +1,17 @@
 Revision history for HAMT
 
+0.04    2026-11-04
+        - Fix the ABI selftest, which let go of a struct the object owned when a store
+          into a borrowed transient failed, and read a copy that had not been made
+        - A test door fails the n-th allocation, and every operation is starved through
+          it: each allocation it makes fails once, with nothing leaked and the inputs kept
+        - Test every checker rule on a trie or a vector broken that one way, the persistent
+          put and delete, a handle cloned into a thread, and the paths the rest walked past
+        - More selftest steps: releasing nothing, a resolver handing back either side, no
+          count or status asked for, the value already there, and vectors of unequal length
+        - The C is at 100% statement, branch, condition and subroutine coverage under
+          Devel::XSCover on clang and gcc 14, with the unreachable marked
+
 0.03    2026-10-15
         - Fix: pairs panicked on DEBUGGING perls 5.28 to 5.36
 

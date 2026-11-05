@@ -17,6 +17,14 @@ use Time::HiRes ();
 
 plan skip_all => 'hypnotoad requires a UNIX-like system' if $^O eq 'MSWin32';
 
+# Slow machines, such as CPAN smokers on a Raspberry Pi, can take well over
+# 15 seconds to start hypnotoad.  They set PERL_TEST_TIME_OUT_FACTOR, and
+# every wait below is multiplied by it.  A wait only lasts its full length
+# when something is wrong, so a generous one costs nothing on a fast machine.
+my $TIME_FACTOR = ((($ENV{PERL_TEST_TIME_OUT_FACTOR} // '') =~ /^\d+(?:\.\d+)?$/a) && ($ENV{PERL_TEST_TIME_OUT_FACTOR} > 1))
+	? $ENV{PERL_TEST_TIME_OUT_FACTOR} : 1;
+my $STARTUP_WAIT = 60 * $TIME_FACTOR;	# seconds for hypnotoad to answer
+
 my $hypnotoad;
 for my $dir (dirname(File::Spec->rel2abs($^X)), split(/\Q$Config{path_sep}\E/, $ENV{PATH} // '')) {
 	next unless defined($dir) && length($dir);
@@ -105,9 +113,9 @@ if (!$server_pid) {
 $server_group = 1;
 
 my $base = "http://127.0.0.1:$port";
-my $ua   = Mojo::UserAgent->new(connect_timeout => 1, request_timeout => 5);
+my $ua   = Mojo::UserAgent->new(connect_timeout => 1 * $TIME_FACTOR, request_timeout => 5 * $TIME_FACTOR);
 my ($first, $ready);
-my $deadline = Time::HiRes::time() + 15;
+my $deadline = Time::HiRes::time() + $STARTUP_WAIT;
 while (Time::HiRes::time() < $deadline) {
 	my $tx = $ua->get("$base/expensive" => {Connection => 'close'});
 	if ($tx->res && $tx->res->is_success && ($tx->res->code == 200)) {
@@ -123,7 +131,7 @@ if (!$ready) {
 	fail('the example started under hypnotoad') or diag("Server log:\n" . read_file($log));
 	stop_server();
 	done_testing();
-	return;
+	exit;
 }
 
 ok(1, 'the example started under hypnotoad');

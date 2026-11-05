@@ -153,7 +153,7 @@ eo_strip_amp(pTHX_ SV *sv)
     if (len && *s == '&') {
         s++; /* # uncoverable statement */
         len--; /* # uncoverable statement */
-    } /* # uncoverable statement */
+    }
     return newSVpvn_flags(s, len, SVs_TEMP | (SvUTF8(sv) ? SVf_UTF8 : 0));
 }
 

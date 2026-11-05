@@ -1,4 +1,12 @@
 Revision history for Dist-Conformance
 
+0.002 2026-11-04 TEODESIAN
+    - CriticProfile compares the policies of the profile with those of its
+      template, and fails with the name of each policy that the template
+      enables and the profile neither enables nor turns off with [-Name].
+      Before, it compared only the first line, so a profile kept passing
+      after its template gained a policy.  The keys header and outdated are
+      deprecated and ignored; a flavor that names them still loads.
+
 0.001 2026-11-02 TEODESIAN
     - Initial Release

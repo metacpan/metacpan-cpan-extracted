@@ -91,6 +91,9 @@ static hamt_node *hamt_node_new(void *cx, uint32_t nslots) {
 }
 
 static hamt_node *hamt_node_retain(hamt_node *n) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (n->refcnt == 0xffffffffU) HAMT_FATAL("a node's reference count would wrap");
     n->refcnt++;
     return n;
@@ -102,6 +105,9 @@ static hamt_node *hamt_node_retain(hamt_node *n) {
 static void hamt_node_adopt(hamt_node *n, uint32_t skip) {
     uint32_t nd = hamt_node_ndata(n), N = hamt_node_nslots(n), i;
     for (i = 0; i < nd; i++)
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 */
         if (i != skip) hamt_entry_retain((hamt_entry *)n->slot[i]);
     for (; i < N; i++)
         if (i != skip) hamt_node_retain((hamt_node *)n->slot[i]);
@@ -241,6 +247,9 @@ static hamt_node *hamt_node_child_to_entry(void *cx, const hamt_node *n,
 /* A collision node with one more entry at its end. */
 static hamt_node *hamt_node_coll_add(void *cx, const hamt_node *n, hamt_entry *e) {
     hamt_node *r;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (n->ncoll == 0xffffffffU) return NULL;
     r = hamt_node_new(cx, n->ncoll + 1);
     if (!r) return NULL;

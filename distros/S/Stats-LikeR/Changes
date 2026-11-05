@@ -1,5 +1,23 @@
 Revision history for Stats-LikeR
 
+0.3415 2026-11-04 CST (Claude Opus 5.5 helped)
+
+ [Windows: build]
+
+ - Stats::LikeR builds on Windows again. alloc_probe_ok(), which lets
+   matrix(), runif(), rnorm(), rbinom() and add_data() croak rather than
+   exit when the memory a count asks for is not there, called malloc()
+   without the interpreter context. Every Windows perl defines
+   PERL_IMPLICIT_SYS, under which XSUB.h makes malloc() and free() into
+   PerlMem_malloc() and PerlMem_free(), and those need it: a Strawberry
+   5.42.3 smoker of 0.3414 stopped at "'my_perl' undeclared". That
+   allocator returns NULL rather than aborting, so the croak is unchanged.
+
+ - No Linux perl can be built with PERL_IMPLICIT_SYS, so the author's
+   matrix script now also compiles LikeR.c with it defined against a
+   threaded perl's headers. Against 0.3414 that reports the smoker's error
+   and nothing else.
+
 0.3414 2026-11-02 CST (Claude Opus 5.5 helped)
 
  [Distribution metadata]

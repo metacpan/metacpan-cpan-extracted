@@ -39,6 +39,10 @@ Readonly my $GEOCODE  => 'Database::BI::Model::Geocode';
 Readonly my $BACKEND  => 'Database::Abstraction';
 Readonly my $GCF      => 'Geo::Coder::Free';
 Readonly my $GCF_FILE => 'Geo/Coder/Free.pm';
+# Geocode puts Geo::Coder::Free in a Geo::Coder::List.  The transitions here are
+# about the local geocoder, so the list is a stand-in too, whether or not the
+# real one is installed (CI installs no recommended modules).
+Readonly my $GCL_FILE => 'Geo/Coder/List.pm';
 
 # The states of DataSource, as the diagram spells them.
 Readonly my $START         => '[START]';
@@ -138,6 +142,14 @@ Readonly my $CAP          => 2;
 		$self->{opts} = \%opts;
 		return { map { $_ => $self->{known}{$_} } @{$values} };
 	}
+}
+{
+	# Geo::Coder::List as far as building one goes: new() and push(), which
+	# returns the list so that calls chain.
+	package Local::FakeList;
+
+	sub new  { my ($class, %args) = @_; return bless { %args, geocoders => [] }, $class }
+	sub push { my ($self, $geocoder) = @_; push @{ $self->{geocoders} }, $geocoder; return $self }
 }
 {
 	# Has neither method a geocoder needs.
@@ -837,6 +849,9 @@ _transition($CONSTRUCTED, 'first call, module OK', $READY, sub {
 	local $Geo::Coder::Free::VERSION = $HIGH_VERSION;
 	local *Geo::Coder::Free::new;
 	_install_fake_gcf(\$made);
+	local $INC{$GCL_FILE} = __FILE__;
+	local $Geo::Coder::List::VERSION = $HIGH_VERSION;
+	local *Geo::Coder::List::new = sub { shift; return Local::FakeList->new(@_) };
 	my $loads = _count_calls($GEOCODE, '_load_geocoder');
 
 	my $geocode = $GEOCODE->new;
@@ -860,6 +875,9 @@ _transition($CONSTRUCTED, 'the module loads and its new() dies', $CONSTRUCTED, s
 	local $INC{$GCF_FILE} = __FILE__;
 	no warnings qw(once redefine);
 	local $Geo::Coder::Free::VERSION = $HIGH_VERSION;
+	local $INC{$GCL_FILE} = __FILE__;
+	local $Geo::Coder::List::VERSION = $HIGH_VERSION;
+	local *Geo::Coder::List::new = sub { shift; return Local::FakeList->new(@_) };
 	local *Geo::Coder::Free::new = sub {
 		$built++;
 		die "no data files\n" if $built == 1;
@@ -915,6 +933,9 @@ _transition($CONSTRUCTED, 'first call, its new() answers nothing', $UNAVAILABLE,
 	no warnings qw(once redefine);
 	local $Geo::Coder::Free::VERSION = $HIGH_VERSION;
 	local *Geo::Coder::Free::new = sub { return };
+	local $INC{$GCL_FILE} = __FILE__;
+	local $Geo::Coder::List::VERSION = $HIGH_VERSION;
+	local *Geo::Coder::List::new = sub { shift; return Local::FakeList->new(@_) };
 
 	my $geocode = $GEOCODE->new;
 	my ($available, $reason) = $geocode->geocoder_available;

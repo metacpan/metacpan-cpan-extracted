@@ -27,6 +27,9 @@
 static size_t hamt_node_count(const hamt_node *n) {
     uint32_t nd, N, i;
     size_t total;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!n) return 0;
     nd = hamt_node_ndata(n);
     N  = hamt_node_nslots(n);
@@ -49,6 +52,10 @@ typedef struct hamt_eq_ctx {
 
 static int hamt_val_same(hamt_eq_ctx *c, void *va, void *vb) {
     if (va == vb) return 1;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     if (!va || !vb) return 0;
     if (c->eq) return c->eq(c->ud, c->cx, va, vb);
     return HAMT_VAL_EQ(c->cx, va, vb) ? 1 : 0;
@@ -60,10 +67,15 @@ static int hamt_node_equal(hamt_eq_ctx *c, const hamt_node *a, const hamt_node *
     uint32_t nd, N, i, j;
 
     if (a == b) return 1;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable branch true count:1 class:ignore_covered_err
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     if (!a || !b) return 0;
     c->visits++;
 
-    if (a->datamap != b->datamap || a->nodemap != b->nodemap || a->ncoll != b->ncoll)
+    if (a->datamap != b->datamap || a->nodemap != b->nodemap || a->ncoll != b->ncoll) /* # uncoverable condition left count:2 */
         return 0;
     nd = hamt_node_ndata(a);
     N  = hamt_node_nslots(a);
@@ -177,6 +189,9 @@ static hamt_node *hamt_coll_merge(hamt_merge_ctx *c, hamt_node *a, hamt_node *b)
     int same_a = 1, same_b = 1;
     hamt_node *r = NULL;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (cap > 0xffffffffU) { c->err = HAMT_ERR_OOM; return NULL; }
     list = (hamt_entry **)HAMT_ALLOC(c->cx, bytes);
     if (!list) { c->err = HAMT_ERR_OOM; return NULL; }
@@ -398,6 +413,9 @@ static int hamt_diff_same_key(hamt_diff_ctx *c, hamt_entry *ea, hamt_entry *eb) 
     int rc;
     if (ea == eb) return 0;
     rc = hamt_val_same(&c->eq, ea->val, eb->val);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (rc < 0) return HAMT_ERR_ABORT;
     return rc ? 0 : hamt_diff_report(c, HAMT_DIFF_CHANGE, ea, eb);
 }
@@ -780,7 +798,7 @@ static hamt_part hamt_node_subtract(hamt_set_ctx *c, hamt_node *a, hamt_node *b,
                                                eb->utf8, eb->hash, &status);
                 same = 0;
                 c->removed++;
-                if (status == HAMT_DEL_OOM || !sub) { c->err = HAMT_ERR_OOM; break; }
+                if (status == HAMT_DEL_OOM || !sub) { c->err = HAMT_ERR_OOM; break; } /* # uncoverable condition left count:2 */
                 if (hamt_node_is_single(sub)) {     /* down to one: it moves up */
                     rd[nd++] = hamt_entry_retain((hamt_entry *)sub->slot[0]);
                     datamap |= bit;

@@ -11,7 +11,13 @@ plan skip_all => 'no cover script found' unless XSCoverTest::cover_script();
 
 my ($tmp, $db, $dir, $perl_tmp, $perl) = XSCoverTest::report_db();
 XSCoverTest::run_report($db, $dir);
-sub page { my $f = File::Spec->catfile($db, shift); open my $fh, '<', $f or die "$f: $!"; local $/; <$fh> }
+sub page {
+    my $f = File::Spec->catfile($db, shift);
+    open my $fh, '<', $f or die "$f: $!";
+    my $text = do { local $/; <$fh> };
+    close $fh;
+    return $text;
+}
 
 my $summary = page('coverage.html');
 like($summary, qr/<h1>Coverage summary<\/h1>/, 'the title');
@@ -51,7 +57,9 @@ like($helper, qr/<span class="sub c3" title="only_from_one: called 2">only_from_
 like($xs, qr/<td class="st"><span class="c3" title="statements: 353062">353062<\/span><\/td>/, 'a statement count');
 unlike($xs, qr/class="cd"/, 'no condition column for a C file');
 
-my ($pm_page) = do { opendir my $dh, $db or die; grep { /Spike-pm\.html$/ } readdir $dh };
+opendir my $dh, $db or die;
+my ($pm_page) = grep { /Spike-pm\.html$/ } readdir $dh;
+closedir $dh;
 my $pm = page($pm_page);
 like($pm, qr/<details class="cond"><summary class="c\d" title="\$a and \$b">\d+%<\/summary><table/, 'a condition opens into its truth table');
 like($pm, qr/<span class="sub c0" title="unused: called 0">unused<\/span>/, 'the never-called sub is marked');

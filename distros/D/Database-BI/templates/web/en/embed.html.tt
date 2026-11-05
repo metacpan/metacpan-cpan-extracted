@@ -58,6 +58,10 @@ body {
 }
 .visual-card-body svg { max-width: 100%; height: auto; }
 .visual-error { color: #dc3545; padding: 0.5rem; font-size: 0.82rem; }
+/* A map marker's rows (_map_popup): the box scrolls, set inline. */
+.bi-map-popup-rows { margin-top: 0.3em; }
+.bi-map-popup-rows table { border-collapse: collapse; font-size: 90%; }
+.bi-map-popup-rows th, .bi-map-popup-rows td { padding: 0.1em 0.6em 0.1em 0; text-align: left; vertical-align: top; white-space: nowrap; }
 </style>
 </head>
 <body>

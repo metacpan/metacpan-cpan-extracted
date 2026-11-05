@@ -101,8 +101,10 @@ XS_EXTERNAL(boot_Abs)
 }
 C
 my $far = $xs->map('Abs.c');
-is_deeply($far->{files}, [$abs], 'a #line naming the xs by an absolute path, as an out-of-tree build writes, keeps that path');
-is_deeply([ $xs->subroutines($far) ], [ { c_name => 'XS_Abs_far', file => $abs, line => 4, names => ['Abs::far'] } ], 'and the declaration is read from there');
+my $abs_name = $abs;
+$abs_name =~ s{\\}{/}g if $^O eq 'MSWin32';
+is_deeply($far->{files}, [$abs_name], 'a #line naming the xs by an absolute path, as an out-of-tree build writes, keeps that path, spelt with slashes on Windows');
+is_deeply([ $xs->subroutines($far) ], [ { c_name => 'XS_Abs_far', file => $abs_name, line => 4, names => ['Abs::far'] } ], 'and the declaration is read from there');
 
 put('Win.c', <<'C');
 #line 1 "deep\Win.xs"

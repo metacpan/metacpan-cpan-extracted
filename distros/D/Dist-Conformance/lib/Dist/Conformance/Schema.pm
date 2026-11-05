@@ -1,4 +1,4 @@
-package Dist::Conformance::Schema 0.001;
+package Dist::Conformance::Schema 0.002;
 
 # ABSTRACT: Parse YAML and JSON, and validate the result against a schema
 
@@ -87,7 +87,7 @@ Dist::Conformance::Schema - Parse YAML and JSON, and validate the result against
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

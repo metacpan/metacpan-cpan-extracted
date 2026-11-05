@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::SortedMerge::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::SortedMerge;
+
+########################################################################
+# two services each keep an event log in time order. one report is
+# wanted in time order, and a second, from a batch that arrived in any
+# order, sorted by the same rule. events are [ $time, $service, $what ].
+########################################################################
+
+sub show( $sorter, $label, $list )
+{
+    say "$label:";
+
+    say sprintf '  t=%-3d %-6s %s', $_->@*
+    for $sorter->contents( $list )->@*;
+}
+
+sub run( $class )
+{
+    my $sorter  = LinkedList::Single::Example::SortedMerge->new( how => 'copy' );
+
+    my $web     = $sorter->build
+    (
+        [  3, 'web',  'login' ]
+      , [  8, 'web',  'view'  ]
+      , [ 12, 'web',  'buy'   ]
+      , [ 20, 'web',  'logout' ]
+    );
+
+    my $db      = $sorter->build
+    (
+        [  1, 'db',   'connect' ]
+      , [  8, 'db',   'query'   ]
+      , [ 15, 'db',   'commit'  ]
+    );
+
+    # equal times: the web event stays ahead of the db event, because
+    # the left input wins ties.
+
+    my $both    = $sorter->merge( $web, $db );
+
+    show $sorter, 'merged', $both;
+
+    say 'inputs consumed: ', ( $web || $db ) ? 'no' : 'yes';
+
+    my $late    = $sorter->build
+    (
+        [ 30, 'cron', 'rotate' ]
+      , [  2, 'cron', 'start'  ]
+      , [ 16, 'cron', 'tick'   ]
+      , [  9, 'cron', 'tick'   ]
+    );
+
+    show $sorter, 'sorted', $sorter->merge_sort( $late );
+
+    $both
+}
+
+__PACKAGE__->run
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+sorted-merge - demonstration of LinkedList::Single::Example::SortedMerge
+
+=head1 SYNOPSIS
+
+    perl app/50-SortedMerge/sorted-merge
+
+=head1 DESCRIPTION
+
+Merges two sorted event logs and sorts a third. See L<LinkedList::Single::Example::SortedMerge::POD>
+for what the example is meant to show.

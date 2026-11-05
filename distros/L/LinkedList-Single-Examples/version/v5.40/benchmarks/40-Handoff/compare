@@ -1,0 +1,333 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Handoff::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Devel::Size qw( total_size );
+use Time::HiRes qw( time );
+
+use LinkedList::Single::Example::Bench  qw( array_bytes complexity list_bytes );
+use LinkedList::Single::Example::Handoff;
+use LinkedList::Single::Example::Handoff::Array;
+use LinkedList::Single::Example::Handoff::Marked;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: the memory runs fork, and a child must not inherit (and
+# then print a second copy of) output the parent has not yet written.
+
+$|  = 1;
+
+# with an argument, only the timing scenarios whose title matches it
+# are run (perl benchmarks/40-Handoff/compare Whole).
+
+my $only    = shift // '';
+
+my @length  = ( 1_000, 20_000, 200_000 );
+my $reps    = 3;
+
+my %impl
+= (
+    'list'          => sub { LinkedList::Single::Example::Handoff->new }
+  , 'array-swap'    => sub { LinkedList::Single::Example::Handoff::Array->new( drain => 'swap' ) }
+  , 'array-copy'    => sub { LinkedList::Single::Example::Handoff::Array->new( drain => 'copy' ) }
+  , 'array-mark'    => sub { LinkedList::Single::Example::Handoff::Marked->new }
+);
+
+my @impl    = ( 'list', 'array-swap', 'array-copy', 'array-mark' );
+
+########################################################################
+# utility
+########################################################################
+
+# build a queue of $n items outside of the timing, run $work on it,
+# and report how long the lock was held and how long it all took, as
+# the best of $reps runs of each.
+
+sub trial( $name, $n, $work )
+{
+    my( $held, $total, $walked, $purged );
+
+    for( 1 .. $reps )
+    {
+        my $queue   = $impl{ $name }->();
+
+        $queue->enqueue( 'job', $_ ) for 1 .. $n;
+
+        my $walk0   = $queue->walked;
+        my $purge0  = $queue->purged;
+
+        $queue->lock->reset;
+
+        my $start   = time;
+
+        $work->( $queue, $n );
+
+        my $took    = time - $start;
+        my $held_s  = $queue->lock->held_secs;
+
+        if( ! defined $total || $took < $total )
+        {
+            $total  = $took;
+        }
+
+        if( ! defined $held || $held_s < $held )
+        {
+            $held   = $held_s;
+        }
+
+        $walked = $queue->walked - $walk0;
+        $purged = $queue->purged - $purge0;
+    }
+
+    return
+    {
+        name    => $name
+      , held    => $held
+      , total   => $total
+      , walked  => $walked
+      , purged  => $purged
+    };
+}
+
+sub table( $title, @row )
+{
+    say "\n$title";
+
+    say sprintf '%-12s %10s %10s %10s %10s'
+    => qw( case held_secs total_secs walked purged );
+
+    say sprintf '%-12s %10.6f %10.6f %10d %10d'
+    =>  $_->{ name }, $_->{ held }, $_->{ total }, $_->{ walked }, $_->{ purged }
+    for @row;
+}
+
+# resident memory in bytes.
+
+sub rss()
+{
+    open my $fh, '<', '/proc/self/statm'
+    or die "Botched rss: /proc/self/statm: $!\n";
+
+    my( undef, $pages ) = split ' ', scalar <$fh>;
+
+    $pages * 4096
+}
+
+########################################################################
+# scenarios
+########################################################################
+
+# whole queue: the case where an array can swap references.
+
+my $drain
+= sub( $queue, $n )
+{
+    my $batch   = $queue->drain;
+
+    $queue->process( $batch, sub( @ ) { } );
+};
+
+# at most 50 at a time, a hundred times, each batch worked outside.
+
+my $bounded
+= sub( $queue, $n )
+{
+    for( 1 .. 100 )
+    {
+        my $batch   = $queue->take( 50 );
+
+        $queue->process( $batch, sub( @ ) { } );
+    }
+};
+
+# 200 queued items cancelled, spread over the whole queue; the same
+# ids for every implementation.
+
+my $cancel
+= sub( $queue, $n )
+{
+    srand 20261030;
+
+    $queue->cancel( 1 + int rand $n ) for 1 .. 200;
+};
+
+# 200 times: take 100, do 50, give the other 50 back to the front.
+
+my $requeue
+= sub( $queue, $n )
+{
+    for( 1 .. 200 )
+    {
+        my $batch   = $queue->take( 100 );
+
+        $queue->process( $batch, sub( @ ) { }, 50 );
+
+        $queue->requeue( $batch );
+    }
+};
+
+########################################################################
+# memory: build in a fresh process so the allocator starts clean. this
+# has to run first: perl keeps what it frees, so once the timing runs
+# below have built and dropped big queues, a child inherits that heap
+# and a new queue appears to cost nothing.
+########################################################################
+
+say "\nResident memory to hold a queue of 200000 items (payload 'job', n)";
+
+say sprintf '%-12s %14s', 'case', 'bytes';
+
+for my $name ( 'list', 'array-swap', 'array-mark' )
+{
+    my $pid = open my $kid, '-|'
+    // die "Botched fork: $!\n";
+
+    if( ! $pid )
+    {
+        my $before  = rss;
+        my $queue   = $impl{ $name }->();
+
+        $queue->enqueue( 'job', $_ ) for 1 .. 200_000;
+
+        say rss() - $before;
+
+        exit
+    }
+
+    my $bytes   = <$kid>;
+
+    close $kid;
+
+    chomp $bytes;
+
+    say sprintf '%-12s %14d', $name, $bytes;
+}
+
+########################################################################
+# run
+########################################################################
+
+my @scenario
+= (
+    [ 'Whole-queue hand-off: drain, then process everything'    => $drain   ]
+  , [ 'Bounded batches: 100 x take(50), each processed'         => $bounded ]
+  , [ 'Cancel by handle: 200 random items'                      => $cancel  ]
+  , [ 'Take 100, process 50, requeue 50: 200 times'             => $requeue ]
+);
+
+for my $s ( @scenario )
+{
+    my( $title, $work ) = $s->@*;
+
+    $title =~ m{ $only }x
+    or next;
+
+    for my $n ( @length )
+    {
+        table "$title; queue of $n"
+        => map { trial $_, $n, $work } @impl;
+    }
+}
+
+########################################################################
+# memory after a burst has been drained and worked off.
+########################################################################
+
+say "\nContainer bytes left after a burst of 200000 is drained and processed";
+
+say sprintf '%-12s %14s', 'case', 'bytes';
+
+for my $name ( @impl )
+{
+    my $queue   = $impl{ $name }->();
+
+    $queue->enqueue( 'job', $_ ) for 1 .. 200_000;
+
+    $queue->process( $queue->drain, sub( @ ) { } );
+
+    my $bytes
+    = $name eq 'list'
+    ? list_bytes( $queue->{ list } ) + 0
+    : array_bytes( $queue->{ queue } )
+    ;
+
+    say sprintf '%-12s %14d', $name, $bytes;
+}
+
+########################################################################
+# memory after cancelling most of a queue. the search-based array is
+# left out: 180,000 cancels of a 200,000 item array take hours.
+#
+# the list gives its nodes back as they are dropped; the marked array
+# keeps a husk for every cancelled item until something takes it.
+# bytes here are the items themselves, not the index beside them.
+########################################################################
+
+say "\nBytes held by the items after cancelling 180000 of 200000 queued";
+
+say sprintf '%-12s %14s', 'case', 'bytes';
+
+for my $name ( 'list', 'array-mark' )
+{
+    my $queue   = $impl{ $name }->();
+
+    $queue->enqueue( 'job', $_ ) for 1 .. 200_000;
+
+    srand 20261030;
+
+    my @id      = 1 .. 200_000;
+
+    # shuffle, and cancel the first 180,000.
+
+    for my $at ( reverse 1 .. $#id )
+    {
+        my $swap        = int rand( $at + 1 );
+
+        @id[ $at, $swap ]   = @id[ $swap, $at ];
+    }
+
+    $queue->cancel( $_ ) for @id[ 0 .. 179_999 ];
+
+    my $bytes
+    = $name eq 'list'
+    ? list_bytes( $queue->{ list } )
+    : total_size( $queue->{ queue } )
+    ;
+
+    say sprintf '%-12s %14d', $name, $bytes;
+}
+
+########################################################################
+# code complexity of the work done under the lock
+########################################################################
+
+say "\nComplexity of the lock-held code (see LinkedList::Single::Example::Bench)";
+
+say sprintf '%-10s %-12s %6s %6s %6s'
+=> qw( method case stmts branch index );
+
+for my $method ( qw( enqueue drain take cancel requeue ) )
+{
+    for my $name ( 'list', 'array', 'marked' )
+    {
+        my $class
+        = $name eq 'list'   ? 'LinkedList::Single::Example::Handoff'
+        : $name eq 'array'  ? 'LinkedList::Single::Example::Handoff::Array'
+        :                     'LinkedList::Single::Example::Handoff::Marked'
+        ;
+
+        my $cx  = complexity \&{ "${class}::_$method" };
+
+        say sprintf '%-10s %-12s %6d %6d %6d'
+        =>  $method, $name, $cx->{ statements }, $cx->{ branches }, $cx->{ index_ops };
+    }
+}
+
+say "\nheld_secs: time inside LinkedList::Single::Example::Lock::hold. walked: nodes/elements"
+  , " stepped over one at a time under the lock; purged: index entries cleared.";

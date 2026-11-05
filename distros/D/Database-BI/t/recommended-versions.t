@@ -140,8 +140,8 @@ is_deeply($from_cpanfile, $from_makefile,
 
 # The floor this file is about: without it the rest of the checks are a scan
 # of a set that could have lost its only interesting member.
-is($from_makefile->{'HTML::OSM'}, 0.12,
-	'HTML::OSM is recommended at 0.12, the version /map needs');
+is($from_makefile->{'HTML::OSM'}, 0.13,
+	'HTML::OSM is recommended at 0.13, the version /map needs');
 ok(!defined $from_makefile->{'HTML::D3'},
 	'HTML::D3 is a hard prerequisite, so loading it needs no gate of its own');
 

@@ -8,7 +8,7 @@ use POSIX	qw(floor ceil);
 use Readonly;
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.019.0';
+our $VERSION = '0.020.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -377,6 +377,9 @@ sub _iso_week {
 
 sub _epoch_of {
 	my ($y, $mon, $day, $h, $mi, $s) = @_;
+	# mktime and localtime run the C library's tzset, which on FreeBSD can
+	# leave errno set (EILSEQ) when it succeeds: the caller's $! is kept.
+	local $!;
 	require POSIX;
 	my $epoch = POSIX::mktime($s, $mi, $h, $day, $mon - 1, $y - 1900);
 	return undef unless defined $epoch;
@@ -468,6 +471,7 @@ sub _civil_day {
 sub _shift_days {
 	my ($y, $mon, $day, $delta) = @_;
 	return ($y, $mon, $day) unless $delta;
+	local $!;	# mktime and localtime may set errno; see _epoch_of
 	require POSIX;
 	my @lt = localtime(POSIX::mktime(12, 0, 0, $day, $mon - 1, $y - 1900) + $delta * 86_400);
 	return ($lt[5] + 1900, $lt[4] + 1, $lt[3]);
@@ -606,6 +610,7 @@ sub _span_label {
 		# Monday is the first day of the ISO week, and 1970-01-05 is the
 		# Monday the week count runs from.
 		require POSIX;
+		local $!;	# mktime and localtime may set errno; see _epoch_of
 		my $dow    = (localtime(POSIX::mktime(12, 0, 0, $day, $mon - 1, $y - 1900)))[6];
 		my $day_no = _civil_day($y, $mon, $day);
 		my $monday = $day_no - ($dow == 0 ? 6 : $dow - 1);
@@ -721,6 +726,7 @@ sub evaluate {
 	$row //= {};
 	return undef unless ref $row eq 'HASH';
 	local $@;	# a failed row is undef, and the caller's $@ is its own
+	local $!;	# the date functions call mktime and localtime, which may set errno
 	# Merge bound parameters into the evaluation context.  Parameters take
 	# precedence over same-named columns: the clash check in new() ensures this
 	# never happens legitimately, but a column added to the data after compile
@@ -1219,6 +1225,7 @@ sub _iso_date_if_real {
 #   %d-%b-%Y  -- DD-Mon-YYYY  (15-Jan-2026, case-insensitive month abbrev)
 sub date_normalise {
 	my ($val, $pattern) = @_;
+	local $!;	# mktime and localtime may set errno; see _epoch_of
 	return undef unless defined $val && defined $pattern && length $val;
 	return _normalise_with_format($val, $pattern) if ref $pattern eq 'HASH';
 	if ($pattern eq '%m/%d/%Y') {

@@ -20,7 +20,7 @@ sub copy_spike {
     File::Find::find({
         no_chdir => 1,
         wanted   => sub {
-            my $rel = File::Spec->abs2rel($_, $spike);
+            (my $rel = File::Spec->abs2rel($_, $spike)) =~ s{\\}{/}g;
             return if $rel eq '.';
             if (-d $_) {
                 $File::Find::prune = 1 if $rel =~ /^(?:blib|cover_db)/;

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Meteorology/PET.pm
+lib/Meteorology/PET/Thornthwaite.pm
+minil.toml
+t/00_compile.t
+t/01_scalar_mode.t
+t/02_pdl_mode.t
+t/03_croak_validation.t
+META.yml
+MANIFEST

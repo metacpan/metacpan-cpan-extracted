@@ -1,0 +1,22 @@
+- v2.0.0 Sun Nov  1 2026
+
+* First release of LinkedList::Single::Examples, split from the
+  LinkedList::Single distribution: worked examples of linked lists
+  with documentation, benchmarks and tests.
+
+* Six examples, each with the LinkedList::Single v2 solution and an
+  array or hash version of the same problem, compared on time, memory
+  and code size: LRU cache, sliding window, lock handoff, sorted merge,
+  ordered index and timer queue. Modules are
+  LinkedList::Single::Example::<Name>; the write-up of each is in
+  LinkedList::Single::Example::<Name>::POD.
+
+* Layout: lib/ (modules), app/NN-Name (programs), benchmarks/NN-Name,
+  t/NN-Name (tests). Programs and benchmarks are in the distribution as
+  source and are not installed. Timings in the documentation come from
+  one machine and are labelled as such.
+
+* The examples use the detach() and relinking append_to() of
+  LinkedList::Single, which are in its CHANGES file under 31 October 2026
+  and are not in earlier releases. They are in LinkedList::Single
+  v2.1.0, which is the prerequisite version.

@@ -620,9 +620,13 @@ subtest 'Insights: compute and method_note' => sub {
 # ===========================================================================
 
 subtest 'Geocode: _load_geocoder answers a geocoder' => sub {
-	# _load_geocoder must hand back the object it built: "return undef" and
-	# "return !(...)" both lose it.  The stand-in means this runs without the real
-	# Geo::Coder::Free, and records what it was given, so openaddr is checked too.
+	# _load_geocoder must hand back the chain it built, with the object it built
+	# in it: "return undef" and "return !(...)" both lose it.  The stand-in means
+	# this runs without the real Geo::Coder::Free, and records what it was given,
+	# so openaddr is checked too.  The chain is the real Geo::Coder::List.
+	plan skip_all => 'Geo::Coder::List 0.39 or later is not installed'
+		unless eval { require Geo::Coder::List; Geo::Coder::List->VERSION(0.39); 1 };
+
 	my %given;
 	my $loaded = bless {}, 'Local::FakeFree';
 
@@ -632,13 +636,17 @@ subtest 'Geocode: _load_geocoder answers a geocoder' => sub {
 	local *Geo::Coder::Free::new = sub { my ($class, %args) = @_; %given = %args; return $loaded };
 	local $ENV{OPENADDR_HOME};
 
-	my $with = Database::BI::Model::Geocode->new(openaddr => '/data/oa');
-	is($with->_load_geocoder, $loaded, 'it answers the object that was built');
+	my $with  = Database::BI::Model::Geocode->new(openaddr => '/data/oa', online => 0);
+	my $chain = $with->_load_geocoder;
+	isa_ok($chain, 'Geo::Coder::List', 'it answers the chain');
+	is($with->{_local}, $loaded, 'holding the object that was built');
+	is_deeply([ @{ $chain->{geocoders} } ], [ $loaded ], 'and only it, when online lookups are off');
 	is_deeply(\%given, { openaddr => '/data/oa' }, 'told where the addresses are');
 
 	%given = ();
-	my $without = Database::BI::Model::Geocode->new;
-	is($without->_load_geocoder, $loaded, 'and without an address directory');
+	my $without = Database::BI::Model::Geocode->new(online => 0);
+	isa_ok($without->_load_geocoder, 'Geo::Coder::List', 'and without an address directory');
+	is($without->{_local}, $loaded, 'the same object is in it');
 	is_deeply(\%given, {}, 'when it is told nothing');
 };
 

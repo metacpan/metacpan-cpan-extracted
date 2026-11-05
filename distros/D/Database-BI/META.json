@@ -34,7 +34,10 @@
          "recommends" : {
             "DBD::MariaDB" : "0",
             "Geo::Coder::Free" : "0.48",
-            "HTML::OSM" : "0.12"
+            "Geo::Coder::List" : "0.39",
+            "Geo::Coder::OSM" : "0.03",
+            "HTML::OSM" : "0.13",
+            "LWP::UserAgent::Throttled" : "0.14"
          },
          "requires" : {
             "CGI::Info" : "0",
@@ -52,7 +55,7 @@
             "File::Path" : "2.07",
             "File::Spec" : "3.40",
             "File::Temp" : "0.2308",
-            "HTML::D3" : "0.27",
+            "HTML::D3" : "0.29",
             "HTML::TableExtract" : "0",
             "HTML::TagCloud" : "0.38",
             "HTTP::Request" : "0",
@@ -64,7 +67,7 @@
             "Mojo::Base" : "0",
             "Mojo::JSON" : "0",
             "Mojolicious" : "9.49",
-            "Mojolicious::Plugin::Buffer" : "0",
+            "Mojolicious::Plugin::Buffer" : "v0.1.1",
             "Mojolicious::Plugin::TemplateToolkit" : "0",
             "Net::SFTP::Foreign" : "0",
             "POSIX" : "0",
@@ -114,6 +117,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.019.0",
+   "version" : "0.020.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,4 +1,4 @@
-package Dist::Conformance::Update 0.001;
+package Dist::Conformance::Update 0.002;
 
 # ABSTRACT: What an update changed, or would change, in a checkout, and what it left to a person
 
@@ -65,7 +65,7 @@ Dist::Conformance::Update - What an update changed, or would change, in a checko
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

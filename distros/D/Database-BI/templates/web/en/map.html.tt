@@ -29,6 +29,15 @@
     color: var(--warning-fg, #5c4a11);
   }
   .map-notes ul { margin: 0; padding-left: 1.1rem; }
+  .map-unplotted { margin: 0.35rem 0 0.15rem; }
+  .map-unplotted summary { cursor: pointer; text-decoration: underline; }
+  .map-unplotted-table { border-collapse: collapse; margin-top: 0.35rem; font-size: 0.85rem; }
+  .map-unplotted-table th,
+  .map-unplotted-table td { text-align: left; padding: 0.15rem 0.75rem 0.15rem 0; vertical-align: top; }
+  .map-unplotted-table td.num { white-space: nowrap; }
+  .map-unplotted-table a,
+  .map-unplotted-all { color: var(--accent-text, #2c3e7a); text-decoration: underline; font-weight: 600; }
+  .map-unplotted-all { display: inline-block; margin: 0.3rem 0 0; }
   .map-summary {
     font-size: 0.85rem;
     color: var(--text-secondary, #555);
@@ -41,29 +50,33 @@
     word-break: break-all;
   }
   .chart-source a { color: inherit; }
-  .map-legend {
-    margin: 0.5rem 0 0;
-    font-size: 0.88rem;
-    color: var(--text-secondary, #444);
+  .map-progress {
+    margin: 0.5rem 0 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-left: 3px solid var(--info-border, #2980b9);
+    background: var(--info-bg, #eaf4fb);
+    color: var(--info-fg, #1a5276);
+    font-size: 0.9rem;
   }
-  .map-legend strong { display: block; margin-bottom: 0.25rem; }
-  .map-legend ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem 1rem;
+  .map-progress-text { margin: 0 0 0.4rem; overflow-wrap: anywhere; }
+  .map-progress-row { display: flex; align-items: center; gap: 0.75rem; }
+  .map-progress-track {
+    flex: 1;
+    height: 0.6rem;
+    border-radius: 0.3rem;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--info-border, #2980b9);
+    overflow: hidden;
   }
-  .legend-dot {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
-    vertical-align: middle;
-    margin-right: 3px;
+  .map-progress-fill {
+    width: 0;
+    height: 100%;
+    background: var(--link, #0d6efd);
+    transition: width 0.2s ease;
   }
+  .map-progress-note { margin: 0.4rem 0 0; font-size: 0.82rem; }
+  .map-progress-note:empty { display: none; }
+  .map-retry { color: var(--accent-text, #2c3e7a); text-decoration: underline; font-weight: 600; }
 </style>
 
 <nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
@@ -71,32 +84,165 @@
 
 <h2 class="graph-title">[% title | html %]</h2>
 
-[% IF messages.size %]
+[% IF geocode_pending %]
+<div class="map-progress" id="map-progress" role="status" aria-live="polite"
+     data-done-url="[% geocode_done_url | html %]" data-cached-url="[% geocode_cached_url | html %]">
+  <p class="map-progress-text" id="map-progress-text">Looking up [% geocode_pending %] place[% geocode_pending == 1 ? '' : 's' %] that [% geocode_pending == 1 ? 'is' : 'are' %] not in the cache yet&hellip;</p>
+  <div class="map-progress-row">
+    <div class="map-progress-track" role="progressbar" id="map-progress-bar"
+         aria-label="Places looked up" aria-valuemin="0" aria-valuemax="[% geocode_pending %]" aria-valuenow="0">
+      <div class="map-progress-fill" id="map-progress-fill"></div>
+    </div>
+    <button type="button" class="btn-secondary" id="map-progress-cancel">Cancel</button>
+  </div>
+  <p class="map-progress-note" id="map-progress-note"></p>
+  <noscript><p class="map-progress-note"><a class="map-retry" href="[% geocode_wait_url | html %]">Look them up and draw the map</a> (the page waits until they are all done).</p></noscript>
+</div>
+<script type="application/json" id="map-pending">[% geocode_pending_json %]</script>
+<script>
+(function () {
+  var box = document.getElementById('map-progress');
+  if (!box) return;
+  var list;
+  try { list = JSON.parse(document.getElementById('map-pending').textContent); } catch (e) { return; }
+  var text   = document.getElementById('map-progress-text');
+  var bar    = document.getElementById('map-progress-bar');
+  var fill   = document.getElementById('map-progress-fill');
+  var note   = document.getElementById('map-progress-note');
+  var cancel = document.getElementById('map-progress-cancel');
+  var doneUrl = box.getAttribute('data-done-url');
+  var cachedUrl = box.getAttribute('data-cached-url');
+  var index = 0, found = 0, missing = 0, unsettled = 0, online = true;
+  var stopped = false, controller = null, message = '';
+
+  function show(done) {
+    bar.setAttribute('aria-valuenow', String(done));
+    fill.style.width = (list.length ? (100 * done / list.length) : 100) + '%';
+  }
+
+  function counts() {
+    var parts = [];
+    if (found) parts.push(found + ' found');
+    if (missing) parts.push(missing + ' not found');
+    if (unsettled) parts.push(unsettled + ' left for later');
+    return parts.join(', ');
+  }
+
+  // A place the server could not settle (not answered, or not saved) is
+  // still not in the cache, so drawing the page again without geocode=cached
+  // would only start the same run again.
+  function finish() {
+    stopped = true;
+    cancel.disabled = true;
+    text.textContent = 'Drawing the map\u2026';
+    window.location.replace(unsettled ? cachedUrl : doneUrl);
+  }
+
+  function next() {
+    if (stopped) return;
+    if (index >= list.length) { finish(); return; }
+
+    var item = list[index];
+    text.textContent = 'Looking up ' + (index + 1) + ' of ' + list.length + ': ' + item.place;
+
+    var body = new URLSearchParams();
+    body.append('place', item.place);
+    body.append('sig', item.sig);
+    if (!online) body.append('online', '0');
+
+    controller = window.AbortController ? new AbortController() : null;
+    fetch('/geo/lookup', {
+      method: 'POST',
+      body: body,
+      headers: { 'Accept': 'application/json' },
+      signal: controller ? controller.signal : undefined
+    }).then(function (res) {
+      return res.json();
+    }).then(function (reply) {
+      if (stopped) return;
+      if (reply.status === 'found' && reply.stored) found++;
+      else if (reply.status === 'not_found' && reply.stored) missing++;
+      else if (reply.status !== 'refused') unsettled++;
+      if (reply.online_failed) online = false;
+      if (reply.messages && reply.messages.length) message = reply.messages[reply.messages.length - 1];
+      else if (reply.error) message = reply.error;
+      advance();
+    }, function () {
+      if (stopped) return;
+      unsettled++;
+      advance();
+    });
+  }
+
+  function advance() {
+    index++;
+    show(index);
+    var c = counts();
+    note.textContent = (c ? c + '. ' : '') + message;
+    next();
+  }
+
+  cancel.addEventListener('click', function () {
+    if (stopped) return;
+    stopped = true;
+    cancel.disabled = true;
+    if (controller) controller.abort();
+    text.textContent = 'Cancelled; drawing the map with the places found so far\u2026';
+    window.location.replace(cachedUrl);
+  });
+
+  show(0);
+  next();
+})();
+</script>
+[% ELSIF messages.size %]
 <div class="map-notes" role="status">
   <ul>
     [%- FOREACH message IN messages %]
-    <li class="map-note" data-key="[% message.key | html %]">[% message.text | html %]</li>
+    <li class="map-note" data-key="[% message.key | html %]">[% message.text | html %]
+      [%- IF message.key == 'warn_map_rows_skipped' && unplotted_url.length %]
+      <br><a class="map-unplotted-all" href="[% unplotted_url | html %]">Show the [% unplotted_rows %] row[% unplotted_rows == 1 ? '' : 's' %] that [% unplotted_rows == 1 ? 'was' : 'were' %] not plotted in the table</a>
+      [%- END %]
+      [%- IF message.key == 'warn_map_rows_skipped' && geocode_retry_url.length %]
+      <br><a class="map-retry" id="map-retry" href="[% geocode_retry_url | html %]">Look up the places not looked up yet</a>
+      [%- END %]
+      [%- IF message.key == 'warn_map_rows_skipped' && unplotted.size %]
+      <details class="map-unplotted">
+        <summary>List the [% unplotted.size %] place[% unplotted.size == 1 ? '' : 's' %] that [% unplotted.size == 1 ? 'was' : 'were' %] not plotted</summary>
+        [%- SET why = {
+          empty     => 'No place in the row',
+          refused   => 'Not a place name (a bare number)',
+          not_found => 'Not found',
+          later     => 'Not looked up yet; it will be tried next time',
+        } %]
+        [%- IF geocode_retry_url.length; why.later = 'Not looked up yet'; END %]
+        <table class="map-unplotted-table">
+          <thead><tr><th scope="col">Place</th><th scope="col">Rows</th><th scope="col">Why</th></tr></thead>
+          <tbody>
+          [%- FOREACH u IN unplotted %]
+          <tr data-reason="[% u.reason | html %]">
+            <td>[% IF u.place.length %][% u.place | html %][% ELSE %]<em>(empty)</em>[% END %]</td>
+            <td class="num">[% IF u.url %]<a href="[% u.url | html %]" title="Show these rows in the table">[% u.rows %] row[% u.rows == 1 ? '' : 's' %]</a>[% ELSE %][% u.rows %][% END %]</td>
+            <td>[% why.${u.reason} | html %]</td>
+          </tr>
+          [%- END %]
+          </tbody>
+        </table>
+      </details>
+      [%- END %]
+    </li>
     [%- END %]
   </ul>
 </div>
 [% END %]
 
-<p class="map-summary">Plotting [% marker_count %] marker[% marker_count == 1 ? '' : 's' %] for [% row_count %] of [% source_rows %] row[% source_rows == 1 ? '' : 's' %][% IF loc_col %] from column [% loc_col | html %][% END %][% IF lat_col %] from columns [% lat_col | html %] and [% lon_col | html %][% END %][% IF backend %]; resolved by [% backend | html %][% END %].</p>
+[% UNLESS geocode_pending && !marker_count %]
+<p class="map-summary">Plotting [% marker_count %] marker[% marker_count == 1 ? '' : 's' %] for [% row_count %] of [% source_rows %] row[% source_rows == 1 ? '' : 's' %][% IF loc_col %] from column[% loc_many ? 's' : '' %] [% loc_col | html %][% END %][% IF lat_col %] from columns [% lat_col | html %] and [% lon_col | html %][% END %][% IF backend %]; resolved by [% backend | html %][% END %].</p>
+[% END %]
 
 [% IF map_body %]
 <div class="map-panel">
   [% map_body %]
-</div>
-[% END %]
-
-[% IF color_col.length %]
-<div class="map-legend">
-  <strong>Colour key: [% color_col | html %]</strong>
-  <ul>
-    [%- FOREACH entry IN color_legend -%]
-    <li><span class="legend-dot" style="background:[% entry.color | html %]"></span>[% entry.label | html %]</li>
-    [%- END -%]
-  </ul>
 </div>
 [% END %]
 

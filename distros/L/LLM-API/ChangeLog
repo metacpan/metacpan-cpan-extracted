@@ -1,3 +1,134 @@
+Wed Nov  4 15:13:19 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/LLM/API.pm.in
+	- refactor from Anthropic-only client to provider-independent dispatcher; rename module description accordingly
+	- add `provider` and `region` accessors; default provider is 'anthropic' for backward compatibility
+	- remove hardcoded $LLM_PRICING constant; replace with _providers() loading providers.yml via File::ShareDir, falling back to project root for source-checkout pre-install tests; cache in process-global $PROVIDERS
+	- add _provider_class() to lazy-load the provider implementation class named in providers.yml and delegate to it
+	- bump $LLM_MAX_TOKENS default from 4096 to 8192
+	- add `region` constructor option for Bedrock; resolves AWS_REGION, then AWS_DEFAULT_REGION, then us-east-1
+	- set_api_key_getter only when provider is 'anthropic'; api_key not required for 'bedrock'
+	- default model set per-provider: claude-sonnet-4-6 (Anthropic) or amazon.nova-micro-v1:0 (Bedrock)
+	- guard models(), api_keys(), usage_report(), cost_report(), and headers() with provider check; throw for non-Anthropic callers
+	(send_prompt, count_input_tokens): delegate to _provider_class
+	(send_messages): new; validates nonempty message array of role/content pairs (user/assistant, text/document blocks) then delegates to _provider_class
+	(pricing): rewrite to load rates from providers.yml as [price, token_count] pairs per provider+model; die on missing or malformed entry
+	(_do_admin_api): delegate to _provider_class
+	* lib/LLM/API/Response.pm.in
+	- add `provider_response` accessor
+	(from_result): new; construct response from a normalized result hash without decoding HTTP body
+	(from_error): new; construct failed response from code and message without an HTTP body
+	(_load_result)
+	- extract from init()
+	- shared by new(), from_result(); tolerates missing usage/content keys with // {} and // []
+	(error)
+	- return provider_error_message when present, before attempting decode_json on raw content
+	(init)
+	- delegate body population to _load_result
+	* lib/LLM/API/Anthropic.pm.in: new
+	- Anthropic HTTP transport provider
+	- implements count_input_tokens, send_prompt, send_messages, headers, _do_admin_api as class methods called with LLM::API instance
+	* lib/LLM/API/Bedrock.pm.in: new
+	- Amazon Bedrock Converse transport provider; implements count_input_tokens (CountTokens), send_prompt, send_messages, headers (AWS auth, no Anthropic API key); adapts document blocks for Converse: text documents as text content, PDF sources decoded from base64 and passed as raw bytes
+	* providers.yml: new
+	- provider catalog shipped as distribution share file; top-level 'providers' mapping keyed by provider name; each entry has 'class' (implementation module) and 'models' with input_tokens/output_tokens as [price_usd, token_count] pairs; loaded once per process by _providers()
+	* buildspec.yml
+	- add providers.yml to share: extra-files list
+	* requires
+	- +Amazon::API::BedrockRuntime 1.43.84
+	- +Amazon::Credentials 2.0.1
+	- +File::ShareDir 1.118
+	- +YAML::Tiny 1.76
+	* cpanfile: likewise
+	* test-requires
+	- +HTTP::Tiny 0.088
+	- +JSON::PP 4.16
+	* t/01-anthropic-transport.t: new
+	- tests for Anthropic provider transport: count_input_tokens, send_prompt, headers
+	* t/02-provider-contract.t: new
+	- tests that provider-only methods (models, api_keys, usage_report, cost_report) throw for non-Anthropic providers
+	* t/03-bedrock-provider.t: new
+	- tests for Bedrock provider construction, region resolution, and send_prompt dispatch
+	* t/04-conversation.t: new
+	- tests send_messages validation: empty array, bad role, missing text, document in assistant role, valid multi-turn
+	* t/05-bedrock-count-tokens.t: new
+	- tests count_input_tokens via Bedrock CountTokens path
+	* t/06-documents.t: new
+	- tests document() block construction for text and PDF types; Bedrock adapter translation of PDF to Converse format
+	* t/07-provider-catalog.t: new
+	- tests providers.yml loading, pricing() rate calculation, and error on missing provider/model
+	* xt/live-bedrock-pdf.t: new
+	- live integration test for Bedrock PDF document submission; requires AWS credentials and a document-capable model
+	* xt/sample.pdf: new
+	- sample PDF used by xt/live-bedrock-pdf.t
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.mk: new
+	- project-registered bootstrapper command role extension makefile
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.yml: new
+	- role metadata for CPAN::Maker::Bootstrapper LLM command role
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.mk: new
+	- project-registered bootstrapper command role extension makefile
+	* .roles/CPAN-Maker-Bootstrapper-Role-PAUSEUpload/role.yml: new
+	- role metadata for CPAN::Maker::Bootstrapper LLM command role
+	* build-mirrors: new
+	* config.mk: new
+	* recommends: new
+	* suggests: new
+	* .gitignore
+	- add patterns for *.bak, *.checked, *.log, *.pod, *.raw, *.tmp, *.reconciled, *.rendered, build-config.mk, buildspec.yml.current, cpanfile.*, deps.mk, extra-files.mk, local/**, release-* artifacts, test-requires.cpanfile, test-requires.scan; add !cpanfile.darkpan negation
+	* .includes/add-plugin.mk: new
+	* .includes/bash-completion.mk: new
+	* .includes/bootstrap.mk: new
+	* .includes/build-init.mk: new
+	* .includes/builder.mk: new
+	* .includes/local.mk: new
+	* .includes/modulino.mk: new
+	* .includes/test.mk: new
+	* .includes/git.mk
+	- add suggests and recommends to RECOMMENDED_ARTIFACTS
+	- prune local/ directory in addition to .git in find loop for ChangeLog generation
+	(repo): new; creates a GitHub repository via GITHUB_ACTIONS; accepts REPO, PUBLIC, REPO_DESCRIPTION, DRYRUN
+	* .includes/help.mk
+	- buffer output to temp file and page through $PAGER (less, more, or cat)
+	- add SYNTAX_CHECKING=OFF and SKIP_TESTS=1 to variable listing; remove MODULINO_NAME and SCAN wording update
+	* .includes/perl.mk
+	- overhaul module rendering: .pm.in -> .pm.rendered (grouped target via BOOTSTRAPPER resolve-vars with vars file) -> .pm (cp or podextract)
+	- add %.pm.checked and %.pl.checked sentinel rules depending on .rendered file; support compile.skip file
+	- replace per-file .tdy and .crit pattern rules with grouped-target rules batching all files via BOOTSTRAPPER perltidy/perlcritic --file-list
+	- add PERLCRITIC_SEVERITY and PERLCRITIC_THEME variables (defaults: 5, pbp)
+	- add gen-vars-file macro writing TEMPLATE_VARS NAME=value pairs to a file
+	- add check-syntax phony target; add render-files and test-resolver targets
+	- remove SYNTAX_CHECKING, PERLTIDYRC, PERLCRITICRC derivation from CPAN::Maker::ConfigReader
+	- add include deps.mk with rule to regenerate from SOURCE_FILES_IN via BOOTSTRAPPER create-deps
+	- PERLINCLUDE now includes local/lib/perl5; PERL5LIB= cleared during syntax checks
+	* .includes/release-notes.mk: deleted
+	* .includes/update.mk
+	- replace MANAGED_FILES list with MANAGED_MK_FILES (glob from BOOTSTRAPPER_DIST_DIR) and MANAGED_SOURCE_FILES
+	- post-update: also merge .gitignore entries from bootstrapper, copy Makefile.txt, add pre-update hook
+	- update-available: replace ad-hoc version comparison with BOOTSTRAPPER update-available subcommand; add case statements for CMB_UPDATE_CHECK and CMB_VERSION_DRIFT with explicit fail/warn/ignore/invalid handling
+	* .includes/version.mk
+	(release, minor, major): add clean prerequisite before version bump
+	* Makefile
+	- require GNU Make 4.3 (grouped-target feature check)
+	- add .SHELLFLAGS pipefail; add lc macro
+	- add PACKAGE_VERSION, BOOTSTRAP_BUILD, TEMPLATE_VARS, GIT_SHA, GIT_DIRTY, GIT_USER variables
+	- add config.mk auto-touch rule; add build-config.mk generated from cmb create-build-config; include build-config.mk unconditionally
+	- include .roles/*/role.mk for project-registered command role extensions
+	- add recommends and suggests to DEPS
+	- refactor cpanfile into cpanfile.requires, cpanfile.suggests, cpanfile.recommends partial files concatenated into cpanfile
+	- replace scan-deps shell macro and filter_requires Perl snippet with SCANDEPS grouped target produces requires.raw, recommends.raw, suggests.raw simultaneously; add provides target; add test-requires.scan and test-requires.raw; add reconcile step producing *.reconciled sentinel files via BOOTSTRAPPER reconcile-deps; filter test-requires against provides
+	- move SCAN=off fallback from scan-deps to else branch requiring pre-existing files
+	- add extra-files and extra-files.mk targets; include extra-files.mk when not bootstrap build
+	- tarball rule: add local/.installed as order-only prereq (unless SKIP_TESTS); pass --skip-tests to cpan-maker; set PERL5LIB to include local/lib/perl5; pass buildspec.yml explicitly with -b
+	- add real-quick target (SCAN=off LINT=off PODCHECKER= SYNTAX_CHECKING=off); add package target (LINT=on SCAN=on)
+	- remove build-ci, workflow, modulino targets; remove module.pm.tmpl rule; remove DOCKER, CONFIG_READER, BASEDIR, UNIT_TEST_NAME, CPAN_MAKER, MD_UTILS derivation from old locations
+	- add DARKPAN_REQUIRES/DARKPAN_URL support with cpanfile.darkpan/cpanm.darkpan targets
+	- add CLEANFILES entries for *.raw, *.reconciled, *.rendered, extra-files.mk, cpanfile.{recommends,requires,runtime,suggests}, build-config.mk
+	* .prompts/change-log.prompt: new
+	* .prompt/release-notes.prompt: new
+
 Sat Jul 18 08:34:07 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.1]:

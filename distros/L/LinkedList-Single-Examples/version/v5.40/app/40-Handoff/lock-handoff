@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Handoff::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Handoff;
+
+########################################################################
+# a mail spooler. producers queue messages and may withdraw one; the
+# sender takes a batch, works through it with the lock released, and
+# puts back what it did not get to.
+########################################################################
+
+sub names( $queue )
+{
+    join ' ', map { $_->[ 1 ] } $queue->contents->@*
+}
+
+sub run( $class )
+{
+    my $queue   = LinkedList::Single::Example::Handoff->new;
+
+    my %id
+    = map { $_ => $queue->enqueue( $_ ) } qw( alice bob carol dave erin frank );
+
+    say 'queued:    ', names $queue;
+
+    # bob changed their mind.
+
+    say 'cancel bob:    ', $queue->cancel( $id{ bob } ) ? 'removed' : 'too late';
+
+    say 'queued:    ', names $queue;
+
+    # the sender takes four. the queue is free to others from here on.
+
+    my $batch   = $queue->take( 4 );
+
+    say 'took 4:    ', $queue->left( $batch ), ' in the batch, ', $queue->size, ' still queued';
+
+    # carol is already in the batch: cancel can no longer reach her.
+
+    say 'cancel carol:  ', $queue->cancel( $id{ carol } ) ? 'removed' : 'too late (already taken)';
+
+    # the sender sends two, and is interrupted.
+
+    $queue->process
+    (
+        $batch
+      , sub( $id, $who ) { say "  sent to $who" }
+      , 2
+    );
+
+    # what is left goes back to the front, ahead of the others.
+
+    say 'requeued:  ', $queue->requeue( $batch ), ' unsent';
+
+    say 'queued:    ', names $queue;
+
+    # shutting down: everything goes in one batch.
+
+    my $rest    = $queue->drain;
+
+    $queue->process( $rest, sub( $id, $who ) { say "  flushed $who" } );
+
+    say 'queued:    ', $queue->size;
+
+    $queue
+}
+
+__PACKAGE__->run
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+lock-handoff - demonstration of LinkedList::Single::Example::Handoff
+
+=head1 SYNOPSIS
+
+    perl app/40-Handoff/lock-handoff
+
+=head1 DESCRIPTION
+
+Queues six messages, withdraws one, takes a batch, tries to withdraw
+one that has already been taken, sends part of the batch, puts the
+rest back, and flushes. See L<LinkedList::Single::Example::Handoff::POD> for what the example is
+meant to show.

@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.019.0';
+our $VERSION = '0.020.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -15,10 +15,10 @@ use CGI::Lingua;
 use Database::BI::Tutorial;
 use Database::BI::Util;
 use Mojo::File;
-use Mojo::JSON		qw(encode_json decode_json);
+use Mojo::JSON		qw(encode_json decode_json from_json to_json);
 use Mojo::Parameters;
 use Mojo::URL;
-use Mojo::Util		qw(url_escape encode xml_escape);
+use Mojo::Util		qw(url_escape encode xml_escape hmac_sha1_sum secure_compare);
 use File::Path		qw(remove_tree);
 use File::Spec;
 use File::Temp		qw(tempfile tempdir);
@@ -105,8 +105,9 @@ Readonly my $MARIADB_SERVER_RE => qr{\Amariadb:([A-Za-z_][A-Za-z0-9_]*)\z};
 # because the [...] notation would be ambiguous in the path syntax).
 Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/;
 
-# The tile layer HTML::OSM 0.10 hardcodes.  HTML::OSM >= 0.12 is required;
-# that release introduced search => 0, max_zoom, and tile_url (0.11).
+# The tile layer HTML::OSM 0.10 hardcodes.  HTML::OSM >= 0.13 is required;
+# 0.12 introduced search => 0, max_zoom, and tile_url (0.11), and 0.13 the scale
+# bar, the key on the map and fit.
 Readonly my $DEFAULT_TILE_URL => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 # The language the distribution ships templates for.  It is what a request falls
@@ -118,7 +119,9 @@ Readonly my $DEFAULT_LANGUAGE => 'en';
 # constructor arguments strictly, so an older install does not ignore the new
 # keys - it croaks on them.  _map_data therefore checks the version before
 # building a map, and reports a missing or old renderer instead of a 500.
-Readonly my $MIN_HTML_OSM_VERSION => '0.12';
+# 0.13 draws the scale bar and the key on the map, listing only what is in view
+# (scale, legend, and group on each marker), and opens on every marker (fit).
+Readonly my $MIN_HTML_OSM_VERSION => '0.13';
 
 # ---------------------------------------------------------------------------
 # I18N message dictionary for all user-visible strings in this controller.
@@ -210,14 +213,18 @@ Readonly my %MESSAGES => (
 	error_map_coordinate_range  => 'Column "%s" holds only values outside the range of %s; check that lat= and lon= are not swapped',
 	error_map_coordinate_numeric => 'Columns "%s" and "%s" hold no numeric coordinate pairs; a map needs numbers, or loc=<column> to geocode places',
 	error_map_no_markers        => 'No row has a location that could be plotted',
-	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.12 or later, and it is not installed',
+	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.13 or later, and it is not installed',
 	error_map_renderer_failed   => 'The map could not be drawn; the server log has the reason',
-	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.12 or later, but the installed HTML::OSM is %s',
+	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.13 or later, but the installed HTML::OSM is %s',
 	warn_join_schema_mismatch   => 'Column "%s" has type %s in %s but %s in %s; the join keeps both columns, so check which one a calculation uses',
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
+	map_legend_empty            => 'Nothing in this view',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
 	error_map_tiles_unknown     => 'Unknown tile source "%s"; define it under tile_sources in database_bi.conf',
+	error_map_geocode_mode      => 'geocode= must be "wait" (look places up before the page is sent) or "cached" (look nothing up), not "%s"',
+	error_geo_lookup_place      => 'A lookup needs place= and the sig= the map page gave it',
+	error_geo_lookup_unsigned   => 'This place was not listed by a map page, or the server has restarted since; open the map again',
 	error_insights_no_data      => 'No data available to analyse',
 	insights_insufficient_data  => 'Insufficient data for this insight type (need more rows or periods)',
 	ask_unavailable    => 'Ask a question is not available: no AI provider is configured',
@@ -262,8 +269,17 @@ Readonly my $DEFAULT_JOIN_MAX_ROWS => 10_000;
 Readonly my $LOOKUP_MAX_BYTES      => 8 * 1_048_576;	# a bigger file is a join, not a lookup
 Readonly my $LOOKUP_NAME_RE        => qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 Readonly my $DEFAULT_MAP_GEOCODE_MAX => 500;   # new lookups per request (map_geocode_max)
+# Places looked up online (OpenStreetMap's Nominatim) per request.  Nominatim
+# allows one request a second, so this is roughly the seconds a page can wait
+# for it: twenty keeps a page well inside hypnotoad's 50-second heartbeat, and
+# script/bi-geocode, which has no page to hold, asks without a limit.
+Readonly my $DEFAULT_MAP_GEOCODE_ONLINE_MAX => 20;   # map_geocode_online_max
 Readonly my $DEFAULT_MAP_MAX_MARKERS => 2_000; # markers drawn per request (map_max_markers)
+Readonly my $DEFAULT_MAP_POPUP_ROWS  => 10;    # rows listed in one marker's popup (map_popup_rows)
 Readonly my $DEFAULT_MARKER_COLOR  => '#3388ff'; # Leaflet default blue
+# A bubble map's size key: the bubbles' own colour when they have one, and
+# this grey when the colour says something else (a colour column)
+Readonly my $MAP_SIZE_KEY_COLOR  => '#888888';
 Readonly my %NAMED_COLORS          => map { $_ => 1 } qw(
     red orange yellow green teal cyan blue navy purple
     magenta pink brown maroon olive silver gray grey gold lime white black
@@ -430,6 +446,36 @@ sub _sequential_scheme {
 	return (defined($name) && !ref($name) && $SEQUENTIAL_SCHEMES{$name}) ? $name : $DEFAULT_SEQUENTIAL_SCHEME;
 }
 
+# _optional_scheme($name) -> $name | undef
+#
+# A categorical scheme for a chart that draws its own colours without one:
+# a histogram's bars are steelblue, a combo's bars and line steelblue and red,
+# and a scheme replaces them with its first colours.  Unlike
+# _categorical_scheme there is no scheme by default, so a name that is not one
+# of the five is undef and the chart keeps the colours it had before scheme=
+# existed.  /histogram, /combo and their canvas cards all read it here.
+sub _optional_scheme {
+	my $name = $_[0];
+	return (defined($name) && !ref($name) && $SCATTER_SCHEMES{$name}) ? $name : undef;
+}
+
+# _scatter_radii($min, $max) -> ($min, $max)
+#
+# A scatter's bubble radius range in pixels: each value a whole number clamped
+# to 1..40, anything else (absent, empty, 0, text) the default 3 or 15, and the
+# pair put in order rather than refused.  /scatter and a canvas scatter card
+# both read it here, so a card saved from the page draws the same bubbles.
+sub _scatter_radii {
+	my ($min, $max) = map { _whole_number(ref $_ ? undef : $_) } @_[0, 1];
+	$min = 3  unless $min;
+	$max = 15 unless $max;
+	for ($min, $max) {
+		$_ = 1  if $_ < 1;
+		$_ = 40 if $_ > 40;
+	}
+	return $min > $max ? ($max, $min) : ($min, $max);
+}
+
 # _pagination($self) -> ($page, $per_page, $offset)
 #
 # Reads ?page= and ?per_page= from the current request, clamps them to sane
@@ -559,7 +605,7 @@ Readonly my %CRUMB_KIND => (
 Readonly my %CRUMB_OP => (
 	eq => '=', ne => '!=', contains => 'contains', starts => 'starts with',
 	lt => '<', le => '<=', gt => '>', ge => '>=', between => 'between',
-	empty => 'is empty', notempty => 'is not empty',
+	empty => 'is empty', notempty => 'is not empty', in => 'is one of',
 );
 
 # A trail is never longer than this, whatever the URLs say.
@@ -747,6 +793,12 @@ sub _crumb_view_suffix {
 		my ($col, $op, $val) = split /:/, $spec, 3;
 		next unless length($col // '') && length($op // '');
 		next unless $col =~ $CRUMB_TEXT_RE;
+		# A list is JSON, which the crumb text pattern refuses: say how long it is.
+		if ($op eq 'in') {
+			my $n = () = _filter_in_values($val);
+			push @bits, "$col $CRUMB_OP{in} $n value" . ($n == 1 ? '' : 's');
+			next;
+		}
 		next if length($val // '') && $val !~ $CRUMB_TEXT_RE;
 		my $word = $CRUMB_OP{$op} // $op;
 		push @bits, ($op eq 'empty' || $op eq 'notempty')
@@ -769,7 +821,8 @@ sub _crumb_view_suffix {
 sub _crumb_chart_subject {
 	my ($kind, $q) = @_;
 	my %p = map {
-		my $v = $q->param($_) // '';
+		# loc= may repeat, for a place spread over columns (address, country).
+		my $v = ($_ eq 'loc') ? join(', ', grep { length } @{ $q->every_param('loc') }) : ($q->param($_) // '');
 		($_ => ($v =~ $CRUMB_TEXT_RE ? $v : ''));
 	} qw(x y cat val seg col rows bar_val line_val loc lat lon);
 
@@ -1412,6 +1465,8 @@ sub _get_columns {
 #       lt (strict), le (inclusive), gt (strict), ge (inclusive)
 #     Unary (val is ignored):
 #       empty (cell eq ''), notempty (cell ne '')
+#     List (val = a JSON array of strings; compared as eq is):
+#       in -- lc(cell) is one of them; a val that is not such an array matches nothing
 #     Range (val = lo:hi, string comparison -- correct for ISO YYYY-MM-DD dates):
 #       between -- lo le cell le hi
 #   Boundary rules for numeric operators:
@@ -1671,6 +1726,20 @@ sub _time_range_request ($c) {
 	return 1;
 }
 
+# _filter_in_values($val) -> @strings
+#
+# The values an f=col:in:<val> filter lists: $val is a JSON array, and only its
+# plain scalars count (a null is the empty cell).  Anything else lists nothing,
+# so a damaged link matches no row rather than every row.
+sub _filter_in_values {
+	my ($val) = @_;
+	local $@;
+	my $list;
+	return () unless eval { $list = from_json($val // q{}); 1 };
+	return () unless ref($list) eq 'ARRAY';
+	return map { $_ // '' } grep { !ref } @{$list};
+}
+
 sub _apply_filter_spec {
 	my ($records, $spec) = @_;
 	my ($col, $op, $val) = split /:/, $spec, 3;
@@ -1690,6 +1759,7 @@ sub _apply_filter_spec {
 	# one, so it matches none of the four, rather than counting as zero.
 	my $by_number = !$is_date && $op =~ /\A(?:lt|le|gt|ge)\z/;
 	my $num_val   = $by_number ? _numeric_cell($val) : undef;
+	my %in_set    = $op eq 'in' ? (map { lc($_) => 1 } _filter_in_values($val)) : ();
 	return [grep {
 		my $cell  = $_->{$col} // '';
 		my $num   = $by_number ? _numeric_cell($cell) : undef;
@@ -1709,6 +1779,7 @@ sub _apply_filter_spec {
 		$op eq 'ge'       ? ($is_date ? $ncell ge $nval  : $both && $num >= $num_val) :
 		$op eq 'empty'    ? $cell eq ''                                         :
 		$op eq 'notempty' ? $cell ne ''                                         :
+		$op eq 'in'       ? $in_set{ lc($cell) }                                 :
 		$op eq 'between'  ? do {
 			my ($lo, $hi) = split /:/, $val, 2;
 			length($lo // '') && length($hi // '') && $ncell ge $lo && $ncell le $hi
@@ -2420,6 +2491,7 @@ sub _dedup_records {
 #   lt / le / gt / ge -- SQL numeric comparison.  Residual when the value is
 #                      not a plain number (avoids column-affinity surprises
 #                      with currency or comma-formatted values).
+#   in              -- Always residual (a list of values, matched as eq is).
 #   empty / notempty -- Always residual.  Must match both SQL NULL and the
 #                      literal empty string; cannot be expressed as a single
 #                      D::A criterion without an -or grouping.
@@ -2864,6 +2936,8 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 # copied and never spliced.
 sub _rows_of_page {
 	my ($rows, $offset, $per_page) = @_;
+	# A negative offset would count from the end of the rows.
+	$offset = 0 if $offset < 0;
 	my $last = $offset + $per_page - 1;
 	$last = $#$rows if $last > $#$rows;
 	return [ @{$rows}[$offset .. $last] ];
@@ -3868,8 +3942,8 @@ sub _page_columns :Protected ($self, $source, $records, $spec_key) {
 		})
 	};
 	unless ($calc_records) {
-		(my $e = $@) =~ s/ at \S+ line \d+\.?\n?$//;
-		$self->render(text => $e, status => 400);
+		# Every location croak added on the way up, not only the last.
+		$self->render(text => _tidy_error($@), status => 400);
 		return ();
 	}
 	return ($calc_records, $calc_columns);
@@ -4180,6 +4254,13 @@ sub canonical_spec {
 	my ($spec) = @_;
 	return $spec unless defined $spec && $spec =~ m{\Apath:(?!/\.\./)([^\n]+)\z};
 	my $path = $1;
+	# Windows' realpath leaves a symlink as it is, so a file reached through
+	# one would be filed under a second key; follow the links first, as
+	# _canonical_path does.
+	if ($^O eq 'MSWin32') {
+		my $followed = eval { _follow_links(Mojo::File->new($path)->to_abs->to_string) };
+		$path = $followed if defined $followed;
+	}
 	return $spec unless -e $path;
 	my $real = eval { Mojo::File->new($path)->realpath->to_string };
 	return (defined $real && length $real) ? "path:$real" : $spec;
@@ -4609,7 +4690,7 @@ sub _analysis_to_url :Protected ($self, $a) {
 	for my $ds (@datasets) {
 		next unless ref $ds->{filters} eq 'ARRAY';
 		for my $f (@{ $ds->{filters} }) {
-			push @params, 'f=' . url_escape($f);
+			push @params, 'f=' . url_escape(encode('UTF-8', $f));
 		}
 	}
 
@@ -5056,11 +5137,22 @@ sub analyses_delete_visual ($self) {
 # _shift_card_param($search, $removed) -> $search
 #
 # A saved query string with its cv= moved down if the card it names came after
-# the one removed.  A text card is never a cross-filter's source, so cv= cannot
-# name the removed card itself.
+# the one removed.  The canvas never makes a text card a cross-filter's source,
+# but a bookmark is stored as PATCHed, so a cv= naming the removed card is
+# dropped: kept, it would name the card that moved into its place.  A cv= of
+# more than nine digits names no card (_cross_filter_source), so it is left
+# as it is: arithmetic on it came back as cv=1e+20.  A search or index that is
+# not one is returned unchanged.
 sub _shift_card_param {
 	my ($search, $removed) = @_;
-	$search =~ s{(?<![^?&])cv=(\d+)}{ 'cv=' . ($1 > $removed ? $1 - 1 : $1) }ge;
+	return $search unless defined($search) && !ref($search)
+		&& defined($removed) && !ref($removed) && $removed =~ /\A[0-9]{1,9}\z/;
+	$search =~ s{(?<![^?&])cv=(\d+)(&?)}{
+		length($1) > 9 ? "cv=$1$2"
+			: $1 == $removed ? ''
+			: ('cv=' . ($1 > $removed ? $1 - 1 : $1) . $2)
+	}ge;
+	$search =~ s{&\z}{};
 	return $search;
 }
 
@@ -5245,6 +5337,16 @@ sub analyses_import ($self) {
 	$self->render(json => { id => $id, imported => 1 }, status => 201);
 }
 
+# _cross_filter_source($cv) -> Int
+#
+# The index of the card a cross-filter came from (cv=), or -1 for none.  Only
+# a whole number names a card: int('abc') is 0, which would draw the first
+# card unfiltered as if it were the source.
+sub _cross_filter_source {
+	my $cv = shift;
+	return (defined($cv) && $cv =~ /\A[0-9]{1,9}\z/) ? int($cv) : -1;
+}
+
 # _build_canvas_pipeline($self, \%analysis) -> ($src, $records, \@cols) or ()
 #
 # Opens the first dataset from a saved analysis and chains any declared joins.
@@ -5310,8 +5412,7 @@ sub _canvas_render_context :Protected ($self, $a, $query, $more_cards = undef) {
 		if $cross_row && $cross_row->{error};
 
 	my @cf_specs  = $params ? grep { /\S/ } @{ $params->every_param('cf') // [] } : ();
-	my $cf_source = (defined $params && defined $params->param('cv'))
-		? int($params->param('cv')) : -1;
+	my $cf_source = _cross_filter_source($params ? $params->param('cv') : undef);
 
 	# The relative time range the canvas page names in its query string is part
 	# of the state a card is drawn through, like cf= and the bound parameters,
@@ -5486,9 +5587,12 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 	return { html => _text_card_markup($vis), title => _text_card_title($vis) }
 		if $kind eq 'text';
 
-	my $encode  = $vis->{encode}  // {};
-	my $options = $vis->{options} // {};
-	my $filters = $vis->{filters} // [];
+	# A stored card is not checked part by part (PUT and import keep a visual
+	# as sent), so a part of the wrong shape is read as absent here rather than
+	# dereferenced.
+	my $encode  = ref($vis->{encode})  eq 'HASH'  ? $vis->{encode}  : {};
+	my $options = ref($vis->{options}) eq 'HASH'  ? $vis->{options} : {};
+	my $filters = ref($vis->{filters}) eq 'ARRAY' ? [ grep { defined && !ref } @{ $vis->{filters} } ] : [];
 	my $title   = $vis->{title}   // '';
 
 	# Every chart on a canvas needs an element id of its own: HTML::D3 names the
@@ -5668,12 +5772,21 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
 		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
 
+		# encode.series is what /graph's "Add to canvas" saves from series=: one
+		# line per value of that column, as on the page.  Without it every row
+		# is one line, which runs through all the groups' points in turn.
+		my $series_col = $encode->{series} // '';
+		$series_col = '' if ref $series_col;
+		return { error => "Column not found: $series_col" }
+			if length $series_col && !$col_set{$series_col};
+
 		# A card whose spec names a measure plots one point per x value rather
 		# than one per row: the shape /graph?agg= draws, and the only shape that
 		# makes sense when the x axis is a bucket.  The fold writes its result
 		# back under the y column's own name, so the loop below is the same one
 		# an unaggregated card runs, and the groups arrive in label order, which
-		# for an ISO bucket is chronological order.
+		# for an ISO bucket is chronological order.  With a series the fold is
+		# per x value and series value, so each line has its own totals.
 		my $rows = $vis_recs;
 		my $m;
 		if (defined $agg_fn) {
@@ -5681,22 +5794,49 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			return { error => $m->{error} } if $m->{error};
 			my $agg = $self->_grouped_totals(
 				{ source => undef, records => $vis_recs },
-				{ by => [$x_col], fn => $m->{fn}, val => $m->{val}, as => 'value' },
+				{ by  => [ $x_col, (length $series_col ? $series_col : ()) ],
+				  fn  => $m->{fn}, val => $m->{val}, as => 'value' },
 			);
 			$rows = [ map { { %$_, $y_col => $_->{value} } } @$agg ];
 		}
 
-		my @pairs;
-		for my $row (@$rows) {
-			my $xv = $row->{$x_col} // ''; next unless length $xv;
-			my $yn = _numeric_cell($row->{$y_col} // ''); next unless defined $yn;
-			push @pairs, [_decode_cell($xv), $yn];
-		}
-		return { error => 'No plottable data' } unless @pairs;
+		my $sn;
+		if (length $series_col) {
+			# The order /graph draws, so each line has the page's colour:
+			# aggregated, lines by name and points by label; unaggregated, lines
+			# as first met and each keeping its rows' order.
+			my (%points_of, @names);
+			for my $row (@$rows) {
+				my $xv   = $row->{$x_col}      // ''; next unless length $xv;
+				my $name = $row->{$series_col} // ''; next unless length $name;
+				my $yn   = _numeric_cell($row->{$y_col} // ''); next unless defined $yn;
+				$name = _decode_cell($name);
+				push @names, $name unless $points_of{$name};
+				push @{ $points_of{$name} }, { label => _decode_cell($xv), value => $yn };
+			}
+			return { error => 'No plottable data' } unless @names;
+			my @series_data = map {
+				my $points = $points_of{$_};
+				$points = [ sort { $a->{label} cmp $b->{label} } @$points ] if $m;
+				{ name => $_, data => $points };
+			} ($m ? sort @names : @names);
 
-		$title ||= $m ? "$m->{label} by $x_col" : "$y_col vs $x_col";
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_zoomable_line_chart_snippet(\@pairs, { id => $svg_id });
+			$title ||= $m ? "$m->{label} by $x_col and $series_col" : "$y_col vs $x_col by $series_col";
+			$sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+				->render_multi_series_line_chart_snippet(\@series_data, { id => $svg_id });
+		} else {
+			my @pairs;
+			for my $row (@$rows) {
+				my $xv = $row->{$x_col} // ''; next unless length $xv;
+				my $yn = _numeric_cell($row->{$y_col} // ''); next unless defined $yn;
+				push @pairs, [_decode_cell($xv), $yn];
+			}
+			return { error => 'No plottable data' } unless @pairs;
+
+			$title ||= $m ? "$m->{label} by $x_col" : "$y_col vs $x_col";
+			$sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+				->render_zoomable_line_chart_snippet(\@pairs, { id => $svg_id });
+		}
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
@@ -5711,11 +5851,31 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => "Column not found: $x_col" } unless $col_set{$x_col};
 		return { error => "Column not found: $y_col" } unless $col_set{$y_col};
 
+		# series and size are what /scatter's "Add to canvas" saves from series=
+		# and size=; scheme, min_r and max_r come with them in options.  A
+		# canvas stores a visual unchecked (PUT, PATCH, import), so the scheme
+		# goes through _categorical_scheme -- HTML::D3 writes it into the script
+		# -- and an unknown one draws the default colours, as on a pie card.
+		my $series_col = $encode->{series} // '';
+		my $size_col   = $encode->{size}   // '';
+		$series_col = '' if ref $series_col;
+		$size_col   = '' if ref $size_col;
+		return { error => "Column not found: $series_col" }
+			if length $series_col && !$col_set{$series_col};
+		return { error => "Column not found: $size_col" }
+			if length $size_col && !$col_set{$size_col};
+
 		my @points;
 		for my $row (@$vis_recs) {
 			my $xv = _numeric_cell($row->{$x_col} // ''); next unless defined $xv;
 			my $yv = _numeric_cell($row->{$y_col} // ''); next unless defined $yv;
-			push @points, [$xv, $yv];
+			my %meta;
+			$meta{series} = _decode_cell($row->{$series_col} // '') if length $series_col;
+			if (length $size_col) {
+				my $sv = _numeric_cell($row->{$size_col} // '');
+				$meta{size} = $sv if defined $sv;
+			}
+			push @points, [$xv, $yv, {}, (%meta ? \%meta : ())];
 		}
 		return { error => 'No plottable data' } unless @points;
 
@@ -5725,6 +5885,14 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 				x_label => $x_col,
 				y_label => $y_col,
 				id      => $svg_id,
+				(length $series_col
+					? (colour_by_series => 1, series_col => $series_col,
+					   scheme => _categorical_scheme($options->{scheme}))
+					: ()),
+				(length $size_col
+					? (size_col => $size_col,
+					   radius_range => [ _scatter_radii($options->{min_r}, $options->{max_r}) ])
+					: ()),
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -5886,6 +6054,9 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 				bar_label  => $bar_col,
 				line_label => $line_col,
 				id         => $svg_id,
+				# What /combo saves from scheme=, checked again: a canvas stores it
+				# unchecked.
+				(_optional_scheme($options->{scheme}) ? (scheme => $options->{scheme}) : ()),
 			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
@@ -5905,6 +6076,19 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		my $m = _visual_measure($agg_fn, $val_col);
 		return { error => $m->{error} } if $m->{error};
 
+		# encode.color and options.color_agg / color_scheme are what /treemap
+		# saves from color=, color_agg= and color_scheme=.  The function is
+		# checked by _tile_colour_measure, as the page's is; the scheme falls back as the
+		# heatmap's does, since HTML::D3 refuses a name it does not know.
+		my $color_col = $encode->{color} // '';
+		$color_col = '' if ref $color_col;
+		my $color_m;
+		if (length $color_col) {
+			return { error => "Column not found: $color_col" } unless $col_set{$color_col};
+			$color_m = $self->_tile_colour_measure($options->{color_agg}, $color_col);
+			return { error => $color_m->{error} } if $color_m->{error};
+		}
+
 		my $agg = $self->_grouped_totals(
 			{ source => $agg_src, records => $vis_recs },
 			{ by  => [$cat_col],
@@ -5913,16 +6097,28 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			  as  => 'value' },
 		);
 		return { error => 'No plottable data' } unless @$agg;
+		my $colour_of = $color_m
+			? $self->_tile_colours($agg_src, $vis_recs, $cat_col, $color_m)
+			: {};
 
-		$title ||= "$m->{label} by $cat_col";
+		$title ||= "$m->{label} by $cat_col" . ($color_m ? " coloured by $color_m->{label}" : q{});
 		my $scheme = _categorical_scheme($options->{scheme});
 		# The snippet takes one row per tile as { path, value }, the shape the
 		# treemap page builds; a [label, value] pair is not a path and croaks.
 		my @tiles = map {
-			{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value} }
+			my $cv = $colour_of->{ $_->{$cat_col} // '' };
+			+{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value},
+			   (defined $cv ? (color_value => $cv) : ()) }
 		} @$agg;
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_treemap_snippet(\@tiles, { scheme => $scheme, id => $svg_id });
+			->render_treemap_snippet(\@tiles, {
+				scheme => $scheme,
+				id     => $svg_id,
+				($color_m
+					? (color_scheme => _sequential_scheme($options->{color_scheme}),
+					   color_label  => $color_m->{label})
+					: ()),
+			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
@@ -5981,7 +6177,14 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 
 		$title ||= "Distribution of $col";
 		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
-			->render_histogram_snippet(\@bin_data, { binned => 1, x_label => $col, id => $svg_id });
+			->render_histogram_snippet(\@bin_data, {
+				binned  => 1,
+				x_label => $col,
+				id      => $svg_id,
+				# What /histogram saves from scheme=.  Stored unchecked, so it
+				# goes through the same check as the page's.
+				(_optional_scheme($options->{scheme}) ? (scheme => $options->{scheme}) : ()),
+			});
 		my $html = $sn->{html};
 		utf8::decode($html) unless utf8::is_utf8($html);
 		return { html => $html, title => $title };
@@ -6385,8 +6588,7 @@ sub canvas_render ($self) {
 		# Semantics: self-highlighting (source shown in full; others filtered).
 		# Multiple simultaneous selections are not supported in this version.
 		my @cf_specs  = grep { /\S/ } @{ $self->every_param('cf') // [] };
-		my $cf_source = defined($self->param('cv'))
-			? int($self->param('cv')) : -1;
+		my $cf_source = _cross_filter_source($self->param('cv'));
 		my $cf_active = !!@cf_specs;
 
 		# Build the "clear cross-filter" URL for the chip close button.
@@ -6425,7 +6627,7 @@ sub canvas_render ($self) {
 			if ($base ne '/') {
 				my $sep = ($base =~ /\?/) ? '&' : '?';
 				for my $cf (@cf_specs) {
-					$base .= $sep . 'f=' . url_escape($cf);
+					$base .= $sep . 'f=' . url_escape(encode('UTF-8', $cf));
 					$sep = '&';
 				}
 				$drillthrough_url = $base;
@@ -10903,7 +11105,9 @@ sub extract_list ($self) {
 # geo.<spec>.places and is written by _map_data independently.
 # ---------------------------------------------------------------------------
 
-# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location[&replace=1]
+# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location|location_suffix[&replace=1]
+# location_suffix is the column whose cells follow the place's, after ", "
+# (a country after an address).
 # col= and kind= may repeat, in pairs, so a latitude and a longitude are saved
 # in one request.  replace=1 forgets the spec's saved columns first: the map
 # panel's "Remember" sends it, so a new choice replaces the old one rather than
@@ -10917,8 +11121,8 @@ sub geo_save ($self) {
 		unless length $spec;
 	return $self->render(json => { error => 'col= required' }, status => 400)
 		unless @cols && !grep { !length } @cols;
-	return $self->render(json => { error => 'kind must be lat, lon, or location' }, status => 400)
-		unless @kinds == @cols && !grep { !/\A(?:lat|lon|location)\z/ } @kinds;
+	return $self->render(json => { error => 'kind must be lat, lon, location or location_suffix' }, status => 400)
+		unless @kinds == @cols && !grep { !/\A(?:lat|lon|location|location_suffix)\z/ } @kinds;
 
 	my $models = $self->_read_models;
 	delete $models->{geo}{$spec}{columns} if $self->param('replace');
@@ -10967,11 +11171,7 @@ sub scatter_view ($self) {
 	my $series_col = $self->param('series') // '';
 	my $size_col   = $self->param('size')   // '';
 	my $scheme     = $self->param('scheme') // 'tableau10';
-	my $min_r      = int($self->param('min_r') || 3);
-	my $max_r      = int($self->param('max_r') || 15);
-	$min_r = 1 if $min_r < 1; $min_r = 40 if $min_r > 40;
-	$max_r = 1 if $max_r < 1; $max_r = 40 if $max_r > 40;
-	($min_r, $max_r) = ($max_r, $min_r) if $min_r > $max_r;
+	my ($min_r, $max_r) = _scatter_radii($self->param('min_r'), $self->param('max_r'));
 	my $back       = _safe_back_url($self->param('back')) // '/';
 	my $back2      = _safe_back_url($self->param('back2'));
 	my $back2_lbl  = $self->param('back2_label') // '';
@@ -11043,7 +11243,13 @@ sub scatter_view ($self) {
 			(length $series_col ? (series => $series_col) : ()),
 			(length $size_col   ? (size   => $size_col)   : ()),
 		},
-		options => { scheme => $scheme },
+		# scheme= means nothing without series=, and is unchecked then, so it
+		# is not saved: a canvas copy would otherwise carry ?scheme=Blues.  The
+		# radii likewise only with size=.
+		options => {
+			(length $series_col ? (scheme => $scheme) : ()),
+			(length $size_col   ? (min_r => $min_r, max_r => $max_r) : ()),
+		},
 	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -11187,6 +11393,7 @@ sub combo_view ($self) {
 	my $line_col   = $self->param('line_val') // $self->param('line') // '';
 	my $bar_label  = $self->param('bar_label')   // '';
 	my $line_label = $self->param('line_label')  // '';
+	my $scheme     = _optional_scheme($self->param('scheme'));
 	my $back       = _safe_back_url($self->param('back')) // '/';
 	my $back2      = _safe_back_url($self->param('back2'));
 	my $back2_lbl  = $self->param('back2_label') // '';
@@ -11262,6 +11469,7 @@ sub combo_view ($self) {
 		->render_combo_snippet(\@data, {
 			bar_label  => $eff_bar_lbl,
 			line_label => $eff_line_lbl,
+			($scheme ? (scheme => $scheme) : ()),
 		});
 
 	my $chart_html = $snippet->{html};
@@ -11271,6 +11479,7 @@ sub combo_view ($self) {
 		kind   => 'combo',
 		title  => $title,
 		encode => { x => $x_col, bar => $bar_col, line => $line_col },
+		($scheme ? (options => { scheme => $scheme }) : ()),
 	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -11295,6 +11504,45 @@ sub combo_view ($self) {
 # Treemap  (GET /treemap)
 # ---------------------------------------------------------------------------
 
+# _tile_colour_measure($self, $fn, $col) -> \%measure | { error => $text }
+#
+# The measure a treemap's tiles are coloured by: $fn (color_agg=, or a card's
+# options.color_agg) of $col, average when $fn is absent or empty, since a
+# margin or a rating is read as an average rather than a total.  A name that
+# is not an aggregate function comes back as { error }, worded as the
+# function check elsewhere words it.  /treemap and a canvas treemap card both
+# ask here, so they accept and refuse the same names.
+sub _tile_colour_measure :Protected ($self, $fn, $col) {
+	$fn = (defined $fn && !ref $fn) ? lc $fn : '';
+	$fn = 'avg' unless length $fn;
+	return { error => $self->_i18n('error_agg_fn', $fn, join(' ', @MEASURE_FNS)) }
+		unless _measure_fn_ok($fn);
+	return _visual_measure($fn, $col);
+}
+
+# _tile_colours($self, $source, \@records, $cat_col, \%measure) -> \%colour_of
+#
+# The number each treemap tile is coloured by: the measure (from
+# _visual_measure) folded per value of $cat_col, keyed by the raw value.  With
+# $cat_col undef it is one total over every row, under the key ''.  A group
+# whose result is not a finite number has no entry, and its tile is drawn
+# grey.  /treemap and a canvas treemap card both fold here, so a card saved
+# from the page is coloured by the same numbers.
+sub _tile_colours :Protected ($self, $source, $records, $cat_col, $m) {
+	my $rows = $self->_grouped_totals(
+		{ source => $source, records => $records },
+		{ by  => [ defined $cat_col ? ($cat_col) : () ],
+		  fn  => $m->{fn}, val => $m->{val}, as => 'colour' },
+	);
+	my %colour_of;
+	for my $r (@$rows) {
+		my $v = $r->{colour};
+		next unless defined $v && Scalar::Util::looks_like_number($v) && $v !~ /\A\s*[-+]?(?:nan|inf)/i;
+		$colour_of{ defined $cat_col ? ($r->{$cat_col} // '') : '' } = $v + 0;
+	}
+	return \%colour_of;
+}
+
 sub treemap_view ($self) {
 	# ?group= is the canonical spec name; ?cat= is the legacy alias (keep both).
 	my $cat_col   = $self->param('group') // $self->param('cat') // '';
@@ -11305,10 +11553,17 @@ sub treemap_view ($self) {
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
 
+	# ?color= shades each tile by a second column, folded per tile with
+	# ?color_agg= (default avg: a margin or a rating is read as an average, not
+	# a total) on the sequential ?color_scheme=, as the heatmap's cells are.
+	my $color_col    = $self->param('color') // '';
+	my $color_m      = length $color_col
+		? $self->_tile_colour_measure($self->param('color_agg'), $color_col)
+		: undef;
+	my $color_scheme = _sequential_scheme($self->param('color_scheme'));
+
 	return $self->render(text => 'Missing group= parameter', status => 400) unless length $cat_col;
-	# ?color= (colour-by-measure) is not yet implemented; reject it explicitly.
-	return $self->render(text => '?color= is not yet supported for /treemap', status => 400)
-		if defined $self->param('color');
+	return $self->render(text => $color_m->{error}, status => 400) if $color_m && $color_m->{error};
 
 	my ($src, $records, $columns) = $self->_run_pipeline_source;
 	return $self->render(text => 'Could not open data source', status => 404) unless defined $records;
@@ -11328,6 +11583,8 @@ sub treemap_view ($self) {
 	my $count_mode = (!length $val_col || $val_col eq '__count__');
 	return $self->render(text => "Column not found: $val_col", status => 400)
 		unless $count_mode || $col_set{$val_col};
+	return $self->render(text => "Column not found: $color_col", status => 400)
+		if length $color_col && !$col_set{$color_col};
 
 	$cat_col = $span->{col} if $span;
 
@@ -11340,6 +11597,10 @@ sub treemap_view ($self) {
 			as  => 'value',
 		},
 	);
+
+	my $colour_of = $color_m
+		? $self->_tile_colours($src, $records, $cat_col, $color_m)
+		: {};
 
 	# Top-N: keep the highest-N tiles, aggregate the rest as "Other".
 	my $topn_n = _whole_number($self->param('topn')) // 0;
@@ -11356,8 +11617,14 @@ sub treemap_view ($self) {
 				{ by  => [], fn  => ($count_mode ? 'count' : 'sum'),
 				  val => ($count_mode ? undef : $val_col), as => 'value' },
 			);
-			push @top_agg, { $cat_col => 'Other', value => $other->[0]{value} }
-				if @$other && defined $other->[0]{value};
+			if (@$other && defined $other->[0]{value}) {
+				push @top_agg, { $cat_col => 'Other', value => $other->[0]{value} };
+				# Other's colour is its own rows', not an average of averages.
+				# The key is the tile, so a category itself named Other is
+				# drawn with this one, as its area already is.
+				$colour_of->{Other} = $self->_tile_colours(undef, $other_rec, undef, $color_m)->{''}
+					if $color_m;
+			}
 		}
 		$agg_rows = \@top_agg;
 	}
@@ -11368,16 +11635,20 @@ sub treemap_view ($self) {
 	) unless @$agg_rows;
 
 	my @data = map {
-		{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value} }
+		my $cv = $colour_of->{ $_->{$cat_col} // '' };
+		+{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value},
+		   (defined $cv ? (color_value => $cv) : ()) }
 	} @$agg_rows;
 
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
 	require HTML::D3;
 	my $title   = $count_mode ? "Treemap of $cat_col by count" : "Treemap of $cat_col by $val_col";
+	$title     .= " coloured by $color_m->{label}" if $color_m;
 	my $snippet = HTML::D3->new(title => $title, width => 800, height => 500)
 		->render_treemap_snippet(\@data, {
 			scheme => $scheme,
+			($color_m ? (color_scheme => $color_scheme, color_label => $color_m->{label}) : ()),
 		});
 
 	my $chart_html = $snippet->{html};
@@ -11386,8 +11657,10 @@ sub treemap_view ($self) {
 	my %chart_spec = (
 		kind    => 'treemap',
 		title   => $title,
-		encode  => { cat => $cat_col, value => $val_col },
-		options => { scheme => $scheme },
+		encode  => { cat => $cat_col, value => $val_col,
+			($color_m ? (color => $color_col) : ()) },
+		options => { scheme => $scheme,
+			($color_m ? (color_agg => $color_m->{fn}, color_scheme => $color_scheme) : ()) },
 	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -11418,6 +11691,7 @@ sub histogram_view ($self) {
 	my $col       = $self->param('col')   // '';
 	my $_bins_raw = $self->param('bins');
 	my $bins      = (defined $_bins_raw && length $_bins_raw) ? $_bins_raw : 10;
+	my $scheme    = _optional_scheme($self->param('scheme'));
 	my $back      = _safe_back_url($self->param('back')) // '/';
 	my $back2     = _safe_back_url($self->param('back2'));
 	my $back2_lbl = $self->param('back2_label') // '';
@@ -11501,6 +11775,7 @@ sub histogram_view ($self) {
 		->render_histogram_snippet(\@bin_data, {
 			binned  => 1,
 			x_label => $col,
+			($scheme ? (scheme => $scheme) : ()),
 		});
 
 	my $chart_html = $snippet->{html};
@@ -11510,7 +11785,7 @@ sub histogram_view ($self) {
 		kind    => 'histogram',
 		title   => $title,
 		encode  => { value => $col },
-		options => { bins => $bins },
+		options => { bins => $bins, ($scheme ? (scheme => $scheme) : ()) },
 	);
 	my ($platform, $language) = $self->_resolve_template;
 	$self->render(
@@ -11794,6 +12069,136 @@ sub wordcloud_view ($self) {
 # filtered, calculated view and not the raw table.
 # ---------------------------------------------------------------------------
 
+# _map_loc_columns($loc) -> @columns
+#
+# The place-name columns of a map, in order, from loc: one name (a canvas card
+# saved before a place could span columns), or a list of them (loc= repeated,
+# or a card's encode.loc array).  Empty and non-string entries are dropped, and
+# a column named twice is used once.
+sub _map_loc_columns {
+	my $loc = shift;
+	my @names = ref($loc) eq 'ARRAY' ? @{$loc} : ($loc);
+	my %seen;
+	return grep { defined($_) && !ref($_) && length($_) && !$seen{$_}++ } @names;
+}
+
+# _map_unplotted(\@records, \@places, $loc_col, \@loc_cols, \%resolved)
+#     -> (\@entries, \@all_filters)
+#
+# The places a geocoded map could not plot, so that the page can say which
+# they are: one entry for each, in the order of the first row that names it,
+# as { place, rows, reason, filters }.  reason is 'empty' (no place in the
+# row), 'refused' (not a place name: a bare number), 'not_found', or 'later'
+# (not looked up yet: past a cap, or waiting for OpenStreetMap).  filters are
+# f= specs that select the place's rows in the table, built from the cells of
+# its first row: one for each place column, eq that cell, or empty.
+#
+# @all_filters select every unplotted row at once: for each place column, in
+# the list of its cells in those rows.  Columns filtered apart can pair a cell
+# of one row with a cell of another, which may name a place that was plotted,
+# so the filters are tried on the rows and kept only when they select exactly
+# the unplotted ones; otherwise @all_filters is empty.
+sub _map_unplotted {
+	my ($records, $places, $loc_col, $loc_cols, $resolved) = @_;
+
+	my %reason;
+	for my $value (@{ $resolved->{skipped} // [] }) {
+		my $key = (defined($value) && !ref($value)) ? $value : '';
+		$reason{$key} = length($key) ? 'refused' : 'empty';
+	}
+	$reason{$_} = 'not_found' for grep { defined } @{ $resolved->{unresolved}    // [] };
+	$reason{$_} = 'later'     for grep { defined } @{ $resolved->{not_attempted} // [] };
+
+	my (%rows, %first, %cells);
+	my $total = 0;
+	for my $index (0 .. $#{$places}) {
+		my $place = $places->[$index];
+		my $value = ref($place) eq 'HASH' ? $place->{$loc_col} : undef;
+		my $key   = (defined($value) && !ref($value)) ? $value : '';
+		next unless exists $reason{$key};
+		$rows{$key}++;
+		$total++;
+		$first{$key} //= $index;
+
+		my $row = $records->[$index];
+		for my $col (@{$loc_cols}) {
+			my $cell = ref($row) eq 'HASH' ? $row->{$col} : undef;
+			$cells{$col}{ (defined($cell) && !ref($cell)) ? $cell : '' } = 1;
+		}
+	}
+
+	my @all_filters;
+	if ($total) {
+		@all_filters = map { "$_:in:" . to_json([ sort keys %{ $cells{$_} } ]) } @{$loc_cols};
+		# Only rows can be filtered; one that is not is never selected.
+		my $hit = [ grep { ref($_) eq 'HASH' } @{$records} ];
+		$hit = _apply_filter_spec($hit, $_) for @all_filters;
+		@all_filters = () unless scalar(@{$hit}) == $total;
+	}
+
+	my @entries = map {
+		my $row = $records->[ $first{$_} ];
+		$row = {} unless ref($row) eq 'HASH';
+		+{
+			place   => $_,
+			rows    => $rows{$_},
+			reason  => $reason{$_},
+			filters => [ map {
+				my $cell = $row->{$_};
+				(defined($cell) && !ref($cell) && length($cell)) ? "$_:eq:$cell" : "$_:empty";
+			} @{$loc_cols} ],
+		};
+	} sort { $first{$a} <=> $first{$b} } keys %first;
+
+	return (\@entries, \@all_filters);
+}
+
+# _map_region($config) -> $region or undef
+#
+# The country hint for the local geocoder: config map_region when it is two
+# letters, else none.
+sub _map_region {
+	my $cfg = shift;
+	my $region = $cfg->{map_region};
+
+	return (defined($region) && !ref($region) && $region =~ /\A[A-Za-z]{2}\z/) ? $region : undef;
+}
+
+# _map_geocoder($self, $online) -> Database::BI::Model::Geocode
+#
+# The geocoder a map asks, built from the config the same way for the map page,
+# a canvas card and /geo/lookup.  The geocoder is a config seam first and a
+# recommended dependency second: a deployment may hand in an object, and a test
+# does exactly that.  With neither, the model reports the module as unavailable
+# and the map is still the map.
+#
+# map_geocode_online => 0 keeps every lookup on this machine: a place the local
+# data does not know is then not sent to OpenStreetMap.  A false $online does
+# the same for one request (the progress run, once Nominatim has failed).
+# Geo::Coder::List keeps its answers in files beside models.json, so a place
+# Nominatim found is not asked again by another request, worker or restart.  A
+# model_dir that is refused (inside data_dir) gets none, and the module falls
+# back on a cache in this process's memory.
+sub _map_geocoder :Protected ($self, $online) {
+	require Database::BI::Model::Geocode;
+
+	my $cfg         = $self->app->config;
+	my $models_path = $self->_calc_models_path;
+	my $injected    = $cfg->{geocoder};
+
+	return Database::BI::Model::Geocode->new(
+		(defined($models_path)
+			? (cache => Database::BI::Model::Geocode->file_cache(Mojo::File->new($models_path)->dirname->to_string))
+			: ()),
+		(defined($injected) && ref($injected) && $injected->can('geocode_many')
+			? (geocoder => $injected) : ()),
+		(defined($cfg->{openaddr}) && length($cfg->{openaddr})
+			? (openaddr => $cfg->{openaddr}) : ()),
+		online     => (($online && ($cfg->{map_geocode_online} // 1)) ? 1 : 0),
+		online_max => _map_limit($cfg->{map_geocode_online_max}, $DEFAULT_MAP_GEOCODE_ONLINE_MAX),
+	);
+}
+
 # _map_data($self, \@records, \@columns, \%encode, \%options, $spec_key, $id_suffix)
 #     -> \%result
 #
@@ -11810,7 +12215,11 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	$encode  //= {};
 	$options //= {};
 
-	my $loc_col = $encode->{loc} // '';
+	# loc may name several columns, in order: the place is their cells joined
+	# with ", " (an address and then its country).  $loc_col is that list's
+	# name, which is what the page and the geocoder are told.
+	my @loc_cols = _map_loc_columns($encode->{loc});
+	my $loc_col = join(', ', @loc_cols);
 	my $lat_col = $encode->{lat} // '';
 	my $lon_col = $encode->{lon} // '';
 	my $by_location = length $loc_col;
@@ -11823,38 +12232,40 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	my %col_set = map { $_ => 1 } @$columns;
 	my $cfg     = $self->app->config;
 
+	my %loc_set = map { $_ => 1 } @loc_cols;
 	my @popup = grep {
-		defined($_) && !ref($_) && length($_) && $_ ne $loc_col && $col_set{$_}
+		defined($_) && !ref($_) && length($_) && !$loc_set{$_} && $col_set{$_}
 	} @{ ref($options->{popup}) eq 'ARRAY' ? $options->{popup} : [] };
 
 	# Default: when no popup columns are requested, show every column that is
 	# not a coordinate column so the marker tooltip is informative out of the box.
 	unless (@popup) {
 		my %coord_set = map { $_ => 1 }
-			grep { defined($_) && length($_) } ($loc_col, $lat_col, $lon_col);
+			grep { defined($_) && length($_) } (@loc_cols, $lat_col, $lon_col);
 		@popup = grep { !$coord_set{$_} } @$columns;
 	}
 
 	my ($backend, $plotted_rows) = (undef, 0);
-	my (@markers, @messages);
+	my (@markers, @messages, @unplotted, @unplotted_filters, @pending);
+
+	# How many rows a popup lists, and where the rest are: the map page passes
+	# rows_url, which makes a table link from filters; a canvas card has none.
+	my $popup_rows = _map_limit($cfg->{map_popup_rows}, $DEFAULT_MAP_POPUP_ROWS);
+	my $rows_url   = ref($options->{rows_url}) eq 'CODE' ? $options->{rows_url} : undef;
 
 	if ($by_location) {
-		return { error => $self->_i18n('error_map_loc_column', $loc_col), status => 400 }
-			unless $col_set{$loc_col};
+		for my $col (@loc_cols) {
+			return { error => $self->_i18n('error_map_loc_column', $col), status => 400 }
+				unless $col_set{$col};
+		}
 
 		require Database::BI::Model::Geocode;
 
-		# The geocoder is a config seam first and a recommended dependency
-		# second: a deployment may hand in an object, and a test does exactly
-		# that.  With neither, the model reports the module as unavailable and
-		# the map is still the map.
-		my $injected = $cfg->{geocoder};
-		my $geocode  = Database::BI::Model::Geocode->new(
-			(defined($injected) && ref($injected) && $injected->can('geocode_many')
-				? (geocoder => $injected) : ()),
-			(defined($cfg->{openaddr}) && length($cfg->{openaddr})
-				? (openaddr => $cfg->{openaddr}) : ()),
-		);
+		# What the geocoder is given: one cell a row, under $loc_col, in the
+		# rows' own order, so a marker's first_row still indexes $records.
+		my ($places) = Database::BI::Model::Geocode->place_rows($records, \@loc_cols);
+
+		my $geocode = $self->_map_geocoder(1);
 
 		# A place name means the same place whichever file's column holds it, so
 		# the answers live in one shared cache: the second dataset that names a
@@ -11868,18 +12279,26 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		my $shared     = Database::BI::Model::Geocode->shared_cache_from_models($models);
 		my %cache      = (%$legacy, %$shared);
 		my $to_share   = grep { !exists $shared->{$_} } keys %$legacy;
-		my $region     = $cfg->{map_region};
+		my $region     = _map_region($cfg);
 
+		# lookup => 0 (the map page in a browser) asks nothing here: the
+		# places not cached yet come back as pending, and the page looks them
+		# up one at a time through /geo/lookup, with a progress bar.
 		my $result = $geocode->resolve_column(
-			$records, $loc_col,
+			$places, $loc_col,
 			cache => \%cache,
-			((defined($region) && $region =~ /\A[A-Za-z]{2}\z/) ? (region => $region) : ()),
+			(defined($region) ? (region => $region) : ()),
 			max   => _map_limit($cfg->{map_geocode_max}, $DEFAULT_MAP_GEOCODE_MAX),
+			lookup => ((defined($options->{lookup}) && !$options->{lookup}) ? 0 : 1),
 		);
+		@pending = @{ $result->{pending} // [] };
 
 		push @messages, @{ $result->{messages} };
 		$backend      = $result->{backend};
 		$plotted_rows = $result->{counts}{plotted};
+		my ($entries, $all) = _map_unplotted($records, $places, $loc_col, \@loc_cols, $result);
+		@unplotted         = @{$entries};
+		@unplotted_filters = @{$all};
 
 		# Only a request that asked something new, or found old answers to move
 		# into the shared cache, has something new to remember: rewriting the
@@ -11905,14 +12324,27 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			}
 		}
 
+		# Every row at a place, keyed as the geocoder keyed the place, so its
+		# popup can list them all and not only the first.
+		my %rows_at;
+		for my $index (0 .. $#{$places}) {
+			my $place = $places->[$index];
+			my $value = ref($place) eq 'HASH' ? $place->{$loc_col} : undef;
+			push @{ $rows_at{ (defined($value) && !ref($value)) ? $value : '' } }, $index;
+		}
+
 		for my $marker (@{ $result->{markers} }) {
-			my $row = ($marker->{first_row} <= $#$records)
-				? $records->[ $marker->{first_row} ] : {};
+			my @at  = @{ $rows_at{ $marker->{value} } // [] };
+			my $row = $records->[ $at[0] // $marker->{first_row} ];
+			$row = {} unless ref($row) eq 'HASH';
+			my $more_url = $rows_url ? $rows_url->([ map {
+				my $cell = $row->{$_};
+				(defined($cell) && !ref($cell) && length($cell)) ? "$_:eq:$cell" : "$_:empty";
+			} @loc_cols ]) : '';
 			push @markers, {
 				%{ $marker },
 				'label' => _map_popup(
-					$marker->{value}, $marker->{rows},
-					[ map { [ $_, $row->{$_} ] } @popup ],
+					$marker->{value}, [ @{$records}[@at] ], \@popup, $popup_rows, $more_url,
 				),
 			};
 		}
@@ -11923,7 +12355,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		return { error => "Column not found: $lon_col", status => 400 }
 			unless $col_set{$lon_col};
 
-		my (%by_key, $out_of_lat, $out_of_lon, $unusable);
+		my (%by_key, %rows_at, $out_of_lat, $out_of_lon, $unusable);
 
 		for my $index (0 .. $#$records) {
 			my $row = $records->[$index];
@@ -11942,6 +12374,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			# file renderable, and "how many are here?" is the question a map
 			# answers.
 			my $key   = sprintf('%.6f,%.6f', $lat, $lon);
+			push @{ $rows_at{$key} }, $index;
 			my $point = $by_key{$key};
 			if ($point) { $point->{rows}++; next }
 
@@ -11967,11 +12400,15 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		} if $plotted_rows < scalar @$records;
 
 		for my $marker (@markers) {
+			my $key = sprintf('%.6f,%.6f', $marker->{lat}, $marker->{lon});
 			my $row = $records->[ $marker->{first_row} ];
+			my $more_url = $rows_url ? $rows_url->([
+				"$lat_col:eq:" . ($row->{$lat_col} // ''),
+				"$lon_col:eq:" . ($row->{$lon_col} // ''),
+			]) : '';
 			$marker->{label} = _map_popup(
 				sprintf('%.6f, %.6f', $marker->{lat}, $marker->{lon}),
-				$marker->{rows},
-				[ map { [ $_, $row->{$_} ] } @popup ],
+				[ @{$records}[ @{ $rows_at{$key} } ] ], \@popup, $popup_rows, $more_url,
 			);
 		}
 	}
@@ -12061,24 +12498,47 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			);
 			# The renderer is a third-party module: whatever it does, the page
 			# reports it and survives, as it does when the module is absent.
+			# The map page passes the colour and size columns as options; a
+			# canvas card has them in its encode, as the page saved them.  A
+			# card's are stored unchecked, so one that names no column is
+			# left out rather than refused.
+			my $color_col = $options->{color_col} // $encode->{color} // '';
+			$color_col = '' if ref($color_col) || !$col_set{$color_col};
+			# A card's rules are stored unchecked: one that is not a rule is
+			# left out rather than read as one.
+			my $color_rules   = [ grep { ref($_) eq 'HASH' }
+				@{ ref($options->{color_rules}) eq 'ARRAY' ? $options->{color_rules} : [] } ];
+			my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
+			my $size_col = $options->{size} // $encode->{size} // '';
+			$size_col = '' if ref($size_col) || !$col_set{$size_col};
+
+			# The scale bar, and the key on the map: colours and bubble sizes.
+			my $size_range = [ _map_size_range($records, \@markers, $size_col) ];
+			my %key = $self->_map_key($color_col, $color_rules, $color_default,
+				defined($options->{scheme}), $size_col, $size_range);
+			$osm_args{scale} = 1;
+			# Without a zoom the map opens on every marker, as the panel promises
+			$osm_args{fit} = 1 unless defined $options->{zoom};
+			%osm_args = (%osm_args, %key) if @{ $key{legend} // [] };
+
 			my $drawn = eval {
 				my $map = HTML::OSM->new(%osm_args);
-				my $color_col     = $options->{color_col} // '';
-				my $color_rules   = $options->{color_rules}   // [];
-				my $color_default = $options->{color_default} // $DEFAULT_MARKER_COLOR;
-				my $size_col      = $options->{size} // '';
 
 				# Bubble maps: one radius per marker, scaled across the plotted
 				# values.  Circle markers keep their pixel size as the reader
 				# zooms, which is what makes them comparable.
-				my ($size_min, $size_max) = _map_size_range($records, \@markers, $size_col);
+				my ($size_min, $size_max) = @{$size_range};
 
 				for my $marker (@markers) {
 					my $row = $records->[ $marker->{first_row} ];
-					my $color;
+					my ($color, $group);
 					if (length $color_col) {
 						my $cval = (defined($row) ? $row->{$color_col} : undef) // '';
 						$color = _apply_color_rule($cval, $color_rules, $color_default);
+						# Which key entry the marker belongs to, so the key lists
+						# only what is in view
+						my $index = _color_rule_index($cval, $color_rules);
+						$group = defined($index) ? "rule$index" : 'other';
 					}
 					if (length $size_col) {
 						my $sv = defined($row)
@@ -12088,12 +12548,14 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 							html   => $marker->{label},
 							radius => _map_radius($sv, $size_min, $size_max),
 							(defined($color) ? (colour => _color_hex($color)) : ()),
+							(defined($group) ? (group  => $group)            : ()),
 						);
 					} else {
 						$map->add_marker(
 							[ $marker->{lat}, $marker->{lon} ],
 							html => $marker->{label},
 							(defined($color) ? (icon => _marker_icon($color)) : ()),
+							(defined($group) ? (group => $group)              : ()),
 						);
 					}
 				}
@@ -12155,7 +12617,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	my %chart_spec = (
 		kind   => 'map',
 		title  => $title,
-		encode => ($by_location ? { loc => $loc_col }
+		encode => ($by_location ? { loc => (@loc_cols == 1 ? $loc_cols[0] : [ @loc_cols ]) }
 		                        : { lat => $lat_col, lon => $lon_col }),
 	);
 	$chart_spec{options}{popup} = \@popup if @popup;
@@ -12192,6 +12654,9 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		lon_col      => ($by_location ? undef    : $lon_col),
 		backend      => $backend,
 		chart        => \%chart_spec,
+		unplotted    => \@unplotted,
+		unplotted_filters => \@unplotted_filters,
+		pending      => \@pending,
 	};
 }
 
@@ -12305,7 +12770,8 @@ sub _canvas_map_html {
 }
 
 sub map_view ($self) {
-	my $loc_col   = $self->param('loc') // '';
+	my @loc_cols  = _map_loc_columns($self->every_param('loc'));
+	my $loc_col   = join(', ', @loc_cols);
 	my $lat_col   = $self->param('lat') // '';
 	my $lon_col   = $self->param('lon') // '';
 	my $back      = _safe_back_url($self->param('back')) // '/';
@@ -12371,10 +12837,25 @@ sub map_view ($self) {
 		return $self->render(text => $e, status => 400);
 	}
 
+	# geocode= says when the places not in the cache yet are looked up: 'wait'
+	# in this request, before the page is sent; 'cached' not at all, so the map
+	# shows what the cache knows (where Cancel leads).  Without it, a page a
+	# browser navigated to (a GET whose Accept names text/html, which fetch()
+	# and scripts do not send) asks nothing here: it lists the places for the
+	# page, which looks them up one at a time with a progress bar.  Any other
+	# client waits, as every client did before.
+	my $geocode_mode = $self->param('geocode') // '';
+	return $self->render(text => $self->_i18n('error_map_geocode_mode', $geocode_mode), status => 400)
+		unless $geocode_mode =~ /\A(?:wait|cached|)\z/;
+	my $progress = $by_location && !length($geocode_mode)
+		&& $self->req->method eq 'GET'
+		&& ($self->req->headers->accept // '') =~ m{\btext/html\b};
+
 	return unless $self->_reduce_or_render(\$records, \$columns);
 
 	my %col_set = map { $_ => 1 } @{ $columns };
-	my @popup = grep { length($_) && $_ ne $loc_col && $col_set{$_} }
+	my %loc_set = map { $_ => 1 } @loc_cols;
+	my @popup = grep { length($_) && !$loc_set{$_} && $col_set{$_} }
 		@{ $self->every_param('popup') };
 
 	# Marker colour params.  color= applies explicit threshold rules;
@@ -12439,36 +12920,30 @@ sub map_view ($self) {
 	$options{tile_url} = $tile_url_override if defined $tile_url_override;
 	$options{heat}     = 1               if $heat;
 	$options{weight}   = $weight_col     if length($weight_col) && $col_set{$weight_col};
+	$options{lookup}   = 0               if $progress || $geocode_mode eq 'cached';
 
-	# Build colour legend for the template
-	my @color_legend;
-	if (length $color_col) {
-		if (@series_cats) {
-			for my $i (0 .. $#series_cats) {
-				push @color_legend, {
-					color => $series_palette->[ $i % @$series_palette ],
-					label => length($series_cats[$i]) ? $series_cats[$i] : '(blank)',
-				};
-			}
-		} else {
-			my %op_label = (
-				gt => '>', ge => '>=', lt => '<', le => '<=', eq => '=', ne => '!=',
-			);
-			for my $rule (@$color_rules) {
-				push @color_legend, {
-					color => $rule->{color},
-					label => $color_col . ' ' . ($op_label{ $rule->{op} } // $rule->{op})
-						. ' ' . $rule->{val},
-				};
-			}
-			push @color_legend, { color => $color_default, label => 'Other' }
-				if @color_legend;
-		}
-	}
+	# Each place that could not be plotted, and each marker with more rows
+	# than its popup lists, links to its rows in the table, as a bar drills
+	# into its category: the table this map came from, with
+	# the place's filters added, and back2= to return here.
+	my $rows_base = ($back =~ m{\A(?:https?://[^/]+)?/(?:open\?|view/)}) ? $back
+		: $self->_spec_to_url($self->param('l') // '');
+	my $here = $self->req->url->path_query;
+	my $rows_url = sub {
+		my ($filters) = @_;
+		return '' if $rows_base eq '/' || !@{$filters};
+		my $sep = ($rows_base =~ /\?/) ? '&' : '?';
+		return $rows_base . $sep . join('&',
+			(map { 'f=' . url_escape(encode('UTF-8', $_)) } @{$filters}),
+			'back2=' . url_escape($here),
+			'back2_label=' . url_escape('Back to map'),
+		);
+	};
+	$options{rows_url} = $rows_url;
 
 	my $result = $self->_map_data(
 		$records, $columns,
-		($by_location ? { loc => $loc_col } : { lat => $lat_col, lon => $lon_col }),
+		($by_location ? { loc => [ @loc_cols ] } : { lat => $lat_col, lon => $lon_col }),
 		\%options,
 		$self->param('l') // '',
 		undef,
@@ -12480,9 +12955,51 @@ sub map_view ($self) {
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 	my ($platform, $language) = $self->_resolve_template;
 
+	my @unplotted = map {
+		my $entry = { %{$_} };
+		$entry->{url} = $rows_url->($entry->{filters});
+		$entry;
+	} @{ $result->{unplotted} // [] };
+	my $unplotted_rows = 0;
+	$unplotted_rows += $_->{rows} for @unplotted;
+
+	# This page with geocode= set to $mode, or without it for undef.
+	my $here_with = sub {
+		my ($mode) = @_;
+		my $url = $self->req->url->clone;
+		$url->query->remove('geocode');
+		$url->query->append(geocode => $mode) if defined $mode;
+		return $url->path_query;
+	};
+
+	# The places to look up, each signed so that /geo/lookup asks only what a
+	# map page listed: without that, any page on the web could post a string
+	# for this server to send to OpenStreetMap.
+	my @pending = $progress ? @{ $result->{pending} // [] } : ();
+	my %progress;
+	if (@pending) {
+		my $json = to_json([ map { { place => $_, sig => $self->_geo_lookup_sig($_) } } @pending ]);
+		$json =~ s{</}{<\\/}g;
+		%progress = (
+			geocode_pending      => scalar @pending,
+			geocode_pending_json => $json,
+			geocode_done_url     => $here_with->(undef),
+			geocode_cached_url   => $here_with->('cached'),
+			geocode_wait_url     => $here_with->('wait'),
+		);
+	}
+
+	# After Cancel, the places left are offered again.
+	$progress{geocode_retry_url} = $here_with->(undef)
+		if $geocode_mode eq 'cached' && grep { $_->{reason} eq 'later' } @unplotted;
+
 	$self->render(
 		handler         => 'tt',
 		template        => "$platform/$language/map",
+		%progress,
+		unplotted       => \@unplotted,
+		unplotted_rows  => $unplotted_rows,
+		unplotted_url   => $rows_url->($result->{unplotted_filters} // []),
 		format          => 'html',
 		title           => $result->{title},
 		extra_head      => $result->{map_head},
@@ -12492,13 +13009,12 @@ sub map_view ($self) {
 		row_count       => $result->{row_count},
 		source_rows     => $result->{source_rows},
 		loc_col         => $result->{loc_col},
+		loc_many        => (@loc_cols > 1 ? 1 : 0),
 		lat_col         => $result->{lat_col},
 		lon_col         => $result->{lon_col},
 		backend         => $result->{backend},
 		chart           => $result->{chart},
 		chart_json      => $self->_chart_json($result->{chart}),
-		color_col       => $color_col,
-		color_legend    => \@color_legend,
 		back_url        => ($back2 // $back),
 		back_label      => ($back2 ? ($back2_lbl || 'Back') : 'Back to table'),
 		($back2 ? (back2_url => $back, back2_label => 'Back to table') : ()),
@@ -12508,20 +13024,140 @@ sub map_view ($self) {
 	);
 }
 
-# _map_popup($heading, $rows, \@extras) -> $html
+# _geo_lookup_sig($self, $place) -> $hex
+#
+# What the map page signs each place it lists with, and /geo/lookup checks.
+# The key is the application's secret, which BI.pm makes at random for each
+# start unless the config names one, so a list outlives neither a restart nor
+# another installation.
+sub _geo_lookup_sig :Protected ($self, $place) {
+	return hmac_sha1_sum(encode('UTF-8', "geo-lookup\0$place"), $self->app->secrets->[0]);
+}
+
+# ---------------------------------------------------------------------------
+# POST /geo/lookup  place=<place>&sig=<sig>[&online=0]
+#
+# One place, for the map page's progress bar: looked up as the map would, and
+# its answer saved in the shared place cache straight away, so a run that is
+# cancelled or interrupted keeps every place it found.  The place must carry the
+# signature the map page gave it.  online=0 keeps the lookup on this machine;
+# the page sends it once OpenStreetMap has failed, so that each place left does
+# not wait for it again.
+#
+# Replies 200 JSON:
+#   { place, status => 'found' | 'not_found' | 'held' | 'refused',
+#     stored => 0|1, online_failed => 0|1, messages => [ text ... ] }
+# 'held' is a place that could not be looked up now (OpenStreetMap did not
+# answer, or the geocoder is missing); it is not remembered, so the next map
+# asks again.  stored says that the answer is in the cache: a found or
+# not-found place the store refused to keep is 0.
+# 400 JSON { error } without place= or sig=; 403 JSON { error } for a bad sig=.
+# ---------------------------------------------------------------------------
+sub geo_lookup ($self) {
+	my $place = $self->param('place') // '';
+	my $sig   = $self->param('sig')   // '';
+
+	return $self->render(json => { error => $self->_i18n('error_geo_lookup_place') }, status => 400)
+		unless length($place) && length($sig);
+	return $self->render(json => { error => $self->_i18n('error_geo_lookup_unsigned') }, status => 403)
+		unless secure_compare($sig, $self->_geo_lookup_sig($place));
+
+	my $cfg     = $self->app->config;
+	my $geocode = $self->_map_geocoder(($self->param('online') // 1) ? 1 : 0);
+	my $models  = $self->_read_models;
+	my $region  = _map_region($cfg);
+
+	my $result = $geocode->resolve_values(
+		[ $place ],
+		cache => Database::BI::Model::Geocode->shared_cache_from_models($models),
+		(defined($region) ? (region => $region) : ()),
+		max   => 1,
+	);
+
+	my $status = $result->{points}{$place}		? 'found'
+		: (grep { $_ eq $place } @{ $result->{unresolved} })	? 'not_found'
+		: (grep { $_ eq $place } @{ $result->{skipped} })	? 'refused'
+		:							  'held';
+
+	# A place another tab answered meanwhile is in the cache already.
+	my $stored = ($status eq 'found' || $status eq 'not_found') && !$result->{counts}{attempted};
+
+	if ($result->{counts}{attempted} && $status ne 'held') {
+		my $backend = $result->{backend};
+		$stored = $self->_write_models(Database::BI::Model::Geocode->models_with_shared_cache(
+			$models, { $place => $result->{cache}{$place} },
+			(defined($backend) ? (backend => $backend) : ()),
+			built => _iso8601_utc(),
+		)) ? 1 : 0;
+	}
+
+	my @messages = map { $_->{text} } grep {
+		$_->{key} ne 'warn_map_geocoder_unavailable_data'
+	} @{ $result->{messages} };
+
+	return $self->render(json => {
+		place         => $place,
+		status        => $status,
+		stored        => $stored ? 1 : 0,
+		online_failed => (grep { $_->{key} eq 'warn_map_geocoder_online_failed' } @{ $result->{messages} }) ? 1 : 0,
+		messages      => \@messages,
+	});
+}
+
+# _map_popup($heading, \@rows, \@columns, $limit, $more_url) -> $html
 #
 # The popup for one marker: what it is, how many rows it stands for, and the
-# columns the request asked for.  Leaflet treats a popup string as HTML, and a
-# place name out of a user's file is not markup, so every value is escaped here.
+# rows themselves.  A value every row shares is said once, as "Column: value";
+# the columns that differ are a small table of at most $limit rows, in a box
+# that scrolls, so a place with many rows does not cover the map.  The rest
+# are counted, with a link to them in the table when $more_url is given.
+# Leaflet treats a popup string as HTML, and a value out of a user's file is
+# not markup, so every value is escaped here.
 sub _map_popup {
-	my ($heading, $rows, $extras) = @_;
+	my ($heading, $rows, $columns, $limit, $more_url) = @_;
+
+	my @rows = grep { ref($_) eq 'HASH' } @{ ref($rows) eq 'ARRAY' ? $rows : [] };
+	my @cols = grep { defined($_) && !ref($_) && length($_) } @{ ref($columns) eq 'ARRAY' ? $columns : [] };
+	$limit = _map_limit($limit, $DEFAULT_MAP_POPUP_ROWS);
+	my $cell = sub { my $v = $_[0]->{ $_[1] }; (defined($v) && !ref($v)) ? $v : '' };
 
 	my @lines = '<strong>' . xml_escape($heading // '') . '</strong>';
-	push @lines, $rows . ' rows' if $rows != 1;
-	push @lines, map { xml_escape($_->[0]) . ': ' . xml_escape($_->[1]) }
-		grep { defined($_->[1]) && length($_->[1]) } @{ $extras // [] };
+	push @lines, scalar(@rows) . ' rows' if @rows > 1;
 
-	return join('<br>', @lines);
+	# The same in every row, or not.
+	my (@shared, @differ);
+	for my $col (@cols) {
+		my %seen = map { $cell->($_, $col) => 1 } @rows;
+		if (keys(%seen) > 1) { push @differ, $col }
+		elsif (@rows)        { push @shared, [ $col, $cell->($rows[0], $col) ] }
+	}
+	push @lines, map { xml_escape($_->[0]) . ': ' . xml_escape($_->[1]) }
+		grep { length $_->[1] } @shared;
+
+	my $html = join('<br>', @lines);
+	return $html unless @differ;
+
+	# The box keeps its size and scroll inline, one style a marker, so a page
+	# without the stylesheet still cannot be covered; the cells' spacing is
+	# .bi-map-popup-rows in the page's stylesheet, not repeated in every cell.
+	my @shown = @rows > $limit ? @rows[0 .. $limit - 1] : @rows;
+	$html .= '<div class="bi-map-popup-rows" style="max-height:14em;overflow:auto">'
+		. '<table><tr>' . join('', map { '<th>' . xml_escape($_) . '</th>' } @differ) . '</tr>'
+		. join('', map {
+			my $row = $_;
+			'<tr>' . join('', map { '<td>' . xml_escape($cell->($row, $_)) . '</td>' } @differ) . '</tr>';
+		} @shown)
+		. '</table></div>';
+
+	if (my $more = @rows - @shown) {
+		$html .= "<div>and $more more"
+			. ((defined($more_url) && length($more_url))
+				? ': <a href="' . xml_escape($more_url) . '">show all ' . scalar(@rows) . ' in the table</a>'
+				: '')
+			. '</div>';
+	}
+
+	return $html;
 }
 
 # _map_size_range($records, \@markers, $col) -> ($min, $max)
@@ -12612,23 +13248,89 @@ sub _parse_color_rules {
 	return (\@rules, $default_color);
 }
 
-# _apply_color_rule($value, \@rules, $default_color) -> $color
+# _map_colour_entries($color_col, \@rules, $default, $is_series) -> @entries
 #
-# Returns the first colour whose rule matches $value, or $default_color.
-# Numeric comparisons are used when both sides look like plain numbers.
-sub _apply_color_rule {
-	my ($value, $rules, $default) = @_;
+# The colour key of a map, as { color, label, group }: one entry for each rule,
+# and Other for the default colour.  A series (series= with a scheme) is
+# listed by value, with no Other: its values past the palette's two cycles
+# take a palette colour but are not listed.  group names the entry for
+# _color_rule_index's answer ("rule<N>", or "other"), which is how HTML::OSM
+# lists only the entries in view.
+sub _map_colour_entries {
+	my ($color_col, $rules, $default, $is_series) = @_;
+
+	my %op_label = (gt => '>', ge => '>=', lt => '<', le => '<=', eq => '=', ne => '!=');
+	my @entries;
+	$rules = [] unless ref($rules) eq 'ARRAY';
+	for my $index (0 .. $#{$rules}) {
+		my $rule = $rules->[$index];
+		next unless ref($rule) eq 'HASH';
+		my $val  = $rule->{val} // '';
+		push @entries, {
+			color => $rule->{color},
+			label => $is_series
+				? (length($val) ? $val : '(blank)')
+				: "$color_col " . ($op_label{ $rule->{op} // '' } // $rule->{op} // '') . " $val",
+			group => "rule$index",
+		};
+	}
+	push @entries, { color => $default, label => 'Other', group => 'other' }
+		if @entries && !$is_series;
+	return @entries;
+}
+
+# _map_key($self, $color_col, \@rules, $default, $is_series, $size_col, \@range)
+#     -> (legend => \@entries, legend_title => $title, legend_empty => $text)
+#
+# What HTML::OSM is given to draw a map's key: the colour entries, each with
+# its group so the key lists only what is in view, then two or three bubble
+# sizes when a size column is set (those are always listed: they say what a
+# size means, wherever the reader is).  The title is the colour column, or
+# the size column when there is no colour; with both, each size is labelled
+# with its column.  The colours go to HTML::OSM as hex, which is all it takes.
+sub _map_key :Protected ($self, $color_col, $rules, $default, $is_series, $size_col, $range) {
+	my @legend = map {
+		{ label => $_->{label}, colour => _color_hex($_->{color}), group => $_->{group} }
+	} (length($color_col) ? _map_colour_entries($color_col, $rules, $default, $is_series) : ());
+
+	my ($min, $max) = @{ $range // [] };
+	if (length($size_col) && defined($min)) {
+		my @values = ($max > $min) ? ($min, ($min + $max) / 2, $max) : ($min);
+		for my $value (@values) {
+			my $text = 0 + sprintf('%.4g', $value);
+			push @legend, {
+				label  => (@legend && length($color_col) ? "$size_col $text" : "$text"),
+				colour => (length($color_col) ? $MAP_SIZE_KEY_COLOR : _color_hex($default)),
+				radius => _map_radius($value, $min, $max),
+			};
+		}
+	}
+
+	return () unless @legend;
+	return (
+		legend       => \@legend,
+		legend_title => (length($color_col) ? $color_col : $size_col),
+		legend_empty => $self->_i18n('map_legend_empty'),
+	);
+}
+
+# _color_rule_index($value, \@rules) -> $index | undef
+#
+# The index of the first rule that matches $value, or undef when none does
+# (the marker takes the default colour).  _apply_color_rule says the colour.
+sub _color_rule_index {
+	my ($value, $rules) = @_;
 	$value //= '';
-	for my $rule (@$rules) {
-		my ($op, $threshold, $color) = @{$rule}{qw(op val color)};
-		my ($num_val, $num_thr);
+	$rules = [] unless ref($rules) eq 'ARRAY';
+	for my $index (0 .. $#{$rules}) {
+		next unless ref($rules->[$index]) eq 'HASH';
+		my ($op, $threshold) = @{ $rules->[$index] }{qw(op val)};
+		$op        //= '';
+		$threshold //= '';
+		my $match;
 		if (	$value     =~ /\A-?\d+(?:\.\d+)?\z/ &&
 			$threshold =~ /\A-?\d+(?:\.\d+)?\z/) {
-			$num_val = $value     + 0;
-			$num_thr = $threshold + 0;
-		}
-		my $match;
-		if (defined $num_val) {
+			my ($num_val, $num_thr) = ($value + 0, $threshold + 0);
 			$match = ($op eq 'gt' && $num_val >  $num_thr)
 			      || ($op eq 'ge' && $num_val >= $num_thr)
 			      || ($op eq 'lt' && $num_val <  $num_thr)
@@ -12639,9 +13341,19 @@ sub _apply_color_rule {
 			$match = ($op eq 'eq' && lc($value) eq lc($threshold))
 			      || ($op eq 'ne' && lc($value) ne lc($threshold));
 		}
-		return $color if $match;
+		return $index if $match;
 	}
-	return $default;
+	return undef;
+}
+
+# _apply_color_rule($value, \@rules, $default_color) -> $color
+#
+# Returns the first colour whose rule matches $value, or $default_color.
+# Numeric comparisons are used when both sides look like plain numbers.
+sub _apply_color_rule {
+	my ($value, $rules, $default) = @_;
+	my $index = _color_rule_index($value, $rules);
+	return defined($index) ? $rules->[$index]{color} : $default;
 }
 
 # _marker_icon($color) -> $data_uri
@@ -13611,6 +14323,9 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
   cat=<col>       X-axis category column (required; x= is a backwards-compat alias)
   bar_val=<col>   Numeric column plotted as bars (required; bar= is a backwards-compat alias)
   line_val=<col>  Numeric column plotted as a line (required; line= is a backwards-compat alias)
+  scheme=<name>   Take the bar colour and the line colour from the first two
+                  colours of a categorical scheme: tableau10, category10, set2,
+                  set3 or paired.  Any other name keeps steel blue and red.
   back=<url>      URL for the "Back to table" breadcrumb link
 
 =head3 API SPECIFICATION
@@ -13621,6 +14336,8 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
   cat       string  Required.  X-axis categorical column name (x= also accepted).
   bar_val   string  Required.  Numeric bar-measure column (bar= also accepted).
   line_val  string  Required.  Numeric line-measure column (line= also accepted).
+  scheme    string  Optional.  Categorical scheme name; ignored unless one of
+                               the five.  Saved in data-chart when used.
   back      url     Optional.  Safe back-link URL.
 
 =head4 OUTPUT
@@ -13642,6 +14359,9 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
   GET /combo?l=table:sales&cat=month&bar_val=revenue&line_val=units
     -> 200 HTML page containing D3 combo bar+line chart SVG
 
+  GET /combo?l=table:sales&cat=month&bar_val=revenue&line_val=units&scheme=set2
+    -> the same chart, bars #66c2a5 and line #fc8d62
+
 =cut
 
 =head2 treemap_view
@@ -13650,11 +14370,18 @@ C<GET /treemap> -- Render a D3.js treemap where tile area encodes a numeric colu
 
 Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
 
-  group=<col>  Tile-label categorical column (required; cat= is a backwards-compat alias)
-  size=<col>   Tile-area numeric column (required; val= is a backwards-compat alias)
-  topn=N       Keep only the top-N tiles by size; remainder collapsed into "Other"
-  scheme=<name> D3 colour scheme (default tableau10)
-  back=<url>   URL for the "Back to table" breadcrumb link
+  group=<col>   Tile-label categorical column (required; cat= is a backwards-compat alias)
+  size=<col>    Tile-area numeric column, summed (val= is a backwards-compat
+                alias); absent, each tile is its count of rows
+  topn=N        Keep only the top-N tiles by size; remainder collapsed into "Other"
+  scheme=<name> D3 categorical colour scheme (default tableau10)
+  color=<col>   Shade each tile by a second column instead, folded over the
+                tile's rows; the Other tile is folded over the rows it holds
+  color_agg=<fn>    How color= is folded: avg (the default), sum, min, max,
+                    median, count, ... (any aggregate function)
+  color_scheme=<name> Sequential scale for color=: YlOrRd (the default), Blues,
+                    Greens, Purples, RdPu or YlGnBu
+  back=<url>    URL for the "Back to table" breadcrumb link
 
 =head3 API SPECIFICATION
 
@@ -13662,17 +14389,22 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
 
   l       spec    Required.  Left table spec.
   group   string  Required.  Tile-label categorical column (cat= also accepted).
-  size    string  Required.  Tile-area numeric column (val= also accepted).
+  size    string  Optional.  Tile-area numeric column (val= also accepted);
+                             absent or __count__ counts rows.
   topn    int     Optional.  Keep top-N tiles; 0 or absent means no limit.
-  scheme  string  Optional.  D3 colour scheme name.
+  scheme  string  Optional.  D3 categorical scheme name; any other is tableau10.
+  color   string  Optional.  Column each tile is shaded by.
+  color_agg    string  Optional.  Aggregate function for color=; default avg,
+                                  case-insensitive.  Ignored without color=.
+  color_scheme string  Optional.  Sequential scale; any other name is YlOrRd.
   back    url     Optional.  Safe back-link URL.
 
 =head4 OUTPUT
 
   200 text/html    Rendered treemap page.
-  400 text/plain   Missing group= or size= parameter.
-  400 text/plain   Unrecognised scheme= parameter (?color= returns 400).
-  400 text/plain   Column not found: <col>.
+  400 text/plain   Missing group= parameter.
+  400 text/plain   Unknown aggregate function "<fn>"... (color_agg=, with color=).
+  400 text/plain   Column not found: <col> (group=, size= or color=).
   404 text/plain   "Could not open data source".
 
 =head3 FORMAL SPECIFICATION
@@ -13680,15 +14412,20 @@ Accepts the same C<l=>, C<j=>, C<f=> pipeline params as C</join>, plus:
   treemap_view == lambda self .
     pre  length(group_col) > 0 /\ length(size_col) > 0
          /\ group_col in columns /\ size_col in columns
-         /\ color param absent (scheme= is the correct param name)
+         /\ (color_col = '' \/ (color_col in columns /\ color_fn in MEASURE_FNS))
     let tiles = _grouped_totals(records, group_col, [], size_sum) in
     let top   = topn > 0 ? top_n(tiles, topn) : tiles in
-    post render(treemap, top)
+    let shade = color_col = '' ? {} :
+                { t -> color_fn(rows_of(t), color_col) | t in top } in
+    post render(treemap, top, shade, color_scheme)
 
 =head3 EXAMPLE
 
   GET /treemap?l=table:sales&group=product&size=amount&topn=10
     -> 200 HTML page containing D3 treemap SVG
+
+  GET /treemap?l=table:sales&group=region&size=amount&color=amount&color_agg=max&color_scheme=Blues
+    -> tiles sized by total amount, shaded by the largest sale, on a blue scale
 
 =cut
 
@@ -13799,16 +14536,28 @@ a dense map draws a count at low zoom and splits it into individual pins as it
 is zoomed in; a sparse map looks the same, because markers far enough apart are
 left on their own.  Clustering is always on; there is no C<cluster=> switch.
 
+A browser is not kept waiting for the geocoder.  The page it navigated to (a
+GET whose Accept names C<text/html>) plots what the cache knows and lists the
+places not cached yet, each signed with the application's secret.  Its script
+then posts them, one at a time, to C<POST /geo/lookup> (L</geo_lookup>), with a
+progress bar naming each place and a Cancel button.  When the last answer is
+in, it draws the page again; after Cancel, or when a place could not be settled
+(not answered, or the store refused it), it draws it with C<geocode=cached>,
+whose notes link back to the page without it.  Any other client, and
+C<geocode=wait>, waits for the lookups as before.
+
 The map page never shows the L<HTML::OSM> Nominatim search box: C<search => 0>
 is always passed, so nothing typed on the page leaves the reader's machine.
-L<HTML::OSM> 0.12 or later is the renderer; with an older optional install (or
+L<HTML::OSM> 0.13 or later is the renderer; with an older optional install (or
 none at all) the page still renders the marker count and a warning, rather than
 failing.
 
 Accepts the same C<l=>, C<j=>, C<c=> and C<f=> pipeline params as every other
 visual, so the map shows the filtered, calculated view.
 
-  loc=<col>       Location column to geocode (required unless lat= and lon= are given)
+  loc=<col>       Location column to geocode (required unless lat= and lon= are given);
+                  repeatable: the place is the columns' cells joined with ", ",
+                  in order, empty ones left out (loc=Address&loc=Country)
   lat=<col>       Latitude column (numeric, -90..90)
   lon=<col>       Longitude column (numeric, -180..180)
   popup=<col>     Column shown in the marker popup (repeatable; default: all non-coordinate columns)
@@ -13825,6 +14574,9 @@ visual, so the map shows the filtered, calculated view.
   color_default=<colour>  Fallback when no rule matches (default #3388ff)
   series=<col>    Colour markers by category; mutually exclusive with color=
   scheme=<name>   Palette for series=: tableau10, category10, set2, set3, paired
+  geocode=wait    Look up places not cached yet before the page is sent
+                  (the default for a client that is not a browser)
+  geocode=cached  Look nothing up; plot what the cache knows
   back=<url>, back2=<url>, back2_label=<text>  Breadcrumb links
   f=              Result filters (repeatable)
 
@@ -13838,11 +14590,15 @@ cycles the chosen palette across distinct values instead, and its legend lists
 categories rather than rules.
 
 Config values: C<map_geocode_max> (new lookups per request, default 500),
+C<map_geocode_online> (0 keeps every lookup local; default 1, which asks
+OpenStreetMap's Nominatim about places the local data does not know),
+C<map_geocode_online_max> (places asked of Nominatim per request, default 20;
+the progress bar asks one place a request),
 C<map_max_markers> (markers per request, default 2000), C<map_region> (a
 two-letter country hint for ambiguous place names), C<map_max_zoom> (the tile
 layer's default maxZoom), C<tile_sources> (a hashref of named tile sources,
 each C<< { url => ... } >>), C<tile_url> (the single default tile layer) and
-C<geocoder> (an object to use instead of loading L<Geo::Coder::Free>; the seam
+C<geocoder> (an object to use instead of the L<Geo::Coder::List> chain; the seam
 the tests use).  The C<leaflet_*>_url keys point Leaflet, markercluster and the
 heatmap plugin at self-hosted copies for an offline deployment.
 
@@ -13867,11 +14623,14 @@ heatmap plugin at self-hosted copies for an offline deployment.
   color_default string Optional.  Fallback marker colour.
   series   string  Optional.  Column to colour by category.
   scheme   string  Optional.  Palette for series= (default tableau10).
+  geocode  string  Optional.  'wait' or 'cached'; see above.
   back     url     Optional.  Safe back-link URL (sanitised by _safe_back_url).
 
 =head4 OUTPUT
 
-  200 text/html    Rendered map page.
+  200 text/html    Rendered map page; for a browser, with the progress bar
+                   when places are not cached yet.
+  400 text/plain   geocode= other than wait or cached.
   400 text/plain   No loc=, or lat= without lon=.
   400 text/plain   Column not found: <col>  (or the geocode message naming it).
   400 text/plain   Coordinate column wholly out of range, naming it.
@@ -13883,7 +14642,53 @@ heatmap plugin at self-hosted copies for an offline deployment.
 =head3 EXAMPLE
 
   GET /map?l=table:sales&loc=place
+  GET /map?l=table:houses&loc=Address&loc=Country
     -> 200 HTML page containing Leaflet markers for the places that resolved
+
+=cut
+
+=head2 geo_lookup
+
+C<POST /geo/lookup> -- Look up one place for the map page's progress bar.
+
+The place is looked up as C<GET /map> would look it up (the same geocoder,
+file cache and region), and the answer goes into the model store's shared place
+cache before the reply is sent.  A run that is cancelled or interrupted
+therefore keeps every place it found.  Only a place a map page listed is
+accepted: the page signs each one with the application's secret, so no other
+site can have this server send a string to OpenStreetMap.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  place   string  Required.  The place, as the map page listed it.
+  sig     string  Required.  The signature the map page gave it.
+  online  bool    Optional.  0 keeps the lookup on this machine (sent once
+                  OpenStreetMap has failed in the run).  Default 1.
+
+=head4 OUTPUT
+
+  200 application/json
+    { place         => $place,
+      status        => 'found' | 'not_found' | 'held' | 'refused',
+      stored        => 0 | 1,     # the answer is in the shared cache
+      online_failed => 0 | 1,     # OpenStreetMap did not answer
+      messages      => [ $text, ... ] }
+  400 application/json  { error }  place= or sig= missing.
+  403 application/json  { error }  sig= is not this server's for the place
+                                   (or the server has restarted since).
+
+C<held> is a place that could not be looked up now; it is not remembered, so
+the next map asks again.  C<refused> is a value the geocoder does not take for
+a place.  A found or not-found place that the store would not keep has
+C<stored> 0.
+
+=head3 EXAMPLE
+
+  POST /geo/lookup  place=Brezje%208%2C%20Cerknica&sig=...
+    -> { "place": "Brezje 8, Cerknica", "status": "found", "stored": 1,
+         "online_failed": 0, "messages": [] }
 
 =cut
 
@@ -14385,6 +15190,9 @@ B<Supported operators:>
   ge        numeric greater-than-or-equal
   empty     cell is undef or empty string (val ignored)
   notempty  cell is defined and non-empty (val ignored)
+  in        case-insensitive equality with any value of a JSON array of
+            strings, e.g. C<f=place:in:["Paris","Rome"]>; a value that is
+            not such an array matches no row
 
 B<Quick-filter bar (table view):>
 

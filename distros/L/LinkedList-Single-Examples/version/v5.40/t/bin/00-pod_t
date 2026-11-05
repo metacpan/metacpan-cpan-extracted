@@ -1,0 +1,61 @@
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Testy;
+use v5.40;
+
+use File::Basename;
+use Pod::Checker;
+use Test::More;
+
+########################################################################
+# the subject is the path in the basename of this symlink, with the
+# separator that leads it standing for '/'.
+########################################################################
+
+my $base0   = basename $0 => qw( .t );
+my $sep     = substr $base0, 0, 1;
+my $path    = $base0 =~ s{$sep}{/}gr;
+
+########################################################################
+# tests
+########################################################################
+
+try
+{
+    for( $path )
+    {
+        -e      or die "Non-existant: '$path' ($base0)\n";
+        -r _    or die "Non-readable: '$path' ($base0)\n";
+        -s _    or die "Zero-size: '$path' ($base0)\n";
+    }
+
+    my $checker = Pod::Checker->new( -warnings => 2 );
+
+    open my $null, '>', '/dev/null'
+    or die "Botched /dev/null: $!\n";
+
+    $checker->parse_from_file( $path => $null );
+
+    my( $errors, $warnings ) = ( $checker->num_errors, $checker->num_warnings );
+
+    $errors < 1
+    or die "$errors POD errors in '$path'\n";
+
+    $warnings < 1
+    or die "$warnings POD warnings in '$path'\n";
+
+    pass "POD OK: '$path'";
+}
+catch( $err )
+{
+    fail "POD unusable: '$path'";
+    diag $err;
+}
+
+done_testing
+__END__
+
+=head1 NAME
+
+00-pod_t - C<podchecker> for every documentation module (C<POD.pm>) in the examples

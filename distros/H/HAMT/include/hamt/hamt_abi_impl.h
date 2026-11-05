@@ -63,7 +63,7 @@ static hamt_map *hamt_abi_map_new(pTHX) {
 static hamt_map *hamt_abi_map_copy(pTHX_ const hamt_map *src) {
     hamt_map *m = hamt_abi_map_new(aTHX);
     if (!m) return NULL;
-    m->root  = src->root ? hamt_node_retain(src->root) : NULL;
+    m->root  = src->root ? hamt_node_retain(src->root) : NULL; /* # uncoverable condition right count:1 */
     m->count = src->count;
     return m;
 }
@@ -98,20 +98,26 @@ static SV *hamt_abi_bless(pTHX_ const MGVTBL *vt, const char *klass, const char 
 }
 
 static const hamt_map *hamt_abi_map_from_sv(pTHX_ SV *obj) {
-    return obj ? hamt_handle_try(aTHX_ obj, &hamt_map_vtbl) : NULL;
+    return obj ? hamt_handle_try(aTHX_ obj, &hamt_map_vtbl) : NULL; /* # uncoverable condition right count:1 */
 }
 static const hamt_map *hamt_abi_set_from_sv(pTHX_ SV *obj) {
-    return obj ? hamt_handle_try(aTHX_ obj, &hamt_set_vtbl) : NULL;
+    return obj ? hamt_handle_try(aTHX_ obj, &hamt_set_vtbl) : NULL; /* # uncoverable condition right count:1 */
 }
 
 /* The struct inside an open transient of the kind `vt` marks, or NULL. */
 static hamt_txn *hamt_abi_txn(pTHX_ SV *obj, const MGVTBL *vt) {
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:3 */
     if (obj && SvROK(obj) && SvTYPE(SvRV(obj)) >= SVt_PVMG) {
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(obj)); mg; mg = mg->mg_moremagic) {
             hamt_txn *t;
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue; /* # uncoverable condition left count:1 */
             t = (hamt_txn *)mg->mg_ptr;
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2 */
             return (t && t->open) ? t : NULL;
         }
     }
@@ -123,7 +129,7 @@ static hamt_map *hamt_abi_map_txn_from_sv(pTHX_ SV *obj) {
 }
 static hamt_map *hamt_abi_set_txn_from_sv(pTHX_ SV *obj) {
     hamt_txn *t = hamt_abi_txn(aTHX_ obj, &hamt_set_txn_vtbl);
-    return t ? &t->m : NULL;
+    return t ? &t->m : NULL; /* # uncoverable condition right count:1 */
 }
 
 static SV *hamt_abi_map_to_sv(pTHX_ hamt_map *m, const char *klass) {
@@ -140,6 +146,9 @@ static SV *hamt_abi_txn_to_sv(pTHX_ hamt_map *m, const MGVTBL *vt, const char *t
     hamt_txn *t = (hamt_txn *)HAMT_ALLOC(HAMT_CX, sizeof(hamt_txn));
     if (!t) return NULL;
     t->m      = *m;                              /* the references move */
+    /*
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     t->origin = (HV *)SvREFCNT_inc_simple_NN((SV *)gv_stashpv(klass ? klass : deflt, GV_ADD));
     t->open   = 1;
     HAMT_FREE(HAMT_CX, m, sizeof(hamt_map));
@@ -210,7 +219,7 @@ static int hamt_abi_store(pTHX_ hamt_map *m, const char *key, STRLEN klen, int u
      * the trie walked to see. */
     old = (value && SvREADONLY(value))
         ? hamt_map_find(m->root, ak.k.p, (size_t)ak.k.len, ak.k.utf8, ak.k.hash) : NULL;
-    if (!old || old->val != (void *)value) rc = hamt_abi_put(aTHX_ m, &ak.k, value);
+    if (!old || old->val != (void *)value) rc = hamt_abi_put(aTHX_ m, &ak.k, value); /* # uncoverable condition left count:2 */
     hamt_abi_key_done(aTHX_ &ak);
     return rc;
 }
@@ -250,7 +259,7 @@ static int hamt_abi_map_update(pTHX_ hamt_map *m, const char *key, STRLEN klen, 
     else {
         /* The callback may have changed the struct; look again. */
         old = hamt_map_find(m->root, ak.k.p, (size_t)ak.k.len, ak.k.utf8, ak.k.hash);
-        if (!old || !old->val || !hamt_sv_eq_cx(HAMT_CX, now, (SV *)old->val))
+        if (!old || !old->val || !hamt_sv_eq_cx(HAMT_CX, now, (SV *)old->val)) /* # uncoverable condition left count:2 */
             rc = hamt_abi_put(aTHX_ m, &ak.k, now);
     }
     hamt_abi_key_done(aTHX_ &ak);
@@ -291,7 +300,7 @@ static hamt_map *hamt_abi_map_from_hv(pTHX_ HV *hv) {
         hamt_key k;
         SV *v = hv_iterval(hv, he);
         hamt_key_from_he(aTHX_ hv, he, &k);
-        if (hamt_abi_put(aTHX_ m, &k, v ? v : &PL_sv_undef)) {
+        if (hamt_abi_put(aTHX_ m, &k, v ? v : &PL_sv_undef)) { /* # uncoverable condition left count:1 */
             hamt_abi_map_release(aTHX_ m);
             return NULL;
         }
@@ -307,10 +316,16 @@ static HV *hamt_abi_map_to_hv(pTHX_ const hamt_map *m) {
     hamt_iter_init(&it, m->root);
     while ((e = hamt_iter_next(&it))) {
         SV *v;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
         if (e->klen > (size_t)I32_MAX) { SvREFCNT_dec((SV *)hv); return NULL; }
-        v = e->val ? newSVsv((SV *)e->val) : newSV(0);
+        v = e->val ? newSVsv((SV *)e->val) : newSV(0); /* # uncoverable condition right count:1 */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:2 */
         if (!hv_store(hv, e->key, e->utf8 ? -(I32)e->klen : (I32)e->klen, v, 0))
-            SvREFCNT_dec(v);
+            SvREFCNT_dec(v); /* # uncoverable statement */
     }
     return hv;
 }
@@ -329,8 +344,8 @@ static int hamt_abi_resolve(void *ud, void *cx, hamt_entry *ea, hamt_entry *eb, 
     SV *copy;
 
     if (!res) return HAMT_ERR_ABORT;
-    if (ea->val && hamt_sv_eq_cx(cx, res, (SV *)ea->val)) { *out = hamt_entry_retain(ea); return HAMT_OK; }
-    if (eb->val && hamt_sv_eq_cx(cx, res, (SV *)eb->val)) { *out = hamt_entry_retain(eb); return HAMT_OK; }
+    if (ea->val && hamt_sv_eq_cx(cx, res, (SV *)ea->val)) { *out = hamt_entry_retain(ea); return HAMT_OK; } /* # uncoverable condition right count:1 */
+    if (eb->val && hamt_sv_eq_cx(cx, res, (SV *)eb->val)) { *out = hamt_entry_retain(eb); return HAMT_OK; } /* # uncoverable condition right count:1 */
     copy = hamt_sv_copy_in(aTHX_ res);
     *out = hamt_entry_new(cx, ea->key, ea->klen, ea->utf8, ea->hash, (void *)copy);
     SvREFCNT_dec(copy);
@@ -429,7 +444,7 @@ static int hamt_abi_map_diff(pTHX_ const hamt_map *a, const hamt_map *b,
     rc = hamt_map_diff(&c, ra, rb);
     LEAVE;
     if (count) *count = c.reported;
-    return rc ? HAMT_ABI_STOPPED : HAMT_ABI_OK;
+    return rc ? HAMT_ABI_STOPPED : HAMT_ABI_OK; /* # uncoverable condition left count:1 */
 }
 
 static hamt_map *hamt_abi_map_key_set(pTHX_ const hamt_map *m) {
@@ -513,16 +528,22 @@ static void hamt_abi_vec_release(pTHX_ hamt_vec *v) {
 }
 
 static const hamt_vec *hamt_abi_vec_from_sv(pTHX_ SV *obj) {
-    return obj ? hamt_vec_handle_try(aTHX_ obj) : NULL;
+    return obj ? hamt_vec_handle_try(aTHX_ obj) : NULL; /* # uncoverable condition right count:1 */
 }
 
 static hamt_vec *hamt_abi_vec_txn_from_sv(pTHX_ SV *obj) {
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:3 */
     if (obj && SvROK(obj) && SvTYPE(SvRV(obj)) >= SVt_PVMG) {
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(obj)); mg; mg = mg->mg_moremagic) {
             hamt_vtxn *t;
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_txn_vtbl) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_txn_vtbl) continue; /* # uncoverable condition left count:1 */
             t = (hamt_vtxn *)mg->mg_ptr;
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2 */
             return (t && t->open) ? &t->v : NULL;
         }
     }
@@ -537,6 +558,9 @@ static SV *hamt_abi_vec_to_txn_sv(pTHX_ hamt_vec *v, const char *klass) {
     hamt_vtxn *t = (hamt_vtxn *)HAMT_ALLOC(HAMT_CX, sizeof(hamt_vtxn));
     if (!t) return NULL;
     t->v      = *v;
+    /*
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     t->origin = (HV *)SvREFCNT_inc_simple_NN((SV *)gv_stashpv(klass ? klass : "HAMT::Vector", GV_ADD));
     t->open   = 1;
     HAMT_FREE(HAMT_CX, v, sizeof(hamt_vec));
@@ -573,6 +597,9 @@ static int hamt_abi_vec_store(pTHX_ hamt_vec *v, size_t index, SV *value) {
     rc = hamt_vec_set(HAMT_CX, v, index, (void *)copy, &dead);
     SvREFCNT_dec(copy);
     if (rc) return HAMT_ABI_NOMEM;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (dead) HAMT_VAL_RELEASE(HAMT_CX, dead);
     return HAMT_ABI_OK;
 }
@@ -612,7 +639,7 @@ static hamt_vec *hamt_abi_vec_from_av(pTHX_ AV *av) {
     if (!v) return NULL;
     for (i = 0; i <= top; i++) {
         SV **svp = av_fetch(av, i, 0);
-        if (hamt_abi_vec_push(aTHX_ v, svp ? *svp : &PL_sv_undef)) {
+        if (hamt_abi_vec_push(aTHX_ v, svp ? *svp : &PL_sv_undef)) { /* # uncoverable condition right count:1 */
             hamt_abi_vec_release(aTHX_ v);
             return NULL;
         }
@@ -627,6 +654,9 @@ static AV *hamt_abi_vec_to_av(pTHX_ const hamt_vec *v) {
     size_t start;
     uint32_t n, i;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (v->count > (size_t)I32_MAX) { SvREFCNT_dec((SV *)av); return NULL; }
     if (v->count) av_extend(av, (I32)(v->count - 1));
     hamt_vec_iter_init(&it, v);

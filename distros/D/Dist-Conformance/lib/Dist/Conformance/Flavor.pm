@@ -1,4 +1,4 @@
-package Dist::Conformance::Flavor 0.001;
+package Dist::Conformance::Flavor 0.002;
 
 # ABSTRACT: A named set of checks and their configuration, read from a standards source
 
@@ -118,7 +118,7 @@ Dist::Conformance::Flavor - A named set of checks and their configuration, read 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ version 0.001
 
 A flavor is the answer to "what does a conforming repository look like" for one
 kind of repository.  It names the checks to run and gives each its
-configuration: which files, which templates, which header, and whether a miss
+configuration: which files, which templates, which skills, and whether a miss
 is a failure or only worth knowing.  A check module has no expectations of its
 own; everything it compares against comes from here.
 
@@ -260,8 +260,6 @@ This is F<troglodyne-5.040.yml> from the fixtures of this distribution:
       CriticProfile:
         file: .perlcriticrc
         template: templates/perlcriticrc
-        outdated:
-          - '# Troglodyne perlcritic policy'
         replace: false
 
 And this is a flavor that differs for a reason other than the perl: a service,

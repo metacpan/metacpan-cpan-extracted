@@ -1,5 +1,5 @@
 package LLM::API;
-# Anthropic specific API client
+# Provider-independent LLM client
 
 use strict;
 use warnings;
@@ -12,15 +12,17 @@ BEGIN {
 }
 
 use English qw(-no_match_vars);
+use File::Basename qw(dirname);
+use File::ShareDir qw(dist_file);
+use File::Spec;
 use CLI::Simple::Utils qw(slurp choose);
 use CLI::Simple::Constants qw(:booleans);
 use JSON::PP qw(encode_json decode_json);
-use HTTP::Tiny;
-use LLM::API::Response;
 use MIME::Base64;
 use Scalar::Util qw(reftype);
 use Time::Piece;
 use URI::Encode qw(uri_encode);
+use YAML::Tiny;
 
 use Readonly;
 
@@ -40,14 +42,8 @@ Readonly::Scalar our $LLM_VERSION    => '2023-06-01';
 Readonly::Scalar our $LLM_ROLE       => 'user';
 Readonly::Scalar our $LLM_TIMEOUT    => 300;
 
-Readonly::Scalar our $LLM_PRICING => {
-  'claude-sonnet-4-6'         => [ 3 / 1_000_000,  15 / 1_000_000 ],
-  'claude-haiku-4-5-20251001' => [ 1 / 1_000_000,  5 / 1_000_000 ],
-  'claude-sonnet-5'           => [ 3 / 1_000_000,  15 / 1_000_000 ],  # see note below
-  'claude-opus-4-8'           => [ 5 / 1_000_000,  25 / 1_000_000 ],
-  'claude-fable-5'            => [ 10 / 1_000_000, 50 / 1_000_000 ],
-  'claude-mythos-5'           => [ 10 / 1_000_000, 50 / 1_000_000 ],
-};
+# Curated provider metadata is installed with the distribution share files.
+my $PROVIDERS;
 
 Readonly::Hash our %LLM_MEDIA_TYPES => (
   text => 'text/plain',
@@ -58,6 +54,8 @@ __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(
   qw(
     api_key_getter
+    provider
+    region
     max_tokens
     model
     version
@@ -66,7 +64,7 @@ __PACKAGE__->mk_accessors(
   )
 );
 
-our $VERSION = '1.0.1';
+our $VERSION = '2.0.0';
 
 use parent qw(Class::Accessor::Fast);
 
@@ -77,6 +75,11 @@ sub new {
 
   my $options = ref $args[0] ? $args[0] : {@args};
 
+  # Anthropic remains the default for existing callers.
+  $options->{provider} //= q{anthropic};
+  die sprintf "ERROR: unsupported LLM provider: %s\n", $options->{provider}
+    if !exists _providers()->{ $options->{provider} };
+
   # API key from the option list takes precedence
   my $api_key = $options->{api_key};
   delete $options->{api_key};
@@ -85,15 +88,19 @@ sub new {
   delete $ENV{LLM_API_KEY};
 
   die "ERROR: api_key is a required argument\n"
-    if !$api_key;
+    if $options->{provider} eq q{anthropic} && !$api_key;
 
-  $options->{model} //= $DEFAULT_LLM_MODEL;
+  $options->{model} //= $options->{provider} eq q{bedrock} ? q{amazon.nova-micro-v1:0} : $DEFAULT_LLM_MODEL;
+
+  $options->{region} //= $ENV{AWS_REGION} // $ENV{AWS_DEFAULT_REGION} // q{us-east-1}
+    if $options->{provider} eq q{bedrock};
 
   $options->{timeout} //= $LLM_TIMEOUT;
 
   my $self = $class->SUPER::new($options);
 
-  $self->set_api_key_getter( sub {$api_key} );
+  $self->set_api_key_getter( sub {$api_key} )
+    if $options->{provider} eq q{anthropic};
 
   $self->_init;
 
@@ -103,63 +110,54 @@ sub new {
 ########################################################################
 sub count_input_tokens {
 ########################################################################
-  my ( $self, $content ) = @_;
+  my ( $self, @args ) = @_;
 
-  die "ERROR: usage: send_prompt(array-ref)\n"
-    if !ref $content || reftype($content) ne 'ARRAY';
-
-  my $req = {
-    headers => $self->headers( 'content-type' => 'application/json' ),
-    content => encode_json(
-      { model    => $self->get_model,
-        messages => [
-          { role    => $self->get_role,
-            content => $content,
-          }
-        ]
-      }
-    )
-  };
-
-  my $rsp = HTTP::Tiny->new( timeout => $self->get_timeout )->post( $LLM_URL_BASE . $LLM_COUNT_TOKENS_EP, $req );
-
-  die sprintf "ERROR %s:%s\n", @{$rsp}{qw(code content)}
-    if !$rsp->{success};
-
-  my ($input_token_cost) = $self->pricing( $self->get_model // $DEFAULT_LLM_MODEL );
-
-  my $decoded = decode_json( $rsp->{content} );
-
-  my $input_tokens = $decoded->{input_tokens};
-
-  return ( $input_tokens, $input_tokens * $input_token_cost );
+  return $self->_provider_class->count_input_tokens( $self, @args );
 }
 
 ########################################################################
 sub send_prompt {
 ########################################################################
-  my ( $self, $content ) = @_;
+  my ( $self, @args ) = @_;
 
-  die "ERROR: usage: send_prompt(array-ref)\n"
-    if !ref $content || reftype($content) ne 'ARRAY';
+  return $self->_provider_class->send_prompt( $self, @args );
+}
 
-  my $req = {
-    headers => $self->headers( 'content-type' => 'application/json' ),
-    content => encode_json(
-      { model      => $self->get_model,
-        max_tokens => $self->get_max_tokens,
-        messages   => [
-          { role    => $self->get_role,
-            content => $content,
-          }
-        ]
+########################################################################
+sub send_messages {
+########################################################################
+  my ( $self, $messages ) = @_;
+
+  die "ERROR: usage: send_messages(array-ref)\n"
+    if !ref $messages || reftype($messages) ne q{ARRAY} || !@{$messages};
+
+  for my $message ( @{$messages} ) {
+    die "ERROR: each message must contain a user or assistant role and text content\n"
+      if !ref $message
+      || reftype($message) ne q{HASH}
+      || ( $message->{role} // q{} ) !~ m{\A(?:user|assistant)\z}
+      || !ref $message->{content}
+      || reftype( $message->{content} ) ne q{ARRAY}
+      || !@{ $message->{content} };
+
+    for my $block ( @{ $message->{content} } ) {
+      die "ERROR: send_messages requires text or document blocks\n"
+        if !ref $block
+        || reftype($block) ne q{HASH}
+        || ( $block->{type} // q{} ) ne q{text} && ( $block->{type} // q{} ) ne q{document};
+
+      if ( $block->{type} eq q{text} ) {
+        die "ERROR: text content is missing\n"
+          if !defined $block->{text};
       }
-    )
-  };
+      else {
+        die "ERROR: document content must be a user message with a source\n"
+          if $message->{role} ne q{user} || ref $block->{source} ne q{HASH};
+      }
+    }
+  }
 
-  my $rsp = HTTP::Tiny->new( timeout => $self->get_timeout )->post( $LLM_URL_BASE . $LLM_MESSAGES_EP, $req );
-
-  return LLM::API::Response->new($rsp);
+  return $self->_provider_class->send_messages( $self, $messages );
 }
 
 ########################################################################
@@ -202,6 +200,9 @@ sub models {
 ########################################################################
   my ($self) = @_;
 
+  die "ERROR: models is not supported by this provider\n"
+    if $self->get_provider ne q{anthropic};
+
   my @model_list;
 
   while ($TRUE) {
@@ -219,6 +220,9 @@ sub models {
 sub api_keys {
 ########################################################################
   my ($self) = @_;
+
+  die "ERROR: api_keys is not supported by this provider\n"
+    if $self->get_provider ne q{anthropic};
 
   return $self->_do_api( $LLM_URL_BASE . $LLM_KEYS_EP );
 }
@@ -289,6 +293,9 @@ sub usage_report {
 ########################################################################
   my ( $self, %args ) = @_;
 
+  die "ERROR: usage_report is not supported by this provider\n"
+    if $self->get_provider ne q{anthropic};
+
   my ( $from, $to, $api_key_ids, $bucket_width ) = @args{qw(from to api_key_ids bucket_width)};
   $from //= $self->now();
 
@@ -311,6 +318,9 @@ sub cost_report {
 ########################################################################
   my ( $self, %args ) = @_;
 
+  die "ERROR: cost_report is not supported by this provider\n"
+    if $self->get_provider ne q{anthropic};
+
   my ( $from, $to, $bucket_width ) = @args{qw(from to bucket_width)};
   $from //= $self->now();
 
@@ -330,13 +340,9 @@ sub cost_report {
 ########################################################################
 sub headers {
 ########################################################################
-  my ( $self, @headers ) = @_;
+  my ( $self, @args ) = @_;
 
-  return {
-    @headers,
-    'x-api-key'         => $self->get_api_key_getter->(),
-    'anthropic-version' => $self->get_version,
-  };
+  return $self->_provider_class->headers( $self, @args );
 }
 
 ########################################################################
@@ -366,16 +372,74 @@ sub pricing {
   my ( $self, $model ) = @_;
 
   $model //= $self->get_model;
+  my $provider = $self->get_provider;
+  my $details  = _providers()->{$provider}->{models}->{$model};
 
-  die "ERROR: no pricing for specified model.\n"
-    if !$LLM_PRICING->{$model};
+  die sprintf "ERROR: no pricing for provider %s, model %s\n", $provider, $model
+    if !$details;
 
-  return @{ $LLM_PRICING->{$model} };
+  my @rates;
+  for my $name (qw(input_tokens output_tokens)) {
+    my $amount = $details->{$name};
+    die sprintf "ERROR: invalid %s pricing for provider %s, model %s\n", $name, $provider, $model
+      if ref $amount ne q{ARRAY}
+      || @{$amount} != 2
+      || !defined $amount->[0]
+      || !defined $amount->[1]
+      || $amount->[0] !~ m{\A\d+(?:\.\d+)?\z}
+      || $amount->[1] !~ m{\A\d+(?:\.\d+)?\z}
+      || $amount->[1] == 0;
+    push @rates, $amount->[0] / $amount->[1];
+  }
+
+  return @rates;
 }
 
 ########################################################################
 # Private Methods
 ########################################################################
+
+########################################################################
+sub _providers {
+########################################################################
+  return $PROVIDERS if defined $PROVIDERS;
+
+  # Installed distributions use their share directory. Source checkouts
+  # use the same catalog from the project root for pre-install tests.
+  my $path = eval { dist_file( q{LLM-API}, q{providers.yml} ) };
+  if ( !$path ) {
+    my $source = File::Spec->catfile( dirname(__FILE__), qw(.. .. providers.yml) );
+    $path = $source if -f $source;
+  }
+  die "ERROR: cannot locate LLM provider catalog providers.yml\n"
+    if !$path;
+
+  my $yaml = YAML::Tiny->read($path);
+  die sprintf "ERROR: cannot read LLM provider catalog %s: %s\n", $path, YAML::Tiny->errstr // q{unknown error}
+    if !$yaml;
+
+  my $providers = $yaml->[0]->{providers};
+  die sprintf "ERROR: invalid LLM provider catalog %s\n", $path
+    if ref $providers ne q{HASH};
+
+  $PROVIDERS = $providers;
+  return $PROVIDERS;
+}
+
+########################################################################
+sub _provider_class {
+########################################################################
+  my ($self) = @_;
+
+  my $class = _providers()->{ $self->get_provider }->{class};
+  die sprintf "ERROR: missing class for LLM provider %s\n", $self->get_provider
+    if !$class;
+
+  eval "require $class"; ## no critic
+  die sprintf "ERROR: cannot load LLM provider %s: %s\n", $self->get_provider, $@
+    if $@;
+  return $class;
+}
 
 ########################################################################
 sub _init {
@@ -401,14 +465,9 @@ sub _do_api { goto &_do_admin_api; }
 ########################################################################
 sub _do_admin_api {
 ########################################################################
-  my ( $self, $url ) = @_;
+  my ( $self, @args ) = @_;
 
-  my $rsp = HTTP::Tiny->new( timeout => $self->get_timeout )->get( $url, { headers => $self->headers } );
-
-  die sprintf "%s:%s\n", @{$rsp}{qw(code content)}
-    if !$rsp->{success};
-
-  return decode_json( $rsp->{content} );
+  return $self->_provider_class->_do_admin_api( $self, @args );
 }
 
 1;
@@ -419,7 +478,7 @@ __END__
 
 =head1 NAME
 
-LLM::API - Anthropic API client for Claude language models
+LLM::API - Provider-independent LLM client
 
 =encoding utf8
 
@@ -445,38 +504,74 @@ LLM::API - Anthropic API client for Claude language models
   my $text = $llm->text('Review this perl module');
   my $rsp  = $llm->send_prompt( [ $doc, $text ] );
 
-  # Retrieve usage and cost data
+  # Send a multi-turn conversation
+  my $conversation = $llm->send_messages( [
+    { role => 'user',      content => [ $llm->text('What is a Perl role?') ] },
+    { role => 'assistant', content => [ $llm->text('A reusable unit of behavior.') ] },
+    { role => 'user',      content => [ $llm->text('Give an example.') ] },
+  ] );
+
+  # Use Amazon Bedrock with AWS credentials instead of an Anthropic API key
+  my $bedrock = LLM::API->new(
+    provider => 'bedrock',
+    model    => 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+    region   => 'us-east-1',
+  );
+
+  # Anthropic-only administrative reporting
   my $usage = $llm->usage_report( from => '2025-01-01', to => '2025-01-31' );
   my $cost  = $llm->cost_report( from => '2025-01-01' );
 
 =head1 DESCRIPTION
 
-LLM::API is a client for the Anthropic Claude REST API. It supports sending
-text and document prompts to Claude models, retrieving model lists, API key
-information, and querying organizational usage and cost reports.
+LLM::API supports Anthropic's direct API and Amazon Bedrock. The provider is
+selected at construction time, and text and document content blocks and
+L<LLM::API::Response> objects provide a common interface. The client supports
+single-turn prompts and explicit multi-turn conversations. Bedrock can invoke
+supported Amazon Nova and Anthropic Claude models; Anthropic's direct API
+supports Claude models.
 
-Authentication is handled by passing an API key at construction time or by
-setting the LLM_API_KEY environment variable. The environment variable is
-deleted from the process environment immediately after it is read, as a
-security measure to prevent accidental exposure to child processes.
+For Anthropic, authentication uses an API key supplied to the constructor or
+in the C<LLM_API_KEY> environment variable. For Bedrock, the underlying AWS
+client resolves AWS credentials; no Anthropic API key is required. The
+constructor deletes C<LLM_API_KEY> from the process environment after reading
+it, including when a constructor argument takes precedence.
+
+Model listing, API-key administration, organizational usage reports, and
+organizational cost reports in this module are supported only for Anthropic's
+direct API. There is no Bedrock model-discovery interface.
+
+Provider classes and model pricing are curated in F<providers.yml>, shipped
+in the distribution's share directory. This catalog is not a list of models
+currently accessible to the caller's credentials.
 
 =head1 CONFIGURATION
 
 The following options may be passed to new():
 
+  provider
+
+    Optional. Defaults to anthropic. Use bedrock for AWS Bedrock Converse.
+
   api_key
 
-    Required. Your Anthropic API key. If not provided as an argument, the
+    Required for Anthropic, not used for Bedrock. Your Anthropic API key. If not provided as an argument, the
     constructor reads it from the LLM_API_KEY environment variable and then
     deletes that variable from the environment.
 
   model
 
-    Optional. The Claude model identifier to use. Defaults to claude-sonnet-4-6.
+    Optional. Defaults to claude-sonnet-4-6 for Anthropic, or amazon.nova-micro-v1:0 for Bedrock.
 
   max_tokens
 
-    Optional. Maximum number of tokens in the model response. Defaults to 4096.
+    Optional. Maximum number of tokens in the model response. Defaults to 8192.
+
+  region
+
+    Optional for Bedrock. Uses AWS_REGION, then AWS_DEFAULT_REGION, then
+    us-east-1. This is the AWS request Region; cross-Region inference routing
+    is selected by the model/inference profile identifier.
 
   timeout
 
@@ -530,7 +625,7 @@ may be referenced as LLM::API::CONSTANT_NAME.
 
   $LLM_MAX_TOKENS
 
-    Default maximum token count for responses: 4096
+    Default maximum token count for responses: 8192
 
   $LLM_VERSION
 
@@ -544,12 +639,6 @@ may be referenced as LLM::API::CONSTANT_NAME.
 
     Default HTTP timeout in seconds: 300
 
-  $LLM_PRICING
-
-    A hash reference mapping model names to two-element array
-    references containing the per-token input cost and per-token
-    output cost in US dollars.
-
   %LLM_MEDIA_TYPES
 
     A hash mapping short type names to MIME type strings.
@@ -562,30 +651,39 @@ may be referenced as LLM::API::CONSTANT_NAME.
 
   my $llm = LLM::API->new( api_key => $key );
   my $llm = LLM::API->new( \%options );
+  my $llm = LLM::API->new( provider => 'anthropic', api_key => $key );
+  my $llm = LLM::API->new( provider => 'bedrock', region => 'us-east-1' );
 
 Constructs and returns a new LLM::API instance. Accepts either a hash of
 named arguments or a reference to a hash.
 
-The C<api_key> argument is required and may alternatively be supplied via the
-LLM_API_KEY environment variable. The environment variable is deleted from
-%ENV immediately after being read.
+For C<provider =E<gt> 'anthropic'> (the default), C<api_key> is required
+and may alternatively be supplied via C<LLM_API_KEY>. The variable is deleted
+from C<%ENV> after being read. For C<provider =E<gt> 'bedrock'>, no Anthropic
+API key is required; AWS credential resolution is handled by the underlying
+AWS client. The constructor rejects unsupported providers.
 
-Dies with an error message if C<api_key> is not provided.
+The default models are C<claude-sonnet-4-6> for Anthropic and
+C<amazon.nova-micro-v1:0> for Bedrock. Model IDs are passed to the selected
+provider; inclusion in F<providers.yml> is required for pricing lookup, not
+for model invocation.
 
 =head2 count_input_tokens
 
   my ( $tokens, $cost ) = $llm->count_input_tokens( $content );
 
 Counts the input tokens in the supplied content by querying the
-Anthropic API token counting endpoint without generating a message
-response. The argument must be an array reference of content
-block structures such as those produced by C<text()> and
+selected provider's token counting endpoint without generating a message
+response. For Bedrock this uses C<CountTokens> with Converse-formatted
+messages, where supported by the selected model. The argument must be an
+array reference of content blocks, such as those produced by C<text()> and
 C<document()>.
 
-Returns a two-element list: the number of input tokens and the
-estimated cost in US dollars at the current pricing for the configured
-model. The cost is calculated by multiplying the token count by the
-per-token input cost from the pricing table.
+Returns a two-element list: the number of input tokens and the estimated
+input cost in US dollars, calculated using the selected provider and model's
+input rate from F<providers.yml>. An unpriced model raises an error rather
+than silently reporting zero cost. Model-specific token counting availability
+is determined by the provider.
 
 Throws an exception if the argument is not an array reference.
 
@@ -593,7 +691,7 @@ Throws an exception if the argument is not an array reference.
 
     my $response = $llm->send_prompt( $content );
 
-Sends a messages request to the Anthropic API. The argument must be an
+Sends a messages request to the selected provider. The argument must be an
 array reference of content block structures such as those produced by
 C<text()> and C<document()> (see L<document>, L<text>). Returns an
 L<LLM::API::Response> object. Throws an exception if argument is not
@@ -608,6 +706,27 @@ C<send_prompt> does not throw exceptions on HTTP failure; instead
 failure information is contained in the response object.
 
 See L<LLM::API::Response> for detail on response object methods.
+
+=head2 send_messages
+
+  my $response = $llm->send_messages( [
+    { role => 'user',      content => [ $llm->text('Hello') ] },
+    { role => 'assistant', content => [ $llm->text('Hello!') ] },
+    { role => 'user',      content => [ $llm->text('Explain closures.') ] },
+  ] );
+
+Sends an explicit multi-turn conversation to the selected provider. The
+argument must be a nonempty array reference of message hash references.
+Each message requires a C<role> of C<user> or C<assistant> and a nonempty
+C<content> array reference containing text or document blocks produced by
+C<text()> or C<document()>.
+
+Text blocks must contain a defined C<text> value. Document blocks must
+appear in user messages and contain a source hash reference. This method
+validates the message shape before delegating to the provider; additional
+provider and model restrictions may apply. It returns an
+L<LLM::API::Response> object. The caller supplies the complete conversation
+on each invocation; this method does not maintain conversation history.
 
 =head2 prompt
 
@@ -647,7 +766,19 @@ The media_type argument accepts the short keys defined in
 value will throw an exception. The corresponding MIME type is resolved
 internally before the block is constructed.
 
+For Bedrock, text documents are sent as text content. PDF sources are
+translated into Converse document blocks with a safe document name. The
+adapter decodes the document helper's base64 source into raw bytes and passes
+those bytes to the AWS transport, which performs base64 encoding for the
+JSON request. A PDF must be accompanied by a nonempty text prompt in the
+same user message, and the selected model must support PDF documents.
+Nova Micro is text-only; use a document-capable model for PDF requests.
+The C<document()> return structure remains unchanged for Anthropic callers.
+
 =head2 models
+
+This method is available only with C<provider =E<gt> 'anthropic'>; it
+throws an exception for other providers.
 
     my $data = $llm->models;
 
@@ -658,6 +789,9 @@ throws an exception containing the HTTP response code and HTTP body.
 See L<https://platform.claude.com/docs/en/api/beta/models/list> for more details.
 
 =head2 api_keys
+
+This method is available only with C<provider =E<gt> 'anthropic'>; it
+throws an exception for other providers.
 
     my $data = $llm->api_keys;
 
@@ -671,6 +805,9 @@ I<Note: This endpoint requires the use of an admin API key.>
 See L<https://platform.claude.com/docs/en/api/admin/api_keys/list> for more details.
 
 =head2 usage_report
+
+This method is available only with C<provider =E<gt> 'anthropic'>; it
+throws an exception for other providers.
 
     my $data = $llm->usage_report(
       from         => '2025-01-01',          # defaults to today
@@ -693,6 +830,9 @@ for more details.
 
 =head2 cost_report
 
+This method is available only with C<provider =E<gt> 'anthropic'>; it
+throws an exception for other providers.
+
     my $data = $llm->cost_report(
       from         => '2025-01-01',          # defaults to today
       to           => '2025-01-31',          # optional end date
@@ -713,9 +853,10 @@ See L<https://platform.claude.com/docs/en/api/admin/cost_report/retrieve> for mo
     my $headers = $llm->headers;
     my $headers = $llm->headers( 'content-type' => 'application/json' );
 
-Builds and returns a hash reference of HTTP request headers. Always includes
-the x-api-key and anthropic-version headers. Additional header key-value pairs
-may be supplied as a flat list and are merged into the returned hash.
+Delegates HTTP header construction to the selected provider. For Anthropic,
+the returned hash reference includes C<x-api-key> and C<anthropic-version>;
+additional header key-value pairs may be supplied as a flat list. Bedrock
+uses AWS authentication rather than Anthropic API-key headers.
 
 =head2 pricing
 
@@ -723,8 +864,12 @@ may be supplied as a flat list and are merged into the returned hash.
     my ( $input_cost, $output_cost ) = $llm->pricing( $model_name );
 
 Returns the per-token input and output costs in US dollars for the
-specified model. Throws an exception of no pricing is available for
-the model.
+specified model and selected provider. Prices are loaded from the
+installed F<providers.yml> catalog. The optional model argument defaults
+to C<get_model>. Bedrock pricing is keyed by the complete model or inference
+profile identifier, so global and geographic profiles may have different
+rates. Throws an exception if pricing is not available for the
+provider/model combination; an unpriced model may still be invoked.
 
 I<Note: Costs are expressed as fractional dollar amounts per single
 token (for example, 0.000003 for $3 per million).>
@@ -734,9 +879,10 @@ token (for example, 0.000003 for $3 per million).>
     my $timestamp = $llm->rfc_3339( '2025-01-15' );
     my $timestamp = $llm->rfc_3339( '2025-01-15 14:30' );
 
-Interprets the input date string as local time and converts it to an
-RFC 3339 formatted UTC timestamp string of the form
-YYYY-MM-DDTHH:MM:SSZ.
+Parses the input date string using C<Time::Piece::strptime> and formats
+it as C<YYYY-MM-DDTHH:MM:SSZ>. The method appends a literal C<Z>; it does
+not explicitly convert a local-time value to UTC. Callers should not rely
+on it to perform timezone conversion.
 
 Accepts exactly two input formats:
 
@@ -761,7 +907,7 @@ string is not guaranteed.
 Values can be scalars, arrays or hashes. Arrays and hashes will be
 expanded in the query string as describe in the examples below.
 
-=over 4 
+=over 4
 
 =item Array Behavior
 
@@ -769,7 +915,7 @@ When an array reference is passed as a value, each element is added to
 the query string as a separate parameter with the same key.
 
   $llm->query_string( id => [1, 2] );
-  
+
 Produces: C<id=1&id=2>
 
 =item Hashes Behavior
@@ -802,6 +948,14 @@ value and set_NAME to write it.
     Holds a code reference that returns the API key when called. The API key
     is stored only inside this closure and is not exposed directly as an
     attribute value.
+
+  get_provider / set_provider
+
+    The selected provider identifier, such as 'anthropic' or 'bedrock'.
+
+  get_region / set_region
+
+    The AWS request Region for Bedrock. Not used for Anthropic requests.
 
   get_max_tokens / set_max_tokens
 
@@ -838,6 +992,11 @@ constructor argument takes precedence
 I<Note: C<LLM_API_KEY> is deleted from the environment as a security
 measure regardless of whether it is used.>
 
+=item AWS_REGION / AWS_DEFAULT_REGION
+
+For Bedrock, C<AWS_REGION> takes precedence over C<AWS_DEFAULT_REGION>.
+When neither is set and no C<region> is provided, C<us-east-1> is used.
+
 =item DEBUG
 
 If set to a true value at program startup, Data::Dumper is loaded and
@@ -845,6 +1004,20 @@ its Dumper function is imported into the current namespace. This is
 intended for development use only and has no effect on API behavior.
 
 =back
+
+=head1 PROVIDER CATALOG
+
+F<providers.yml> is installed as a distribution share file. Its top-level
+C<providers> mapping identifies each provider's implementation class and
+curated model pricing. For development from a source checkout, the module
+can load F<providers.yml> from the project root when the installed share
+file is unavailable.
+
+Each model entry contains C<input_tokens> and C<output_tokens> as
+C<[price_in_usd, token_count]> pairs. C<pricing()> divides the quoted
+price by the token count to return rates per single token. The catalog is
+loaded once per process. It does not perform live model discovery or test
+whether the configured credentials can invoke a model.
 
 =head1 CAVEATS
 
@@ -860,21 +1033,28 @@ Anthropic API requires parameters in a specific order this should not be
 a concern because HTTP query strings are order-independent, but callers
 relying on a stable string representation should not depend on the output order.
 
-=item Pricing constants are hardcoded for claude-sonnet-4-6 and reflect the rates
-at the time this module was written. Anthropic may change pricing at any time.
-Verify current rates at L<https://www.anthropic.com/pricing> before relying
-on these values for billing calculations.
+=item Pricing is curated in F<providers.yml> in the distribution share
+    directory. The rates are estimates for standard, uncached,
+    on-demand token usage. Providers may change rates; verify current
+    pricing before using the estimates for billing calculations.
 
 =back
 
 =head1 DEPENDENCIES
 
     Class::Accessor::Fast
+    File::Basename
+    File::ShareDir
+    File::Spec
+    YAML::Tiny
     CLI::Simple::Constants
     CLI::Simple::Utils
     English
-    HTTP::Tiny
+    HTTP::Tiny (Anthropic transport)
     JSON::PP
+    Scalar::Util
+    LLM::API::Anthropic (provided by this distribution)
+    LLM::API::Bedrock (provided by this distribution)
     LLM::API::Response (provided by this distribution)
     MIME::Base64
     Readonly
@@ -905,7 +1085,7 @@ Anthropic pricing: L<https://www.anthropic.com/pricing>
 
 =head1 VERSION
 
-This documentation refers to version 1.0.1.
+This documentation refers to version 2.0.0.
 
 =head1 AUTHOR
 

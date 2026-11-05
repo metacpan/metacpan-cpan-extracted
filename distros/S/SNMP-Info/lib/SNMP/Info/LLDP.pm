@@ -39,7 +39,7 @@ use SNMP::Info;
 
 our ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE);
 
-$VERSION = '3.985000';
+$VERSION = '3.985001';
 
 %MIBS = (
     'LLDP-MIB'          => 'lldpLocSysCapEnabled',
@@ -289,6 +289,15 @@ sub lldp_ip {
         next unless defined $index;
         next unless $proto == 1;
         $lldp_ip{$index} = $addr;
+    }
+
+    # Neighbors often advertise only a MAC chassis ID. Return 0.0.0.0 for
+    # them, which callers resolve by looking up c_id among known devices.
+    my $id_types = $lldp->_lldp_rem( 'lldp_rem_id_type', $partial );
+    foreach my $key ( keys %$id_types ) {
+        next if defined $lldp_ip{$key};
+        $lldp_ip{$key} = '0.0.0.0'
+            if ( $id_types->{$key} // '' ) eq 'macAddress';
     }
     return \%lldp_ip;
 }
@@ -774,6 +783,11 @@ F<LLDP-V2-MIB> rows carry the (C<ifIndex>) in their index.
 
 Returns remote IPv4 address.  Returns for all other address types, use
 lldp_addr if you want any return address type.
+
+A neighbor with a MAC chassis ID (C<lldpRemChassisIdSubtype>) that
+advertises no IPv4 management address returns C<0.0.0.0>, which callers can
+resolve by looking up C<c_id()>. C<0.0.0.0> marks a missing address: it is
+not an address to store or contact.
 
 Falls back to F<LLDP-V2-MIB> when F<LLDP-MIB> reports no neighbors.
 

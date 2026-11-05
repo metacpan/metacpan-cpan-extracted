@@ -4,15 +4,20 @@ use strict;
 use warnings;
 
 use File::Temp qw/tempfile/;
+use IO::Socket::INET;
 use Test::HTTPStatus;
 use Test::Most;
-use Test::RequiresInternet ();
-
-# Check at run time, not compile time, so 'perl -c' (t/cover.t) still passes
-# when NO_NETWORK_TESTING is set
-Test::RequiresInternet->import('nominatim.openstreetmap.org' => 'https');
 
 use_ok('HTML::OSM');
+
+# A geocoder that finds nothing.  Tests of failed lookups use it rather than
+# asking Nominatim, whose answer for any name can change as OpenStreetMap
+# grows (RT#179908)
+{
+	package BasicsNoResult;
+	sub new { return bless {}, shift }
+	sub geocode { return }
+}
 
 # Test for broken smokers that don't set AUTOMATED_TESTING
 if(my $reporter = $ENV{'PERL_CPAN_REPORTER_CONFIG'}) {
@@ -76,7 +81,7 @@ is_deeply($osm->{center}, [40.7128, -74.0060], 'Center is correctly updated');
 
 # Invalid center inputs
 ok(!$osm->center([999, 999]), 'Invalid coordinates do not update the center');
-ok(!$osm->center('xyzzy'), 'Fails on unknown center location');
+ok(!HTML::OSM->new(geocoder => BasicsNoResult->new())->center('xyzzy'), 'Fails on unknown center location');
 
 # 4. Zoom Level Tests
 # Valid zoom changes
@@ -88,8 +93,12 @@ dies_ok { $osm->zoom('invalid') } 'Dies on invalid zoom type';
 dies_ok { $osm->zoom(-5) } 'Dies on negative zoom level';
 
 # 5. Geocoding Tests
-# Simulate address lookup (Requires proper mocking for real tests)
-ok(!$osm->add_marker(['xyzzy']), 'Rejects when geocoding fails');
+ok(!$osm->add_marker(['xyzzy']), 'Rejects an arrayref without exactly two elements');
+{
+	my $nf = HTML::OSM->new(geocoder => BasicsNoResult->new());
+	ok(!$nf->add_marker('xyzzy'), 'Rejects an address the geocoder cannot find');
+	is_deeply($nf->{coordinates}, [], 'No marker is stored for it');
+}
 
 # 6. Map Rendering Tests
 my ($head, $body) = $osm->onload_render();
@@ -105,8 +114,11 @@ my $osm_clone = $osm->new(zoom => 17);
 isa_ok($osm_clone, 'HTML::OSM', 'Cloned object is still HTML::OSM');
 is($osm_clone->{zoom}, 17, 'Cloned object has updated zoom');
 
-unless($ENV{'NO_NETWORK_TESTING'}) {
-	# HTTP Tests
+# HTTP Tests: the only part of this file that needs the internet
+SKIP: {
+	skip('NO_NETWORK_TESTING is set', 2) if($ENV{'NO_NETWORK_TESTING'});
+	skip('unpkg.com cannot be reached', 2)
+		unless(IO::Socket::INET->new(PeerAddr => 'unpkg.com', PeerPort => 443, Timeout => 5));
 	http_ok($osm->{'css_url'}, HTTP_OK);
 	http_ok($osm->{'js_url'}, HTTP_OK);
 }

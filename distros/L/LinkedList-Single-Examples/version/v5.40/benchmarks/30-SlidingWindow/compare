@@ -1,0 +1,121 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::SlidingWindow::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Bench  qw( array_bytes best_of complexity list_bytes report );
+use LinkedList::Single::Example::SlidingWindow;
+use LinkedList::Single::Example::SlidingWindow::Array;
+
+########################################################################
+# package variables
+########################################################################
+
+my $span    = 1_000;
+my $stream  = 100_000;
+my $burst   = 200_000;
+my $keep    = 10;
+
+my %impl
+= (
+    list    => 'LinkedList::Single::Example::SlidingWindow'
+  , array   => 'LinkedList::Single::Example::SlidingWindow::Array'
+);
+
+########################################################################
+# steady state: one event in, expire as it goes.
+#
+# this is the array's best case: shift/splice at the front is cheap in
+# perl, and the expired events are a short prefix.
+########################################################################
+
+my $steady
+= sub( $class, $every )
+{
+    return
+    sub
+    {
+        my $window  = $class->new( span => $span );
+
+        for my $time ( 1 .. $stream )
+        {
+            $window->record( $time, 'e' );
+
+            $window->expire( $time )
+            unless $time % $every;
+        }
+    };
+};
+
+########################################################################
+# burst then drain: a flood of events that all expire at once, leaving
+# a handful behind. how much does each container hold afterwards?
+#
+# the list gives its nodes back as the expired fragment is consumed;
+# the array keeps the capacity it grew to.
+########################################################################
+
+my $drain
+= sub( $class )
+{
+    my $window  = $class->new( span => $span );
+
+    $window->record( $_, 'e' ) for 1 .. $burst;
+
+    $window->expire( $burst + $span - $keep );
+
+    $window
+};
+
+########################################################################
+# run
+########################################################################
+
+for my $every ( 1, 100 )
+{
+    my @row
+    = map
+    {
+        my $name    = $_;
+        my $class   = $impl{ $name };
+
+        {
+            name    => $name
+          , secs    => best_of( 3, $steady->( $class, $every ) )
+          , cx      => complexity \&{ "${class}::expire" }
+        }
+    }
+    qw( list array );
+
+    report "Steady state: $stream events, window of $span, expire every $every" => @row;
+}
+
+my @drain_row
+= map
+{
+    my $name    = $_;
+    my $class   = $impl{ $name };
+    my $window;
+
+    my $secs    = best_of( 3, sub { $window = $drain->( $class ) } );
+
+    {
+        name    => $name
+      , secs    => $secs
+      , bytes   =>
+            $name eq 'list'
+            ? list_bytes( $window->{ list } )
+            : array_bytes( $window->{ window } )
+      , cx      => complexity \&{ "${class}::expire" }
+    }
+}
+qw( list array );
+
+report "Burst of $burst events, then expire down to $keep" => @drain_row;
+
+say "\nbytes: container overhead left holding $keep live events;"
+  , " the payload itself is not counted.";
+say "stmts/branch/index: complexity of the expire method (see LinkedList::Single::Example::Bench).";

@@ -27,6 +27,9 @@ static hamt_entry *hamt_entry_new(void *cx, const char *key, size_t klen,
                                   int utf8, uint64_t hash, void *val) {
     hamt_entry *e;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (klen > (size_t)-1 - offsetof(hamt_entry, key) - 1) return NULL;
     e = (hamt_entry *)HAMT_ALLOC(cx, HAMT_ENTRY_BYTES(klen));
     if (!e) return NULL;
@@ -47,6 +50,9 @@ static hamt_entry *hamt_entry_new(void *cx, const char *key, size_t klen,
 /* Reaching the limit takes four billion live nodes pointing at one entry.
  * It stops rather than wrapping to a count that frees the entry under them. */
 static hamt_entry *hamt_entry_retain(hamt_entry *e) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (e->refcnt == 0xffffffffU) HAMT_FATAL("an entry's reference count would wrap");
     e->refcnt++;
     return e;

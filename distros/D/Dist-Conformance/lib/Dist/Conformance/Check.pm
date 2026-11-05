@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.001;
+package Dist::Conformance::Check 0.002;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -91,7 +91,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ person, rather than guessing.
 =back
 
 A check holds no expectations of its own.  The files, the templates, the
-header, whether a miss fails or is only worth knowing: all of that is its
+policies, whether a miss fails or is only worth knowing: all of that is its
 configuration, which comes from the flavor (see L<Dist::Conformance::Flavor>)
 and from F<.conformance.yml> (see L<Dist::Conformance::Config>).  Each check
 module documents the keys that it takes, and validates them against its
@@ -267,7 +267,8 @@ F<CLAUDE.md> exists and names the skills that it must.
 
 =item L<Dist::Conformance::Check::CriticProfile>
 
-The perlcritic profile starts with the header of its template.
+The perlcritic profile enables or turns off every policy that its template
+enables.
 
 =item L<Dist::Conformance::Check::ToolConfiguration>
 

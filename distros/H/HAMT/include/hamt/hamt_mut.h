@@ -49,7 +49,7 @@ static hamt_node *hamt_node_add_entry_move(void *cx, hamt_node *n, uint32_t bit,
     hamt_node *r;
 
     /* Room for one more where it stands: nothing is allocated. */
-    if (HAMT_NODE_ROOM(N + 1) == HAMT_NODE_ROOM(N) && N) {
+    if (HAMT_NODE_ROOM(N + 1) == HAMT_NODE_ROOM(N) && N) { /* # uncoverable condition right count:2 */
         memmove(n->slot + di + 1, n->slot + di, (size_t)(N - di) * sizeof(void *));
         n->slot[di] = hamt_entry_retain(e);
         n->datamap |= bit;
@@ -137,7 +137,7 @@ static hamt_node *hamt_node_put_mut(void *cx, hamt_node *n, unsigned depth,
         for (i = 0; i < n->ncoll; i++) {
             hamt_entry *old = (hamt_entry *)n->slot[i];
             if (!hamt_entry_key_eq(old, e->key, e->klen, e->utf8, e->hash)) continue;
-            if (old == e || old->val == e->val) return n;
+            if (old == e || old->val == e->val) return n; /* # uncoverable condition left count:1 */
             if (edit) {
                 n->slot[i] = hamt_entry_retain(e);
                 *dead = old;
@@ -167,7 +167,7 @@ static hamt_node *hamt_node_put_mut(void *cx, hamt_node *n, unsigned depth,
         hamt_node *sub;
 
         if (hamt_entry_key_eq(old, e->key, e->klen, e->utf8, e->hash)) {
-            if (old == e || old->val == e->val) return n;
+            if (old == e || old->val == e->val) return n; /* # uncoverable condition left count:1 */
             if (edit) {
                 n->slot[di] = hamt_entry_retain(e);
                 *dead = old;
@@ -335,6 +335,9 @@ static hamt_node *hamt_node_del_mut(void *cx, hamt_node *n, unsigned depth,
             sub = hamt_node_del_mut(cx, child, depth + 1, key, klen, utf8, hash,
                                     status, dead);
             if (*status != HAMT_DEL_DONE) return *status == HAMT_DEL_ABSENT ? n : NULL;
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 */
             if (!sub) HAMT_FATAL("a node below the root came back empty");
 
             if (hamt_node_is_single(sub)) {
@@ -354,6 +357,9 @@ static hamt_node *hamt_node_del_mut(void *cx, hamt_node *n, unsigned depth,
                                 status, dead);
         if (*status == HAMT_DEL_OOM) { hamt_node_release(cx, child); return NULL; }
         if (*status == HAMT_DEL_ABSENT) { hamt_node_release(cx, child); return n; }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
         if (!sub) HAMT_FATAL("a node below the root came back empty");
 
         r = hamt_node_is_single(sub)
@@ -361,6 +367,9 @@ static hamt_node *hamt_node_del_mut(void *cx, hamt_node *n, unsigned depth,
           : hamt_node_with_slot(cx, n, ci, sub, HAMT_NO_SKIP);
         hamt_node_release(cx, sub);
         if (!r) {
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 */
             if (*dead) { hamt_entry_release(cx, *dead); *dead = NULL; }
             *status = HAMT_DEL_OOM;
             return NULL;

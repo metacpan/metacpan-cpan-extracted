@@ -1,0 +1,22 @@
+# build output
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^LinkedList-Single-Examples-.*\.tar\.gz$
+# the top-level copies of version/*/{lib,t,app,benchmarks} made by Makefile.PL
+^lib/
+^t/
+^app/
+^benchmarks/
+# generated tiers
+^version/[^/]+/t/00-(syntax|pod)/
+# development notes
+^PLAN\.md$
+^plan/
+# vcs and editor
+^\.git/
+^\.claude
+~$
+\.old$

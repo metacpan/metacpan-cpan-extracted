@@ -2,9 +2,11 @@ package Database::BI::Model::Geocode;
 
 # Resolve a location column to coordinates, once per distinct value.
 #
-# Phase 6.2 of BI-Phase6.md: a dataset with places but no coordinates offers
-# loc=<column>, and the distinct values of that column are looked up in
-# Geo::Coder::Free.  This module is that lookup, kept out of the controller so
+# A dataset with places but no coordinates offers
+# loc=<column>, and the distinct values of that column are looked up by a
+# Geo::Coder::List chain: Geo::Coder::Free's local data first, then
+# OpenStreetMap's Nominatim service (Geo::Coder::OSM) for the places the local
+# data does not know.  This module is that lookup, kept out of the controller so
 # that the interesting part - which values are worth asking about, which were
 # asked already, and what happens to the rest - is testable without an HTTP
 # request, a data file, or a geocoder on the machine.
@@ -23,9 +25,8 @@ package Database::BI::Model::Geocode;
 #      eval: a backend exception still propagates, exactly as it does from
 #      geocode() itself.
 #
-# Skipping is remembered rather than repeated.  An attempted-and-unresolved value
-# is stored as 0 - the shape BI-Phase6.md section 6.3 gives the geo section of
-# .bi/models.json - so the next request over the same column plots what resolved,
+# Skipping is remembered rather than repeated.  An attempted-and-unresolved value,
+# so the next request over the same column plots what resolved,
 # reports the rest, and asks the geocoder nothing at all.
 
 use strict;
@@ -34,10 +35,11 @@ use warnings;
 use Carp			qw(croak carp);
 use Readonly;
 use Scalar::Util		qw(blessed);
+use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.019.0';
+use version; our $VERSION = version->declare('0.020.0');
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -49,6 +51,43 @@ our $VERSION = '0.019.0';
 # floor it asked for.  t/recommended-versions.t holds the constant and the
 # Makefile.PL recommends entry to each other.
 Readonly my $MIN_GEOCODER_VERSION => '0.48';
+
+# The chain the lookups go through, and the online geocoder at its end.
+# Geo::Coder::List 0.39 records every geocoder it asks in log(), which is how a
+# lookup that reached Nominatim is told from one the local data answered, and
+# how a Nominatim that did not answer is told from a place it does not know.
+# These are named FLOOR rather than MIN_*VERSION: t/recommended-versions.t
+# reads the file's one $MIN_*VERSION as Geo::Coder::Free's floor, and the
+# messages that name these modules spell their numbers out instead.
+Readonly my $LIST_FLOOR      => '0.39';
+Readonly my $OSM_FLOOR       => '0.03';
+Readonly my $THROTTLED_FLOOR => '0.14';
+
+# Nominatim's usage policy: at most one request a second, from a client that
+# names itself.  The gap is kept by LWP::UserAgent::Throttled, which waits
+# before a request rather than refusing it, and the user agent is shared by
+# every lookup in the process, so two map pages opened together still keep it.
+Readonly my $NOMINATIM_HOST => 'nominatim.openstreetmap.org';
+Readonly my $NOMINATIM_GAP  => 1;
+
+# Geo::Coder::OSM 0.03 asks http://nominatim..., which answers with a redirect
+# to https: two requests a lookup, the second held a second by the throttle, and
+# the place name sent once in clear.  Its documented %SOURCES hook names this
+# source instead, and it is asked for by name.
+Readonly my $NOMINATIM_SOURCE => 'database-bi-https';
+Readonly my $NOMINATIM_URL    => "https://$NOMINATIM_HOST";
+Readonly my $ONLINE_TIMEOUT => 10;	# seconds; a service that has stopped answering must not hold a page
+Readonly my $USER_AGENT     => "Database-BI/$VERSION (+https://metacpan.org/dist/Database-BI)";
+
+# Geo::Coder::List's own cache (its L2), used when the caller gives none: one
+# CHI Memory cache for the process, so the answers outlive the object, which the
+# map page makes afresh for every request.  A place Nominatim found is then not
+# asked again while the process lives, whichever request needs it.  The map page
+# and script/bi-geocode pass a CHI File cache under model_dir instead, which
+# also outlives the process and is shared by every hypnotoad worker.
+Readonly my $CACHE_NAMESPACE => __PACKAGE__;
+Readonly my $CACHE_MAX_SIZE  => 4 * 1024 * 1024;	# bytes, for the process-wide default
+Readonly my $CACHE_DIR       => 'geocode-cache';	# under model_dir, for file_cache()
 
 # The default for map_geocode_max (section 6.2): new lookups allowed in one
 # request.  A crafted URL must not be able to turn one request into unbounded CPU.
@@ -64,7 +103,7 @@ Readonly my $SHARED_CACHE_KEY => 'shared';
 # ---------------------------------------------------------------------------
 # I18N message dictionary.
 # Every user-visible string this module produces is keyed here.  The keys are
-# BI-Phase6.md section 11's for the conditions it names - geocoder missing, the
+# for the conditions it names - geocoder missing, the
 # location column not being in the view, skipped rows, the cap, and no openaddr
 # data - so the controller and this module describe the same conditions with the
 # same words; the rest are this module's own argument and interface errors, which
@@ -75,15 +114,26 @@ Readonly my $SHARED_CACHE_KEY => 'shared';
 
 Readonly our %MESSAGES => (
 	'error_map_geocoder_missing'		=> 'Geocoding a location column needs Geo::Coder::Free %s or later, and %s',
+	'error_map_geocoder_list_missing'	=> 'Geocoding a location column needs Geo::Coder::List 0.39 or later, and %s',
 	'error_map_loc_column'			=> 'Column "%s" is not in this dataset, so there is nothing to geocode',
 	'error_geocoder_interface'		=> 'Geocode: the geocoder must provide %s; Geo::Coder::Free %s or later does',
 	'error_max_invalid'			=> 'Geocode: option "max" must be a positive integer, not "%s"',
+	'error_online_max_invalid'		=> 'Geocode: option "online_max" must be a positive integer, not "%s"',
+	'error_cache_dir'			=> 'Geocode: the geocode cache needs a directory that exists, not "%s"',
+	'error_cache_interface'			=> 'Geocode: option "cache" must be a hashref or an object with get() and set(), not a %s',
 	'error_values_arrayref'			=> 'Geocode: the values must be an arrayref, not "%s"',
 	'error_rows_arrayref'			=> 'Geocode: the rows must be an arrayref, not "%s"',
 	'error_column_required'			=> 'Geocode: the column name is required',
-	'warn_map_rows_skipped'			=> 'Plotted %d of %d rows; %d hold no location that could be plotted (an empty cell, a bare number, or a place that could not be found)',
+	'warn_map_rows_skipped'			=> 'Plotted %d of %d rows; %d could not be plotted: %s',
+	# The reasons warn_map_rows_skipped gives, those that apply, joined with ', '.
+	'warn_map_rows_why_empty'		=> '%d with no place in the row',
+	'warn_map_rows_why_refused'		=> '%d whose place is a bare number, not a place name',
+	'warn_map_rows_why_not_found'		=> '%d whose place was not found',
+	'warn_map_rows_why_later'		=> '%d whose place has not been looked up yet',
 	'warn_map_geocode_capped'		=> 'Geocoded %d of the %d places that had not been looked up before; the rest are untouched, so open the data source again or run the geocode warm script to finish them',
 	'warn_map_geocoder_unavailable_data'	=> 'The geocoder has no OpenAddresses data configured (OPENADDR_HOME), so places resolve only as coarsely as the bundled MaxMind data allows',
+	'warn_map_geocoder_local_only'		=> 'Places the local data does not know were not looked up online, which needs Geo::Coder::OSM 0.03 and LWP::UserAgent::Throttled 0.14 or later',
+	'warn_map_geocoder_online_failed'	=> 'OpenStreetMap did not answer (%s), so %d places the local data does not know are left to try again later',
 );
 
 # _fmt($key [, @args]) -> $string
@@ -121,15 +171,13 @@ sub _message {
 	return { 'key' => $key, 'text' => $self->_msg($key, @args) };
 }
 
-=encoding utf8
-
 =head1 NAME
 
 Database::BI::Model::Geocode - Resolve a location column to coordinates, once per distinct value
 
 =head1 VERSION
 
-0.013.0
+0.020.0
 
 =head1 SYNOPSIS
 
@@ -206,10 +254,22 @@ B<Inject a test double so geocoding works without a real geocoder:>
 
 =head1 DESCRIPTION
 
-C<Geo::Coder::Free> resolves a place name to a C<Geo::Location::Point>.  A table
-column holds something less tidy: values repeated thousands of times, blank cells,
-numbers that drifted in from an adjacent column.  This module does the three things
-the column then needs.
+The geocoder is a L<Geo::Coder::List> chain:
+
+    Geo::Coder::List->new()
+        ->push(Geo::Coder::Free->new())   # the local data
+        ->push(Geo::Coder::OSM->new());   # OpenStreetMap's Nominatim
+
+C<Geo::Coder::Free> answers from data on this machine.  A place it does not know
+is asked of Nominatim, over the network, through an L<LWP::UserAgent::Throttled>
+that keeps Nominatim's usage policy: one request a second, from a client that
+names itself (C<Database-BI/I<version>>), with a ten-second time-out.  The user
+agent is shared by every lookup in the process, so the gap holds across
+requests.  Nominatim is told the place name and nothing else.
+
+A table column holds something less tidy than a place name: values repeated
+thousands of times, blank cells, numbers that drifted in from an adjacent
+column.  This module does the three things the column then needs.
 
 =over 4
 
@@ -229,9 +289,28 @@ a backend that would reject it anyway.
 
 =item B<Look the rest up without letting one value end the batch.>
 
-The batch is requested with C<< on_error => 'undef' >>.  A value the geocoder
-refuses after the pre-filter is a miss; a backend that throws an exception is
-still a throw, because nothing here wraps the geocoder in an C<eval>.
+Each place goes down a C<Geo::Coder::List> on its own: the local data, then
+Nominatim when it is in the chain.  With the local data alone the list holds
+only C<Geo::Coder::Free>, which is given the C<region> hint (C<Geo::Coder::OSM>
+would put it in the Nominatim query).  Either way the list's cache answers what
+it has found before.  C<Geo::Coder::List> catches what a geocoder throws and
+asks the next one, so a throw does not end the request; a place whose lookup
+threw and found nothing is held (put in C<not_attempted>, not cached), because "not found" is
+remembered for good and an error is not an answer.
+
+An injected C<geocoder> is asked for one C<geocode_many()> batch instead,
+requested with C<< on_error => 'undef' >>.  A value it refuses after the
+pre-filter is a miss; a backend that throws is still a throw, because nothing
+here wraps it in an C<eval>.
+
+=item B<Tell a Nominatim that failed from a place it does not know.>
+
+C<Geo::Coder::OSM> answers nothing in both cases.  The chain's log says whether
+Nominatim was asked, and its last response says whether it answered.  A place
+it failed on is held, not remembered as not found, and Nominatim is not asked
+again in that request: the rest are asked of the local data alone, and the ones
+it does not know are held too.  The page is told Nominatim's status line and how
+many places wait, never which.
 
 =back
 
@@ -240,10 +319,11 @@ The counts the module returns add up, always.
     skipped + cached + attempted + not_attempted  ==  distinct
     resolved + unresolved                         ==  cached + attempted
 
-C<lookups> is the number the geocoder itself reports for the batch.  With
-C<Geo::Coder::Free> 0.48 and later it may be lower than C<attempted>, because
-the geocoder counts database reads and a value it answered from a warm process
-cache costs zero reads.  It never exceeds C<attempted>.
+C<lookups> is the number of places that reached a geocoder rather than the
+chain's own cache.  For an injected geocoder it is the number that geocoder
+reports for the batch, which C<Geo::Coder::Free> 0.48 and later keeps lower than
+C<attempted> when a value is answered from a warm process cache.  It never exceeds
+C<attempted>.  C<online> is how many of them were asked of Nominatim.
 
 =head2 The cache
 
@@ -263,9 +343,13 @@ Places already resolved continue to be plotted; only new lookups are unavailable
 
 =head2 Without the geocoder
 
-C<Geo::Coder::Free> is a recommended dependency, not a required one.  It is
-loaded the first time it is needed, not at compile time.  When it is absent or
-older than the minimum version:
+C<Geo::Coder::Free> and C<Geo::Coder::List> are recommended dependencies, not
+required ones.  They are loaded the first time they are needed, not at compile
+time.  C<Geo::Coder::OSM> and C<LWP::UserAgent::Throttled> are recommended too;
+without them the chain is the local data alone, and a request with places it
+did not know says so (C<warn_map_geocoder_local_only>).  When
+C<Geo::Coder::Free> or C<Geo::Coder::List> is absent or older than its minimum
+version:
 
 =over 4
 
@@ -303,6 +387,9 @@ are handled by C<Params::Get>.
     openaddr             => string,   # optional; path to OpenAddresses data (default: $ENV{OPENADDR_HOME})
     min_geocoder_version => string,   # optional; minimum version to accept (default: '0.48')
     i18n                 => object,   # optional; must implement maketext($key, @args)
+    online               => boolean,  # optional; ask Nominatim about places the local data does not know (default: 1)
+    online_max           => positive integer, # optional; places asked of Nominatim per call (default: no limit)
+    cache                => hashref|object, # optional; Geo::Coder::List's cache (a hashref, or an object with get() and set(), such as file_cache()); default: one CHI Memory cache per process
 
 C<geocoder> is the injection seam for tests.  An injected geocoder is used
 exactly as given: it is not version-checked, so any object that responds to
@@ -319,6 +406,13 @@ C<warn_map_geocoder_unavailable_data> is emitted in that case.
 C<min_geocoder_version> lets the caller pin the floor, or a test simulate
 a too-old installation on a machine that has the current version.
 
+C<< online => 0 >> keeps every lookup on this machine: a place the local data
+does not know is then not sent to OpenStreetMap.  C<online_max> caps how many
+places one C<resolve_*()> call asks Nominatim about.  At one a second, it is
+roughly how long the call can wait for Nominatim; the places past it go into
+C<not_attempted> uncached, so the next call asks them.  An injected
+C<geocoder> is used as it is, and these two do not apply to it.
+
 C<i18n> is an optional object whose C<maketext($key, @args)> method is called
 in place of the built-in C<%MESSAGES> table.  The key is one of the constants
 defined in C<%MESSAGES>; the args are the same positional values C<sprintf>
@@ -329,7 +423,8 @@ would receive.
 Returns C<$self>.
 
 Croaks with C<error_geocoder_interface> if the injected C<geocoder> does not
-provide both C<valid_location()> and C<geocode_many()>.
+provide both C<valid_location()> and C<geocode_many()>, and with
+C<error_online_max_invalid> if C<online_max> is not a positive integer.
 
 Never croaks because the geocoder module is absent or too old: that is a
 runtime condition reported by C<geocoder_available()>, not a constructor error.
@@ -357,6 +452,7 @@ C<markers> list that a map rendering loop needs.
     cache    => hashref,            # optional; { value => [lat, lon] | 0 }
     region   => two-letter string,  # optional; country hint for the geocoder (e.g. 'GB')
     max      => positive integer,   # optional; max new lookups; default 500
+    lookup   => 0 | 1,              # optional; 0 asks nothing and lists what it would ask; default 1
 
 C<\@rows> is the full record set as returned by the pipeline.  Rows that are
 not hashrefs produce an C<undef> cell, which is classified as skipped.
@@ -379,6 +475,13 @@ and does not count toward it.  Values held back by the cap go into
 C<not_attempted> and are not stored in the cache, so the next request picks
 them up.
 
+C<lookup =E<gt> 0> plots from C<cache> alone and asks the geocoder nothing.
+The places it would have asked (up to C<max>, in first-seen order) are returned
+in C<pending>, and are counted in C<not_attempted> meanwhile.  A caller can then
+look them up one at a time with L</resolve_values>, saving each answer as it
+comes, which is how the map page shows its progress and can be cancelled.  The
+geocoder is still loaded, because its rule decides which values are places.
+
 =head4 OUTPUT
 
 Returns a hashref:
@@ -396,13 +499,15 @@ Returns a hashref:
             cached        => $n,   # found in the cache (resolved or not)
             attempted     => $n,   # sent to the geocoder this request
             lookups       => $n,   # lookups the geocoder reports (may be < attempted)
+            online        => $n,   # of those, places asked of Nominatim
             resolved      => $n,   # total with a position (cache + new)
             unresolved    => $n,   # total without (cache + new)
-            not_attempted => $n,   # held back by the cap, or skipped because no geocoder
+            not_attempted => $n,   # held back by a cap, by a failed lookup, or because no geocoder
         },
         skipped       => [ $value, ... ],   # values refused before lookup
         unresolved    => [ $value, ... ],   # values tried (now or before) and not found
         not_attempted => [ $value, ... ],   # held back by the cap
+        pending       => [ $value, ... ],   # with lookup => 0: what would have been asked; else empty
         messages      => [ { key => $k, text => $t }, ... ],
         cache         => { $value => [lat, lon] | 0 },   # updated copy; never the caller's hashref
         backends      => { $backend_name => $count },
@@ -430,9 +535,13 @@ The count invariant always holds:
     error_column_required              -- $column_name is empty or undef
     error_map_loc_column               -- column not found in any row
     error_map_geocoder_missing         -- no geocoder, or version below the floor
-    warn_map_rows_skipped              -- some rows could not be plotted
-    warn_map_geocode_capped            -- the cap held some values back
-    warn_map_geocoder_unavailable_data -- OPENADDR_HOME not set; coarse resolution only
+    error_map_geocoder_list_missing    -- Geo::Coder::List absent or too old
+    warn_map_rows_skipped              -- some rows could not be plotted, and why
+    warn_map_rows_why_*                -- the reasons it names (not messages of their own)
+    warn_map_geocode_capped            -- max or online_max held some values back
+    warn_map_geocoder_unavailable_data -- local data only, and OPENADDR_HOME not set
+    warn_map_geocoder_local_only       -- no Geo::Coder::OSM, and places were not found
+    warn_map_geocoder_online_failed    -- Nominatim did not answer; places held
 
 =head3 EXAMPLE
 
@@ -468,14 +577,33 @@ sub new {
 			openaddr             => { type => 'string',  optional => 1, default => undef },
 			min_geocoder_version => { type => 'string',  optional => 1, default => $MIN_GEOCODER_VERSION },
 			i18n                 => { type => 'object',  optional => 1, default => undef, can => 'maketext' },
+			online               => { type => 'scalar',  optional => 1, default => 1 },
+			online_max           => { type => 'scalar',  optional => 1, default => undef },
+			cache                => { type => 'object|hashref', optional => 1, default => undef },
 		},
 		input => $raw,
 	);
+
+	# Geo::Coder::List calls get() and set() on its cache inside an eval and
+	# carries on when they fail, so an object without them would cache nothing
+	# and say so only in a warning per place.  It is refused here instead.
+	my $cache = $args->{'cache'};
+	croak(_fmt('error_cache_interface', ref($cache)))
+		if blessed($cache) && !($cache->can('get') && $cache->can('set'));
+
+	# A cap that is not a positive integer is refused, as max is in _options:
+	# defaulting it would quietly lift the limit a caller set to keep a page quick.
+	my $online_max = $args->{'online_max'};
+	croak(_fmt('error_online_max_invalid', $online_max))
+		if defined($online_max) && !(($online_max =~ /\A\d+\z/) && ($online_max > 0));
 
 	my $self = bless {
 		'_i18n'       => $args->{'i18n'},
 		'openaddr'    => $args->{'openaddr'} // $ENV{'OPENADDR_HOME'},
 		'min_version' => $args->{'min_geocoder_version'},
+		'online'      => $args->{'online'} ? 1 : 0,
+		'online_max'  => $online_max,
+		'cache'       => $cache,
 	}, $class;
 
 	if (my $geocoder = $args->{'geocoder'}) {
@@ -504,8 +632,12 @@ sub _check_interface {
 # _load_geocoder() -> geocoder object, or undef when there is not one to be had
 #
 # The real geocoder, loaded on demand so the application installs, starts and
-# tests without it.  Returns nothing when the module is absent, older than the
-# floor, will not load, or builds nothing, and records which it was for the message.
+# tests without it: a Geo::Coder::List holding Geo::Coder::Free, and then
+# Geo::Coder::OSM when online lookups are wanted and it can be had.  Returns
+# nothing when Geo::Coder::Free or Geo::Coder::List is absent, older than its
+# floor, will not load, or builds nothing, and records which it was for the
+# message.  Geo::Coder::OSM is not needed: without it the chain is the local
+# data alone, and a page whose places it does not know says why.
 sub _load_geocoder {
 	my $self = shift;
 
@@ -526,14 +658,120 @@ sub _load_geocoder {
 		return;
 	}
 
-	my $geocoder = Geo::Coder::Free->new(
+	my $have_list = eval {
+		require Geo::Coder::List;
+		Geo::Coder::List->VERSION($LIST_FLOOR);
+		1;
+	};
+
+	unless ($have_list) {
+		my $error = $@;
+
+		$self->{'_unavailable_key'} = 'error_map_geocoder_list_missing';
+		$self->{'_unavailable'} =
+			($error =~ /Can't locate/)			? 'it is not installed'
+			: (defined($Geo::Coder::List::VERSION)		? "$Geo::Coder::List::VERSION is installed"
+			: 'it could not be loaded');
+
+		return;
+	}
+
+	my $local = Geo::Coder::Free->new(
 		$self->{'openaddr'} ? (openaddr => $self->{'openaddr'}) : ()
 	);
 
-	# It is installed, so the message must not fall back on saying that it is not.
-	$self->{'_unavailable'} = 'it could not be started' unless $geocoder;
+	unless ($local) {
+		# It is installed, so the message must not fall back on saying that it is not.
+		$self->{'_unavailable'} = 'it could not be started';
+		return;
+	}
 
-	return $geocoder;
+	# Two lists over one cache: the local data alone, which is asked with the
+	# region hint (Geo::Coder::OSM would put it in the Nominatim query), and the
+	# whole chain when Nominatim is wanted.  What either finds is in the cache
+	# for the other.
+	my $cache = $self->{'cache'} // _default_cache();
+	my $chain = Geo::Coder::List->new(cache => $cache)->push($local);
+	$self->{'_local'}       = $local;
+	$self->{'_local_chain'} = $chain;
+
+	if ($self->{'online'}) {
+		if (my $online = _online_geocoder()) {
+			$chain = Geo::Coder::List->new(cache => $cache)->push($local)->push($online);
+			$self->{'_online'} = $online;
+		} else {
+			$self->{'_online_missing'} = 1;
+		}
+	}
+
+	return $chain;
+}
+
+# _default_cache() -> CHI cache
+#
+# The process-wide cache for Geo::Coder::List, made on first use.  CHI is a
+# prerequisite of the distribution, so this is not one more optional module.
+my $default_cache;
+
+sub _default_cache {
+	require CHI;
+
+	$default_cache //= CHI->new(
+		driver    => 'Memory',
+		global    => 1,
+		namespace => $CACHE_NAMESPACE,
+		max_size  => $CACHE_MAX_SIZE,
+	);
+
+	return $default_cache;
+}
+
+# _online_geocoder() -> Geo::Coder::OSM object, or undef when it cannot be had
+#
+# Nominatim, behind a user agent that keeps its usage policy: one request a
+# second, a name that says who is asking, and a time-out so a service that has
+# stopped answering cannot hold a page.  The user agent is made once per
+# process, because the gap it keeps is measured from the last request it made:
+# one per object would let two pages opened together ask twice in a second.
+my $online_ua;
+
+sub _online_geocoder {
+	my $ok = eval {
+		require Geo::Coder::OSM;
+		Geo::Coder::OSM->VERSION($OSM_FLOOR);
+		require LWP::UserAgent::Throttled;
+		LWP::UserAgent::Throttled->VERSION($THROTTLED_FLOOR);
+		1;
+	};
+	return unless $ok;
+
+	if (!$online_ua) {
+		my $ua = LWP::UserAgent::Throttled->new(
+			agent      => $USER_AGENT,
+			timeout    => $ONLINE_TIMEOUT,
+			keep_alive => 1,
+		);
+		$ua->env_proxy();
+		$ua->throttle({ $NOMINATIM_HOST => $NOMINATIM_GAP });
+		$online_ua = $ua;
+	}
+
+	{
+		no warnings qw(once);	# the module's own variable, which only it reads
+		$Geo::Coder::OSM::SOURCES{$NOMINATIM_SOURCE} = $NOMINATIM_URL;
+	}
+
+	return Geo::Coder::OSM->new(ua => $online_ua, sources => $NOMINATIM_SOURCE);
+}
+
+# _judge() -> the object whose valid_location() decides what is a place
+#
+# An injected geocoder answers for itself.  Geo::Coder::List has no rule of its
+# own, so the chain is judged by Geo::Coder::Free's, the module it asks first.
+sub _judge {
+	my ($self, $geocoder) = @_;
+
+	return $geocoder->can('valid_location') ? $geocoder : $self->{'_local'};
 }
 
 # _geocoder() -> geocoder object or undef
@@ -576,7 +814,9 @@ sub _coordinates {
 #
 # Which database answered, as section 6.2 wants recorded and shown.  'database'
 # names the backend and 'geocoder' the distribution; a result carrying neither is
-# not guessed at.
+# not guessed at.  Geo::Coder::List puts the geocoder object that answered in
+# 'geocoder', which is named by its class (Geo::Coder::OSM), and 'cache' when
+# its own cache did, which names nothing.
 sub _backend_of {
 	my $point = shift;
 
@@ -584,6 +824,8 @@ sub _backend_of {
 
 	for my $key (qw(database geocoder)) {
 		my $value = (blessed($point) && $point->can($key)) ? $point->$key() : $point->{$key};
+		$value = ref($value) if blessed($value);
+		next if defined($value) && $value eq 'cache';
 		return $value if defined($value) && length($value) && !ref($value);
 	}
 
@@ -672,7 +914,7 @@ sub _resolve {
 
 		# The rule, asked of the module that would do the lookup.  A value it
 		# refuses never reaches a backend, so it cannot croak there.
-		unless ($geocoder->valid_location($key)) {
+		unless ($self->_judge($geocoder)->valid_location($key)) {
 			push @skipped, $value;
 			next;
 		}
@@ -692,29 +934,52 @@ sub _resolve {
 		$capped = 1;
 	}
 
-	# 3. One batch, with the non-croaking mode and the region hint.
+	# With lookup => 0 nothing is asked: the places that would have been are
+	# handed back as 'pending', for a caller that looks them up one at a time
+	# (the map page's progress bar), and are not_attempted meanwhile.  The cap
+	# still bounds the list; the rest are pending on the next request.
+	my @wait;
+
+	unless ($opts->{'lookup'} // 1) {
+		@wait = @attempt;
+		unshift @not_attempted, @attempt;
+		@attempt = ();
+		$capped  = 0;
+	}
+
+	# 3. The lookups, each place down a Geo::Coder::List on its own, so that its
+	# cache answers what it has found before.  With an online geocoder a place
+	# that reaches Nominatim is counted against online_max, and a Nominatim that
+	# does not answer is not taken to mean the place does not exist.  Without
+	# one the list holds the local data alone, asked with the region hint.  An
+	# injected geocoder is asked for one batch, with the non-croaking mode.
 	my ($lookups, $resolved, $unresolved) = (0, 0, 0);
+	my $lookup = { 'answers' => {}, 'held' => [], 'online' => 0 };
 
 	if (@attempt) {
-		my $batch = $geocoder->geocode_many(
-			\@attempt,
-			(defined($region) ? (region => $region) : ()),
-			on_error => 'undef',
-		);
+		$lookup = $self->{'_online'}		? $self->_lookup_online($geocoder, \@attempt, $region)
+			: $self->{'_local_chain'}	? $self->_lookup_local(\@attempt, $region)
+			:				  _lookup_batch($geocoder, \@attempt, $region);
 
-		# The count the geocoder reports for the batch is the one a caller caps
-		# its work by; a geocoder that reports none leaves the number of values
-		# it was handed.
-		$lookups = ((ref($batch) eq 'HASH') && defined($batch->{'lookups'}))
-			? $batch->{'lookups'}
-			: scalar @attempt;
+		$lookups = $lookup->{'lookups'};
+
+		# A place held back was not answered either way: it is left out of the
+		# cache, like a place past the cap, so the next request asks again.
+		my %held = map { $_ => 1 } @{ $lookup->{'held'} };
+		push @not_attempted, @{ $lookup->{'held'} };
+		@attempt = grep { !$held{$_} } @attempt;
+		$capped = 1 if $lookup->{'spent'} && @{ $lookup->{'held'} };
 
 		for my $value (@attempt) {
-			my $point = (ref($batch) eq 'HASH') ? $batch->{$value} : undef;
+			my $point = $lookup->{'answers'}{$value};
 			my ($lat, $lon) = _coordinates($point);
 
 			if (defined($lat) && defined($lon)) {
 				my $backend = _backend_of($point);
+
+				# Nominatim answers in strings ("51.33"), the local data in
+				# numbers; the cache and the map get numbers either way.
+				($lat, $lon) = ($lat + 0, $lon + 0);
 
 				$cache{$value} = [ $lat, $lon ];
 				$points{$value} = {
@@ -742,15 +1007,23 @@ sub _resolve {
 	# geocoder_available() already returns the finished sentence, so it is used as
 	# the text; formatting it again repeated the whole message.
 	push @messages, {
-		'key'  => 'error_map_geocoder_missing',
+		'key'  => $self->{'_unavailable_key'} // 'error_map_geocoder_missing',
 		'text' => defined($reason) ? $reason : $self->_msg('error_map_geocoder_missing', $self->{'min_version'}, 'it is not installed'),
 	} unless $available;
 
 	push @messages, $self->_message('warn_map_geocode_capped', scalar @attempt, $wanted)
 		if $capped;
 
+	push @messages, $self->_message('warn_map_geocoder_online_failed', $lookup->{'failed'}, scalar @{ $lookup->{'held'} })
+		if defined($lookup->{'failed'}) && @{ $lookup->{'held'} };
+
+	# Coarse answers are what the local data gives on its own; once Nominatim is
+	# asked about the places it does not know, the warning is no longer true.
 	push @messages, $self->_message('warn_map_geocoder_unavailable_data')
-		if @attempt && !$self->{'openaddr'};
+		if @attempt && !$self->{'openaddr'} && !$self->{'_online'};
+
+	push @messages, $self->_message('warn_map_geocoder_local_only')
+		if $unresolved && $self->{'_online_missing'};
 
 	my @names = sort keys %backends;
 
@@ -763,6 +1036,7 @@ sub _resolve {
 			'cached'	=> $cached_resolved + $cached_unresolved,
 			'attempted'	=> scalar @attempt,
 			'lookups'	=> $lookups,
+			'online'	=> $lookup->{'online'},
 			'resolved'	=> $cached_resolved + $resolved,
 			'unresolved'	=> $cached_unresolved + $unresolved,
 			'not_attempted'	=> scalar @not_attempted,
@@ -770,11 +1044,172 @@ sub _resolve {
 		'skipped'	=> \@skipped,
 		'unresolved'	=> \@unresolved,
 		'not_attempted'	=> \@not_attempted,
+		'pending'	=> \@wait,
 		'messages'	=> \@messages,
 		'cache'		=> \%cache,
 		'backends'	=> \%backends,
 		'backend'	=> @names ? join(', ', @names) : undef,
 		'capped'	=> $capped,
+	};
+}
+
+# _lookup_batch($geocoder, \@values, $region) -> \%lookup
+#
+# One geocode_many() call, for a geocoder injected in place of the chain.
+# The count the geocoder reports for the batch is the one a caller caps its
+# work by; a geocoder that reports none leaves the number of values it was
+# handed.
+sub _lookup_batch {
+	my ($geocoder, $values, $region) = @_;
+
+	my $batch = $geocoder->geocode_many(
+		$values,
+		(defined($region) ? (region => $region) : ()),
+		on_error => 'undef',
+	);
+
+	return {
+		'answers' => (ref($batch) eq 'HASH') ? $batch : {},
+		'lookups' => ((ref($batch) eq 'HASH') && defined($batch->{'lookups'}))
+			? $batch->{'lookups'}
+			: scalar @{ $values },
+		'held'    => [],
+		'online'  => 0,
+	};
+}
+
+# _lookup_local(\@values, $region) -> \%lookup
+#
+# Each place down the Geo::Coder::List that holds the local data alone, with
+# the region hint.  Geo::Coder::Free's own geocode_many() asks geocode() once a
+# place as well, so going one at a time costs nothing, and the list's cache
+# answers what it has found before, here or online.  A lookup answered by that
+# cache is not counted as one.  The list catches what the local geocoder throws
+# and logs it; a place whose lookup threw and found nothing is held, not
+# remembered as not found, as on the online path.
+sub _lookup_local {
+	my ($self, $values, $region) = @_;
+
+	my $chain = $self->{'_local_chain'};
+	my (%answers, @held);
+	my $lookups = 0;
+
+	for my $value (@{ $values }) {
+		$chain->flush();
+		my $point = $chain->geocode(location => $value, (defined($region) ? (region => $region) : ()));
+		my @log   = @{ $chain->log() // [] };
+
+		$lookups++ unless grep { ($_->{'geocoder'} // '') eq 'cache' } @log;
+
+		if (!$point && grep { defined $_->{'error'} } @log) {
+			push @held, $value;
+			next;
+		}
+
+		$answers{$value} = $point;
+	}
+
+	return {
+		'answers' => \%answers,
+		'lookups' => $lookups,
+		'held'    => \@held,
+		'online'  => 0,
+	};
+}
+
+# _lookup_online($chain, \@values, $region) -> \%lookup
+#
+# Each place down the Geo::Coder::List chain: the local data, then Nominatim.
+# The chain's log says which geocoders a place reached, which is how the
+# lookups that went online are counted, and how a Nominatim that did not answer
+# is told apart from a place it does not know: Geo::Coder::OSM answers nothing
+# in both cases, and only its last response says which.
+#
+# Once online_max places have gone online, or Nominatim has failed once, the
+# rest are asked of the local data alone, through _lookup_local.  A place it
+# does not know is then held rather than remembered as not found, because Nominatim
+# was never asked.
+#
+# Geo::Coder::List catches whatever a geocoder in it throws, logs it and asks
+# the next one, so on this path a local geocoder that throws does not end the
+# request as it does on the batch path.  A place whose lookup threw somewhere
+# and found nothing is held too: "not found" is remembered for good, and an
+# error is not an answer.  Nothing here adds an eval of its own.
+sub _lookup_online {
+	my ($self, $chain, $values, $region) = @_;
+
+	my $online = $self->{'_online'};
+	my $class  = ref($online);
+	my $budget = $self->{'online_max'};
+
+	my (%answers, @held, @rest);
+	my ($lookups, $asked, $failed) = (0, 0, undef);
+
+	for my $index (0 .. $#{ $values }) {
+		if (defined($failed) || (defined($budget) && ($asked >= $budget))) {
+			@rest = @{ $values }[$index .. $#{ $values }];
+			last;
+		}
+
+		my $value = $values->[$index];
+
+		$chain->flush();
+		my $point = $chain->geocode(location => $value);
+		my @log   = @{ $chain->log() // [] };
+
+		$lookups++ unless grep { ($_->{'geocoder'} // '') eq 'cache' } @log;
+
+		my @went = grep { ($_->{'geocoder'} // '') eq $class } @log;
+		if (@went) {
+			$asked++;
+
+			my $response = $online->response();
+			my ($thrown) = grep { defined } map { $_->{'error'} } @went;
+
+			if (!$point && (defined($thrown) || !$response || !$response->is_success())) {
+				# What the page is told is the status line, never the error
+				# text: an exception may quote the request, and the request
+				# holds the place, which is the reader's data (section 7).
+				$failed = defined($thrown)		? 'an error in Geo::Coder::OSM'
+					: $response			? $response->status_line()
+					:				  'no response';
+				push @held, $value;
+				next;
+			}
+		}
+
+		if (!$point && grep { defined $_->{'error'} && ($_->{'geocoder'} // '') ne $class } @log) {
+			push @held, $value;
+			next;
+		}
+
+		$answers{$value} = $point;
+	}
+
+	if (@rest) {
+		my $local = $self->_lookup_local(\@rest, $region);
+		$lookups += $local->{'lookups'};
+		push @held, @{ $local->{'held'} };
+
+		my %thrown = map { $_ => 1 } @{ $local->{'held'} };
+		for my $value (grep { !$thrown{$_} } @rest) {
+			my ($lat, $lon) = _coordinates($local->{'answers'}{$value});
+
+			if (defined($lat) && defined($lon)) {
+				$answers{$value} = $local->{'answers'}{$value};
+			} else {
+				push @held, $value;
+			}
+		}
+	}
+
+	return {
+		'answers' => \%answers,
+		'lookups' => $lookups,
+		'held'    => \@held,
+		'online'  => $asked,
+		'spent'   => (!defined($failed) && @rest) ? 1 : 0,
+		'failed'  => $failed,
 	};
 }
 
@@ -787,6 +1222,7 @@ sub _options {
 			cache  => { type => 'hashref', optional => 1, default => undef },
 			region => { type => 'string',  optional => 1, default => undef },
 			max    => { type => 'scalar',  optional => 1, default => undef },
+			lookup => { type => 'scalar',  optional => 1, default => 1 },
 		},
 		stack_trace => 1,
 		input => $opts,
@@ -809,6 +1245,7 @@ sub _options {
 		'cache'  => $args->{'cache'},
 		'region' => $args->{'region'},
 		'max'    => $max,
+		'lookup' => $args->{'lookup'} ? 1 : 0,
 	};
 }
 
@@ -834,6 +1271,7 @@ absent, and C<warn_map_rows_skipped> is never emitted.
     cache    => hashref,             # optional; { value => [lat, lon] | 0 }
     region   => string,              # optional; two-letter country hint
     max      => positive integer,    # optional; new lookups allowed; default 500
+    lookup   => 0 | 1,               # optional; 0 asks nothing (see resolve_column); default 1
 
 Duplicate values in C<\@values> cost one lookup each.  C<undef>, references,
 empty strings, and pure-digit strings are refused before any lookup and counted
@@ -860,6 +1298,7 @@ C<counts.rows>, C<counts.plotted>, and C<counts.unusable>):
         skipped       => [ $value, ... ],
         unresolved    => [ $value, ... ],
         not_attempted => [ $value, ... ],
+        pending       => [ $value, ... ],
         messages      => [ { key => $k, text => $t }, ... ],
         cache         => { $value => [lat, lon] | 0 },
         backends      => { $name => $count },
@@ -969,8 +1408,27 @@ sub resolve_column {
 	$result->{'counts'}{'plotted'}  = $plotted;
 	$result->{'counts'}{'unusable'} = $rows_total - $plotted;
 
-	push @{ $result->{'messages'} }, $self->_message('warn_map_rows_skipped', $plotted, $rows_total, $rows_total - $plotted)
-		if $plotted < $rows_total;
+	if ($plotted < $rows_total) {
+		# Why the rest were not plotted, counted in rows, naming only the reasons
+		# that apply: a list of every possible reason sent a reader looking for
+		# empty cells that were not there.
+		my %why;
+		for my $value (@{ $result->{'skipped'} }) {
+			my $key = (defined($value) && !ref($value)) ? $value : '';
+			$why{$key} = length($key) ? 'refused' : 'empty';
+		}
+		$why{$_} = 'not_found' for grep { defined } @{ $result->{'unresolved'} };
+		$why{$_} = 'later'     for grep { defined } @{ $result->{'not_attempted'} };
+
+		my %rows_by;
+		$rows_by{ $why{$_} } += $row_count{$_} for grep { exists $row_count{$_} } keys %why;
+
+		my $reasons = join(', ', map { $self->_msg("warn_map_rows_why_$_", $rows_by{$_}) }
+			grep { $rows_by{$_} } qw(empty refused not_found later));
+
+		push @{ $result->{'messages'} }, $self->_message('warn_map_rows_skipped',
+			$plotted, $rows_total, $rows_total - $plotted, $reasons);
+	}
 
 	return $result;
 }
@@ -1019,9 +1477,131 @@ sub geocoder_available {
 
 	return (1, undef) if $self->_geocoder();
 
+	return (0, $self->_msg('error_map_geocoder_list_missing', $self->{'_unavailable'}))
+		if ($self->{'_unavailable_key'} // '') eq 'error_map_geocoder_list_missing';
+
 	return (0, $self->_msg('error_map_geocoder_missing',
 		$self->{'min_version'},
 		$self->{'_unavailable'} // 'it is not installed'));
+}
+
+=head2 file_cache
+
+    my $cache   = Database::BI::Model::Geocode->file_cache($model_dir);
+    my $geocode = Database::BI::Model::Geocode->new(cache => $cache);
+
+The cache Geo::Coder::List keeps its answers in, as files under
+F<$model_dir/geocode-cache>: a place Nominatim found is not asked again for a
+month (Geo::Coder::List's C<cache_hit_duration>), across requests, restarts and
+every hypnotoad worker.  A copy of each answer is also kept in the process's
+memory.  The directory is made when the first answer is stored.
+
+This is a B<class method>.  The map page and C<script/bi-geocode> both call it
+with the directory that holds F<models.json>, so they share one cache.  It holds
+place names, as F<models.json> does, so it belongs in C<model_dir> and never in
+C<data_dir>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    $model_dir => string, required; an existing directory
+
+=head4 OUTPUT
+
+A L<CHI> object (the C<File> driver), for the C<cache> option of C<new()>.
+Croaks with C<error_cache_dir> when C<$model_dir> is not a directory.
+
+=head3 EXAMPLE
+
+    my $geocode = Database::BI::Model::Geocode->new(
+        cache => Database::BI::Model::Geocode->file_cache('.bi'),
+    );
+
+=cut
+
+sub file_cache {
+	my (undef, $dir) = @_;
+
+	croak(_fmt('error_cache_dir', defined($dir) ? $dir : 'undef'))
+		unless defined($dir) && !ref($dir) && -d $dir;
+
+	require CHI;
+	require File::Spec;
+
+	return CHI->new(
+		driver    => 'File',
+		root_dir  => File::Spec->catdir($dir, $CACHE_DIR),
+		namespace => $CACHE_NAMESPACE,
+		l1_cache  => { driver => 'RawMemory', global => 1, max_size => $CACHE_MAX_SIZE },
+	);
+}
+
+=head2 place_rows
+
+    my ($places, $name) = Database::BI::Model::Geocode->place_rows(\@rows, [ 'Address', 'Country' ]);
+    my $result = $geocode->resolve_column($places, $name);
+
+A place written across several columns, such as an address and then its
+country, as one column to geocode.  Each row's cells are trimmed and joined in
+the order given, with C<", ">, leaving out the empty ones:
+C<"Brezje 8, Cerknica"> and C<"Slovenia"> become
+C<"Brezje 8, Cerknica, Slovenia">.  A row with every cell empty gives C<''>,
+which C<resolve_column> counts as skipped.
+
+The rows themselves are not changed (a SQL backend's are locked): the result is
+a new row for each, in the same order, holding only the joined place, so a
+marker's C<first_row> still indexes C<\@rows>.  With a single column the rows
+are returned as they are, under that column's name.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    \@rows       arrayref of hashrefs        # required; a row that is not a hashref gives undef
+    \@columns    arrayref of column names    # required; one or more, in order
+
+=head4 OUTPUT
+
+    (\@places, $name)
+        \@places   one hashref { $name => $place } per row, or \@rows itself for one column
+        $name      the columns joined with ", " ("Address, Country")
+
+Croaks with C<error_rows_arrayref> when C<\@rows> is not an arrayref, and with
+C<error_column_required> when C<\@columns> names no column.
+
+=head3 EXAMPLE
+
+    # loc=Address&loc=Country on the map page
+    my ($places, $name) = Database::BI::Model::Geocode->place_rows($records, [qw(Address Country)]);
+    my $result = Database::BI::Model::Geocode->new->resolve_column($places, $name, cache => \%cache);
+
+=cut
+
+sub place_rows {
+	my ($class, $rows, $columns) = @_;
+
+	croak(_fmt('error_rows_arrayref', defined($rows) ? ref($rows) || $rows : 'undef'))
+		unless ref($rows) eq 'ARRAY';
+
+	my @columns = grep { defined($_) && !ref($_) && length($_) }
+		(ref($columns) eq 'ARRAY' ? @{$columns} : ());
+	croak(_fmt('error_column_required')) unless @columns;
+
+	my $name = join(', ', @columns);
+	return ($rows, $name) if @columns == 1;
+
+	my @places = map {
+		my $row = $_;
+		(ref($row) eq 'HASH')
+			? +{ $name => join(', ', grep { length } map {
+				my $cell = $row->{$_};
+				(defined($cell) && !ref($cell)) ? ($cell =~ s/\A\s+|\s+\z//gr) : '';
+			} @columns) }
+			: undef;
+	} @{$rows};
+
+	return (\@places, $name);
 }
 
 =head2 cache_from_models
@@ -1090,7 +1670,7 @@ This is a B<class method>; the invocant is ignored.
 This module never writes the file.  The caller is responsible for passing
 C<$updated_models> to C<_write_models()> or its equivalent, which is where
 the writability and C<data_dir> guards live.  The separation keeps those
-guards in the one place that already owns them (section 7 of the phase spec).
+guards in the one place that already owns them
 
 =head3 API SPECIFICATION
 
@@ -1344,9 +1924,9 @@ You may call them on an instance for convenience, but the invocant is not used.
 The pattern C<< Database::BI::Model::Geocode->cache_from_models(...) >> is
 clearer.
 
-=item B<The geocoder batch receives on_error => 'undef'.>
+=item B<An injected geocoder's batch receives on_error => 'undef'.>
 
-A value the geocoder rejects after the C<valid_location()> pre-filter is
+A value an injected geocoder rejects after the C<valid_location()> pre-filter is
 returned as C<undef> from the batch; it does not croak.  A backend that throws
 an exception (a real database error, a network failure) still propagates
 upward, because nothing here wraps the geocoder in an C<eval>.
@@ -1404,6 +1984,33 @@ installed") or is too old (the second C<%s> is the installed version number).
 The first C<%s> is the floor this module checks for - C<0.48> unless the caller
 pinned C<min_geocoder_version>.  Install or upgrade C<Geo::Coder::Free>.
 
+=item C<error_map_geocoder_list_missing>
+
+    Geocoding a location column needs Geo::Coder::List 0.39 or later, and %s
+
+C<Geo::Coder::Free> loaded but C<Geo::Coder::List>, which holds the chain, did
+not: the C<%s> is "it is not installed" or the version that is.  Install or
+upgrade C<Geo::Coder::List>.
+
+=item C<error_cache_dir>
+
+    Geocode: the geocode cache needs a directory that exists, not "%s"
+
+C<file_cache()> was given a path that is not a directory.  Create it first.
+
+=item C<error_cache_interface>
+
+    Geocode: option "cache" must be a hashref or an object with get() and set(), not a %s
+
+C<new()> was given a C<cache> object that Geo::Coder::List cannot use.
+
+=item C<error_online_max_invalid>
+
+    Geocode: option "online_max" must be a positive integer, not "%s"
+
+C<new()> was given an C<online_max> that is not a positive integer.  Leave it
+out for no limit, or pass C<< online => 0 >> to ask Nominatim nothing.
+
 =item C<error_map_loc_column>
 
     Column "%s" is not in this dataset, so there is nothing to geocode
@@ -1448,30 +2055,56 @@ string.
 
 =item C<warn_map_rows_skipped>
 
-    Plotted %d of %d rows; %d hold no location that could be plotted ...
+    Plotted %d of %d rows; %d could not be plotted: %s
 
-Some rows in the input had a cell that was empty, a bare number, or a place
-that the geocoder could not find.  The count of plotted rows is less than the
-total.  Not an error: the map renders with the rows that could be resolved.
+Some rows could not be plotted.  The last argument says why, counted in rows,
+naming only the reasons that apply, joined with C<, >; each is one of
+
+    warn_map_rows_why_empty      %d with no place in the row
+    warn_map_rows_why_refused    %d whose place is a bare number, not a place name
+    warn_map_rows_why_not_found  %d whose place was not found
+    warn_map_rows_why_later      %d whose place has not been looked up yet
+
+in that order, rendered through the same C<i18n> object as the message.  Not an
+error: the map renders with the rows that could be resolved.
 
 =item C<warn_map_geocode_capped>
 
     Geocoded %d of the %d places that had not been looked up before; ...
 
-The C<max> cap prevented all pending values from being looked up in this
-request.  The un-looked-up values are in C<not_attempted> and are not stored
-in the cache, so the next request picks them up.
+The C<max> cap, or C<online_max>, prevented all pending values from being
+looked up in this request.  The un-looked-up values are in C<not_attempted> and
+are not stored in the cache, so the next request picks them up.
 
 =item C<warn_map_geocoder_unavailable_data>
 
     The geocoder has no OpenAddresses data configured (OPENADDR_HOME), ...
 
-The geocoder was loaded successfully but C<OPENADDR_HOME> is not set and
-C<openaddr> was not passed to C<new()>.  Resolution will succeed for broad
-place names (cities, countries) but will fail for street-level addresses.
-Set the environment variable or pass C<< openaddr => $path >> to C<new()>.
+The geocoder was loaded successfully but C<OPENADDR_HOME> is not set,
+C<openaddr> was not passed to C<new()>, and Nominatim is not in the chain.
+Resolution will succeed for broad place names (cities, countries) but will fail
+for street-level addresses.  Set the environment variable or pass
+C<< openaddr => $path >> to C<new()>.
+
+=item C<warn_map_geocoder_local_only>
+
+    Places the local data does not know were not looked up online, which needs Geo::Coder::OSM 0.03 and LWP::UserAgent::Throttled 0.14 or later
+
+Online lookups were wanted, but one of the two modules is missing or too old,
+and some places were not found.  Install them, or pass C<< online => 0 >> to
+say the local data is all that is wanted.
+
+=item C<warn_map_geocoder_online_failed>
+
+    OpenStreetMap did not answer (%s), so %d places the local data does not know are left to try again later
+
+Nominatim answered with an error (the C<%s> is its status line, such as
+C<429 Too Many Requests>) or not at all.  The places are in C<not_attempted>,
+uncached, and the next request asks again.
 
 =back
+
+=encoding utf8
 
 =head1 FORMAL SPECIFICATION
 
@@ -1510,9 +2143,20 @@ Cap application (MAX = the max option, default 500):
     CAPPED         = |PENDING| > MAX
     NOT_ATTEMPTED' = NOT_ATTEMPTED ∪ PENDING[MAX .. |PENDING| - 1]   (when CAPPED)
 
+Deferral (lookup => 0):
+
+    R.pending      = ATTEMPT
+    NOT_ATTEMPTED' = NOT_ATTEMPTED' ∪ ATTEMPT
+    ATTEMPT        = ∅                 (so CACHE' = CACHE, and nothing is asked)
+    CAPPED         = false
+
+Otherwise R.pending = ∅.
+
 Geocoding step -- for each v in ATTEMPT:
 
-    BATCH = geocoder.geocode_many(ATTEMPT, on_error => 'undef')
+    BATCH = { v => chain.geocode(v) | v in ATTEMPT }    (each through the list's
+            cache; an injected geocoder: geocode_many(ATTEMPT, on_error => 'undef');
+            a v whose lookup threw and found nothing moves to NOT_ATTEMPTED)
 
     for v in ATTEMPT:
         (lat, lon) = coordinates(BATCH(v))

@@ -13,7 +13,7 @@ use Symbol ();
 
 use Devel::XSCover::Flow ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my ($class, %args) = @_;
@@ -43,7 +43,7 @@ sub find_gcda {
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
+                $File::Find::prune = 1 if $skip{$base} && _slashes($_) ne $top;
                 return;
             }
             push @found, _slashes(File::Spec->abs2rel($_, $self->{dir})) if /\.gcda\z/;

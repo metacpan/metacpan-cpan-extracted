@@ -25,6 +25,7 @@ t/extended_tests.t
 t/function.t
 t/fuzz.t
 t/integration.t
+t/legend.t
 t/limiting.t
 t/locales.t
 t/mock.t

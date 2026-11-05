@@ -11,6 +11,7 @@ README
 README.md
 SECURITY.md
 lib/Stats/LikeR.pm
+lib/Stats/LikeR.pm.orig
 lib/Stats/LikeR/Usage.pm
 ppport.h
 t/01.t

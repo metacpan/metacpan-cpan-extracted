@@ -1,0 +1,14 @@
+requires 'Array::Compare', '== 3.0.8'; # or your minimum version
+requires 'perl', '5.008001';
+recommends 'PDL';
+
+on 'test' => sub {
+    requires 'Test::More', '>= 0.98';
+    requires 'IPC::Open3';
+};
+
+on 'develop' => sub {
+    requires 'Software::License';
+    requires 'Software::License::CC0_1_0';
+    requires 'Minilla';
+};

@@ -1,4 +1,4 @@
-package Dist::Conformance::Source::Git 0.001;
+package Dist::Conformance::Source::Git 0.002;
 
 # ABSTRACT: Standards fetched from a git repository into a cache directory
 
@@ -90,7 +90,7 @@ Dist::Conformance::Source::Git - Standards fetched from a git repository into a 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

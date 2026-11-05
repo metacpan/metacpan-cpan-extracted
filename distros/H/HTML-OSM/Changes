@@ -1,5 +1,65 @@
 Revision history for HTML-OSM
 
+0.13	Wed Nov  4 10:02:06 AM EST 2026
+	[ Enhancements ]
+	- new(scale => 1) adds Leaflet's scale bar, in kilometres and miles.  It
+	  is redrawn as the reader moves and zooms
+	- new(legend => [ { label, colour, radius, group }, ... ]) draws a key in
+	  a corner of the map (legend_position, default topright), headed by
+	  legend_title.  A radius gives a swatch that size, for a key to the
+	  sizes of circle markers
+	- add_marker() and add_circle_marker() take group.  A key entry with a
+	  group is listed only while a marker of that group is in view, so the
+	  key changes as the reader pans and zooms; a marker inside a cluster
+	  counts.  When nothing is listed the key says legend_empty ("Nothing in
+	  this view")
+	- new() croaks on a key entry it cannot draw and on a position that is
+	  not a corner; onload_render() leaves out such an entry from a config
+	  file or a clone, with a warning.  Every text in the key is written as
+	  text, never as HTML
+	- new(fit => 1) opens the map on every pin and circle marker, zooming in
+	  no further than zoom, and "Reset Map" returns there.  Without it the
+	  map still opens at zoom around the markers' midpoint, which can leave
+	  them all out of view.  A centre set with center() wins
+
+	[ Tests ]
+	- Add t/legend.t (scale, legend, legend_title, legend_position,
+	  legend_empty, group and fit)
+	- t/30-basics.t no longer asks Nominatim about "xyzzy" to test an unknown
+	  centre location; it uses a geocoder stub that finds nothing.  The test
+	  failed whenever Nominatim found a place of that name (RT#179908).  An
+	  address the geocoder cannot find is now tested through add_marker()
+	  too.  Only the CDN checks need the internet, so the rest of the file
+	  runs without it and Test::RequiresInternet is no longer needed
+	- t/conf/new.yml covers legend_position
+	- Require Test::Mockingbird 0.03, the first version with the
+	  mock 'Pkg::method' => sub { ... } form the tests use.  With 0.02 eight
+	  test files failed to compile
+	  Fixes https://www.cpantesters.org/cpan/report/876c3bf2-cf9d-11f1-a02c-9138a504d503
+	- .github/workflows/actionlint.yml lints every workflow on push and pull
+	  request: actionlint reads each expression with the contexts available where
+	  it stands, which is how Database-BI's browser.yml was refused whole -
+	  "Unrecognized named-value: 'runner'" for ${{ runner.temp }} in a job-level
+	  env, with none of its four jobs run - and shellcheck checks the shell inside
+	  every run: block.  Both are downloaded from a pinned release with a
+	  verified checksum, and the workflows are found rather than listed, so one
+	  added later is covered without being added here as well.  The file is the
+	  one the distributions that share these workflows carry unchanged - the
+	  contract job's four callers, the siblings it checks out and the eight the
+	  location-predicate fuzz assembles - so the copies here are held to the same
+	  rules.
+	- The findings it reported in .github/workflows/perl-ci.yml are fixed rather
+	  than silenced: the documented `eval "$(perl -Mlocal::lib)"` idiom is quoted
+	  (SC2046), and `find lib -name '*.pm' | xargs` is -print0 and -0 now
+	  (SC2038), so a module path holding a space is no longer split into two.
+	- The other copies in this repository are fixed too: dashboard.yml and
+	  mutate.yml quote their writes to $GITHUB_ENV and $GITHUB_PATH (SC2086) and
+	  give `find xt ... | xargs git add` -print0 and -0 (SC2038).  mutate.yml's
+	  mutator command and its flags are arrays rather than strings split by the
+	  shell - an empty string that relied on splitting to vanish is an empty
+	  array - and `command -v` replaces `which`, so the branch taken is about
+	  whether the program exists rather than what a wrapper printed.
+
 0.12	Fri Oct 23 09:19:01 PM EDT 2026
 	[ Enhancements ]
 	- new(search => 0) leaves out the Nominatim search box, the "Clear search

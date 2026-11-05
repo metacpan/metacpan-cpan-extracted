@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::SlidingWindow::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::SlidingWindow;
+
+########################################################################
+# a login throttle: refuse a user after 3 attempts in 10 seconds.
+########################################################################
+
+sub run( $class, @attempt )
+{
+    my $window  = LinkedList::Single::Example::SlidingWindow->new( span => 10 );
+    my $limit   = 3;
+
+    for my $at ( @attempt )
+    {
+        # forget the attempts that have aged out, say so as they go.
+
+        $window->expire
+        (
+            $at
+          , sub( $time, $who )
+            {
+                say "  t=$time  forgot attempt by $who";
+            }
+        );
+
+        if( $window->size >= $limit )
+        {
+            say "t=$at  REFUSED: $limit attempts in the last 10 seconds";
+        }
+        else
+        {
+            $window->record( $at, 'mallory' );
+
+            say "t=$at  allowed (", $window->size, " in the window)";
+        }
+    }
+
+    $window
+}
+
+__PACKAGE__->run( 1, 2, 3, 4, 8, 12, 13, 14, 30 )
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+sliding-window - demonstration of LinkedList::Single::Example::SlidingWindow
+
+=head1 SYNOPSIS
+
+    perl app/30-SlidingWindow/sliding-window
+
+=head1 DESCRIPTION
+
+Runs a small login throttle. See L<LinkedList::Single::Example::SlidingWindow::POD> for what the
+example is meant to show.

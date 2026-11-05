@@ -60,5 +60,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Mojolicious-Plugin-Buffer/issues
   repository: git://github.com/nigelhorne/Mojolicious-Plugin-Buffer.git
-version: 0.001.1
+version: 0.002.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -129,7 +129,19 @@ my $shared_b_csv = _write_file(File::Spec->catfile($dir, 'shared-b.csv'),
 	. "2,Hastings\n"
 );
 
+# A place written across two columns: an address, then its country.  The
+# second row has no address, so its place is the country alone; the third's
+# address has spaces around it.
+my $houses_csv = _write_file(File::Spec->catfile($dir, 'houses.csv'),
+	"id,person,address,country\n"
+	. "1,Valentin,\"Brezje 8, Cerknica\",Slovenia\n"
+	. "2,Franc,,Slovenia\n"
+	. "3,Marija,\"  Brezje 8, Cerknica \",Slovenia\n"
+	. "4,Ana,,\n"
+);
+
 my $places_spec = 'path:' . $places_csv;
+my $houses_spec = 'path:' . $houses_csv;
 my $markup_spec = 'path:' . $markup_csv;
 my $range_spec  = 'path:' . $range_csv;
 my $towns_spec  = 'path:' . $towns_csv;
@@ -160,6 +172,8 @@ my $stub = Stub::Geocoder->new(results => {
 	'Faversham'           => Stub::Point->new(latitude => 51.31, longitude => 0.89, database => 'OpenAddresses'),
 	'Hastings'            => Stub::Point->new(latitude => 50.85, longitude => 0.57, database => 'OpenAddresses'),
 	'Rye'                 => Stub::Point->new(latitude => 50.95, longitude => 0.73, database => 'OpenAddresses'),
+	'Brezje 8, Cerknica, Slovenia' => Stub::Point->new(latitude => 45.79, longitude => 14.36, database => 'OpenAddresses'),
+	'Slovenia'            => Stub::Point->new(latitude => 46.12, longitude => 14.82, database => 'OpenAddresses'),
 });
 
 $t->app->config->{geocoder} = $stub;
@@ -167,12 +181,12 @@ $t->app->config->{geocoder} = $stub;
 # HTML::OSM is a recommends dep; skip when absent so CI does not fail just
 # because the optional renderer is not installed.
 #
-# 0.12 is the floor, not just installation: below it the application reports
+# 0.13 is the floor, not just installation: below it the application reports
 # the renderer in the page and draws nothing, so every assertion here about
 # markers, popups and Leaflet assets would fail for a reason the file cannot
 # test.  The degraded page is covered by the in-process stand-in instead.
-my $have_map_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
-plan skip_all => 'HTML::OSM 0.12 or later is needed to draw a map'
+my $have_map_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
+plan skip_all => 'HTML::OSM 0.13 or later is needed to draw a map'
 	unless $have_map_renderer;
 
 # ===========================================================================
@@ -291,7 +305,10 @@ subtest 'popup= adds a column to the marker popup' => sub {
 		->status_is(200);
 
 	my $body = $t->tx->res->body;
-	like($body, qr/amount: 10/, 'the popup names the requested column and its value');
+	like($body, qr/amount: 3/, 'the popup names the requested column and its value');
+	like($body, qr{<th>amount<\\/th><\\/tr><tr><td>10<\\/td><\\/tr><tr><td>5<\\/td>},
+		'and lists it for each row of a place where it differs');
+	unlike($body, qr{<th>id<}, 'only the requested column');
 };
 
 subtest 'A place value is escaped, never injected as markup' => sub {
@@ -623,10 +640,6 @@ subtest 'Leaflet assets and tiles can be self-hosted for an offline deployment' 
 	# A deployment with no outbound network access serves the library and the
 	# tiles itself.  Every asset is a config key, and both the map page and a
 	# map card on a canvas have to use the configured copies rather than the CDN.
-	# These config keys were added in HTML::OSM 0.11; skip on older installs
-	# (0.12 is the new minimum, so this guard is now effectively always true).
-	plan skip_all => 'HTML::OSM >= 0.12 required for asset URL overrides'
-		unless $HTML::OSM::VERSION >= 0.12;
 	local $t->app->config->{leaflet_js_url}                  = '/static/leaflet/leaflet.js';
 	local $t->app->config->{leaflet_css_url}                 = '/static/leaflet/leaflet.css';
 	local $t->app->config->{leaflet_cluster_js_url}          = '/static/leaflet/leaflet.markercluster.js';
@@ -672,10 +685,7 @@ subtest 'Leaflet assets and tiles can be self-hosted for an offline deployment' 
 };
 
 subtest 'Nominatim search box is suppressed (search => 0 set by _map_data)' => sub {
-	# HTML::OSM >= 0.12 added the search => 0 constructor param; _map_data always
-	# passes it so no keystrokes leave the server.
-	plan skip_all => 'HTML::OSM >= 0.12 required for search => 0'
-		unless $HTML::OSM::VERSION >= 0.12;
+	# _map_data always passes search => 0, so no keystrokes leave the server.
 
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
 	my $body = $t->tx->res->body;
@@ -686,8 +696,6 @@ subtest 'Nominatim search box is suppressed (search => 0 set by _map_data)' => s
 };
 
 subtest 'max_zoom= caps the tile layer zoom' => sub {
-	plan skip_all => 'HTML::OSM >= 0.12 required for max_zoom'
-		unless $HTML::OSM::VERSION >= 0.12;
 
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', max_zoom => 16))
 		->status_is(200);
@@ -699,12 +707,12 @@ subtest 'max_zoom= caps the tile layer zoom' => sub {
 
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))
 		->status_is(200);
-	unlike($t->tx->res->body, qr/maxZoom/, 'absent max_zoom= means no maxZoom option emitted');
+	# The tile layer's options: fitBounds has a maxZoom of its own, the zoom it
+	# fits to at most
+	unlike($t->tx->res->body, qr/attribution: '(?:[^'\\]|\\.)*',\s*maxZoom/, 'absent max_zoom= means no maxZoom option emitted');
 };
 
 subtest 'max_zoom= can come from config (map_max_zoom)' => sub {
-	plan skip_all => 'HTML::OSM >= 0.12 required for max_zoom'
-		unless $HTML::OSM::VERSION >= 0.12;
 
 	local $t->app->config->{map_max_zoom} = 18;
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
@@ -779,8 +787,8 @@ subtest 'series= colours markers by category from the named scheme' => sub {
 		series => 'place', scheme => 'set2'))
 		->status_is(200)
 		->content_like(qr/data:image\/svg/, 'per-marker coloured icons are emitted')
-		->content_like(qr/map-legend/, 'a colour legend is shown')
-		->content_like(qr/Ramsgate/, 'the legend names a category')
+		->content_like(qr/var legendEntries = /, 'a colour key is drawn on the map')
+		->content_like(qr/Ramsgate/, 'the key names a category')
 		->content_like(qr/#66c2a5/, 'the first set2 colour is used');
 
 	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
@@ -839,7 +847,7 @@ sub _fake_renderer {
 subtest 'a missing HTML::OSM degrades instead of returning 500' => sub {
 	_fake_renderer(0, undef)
 		->status_is(200, 'the map page still renders')
-		->content_like(qr/HTML::OSM 0\.12 or later/,
+		->content_like(qr/HTML::OSM 0\.13 or later/,
 			'the warning names the version that is required')
 		->content_like(qr/and it is not installed/,
 			'the warning says the module is not installed')
@@ -851,10 +859,10 @@ subtest 'a missing HTML::OSM degrades instead of returning 500' => sub {
 			'and the rows without a coordinate are still counted');
 };
 
-subtest 'an HTML::OSM older than 0.12 degrades instead of returning 500' => sub {
+subtest 'an HTML::OSM older than 0.13 degrades instead of returning 500' => sub {
 	_fake_renderer(0, '0.11')
 		->status_is(200, 'the map page still renders')
-		->content_like(qr/HTML::OSM 0\.12 or later/,
+		->content_like(qr/HTML::OSM 0\.13 or later/,
 			'the warning names the version that is required')
 		->content_like(qr/installed HTML::OSM is 0\.11/,
 			'the warning names the version that is installed')
@@ -862,6 +870,272 @@ subtest 'an HTML::OSM older than 0.12 degrades instead of returning 500' => sub 
 			'the warning is the older-install message, not the missing-module one')
 		->content_unlike(qr/L\.marker\(/, 'no map script is emitted')
 		->content_like(qr/Plotting 2 markers/, 'the markers are still counted');
+};
+
+# The key HTML::OSM draws on the map: its entries, groups and points, as the
+# script declares them
+sub _map_key_of {
+	my ($body) = @_;
+	my ($entries) = $body =~ /var legendEntries = (.*?);\n/;
+	my ($groups)  = $body =~ /var legendGroups = (.*?);\n/;
+	my ($points)  = $body =~ /var legendPoints = (.*?);\n/;
+	my ($title)   = $body =~ /var legendTitle = '((?:[^'\\]|\\.)*)';/;
+	return {
+		entries => defined($entries) ? decode_json($entries) : undef,
+		groups  => defined($groups)  ? decode_json($groups)  : undef,
+		points  => $points,
+		title   => $title,
+	};
+}
+
+subtest 'the map has a scale bar and a key that follows the view' => sub {
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon'))->status_is(200);
+	like($t->tx->res->body, qr/L\.control\.scale\(\)\.addTo\(map\)/, 'every map has a scale bar');
+	unlike($t->tx->res->body, qr/legendEntries/, 'and a map with nothing to explain has no key');
+	like($t->tx->res->body, qr/map\.fitBounds\(\[\[51\.33, 0\.75\], \[51\.92, 1\.42\]\]/,
+		'with no zoom= it opens on every marker');
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', zoom => 9))->status_is(200);
+	unlike($t->tx->res->body, qr/fitBounds/, 'a zoom= is where it opens instead');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', series => 'place', scheme => 'set2'))->status_is(200);
+	my $body = $t->tx->res->body;
+	my $key  = _map_key_of($body);
+	is($key->{title}, 'place', 'a series key is titled with its column');
+	is_deeply([ map { [ @{$_}{qw(label colour group)} ] } @{ $key->{entries} } ],
+		[ [ 'Ramsgate', '#66c2a5', 'rule0' ], [ 'Earls Colne', '#fc8d62', 'rule1' ],
+		  [ '(blank)', '#8da0cb', 'rule2' ], [ '12345', '#e78ac3', 'rule3' ] ],
+		'each value, its colour, and the group its markers are given');
+	is_deeply($key->{groups}, [ 'rule0', 'rule1' ],
+		'the values of rows with no position have no marker, so they are never in view and never listed');
+	is($key->{points}, '[[51.33,1.42,0],[51.92,0.75,1]]', 'and the key knows where each one is, to list only those in view');
+	like($body, qr/var legendEmpty = 'Nothing in this view';/, 'what it says when nothing is in view');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon',
+		color => 'amount', color_rule => 'gt:6:#ff0000', color_default => 'green'))->status_is(200);
+	$key = _map_key_of($t->tx->res->body);
+	is_deeply([ map { [ @{$_}{qw(label colour group)} ] } @{ $key->{entries} } ],
+		[ [ 'amount > 6', '#ff0000', 'rule0' ], [ 'Other', '#008000', 'other' ] ],
+		'colour rules are listed as rules, with Other; a named colour is passed as hex')
+		or diag(explain($key->{entries}));
+	is($key->{points}, '[[51.33,1.42,0],[51.92,0.75,1]]', 'a marker that matches no rule belongs to Other');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', size => 'amount'))->status_is(200);
+	$key = _map_key_of($t->tx->res->body);
+	is($key->{title}, 'amount', 'a bubble key is titled with the size column');
+	is_deeply([ map { [ $_->{label}, $_->{radius} ] } @{ $key->{entries} } ],
+		[ [ '3', 6 ], [ '6.5', 18 ], [ '10', 30 ] ],
+		'the smallest, middle and largest sizes, drawn the size their bubbles are');
+	ok(!(grep { exists $_->{group} } @{ $key->{entries} }), 'sizes say what a size means anywhere, so they are always listed');
+
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', series => 'place', size => 'amount'))->status_is(200);
+	$key = _map_key_of($t->tx->res->body);
+	is_deeply([ map { $_->{label} } @{ $key->{entries} } ],
+		[ 'Ramsgate', 'Earls Colne', '(blank)', '12345', 'amount 3', 'amount 6.5', 'amount 10' ],
+		'with both, the sizes are labelled with their column');
+	like($t->tx->res->body, qr/L\.circleMarker\([^)]*\]?, \{[^}]*\}\)/, 'and the bubbles are drawn');
+};
+
+subtest 'a canvas map card is coloured and sized as the map it was saved from' => sub {
+	# A card stores its colour and size columns in encode, as the map page
+	# saves them.  They used to be read only from the page's options, so a
+	# card drew plain pins.
+	my $cid = $t->post_ok('/api/analyses',
+		{ 'Content-Type' => 'application/json' },
+		encode_json({
+			name     => 'Keyed maps',
+			datasets => [ { spec => $places_spec, alias => 'left' } ],
+			visuals  => [
+				{ kind => 'map', encode => { lat => 'lat', lon => 'lon', color => 'amount' },
+				  options => { color_rules => [ { op => 'gt', val => 6, color => '#ff0000' } ], color_default => '#00ff00' },
+				  title => 'Coloured' },
+				{ kind => 'map', encode => { lat => 'lat', lon => 'lon', size => 'amount' }, title => 'Sized' },
+				{ kind => 'map', encode => { lat => 'lat', lon => 'lon', color => 'nope', size => 'nope' }, title => 'Stale' },
+			],
+		})
+	)->status_is(201)->tx->res->json->{id};
+
+	$t->get_ok("/a/$cid")->status_is(200);
+	my $body = $t->tx->res->body;
+	my @scripts = $body =~ m{(<script>(?:(?!</script>).)*?L\.map\('map-\d'\).*?</script>)}sg;
+	is(scalar @scripts, 3, 'three map cards');
+	like($scripts[0], qr/%23ff0000/, 'the coloured card colours a marker by its rule');
+	like($scripts[0], qr/%2300ff00/, 'and the rest by its default');
+	like($scripts[1], qr/L\.circleMarker\(/, 'the sized card draws bubbles');
+	unlike($scripts[2], qr/L\.circleMarker\(|%23/, 'a card naming columns that are gone draws plain pins');
+
+	is_deeply([ map { $_->{label} } @{ _map_key_of($scripts[0])->{entries} } ], [ 'amount > 6', 'Other' ],
+		'the coloured card has its key');
+	is(_map_key_of($scripts[1])->{title}, 'amount', 'and the sized card has one for its sizes');
+	like($scripts[2], qr/L\.control\.scale/, 'every card has a scale bar');
+};
+
+subtest 'loc= repeated geocodes the columns joined with ", "' => sub {
+	my $url = '/map?l=' . url_escape($houses_spec) . '&loc=address&loc=country';
+	my $before = scalar @{ $stub->{calls} };
+
+	$t->get_ok($url)->status_is(200);
+	my $body = $t->tx->res->body;
+
+	my @asked = map { @{ $_->{values} } } @{ $stub->{calls} }[ $before .. $#{ $stub->{calls} } ];
+	is_deeply([ sort @asked ], [ 'Brezje 8, Cerknica, Slovenia', 'Slovenia' ],
+		'the geocoder is asked for each row\'s cells joined, trimmed, without the empty ones');
+
+	like($body, qr/<title>Map of address, country/, 'the page is titled after both columns');
+	like($body, qr/from columns address, country/, 'the summary names both columns');
+	like($body, qr/Plotting 2 markers for 3 of 4 rows/, 'a row with neither cell is not plotted');
+	like($body, qr/L\.marker\(\[45\.79, 14\.36\]/, 'the address is plotted');
+	like($body, qr/L\.marker\(\[46\.12, 14\.82\]/, 'and the row with only a country, at the country');
+	like($body, qr/<strong>Brezje 8, Cerknica, Slovenia/, 'the popup names the joined place');
+	unlike($body, qr/<b>address:<\/b>|<b>country:<\/b>/, 'and leaves the two columns out of its list');
+	like(html_unescape($body), qr/Map: address, country/, 'the breadcrumb names both columns');
+
+	my ($chart) = $body =~ /data-chart="([^"]*)"/;
+	my $spec = decode_json(html_unescape($chart // 'null'));
+	is_deeply($spec->{encode}{loc}, [qw(address country)], 'Add to canvas keeps both columns, in order');
+
+	$t->get_ok('/map?l=' . url_escape($houses_spec) . '&loc=address&loc=nope')
+		->status_is(400, 'a second column that is not there is refused')
+		->content_like(qr/Column "nope" is not in this view/);
+
+	$t->get_ok('/map?l=' . url_escape($houses_spec) . '&loc=country&loc=')
+		->status_is(200, 'an empty loc= is ignored')
+		->content_like(qr/<title>Map of country &#x2014;/, 'leaving the one column');
+
+	# A canvas card stores the columns as a list, and draws the same map.
+	$t->post_ok('/api/analyses' => json => {
+		name     => 'Houses',
+		datasets => [ { spec => $houses_spec, alias => 'left' } ],
+		visuals  => [ { kind => 'map', encode => { loc => [qw(address country)] }, title => 'Houses' } ],
+	})->status_is(201);
+	my $id = $t->tx->res->json->{id};
+	$t->get_ok("/a/$id")->status_is(200)
+		->content_like(qr/L\.marker\(\[45\.79, 14\.36\]/, 'a card with two place columns plots the joined place')
+		->content_like(qr/Plotting 2 markers for 3 of 4 rows/, 'and counts the same rows');
+
+	# The map panel offers the second column, and remembers it.
+	$t->get_ok('/open?path=' . url_escape($houses_csv))->status_is(200)
+		->element_exists('select#map-loc2-sel[name="loc"]', 'the map panel has a "Followed by" column');
+	$t->post_ok('/geo/save' => form => {
+		l => $houses_spec, replace => 1, col => [qw(address country)], kind => [qw(location location_suffix)],
+	})->status_is(200)->json_is('/ok' => 1);
+	$t->get_ok('/geo/list?l=' . url_escape($houses_spec))
+		->json_is('/columns/country/kind' => 'location_suffix', 'the second column is remembered as such')
+		->json_is('/columns/address/kind' => 'location');
+	$t->post_ok('/geo/save' => form => { l => $houses_spec, col => 'country', kind => 'suffix' })
+		->status_is(400, 'an unknown kind is still refused');
+};
+
+subtest 'the places that were not plotted can be listed, and their rows opened' => sub {
+	# Ramsgate is known; Atlantis is not, and is named twice; Lyonesse is past
+	# the cap of one new lookup; one row is empty and one a bare number.
+	my $csv = _write_file(File::Spec->catfile($dir, 'unplotted.csv'),
+		"id,place\n1,Ramsgate\n2,Atlantis\n3,Atlantis\n4,\n5,12345\n6,Lyonesse\n");
+	my $spec  = "path:$csv";
+	my $table = '/open?path=' . url_escape($csv);
+	my $map   = '/map?l=' . url_escape($spec) . '&loc=place';
+
+	local $t->app->config->{map_geocode_max} = 1;
+	$t->get_ok($map . '&back=' . url_escape($table))->status_is(200);
+	my $body = $t->tx->res->body;
+
+	like($body, qr/data-key="warn_map_rows_skipped"/, 'the rows are said to be unplotted');
+	like(html_unescape($body), qr/Plotted 1 of 6 rows; 5 could not be plotted: 1 with no place in the row, 1 whose place is a bare number, not a place name, 2 whose place was not found, 1 whose place has not been looked up yet</,
+		'the note names each reason that applies, counted in rows');
+	like($body, qr/<summary>List the 4 places that were not plotted<\/summary>/,
+		'and the note opens onto the places, one each however many rows name it');
+
+	my @entries = $body =~ /<tr data-reason="([^"]+)">\s*<td>(.*?)<\/td>\s*<td class="num">(.*?)<\/td>/sg;
+	my @got;
+	while (my ($reason, $place, $rows) = splice @entries, 0, 3) {
+		my ($href) = $rows =~ /href="([^"]+)"/;
+		(my $count = $rows) =~ s/<[^>]+>//g;
+		push @got, [ $reason, $place, $count, html_unescape($href // '') ];
+	}
+	is_deeply([ map { [ @{$_}[0 .. 2] ] } @got ], [
+		[ 'not_found', 'Atlantis',          '2 rows' ],
+		[ 'empty',     '<em>(empty)</em>',  '1 row'  ],
+		[ 'refused',   '12345',             '1 row'  ],
+		[ 'later',     'Lyonesse',          '1 row'  ],
+	], 'in row order, each with its reason and how many rows it stands for');
+	like($body, qr/Not looked up yet; it will be tried next time/, 'the reasons are said in words');
+
+	my ($atlantis, $empty) = map { $_->[3] } @got[0, 1];
+	like($atlantis, qr/\A\Q$table\E&f=place%3Aeq%3AAtlantis&back2=/, 'a place links to the table it came from, filtered to it');
+	like($empty, qr/&f=place%3Aempty&/, 'an empty cell to its empty rows');
+
+	# One link opens every unplotted row at once, whatever the reason.
+	my ($all) = $body =~ /<a class="map-unplotted-all" href="([^"]+)">([^<]+)</;
+	like($body, qr/>Show the 5 rows that were not plotted in the table</, 'one link offers every unplotted row');
+	$all = html_unescape($all // '');
+	like($all, qr/\A\Q$table\E&f=place%3Ain%3A&back2=|\A\Q$table\E&f=place%3Ain%3A/, 'as an in filter on the table it came from');
+	$t->get_ok($all)->status_is(200);
+	my $all_page = $t->tx->res->body;
+	my @ids = $all_page =~ /<td[^>]*>([1-6])<\/td>\s*<td[^>]*>(?:Atlantis|Lyonesse|12345|)<\/td>/g;
+	is_deeply([ sort @ids ], [ 2 .. 6 ], 'which shows those rows and not the plotted one')
+		or diag($all);
+	unlike($all_page, qr/<td[^>]*>Ramsgate<\/td>/, 'Ramsgate, which was plotted, is not among them');
+
+	$t->get_ok($atlantis)->status_is(200);
+	my $rows_page = $t->tx->res->body;
+	is(scalar(() = $rows_page =~ /<td[^>]*>Atlantis<\/td>/g), 2, 'the link shows the rows that name the place');
+	like(html_unescape($rows_page), qr/Map: place/, 'with the map in its breadcrumb, to go back to');
+
+	$t->get_ok($map)->status_is(200);
+	like(html_unescape($t->tx->res->body), qr{href="/open\?path=[^"]*&f=place%3Aeq%3AAtlantis}, 'with no back=, the link is to the file\'s own table');
+
+	$t->get_ok('/map?l=' . url_escape("path:$shared_a_csv") . '&loc=place&back=' . url_escape($table))->status_is(200);
+	unlike($t->tx->res->body, qr/class="map-unplotted"/, 'a map that plots every row lists nothing');
+};
+
+subtest 'the link to every unplotted row is offered only when it is exact' => sub {
+	# A place across two columns is filtered column by column, so the cells of
+	# two unplotted rows can pair up into a row that was plotted.  Then the one
+	# link would show too much, and only the per-place links are offered.
+	my $mixed = _write_file(File::Spec->catfile($dir, 'unplotted-mixed.csv'),
+		"id,address,country\n"
+		. "1,\"Brezje 8, Cerknica\",Slovenia\n"
+		. "2,Atlantis,Slovenia\n"
+		. "3,\"Brezje 8, Cerknica\",Sea\n");
+	$t->get_ok('/map?l=' . url_escape("path:$mixed") . '&loc=address&loc=country')->status_is(200);
+	my $body = $t->tx->res->body;
+	like($body, qr/<summary>List the 2 places that were not plotted<\/summary>/, 'two places were not plotted');
+	unlike($body, qr/class="map-unplotted-all"/, 'and the one link, which would also select row 1, is not offered');
+	is(scalar(() = $body =~ /title="Show these rows in the table"/g), 2, 'but each place still links to its rows');
+
+	my $apart = _write_file(File::Spec->catfile($dir, 'unplotted-apart.csv'),
+		"id,address,country\n"
+		. "1,\"Brezje 8, Cerknica\",Slovenia\n"
+		. "2,Atlantis,Sea\n"
+		. "3,Lyonesse,Sea\n");
+	$t->get_ok('/map?l=' . url_escape("path:$apart") . '&loc=address&loc=country')->status_is(200);
+	my ($all) = $t->tx->res->body =~ /<a class="map-unplotted-all" href="([^"]+)"/;
+	ok(defined $all, 'when the columns select exactly the unplotted rows, the link is offered');
+	$all = html_unescape($all // '');
+	like($all, qr/f=address%3Ain%3A.*&f=country%3Ain%3A/, 'with an in filter on each place column');
+	$t->get_ok($all)->status_is(200);
+	my $rows = $t->tx->res->body;
+	ok(scalar($rows =~ /<td[^>]*>Atlantis<\/td>/) && scalar($rows =~ /<td[^>]*>Lyonesse<\/td>/), 'it shows both unplotted rows');
+	unlike($rows, qr/<td[^>]*>Brezje 8, Cerknica<\/td>/, 'and not the plotted one');
+};
+
+subtest 'a place outside ASCII links to its rows' => sub {
+	# The links carry the cell in the URL.  Escaped as characters rather than
+	# UTF-8, the letters came back as something else and no row matched.
+	my $town = "\x{10C}u\x{10D}ki";
+	my $csv  = _write_file(File::Spec->catfile($dir, 'unplotted-utf8.csv'),
+		Mojo::Util::encode('UTF-8', "id,place\n1,Ramsgate\n2,$town\n3,$town\n"));
+	$t->get_ok('/map?l=' . url_escape("path:$csv") . '&loc=place')->status_is(200);
+	my $body = $t->tx->res->body;
+
+	my ($one) = $body =~ /<a href="([^"]+)" title="Show these rows in the table">/;
+	my ($all) = $body =~ /<a class="map-unplotted-all" href="([^"]+)"/;
+	ok(defined($one) && defined($all), 'the place and all the unplotted rows are linked');
+
+	for my $link ([ 'the place', $one ], [ 'every unplotted row', $all ]) {
+		$t->get_ok(html_unescape($link->[1] // ''))->status_is(200);
+		my $page = Mojo::Util::decode('UTF-8', $t->tx->res->body);
+		is(scalar(() = $page =~ /<td[^>]*>\Q$town\E<\/td>/g), 2, "the link to $link->[0] shows its two rows");
+	}
 };
 
 subtest 'a canvas map card degrades the same way' => sub {
@@ -913,5 +1187,169 @@ subtest 'a canvas map card degrades the same way' => sub {
 			"$label: and still shows the data rows";
 	}
 };
+
+# ===========================================================================
+# The progress bar: a browser's map page asks nothing, lists the places, and
+# /geo/lookup answers them one at a time, saving each answer as it comes.
+# ===========================================================================
+
+subtest 'A browser is shown the map at once, with the places to look up listed' => sub {
+	my $progress_csv = _write_file(File::Spec->catfile(tempdir(CLEANUP => 1), 'progress.csv'),
+		"id,town\n1,Ramsgate\n2,Walmer\n3,Sandwich\n4,Walmer\n5,42\n");
+	my $spec  = 'path:' . $progress_csv;
+	my $html  = { Accept => 'text/html,application/xhtml+xml' };
+	my $calls = scalar @{ $stub->{'calls'} };
+
+	$t->get_ok(_url(l => $spec, loc => 'town'), $html)->status_is(200);
+	my $body = $t->tx->res->body;
+
+	is(scalar @{ $stub->{'calls'} }, $calls, 'the page asked the geocoder nothing');
+	like($body, qr/id="map-progress"/, 'it has the progress bar');
+	like($body, qr/id="map-progress-cancel"/, 'and a Cancel button');
+	like($body, qr/Looking up 2 places that are not in the cache yet/,
+		'it counts the places that are not cached, once each, without the bare number');
+	like($body, qr/L\.marker\(\[51\.33, 1\.42\]/, 'a cached place is on the map already');
+	unlike($body, qr/class="map-notes"/, 'the notes wait until the places are looked up');
+	like($body, qr{fetch\('/geo/lookup'}, 'the page posts to /geo/lookup');
+
+	my ($json) = $body =~ m{<script type="application/json" id="map-pending">(.*?)</script>}s;
+	ok(defined($json), 'the places are listed for the script');
+	my $pending = decode_json($json // '[]');
+	is_deeply([ map { $_->{place} } @{$pending} ], [qw(Walmer Sandwich)], 'in the order of their rows');
+	ok(!(grep { !length($_->{sig} // '') } @{$pending}), 'each one signed');
+
+	my ($done)   = $body =~ /data-done-url="([^"]*)"/;
+	my ($cached) = $body =~ /data-cached-url="([^"]*)"/;
+	$done   = html_unescape($done // '');
+	$cached = html_unescape($cached // '');
+	unlike($done, qr/geocode=/, 'when it is done the page is drawn again as it was asked for');
+	like($cached, qr/geocode=cached/, 'and Cancel draws it from the cache');
+	like($body, qr/<noscript>.*geocode=wait/s, 'without a script, a link waits for the lookups');
+
+	# Walmer is found, and saved at once.
+	$stub->{'results'}{'Walmer'} = Stub::Point->new(latitude => 51.20, longitude => 1.40, database => 'OpenAddresses');
+	$t->post_ok('/geo/lookup' => form => $pending->[0])->status_is(200)
+		->json_is('/status', 'found')->json_is('/stored', 1)->json_is('/place', 'Walmer');
+	is(scalar @{ $stub->{'calls'} }, $calls + 1, 'one place, one lookup');
+	my $models = decode_json(do { open(my $fh, '<', $model_store) or die $!; local $/; <$fh> });
+	is_deeply($models->{geo}{shared}{places}{Walmer}, [51.20, 1.40], 'Walmer is in the shared cache already');
+
+	# Asking again (another tab) is answered from the cache.
+	$t->post_ok('/geo/lookup' => form => $pending->[0])->status_is(200)
+		->json_is('/status', 'found')->json_is('/stored', 1);
+	is(scalar @{ $stub->{'calls'} }, $calls + 1, 'a place in the cache is not looked up again');
+
+	# A place's signature does not fit another place.
+	$t->post_ok('/geo/lookup' => form => { place => 'Sandwich', sig => $pending->[0]{sig} })->status_is(403);
+
+	# Cancel: the map is drawn from the cache, Sandwich is left for later, and
+	# a link offers to look it up.
+	$t->get_ok($cached, $html)->status_is(200);
+	$body = $t->tx->res->body;
+	is(scalar @{ $stub->{'calls'} }, $calls + 1, 'geocode=cached asks nothing');
+	unlike($body, qr/id="map-progress"/, 'and shows no progress bar');
+	like($body, qr/L\.marker\(\[51\.2, 1\.4\]/, 'the place found before Cancel is on the map');
+	like($body, qr/<tr data-reason="later">\s*<td>Sandwich</, 'the place not looked up is listed as later');
+	my ($retry) = $body =~ /id="map-retry" href="([^"]*)"/;
+	ok(defined($retry), 'with a link to look it up');
+	unlike(html_unescape($retry // ''), qr/geocode=/, 'which is the map without geocode=');
+
+	# Sandwich is not found: remembered as such, so the next page is complete.
+	$t->post_ok('/geo/lookup' => form => $pending->[1])->status_is(200)
+		->json_is('/status', 'not_found')->json_is('/stored', 1);
+	$t->get_ok($done, $html)->status_is(200);
+	$body = $t->tx->res->body;
+	unlike($body, qr/id="map-progress"/, 'once every place has an answer, there is no progress bar');
+	like($body, qr/<tr data-reason="not_found">\s*<td>Sandwich</, 'and Sandwich is not found');
+	like($body, qr/Plotting 2 markers for 3 of 5 rows/, 'the rest are plotted');
+};
+
+subtest 'geocode=wait, and a client that is not a browser, look places up first' => sub {
+	my $wait_csv = _write_file(File::Spec->catfile(tempdir(CLEANUP => 1), 'wait.csv'),
+		"id,town\n1,Margate\n2,Broadstairs\n");
+	$stub->{'results'}{'Margate'}     = Stub::Point->new(latitude => 51.38, longitude => 1.38, database => 'OpenAddresses');
+	$stub->{'results'}{'Broadstairs'} = Stub::Point->new(latitude => 51.36, longitude => 1.43, database => 'OpenAddresses');
+	my $calls = scalar @{ $stub->{'calls'} };
+
+	$t->get_ok(_url(l => "path:$wait_csv", loc => 'town', geocode => 'wait'),
+		{ Accept => 'text/html' })->status_is(200);
+	is(scalar @{ $stub->{'calls'} }, $calls + 1, 'geocode=wait looks them up in the request');
+	unlike($t->tx->res->body, qr/id="map-progress"/, 'with no progress bar');
+	like($t->tx->res->body, qr/Plotting 2 markers for 2 of 2 rows/, 'and plots them');
+
+	$t->get_ok(_url(l => "path:$wait_csv", loc => 'town', geocode => 'nope'))->status_is(400)
+		->content_like(qr/geocode= must be "wait"/);
+};
+
+subtest '/geo/lookup: a place that cannot be looked up now is held, not remembered' => sub {
+	my $held_csv = _write_file(File::Spec->catfile(tempdir(CLEANUP => 1), 'held.csv'),
+		"id,town\n1,Nowhere Yet\n");
+	my $url  = _url(l => "path:$held_csv", loc => 'town');
+	my $html = { Accept => 'text/html' };
+
+	# Listed by the page while there is a geocoder to ask...
+	$t->get_ok($url, $html)->status_is(200);
+	my ($json) = $t->tx->res->body =~ m{<script type="application/json" id="map-pending">(.*?)</script>}s;
+	my ($item) = @{ decode_json($json // '[]') };
+	is($item->{place}, 'Nowhere Yet', 'the page lists the place');
+
+	# ...and looked up after it has gone.
+	my $geocoder = delete $t->app->config->{geocoder};
+	no warnings qw(redefine once);
+	local *Database::BI::Model::Geocode::_load_geocoder = sub { $_[0]{_unavailable} = 'it is not installed'; return };
+
+	$t->post_ok('/geo/lookup' => form => $item)->status_is(200)
+		->json_is('/status', 'held')->json_is('/stored', 0);
+	my $models = decode_json(do { open(my $fh, '<', $model_store) or die $!; local $/; <$fh> });
+	ok(!exists $models->{geo}{shared}{places}{'Nowhere Yet'}, 'it is not remembered');
+
+	$t->get_ok($url, $html)->status_is(200);
+	unlike($t->tx->res->body, qr/id="map-progress"/,
+		'without a geocoder nothing can be asked, so there is no progress bar');
+
+	$t->app->config->{geocoder} = $geocoder;
+};
+
+# ---------------------------------------------------------------------------
+# A marker stands for every row at its place, and its popup lists them: the
+# values the rows share once, the ones that differ as a table.  Past
+# map_popup_rows the rest are counted, with a link to them in the table this
+# map came from.  (Reported on a family-history file: a house where three
+# events happened showed "3 rows" and only the first event.)
+# ---------------------------------------------------------------------------
+subtest 'a popup lists every row at a place, capped, with a link to the rest' => sub {
+	$t->get_ok(_url(l => $places_spec, loc => 'place'))->status_is(200);
+	my $body = $t->tx->res->body;
+	my ($popup) = $body =~ m{bindPopup\('(<strong>Ramsgate.*?)'\)}s;
+	ok defined($popup), 'the Ramsgate marker has a popup' or return;
+	like $popup, qr/2 rows<br>lat: 51\.33<br>lon: 1\.42/, 'what both rows share is said once';
+	like $popup, qr{<tr><th>id<\\/th><th>amount<\\/th><\\/tr><tr><td>1<\\/td><td>10<\\/td><\\/tr><tr><td>2<\\/td><td>5<\\/td><\\/tr>},
+		'and both rows are listed, not only the first';
+	unlike $popup, qr/more/, 'two rows are under the default cap';
+
+	local $t->app->config->{map_popup_rows} = 1;
+	my $back = '/open?path=' . url_escape($places_csv);
+	$t->get_ok(_url(l => $places_spec, loc => 'place', back => $back))->status_is(200);
+	($popup) = $t->tx->res->body =~ m{bindPopup\('(<strong>Ramsgate.*?)'\)}s;
+	is scalar(() = $popup =~ /<td>/g), 2, 'one row of two cells under a cap of one';
+	my ($link) = $popup =~ m{and 1 more: <a href="([^"]+)">show all 2 in the table<\\/a>};
+	ok defined($link), 'the rest are counted and linked' or return;
+	$link =~ s/&amp;/&/g;
+	like $link, qr{\A/open\?path=[^&]+&f=place%3Aeq%3ARamsgate&back2=}, 'to the table, filtered to the place';
+	$t->get_ok($link)->status_is(200);
+	is scalar(() = $t->tx->res->body =~ m{<td[^>]*>Ramsgate</td>}g), 2, 'which shows exactly its rows';
+
+	# By coordinates, rows at one point are one marker in the same way.
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', back => $back))->status_is(200);
+	($popup) = $t->tx->res->body =~ m{bindPopup\('(<strong>51\.330000, 1\.420000.*?)'\)}s;
+	like $popup, qr/place: Ramsgate/, 'a point lists its shared values';
+	like $popup, qr{and 1 more: <a href="[^"]*f=lat%3Aeq%3A51\.33&amp;f=lon%3Aeq%3A1\.42}, 'and links to its rows by coordinate';
+
+	# A cap that is not a number is the default.
+	local $t->app->config->{map_popup_rows} = 'lots';
+	$t->get_ok(_url(l => $places_spec, loc => 'place'))->status_is(200);
+	unlike $t->tx->res->body, qr/and \d+ more/, 'a bad map_popup_rows is ignored';
+};
+
 
 done_testing();

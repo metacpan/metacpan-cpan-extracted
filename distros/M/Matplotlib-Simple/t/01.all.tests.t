@@ -3,11 +3,17 @@
 require 5.010;
 use strict;
 use warnings FATAL => 'all';
-use autodie ':all';
+use autodie ':default';   # ':all' would need IPC::System::Simple, for a system() this never calls
 use feature 'say';
 use File::Spec;
 use File::Temp 'tempfile';
 use Matplotlib::Simple;
+# The interpreter the module itself runs: "python3", or on MSWin32 the first of
+# python, py -3 and python3 that is Python 3. Asking the module, rather than
+# naming python3 here, is what lets a Windows smoker that has Python test the
+# module with it instead of skipping; the list is empty when there is none.
+my @PY = Matplotlib::Simple::Matplotlib::python_command();
+my $PY = join ' ', @PY;
 use Test::Exception; # die_ok
 use Test::More;
 #use Digest::SHA 'sha512_base64';
@@ -20,7 +26,7 @@ sub file2string {
 	open my $fh, '<', $file;
 	return do { local $/; <$fh> };
 }
-my $python_version_raw = qx/python3 --version 2>&1/;
+my $python_version_raw = ( scalar @PY ? do { no warnings 'exec'; qx/$PY --version 2>&1/ } // '' : '' );    # 'exec': see t/16.creator.t
 my $python_version = '';
 my $python_available = 0;
 
@@ -33,13 +39,13 @@ if ($? == 0 && $python_version_raw =~ m/Python\s+3\.\d+/i) {
 
 unless ($python_available) {
     # plan skip_all is the core module way to gracefully skip the entire file
-    plan skip_all => 'SKIP: python3 command not found in PATH or is not Python 3. Matplotlib::Simple requires Python 3.';
+    plan skip_all => 'SKIP: no Python 3 interpreter found (python3, or on MSWin32 python, py -3 or python3). Matplotlib::Simple requires Python 3.';
 }
 
-# --- Dependency Check 2: Matplotlib ---
+# Dependency Check 2: Matplotlib
 
 # Command to import matplotlib and print its version.
-my $mpl_command = 'python3 -c "import matplotlib; print(matplotlib.__version__)" 2>&1';
+my $mpl_command = "$PY -c \"import matplotlib; print(matplotlib.__version__)\" 2>&1";
 my ($mpl_major, $mpl_minor, $mpl_patch);
 my $mpl_version_raw = qx/$mpl_command/;
 my $mpl_available = 0;
@@ -76,7 +82,7 @@ if (($mpl_major == 3) && ($mpl_minor < 10)) {
 # --- Optional Dependency: matplotlib_venn (only needed by venn_proportional_area) ---
 # This is NOT a hard dependency of the module, so the whole file is not skipped when
 # it is missing; only the venn_proportional_area test below is skipped.
-my $venn_command = 'python3 -c "import matplotlib_venn" 2>&1';
+my $venn_command = "$PY -c \"import matplotlib_venn\" 2>&1";
 qx/$venn_command/;
 my $venn_available = ($? == 0) ? 1 : 0;
 
@@ -94,6 +100,16 @@ diag($venn_available ? '  matplotlib_venn: found'
 # File::Temp dies with "Parent directory (\tmp\) does not exist" there.
 # On unix this still resolves to /tmp, so the files land where they always did.
 my $tmpdir = File::Spec->tmpdir;
+
+# Where every figure in this file is written. The block below is generated from
+# mpl.examples.pl by md2pod.pl, which rewrites that script's two spellings of an
+# output file -- "output.images/x.png" and "/tmp/x.svg" -- into outfile('x.svg'),
+# and rewrites the @output_files list at the end of the file to match. Before
+# that the generated block carried ~50 hardcoded /tmp paths, which is the one
+# thing CLAUDE.md forbids outright: they cannot work on Windows, and they were
+# invisible on the smokers only because this file skips without python and
+# matplotlib, which a Windows smoker rarely has.
+sub outfile { return File::Spec->catfile( $tmpdir, $_[0] ) }
 
 sub is_valid_svg { # mostly written by Gemini
 	my ($filepath) = @_;
@@ -131,15 +147,15 @@ dies_ok {
 		data => {
 			A => 1
 		},
-		'plot.type'   => 'bar',
-		'output.file' => "$tmpdir/dies_ok.svg",
+		plot_type     => 'bar',
+		output_file => "$tmpdir/dies_ok.svg",
 		orientation   => 'blah' # should cause failure
 	});
 } '"plt" barplot dies when bar gets undefined options';
 dies_ok {
 	plt({
-		'plot.type' => 'bar',
-		'output.file' => "$tmpdir/dies_ok.svg",
+		plot_type => 'bar',
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" barplot dies when no data is defined';
 dies_ok {
@@ -147,17 +163,17 @@ dies_ok {
 		data => {
 			A => 1
 		},
-		'output.file' => "$tmpdir/dies_ok.svg",
+		output_file => "$tmpdir/dies_ok.svg",
 	});
-} '"plt" barplot dies when no "plot.type" is defined';
+} '"plt" barplot dies when no "plot_type" is defined';
 dies_ok {
 	plt({
 		data => {
 			A => [1,2,3]
 		},
-		'plot.type'   => 'hist',
+		plot_type     => 'hist',
 		vmax          => 1,
-		'output.file' => "$tmpdir/dies_ok.svg",
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" hist dies when undefined option is used';
 dies_ok {
@@ -165,9 +181,9 @@ dies_ok {
 		data => {
 			A => [1,2,3]
 		},
-		'plot.type'   => 'hist',
+		plot_type     => 'hist',
 	});
-} '"plt" hist dies when "output.file" is omitted';
+} '"plt" hist dies when "output_file" is omitted';
 dies_ok {
 	plt({
 		data => {
@@ -175,17 +191,17 @@ dies_ok {
 		},
 		execute       => 0,
 		fh            => $python_available,
-		'plot.type'   => 'hist',
+		plot_type     => 'hist',
 	});
 } '"plt" dies when it is given a scalar that is not a filehandle';
 dies_ok {
 	plt({
 		plots         => [
 			{
-				'plot.type'   => 'violinplot',
+				plot_type     => 'violinplot',
 			},
 		],
-		'output.file' => "$tmpdir/dies_ok.svg",
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when given a subplot that is missing {data}';
 dies_ok {
@@ -193,17 +209,17 @@ dies_ok {
 		plots         => [
 			{
 				data          => {},
-				'plot.type'   => 'violinplot',
+				plot_type     => 'violinplot',
 			},
 		],
-		'output.file' => "$tmpdir/dies_ok.svg",
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when a subplot is given an empty data hash';
 dies_ok {
 	plt({
 		data => {},
-		'plot.type' => 'violinplot',
-		'output.file' => "$tmpdir/dies_ok.svg",
+		plot_type => 'violinplot',
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when a single plot is given an empty data hash';
 dies_ok {
@@ -214,8 +230,8 @@ dies_ok {
 				[2,3,'x']
 			]
 		],
-		'plot.type' => 'plot',
-		'output.file' => "$tmpdir/dies_ok.svg"
+		plot_type => 'plot',
+		output_file => "$tmpdir/dies_ok.svg"
 	});
 } '"plt" dies when non-numeric values are given to "plot"';
 my ($tfh, $tfname) = tempfile(DIR => $tmpdir, UNLINK => 1);
@@ -223,8 +239,8 @@ dies_ok {
 	plt({
 		data => {A => 1},
 		fh          => $tfh,
-		'plot.type' => 'bar',
-		'output.file' => "$tmpdir/dies_ok.svg",
+		plot_type => 'bar',
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when given a non-File::Temp object';
 foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley', 'ncol', 'nrow') {
@@ -232,16 +248,16 @@ foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley',
 		plt({
 			$numeric_arg  => 'A',
 			data          => [[0,1], [0,3]],
-			'plot.type'   => 'imshow', # this plot.type actually has all of these options
-			'output.file' => "$tmpdir/dies_ok.svg",
+			plot_type     => 'imshow', # this plot_type actually has all of these options
+			output_file => "$tmpdir/dies_ok.svg",
 		});
 	} '"plt" dies when "' . $numeric_arg . '" is non-numeric';
 }
 dies_ok {
 	plt({
 		data          => {A => [0,1], B => [0,3]},
-		'plot.type'   => 'imshow', # this plot.type actually has all of these options
-		'output.file' => "$tmpdir/dies_ok.svg",
+		plot_type     => 'imshow', # this plot_type actually has all of these options
+		output_file => "$tmpdir/dies_ok.svg",
 	});
 } '"plt" dies when "imshow" gets something besides an array (dies with better error)';
 # Λέγω οὖν, μὴ ἀπώσατο ὁ θεὸς
@@ -296,10 +312,13 @@ my $x = generate_normal_dist( 100, 15, 3 * 10 );
 my $y = generate_normal_dist( 85,  15, 3 * 10 );
 my $z = generate_normal_dist( 106, 15, 3 * 10 );
 my @x  = linspace( -2 * $pi, 2 * $pi, 100, 1 );
-my $fh = File::Temp->new( DIR => '/tmp', SUFFIX => '.py', UNLINK => 0 );
+# File::Spec->tmpdir, not a literal "/tmp": this line is copied verbatim into
+# t/01.all.tests.t, where a hardcoded /tmp is what took 0.312 down on Windows
+# (File::Temp dies with "Parent directory (\tmp\) does not exist" there).
+my $fh = File::Temp->new( DIR => File::Spec->tmpdir, SUFFIX => '.py', UNLINK => 0 );
 plt({
-	'output.file' => '/tmp/add.single.svg',
-	'plot.type'       => 'plot',
+	output_file => outfile('add.single.svg'),
+	plot_type         => 'plot',
 	data              => {
 		'sin(2x)'       => [
 			[@x],
@@ -307,7 +326,7 @@ plt({
 		]
 	},
 	title             => 'Multiple plots',
-	'set.options'     => {
+	set_options       => {
 		'sin(2x)' => 'color = "green"'
 	},
 	add               => [
@@ -318,8 +337,8 @@ plt({
 					[map {sin($_)} @x]
 				]
 			},
-			'plot.type' => 'plot',
-			'set.options' => {
+			plot_type => 'plot',
+			set_options => {
 				'sin(x)'	=>  'color = "red", linestyle = "dashed"'
 			}
 		},
@@ -330,8 +349,8 @@ plt({
 					[map {cos($_)} @x]
 				]
 			},
-			'plot.type' => 'plot',
-			'set.options' => {
+			plot_type => 'plot',
+			set_options => {
 				'cos(x)'	=>  'color = "blue", linestyle = "dashed"'
 			}
 		},
@@ -358,8 +377,8 @@ plt({
 		    [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
 		]
 	},
-	'output.file' => '/tmp/single.wide.svg',
-	'plot.type'       => 'wide',
+	output_file => outfile('single.wide.svg'),
+	plot_type         => 'wide',
 	color             => {
 		Clinical => 'blue',
 		HGI      => 'green'
@@ -377,8 +396,8 @@ plt({
 		[ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
 		[ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
 	],
-	'output.file' => '/tmp/single.array.svg',
-	'plot.type'       => 'wide',
+	output_file => outfile('single.array.svg'),
+	plot_type         => 'wide',
 	color             => 'red',
 	title             => 'Visualization of similar lines plotted together',
 	fh => $fh,
@@ -395,18 +414,18 @@ plt({
 			  [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ],
 			  [ [@xw], [ map { $_ + rand_between( -0.5, 0.5 ) } @y ] ]
 			],
-			'plot.type' => 'wide',
+			plot_type => 'wide',
 			color       => 'red',
 			title       => 'Visualization of similar lines plotted together'
 		}
 	],
-	'output.file' => '/tmp/wide.subplots.svg',
+	output_file => outfile('wide.subplots.svg'),
 	suptitle          => 'SubPlots',
 	fh => $fh,
 	execute           => 0,
 });
 pie({
-	'output.file' => '/tmp/single.pie.svg',
+	output_file => outfile('single.pie.svg'),
 	data              => {                                 # simple hash
 		Fri => 76,
 		Mon => 73,
@@ -421,7 +440,7 @@ pie({
 	execute      => 0,
 });
 plt({
-	'output.file' => '/tmp/pie.svg',
+	output_file => outfile('pie.svg'),
 	plots             => [
 		{
 		    data => {
@@ -437,7 +456,7 @@ plt({
 		        'Romanian'  => 24_000_000,    # Romania, Moldova
 		        'Dutch'     => 22_000_000     # Netherlands, Belgium
 		    },
-		    'plot.type' => 'pie',
+		    plot_type => 'pie',
 		    title       => 'Top Languages in Europe',
 		    suptitle    => 'Pie in subplots',
 		},
@@ -455,7 +474,7 @@ plt({
 		        'Romanian'  => 24_000_000,    # Romania, Moldova
 		        'Dutch'     => 22_000_000     # Netherlands, Belgium
 		    },
-		    'plot.type' => 'pie',
+		    plot_type => 'pie',
 		    title       => 'Top Languages in Europe',
 		    autopct     => '%1.1f%%',
 		},
@@ -469,7 +488,7 @@ plt({
 		        'Israel'         => 6,
 		    },
 		    title         => 'Chem. Nobels: swap text positions',
-		    'plot.type'   => 'pie',
+		    plot_type     => 'pie',
 		    autopct       => '%1.1f%%',
 		    pctdistance   => 1.25,
 		    labeldistance => 0.6,
@@ -483,21 +502,21 @@ plt({
 
 # single plots are simple
 plt({
-        'output.file' => '/tmp/single.boxplot.svg',
+        output_file => outfile('single.boxplot.svg'),
         data              => {                                     # simple hash
             E => [ 55,    @{$x}, 160 ],
             B => [ @{$y}, 140 ],
 
             #		A => @a
         },
-        'plot.type'  => 'boxplot',
+        plot_type    => 'boxplot',
         title        => 'Single Box Plot: Specified Colors',
         colors       => { E => 'yellow', B => 'purple' },
         fh => $fh,
         execute      => 0,
 });
 plt({
-	'output.file' => '/tmp/boxplot.svg',
+	output_file => outfile('boxplot.svg'),
 	execute           => 0,
 	fh => $fh,
 	plots             => [
@@ -510,7 +529,7 @@ plt({
 			title       => 'Simple Boxplot',
 			ylabel      => 'ylabel',
 			xlabel      => 'label',
-			'plot.type' => 'boxplot',
+			plot_type => 'boxplot',
 			suptitle    => 'Boxplot examples'
 		},
 		{
@@ -523,7 +542,7 @@ plt({
 			title       => 'Specify single color',
 			ylabel      => 'ylabel',
 			xlabel      => 'label',
-			'plot.type' => 'boxplot'
+			plot_type => 'boxplot'
 		},
 		{
 		    colors => {
@@ -539,7 +558,7 @@ plt({
 		    title       => 'Specify set-specific color; showfliers = False',
 		    ylabel      => 'ylabel',
 		    xlabel      => 'label',
-		    'plot.type' => 'boxplot',
+		    plot_type => 'boxplot',
 		    showmeans   => 'True',
 		    showfliers  => 'False',
 		},
@@ -557,7 +576,7 @@ plt({
 		    title       => 'Specify set-specific color; showmeans = False',
 		    ylabel      => 'ylabel',
 		    xlabel      => 'label',
-		    'plot.type' => 'boxplot',
+		    plot_type => 'boxplot',
 		    showmeans   => 'False',
 		},
 		{
@@ -575,7 +594,7 @@ plt({
 		    ylabel      => 'ylabel',
 		    xlabel      => 'label',
 		    orientation => 'horizontal',
-		    'plot.type' => 'boxplot',
+		    plot_type => 'boxplot',
 		},
 		{
 			colors => {
@@ -592,7 +611,7 @@ plt({
 			ylabel      => 'ylabel',
 			xlabel      => 'label',
 			notch       => 'True',
-			'plot.type' => 'boxplot',
+			plot_type => 'boxplot',
 		},
 		{
 			colors => {
@@ -609,7 +628,7 @@ plt({
 			ylabel        => 'ylabel',
 			xlabel        => 'label',
 			showcaps      => 'False',
-			'plot.type'   => 'boxplot',
+			plot_type     => 'boxplot',
 		},
 	],
 	ncols => 3,
@@ -618,13 +637,13 @@ plt({
    set_figwidth => 12
 });
 plt({
-	'output.file' => '/tmp/single.violinplot.svg',
+	output_file => outfile('single.violinplot.svg'),
 	data              => {                                     # simple hash
 		A => [ 55, @{$z} ],
 		E => [ @{$y} ],
 		B => [ 122, @{$z} ],
 	},
-	'plot.type'  => 'violinplot',
+	plot_type    => 'violinplot',
 	title        => 'Single Violin Plot: Specified Colors',
 	colors       => { E => 'yellow', B => 'purple', A => 'green' },
 	fh => $fh,
@@ -636,14 +655,14 @@ my @a = generate_normal_dist( 105, 15, 3 * 200 );
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/violin.svg',
+	output_file => outfile('violin.svg'),
 	plots             => [
 		{
 		    data => {
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'violinplot',
+		    plot_type    => 'violinplot',
 		    title        => 'Basic',
 		    xlabel       => 'xlabel',
 		    set_figwidth => 12,
@@ -654,7 +673,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type' => 'violinplot',
+		    plot_type => 'violinplot',
 		    color       => 'red',
 		    title       => 'Set Same Color for All',
 		},
@@ -663,7 +682,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type' => 'violinplot',
+		    plot_type => 'violinplot',
 		    colors      => {
 		        E => 'yellow',
 		        B => 'black'
@@ -676,7 +695,7 @@ plt({
 		        B => @b
 		    },
 		    orientation => 'horizontal',
-		    'plot.type' => 'violinplot',
+		    plot_type => 'violinplot',
 		    colors      => {
 		        E => 'yellow',
 		        B => 'black'
@@ -689,7 +708,7 @@ plt({
 		        B => @b
 		    },
 		    whiskers    => 0,
-		    'plot.type' => 'violinplot',
+		    plot_type => 'violinplot',
 		    colors      => {
 		        E => 'yellow',
 		        B => 'black'
@@ -712,8 +731,8 @@ plt({
 	},
 	execute      => 0,
 	fh           => $fh,
-	'output.file' => '/tmp/single.barplot.svg',
-	'plot.type'  => 'bar',
+	output_file => outfile('single.barplot.svg'),
+	plot_type    => 'bar',
 	title        => 'Customer Calls by Days',
 	xlabel       => '# of Days',
 	ylabel       => 'Count',
@@ -725,18 +744,18 @@ plt({
 	},
 	execute           => 0,
 	fh => $fh,
-	'output.file' => '/tmp/single.hexbin.svg',
-	'plot.type'       => 'hexbin',
+	output_file => outfile('single.hexbin.svg'),
+	plot_type         => 'hexbin',
 	set_figwidth      => 12,
 	title             => 'Simple Hexbin',
 });
 plt({
-	'output.file' => '/tmp/single.hist2d.svg',
+	output_file => outfile('single.hist2d.svg'),
 	data              => {
 		E => @e,
 		B => @b
 	},
-	'plot.type'  => 'hist2d',
+	plot_type    => 'hist2d',
 	title        => 'title',
 	execute      => 0,
 	fh => $fh,
@@ -744,14 +763,14 @@ plt({
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/hexbin.svg',
+	output_file => outfile('hexbin.svg'),
 	plots             => [
 		{
 			data => {
 			E => @e,
 			B => @b
 			},
-			'plot.type'  => 'hexbin',
+			plot_type    => 'hexbin',
 			title        => 'Simple Hexbin',
 		},
 		{
@@ -759,7 +778,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type' => 'hexbin',
+		    plot_type => 'hexbin',
 		    title       => 'colorbar logscale',
 		    cb_logscale => 1
 		},
@@ -769,7 +788,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'cmap is jet',
 		    xlabel       => 'xlabel',
 		},
@@ -778,16 +797,16 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'key.order'  => ['E', 'B'],
-		    'plot.type'  => 'hexbin',
-		    title        => 'Switch axes with key.order',
+		    key_order    => ['E', 'B'],
+		    plot_type    => 'hexbin',
+		    title        => 'Switch axes with key_order',
 		},
 		 {
 		    data => {
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'vmax set to 25',
 		    vmax         => 25
 		},
@@ -796,7 +815,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'vmin set to -4',
 		    vmin         => -4
 		},
@@ -805,7 +824,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'mincnt set to 7',
 		    mincnt       => 7
 		},
@@ -814,7 +833,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'xbins set to 9',
 		    xbins        => 9
 		},
@@ -823,7 +842,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'ybins set to 9',
 		    ybins        => 9
 		},
@@ -832,7 +851,7 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
+		    plot_type    => 'hexbin',
 		    title        => 'marginals = 1',
 		    marginals    => 1
 		},
@@ -841,18 +860,18 @@ plt({
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
-		    title        => 'xscale.hexbin = 1',
-		    'xscale.hexbin' => 'log'
+		    plot_type    => 'hexbin',
+		    title        => 'xscale_hexbin = 1',
+		    xscale_hexbin => 'log'
 		},
 		{
 		    data => {
 		        E => @e,
 		        B => @b
 		    },
-		    'plot.type'  => 'hexbin',
-		    title        => 'yscale.hexbin = 1',
-		    'yscale.hexbin' => 'log'
+		    plot_type    => 'hexbin',
+		    title        => 'yscale_hexbin = 1',
+		    yscale_hexbin => 'log'
 		},
 	],
 	ncols        => 4,
@@ -912,7 +931,7 @@ my ($min, $max) = (-9,9);
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/plots.svg',
+	output_file => outfile('plots.svg'),
 	plots         => [
 	{ # sin
 		data          => {
@@ -921,8 +940,8 @@ plt({
 				[map {sin($_)} @x]
 			]
 		},
-		'plot.type'   => 'plot',
-		'set.options' => {
+		plot_type     => 'plot',
+		set_options => {
 			'sin(θ)' => 'color = "orange"'
 		},
 		set_xticks    => $xticks,
@@ -937,8 +956,8 @@ plt({
 				[map {cos($_)} @x]
 			]
 		},
-		'plot.type'   => 'plot',
-		'set.options' => {
+		plot_type     => 'plot',
+		set_options => {
 			'cos(θ)' => 'color = "black"'
 		},
 		set_xticks    => $xticks,
@@ -948,12 +967,12 @@ plt({
 	},
 	{ # csc
 		data          => $d{csc},
-		'plot.type'   => 'plot',
-		'set.options' => $set_opt{csc},
+		plot_type     => 'plot',
+		set_options => $set_opt{csc},
 		set_xticks    => $xticks,
 		set_xlim      => "-2*$pi, 2*$pi",
 		set_ylim      => "$min,$max",
-		'show.legend' => 0,
+		show_legend => 0,
 		vlines        => [ # asymptotes
 			"-2*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
 			"-$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
@@ -966,12 +985,12 @@ plt({
 	},
 	{ # sec
 		data          => $d{sec},
-		'plot.type'   => 'plot',
-		'set.options' => $set_opt{sec},
+		plot_type     => 'plot',
+		set_options => $set_opt{sec},
 		set_xticks    => $xticks,
 		set_xlim      => "-2*$pi, 2*$pi",
 		set_ylim      => "$min,$max",
-		'show.legend' => 0,
+		show_legend => 0,
 		vlines        => [ # asymptotes
 			"-1.5*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
 			"-.5*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
@@ -984,12 +1003,12 @@ plt({
 	},
 		{ # csc
 		data          => $d{cot},
-		'plot.type'   => 'plot',
-		'set.options' => $set_opt{cot},
+		plot_type     => 'plot',
+		set_options => $set_opt{cot},
 		set_xticks    => $xticks,
 		set_xlim      => "-2*$pi, 2*$pi",
 		set_ylim      => "$min,$max",
-		'show.legend' => 0,
+		show_legend => 0,
 		vlines        => [ # asymptotes
 			"-2*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
 			"-$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
@@ -1002,12 +1021,12 @@ plt({
 	},
 	{ # sec
 		data          => $d{tan},
-		'plot.type'   => 'plot',
-		'set.options' => $set_opt{tan},
+		plot_type     => 'plot',
+		set_options => $set_opt{tan},
 		set_xticks    => $xticks,
 		set_xlim      => "-2*$pi, 2*$pi",
 		set_ylim      => "$min,$max",
-		'show.legend' => 0,
+		show_legend => 0,
 		vlines        => [ # asymptotes
 			"-1.5*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
 			"-.5*$pi, $min, $max, color = 'gray', linestyle = 'dashed'",
@@ -1027,7 +1046,7 @@ plt({
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/plot.single.svg',
+	output_file => outfile('plot.single.svg'),
 	data              => {
 		'sin(x)' => [
 			[@x],                     # x
@@ -1038,12 +1057,12 @@ plt({
 		 	[ map { cos($_) } @x ]    # y
 		],
 	},
-	'plot.type' => 'plot',
+	plot_type => 'plot',
 	title       => 'simple plot',
 	set_xticks  =>
 	"[-2 * $pi, -3 * $pi / 2, -$pi, -$pi / 2, 0, $pi / 2, $pi, 3 * $pi / 2, 2 * $pi"
 	 . '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']',
-	'set.options' => {    # set options overrides global settings
+	set_options => {    # set options overrides global settings
 		'sin(x)' => 'color="blue", linewidth=2',
 		'cos(x)' => 'color="red",  linewidth=2'
 	}
@@ -1051,7 +1070,7 @@ plt({
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/plot.single.arr.svg',
+	output_file => outfile('plot.single.arr.svg'),
 	data              => [
 		[
 			[@x],                     # x
@@ -1062,20 +1081,35 @@ plt({
 		 	[ map { cos($_) } @x ]    # y
 		],
 	],
-	'plot.type' => 'plot',
+	plot_type => 'plot',
 	title       => 'simple plot',
 	set_xticks  =>
 	"[-2 * $pi, -3 * $pi / 2, -$pi, -$pi / 2, 0, $pi / 2, $pi, 3 * $pi / 2, 2 * $pi"
 	 . '], [r\'$-2\pi$\', r\'$-3\pi/2$\', r\'$-\pi$\', r\'$-\pi/2$\', r\'$0$\', r\'$\pi/2$\', r\'$\pi$\', r\'$3\pi/2$\', r\'$2\pi$\']',
-	'set.options' => [    # set options overrides global settings; indices match data array
+	set_options => [    # set options overrides global settings; indices match data array
 		'color="blue", linewidth=2, label = "sin(x)"', # labels aren't added automatically when using array here
 		'color="red",  linewidth=2, label = "cos(x)"'
 	],
 });
 plt({
 	fh => $fh,
+	execute     => 0,
+	output_file => outfile('plot.y.only.svg'),
+	data        => {    # y values only: x is 0, 1, 2, ... for each
+		'1cka' => [ 0.86, 0.85, 0.85, 0.85, 0.85 ],
+		'1ckb' => [ 0.81, 0.8,  0.79, 0.78, 0.77 ],
+		'1d4t' => [ 0.92, 0.92, 0.92, 0.92, 0.91 ],
+	},
+	plot_type => 'plot',
+	title     => 'y values only',
+	xlabel    => 'index',
+	ylabel    => 'score',
+	set_xticks => '[0, 1, 2, 3, 4]',
+});
+plt({
+	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/barplots.svg',
+	output_file => outfile('barplots.svg'),
 	plots             => [
 		{    # simple plot
 			data => {    # simple hash
@@ -1087,8 +1121,8 @@ plt({
 				Tue => 93,
 				Wed => 77
 		    },
-		    'plot.type' => 'bar',
-		    'key.order' =>
+		    plot_type => 'bar',
+		    key_order =>
 		      [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
 		    suptitle => 'Types of Plots',    # applies to all
 		    color    => [
@@ -1103,7 +1137,7 @@ plt({
 		    ylabel        => 'No. of Rejections'
 		},
 		{                                    # grouped bar plot
-			 'plot.type' => 'bar',
+			 plot_type => 'bar',
 			 data        => {
 				  1941 => {
 				      UK      => 6.6,
@@ -1142,7 +1176,7 @@ plt({
 			 ylabel  => 'Military Expenditure (Billions of $)'
 		},
 		{    # grouped bar plot
-			 'plot.type' => 'bar',
+			 plot_type => 'bar',
 			 data        => {
 				  1941 => {
 				      UK      => 6.6,
@@ -1194,7 +1228,7 @@ plt({
 				  'Second Bull Run'  => [ 10000, 8000 ],
 				  'Fredericksburg'   => [ 12600, 5300 ],
 				},
-			 'plot.type' => 'barh',
+			 plot_type => 'barh',
 			 color       => [ 'blue', 'gray' ]
 			 ,    # colors match indices of data arrays
 			 label => [ 'North', 'South' ]
@@ -1217,10 +1251,10 @@ plt({
 			 'log'       => 1,
 			 title       => 'grouped bar: Casualties in WWII',
 			 ylabel      => 'Casualties',
-			 'plot.type' => 'bar'
+			 plot_type => 'bar'
 		},
 		{        # nuclear weapons barplot
-			 'plot.type' => 'bar',
+			 plot_type => 'bar',
 			 color       => 'red',
 			 data        => {
 				  'USA'         => 5277,    # FAS Estimate
@@ -1259,18 +1293,18 @@ plt({
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/single.hist.svg',
+	output_file => outfile('single.hist.svg'),
 	data              => {
 		E => @e,
 		B => @b,
 		A => @a,
 	},
-	'plot.type'       => 'hist'
+	plot_type         => 'hist'
 });
 plt({
 	fh => $fh,
 	execute           => 0,
-	'output.file' => '/tmp/histogram.svg',
+	output_file => outfile('histogram.svg'),
    set_figwidth => 15,
    suptitle          => 'hist Examples',
 	plots             => [
@@ -1280,7 +1314,7 @@ plt({
 		        B => @b,
 		        A => @a,
 		    },
-		    'plot.type' => 'hist',
+		    plot_type => 'hist',
 		    alpha       => 0.25,
 		    bins        => 50,
 		    title       => 'alpha = 0.25',
@@ -1302,7 +1336,7 @@ plt({
 				B => @b,
 				A => @a,
 		    },
-		    'plot.type' => 'hist',
+		    plot_type => 'hist',
 		    alpha       => 0.75,
 		    bins        => 50,
 		    title       => 'alpha = 0.75',
@@ -1323,8 +1357,8 @@ plt({
 						[map {150 * exp(-0.5*($_-100)**2)} 40..150]
 					]
 				},
-				'plot.type' => 'plot',
-				'set.options' => {
+				plot_type => 'plot',
+				set_options => {
 					'Gaussian' =>  'color = "red", linestyle = "dashed"'
 				}
 			}
@@ -1334,7 +1368,7 @@ plt({
 		        B => @b,
 		        A => @a,
 		    },
-		    'plot.type' => 'hist',
+		    plot_type => 'hist',
 		    alpha       => 0.75,
 		    bins        => {
 		        A => 10,
@@ -1356,7 +1390,7 @@ plt({
 		        B => @b,
 		        A => @a,
 		    },
-		    'plot.type' => 'hist',
+		    plot_type => 'hist',
 		    alpha       => 0.75,
 		    color       => {
 		        B  => 'Black',
@@ -1379,11 +1413,11 @@ scatter({
 		Y => [map {sin($_)} @x]
 	},
 	execute       => 0,
-	'output.file' => '/tmp/single.scatter.svg',
+	output_file => outfile('single.scatter.svg'),
 });
 plt({
 	fh                => $fh,
-	'output.file'     => '/tmp/scatterplots.svg',
+	output_file     => outfile('scatterplots.svg'),
 	execute           => 0,
 	nrows             => 2,
 	ncols             => 3,
@@ -1399,10 +1433,10 @@ plt({
 			},
 			title     => '"Single Set Scatterplot: Random Distributions"',
 			color_key => 'Z',
-			'set.options' => 'marker = "v"'
-			, # arguments to ax.scatter: there's only 1 set, so "set.options" is a scalar
+			set_options => 'marker = "v"'
+			, # arguments to ax.scatter: there's only 1 set, so "set_options" is a scalar
 			text        => [ '100, 100, "text1"', '100, 100, "text2"', ],
-			'plot.type' => 'scatter',
+			plot_type => 'scatter',
 		},
 		{     # multiple-set scatter, labels are "X" and "Y"
 			data => {
@@ -1415,9 +1449,9 @@ plt({
 					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
 				}
 			},
-			'plot.type'   => 'scatter',
+			plot_type     => 'scatter',
 			title         => 'Multiple Set Scatterplot',
-			'set.options' =>
+			set_options =>
 			{    # arguments to ax.scatter, for each set in data
 			  X => 'marker = ".", color = "red"',
 			  W => 'marker = "d", color = "green"'
@@ -1434,9 +1468,9 @@ plt({
 					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
 				},
 			},
-			'plot.type'   => 'scatter',
+			plot_type     => 'scatter',
 			title         => 'Multiple Set Scatter w/ colorbar',
-			'set.options' => {    # arguments to ax.scatter, for each set in data
+			set_options => {    # arguments to ax.scatter, for each set in data
 				X => 'marker = "."',
 				Y => 'marker = "d"'     # diamond
 			},
@@ -1453,7 +1487,7 @@ imshow(
 	data          => \@imshow_data,
 	execute       => 0,
    fh            => $fh,
-	'output.file' => '/tmp/imshow.single.svg',
+	output_file => outfile('imshow.single.svg'),
 	set_xlim      => '0, ' . scalar @imshow_data,
 	set_ylim      => '0, ' . scalar @imshow_data,
 );
@@ -1461,7 +1495,7 @@ plt({
 	plots  => [
 		{
 			data => \@imshow_data,
-			'plot.type'       => 'imshow',
+			plot_type         => 'imshow',
 			set_xlim          => '0, ' . scalar @imshow_data,
 			set_ylim          => '0, ' . scalar @imshow_data,
 			title             => 'basic',
@@ -1469,7 +1503,7 @@ plt({
 		{
 			cblabel           => 'sin(x) * cos(x)',
 			data => \@imshow_data,
-			'plot.type'       => 'imshow',
+			plot_type         => 'imshow',
 			set_xlim          => '0, ' . scalar @imshow_data,
 			set_ylim          => '0, ' . scalar @imshow_data,
 			title             => 'cblabel',
@@ -1478,7 +1512,7 @@ plt({
 			cblabel           => 'sin(x) * cos(x)',
 			cblocation        => 'left',
 			data              => \@imshow_data,
-			'plot.type'       => 'imshow',
+			plot_type         => 'imshow',
 			set_xlim          => '0, ' . scalar @imshow_data,
 			set_ylim          => '0, ' . scalar @imshow_data,
 			title             => 'cblocation = left',
@@ -1498,14 +1532,14 @@ plt({
 						[map {180 + 180*cos($_ * $pi/180)} 0..360]
 					],
 				},
-				'plot.type' => 'plot',
-				'set.options' => {
+				plot_type => 'plot',
+				set_options => {
 					'sin(x)'	=>  'color = "red", linestyle = "dashed"',
 					'cos(x)'	=>  'color = "blue", linestyle = "dashed"',
 				}
 			}
 			],
-			'plot.type'       => 'imshow',
+			plot_type         => 'imshow',
 			set_xlim          => '0, ' . scalar @imshow_data,
 			set_ylim          => '0, ' . scalar @imshow_data,
 			title             => 'auxiliary plots',
@@ -1513,7 +1547,7 @@ plt({
 	],
 	execute         => 0,
    fh              => $fh,
-	'output.file'   => '/tmp/imshow.multiple.svg',
+	output_file   => outfile('imshow.multiple.svg'),
 	ncols           => 2,
 	nrows           => 2,
 	set_figheight   => 6*3,# 4.8
@@ -1555,46 +1589,46 @@ my %bond_dissociation = (
 );
 colored_table({
 	'cblabel'     => 'kJ/mol',
-	'col.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
+	col_labels    => ['H', 'F', 'Cl', 'Br', 'I'],
 	data          => \%bond_dissociation,
 	execute       => 0,
 	fh            => $fh,
 	mirror        => 1,
-	'output.file' => '/tmp/single.tab.svg',
-	'row.labels'  => ['H', 'F', 'Cl', 'Br', 'I'],
-	'show.numbers'=> 1,
+	output_file => outfile('single.tab.svg'),
+	row_labels    => ['H', 'F', 'Cl', 'Br', 'I'],
+	show_numbers=> 1,
 	set_title     => 'Bond Dissociation Energy'
 });
 plt({
 	execute       => 0,
 	fh            => $fh,
-	'output.file' => '/tmp/single.bonds.svg',
+	output_file => outfile('single.bonds.svg'),
 	plots         => [
 		{
 			data          => \%bond_dissociation,
-			'plot.type'   => 'colored_table',
+			plot_type     => 'colored_table',
 			set_title     => 'No other options'
 		},
 		{
 			data          => \%bond_dissociation,
 			cblabel       => 'Average Dissociation Energy (kJ/mol)',
-			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			col_labels    => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			mirror        => 1,
-			'plot.type'   => 'colored_table',
-			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
-			'show.numbers'=> 1,
+			plot_type     => 'colored_table',
+			row_labels    => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			show_numbers=> 1,
 			set_title     => 'Showing numbers and mirror with defined order'
 		},
 		{
 			data          => \%bond_dissociation,
 			cblabel       => 'Average Dissociation Energy (kJ/mol)',
-			'col.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			col_labels    => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
 			mirror        => 1,
-			'plot.type'   => 'colored_table',
-			'row.labels'  => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
-			'show.numbers'=> 1,
+			plot_type     => 'colored_table',
+			row_labels    => ['H', 'C', 'N', 'O', 'F', 'Si', 'S', 'Cl', 'Br', 'I'],
+			show_numbers=> 1,
 			set_title     => 'Set undefined color to white',
-			'undef.color' => 'white'
+			undef_color => 'white'
 		}
 	],
 	ncols         => 3,
@@ -1602,7 +1636,7 @@ plt({
 	suptitle      => 'Colored Table options'
 });
 plt({
-	'plot.type'   => 'plot',
+	plot_type     => 'plot',
 	data          => {
 		'expo' => [
 			[@x],
@@ -1612,9 +1646,9 @@ plt({
 	execute       => 0,
 	fh            => $fh,
 	hlines        => "1,$x[0],$x[-1], linestyles = 'dashed'",
-	'output.file' => '/tmp/hlines.svg',
+	output_file => outfile('hlines.svg'),
 	set_xlim      => "$x[0],$x[-1]",
-	'show.legend' => 0
+	show_legend => 0
 });
 plt({
 	cbpad       => 0.01,          # default 0.05 is too big
@@ -1624,7 +1658,7 @@ plt({
 	],
 	execute     => 0,
 	fh          => $fh,
-	'plot.type' => 'imshow',
+	plot_type => 'imshow',
 	stringmap   => {
 		'H' => 'Alpha helix',
 		'B' => 'Residue in isolated β-bridge',
@@ -1635,7 +1669,7 @@ plt({
 		'S' => 'bend',
 		' ' => 'Loops and irregular elements'
 	},
-	'output.file' => '/tmp/dssp.single.svg',
+	output_file => outfile('dssp.single.svg'),
 	scalex        => 2.4,
 	set_ylim      => '0, 1',
 	title         => 'Dictionary of Secondary Structure in Proteins (DSSP)',
@@ -1650,7 +1684,7 @@ plt({
 				[' ', ' ', ' ', ' ', 'G'], # bottom
 				['S', 'I', 'T', 'E', 'H'], # top
 			],
-			'plot.type' => 'imshow',
+			plot_type => 'imshow',
 			set_xticklabels=> '[]', # remove x-axis labels
 			set_ylim    => '0, 1',
 			stringmap   => {
@@ -1671,7 +1705,7 @@ plt({
 				[' ', ' ', ' ', ' ', 'G'], # bottom
 				['S', 'I', 'T', 'E', 'H'], # top
 			],
-			'plot.type' => 'imshow',
+			plot_type => 'imshow',
 			set_ylim    => '0, 1',
 			stringmap   => {
 				'H' => 'Alpha helix',
@@ -1691,9 +1725,9 @@ plt({
 	execute           => 0,
 	fh                => $fh,
 	nrows             => 2,
-	'output.file'     => '/tmp/dssp.multiple.svg',
+	output_file     => outfile('dssp.multiple.svg'),
 	scalex            => 2.4,
-	'shared.colorbar' => [0,1], # plots 0 and 1 share a colorbar
+	shared_colorbar => [0,1], # plots 0 and 1 share a colorbar
 	suptitle          => 'Dictionary of Secondary Structure in Proteins (DSSP)',
 });
 my @plots = ({
@@ -1701,7 +1735,7 @@ my @plots = ({
 			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
 			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
 		},
-	'plot.type' => 'hist2d',
+	plot_type => 'hist2d',
 	cbpad       => 0.001,
 	title       => 'pad = 0.001'
 });
@@ -1711,7 +1745,7 @@ for (my $pad = 0.01; $pad <= 0.09; $pad += 0.03) {
 			'sin' => [map {sin($_ * 3.14159265/180)} 0..360],
 			'cos' => [map {cos($_ * 3.14159265/180)} 0..360]
 		},
-		'plot.type' => 'hist2d',
+		plot_type => 'hist2d',
 		cbpad       => $pad,
 		title       => "pad = $pad"
 	};
@@ -1719,7 +1753,7 @@ for (my $pad = 0.01; $pad <= 0.09; $pad += 0.03) {
 plt(
 	execute       => 0,
 	fh            => $fh,
-	'output.file' => '/tmp/hist2d.pads.svg',
+	output_file => outfile('hist2d.pads.svg'),
 	plots         => \@plots,
 	ncols         => 2,
 	nrows         => 2,
@@ -1743,15 +1777,15 @@ plt(
 			[map {exp($_)} @t]
 		]
 	],
-	'output.file' => '/tmp/twinx.arr.svg',
-	'plot.type'   => 'plot',
-	'set.options' => [
+	output_file => outfile('twinx.arr.svg'),
+	plot_type     => 'plot',
+	set_options => [
 		'color = "blue"', # plot 0
 		'color = "red"'   # plot 1
 	],
 	tick_params => 'axis = "y", labelcolor = "blue"',
 	ylabel      => '"sin", color="blue"', # applies to base ax object
-	'twinx.args'  => {
+	twinx_args    => {
 		1 => { # automatically knows that plot 1 is twinned on x
 			tick_params => 'axis = "y", labelcolor = "red"',
 			ylabel      => '"exp", color="red"',
@@ -1771,15 +1805,15 @@ plt(
 			[map {exp($_)} @t]
 		]
 	},
-	'output.file' => '/tmp/twinx.hash.svg',
-	'plot.type'   => 'plot',
-	'set.options' => {
+	output_file => outfile('twinx.hash.svg'),
+	plot_type     => 'plot',
+	set_options => {
 		'sin' => 'color = "blue"',
 		'exp' => 'color = "red"'
 	},
 	tick_params => 'axis = "y", labelcolor = "blue"',
 	ylabel      => '"sin", color="blue"', # applies to base ax object
-	'twinx.args'  => {
+	twinx_args    => {
 		'exp' => { # automatically knows that plot is twinx
 			tick_params => 'axis = "y", labelcolor = "red"',
 			ylabel      => '"exp", color="red"',
@@ -1797,7 +1831,7 @@ plt({
 			data => {
 				A => 1, B => 2, C => 3
 			},
-			'plot.type'   => 'bar'
+			plot_type     => 'bar'
 		},
 		{
 			color        => {
@@ -1806,11 +1840,11 @@ plt({
 			data => {
 				A => 1, B => 2, C => 3
 			},
-			'plot.type'   => 'barh'
+			plot_type     => 'barh'
 		},
 	],
 	ncols         => 2,
-	'output.file' => '/tmp/key.colors.bar.svg',
+	output_file => outfile('key.colors.bar.svg'),
 });
 bar({
 	execute => 0,
@@ -1818,7 +1852,7 @@ bar({
 	data => {
 		A => 1, B => 2,
 	},
-	'output.file' => '/tmp/bar.sub.svg'
+	output_file => outfile('bar.sub.svg')
 });
 bar({
 	execute => 0,
@@ -1826,7 +1860,7 @@ bar({
 	data => {
 		C => 3, D => 4
 	},
-	'output.file' => '/tmp/bar.sub.self.svg'
+	output_file => outfile('bar.sub.self.svg')
 });
 barh({
 	execute => 0,
@@ -1834,7 +1868,7 @@ barh({
 	data => {
 		A => 1, B => 2,
 	},
-	'output.file' => '/tmp/barh.sub.svg'
+	output_file => outfile('barh.sub.svg')
 });
 boxplot({
 	execute => 0,
@@ -1842,7 +1876,7 @@ boxplot({
 	data => {
 		A => [0..9]
 	},
-	'output.file' => '/tmp/boxplot.sub.svg'
+	output_file => outfile('boxplot.sub.svg')
 });
 hexbin({
 	execute => 0,
@@ -1851,7 +1885,7 @@ hexbin({
 		A => [0..9],
 		B => [0..9]
 	},
-	'output.file' => '/tmp/hexbin.sub.svg'
+	output_file => outfile('hexbin.sub.svg')
 });
 hist({
 	execute => 0,
@@ -1859,7 +1893,7 @@ hist({
 	data => {
 		A => [0..9]
 	},
-	'output.file' => '/tmp/hist.sub.svg'
+	output_file => outfile('hist.sub.svg')
 });
 hist2d({
 	execute => 0,
@@ -1868,7 +1902,7 @@ hist2d({
 		A => [0..9],
 		B => [0..9]
 	},
-	'output.file' => '/tmp/hist2d.sub.svg'
+	output_file => outfile('hist2d.sub.svg')
 });
 plot({
 	execute => 0,
@@ -1879,10 +1913,10 @@ plot({
 			[2,3]
 		]
 	],
-	'output.file' => '/tmp/plot.sub.svg'
+	output_file => outfile('plot.sub.svg')
 });
 bar({
-	'output.file' => '/tmp/newline_fail.svg',
+	output_file => outfile('newline_fail.svg'),
 	execute       => 0,
 	fh            => $fh,
 	data          => {
@@ -1898,14 +1932,14 @@ plt({
 	execute       => 0,
 	fh            => $fh,
 	logscale      => ['x'],
-	'output.file' => '/tmp/hist2d.logscale.svg',
-	'plot.type'   => 'hist2d',
+	output_file => outfile('hist2d.logscale.svg'),
+	plot_type     => 'hist2d',
 });
 scatter(
 	add           => [
 	{
-		'plot.type' => 'plot',
-		'show.legend' => 0,
+		plot_type => 'plot',
+		show_legend => 0,
 		data        => {
 			A => [
 				[1..9],
@@ -1916,7 +1950,7 @@ scatter(
 	],
 	execute       => 0,
 	fh            => $fh,
-	'output.file' => '/tmp/scatter.logscale.svg',
+	output_file => outfile('scatter.logscale.svg'),
 	data        => {
 		A => [1..9],
 		B => [1..9]
@@ -1927,7 +1961,7 @@ hist({
 	execute       => 0,
 	fh            => $fh,
 	data          => [0..9],
-	'output.file' => '/tmp/hist.arr.svg',
+	output_file => outfile('hist.arr.svg'),
 });
 plt({
 	execute => 0,
@@ -1935,19 +1969,19 @@ plt({
 	ncol    => 3,
 	plots   => [
 		{
-			'plot.type' => 'violin',
+			plot_type => 'violin',
 			data        => [0..3]
 		},
 		{
-			'plot.type' => 'hist',
+			plot_type => 'hist',
 			data        => [0..3]
 		},
 		{
-			'plot.type' => 'boxplot',
+			plot_type => 'boxplot',
 			data        => [0..3]
 		},
 	],
-	'output.file' => '/tmp/simple.arr.not.hash.svg'
+	output_file => outfile('simple.arr.not.hash.svg')
 });
 plt({
 	data => {
@@ -1987,34 +2021,34 @@ plt({
     },
 	fh          => $fh,
 	execute     => 0,
-	'plot.type' => 'scatter',
+	plot_type => 'scatter',
 	color_key   => 'MSE',
-	'output.file' => '/tmp/scatter.multiset.colorkey.svg'
+	output_file => outfile('scatter.multiset.colorkey.svg')
 });
 plt(
 	p => [
 		{
-			'plot.type' => 'bar',
+			plot_type => 'bar',
 			data        => {
 				A => 1, B => 2, C => 3
 			}
 		},
 		{
-			'plot.type' => 'plot',
+			plot_type => 'plot',
 			data        => {
 				A => [
 					[0,1,2],
 					[0,1,2]
 				]
 			},
-			'set.options' => {
+			set_options => {
 				A => 'color = "black"'
 			}
 		}
 	],
 	execute       => 0,
 	fh            => $fh,
-	'output.file' => '/tmp/p.arg.svg'
+	output_file => outfile('p.arg.svg')
 );
 plt({
 	fh                => $fh,
@@ -2028,7 +2062,7 @@ plt({
 			X => $x,    # x-axis
 			Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title       => 'Simple hist2d',
 		},
 		{
@@ -2036,7 +2070,7 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title       => 'cmap = terrain',
 			cmap        => 'terrain'
 		},
@@ -2046,7 +2080,7 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title => 'cmap = ocean and set colorbar range with vmin/vmax',
 			set_figwidth => 15,
 			vmin         => -2,
@@ -2057,7 +2091,7 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title       => 'density = True',
 			cmap        => 'terrain',
 			density     => 'True'
@@ -2067,10 +2101,10 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
-			title       => 'key.order flips axes',
+			plot_type => 'hist2d',
+			title       => 'key_order flips axes',
 			cmap        => 'terrain',
-			'key.order' => [ 'Y', 'X' ]
+			key_order => [ 'Y', 'X' ]
 		},
 		{
 			cb_logscale => 1,
@@ -2078,7 +2112,7 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title       => 'cb_logscale = 1',
 		},
 		{
@@ -2087,7 +2121,7 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type' => 'hist2d',
+			plot_type => 'hist2d',
 			title       => 'cb_logscale = 1 with vmax set',
 			vmax        => 2.1,
 			vmin        => 1
@@ -2097,8 +2131,8 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type'     => 'hist2d',
-			'show.colorbar' => 0,
+			plot_type       => 'hist2d',
+			show_colorbar => 0,
 			title           => 'no colorbar',
 		},
 		{
@@ -2106,15 +2140,15 @@ plt({
 				X => $x,    # x-axis
 				Y => $y,    # y-axis
 			},
-			'plot.type'     => 'hist2d',
+			plot_type       => 'hist2d',
 			title           => 'xbins = 9',
 			xbins           => 9
 		},
 	],
-	'output.file' => '/tmp/hist2d.svg',
+	output_file => outfile('hist2d.svg'),
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/key.colors.bar.svg', '/tmp/bar.sub.svg', '/tmp/bar.sub.self.svg', '/tmp/barh.sub.svg', '/tmp/boxplot.sub.svg', '/tmp/hexbin.sub.svg', '/tmp/hist.sub.svg', '/tmp/hist2d.sub.svg', '/tmp/plot.sub.svg', '/tmp/newline_fail.svg', '/tmp/hist2d.logscale.svg', '/tmp/scatter.logscale.svg', '/tmp/hist.arr.svg', '/tmp/simple.arr.not.hash.svg', '/tmp/scatter.multiset.colorkey.svg', '/tmp/p.arg.svg', '/tmp/hist2d.svg');
+my @output_files = map { outfile($_) } ('add.single.svg', 'single.wide.svg', 'single.array.svg', 'wide.subplots.svg', 'single.pie.svg', 'pie.svg', 'single.boxplot.svg', 'boxplot.svg', 'single.violinplot.svg', 'violin.svg', 'single.barplot.svg', 'single.hexbin.svg', 'single.hist2d.svg', 'hexbin.svg', 'plots.svg', 'plot.single.svg', 'plot.single.arr.svg', 'plot.y.only.svg', 'barplots.svg', 'single.hist.svg', 'histogram.svg', 'single.scatter.svg', 'scatterplots.svg', 'imshow.single.svg', 'imshow.multiple.svg', 'single.tab.svg', 'single.bonds.svg', 'hlines.svg', 'dssp.single.svg', 'dssp.multiple.svg', 'hist2d.pads.svg', 'twinx.arr.svg', 'twinx.hash.svg', 'key.colors.bar.svg', 'bar.sub.svg', 'bar.sub.self.svg', 'barh.sub.svg', 'boxplot.sub.svg', 'hexbin.sub.svg', 'hist.sub.svg', 'hist2d.sub.svg', 'plot.sub.svg', 'newline_fail.svg', 'hist2d.logscale.svg', 'scatter.logscale.svg', 'hist.arr.svg', 'simple.arr.not.hash.svg', 'scatter.multiset.colorkey.svg', 'p.arg.svg', 'hist2d.svg');
 #my %file2SHA;
 #open my $tsv, '<', $sha_sum_filename;
 #while (<$tsv>) {
@@ -2169,7 +2203,7 @@ SKIP: {
 	my $venn3_file = "$tmpdir/venn3.svg";
 	lives_ok {
 		venn_proportional_area({
-			'output.file' => $venn2_file,
+			output_file => $venn2_file,
 			title         => 'Two-set proportional-area Venn',
 			data          => {
 				Gospels  => [qw(Matthew Mark Luke John)],
@@ -2180,7 +2214,7 @@ SKIP: {
 	ok(is_valid_svg($venn2_file), "$venn2_file is likely a valid SVG file");
 	lives_ok {
 		venn_proportional_area({
-			'output.file' => $venn3_file,
+			output_file => $venn3_file,
 			title         => 'Three-set proportional-area Venn',
 			set_colors    => [qw(skyblue lightgreen salmon)],
 			alpha         => 0.5,

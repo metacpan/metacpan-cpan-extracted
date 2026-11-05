@@ -12,7 +12,7 @@ use Readonly;
 use Scalar::Util qw(blessed looks_like_number);
 use Sub::Private { mode => 'enforce' };
 
-use version; our $VERSION = version->declare('0.001.1');
+use version; our $VERSION = version->declare('0.002.0');
 
 # Classes that want the i18n() method import it rather than inheriting it, so
 # the plugin keeps Mojolicious::Plugin as its only base class
@@ -48,6 +48,7 @@ Readonly::Hash my %MESSAGES => (
 	option_optimise_content => 'Mojolicious::Plugin::Buffer: optimise_content must be 0, 1 or 2',
 	option_last_modified => 'Mojolicious::Plugin::Buffer: last_modified must be 0, 1, an epoch, a date string or a code reference',
 	option_min_compress_size => 'Mojolicious::Plugin::Buffer: min_compress_size must be a non-negative integer',
+	option_min_compress_saving => 'Mojolicious::Plugin::Buffer: min_compress_saving must be a non-negative integer',
 	option_encodings => 'Mojolicious::Plugin::Buffer: encodings must be an array reference',
 	option_compressible_types => 'Mojolicious::Plugin::Buffer: compressible_types must be an array reference',
 	option_excluded_types => 'Mojolicious::Plugin::Buffer: excluded_types must be an array reference',
@@ -133,7 +134,7 @@ Mojolicious::Plugin::Buffer::I18N - message catalog for Mojolicious::Plugin::Buf
 
 =head1 VERSION
 
-Version 0.001.1
+Version 0.002.0
 
 =head1 SYNOPSIS
 

@@ -42,3 +42,4 @@ str
 UA
 usr
 WGS
+textContent

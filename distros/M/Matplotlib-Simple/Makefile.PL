@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker 6.58;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Access Matplotlib from Perl; providing consistent user interface between different plot types",
+  "ABSTRACT" => "Plots from Perl data structures, drawn by matplotlib, gnuplot or ggplot2, with one interface for every plot type",
   "AUTHOR" => "David E. Condon <dec986\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.58"
@@ -21,15 +21,17 @@ my %WriteMakefileArgs = (
     "Data::Printer" => 0,
     "Devel::Confess" => 0,
     "Devel::Size" => 0,
-    "IPC::System::Simple" => 0,
     "JSON::MaybeXS" => 0,
     "MIME::Base64" => 0,
-    "Scalar::Util" => "1.22",
+    "Scalar::Util" => "1.22"
+  },
+  "TEST_REQUIRES" => {
+    "Storable" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.3121",
+  "VERSION" => "0.3341",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,10 +43,10 @@ my %FallbackPrereqs = (
   "Data::Printer" => 0,
   "Devel::Confess" => 0,
   "Devel::Size" => 0,
-  "IPC::System::Simple" => 0,
   "JSON::MaybeXS" => 0,
   "MIME::Base64" => 0,
   "Scalar::Util" => "1.22",
+  "Storable" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "autodie" => 0

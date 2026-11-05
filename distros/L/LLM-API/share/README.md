@@ -9,6 +9,7 @@
   * [new](#new)
   * [count\_input\_tokens](#count\input\tokens)
   * [send\_prompt](#send\prompt)
+  * [send\_messages](#send\messages)
   * [prompt](#prompt)
   * [text](#text)
   * [document](#document)
@@ -23,6 +24,7 @@
   * [now](#now)
 * [ACCESSORS](#accessors)
 * [ENVIRONMENT](#environment)
+* [PROVIDER CATALOG](#provider-catalog)
 * [CAVEATS](#caveats)
 * [DEPENDENCIES](#dependencies)
 * [SEE ALSO](#see-also)
@@ -31,7 +33,7 @@
 * [LICENSE](#license)
 # NAME
 
-LLM::API - Anthropic API client for Claude language models
+LLM::API - Provider-independent LLM client
 
 # SYNOPSIS
 
@@ -55,38 +57,74 @@ LLM::API - Anthropic API client for Claude language models
     my $text = $llm->text('Review this perl module');
     my $rsp  = $llm->send_prompt( [ $doc, $text ] );
 
-    # Retrieve usage and cost data
+    # Send a multi-turn conversation
+    my $conversation = $llm->send_messages( [
+      { role => 'user',      content => [ $llm->text('What is a Perl role?') ] },
+      { role => 'assistant', content => [ $llm->text('A reusable unit of behavior.') ] },
+      { role => 'user',      content => [ $llm->text('Give an example.') ] },
+    ] );
+
+    # Use Amazon Bedrock with AWS credentials instead of an Anthropic API key
+    my $bedrock = LLM::API->new(
+      provider => 'bedrock',
+      model    => 'us.anthropic.claude-haiku-4-5-20251001-v1:0',
+      region   => 'us-east-1',
+    );
+
+    # Anthropic-only administrative reporting
     my $usage = $llm->usage_report( from => '2025-01-01', to => '2025-01-31' );
     my $cost  = $llm->cost_report( from => '2025-01-01' );
 
 # DESCRIPTION
 
-LLM::API is a client for the Anthropic Claude REST API. It supports sending
-text and document prompts to Claude models, retrieving model lists, API key
-information, and querying organizational usage and cost reports.
+LLM::API supports Anthropic's direct API and Amazon Bedrock. The provider is
+selected at construction time, and text and document content blocks and
+[LLM::API::Response](https://metacpan.org/pod/LLM%3A%3AAPI%3A%3AResponse) objects provide a common interface. The client supports
+single-turn prompts and explicit multi-turn conversations. Bedrock can invoke
+supported Amazon Nova and Anthropic Claude models; Anthropic's direct API
+supports Claude models.
 
-Authentication is handled by passing an API key at construction time or by
-setting the LLM\_API\_KEY environment variable. The environment variable is
-deleted from the process environment immediately after it is read, as a
-security measure to prevent accidental exposure to child processes.
+For Anthropic, authentication uses an API key supplied to the constructor or
+in the `LLM_API_KEY` environment variable. For Bedrock, the underlying AWS
+client resolves AWS credentials; no Anthropic API key is required. The
+constructor deletes `LLM_API_KEY` from the process environment after reading
+it, including when a constructor argument takes precedence.
+
+Model listing, API-key administration, organizational usage reports, and
+organizational cost reports in this module are supported only for Anthropic's
+direct API. There is no Bedrock model-discovery interface.
+
+Provider classes and model pricing are curated in `providers.yml`, shipped
+in the distribution's share directory. This catalog is not a list of models
+currently accessible to the caller's credentials.
 
 # CONFIGURATION
 
 The following options may be passed to new():
 
+    provider
+
+      Optional. Defaults to anthropic. Use bedrock for AWS Bedrock Converse.
+
     api_key
 
-      Required. Your Anthropic API key. If not provided as an argument, the
+      Required for Anthropic, not used for Bedrock. Your Anthropic API key. If not provided as an argument, the
       constructor reads it from the LLM_API_KEY environment variable and then
       deletes that variable from the environment.
 
     model
 
-      Optional. The Claude model identifier to use. Defaults to claude-sonnet-4-6.
+      Optional. Defaults to claude-sonnet-4-6 for Anthropic, or amazon.nova-micro-v1:0 for Bedrock.
 
     max_tokens
 
-      Optional. Maximum number of tokens in the model response. Defaults to 4096.
+      Optional. Maximum number of tokens in the model response. Defaults to 8192.
+
+    region
+
+      Optional for Bedrock. Uses AWS_REGION, then AWS_DEFAULT_REGION, then
+      us-east-1. This is the AWS request Region; cross-Region inference routing
+      is selected by the model/inference profile identifier.
 
     timeout
 
@@ -140,7 +178,7 @@ may be referenced as LLM::API::CONSTANT\_NAME.
 
     $LLM_MAX_TOKENS
 
-      Default maximum token count for responses: 4096
+      Default maximum token count for responses: 8192
 
     $LLM_VERSION
 
@@ -154,12 +192,6 @@ may be referenced as LLM::API::CONSTANT\_NAME.
 
       Default HTTP timeout in seconds: 300
 
-    $LLM_PRICING
-
-      A hash reference mapping model names to two-element array
-      references containing the per-token input cost and per-token
-      output cost in US dollars.
-
     %LLM_MEDIA_TYPES
 
       A hash mapping short type names to MIME type strings.
@@ -172,30 +204,39 @@ may be referenced as LLM::API::CONSTANT\_NAME.
 
     my $llm = LLM::API->new( api_key => $key );
     my $llm = LLM::API->new( \%options );
+    my $llm = LLM::API->new( provider => 'anthropic', api_key => $key );
+    my $llm = LLM::API->new( provider => 'bedrock', region => 'us-east-1' );
 
 Constructs and returns a new LLM::API instance. Accepts either a hash of
 named arguments or a reference to a hash.
 
-The `api_key` argument is required and may alternatively be supplied via the
-LLM\_API\_KEY environment variable. The environment variable is deleted from
-%ENV immediately after being read.
+For `provider => 'anthropic'` (the default), `api_key` is required
+and may alternatively be supplied via `LLM_API_KEY`. The variable is deleted
+from `%ENV` after being read. For `provider => 'bedrock'`, no Anthropic
+API key is required; AWS credential resolution is handled by the underlying
+AWS client. The constructor rejects unsupported providers.
 
-Dies with an error message if `api_key` is not provided.
+The default models are `claude-sonnet-4-6` for Anthropic and
+`amazon.nova-micro-v1:0` for Bedrock. Model IDs are passed to the selected
+provider; inclusion in `providers.yml` is required for pricing lookup, not
+for model invocation.
 
 ## count\_input\_tokens
 
     my ( $tokens, $cost ) = $llm->count_input_tokens( $content );
 
 Counts the input tokens in the supplied content by querying the
-Anthropic API token counting endpoint without generating a message
-response. The argument must be an array reference of content
-block structures such as those produced by `text()` and
+selected provider's token counting endpoint without generating a message
+response. For Bedrock this uses `CountTokens` with Converse-formatted
+messages, where supported by the selected model. The argument must be an
+array reference of content blocks, such as those produced by `text()` and
 `document()`.
 
-Returns a two-element list: the number of input tokens and the
-estimated cost in US dollars at the current pricing for the configured
-model. The cost is calculated by multiplying the token count by the
-per-token input cost from the pricing table.
+Returns a two-element list: the number of input tokens and the estimated
+input cost in US dollars, calculated using the selected provider and model's
+input rate from `providers.yml`. An unpriced model raises an error rather
+than silently reporting zero cost. Model-specific token counting availability
+is determined by the provider.
 
 Throws an exception if the argument is not an array reference.
 
@@ -203,7 +244,7 @@ Throws an exception if the argument is not an array reference.
 
     my $response = $llm->send_prompt( $content );
 
-Sends a messages request to the Anthropic API. The argument must be an
+Sends a messages request to the selected provider. The argument must be an
 array reference of content block structures such as those produced by
 `text()` and `document()` (see [document](https://metacpan.org/pod/document), [text](https://metacpan.org/pod/text)). Returns an
 [LLM::API::Response](https://metacpan.org/pod/LLM%3A%3AAPI%3A%3AResponse) object. Throws an exception if argument is not
@@ -218,6 +259,27 @@ Use the `is_success` method of the response to test for success before accessing
 failure information is contained in the response object.
 
 See [LLM::API::Response](https://metacpan.org/pod/LLM%3A%3AAPI%3A%3AResponse) for detail on response object methods.
+
+## send\_messages
+
+    my $response = $llm->send_messages( [
+      { role => 'user',      content => [ $llm->text('Hello') ] },
+      { role => 'assistant', content => [ $llm->text('Hello!') ] },
+      { role => 'user',      content => [ $llm->text('Explain closures.') ] },
+    ] );
+
+Sends an explicit multi-turn conversation to the selected provider. The
+argument must be a nonempty array reference of message hash references.
+Each message requires a `role` of `user` or `assistant` and a nonempty
+`content` array reference containing text or document blocks produced by
+`text()` or `document()`.
+
+Text blocks must contain a defined `text` value. Document blocks must
+appear in user messages and contain a source hash reference. This method
+validates the message shape before delegating to the provider; additional
+provider and model restrictions may apply. It returns an
+[LLM::API::Response](https://metacpan.org/pod/LLM%3A%3AAPI%3A%3AResponse) object. The caller supplies the complete conversation
+on each invocation; this method does not maintain conversation history.
 
 ## prompt
 
@@ -257,7 +319,19 @@ The media\_type argument accepts the short keys defined in
 value will throw an exception. The corresponding MIME type is resolved
 internally before the block is constructed.
 
+For Bedrock, text documents are sent as text content. PDF sources are
+translated into Converse document blocks with a safe document name. The
+adapter decodes the document helper's base64 source into raw bytes and passes
+those bytes to the AWS transport, which performs base64 encoding for the
+JSON request. A PDF must be accompanied by a nonempty text prompt in the
+same user message, and the selected model must support PDF documents.
+Nova Micro is text-only; use a document-capable model for PDF requests.
+The `document()` return structure remains unchanged for Anthropic callers.
+
 ## models
+
+This method is available only with `provider => 'anthropic'`; it
+throws an exception for other providers.
 
     my $data = $llm->models;
 
@@ -268,6 +342,9 @@ throws an exception containing the HTTP response code and HTTP body.
 See [https://platform.claude.com/docs/en/api/beta/models/list](https://platform.claude.com/docs/en/api/beta/models/list) for more details.
 
 ## api\_keys
+
+This method is available only with `provider => 'anthropic'`; it
+throws an exception for other providers.
 
     my $data = $llm->api_keys;
 
@@ -281,6 +358,9 @@ _Note: This endpoint requires the use of an admin API key._
 See [https://platform.claude.com/docs/en/api/admin/api\_keys/list](https://platform.claude.com/docs/en/api/admin/api_keys/list) for more details.
 
 ## usage\_report
+
+This method is available only with `provider => 'anthropic'`; it
+throws an exception for other providers.
 
     my $data = $llm->usage_report(
       from         => '2025-01-01',          # defaults to today
@@ -303,6 +383,9 @@ for more details.
 
 ## cost\_report
 
+This method is available only with `provider => 'anthropic'`; it
+throws an exception for other providers.
+
     my $data = $llm->cost_report(
       from         => '2025-01-01',          # defaults to today
       to           => '2025-01-31',          # optional end date
@@ -323,9 +406,10 @@ See [https://platform.claude.com/docs/en/api/admin/cost\_report/retrieve](https:
     my $headers = $llm->headers;
     my $headers = $llm->headers( 'content-type' => 'application/json' );
 
-Builds and returns a hash reference of HTTP request headers. Always includes
-the x-api-key and anthropic-version headers. Additional header key-value pairs
-may be supplied as a flat list and are merged into the returned hash.
+Delegates HTTP header construction to the selected provider. For Anthropic,
+the returned hash reference includes `x-api-key` and `anthropic-version`;
+additional header key-value pairs may be supplied as a flat list. Bedrock
+uses AWS authentication rather than Anthropic API-key headers.
 
 ## pricing
 
@@ -333,8 +417,12 @@ may be supplied as a flat list and are merged into the returned hash.
     my ( $input_cost, $output_cost ) = $llm->pricing( $model_name );
 
 Returns the per-token input and output costs in US dollars for the
-specified model. Throws an exception of no pricing is available for
-the model.
+specified model and selected provider. Prices are loaded from the
+installed `providers.yml` catalog. The optional model argument defaults
+to `get_model`. Bedrock pricing is keyed by the complete model or inference
+profile identifier, so global and geographic profiles may have different
+rates. Throws an exception if pricing is not available for the
+provider/model combination; an unpriced model may still be invoked.
 
 _Note: Costs are expressed as fractional dollar amounts per single
 token (for example, 0.000003 for $3 per million)._
@@ -344,9 +432,10 @@ token (for example, 0.000003 for $3 per million)._
     my $timestamp = $llm->rfc_3339( '2025-01-15' );
     my $timestamp = $llm->rfc_3339( '2025-01-15 14:30' );
 
-Interprets the input date string as local time and converts it to an
-RFC 3339 formatted UTC timestamp string of the form
-YYYY-MM-DDTHH:MM:SSZ.
+Parses the input date string using `Time::Piece::strptime` and formats
+it as `YYYY-MM-DDTHH:MM:SSZ`. The method appends a literal `Z`; it does
+not explicitly convert a local-time value to UTC. Callers should not rely
+on it to perform timezone conversion.
 
 Accepts exactly two input formats:
 
@@ -377,7 +466,6 @@ expanded in the query string as describe in the examples below.
     the query string as a separate parameter with the same key.
 
         $llm->query_string( id => [1, 2] );
-        
 
     Produces: `id=1&id=2`
 
@@ -409,6 +497,14 @@ value and set\_NAME to write it.
       Holds a code reference that returns the API key when called. The API key
       is stored only inside this closure and is not exposed directly as an
       attribute value.
+
+    get_provider / set_provider
+
+      The selected provider identifier, such as 'anthropic' or 'bedrock'.
+
+    get_region / set_region
+
+      The AWS request Region for Bedrock. Not used for Anthropic requests.
 
     get_max_tokens / set_max_tokens
 
@@ -443,11 +539,30 @@ value and set\_NAME to write it.
     _Note: `LLM_API_KEY` is deleted from the environment as a security
     measure regardless of whether it is used._
 
+- AWS\_REGION / AWS\_DEFAULT\_REGION
+
+    For Bedrock, `AWS_REGION` takes precedence over `AWS_DEFAULT_REGION`.
+    When neither is set and no `region` is provided, `us-east-1` is used.
+
 - DEBUG
 
     If set to a true value at program startup, Data::Dumper is loaded and
     its Dumper function is imported into the current namespace. This is
     intended for development use only and has no effect on API behavior.
+
+# PROVIDER CATALOG
+
+`providers.yml` is installed as a distribution share file. Its top-level
+`providers` mapping identifies each provider's implementation class and
+curated model pricing. For development from a source checkout, the module
+can load `providers.yml` from the project root when the installed share
+file is unavailable.
+
+Each model entry contains `input_tokens` and `output_tokens` as
+`[price_in_usd, token_count]` pairs. `pricing()` divides the quoted
+price by the token count to return rates per single token. The catalog is
+loaded once per process. It does not perform live model discovery or test
+whether the configured credentials can invoke a model.
 
 # CAVEATS
 
@@ -459,19 +574,26 @@ not conform to two supported formats will raise an exception from
 Anthropic API requires parameters in a specific order this should not be
 a concern because HTTP query strings are order-independent, but callers
 relying on a stable string representation should not depend on the output order.
-- Pricing constants are hardcoded for claude-sonnet-4-6 and reflect the rates
-at the time this module was written. Anthropic may change pricing at any time.
-Verify current rates at [https://www.anthropic.com/pricing](https://www.anthropic.com/pricing) before relying
-on these values for billing calculations.
+- Pricing is curated in `providers.yml` in the distribution share
+    directory. The rates are estimates for standard, uncached,
+    on-demand token usage. Providers may change rates; verify current
+    pricing before using the estimates for billing calculations.
 
 # DEPENDENCIES
 
     Class::Accessor::Fast
+    File::Basename
+    File::ShareDir
+    File::Spec
+    YAML::Tiny
     CLI::Simple::Constants
     CLI::Simple::Utils
     English
-    HTTP::Tiny
+    HTTP::Tiny (Anthropic transport)
     JSON::PP
+    Scalar::Util
+    LLM::API::Anthropic (provided by this distribution)
+    LLM::API::Bedrock (provided by this distribution)
     LLM::API::Response (provided by this distribution)
     MIME::Base64
     Readonly
@@ -502,7 +624,7 @@ Anthropic pricing: [https://www.anthropic.com/pricing](https://www.anthropic.com
 
 # VERSION
 
-This documentation refers to version 1.0.1.
+This documentation refers to version 2.0.0.
 
 # AUTHOR
 

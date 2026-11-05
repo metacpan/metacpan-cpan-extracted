@@ -53,14 +53,14 @@
          "requires" : {
             "File::Temp" : "0",
             "HTTP::Response" : "0",
+            "IO::Socket::INET" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::HTTPStatus" : "0",
             "Test::Memory::Cycle" : "0",
-            "Test::Mockingbird" : "0",
+            "Test::Mockingbird" : "0.03",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::RequiresInternet" : "0",
             "Test::Returns" : "0",
             "Test::Which" : "0",
             "Test::Without::Module" : "0"
@@ -68,7 +68,19 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.12",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-HTML-OSM@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-OSM",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-OSM"
+      },
+      "homepage" : "https://metacpan.org/pod/HTML::OSM",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/HTML-OSM.git",
+         "web" : "https://github.com/nigelhorne/HTML-OSM"
+      }
+   },
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -640,6 +640,12 @@ static MAGIC* get_object_magic(pTHX_ SV *obj) {
     return NULL;
 }
 
+/* A slot holding the shared undef is empty: before perl 5.20 av_fill put
+   &PL_sv_undef in new slots rather than NULL, and it is read-only. */
+static int slot_is_writable(SV *slot) {
+    return slot && slot != &PL_sv_undef; /* # uncoverable condition right count:2 */
+}
+
 /* Add object magic */
 static MAGIC* add_object_magic(pTHX_ SV *obj) {
     MAGIC *mg;
@@ -937,7 +943,7 @@ static OP* pp_object_set(pTHX) {
     /* In-place update if slot already has an SV (avoids alloc/dealloc) */
     if (idx <= AvFILLp(av)) {
         SV *slot = AvARRAY(av)[idx];
-        if (slot) {
+        if (slot_is_writable(slot)) {
             sv_setsv(slot, val);
             SETs(val);
             RETURN;
@@ -1047,7 +1053,7 @@ static OP* pp_object_set_typed(pTHX) {
         /* In-place update avoids newSVsv allocation (common case) */
         if (idx <= AvFILLp(av)) {
             SV *slot = AvARRAY(av)[idx];
-            if (slot) {
+            if (slot_is_writable(slot)) {
                 sv_setsv(slot, val);
                 SETs(val);
                 RETURN;
@@ -1390,7 +1396,7 @@ XS_INTERNAL(xs_accessor_fallback) {
         /* In-place update if slot already has an SV */
         if (idx <= AvFILLp(av)) {
             SV *slot = AvARRAY(av)[idx];
-            if (slot) {
+            if (slot_is_writable(slot)) {
                 sv_setsv(slot, ST(1));
                 ST(0) = ST(1);
                 XSRETURN(1);
@@ -1551,7 +1557,7 @@ static OP* pp_object_func_set(pTHX) {
     /* In-place update if slot already has an SV (avoids alloc/dealloc) */
     if (idx <= AvFILLp(av)) {
         SV *slot = AvARRAY(av)[idx];
-        if (slot) {
+        if (slot_is_writable(slot)) {
             sv_setsv(slot, val);
             SETs(val);
             RETURN;
@@ -1726,7 +1732,7 @@ XS_INTERNAL(xs_func_accessor_fallback) {
         /* In-place update if slot already has an SV */
         if (idx <= AvFILLp(av)) {
             SV *slot = AvARRAY(av)[idx];
-            if (slot) {
+            if (slot_is_writable(slot)) {
                 sv_setsv(slot, ST(1));
                 ST(0) = ST(1);
                 XSRETURN(1);
@@ -2386,7 +2392,7 @@ XS_INTERNAL(xs_reader_fallback) {
                         }
                     }
                     
-                    if (slot) {
+                    if (slot_is_writable(slot)) {
                         sv_setsv(slot, built_val);
                     }
                     else {
@@ -2486,7 +2492,7 @@ XS_INTERNAL(xs_writer_fallback) {
         /* In-place update */
         if (idx <= AvFILLp(av)) {
             SV *slot = AvARRAY(av)[idx];
-            if (slot) {
+            if (slot_is_writable(slot)) {
                 sv_setsv(slot, val);
                 /* Weaken reference if is_weak flag is set */
                 if (spec && spec->is_weak && SvROK(slot)) { /* # uncoverable condition right count:1 */

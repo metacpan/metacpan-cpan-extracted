@@ -34,6 +34,7 @@ script/database-bi
 t/alert.t
 t/ask.t
 t/basic.t
+t/bi-geocode.t
 t/binned.t
 t/breadcrumb.t
 t/calc.t
@@ -52,8 +53,12 @@ t/extract.t
 t/filter.t
 t/field-extract.t
 t/function.t
+t/geocode-online.t
 t/geocode-real.t
 t/geocode.t
+t/graph-series.t
+t/histogram-scheme.t
+t/treemap-combo-colour.t
 t/html-lang.t
 t/insights.t
 t/integration.t
@@ -61,6 +66,7 @@ t/language-fallback.t
 t/launcher.t
 t/lib/BI/Test/Command.pm
 t/lib/BI/Test/Marionette.pm
+t/lib/BI/Test/Nominatim.pm
 t/locales.t
 t/lookup.t
 t/manifest.t
@@ -76,6 +82,7 @@ t/recommended-versions.t
 t/redis.t
 t/redis_live.t
 t/rls.t
+t/scatter.t
 t/sqlite-table-names.t
 t/summary.t
 t/theme.t

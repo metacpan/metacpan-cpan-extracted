@@ -168,7 +168,7 @@ static hamt_node *hamt_node_del(void *cx, hamt_node *n, unsigned depth,
             if (!hamt_entry_key_eq((hamt_entry *)n->slot[i], key, klen, utf8, hash))
                 continue;
             r = hamt_node_coll_drop(cx, n, i);
-            *status = r ? HAMT_DEL_DONE : HAMT_DEL_OOM;
+            *status = r ? HAMT_DEL_DONE : HAMT_DEL_OOM; /* # uncoverable condition right count:1 */
             return r;
         }
         *status = HAMT_DEL_ABSENT;
@@ -209,6 +209,9 @@ static hamt_node *hamt_node_del(void *cx, hamt_node *n, unsigned depth,
             hamt_node_release(cx, sub);
             return hamt_node_retain(n);
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
         if (!sub) HAMT_FATAL("a node below the root came back empty");
 
         /* The fold. The child is down to one entry, so it stops existing and

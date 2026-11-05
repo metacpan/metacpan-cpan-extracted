@@ -1,12 +1,22 @@
 ChangeLog
 lib/LLM/API.pm
+lib/LLM/API/Anthropic.pm
+lib/LLM/API/Bedrock.pm
 lib/LLM/API/Content.pm
 lib/LLM/API/Response.pm
 lib/LLM/API/Usage.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+share/providers.yml
 share/README.md
 t/00-llm-api.t
+t/01-anthropic-transport.t
+t/02-provider-contract.t
+t/03-bedrock-provider.t
+t/04-conversation.t
+t/05-bedrock-count-tokens.t
+t/06-documents.t
+t/07-provider-catalog.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

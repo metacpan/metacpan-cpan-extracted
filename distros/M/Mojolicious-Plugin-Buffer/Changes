@@ -1,5 +1,20 @@
 Revision history for Mojolicious-Plugin-Buffer
 
+0.002.0	Wed Nov  4 04:17:22 PM EST 2026
+	[ Enhancements ]
+	- New option min_compress_saving: a response is not compressed
+		unless compression saves at least this many bytes, defaults
+		to 16
+	- min_compress_size now defaults to 64 bytes, up from 32
+	[ Bug Fixes ]
+	- t/80-hypnotoad.t and t/85-example.t gave hypnotoad only 15 seconds
+		to start, which is not enough on slow machines such as a
+		Raspberry Pi.  They now wait up to 60 seconds, and every wait is
+		multiplied by PERL_TEST_TIME_OUT_FACTOR when it is set
+	- t/80-hypnotoad.t and t/85-example.t died with "Can't return outside
+		a subroutine" when hypnotoad did not start, instead of
+		reporting the failure
+
 0.001.1	Mon Nov  2 02:57:26 PM EST 2026
 	[ Security ]
 	- A response with Cache-Control: no-cache is no longer stored in the

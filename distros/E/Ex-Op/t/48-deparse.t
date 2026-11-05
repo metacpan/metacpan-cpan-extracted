@@ -6,6 +6,10 @@ use Test::More;
 use Ex::Op ();
 use B::Deparse ();
 
+# Before 5.14 a custom op is registered by name alone, with no class, so B
+# hands B::Deparse a plain B::OP for the call and it dies asking for ->first.
+plan skip_all => 'B::Deparse cannot tell a custom op\'s class before perl 5.14' if $] < 5.014;
+
 BEGIN { Ex::Op::make(twice => sub { my ($x) = @_; $x * 2 }) }
 sub uses_it { my ($y) = @_; twice($y) + 1 }
 

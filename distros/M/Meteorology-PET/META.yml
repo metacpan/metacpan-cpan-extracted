@@ -1,0 +1,45 @@
+---
+abstract: 'Perl packages to calculate potential evapotranspiration (PET)'
+author:
+  - 'Adam Allgood, NOAA/NWS/NCEP/Weather Prediction Center'
+build_requires:
+  IPC::Open3: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Meteorology-PET
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Meteorology::PET:
+    file: lib/Meteorology/PET.pm
+    version: '0.01'
+  Meteorology::PET::Thornthwaite:
+    file: lib/Meteorology/PET/Thornthwaite.pm
+    version: '0.01'
+recommends:
+  PDL: '0'
+requires:
+  Array::Compare: '== v3.0.8'
+  perl: '5.008001'
+resources:
+  repository: https://gitlab-community.vlab.noaa.gov/NWS/Operations/NCEP/WPC/EPD/perl-meteorology-pet.git
+version: '0.01'
+x_contributors:
+  - 'Adam Allgood <adam.allgood@noaa.gov>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

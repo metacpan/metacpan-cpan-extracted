@@ -26,7 +26,7 @@
 /* The hash bits that every entry under a node at this depth must share. */
 static uint64_t hamt_chk_prefix_mask(unsigned depth) {
     unsigned bits = HAMT_BITS * depth;
-    return bits >= 64 ? ~(uint64_t)0 : (((uint64_t)1 << bits) - 1);
+    return bits >= 64 ? ~(uint64_t)0 : (((uint64_t)1 << bits) - 1); /* # uncoverable condition right count:1 */
 }
 
 static int hamt_node_check(const hamt_node *n, unsigned depth, uint64_t prefix,
@@ -39,7 +39,7 @@ static int hamt_node_check(const hamt_node *n, unsigned depth, uint64_t prefix,
 
     if (n->ncoll) {
         if (depth < HAMT_MAX_DEPTH) return HAMT_CHK_COLL_SHALLOW;
-        if (n->datamap || n->nodemap) return HAMT_CHK_COLL_MAPS;
+        if (n->datamap || n->nodemap) return HAMT_CHK_COLL_MAPS; /* # uncoverable condition left count:2 */
         if (n->ncoll < 2) return HAMT_CHK_COLL_SMALL;
         for (i = 0; i < n->ncoll; i++) {
             const hamt_entry *e = (const hamt_entry *)n->slot[i];
@@ -98,7 +98,7 @@ static int hamt_node_check(const hamt_node *n, unsigned depth, uint64_t prefix,
 static int hamt_map_check(const hamt_node *root, size_t count) {
     size_t seen = 0;
     int rc;
-    if (!root) return count == 0 ? HAMT_CHK_OK : HAMT_CHK_COUNT;
+    if (!root) return count == 0 ? HAMT_CHK_OK : HAMT_CHK_COUNT; /* # uncoverable condition right count:2 */
     rc = hamt_node_check(root, 0, 0, &seen);
     if (rc) return rc;
     return seen == count ? HAMT_CHK_OK : HAMT_CHK_COUNT;

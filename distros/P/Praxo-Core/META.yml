@@ -1,0 +1,34 @@
+---
+abstract: 'Embeddable MIT-licensed agent framework for Perl'
+author:
+  - 'AxisVela <releases@axisvela.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Praxo-Core
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Praxo::Core:
+    file: lib/Praxo/Core.pm
+    version: v0.1.1
+requires:
+  Cwd: '0'
+  File::Spec: '0'
+  JSON::PP: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/axisvela/praxo-core/issues
+  homepage: https://axisvela.github.io/praxo-core/
+  repository: https://github.com/axisvela/praxo-core
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

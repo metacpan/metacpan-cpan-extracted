@@ -1,6 +1,6 @@
 package Mail::TLSRPT::Policy;
 # ABSTRACT: TLSRPT policy object
-our $VERSION = '2.20210112'; # VERSION
+our $VERSION = '2.20261104'; # VERSION
 use 5.20.0;
 use Moo;
 use Mail::TLSRPT::Pragmas;
@@ -126,7 +126,7 @@ Mail::TLSRPT::Policy - TLSRPT policy object
 
 =head1 VERSION
 
-version 2.20210112
+version 2.20261104
 
 =head1 SYNOPSIS
 
@@ -170,11 +170,11 @@ Generate metrics using the given Prometheus::Tiny object
 
 =head1 AUTHOR
 
-Marc Bradshaw <marc@marcbradshaw.net>
+Jemma Bradshaw <jemma@nothingbutstatic.dev>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Marc Bradshaw.
+This software is copyright (c) 2026 by Jemma Bradshaw.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use File::Spec ();
 use Getopt::Long ();
 use POSIX ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our (%LABEL, %SHORT, %COLUMN, $THRESHOLD);
 

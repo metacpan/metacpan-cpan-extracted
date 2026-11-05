@@ -628,6 +628,15 @@
         <input type="text" id="graph-y-text" readonly hidden tabindex="-1">
       </div>
       <div class="join-field">
+        <label for="graph-series-sel" title="Draw one line for each value of this column">Lines by (optional)</label>
+        <select id="graph-series-sel" name="series">
+          <option value="">&#x2014; none &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
         <label for="graph-span-sel" title="Group the X axis by the hour, day, month or year it falls in">Time bucket</label>
         <select id="graph-span-sel" name="span">
           <option value="">None</option>
@@ -1071,6 +1080,17 @@
         </select>
       </div>
       <div class="join-field">
+        <label for="combo-scheme-sel" title="The bars take the first colour of the scheme and the line the second">Colours</label>
+        <select id="combo-scheme-sel" name="scheme">
+          <option value="">Default (blue and red)</option>
+          <option value="tableau10">Tableau 10</option>
+          <option value="category10">Category 10</option>
+          <option value="set2">Set 2</option>
+          <option value="set3">Set 3</option>
+          <option value="paired">Paired</option>
+        </select>
+      </div>
+      <div class="join-field">
         <label for="combo-span-sel" title="Group the X axis by the hour, day, month or year it falls in">Time bucket</label>
         <select id="combo-span-sel" name="span">
           <option value="">None</option>
@@ -1126,6 +1146,36 @@
         </select>
       </div>
       <div class="join-field">
+        <label for="treemap-color-sel" title="Shade each tile by a second number, such as a margin or a rating">Colour by (optional)</label>
+        <select id="treemap-color-sel" name="color">
+          <option value="">&#x2014; none &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="treemap-color-agg-sel" title="How the colour column is folded into one number per tile">Colour from</label>
+        <select id="treemap-color-agg-sel" name="color_agg" disabled>
+          <option value="avg">Average</option>
+          <option value="sum">Sum</option>
+          <option value="min">Min</option>
+          <option value="max">Max</option>
+          <option value="median">Median</option>
+        </select>
+      </div>
+      <div class="join-field">
+        <label for="treemap-color-scheme-sel">Colour scale</label>
+        <select id="treemap-color-scheme-sel" name="color_scheme" disabled>
+          <option value="YlOrRd">Yellow&#x2013;Red</option>
+          <option value="Blues">Blues</option>
+          <option value="Greens">Greens</option>
+          <option value="Purples">Purples</option>
+          <option value="RdPu">Red&#x2013;Purple</option>
+          <option value="YlGnBu">Yellow&#x2013;Blue</option>
+        </select>
+      </div>
+      <div class="join-field">
         <label for="treemap-topn-inp" title="Show only the top N tiles; the rest are aggregated into an Other tile">Top N tiles</label>
         <input type="number" id="treemap-topn-inp" name="topn" min="1" placeholder="all"
                style="width:5rem" title="Show only the top N tiles; the rest become Other">
@@ -1177,6 +1227,17 @@
         <label for="histogram-bins-inp">Number of bins</label>
         <input type="number" id="histogram-bins-inp" name="bins" min="1" max="200" value="10"
                style="width:5rem">
+      </div>
+      <div class="join-field">
+        <label for="histogram-scheme-sel" title="The bars take the first colour of the scheme">Bar colour</label>
+        <select id="histogram-scheme-sel" name="scheme">
+          <option value="">Default (steel blue)</option>
+          <option value="tableau10">Tableau 10</option>
+          <option value="category10">Category 10</option>
+          <option value="set2">Set 2</option>
+          <option value="set3">Set 3</option>
+          <option value="paired">Paired</option>
+        </select>
       </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
@@ -1355,6 +1416,16 @@
         <label for="map-loc-sel">Place column</label>
         <select id="map-loc-sel" name="loc" disabled>
           <option value="">&#x2014; select column &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field" id="map-loc2-field" hidden>
+        <label for="map-loc2-sel">Followed by</label>
+        <select id="map-loc2-sel" name="loc" disabled
+                title="A column added after the place, with a comma: an address column followed by a country column looks up &quot;Brezje 8, Cerknica, Slovenia&quot;">
+          <option value="">&#x2014; nothing &#x2014;</option>
           [%- FOREACH col IN columns -%]
           <option value="[% col | html %]">[% col | html %]</option>
           [%- END -%]
@@ -2481,6 +2552,9 @@ function biDetectColType(colName) {
 
     function rebuildRowOps(ops, keepOp) {
       opSel.innerHTML = '';
+      // "is one of" is never offered, but a link (a map's unplotted rows)
+      // can bring one; keep it, or reopening the panel would turn it into eq.
+      if (keepOp === 'in') ops = ops.concat([['in', 'is one of']]);
       ops.forEach(function (pair) {
         var opt = document.createElement('option');
         opt.value = pair[0]; opt.textContent = pair[1];
@@ -2508,20 +2582,20 @@ function biDetectColType(colName) {
     valInp.type = 'text';
     valInp.className = 'filter-val-inp';
     valInp.placeholder = 'value';
-    valInp.value = (prefill.op !== 'between' && rowColType !== 'date' && rowColType !== 'numeric' && prefill.val !== undefined) ? prefill.val : '';
+    valInp.value = (prefill.op !== 'between' && (prefill.op === 'in' || (rowColType !== 'date' && rowColType !== 'numeric')) && prefill.val !== undefined) ? prefill.val : '';
 
     var numInp = document.createElement('input');
     numInp.type = 'number';
     numInp.className = 'filter-num-inp';
     numInp.placeholder = 'number';
     numInp.style.display = 'none';
-    if (rowColType === 'numeric' && prefill.val !== undefined) numInp.value = prefill.val;
+    if (rowColType === 'numeric' && prefill.op !== 'in' && prefill.val !== undefined) numInp.value = prefill.val;
 
     var dateInp = document.createElement('input');
     dateInp.type = 'date';
     dateInp.className = 'filter-date-inp';
     dateInp.style.display = 'none';
-    if (rowColType === 'date' && prefill.op !== 'between' && prefill.val) dateInp.value = prefill.val;
+    if (rowColType === 'date' && prefill.op !== 'between' && prefill.op !== 'in' && prefill.val) dateInp.value = prefill.val;
 
     var fromInp = document.createElement('input');
     fromInp.type = 'date';
@@ -2548,8 +2622,9 @@ function biDetectColType(colName) {
       var op        = opSel.value;
       var isBetween = op === 'between';
       var isUnary   = op === 'empty' || op === 'notempty';
-      var isDate    = rowColType === 'date';
-      var isNumeric = rowColType === 'numeric';
+      var isList    = op === 'in';
+      var isDate    = rowColType === 'date' && !isList;
+      var isNumeric = rowColType === 'numeric' && !isList;
       valInp.style.display  = (!isDate && !isNumeric && !isUnary) ? '' : 'none';
       numInp.style.display  = (isNumeric && !isUnary)             ? '' : 'none';
       dateInp.style.display = (isDate && !isUnary && !isBetween)  ? '' : 'none';
@@ -3809,6 +3884,19 @@ function biDetectColType(colName) {
     btnDo.disabled = !catSel.value;
   }
 
+  // How the colour is folded and its scale mean nothing without a colour
+  // column, and a disabled field is not sent.
+  var colorSel       = document.getElementById('treemap-color-sel');
+  var colorAggSel    = document.getElementById('treemap-color-agg-sel');
+  var colorSchemeSel = document.getElementById('treemap-color-scheme-sel');
+  function syncTreemapColour() {
+    var on = !!(colorSel && colorSel.value);
+    if (colorAggSel)    colorAggSel.disabled    = !on;
+    if (colorSchemeSel) colorSchemeSel.disabled = !on;
+  }
+  if (colorSel) colorSel.addEventListener('change', syncTreemapColour);
+  syncTreemapColour();
+
   btnOpen.addEventListener('click', function () {
     biClosePanels(panel);
     backInp.value = window.location.href;
@@ -4184,6 +4272,8 @@ function biDetectColType(colName) {
   var latSel        = document.getElementById('map-lat-sel');
   var lonSel        = document.getElementById('map-lon-sel');
   var locSel        = document.getElementById('map-loc-sel');
+  var loc2Sel       = document.getElementById('map-loc2-sel');
+  var loc2Field     = document.getElementById('map-loc2-field');
   var latField      = document.getElementById('map-lat-field');
   var lonField      = document.getElementById('map-lon-field');
   var locField      = document.getElementById('map-loc-field');
@@ -4199,7 +4289,7 @@ function biDetectColType(colName) {
 
   function checkMap() {
     if (byLocation()) {
-      btnDo.disabled = !locSel.value;
+      btnDo.disabled = !locSel.value || loc2Sel.value === locSel.value;
     } else {
       btnDo.disabled = !(latSel.value && lonSel.value && latSel.value !== lonSel.value);
     }
@@ -4212,9 +4302,11 @@ function biDetectColType(colName) {
     latField.hidden = loc;
     lonField.hidden = loc;
     locField.hidden = !loc;
+    loc2Field.hidden = !loc;
     latSel.disabled = loc;
     lonSel.disabled = loc;
     locSel.disabled = !loc;
+    loc2Sel.disabled = !loc;
     latSel.required = !loc;
     lonSel.required = !loc;
     locSel.required = loc;
@@ -4237,6 +4329,12 @@ function biDetectColType(colName) {
     if (!latSel.value) latSel.value = guess(latSel, [/^(lat|latitude)$/i, /lat/i]);
     if (!lonSel.value) lonSel.value = guess(lonSel, [/^(lon|lng|long|longitude)$/i, /(lon|lng|longitude)/i]);
     if (!locSel.value) locSel.value = guess(locSel, [/^(loc|location|place|city|town|address)$/i, /(place|location|city|address)/i]);
+    // A country column is what an address usually lacks: offer it as the
+    // second part, unless it is the place column itself.
+    if (!loc2Sel.value && locSel.value && !loc2Sel.dataset.chosen) {
+      var country = guess(loc2Sel, [/^country$/i]);
+      if (country !== locSel.value) loc2Sel.value = country;
+    }
     if (!latSel.value || !lonSel.value) {
       if (locSel.value) modeSel.value = 'loc';
     }
@@ -4244,7 +4342,7 @@ function biDetectColType(colName) {
 
   // Pre-populate selects from /geo/list, then fall back to guessColumns().
   function applyGeoPrefs(cols) {
-    var kindMap = { lat: latSel, lon: lonSel, location: locSel };
+    var kindMap = { lat: latSel, lon: lonSel, location: locSel, location_suffix: loc2Sel };
     var anySet  = false;
     Object.keys(cols).forEach(function (col) {
       var kind = (cols[col] || {}).kind;
@@ -4287,11 +4385,14 @@ function biDetectColType(colName) {
             guessColumns();
           }
           if (forgetBtn) forgetBtn.hidden = !saved;
-          checkMap();
+          // A remembered or guessed place column switches the mode, so the
+          // fields are shown, enabled and checked again for it.
+          syncMode();
         })
-        .catch(function () { guessColumns(); checkMap(); });
+        .catch(function () { guessColumns(); syncMode(); });
     } else {
       guessColumns();
+      syncMode();
     }
   });
 
@@ -4311,7 +4412,7 @@ function biDetectColType(colName) {
       if (!j.ok) return;
       forgetBtn.hidden = true;
       guessColumns();
-      checkMap();
+      syncMode();
     }).catch(function () {});
   });
 
@@ -4319,6 +4420,10 @@ function biDetectColType(colName) {
   latSel.addEventListener('change', checkMap);
   lonSel.addEventListener('change', checkMap);
   locSel.addEventListener('change', checkMap);
+  loc2Sel.addEventListener('change', function () {
+    loc2Sel.dataset.chosen = '1';	// the user's choice, "nothing" included, is not guessed over
+    checkMap();
+  });
 
   // --- Colour-coding controls ---
   function isMapDateVal(v) {
@@ -4423,6 +4528,10 @@ function biDetectColType(colName) {
       mapForm.appendChild(inp);
     }
 
+    // "Followed by: nothing" sends no second loc=; opening the panel again
+    // enables it (syncMode).
+    if (!loc2Sel.value) loc2Sel.disabled = true;
+
     // Save column preferences when the checkbox is checked.
     var remChk = document.getElementById('map-remember-chk');
     if (remChk && remChk.checked) {
@@ -4436,6 +4545,8 @@ function biDetectColType(colName) {
           saves.push({ col: lonSel.value, kind: 'lon' });
         if (byLocation() && locSel.value)
           saves.push({ col: locSel.value, kind: 'location' });
+        if (byLocation() && locSel.value && loc2Sel.value)
+          saves.push({ col: loc2Sel.value, kind: 'location_suffix' });
         // One request, which replaces what was saved before; keepalive lets it
         // finish while the form takes the page to the map.
         if (saves.length) {

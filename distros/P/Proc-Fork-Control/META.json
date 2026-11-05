@@ -1,16 +1,17 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "management front end to fork()",
    "author" : [
-      "unknown"
+      "Colin Faber <cfaber@fpsn.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_2",
+      "artistic_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Proc-Fork-Control",
    "no_index" : {
@@ -27,13 +28,34 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.6"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cfaber/Proc-Fork-Control/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cfaber/Proc-Fork-Control.git",
+         "web" : "https://github.com/cfaber/Proc-Fork-Control"
+      }
+   },
+   "version" : "1.7",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

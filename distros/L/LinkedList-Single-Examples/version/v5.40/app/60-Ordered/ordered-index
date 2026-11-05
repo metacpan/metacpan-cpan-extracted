@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Ordered::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Ordered;
+
+########################################################################
+# a price list keyed by quantity: the price that applies from that
+# quantity up. put, look up, list a range in order, and cut a range out
+# as one piece.
+########################################################################
+
+sub run( $class )
+{
+    my $map = LinkedList::Single::Example::Ordered->new( bucket => 2 );
+
+    $map->put( $_ * 10, sprintf '%.2f', 100 / ( 1 + $_ ) ) for 1 .. 12;
+
+    say 'buckets: ', $map->buckets, ' for ', $map->size, ' entries';
+
+    say 'price at 70: ', $map->get( 70 );
+
+    say 'range 35 .. 85: ', join ' ', map { "$_->[ 0 ]=$_->[ 1 ]" } $map->range( 35, 85 )->@*;
+
+    my $cut = $map->cut( 35, 85 );
+
+    say 'cut ', scalar @$cut, ' entries; left: ', join ' ', map { $_->[ 0 ] } $map->contents->@*;
+
+    say 'buckets: ', $map->buckets, ' for ', $map->size, ' entries';
+
+    $map
+}
+
+__PACKAGE__->run
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+ordered-index - demonstration of LinkedList::Single::Example::Ordered
+
+=head1 SYNOPSIS
+
+    perl app/60-Ordered/ordered-index
+
+=head1 DESCRIPTION
+
+Builds a small ordered map with two entries to a bucket so that the
+markers show, looks up a key, lists a range in order, and cuts a range
+out. See L<LinkedList::Single::Example::Ordered::POD> for the design and the measurements.

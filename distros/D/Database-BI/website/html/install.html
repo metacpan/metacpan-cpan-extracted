@@ -77,8 +77,8 @@
 		</tr>
 		<tr>
 			<td>HTML::D3</td>
-			<td>0.27</td>
-			<td>The chart snippets. 0.27 stops a label ending the script it is written into.</td>
+			<td>0.29</td>
+			<td>The chart snippets. 0.29 colours treemap tiles by a measure, colours a combo chart from a scheme and escapes the text in tooltips; 0.27 stops a label ending the script it is written into.</td>
 		</tr>
 		<tr>
 			<td>HTML::TagCloud</td>
@@ -90,11 +90,19 @@
 </div>
 
 <p>
-	Two modules are recommended rather than required, so the application installs,
-	starts and tests without them: <strong>HTML::OSM</strong> (0.12 or later) draws
-	maps, and <strong>Geo::Coder::Free</strong> (0.48 or later) turns a place column
-	into coordinates from a local database. Without them the map pages are hidden
-	and the rest of the application is unaffected. <strong>Redis</strong> (or
+	Some modules are recommended rather than required, so the application installs,
+	starts and tests without them. <strong>HTML::OSM</strong> (0.13 or later) draws
+	maps, with a scale bar, a key on the map that follows the view, and a first
+	view that fits every marker. A place column is turned into coordinates by <strong>Geo::Coder::List</strong>
+	(0.39 or later), which asks <strong>Geo::Coder::Free</strong> (0.48 or later) and
+	its local database first, then OpenStreetMap's Nominatim service through
+	<strong>Geo::Coder::OSM</strong> (0.03 or later) for the places the local data does
+	not know. <strong>LWP::UserAgent::Throttled</strong> (0.14 or later) keeps those
+	requests to Nominatim's limit of one a second. Nominatim is asked over https, and
+	what it finds is kept for a month in <code>&lt;model_dir&gt;/geocode-cache/</code>. Without Geo::Coder::OSM, or with
+	<code>map_geocode_online =&gt; 0</code>, every lookup stays on this machine.
+	Without HTML::OSM the map pages are hidden, and the rest of the application is
+	unaffected. <strong>Redis</strong> (or
 	<strong>Redis::Fast</strong>) is optional too, and switches on the
 	<code>redis:</code> data source when installed.
 </p>
@@ -214,9 +222,35 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td><code>model_dir</code></td>
 			<td><code>.bi</code></td>
 			<td>
-				Where saved canvases, calculated fields, groups, date patterns and
-				geocoded places live. It may be absolute, but it may not be equal to
+				Where saved canvases, calculated fields, groups, date patterns,
+				geocoded places and the geocode cache live. It may be absolute, but it may not be equal to
 				or inside <code>data_dir</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>map_geocode_online</code></td>
+			<td><code>1</code></td>
+			<td>
+				Ask OpenStreetMap's Nominatim about places the local data does not
+				know. Only the place name is sent. Set it to <code>0</code> to keep
+				every lookup on this machine.
+			</td>
+		</tr>
+		<tr>
+			<td><code>map_geocode_online_max</code></td>
+			<td><code>20</code></td>
+			<td>
+				Places asked of Nominatim each time a map opens. Nominatim allows one
+				request a second, so this is roughly how long a page can wait for it.
+				The rest are asked next time, or by <code>script/bi-geocode</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>map_popup_rows</code></td>
+			<td><code>10</code></td>
+			<td>
+				Rows listed in one map marker's popup. A place with more shows this
+				many, says how many more there are, and links to them all in the table.
 			</td>
 		</tr>
 		<tr>
@@ -280,11 +314,18 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 <h3><code>script/bi-geocode</code></h3>
 <p>
 	Warms the shared geocode cache for one column, so later map requests make no
-	lookups:
+	lookups. Places the local data does not know are asked of OpenStreetMap's
+	Nominatim, one a second and with no limit on how many: a map page asks it about
+	at most <code>map_geocode_online_max</code> places, and this is how the rest are
+	found. <code>--col</code> may be given twice for a place written across
+	columns (<code>--col Address --col Country</code>), joined with a comma as
+	<code>loc=</code> joins them on the map. <code>--offline</code> keeps every lookup
+	local, and <code>--online-max N</code> sets a limit:
 </p>
 <pre><code>./script/bi-geocode --spec table:customers --col city \
                     [--data-dir DIR] [--model-dir DIR] \
-                    [--openaddr PATH] [--region CC] [--dry-run] [--verbose]</code></pre>
+                    [--openaddr PATH] [--region CC] \
+                    [--offline] [--online-max N] [--dry-run] [--verbose]</code></pre>
 <p>
 	It is idempotent: a second run against a warm cache resolves nothing and says
 	so. Exit status is 0 on success, 1 when the column is missing or no rows load,

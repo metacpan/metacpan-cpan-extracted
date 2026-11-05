@@ -22,16 +22,22 @@ WriteMakefile(
 		: ()),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	}, META_MERGE => {
+	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
 		resources => {
+			homepage => 'https://metacpan.org/pod/HTML::OSM',
 			repository => {
 				type => 'git',
-				url => 'https://github.com/nigelhorne/HTML-OSM.git',
+				url => 'git://github.com/nigelhorne/HTML-OSM.git',
 				web => 'https://github.com/nigelhorne/HTML-OSM',
-			},
-			bugtracker => {
-				web => 'https://github.com/nigelhorne/HTML-OSM/issues',
-			},
+				# license => 'http://dev.perl.org/licenses/',
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-OSM',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-OSM',
+				# web => 'https://github.com/nigelhorne/HTML-OSM/issues',
+				# url => 'https://github.com/nigelhorne/HTML-OSM/issues',
+				mailto => 'bug-HTML-OSM@rt.cpan.org'
+			}
 		},
 	}, PREREQ_PM => {
 		'B' => 0,
@@ -51,14 +57,14 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'File::Temp' => 0,
 		'HTTP::Response' => 0,
+		'IO::Socket::INET' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::HTTPStatus' => 0,
 		'Test::Memory::Cycle' => 0,
-		'Test::Mockingbird' => 0,
+		'Test::Mockingbird' => 0.03,	# mock 'Pkg::method' => sub {...} shorthand
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::RequiresInternet' => 0,
 		'Test::Returns' => 0,
 		'Test::Which' => 0,
 		'Test::Without::Module' => 0

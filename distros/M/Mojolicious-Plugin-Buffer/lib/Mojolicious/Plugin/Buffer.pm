@@ -30,7 +30,7 @@ use Sub::Private { mode => 'enforce' };
 use Sub::Protected;
 use Time::HiRes ();
 
-use version; our $VERSION = version->declare('0.001.1');
+use version; our $VERSION = version->declare('0.002.0');
 
 # ---------------------------------------------------------------------------
 # Constants.  Nothing below this block should contain a bare number or a
@@ -86,7 +86,8 @@ Readonly::Scalar my $RETRY_AFTER => 1;
 # symlink loop can only be told apart by its ever-longer path.
 Readonly::Scalar my $MAX_SCAN_DEPTH => 32;
 
-Readonly::Scalar my $DEFAULT_MIN_COMPRESS_SIZE => 32;
+Readonly::Scalar my $DEFAULT_MIN_COMPRESS_SIZE => 64;
+Readonly::Scalar my $DEFAULT_MIN_COMPRESS_SAVING => 16;	# bytes compression must save to be used
 Readonly::Scalar my $OPTIMISE_AGGRESSIVE => 2;	# optimise_content level that touches JavaScript
 
 # Stash keys.  'buffer' is the documented per-response override; the
@@ -145,6 +146,7 @@ Readonly::Hash my %DEFAULTS => (
 	template_mtime_cache => undef,	# cache object for the template mtime scan
 	template_mtime_cache_duration => $DEFAULT_MTIME_DURATION,
 	min_compress_size => $DEFAULT_MIN_COMPRESS_SIZE,
+	min_compress_saving => $DEFAULT_MIN_COMPRESS_SAVING,
 	encodings => [@DEFAULT_ENCODINGS],
 	compressible_types => [@DEFAULT_COMPRESSIBLE_TYPES],
 	excluded_types => [@DEFAULT_EXCLUDED_TYPES],
@@ -174,6 +176,7 @@ Readonly::Hash my %OPTION_SCHEMA => (
 	template_mtime_cache => {type => 'object', can => [qw(get set)], optional => 1},
 	template_mtime_cache_duration => $DURATION,
 	min_compress_size => {type => 'integer', min => 0},
+	min_compress_saving => {type => 'integer', min => 0},
 	encodings => {type => 'arrayref'},
 	compressible_types => {type => 'arrayref'},
 	excluded_types => {type => 'arrayref'},
@@ -218,7 +221,7 @@ Mojolicious::Plugin::Buffer - Optimise, compress and validate Mojolicious respon
 
 =head1 VERSION
 
-Version 0.001.1
+Version 0.002.0
 
 =cut
 
@@ -798,9 +801,16 @@ human-readable duration.
 
 =head2 min_compress_size
 
-Do not compress bodies smaller than this many bytes, defaults to 32.  Must be
-a non-negative integer.  Compression is also skipped if it would not make the
-body smaller.
+Do not compress bodies smaller than this many bytes, defaults to 64.  Must be
+a non-negative integer.  See also L</min_compress_saving>.
+
+=head2 min_compress_saving
+
+Do not compress a body if compression would save fewer than this many
+bytes, defaults to 16.  Must be a non-negative integer.  A small saving is
+not worth the C<Content-Encoding> header and the client's work to decode
+the body.  Compression is always skipped if it would not make the body
+smaller, even when this is 0.
 
 =head2 encodings
 
@@ -1052,6 +1062,7 @@ logs at debug level when L</optimise_content> is on without L<HTML::Packer>.
 	template_mtime_cache          => { type => 'object', can => [qw(get set)], optional => 1 },
 	template_mtime_cache_duration => { type => 'string', min => 1, optional => 1 },
 	min_compress_size             => { type => 'integer', min => 0 },
+	min_compress_saving           => { type => 'integer', min => 0 },
 	encodings                     => { type => 'arrayref' },   # of br|zstd|gzip|x-gzip
 	compressible_types            => { type => 'arrayref' },   # of strings or qr//
 	excluded_types                => { type => 'arrayref' },   # of strings or qr//
@@ -1094,7 +1105,8 @@ these.
     option_optimise_content         optimise_content must be 0, 1 or 2                  Use one of the documented levels
     option_last_modified            last_modified must be 0, 1, an epoch, a date        Pass a scalar or a coderef
                                     string or a code reference
-    option_min_compress_size        min_compress_size must be a non-negative integer    Pass e.g. 32
+    option_min_compress_size        min_compress_size must be a non-negative integer    Pass e.g. 64
+    option_min_compress_saving      min_compress_saving must be a non-negative integer  Pass e.g. 16
     option_encodings                encodings must be an array reference                Pass [qw(br gzip)]
     unknown_encoding                unknown encoding 'NAME'                             Use br, zstd, gzip or x-gzip
     option_compressible_types       compressible_types must be an array reference       Pass [qr{^text/}, ...]
@@ -1698,8 +1710,12 @@ sub _compress :Private {
 		return undef;
 	}
 
-	# Compression that does not save anything is not worth the header
-	return undef unless defined($result->{body}) && (length($result->{body}) < length($entity));
+	# Compression that saves less than min_compress_saving bytes is not
+	# worth the header and the client's work to decode it; it must always
+	# save something
+	return undef unless defined($result->{body});
+	my $saving = length($entity) - length($result->{body});
+	return undef unless ($saving > 0) && ($saving >= ($options->{min_compress_saving} // 0));
 
 	$headers->content_encoding($wanted);
 	$self->_log($c->app, debug => 'log_compressed',
@@ -3201,10 +3217,10 @@ the default" or "off":
       template_mtime_cache_duration
     messages                              the built-in English texts
 
-For C<encodings>, C<compressible_types>, C<excluded_types>, C<vary_by> and
-C<min_compress_size>, undef is refused when the plugin is registered.  This
-matters most for C<vary_by>: an undef there would have silently removed the
-C<Cookie> header from the cache key.
+For C<encodings>, C<compressible_types>, C<excluded_types>, C<vary_by>,
+C<min_compress_size> and C<min_compress_saving>, undef is refused when the
+plugin is registered.  This matters most for C<vary_by>: an undef there
+would have silently removed the C<Cookie> header from the cache key.
 
 =item * In C<messages>, undef does B<not> restore the built-in text.
 C<< messages =E<gt> {retry_later =E<gt> undef} >> makes visitors see the
@@ -3686,7 +3702,8 @@ This is the life of one cache key, seen by all workers together.
      +-----------------+  [compress_content on and type in
      | 3. COMPRESS     |   compressible_types] / Vary: Accept-Encoding;
      +-----------------+   then [client accepts a coding, body >=
-          |                min_compress_size, result smaller]
+          |                min_compress_size, result at least
+          |                min_compress_saving bytes smaller]
           |                / body compressed, Content-Encoding set
           |
           v

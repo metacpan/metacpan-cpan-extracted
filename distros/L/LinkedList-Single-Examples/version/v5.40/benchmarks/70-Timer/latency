@@ -1,0 +1,269 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Timer::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Latency    qw( clock_floor clock_name in_child row sample summary tick );
+use LinkedList::Single::Example::Timer;
+use LinkedList::Single::Example::Timer::Array;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: each case runs in a child of its own, and the child must
+# not inherit output the parent has not yet written.
+
+$|  = 1;
+
+# with an argument, only the scenarios whose title matches it are run
+# (perl benchmarks/70-Timer/latency Window).
+
+my $only    = shift // '';
+
+# every case runs in a fresh process this many times; the row shown is
+# the run with the median worst call, and the spread of the worst calls
+# over the runs is printed beside it.
+
+my $runs    = 3;
+
+my %impl
+= (
+    list    => sub { LinkedList::Single::Example::Timer->new( clock => sub { 0 } ) }
+  , array   => sub { LinkedList::Single::Example::Timer::Array->new( clock => sub { 0 } ) }
+);
+
+my @impl    = ( 'list', 'array' );
+
+########################################################################
+# utility
+########################################################################
+
+sub wanted( $title )
+{
+    $only eq '' || $title =~ m{ $only }xi
+}
+
+sub header( $title )
+{
+    say "\n$title";
+
+    say sprintf '%-18s %9s %9s %9s %9s %11s %9s'
+    => qw( case mean p50 p99 p99.9 max(us) max_at );
+}
+
+# run $make->() in a child $runs times; each returns a summary as a
+# list. print the median run and the spread of the maxima.
+
+sub case( $name, $make )
+{
+    my @run
+    = sort { $a->{ max } <=> $b->{ max } }
+      map
+      {
+          my @n = in_child( $make );
+
+          +{ zip_summary( @n ) }
+      }
+      1 .. $runs;
+
+    my $mid = $run[ $#run / 2 ];
+
+    say row( $name, $mid )
+    . sprintf '   worst of %d runs: %.0f .. %.0f us'
+    =>  $runs, $run[ 0 ]{ max }, $run[ -1 ]{ max };
+}
+
+sub flat( $s )
+{
+    $s->@{ qw( mean p50 p99 p999 max at ) }
+}
+
+sub zip_summary( @n )
+{
+    my @key = qw( mean p50 p99 p999 max at );
+
+    map { $key[ $_ ] => $n[ $_ ] } 0 .. $#key
+}
+
+# a queue of $n messages in start order, outside of any timing.
+
+sub filled( $name, $n )
+{
+    my $queue   = $impl{ $name }->();
+
+    $queue->enqueue( $_, 'job' ) for 1 .. $n;
+
+    $queue
+}
+
+########################################################################
+# the cost of the clock
+########################################################################
+
+header( 'Floor: the timing loop around an empty call (what no row can beat); clock: ' . clock_name() );
+
+say row( 'empty call', clock_floor() );
+
+########################################################################
+# growth: a queue that fills up, messages in start order
+########################################################################
+
+if( wanted( 'Growth' ) )
+{
+    my $n   = 200_000;
+
+    header( "Growth: enqueue $n messages in start order, each call timed (microseconds)" );
+
+    for my $name ( @impl )
+    {
+        case
+        (
+            $name
+          , sub
+            {
+                my $queue   = $impl{ $name }->();
+
+                flat summary sample( $n, sub( $i ) { $queue->enqueue( $i, 'job' ) } )
+            }
+        );
+    }
+}
+
+########################################################################
+# steady dispatch: one message arrives, one is due, with N queued
+########################################################################
+
+if( wanted( 'Steady' ) )
+{
+    for my $queued ( 10_000, 200_000 )
+    {
+        my $ops = 50_000;
+
+        header( "Steady: $queued queued; enqueue one (in order), then dispatch one (take + process)" );
+
+        for my $name ( @impl )
+        {
+            case
+            (
+                "$name enqueue"
+              , sub
+                {
+                    my $queue   = filled( $name, $queued );
+
+                    flat summary sample
+                    (
+                        $ops
+                      , sub( $i ) { $queue->enqueue( $queued + 1 + $i, 'job' ) }
+                    )
+                }
+            );
+
+            case
+            (
+                "$name dispatch"
+              , sub
+                {
+                    my $queue   = filled( $name, $queued + $ops );
+
+                    flat summary sample
+                    (
+                        $ops
+                      , sub( $i )
+                        {
+                            my $batch   = $queue->take( $i + 1 );
+
+                            $queue->process( $batch, sub {}, 9**9**9 );
+                        }
+                    )
+                }
+            );
+        }
+    }
+}
+
+########################################################################
+# the window cycle: take K that are due, dispatch none, put them all back.
+# 200,000 are queued behind. this is the longest take and the longest
+# requeue the dispatcher can ask for with K due.
+########################################################################
+
+if( wanted( 'Window' ) )
+{
+    my $behind  = 200_000;
+    my $cycles  = 100;
+
+    for my $k ( 100, 5_000 )
+    {
+        header( "Window cycle: $k due, none dispatched, $k put back; $behind queued behind" );
+
+        for my $name ( @impl )
+        {
+            for my $part ( qw( take requeue ) )
+            {
+                case
+                (
+                    "$name $part"
+                  , sub
+                    {
+                        my $queue = $impl{ $name }->();
+
+                        $queue->enqueue( $_, 'job' ) for 1 .. $k;
+                        $queue->enqueue( 1e6 + $_, 'job' ) for 1 .. $behind;
+
+                        my @take;
+                        my @back;
+
+                        $#take  = $#back = $cycles - 1;
+
+                        for my $i ( 0 .. $cycles - 1 )
+                        {
+                            my $t0      = tick();
+                            my $batch   = $queue->take( $k );
+                            my $t1      = tick();
+
+                            $queue->requeue( $batch );
+
+                            my $t2      = tick();
+
+                            $take[ $i ] = $t1 - $t0;
+                            $back[ $i ] = $t2 - $t1;
+                        }
+
+                        flat summary( $part eq 'take' ? \@take : \@back )
+                    }
+                );
+            }
+        }
+    }
+}
+
+########################################################################
+# freeing: a queue of N messages goes out of scope all at once
+########################################################################
+
+if( wanted( 'Free' ) )
+{
+    my $n   = 200_000;
+
+    header( "Free: the one call that lets go of a queue of $n messages" );
+
+    for my $name ( @impl )
+    {
+        case
+        (
+            $name
+          , sub
+            {
+                my $queue   = filled( $name, $n );
+
+                flat summary sample( 1, sub { undef $queue } )
+            }
+        );
+    }
+}
+
+__END__

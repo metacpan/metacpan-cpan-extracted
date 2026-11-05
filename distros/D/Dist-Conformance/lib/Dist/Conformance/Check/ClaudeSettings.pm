@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ClaudeSettings 0.001;
+package Dist::Conformance::Check::ClaudeSettings 0.002;
 
 # ABSTRACT: .claude/settings.json enables the plugins of the harness
 
@@ -76,7 +76,7 @@ Dist::Conformance::Check::ClaudeSettings - .claude/settings.json enables the plu
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

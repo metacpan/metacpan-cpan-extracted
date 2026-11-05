@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 use Test::Most;
-use Test::Needs { 'Geo::Coder::Free' => '0.48' };
+use Test::Needs { 'Geo::Coder::Free' => '0.48', 'Geo::Coder::List' => '0.39' };
 use Database::BI::Model::Geocode;
 
 # Geo::Coder::Free is a recommends, not a prerequisite: 0.46 added
@@ -80,7 +80,12 @@ sub rows_for {
 # about the answers.
 # ---------------------------------------------------------------------------
 
-my $geocode = Database::BI::Model::Geocode->new();	# no injected geocoder: the real one
+# No injected geocoder: the real one.  online => 0 keeps it to the local data,
+# which is what this file is about, and keeps the test off the network: the
+# chain would otherwise ask OpenStreetMap about every place the catalogues do
+# not know, the unknown place above among them.  t/geocode-online.t covers that
+# half with a Nominatim that is not on the network.
+my $geocode = Database::BI::Model::Geocode->new(online => 0);
 
 my ($available, $reason) = $geocode->geocoder_available();
 plan skip_all => "no usable geocoder: $reason" unless $available;

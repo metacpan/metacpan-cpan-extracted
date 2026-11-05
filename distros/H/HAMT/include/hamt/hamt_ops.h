@@ -91,8 +91,14 @@ static void hamt_fn_export(pTHX_ HV *stash, int i) {
     const char *name = hamt_fn_names[i];
     CV *cv = get_cv(form("%s::%s", hamt_fn_pkg(i), name), 0);
     SV **svp;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!cv) croak("HAMT: %s is not built", name);
     svp = hv_fetch(stash, name, (I32)strlen(name), 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!svp) croak("HAMT: cannot export %s", name);
     if (SvTYPE(*svp) != SVt_PVGV)
         gv_init((GV *)*svp, stash, name, (I32)strlen(name), GV_ADDMULTI);
@@ -194,9 +200,12 @@ static OP *hamt_ck_rewrite(pTHX_ OP *o, GV *namegv, SV *ckobj,
 
     o = ck_entersub_args_proto(o, namegv, ckobj);
     pushop = cUNOPx(o)->op_first;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 */
     if (!OpHAS_SIBLING(pushop)) pushop = cUNOPx(pushop)->op_first;
     a = OpSIBLING(pushop);
-    if (!a || !OpHAS_SIBLING(a)) return o;
+    if (!a || !OpHAS_SIBLING(a)) return o; /* # uncoverable condition left count:1 */
     if (nargs == 2) {
         b = OpSIBLING(a);
         if (!OpHAS_SIBLING(b)) return o;
@@ -239,6 +248,9 @@ static void hamt_ops_one(pTHX_ int i, Perl_ppaddr_t pp, Perl_call_checker ck, U3
     XopENTRY_set(&hamt_xop[i], xop_desc, hamt_fn_names[i]);
     XopENTRY_set(&hamt_xop[i], xop_class, cls);
     Perl_custom_op_register(aTHX_ pp, &hamt_xop[i]);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (cv) cv_set_call_checker(cv, ck, (SV *)cv);
 }
 

@@ -1,0 +1,228 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::Ordered::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::Latency    qw( clock_floor clock_name in_child row sample summary tick );
+use LinkedList::Single::Example::Ordered;
+use LinkedList::Single::Example::Ordered::Sorted;
+use LinkedList::Single::Example::Ordered::Buckets;
+use LinkedList::Single::Example::Ordered::Hash;
+
+########################################################################
+# package variables
+########################################################################
+
+# unbuffered: each case runs in a child of its own, and the child must
+# not inherit output the parent has not yet written.
+
+$|  = 1;
+
+# with an argument, only the sizes that match it are run
+# (perl benchmarks/60-Ordered/latency 100000).
+
+my $only    = shift // '';
+
+# every case runs in a fresh process this many times; the row shown for
+# each series is the run with the median worst call, and the spread of the
+# worst calls over the runs is printed beside it.
+
+my $runs    = 3;
+
+my @size    = ( 100_000, 400_000 );
+
+# the bucket size is given explicitly where it is part of the case.
+# 3 is the module's default, 16 the size the POD tables were made with.
+
+my %impl
+= (
+    'list b=3'      => sub { LinkedList::Single::Example::Ordered->new( bucket => 3 )           }
+  , 'list b=16'     => sub { LinkedList::Single::Example::Ordered->new( bucket => 16 )          }
+  , 'buckets b=3'   => sub { LinkedList::Single::Example::Ordered::Buckets->new( bucket => 3 )  }
+  , 'buckets b=16'  => sub { LinkedList::Single::Example::Ordered::Buckets->new( bucket => 16 ) }
+  , 'sorted'        => sub { LinkedList::Single::Example::Ordered::Sorted->new                  }
+  , 'hash'          => sub { LinkedList::Single::Example::Ordered::Hash->new                    }
+);
+
+my @impl
+= ( 'list b=3', 'list b=16', 'buckets b=3', 'buckets b=16', 'sorted', 'hash' );
+
+my @series  = qw( put churn range cut free );
+
+my @key     = qw( mean p50 p99 p999 max at );
+
+srand 20261031;
+
+########################################################################
+# utility
+########################################################################
+
+sub header( $title )
+{
+    say "\n$title";
+
+    say sprintf '%-18s %9s %9s %9s %9s %11s %9s'
+    => qw( case mean p50 p99 p99.9 max(us) max_at );
+}
+
+sub flat( $s )
+{
+    $s->@{ @key }
+}
+
+sub unflat( @n )
+{
+    my %s;
+
+    @s{ @key }  = @n;
+
+    \%s
+}
+
+# the keys are distinct random integers: a collision would be a replace,
+# not an insert, and would make the series the wrong length.
+
+sub keys_for( $n )
+{
+    my %seen;
+    my @key;
+
+    while( @key < $n )
+    {
+        my $k   = int rand 1e9;
+
+        $seen{ $k }++
+        or push @key, $k;
+    }
+
+    @key
+}
+
+# one map built and worked on in this process, timing every call.
+#
+#   put     the $n inserts that build it
+#   churn   100,000 times: remove a random key, add a new one (one call
+#           each, so one timed call is a delete and a put)
+#   range   a range of about 50 entries
+#   cut     a range of about 1,000 entries, which is then put back
+#           (untimed) so that the map stays the same size
+#   free     the one call that lets go of the whole map
+#
+# a hash has to sort every key for a range, so it is given far fewer
+# calls: they are as slow as that.
+
+sub work( $name, $n )
+{
+    my $map     = $impl{ $name }->();
+    my @key     = keys_for( $n );
+    my @spare   = keys_for( 100_000 );
+
+    my @live    = @key;
+
+    my( $ranges, $cuts )
+    = ( $name eq 'hash' )
+    ? ( 10, 5 )
+    : ( 2_000, 200 )
+    ;
+
+    my @out;
+
+    push @out, summary sample( $n, sub( $i ) { $map->put( $key[ $i ], $i ) } );
+
+    # churn: out with a random live key, in with a spare one.
+
+    push @out, summary sample
+    (
+        scalar @spare
+      , sub( $i )
+        {
+            my $at          = int rand @live;
+            my $gone        = $live[ $at ];
+
+            $live[ $at ]    = $spare[ $i ];
+
+            $map->delete( $gone );
+            $map->put( $spare[ $i ], $i );
+        }
+    );
+
+    my $dense   = 1e9 / $n;
+
+    push @out, summary sample
+    (
+        $ranges
+      , sub( $i )
+        {
+            my $lo  = int rand( 1e9 - 50 * $dense );
+
+            $map->range( $lo, $lo + 50 * $dense );
+        }
+    );
+
+    # the cut alone is timed. the entries are put back afterwards.
+
+    my @took;
+
+    $#took  = $cuts - 1;
+
+    for my $i ( 0 .. $cuts - 1 )
+    {
+        my $lo  = int rand( 1e9 - 1_000 * $dense );
+
+        my $t0  = tick();
+        my $got = $map->cut( $lo, $lo + 1_000 * $dense );
+
+        $took[ $i ] = tick() - $t0;
+
+        $map->put( $_->@* ) for @$got;
+    }
+
+    push @out, summary \@took;
+
+    push @out, summary sample( 1, sub { undef $map } );
+
+    map { flat $_ } @out
+}
+
+# run $name at $n in a child $runs times, and print the median run of
+# each series with the spread of the maxima.
+
+sub case( $name, $n )
+{
+    my @run = map { [ in_child( sub { work( $name, $n ) } ) ] } 1 .. $runs;
+
+    for my $s ( 0 .. $#series )
+    {
+        my @part
+        = sort { $a->{ max } <=> $b->{ max } }
+          map  { unflat( $_->@[ $s * @key .. $s * @key + $#key ] ) }
+          @run;
+
+        say row( "$name $series[ $s ]", $part[ $#part / 2 ] )
+        . sprintf '   worst of %d: %.0f .. %.0f'
+        =>  $runs, $part[ 0 ]{ max }, $part[ -1 ]{ max };
+    }
+}
+
+########################################################################
+# run
+########################################################################
+
+header( 'Floor: the timing loop around an empty call (what no row can beat); clock: ' . clock_name() );
+
+say row( 'empty call', clock_floor() );
+
+for my $n ( @size )
+{
+    $only eq '' || $n =~ m{ $only }x
+    or next;
+
+    header( "Latency at $n entries (microseconds per call; max_at is the call number of the slowest)" );
+
+    case( $_, $n ) for @impl;
+}
+
+__END__

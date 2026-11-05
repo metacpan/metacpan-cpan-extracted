@@ -94,7 +94,10 @@
 	<code>sql</code>, <code>sqlite</code>, <code>sqlite3</code>, <code>db</code>,
 	<code>xml</code>, <code>xlsx</code> and JSON. A file whose columns cannot be
 	identified is read as header-less and given synthetic column names rather
-	than silently losing its first row.
+	than silently losing its first row. Nor are rows lost when a column is
+	mostly empty: a bank export whose cheque-number column is filled in only
+	now and then still shows every transaction, and a filter such as
+	<em>is not empty</em> on that column picks out the cheques.
 </p>
 <p id="mariadb">
 	A <strong>MariaDB or MySQL server</strong> is opened by name. Add it to
@@ -164,7 +167,10 @@
 	<dd>
 		<code>eq</code>, <code>ne</code>, <code>contains</code>,
 		<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
-		<code>ge</code>, <code>empty</code>, <code>notempty</code>. String
+		<code>ge</code>, <code>empty</code>, <code>notempty</code>, and
+		<code>in</code>, any value of a JSON list
+		(<code>f=place:in:["Paris","Rome"]</code>), which a map uses to link to
+		the rows it could not plot. String
 		comparisons are case-insensitive. The four order operators compare numbers,
 		reading <code>$1,234.56</code> and <code>(1,234.56)</code> as numbers too; a
 		blank or a word in the cell matches none of them.

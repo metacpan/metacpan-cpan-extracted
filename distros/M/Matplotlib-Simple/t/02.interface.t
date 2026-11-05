@@ -8,17 +8,23 @@ use File::Spec;
 use Capture::Tiny 'capture';
 use Test::Exception;                 # lives_ok
 use Matplotlib::Simple;
+# The interpreter the module itself runs: "python3", or on MSWin32 the first of
+# python, py -3 and python3 that is Python 3. Asking the module, rather than
+# naming python3 here, is what lets a Windows smoker that has Python test the
+# module with it instead of skipping; the list is empty when there is none.
+my @PY = Matplotlib::Simple::Matplotlib::python_command();
+my $PY = join ' ', @PY;
 use Test::More;
 #
 # Dependency discovery (python3 is needed for the SVG well-formedness check and
 # for the render layer; matplotlib only for the render layer).
 # 
-my $python_version_raw = qx/python3 --version 2>&1/;
+my $python_version_raw = ( scalar @PY ? do { no warnings 'exec'; qx/$PY --version 2>&1/ } // '' : '' );    # 'exec': see t/16.creator.t
 my $python_available = ( $? == 0 && $python_version_raw =~ m/Python\s+3\.\d+/i ) ? 1 : 0;
 my $mpl_available = 0;
 my $mpl_version   = '';
 if ($python_available) {
-	my $raw = qx/python3 -c "import matplotlib; print(matplotlib.__version__)" 2>&1/;
+	my $raw = qx/$PY -c "import matplotlib; print(matplotlib.__version__)" 2>&1/;
 	if ( $? == 0 && $raw =~ m/^\s*(\d+)\.(\d+)\.\d+/ ) {
 		# the module documents a 3.10+ requirement; render only when satisfied
 		$mpl_available = ( $1 > 3 || ( $1 == 3 && $2 >= 10 ) ) ? 1 : 0;
@@ -28,10 +34,10 @@ if ($python_available) {
 # matplotlib_venn is an optional dependency, needed only by venn_proportional_area
 my $venn_available = 0;
 if ($python_available) {
-	qx/python3 -c "import matplotlib_venn" 2>&1/;
+	qx/$PY -c "import matplotlib_venn" 2>&1/;
 	$venn_available = ( $? == 0 ) ? 1 : 0;
 }
-diag( $python_available ? "python3: $python_version_raw" : 'python3 not found' );
+diag( $python_available ? "$PY: $python_version_raw" : 'no Python 3 interpreter found' );
 diag( $mpl_available ? "matplotlib: $mpl_version (render layer ON)"
 	: 'matplotlib >= 3.10 not found (render layer SKIPPED)' );
 diag( $venn_available ? 'matplotlib_venn: found'
@@ -53,7 +59,7 @@ sub slurp {
 }
 
 # Build a figure with "p" but DON'T run python (execute => 0). "show => 1"
-# satisfies plt()'s "need output.file or show" guard without touching the
+# satisfies plt()'s "need output_file or show" guard without touching the
 # output-file machinery, so these structural checks are pure and offline.
 # Returns the generated python source text.
 sub build_py {
@@ -76,7 +82,7 @@ sub count_matches {
 # A minimal, valid single-plot spec (hist needs numeric data only).
 sub H {
 	my ( $key, @vals ) = @_;
-	return { 'plot.type' => 'hist', data => { $key => [@vals] } };
+	return { plot_type => 'hist', data => { $key => [@vals] } };
 }
 
 # ----------------------------------------------------------------------------
@@ -107,9 +113,9 @@ sub H {
 	my $py;
 	lives_ok {
 		$py = build_py(
-			{ 'plot.type' => 'hist', data => { A => [1,2,3] }, title => 'single' },
+			{ plot_type => 'hist', data => { A => [1,2,3] }, title => 'single' },
 			[ H('B',1,2), H('C',3,4) ],                      # overlaid in ONE subplot
-			{ 'plot.type' => 'hist', data => { D => [5,6] }, title => 'third' },
+			{ plot_type => 'hist', data => { D => [5,6] }, title => 'third' },
 		);
 	} 'mixed p: hash + array-of-hashes + hash builds without dying';
 
@@ -192,8 +198,8 @@ throws_msg_like { plt({ p => [ [ 42 ] ],        show => 1 }) }
 	qr/every plot must be a HASH/,         'non-hash inside an inner array dies';
 throws_msg_like { plt({ p => [ H('A',1) ], data => { X => [1] },     show => 1 }) }
 	qr/cannot be combined with/,           '"data" combined with "p" dies';
-throws_msg_like { plt({ p => [ H('A',1) ], 'plot.type' => 'hist',    show => 1 }) }
-	qr/cannot be combined with/,           '"plot.type" combined with "p" dies';
+throws_msg_like { plt({ p => [ H('A',1) ], plot_type => 'hist',    show => 1 }) }
+	qr/cannot be combined with/,           '"plot_type" combined with "p" dies';
 throws_msg_like { plt({ p => [ H('A',1) ], plots => [ H('A',1) ],    show => 1 }) }
 	qr/cannot be combined with/,           '"plots" combined with "p" dies';
 throws_msg_like { plt({ p => [ H('A',1) ], add => [ H('A',1) ],      show => 1 }) }
@@ -220,7 +226,7 @@ SKIP: {
 					[ H('B',1,1,2,2,3), H('C',2,3,3,4,4,5) ],   # overlay -> one subplot
 					H('D',5,5,6,6,6,7),
 				],
-				'output.file' => $svg,
+				output_file => $svg,
 				execute       => 1,
 			});
 		};

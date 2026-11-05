@@ -21,7 +21,7 @@ use warnings;
 use Config;
 use Time::HiRes;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 =head1 METHODS
 
@@ -55,6 +55,8 @@ sub new {
 
 sub _shuffle_seed {
 	my $class = shift;
+	
+	srand();
 	
 	return rand() * ((join '.', reverse Time::HiRes::gettimeofday) . $$);
 }
@@ -128,7 +130,7 @@ sub rand {
 
 =head1 VERSION
 
-0.95
+0.96
 
 =head1 AUTHOR
 

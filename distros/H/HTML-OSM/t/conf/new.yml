@@ -44,3 +44,23 @@ input:
   search:
     type: boolean
     optional: true
+  scale:
+    type: boolean
+    optional: true
+  legend_title:
+    type: string
+    optional: true
+  legend_empty:
+    type: string
+    optional: true
+  fit:
+    type: boolean
+    optional: true
+  legend_position:
+    type: string
+    enum:
+      - topright
+      - topleft
+      - bottomright
+      - bottomleft
+    optional: true

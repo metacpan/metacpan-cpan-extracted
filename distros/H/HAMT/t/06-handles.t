@@ -131,4 +131,42 @@ SKIP: {
     is($shared->count, 100, 'the parent\'s map is intact after the thread has gone');
 }
 
+# A subclass that lets itself be cloned. The clone carries the magic, the
+# dup hook has emptied it, so every method refuses it by name and freeing it
+# at the thread's end frees nothing twice.
+SKIP: {
+    skip 'this perl has no ithreads', 8 unless $Config{useithreads};
+    skip 'threads.pm does not load', 8 unless eval { require threads; 1 };
+    require HAMT::Set;
+    require HAMT::Vector;
+    { package HAMT::Test::ClonedMap;    our @ISA = ('HAMT::Map');                sub CLONE_SKIP { 0 } }
+    { package HAMT::Test::ClonedSet;    our @ISA = ('HAMT::Set');                sub CLONE_SKIP { 0 } }
+    { package HAMT::Test::ClonedVector; our @ISA = ('HAMT::Vector');             sub CLONE_SKIP { 0 } }
+    { package HAMT::Test::ClonedMapTxn; our @ISA = ('HAMT::Map::Transient');     sub CLONE_SKIP { 0 } }
+    { package HAMT::Test::ClonedVecTxn; our @ISA = ('HAMT::Vector::Transient');  sub CLONE_SKIP { 0 } }
+
+    my $map = HAMT::Test::ClonedMap->new(a => 1);
+    my $set = HAMT::Test::ClonedSet->new('a');
+    my $vec = HAMT::Test::ClonedVector->new(1);
+    my $mt  = bless $map->transient, 'HAMT::Test::ClonedMapTxn';
+    my $vt  = bless $vec->transient, 'HAMT::Test::ClonedVecTxn';
+    my @refused = threads->create({ context => 'list' }, sub {
+        my @e;
+        for my $try ([map => sub { $map->count }], [set => sub { $set->count }],
+                     [vector => sub { $vec->count }], ['map transient' => sub { $mt->count }],
+                     ['vector transient' => sub { $vt->count }]) {
+            push @e, eval { $try->[1]->(); "$try->[0]: answered" } // "$try->[0]: $@";
+        }
+        return @e;
+    })->join;
+    is(scalar @refused, 5, 'the new thread tried every cloned handle');
+    like($refused[0], qr/^map: HAMT::Map::count: this map belongs to another thread/, 'a cloned map is refused by name');
+    like($refused[1], qr/^set: HAMT::Set::count: this set belongs to another thread/, 'a cloned set too');
+    like($refused[2], qr/^vector: HAMT::Vector::count: this vector belongs to another thread/, 'a cloned vector too');
+    like($refused[3], qr/^map transient: .*this transient belongs to another thread/, 'a cloned map transient too');
+    like($refused[4], qr/^vector transient: .*this transient belongs to another thread/, 'a cloned vector transient too');
+    is($map->count, 1, 'and the parent still has its map');
+    is($vt->count, 1, 'and its transients');
+}
+
 done_testing;

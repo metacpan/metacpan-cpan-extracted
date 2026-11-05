@@ -1,21 +1,30 @@
 ---
-abstract: unknown
+abstract: 'management front end to fork()'
 author:
-  - unknown
+  - 'Colin Faber <cfaber@fpsn.net>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Proc-Fork-Control
 no_index:
   directory:
     - t
     - inc
-requires: {}
-version: 1.6
+requires:
+  POSIX: '0'
+  Time::HiRes: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/cfaber/Proc-Fork-Control/issues
+  repository: https://github.com/cfaber/Proc-Fork-Control.git
+version: '1.7'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,75 @@
+#!/bin/bash
+########################################################################
+# generate the tiers whose subjects are discovered, not listed:
+#
+#   t/00-syntax/   one test per perl file (*.pm and scripts) in the examples
+#   t/00-pod/      one test per POD.pm (the documentation modules)
+#
+# each test is a symlink to the template of the tier; the basename of the
+# symlink is the path of the subject with '/' replaced by '~'. rerun this
+# after adding or removing a file. the hand-written tests are in t/NN/
+# for example NN and are not touched.
+########################################################################
+
+base0=$( basename $0 );
+dir0=$( dirname $0 );
+
+fatal()
+{
+    echo "Fatal $base0: $*";
+    exit 1;
+}
+
+typeset -rx  bin_d=$( cd $dir0; pwd -L );
+typeset -rx test_d=$( dirname $bin_d );
+typeset -rx root_d=$( dirname $test_d );
+
+# the subjects: anything under an example's directory, shared lib
+# included, that is not a test or a scratch tree. scripts have no
+# extension, so they are found by what file(1) says they are.
+
+find-subjects()
+{
+    find $root_d \
+        \( -name t -o -path $root_d/Single -o -path $root_d/blib -o -path $root_d/plan -o -path $root_d/version -o -name .git \) -prune \
+        -o -type f -name "$1" -print;
+}
+
+find-perly()
+{
+    find-subjects '*.pm';
+
+    find-subjects '*'                       |
+    grep -vE '\.(pm|pod|PL)$|/MANIFEST'    |
+    xargs file                              |
+    grep -E ':\s+(Perl script|.*env perl)'  |
+    cut -d ':' -f1;
+}
+
+find-pod()
+{
+    find-subjects 'POD.pm';
+}
+
+install-tier()
+{
+    tier=${1:?Bogus install-tier: false tier};
+    name=${2:?Bogus install-tier: false name pattern};
+    rel=../bin/${tier}_t;
+
+    [[ -e $bin_d/${tier}_t ]]   || fatal "Non-existant: ${tier}_t";
+
+    rm -rf  $test_d/$tier       || fatal "Failed cleanup $tier";
+    mkdir   $test_d/$tier       || fatal "Failed mkdir $tier";
+
+    for i in $( $name | sort )
+    do
+        j=$( echo "$i" | tr '/' '~' ).t;
+        ln -fs $rel $test_d/$tier/$j    || fatal "Failed symlink $j";
+    done
+}
+
+install-tier 00-syntax  find-perly;
+install-tier 00-pod     find-pod;
+
+exit 0;

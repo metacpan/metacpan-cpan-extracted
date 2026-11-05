@@ -1,0 +1,10 @@
+#!include_default
+
+# Release tarballs and MakeMaker leftovers
+\.tar\.gz$
+^MYMETA\.
+^patch$
+,bk$
+,new$
+~$
+^cover_db/

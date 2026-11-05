@@ -57,7 +57,7 @@
          "url" : "git://github.com/sparky/perl-Net-Curl.git"
       }
    },
-   "version" : "0.59",
+   "version" : "0.60",
    "x_contributors" : [
       "Bálint Szilakszi",
       "David Geiger",
@@ -77,7 +77,9 @@
       "Yuni Kim",
       "Todd Rinaldo",
       "C.J. Collier",
-      "Chris Novakovic"
+      "Chris Novakovic",
+      "Ysincit",
+      "Funda Wang"
    ],
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -24,11 +24,11 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 # CDN URLs pinned to tested versions.  Override via constructor params to use
 # a self-hosted copy or a different version.
@@ -68,6 +68,14 @@ Readonly::Scalar my $MAX_ZOOM_LIMIT => 28;
 Readonly::Scalar my $DEFAULT_CIRCLE_RADIUS => 8;
 Readonly::Scalar my $DEFAULT_CIRCLE_COLOUR => '#3388ff';
 Readonly::Scalar my $HEX_COLOUR            => qr/\A#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\z/;
+
+# The key (legend): the corners Leaflet puts a control in, where it goes by
+# default, what it says when nothing it lists is in view, and the largest
+# swatch it draws for an entry with a radius, in pixels
+Readonly::Array  my @LEGEND_POSITIONS        => qw(topright topleft bottomright bottomleft);
+Readonly::Scalar my $DEFAULT_LEGEND_POSITION => 'topright';
+Readonly::Scalar my $DEFAULT_LEGEND_EMPTY    => 'Nothing in this view';
+Readonly::Scalar my $LEGEND_SWATCH_MAX       => 25;
 
 =head1 SYNOPSIS
 
@@ -130,6 +138,18 @@ types to Nominatim, and a button that clears the markers it adds.  Set
 C<< search => 0 >> to leave both out, so that nothing typed on the page leaves
 the reader's machine.  The "Reset Map" button is always included.
 
+=item * Fitting the markers
+
+By default the map opens at C<zoom> (12) around the middle of the markers,
+which can leave them all out of view.  C<< fit => 1 >> opens it on every
+pin and circle marker instead, zooming in no further than C<zoom>, and the
+"Reset Map" button returns there.  A centre set with C<center()> wins.
+
+=item * Scale and key
+
+C<< scale => 1 >> adds a scale bar, and C<legend> a key that lists only what
+is in view.  Both change as the reader zooms; see L</Scale and key>.
+
 =back
 
 =head1 DESCRIPTION
@@ -147,6 +167,64 @@ spaced out with C<min_interval>.
 C<onload_render()> returns two HTML fragments: one for the page's
 C<< <head> >> and one for its C<< <body> >>.  The interface follows
 L<HTML::GoogleMaps::V3>, so code written for that module needs few changes.
+
+=head2 Scale and key
+
+    my $map = HTML::OSM->new(
+        scale        => 1,
+        legend_title => 'Country',
+        legend       => [
+            { label => 'England', colour => '#e41a1c', group => 'en' },
+            { label => 'France',  colour => '#377eb8', group => 'fr' },
+            { label => '100 people', colour => '#888888', radius => 14 },
+        ],
+    );
+    $map->add_marker([51.5074, -0.1278], html => 'London', group => 'en');
+    $map->add_circle_marker([48.8566, 2.3522], html => 'Paris', group => 'fr',
+        colour => '#377eb8');
+
+C<< scale => 1 >> adds Leaflet's scale bar, in kilometres and miles, to the
+bottom left corner.  It is redrawn whenever the map moves or zooms.  The
+default is no scale bar.
+
+C<legend> draws a key in a corner of the map: C<legend_position> is
+C<topright> (the default), C<topleft>, C<bottomright> or C<bottomleft>.
+C<legend_title> is printed above the entries.  Each entry is a hashref:
+
+=over 4
+
+=item C<label>
+
+The text, required.  It is written as text, never as HTML.
+
+=item C<colour>
+
+A hex colour, C<#rgb> or C<#rrggbb>, for the round swatch.  The default is
+C<#3388ff>, Leaflet's own blue.
+
+=item C<radius>
+
+The swatch's radius in pixels, for a key to the sizes of circle markers.
+Without it the swatch is 12 pixels across.  A large radius is drawn at
+most 50 pixels across.
+
+=item C<group>
+
+The entry is listed only while a marker given the same C<group> (through
+C<add_marker> or C<add_circle_marker>) is inside the map's view.  Each time
+the reader pans or zooms, the key is drawn again, so it shows only the
+entries for what can be seen.  A marker hidden in a cluster still counts.
+An entry without a group is always listed.
+
+=back
+
+When no entry is listed, the key says C<legend_empty>, by default
+"Nothing in this view".
+
+C<new()> croaks on an entry it cannot use, and on an unknown position.
+Values from a config file or a clone skip that check, so C<onload_render()>
+checks them again.  It leaves out a bad entry and uses C<topright> for a bad
+position, with a warning.
 
 =head1 SUBROUTINES/METHODS
 
@@ -176,15 +254,21 @@ merging C<%overrides> onto the existing object's state without re-validating.
     coordinates             => { type => arrayref,                  optional },
     css_url                 => { type => string,                    optional },
     email                   => { type => string,                    optional },
+    fit                     => { type => boolean,                   optional },
     geocoder                => { type => object, can => geocode,    optional },
     gpx_js_url              => { type => string,                    optional },
     heatmap_js_url          => { type => string,                    optional },
     height                  => { type => string,                    optional },
     host                    => { type => string,                    optional },
     js_url                  => { type => string,                    optional },
+    legend                  => { type => arrayref,                  optional },
+    legend_empty            => { type => string,                    optional },
+    legend_position         => { type => string, enum => [topright, topleft, bottomright, bottomleft], optional },
+    legend_title            => { type => string,                    optional },
     logger                  => { type => object,                    optional },
     max_zoom                => { type => integer, min => 0, max => 28, optional },
     min_interval            => { type => number,  min => 0,         optional },
+    scale                   => { type => boolean,                   optional },
     search                  => { type => boolean,                   optional },
     tile_attribution        => { type => string,                    optional },
     tile_url                => { type => string,                    optional },
@@ -202,6 +286,8 @@ merging C<%overrides> onto the existing object's state without re-validating.
   | Message                                        | Meaning / Resolution                          |
   |------------------------------------------------|-----------------------------------------------|
   | (validation error from Params::Validate::Strict) | A param has the wrong type or is out of range |
+  | new(): invalid legend_position: VALUE          | Not one of topright, topleft, bottomright, bottomleft |
+  | new(): legend entry N: ...                     | An entry of legend is unusable; see L</Scale and key> |
 
 =head3 PSEUDOCODE
 
@@ -249,15 +335,21 @@ sub new
 			coordinates             => { type => 'arrayref',                       optional => 1 },
 			css_url                 => { type => 'string',                         optional => 1 },
 			email                   => { type => 'string',                         optional => 1 },
+			fit                     => { type => 'boolean',                        optional => 1 },
 			geocoder                => { type => 'object',  can => 'geocode',      optional => 1 },
 			gpx_js_url              => { type => 'string',                         optional => 1 },
 			heatmap_js_url          => { type => 'string',                         optional => 1 },
 			height                  => { type => 'string',                         optional => 1 },
 			host                    => { type => 'string',                         optional => 1 },
 			js_url                  => { type => 'string',                         optional => 1 },
+			legend                  => { type => 'arrayref',                       optional => 1 },
+			legend_empty            => { type => 'string',                         optional => 1 },
+			legend_position         => { type => 'string',                         optional => 1 },
+			legend_title            => { type => 'string',                         optional => 1 },
 			logger                  => { type => 'object',                         optional => 1 },
 			max_zoom                => { type => 'integer', min => $ZOOM_MIN, max => $MAX_ZOOM_LIMIT, optional => 1 },
 			min_interval            => { type => 'number',  min => 0,              optional => 1 },
+			scale                   => { type => 'boolean',                        optional => 1 },
 			search                  => { type => 'boolean',                        optional => 1 },
 			tile_attribution        => { type => 'string',                         optional => 1 },
 			tile_url                => { type => 'string',                         optional => 1 },
@@ -266,6 +358,15 @@ sub new
 			zoom                    => { type => 'integer', min => $ZOOM_MIN, max => $ZOOM_MAX, optional => 1 },
 		},
 	});
+
+	# The key is checked here so a mistake is reported where it was made;
+	# onload_render() checks it again, for values from a config file or a clone
+	if(defined(my $position = $params->{'legend_position'})) {
+		unless(grep { $_ eq $position } @LEGEND_POSITIONS) {
+			croak "new(): invalid legend_position: $position";
+		}
+	}
+	_legend_entries($params->{'legend'}, 'new()') if defined($params->{'legend'});
 
 	# Config file values override programmatic defaults (separation of config and code).
 	$params = Object::Configure::configure($class, $params);
@@ -288,6 +389,10 @@ sub new
 		last_request            => 0,
 		cluster                 => 0,
 		search                  => 1,
+		scale                   => 0,
+		fit                     => 0,
+		legend_position         => $DEFAULT_LEGEND_POSITION,
+		legend_empty            => $DEFAULT_LEGEND_EMPTY,
 		css_url                 => $LEAFLET_CSS_URL,
 		js_url                  => $LEAFLET_JS_URL,
 		cluster_js_url          => $CLUSTER_JS_URL,
@@ -320,6 +425,7 @@ also returns 0.
   point : arrayref [lat, lon] | string address | object with latitude()/longitude()
   html  : string   (optional popup label)
   icon  : string   (optional icon URL)
+  group : string   (optional; the key entry this marker belongs to, see L</Scale and key>)
 
 =head4 OUTPUT
 
@@ -330,6 +436,7 @@ also returns 0.
   | Message                                 | Meaning / Resolution                        |
   |-----------------------------------------|---------------------------------------------|
   | add_marker(): unknown point type: TYPE | Point is a ref type with no lat/lon methods |
+  | add_marker(): group must be a string    | group is a reference                        |
   | Skipping invalid coordinate: (LAT, LON) | Warning: the point is not numeric or is out of range; 0 is returned |
 
 =head3 EXAMPLES
@@ -364,9 +471,11 @@ sub add_marker
 	my $self = shift;
 
 	my ($lat, $lon, $params) = $self->_point_args('add_marker', @_);
+	my $group = $self->_group_arg('add_marker', $params);
 	return 0 unless defined($lat);
 
-	push @{$self->{coordinates}}, [$lat, $lon, $params->{'html'}, $params->{'icon'}];
+	# The group is stored only when given, so a marker without one keeps its old shape
+	push @{$self->{coordinates}}, [$lat, $lon, $params->{'html'}, $params->{'icon'}, (defined($group) ? $group : ())];
 	return 1;
 }
 
@@ -396,6 +505,7 @@ Returns 1 on success, 0 if the point cannot be resolved or is out of range.
   html   : string   (optional popup label)
   radius : number > 0 and < 1e6   (optional, default 8)
   colour : string   hex #rrggbb or #rgb, any case   (optional, default '#3388ff')
+  group  : string   (optional; the key entry this circle belongs to, see L</Scale and key>)
 
 =head4 OUTPUT
 
@@ -408,6 +518,7 @@ Returns 1 on success, 0 if the point cannot be resolved or is out of range.
   | add_circle_marker(): radius must be a positive number | radius is 0, negative, 1e6 or more, or not a plain number |
   | add_circle_marker(): invalid colour: VALUE          | colour is not a #rgb or #rrggbb hex string  |
   | add_circle_marker(): unknown point type: TYPE       | Point is a ref type with no lat/lon methods |
+  | add_circle_marker(): group must be a string         | group is a reference                        |
   | Skipping invalid coordinate: (LAT, LON)             | Warning: the point is not numeric or is out of range; 0 is returned |
 
 =head3 EXAMPLES
@@ -448,9 +559,11 @@ sub add_circle_marker
 		croak $msg;
 	}
 
+	my $group = $self->_group_arg('add_circle_marker', $params);
+
 	return 0 unless defined($lat);
 
-	push @{$self->{circle_markers}}, [$lat, $lon, $params->{'html'}, $checked, lc($colour)];
+	push @{$self->{circle_markers}}, [$lat, $lon, $params->{'html'}, $checked, lc($colour), (defined($group) ? $group : ())];
 	return 1;
 }
 
@@ -879,7 +992,12 @@ Left out when C<< search => 0 >>.
 leaving static markers (added via C<add_marker>) intact.
 Left out when C<< search => 0 >>.
 
-=item * A "Reset Map" button that returns the view to the initial centre and zoom.
+=item * A "Reset Map" button that returns the view to the initial centre and zoom,
+or to every marker when C<< fit => 1 >>.
+
+=item * A scale bar, when C<< scale => 1 >>.
+
+=item * A key, when C<legend> has entries, that lists only the groups in view.
 
 =back
 
@@ -911,6 +1029,9 @@ replacement gives a warning.
   | onload_render: invalid max_zoom 'Z', ignoring it | Warning: max_zoom from a config file or clone is not an integer from 0 to 28 |
   | onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |
   | onload_render: invalid height 'H', using 400px   | Warning: height is not a CSS length |
+  | onload_render: invalid legend_position 'P', using topright | Warning: legend_position from a config file or clone is not a corner |
+  | onload_render: legend entry N: ...; leaving it out of the key | Warning: a legend entry from a config file or clone is unusable |
+  | onload_render: legend must be an arrayref; leaving it out of the key | Warning: legend from a config file or clone is not an arrayref; no key is drawn |
   | _fetch_coordinates: failed to decode Nominatim response: ERROR | Warning: Nominatim returned something that is not JSON; the marker is skipped |
   | _fetch_coordinates: unrecognised geocoder result type: TYPE | Warning: the injected geocoder returned an unknown type; the marker is skipped |
 
@@ -944,7 +1065,8 @@ replacement gives a warning.
      Check circle markers the same way.
      Re-check zoom, max_zoom, width and height; fall back with a warning.
   3. Determine map centre: caller-supplied > computed midpoint of the bounds
-     of the pin and circle markers.
+     of the pin and circle markers.  With fit and no caller centre, also
+     fit the view to those bounds, at most at zoom, on load and on reset.
      Croak if neither is available.
   4. Build <head>: Leaflet CSS + JS; inject cluster/heatmap/GPX plugin assets
      only when the corresponding layer type is present.
@@ -953,7 +1075,9 @@ replacement gives a warning.
   6. Initialise Leaflet map, tile layer (with maxZoom when max_zoom is set),
      and the searchMarkers array when search is on.
   7. Emit JS for each pin and circle marker (via one clusterGroup when
-     cluster is set).
+     cluster is set), then the scale bar when scale is set, then the key
+     when legend has entries: its entries, the groups and where each
+     grouped marker is, redrawn on every moveend.
   8. Emit JS for each GeoJSON, heatmap, GPX, and choropleth layer.
   9. Attach event listeners: reset-view, and when search is on,
      clear-search-markers and search-on-Enter.
@@ -992,7 +1116,7 @@ sub onload_render
 	# Geocode address strings; validate and discard bad numeric pairs.
 	my @valid_coordinates;
 	for my $coord (@$coordinates) {
-		my ($lat, $lon, $label, $icon_url) = @$coord;
+		my ($lat, $lon, $label, $icon_url, $group) = @$coord;
 		if(!defined $lat || !defined $lon) {
 			# No coordinates and no address: nothing to look up
 			next unless defined($label) && length($label);
@@ -1004,19 +1128,19 @@ sub onload_render
 		next unless defined($lat) && defined($lon);
 		($lat, $lon) = (_num_str($lat), _num_str($lon));
 		next unless _validate($lat, $lon);
-		push @valid_coordinates, [$lat, $lon, $label, $icon_url];
+		push @valid_coordinates, [$lat, $lon, $label, $icon_url, _group_value($group)];
 	}
 
 	# add_circle_marker checked these, but a clone can bring in anything
 	my @valid_circles;
 	for my $circle (@$circle_markers) {
-		my ($lat, $lon, $label, $radius, $colour) = @$circle;
+		my ($lat, $lon, $label, $radius, $colour, $group) = @$circle;
 		next unless defined($lat) && defined($lon);
 		($lat, $lon) = (_num_str($lat), _num_str($lon));
 		next unless _validate($lat, $lon);
 		$radius = _positive_number($radius, $DEFAULT_CIRCLE_RADIUS);
 		$colour = $DEFAULT_CIRCLE_COLOUR unless defined($colour) && !ref($colour) && $colour =~ $HEX_COLOUR;
-		push @valid_circles, [$lat, $lon, $label, $radius, lc($colour)];
+		push @valid_circles, [$lat, $lon, $label, $radius, lc($colour), _group_value($group)];
 	}
 
 	# Only an integer in Leaflet's range is put into the tile layer options
@@ -1030,6 +1154,22 @@ sub onload_render
 	# A config file can give the words 'false', 'no' or 'off'
 	my $search = $self->{'search'};
 	$search = 0 if defined($search) && $search =~ /\A(?:false|no|off)\z/i;
+
+	# The scale bar and the key, checked again like the rest
+	my $scale = $self->{'scale'};
+	$scale = 0 if defined($scale) && $scale =~ /\A(?:false|no|off)\z/i;
+	my @legend = defined($self->{'legend'}) ? _legend_entries($self->{'legend'}) : ();
+	my $legend_position = $self->{'legend_position'} // $DEFAULT_LEGEND_POSITION;
+	unless(!ref($legend_position) && grep { $_ eq $legend_position } @LEGEND_POSITIONS) {
+		carp "onload_render: invalid legend_position '$legend_position', using $DEFAULT_LEGEND_POSITION";
+		$legend_position = $DEFAULT_LEGEND_POSITION;
+	}
+
+	# fit => 1 opens the map on every marker rather than at zoom around their
+	# midpoint; a centre the caller set wins over it
+	my $fit = $self->{'fit'};
+	$fit = 0 if defined($fit) && $fit =~ /\A(?:false|no|off)\z/i;
+	my $fit_js;
 
 	# Determine map centre: caller-set wins; else compute from marker bounds.
 	my ($center_lat, $center_lon);
@@ -1047,6 +1187,12 @@ sub onload_render
 		}
 		$center_lat = ($min_lat + $max_lat) / 2;
 		$center_lon = ($min_lon + $max_lon) / 2;
+		# The zoom is the most it may zoom in, so one marker is not shown
+		# at street level
+		if($fit) {
+			my ($south, $west, $north, $east) = map { _num_str($_) } ($min_lat, $min_lon, $max_lat, $max_lon);
+			$fit_js = "map.fitBounds([[$south, $west], [$north, $east]], { padding: [30, 30], maxZoom: $zoom });";
+		}
 	} else {
 		croak 'center() must be called when no point markers are provided';
 	}
@@ -1106,6 +1252,7 @@ sub onload_render
 				attribution: '$tile_attribution'$max_zoom_js
 			}).addTo(map);
 	};
+	$body .= "\t\t\t$fit_js\n" if $fit_js;
 	$body .= "\n\t\t\tvar searchMarkers = [];\n" if $search;
 
 	# Point and circle markers — optionally grouped into one cluster layer.
@@ -1150,6 +1297,18 @@ sub onload_render
 	}
 
 	$body .= "\t\t\tmap.addLayer(clusterGroup);\n" if $clustered;
+
+	# Leaflet's scale bar redraws itself as the map moves and zooms
+	$body .= "\t\t\tL.control.scale().addTo(map);\n" if $scale;
+
+	# The key lists what is in view, so it needs where each grouped marker is
+	if(@legend) {
+		my @points = (
+			(map { [ @{$_}[0, 1, 4] ] } @valid_coordinates),
+			(map { [ @{$_}[0, 1, 5] ] } @valid_circles),
+		);
+		$body .= $self->_legend_js(\@legend, $legend_position, \@points);
+	}
 
 	# GeoJSON layers.
 	for my $layer (@$geojson_layers) {
@@ -1214,7 +1373,7 @@ sub onload_render
 	# Event handlers.
 	$body .= qq{
 			document.getElementById('reset-button').addEventListener('click', function() {
-				map.setView([$center_lat, $center_lon], $zoom);
+				${\ ($fit_js // "map.setView([$center_lat, $center_lon], $zoom);") }
 			});
 	};
 
@@ -1310,6 +1469,189 @@ sub _point_args
 	return (undef, undef, $params) unless _validate($lat, $lon);
 
 	return ($lat, $lon, $params);
+}
+
+# _group_arg: Read a marker method's group option.
+# Purpose: add_marker and add_circle_marker both take group, the name of the
+#          key entry a marker belongs to.
+# Entry:   $self, $caller (method name for messages), \%params.
+# Exit:    The group as a string, or undef when none was given.
+# Side Effects: Croaks (and logs) when group is a reference.
+sub _group_arg
+{
+	my ($self, $caller, $params) = @_;
+
+	my $group = $params->{'group'};
+	return undef unless defined($group);
+	if(ref($group)) {
+		my $msg = "$caller(): group must be a string";
+		$self->{logger}->error($msg) if $self->{logger};
+		croak $msg;
+	}
+	return "$group";
+}
+
+# _group_value: A stored marker's group, as onload_render() embeds it.
+# Purpose: A clone can bring in anything, so a group that is not a plain
+#          value is dropped rather than embedded.
+# Entry:   Any scalar.
+# Exit:    A string, or undef.
+sub _group_value
+{
+	my $group = shift;
+
+	return (defined($group) && !ref($group)) ? "$group" : undef;
+}
+
+# _legend_entries: Check the entries of the key.
+# Purpose: new() reports a bad entry where it was made; onload_render() sees
+#          values from a config file or a clone too, so it skips them instead.
+# Entry:   $entries (the legend option); $caller, given only by new(), makes
+#          a bad entry croak.
+# Exit:    A list of hashrefs { label, colour, radius?, group? }, colour a
+#          lower-case hex string and radius from _positive_number.
+# Side Effects: Croaks when $caller is given, else carps, for each bad entry.
+sub _legend_entries
+{
+	my ($entries, $caller) = @_;
+
+	my $fail = sub {
+		my $msg = shift;
+		croak "$caller: $msg" if defined($caller);
+		carp "onload_render: $msg; leaving it out of the key";
+		return;
+	};
+
+	if(ref($entries) ne 'ARRAY') {
+		$fail->('legend must be an arrayref');
+		return ();
+	}
+
+	my @checked;
+	for my $n (1 .. scalar(@{$entries})) {
+		my $entry = $entries->[$n - 1];
+		if(ref($entry) ne 'HASH') {
+			$fail->("legend entry $n is not a hashref");
+			next;
+		}
+		my ($label, $colour, $radius, $group) = @{$entry}{qw(label colour radius group)};
+		if(!defined($label) || ref($label) || !length($label)) {
+			$fail->("legend entry $n: label is required");
+			next;
+		}
+		$colour //= $DEFAULT_CIRCLE_COLOUR;
+		if(ref($colour) || $colour !~ $HEX_COLOUR) {
+			$fail->("legend entry $n: invalid colour: $colour");
+			next;
+		}
+		my %out = (label => "$label", colour => lc($colour));
+		if(defined($radius)) {
+			my $checked = _positive_number($radius, undef);
+			if(!defined($checked)) {
+				$fail->("legend entry $n: radius must be a positive number");
+				next;
+			}
+			$out{'radius'} = $checked;
+		}
+		if(defined($group)) {
+			if(ref($group)) {
+				$fail->("legend entry $n: group must be a string");
+				next;
+			}
+			$out{'group'} = "$group";
+		}
+		push @checked, \%out;
+	}
+	return @checked;
+}
+
+# _legend_js: The script that draws the key and keeps it to what is in view.
+# Purpose: An entry with a group is listed only while a marker of that group
+#          is inside the map's bounds, so the key follows the reader's zoom
+#          and pan.  Markers inside a cluster count: the check is on where a
+#          marker is, not on whether Leaflet is drawing it on its own.
+# Entry:   $self; \@entries from _legend_entries; $position (a Leaflet
+#          corner, already checked); \@points of [lat, lon, group] with
+#          validated coordinates.
+# Exit:    JavaScript for inside the map's <script> block.  Every text reaches
+#          the page through textContent, never as markup.
+sub _legend_js
+{
+	my ($self, $entries, $position, $points) = @_;
+
+	# Groups are numbered, so each marker adds two numbers and an index
+	my (%index, @groups);
+	my @point_js;
+	for my $p (@{$points}) {
+		my ($lat, $lon, $group) = @{$p};
+		next unless defined($group);
+		$index{$group} //= do { push @groups, $group; $#groups };
+		push @point_js, "[$lat,$lon,$index{$group}]";
+	}
+
+	my $entries_json = _html_json($entries);
+	my $groups_json  = _html_json(\@groups);
+	my $points_js    = join(',', @point_js);
+	my $title        = _js_string($self->{'legend_title'});
+	my $empty        = _js_string($self->{'legend_empty'} // $DEFAULT_LEGEND_EMPTY);
+
+	return qq{
+			(function() {
+				var legendEntries = $entries_json;
+				var legendGroups = $groups_json;
+				var legendPoints = [$points_js];
+				var legendTitle = '$title';
+				var legendEmpty = '$empty';
+				var legend = L.control({ position: '$position' });
+				legend.onAdd = function() {
+					var div = L.DomUtil.create('div', 'html-osm-legend');
+					div.style.cssText = 'background: rgba(255,255,255,0.9); color: #222; padding: 6px 8px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.3); font: 12px/1.5 sans-serif; max-height: 40vh; overflow-y: auto;';
+					L.DomEvent.disableClickPropagation(div);
+					L.DomEvent.disableScrollPropagation(div);
+					return div;
+				};
+				legend.addTo(map);
+				function drawLegend() {
+					var div = legend.getContainer();
+					var bounds = map.getBounds();
+					var inView = {};
+					legendPoints.forEach(function(p) {
+						if(bounds.contains(L.latLng(p[0], p[1]))) { inView[legendGroups[p[2]]] = true; }
+					});
+					while(div.firstChild) { div.removeChild(div.firstChild); }
+					if(legendTitle.length) {
+						var title = document.createElement('strong');
+						title.style.display = 'block';
+						title.textContent = legendTitle;
+						div.appendChild(title);
+					}
+					var shown = 0;
+					legendEntries.forEach(function(e) {
+						if(e.group !== undefined && !inView[e.group]) { return; }
+						var row = document.createElement('div');
+						row.className = 'html-osm-legend-entry';
+						var size = e.radius ? Math.min(2 * e.radius, 2 * $LEGEND_SWATCH_MAX) : 12;
+						var swatch = document.createElement('span');
+						swatch.style.cssText = 'display: inline-block; vertical-align: middle; margin-right: 6px; border-radius: 50%; opacity: 0.85;';
+						swatch.style.width = size + 'px';
+						swatch.style.height = size + 'px';
+						swatch.style.background = e.colour;
+						swatch.style.border = '1px solid ' + e.colour;
+						row.appendChild(swatch);
+						row.appendChild(document.createTextNode(e.label));
+						div.appendChild(row);
+						shown++;
+					});
+					if(!shown) {
+						var none = document.createElement('em');
+						none.textContent = legendEmpty;
+						div.appendChild(none);
+					}
+				}
+				drawLegend();
+				map.on('moveend', drawLegend);
+			})();
+};
 }
 
 # _fetch_coordinates: Resolve a place-name string to a (lat, lon) pair.
@@ -1650,11 +1992,20 @@ Allow per-marker removal via clicking on a marker.
 =head2 new
 
   HTML_OSM
-    coordinates     : iseq (ℝ x ℝ x S x S)
+    coordinates     : iseq (ℝ x ℝ x S x S x (S ∪ {∅}))
     zoom            : Z
     cluster         : B
+    scale           : B
+    legend          : iseq LegendEntry
+    legend_position : {topright, topleft, bottomright, bottomleft}
   ----------------------------------------
     ZOOM_MIN <= zoom <= ZOOM_MAX
+
+  LegendEntry
+    label  : S | label ≠ ''
+    colour : HexColour
+    radius : ℝ ∪ {∅} | radius = ∅ ∨ 0 < radius < 10^6
+    group  : S ∪ {∅}
 
   new ≙
     params? : Params
@@ -1662,6 +2013,9 @@ Allow per-marker removal via clicking on a marker.
   ----------------------------------------
     osm!.zoom     = params?.zoom     ∨ 12
     osm!.cluster  = params?.cluster  ∨ false
+    osm!.scale    = params?.scale    ∨ false
+    osm!.fit      = params?.fit      ∨ false
+    osm!.legend_position = params?.legend_position ∨ topright
 
 =head2 add_marker
 
@@ -1671,7 +2025,7 @@ Allow per-marker removal via clicking on a marker.
     result! : {0, 1}
   -----------------------------------------
     result! = 1 ⟺ point? resolves to (lat, lon) ∈ ValidCoord
-    result! = 1 ⟹ coordinates' = coordinates ⌢ ⟨(lat, lon, label, icon)⟩
+    result! = 1 ⟹ coordinates' = coordinates ⌢ ⟨(lat, lon, label, icon, group)⟩
 
 =head2 add_geojson
 
@@ -1742,6 +2096,10 @@ Allow per-marker removal via clicking on a marker.
   -----------------------------------------
     (#coordinates + #geojson + #heatmap_layers + #gpx_tracks + #choropleth_layers) > 0
     center ≠ ∅  ∨  ∃ valid ∈ coordinates • valid ∈ ValidCoord
+    Let InView(b) = { m.group | m ∈ coordinates ∪ circle_markers • (m.lat, m.lon) ∈ b }
+    fit ∧ center = ∅ ⟹ the initial view contains every (m.lat, m.lon), at zoom ≤ zoom
+    ∀ bounds b reached by a move or zoom •
+      listed(b) = ⟨ e ∈ legend | e.group = ∅ ∨ e.group ∈ InView(b) ⟩
 
 =head1 LICENSE AND COPYRIGHT
 

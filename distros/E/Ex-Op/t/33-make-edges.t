@@ -9,9 +9,12 @@ use Ex::Op ();
 no strict 'refs';
 our @shared = (1, 2);
 
+# An empty my list does not compile before perl 5.22, so that case is made at
+# run time and left out where it cannot be.
+my $empty_my = eval 'sub { my () = @_; scalar @_ }';
 my @decline = (
     [ '\*_',                   'it uses *_',                                   sub { my ($x) = @_; my $g = \*_; $x } ],
-    [ 'my () = @_',            'its first statement assigns @_ to something other than new scalars', sub { my () = @_; scalar @_ } ],
+    ($empty_my ? [ 'my () = @_', 'its first statement assigns @_ to something other than new scalars', $empty_my ] : ()),
 );
 for my $case (@decline) {
     my ($desc, $why, $code) = @$case;
@@ -51,7 +54,7 @@ is( acc_a_first_statement_that_assigns_from_another_array(9), 1, 'a first statem
     Ex::Op::make(gone_for_good => sub { my ($x) = @_; $x });
     undef &gone_for_good;
     eval q{ gone_for_good(1) };
-    like( $@, qr/^Undefined subroutine/, 'a call compiled after the op was undefined is an ordinary call too' );
+    like( $@, qr/^(?:Undefined subroutine|Not a CODE reference)/, 'a call compiled after the op was undefined is an ordinary call too' );
 }
 
 done_testing;

@@ -14,6 +14,14 @@ use Time::HiRes ();
 
 plan skip_all => 'hypnotoad requires a UNIX-like system' if $^O eq 'MSWin32';
 
+# Slow machines, such as CPAN smokers on a Raspberry Pi, can take well over
+# 15 seconds to start hypnotoad.  They set PERL_TEST_TIME_OUT_FACTOR, and
+# every wait below is multiplied by it.  A wait only lasts its full length
+# when something is wrong, so a generous one costs nothing on a fast machine.
+my $TIME_FACTOR = ((($ENV{PERL_TEST_TIME_OUT_FACTOR} // '') =~ /^\d+(?:\.\d+)?$/a) && ($ENV{PERL_TEST_TIME_OUT_FACTOR} > 1))
+	? $ENV{PERL_TEST_TIME_OUT_FACTOR} : 1;
+my $STARTUP_WAIT = 60 * $TIME_FACTOR;	# seconds for hypnotoad to answer
+
 my $hypnotoad;
 for my $dir (dirname(File::Spec->rel2abs($^X)), split(/\Q$Config{path_sep}\E/, $ENV{PATH} // '')) {
 	next unless defined($dir) && length($dir);
@@ -150,7 +158,7 @@ get '/stuck' => sub {
 
 	# Hold the shared lock until the test explicitly releases it, so the
 	# waiter is guaranteed to time out rather than race a fixed sleep.
-	my $deadline = time + 10;
+	my $deadline = time + 10 * ($ENV{MPB_TIME_FACTOR} // 1);
 	while (!-e $ENV{MPB_RELEASE_MARKER} && (time < $deadline)) {
 		select(undef, undef, undef, 0.05);
 	}
@@ -208,7 +216,7 @@ get '/fail' => sub {
 
 	# Hold the shared lock until the test has a waiter, then fail.  The action
 	# dies with the lock still held, so releasing it is the plugin's job.
-	my $deadline = time + 10;
+	my $deadline = time + 10 * ($ENV{MPB_TIME_FACTOR} // 1);
 	while (!-e $ENV{MPB_FAIL_RELEASE} && (time < $deadline)) {
 		select(undef, undef, undef, 0.05);
 	}
@@ -276,6 +284,7 @@ my $server = spawn_hypnotoad(
 	MPB_FAIL_MARKER    => $fail_marker,
 	MPB_FAIL_RELEASE   => $fail_release,
 	MPB_TIMEOUT_LOG    => $timeout_log,
+	MPB_TIME_FACTOR    => $TIME_FACTOR,
 );
 $server_pid   = $server->{pid};
 $server_group = $server->{group};
@@ -285,7 +294,7 @@ if (!$server_group) {
 	$server_pid = 0;
 	fail(failure_message('hypnotoad did not start'));
 	done_testing();
-	return;
+	exit;
 }
 
 my $base = "http://127.0.0.1:$port";
@@ -295,15 +304,15 @@ if (!$ready) {
 	fail(failure_message('hypnotoad did not become ready'));
 	stop_server();
 	done_testing();
-	return;
+	exit;
 }
 
 # Let the master finish forking every worker
-Time::HiRes::sleep(0.2);
+Time::HiRes::sleep(0.2 * $TIME_FACTOR);
 
 my $client = Mojo::UserAgent->new(
-	connect_timeout => 2,
-	request_timeout => 10,
+	connect_timeout => 2 * $TIME_FACTOR,
+	request_timeout => 10 * $TIME_FACTOR,
 	max_connections => 20,
 );
 # A worker can accept several connections before its event loop starts the
@@ -358,7 +367,7 @@ defined($builder_pid) or die "Cannot fork: $!";
 
 if (!$builder_pid) {
 	close($builder_reader);
-	my $builder_ua = Mojo::UserAgent->new(connect_timeout => 2, request_timeout => 10);
+	my $builder_ua = Mojo::UserAgent->new(connect_timeout => 2 * $TIME_FACTOR, request_timeout => 20 * $TIME_FACTOR);
 	my $tx = $builder_ua->get("$base/stuck" => {Connection => 'close'});
 	my $code = $tx->res ? $tx->res->code : 0;
 	print {$builder_writer} "$code\n";
@@ -368,7 +377,7 @@ if (!$builder_pid) {
 
 close($builder_writer);
 
-my $stuck_deadline = Time::HiRes::time() + 5;
+my $stuck_deadline = Time::HiRes::time() + 5 * $TIME_FACTOR;
 while (!-e $stuck_marker && Time::HiRes::time() < $stuck_deadline) {
 	Time::HiRes::sleep(0.05);
 }
@@ -403,7 +412,7 @@ if ($holding) {
 	is($waiter_res ? $waiter_res->headers->header('Retry-After') : undef, 1, 'the waiter was told to retry');
 	is($waiter_res ? $waiter_res->headers->header('X-Cache') : undef, 'MISS', 'the waiter did not get a cached response');
 	like($waiter_res ? $waiter_res->body : '', qr/being generated/, 'the waiter received the retry page');
-	cmp_ok($waiter_elapsed, '<', 2.5, 'the waiter timed out before the builder released the lock');
+	cmp_ok($waiter_elapsed, '<', 2.5 * $TIME_FACTOR, 'the waiter timed out before the builder released the lock');
 
 	my $after_tx = $client->get("$base/waiter" => {
 		Connection  => 'close',
@@ -462,7 +471,7 @@ ok(defined($die_pid) && ($die_pid =~ /^\d+$/), 'the dying builder recorded its w
 
 my $dead = 0;
 if (defined($die_pid) && ($die_pid =~ /^\d+$/)) {
-	my $deadline = Time::HiRes::time() + 5;
+	my $deadline = Time::HiRes::time() + 5 * $TIME_FACTOR;
 	while (Time::HiRes::time() < $deadline) {
 		if (!kill(0, $die_pid)) {
 			$dead = 1;
@@ -496,7 +505,7 @@ defined($fail_pid) or die "Cannot fork: $!";
 
 if (!$fail_pid) {
 	close($fail_reader);
-	my $fail_ua = Mojo::UserAgent->new(connect_timeout => 2, request_timeout => 10);
+	my $fail_ua = Mojo::UserAgent->new(connect_timeout => 2 * $TIME_FACTOR, request_timeout => 20 * $TIME_FACTOR);
 	my $tx = $fail_ua->get("$base/fail" => {Connection => 'close'});
 	my $code = $tx->res ? $tx->res->code : 0;
 	print {$fail_writer} "$code\n";
@@ -506,7 +515,7 @@ if (!$fail_pid) {
 
 close($fail_writer);
 
-my $fail_deadline = Time::HiRes::time() + 5;
+my $fail_deadline = Time::HiRes::time() + 5 * $TIME_FACTOR;
 while (!-e $fail_marker && Time::HiRes::time() < $fail_deadline) {
 	Time::HiRes::sleep(0.05);
 }
@@ -641,6 +650,7 @@ subtest 'a live single-worker pool retries the cold batch' => sub {
 		MPB_FAIL_RELEASE      => File::Spec->catfile("$single_tmp", 'fail.release'),
 		MPB_TIMEOUT_LOG       => File::Spec->catfile("$single_tmp", 'timeout.workers'),
 		MPB_HYPNOTOAD_WORKERS => 1,
+		MPB_TIME_FACTOR       => $TIME_FACTOR,
 	);
 
 	my $single_base = "http://127.0.0.1:$single_port";
@@ -651,7 +661,7 @@ subtest 'a live single-worker pool retries the cold batch' => sub {
 	my ($report, $single_batch);
 	if ($ready) {
 		# Let the master finish forking its one worker
-		Time::HiRes::sleep(0.2);
+		Time::HiRes::sleep(0.2 * $TIME_FACTOR);
 
 		($report, $single_batch) = capture_stderr(sub {
 			run_cold_batch(sub {
@@ -769,8 +779,8 @@ sub spawn_hypnotoad {
 sub wait_for_ready {
 	my ($base, $pid) = @_;
 
-	my $ua       = Mojo::UserAgent->new(connect_timeout => 1, request_timeout => 2);
-	my $deadline = Time::HiRes::time() + 15;
+	my $ua       = Mojo::UserAgent->new(connect_timeout => 1 * $TIME_FACTOR, request_timeout => 2 * $TIME_FACTOR);
+	my $deadline = Time::HiRes::time() + $STARTUP_WAIT;
 	while (Time::HiRes::time() < $deadline) {
 		my $tx = $ua->get("$base/ping" => {Connection => 'close'});
 		return 1 if $tx->res && $tx->res->is_success && ($tx->res->code == 200);

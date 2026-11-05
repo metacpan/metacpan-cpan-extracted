@@ -100,8 +100,10 @@ members(self)
             PUSHs(sv_2mortal(newSVuv((UV)m->count)));
             XSRETURN(1);
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1
         if (m->count > ((size_t)-1 >> 2))
-            croak("HAMT::Set::members: too many members for one list");
+            croak("HAMT::Set::members: too many members for one list"); /* # uncoverable statement */
         EXTEND(SP, (SSize_t)m->count);
         hamt_iter_init(&it, m->root);
         while ((e = hamt_iter_next(&it)))
@@ -130,9 +132,9 @@ each(self, code)
         while ((e = hamt_iter_next(&it))) {
             keysv = hamt_xs_scratch(aTHX_ keysv);
             sv_setpvn(keysv, e->key, (STRLEN)e->klen);
-            if (e->utf8) SvUTF8_on(keysv); else SvUTF8_off(keysv);
+            if (e->utf8) SvUTF8_on(keysv); else SvUTF8_off(keysv); /* # uncoverable condition left count:1 */
             how = hamt_xs_call(aTHX_ code, &keysv, 1, NULL);
-            if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break;
+            if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break; /* # uncoverable branch true count:1 class:ignore_covered_err */
         }
         hamt_xs_call_leave(aTHX);
         FREETMPS;
@@ -191,6 +193,8 @@ union(self, other)
             XSRETURN(1);
         }
         if (ix == 0 && r == o->root && SvSTASH(SvRV(other)) == stash) {
+            # uncoverable branch false
+            # uncoverable condition right count:1
             if (r) hamt_node_release(HAMT_CX, r);
             ST(0) = other;
             XSRETURN(1);

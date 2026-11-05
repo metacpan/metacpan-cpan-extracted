@@ -1865,8 +1865,8 @@ subtest '/map loc= path: geocoder called, markers + counts correct' => sub {
 	# Both distinct non-skipped places appear in map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
 		like $body, qr/Ramsgate/i, 'Ramsgate marker present in response';
 		like $body, qr/Margate/i,  'Margate marker present in response';
 	}
@@ -2037,8 +2037,8 @@ subtest '/map lat/lon path: duplicate coordinates collapse to one marker' => sub
 	# Rows 1+2 share a coordinate -> one marker; row 3 is separate; row 4 is unusable.
 	# The lat values appear inside the Leaflet JS in map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
 		like $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat present in response';
 		like $body, qr/$MARGATE_LAT/,  'Margate lat present in response';
 	}
@@ -2057,8 +2057,8 @@ subtest '/map lat/lon path: f= filter applied before marker construction' => sub
 	# Only row 1 (name=A) survives the filter.
 	# Lat values appear in the Leaflet JS inside map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
 		like   $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat in response after filter';
 		unlike $body, qr/$MARGATE_LAT/,  'Margate lat absent after name:eq:A filter';
 	}
@@ -2171,8 +2171,8 @@ subtest '/map popup= column appears in marker label HTML' => sub {
 	# Popup column names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
 		like $body, qr/amount/i, 'amount column referenced in map output (popup)';
 	}
 
@@ -2296,7 +2296,7 @@ subtest '/map: an older HTML::OSM => 200 with the older-renderer warning' => sub
 		'the older install is reported as such, not as a missing module';
 	like $body, qr/installed HTML::OSM is 0\.11/,
 		'the warning names the version that is installed';
-	like $body, qr/HTML::OSM 0\.12 or later/,
+	like $body, qr/HTML::OSM 0\.13 or later/,
 		'and the version that is needed';
 };
 
@@ -2306,7 +2306,7 @@ subtest '/map: a missing HTML::OSM => 200 with the not-installed warning' => sub
 	like $body, qr/data-key="error_map_renderer_missing"/,
 		'the missing renderer is reported as not installed';
 	like $body, qr/and it is not installed/, 'the warning says so';
-	like $body, qr/HTML::OSM 0\.12 or later/, 'and names the version that is needed';
+	like $body, qr/HTML::OSM 0\.13 or later/, 'and names the version that is needed';
 	unlike $body, qr/installed HTML::OSM is/, 'it does not claim a version is installed';
 };
 
@@ -2350,8 +2350,8 @@ subtest '/map: ?c= calculated field applied before geocoding' => sub {
 	# City names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 }
-			or skip 'HTML::OSM 0.12 or later is needed for marker HTML', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
+			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
 		like $body, qr/ramsgate/i, 'ramsgate appears in the map output';
 	}
 
@@ -3220,7 +3220,8 @@ subtest 'Requests in flight together each get their own answer' => sub {
 # nothing else.
 # ===========================================================================
 Readonly my @OPTIONAL_GROUPS => (
-	[ geocoder => 'Geo::Coder::Free' ],
+	# The geocoder is Geo::Coder::Free in a Geo::Coder::List: it needs both.
+	[ geocoder => 'Geo::Coder::Free', 'Geo::Coder::List' ],
 	[ osm      => 'HTML::OSM' ],
 	[ redis    => 'Redis', 'Redis::Fast' ],
 	[ xml      => 'XML::Simple' ],
@@ -3228,6 +3229,9 @@ Readonly my @OPTIONAL_GROUPS => (
 	[ sftp     => 'Net::SFTP::Foreign' ],
 	[ xlsx     => 'Spreadsheet::ParseXLSX' ],
 );
+
+# The groups whose modules are needed together rather than as alternatives.
+Readonly my %ALL_OF => (geocoder => 1);
 
 Readonly my $MATRIX_DRIVER => <<'DRIVER';
 use strict;
@@ -3412,9 +3416,12 @@ subtest 'Optional modules: every combination degrades only its own feature' => s
 	my $status = system($^X, @include, $driver, $input);
 	is($status, 0, 'the driver ran to the end');
 
+	# A group is there when any of its modules is (Redis or Redis::Fast), except
+	# one that needs all of them together.
 	my %installed = map {
 		my ($name, @mods) = @{$_};
-		$name => (scalar grep { _module_is_installed($_) } @mods) ? 1 : 0;
+		my $found = scalar grep { _module_is_installed($_) } @mods;
+		$name => ($ALL_OF{$name} ? $found == @mods : $found) ? 1 : 0;
 	} @OPTIONAL_GROUPS;
 
 	for my $mask (0 .. (2 ** @OPTIONAL_GROUPS) - 1) {
@@ -3701,6 +3708,38 @@ subtest 'A cell holding a script tag cannot end the script of a chart' => sub {
 		$t->get_ok("/$query&$source")->status_is(200)
 		  ->content_like(qr/alert\(1\)/, "$query draws the cell")
 		  ->content_unlike(qr{</script>\s*<script>\s*alert}i, "$query keeps it inside the script");
+	}
+};
+
+# A tooltip is set with .html(), so the text put into it is markup.  Before
+# HTML::D3 0.29 the stacked, combo and treemap tooltips put labels in as they
+# were, and a cell holding <img onerror=...> ran when its bar or tile was
+# hovered.  The browser is not run here: each page must define esc() and must
+# not hold the unescaped forms 0.28 wrote.
+subtest 'A cell holding markup is escaped in a chart tooltip' => sub {
+	Readonly my $FLOOR  => '0.29';
+	Readonly my $ATTACK => '<img src=x onerror=alert(2)>';
+
+	for my $file (qw(Makefile.PL cpanfile)) {
+		next unless -r $file;
+		my ($declared) = Mojo::File->new($file)->slurp =~ /'HTML::D3'\s*(?:=>|,)\s*'([\d.]+)'/;
+		cmp_ok($declared // 0, '>=', $FLOOR, "$file asks for an HTML::D3 that escapes its tooltips");
+	}
+
+	my $csv = _csv_file(tempdir(CLEANUP => 1), 'tips.csv', 'id,label,seg,amount', "1,$ATTACK,$ATTACK,5", '2,Plain,Other,7');
+	my $source = 'l=' . url_escape("path:$csv");
+	my %raw = (
+		stacked => [ qr/"<b>"\+d\.data\.cat\+/, qr/\+seg\+": "/ ],
+		combo   => [ qr/"<b>"\+d\.x\+/, qr/\+barLabel\+/ ],
+		treemap => [ qr/"<b>"\+name\+/ ],
+	);
+	for my $query ('stacked?cat=label&seg=seg&val=amount', 'combo?cat=label&bar_val=amount&line_val=amount',
+	               'treemap?group=label&size=amount') {
+		my ($kind) = $query =~ /^(\w+)/;
+		$t->get_ok("/$query&$source")->status_is(200)
+		  ->content_like(qr/onerror=alert\(2\)/, "$kind draws the cell")
+		  ->content_like(qr/function esc\(s\)/, "$kind escapes its tooltip text");
+		$t->content_unlike($_, "$kind never sets a label raw: $_") for @{ $raw{$kind} };
 	}
 };
 
@@ -4109,7 +4148,7 @@ subtest 'A geocoder that throws: the request fails, and leaves nothing behind' =
 };
 
 subtest 'A map renderer that fails mid-request is not a crash' => sub {
-	plan skip_all => 'needs HTML::OSM 0.12 or later' unless eval { require HTML::OSM; HTML::OSM->VERSION(0.12); 1 };
+	plan skip_all => 'needs HTML::OSM 0.13 or later' unless eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
 	my $tm = _isolated_app();
 	my $places = _csv_file(tempdir(CLEANUP => 1), 'coords.csv', 'id,lat,lon', '1,51.3,1.4');
 	my $guard = mock_scoped('HTML::OSM', new => sub { die "tile server unreachable\n" });
@@ -4315,6 +4354,41 @@ subtest 'A SQLite export opens again' => sub {
 		return [ sort { $a->{id} <=> $b->{id} } @{ $tm->tx->res->json } ];
 	};
 	is_deeply($rows->(url_escape("path:$file")), $rows->('table:sales'), 'and the same rows as the table it came from');
+};
+
+# A bank export: the first transaction has a cheque number and almost no other
+# row does.  The id column was the first safe column with a value in the first
+# data row, so it was Check, and Database::Abstraction dropped every row with
+# no cheque number: the table showed 2 of 6 rows.  Every row must be shown, and
+# exported, whichever cells happen to be filled in the first one.
+subtest 'A column empty in most rows is not the id' => sub {
+	my $tm  = _isolated_app();
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $file = File::Spec->catfile($dir, 'AccountHistory.csv');
+	Mojo::File->new($file)->spew(join("\r\n",
+		'Account Number,Post Date,Check,Description,Debit,Credit,Status',
+		'"XX2106",11/4/2026,650825,"Money Transfer",260.00,,Pending',
+		'"XX2106",11/3/2026,,"Humana",145.22,,Posted',
+		'"XX2106",11/2/2026,,"Zelle, Transfer",141.00,,Posted',
+		'"XX2106",10/30/2026,650826,"Card",673.42,,Posted',
+		'"XX2106",10/20/2026,,"Aviva",,897.32,Posted',
+		'"XX2106",10/19/2026,,"Zelle Transfer",,341.54,Posted',
+	) . "\r\n");
+	$tm->get_ok('/open?path=' . url_escape($file))->status_is(200);
+	my $body = $tm->tx->res->body;
+	is(scalar(() = $body =~ m{<td[^>]*>XX2106</td>}g), 6, 'every row is shown');
+	like($body, qr{<td[^>]*>Zelle, Transfer</td>}, 'a quoted separator does not shift the columns');
+	$tm->get_ok('/export?format=json&l=' . url_escape("path:$file"))->status_is(200);
+	is(scalar(@{ $tm->tx->res->json }), 6, 'and exported');
+
+	# The rows without a cheque number must be there to be filtered,
+	# not dropped before any filter runs
+	$tm->get_ok('/open?path=' . url_escape($file) . '&f=' . url_escape('Check:notempty:'))->status_is(200);
+	$body = $tm->tx->res->body;
+	is(scalar(() = $body =~ m{<td[^>]*>XX2106</td>}g), 2, 'a notempty filter on Check keeps the 2 cheques');
+	like($body, qr{<td[^>]*>650826</td>}, 'one of them is the second cheque');
+	$tm->get_ok('/open?path=' . url_escape($file) . '&f=' . url_escape('Check:empty:'))->status_is(200);
+	is(scalar(() = $tm->tx->res->body =~ m{<td[^>]*>XX2106</td>}g), 4, 'an empty filter on Check gives the other 4');
 };
 
 done_testing();

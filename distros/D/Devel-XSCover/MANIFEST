@@ -99,6 +99,8 @@ t/fixtures/perl/Spike.pm
 t/fixtures/spike/include/spike.h
 t/fixtures/spike/Spike.c
 t/fixtures/spike/Spike.xs
+t/fixtures/dropped/Dropped.c
+t/fixtures/dropped/Dropped.xs
 t/fixtures/spike/src/helper.c
 t/fixtures/spike/xs/more.xs
 t/lib/XSCoverTest.pm

@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DataSchema 0.001;
+package Dist::Conformance::Check::DataSchema 0.002;
 
 # ABSTRACT: A JSON or YAML file parses and matches a schema
 
@@ -68,7 +68,7 @@ Dist::Conformance::Check::DataSchema - A JSON or YAML file parses and matches a 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

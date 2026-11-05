@@ -1,5 +1,9 @@
 Revision history for Object-Proto
 
+1.04	2026-11-04
+	- Treat a slot holding the shared undef as empty when writing in place, since av_fill left that read-only value in new slots before perl 5.20 
+	- Free the DEMOLISH test object by scope exit
+
 1.03	2026-11-04
 	- Find the import library for the C API test by path, since ExtUtils::Depends before 0.8002 has a different find_extra_libs and returned nothing on Strawberry
 

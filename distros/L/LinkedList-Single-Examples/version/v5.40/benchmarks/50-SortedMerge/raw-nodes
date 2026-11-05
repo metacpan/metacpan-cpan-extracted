@@ -1,0 +1,141 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::SortedMerge::Benchmark v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use Time::HiRes qw( time );
+
+use LinkedList::Single qw( v2 );
+
+########################################################################
+# THIS SCRIPT BREAKS THE RULE OF THE OTHER EXAMPLES, ON PURPOSE.
+#
+# the examples use LinkedList::Single only through its public methods,
+# and its documentation says that nothing outside the node-handling
+# role should look inside a node. This script does look inside: a node
+# is [ $next, @data ] and the sentinel is [], and it sorts a real list
+# by relinking those nodes with plain pointer assignments.
+#
+# the point is to measure the ceiling. code in the module itself could
+# do this (the 'sort' method, for one), and the public API cannot get
+# near it: see LinkedList::Single::Example::SortedMerge::POD. nothing here is a proposal to expose
+# the nodes.
+########################################################################
+
+########################################################################
+# merge two chains of nodes by relinking. each chain ends in its own
+# sentinel; whichever chain is left over supplies the final one.
+########################################################################
+
+sub merge_nodes( $x, $y )
+{
+    my $head    = [ undef ];
+    my $tail    = $head;
+
+    while( $x->@* && $y->@* )
+    {
+        if( $x->[ 1 ] <= $y->[ 1 ] )
+        {
+            $tail->[ 0 ]    = $x;
+            $tail           = $x;
+            $x              = $x->[ 0 ];
+        }
+        else
+        {
+            $tail->[ 0 ]    = $y;
+            $tail           = $y;
+            $y              = $y->[ 0 ];
+        }
+    }
+
+    $tail->[ 0 ]    = $x->@* ? $x : $y;
+
+    $head->[ 0 ]
+}
+
+# sort $count nodes starting at $node: cut after the first half,
+# sort both, merge.
+
+sub sort_nodes( $node, $count )
+{
+    $count > 1
+    or return $node;
+
+    my $half    = int( ( $count + 1 ) / 2 );
+    my $last    = $node;
+
+    $last       = $last->[ 0 ] for 2 .. $half;
+
+    my $right   = $last->[ 0 ];
+
+    $last->[ 0 ]    = [];
+
+    merge_nodes
+    (
+        sort_nodes( $node,  $half           )
+      , sort_nodes( $right, $count - $half  )
+    )
+}
+
+########################################################################
+# run
+########################################################################
+
+sub run( $class )
+{
+    say sprintf '%8s %12s %12s %8s', qw( n pointer_sec perl_sort ok );
+
+    for my $n ( 1_000, 10_000, 100_000, 500_000 )
+    {
+        my @key     = map { int rand 1_000_000 } 1 .. $n;
+        my $list    = LinkedList::Single->new;
+        my $tail    = $list->cursor;
+
+        $tail->push( $_ )->advance for @key;
+
+        my $start   = time;
+
+        # node is an lvalue accessor: the list gets its new head.
+
+        $list->node = sort_nodes( $list->node, $n );
+
+        my $took    = time - $start;
+
+        $start      = time;
+
+        my @want    = sort { $a <=> $b } @key;
+
+        my $perl    = time - $start;
+
+        my $have    = join ',', map { $_->[ 0 ] } ( scalar $list->extract )->@*;
+
+        say sprintf '%8d %12.4f %12.4f %8s'
+        => $n, $took, $perl, $have eq join( ',', @want ) ? 'yes' : 'NO';
+    }
+
+    return
+}
+
+__PACKAGE__->run
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+raw-nodes - the speed of a pointer merge sort on LinkedList::Single's nodes
+
+=head1 SYNOPSIS
+
+    perl benchmarks/50-SortedMerge/raw-nodes
+
+=head1 DESCRIPTION
+
+Sorts a real LinkedList::Single list in place by relinking its nodes
+directly, and compares with perl's C<sort>. This deliberately looks
+inside the nodes, which the other examples do not; see the comment at
+the top of the file and L<LinkedList::Single::Example::SortedMerge::POD>.

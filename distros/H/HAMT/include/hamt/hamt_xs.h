@@ -60,10 +60,10 @@ static MGVTBL hamt_set_vtbl = {
  * the method, "HAMT::Map::get"; `kind` is the word for the thing, "map". */
 static hamt_map *hamt_handle(pTHX_ SV *sv, const MGVTBL *vt, const char *what,
                              const char *kind) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue; /* # uncoverable condition left count:1 */
             if (!mg->mg_ptr)
                 croak("%s: this %s belongs to another thread", what, kind);
             return (hamt_map *)mg->mg_ptr;
@@ -96,7 +96,7 @@ static SV *hamt_handle_new(pTHX_ const MGVTBL *vt, HV *stash, hamt_node *root,
 
 /* The class to bless into: the one named, or the one an object is in. */
 static HV *hamt_class_stash(pTHX_ SV *klass) {
-    if (SvROK(klass) && SvOBJECT(SvRV(klass))) return SvSTASH(SvRV(klass));
+    if (SvROK(klass) && SvOBJECT(SvRV(klass))) return SvSTASH(SvRV(klass)); /* # uncoverable condition right count:2 */
     return gv_stashsv(klass, GV_ADD);
 }
 
@@ -288,6 +288,9 @@ static void hamt_xs_hold_root(pTHX_ hamt_node *root) {
  * a sub always sees a scalar that is its own to keep or change, as it
  * would if each were fresh. The scalar is a temporary of the walk's frame. */
 static SV *hamt_xs_scratch(pTHX_ SV *sv) {
+    /*
+     # uncoverable condition right count:4
+     # uncoverable condition right count:5 */
     if (sv && SvREFCNT(sv) == 1 && !SvMAGICAL(sv) && !SvREADONLY(sv) && !SvROK(sv)) return sv;
     return sv_2mortal(newSV(0));
 }
@@ -299,7 +302,7 @@ static void hamt_xs_need_code(pTHX_ SV *code, const char *what) {
 }
 
 static SV *hamt_xs_val_sv(pTHX_ const hamt_entry *e) {
-    return (e && e->val) ? (SV *)e->val : sv_newmortal();
+    return (e && e->val) ? (SV *)e->val : sv_newmortal(); /* # uncoverable condition right count:2 */
 }
 
 /* ---- calling a sub -------------------------------------------------------
@@ -347,6 +350,10 @@ static void hamt_xs_call_leave(pTHX) {
 static void hamt_xs_walk_enter(pTHX) {
     CV *filter = get_cv("HAMT::_warn_filter", 0);
     hamt_xs_call_enter(aTHX);
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition left count:4 */
     if (filter && PL_warnhook != PERL_WARNHOOK_FATAL
         && !(PL_warnhook && SvROK(PL_warnhook) && SvRV(PL_warnhook) == (SV *)filter)) {
         GV *gv = gv_fetchpvs("HAMT::_warn_prev", GV_ADD, SVt_PV);
@@ -383,7 +390,7 @@ static int hamt_xs_call(pTHX_ SV *code, SV **args, int nargs, SV **res) {
     PUTBACK;
     n = call_sv(code, (res ? G_SCALAR : G_DISCARD | G_VOID) | G_EVAL);
     SPAGAIN;
-    if (res) *res = n > 0 ? *SP : &PL_sv_undef;
+    if (res) *res = n > 0 ? *SP : &PL_sv_undef; /* # uncoverable condition right count:2 */
     SP -= n;
     PUTBACK;
     err = ERRSV;
@@ -468,8 +475,8 @@ static int hamt_xs_resolve_cb(void *ud, void *cx, hamt_entry *ea, hamt_entry *eb
      * handed" cannot be seen by address. It is seen by value, as `equals`
      * compares values, and then the entry already there is kept: that is
      * what lets a merge that changes nothing return the map it started from. */
-    else if (ea->val && hamt_sv_eq_cx(cx, res, (SV *)ea->val)) *out = hamt_entry_retain(ea);
-    else if (eb->val && hamt_sv_eq_cx(cx, res, (SV *)eb->val)) *out = hamt_entry_retain(eb);
+    else if (ea->val && hamt_sv_eq_cx(cx, res, (SV *)ea->val)) *out = hamt_entry_retain(ea); /* # uncoverable condition right count:1 */
+    else if (eb->val && hamt_sv_eq_cx(cx, res, (SV *)eb->val)) *out = hamt_entry_retain(eb); /* # uncoverable condition right count:1 */
     else {
         SV *copy = hamt_sv_copy_in(aTHX_ res);
         *out = hamt_entry_new(cx, ea->key, ea->klen, ea->utf8, ea->hash, (void *)copy);
@@ -511,10 +518,10 @@ static int hamt_xs_diff_cb(void *ud, void *cx, int kind, hamt_entry *ea,
 /* The struct behind an object, or NULL: for a method that takes "something
  * that may be a map" and has an answer when it is not. */
 static hamt_map *hamt_handle_try(pTHX_ SV *sv, const MGVTBL *vt) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic)
-            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == vt)
+            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == vt) /* # uncoverable condition right count:1 */
                 return (hamt_map *)mg->mg_ptr;
     }
     return NULL;
@@ -544,7 +551,7 @@ static int hamt_txn_free(pTHX_ SV *sv, MAGIC *mg) {
         HV *origin = t->origin;
         mg->mg_ptr = NULL;
         HAMT_FREE(HAMT_CX, t, sizeof(hamt_txn));
-        if (origin && !PL_dirty) SvREFCNT_dec((SV *)origin);
+        if (origin && !PL_dirty) SvREFCNT_dec((SV *)origin); /* # uncoverable condition right count:2 */
         if (root) hamt_node_release(HAMT_CX, root);
     }
     return 0;
@@ -560,11 +567,11 @@ static MGVTBL hamt_set_txn_vtbl = {
 
 /* The struct behind a transient that is still open, or a croak. */
 static hamt_txn *hamt_txn_handle(pTHX_ SV *sv, const MGVTBL *vt, const char *what) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
             hamt_txn *t;
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != vt) continue; /* # uncoverable condition left count:1 */
             t = (hamt_txn *)mg->mg_ptr;
             if (!t) croak("%s: this transient belongs to another thread", what);
             if (!t->open) croak("%s: this transient is closed", what);
@@ -617,10 +624,10 @@ static MGVTBL hamt_vec_vtbl = {
 };
 
 static hamt_vec *hamt_vec_handle(pTHX_ SV *sv, const char *what) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_vtbl) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_vtbl) continue; /* # uncoverable condition left count:1 */
             if (!mg->mg_ptr) croak("%s: this vector belongs to another thread", what);
             return (hamt_vec *)mg->mg_ptr;
         }
@@ -630,10 +637,10 @@ static hamt_vec *hamt_vec_handle(pTHX_ SV *sv, const char *what) {
 }
 
 static hamt_vec *hamt_vec_handle_try(pTHX_ SV *sv) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic)
-            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &hamt_vec_vtbl)
+            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &hamt_vec_vtbl) /* # uncoverable condition right count:1 */
                 return (hamt_vec *)mg->mg_ptr;
     }
     return NULL;
@@ -713,6 +720,9 @@ static void hamt_xs_vec_set(pTHX_ hamt_vec *v, size_t i, SV *valsv, const char *
     rc = hamt_vec_set(HAMT_CX, v, i, (void *)copy, &dead);
     SvREFCNT_dec(copy);
     if (rc) croak("%s: out of memory", what);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (dead) HAMT_VAL_RELEASE(HAMT_CX, dead);
 }
 
@@ -784,7 +794,7 @@ static int hamt_vtxn_free(pTHX_ SV *sv, MAGIC *mg) {
         HV *origin = t->origin;
         mg->mg_ptr = NULL;
         HAMT_FREE(HAMT_CX, t, sizeof(hamt_vtxn));
-        if (origin && !PL_dirty) SvREFCNT_dec((SV *)origin);
+        if (origin && !PL_dirty) SvREFCNT_dec((SV *)origin); /* # uncoverable condition right count:2 */
         hamt_vec_clear(HAMT_CX, &gone);
     }
     return 0;
@@ -795,11 +805,11 @@ static MGVTBL hamt_vec_txn_vtbl = {
 };
 
 static hamt_vtxn *hamt_vtxn_handle(pTHX_ SV *sv, const char *what) {
-    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) {
+    if (SvROK(sv) && SvTYPE(SvRV(sv)) >= SVt_PVMG) { /* # uncoverable condition right count:2 */
         MAGIC *mg;
         for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
             hamt_vtxn *t;
-            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_txn_vtbl) continue;
+            if (mg->mg_type != PERL_MAGIC_ext || mg->mg_virtual != &hamt_vec_txn_vtbl) continue; /* # uncoverable condition left count:1 */
             t = (hamt_vtxn *)mg->mg_ptr;
             if (!t) croak("%s: this transient belongs to another thread", what);
             if (!t->open) croak("%s: this transient is closed", what);

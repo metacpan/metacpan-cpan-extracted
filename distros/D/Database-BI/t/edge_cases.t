@@ -2022,4 +2022,489 @@ subtest '_numeric_cell -- multiple dots return undef' => sub {
 	is $NUMERIC_CELL->('1.2.3'), undef, '"1.2.3" is not a valid number';
 };
 
+# ===========================================================================
+# Sections 31-35: the id column, map popups, canvas card renumbering
+#
+# These are the helpers changed for two bugs found in the wild: a bank export
+# showing 4 of its 362 rows (the id was chosen from the first data row), and a
+# map marker naming three rows while showing one.  Each section attacks the
+# helper directly, then through the route a reader uses.
+# ===========================================================================
+
+use Test::Returns qw(returns_is);
+use Config ();
+use Carp qw(croak);
+
+Readonly my %EDGE => (
+	time_budget   => 5,		# seconds; generous, as Devel::Cover runs slowly
+	big_rows      => 50_000,
+	wide_cols     => 2_000,
+	quote_flood   => 1_000_000,
+	popup_rows    => 100_000,
+	popup_limit   => 10,
+	fd_rounds     => 200,
+	fd_slack      => 5,		# handles a test harness may open meanwhile
+	fd_ulimit     => 64,
+	max_digits    => 9,		# a cv= longer than this names no card
+	search_flood  => 200_000,
+);
+Readonly my $BEST_ID   => \&Database::BI::Model::DataSource::_best_id_column;
+Readonly my $SHIFT_CV  => \&Database::BI::Controller::Dashboard::_shift_card_param;
+Readonly my $CV_SOURCE => \&Database::BI::Controller::Dashboard::_cross_filter_source;
+Readonly my $POPUP     => \&Database::BI::Controller::Dashboard::_map_popup;
+Readonly my $HOSTILE   => q{<script>alert(1)</script>"'&};
+
+# Run $code under an alarm, failing (not hanging) when it overruns: the
+# helpers below loop over input, and a loop that cannot end must be a failed
+# test rather than a stuck CI job.
+sub within_budget {
+	my ($name, $code) = @_;
+	my @got;
+	my $ok = eval {
+		local $SIG{ALRM} = sub { die "timeout\n" };	## no critic (RequireCarping) -- a signal handler
+		alarm $EDGE{time_budget};
+		@got = $code->();
+		alarm 0;
+		1;
+	};
+	alarm 0;
+	ok($ok, "$name finishes within $EDGE{time_budget}s") or diag($@);
+	return wantarray ? @got : $got[0];
+}
+
+# What _best_id_column picks for $content after a header of @header.
+sub pick_id {
+	my ($content, @header) = @_;
+	CORE::open(my $fh, '<', \$content) or return 'cannot read';
+	return $BEST_ID->($fh, ',', \@header);
+}
+
+# A data file of its own directory (one stem per directory: see CLAUDE.md).
+sub edge_csv {
+	my ($stem, $content) = @_;
+	my $dir = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/$stem.csv")->spew($content);
+	return $dir;
+}
+
+sub rows_of {
+	my ($dir, $stem) = @_;
+	return scalar @{ Database::BI::Model::DataSource->new(directory => $dir, table => $stem)->fetch_all };
+}
+
+# Open descriptors of this process, where the OS will say.
+sub open_fds {
+	return undef unless -d "/proc/$$/fd";
+	opendir(my $dh, "/proc/$$/fd") or return undef;
+	my $n = () = grep { !/\A\./ } readdir $dh;
+	return $n;
+}
+
+# ---------------------------------------------------------------------------
+# Section 31: DataSource::_best_id_column -- choosing the id cannot lose rows
+#
+# Strategy: D::A drops every row whose id cell is empty or starts with '#', so
+# the helper must count those across the whole file, parsed as D::A parses it.
+# Each subtest feeds a file whose early rows would mislead a shortcut.
+# ---------------------------------------------------------------------------
+
+subtest '_best_id_column -- regression: a column full in row 1 only is not the id' => sub {
+	# The bank export: the first transaction had a cheque number.
+	my $csv = "650825,Money Transfer\n" . join('', map { ",Payee $_\n" } 1 .. 20);
+	is pick_id($csv, qw(Check Description)), 'Description', 'the full column wins';
+	my $dir = edge_csv('acct', "Check,Description\n$csv");
+	is rows_of($dir, 'acct'), 21, 'and D::A keeps every row';
+};
+
+subtest '_best_id_column -- a backslash-escaped quote does not end the count' => sub {
+	# D::A reads with escape_char '\\'.  Parsed any other way, row 2 is an
+	# error, and a count that stopped there saw only the rows with a cheque.
+	my $csv = qq{1,"Shop"\n2,"Joe\\"s Bar"\n} . join('', map { ",d$_\n" } 1 .. 10);
+	is pick_id($csv, qw(Check Description)), 'Description', 'the rows after it are counted';
+	my $dir = edge_csv('escaped', "Check,Description\n$csv");
+	is rows_of($dir, 'escaped'), 12, 'and all 12 rows are read';
+};
+
+subtest '_best_id_column -- a line that will not parse is skipped, not the end' => sub {
+	my $csv = qq{1,a\n2,b"c"d\n} . join('', map { ",d$_\n" } 1 .. 10);
+	is pick_id($csv, qw(Check Description)), 'Description', 'counting goes on past it';
+};
+
+subtest '_best_id_column -- what D::A drops counts as dropped' => sub {
+	is pick_id("   ,x\n,y\n1,\n", qw(a b)), 'b', 'whitespace-only cells are empty';
+	is pick_id("#1,x\n#2,y\n3,\n", qw(a b)), 'b', 'cells starting with # are comments to D::A';
+	is pick_id("  #1,x\n2,y\n3,\n", qw(a b)), 'a', 'with leading space too, but a tie keeps the earlier';
+	is pick_id("\n\n1,\n\n2,\n", qw(a b)), 'a', 'blank lines are not rows that drop';
+	is pick_id("1\n2\n", qw(a b)), 'a', 'a short row is missing its later cells';
+};
+
+subtest '_best_id_column -- headers it cannot use' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is pick_id("1,2\n", 'First Name', 'Last Name'), undef, 'no safe name: undef, for the headerless path';
+	is pick_id("1,2\n", undef, 'ok'), 'ok', 'an undef name is passed over';
+	is pick_id("1,2\n", '', 'ok'), 'ok', 'as is an empty one';
+	is pick_id("1,2\n", "a\nb", 'ok'), 'ok', 'and one with a newline in it';
+	is pick_id("1,2\n", '1abc', 'ok'), 'ok', 'and one starting with a digit';
+	is pick_id('', qw(a b)), 'a', 'no data rows: the first safe column';
+	is_deeply \@warnings, [], 'without a warning';
+	returns_is(pick_id("1,2\n", qw(a b)), { type => 'string' }, 'a name is a string');
+};
+
+subtest '_best_id_column -- hostile bytes in cells' => sub {
+	is pick_id("\xFF\xFE,x\n\0,y\n,z\n", qw(a b)), 'b', 'invalid UTF-8 and NUL are values, not errors';
+	is pick_id(qq{"a\nb",1\n"c\nd",2\n,3\n}, qw(a b)), 'b', 'a quoted newline is one row, not two';
+	is pick_id("1,a,extra,more\n,b\n", qw(a b)), 'b', 'surplus cells are ignored';
+};
+
+subtest '_best_id_column -- a parser that fails without reading cannot loop for ever' => sub {
+	# Simulates a read that errors at the same place every time.  The loop's
+	# guard is that the handle did not move; without it this test times out.
+	require Text::CSV;
+	mock 'Text::CSV::getline' => sub { undef };
+	mock 'Text::CSV::eof'     => sub { 0 };
+	my $got = within_budget('a parser stuck at one place', sub { pick_id("1,2\n,3\n", qw(a b)) });
+	is $got, 'a', 'nothing was counted, so the first safe column';
+	restore_all();
+};
+
+subtest '_best_id_column -- a read that dies mid-file is reported, and leaks nothing' => sub {
+	# A disk error mid-read: the open must fail as an error, not as a table
+	# with rows quietly missing, and the file handle must not stay open.
+	my $dir    = edge_csv('dies', "a,b\n" . join('', map { "$_,x\n" } 1 .. 50));
+	my $before = open_fds();
+	require Text::CSV;
+	my $calls = 0;
+	mock 'Text::CSV::getline' => sub { croak('Input/output error') if ++$calls > 3; return [ 1, 'x' ] };
+	throws_ok { Database::BI::Model::DataSource->new(directory => $dir, table => 'dies')->fetch_all }
+		qr/Input\/output error/, 'the read error reaches the caller';
+	restore_all();
+	SKIP: {
+		skip 'no /proc to count descriptors', 1 unless defined $before;
+		cmp_ok open_fds(), '<=', $before + $EDGE{fd_slack}, 'no descriptor left open';
+	}
+};
+
+subtest '_best_id_column -- volume: many rows, wide rows, a flood of quotes' => sub {
+	my $big = join('', map { (($_ % 90) ? '' : $_) . ",d$_\n" } 1 .. $EDGE{big_rows});
+	is within_budget("$EDGE{big_rows} rows", sub { pick_id($big, qw(Check Description)) }), 'Description',
+		'a cheque in one row in 90 does not make Check the id';
+
+	my @wide = map { "c$_" } 1 .. $EDGE{wide_cols};
+	my $wide = join(',', ('') x ($EDGE{wide_cols} - 1), 'v') . "\n";
+	is within_budget("$EDGE{wide_cols} columns", sub { pick_id($wide x 3, @wide) }), "c$EDGE{wide_cols}",
+		'the one full column of thousands';
+
+	my $flood = '"' x $EDGE{quote_flood};
+	ok defined(within_budget('a megabyte of quotes', sub { pick_id($flood, qw(a b)) })),
+		'unparseable quotes end in an answer, not catastrophic work';
+};
+
+subtest '_best_id_column -- globals and context' => sub {
+	my ($got, $after);
+	{
+		local $_ = 'sentinel';
+		$got   = pick_id("1,x\n,y\n", qw(a b));
+		$after = $_;
+	}
+	is $after, 'sentinel', '$_ is left alone';
+	is $got, 'b', 'with the right answer';
+	my @list = pick_id('', 'First Name');
+	is scalar(@list), 1, 'no answer is one undef in list context, not an empty list';
+};
+
+subtest 'DataSource -- a caller in slurp mode still gets every row' => sub {
+	# Regression: with $/ undef the header read the whole file as one line and
+	# the table had 0 rows.  The public reading methods now localise $/.
+	my $dir = edge_csv('slurp', "a,b\n" . join('', map { "$_,x$_\n" } 1 .. 11));
+	for my $irs (undef, '', 'x', \2) {
+		my $shown = defined($irs) ? (ref($irs) ? 'a record length' : "'$irs'") : 'undef';
+		my $n;
+		{
+			local $/ = $irs;
+			$n = eval { rows_of($dir, 'slurp') } // "error: $@";
+		}
+		is $n, 11, "\$/ = $shown";
+	}
+	is $/, "\n", 'and $/ is the default again after';
+};
+
+subtest 'DataSource -- descriptors: opening a file again and again leaks none' => sub {
+	my $dir = edge_csv('fds', "a,b\n1,x\n,y\n");
+	my $before = open_fds();
+	SKIP: {
+		skip 'no /proc to count descriptors', 1 unless defined $before;
+		rows_of($dir, 'fds') for 1 .. $EDGE{fd_rounds};
+		cmp_ok open_fds(), '<=', $before + $EDGE{fd_slack}, "$EDGE{fd_rounds} opens leave no handle behind";
+	}
+};
+
+subtest 'DataSource -- with every descriptor in use, an open fails cleanly' => sub {
+	# A child under a low ulimit fills its descriptor table, tries the file,
+	# frees the table and tries again.  The first must be an error (not a
+	# crash, not a table with no rows); the second must read every row.
+	plan skip_all => 'needs a POSIX shell with ulimit' if $^O eq 'MSWin32' || !-x '/bin/sh';
+	my $dir = edge_csv('emfile', "a,b\n1,x\n2,y\n,z\n");
+	my $script = <<'PERL';
+use strict; use warnings;
+use Test::Mojo;
+my $t = Test::Mojo->new('Database::BI');
+my ($dir) = @ARGV;
+my @held;
+while (open(my $fh, '<', '/dev/null')) { push @held, $fh }
+my $first = eval { scalar @{ Database::BI::Model::DataSource->new(directory => $dir, table => 'emfile')->fetch_all } };
+my $err = $@;
+@held = ();
+my $second = eval { scalar @{ Database::BI::Model::DataSource->new(directory => $dir, table => 'emfile')->fetch_all } } // "error $@";
+print 'first=', (defined $first ? $first : 'error'), "\nsecond=$second\n";
+PERL
+	my $file = File::Temp->new(SUFFIX => '.pl');
+	print {$file} $script;
+	close $file;
+	my $lib = File::Spec->rel2abs('lib');
+	my $out = `ulimit -n $EDGE{fd_ulimit} 2>/dev/null && "$^X" -I"$lib" "$file" "$dir" 2>/dev/null`;
+	diag("child said: $out") if $ENV{TEST_VERBOSE};
+	plan skip_all => 'could not lower the descriptor limit' unless defined($out) && $out =~ /second=/;
+	like $out, qr/^first=error$/m, 'with no descriptor free, the open is an error';
+	like $out, qr/^second=3$/m, 'with them freed, all 3 rows (the blank-a row too)';
+};
+
+subtest 'DataSource -- unreadable and odd files' => sub {
+	my $dir = edge_csv('locked', "a,b\n1,x\n");
+	SKIP: {
+		skip_unless_can_revoke('read', 1, $dir);
+		with_revoked('read', "$dir/locked.csv", sub {
+			ok !defined(eval { rows_of($dir, 'locked') }), 'an unreadable file is an error, not an empty table';
+		});
+	}
+	SKIP: {
+		skip 'symlinks unavailable', 2 unless eval { symlink('', ''); 1 } && $Config::Config{d_symlink};
+		my $dangling = tempdir(CLEANUP => 1);
+		symlink("$dangling/nowhere.csv", "$dangling/ghost.csv") or skip 'symlink failed', 2;
+		$t->get_ok('/open?path=' . url_escape("$dangling/ghost.csv"))->status_isnt(500, 'a dangling symlink is not a 500');
+	}
+	my $odd = tempdir(CLEANUP => 1);
+	my $name = "pay \$(id); \nme.csv";
+	SKIP: {
+		skip 'this filesystem refuses the name', 3 unless eval { Mojo::File->new("$odd/$name")->spew("Check,Description\n1,a\n,b\n"); 1 };
+		$t->get_ok('/open?path=' . url_escape("$odd/$name"))->status_is(200, 'shell characters and a newline in the name');
+		like $t->tx->res->body, qr{<td[^>]*>b</td>}, 'and the row with no cheque is shown';
+	}
+};
+
+# ---------------------------------------------------------------------------
+# Section 32: _shift_card_param -- renumbering bookmarks after a card goes
+#
+# Strategy: a bookmark's state is stored as the browser sent it, so it can
+# hold anything.  Renumbering must touch only cv= values that name a card.
+# ---------------------------------------------------------------------------
+
+subtest '_shift_card_param -- regression: a cv= too long to be a card is left alone' => sub {
+	my $huge = '9' x ($EDGE{max_digits} + 11);
+	is $SHIFT_CV->("?cv=$huge&x=1", 1), "?cv=$huge&x=1", 'not turned into cv=1e+20';
+	my $edge = '9' x $EDGE{max_digits};
+	is $SHIFT_CV->("?cv=$edge", 1), '?cv=' . ($edge - 1), 'the longest that names a card still moves';
+};
+
+subtest '_shift_card_param -- arguments that are not a search and an index' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is $SHIFT_CV->(undef, 1), undef, 'no search: none back';
+	is $SHIFT_CV->('?cv=2', undef), '?cv=2', 'no index: unchanged, not read as card 0';
+	is $SHIFT_CV->('?cv=2', 'abc'), '?cv=2', 'an index that is not a number';
+	is $SHIFT_CV->('?cv=2', -1), '?cv=2', 'or is negative';
+	is $SHIFT_CV->('?cv=2', '1e0'), '?cv=2', 'or is written as a float';
+	is $SHIFT_CV->('?cv=2', [1]), '?cv=2', 'or is a reference';
+	my $ref = [1];
+	is $SHIFT_CV->($ref, 1), $ref, 'a reference search comes back as it went';
+	is $SHIFT_CV->('', 1), '', 'an empty search';
+	is_deeply \@warnings, [], 'without a warning';
+};
+
+subtest '_shift_card_param -- look-alikes and odd spellings' => sub {
+	is $SHIFT_CV->('?cv=&x=1', 0), '?cv=&x=1', 'an empty cv= names no card';
+	is $SHIFT_CV->('?cv=-3', 1), '?cv=-3', 'nor does a negative one';
+	is $SHIFT_CV->('?cv=1a', 0), '?cv=0a', 'digits then junk: the digits are the card (as the canvas reads it)';
+	is $SHIFT_CV->('?CV=3', 1), '?CV=3', 'the name is case-sensitive';
+	is $SHIFT_CV->('?x=cv=3', 1), '?x=cv=3', 'cv= inside a value is a value';
+	is $SHIFT_CV->('?cv=0003', 1), '?cv=2', 'leading zeros name the same card';
+	is $SHIFT_CV->("?cv=3\n", 1), "?cv=2\n", 'a trailing newline is kept';
+};
+
+subtest '_shift_card_param -- volume and backtracking' => sub {
+	my $many = '?' . join('&', map { "cv=$_" } 1 .. $EDGE{search_flood} / 10);
+	my $got = within_budget('thousands of cv=', sub { $SHIFT_CV->($many, 1) });
+	my $want = '?' . join('&', map { 'cv=' . ($_ - 1) } 2 .. $EDGE{search_flood} / 10);
+	ok($got eq $want, 'the removed card dropped, each later one moved down');
+	within_budget('a flood of cv=cv=cv=', sub { $SHIFT_CV->('?' . ('cv=' x $EDGE{search_flood}), 1) });
+	within_budget('a flood of ampersands', sub { $SHIFT_CV->('?' . ('&' x $EDGE{search_flood}) . 'cv=3', 1) });
+	my @list = $SHIFT_CV->('?cv=3', 1);
+	is_deeply \@list, [ '?cv=2' ], 'one value in list context';
+};
+
+subtest 'DELETE a card -- a bookmark naming no card survives intact' => sub {
+	my $huge = '9' x ($EDGE{max_digits} + 11);
+	my $id = $t->post_ok('/api/analyses' => json => {
+		name => 'edge', datasets => [ { spec => 'table:sales' } ],
+		visuals => [
+			{ kind => 'text', options => { text => 'note' } },
+			{ kind => 'bar', encode => { cat => 'region', value => 'amount' } },
+		],
+		bookmarks => [ { name => 'b', state => "?cv=$huge&cv=1" } ],
+	})->status_is(201)->tx->res->json->{id};
+	$t->delete_ok("/api/analyses/$id/visuals/0")->status_is(200);
+	$t->get_ok("/api/analyses/$id")->json_is('/bookmarks/0/state', "?cv=$huge&cv=0",
+		'the long cv= is kept, the real one moves down');
+};
+
+# ---------------------------------------------------------------------------
+# Section 33: _cross_filter_source -- which card a cv= names
+#
+# Strategy: anything but 1-9 ASCII digits must name no card (-1), so a
+# hostile value can never select a card by accident.
+# ---------------------------------------------------------------------------
+
+subtest '_cross_filter_source -- hostile values name no card' => sub {
+	for my $bad (undef, '', ' 1', '1 ', "1\n", '+1', '-1', '1.0', '1e2', '0x1', "\x{661}", "\x{FF11}",
+		'1' x ($EDGE{max_digits} + 1), [1], { 1 => 1 }, \1, \*STDOUT, sub { 1 }) {
+		my $shown = defined($bad) ? (ref($bad) ? ref($bad) : "'$bad'") : 'undef';
+		$shown =~ s/[^\x20-\x7E]/?/g;
+		is $CV_SOURCE->($bad), -1, "$shown names no card";
+	}
+	is $CV_SOURCE->('0'), 0, '0 is the first card';
+	is $CV_SOURCE->('007'), 7, 'leading zeros are the same card';
+	is $CV_SOURCE->('9' x $EDGE{max_digits}), '9' x $EDGE{max_digits}, 'the longest allowed';
+	returns_is($CV_SOURCE->('3'), { type => 'integer' }, 'an integer back');
+};
+
+subtest 'GET /a/:id -- hostile cv= never breaks the canvas' => sub {
+	my $id = $t->post_ok('/api/analyses' => json => {
+		name => 'cv', datasets => [ { spec => 'table:sales' } ],
+		visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ],
+	})->tx->res->json->{id};
+	for my $cv ('abc', '9' x 30, '-1', '0x1', "1\n", '1' x 5000, $HOSTILE) {
+		$t->get_ok("/a/$id?cv=" . url_escape($cv))->status_is(200);
+		$t->content_unlike(qr/<script>alert/, 'nothing reflected unescaped');
+	}
+};
+
+# ---------------------------------------------------------------------------
+# Section 34: stored cards of the wrong shape
+#
+# Strategy: PUT and import store a visual unchecked, and a share link serves
+# the canvas to strangers, so every part of a card that is the wrong kind
+# must be read as absent, never dereferenced (a 500) or echoed raw.
+# ---------------------------------------------------------------------------
+
+subtest 'GET /a/:id -- cards with parts of the wrong kind still draw' => sub {
+	my $id = $t->post_ok('/api/analyses' => json => {
+		name => 'shape', datasets => [ { spec => 'table:sales' } ],
+		visuals => [ { kind => 'bar', encode => { cat => 'region', value => 'amount' } } ],
+	})->tx->res->json->{id};
+	my @cards = (
+		{ kind => 'bar', encode => [ 'region' ], filters => { a => 1 }, options => 'x' },
+		{ kind => 'bar', encode => { cat => 'region', value => 'amount' }, filters => [ [1], { a => 1 }, undef, 'region:eq:North' ] },
+		{ kind => [ 'bar' ], encode => {}, title => { x => 1 } },
+		{ kind => 'pie', encode => { cat => [ 'region' ], value => { a => 1 } } },
+		{ kind => 'bar', encode => { cat => 'region', value => 'amount' }, cross_row => [ 1 ] },
+		{ kind => 'map', encode => { loc => { x => 1 } } },
+		{ kind => 'table', encode => { cols => 'region' } },
+		{ kind => 'bar', encode => { cat => $HOSTILE, value => $HOSTILE }, title => $HOSTILE },
+	);
+	for my $i (0 .. $#cards) {
+		$t->put_ok("/api/analyses/$id" => json => {
+			name => 'shape', datasets => [ { spec => 'table:sales' } ], visuals => [ $cards[$i] ],
+		})->status_is(200);
+		$t->get_ok("/a/$id")->status_is(200, "card $i draws a page");
+		$t->content_unlike(qr/<script>alert/, "card $i echoes nothing raw");
+	}
+};
+
+# ---------------------------------------------------------------------------
+# Section 35: _map_popup -- every row at a marker, without smothering the map
+#
+# Strategy: the popup is HTML put into a map, built from cells a stranger may
+# have written, so every value must be escaped, the table capped however many
+# rows come, and arguments of the wrong kind read as absent.
+# ---------------------------------------------------------------------------
+
+subtest '_map_popup -- arguments of the wrong kind' => sub {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is $POPUP->(undef, undef, undef), '<strong></strong>', 'nothing at all: an empty heading';
+	is $POPUP->('h', 'rows', 'cols'), '<strong>h</strong>', 'strings for lists';
+	is $POPUP->('h', [ 1, 'x', undef, [1], \*STDOUT ], [ 'a' ]), '<strong>h</strong>', 'rows that are not hashes are not rows';
+	is $POPUP->('h', [ { a => 1 } ], [ undef, '', [ 'a' ], 'a' ]), '<strong>h</strong><br>a: 1', 'nor are such columns';
+	like $POPUP->(\*STDOUT, [ { a => 1 } ], [ 'a' ]), qr{\A<strong>GLOB\(0x[0-9a-f]+\)</strong>}, 'a glob heading is only text';
+	is_deeply \@warnings, [], 'without a warning';
+};
+
+subtest '_map_popup -- cells that are references or cycles' => sub {
+	my $cyc = { a => 1 };
+	$cyc->{self} = $cyc;
+	my $html = within_budget('a cyclic row', sub { $POPUP->('h', [ $cyc, { a => 2, self => [ 1 ] } ], [ 'a', 'self' ], 5) });
+	unlike $html, qr/HASH\(|ARRAY\(/, 'a reference cell is empty, not its address';
+	like $html, qr{<th>a</th>}, 'and the plain column still differs';
+	unlike $html, qr{<th>self</th>}, 'while the reference column, empty in both, is not a column';
+};
+
+subtest '_map_popup -- every limit that is not a count falls back to the default' => sub {
+	my @rows = map { { n => $_ } } 1 .. ($EDGE{popup_limit} * 3);
+	for my $bad (undef, 0, -1, '', 'abc', '1.5', '1e3', [ 1 ], "5\n") {
+		my $shown = defined($bad) ? (ref($bad) ? 'a reference' : "'$bad'") : 'undef';
+		$shown =~ s/\n/\\n/g;
+		my $html = $POPUP->('h', \@rows, [ 'n' ], $bad);
+		my $shown_rows = () = $html =~ /<td>/g;
+		is $shown_rows, $EDGE{popup_limit}, "limit $shown shows the default $EDGE{popup_limit}";
+	}
+	my $html = $POPUP->('h', \@rows, [ 'n' ], 999_999_999);
+	is scalar(() = $html =~ /<td>/g), scalar(@rows), 'a huge limit shows what there is';
+};
+
+subtest '_map_popup -- many rows cannot make a huge popup' => sub {
+	my @rows = map { { n => $_, place => 'same' } } 1 .. $EDGE{popup_rows};
+	my $html = within_budget("$EDGE{popup_rows} rows", sub { $POPUP->('h', \@rows, [ 'place', 'n' ], $EDGE{popup_limit}, '/open?x=1') });
+	is scalar(() = $html =~ /<tr>/g), $EDGE{popup_limit} + 1, 'a header and the capped rows';
+	like $html, qr{and \Q@{[ $EDGE{popup_rows} - $EDGE{popup_limit} ]}\E more: <a href="/open\?x=1">show all $EDGE{popup_rows} in the table</a>},
+		'the rest are counted and linked';
+	cmp_ok length($html), '<', 2_000, 'and the popup stays small';
+	diag("popup: $html") if $ENV{TEST_VERBOSE};
+};
+
+subtest '_map_popup -- everything a stranger wrote is escaped' => sub {
+	my @rows = ({ $HOSTILE => $HOSTILE, s => $HOSTILE }, { $HOSTILE => 'x', s => $HOSTILE });
+	my $html = $POPUP->($HOSTILE, \@rows, [ $HOSTILE, 's' ], 1, qq{/open?a="><script>alert(1)</script>});
+	unlike $html, qr/<script>/, 'no element from the data';
+	unlike $html, qr/href="[^"]*"[^>]*"/, 'the link cannot break out of its attribute';
+	like $html, qr{&lt;script&gt;}, 'the text is shown, escaped';
+	my $bytes = $POPUP->("\xFF\xFE", [ { a => "\0\xC3" }, { a => 'b' } ], [ 'a' ]);
+	like $bytes, qr/<td>/, 'invalid UTF-8 and NUL are drawn, not fatal';
+};
+
+subtest '_map_popup -- globals and context' => sub {
+	my ($after, @list);
+	{
+		local $_ = 'sentinel';
+		@list  = $POPUP->('h', [ { a => 1 }, { a => 2 } ], [ 'a' ]);
+		$after = $_;
+	}
+	is $after, 'sentinel', '$_ is left alone';
+	is scalar(@list), 1, 'one string in list context';
+	returns_is($list[0], { type => 'string' }, 'a string');
+};
+
+subtest 'GET /map -- many rows at one place: capped, escaped, linked' => sub {
+	plan skip_all => 'HTML::OSM 0.13 is needed to draw a map'
+		unless eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
+	my $rows = $EDGE{popup_limit} * 4;
+	my $dir  = tempdir(CLEANUP => 1);
+	Mojo::File->new("$dir/stack.csv")->spew("lat,lon,who\n"
+		. join('', map { "51.5,-0.1,\"$HOSTILE$_\"\n" } 1 .. $rows));
+	$t->get_ok('/map?l=' . url_escape("path:$dir/stack.csv") . '&lat=lat&lon=lon&popup=who')->status_is(200);
+	my $body = $t->tx->res->body;
+	unlike $body, qr/<script>alert/, 'no cell runs';
+	like $body, qr/\Q@{[ $rows - $EDGE{popup_limit} ]}\E more/, 'the popup counts the rest';
+	like $body, qr/show all $rows in the table/, 'and links to them';
+};
+
 done_testing();

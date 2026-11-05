@@ -10,7 +10,7 @@ use File::Spec ();
 use IPC::Open3 ();
 use Symbol ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our (%SOURCE_EXT, $COVERAGE);
 
@@ -174,7 +174,7 @@ sub touch {
         wanted   => sub {
             if (-d $_) {
                 my $base = (File::Spec->splitdir($_))[-1];
-                $File::Find::prune = 1 if $skip{$base} && $_ ne $top;
+                $File::Find::prune = 1 if $skip{$base} && _slashes($_) ne $top;
                 return;
             }
             return unless /\.([A-Za-z]+)\z/ && $SOURCE_EXT{ lc $1 };

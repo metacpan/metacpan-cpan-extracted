@@ -167,8 +167,10 @@ keys(self)
         /* Twice the count has to fit the signed size EXTEND takes. There
          * is no SSize_t_MAX before 5.16 or so; a quarter of size_t is under
          * it on every platform. */
+        # uncoverable branch true
+        # uncoverable condition left count:1
         if (m->count > ((size_t)-1 >> 2))
-            croak("%s: too many entries for one list", name[ix]);
+            croak("%s: too many entries for one list", name[ix]); /* # uncoverable statement */
         /* Counted outside EXTEND: on a DEBUGGING perl from 5.28 to 5.36 the
          * macro declares a local named ix, which hides the alias's ix in
          * its argument and extended by the count alone for pairs. */
@@ -177,7 +179,7 @@ keys(self)
         hamt_iter_init(&it, m->root);
         while ((e = hamt_iter_next(&it))) {
             if (ix != 1) PUSHs(sv_2mortal(hamt_key_to_sv(aTHX_ e)));
-            if (ix != 0) PUSHs(e->val ? sv_2mortal(SvREFCNT_inc_simple_NN((SV *)e->val))
+            if (ix != 0) PUSHs(e->val ? sv_2mortal(SvREFCNT_inc_simple_NN((SV *)e->val)) /* # uncoverable condition right count:2 */
                                       : sv_newmortal());
         }
 
@@ -196,12 +198,16 @@ to_hash(self)
         hamt_iter_init(&it, m->root);
         while ((e = hamt_iter_next(&it))) {
             SV *v;
+            # uncoverable branch true
+            # uncoverable condition left count:1
             if (e->klen > (size_t)I32_MAX)
-                croak("HAMT::Map::to_hash: a key is too long for a hash");
+                croak("HAMT::Map::to_hash: a key is too long for a hash"); /* # uncoverable statement */
             /* A copy, so the hash is an ordinary one: writable throughout. */
-            v = e->val ? newSVsv((SV *)e->val) : newSV(0);
+            v = e->val ? newSVsv((SV *)e->val) : newSV(0); /* # uncoverable condition right count:1 */
+            # uncoverable branch true
+            # uncoverable condition left count:2
             if (!hv_store(hv, e->key, e->utf8 ? -(I32)e->klen : (I32)e->klen, v, 0))
-                SvREFCNT_dec(v);
+                SvREFCNT_dec(v); /* # uncoverable statement */
         }
         XSRETURN(1);
 
@@ -234,7 +240,7 @@ each(self, code)
             args[1] = hamt_xs_val_sv(aTHX_ e);
             /* The call frees whatever temporaries the sub makes. */
             how = hamt_xs_call(aTHX_ code, args, 2, NULL);
-            if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break;
+            if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break; /* # uncoverable branch true count:1 class:ignore_covered_err */
         }
         hamt_xs_call_leave(aTHX);
         FREETMPS;
@@ -326,11 +332,15 @@ merge(self, other, ...)
         }
         if (r == rb && SvSTASH(SvRV(other)) == stash) {
             /* The result is exactly the other map, and it is of our class. */
+            # uncoverable branch false
+            # uncoverable condition right count:1
             if (r) hamt_node_release(HAMT_CX, r);
             LEAVE;
             ST(0) = other;
             XSRETURN(1);
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (r) SAVEDESTRUCTOR_X(hamt_xs_root_unref, r);
         obj = hamt_handle_new(aTHX_ &hamt_map_vtbl, stash, r, count + c.added, &n,
                               "HAMT::Map::merge");
@@ -379,7 +389,7 @@ update(self, key, code)
             /* Stored before the frame goes: what the sub returned is a
              * temporary of that frame. */
             /* By value, not by address: a sub's return is always a copy. */
-            same = err || (e && e->val && hamt_sv_eq_cx(HAMT_CX, res, (SV *)e->val));
+            same = err || (e && e->val && hamt_sv_eq_cx(HAMT_CX, res, (SV *)e->val)); /* # uncoverable condition right count:3 */
             if (!same) hamt_xs_put_key(aTHX_ n, &k, res, "HAMT::Map::update");
             FREETMPS;
             LEAVE;

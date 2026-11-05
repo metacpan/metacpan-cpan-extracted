@@ -1,4 +1,4 @@
-package Dist::Conformance::Snapshot 0.001;
+package Dist::Conformance::Snapshot 0.002;
 
 # ABSTRACT: What a check can read of a repository: its paths, their blob SHAs and their contents
 
@@ -48,7 +48,7 @@ Dist::Conformance::Snapshot - What a check can read of a repository: its paths, 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

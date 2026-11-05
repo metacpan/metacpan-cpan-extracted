@@ -91,18 +91,18 @@
 		</tr>
 		<tr>
 			<td><code>/combo</code></td>
-			<td>Bars and a line on one pair of axes, each with its own measure column.</td>
-			<td><code>cat</code>, <code>bar_val</code>, <code>line_val</code></td>
+			<td>Bars and a line on one pair of axes, each with its own measure column; a scheme gives the bars its first colour and the line its second.</td>
+			<td><code>cat</code>, <code>bar_val</code>, <code>line_val</code>, <code>scheme</code></td>
 		</tr>
 		<tr>
 			<td><code>/treemap</code></td>
-			<td>Tiles sized by a measure, grouped by a label column, with a top-N tail merged.</td>
-			<td><code>group</code>, <code>size</code>, <code>topn</code>, <code>scheme</code></td>
+			<td>Tiles sized by a measure, grouped by a label column, with a top-N tail merged. Tiles can instead be shaded by a second measure &mdash; size for sales, colour for margin &mdash; with a legend for the scale.</td>
+			<td><code>group</code>, <code>size</code>, <code>topn</code>, <code>scheme</code>, <code>color</code>, <code>color_agg</code> (default avg), <code>color_scheme</code></td>
 		</tr>
 		<tr>
 			<td><code>/histogram</code></td>
 			<td>Histogram with server-side binning, so the counts are the data's counts rather than a client's sample.</td>
-			<td><code>col</code>, <code>bins</code> (1&ndash;200, default 10)</td>
+			<td><code>col</code>, <code>bins</code> (1&ndash;200, default 10), <code>scheme</code> (bar colour)</td>
 		</tr>
 		<tr>
 			<td><code>/wordcloud</code></td>
@@ -175,14 +175,47 @@
 <p>
 	<code>GET /map</code> plots the filtered view with
 	<code>HTML::OSM</code> and Leaflet. A row's position comes from a place column
-	that is geocoded locally (<code>loc=</code>, one lookup per distinct value,
-	remembered in the model store and shared by every dataset that names it) or
+	that is geocoded (<code>loc=</code>, one lookup per distinct value, in the
+	local data first and then on OpenStreetMap's Nominatim, remembered in the
+	model store and shared by every dataset that names it) or
 	from coordinate columns (<code>lat=</code> and <code>lon=</code>). Rows
-	sharing a position become one marker.
+	sharing a position become one marker. The map opens on every marker, unless
+	<code>zoom=</code> says otherwise, and has a scale bar. A map coloured by
+	<code>series=</code>, <code>color=</code> or <code>size=</code> draws its key on
+	the map, listing only the colours of the markers in view, so it changes as the
+	map is zoomed and moved. When some rows cannot be plotted, the
+	note that says so counts them by reason, links to all of them in the table,
+	and opens onto a list of their places: how many rows each one stands for, why
+	it was not plotted, and a link to those rows.
+</p>
+<p>
+	Places that are not in the cache yet are looked up after the page is shown.
+	The map draws what the cache knows, and a progress bar names each place as it
+	is looked up, such as <em>Looking up 5 of 10: 10 Downing St, London</em>. Each
+	answer is saved at once, and the map is drawn again when the last place is in.
+	<em>Cancel</em> stops the lookups and draws the map with the places found so
+	far. The rest are listed as not looked up yet, with a link to look them up.
+	<code>geocode=wait</code> looks every place up before the page is sent, which
+	is also what a client that is not a browser gets, and
+	<code>geocode=cached</code> looks nothing up.
 </p>
 <dl class="spec">
+	<dt><code>loc=&lt;col&gt;</code></dt>
+	<dd>
+		A column of places to geocode. Repeat it for a place written across
+		columns: <code>loc=Address&amp;loc=Country</code> looks up each row's
+		address and country joined with a comma, leaving out an empty cell. The
+		map panel's <em>Followed by</em> field does the same.
+	</dd>
 	<dt><code>popup=&lt;col&gt;</code></dt>
-	<dd>A column shown in the marker popup; repeatable.</dd>
+	<dd>
+		A column shown in the marker popup; repeatable. By default the popup
+		shows every column but the place. A marker stands for every row at its
+		place, and its popup lists them: a value they all share once, the rest
+		as a small table. Past ten rows (<code>map_popup_rows</code>) the table
+		scrolls no further; the rest are counted, with a link to them in the
+		table.
+	</dd>
 	<dt><code>max=N</code>, <code>zoom=N</code></dt>
 	<dd>How many markers to draw (default 2,000) and the initial zoom; by default the map fits its markers.</dd>
 	<dt><code>tiles=name</code></dt>

@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Conformance",
   "PREREQ_PM" => {
     "Clone" => 0,
+    "Config::Tiny" => 0,
     "Cpanel::JSON::XS" => 0,
     "Digest::SHA" => 0,
     "File::Find" => 0,
@@ -52,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Clone" => 0,
+  "Config::Tiny" => 0,
   "Cpanel::JSON::XS" => 0,
   "Digest::SHA" => 0,
   "File::Find" => 0,

@@ -1,8 +1,12 @@
 ---
-abstract: 'Access Matplotlib from Perl; providing consistent user interface between different plot types'
+abstract: 'Plots from Perl data structures, drawn by matplotlib, gnuplot or ggplot2, with one interface for every plot type'
 author:
   - 'David E. Condon <dec986@gmail.com>'
-build_requires: {}
+build_requires:
+  Storable: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.58'
 dynamic_config: 0
@@ -12,24 +16,36 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Matplotlib-Simple
+provides:
+  Matplotlib::Simple:
+    file: lib/Matplotlib/Simple.pm
+    version: '0.3341'
+  Matplotlib::Simple::Colors:
+    file: lib/Matplotlib/Simple/Colors.pm
+    version: '0.3341'
+  Matplotlib::Simple::Ggplot2:
+    file: lib/Matplotlib/Simple/Ggplot2.pm
+    version: '0.3341'
+  Matplotlib::Simple::Gnuplot:
+    file: lib/Matplotlib/Simple/Gnuplot.pm
+    version: '0.3341'
+  Matplotlib::Simple::Matplotlib:
+    file: lib/Matplotlib/Simple/Matplotlib.pm
+    version: '0.3341'
 requires:
   Capture::Tiny: '0'
   Data::Printer: '0'
   Devel::Confess: '0'
   Devel::Size: '0'
-  IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
   MIME::Base64: '0'
   Scalar::Util: '1.22'
-  Test::Exception: '0'
-  Test::More: '0'
-  autodie: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/hhg7/MatPlotLib-Simple/issues
   homepage: https://metacpan.org/dist/Matplotlib-Simple
   repository: git://github.com/hhg7/MatPlotLib-Simple
-version: '0.3121'
+version: '0.3341'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

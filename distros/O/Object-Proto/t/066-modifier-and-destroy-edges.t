@@ -36,6 +36,9 @@ my @warned;
     local $SIG{__WARN__} = sub { push @warned, $_[0] };
     my $d = MD::Dies->new;
     undef $d;
+    # the undef may only schedule the free, which the next statement boundary
+    # runs, so a statement must follow it while the handler is still in place
+    is(scalar @warned, 1, "the DEMOLISH warning has arrived by the next statement");
 }
 like($warned[0], qr/Error in DEMOLISH: boom/, 'an error in DEMOLISH is a warning');
 

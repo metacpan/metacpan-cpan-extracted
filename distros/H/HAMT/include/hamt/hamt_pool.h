@@ -46,7 +46,7 @@ static void hamt_pool_open(hamt_pool *pl) {
 static void *hamt_pool_alloc(hamt_pool *pl, size_t bytes) {
     size_t c = HAMT_POOL_CLASS(bytes);
 
-    if (c == 0 || c >= HAMT_POOL_CLASSES) return HAMT_POOL_RAW_ALLOC(bytes);
+    if (c == 0 || c >= HAMT_POOL_CLASSES) return HAMT_POOL_RAW_ALLOC(bytes); /* # uncoverable condition left count:1 */
     if (pl && pl->head[c]) {
         void *p = pl->head[c];
         memcpy(&pl->head[c], p, sizeof(void *));
@@ -59,8 +59,8 @@ static void *hamt_pool_alloc(hamt_pool *pl, size_t bytes) {
 static void hamt_pool_free(hamt_pool *pl, void *p, size_t bytes) {
     size_t c = HAMT_POOL_CLASS(bytes);
 
-    if (c == 0 || c >= HAMT_POOL_CLASSES) { HAMT_POOL_RAW_FREE(p, bytes); return; }
-    if (pl && pl->open && pl->n[c] < HAMT_POOL_KEEP) {
+    if (c == 0 || c >= HAMT_POOL_CLASSES) { HAMT_POOL_RAW_FREE(p, bytes); return; } /* # uncoverable condition left count:1 */
+    if (pl && pl->open && pl->n[c] < HAMT_POOL_KEEP) { /* # uncoverable condition right count:2 */
         memcpy(p, &pl->head[c], sizeof(void *));
         pl->head[c] = p;
         pl->n[c]++;

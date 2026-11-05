@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.019.0';
+our $VERSION = '0.020.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -415,6 +415,7 @@ my @CHAPTERS = (
 			'Open the table and click Line graph...',
 			'Choose the X axis. A date column or a number column works well.',
 			'Choose the Y axis. This must be a number column.',
+			'Optional: choose Lines by to draw one line for each value of a column, such as one per region.',
 			'For a total per period, set Time bucket and then set Aggregate to Sum.',
 			'Click Plot.',
 		],
@@ -522,7 +523,7 @@ my @CHAPTERS = (
 			'Optional: choose Colour by to colour the points by a group. Use Bubble size to size them by a number.',
 			'Click Plot.',
 		],
-		tip   => 'If a column is not numeric, it does not appear in the axis lists.',
+		tip   => 'If a column is not numeric, it does not appear in the axis lists. A scatter card on a canvas keeps its colours and bubbles. In Add current view, choose Scatter chart to set Colour by and Bubble size there too.',
 		walkthrough => {
 			title => 'Walk through: county location and size',
 			intro => 'This example uses the virginia_counties table in the data folder.',
@@ -548,9 +549,10 @@ my @CHAPTERS = (
 			'Choose X axis.',
 			'Choose Bar column (numeric).',
 			'Choose Line column (numeric).',
+			'Optional: choose a scheme in Colours. The bars take its first colour and the line its second.',
 			'Click Plot.',
 		],
-		tip   => 'Use a combo chart when two numbers are measured in different units.',
+		tip   => 'Use a combo chart when two numbers are measured in different units. A combo card on a canvas keeps its colours.',
 		routes => [ '/combo' ],
 	},
 	{
@@ -564,9 +566,12 @@ my @CHAPTERS = (
 			'Choose Category column.',
 			'Leave Value (tile size) on Count (rows), or choose a number column to sum.',
 			'Set Top N tiles if you want only the largest groups.',
+			'Optional: choose Colour by to shade each tile by another number, such as a margin.',
+			'Colour from says how that number is worked out for each tile. Average is the default.',
+			'Colour scale picks the colours, from light for low values to dark for high ones.',
 			'Click Plot.',
 		],
-		tip   => 'A treemap is useful when one level has many groups.',
+		tip   => 'A treemap is useful when one level has many groups. Size and colour can show two numbers at once: size for sales, colour for margin. A treemap card on a canvas keeps its colours.',
 		routes => [ '/treemap' ],
 	},
 	{
@@ -579,6 +584,7 @@ my @CHAPTERS = (
 			'Open the table and click Histogram...',
 			'Choose Numeric column.',
 			'Set Number of bins. More bins show more detail.',
+			'Optional: choose Bar colour to fill the bars with the first colour of a scheme.',
 			'Click Plot.',
 		],
 		tip   => 'A histogram works best with a number column that has many different values.',
@@ -594,14 +600,19 @@ my @CHAPTERS = (
 			'Open the table and click Map...',
 			'Keep Coordinate columns, then choose the latitude and longitude columns.',
 			'If your table has places instead, choose Place-name column and pick that column.',
+			'If the place is split over two columns, such as an address and its country, choose the second one under Followed by. The map then looks up "Brezje 8, Cerknica, Slovenia".',
 			'Tick Remember columns. Next time, the panel chooses the same columns for this table. Click Forget remembered columns to stop this.',
 			'Tick Heatmap layer to colour the busy areas. Choose a Heat weight column to make some rows count for more.',
 			'Type an Initial zoom from 0 to 19 to start closer in. Leave it empty to fit every marker.',
 			'To colour the markers, choose Colour by column, then click Add rule. The first rule that matches gives the colour.',
 			'Type a Default colour for the markers that match no rule.',
 			'Click Open map.',
+			'If some rows could not be plotted, the map says how many, and why.',
+			'Click Show the rows that were not plotted in the table to see them all.',
+			'Or click List the places that were not plotted to see each place.',
+			'Click the number of rows beside a place to see those rows in the table.',
 		],
-		tip   => 'Rows at one place become one marker. Click a marker to see what it stands for. To size each marker by a number, add &size= and a column name to the map address. To give each category its own colour and a legend, add &series= and a column name instead.',
+		tip   => 'Rows at one place become one marker. Click a marker to see every row it stands for. What the rows share is shown once, and the rest is a short table. A place with many rows shows the first ten, with a link to them all. The scale bar and the key change as you zoom. The key lists only the colours you can see. To size each marker by a number, add &size= and a column name to the map address. To give each category its own colour and a legend, add &series= and a column name instead. A place the local data does not know is looked up on OpenStreetMap. The map opens at once with the places already known. A bar shows each new place as it is looked up. Click Cancel to stop and see the map with the places found so far. Every place found is kept, so the next map of it opens at once.',
 		walkthrough => {
 			title => 'Walk through: Virginia counties on a map',
 			intro => 'This example uses the virginia_counties table in the data folder.',
@@ -943,12 +954,14 @@ my @CHAPTERS = (
 		steps => [
 			'Find the script at script/bi-geocode in the application folder.',
 			'Pass --spec with the table, and --col with the column that holds the place names.',
+			'Give --col twice for a place split over two columns, such as --col Address --col Country.',
 			'For example: bi-geocode --spec table:virginia_counties --col county --region US.',
 			'Pass --region with a country code, such as GB or US, when the names could be in several countries.',
 			'Pass --dry-run to look the places up without keeping the result.',
+			'Places the local data does not know are looked up on OpenStreetMap, one each second. Pass --offline to stop that.',
 			'Run it again at any time. Places that it already knows are not looked up twice.',
 		],
-		tip   => 'The map with a Place-name column then opens at once, because no place has to be looked up. The script needs the Geo::Coder::Free module. Exit code 0 means success.',
+		tip   => 'The map with a Place-name column then opens at once, because no place has to be looked up. The script needs Geo::Coder::List 0.39 and Geo::Coder::Free 0.48 or later. OpenStreetMap also needs Geo::Coder::OSM 0.03 or later. Exit code 0 means success.',
 		routes => [],
 	},
 	{

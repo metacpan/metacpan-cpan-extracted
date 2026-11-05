@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package LinkedList::Single::Example::LRU::Demo v2.0.0;
+use v5.40;
+use FindBin::libs;
+
+use LinkedList::Single::Example::LRU;
+
+########################################################################
+# a cache of three user records in front of a slow lookup. a miss
+# fetches and stores; an entry pushed out is written back.
+########################################################################
+
+sub run( $class, @request )
+{
+    my $fetches = 0;
+
+    my $cache
+    = LinkedList::Single::Example::LRU->new
+    (
+        limit       => 3
+      , on_evict    => sub( $key, $value ) { say "  evicted $key ($value)" }
+    );
+
+    for my $key ( @request )
+    {
+        my $value   = $cache->get( $key );
+
+        if( defined $value )
+        {
+            say "$key: hit";
+        }
+        else
+        {
+            ++$fetches;
+
+            say "$key: miss, fetched";
+
+            $cache->put( $key, "record-$key" );
+        }
+
+        say '  newest first: ', join ' ', map { $_->[ 0 ] } $cache->contents->@*;
+    }
+
+    say "$fetches fetches for ", scalar @request, " requests";
+
+    $cache
+}
+
+__PACKAGE__->run( qw( a b c a d b e a ) )
+unless caller;
+
+1
+__END__
+
+=head1 NAME
+
+lru-cache - demonstration of LinkedList::Single::Example::LRU
+
+=head1 SYNOPSIS
+
+    perl app/10-LRU/lru-cache
+
+=head1 DESCRIPTION
+
+Requests eight keys through a cache of three, showing which are hits,
+which entries are evicted, and the order after every request. See
+L<LinkedList::Single::Example::LRU::POD> for the design and the measurements.

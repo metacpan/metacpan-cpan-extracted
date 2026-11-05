@@ -419,7 +419,8 @@ subtest 'hostile input is optimised in linear time' => sub {
 	) {
 		my ($name, $page) = @{$test};
 
-		# HTML::Packer is itself quadratic here; t/90 runs this without it
+		# HTML::Packer is itself quadratic here, so t/90 runs this without it.
+		# https://github.com/leejo/html-packer-perl/issues/20
 		if ($HAVE_PACKER && ($name =~ /<pre>/)) {
 			pass("$name: skipped, HTML::Packer is installed");
 			next;

@@ -64,6 +64,9 @@ t/21-nested.t
 t/22-functions.t
 t/23-pool.t
 t/24-callback-loop.t
+t/25-no-memory.t
+t/26-edges.t
+t/27-check-rules.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

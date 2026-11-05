@@ -137,8 +137,10 @@ list(self)
             PUSHs(sv_2mortal(newSVuv((UV)v->count)));
             XSRETURN(1);
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1
         if (v->count > ((size_t)-1 >> 2))
-            croak("HAMT::Vector::list: too many elements for one list");
+            croak("HAMT::Vector::list: too many elements for one list"); /* # uncoverable statement */
         EXTEND(SP, (SSize_t)v->count);
         hamt_vec_iter_init(&it, v);
         while ((run = hamt_vec_iter_next(&it, &start, &n)))
@@ -161,6 +163,8 @@ to_array(self)
         av = newAV();
         ST(0) = sv_2mortal(newRV_noinc((SV *)av));
         if (v->count) {
+            # uncoverable branch true
+            # uncoverable condition left count:1
             if (v->count > (size_t)I32_MAX) croak("HAMT::Vector::to_array: too many elements for an array");
             av_extend(av, (I32)(v->count - 1));
         }
@@ -277,7 +281,7 @@ remove(self, index, ...)
     CODE:
         v = hamt_vec_handle(aTHX_ self, "HAMT::Vector::remove");
         if (items > 3) croak("HAMT::Vector::remove: too many arguments");
-        if (items == 3 && SvOK(ST(2))) {
+        if (items == 3 && SvOK(ST(2))) { /* # uncoverable condition right count:2 */
             l = SvIV(ST(2));
             if (l < 0) croak("HAMT::Vector::remove: length %" IVdf " is negative", l);
             len = (size_t)l;
@@ -322,7 +326,7 @@ each(self, code)
                 args[0] = (SV *)run[i];
                 args[1] = idxsv;
                 how = hamt_xs_call(aTHX_ code, args, 2, NULL);
-                if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break;
+                if (how == HAMT_XS_LAST || (err = hamt_xs_call_err(aTHX_ how, 1))) break; /* # uncoverable branch true count:1 class:ignore_covered_err */
             }
         }
         hamt_xs_call_leave(aTHX);

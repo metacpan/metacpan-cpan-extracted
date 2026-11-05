@@ -3,7 +3,7 @@ package Database::BI::Summary;
 use strict;
 use warnings;
 
-our $VERSION = '0.019.0';
+our $VERSION = '0.020.0';
 
 use Carp        qw(croak);
 use Digest::MD5 qw(md5_hex);
