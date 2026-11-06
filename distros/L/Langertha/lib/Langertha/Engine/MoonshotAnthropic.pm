@@ -1,6 +1,6 @@
 package Langertha::Engine::MoonshotAnthropic;
 # ABSTRACT: Moonshot AI Kimi API via Anthropic-compatible endpoint
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( croak );
 
@@ -125,7 +125,7 @@ Langertha::Engine::MoonshotAnthropic - Moonshot AI Kimi API via Anthropic-compat
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -206,7 +206,7 @@ C<LANGERTHA_MOONSHOT_API_KEY> in your environment.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -223,7 +223,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

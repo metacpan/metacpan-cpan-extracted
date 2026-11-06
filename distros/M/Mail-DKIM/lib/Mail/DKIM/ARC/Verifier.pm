@@ -1,7 +1,7 @@
 package Mail::DKIM::ARC::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: verifies an ARC-Sealed message
 
 # Copyright 2017 FastMail Pty Ltd.  All Rights Reserved.
@@ -15,6 +15,7 @@ our $VERSION = '1.20240923'; # VERSION
 use base 'Mail::DKIM::Common';
 use Mail::DKIM::ARC::MessageSignature;
 use Mail::DKIM::ARC::Seal;
+use Mail::DKIM::Canonicalization::seal;
 use Mail::Address;
 use Carp;
 our $MAX_SIGNATURES_TO_PROCESS = 50;
@@ -109,33 +110,6 @@ sub add_signature {
         return;
     }
 
-    # signature looks ok, go ahead and query for the public key
-    $signature->fetch_public_key;
-
-    # create a canonicalization filter and algorithm
-    my $algorithm_class =
-      $signature->get_algorithm_class( $signature->algorithm );
-    my $algorithm = $algorithm_class->new(
-        Signature              => $signature,
-        Debug_Canonicalization => $signature->isa('Mail::DKIM::ARC::Seal')
-        ? $self->{AS_Canonicalization}
-        : $self->{AMS_Canonicalization},
-    );
-
-    # push through the headers parsed prior to the signature header
-    if ( $algorithm->wants_pre_signature_headers ) {
-
-        # Note: this will include the signature header that led to this
-        # "algorithm"...
-        foreach my $head ( @{ $self->{headers} } ) {
-            $algorithm->add_header($head);
-        }
-    }
-
-    # save the algorithm
-    $self->{algorithms} ||= [];
-    push @{ $self->{algorithms} }, $algorithm;
-
  # check for bogus tags (should be done much earlier but better late than never)
  # tagkeys is uniq'd via a hash, rawtaglen counts all the tags
     my @tagkeys   = keys %{ $signature->{tags_by_name} };
@@ -159,8 +133,10 @@ sub add_signature {
         return;
     }
 
+    # the instance this signature will be saved at, once it has been set up
+    my ( $set, $instance );
+
     if ( $signature->isa('Mail::DKIM::ARC::Seal') ) {
-        my ($instance);
         $instance = $signature->instance() || '';
 
         if ( $instance !~ m{^\d+$} or $instance < 1 or $instance > $MAX_SIGNATURES_TO_PROCESS ) {
@@ -181,10 +157,10 @@ sub add_signature {
             return;
         }
 
-        $self->{seals}[$instance] = $signature;
+        $set = 'seals';
     }
     elsif ( $signature->isa('Mail::DKIM::ARC::MessageSignature') ) {
-        my $instance = $signature->instance() || '';
+        $instance = $signature->instance() || '';
 
         if ( $instance !~ m{^\d+$} or $instance < 1 or $instance > $MAX_SIGNATURES_TO_PROCESS ) {
             $self->{result} = 'fail';    # bogus
@@ -207,8 +183,37 @@ sub add_signature {
             }
             return;
         }
-        $self->{messages}[$instance] = $signature;
+        $set = 'messages';
     }
+
+    # signature looks ok, go ahead and query for the public key
+    # (only now that the tags and instance number have been checked, so a
+    # bogus signature costs neither a DNS query nor a canonicalization)
+    $signature->fetch_public_key;
+
+    # create a canonicalization filter and algorithm
+    my $algorithm_class =
+      $signature->get_algorithm_class( $signature->algorithm );
+    my $algorithm = $algorithm_class->new(
+        Signature              => $signature,
+        Debug_Canonicalization => $signature->isa('Mail::DKIM::ARC::Seal')
+        ? $self->{AS_Canonicalization}
+        : $self->{AMS_Canonicalization},
+    );
+
+    # an algorithm that wants the headers prior to the signature header
+    # canonicalizes the whole header from finish_header(), so only the
+    # others need each header field as it is parsed
+    push @{ $self->{header_algorithms} }, $algorithm
+      unless $algorithm->wants_pre_signature_headers;
+
+    # save the algorithm
+    $self->{algorithms} ||= [];
+    push @{ $self->{algorithms} }, $algorithm;
+
+    # fetch_public_key dies on an unusable selector or domain, so only now
+    # save the signature for the chain checks
+    $self->{$set}[$instance] = $signature if $set;
 }
 
 sub check_signature {
@@ -348,24 +353,51 @@ sub finish_header {
         return;
     }
 
-    # check for duplicate AAR headers (dup AS and AMS checked in add_signature)
-    my @aars = [];
-    foreach my $hdr ( @{ $self->{headers} } ) {
-        if ( my ($i) = $hdr =~ m{ARC-Authentication-Results:\s*i=(\d+)\s*;}i ) {
-            if ( defined $aars[$i] ) {
-                $self->{result} = 'fail';
-                $self->{details} =
-                  "Duplicate ARC-Authentication-Results header $1";
-                return;
-            }
-            $aars[$i] = $hdr;
-        }
+    # already failed in add_signature: drop the algorithms, since a seal
+    # canonicalization loops up to its signature's i= value, which may be
+    # the bad instance number that failed the chain
+    if ( $self->{result} ) {
+        $self->{algorithms} = [];
+        return;
     }
 
+    # check the AAR headers: each must have an instance the seal
+    # canonicalization finds, since one it doesn't is covered by no seal
+    # but may still be read as part of the chain (e.g. "i = 1", which
+    # RFC 8617 allows), and there must be no duplicates (dup AS and AMS
+    # checked in add_signature)
+    my %aars;
+    foreach my $hdr ( @{ $self->{headers} } ) {
+        next unless $hdr =~ m{^ARC-Authentication-Results\s*:}i;
+        my $i = Mail::DKIM::Canonicalization::seal::_aar_instance($hdr);
+        if ( !defined $i ) {
+            $self->{result}  = 'fail';
+            $self->{details} = 'Unparseable ARC-Authentication-Results header';
+            return;
+        }
+        if ( $i < 1 or $i > $MAX_SIGNATURES_TO_PROCESS ) {
+            $self->{result} = 'fail';
+            $self->{details} =
+              "Invalid ARC-Authentication-Results instance '$i'";
+            return;
+        }
+        if ( defined $aars{$i} ) {
+            $self->{result} = 'fail';
+            $self->{details} =
+              "Duplicate ARC-Authentication-Results header $i";
+            return;
+        }
+        $aars{$i} = $hdr;
+    }
+    $self->{aars} = \%aars;
+
+    # share the header indexes between the signatures
+    my $index = {};
     foreach my $algorithm ( @{ $self->{algorithms} } ) {
         $algorithm->finish_header(
-            Headers => $self->{headers},
-            Chain   => 'pass'
+            Headers     => $self->{headers},
+            HeaderIndex => $index,
+            Chain       => 'pass'
         );
     }
 
@@ -488,6 +520,7 @@ sub finish_body {
 
     my $seals    = $self->{seals}    || [];
     my $messages = $self->{messages} || [];
+    my $aars     = $self->{aars}     || {};
     unless ( @$seals or @$messages ) {
         $self->{result}  = 'none';
         $self->{details} = 'no ARC headers found';
@@ -521,6 +554,13 @@ sub finish_body {
         return;
     }
 
+    my ($max_aar) = sort { $b <=> $a } keys %$aars;
+    if ( defined $max_aar and $max_aar > $#$seals ) {
+        $self->{result}  = 'fail';
+        $self->{details} = 'missing Arc-Seal ' . $max_aar;
+        return;
+    }
+
     foreach my $i ( 1 .. $#$seals ) {
 
 # XXX - we should error if it's already present, but that's done above if at all
@@ -532,6 +572,11 @@ sub finish_body {
         if ( !$messages->[$i] ) {
             $self->{result}  = 'fail';
             $self->{details} = "missing ARC-Message-Signature $i";
+            return;
+        }
+        if ( !$aars->{$i} ) {
+            $self->{result}  = 'fail';
+            $self->{details} = "missing ARC-Authentication-Results $i";
             return;
         }
     }
@@ -558,7 +603,7 @@ sub finish_body {
     }
     foreach my $i ( 2 .. $#$seals ) {
         my $cv = $seals->[$i]->get_tag('cv');
-        if ( $cv ne 'pass' ) {
+        if ( !defined $cv or $cv ne 'pass' ) {
             $self->{signature} = $seals->[$i]->signature;
             $self->{result}    = 'fail';
             $self->{details}   = "wrong cv for ARC-Seal i=$i";
@@ -626,7 +671,7 @@ Mail::DKIM::ARC::Verifier - verifies an ARC-Sealed message
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 

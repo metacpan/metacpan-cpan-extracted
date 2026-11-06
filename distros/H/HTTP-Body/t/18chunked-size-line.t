@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use HTTP::Body;
 use Time::HiRes qw/ time /;
@@ -20,8 +20,17 @@ my $ct = 'application/x-www-form-urlencoded';
 {
     # A size line whose first LF has no CR before it never matches; the
     # old pattern backtracked over it in time quadratic in its length.
+    # Without the line length limit the line reaches the pattern whole.
+    local $HTTP::Body::max_chunk_line_size = 0;
     my $body = HTTP::Body->new( $ct, undef );
     my $t    = time;
-    $body->add( ( '1' x 100_000 ) . "\n\r\n" );
+    eval { $body->add( ( '1' x 100_000 ) . "\n\r\n" ) };
     cmp_ok( time - $t, '<', 5, 'unterminated chunk size line is rejected in linear time' );
+    like( $@, qr/Invalid chunk size line/, '... and refused' );
+}
+
+{
+    my $body = HTTP::Body->new( $ct, undef );
+    eval { $body->add( ( '1' x 100_000 ) . "\n\r\n" ) };
+    like( $@, qr/Chunk size line exceeds/, 'with the limit it is refused by its length alone' );
 }

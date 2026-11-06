@@ -6,7 +6,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(differential_evolution grid_search);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf8
 

@@ -21,7 +21,7 @@ $DEBUG = 0;
 # entry creation and parsing from a Text::BibTeX::File object
 
 my ($bibfile, $entry);
-my $multiple_file = 'btparse/tests/data/simple.bib';
+my $multiple_file = 't/data/simple.bib';
 
 ok($bibfile = Text::BibTeX::File->new( $multiple_file));
 err_like sub { ok($entry =  Text::BibTeX::Entry->new( $bibfile)); },

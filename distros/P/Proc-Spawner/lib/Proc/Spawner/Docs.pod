@@ -144,8 +144,8 @@ Every probed difference between dash and bash, blatant or subtle, with who or wh
 
 =head2 Not Markdown
 
-F<doc/checklists/*.html> are the decision pages (items, plans, and Claude's answers; the marks lived in the
-published pages and show empty here). F<doc/large-subset/tools/> and F<doc/parsers/tools/> hold the
+The decision pages (items, plans, and Claude's answers) are no longer shipped: "Shell Corpus Gaps" is in
+Proc-Spawner 0.04, the older ones in 0.03. F<doc/large-subset/tools/> and F<doc/parsers/tools/> hold the
 measurement and test-pool scripts; F<doc/large-subset/dialect-cases/> the probes run in both shells.
 
 =head1 SEE ALSO

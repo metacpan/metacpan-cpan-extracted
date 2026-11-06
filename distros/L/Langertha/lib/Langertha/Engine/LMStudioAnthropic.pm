@@ -1,6 +1,6 @@
 package Langertha::Engine::LMStudioAnthropic;
 # ABSTRACT: LM Studio via Anthropic-compatible API
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 
 extends 'Langertha::Engine::AnthropicBase';
@@ -80,7 +80,7 @@ Langertha::Engine::LMStudioAnthropic - LM Studio via Anthropic-compatible API
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -130,7 +130,7 @@ no explicit C<api_key> and no C<LANGERTHA_LMSTUDIO_API_KEY> are set.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -147,7 +147,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

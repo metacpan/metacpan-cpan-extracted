@@ -40,6 +40,21 @@ You can also look for information at:
         https://metacpan.org/release/Chandra
 
 
+COVERAGE
+
+The dist is at 100% under Devel::XSCover, Perl and C alike, when the live
+tests run. They open a window, a tray and a notification, so they run only
+when asked for:
+
+    CHANDRA_LIVE_TESTS=1 xs_cover
+
+A bare xs_cover leaves the native paths of core.xs, tray.xs, app.xs and the
+window and PerlChandra headers uncovered. The bundled webview sources are
+left out by the .xs_cover file beside this README (Devel::XSCover 0.08 and
+later), or by -ignore include/webview on older versions. Under Linux the same
+run works in a container with Xvfb, see docker/xs-cover.sh in the
+Semantic tree.
+
 LICENSE AND COPYRIGHT
 
 This software is Copyright (c) 2026 by LNATION.

@@ -74,19 +74,22 @@ The broker exposes three tools of its own:
 Lists the configured downstream servers and their instructions by prefix.
 An entry is a string of instructions, C<null> for a reachable server with
 no instructions, or C<{error: MESSAGE}> for an unreachable server.
+Hidden servers are listed, with instructions on how to discover their tools.
 
 =item list-tools
 
 Queries downstream servers for their tool definitions and refreshes the
 combined list. An optional C<broker> argument selects one exact downstream
-prefix, excluding the multibroker's own tools. Unknown broker names or
+prefix, including hidden servers and excluding the multibroker's own tools.
+Without C<broker>, hidden servers are omitted. Unknown broker names or
 arguments are errors. Unreachable servers are omitted from tool listings
 but reported by C<discover-brokers>.
 
 =item call-tool
 
 Calls a downstream tool by its C<PREFIX.TOOL> name with the supplied
-arguments. Calls to an unavailable server fail as tool errors; calls are
+arguments, including hidden servers. Calls to an unavailable server fail
+as tool errors; calls are
 not replayed after transport failures.
 
 =back
@@ -135,6 +138,13 @@ Broker-wide options precede the first server entry. Downstream options
 follow that server's URL or closing C<--->; Getopt::Long stops at the next
 prefix. Options inside an argv list belong exclusively to the child.
 
+C<--hidden> after a server keeps its tools out of normal MCP C<tools/list>
+and unfiltered C<list-tools> results. This reduces the initial tool list
+for large or rarely used servers. C<discover-brokers> still lists it;
+C<list-tools broker=PREFIX>
+returns its definitions, and C<call-tool> still works. Hiding reduces the
+advertised tool set, not the permissions or availability of the server.
+
 C<--eager> after either stdio form starts that child at
 multibroker startup rather than waiting for its first MCP use. This is useful
 for children that also provide their own TCP service, such as C<mcp-vim>.
@@ -159,17 +169,23 @@ C<--listen> to keep this listener active:
 Use the token returned by C<--print-url>. The connecting server extracts
 the host, port, token and alias from this URL, sends
 C<["mcp-connect", token, alias]> followed by a newline, then ordinary MCP
-JSONL. The connection is raw TCP on the HTTP listener, not an HTTP request.
+JSONL. The connection uses the HTTP listener but is not an HTTP request.
+With C<--tls-cert> or C<--tls-key>, the same port also accepts TLS, and
+C<--print-url> prints HTTPS first and HTTP second. Reverse connections using
+C<https://> verify the listener certificate and hostname; C<http://> uses
+plaintext.
 It uses the same accepted tokens as HTTP. Authentication grants registration
 under any free alias; configured or connected aliases cannot be replaced.
 
 The connecting program remains the MCP server. The multibroker attaches an
 MCP client and discovers its tools immediately. Forms and cancellation follow
-the same routes as other downstream connections. A disconnect fails pending
-calls and removes the registration; the server retries once per second, up to
-sixty attempts, and registers again when the connection is restored.
-No interrupted operation is replayed. Plain HTTP endpoint URLs do not provide
-transport encryption; use an existing trusted connection or tunnel as needed.
+the same routes as other downstream connections. An unexpected disconnect
+fails pending calls, removes the registration and starts a new connection
+period. Refused TCP connections are retried every second, up to sixty times.
+Other TCP setup failures and TLS verification failures log an error and stop;
+there is no automatic downgrade to plaintext. No interrupted operation is
+replayed. Plain HTTP endpoint URLs do not provide transport encryption;
+use a trusted connection or tunnel as needed.
 
 =head2 Process lifetime
 
@@ -186,8 +202,12 @@ C<--ask helper> (the default) answers downstream form challenges locally.
 Ordinary forms use C<anyevent-mcp-form-elicitation>; permission requests keep their
 specialised permission dialogs. C<--ask mcp> forwards modern challenges to
 the upstream client. C<--ask auto> uses upstream form support when advertised,
-otherwise the local helper. A decline or cancel is never retried through
-another interface. If a client advertises forms but silently declines them,
+otherwise the local helper. Both modes deliberately trust the upstream
+client's user assertion when permission authority has been delegated to it.
+The multibroker forwards the original authenticated user with every tool call,
+even when a downstream saved permission rule resolves that request without
+another prompt. A decline or cancel is never retried through another
+interface. If a client advertises forms but silently declines them,
 select C<helper> explicitly.
 
 C<--ask tty> and C<--ask yad> select only the built-in terminal or YAD
@@ -236,47 +256,83 @@ still require an accepted token. See L<AnyEvent::MCP::Intro> for examples.
 
 =head1 OPTIONS
 
-Common upstream server options:
-L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-The default upstream instance name is C<default>; it does not affect child
-prefixes. C<--token> authenticates upstream; C<--bearer> authenticates
-a downstream HTTP child. C<--tool-help> lists broker's own tools only,
-not child registries. Automatic permission rules match broker-visible
-tool names, not downstream servers' independent permission checks.
+Shared upstream switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+Put broker-wide options before the first PREFIX/URL pair. Downstream
+options must immediately follow the server they configure.
 
-Put upstream options B<before> first PREFIX/URL pair. Options applying
-to one downstream server follow that pair immediately.
+=head2 Broker options
 
 =over
 
 =item --listen
 
-Keep upstream HTTP/extension listener active alongside C<--stdio> or
-C<--connect>. Without those, HTTP is already default. Applies to
-upstream broker, not child connections.
+Keep the upstream HTTP/extension listener active alongside C<--stdio>
+or C<--connect>. Without those, HTTP is already the default.
+Applies to the broker, not its downstream servers.
 
 =item --ask MODE
 
-Permission prompts for downstream servers: C<helper> (default), C<tty>,
-C<yad>, C<mcp>, or C<auto>. Selects local prompt interface or upstream
-client elicitation; passes mode to spawned stdio children as their
-permission default. See L</PERMISSION PROMPTS>.
+Select how downstream permission prompts are presented:
+C<helper> (default), C<tty>, C<yad>, C<mcp>, or C<auto>.
+This also supplies the default asking mode to spawned stdio children.
+See L</PERMISSION PROMPTS>.
+
+=back
+
+=head2 Downstream options
+
+=over
 
 =item --bearer TOKEN
 
-Authenticate preceding HTTP(S) child with bearer token; does not configure
-upstream listener. Supply after child URL; invalid for stdio children.
+Authenticate the preceding HTTP(S) child with a bearer token, not
+the broker's upstream listener. Supply after the child URL;
+invalid for stdio children.
+
+=item --hidden
+
+Omit the preceding child's tools from ordinary tool discovery,
+including unfiltered C<list-tools>. Discover its definitions with
+C<list-tools> specifying its C<broker> prefix. Its tools remain
+callable by name. Applies to HTTP and stdio children.
 
 =item --eager
 
-Start preceding stdio child immediately at startup, rather than lazily
-on request. Not available for HTTP children.
+Start the preceding stdio child at broker startup instead of on
+first use. Not available for HTTP children.
 
 =item --required
 
-Require preceding stdio child to initialize and stay connected. Implies
-C<--eager>; unexpected disconnect exits multibroker with failure,
-but managed idle shutdown is permitted. Not available for HTTP children.
+Require the preceding stdio child to initialize and remain connected.
+Implies C<--eager>; an unexpected disconnect causes the broker to exit.
+Managed idle shutdown is permitted. Not available for HTTP children.
+
+=back
+
+=head2 Shared-option behavior
+
+=over
+
+=item --name NAME
+
+Select the upstream broker's instance (default C<default>).
+Does not affect downstream prefixes or their instance names.
+
+=item --token TOKEN
+
+Authenticate clients of the upstream broker. To authenticate an
+HTTP(S) child, use C<--bearer> after its URL instead.
+
+=item --tool-help
+
+Lists only the broker's own tools. Use its C<list-tools> tool to
+discover individual downstream registries.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+Matches the broker-visible tool names, not a downstream server's
+independent permission checks.
 
 =back
 
@@ -313,6 +369,7 @@ my $server_options = mcp_getoptions ({
       ["--eager", "Start the preceding stdio child at broker startup"],
       ["--required", "Require stdio child; implies --eager, exit on failure"],
       ["--bearer TOKEN", "Authenticate to the preceding HTTP child"],
+      ["--hidden", "Hide child's tools from default discovery; explicit list-tools and calls still work"],
    ],
    examples => "  $0 --ask auto files 'stdio:mcp-fs /home/alice/src/project'\n"
       . "  $0 files --- mcp-fs /home/alice/src/project --- --eager\n"
@@ -330,7 +387,7 @@ $ask_mode //= $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
 die "--ask must be helper, tty, yad, auto, or mcp\n"
    if defined $ask_mode && $ask_mode !~ /\A(?:helper|tty|yad|auto|mcp)\z/;
 
-my (%broker, %stdio, %eager, %required);
+my (%broker, %stdio, %eager, %required, %hidden);
 my $shutting_down;
 my @prompts;
 my $prompt;
@@ -345,6 +402,9 @@ sub ask_prompt {
 
    my $old_cancel = $req->{on_cancel};
    $req->{on_cancel} = sub {
+      AE::log trace => "local prompt cancelled "
+         . (defined $entry->{started} ? sprintf ("after %.2fs", AE::now - $entry->{started}) : "while queued")
+         . (defined $_[1] ? ": $_[1]" : "");
       $entry->{job}->cancel if $entry->{job};
       $old_cancel->(@_) if $old_cancel;
    };
@@ -368,9 +428,17 @@ sub next_prompt {
             ($ask_mode eq "tty" || $ask_mode eq "yad"
                ? (helper => ["anyevent-mcp-askpermission", "--$ask_mode"]) : ()),
          );
+      $entry->{started} = AE::now;
+      AE::log trace => "local prompt started (" . ($entry->{form} ? "form" : "permission") . ")";
       $entry->{job}->ask ($entry->{prepared}, sub {
          my ($success, $result) = @_;
 
+         unless ($entry->{request}{finished}) {
+            my $outcome = $success
+               ? (ref $result eq "HASH" ? $result->{decision} || $result->{action} || "answered" : "answered")
+               : "failed: $result";
+            AE::log trace => sprintf "local prompt %s after %.2fs", $outcome, AE::now - $entry->{started};
+         }
          undef $prompt;
          delete $entry->{job};
          $entry->{done}->($success, $result) unless $entry->{request}{finished};
@@ -456,7 +524,7 @@ sub on_child_notification {
 
    return unless $stdio{$prefix} && $method eq "anyevent-mcp/idle-exit";
    return if $client->{idle_shutdown_pending};
-   # The child offered to exit; only act while no broker calls need it.
+   # the child offered to exit; only act while no broker calls need it.
    return if keys %{$client->{operations}};
 
    $client->{idle_shutdown_pending} = 1;
@@ -574,6 +642,7 @@ while (@ARGV) {
          defined $command or die "--eager requires a stdio broker ('$prefix')\n";
          $eager{$prefix} = 1;
       },
+      "hidden" => sub { $hidden{$prefix} = 1 },
       "required" => sub {
          defined $command or die "--required requires a stdio broker ('$prefix')\n";
          $eager{$prefix} = $required{$prefix} = 1;
@@ -615,7 +684,7 @@ sub all_tools {
    my ($req, $done, $name) = @_;
 
    my @tools = defined $name ? () : map @{$_->list}, @{$req->{server}{toolsets}};
-   my @prefix = defined $name ? ($name) : sort keys %broker;
+   my @prefix = defined $name ? ($name) : grep !$hidden{$_}, sort keys %broker;
    my @results;
    my %pending = map { $_ => 1 } @prefix;
    my $remaining = @prefix;
@@ -668,6 +737,7 @@ sub call_tool {
    AE::log trace => "multibroker $name";
    my %params = (%{$req->{params}}, name => $tool, arguments => $args);
    $params{_meta} = { %{$params{_meta} || {}} };
+   $params{_meta}{"anyevent-mcp/user"} = $req->{user};
    my $caps = $params{_meta}{"io.modelcontextprotocol/clientCapabilities"};
    $caps = ref $caps eq "HASH" ? { %$caps } : {};
    my $native_forms = $req->{protocol_version} ge "2026"
@@ -731,7 +801,9 @@ $toolset->tool (discover_brokers =>
             return if $finished;
             my ($success, $result) = @_;
             if ($success) {
-               $instructions{$prefix} = $client->{instructions};
+               $instructions{$prefix} = $hidden{$prefix}
+                  ? "Hidden tools; use list-tools broker=$prefix.\n" . ($client->{instructions} // "")
+                  : $client->{instructions};
             } else {
                AE::log warn => "$prefix: $result->{message}";
                $instructions{$prefix} = { error => $result->{message} };
@@ -743,11 +815,11 @@ $toolset->tool (discover_brokers =>
    },
 );
 $toolset->tool (list_tools =>
-   "Refresh available tools; optional broker filters to one downstream. Omit for local + all reachable brokers.",
+   "Refresh tools; broker selects one downstream, including hidden ones. Omit for local + visible brokers.",
    {
       type => "object",
       properties => {
-         broker => { type => "string", description => "Downstream broker; underscores may replace hyphens. Omit for all brokers + local tools." },
+         broker => { type => "string", description => "Downstream broker, including hidden; underscores may replace hyphens. Omit for visible brokers + local tools." },
       },
       additionalProperties => JSON::XS::false,
    },
@@ -796,9 +868,9 @@ mcp_config
    server_version => $AnyEvent::MCP::VERSION,
    on_request => \&log_request,
    on_error => sub { AE::log error => "MCP dispatch $_[1]{method}: $_[2]" },
-   short_instructions => "MCP tool router. Find downstream tools; discover-brokers gives purposes. Tools may change.",
+   short_instructions => "MCP tool router. discover-brokers lists servers including hidden ones; list-tools broker=NAME finds their tools.",
    instructions => <<'EOF';
-Proxy MCP servers (Vim, filesystem, browser, etc.) as PREFIX.TOOL. discover-brokers returns server purposes; list-tools refreshes tools; call-tool invokes by prefixed name, including tools not yet loaded. Tools may change dynamically.
+Proxy MCP servers as PREFIX.TOOL. discover-brokers lists servers, including hidden ones; list-tools broker=NAME retrieves a server's tools. list-tools without a broker returns visible tools; call-tool invokes by prefixed name, even when hidden. Tools may change.
 EOF
 
 # start selected stdio children now, before the upstream event loop starts.

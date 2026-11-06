@@ -1,6 +1,6 @@
 package Langertha::Engine::vLLM;
 # ABSTRACT: vLLM inference server
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( croak );
 
@@ -75,7 +75,7 @@ Langertha::Engine::vLLM - vLLM inference server
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -193,6 +193,11 @@ vLLM translates the value into C<enable_thinking> via the chat template:
     reasoning_effort none              ->  enable_thinking = false
     (unset)                            ->  enable_thinking not injected
 
+vLLM stays on the C<openai> reasoning wire, because it does that mapping
+itself. A vLLM whose template needs the switch sent explicitly opts in with
+C<< reasoning_wire_format =E<gt> 'chat_template_kwargs' >>
+(L<Langertha::Reasoning/to_chat_template_kwargs>).
+
 The thought itself comes back in the C<reasoning> response field — mainline
 vLLM renamed it from C<reasoning_content> to C<reasoning> in v0.16.0, and
 both spellings are read — surfaced on C<< $response->thinking >>. It is only
@@ -301,7 +306,7 @@ Advertised flags (derived from composed roles via L<Langertha::Role::Capabilitie
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -318,7 +323,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

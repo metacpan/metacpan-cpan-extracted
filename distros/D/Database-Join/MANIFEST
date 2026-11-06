@@ -1,6 +1,7 @@
 Changes
 cpanfile
 lib/Database/Join.pm
+lib/Database/Join/Catalog.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -15,6 +16,7 @@ t/40-filters.t
 t/50-logic-proofs.t
 t/aggregate.t
 t/base-criteria.t
+t/catalog.t
 t/cgi_security.t
 t/cities.t
 t/collision-prefix.t

@@ -54,11 +54,13 @@ dnf install perl-HTTP-Body
 
 ### Dependencies
 
-- [HTTP::Headers](https://metacpan.org/pod/HTTP::Headers)
-- [HTTP::Message](https://metacpan.org/pod/HTTP::Message)
+- [HTTP::Message](https://metacpan.org/pod/HTTP::Message) (includes [HTTP::Headers](https://metacpan.org/pod/HTTP::Headers))
 - [File::Temp](https://metacpan.org/pod/File::Temp) (>= 0.14)
 - [IO::File](https://metacpan.org/pod/IO::File) (>= 1.14)
-- [Digest::MD5](https://metacpan.org/pod/Digest::MD5)
+- [File::Spec](https://metacpan.org/pod/File::Spec)
+- [Carp](https://metacpan.org/pod/Carp)
+
+All but HTTP::Message ship with Perl itself.
 
 ## Synopsis
 
@@ -142,6 +144,11 @@ To bound resource use on hostile input, `add()` enforces limits and croaks when 
 | `$HTTP::Body::UrlEncoded::max_params` | 1000 | fields in a urlencoded body |
 | `$HTTP::Body::MultiPart::max_header_size` | 32768 | bytes in a part's header block |
 | `$HTTP::Body::MultiPart::max_header_lines` | 100 | lines in a part's header block |
+| `$HTTP::Body::max_chunk_line_size` | 1024 | bytes in a chunk-size line of a chunked body |
+| `$HTTP::Body::max_trailer_size` | 32768 | bytes in the trailer of a chunked body |
+| `$HTTP::Body::max_trailer_lines` | 100 | header lines in the trailer of a chunked body |
+
+A chunked body with malformed framing (a line that is no chunk-size line, a size that does not fit an integer, chunk data not followed by CRLF) makes `add()` croak as well.
 
 ## Configuring Upload Temporary Files
 
@@ -150,6 +157,10 @@ By default, temporary files for uploads use the `.upload` extension instead of t
 ```perl
 # Keep the uploaded file's own extension (behavior before 1.23)
 $HTTP::Body::MultiPart::file_temp_suffix = undef;
+
+# How that extension is taken from the filename (only used when
+# file_temp_suffix is undef; matched against the last 255 bytes)
+$HTTP::Body::MultiPart::basename_regexp = qr/(\.\w+)$/;
 
 # Custom File::Temp template
 $HTTP::Body::MultiPart::file_temp_template = 'uploadXXXXXX';

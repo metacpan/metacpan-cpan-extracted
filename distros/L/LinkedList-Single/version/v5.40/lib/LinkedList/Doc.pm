@@ -1,4 +1,4 @@
-package LinkedList::Single::Doc v2.0.0;
+package LinkedList::Single::Doc v2.0.1;
 1
 __END__
 
@@ -6,7 +6,7 @@ __END__
 
 =head1 NAME
 
-LinkedList::Single v2.0.0 - Re-written using Object::Pad.
+LinkedList::Single v2.1.0 - Re-written using Object::Pad.
 
 =head1 SYNOPSIS
 
@@ -39,18 +39,6 @@ LinkedList::Single v2.0.0 - Re-written using Object::Pad.
     {
         die 'This list is empty!';
     }
-
-    # the lists's root node can store data for the list. 
-    # this node is unaffected by shift/unshift/push/pop
-    # and the set_data/data calls will succeed on an
-    # empty list.
-    #
-    # data returns a list or arrayref of copied values.
-
-    $list->set_data( 'List Name', [ qw( blah blah ) ] );
-
-    my @data    = $list->data;  # ( 'List Name', [...]  )
-    my $data    = $list->data;  # [ 'List Name', [...]  ]
 
     # lists have a head and tail if they are not empty;
     # accessing the head or tail of an empty list will
@@ -713,53 +701,148 @@ LinkedList::Single v2.0.0 - Re-written using Object::Pad.
 
 =head1 DESCRIPTION
 
-What you have here are two classes:
+What you have here are three trivial classes:
 
     LinkedList::Single::List
     LinkedList::Single::Coursor
-
-and one role:
+    LinkedList::Single::Fragment
 
     LinkedList::Single::NodeMgr
 
-Class similarities:
+And four not-to-trivial roles:
+
+    LinkedList::Single::NodeMgr;    # manage node structure.
+    LinkedList::Single::Header;     # access current node.
+    LinkedList::Single::Iterator;   # move along the list.
+    LinkedList::Single::Transient;  # nodes without a static List.
+
 
 =over 4
 
-Lists and cursors both access an ordered list of "nodes" that contain 
-data and references to the next node. The references only go one way, 
-"down" the list and the data may be anything, including other lists, 
-or empty.
+The objects all access an ordered list of "nodes" that contain 
+a reference to a next node and [possibly empty] data with a final
+"Sentinel" node that has neither 'next' or data.
 
-The last node on any list is a empty "sentinel" node used to track 
-whether the list is empty (i.e., the first node is a sentinel) or 
-determine if a cursor has iterated through the entire list.
+All of the classes apply NodeMgr in order to access methods that 
+unwrap the node contents. Objects applying Iterator or Transient can 
+move 'down' the list, but never up; objects applying only Header 
+cannot move, have access to "head", "shift", and "unshift" but cannot 
+move. 
 
-Both lists and cursors can be used in a boolean context, testing if a 
-list is not empty or a cursor does not reference the sentinel node.
+The last node on any list is a empty "sentinel" node. A List or 
+Fragment with only a sentinel node is empty; a Cursor referencing a
+sentinel node has walked off the list. 
+
+All of the classes have a boolean operator which returns false if
+the object references a sentinel node.
 
 =back
 
-Basic differences:
+=head2 Roles 
+
+=over4
+
+=item NodeMgr
+
+This is the only role which will 'unwrap' the node structure. If
+some other structure were preferred the methods here could be updated
+to use it without having to modify any of the other roles. The common
+sanity check during construction is that any object does NodeMgr,
+at which point it's assumed suitable for use in the list. NodeMgr
+methods include everyting node() and node_data() for accessing the
+node contents, advance() and next() for moving along the list, and
+append() and insert() to modify the contents. Everything else done
+in all of the roles is defined here.
+
+=item Header
+
+This has the methods for access the current node only, not its 
+'next' node. The role offers immediate access to the list 
+for head(), shift(), and unshift() (or unshift_lazy() or 
+unshift_list()) but nothing that will 'move' the object along 
+a list.
+
+=item Iterator
+
+This has methods for moving along the list using methods in NodeMgr
+to unwrap the next node. This also contains the bulk operations like
+map, grep, each, and sort. Classes using Iterator are not suitable 
+for a list, they move along the list and will not keep the object
+referencing the head. 
+
+=item Transient
+
+The methods here are for managing a list fragment that will be 
+either "consumed" by advancing a cursor-ish object down a list
+without a separate object to keep a static head alive, or for 
+objects that are used to transfer fragments between lists. One
+uncommon trait of many methods here is returning their argument
+rater than the invoking object. This works becuse the transient
+object is empty after pushing its contents or being used to 
+splice part of one list onto another. At that point the dispatching
+object is no longer useful, the destination object hat has the live 
+nodes is.
+
+=back
+
+=head2 Classes
+
+These all apply NodeMgr and use "does( 'NodeMgr' )" as a basic
+sanity check for interacting with other objects.
+
+All of them have a boolean override to return false if the reference
+a sentinel node:
+
+    $list   or die 'Your List is empty';
+    $curs   or die 'Your Cursor has walked off the list';
+    $frag   or die 'Your Fragment has no nodes';
+
+or
+
+    frobnicate( $list->head->node_data ) while $list;
+
+    frobnicate( $curs->node_data ) && $curs->advance while $curs;
+
+    $frag   = LinkedList::Single::Fragment->new( $cursor )
+    or die 'Empty fragment';
 
 =over4 
 
-Lists are anchored and keep their list alive but cannot move;
-cursors can move but won't keep their data alive if they move.
+=item List
 
-List are created empty, have data added to them, and can 
-only manipulate their first ("head") and last ("tail") entries.
+A list object ($list in the code) is constructed empty, never 
+'moves', and serves to anchor the list and keep it alive by 
+referencing the first node. The Header role supplies methods
+head(), shift(), and unshift() but no methods for accessing
+any further nodes down the list. For that uses a Cursor.
 
-Cursors are creatd from lists and can manipulate the data from 
-the middle.
+=item Cursor
 
-Cursors can be used to create transient lists that are dependent
-on the cursor to keep alive; moving the cursor down a fragment 
-will automatically free the previous nodes. This is a Good Thing.
+A Cursor object ($curs in the code) is constructed from some other 
+NodeMgr object, referencing its node. It applys NodeMgr and Iterator
+to allow moving down the list. Cursors are ligtweight, fast to 
+construct, and suitable as transient objects for locating or 
+manipulating nodes along the list. Cursors are returned from 
+methods like head(), tail(), and next() that supply a postition
+along the list.
+
+Note: Cursors are not suitable for transferring nodes between Lists!
+For that uses a Fragment, which detaches the list of nodes from the
+source to avoid dual referencing of the nodes.
+
+=item Fragment
+
+A Fragment object ($frag in the code) is transient, used largely
+to either transfer objects between lists or extract a subset of 
+nodes and consume them by advancing down its list.  It applies 
+NodeMgr, Iterator, and Transient.Fragments are constructed with 
+another NodeMgr object or empty (i.e., with no argument). 
 
 =back
 
 =head2 Basic Structures
+
+<!-- in work below this point -->
 
 =head3 List Class
 

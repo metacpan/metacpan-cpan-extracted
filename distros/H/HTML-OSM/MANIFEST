@@ -29,6 +29,7 @@ t/legend.t
 t/limiting.t
 t/locales.t
 t/mock.t
+t/nonce.t
 t/options.t
 t/pod-cm.t
 t/pod-coverage.t

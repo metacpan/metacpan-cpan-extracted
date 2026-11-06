@@ -21,7 +21,7 @@ BEGIN {
 
 my ($fh, $entry);
 
-my $regular_file = 'btparse/tests/data/regular.bib';
+my $regular_file = 't/data/regular.bib';
 
 # first, from a regular ol' Perl filehandle, with 'new' and 'parse"
 # bundled into one call

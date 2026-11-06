@@ -59,7 +59,7 @@ ok $port == AnyEvent::MCP::Config->new (file => $file)->server_port ("demo"),
    "default port persists across processes";
 my %http = $config->http_settings ("demo");
 ok $http{host} eq "127.0.0.1" && $http{port} == $port, "default listener is IPv4 loopback";
-ok @{$http{tokens}} == 1 && $http{tokens}[0] eq $config->credential ("token", "demo"),
+ok @{$http{tokens}} == 1 && $http{tokens}[0] eq $config->user_credentials ("demo")->[0][2],
    "default listener has one derived URL/bearer token";
 
 $config->{section}{"instance demo"}{bind} = "127.0.0.2:43001";
@@ -76,7 +76,7 @@ ok $http{host} eq "127.0.0.1" && $http{port} == 43003, "port-only bind defaults 
 ok $http{url_host} eq "localhost" && $http{port} == 43005
    && ($http{host} eq "127.0.0.1" || $http{host} eq "::1"), "hostname bind resolves to numeric address";
 ok $config->http_url ("demo", "127.0.0.1:43004", path => "/") eq
-   "http://127.0.0.1:43004/" . $config->credential ("token", "demo") . "/",
+   "http://127.0.0.1:43004/" . $config->user_credentials ("demo")->[0][2] . "/",
    "printable URL uses effective settings and stable token";
 eval { $config->http_url ("demo", ":0", path => "/") };
 ok $@ =~ /port is not known/, "port zero cannot yield an offline URL";
@@ -86,7 +86,7 @@ eval { $config->http_settings ("demo", ":65536") };
 ok $@ =~ /Invalid MCP bind/, "invalid explicit bind ports are rejected";
 my ($n, $b, $u, @tokens);
 my %getopt = AnyEvent::MCP::Config::http_getopt (\$n, \$b, \$u, \@tokens);
-ok $getopt{"name=s"} == \$n && $getopt{"bind=s"} == \$b && $getopt{"print-url"} == \$u
+ok $getopt{"name=s"} == \$n && $getopt{"bind=s"} == \$b && $getopt{"print-url|print-urls:s"} == \$u
    && $getopt{"token=s@"} == \@tokens, "shared Getopt options refer directly to caller lexicals";
 
 ok $config->{section}{"mcp-fs"}{utility} eq "/path with spaces/tool", "arbitrary section and spaces";

@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Find: '0'
   File::Temp: '0'
+  POSIX: '0'
   Test::Exception: '0'
   Test::Mockingbird::TimeTravel: '0.14'
   Test::Most: '0'
@@ -62,5 +63,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/App-FileSync/issues
   repository: https://github.com/nigelhorne/App-FileSync.git
-version: 0.001.5
+version: 0.002.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

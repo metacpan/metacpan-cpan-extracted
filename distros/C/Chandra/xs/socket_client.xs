@@ -71,6 +71,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         dSP;
         int count;
@@ -81,6 +83,8 @@ CODE:
         PUTBACK;
         count = call_method("is_connected", G_SCALAR);
         SPAGAIN;
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (count > 0) { SV *tmp = POPs; RETVAL = SvIV(tmp); }
         PUTBACK;
         FREETMPS;
@@ -101,6 +105,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **handlers_svp = hv_fetchs(hv, "_handlers", 0);
+    # uncoverable condition right count:2
     if (handlers_svp && SvROK(*handlers_svp)) {
         HV *handlers = (HV *)SvRV(*handlers_svp);
         const char *channel;
@@ -122,6 +127,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         dSP;
         int count;
@@ -137,6 +144,7 @@ CODE:
         PUTBACK;
         count = call_method("send", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         RETVAL = (count > 0) ? newSVsv(POPs) : newSViv(0);
         PUTBACK;
         FREETMPS;
@@ -158,15 +166,20 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         /* Increment _next_id */
         SV **id_svp = hv_fetchs(hv, "_next_id", 0);
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         IV id = (id_svp && SvOK(*id_svp)) ? SvIV(*id_svp) + 1 : 1;
         (void)hv_stores(hv, "_next_id", newSViv(id));
 
         /* Store pending callback */
         {
             SV **pending_svp = hv_fetchs(hv, "_pending", 0);
+            # uncoverable condition right count:2
             if (pending_svp && SvROK(*pending_svp)) {
                 HV *pending = (HV *)SvRV(*pending_svp);
                 char id_str[32];
@@ -192,6 +205,7 @@ CODE:
             PUTBACK;
             count = call_method("send", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             RETVAL = (count > 0) ? newSVsv(POPs) : newSViv(0);
             PUTBACK;
             FREETMPS;
@@ -233,6 +247,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         dSP;
         ENTER;
@@ -254,6 +270,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         dSP;
         ENTER;

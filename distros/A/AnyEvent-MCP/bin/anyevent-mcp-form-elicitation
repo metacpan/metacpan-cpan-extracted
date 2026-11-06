@@ -67,11 +67,13 @@ Print short usage synopsis and exit.
 =cut
 
 use common::sense;
+
 use Getopt::Long ();
-use AnyEvent::MCP ();
 use JSON::XS ();
 use Scalar::Util qw(looks_like_number);
 use Text::ParseWords ();
+
+use AnyEvent::MCP ();
 
 Getopt::Long::GetOptions ("tty" => \my $tty_only, "yad" => \my $yad_only, "help" => \my $help) or exit 2;
 die "Unexpected arguments\n" if @ARGV;
@@ -212,7 +214,6 @@ sub response {
    }
    { action => "accept", content => \%content }
 }
-
 
 # escape terminal controls without interpreting markup or form field syntax.
 sub visible {

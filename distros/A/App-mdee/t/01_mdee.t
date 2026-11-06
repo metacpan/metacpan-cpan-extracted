@@ -426,6 +426,24 @@ CONF
         unlike($out, qr/###/, '--no-theme --theme=warm skips hashed');
     }
 
+    # Test --theme and --no-theme skip default[theme]: the result must
+    # differ from what default[theme] gives
+    {
+        open my $fh, q(>), "$config_dir/config.sh" or die;
+        print $fh "default[theme]=\x27warm\x27\n";
+        close $fh;
+        my $out = `XDG_CONFIG_HOME=$tmpdir $mdee -d --dryrun --mode=light --no-theme $test_md 2>&1`;
+        unlike($out, qr/Coral/, q(--no-theme skips default[theme]));
+        $out = `XDG_CONFIG_HOME=$tmpdir $mdee -d --dryrun --mode=light --theme=hashed $test_md 2>&1`;
+        unlike($out, qr/Coral/, q(--theme skips default[theme]));
+        like($out, qr/hashed\.h3=1/, q(--theme still adds to the built-in default));
+        open $fh, q(>), "$config_dir/config.sh" or die;
+        print $fh "default[theme]=\x27hashed\x27\n";
+        close $fh;
+        $out = `XDG_CONFIG_HOME=$tmpdir $mdee -d --dryrun --mode=light --theme=warm $test_md 2>&1`;
+        like($out, qr/Coral/, q(the theme given with --theme is applied));
+    }
+
     # Test --base-color overrides config theme override
     {
         open my $fh, '>', "$config_dir/config.sh" or die;
@@ -480,6 +498,33 @@ subtest 'share theme warm' => sub {
     my $out = `$mdee -d --dryrun --mode=light --theme=warm $test_md 2>&1`;
     is($?, 0, 'warm theme loads successfully');
     like($out, qr/Coral/, 'warm theme uses Coral base color');
+};
+
+subtest 'share theme doubleline' => sub {
+    plan skip_all => 'share/theme/doubleline.sh not found' unless -f 'share/theme/doubleline.sh';
+    my @vars = qw(TERM_PROGRAM KITTY_WINDOW_ID ALACRITTY_WINDOW_ID KONSOLE_VERSION WT_SESSION VTE_VERSION);
+    delete local @ENV{@vars};
+    local $ENV{TERM} = 'xterm-256color';
+    my $h4 = sub {
+	my($opt, %env) = @_;
+	local @ENV{keys %env} = values %env;
+	scalar `$mdee -s cat $opt $test_md`;
+    };
+    my @good = (
+	[ TERM_PROGRAM => 'iTerm.app' ], [ TERM_PROGRAM => 'ghostty' ],
+	[ TERM_PROGRAM => 'vscode' ],    [ TERM_PROGRAM => 'WezTerm' ],
+	[ KITTY_WINDOW_ID => 1 ],  [ ALACRITTY_WINDOW_ID => 1 ],
+	[ KONSOLE_VERSION => 230000 ], [ WT_SESSION => 'x' ], [ VTE_VERSION => 5200 ],
+    );
+    my @bad = (
+	[ TERM_PROGRAM => 'Apple_Terminal' ], [ TERM_PROGRAM => 'tmux' ],
+	[ TERM_PROGRAM => 'unknown' ], [ VTE_VERSION => 5199 ],
+    );
+    like($h4->('', @$_), qr/4:2;1m#* ?Heading 4/, "double underline with @$_") for @good;
+    unlike($h4->('', @$_), qr/4:2/, "no double underline with @$_") for @bad;
+    unlike($h4->(''), qr/4:2/, 'no double underline without the variables');
+    unlike($h4->('--no-theme', TERM_PROGRAM => 'iTerm.app'), qr/4:2/, 'no double underline without the theme');
+    unlike($h4->('', TERM => $_, KITTY_WINDOW_ID => 1), qr/4:2/, "no double underline in TERM=$_") for qw(screen-256color tmux-256color);
 };
 
 subtest 'share themes markcell and markwrap' => sub {
@@ -549,6 +594,7 @@ subtest q(parallel option) => sub {
 subtest q(table style option) => sub {
     my $help = `$mdee --help 2>&1`;
     like($help, qr/--table-style=/, q(--help shows --table-style option));
+    like(`COLUMNS=200 $mdee -ddn --ts=3line $test_md 2>&1`, qr/debug: greple .*table_style=3line/, q(--ts is short for --table-style));
 
     my $default = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
     unlike($default, qr/table_style=/, q(no table_style parameter by default));
@@ -566,6 +612,36 @@ subtest q(table style option) => sub {
 	my $bad = `$mdee -n --table-style=$style $test_md 2>&1`;
 	like($bad, qr/--table-style: lattice, 3line or simple expected/, qq(--table-style=$style is rejected));
     }
+};
+
+subtest q(pass_md in config.sh) => sub {
+    my $tmp = tempdir(CLEANUP => 1);
+    mkdir "$tmp/mdee";
+    open my $fh, q(>), "$tmp/mdee/config.sh" or die;
+    print $fh "pass_md+=(--begin 'sub{ s/a/b/ }')\nmd_config+=(tick_open=x)\n";
+    close $fh;
+    my $out = `XDG_CONFIG_HOME=$tmp COLUMNS=200 $mdee -n $test_md 2>&1`;
+    is(() = $out =~ /--begin 'sub\{ s\/a\/b/g, 1, q(pass_md of config.sh is given once));
+    is(() = $out =~ /tick_open=x/g, 1, q(md_config of config.sh is given once));
+};
+
+subtest q(theme name with a path) => sub {
+    my $tmp = tempdir(CLEANUP => 1);
+    mkdir "$tmp/mdee";
+    mkdir "$tmp/mdee/theme";
+    open my $fh, q(>), "$tmp/evil.sh" or die;
+    print $fh "touch $tmp/run\n";
+    close $fh;
+    open $fh, q(>), "$tmp/mdee/theme/good.sh" or die;
+    print $fh "touch $tmp/good\n";
+    close $fh;
+    my $out = `XDG_CONFIG_HOME=$tmp $mdee -n -t ../../evil $test_md 2>&1`;
+    isnt($?, 0, q(a name with a slash is an error));
+    like($out, qr/theme not found/, q(as a theme not found));
+    ok(!-e "$tmp/run", q(the file does not run));
+    `XDG_CONFIG_HOME=$tmp $mdee -n -t good $test_md 2>&1`;
+    is($?, 0, q(a theme in the directory is fine));
+    ok(-e "$tmp/good", q(and runs));
 };
 
 subtest q(filename option) => sub {

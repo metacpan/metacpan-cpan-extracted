@@ -16,7 +16,7 @@ use Scalar::Util ();
 use VPNDetection::Error;
 use VPNDetection::OauthError;
 
-our $VERSION = '3.10.2';
+our $VERSION = '3.10.3';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.
@@ -284,10 +284,16 @@ sub _new {
 sub _poll_p {
     my ($self, $poll) = @_;
     my $left = $poll->{deadline} - $self->{now}->();
-    my $wait = $poll->{interval} < $left ? $poll->{interval} : $left > 0 ? $left : 0;
-    return $self->{sleep_p}->($wait)->then(sub {
+    # Not above 0 is nothing left, NaN included: a hand-built lifetime that is no
+    # number would otherwise wait nothing and ask again at once, for good.
+    $left = 0 unless $left > 0;
+    my $to_deadline = $left <= $poll->{interval};
+    return $self->{sleep_p}->($to_deadline ? $left : $poll->{interval})->then(sub {
+        # A wait that ran to the deadline ends the poll without reading the clock
+        # again: a timer may wake before the clock has moved its whole delay, and
+        # the deadline would then read as not yet reached.
         die VPNDetection::OauthExpiredTokenError->new(error_code => 'expired_token')
-            if $self->{now}->() >= $poll->{deadline};
+            if $to_deadline || $self->{now}->() >= $poll->{deadline};
         return $self->_exchange_p({
             grant_type => DEVICE_CODE_GRANT,
             device_code => $poll->{device_code},
@@ -524,8 +530,9 @@ never past C<expires_in>: a wait that would end later ends then. It ends at the
 first answer that is neither: a denial dies with
 C<VPNDetection::OauthAccessDeniedError>, a code that ran out with
 C<VPNDetection::OauthExpiredTokenError> - as does outliving C<expires_in>, counted
-from this call, with no C<status> - and any other failure as it came. The timeout
-bounds each request, never the poll.
+from this call, with no C<status>, and a C<expires_in> that is no number at once,
+with no request sent - and any other failure as it came. The timeout bounds each
+request, never the poll.
 
 There is no cancellation handle: the blocking form returns only at one of those
 outcomes. The waits are event-loop timers, so C<poll_device_token_p> shares a

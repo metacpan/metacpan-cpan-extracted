@@ -1,0 +1,30 @@
+# Perl build artifacts
+Makefile
+Makefile.old
+MYMETA.*
+blib/
+pm_to_blib
+auto/
+*.bs
+*.o
+*.so
+*.tar.gz
+*.zip
+*.bak
+*.swp
+cover_db/
+local/
+_build/
+# Local reports and sensitive exports
+perl-code-map*.html
+perl-code-map*.json
+code-map*.html
+code-map*.json
+example.html
+example.json
+# Environment/editor
+.vscode/
+.idea/
+.DS_Store
+*.log
+_site/

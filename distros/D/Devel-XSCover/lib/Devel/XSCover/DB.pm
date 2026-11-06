@@ -10,7 +10,7 @@ use File::Spec ();
 
 use Devel::XSCover::Flow ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our (@CRITERIA);
 

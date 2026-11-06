@@ -52,14 +52,25 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_OPEN, WEBVIEW_DIALOG_FLAG_FILE, title, filter, result, sizeof(result));
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         if (strlen(result) > 0) {
+            # uncoverable statement
             RETVAL = newSVpv(result, 0);
         } else {
+            # uncoverable statement
             RETVAL = &PL_sv_undef;
         }
     } else {
@@ -73,6 +84,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;
@@ -88,6 +100,7 @@ CODE:
         PUTBACK;
         count = call_method("dialog", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK;
         FREETMPS; LEAVE;
@@ -114,14 +127,25 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_OPEN, WEBVIEW_DIALOG_FLAG_DIRECTORY, title, "", result, sizeof(result));
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         if (strlen(result) > 0) {
+            # uncoverable statement
             RETVAL = newSVpv(result, 0);
         } else {
+            # uncoverable statement
             RETVAL = &PL_sv_undef;
         }
     } else {
@@ -135,6 +159,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;
@@ -150,6 +175,7 @@ CODE:
         PUTBACK;
         count = call_method("dialog", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK;
         FREETMPS; LEAVE;
@@ -178,14 +204,25 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_SAVE, WEBVIEW_DIALOG_FLAG_FILE, title, def, result, sizeof(result));
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         if (strlen(result) > 0) {
+            # uncoverable statement
             RETVAL = newSVpv(result, 0);
         } else {
+            # uncoverable statement
             RETVAL = &PL_sv_undef;
         }
     } else {
@@ -199,6 +236,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;
@@ -214,6 +252,7 @@ CODE:
         PUTBACK;
         count = call_method("dialog", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK;
         FREETMPS; LEAVE;
@@ -242,10 +281,14 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_ALERT, WEBVIEW_DIALOG_FLAG_INFO, title, message, result, sizeof(result));
     } else {
         /* Fallback to Perl call for mocks */
@@ -258,6 +301,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;
@@ -299,10 +343,14 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_ALERT, WEBVIEW_DIALOG_FLAG_WARNING, title, message, result, sizeof(result));
     } else {
         /* Fallback to Perl call for mocks */
@@ -315,6 +363,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;
@@ -356,10 +405,14 @@ CODE:
     }
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (pc) {
         /* Direct C call */
         char result[4096];
+        # uncoverable statement
         memset(result, 0, sizeof(result));
+        # uncoverable statement
         webview_dialog(&pc->wv, WEBVIEW_DIALOG_TYPE_ALERT, WEBVIEW_DIALOG_FLAG_ERROR, title, message, result, sizeof(result));
     } else {
         /* Fallback to Perl call for mocks */
@@ -372,6 +425,7 @@ CODE:
         PUTBACK;
         count = call_method("webview", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         wv = (count > 0) ? POPs : &PL_sv_undef;
         SvREFCNT_inc_simple_void(wv);
         PUTBACK;

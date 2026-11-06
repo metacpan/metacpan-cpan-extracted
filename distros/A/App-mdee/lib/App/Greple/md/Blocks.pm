@@ -4,7 +4,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.15";
+our $VERSION = "1.16";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(blocks available);
@@ -34,12 +34,12 @@ sub blocks {
 
 # The parsers that work here, the fastest first.
 sub available {
-    state @parsers = (
+    state $parsers = [
         (eval { require CommonMark; 1 } ? 'cmark' : ()),
         (mdperl_works() ? 'mdperl' : ()),
         (pandoc_works() ? 'pandoc' : ()),
-    );
-    @parsers;
+    ];
+    @$parsers;
 }
 
 # pandoc with the sourcepos extension (2.11.3 or later): run the reader

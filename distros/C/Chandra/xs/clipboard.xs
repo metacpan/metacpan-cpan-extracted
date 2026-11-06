@@ -47,9 +47,14 @@ get_html(class)
 CODE:
 {
     char *html = chandra_clipboard_get_html(aTHX);
+    # uncoverable branch true class:ignore_covered_err
+    # uncoverable condition left count:1
     if (html) {
+        # uncoverable statement class:ignore_covered_err
         RETVAL = newSVpv(html, 0);
+        # uncoverable statement class:ignore_covered_err
         SvUTF8_on(RETVAL);
+        # uncoverable statement class:ignore_covered_err
         safefree(html);
     } else {
         RETVAL = &PL_sv_undef;

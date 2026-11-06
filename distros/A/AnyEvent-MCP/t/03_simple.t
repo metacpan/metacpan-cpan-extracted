@@ -12,7 +12,7 @@ use JSON::XS ();
 use MIME::Base64 ();
 use Socket;
 
-print "1..42\n";
+print "1..45\n";
 
 my $test;
 sub ok($$) {
@@ -83,6 +83,18 @@ ok $header =~ m{HTTP/1.1 200}, "first token works as bearer";
 ($header, $body) = post ($server, "/mcp/", "Basic YTpi");
 ok $header =~ m{HTTP/1.1 401} && $header !~ /WWW-Authenticate: Basic/, "Basic authentication is not supported";
 
+$server = AnyEvent::MCP::Server::HTTP->new (
+   path => "/", tokens => ["first", "second"],
+   token_users => { first => "global:alice", second => "global:bob" },
+   on_request => sub { $_[1]->reply ({ user => $_[1]{user} }) },
+);
+($header, $body) = post ($server, "/first/");
+ok JSON::XS::decode_json ($body)->{result}{user} eq "global:alice", "path token identifies user";
+($header, $body) = post ($server, "/", "Bearer second");
+ok JSON::XS::decode_json ($body)->{result}{user} eq "global:bob", "Bearer identifies distinct user";
+($header, $body) = post ($server, "/first/", "Bearer second");
+ok $header =~ m{HTTP/1.1 401}, "conflicting path and Bearer identities rejected";
+
 $server = AnyEvent::MCP::Server::HTTP->new (tokens => ["standalone"]);
 ($header, $body) = post ($server, "/mcp/");
 ok $header =~ m{HTTP/1.1 401}, "embedded server with tokens rejects unauthenticated requests";
@@ -118,7 +130,7 @@ my $printed = "";
 ok $server->isa ("AnyEvent::MCP::Server::HTTP"), "normal startup uses HTTP";
 ok $server->{port} && $printed eq "", "HTTP startup leaves stdout empty";
 my $config = AnyEvent::MCP::Config->global;
-ok $server->{tokens}[0] eq $config->credential ("token", "example"),
+ok $server->{tokens}[0] eq $config->user_credentials ("example")->[0][2],
    "startup token matches derived utility";
 ok $server->{server_info}{name} eq "AnyEvent::MCP", "instance name is not the server implementation name";
 ok JSON::XS::encode_json ($server->{server_info}) =~ /"version":"0\.61"/,

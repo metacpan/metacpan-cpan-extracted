@@ -7,16 +7,16 @@ no warnings 'once';
 use_ok('Chandra::Protocol');
 
 # --- Mock helpers ---
-sub _mock_app {
-    my $mock = bless { _binds => {} }, 'MockPEdgeApp';
+{
     no strict 'refs';
     *MockPEdgeApp::bind = sub {
         $_[0]->{_binds}{$_[1]} = $_[2];
         return $_[0];
     };
     *MockPEdgeApp::eval = sub { };
-    use strict 'refs';
-    return $mock;
+}
+sub _mock_app {
+    return bless { _binds => {} }, 'MockPEdgeApp';
 }
 
 # === register returns self for chaining ===

@@ -1,0 +1,4 @@
+#!include_default
+^fix-md\.sh$
+^MYMETA\.
+^Oracle-TNS-

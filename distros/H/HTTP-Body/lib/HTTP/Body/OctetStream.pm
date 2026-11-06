@@ -1,5 +1,5 @@
 package HTTP::Body::OctetStream;
-$HTTP::Body::OctetStream::VERSION = '1.24';
+$HTTP::Body::OctetStream::VERSION = '1.25';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -16,13 +16,20 @@ HTTP::Body::OctetStream - HTTP Body OctetStream Parser
 
 =head1 DESCRIPTION
 
-HTTP Body OctetStream Parser.
+HTTP Body OctetStream Parser.  It stores the body unparsed in a temporary
+file, for application/octet-stream, application/json and any content type
+HTTP::Body has no other parser for.
 
 =head1 METHODS
 
 =over 4
 
 =item spin
+
+Writes the data that has arrived to a temporary file in
+L<tmpdir|HTTP::Body/tmpdir>, which is the L<body|HTTP::Body/body>.  Once the
+whole body is there, it seeks the file back to its start and sets the state to
+done.  Croaks when the file can not be written.
 
 =cut
 

@@ -782,4 +782,89 @@ subtest '$_ not clobbered by any public method under varied inputs' => sub {
 	}
 };
 
+# ===========================================================================
+# SECTION 15: Boundaries fixed in the 0.03 refactor
+# ===========================================================================
+
+# Purpose: an object blessed into package '0' has ref() eq blessed() eq '0'
+# (both false).  Truth-based checks used to misread it as a plain string and
+# then try to bless into a reference.
+subtest 'object blessed into package "0" is a valid invocant' => sub {
+	plan tests => 3;
+
+	my $obj = bless {}, $config{str_zero};
+
+	my $copy;
+	lives_ok { $copy = Class::Abstract::new($obj) } 'new($obj_in_0) lives';
+	is ref($copy), $config{str_zero}, 'new($obj_in_0) blesses into "0"';
+	is( Class::Abstract->is_abstract($obj), $FALSE, 'is_abstract($obj_in_0) = 0' );
+};
+
+# Purpose: an undef element in @ISA must not emit "uninitialized" warnings
+subtest 'undef element in @ISA is skipped silently' => sub {
+	plan tests => 2;
+
+	# Perl's own @ISA magic warns while storing undef; that is not under test
+	no warnings qw(once uninitialized);
+	local @EC::HoleyISA::ISA = (undef, $CLASS_ABSTRACT);
+
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	is( Class::Abstract->is_abstract('EC::HoleyISA'), $TRUE,
+		'Class::Abstract found after an undef @ISA entry' );
+	is scalar(@warnings), 0, 'no warnings emitted';
+};
+
+# Purpose: hostile-looking names are looked up, never evaluated or created
+subtest 'odd package names are inert and not autovivified' => sub {
+	plan tests => 4;
+
+	foreach my $name ($config{str_spaces}, 'EC::Evil; system("false")', "EC::Nul\0Byte") {
+		is( Class::Abstract->is_abstract($name), $FALSE, 'is_abstract(odd name) = 0' );
+	}
+	ok !exists $EC::{'Evil; system("false")::'}, 'no stash created for odd name';
+};
+
+
+# Purpose: back the POD's ENCODING section -- non-ASCII and emoji class
+# names work when they are character strings; raw UTF-8 bytes do not match
+subtest 'non-ASCII and emoji class names (POD: ENCODING)' => sub {
+	plan skip_all => 'Unicode package names need Perl 5.16' if $] < 5.016;
+	plan tests => 6;
+
+	use utf8;    # lexical: only the literals in this block are characters
+
+	my %names = (
+		latin => "EC::Caf\x{e9}",
+		cjk   => "EC::\x{65e5}\x{672c}",
+		emoji => "EC::\x{1F436}",
+	);
+	{
+		no strict 'refs';
+		@{"$names{$_}::ISA"} = ($CLASS_ABSTRACT) for keys %names;
+	}
+
+	# Each name is abstract and new() croaks with the name in the message
+	foreach my $key (sort keys %names) {
+		is( Class::Abstract->is_abstract($names{$key}), $TRUE, "$key name is abstract" );
+	}
+	throws_ok { enforcement_on { Class::Abstract::new($names{emoji}) } }
+		qr/Cannot instantiate abstract class \Q$names{emoji}\E directly/,
+		'error message contains the emoji class name';
+
+	# The same name as undecoded UTF-8 bytes is a different package
+	my $bytes = $names{latin};
+	utf8::encode($bytes);
+	is( Class::Abstract->is_abstract($bytes), $FALSE,
+		'raw UTF-8 bytes do not match the character-string name' );
+
+	# A concrete child with a non-ASCII name can be built
+	{
+		no strict 'refs';
+		@{"$names{latin}::Chat::ISA"} = ($names{latin});
+	}
+	my $obj = enforcement_on { "$names{latin}::Chat"->new };
+	is( ref($obj), "$names{latin}::Chat", 'concrete non-ASCII child is built' );
+};
+
 done_testing;

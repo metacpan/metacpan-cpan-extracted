@@ -1,5 +1,5 @@
 package Thunderhorse::Request;
-$Thunderhorse::Request::VERSION = '0.106';
+$Thunderhorse::Request::VERSION = '0.107';
 use v5.40;
 use Mooish::Base -standard;
 

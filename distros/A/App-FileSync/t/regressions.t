@@ -395,6 +395,32 @@ subtest 'CLI: default client id is a valid id' => sub {
 	}
 };
 
+subtest 'CLI: sync --quiet says nothing when nothing happened' => sub {
+	# It used to print "docs: pulled 0, pushed 0, deleted 0, conflicts 0" and
+	# a zero transfer line on every run, so a cron job mailed noise each time.
+	my $filesync = File::Spec->catfile('bin', 'filesync');
+	my $env = TestSync->new_env();
+	$env->write_file('client', 'a.txt', "alpha\n", 1_700_000_000);
+
+	my $output = `$^X -Ilib $filesync sync --repo docs --quiet 2>&1`;
+	is($?, 0, 'the first sync exits 0');
+	like($output, qr/docs: pulled 0, pushed 1/, '--quiet still reports a sync that did something');
+
+	$output = `$^X -Ilib $filesync sync --repo docs --quiet 2>&1`;
+	is($?, 0, 'an idle sync exits 0');
+	is($output, '', '--quiet prints nothing for an idle sync');
+
+	$output = `$^X -Ilib $filesync sync --repo docs --quiet --dry-run 2>&1`;
+	is($output, '', 'nor for an idle dry run');
+
+	$output = `$^X -Ilib $filesync sync --repo docs 2>&1`;
+	like($output, qr/docs: pulled 0, pushed 0, deleted 0, conflicts 0/, 'without --quiet an idle sync is still reported');
+
+	$env->write_file('client', 'b.txt', "beta\n", 1_700_000_100);
+	$output = `$^X -Ilib $filesync sync --repo docs --quiet --dry-run 2>&1`;
+	like($output, qr/would push b\.txt/, '--quiet --dry-run still lists what it would do');
+};
+
 subtest 'Sub::Private is enforced outside the test harness' => sub {
 	local $Sub::Private::config{harness_bypass} = 0;
 	throws_ok { App::FileSync::CLI::_default_client_id() } qr/private/i, 'a private sub called from outside its package';

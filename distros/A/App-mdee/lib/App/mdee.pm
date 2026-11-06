@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.15";
+our $VERSION = "1.16";
 
 1;
 =encoding utf-8
@@ -32,7 +32,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-         --table-style=#    table style: lattice, 3line or simple (default: lattice)
+    --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
@@ -40,7 +40,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --runout=#         run-out width for line breaking (default: 4)
          --runlen=#         set both run-in and run-out
          --boundary=#       fold boundary: word, space or none (default: word)
-     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
+     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell,doubleline)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
                             (e.g., Ivory, #780043, (120,0,67))
@@ -60,7 +60,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.15
+Version 1.16
 
 =cut
 =head1 DESCRIPTION
@@ -354,7 +354,7 @@ Unicode box-drawing characters (C<│>, C<├>, C<┤>, C<┼>) and
 dashes (C<->) in separator lines are replaced with horizontal
 rules (C<─>).  Default is enabled.
 
-=item B<--table-style>=I<STYLE>
+=item B<--table-style>=I<STYLE>, B<--ts> I<STYLE>
 
 Select how tables are drawn.  C<lattice> (default) keeps a separator
 between the columns, C<│> or C<|> depending on C<--rule>.  C<pipe> is
@@ -450,10 +450,10 @@ bold text, etc.).
 
 =item B<-t> I<NAME>, B<--theme>=I<NAME>[,I<NAME>,...]
 
-Select color themes.  The default is C<hashed,nomark,markcell>,
+Select color themes.  The default is C<hashed,nomark,markcell,doubleline>,
 which appends closing hashes to h3-h6 headers, hides markup
-characters for a clean reading experience, and marks the rows of
-tables whose cells are wrapped.
+characters for a clean reading experience, marks the rows of
+tables whose cells are wrapped, and gives h4 a double underline.
 
 Themes specified with C<--theme> are added to the default, not
 replacing it (C<default[theme]> in the configuration file replaces
@@ -462,7 +462,7 @@ by repeating the option.  Each theme is applied in order as a
 transformation, and when two themes set the same value the later
 one wins:
 
-    mdee --theme=warm file.md         # hashed,nomark,markcell (default) + warm
+    mdee --theme=warm file.md         # the default themes + warm
     mdee --no-theme --theme=warm      # warm only (clear default first)
     mdee --no-theme file.md           # no theme (show all markup)
 
@@ -510,6 +510,18 @@ Content text keeps its formatting (bold, italic,
 strikethrough, code, clickable links) but the surrounding
 markers are not displayed.  Table marks (C<markcell>,
 C<markwrap>) are independent of this theme.
+
+=item C<doubleline> (default)
+
+Give h4 headers a double underline, which is C<ESC[4:2m>, in the
+terminals known to take it, decided by environment variables: iTerm2,
+Ghostty, cmux, VS Code, WezTerm, kitty, Alacritty, Konsole, Windows
+Terminal and terminals based on VTE 0.52 or later.  Elsewhere, inside
+B<tmux> and B<screen>, and where the variables do not reach, as through
+B<ssh>, this theme does nothing and h4 has a single underline, the same
+as h5.  Many terminals do not take the sequence: it becomes a background color in Terminal.app and
+rxvt-unicode, and the Linux console and mosh drop the whole sequence
+with its color.
 
 =item C<warm>
 
@@ -634,6 +646,7 @@ placeholder can be used and will be expanded at runtime.
     mdee --config FILE='L25D/R;E'             # red file label
     mdee --config FILE_FORMAT=%s:             # simple format
     mdee --config hashed.h3=1                 # enable h3 closing hashes
+    mdee --config cjk_friendly=1              # see LIMITATIONS, Emphasis
 
 Theme keys consumed by mdee:
 
@@ -659,7 +672,7 @@ C<tick_open>, C<tick_close>, etc.
 
 =over 4
 
-=item B<--colormap>=I<LABEL>=I<SPEC>, B<--cm>=I<LABEL>=I<SPEC>
+=item B<--colormap>=I<LABEL>=I<SPEC>, B<--cm> I<LABEL>=I<SPEC>
 
 Override the color for a specific element.  I<LABEL> is one of the
 color labels listed below.  I<SPEC> follows
@@ -1142,6 +1155,22 @@ Multi-line emphasis text is not supported.
 C<***bold italic***> and C<___bold italic___> are supported.
 Other nested forms (e.g., C<< **bold _italic_** >>) are not.
 
+C<*> and C<**> start and end emphasis as in CommonMark: a delimiter
+with a letter on one side and punctuation on the other does not
+count, so C<L*=50, a*=68> is not italic.  CommonMark counts Unicode
+punctuation, and this rejects some emphasis in Japanese text,
+such as C<日本語の*「強調」*です> and C<日本語の**強調。**です>.  mdee
+shows them as pandoc and zenn.dev do, with the markers and without
+emphasis, so that such text can be found before it is published.
+
+With C<cjk_friendly=1> (C<--config cjk_friendly=1>, or
+C<md_config+=(cjk_friendly=1)> in F<config.sh>), the rules of
+L<markdown-cjk-friendly|https://github.com/tats-u/markdown-cjk-friendly>
+are used instead: CJK punctuation does not count, and a CJK character
+on the other side is as good as a space, so these are emphasis.  This
+is a proposal, not part of CommonMark; use it for text that is
+processed by an implementation of it.
+
 =head2 Block Quotes
 
 A block quote is recognized by its C<E<gt>> markers at the start of a
@@ -1265,6 +1294,16 @@ ANSI-aware column formatting for table alignment.
 =item L<CommonMark>, L<Markdown::Perl>, L<pandoc|https://pandoc.org>
 
 One of them finds the paragraphs for C<--refill>.
+
+=item L<CommonMark Spec 0.31.2, Emphasis and strong emphasis|https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis>
+
+The rules that C<*> and C<**> follow by default (see L</Emphasis>).
+
+=item L<CommonMark CJK-friendly Amendments|https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md>
+
+The rules that C<cjk_friendly=1> follows.  The proposal comes from
+L<commonmark-spec issue #650, Emphasis with CJK punctuation|https://github.com/commonmark/commonmark-spec/issues/650>,
+open since 2020.
 
 =item L<https://github.com/tecolicom/App-mdee>
 

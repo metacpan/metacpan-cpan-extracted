@@ -23,6 +23,7 @@ CODE:
     int eid_len;
     SV *self_rv;
 
+    # uncoverable condition right count:4
     if (items > 1 && SvOK(ST(1)) && SvROK(ST(1)) &&
         SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
         args = (HV *)SvRV(ST(1));
@@ -38,21 +39,28 @@ CODE:
 
     /* style */
     style_svp = args ? hv_fetchs(args, "style", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (style_svp && *style_svp && SvOK(*style_svp))
         (void)hv_stores(self_hv, "style", newSVsv(*style_svp));
 
     /* class */
     class_svp = args ? hv_fetchs(args, "class", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (class_svp && *class_svp && SvOK(*class_svp))
         (void)hv_stores(self_hv, "class", newSVsv(*class_svp));
 
     /* data */
     data_svp = args ? hv_fetchs(args, "data", 0) : NULL;
+    # uncoverable condition right count:2
     if (data_svp && *data_svp && SvOK(*data_svp))
         (void)hv_stores(self_hv, "data", newSVsv(*data_svp));
 
     /* raw */
     raw_svp = args ? hv_fetchs(args, "raw", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (raw_svp && *raw_svp && SvOK(*raw_svp))
         (void)hv_stores(self_hv, "raw", newSVsv(*raw_svp));
 
@@ -71,6 +79,8 @@ CODE:
 
     /* id - use provided or auto-assign from _eid */
     id_svp = args ? hv_fetchs(args, "id", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (id_svp && *id_svp && SvOK(*id_svp)) {
         (void)hv_stores(self_hv, "id", newSVsv(*id_svp));
     } else {
@@ -105,12 +115,15 @@ CODE:
         /* Process children */
         {
             SV **ch_svp = hv_fetchs(args, "children", 0);
+            # uncoverable condition right count:2
+            # uncoverable condition right count:4
             if (ch_svp && *ch_svp && SvROK(*ch_svp) &&
                 SvTYPE(SvRV(*ch_svp)) == SVt_PVAV) {
                 AV *ch_av = (AV *)SvRV(*ch_svp);
                 SSize_t i, chlen = av_len(ch_av) + 1;
                 for (i = 0; i < chlen; i++) {
                     SV **csvp = av_fetch(ch_av, i, 0);
+                    # uncoverable condition right count:2
                     if (csvp && *csvp) {
                         SV *child;
                         if (SvROK(*csvp) &&
@@ -129,6 +142,7 @@ CODE:
                             SPAGAIN;
                             child = (count > 0)
                                 ? SvREFCNT_inc(POPs)
+                                # uncoverable statement class:ignore_covered_err
                                 : &PL_sv_undef;
                             PUTBACK;
                             FREETMPS;
@@ -158,6 +172,7 @@ CODE:
     SV **ch_svp = hv_fetchs(hv, "children", 0);
     AV *children = (AV *)SvRV(*ch_svp);
 
+    # uncoverable condition right count:2
     if (SvROK(child) && SvTYPE(SvRV(child)) == SVt_PVHV &&
         !sv_isobject(child)) {
         /* Hashref → create new Element */
@@ -172,6 +187,7 @@ CODE:
         PUTBACK;
         count = call_method("new", G_SCALAR);
         SPAGAIN;
+        # uncoverable condition right count:1
         new_child = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
         PUTBACK;
         FREETMPS;
@@ -193,6 +209,11 @@ PPCODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **ch_svp = hv_fetchs(hv, "children", 0);
+    # uncoverable branch false
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
+    # uncoverable condition right count:4
     if (ch_svp && *ch_svp && SvROK(*ch_svp) &&
         SvTYPE(SvRV(*ch_svp)) == SVt_PVAV) {
         AV *children = (AV *)SvRV(*ch_svp);
@@ -203,11 +224,18 @@ PPCODE:
             EXTEND(SP, len);
             for (i = 0; i < len; i++) {
                 SV **csvp = av_fetch(children, i, 0);
+                # uncoverable condition right count:2
                 if (csvp && *csvp)
                     PUSHs(*csvp);
             }
         }
+    # uncoverable branch true
+    # uncoverable branch false
+    # uncoverable statement class:ignore_covered_err
+    # uncoverable condition left count:1
+    # uncoverable condition right count:1
     } else if (GIMME_V == G_SCALAR) {
+        # uncoverable statement
         XPUSHs(sv_2mortal(newSViv(0)));
     }
 }
@@ -219,6 +247,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "tag", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSVpvs("div");
 }
 OUTPUT:
@@ -231,10 +261,13 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp;
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         (void)hv_stores(hv, "id", newSVsv(ST(1)));
     }
     svp = hv_fetchs(hv, "id", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSV(0);
 }
 OUTPUT:
@@ -247,10 +280,13 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp;
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         (void)hv_stores(hv, "class", newSVsv(ST(1)));
     }
     svp = hv_fetchs(hv, "class", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSV(0);
 }
 OUTPUT:
@@ -263,8 +299,10 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp;
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         SV *val = ST(1);
+        # uncoverable condition right count:2
         if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
             /* Unwrap single-element array (Moonshine compat) */
             AV *av = (AV *)SvRV(val);
@@ -276,6 +314,8 @@ CODE:
         }
     }
     svp = hv_fetchs(hv, "data", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSV(0);
 }
 OUTPUT:
@@ -288,10 +328,13 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp;
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         (void)hv_stores(hv, "raw", newSVsv(ST(1)));
     }
     svp = hv_fetchs(hv, "raw", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSV(0);
 }
 OUTPUT:
@@ -304,10 +347,13 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp;
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         (void)hv_stores(hv, "style", newSVsv(ST(1)));
     }
     svp = hv_fetchs(hv, "style", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp) ? SvREFCNT_inc(*svp) : newSV(0);
 }
 OUTPUT:
@@ -331,6 +377,7 @@ CODE:
     }
 
     vsvp = hv_fetch(attrs, kstr, (I32)klen, 0);
+    # uncoverable condition right count:2
     RETVAL = (vsvp && *vsvp) ? SvREFCNT_inc(*vsvp) : newSV(0);
 }
 OUTPUT:
@@ -376,6 +423,9 @@ PPCODE:
     EXTEND(SP, len);
     for (i = 0; i < len; i++) {
         SV **svp = av_fetch(results, i, 0);
+        # uncoverable branch false
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         if (svp && *svp)
             PUSHs(*svp);
     }
@@ -417,6 +467,7 @@ CODE:
     h = _elem_get_handlers(aTHX);
     hstr = SvPV(hid, hlen);
     svp = hv_fetch(h, hstr, (I32)hlen, 0);
+    # uncoverable condition right count:2
     if (svp && *svp) {
         RETVAL = SvREFCNT_inc(*svp);
     } else {

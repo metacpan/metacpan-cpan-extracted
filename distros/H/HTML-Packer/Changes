@@ -1,5 +1,8 @@
 Revision history for HTML-Packer
 
+2.12       2026-11-05
+    - Merge GH #20: fix quadratic time on unclosed elements (thanks to nigelhorne)
+
 2.11       2024-10-10
     - Merge GH #19: fix unblessed reference (thanks to xvaara)
 

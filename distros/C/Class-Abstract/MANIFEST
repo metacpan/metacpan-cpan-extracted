@@ -14,6 +14,7 @@ t/extended_tests.t
 t/function.t
 t/integration.t
 t/is_abstract.t
+t/locales.t
 t/mutant_killers.t
 t/override_new.t
 t/unit.t

@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Component;
 use Chandra::Element;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 BEGIN {
     Object::Proto::define('Chandra::Breadcrumb',
@@ -114,6 +114,47 @@ Chandra::Breadcrumb - Breadcrumb navigation component
 
     $app->css(Chandra::Breadcrumb->css);
     $crumbs->mount($app, '#breadcrumb');
+
+=head1 METHODS
+
+=over 4
+
+=item C<new(items => \@items, separator => $text)>
+
+Each item is a hash with a C<label> and, for all but the last, a C<route>.
+The separator defaults to a single right-pointing angle quotation mark.
+
+=item C<BUILD>
+
+Sets the default separator after the component's own C<BUILD>.
+
+=item C<render>
+
+The trail, with links for the items that have a route.
+
+=item C<on_navigate($route)>
+
+Navigates the app when it can.
+
+=item C<css>
+
+The breadcrumb's stylesheet.
+
+=item C<prototype>, C<set_prototype>
+
+Object::Proto's prototype accessors.
+
+=back
+
+=head1 SLOT ACCESSORS
+
+=over 4
+
+=item C<items>, C<separator> - the slots as methods
+
+=item C<bc_items>, C<bc_separator>, C<bc__cid>, C<bc__app>, C<bc__selector>, C<bc__mounted>, C<bc__children>, C<bc__parent> - the slot functions
+
+=back
 
 =head1 SEE ALSO
 

@@ -25,6 +25,7 @@ xs_cover - XS and C coverage for a distribution in one command
     xs_cover -plain t/05-forks.t     run that file without Devel::Cover
     xs_cover -no_perl                run everything without Devel::Cover, the C side alone
     xs_cover -ignore 'vendor/'       add a pattern to the default ignores
+    xs_cover                         with a .xs_cover file in the dist holding such options
     xs_cover -keep                   keep the counters and instrumented objects after the run
     xs_cover -no_delete              keep an existing cover_db instead of starting afresh
     xs_cover -db cover_db            the database directory
@@ -86,6 +87,10 @@ C<XSLoader>.
 
 A regular expression on a source path. Matching files are left out of the report.
 F<ppport.h> and every file outside the distribution are left out already.
+
+A distribution can keep this and any other option in a F<.xs_cover> file in its
+directory, one or more words a line, C<#> starting a comment: the file's words go
+before the command line.
 
 =item -keep
 

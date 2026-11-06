@@ -1,10 +1,18 @@
-BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+BEGIN { -e 'Distar' or system("git clone https://github.com/p5sagit/Distar.git") }
 use lib 'Distar/lib';
 use Distar 0.001;
 
 use ExtUtils::MakeMaker 6.57_10 ();
 
-author 'Nathan Wiger <nate@wiger.org>';
+author 'Torsten Raudssus <torsten@raudssus.de>';
 
 manifest_include examples => qr/sqla-format|.*\.pl/;
+manifest_include '' => qr{SECURITY\.md};
+
+# releases are cut from main, not Distar's default master
+{
+  no warnings 'redefine';
+  my $dist_test = \&Distar::MM::dist_test;
+  *Distar::MM::dist_test = sub { $_[0]{BRANCH} ||= 'main'; goto &$dist_test };
+}
 1;

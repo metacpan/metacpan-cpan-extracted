@@ -130,7 +130,7 @@ for my $c (@CASES) {
 	cmp_ok($hi, '<=', $size, "size=$size p=$p: no variate above size");
 }
 
-# ------------------------------------------------------ the short circuits
+# the short circuits
 {
 	is_deeply(rbinom(n => 4, size => 0,  prob => 0.5), [0, 0, 0, 0], 'size = 0 is all 0');
 	is_deeply(rbinom(n => 4, size => 7,  prob => 0),   [0, 0, 0, 0], 'prob = 0 is all 0');
@@ -142,7 +142,7 @@ for my $c (@CASES) {
 	is_deeply(rbinom(n => 0, size => 5, prob => 0.5), [], 'n = 0 returns nothing');
 }
 
-# ------------------------------------------------- size is a count of trials
+# size is a count of trials
 #
 # `size` is not an element count, so the 2^48 sanity bound on n does not apply
 # to it: R's rbinom(3, 1e15, 0.3) draws, and so must this (up to 0.3413 it
@@ -150,7 +150,11 @@ for my $c (@CASES) {
 # variate in, an IV, so size may be anything up to IV_MAX.  Expectations are
 # keyed off $Config{ivsize}, as t/seq.R.t does: 5.44.0-i686 has IV_MAX 2**31-1,
 # which an NV holds exactly; where ivsize is 8, 2**63-1 is not an NV, so the
-# largest accepted size is the double just below 2**63, 2**63-1024.  No R
+# largest accepted size is the double just below 2**63, 2**63-1024.  The
+# pointer width does not enter into it: up to 0.3416 size was held in a size_t
+# capped at (size_t)IV_MAX, which is 2**32-1 on a 32-bit -Duse64bitint perl,
+# and 85-86 below failed on three i686-linux-64int smokers (reproduced on
+# 5.44.0-i686-64int).  No R
 # reference exists for the bound itself (R falls back to qbinom() past INT_MAX);
 # the distribution checks use the same moments the cases above do.
 {
@@ -189,7 +193,7 @@ for my $c (@CASES) {
 	like($@, qr/n is too large/, 'n keeps its 2^48 bound');
 }
 
-# ------------------------------------------------------------ reproducible
+# reproducible
 #
 # srand() still governs the stream, which is the contract; WHICH numbers it
 # gives is the algorithm's business and is deliberately not pinned here.
@@ -201,7 +205,7 @@ for my $c (@CASES) {
 	isnt(join(',', @$a), join(',', @$c), 'a different seed gives different variates');
 }
 
-# ---------------------------------------------------- the reflection is exact
+# the reflection is exact
 #
 # BTPE draws for min(p, 1-p) and returns n - ix when p > 0.5, so the two must
 # be the same stream mirrored.  This is also what makes the p > 0.5 cases above
@@ -223,7 +227,7 @@ for my $c (@CASES) {
 	          'prob and 1-prob mirror each other on the same seed');
 }
 
-# ------------------------------------------------------- cost, not distribution
+# cost, not distribution
 #
 # The point of the change.  1000 variates at size = 1e9 is 1e12 Bernoulli
 # trials under the old loop -- hours -- and about forty uniforms in total under

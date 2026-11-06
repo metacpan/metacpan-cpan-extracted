@@ -1,6 +1,6 @@
 package Langertha::Manifest::Builder;
 # ABSTRACT: Build a provider manifest from configured engines (offline, never copies a secret)
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( carp croak );
 use Scalar::Util qw( blessed );
@@ -359,7 +359,7 @@ Langertha::Manifest::Builder - Build a provider manifest from configured engines
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -570,7 +570,7 @@ Returns the validated L<Langertha::Manifest>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -587,7 +587,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

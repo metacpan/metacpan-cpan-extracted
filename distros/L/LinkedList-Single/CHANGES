@@ -1,3 +1,38 @@
+- v2.1.0 Tue Nov  3 2026
+
+* The interface is unchanged; the changes below are noticeable, so
+  Single/v2.pm is now v2.1.0. Single.pm did not change (v2.0.0).
+
+* Module versions follow one rule: an API change raises the major version
+  of every module; an internal change or bug fix raises the sub-version
+  (v2.pm is v2.1.0); a change to tests, documentation or comments raises
+  the last number (Doc.pm is v2.0.1). The version in Makefile.PL and
+  CHANGES is raised by the largest kind of change in the release, so it
+  can differ from a file's own version, and it restarts with each major
+  release.
+
+* The distribution version is hardwired in Makefile.PL (VERSION) and
+  is raised whenever anything in the distribution changes; the modules
+  keep their own versions.
+
+- Sat Oct 31 2026
+
+* New detach( $count = 1 ): remove the nodes after a cursor by relinking
+  and return them as a Fragment (NodeMgr::detach_nodes).
+
+* append_to now relinks (NodeMgr::attach_nodes) instead of moving the
+  contents of the successor nodes: held cursors keep their data, and an
+  empty fragment is a no-op.
+
+- Fri Oct 30 2026
+
+* Iterator sort is now a merge sort that relinks the nodes (default
+  comparison: perl's sort on the nodes), O(n log n), where the insertion
+  sort took time proportional to the square of the length (8,000 nodes
+  took 42 seconds, 100,000 now take 0.2 to 0.4 seconds, or 1.8 with a
+  comparator generator). Same comparator-generator interface; equal
+  nodes stay in order; a dying comparator leaves the list as it was.
+
 - Fri Sep 18 15:11:14 EDT 2026
 
 Been a while, eh?

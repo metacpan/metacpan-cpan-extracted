@@ -1,7 +1,7 @@
 ---
-abstract: unknown
+abstract: 'Model Context Protocol client/server support'
 author:
-  - unknown
+  - 'Marc Lehmann'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Pod::Checker: '0'
@@ -23,9 +23,12 @@ recommends:
   AnyEvent::Fork::RPC: '2'
   AnyEvent::WebSocket::Message: '0'
   AnyEvent::WebSocket::Server: '0'
+  Authen::SASL: '2.18'
+  HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
   Mail::IMAPTalk: '4.07'
   Term::ReadKey: '0'
+  XML::LibXML: '0'
 requires:
   AnyEvent: '5.33'
   AnyEvent::HTTP: '0'
@@ -36,5 +39,5 @@ requires:
   Scalar::Util: '0'
   common::sense: '3.3'
   parent: '0'
-version: 0.71
+version: 0.81
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

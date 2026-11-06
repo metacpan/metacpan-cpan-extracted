@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Large;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 # EXPERIMENTAL, awaiting approval: what Proc::ShellSpawn needs to run Proc::ShellSubset::Large trees
 # (doc/large-subset/large-subset-spec.md, sections 4 and 5), as handlers named in Proc::ShellSpawn's tables:
 #   x_NAME(CONTEXT, NODE, TAIL, K)         command nodes { func | export | readonly | local | exec => ... }
@@ -19,11 +19,26 @@ sub unsupported {   # A4: something outside the subset, found at run time
   my ($c, $what) = @_; put($c, 2, "Proc::ShellSubset::Large: $what is not supported\n", sub { leave($c, $UNSUPPORTED) }) }
 sub run_text {   # eval, ., trap actions: parse with the large grammar and run in this shell
   my ($c, $text, $what, $k) = @_;
-  my $sh = $c->{sh}; my $t = $sh->{parse}->($text, %{$sh->{alias}} ? (aliases => { %{$sh->{alias}} }) : ());   # the run's own parser
+  my $sh = $c->{sh}; my $t = $sh->{parse}->($text, %{$sh->{alias}} ? (aliases => { %{$sh->{alias}} }) : (),
+    $what =~ /^the text of '\. / ? () : (nolineno => 1));   # the run's own parser; $LINENO in eval or trap text: A4 (G8)
   return unsupported($c, $what) if ref $t ne 'ARRAY';
   return defer($k, 0) unless @$t;
   $sh->{intext}++; x_list($c, $t, undef, sub { $sh->{intext}--; $k->(@_) }) }   # alias in this text: B1, A4
 sub b_unsupported { my ($c, $argv) = @_; unsupported($c, "'$argv->[0]'") }   # a builtin left to sh, named at run time
+sub x_rest {   # P1 (post2-0.04): the rest of the text after a line with an alias definition known only when it ran: parsed now,
+  # with the aliases defined by now, as both shells read a text one complete command at a time; a form outside the subset: A4
+  my ($c, $x, $tail, $k) = @_; my $sh = $c->{sh};
+  my $t = $sh->{parse}->($x->{rest}, %{$sh->{alias}} ? (aliases => { %{$sh->{alias}} }) : (), lineoff => $x->{lineoff});
+  return unsupported($c, "a command after an alias definition") if ref $t ne 'ARRAY';
+  return defer($k, $sh->{q}) unless @$t;
+  x_list($c, $t, $tail, $k) }
+sub b_late {   # 3A (post-0.04): a command whose name the text also defines as a function, which is not defined (yet):
+  # parsed again from its expanded words, quoted, so that the builtin's own checks apply as they would have at parse time
+  my ($c, $argv, $env, $k) = @_; my $q = sub { (my $w = shift) =~ s/'/'\\''/g; "'$w'" };
+  my $text = join ' ', (map "$_=" . $q->($env->{$_}), sort keys %$env), map $q->($_), @$argv;
+  my $t = $c->{sh}{parse}->($text);
+  return unsupported($c, "'$argv->[0]' in this form") if ref $t ne 'ARRAY';
+  x_list($c, $t, undef, $k) }
 
 # ------------------------------------------------------------------ functions
 sub x_func { my ($c, $x, $tail, $k) = @_; $c->{sh}{cmd}{$x->{func}} = ['Proc::ShellSpawn::Large::call', $x->{body}]; defer($k, 0) }
@@ -49,23 +64,24 @@ sub b_return {
 
 # ------------------------------------------------------------------ declarations
 sub declare {   # export, readonly, local: [NAME, Word or undef, ...]; $each->(NAME) after the value is set
-  my ($c, $list, $k, $each) = @_; my @l = @$list; my @pairs; push @pairs, [splice @l, 0, 2] while @l;
+  my ($c, $list, $k, $each, $what) = @_; my @l = @$list; my @pairs; push @pairs, [splice @l, 0, 2] while @l;
+  my @log;   # NAME or NAME=VALUE as set, for $Proc::ShellSpawn::ONBUILTIN (measurement)
   each_async(\@pairs, sub { my ($p, $next) = @_; my ($n, $w) = @$p;
     return expand_str($c, $n, sub { my $m = shift;   # export $v[=value] (parser item P4): the name known only now
-      $m =~ /^[A-Za-z_][A-Za-z0-9_]*\z/ && !eval { Proc::ShellSubset::name($m, 0); 0 } && $m !~ /^(?:HOME|CDPATH)\z/
-        or return unsupported($c, "the name '$m' in 'export'");
-      return $each->($m), $next->() unless defined $w;
-      expand_str($c, $w, sub { setvar($c, $m, shift) or return; $each->($m); $next->() }) }) if ref $n;
-    return $each->($n), $next->() unless defined $w;
-    expand_str($c, $w, sub { setvar($c, $n, shift) or return; $each->($n); $next->() }) }, sub { defer($k, 0) }) }
-sub x_export   { my ($c, $x, $tail, $k) = @_; declare($c, $x->{export}, $k, sub { $c->{sh}{exp}{$_[0]} = 1 }) }
-sub x_readonly { my ($c, $x, $tail, $k) = @_; declare($c, $x->{readonly}, $k, sub { $c->{sh}{ro}{$_[0]} = 1 }) }
+      Proc::ShellSubset::settable($m) or return unsupported($c, "the name '$m' in 'export'");   # post-0.04: the old test let every name pass
+      return push(@log, $m), $each->($m), $next->() unless defined $w;
+      expand_str($c, $w, sub { my $v = shift; push @log, "$m=$v"; setvar($c, $m, $v) or return; $each->($m); $next->() }) }) if ref $n;
+    return push(@log, $n), $each->($n), $next->() unless defined $w;
+    expand_str($c, $w, sub { my $v = shift; push @log, "$n=$v"; setvar($c, $n, $v) or return; $each->($n); $next->() }) },
+    sub { $Proc::ShellSpawn::ONBUILTIN->("x_$what", [$what, @log], {}) if $what && $Proc::ShellSpawn::ONBUILTIN; defer($k, 0) }) }
+sub x_export   { my ($c, $x, $tail, $k) = @_; declare($c, $x->{export}, $k, sub { $c->{sh}{exp}{$_[0]} = 1 }, 'export') }
+sub x_readonly { my ($c, $x, $tail, $k) = @_; declare($c, $x->{readonly}, $k, sub { $c->{sh}{ro}{$_[0]} = 1 }, 'readonly') }
 sub x_local {
   my ($c, $x, $tail, $k) = @_; my $fr = $c->{frame};
   return fail($c, 2, "local: not in a function") unless $fr;   # A5 (reached only dynamically)
   my $sh = $c->{sh}; my %l = @{$x->{local}};
   $fr->{saved}{$_} //= [exists $sh->{vars}{$_}, $sh->{vars}{$_}, $sh->{exp}{$_}] for keys %l;
-  declare($c, $x->{local}, $k, sub {}) }
+  declare($c, $x->{local}, $k, sub {}, 'local') }
 
 # ------------------------------------------------------------------ exec with redirections only: for the rest of the shell
 sub x_exec {
@@ -164,6 +180,15 @@ sub b_pwd {   # X23 (the user's choice C, post2-0.03): the program, as '/bin/pwd
   my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv; my @o;
   while (@a && $a[0] =~ /^-/) { my $o = shift @a; last if $o eq '--'; push @o, $o }
   spawn($c, $c->{map}, ['pwd', '-L', @o], { %$env, PWD => $c->{sh}{cwd} }, $k) }
+sub b_test {   # rule F (post2-0.04): 's1 < s2', 's1 > s2' (also after '!'), which the program refuses, compared here by
+  # bytes, as both shells (POSIX 2024: "collates before/after ... in the current locale"; the same in the C locale);
+  # every other form: the program, as before (P5)
+  my ($c, $argv, $env, $k) = @_; my ($n, @a) = @$argv;
+  if ($n eq '[') { return spawn($c, $c->{map}, $argv, $env, $k) unless @a && $a[-1] eq ']'; pop @a }
+  my $not = @a == 4 && $a[0] eq '!' and shift @a;
+  return spawn($c, $c->{map}, $argv, $env, $k) unless @a == 3 && $a[1] =~ /^[<>]\z/;
+  my $r = $a[1] eq '<' ? $a[0] lt $a[2] : $a[0] gt $a[2]; $r = !$r if $not;
+  defer($k, $r ? 0 : 1) }
 sub b_command {
   my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv;
   if (($a[0] // '') eq '-v') {
@@ -174,8 +199,9 @@ sub b_command {
     return put($c, 1, "$p\n", sub { $k->(0) }) }
   return defer($k, 0) unless @a;
   if ($a[0] eq '-p') {   # command -p PROGRAM ... (parser item P4): looked up in a default PATH, run with the PATH it has
-    shift @a; return Proc::ShellSpawn::cmd_of($a[0]) || $c->{sh}{cmd}{$a[0]} ? unsupported($c, "'command -p $a[0]'")
+    shift @a; return (Proc::ShellSpawn::cmd_of($a[0]) // [''])->[0] !~ /b_test\z|^\z/ || $c->{sh}{cmd}{$a[0]} ? unsupported($c, "'command -p $a[0]'")
       : spawn($c, $c->{map}, \@a, $env, $k, $DEFPATH) }
+  return b_late($c, \@a, $env, $k) if $Proc::ShellSubset::REGBI{$a[0]};   # a builtin, not a function: its checks, then it (3A)
   if (my $e = Proc::ShellSpawn::cmd_of($a[0])) { return handler($e->[0])->($c, \@a, $env, $k, $e->[1]) }   # a builtin, not a function
   spawn($c, $c->{map}, \@a, $env, $k) }
 
@@ -218,15 +244,23 @@ sub b_unset {
 my %SIGNUM; @SIGNUM{split ' ', $Config::Config{sig_name}} = split ' ', $Config::Config{sig_num};
 sub b_kill {   # kill ... $$: the shell takes the signal itself (F9); other process IDs go to the program kill
   my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv; my $sh = $c->{sh};
+  my @o = @a;   # K0 (the user, 2026-11-05): a signal (-N, -NAME, -s NAME), maybe '--', and no process ID: as both shells,
+                #   status 2, with dash's text (the program kill: status 1, a long usage text).  'kill -s' alone: the program
+  if (@o && $o[0] eq '-s') { splice @o, 0, 2 } elsif (@o && $o[0] =~ /^-[0-9A-Za-z]+\z/ && $o[0] !~ /^-l/) { shift @o }
+  shift @o if @o && $o[0] eq '--';
+  return msg($c, "kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or\nkill -l [exitstatus]", sub { $k->(2) })
+    if !@o && "@a" ne '-s';
   return spawn($c, $c->{map}, $argv, $env, $k) unless grep $_ eq $sh->{pid}, @a;
   my $s = 'TERM';
   if (@a && $a[0] =~ /^-(?:s)?\z/ && @a > 1) { shift @a; $s = shift @a }
   elsif (@a && $a[0] =~ /^-(\w+)\z/) { shift @a; $s = $1 }
   $s = $SIGNAME{$s} // $s if $s =~ /^[0-9]+\z/; $s =~ s/^SIG//;
+  my $harmless = $s =~ /^(?:CHLD|CLD|URG|WINCH|CONT)\z/;   # post4-0.04: by default these do nothing to the shell (0 is EXIT here)
   my @other = grep $_ ne $sh->{pid}, @a;
   my $m = $sh->{main} // $sh;   # $$ is the main shell, also in a subshell: its trap counts (L6)
   my $self = sub {
     my $t = $m->{trap}{$s};
+    return defer($k, 0) if $s eq 'EXIT' || $harmless && !defined $t;   # kill -0 $$ only tests; as both shells, status 0
     return defer($k, 0) if defined $t && $t eq '';            # ignored
     return run_trap($c, $s, sub { defer($k, 0) }) if defined $t && $m == $sh;
     if (defined $t) { $SIG{$s}->($s) if ref $SIG{$s} eq 'CODE'; return defer($k, 0) }   # as a real signal: the trap runs in the main shell

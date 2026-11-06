@@ -11,9 +11,13 @@ CODE:
     char hex[33];
 
     fd = open("/dev/urandom", O_RDONLY);
+    # uncoverable branch false
+    # uncoverable condition right count:1
     if (fd >= 0) {
         ssize_t n = read(fd, bytes, 16);
         close(fd);
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (n == 16) {
             int i;
             for (i = 0; i < 16; i++)
@@ -26,10 +30,19 @@ CODE:
     /* Fallback: Perl random */
     {
         int i;
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         for (i = 0; i < 4; i++)
+            # uncoverable statement
             sprintf(hex + i * 8, "%08x",
+                # uncoverable statement
                 (unsigned int)(Drand01() * (double)0xFFFFFFFF));
+        # uncoverable statement
         hex[32] = '\0';
+        # uncoverable statement
         RETVAL = newSVpvn(hex, 32);
     }
     done:
@@ -95,9 +108,13 @@ CODE:
         SV *token_sv;
 
         fd = open("/dev/urandom", O_RDONLY);
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (fd >= 0) {
             ssize_t n = read(fd, bytes, 16);
             close(fd);
+            # uncoverable branch false
+            # uncoverable condition right count:1
             if (n == 16) {
                 int i;
                 for (i = 0; i < 16; i++)
@@ -107,19 +124,37 @@ CODE:
             } else {
                 /* Fallback: Perl random */
                 int i;
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 for (i = 0; i < 4; i++)
+                    # uncoverable statement
                     sprintf(hex + i * 8, "%08x",
+                        # uncoverable statement
                         (unsigned int)(Drand01() * (double)0xFFFFFFFF));
+                # uncoverable statement
                 hex[32] = '\0';
+                # uncoverable statement
                 token_sv = newSVpvn(hex, 32);
             }
         } else {
             /* Fallback: Perl random */
             int i;
+            # uncoverable statement
+            # uncoverable branch true
+            # uncoverable branch false
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
             for (i = 0; i < 4; i++)
+                # uncoverable statement
                 sprintf(hex + i * 8, "%08x",
+                    # uncoverable statement
                     (unsigned int)(Drand01() * (double)0xFFFFFFFF));
+            # uncoverable statement
             hex[32] = '\0';
+            # uncoverable statement
             token_sv = newSVpvn(hex, 32);
         }
         (void)hv_stores(self_hv, "_token", token_sv);
@@ -128,6 +163,8 @@ CODE:
     /* If token config is a hashref, create a Token manager */
     {
         SV **tc_svp = hv_fetchs(self_hv, "_token_config", 0);
+        # uncoverable condition right count:2
+        # uncoverable condition right count:4
         if (tc_svp && SvOK(*tc_svp) && SvROK(*tc_svp)
             && SvTYPE(SvRV(*tc_svp)) == SVt_PVHV) {
             HV *tc_hv = (HV *)SvRV(*tc_svp);
@@ -152,11 +189,18 @@ CODE:
                 alen = av_len(args);
                 for (j = 0; j <= alen; j++) {
                     SV **el = av_fetch(args, j, 0);
+                    # uncoverable branch false
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
                     if (el) XPUSHs(sv_2mortal(newSVsv(*el)));
                 }
                 PUTBACK;
                 count = call_method("new", G_SCALAR);
                 SPAGAIN;
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (count > 0) {
                     tm = newSVsv(POPs);
                     (void)hv_stores(self_hv, "_token_manager", tm);
@@ -169,8 +213,12 @@ CODE:
                         PUTBACK;
                         count = call_method("current", G_SCALAR);
                         SPAGAIN;
+                        # uncoverable branch false
+                        # uncoverable condition right count:1
                         if (count > 0) {
                             cur = POPs;
+                            # uncoverable branch false
+                            # uncoverable condition right count:1
                             if (SvOK(cur))
                                 (void)hv_stores(self_hv, "_token",
                                     newSVsv(cur));
@@ -195,6 +243,8 @@ CODE:
         PUTBACK;
         count = call_method("new", G_SCALAR);
         SPAGAIN;
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (count > 0) {
             SV *sel = POPs;
             (void)hv_stores(self_hv, "_select", newSVsv(sel));
@@ -217,6 +267,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_token", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvREFCNT_inc(*svp) : &PL_sv_undef;
 }
 OUTPUT:
@@ -248,6 +300,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **handlers_svp = hv_fetchs(hv, "_handlers", 0);
+    # uncoverable condition right count:2
     if (handlers_svp && SvROK(*handlers_svp)) {
         HV *handlers = (HV *)SvRV(*handlers_svp);
         const char *channel;
@@ -309,6 +362,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **clients_svp = hv_fetchs(hv, "_clients", 0);
+    # uncoverable condition right count:2
     if (clients_svp && SvROK(*clients_svp)) {
         HV *clients = (HV *)SvRV(*clients_svp);
         const char *name;
@@ -316,6 +370,7 @@ CODE:
         SV **conn_svp;
         name = SvPV(name_sv, name_len);
         conn_svp = hv_fetch(clients, name, name_len, 0);
+        # uncoverable condition right count:2
         if (conn_svp && SvOK(*conn_svp)) {
             dSP;
             int count;
@@ -328,6 +383,7 @@ CODE:
             PUTBACK;
             count = call_method("send", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             RETVAL = (count > 0) ? newSVsv(POPs) : newSViv(0);
             PUTBACK;
             FREETMPS;
@@ -349,6 +405,7 @@ PPCODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **clients_svp = hv_fetchs(hv, "_clients", 0);
+    # uncoverable condition right count:2
     if (clients_svp && SvROK(*clients_svp)) {
         HV *clients = (HV *)SvRV(*clients_svp);
         I32 num_keys = hv_iterinit(clients);
@@ -381,17 +438,26 @@ OUTPUT:
     RETVAL
 
 void
+# uncoverable subroutine class:ignore_covered_err
+# uncoverable statement class:ignore_covered_err
 run(self)
     SV *self
 CODE:
 {
+    /* run is left only by a die out of a callback in _hub_do_poll, and gcov
+     * derives the counts of a function that never returns as zero */
+    # uncoverable statement
     while (1) {
+        # uncoverable statement class:ignore_covered_err
         _hub_do_poll(aTHX_ self);
         /* Small sleep to avoid CPU spin - 10ms */
         {
             struct timeval tv;
+            # uncoverable statement class:ignore_covered_err
             tv.tv_sec = 0;
+            # uncoverable statement class:ignore_covered_err
             tv.tv_usec = 10000;
+            # uncoverable statement class:ignore_covered_err
             select(0, NULL, NULL, NULL, &tv);
         }
     }
@@ -420,6 +486,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **tm_svp = hv_fetchs(hv, "_token_manager", 0);
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (tm_svp && SvOK(*tm_svp) && SvROK(*tm_svp)) {
         /* Force rotation by setting rotation_at to past */
         HV *tm_hv = (HV *)SvRV(*tm_svp);
@@ -448,6 +516,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_token_manager", 0);
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvREFCNT_inc(*svp) : &PL_sv_undef;
 }
 OUTPUT:

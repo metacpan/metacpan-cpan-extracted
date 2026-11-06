@@ -29,6 +29,13 @@ my $have_websocket = eval {
 }
 
 {
+   local @ARGV = ("--tls-cert", "certificate.pem", "--tls-key", "private.pem");
+   my $options = mcp_getoptions;
+   is $options->{tls_cert}, "certificate.pem", "shared TLS certificate option";
+   is $options->{tls_key}, "private.pem", "shared TLS key option";
+}
+
+{
    local @ARGV = ("--name", "memory", "--custom-instructions", "Use for lasting memories.");
    my $options = mcp_getoptions;
    is $options->{custom_instructions}, "Use for lasting memories.",
@@ -86,6 +93,13 @@ is $status, 0, "shared print-url exits without starting a listener";
 is $out, "http://127.0.0.1:31740/first/custom/\n", "print-url uses first CLI token and effective URL";
 is $err, "", "print-url has no diagnostics";
 
+($status, $out, $err) = command ($script, "--name", "demo", "--bind", ":31740",
+   "--token", "first", "--tls-key", "combined.pem", "--print-url");
+is $status, 0, "combined TLS PEM URL discovery succeeds";
+is $out, "https://127.0.0.1:31740/first/custom/\nhttp://127.0.0.1:31740/first/custom/\n",
+   "TLS URL discovery prints HTTPS first and HTTP second";
+is $err, "", "TLS URL discovery has no diagnostics";
+
 ($status, $out) = command ($script, "--name", "demo", "--help");
 is $status, 0, "standard --help succeeds";
 like $out, qr/\Ausage in subprocess\n\nCommon options:\n/,
@@ -121,6 +135,16 @@ close $fh or die $!;
 is $status, 0, "named endpoint URL discovery succeeds";
 is $out, "http://127.0.0.1:31740/static/named/\n",
    "shared print-url retains named server path";
+
+open $fh, ">>", "$dir/anyevent-mcp/global.ini" or die $!;
+print {$fh} "\n[instance secured]\ntls_cert = cert.pem\n";
+close $fh or die $!;
+($status, $out, $err) = command ('mcp_getoptions;', "--name", "secured",
+   "--bind", ":31740", "--token", "static", "--print-url");
+is $status, 0, "named TLS URL discovery succeeds";
+is $out, "https://127.0.0.1:31740/static/\nhttp://127.0.0.1:31740/static/\n",
+   "named TLS certificate selects dual URLs";
+is $err, "", "named TLS URL discovery has no diagnostics";
 
 open $fh, ">>", "$dir/anyevent-mcp/global.ini" or die $!;
 print {$fh} "\n[program perl]\ncustom_instructions = Program purpose\n"
@@ -165,7 +189,7 @@ is $config->http_url ("demo", ":31740", path => "/", auth => "none"),
    "http://127.0.0.1:31740/", "explicit unauthenticated URL contains no token";
 
 my %http = $config->http_settings ("demo");
-is $config->credential ("token", "demo"), $http{tokens}[0],
+is $config->user_credentials ("demo")->[0][2], $http{tokens}[0],
    "derived default uses token HKDF purpose";
 
 my $unstable = AnyEvent::MCP::Config->new (file => "$dir/anyevent-mcp/global.ini");
@@ -410,6 +434,30 @@ like $err, qr/request method=GET url=https:\/\/example.org\/page\n/,
    "applications can add sanitized context to the shared request logger";
 like $err, qr/\d\d \d\d:\d\d:\d\d\.\d\d [^\s]+\/example\[\d+\] error main: diagnostic failure\n/,
    "ordinary diagnostics use the same process-wide formatter";
+
+my $error_probe = q{
+   mcp_http auth => "none", port => 0, on_start => sub {
+      my ($server) = @_;
+      $server->event (connection_error => bless ({
+         mcp_remote => "127.0.0.1:12345",
+         mcp_peer => { client_info => { name => "two\nlines" } },
+      }, "AnyEvent::Handle"), "Broken pipe");
+      $server->event (connection_error => bless ({
+         mcp_peer => {},
+      }, "AnyEvent::Handle"), "Broken pipe");
+      $server->close;
+   };
+};
+{
+   local $ENV{PERL_ANYEVENT_LOG} = "filter=warn";
+   ($status, $out, $err) = command ($error_probe);
+}
+is $status, 0, "connection error log probe exits cleanly";
+like $err, qr/MCP connection id=[a-f0-9]+ remote=127\.0\.0\.1:12345 client="two\\nlines": Broken pipe\n/,
+   "connection errors identify the remote endpoint and escaped client name";
+like $err, qr/MCP connection id=[a-f0-9]+: Broken pipe\n/,
+   "unidentified connections still receive a connection id";
+
 ($status, $out, $err) = command ($log_probe, "--quiet");
 is $status, 0, "--quiet exits normally";
 unlike $err, qr/file-patch|path-op|ex target=/, "--quiet suppresses activity and tool errors";

@@ -24,6 +24,8 @@ t/Pastes.csv
 t/Penicillin.csv
 t/PetersenCL.csv
 t/SchoolingReturns.csv
+t/TukeyHSD.twoway.R.R
+t/TukeyHSD.twoway.R.t
 t/_parse_csv.t
 t/add_data.t
 t/age_standardize.t
@@ -127,6 +129,8 @@ t/dnorm.nv_width.t
 t/docvis.csv
 t/drop_duplicates.t
 t/dropna.t
+t/dunn_test.statsmodels.py
+t/dunn_test.statsmodels.t
 t/dunn_test.t
 t/effect_sizes.t
 t/epi_2x2.t
@@ -253,6 +257,7 @@ t/prcomp.t
 t/predict.long_names.t
 t/predict.t
 t/predict2.t
+t/prop_test.R.statsmodels.t
 t/prop_test.t
 t/pt.log_tail.R.R
 t/pt.log_tail.R.t

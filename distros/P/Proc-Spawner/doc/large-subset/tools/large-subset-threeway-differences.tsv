@@ -1,0 +1,138 @@
+class	samples	call	dash	bash	program	examples
+all three differ	1	printf %(%s%s)T -1	2 |printf: %(: invalid directive\n	0 17938824051793882405|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar11
+all three differ	1	printf %(%s)T	2 |printf: %(: invalid directive\n	0 1793882405|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar19
+all three differ	1	printf %d %(%s)T	2 0 |printf: %(: invalid directive\n	0 0 1793882406|	1 0 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar21
+all three differ	1	printf %d %(%s)T 42	2 42 |printf: %(: invalid directive\n	0 42 1793882406|	1 42 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar20
+all three differ	1	printf -v foo bar	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'foo'\n	SC:Analytics.hs:prop_checkUnassignedReferences20
+all three differ	1	printf -v myvar This is %s = %d\n a year 2016	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'myvar'	TL:common/printf.md:29
+all three differ	1	printf -vTODAY %(%Y)T	2 |printf: Illegal option -v\n	0 |	0 -vTODAY|printf: warning: ignoring excess arguments, starting with '%	SC:Checks/Commands.hs:prop_checkPrintfVar23
+all three differ	2	kill -l	0 0\nHUP\nINT\nQUIT\nILL\nTRAP\nABRT\nBUS\nFPE\nKILL\nUSR1\nSEGV\nUSR2	0 HUP INT QUIT ILL TRAP ABRT BUS FPE KILL USR1 SEGV USR2 PIPE ALRM TER	0 HUP INT QUIT ILL TRAP ABRT BUS FPE KILL USR1 SEGV USR2 PIPE ALRM TER	TL:linux/kill.md:13,TL:common/kill.md:13
+bash=program, dash differs	1	[  == 42 ]	2 |[: unexpected operator\n	1 |	1 |	SC:Checks/ShellSupport.hs:prop_checkBashisms6
+bash=program, dash differs	1	[ -N file ]	2 |[: -N: unexpected operator\n	1 |	1 |	SC:Checks/ShellSupport.hs:prop_checkBashisms148
+bash=program, dash differs	1	[ d41d8cd98f00b204e9800998ecf842... == d41d8cd98f00b204e9800998ecf842... ]	2 |[: d41d8cd98f00b204e9800998ecf8427e: unexpected operator\n	0 |	0 |	NB:550
+bash=program, dash differs	1	[ x == x ]	2 |[: x: unexpected operator\n	0 |	0 |	SC:Checks/ShellSupport.hs:prop_checkBashisms107
+bash=program, dash differs	1	echo -e 	0 -e \n|	0 \n|	0 \n|	SC:Analytics.hs:prop_checkUuoeVar3
+bash=program, dash differs	1	echo -e 1.0\n2.5\n3.1\n4.3\n5.6\n5.7	0 -e 1.0\n2.5\n3.1\n4.3\n5.6\n5.7\n|	0 1.0\n2.5\n3.1\n4.3\n5.6\n5.7\n|	0 1.0\n2.5\n3.1\n4.3\n5.6\n5.7\n|	TL:linux/datamash.md:12
+bash=program, dash differs	1	echo -e 1\n2\n3	0 -e 1\n2\n3\n|	0 1\n2\n3\n|	0 1\n2\n3\n|	NB:109
+bash=program, dash differs	1	echo -e 1\n2\n3\n4\n5\n5	0 -e 1\n2\n3\n4\n5\n5\n|	0 1\n2\n3\n4\n5\n5\n|	0 1\n2\n3\n4\n5\n5\n|	TL:linux/datamash.md:16
+bash=program, dash differs	1	echo -e 1\n2\nNa\n3\nNaN	0 -e 1\n2\nNa\n3\nNaN\n|	0 1\n2\nNa\n3\nNaN\n|	0 1\n2\nNa\n3\nNaN\n|	TL:linux/datamash.md:20
+bash=program, dash differs	1	echo -e <line>	0 -e <line>\n|	0 <line>\n|	0 <line>\n|	NB:6330
+bash=program, dash differs	1	echo -e ALERT - Shell Access on:'   '\...	0 -e ALERT - Shell Access on:'   '\n\n' \n|	0 ALERT - Shell Access on:'   '\n\n' \n|	0 ALERT - Shell Access on:'   '\n\n' \n|	NB:6025
+bash=program, dash differs	1	echo -e Column 1\tColumn 2	0 -e Column 1	Column 2\n|	0 Column 1	Column 2\n|	0 Column 1	Column 2\n|	TL:common/echo.md:25
+bash=program, dash differs	1	echo -e GET / HTTP/1.1\nHost: host\n\n	0 -e GET / HTTP/1.1\nHost: host\n\n\n|	0 GET / HTTP/1.1\nHost: host\n\n\n|	0 GET / HTTP/1.1\nHost: host\n\n\n|	TL:common/nc.md:32
+bash=program, dash differs	1	echo -e HTTP/1.1 200 OK\n\n 	0 -e HTTP/1.1 200 OK\n\n \n|	0 HTTP/1.1 200 OK\n\n \n|	0 HTTP/1.1 200 OK\n\n \n|	NB:5820
+bash=program, dash differs	1	echo -e Icon\r	0 -e Icon\n|	0 Icon\n|	0 Icon\n|	NB:1157
+bash=program, dash differs	1	echo -e ONBOOT="YES"\nIPADDR=10.42.84....	0 -e ONBOOT="YES"\nIPADDR=10.42.84.168\nPREFIX=24\n|	0 ONBOOT="YES"\nIPADDR=10.42.84.168\nPREFIX=24\n|	0 ONBOOT="YES"\nIPADDR=10.42.84.168\nPREFIX=24\n|	NB:6243
+bash=program, dash differs	1	echo -e Test\rTesting\r\nTester\rTeste...	0 -e TestTesting\nTesterTested\n|	0 TestTesting\nTesterTested\n|	0 TestTesting\nTesterTested\n|	NB:1647
+bash=program, dash differs	1	echo -e Testing\r\nTested_Hello_World	0 -e Testing\nTested_Hello_World\n|	0 Testing\nTested_Hello_World\n|	0 Testing\nTested_Hello_World\n|	NB:7760
+bash=program, dash differs	1	echo -e Testing\r_Tested	0 -e Testing_Tested\n|	0 Testing_Tested\n|	0 Testing_Tested\n|	NB:7761
+bash=program, dash differs	1	echo -e UI Backend\nBackend Database\n...	0 -e UI Backend\nBackend Database\nDocs UI\n|	0 UI Backend\nBackend Database\nDocs UI\n|	0 UI Backend\nBackend Database\nDocs UI\n|	TL:common/tsort.md:13
+bash=program, dash differs	1	echo -e \n/usr/local/boost_1_54_0/stag...	0 -e \n/usr/local/boost_1_54_0/stage/lib\n|	0 \n/usr/local/boost_1_54_0/stage/lib\n|	0 \n/usr/local/boost_1_54_0/stage/lib\n|	NB:9669
+bash=program, dash differs	1	echo -e \nPlease Enter\na Message: 	0 -e \nPlease Enter\na Message: \n|	0 \nPlease Enter\na Message: \n|	0 \nPlease Enter\na Message: \n|	NB:6952
+bash=program, dash differs	1	echo -e \n\n\n	0 -e \n\n\n\n|	0 \n\n\n\n|	0 \n\n\n\n|	NB:5761
+bash=program, dash differs	1	echo -e \r	0 -e \n|	0 \n|	0 \n|	NB:1132
+bash=program, dash differs	1	echo -e a\nb	0 -e a\nb\n|	0 a\nb\n|	0 a\nb\n|	TL:common/xe.md:16
+bash=program, dash differs	1	echo -e a\nb\ncccccccccccc\nd	0 -e a\nb\ncccccccccccc\nd\n|	0 a\nb\ncccccccccccc\nd\n|	0 a\nb\ncccccccccccc\nd\n|	NB:5799
+bash=program, dash differs	1	echo -e foi\nbar	0 -e foi\nbar\n|	0 foi\nbar\n|	0 foi\nbar\n|	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes2
+bash=program, dash differs	1	echo -e length(FOO)==0	0 -e length(FOO)==0\n|	0 length(FOO)==0\n|	0 length(FOO)==0\n|	NB:7887
+bash=program, dash differs	1	echo -e length(FOO_NO_EXTERNAL_SPACE)=...	0 -e length(FOO_NO_EXTERNAL_SPACE)==0\n|	0 length(FOO_NO_EXTERNAL_SPACE)==0\n|	0 length(FOO_NO_EXTERNAL_SPACE)==0\n|	NB:7883
+bash=program, dash differs	1	echo -e length(FOO_NO_LEAD_SPACE)==0	0 -e length(FOO_NO_LEAD_SPACE)==0\n|	0 length(FOO_NO_LEAD_SPACE)==0\n|	0 length(FOO_NO_LEAD_SPACE)==0\n|	NB:7884
+bash=program, dash differs	1	echo -e length(FOO_NO_TRAIL_SPACE)==0	0 -e length(FOO_NO_TRAIL_SPACE)==0\n|	0 length(FOO_NO_TRAIL_SPACE)==0\n|	0 length(FOO_NO_TRAIL_SPACE)==0\n|	NB:7885
+bash=program, dash differs	1	echo -e length(FOO_NO_WHITESPACE)==0	0 -e length(FOO_NO_WHITESPACE)==0\n|	0 length(FOO_NO_WHITESPACE)==0\n|	0 length(FOO_NO_WHITESPACE)==0\n|	NB:7886
+bash=program, dash differs	1	echo -e test1\ntest2\ntest3	0 -e test1\ntest2\ntest3\n|	0 test1\ntest2\ntest3\n|	0 test1\ntest2\ntest3\n|	NB:7326
+bash=program, dash differs	1	echo -e y\n	0 -e y\n\n|	0 y\n\n|	0 y\n\n|	NB:1087
+bash=program, dash differs	1	echo -n -e 	0 -e |	0 |	0 |	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes5
+bash=program, dash differs	1	echo -n -e \x61	0 -e \x61|	0 a|	0 a|	NB:306
+bash=program, dash differs	1	echo -ne \n	0 -ne \n\n|	0 \n|	0 \n|	NB:8155
+bash=program, dash differs	1	echo -ne some random\nbytes	0 -ne some random\nbytes\n|	0 some random\nbytes|	0 some random\nbytes|	NB:706
+bash=program, dash differs	1	echo 1\n2\n3\n4\n5	0 1\n2\n3\n4\n5\n|	0 1\n2\n3\n4\n5\n|	0 1\n2\n3\n4\n5\n|	NB:7825
+bash=program, dash differs	1	echo PM7\n#comment\n\nH 0.95506 0.0...	0 PM7\n#comment\n\nH 0.95506 0.05781 -0.03133\nF 1.89426 0.05781 -0.03	0 PM7\n#comment\n\nH 0.95506 0.05781 -0.03133\nF 1.89426 0.05781 -0.03	0 PM7\n#comment\n\nH 0.95506 0.05781 -0.03133\nF 1.89426 0.05781 -0.03	TL:linux/mopac.md:12
+bash=program, dash differs	1	echo \506	0 F\n|	0 \506\n|	0 \506\n|	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes6
+bash=program, dash differs	1	echo \5a	0 a\n|	0 \5a\n|	0 \5a\n|	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes7
+bash=program, dash differs	1	echo foo\nbar\n	0 foo\nbar\n\n|	0 foo\nbar\n\n|	0 foo\nbar\n\n|	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes1
+bash=program, dash differs	1	echo n:\t42	0 n:	42\n|	0 n:\t42\n|	0 n:\t42\n|	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes3
+bash=program, dash differs	1	kill %1	2 |kill: No such job: %1\n	1 |kill: %1: no such job\n	1 |kill: failed to parse argument: '%1'\n	NB:9048
+bash=program, dash differs	1	kill %job_id	2 |kill: No such job: %job_id\n	1 |kill: %job_id: no such job\n	1 |kill: failed to parse argument: '%job_id'\n	TL:linux/kill.md:17
+bash=program, dash differs	1	kill -1 process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:common/kill.md:17
+bash=program, dash differs	1	kill -10 -group_id	2 |kill: Illegal number: group_id\n	1 |kill: -group_id: arguments must be process or job IDs\n	1 |kill: invalid argument g\n\nUsage:\n kill [options] <pid> [...]\n\n	TL:linux/kill.md:37
+bash=program, dash differs	1	kill -19 process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:linux/kill.md:33
+bash=program, dash differs	1	kill -2 process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:common/kill.md:21
+bash=program, dash differs	1	kill -9 `pgrep myprocess`	2 |kill: Illegal number: `pgrep\n	1 |kill: `pgrep: arguments must be process or job IDs\nkill: myprocess	1 |kill: failed to parse argument: '`pgrep'\n	NB:4809
+bash=program, dash differs	1	kill -9 process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:common/kill.md:25
+bash=program, dash differs	1	kill -CONT runit_process_id	2 |kill: Illegal number: runit_process_id\n	1 |kill: runit_process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'runit_process_id'\n	TL:common/runit.md:12
+bash=program, dash differs	1	kill -STOP process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:common/kill.md:29
+bash=program, dash differs	1	kill -USR1 -group_id	2 |kill: Illegal number: group_id\n	1 |kill: -group_id: arguments must be process or job IDs\n	1 |kill: invalid argument g\n\nUsage:\n kill [options] <pid> [...]\n\n	TL:common/kill.md:33
+bash=program, dash differs	1	kill instance_id	2 |kill: Illegal number: instance_id\n	1 |kill: instance_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'instance_id'\n	TL:common/odpscmd-inst.md:24
+bash=program, dash differs	1	kill process_id	2 |kill: Illegal number: process_id\n	1 |kill: process_id: arguments must be process or job IDs\n	1 |kill: failed to parse argument: 'process_id'\n	TL:common/kill.md:9
+bash=program, dash differs	1	printf %q 	2 |printf: %q: invalid directive\n	0 ''|	0 ''|	SC:Checks/ShellSupport.hs:prop_checkBashisms31
+bash=program, dash differs	1	printf \x1b[38;5;4mCiao, \x1b[1;7mBab...	0 \x1b[38;5;4mCiao, \x1b[1;7mBaby.\x1b[0m\n|	0 [38;5;4mCiao, [1;7mBaby.[0m\n|	0 [38;5;4mCiao, [1;7mBaby.[0m\n|	TL:common/sequin.md:9
+bash=program, dash differs	1	printf ^\xef\xbb\xbf	0 ^\xef\xbb\xbf|	0 ^﻿|	0 ^﻿|	NB:2007
+bash=program, dash differs	1	test  == 42	2 |test: unexpected operator\n	1 |	1 |	SC:Checks/ShellSupport.hs:prop_checkBashisms6b
+bash=program, dash differs	2	[ x == y ]	2 |[: x: unexpected operator\n	1 |	1 |	SC:Checks/ShellSupport.hs:prop_checkBashisms120,SC:Checks/ShellSupport.hs:prop_checkBashisms121
+bash=program, dash differs	2	echo -e 	0 -e \n|	0 \n|	0 \n|	NB:1169,NB:4816
+bash=program, dash differs	2	echo -e Please Enter a Message: \n\b	0 -e Please Enter a Message: \n\n|	0 Please Enter a Message: \n\n|	0 Please Enter a Message: \n\n|	NB:6954,NB:6951
+bash=program, dash differs	2	echo -e \n	0 -e \n\n|	0 \n\n|	0 \n\n|	NB:1916,NB:8186
+bash=program, dash differs	2	echo -e line1\r\nline2	0 -e line1\nline2\n|	0 line1\nline2\n|	0 line1\nline2\n|	NB:1648,NB:1649
+bash=program, dash differs	2	echo -en 111 22 3\n4 555 66\n	0 -en 111 22 3\n4 555 66\n\n|	0 111 22 3\n4 555 66\n|	0 111 22 3\n4 555 66\n|	NB:1138,NB:5824
+bash=program, dash differs	2	echo -ne Welcome !\n	0 -ne Welcome !\n\n|	0 Welcome !\n|	0 Welcome !\n|	NB:5970,NB:5971
+bash=program, dash differs	2	echo -ne foo	0 -ne foo\n|	0 foo|	0 foo|	SC:Checks/ShellSupport.hs:prop_checkBashisms78,SC:Checks/ShellSupport.hs:prop_checkBashisms127
+bash=program, dash differs	2	echo Hello\nWorld!	0 Hello\nWorld!\n|	0 Hello\nWorld!\n|	0 Hello\nWorld!\n|	TL:common/pbmtext.md:13,TL:common/pbmtext.md:21
+bash=program, dash differs	4	echo -e red\ngreen\nblue	0 -e red\ngreen\nblue\n|	0 red\ngreen\nblue\n|	0 red\ngreen\nblue\n|	TL:linux/fuzzel.md:20,TL:linux/fuzzel.md:24,TL:linux/dmenu.md:13
+bash=program, dash differs	6	echo -ne 	0 -ne \n|	0 |	0 |	NB:7885,NB:5899,NB:7886
+dash=bash, program differs	1	printf %0.s- 1	0 -|	0 -|	1 |printf: %0.s: invalid conversion specification\n	NB:5904
+dash=bash, program differs	1	printf -v %s 	2 |printf: Illegal option -v\n	2 |printf: `%s': not a valid identifier\n	0 -v|printf: warning: ignoring excess arguments, starting with '%s'\n	SC:Checks/ShellSupport.hs:prop_checkBashisms30
+dash=bash, program differs	1	printf -v cow	2 |printf: Illegal option -v\n	2 |printf: usage: printf [-v var] format [arguments]\n	0 -v|printf: warning: ignoring excess arguments, starting with 'cow'\n	SC:Checks/Commands.hs:prop_checkPrintfVar3
+dash=program, bash differs	1	[ ! -a file ]	2 |[: -a: unexpected operator\n	0 |	2 |[: '-a': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps5
+dash=program, bash differs	1	[ ! -a foo ]	2 |[: -a: unexpected operator\n	0 |	2 |[: '-a': unary operator expected\n	SC:Analytics.hs:prop_checkUnaryTestA2
+dash=program, bash differs	1	[ ! -o braceexpand ]	2 |[: -o: unexpected operator\n	0 |	2 |[: '-o': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps1
+dash=program, bash differs	1	[ -R a ]	2 |[: -R: unexpected operator\n	1 |	2 |[: '-R': unary operator expected\n	SC:Analytics.hs:prop_checkUnused23
+dash=program, bash differs	1	[ -R ref ]	2 |[: -R: unexpected operator\n	1 |	2 |[: '-R': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms147
+dash=program, bash differs	1	[ -a foo ]	2 |[: -a: unexpected operator\n	1 |	2 |[: '-a': unary operator expected\n	SC:Analytics.hs:prop_checkUnaryTestA1
+dash=program, bash differs	1	[ -o errexit ]	2 |[: -o: unexpected operator\n	1 |	2 |[: '-o': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms131
+dash=program, bash differs	1	[ -v a ]	2 |[: -v: unexpected operator\n	1 |	2 |[: '-v': unary operator expected\n	SC:Analytics.hs:prop_checkUnused22
+dash=program, bash differs	1	[ -v bar[$foo] ]	2 |[: -v: unexpected operator\n	1 |	2 |[: '-v': unary operator expected\n	SC:Analytics.hs:prop_checkSingleQuotedVariables14
+dash=program, bash differs	1	test -a foo	2 |test: -a: unexpected operator\n	1 |	2 |test: '-a': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms21b
+dash=program, bash differs	2	[ -o braceexpand ]	2 |[: -o: unexpected operator\n	0 |	2 |[: '-o': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps2,SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps4
+dash=program, bash differs	2	[ -v var ]	2 |[: -v: unexpected operator\n	1 |	2 |[: '-v': unary operator expected\n	SC:Analytics.hs:prop_checkSpacefulnessCfg32,SC:Checks/ShellSupport.hs:prop_checkBashisms94
+messages only	1	[  != lol	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkOrNeq3
+messages only	1	[  -eq	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	TL:common/[.md:18
+messages only	1	[  = lol	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkAndEq3
+messages only	1	[ ! -eq 0 ]	2 |[: Illegal number: !\n	2 |[: !: integer expression expected\n	2 |[: invalid integer '!'\n	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest9
+messages only	1	[ != /bin /bin.usr-is-merged /boot /container_info.json /dev /etc /home /lib /lib.usr-is-merged /lib64 /lost+found /media /mnt /nix /old_root /opt /proc /root /run /sbin /srv /sys /tmp /usr /var ]	2 |[: !=: unexpected operator\n	2 |[: too many arguments\n	2 |[: extra argument '/bin'\n	SC:Analytics.hs:prop_checkComparisonAgainstGlob6
+messages only	1	[ != foo ]	2 |[: !=: unexpected operator\n	2 |[: !=: unary operator expected\n	2 |[: missing argument after 'foo'\n	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest6
+messages only	1	[ -M a ]	2 |[: -M: unexpected operator\n	2 |[: -M: unary operator expected\n	2 |[: '-M': unary operator expected\n	SC:Analytics.hs:prop_checkValidCondOps2
+messages only	1	[ -eq 1 ]	2 |[: -eq: unexpected operator\n	2 |[: -eq: unary operator expected\n	2 |[: missing argument after '1'\n	SC:Analytics.hs:prop_checkAndEq11
+messages only	1	[ -eq N ]	2 |[: -eq: unexpected operator\n	2 |[: -eq: unary operator expected\n	2 |[: missing argument after 'N'\n	SC:Analytics.hs:prop_checkNumberComparisons11
+messages only	1	[ -n -o -t 1 ]	2 |[: -o: unexpected operator\n	2 |[: syntax error: `-t' unexpected\n	2 |[: extra argument '-t'\n	SC:Analytics.hs:prop_checkUnquotedN4
+messages only	1	[ 0 -eq ]	2 |[: -eq: argument expected\n	2 |[: 0: unary operator expected\n	2 |[: missing argument after '-eq'\n	SC:Analytics.hs:prop_checkAndEq9
+messages only	1	[ 0 -ne ]	2 |[: -ne: argument expected\n	2 |[: 0: unary operator expected\n	2 |[: missing argument after '-ne'\n	SC:Analytics.hs:prop_checkOrNeq9
+messages only	1	[ 6 -eq 2*3 ]	2 |[: Illegal number: 2*3\n	2 |[: 2*3: integer expression expected\n	2 |[: invalid integer '2*3'\n	SC:Analytics.hs:prop_checkTestArgumentSplitting21
+messages only	1	[ = *foo* ]	2 |[: =: unexpected operator\n	2 |[: =: unary operator expected\n	2 |[: missing argument after '*foo*'\n	SC:Analytics.hs:prop_checkComparisonAgainstGlob3
+messages only	1	[ = foo ]	2 |[: =: unexpected operator\n	2 |[: =: unary operator expected\n	2 |[: missing argument after 'foo'\n	SC:Analytics.hs:prop_checkComparisonAgainstGlob4
+messages only	1	[ = xbar ]	2 |[: =: unexpected operator\n	2 |[: =: unary operator expected\n	2 |[: missing argument after 'xbar'\n	SC:Analytics.hs:prop_checkComparisonWithLeadingX3
+messages only	1	[ = your/dir ]	2 |[: =: unexpected operator\n	2 |[: =: unary operator expected\n	2 |[: missing argument after 'your/dir'\n	NB:562
+messages only	1	[ ==  ]	2 |[: ==: unexpected operator\n	2 |[: ==: unary operator expected\n	2 |[: missing argument after ''\n	SC:Analytics.hs:prop_checkTestArgumentSplitting13
+messages only	1	[ == cow ]	2 |[: ==: unexpected operator\n	2 |[: ==: unary operator expected\n	2 |[: missing argument after 'cow'\n	SC:Analytics.hs:prop_checkUnquotedExpansions3
+messages only	1	[ a !=	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkOrNeq4
+messages only	1	[ a =	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkAndEq4
+messages only	1	[ a.txt	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkLiteralBreakingTest4
+messages only	1	[ foo	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkConditionalAndOrs1
+messages only	1	[ foo -eq y ]	2 |[: Illegal number: foo\n	2 |[: foo: integer expression expected\n	2 |[: invalid integer 'foo'\n	SC:Analytics.hs:prop_checkNumberComparisons16
+messages only	1	[ foo =~ bar ]	2 |[: foo: unexpected operator\n	2 |[: =~: binary operator expected\n	2 |[: '=~': binary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms6c
+messages only	1	[ foo >= bar ]	2 |[: foo: unexpected operator\n	2 |[: >=: binary operator expected\n	2 |[: '>=': binary operator expected\n	SC:Analytics.hs:prop_checkNumberComparisons9
+messages only	1	[ n -le 4 ]	2 |[: Illegal number: n\n	2 |[: n: integer expression expected\n	2 |[: invalid integer 'n'\n	SC:Analytics.hs:prop_checkConstantIfs2a
+messages only	1	[ test =~ foo ]	2 |[: test: unexpected operator\n	2 |[: =~: binary operator expected\n	2 |[: '=~': binary operator expected\n	SC:Analytics.hs:prop_checkSingleBracketOperators1
+messages only	1	[ var -eq 3 ]	2 |[: Illegal number: var\n	2 |[: var: integer expression expected\n	2 |[: invalid integer 'var'\n	SC:Analytics.hs:prop_checkUnused27
+messages only	1	[ var[x] -eq 2 ]	2 |[: Illegal number: var[x]\n	2 |[: var[x]: integer expression expected\n	2 |[: invalid integer 'var[x]'\n	SC:Analytics.hs:prop_checkTestArgumentSplitting20
+messages only	1	[ x -gt x ]	2 |[: Illegal number: x\n	2 |[: x: integer expression expected\n	2 |[: invalid integer 'x'\n	SC:Analytics.hs:prop_checkNumberComparisons12
+messages only	1	kill -0 1	1 |kill: Operation not permitted\n\n	1 |kill: (1) - Operation not permitted\n	1 |kill: (1): Operation not permitted\n	NB:557
+messages only	1	kill -9 16085	1 |kill: No such process\n\n	1 |kill: (16085) - No such process\n	1 |kill: (16085): No such process\n	NB:9033
+messages only	1	kill -9 18581 18582 18583	1 |kill: No such process\n\nkill: No such process\n\nkill: No such pro	1 |kill: (18581) - No such process\nkill: (18582) - No such process\nk	1 |kill: (18581): No such process\nkill: (18582): No such process\nkil	NB:9034
+messages only	1	printf -- foo bar baz	0 foo|	0 foo|	0 foo|printf: warning: ignoring excess arguments, starting with 'bar'\	SC:Checks/Commands.hs:prop_checkPrintfVar7
+messages only	1	printf foo bar baz	0 foo|	0 foo|	0 foo|printf: warning: ignoring excess arguments, starting with 'bar'\	SC:Checks/Commands.hs:prop_checkPrintfVar6
+messages only	1	test = xbar	2 |test: =: unexpected operator\n	2 |test: =: unary operator expected\n	2 |test: missing argument after 'xbar'\n	SC:Analytics.hs:prop_checkComparisonWithLeadingX4
+messages only	1	test foo =~ bar	2 |test: foo: unexpected operator\n	2 |test: =~: binary operator expected\n	2 |test: '=~': binary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms6d
+messages only	2	[ != a ]	2 |[: !=: unexpected operator\n	2 |[: !=: unary operator expected\n	2 |[: missing argument after 'a'\n	SC:Analytics.hs:prop_checkOrNeq6,SC:Analytics.hs:prop_checkOrNeq7
+messages only	2	[ != b ]	2 |[: !=: unexpected operator\n	2 |[: !=: unary operator expected\n	2 |[: missing argument after 'b'\n	SC:Analytics.hs:prop_checkOrNeq6,SC:Analytics.hs:prop_checkOrNeq7
+messages only	2	[ 1 -eq ]	2 |[: -eq: argument expected\n	2 |[: 1: unary operator expected\n	2 |[: missing argument after '-eq'\n	SC:Analytics.hs:prop_checkAndEq12,SC:Analytics.hs:prop_checkAndEq13
+messages only	2	[ = a ]	2 |[: =: unexpected operator\n	2 |[: =: unary operator expected\n	2 |[: missing argument after 'a'\n	SC:Analytics.hs:prop_checkAndEq6,SC:Analytics.hs:prop_checkAndEq7

@@ -1,0 +1,327 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.020;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib"; # source checkout or build tree
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use JSON::PP ();
+use Perl::CodeMap;
+
+my %options = (root => '.', output => 'perl-code-map.html', parser => 'auto', embed_source => 1);
+my $root_set = 0;
+GetOptions(
+    'root=s' => sub { $options{root} = $_[1]; $root_set = 1; },
+    'o|output=s' => \$options{output},
+    'json=s' => \$options{json},
+    'from-json=s' => \$options{from_json},
+    'parser=s' => \$options{parser},
+    'embed-source!' => \$options{embed_source},
+    'max-source-bytes=i' => \$options{max_source_bytes},
+    'include-tests!' => \$options{include_tests},
+    'source-base=s' => \$options{source_base},
+    'name=s' => \$options{name},
+    'version' => \$options{version},
+    'help|h' => \$options{help},
+    'man' => \$options{man},
+) or pod2usage(-verbose => 0, -exitval => 2);
+if ($options{help}) { pod2usage(-verbose => 1, -exitval => 0); }
+if ($options{man})  { pod2usage(-verbose => 2, -noperldoc => 1, -exitval => 0); }
+if ($options{version}) { print "Perl CodeMap $Perl::CodeMap::VERSION\n"; exit 0; }
+my $cm = eval { Perl::CodeMap->new(%options) };
+if (!$cm) { print STDERR "perl-codemap: $@"; exit 2; }
+my $data;
+if ($options{from_json}) {
+    eval {
+        open my $fh, '<:raw', $options{from_json} or die "Cannot read $options{from_json}: $!\n";
+        local $/;
+        $data = JSON::PP->new->utf8(1)->decode(<$fh>);
+        close $fh;
+        die "Expected a CodeMap JSON object with a pkgs array\n"
+            unless ref($data) eq 'HASH' && ref($data->{pkgs}) eq 'ARRAY';
+        $data->{sources} ||= {};
+        if (!$options{embed_source}) {
+            $data->{sources} = {};
+        } else {
+            my $root = $root_set ? $options{root}
+                : ((defined $data->{module} && -d $data->{module}) ? $data->{module} : undef);
+            $cm->hydrate_sources($data, $root) if defined $root;
+        }
+        $data->{source} = $options{source_base} if defined $options{source_base};
+        $data->{name} = $options{name} if defined $options{name};
+        1;
+    } or do { print STDERR "perl-codemap: $@"; exit 2; };
+} else {
+    $data = eval { $cm->analyze };
+    if (!$data) { print STDERR "perl-codemap: $@"; exit 2; }
+}
+if (!@{$data->{pkgs}}) {
+    print STDERR "perl-codemap: no Perl packages found under the selected source root\n";
+    exit 1;
+}
+my $ok = eval { $cm->write_report($data, output => $options{output}, json => $options{json}); 1 };
+if (!$ok) { print STDERR "perl-codemap: $@"; exit 2; }
+my $fn_count = 0;
+$fn_count += @{$_->{funcs}} for map { @{$_->{files}} } @{$data->{pkgs}};
+print "Report: $options{output}\n";
+print 'Packages: ', scalar(@{$data->{pkgs}}), " | Declarations: $fn_count",
+    ' | Embedded sources: ', scalar(keys %{$data->{sources} || {}}), "\n";
+print STDERR "Warning: lite parser is heuristic; install PPI for full structural extraction.\n"
+    if ($data->{parser} // '') eq 'lite';
+print STDERR "Warning: $_\n" for @{$data->{warnings} || []};
+
+__END__
+
+=head1 NAME
+
+perl-codemap - Create interactive Perl dependency graphs and source-code maps
+
+=head1 SYNOPSIS
+
+  perl-codemap --root ./lib --output code-map.html
+  perl-codemap --root . --parser ppi --include-tests \
+    --output architecture.html --json architecture.json
+  perl-codemap --from-json architecture.json --output updated.html
+  perl-codemap --from-json architecture.json --root ./original-source \
+    --output updated.html
+  perl-codemap --help
+  perl-codemap --man
+  perl-codemap --version
+
+=head1 DESCRIPTION
+
+B<perl-codemap> statically scans Perl source trees and produces a standalone,
+interactive HTML report with local package dependency diagrams, searchable
+subroutines and files, and an optional syntax-highlighted source browser.
+The program does B<not> load or execute the source files it scans. It also
+supports machine-readable JSON exports and regenerating HTML from an existing
+JSON export.
+
+The generated HTML contains its own CSS, JavaScript, and Perl syntax highlighter;
+it can be opened offline without a web server. Its source browser is available
+only when source was embedded in the report.
+
+By default, the parser selects L<PPI> when installed. Without PPI, it uses
+an intentionally limited heuristic parser (C<lite>). For complex applications,
+install PPI and specify C<--parser ppi> to require structural parsing.
+
+=head1 INSTALLATION
+
+Install the published CPAN distribution, then the recommended PPI parser:
+
+  cpanm Perl::CodeMap
+  cpanm PPI
+
+B<perl-codemap> is the command supplied by the C<Perl::CodeMap> distribution.
+It requires Perl 5.20 or newer. PPI is recommended, not a hard dependency.
+
+=head1 QUICK START
+
+Analyze a directory containing Perl modules:
+
+  perl-codemap --root ./lib --output map.html
+
+Open C<map.html> in a browser. Select namespace groups and packages to explore
+local dependencies. Search for package names, files, methods, or subroutines;
+open a result to browse syntax-highlighted code when the report includes it.
+
+Use C<--parser ppi> to require PPI and C<--json map.json> to export a reusable
+JSON representation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--root> I<DIR>
+
+Root directory to scan, defaulting to the current working directory. Only
+recognized Perl source files beneath the root are considered. When used with
+C<--from-json>, identifies the original source directory used to rehydrate
+source files. Without an explicit root in that mode, the program tries the
+original directory recorded in the JSON export if it still exists.
+
+=item B<-o> I<FILE>, B<--output> I<FILE>
+
+HTML report destination. Defaults to C<perl-code-map.html>. The parent
+directory must exist and be writable; existing files at the destination are
+overwritten.
+
+=item B<--json> I<FILE>
+
+Also write the analysis data as JSON. This JSON may include complete source
+files (see C<--no-embed-source>). Existing destination files are overwritten.
+
+=item B<--from-json> I<FILE>
+
+Load a previously generated CodeMap JSON export, then write a new HTML report.
+Requires a JSON object with a C<pkgs> array. Use C<--root> to attach source files
+from their original location if they were not embedded in the export.
+C<--parser> is not used to reanalyze an imported JSON export.
+
+=item B<--parser> I<auto|ppi|lite>
+
+Analysis strategy, defaulting to C<auto>. C<auto> selects PPI if installed,
+otherwise the limited lite parser. C<ppi> requires PPI and exits with an error
+if unavailable. C<lite> forces the heuristic parser, which may miss or
+misinterpret complex Perl syntax.
+
+=item B<--embed-source>, B<--no-embed-source>
+
+Embed source contents in generated HTML and JSON (enabled by default).
+C<--no-embed-source> excludes embedded source even when importing an existing
+JSON export. Excluding source disables the offline source viewer but retains
+package, file, and function metadata.
+
+=item B<--max-source-bytes> I<N>
+
+Maximum number of bytes to embed from any individual source file, defaulting
+to C<2000000>. Files above this limit still contribute metadata but not source
+text. Must be a positive integer.
+
+=item B<--include-tests>, B<--no-include-tests>
+
+Include or exclude F<.t> files and common test directories (F<t/>, F<xt/>,
+F<test/>, F<tests/>). Excluded by default. Vendor and common build directories
+are skipped regardless of this option.
+
+=item B<--source-base> I<URL>
+
+Base URL for links from report files to a hosted GitHub/GitLab source tree.
+Use a URL that points to the root of the scanned source directory at a
+particular revision, normally ending in C</>. Relative source paths are
+appended to this URL; line-number anchors are added by the viewer.
+If omitted, the program attempts to detect GitHub's C<origin> remote and
+current commit for a scanned Git checkout. Non-GitHub hosts normally require
+this option.
+
+=item B<--name> I<TITLE>
+
+Title displayed in the generated report. Defaults to the scanned directory's
+base name.
+
+=item B<--version>
+
+Print the program version and exit.
+
+=item B<-h>, B<--help>
+
+Show command synopsis and option descriptions from this manual, then exit.
+
+=item B<--man>
+
+Show this complete reference manual, then exit.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Map a Perl application
+
+  perl-codemap --root ./lib --parser ppi \
+    --name 'My Application' --output architecture.html
+
+=head2 Analyze a repository including its tests
+
+  perl-codemap --root . --include-tests --parser ppi \
+    --output full-map.html --json full-map.json
+
+=head2 Produce a metadata-only report
+
+  perl-codemap --root ./lib --no-embed-source \
+    --output architecture-only.html
+
+This avoids embedding full source text, but the HTML report may still include
+internal names and paths. Treat outputs from private repositories as private.
+
+=head2 Re-render an existing analysis without rescanning
+
+  perl-codemap --from-json previous.json --output latest.html
+
+=head2 Reattach code to an old export
+
+  perl-codemap --from-json previous.json \
+    --root /path/to/original/source-root \
+    --output with-source.html
+
+The root must match the source directory relative to which the paths in the
+original JSON were recorded. Rehydration rejects paths that escape that root.
+
+=head2 Link reports to GitLab source
+
+  perl-codemap --root ./lib --parser ppi \
+    --source-base 'https://gitlab.example.org/team/app/-/blob/COMMIT/lib/' \
+    --output code-map.html
+
+Replace C<COMMIT> with an immutable revision and update the host, project, and
+subdirectory to match your actual repository.
+
+=head1 INPUT FILES AND OUTPUT
+
+The scan considers F<.pm>, F<.pl>, F<.psgi>, optional F<.t> files, and
+extensionless files whose shebang declares Perl. Hidden directories, symlinks,
+common vendor paths, and generated build directories are not traversed.
+Discovered dependencies are limited to statically recognizable packages
+present inside the scanned source root; external installed modules do not
+appear as dependency nodes unless their source is also included in that root.
+
+The HTML report is self-contained and requires JavaScript in the browser.
+A JSON export contains the same metadata and, unless disabled, an additional
+C<sources> object with potentially complete source files.
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item B<0>
+
+Command completed successfully, or C<--help>, C<--man>, or C<--version>
+was requested.
+
+=item B<1>
+
+No Perl packages were found beneath the selected root.
+
+=item B<2>
+
+Invalid option, configuration, missing PPI when explicitly required, invalid
+JSON input, or a report read/write error.
+
+=back
+
+=head1 LIMITATIONS
+
+This is a static architectural visualization, B<not> a runtime call graph.
+Dynamic C<require>, dynamic method dispatch, C<AUTOLOAD>, generated code,
+Moose modifiers, Catalyst routing, and DBIx::Class runtime relationships are
+not fully modeled. Multiple package declarations per file are supported, but
+block-scoped constructs are best effort.
+
+=head1 SECURITY AND PRIVACY
+
+B<Reports embed source code by default>. Do not place generated HTML or JSON
+from a private application on public GitHub Pages, issue trackers, or CI
+artifacts. Such reports can reveal secrets, internal paths, and proprietary
+code. C<--no-embed-source> reduces exposure but does not remove sensitive
+package or function names.
+
+Source is statically parsed, not evaluated. The tool is not a secrets scanner
+or a security sandbox.
+
+=head1 SEE ALSO
+
+L<Perl::CodeMap>, L<PPI>, L<Pod::Usage>,
+L<Perl CodeMap on MetaCPAN|https://metacpan.org/dist/Perl-CodeMap>,
+L<Live sample|https://interrupt21h.github.io/perl-codemap/>,
+L<Source and issues|https://github.com/interrupt21h/perl-codemap>.
+
+=head1 AUTHOR
+
+Scott Muller <scott@21h.io>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Scott Muller. Released under the MIT License. See the
+project's LICENSE and NOTICE.md for acknowledgments and third-party licenses.
+
+=cut

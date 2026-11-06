@@ -1,0 +1,16 @@
+^\.git/
+^blib/
+^local/
+^_build/
+^MYMETA\.
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^cover_db/
+\.swp$
+\.bak$
+\.log$
+^example\.html$
+^example\.json$
+^perl-code-map.*\.(?:html|json)$
+^_site/

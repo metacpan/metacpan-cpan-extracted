@@ -11,7 +11,6 @@ use Langertha::Engine::vLLM;
 
 my $json = JSON::MaybeXS->new->canonical(1)->utf8(1);
 
-plan(10);
 
 # --- Default model is 'default' (single-model vLLM server) ---
 is(
@@ -82,3 +81,5 @@ ok(
   # they want to disable reasoning (per vLLM docs, reasoning_effort=none maps
   # to enable_thinking=false; some vLLM builds don't honour the none value).
 }
+
+done_testing;

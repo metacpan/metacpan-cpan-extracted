@@ -1,0 +1,3 @@
+# defaults for xs_cover (Devel::XSCover 0.08 and later)
+# the bundled upstream webview is not this dist's code
+-ignore include/webview

@@ -14,7 +14,7 @@ our %EXPORT_TAGS = (
 );
 
 BEGIN {
-	our $VERSION = '0.11';
+	our $VERSION = '0.12';
 	require XSLoader;
 	XSLoader::load("Bijection::XS", $VERSION);
 	bijection_set(qw/b c d f g h j k l m n p q r s t v w x y z B C D F G H J K L M N P Q R S T V W X Y Z 0 1 2 3 4 5 6 7 8 9/);
@@ -31,7 +31,7 @@ Bijection::XS - Bijection of an integer faster
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 

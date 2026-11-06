@@ -10,7 +10,7 @@ our @EXPORT_OK = qw(cauchy_nk sellmeier_nk tauc_lorentz_nk drude_nk genosc_nk
                     drude_lorentz_nk forouhi_bloomer_nk cody_lorentz_nk
                     critical_point_nk gaussian_nk bspline_nk);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 

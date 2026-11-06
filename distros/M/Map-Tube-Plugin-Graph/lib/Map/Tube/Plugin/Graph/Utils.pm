@@ -2,7 +2,7 @@ package Map::Tube::Plugin::Graph::Utils;
 
 use version;
 
-our $VERSION   = qv('v1.2.2');
+our $VERSION   = qv('v1.3.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -11,7 +11,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version v1.2.2
+Version v1.3.0
 
 =cut
 
@@ -20,6 +20,7 @@ use strict;
 use warnings;
 use Carp;
 # use Data::Dumper;
+use Encode qw(encode);
 use File::Which;
 use GraphViz2;
 use IPC::Run3;
@@ -29,6 +30,7 @@ use Map::Tube::Exception::InvalidLineName;
 use Map::Tube::Exception::InvalidColorName;
 use Map::Tube::Exception::InvalidColorHexCode;
 use parent 'Exporter';
+use Path::Tiny;
 
 our @EXPORT_OK = qw(graph_line_image graph_map_image get_graphviz_supported);
 
@@ -53,8 +55,8 @@ sub graph_line_image {
     $args{format} = lc($args{format});
     if ( exists $args{output_file} && !defined $args{output_file} ) {
       $args{output_file} = $map->name() . '_' . $line_name . '.' . $args{format};
-      $args{output_file} =~ s/[^\w.]+/_/g;
     }
+    $args{output_file} = _clean_path($args{output_file}) if defined($args{output_file});
 
     my @caller = caller(0);
     @caller = caller(2) if $caller[3] eq '(eval)';
@@ -136,8 +138,9 @@ sub graph_map_image {
     $args{format} = lc($args{format});
     if ( exists $args{output_file} && !defined $args{output_file} ) {
       $args{output_file} = $map->name() . '.' . $args{format};
-      $args{output_file} =~ s/[^\w.]+/_/g;
     }
+    $args{output_file} = _clean_path($args{output_file}) if defined($args{output_file});
+
     my $bgcolor = $map->bgcolor;
     $bgcolor = $BGCOLOR unless defined $bgcolor;
     my $overlap = exists $args{overlap} ? !!$args{overlap} : 0;
@@ -274,9 +277,51 @@ sub _graph_contrast_color {
     return "#$r$g$b";
 }
 
+sub _clean_path {
+    my ($tainted_path) = @_;
+
+    # Force string value (in case of malicious use of dualvars):
+    $tainted_path = "$tainted_path";
+
+    # Basic file name cleaning; printable characters only
+    $tainted_path =~ /^([[:print:]]+)$/
+        or croak "Non-printable characters detected in file name";
+    my $clean_path = $1;
+
+    # Exclude redirection characters ( < | > ) from path
+    $clean_path =~ s/[<>\|]//g;
+
+    # Reduce to basename (no paths allowed):
+    # This ensures the user cannot use "../../" to escape the current directory
+    $clean_path = path($clean_path)->basename;
+    $clean_path = encode( 'UTF-8', $clean_path );
+    $clean_path =~ s/[^\w.]+/_/g;
+
+    # Confirm it's a regular file, if it already exists:
+    # We check here so the error message contains the simple name, not the absolute path.
+    if (path($clean_path)->exists && !-f $clean_path) {
+        croak "File exists but is not a regular file: $clean_path";
+    }
+
+    # Canonicalize path (Now safe to make absolute for internal use):
+    # $clean_path = path($clean_path)->realpath;
+
+    return $clean_path;
+}
+
 =head1 AUTHOR
 
 Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item * Gisbert W. Selke
+
+=item * Ed J
+
+=back
 
 =head1 REPOSITORY
 

@@ -1,0 +1,160 @@
+=head1 NAME
+
+bt_macros - accessing and manipulating the btparse macro table
+
+=head1 SYNOPSIS
+
+   bt_macros * bt_macros_new (bt_macros *parent);
+   bt_macros * bt_macros_clone (const bt_macros *macros, bt_macros *parent);
+   void        bt_macros_free (bt_macros *macros);
+
+   void bt_add_macro_value (bt_macros *macros, bt_errors *errs,
+                            AST *assignment, btshort options);
+   void bt_add_macro_text (bt_macros *macros, bt_errors *errs,
+                           const char *macro, const char *text,
+                           const char *filename, int line);
+
+   void bt_delete_macro (bt_macros *macros, const char *macro);
+   void bt_delete_all_macros (bt_macros *macros);
+
+   int bt_macro_length (bt_macros *macros, const char *macro);
+   const char * bt_macro_text (bt_macros *macros, bt_errors *errs,
+                               const char *macro,
+                               const char *filename, int line);
+
+=head1 DESCRIPTION
+
+Macros (abbreviations) live in macro tables, C<bt_macros> objects.  A
+parser stores the definitions from every macro definition (C<@string>)
+entry in its table (see C<bt_parser_set_macros()> in L<bt_input>), and
+refers to it whenever a macro is used in an entry and needs to be
+expanded.  (Macros are not necessarily expanded on input, although this
+is the default.  See L<bt_postprocess>.)
+
+Macro names are case-insensitive: they are compared after Unicode case
+folding.
+
+A table may have a I<parent>, given when it is created: a lookup that
+fails in a table is tried in its parent (and so on), but definitions and
+deletions only ever affect the table itself.  C<Text::BibTeX> uses one
+global table, which by default all files share (as BibTeX does); a file
+opened with the C<private_macros> option gets its own table, whose parent
+is the global one.
+
+=head1 FUNCTIONS
+
+You can use the following functions to add macros, delete them, and
+query their values---thus interfering with B<btparse>'s normal operation
+on the fly.
+
+=over 4
+
+=item bt_add_macro_text ()
+
+   void bt_add_macro_text (bt_macros *macros, bt_errors *errs,
+                           const char *macro, const char *text,
+                           const char *filename, int line);
+
+Defines a new macro, or redefines an old one.  C<macro> is the name of
+the macro, and C<text> is the text it should expand to.  C<filename> and
+C<line> are just used to generate any warnings about the macro
+definition; if they don't apply, specify C<NULL> for C<filename> and
+C<0> for C<line>.  The only such warning occurs when you redefine an old
+macro (in the same table): its value is overridden, and a warning is
+added to C<errs>.
+
+For instance, when parsing this macro definition entry:
+
+   @string{fubar = "Fouled Up Beyond All Recognition"}
+
+the library (in particular, the post-processing code called after an
+entry is successfully parsed) will ultimately do this:
+
+   bt_add_macro_text (macros, errs, "fubar",
+                      "Fouled Up Beyond All Recognition", filename, line);
+
+This in turn will cause the macro C<fubar> to be expanded appropriately
+whenever the post-processing code sees it in any future entries.
+
+=item bt_add_macro_value ()
+
+   void bt_add_macro_value (bt_macros *macros, bt_errors *errs,
+                            AST *assignment, btshort options);
+
+This function is mainly for internal use by the library, but it's
+available to you if you ever find yourself with a little bit of AST
+representing a macro definition, and you want to set the macro yourself
+(rather than letting the library's post-processing code take care of it
+for you).  C<assignment> must be an AST node as returned by
+C<bt_next_field()>.  Unlike most other B<btparse> functions that take an
+C<options> argument, C<options> here tells how the value in
+C<assignment> was post-processed.  This is needed because macro values
+have to be processed in a special way to be valid in future expansions;
+if this one wasn't processed like that, C<bt_add_macro_value()> will do
+it for you.  If you don't know how the value was post-processed, just
+supply C<0> for C<options>---that's guaranteed to describe something
+different from "the right way" for macros, so the post-processing will
+be done correctly.
+
+The processing done to macro values is mainly to ensure that we can get
+away with storing just a string in the macro table: macros invoked by
+the macro are themselves expanded, and all sub-strings are concatenated.
+For instance, if B<btparse> parses these entries:
+
+   @string{and = " and "}
+   @string{jim_n_bob = "James Smith" # and # "Bob Jones"}
+
+then the value stored for C<jim_n_bob> should obviously be the string
+C<"James Smith and Bob Jones">.  To ensure this, B<btparse> has to
+process the value of C<and> differently from most BibTeX strings: in
+particular, whitespace is I<not> collapsed before the string is stored.
+That way, the correct value, C<" and ">, is interpolated into the value
+of C<jim_n_bob>.  Thus, all macro values have sub-macros expanded and
+strings concatenated before they are stored, but whitespace is not
+collapsed until the macro is used in a regular entry.
+
+This function calls C<bt_add_macro_text()>, so the same proviso about
+redefining old macros applies---a warning will be issued, and the old
+value lost.
+
+=item bt_delete_macro ()
+
+   void bt_delete_macro (bt_macros *macros, const char *macro);
+
+Deletes a macro from the macro table.  If C<macro> isn't defined,
+takes no action.
+
+=item bt_delete_all_macros ()
+
+   void bt_delete_all_macros (bt_macros *macros);
+
+Deletes all macros from the macro table (but not from its parent).
+
+=item bt_macro_length ()
+
+   int bt_macro_length (bt_macros *macros, const char *macro);
+
+Returns the length of a macro's expansion text.  If the macro is
+undefined, returns 0; no warning is issued.
+
+=item bt_macro_text ()
+
+   const char * bt_macro_text (bt_macros *macros, bt_errors *errs,
+                               const char *macro,
+                               const char *filename, int line);
+
+Returns the expansion text of a macro (owned by the table).  If the macro
+is not defined, adds a warning to C<errs> and returns C<NULL>.  C<filename> and C<line> are used
+for generating this warning; if they don't apply (i.e. you're not
+expanding the macro as a result of finding it in some file), supply
+C<NULL> for C<filename> and C<0> for C<line>.
+
+=back
+
+=head1 SEE ALSO
+
+L<btparse>
+
+=head1 AUTHOR
+
+Greg Ward <gward@python.net>

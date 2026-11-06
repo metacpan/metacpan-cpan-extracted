@@ -80,6 +80,32 @@ rgb24 {
 
 is(ansi_code("~D~P~I~U~F~Q~S~H~X"), "\e[21;22;23;24;25;26;27;28;29m", "negate effect");
 
+# underline style
+{
+    my @warn;
+    local $SIG{__WARN__} = sub { push @warn, @_ };
+    is(ansi_code("U:3"), "\e[4:3m", "underline style");
+    is(ansi_code("u:3"), "\e[4:3m", "underline style in lower case");
+    is(ansi_code("U:0"), "\e[4:0m", "no underline by style");
+    is(ansi_code("U"),   "\e[4m",   "plain underline stays");
+    is(ansi_code("X:2"), "\e[9:2m", "style of another effect");
+    is(ansi_code("DU:3"), "\e[1;4:3m", "underline style with an effect");
+    is(ansi_code("U:3R"), "\e[4:3;31m", "underline style with a color");
+    is(ansi_code("U:3;555"), "\e[4:3;38;5;231m", "style and a color in digits");
+    is(ansi_code("U:3555"), "\e[4:3555m", "digits belong to the style");
+    is(ansi_code("U:"),     "\e[4:m",     "colon only");
+    is(ansi_code("U:::3"),  "\e[4:::3m",  "empty values");
+    is(ansi_code("U:3:1"),  "\e[4:3:1m",  "two values");
+    is(ansi_color("U:3", "AB"), "\e[4:3m" . "AB" . RESET, "ansi_color with a style");
+    is(ansi_color("U:3", "A" . ansi_color("R", "B") . "C"),
+       "\e[4:3m" . "A" . "\e[31m" . "B" . RESET . "\e[4:3m" . "C" . RESET,
+       "nested in a style");
+    is_deeply(\@warn, [], "no warning from the style");
+    for my $spec (qw(~U:3 R:3 Z:1 N:1)) {
+        ok(!eval { ansi_code($spec); 1 }, "$spec is an error");
+    }
+}
+
 is(ansi_code("#AABBCC"), "\e[38;5;146m", "hex24 with #");
 is(ansi_code("#ABC"),    "\e[38;5;146m", "hex12");
 rgb24 {
@@ -124,6 +150,14 @@ is(ansi_code("DK/{EL}544"), "\e[1;30m"."\e[K"."\e[48;5;224m" , "{EL}");
 is(ansi_code("{SGR}"), "\e[m", "{SGR}");
 is(ansi_code("{SGR1;30;48;5;224}"), "\e[1;30;48;5;224m", "{SGR...}");
 is(ansi_code("{SGR(1,30,48,5,224)}"), "\e[1;30;48;5;224m", "{SGR(...)}");
+is(ansi_code("{SGR4:2}"), "\e[4:2m", "{SGR...} with a colon");
+is(ansi_code("{SGR(4:2,1)}"), "\e[4:2;1m", "{SGR(...)} with a colon");
+is(ansi_code("{SGR4:3;58:2::255:0:0}"), "\e[4:3;58:2::255:0:0m", "{SGR...} with empty values");
+is(ansi_color("{SGR4:2}", "AB"), "\e[4:2m" . "AB" . RESET, "ansi_color with {SGR...} and a colon");
+for my $spec ("{CUP1:2}", "{EL(0:1)}") {
+    eval { ansi_code($spec) };
+    like($@, qr/Color spec error: "\Q$spec\E"/, "$spec: a colon is only for SGR");
+}
 
 like(ansi_end("DK/544E"), qr/^\e\[?K/, "E before RESET");
 like(ansi_end("DK/544{EL}"), qr/^\e\[?K/, "{EL} before RESET");

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install &mdash; App::FileSync</title>
+<meta name="description" content="Install App::FileSync from CPAN or from source, with its Perl and module requirements.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="install.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Install &mdash; App::FileSync">
+<meta property="og:description" content="Install App::FileSync from CPAN or from source, with its Perl and module requirements.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html" aria-current="page">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Install</h1>
+
+	<p class="lede">Install on the server and on every client. The server runs
+	<code>filesync-admin</code> and <code>filesync-server</code>; the clients run
+	<code>filesync</code>. One installation provides all three programs.</p>
+
+	<h2>From CPAN</h2>
+
+<pre><code>cpanm App::FileSync</code></pre>
+
+	<p>Or with the traditional client:</p>
+
+<pre><code>perl -MCPAN -e 'install App::FileSync'</code></pre>
+
+	<h2>From source</h2>
+
+<pre><code>tar xzf App-FileSync-0.002.0.tar.gz
+cd App-FileSync-0.002.0
+perl Makefile.PL
+make
+make test
+make install</code></pre>
+
+	<p><code>make install</code> may need root, or a <code>PERL_MM_OPT</code>/
+	<code>local::lib</code> prefix. If you install into a per-user directory,
+	remember that cron's <code>PATH</code> rarely includes it: name the full path
+	in the crontab, as the <a href="quickstart.html#cron">quick start</a> does.</p>
+
+	<h2>Requirements</h2>
+
+	<p>Perl 5.14 or later. Most of what the distribution uses ships with Perl; the
+	non-core prerequisites are:</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Module</th><th>Minimum</th><th>Why</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>Config::Abstraction</code></td><td>0.41</td><td><code>explain_sources()</code>, used by <code>filesync settings</code></td></tr>
+			<tr><td><code>Log::Abstraction</code></td><td>0.36</td><td>structured fields in the run log</td></tr>
+			<tr><td><code>Params::Validate::Strict</code></td><td>0.41</td><td>argument validation at public entry points</td></tr>
+			<tr><td><code>Params::Get</code></td><td>0.17</td><td>named and positional argument handling</td></tr>
+			<tr><td><code>Object::Configure</code></td><td>&mdash;</td><td>layered process settings</td></tr>
+			<tr><td><code>Readonly</code></td><td>2.05</td><td>constants</td></tr>
+			<tr><td><code>Sub::Private</code></td><td>0.07</td><td>private methods in enforce mode</td></tr>
+			<tr><td><code>Sub::Protected</code></td><td>0.03</td><td>protected methods in the base class</td></tr>
+			<tr><td><code>IPC::System::Simple</code></td><td>1.30</td><td>running ssh</td></tr>
+			<tr><td><code>Compress::Raw::Zlib</code></td><td>&mdash;</td><td>deflating data frames</td></tr>
+			<tr><td><code>Digest::SHA</code></td><td>&mdash;</td><td>content hashes and transfer verification</td></tr>
+			<tr><td><code>JSON::PP</code></td><td>&mdash;</td><td>configuration, manifests and the wire protocol</td></tr>
+			<tr><td><code>autodie</code></td><td>2.37</td><td>file operations</td></tr>
+			<tr><td><code>List::Util</code></td><td>1.54</td><td>list helpers</td></tr>
+			<tr><td><code>version</code></td><td>0.77</td><td>dotted version objects</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>The rest &mdash; <code>Carp</code>, <code>Cwd</code>, <code>Exporter</code>,
+	<code>Fcntl</code>, <code>File::Basename</code>, <code>File::Copy</code>,
+	<code>File::Path</code>, <code>File::Spec</code>, <code>File::Temp</code>,
+	<code>FindBin</code>, <code>Getopt::Long</code>, <code>IO::Handle</code>,
+	<code>IPC::Open3</code>, <code>Scalar::Util</code>, <code>Sys::Hostname</code>,
+	<code>Time::HiRes</code> and <code>Time::Local</code> &mdash; ships with
+	Perl.</p>
+
+	<div class="callout">
+		<p>The two version minimums are deliberate. <code>Config::Abstraction</code>
+		0.41 added <code>explain_sources()</code>, and <code>Log::Abstraction</code>
+		0.36 added the structured fields the client writes its run summary with. An
+		older copy of either used to satisfy the installer and then misbehave at run
+		time, so both are now declared.</p>
+	</div>
+
+	<h2>Platforms</h2>
+
+	<ul>
+		<li><strong>Linux and other Unix systems.</strong> The usual target. Cron
+		starts the client; ssh carries the session.</li>
+		<li><strong>macOS.</strong> Works as a client, and as a server over ssh.
+		The distribution builds its tarball with <code>gtar</code> there.</li>
+		<li><strong>Windows.</strong> Use Strawberry Perl and the Task Scheduler.
+		On Perl 5.42 the plain-Perl end-of-scope hook is selected automatically, so
+		nothing has to be set in the environment to build or run the tools.</li>
+	</ul>
+
+	<h2>Check the installation</h2>
+
+<pre><code>filesync version
+perldoc App::FileSync</code></pre>
+
+	<p><code>filesync version</code> prints the release. If the command is not
+	found, the installation directory is not on <code>PATH</code>; use the full
+	path, or add it to the <code>PATH</code> the scheduler sees.</p>
+
+	<h2>Upgrading</h2>
+
+	<p>Install the newer release the same way. The client configuration, the
+	server's repo metadata and the on-disk index are read as they are; unknown keys
+	are kept and ignored. Peers speak the line-delimited JSON protocol, so upgrade
+	the server before, or together with, the clients.</p>
+
+	<p>Trash written by releases before 0.001.1 sits in one shared directory.
+	<code>filesync restore</code> still searches it, so files trashed before an
+	upgrade can still be recovered.</p>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

@@ -1,6 +1,6 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with axes and shields to AId your rAId
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use utf8;
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ Langertha - The clan of fierce vikings with axes and shields to AId your rAId
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -787,7 +787,7 @@ L<LangerthaX>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -804,7 +804,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

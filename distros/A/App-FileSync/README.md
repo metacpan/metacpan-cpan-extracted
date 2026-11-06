@@ -4,7 +4,7 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 ## Version
 
-0.001.5
+0.002.0
 
 ## Synopsis
 
@@ -675,7 +675,7 @@ answer a password prompt.
 
 ```
     # crontab -e, on each client
-    * * * * * /usr/local/bin/filesync sync --repo documents --quiet >/dev/null
+    * * * * * ionice -c3 /usr/local/bin/filesync sync --repo documents --quiet >/dev/null
 ```
 
 The summary line is dropped so cron does not mail on every successful run;
@@ -730,7 +730,7 @@ once - rsync creates the last component only - then let cron keep it in step:
     mkdir -p /home/foo/backups/documents
 
     # crontab -e, on the server
-    * * * * * rsync -a --delete --exclude '.filesync-tmp-*' \
+    * * * * * ionice -c3 rsync -a --delete --exclude '.filesync-tmp-*' \
         /home/foo/filesync/master/documents/ /home/foo/backups/documents/
 ```
 

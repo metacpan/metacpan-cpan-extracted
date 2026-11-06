@@ -24,9 +24,26 @@ use Class::Abstract;
 diag 'Bypass mechanics' if $ENV{TEST_VERBOSE};
 
 # ---------------------------------------------------------------------------
-# Baseline: enforcement is on by default (inside the harness we must clear
-# both bypass paths to trigger the croak).
+# Baseline: enforcement is on by default, even inside a test harness
+# (harness_bypass defaults to 0 since 0.03).  No locals here on purpose:
+# this is what a downstream distribution's test suite sees.
 # ---------------------------------------------------------------------------
+
+subtest 'defaults: enforcement is on under HARNESS_ACTIVE' => sub {
+	plan tests => 2;
+
+	# Make the harness explicit so the test means the same under plain perl
+	local $ENV{HARNESS_ACTIVE} = 1;
+
+	throws_ok { BY::Abstract->new }
+		qr/Cannot instantiate abstract class BY::Abstract directly/,
+		'abstract class croaks with default settings inside a harness';
+
+	# Opting back in to the pre-0.03 behaviour still works
+	local $Class::Abstract::config{harness_bypass} = 1;
+	lives_ok { BY::Abstract->new }
+		'harness_bypass = 1 restores the old suppression';
+};
 
 subtest 'enforcement fires when both bypass paths are disabled' => sub {
 	plan tests => 1;

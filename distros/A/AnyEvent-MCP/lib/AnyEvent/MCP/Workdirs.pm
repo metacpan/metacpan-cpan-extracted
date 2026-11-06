@@ -4,8 +4,12 @@ AnyEvent::MCP::Workdirs - persistent filesystem workdir IDs
 
 =head1 DESCRIPTION
 
-The registry assigns small positive integers to resolved absolute workdir
-paths. It is shared by filesystem server instances using the same file.
+The registry assigns small positive integers to pathname strings.
+C<mcp-fs> supplies logical absolute pathnames without following symlinks;
+relative local workdir arguments are made absolute lexically. The same
+logical pathname on two hosts gets the same ID even if its symlink resolves
+to a different physical directory. IDs compress pathnames, not host
+identities or permissions. The registry is shared by instances using the same file.
 Permission-rule identities remain independent of these selectors.
 
 It is used by C<mcp-fs> so assistants can refer to a workdir by a short,
@@ -31,7 +35,7 @@ and L<AnyEvent::MCP::File> for the locked state-file operations.
 
 =item $registry = AnyEvent::MCP::Workdirs->new (file => $file, paths => [$path...], expiry => $seconds)
 
-Resolve IDs for the supplied resolved paths, reserving new allocations under
+Resolve IDs for the supplied pathnames, reserving new allocations under
 the file lock. C<expiry> defaults to seven days. C<ids> contains the assigned
 IDs in path order and stays fixed for this object's lifetime. The caller
 refreshes immediately and periodically while its server is running.
@@ -73,7 +77,7 @@ sub _read {
    for my $id (keys %$entries) {
       my $entry = $entries->{$id};
       $id =~ /\A[1-9][0-9]*\z/ && ref $entry eq "ARRAY" && @$entry == 2
-         && defined $entry->[0] && !ref $entry->[0] && $entry->[0] =~ m{\A/} && $entry->[0] !~ /\0/
+         && defined $entry->[0] && !ref $entry->[0] && length $entry->[0] && $entry->[0] !~ /\0/
          && defined $entry->[1] && !ref $entry->[1] && $entry->[1] =~ /\A[0-9]+\z/
          or die "$self->{file}: invalid workdir entry '$id'\n";
    }

@@ -36,11 +36,12 @@ handle, including buffered bytes after the hello. Remaining array fields belong
 to the selected protocol. An optional C<$reject> callback releases any
 listener ownership on rejection; otherwise the handle is destroyed.
 
-=item ($host, $port, $token, $alias) = AnyEvent::MCP::Extension::parse_url $url
+=item ($host, $port, $token, $alias, $scheme) = AnyEvent::MCP::Extension::parse_url $url
 
-Parse C<http://host[:port]/token/alias>, including bracketed IPv6 hosts.
-An omitted port defaults to 80. The URL names a raw TCP extension endpoint
-sharing an HTTP listener; no HTTP request is sent. Tokens use the ordinary
+Parse C<http[s]://host[:port]/token/alias>, including bracketed IPv6 hosts.
+An omitted port defaults to 80 for HTTP and 443 for HTTPS. The URL names a
+raw extension endpoint sharing an HTTP listener; no HTTP request is sent.
+Tokens use the ordinary
 listener token syntax and aliases use ASCII letters, digits, underscores and hyphens.
 
 =back
@@ -55,13 +56,13 @@ use JSON::XS ();
 sub parse_url {
    my ($url) = @_;
 
-   my ($host, $port, $token, $alias) =
-      $url =~ m{\Ahttp://(\[[^\]]+\]|[^/:?#]+)(?::([0-9]+))?/([A-Za-z0-9_.~-]+)/([A-Za-z0-9_-]+)\z};
+   my ($scheme, $host, $port, $token, $alias) =
+      $url =~ m{\A(https?)://(\[[^\]]+\]|[^/:?#]+)(?::([0-9]+))?/([A-Za-z0-9_.~-]+)/([A-Za-z0-9_-]+)\z};
    defined $host && (!defined $port || $port > 0 && $port <= 65535)
-      or die "Expected extension URL http://host[:port]/token/alias\n";
+      or die "Expected extension URL http[s]://host[:port]/token/alias\n";
    $host =~ s/\A\[(.*)\]\z/$1/;
 
-   ($host, defined $port ? 0 + $port : 80, $token, $alias)
+   ($host, defined $port ? 0 + $port : $scheme eq "https" ? 443 : 80, $token, $alias, $scheme)
 }
 
 sub accept {

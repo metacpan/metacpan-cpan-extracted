@@ -1,0 +1,34 @@
+Revision history for Perl extension Oracle::TNS
+
+1.04  2026.11.05
+
+    1. first public release, renamed from Data::TNS to Oracle::TNS
+    2. API: tns_construct() and tns_construct_names() renamed to tns_build()
+       and tns_build_names()
+    3. tns_parse(): empty descriptor is an error
+    4. tns_parse_names(): one top-level group per alias, groups following
+       it without a new alias are an error
+    5. tns_parse_names(): "NAME = value" entries (e.g. IFILE) returned as
+       scalars, repeated ones as arrayref, CRLF line endings supported
+    6. tns_build_names(): scalar and arrayref of scalars written back as
+       "NAME = value" entries
+    7. tns_build(): empty hashtree, empty hashref value and values with
+       double quotes are errors
+    8. tns_build() keeps the parsed order of keys and values, e.g. ADDRESS
+       and ADDRESS_LIST in SOURCE_ROUTE descriptors, values and keys added
+       later follow their key or the predefined order
+    9. "#" comments stripped only outside quoted values, quoted values with
+       "#" round trip
+   10. double quote in bare value and unterminated quote are errors
+   11. new tns_parse_connect() and tns_build_connect() for DBI-style connect
+       strings: user/pass@descriptor, @alias or @EZConnect, /@target
+   12. new tns_mask_connect() replaces USER and PASS in connect strings,
+       e.g. for logging
+   13. perl 5.10 required, for Hash::Util::FieldHash
+   14. tests for parsing, building, connect strings and tns_mask_connect()
+       in t/
+   15. xt/test_samples.pl: author tests checking that descriptors,
+       tnsnames.ora entries and connect strings from Oracle docs and others
+       are parsed and built back without data loss
+   16. KNOWN_ISSUES file lists the open issues and explains the xt/ tests,
+       xt/ is included in the distribution, it is not run by "make test"

@@ -2,8 +2,8 @@ NAME
     App::perlmv - Rename files using Perl code
 
 VERSION
-    This document describes version 0.609 of App::perlmv (from Perl
-    distribution App-perlmv), released on 2023-11-17.
+    This document describes version 0.610 of App::perlmv (from Perl
+    distribution App-perlmv), released on 2026-11-06.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -19,9 +19,11 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 CONTRIBUTORS
+    *   perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+
     *   Sawyer X <xsawyerx@cpan.org>
 
-    *   Steven Haryanto <stevenharyanto@gmail.com>
+    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
     *   Steven Haryanto <steven@masterweb.net>
 
@@ -42,8 +44,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2020, 2015, 2014, 2013, 2012,
-    2011, 2010 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

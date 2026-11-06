@@ -5,7 +5,7 @@
 
 The official Perl client library for the [VPNDetection](https://vpndetection.io) API.
 
-The library helps you query VPNDetection's APIs for anonymity detection including VPNs, residential proxies, Tor nodes, hosting servers, CDNs, relays and more.
+It tells you whether an IP address is a VPN, residential proxy, Tor node, relay or hosting server.
 
 ## Getting Started
 
@@ -204,7 +204,7 @@ under sub ($c) {
 
 ### Database downloads
 
-If your key carries the `db.download` scope, the licensed databases are available through `$client->database`. A license covers a database *family*, and the id you download is the one hanging off its `versions`:
+If your key carries the `db.download` scope, the licensed databases are available through `$client->database`. A license covers a database *family*, and the ID you download is the one hanging off its `versions`:
 
 ```perl
 my $databases = $client->database->list;

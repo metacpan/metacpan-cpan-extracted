@@ -10,7 +10,7 @@ HTML::Packer - Another HTML code cleaner
 
 # VERSION
 
-Version 2.11
+Version 2.12
 
 # DESCRIPTION
 
@@ -99,10 +99,11 @@ Second argument must be a hashref of options. Possible options are
 Merten Falk, `<nevesenin at cpan.org>`. Now maintained by Lee
 Johnson (LEEJO) with contributions from:
 
-        Alexander Krizhanovsky <ak@natsys-lab.com>
-        Bas Bloemsaat <bas@bloemsaat.com>
-        girst <girst@users.noreply.github.com>
-        Ankit Pati (ANKITPATI) <contact@ankitpati.in>
+        Alexander Krizhanovsky
+        Bas Bloemsaat
+        girst
+        Ankit Pati (ANKITPATI)
+        Nigel Horne (nigelhorne)
 
 # BUGS
 

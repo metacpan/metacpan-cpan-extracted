@@ -5,6 +5,7 @@ requires 'perl', '5.010';
 requires 'Carp';
 requires 'Class::Abstract';
 requires 'Cwd';
+requires 'DBD::CSV', '0.64';   # CSV/PSV/TSV, the default format; 0.64+ (SQL::Statement 1.414+) for SELECT DISTINCT
 requires 'DBD::SQLite::Constants';
 requires 'DBI', '1.6';
 requires 'Data::Reuse';   # Required for result-set memory deduplication; see also RT#100461
@@ -18,10 +19,11 @@ requires 'Return::Set';
 requires 'Scalar::Util';
 requires 'Sub::Private', '0.09';
 requires 'Sub::Protected';
+requires 'Text::xSV::Slurp';   # the CSV/PSV slurp path, taken for every file under max_slurp_size
+requires 'XML::Simple';   # XML files
 requires 'autodie';
 requires 'strict';
 requires 'warnings';
-recommends 'DBD::CSV', '0.64';   # CSV/PSV/TSV DBI backend; 0.64+ required for SELECT DISTINCT
 recommends 'DBD::Excel';   # .xls (old binary Excel) backend
 recommends 'DBD::MariaDB';   # MariaDB/MySQL backend (preferred over DBD::mysql for MariaDB)
 recommends 'DBM::Deep';   # .dbm/.deep/magic-byte .db backend
@@ -33,8 +35,6 @@ recommends 'LWP::UserAgent::Cached';   # URL backend (HTML and JSON)
 recommends 'Redis';   # Redis backend (pure-Perl fallback)
 recommends 'Redis::Fast';   # Redis backend (XS, preferred)
 recommends 'Spreadsheet::ParseXLSX';   # .xlsx (OOXML Excel) backend
-recommends 'Text::xSV::Slurp';   # CSV/PSV slurp backend
-recommends 'XML::Simple';   # XML backend
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
@@ -42,7 +42,6 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'CHI';
-	requires 'DBD::CSV', '0.64';   # 0.64+ (SQL::Statement 1.414+) required for correct SELECT DISTINCT
 	requires 'DBD::XMLSimple', '0.07';
 	requires 'DBM::Deep';
 	requires 'Excel::Writer::XLSX';
@@ -79,9 +78,7 @@ on 'test' => sub {
 	requires 'Test::Warn';
 	requires 'Test::Which';
 	requires 'Test::Without::Module';
-	requires 'Text::xSV::Slurp';
 	requires 'Time::HiRes';
-	requires 'XML::Simple';
 	requires 'YAML::XS';
 };
 

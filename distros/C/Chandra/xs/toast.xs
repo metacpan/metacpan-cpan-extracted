@@ -46,6 +46,7 @@ CODE:
             type = SvPV_nolen(val);
         } else if (strEQ(key, "duration")) {
             duration = SvIV(val);
+        # uncoverable condition right count:3
         } else if (strEQ(key, "action") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
             HV *act_hv = (HV *)SvRV(val);
             SV **label_svp = hv_fetchs(act_hv, "label", 0);
@@ -81,6 +82,8 @@ CODE:
             XPUSHs(action_handler);
             PUTBACK;
             call_method("bind", G_DISCARD | G_EVAL);
+            # uncoverable condition right count:1
+            # uncoverable condition right count:3
             if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_undef);
             FREETMPS; LEAVE;
         }

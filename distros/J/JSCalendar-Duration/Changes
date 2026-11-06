@@ -1,5 +1,35 @@
 Revision history for JSCalendar-Duration
 
+0.006     2026-11-05 14:51:15-05:00 America/New_York
+        - seconds_to_duration and seconds_to_signed_duration now reject
+          whole seconds above 2**53 - 1; very large inputs used to make them
+          loop forever, and they are now much faster on large inputs
+        - duration_to_seconds and signed_duration_to_seconds now reject
+          durations over the same limit, which used to give imprecise
+          results, or "Inf"
+        - seconds_to_duration no longer omits the whole seconds before a
+          fraction, as in "PT1M.5S"; it now produces "PT1M0.5S" (thanks, Asif
+          Islam!)
+        - seconds_to_duration no longer puts seconds directly after hours,
+          as in "PT1H1S", which the grammar forbids; it now produces
+          "PT1H0M1S"
+        - seconds_to_duration no longer produces fractions with trailing
+          zeros, like "PT1.50S", or fractions of zero, like "PT0.00S"
+        - seconds_to_duration no longer discards the fraction from a whole
+          number of weeks plus a fraction; 604800.5 was "P1W"
+        - seconds_to_duration now rejects input with a trailing newline or
+          non-ASCII digits, which were accepted, sometimes yielding garbage
+        - duration_to_seconds now accepts weeks followed by days or a time
+          component, like "P1W1D" or "P1WT1H", as RFC 8984 permits
+        - duration_to_seconds now rejects seconds directly after hours, like
+          "PT1H1S", which the grammar forbids
+        - duration_to_seconds now rejects fractional seconds with trailing
+          zeros, like "PT1.50S" or "PT1.0S", which RFC 8984 forbids
+        - added seconds_to_signed_duration and signed_duration_to_seconds,
+          for the SignedDuration type, exportable on request
+        - seconds_to_duration now rejects the empty string, which was
+          treated as zero
+
 0.005     2026-10-02 13:28:58-04:00 America/New_York
         - duration_to_seconds now rejects durations with no components,
           like "P", "PT", and "P1DT"; these were treated as zero seconds

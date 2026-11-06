@@ -145,9 +145,9 @@ C<ask-user>.
 
 =head1 OPTIONS
 
-Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-HTTP is the default; C<--print-url> prints the authenticated URL without
-starting a listener.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+HTTP is the default transport. The following switch is application-specific.
 
 =over
 
@@ -169,11 +169,14 @@ native forms require C<--ask helper>.
 =cut
 
 use common::sense;
-use AnyEvent::MCP::Server::Simple;
+
+use JSON::XS ();
+
 use AnyEvent ();
 use AnyEvent::MCP ();
-use JSON::XS ();
 use AnyEvent::MCP::Helper ();
+
+use AnyEvent::MCP::Server::Simple;
 
 my $options = mcp_getoptions ({
    usage       => "Usage: $0 [OPTION]...\n",

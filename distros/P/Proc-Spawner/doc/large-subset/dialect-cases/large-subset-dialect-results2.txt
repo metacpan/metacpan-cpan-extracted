@@ -93,3 +93,10 @@ trapint	DASH: c|after|<0>|	BASH: c|after|<0>|
 trapnum2	DASH: c|after|<0>|	BASH: c|after|<0>|
 trapkill	DASH: st=0|<0>|	BASH: st=0|<0>|
 setnop	DASH: st=0|<0>|	BASH: st=0|<0>|
+fnkill	kill() { echo K "$@"; }; kill -SIGHUP 1	DASH: K -SIGHUP 1|<0>|	BASH: K -SIGHUP 1|<0>|
+fncd	cd() { echo "cd to $1"; command cd "$@"; }; cd /; pwd	DASH: cd to /|/|<0>|	BASH: cd to /|/|<0>|
+unsetarr	array=x; unset array[2]; echo "st=$? [$array]"	DASH: dash: 1: unset: array[2]: bad variable name|<2>|	BASH: bash: line 1: unset: array: not an array variable|st=1 [x]|<0>|
+brquote	touch '^<' '^>' a ']'; echo ^[\>\<]; echo [a"]"]; v='<>'; echo ^["$v"]	DASH: ^< ^>|] a|^< ^>|<0>|	BASH: ^< ^>|] a|^< ^>|<0>|
+brslash	mkdir 'a['; touch 'a[/]b'; echo a[/]* x/y[^/]*	DASH: a[/]b x/y[^/]*|<0>|	BASH: a[/]b x/y[^/]*|<0>|
+dqpword	set --; echo "${1:-sure? [y/N]}"; x=a.b; echo ${x%["."]*}	DASH: sure? [y/N]|a|<0>|	BASH: sure? [y/N]|a|<0>|
+unsetbad	unset foo][; echo "st=$?"	DASH: dash: 1: unset: foo][: bad variable name|<2>|	BASH: st=0|<0>|

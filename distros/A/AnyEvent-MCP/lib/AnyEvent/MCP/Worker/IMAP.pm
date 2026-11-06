@@ -9,7 +9,7 @@ use Encode ();
 use JSON::XS ();
 
 # mboxo stores raw messages without reliably escaping From_ lines.
-# Check the original bytes, not decoded MIME parts; never rewrite the message.
+# check the original bytes, not decoded MIME parts; never rewrite the message.
 sub mbox_from {
    my ($bytes) = @_;
    $bytes =~ /^From[ \t]+\S+[ \t]+[^\r\n]*
@@ -55,8 +55,24 @@ sub imap_connect {
    }
 
    $imap or die "IMAP connection failed: $@\n";
-   $imap->login ($config->{user}, $config->{password})
-      or die "IMAP authentication failed: " . $imap->get_last_error . "\n";
+   if (($config->{method} || "password") eq "oauth2") {
+      require AnyEvent::MCP::IMAP::OAuth2;
+      require Authen::SASL;
+      my $mechanism = uc ($config->{oauth}{"oauth-sasl"} || "xoauth2");
+      $imap->capability->{"auth=" . lc $mechanism}
+         or die "IMAP server does not advertise AUTH=$mechanism\n";
+      my $token = $config->{access_token}
+         || AnyEvent::MCP::IMAP::OAuth2::refresh ($config->{account_file}, $config->{oauth});
+      my $sasl = Authen::SASL->new (
+         mechanism => $mechanism,
+         callback => { user => $config->{user}, pass => $token },
+      );
+      $imap->authenticate ($sasl)
+         or die "IMAP OAuth authentication failed: " . $imap->get_last_error . "\n";
+   } else {
+      $imap->login ($config->{user}, $config->{password})
+         or die "IMAP authentication failed: " . $imap->get_last_error . "\n";
+   }
 
    $imap->uid (1);
    $imap->parse_mode (DecodeUTF8 => 1);
@@ -64,7 +80,7 @@ sub imap_connect {
    +{ connected => JSON::XS::true, capabilities => [sort keys %{$imap->capability}] }
 }
 
-sub checked {
+sub checked ($$) {
    my ($result, $what) = @_;
 
    defined $result && $result
@@ -117,6 +133,67 @@ sub message {
    +{ uid => 0 + $uid, uidvalidity => $validity, %$f }
 }
 
+sub search_filter {
+   my ($filter, $depth, $nodes) = @_;
+
+   ref $filter eq "HASH" && (!$depth || keys %$filter)
+      or die "Invalid SEARCH filter group\n";
+   ++$$nodes <= 100 && $depth <= 12 or die "SEARCH filter too complex\n";
+
+   my @criteria;
+   for my $key (sort keys %$filter) {
+      my $value = $filter->{$key};
+
+      if ($key eq "all" || $key eq "any") {
+         ref $value eq "ARRAY" && @$value && @$value <= 100
+            or die "SEARCH $key requires a nonempty array of filters\n";
+         my @groups = map [search_filter ($_, $depth + 1, $nodes)], @$value;
+         if ($key eq "all") {
+            push @criteria, @groups;
+         } else {
+            my $or = pop @groups;
+            $or = ["OR", pop @groups, $or] while @groups;
+            push @criteria, @$or;
+         }
+      } elsif ($key eq "not") {
+         push @criteria, "NOT", [search_filter ($value, $depth + 1, $nodes)];
+      } elsif ($key eq "header") {
+         ref $value eq "HASH" && keys %$value && keys %$value <= 20
+            or die "SEARCH header requires 1..20 header names\n";
+         for my $name (sort keys %$value) {
+            $name =~ /\A[A-Za-z0-9][A-Za-z0-9-]{0,62}\z/
+               or die "Invalid SEARCH header name\n";
+            my $text = $value->{$name};
+            defined $text && !ref $text && length $text <= 500
+               or die "Invalid SEARCH header value\n";
+            push @criteria, "HEADER", $name, { Quote => $text };
+         }
+      } elsif ($key =~ /\A(?:from|to|cc|bcc|subject|body|text)\z/) {
+         defined $value && !ref $value && length $value <= 500
+            or die "Invalid SEARCH $key value\n";
+         push @criteria, uc $key, { Quote => $value };
+      } elsif ($key =~ /\A(?:since|before|on|sent_since|sent_before|sent_on)\z/) {
+         defined $value && !ref $value && $value =~ /\A[0-9]{1,2}-[A-Za-z]{3}-[0-9]{4}\z/
+            or die "Invalid SEARCH $key date (D-Mon-YYYY)\n";
+         (my $command = uc $key) =~ tr/_//d;
+         push @criteria, $command, $value;
+      } elsif ($key eq "larger" || $key eq "smaller") {
+         defined $value && !ref $value && $value =~ /\A[0-9]{1,10}\z/ && $value <= 4294967295
+            or die "Invalid SEARCH $key size\n";
+         push @criteria, uc $key, $value;
+      } elsif ($key =~ /\A(?:seen|unseen|answered|unanswered|flagged|unflagged|deleted|undeleted|draft|undraft|recent|old|new)\z/) {
+         defined $value && "$value" =~ /\A[01]\z/
+            or die "Invalid SEARCH $key boolean\n";
+         push @criteria, uc $key if $value;
+      } else {
+         die "Unknown SEARCH filter: $key\n";
+      }
+   }
+
+   @criteria or !$depth or die "Empty SEARCH filter group\n";
+   @criteria
+}
+
 sub messages {
    my ($args) = @_;
 
@@ -132,24 +209,8 @@ sub messages {
          or die "Stale or invalid UID cursor\n";
    }
 
-   my $filter = $args->{filter} || {};
-   ref $filter eq "HASH" or die "filter must be an object\n";
-   my @criteria;
-   for my $key (qw(from to subject)) {
-      next unless defined $filter->{$key};
-      !ref $filter->{$key} && length $filter->{$key} <= 500
-         or die "Invalid $key search\n";
-      push @criteria, uc $key, $filter->{$key};
-   }
-   for my $key (qw(since before)) {
-      next unless defined $filter->{$key};
-      $filter->{$key} =~ /\A[0-9]{1,2}-[A-Za-z]{3}-[0-9]{4}\z/
-         or die "Date must be D-Mon-YYYY\n";
-      push @criteria, uc $key, $filter->{$key};
-   }
-   for my $key (qw(unseen flagged undeleted)) {
-      push @criteria, uc $key if $filter->{$key};
-   }
+   my $nodes = 0;
+   my @criteria = search_filter ($args->{filter} // {}, 0, \$nodes);
 
    my @fields = @{$args->{fields} || [qw(subject from date flags size)]};
    my %valid = map +($_ => 1), qw(uid from to subject date cc reply-to message-id flags size internaldate);
@@ -160,7 +221,7 @@ sub messages {
       /\A[A-Za-z0-9][A-Za-z0-9-]{0,62}\z/ or die "Invalid header name: $_\n";
    }
 
-   # Search in descending UID windows: ordinary UID SEARCH can otherwise return
+   # search in descending UID windows: ordinary UID SEARCH can otherwise return
    # millions of matches even when only one summary page was requested.
    # Mail::IMAPTalk caches SELECT, so UIDNEXT from that SELECT becomes stale.
    my $status = checked ($imap->status ($args->{mailbox}, "(UIDNEXT UIDVALIDITY)"), "STATUS");
@@ -289,8 +350,9 @@ sub run {
 
       $imap && $imap->is_open or die "IMAP connection closed; restart mcp-imap\n";
 
-      if ($cmd eq "mailboxes") {
-         return (1, { mailboxes => checked ($imap->list ("", "*"), "LIST") });
+      if ($cmd eq "mailboxes" || $cmd eq "lsub") {
+         my $method = $cmd eq "lsub" ? "lsub" : "list";
+         return (1, { mailboxes => checked ($imap->$method ("", "*"), uc $method) });
       } elsif ($cmd eq "messages") {
          return (1, messages ($args));
       } elsif ($cmd eq "message") {

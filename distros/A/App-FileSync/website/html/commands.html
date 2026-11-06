@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commands &mdash; App::FileSync</title>
+<meta name="description" content="Reference for filesync, filesync-admin and filesync-server: every subcommand, option and exit code.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="commands.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Commands &mdash; App::FileSync">
+<meta property="og:description" content="Reference for filesync, filesync-admin and filesync-server: every subcommand, option and exit code.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html" aria-current="page">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Commands</h1>
+
+	<p class="lede">Three programs. <code>filesync</code> runs on each client,
+	<code>filesync-admin</code> on the server, and <code>filesync-server</code> is
+	started by sshd, never by hand.</p>
+
+	<div class="toc">
+		<p>On this page</p>
+		<ul>
+			<li><a href="#filesync">filesync</a></li>
+			<li><a href="#init">filesync init</a></li>
+			<li><a href="#sync">filesync sync</a></li>
+			<li><a href="#inspect">status, log, settings, verify</a></li>
+			<li><a href="#restore">restore and snapshots</a></li>
+			<li><a href="#admin">filesync-admin</a></li>
+			<li><a href="#server">filesync-server</a></li>
+			<li><a href="#exit">Exit codes</a></li>
+		</ul>
+	</div>
+
+	<h2 id="filesync">filesync</h2>
+
+<pre><code>filesync init --repo NAME --root DIR --server USER@HOST [--remote-repo NAME]
+              [--id ID] [--role client|replica] [--port N] [--identity FILE]
+              [--accept-host-key] [--known-hosts FILE] [--server-command PATH]
+              [--snapshot-mode hardlink|copy]
+filesync init --repo NAME --root DIR --transport local --server-root DIR
+              [--remote-repo NAME] [--id ID] [--role client|replica]
+filesync sync   [--repo NAME]... [--dry-run] [--force] [--verbose] [--quiet]
+                [--json] [--no-prune] [--no-delta]
+filesync status [--repo NAME] [--json]
+filesync log    [--repo NAME] [-n N] [--since YYYY-MM-DD|EPOCH]
+                [--until YYYY-MM-DD|EPOCH] [--exit N]... [--warnings] [--json]
+filesync settings [--config FILE] [--json]
+filesync verify [--repo NAME] [--deep] [--json]
+filesync restore PATH [--repo NAME] [--to DIR] [--list]
+filesync snapshot [--repo NAME] [--keep N]
+filesync snapshot list [--repo NAME]
+filesync snapshot restore DATE [PATH] [--repo NAME] [--to DIR]
+filesync version</code></pre>
+
+	<p>The sync root must contain the <code>.filesync-root</code> marker created by
+	<code>filesync init</code>. Diagnostics go to standard error; command output,
+	including any <code>--json</code> document, goes to standard output, so a cron
+	job can separate the two.</p>
+
+	<h2 id="init">filesync init</h2>
+
+	<p>Registers a directory in this client's configuration. It creates the root if
+	needed and writes the <code>.filesync-root</code> marker.</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>--repo NAME</code></td><td>The repo name, as the server knows it.</td></tr>
+			<tr><td><code>--root DIR</code></td><td>The local directory to keep in step; created if needed.</td></tr>
+			<tr><td><code>--server HOST</code></td><td>The ssh server, as <code>host</code> or <code>user@host</code>.</td></tr>
+			<tr><td><code>--server-root DIR</code></td><td>The server root, for <code>--transport local</code>.</td></tr>
+			<tr><td><code>--remote-repo NAME</code></td><td>The repo name on the server, if it differs from <code>--repo</code>.</td></tr>
+			<tr><td><code>--id ID</code></td><td>The id the server knows this client by.</td></tr>
+			<tr><td><code>--transport ssh|local</code></td><td>How the server is reached; the default is <code>ssh</code>, or <code>local</code> when <code>--server-root</code> is given.</td></tr>
+			<tr><td><code>--role client|replica</code></td><td>What this client may do; the default is <code>client</code>. Only a replica may take snapshots.</td></tr>
+			<tr><td><code>--identity FILE</code></td><td>ssh identity file.</td></tr>
+			<tr><td><code>--known-hosts FILE</code></td><td>ssh known_hosts file.</td></tr>
+			<tr><td><code>--port N</code></td><td>ssh port.</td></tr>
+			<tr><td><code>--accept-host-key</code></td><td>Trust an unknown host key on first use.</td></tr>
+			<tr><td><code>--server-command PATH</code></td><td>The server program to run over ssh.</td></tr>
+			<tr><td><code>--snapshot-mode MODE</code></td><td><code>hardlink</code> or <code>copy</code>, for <code>filesync snapshot</code>.</td></tr>
+			<tr><td><code>--config FILE</code></td><td>The client configuration file to write.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>The id defaults to this machine's host name. That is the name the server
+	keeps this client's base, journal entries and conflict copies under, and the
+	name <code>filesync-admin client allow</code> must list. Pass <code>--id</code>
+	only to override it &mdash; for two machines with the same host name, say. It
+	is not a login, and it does not divide the repo: every client of a repo syncs
+	the whole tree.</p>
+
+	<h2 id="sync">filesync sync</h2>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>--repo NAME</code></td><td>Sync this repo; repeatable to sync several. Default: every repo in the client configuration.</td></tr>
+			<tr><td><code>--dry-run</code></td><td>Print the planned actions without changing either side.</td></tr>
+			<tr><td><code>--force</code></td><td>Proceed despite the deletion limits that normally stop a suspicious run.</td></tr>
+			<tr><td><code>--no-prune</code></td><td>Do not prune this repo's local trash during the run.</td></tr>
+			<tr><td><code>--no-delta</code></td><td>Send whole files instead of block deltas.</td></tr>
+			<tr><td><code>--verbose</code></td><td>Raise the log level to <code>debug</code> for this run.</td></tr>
+			<tr><td><code>--quiet</code></td><td>Lower the log level to <code>error</code>. The summary line is still printed when the sync did something; a repo where nothing happened prints nothing.</td></tr>
+			<tr><td><code>--json</code></td><td>Print one JSON document instead of text.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>Each run reports what moved and what it cost:</p>
+
+<pre><code>documents: pulled 2, pushed 1, deleted 0, conflicts 0
+  transfer: sent 12.4 KiB, received 96.1 KiB, 1 file by delta</code></pre>
+
+	<p>Every attempt, successful or not, is appended to
+	<code>~/.filesync/logs/REPO.jsonl</code>. A lock refusal is reported as exit
+	code 2 rather than an error, because cron starting a run while the previous one
+	is finishing is normal.</p>
+
+	<h2 id="inspect">status, log, settings, verify</h2>
+
+	<h3>filesync status</h3>
+
+	<p>When each repo last synced, how big it is, and what the last transfer cost.
+	<code>--repo</code> limits it and <code>--json</code> makes it machine
+	readable.</p>
+
+	<h3>filesync log</h3>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>-n N</code></td><td>Show at most N runs; the default is 20.</td></tr>
+			<tr><td><code>--since</code>, <code>--until</code></td><td>Inclusive window, as <code>YYYY-MM-DD</code> or an epoch. A date means midnight UTC; <code>--until</code> includes the whole day.</td></tr>
+			<tr><td><code>--exit N</code></td><td>Only runs that ended with this code; repeatable.</td></tr>
+			<tr><td><code>--warnings</code></td><td>Only runs that recorded a warning, conflict or skipped path.</td></tr>
+			<tr><td><code>--json</code></td><td>One JSON document.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>All filters apply before the limit. Runs are listed oldest first, and a torn
+	final line from a killed run is skipped.</p>
+
+	<h3>filesync settings</h3>
+
+	<p>Prints every process setting, its effective value, and where that value came
+	from &mdash; built-in default, settings file, or environment. See
+	<a href="settings.html">Settings</a>. <code>--config FILE</code> names the
+	settings file; <code>--json</code> prints the report as data.</p>
+
+	<h3>filesync verify</h3>
+
+	<p>Compares the local tree with the base the last successful sync recorded.
+	Drift means the tree changed without being synced. It works offline: the ignore
+	list is the one cached by the last sync.</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>--deep</code></td><td>Hash every file rather than trusting size and mtime.</td></tr>
+			<tr><td><code>--json</code></td><td>One JSON document.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>Exit code 4 means verification found drift.</p>
+
+	<h2 id="restore">restore and snapshots</h2>
+
+	<h3>filesync restore</h3>
+
+	<p>Puts a path back from this repo's local trash. The newest stored version
+	wins; <code>--list</code> shows them all instead. Versions are searched in this
+	repo's trash first, then in the shared trash that releases before 0.001.1
+	used, so files trashed before an upgrade can still be restored.</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Option</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>--to DIR</code></td><td>Copy the version into DIR instead of back into the sync root.</td></tr>
+			<tr><td><code>--list</code></td><td>List the stored versions; restore nothing.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>The trash entry is kept, so a restore is repeatable. The destination must not
+	already exist.</p>
+
+	<h3>filesync snapshot</h3>
+
+	<p>Takes today's snapshot of a replica, pruning old ones. Snapshots are for the
+	<code>replica</code> role only. <code>--keep N</code> sets how many to keep,
+	defaulting to the repo's <code>snapshot_keep</code> and then to 14; 0 keeps
+	all.</p>
+
+<pre><code>filesync snapshot --repo offsite --keep 7
+filesync snapshot list --repo offsite
+filesync snapshot restore 2026-10-20 --repo offsite --to /tmp/export
+filesync snapshot restore 2026-10-20 notes --repo offsite</code></pre>
+
+	<p><code>snapshot restore</code> copies a whole snapshot, or one relative path
+	of it, back. Without <code>--to</code> it restores into the sync root, which
+	rolls the replica back to that date. It holds the repo lock while it works.</p>
+
+	<h2 id="admin">filesync-admin</h2>
+
+<pre><code>filesync-admin --root DIR &lt;command&gt;
+
+  repo create NAME [--trash-days N] [--max-deletes N] [--max-delete-percent N]
+                   [--ignore PATTERN]...
+  repo list
+  repo show NAME
+  client allow ID --repo NAME [--role client|replica]
+  client list --repo NAME
+  client forget ID --repo NAME
+  reindex NAME [--dry-run] [--json]
+  verify NAME [--deep] [--sample N] [--json]
+  restore NAME PATH [--to DIR] [--list] [--date YYYY-MM-DD]
+  log NAME... [-n N] [--client ID] [--since YYYY-MM-DD|EPOCH]
+              [--until YYYY-MM-DD|EPOCH] [--exit N]... [--warnings] [--json]</code></pre>
+
+	<p><code>--root</code> is read only before the command name.</p>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Command</th><th>What it does</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>repo create</code></td><td>Creates the master tree, the metadata directory, the policy and an empty index. <code>--trash-days</code> sets retention, <code>--max-deletes</code> and <code>--max-delete-percent</code> the per-session deletion limits, and <code>--ignore</code> replaces the default ignore list.</td></tr>
+			<tr><td><code>repo list</code></td><td>Lists the repos under the root.</td></tr>
+			<tr><td><code>repo show</code></td><td>Prints one repo's policy.</td></tr>
+			<tr><td><code>client allow</code></td><td>Admits a client id to a repo, as <code>client</code> or <code>replica</code>. A repo with no listed clients admits every client.</td></tr>
+			<tr><td><code>client list</code></td><td>Lists a repo's admitted clients.</td></tr>
+			<tr><td><code>client forget</code></td><td>Removes a client from the list.</td></tr>
+			<tr><td><code>reindex</code></td><td>Rebuilds the master index by hashing every file. Holds the repo lock. Used after a manual repair such as a rollback from backup; <code>--dry-run</code> reports without writing.</td></tr>
+			<tr><td><code>verify</code></td><td>Compares the master with its index. <code>--deep</code> hashes every file; <code>--sample N</code> hashes N of them.</td></tr>
+			<tr><td><code>restore</code></td><td>Puts a path back from the server trash, into the master by default or into <code>--to</code> as an export. <code>--date</code> picks the newest version from that day; <code>--list</code> lists versions. Restoring into the master rebuilds the index.</td></tr>
+			<tr><td><code>log</code></td><td>The server's journal, for one or more repos, with the same time, exit and warning filters as <code>filesync log</code> plus <code>--client</code>.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>If the server root cannot be written, <code>repo create</code> names the
+	directory that blocks it and says to chown it to the running account or to use
+	<code>--root</code> elsewhere. That advice is given only when a directory really
+	is unwritable, so a full disk or a root that is a file keeps its own error.</p>
+
+	<h2 id="server">filesync-server</h2>
+
+<pre><code>command="filesync-server --repo docs --client laptop --role client" ssh-ed25519 AAAA...</code></pre>
+
+	<p>It is not run by hand: sshd starts it with the arguments pinned in
+	<code>authorized_keys</code>. The session carries only the repo, the client id
+	and the role, which is why the client cannot choose the server root and why
+	the <a href="quickstart.html#wrapper">wrapper</a> exists. It refuses to speak
+	the protocol on a terminal unless <code>FILESYNC_ALLOW_TTY</code> is set.</p>
+
+	<h2 id="exit">Exit codes</h2>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Code</th><th>Meaning</th><th>Applies to</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>0</td><td>Success.</td><td>both</td></tr>
+			<tr><td>1</td><td>Fatal error.</td><td>both</td></tr>
+			<tr><td>2</td><td>Another run holds the lock.</td><td>client</td></tr>
+			<tr><td>3</td><td>Completed with warnings.</td><td>client</td></tr>
+			<tr><td>4</td><td>Verification found drift.</td><td>both</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>Library errors are raised with <code>croak</code>, but the commands strip the
+	<code>at FILE line N</code> suffix before printing. Set
+	<code>FILESYNC_TRACE=1</code> to keep the full stack trace.</p>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

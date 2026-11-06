@@ -1,5 +1,10 @@
 Revision history for Bijection-XS
 
+0.12    2026-11-04
+        - Test offset_set, a set with a zero or negative first argument, and what import
+          passes on; the XS is at 100% coverage under Devel::XSCover on clang and gcc 14
+        - Add a MANIFEST.SKIP, so the manifest test passes in a git clone
+
 0.11    2026-10-23
         - Export with Ex::Op instead of Import::Export, perl 5.10 or later
 

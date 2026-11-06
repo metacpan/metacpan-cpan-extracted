@@ -17,13 +17,16 @@
 
 package Text::BibTeX::File;
 
+use 5.026;
 use strict;
+use warnings;
 use Carp;
 use IO::File;
+use Scalar::Util qw(blessed reftype);
+use Text::BibTeX;
 use Text::BibTeX::Entry;
 
-use vars qw'$VERSION';
-$VERSION = 0.88;
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -69,10 +72,13 @@ it to the C<open> method (along with OPTS).  If the C<open> fails, C<new>
 fails and returns false; if the C<open> succeeds (or if FILENAME isn't
 supplied), C<new> returns the new object reference.
 
-=item open (FILENAME [OPTS])
+=item open (SOURCE [, OPTS])
 
-Opens the file specified by FILENAME. OPTS is an hashref that can have
-the following values:
+Opens SOURCE for reading.  SOURCE is usually a filename, but may also be
+a reference to a scalar (to read from a string in memory) or an already
+open filehandle (any Perl filehandle works, including tied handles and
+handles with I/O layers).  OPTS is a hashref that can have the following
+values (case-insensitive):
 
 =over 4
 
@@ -87,31 +93,47 @@ with C<MODE>
 
 =item BINMODE
 
-By default, Text::BibTeX uses bytes directly. Thus, you need to encode
-strings accordingly with the encoding of the files you are reading. You can
-also select UTF-8. In this case, Text::BibTeX will return UTF-8 strings in
-NFC mode. Note that at the moment files with BOM are not supported.
+C<'utf-8'> (the default) or C<'bytes'> (also C<'raw'>).
 
-Valid values are 'raw/bytes' or 'utf-8'.
+In C<'utf-8'> mode the input is decoded as UTF-8 and all strings returned
+(entry types, keys, field names, values, names...) are Perl character
+strings, normalised as given by C<NORMALIZATION>.  Bytes that are not valid
+UTF-8 are replaced by U+FFFD with a warning; use C<ENCODING> to read files
+in other encodings.  A leading byte order mark is ignored.
+
+In C<'bytes'> mode the input is not decoded at all and strings are
+returned as byte strings, exactly as they appear in the file.
+
+=item ENCODING
+
+The encoding of the file, if it isn't UTF-8 (eg. C<'latin1'>): an
+C<:encoding(...)> layer is pushed onto the filehandle.  If you pass in a
+filehandle that already has an encoding layer, you don't need this.
 
 =item NORMALIZATION
 
-By default, Text::BibTeX outputs UTF-8 in NFC form. You can change this by passing
-the name of a different form.
-
-Valid values are those forms supported by the Unicode::Normalize module
-('NFD', 'NFDK' etc.)
+The Unicode normalization form for strings returned in C<'utf-8'> mode:
+C<'NFC'> (the default), C<'NFD'>, C<'NFKC'>, C<'NFKD'>, or C<'none'>.
 
 =item RESET_MACROS
 
-By default, Text::BibTeX accumulates macros. This means that when you open a second
-file, macros defined by the first are still available. This may result on warnings
-of macros being redefined.
+By default, macros (C<@string> definitions) accumulate in one global
+table, as in BibTeX itself: when you open a second file, macros defined by
+the first are still available.  This option clears all macro definitions
+(except for the month macros) before the file is read.
 
-This option can be used to force Text::BibTeX to clean up all macros definitions
-(except for the month macros).
+=item PRIVATE_MACROS
 
-=back 
+Give this file its own macro table: C<@string> definitions in it are not
+seen by any other file, and it does not see those made by other files.
+It still sees the global macros (the month names, and any defined with
+L<Text::BibTeX/add_macro_text>).
+
+=item FILENAME
+
+When SOURCE is a filehandle, the name to use in error messages.
+
+=back
 
 =item close ()
 
@@ -133,59 +155,85 @@ sub new
 
    $class = ref ($class) || $class;
    my $self = bless {}, $class;
-   ($self->open (@_) || return undef) if @_; 
+   ($self->open (@_) || return undef) if @_;
    $self;
 }
 
 sub open {
-    my ($self) = shift;
-    $self->{filename} = shift;
+    my ($self, $source, @args) = @_;
+    my $opts = (ref $args[0] eq 'HASH') ? shift @args : {};
+    my ($binmode, $norm, $o) = Text::BibTeX::_options($opts);
 
-    $self->{binmode}       = 'bytes';
-    $self->{normalization} = 'NFC';
-    my @args = ( $self->{filename} );
+    $self->close if $self->{handle};
+    $self->{binmode}        = $binmode;
+    $self->{normalization}  = $norm;
+    $self->{private_macros} = $o->{private_macros} ? 1 : 0;
 
-    if ( ref $_[0] eq "HASH" ) {
-        my $opts = {};
-        $opts = shift;
-        $opts->{ lc $_ } = $opts->{$_} for ( keys %$opts );
-        $self->{binmode} = 'utf-8'
-            if exists $opts->{binmode} && $opts->{binmode} =~ /utf-?8/i;
-        $self->{normalization} = $opts->{normalization} if exists $opts->{normalization};
+    if ($o->{reset_macros}) {
+        Text::BibTeX::delete_all_macros();
+        Text::BibTeX::_define_months();
+    }
 
-        if (exists $opts->{reset_macros} && $opts->{reset_macros}) {
-          Text::BibTeX::delete_all_macros();
-          Text::BibTeX::_define_months();
-        }
+    if (exists $o->{mode}) {
+        @args = ($o->{mode});
+        push @args, $o->{perms} if exists $o->{perms};
+    }
 
-        if ( exists $opts->{mode} ) {
-            push @args, $opts->{mode};
-            push @args, $opts->{perms} if exists $opts->{perms};
-        }
+    my $fh;
+    if (ref $source && (reftype($source) // '') eq 'GLOB') {
+        $fh = $source;                  # an open filehandle
+        $self->{filename} = $o->{filename};
+        $self->{own_handle} = 0;
     }
     else {
-        push @args, @_;
+        $self->{filename} = $o->{filename} // (ref $source ? undef : $source);
+        $fh = IO::File->new;
+        # (a plain filename keeps IO::File's 2-argument open semantics)
+        @args = ('<') if ref $source && !@args;
+        $fh->open($source, @args) or return;
+        $self->{own_handle} = 1;
     }
 
-    $self->{handle} = IO::File->new;
-    $self->{handle}->open(@args);    # filename, maybe mode, maybe perms
+    if (defined $o->{encoding}) {
+        binmode($fh, ":encoding($o->{encoding})")
+            or croak "Text::BibTeX::File: can't use encoding '$o->{encoding}': $!";
+    }
+    elsif ($binmode eq 'utf-8' && $self->{own_handle} && @args
+           && $args[0] =~ /^\s*(?:[>+]|[wa])/) {
+        # writing character strings: encode them as UTF-8
+        binmode($fh, ':encoding(UTF-8)');
+    }
+
+    $self->{handle} = $fh;
+    return 1;
 }
 
+# The parser for this file (created when the first entry is read)
+sub _parser {
+    my $self = shift;
+    croak "Text::BibTeX::File: file is not open" unless $self->{handle};
+    return $self->{parser} //= Text::BibTeX::Parser->new(
+        $self->{handle}, $self->{filename},
+        $self->{binmode} eq 'utf-8' ? 1 : 0, $self->{private_macros});
+}
 
 sub close
 {
    my $self = shift;
-   if ( $self->{handle} ) {
-      Text::BibTeX::Entry->new ($self->{filename}, undef);   # resets parser
-      $self->{handle}->close;
+   delete $self->{parser};
+   if (my $fh = delete $self->{handle}) {
+      $fh->close if $self->{own_handle};
    }
 }
 
 sub eof
 {
-   eof (shift->{handle});
+   my $self = shift;
+   return 1 unless $self->{handle};
+   return $self->{parser}->eof if $self->{parser};
+   eof ($self->{handle});
 }
-      
+
 sub DESTROY
 {
    my $self = shift;

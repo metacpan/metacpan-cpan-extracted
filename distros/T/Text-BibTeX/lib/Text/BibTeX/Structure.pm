@@ -23,8 +23,7 @@ require 5.004;                              # for 'isa' and 'can'
 use strict;
 use Carp;
 
-use vars qw'$VERSION';
-$VERSION = 0.88;
+our $VERSION = '1.00';
 
 use Text::BibTeX ('check_class');
 
@@ -869,12 +868,11 @@ sub get_options
 
 package Text::BibTeX::StructuredEntry;
 use strict;
-use vars qw(@ISA $VERSION);
-$VERSION = 0.88;
+our $VERSION = '1.00';
 
 use Carp;
 
-@ISA = ('Text::BibTeX::Entry');
+our @ISA = ('Text::BibTeX::Entry');
 use Text::BibTeX qw(:metatypes display_list);
 
 =head1 METHODS 2: BASE STRUCTURED ENTRY CLASS

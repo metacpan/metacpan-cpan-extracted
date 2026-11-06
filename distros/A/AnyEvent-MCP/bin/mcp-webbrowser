@@ -29,7 +29,9 @@ unapproved tabs merely because the userscript is installed.
 
 The HTTP/WebSocket listener stays active alongside MCP stdio or an outgoing
 C<--connect>. Listener configuration, token derivation and URL discovery follow
-C<mcp-vim>. Tokens authenticate both MCP HTTP and browser WebSocket connections.
+C<mcp-vim>. All enabled users authenticate ordinary MCP requests, but only
+C<connect_user> (default C<default>) may attach browser WebSockets. Explicit
+static tokens may still authenticate both connection types.
 Keep the broker URL private. The userscript accepts the C<http://> URL printed
 by C<mcp-webbrowser --print-url>, converts it to WebSocket internally and
 appends its own opaque per-tab target ID.
@@ -71,6 +73,15 @@ by C<--print-url> when prompted. Do not append a tab name or convert
 C<http> to C<ws> yourself. The URL is remembered across tabs; the grant is
 per tab, not per website. Pages remain unexposed until explicitly allowed,
 and the menu on an unapproved tab contains only the Allow command.
+
+If C<mcp-multibroker> starts this broker as a stdio child, specify
+C<--eager> after the child's closing C<---> so the browser listener is
+available before the first MCP tool call:
+
+   mcp-multibroker --stdio browser --- mcp-webbrowser --- --eager
+
+Without C<--eager>, the child does not start until an MCP tool needs it,
+and browser tabs cannot connect before then.
 
 When allowed, the menu offers B<Disconnect MCP access to this tab>, the
 broker URL configuration and independent toggles for a tab-title indicator
@@ -232,11 +243,9 @@ C<--ask> selects the same helper, tty, yad, mcp or auto modes as other servers.
 
 =head1 OPTIONS
 
-Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-The HTTP/WebSocket listener remains active under C<--stdio> or C<--connect>.
-C<--tool-help> lists registered tools and arguments without listening.
-For example, C<--auto-allow '*,*'> approves discovery and JavaScript
-execution in explicitly opted-in tabs; page code then has full authority.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+The following switch is specific to C<mcp-webbrowser>.
 
 =over
 
@@ -245,6 +254,28 @@ execution in explicitly opted-in tabs; page code then has full authority.
 Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
 C<auto>. tty/yad force local interface; mcp delegates to client,
 auto prefers native elicitation when offered. See L</PERMISSIONS>.
+
+=back
+
+=head2 Shared-option behavior
+
+=over
+
+=item --stdio
+
+The browser's auxiliary HTTP/WebSocket listener stays active while
+MCP uses stdio.
+
+=item --connect URL
+
+The auxiliary browser HTTP/WebSocket listener stays active while
+MCP connects to an upstream multibroker.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+For example, C<--auto-allow '*,*'> allows discovery and JavaScript
+execution in explicitly opted-in tabs. The executed page code then
+has full authority within that page; use this only when intended.
 
 =back
 
@@ -320,21 +351,24 @@ it has no event subscriptions or separate SPA revision counter.
 =cut
 
 use common::sense;
+
+use JSON::XS ();
+use Socket ();
+use Scalar::Util qw(weaken);
+
 use AnyEvent ();
 use AnyEvent::Socket ();
 use AnyEvent::Handle ();
+use AnyEvent::WebSocket::Server ();
+use AnyEvent::WebSocket::Message ();
 use AnyEvent::MCP ();
 use AnyEvent::MCP::Config ();
 use AnyEvent::MCP::Server::HTTP ();
 use AnyEvent::MCP::Server::JSONL ();
 use AnyEvent::MCP::Server::Permissions ();
 use AnyEvent::MCP::Server::Toolset ();
+
 use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
-use AnyEvent::WebSocket::Server ();
-use AnyEvent::WebSocket::Message ();
-use JSON::XS ();
-use Socket ();
-use Scalar::Util qw(weaken);
 
 my $options = mcp_getoptions ({
    usage => "Usage: mcp-webbrowser [OPTION]...\n",
@@ -352,7 +386,8 @@ my $stdio = $options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MUL
 my $config = AnyEvent::MCP::Config->global;
 my %http = $config->http_settings ($name, $options->{bind});
 $http{tokens} = $options->{tokens} if $options->{tokens};
-my %token = map { $_ => 1 } @{$http{tokens}};
+$http{connect_tokens} = $options->{tokens} if $options->{tokens};
+my %token = map { $_ => 1 } @{$http{connect_tokens}};
 my $json = JSON::XS->new->utf8->max_depth (64);
 my (%connections, %pages, %tabs);
 my $done = AE::cv;
@@ -715,17 +750,22 @@ sub receive_message {
 sub accept_browser {
    my ($fh) = @_;
 
-   my $requested;
+   my ($requested, $rejection);
+   my $reject = sub {
+      $rejection = shift;
+      die "Browser WebSocket handshake rejected\n";
+   };
    my $ws = AnyEvent::WebSocket::Server->new (
       max_payload_size => 16 * 1024 * 1024,
       handshake => sub {
          my ($req, $res) = @_;
          my ($cookie, $target) = $req->{resource_name} =~ m{\A/([^/]+)/([^/?#]+)\z};
-         defined $cookie && $token{$cookie} or return;
-         $target =~ /%(?![0-9a-fA-F]{2})/ and return;
+         defined $cookie or $reject->("invalid path");
+         $token{$cookie} or $reject->("invalid token");
+         $target =~ /%(?![0-9a-fA-F]{2})/ and $reject->("invalid target");
          $target =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
-         utf8::decode $target or return;
-         length $target && $target !~ /\0/ or return;
+         utf8::decode $target or $reject->("invalid target");
+         length $target && $target !~ /\0/ or $reject->("invalid target");
          $requested = $target;
 
          $res
@@ -734,7 +774,9 @@ sub accept_browser {
    $ws->establish ($fh)->cb (sub {
       my $conn = eval { $_[0]->recv };
       unless ($conn) {
-         AE::log warn => "Browser WebSocket establishment failed: " . ($@ || "no connection");
+         AE::log warn => $rejection
+            ? "Browser WebSocket rejected: $rejection"
+            : "Browser WebSocket establishment failed: " . ($@ || "no connection");
          return;
       }
 

@@ -1,7 +1,7 @@
 package Mail::DKIM::KeyValueList;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: Represents a Key/Value list
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -34,15 +34,23 @@ sub parse {
         my $tag = { raw => $raw_tag };
         push @{ $self->{tags} }, $tag;
 
-        # strip preceding and trailing whitespace
-        $raw_tag =~ s/^\s+|\s*$//g;
+        # strip preceding and trailing whitespace (not s/^\s+|\s*$//g,
+        # which is quadratic in a whitespace run inside the tag)
+        $raw_tag =~ s/^\s+//;
+        $raw_tag =~ s/\s+\z//;
 
         next if ( $raw_tag eq '' );
 
-        my ( $tagname, $value ) = split( /\s*=\s*/, $raw_tag, 2 );
-        unless ( defined $value ) {
+        # split at the first "=" (not split(/\s*=\s*/, ...), which is
+        # quadratic in a whitespace run in the tag name)
+        my $i = index( $raw_tag, '=' );
+        unless ( $i >= 0 ) {
             die "syntax error\n";
         }
+        my $tagname = substr( $raw_tag, 0, $i );
+        my $value   = substr( $raw_tag, $i + 1 );
+        $tagname =~ s/\s+\z//;
+        $value   =~ s/^\s+//;
 
         $tag->{name}  = $tagname;
         $tag->{value} = $value;
@@ -195,7 +203,7 @@ Mail::DKIM::KeyValueList - Represents a Key/Value list
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 AUTHORS
 

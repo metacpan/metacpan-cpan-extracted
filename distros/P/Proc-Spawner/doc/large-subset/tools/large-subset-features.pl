@@ -38,6 +38,7 @@ my @F = (   # [id, verdict, basis, regex, on: r(aw text) or u(nquoted parts only
   [function    => B => 'P:function',   qr/${C}function\s+[^\s(]/, 'u'],
   [select      => B => 'P:select',     qr/${C}select\s+\w+/, 'g'],
   [casefall    => B => 'P:casefall',   qr/;;&|(?<!;);&/, 'u'],
+  [unsetarr    => B => 'P:unsetarr',   qr/${C}unset(?:\s+-[vf])?(?:\s+[^\s;&|]+)*?\s+[A-Za-z_]\w*\[/, 'g'],   # post4-0.04: dash refuses it, bash unsets an element
   [bashbuiltin => B => 'P:source',     qr/${C}(?:source|declare|typeset|let|pushd|popd|dirs|shopt|mapfile|readarray|coproc|disown|enable|builtin|caller|complete|compgen|suspend)\b/, 'u'],
   [interactive => X => 'user:B2',    qr/${C}(?:history|fc|bind|help|compopt|logout)\b|\bset\s+[-+]o\s+history\b/, 'u'],   # do nothing, by the user's decision B2
   [time        => X => 'P:time',       qr/${C}time\b/, 'u'],
@@ -56,7 +57,9 @@ my @F = (   # [id, verdict, basis, regex, on: r(aw text) or u(nquoted parts only
   [trapsig     => B => 'P:trapsigint', qr/\btrap\b[^;&|\n]*\s(?:SIG[A-Z]+|ERR|DEBUG|RETURN)\b/, 'u'],
   [jobspec     => X => 'P:job',        qr/\b(?:kill|fg|bg|wait|jobs|disown)\s+(?:-\S+\s+)*%/, 'u'],
   [fnreserved  => B => 'P:fnlocal',    qr/(?:^|[;&|\s])(?:local|source|export|exit|set|shift|eval|exec|readonly|return|trap|unset|break|continue|times|\.)\s*\(\s*\)/m, 'u'],
-  [roassign    => B => 'P:uidset',     qr/(?:^|[;&|\s])(?:UID|EUID|PPID|BASHOPTS|SHELLOPTS)=/m, 'u'],
+  [roassign    => B => 'P:uidset',     qr/(?:^|[;&|\s])(?:EUID|PPID|BASHOPTS|SHELLOPTS)=/m, 'u'],
+  [uidassign   => X => 'E:posix',      qr/(?:^|[;&|\s])UID=/m, 'u'],   # an ordinary variable, as dash (G15, post-0.04)
+  [uidread     => B => 'P:bashvar',    qr/(?!)/, 'u', sub { $_[0] =~ /\$\{?UID\b/ && $_[0] !~ /(?:^|[;&|\s])UID=/m }],   # set by bash
   [fdmulti     => X => 'E:same',    qr/(?:^|\s)[0-9]{2,}[<>]/m, 'u'],
   # both run it, the results always differ (blatant by probe)
   [echobs      => X => 'P:echobs',     qr/(?!)/, 'r', \&echobs],   # a backslash that reaches echo's arguments
@@ -70,29 +73,29 @@ my @F = (   # [id, verdict, basis, regex, on: r(aw text) or u(nquoted parts only
   [dotstar     => X => 'E:harm',       qr/(?:^|[\s\/=])\.[*?]+(?=$|[\s\/;&|)])/m, 'g'],   # a component that can match . or ..
   [caret       => X => 'E:platform',      qr/\[\^/, 'g'],
   [atlen       => B => 'P:atlen',      qr/\$\{#[@*]\}/, 'u'],
-  [atpat       => B => 'P:atpat',      qr/\$\{[@*](?:%|#)/, 'u'],
+  [atpat       => X => 'E:same',       qr/\$\{[@*](?:%|#)/, 'u'],   # on each parameter, as bash (G4, post-0.04)
   [bqdq        => B => 'P:bqdq',       qr/"\$\{[^}]*`[^`]*\\"/, 'r'],
-  [bashvar     => B => 'P:bashvar',    qr/\$\{?(?:RANDOM|SRANDOM|SECONDS|BASH_VERSION|BASH_VERSINFO|BASHPID|BASH_SOURCE|BASH_LINENO|FUNCNAME|EUID|UID|HOSTNAME|OSTYPE|HOSTTYPE|MACHTYPE|EPOCHSECONDS|EPOCHREALTIME|GROUPS|HISTCMD|DIRSTACK|BASH)\b/, 'u'],
+  [bashvar     => B => 'P:bashvar',    qr/\$\{?(?:RANDOM|SRANDOM|SECONDS|BASH_VERSION|BASH_VERSINFO|BASHPID|BASH_SOURCE|BASH_LINENO|FUNCNAME|EUID|HOSTNAME|OSTYPE|HOSTTYPE|MACHTYPE|EPOCHSECONDS|EPOCHREALTIME|GROUPS|HISTCMD|DIRSTACK|BASH)\b/, 'u'],
   [underscore  => B => 'P:underscore', qr/\$_(?![A-Za-z0-9_])|\$\{_\}/, 'u'],
   # judgements (not yet reviewed)
   [dashflags   => B => 'J',            qr/\$-|\$\{-\}/, 'u'],           # the value always differs; a test for *i* agrees
-  [lineno      => B => 'J',            qr/\$\{?LINENO\b/, 'u'],         # dash: empty in -c; its manual (not checked) documents it
+  [lineno      => X => 'E:info',       qr/\$\{?LINENO\b/, 'u'],         # the line number, as bash (G8, post-0.04); dash: empty in -c
   [scope       => B => 'P:local',      qr/(?!)/, 'u', sub { $_[0] =~ /${C}local\b(?!=)/ && $_[0] !~ /\w\s*\(\s*\)/ }],   # local outside a function: both shells fail
   [returnout   => X => 'E:error',      qr/(?!)/, 'u', sub { $_[0] =~ /${C}return\b(?!=)/ && $_[0] !~ /\w\s*\(\s*\)/ }],   # return outside a function: an error, as bash (rule E)
   [killsig     => B => 'M:38',         qr/\bkill\s+-SIG/, 'u'],          # both refuse in --posix; whether bash's manual allows it: not checked
-  [specialerr  => B => 'M:24',            qr/(?!)/, 'u'],                   # a special builtin's error (dash stops, bash goes on): not detectable from text
+  [specialerr  => X => 'E:posix',         qr/(?!)/, 'u'],                   # a special builtin's error (dash stops, bash goes on): not detectable from text
   # subtle
   [localnoval  => S => 'P:local',      qr/\blocal\s+(?:[A-Za-z_]\w*\s+)*[A-Za-z_]\w*(?:\s*$|\s*[;&|)])/m, 'u'],
   [atassign    => S => 'P:atjoin',     qr/=["]?\$\{?@/, 'r'],
   [assignredir => X => 'E:effect',            qr/(?:^|[;&|]\s*)[A-Za-z_]\w*=[^\s;&|]*[\$`][^;&|\n]*\s[0-9]*[<>]/m, 'u'],
-  [qmark       => S => 'P:qmark',      qr/\$\{[A-Za-z_]\w*:?\?/, 'u'],
-  [cmdv        => S => 'P:cmdvst',     qr/\bcommand\s+-v\b/, 'u'],
+  [qmark       => X => 'E:meaning',    qr/\$\{[A-Za-z_]\w*:?\?/, 'u'],   # done (rule A5, as dash; large-subset-logical.md, N2)
+  [cmdv        => X => 'user:A5',      qr/\bcommand\s+-v\b/, 'u'],       # done (rule A5 stands, as dash; N3)
   [getopts     => X => 'E:posix', qr/\bgetopts\b/, 'u'],
   [listing     => S => 'P:listset',    qr/${C}(?:set|export|readonly|trap|alias)\s*(?:$|[;&|)])|\b(?:export|readonly)\s+-p\b/m, 'u'],
   [trace       => S => 'P:setx',       qr/\bset\s+(?:[-+][A-Za-z]*[xv]|[-+]o\s+(?:xtrace|verbose))/, 'u'],
   [setm        => S => 'P:setm',       qr/\bset\s+-[A-Za-z]*m/, 'u'],
   [ps1         => S => 'P:ps1',        qr/\$\{?PS1\b/, 'u'],
-  [nohome      => S => 'P:tildehome',  qr/\bunset\b[^;&|\n]*\bHOME\b/, 'u'],
+  [nohome      => X => 'E:info',       qr/\bunset\b[^;&|\n]*\bHOME\b/, 'u'],   # ~ from the password file, as bash (G16, post-0.04)
 );
 sub ctx {   # the quoting context of each character: u(nquoted) e(scaped: \ and the next) s(ingle) d(ouble) b(ackquoted)
   my $s = shift; my ($m, $st) = ('', '');   # $st: 'd' inside "...", 'b' inside `...`, 'bd' "..." inside `...`
@@ -133,6 +136,7 @@ sub sc_features {   # ShellCheck's portability codes (SC3xxx) of a sample, with 
     if ($SCX{$c}) { push @f, [lc $c, X => "SC:$c"] }
     elsif ($c eq 'SC3026') { push @f, [sc3026 => X => 'E:platform'] }   # ^ in a bracket expression negates (rule E, as caret)
     elsif ($c eq 'SC3023') { push @f, [sc3023 => X => 'E:same'] }       # descriptors above 9 (rule E, as fdmulti)
+    elsif ($c eq 'SC3058') { push @f, [sc3058 => X => 'E:same'] }       # string operations on $@, $* (rule E, as atpat; post-0.04)
     elsif ($c eq 'SC3031') { push @f, [sc3031 => '-' => 'M:13'] }        # bash --posix does not glob a redirection target either
     elsif ($c eq 'SC3045' && $msg =~ /\bread -p\b/) { push @f, ['sc3045-read-p', '-' => 'P:readp'] }   # dash 0.5.12 has read -p
     elsif ($c eq 'SC3045' && $msg =~ /\bprintf -v\b/) { push @f, ['sc3045-printf-v', X => 'P:printfv'] }

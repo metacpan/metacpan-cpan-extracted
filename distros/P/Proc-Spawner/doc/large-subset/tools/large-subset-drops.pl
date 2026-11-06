@@ -8,14 +8,17 @@
 #   shellcheck: scope error SCnnnn       a ShellCheck test string that is wrong where it stands: return, local,
 #                                        break or continue outside their function or loop, an exit or return
 #                                        status outside 0-255 (by ShellCheck's own codes; shellcheck in PATH)
-use strict; use warnings; use JSON::PP; use File::Temp 'tempdir';
+#   the reason given in large-subset-noise.txt (next to this script): noise marked by hand (post-0.04)
+use strict; use warnings; use JSON::PP; use File::Temp 'tempdir'; use FindBin;
+my %NOISE; if (open my $n, '<:utf8', "$FindBin::Bin/large-subset-noise.txt") {
+  while (<$n>) { next if /^#/ || !/\S/; chomp; my ($s, $i, $r) = split /\t/; $NOISE{"$s\t$i"} = $r } }
 my %SCOPE = map +($_ => 1), qw(2104 2105 2106 2151 2152 2168 2242);
 my (%first, @sc);
 open my $in, '<', shift // 'samples.jsonl' or die; open my $out, '>', shift // 'drops.tsv' or die;
 binmode $out, ':utf8';
 while (<$in>) { my $h = decode_json $_; my ($src, $id) = @$h{qw(src id)};
   my $why = $src eq 'makebook' ? 'make book: noisy extraction'
-    : $first{"$src\0$h->{text}"} ? "duplicate of $first{qq($src\0$h->{text})}" : $h->{drop};
+    : $first{"$src\0$h->{text}"} ? "duplicate of $first{qq($src\0$h->{text})}" : $h->{drop} // $NOISE{"$src\t$id"};
   $first{"$src\0$h->{text}"} //= $id;
   if ($why) { print $out "$src\t$id\t$why\n" } elsif ($src eq 'shellcheck') { push @sc, $h } }
 my $d = tempdir(CLEANUP => 1);

@@ -114,13 +114,18 @@ WEBVIEW_API int webview_tray_create(struct webview_tray *t) {
   if (!priv) return -1;
   t->_priv = priv;
 
-  /* Create a delegate class for handling menu actions */
-  priv->delegate_class = objc_allocateClassPair(
-      (Class)objc_getClass("NSObject"), "ChandraTrayDelegate", 0);
-  if (priv->delegate_class) {
-    class_addMethod(priv->delegate_class, sel_registerName("trayMenuAction:"),
-                    (IMP)tray_menu_item_action, "v@:@");
-    objc_registerClassPair(priv->delegate_class);
+  /* The delegate class handles menu actions. The runtime refuses to allocate
+   * a class whose name is registered already, so a tray created after an
+   * earlier one was destroyed reuses the class. */
+  priv->delegate_class = (Class)objc_getClass("ChandraTrayDelegate");
+  if (!priv->delegate_class) {
+    priv->delegate_class = objc_allocateClassPair(
+        (Class)objc_getClass("NSObject"), "ChandraTrayDelegate", 0);
+    if (priv->delegate_class) {
+      class_addMethod(priv->delegate_class, sel_registerName("trayMenuAction:"),
+                      (IMP)tray_menu_item_action, "v@:@");
+      objc_registerClassPair(priv->delegate_class);
+    }
   }
   priv->delegate = ((id(*)(id, SEL))objc_msgSend)(
       ((id(*)(id, SEL))objc_msgSend)(priv->delegate_class,

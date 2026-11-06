@@ -262,26 +262,12 @@ my @in_between_tests = (
     test => '-in with an array of function array refs with args',
   },
   {
-    throws => qr/
-      \QSQL::Abstract before v1.75 used to generate incorrect SQL \E
-      \Qwhen the -IN operator was given an undef-containing list: \E
-      \Q!!!AUDIT YOUR CODE AND DATA!!! (the upcoming Data::Query-based \E
-      \Qversion of SQL::Abstract will emit the logically correct SQL \E
-      \Qinstead of raising this exception)\E
-    /x,
     where => { x => { -in => [ 1, undef ] } },
     stmt => " WHERE ( x IN ( ? ) OR x IS NULL )",
     bind => [ 1 ],
     test => '-in with undef as an element',
   },
   {
-    throws => qr/
-      \QSQL::Abstract before v1.75 used to generate incorrect SQL \E
-      \Qwhen the -IN operator was given an undef-containing list: \E
-      \Q!!!AUDIT YOUR CODE AND DATA!!! (the upcoming Data::Query-based \E
-      \Qversion of SQL::Abstract will emit the logically correct SQL \E
-      \Qinstead of raising this exception)\E
-    /x,
     where => { x => { -in => [ 1, undef, 2, 3, undef ] } },
     stmt => " WHERE ( x IN ( ?, ?, ? ) OR x IS NULL )",
     bind => [ 1, 2, 3 ],
@@ -300,26 +286,18 @@ my @in_between_tests = (
     test => '-in, -not_in with empty arrays',
   },
   {
-    throws => qr/
-      \QSQL::Abstract before v1.75 used to generate incorrect SQL \E
-      \Qwhen the -IN operator was given an undef-containing list: \E
-      \Q!!!AUDIT YOUR CODE AND DATA!!! (the upcoming Data::Query-based \E
-      \Qversion of SQL::Abstract will emit the logically correct SQL \E
-      \Qinstead of raising this exception)\E
-    /x,
     where => { a => { -in => [42, undef] }, b => { -not_in => [42, undef] } },
     stmt => ' WHERE ( ( a IN ( ? ) OR a IS NULL ) AND b NOT IN ( ? ) AND b IS NOT NULL )',
     bind => [ 42, 42 ],
     test => '-in, -not_in with undef among elements',
   },
   {
-    throws => qr/
-      \QSQL::Abstract before v1.75 used to generate incorrect SQL \E
-      \Qwhen the -IN operator was given an undef-containing list: \E
-      \Q!!!AUDIT YOUR CODE AND DATA!!! (the upcoming Data::Query-based \E
-      \Qversion of SQL::Abstract will emit the logically correct SQL \E
-      \Qinstead of raising this exception)\E
-    /x,
+    where => { b => { -not_in => [1, undef, 2, undef] } },
+    stmt => ' WHERE ( b NOT IN ( ?, ? ) AND b IS NOT NULL )',
+    bind => [ 1, 2 ],
+    test => '-not_in with several values and undefs (RT#127356)',
+  },
+  {
     where => { a => { -in => [undef] }, b => { -not_in => [undef] } },
     stmt => ' WHERE ( a IS NULL AND b IS NOT NULL )',
     bind => [],
@@ -373,6 +351,17 @@ my @in_between_tests = (
     test => 'Complex top-level -in',
   },
   {
+    where => {
+      -in => [
+        { -row => [ 'x', 'y' ] },
+        { -row => [ 1, undef ] },
+      ],
+    },
+    stmt => ' WHERE (x, y) IN ((?, ?))',
+    bind => [ 1, undef ],
+    test => 'undef inside -row is a NULL bind, not dropped (RT#137357)',
+  },
+  {
     where => { -is => [ 'bob', undef ] },
     stmt => ' WHERE bob IS NULL',
     bind => [],
@@ -416,6 +405,61 @@ for my $case (@in_between_tests) {
         ) || diag dumper ({ where => $case->{where}, exp => $sql->_expand_expr($case->{where}) });
       } || diag dumper ({ where => $case->{where}, exp => $sql->_expand_expr($case->{where}) });
     }
+  }
+}
+
+{
+  package SubClass;
+  our @ISA = 'SQL::Abstract';
+}
+
+{
+  package SubClass::OverrideIn;
+  our @ISA = 'SubClass';
+  sub _where_field_IN { shift->next::method(@_) }
+}
+
+{
+  package SubClass::OverrideBetween;
+  our @ISA = 'SubClass';
+  sub _where_field_BETWEEN { shift->next::method(@_) }
+}
+
+for (
+  {
+    class => 'SubClass::OverrideIn',
+    where => { foo => { -in => [] } },
+    stmt  => 'WHERE 0=1',
+    label => 'Subclass overriding _where_field_IN with empty array ref for -in',
+  },
+  {
+    class => 'SubClass::OverrideIn',
+    where => { foo => { -not_in => [] } },
+    stmt  => 'WHERE 1=1',
+    label => 'Subclass overriding _where_field_IN with empty array ref for -not_in',
+  },
+  {
+    class  => 'SubClass::OverrideBetween',
+    where  => { foo => { -between => [] } },
+    throws => qr/Fatal: Arguments to between must be defined/,
+    label => 'Subclass overriding _where_field_BETWEEN with empty array ref for -between',
+  },
+  {
+    class  => 'SubClass::OverrideBetween',
+    where  => { foo => { -not_between => [] } },
+    throws => qr/Fatal: Arguments to between must be defined/,
+    label => 'Subclass overriding _where_field_BETWEEN with empty array ref for -not_between',
+  },
+) {
+  if (my $e = $_->{throws}) {
+    my $stmt;
+    throws_ok { ($stmt) = $_->{class}->new->select(table => ['*'], $_->{where}) } $e,
+      $_->{label} . ' throws correctly'
+      or diag dumper ({ where => $_->{where}, result => $stmt });
+  } else {
+    $_->{stmt} = 'SELECT * FROM table ' . $_->{stmt};
+    is +SubClass->new->select( table => ['*'], $_->{where}), $_->{stmt}, $_->{label} . ': parent';
+    is +$_->{class}->new->select( table => ['*'], $_->{where}), $_->{stmt}, $_->{label};
   }
 }
 

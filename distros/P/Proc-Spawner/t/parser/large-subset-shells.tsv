@@ -19,7 +19,7 @@ large-subset-tests.pl	LS:17	rej	both	-
 large-subset-tests.pl	LS:18	ok	both	-		
 large-subset-tests.pl	LS:19	ok	both	X	assignredir:X:E:effect	
 large-subset-tests.pl	LS:20	ok	both	-		
-large-subset-tests.pl	LS:21	ok	both	S	qmark:S:P:qmark	
+large-subset-tests.pl	LS:21	ok	both	X	qmark:X:E:meaning	
 large-subset-tests.pl	LS:22	rej	both	-		
 large-subset-tests.pl	LS:23	ok	both	-		
 large-subset-tests.pl	LS:24	rej	both	B	bashparam:B:P:substr	
@@ -79,7 +79,7 @@ large-subset-tests.pl	LS:100	ok	both	-
 large-subset-tests.pl	LS:101	rej	both	X	jobspec:X:P:job	
 large-subset-tests.pl	LS:102	ok	both	-		
 large-subset-tests.pl	LS:103	ok	both	-		
-large-subset-tests.pl	LS:104	ok	both	S	cmdv:S:P:cmdvst	
+large-subset-tests.pl	LS:104	ok	both	X	cmdv:X:user:A5	
 large-subset-tests.pl	LS:105	rej	both	-		
 large-subset-tests.pl	LS:106	ok	both	-		
 large-subset-tests.pl	LS:107	rej	both	-		
@@ -117,9 +117,9 @@ large-subset-tests.pl	LS:155	rej	both	S	localnoval:S:P:local
 large-subset-tests.pl	LS:156	ok	both	-		
 large-subset-tests.pl	LS:157	rej	both	-		
 large-subset-tests.pl	LS:158	rej	dash	B	parse:B:P:-n	
-large-subset-tests.pl	LS:159	rej	both	-		
+large-subset-tests.pl	LS:159	ok	both	-		
 large-subset-tests.pl	LS:160	rej	both	-		
-large-subset-tests.pl	LS:161	rej	both	B	atpat:B:P:atpat	
+large-subset-tests.pl	LS:161	ok	both	X	atpat:X:E:same	
 large-subset-tests.pl	LS:162	rej	both	S	atassign:S:P:atjoin	
 large-subset-tests.pl	LS:163	rej	both	S	atassign:S:P:atjoin	
 large-subset-tests.pl	LS:164	rej	both	-		
@@ -127,13 +127,13 @@ large-subset-tests.pl	LS:165	rej	both	S	atassign:S:P:atjoin
 large-subset-tests.pl	LS:166	rej	both	-		
 large-subset-tests.pl	LS:167	rej	both	B	bqdq:B:P:bqdq	
 large-subset-tests.pl	LS:168	ok	both	-		
-large-subset-tests.pl	LS:169	rej	both	S	nohome:S:P:tildehome	
-large-subset-tests.pl	LS:170	rej	both	-		
+large-subset-tests.pl	LS:169	ok	both	X	nohome:X:E:info	
+large-subset-tests.pl	LS:170	ok	both	-		
 large-subset-tests.pl	LS:171	rej	both	-		
 large-subset-tests.pl	LS:172	rej	both	B	roassign:B:P:uidset	
 large-subset-tests.pl	LS:173	rej	bash	B	parse:B:P:-n,fnreserved:B:P:fnlocal	
 large-subset-tests.pl	LS:174	rej	both	B	bashbuiltin:B:P:source,fnreserved:B:P:fnlocal	
-large-subset-tests.pl	LS:175	rej	both	-		
+large-subset-tests.pl	LS:175	ok	both	-		
 large-subset-tests.pl	LS:176	rej	both	-		
 large-subset-tests.pl	LS:177	rej	both	X	getopts:X:E:posix	
 large-subset-tests.pl	LS:178	rej	both	-		
@@ -213,7 +213,7 @@ large-subset-tests.pl	LS:251	ok	both	-
 large-subset-tests.pl	LS:252	ok	both	-		
 large-subset-tests.pl	LS:253	rej	none	B	parse:B:P:-n	
 large-subset-tests.pl	LS:254	ok	both	X	testext:X:P:testeqeq	
-large-subset-tests.pl	LS:255	rej	both	-		
+large-subset-tests.pl	LS:255	ok	both	-		
 large-subset-tests.pl	LS:256	rej	both	-		
 large-subset-tests.pl	LS:257	ok	both	-		
 large-subset-tests.pl	LS:258	ok	both	-		
@@ -221,11 +221,11 @@ large-subset-tests.pl	LS:259	ok	both	-
 large-subset-tests.pl	LS:260	ok	both	-		
 large-subset-tests.pl	LS:261	ok	both	-		
 large-subset-tests.pl	LS:262	ok	both	S	listing:S:P:listset	
-large-subset-tests.pl	LS:263	rej	both	-		
-large-subset-tests.pl	LS:264	rej	both	-		
-large-subset-tests.pl	LS:265	rej	both	-		
+large-subset-tests.pl	LS:263	ok	both	-		
+large-subset-tests.pl	LS:264	ok	both	-		
+large-subset-tests.pl	LS:265	ok	both	-		
 large-subset-tests.pl	LS:266	rej	none	B	parse:B:P:-n	
-large-subset-tests.pl	LS:267	rej	both	-		
+large-subset-tests.pl	LS:267	ok	both	-		
 large-subset-tests.pl	LS:268	ok	both	X	jobspec:X:P:job	
 large-subset-tests.pl	LS:269	rej	both	-		
 large-subset-tests.pl	LS:270	ok	both	-		
@@ -253,10 +253,35 @@ large-subset-tests.pl	LS:291	ok	both	-
 large-subset-tests.pl	LS:292	ok	both	-		
 large-subset-tests.pl	LS:293	ok	both	X	cdargs:X:E:error,fdmulti:X:E:same,dotstar:X:E:harm,caret:X:E:platform,assignredir:X:E:effect	
 large-subset-tests.pl	LS:294	rej	both	B	scope:B:P:local,localnoval:S:P:local	
-large-subset-tests.pl	LS:295	rej	both	O	lineno:O:open	
+large-subset-tests.pl	LS:295	ok	both	X	lineno:X:E:info	
 large-subset-tests.pl	LS:296	ok	both	-		
 large-subset-tests.pl	LS:297	rej	both	B	roassign:B:P:uidset	
 large-subset-tests.pl	LS:298	rej	both	-		
+large-subset-tests.pl	LS:299	ok	both	-	killsig:B:M:38	P:fnkill
+large-subset-tests.pl	LS:300	rej	both	-		
+large-subset-tests.pl	LS:301	ok	both	-		
+large-subset-tests.pl	LS:302	ok	both	-		
+large-subset-tests.pl	LS:303	rej	both	-		
+large-subset-tests.pl	LS:304	ok	both	X	atpat:X:E:same	
+large-subset-tests.pl	LS:305	ok	both	X	lineno:X:E:info	
+large-subset-tests.pl	LS:306	rej	both	-		
+large-subset-tests.pl	LS:307	ok	both	X	uidassign:X:E:posix	
+large-subset-tests.pl	LS:308	rej	both	B	uidread:B:P:bashvar	
+large-subset-tests.pl	LS:309	ok	both	X	jobspec:X:P:job	
+large-subset-tests.pl	LS:310	rej	both	X	jobspec:X:P:job	
+large-subset-tests.pl	LS:311	ok	both	-		
+large-subset-tests.pl	LS:312	rej	both	-		
+large-subset-tests.pl	LS:313	ok	both	-		
+large-subset-tests.pl	LS:314	ok	both	-		
+large-subset-tests.pl	LS:315	ok	both	-		
+large-subset-tests.pl	LS:316	ok	both	-		
+large-subset-tests.pl	LS:317	ok	both	-		
+large-subset-tests.pl	LS:318	rej	both	-		
+large-subset-tests.pl	LS:319	ok	both	-		
+large-subset-tests.pl	LS:320	ok	both	X	caret:X:E:platform	
+large-subset-tests.pl	LS:321	ok	both	-		
+large-subset-tests.pl	LS:322	rej	both	B	unsetarr:B:P:unsetarr	
+large-subset-tests.pl	LS:323	rej	both	-		
 shell-subset-tests.pl	OWN:1	ok	both	-		
 shell-subset-tests.pl	OWN:2	ok	both	-		
 shell-subset-tests.pl	OWN:3	ok	both	-		
@@ -473,7 +498,7 @@ shell-subset-tests.pl	OWN:213	ok	both	-
 shell-subset-tests.pl	OWN:214	ok	both	-		
 shell-subset-tests.pl	OWN:215	rej	both	-		
 shell-subset-tests.pl	OWN:216	rej	both	-		
-shell-subset-tests.pl	OWN:217	rej	both	B	roassign:B:P:uidset	
+shell-subset-tests.pl	OWN:217	rej	both	X	uidassign:X:E:posix	
 shell-subset-tests.pl	OWN:218	rej	both	B	bqdq:B:P:bqdq	
 shell-subset-tests.pl	OWN:219	ok	both	-		
 shell-subset-tests.pl	OWN:220	rej	bash	B	parse:B:P:-n,redirdigit:B:P:redirdigit	
@@ -1083,7 +1108,7 @@ shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkSpacefulnessCfg35:1	rej	b
 shell-subset-corpus-tests.pl	PB:README.md:350c5-351	rej	both	-		
 shell-subset-corpus-tests.pl	PB:README.md:376c5-377	rej	both	-		
 shell-subset-corpus-tests.pl	PB:README.md:402c5-403	rej	both	-		
-shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms55:1-2	rej	both	B	atpat:B:P:atpat	
+shell-subset-corpus-tests.pl	SC:Checks/ShellSupport.hs:prop_checkBashisms55:1-2	rej	both	X	atpat:X:E:same	
 shell-subset-corpus-tests.pl	SC:Analytics.hs:prop_checkUnquotedDollarAt10:1	rej	both	-		
 shell-subset-corpus-tests.pl	NB:6087	rej	bash	B	parse:B:P:-n,bashparam:B:P:substr,procsub:B:P:procsub	
 shell-subset-corpus-tests.pl	PB:README.md:197c5	rej	both	-		

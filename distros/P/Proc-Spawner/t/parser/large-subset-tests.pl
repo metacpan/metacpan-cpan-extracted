@@ -9,6 +9,10 @@ sub syn { my ($t, @sh) = @_; my $pid = fork // die;
   waitpid $pid, 0; $? == 0 }
 my ($bad, $n) = (0, 0);
 my %tree = (   # the whole expected tree, where acceptance alone would not show a bug
+  q~LS:319~ => q~[[[{"argv" => ["grep",[["*","^["],"><",["*","]"]],"f"]}]],[[{"argv" => ["ls",[["*","[a"],"]",["*","]"]],[["*","[!"],"x",["*","]*"]],[["*","["],"",["\"\$","v"],["*","x]"]],[["*","["],["\$","v"],["*","]"]],[["*","c["],"^",["*","]"]]]}]]]~,
+  q~LS:314~ => q~[[[{"set" => ["v","X"]}]],[[{"argv" => ["alias",["a=echo ",["\"\$","v"]]]}]],[[{"lineoff" => 1,"rest" => "a"}]]]~,
+  q~LS:299~ => q~[[[{"body" => {"group" => [[[{"argv" => ["command","cd",["",["\"\$","\@"]]]}]]]},"func" => "cd"}]],[[{"argv" => ["cd","/tmp"],"fn" => 1}]],[[{"body" => {"group" => [[[{"argv" => [":"]}]]]},"func" => "read"}]],[[{"argv" => ["read","-z"],"fn" => 1}]],[[{"body" => {"group" => [[[{"argv" => [":"]}]]]},"func" => "jobs"}]],[[{"argv" => ["jobs","-x"],"fn" => 1}]],[[{"body" => {"group" => [[[{"argv" => [":"]}]]]},"func" => "kill"}]],[[{"argv" => ["kill","-SIGHUP",1],"fn" => 1}]]]~,
+  q~LS:305~ => q~[[[{"argv" => ["echo",[["\$","LINENO"]]],"line" => 1}]],[[{"if" => [[[[{"argv" => ["true"],"line" => 2}]]],[[[{"argv" => ["echo",[["\$","LINENO"]],[["\$((","LINENO + 1"]]],"line" => 3}]]]],"line" => 2}]]]~,
   q~LS:33~ => q~[[[{"argv" => ["echo",["",["\"\${","x",":-","a}b"]],["",["\"\${","x",":-","a\$b\\\\e"]],[["\${","x",":-",[["'","a"]]]]]}]]]~,
   q~LS:1~ => q~[[[{"body" => {"group" => [[[{"argv" => ["echo",["",["\"\$","#"],":",["\"\$",1]]]}]]]},"func" => "f"}]],[[{"argv" => ["f","a","b"]}]],[[{"argv" => ["echo",["",["\"\$","#"]]]}]]]~,
   q~LS:4~ => q~[[[{"body" => {"group" => [[[{"argv" => ["echo","a"]}]]],"redir" => [[1,">","/dev/null"]]},"func" => "f"}]],[[{"argv" => ["f"]}]]]~,
@@ -173,9 +177,9 @@ rej -  LS:155  command local x
 ok  -  LS:156  "exec" echo hi; echo after
 rej -  LS:157  x[a; echo hi]
 rej -  LS:158  echo[
-rej -  LS:159  echo ${##}
+ok  -  LS:159  echo ${##}
 rej -  LS:160  echo ${#-}
-rej -  LS:161  echo "${@#?}"
+ok  -  LS:161  echo "${@#?}"
 rej -  LS:162  x=$@
 rej -  LS:163  export z=$@
 rej -  LS:164  case "$@" in a) ;; esac
@@ -183,13 +187,13 @@ rej -  LS:165  echo ${x:=$@}
 rej -  LS:166  cat <<E@N$@@NE
 rej -  LS:167  echo "${x:-`echo \"q\"`}"
 ok  -  LS:168  echo ${x:-a\@Nb} "${x:-c\@Nd}"
-rej -  LS:169  unset HOME
-rej -  LS:170  read HOME
+ok  -  LS:169  unset HOME
+ok  -  LS:170  read HOME
 rej -  LS:171  CDPATH=/ :
 rej -  LS:172  PPID=5 :
 rej -  LS:173  local() { :; }
 rej -  LS:174  source() { :; }
-rej -  LS:175  cd() { :; }
+ok  -  LS:175  cd() { :; }
 rej -  LS:176  unset 1
 rej -  LS:177  getopts ab 1x
 rej -  LS:178  echo $((0 ? 1 : b = 2))
@@ -275,7 +279,7 @@ ok  -  LS:252  find . -inum 5 -exec rm {} \
 rej -  LS:253  echo "a\
 # P5 and R1 of "Shell Corpus Gaps" (2026-11-03): [ and test are the program; < and > between operands need the option
 ok  -  LS:254  [ a == a ]; [ -v x ]; test -a f; [ -N f ]
-rej -  LS:255  [ a \< b ]
+ok  -  LS:255  [ a \< b ]
 rej -  LS:256  test "$x" '>' b -a c
 ok  test_lt_gt  LS:257  [ a \< b ]
 ok  -  LS:258  [ "<" = "<" ]; test ">" != x
@@ -285,11 +289,11 @@ ok  -  LS:259  alias ll="echo L"@Nll x
 ok  -  LS:260  alias ll="echo L"; ll x
 ok  -  LS:261  alias e="echo " x=X@Ne x
 ok  -  LS:262  alias a=b; unalias a; alias | wc -l; alias a
-rej -  LS:263  if true; then alias a=b; fi
-rej -  LS:264  x && alias a=b
-rej -  LS:265  alias a=b &
+ok  -  LS:263  if true; then alias a=b; fi
+ok  -  LS:264  x && alias a=b
+ok  -  LS:265  alias a=b &
 rej -  LS:266  alias x=if@Nx true; then :; fi
-rej -  LS:267  alias $n=v
+ok  -  LS:267  alias $n=v
 ok  -  LS:268  jobs; times; hash ls; hash -r; hash; type ls cd; ulimit -n; ulimit -Hn; ulimit; bg; fg %1
 rej -  LS:269  ulimit -n 10
 ok  -  LS:270  jobs -l
@@ -320,8 +324,40 @@ ok  -  LS:292  if true; then jobs; fi
 # rule E (the user, 2026-11-03): where the shells differ, the plainly logical behaviour (doc/large-subset/large-subset-logical.md)
 ok  -  LS:293  cd a b; echo hi 10>/dev/null; case b in [^a]) echo n;; esac; echo .*; x=$(f) 2>/dev/null
 rej -  LS:294  local x
-rej -  LS:295  echo $LINENO
+ok  -  LS:295  echo $LINENO
 # post4-0.03: more forms both shells run alike
 ok  -  LS:296  echo $PPID; export "$foo" "${bar}"; umask a+r; umask g+w,o=rx; umask =rx; cd - >/dev/null; jobs -p; jobs -lp
 rej -  LS:297  PPID=3
 rej -  LS:298  umask -S a=
+# post-0.04: 3A (the user, 2026-11-03): a function comes before a regular builtin of that name (POSIX order)
+ok  -  LS:299  cd() { command cd "$@"; }; cd /tmp; read() { :; }; read -z; jobs() { :; }; jobs -x; kill() { :; }; kill -SIGHUP 1
+rej -  LS:300  alias() { :; }
+ok  -  LS:301  command cd /tmp; command read x; command umask 022
+# post-0.04: rule E choices (doc/large-subset/large-subset-logical.md): break, continue in a subshell in a loop end it (as dash);
+# ${@#p} on each parameter (G4); $LINENO (G8; not in eval or trap text); UID an ordinary variable where set (G15); jobs %N
+ok  -  LS:302  for v in a; do (cd "$v" || continue; echo x); x=$(break); echo a | { continue; }; done
+rej -  LS:303  (continue)
+ok  -  LS:304  set -- ab; echo ${@#a} "${*%b}" ${*##a} "${@%%b*}"
+ok  -  LS:305  echo $LINENO@Nif true; then@N  echo ${LINENO} $((LINENO + 1))@Nfi
+rej -  LS:306  trap 'echo $LINENO' EXIT
+ok  -  LS:307  UID=5 env; echo $UID
+rej -  LS:308  echo $UID
+ok  -  LS:309  sleep 1 & jobs %1 %% %+ %-; jobs -l %1; jobs -p %%
+rej -  LS:310  jobs %sleep
+# post-0.04 (the user, 2026-11-03: "cannot we do it easily?"): read with names from expansions, checked at run time; lengths of special parameters
+ok  -  LS:311  v=x; read $v; read -r "$v" y; read -p "$p" $v z
+rej -  LS:312  read arr[$i]
+ok  -  LS:313  echo ${##} ${#?} ${#!} ${#$}
+# post2-0.04, P1 (the user, 2026-11-03: "go with better aliases"): after a line with an alias known only when it runs, the rest is parsed then
+ok  -  LS:314  v=X; alias a="echo $v"@Na
+ok  -  LS:315  { alias x=y@Nx@N}@Nx
+ok  -  LS:316  f() { alias z="echo Z"; }; f@Nz
+# post2-0.04, rule F (the user, 2026-11-03: where the program is wrong, we may do better): s1 < s2 and s1 > s2 alone, compared by us
+ok  -  LS:317  [ ! "$x" \> y ]; test a \< b
+rej -  LS:318  [ a \< b -a c ]
+# post4-0.04: bracket expressions with quoted members, expansions or '/' (both shells: quoted characters are members; a '/' makes the '[' literal)
+ok  -  LS:319  grep ^[\>\<] f; ls [a"]"] [!"x"]* ["$v"x] [$v] c['^']
+ok  -  LS:320  find . | grep /path/to/something[^/]*$; echo a[/]*
+ok  -  LS:321  x=a.b; echo ${x%["."]*} "${x#*[.]}"; read -r -p "${1:-Are you sure? [y/N]} " r; echo ${1:-a?}
+rej -  LS:322  unset foo[$i]
+rej -  LS:323  echo [{a]

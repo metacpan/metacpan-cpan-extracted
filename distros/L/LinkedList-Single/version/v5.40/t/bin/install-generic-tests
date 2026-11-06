@@ -30,7 +30,7 @@ find-pm()
 find-perly()
 {
     find \
-    $root_d/* -path "*/t" -prune -o -print -type f -name '*[*~]'   |
+    $root_d/* \( -path "*/t" -o -name Examples -o -name examples \) -prune -o -print -type f -name '*[*~]'   |
     xargs file                                                     |
     grep -E ':\s+Perl script'                                      |
     cut -d ':' -f1
@@ -39,7 +39,7 @@ find-perly()
 find-bash()
 {
     find \
-    $root_d/* -path "*/t" -prune -o -print -type f -name '*[*~]'   |
+    $root_d/* \( -path "*/t" -o -name Examples -o -name examples \) -prune -o -print -type f -name '*[*~]'   |
     xargs file                                                     |
     grep -E ':\s+Bourne-Again'                                     |
     cut -d ':' -f1

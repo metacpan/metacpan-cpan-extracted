@@ -23,7 +23,7 @@ the release actually does, and the two traps that cost real money and real time.
 | Request layer | `lib/Langertha/{Request,HTTP,Input,Output,Spec}/` | transport and the input/output value objects |
 | Provider manifest | `lib/Langertha/Manifest.pm` | the provider capability manifest (ADR 0029) |
 | Tests | `t/` | the layers `0x` … `8x`; the `8x` layer is live and costs money |
-| Decisions | `docs/adr/` | ADRs 0001–0039; the format is skill `langertha-adr` |
+| Decisions | `docs/adr/` | ADRs 0001–0040; the format is skill `langertha-adr` |
 | Vocabulary | `CONTEXT.md` | the resolved wire vocabulary — read it before changing the seam |
 
 Two entries are stubs on purpose: `Langertha::Result` is a reserved-namespace stub (its

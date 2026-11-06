@@ -26,8 +26,8 @@
 
   In addition to the man pages embedded in each module (and available
   after installation), Greg Ward has written a technical report
-  describing btOOL, with the btparse and Text::BibTeX documentation
-  included as appendices.  The whole report is just over 100 pages,
+  describing btOOL (the 0.x versions), with the btparse and
+  Text::BibTeX documentation included as appendices.  The whole report is just over 100 pages,
   around 45 of which make up the Text::BibTeX documentation (the
   btparse documentation is a further 30 pages).  You can find it at
   the btOOL home page:
@@ -38,13 +38,10 @@
   INSTALLATION
 ---------------------------------------------------------------------------
 
-  To install Text::BibTeX you need a recent Perl, an ANSI-compliant C
-  compiler and a bunch of Perl modules.
-
-  The build system changed with version 0.40, and has been tested in
-  different platforms, ranging from Linux, Mac OS X, Solaris and
-  Windows. Unfortunately on this last just the Strawberry Perl
-  distribution was a success.
+  To install Text::BibTeX you need Perl 5.26 or later and a C99
+  compiler.  The C library at its core (in src/, derived from Greg
+  Ward's btparse) is compiled into the Perl module, so nothing else
+  needs to be installed.
 
   To build the module use the usual set of commands for a
   Module::Build distribution:
@@ -53,17 +50,9 @@
     ./Build
     ./Build test
 
-  And then, as super user, install it
+  And then install it
 
     ./Build install
 
-  Note that if your Perl is installed in a non standard path you can
-  end up with libbtparse library in the wrong place. If the tests pass
-  successfully, but after installing you can not issue
-
-    perl -MText::BibTeX
-
-  without an error message, then probably libbtparse is not reachable
-  by the library loader. In this case you can either copy the library
-  to the proper place or add the path to the library in the
-  LD_LIBARY_PATH environment variable.
+  The C library can also be built on its own, with sanitizers, for
+  testing and fuzzing: see fuzz/Makefile.

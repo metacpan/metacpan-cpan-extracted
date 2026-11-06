@@ -1,5 +1,5 @@
 package HTTP::Body::MultiPart;
-$HTTP::Body::MultiPart::VERSION = '1.24';
+$HTTP::Body::MultiPart::VERSION = '1.25';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -18,13 +18,25 @@ HTTP::Body::MultiPart - HTTP Body Multipart Parser
 
 =head1 DESCRIPTION
 
-HTTP Body Multipart Parser.
+HTTP Body Multipart Parser for multipart/form-data bodies.
+
+A part with a non-empty filename in its Content-Disposition is an upload: its
+data is written to a temporary file as it arrives, and the part is stored with
+L<HTTP::Body/upload> once it is complete.  Every other part is stored with
+L<HTTP::Body/param> and L<HTTP::Body/part_data>, except a part with an empty
+filename (a file field left empty), which is dropped.
+
+See L<HTTP::Body/Limits> for the limits on parts and their headers, and
+L<HTTP::Body/CONFIGURING UPLOAD TEMPORARY FILES> for the temporary files.
 
 =head1 METHODS
 
 =over 4
 
 =item init
+
+Takes the boundary from the content type, croaking if it has none, and starts
+the parser in the preamble state.
 
 =cut
 
@@ -43,6 +55,10 @@ sub init {
 }
 
 =item spin
+
+Runs the parse method of the current state (parse_preamble, parse_boundary,
+parse_header or parse_body) until one of them needs more data or the body is
+done.
 
 =cut
 
@@ -64,6 +80,8 @@ sub spin {
 
 =item boundary
 
+The boundary parameter of the content type.
+
 =cut
 
 sub boundary {
@@ -71,6 +89,8 @@ sub boundary {
 }
 
 =item boundary_begin
+
+C<--> followed by the boundary.
 
 =cut
 
@@ -80,6 +100,8 @@ sub boundary_begin {
 
 =item boundary_end
 
+boundary_begin followed by C<-->.
+
 =cut
 
 sub boundary_end {
@@ -88,6 +110,8 @@ sub boundary_end {
 
 =item crlf
 
+The line ending of a multipart body, C<"\x0D\x0A">.
+
 =cut
 
 sub crlf () {
@@ -95,6 +119,8 @@ sub crlf () {
 }
 
 =item delimiter_begin
+
+crlf followed by boundary_begin: the delimiter that ends the data of a part.
 
 =cut
 
@@ -105,6 +131,8 @@ sub delimiter_begin {
 
 =item delimiter_end
 
+crlf followed by boundary_end: the close delimiter that ends the body.
+
 =cut
 
 sub delimiter_end {
@@ -113,6 +141,10 @@ sub delimiter_end {
 }
 
 =item parse_preamble
+
+Drops the preamble before the first boundary and moves on to the boundary
+state.  Until the boundary is found, only as many bytes are kept as could be
+its start.
 
 =cut
 
@@ -137,6 +169,11 @@ sub parse_preamble {
 }
 
 =item parse_boundary
+
+Reads a delimiter line.  A delimiter starts the next part and the header
+state; a close delimiter ends the body, and whatever follows it (padding, an
+epilogue) is ignored.  Croaks on a line that is neither, and when the body has
+more than C<$HTTP::Body::MultiPart::max_parts> parts.
 
 =cut
 
@@ -182,6 +219,13 @@ sub parse_boundary {
 
 =item parse_header
 
+Reads a part's header block, up to the blank line, into C<< $part->{headers} >>,
+keyed by field name with the first letter of each word upper-cased; a field
+that occurs more than once gets an array reference.  A continuation line is
+joined to the line before it, and a line that is no header field is dropped.
+Croaks when the block exceeds C<$HTTP::Body::MultiPart::max_header_size> bytes
+or C<$HTTP::Body::MultiPart::max_header_lines> lines.
+
 =cut
 
 our $max_header_size  = 32 * 1024;
@@ -214,7 +258,8 @@ sub parse_header {
     my @headers;
     for ( split /$crlf/, $header ) {
         if (s/^[ \t]+//) {
-            $headers[-1] .= $_;
+            # a continuation line; with no line to continue it is dropped
+            $headers[-1] .= $_ if @headers;
         }
         else {
             push @headers, $_;
@@ -225,7 +270,9 @@ sub parse_header {
 
     for my $header (@headers) {
 
-        $header =~ s/^($token):[\t ]*//;
+        # A line that is no header field is dropped: without a match $1 would
+        # still hold whatever the last successful match captured.
+        next unless $header =~ s/^($token):[\t ]*//;
 
         ( my $field = $1 ) =~ s/\b(\w)/uc($1)/eg;
 
@@ -246,6 +293,11 @@ sub parse_header {
 }
 
 =item parse_body
+
+Passes a part's data on to handler as it arrives, holding back only as many
+bytes as could be the start of the next delimiter.  At the delimiter it sets
+C<< $part->{done} >>, calls handler a last time and moves on to the boundary
+state.
 
 =cut
 
@@ -285,9 +337,20 @@ sub parse_body {
 
 =item handler
 
+Called by parse_body with the part each time data arrives.  On the first call
+it takes the part's name and filename from its Content-Disposition, unless a
+subclass has named the part already, and strips any NUL from the filename.  A
+part with a non-empty filename gets a temporary file, and its data is written
+there as it arrives.  Once the part is done it is stored as described under
+L</DESCRIPTION>.  Croaks when the temporary file can not be written.
+
 =cut
 
-our $basename_regexp = qr/[^.]+(\.[^\\\/]+)$/;
+# The default is also kept here: while $basename_regexp still holds it, the
+# suffix is found by _default_suffix, a string search with the same result.
+my $default_basename_regexp = qr/[^.]+(\.[^\\\/]+)$/;
+
+our $basename_regexp = $default_basename_regexp;
 our $file_temp_suffix = '.upload';
 our $file_temp_template;
 our %file_temp_parameters;
@@ -302,28 +365,46 @@ sub handler {
         my ($filename)  = $disposition =~ / filename="?([^\"]*)"?/;
         # Need to match empty filenames above, so this part is flagged as an upload type
 
+        $part->{name}     = $name;
+        $part->{filename} = $filename if defined $filename;
+    }
+
+    # A file part gets its temporary file on the first call, also when a
+    # subclass has named the part and set its filename itself.
+    if ( defined $part->{filename} && !exists $part->{tempname} ) {
+
         # A NUL in the filename truncates the path for anything downstream that
         # hands it to the C layer, so strip it before the name is used or stored.
-        $filename =~ s/\0//g if defined $filename;
+        $part->{filename} =~ s/\0//g;
 
-        $part->{name} = $name;
+        if ( $part->{filename} ne "" ) {
+            my $suffix = $file_temp_suffix;
 
-        if ( defined $filename ) {
-            $part->{filename} = $filename;
+            unless ($suffix) {
+                my $basename = (File::Spec->splitpath($part->{filename}))[2];
 
-            if ( $filename ne "" ) {
-                my $basename = (File::Spec->splitpath($filename))[2];
-                my $suffix = $basename =~ $basename_regexp ? $1 : q{};
+                # A suffix can be no longer than a file name, so only the end
+                # of a long basename is looked at.  On the whole of a hostile
+                # one a regexp like the default backtracks in time quadratic
+                # in its length: seconds per part, once for every part.
+                $basename = substr( $basename, -255 ) if length($basename) > 255;
 
-                my $fh = File::Temp->new(
-                    UNLINK => 0, DIR => $self->tmpdir, SUFFIX => ($file_temp_suffix||$suffix),
-                    ( $file_temp_template ? ( TEMPLATE => $file_temp_template ) : () ),
-                    %file_temp_parameters,
-                );
-
-                $part->{fh}       = $fh;
-                $part->{tempname} = $fh->filename;
+                if ( ref $basename_regexp && $basename_regexp == $default_basename_regexp ) {
+                    $suffix = _default_suffix($basename);
+                }
+                else {
+                    $suffix = $basename =~ $basename_regexp ? $1 : q{};
+                }
             }
+
+            my $fh = File::Temp->new(
+                UNLINK => 0, DIR => $self->tmpdir, SUFFIX => $suffix,
+                ( $file_temp_template ? ( TEMPLATE => $file_temp_template ) : () ),
+                %file_temp_parameters,
+            );
+
+            $part->{fh}       = $fh;
+            $part->{tempname} = $fh->filename;
         }
     }
 
@@ -354,6 +435,27 @@ sub handler {
             $self->part_data( $part->{name}, $part )
         }
     }
+}
+
+# The suffix the default $basename_regexp captures, found without a regexp,
+# in time linear in the basename's length.  It starts at the first dot after
+# the last slash or backslash that follows a byte other than a dot, and runs
+# to the end; a dot that is the last byte gives no suffix.
+sub _default_suffix {
+    my ($basename) = @_;
+
+    my $last = length($basename) - 1;
+    my $dot  = rindex( $basename, '/' );
+    my $back = rindex( $basename, '\\' );
+    $dot = $back if $back > $dot;
+
+    while ( ( $dot = index( $basename, '.', $dot + 1 ) ) >= 0 ) {
+        return q{} if $dot == $last;
+        return substr( $basename, $dot )
+            if $dot > 0 && substr( $basename, $dot - 1, 1 ) ne '.';
+    }
+
+    return q{};
 }
 
 =back

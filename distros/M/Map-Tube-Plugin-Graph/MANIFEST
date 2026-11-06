@@ -16,6 +16,7 @@ t/06-as_png.t
 t/07-as_graph.t
 t/08-drivers.t
 t/09-unusual-station-name.t
+t/10-path-check.t
 t/sample.xml
 t/unusual-station-name.xml
 t/lib/Sample.pm
@@ -23,5 +24,6 @@ xt/changes.t
 xt/manifest.t
 xt/pod.t
 xt/version.t
+xt/provides.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limitations &mdash; App::FileSync</title>
+<meta name="description" content="The design weaknesses of App::FileSync: one master, whole-manifest runs, clock-based conflict resolution, no fsync, bounded deltas and unsynced metadata.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="limitations.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Limitations &mdash; App::FileSync">
+<meta property="og:description" content="The design weaknesses of App::FileSync: one master, whole-manifest runs, clock-based conflict resolution, no fsync, bounded deltas and unsynced metadata.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html" aria-current="page">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Limitations</h1>
+
+	<p class="lede">These are the design weaknesses to weigh before relying on the
+	tool. None of them loses data silently; most cost time or space.</p>
+
+	<h2>Topology and scale</h2>
+
+	<ul>
+		<li><strong>One master.</strong> The topology is a star around one server.
+		The replica is a pull-only mirror, not a failover: if the server is lost,
+		clients stop until an administrator points them at a rebuilt master.</li>
+		<li><strong>Every run exchanges the whole manifest.</strong> The client sends
+		one entry per file and the server answers with the whole plan as a single
+		JSON line, so a run costs O(files) in time, memory and bandwidth even when
+		nothing changed. A tree of a million files means a plan message of the order
+		of a hundred megabytes. A change journal or Merkle summary would remove
+		that, at the cost of the "everything is inspectable with cat" property.</li>
+		<li><strong>No line-length cap on the wire.</strong> Because of the previous
+		point, a control message cannot be bounded without breaking large trees.
+		The peer is authenticated by ssh and pinned by the forced command, so this is
+		a resource risk from a misbehaving client, not from the network.</li>
+		<li><strong>Lock-step protocol.</strong> One request is in flight at a time
+		and each 256&nbsp;KiB chunk waits for its acknowledgement, so throughput is
+		bound by the round-trip time on a high-latency link.</li>
+		<li><strong>Large trees cost memory.</strong> The plan holds every path in
+		memory three times over &mdash; the union of the three manifests &mdash; and
+		the server holds the whole client manifest and the plan. That is the price of
+		a stateless server.</li>
+		<li><strong>Every run stats every file.</strong> There is no change
+		notification. On a very large tree the walk, not the transfer, dominates a
+		quiet run.</li>
+	</ul>
+
+	<h2>Consistency</h2>
+
+	<ul>
+		<li><strong>Clock-dependent tie-breaks.</strong> When both sides changed a
+		file, the newer mtime wins (the master wins ties within two seconds). A
+		client with a wrong clock picks the wrong winner; the loser is still kept as
+		a conflict copy.</li>
+		<li><strong>The cache trusts size and mtime.</strong> A tool that rewrites a
+		file and restores its mtime &mdash; some backup restorers do &mdash; goes
+		unnoticed until a <code>verify --deep</code>.</li>
+		<li><strong>One scan per session.</strong> The plan is computed once, from a
+		scan taken while the lock is held. Anything other than filesync writing into
+		the master during a session is not seen until the next session, and a file
+		it replaces may be overwritten.</li>
+		<li><strong>Pulls are verified against the plan.</strong> If the master
+		changes during the session (only possible if something other than filesync
+		writes to it), the pull fails with a hash mismatch and the next sync
+		retries.</li>
+		<li><strong>Uploads are verified only at the end.</strong> A client that
+		sends a wrong file of the announced size wastes the transfer before it is
+		refused.</li>
+	</ul>
+
+	<h2>Durability</h2>
+
+	<ul>
+		<li><strong>No fsync.</strong> Renames are atomic between processes but not
+		durable across a power cut; the new name can point at a file whose data
+		never reached the disk. Adding <code>IO::Handle::sync</code> before each
+		rename would make every upload pay a disk flush; the trade-off has not been
+		measured.</li>
+		<li><strong>No extended metadata.</strong> <code>File::Copy::copy</code> does
+		not copy extended attributes, ACLs or alternate data streams.</li>
+		<li><strong>Snapshots share the disk.</strong> They live inside the replica
+		root, on the same filesystem: they guard against bad syncs, not against
+		losing that disk.</li>
+	</ul>
+
+	<h2>Deltas</h2>
+
+	<ul>
+		<li><strong>Pure Perl.</strong> The rolling loop runs at a few MB/s, which is
+		why only 8&nbsp;MiB after the matched prefix is scanned. An edit near the end
+		of a large file whose earlier blocks also shifted is sent mostly
+		literally.</li>
+		<li><strong>Block-aligned moves only.</strong> A block that moved by a whole
+		number of blocks is found; a block that occurs twice in the receiver's file
+		is matched to its first occurrence.</li>
+		<li><strong>32-bit offsets.</strong> A delta cannot refer beyond 4&nbsp;GiB
+		into the receiver's file; larger files fall back to whole-file transfer of
+		the remainder as literals.</li>
+	</ul>
+
+	<h2>What is not synced</h2>
+
+	<ul>
+		<li>Symlinks, devices, sockets, extended attributes, ACLs and ownership.
+		Permission bits are carried only between POSIX systems.</li>
+		<li><strong>Unicode normalisation is not reconciled</strong>, so the same
+		name in NFC (Linux) and NFD (older macOS) is two different files. A
+		case-insensitive client cannot hold two master paths that differ only in
+		case.</li>
+		<li><strong>A rename is a deletion plus a creation</strong>, so a renamed
+		large file is transferred again rather than moved.</li>
+		<li><strong>Ignore matching is literal and linear.</strong> Character
+		classes (<code>[abc]</code>) and backslash escapes are taken literally; a
+		trailing <code>/</code> is dropped, so <code>build/</code> matches
+		<code>build</code> at any depth, and as the matcher has no type information
+		it matches a file of that name too. Combining patterns into one alternation
+		would be faster but would lose "later patterns win".</li>
+	</ul>
+
+	<h2>Recovery and administration</h2>
+
+	<ul>
+		<li><strong>Trash is per repo and per client.</strong> Local trash written by
+		releases before 0.001.1 sits in one shared directory. It is still searched
+		by <code>restore</code> and pruned with the default 30 days, but a
+		<code>restore</code> can then offer another repo's file of the same relative
+		path.</li>
+		<li><strong>Same-day trash collisions are numeric.</strong> A real file whose
+		name already ends in <code>.N</code> (<code>backup.1</code>) deleted the same
+		day as <code>backup</code> is listed as a version of <code>backup</code>
+		too. Pruning works in whole UTC days, so retention is accurate to a day.</li>
+		<li><strong>Trash cannot cross filesystems by rename.</strong> Files are
+		copied and removed; directories must rename.</li>
+		<li><strong>Admin methods mostly take no lock.</strong> Only
+		<code>reindex</code> does; <code>restore</code> into the master rebuilds the
+		index by walking the tree and does not take the repo lock, so a session
+		running at the same moment can save an index that omits the restored file
+		until its next sync.</li>
+		<li><strong>The server journal is read whole.</strong> <code>filesync-admin
+		log</code> loads every monthly journal into memory before filtering and
+		applying the limit. A repo with years of history pays for all of it on every
+		call.</li>
+		<li><strong>A shallow verify trusts size and mtime</strong>, so it cannot see
+		a change that kept both; use <code>--deep</code> or <code>--sample</code>.
+		The report says what differs, not which side is right.</li>
+		<li><strong>Snapshot listing is slow.</strong> <code>snapshot list</code>
+		walks every snapshot to count it.</li>
+	</ul>
+
+	<h2>Costs and implementation notes</h2>
+
+	<ul>
+		<li><strong>Encapsulation has a price.</strong> Private methods use
+		Sub::Private in <code>enforce</code> mode, about 1.4 microseconds per call
+		(measured on 5.40). Helpers that run per file or per JSON value &mdash; the
+		merge comparisons, the JSON byte downgrade, the rolling checksum &mdash; are
+		therefore lexical code references: private by scope, with no wrapper.</li>
+		<li><strong>Validation has a price.</strong> Params::Validate::Strict costs
+		about 11 microseconds per call, so it guards the public entry points that run
+		a few times per command. Functions that run per path or per protocol frame
+		check their arguments by hand.</li>
+		<li><strong>English only.</strong> The catalogue mechanism supports other
+		languages, plural forms and gender, but only the English catalogue ships.
+		The plural rules cover English, German, French, Chinese, Japanese and Korean;
+		other languages use the English rule until one is added. Operating-system
+		reasons (<code>$!</code>) come from the C library and follow the process
+		locale, not the catalogue language.</li>
+		<li><strong>Option parsing is Getopt::Long's.</strong> Its diagnostics for an
+		unknown option are printed in English before the catalogued usage line.
+		<code>--json</code> output is not localised, because field names and values
+		are data.</li>
+		<li><strong><code>filesync-admin</code> reads <code>--root</code> only before
+		the command name.</strong></li>
+		<li><strong>Two configuration mechanisms.</strong> The client's repo list is
+		JSON written by <code>filesync init</code> and must round-trip exactly;
+		process settings go through Object::Configure. Two mechanisms is one too
+		many, but the layered merge does not promise an exact round trip.</li>
+	</ul>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

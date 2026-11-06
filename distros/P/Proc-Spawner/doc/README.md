@@ -16,7 +16,8 @@ The newest describe the current state; older ones may use the former module name
 | `parsers/` | the base parser `Proc::ShellSubset` (and `::Small`): its grammar, the provenance of the corpus tests and the scripts that made them (`parsers/tools/`), the first corpus statistics (old module names) |
 | `test-pools.md` | how to rebuild every borrowed test pool and measurement from the pinned sources |
 | (removed) | the documents of only historical interest (`pspawn-run-shortcomings.md`, `pspawn-upstream-reports.md`, `parsers/shell-subset-corpus-stats.md`, and in `large-subset/` the ceiling, investigation, marks and upstream reports) are in Proc-Spawner 0.03 on CPAN |
-| `checklists/*.html` | the decision pages of the executor ("Child Exit Wake-up", "Run Graph API", "Spawn Graph Notation") and of the parser session ("Shell Large Subset", "Shell Dialect Choices", "Shell Corpus Gaps"; sources in `large-subset/pages/`): their items and Claude's answers. Self-contained HTML, but the marks and notes lived in the published page's database, so here they show empty. |
+
+| (removed) | the decision pages that are no longer relevant: "Child Exit Wake-up", "Run Graph API" and "Spawn Graph Notation" (the executor; their outcomes are in `pspawn-spawner.md`, `pspawn-design.md`, `pspawn-graph.md` and `pspawn-extensions.md`), "Shell Large Subset" (its outcome is `large-subset/large-subset-spec.md`) and "Shell Dialect Choices" (it had no marks; every item is decided in `large-subset/large-subset-logical.md`). They and their sources are in Proc-Spawner 0.03 on CPAN, under `doc/checklists/` and `doc/large-subset/pages/`. The last one, "Shell Corpus Gaps", left after 0.04, when its last open question (Q2) was decided; it and its sources are in 0.04 (its decisions: `large-subset/large-subset-state.md` and `large-subset-logical.md`). |
 
 ## Version labels of the figures
 
@@ -33,6 +34,12 @@ Every measured figure in these documents (corpus acceptance, the yardsticks, bat
 | post2-0.03 | post-0.03 plus `pwd` as `/bin/pwd -L` (known issue X23); the parsers are those of post-0.03 |
 | post3-0.03 | post2-0.03 plus `jobs` rejected in a pipeline, `$( )` or a compound command, and two more detector features |
 | post4-0.03 | post3-0.03 plus rule E (`large-subset/large-subset-logical.md`; `jobs` there lists the jobs again, as bash), more forms both shells run alike, X19 fixed; measured 2026-11-03 (`large-subset/large-subset-state.md`, section 3) |
-| 0.04 | the release of 2026-11-03: post4-0.03 with the version number 0.04 and the documents of only historical interest removed; the figures of post4-0.03 checked again on it (the same per-sample results) |
+| 0.04 | the release of 2026-11-03: post4-0.03 with the version number 0.04 and the documents and decision pages of only historical interest removed; the figures of post4-0.03 checked again on it (the same per-sample results) |
+| post-0.04 | 0.04 plus 3A (functions before regular builtins), background jobs going on between run() calls (K3, choice B), the rule-E choices G4, G8, G15, G16 and `break`/`continue` in a subshell, `jobs %N`, X25 fixed; measured 2026-11-03 (`large-subset/large-subset-state.md`, section 3) |
+| post2-0.04 | post-0.04 plus `read` with names from expansions, `${##}` and the like, 14 corpus samples marked as noise by hand, the detector rows N1–N3 as class X; measured 2026-11-03 (`large-subset/large-subset-state.md`, section 3) |
+| post3-0.04 | post2-0.04 plus aliases known only when they run (P1: the rest of the text is parsed when it runs) and rule F (`[ s1 < s2 ]` compared by us); measured 2026-11-03 (`large-subset/large-subset-state.md`, section 3) |
+| post4-0.04 | post3-0.04 plus bracket expressions with quotes, expansions or `/`, `* ? [` in a `${x:-word}`, `unset NAME[…]` rejected (X26); measured 2026-11-05 (`large-subset/large-subset-state.md`, section 3) |
+| 0.05 | the release of 2026-11-05: post4-0.04 with the version number 0.05; the figures of post4-0.04 hold for it (the measured files differ only in `$VERSION`) |
+| 0.06 | the release of 2026-11-05 (later): 0.05 plus the fixes for systems without `/proc` (RT #182479, known issue X28) and the measurement of the atomic calls extended; the figures of post4-0.04 hold for it |
 
 Measured again on 2026-11-03: the corpus figures of 0.01 (`large-subset/large-subset-ceiling.md` (in Proc-Spawner 0.03), section 3) and every figure of 0.03 (in `doc/large-subset/large-subset-state.md` of the Proc-Spawner-0.03 distribution). Every figure was measured on one of the states in this table; pre-0.01 covers many states, so its figures also carry their dates.

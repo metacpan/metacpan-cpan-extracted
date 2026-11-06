@@ -2,14 +2,12 @@
 use 5.014;
 use strict;
 use warnings;
-use File::Spec;
+use Path::Tiny;
 use Test::Lib;
 use Test::More tests => 3;
 use Sample;
 
-my @localdir = File::Spec->splitdir($0);
-pop(@localdir);
-my $dataname = File::Spec->catfile( @localdir, 'unusual-station-name.xml' );
+my $dataname = path( path($0)->parent, 'unusual-station-name.xml' );
 my $tube = Sample->new( xml => $dataname );
 
 my ($dot, $fname);

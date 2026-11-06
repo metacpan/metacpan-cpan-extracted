@@ -1,7 +1,7 @@
 package Mail::DKIM::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: verifies a DKIM-signed message
 
 # Copyright 2005-2009 Messiah College. All rights reserved.
@@ -126,15 +126,11 @@ sub add_signature {
         Debug_Canonicalization => $self->{Debug_Canonicalization},
     );
 
-    # push through the headers parsed prior to the signature header
-    if ( $algorithm->wants_pre_signature_headers ) {
-
-        # Note: this will include the signature header that led to this
-        # "algorithm"...
-        foreach my $head ( @{ $self->{headers} } ) {
-            $algorithm->add_header($head);
-        }
-    }
+    # an algorithm that wants the headers prior to the signature header
+    # canonicalizes the whole header from finish_header(), so only the
+    # others need each header field as it is parsed
+    push @{ $self->{header_algorithms} }, $algorithm
+      unless $algorithm->wants_pre_signature_headers;
 
     # save the algorithm
     $self->{algorithms} ||= [];
@@ -308,8 +304,13 @@ sub finish_header {
         return;
     }
 
+    # share the header indexes between the signatures
+    my $index = {};
     foreach my $algorithm ( @{ $self->{algorithms} } ) {
-        $algorithm->finish_header( Headers => $self->{headers} );
+        $algorithm->finish_header(
+            Headers     => $self->{headers},
+            HeaderIndex => $index
+        );
     }
 
     # stop processing signatures that are already known to be invalid
@@ -505,7 +506,7 @@ Mail::DKIM::Verifier - verifies a DKIM-signed message
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 

@@ -594,9 +594,7 @@ the hash, for example C<< $req->{tool} >> and C<< $req->{server} >>.
 
 =item $server_options = mcp_getoptions ({ %settings }, @getopt_options)
 
-Parse standard server options C<--name>, C<--bind>, repeatable
-C<--token>, C<--stdio>, C<--custom-instructions>, repeatable
-C<--auto-allow> and C<--auto-deny>, C<--quiet>, C<--print-url>, C<--tool-help> and C<--help> alongside any
+Parse the switches documented in L</COMMON COMMAND-LINE OPTIONS> alongside
 application-specific L<Getopt::Long> option specifications:
 
    my $verbose;
@@ -645,90 +643,8 @@ Preformatted examples.
 
 =back
 
-Common command-line options parsed by C<mcp_getoptions>:
-
-=over
-
-=item --name NAME
-
-Select local instance (default C<default>). NAME starts with letter or
-underscore, followed by letters, digits, underscores or hyphens. Selects
-C<[instance NAME]> configuration, derived HTTP port and credentials; does
-not change advertised MCP implementation name. Example: C<--name project>.
-
-=item --bind ADDRESS[:PORT]
-
-Override HTTP listen address/port. Default: C<127.0.0.1> with
-stable instance-derived port (16384..32767). C<:31740> means loopback port
-31740; C<127.0.0.1:31740> chooses both. Port C<0> requests an ephemeral port
-and cannot be used with C<--print-url>. Ignored for stdio-only startup.
-
-=item --token TOKEN
-
-Accept TOKEN for HTTP authentication; repeat for multiple accepted tokens.
-Explicit tokens replace configured or secret-derived defaults. Tokens work
-in authenticated URL paths and C<Authorization: Bearer TOKEN> headers.
-Example: C<--token first --token second>.
-
-=item --stdio
-
-Serve MCP JSONL over stdin/stdout. For ordinary C<mcp_start>, replaces
-default HTTP listener; programs with additional listeners may keep them.
-Cannot combine explicitly with C<--connect>.
-
-=item --connect URL
-
-Connect server to upstream multibroker using reverse connection URL,
-e.g. C<http://host:port/TOKEN/alias>. Replaces default MCP listener and
-overrides implicit stdio selection from environment. Cannot combine with
-explicit C<--stdio>.
-
-=item --custom-instructions TEXT
-
-Override configured instance-purpose instructions describing when clients
-should use server. Example: C<--custom-instructions 'Use for build logs'>.
-
-=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
-
-Add process-local permission allow rule; repeatable. TOOL identifies
-permission-checked tool; ACTION and CAPABILITY narrow rule. Omitted fields
-and C<*> match anything. Example: C<--auto-allow '*,read,workdir-read'>.
-Rules run in command-line order before saved rules; they never authorize
-tools that bypass permission checks. See
-L<AnyEvent::MCP::Server::Permissions/auto_rules>.
-
-=item --auto-deny TOOL[,ACTION[,CAPABILITY]]
-
-Add process-local deny rule with same pattern syntax as C<--auto-allow>.
-Repeatable; evaluated in command-line order before saved rules.
-Example: C<--auto-deny '*,exec'>. Rules affect permission-checked tools,
-not calls with no permission check.
-
-=item --quiet
-
-Suppress routine tool activity and tool-failure logging. Does not
-suppress warnings or normal diagnostics; C<PERL_ANYEVENT_LOG> still controls
-diagnostic levels and destinations.
-
-=item --print-url
-
-Print first accepted token in authenticated HTTP URL, then exit without
-starting listener. Uses same name, bind, token and endpoint configuration
-as startup. Derived tokens require persistent master secret; port C<0>
-cannot be predicted. Example: C<--name project --print-url>.
-
-=item --tool-help
-
-Print registered tool names, descriptions, argument types, required fields
-and defaults; exit without starting MCP listener. Registration may depend on
-available utilities and application setup. Invoke after registering tools.
-
-=item -h, --help
-
-Print common and application-specific command-line help; exit without
-starting server. Invalid options instead report usage.
-
-=back
+See L</COMMON COMMAND-LINE OPTIONS> for the full reference to shared
+server switches. Application-specific Getopt::Long options are parsed alongside them.
 
 These switches also appear in C<--help>; application options are passed
 through to L<Getopt::Long>. Other leading hash settings (e.g. C<path>,
@@ -780,8 +696,9 @@ option prints the first accepted token in its URL.
 
 C<name> selects the C<[instance NAME]> configuration section and credential.
 It defaults to C<default>.
-Named settings C<bind>, C<path>, C<url_host>, C<url_scheme> and C<tokens>
-are loaded from the global configuration. Explicit C<tokens> (an ordered,
+Named settings C<bind>, C<path>, C<url_host>, C<url_scheme>, C<tokens>,
+C<tls_cert> and C<tls_key> are loaded from the global configuration.
+Explicit C<tokens> (an ordered,
 nonempty array reference of URL-safe strings) replaces the configured list
 and the derived default. Every token works in the URL and bearer header.
 An explicit C<bind> overrides the configured bind address. Other arguments
@@ -797,9 +714,13 @@ options and URL discovery before starting the event loop.
 =item mcp_connect %config
 
 Run a reverse-connecting JSONL server using C<connect =E<gt>
-"http://host:port/token/alias">. It sends the authenticated extension hello
-then serves ordinary MCP over the socket. Retry every second for up to sixty
-attempts after a disconnect; calls are cancelled rather than replayed.
+"http[s]://host:port/token/alias">. HTTPS verifies the server certificate
+and hostname. It sends the authenticated extension hello only after the
+transport is established, then serves MCP over the socket. Refused TCP
+connections retry every second for at most sixty attempts, and unexpected
+established disconnects start a new retry period. Other TCP setup and TLS
+handshake errors are reported and stop the server.
+Calls are cancelled rather than replayed.
 This connection has no spawned-child lifecycle authority.
 
 =item mcp_stdio %config
@@ -835,20 +756,153 @@ requests. The signal watchers belong to the blocking call.
 
 =back
 
+=head1 COMMON COMMAND-LINE OPTIONS
+
+C<mcp_getoptions> parses these options for executables using
+L<AnyEvent::MCP::Server::Simple>. The executable's own OPTIONS section
+documents any additional switches or differences in shared-option behavior.
+
+=over
+
+=item --name NAME
+
+Select the instance (default C<default>). NAME starts with a letter or
+underscore, followed by letters, digits, underscores or hyphens.
+Selects C<[instance NAME]> configuration, derived HTTP port and credentials;
+does not change the advertised MCP implementation name.
+Example: C<--name project>.
+
+=item --bind ADDRESS[:PORT]
+
+Override HTTP listening address and port. Defaults to C<127.0.0.1> and a
+stable instance-derived port in 16384..32767. C<:31740> uses the loopback
+address and port 31740; C<127.0.0.1:31740> specifies both.
+Port zero requests an ephemeral port and is incompatible with
+C<--print-url>. Ignored for stdio-only startup.
+
+=item --tls-cert FILE
+
+Enable opportunistic HTTPS using a PEM certificate chain. Without
+C<--tls-key>, FILE must also contain the private key. The same listener
+continues to accept plain HTTP.
+
+=item --tls-key FILE
+
+Private-key PEM file for C<--tls-cert>. If supplied alone, FILE must
+contain both certificate chain and private key. Requires C<Net::SSLeay>.
+
+=item --token TOKEN
+
+Accept TOKEN for HTTP authentication. Repeat to accept multiple tokens.
+Explicit tokens replace configured or master-secret-derived defaults.
+Tokens work both as credential-bearing URL components and with the
+C<Authorization: Bearer TOKEN> header.
+Example: C<--token first --token second>.
+
+=item --stdio
+
+Serve MCP JSONL on stdin/stdout rather than the default HTTP listener.
+Applications with auxiliary listeners can keep those active. Cannot
+combine explicitly with C<--connect>.
+
+=item --connect URL
+
+Reverse-connect to an upstream multibroker. For example:
+C<http://host:port/TOKEN/alias> or C<https://host:port/TOKEN/alias>.
+HTTPS requires successful certificate and hostname verification; it
+never falls back to plaintext. Replaces the default MCP listener and
+overrides implicit stdio selection. Cannot combine with explicit
+C<--stdio>.
+
+=item --custom-instructions TEXT
+
+Override configured instance-purpose guidance describing when MCP
+clients should use the server.
+Example: C<--custom-instructions 'Use for build logs'>.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+Add a process-local permission allow rule, repeatable. TOOL identifies
+the permission-checked tool; ACTION and CAPABILITY narrow the match.
+Missing fields and C<*> match anything.
+Example: C<--auto-allow '*,read,workdir-read'>.
+Rules run in command-line order before saved rules; they cannot grant
+permissions to tools that do not check permissions.
+See L<AnyEvent::MCP::Server::Permissions/auto_rules>.
+
+=item --auto-deny TOOL[,ACTION[,CAPABILITY]]
+
+Add a repeatable process-local deny rule with the same matching syntax
+and evaluation order as C<--auto-allow>.
+Example: C<--auto-deny '*,exec'>.
+
+=item --quiet
+
+Suppress routine tool activity and tool-failure logging. Warnings and
+ordinary diagnostics remain; C<PERL_ANYEVENT_LOG> determines diagnostic
+levels and destinations.
+
+=item --print-url[=USER]
+
+Print credential-bearing URLs and exit without starting a listener.
+With managed users, prints each effective enabled user's URL, or only
+the exact username USER. Comments identify scope-qualified principals
+and the selected auxiliary connection user. With configured TLS, HTTPS
+is printed before HTTP. Explicit tokens retain a single-token output
+and cannot be combined with a user selector. Requires a predictable,
+nonzero port and a persistent master secret for derived credentials.
+Example: C<--name project --print-url=claude>.
+
+=item --print-urls
+
+Alias for C<--print-url>.
+
+=item --tool-help
+
+Print currently registered tool names, descriptions, argument types,
+required fields and defaults; exit without starting the MCP listener.
+Registered tools can depend on installed utilities and application setup.
+
+=item --help
+
+Print shared and application-specific command-line help; exit without
+starting a server. Invalid options instead report usage.
+
+=back
+
 =cut
 
 package AnyEvent::MCP::Server::Simple;
 
 use common::sense;
+
+use Exporter ();
+use JSON::XS ();
+use Scalar::Util qw(refaddr);
+
 use AnyEvent ();
+use AnyEvent::Log ();
 use AnyEvent::MCP ();
 use AnyEvent::MCP::Server::Toolset ();
-use Exporter ();
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(mcp_config mcp_tool mcp_getoptions mcp_tool_help mcp_log mcp_log_request mcp_start mcp_stdio mcp_http mcp_connect);
 
-my %config = (auto_instructions => 1, on_request => \&mcp_log_request);
+my %config = (
+   auto_instructions => 1,
+   on_request => \&mcp_log_request,
+   on_connection_error => sub {
+      my ($server, $handle, $error) = @_;
+      my $info = $handle->{mcp_peer}{client_info};
+      my $name = ref $info eq "HASH" ? $info->{name} : undef;
+      my @details = (
+         "id=" . sprintf ("%x", refaddr $handle),
+         defined $handle->{mcp_remote} ? "remote=$handle->{mcp_remote}" : (),
+         defined $name && !ref $name ? "client=" . JSON::XS::encode_json (substr $name, 0, 80) : (),
+      );
+      AE::log warn => "MCP connection " . join (" ", @details) . ": $error";
+   },
+);
 my $toolset = AnyEvent::MCP::Server::Toolset->new;
 my $quiet;
 
@@ -858,7 +912,6 @@ sub _run;
 # independently of the diagnostic verbosity filter.
 sub mcp_log {
    return if $quiet;
-   require AnyEvent::Log;
    $AnyEvent::Log::LOG->log (info => @_);
 }
 
@@ -933,7 +986,6 @@ sub _mcp_log_init {
    my ($name, $silent) = @_;
 
    $quiet = $silent;
-   require AnyEvent::Log;
    my $identity = AnyEvent::MCP::Config::program_name () . "/$name" . "[$$]";
 
    no warnings 'redefine';
@@ -1039,16 +1091,18 @@ sub _mcp_help {
    my @common = (
       ["--name NAME", "Select named configuration (instance defaults to 'default')"],
       ["--bind ADDRESS[:PORT]", "Override the HTTP listen address or port"],
+      ["--tls-cert FILE", "PEM certificate (and optionally key) for HTTPS"],
+      ["--tls-key FILE", "PEM private key (or combined key/certificate PEM)"],
       ["--token TOKEN", "Set an accepted token (repeatable; replaces defaults)"],
       ["--stdio", "Serve MCP on stdin/stdout; other listeners may remain"],
-      ["--connect URL", "Connect to a multibroker at http://host:port/token/alias"],
+      ["--connect URL", "Connect to a multibroker at http[s]://host:port/token/alias"],
       ["--custom-instructions TEXT", "Describe when this server instance should be used"],
       ["--auto-allow TOOL[,ACTION[,CAPABILITY]]", "Add an ordered automatic allow rule (repeatable)"],
       ["--auto-deny TOOL[,ACTION[,CAPABILITY]]", "Add an ordered automatic deny rule (repeatable)"],
       ["--quiet", "Suppress routine tool activity and tool-failure logging"],
-      ["--print-url", "Print authenticated HTTP URL and exit without listening"],
+      ["--print-url[=USER] (--print-urls)", "Print enabled user URLs, or one exact user"],
       ["--tool-help", "Print registered tool descriptions and arguments, then exit"],
-      ["-h, --help", "Display this help and exit"],
+      ["--help", "Display this help and exit"],
    );
    $help .= _mcp_help_row (@$_) for @common;
 
@@ -1066,6 +1120,13 @@ sub _mcp_help {
    }
    $help .= "\nExamples:\n$examples\n"
       if defined $examples && length $examples;
+   $help .= "\nNamed users and URLs:\n"
+      . "  anyevent-mcp create-user chatgpt\n"
+      . "  $0 --print-urls         # list URLs for all enabled users\n"
+      . "  $0 --print-url=chatgpt  # select one user\n"
+      . "A URL marked (connect) is the one used for browser, Vim, or reverse connections.\n"
+      . "Users inherit from global, program, then instance; server restart is needed\n"
+      . "after changing user definitions.\n";
 
    $help
 }
@@ -1084,6 +1145,8 @@ sub mcp_getoptions {
 
    Getopt::Long::GetOptions (
       AnyEvent::MCP::Config::http_getopt (\my $name, \my $bind, \my $print_url, \my @tokens),
+      "tls-cert=s" => \my $tls_cert,
+      "tls-key=s" => \my $tls_key,
       "stdio" => \my $stdio,
       "connect=s" => \my $connect,
       "custom-instructions=s" => \my $custom_instructions,
@@ -1091,7 +1154,7 @@ sub mcp_getoptions {
       "auto-deny=s"  => sub { push @auto_rules, ["deny", $_[1]] },
       "tool-help" => \my $tool_help,
       "quiet" => \my $silent,
-      "help|h" => \my $help,
+      "help" => \my $help,
       @_,
    ) or die $usage;
 
@@ -1106,6 +1169,8 @@ sub mcp_getoptions {
       %settings,
       name => $name,
       (defined $bind ? (bind => $bind) : ()),
+      (defined $tls_cert ? (tls_cert => $tls_cert) : ()),
+      (defined $tls_key ? (tls_key => $tls_key) : ()),
       (@tokens ? (tokens => \@tokens) : ()),
       ($stdio ? (stdio => 1) : ()),
       (defined $connect ? (connect => $connect) : ()),
@@ -1114,8 +1179,13 @@ sub mcp_getoptions {
       ($tool_help ? (tool_help => 1) : ()),
    );
 
-   if ($print_url) {
-      my %options = (%url, (@tokens ? (tokens => \@tokens) : ()));
+   if (defined $print_url) {
+      my %options = (
+         %url,
+         (defined $tls_cert ? (tls_cert => $tls_cert) : ()),
+         (defined $tls_key ? (tls_key => $tls_key) : ()),
+         (@tokens ? (tokens => \@tokens) : ()),
+      );
       my $global = AnyEvent::MCP::Config->global;
       $options{path} //= $global->{section}{"instance $name"}{path}
          // $global->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{path} // "/";
@@ -1123,7 +1193,39 @@ sub mcp_getoptions {
          !exists $options{tokens} or die "Cannot combine auth => none with tokens\n";
       }
       my $selected_bind = defined $bind ? $bind : ($settings{bind} // $config{bind});
-      print $global->http_url ($name, $selected_bind, %options), "\n";
+      my %http = ($global->http_settings ($name, $selected_bind), %options);
+      my @schemes = defined $http{tls_cert} || defined $http{tls_key}
+         ? ("https", "http") : ($http{url_scheme} || "http");
+      my $managed = ($http{auth} || "") ne "none"
+         && !exists $options{tokens}
+         && !exists $global->{section}{"instance $name"}{tokens}
+         && !exists $global->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{tokens};
+
+      if ($managed) {
+         my $saved = (ref $global)->new (file => $global->{file});
+         $saved->{section}{global}{secret} eq $global->{section}{global}{secret}
+            or die "MCP master secret is not persistently stored in $global->{file}\n";
+         my $credentials = $global->user_credentials ($name);
+         if (length $print_url) {
+            @$credentials = grep $_->[0] eq $print_url, @$credentials;
+            @$credentials or die "User '$print_url' is not enabled\n";
+         }
+         my $connect = $global->connect_user ($name);
+         for my $entry (@$credentials) {
+            my ($user, $principal, $token) = @$entry;
+            for my $scheme (@schemes) {
+               print $global->http_url ($name, $selected_bind, %options,
+                  tokens => [$token], url_scheme => $scheme),
+                  "  # user $principal", ($user eq $connect ? " (connect)" : ""), "\n";
+            }
+         }
+      } else {
+         length $print_url
+            and die "Cannot select a managed user with explicit tokens or auth=none\n";
+         for my $scheme (@schemes) {
+            print $global->http_url ($name, $selected_bind, %options, url_scheme => $scheme), "\n";
+         }
+      }
       exit;
    }
 
@@ -1193,8 +1295,12 @@ sub mcp_start {
    }
 
    my %http = ($global ||= AnyEvent::MCP::Config->global)->http_settings ($name, delete $kv{bind});
-   delete $http{tokens} if ($kv{auth} || "") eq "none";
+   delete @http{qw(tokens connect_tokens token_users)} if ($kv{auth} || "") eq "none";
    my %options = (path => "/", %http, %kv);
+   if (exists $kv{tokens}) {
+      $options{connect_tokens} = $kv{tokens};
+      delete $options{token_users};
+   }
 
    if ($stdio || defined $connect) {
       require AnyEvent::MCP::Server::HTTP;

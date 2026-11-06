@@ -97,7 +97,7 @@ the same change, or stops and reports.
 | Learned model capabilities (metadata probe, `ModelProbe`, `model_metadata_format`) | 0032 |
 | Dialect inheritance vs capability roles, `*Compatible` envelopes, `-excludes` | 0006, 0013, 0015, 0016, 0020 |
 | Wire extras on the body / `Response` | 0004 |
-| Request-side controls (reasoning, cache, knobs), temperature gate | 0009, 0012, 0023, 0025 |
+| Request-side controls (reasoning, cache, knobs), temperature gate, `chat_template_kwargs` / `thinking_enabled` | 0009, 0012, 0023, 0025, 0040 |
 | Gemini bound `cachedContent` vs request `systemInstruction` / `tools` / `toolConfig` | 0035 |
 | Normalizing a provider's wire spelling | 0018 |
 | Response observability: timing, `created`, rate-limit reset | 0011, 0017, 0022 |

@@ -2,164 +2,237 @@
 
 set -euo pipefail
 
-define() { IFS='\n' read -r -d '' ${1} || true ; }
-
-define pod <<"=cut"
+: <<"=cut"
 
 =encoding utf-8
 
 =head1 NAME
 
-    cmap - Term::ANSIColor::Concise demo/test script
+cmap - Term::ANSIColor::Concise demo/test script
 
 =head1 SYNOPSIS
 
-    cmap [ options ]
+cmap [ options ]
 
-        -f # , --format    specify color format (*hsl, rgb, lch)
-        -m # , --mod       set color modifier (ex. +r180%y50)
-        -r   , --reverse   flip foreground/background color
-        -L # , --leader    set leader string
-        -l # , --label     set label string
-        -C # , --column    set column number
-        -o # , --xyz-order set X,Y,Z order
-        -[XYZ] #           set X,Y,Z values
+=head1 DESCRIPTION
 
-        -h   , --help      show help
-        -d   , --debug     debug
-        -n   , --dryrun    dry-run
-        -t   , --terse     terse message
-        -q   , --quiet     quiet mode
-        -v   , --verbose   verbose mode
-        -M # , --package   select color handling package
-        -I # , --include   include Perl module path
+Print a table of color samples.  The three parameters of a color space
+are taken from the values of B<-X>, B<-Y> and B<-Z>: one table for each
+Z, one column for each X and one row for each Y.  Each sample has the
+color as its background, and the same color changed by a modifier as
+its foreground.
+
+The samples are made by L<ansiecho|App::ansiecho> and laid out by
+L<ansicolumn|App::ansicolumn>.  L<getoptlong.sh|Getopt::Long::Bash> is
+taken from PATH.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f> I<format>, B<--format>=I<format>
+
+Color format, which gives the default values and order of X, Y and Z:
+
+    hsl        X: hue         Y: lightness  Z: saturation  (default)
+    rgb        X: red         Y: green      Z: blue
+    lch        X: hue         Y: luminance  Z: chroma
+    rgb-chart  X: red         Y: green      Z: blue
+
+C<rgb-chart> is C<rgb> with a smaller step of X and without text, to be
+looked at as a chart.
+
+=item B<-X> I<values>, B<-Y> I<values>, B<-Z> I<values>
+
+Values of the parameters instead of the default of the format.  Values
+are separated by commas, and the option can be repeated.
+
+=item B<-o> I<order>, B<--xyz-order>=I<order>
+
+Which of X, Y and Z goes to each parameter of the color, as in C<yzx>,
+C<y,z,x> or C<"y z x">.  The default depends on the format.
+
+=item B<-m> I<modifier>, B<--mods>=I<modifier>
+
+Color modifier of the foreground.  A table is printed for each modifier.
+
+=item B<-D> I<modifier>, B<--default-mod>=I<modifier>
+
+Modifier used when no B<-m> is given.  Default is C<+r90%y50>.
+
+=item B<-r>, B<--reverse>
+
+Apply the modifier to the background instead of the foreground.
+
+=item B<-L> I<string>, B<--leader>=I<string>
+
+String put before the text of each sample.
+
+=item B<-l>, B<--label>[=I<string>]
+
+Text of the samples, instead of the color spec.  Without a value, a
+fixed sample text is used.
+
+=item B<-C> I<number>, B<--column>=I<number>
+
+Number of columns.  Default is the number of X values.
+
+=item B<-t>, B<--terse>
+
+Do not print the header of each column.
+
+=item B<--message> B<BEGIN>=I<string>, B<--message> B<END>=I<string>
+
+String printed before and after the tables.
+
+=item B<-M> I<package>, B<--package>=I<package>
+
+Package for color handling under C<Term::ANSIColor::Concise::>:
+C<ColorObject> or C<Color>.
+
+=item B<-I> I<path>, B<--include>=I<path>
+
+Perl module path.  Default is the F<lib> directory of the distribution
+that this script belongs to.
+
+=item B<-n>, B<--dryrun>
+
+Print the B<ansiecho> commands and do not run them.
+
+=item B<-d>, B<--debug>
+
+Print the option values.  Repeat to print the internal ones too.
+
+=item B<-x>, B<--trace>
+
+Trace the script with C<set -x>.
+
+=item B<-h>, B<--help>
+
+Show the list of options.
+
+=item B<--man>
+
+Show this document.
+
+=back
+
+=head1 EXAMPLES
+
+    cmap
+    cmap -f rgb
+    cmap -f lch -m '+r90%y50' -m '+l20'
+    cmap -t --label=Sample -X 0,120,240 -Z 100
+    cmap -f rgb-chart
+
+=head1 SEE ALSO
+
+L<Term::ANSIColor::Concise>
 
 =cut
 
-note()   { [[ $quiet ]] && return ; echo "$@" ; }
-warn()   { note "$@" >&2 ; }
-die()    { warn "$@" ; exit 1 ; }
+die() { echo "$@" >&2 ; exit 1 ; }
+man() { perldoc "$0" ; exit ; }
 
-my_help() {
-    case $1 in
-    man)
-	perldoc $0 ;;
-    *)
-	sed -r \
-	    -e '/^$/N' \
-	    -e '/^\n*(#|=encoding)/d' \
-	    -e 's/^(\n*)=[a-z]+[0-9]* */\1/' \
-	    -e '/Version/q' \
-	    <<< $pod
-	;;
-    esac
-    exit
-}
-
-define USAGE <<END
-cmap - Term::ANSIColor::Concise demo/test script
+USAGE='cmap - Term::ANSIColor::Concise demo/test script
 
 cmap [ options ]
-END
+'
 
 declare -A OPTS=(
-    [&USAGE]="$USAGE"
-    [      format | f :!                                        ]=hsl
-    [ default-mod | D :                                         ]="+r180%y50"
-    [        mods | m @ # set color MODIFIER (ex. +r180%y50)    ]=
-    [     package | M : # select color handling PACKAGE         ]=
-    [      leader | L :                                         ]="██  "
-    [               X @                                         ]=
-    [               Y @                                         ]=
-    [               Z @                                         ]=
-    [   xyz-order | o :                                         ]=
-    [       terse | t                                           ]=
-    [       quiet | q                                           ]=
-    [       label | l ?!                                        ]=
-    [     reverse | r                                           ]=
-    [      column | C :                                         ]=
-    [     verbose | v                                           ]=
-    [      dryrun | n                                           ]=
-    [       debug | d +                                         ]=0
-    [       trace | x  !                                        ]=
-    [       usage | u                                           ]=
-    [         man                                               ]=
-    [     include | I : # include Perl module path              ]=./lib
-    [     message     %                                         ]=
-#   [     message     % #                                       ]="([BEGIN]=$'HELLO\n' [END]=$'\nGOODBY')"
+    [&REQUIRE]=1.1.0 [&USAGE]="$USAGE"
+    [      format | f :  # color FORMAT: hsl, rgb, lch, rgb-chart ]=hsl
+    [ default-mod | D :  # MODIFIER used without --mods           ]="+r90%y50"
+    [        mods | m @  # color MODIFIER (ex. +r90%y50)          ]=
+    [     package | M :  # color PACKAGE: ColorObject, Color      ]=
+    [      leader | L :  # STRING before the text of a sample     ]="██  "
+    [               X @  # values of X                            ]=
+    [               Y @  # values of Y                            ]=
+    [               Z @  # values of Z                            ]=
+    [   xyz-order | o :  # order of X, Y and Z (ex. yzx)          ]=
+    [       terse | t    # no column headers                      ]=
+    [       label | l ?! # text of the samples                    ]=
+    [     reverse | r    # modify the background                  ]=
+    [      column | C :  # number of columns                      ]=
+    [      dryrun | n    # print commands, do not run             ]=
+    [       debug | d +  # print option values                    ]=0
+    [       trace | x !  # trace the script                       ]=
+    [         man     !  # show the manual                        ]=
+    [     include | I :  # Perl module PATH                       ]="${0%/*}/../lib"
+    [     message     %  # BEGIN=STRING, END=STRING               ]=
 )
 
-. "${0%/*}"/getoptlong/getoptlong.sh -
+. getoptlong.sh -
 getoptlong init OPTS
-getoptlong callback man   'my_help'  \
-                    usage 'my_help'
-getoptlong callback --before X xyz Y xyz Z xyz
-xyz() { eval "$1=()" ; }
 
-label() { [[ $1 ]] || label='hasta la vista  '; }
-trace() { [[ $1 ]] && set -x || set +x ; }
-
-format() {
-    (( $# == 0 )) && return
-    local _fmt=${@:$#}
-    case $_fmt in
-    hsl)
-	xyz_order="x z y"
-	X=($(seq 0 60 359))      # Hue
-	Y=($(seq 0 5 99))        # Lightness
-	Z=(20,80,100)            # Saturation
-	;;
-    rgb)
-	xyz_order="x y z"
-	X=(0 51 102 153 204 255) # Red
-	Y=($(seq 0 15 255))      # Green
-	Z=(0,128,255)            # Blue
-	;;
-    rgb-chart)
-	format=rgb
-	xyz_order="x y z"
-	X=($(seq 0 2 255))       # Red
-	Y=($(seq 0 15 255))      # Green
-	Z=(0,128,255)            # Blue
-	label=" "
-	terse=yes
-	leader=
-	mod=";"
-	;;
-    lch)
-	xyz_order="y z x"
-	X=($(seq 0 60 359))      # Hue
-	Y=($(seq 0 5 99))        # Luminance
-	Z=(20,60,100)            # Chroma
-	;;
-    *)
-	die "$_fmt: unknown format"
-    esac
-}
-[[ $format ]] && format $format
+label() { [[ ${2:-} ]] || label='hasta la vista  ' ; }
+trace() { [[ ${2:-} ]] && set -x || set +x ; }
 
 getoptlong parse "$@" && eval "$(getoptlong set)"
 
+(( $# == 0 )) || die "$*: unexpected argument"
+
+# Set the values that the options did not give.
+format_defaults() {
+    local x y z order
+    case $format in
+    hsl)
+	order="x z y"
+	x=$(seq 0 60 359)        # Hue
+	y=$(seq 0 5 99)          # Lightness
+	z=20,80,100              # Saturation
+	;;
+    rgb)
+	order="x y z"
+	x="0 51 102 153 204 255" # Red
+	y=$(seq 0 15 255)        # Green
+	z=0,128,255              # Blue
+	;;
+    rgb-chart)
+	format=rgb
+	order="x y z"
+	x=$(seq 0 2 255)         # Red
+	y=$(seq 0 15 255)        # Green
+	z=0,128,255              # Blue
+	label=" "
+	terse=yes
+	leader=
+	;;
+    lch)
+	order="y z x"
+	x=$(seq 0 60 359)        # Hue
+	y=$(seq 0 5 99)          # Luminance
+	z=20,60,100              # Chroma
+	;;
+    *)
+	die "$format: unknown format"
+    esac
+    (( ${#X[@]} )) || X=($x)
+    (( ${#Y[@]} )) || Y=($y)
+    (( ${#Z[@]} )) || Z=($z)
+    [[ $xyz_order ]] || xyz_order=$order
+}
+format_defaults
+
+xyz_order=${xyz_order//[ ,]/}
+[[ $xyz_order =~ ^[xyz]{3}$ ]] || die "$xyz_order: invalid order"
+
 [[ $package ]] && export TAC_COLOR_PACKAGE=${package}
-[[ $include ]] && export PERL5LIB=${include}:$PERL5LIB
-(( $debug > 1 )) && dump_opt=-a
-(( $debug > 0 )) && {
+[[ $include ]] && export PERL5LIB=${include}${PERL5LIB:+:$PERL5LIB}
+(( debug > 1 )) && dump_opt=-a
+(( debug > 0 )) && {
     gol_dump ${dump_opt-} | column
     declare -p mods
     declare -p message
 }
 
-declare -A xyz=(
-    [x]=0 [y]=1 [z]=2
-    [0]=0 [1]=1 [2]=2
-)
+declare -A xyz=([x]=0 [y]=1 [z]=2)
 reorder() {
-    local orig=("$@") ans p n
-    for p in $xyz_order ; do
-	n=${xyz[$p]}
-	ans+=(${orig[$n]})
+    local orig=("$@") ans=() i
+    for ((i = 0; i < ${#xyz_order}; i++)) ; do
+	ans+=("${orig[${xyz[${xyz_order:i:1}]}]}")
     done
-    echo ${ans[@]}
+    echo "${ans[@]}"
 }
 
 table() {
@@ -186,13 +259,16 @@ table() {
     done
 }
 
-(( $# > 0 )) && echo "$@"
-[[ ${#mods[@]} == 0 ]] && mods=(${default_mod})
+(( ${#mods[@]} )) || mods=("$default_mod")
 
-[[ -v message[BEGIN] ]] && echo "${message[BEGIN]}"
+if [[ -v message[BEGIN] ]] ; then
+    echo "${message[BEGIN]}"
+fi
 
 for mod in "${mods[@]}" ; do
-    table $mod
+    table "$mod"
 done
 
-[[ -v message[END] ]] && echo "${message[END]}"
+if [[ -v message[END] ]] ; then
+    echo "${message[END]}"
+fi

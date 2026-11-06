@@ -17,7 +17,7 @@ use Langertha::Raider;
 # Supports Ollama (default) or OpenAI via env vars.
 #
 #   Ollama (default):
-#     OLLAMA_URL=http://avatar.conflict.industries:31434 perl ex/raider_rag.pl
+#     OLLAMA_URL=http://localhost:11434 perl ex/raider_rag.pl
 #
 #   OpenAI:
 #     OPENAI_API_KEY=sk-... perl ex/raider_rag.pl
@@ -34,7 +34,7 @@ if ($ENV{OPENAI_API_KEY}) {
   $embedder = Langertha::Embedder->new(engine => $engine);
   printf "Engine: OpenAI %s\n", $engine->model;
 } else {
-  my $url = $ENV{OLLAMA_URL} || 'http://avatar.conflict.industries:31434';
+  my $url = $ENV{OLLAMA_URL} || 'http://localhost:11434';
   require Langertha::Engine::Ollama;
   $engine = Langertha::Engine::Ollama->new(
     url   => $url,

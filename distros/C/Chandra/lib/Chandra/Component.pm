@@ -5,7 +5,7 @@ use warnings;
 use Object::Proto;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Chandra;
 
@@ -313,6 +313,69 @@ with C<data-action="method:arg1:arg2">.
 
 Children are rendered inside the parent and automatically
 mounted/unmounted with it.
+
+=head1 METHODS
+
+=over 4
+
+=item C<new(%slots)>
+
+Makes a component. Object::Proto builds the object from the slots the
+subclass declared, then C<BUILD> runs.
+
+=item C<BUILD>
+
+Gives the component its id and puts it in the registry. A subclass with
+its own C<BUILD> calls this one.
+
+=item C<child($component)>
+
+Adds a child component, which renders inside this one and mounts with it.
+Returns the parent.
+
+=item C<render_children>
+
+The children's html, each wrapped with its id.
+
+=item C<update_part($id, $html)>
+
+Replaces one element inside a mounted component, after rewriting the
+C<data-action> attributes in the html. Returns the component.
+
+=item C<find_component($id)>
+
+Class method. The live component with that id, or undef.
+
+=item C<reset>
+
+Class method. Empties the registry and starts the ids again.
+
+=item C<prototype>, C<set_prototype>
+
+Object::Proto's prototype accessors, inherited by every component.
+
+=back
+
+=head1 SLOT ACCESSORS
+
+Object::Proto makes a function for each slot, imported with the C<comp_>
+prefix, and a method of the slot's name.
+
+=over 4
+
+=item C<comp__cid> - the component id
+
+=item C<comp__app> - the app the component is mounted on
+
+=item C<comp__selector> - the selector it was mounted into
+
+=item C<comp__mounted> - whether it is mounted
+
+=item C<comp__children> - the child components
+
+=item C<comp__parent> - the parent component, held weakly
+
+=back
 
 =head1 SEE ALSO
 

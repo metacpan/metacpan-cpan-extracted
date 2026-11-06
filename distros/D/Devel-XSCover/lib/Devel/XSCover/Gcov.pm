@@ -13,7 +13,7 @@ use Symbol ();
 
 use Devel::XSCover::Flow ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my ($class, %args) = @_;
@@ -22,6 +22,8 @@ sub new {
         gcov      => ['gcov'],
         ignore    => [],
         generated => [],
+        xsubs     => {},
+        inverse   => {},
         skip      => [qw(blib cover_db .git)],
         save      => undef,
         conditions => 0,
@@ -108,8 +110,8 @@ sub attach_decisions {
     my ($self, $parsed, $text) = @_;
     return 0 unless defined $text && length $text;
     my $flow  = Devel::XSCover::Flow->new(dir => $self->{dir}, silent => $self->{silent});
-    my $graph = $self->{flow} eq 'llvm' ? $flow->parse_llvm($text, $parsed) : $flow->parse_gcc($text);
-    my $decisions = $flow->decisions($graph);
+    my $graph = $self->{flow} eq 'llvm' ? $flow->parse_llvm($text, $parsed, $self->{xsubs}) : $flow->parse_gcc($text);
+    my $decisions = $flow->decisions($graph, $self->{inverse});
     my $n = 0;
     for my $file (keys %$decisions) {
         next unless $parsed->{$file};
@@ -187,12 +189,13 @@ sub parse {
 }
 
 sub filter {
-    my ($self, $files) = @_;
+    my ($self, $files, $gcda) = @_;
     my $root = Cwd::abs_path($self->{dir});
     $root = File::Spec->rel2abs($self->{dir}) unless defined $root;
     $root = _slashes($root);
     my %generated = map { $_ => 1 } @{ $self->{generated} };
     my @ignore    = map { qr/$_/ } @{ $self->{ignore} };
+    my ($vol, $beside) = defined $gcda ? File::Spec->splitpath($gcda) : ('', '');
     my (%kept, %aside);
     for my $name (sort keys %$files) {
         my $rel = $name;
@@ -202,6 +205,10 @@ sub filter {
             $abs = _slashes($abs);
             next unless index($abs, "$root/") == 0;
             $rel = File::Spec->abs2rel($abs, $root);
+        }
+        elsif (length $beside && !-f File::Spec->catfile($self->{dir}, $rel)) {
+            my $near = File::Spec->catpath($vol, $beside, $rel);
+            $rel = $near if -f File::Spec->catfile($self->{dir}, $near);
         }
         $rel =~ s{^\./+}{};
         $rel = _slashes(File::Spec->canonpath($rel));
@@ -224,7 +231,7 @@ sub read {
         next unless length $text;
         my $parsed = $self->parse($text);
         $self->attach_decisions($parsed, $self->run_flow($gcda));
-        my ($files, $generated) = $self->filter($parsed);
+        my ($files, $generated) = $self->filter($parsed, $gcda);
         push @objects, { object => $gcda, files => $files, generated => $generated };
     }
     $self->_say(sprintf 'xs_cover: read %d object%s', scalar @objects, @objects == 1 ? '' : 's');
@@ -299,7 +306,9 @@ each source are read from it too, through L<Devel::XSCover::Flow>.
 Options: C<dir>, C<gcov> (the tool as a list of words), C<conditions> (ask gcov for
 condition coverage, gcc 14 and later), C<flow> (C<llvm> or C<gcc> to ask the tool
 for the flow graph too, as L<Devel::XSCover::Build> detects it, or empty), C<ignore>
-(patterns on the relative path), C<generated> (the generated C files to keep aside),
+(patterns on the relative path), C<generated> (the generated C files to keep aside), C<xsubs> (C wrapper name to the
+F<.xs> file of its body, for the llvm flow dump), C<inverse> (per XS file, the line gcov
+reports to the line written, for the decisions of a body with dropped comment lines),
 C<skip> (directories not searched, C<blib>, C<cover_db> and C<.git> by default),
 C<save> (a directory to keep each object's gcov text in), C<dry> and C<silent>.
 
@@ -358,11 +367,14 @@ never decided the result. Each term ends up with a C<true> and a C<false> flag.
 
 =head2 filter
 
-    my ($kept, $aside) = $reader->filter($files);
+    my ($kept, $aside) = $reader->filter($files, $gcda);
 
 Drops every file outside the distribution directory, F<ppport.h>, and files matching
 an C<ignore> pattern. Files in C<generated> are returned apart, as the second value,
-for the XS map. Absolute paths under the directory become relative.
+for the XS map. Absolute paths under the directory become relative. A relative name
+that is not under the directory itself but is beside the counter file, when one is
+given, takes that directory: an object compiled in a subdirectory, a test's own XS
+module say, names its sources from there.
 
 =head2 read
 

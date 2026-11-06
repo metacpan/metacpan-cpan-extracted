@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::Base;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: base class for canonicalization methods
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -85,7 +85,7 @@ Mail::DKIM::Canonicalization::Base - base class for canonicalization methods
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 
@@ -171,6 +171,13 @@ canonicalization object has its own copy of the header.
 
 The headers array is an array of one element per header field, with
 the headers not processed/canonicalized in any way.
+
+  $method->finish_header(Headers => \@all_headers, HeaderIndex => \%index);
+
+When several canonicalization objects are finished with the same
+headers, pass the same empty hash as HeaderIndex to each of them, so
+that the header is indexed once for all of them rather than once for
+each.
 
 =head2 result()
 

@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAI;
 # ABSTRACT: OpenAI API
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( croak );
 use Langertha::Engine::TranscriptionBase;
@@ -109,9 +109,10 @@ sub _temperature_rejected_by_reasoning {
   return 0 unless $profile->is_reasoning_model;
   # Resolved reasoning effort: a per-request control (chat_f, karr #46) beats the
   # engine attribute; neither set means the model's server-side default applies.
-  my $effort = exists $controls->{reasoning_effort} ? $controls->{reasoning_effort}
-             : $self->has_reasoning_effort          ? $self->reasoning_effort
-             :                                         undef;
+  # Resolved by the same layering the serializer uses, so an off switch
+  # (thinking_enabled => 0, karr k382) reads as effort 'none' here too.
+  my %reasoning = $self->_reasoning_controls_for( %{ $controls // {} } );
+  my $effort = $reasoning{effort};
   # No explicit effort: the model's server-side default effort applies. For most
   # reasoning models that default is a reasoning level (temperature rejected), but
   # the gpt-5.1/5.2/5.4 line defaults to reasoning-OFF, so a non-default
@@ -169,7 +170,7 @@ Langertha::Engine::OpenAI - OpenAI API
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -275,7 +276,7 @@ a different model or endpoint.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -292,7 +293,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::DkimCommon;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: common canonicalization
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -44,44 +44,49 @@ sub finish_header {
     #
     # This is described in 5.4 of RFC4871.
 
-    # Since the bottom-most headers are to get precedence, we reverse
-    # the headers here... (now the first header matching a particular
-    # name is the header to insert)
-    my @mess_headers = reverse @{ $args{Headers} };
-
     # presence of a h= tag is mandatory...
     unless ( defined $self->{Signature}->headerlist ) {
         die "Error: h= tag is required for this canonicalization\n";
     }
 
+    # the message headers grouped by name, bottom-up, so each name in h=
+    # costs one lookup rather than a scan of the header; the grouping is
+    # shared through HeaderIndex by every signature on the message
+    my $heads = $args{HeaderIndex} ? $args{HeaderIndex}{dkim} : undef;
+    unless ($heads) {
+        $heads = _group_headers( $args{Headers} );
+        $args{HeaderIndex}{dkim} = $heads if $args{HeaderIndex};
+    }
+
     # iterate through the header field names specified in the signature
+    my %used;
     my @sig_headers = $self->{Signature}->headerlist;
     foreach my $hdr_name (@sig_headers) {
-        $hdr_name = lc $hdr_name;
 
-        # find the specified header in the message
-      inner_loop:
-        for ( my $i = 0 ; $i < @mess_headers ; $i++ ) {
-            my $hdr = $mess_headers[$i];
+        # find the specified header in the message, counting how many of
+        # that name we've used, so if it occurs more than once, we'll get
+        # the next header in line
+        my $name = lc $hdr_name;
+        my $list = $heads->{$name} or next;
+        my $hdr  = $list->[ $used{$name}++ ];
+        next unless defined $hdr;
 
-            if ( $hdr =~ /^([^\s:]+)\s*:/ ) {
-                my $key = lc $1;
-                if ( $key eq $hdr_name ) {
-
-                    # found it
-
-                    # remove it from our list, so if it occurs more than
-                    # once, we'll get the next header in line
-                    splice @mess_headers, $i, 1;
-
-                    $hdr =~ s/\015\012\z//s;
-                    $self->output(
-                        $self->canonicalize_header($hdr) . "\015\012" );
-                    last inner_loop;
-                }
-            }
-        }
+        $hdr =~ s/\015\012\z//s;
+        $self->output( $self->canonicalize_header($hdr) . "\015\012" );
     }
+}
+
+# group the headers by lowercased name; since the bottom-most headers
+# are to get precedence, each group is in reverse order (now the first
+# header matching a particular name is the header to insert)
+sub _group_headers {
+    my ($headers) = @_;
+    my %heads;
+    foreach my $hdr ( reverse @$headers ) {
+        next unless $hdr =~ /^([^\s:]+)\s*:/;
+        push @{ $heads{ lc $1 } }, $hdr;
+    }
+    return \%heads;
 }
 
 sub add_body {
@@ -144,7 +149,7 @@ Mail::DKIM::Canonicalization::DkimCommon - common canonicalization
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 DESCRIPTION
 

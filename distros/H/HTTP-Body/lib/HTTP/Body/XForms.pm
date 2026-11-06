@@ -1,5 +1,5 @@
 package HTTP::Body::XForms;
-$HTTP::Body::XForms::VERSION = '1.24';
+$HTTP::Body::XForms::VERSION = '1.25';
 use strict;
 use base 'HTTP::Body';
 use bytes;

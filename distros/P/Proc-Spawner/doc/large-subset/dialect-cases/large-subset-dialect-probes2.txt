@@ -93,3 +93,10 @@ trapint	trap 'echo c' int; kill -INT $$; echo after
 trapnum2	trap 'echo c' 2; kill -INT $$; echo after
 trapkill	trap 'echo c' 9; echo st=$?
 setnop	set -o ignoreeof; set -o notify; set -o nolog; set -b; set +m; echo st=$?
+fnkill	kill() { echo K "$@"; }; kill -SIGHUP 1
+fncd	cd() { echo "cd to $1"; command cd "$@"; }; cd /; pwd
+unsetarr	array=x; unset array[2]; echo "st=$? [$array]"
+brquote	touch '^<' '^>' a ']'; echo ^[\>\<]; echo [a"]"]; v='<>'; echo ^["$v"]
+brslash	mkdir 'a['; touch 'a[/]b'; echo a[/]* x/y[^/]*
+dqpword	set --; echo "${1:-sure? [y/N]}"; x=a.b; echo ${x%["."]*}
+unsetbad	unset foo][; echo "st=$?"

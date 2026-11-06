@@ -1,4 +1,4 @@
-package LinkedList::Single::Examples v2.0.0;
+package LinkedList::Single::Examples v2.0.1;
 use v5.40;
 
 1
@@ -65,7 +65,7 @@ or directly, and nothing needs the extension to be found or installed.
 The examples are installed separately from L<LinkedList::Single> and do
 not carry a copy of it: each one has C<use LinkedList::Single qw( v2 )> and
 gets the module from the installed copy, which is a prerequisite
-(version 2.0.0 or later). Every program, benchmark and test has C<use FindBin::libs>, which adds
+(version 2.1.0 or later). Every program, benchmark and test has C<use FindBin::libs>, which adds
 the C<lib> directories above it to C<@INC>, nearest first: for a test,
 C<t/lib> (test-only overrides, which the programs do not see), then the
 examples' C<lib>, and, in the source tree, the module's own C<lib> further
@@ -81,4 +81,53 @@ code to be loaded by other programs and are left in the scratch space.
 
 =head1 SEE ALSO
 
-L<LinkedList::Single>
+L<LinkedList::Single>, the module the examples are built with.
+
+The examples, each with a twin that uses an array or a hash, a paper that
+compares them, a program, a benchmark and tests:
+
+=over 4
+
+=item L<LinkedList::Single::Example::LRU>
+
+A least-recently-used cache with its order in a list. Illustrates stored
+cursors as handles, and moving an entry to the front with C<detach> and
+C<append_to>.
+
+=item L<LinkedList::Single::Example::SlidingWindow>
+
+Events kept for a period of time. Illustrates the array's best case as a
+control, a tail cursor, and memory that returns as a burst expires.
+
+=item L<LinkedList::Single::Example::Handoff>
+
+A work queue passed to a consumer, with cancel by handle and a batch given
+back unfinished. Illustrates C<drop> against placeholders, and hand-over of
+the whole queue or a batch.
+
+=item L<LinkedList::Single::Example::SortedMerge>
+
+Merge and merge sort on lists. Illustrates relinking nodes against copying
+them, and where the public interface is slower than the module's own sort.
+
+=item L<LinkedList::Single::Example::Ordered>
+
+A map in key order, held in a list with an index of markers. Illustrates the
+list as the building block of a larger structure, and cutting whole buckets
+out as Fragments.
+
+=item L<LinkedList::Single::Example::Timer>
+
+Messages dispatched when their start time has passed. Illustrates cutting a
+batch off as a Fragment, C<consume> with a time limit, and putting the
+unfinished rest back at the front.
+
+=item L<LinkedList::Single::Example::POD>
+
+An overview of the examples: why these were chosen, what each paper covers,
+and what the results show in short, with references.
+
+=back
+
+Each example has a paper, in the C<::POD> module under its name (for
+example L<LinkedList::Single::Example::LRU::POD>).

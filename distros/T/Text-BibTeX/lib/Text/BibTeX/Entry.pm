@@ -16,14 +16,15 @@
 # ----------------------------------------------------------------------
 package Text::BibTeX::Entry;
 
-require 5.004;                          # for isa, and delete on a slice
-
+use 5.026;
 use strict;
-use vars qw'$VERSION';
+use warnings;
 use Carp;
+use Scalar::Util qw(blessed refaddr);
+use Symbol ();
 use Text::BibTeX qw(:metatypes :nodetypes);
 
-$VERSION = 0.88;
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -185,17 +186,20 @@ Supported options are:
 
 =item BINMODE
 
-Set the way Text::BibTeX deals with strings. By default it manages
-strings as bytes. You can set BINMODE to 'utf-8' to get NFC normalized
+Set the way Text::BibTeX deals with strings: C<'utf-8'> (the default)
+to get Perl character strings, or C<'bytes'> to get byte strings exactly
+as they appear in the input.  See L<Text::BibTeX/"STRINGS AND UNICODE">.
+When reading from a C<Text::BibTeX::File>, the file's setting is used
+unless you give one here.
 
-Text::BibTeX::Entry->new(
-      { binmode => 'utf-8', normalization => 'NFD' },
-      $file });
-
+   Text::BibTeX::Entry->new(
+         { binmode => 'utf-8', normalization => 'NFD' },
+         $file);
 
 =item NORMALIZATION
 
-UTF-8 strings and you can customise the normalization with the NORMALIZATION option.
+The Unicode normalization form for strings in C<'utf-8'> mode: C<'NFC'>
+(the default), C<'NFD'>, C<'NFKC'>, C<'NFKD'> or C<'none'>.
 
 =back
 
@@ -205,30 +209,29 @@ UTF-8 strings and you can customise the normalization with the NORMALIZATION opt
 sub new
 {
    my ($class, @source) = @_;
-
    $class = ref ($class) || $class;
-   
+
    my $self = {'file'     => undef,
                'type'     => undef,
                'key'      => undef,
                'status'   => undef,
                'metatype' => undef,
                'fields'   => [],
-               'values'   => {}};
+               'values'   => {},
+               'errors'   => []};
    bless $self, $class;
 
-   my $opts = {};
+   my $opts;
    $opts = shift @source if scalar(@source) and ref $source[0] eq "HASH";
-   $opts->{ lc $_ } = $opts->{$_} for ( keys %$opts );
-   $self->{binmode} = 'utf-8'
-          if exists $opts->{binmode} && $opts->{binmode} =~ /utf-?8/i;
-   $self->{normalization} = $opts->{normalization} if exists $opts->{normalization};
+   if ($opts) {
+      @{$self}{qw(binmode normalization)} = Text::BibTeX::_options($opts);
+   }
 
    if (@source)
    {
       my $status;
 
-      if (@source == 1 && ref($source[0]) && $source[0]->isa ('Text::BibTeX::File'))
+      if (@source == 1 && blessed($source[0]) && $source[0]->isa ('Text::BibTeX::File'))
       {
          my $file = $source[0];
          $status = $self->read ($file);
@@ -238,7 +241,7 @@ sub new
             bless $self, $structure->entry_class;
          }
       }
-      elsif (@source == 2 && (defined ($source[0]) && ! ref ($source[0])) && (!defined ($source[1]) || fileno ($source[1]) >= 0))
+      elsif (@source == 2 && (defined ($source[0]) && ! ref ($source[0])))
           { $status = $self->parse ($source[0], $source[1]) }
       elsif (@source == 1 && ! ref ($source[0]))
           { $status = $self->parse_s ($source[0]) }
@@ -252,6 +255,11 @@ sub new
    $self;
 }
 
+# String conversion options for this entry
+sub _binmode { $_[0]{binmode} // 'utf-8' }
+sub _norm    { $_[0]{normalization} // 'NFC' }
+sub _in      { Text::BibTeX::_in($_[0]->_binmode, $_[0]->_norm, $_[1]) }
+
 =item clone
 
 Clone a Text::BibTeX::Entry object, returning the clone. This re-uses the reference to any
@@ -264,14 +272,17 @@ sub clone
 {
   my $self = shift;
   my $clone = {};
+
   # Use the same structure object - won't be changed
   if ($self->{structure}) {
     $clone->{structure} = $self->{structure};
   }
+
   # Use the same file object - won't be changed
   if ($self->{file}) {
     $clone->{file} = $self->{file}
   }
+
   # These might be changed so make copies
   $clone->{binmode} = $self->{binmode};
   $clone->{normalization} = $self->{normalization};
@@ -279,13 +290,12 @@ sub clone
   $clone->{key}      = $self->{key};
   $clone->{status}   = $self->{status};
   $clone->{metatype} = $self->{metatype};
-  $clone->{fields}   = [ map {$_} @{$self->{fields}} ];
-  while (my ($k, $v) = each %{$self->{values}}) {
-    $clone->{values}{$k} = $v;
-  }
-  while (my ($k, $v) = each %{$self->{lines}}) {
-    $clone->{lines}{$k} = $v;
-  }
+  $clone->{value}    = $self->{value} if exists $self->{value};
+  $clone->{fields}   = [ @{$self->{fields}} ];
+  $clone->{values}   = { %{$self->{values}} };
+  $clone->{lines}    = { %{$self->{lines} || {}} };
+  $clone->{errors}   = [ @{$self->{errors} || []} ];
+
   bless $clone, ref($self);
   return $clone;
 }
@@ -307,16 +317,15 @@ sub read
    my ($self, $source, $preserve) = @_;
    croak "`source' argument must be ref to open Text::BibTeX::File " .
          "(or descendant) object"
-      unless ($source->isa('Text::BibTeX::File'));
+      unless (blessed($source) && $source->isa('Text::BibTeX::File'));
 
-   my $fn = $source->{'filename'};
-   my $fh = $source->{'handle'};
    $self->{'file'} = $source;        # store File object for later use
    ## Propagate flags
    for my $f (qw.binmode normalization.) {
-      $self->{$f} = $source->{$f} unless exists $self->{$f};
+      $self->{$f} = $source->{$f} unless defined $self->{$f};
    }
-   return $self->parse ($fn, $fh, $preserve);
+   $preserve = $self->_preserve ($preserve) ? 1 : 0;
+   return $self->_finish(_parse ($self, $source->_parser, $preserve));
 }
 
 
@@ -338,12 +347,11 @@ The success of the parse is stored internally so that you can later
 query it with the C<parse_ok> method.  Even in the presence of syntax
 errors, you'll usually get something resembling your input, but it's
 usually not wise to try to do anything with it.  Just call C<parse_ok>,
-and if it returns false then silently skip to the next entry.  (The
-error messages printed out by the parser should be quite adequate for
-the user to figure out what's wrong.  And no, there's currently no way
-for you to capture or redirect those error messages -- they're always
-printed to C<stderr> by the underlying C code.  That should change in
-future releases.)
+and if it returns false then silently skip to the next entry.  The error
+messages should be quite adequate for the user to figure out what's
+wrong; they are reported with Perl's C<warn> (so they can be caught or
+redirected like any other warning), and are also available from the
+C<errors> method.  See L<Text::BibTeX::Error>.
 
 If no '@' signs are seen on the input before reaching end-of-file, then
 we've exhausted all the entries in the file, and C<parse> returns a
@@ -354,8 +362,12 @@ The FILENAME parameter is only used for generating error messages, but
 anybody using your program will certainly appreciate your setting it
 correctly!
 
-Passing C<undef> to FILEHANDLE will reset the state of the underlying
-C parser, which is required in order to parse multiple files.
+FILEHANDLE may be any Perl filehandle, including in-memory and tied
+handles.  The parser reads ahead in the file, so don't read from the
+handle yourself in between calls.  Passing C<undef> as FILEHANDLE
+forgets about all the filehandles C<parse> has been reading from.  (It
+is usually simpler to use a C<Text::BibTeX::File> object and the C<read>
+method.)
 
 =item parse_s (TEXT)
 
@@ -383,16 +395,26 @@ sub _preserve
    $preserve;
 }
 
+# Parsers for raw filehandles passed to parse(), keyed on the handle
+my %Parsers;
+
 sub parse
 {
    my ($self, $filename, $filehandle, $preserve) = @_;
 
-   $preserve = $self->_preserve ($preserve);
-   if (defined $filehandle) {
-      _parse ($self, $filename, $filehandle, $preserve);
-   } else {
-      _reset_parse ();
+   if (!defined $filehandle) {          # reset (forget) all parsers
+      %Parsers = ();
+      return;
    }
+
+   my $handle = ref $filehandle ? $filehandle : \*{ Symbol::qualify($filehandle, caller) };
+   $preserve = $self->_preserve ($preserve) ? 1 : 0;
+   my $id = refaddr $handle;
+   my $parser = $Parsers{$id} //= Text::BibTeX::Parser->new(
+       $handle, $filename, $self->_binmode eq 'utf-8' ? 1 : 0, 0);
+   my $found = _parse ($self, $parser, $preserve);
+   delete $Parsers{$id} unless $found;  # at end of file
+   return $self->_finish($found);
 }
 
 
@@ -400,12 +422,56 @@ sub parse_s
 {
    my ($self, $text, $preserve) = @_;
 
-   $preserve = $self->_preserve ($preserve);
-   if (defined $text) {
-      _parse_s ($self, $text, $preserve);
-   } else {
-      _reset_parse_s ();
+   return unless defined $text;
+   $preserve = $self->_preserve ($preserve) ? 1 : 0;
+   if ($self->_binmode eq 'utf-8') {
+      if (!utf8::is_utf8($text) && $text =~ /[^\x00-\x7f]/) {
+         my $c = $text;
+         $text = $c if utf8::decode($c);
+      }
    }
+   else {
+      $text = Text::BibTeX::_to_c('bytes', 'none', $text);
+   }
+   return $self->_finish(_parse_s ($self, $text, $preserve,
+                                   $self->_binmode eq 'utf-8' ? 1 : 0));
+}
+
+# After parsing: put the entry's strings into normal form
+sub _finish
+{
+   my ($self, $found) = @_;
+   return $found unless $found;
+   my $norm = $self->_norm;
+   return $found if $self->_binmode ne 'utf-8' || $norm eq 'none';
+
+   my $n = sub { Text::BibTeX::_normalise($norm, $_[0]) };
+   for my $k (qw(type key)) {
+      $self->{$k} = $n->($self->{$k}) if defined $self->{$k};
+   }
+   my $fix_value = sub {
+      my $v = shift;
+      return $n->($v) unless ref $v;
+      $_->[1] = $n->($_->[1]) for $v->values;
+      return $v;
+   };
+   if (exists $self->{value}) {
+      $self->{value} = $fix_value->($self->{value});
+   }
+   if (grep { /[^\x00-\x7f]/ } @{$self->{fields}}) {
+      my (%values, %lines);
+      for my $f (@{$self->{fields}}) {
+         my $nf = $n->($f);
+         $values{$nf} = $self->{values}{$f};
+         $lines{$nf} = $self->{lines}{$f};
+         $f = $nf;
+      }
+      $lines{$_} = $self->{lines}{$_} for qw(START STOP);
+      $self->{values} = \%values;
+      $self->{lines} = \%lines;
+   }
+   $_ = $fix_value->($_) for values %{$self->{values}};
+   return $found;
 }
 
 
@@ -416,10 +482,14 @@ sub parse_s
 =item parse_ok ()
 
 Returns false if there were any serious errors encountered while parsing
-the entry.  (A "serious" error is a lexical or syntax error; currently,
-warnings such as "undefined macro" result in an error message being
-printed to C<stderr> for the user's edification, but no notice is
-available to the calling code.)
+the entry.  (A "serious" error is a lexical or syntax error; warnings,
+such as "undefined macro", don't count.)
+
+=item errors ()
+
+Returns the list of L<Text::BibTeX::Error> objects for all the problems
+-- serious or not -- found while the entry was parsed (including any
+"junk" found before it in the file).
 
 =item type ()
 
@@ -460,29 +530,15 @@ reference to the object's own list of fields.
 
 sub parse_ok   { shift->{'status'}; }
 
-sub metatype   {
-    my $self = shift;
-    Text::BibTeX->_process_result( $self->{'metatype'}, $self->{binmode}, $self->{normalization} );
-}
+sub metatype   { shift->{'metatype'} }
 
-sub type {
-    my $self = shift;
-    Text::BibTeX->_process_result( $self->{'type'}, $self->{binmode}, $self->{normalization} );
-}
+sub type       { shift->{'type'} }
 
-sub key        { 
-  my $self = shift;
-  exists $self->{key}
-    ? Text::BibTeX->_process_result($self->{key}, $self->{binmode}, $self->{normalization})
-    : undef;
-}
+sub key        { shift->{'key'} }
 
 sub num_fields { scalar @{shift->{'fields'}}; }
 
-sub fieldlist  { 
-  my $self = shift;
-  return map { Text::BibTeX->_process_result($_, $self->{binmode}, $self->{normalization})} @{$self->{'fields'}};
-}
+sub fieldlist  { @{shift->{'fields'}} }
   
 =item exists (FIELD)
 
@@ -507,8 +563,8 @@ implicitly set to C<undef>).
 Normally, the field value is what the input looks like after "maximal
 processing"--quote characters are removed, whitespace is collapsed (the
 same way that BibTeX itself does it), macros are expanded, and multiple
-tokens are pasted together.  (See L<bt_postprocess> for details on the
-post-processing performed by B<btparse>.)
+tokens are pasted together.  (See L<Text::BibTeX::Value/POST-PROCESSING>
+for details.)
 
 For example, if your input file has the following:
 
@@ -551,28 +607,22 @@ string.
 
 =cut
 
-sub exists 
+sub exists
 {
    my ($self, $field) = @_;
-
-   exists $self->{values}{Text::BibTeX->_process_argument($field, $self->{binmode}, $self->{normalization})};
+   exists $self->{values}{$self->_in($field)};
 }
 
 sub get
 {
    my ($self, @fields) = @_;
-
-   my @x = @{$self->{'values'}}{map {Text::BibTeX->_process_argument($_, $self->{binmode}, $self->{normalization})} @fields};
-
-   @x = map {defined($_) ? Text::BibTeX->_process_result($_, $self->{binmode}, $self->{normalization}): undef} @x;
-
+   my @x = @{$self->{'values'}}{map { $self->_in($_) } @fields};
    return (@x > 1) ? @x : $x[0];
 }
 
-sub value { 
-  my $self = shift;
-  Text::BibTeX->_process_result($self->{value}, $self->{binmode}, $self->{normalization});
-}
+sub value      { shift->{'value'} }
+
+sub errors     { @{shift->{'errors'} || []} }
 
 
 =head2 Author name methods
@@ -669,18 +719,17 @@ sub split
    my ($self, $field, $delim, $desc) = @_;
 
    return unless $self->exists($field);
+   $field = $self->_in($field);
    $delim ||= 'and';
    $desc ||= 'name';
 
-#   local $^W = 0                        # suppress spurious warning from 
-#      unless defined $filename;         # undefined $filename
    Text::BibTeX::split_list($self->{values}{$field},
                             $delim,
                             ($self->{file} && $self->{file}{filename}),
                             $self->{lines}{$field},
                             $desc,
-                            {binmode       => $self->{binmode},
-                             normalization => $self->{normalization}});
+                            {binmode       => $self->_binmode,
+                             normalization => $self->_norm});
 }
 
 sub names
@@ -691,15 +740,15 @@ sub names
    my (@names, $i);
 
    my $filename = ($self->{'file'} && $self->{'file'}{'filename'});
-   my $line = $self->{'lines'}{$field};
+   my $line = $self->{'lines'}{$self->_in($field)};
 
    @names = $self->split ($field);
-#   local $^W = 0                        # suppress spurious warning from 
-#      unless defined $filename;         # undefined $filename
    for $i (0 .. $#names)
    {
+      # an empty name (eg. from "and and") becomes an empty Name object
       $names[$i] = Text::BibTeX::Name->new(
-        {binmode => $self->{binmode}, normalization => $self->{normalization}},$names[$i], $filename, $line, $i);
+        {binmode => $self->_binmode, normalization => $self->_norm},
+        $names[$i] // '', $filename, $line, $i + 1);
    }
    @names;
 }
@@ -763,7 +812,7 @@ sub set_type
 {
    my ($self, $type) = @_;
 
-   $self->{'type'} = $type;
+   $self->{'type'} = $self->_in($type);
 }
 
 sub set_metatype
@@ -777,7 +826,7 @@ sub set_key
 {
    my ($self, $key) = @_;
 
-   $self->{'key'} = Text::BibTeX->_process_argument($key, $self->{binmode}, $self->{normalization});
+   $self->{'key'} = $self->_in($key);
 }
 
 sub set
@@ -789,7 +838,7 @@ sub set
 
    while (@_)
    {
-      ($field,$value) = (shift,Text::BibTeX->_process_argument(shift, $self->{binmode}, $self->{normalization}));
+      ($field,$value) = ($self->_in(shift), $self->_in(shift));
       push (@{$self->{'fields'}}, $field)
          unless exists $self->{'values'}{$field};
       $self->{'values'}{$field} = $value;
@@ -801,6 +850,7 @@ sub delete
    my ($self, @fields) = @_;
    my (%gone);
 
+   @fields = map { $self->_in($_) } @fields;
    %gone = map {$_, 1} @fields;
    @{$self->{'fields'}} = grep (! $gone{$_}, @{$self->{'fields'}});
    delete @{$self->{'values'}}{@fields};
@@ -951,8 +1001,7 @@ sub print_s
 
    # Tack on the last line, and we're done!
    $output .= "}\n\n";
-   
-   Text::BibTeX->_process_result($output, $self->{binmode}, $self->{normalization});
+   $output;
 }
 
 =back

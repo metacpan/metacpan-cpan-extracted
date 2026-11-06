@@ -1,566 +1,1065 @@
-# NAME
+## Name
 
-Class::Abstract - Enforce abstract (non-instantiable) base classes for plain-Perl OO
+Class::Abstract - Stop code from making objects of a class that is only a template
 
-# VERSION
+## Version
 
-Version 0.01
+Version 0.03
 
-# SYNOPSIS
+## Synopsis
 
-    # ---- Preferred: use parent -------------------------------------------
-    package Animal;
-    use parent 'Class::Abstract';
+### 1. Make a Class Abstract (The Usual Way)
 
-    # ---- Alternative: use Class::Abstract --------------------------------
-    package Vehicle;
-    use Class::Abstract;    # equivalent: adds Class::Abstract to @ISA
+```perl
+package Animal;
+use parent 'Class::Abstract';    # Animal is now abstract
 
-    # ---- Combine with Sub::Abstract for method contracts -----------------
-    package Animal;
-    use parent 'Class::Abstract';
-    use Sub::Abstract qw(speak eat);   # subclasses must implement these
+package Dog;
+use parent -norequire, 'Animal'; # Dog is a normal (concrete) class
 
-    # ---- Concrete subclass -----------------------------------------------
-    package Dog;
-    use parent 'Animal';
+package main;
+my $dog = Dog->new;              # works: you get a Dog object
+my $bad = Animal->new;           # dies: "Cannot instantiate abstract class Animal directly"
+```
 
-    sub new {
-        my ($class, %args) = @_;
-        my $self = $class->SUPER::new;  # delegates through Animal to here
-        $self->{name} = $args{name};
-        return $self;
-    }
-    sub speak { 'Woof' }
-    sub eat   { 'Nom'  }
+### 2. Make a Class Abstract With "Use"
 
-    # ---- If Animal defines its own new(), call check_abstract() first ----
-    package Animal;
-    use parent 'Class::Abstract';
+```perl
+package Vehicle;
+use Class::Abstract;             # same result as: use parent 'Class::Abstract'
+```
 
-    sub new {
-        my $class = shift;
-        Class::Abstract::check_abstract($class);  # enforces abstract contract
-        return bless { a => 'default' }, $class;
-    }
+### 3. A Child Class That Stores Its Own Data
 
-    # ---- Runtime behaviour -----------------------------------------------
-    Animal->new;             # croaks: Cannot instantiate abstract class Animal directly
-    Dog->new(name => 'Rex'); # returns a blessed Dog hashref
-    Animal->is_abstract;     # 1
-    Dog->is_abstract;        # 0
+```perl
+package Dog;
+use parent -norequire, 'Animal';
 
-# DESCRIPTION
+sub new {
+    my ($class, %args) = @_;
+    my $self = $class->SUPER::new;   # the check happens here
+    $self->{name} = $args{name};     # then add your own data
+    return $self;
+}
 
-Prevents direct instantiation of a class while still allowing concrete
-subclasses to call `$class->SUPER::new(...)` through the normal
-inheritance chain.
+package main;
+my $rex = Dog->new(name => 'Rex');
+```
 
-A class becomes abstract by listing `Class::Abstract` as a direct parent:
+### 4. An Abstract Class That Has Its Own New()
 
-    package Animal;
-    use parent 'Class::Abstract';   # Animal is abstract
+```perl
+package Shape;
+use parent 'Class::Abstract';
 
-or equivalently via `use`:
+sub new {
+    my ($class, %args) = @_;
+    Class::Abstract::check_abstract($class);   # dies if $class is Shape
+    return bless { colour => $args{colour} }, $class;
+}
 
-    use Class::Abstract;            # also adds to @ISA
+package Circle;
+use parent -norequire, 'Shape';
 
-Only the class that has `Class::Abstract` directly in its `@ISA` is
-abstract.  Subclasses of that class are **not** automatically abstract; each
-abstract class in a hierarchy must opt in explicitly.
+package main;
+my $c = Circle->new(colour => 'red');   # works
+Shape->new(colour => 'red');            # dies
+```
 
-The enforcement check is performed at runtime inside `new()`.  When a
-concrete subclass calls `$class->SUPER::new(...)`, `$class` is the
-concrete subclass, not the abstract base, so the check passes.
+### 5. Ask Whether a Class Is Abstract
 
-## Usage forms
+```
+Animal->is_abstract;                        # 1
+Dog->is_abstract;                           # 0
+$rex->is_abstract;                          # 0 (asks about Dog)
+Class::Abstract->is_abstract('Animal');     # 1
+Class::Abstract->is_abstract($rex);         # 0
+```
 
-- Inheritance form (preferred)
+### 6. Make an Object of an Abstract Class Inside a Test
 
-        package Animal;
-        use parent 'Class::Abstract';
+```perl
+use Test::More;
 
-    `parent.pm` adds `Class::Abstract` to `@Animal::ISA`, making
-    `Class::Abstract::new` available via MRO.  No `import()` call is made.
-    `Animal-`new> will croak; `Dog-`new> (where Dog inherits Animal) will not.
+my $animal = do {
+    local $Class::Abstract::BYPASS = 1;    # turn the check off for this block only
+    Animal->new;
+};
+is( $animal->legs, 4, 'default number of legs' );
+```
 
-- Import form
+### 7. Use With Sub::Abstract
 
-        package Vehicle;
-        use Class::Abstract;
+```perl
+package Animal;
+use parent 'Class::Abstract';      # nobody can make an Animal directly
+use Sub::Abstract qw(speak);       # every child class must write speak()
+```
 
-    Calls `import()`, which pushes `Class::Abstract` onto `@Vehicle::ISA`
-    if not already present.  Functionally identical to the inheritance form.
+## Description
 
-## Multiple abstract levels in a hierarchy
+### What This Module Does
 
-Each abstract class must opt in:
+An _abstract class_ is a class that is only a template.  It holds code
+that its child classes share, but it is not complete on its own.  You
+should never make an object of it.  You make objects of its child classes
+instead.
 
-    package Animal;   use parent 'Class::Abstract';      # abstract
-    package Mammal;   use parent 'Class::Abstract', 'Animal'; # also abstract
-    package Dog;      use parent 'Mammal';               # concrete
+Perl has no built-in way to say "this class is abstract".  This module
+adds one.  When code tries to make an object of an abstract class, the
+program dies with a clear error message.  Child classes work normally.
 
-## Integration with Sub::Abstract
+### Terms Used in This Document
 
-The two modules complement each other:
+- class, package
 
-    use parent 'Class::Abstract';          # cannot instantiate directly
-    use Sub::Abstract qw(speak eat);       # subclasses must implement speak + eat
+    In Perl, a class is a package.  `Animal` and `Dog` are package names.
 
-## Bypass for testing
+- parent class, child class, @ISA
 
-Either condition alone (OR logic) suppresses the croak:
+    Each package has a list called `@ISA` that names its parent classes.
+    If `@Dog::ISA` contains `Animal`, then `Dog` is a child of `Animal`,
+    and `Dog` can use `Animal`'s methods.
 
-- `$Class::Abstract::BYPASS` set to a true value.  Use `local` in tests.
-Checked first; short-circuits the second condition.
-- `$ENV{HARNESS_ACTIVE}` set (the convention used by [Test::Harness](https://metacpan.org/pod/Test%3A%3AHarness)/prove)
-**and** `$config{harness_bypass}` is truthy (the default).
+- abstract, concrete
 
-**Important:** `$BYPASS` takes full precedence.  Setting
-`harness_bypass = 0` does not re-enable enforcement when `$BYPASS` is
-truthy.  To test enforcement inside a harness:
+    A class is _abstract_ when `Class::Abstract` is in its **own** `@ISA`.
+    All other classes are _concrete_ (normal).
 
-    local $Class::Abstract::BYPASS = 0;
+- invocant
+
+    The value on the left of the arrow in a method call.  In
+    `Dog->new` the invocant is the string `'Dog'`.  In
+    `$rex->speak` the invocant is the object `$rex`.
+
+- croak, die
+
+    Stop the program (or the current `eval` block) with an error message.
+
+- bypass
+
+    A setting that turns the check off.  See ["Turning the check off"](#turning-the-check-off).
+
+- test harness
+
+    The program that runs test files, for example `prove` or `make test`.
+    It sets the environment variable `HARNESS_ACTIVE`.
+
+### How to Make a Class Abstract
+
+Put `Class::Abstract` in the class's own `@ISA`.  There are two ways:
+
+```perl
+package Animal;
+use parent 'Class::Abstract';    # way 1 (recommended)
+
+package Vehicle;
+use Class::Abstract;             # way 2
+```
+
+Both ways have the same result.
+
+### How the Check Works
+
+`Class::Abstract` gives every class below it a method called `new()`.
+When `new()` runs, it looks at the invocant (the class name on the left
+of the arrow).  If that class has `Class::Abstract` in its **own**
+`@ISA`, `new()` dies.  If not, `new()` makes and returns an empty
+object.
+
+This is why child classes work.  When `Dog` calls
+`$class->SUPER::new`, the invocant is still `'Dog'`, not
+`'Animal'`.  `Dog` does not have `Class::Abstract` in its own `@ISA`,
+so the check passes.
+
+### Only the Class That Asks Is Abstract
+
+Being abstract is **not** passed down to child classes.  If you want an
+abstract class below another abstract class, list `Class::Abstract` in
+that class too:
+
+```perl
+package Animal;   use parent 'Class::Abstract';               # abstract
+package Mammal;   use parent 'Class::Abstract', 'Animal';     # also abstract
+package Dog;      use parent -norequire, 'Mammal';            # concrete
+```
+
+### Turning the Check Off
+
+Sometimes a test needs an object of an abstract class.  Two settings turn
+the check off.  If **either** one is on, the check is off.
+
+- 1. The variable `$Class::Abstract::BYPASS`
+
+    Set it to a true value.  Always use `local`, so the setting ends at the
+    end of the block:
+
+    ```perl
+    my $animal = do { local $Class::Abstract::BYPASS = 1; Animal->new };
+    ```
+
+- 2. The setting `harness_bypass` together with a test harness
+
+    If `$Class::Abstract::config{harness_bypass}` is true **and** the
+    environment variable `HARNESS_ACTIVE` is true, the check is off.
+    `harness_bypass` is false by default, so the check is **on** in your
+    tests unless you change it.
+
+`$BYPASS` is checked first.  If `$BYPASS` is true, setting
+`harness_bypass` to 0 does **not** turn the check back on.
+
+**Changed in version 0.03:** before 0.03, `harness_bypass` was 1 by
+default.  That meant the check was **off** in every test suite.  To get
+the old behaviour back, put this near the top of your test files:
+
+```
+$Class::Abstract::config{harness_bypass} = 1;
+```
+
+## Methods
+
+### Import
+
+```perl
+use Class::Abstract;
+```
+
+Perl calls `import()` for you when you write `use Class::Abstract;`.
+You do not normally call it yourself.
+
+It makes the package that contains the `use` line abstract.  It does
+this by adding `'Class::Abstract'` to that package's `@ISA`.  The
+result is the same as `use parent 'Class::Abstract'`.
+
+#### Arguments
+
+None that you pass yourself.  Perl passes the string
+`'Class::Abstract'` as the first argument.  Anything in an import list
+(for example `use Class::Abstract qw(x y)`) is ignored.
+
+#### Returns
+
+The string `'Class::Abstract'`.  `use` throws this value away, so you
+only see it if you call `Class::Abstract->import` yourself.
+
+#### Side Effects
+
+Adds `'Class::Abstract'` to the end of the calling package's `@ISA`.
+It does **nothing** in these cases:
+
+- `'Class::Abstract'` is already in that `@ISA`.  So writing
+`use Class::Abstract;` twice is safe.
+- The calling package is `Class::Abstract` itself.  A class cannot
+be its own parent.
+- Perl cannot tell which package is calling (this can happen in
+unusual code, such as a `BEGIN` block inside a string `eval`).  Without
+this rule, the module would change `@main::ISA` by mistake.
+
+It does not change the global variables `$_`, `$@` or `$!`, and it
+does not touch an `alarm()` timer.  (Before version 0.03 it cleared
+`$@`.)
+
+#### Example
+
+```perl
+package Vehicle;
+use Class::Abstract;          # @Vehicle::ISA is now ('Class::Abstract')
+use Class::Abstract;          # no change: it is already there
+
+package Car;
+our @ISA = ('Vehicle');       # Car is concrete
+
+package main;
+my $car = Car->new;           # works
+Vehicle->new;                 # dies
+```
+
+To load the module **without** making the current package abstract, pass
+an empty list.  Perl then does not call `import()`:
+
+```perl
+use Class::Abstract ();       # main is NOT made abstract
+```
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    class => { type => 'string', optional => 0 },   # always 'Class::Abstract'
+}
+```
+
+##### Output
+
+```perl
+{
+    type => 'string',
+}
+```
+
+#### Messages
+
+None.  `import()` never dies and never warns.
+
+### New
+
+```perl
+my $obj  = ConcreteClass->new;
+my $obj  = ConcreteClass->new(name => 'Rex');   # arguments are ignored
+my $copy = $obj->new;                           # new, empty object of the same class
+```
+
+Makes a new, empty object, but only for a concrete class.
+
+- If the class is abstract, `new()` dies with an error message.
+- If the class is concrete, `new()` returns an empty hash
+reference blessed into that class.
+
+Child classes usually call this through `$class->SUPER::new` from
+their own `new()`.  That works because the check looks at the class name
+on the left of the arrow (the child), not at the class where `new()` is
+written.
+
+#### Arguments
+
+- `$invocant` (required)
+
+    The class name or object on the left of the arrow.  In `Dog->new`
+    it is the string `'Dog'`.  If it is an object, the object's class is
+    used.  It must not be `undef`, the empty
+    string, or a reference that is not an object (such as `[]` or `{}`).
+
+- `%args` (optional)
+
+    Any other arguments.  They are accepted and **ignored**.  This lets a
+    child class pass its arguments to `SUPER::new` without errors.  The
+    child class must store its own data after `SUPER::new` returns.
+
+#### Returns
+
+A new, empty hash reference, blessed into the class.
+
+#### Side Effects
+
+None, except that `bless` creates the package in Perl's symbol table if
+it did not exist yet.  (The check itself never creates a package.)
+
+It does not change the global variables `$_`, `$@` or `$!`, and it
+does not touch an `alarm()` timer.
+
+#### Example
+
+```perl
+package Animal;
+use parent 'Class::Abstract';
+
+package Dog;
+our @ISA = ('Animal');
+
+sub new {
+    my ($class, %args) = @_;
+    my $self = $class->SUPER::new;   # the check happens here
+    $self->{name} = $args{name};
+    return $self;
+}
+
+package main;
+my $rex = Dog->new(name => 'Rex');   # works: Dog is concrete
+
+eval { Animal->new };                # dies: Animal is abstract
+print $@;   # Cannot instantiate abstract class Animal directly at ...
+```
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    invocant => {
+        type     => 'string|object',   # class name, or an object of that class
+        optional => 0,
+        min      => 1,                 # a name must not be empty
+    },
+}
+```
+
+##### Output
+
+```perl
+{
+    type => 'object',                  # a hashref blessed into the class
+}
+```
+
+#### Messages
+
+```
+Message                                   What it means / What to do
+-------                                   --------------------------
+Cannot instantiate abstract class CLASS   CLASS is abstract and no bypass is on.
+  directly                                Make an object of a child class instead.
+
+new() invocant must be a class name or    new() was called as a plain function
+  blessed object, got TYPE                with a reference that is not an object
+                                          (TYPE is ARRAY, HASH, CODE, ...).
+                                          Call it as Class->new or $obj->new.
+
+new() requires a defined class name as    new() was called as a plain function
+  invocant                                with undef or ''.  Pass a class name.
+```
+
+### Check\_Abstract
+
+```
+Class::Abstract::check_abstract($class);
+```
+
+Runs the same check as `new()`, but does not make an object.
+
+Use it when your abstract class writes its **own** `new()` and that
+`new()` does not call `$class->SUPER::new`.  In that case
+`Class::Abstract::new()` never runs, so nothing checks the class.  Call
+`check_abstract()` as the first line of your `new()` to put the check
+back.
+
+#### Arguments
+
+- `$invocant` (required)
+
+    The class to check: a class name (a string) or an object.  If it is an
+    object, the object's class is used.  In your own `new()`, pass the
+    `$class` variable.  It must not be `undef`, the empty string, or a reference
+    that is not an object.
+
+#### Returns
+
+Nothing if the class is concrete or a bypass is on: `undef` in scalar
+context, or an empty list in list context.  Otherwise it dies.
+
+#### Side Effects
+
+None.  It obeys `$BYPASS` and `harness_bypass` in exactly the same way
+as `new()`.
+
+It does not change the global variables `$_`, `$@` or `$!`, and it
+does not touch an `alarm()` timer.
+
+#### Example
+
+```perl
+package Shape;
+use parent 'Class::Abstract';
+
+sub new {
+    my ($class, %args) = @_;
+    Class::Abstract::check_abstract($class);   # dies if $class is Shape
+    return bless { sides => $args{sides} }, $class;
+}
+
+package Square;
+our @ISA = ('Shape');
+
+package main;
+my $sq = Square->new(sides => 4);    # works
+Shape->new(sides => 4);              # dies: Shape is abstract
+```
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    invocant => {
+        type     => 'string|object',
+        optional => 0,
+        min      => 1,
+    },
+}
+```
+
+##### Output
+
+```perl
+{
+    type => 'undef',
+}
+```
+
+#### Messages
+
+```perl
+Message                                   What it means / What to do
+-------                                   --------------------------
+Cannot instantiate abstract class CLASS   The same as for new().
+  directly
+
+check_abstract() requires a class name    The argument was a reference that is
+  or blessed object, got TYPE             not an object.  Pass $class or $self.
+
+check_abstract() requires a defined       The argument was undef or ''.  This
+  class name                              usually means "my $class = shift;"
+                                          is missing from your new().
+```
+
+### Is\_Abstract
+
+```perl
+my $yes_or_no = SomeClass->is_abstract;
+my $yes_or_no = $obj->is_abstract;
+my $yes_or_no = Class::Abstract->is_abstract('SomeClass');
+my $yes_or_no = Class::Abstract->is_abstract($obj);
+```
+
+Tells you whether a class is abstract.  It returns `1` (yes) or `0`
+(no).
+
+A class is abstract only when `Class::Abstract` is in its **own**
+`@ISA`, or when the class **is** `Class::Abstract`.  A child of an
+abstract class is **not** abstract, so `is_abstract()` returns `0` for
+it.
+
+Every class below `Class::Abstract` can call this method.
+
+#### Arguments
+
+- `$self`
+
+    Required.  The class name or object on the left of the arrow.  If no target is given (see
+    below), this is the class that is checked.
+
+- `$target` (optional)
+
+    A class name or an object to check **instead of** the invocant.  This is
+    how you ask about any class: `Class::Abstract->is_abstract('Dog')`.
+    If `$target` is `undef`, it is treated as "not given".
+
+#### Returns
+
+The integer `1` if the class is abstract, otherwise the integer `0`.
+
+A class name that does not exist (for example, a spelling mistake) gives
+`0`, not an error.
+
+#### Side Effects
+
+None.  Asking about a class that does not exist does **not** create it.
+
+It does not change the global variables `$_`, `$@` or `$!`, and it
+does not touch an `alarm()` timer.
+
+#### Example
+
+```perl
+Animal->is_abstract;                         # 1
+Dog->is_abstract;                            # 0
+
+my $rex = Dog->new(name => 'Rex');
+$rex->is_abstract;                           # 0 (asks about Dog)
+
+Class::Abstract->is_abstract('Animal');      # 1
+Class::Abstract->is_abstract($rex);          # 0 (asks about Dog)
+Class::Abstract->is_abstract('Anmial');      # 0 (spelling mistake: no such class)
+```
+
+#### Api Specification
+
+##### Input
+
+```perl
+{
+    self   => { type => 'string|object', optional => 0, min => 1 },
+    target => { type => 'string|object', optional => 1, min => 1 },
+}
+```
+
+##### Output
+
+```perl
+{
+    type => 'integer',
+    min  => 0,
+    max  => 1,
+}
+```
+
+#### Messages
+
+```
+Message                                   What it means / What to do
+-------                                   --------------------------
+is_abstract() requires a class name or    The class to check was a reference
+  object invocant, got TYPE               that is not an object.
+
+is_abstract() requires a class name or    The class to check was undef or ''.
+  object invocant
+```
+
+## Public Variables
+
+### $Class::Abstract::BYPASS
+
+Default: `0`.
+
+When this is true, the check is off for **every** class.  Always change
+it with `local`, so that it goes back to its old value at the end of the
+block:
+
+```perl
+{
+    local $Class::Abstract::BYPASS = 1;
+    my $animal = Animal->new;    # works, even though Animal is abstract
+}
+Animal->new;                     # dies again
+```
+
+Any true value turns the check off.  This includes strings that look
+false to a person, such as `"false"`, `"no"` and `"0E0"`.
+
+### %Class::Abstract::config
+
+Settings for the module.  It has one key.
+
+- harness\_bypass
+
+    Default: `0`.
+
+    When this is true **and** the environment variable `HARNESS_ACTIVE` is
+    true, the check is off.  `HARNESS_ACTIVE` is set by test harnesses such
+    as `prove` and `make test`.
+
+    The default was `1` before version 0.03.  Set it to `1` to get the old
+    behaviour back.
+
+## Error Messages
+
+This is the full list of messages that the module can produce.  The text
+is always plain English.  It does not change with the locale.  Each
+message ends with the file and line number of **your** code, for example
+`at script.pl line 12.`
+
+```
+Message                                                    Comes from
+-------                                                    ----------
+Cannot instantiate abstract class CLASS directly           new, check_abstract
+new() invocant must be a class name or blessed object,     new
+  got TYPE
+new() requires a defined class name as invocant            new
+check_abstract() requires a class name or blessed object,  check_abstract
+  got TYPE
+check_abstract() requires a defined class name             check_abstract
+is_abstract() requires a class name or object invocant,    is_abstract
+  got TYPE
+is_abstract() requires a class name or object invocant     is_abstract
+Class::Abstract internal error: unknown message key KEY    (a bug in this
+                                                            module; please
+                                                            report it)
+```
+
+CLASS is the class name.  TYPE is the kind of reference, such as
+`ARRAY`, `HASH` or `CODE`.
+
+## Common Pitfalls
+
+- Your own new() skips the check
+
+    If an abstract class writes its own `new()` and creates the object
+    with `bless`, `Class::Abstract::new()` never runs.  Nothing stops
+    `Shape->new`.  Fix: call
+    `Class::Abstract::check_abstract($class)` on the first line, or build
+    the object with `$class->SUPER::new`.
+
+- The order of parents matters
+
+    Perl uses the **first** `new()` it finds, reading `@ISA` from left to
+    right.  In `use parent 'Animal', 'Class::Abstract'`, Perl finds
+    `Animal::new` first, if `Animal` has one.  If that `new()` does not
+    call `check_abstract()`, there is no check.
+
+- Child classes are not abstract automatically
+
+    `Mammal` below the abstract class `Animal` is **concrete** unless
+    `Mammal` also lists `Class::Abstract` in its own `@ISA`.
+
+- "use Class::Abstract;" changes the current package
+
+    `use Class::Abstract;` makes the package it is written in abstract.  If
+    you write it in a script only to call `is_abstract()`, the `main`
+    package becomes abstract.  Write `use Class::Abstract ();` instead.
+    With the empty list, Perl does not call `import()`.  The same is true
+    for `require Class::Abstract;`: it does **not** make any class abstract.
+
+- undef and empty strings
+
+    `Class::Abstract::new(undef)`, `new('')` and the same calls to
+    `check_abstract()` and `is_abstract()` die.  But an `undef`
+    **target** in `$obj->is_abstract(undef)` is treated as "no target",
+    so the invocant is checked.
+
+- Spelling mistakes give 0, not an error
+
+    `Class::Abstract->is_abstract('Anmial')` returns `0`, because no
+    package with that name has `Class::Abstract` in its `@ISA`.  Check
+    the spelling if you get `0` when you expect `1`.
+
+- A bypass without "local" never ends
+
+    `$Class::Abstract::BYPASS = 1;` without `local` turns the check off
+    for the rest of the program, in every file.
+
+- Strings that look false are true
+
+    `$BYPASS = 'false'` and `$BYPASS = 'no'` turn the check **off**,
+    because Perl treats every non-empty string except `'0'` as true.  Use
+    `1` and `0`.
+
+- $BYPASS wins over harness\_bypass
+
+    If `$BYPASS` is true, setting `harness_bypass` to `0` does not turn
+    the check on.  To be sure the check is on, set both:
+
+    ```
+    local $Class::Abstract::BYPASS                 = 0;
     local $Class::Abstract::config{harness_bypass} = 0;
+    ```
 
-## Error message format
+- Tests that passed before 0.03 may now die
 
-    Cannot instantiate abstract class Animal directly
+    Before version 0.03 the check was off inside a test harness.  If your
+    tests make objects of abstract classes, they will now die.  See
+    ["Turning the check off"](#turning-the-check-off).
 
-# METHODS/SUBROUTINES
+- isa() is not the same as is\_abstract()
 
-## import
+    `Dog->isa('Class::Abstract')` is true, because `Class::Abstract`
+    is a grandparent of `Dog`.  Use `Dog->is_abstract` to ask whether
+    `Dog` itself is abstract.
 
-    use Class::Abstract;
+- new() throws away its arguments
 
-Called automatically by `use Class::Abstract`.  Adds `Class::Abstract`
-to the calling package's `@ISA` (if not already present), making the
-calling package abstract in the same way as `use parent 'Class::Abstract'`.
+    `Dog->SUPER::new(name => 'Rex')` does not store `name`.  Store it
+    yourself after `SUPER::new` returns.
 
-Has no effect when called on `Class::Abstract` itself (no self-registration).
+- Objects made during a bypass stay abstract
 
-### Arguments
+    An object made while the bypass was on still belongs to the abstract
+    class.  Calling `$obj->new` on it later, with the check on, dies.
 
-- `$class` (required, implicit)
+## Encoding
 
-    Always `'Class::Abstract'` in normal usage.
+The module does not read files, the terminal or the network.  The only
+text it handles is class names, and the error messages that contain them.
 
-### Returns
+- Class names
 
-The class name (`'Class::Abstract'`) as a plain string.
+    Class names may contain any characters that Perl allows in a package
+    name.  This includes non-ASCII letters (`Café`, Japanese,
+    Chinese) and, for names made with `bless` or symbolic references, emoji.
+    The module compares names exactly, character by character.
 
-### Example
+    Two conditions apply:
 
-    package Vehicle;
-    use Class::Abstract;   # Vehicle is now abstract; Class::Abstract in @ISA
+    - Non-ASCII package names need Perl 5.16 or later.  The rest of
+    the module works on Perl 5.8.
+    - The name must be a **character string**, not raw UTF-8 bytes.
+    Names written in source code under `use utf8;` are character strings.
+    Names read from a file or the network must be decoded first (for example
+    with ["decode" in Encode](https://metacpan.org/pod/Encode#decode)).  A name that is still raw bytes is a **different**
+    name to Perl, so `is_abstract()` returns `0` for it.
 
-### API SPECIFICATION
+- Error messages
 
-#### Input
+    The fixed text of every message is plain ASCII English.  A message also
+    contains the class name, so it can contain non-ASCII characters.  If you
+    print such a message to a file handle that has no encoding layer, Perl
+    warns `Wide character in print`.  Add a layer to avoid this:
 
-    # No named-parameter schema: import() takes only the implicit $class.
+    ```
+    binmode STDERR, ':encoding(UTF-8)';
+    ```
 
-#### Output
+- Settings
 
-    { type => 'string' }    # always returns 'Class::Abstract'
+    `$BYPASS`, `harness_bypass` and `HARNESS_ACTIVE` are only tested for
+    true or false.  Their text is never used.
 
-## new
+## Limitations
 
-    my $obj = ConcreteChild->new;
-    my $obj = ConcreteChild->new(%initial_attrs);
+- Only the check in new() and check\_abstract() protects a class
 
-Base constructor with abstract-class enforcement.  When called on an
-abstract class (one with `Class::Abstract` directly in its `@ISA`), it
-croaks.  When called on a concrete subclass -- including via
-`$class->SUPER::new(...)` from a child's own `new()` -- it succeeds
-and returns a blessed empty hashref.
+    Code can still make an object of an abstract class with
+    `bless {}, 'Animal'`, with ["dclone" in Storable](https://metacpan.org/pod/Storable#dclone), with `thaw`, or with a
+    `new()` that forgets to call `check_abstract()`.  The check is a rule
+    that the module follows when it is asked.  It is not built into Perl.
 
-The check is performed on the **original invocant** (`$class`), not on
-the package where `new()` is defined.  This means `SUPER::new` works
-correctly: `$class` is the concrete subclass, so the abstract-class check
-passes.
+- can('new') returns a method that dies
 
-### Arguments
+    `Animal->can('new')` returns `\&Class::Abstract::new`.  This looks
+    like "yes, you can call new()".  You can call it, but it dies.
 
-- `$class` (required)
+- The bypass is global
 
-    The invocant -- either a class name or a blessed object (to support
-    `ref($obj)-`new>-style calls).
+    `$BYPASS` turns the check off for every class, not only for the class
+    that a test is about.
 
-- `%initial_attrs` (optional, ignored)
+- The old package separator is not supported
 
-    Any additional arguments are accepted but not used by this base constructor.
-    They are silently discarded so that subclass `new()` methods can pass
-    arguments through `SUPER::new` without errors.  Subclasses should
-    populate object attributes themselves after calling `SUPER::new`.
+    Perl once allowed `'` between parts of a package name (`Foo'Bar`
+    meaning `Foo::Bar`).  This module does not convert `'` to `::`, so
+    such names are treated as concrete.
 
-### Returns
+- Threads
 
-A new blessed empty hashref of class `$class`.
+    The module shares no data between threads, except `$BYPASS` and
+    `%config`, which are normally only read.  `import()` changes the
+    caller's `@ISA`, usually when the program is compiled.  This is safe if
+    modules are not loaded with `require` from several threads at once.
 
-### Example
+- Not for Moo or Moose
 
-    package Dog;
-    our @ISA = ('Animal');   # Animal is abstract via Class::Abstract
+    Moo and Moose have their own ways to make abstract classes and required
+    methods.  This module is for plain Perl classes.
 
-    sub new {
-        my ($class, %args) = @_;
-        my $self = $class->SUPER::new;   # delegates to Class::Abstract::new
-        $self->{name} = $args{name};     # populate after SUPER
-        return $self;
-    }
+## Dependencies
 
-    # Dog->new(name => 'Rex') works; Animal->new croaks.
-
-### API SPECIFICATION
-
-#### Input
-
-    # Positional: ($class, @ignored_args)
-    # $class must be a defined non-reference scalar (package name or blessed ref).
-
-#### Output
-
-    { type => 'object', isa => $class }    # a blessed hashref of the given class
-
-### PSEUDOCODE
-
-    new($class, @args):
-        class <- ref($class) if blessed, else $class
-        UNLESS bypass is active
-            IF class is directly abstract
-                CROAK "Cannot instantiate abstract class CLASS directly"
-        END UNLESS
-        RETURN bless({}, class)
-
-### MESSAGES
-
-    Message                                              Meaning / Action
-    -------                                              ----------------
-    Cannot instantiate abstract class CLASS directly     CLASS has Class::Abstract
-                                                         directly in its @ISA (or IS
-                                                         Class::Abstract).  You are
-                                                         trying to instantiate an
-                                                         abstract class.  Action:
-                                                         instantiate a concrete
-                                                         subclass of CLASS instead.
-
-## check\_abstract
-
-    Class::Abstract::check_abstract($class);
-    $class->Class::Abstract::check_abstract;
-
-Enforces the abstract-class contract from within a user-defined `new()`.
-Call this at the top of an abstract class's own `new()` when that class
-overrides `new()` directly rather than delegating to `SUPER::new()`.
-Croaks if `$class` is directly abstract and no bypass is active; returns
-normally otherwise.
-
-**When to use:** If your abstract class defines its own `new()` and that
-`new()` creates the object directly (via `bless`) rather than calling
-`$class->SUPER::new`, you must call `check_abstract()` first -- otherwise
-the enforcement in `Class::Abstract::new` is never reached.
-
-    package Animal;
-    use parent 'Class::Abstract';
-
-    sub new {
-        my $class = shift;
-        Class::Abstract::check_abstract($class);  # croaks if $class is Animal
-        return bless { a => 'default' }, $class;  # only reaches here for subclasses
-    }
-
-### Arguments
-
-- `$class` (required)
-
-    A class name string or a blessed object.  Unblessed references are rejected.
-
-### Returns
-
-`undef` on success (i.e. `$class` is concrete or bypass is active).
-Croaks on failure.
-
-### MESSAGES
-
-    Message                                              Meaning / Action
-    -------                                              ----------------
-    Cannot instantiate abstract class CLASS directly     Same as new() -- see above.
-    check_abstract() requires a class name or           Invocant was an unblessed ref.
-      blessed object
-    check_abstract() requires a defined class name      Invocant was undef or empty string.
-
-## is\_abstract
-
-    my $bool = SomeClass->is_abstract;
-    my $bool = $obj->is_abstract;
-    my $bool = Class::Abstract->is_abstract('SomeClass');
-
-Returns `1` if the invocant (or named class) is a **directly** abstract class
-(i.e. has `Class::Abstract` in its own `@ISA`, or is `Class::Abstract`
-itself).  Returns `0` for concrete subclasses even if they transitively
-inherit from an abstract base.
-
-Inheritable via MRO: any class that has `Class::Abstract` in its ancestry
-can call this as a class method or an instance method.
-
-### Arguments
-
-- `$self_or_class` (required)
-
-    The invocant -- a class name, a blessed object, or `Class::Abstract`
-    itself.  When a class name is passed, `is_abstract` is checked on that
-    class.  When a blessed object is passed, the object's class is used.
-
-- `$class_name` (optional)
-
-    When provided, check this class name instead of resolving from the invocant.
-    Intended for the explicit form `Class::Abstract-`is\_abstract('SomeClass')>.
-
-### Returns
-
-`1` if directly abstract, `0` otherwise, as a plain integer.
-
-### Example
-
-    Animal->is_abstract;    # 1 (Animal has Class::Abstract in @ISA)
-    Dog->is_abstract;       # 0 (Dog's @ISA contains Animal, not Class::Abstract)
-
-    my $dog = Dog->new(name => 'Rex');
-    $dog->is_abstract;      # 0 (checks ref($dog) = 'Dog')
-
-### API SPECIFICATION
-
-#### Input
-
-    # Positional: ($self_or_class)
-    # Must be a defined value (class name string or blessed ref).
-
-#### Output
-
-    { type => 'integer', values => [0, 1] }
-
-# KNOWN LIMITATIONS
-
-- Only direct @ISA is checked
-
-    `_is_direct_abstract` looks only at the immediate `@ISA` of the invocant.
-    If `Class::Abstract` appears higher in the MRO (e.g. `Dog` inherits
-    `Animal` which is abstract), `Dog` is **not** considered abstract -- which
-    is the intended behaviour.  However this also means that making a subclass
-    abstract requires an explicit opt-in:
-
-        package Mammal;
-        use parent 'Class::Abstract', 'Animal';   # both in @ISA; Mammal is abstract
-
-- `isa()` cannot distinguish abstract from concrete
-
-    `Dog->isa('Class::Abstract')` returns true (Dog inherits Class::Abstract
-    transitively).  Use `is_abstract()` to distinguish direct-abstract from
-    merely-related-to-abstract.
-
-- `can('new')` returns the croak-stub
-
-    `Animal->can('new')` returns `Class::Abstract::new` (a truthy CODE ref),
-    suggesting the method is callable.  It is callable -- it will just croak.
-
-- new() discards constructor arguments
-
-    The base constructor ignores all arguments beyond `$class` and returns an
-    empty blessed hashref.  Subclasses must populate their own attributes after
-    calling `SUPER::new`.  If you need a smarter base constructor (e.g. one
-    that accepts named parameters and validates them), override `new()` in
-    your abstract base class.
-
-- Bypass precedence
-
-    The bypass guard is `$BYPASS || ($config{harness_bypass} &&
-    $ENV{HARNESS_ACTIVE})`.  `$BYPASS` short-circuits the `||`, so setting
-    `$config{harness_bypass} = 0` does **not** re-enable enforcement when
-    `$BYPASS` is truthy.  Both must be cleared to test enforcement in a harness:
-
-        local $Class::Abstract::BYPASS = 0;
-        local $Class::Abstract::config{harness_bypass} = 0;
-
-- Thread safety
-
-    No shared mutable state is used beyond `$BYPASS` and `%config` (both
-    read-only in normal operation).  `import()` modifies caller's `@ISA`
-    at compile time; this is safe as long as modules are not `require`d
-    concurrently from multiple threads.
-
-- DESTROY and Perl 5.42+
-
-    If a class marks `DESTROY` as abstract via `Sub::Abstract`, exceptions
-    thrown inside `DESTROY` are silently discarded on Perl 5.42+ (emitted to
-    STDERR instead).  Test with `lives_ok` for `DESTROY` paths.
-
-- Not for Moo/Moose
-
-    Moo's `requires` and Moose's `abstract` provide similar guarantees within
-    their own object systems.  This module is for plain-Perl OO only.
-
-# FORMAL SPECIFICATION
-
-The following schemas formally specify the module's behaviour.
-
-    -- Type abbreviations
-    Package  == seq CHAR    -- Perl package name string
-
-    -- System state
-    +-Registry--------------------------------------------+
-    | bypass    : BOOL                                    |
-    | config    : { harness_bypass : BOOL }               |
-    +-----------------------------------------------------+
-
-    -- Initial state
-    +-InitRegistry----------------------------------------+
-    | Registry                                            |
-    |-----------------------------------------------------|
-    | bypass    = false                                   |
-    | config    = { harness_bypass |-> true }             |
-    +-----------------------------------------------------+
-
-    -- Bypass predicate
-    bypass_active(R) <=>
-        R.bypass
-        or (R.config.harness_bypass and HARNESS_ACTIVE)
-
-    -- Directly-abstract predicate
-    is_direct_abstract(c) <=>
-        c = 'Class::Abstract'
-        \/ 'Class::Abstract' in direct_ISA(c)
-
-    -- AbstractNew (success): concrete class or bypass active
-    +-AbstractNew-----------------------------------------+
-    | class?   : Package                                  |
-    | result!  : class? (blessed hashref)                |
-    |-----------------------------------------------------|
-    | (not is_direct_abstract(class?))                    |
-    | \/ bypass_active                                   |
-    | result! = bless({}, class?)                        |
-    +-----------------------------------------------------+
-
-    -- AbstractNew (failure): abstract class, no bypass
-    +-AbstractNewFail--------------------------------------+
-    | class?   : Package                                  |
-    |-----------------------------------------------------|
-    | is_direct_abstract(class?) /\ not bypass_active     |
-    | croak("Cannot instantiate abstract class "          |
-    |        ++ class? ++ " directly")                    |
-    +-----------------------------------------------------+
-
-    -- Key properties:
-    --   When Dog->SUPER::new is called, $class = 'Dog'.
-    --   is_direct_abstract('Dog') is false (Dog's @ISA = ('Animal')).
-    --   Enforcement never fires for concrete subclasses via SUPER::new.
-
-# DEPENDENCIES
-
-[Carp](https://metacpan.org/pod/Carp) (core),
-[Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil) (core),
+[Carp](https://metacpan.org/pod/Carp) (part of Perl),
+[Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil) (part of Perl),
 [Readonly](https://metacpan.org/pod/Readonly),
 [Return::Set](https://metacpan.org/pod/Return%3A%3ASet).
 
-# SEE ALSO
+## See Also
 
 - [Test Dashboard](https://nigelhorne.github.io/Class-Abstract/coverage/)
 - [Sub::Abstract](https://metacpan.org/pod/Sub%3A%3AAbstract)
 
-    Sister module: enforces abstract (pure-virtual) method contracts.
-    Pair with `Class::Abstract` to create fully enforced abstract base classes.
+    Makes child classes write certain methods.  Use it together with
+    `Class::Abstract` for a complete abstract base class.
 
 - [Sub::Private](https://metacpan.org/pod/Sub%3A%3APrivate)
 
-    Sister module: enforces strictly private (owner-only) access.
+    Makes a method callable only from its own class.
 
 - [Sub::Protected](https://metacpan.org/pod/Sub%3A%3AProtected)
 
-    Sister module: enforces protected (owner + subclass) access.
+    Makes a method callable only from its own class and its child classes.
 
-# PUBLIC VARIABLES
-
-## `$BYPASS`
-
-Set to a true value to disable the abstract-class croak.  Use `local`:
-
-    local $Class::Abstract::BYPASS = 1;
-
-**Warning:** any truthy value (including `"false"`, `"0E0"`) enables bypass.
-
-## `%config`
-
-- `harness_bypass` (default: 1)
-
-    When true, the abstract-class croak is suppressed whenever
-    `$ENV{HARNESS_ACTIVE}` is set.  Set to 0 to test enforcement in a harness.
-    Note `$BYPASS` takes precedence (see ["Bypass precedence"](#bypass-precedence)).
-
-# FORMAL SPECIFICATION
-
-## import
-
-    -- Type abbreviations
-    Package == seq CHAR    -- Perl package name string
-
-    -- Pre-condition
-    caller? : Package
-    caller? /= 'Class::Abstract'
-
-    -- Post-condition
-    'Class::Abstract' in ISA(caller?)
-
-    -- Effect on ISA
-    ISA(caller?)' = ISA(caller?) union {'Class::Abstract'}
-                    if 'Class::Abstract' not in ISA(caller?),
-                    ISA(caller?) otherwise
-
-## new
-
-    -- bypass_active predicate (OR; $BYPASS checked first)
-    bypass_active <=>
-        $BYPASS
-        or ($config{harness_bypass} and HARNESS_ACTIVE)
-
-    -- Successful construction
-    +-- New (success) ----------------------------------------+
-    | class?   : Package                                      |
-    | result!  : blessed hashref                             |
-    |---------------------------------------------------------|
-    | not is_direct_abstract(class?) \/ bypass_active        |
-    | result! = bless({}, class?)                            |
-    +---------------------------------------------------------+
-
-    -- Failed construction
-    +-- New (failure) ----------------------------------------+
-    | class?   : Package                                      |
-    |---------------------------------------------------------|
-    | is_direct_abstract(class?) /\ not bypass_active        |
-    | croak("Cannot instantiate abstract class "             |
-    |        ++ class? ++ " directly")                       |
-    +---------------------------------------------------------+
-
-## is\_abstract
-
-    -- is_abstract predicate
-    +-- IsAbstract -------------------------------------------+
-    | self?   : Package | blessed ref                         |
-    | result! : B                                             |
-    |---------------------------------------------------------|
-    | let c = ref(self?) if blessed, else self?               |
-    | result! = is_direct_abstract(c)                         |
-    +---------------------------------------------------------+
-
-    -- is_direct_abstract predicate
-    is_direct_abstract(c) <=>
-        c = 'Class::Abstract'
-        \/ 'Class::Abstract' in direct_ISA(c)
-
-# AUTHOR
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# LICENCE AND COPYRIGHT
+## Formal Specification
+
+This section describes the module in the Z notation.  You do not need to
+read it to use the module.
+
+### Definitions
+
+```
+Package == seq CHAR
+[Object, Ref]                     -- objects and references; Object ⊆ Ref
+
+┌─ Registry ────────────────────────────────────────────
+│ bypass         : 𝔹
+│ harness_bypass : 𝔹
+│ HARNESS_ACTIVE : 𝔹
+│ ISA            : Package ⇸ seq Package
+└───────────────────────────────────────────────────────
+
+┌─ InitRegistry ────────────────────────────────────────
+│ Registry'
+├───────────────────────────────────────────────────────
+│ bypass' = false ∧ harness_bypass' = false
+└───────────────────────────────────────────────────────
+
+bypass_active ⇔ bypass ∨ (harness_bypass ∧ HARNESS_ACTIVE)
+
+resolve : (Package ∪ Object) ⇸ Package
+resolve(x) = class_of(x)  if x ∈ Object
+           = x            if x ∈ Package ∧ #x > 0
+
+is_direct_abstract : Package → 𝔹
+is_direct_abstract(c) ⇔ c = 'Class::Abstract'
+                      ∨ (c ∈ dom ISA ∧ 'Class::Abstract' ∈ ran ISA(c))
+
+┌─ BadInvocant ─────────────────────────────────────────
+│ ΞRegistry
+│ inv? : Package ∪ Ref ∪ {⊥}
+├───────────────────────────────────────────────────────
+│ inv? ∈ Ref ∖ Object ∨ inv? = ⊥ ∨ inv? = ''
+│ croak(message for the calling routine)
+└───────────────────────────────────────────────────────
+
+┌─ NewAbstract ─────────────────────────────────────────
+│ ΞRegistry
+│ inv? : Package ∪ Object
+├───────────────────────────────────────────────────────
+│ is_direct_abstract(resolve(inv?)) ∧ ¬bypass_active
+│ croak('Cannot instantiate abstract class ' ⁀ resolve(inv?) ⁀ ' directly')
+└───────────────────────────────────────────────────────
+```
+
+### Import
+
+```
+┌─ Import ──────────────────────────────────────────────
+│ ΔRegistry
+│ class?  : Package
+│ caller? : Package ∪ {⊥}
+│ result! : Package
+├───────────────────────────────────────────────────────
+│ registrable ⇔ caller? ≠ ⊥ ∧ #caller? > 0
+│               ∧ caller? ≠ 'Class::Abstract'
+│               ∧ ¬is_direct_abstract(caller?)
+│ registrable ⇒ ISA'(caller?) = ISA(caller?) ⁀ ⟨'Class::Abstract'⟩
+│ ¬registrable ⇒ ISA' = ISA
+│ bypass' = bypass ∧ harness_bypass' = harness_bypass
+│ result! = class?
+└───────────────────────────────────────────────────────
+```
+
+### New
+
+```
+┌─ New ─────────────────────────────────────────────────
+│ ΞRegistry
+│ inv?    : Package ∪ Object
+│ result! : Object
+├───────────────────────────────────────────────────────
+│ ¬is_direct_abstract(resolve(inv?)) ∨ bypass_active
+│ class_of(result!) = resolve(inv?)
+│ result! is a new, empty hash
+└───────────────────────────────────────────────────────
+
+NewOp ≙ New ∨ NewAbstract ∨ BadInvocant
+```
+
+### Check\_Abstract
+
+```
+┌─ CheckAbstract ───────────────────────────────────────
+│ ΞRegistry
+│ inv?    : Package ∪ Object
+│ result! : {⊥}
+├───────────────────────────────────────────────────────
+│ ¬is_direct_abstract(resolve(inv?)) ∨ bypass_active
+│ result! = ⊥
+└───────────────────────────────────────────────────────
+
+CheckAbstractOp ≙ CheckAbstract ∨ NewAbstract ∨ BadInvocant
+```
+
+### Is\_Abstract
+
+```
+┌─ IsAbstract ──────────────────────────────────────────
+│ ΞRegistry
+│ self?   : Package ∪ Object
+│ target? : Package ∪ Object ∪ {⊥}
+│ result! : {0, 1}
+├───────────────────────────────────────────────────────
+│ c = resolve(if target? = ⊥ then self? else target?)
+│ result! = 1 ⇔ is_direct_abstract(c)
+└───────────────────────────────────────────────────────
+
+IsAbstractOp ≙ IsAbstract ∨ BadInvocant
+
+-- ΞRegistry in New, CheckAbstract and IsAbstract means that
+-- asking about a package never creates it or changes any @ISA.
+```
+
+## State Diagram
+
+The module has two independent kinds of state: the state of **each
+class**, and the global **check mode**.
+
+### Class States
+
+Every package is in exactly one of these states:
+
+```
+MISSING    The package does not exist yet.
+PLAIN      The package exists.  Class::Abstract is not one of its
+           ancestors, so it has no new() from this module.
+ABSTRACT   'Class::Abstract' is in the package's own @ISA.
+CONCRETE   The package inherits from an abstract class, but
+           'Class::Abstract' is not in its own @ISA.
+```
+
+Transitions:
+
+```perl
+                   use Class::Abstract;
+                   use parent 'Class::Abstract';
+                   push @P::ISA, 'Class::Abstract'
+    +---------+  ------------------------------->  +----------+
+    | MISSING |                                    |          |
+    +---------+                                    |          |
+      |     |                                      |          |
+      |     | Class::Abstract::new('P')            |          |
+      |     | (bless creates P)                    | ABSTRACT |
+      |     v                                      |          |
+      |  +-------+   same triggers as above        |          |
+      |  | PLAIN | ------------------------------> |          |
+      |  |       | <------------------------------ |          |
+      |  +-------+   remove 'Class::Abstract'      +----------+
+      |     |        from @P::ISA (P->new now          ^   |
+      |     |        fails: "Can't locate object       |   | remove
+      |     |        method new")                      |   | 'Class::Abstract'
+      |     | @P::ISA = ('Animal')                     |   | from @P::ISA
+      |     | (Animal is ABSTRACT or CONCRETE)         |   | (an abstract
+      |     v                                    add   |   | parent remains)
+      |  +----------+  ----------------------------->--+   |
+      +->| CONCRETE |   use parent 'Class::Abstract'       |
+         |          |  <-----------------------------------+
+         +----------+
+
+@P::ISA = ('Animal') also moves MISSING directly to CONCRETE.
+```
+
+Calls that never change a class's state:
+
+```perl
+P->is_abstract, Class::Abstract->is_abstract('P')   any state  -> same state
+Class::Abstract::check_abstract('P')                any state  -> same state
+use Class::Abstract;  (again, in P)                 ABSTRACT   -> ABSTRACT
+```
+
+### Check Mode
+
+```
++-----------+   local $Class::Abstract::BYPASS = 1               +----------+
+|           | -------------------------------------------------> |          |
+| ENFORCING |   $config{harness_bypass} = 1 while HARNESS_ACTIVE | BYPASSED |
+|           |   HARNESS_ACTIVE set while harness_bypass is 1     |          |
+|           | <------------------------------------------------- |          |
++-----------+   end of the block with "local"                    +----------+
+                $BYPASS false AND (harness_bypass false
+                OR HARNESS_ACTIVE false)
+
+Start state: ENFORCING  ($BYPASS = 0, harness_bypass = 0).
+```
+
+### What New() and Check\_Abstract() Do in Each State
+
+```
+Class state  Check mode  P->new                       check_abstract('P')
+-----------  ----------  ---------------------------  -------------------
+ABSTRACT     ENFORCING   dies: "Cannot instantiate    dies (same message)
+                         abstract class P directly"
+ABSTRACT     BYPASSED    returns an object of P       returns undef
+CONCRETE     either      returns an object of P       returns undef
+PLAIN        either      dies: "Can't locate object   returns undef
+                         method new" (Perl error)
+MISSING      either      dies: "Can't locate object   returns undef
+                         method new" (Perl error)
+```
+
+No call changes the check mode except the assignments shown above.
+
+## Licence and Copyright
 
 Copyright 2026 Nigel Horne.
 

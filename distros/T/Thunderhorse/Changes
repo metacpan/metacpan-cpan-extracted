@@ -1,5 +1,9 @@
 Revision history for Thunderhorse
 
+0.107 - 2026-11-05
+	[Fixes]
+	- fix a memory leak in handling of Thunderhorse context
+
 0.106 - 2026-06-27
 	[Public interface changes]
 	- Added connection attribute to Context

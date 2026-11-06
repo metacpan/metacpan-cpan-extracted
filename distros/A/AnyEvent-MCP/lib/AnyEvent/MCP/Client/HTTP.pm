@@ -84,7 +84,7 @@ bearer header are supplied by this module.
 =item max_size => $bytes
 
 Bounds a JSON response or an individual buffered SSE event, defaulting to
-16 MiB. SSE notifications are delivered incrementally rather than after
+8 MiB. SSE notifications are delivered incrementally rather than after
 the HTTP response ends.
 
 =back
@@ -161,7 +161,7 @@ sub _send {
    }
 
    my ($buffer, $sse, $received, $failure) = ("", 0, 0);
-   my $limit = $self->{max_size} || 16 * 1024 * 1024;
+   my $limit = $self->{max_size} || 8 * 1024 * 1024;
    weaken $self;
 
    my $deliver = sub {

@@ -37,6 +37,8 @@ package Proc::Spawner;
 #   on_write(FD, BYTES, CODE)  writes BYTES as the reader takes them; CODE->() when all is written or the
 #                              reader is gone.  FD: a handle (made non-blocking) or an fd number (left as it is)
 #   defer(CODE, ARGS)          queues CODE->(ARGS)
+#   poll()                     runs what is ready now (queued calls, ended children, ready fds) without
+#                              waiting; does nothing inside wait_until or a callback (EXPERIMENTAL, post-0.04)
 #   wait_until(CODE)           runs the queue and waits for events until CODE->() is true
 #
 # The rules (decisions R1, D1-D3 of the page "Child Exit Wake-up"; EXPERIMENTAL, awaiting approval):
@@ -48,12 +50,14 @@ package Proc::Spawner;
 # perl-signals-findings.md.
 #
 # Process-wide state flipped for a while, so bullet-proof only in non-threaded execution: the umask,
-# around start's call (umask => N); the SIGCHLD action, while wait_until runs (D3).
+# around start's call (umask => N); the SIGCHLD action, while wait_until runs (D3).  Between waits a
+# caller may move things on with poll(), for example from its own deferred SIGCHLD handler, as
+# Proc::ShellSpawn does while background jobs remain (K3, the user's choice B, post-0.04).
 use strict; use warnings;
 use POSIX ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 *spawn = \&__posix_spawn;   # the raw call; a Windows port would put its own here
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
@@ -121,15 +125,16 @@ sub wait_until {
   ($CHLD_C ? Proc::Spawner::chld_restore() : POSIX::sigaction(POSIX::SIGCHLD(), $old)) unless $DEPTH;
   die $@ unless $ok }
 
-sub turn {   # one queued call, or one round of waiting
-  return do { my ($cause, $k, @a) = @{shift @Q}; local ($CAUSE, $REACTING) = ($cause, 1); $k->(@a) } if @Q;
-  reap(); return if @Q;
+sub turn {   # one queued call, or one round of waiting (at most $timeout seconds; default $TICK): false if nothing happened
+  my $timeout = @_ ? shift : $TICK;
+  if (@Q) { my ($cause, $k, @a) = @{shift @Q}; local ($CAUSE, $REACTING) = ($cause, 1); $k->(@a); return 1 }
+  reap(); return 1 if @Q;
   die "Proc::Spawner: nothing left to wait for\n" unless %KID || %RD || %WR;
   my $rin = ''; vec($rin, $_, 1) = 1 for fileno $SELF_R, map $_->[0], values %RD;
   my $win = ''; vec($win, $_->[0], 1) = 1 for values %WR;
-  my $n = select my $rout = $rin, my $wout = $win, undef, $TICK;
+  my $n = select my $rout = $rin, my $wout = $win, undef, $timeout;
   1 while sysread $SELF_R, my $buf, 512;
-  return if $n <= 0;                    # timeout, or EINTR: the sets say nothing
+  return 0 if $n <= 0;                  # timeout, or EINTR: the sets say nothing
   my %served;                           # one reader per fd and round, the oldest first
   for my $id (sort { $a <=> $b } keys %RD) {
     my ($fd, $len, $cb) = @{$RD{$id}};
@@ -141,18 +146,23 @@ sub turn {   # one queued call, or one round of waiting
     defer($cb, $got ? $b : undef) }
   for my $id (sort { $a <=> $b } keys %WR) {
     my $w = $WR{$id}; next unless vec($wout, $w->[0], 1);
-    my $did = POSIX::write($w->[0], $w->[1], length $w->[1]);
+    my $did = POSIX::write($w->[0], $w->[1], $w->[3] && $w->[3] < length $w->[1] ? $w->[3] : length $w->[1]);
     next if !defined $did && $! == POSIX::EAGAIN();
     substr($w->[1], 0, $did // length $w->[1]) = '';   # an error (the reader is gone) ends the write
-    defer((delete $WR{$id})->[2]) if $w->[1] eq '' } }
+    defer((delete $WR{$id})->[2]) if $w->[1] eq '' }
+  1 }
+sub poll {   # between waits (K3, the user's choice B, post-0.04): what is ready now, without waiting
+  return if $REACTING || $DEPTH;
+  local $DEPTH = $DEPTH + 1;            # a callback's own wait_until still dies (D2)
+  1 while (@Q || %KID || %RD || %WR) && turn(0) }
 
 my $ID = 0;
 sub fd_of { ref $_[0] ? fileno $_[0] : $_[0] }
 sub on_read { my ($fd, $n, $cb) = @_; $RD{++$ID} = [fd_of($fd), $n, $cb]; $ID }
-sub on_write {
-  my ($fd, $bytes, $cb) = @_;
+sub on_write {   # $chunk: at most so many bytes per write (a blocking pipe: PIPE_BUF, which a writable pipe takes at once)
+  my ($fd, $bytes, $cb, $chunk) = @_;
   fcntl($fd, F_SETFL, fcntl($fd, F_GETFL, 0) | O_NONBLOCK) if ref $fd;
-  $WR{++$ID} = [fd_of($fd), $bytes, $cb]; $ID }
+  $WR{++$ID} = [fd_of($fd), $bytes, $cb, $chunk]; $ID }
 
 1;
 
@@ -211,7 +221,11 @@ dropped C<pidfd> returns only the pid.
 Process-wide state is flipped for a while, so these parts are bullet-proof
 only in non-threaded execution: the umask, set around C<start>'s call
 (C<< umask => N >>), and the SIGCHLD action, taken over while C<wait_until>
-runs.
+runs.  C<poll()> (EXPERIMENTAL) runs what is ready without waiting; it does
+nothing inside C<wait_until> or a callback.  L<Proc::ShellSpawn> calls it from a
+deferred SIGCHLD handler of its own between C<run()> calls while background
+jobs remain; while that handler is installed, the program's own C<sleep> and
+C<select> return early whenever a child ends.
 posix_spawn cannot make the child ignore a signal, nor set its resource
 limits or nice value.  Only Linux with glibc 2.39 has been tested.
 

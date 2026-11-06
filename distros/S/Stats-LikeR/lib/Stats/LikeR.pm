@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3415';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3416';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -6893,7 +6893,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3415
+version 0.3416
 
 =head1 Synopsis
 
@@ -6902,7 +6902,7 @@ version 0.3415
  my $patients = read_table('patients.csv');    # array of hashes, one per row
  summary($patients);                            # R's summary(), one row per column
 
- my @sbp = map { $_->{sbp} } @$patients;
+ my @sbp = avals($patients, 'sbp'); # avals -> array values
  printf "mean SBP %.1f (sd %.1f)\n", mean(\@sbp), sd(\@sbp);
 
  my %by_arm = (drug => [], placebo => []);

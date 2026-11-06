@@ -1,8 +1,9 @@
 package Langertha::Engine::DeepSeek;
 # ABSTRACT: DeepSeek API
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( croak );
+use Langertha::Reasoning;
 
 extends 'Langertha::Engine::OpenAIBase';
 
@@ -94,15 +95,32 @@ sub _is_deepseek_v3 {
 sub reasoning_kwargs_for {
   my ( $self, %args ) = @_;
   # A per-request reasoning_effort control (chat_f, karr #46) beats the
-  # engine attribute; the rest of the model-gated placement is unchanged.
-  my $e = exists $args{reasoning_effort} ? $args{reasoning_effort}
-        : exists $args{effort}           ? $args{effort}
-        : $self->has_reasoning_effort    ? $self->reasoning_effort
-        : undef;
-  return () unless defined $e;
+  # engine attribute; the rest of the model-gated placement is unchanged. The
+  # shared resolver also turns an off switch (thinking_enabled => 0, karr
+  # k382) into 'none'.
+  my %reasoning = $self->_reasoning_controls_for(%args);
+  # No Langertha::Reasoning is built here, so its BUILD check would not run;
+  # check explicitly, so a layer contradicting itself (effort high +
+  # thinking_enabled 0) croaks with the message every other engine gives
+  # (karr k382).
+  Langertha::Reasoning->assert_switch_agrees( $reasoning{thinking_enabled}, $reasoning{effort} );
+  my $e = $reasoning{effort};
   my $model = $self->can('chat_model') ? ( $self->chat_model // '' ) : '';
+  # The V3.x toggle: `thinking.type` is enabled | disabled, "disabled" uses
+  # non-thinking mode (api-docs.deepseek.com/api/create-chat-completion, read
+  # 2026-11-04, karr k382). Effort none -- and so thinking_enabled => 0 -- turns
+  # it off; it used to send enabled for none as well. A bare
+  # thinking_enabled => 1 is the on-switch.
   if ( _is_deepseek_v3($model) ) {
-    return ( thinking => { type => 'enabled' } );
+    return ( thinking => { type => $e eq 'none' ? 'disabled' : 'enabled' } )
+      if defined $e;
+    return $reasoning{thinking_enabled} ? ( thinking => { type => 'enabled' } ) : ();
+  }
+  # V4: the flat effort string has no level-free on-switch.
+  unless ( defined $e ) {
+    $self->_warn_thinking_enabled_dropped( $self->reasoning_wire_format )
+      if $reasoning{thinking_enabled};
+    return ();
   }
   return () unless $e eq 'none' || $e eq 'low' || $e eq 'high' || $e eq 'max';
   return ( reasoning_effort => $e );
@@ -136,7 +154,7 @@ Langertha::Engine::DeepSeek - DeepSeek API
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -169,7 +187,11 @@ B<Reasoning effort:> the chat-completion endpoint — serving both
 C<deepseek-flash> and C<deepseek-v4-pro> — accepts C<none>, C<low>, C<high>
 (server default) and C<max>, with B<no per-model difference>; C<none> disables
 thinking. Set it via the C<reasoning_effort> attribute or the per-request
-C<chat_f> control.
+C<chat_f> control. C<< thinking_enabled =E<gt> 0 >> is effort C<none>; a bare
+C<< thinking_enabled =E<gt> 1 >> is dropped with a carp on V4 (no level-free
+on-switch). The legacy V3.x ids get C<< thinking =E<gt> { type =E<gt> ... } >>
+instead: C<disabled> for C<none> / C<< thinking_enabled =E<gt> 0 >>,
+C<enabled> for any other level or C<< thinking_enabled =E<gt> 1 >>.
 
 Get your API key at L<https://platform.deepseek.com/> and set
 C<LANGERTHA_DEEPSEEK_API_KEY> in your environment.
@@ -194,7 +216,7 @@ B<THIS API IS WORK IN PROGRESS>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -211,7 +233,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

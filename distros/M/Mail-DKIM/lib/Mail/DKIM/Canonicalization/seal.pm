@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::seal;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: arc seal canonicalization
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -53,16 +53,60 @@ sub init {
     $self->SUPER::init;
 }
 
-sub _output_indexed_header {
-    my ( $self, $headers, $h, $i ) = @_;
-    foreach my $hdr (@$headers) {
+# ARC limits instance numbers to 1..50 (RFC 8617 section 4.2.1)
+our $MAX_INSTANCE = 50;
 
-        # this ugly pattern matches header: field; field; ... i=N
-        next unless $hdr =~ m/^$h:\s*(?:[^;]*;\s*)*i=(\d+)/i and $1 == $i;
-        $hdr =~ s/\015\012\z//s;
-        $self->output( $self->canonicalize_header($hdr) . "\015\012" );
-        return;
+# how to find the instance of each ARC header
+my %ARC_HEADERS = (
+
+    # i= comes first, and the rest is free text which may itself
+    # contain "; i=" (RFC 8617 section 4.1.1)
+    'arc-authentication-results' =>
+      qr/^ARC-Authentication-Results:\s*i=(\d+)\s*;/i,
+
+    # these are tag lists, so i= may be anywhere; this ugly pattern
+    # matches header: field; field; ... i=N
+    # (not (?:[^;]*;\s*)*, where whitespace after a ; can be taken by
+    # either part, which is quadratic in a whitespace run)
+    'arc-message-signature' =>
+      qr/^ARC-Message-Signature:(?:[^;]*;)*\s*i=(\d+)/i,
+    'arc-seal' => qr/^ARC-Seal:(?:[^;]*;)*\s*i=(\d+)/i,
+);
+
+# the instance of an ARC-Authentication-Results header field as this
+# canonicalization finds it, without leading zeros, or undef if it finds
+# none; the verifier and signer use this so that every field they accept
+# as an AAR is one the seals cover
+sub _aar_instance {
+    my ($header) = @_;
+    my ($i) = $header =~ $ARC_HEADERS{'arc-authentication-results'}
+      or return;
+    $i =~ s{^0+(?=\d)}{};
+    return $i;
+}
+
+# index the ARC headers by lowercased name and instance, keeping the
+# first of each, so each lookup doesn't have to scan the whole header
+sub _index_headers {
+    my ( $self, $headers ) = @_;
+    my %index;
+    foreach my $hdr (@$headers) {
+        next unless $hdr =~ /^ARC-/i;
+        foreach my $h ( keys %ARC_HEADERS ) {
+            next unless $hdr =~ $ARC_HEADERS{$h};
+            ( my $i = $1 ) =~ s{^0+(?=\d)}{};
+            $index{$h}{$i} = $hdr unless exists $index{$h}{$i};
+        }
     }
+    return \%index;
+}
+
+sub _output_indexed_header {
+    my ( $self, $index, $h, $i ) = @_;
+    my $hdr = $index->{ lc $h }{$i};
+    return unless defined $hdr;
+    $hdr =~ s/\015\012\z//s;
+    $self->output( $self->canonicalize_header($hdr) . "\015\012" );
 }
 
 sub finish_header {
@@ -71,6 +115,15 @@ sub finish_header {
 
     my $i = $self->{Signature}->identity();
     return unless $i =~ m{^\d+$};    # don't waste time if i= is bogus
+    $i =~ s{^0+(?=\d)}{};
+    return if $i < 1 or $i > $MAX_INSTANCE;
+
+    # the index is shared through HeaderIndex by every seal on the message
+    my $index = $args{HeaderIndex} ? $args{HeaderIndex}{seal} : undef;
+    unless ($index) {
+        $index = $self->_index_headers( $args{Headers} );
+        $args{HeaderIndex}{seal} = $index if $args{HeaderIndex};
+    }
 
     my $chain = $args{Chain};
     $chain = $self->{Signature}->chain() if ! defined $chain;
@@ -79,19 +132,15 @@ sub finish_header {
     # if the previous status was pass
     if ( $chain eq 'pass' ) {
         foreach my $n ( 1 .. ( $i - 1 ) ) {
-            $self->_output_indexed_header( $args{Headers},
-                'ARC-Authentication-Results', $n );
-            $self->_output_indexed_header( $args{Headers},
-                'ARC-Message-Signature', $n );
-            $self->_output_indexed_header( $args{Headers}, 'ARC-Seal', $n );
+            $self->_output_indexed_header( $index, 'ARC-Authentication-Results', $n );
+            $self->_output_indexed_header( $index, 'ARC-Message-Signature', $n );
+            $self->_output_indexed_header( $index, 'ARC-Seal', $n );
         }
     }
 
     # always include this header set
-    $self->_output_indexed_header( $args{Headers},
-        'ARC-Authentication-Results', $i );
-    $self->_output_indexed_header( $args{Headers}, 'ARC-Message-Signature',
-        $i );
+    $self->_output_indexed_header( $index, 'ARC-Authentication-Results', $i );
+    $self->_output_indexed_header( $index, 'ARC-Message-Signature', $i );
 
   # we don't add ARC-Seal at our index, because that is this signature, and it's
   # formed with standard DKIM style, so automatically appeneded
@@ -116,7 +165,7 @@ Mail::DKIM::Canonicalization::seal - arc seal canonicalization
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 AUTHORS
 

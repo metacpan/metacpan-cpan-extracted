@@ -29,3 +29,6 @@ large-subset-e.txt	rule E (error): cd without HOME is an error, as bash	n=HOME; 
 largebattery.txt	rule E (posix): OPTARG is unset when no option, or an option without an argument, was found (POSIX getopts; as bash)	while getopts ab:c o -ac -b x -c y; do echo "$o ${OPTARG-u} $OPTIND"; done; echo "end $OPTIND"
 largebattery.txt	rule E (posix): OPTARG is unset when no option, or an option without an argument, was found (POSIX getopts; as bash)	getopts ab: o -b v; getopts ab: o -b v; echo "[$o] [$OPTARG] $OPTIND"
 largebattery.txt	rule E (posix): OPTARG is unset when no option, or an option without an argument, was found (POSIX getopts; as bash)	getopts :a o -x; echo "[$o] [$OPTARG]"; getopts a o -x; echo "[$o] [${OPTARG-unset}]"
+large-subset-post04.txt	rule E (same): ${@#p} and ${*%p} work on each parameter, as bash (G4)	set -- ab ac bc; echo ${@#a}; for x in "${@#a}"; do echo "[$x]"; done; echo "${*%c}"
+large-subset-post04.txt	rule E (info): $LINENO is the line number, as bash (G8)	echo $LINENO@Necho $LINENO; f() {@Necho $LINENO@N}@Nf; echo $((LINENO + 10)) ${LINENO}
+large-subset-post04.txt	rule E (info): ~ without HOME is the home in the password file, as bash (G16)	unset HOME; echo ~ ~/x; HOME=/usr; echo ~; cd; pwd

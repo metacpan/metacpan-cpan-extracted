@@ -178,8 +178,11 @@ _elem_escape_js(pTHX_ const char *src, STRLEN len)
 static HV *
 _elem_get_handlers(pTHX)
 {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!_elem_handlers)
-        _elem_handlers = newHV();
+        _elem_handlers = newHV(); /* # uncoverable statement */
     return _elem_handlers;
 }
 
@@ -193,7 +196,7 @@ _elem_register_handler(pTHX_ HV *self_hv, const char *event_attr,
     int hid_len;
     SV **hvp;
 
-    if (!SvROK(sub_sv) || SvTYPE(SvRV(sub_sv)) != SVt_PVCV)
+    if (!SvROK(sub_sv) || SvTYPE(SvRV(sub_sv)) != SVt_PVCV) /* # uncoverable condition left count:2 */
         return 0;
 
     handlers = _elem_get_handlers(aTHX);
@@ -204,6 +207,12 @@ _elem_register_handler(pTHX_ HV *self_hv, const char *event_attr,
 
     /* Store handler ID in element's _handlers hash */
     hvp = hv_fetchs(self_hv, "_handlers", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (hvp && *hvp && SvROK(*hvp) && SvTYPE(SvRV(*hvp)) == SVt_PVHV) {
         HV *eh = (HV *)SvRV(*hvp);
         (void)hv_store(eh, event_attr, (I32)event_len,
@@ -238,23 +247,37 @@ _elem_find_by_id(pTHX_ SV *self_sv, const char *target_id)
     HV *hv;
     SV **id_svp, **ch_svp;
 
-    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV)
+    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV) /* # uncoverable condition left count:1 */
         return NULL;
 
     hv = (HV *)SvRV(self_sv);
 
     id_svp = hv_fetchs(hv, "id", 0);
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (id_svp && *id_svp && SvOK(*id_svp) &&
         strEQ(SvPV_nolen(*id_svp), target_id))
         return self_sv;
 
     ch_svp = hv_fetchs(hv, "children", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (ch_svp && *ch_svp && SvROK(*ch_svp) &&
         SvTYPE(SvRV(*ch_svp)) == SVt_PVAV) {
         AV *children = (AV *)SvRV(*ch_svp);
         SSize_t i, len = av_len(children) + 1;
         for (i = 0; i < len; i++) {
             SV **csvp = av_fetch(children, i, 0);
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2
+             # uncoverable condition right count:4 */
             if (csvp && *csvp && SvROK(*csvp) &&
                 sv_derived_from(*csvp, "Chandra::Element")) {
                 SV *found = _elem_find_by_id(aTHX_ *csvp, target_id);
@@ -272,22 +295,35 @@ _elem_find_by_tag(pTHX_ SV *self_sv, const char *target_tag)
     HV *hv;
     SV **tag_svp, **ch_svp;
 
-    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV)
+    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV) /* # uncoverable condition left count:1 */
         return NULL;
 
     hv = (HV *)SvRV(self_sv);
 
     tag_svp = hv_fetchs(hv, "tag", 0);
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (tag_svp && *tag_svp && strEQ(SvPV_nolen(*tag_svp), target_tag))
         return self_sv;
 
     ch_svp = hv_fetchs(hv, "children", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (ch_svp && *ch_svp && SvROK(*ch_svp) &&
         SvTYPE(SvRV(*ch_svp)) == SVt_PVAV) {
         AV *children = (AV *)SvRV(*ch_svp);
         SSize_t i, len = av_len(children) + 1;
         for (i = 0; i < len; i++) {
             SV **csvp = av_fetch(children, i, 0);
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2
+             # uncoverable condition right count:4 */
             if (csvp && *csvp && SvROK(*csvp) &&
                 sv_derived_from(*csvp, "Chandra::Element")) {
                 SV *found = _elem_find_by_tag(aTHX_ *csvp, target_tag);
@@ -306,12 +342,15 @@ _elem_collect_by_class(pTHX_ SV *self_sv, const char *target_class,
     HV *hv;
     SV **class_svp, **ch_svp;
 
-    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV)
+    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV) /* # uncoverable condition left count:1 */
         return;
 
     hv = (HV *)SvRV(self_sv);
 
     class_svp = hv_fetchs(hv, "class", 0);
+    /*
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (class_svp && *class_svp && SvOK(*class_svp)) {
         STRLEN clen;
         const char *cstr = SvPV(*class_svp, clen);
@@ -322,10 +361,13 @@ _elem_collect_by_class(pTHX_ SV *self_sv, const char *target_class,
             const char *start;
             STRLEN wlen;
 
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition left count:3 */
             while (p < end && (*p == ' ' || *p == '\t'))
                 p++;
             start = p;
-            while (p < end && *p != ' ' && *p != '\t')
+            while (p < end && *p != ' ' && *p != '\t') /* # uncoverable condition right count:3 */
                 p++;
             wlen = p - start;
             if (wlen == tlen && memEQ(start, target_class, tlen)) {
@@ -336,12 +378,22 @@ _elem_collect_by_class(pTHX_ SV *self_sv, const char *target_class,
     }
 
     ch_svp = hv_fetchs(hv, "children", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (ch_svp && *ch_svp && SvROK(*ch_svp) &&
         SvTYPE(SvRV(*ch_svp)) == SVt_PVAV) {
         AV *children = (AV *)SvRV(*ch_svp);
         SSize_t i, len = av_len(children) + 1;
         for (i = 0; i < len; i++) {
             SV **csvp = av_fetch(children, i, 0);
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2
+             # uncoverable condition right count:4 */
             if (csvp && *csvp && SvROK(*csvp) &&
                 sv_derived_from(*csvp, "Chandra::Element")) {
                 _elem_collect_by_class(aTHX_ *csvp, target_class,
@@ -382,7 +434,7 @@ _elem_render(pTHX_ SV *self_sv)
     SV **attrs_svp, **hdl_svp, **raw_svp, **data_svp, **children_svp;
     const char *tag;
 
-    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV)
+    if (!SvROK(self_sv) || SvTYPE(SvRV(self_sv)) != SVt_PVHV) /* # uncoverable condition left count:1 */
         return newSVpvs("");
 
     hv = (HV *)SvRV(self_sv);
@@ -396,6 +448,11 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* id */
     id_svp = hv_fetchs(hv, "id", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (id_svp && *id_svp && SvOK(*id_svp)) {
         STRLEN id_len;
         const char *id_str = SvPV(*id_svp, id_len);
@@ -408,6 +465,9 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* class */
     class_svp = hv_fetchs(hv, "class", 0);
+    /*
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (class_svp && *class_svp && SvOK(*class_svp)) {
         STRLEN cls_len;
         const char *cls_str = SvPV(*class_svp, cls_len);
@@ -420,10 +480,13 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* style */
     style_svp = hv_fetchs(hv, "style", 0);
+    /*
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (style_svp && *style_svp && SvOK(*style_svp)) {
         SV *style_str = NULL;
 
-        if (SvROK(*style_svp) &&
+        if (SvROK(*style_svp) && /* # uncoverable condition right count:2 */
             SvTYPE(SvRV(*style_svp)) == SVt_PVHV) {
             HV *style_hv = (HV *)SvRV(*style_svp);
             AV *skeys = _elem_sorted_hv_keys(aTHX_ style_hv);
@@ -434,10 +497,18 @@ _elem_render(pTHX_ SV *self_sv)
                 style_str = newSVpvs("");
                 for (si = 0; si < slen; si++) {
                     SV **ksvp = av_fetch(skeys, si, 0);
+                    /*
+                     # uncoverable branch false
+                     # uncoverable condition right count:1
+                     # uncoverable condition right count:2 */
                     if (ksvp && *ksvp) {
                         STRLEN kl;
                         const char *kstr = SvPV(*ksvp, kl);
                         SV **vsvp = hv_fetch(style_hv, kstr, kl, 0);
+                        /*
+                         # uncoverable branch false
+                         # uncoverable condition right count:1
+                         # uncoverable condition right count:2 */
                         if (vsvp && *vsvp) {
                             if (SvCUR(style_str) > 0)
                                 sv_catpvs(style_str, "; ");
@@ -455,7 +526,7 @@ _elem_render(pTHX_ SV *self_sv)
                 style_str = newSVpvn(sstr, slen);
         }
 
-        if (style_str && SvCUR(style_str) > 0) {
+        if (style_str && SvCUR(style_str) > 0) { /* # uncoverable condition right count:2 */
             STRLEN ssl;
             const char *ssstr = SvPV(style_str, ssl);
             SV *esc = _elem_escape_attr(aTHX_ ssstr, ssl);
@@ -470,6 +541,12 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* Attributes (sorted) */
     attrs_svp = hv_fetchs(hv, "attributes", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (attrs_svp && *attrs_svp && SvROK(*attrs_svp) &&
         SvTYPE(SvRV(*attrs_svp)) == SVt_PVHV) {
         HV *attrs = (HV *)SvRV(*attrs_svp);
@@ -479,11 +556,18 @@ _elem_render(pTHX_ SV *self_sv)
 
         for (ai = 0; ai < alen; ai++) {
             SV **ksvp = av_fetch(akeys, ai, 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2 */
             if (ksvp && *ksvp) {
                 STRLEN kl;
                 const char *kstr = SvPV(*ksvp, kl);
                 SV **vsvp = hv_fetch(attrs, kstr, kl, 0);
 
+                /*
+                 # uncoverable condition right count:1
+                 # uncoverable condition right count:2 */
                 if (vsvp && *vsvp && SvOK(*vsvp)) {
                     STRLEN vl;
                     const char *vstr = SvPV(*vsvp, vl);
@@ -503,6 +587,10 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* Event handlers (sorted) */
     hdl_svp = hv_fetchs(hv, "_handlers", 0);
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:4 */
     if (hdl_svp && *hdl_svp && SvROK(*hdl_svp) &&
         SvTYPE(SvRV(*hdl_svp)) == SVt_PVHV) {
         HV *hdl = (HV *)SvRV(*hdl_svp);
@@ -512,11 +600,19 @@ _elem_render(pTHX_ SV *self_sv)
 
         for (hi = 0; hi < hlen; hi++) {
             SV **ksvp = av_fetch(hkeys, hi, 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2 */
             if (ksvp && *ksvp) {
                 STRLEN kal;
                 const char *kastr = SvPV(*ksvp, kal);
                 SV **hidsvp = hv_fetch(hdl, kastr, kal, 0);
 
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1
+                 # uncoverable condition right count:2 */
                 if (hidsvp && *hidsvp) {
                     const char *hid = SvPV_nolen(*hidsvp);
                     const char *eid = "";
@@ -526,8 +622,18 @@ _elem_render(pTHX_ SV *self_sv)
 
                     /* Get element id for targetId */
                     SV **eid_svp = hv_fetchs(hv, "id", 0);
+                    /*
+                     # uncoverable branch true
+                     # uncoverable condition left count:1
+                     # uncoverable condition left count:2
+                     # uncoverable condition left count:3 */
                     if (!eid_svp || !*eid_svp || !SvOK(*eid_svp))
-                        eid_svp = hv_fetchs(hv, "_eid", 0);
+                        eid_svp = hv_fetchs(hv, "_eid", 0); /* # uncoverable statement */
+                    /*
+                     # uncoverable branch false
+                     # uncoverable condition right count:1
+                     # uncoverable condition right count:2
+                     # uncoverable condition right count:3 */
                     if (eid_svp && *eid_svp && SvOK(*eid_svp))
                         eid = SvPV_nolen(*eid_svp);
 
@@ -563,12 +669,18 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* Raw content (not escaped) */
     raw_svp = hv_fetchs(hv, "raw", 0);
+    /*
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (raw_svp && *raw_svp && SvOK(*raw_svp)) {
         sv_catsv(out, *raw_svp);
     }
 
     /* Text data (escaped) */
     data_svp = hv_fetchs(hv, "data", 0);
+    /*
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3 */
     if (data_svp && *data_svp && SvOK(*data_svp)) {
         STRLEN dlen;
         const char *dstr = SvPV(*data_svp, dlen);
@@ -579,14 +691,20 @@ _elem_render(pTHX_ SV *self_sv)
 
     /* Children (recursive) */
     children_svp = hv_fetchs(hv, "children", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2
+     # uncoverable condition right count:3
+     # uncoverable condition right count:4 */
     if (children_svp && *children_svp && SvROK(*children_svp) &&
         SvTYPE(SvRV(*children_svp)) == SVt_PVAV) {
         AV *children = (AV *)SvRV(*children_svp);
         SSize_t i, clen = av_len(children) + 1;
         for (i = 0; i < clen; i++) {
             SV **csvp = av_fetch(children, i, 0);
-            if (csvp && *csvp) {
-                if (SvROK(*csvp) &&
+            if (csvp && *csvp) { /* # uncoverable condition right count:2 */
+                if (SvROK(*csvp) && /* # uncoverable condition right count:2 */
                     sv_derived_from(*csvp, "Chandra::Element")) {
                     SV *child_html = _elem_render(aTHX_ *csvp);
                     sv_catsv(out, child_html);

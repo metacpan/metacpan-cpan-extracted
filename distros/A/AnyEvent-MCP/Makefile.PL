@@ -2,12 +2,14 @@ use ExtUtils::MakeMaker;
 
 my $mm = MM->new({
     dist         => {
-       PREOP	=> 'pod2text lib/AnyEvent/MCP/Intro.pod | tee README >$(DISTVNAME)/README; chmod -R u=rwX,go=rX . ;',
-       COMPRESS	=> 'gzip -9v',
+       PREOP	=> 'pod2text lib/AnyEvent/MCP/Intro.pod | tee README >$(DISTVNAME)/README; chmod -R u=rwX,go=rX $(DISTVNAME) ;',
+       COMPRESS	=> 'pigz -11',
        SUFFIX	=> '.gz',
 	            },
     NAME         => "AnyEvent::MCP",
     LICENSE      => "perl_5",
+    ABSTRACT_FROM => "lib/AnyEvent/MCP.pm",
+    AUTHOR       => "Marc Lehmann",
     VERSION_FROM => "lib/AnyEvent/MCP.pm",
     EXE_FILES    => [
        "bin/anyevent-mcp",
@@ -40,8 +42,11 @@ my $mm = MM->new({
              AnyEvent::WebSocket::Message => 0,
              AnyEvent::Fork::RPC          => 2.0,
              Mail::IMAPTalk               => 4.07,
+             Authen::SASL                 => 2.1800,
              IO::Socket::SSL              => 0,
              Term::ReadKey                => 0,
+             HTTP::Tiny                   => 0,
+             XML::LibXML                  => 0,
           } },
           test => { recommends => {
              Protocol::WebSocket::Frame => 0,

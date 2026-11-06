@@ -20,6 +20,7 @@ lib/App/Greple/md/Blocks.pm
 lib/App/mdee.pm
 minil.toml
 script/mdee
+share/theme/doubleline.sh
 share/theme/fatchap.sh
 share/theme/hashed.sh
 share/theme/markcell.sh
@@ -38,6 +39,7 @@ t/08_refill_join.t
 t/09_refill.t
 t/10_blocks.t
 t/11_quote_fold.t
+t/14_escape.t
 t/Util.pm
 t/demo.md
 t/table_wrap.md

@@ -20,8 +20,8 @@ like $Class::Abstract::VERSION, qr/\A\d+\.\d+/,
 # Public variables must exist with correct defaults.
 is $Class::Abstract::BYPASS, 0,
 	'$BYPASS defaults to 0';
-is $Class::Abstract::config{harness_bypass}, 1,
-	'$config{harness_bypass} defaults to 1';
+is $Class::Abstract::config{harness_bypass}, 0,
+	'$config{harness_bypass} defaults to 0 (enforcement on under a harness)';
 
 # Public methods must be present.  Parentheses required: without them Perl
 # parses "ok CLASS->can(...)" as CLASS->can()->ok(...), not ok(CLASS->can(...)).

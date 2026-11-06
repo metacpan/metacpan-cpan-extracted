@@ -1,6 +1,6 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak carp );
@@ -271,6 +271,33 @@ sub _openai_parallel_tool_calls_kwarg {
   return $self->_parallel_tool_calls_kwarg( $extra, $controls );
 }
 
+# The generation block (reasoning + prompt cache) for both request builders,
+# with chat_template_kwargs merged one level deep (karr k382): the reasoning
+# serializer's keys (enable_thinking, Langertha::Reasoning::to_chat_template_kwargs)
+# go first and the caller's chat_template_kwargs from %extra win key by key, so
+# a caller's other template switches (e.g. thinking => false for DeepSeek-V3.x /
+# Kimi templates) survive next to ours. The merged hash is written back into
+# %extra, which the builders spread last. This deliberately differs from
+# stream_options, where a caller value in %extra replaces ours whole (ADR 0038):
+# chat_template_kwargs is a bag of independent template switches, not one
+# setting. Without a caller value ours goes out as-is; without ours the
+# caller's passes through untouched. An undef caller value is no value (it is
+# not sent as null); any other non-hash caller value replaces ours whole.
+sub _openai_generation_kwargs {
+  my ( $self, $extra, $controls ) = @_;
+  delete $extra->{chat_template_kwargs}
+    if exists $extra->{chat_template_kwargs} && !defined $extra->{chat_template_kwargs};
+  my %generation = $self->generation_kwargs_for(%$controls);
+  if ( ref $generation{chat_template_kwargs} eq 'HASH'
+    && ref $extra->{chat_template_kwargs} eq 'HASH' ) {
+    $extra->{chat_template_kwargs} = {
+      %{ delete $generation{chat_template_kwargs} },
+      %{ $extra->{chat_template_kwargs} },
+    };
+  }
+  return %generation;
+}
+
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
 
@@ -292,7 +319,7 @@ sub chat_request {
       : ( ($self->can('has_response_format') && $self->has_response_format) ? ( response_format => $self->response_format ) : () ),
     $self->_temperature_kwargs($controls),
     exists $controls->{seed} ? ( seed => $controls->{seed} ) : (),
-    $self->generation_kwargs_for(%$controls),
+    $self->_openai_generation_kwargs(\%extra, $controls),
     ( $self->can('knobs_kwargs_for') ? $self->knobs_kwargs_for(%$controls) : () ),
     stream => JSON->false,
     %extra,
@@ -519,7 +546,7 @@ sub chat_stream_request {
       : ( ($self->can('has_response_format') && $self->has_response_format) ? ( response_format => $self->response_format ) : () ),
     $self->_temperature_kwargs($controls),
     exists $controls->{seed} ? ( seed => $controls->{seed} ) : (),
-    $self->generation_kwargs_for(%$controls),
+    $self->_openai_generation_kwargs(\%extra, $controls),
     ( $self->can('knobs_kwargs_for') ? $self->knobs_kwargs_for(%$controls) : () ),
     stream => JSON->true,
     # The stream's token usage comes only when the request asks for it; before
@@ -780,7 +807,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -960,6 +987,16 @@ when you need the raw form.
 Generates an OpenAI-format chat completion request. Includes model,
 messages, max_tokens, temperature, response_format (if set), and
 C<stream =E<gt> false>. Returns an HTTP request object.
+
+A C<chat_template_kwargs> HashRef in C<%extra> is merged with the one the
+reasoning control emits on the C<chat_template_kwargs> wire
+(L<Langertha::Reasoning/to_chat_template_kwargs>): one level deep, the
+caller's keys win, the caller's other keys are kept. Pass e.g.
+C<< chat_template_kwargs =E<gt> { thinking =E<gt> JSON->false } >> for chat
+templates that read C<thinking> rather than C<enable_thinking>. A caller value
+that is not a HashRef replaces the reasoning one whole (the caller wins); an
+undef one is not sent, and the reasoning one goes out as if none were given.
+The same merge applies to L</chat_stream_request>.
 
 =head2 _wire_usage
 
@@ -1200,7 +1237,7 @@ instants are derived lazily against L<Langertha::RateLimit/received>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -1217,7 +1254,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

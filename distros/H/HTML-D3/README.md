@@ -4,7 +4,7 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 ## Version
 
-Version 0.29
+Version 0.30
 
 ## Synopsis
 
@@ -73,6 +73,14 @@ Accepts the following optional arguments:
 - `title` - The title of the chart (default: 'Chart').
 It is plain text, escaped when it is written to the page: `<` and `&` appear
 as themselves, and HTML in a title is shown rather than obeyed.
+- `nonce` - A Content-Security-Policy nonce.  Every `<script>`
+element the object writes, inline or not, then carries `nonce="..."`, so a page
+whose policy is `script-src 'nonce-...'` runs the chart without
+`'unsafe-inline'`.  It must be made of the characters a base64 or base64url
+nonce uses (`A-Z a-z 0-9 + / _ - =`), so it cannot end the attribute.  Give a
+fresh one for each response, and never add it to markup afterwards: a nonce put
+on every `<script>` of a finished page would bless one injected through
+the data as well.  Without it the elements are written as before.
 - `responsive` - If true, SVG elements are rendered with
 `viewBox` and `width="100%"` instead of fixed pixel dimensions, so the
 chart scales fluidly with its container; with no `height` attribute, the
@@ -727,8 +735,8 @@ splicing directly into a Mojolicious TT (or any other) layout.
 
 The caller is responsible for loading D3 in the page `<head`>, e.g.:
 
-```
-<script src="https://d3js.org/d3.v7.min.js"></script>
+```perl
+<script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
 ```
 
 #### Arguments

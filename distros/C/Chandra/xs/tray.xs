@@ -19,6 +19,8 @@ CODE:
     chandra_tray_parse_menu_json(menu_json, &self->tray);
 
     /* Set up callback */
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (callback && SvOK(callback) && SvROK(callback)) {
         if (self->tray_callback) {
             SvREFCNT_dec(self->tray_callback);
@@ -44,7 +46,11 @@ _tray_update(self, icon_path, tooltip, menu_json)
 CODE:
     if (!self->tray_active) return;
 
+    # uncoverable branch false
+    # uncoverable condition right count:1
     if (self->tray.icon_path) Safefree((char *)self->tray.icon_path);
+    # uncoverable branch false
+    # uncoverable condition right count:1
     if (self->tray.tooltip) Safefree((char *)self->tray.tooltip);
     self->tray.icon_path = savepv(icon_path);
     self->tray.tooltip = savepv(tooltip);
@@ -62,14 +68,20 @@ CODE:
     if (self->tray_active) {
         webview_tray_destroy(&self->tray);
         self->tray_active = 0;
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (self->tray.icon_path) {
             Safefree((char *)self->tray.icon_path);
             self->tray.icon_path = NULL;
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (self->tray.tooltip) {
             Safefree((char *)self->tray.tooltip);
             self->tray.tooltip = NULL;
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (self->tray_callback) {
             SvREFCNT_dec(self->tray_callback);
             self->tray_callback = NULL;
@@ -108,11 +120,14 @@ CODE:
         const char *key;
         STRLEN key_len;
         key = SvPV(ST(i), key_len);
+        # uncoverable condition right count:2
         if (key_len == 3 && strEQ(key, "app")) {
             app_sv = newSVsv(ST(i + 1));
+        # uncoverable condition right count:2
         } else if (key_len == 4 && strEQ(key, "icon")) {
             SvREFCNT_dec(icon_sv);
             icon_sv = newSVsv(ST(i + 1));
+        # uncoverable condition right count:2
         } else if (key_len == 7 && strEQ(key, "tooltip")) {
             SvREFCNT_dec(tooltip_sv);
             tooltip_sv = newSVsv(ST(i + 1));
@@ -169,12 +184,14 @@ CODE:
     av_push(items_av, newRV_noinc((SV *)entry));
 
     /* Store handler if provided */
+    # uncoverable condition right count:3
     if (items > 2 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVCV) {
         id_len = my_snprintf(id_str, sizeof(id_str), "%ld", (long)id);
         (void)hv_store(handlers_hv, id_str, id_len, newSVsv(ST(2)), 0);
     }
 
     /* _sync if active */
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -208,6 +225,7 @@ CODE:
     (void)hv_stores(entry, "separator", newSViv(1));
     av_push(items_av, newRV_noinc((SV *)entry));
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -239,6 +257,7 @@ CODE:
     I32 si, sub_len;
 
     /* sub_items must be an array ref */
+    # uncoverable condition left count:2
     if (!SvROK(sub_items_sv) || SvTYPE(SvRV(sub_items_sv)) != SVt_PVAV) {
         RETVAL = SvREFCNT_inc(self);
         goto done_add_submenu;
@@ -264,6 +283,7 @@ CODE:
         char id_str[32];
         int id_len;
 
+        # uncoverable condition left count:1
         if (!elem_svp || !SvROK(*elem_svp)) continue;
         elem_hv = (HV *)SvRV(*elem_svp);
 
@@ -278,6 +298,7 @@ CODE:
             (lbl_svp && SvOK(*lbl_svp)) ? newSVsv(*lbl_svp) : newSVpvs(""));
 
         hdl_svp = hv_fetchs(elem_hv, "handler", 0);
+        # uncoverable condition right count:3
         if (hdl_svp && SvROK(*hdl_svp) && SvTYPE(SvRV(*hdl_svp)) == SVt_PVCV) {
             id_len = my_snprintf(id_str, sizeof(id_str), "%ld", (long)sub_id);
             (void)hv_store(handlers_hv, id_str, id_len, newSVsv(*hdl_svp), 0);
@@ -292,6 +313,7 @@ CODE:
     (void)hv_stores(entry, "submenu", newRV_noinc((SV *)out_sub));
     av_push(items_av, newRV_noinc((SV *)entry));
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -320,6 +342,7 @@ CODE:
     SV **active_svp = hv_fetchs(hv, "_active", 0);
     SV *icon_val;
 
+    # uncoverable condition right count:1
     if (items > 1 && SvOK(ST(1))) {
         icon_val = newSVsv(ST(1));
     } else {
@@ -327,6 +350,7 @@ CODE:
     }
     (void)hv_stores(hv, "icon", icon_val);
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -353,6 +377,7 @@ CODE:
     SV **active_svp = hv_fetchs(hv, "_active", 0);
     SV *tip_val;
 
+    # uncoverable condition right count:1
     if (items > 1 && SvOK(ST(1))) {
         tip_val = newSVsv(ST(1));
     } else {
@@ -360,6 +385,7 @@ CODE:
     }
     (void)hv_stores(hv, "tooltip", tip_val);
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -402,6 +428,7 @@ CODE:
         STRLEN si;
         if (search_len == 0) is_numeric = 0;
         for (si = 0; si < search_len; si++) {
+            # uncoverable condition left count:1
             if (search[si] < '0' || search[si] > '9') { is_numeric = 0; break; }
         }
     }
@@ -414,15 +441,19 @@ CODE:
         SV **id_svp, **label_svp;
         int match = 0;
 
+        # uncoverable condition left count:1
         if (!elem_svp || !SvROK(*elem_svp)) continue;
         elem_hv = (HV *)SvRV(*elem_svp);
 
         if (is_numeric) {
             id_svp = hv_fetchs(elem_hv, "id", 0);
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
             if (id_svp && SvOK(*id_svp) && SvIV(*id_svp) == search_id)
                 match = 1;
         } else {
             label_svp = hv_fetchs(elem_hv, "label", 0);
+            # uncoverable condition right count:1
             if (label_svp && SvOK(*label_svp)) {
                 const char *lbl;
                 STRLEN lbl_len;
@@ -441,15 +472,19 @@ CODE:
                 key = SvPV(ST(ki), key_len);
                 if (key_len == 5 && strEQ(key, "label")) {
                     (void)hv_stores(elem_hv, "label", newSVsv(ST(ki + 1)));
+                # uncoverable condition right count:2
                 } else if (key_len == 8 && strEQ(key, "disabled")) {
                     (void)hv_stores(elem_hv, "disabled",
                         newSViv(SvTRUE(ST(ki + 1)) ? 1 : 0));
                 } else if (key_len == 7 && strEQ(key, "checked")) {
                     (void)hv_stores(elem_hv, "checked",
                         newSViv(SvTRUE(ST(ki + 1)) ? 1 : 0));
+                # uncoverable condition right count:2
                 } else if (key_len == 7 && strEQ(key, "handler")) {
+                    # uncoverable condition right count:2
                     if (SvROK(ST(ki + 1)) && SvTYPE(SvRV(ST(ki + 1))) == SVt_PVCV) {
                         SV **eid = hv_fetchs(elem_hv, "id", 0);
+                        # uncoverable condition right count:2
                         if (eid && SvOK(*eid)) {
                             char id_str[32];
                             int id_len = my_snprintf(id_str, sizeof(id_str),
@@ -464,6 +499,7 @@ CODE:
         }
     }
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -539,6 +575,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **active_svp = hv_fetchs(hv, "_active", 0);
+    # uncoverable condition right count:1
     RETVAL = (active_svp && SvIV(*active_svp)) ? 1 : 0;
 }
 OUTPUT:
@@ -556,12 +593,14 @@ CODE:
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
     /* Already active - no-op */
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         RETVAL = SvREFCNT_inc(self);
         goto done_show;
     }
 
     /* No app - return self */
+    # uncoverable condition left count:1
     if (!app_svp || !SvOK(*app_svp)) {
         RETVAL = SvREFCNT_inc(self);
         goto done_show;
@@ -605,7 +644,11 @@ CODE:
             goto done_show;
         }
 
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         icon_str = (icon_svp && SvOK(*icon_svp)) ? SvPV_nolen(*icon_svp) : "";
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         tooltip_str = (tooltip_svp && SvOK(*tooltip_svp)) ? SvPV_nolen(*tooltip_svp) : "";
 
         /* Build menu JSON directly */
@@ -621,6 +664,7 @@ CODE:
             PUTBACK;
             count = call_method("_make_dispatch_callback", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             dispatch_cb = (count > 0) ? newSVsv(POPs) : newSV(0);
             PUTBACK;
             FREETMPS; LEAVE;
@@ -637,11 +681,18 @@ CODE:
         SvREFCNT_dec(menu_json_sv);
 
         /* Set up callback */
+        # uncoverable branch false
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
+        # uncoverable condition right count:3
         if (dispatch_cb && SvOK(dispatch_cb) && SvROK(dispatch_cb)) {
+            # uncoverable branch true
+            # uncoverable condition left count:1
             if (pc->tray_callback) SvREFCNT_dec(pc->tray_callback);
             pc->tray_callback = SvREFCNT_inc(dispatch_cb);
             pc->tray.menu_cb = tray_menu_cb;
         } else {
+            # uncoverable statement
             pc->tray.menu_cb = NULL;
         }
         SvREFCNT_dec(dispatch_cb);
@@ -649,6 +700,8 @@ CODE:
         result = webview_tray_create(&pc->tray);
         pc->tray_active = (result == 0) ? 1 : 0;
 
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (result == 0)
             (void)hv_stores(hv, "_active", newSViv(1));
         (void)hv_stores(hv, "_pending", newSViv(0));
@@ -671,21 +724,30 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **active_svp = hv_fetchs(hv, "_active", 0);
 
+    # uncoverable condition right count:1
     if (active_svp && SvIV(*active_svp)) {
         SV **app_svp = hv_fetchs(hv, "app", 0);
+        # uncoverable condition right count:1
         if (app_svp && SvOK(*app_svp)) {
             PerlChandra *pc = CHANDRA_PC_FROM_APP(*app_svp);
+            # uncoverable condition right count:2
             if (pc && pc->tray_active) {
                 webview_tray_destroy(&pc->tray);
                 pc->tray_active = 0;
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (pc->tray.icon_path) {
                     Safefree((char *)pc->tray.icon_path);
                     pc->tray.icon_path = NULL;
                 }
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (pc->tray.tooltip) {
                     Safefree((char *)pc->tray.tooltip);
                     pc->tray.tooltip = NULL;
                 }
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (pc->tray_callback) {
                     SvREFCNT_dec(pc->tray_callback);
                     pc->tray_callback = NULL;
@@ -712,10 +774,13 @@ CODE:
     SV **app_svp = hv_fetchs(hv, "app", 0);
     PerlChandra *pc;
 
+    # uncoverable condition left count:1
     if (!active_svp || !SvIV(*active_svp)) return;
+    # uncoverable condition left count:1
     if (!app_svp || !SvOK(*app_svp)) return;
 
     pc = CHANDRA_PC_FROM_APP(*app_svp);
+    # uncoverable condition left count:2
     if (!pc || !pc->tray_active) return;
 
     {
@@ -724,14 +789,22 @@ CODE:
         SV **tooltip_svp = hv_fetchs(hv, "tooltip", 0);
         const char *icon_str, *tooltip_str;
 
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         icon_str = (icon_svp && SvOK(*icon_svp)) ? SvPV_nolen(*icon_svp) : "";
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         tooltip_str = (tooltip_svp && SvOK(*tooltip_svp)) ? SvPV_nolen(*tooltip_svp) : "";
 
         /* Build menu JSON directly */
         menu_json_sv = chandra_tray_build_menu_json(aTHX_ self);
 
         /* Update tray struct directly */
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (pc->tray.icon_path) Safefree((char *)pc->tray.icon_path);
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (pc->tray.tooltip) Safefree((char *)pc->tray.tooltip);
         pc->tray.icon_path = savepv(icon_str);
         pc->tray.tooltip = savepv(tooltip_str);
@@ -768,10 +841,12 @@ CODE:
             HV *elem_hv, *out_entry;
             SV **sep_svp, **sub_svp, **id_svp, **lbl_svp, **dis_svp, **chk_svp;
 
+            # uncoverable condition left count:1
             if (!elem_svp || !SvROK(*elem_svp)) continue;
             elem_hv = (HV *)SvRV(*elem_svp);
 
             sep_svp = hv_fetchs(elem_hv, "separator", 0);
+            # uncoverable condition right count:2
             if (sep_svp && SvTRUE(*sep_svp)) {
                 out_entry = newHV();
                 (void)hv_stores(out_entry, "separator", newSViv(1));
@@ -780,6 +855,7 @@ CODE:
             }
 
             sub_svp = hv_fetchs(elem_hv, "submenu", 0);
+            # uncoverable condition right count:2
             if (sub_svp && SvROK(*sub_svp)) {
                 /* Flatten: emit parent label, then indented children */
                 AV *sub_av = (AV *)SvRV(*sub_svp);
@@ -800,6 +876,7 @@ CODE:
                     HV *sub_hv, *sub_out;
                     SV **sid_svp, **slbl_svp;
 
+                    # uncoverable condition left count:1
                     if (!sub_elem || !SvROK(*sub_elem)) continue;
                     sub_hv = (HV *)SvRV(*sub_elem);
 
@@ -811,6 +888,7 @@ CODE:
                         newSViv((sid_svp && SvOK(*sid_svp)) ? SvIV(*sid_svp) : 0));
                     {
                         SV *prefixed = newSVpvs("  ");
+                        # uncoverable condition right count:1
                         if (slbl_svp && SvOK(*slbl_svp))
                             sv_catsv(prefixed, *slbl_svp);
                         (void)hv_stores(sub_out, "label", prefixed);
@@ -831,8 +909,10 @@ CODE:
                 newSViv((id_svp && SvOK(*id_svp)) ? SvIV(*id_svp) : 0));
             (void)hv_stores(out_entry, "label",
                 (lbl_svp && SvOK(*lbl_svp)) ? newSVsv(*lbl_svp) : newSVpvs(""));
+            # uncoverable condition right count:2
             if (dis_svp && SvTRUE(*dis_svp))
                 (void)hv_stores(out_entry, "disabled", newSViv(1));
+            # uncoverable condition right count:2
             if (chk_svp && SvTRUE(*chk_svp))
                 (void)hv_stores(out_entry, "checked", newSViv(1));
             av_push(out, newRV_noinc((SV *)out_entry));
@@ -845,6 +925,8 @@ CODE:
         PUTBACK;
         count = call_method("new", G_SCALAR);
         SPAGAIN;
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (count > 0) {
             SV *json_obj = POPs;
 
@@ -868,9 +950,12 @@ CODE:
             PUTBACK;
             count = call_method("encode", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             RETVAL = (count > 0) ? newSVsv(POPs) : newSVpvs("[]");
         } else {
+            # uncoverable statement
             SvREFCNT_dec((SV *)out);
+            # uncoverable statement
             RETVAL = newSVpvs("[]");
         }
         PUTBACK;
@@ -923,9 +1008,7 @@ CODE:
             "}"
         );
 
-        /* eval the factory */
-        PUSHMARK(SP);
-        PUTBACK;
+        /* eval the factory, which may move the stack, so read SP again after */
         {
             SV *factory = eval_pv(SvPV_nolen(code_sv), 1);
             SvREFCNT_dec(code_sv);
@@ -936,11 +1019,13 @@ CODE:
                 av_push(args, handlers_ref);
                 av_push(args, on_click_ref);
 
+                SPAGAIN;
                 PUSHMARK(SP);
                 XPUSHs(sv_2mortal(newRV_noinc((SV *)args)));
                 PUTBACK;
                 count = call_sv(factory, G_SCALAR);
                 SPAGAIN;
+                # uncoverable condition right count:1
                 RETVAL = (count > 0) ? newSVsv(POPs) : newSV(0);
             }
         }

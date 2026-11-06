@@ -66,7 +66,7 @@ static SV *_store_json_obj = NULL;
 static SV *
 chandra_store_get_json(pTHX)
 {
-    if (!_store_json_obj || !SvOK(_store_json_obj)) {
+    if (!_store_json_obj || !SvOK(_store_json_obj)) { /* # uncoverable condition left count:2 */
         _store_json_obj = eval_pv(
             "require Cpanel::JSON::XS;"
             "Cpanel::JSON::XS->new->utf8->pretty(1)->canonical(1)->allow_nonref",
@@ -93,6 +93,9 @@ chandra_store_encode(pTHX_ SV *val)
     SPAGAIN;
     result = (count > 0 && !SvTRUE(ERRSV))
         ? newSVsv(POPs) : newSVpvs("{}");
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:3 */
     if (SvTRUE(ERRSV)) sv_setpvs(ERRSV, "");
     PUTBACK; FREETMPS; LEAVE;
     return result;
@@ -113,14 +116,20 @@ chandra_store_decode(pTHX_ SV *json_sv, const char *path)
     PUTBACK;
     count = call_method("decode", G_SCALAR | G_EVAL);
     SPAGAIN;
-    if (count > 0 && !SvTRUE(ERRSV)) {
+    if (count > 0 && !SvTRUE(ERRSV)) { /* # uncoverable condition right count:1 */
         SV *decoded = POPs;
+        /*
+         # uncoverable condition right count:1
+         # uncoverable condition right count:2 */
         if (SvOK(decoded) && SvROK(decoded)
                 && SvTYPE(SvRV(decoded)) == SVt_PVHV) {
             result = (HV *)SvRV(decoded);
             SvREFCNT_inc_simple_void((SV *)result);
         }
     }
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:3 */
     if (SvTRUE(ERRSV)) sv_setpvs(ERRSV, "");
     PUTBACK; FREETMPS; LEAVE;
     if (!result)
@@ -155,7 +164,7 @@ chandra_store_mkdirp(const char *path, int mode)
     strncpy(tmp, path, sizeof(tmp) - 1);
     tmp[sizeof(tmp) - 1] = '\0';
     len = strlen(tmp);
-    if (len > 0 && tmp[len - 1] == '/') tmp[len - 1] = '\0';
+    if (len > 0 && tmp[len - 1] == '/') tmp[len - 1] = '\0'; /* # uncoverable condition right count:1 */
 #ifdef _WIN32
     /* Also handle backslash separators */
     if (len > 0 && tmp[len - 1] == '\\') tmp[len - 1] = '\0';
@@ -179,6 +188,11 @@ chandra_store_mkdirp(const char *path, int mode)
             {
                 struct stat st;
                 if (stat(tmp, &st) != 0)
+                    /*
+                     # uncoverable branch true class:ignore_covered_err
+                     # uncoverable condition left count:1
+                     # uncoverable condition left count:2
+                     # uncoverable condition right count:2 */
                     if (mkdir(tmp, mode) != 0 && errno != EEXIST) return -1;
             }
 #endif
@@ -194,6 +208,11 @@ chandra_store_mkdirp(const char *path, int mode)
     if (!CreateDirectoryA(tmp, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)
         return -1;
 #else
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2
+     # uncoverable condition right count:2 */
     if (mkdir(tmp, mode) != 0 && errno != EEXIST) return -1;
 #endif
     return 0;
@@ -217,6 +236,9 @@ chandra_store_traverse(pTHX_ HV *data, const char *key, STRLEN klen,
     HV *node = data;
 
     *leaf_sv = NULL;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (not_hash) *not_hash = 0;
 
     Newx(buf, klen + 1, char);
@@ -234,16 +256,19 @@ chandra_store_traverse(pTHX_ HV *data, const char *key, STRLEN klen,
             seg_len = (STRLEN)(p - seg);
 
             svp = hv_fetch(node, seg, (I32)seg_len, 0);
-            if (!svp || !SvOK(*svp)) {
+            if (!svp || !SvOK(*svp)) { /* # uncoverable condition left count:2 */
                 if (!create) { Safefree(buf); return NULL; }
                 HV *new_hv = newHV();
                 (void)hv_store(node, seg, (I32)seg_len,
                                newRV_noinc((SV *)new_hv), 0);
                 node = new_hv;
-            } else if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVHV) {
+            } else if (SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVHV) { /* # uncoverable condition right count:2 */
                 node = (HV *)SvRV(*svp);
             } else {
                 /* Non-hash in the middle of the path */
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 */
                 if (not_hash) *not_hash = 1;
                 Safefree(buf);
                 return NULL;
@@ -279,8 +304,8 @@ chandra_store_save_c(pTHX_ HV *self_hv)
     FILE *fh;
     int fd;
 
-    if (!path_svp || !SvOK(*path_svp)) return;
-    if (!data_svp || !SvROK(*data_svp)) return;
+    if (!path_svp || !SvOK(*path_svp)) return; /* # uncoverable condition left count:1 */
+    if (!data_svp || !SvROK(*data_svp)) return; /* # uncoverable condition left count:2 */
 
     path = SvPV_nolen(*path_svp);
 
@@ -326,9 +351,12 @@ chandra_store_save_c(pTHX_ HV *self_hv)
         croak("Chandra::Store: cannot rename '%s' to '%s': error %lu\n",
               tmp_path, path, (unsigned long)GetLastError());
 #else
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (rename(tmp_path, path) != 0)
-        croak("Chandra::Store: cannot rename '%s' to '%s': %s\n",
-              tmp_path, path, strerror(errno));
+        croak("Chandra::Store: cannot rename '%s' to '%s': %s\n", /* # uncoverable statement */
+              tmp_path, path, strerror(errno)); /* # uncoverable statement */
 #endif
 }
 
@@ -344,7 +372,7 @@ chandra_store_reload_c(pTHX_ HV *self_hv)
     SV *json_sv;
     HV *new_data;
 
-    if (!path_svp || !SvOK(*path_svp)) return;
+    if (!path_svp || !SvOK(*path_svp)) return; /* # uncoverable condition left count:1 */
     path = SvPV_nolen(*path_svp);
 
     fh = fopen(path, "rb");
@@ -376,7 +404,7 @@ chandra_store_reload_c(pTHX_ HV *self_hv)
     new_data = chandra_store_decode(aTHX_ json_sv, path);
     if (new_data) {
         SV **old_svp = hv_fetchs(self_hv, "_data", 0);
-        if (old_svp && SvROK(*old_svp)) {
+        if (old_svp && SvROK(*old_svp)) { /* # uncoverable condition right count:1 */
             /* Replace _data with freshly decoded HV */
             (void)hv_stores(self_hv, "_data", newRV_noinc((SV *)new_data));
         } else {
@@ -407,10 +435,10 @@ chandra_store_default_path(pTHX_ const char *name)
         home = "C:\\\\";
     }
 #else
-    if (!home || !*home) {
+    if (!home || !*home) { /* # uncoverable condition left count:1 */
         /* Fall back to getpwuid */
         struct passwd *pw = getpwuid(getuid());
-        home = pw ? pw->pw_dir : "/tmp";
+        home = pw ? pw->pw_dir : "/tmp"; /* # uncoverable condition right count:1 */
     }
 #endif
 

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works &mdash; App::FileSync</title>
+<meta name="description" content="The sync session, the line-delimited JSON protocol, block deltas, conflict copies, trash, snapshots, locking and the on-disk layout.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="how-it-works.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="How it works &mdash; App::FileSync">
+<meta property="og:description" content="The sync session, the line-delimited JSON protocol, block deltas, conflict copies, trash, snapshots, locking and the on-disk layout.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html" aria-current="page">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>How it works</h1>
+
+	<p class="lede">A star around one master. Clients never talk to each other: each
+	pushes its changes to the master and pulls everyone else's from it. The server
+	is stateless between runs apart from the index and the per-client bases it keeps
+	on disk.</p>
+
+	<div class="toc">
+		<p>On this page</p>
+		<ul>
+			<li><a href="#session">One session</a></li>
+			<li><a href="#transfer">Transfer and deltas</a></li>
+			<li><a href="#conflicts">Conflicts</a></li>
+			<li><a href="#deletions">Deletions and trash</a></li>
+			<li><a href="#snapshots">Replica snapshots</a></li>
+			<li><a href="#layout">On-disk layout</a></li>
+			<li><a href="#locking">Locking and concurrency</a></li>
+			<li><a href="#security">Security model</a></li>
+		</ul>
+	</div>
+
+	<h2 id="session">One session</h2>
+
+	<p>Every run is a short-lived process. In outline:</p>
+
+	<ol class="steps">
+		<li>
+			<h3>The client checks its root and takes its lock</h3>
+			<p>The sync root must contain the <code>.filesync-root</code> marker that
+			<code>filesync init</code> wrote, so an unmounted drive is reported rather
+			than treated as a tree of deletions. A local lock keeps two runs of the
+			same repo apart.</p>
+		</li>
+		<li>
+			<h3>It opens the transport</h3>
+			<p>Over ssh, with <code>BatchMode=yes</code> and a forced command pinned in
+			<code>authorized_keys</code>. The pinned command carries the repo, the
+			client id and the role, so the session itself never chooses the server
+			root. The <code>local</code> transport runs the same protocol over a pipe
+			for testing and single-machine use.</p>
+		</li>
+		<li>
+			<h3>It scans the tree and sends a manifest</h3>
+			<p>The walk is sorted, so manifests and logs are reproducible. A cache of
+			size and mtime decides which files need hashing. Ignore patterns are
+			applied on both sides. The manifest has one entry per file, and it is sent
+			whole: there is no change journal.</p>
+		</li>
+		<li>
+			<h3>The server plans against its index</h3>
+			<p>Holding the repo lock, the server compares the client's manifest with
+			the master index and with that client's base, and answers with one plan:
+			what to pull, what to push, what to delete, and which paths conflict.</p>
+		</li>
+		<li>
+			<h3>Both sides move the files the plan names</h3>
+			<p>Pulls are requested in chunks and pushes are sent in chunks; each
+			256&nbsp;KiB chunk waits for its acknowledgement, so one request is in
+			flight at a time. Files of at least 64&nbsp;KiB are sent as block deltas
+			when the other side already holds an older copy.</p>
+		</li>
+		<li>
+			<h3>Transfers are verified, then committed</h3>
+			<p>An upload is checked against its SHA-256 at the end and only then
+			renamed into the master. A pull is checked against the hash in the plan; a
+			mismatch fails that pull and the next run retries. Temporary names carry
+			a <code>.filesync-tmp-</code> prefix, which the backup example excludes.</p>
+		</li>
+		<li>
+			<h3>State is written and the run is logged</h3>
+			<p>The server rewrites the index and the client's base and appends to the
+			repo journal. The client updates its cache, prunes its local trash unless
+			<code>--no-prune</code> was given, and appends to
+			<code>~/.filesync/logs/REPO.jsonl</code> whatever the outcome. The summary
+			reports pulled, pushed, deleted and conflicted counts, the payload bytes
+			in each direction, and how many files moved as a delta.</p>
+		</li>
+	</ol>
+
+	<h2 id="transfer">Transfer and deltas</h2>
+
+	<p>Each control message is one JSON object on one line. A message that
+	announces a payload carries <code>len</code>, the bytes on the wire, and
+	<code>z</code> when the payload was deflated; the payload follows the line
+	directly. Only payload bytes are counted in the transfer report; headers and
+	control messages are excluded.</p>
+
+	<p>Deflation is used when it makes the frame smaller. For a file the other side
+	already has an older copy of, the sender builds a signature of the receiver's
+	blocks and sends copy instructions plus literals, rsync-style. The rolling
+	scan runs in pure Perl, so it covers at most the first 8&nbsp;MiB after the
+	unchanged prefix; later changes go as literals. Offsets and lengths are 32-bit
+	on the wire, so a delta cannot refer beyond 4&nbsp;GiB into the receiver's
+	file; larger remainders fall back to whole-file transfer.</p>
+
+	<p>Writing is atomic between processes: every file is written to a temporary
+	name and renamed into place. Nothing is <code>fsync</code>ed, so a rename
+	survives a crash as a name but not necessarily as durable data.</p>
+
+	<h2 id="conflicts">Conflicts</h2>
+
+	<p>When both sides changed a path, the newer mtime wins, and the master wins
+	ties within two seconds. The loser is not discarded: it is kept beside the
+	winner as a conflict copy named before the extension, for example</p>
+
+<pre><code>report.conflict-laptop-1-20261022T101500Z.txt</code></pre>
+
+	<p>The name is capped at 200 bytes so it fits common filesystems. The server
+	keeps a conflict copy under the planned name whether or not the client names
+	it, and refuses any other name; acknowledgements are accepted only for actions
+	the client was told to apply.</p>
+
+	<p>Because the tie-break uses mtimes, a client with a wrong clock can pick the
+	wrong winner. The losing content is still preserved, so the cost is a merge,
+	not lost data.</p>
+
+	<h2 id="deletions">Deletions and trash</h2>
+
+	<p>A deletion is a plan action like any other, but it is bounded: by default a
+	session may delete at most 200 files or 10% of the known files, whichever
+	limit is reached first. A tree that suddenly looks empty therefore stops the
+	run instead of being propagated. <code>filesync sync --force</code> proceeds
+	when that is really what you want.</p>
+
+	<p>On the client, a removed file is moved into that repo's local trash, kept
+	for 30 days by default. A second deletion of the same path on the same day is
+	stored as <code>PATH.1</code>, then <code>PATH.2</code>, and so on. The server
+	keeps its own trash, with the retention set per repo.</p>
+
+<pre><code>filesync restore notes/a.txt --list
+filesync restore notes/a.txt
+filesync restore notes/a.txt --to /tmp/recovered</code></pre>
+
+	<p>Restores copy rather than move, so the trash entry survives and the
+	operation is repeatable. The destination must not already exist.</p>
+
+	<h2 id="snapshots">Replica snapshots</h2>
+
+	<p>A machine registered with <code>--role replica</code> may take a daily
+	snapshot of its tree. Snapshots live in <code>.filesync-snapshots</code> inside
+	the replica root and are made by hard link or by copy, chosen with
+	<code>--snapshot-mode</code>. Fourteen are kept by default.</p>
+
+	<p>A hard-linked snapshot shares the file with the live tree. The sync replaces
+	files by rename, which leaves the snapshot's link intact, but any other tool
+	that edits a replica file in place also changes every snapshot that links it.
+	Use <code>snapshot_mode copy</code> if anything but filesync writes there.</p>
+
+	<p>Snapshots guard against a bad sync, not against losing the disk: they sit on
+	the same filesystem as the replica.</p>
+
+	<h2 id="layout">On-disk layout</h2>
+
+	<h3>On the client</h3>
+
+	<div class="table-wrap">
+	<table>
+		<thead><tr><th>Path</th><th>Holds</th></tr></thead>
+		<tbody>
+			<tr><td><code>~/.filesync/config.json</code></td><td>The repo list, written by <code>filesync init</code>. <code>$FILESYNC_CONFIG</code> overrides the path, <code>$FILESYNC_HOME</code> the directory.</td></tr>
+			<tr><td><code>~/.filesync/logs/REPO.jsonl</code></td><td>One JSON object per run attempt, successful or not.</td></tr>
+			<tr><td><code>~/.filesync/</code></td><td>The cache, the per-repo lock and the local trash as well.</td></tr>
+			<tr><td><code>ROOT/.filesync-root</code></td><td>The marker that proves the sync root is mounted and is the tree the client registered.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<h3>On the server</h3>
+
+	<div class="table-wrap">
+	<table>
+		<thead><tr><th>Path</th><th>Holds</th></tr></thead>
+		<tbody>
+			<tr><td><code>ROOT/master/REPO/</code></td><td>The master tree, an ordinary directory.</td></tr>
+			<tr><td><code>ROOT/.filesync/repos/REPO/config.json</code></td><td>The repo policy and the admitted clients.</td></tr>
+			<tr><td><code>ROOT/.filesync/repos/REPO/</code></td><td>The index, the per-client bases, the server trash and the journal.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>The master is a normal tree, so backup is rsync and restore is rsync plus
+	<code>filesync-admin reindex</code>. The index is a JSON file rewritten whole
+	at the end of each session.</p>
+
+	<h2 id="locking">Locking and concurrency</h2>
+
+	<p>Both the client and the server take locks, and a refusal is not an error:
+	<code>filesync</code> exits <strong>2</strong> so cron can tell "a run was
+	already in progress" from "a run failed". The plan is computed once, from a
+	scan taken while the repo lock is held; something else writing into the master
+	during a session is not seen until the next one.</p>
+
+	<p><code>flock</code> is advisory and, on NFS, may not lock across machines at
+	all. Keep the server root and the client's <code>~/.filesync</code> on local
+	disks.</p>
+
+	<h2 id="security">Security model</h2>
+
+	<ul>
+		<li><strong>Authentication is ssh's.</strong> The client id is a name for
+		bases, journals and conflict copies, not a credential. ssh runs with
+		<code>BatchMode=yes</code>, so cron cannot sit at a password prompt.</li>
+		<li><strong>The server pins the session.</strong> sshd starts
+		<code>filesync-server</code> with <code>--repo</code>, <code>--client</code>
+		and <code>--role</code> from <code>authorized_keys</code>. An ssh server of
+		the form <code>-v@host</code>, or a program name starting with <code>-</code>,
+		is refused rather than passed to ssh as an option.</li>
+		<li><strong>Ids are plain.</strong> A repo or client name must match
+		<code>[A-Za-z0-9][A-Za-z0-9._-]*</code> and be at most 64 characters, so
+		<code>../x</code> cannot become a path.</li>
+		<li><strong>Paths are validated on the wire.</strong> No absolute paths,
+		drive letters, backslashes, NUL or control characters, empty or
+		<code>.</code>/<code>..</code> components; at most 4096 bytes, and no
+		component over 255. Symlinks are not followed.</li>
+		<li><strong>Frames are bounded.</strong> A payload length must be a number no
+		larger than 64&nbsp;MiB, and the receiver refuses a frame that does not match
+		it. An upload larger than announced is refused and discarded.</li>
+		<li><strong>Errors carry no file paths by default.</strong> Commands strip
+		Perl's <code>at FILE line N</code> suffix; <code>FILESYNC_TRACE=1</code>
+		turns every error into a full stack trace when debugging.</li>
+	</ul>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

@@ -22,7 +22,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
          --[no-]rule        use Unicode rules for tables (default: on)
-         --table-style=#    table style: lattice, 3line or simple (default: lattice)
+    --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
      -w  --width=#          output width (default: terminal width)
          --fold-width=#     fold width (default: pane width - 3 - run-in)
@@ -30,7 +30,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --runout=#         run-out width for line breaking (default: 4)
          --runlen=#         set both run-in and run-out
          --boundary=#       fold boundary: word, space or none (default: word)
-     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell)
+     -t  --theme=#[,#,...]  color theme(s) (default: hashed,nomark,markcell,doubleline)
      -m  --mode=#           light or dark (default: light)
      -B  --base-color=#     override base color of theme
                             (e.g., Ivory, #780043, (120,0,67))
@@ -50,7 +50,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 # VERSION
 
-Version 1.15
+Version 1.16
 
 # DESCRIPTION
 
@@ -323,7 +323,7 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     dashes (`-`) in separator lines are replaced with horizontal
     rules (`─`).  Default is enabled.
 
-- **--table-style**=_STYLE_
+- **--table-style**=_STYLE_, **--ts** _STYLE_
 
     Select how tables are drawn.  `lattice` (default) keeps a separator
     between the columns, `│` or `|` depending on `--rule`.  `pipe` is
@@ -415,10 +415,10 @@ bold text, etc.).
 
 - **-t** _NAME_, **--theme**=_NAME_\[,_NAME_,...\]
 
-    Select color themes.  The default is `hashed,nomark,markcell`,
+    Select color themes.  The default is `hashed,nomark,markcell,doubleline`,
     which appends closing hashes to h3-h6 headers, hides markup
-    characters for a clean reading experience, and marks the rows of
-    tables whose cells are wrapped.
+    characters for a clean reading experience, marks the rows of
+    tables whose cells are wrapped, and gives h4 a double underline.
 
     Themes specified with `--theme` are added to the default, not
     replacing it (`default[theme]` in the configuration file replaces
@@ -427,7 +427,7 @@ bold text, etc.).
     transformation, and when two themes set the same value the later
     one wins:
 
-        mdee --theme=warm file.md         # hashed,nomark,markcell (default) + warm
+        mdee --theme=warm file.md         # the default themes + warm
         mdee --no-theme --theme=warm      # warm only (clear default first)
         mdee --no-theme file.md           # no theme (show all markup)
 
@@ -468,6 +468,18 @@ bold text, etc.).
         strikethrough, code, clickable links) but the surrounding
         markers are not displayed.  Table marks (`markcell`,
         `markwrap`) are independent of this theme.
+
+    - `doubleline` (default)
+
+        Give h4 headers a double underline, which is `ESC[4:2m`, in the
+        terminals known to take it, decided by environment variables: iTerm2,
+        Ghostty, cmux, VS Code, WezTerm, kitty, Alacritty, Konsole, Windows
+        Terminal and terminals based on VTE 0.52 or later.  Elsewhere, inside
+        **tmux** and **screen**, and where the variables do not reach, as through
+        **ssh**, this theme does nothing and h4 has a single underline, the same
+        as h5.  Many terminals do not take the sequence: it becomes a background color in Terminal.app and
+        rxvt-unicode, and the Linux console and mosh drop the whole sequence
+        with its color.
 
     - `warm`
 
@@ -585,6 +597,7 @@ bold text, etc.).
         mdee --config FILE='L25D/R;E'             # red file label
         mdee --config FILE_FORMAT=%s:             # simple format
         mdee --config hashed.h3=1                 # enable h3 closing hashes
+        mdee --config cjk_friendly=1              # see LIMITATIONS, Emphasis
 
     Theme keys consumed by mdee:
 
@@ -600,7 +613,7 @@ bold text, etc.).
 
 ## Highlight Options
 
-- **--colormap**=_LABEL_=_SPEC_, **--cm**=_LABEL_=_SPEC_
+- **--colormap**=_LABEL_=_SPEC_, **--cm** _LABEL_=_SPEC_
 
     Override the color for a specific element.  _LABEL_ is one of the
     color labels listed below.  _SPEC_ follows
@@ -1029,6 +1042,22 @@ Multi-line emphasis text is not supported.
 `***bold italic***` and `___bold italic___` are supported.
 Other nested forms (e.g., `**bold _italic_**`) are not.
 
+`*` and `**` start and end emphasis as in CommonMark: a delimiter
+with a letter on one side and punctuation on the other does not
+count, so `L*=50, a*=68` is not italic.  CommonMark counts Unicode
+punctuation, and this rejects some emphasis in Japanese text,
+such as `日本語の*「強調」*です` and `日本語の**強調。**です`.  mdee
+shows them as pandoc and zenn.dev do, with the markers and without
+emphasis, so that such text can be found before it is published.
+
+With `cjk_friendly=1` (`--config cjk_friendly=1`, or
+`md_config+=(cjk_friendly=1)` in `config.sh`), the rules of
+[markdown-cjk-friendly](https://github.com/tats-u/markdown-cjk-friendly)
+are used instead: CJK punctuation does not count, and a CJK character
+on the other side is as good as a space, so these are emphasis.  This
+is a proposal, not part of CommonMark; use it for text that is
+processed by an implementation of it.
+
 ## Block Quotes
 
 A block quote is recognized by its `>` markers at the start of a
@@ -1140,6 +1169,16 @@ does not override them.
 - [CommonMark](https://metacpan.org/pod/CommonMark), [Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl), [pandoc](https://pandoc.org)
 
     One of them finds the paragraphs for `--refill`.
+
+- [CommonMark Spec 0.31.2, Emphasis and strong emphasis](https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis)
+
+    The rules that `*` and `**` follow by default (see ["Emphasis"](#emphasis)).
+
+- [CommonMark CJK-friendly Amendments](https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md)
+
+    The rules that `cjk_friendly=1` follows.  The proposal comes from
+    [commonmark-spec issue #650, Emphasis with CJK punctuation](https://github.com/commonmark/commonmark-spec/issues/650),
+    open since 2020.
 
 - [https://github.com/tecolicom/App-mdee](https://github.com/tecolicom/App-mdee)
 

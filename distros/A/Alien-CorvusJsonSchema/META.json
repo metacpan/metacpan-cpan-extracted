@@ -68,7 +68,7 @@
          "web" : "https://github.com/corvus-dotnet/Corvus.JsonSchema/tree/main/src-perl/Alien-CorvusJsonSchema"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.88",
       "requires" : {

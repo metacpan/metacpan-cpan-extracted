@@ -1,5 +1,31 @@
 Revision history for Langertha
 
+0.505     2026-11-05 15:50:14Z
+
+    - New reasoning_wire_format chat_template_kwargs: sends
+      chat_template_kwargs.enable_thinking (a JSON boolean) plus
+      reasoning_effort, and only enable_thinking false for effort none.
+      It is the default on LlamaCpp and SGLang, and any OpenAI-compatible
+      engine takes it through the constructor. A chat_template_kwargs hash
+      the caller passes in %extra is merged one level deep; the caller's
+      keys win (ADR 0040).
+    - New tri-state thinking_enabled control (engine attribute and chat_f
+      control) next to reasoning_effort: on, off, or unset. A per-request
+      value replaces both engine values; a contradiction inside one layer
+      croaks, at construction too. Ollama native honors a per-request
+      thinking_enabled.
+    - DeepSeek V3.x with reasoning effort none or thinking off sends
+      thinking {type: disabled}; it sent enabled before. The OpenAI
+      temperature gate reads the resolved effort.
+    - Fix constructing an engine or a plugin from one hash reference:
+      new({ ... }) now takes every argument, the same as new( ... ), and
+      warns nothing. This covers every chat engine (through
+      Langertha::Role::Langfuse) and Langertha::Plugin; the LANGFUSE_PUBLIC_KEY
+      / LANGFUSE_SECRET_KEY defaults and the raider alias for host apply to
+      both forms.
+    - ex/raider_rag.pl defaults to a local Ollama at
+      http://localhost:11434, like the other examples.
+
 0.504     2026-10-22 21:00:18Z
 
     - Gemini 4 (gemini-4-argon, any gemini-4* id) gets its own request
@@ -1827,7 +1853,7 @@ Revision history for Langertha
       contract that Langertha::Response expects.
       Normalises input_tokens/output_tokens and
       output_tokens_details.reasoning_tokens to the chat-style names
-      Goldmine's cost lookup expects. Streaming not supported.
+      downstream cost lookups expect. Streaming not supported.
 
     - Langertha::ToolCall gained from_responses() constructor for
       extracting tool calls from Responses API

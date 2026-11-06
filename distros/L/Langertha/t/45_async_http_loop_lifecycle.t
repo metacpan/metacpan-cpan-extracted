@@ -143,7 +143,15 @@ subtest 'a client its owner already took off the loop is not removed twice' => s
 # global destruction frees.
 subtest 'destruction at program exit is silent' => sub {
   my $lib  = "$FindBin::Bin/../lib";
+  # Lexical warnings (`use warnings` in the program text) cover Langertha and
+  # the user code, and the (in cleanup) / global-destruction messages raised
+  # from Langertha's own scopes. A global -w would also check third-party
+  # modules: with Cpanel::JSON::XS loaded before JSON::PP (JSON::MaybeXS
+  # first, then Langertha::Role::OpenAPI's `use JSON::PP`), perl 5.36's
+  # JSON::PP::Boolean re-declares the overloads Cpanel::JSON::XS already put
+  # on that class, and overload.pm (no `use warnings`) reports it under -w.
   my $code = join ' ',
+    'use warnings;',
     'my %args = ( api_key => "k", url => "http://127.0.0.1:1/v1" );',
     'my $loop = IO::Async::Loop->new;',
     'our $on_default = Langertha::Engine::OpenAI->new(%args); $on_default->_async_http;',
@@ -151,7 +159,7 @@ subtest 'destruction at program exit is silent' => sub {
     'our $on_own = Langertha::Engine::OpenAI->new(%args, _async_loop => $own_loop); $on_own->_async_http;',
     '{ my $cycle = Langertha::Engine::OpenAI->new(%args); $cycle->_async_http; $cycle->{_self_cycle} = $cycle; }',
     'print "ready\n";';
-  my $out = qx{"$^X" -I"$lib" -MIO::Async::Loop -MLangertha::Engine::OpenAI -we '$code' 2>&1};
+  my $out = qx{"$^X" -I"$lib" -MIO::Async::Loop -MLangertha::Engine::OpenAI -e '$code' 2>&1};
   is( $?, 0, 'exit status 0' );
   is( $out, "ready\n", 'nothing on stderr' );
 };

@@ -1,5 +1,21 @@
 Revision history for Database::Join
 
+0.011.1	Thu Nov  5 10:02:16 PM EST 2026
+	[ Bug fix ]
+	- Test a driver that fails without a reason
+
+0.011.0	Thu Nov  5 09:21:15 PM EST 2026
+	[ Enhancements ]
+	- Database::Join::Catalog: what an application needs to know about a
+	  database before opening its tables, without a driver of its own.
+	  tables() and schema() list a SQLite file's tables, or a MariaDB or
+	  MySQL database's, with their columns in declared order; table_info()
+	  gives a table's columns and primary key; write_sqlite() and
+	  sqlite_bytes() write rows as a one-table SQLite file; available_driver()
+	  says which DBD driver is installed.  A SQLite file is opened read-only,
+	  so a missing one is not created.  Failures croak with an error that
+	  says whether connecting or the query failed.
+
 0.010.1	Sun Nov  1 07:59:33 PM EST 2026
 	[ Enhancements ]
 	- autoload_pk: new constructor parameter that sets the column name used as

@@ -205,7 +205,7 @@ WriteMakefile
         LICENSE             perl
         MIN_PERL_VERSION    5.040
     )
-  , VERSION         => 'v2.0.0'
+  , VERSION         => 'v2.0.1'
   , ABSTRACT_FROM   => 'lib/LinkedList/Single/Examples.pm'
   , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
 

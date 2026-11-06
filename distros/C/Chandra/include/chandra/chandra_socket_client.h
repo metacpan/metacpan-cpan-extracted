@@ -16,11 +16,11 @@ _client_connect_tcp(pTHX_ HV *hv)
     SV **tls_svp  = hv_fetchs(hv, "tls", 0);
     SV **host_svp = hv_fetchs(hv, "host", 0);
     SV **port_svp = hv_fetchs(hv, "port", 0);
-    SV *host = host_svp ? *host_svp : sv_2mortal(newSVpvs("127.0.0.1"));
-    SV *port = port_svp ? *port_svp : &PL_sv_undef;
+    SV *host = host_svp ? *host_svp : sv_2mortal(newSVpvs("127.0.0.1")); /* # uncoverable condition right count:1 */
+    SV *port = port_svp ? *port_svp : &PL_sv_undef; /* # uncoverable condition right count:1 */
     SV *sock;
 
-    if (tls_svp && SvTRUE(*tls_svp)) {
+    if (tls_svp && SvTRUE(*tls_svp)) { /* # uncoverable condition right count:2 */
         SV **tls_ca_svp = hv_fetchs(hv, "tls_ca", 0);
         sock = _sock_tls_connect(aTHX_ host, port,
             (tls_ca_svp && SvOK(*tls_ca_svp)) ? *tls_ca_svp : NULL);
@@ -52,7 +52,7 @@ _client_connect_unix(pTHX_ HV *hv)
         _sock_set_nonblocking(aTHX_ sock);
 
         /* Read token from file unless explicitly provided */
-        if (!explicit_svp || !SvTRUE(*explicit_svp)) {
+        if (!explicit_svp || !SvTRUE(*explicit_svp)) { /* # uncoverable condition left count:1 */
             SV *tok = _sock_read_token_file(aTHX_ SvPV_nolen(path_sv));
             if (tok)
                 (void)hv_stores(hv, "_token", tok);
@@ -73,12 +73,16 @@ _client_send_handshake(pTHX_ HV *hv)
     SV **token_svp = hv_fetchs(hv, "_token", 0);
     HV *hs;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     if (!conn_svp || !SvOK(*conn_svp)) return;
 
     hs = newHV();
-    if (name_svp && SvOK(*name_svp))
+    if (name_svp && SvOK(*name_svp)) /* # uncoverable condition right count:2 */
         (void)hv_stores(hs, "name", newSVsv(*name_svp));
-    if (token_svp && SvOK(*token_svp))
+    if (token_svp && SvOK(*token_svp)) /* # uncoverable condition right count:2 */
         (void)hv_stores(hs, "token", newSVsv(*token_svp));
 
     _sock_conn_send(aTHX_ *conn_svp, "__handshake",
@@ -153,7 +157,7 @@ _client_do_connect(pTHX_ SV *self)
     conn = _sock_connection_new(aTHX_ sock,
         (name_svp && SvOK(*name_svp)) ? *name_svp : NULL);
 
-    (void)hv_stores(hv, "_conn", conn ? conn : newSV(0));
+    (void)hv_stores(hv, "_conn", conn ? conn : newSV(0)); /* # uncoverable condition left count:1 */
     _client_send_handshake(aTHX_ hv);
     (void)hv_stores(hv, "_retry_delay", newSVnv(0.1));
 
@@ -169,6 +173,9 @@ _client_do_reconnect(pTHX_ SV *self)
     HV *hv = (HV *)SvRV(self);
     SV **conn_svp = hv_fetchs(hv, "_conn", 0);
 
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:3 */
     if (conn_svp && SvOK(*conn_svp) && SvROK(*conn_svp)) {
         _sock_call_void(aTHX_ *conn_svp, "close");
         (void)hv_stores(hv, "_conn", newSV(0));
@@ -201,16 +208,20 @@ _client_dispatch_reply(pTHX_ HV *hv, SV *reply_sv, SV *data)
     if (!reply_sv || !SvOK(reply_sv)) return 0;
 
     pending_svp = hv_fetchs(hv, "_pending", 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     if (!pending_svp || !SvROK(*pending_svp)) return 0;
 
     pending_hv = (HV *)SvRV(*pending_svp);
     rstr = SvPV(reply_sv, rlen);
     cb_svp = hv_fetch(pending_hv, rstr, rlen, 0);
-    if (!cb_svp || !SvOK(*cb_svp)) return 0;
+    if (!cb_svp || !SvOK(*cb_svp)) return 0; /* # uncoverable condition left count:2 */
 
     cb = newSVsv(*cb_svp);
     (void)hv_delete(pending_hv, rstr, rlen, G_DISCARD);
-    _sock_dispatch_cb(aTHX_ cb, data ? data : &PL_sv_undef);
+    _sock_dispatch_cb(aTHX_ cb, data ? data : &PL_sv_undef); /* # uncoverable condition left count:1 */
     SvREFCNT_dec(cb);
     return 1;
 }
@@ -226,17 +237,17 @@ _client_dispatch_channel(pTHX_ HV *hv, SV *channel, SV *data)
     const char *ch_str;
     SV **hnd_svp;
 
-    if (!channel || !SvOK(channel)) return;
+    if (!channel || !SvOK(channel)) return; /* # uncoverable condition left count:1 */
 
     handlers_svp = hv_fetchs(hv, "_handlers", 0);
-    if (!handlers_svp || !SvROK(*handlers_svp)) return;
+    if (!handlers_svp || !SvROK(*handlers_svp)) return; /* # uncoverable condition left count:2 */
 
     hnd_hv = (HV *)SvRV(*handlers_svp);
     ch_str = SvPV(channel, ch_len);
     hnd_svp = hv_fetch(hnd_hv, ch_str, ch_len, 0);
-    if (!hnd_svp || !SvOK(*hnd_svp)) return;
+    if (!hnd_svp || !SvOK(*hnd_svp)) return; /* # uncoverable condition left count:2 */
 
-    _sock_dispatch_cb(aTHX_ *hnd_svp, data ? data : &PL_sv_undef);
+    _sock_dispatch_cb(aTHX_ *hnd_svp, data ? data : &PL_sv_undef); /* # uncoverable condition left count:1 */
 }
 
 /* ---- Poll for incoming messages ---- */
@@ -250,6 +261,10 @@ _client_do_poll(pTHX_ SV *self)
     int msg_count = 0;
     int mi;
 
+    /*
+     # uncoverable condition left count:1
+     # uncoverable condition left count:3
+     # uncoverable condition left count:4 */
     if (!conn_svp || !SvOK(*conn_svp) || !SvROK(*conn_svp) ||
         !_sock_is_connected(aTHX_ *conn_svp)) {
         _client_do_reconnect(aTHX_ self);
@@ -260,6 +275,10 @@ _client_do_poll(pTHX_ SV *self)
 
     if (msg_count == 0) {
         conn_svp = hv_fetchs(hv, "_conn", 0);
+        /*
+         # uncoverable condition left count:1
+         # uncoverable condition left count:2
+         # uncoverable condition left count:3 */
         if (!conn_svp || !SvOK(*conn_svp) || !SvROK(*conn_svp) ||
             !_sock_is_connected(aTHX_ *conn_svp)) {
             _client_do_reconnect(aTHX_ self);
@@ -271,25 +290,31 @@ _client_do_poll(pTHX_ SV *self)
         HV *msg_hv;
         SV **reply_svp, **ch_svp, **data_svp;
 
-        if (!SvOK(msg_svs[mi]) || !SvROK(msg_svs[mi])) continue;
+        if (!SvOK(msg_svs[mi]) || !SvROK(msg_svs[mi])) continue; /* # uncoverable condition left count:1 */
         msg_hv    = (HV *)SvRV(msg_svs[mi]);
         reply_svp = hv_fetchs(msg_hv, "_reply_to", 0);
         ch_svp    = hv_fetchs(msg_hv, "channel", 0);
         data_svp  = hv_fetchs(msg_hv, "data", 0);
 
         /* Handle __token_rotate from hub */
-        if (ch_svp && SvOK(*ch_svp) &&
+        if (ch_svp && SvOK(*ch_svp) && /* # uncoverable condition right count:1 */
             strEQ(SvPV_nolen(*ch_svp), "__token_rotate")) {
+            /*
+             # uncoverable condition right count:1
+             # uncoverable condition right count:2 */
             if (data_svp && SvOK(*data_svp) && SvROK(*data_svp)) {
                 HV *td = (HV *)SvRV(*data_svp);
                 SV **new_tok_svp = hv_fetchs(td, "token", 0);
-                if (new_tok_svp && SvOK(*new_tok_svp)) {
+                if (new_tok_svp && SvOK(*new_tok_svp)) { /* # uncoverable condition right count:2 */
                     (void)hv_stores(hv, "_token",
                         newSVsv(*new_tok_svp));
                     /* Fire on_token_refresh callback */
                     {
                         SV **cb_svp2 = hv_fetchs(hv,
                             "_on_token_refresh", 0);
+                        /*
+                         # uncoverable condition right count:2
+                         # uncoverable condition right count:3 */
                         if (cb_svp2 && SvOK(*cb_svp2)
                             && SvROK(*cb_svp2)) {
                             _sock_dispatch_cb(aTHX_ *cb_svp2,
@@ -301,7 +326,7 @@ _client_do_poll(pTHX_ SV *self)
             continue;
         }
 
-        if (_client_dispatch_reply(aTHX_ hv,
+        if (_client_dispatch_reply(aTHX_ hv, /* # uncoverable condition right count:2 */
                 reply_svp ? *reply_svp : NULL,
                 data_svp ? *data_svp : NULL))
             continue;

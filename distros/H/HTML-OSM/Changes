@@ -1,5 +1,14 @@
 Revision history for HTML-OSM
 
+0.14	Thu Nov  5 10:55:00 AM EST 2026
+	[ Enhancements ]
+	- new(nonce => ...) puts nonce="..." on every <script> onload_render()
+	  writes: Leaflet and its plugins in the head and the map's own script, so
+	  a page whose Content-Security-Policy allows scripts only by nonce draws
+	  the map without 'unsafe-inline'.  It must be base64 or base64url, so it
+	  cannot end the attribute; onload_render() checks it again for a clone or
+	  a config file.  t/nonce.t
+
 0.13	Wed Nov  4 10:02:06 AM EST 2026
 	[ Enhancements ]
 	- new(scale => 1) adds Leaflet's scale bar, in kilometres and miles.  It

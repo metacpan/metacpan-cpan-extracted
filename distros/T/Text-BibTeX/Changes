@@ -1,5 +1,57 @@
 Revision history for Perl module Text::BibTeX
 
+1.00 (unreleased)
+ Rewrite of the btparse C library.  See "UPGRADING FROM 0.x" in
+ Text::BibTeX for the incompatible changes.
+
+ * The PCCTS-generated parser is replaced by a hand-written, reentrant
+   lexer and parser.  All state (lexer state, error counts, macro
+   tables) lives in explicit objects, so several files can be parsed at
+   once and Text::BibTeX is thread-safe.  The fixed-size parser stacks
+   (and their limits on the number of fields in an entry) are gone.
+ * The C library never prints, exits or aborts.  Errors are collected
+   and reported as Text::BibTeX::Error objects through Perl's warn/die:
+   they can be caught with $SIG{__WARN__}, redirected with STDERR,
+   controlled with the 'Text::BibTeX' warnings category, or handled by
+   $Text::BibTeX::Error::Handler.  Entries record their errors
+   (Text::BibTeX::Entry::errors).  Usage errors throw exceptions.
+ * Input is read through PerlIO: any filehandle works, including
+   in-memory handles, tied handles and handles with :encoding layers.
+   Text::BibTeX::File::open accepts a filehandle or a scalar reference,
+   and new 'encoding', 'private_macros' and 'filename' options.
+ * Full Unicode support: binmode 'utf-8' is now the default; input is
+   validated (invalid bytes become U+FFFD with a warning) and normalised
+   once when read, rather than on every access.  Field names, entry
+   types and macro names use full Unicode case mappings; name splitting
+   ("von" detection), initials (grapheme clusters), purify_string and
+   change_case are Unicode-aware, using tables generated at build time
+   from the building perl's Unicode database.  TeX markup is passed
+   through unchanged.  Files opened for writing in utf-8 mode get an
+   :encoding(UTF-8) layer.
+ * Better error recovery: a missing closing brace no longer loses the
+   following entry, and a syntax error no longer stops the rest of the
+   file being read.
+ * Fixed crashes and undefined behaviour in the old library: consecutive
+   or leading commas in names, "and  and" with doubled spaces, empty
+   delimiters, preambles containing macros in preserve mode, stray bytes
+   at the end of change_case results, and many uses of uninitialised
+   memory found by fuzzing.
+ * The C library is compiled straight into the XS module: libbtparse is
+   no longer built or installed (no more library path problems), and the
+   biblex, bibparse and dumpnames programs are gone.  The build no longer
+   needs Config::AutoConf or ExtUtils::LibBuilder.
+ * Inputs which BibTeX accepts are no longer syntax errors: an entry
+   with a key but no fields (@misc{key}), and @comment not followed by
+   a braced or parenthesised comment, whose text is then skipped like
+   other text between entries (an unterminated @comment{ is still an
+   error).
+ * New: Text::BibTeX::unicode_version(); a stand-alone fuzzing harness
+   for the C library (fuzz/).
+ * Text::BibTeX::Error objects record the entry key (key) and the calling
+   location (caller_file, caller_line); name warnings from
+   Text::BibTeX::Entry::names number names from 1.
+ * Requires Perl 5.26.
+
 0.91 2025-01-29
  * Fix compilation issue with btparse code (Colin Mcdonald)
 

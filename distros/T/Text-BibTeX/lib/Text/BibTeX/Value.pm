@@ -21,8 +21,7 @@ use strict;
 use Scalar::Util 'blessed';
 use Carp;
 
-use vars qw'$VERSION';
-$VERSION = 0.88;
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -158,6 +157,51 @@ methods, C<type> and C<text>:
 
    $entry->get ('year')->value (0)->text;   # "1997"
 
+=head1 POST-PROCESSING
+
+Unless values are preserved, each field value goes through the same
+processing as in BibTeX:
+
+=over 4
+
+=item *
+
+numbers are converted to strings (they are always kept as the string of
+digits that appears in the file);
+
+=item *
+
+macros are expanded (an undefined macro expands to the empty string,
+with a warning);
+
+=item *
+
+the simple values are pasted together into a single string;
+
+=item *
+
+whitespace is collapsed: runs of whitespace become a single space, and
+leading and trailing whitespace is removed.
+
+=back
+
+So, with the C<and> macro defined as C<" and ">, the C<author> field in
+the example above becomes C<"Homer Simpson and Ned Flanders">.  Note
+that whitespace is collapsed I<after> pasting, so it doesn't matter
+which of the pieces the spaces between them came from.
+
+The text of a macro definition (C<@string>) is processed in the same way
+except that its whitespace is not collapsed: that happens when the
+macro is used in a field value.
+
+When values are preserved, none of this is done, so the text of each
+simple value is as it appears in the input (minus the quotes or braces
+around strings), except that each newline, carriage return and tab in a
+string is replaced with a space.
+
+Whether or not values are preserved, entry types and field names are
+converted to lowercase (using Unicode case mapping).
+
 =head1 METHODS
 
 Normally, you won't need to create C<Value> or C<SimpleValue>
@@ -244,8 +288,7 @@ use strict;
 use Carp;
 use Text::BibTeX qw(:nodetypes);
 
-use vars qw($VERSION);
-$VERSION = '0.88';
+our $VERSION = '1.00';
 
 
 =head2 Text::BibTeX::SimpleValue methods

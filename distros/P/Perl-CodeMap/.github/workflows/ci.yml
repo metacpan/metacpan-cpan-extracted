@@ -1,0 +1,94 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  perl:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.32', '5.40']
+        parser: ['lite', 'ppi']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install PPI for structural parsing jobs
+        if: matrix.parser == 'ppi'
+        run: cpanm --notest PPI
+      - name: Test distribution
+        run: |
+          perl Makefile.PL
+          make
+          make test
+          prove -Ilib -v t
+      - name: Verify command and standalone report
+        run: |
+          perl bin/perl-codemap --root examples/sample --parser ${{ matrix.parser }} --output example.html --json example.json
+          test -s example.html
+          test -s example.json
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax and DOM smoke checks
+        run: |
+          node --check lib/Perl/CodeMap/assets/app.js
+          node t/browser-smoke.js
+
+  # Only the synthetic example is published. Existing Perl and JS CI jobs
+  # must all succeed before the Pages artifact is prepared.
+  build-pages:
+    name: Build public sample for GitHub Pages
+    needs: [perl, frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Generate standalone demo from synthetic fixture
+        run: |
+          mkdir -p _site
+          perl bin/perl-codemap \
+            --root examples/sample \
+            --parser lite \
+            --include-tests \
+            --name 'Perl CodeMap - Live Demo' \
+            --output _site/index.html
+          test -s _site/index.html
+          grep -q 'Demo::App' _site/index.html
+          touch _site/.nojekyll
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload only the generated sample
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy-pages:
+    name: Deploy sample to GitHub Pages
+    needs: build-pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - name: Deploy Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

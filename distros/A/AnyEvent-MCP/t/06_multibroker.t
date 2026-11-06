@@ -14,7 +14,7 @@ use IO::Socket::INET ();
 use JSON::XS ();
 use Time::HiRes ();
 
-print "1..69\n";
+print "1..82\n";
 my $test;
 sub ok($$) {
    my ($condition, $name) = @_;
@@ -144,6 +144,11 @@ ok $success && $result->{content}[0]{text} eq "child", "downstream synthetic ins
 ($success, $result) = wait_for (sub { $client->call ("meta-instructions", {}, $_[0]) });
 ok $success && $result->{content}[0]{text} =~ /Proxy MCP servers.*PREFIX\.TOOL/,
    "multibroker synthetic instructions are callable with custom routing";
+($success, $result) = wait_for (sub {
+   $client->call ("meta-instructions", { padding => "x" x (2 * 1024 * 1024) }, $_[0]);
+});
+ok $success && $result->{content}[0]{text} =~ /Proxy MCP servers/,
+   "multibroker accepts upstream requests larger than 1 MiB";
 ok !$tools{"list-tools"}{inputSchema}{additionalProperties},
    "list-tools schema forbids unknown arguments";
 ok $tools{"http.echo"}{annotations}{readOnlyHint}, "tool definition extensions preserved";
@@ -209,6 +214,63 @@ ok $success && $result->{isError}, "list-tools rejects unknown exact broker name
 ok $success && $result->{isError}
    && $result->{content}[0]{text} =~ /Unknown list-tools argument 'bogus'/,
    "list-tools rejects unrecognized input fields instead of ignoring them";
+
+# Hidden brokers remain discoverable and callable, but do not advertise tools.
+my $hidden_http = AnyEvent::MCP::Client::JSONL->new (
+   command => [$^X, "-Ilib", "bin/mcp-multibroker",
+      http => $http->url (0), "--bearer", "secret", "--hidden",
+      child => $command[-1]],
+   env => { PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio" },
+);
+($success, $result) = wait_for (sub { $hidden_http->tools ($_[0]) });
+ok $success && @$result == 8 && !grep (/\Ahttp\./, map $_->{name}, @$result),
+   "HTTP hidden child omitted from normal tools/list";
+($success, $result) = wait_for (sub { $hidden_http->call ("list-tools", {}, $_[0]) });
+ok $success && @{$result->{structuredContent}{tools}} == 8
+   && !grep (/\Ahttp\./, map $_->{name}, @{$result->{structuredContent}{tools}}),
+   "unfiltered list-tools omits hidden child";
+($success, $result) = wait_for (sub { $hidden_http->call ("list-tools", { broker => "http" }, $_[0]) });
+ok $success && @{$result->{structuredContent}{tools}} == 4
+   && !grep ($_->{name} !~ /\Ahttp\./, @{$result->{structuredContent}{tools}}),
+   "explicit list-tools includes hidden HTTP child";
+($success, $result) = wait_for (sub { $hidden_http->call ("discover-brokers", {}, $_[0]) });
+ok $success && $result->{structuredContent}{http} =~ /Hidden tools; use list-tools broker=http/
+   && $result->{structuredContent}{http} =~ /HTTP instructions/
+   && $result->{structuredContent}{child} eq "child", "discover-brokers identifies hidden child";
+($success, $result) = wait_for (sub { $hidden_http->call ("http.echo", { direct => 1 }, $_[0]) });
+ok $success && $result->{structuredContent}{direct}, "hidden HTTP child callable directly";
+($success, $result) = wait_for (sub {
+   $hidden_http->call ("call-tool", { name => "http.echo", arguments => { wrapped => 1 } }, $_[0]);
+});
+ok $success && $result->{structuredContent}{wrapped}, "hidden HTTP child callable through call-tool";
+$hidden_http->close;
+
+my $hidden_stdio = AnyEvent::MCP::Client::JSONL->new (
+   command => [$^X, "-Ilib", "bin/mcp-multibroker",
+      http => $http->url (0), "--bearer", "secret",
+      child => "---", $^X, "-Ilib", "$dir/child", "---", "--hidden"],
+   env => { PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL => "stdio" },
+);
+($success, $result) = wait_for (sub { $hidden_stdio->tools ($_[0]) });
+ok $success && @$result == 8 && !grep (/\Achild\./, map $_->{name}, @$result),
+   "hidden stdio child omitted from normal tools/list";
+($success, $result) = wait_for (sub { $hidden_stdio->call ("list-tools", {}, $_[0]) });
+ok $success && @{$result->{structuredContent}{tools}} == 8,
+   "unfiltered list-tools omits hidden stdio child";
+($success, $result) = wait_for (sub { $hidden_stdio->call ("list-tools", { broker => "child" }, $_[0]) });
+ok $success && @{$result->{structuredContent}{tools}} == 4,
+   "explicit list-tools includes hidden stdio child";
+($success, $result) = wait_for (sub { $hidden_stdio->call ("discover-brokers", {}, $_[0]) });
+ok $success && $result->{structuredContent}{child} =~ /Hidden tools; use list-tools broker=child/,
+   "discover-brokers identifies hidden stdio child";
+($success, $result) = wait_for (sub { $hidden_stdio->call ("child.echo", { direct => 1 }, $_[0]) });
+ok $success && $result->{structuredContent}{direct}, "hidden stdio child callable directly";
+($success, $result) = wait_for (sub {
+   $hidden_stdio->call ("call-tool", { name => "child.echo", arguments => { wrapped => 1 } }, $_[0]);
+});
+ok $success && $result->{structuredContent}{wrapped}, "hidden stdio child callable through call-tool";
+$hidden_stdio->close;
+
 ($success, $result) = wait_for (sub { $client->call ("missing.tool", {}, $_[0]) });
 ok $success && $result->{isError}, "unknown route is a tool error";
 ($success, $result) = wait_for (sub { $client->call ("call-tool", { name => "call-tool" }, $_[0]) });
@@ -478,6 +540,7 @@ for my $cli (1, 0) {
       $cv->recv == 0 or die "multibroker --print-url: $url_error\n";
    }
    chomp $url;
+   $url =~ s/\s+# user [^\n]*\z//;
    my $pid;
    END { kill TERM => $pid if $pid }
    my $server_cv;

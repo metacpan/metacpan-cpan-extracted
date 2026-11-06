@@ -60,6 +60,7 @@ WriteMakefile(
 		'Errno'          => 0,
 		'File::Find'     => 0,
 		'File::Temp'     => 0,
+		'POSIX'          => 0,
 		'Test::Exception' => 0,
 		'Test::Mockingbird::TimeTravel' => '0.14',
 		'Test::Most'     => 0,

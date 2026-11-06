@@ -1,11 +1,201 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.06  2026-11-05
+      - Since 0.05, the same day: the fixes for systems without /proc, and the
+        measurement of the atomic calls extended.  The figures of post4-0.04
+        hold (the measured files differ only in $VERSION); digest of the code
+        they depend on:
+        c19ac884428cba12a90ff7e8d1bfc4dba7b540e621dc72062563a5ce4ec950b1.
+      - RT #182479 (Slaven Rezic: the tests fail on FreeBSD, which has no
+        /proc and no /bin/true; thanks to Slaven for the report and for his
+        smokers).  The tests find programs through PATH, read
+        signal dispositions, masks and process groups from a Perl child
+        instead of /proc, and skip what needs Linux's /proc (t/graph.t's
+        reporter, the batteries fdbattery and sigenv, pidfd without
+        /proc/self/fdinfo).  Running the suite with /proc hidden found three
+        faults of the library itself without /proc, now fixed: (1) Perl's
+        writes into a pipe it shares with children set O_NONBLOCK on the
+        shared open file, so the children's writes failed with EAGAIN and
+        output was lost (known issue L10's fallback); a pipe of ours is now a
+        named FIFO opened once more for Perl alone, and a pipe we were given
+        takes PIPE_BUF bytes per blocking write; (2) the check whether an fd
+        is close-on-exec read /proc/self/fdinfo, and took every fd as
+        inherited without it (echo x >&5 then failed like the program, not
+        like dash): now fcntl, through the new XSUB
+        Proc::Spawner::__fd_cloexec; (3) ulimit died ("Undefined subroutine
+        Proc::ShellSpawn::Large::unsupported") without /proc/self/limits; it
+        now asks a shell, which has Perl's limits: dash, bash --posix, ksh or
+        sh, in /bin first, then on PATH (none: "not supported", status 248).
+        Known issue X28.
+      - The atomic calls where no program runs (large-subset-builtins.pl) now
+        include commands not found and settings alone ($ONBUILTIN reports
+        them too), with messages as dash's, bash's or neither; the external
+        calls of every sample in the classes of the main table
+        (large-subset-runreport.pl -x).
+
+0.05  2026-11-05
+      - The release of post4-0.04, with the version number 0.05 and
+        NOTES-post3-0.04.txt no longer shipped.  The figures of post4-0.04
+        hold (the measured files differ only in $VERSION); digest of the code
+        they depend on:
+        743121ae0b5fb7af55b5308fb51c3db9cf61ca74ec2d3a40e98a3dc6cca634cd.
+      - In short, since 0.04: functions before regular builtins (3A); rule-E
+        choices; background jobs go on between run() calls (K3); aliases
+        known only when they run (P1); rule F ([ a \< b ]); read with names
+        from expansions; bracket expressions with quotes, expansions or '/';
+        K0 (kill with no process ID); bugs X25, X26 and others fixed; the
+        behaviour of every accepted corpus sample compared with dash and bash
+        at run time (doc/large-subset/large-subset-state.md, section 7).
+      The documents label the unreleased states between 0.04 and 0.05 post-0.04
+      to post4-0.04; their entries follow, newest first.
+
+    post4-0.04:
+      - Bracket expressions with quoted members, expansions or '/' (the work
+        list, large-subset-state.md section 4; both shells agree, probes
+        brquote, brslash): grep ^[\>\<], ls [a"]"], ^["$v"], [$v], and
+        something[^/]*.  Quoted characters are members, never operators
+        (also ! ^ - ]); an unquoted expansion's characters are active.  In
+        pathname expansion a bracket expression with a '/' is none: its '['
+        is literal, as both shells.  Also in the pattern of ${x%[...]}.  The
+        large grammar only; Proc::ShellSubset itself still rejects them.
+      - In ${x:-word} (not a pattern), * ? [ are accepted: literal where the
+        ${...} is quoted ("${1:-sure? [y/N]}"), active where it is not
+        (probe dqpword).
+      - Case patterns and ${x%p} are put together whole before they become a
+        regex, so a bracket expression may span quoted and unquoted parts.
+      - Fixed: [^...] (rule E: negation) was turned into [!...] by the
+        parser, so a word that matched no file came out as [!...] instead of
+        as written.  The parser now keeps '^'; the executor reads it.
+      - Fixed: unset NAME[...] was accepted and did nothing, with status 0;
+        dash stops with "bad variable name", bash unsets an array element
+        (probe unsetarr).  It is rejected now, as bash's arrays are; known
+        issue X26.  New detector feature unsetarr (B); unset foo][ is B by
+        hand (probe unsetbad: dash fails, bash returns 0).
+      - Proc::ShellSpawn: $ONBUILTIN, a code ref called before each builtin
+        or function runs (for measurement; t/try.pl logs to the file named by
+        RECBUILTIN); doc/large-subset/tools/large-subset-builtins.pl runs every
+        builtin call of the corpus alone in dash, bash and ours;
+        large-subset-runreport.pl -x compares the external calls one by one.
+      - The behaviour figures in separate tables, with and without a
+        coreutils program involved (large-subset-runreport.pl -q), and the
+        atomic calls: every call the corpus makes to echo, printf, test, [,
+        kill or pwd, run as dash's builtin, bash's builtin and the program
+        (large-subset-threeway.pl; the database large-subset-threeway-db.jsonl,
+        757 calls; calls made by xargs are left out).  With K0, dash and bash
+        agree and ours differs in 7 samples of 40,410 (first run: 57).  The
+        messages are compared as multisets of characters (the shells' messages
+        of pipeline elements mix).  README: a summary, near the top.
+      - The Git history now has the CPAN releases 0.01 to 0.04 (tags v0.01 to
+        v0.04); CPAN's 0.04 is the tree once called "the pre-release snapshot".
+        doc/pspawn-spawner.md, section 8, and the post-0.04 entry below: the
+        Windows section was never in a CPAN release.
+      - K0 (the user, 2026-11-05): kill with a signal (-N, -NAME, -s NAME) or
+        --, and no process ID (kill $(pgrep x) when nothing matches), is
+        answered by us as by both shells: dash's usage text, status 2 (the
+        program kill: a long usage, status 1).  large-subset-state.md, section
+        1: the rules are a triage of the past; two principles of least
+        surprise in conflict (a tool called in a script as when called alone;
+        a tool's own treatment of rare edge cases), and the per-tool
+        decisions (K0, rule F, Q2).  Known issue X27 (TODO): which samples of
+        the run-time comparison depend on the environment.
+      - New: the behaviour of the accepted samples, run in dash, bash --posix
+        and ours (tools/large-subset-runcompare.pl, large-subset-runreport.pl;
+        large-subset-state.md section 7): of 40,410, all three agree in
+        15,760, only the messages differ in 23,368, and dash and bash agree
+        while ours differs in 33 (29: kill with no process ID, the program's
+        status 1 against the shells' 2; question for the user).
+      - Fixed, found so: a string with no command, or only comments, was
+        rejected by run() (the parser option 'empty' was missing from
+        run()'s options), though the measurement counted it as accepted;
+        eval of empty text stopped with status 248; kill -s WINCH $$ (also
+        CHLD, URG, CONT, kill -0 $$) ended the shell with status 156.
+      - Figures: 44 samples rejected within the lower yardstick (post3-0.04:
+        49; 3 accepted now, 2 reclassified as blatant by unsetarr); digest
+        aa2734f2147be58073d44713de7f003cdee525f593d5e90f70f9f64e900f08bc.
+        Tests LS:319-323; battery lines in t/batteries/large-subset-post04.txt.
+
+    post3-0.04:
+      - Aliases known only when they run (P1, the user, 2026-11-03: "go with
+        better aliases"): where an alias definition has an expansion, or stands
+        in a compound command, a function, an and-or list, a pipeline or the
+        background, the parser stops after that line; the executor parses the
+        rest of the text when it gets there, with the aliases defined by then,
+        as both shells read a text one complete command at a time.  Tree node
+        { rest => TEXT, lineoff => N }.
+      - Rule F (the user, 2026-11-03: where a utility is implemented wrongly,
+        we may do better): [ s1 \< s2 ] and [ s1 \> s2 ] (also test, also after
+        !), which both shells run and the coreutils program refuses, are
+        compared by the executor, by bytes; the option test_lt_gt is needed
+        only for longer expressions with < or >.
+      - doc/large-subset/large-subset-state.md, section 4: what POSIX says of
+        the ${...} forms both shells refuse (an expansion error, or
+        unspecified).
+      - Figures: 49 samples rejected within the lower yardstick (post2-0.04:
+        72); digest
+        b189e43efd804af3e15e4224d2e7f46a890d7723301dd792fd9094ec8aaf6c59.
+
+    post2-0.04:
+      - read takes names from expansions (read $v, read "$v"), checked when it
+        runs, with dash's messages and status 2; a read-only name no longer ends
+        the shell (as dash).  ${##}, ${#?}, ${#!}, ${#$} accepted (both shells).
+      - Fixed: a name from an expansion in export "$v" was never checked against
+        the names the subset may not set (the test was always true).
+      - Measurement: 14 samples left out by hand as noise
+        (doc/large-subset/tools/large-subset-noise.txt, read by
+        large-subset-drops.pl; the user, 2026-11-03); the detector counts the
+        decided rows N1-N3 (${x:?}, a special builtin's error, command -v) as
+        class X, as large-subset-logical.md says of every decided row.
+      - Figures: 72 samples rejected within the lower yardstick (post-0.04: 91);
+        digest (now also over large-subset-noise.txt)
+        a23490770df33a87e8cbc1008d7d7301c7bcf567cb56bd2d5b5e13a94e0c4636.
+
+    post-0.04:
+      - 3A (the user, 2026-11-03): a function comes before a regular builtin of
+        its name and before the commands run as programs (POSIX order).  Functions
+        may be named cd, read, jobs, echo, kill, pwd, ...; such calls are checked
+        at run time (Proc::ShellSpawn::Large::b_late); command NAME reaches the
+        regular builtins we run.  Not alias, unalias.
+      - Rule E choices done: ${@#p}, ${*%p} on each parameter (G4, as bash);
+        $LINENO (G8, as bash; not in eval or trap text); UID an ordinary
+        variable where the string sets it (G15, as dash); ~ without HOME from
+        the password file (G16, as bash), and HOME may be set and unset; break
+        and continue in a subshell inside a loop end it (as dash).  jobs takes
+        %N, %%, %+, %-.
+      - K3 (the user's choice B, 2026-11-03): background jobs go on between
+        run() calls too: while they remain, Proc::ShellSpawn keeps a deferred
+        SIGCHLD handler installed, which calls the new Proc::Spawner::poll().
+        Cost (documented in doc/pspawn-design.md, section 6, and the POD): the
+        program's own sleep and select return early when a child ends.  Test
+        t/between.t.
+      - Q2 decided (the user's choice B): printf -v stays with the program.
+      - doc/checklists/corpus-gaps.html and its sources (doc/large-subset/pages/)
+        are no longer shipped: all its questions are decided (they are in 0.04).
+      - X25 fixed (a bug since 0.01): break or continue in a pipeline element
+        inside a loop died with a Perl error.
+      - Hand-kept verdict "no difference" for the new parser test LS:299
+        (kill() { :; }; kill -SIGHUP 1): the detector flags kill -SIGHUP, but
+        both shells run the function (probe fnkill).
+      - doc/pspawn-spawner.md: section 8 (Windows) is in the distribution.
+        (Corrected post4-0.04: it was not "in 0.01 but lost by 0.04"; no CPAN
+        release had it, only the Project's later copy of 0.01.)
+      - Detector: atpat, lineno, nohome, uidassign, SC3058 are class X (rule E);
+        uidread is the old bashvar for UID.  Battery
+        t/batteries/large-subset-post04.txt.
+      - Figures: 91 samples rejected within the lower yardstick (0.04: 95);
+        digest 1b9eac74d672e79d89764f71b1a6125e4a52f4cdc42943a6db39ec3d0b6d95aa.
+
 0.04  2026-11-03
       - The documents of only historical interest are no longer shipped; they
         are in Proc-Spawner 0.03 on CPAN: doc/large-subset/large-subset-
         {ceiling,investigation,marks,upstream-reports}.md, doc/pspawn-run-
         shortcomings.md, doc/pspawn-upstream-reports.md, doc/parsers/shell-
         subset-corpus-stats.md.  References to them say so.
+      - The decision pages that are no longer relevant are no longer shipped
+        either (they are in 0.03): in doc/checklists/ child-exit, run-graph-api,
+        spawn-graph, large-subset and dialect-choices.html, and in
+        doc/large-subset/pages/ their sources and build.pl.  Only
+        corpus-gaps.html (question Q2 is open) and its sources stay.
+        Known issue X1 now names the alternatives of K3 itself.
       - The figures of post4-0.03 were checked again on 0.04: the same per-sample
         results; they are labelled 0.04.  Digest of the code they depend on:
         ecde8b9b9610680560a69e56313f01687f29e51688bcd029c6cef837fa03eeac.

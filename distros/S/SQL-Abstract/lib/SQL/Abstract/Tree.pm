@@ -48,6 +48,7 @@ my @expression_start_keywords = (
   'UNION',
   'INTERSECT',
   'EXCEPT',
+  'MINUS',
   'BEGIN \s+ WORK',
   'COMMIT',
   'ROLLBACK \s+ TO \s+ SAVEPOINT',
@@ -105,6 +106,9 @@ my $tokenizer_re = join("\n\t|\n",
   $and_or_re,
   $op_look_behind . ' \* ' . $op_look_ahead,
   (map { quotemeta $_ } qw/, ( )/),
+  # a backslash-escaped question mark is not a placeholder but (part of)
+  # an operator, e.g. PostgreSQL's ?| or ?-| written as \?| for DBD::Pg
+  ' \\\\ \? [\-\+\*\/<>=~!\@\#%\^&\|\?]* ',
   $placeholder_re,
 );
 
@@ -171,6 +175,7 @@ my %indents = (
 
 has [qw(
   newline indent_string indent_amount fill_in_placeholders placeholder_surround
+  html_escape
 )] => (is => 'ro');
 
 has [qw( indentmap colormap )] => ( is => 'ro', default => quote_sub('{}') );
@@ -254,6 +259,7 @@ sub BUILDARGS {
     }
     elsif ($p eq 'html') {
       %extra_args = (
+        html_escape => 1,
         fill_in_placeholders => 1,
         placeholder_surround => ['<span class="placeholder">', '</span>'],
         indent_string => '&nbsp;',
@@ -319,16 +325,24 @@ sub parse {
 
   return [] unless defined $s;
 
+  # Swap the contents of quoted strings and identifiers for a NUL-delimited
+  # index before tokenizing, so the separators inside them (whitespace,
+  # commas, parenthesis, keywords) can not split them up. The quotes stay in
+  # place, so whatever is glued to them (N'..', '..'::date) still tokenizes
+  # as before. Doubled quotes are the SQL escape; backslashes are literal.
+  my @quoted;
+  $s =~ s{ ( ' (?: [^'] | '' )* ' | " (?: [^"] | "" )* " | ` (?: [^`] | `` )* ` ) }{
+    push @quoted, $1;
+    my $q = substr($1, 0, 1);
+    "$q\x00$#quoted\x00$q";
+  }gex;
+
   # tokenize string, and remove all optional whitespace
   my $tokens = [];
   foreach my $token (split $tokenizer_re, $s) {
-    push @$tokens, $token if (
-      defined $token
-        and
-      length $token
-        and
-      $token =~ /\S/
-    );
+    next unless defined $token and length $token and $token =~ /\S/;
+    $token =~ s{ (['"`]) \x00 (\d+) \x00 \1 }{$quoted[$2]}gx if @quoted;
+    push @$tokens, $token;
   }
 
   return [ $self->_recurse_parse($tokens, PARSE_TOP_LEVEL) ];
@@ -370,6 +384,14 @@ sub _recurse_parse {
 
       my @right = $self->_recurse_parse($tokens, PARSE_IN_EXPR);
 
+      # several nodes on one side (e.g. "x <@" followed by a function call)
+      # are a single operand, not one operand each
+      for my $side (\@left, \@right) {
+        @$side = [ -MISC => [
+          map { $_->[0] eq '-MISC' ? @{$_->[1]} : $_ } @$side
+        ] ] if @$side > 1;
+      }
+
       # Merge chunks if "logic" matches
       @left = [ $op => [ @left, (@right and $op eq $right[0][0])
         ? @{ $right[0][1] }
@@ -397,6 +419,12 @@ sub _recurse_parse {
         ;
       }
       else {
+        # several nodes before the comma (e.g. "x - ( y )") are one list
+        # element, not one element each
+        @left = [ -MISC => [
+          map { $_->[0] eq '-MISC' ? @{$_->[1]} : $_ } @left
+        ] ] if @left > 1;
+
         @left = [ -LIST => [ @left, @right ] ];
       }
     }
@@ -407,11 +435,16 @@ sub _recurse_parse {
 
       my @right = $self->_recurse_parse($tokens, PARSE_RHS);
 
-      # A between with a simple LITERAL for a 1st RHS argument needs a
-      # rerun of the search to (hopefully) find the proper AND construct
-      if ($op eq 'BETWEEN' and $right[0] eq '-LITERAL') {
-        unshift @$tokens, $right[1][0];
-        @right = $self->_recurse_parse($tokens, PARSE_IN_EXPR);
+      # BETWEEN's two bounds are joined by an AND, but PARSE_RHS stops at
+      # that AND, so only the lower bound has been parsed so far. Pull the
+      # upper bound in and group both under the BETWEEN as AND[low, high],
+      # otherwise the upper bound leaks out as a sibling of the BETWEEN in
+      # the enclosing expression. (The previous guard here compared an
+      # arrayref node to the string '-LITERAL' and so never fired.)
+      if (($op eq 'BETWEEN' or $op eq 'NOT BETWEEN')
+            and @$tokens and $tokens->[0] =~ /\AAND\z/i) {
+        my $and = uc shift @$tokens;
+        @right = ([ $and => [ @right, $self->_recurse_parse($tokens, PARSE_RHS) ] ]);
       }
 
       push @left, [$op => [ (@left ? pop @left : ''), @right ]];
@@ -504,11 +537,23 @@ sub _recurse_parse {
 sub format_keyword {
   my ($self, $keyword) = @_;
 
-  if (my $around = $self->colormap->{lc $keyword}) {
-     $keyword = "$around->[0]$keyword$around->[1]";
-  }
+  my $around = $self->colormap->{lc $keyword};
+  $keyword = $self->_escape($keyword);
+  $keyword = "$around->[0]$keyword$around->[1]" if $around;
 
   return $keyword
+}
+
+# SQL text and bind values only - never the markup from the profile
+sub _escape {
+  my ($self, $text) = @_;
+  return $text unless $self->html_escape;
+  $text =~ s/&/&amp;/g;
+  $text =~ s/</&lt;/g;
+  $text =~ s/>/&gt;/g;
+  $text =~ s/"/&quot;/g;
+  $text =~ s/'/&#39;/g;
+  return $text;
 }
 
 my %starters = (
@@ -523,7 +568,9 @@ sub pad_keyword {
 
    my $before = '';
    if (defined $self->indentmap->{lc $keyword}) {
-      $before = $self->newline . $self->indent($depth + $self->indentmap->{lc $keyword});
+      # guard newline like _unparse does - a caller may set an indentmap
+      # without a newline (outside the canned profiles)
+      $before = ($self->newline||'') . $self->indent($depth + $self->indentmap->{lc $keyword});
    }
    $before = '' if $depth == 0 and defined $starters{lc $keyword};
    return [$before, ''];
@@ -531,23 +578,40 @@ sub pad_keyword {
 
 sub indent { ($_[0]->indent_string||'') x ( ( $_[0]->indent_amount || 0 ) * $_[1] ) }
 
+# indentmap entries that put things on lines of their own but are not
+# clause keywords
+my %line_break_keys = map { $_ => 1 } ('and', 'or', ',');
+
+# the indent level of the clause keyword currently being unparsed
+our $Clause_Indent = 0;
+
+# the indent for a line break entry ('and', 'or', ','), or undef when the
+# entry is not set or there is no newline to break with
+sub _line_break_indent {
+   my ($self, $key) = @_;
+   return undef unless length( $self->newline || '' );
+   return $self->indentmap->{$key};
+}
+
 sub _is_key {
    my ($self, $tree) = @_;
    $tree = $tree->[0] while ref $tree;
 
-   defined $tree && defined $self->indentmap->{lc $tree};
+   defined $tree && !$line_break_keys{lc $tree} && defined $self->indentmap->{lc $tree};
 }
 
 sub fill_in_placeholder {
    my ($self, $bindargs) = @_;
 
    if ($self->fill_in_placeholders) {
-      my $val = shift @{$bindargs} || '';
+      my $val = shift @{$bindargs};
+      $val = '' unless defined $val; # preserve a real 0/'0' bind value (5.6-safe defined-or)
       my $quoted = $val =~ s/^(['"])(.*)\1$/$2/;
-      my ($left, $right) = @{$self->placeholder_surround};
+      my ($left, $right) = map { defined $_ ? $_ : '' } @{$self->placeholder_surround || []}[0, 1];
       $val =~ s/\\/\\\\/g;
       $val =~ s/'/\\'/g;
       $val = qq('$val') if $quoted;
+      $val = $self->_escape($val);
       return qq($left$val$right)
    }
    return '?'
@@ -582,7 +646,7 @@ sub _unparse {
     return join (' ', map $self->_unparse($_, $bindargs, $depth), @$tree);
   }
   elsif ($op eq '-LITERAL') { # literal has different sig
-    return $args->[0];
+    return $self->_escape($args->[0]);
   }
   elsif ($op eq '-PLACEHOLDER') {
     return $self->fill_in_placeholder($bindargs);
@@ -597,8 +661,21 @@ sub _unparse {
       )
     );
   }
-  elsif ($op eq 'AND' or $op eq 'OR' or $op =~ $binary_op_re ) {
-    return join (" $op ", map $self->_unparse($_, $bindargs, $depth), @{$args});
+  elsif ($op eq 'AND' or $op eq 'OR') {
+    my @parts = map $self->_unparse($_, $bindargs, $depth), @{$args};
+
+    # every further condition on a line of its own, indented below the
+    # clause it belongs to (or below the parenthesis it is in)
+    if (defined (my $indent = $self->_line_break_indent(lc $op))) {
+      my $base = $depth > $Clause_Indent ? $depth : $Clause_Indent;
+      return join ($self->newline . $self->indent($base + $indent) . "$op ", @parts);
+    }
+
+    return join (" $op ", @parts);
+  }
+  elsif ($op =~ $binary_op_re) {
+    my $sep = ' ' . $self->_escape($op) . ' ';
+    return join ($sep, map $self->_unparse($_, $bindargs, $depth), @{$args});
   }
   elsif ($op eq '-LIST' ) {
     return join (', ', map $self->_unparse($_, $bindargs, $depth), @{$args});
@@ -613,11 +690,40 @@ sub _unparse {
   else {
     my ($l, $r) = @{$self->pad_keyword($op, $depth)};
 
-    my $rhs = $self->_unparse($args, $bindargs, $depth);
+    my $clause_indent = $self->indentmap->{lc $op};
+    local $Clause_Indent = defined $clause_indent
+      ? $depth + $clause_indent
+      : $Clause_Indent;
+
+    my $rhs;
+    my $item_indent;
+    if (
+      defined $clause_indent
+        and
+      defined ($item_indent = $self->_line_break_indent(','))
+        and
+      ref $args eq 'ARRAY' and @$args == 1
+        and
+      ref $args->[0] eq 'ARRAY' and ($args->[0][0]||'') eq '-LIST'
+    ) {
+      # the comma list right below a clause (select list, order by, set
+      # ...): every item on a line of its own. Lists further down (function
+      # arguments, IN lists) stay as they are.
+      $self->_parenthesis_unroll($args->[0]);
+      my $break = $self->newline . $self->indent($Clause_Indent + $item_indent);
+      $rhs = join ',', map { $break . $self->_unparse($_, $bindargs, $depth) } @{$args->[0][1]};
+    }
+    else {
+      $rhs = $self->_unparse($args, $bindargs, $depth);
+    }
 
     return sprintf "$l%s$r", join(
-      ( ref $args eq 'ARRAY' and @{$args} == 1 and $args->[0][0] eq '-PAREN' )
-        ? ''    # mysql--
+      (
+        ( ref $args eq 'ARRAY' and @{$args} == 1 and $args->[0][0] eq '-PAREN' )  # mysql--
+          or
+        defined $item_indent and substr($rhs, 0, length $self->newline) eq $self->newline
+      )
+        ? ''
         : ' '
       ,
       $self->format_keyword($op),
@@ -636,7 +742,9 @@ my @unrollable_ops = (
   'I?LIKE',
 );
 my $unrollable_ops_re = join ' | ', @unrollable_ops;
-$unrollable_ops_re = qr/$unrollable_ops_re/xi;
+# anchored, so that ON does not match inside function names like
+# GROUP_CONCAT or CONCAT_WS and strip their parenthesis (RT#105563, RT#117234)
+$unrollable_ops_re = qr/ \A (?: $unrollable_ops_re ) \z /xi;
 
 sub _parenthesis_unroll {
   my $self = shift;
@@ -672,7 +780,7 @@ sub _parenthesis_unroll {
       my $child_op_argc = $single_child_op ? scalar @{$child->[1][0][1]} : undef;
 
       my $single_grandchild_op
-        = ( $child_op_argc||0 == 1 and ref $child->[1][0][1][0] eq 'ARRAY' )
+        = ( ($child_op_argc||0) == 1 and ref $child->[1][0][1][0] eq 'ARRAY' )
             ? $child->[1][0][1][0][0]
             : ''
       ;
@@ -846,6 +954,8 @@ SQL::Abstract::Tree - Represent SQL as an AST
    indent_amount => 2,        # how many of above string to use for a single
                               # indent level
    newline       => "\n",     # string for newline
+   html_escape   => 0,        # HTML-escape the SQL text and the filled in
+                              # placeholders (but not the strings above)
    colormap      => {
      select => [RED, RESET], # a pair of strings defining what to surround
                              # the keyword with for colorization
@@ -857,10 +967,58 @@ SQL::Abstract::Tree - Represent SQL as an AST
      from          => 1,     # Any other positive integer means that after
      on            => 2,     # said newline it will get that many indents
      # ...
+     and           => 1,     # optional, see "Lines of their own" below
+     or            => 1,
+     ','           => 1,
    },
  }
 
 Returns a new SQL::Abstract::Tree object.  All arguments are optional.
+
+=head3 Lines of their own
+
+Besides clause keywords, the C<indentmap> understands three more entries,
+none of which is set by the predefined profiles:
+
+=over
+
+=item C<and>, C<or>
+
+Every further condition joined with C<AND> (or C<OR>) starts a new line,
+indented by that many levels below its clause (or below the parenthesis it
+is in).
+
+=item C<,>
+
+The items of a comma list right below a clause (the select list, C<ORDER BY>,
+C<GROUP BY>, C<SET> ...) each get a line of their own, indented by that many
+levels below the clause. Lists further down, like function arguments or an
+C<IN> list, stay on one line.
+
+=back
+
+Merge them into a profile like any other override:
+
+ my $sqlat = SQL::Abstract::Tree->new({
+   profile   => 'console',
+   indentmap => { and => 1, or => 1, ',' => 1 },
+ });
+
+ print $sqlat->format(
+   'SELECT a, b FROM t WHERE x = ? AND y = ? ORDER BY a, b', [1, 2]
+ );
+
+ # SELECT
+ #   a,
+ #   b
+ #   FROM t
+ # WHERE x = 1
+ #   AND y = 2
+ # ORDER BY
+ #   a,
+ #   b
+
+They only have an effect when a L</newline> is set.
 
 =head3 profiles
 
@@ -868,6 +1026,10 @@ There are four predefined profiles, C<none>, C<console>, C<console_monochrome>,
 and C<html>.  Typically a user will probably just use C<console> or
 C<console_monochrome>, but if something about a profile bothers you, merely
 use the profile and override the parts that you don't like.
+
+The C<html> profile sets L</html_escape>, so its output can go straight
+into an HTML page: bind values and SQL text are escaped, the profile's own
+C<< <span> >> and C<< <br /> >> markup is not.
 
 =head2 format
 
@@ -923,6 +1085,10 @@ See L</new>
 =head2 fill_in_placeholders
 
 See L</new>
+
+=head2 html_escape
+
+See L</new> and L</profiles>
 
 =head2 indent_amount
 

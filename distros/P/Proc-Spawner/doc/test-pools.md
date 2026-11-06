@@ -5,8 +5,8 @@ The distribution has two pools of shell strings taken from public collections ("
 | Pool | File | Made by | Size |
 |---|---|---|---|
 | A. corpus tests of the base parser | `t/parser/shell-subset-corpus-tests.pl` | `doc/parsers/tools/` | 612 tests |
-| B. corpus measurement of the large parser | not shipped (made on demand) | `doc/large-subset/tools/` | 45,501 extracted; 41,966 after leaving out duplicates and the like (`drops.tsv`; 0.03 and post-0.03) |
-| C. the shells' verdict on every parser test | `t/parser/large-subset-shells.tsv` | `doc/large-subset/tools/large-subset-features.pl` | 1,092 lines (0.04; 0.03: 1,066) |
+| B. corpus measurement of the large parser | not shipped (made on demand) | `doc/large-subset/tools/` | 45,501 extracted; 41,952 after leaving out duplicates, noise marked by hand (`tools/large-subset-noise.txt`, post2-0.04) and the like (`drops.tsv`; 41,966 for 0.03 to post-0.04) |
+| C. the shells' verdict on every parser test | `t/parser/large-subset-shells.tsv` | `doc/large-subset/tools/large-subset-features.pl` | 1,117 lines (post4-0.04; post3-0.04: 1,112; post2-0.04: 1,107; post-0.04: 1,104; 0.04: 1,092; 0.03: 1,066) |
 
 The hand-written tests (`t/parser/shell-subset-tests.pl`, `t/parser/large-subset-tests.pl`) are not borrowed. Their IDs are `OWN:n` and `LS:n`.
 
@@ -79,7 +79,7 @@ pip install shellcheck-py==0.11.0.1                    # ShellCheck 0.11.0
 T=doc/large-subset/tools
 perl $T/large-subset-extract.pl CORPORA samples.jsonl
 perl -Ilib $T/large-subset-scan.pl samples.jsonl > large-scan.jsonl              # about 25 minutes
-perl $T/large-subset-drops.pl samples.jsonl drops.tsv                            # what is left out, and why
+perl $T/large-subset-drops.pl samples.jsonl drops.tsv                            # what is left out, and why (also large-subset-noise.txt)
 perl $T/large-subset-yardsticks.pl -v -c sc-cache.jsonl -o samples.tsv samples.jsonl large-scan.jsonl drops.tsv
 ```
 
@@ -89,6 +89,15 @@ perl $T/large-subset-yardsticks.pl -v -c sc-cache.jsonl -o samples.tsv samples.j
 - `large-subset-remeasure.pl -d drops.tsv large-scan.jsonl` prints the older single ceiling, for comparison.
 
 The figures and what they mean: `doc/large-subset/large-subset-state.md`. The history of the filters: `doc/large-subset/large-subset-ceiling.md` (in Proc-Spawner 0.03).
+
+**Behaviour** (post4-0.04; `doc/large-subset/large-subset-state.md`, section 7): run every accepted sample in dash, `bash --posix` and ours, about 21 minutes. As root (it makes the users `rc0`…`rc3` and runs the samples as them), with no network, after `make`:
+
+```sh
+unshare -n perl $T/large-subset-runcompare.pl -j 4 samples.jsonl samples.tsv rundir    # restartable: it skips what rundir has
+unshare -n perl $T/large-subset-runcompare.pl -q -j 4 samples.jsonl samples.tsv qdir   # ours only, the programs' calls logged
+perl $T/large-subset-runreport.pl -q qdir -l $T/large-subset-run-differences.tsv rundir   # with and without coreutils
+unshare -n perl $T/large-subset-threeway.pl -l $T/large-subset-threeway-differences.tsv -db $T/large-subset-threeway-db.jsonl qdir
+```
 
 ## 4. Record C: the shells' verdict on every parser test
 

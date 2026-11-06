@@ -1,7 +1,7 @@
 package Mail::DKIM::Signer;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: generates a DKIM signature for a message
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -167,13 +167,18 @@ sub finish_header {
         );
     }
 
+    # share the header indexes between the signatures
+    my $index = {};
     foreach my $algorithm ( @{ $self->{algorithms} } ) {
 
         # output header as received so far into canonicalization
         foreach my $header ( @{ $self->{headers} } ) {
             $algorithm->add_header($header);
         }
-        $algorithm->finish_header( Headers => $self->{headers} );
+        $algorithm->finish_header(
+            Headers     => $self->{headers},
+            HeaderIndex => $index
+        );
     }
 }
 
@@ -440,7 +445,7 @@ Mail::DKIM::Signer - generates a DKIM signature for a message
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 

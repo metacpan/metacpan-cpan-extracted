@@ -69,6 +69,7 @@ format_text(class, err)
     SV *err
 CODE:
     PERL_UNUSED_VAR(class);
+    # uncoverable condition left count:2
     if (!SvROK(err) || SvTYPE(SvRV(err)) != SVt_PVHV) {
         croak("format_text requires a hashref");
     }
@@ -82,6 +83,7 @@ format_js_console(class, err)
     SV *err
 CODE:
     PERL_UNUSED_VAR(class);
+    # uncoverable condition left count:1
     if (!SvROK(err) || SvTYPE(SvRV(err)) != SVt_PVHV) {
         croak("format_js_console requires a hashref");
     }

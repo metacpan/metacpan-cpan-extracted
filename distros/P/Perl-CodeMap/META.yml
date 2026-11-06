@@ -1,0 +1,40 @@
+---
+abstract: 'Offline Perl dependency visualization and source explorer'
+author:
+  - 'Scott Muller <scott@21h.io>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Pod::Simple: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-CodeMap
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  PPI: '1.291'
+requires:
+  Cwd: '0'
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IPC::Open3: '0'
+  JSON::PP: '0'
+  Pod::Usage: '0'
+  Symbol: '0'
+  perl: '5.020'
+resources:
+  homepage: https://github.com/interrupt21h/perl-codemap
+version: v0.3.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

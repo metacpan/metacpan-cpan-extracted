@@ -166,4 +166,18 @@ my %nothing = (complete => 1, files => { 'd.c' => { 40 => { blocks => { 1 => 1 }
 is_deeply($flow->decisions(\%nothing)->{'d.c'}, [], 'blocks on lines with no decision give nothing');
 is_deeply($flow->decisions({ complete => 1, files => { 'missing.c' => { 1 => { blocks => {}, arcs => [], count => undef } } } }), {}, 'a file that cannot be read is left out');
 
+my $xs = File::Spec->catfile($dir, "m.xs");
+open my $xfh, ">", $xs or die;
+print $xfh "MODULE = M PACKAGE = M\n\nvoid\nf(x)\n    int x\nCODE:\n    # uncoverable branch false\n    if (x) {\n        x = 0;\n    }\n";
+close $xfh;
+my %claimed = (complete => 1, files => { "m.xs" => {
+    7 => { blocks => { 1 => 1 }, arcs => [ [1, 2, 3], [1, 3, 0] ], count => 3 },
+    8 => { blocks => { 2 => 1 }, arcs => [ [2, 3, 3] ], count => 3 },
+} });
+is_deeply($flow->decisions(\%claimed, { "m.xs" => { 7 => 8, 8 => 9 } })->{"m.xs"}, [ { line => 7, arms => [3, 0] } ],
+    "with the XS map's table an XS source is read in the lines gcov reports, so a decision after a mark is found where the graph has it");
+is_deeply($flow->decisions(\%claimed)->{"m.xs"}, [], "without it the decision is sought a line down, where the graph has nothing");
+is_deeply($flow->dropped([ "MODULE = M\n", "# a\n", "#if X\n", "  # uncoverable statement\n" ]), { 2 => 1, 4 => 1 }, "dropped lists the comment lines after MODULE, not the directives");
+is_deeply($flow->dropped([ "# before\n", "MODULE = M\n" ]), {}, "and nothing before MODULE");
+
 done_testing;

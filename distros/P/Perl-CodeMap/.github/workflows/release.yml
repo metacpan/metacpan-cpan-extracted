@@ -1,0 +1,160 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: perl-codemap-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate version and publication state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(perl -Ilib -MPerl::CodeMap -e 'print $Perl::CodeMap::VERSION')"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+            echo "Invalid semantic version: $version" >&2
+            exit 1
+          }
+          if [[ "$GITHUB_EVENT_NAME" == 'push' && "$version" != '0.3.2' ]]; then
+            echo 'Push-triggered publication is restricted to the v0.3.2 documentation upgrade.' >&2
+            exit 1
+          fi
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          if gh release view "v$version" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "The v$version release already exists. Never overwrite a public version." >&2
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "Preparing Perl CodeMap $version by Scott Muller <scott@21h.io>"
+
+      - name: Install PPI and author documentation checks
+        run: cpanm --notest PPI Test::Pod Test::Pod::Coverage
+
+      - name: Validate and build the source distribution
+        shell: bash
+        run: |
+          set -euo pipefail
+          perl Makefile.PL
+          make
+          make test
+          prove -Ilib xt/author/pod.t
+          perl -MPod::Man -e 'Pod::Man->new(section => 1, release => "Perl CodeMap")->parse_from_file("bin/perl-codemap", "/tmp/perl-codemap.1")'
+          test -s /tmp/perl-codemap.1
+          node --check lib/Perl/CodeMap/assets/app.js
+          node t/browser-smoke.js
+          make distcheck
+          make disttest
+          make dist
+
+      - name: Audit distribution contents and author metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Perl-CodeMap-${VERSION}.tar.gz"
+          test -s "$archive"
+          tar -tzf "$archive" > /tmp/codemap-files.txt
+          for path in AUTHORS.md LICENSE META.json bin/perl-codemap \
+                      docs/RELEASING.md lib/Perl/CodeMap/assets/prism-perl.min.js \
+                      t/50-maintainer.t t/60-pod.t xt/author/pod.t; do
+            grep -Fx "Perl-CodeMap-${VERSION}/$path" /tmp/codemap-files.txt
+          done
+          tar -xzOf "$archive" "Perl-CodeMap-${VERSION}/META.json" |
+            perl -MJSON::PP -e '
+              local $/;
+              my $data = decode_json(<STDIN>);
+              my $authors = $data->{author} || [];
+              die "Incorrect CPAN metadata author\n" unless
+                ref($authors) eq "ARRAY" &&
+                grep { $_ eq "Scott Muller <scott\@21h.io>" } @$authors;
+              die "Incorrect CPAN metadata name\n" unless $data->{name} eq "Perl-CodeMap";
+              print "Validated author: ", join(", ", @$authors), "\n";
+            '
+          sha256sum "$archive" > "$archive.sha256"
+          sha256sum -c "$archive.sha256"
+
+      - name: Create immutable annotated tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            test "$(git rev-parse "$tag^{commit}")" = "$GITHUB_SHA" || {
+              echo "Tag $tag belongs to a different commit: refusing to move it." >&2
+              exit 1
+            }
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a "$tag" -m "Perl CodeMap ${VERSION}"
+            git push origin "refs/tags/$tag"
+          fi
+
+      - name: Prepare release notes from changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          awk -v version="$VERSION" '
+            index($0, "## [" version "]") == 1 { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > /tmp/codemap-changes.md
+          test -s /tmp/codemap-changes.md || {
+            echo "No changelog entry for $VERSION" >&2
+            exit 1
+          }
+          {
+            printf '## Perl CodeMap %s\n\n' "$VERSION"
+            printf 'Author and maintainer: **Scott Muller** (scott@21h.io).\n\n'
+            cat /tmp/codemap-changes.md
+            printf '\n### Installation\n\n'
+            printf 'After CPAN indexing: `cpanm Perl::CodeMap` (PPI recommended).\n\n'
+            printf 'Alternatively, download the verified tarball and run:\n\n'
+            printf '```sh\nperl Makefile.PL\nmake\nmake test\nmake install\n```\n\n'
+            printf '### Documentation and links\n\n'
+            printf -- '- CLI reference: `perl-codemap --help` or `perl-codemap --man`\n'
+            printf -- '- Perl module API: `perldoc Perl::CodeMap`\n'
+            printf -- '- [Changelog](https://github.com/interrupt21h/perl-codemap/blob/v%s/CHANGELOG.md)\n' "$VERSION"
+            printf -- '- [Live interactive sample](https://interrupt21h.github.io/perl-codemap/)\n'
+            printf -- '- [Source repository](https://github.com/interrupt21h/perl-codemap)\n'
+            printf -- '- [MetaCPAN](https://metacpan.org/dist/Perl-CodeMap)\n\n'
+            printf 'GitHub publication does not automatically upload to PAUSE/CPAN.\n'
+          } > /tmp/codemap-release-notes.md
+
+      - name: Publish GitHub release with tested assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="Perl-CodeMap-${VERSION}.tar.gz"
+          gh release create "v${VERSION}" "$archive" "$archive.sha256" \
+            --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "Perl CodeMap ${VERSION}" \
+            --notes-file /tmp/codemap-release-notes.md

@@ -1,6 +1,6 @@
 package Langertha::Reasoning;
 # ABSTRACT: Immutable normalized reasoning-effort control with cross-provider conversion
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -37,6 +37,13 @@ has thinking_display => (
   predicate => 'has_thinking_display',
 );
 
+
+
+has thinking_enabled => (
+  is        => 'ro',
+  isa       => 'Bool',
+  predicate => 'has_thinking_enabled',
+);
 
 
 has thinking_toggle => (
@@ -76,6 +83,43 @@ sub _build_profile {
   return $profile;
 }
 
+# thinking_enabled => 0 without an effort is the off switch every wire already
+# knows as effort 'none' (karr k382): normalize it here, before BUILD checks
+# the per-generation gates, so the serializers and the ADR 0025 temperature
+# gate see one value. A contradicting effort is left alone for BUILD to croak.
+around BUILDARGS => sub {
+  my ( $orig, $class, @args ) = @_;
+  return $class->normalize_off_switch( $class->$orig(@args) );
+};
+
+sub normalize_off_switch {
+  my ( $self, $args ) = @_;
+  return $args unless defined $args->{thinking_enabled} && !$args->{thinking_enabled}
+    && !defined $args->{effort};
+  # A budget-control generation (Gemini 2.5) takes no effort at all, so the
+  # off switch cannot become effort 'none' there (it would croak, and collide
+  # with a thinking_budget); it stays a bare thinking_enabled => 0, which no
+  # serializer of that generation sends and drops_thinking_enabled_on reports.
+  # Mapping it to thinkingBudget 0 is not done: which 2.5 models take 0 is
+  # unverified.
+  my $profile = Langertha::Reasoning::Profile->for_model( $args->{model} // '' );
+  return $args if $profile->control eq 'budget';
+  return { %$args, effort => 'none' };
+}
+
+
+sub assert_switch_agrees {
+  my ( $self, $thinking_enabled, $effort ) = @_;
+  return unless defined $thinking_enabled && defined $effort;
+  my $effort_on = $effort ne 'none';
+  return if $thinking_enabled ? $effort_on : !$effort_on;
+  croak "Langertha::Reasoning: thinking_enabled => "
+    . ( $thinking_enabled ? 1 : 0 ) . " contradicts effort '"
+    . $effort . "' -- thinking off is effort 'none', thinking on is "
+    . "any other effort level; set one of them, or make them agree";
+}
+
+
 # Build-time wire-truth gate: exactly one native control per generation, never
 # both. Errors here surface before the request is built (Langertha::Engine::Gemini
 # calls to() inside chat_request), so a misconfigured engine never produces an
@@ -84,6 +128,11 @@ sub _build_profile {
 # family boundary lives in Langertha::Reasoning::Profile, not in an inline regex.
 sub BUILD {
   my ( $self ) = @_;
+
+  $self->assert_switch_agrees(
+    ( $self->has_thinking_enabled ? $self->thinking_enabled : undef ),
+    ( $self->has_effort ? $self->effort : undef ),
+  );
 
   my $has_effort = $self->has_effort;
   my $has_budget = $self->has_thinking_budget;
@@ -130,8 +179,11 @@ sub _thinking_toggle {
   my ( $self, $with_display ) = @_;
   my $profile = $self->_profile;
   my $display = $with_display && $self->has_thinking_display;
+  # thinking_enabled without an effort is always 1 here (0 is normalized to
+  # effort 'none' in BUILDARGS), so it turns the toggle on (karr k382).
   my $thinking = $self->has_effort ? $profile->thinking_toggle_for( $self->effort )
-               : $display          ? { type => $profile->thinking_on }
+               : $display || $self->has_thinking_enabled
+                                   ? { type => $profile->thinking_on }
                :                     undef;
   return () unless $thinking;
   $thinking = { %$thinking, display => $self->thinking_display }
@@ -195,7 +247,13 @@ sub to_gemini {
 
 sub to_ollama {
   my ( $self ) = @_;
-  return () unless $self->has_effort;
+  # A bare thinking_enabled => 1 is the boolean on-switch; GPT-OSS has no
+  # level-free form, so nothing there (drops_thinking_enabled_on).
+  unless ( $self->has_effort ) {
+    return () unless $self->has_thinking_enabled && $self->thinking_enabled
+      && !$self->_profile->has_ollama_levels;
+    return ( think => JSON->true );
+  }
   # GPT-OSS takes graded level STRINGS on the options.think knob
   # (low<medium<high<max) and ALWAYS reasons — there is no "off": think:false is
   # ignored, so a boolean has zero effect and 'none' maps to the floor 'low'.
@@ -207,13 +265,57 @@ sub to_ollama {
 }
 
 
+# Self-hosted OpenAI-compatible servers (llama.cpp, SGLang; opt-in for any
+# other) switch thinking through the chat template: top-level
+# chat_template_kwargs.enable_thinking (karr k382, advisor-validated against the
+# llama.cpp / SGLang source). The OpenAI per-model effort ladder is NOT
+# consulted -- a self-hosted model id is whatever the operator named it, so the
+# effort goes out unclamped. enable_thinking must be a real JSON boolean:
+# llama.cpp reacts only to true/false after dumping the kwargs (a 0/1 desyncs
+# template and reasoning parser), and a string 400s. 'none' sends no
+# reasoning_effort, because older SGLang, gpt-oss and MiniMax-M3 templates 400
+# on it.
+sub to_chat_template_kwargs {
+  my ( $self ) = @_;
+  if ( $self->has_effort ) {
+    return ( chat_template_kwargs => { enable_thinking => JSON->false } )
+      if $self->effort eq 'none';
+    return (
+      chat_template_kwargs => { enable_thinking => JSON->true },
+      reasoning_effort     => $self->effort,
+    );
+  }
+  return () unless $self->has_thinking_enabled;
+  return ( chat_template_kwargs => {
+    enable_thinking => $self->thinking_enabled ? JSON->true : JSON->false,
+  } );
+}
+
+
+sub drops_thinking_enabled_on {
+  my ( $self, $fmt ) = @_;
+  return 0 unless $self->has_thinking_enabled && !$self->has_effort;
+  $fmt //= '';
+  return 0 if $fmt eq 'chat_template_kwargs';
+  # An off switch left without an effort is one normalize_off_switch kept (a
+  # budget generation): no other wire sends it.
+  return 1 unless $self->thinking_enabled;
+  # The toggle path of to_openai / to_anthropic has an on-type of its own.
+  return 0 if $self->_profile->has_thinking_on && ( $fmt eq 'openai' || $fmt eq 'anthropic' );
+  # Ollama's boolean think; GPT-OSS takes only levels, so nothing there.
+  return 0 if $fmt eq 'ollama' && !$self->_profile->has_ollama_levels;
+  return 1;
+}
+
+
 # Maps a reasoning_wire_format tag to the per-format serializer method.
 my %TO_METHOD = (
-  openai    => 'to_openai',
-  responses => 'to_responses',
-  anthropic => 'to_anthropic',
-  gemini    => 'to_gemini',
-  ollama    => 'to_ollama',
+  openai               => 'to_openai',
+  responses            => 'to_responses',
+  anthropic            => 'to_anthropic',
+  gemini               => 'to_gemini',
+  ollama               => 'to_ollama',
+  chat_template_kwargs => 'to_chat_template_kwargs',
 );
 
 sub to {
@@ -241,7 +343,7 @@ Langertha::Reasoning - Immutable normalized reasoning-effort control with cross-
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -294,6 +396,12 @@ form (either field on the wrong generation, or both fields together on any
 generation). The rule is "exactly one native control per generation",
 enforced loudly before any request is built.
 
+Self-hosted OpenAI-compatible servers (llama.cpp, SGLang) switch thinking
+through the chat template instead: the C<chat_template_kwargs> tag
+(L</to_chat_template_kwargs>) sends C<chat_template_kwargs.enable_thinking>
+plus the effort unclamped. L</thinking_enabled> is an explicit on/off switch
+without an effort level; it and L</effort> are one concern and must agree.
+
 =head2 effort
 
 The normalized reasoning effort, one of C<none|minimal|low|medium|high|xhigh|max>.
@@ -334,6 +442,26 @@ rejected at construction time (L</BUILD>) — the two fields speak different
 units (binary level vs integer tokens) and a combined or wrong-generation wire
 form would be ambiguous.
 
+=head2 thinking_enabled
+
+Optional explicit thinking on/off switch, without an effort level (karr
+k382). Tri-state: unset (C<has_thinking_enabled> false, the default), C<0> or
+C<1>. It is the same concern as L</effort>, so the two must agree:
+C<thinking_enabled =E<gt> 0> together with any effort other than C<none>, or
+C<thinking_enabled =E<gt> 1> together with effort C<none>, croaks at
+construction (L</BUILD>). C<thinking_enabled =E<gt> 0> without an effort is
+normalized to effort C<none> at construction (L</normalize_off_switch>), so
+every wire sees the same off switch. Off therefore cannot disable thinking
+where effort C<none> cannot: Gemini 3/4 raise it to their floor level
+(C<minimal> or C<low>), models whose OpenAI or Responses ladder has no C<none>
+(gpt-6, legacy gpt-5) drop it, GPT-OSS on Ollama raises it to C<low>, and on a
+Gemini 2.5 (budget-control) model it is not normalized at all and is dropped
+with a carp. C<thinking_enabled =E<gt> 1> without an effort has a wire form only
+on C<chat_template_kwargs> (L</to_chat_template_kwargs>), on the opted-in
+thinking-toggle path (L</thinking_toggle>, the model's on-type) and on Ollama's
+boolean C<think> (not GPT-OSS); every other wire sends nothing for it
+(L</drops_thinking_enabled_on>).
+
 =head2 thinking_toggle
 
 Whether the target endpoint speaks the C<thinking> on/off toggle (MiniMax's
@@ -344,6 +472,27 @@ opt-in. Only when it is true does a thinking-toggle profile
 false (the default) the same model id serializes exactly like the unlisted-id
 passthrough, because a self-hosted server or proxy serving a bare
 C<MiniMax-M3> / C<kimi-k2.6> id does not parse the toggle.
+
+=head2 normalize_off_switch
+
+    my $args = Langertha::Reasoning->normalize_off_switch(\%args);
+
+Returns the constructor arguments with C<thinking_enabled =E<gt> 0> (and no
+C<effort>) turned into C<effort =E<gt> 'none'>, the off switch every wire knows.
+Not on a budget-control generation (Gemini 2.5, see L</thinking_budget>), which
+takes no effort: there the switch stays as given and is dropped
+(L</drops_thinking_enabled_on>). The constructor calls it;
+L<Langertha::Role::ReasoningEffort> calls it to resolve the effort for readers
+other than the serializers.
+
+=head2 assert_switch_agrees
+
+    Langertha::Reasoning->assert_switch_agrees( $thinking_enabled, $effort );
+
+Croaks when the two disagree within one layer: C<thinking_enabled =E<gt> 0>
+with an effort other than C<none>, or C<thinking_enabled =E<gt> 1> with
+C<none>. Either one undefined passes. Called from L</BUILD> and from the
+engine constructor (L<Langertha::Role::ReasoningEffort/thinking_enabled>).
 
 =head2 to_gemini_level
 
@@ -411,10 +560,45 @@ graded level B<string> — C<low>/C<medium>/C<high>/C<max> — because GPT-OSS
 ignores the boolean and always reasons (C<none> maps to the floor C<low>;
 live-probed 2026-09-17 via ollama.com gpt-oss:20b, k175). For every other model
 it emits the C<options.think> B<boolean>: any effort level other than C<none>
-turns thinking on, C<none> turns it off. Empty list when no effort is set.
+turns thinking on, C<none> turns it off, and so do L</thinking_enabled> C<1> and
+C<0>. A bare C<thinking_enabled =E<gt> 1> sends nothing on GPT-OSS. Empty list
+when neither is set.
 (Ollama does not compose L<Langertha::Role::ReasoningEffort> — the engine calls
 this serializer directly from its C<chat_request> when a per-request
-C<reasoning_effort> control arrives.)
+C<reasoning_effort> or C<thinking_enabled> control arrives.)
+
+=head2 to_chat_template_kwargs
+
+Serializes to the chat-template switch of self-hosted OpenAI-compatible
+servers (llama.cpp, SGLang, and any OpenAI-compatible endpoint that opts in
+with C<reasoning_wire_format =E<gt> 'chat_template_kwargs'>):
+
+    effort none                 ->  chat_template_kwargs => { enable_thinking => false }
+    effort low .. max           ->  chat_template_kwargs => { enable_thinking => true },
+                                    reasoning_effort     => $effort
+    thinking_enabled 1 (alone)  ->  chat_template_kwargs => { enable_thinking => true }
+    nothing set                 ->  ()
+
+C<enable_thinking> is always a real JSON boolean. The effort is sent as given:
+the OpenAI per-model effort ladder (L</to_openai>) is not consulted, since a
+self-hosted model id says nothing about which levels its template takes. Effort
+C<none> sends no C<reasoning_effort>, because some servers and templates reject
+it. A C<chat_template_kwargs> the caller passes to the request is merged with
+this one, the caller's keys winning
+(L<Langertha::Role::OpenAICompatible/chat_request>).
+
+=head2 drops_thinking_enabled_on
+
+    my $dropped = $r->drops_thinking_enabled_on($reasoning_wire_format);
+
+True when L</thinking_enabled> is set without an L</effort> and the given wire
+has no form for it, so the serializers send nothing;
+L<Langertha::Role::ReasoningEffort/reasoning_kwargs_for> uses this to carp once
+per engine. A bare C<thinking_enabled =E<gt> 1> has a form on
+C<chat_template_kwargs>, on the opted-in thinking-toggle path and on C<ollama>
+(except GPT-OSS, which takes only levels). A bare C<thinking_enabled =E<gt> 0>
+is left only on a budget-control generation (L</normalize_off_switch>) and has
+a form only on C<chat_template_kwargs>.
 
 =head2 to
 
@@ -440,7 +624,7 @@ and C<thinking_budget>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -457,7 +641,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

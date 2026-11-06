@@ -229,6 +229,19 @@ __posix_spawn(file, argv, envp, actions, attr, unsupported = &PL_sv_undef)
     if (want_pidfd) mXPUSHi(pidfd);
 
 int
+__fd_cloexec(fd)
+    int fd
+  CODE:
+    /* Is fd open, and close-on-exec?  1: close-on-exec, 0: inherited by a child, -1: not open.  Portable
+       (fcntl F_GETFD); Perl itself could ask only through a handle, which would close the fd later. */
+    {
+      int f = fcntl(fd, F_GETFD);
+      RETVAL = f < 0 ? -1 : (f & FD_CLOEXEC) ? 1 : 0;
+    }
+  OUTPUT:
+    RETVAL
+
+int
 fpe_at_exec()
   CODE:
     /* What Perl's own exec gives SIGFPE: Perl may ignore SIGFPE for itself at startup and then restores

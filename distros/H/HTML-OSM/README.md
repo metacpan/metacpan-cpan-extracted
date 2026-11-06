@@ -4,7 +4,7 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 ## Version
 
-Version 0.13
+Version 0.14
 
 ## Synopsis
 
@@ -59,6 +59,17 @@ my ($head, $body) = $map->onload_render();
     `email` is added to every Nominatim request the module makes, as the
     Nominatim usage policy asks of heavy users.  It is not put into the rendered
     page, so the in-page search box sends no address.
+
+- Content-Security-Policy
+
+    `nonce` puts `nonce="..."` on every `<script>` that `onload_render()`
+    writes, the Leaflet and plugin scripts in the head as well as the map's own,
+    so a page whose policy allows scripts only by nonce draws the map without
+    `'unsafe-inline'`.  It must be base64 or base64url (`A-Z a-z 0-9 + / _ - =`),
+    so it cannot end the attribute; `onload_render()` checks it again, because a
+    config file or a clone skips `new()`'s check.  Give a fresh one for each
+    response.  The `<style>` blocks carry none: the policy's `style-src`
+    needs `'unsafe-inline'` anyway for the styles Leaflet sets.
 
 - Search box
 
@@ -196,6 +207,7 @@ merging `%overrides` onto the existing object's state without re-validating.
   logger                  => { type => object,                    optional },
   max_zoom                => { type => integer, min => 0, max => 28, optional },
   min_interval            => { type => number,  min => 0,         optional },
+  nonce                   => { type => string, matches => qr/\A[A-Za-z0-9+\/_=-]+\z/, optional },
   scale                   => { type => boolean,                   optional },
   search                  => { type => boolean,                   optional },
   tile_attribution        => { type => string,                    optional },
@@ -748,6 +760,7 @@ replacement gives a warning.
 | No map data provided                             | No markers, circle markers, GeoJSON, heatmap, GPX, or choropleth added yet |
 | center() must be called when no point markers are provided | Non-marker-only render needs explicit centre |
 | Skipping invalid coordinate: (LAT, LON)          | Warning: a marker is not numeric or out of range; it is left off the map |
+| onload_render: invalid nonce                     | nonce from a config file or clone is not base64 or base64url |
 | onload_render: invalid zoom 'Z', using 12        | Warning: zoom from a config file or clone is out of range |
 | onload_render: invalid max_zoom 'Z', ignoring it | Warning: max_zoom from a config file or clone is not an integer from 0 to 28 |
 | onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |

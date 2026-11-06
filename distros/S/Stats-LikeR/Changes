@@ -1,5 +1,46 @@
 Revision history for Stats-LikeR
 
+0.3416 2026-11-05 CST (Claude Opus 5.5 helped)
+
+ [dunn_test()]
+
+ - method => 'sidak' and method => 'hs' (Holm-Sidak) no longer report an
+   adjusted p-value of 0 for a small raw p. Both computed 1 - (1 - p)^m
+   as written, and 1 - p rounds to 1 once p is below about 1e-16, so four
+   well-separated groups of 200 came back with 0 for every pair where
+   Bonferroni gives 2.96e-17; a raw p of 1e-10 kept only about six
+   correct digits. The adjustment is now -expm1(m * log1p(-p)), the form
+   statsmodels' multipletests() uses.
+
+ [rbinom()]
+
+ - size is accepted up to IV_MAX on a 32-bit perl built with 64-bit
+   integers (i686-linux-64int). Such a perl has an 8-byte IV and a 4-byte
+   size_t, and rbinom() held size in a size_t, so it refused size => 1e15
+   with "size is too large" where every other perl with 64-bit integers
+   draws, as R does. size is now carried as a UV. This failed
+   t/rbinom.dist.t on three CPAN smokers for 0.3414.
+
+ [Tests]
+
+ - t/dunn_test.statsmodels.t checks all seven of dunn_test()'s methods
+   against statsmodels' multipletests(), with raw p-values from 0.83 down
+   to 1.2e-148. Nothing ran sidak, hs or by before; against 0.3415 the
+   file fails all 20 of its sidak and hs rows.
+
+ - t/TukeyHSD.twoway.R.t runs TukeyHSD() on R's own two-factor example,
+   aov(breaks ~ wool + tension, warpbreaks), with the data given as a
+   HoA, an AoH and a HoH. Earlier tests fitted one factor and passed a
+   HoA only. It also records a known difference from R: TukeyHSD()
+   compares observed marginal means, while R adjusts a later factor for
+   the earlier ones, so in an unbalanced design the two disagree for
+   every factor after the first. Those rows run as TODO tests.
+
+ - t/prop_test.R.statsmodels.t checks prop_test() with given null
+   proportions, as an array and as a single number, against the R results
+   recorded in statsmodels' test suite, and checks each way of raising
+   the "Chi-squared approximation may be incorrect" warning.
+
 0.3415 2026-11-04 CST (Claude Opus 5.5 helped)
 
  [Windows: build]

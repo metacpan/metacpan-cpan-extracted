@@ -1,6 +1,7 @@
 use common::sense;
 use Test::More;
 use MIME::Base64 ();
+use JSON::XS ();
 
 BEGIN {
    eval { require Mail::IMAPTalk; require IO::Socket::SSL; 1 }
@@ -29,13 +30,21 @@ require AnyEvent::MCP::Worker::IMAP;
       $seen{select} = [@_];
       1
    }
-   sub list { [ ["", "/", "INBOX"], ["", "/", "Archive"] ] }
+   sub list {
+      my $mailboxes = [ ["", "/", "INBOX"], ["", "/", "Archive"] ];
+      wantarray ? @$mailboxes : $mailboxes
+   }
+   sub lsub {
+      my $mailboxes = [ ["", "/", "INBOX"] ];
+      wantarray ? @$mailboxes : $mailboxes
+   }
    sub status { $seen{status}++; { uidnext => $uidnext, uidvalidity => 123 } }
    sub search {
       my ($self, $range, @criteria) = @_;
       $seen{search} = [$range, @criteria];
       my ($lo, $hi) = split /:/, $range;
-      [grep $_ >= $lo && $_ <= $hi, (20, 1001, 2200, 2900, 3200)]
+      my $uids = [grep $_ >= $lo && $_ <= $hi, (20, 1001, 2200, 2900, 3200)];
+      wantarray ? @$uids : $uids
    }
    sub fetch {
       my ($self, $uids, $items) = @_;
@@ -62,7 +71,7 @@ require AnyEvent::MCP::Worker::IMAP;
    sub store { $seen{store} = [@_]; 1 }
    sub copy { $seen{copy} = [@_]; 1 }
    sub move { $seen{move} = [@_]; 1 }
-   sub append { $seen{append} = [@_]; 1 }
+   sub append { $seen{append} = [@_]; wantarray ? () : 1 }
    sub expunge { ++$seen{expunge}; 1 }
    sub uidexpunge { $seen{uidexpunge} = [@_]; 1 }
    sub create { $seen{create} = [@_]; 1 }
@@ -84,6 +93,62 @@ require AnyEvent::MCP::Worker::IMAP;
    ok $ok, "list";
    is scalar @{$result->{mailboxes}}, 2, "two mailboxes";
 
+   ($ok, $result) = AnyEvent::MCP::Worker::IMAP::run ("lsub", {});
+   ok $ok, "lsub";
+   is_deeply $result->{mailboxes}, [["", "/", "INBOX"]], "only subscribed mailboxes returned";
+
+   my $nodes = 0;
+   my @criteria = AnyEvent::MCP::Worker::IMAP::search_filter ({
+      since => "1-Nov-2026",
+      any => [
+         { from => "alice\@example.org" },
+         { subject => "invoice", body => "overdue" },
+         { text => "last chance" },
+      ],
+      not => { flagged => JSON::XS::true },
+      all => [
+         { header => { "X-Test" => "(UNSEEN)" }, larger => 512 },
+         { sent_before => "5-Nov-2026", cc => "jane\@example.org" },
+      ],
+   }, 0, \$nodes);
+   is_deeply \@criteria, [
+      ["HEADER", "X-Test", { Quote => "(UNSEEN)" }, "LARGER", 512],
+      ["CC", { Quote => "jane\@example.org" }, "SENTBEFORE", "5-Nov-2026"],
+      "OR", ["FROM", { Quote => "alice\@example.org" }],
+      ["OR", ["BODY", { Quote => "overdue" }, "SUBJECT", { Quote => "invoice" }],
+         ["TEXT", { Quote => "last chance" }]],
+      "NOT", ["FLAGGED"], "SINCE", "1-Nov-2026",
+   ], "recursive AND, OR, NOT compile to grouped IMAP SEARCH arguments";
+
+   my $wire = Mail::IMAPTalk::_send_data (bless ({}, "Mail::IMAPTalk"), {}, "", @criteria);
+   like $wire, qr/HEADER X-Test "\Q(UNSEEN)\E"/, "SEARCH parentheses are quoted as a value";
+   like $wire, qr/OR \(FROM "alice\@example\.org"\) \(OR /, "multiple OR alternatives are grouped";
+   like $wire, qr/NOT \(FLAGGED\)/, "NOT scopes its operand";
+
+   for my $bad (
+      { any => [] }, { all => [ {} ] }, { not => {} },
+      { any => [ { subject => "x" }, { bogus => 1 } ] },
+      { header => { "X) OR ALL" => "injection" } },
+      { header => { "X-Test" => [] } },
+      { larger => "123x" }, { sent_since => "yesterday" }, { unseen => [] },
+   ) {
+      my $nodes = 0;
+      my $ok = eval { AnyEvent::MCP::Worker::IMAP::search_filter ($bad, 0, \$nodes); 1 };
+      ok !$ok && $@, "invalid SEARCH filter rejected";
+   }
+   {
+      my $nested = { subject => "x" };
+      $nested = { not => $nested } for 1 .. 15;
+      my $nodes = 0;
+      my $ok = eval { AnyEvent::MCP::Worker::IMAP::search_filter ($nested, 0, \$nodes); 1 };
+      ok !$ok && $@ =~ /too complex/, "SEARCH nesting depth bounded";
+   }
+   {
+      my $nodes = 0;
+      is_deeply [AnyEvent::MCP::Worker::IMAP::search_filter ({ unseen => JSON::XS::false }, 0, \$nodes)], [],
+         "false flag preserves existing no-filter behavior";
+   }
+
    ($ok, $result) = AnyEvent::MCP::Worker::IMAP::run ("messages", {
       mailbox => "INBOX", limit => 2, fields => [qw(subject flags)],
       filter => { subject => "test" },
@@ -98,6 +163,15 @@ require AnyEvent::MCP::Worker::IMAP;
       mailbox => "INBOX", limit => 2, cursor => $result->{next_cursor},
    });
    is_deeply [map $_->{uid}, @{$result->{messages}}], [1001, 20], "cursor resumes lower UIDs";
+
+   ($ok, $result) = AnyEvent::MCP::Worker::IMAP::run ("messages", {
+      mailbox => "INBOX", limit => 2,
+      filter => { any => [{ from => "alice" }, { subject => "invoice" }], not => { deleted => 1 } },
+   });
+   ok $ok, "Boolean SEARCH integrated with message pagination";
+   is_deeply [@{$IMAPMock::seen{search}}[1 .. 5]],
+      ["OR", ["FROM", { Quote => "alice" }], ["SUBJECT", { Quote => "invoice" }], "NOT", ["DELETED"]],
+      "pagination sends grouped SEARCH terms to IMAP";
 
    {
       local $IMAPMock::uidnext = 3501;

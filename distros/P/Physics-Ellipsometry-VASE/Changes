@@ -1,5 +1,12 @@
 Revision history for Physics-Ellipsometry-VASE
 
+1.04    2026-11-04
+	- fit(): implement the documented lm_reg_floor option (damped-diagonal
+	  floor in Levenberg-Marquardt). Fixes "lu_backsub: LU decomposition
+	  is undef" when a parameter has zero derivative, e.g. one held at a
+	  model clamp. Fixes the PDL demo multi-layer fit and plot.
+	- Added zero-derivative regression test to t/02-fit.t
+
 1.00    2025-07-21
 	- Major release: built-in optical modelling toolkit
 	- VASE::TMM — Transfer Matrix Method with physics sign convention

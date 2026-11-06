@@ -1,7 +1,7 @@
 package Mail::DKIM::Policy;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: abstract base class for originator "signing" policies
 
 # Copyright 2005-2007 Messiah College.
@@ -84,8 +84,9 @@ sub parse {
     my %tags;
     foreach my $tag ( split /;/, $text ) {
 
-        # strip whitespace
-        $tag =~ s/^\s+|\s+$//g;
+        # strip whitespace (not s/^\s+|\s+$//g, which is quadratic)
+        $tag =~ s/^\s+//;
+        $tag =~ s/\s+$//;
 
         my ( $tagname, $value ) = split /=/, $tag, 2;
         unless ( defined $value ) {
@@ -162,7 +163,7 @@ Mail::DKIM::Policy - abstract base class for originator "signing" policies
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 

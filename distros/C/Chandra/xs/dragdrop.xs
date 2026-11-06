@@ -41,6 +41,7 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **h_svp = hv_fetchs(hv, "_handlers", 0);
     HV *handlers = (HV *)SvRV(*h_svp);
+    # uncoverable condition left count:2
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("on_file_drop() requires a coderef");
     (void)hv_stores(handlers, "file_drop", newSVsv(callback));
@@ -60,6 +61,7 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **h_svp = hv_fetchs(hv, "_handlers", 0);
     HV *handlers = (HV *)SvRV(*h_svp);
+    # uncoverable condition left count:2
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("on_text_drop() requires a coderef");
     (void)hv_stores(handlers, "text_drop", newSVsv(callback));
@@ -79,6 +81,7 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **h_svp = hv_fetchs(hv, "_handlers", 0);
     HV *handlers = (HV *)SvRV(*h_svp);
+    # uncoverable condition left count:1
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("on_drag_enter() requires a coderef");
     (void)hv_stores(handlers, "drag_enter", newSVsv(callback));
@@ -139,6 +142,7 @@ CODE:
     HV *zones = (HV *)SvRV(*dz_svp);
     STRLEN slen;
     const char *sel = SvPV(selector, slen);
+    # uncoverable condition left count:2
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("add_drop_zone() requires a coderef");
     (void)hv_store(zones, sel, (I32)slen, newSVsv(callback), 0);
@@ -269,6 +273,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **en_svp = hv_fetchs(hv, "_enabled", 0);
+    # uncoverable condition right count:1
     RETVAL = newSViv(en_svp && SvTRUE(*en_svp) ? 1 : 0);
 }
 OUTPUT:
@@ -292,6 +297,7 @@ CODE:
     const char *type;
 
     /* Check enabled */
+    # uncoverable condition left count:1
     if (!en_svp || !SvTRUE(*en_svp)) goto done_dispatch;
 
     h_svp = hv_fetchs(hv, "_handlers", 0);
@@ -309,6 +315,7 @@ CODE:
         PUTBACK;
         count = call_pv("Cpanel::JSON::XS::decode_json", G_SCALAR | G_EVAL);
         SPAGAIN;
+        # uncoverable condition left count:2
         if (SvTRUE(ERRSV) || count < 1) {
             FREETMPS; LEAVE;
             goto done_dispatch;
@@ -325,6 +332,7 @@ CODE:
 
     event_hv = (HV *)SvRV(event_hv_sv);
     type_svp = hv_fetchs(event_hv, "type", 0);
+    # uncoverable condition left count:2
     if (!type_svp || !SvOK(*type_svp)) {
         SvREFCNT_dec(event_hv_sv);
         goto done_dispatch;
@@ -351,19 +359,23 @@ CODE:
         }
 
         /* Check zone-specific handler first */
+        # uncoverable condition right count:2
         if (zone_svp && SvOK(*zone_svp)) {
             STRLEN zlen;
             const char *zstr = SvPV(*zone_svp, zlen);
             SV **cb_svp = hv_fetch(zones, zstr, (I32)zlen, 0);
+            # uncoverable condition right count:1
             if (cb_svp && SvROK(*cb_svp)) {
                 dSP;
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
                 XPUSHs(sv_2mortal(newRV_inc((SV *)files_av)));
+                # uncoverable condition right count:2
                 if (target_svp && SvOK(*target_svp))
                     XPUSHs(*target_svp);
                 PUTBACK;
                 call_sv(*cb_svp, G_DISCARD | G_EVAL);
+                # uncoverable condition right count:1
                 if (SvTRUE(ERRSV))
                     warn("DragDrop zone handler error: %s", SvPV_nolen(ERRSV));
                 FREETMPS; LEAVE;
@@ -373,15 +385,18 @@ CODE:
         /* Global file_drop handler */
         {
             SV **cb_svp = hv_fetchs(handlers, "file_drop", 0);
+            # uncoverable condition right count:2
             if (cb_svp && SvROK(*cb_svp)) {
                 dSP;
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
                 XPUSHs(sv_2mortal(newRV_inc((SV *)files_av)));
+                # uncoverable condition right count:2
                 if (target_svp && SvOK(*target_svp))
                     XPUSHs(*target_svp);
                 PUTBACK;
                 call_sv(*cb_svp, G_DISCARD | G_EVAL);
+                # uncoverable condition right count:1
                 if (SvTRUE(ERRSV))
                     warn("DragDrop file_drop handler error: %s", SvPV_nolen(ERRSV));
                 FREETMPS; LEAVE;
@@ -394,15 +409,20 @@ CODE:
         SV **text_svp = hv_fetchs(event_hv, "text", 0);
         SV **target_svp = hv_fetchs(event_hv, "target", 0);
         SV **cb_svp = hv_fetchs(handlers, "text_drop", 0);
+        # uncoverable condition right count:2
+        # uncoverable condition right count:3
+        # uncoverable condition right count:4
         if (cb_svp && SvROK(*cb_svp) && text_svp && SvOK(*text_svp)) {
             dSP;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
             XPUSHs(*text_svp);
+            # uncoverable condition right count:2
             if (target_svp && SvOK(*target_svp))
                 XPUSHs(*target_svp);
             PUTBACK;
             call_sv(*cb_svp, G_DISCARD | G_EVAL);
+            # uncoverable condition right count:1
             if (SvTRUE(ERRSV))
                 warn("DragDrop text_drop handler error: %s", SvPV_nolen(ERRSV));
             FREETMPS; LEAVE;
@@ -413,26 +433,33 @@ CODE:
     else if (strEQ(type, "drag_enter")) {
         SV **target_svp = hv_fetchs(event_hv, "target", 0);
         SV **cb_svp = hv_fetchs(handlers, "drag_enter", 0);
+        # uncoverable condition right count:2
         if (cb_svp && SvROK(*cb_svp)) {
             SV *result;
             dSP;
             int count;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
+            # uncoverable condition right count:2
             if (target_svp && SvOK(*target_svp))
                 XPUSHs(*target_svp);
             PUTBACK;
             count = call_sv(*cb_svp, G_SCALAR | G_EVAL);
             SPAGAIN;
+            # uncoverable condition right count:1
             if (SvTRUE(ERRSV)) {
                 warn("DragDrop drag_enter handler error: %s", SvPV_nolen(ERRSV));
+            # uncoverable branch false
+            # uncoverable condition right count:1
             } else if (count > 0) {
                 result = POPs;
                 /* Return CSS class to JS for visual feedback */
                 if (SvOK(result)) {
                     SV **app_svp = hv_fetchs(hv, "app", 0);
+                    # uncoverable condition right count:2
                     if (app_svp && SvOK(*app_svp)) {
                         SV *tgt_id = NULL;
+                        # uncoverable condition right count:3
                         if (target_svp && SvROK(*target_svp)
                             && SvTYPE(SvRV(*target_svp)) == SVt_PVHV) {
                             SV **id_svp = hv_fetchs((HV *)SvRV(*target_svp), "id", 0);
@@ -463,14 +490,17 @@ CODE:
     else if (strEQ(type, "drag_leave")) {
         SV **target_svp = hv_fetchs(event_hv, "target", 0);
         SV **cb_svp = hv_fetchs(handlers, "drag_leave", 0);
+        # uncoverable condition right count:2
         if (cb_svp && SvROK(*cb_svp)) {
             dSP;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
+            # uncoverable condition right count:2
             if (target_svp && SvOK(*target_svp))
                 XPUSHs(*target_svp);
             PUTBACK;
             call_sv(*cb_svp, G_DISCARD | G_EVAL);
+            # uncoverable condition right count:1
             if (SvTRUE(ERRSV))
                 warn("DragDrop drag_leave handler error: %s", SvPV_nolen(ERRSV));
             FREETMPS; LEAVE;
@@ -483,24 +513,29 @@ CODE:
         SV **source_svp = hv_fetchs(event_hv, "source", 0);
         SV **target_svp = hv_fetchs(event_hv, "target", 0);
         SV **cb_svp = hv_fetchs(handlers, "internal_drop", 0);
+        # uncoverable condition right count:2
         if (cb_svp && SvROK(*cb_svp)) {
             dSP;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
+            # uncoverable condition right count:2
             if (data_svp && SvOK(*data_svp))
                 XPUSHs(*data_svp);
             else
                 XPUSHs(&PL_sv_undef);
+            # uncoverable condition right count:2
             if (source_svp && SvOK(*source_svp))
                 XPUSHs(*source_svp);
             else
                 XPUSHs(&PL_sv_undef);
+            # uncoverable condition right count:2
             if (target_svp && SvOK(*target_svp))
                 XPUSHs(*target_svp);
             else
                 XPUSHs(&PL_sv_undef);
             PUTBACK;
             call_sv(*cb_svp, G_DISCARD | G_EVAL);
+            # uncoverable condition right count:1
             if (SvTRUE(ERRSV))
                 warn("DragDrop internal_drop handler error: %s", SvPV_nolen(ERRSV));
             FREETMPS; LEAVE;
@@ -568,14 +603,17 @@ CODE:
             sv_catpvn(js, key, klen);
             sv_catpvs(js, "'");
 
+            # uncoverable condition right count:2
             if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
                 HV *opts = (HV *)SvRV(val);
                 SV **df_svp = hv_fetchs(opts, "data_from", 0);
                 SV **d_svp = hv_fetchs(opts, "data", 0);
+                # uncoverable condition right count:2
                 if (df_svp && SvOK(*df_svp)) {
                     sv_catpvs(js, ",dataFrom:'");
                     sv_catpv(js, SvPV_nolen(*df_svp));
                     sv_catpvs(js, "'");
+                # uncoverable condition right count:2
                 } else if (d_svp && SvOK(*d_svp)) {
                     /* Encode data to JSON */
                     dSP;
@@ -586,6 +624,7 @@ CODE:
                     PUTBACK;
                     count = call_pv("Cpanel::JSON::XS::encode_json", G_SCALAR | G_EVAL);
                     SPAGAIN;
+                    # uncoverable condition right count:2
                     if (!SvTRUE(ERRSV) && count > 0) {
                         SV *json = POPs;
                         sv_catpvs(js, ",data:");
@@ -727,6 +766,7 @@ CODE:
     SV **injected_svp;
 
     injected_svp = hv_fetchs(hv, "_injected", 0);
+    # uncoverable condition right count:1
     if (injected_svp && SvTRUE(*injected_svp)) {
         RETVAL = SvREFCNT_inc(self);
     } else {
@@ -737,8 +777,10 @@ CODE:
         /* Bind __chandra_dragdrop dispatch if not already done */
         {
             SV **db_svp = hv_fetchs(hv, "_dispatch_bound", 0);
+            # uncoverable condition left count:1
             if (!db_svp || !SvTRUE(*db_svp)) {
                 SV **app_svp = hv_fetchs(hv, "app", 0);
+                # uncoverable condition right count:2
                 if (app_svp && SvOK(*app_svp)) {
                     SV *dd_self_ref = newSVsv(self);
                     CV *wrapper_cv;
@@ -772,6 +814,7 @@ CODE:
             PUTBACK;
             count = call_method("js_code", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             js = (count > 0) ? newSVsv(POPs) : newSVpvs("");
             PUTBACK;
             FREETMPS; LEAVE;
@@ -780,6 +823,7 @@ CODE:
         /* Call $self->{app}->eval($js) */
         {
             SV **app_svp = hv_fetchs(hv, "app", 0);
+            # uncoverable condition right count:2
             if (app_svp && SvOK(*app_svp)) {
                 dSP;
                 ENTER; SAVETMPS;

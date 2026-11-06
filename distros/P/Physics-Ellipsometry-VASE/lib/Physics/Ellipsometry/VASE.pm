@@ -6,7 +6,7 @@ use PDL::Fit::LM;
 use PDL::NiceSlice;
 use PDL::Constants qw(PI);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 # Sub-modules (loaded on demand)
 # use Physics::Ellipsometry::VASE::TMM;
@@ -167,9 +167,10 @@ sub fit {
         }
     };
 
-    my ($ym, $finalp, $covar, $iters) = lmfit(
+    my ($ym, $finalp, $covar, $iters) = _lmfit(
         $x_fit, $y_data, $sigma, $fit_func, $initial_params,
-        {Maxiter => $self->{maxiter}, Eps => $self->{eps}}
+        {Maxiter => $self->{maxiter}, Eps => $self->{eps},
+         RegFloor => $self->{lm_reg_floor}}
     );
 
     $self->{covar} = $covar;
@@ -177,6 +178,64 @@ sub fit {
     $self->{ym}    = $ym;
 
     return $finalp;
+}
+
+# Levenberg-Marquardt, identical to PDL::Fit::LM::lmfit except that the
+# damped diagonal gets an additive floor (lambda * RegFloor).  Without it, a
+# parameter with an all-zero Jacobian column (e.g. one pinned at a clamp in
+# the model) makes the normal matrix singular and lu_backsub dies.  With it,
+# that parameter simply receives a zero step.
+sub _lmfit {
+    my ($x, $y, $sig, $func, $c, $opt) = @_;
+    my $maxiter = $opt->{Maxiter} // 200;
+    my $eps     = $opt->{Eps}     // 1e-4;
+    my $floor   = $opt->{RegFloor} // 1e-10;
+
+    my ($isig2, $chisq) = (1 / ($sig * $sig), 0);
+    my ($ym, $al, $cov, $bet, $oldbet, $olda, $oldal, $ochisq, $di) =
+        map { null } (0 .. 8);
+    my ($aldiag, $codiag);
+    my $dyda = zeroes($x->type, $x->getdim(0), $c->getdim(0));
+    my $alv  = zeroes($x->type, $x->getdim(0), $c->getdim(0), $c->getdim(0));
+    my ($iter, $lambda) = (0, 0.001);
+
+    do {
+        if ($iter > 0) {
+            $cov .= $al;
+            $codiag .= $aldiag * (1 + $lambda) + $lambda * $floor;
+            my ($lu, $perm, $par) = lu_decomp($cov);
+            $bet .= lu_backsub($lu, $perm, $par, $bet);
+            $c += $bet;
+        }
+        &$func($x, $c, $ym, $dyda);
+        $chisq = ($y - $ym) * ($y - $ym);
+        $chisq *= $isig2;
+        $chisq = $chisq->sumover;
+        $dyda->transpose->outer($dyda->transpose, $alv->mv(0, 2));
+        $alv *= $isig2;
+        $alv->sumover($al);
+        (($y - $ym) * $isig2 * $dyda)->sumover($bet);
+        if ($iter == 0) {
+            $olda .= $c; $ochisq .= $chisq; $oldbet .= $bet;
+            $oldal .= $al; $aldiag = $al->diagonal(0, 1);
+            $cov .= $al;   $codiag = $cov->diagonal(0, 1);
+        }
+        $di .= abs($chisq - $ochisq);
+        if ($chisq < $ochisq) {
+            $lambda *= 0.1;
+            $ochisq .= $chisq; $olda .= $c; $oldbet .= $bet; $oldal .= $al;
+        } else {
+            $lambda *= 10;
+            $chisq .= $ochisq; $c .= $olda; $bet .= $oldbet; $al .= $oldal;
+        }
+    } while ($iter++ == 0 || $iter < $maxiter && $di / $chisq > $eps);
+    barf "iteration did not converge" if $iter >= $maxiter && $di / $chisq > $eps;
+
+    # Covariance estimate; floor the diagonal so inv() survives dead parameters
+    my $alr = $al->copy;
+    my $d   = $alr->diagonal(0, 1);
+    $d->where($d < $floor) .= $floor;
+    return ($ym, $c, inv($alr), $iter);
 }
 
 # Calculate MSE (WVASE convention: sqrt(χ²/(2N-M)))
@@ -321,7 +380,7 @@ Physics::Ellipsometry::VASE - Variable Angle Spectroscopic Ellipsometry analysis
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -354,7 +413,7 @@ Version 1.03
 
 =head1 DESCRIPTION
 
-Physics::Ellipsometry::VASE v1.03 provides a complete framework for
+Physics::Ellipsometry::VASE v1.04 provides a complete framework for
 spectroscopic ellipsometry analysis including:
 
 =over
@@ -386,6 +445,11 @@ spectroscopic ellipsometry analysis including:
 Constructor.  Accepts the following options: C<layers> (number of thin-film
 layers), C<circular_delta> (enable circular Delta residuals),
 C<deriv_step>, C<min_deriv_step>, C<maxiter>, C<eps>, C<lm_reg_floor>.
+
+C<lm_reg_floor> (default 1e-10) is added, scaled by the Marquardt lambda, to
+the diagonal of the LM normal matrix.  It keeps the solve non-singular when a
+parameter has no effect on the model (for example, one clamped at a bound),
+in which case that parameter is simply left unchanged.
 
 =head2 load_data
 

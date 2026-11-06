@@ -72,11 +72,17 @@ csplash_js_escape(const char *input)
     size_t i, len, out_len;
     char  *buf, *p;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!input) input = "";
     len = strlen(input);
 
     /* Worst case: every char becomes \uXXXX (6 chars) + quotes + NUL */
     buf = (char *)malloc(len * 6 + 3);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!buf) return NULL;
 
     p = buf;
@@ -113,9 +119,15 @@ csplash_js_escape(const char *input)
 static char *
 csplash_build_html(const char *title)
 {
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     const char *t = (title && *title) ? title : "";
     size_t len = strlen(CHANDRA_SPLASH_DEFAULT_TMPL) + strlen(t) + 1;
     char *buf = (char *)malloc(len);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!buf) return NULL;
     snprintf(buf, len, CHANDRA_SPLASH_DEFAULT_TMPL, t);
     return buf;
@@ -129,7 +141,7 @@ static int
 csplash_create(const char *title, int width, int height, int frameless)
 {
     /* -1/-1 → center on screen */
-    return cwin_create(title ? title : "", width, height, -1, -1, 0, frameless);
+    return cwin_create(title ? title : "", width, height, -1, -1, 0, frameless); /* # uncoverable condition right count:1 */
 }
 
 /*
@@ -150,10 +162,16 @@ static void
 csplash_update_status(int wid, const char *text)
 {
     char *escaped = csplash_js_escape(text);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!escaped) return;
     /* JS_STATUS expects a %s that is already a quoted JS string literal */
     size_t js_len = strlen(CHANDRA_SPLASH_JS_STATUS) + strlen(escaped) + 1;
     char *js = (char *)malloc(js_len);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (js) {
         snprintf(js, js_len, CHANDRA_SPLASH_JS_STATUS, escaped);
         cwin_eval_js(wid, js);

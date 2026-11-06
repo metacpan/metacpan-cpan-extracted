@@ -7,7 +7,8 @@ inc/
 pm_to_blib
 MANIFEST
 MANIFEST.bak
-META.*
+# No META.*: the image is built from the dzil build root, and the Dockerfile
+# installs the configure prereqs from its META.json.
 MYMETA.*
 Makefile
 Makefile.old

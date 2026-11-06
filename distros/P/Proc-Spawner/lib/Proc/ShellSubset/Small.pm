@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Small;  # Proc::ShellSubset with its options frozen (see doc/parsers/shell-subset-spec.md, section 9)
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use strict; use warnings;
 
 # Proc::ShellSubset::Small::parse($string) returns a List, or { error => '...', pos => N, last => N, tree => List }:

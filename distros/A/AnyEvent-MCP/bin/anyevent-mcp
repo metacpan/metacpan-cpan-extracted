@@ -2,12 +2,14 @@
 
 =head1 NAME
 
-anyevent-mcp - initialize MCP configuration and manage permission rules
+anyevent-mcp - initialize MCP configuration and manage users and permissions
 
 =head1 SYNOPSIS
 
    anyevent-mcp init
    anyevent-mcp manage-rules fs-default
+   anyevent-mcp create-user chatgpt
+   anyevent-mcp revoke-user chatgpt
    anyevent-mcp edit-rules-file /path/to/rules.ini
 
 =head1 DESCRIPTION
@@ -61,6 +63,18 @@ Open the rule manager for the explicit pathname C<$file>.
 Open C<$file> in a text editor. Use these explicit-file commands for
 applications whose rule files do not use the named-profile convention.
 
+=item create-user USER
+
+Enable a new named user; rotate a revoked user at the next generation.
+Use --program or --instance for a scoped override.
+
+=item revoke-user USER
+
+Disable a user, preserving the generation for later rotation. In a narrower
+scope, a negative definition also blocks inherited credentials. Implicit
+global:default is revocable. Restart affected servers after changes; these
+commands do not print secrets. Use server --print-url[=USER] for URLs.
+
 =back
 
 Named profiles use
@@ -76,8 +90,16 @@ For server URLs, use each server's C<--print-url> option.
 
 Use FILE instead of default global configuration
 (C<$XDG_CONFIG_HOME/anyevent-mcp/global.ini>, or
-C<~/.config/anyevent-mcp/global.ini>). Relevant to C<init>; the rule
-management commands use their own profile or explicit pathname.
+C<~/.config/anyevent-mcp/global.ini>). Relevant to C<init> and user
+management; rule management uses its own profile or pathname.
+
+=item --program NAME
+
+Select C<[program NAME]> for user management.
+
+=item --instance NAME
+
+Select C<[instance NAME]> for user management. Cannot combine with --program.
 
 =item --help
 
@@ -91,18 +113,45 @@ then exit without running a command.
 use common::sense;
 
 use Getopt::Long ();
+
 use AnyEvent::MCP ();
 use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::File ();
 
 sub usage {
    print <<'EOF';
-Usage: anyevent-mcp [--config FILE] COMMAND [ARGUMENTS]
+Usage: anyevent-mcp [OPTIONS] COMMAND [ARGUMENTS]
 
    manage-rules NAME       delete/reorder rules in YAD
    edit-rules NAME         edit rules with VISUAL, EDITOR, sensible-editor, vi
    manage-rules-file FILE  manage an explicit rules file
    edit-rules-file FILE    edit an explicit rules file
    init                    create a private configuration and master secret
+   create-user USER        enable or rotate a managed user
+   revoke-user USER        revoke a managed user
+
+Options (before COMMAND):
+   --config FILE           use a different global configuration file
+   --program NAME          select [program NAME] for user management
+   --instance NAME         select [instance NAME] for user management
+   --help                  show this help
+
+User definitions inherit from [global] through [program NAME] to
+[instance NAME]; narrower scopes override wider ones. Without --program
+or --instance, user commands modify [global]. Revoked users remain
+disabled until recreated with a new token generation. The implicit
+global:default user is enabled initially.
+
+Examples:
+   anyevent-mcp create-user chatgpt
+   anyevent-mcp --program mcp-fs create-user backup
+   anyevent-mcp --instance private revoke-user alice
+   anyevent-mcp revoke-user chatgpt
+   mcp-multibroker --print-urls        # list all enabled user URLs
+   mcp-multibroker --print-url=chatgpt # show just chatgpt's URL
+
+Server changes take effect after restart. The selected connect_user
+(default: default) authenticates auxiliary browser/Vim/reverse connections.
 
 Rule profiles are stored under $XDG_CONFIG_HOME/anyevent-mcp, falling back
 to ~/.config/anyevent-mcp/rules (e.g. manage-rules fs-default).
@@ -115,8 +164,68 @@ loads its configuration. Configuration format: see AnyEvent::MCP.
 EOF
 }
 
+sub change_user {
+   my ($file, $section, $user, $command) = @_;
+
+   my $lock = AnyEvent::MCP::File::lock $file;
+   open my $fh, "<:raw", $file or die "$file: $!\n";
+   local $/;
+   my $body = <$fh>;
+   close $fh or die "$file: $!\n";
+
+   my @lines = split /(?<=\n)/, $body;
+   my ($current, $found, $position, $value);
+   my $key = "user.$user";
+
+   for my $i (0 .. $#lines) {
+      if ($lines[$i] =~ /^\s*\[([^\]\r\n]+)\]\s*(?:[;#][^\r\n]*)?\r?\n?\z/) {
+         $current = $1;
+         $position = $i + 1 if $current eq $section;
+      } elsif ($current eq $section && $lines[$i] =~ /^\s*\Q$key\E\s*=\s*([^\r\n;#]*)(?:[;#][^\r\n]*)?\r?\n?\z/) {
+         die "Duplicate $key in [$section]\n" if defined $found;
+         ($found, $value) = ($i, $1);
+         $value =~ s/\s+\z//;
+      }
+   }
+
+   my $generation;
+   if (defined $found) {
+      $value =~ /\A-?[1-9][0-9]*\z/ && length $value < 18
+         or die "Invalid $key generation '$value'\n";
+      $generation = 0 + $value;
+   }
+
+   if ($command eq "create-user") {
+      die "$key already enabled in [$section]\n"
+         if defined $generation && $generation > 0 || !defined $generation && $section eq "global" && $user eq "default";
+      $generation = defined $generation ? -$generation + 1 : 1;
+   } else {
+      die "$key already revoked in [$section]\n" if defined $generation && $generation < 0;
+      if (!defined $generation) {
+         ($section ne "global" || $user eq "default")
+            or die "$key is not enabled\n";
+         $generation = -1;
+      } else {
+         $generation = -$generation;
+      }
+   }
+
+   if (defined $found) {
+      $lines[$found] = "$key = $generation\n";
+   } elsif (defined $position) {
+      splice @lines, $position, 0, "$key = $generation\n";
+   } else {
+      push @lines, "\n[$section]\n$key = $generation\n";
+   }
+   AnyEvent::MCP::File::replace $file, join "", @lines;
+   close $lock;
+   print "$section: $user generation " . abs ($generation)
+      . ($generation > 0 ? " enabled\n" : " revoked\n");
+}
+
 Getopt::Long::Configure ("no_auto_abbrev", "no_ignore_case", "require_order");
-Getopt::Long::GetOptions ("config=s" => \my $file, "help" => \my $help)
+Getopt::Long::GetOptions ("config=s" => \my $file, "program=s" => \my $program,
+                         "instance=s" => \my $instance, "help" => \my $help)
    or exit 2;
 
 if ($help) {
@@ -148,6 +257,15 @@ eval {
    } elsif ($command eq "init" && !@ARGV) {
       my $config = AnyEvent::MCP::Config->init (defined $file ? (file => $file) : ());
       print "Created $config->{file}\n";
+   } elsif ($command =~ /\A(?:create-user|revoke-user)\z/ && @ARGV == 1) {
+      !defined $program || !defined $instance or die "--program and --instance are exclusive\n";
+      my $user = AnyEvent::MCP::Config::server_name ($ARGV[0]);
+      my $scope = defined $program ? "program " . AnyEvent::MCP::Config::server_name ($program)
+                : defined $instance ? "instance " . AnyEvent::MCP::Config::server_name ($instance)
+                : "global";
+      my $config_file = $file // AnyEvent::MCP::Config::_file ();
+      AnyEvent::MCP::Config->new (file => $config_file);
+      change_user $config_file, $scope, $user, $command;
    } else {
       die "Invalid command or arguments; use --help\n";
    }

@@ -1,0 +1,37 @@
+cd() { echo "cd to $1"; command cd "$@"; }; cd /; pwd
+cd /; cd() { echo mine; }; cd /tmp; pwd
+read() { echo R "$@"; }; read -z q
+echo() { printf "<%s>\n" "$@"; }; echo a b
+kill() { echo K "$@"; }; kill -SIGHUP 1
+jobs() { echo J; }; jobs -x
+pwd() { echo P; }; pwd -Q
+cd() { :; }; unset -f cd; cd /; pwd
+command cd /; pwd; command read x <<E@Nhi@NE@Necho $x
+for v in /nonexist /; do (cd "$v" 2>/dev/null || continue; echo x $v); echo after $v; done
+for v in 1 2; do (echo a; break; echo b); echo "st=$? $v"; done
+for v in 1; do x=$(continue; echo y); echo "[$x] $?"; done
+for v in 1; do echo a | { continue; echo b; }; echo "st=$?"; done
+for v in 1; do (false; continue 1); echo "st=$?"; done
+set -- ab ac bc; echo ${@#a}; for x in "${@#a}"; do echo "[$x]"; done; echo "${*%c}"
+set -- "a b" c; IFS=:; echo "${*#a}"
+echo $LINENO@Necho $LINENO; f() {@Necho $LINENO@N}@Nf; echo $((LINENO + 10)) ${LINENO}
+UID=5 sh -c 'echo $UID'; UID=7; echo $UID
+unset HOME; echo ~ ~/x; HOME=/usr; echo ~; cd; pwd
+sleep 1 & sleep 2 & jobs %2; jobs %1 %2; jobs %5; echo $?; jobs %-; jobs -p %1 >/dev/null; echo $?
+v=x; read $v <<E@Nhi@NE@Necho "[$x]"
+v=1x; read "$v" <<E@Nhi@NE@Necho "st=$?"
+readonly r=1; read r <<E@N2@NE@Necho "st=$? $r"
+set -- a b c; echo ${##} ${#?}
+v=X; alias a="echo $v"@Na
+f() { alias z="echo Z"; }; f@Nz
+alias q="echo Q"@Nq; alias r="echo R"@Nr; cat <<E@Nbody@NE@Nr
+[ a \< b ]; echo $?; [ b \< a ]; echo $?; test b \> a; echo $?; [ ! a \< b ]; echo $?
+mkdir -p br && cd br && touch '^<' '^>' a ']' && echo ^[\>\<] && ls [a"]"] && v='<>' && echo ^["$v"] ^[$v] [!"a"]
+mkdir -p bs && cd bs && mkdir -p 'a[' && touch 'a[/]b' && echo a[/]* /x/y[^/]*$ a[/
+x=a.b; echo ${x%["."]*} "${x#*[.]}"; set --; echo "${1:-sure? [y/N]}"; v=b; x=ab; echo "${x%[$v]}"
+case "^" in ["^"a]) echo m1;; esac; case "]" in [\]]) echo m2;; esac; case - in [a\-c]) echo m3;; esac; case b in [!"b"]) echo no;; *) echo m4;; esac
+kill -s WINCH $$; echo "after $?"; kill -0 $$; echo "after $?"; kill -CHLD $$; kill -s CONT $$; echo end
+trap "echo e" EXIT; kill -0 $$; echo "after $?"
+eval ""; eval '# c'; set --; eval $@; echo "st=$?"
+@N# only comments@N
+kill; echo "st=$?"; kill -9; kill -s HUP; kill --; set --; kill $(echo); echo "st=$?"

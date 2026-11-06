@@ -43,4 +43,12 @@ like($out, qr/^   \e\[[0-9;]*m> .*\n   \e\[[0-9;]*m> /m, 'an indented colored qu
 my @span_after_marker = $out =~ /^\e\[[0-9;]*m(?:> )+\e\[m\e\[K\e/mg;
 is(scalar @span_after_marker, 1, 'a span at the start of a quote does not bleed into the continuation lines');
 
+# A marker with a colon in its color, as in ESC[4:3m, is a marker too
+my($cfh, $cmd) = tempfile(SUFFIX => ".md", UNLINK => 1);
+binmode $cfh, ":encoding(utf-8)";
+print $cfh "\e[4:3m>\e[m $long\n";
+close $cfh;
+$out = run("'-Mmd::config(colorize=0,fold=1,fold_width=40)' $cmd")->stdout;
+like($out, qr/^\e\[4:3m>\e\[m quote.*\n\e\[4:3m>\e\[m \S/m, "a marker with a colon in its color is repeated");
+
 done_testing;

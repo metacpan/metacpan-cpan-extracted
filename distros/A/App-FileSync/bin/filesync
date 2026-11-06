@@ -34,6 +34,61 @@ Run C<filesync help> for the full usage.
 
 See L<App::FileSync::CLI> and L<App::FileSync>.
 
+=head1 OPTIONS
+
+C<filesync sync> takes these options; C<filesync help> lists the options of
+the other commands.
+
+=over 4
+
+=item --repo NAME
+
+Sync this repo. Repeat it to sync several. Without it every repo in the
+client configuration is synced.
+
+=item --dry-run
+
+Print the planned actions without changing either side.
+
+=item --force
+
+Proceed despite the deletion limits that normally stop a suspicious run.
+
+=item --no-prune
+
+Do not prune this repo's local trash during the run.
+
+=item --no-delta
+
+Send whole files instead of block deltas.
+
+=item --verbose
+
+Raise the log level to C<debug> for this run.
+
+=item --quiet
+
+Lower the log level to C<error> and hide warnings. A repo where the sync did
+something still prints its summary; a repo where nothing happened (nothing
+planned, moved, deleted, conflicted or skipped, and no bytes sent) prints
+nothing, so a cron job that finds nothing to do is silent.
+
+=item --json
+
+Print one JSON document instead of text.
+
+=item --config FILE
+
+Read the client configuration from FILE.
+
+=back
+
+=head1 EXIT STATUS
+
+0 ok, 1 fatal error, 2 another run holds the lock, 3 completed with
+warnings, 4 verification found drift.  When several repos are synced the
+most severe outcome wins: 1, then 3, then 2.
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>

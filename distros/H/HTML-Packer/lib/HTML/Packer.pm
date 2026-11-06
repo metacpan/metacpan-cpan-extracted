@@ -10,7 +10,7 @@ use Safe::Isa;
 
 # -----------------------------------------------------------------------------
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 our @BOOLEAN_ACCESSORS = (
     'remove_comments',
@@ -47,7 +47,10 @@ our $PACKER_COMMENT = '<!--\s*HTML::Packer\s*(\w+)\s*-->';
 
 our $DOCTYPE        = '<\!DOCTYPE[^>]*>';
 
-our $DONT_CLEAN     = '(<\s*(pre|code|textarea|script|style)[^>]*>)(.*?)(<\s*\/\2[^>]*>)';
+# An element that is never closed takes the rest of the document, which is then
+# left as it is.  Without the \z each unclosed element was searched to the end of
+# the document, which took time proportional to the square of its size.
+our $DONT_CLEAN     = '(<\s*(pre|code|textarea|script|style)[^>]*>)(.*?)(<\s*\/\2[^>]*>|\z)';
 
 our $WHITESPACES    = [
     {
@@ -273,7 +276,11 @@ sub init {
             store => sub {
                 my ( $opening, undef, $content, $closing )  = @{$_[0]->{submatches}};
 
-                if ( $content ) {
+                if ( $content and not length $closing ) {
+                    # Never closed: keep the rest of the document as it is,
+                    # rather than give HTML to the JavaScript or CSS packer
+                }
+                elsif ( $content ) {
                     my $opening_script_re   = '<\s*script' . ( $html5 ? '[^>]*>' : '[^>]*(?:java|ecma)script[^>]*>' );
                     my $opening_style_re    = '<\s*style' . ( $html5 ? '[^>]*>' : '[^>]*text\/css[^>]*>' );
 					my $js_type_re          = q{type=['"]((((application|text)/){0,1}(x-){0,1}(java|ecma)script)|module)['"]};
@@ -494,7 +501,7 @@ HTML::Packer - Another HTML code cleaner
 
 =head1 VERSION
 
-Version 2.11
+Version 2.12
 
 =head1 DESCRIPTION
 
@@ -587,10 +594,11 @@ C<E<lt>scriptE<gt>> or C<E<lt>styleE<gt>> tag.
 Merten Falk, C<< <nevesenin at cpan.org> >>. Now maintained by Lee
 Johnson (LEEJO) with contributions from:
 
-	Alexander Krizhanovsky <ak@natsys-lab.com>
-	Bas Bloemsaat <bas@bloemsaat.com>
-	girst <girst@users.noreply.github.com>
-	Ankit Pati (ANKITPATI) <contact@ankitpati.in>
+	Alexander Krizhanovsky
+	Bas Bloemsaat
+	girst
+	Ankit Pati (ANKITPATI)
+	Nigel Horne (nigelhorne)
 
 =head1 BUGS
 

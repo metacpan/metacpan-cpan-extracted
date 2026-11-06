@@ -48,6 +48,14 @@ my $gone = File::Spec->catdir($dir, 'gone', 'deeper');
 is_deeply([sort keys %$kept], ['Spike.xs', 'src/helper.c'],
     'a directory that is not there yet is still the root: relative paths kept, absolute ones measured against it as written');
 
+($kept, $aside) = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1)->filter({
+    'helper.c'   => { %entry },
+    'Spike.xs'   => { %entry },
+    'missing.c'  => { %entry },
+}, 'src/helper.gcda');
+is_deeply([sort keys %$kept], ['Spike.xs', 'missing.c', 'src/helper.c'],
+    'a name an object in a subdirectory wrote relative to itself is placed beside its counter file, the rest as written');
+
 {
     local $^O = 'MSWin32';
     ($kept, $aside) = Devel::XSCover::Gcov->new(dir => "$dir", silent => 1)->filter({

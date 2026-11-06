@@ -150,7 +150,7 @@
     "mmdb"
   ],
   "visibility": {
-    "why": "A private family is one built for a single customer. It must be ABSENT from a listing for an org that does not license it, not present with standing 'unlicensed' - the standing field is the discovery surface for public datasets only. The server enforces this; an SDK must not reconstruct a catalog from any other source and must not assume the listing is the same for every key. The private ids are deliberately NOT named here: this corpus is committed into twelve PUBLIC repositories, so naming them would publish the customer relationship the rule exists to keep private.",
+    "why": "A private family is one built for a single customer. It must be ABSENT from a listing for an org that does not license it, not present with standing 'unlicensed' - the standing field is the discovery surface for public datasets only. The server enforces this; an SDK must not reconstruct a catalog from any other source and must not assume the listing is the same for every key. The private IDs are deliberately NOT named here: this corpus is committed into twelve PUBLIC repositories, so naming them would publish the customer relationship the rule exists to keep private.",
     "clientRules": [
       "listing-is-returned-as-served",
       "no-catalog-is-compiled-into-the-client",

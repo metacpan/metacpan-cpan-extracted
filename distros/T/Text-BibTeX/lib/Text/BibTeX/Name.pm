@@ -18,12 +18,12 @@
 
 package Text::BibTeX::Name;
 
-require 5.004;
-
+use 5.026;
 use strict;
+use warnings;
 use Carp;
-use vars qw'$VERSION';
-$VERSION = 0.88;
+
+our $VERSION = '1.00';
 
 use Text::BibTeX;
 
@@ -87,21 +87,41 @@ part.  Again, if there are no tokens following a leading sequence of
 lowercase tokens, a warning is printed and the token immediately
 preceding the comma is taken to be the `last' part.
 
+A token "starts with a lower-case letter" if its first character is a
+lowercase letter in the Unicode sense (general category C<Ll>), so
+C<"van">, C<"de"> and C<"ван"> are all lowercase tokens.  A token that
+starts with a brace is never lowercase: this is how to keep a
+lowercase token out of the `von' part (C<"{de} Gaulle">), or to make a
+group of words a single token (C<"{Barnes and Noble}">).  TeX special
+characters at the start of a token (C<"{\'e}tienne">) are treated like
+any other brace group.
+
 If a name has more than two commas, a warning is printed and the name is
-treated as though only the first two commas were present.
+treated as though only the first two commas were present.  Consecutive
+commas (C<"Smith,, John">) count as one comma.
 
 Finally, if a name has two commas, it is assumed to be in "von last, jr,
 first" form.  (This is the only way to represent a name with a `jr'
 part.)  The parsing of the name is the same as for a one-comma name,
 except that tokens between the two commas are taken to be the `jr' part.
 
+Note that BibTeX has no idea that C<"Jr."> is special: C<"Henry Ford
+Jr."> splits into first name C<"Henry Ford"> and last name C<"Jr.">.
+Write it as C<"Ford, Jr., Henry"> instead, or, if you don't want the
+`jr' part to be separate, as C<"Henry {Ford Jr.}">.
+
+A name with no last name at all (as in C<", John">) keeps its other
+parts, and a warning is printed.
+
 =head1 CAVEAT
 
-The C code that does the actual work of splitting up names takes a shortcut
+The code that does the actual work of splitting up names takes a shortcut
 and makes few assumptions about whitespace.  In particular, there must be
 no leading whitespace, no trailing whitespace, no consecutive whitespace
 characters in the string, and no whitespace characters other than space.
 In other words, all whitespace must consist of lone internal spaces.
+(Field values from parsed entries are always like this.  Other strings
+are split without error, but the result may not be what you expect.)
 
 =head1 EXAMPLES
 
@@ -288,13 +308,18 @@ configuration values. At the moment the available values are:
 
 =item BINMODE
 
-Set the way Text::BibTeX deals with strings. By default it manages
-strings as bytes. You can set BINMODE to 'utf-8' to get NFC normalized
-UTF-8 strings and you can customise the normalization with the NORMALIZATION option.
+Set the way Text::BibTeX deals with strings: C<'utf-8'> (the default)
+to get Perl character strings, or C<'bytes'> for byte strings.  See
+L<Text::BibTeX/"STRINGS AND UNICODE">.
+
+=item NORMALIZATION
+
+The Unicode normalization form for strings in C<'utf-8'> mode: C<'NFC'>
+(the default), C<'NFD'>, C<'NFKC'>, C<'NFKD'> or C<'none'>.
 
    Text::BibTeX::Name->new(
       { binmode => 'utf-8', normalization => 'NFD' },
-      "Alberto Simões"});
+      "Alberto Simões");
 
 =back
 
@@ -302,23 +327,13 @@ UTF-8 strings and you can customise the normalization with the NORMALIZATION opt
 
 sub new {
     my $class = shift;
-    my $opts = ref $_[0] eq 'HASH' ? shift : {};
-
-    $opts->{ lc $_ } = $opts->{$_} for ( keys %$opts );
-
+    my $opts = ref $_[0] eq 'HASH' ? shift : undef;
     my ( $name, $filename, $line, $name_num ) = @_;
 
     $class = ref($class) || $class;
     my $self = bless { }, $class;
-
-    $self->{binmode} = 'bytes';
-    $self->{normalization} = 'NFC';
-    $self->{binmode} = 'utf-8'
-        if exists $opts->{binmode} && $opts->{binmode} =~ /utf-?8/i;
-    $self->{normalization} = $opts->{normalization} if exists $opts->{normalization};
-
-    $self->split( Text::BibTeX->_process_argument($name, $self->{binmode}, $self->{normalization}),
-        $filename, $line, $name_num, 1 )
+    @{$self}{qw(binmode normalization)} = Text::BibTeX::_options($opts);
+    $self->split( $name, $filename, $line, $name_num, 1 )
         if ( defined $name );
     $self;
 }
@@ -326,8 +341,7 @@ sub new {
 
 sub DESTROY
 {
-   my $self = shift;
-   $self->free;                         # free the C structure kept by `split'
+   # the C structure kept by `split' is freed with its Perl wrapper
 }
 
 
@@ -350,7 +364,9 @@ sub split
    my ($self, $name, $filename, $line, $name_num) = @_;
 
    # Call the XSUB with default values if necessary
-   $self->_split (Text::BibTeX->_process_argument($name, $self->{binmode}, $self->{normalization}), $filename, 
+   $self->_split (Text::BibTeX::_to_c($self->{binmode} // 'utf-8',
+                                    $self->{normalization} // 'NFC', $name),
+                  $filename,
                   defined $line ? $line : -1,
                   defined $name_num ? $name_num : -1,
                   1);
@@ -379,10 +395,8 @@ sub part {
 
     croak "unknown name part"
         unless $partname =~ /^(first|von|last|jr)$/;
-
     if ( exists $self->{$partname} ) {
-        my @x = map { Text::BibTeX->_process_result($_, $self->{binmode}, $self->{normalization}) }
-            @{ $self->{$partname} };
+        my @x = @{ $self->{$partname} };
         return @x > 1 ? @x : $x[0];
     }
     return undef;
@@ -413,7 +427,8 @@ sub format
 
 =head1 SEE ALSO
 
-L<Text::BibTeX::Entry>, L<Text::BibTeX::NameFormat>, L<bt_split_names>.
+L<Text::BibTeX::Entry>, L<Text::BibTeX::NameFormat>,
+L<Text::BibTeX/split_list>.
 
 =head1 AUTHOR
 

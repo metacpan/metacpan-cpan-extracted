@@ -23,6 +23,8 @@ lib/AnyEvent/MCP/Client/JSONL.pm
 lib/AnyEvent/MCP/Client/Request.pm
 lib/AnyEvent/MCP/Config.pm
 lib/AnyEvent/MCP/File.pm
+lib/AnyEvent/MCP/IMAP/Providers.pm
+lib/AnyEvent/MCP/IMAP/OAuth2.pm
 lib/AnyEvent/MCP/Worker/IMAP.pm
 lib/AnyEvent/MCP/Extension.pm
 lib/AnyEvent/MCP/Workdirs.pm
@@ -62,5 +64,10 @@ t/22_webbrowser.t
 t/23_http_hook.t
 t/24_imap.t
 t/25_http.t
+t/26_tls.t
+t/27_users.t
+t/28_imap_providers.t
+t/29_imap_oauth.t
+t/30_fs_remote.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,269 @@
+id	class	parts	verdict	text
+BC:ch15/using_phases	neither	out	-	# cookbook filename: using_phases # Main loop until [ "$phase" = "Finished." ]; do case $phase in phase0 ) ThisPhase=0 N
+BC:ch17/ff-sessions	neither	out	X	#!/usr/bin/env bash # cookbook filename: ff-sessions # Save/Restore FF sessions # Run from cron like: # 45 03,15 * * * o
+NB:11817	msg-own		X	bind -l | grep /
+NB:11864	msg-own		X	bind -P | grep --fixed-strings ' can be found on ' | perl -pe 's/((?<!\\)(?:\\\\)*)\\C/\1Ctrl/g;s/((?<!\\)(?:\\\\)*)\\e/
+NB:11872	neither	status+out	X	bind -P
+NB:11884	msg-own		X	bind -P | grep '\\e\\C-k'
+NB:119	neither	status	X	history -r .cwdhist
+NB:11906	neither	status	X	history -n
+NB:12011	neither	rec	-	su - joe -c "/path/to/my_daemon & echo \$! > /tmp/su.joe.$$"
+NB:121	neither	rec	-	LOGNAME="`basename "$0"`_`date "+%Y%m%d_%H%M"`"
+NB:1215	neither	rec	-	set script_dir = `pwd`/`dirname $0`
+NB:1227	neither	rec	-	tempFile="$(mktemp "${TMPDIR:-/tmp/}$(basename "$0")-XXXXX")"
+NB:1234	neither	rec	-	gnuplotscript=$(mktemp /tmp/gnuplot_cmd_$(basename "${0}").XXXXXX.gnuplot)
+NB:1248	neither	rec	-	mydir=$(mktemp -d "${TMPDIR:-/tmp/}$(basename $0).XXXXXXXXXXXX")
+NB:1251	neither	rec	-	mktemp -dt "$(basename $0).XXXXXXXXXX"
+NB:1460	neither	status	X	history -d "$1"
+NB:1469	neither	status	X	for h in $(seq 1006 1008 | tac); do history -d $h; done
+NB:1756	msg-own		-	exec 1 | tee ${LOG_FILE}
+NB:1757	neither	out	-	exec 1 2>&1 | tee ${LOG_FILE}
+NB:1758	msg-own		-	exec 2 | tee ${LOG_FILE}
+NB:1859	neither	status	X	logout
+NB:1871	neither	out	-	set `od -j $o -N 8 -t u1 $pkg`
+NB:1872	neither	out	-	set `od -j $o -N 8 -t u1 $rpm`
+NB:1925	msg-own		-	crontab -u $user -l 2>/dev/null | grep -v '^#'
+NB:2649	neither	rec	-	find . -mount -type d -print0 | xargs -0 -n1 /tmp/count_em_$$ | sort -n
+NB:2773	msg-own		-	find . -mtime -1 | cpio -oa 2>/dev/null | ( cd $backup_dir && cpio -imd)
+NB:2952	neither	rec	-	find $1 -type f -not -regex '.*/\..*' -exec $0 hashmove '{}' \;
+NB:3177	neither	rec	-	find . -exec $0 {} +
+NB:3595	neither	rec	-	find /tmefndr/oravl01 -type f -newer /tmp/$$
+NB:365	neither	rec	-	cd $(dirname $(which $0) )
+NB:370	neither	rec	-	cd $(dirname $(readlink -f $0))
+NB:372	neither	rec	-	cd $(readlink -f $(dirname $0))
+NB:4172	neither	rec	-	find /usr -newer /tmp/stamp$$
+NB:4314	neither	rec	-	find test -type l -exec cp {} {}.tmp$$ \; -exec mv {}.tmp$$ {} \;
+NB:4569	neither	out+rec	-	basename -- $0
+NB:4570	neither	out+rec	-	basename $0
+NB:4623	neither	rec	-	ps -p $$ | awk '$1 == PP {print $4}' PP=$$
+NB:4624	neither	rec	-	ps | grep `echo $$` | awk '{ print $4 }'
+NB:4727	neither	status+out	-	cd -
+NB:4774	neither	rec	-	ps -o pid= --ppid $PPID | xargs kill -9
+NB:4909	msg-own		-	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
+NB:5137	neither	out	-	env | sed 's/;/\\;/g'
+NB:5293	neither	out	-	ls -l /proc/self/fd/
+NB:5298	neither	status	X	bind -f ~/.inputrc
+NB:5390	neither	rec+files	-	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs mkdir
+NB:5391	neither	rec+files	-	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+NB:552	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
+NB:557	msg-own		-	kill -0 1
+NB:562	msg-own		-	[ $(find your/dir -prune -empty) = your/dir ]
+NB:571	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
+NB:5763	msg-own		-	cat somedata.txt | "$outfile"
+NB:5776	OURS	files	-	{ echo foo; cat bar; } | tee bar > /dev/null
+NB:5841	neither	out	-	od -A n -t d -N 1 /dev/urandom
+NB:5874	neither	out	-	od -An -N2 -i /dev/random
+NB:5904	OURS	status+out	-	printf '%0.s-' $(seq 1 $variable)
+NB:5908	neither	out	-	cat /dev/urandom | tr -dc '. ' | fold -w 100 | head -1
+NB:5939	neither	out	-	seq 2000 65000 | sort -R | head -n 1
+NB:6081	neither	rec	-	ps -ef | grep $$ | grep -v grep
+NB:6082	neither	rec	-	ps -p $$
+NB:6161	neither	status+out	-	cat -v /dev/urandom
+NB:6188	neither	rec	-	ps -ef | grep $0 | grep $(whoami)
+NB:6247	neither	rec	-	ps -o user= -p $$ | awk '{print $1}'
+NB:6259	neither	out	-	seq 10 | xargs -P4 -I'{}' echo '{}'
+NB:6276	neither	out	-	cat /dev/urandom | tr -dc 'a-zA-Z0-9'
+NB:6286	neither	out	-	cat /dev/urandom | tr -dC '[:graph:]'
+NB:6343	neither	rec	-	dirname "$(readlink -f "$0")"
+NB:6361	neither	out+rec	-	echo $(basename $(readlink -nf $0))
+NB:6436	neither	rec	-	ps -p $$ | tail -1 | awk '{print $NF}'
+NB:6453	neither	rec	-	echo "dirname/readlink: $(dirname $(readlink -f $0))"
+NB:6484	neither	out	-	tree --help 2>&1 | head -n2
+NB:6487	neither	out	-	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
+NB:6488	neither	out	-	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
+NB:6489	neither	out	-	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
+NB:6627	neither	rec	-	echo `pwd`/`dirname $0`
+NB:6664	neither	out+rec	-	echo $(cat /proc/$$/cmdline)
+NB:6669	neither	out	-	seq -f 'some line %g' 500 | nl | sort -R | cut -f2- | head -3
+NB:6731	OURS	out	-	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
+NB:6758	neither	rec	-	$(dirname $0)
+NB:6759	neither	rec	-	`dirname $0`
+NB:6765	neither	rec	-	echo "dirname: `dirname "$0"`"
+NB:6766	neither	rec	-	echo "dirname: `dirname $0`"
+NB:6799	OURS	out	-	ls -l -- "$dir/$file"
+NB:680	neither	files	-	yes > backingfile &
+NB:6800	neither	out+rec	-	ls -l ${0}
+NB:6818	neither	out+files	-	ls -lR / | tee -a output.file
+NB:6819	neither	out+files	-	ls -lR / | tee output.file
+NB:6820	neither	out+rec	-	echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
+NB:6821	neither	out+rec	-	ls -l /proc/$$/exe | sed 's%.*/%%'
+NB:6840	neither	rec	-	pstree -A -s $$
+NB:6843	neither	rec	-	pstree -sp $$
+NB:6844	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | less
+NB:6847	neither	rec	-	pstree -p $$
+NB:6848	neither	rec	-	pstree -s $$
+NB:6855	neither	rec	-	$(readlink -f $(dirname "$0"))
+NB:6912	neither	rec	-	MY_DIR=$(dirname $(readlink -f $0))
+NB:6920	neither	status+out	X	bind -q complete
+NB:6925	neither	rec	-	head -c 10 "$0" | tr '\000-\377' '#'
+NB:7016	neither	status	X	history -r "$HISTFILE" #Alternative: exec bash
+NB:7017	neither	status	X	history -r
+NB:7019	neither	out	-	od -A n -N 2 -t u2 /dev/urandom
+NB:7218	neither	out	-	stat --printf="%y %n\n" $(ls -tr $(find * -type f))
+NB:7296	neither	status+rec+files	X	{ time find / 2>/dev/null; } 2>time.txt
+NB:739	neither	out	-	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
+NB:7781	msg-own		-	sed s/STRING_TO_REPLACE/STRING_TO_REPLACE_IT/g index.html | tee index.html
+NB:7890	neither	status+rec+files	X	{ time sleep 1 ; } 2> time.txt
+NB:7891	neither	status+rec+files	X	{ time sleep 1 2> sleep.stderr ; } 2> time.txt
+NB:8075	neither	rec	-	MY_PATH=$(readlink -f "$0")
+NB:8076	neither	rec	-	SCRIPT="$(readlink --canonicalize-existing "$0")"
+NB:8115	neither	rec	-	SELF=$(readlink /proc/$$/fd/255)
+NB:8116	neither	rec	-	SELF=`readlink /proc/$$/fd/255`
+NB:8119	neither	rec	-	DIR=$(dirname "$(readlink -f \"$0\")")
+NB:8121	neither	rec	-	me=$(readlink --canonicalize --no-newline $0)
+NB:8133	neither	rec	-	DIR=`pwd`/`dirname $0`
+NB:8139	neither	rec	-	path="$( dirname "$( which "$0" )" )"
+NB:8141	neither	rec	-	dir=$(dirname $(readlink /proc/$$/fd/255))
+NB:8207	neither	status+rec+files	X	(time ls) > ls_results 2> time_results
+NB:8208	neither	rec+files	X	{ time ls; } 2>&1 | cat > time.txt
+NB:8214	neither	status+rec+files	X	(time ls) > outfile 2>&1
+NB:8235	neither	out	-	set `cal $month $year`
+NB:9033	msg-own		-	kill -9 16085
+NB:9034	msg-own		-	kill -9 18581 18582 18583
+NB:9162	neither	rec	-	me=`basename -- "$0"`
+NB:9163	neither	rec	-	me=`basename "$0"`
+NB:9212	neither	status	-	shift $(($#-1))
+NB:9213	neither	status	-	shift `expr $# - 1`
+NB:9215	neither	status	-	shift [n]
+NB:9459	neither	rec	-	basedir=$(cygpath -am "$(dirname "$0")")
+NB:9460	neither	rec	-	basedir=$(cygpath -m "$(dirname "$0")")
+NB:9461	neither	rec	-	basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+NB:9582	neither	status+files	X	history -w
+NB:9583	neither	rec	-	touch -t `date +%m%d0000` /tmp/$$
+NB:9680	msg-own		-	echo "fifo forever" | cat - fifo | tee fifo
+NB:9682	neither	out	-	echo foo | readlink /proc/self/fd/0
+NB:9704	neither	out+files	-	ant 2>&1|tee build.log
+NB:9707	neither	out+files	-	update-client 2>&1 | tee my.log
+NB:9721	neither	out+files	-	./a.out 2>&1 | tee output
+NB:9723	neither	out+files	-	./aaa.sh 2>&1 | tee -a log
+NB:9736	msg-own		-	input_prog 2>&1 | tee /dev/tty | my_editor
+NB:9744	neither	out+files	-	progam.sh 2>&1 | tee -a log
+NB:9745	neither	out+files	-	someCommand 2>&1 | tee someFile
+NB:9746	neither	out+files	-	someCommand 2>&1 | tee -a someFile
+PB:README.md:1596	msg-own		-	# Right. var="$(command)" # Wrong. var=`command` # $() can easily be nested whereas `` cannot. var="$(command "$(command
+PB:README.md:1646	msg-own		-	"$EDITOR" "$file" # NOTE: This variable may be empty, set a fallback value. "${EDITOR:-vi}" "$file" 
+PS:README.md:965	msg-own		-	# Right. var="$(command)" # Wrong. var=`command` # $() can easily be nested whereas `` cannot. var="$(command "$(command
+PS:README.md:980	msg-own		-	"$EDITOR" "$file" # NOTE: This variable may be empty, set a fallback value. "${EDITOR:-vi}" "$file" 
+PS:README.md:997	msg-own		-	"$$" 
+SC:Analytics.hs:prop_checkAndEq11	msg-own		-	[ $x -eq 1 ] && [ $x -eq 2 ]
+SC:Analytics.hs:prop_checkAndEq12	msg-own		-	[ 1 -eq $x ] && [ $x -eq 2 ]
+SC:Analytics.hs:prop_checkAndEq13	msg-own		-	[ 1 -eq $x ] && [ $x -eq 1 ]
+SC:Analytics.hs:prop_checkAndEq3	msg-own		-	[ "$a" = lol && "$a" = foo ]
+SC:Analytics.hs:prop_checkAndEq4	msg-own		-	[ a = $cow && b = $foo ]
+SC:Analytics.hs:prop_checkAndEq6	msg-own		-	[ $a = a ] && [ $a = b ]
+SC:Analytics.hs:prop_checkAndEq7	msg-own		-	[ $a = a ] && [ $a = b ] || true
+SC:Analytics.hs:prop_checkAndEq9	msg-own		-	[ 0 -eq $FOO ] && [ 0 -eq $BAR ]
+SC:Analytics.hs:prop_checkBadParameterSubstitution3	msg-own		-	${$#}
+SC:Analytics.hs:prop_checkComparisonAgainstGlob3	msg-own		-	[ $cow = *foo* ]
+SC:Analytics.hs:prop_checkComparisonAgainstGlob4	msg-own		-	[ $cow = foo ]
+SC:Analytics.hs:prop_checkComparisonAgainstGlob6	msg-own		-	[ $f != /* ]
+SC:Analytics.hs:prop_checkComparisonWithLeadingX3	msg-own		-	[ $foo = xbar ]
+SC:Analytics.hs:prop_checkComparisonWithLeadingX4	msg-own		-	test $foo = xbar
+SC:Analytics.hs:prop_checkConditionalAndOrs1	msg-own		-	[ foo && bar ]
+SC:Analytics.hs:prop_checkConstantIfs2a	msg-own		-	[ n -le 4 ]
+SC:Analytics.hs:prop_checkDollarQuoteParen3	msg-own		-	"$(foo)"
+SC:Analytics.hs:prop_checkExpansionWithRedirection5	msg-own		X	stderr=$(foo 2>&1 > /dev/null)
+SC:Analytics.hs:prop_checkNumberComparisons11	msg-own		-	[ $foo -eq 'N' ]
+SC:Analytics.hs:prop_checkNumberComparisons12	msg-own		-	[ x$foo -gt x${N} ]
+SC:Analytics.hs:prop_checkNumberComparisons16	msg-own		-	[ foo -eq 'y' ]
+SC:Analytics.hs:prop_checkNumberComparisons9	msg-own		-	[ foo \>= bar ]
+SC:Analytics.hs:prop_checkOrNeq3	msg-own		-	[ "$a" != lol || "$a" != foo ]
+SC:Analytics.hs:prop_checkOrNeq4	msg-own		-	[ a != $cow || b != $foo ]
+SC:Analytics.hs:prop_checkOrNeq6	msg-own		-	[ $a != a ] || [ $a != b ]
+SC:Analytics.hs:prop_checkOrNeq7	msg-own		-	[ $a != a ] || [ $a != b ] || true
+SC:Analytics.hs:prop_checkOrNeq9	msg-own		-	[ 0 -ne $FOO ] || [ 0 -ne $BAR ]
+SC:Analytics.hs:prop_checkQuotesInLiterals5	msg-own		-	param="--foo='lolbar'"; eval app $param
+SC:Analytics.hs:prop_checkRedirectToSame5	neither	files	-	foo > bar 2> bar
+SC:Analytics.hs:prop_checkSingleBracketOperators1	msg-own		X	[ test =~ foo ]
+SC:Analytics.hs:prop_checkSpacefulnessCfg14	neither	out	-	foo=$3 env
+SC:Analytics.hs:prop_checkSpuriousExec1	msg-own		-	exec foo; true
+SC:Analytics.hs:prop_checkSpuriousExec3	msg-own		-	echo cow; exec foo
+SC:Analytics.hs:prop_checkSpuriousExec6	msg-own		-	exec foo > file; cmd
+SC:Analytics.hs:prop_checkSpuriousExec9	msg-own		-	for file in rc.d/*; do exec "$file"; done
+SC:Analytics.hs:prop_checkStderrRedirect6	neither	out	-	foo | bar 2>&1 > /dev/null
+SC:Analytics.hs:prop_checkStderrRedirect7	neither	out	-	{ cmd > file; } 2>&1
+SC:Analytics.hs:prop_checkTestArgumentSplitting13	msg-own		X	[ "$@" == "" ]
+SC:Analytics.hs:prop_checkTestArgumentSplitting20	msg-own		-	[ var[x] -eq 2 ]
+SC:Analytics.hs:prop_checkTestArgumentSplitting21	msg-own		-	[ 6 -eq 2*3 ]
+SC:Analytics.hs:prop_checkUnassignedReferences20	neither	out	X	printf -v foo bar; echo $foo
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest6	msg-own		-	! [ $var != foo ]
+SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest9	msg-own		-	[ ! $var -eq 0 ]
+SC:Analytics.hs:prop_checkUnpassedInFunctions4	neither	out	-	foo() { echo $0; }; foo
+SC:Analytics.hs:prop_checkUnquotedExpansions3	msg-own		X	[ $(foo) == cow ]
+SC:Analytics.hs:prop_checkUnquotedN4	msg-own		-	[ -n $cow -o -t 1 ]
+SC:Analytics.hs:prop_checkUnquotedParameterExpansionPattern2	msg-own		-	echo "${var%%$(x)}"
+SC:Analytics.hs:prop_checkUnused27	msg-own		-	var=3; [ var -eq 3 ]
+SC:Analytics.hs:prop_checkValidCondOps2	msg-own		-	[ -M a ]
+SC:Checks/Commands.hs:prop_checkExportedExpansions1	neither	out	-	export $foo
+SC:Checks/Commands.hs:prop_checkExportedExpansions2	neither	status	-	export "$foo"
+SC:Checks/Commands.hs:prop_checkPrintfVar11	neither	status+out	X	printf '%(%s%s)T' -1
+SC:Checks/Commands.hs:prop_checkPrintfVar19	neither	status+out	X	printf '%(%s)T'
+SC:Checks/Commands.hs:prop_checkPrintfVar20	neither	status+out	-	printf '%d %(%s)T' 42
+SC:Checks/Commands.hs:prop_checkPrintfVar21	neither	status+out	-	printf '%d %(%s)T'
+SC:Checks/Commands.hs:prop_checkPrintfVar23	neither	status	X	printf -vTODAY '%(%Y)T'
+SC:Checks/Commands.hs:prop_checkPrintfVar3	OURS	status+out	X	printf -v cow $(cmd)
+SC:Checks/Commands.hs:prop_checkPrintfVar6	msg-own		-	printf foo bar baz
+SC:Checks/Commands.hs:prop_checkPrintfVar7	msg-own		-	printf -- foo bar baz
+SC:Checks/Commands.hs:prop_checkSourceArgs2	neither	rec	-	#!/bin/sh . script
+SC:Checks/ShellSupport.hs:prop_checkBashisms30	OURS	status+out	X	printf -v '%s' "$1"
+SC:Checks/ShellSupport.hs:prop_checkBashisms51	neither	out	-	#!/bin/sh cmd 2>&1
+SC:Checks/ShellSupport.hs:prop_checkBashisms6c	msg-own		X	[ foo =~ bar ]
+SC:Checks/ShellSupport.hs:prop_checkBashisms6d	msg-own		X	test foo =~ bar
+SC:Checks/ShellSupport.hs:prop_checkBashisms90	neither	status+out	-	#!/bin/sh set -o "$opt"
+TL:common/[.md:18	msg-own		-	[ "$variable" -eq|ne|gt|lt|ge|le integer ]
+TL:common/arthas.md:17	msg-own		X	exit|quit|logout|q
+TL:common/bind.md:12	neither	status	X	bind -q command
+TL:common/bind.md:24	neither	status+out	X	help bind
+TL:common/bind.md:8	msg-own		X	bind -p|-P
+TL:common/case.md:24	neither	status+out	X	help case
+TL:common/cd.md:24	neither	status+out	-	cd -
+TL:common/compopt.md:10	neither	status	X	compopt command
+TL:common/compopt.md:14	msg-own		X	compopt -o|+o option1 -o|+o option2 command
+TL:common/compopt.md:18	neither	status	X	compopt
+TL:common/cppcheck.md:9	neither	files	-	cppcheck . 2>cppcheck.log
+TL:common/diffoscope.md:16	msg-own		-	diffoscope --html path/to/outfile|- path/to/file1 path/to/file2
+TL:common/dmd.md:20	msg-own		X	dmd -check=h|help|?
+TL:common/enable.md:24	neither	status+out	X	help enable
+TL:common/env.md:8	neither	out	-	env
+TL:common/exec.md:8	msg-own		-	exec command -with -flags
+TL:common/fc.md:33	neither	status	X	fc -s string1=string2
+TL:common/fc.md:37	neither	status+out	X	fc --help
+TL:common/function.md:21	neither	status+out	X	help function
+TL:common/greater-than.md:28	msg-own		-	command1 2>&1 | command2
+TL:common/help.md:12	neither	status+out	X	help while
+TL:common/help.md:16	neither	status+out	X	help for
+TL:common/help.md:20	neither	status+out	X	help [[
+TL:common/help.md:24	neither	status+out	X	help \(
+TL:common/help.md:28	neither	status+out	X	help cd
+TL:common/help.md:8	neither	status+out	X	help
+TL:common/history.md:16	msg-own		X	history -d|f|i|E
+TL:common/history.md:24	neither	status+files	X	history -w
+TL:common/history.md:28	neither	status	X	history -d offset
+TL:common/jc.json.md:8	msg-own		-	ifconfig | jc --ifconfig
+TL:common/katana.md:21	msg-own		-	katana -s depth-first|breadth-first -d value -rl value -u https://example.com
+TL:common/kill.md:13	neither	out	-	kill -l
+TL:common/logout.md:12	neither	status	X	logout exit_code
+TL:common/logout.md:8	neither	status	X	logout
+TL:common/maigret.md:18	msg-own		-	maigret username -p socks5://127.0.0.1:9050|http://127.0.0.1:8080
+TL:common/printenv.md:8	neither	out	-	printenv
+TL:common/printf.md:29	neither	status	X	printf -v myvar "This is %s = %d\n" "a year" 2016
+TL:common/pydocstyle.md:12	msg-own		-	pydocstyle -e file.py|path/to/directory
+TL:common/readarray.md:32	neither	status+out	X	help mapfile
+TL:common/shopt.md:25	neither	status+out	X	help shopt
+TL:common/test.md:34	neither	status+out	X	help test
+TL:common/times.md:10	neither	out	-	times
+TL:common/ulimit.md:29	neither	status+out	X	help ulimit
+TL:common/vboxmanage-showvminfo.md:28	msg-own		-	VBoxManage showvminfo --log vm_name|uuid
+TL:common/vboxmanage.md:26	msg-own		-	VBoxManage controlvm name|uuid savestate
+TL:common/volta.md:28	neither	status+out	X	volta help fetch|install|uninstall|pin|list|completions|which|setup|run|help
+TL:linux/dialog.md:13	neither	files	-	dialog --inputbox "Enter text:" 8 40 2>output.txt
+TL:linux/grdctl.md:12	msg-own		-	grdctl rdp|vnc enable
+TL:linux/grdctl.md:24	msg-own		-	grdctl rdp|vnc disable-view-only
+TL:linux/grim.md:22	msg-own		-	grim - | clipboard_manager
+TL:linux/sqfstar.md:20	msg-own		-	zstdcat archive.tar.zst | sqfstar filesystem.squashfs "*.gz"
+TL:linux/trap.md:36	neither	status+out	X	help trap
+TL:linux/whiptail.md:21	msg-own		X	result_variable_name="$(whiptail --title "title" --inputbox "message" height_in_chars width_in_chars default_text 3>&1 1
+TL:linux/whiptail.md:25	msg-own		X	result_variable_name="$(whiptail --title "title" --passwordbox "message" height_in_chars width_in_chars 3>&1 1>&2 2>&3)"
+TL:linux/whiptail.md:29	msg-own		X	result_variable_name=$(whiptail --title "title" --menu "message" height_in_chars width_in_chars menu_display_height "val
+TL:linux/xclip.md:14	msg-own		-	echo 123 | xclip -se primary|secondary|clipboard
+TL:linux/zenity.md:25	OURS	rec	-	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress

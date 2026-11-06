@@ -941,11 +941,15 @@ like $log, qr/vim <secondary-vim> disconnected/,
 like $log, qr/ex target=secondary-vim command="echo 'hello' \| echo 'world'\\nlet g:example = 1"/,
    "Ex call logs its command preview without requiring debug verbosity";
 SKIP: {
-   skip "WebSocket modules not installed", 2 unless $have_websocket;
-   like $log, qr/illegal websocket connect from 127\.0\.0\.1:\d+/,
-      "rejected websocket handshake logs the numeric TCP peer and port";
+   skip "WebSocket modules not installed", 4 unless $have_websocket;
+   like $log, qr/Vim WebSocket rejected: invalid token \(127\.0\.0\.1:\d+\)/,
+      "wrong Vim WebSocket token produces one meaningful warning with peer";
+   like $log, qr/Vim WebSocket rejected: invalid path \(127\.0\.0\.1:\d+\)/,
+      "malformed Vim WebSocket path produces one meaningful warning with peer";
    unlike $log, qr/secret-do-not-log-XYZ|\/secondary\//,
       "rejected URL never exposes supplied credentials in the log";
+   unlike $log, qr/handshake response was undef/,
+      "rejected Vim WebSocket upgrade never reports an undef handshake response";
 }
 close $err;
 

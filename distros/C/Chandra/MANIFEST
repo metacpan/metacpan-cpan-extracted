@@ -1,3 +1,4 @@
+.xs_cover
 Chandra.xs
 Changes
 examples/assets_example.pl
@@ -104,6 +105,7 @@ lib/Chandra/Tray.pm
 lib/Chandra/Window.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module YAML meta-data (added by MakeMaker)
 ppport.h
@@ -181,6 +183,28 @@ t/77_toast.t
 t/78_modal.t
 t/79_validation.t
 t/80_nav.t
+t/81_modal_xs.t
+t/82_toast_xs.t
+t/83_tray_xs.t
+t/84_contextmenu_xs.t
+t/85_dragdrop_xs.t
+t/86_socket_xs.t
+t/87_core_xs.t
+t/88_app_xs.t
+t/89_window_xs.t
+t/90_form_xs.t
+t/91_canvas_xs.t
+t/92_assets_xs.t
+t/93_misc_xs.t
+t/94_tail_xs.t
+t/95_live_window.t
+t/96_components.t
+t/97_pack.t
+t/98_tail2_xs.t
+t/99_branches.t
+t/99_pack_branches.t
+t/99_pack_darwin.t
+t/99_xs_branches.t
 t/lib/Chandra/Test/Display.pm
 typemap
 xs/app.xs

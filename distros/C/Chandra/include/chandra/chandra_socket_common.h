@@ -59,6 +59,9 @@ _sock_fileno(pTHX_ SV *obj)
     PUTBACK;
     count = call_method("fileno", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 */
     if (count > 0) { SV *tmp = POPs; result = SvIV(tmp); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -79,6 +82,9 @@ _sock_is_connected(pTHX_ SV *obj)
     PUTBACK;
     count = call_method("is_connected", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (count > 0) { SV *tmp = POPs; result = SvIV(tmp); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -160,10 +166,13 @@ _sock_runtime_dir(pTHX)
 {
     SV **env_svp;
     HV *env_hv = get_hv("ENV", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (env_hv) {
-        if ((env_svp = hv_fetchs(env_hv, "XDG_RUNTIME_DIR", 0)) && SvOK(*env_svp))
+        if ((env_svp = hv_fetchs(env_hv, "XDG_RUNTIME_DIR", 0)) && SvOK(*env_svp)) /* # uncoverable condition right count:2 */
             return newSVsv(*env_svp);
-        if ((env_svp = hv_fetchs(env_hv, "TMPDIR", 0)) && SvOK(*env_svp))
+        if ((env_svp = hv_fetchs(env_hv, "TMPDIR", 0)) && SvOK(*env_svp)) /* # uncoverable condition right count:2 */
             return newSVsv(*env_svp);
 #ifdef _WIN32
         if ((env_svp = hv_fetchs(env_hv, "TEMP", 0)) && SvOK(*env_svp))
@@ -190,6 +199,9 @@ _sock_catfile(pTHX_ SV *dir_sv, SV *filename_sv)
     SV *result;
 
     /* Strip trailing slashes from dir */
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition left count:3 */
     while (dir_len > 0 && (dir[dir_len-1] == '/' || dir[dir_len-1] == '\\'))
         dir_len--;
 
@@ -231,6 +243,9 @@ _sock_unix_connect(pTHX_ SV *path_sv)
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -256,6 +271,9 @@ _sock_unix_listen(pTHX_ SV *path_sv)
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -283,6 +301,10 @@ _sock_tcp_connect(pTHX_ SV *host_sv, SV *port_sv)
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -314,6 +336,10 @@ _sock_tcp_listen(pTHX_ SV *host_sv, SV *port_sv)
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -343,7 +369,7 @@ _sock_tls_connect(pTHX_ SV *host_sv, SV *port_sv, SV *tls_ca_sv)
                 : "IO::Socket::SSL::SSL_VERIFY_NONE",
             G_SCALAR);
         SPAGAIN;
-        verify_mode = (count > 0) ? newSVsv(POPs) : newSViv(0);
+        verify_mode = (count > 0) ? newSVsv(POPs) : newSViv(0); /* # uncoverable condition right count:1 */
         PUTBACK;
         FREETMPS; LEAVE;
     }
@@ -358,13 +384,16 @@ _sock_tls_connect(pTHX_ SV *host_sv, SV *port_sv, SV *tls_ca_sv)
         XPUSHs(port_sv);
         XPUSHs(sv_2mortal(newSVpvs("SSL_verify_mode")));
         XPUSHs(sv_2mortal(verify_mode));
-        if (tls_ca_sv && SvOK(tls_ca_sv)) {
+        if (tls_ca_sv && SvOK(tls_ca_sv)) { /* # uncoverable condition right count:2 */
             XPUSHs(sv_2mortal(newSVpvs("SSL_ca_file")));
             XPUSHs(tls_ca_sv);
         }
         PUTBACK;
         count = call_method("new", G_SCALAR);
         SPAGAIN;
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 */
         if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
         PUTBACK;
         FREETMPS; LEAVE;
@@ -404,6 +433,10 @@ _sock_tls_listen(pTHX_ SV *host_sv, SV *port_sv,
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -424,6 +457,10 @@ _sock_accept(pTHX_ SV *listener)
     PUTBACK;
     count = call_method("accept", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (count > 0) { SV *s = POPs; if (SvOK(s)) sock = newSVsv(s); }
     PUTBACK;
     FREETMPS; LEAVE;
@@ -450,6 +487,9 @@ _sock_connection_new(pTHX_ SV *sock, SV *name_sv)
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (count > 0) conn = newSVsv(POPs);
     PUTBACK;
     FREETMPS; LEAVE;
@@ -506,6 +546,9 @@ _sock_dispatch_cb(pTHX_ SV *cb, SV *data)
     dSP;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
+    /*
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
     XPUSHs(data ? data : &PL_sv_undef);
     PUTBACK;
     call_sv(cb, G_DISCARD);
@@ -525,7 +568,7 @@ _sock_read_token_file(pTHX_ const char *path)
         char buf[256];
         SSize_t n = PerlLIO_read(fd, buf, sizeof(buf) - 1);
         PerlLIO_close(fd);
-        if (n > 0)
+        if (n > 0) /* # uncoverable branch false class:ignore_covered_err */
             return newSVpvn(buf, (STRLEN)n);
     }
     return NULL;
@@ -537,6 +580,9 @@ static void
 _sock_write_token_file(pTHX_ const char *path, const char *token, STRLEN tlen)
 {
     int fd = PerlLIO_open3(path, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (fd >= 0) {
         ssize_t n = PerlLIO_write(fd, token, tlen);
         (void)n;

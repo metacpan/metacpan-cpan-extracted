@@ -44,8 +44,10 @@ CODE:
     (void)hv_stores(self, "_wid",      newSViv(-1));
     (void)hv_stores(self, "_shown",    newSViv(0));
 
+    # uncoverable condition right count:2
     if (content_sv && SvOK(content_sv))
         (void)hv_stores(self, "content", newSVsv(content_sv));
+    # uncoverable condition right count:2
     if (image_sv && SvOK(image_sv))
         (void)hv_stores(self, "image", newSVsv(image_sv));
 
@@ -71,6 +73,7 @@ CODE:
 {
     hv        = (HV *)SvRV(self);
     svp       = hv_fetchs(hv, "_shown", 0);
+    # uncoverable condition right count:1
     if (svp && SvIV(*svp)) {
         RETVAL = SvREFCNT_inc(self);
         goto show_done;
@@ -84,9 +87,14 @@ CODE:
     timeout   = SvIV(*hv_fetchs(hv, "timeout",   0));
 
     wid = csplash_create(title, width, height, frameless);
+    # uncoverable branch true
+    # uncoverable condition left count:1
     if (wid < 0) {
+        # uncoverable statement
         warn("Chandra::Splash: multi-window not supported on this platform");
+        # uncoverable statement
         RETVAL = SvREFCNT_inc(self);
+        # uncoverable statement
         goto show_done;
     }
     (void)hv_stores(hv, "_wid",   newSViv(wid));
@@ -97,6 +105,7 @@ CODE:
         SV **content_svp = hv_fetchs(hv, "content", 0);
         SV **image_svp   = hv_fetchs(hv, "image",   0);
 
+        # uncoverable condition right count:2
         if (image_svp && SvOK(*image_svp)) {
             /* Image mode: base64-encode the file */
             const char *path = SvPV_nolen(*image_svp);
@@ -109,14 +118,23 @@ CODE:
                 long fsize = ftell(fh);
                 rewind(fh);
                 unsigned char *fbuf = (unsigned char *)malloc(fsize);
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (fbuf) {
                     size_t nread = fread(fbuf, 1, fsize, fh);
+                    # uncoverable branch true
+                    # uncoverable condition left count:1
                     if ((long)nread != fsize) {
+                        # uncoverable statement
                         warn("Chandra::Splash: short read on '%s'", path);
+                        # uncoverable statement
                         free(fbuf);
+                        # uncoverable statement
                         fbuf = NULL;
                     }
                 }
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (fbuf) {
                     STRLEN b64len;
                     SV *b64sv = sv_2mortal(newSV(0));
@@ -134,6 +152,8 @@ CODE:
                         count = call_pv("MIME::Base64::encode_base64",
                                         G_SCALAR);
                         SPAGAIN;
+                        # uncoverable branch false
+                        # uncoverable condition right count:1
                         if (count > 0) {
                             SV *b64result = POPs;
                             /* Strip newlines from base64 output */
@@ -142,6 +162,7 @@ CODE:
                             SV *clean = sv_2mortal(newSVpv("", 0));
                             STRLEN ci;
                             for (ci = 0; ci < b64l; ci++) {
+                                # uncoverable condition right count:2
                                 if (b64s[ci] != '\n' && b64s[ci] != '\r')
                                     sv_catpvn(clean, b64s + ci, 1);
                             }
@@ -149,6 +170,7 @@ CODE:
                             const char *mime = "image/png";
                             const char *dot = strrchr(path, '.');
                             if (dot) {
+                                # uncoverable condition left count:2
                                 if (strcasecmp(dot, ".jpg") == 0 ||
                                     strcasecmp(dot, ".jpeg") == 0)
                                     mime = "image/jpeg";
@@ -162,6 +184,8 @@ CODE:
                             size_t hlen = strlen(CHANDRA_SPLASH_IMAGE_TMPL)
                                         + strlen(mime) + cl + 1;
                             html = (char *)malloc(hlen);
+                            # uncoverable branch false
+                            # uncoverable condition right count:1
                             if (html)
                                 snprintf(html, hlen, CHANDRA_SPLASH_IMAGE_TMPL,
                                          mime, cs);
@@ -173,6 +197,7 @@ CODE:
                 }
                 fclose(fh);
             }
+        # uncoverable condition right count:2
         } else if (content_svp && SvOK(*content_svp)) {
             html = strdup(SvPV_nolen(*content_svp));
         } else if (progress) {
@@ -215,6 +240,7 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
     if (svp && SvOK(*svp)) {
         int wid = (int)SvIV(*svp);
         if (wid > 0) csplash_update_status(wid, text);
@@ -234,6 +260,7 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
     if (svp && SvOK(*svp)) {
         int wid = (int)SvIV(*svp);
         if (wid > 0) csplash_update_progress(wid, percent);
@@ -252,6 +279,7 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
     if (svp && SvOK(*svp)) {
         int wid = (int)SvIV(*svp);
         if (wid > 0) {
@@ -271,6 +299,8 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? csplash_is_open((int)SvIV(*svp)) : 0;
 }
 OUTPUT:
@@ -285,6 +315,8 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? (int)SvIV(*svp) : -1;
 }
 OUTPUT:
@@ -300,6 +332,7 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable condition right count:1
     if (svp && SvOK(*svp)) {
         int wid = (int)SvIV(*svp);
         if (wid > 0) cwin_eval_js(wid, js);
@@ -315,6 +348,9 @@ CODE:
 {
     HV  *hv  = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_wid", 0);
+    # uncoverable branch false
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     if (svp && SvOK(*svp)) {
         int wid = (int)SvIV(*svp);
         if (wid > 0) {
@@ -333,6 +369,8 @@ CODE:
     HV  *hv  = (HV *)SvRV(self);
     SV **dl  = hv_fetchs(hv, "_deadline", 0);
     RETVAL = 0;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (dl && SvOK(*dl) && SvIV(*dl) > 0) {
         struct timeval tv;
         gettimeofday(&tv, NULL);
@@ -340,6 +378,7 @@ CODE:
         if (now_ms >= SvIV(*dl)) {
             /* Deadline passed - close the window */
             SV **wid_svp = hv_fetchs(hv, "_wid", 0);
+            # uncoverable condition right count:1
             if (wid_svp && SvOK(*wid_svp)) {
                 int wid = (int)SvIV(*wid_svp);
                 if (wid > 0) {

@@ -7,7 +7,7 @@ package App::FileSync::Platform;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.001.5');
+use version; our $VERSION = version->declare('0.002.0');
 
 =encoding utf8
 

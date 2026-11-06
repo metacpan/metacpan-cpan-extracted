@@ -27,7 +27,7 @@ BEGIN {
 # GLOBALS
 #======================================================================
 
-our $VERSION  = '2.000001';
+our $VERSION  = '2.000002';
 
 # This would confuse some packagers
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
@@ -35,14 +35,19 @@ $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev relea
 our $AUTOLOAD;
 
 # special operators (-in, -between). May be extended/overridden by user.
-# See section WHERE: BUILTIN SPECIAL OPERATORS below for implementation
-my @BUILTIN_SPECIAL_OPS = (
-  {regex => qr/^ (?: not \s )? between $/ix, handler => sub { die "NOPE" }},
-  {regex => qr/^ is (?: \s+ not )?     $/ix, handler => sub { die "NOPE" }},
-  {regex => qr/^ (?: not \s )? in      $/ix, handler => sub { die "NOPE" }},
-  {regex => qr/^ ident                 $/ix, handler => sub { die "NOPE" }},
-  {regex => qr/^ value                 $/ix, handler => sub { die "NOPE" }},
-);
+# See section WHERE: BUILTIN SPECIAL OPERATORS below for implementation.
+# Single precompiled alternation of the builtin special-op names, used only
+# to reject their top-level use under the old special-op compat path; this is
+# equivalent to (and much faster than) a List::Util::first over one regex each.
+my $BUILTIN_SPECIAL_OP_RE = qr/^
+  (?:
+      (?: not \s )? between
+    | is (?: \s+ not )?
+    | (?: not \s )? in
+    | ident
+    | value
+  )
+$/ix;
 
 #======================================================================
 # DEBUGGING AND ERROR REPORTING
@@ -55,11 +60,13 @@ sub _debug {
 }
 
 sub belch (@) {
+  Scalar::Util::blessed($_[0]) and $_[0]->isa(__PACKAGE__) and shift;
   my($func) = (caller(1))[3];
   Carp::carp "[$func] Warning: ", @_;
 }
 
 sub puke (@) {
+  Scalar::Util::blessed($_[0]) and $_[0]->isa(__PACKAGE__) and shift;
   my($func) = (caller(1))[3];
   Carp::croak "[$func] Fatal: ", @_;
 }
@@ -164,7 +171,7 @@ our %Defaults = (
     (map +($_ => '_render_op_between'), 'between', 'not_between'),
     (map +($_ => '_render_op_in'), 'in', 'not_in'),
     (map +($_ => '_render_unop_postfix'),
-      'is_null', 'is_not_null', 'asc', 'desc',
+      'is_null', 'is_not_null', 'asc', 'desc', 'nulls_first', 'nulls_last',
     ),
     (not => '_render_unop_paren'),
     (map +($_ => '_render_op_andor'), qw(and or)),
@@ -200,6 +207,101 @@ foreach my $stmt (keys %{$Defaults{clauses_of}}) {
   }
 }
 
+{
+  my $expand_ident = sub { $_[2] };
+
+  my %render_returning = (
+    map {
+      my $method = "_${_}_returning";
+      ($_ => sub { [ $_[0]->$method($_[3]) ] });
+    } qw(insert update delete)
+  );
+
+  my $expand_table = sub { +{ -literal => [ $_[0]->_table($_[2]) ] } };
+
+  my $render_order_by = sub { [ $_[0]->_order_by($_[2]) ] };
+
+  my $render_select_select = sub {
+    my @super = $_[0]->_select_fields($_[2]);
+    my $effort = [
+      ref($super[0]) eq 'HASH'
+        ? $_[0]->render_expr($super[0])
+        : @super
+    ];
+    return $_[0]->join_query_parts(
+      ' ', { -keyword => 'select' }, $effort
+    );
+  };
+
+  my %expand_field_type = map {
+    my $type = $_;
+    my $meth = "_where_field_".uc($type);
+    my $exp = sub {
+      my ($self, $op, $v, $k) = @_;
+      $op = join ' ', split '_', $op;
+      return +{ -literal => [
+        $self->$meth($k, $op, $v)
+      ] };
+    };
+    ($type => $exp)
+  } qw(in between);
+
+  my $dbic_select_where = sub {
+    my ($sql, @bind) = $_[0]->where($_[2]);
+    s/\A\s+//, s/\s+\Z// for $sql;
+    return [ $sql, @bind ];
+  };
+
+  my $dbic_expand_ident = __PACKAGE__->make_unop_expander(sub {
+    my ($self, undef, $body) = @_;
+    $body = $body->from if Scalar::Util::blessed($body);
+    $self->_expand_ident(ident => $body);
+  });
+
+  sub __maybe_setup_subclass_overrides {
+    my ($class, $opts) = @_;
+
+    return if $class eq __PACKAGE__;
+
+    # we are a subclass, so check for overriden methods
+
+    my $subclassed = sub { __PACKAGE__->can($_[0]) != $class->can($_[0]) };
+
+    foreach my $type (qw(insert update delete)) {
+      my $method = "_${type}_returning";
+      if ($subclassed->($method)) {
+        my $clause = "${type}.returning";
+        $opts->{expand_clause}{$clause} = $expand_ident;
+        $opts->{render_clause}{$clause} = $render_returning{$type};
+      }
+    }
+    if ($subclassed->('_table')) {
+      $opts->{expand_clause}{'select.from'} = $expand_table;
+    }
+    if ($subclassed->('_order_by')) {
+      $opts->{expand_clause}{'select.order_by'} = $expand_ident;
+      $opts->{render_clause}{'select.order_by'} = $render_order_by;
+    }
+    if ($subclassed->('_select_fields')) {
+      $opts->{expand_clause}{'select.select'} = $expand_ident;
+      $opts->{render_clause}{'select.select'} = $render_select_select;
+    }
+    foreach my $type (qw(in between)) {
+      my $meth = "_where_field_".uc($type);
+      if ($subclassed->($meth)) {
+        my $exp = $expand_field_type{$type};
+        $opts->{expand_op}{$_} = $exp for $type, "not_${type}";
+      }
+    }
+    if ($class->isa('DBIx::Class::SQLMaker')) {
+      $opts->{warn_once_on_nest} = 1;
+      $opts->{disable_old_special_ops} = 1;
+      $opts->{render_clause}{'select.where'} = $dbic_select_where;
+      $opts->{expand_op}{ident} = $dbic_expand_ident;
+    }
+  }
+}
+
 sub new {
   my $self = shift;
   my $class = ref($self) || $self;
@@ -210,6 +312,10 @@ sub new {
 
   # default logic for interpreting arrayrefs
   $opt{logic} = $opt{logic} ? uc $opt{logic} : 'OR';
+
+  # an arrayref as a column value in insert / update is one bind value;
+  # literal SQL is \[ $sql, @bind ] (array_datatypes => 0 for the old way)
+  $opt{array_datatypes} = 1 unless defined $opt{array_datatypes};
 
   # how to return bind vars
   $opt{bindtype} ||= 'normal';
@@ -255,107 +361,14 @@ sub new {
     $opt{$name} = { %{$Defaults{$name}}, %{$opt{$name}||{}} };
   }
 
-  if ($class ne __PACKAGE__) {
-
-    # check for overriden methods
-
-    foreach my $type (qw(insert update delete)) {
-      my $method = "_${type}_returning";
-      if (__PACKAGE__->can($method) ne $class->can($method)) {
-        my $clause = "${type}.returning";
-        $opt{expand_clause}{$clause} = sub { $_[2] },
-        $opt{render_clause}{$clause}
-          = sub { [ $_[0]->$method($_[3]) ] };
-      }
-    }
-    if (__PACKAGE__->can('_table') ne $class->can('_table')) {
-      $opt{expand_clause}{'select.from'} = sub {
-        return +{ -literal => [ $_[0]->_table($_[2]) ] };
-      };
-    }
-    if (__PACKAGE__->can('_order_by') ne $class->can('_order_by')) {
-      $opt{expand_clause}{'select.order_by'} = sub { $_[2] };
-      $opt{render_clause}{'select.order_by'} = sub {
-        [ $_[0]->_order_by($_[2]) ];
-      };
-    }
-    if (__PACKAGE__->can('_select_fields') ne $class->can('_select_fields')) {
-      $opt{expand_clause}{'select.select'} = sub { $_[2] };
-      $opt{render_clause}{'select.select'} = sub {
-        my @super = $_[0]->_select_fields($_[2]);
-        my $effort = [
-          ref($super[0]) eq 'HASH'
-            ? $_[0]->render_expr($super[0])
-            : @super
-        ];
-        return $_[0]->join_query_parts(
-          ' ', { -keyword => 'select' }, $effort
-        );
-      };
-    }
-    foreach my $type (qw(in between)) {
-      my $meth = "_where_field_".uc($type);
-      if (__PACKAGE__->can($meth) ne $class->can($meth)) {
-        my $exp = sub {
-          my ($self, $op, $v, $k) = @_;
-          $op = join ' ', split '_', $op;
-          return +{ -literal => [
-            $self->$meth($k, $op, $v)
-          ] };
-        };
-        $opt{expand_op}{$_} = $exp for $type, "not_${type}";
-      }
-    }
-    if ($class->isa('DBIx::Class::SQLMaker')) {
-      $opt{warn_once_on_nest} = 1;
-      $opt{disable_old_special_ops} = 1;
-      $opt{render_clause}{'select.where'} = sub {
-        my ($sql, @bind) = $_[0]->where($_[2]);
-        s/\A\s+//, s/\s+\Z// for $sql;
-        return [ $sql, @bind ];
-      };
-      $opt{expand_op}{ident} = $class->make_unop_expander(sub {
-        my ($self, undef, $body) = @_;
-        $body = $body->from if Scalar::Util::blessed($body);
-        $self->_expand_ident(ident => $body);
-      });
-    }
-    if ($class->isa('SQL::Abstract::More')) {
-      my $orig = $opt{expand_op}{or};
-      $opt{expand_op}{or} = sub {
-        my ($self, $logop, $v, $k) = @_;
-        if ($k and ref($v) eq 'ARRAY') {
-          my ($type, $val) = @$v;
-          my $op;
-          if (
-            ref($type) eq 'HASH' and ref($val) eq 'HASH'
-            and keys %$type == 1 and keys %$val == 1
-            and (keys %$type)[0] eq (keys %$val)[0]
-          ) {
-            ($op) = keys %$type;
-            ($type) = values %$type;
-            ($val) = values %$val;
-          }
-          if ($self->is_bind_value_with_type(my $v = [ $type, $val ])) {
-            return $self->expand_expr(
-              { $k, map +($op ? { $op => $_ } : $_), { -bind => $v } }
-            );
-          }
-        }
-        return $self->$orig($logop, $v, $k);
-      };
-      $opt{render}{bind} = sub {
-        return [ '?', map +(ref($_->[0]) ? $_ : $_->[1]), $_[2] ]
-      };
-    }
-  }
+  $class->__maybe_setup_subclass_overrides(\%opt);
 
   if ($opt{lazy_join_sql_parts}) {
     require SQL::Abstract::Parts;
     $opt{join_sql_parts} ||= sub { SQL::Abstract::Parts->new(@_) };
   }
 
-  $opt{join_sql_parts} ||= sub { join $_[0], @_[1..$#_] };
+  $opt{join_sql_parts} ||= $class->can('default_join_sql_parts');
 
   return bless \%opt, $class;
 }
@@ -450,8 +463,6 @@ BEGIN {
   }
 }
 
-#sub register_op { $_[0]->{is_op}{$_[1]} = 1; $_[0] }
-
 sub statement_list { sort keys %{$_[0]->{clauses_of}} }
 
 sub clauses_of {
@@ -486,9 +497,9 @@ sub sqlfalse { +{ -literal => [ $_[0]->{sqlfalse} ] } }
 sub _assert_pass_injection_guard {
   if ($_[1] =~ $_[0]->{injection_guard}) {
     my $class = ref $_[0];
-    puke "Possible SQL injection attempt '$_[1]'. If this is indeed a part of the "
+    $_[0]->puke("Possible SQL injection attempt '$_[1]'. If this is indeed a part of the "
      . "desired SQL use literal SQL ( \'...' or \[ '...' ] ) or supply your own "
-     . "{injection_guard} attribute to ${class}->new()"
+     . "{injection_guard} attribute to ${class}->new()")
   }
 }
 
@@ -528,6 +539,9 @@ sub _expand_insert_clause_from {
   if (ref($data) eq 'HASH' and (keys(%$data))[0] =~ /^-/) {
     return $self->expand_expr($data);
   }
+  if (my $literal = is_literal_value($data)) {
+    return (from => { -literal => $literal });
+  }
   my ($f_aqt, $v_aqt) = $self->_expand_insert_values($data);
   return (
     from => { -values => [ $v_aqt ] },
@@ -552,7 +566,7 @@ sub _expand_insert_values {
 
     # no names (arrayref) means can't generate bindtype
     !($fields) && $self->{bindtype} eq 'columns'
-      && belch "can't do 'columns' bindtype when called with arrayref";
+      && $self->belch("can't do 'columns' bindtype when called with arrayref");
 
     +(
       (@$fields
@@ -618,7 +632,8 @@ sub _expand_insert_value {
   }
   if (ref($v) eq 'HASH') {
     if (grep !/^-/, keys %$v) {
-      belch "HASH ref as bind value in insert is not supported";
+      # pass a plain hashref straight through as a bind value; this is how
+      # e.g. a Postgres json/jsonb column value is supplied (GH#18, RT#120676)
       return +{ -bind => [ $k, $v ] };
     }
   }
@@ -643,7 +658,7 @@ sub update {
     } else {
       my %clauses;
       @clauses{qw(target set where)} = ($table, $set, $where);
-      puke "Unsupported data type specified to \$sql->update"
+      $self->puke("Unsupported data type specified to \$sql->update")
         unless ref($clauses{set}) eq 'HASH';
       @clauses{keys %$options} = values %$options;
       \%clauses;
@@ -724,6 +739,13 @@ sub select {
     if (ref(my $sel = $args[0]) eq 'HASH') {
       $sel
     } else {
+      # a flat list of clause pairs (select => ..., from => ..., ...) would
+      # otherwise be taken as the positional form and produce garbage SQL
+      # (RT#148271)
+      $self->puke(
+        'select() takes a single hashref of clauses or up to four positional'
+        . ' arguments (source, fields, where, order), got ' . @args
+      ) if @args > 4;
       my %clauses;
       @clauses{qw(from select where order_by)} = @args;
 
@@ -908,6 +930,9 @@ sub render_statement {
 
 sub _expand_statement {
   my ($self, $type, $args) = @_;
+  # a statement can sit where plain scalars are identifiers (select list,
+  # order by, from ...), but its own where/set/values scalars are values
+  local our $Default_Scalar_To = -value;
   my $ec = $self->{expand_clause};
   if ($args->{_}) {
     $args = { %$args };
@@ -976,8 +1001,8 @@ sub _expand_expr {
     }
     my ($key, $value) = %$expr;
     if ($key =~ /^-/ and $key =~ s/ [_\s]? \d+ $//x ) {
-      belch 'Use of [and|or|nest]_N modifiers is deprecated and will be removed in SQLA v2.0. '
-          . "You probably wanted ...-and => [ $key => COND1, $key => COND2 ... ]";
+      $self->belch('Use of [and|or|nest]_N modifiers is deprecated and will be removed in a future version. '
+          . "You probably wanted ...-and => [ $key => COND1, $key => COND2 ... ]");
     }
     return $self->_expand_hashpair($key, $value);
   }
@@ -997,10 +1022,10 @@ sub _expand_hashpair {
   my ($self, $k, $v) = @_;
   unless (defined($k) and length($k)) {
     if (defined($k) and my $literal = is_literal_value($v)) {
-      belch 'Hash-pairs consisting of an empty string with a literal are deprecated, and will be removed in 2.0: use -and => [ $literal ] instead';
+      $self->belch('Hash-pairs consisting of an empty string with a literal are deprecated, and will be removed in a future version: use -and => [ $literal ] instead');
       return { -literal => $literal };
     }
-    puke "Supplying an empty left hand side argument is not supported";
+    $self->puke("Supplying an empty left hand side argument is not supported");
   }
   if ($k =~ /^-./) {
     return $self->_expand_hashpair_op($k, $v);
@@ -1052,6 +1077,9 @@ sub _expand_hashpair_ident {
         ? (shift(@{$v = [ @$v ]}), $1)
         : lc($self->{logic} || 'OR')
     );
+    if ($logic eq 'or' and my $in = $self->_array_as_in($k, $v)) {
+      return $in;
+    }
     return $self->_expand_logop(
       $logic => $v, $k
     );
@@ -1059,7 +1087,7 @@ sub _expand_hashpair_ident {
 
   if (my $literal = is_literal_value($v)) {
     unless (length $k) {
-      belch 'Hash-pairs consisting of an empty string with a literal are deprecated, and will be removed in 2.0: use -and => [ $literal ] instead';
+      $self->belch('Hash-pairs consisting of an empty string with a literal are deprecated, and will be removed in a future version: use -and => [ $literal ] instead');
       return \$literal;
     }
     my ($sql, @bind) = @$literal;
@@ -1071,6 +1099,24 @@ sub _expand_hashpair_ident {
     return +{ -literal => [ $self->_quote($k).' '.$sql, @bind ] };
   }
   die "notreached";
+}
+
+# array_as_in: turn col => [ 1, 2, undef ] into col IN (1, 2) OR col IS NULL,
+# but only when that means exactly the same as the OR-of-equalities
+# expansion: equality cmp, every element a bind value or undef, and at
+# least two values for the IN. Returns nothing when it does not apply.
+sub _array_as_in {
+  my ($self, $k, $v) = @_;
+  return unless $self->{array_as_in} and $self->{cmp} eq '=';
+  my $values = 0;
+  for my $el (@$v) {
+    next unless defined $el;
+    return if ref($el) and !Scalar::Util::blessed($el);
+    $values++;
+  }
+  return unless $values > 1;
+  # -in turns undef elements into an extra OR col IS NULL
+  return $self->_expand_expr({ $k => { -in => $v } });
 }
 
 sub _expand_scalar {
@@ -1094,9 +1140,7 @@ sub _expand_hashpair_op {
 
   my $op = $self->_normalize_op($k);
 
-  my $wsop = join(' ', split '_', $op);
-
-  my $is_special = List::Util::first { $wsop =~ $_->{regex} }
+  my $is_special = List::Util::first { $op =~ $_->{regex} }
                      @{$self->{special_ops}};
 
   { # Old SQLA compat
@@ -1109,11 +1153,11 @@ sub _expand_hashpair_op {
         $is_special
         or (
           $self->{disable_old_special_ops}
-          and List::Util::first { $wsop =~ $_->{regex} } @BUILTIN_SPECIAL_OPS
+          and $op =~ $BUILTIN_SPECIAL_OP_RE
         )
       )
     ) {
-      puke "Illegal use of top-level '-$wsop'"
+      $self->puke("Illegal use of top-level '-$op'")
     }
   }
 
@@ -1193,8 +1237,6 @@ sub _expand_hashtriple {
   }
   { # Old SQLA compat
 
-    my $op = join(' ', split '_', $op);
-
     if (my $us = List::Util::first { $op =~ $_->{regex} } @{$self->{special_ops}}) {
       return { -op => [ $op, $ik, $vv ] };
     }
@@ -1216,10 +1258,10 @@ sub _expand_hashtriple {
       or $op =~ $self->{not_like_op}
     ) {
       if (lc($logic) eq 'or' and @values > 1) {
-        belch "A multi-element arrayref as an argument to the inequality op '${\uc(join ' ', split '_', $op)}' "
+        $self->belch("A multi-element arrayref as an argument to the inequality op '${\uc(join ' ', split '_', $op)}' "
             . 'is technically equivalent to an always-true 1=1 (you probably wanted '
             . "to say ...{ \$inequality_op => [ -and => \@values ] }... instead)"
-        ;
+        );
       }
     }
     unless (@values) {
@@ -1259,29 +1301,30 @@ sub _dwim_op_to_is {
     return 1;
   }
   if ($op =~ $self->{like_op}) {
-    belch(sprintf $empty, uc(join ' ', split '_', $op));
+    $self->belch(sprintf $empty, uc(join ' ', split '_', $op));
     return 1;
   }
   if ($op =~ $self->{inequality_op}) {
     return 0;
   }
   if ($op =~ $self->{not_like_op}) {
-    belch(sprintf $empty, uc(join ' ', split '_', $op));
+    $self->belch(sprintf $empty, uc(join ' ', split '_', $op));
     return 0;
   }
-  puke(sprintf $fail, $op);
+  $self->puke(sprintf $fail, $op);
 }
 
 sub _expand_func {
   my ($self, undef, $args) = @_;
   my ($func, @args) = @$args;
+  $self->_assert_pass_injection_guard($func);
   return +{ -func => [ $func, map $self->expand_expr($_), @args ] };
 }
 
 sub _expand_ident {
   my ($self, undef, $body) = @_;
   unless (defined($body) or (ref($body) and ref($body) eq 'ARRAY')) {
-    puke "-ident requires a single plain scalar argument (a quotable identifier) or an arrayref of identifier parts";
+    $self->puke("-ident requires a single plain scalar argument (a quotable identifier) or an arrayref of identifier parts");
   }
   my ($sep) = map +(defined() ? $_ : '.') , $self->{name_sep};
   my @parts = map +($sep
@@ -1301,7 +1344,16 @@ sub _expand_value {
 
 sub _expand_row {
   my ($self, undef, $args) = @_;
-  +{ -row => [ map $self->expand_expr($_), @$args ] };
+  +{ -row => [
+    map {
+      # a row is positional, so an undef element is a NULL value and must
+      # keep its placeholder and bind slot rather than being expanded to
+      # nothing and silently dropped by the renderer (RT#137357)
+      defined($_)
+        ? $self->expand_expr($_)
+        : +{ -bind => [ our $Cur_Col_Meta, undef ] }
+    } @$args
+  ] };
 }
 
 sub _expand_op {
@@ -1321,7 +1373,7 @@ sub _expand_bool {
   if (ref($v)) {
     return $self->_expand_expr($v);
   }
-  puke "-bool => undef not supported" unless defined($v);
+  $self->puke("-bool => undef not supported") unless defined($v);
   return $self->_expand_expr({ -ident => $v });
 }
 
@@ -1360,7 +1412,7 @@ sub _expand_op_andor {
     ] };
   }
   if (ref($v) eq 'ARRAY') {
-    $logop eq 'and' or $logop eq 'or' or puke "unknown logic: $logop";
+    $logop eq 'and' or $logop eq 'or' or $self->puke("unknown logic: $logop");
 
     my @expr = grep {
       (ref($_) eq 'ARRAY' and @$_)
@@ -1371,7 +1423,7 @@ sub _expand_op_andor {
     my @res;
 
     while (my ($el) = splice @expr, 0, 1) {
-      puke "Supplying an empty left hand side argument is not supported in array-pairs"
+      $self->puke("Supplying an empty left hand side argument is not supported in array-pairs")
         unless defined($el) and length($el);
       my $elref = ref($el);
       if (!$elref) {
@@ -1398,7 +1450,7 @@ sub _expand_op_andor {
 sub _expand_op_is {
   my ($self, $op, $vv, $k) = @_;
   ($k, $vv) = @$vv unless defined $k;
-  puke "$op can only take undef as argument"
+  $self->puke("$op can only take undef as argument")
     if defined($vv)
        and not (
          ref($vv) eq 'HASH'
@@ -1417,7 +1469,7 @@ sub _expand_between {
     or
     (@rhs == 2 and defined($rhs[0]) and defined($rhs[1]))
   ) {
-    puke "Operator '${\uc($op)}' requires either an arrayref with two defined values or expressions, or a single literal scalarref/arrayref-ref";
+    $self->puke("Operator '${\uc($op)}' requires either an arrayref with two defined values or expressions, or a single literal scalarref/arrayref-ref");
   }
   return +{ -op => [
     $op,
@@ -1436,24 +1488,30 @@ sub _expand_in {
       { -literal => [ $opened_sql, @bind ] }
     ] };
   }
-  my $undef_err =
-    'SQL::Abstract before v1.75 used to generate incorrect SQL when the '
-  . "-${\uc($op)} operator was given an undef-containing list: !!!AUDIT YOUR CODE "
-  . 'AND DATA!!! (the upcoming Data::Query-based version of SQL::Abstract '
-  . 'will emit the logically correct SQL instead of raising this exception)'
-  ;
-  puke("Argument passed to the '${\uc($op)}' operator can not be undefined")
+  $self->puke("Argument passed to the '${\uc($op)}' operator can not be undefined")
     if !defined($vv);
-  my @rhs = map $self->expand_expr($_, -value),
-              map { defined($_) ? $_: puke($undef_err) }
-                (ref($vv) eq 'ARRAY' ? @$vv : $vv);
-  return $self->${\($op =~ /^not/ ? 'sqltrue' : 'sqlfalse')} unless @rhs;
+  my $not = $op =~ /^not/;
+  my @values = ref($vv) eq 'ARRAY' ? @$vv : $vv;
 
-  return +{ -op => [
+  # undef elements mean NULL, which IN never matches: turn them into
+  # col IN (...) OR col IS NULL, and col NOT IN (...) AND col IS NOT NULL
+  my $has_undef = grep !defined, @values;
+  my @rhs = map $self->expand_expr($_, -value), grep defined, @values;
+
+  my $null = $has_undef && { -op => [
+    ($not ? 'is_not_null' : 'is_null'), $self->expand_expr($k, -ident)
+  ] };
+  unless (@rhs) {
+    return $null || $self->${\($not ? 'sqltrue' : 'sqlfalse')};
+  }
+
+  my $in = { -op => [
     $op,
     $self->expand_expr($k, -ident),
     @rhs
   ] };
+  return $in unless $null;
+  return { -op => [ ($not ? 'and' : 'or'), $in, $null ] };
 }
 
 sub _expand_nest {
@@ -1462,7 +1520,7 @@ sub _expand_nest {
   # method it overrode to do so no longer exists
   if ($self->{warn_once_on_nest}) {
     unless (our $Nest_Warned) {
-      belch(
+      $self->belch(
         "-nest in search conditions is deprecated, you most probably wanted:\n"
         .q|{..., -and => [ \%cond0, \@cond1, \'cond2', \[ 'cond3', [ col => bind ] ], etc. ], ... }|
       );
@@ -1474,11 +1532,13 @@ sub _expand_nest {
 
 sub _expand_values {
   my ($self, undef, $values) = @_;
+  # VALUES rows hold values, even in an identifier context like from
+  local our $Default_Scalar_To = -value;
   return { -values => [
     map +(
       ref($_) eq 'HASH'
         ? $self->expand_expr($_)
-        : +{ -row => [ map $self->expand_expr($_), @$_ ] }
+        : $self->_expand_row(undef, $_)
     ), ref($values) eq 'ARRAY' ? @$values : $values
   ] };
 }
@@ -1501,7 +1561,7 @@ sub _recurse_where {
     return ($sql, @bind);
   }
   else {
-    belch "Calling _recurse_where in scalar context is deprecated and will go away before 2.0";
+    $self->belch("Calling _recurse_where in scalar context is deprecated and will go away in a future version");
     return $sql;
   }
 }
@@ -1561,11 +1621,9 @@ sub _render_op {
 
   { # Old SQLA compat
 
-    my $op = join(' ', split '_', $op);
-
     my $ss = List::Util::first { $op =~ $_->{regex} } @{$self->{special_ops}};
     if ($ss and @args > 1) {
-      puke "Special op '${op}' requires first value to be identifier"
+      $self->puke("Special op '${op}' requires first value to be identifier")
         unless my ($ident) = map $_->{-ident}, grep ref($_) eq 'HASH', $args[0];
       my $k = join(($self->{name_sep}||'.'), @$ident);
       local our $Expand_Depth = 1;
@@ -1592,10 +1650,12 @@ sub _render_op_between {
   my ($left, $low, $high) = @$args;
   my @rh = do {
     if (@$args == 2) {
-      puke "Single arg to between must be a literal"
+      $self->puke("Single arg to between must be a literal")
         unless $low->{-literal};
       $low;
     } else {
+      puke "Arguments to between must be defined"
+        unless defined $low && defined $high;
       +($low, { -keyword => 'and' }, $high);
     }
   };
@@ -1609,13 +1669,17 @@ sub _render_op_in {
   my ($lhs, @rhs) = @$args;
 
   return $self->join_query_parts(' ',
-    $lhs,
-    { -keyword => $op },
-    $self->join_query_parts(' ',
-      '(',
-      $self->join_query_parts(', ', @rhs),
-      ')'
-    ),
+    @rhs
+      ? (
+          $lhs,
+          { -keyword => $op },
+          $self->join_query_parts(' ',
+            '(',
+            $self->join_query_parts(', ', @rhs),
+            ')'
+          )
+        )
+      : $self->${\($op =~ /^not/ ? 'sqltrue' : 'sqlfalse')}
   );
 }
 
@@ -1655,6 +1719,8 @@ sub _render_values {
   );
 }
 
+sub default_join_sql_parts { join $_[0], @_[1..$#_] }
+
 sub join_query_parts {
   my ($self, $join, @parts) = @_;
   if (ref($join) eq 'HASH') {
@@ -1682,9 +1748,6 @@ sub _render_unop_paren {
 
 sub _render_unop_prefix {
   my ($self, $op, $v) = @_;
-  my $op_sql = $self->{restore_old_unop_handling}
-                 ? $self->_sqlcase($op)
-                 : { -keyword => $op };
   return $self->join_query_parts(' ',
     ($self->{restore_old_unop_handling}
       ? $self->_sqlcase($op)
@@ -1757,7 +1820,7 @@ sub _where_field_BETWEEN {
 sub _expand_order_by {
   my ($self, $arg) = @_;
 
-  return unless defined($arg) and not (ref($arg) eq 'ARRAY' and !@$arg);
+  return undef unless defined($arg) and not (ref($arg) eq 'ARRAY' and !@$arg);
 
   return $self->expand_expr({ -list => $arg })
     if ref($arg) eq 'HASH' and ($arg->{-op}||[''])->[0] eq ',';
@@ -1768,17 +1831,33 @@ sub _expand_order_by {
     foreach my $arg (@to_expand) {
       if (
         ref($arg) eq 'HASH'
+        and !exists $arg->{-nulls}
         and keys %$arg > 1
         and grep /^-(asc|desc)$/, keys %$arg
       ) {
-        puke "ordering direction hash passed to order by must have exactly one key (-asc or -desc)";
+        $self->puke("ordering direction hash passed to order by must have exactly one key (-asc or -desc)");
       }
     }
-    my @exp = map +(
-                defined($dir) ? { -op => [ $dir =~ /^-?(.*)$/ ,=> $_ ] } : $_
-              ),
-                map $self->expand_expr($_, -ident),
-                map ref($_) eq 'ARRAY' ? @$_ : $_, @to_expand;
+    my @exp;
+    foreach my $arg (map ref($_) eq 'ARRAY' ? @$_ : $_, @to_expand) {
+      if (ref($arg) eq 'HASH' and exists $arg->{-nulls}) {
+        # { -asc => $col, -nulls => 'first' } => col ASC NULLS FIRST
+        my %by = %$arg;
+        my $nulls = delete $by{-nulls};
+        $self->puke("invalid value for -nulls in order by: must be 'first' or 'last'")
+          unless defined($nulls) and !ref($nulls) and $nulls =~ /\A(?:first|last)\z/i;
+        my ($by_dir) = keys %by;
+        $self->puke("-nulls in an order by hash needs exactly one of -asc or -desc")
+          unless keys %by == 1 and $by_dir =~ /\A-(?:asc|desc)\z/;
+        # goes through the -asc / -desc expander installed below
+        my $sorted = $self->expand_expr({ $by_dir => $by{$by_dir} }) or next;
+        my (undef, @cols) = @{$sorted->{-op}};
+        push @exp, map +{ -op => [ 'nulls_'.lc($nulls), $_ ] }, @cols;
+        next;
+      }
+      my $e = $self->expand_expr($arg, -ident);
+      push @exp, defined($dir) ? { -op => [ $dir =~ /^-?(.*)$/ ,=> $e ] } : $e;
+    }
     return undef unless @exp;
     return undef if @exp == 1 and not defined($exp[0]);
     return +{ -op => [ ',', @exp ] };
@@ -1855,7 +1934,7 @@ sub _quote {
 
   return '' unless defined $_[1];
   return ${$_[1]} if ref($_[1]) eq 'SCALAR';
-  puke 'Identifier cannot be hashref' if ref($_[1]) eq 'HASH';
+  $_[0]->puke('Identifier cannot be hashref') if ref($_[1]) eq 'HASH';
 
   unless ($_[0]->{quote_char}) {
     if (ref($_[1]) eq 'ARRAY') {
@@ -1870,13 +1949,17 @@ sub _quote {
   my ($l, $r) =
       !$qref             ? ($_[0]->{quote_char}, $_[0]->{quote_char})
     : ($qref eq 'ARRAY') ? @{$_[0]->{quote_char}}
-    : puke "Unsupported quote_char format: $_[0]->{quote_char}";
+    : $_[0]->puke("Unsupported quote_char format: $_[0]->{quote_char}");
 
   my $esc = $_[0]->{escape_char} || $r;
 
+  # an unset name_sep means '.' (as in _expand_ident); an empty one only
+  # keeps plain names from being split
+  my $sep = defined $_[0]->{name_sep} ? $_[0]->{name_sep} : '.';
+
   # parts containing * are naturally unquoted
   return join(
-    $_[0]->{name_sep}||'',
+    (length $sep ? $sep : '.'),
     map +(
       $_ eq '*'
         ? $_
@@ -1885,8 +1968,8 @@ sub _quote {
     (ref($_[1]) eq 'ARRAY'
       ? @{$_[1]}
       : (
-          $_[0]->{name_sep}
-            ? split (/\Q$_[0]->{name_sep}\E/, $_[1] )
+          length $sep
+            ? split (/\Q$sep\E/, $_[1] )
             : $_[1]
         )
     )
@@ -1924,7 +2007,7 @@ sub _assert_bindval_matches_bindtype {
   if ($self->{bindtype} eq 'columns') {
     for (@_) {
       if (!defined $_ || ref($_) ne 'ARRAY' || @$_ != 2) {
-        puke "bindtype 'columns' selected, you need to pass: [column_name => bind_value]"
+        $self->puke("bindtype 'columns' selected, you need to pass: [column_name => bind_value]")
       }
     }
   }
@@ -1978,7 +2061,7 @@ sub _METHOD_FOR_refkind {
       and last;
   }
 
-  return $method || puke "cannot dispatch on '$meth_prefix' for ".$self->_refkind($data);
+  return $method || $self->puke("cannot dispatch on '$meth_prefix' for ".$self->_refkind($data));
 }
 
 
@@ -1991,7 +2074,7 @@ sub _SWITCH_refkind {
       and last;
   }
 
-  puke "no dispatch entry for ".$self->_refkind($data)
+  $self->puke("no dispatch entry for ".$self->_refkind($data))
     unless $coderef;
 
   $coderef->();
@@ -2011,7 +2094,7 @@ sub _SWITCH_refkind {
 sub values {
     my $self = shift;
     my $data = shift || return;
-    puke "Argument to ", __PACKAGE__, "->values must be a \\%hash"
+    $self->puke("Argument to ", __PACKAGE__, "->values must be a \\%hash")
         unless ref $data eq 'HASH';
 
     my @all_bind;
@@ -2106,8 +2189,10 @@ sub generate {
     if (wantarray) {
         return ($sql, @sqlv);
     } else {
-        1 while $sql =~ s/\?/my $d = shift(@sqlv);
-                             ref $d ? $d->[1] : $d/e;
+        # single global pass: replace each original placeholder once, so a
+        # bind value that itself contains a '?' does not swallow later binds
+        $sql =~ s/\?/my $d = shift(@sqlv);
+                     ref $d ? $d->[1] : $d/ge;
         return $sql;
     }
 }
@@ -2119,7 +2204,7 @@ sub AUTOLOAD {
     # This allows us to check for a local, then _form, attr
     my $self = shift;
     my($name) = $AUTOLOAD =~ /.*::(.+)/;
-    puke "AUTOLOAD invoked for method name ${name} and allow_autoload option not set" unless $self->{allow_autoload};
+    $self->puke("AUTOLOAD invoked for method name ${name} and allow_autoload option not set") unless $self->{allow_autoload};
     return $self->generate($name, @_);
 }
 
@@ -2205,12 +2290,10 @@ These are then used directly in your DBI code:
 
 =head2 Inserting and Updating Arrays
 
-If your database has array types (like for example Postgres),
-activate the special option C<< array_datatypes => 1 >>
-when creating the C<SQL::Abstract> object.
-Then you may use an arrayref to insert and update database array types:
+An arrayref as a column value in C<insert> or C<update> is one bind
+value, for databases with array types (like for example Postgres):
 
-    my $sql = SQL::Abstract->new(array_datatypes => 1);
+    my $sql = SQL::Abstract->new;
     my %data = (
         planets => [qw/Mercury Venus Earth Mars/]
     );
@@ -2285,6 +2368,24 @@ Which you could then use in DBI code like so:
 
 Easy, eh?
 
+=head2 SQL::Abstract, DBIx::Class and DBIO
+
+For a long time this module was best known as the SQL generator behind
+L<DBIx::Class>. That is no longer the case: since version 0.082842 (2020)
+DBIx::Class builds its SQL with L<SQL::Abstract::Classic>, a frozen copy of
+the 1.x line of this module, and does not use SQL::Abstract at all. Changes
+made here therefore do not reach DBIx::Class.
+
+L<DBIO>, a fork of DBIx::Class, does use this module: its SQL maker
+(L<DBIO::SQLMaker>) is built on SQL::Abstract 2.x, and its pretty-printing
+query trace uses L<SQL::Abstract::Tree>.
+
+The C<DBIx::Class::*> modules shipped in this distribution
+(L<DBIx::Class::SQLMaker::Role::SQLA2Passthrough> and
+L<DBIx::Class::Storage::Debug::PrettyPrint>) are optional helpers for
+DBIx::Class users who want SQL::Abstract 2.x features anyway; they need
+DBIx::Class installed and are not loaded otherwise.
+
 =head1 METHODS
 
 The methods are simple. There's one for every major SQL operation,
@@ -2328,6 +2429,32 @@ C<cmp> to C<like> you would get SQL such as:
 You can also override the comparison on an individual basis - see
 the huge section on L</"WHERE CLAUSES"> at the bottom.
 
+=item array_as_in
+
+Off by default. When set to a true value, an arrayref of plain values
+given for a column is rendered with C<IN> instead of a chain of
+equalities joined by C<OR>:
+
+    my $sql = SQL::Abstract->new(array_as_in => 1);
+
+    $sql->where({ id => [1, 2, 3] });
+    # WHERE id IN ( ?, ?, ? )             instead of
+    # WHERE ( id = ? OR id = ? OR id = ? )
+
+    $sql->where({ id => [1, 2, undef] });
+    # WHERE ( id IN ( ?, ? ) OR id IS NULL )
+
+Both forms select the same rows, but some databases (MySQL in
+particular) plan a long C<OR> chain much worse than the equivalent
+C<IN> list.
+
+The rewrite only happens when the result means exactly the same as the
+default expansion, so everything else is left as it is: a single value
+(C<id = ?>), an empty arrayref, an arrayref starting with C<-and>,
+elements that are hashrefs, literal SQL or other unblessed references,
+a L</cmp> other than C<=>, and C<< logic => 'and' >>. An explicit
+C<< { '=' => [ ... ] } >> is not rewritten either.
+
 =item sqltrue, sqlfalse
 
 Expressions for inserting boolean values within SQL statements.
@@ -2342,10 +2469,11 @@ statements in arrays or hashes. If absent, the default logic is "or"
 for arrays, and "and" for hashes. This means that a WHERE
 array of the form:
 
-    @where = (
+    my @where = (
         event_date => {'>=', '2/13/99'},
         event_date => {'<=', '4/24/03'},
     );
+    my ($stmt, @bind) = $sql->where(\@where);
 
 will generate SQL like this:
 
@@ -2363,8 +2491,8 @@ Which will change the above C<WHERE> to:
 The logic can also be changed locally by inserting
 a modifier in front of an arrayref:
 
-    @where = (-and => [event_date => {'>=', '2/13/99'},
-                       event_date => {'<=', '4/24/03'} ]);
+    my @where = (-and => [event_date => {'>=', '2/13/99'},
+                          event_date => {'<=', '4/24/03'} ]);
 
 See the L</"WHERE CLAUSES"> section for explanations.
 
@@ -2473,11 +2601,13 @@ explicitly.
 
 =item name_sep
 
-This is the character that separates a table and column name.  It is
-necessary to specify this when the C<quote_char> option is selected,
-so that tables and column names can be individually quoted like this:
+This is the character that separates a table and column name. With
+C<quote_char> set, each part gets its own quotes:
 
   SELECT `table`.`one_field` FROM `table` WHERE `table`.`other_field` = 1
+
+Defaults to C<.>. Set it to an empty string to quote a dotted name like
+C<table.one_field> as a single identifier.
 
 =item injection_guard
 
@@ -2491,18 +2621,30 @@ injection attacks when mishandling user input e.g.:
 If the expression matches an exception is thrown. Note that literal SQL
 supplied via C<\'...'> or C<\['...']> is B<not> checked in any way.
 
-Defaults to checking for C<;> and the C<GO> keyword (TransactSQL)
+Defaults to checking for C<;> and the C<GO> keyword (TransactSQL).
+
+B<This default is deliberately minimal and is not a general-purpose SQL
+injection filter.> It does not catch parentheses, comment introducers
+(C<-->, C</*>) or most other injection payloads, and by design cannot see
+into literal SQL. Identifiers are B<not> quoted unless you set
+L</quote_char>. The only robust protection is therefore to pass untrusted
+input as B<bind values> (which become C<?> placeholders), never as hash
+B<keys> (column/operator names) or as literal SQL, and to set C<quote_char>
+when identifiers may originate from user input. If your application does
+route untrusted data through identifiers, supply a stricter C<injection_guard>
+of your own.
 
 =item array_datatypes
 
-When this option is true, arrayrefs in INSERT or UPDATE are
-interpreted as array datatypes and are passed directly
-to the DBI layer.
-When this option is false, arrayrefs are interpreted
-as literal SQL, just like refs to arrayrefs
-(but this behavior is for backwards compatibility; when writing
-new queries, use the "reference to arrayref" syntax
-for literal SQL).
+On by default: an arrayref as a column value in INSERT or UPDATE
+(and in C<values>) is one bind value, an array datatype passed
+directly to the DBI layer. Literal SQL is C<\[ $sql, @bind ]>.
+
+C<< array_datatypes => 0 >> restores the behaviour from before
+2.000002: the arrayref is literal SQL, its first element goes into the
+SQL text and the rest become bind values. Do not use it with data that
+can come from outside - a JSON array or a repeated form field turns
+into an arrayref, and its first element ends up in the SQL as-is.
 
 
 =item special_ops
@@ -2629,13 +2771,32 @@ L<insert|/insert($table, \@values || \%fieldvals, \%options)>.
 
 =back
 
-=head2 where(\%where, $order)
+=head2 where($where, $order)
 
 This is used to generate just the WHERE clause. For example,
 if you have an arbitrary data structure and know what the
 rest of your SQL is going to look like, but want an easy way
 to produce a WHERE clause, use this. It returns an SQL WHERE
 clause and list of bind values.
+
+    my ($stmt, @bind) = $sql->where(\%where);           # conditions ANDed
+    my ($stmt, @bind) = $sql->where(\@where);           # conditions ORed
+    my ($stmt, @bind) = $sql->where(\%where, \@order);  # plus ORDER BY
+
+=over
+
+=item $where
+
+The WHERE part, most often a hashref, but can also be an arrayref or
+a plain scalar -- see section L<WHERE clause|/"WHERE CLAUSES"> for
+details.
+
+=item $order
+
+Optional ORDER BY part, a scalar, a hashref or an arrayref -- see
+section L<ORDER BY clause|/"ORDER BY CLAUSES"> for details.
+
+=back
 
 
 =head2 values(\%data)
@@ -2730,7 +2891,7 @@ or perhaps even
 
 If you fall victim to the above - please attempt to reduce the problem
 to something that could be sent to the L<SQL::Abstract developers
-|DBIx::Class/GETTING HELP/SUPPORT>
+|/SUPPORT>
 (either publicly or privately). As a workaround in the meantime you can
 set C<$ENV{SQLA_ISVALUE_IGNORE_AUTOGENERATED_STRINGIFICATION}> to a true
 value, which will most likely eliminate your problem (at the expense of
@@ -2776,8 +2937,12 @@ each C<%where> hash shown, it is assumed you used:
 
     my($stmt, @bind) = $sql->where(\%where);
 
-However, note that the C<%where> hash can be used directly in any
-of the other functions as well, as described above.
+and after each C<@where> array, likewise:
+
+    my($stmt, @bind) = $sql->where(\@where);
+
+However, note that the C<%where> hash or C<@where> array can be used
+directly in any of the other functions as well, as described above.
 
 =head2 Key-value pairs
 
@@ -2875,7 +3040,7 @@ into an C<AND> of its elements:
 
 To get an OR instead, you can combine it with the arrayref idea:
 
-    my %where => (
+    my %where = (
          user => 'nwiger',
          priority => [ { '=', 2 }, { '>', 5 } ]
     );
@@ -2961,6 +3126,18 @@ the same way.
 If the argument to C<-in> is an empty array, 'sqlfalse' is generated
 (by default: C<1=0>). Similarly, C<< -not_in => [] >> generates
 'sqltrue' (by default: C<1=1>).
+
+An C<undef> element stands for C<NULL>, which C<IN> can never match, so
+it is turned into a separate C<IS NULL> test:
+
+    status => { -in     => [ 'a', 'b', undef ] }
+    # ( status IN ( ?, ? ) OR status IS NULL )
+
+    status => { -not_in => [ 'a', 'b', undef ] }
+    # ( status NOT IN ( ?, ? ) AND status IS NOT NULL )
+
+(Older versions died on such a list with an
+C<!!!AUDIT YOUR CODE AND DATA!!!> exception.)
 
 In addition to the array you can supply a chunk of literal sql or
 literal sql with bind:
@@ -3081,9 +3258,9 @@ hashes and then putting those hashes in an array. For example:
 
 This data structure would create the following:
 
-    $stmt = "WHERE ( user = ? AND ( status LIKE ? OR status LIKE ? ) )
-                OR ( user = ? AND status = ? ) )";
-    @bind = ('nwiger', 'pending', 'dispatched', 'robot', 'unassigned');
+    $stmt = "WHERE ( ( status LIKE ? OR status LIKE ? ) AND user = ? )
+                OR ( status = ? AND user = ? )";
+    @bind = ('pending%', 'dispatched', 'nwiger', 'unassigned', 'robot');
 
 
 Clauses in hashrefs or arrayrefs can be prefixed with an C<-and> or C<-or>
@@ -3231,7 +3408,7 @@ not so common, but perfectly legal Perl). For example, to find a date
 in Postgres you can use something like this:
 
     my %where = (
-       date_column => \[ "= date '2008-09-30' - ?::integer", 10 ]
+       date_column => { '=' => \[ "date '2008-09-30' - ?::integer", 10 ] }
     )
 
 This would create:
@@ -3240,7 +3417,7 @@ This would create:
     @bind = ('10');
 
 Note that you must pass the bind values in the same format as they are returned
-by L<where|/where(\%where, $order)>. This means that if you set L</bindtype>
+by L<where|/where($where, $order)>. This means that if you set L</bindtype>
 to C<columns>, you must provide the bind values in the
 C<< [ column_meta => value ] >> format, where C<column_meta> is an opaque
 scalar value; most commonly the column name, but you can use any scalar value
@@ -3249,8 +3426,13 @@ pass it through intact. So if C<bindtype> is set to C<columns> the above
 example will look like:
 
     my %where = (
-       date_column => \[ "= date '2008-09-30' - ?::integer", [ {} => 10 ] ]
+       date_column => { '=' => \[ "date '2008-09-30' - ?::integer", [ {} => 10 ] ] }
     )
+
+You may also see the operator written inside the literal, as in
+C<< date_column => \[ "= date '2008-09-30' - ?::integer", 10 ] >>. That
+still works and produces the same SQL, but keeping the operator outside
+makes it clear what the literal is compared with.
 
 Literal SQL is especially useful for nesting parenthesized clauses in the
 main SQL query. Here is a first example:
@@ -3259,26 +3441,27 @@ main SQL query. Here is a first example:
                                100, "foo%");
   my %where = (
     foo => 1234,
-    bar => \["IN ($sub_stmt)" => @sub_bind],
+    bar => { -in => \[ $sub_stmt, @sub_bind ] },
   );
 
 This yields:
 
-  $stmt = "WHERE (foo = ? AND bar IN (SELECT c1 FROM t1
-                                             WHERE c2 < ? AND c3 LIKE ?))";
-  @bind = (1234, 100, "foo%");
+  $stmt = "WHERE (bar IN (SELECT c1 FROM t1 WHERE c2 < ? AND c3 LIKE ?)
+                  AND foo = ?)";
+  @bind = (100, "foo%", 1234);
 
-Other subquery operators, like for example C<"E<gt> ALL"> or C<"NOT IN">,
-are expressed in the same way. Of course the C<$sub_stmt> and
-its associated bind values can be generated through a former call
-to C<select()> :
+Other subquery operators are expressed in the same way, for example
+C<< bar => { -not_in => \[ $sub_stmt, @sub_bind ] } >>, or
+C<< bar => { '>' => \[ "ALL ($sub_stmt)", @sub_bind ] } >> for
+C<"E<gt> ALL">. Of course the C<$sub_stmt> and its associated bind
+values can be generated through a former call to C<select()> :
 
   my ($sub_stmt, @sub_bind)
      = $sql->select("t1", "c1", {c2 => {"<" => 100},
                                  c3 => {-like => "foo%"}});
   my %where = (
     foo => 1234,
-    bar => \["> ALL ($sub_stmt)" => @sub_bind],
+    bar => { '>' => \[ "ALL ($sub_stmt)", @sub_bind ] },
   );
 
 In the examples above, the subquery was used as an operator on a column;
@@ -3286,7 +3469,7 @@ but the same principle also applies for a clause within the main C<%where>
 hash, like an EXISTS subquery:
 
   my ($sub_stmt, @sub_bind)
-     = $sql->select("t1", "*", {c1 => 1, c2 => \"> t0.c0"});
+     = $sql->select("t1", "*", {c1 => 1, c2 => { '>' => { -ident => 't0.c0' } }});
   my %where = ( -and => [
     foo   => 1234,
     \["EXISTS ($sub_stmt)" => @sub_bind],
@@ -3301,7 +3484,7 @@ which yields
 
 Observe that the condition on C<c2> in the subquery refers to
 column C<t0.c0> of the main query: this is I<not> a bind
-value, so we have to express it through a scalar ref.
+value, so we have to mark it as an identifier with L</-ident>.
 Writing C<< c2 => {">" => "t0.c0"} >> would have generated
 C<< c2 > ? >> with bind value C<"t0.c0"> ... not exactly
 what we wanted here.
@@ -3413,7 +3596,45 @@ forms. Examples:
       \'colE DESC',               |     colE DESC,
       \[ 'FUNC(colF, ?)', $x ],   |     FUNC(colF, ?)
     ]                             |   /* ...with $x bound to ? */
+                                  |
+    { -asc => 'colA',             | ORDER BY colA ASC NULLS FIRST
+      -nulls => 'first' }         |
+                                  |
+    { -desc => [qw/colA colB/],   | ORDER BY colA DESC NULLS LAST,
+      -nulls => 'last' }          |          colB DESC NULLS LAST
     ===============================================================
+
+The C<-nulls> key (C<first> or C<last>) adds C<NULLS FIRST> or
+C<NULLS LAST> to every column of its C<-asc> / C<-desc> hash, and needs
+exactly one of the two next to it. Not every database knows this syntax
+(PostgreSQL, Oracle and SQLite 3.30+ do, MySQL does not).
+
+=head2 CAVEAT: untrusted input in ORDER BY
+
+Everything in an order by clause is an identifier or literal SQL, never a
+bind value - a placeholder can only stand for a value, not for a column to
+sort by. Without L</quote_char> the column names go into the statement
+exactly as given, so passing a user-supplied sort column straight through is
+an SQL injection:
+
+    $sql->select('users', '*', { id => 1 }, [ $cgi->param('sort') ]);
+    # sort = "1, (SELECT password FROM users LIMIT 1)"
+    # ... ORDER BY 1, (SELECT password FROM users LIMIT 1)
+
+The safe way is to map the request onto a fixed list of columns you allow:
+
+    my %sortable = (name => 'name', created => 'created_at');
+    my $col = $sortable{ $cgi->param('sort') } || 'name';
+    my $dir = $cgi->param('desc') ? '-desc' : '-asc';
+    $sql->select('users', '*', { id => 1 }, { $dir => $col });
+
+Setting L</quote_char> also helps: every name is then quoted (with
+embedded quote characters doubled), so the input above becomes one odd,
+non-existent column name instead of a subquery. It does not stop a user
+from sorting by any existing column, though, so keep the allow-list for
+anything that comes from outside. The default L</injection_guard> does
+check unquoted order by columns, but it only rejects C<;> and C<GO>, so it
+lets the example above through.
 
 
 
@@ -3503,6 +3724,15 @@ of the MATCH .. AGAINST syntax for MySQL
 
   ]);
 
+which is then used like any other operator:
+
+  my ($stmt, @bind) = $sqlmaker->where({
+    field => { match => [ 'word1', 'word2', 'word3' ] },
+  });
+
+  # $stmt = "WHERE MATCH (field) AGAINST (?, ?, ?)"
+  # @bind = ('word1', 'word2', 'word3')
+
 
 =head2 UNARY OPERATORS
 
@@ -3537,7 +3767,7 @@ the regular expression to match the operator
 =item handler
 
 Either a coderef or a plain scalar method name. In both cases
-the expected return is C<< $sql >>.
+the expected return is C<< ($sql, @bind) >>.
 
 When supplied with a method name, it is simply called on the
 L<SQL::Abstract> object as:
@@ -3555,6 +3785,24 @@ When supplied with a coderef, it is called as:
 
 
 =back
+
+For example, a C<SOUNDEX> operator:
+
+  my $sqlmaker = SQL::Abstract->new(unary_ops => [
+    {regex => qr/^soundex$/i,
+     handler => sub {
+       my ($self, $op, $arg) = @_;
+       my ($placeholder) = $self->_convert('?');
+       return ($self->_sqlcase('soundex') . "($placeholder)",
+               $self->_bindtype($op, $arg));
+     }
+    },
+  ]);
+
+  my ($stmt, @bind) = $sqlmaker->where({ name => { soundex => 'Robert' } });
+
+  # $stmt = "WHERE name = SOUNDEX(?)"
+  # @bind = ('Robert')
 
 =head1 NEW METHODS (EXPERIMENTAL)
 
@@ -3806,24 +4054,11 @@ apps in under 50 lines.
 Contributions are always welcome, in all usable forms (we especially
 welcome documentation improvements). The delivery methods include git-
 or unified-diff formatted patches, GitHub pull requests, or plain bug
-reports either via RT or the Mailing list. Contributors are generally
-granted full access to the official repository after their first several
-patches pass successful review.
+reports via RT. For discussion, find us on IRC in C<#dbio> on
+C<irc.perl.org>.
 
-This project is maintained in a git repository. The code and related tools are
-accessible at the following locations:
-
-=over
-
-=item * Official repo: L<git://git.shadowcat.co.uk/dbsrgits/SQL-Abstract.git>
-
-=item * Official gitweb: L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/SQL-Abstract.git>
-
-=item * GitHub mirror: L<https://github.com/dbsrgits/sql-abstract>
-
-=item * Authorized committers: L<ssh://dbsrgits@git.shadowcat.co.uk/SQL-Abstract.git>
-
-=back
+This project is maintained in a git repository at
+L<https://github.com/dbsrgits/sql-abstract>.
 
 =head1 CHANGES
 
@@ -3892,7 +4127,7 @@ this module. Unfortunately, most of them submitted bugs via CPAN
 so I have no idea who they are! But the people I do know are:
 
     Ash Berlin (order_by hash term support)
-    Matt Trout (DBIx::Class support)
+    Matt S Trout (DBIx::Class support, long-time maintainer)
     Mark Stosberg (benchmarking)
     Chas Owens (initial "IN" operator support)
     Philip Collins (per-field SQL functions)
@@ -3909,18 +4144,26 @@ Thanks!
 
 =head1 SEE ALSO
 
-L<DBIx::Class>, L<DBIx::Abstract>, L<CGI::FormBuilder>, L<HTML::QuickTable>.
+L<DBIO>, L<SQL::Abstract::Classic>, L<DBIx::Class>, L<DBIx::Abstract>,
+L<CGI::FormBuilder>, L<HTML::QuickTable>.
 
 =head1 AUTHOR
 
-Copyright (c) 2001-2007 Nathan Wiger <nwiger@cpan.org>. All Rights Reserved.
+Originally written by Nathan Wiger <nwiger@gmail.com> (2001-2007).
 
-This module is actively maintained by Matt Trout <mst@shadowcatsystems.co.uk>
+=head1 SUPPORT
 
-For support, your best bet is to try the C<DBIx::Class> users mailing list.
-While not an official support venue, C<DBIx::Class> makes heavy use of
-C<SQL::Abstract>, and as such list members there are very familiar with
-how to create queries.
+Maintainer: Torsten Raudssus <torsten@raudssus.de>
+
+IRC: join C<#dbio> on C<irc.perl.org>
+(L<irc://irc.perl.org/#dbio>).
+
+Bugs: L<https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2026 Nathan Wiger and the SQL::Abstract contributors
+(see L</ACKNOWLEDGEMENTS> and the git history).
 
 =head1 LICENSE
 

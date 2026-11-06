@@ -1,4 +1,4 @@
-Proc-Spawner version 0.02 (EXPERIMENTAL)
+Proc-Spawner version 0.06 (EXPERIMENTAL)
 ========================================
 
 Compiles and runs shell one-liners (or portable shell scripts) from Perl
@@ -15,8 +15,45 @@ to descendants.)
   Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large
                          parsers of three sizes of the shell language
 
+HOW CLOSE TO DASH AND BASH (0.06; doc/large-subset/large-subset-state.md)
+
+Of 41,952 shell strings from six public collections (tldr, NL2Bash,
+ShellCheck's tests, the bash Cookbook, the pure sh and bash bibles), the
+large parser accepts 40,410.  The rest are mostly bash-only syntax, which the
+subset rejects on purpose; 44 are forms both shells run alike, the work list
+(section 4).  Each accepted string was then run by dash, by bash --posix and
+by Proc::ShellSpawn, isolated, with every program but the plain text tools
+replaced by a recorder of its arguments (section 7; the limits: known issue
+X27):
+
+                       run   same   only the    dash and bash  dash and bash
+                                    messages    agree, ours    differ
+                                    differ      differs
+  coreutils involved  1,344    892     313            5            131
+  no coreutils       39,066 14,859  23,083            2          1,108
+  all                40,410 15,751  23,396            7          1,239
+  (and 17 strings that never end, or not in ours: section 7)
+
+"Coreutils involved": the string calls echo, printf, test, [, kill or pwd,
+which the subset runs as programs where the shells have builtins.  "Only the
+messages differ" is mostly dash's "x: not found" against bash's "x: command
+not found".  Where dash and bash differ, the subset follows dash in 971,
+bash in 98, and neither in 170 (mostly $0, dates, random data).  The 7
+where ours differs: printf -v (2, decided), printf '%0.s' (1, open), echo
+into a broken pipe in a subshell (1), and 3 that depend on chance.
+
+For the programs alone, each call the strings make was also run as dash's
+builtin, as bash's builtin and as the program: of 757 calls (1,268 uses),
+620 (1,107) agree, 42 (46) differ in messages only, and 95 (115) differ:
+mostly echo -e and backslashes (dash's builtin against bash and the
+program), unary -a -o -v in [ ] (bash's builtin against dash and the
+program), and kill with a word that is no process ID (dash against bash and
+the program).  Section 7 has them all, with the decisions taken so far.
+
 Tested on Linux with glibc 2.39 (also built as if some or all of the
-extensions were missing: PROC_SPAWNER_WITHOUT="PIDFD_SPAWN ..." perl Makefile.PL).  Parts that flip process-wide
+extensions were missing: PROC_SPAWNER_WITHOUT="PIDFD_SPAWN ..." perl Makefile.PL),
+and with /proc hidden, as on FreeBSD (RT #182479; FreeBSD itself is not tested
+here): without /proc, t/graph.t and two batteries of t/dash.t are skipped.  Parts that flip process-wide
 state for a while (umask, signal actions) are bullet-proof only in
 non-threaded execution.
 
@@ -39,7 +76,7 @@ option the libc lacks fails with ENOTSUP, or is dropped, as
 or later); without it t/dash.t is skipped.
 
 Tests: t/spawner.t (Proc::Spawner and the graph), t/graph.t (hand-written
-graphs), t/parsers.t (1,092 strings through the parsers), and t/dash.t
+graphs), t/parsers.t (1,117 strings through the parsers), and t/dash.t
 (every battery string run by dash and by the shell layer; skipped without
 dash; t/dash-known.txt lists the known differences).  Their fixtures are
 in t/: t/batteries/, t/parser/, t/sgraph/, t/try.pl (runs one string: perl t/try.pl 'STRING').

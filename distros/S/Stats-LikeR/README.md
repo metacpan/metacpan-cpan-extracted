@@ -5,7 +5,7 @@
     my $patients = read_table('patients.csv');    # array of hashes, one per row
     summary($patients);                            # R's summary(), one row per column
 
-    my @sbp = map { $_->{sbp} } @$patients;
+    my @sbp = avals($patients, 'sbp'); # avals -> array values
     printf "mean SBP %.1f (sd %.1f)\n", mean(\@sbp), sd(\@sbp);
 
     my %by_arm = (drug => [], placebo => []);

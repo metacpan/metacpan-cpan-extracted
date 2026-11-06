@@ -114,9 +114,10 @@ use common::sense;
 
 use Getopt::Long ();
 use Text::ParseWords ();
-use AnyEvent::MCP ();
-use JSON::XS ();
 use File::Temp ();
+use JSON::XS ();
+
+use AnyEvent::MCP ();
 use AnyEvent::MCP::Permissions::Ask ();
 use AnyEvent::MCP::Server::Permissions ();
 
@@ -233,7 +234,7 @@ sub edit_rules {
 
    my $permissions = AnyEvent::MCP::Server::Permissions->new;
    $permissions->{file} = $file;
-   my $lock = $permissions->_lock; # Ensure the file exists and is private.
+   my $lock = $permissions->_lock; # ensure the file exists and is private.
    close $lock or die "Cannot unlock permission rules: $!\n";
 
    for my $choice (grep { defined && /\S/ } @ENV{qw(VISUAL EDITOR)}, "sensible-editor", "vi") {

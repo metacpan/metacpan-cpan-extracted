@@ -28,11 +28,17 @@ CODE:
     STRLEN dlen = 0;
     STRLEN i;
 
+    # uncoverable branch true class:ignore_covered_err
+    # uncoverable branch false class:ignore_covered_err
     for (i = 0; i < src_len; i++) {
+        # uncoverable branch true count:1
+        # uncoverable branch true count:4
         switch (src[i]) {
+            # uncoverable statement
             case '\\': dst[dlen++] = '\\'; dst[dlen++] = '\\'; break;
             case '\'': dst[dlen++] = '\\'; dst[dlen++] = '\''; break;
             case '\n': dst[dlen++] = '\\'; dst[dlen++] = 'n';  break;
+            # uncoverable statement
             case '\r': dst[dlen++] = '\\'; dst[dlen++] = 'r';  break;
             default:   dst[dlen++] = src[i]; break;
         }

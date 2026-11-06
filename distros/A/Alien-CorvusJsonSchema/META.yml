@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/corvus-dotnet/Corvus.JsonSchema/issues
   homepage: https://corvus-oss.org/Corvus.JsonSchema/
   repository: https://github.com/corvus-dotnet/Corvus.JsonSchema.git
-version: v0.1.1
+version: v0.1.2
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.88'
   requires:

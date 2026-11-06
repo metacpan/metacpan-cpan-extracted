@@ -17,82 +17,85 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Capture::Tiny" : "0.06",
-            "Config::AutoConf" : "0.320",
-            "Cwd" : "0",
-            "ExtUtils::CBuilder" : "0.27",
-            "ExtUtils::LibBuilder" : "0.02",
-            "File::Copy" : "0",
-            "Module::Build" : "0.3603"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Config::AutoConf" : "0.16",
-            "ExtUtils::LibBuilder" : "0.09",
-            "Module::Build" : "0.36"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
             "Encode" : "0",
             "Scalar::Util" : "1.42",
-            "Unicode::Normalize" : "0"
+            "Unicode::Normalize" : "0",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.06",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Text::BibTeX" : {
          "file" : "lib/Text/BibTeX.pm",
-         "version" : "0.91"
+         "version" : "1.00"
       },
       "Text::BibTeX::BibEntry" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::BibFormat" : {
          "file" : "lib/Text/BibTeX/BibFormat.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::BibSort" : {
          "file" : "lib/Text/BibTeX/BibSort.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::BibStructure" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::Entry" : {
          "file" : "lib/Text/BibTeX/Entry.pm",
-         "version" : "0.88"
+         "version" : "1.00"
+      },
+      "Text::BibTeX::Error" : {
+         "file" : "lib/Text/BibTeX/Error.pm",
+         "version" : "1.00"
       },
       "Text::BibTeX::File" : {
          "file" : "lib/Text/BibTeX/File.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::Name" : {
          "file" : "lib/Text/BibTeX/Name.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::NameFormat" : {
          "file" : "lib/Text/BibTeX/NameFormat.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::SimpleValue" : {
          "file" : "lib/Text/BibTeX/Value.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::Structure" : {
          "file" : "lib/Text/BibTeX/Structure.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::StructuredEntry" : {
          "file" : "lib/Text/BibTeX/Structure.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       },
       "Text::BibTeX::Value" : {
          "file" : "lib/Text/BibTeX/Value.pm",
-         "version" : "0.88"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -104,6 +107,6 @@
          "url" : "http://github.com/ambs/Text-BibTeX"
       }
    },
-   "version" : "0.91",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

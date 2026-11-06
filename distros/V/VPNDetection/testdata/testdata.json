@@ -814,10 +814,24 @@
     },
     {
       "name": "plan-quota-is-not-retryable",
+      "why": "No Retry-After. A free key's monthly allowance is spent, and upgrading, not retrying, is what helps.",
       "status": 429,
       "headers": {},
       "body": {
-        "error": "request allowance exceeded; raise or remove your overage limit"
+        "error": "monthly request allowance spent; upgrade your plan for more lookups"
+      },
+      "expect": {
+        "kind": "quota_exceeded",
+        "retryable": false
+      }
+    },
+    {
+      "name": "overage-cap-is-not-retryable",
+      "why": "No Retry-After. A paid key has reached its overage cap, and raising the cap in Billing, not retrying, is what helps.",
+      "status": 429,
+      "headers": {},
+      "body": {
+        "error": "overage cap reached; raise or remove it in Billing"
       },
       "expect": {
         "kind": "quota_exceeded",

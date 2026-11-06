@@ -7,12 +7,36 @@ from the the Encoder and Decoder changelogs:
    * https://github.com/Sereal/Sereal/blob/master/Perl/Encoder/Changes
 
 ****************************************************************
-* Sereal 6 is a major release. For a site-wide rollout, upgrade *
-* Sereal::Decoder to version 6 on every node first. Verify the   *
-* Decoder rollout is complete before upgrading Sereal::Encoder  *
-* to version 6 anywhere in the fleet. Encoder 6 can emit v6     *
-* packets, which require Decoder 6 to read.                     *
+* Sereal 7 is a major release. Developers concerned with       *
+* security or portability should upgrade as soon as possible.  *
+*                                                              *
+* Upgrade Sereal::Decoder to version 7 on every reader FIRST.  *
+* Verify that rollout is complete before upgrading             *
+* Sereal::Encoder to version 7 on any writer. V7 packets       *
+* require a version 7 Decoder.                                 *
 ****************************************************************
+
+7.001
+    * Roll up the v6 features and portability fixes with protocol v7.
+      Upgrade Decoder to version 7 throughout the fleet before emitting
+      v7 packets.
+    * Use portable little-endian IEEE floating-point storage by default,
+      including IEEE binary128 for extended values. Offer explicit
+      native long-double storage with reader compatibility checks and
+      optional same-build trust for unidentified layouts.
+    * Include protocol v6 v-string and negative-integer support, keyed
+      SipHash checksums, checksum keys, modes, policies, defaults and
+      helper functions. Preserve regexp modifiers, including /n and /xx.
+    * Preserve protocol v1-v6 numeric wire behavior and support a known
+      source byte order when decoding legacy floats.
+    * Include callback lifetime, older-Perl, Perl 5.24, 32-bit, Haiku
+      and BusyBox fixes. Extend stored corpus coverage with Fedora s390x
+      producer captures; thanks to pghmcfc for the report and corpus
+      (issue #337).
+    * Ship the shared SECURITY policy and improve the protocol
+      specification and security, checksum and floating-point
+      documentation.
+
 6.003
     * Fix Encoder and Decoder builds on Haiku.
     * Fix hobodecoder compatibility with BusyBox od and checksum test

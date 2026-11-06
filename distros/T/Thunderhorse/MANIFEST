@@ -51,6 +51,7 @@ lib/Thunderhorse/Router/Location.pm
 lib/Thunderhorse/Router/SpecializedCache.pm
 lib/Thunderhorse/SSE.pm
 lib/Thunderhorse/WebSocket.pm
+t/author-leaks.t
 t/author-pod-links.t
 t/author-pod-syntax.t
 t/autoloadable.t

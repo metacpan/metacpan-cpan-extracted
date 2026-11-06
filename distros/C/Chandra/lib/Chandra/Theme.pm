@@ -3,7 +3,7 @@ package Chandra::Theme;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Chandra;
 
@@ -380,6 +380,26 @@ All tokens are available as C<--chandra-*> CSS variables:
     --chandra-hover, --chandra-selected, --chandra-shadow,
     --chandra-font, --chandra-font-mono,
     --chandra-radius, --chandra-font-size, --chandra-line-height
+
+=head1 METHODS
+
+=over 4
+
+=item C<apply($app, $theme)>
+
+Adds the theme's css to the app. C<$theme> is C<light>, C<dark>, C<auto>
+(light with a dark media block) or a hash of variables merged over light.
+An unknown name warns and applies light. Returns the app.
+
+=item C<themes>
+
+The names of the built-in themes.
+
+=item C<get($name)>
+
+A copy of a built-in theme's variables, or undef.
+
+=back
 
 =head1 SEE ALSO
 

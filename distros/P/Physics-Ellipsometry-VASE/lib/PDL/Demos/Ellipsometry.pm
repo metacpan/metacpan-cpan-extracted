@@ -5,7 +5,7 @@ use warnings;
 use PDL;
 use Physics::Ellipsometry::VASE;
 
-sub info {('ellipsometry', 'Spectroscopic ellipsometry analysis with Physics::Ellipsometry::VASE (Req.: PDL::Graphics::Simple)')}
+sub info {('ellipsometry', 'Spectroscopic ellipsometry (Req: P:G:Simple)')}
 
 # Locate data files shipped alongside this module
 sub _data_dir {
@@ -89,10 +89,7 @@ my @demo = (
 
   sub linear_model {
       my ($params, $x) = @_;
-      my $a = $params->slice("(0)");
-      my $b = $params->slice("(1)");
-      my $c = $params->slice("(2)");
-      my $d = $params->slice("(3)");
+      my ($a, $b, $c, $d) = $params->using(0..3);
       my $wl  = $x->slice(",(0)")->flat;             # wavelength column
       my $psi = $a - $b * $wl;
       my $del = $c + $d * $wl;
@@ -181,10 +178,8 @@ my @demo = (
   # Compute Psi & Delta via Fresnel equations for a single film on substrate
   sub fresnel_cauchy {
       my ($par, $x) = @_;
-      my $A  = $par->slice("(0)");
-      my $B  = $par->slice("(1)") * 1e4;   # rescale B
-      my $n2 = $par->slice("(2)");          # substrate index
-      my $d  = $par->slice("(3)");          # thickness (nm)
+      my ($A, $B, $n2, $d) = $par->using(0..3); # n2 = substrate index, d = thickness (nm)
+      $B = $B * 1e4; # rescale B
       my $n0 = 1.0;                         # ambient (air)
 
       my $lam    = $x->slice(",(0)")->flat;
@@ -625,7 +620,7 @@ B<Step 3: Define and fit a linear model>
 
     sub linear_model {
         my ($params, $x) = @_;
-        my ($a, $b, $c, $d) = map { $params->slice("($_)") } 0..3;
+        my ($a, $b, $c, $d) = $params->using(0..3);
         my $wl  = $x->slice(",(0)")->flat;
         my $psi = $a - $b * $wl;
         my $del = $c + $d * $wl;

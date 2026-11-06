@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.10.3 - 2026-11-05
+
+### Fixes
+
+- End a device poll once its wait runs to the deadline, NaN included ([`b0cc83c`](https://github.com/vpndetection-io/sdk-perl/commit/b0cc83c739abadc89ffca096ce6b458fbc17333d))
+
 ## 3.10.2 - 2026-11-01
 
 ### Fixes

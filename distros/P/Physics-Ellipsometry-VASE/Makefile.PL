@@ -22,6 +22,7 @@ WriteMakefile(
         'PDL'            => '2.0',
         'PDL::Fit::LM'  => 0,
         'PDL::NiceSlice' => 0,
+        'Scalar::Util'   => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -46,6 +47,8 @@ WriteMakefile(
             '$(INST_LIB)/Physics/Ellipsometry/VASE.pm',
         'lib/Physics/Ellipsometry/VASE/TMM.pm' =>
             '$(INST_LIB)/Physics/Ellipsometry/VASE/TMM.pm',
+        'lib/Physics/Ellipsometry/VASE/Anisotropy.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Anisotropy.pm',
         'lib/Physics/Ellipsometry/VASE/Dispersion.pm' =>
             '$(INST_LIB)/Physics/Ellipsometry/VASE/Dispersion.pm',
         'lib/Physics/Ellipsometry/VASE/EMA.pm' =>
@@ -56,6 +59,10 @@ WriteMakefile(
             '$(INST_LIB)/Physics/Ellipsometry/VASE/Parameter.pm',
         'lib/Physics/Ellipsometry/VASE/Optimizer.pm' =>
             '$(INST_LIB)/Physics/Ellipsometry/VASE/Optimizer.pm',
+        'lib/Physics/Ellipsometry/VASE/MagnetoOptic.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/MagnetoOptic.pm',
+        'lib/Physics/Ellipsometry/VASE/Temperature.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Temperature.pm',
         'lib/PDL/Demos/Ellipsometry.pm' =>
             '$(INST_LIB)/PDL/Demos/Ellipsometry.pm',
         'lib/PDL/Demos/demo_wafer.dat' =>

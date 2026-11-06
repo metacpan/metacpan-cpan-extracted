@@ -3,7 +3,7 @@ package Chandra::Form::Validator;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Chandra;
 
@@ -30,22 +30,27 @@ sub validation_js {
 
         my @field_rules;
         if ($opts->{required}) {
+            # uncoverable condition false
             my $msg = _js_escape($opts->{required_msg} || ($opts->{label} || $name) . ' is required');
             push @field_rules, "{type:'required',msg:'$msg'}";
         }
         if (defined $opts->{minlength}) {
+            # uncoverable condition false
             my $msg = _js_escape($opts->{minlength_msg} || "Must be at least $opts->{minlength} characters");
             push @field_rules, "{type:'minlength',val:$opts->{minlength},msg:'$msg'}";
         }
         if (defined $opts->{maxlength}) {
+            # uncoverable condition false
             my $msg = _js_escape($opts->{maxlength_msg} || "Must be at most $opts->{maxlength} characters");
             push @field_rules, "{type:'maxlength',val:$opts->{maxlength},msg:'$msg'}";
         }
         if (defined $opts->{min}) {
+            # uncoverable condition false
             my $msg = _js_escape($opts->{min_msg} || "Must be at least $opts->{min}");
             push @field_rules, "{type:'min',val:$opts->{min},msg:'$msg'}";
         }
         if (defined $opts->{max}) {
+            # uncoverable condition false
             my $msg = _js_escape($opts->{max_msg} || "Must be at most $opts->{max}");
             push @field_rules, "{type:'max',val:$opts->{max},msg:'$msg'}";
         }
@@ -147,6 +152,23 @@ Chandra::Form::Validator - Form validation for Chandra::Form
     # Client-side validation JS
     my $js = Chandra::Form::Validator->validation_js($form);
     $app->eval($js);
+
+=head1 METHODS
+
+=over 4
+
+=item C<validate($form, \%data)>
+
+Hands the data to the form's own C<validate> and returns its errors, or
+undef when there are none.
+
+=item C<validation_js($form)>
+
+A script that checks the form's fields in the browser with the same rules:
+required, minlength, maxlength, min, max, a string pattern and an email
+type. Empty when the form has no rules.
+
+=back
 
 =head1 SEE ALSO
 

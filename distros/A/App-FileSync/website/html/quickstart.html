@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick start &mdash; App::FileSync</title>
+<meta name="description" content="Set up a server root, register a client, run the first sync, and put it in cron or the Windows Task Scheduler.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="quickstart.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Quick start &mdash; App::FileSync">
+<meta property="og:description" content="Set up a server root, register a client, run the first sync, and put it in cron or the Windows Task Scheduler.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html" aria-current="page">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Quick start</h1>
+
+	<p class="lede">Two machines are involved: the server, which holds the master,
+	and each client, which holds a copy. Install App::FileSync on both &mdash;
+	<code>filesync-admin</code> and <code>filesync-server</code> run on the server,
+	<code>filesync</code> on the clients.</p>
+
+	<div class="toc">
+		<p>On this page</p>
+		<ul>
+			<li><a href="#server">On the server</a></li>
+			<li><a href="#wrapper">The server-command wrapper</a></li>
+			<li><a href="#client">On each client</a></li>
+			<li><a href="#first">The first sync</a></li>
+			<li><a href="#cron">From cron</a></li>
+			<li><a href="#checking">Checking what happened</a></li>
+			<li><a href="#windows">On Windows</a></li>
+			<li><a href="#srv">A root of /srv/filesync instead</a></li>
+			<li><a href="#backup">Backup and restore</a></li>
+		</ul>
+	</div>
+
+	<h2 id="server">On the server</h2>
+
+	<p>Create the repo as the account the clients log in to. A session over ssh
+	carries only the repo, the client id and the role, so the client never tells
+	the server which root to use: name the same <code>--root</code> on every
+	server command.</p>
+
+<pre><code># on the server, once
+filesync-admin --root ~/filesync repo create documents
+filesync-admin --root ~/filesync client allow laptop --repo documents</code></pre>
+
+	<p><code>repo create</code> makes the master directory and the metadata beside
+	it, printing both paths. <code>client allow</code> is optional, because a repo
+	with no clients admits every client; it takes the client's id, which is the
+	host name unless <code>--id</code> was given.</p>
+
+	<p>The example keeps the master in the server account's home directory, so
+	nothing has to run as root. <code>/srv/filesync</code> is the built-in default
+	root; see <a href="#srv">a root of /srv/filesync instead</a> if you prefer it.</p>
+
+	<h2 id="wrapper">The server-command wrapper</h2>
+
+	<p>The server also needs <code>--root</code> when <code>filesync-server</code>
+	starts, and the client cannot pass one, so wrap it:</p>
+
+<pre><code># on the server, once
+cat &gt; ~/bin/filesync-server-home &lt;&lt;'EOF'
+#!/bin/sh
+exec /usr/local/bin/filesync-server --root "$HOME/filesync" "$@"
+EOF
+chmod +x ~/bin/filesync-server-home</code></pre>
+
+	<p>Use the path <code>filesync-server</code> was actually installed to, which
+	<code>ssh srv 'command -v filesync-server'</code> shows: a non-interactive ssh
+	command can see a shorter <code>PATH</code> than an interactive login
+	shell.</p>
+
+	<h2 id="client">On each client</h2>
+
+	<p>Register the directory and name the wrapper as the server program:</p>
+
+<pre><code># on the client, once
+filesync init --repo documents --root /home/foo/Documents \
+        --server foo@srv \
+        --server-command /home/foo/bin/filesync-server-home</code></pre>
+
+	<p>Nothing else needs naming: the client reports its host name, which is the id
+	<code>client allow</code> lists and the name the server keeps this client's
+	base, its journal entries and its conflict copies under. Pass <code>--id</code>
+	only when the host name is not the name you want, and allow that name on the
+	server instead. An id is not a login &mdash; the ssh key and the account do the
+	authenticating &mdash; and it does not divide the repo: every client of a repo
+	syncs the whole tree.</p>
+
+	<div class="callout">
+		<p>ssh runs with <code>BatchMode=yes</code>, so the client's key must already
+		be in the server account's <code>authorized_keys</code>, or loaded in
+		<code>ssh-agent</code>: cron cannot answer a password prompt.</p>
+	</div>
+
+	<h2 id="first">The first sync</h2>
+
+	<p>Look before you leap. <code>--dry-run</code> prints the actions the session
+	would take without changing either side.</p>
+
+<pre><code>filesync sync --repo documents --dry-run
+filesync sync --repo documents</code></pre>
+
+	<p>Each run reports what moved and how much of it crossed the wire:</p>
+
+<pre><code>documents: pulled 0, pushed 3, deleted 0, conflicts 0
+  transfer: sent 148.2 KiB, received 0 B, 1 file by delta</code></pre>
+
+	<h2 id="cron">From cron</h2>
+
+<pre><code># crontab -e, on each client
+* * * * * ionice -c3 /usr/local/bin/filesync sync --repo documents --quiet &gt;/dev/null</code></pre>
+
+	<p>The summary line is dropped so cron does not mail on every successful run;
+	diagnostics still go to standard error, so a failure is mailed. Every attempt,
+	successful or not, is also appended to
+	<code>~/.filesync/logs/documents.jsonl</code>.</p>
+
+	<p>Adjust <code>/usr/local/bin/filesync</code> to where the script was
+	installed, because cron's default <code>PATH</code> rarely includes a per-user
+	Perl bin directory.</p>
+
+	<h2 id="checking">Checking what happened</h2>
+
+<pre><code>filesync status --repo documents
+filesync log --repo documents -n 5
+filesync log --repo documents --exit 1
+filesync verify --repo documents --deep</code></pre>
+
+	<p><code>status</code> shows when each repo last synced, how big it is and what
+	the last transfer cost. <code>log</code> filters the run log by time, exit code
+	or warning. <code>verify</code> compares the local tree with the base the last
+	successful sync recorded; it works offline.</p>
+
+	<p>Exit codes tell cron what happened: <strong>0</strong> ok,
+	<strong>1</strong> fatal, <strong>2</strong> another run holds the lock,
+	<strong>3</strong> completed with warnings, <strong>4</strong> verification
+	found drift.</p>
+
+	<h2 id="windows">On Windows</h2>
+
+	<p>Windows clients use a scheduled task rather than cron. With the script in
+	<code>C:\filesync</code> and Strawberry Perl installed, the same job is set up
+	from a command prompt:</p>
+
+<pre><code>REM on the client, once
+C:\Strawberry\perl\bin\perl.exe C:\filesync\bin\filesync init ^
+  --repo documents --root C:\Users\foo\Documents --server foo@srv ^
+  --server-command /home/foo/bin/filesync-server-home
+
+REM then create the task; it runs every minute as the current user
+schtasks /Create /SC MINUTE /MO 1 /TN FileSync /F ^
+  /TR "C:\Strawberry\perl\bin\perl.exe C:\filesync\bin\filesync sync --repo documents --quiet"</code></pre>
+
+	<p>The task runs only while that user is logged on, which suits a Documents
+	folder; its run log is still written under
+	<code>%USERPROFILE%\.filesync\logs</code>, so
+	<code>filesync log --repo documents --warnings</code> works there too.</p>
+
+	<h2 id="srv">A root of /srv/filesync instead</h2>
+
+	<p>To keep the master outside a home directory, create the default root once
+	for the account the clients log in to. Then no <code>--root</code> is needed
+	on the server commands, and no <code>--server-command</code> on the client:</p>
+
+<pre><code># on the server, as an administrator
+sudo mkdir -p /srv/filesync
+sudo chown -R foo /srv/filesync</code></pre>
+
+	<p><code>filesync-admin repo create documents</code> then works as it is, and
+	the master is <code>/srv/filesync/master/documents</code>.</p>
+
+	<h2 id="backup">Backup and restore</h2>
+
+	<p>The master directory is an ordinary directory tree, so it can be mirrored
+	to a backup directory from the server account's crontab. Make the backup
+	directory once &mdash; rsync creates the last component only &mdash; then let
+	cron keep it in step:</p>
+
+<pre><code># on the server, once
+mkdir -p /home/foo/backups/documents
+
+# crontab -e, on the server
+* * * * * ionice -c3 rsync -a --delete --exclude '.filesync-tmp-*' \
+    /home/foo/filesync/master/documents/ /home/foo/backups/documents/</code></pre>
+
+	<p>Filesync writes each file to a temporary name and renames it into place, so
+	the mirror never catches a half-written upload; the exclusion keeps the
+	temporary files themselves out of the backup. <code>--delete</code> makes the
+	copy a mirror: a deletion that reaches the master also removes the backed-up
+	file.</p>
+
+	<p>To restore the master from that backup, stop the client jobs (comment out
+	their cron lines, or disable the scheduled task) and the server's backup job,
+	so the backup job cannot copy a half-restored tree back into the backup. Let
+	any running sync finish, then mirror the backup back:</p>
+
+<pre><code>rsync -a --delete --checksum \
+    /home/foo/backups/documents/ /home/foo/filesync/master/documents/</code></pre>
+
+	<p><code>--checksum</code> compares the contents, so a restored file is not
+	skipped just because its size and modification time happen to match the newer
+	copy. This is a rollback rather than a merge: files created after the backup
+	was taken disappear from the master, and the next sync propagates that to the
+	clients, so copy anything you need to keep out of the tree first.</p>
+
+	<p>The server would rehash the restored files on the next session anyway, but
+	<code>filesync-admin reindex</code> rebuilds the index immediately, before any
+	client reconnects; clients then pull the restored versions, merging edits they
+	have not synced as usual.</p>
+
+	<p>Before re-enabling the jobs, check that the copy is exact with a read-only
+	comparison against the backup:</p>
+
+<pre><code>rsync -a --delete --checksum --dry-run --itemize-changes \
+    /home/foo/backups/documents/ /home/foo/filesync/master/documents/</code></pre>
+
+	<p>No output and exit 0 mean the master matches the backup. Any line beginning
+	<code>&gt;f</code> names a path that still differs, and <code>*deleting</code>
+	names one the rollback should have removed. The index still describes the
+	pre-rollback tree, so <code>filesync-admin verify</code> may report drift at
+	this point; that is expected. Rebuild it and check it:</p>
+
+<pre><code>filesync-admin --root ~/filesync reindex documents
+filesync-admin --root ~/filesync verify documents --deep</code></pre>
+
+	<p><code>reindex</code> hashes every file in the master and replaces the index
+	atomically; it refuses to run while a sync session holds the repo lock, and it
+	names any paths it could not index. <code>clean</code> and exit 0 from
+	<code>verify</code> confirm that the master and its index agree. Re-enable the
+	jobs once that check passes.</p>
+
+	<p>To restore just one file or directory, copy that path back instead of
+	mirroring the whole tree, with the jobs paused as above so nothing changes the
+	tree while the copy runs:</p>
+
+<pre><code>rsync -a --checksum /home/foo/backups/documents/notes/plan.txt \
+    /home/foo/filesync/master/documents/notes/
+rsync -a --checksum /home/foo/backups/documents/photos/ \
+    /home/foo/filesync/master/documents/photos/</code></pre>
+
+	<p>The trailing slash on the second source copies the directory's contents;
+	without it rsync would put the directory itself inside the destination. Add
+	<code>--delete</code> only when that directory should match the backup
+	exactly, since it removes files created after the backup was taken. Refresh
+	the index with <code>reindex</code> as above, or let the next session do it,
+	and clients pull the restored versions.</p>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

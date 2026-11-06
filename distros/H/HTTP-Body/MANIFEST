@@ -33,6 +33,13 @@ t/17count-limits.t
 t/18chunked-size-line.t
 t/19chunked-split.t
 t/20temp-write-and-filename.t
+t/21filename-suffix-redos.t
+t/22chunked-malformed.t
+t/23xforms-attachment.t
+t/24part-header-lines.t
+t/25add-keeps-argument.t
+t/26filename-suffix-string-search.t
+t/27chunked-trailer.t
 t/data/multipart/001-content.dat
 t/data/multipart/001-headers.pml
 t/data/multipart/001-results.pml

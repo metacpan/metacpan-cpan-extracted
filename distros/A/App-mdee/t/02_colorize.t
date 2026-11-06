@@ -77,6 +77,51 @@ SKIP: {
     like($inner, qr/\e\[[0-9;]*48;/, "```sh inside a ``` block is code, not a fence");
 }
 
+# * and ** need a left-flanking opener and a right-flanking closer
+# (CommonMark); cjk_friendly=1 takes the markdown-cjk-friendly rules
+{
+    use File::Temp qw(tempfile);
+    my ($fh, $file) = tempfile(SUFFIX => '.md', UNLINK => 1);
+    binmode $fh, ':encoding(utf-8)';
+    # key, text, italic (\e[3m) or bold (\e[1m), CommonMark, cjk_friendly
+    my @cases = (
+        [ A => 'L*=50, a*=68, b*=48',                   3, 0, 0, "an opener after a letter and before '='" ],
+        [ B => 'x *foo* y',                             3, 1, 1, "*foo*" ],
+        [ C => '2*3*4',                                 3, 1, 1, "* inside a word" ],
+        [ D => 'x * foo * y',                           3, 0, 0, "an opener before a space" ],
+        [ E => 'x *"foo"* y',                           3, 1, 1, "*\"foo\"* after a space" ],
+        [ F => 'a*"foo"*b',                             3, 0, 0, "*\"foo\"* between letters" ],
+        [ G => 'x *foo *y',                             3, 0, 0, "a closer after a space" ],
+        [ H => "x *foo\x{3002}* y",                     3, 1, 1, "a closer after a fullwidth period and before a space" ],
+        [ I => "\x{65e5}*\x{300c}foo\x{300d}*\x{3067}", 3, 0, 1, "Japanese: *\x{300c}...\x{300d}* between kanji and kana" ],
+        [ J => "\x{65e5}*foo\x{3002}*\x{3067}",         3, 0, 1, "Japanese: a closer after a fullwidth period" ],
+        [ K => 'L**=50, a**=68',                        1, 0, 0, "** after a letter and before '='" ],
+        [ L => 'x **foo** y',                           1, 1, 1, "**foo**" ],
+        [ M => "\x{65e5}**\x{300c}foo\x{300d}**\x{3067}", 1, 0, 1, "Japanese: **\x{300c}...\x{300d}** between kanji and kana" ],
+        [ N => "\x{65e5}**foo\x{3002}**\x{3067}",       1, 0, 1, "Japanese: ** after a fullwidth period" ],
+        [ O => "x **[link](#u)**\x{3082}",              1, 0, 1, "** after a link and before kana" ],
+        [ P => 'x **`code`**y',                         1, 0, 0, "** after code and before a letter" ],
+        [ Q => 'x **[link](#u)** y',                    1, 1, 1, "** around a link" ],
+        [ R => 'x **a#**b**c',                          1, 1, 1, "** closes the nearest opener" ],
+    );
+    print $fh map { "$_->[0]: $_->[1]\n\n" } @cases;
+    close $fh;
+    for my $mode ([ CommonMark => '-Mmd' ], [ cjk_friendly => "'-Mmd::config(cjk_friendly=1)'" ]) {
+        my($name, $module) = @$mode;
+        my @lines = split /\n/, run("$module $file")->stdout;
+        my $i = $name eq 'CommonMark' ? 3 : 4;
+        for (@cases) {
+            my($key, $sgr, $want, $desc) = @{$_}[0, 2, $i, 5];
+            my ($l) = grep { /^\Q$key\E:/ } @lines;
+            my $got = $l =~ /\e\[${sgr}m/ ? 1 : 0;
+            is($got, $want, "$name: $desc" . ($want ? "" : " does not count"));
+        }
+        # the ** after "#" can only open, and pairs with the next one
+        my ($r) = map { s/\e\[1m/</gr =~ s/\e\[[\d;]*[mK]//gr } grep { /^R:/ } @lines;
+        like($r, qr/\*\*a#\*\*<b\*\*c/, "$name: only b is bold in **a#**b**c");
+    }
+}
+
 # ATX headings: empty headings and up to 3 spaces of indentation (CommonMark)
 {
     use File::Temp qw(tempfile);
@@ -91,6 +136,15 @@ SKIP: {
     ok(!$colored->(qr/# four spaces/),  "4 spaces of indentation is not a heading");
     ok(!$colored->(qr/#foo/),           "'#foo' is not a heading");
     ok(!$colored->(qr/####### seven/),  "7 '#' is not a heading");
+}
+
+# h4 and h5 are bold with an underline, h6 is bold
+{
+    my $out = run("-Mmd t/test.md")->stdout;
+    like($out, qr/\e\[[\d;]*;4;1m#### /, "h4 has an underline");
+    like($out, qr/\e\[[\d;]*;4;1m##### /, "h5 has an underline");
+    like($out, qr/\e\[[\d;]*;1m###### /, "h6 has none");
+    unlike($out, qr/4:2/, "no double underline without the theme");
 }
 
 done_testing;

@@ -46,7 +46,7 @@ With separate input/output handles, input EOF waits for pending replies
 and drains the output before closing. EOF on a bidirectional socket closes
 it immediately and cancels outstanding requests.
 
-C<max_size> limits a buffered incoming message, defaulting to 1 MiB.
+C<max_size> limits a buffered incoming message, defaulting to 8 MiB.
 
 =item $server->close
 
@@ -113,7 +113,7 @@ sub accept {
 
    my $handle = AnyEvent::Handle->new (
       fh       => $fh,
-      rbuf_max => $self->{max_size} || 1024 * 1024,
+      rbuf_max => $self->{max_size} || 8 * 1024 * 1024,
       on_read  => sub { $self->_read ($_[0]) if $self },
       on_error => sub {
          my ($handle, $fatal, $message) = @_;
@@ -135,10 +135,11 @@ sub accept {
    );
 
    if ($fh_out) {
+      weaken (my $input = $handle);
       $handle->{mcp_out} = AnyEvent::Handle->new (
          fh       => $fh_out,
          on_error => sub {
-            $self->event (connection_error => $_[0], $_[2]) if $self;
+            $self->event (connection_error => $input, $_[2]) if $self && $input;
             $self->close if $self;
          },
       );

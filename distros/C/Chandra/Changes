@@ -1,5 +1,22 @@
 Revision history for Chandra
 
+0.31 2026-11-06
+  - xs/tray.xs: a stale stack after eval_pv in the dispatch callback, and a stray PUSHMARK
+  - xs/form.xs: six hash slots held the immortal undef, attach pushed a reference to the code reference
+  - xs/canvas.xs: flush returned nothing, a dSP in the PPCODE body shadowed the frame stack
+  - include/chandra/chandra_socket_hub.h: the path was freed before the croak that printed it, and a TLS listener left non-blocking could never complete a handshake
+  - include/webview-tray-cocoa.c: a second tray in one process reuses the delegate class
+  - Chandra::Table: the "All" filter option kept its value
+  - Chandra::Pack: save no longer warns as an unknown key, commands with spaces in their paths are quoted
+  - POD for every method of Component, Theme, Notify, Tabs, Nav, Breadcrumb, Table, Form::Validator and Pack
+  - test doors in xs/core.xs, tests t/81 to t/99, live tests under CHANDRA_LIVE_TESTS, MANIFEST.SKIP
+  - include/chandra/chandra_window.h: a child window made before the main window initialises GTK itself, instead of aborting the process
+  - the privileged-port and unwritable-directory tests skip under root, the dragdrop test tolerates a coverage runner holding its object
+  - t/99_pack_darwin.t: the macOS steps of Chandra::Pack on any host, with the Apple tools faked, and the other systems' arms on a Mac
+  - t/24_protocol_edge.t defines its mock methods once, perl 5.40 warned of a redefinition on every call
+  - .xs_cover: the bundled webview sources are left out of a coverage run by default (Devel::XSCover 0.08), README says how the 100% is run
+  - uncoverable marks: the dist is at 100% under Devel::XSCover on clang and on gcc 14 (docker/Dockerfile.xscover-gcc14-gtk, Xvfb for the live tests)
+
 0.30 2026-07-25
   - Chandra::App: document on_tick - a per-frame callback for games and
     animations that switches run() to a non-blocking event loop

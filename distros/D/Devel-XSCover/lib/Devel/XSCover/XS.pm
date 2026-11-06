@@ -7,7 +7,7 @@ use warnings;
 use File::Find ();
 use File::Spec ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our ($KEYWORDS);
 
@@ -70,7 +70,7 @@ sub line_map {
         $n++;
         if ($text =~ /^#line\s+(\d+)\s+"([^"]*)"/) {
             $map[$n] = [ $own, $n ];
-            ($file, $line, $said) = ($self->_canon($2), $1, $1);
+            ($file, $line, $said) = ($self->resolve($c, $2), $1, $1);
             $dropped = $file eq $own ? undef : $self->_dropped($file);
             next;
         }
@@ -89,15 +89,8 @@ sub _dropped {
     my %dropped;
     my $path = File::Spec->file_name_is_absolute($file) ? $file : File::Spec->catfile($self->{dir}, $file);
     if (-f $path) {
-        my $in_body = 0;
-        my $n = 0;
-        for my $text ($self->_lines($file)) {
-            $n++;
-            $in_body = 1 if !$in_body && $text =~ /^MODULE\s*=/;
-            next unless $in_body && $text =~ /^\s*#/;
-            next if $text =~ /^\s*#\s*(?:if|ifdef|ifndef|elif|else|endif|define|undef|include|line|pragma|error|warning)\b/;
-            $dropped{$n} = 1;
-        }
+        require Devel::XSCover::Flow;
+        %dropped = %{ Devel::XSCover::Flow->new->dropped([ $self->_lines($file) ]) };
     }
     return $self->{dropped}{$file} = \%dropped;
 }
@@ -115,7 +108,7 @@ sub xsubs {
         for my $j ($i + 1 .. $#lines) {
             last if $lines[$j] =~ /^XS(?:_EUPXS|_EXTERNAL|_INTERNAL)?\(\w+\)\s*$/;
             next unless $lines[$j] =~ /^#line\s+(\d+)\s+"([^"]*)"/;
-            my $file = $self->_canon($2);
+            my $file = $self->resolve($c, $2);
             next if $file eq $canon;
             @xsub{qw(file body_line)} = ($file, $1);
             last;
@@ -231,6 +224,16 @@ sub _lines {
     return @lines;
 }
 
+sub resolve {
+    my ($self, $c, $name) = @_;
+    my $canon = $self->_canon($name);
+    return $canon if File::Spec->file_name_is_absolute($name);
+    return $canon if -f File::Spec->catfile($self->{dir}, $canon);
+    my ($vol, $dirs) = File::Spec->splitpath($c);
+    my $beside = $self->_canon(File::Spec->catpath($vol, $dirs, $name));
+    return -f File::Spec->catfile($self->{dir}, $beside) ? $beside : $canon;
+}
+
 sub _canon {
     my ($self, $name) = @_;
     $name =~ s{^\./+}{};
@@ -290,6 +293,15 @@ after it one short in the compiler's eyes and in gcov's. The map reads the F<.xs
 and counts those lines, so a C<# uncoverable> line in a body lands where it was
 written, and C<map> carries an C<inverse> table, per XS file, from the line gcov
 reports to the line meant.
+
+=head2 resolve
+
+    my $file = $xs->resolve('t/consumer/Consumer.c', 'Consumer.xs');
+
+The file a C<#line> directive in a generated F<.c> names, relative to the
+distribution directory. xsubpp writes the name it was given, which is relative to
+the directory it ran in, so a name that is not under the distribution directory but
+is beside the F<.c> takes that directory.
 
 =head2 xsubs
 

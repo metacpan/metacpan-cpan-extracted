@@ -1,0 +1,15 @@
+MANIFEST
+MANIFEST.SKIP
+COPYING
+Changes
+KNOWN_ISSUES
+README
+README.md
+Makefile.PL
+lib/Oracle/TNS.pm
+t/test_build.pl
+t/test_connect.pl
+t/test_parse.pl
+xt/test_samples.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

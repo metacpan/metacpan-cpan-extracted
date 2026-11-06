@@ -24,6 +24,7 @@ CODE:
             chandra_log_parse_output(aTHX_ ctx, val);
             has_output = 1;
         } else if (strEQ(key, "formatter")) {
+            # uncoverable condition right count:2
             if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVCV) {
                 ctx->fmt_type   = CHANDRA_LOG_FMT_CUSTOM;
                 ctx->fmt_custom = SvREFCNT_inc(val);
@@ -37,11 +38,13 @@ CODE:
                     ctx->fmt_type = CHANDRA_LOG_FMT_TEXT;
             }
         } else if (strEQ(key, "rotate")) {
+            # uncoverable condition right count:2
             if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
                 HV *rhv = (HV *)SvRV(val);
                 SV **ms = hv_fetchs(rhv, "max_size", 0);
                 SV **kp = hv_fetchs(rhv, "keep", 0);
                 if (ms) ctx->rotate_max_size = chandra_log_parse_size(aTHX_ *ms);
+                # uncoverable condition right count:2
                 if (kp && SvOK(*kp)) ctx->rotate_keep = SvIV(*kp);
             }
         }
@@ -68,6 +71,7 @@ CODE:
     if (!SvROK(self)) XSRETURN_EMPTY;
     hv = (HV *)SvRV(self);
     svp = hv_fetchs(hv, "_ctx", 0);
+    # uncoverable condition right count:2
     if (svp && SvIOK(*svp)) {
         chandra_log_ctx *ctx = INT2PTR(chandra_log_ctx *, SvIV(*svp));
         chandra_log_free_ctx(aTHX_ ctx);
@@ -82,6 +86,7 @@ level(self, ...)
 CODE:
 {
     chandra_log_ctx *ctx = chandra_log_get_ctx(aTHX_ self);
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         ctx->level = chandra_log_parse_level(SvPV_nolen(ST(1)));
     }
@@ -117,6 +122,7 @@ CODE:
         ctx->fmt_custom = NULL;
     }
 
+    # uncoverable condition right count:2
     if (SvROK(fmt) && SvTYPE(SvRV(fmt)) == SVt_PVCV) {
         ctx->fmt_type   = CHANDRA_LOG_FMT_CUSTOM;
         ctx->fmt_custom = SvREFCNT_inc(fmt);

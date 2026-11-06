@@ -17,6 +17,7 @@ CODE:
         if (strEQ(key, "app")) {
             (void)hv_stores(self_hv, "app", newSVsv(val));
         } else if (strEQ(key, "items")) {
+            # uncoverable condition right count:2
             if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
                 SvREFCNT_dec(items_av);
                 items_av = (AV *)SvRV(val);
@@ -39,6 +40,7 @@ CODE:
     /* Set default mode */
     {
         SV **mode_svp = hv_fetchs(self_hv, "mode", 0);
+        # uncoverable condition left count:2
         if (!mode_svp || !SvOK(*mode_svp))
             (void)hv_stores(self_hv, "mode", newSVpvs("html"));
     }
@@ -79,6 +81,8 @@ CODE:
     {
         SV **items_svp = hv_fetchs(hv, "_items", 0);
         SV **actions_svp = hv_fetchs(hv, "_actions", 0);
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
         if (items_svp && SvROK(*items_svp) && actions_svp && SvROK(*actions_svp)) {
             _cm_register_actions(aTHX_ hv, (AV *)SvRV(*items_svp),
                 (HV *)SvRV(*actions_svp));
@@ -119,6 +123,8 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     (void)hv_stores(hv, "_global", newSViv(1));
 
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (items > 1 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVCV) {
         (void)hv_stores(hv, "_global_dynamic", newSVsv(ST(1)));
     }
@@ -127,6 +133,11 @@ CODE:
     {
         SV **items_svp = hv_fetchs(hv, "_items", 0);
         SV **actions_svp = hv_fetchs(hv, "_actions", 0);
+        # uncoverable branch false
+        # uncoverable condition right count:1
+        # uncoverable condition right count:2
+        # uncoverable condition right count:3
+        # uncoverable condition right count:4
         if (items_svp && SvROK(*items_svp) && actions_svp && SvROK(*actions_svp)) {
             _cm_register_actions(aTHX_ hv, (AV *)SvRV(*items_svp),
                 (HV *)SvRV(*actions_svp));
@@ -196,6 +207,8 @@ CODE:
         SV **elem = av_fetch(items_av, j, 0);
         HV *item_hv;
         SV **l_svp;
+        # uncoverable condition left count:1
+        # uncoverable condition left count:3
         if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
             continue;
         item_hv = (HV *)SvRV(*elem);
@@ -231,6 +244,7 @@ CODE:
     SV **items_svp = hv_fetchs(hv, "_items", 0);
     AV *items_av = (AV *)SvRV(*items_svp);
 
+    # uncoverable condition left count:2
     if (!SvROK(item) || SvTYPE(SvRV(item)) != SVt_PVHV)
         croak("add_item() requires a hashref");
 
@@ -242,6 +256,8 @@ CODE:
         HV *actions = (HV *)SvRV(*actions_svp);
         HV *item_hv = (HV *)SvRV(item);
         SV **act_svp = hv_fetchs(item_hv, "action", 0);
+        # uncoverable condition right count:2
+        # uncoverable condition right count:3
         if (act_svp && SvROK(*act_svp) && SvTYPE(SvRV(*act_svp)) == SVt_PVCV) {
             IV id = _cm_next_id(aTHX_ hv);
             char id_str[32];
@@ -275,6 +291,8 @@ CODE:
         SV **elem = av_fetch(items_av, j, 0);
         HV *item_hv;
         SV **l_svp;
+        # uncoverable condition left count:1
+        # uncoverable condition left count:3
         if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
             continue;
         item_hv = (HV *)SvRV(*elem);
@@ -285,6 +303,7 @@ CODE:
         /* Remove action from registry */
         {
             SV **id_svp = hv_fetchs(item_hv, "_id", 0);
+            # uncoverable condition right count:2
             if (id_svp && SvOK(*id_svp)) {
                 SV **actions_svp = hv_fetchs(hv, "_actions", 0);
                 char id_str[32];
@@ -298,6 +317,8 @@ CODE:
             I32 k;
             for (k = j; k < len; k++) {
                 SV **next = av_fetch(items_av, k + 1, 0);
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (next) av_store(items_av, k, SvREFCNT_inc(*next));
             }
             av_pop(items_av);
@@ -379,6 +400,7 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **en_svp = hv_fetchs(hv, "_enabled", 0);
+    # uncoverable condition right count:1
     RETVAL = (en_svp && SvTRUE(*en_svp)) ? 1 : 0;
 }
 OUTPUT:
@@ -397,6 +419,7 @@ CODE:
     SV **global_svp = hv_fetchs(hv, "_global", 0);
     HV *att_hv = (HV *)SvRV(*att_svp);
     AV *items_av = (AV *)SvRV(*items_svp);
+    # uncoverable condition right count:1
     int is_global = (global_svp && SvTRUE(*global_svp));
     SV *js;
 
@@ -643,6 +666,7 @@ CODE:
     SV **type_svp;
     const char *type;
 
+    # uncoverable condition left count:1
     if (!en_svp || !SvTRUE(*en_svp)) return;
 
     /* Decode JSON */
@@ -655,6 +679,7 @@ CODE:
         PUTBACK;
         count = call_pv("Cpanel::JSON::XS::decode_json", G_SCALAR | G_EVAL);
         SPAGAIN;
+        # uncoverable condition left count:2
         if (SvTRUE(ERRSV) || count < 1) {
             FREETMPS; LEAVE;
             return;
@@ -689,8 +714,11 @@ CODE:
             int id_len = my_snprintf(id_str, sizeof(id_str), "%ld", (long)SvIV(*id_svp));
             SV **cb_svp = hv_fetch(actions, id_str, id_len, 0);
 
+            # uncoverable condition right count:2
+            # uncoverable condition right count:3
             if (cb_svp && SvROK(*cb_svp) && SvTYPE(SvRV(*cb_svp)) == SVt_PVCV) {
                 /* Update checked state in items if checkable */
+                # uncoverable condition right count:2
                 if (chk_svp && SvOK(*chk_svp)) {
                     /* Find item by _id and update checked */
                     SV **items_svp = hv_fetchs(hv, "_items", 0);
@@ -699,10 +727,14 @@ CODE:
                     I32 j;
                     for (j = 0; j <= len; j++) {
                         SV **elem = av_fetch(items_av, j, 0);
+                        # uncoverable condition left count:1
+                        # uncoverable condition left count:3
                         if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
                             continue;
                         HV *it = (HV *)SvRV(*elem);
                         SV **iid = hv_fetchs(it, "_id", 0);
+                        # uncoverable condition right count:1
+                        # uncoverable condition right count:2
                         if (iid && SvOK(*iid) && SvIV(*iid) == SvIV(*id_svp)) {
                             (void)hv_stores(it, "checked",
                                 newSViv(SvTRUE(*chk_svp) ? 1 : 0));
@@ -715,10 +747,12 @@ CODE:
                     dSP;
                     ENTER; SAVETMPS;
                     PUSHMARK(SP);
+                    # uncoverable condition right count:2
                     if (chk_svp && SvOK(*chk_svp))
                         XPUSHs(*chk_svp);
                     PUTBACK;
                     call_sv(*cb_svp, G_DISCARD | G_EVAL);
+                    # uncoverable condition right count:1
                     if (SvTRUE(ERRSV))
                         warn("ContextMenu action error: %s", SvPV_nolen(ERRSV));
                     FREETMPS; LEAVE;
@@ -731,7 +765,9 @@ CODE:
         SV **x_svp = hv_fetchs(event_hv, "x", 0);
         SV **y_svp = hv_fetchs(event_hv, "y", 0);
         SV **target_svp = hv_fetchs(event_hv, "target", 0);
+        # uncoverable condition right count:2
         NV x = (x_svp && SvOK(*x_svp)) ? SvNV(*x_svp) : 0;
+        # uncoverable condition right count:2
         NV y = (y_svp && SvOK(*y_svp)) ? SvNV(*y_svp) : 0;
 
         /* Check for dynamic callback: per-selector or global */
@@ -739,18 +775,22 @@ CODE:
         if (target_svp && SvROK(*target_svp)) {
             HV *tgt = (HV *)SvRV(*target_svp);
             SV **sel_svp = hv_fetchs(tgt, "sel", 0);
+            # uncoverable condition right count:2
             if (sel_svp && SvOK(*sel_svp) && SvCUR(*sel_svp) > 0) {
                 SV **att_svp2 = hv_fetchs(hv, "_attachments", 0);
                 HV *att = (HV *)SvRV(*att_svp2);
                 STRLEN slen;
                 const char *s = SvPV(*sel_svp, slen);
                 SV **dcb = hv_fetch(att, s, slen, 0);
+                # uncoverable condition right count:3
                 if (dcb && SvROK(*dcb) && SvTYPE(SvRV(*dcb)) == SVt_PVCV)
                     dynamic_cb = *dcb;
             }
         }
         if (!dynamic_cb) {
             SV **gd_svp = hv_fetchs(hv, "_global_dynamic", 0);
+            # uncoverable condition right count:2
+            # uncoverable condition right count:3
             if (gd_svp && SvROK(*gd_svp) && SvTYPE(SvRV(*gd_svp)) == SVt_PVCV)
                 dynamic_cb = *gd_svp;
         }
@@ -769,17 +809,21 @@ CODE:
                 PUTBACK;
                 count = call_sv(dynamic_cb, G_SCALAR | G_EVAL);
                 SPAGAIN;
+                # uncoverable condition right count:1
                 if (SvTRUE(ERRSV)) {
                     warn("ContextMenu dynamic callback error: %s", SvPV_nolen(ERRSV));
                     FREETMPS; LEAVE;
                     SvREFCNT_dec(event_sv);
                     return;
                 }
+                # uncoverable condition right count:1
                 dyn_items = (count > 0) ? newSVsv(POPs) : NULL;
                 PUTBACK;
                 FREETMPS; LEAVE;
             }
 
+            # uncoverable condition right count:1
+            # uncoverable condition right count:3
             if (dyn_items && SvROK(dyn_items) && SvTYPE(SvRV(dyn_items)) == SVt_PVAV) {
                 dyn_av = (AV *)SvRV(dyn_items);
 
@@ -799,6 +843,7 @@ CODE:
                     /* Call app->eval(js) */
                     {
                         SV **app_svp = hv_fetchs(hv, "app", 0);
+                        # uncoverable condition right count:2
                         if (app_svp && SvOK(*app_svp)) {
                             dSP;
                             ENTER; SAVETMPS;
@@ -818,6 +863,7 @@ CODE:
             /* Static menu - show via JS */
             SV *show_js = newSVpvf("window.__chandraCtxShow(%g,%g);", x, y);
             SV **app_svp = hv_fetchs(hv, "app", 0);
+            # uncoverable condition right count:2
             if (app_svp && SvOK(*app_svp)) {
                 dSP;
                 ENTER; SAVETMPS;
@@ -846,6 +892,7 @@ CODE:
     SV **injected_svp;
 
     injected_svp = hv_fetchs(hv, "_injected", 0);
+    # uncoverable condition right count:1
     if (injected_svp && SvTRUE(*injected_svp)) {
         RETVAL = SvREFCNT_inc(self);
     } else {
@@ -856,8 +903,10 @@ CODE:
         /* Bind __chandraContextMenuBridge dispatch if not already done */
         {
             SV **db_svp = hv_fetchs(hv, "_dispatch_bound", 0);
+            # uncoverable condition left count:1
             if (!db_svp || !SvTRUE(*db_svp)) {
                 SV **app_svp = hv_fetchs(hv, "app", 0);
+                # uncoverable condition right count:2
                 if (app_svp && SvOK(*app_svp)) {
                     SV *cm_self_ref = newSVsv(self);
                     CV *wrapper_cv;
@@ -891,6 +940,7 @@ CODE:
             PUTBACK;
             count = call_method("js_code", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             js = (count > 0) ? newSVsv(POPs) : newSVpvs("");
             PUTBACK;
             FREETMPS; LEAVE;
@@ -899,6 +949,7 @@ CODE:
         /* Call $self->{app}->eval($js) */
         {
             SV **app_svp = hv_fetchs(hv, "app", 0);
+            # uncoverable condition right count:2
             if (app_svp && SvOK(*app_svp)) {
                 dSP;
                 ENTER; SAVETMPS;

@@ -1,16 +1,16 @@
 {
    "abstract" : "Generate SQL from Perl data structures",
    "author" : [
-      "Nathan Wiger <nate@wiger.org>"
+      "Torsten Raudssus <torsten@raudssus.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SQL-Abstract",
    "no_index" : {
@@ -20,7 +20,8 @@
          "examples"
       ],
       "package" : [
-         "DBIx::Class::Storage::Debug::PrettyPrint"
+         "DBIx::Class::Storage::Debug::PrettyPrint",
+         "DBIx::Class::SQLMaker::Role::SQLA2Passthrough"
       ]
    },
    "prereqs" : {
@@ -80,8 +81,8 @@
          "url" : "https://github.com/dbsrgits/sql-abstract.git",
          "web" : "https://github.com/dbsrgits/sql-abstract"
       },
-      "x_IRC" : "irc://irc.perl.org/#dbix-class"
+      "x_IRC" : "irc://irc.perl.org/#dbio"
    },
-   "version" : "2.000001",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.000002",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

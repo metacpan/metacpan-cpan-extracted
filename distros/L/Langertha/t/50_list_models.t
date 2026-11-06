@@ -47,8 +47,6 @@ sub mock_response {
 }
 
 subtest 'OpenAI response parsing' => sub {
-  plan tests => 4;
-
   ok(eval { require Langertha::Engine::OpenAI; 1 }, 'use Langertha::Engine::OpenAI;') or diag $@;
 
   my $fixture = load_fixture('openai_models.json');
@@ -65,8 +63,6 @@ subtest 'OpenAI response parsing' => sub {
 };
 
 subtest 'Anthropic response parsing' => sub {
-  plan tests => 5;
-
   ok(eval { require Langertha::Engine::Anthropic; 1 }, 'use Langertha::Engine::Anthropic;') or diag $@;
 
   my $fixture = load_fixture('anthropic_models.json');
@@ -84,8 +80,6 @@ subtest 'Anthropic response parsing' => sub {
 };
 
 subtest 'Gemini response parsing' => sub {
-  plan tests => 5;
-
   ok(eval { require Langertha::Engine::Gemini; 1 }, 'use Langertha::Engine::Gemini;') or diag $@;
 
   my $fixture = load_fixture('gemini_models.json');
@@ -103,8 +97,6 @@ subtest 'Gemini response parsing' => sub {
 };
 
 subtest 'Groq response parsing' => sub {
-  plan tests => 4;
-
   ok(eval { require Langertha::Engine::Groq; 1 }, 'use Langertha::Engine::Groq;') or diag $@;
 
   my $fixture = load_fixture('groq_models.json');
@@ -121,8 +113,6 @@ subtest 'Groq response parsing' => sub {
 };
 
 subtest 'Mistral response parsing' => sub {
-  plan tests => 4;
-
   ok(eval { require Langertha::Engine::Mistral; 1 }, 'use Langertha::Engine::Mistral;') or diag $@;
 
   my $fixture = load_fixture('mistral_models.json');
@@ -139,8 +129,6 @@ subtest 'Mistral response parsing' => sub {
 };
 
 subtest 'DeepSeek response parsing' => sub {
-  plan tests => 4;
-
   ok(eval { require Langertha::Engine::DeepSeek; 1 }, 'use Langertha::Engine::DeepSeek;') or diag $@;
 
   my $fixture = load_fixture('deepseek_models.json');
@@ -157,8 +145,6 @@ subtest 'DeepSeek response parsing' => sub {
 };
 
 subtest 'OpenAI list_models_request construction' => sub {
-  plan tests => 3;
-
   my $engine = Langertha::Engine::OpenAI->new(api_key => 'test-key');
   my $request = $engine->list_models_request;
 
@@ -168,8 +154,6 @@ subtest 'OpenAI list_models_request construction' => sub {
 };
 
 subtest 'Anthropic list_models_request construction' => sub {
-  plan tests => 4;
-
   my $engine = Langertha::Engine::Anthropic->new(api_key => 'test-key');
 
   # Without pagination
@@ -184,8 +168,6 @@ subtest 'Anthropic list_models_request construction' => sub {
 };
 
 subtest 'Gemini list_models_request construction' => sub {
-  plan tests => 3;
-
   my $engine = Langertha::Engine::Gemini->new(api_key => 'test-key');
   my $request = $engine->list_models_request;
 
@@ -195,8 +177,6 @@ subtest 'Gemini list_models_request construction' => sub {
 };
 
 subtest 'OpenAI list_models with mock user_agent' => sub {
-  plan tests => 8;
-
   my $fixture = load_fixture('openai_models.json');
   my $mock_ua = MockUA->new([mock_response($fixture), mock_response($fixture)]);
 
@@ -228,8 +208,6 @@ subtest 'OpenAI list_models with mock user_agent' => sub {
 };
 
 subtest 'Cache TTL behavior' => sub {
-  plan tests => 2;
-
   my $fixture = load_fixture('openai_models.json');
   my $mock_ua = MockUA->new([mock_response($fixture), mock_response($fixture)]);
 
@@ -248,8 +226,6 @@ subtest 'Cache TTL behavior' => sub {
 };
 
 subtest 'Anthropic pagination with _fetch_all_models' => sub {
-  plan tests => 2;
-
   # Page 1: has_more = true
   my $page1 = {
     data => [
@@ -288,8 +264,6 @@ subtest 'Anthropic pagination with _fetch_all_models' => sub {
 };
 
 subtest 'Gemini model ID prefix stripping' => sub {
-  plan tests => 2;
-
   my $fixture = load_fixture('gemini_models.json');
   my $mock_ua = MockUA->new([mock_response($fixture)]);
 
@@ -304,8 +278,6 @@ subtest 'Gemini model ID prefix stripping' => sub {
 };
 
 subtest 'Models role cache attributes' => sub {
-  plan tests => 4;
-
   my $engine = Langertha::Engine::OpenAI->new(api_key => 'test-key');
 
   # Default TTL
@@ -328,8 +300,6 @@ subtest 'Models role cache attributes' => sub {
 };
 
 subtest 'Anthropic new parameters' => sub {
-  plan tests => 6;
-
   # Without effort/inference_geo
   my $engine = Langertha::Engine::Anthropic->new(api_key => 'test-key');
   ok(!$engine->has_effort, 'effort not set by default');
@@ -367,7 +337,6 @@ subtest 'list_models URL correctness for all OpenAICompatible engines' => sub {
     [ 'Langertha::Engine::TSystems',     qr{llmhub\.t-systems\.net/v2/models$} ],
   );
 
-  plan tests => scalar(@engines) * 2;
 
   for my $e (@engines) {
     my ($class, $expected) = @$e;
@@ -379,8 +348,6 @@ subtest 'list_models URL correctness for all OpenAICompatible engines' => sub {
 };
 
 subtest 'Mistral list_models_path override' => sub {
-  plan tests => 2;
-
   my $mistral = Langertha::Engine::Mistral->new(api_key => 'test-key');
   is($mistral->list_models_path, '/v1/models', 'Mistral overrides list_models_path to /v1/models');
 
@@ -389,8 +356,6 @@ subtest 'Mistral list_models_path override' => sub {
 };
 
 subtest 'Perplexity static models' => sub {
-  plan tests => 5;
-
   ok(eval { require Langertha::Engine::Perplexity; 1 }, 'use Langertha::Engine::Perplexity;') or diag $@;
 
   my $engine = Langertha::Engine::Perplexity->new(api_key => 'test-key');
@@ -405,8 +370,6 @@ subtest 'Perplexity static models' => sub {
 };
 
 subtest 'NousResearch static models' => sub {
-  plan tests => 6;
-
   ok(eval { require Langertha::Engine::NousResearch; 1 }, 'use Langertha::Engine::NousResearch;') or diag $@;
 
   my $engine = Langertha::Engine::NousResearch->new(api_key => 'test-key');
@@ -423,8 +386,6 @@ subtest 'NousResearch static models' => sub {
 };
 
 subtest 'MiniMax static models' => sub {
-  plan tests => 7;
-
   ok(eval { require Langertha::Engine::MiniMax; 1 }, 'use Langertha::Engine::MiniMax;') or diag $@;
 
   my $engine = Langertha::Engine::MiniMax->new(api_key => 'test-key');
@@ -443,8 +404,6 @@ subtest 'MiniMax static models' => sub {
 };
 
 subtest 'Moonshot static models' => sub {
-  plan tests => 7;
-
   ok(eval { require Langertha::Engine::Moonshot; 1 }, 'use Langertha::Engine::Moonshot;') or diag $@;
 
   my $engine = Langertha::Engine::Moonshot->new(api_key => 'test-key');
@@ -463,8 +422,6 @@ subtest 'Moonshot static models' => sub {
 };
 
 subtest 'HuggingFace Hub API list_models' => sub {
-  plan tests => 7;
-
   ok(eval { require Langertha::Engine::HuggingFace; 1 }, 'use Langertha::Engine::HuggingFace;') or diag $@;
 
   my $fixture = load_fixture('huggingface_hub_models.json');
@@ -494,8 +451,6 @@ subtest 'HuggingFace Hub API list_models' => sub {
 };
 
 subtest 'HuggingFace list_models with search' => sub {
-  plan tests => 2;
-
   my $fixture = load_fixture('huggingface_hub_models.json');
   my $mock_ua = MockUA->new([mock_response($fixture)]);
 
@@ -511,8 +466,6 @@ subtest 'HuggingFace list_models with search' => sub {
 };
 
 subtest 'list_models guard for unsupported operations' => sub {
-  plan tests => 3;
-
   # Perplexity's Agent engine (k139) composes no OpenAPI at all — StaticModels
   # only — so it structurally cannot hit a /models endpoint, rather than
   # composing OpenAPI and then guarding listModels out of supported_operations.

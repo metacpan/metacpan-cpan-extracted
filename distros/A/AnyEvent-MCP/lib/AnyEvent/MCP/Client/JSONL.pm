@@ -79,7 +79,7 @@ are managed by this transport.
 
 =item max_size => $bytes
 
-Bounds a buffered incoming JSON line, defaulting to 16 MiB.
+Bounds a buffered incoming JSON line, defaulting to 8 MiB.
 
 =back
 
@@ -119,7 +119,7 @@ sub attach {
    weaken $self;
    $self->{read_handle} = blessed $fh_in && $fh_in->isa ("AnyEvent::Handle")
       ? $fh_in : AnyEvent::Handle->new (%{$self->{handle} || {}}, fh => $fh_in);
-   $self->{read_handle}{rbuf_max} = $self->{max_size} || 16 * 1024 * 1024;
+   $self->{read_handle}{rbuf_max} = $self->{max_size} || 8 * 1024 * 1024;
    $self->{read_handle}->on_read (undef);
    $self->{read_handle}->on_error (sub { $self->close ($_[2]) if $self });
    $self->{read_handle}->on_eof (sub { $self->close ("MCP stream closed") if $self });

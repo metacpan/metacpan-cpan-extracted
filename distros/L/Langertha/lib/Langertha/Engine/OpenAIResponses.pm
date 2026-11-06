@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAIResponses;
 # ABSTRACT: OpenAI Responses API (reasoning models like gpt-5.5-pro)
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 
 extends 'Langertha::Engine::OpenAI';
@@ -61,7 +61,7 @@ Langertha::Engine::OpenAIResponses - OpenAI Responses API (reasoning models like
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ OpenAI's Bearer auth, API key and model list from L<Langertha::Engine::OpenAI>,
 composes the Responses envelope on top, and opts out of streaming.
 
 This engine returns a L<Langertha::Response> that is shape-compatible with
-the chat path, so existing consumers (including Goldmine's C<complete>
+the chat path, so existing consumers (e.g. a C<complete>
 method) work without modification. Reasoning tokens are normalized to
 C<completion_tokens_details.reasoning_tokens> for cost lookup compatibility.
 
@@ -164,7 +164,7 @@ envelope, but this engine opts out (see below).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -181,7 +181,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

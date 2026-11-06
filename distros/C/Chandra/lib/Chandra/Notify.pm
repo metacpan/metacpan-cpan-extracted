@@ -5,7 +5,7 @@ use warnings;
 # Load XS functions from Chandra bootstrap
 use Chandra ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 =head1 NAME
 
@@ -116,6 +116,15 @@ sub notify {
 1;
 
 __END__
+
+=head2 new(%defaults)
+
+An object holding default arguments for C<notify>.
+
+=head2 notify(%args)
+
+Sends a notification with the object's defaults under the arguments given,
+through C<send>.
 
 =head1 EXAMPLES
 

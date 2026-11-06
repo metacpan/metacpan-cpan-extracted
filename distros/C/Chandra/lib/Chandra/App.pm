@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Bridge;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 1;
 

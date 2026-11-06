@@ -1,7 +1,7 @@
 package Mail::DKIM::MessageParser;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -37,8 +37,9 @@ sub init {
     my $self = shift;
 
     my $buf = '';
-    $self->{buf_ref}   = \$buf;
-    $self->{in_header} = 1;
+    $self->{buf_ref}     = \$buf;
+    $self->{in_header}   = 1;
+    $self->{header_scan} = 0;
 }
 
 sub PRINT {
@@ -47,21 +48,53 @@ sub PRINT {
     $$buf_ref .= @_ == 1 ? $_[0] : join( '', @_ ) if @_;
 
     if ( $self->{in_header} ) {
-        local $1;    # avoid polluting a global $1
-        while ( $$buf_ref ne '' ) {
-            if ( substr( $$buf_ref, 0, 2 ) eq "\015\012" ) {
-                substr( $$buf_ref, 0, 2 ) = '';
+
+        # Walk the buffer with an offset, remove the parsed fields once,
+        # and resume the search for the end of an incomplete field where
+        # the last call stopped: removing each field from the front of
+        # the buffer, or rescanning an incomplete field on every call,
+        # is quadratic.
+        my $off  = 0;
+        my $scan = $self->{header_scan};
+        while ( $off < length($$buf_ref) ) {
+            if ( substr( $$buf_ref, $off, 2 ) eq "\015\012" ) {
+                substr( $$buf_ref, 0, $off + 2 ) = '';
+                $off = $scan = 0;
                 $self->finish_header();
                 $self->{in_header} = 0;
                 last;
             }
-            if ( $$buf_ref !~ /^(.+?\015\012)[^\ \t]/s ) {
+
+            # the field ends at the first CRLF not followed by SP or HTAB
+            my $end;
+            my $i = $scan > $off ? $scan : $off;
+            while (1) {
+                my $j = index( $$buf_ref, "\015\012", $i );
+                if ( $j < 0 ) {
+                    $i = length($$buf_ref) - 1;    # a final CR may start a CRLF
+                    last;
+                }
+                if ( $j + 2 >= length($$buf_ref) ) {
+                    $i = $j;    # the next character isn't here yet
+                    last;
+                }
+                my $c = substr( $$buf_ref, $j + 2, 1 );
+                if ( $c ne ' ' && $c ne "\t" ) {
+                    $end = $j + 2;
+                    last;
+                }
+                $i = $j + 2;
+            }
+            if ( !defined $end ) {
+                $scan = $i;
                 last;
             }
-            my $header = $1;
-            $self->add_header($header);
-            substr( $$buf_ref, 0, length($header) ) = '';
+            $self->add_header( substr( $$buf_ref, $off, $end - $off ) );
+            $off  = $end;
+            $scan = 0;
         }
+        substr( $$buf_ref, 0, $off ) = '' if $off;
+        $self->{header_scan} = $scan > $off ? $scan - $off : 0;
     }
 
     if ( !$self->{in_header} ) {
@@ -142,7 +175,7 @@ Mail::DKIM::MessageParser - Signs/verifies Internet mail with DKIM/DomainKey sig
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 AUTHORS
 

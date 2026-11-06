@@ -1,5 +1,5 @@
 package Proc::Spawner::Graph;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 # EXPERIMENTAL.  The companion of Proc::Spawner: the spawn graph, which is what gets executed.  It says,
 # for the current moment, which of our children and which of our own reads and writes use which open
 # file, and carries on each process what to do when it ends.  That reaction may start new processes,
@@ -26,7 +26,7 @@ our $VERSION = '0.04';
 # its DATA); ends refer back only weakly.  So DATA must not hold the graph: a handler gets it as an argument.
 use strict; use warnings; use feature 'current_sub';
 use Scalar::Util qw(refaddr weaken);
-use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL O_RDONLY O_WRONLY O_RDWR O_CREAT O_TRUNC O_APPEND O_NONBLOCK S_ISFIFO);
+use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_RDONLY O_WRONLY O_RDWR O_CREAT O_TRUNC O_APPEND O_NONBLOCK S_ISFIFO);
 use POSIX ();
 use Proc::Spawner;
 
@@ -52,10 +52,23 @@ sub adopt {   # end $e gets the handle $fh, with one hold
   fcntl($fh, F_SETFD, FD_CLOEXEC);   # also when Perl gave it an fd <= $^F
   @$e{qw(fd fh n what)} = (fileno $fh, $fh, 1, $what); delete $e->{forgotten}; weaken($e->{g} = $g); $e }
 sub peers { my @e = @_; $e[0]{peer} = $e[1]; $e[1]{peer} = $e[0]; weaken($_->{peer}) for @e; @e }
+# Where /proc/self/fd cannot open a pipe end anew (no /proc: FreeBSD; RT #182479), a pipe of ours is a named FIFO,
+# opened once more for Perl's own non-blocking writes and then unlinked: so Perl's flag never reaches the children.
+our $REOPEN = -d '/proc/self/fd';
+my ($FIFODIR, $FIFON);
+sub fifo_pipe {   # (read handle, write handle, Perl's own non-blocking write handle), or () with $!
+  $FIFODIR //= do { require File::Temp; File::Temp::tempdir('proc-spawner-XXXXXX', TMPDIR => 1, CLEANUP => 1) };
+  my $p = "$FIFODIR/" . ++$FIFON; POSIX::mkfifo($p, 0600) or return;
+  my ($r, $w, $nb);
+  my $ok = sysopen($r, $p, O_RDONLY|O_NONBLOCK) && sysopen($w, $p, O_WRONLY) && sysopen($nb, $p, O_WRONLY|O_NONBLOCK);
+  my $err = $!; unlink $p; $! = $err; $ok or return;
+  fcntl($r, F_SETFL, fcntl($r, F_GETFL, 0) & ~O_NONBLOCK);   # the read end as pipe(2) gives it: blocking
+  fcntl($nb, F_SETFD, FD_CLOEXEC); ($r, $w, $nb) }
 sub new_pipe {   # (read end, write end)
-  my $g = shift; pipe my $r, my $w or return; my $n = ++$g->{pipes};
+  my $g = shift; my ($r, $w, $nb); my $n = ++$g->{pipes};
+  if ($REOPEN) { pipe $r, $w or return } else { ($r, $w, $nb) = fifo_pipe() or return }
   my @e = peers(map +{ kind => $_, pipe => $n }, qw(r w));
-  adopt($g, $e[0], $r, "pipe $n read end"); adopt($g, $e[1], $w, "pipe $n write end");
+  adopt($g, $e[0], $r, "pipe $n read end"); adopt($g, $e[1], $w, "pipe $n write end"); $e[1]{nbw} = $nb if $nb;
   tr_("pipe $n: read end fd $e[0]{fd}, write end fd $e[1]{fd}"); @e }
 sub file_end {   # the end for a file the caller opened as $fh
   my ($g, $fh, $mode, $path) = @_;
@@ -73,6 +86,7 @@ sub release {
   my $e = shift or return;
   return if !$e->{fh} or --$e->{n} > 0;
   tr_("close fd $e->{fd} ($e->{what})"); close delete $e->{fh}; $e->{forgotten} = 1;
+  close delete $e->{nbw} if $e->{nbw};   # Perl's own write handle of a FIFO pipe (fifo_pipe): else no end of file
   $e->{g}->event("close $e->{what}") if $e->{g} }
 sub op_of { my $e = shift; { r => '<', w => '>' }->{$e->{kind}} // ($e->{mode} =~ /^(<>|<)\z/ ? "$1" : '>') }
 
@@ -107,11 +121,13 @@ sub perl_read {   # one read of at most $len bytes
   $id = Proc::Spawner::on_read($e->{fd}, $len, sub { delete $g->{io}{$id}; call($h, $g, @_) });
   $g->{io}{$id} = [$e, '<']; $id }
 sub perl_write {   # to a pipe or FIFO through an open file of our own, made non-blocking: the flag on the
-  # shared one would reach the children writing to it too (L10).  Linux: /proc/self/fd/N opens anew.
+  # shared one would reach the children writing to it too (L10).  Linux: /proc/self/fd/N opens anew; a pipe of
+  # ours without /proc: the FIFO's handle opened for this (fifo_pipe).  Otherwise (a pipe we were given, without
+  # /proc) the shared one stays blocking and takes PIPE_BUF bytes per write, which a writable pipe takes at once.
   my ($g, $e, $bytes, $h) = @_; my ($id, $nb);
-  my $to = S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0)
-           && (sysopen($nb, "/proc/self/fd/$e->{fd}", O_WRONLY|O_NONBLOCK) ? $nb : $e->{fh}) || $e->{fd};
-  $id = Proc::Spawner::on_write($to, $bytes, sub { undef $nb; delete $g->{io}{$id}; call($h, $g) });
+  my ($to, $chunk) = !S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0) ? $e->{fd} : $e->{nbw} ? $e->{nbw}
+    : sysopen($nb, "/proc/self/fd/$e->{fd}", O_WRONLY|O_NONBLOCK) ? $nb : ($e->{fd}, POSIX::PIPE_BUF());
+  $id = Proc::Spawner::on_write($to, $bytes, sub { undef $nb; delete $g->{io}{$id}; call($h, $g) }, $chunk);
   $g->{io}{$id} = [$e, '>']; $id }
 
 # An ended process stays while it shares an end, or a pipe, with a process still to run or with one of

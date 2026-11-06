@@ -1,0 +1,173 @@
+# NAME
+
+Oracle::TNS - parse and build Oracle TNS descriptors and tnsnames.ora strings
+
+# SYNOPSIS
+
+    use Oracle::TNS;
+
+    my ( $tree, $err ) = tns_parse( '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=db1)(PORT=1521))'
+                                   .'(ADDRESS=(PROTOCOL=TCP)(HOST=db2)(PORT=1521))'
+                                   .'(CONNECT_DATA=(SERVICE_NAME=ORCLPDB1)))' );
+    die $err if $err;
+
+    $tree->{ DESCRIPTION }{ CONNECT_DATA }{ SERVER } = 'DEDICATED';
+    push @{ $tree->{ DESCRIPTION }{ ADDRESS } }, { PROTOCOL => 'TCP', HOST => 'db3', PORT => 1521 };
+
+    my ( $str, $err2 ) = tns_build( $tree, 2 );   # pretty, 2-space indent
+    my ( $one, $err3 ) = tns_build( $tree );      # single line
+
+    # tnsnames.ora round trip
+    my ( $names, $e ) = tns_parse_names( $tnsnames_file_content );
+    my ( $text,  $f ) = tns_build_names( $names );
+
+    # DBI-style connect strings
+    my ( $conn, $g ) = tns_parse_connect( 'scott/tiger@(DESCRIPTION=(ADDRESS=(HOST=db1)(PORT=1521))'
+                                         .'(CONNECT_DATA=(SID=ORCL)))' );
+    # { USER => 'scott', PASS => 'tiger', TNS => { DESCRIPTION => { ... } } }
+    my ( $cstr, $h ) = tns_build_connect( { USER => 'scott', PASS => 'tiger',
+                                            EZCONNECT => { HOST => 'db1', PORT => 1521, SERVICE_NAME => 'ORCL' } } );
+    # scott/tiger@db1:1521/ORCL
+
+# DESCRIPTION
+
+Oracle::TNS parses Oracle TNS connect descriptors and tnsnames.ora content
+into a hashtree and builds descriptor strings back from a hashtree.
+
+    (DESCRIPTION=(ADDRESS=(HOST=a)(PORT=1521))(ADDRESS=(HOST=b)(PORT=1521))
+                 (CONNECT_DATA=(SERVICE_NAME=X)))
+
+becomes
+
+    {
+      DESCRIPTION => {
+        ADDRESS => [ { HOST => 'a', PORT => 1521 },
+                     { HOST => 'b', PORT => 1521 } ],
+        CONNECT_DATA => { SERVICE_NAME => 'X' },
+      }
+    }
+
+Repeated keys at the same level are collected into an array reference.
+Keys are uppercased on parse. A single-element value may be given either
+as a scalar/hashref or as a one-element arrayref when building.
+Comments (from # to the end of the line, outside of quoted values) are
+ignored on parse. Values cannot contain double quotes; there is no escaping.
+
+# FUNCTIONS
+
+All functions are exported by default and return a two-element list: the
+result and undef on success, or undef and an error message on failure.
+
+## tns\_parse( $string )
+
+Parses a single descriptor string, e.g. "(DESCRIPTION=...)", and returns
+its hashtree. An empty descriptor is an error.
+
+## tns\_parse\_names( $string )
+
+Parses tnsnames.ora content, "ALIAS\[, ALIAS2\] = (DESCRIPTION=...)" entries,
+and returns { ALIAS => $hashtree, ... }. Aliases are uppercased. Each alias
+takes exactly one top-level group; groups following it without a new alias
+are an error. A repeated alias replaces the earlier one.
+
+Entries with a single-line value instead of a group, e.g.
+"IFILE = /etc/oracle/more.ora", are returned as plain scalars,
+{ IFILE => '/etc/oracle/more.ora' }, repeated ones as an array reference.
+
+## tns\_build( $hashtree, $indent )
+
+Builds a descriptor string from a hashtree. If $indent is undef the
+result is a single line, otherwise it is the number of spaces per nesting
+level.
+
+Trees returned by the parse functions keep the parsed order, so a parsed
+descriptor is built back in its original order, e.g. ADDRESS and
+ADDRESS\_LIST in a SOURCE\_ROUTE. Values added later are placed after the
+previous value of the same key (or at the first position of that key), and
+the order inside an array reference is kept. Keys added later, and all keys
+of hashes not created by parsing (including copies of parsed ones), are
+emitted in predefined order: well-known keys first in canonical order, the
+rest alphabetically. Values containing parentheses, whitespace, "=" or "#" are
+double-quoted. An empty hashtree or an empty hashref value is an error, so
+is a value containing a double quote.
+
+## tns\_build\_names( $names, $indent )
+
+Builds tnsnames.ora content from { ALIAS => $hashtree, ... }, aliases
+sorted. $indent defaults to 2. Scalar values (or array references of
+scalars) are written as "NAME = value" entries, as returned by
+tns\_parse\_names(). Such values are double-quoted if empty, if they contain
+parentheses, "=" or "#", or if they start or end with whitespace. Multiline
+values are an error.
+
+## tns\_parse\_connect( $string )
+
+Parses a DBI or sqlplus style connect string and returns a hashref with
+USER and PASS (when given) and at most one connect target:
+
+    user/pass@(DESCRIPTION=...)     { USER, PASS, TNS => $hashtree }
+    user/pass@ALIAS                 { USER, PASS, ALIAS => 'ALIAS' }
+    user/pass@host:1521/service     { USER, PASS, EZCONNECT => { HOST, PORT, SERVICE_NAME } }
+    user@ALIAS                      { USER, ALIAS }
+    user/pass                       { USER, PASS }
+    /@ALIAS                         { ALIAS }, external authentication
+
+USER and PASS may be double-quoted, e.g. user/"p@ss w"@ALIAS, the quotes are
+removed. An unquoted password cannot contain "@" or whitespace.
+
+A target starting with "(" is parsed with tns\_parse(). A target made only of
+letters, digits, "\_", "." and "-" is an alias (case kept, note that
+tns\_parse\_names() uppercases aliases). Anything else is EZConnect:
+
+    [//]host[:port][/service_name[:server][/instance_name]]
+
+returned as EZCONNECT hashref with keys HOST, PORT, SERVICE\_NAME, SERVER and
+INSTANCE\_NAME, only the ones given. IPv6 hosts are written in brackets,
+"\[::1\]:1521/svc", and returned without them. A host alone is read as an
+alias, use "//host" for EZConnect.
+
+## tns\_build\_connect( $conn, $indent )
+
+Builds a connect string from a hashref as returned by tns\_parse\_connect().
+USER and PASS are double-quoted if empty or containing whitespace or "@"
+(USER also "/"), double quotes in them are an error. Without USER the
+string starts with "/". $indent is passed to tns\_build() for TNS, by
+default the descriptor is a single line. EZConnect with HOST only is
+written as "//host". Unknown keys, more than one target, PASS without
+USER and SERVER or INSTANCE\_NAME without SERVICE\_NAME are errors.
+
+## tns\_mask\_connect( $string, $mask )
+
+Returns the connect string with USER and PASS replaced by $mask (default
+"\*\*\*"), for logging. The target is rebuilt with tns\_build\_connect(), so a
+descriptor comes back on a single line:
+
+    scott/tiger@(DESCRIPTION=...)   ***/***@(DESCRIPTION=...)
+    scott@PROD                      ***@PROD
+    scott                           ***
+    /@PROD                          /@PROD
+
+It never fails and returns a plain string, not a ( $string, $error ) pair.
+If $string cannot be parsed, only the part after the last "@" is kept, and
+only if $string has no double quote, otherwise just $mask is returned.
+Undefined or blank $string is returned as is.
+
+# KNOWN ISSUES
+
+Single-quoted values, values containing a backslash or a single quote and
+Easy Connect Plus syntax (parameters after "?", several hosts, "tcps://")
+are not fully supported, some of them are changed without an error. See
+the KNOWN\_ISSUES file for the full list, and for the author tests in xt/
+which check real-world samples and show these issues.
+
+# LICENSE
+
+Distributed under the GNU General Public License, version 2, see COPYING
+file for details.
+
+# AUTHOR
+
+    Vladi Belperchinov-Shabanski "Cade"
+          <cade@noxrun.com>
+    http://cade.noxrun.com
+    https://github.com/cade-vs

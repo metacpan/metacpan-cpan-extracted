@@ -7,8 +7,10 @@ sibling distribution langertha-raider (`Langertha::Raider`, `requires 'Langertha
 
 This distribution ships its own agent skills (`.claude/skills/`), agents (`.claude/agents/`),
 and house rules (`.claude/rules/`). The engineering discipline, delegation, coordination,
-public-issue and release rules live in `.claude/rules/langertha-rules.md` — imported here so
-they load for the main agent and every subagent.
+publish and release rules are shared house rules (skilletor bundle `getty-cpan-dist@getty`);
+what is true only here (public issues, live-test spend) lives in
+`.claude/rules/langertha-rules.md` — imported here so it loads for the main agent and every
+subagent.
 
 @.claude/rules/langertha-rules.md
 
@@ -89,6 +91,7 @@ refactors:
 - **0037** — `connect_address` pins an engine's TCP connection to a caller-checked IP (DNS-rebinding defence); Host, SNI and the certificate check keep the host name; async `on_ready` / sync request-scoped `_extra_sock_opts` + `_check_sock` wraps verify every connection before writing; cross-host redirects and unpinnable setups refuse (k375, amends 0036)
 - **0038** — `stream_usage` capability (`Role::StreamUsage`): `OpenAICompatible::chat_stream_request` sends `stream_options.include_usage` itself (before `%extra`, the caller's value wins) on engines whose provider docs name the field; composed per engine, off when in doubt; `OpenAIResponses` clears it; not published in the manifest
 - **0039** — images / PDFs in tool results are public capabilities `tool_result_images` / `tool_result_pdf` (`Role::ToolResultImages` / `Role::ToolResultPDF`); the registry is the single source `format_tool_results` reads (private `_tool_result_*_on_wire` hooks gone); base dependencies after the learned layer: both need a native form on the current `tool_wire_format` (`ToolResult->carries_native`), vision-needing forms (images; PDFs on responses/gemini, `ToolResult->native_needs_vision`) need `image_input`; anthropic PDF follows `_tool_result_source_blocks_on_wire` (not vision-gated); Gemini 3 and later; not published in the manifest (k380)
+- **0040** — new `reasoning_wire_format` `chat_template_kwargs` (`Reasoning->to_chat_template_kwargs`, default on LlamaCpp + SGLang, opt-in elsewhere, vLLM stays `openai`): `none` → only `enable_thinking` JSON false, other levels → `enable_thinking` true + unclamped `reasoning_effort`; tri-state `thinking_enabled` is one concern with `reasoning_effort` (a per-request value of either replaces both engine values, croak only within one layer, off = effort `none`, a switch without a wire form carps, never croaks); caller `chat_template_kwargs` merged one level, caller keys win (unlike ADR 0038's whole-replace); amends 0009 (k382)
 
 Format + when-to-write: skill `langertha-adr`; backfill new ones via the `langertha-adr-auditor`
 agent. `CONTEXT.md` is the domain language for the tools lane (canonical terms, not a decision

@@ -383,7 +383,7 @@ subtest 'the API key reaches the wire, and only one way' => sub {
 };
 
 subtest 'database responses are unwrapped at the right depth' => sub {
-    # A license covers a dataset FAMILY, and the id a download takes hangs off
+    # A license covers a dataset FAMILY, and the ID a download takes hangs off
     # `versions`. An earlier spec claimed the list answered {id, formats}, which
     # it never did, so `list` handed back a shape that could not be downloaded.
     my $family = {

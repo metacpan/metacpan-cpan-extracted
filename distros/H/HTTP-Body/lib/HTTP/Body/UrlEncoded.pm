@@ -1,5 +1,5 @@
 package HTTP::Body::UrlEncoded;
-$HTTP::Body::UrlEncoded::VERSION = '1.24';
+$HTTP::Body::UrlEncoded::VERSION = '1.25';
 use strict;
 use base 'HTTP::Body';
 use bytes;
@@ -25,13 +25,19 @@ HTTP::Body::UrlEncoded - HTTP Body UrlEncoded Parser
 
 =head1 DESCRIPTION
 
-HTTP Body UrlEncoded Parser.
+HTTP Body UrlEncoded Parser for application/x-www-form-urlencoded bodies.
 
 =head1 METHODS
 
 =over 4
 
 =item spin
+
+Waits until the whole body has arrived, then splits it into fields on C<&>
+and C<;>, decodes C<+> and percent escapes in names and values, and stores
+each field with L<HTTP::Body/param>.  A field without C<=> is dropped.  Croaks
+when the body has more than C<$HTTP::Body::UrlEncoded::max_params> fields (see
+L<HTTP::Body/Limits>).
 
 =cut
 

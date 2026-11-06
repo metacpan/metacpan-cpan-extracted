@@ -13,3 +13,12 @@ Alberto would like to thank you:
   0.38 to 0.40
 
 * Jens Rehsack and Jerome Quelin for building patchs.
+
+
+Version 1.00 rewrote the C library at the core of Text::BibTeX, but it
+is still Greg Ward's btparse underneath: its design, its grammar, its
+rules for splitting and formatting names and processing strings, and
+most of its documentation come from btparse, which Greg wrote and
+maintained from 1996 to 2000 as part of btOOL.  The library now lives
+in src/ and is no longer distributed separately, but the credit and the
+LGPL licence (src/COPYING) remain his.

@@ -9,22 +9,56 @@ mcp-imap - inspect and manage one IMAP account through MCP
 =head1 SYNOPSIS
 
    mcp-imap [OPTION]...
-   mcp-imap [OPTION]... login [server HOST] [user USER] [tls ssl|starttls] [port PORT]
+   mcp-imap [OPTION]... login [method password|oauth2] [server HOST]
+       [user USER] [tls ssl|starttls] [port PORT] [oauth-KEY VALUE]...
+   mcp-imap [OPTION]... providers [SEARCH]
 
 =head1 DESCRIPTION
 
-Each C<--name> is one IMAP account and one independent MCP permission profile.
-Run C<mcp-imap --name doom login server doom user root tls starttls> to configure
-the account; then start C<mcp-imap --name doom --stdio> or its usual HTTP
-listener. Login asks for a password on the controlling terminal without echo.
-It never accepts passwords on the command line or through an MCP tool.
+Each C<--name> selects one IMAP account and an independent MCP permission
+profile. Configure the account with C<login>, then run the MCP server with
+C<--stdio>, C<--connect>, or an HTTP listener. Login takes passwords from
+the controlling terminal without echo, never from command-line arguments
+or MCP tools.
 
 The account is stored as C<imap-NAME.ini> under
 C<$XDG_CONFIG_HOME/anyevent-mcp> or C<~/.config/anyevent-mcp>, mode 0600.
 Password data is Base64 in that private file, not encrypted. Protect the
 file like a password. Repeating C<login> replaces the saved password after
-a successful connection. No OAuth or insecure cleartext IMAP login is
-implemented.
+a successful connection. For C<login method oauth2>, it prints a browser
+authorization URL and accepts the resulting redirect URL from the terminal,
+without listening on a callback port. The private file stores the refresh
+token; later IMAP sessions refresh access tokens automatically. Neither
+passwords nor OAuth tokens are accepted as command-line values.
+Unencrypted IMAP authentication is not supported.
+
+C<providers> searches Thunderbird's ISPDB domain index and OAuth provider
+definitions. With no argument it lists known domains. A domain, substring,
+or full email address selects a provider and looks up provider-hosted HTTPS
+autoconfig (preferred) or Thunderbird's ISPDB as a fallback. It prints
+shell-quoted password login commands for supported IMAP/TLS alternatives,
+provider setup instructions, and OAuth commands if a matching public OAuth
+registration is known. An email address fills in the username.
+The commands are NOT executed. Thunderbird's client registrations may not
+be usable by unrelated applications. OAuth authorization requests need
+registered redirect URIs and may require provider-specific optional
+C<oauth-auth-NAME VALUE> arguments (e.g. C<oauth-auth-access_type offline>).
+
+OAuth2 login accepts C<oauth-client-id>, optional C<oauth-client-secret>,
+C<oauth-authorization-endpoint>, C<oauth-token-endpoint>, C<oauth-scope>,
+and C<oauth-redirect-uri>. Optional C<oauth-client-auth> selects
+C<none>, C<client_secret_post> (default when a secret is supplied) or
+C<client_secret_basic>. C<oauth-pkce> defaults to C<1> (S256), or C<0>
+when a provider registration does not support PKCE. C<oauth-sasl> selects
+C<xoauth2> (default) or C<oauthbearer>, depending on the IMAP server.
+Additional authorization query parameters use C<oauth-auth-NAME VALUE>.
+Successful OAuth2 login requires a refresh token; provider-specific offline
+access parameters may be necessary. Authorization is human-initiated only,
+never exposed through an MCP tool. After authorization, the browser will
+normally show an error page because no server is listening on the loopback
+redirect URI. B<This is expected; copy the full redirect URL from the address
+bar anyway.> Port 1 works with Chromium's error-page behavior, but provider
+redirect registrations and other browsers may differ.
 
 IMAP runs in a separate persistent synchronous worker, so an IMAP command
 does not block the MCP event loop. One request at a time is processed by the
@@ -37,13 +71,88 @@ expunge. EXPUNGE is explicit. Selecting another mailbox or logging out does
 not expunge. Search is bounded by UID windows, potentially returning a
 partial/empty page with a continuation cursor when matches are sparse.
 
+=head1 FIRST USE
+
+Discover your provider's settings before logging in:
+
+   mcp-imap --name personal providers alice@example.net
+
+Replace the example address. This reports possible IMAP settings and
+login commands; provider-specific OAuth client registrations may be
+restricted to their original application. For a password-based provider,
+for example:
+
+   mcp-imap --name personal login method password \
+      server imap.example.net user alice@example.net tls ssl port 993
+
+The password is read interactively. For OAuth2, run C<login method oauth2>
+with your provider-approved client ID, authorization/token endpoints,
+scope and redirect URI. For example, the structure of such a command
+(the provider URLs and registration below are placeholders) is:
+
+   mcp-imap --name personal login method oauth2 \
+      server imap.example.net user alice@example.net tls ssl port 993 \
+      oauth-client-id REGISTERED_CLIENT_ID \
+      oauth-authorization-endpoint https://login.example.net/authorize \
+      oauth-token-endpoint https://login.example.net/token \
+      oauth-scope MAIL_SCOPE \
+      oauth-redirect-uri http://127.0.0.1:1
+
+The redirect URI must be allowed by the OAuth client registration. Some
+providers additionally require C<oauth-auth-access_type offline> or
+other authorization parameters to issue a refresh token. After opening
+the printed authorization URL, authorize the intended account and paste
+the B<full> redirect URL from the browser's address bar even if the browser
+reports an unreachable loopback page. Login checks IMAP authentication
+before saving the account.
+
+Then configure your MCP client to start:
+
+   mcp-imap --name personal --stdio
+
+Or expose it through a multibroker:
+
+   mcp-multibroker --stdio mail --- mcp-imap --name personal --stdio ---
+
+Ask the assistant:
+
+   List my subscribed mailboxes, then show the ten newest subjects
+   and senders in INBOX. Do not modify flags or move messages.
+
+For example, to subscribe a folder called C<Receipts>, invoke C<mailbox>
+with C<{"operation":"subscribe","mailbox":"Receipts"}>, then call C<lsub>
+to see subscribed folders. Read operations request C<read> permission;
+changing subscriptions requires C<manage>. A mailbox-specific permission
+prompt can allow just that mailbox or all mailboxes.
+
+To let a separately started server join an existing multibroker with
+an HTTP/extension listener, run:
+
+   mcp-imap --name personal --connect http://127.0.0.1:31740/TOKEN/mail
+
+Replace C<TOKEN> with the token obtained using the multibroker's
+C<--print-url>. Use C<https://> with a trusted, matching certificate.
+
+The C<lsub> tool lists subscribed mailboxes; C<mailboxes> lists all
+visible mailboxes. Subscriptions affect folder selection in clients,
+not message delivery or permissions. See
+L<AnyEvent::MCP::Intro/Read and organize mail> for search and safety
+examples.
+
 =head1 TOOLS
 
 =over
 
 =item mailboxes
 
-List visible mailboxes.
+List visible mailboxes. The C<mailboxes> result contains triples of
+C<[attributes, hierarchy_separator, name]>. One entry might be
+C<[["\\HasNoChildren"], "/", "INBOX"]>. Mailboxes marked C<\\Noselect>
+are containers, not selectable message folders.
+
+=item lsub
+
+List subscribed mailboxes (IMAP LSUB). Uses the same result format as C<mailboxes>.
 
 =item messages
 
@@ -52,9 +161,44 @@ filter, summary fields, header names and UIDVALIDITY-aware cursor.
 C<incomplete> means the search reached its 20000-UID scan budget:
 continue with C<next_cursor> even if the page contains no messages.
 
+C<filter> combines its keys with AND. Text search keys are C<from>, C<to>,
+C<cc>, C<bcc>, C<subject>, C<body> and C<text> (headers and body).
+C<header> maps header names to search strings. Date keys are C<since>,
+C<before>, C<on>, C<sent_since>, C<sent_before> and C<sent_on>, with dates
+as C<D-Mon-YYYY>. C<since>/C<before>/C<on> use the IMAP internal date;
+C<sent_*> keys use the message's Date header. C<larger> and C<smaller>
+filter by message size. Boolean flags include C<seen>, C<unseen>,
+C<answered>, C<unanswered>, C<flagged>, C<unflagged>, C<deleted>,
+C<undeleted>, C<draft>, C<undraft>, C<recent>, C<old> and C<new>.
+C<all> and C<any> contain arrays of nested filters (AND and OR);
+C<not> contains one nested filter. For example:
+
+   {
+     "mailbox": "INBOX",
+     "limit": 20,
+     "filter": {
+       "since": "1-Nov-2026",
+       "any": [
+         {"from": "alice@example.net"},
+         {"subject": "invoice", "body": "overdue"}
+       ],
+       "not": {"flagged": true}
+     }
+   }
+
+The example finds messages with an internal date since November 1 from
+Alice or containing both invoice in the subject and overdue in the body,
+excluding flagged mail. Filter nesting and size are bounded; search
+values are explicitly quoted as IMAP arguments, never interpolated into
+raw SEARCH commands.
+
 =item message
 
 Read ENVELOPE, flags, dates, size and MIME BODYSTRUCTURE for a UID.
+Use the C<uidvalidity> and C<uid> returned by C<messages> for the selected
+mailbox. For example, if the current UIDVALIDITY is 13 and the UID is 42:
+
+   {"mailbox": "INBOX", "uidvalidity": "13", "uid": 42}
 
 =item part
 
@@ -99,28 +243,43 @@ Create, rename, delete, subscribe or unsubscribe a mailbox.
 
 The independent profile is C<imap-NAME>, with C<read>, C<modify>,
 C<manage> and C<expunge> actions. Each tool checks permission before
-network activity. Approval applies to the selected mailbox or all
-mailboxes. This worker is NOT filesystem- or network-sandboxed; permissions
-authorize operations, not OS-level confinement.
+network activity. Mailbox-specific operations can be approved for one
+mailbox or all mailboxes; C<mailboxes> and C<lsub> list folders without
+selecting a mailbox. This worker is NOT filesystem- or network-sandboxed;
+permissions authorize operations, not OS-level confinement.
 
 =head1 OPTIONS
 
-Common options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>, including
-C<--name>, C<--stdio>, C<--connect>, C<--print-url>,
-C<--auto-allow>, C<--auto-deny> and C<--tool-help>.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+The following switches are specific to C<mcp-imap>.
 
 =over
 
 =item --ask MODE
 
-Choose permission prompting: C<helper> (default), C<tty>, C<yad>,
-C<mcp> or C<auto>.
+Choose where permission prompts appear: C<helper> (default when run
+independently) uses a local helper; C<tty> and C<yad> force those
+local interfaces without fallback. C<mcp> delegates prompts to the
+MCP client; C<auto> uses client elicitation when advertised and
+otherwise falls back to the helper. A server spawned by a multibroker
+defaults to C<mcp> so the broker can present its prompts.
 
 =item --allow-mbox-from
 
 Allow APPEND messages with unescaped mbox From_ separator-like lines.
 Unsafe with mboxo servers which fail to escape these lines. Off by default;
 can only be enabled by the server operator, not through an MCP tool.
+
+=item --provider-file FILE
+
+Use FILE as a local Thunderbird OAuth JavaScript source with the
+C<providers> command. Invalid for normal server startup or C<login>.
+
+=item --ispdb-file FILE
+
+Use FILE as a local Thunderbird autoconfiguration XML source with the
+C<providers> command. Invalid for normal server startup or C<login>.
 
 =back
 
@@ -145,18 +304,32 @@ use AnyEvent::MCP::Server::Simple;
 
 my $options = mcp_getoptions
    {
-      usage       => "Usage: mcp-imap [OPTION]... [login [key value ...]]\n",
-      description => "Serve one named IMAP account; 'login' configures plain password authentication.",
+      usage       => "Usage: mcp-imap [OPTION]... [login [key value ...] | providers [SEARCH]]\n",
+      description => "Serve one named IMAP account; 'login' configures password or OAuth2; 'providers' discovers mail setup.",
       options     => [["--ask MODE", "Permission prompts: helper (default), tty, yad, mcp, auto"],
-                      ["--allow-mbox-from", "Allow potentially unsafe unescaped mbox From_ lines in APPEND"]],
+                      ["--allow-mbox-from", "Allow potentially unsafe unescaped mbox From_ lines in APPEND"],
+                      ["--provider-file FILE", "Use local Thunderbird OAuth source with providers"],
+                      ["--ispdb-file FILE", "Use local autoconfig XML with providers"]],
       examples    => "  mcp-imap --name doom login server doom user root tls starttls\n"
+                   . "  mcp-imap --name gmail providers gmail\n"
                    . "  mcp-imap --name doom --stdio",
    },
    "ask=s" => \my $ask,
    "allow-mbox-from!" => \my $allow_mbox_from,
+   "provider-file=s" => \my $provider_file,
+   "ispdb-file=s" => \my $ispdb_file,
 ;
 
 my $name = $options->{name};
+if (@ARGV && $ARGV[0] eq "providers") {
+   shift @ARGV;
+   require AnyEvent::MCP::IMAP::Providers;
+   AnyEvent::MCP::IMAP::Providers::run ($name, $provider_file, $ispdb_file, @ARGV);
+   exit;
+}
+(defined $provider_file || defined $ispdb_file)
+   and die "--provider-file and --ispdb-file are only for providers\n";
+
 my $directory = ($ENV{XDG_CONFIG_HOME} || ($ENV{HOME} || die "HOME is not set\n") . "/.config")
               . "/anyevent-mcp";
 my $file = "$directory/imap-$name.ini";
@@ -164,8 +337,6 @@ my $file = "$directory/imap-$name.ini";
 sub load_account {
    return {} unless -e $file;
 
-   my @stat = stat $file or die "$file: $!\n";
-   $stat[2] & 077 or die "$file: unsafe mode, expected 0600\n";
    open my $fh, "<:raw", $file or die "$file: $!\n";
    local $/;
    my $text = <$fh>;
@@ -184,7 +355,7 @@ sub load_account {
 sub settings {
    my ($kv) = @_;
 
-   for (qw(server user tls port password-base64)) {
+   for (qw(server user tls port)) {
       defined $kv->{$_} && length $kv->{$_} or die "$file: missing $_; run mcp-imap --name $name login\n";
    }
    $kv->{tls} =~ /\A(?:ssl|starttls)\z/ or die "$file: invalid tls mode\n";
@@ -193,26 +364,54 @@ sub settings {
    $kv->{server} !~ /[\s\x00-\x1f]/ && length $kv->{server} <= 255
       or die "$file: invalid server\n";
    $kv->{user} !~ /[\r\n\x00]/ or die "$file: invalid user\n";
-   $kv->{"password-base64"} =~ /\A[A-Za-z0-9+\/]*={0,2}\z/
-      or die "$file: invalid password encoding\n";
 
+   my %connection = map +($_ => $kv->{$_}), qw(server user port tls);
+   my $method = $kv->{method} || "password";
+   if ($method eq "oauth2") {
+      require AnyEvent::MCP::IMAP::OAuth2;
+      AnyEvent::MCP::IMAP::OAuth2::validate ($kv);
+      defined $kv->{"oauth-refresh-token-base64"}
+         && $kv->{"oauth-refresh-token-base64"} =~ /\A[A-Za-z0-9+\/]*={0,2}\z/
+         && length $kv->{"oauth-refresh-token-base64"}
+         or die "$file: missing or invalid OAuth refresh token; run mcp-imap login\n";
+      return {
+         %connection, method => "oauth2", account_file => $file, oauth => { %$kv },
+      };
+   }
+
+   $method eq "password" or die "$file: invalid login method\n";
+   defined $kv->{"password-base64"}
+      && $kv->{"password-base64"} =~ /\A[A-Za-z0-9+\/]*={0,2}\z/
+      && length $kv->{"password-base64"}
+      or die "$file: missing or invalid password encoding\n";
    +{
-      map +($_ => $kv->{$_}), qw(server user port tls),
+      %connection, method => "password",
       password => MIME::Base64::decode_base64 ($kv->{"password-base64"}),
    }
 }
 
 sub login {
-   my %input = @_;
    @ARGV % 2 == 0 or die "login expects key/value pairs\n";
+   my %input;
    while (@ARGV) {
       my ($key, $value) = splice @ARGV, 0, 2;
-      $key =~ /\A(?:server|user|tls|port)\z/
-         or die "Unknown login key '$key' (passwords cannot be given on argv)\n";
+      $key =~ /\A(?:method|server|user|tls|port|oauth-(?:client-id|client-secret|client-auth|authorization-endpoint|token-endpoint|scope|pkce|redirect-uri|sasl|auth-[A-Za-z0-9_]+))\z/
+         or die "Unknown login key '$key' (passwords and tokens cannot be given on argv)\n";
+      $value !~ /[\r\n\x00]/ or die "Invalid $key\n";
       $input{$key} = $value;
    }
    my $old = load_account ();
-   my %kv = (%$old, %input);
+   my $method = $input{method} || $old->{method} || "password";
+   $method =~ /\A(?:password|oauth2)\z/ or die "Unknown login method\n";
+
+   my %kv = %$old;
+   %kv = map +(exists $old->{$_} ? ($_ => $old->{$_}) : ()), qw(server user tls port)
+      if ($old->{method} || "password") ne $method;
+   %kv = (%kv, %input);
+   $kv{method} = $method;
+   delete $kv{"password-base64"} if $method eq "oauth2";
+   delete @kv{grep /^oauth-/, keys %kv} if $method eq "password";
+
    for my $key (qw(server user)) {
       next if defined $kv{$key} && length $kv{$key};
       print STDERR "$key: ";
@@ -221,32 +420,56 @@ sub login {
    $kv{tls} ||= "ssl";
    $kv{port} ||= $kv{tls} eq "ssl" ? 993 : 143;
 
-   open my $tty, "+<", "/dev/tty"
-      or die "Password requires a controlling terminal: $!\n";
-   print {$tty} "IMAP password for $kv{user}\@$kv{server}: ";
-   Term::ReadKey::ReadMode ("noecho", $tty);
-   my $password = <$tty>;
-   Term::ReadKey::ReadMode ("restore", $tty);
-   print {$tty} "\n";
-   close $tty;
-   defined $password or die "No password supplied\n";
-   $password =~ s/\r?\n\z//;
-   length $password or die "Empty password\n";
-   $kv{"password-base64"} = MIME::Base64::encode_base64 ($password, "");
+   my $account;
+   if ($method eq "oauth2") {
+      require AnyEvent::MCP::IMAP::OAuth2;
+      AnyEvent::MCP::IMAP::OAuth2::validate (\%kv);
+      my ($url, $state, $verifier) = AnyEvent::MCP::IMAP::OAuth2::authorize (\%kv);
+      print STDERR "Authorize the mail account '$kv{user}', not a different account already signed into the browser.\n";
+      print STDERR "Open this OAuth authorization URL in a browser:\n$url\n\n";
+      print STDERR "After authorization, the browser will display an error page because no server listens at the redirect URI.\n";
+      print STDERR "This is expected. Copy the FULL URL from the browser address bar and paste it here.\n";
+      open my $tty, "+<", "/dev/tty"
+         or die "OAuth callback requires a controlling terminal: $!\n";
+      print {$tty} "Paste redirected URL: ";
+      Term::ReadKey::ReadMode ("noecho", $tty);
+      my $redirect = <$tty>;
+      Term::ReadKey::ReadMode ("restore", $tty);
+      print {$tty} "\n";
+      close $tty;
+      defined $redirect or die "No OAuth redirect URL supplied\n";
+      $redirect =~ s/\r?\n\z//;
+      my $tokens = AnyEvent::MCP::IMAP::OAuth2::finish (\%kv, $state, $verifier, $redirect);
+      my $refresh = $tokens->{refresh_token}
+         or die "OAuth provider returned no refresh token; configure offline access and try again\n";
+      $kv{"oauth-refresh-token-base64"} = MIME::Base64::encode_base64 ($refresh, "");
+      $account = settings (\%kv);
+      $account->{access_token} = $tokens->{access_token};
+   } else {
+      open my $tty, "+<", "/dev/tty"
+         or die "Password requires a controlling terminal: $!\n";
+      print {$tty} "IMAP password for $kv{user}\@$kv{server}: ";
+      Term::ReadKey::ReadMode ("noecho", $tty);
+      my $password = <$tty>;
+      Term::ReadKey::ReadMode ("restore", $tty);
+      print {$tty} "\n";
+      close $tty;
+      defined $password or die "No password supplied\n";
+      $password =~ s/\r?\n\z//;
+      length $password or die "Empty password\n";
+      $kv{"password-base64"} = MIME::Base64::encode_base64 ($password, "");
+      $account = settings (\%kv);
+   }
 
-   my $account = settings (\%kv);
    require AnyEvent::MCP::Worker::IMAP;
    AnyEvent::MCP::Worker::IMAP::imap_connect ($account);
 
    my $lock = AnyEvent::MCP::File::lock $file;
-   my $current = load_account ();
-   my %save = (%$current, %kv);
    AnyEvent::MCP::File::replace $file, "[account]\n"
-      . (join "", map "$_ = $save{$_}\n", sort keys %save);
+      . (join "", map "$_ = $kv{$_}\n", sort keys %kv);
    close $lock;
 
    print STDERR "Authenticated and saved account '$name' in $file\n";
-   return
 }
 
 if (@ARGV && $ARGV[0] eq "login") {
@@ -336,14 +559,20 @@ sub require_mail_permission {
    my ($req, $action, $args) = @_;
 
    my $mailbox = $args->{mailbox};
-   my $subject = defined $mailbox ? "mailbox:$mailbox" : "mailboxes";
-   my @subjects = ({ label => "this mailbox", match => $subject });
-   push @subjects, { label => "all mailboxes", match => "^mailbox:" }
-      if defined $mailbox;
+
    $req->require_permission ({
       tool           => $req->{tool},
       action         => $action,
-      dimensions     => { subject => { label => "Mailbox", value => $subject, choices => \@subjects } },
+      (defined $mailbox ? (dimensions => {
+         subject => {
+            label   => "Mailbox",
+            value   => "mailbox:$mailbox",
+            choices => [
+               { label => "this mailbox", match => "mailbox:$mailbox" },
+               { label => "all mailboxes", match => "^mailbox:" },
+            ],
+         },
+      }) : ()),
       sandbox_grants => [],
       reason         => "$req->{tool} " . (defined $mailbox ? "mailbox '$mailbox'" : "mailboxes"),
    });
@@ -400,6 +629,9 @@ sub expose {
 expose mailboxes => "List IMAP mailboxes.", [],
    {}, "read";
 
+expose lsub => "List subscribed IMAP mailboxes (LSUB).", [],
+   {}, "read";
+
 expose messages =>
    "Page UID summaries, newest first. SEARCH filter; cursor anchors UIDVALIDITY. Continue on incomplete pages.",
    ["mailbox"],
@@ -411,7 +643,11 @@ expose messages =>
       headers => { type => "array", items => property ("string", "RFC 5322 header name"), maxItems => 20 },
       filter  => {
          type        => "object",
-         description => "from/to/subject substring; since/before D-Mon-YYYY; unseen/flagged/undeleted",
+         description => "AND of: from/to/cc/bcc/subject/body/text strings; header:{Name:string}; "
+                      . "since/before/on/sent_since/sent_before/sent_on dates (D-Mon-YYYY); "
+                      . "larger/smaller byte counts; seen/unseen/answered/unanswered/flagged/unflagged/"
+                      . "deleted/undeleted/draft/undraft/recent/old/new booleans; "
+                      . "all:[filter,...], any:[filter,...], not:filter (recursive Boolean grouping)",
       },
    }, "read";
 

@@ -90,9 +90,11 @@ sub trip {
 }
 
 # Replaces the poll's wait AND its clock, so the deadline reads the time the waits
-# spent. Returns the waits, in seconds.
+# spent. Returns the waits, in seconds. Given $short, each wait of at least 1 ms
+# wakes that many seconds before the clock has moved its delay, as a runtime
+# timer may.
 sub fake_clock {
-    my ($oauth) = @_;
+    my ($oauth, $short) = @_;
     my ($elapsed, $reads, @waits) = (0, 0);
     $oauth->{now} = sub {
         trip("read the clock $reads times") if ++$reads > 2 * BOUND;
@@ -101,7 +103,7 @@ sub fake_clock {
     $oauth->{sleep_p} = sub {
         trip('waited more than ' . BOUND . ' times') if @waits == BOUND;
         push @waits, $_[0];
-        $elapsed += $_[0];
+        $elapsed += $short && $_[0] >= 0.001 ? $_[0] - $short : $_[0];
         return Mojo::Promise->resolve;
     };
     return \@waits;
@@ -497,6 +499,41 @@ subtest 'a poll past its deadline waits nothing, never a negative time' => sub {
     is_deeply($waits, [0], 'one wait, of nothing');
     is(scalar @requests, 0, 'and no request');
     is_outcome($outcome, { type => 'expiredToken', status => undef }, 'expires_in -3');
+};
+
+# A timer that wakes before the clock has moved its delay leaves the deadline
+# reading as not yet reached, so a poll that read the clock again would ask once
+# more at it. A wait cut to the deadline, or ending at it, ends the poll.
+subtest 'a wait that ran to the deadline ends the poll, however early the timer woke' => sub {
+    for my $interval (5, 3) {
+        serve({ status => 400, body => { error => 'authorization_pending' } });
+        my $oauth = client()->oauth;
+        my $waits = fake_clock($oauth, 0.0005);
+
+        my $outcome = settle(sub {
+            $oauth->poll_device_token('vpndetection-cli', { %DEVICE, interval => $interval, expires_in => 3 })
+        });
+
+        is_deeply($waits, [3], "interval $interval: one wait, to the deadline");
+        is(scalar @requests, 0, "interval $interval: and no request");
+        is_outcome($outcome, { type => 'expiredToken', status => undef }, "interval $interval, expires_in 3");
+    }
+};
+
+# NaN compares false with everything, so a lifetime that is no number left the
+# wait at 0 and the deadline never reached: the poll asked again at once, for good.
+subtest 'a hand-built lifetime that is no number ends the poll at once' => sub {
+    serve({ status => 400, body => { error => 'authorization_pending' } });
+    my $oauth = client()->oauth;
+    my $waits = fake_clock($oauth);
+
+    my $outcome = settle(sub {
+        $oauth->poll_device_token('vpndetection-cli', { %DEVICE, interval => 1, expires_in => 9**9**9 / 9**9**9 })
+    });
+
+    is_deeply($waits, [0], 'one wait, of nothing');
+    is(scalar @requests, 0, 'and no request');
+    is_outcome($outcome, { type => 'expiredToken', status => undef }, 'expires_in NaN');
 };
 
 # The seam above proves the schedule; this proves the real wait is one.

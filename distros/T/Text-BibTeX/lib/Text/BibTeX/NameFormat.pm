@@ -18,12 +18,12 @@
 
 package Text::BibTeX::NameFormat;
 
-require 5.004;
-
+use 5.026;
 use strict;
+use warnings;
 use Carp;
-use vars qw'$VERSION';
-$VERSION = 0.88;
+
+our $VERSION = '1.00';
 
 =head1 NAME
 
@@ -61,22 +61,14 @@ not need to do any customization of the format object.  If you do need
 to customize the format, though, the C<set_text()> and C<set_options()>
 methods provide that capability.
 
-Note that C<Text::BibTeX::NameFormat> is a fairly direct translation of
-the name-formatting C interface in the B<btparse> library.  This manual
-page is meant to provide enough information to use the Perl class, but
-for more details and examples, consult L<bt_format_names>.
-
 =head1 CONSTANTS
 
-Two enumerated types for dealing with names and name formatting have
-been brought from C into Perl.  In the B<btparse> documentation, you'll
-see references to C<bt_namepart> and C<bt_joinmethod>.  The former lists
-the four "parts" of a BibTeX name: first, von, last, and jr; its values
-(in both C and Perl) are C<BTN_FIRST>, C<BTN_VON>, C<BTN_LAST>, and
-C<BTN_JR>.  The latter lists the ways in which C<bt_format_name()> (the
-C function that corresponds to C<Text::BibTeX::NameFormat>'s C<apply>
-method) can join adjacent tokens together: C<BTJ_MAYTIE>, C<BTJ_SPACE>,
-C<BTJ_FORCETIE>, and C<BTJ_NOTHING>.  Both sets of values may be
+Two sets of constants are used with name formats.  The "name part"
+constants name the four "parts" of a BibTeX name: C<BTN_FIRST>,
+C<BTN_VON>, C<BTN_LAST>, and C<BTN_JR>.  The "join method" constants
+are the ways in which adjacent tokens can be joined together:
+C<BTJ_MAYTIE>, C<BTJ_SPACE>, C<BTJ_FORCETIE>, and C<BTJ_NOTHING> (see
+L</"FORMATTING RULES">).  Both sets of values may be
 imported from the C<Text::BibTeX> module, using the import tags
 C<nameparts> and C<joinmethods>.  For instance:
 
@@ -92,6 +84,130 @@ formatting options that you can set for a part: you can control how to
 join the individual tokens of a name (C<"JR Smith">, or C<"J R Smith">,
 or C<"J~R Smith">, and you can control how the final token of one part
 is joined to the next part (C<"la Roche"> versus C<"la~Roche">).
+
+=head1 FORMATTING RULES
+
+A name format controls the following:
+
+=over 4
+
+=item *
+
+which name parts are printed, and in what order (e.g. "first von last
+jr", or "von last jr first")
+
+=item *
+
+the text that precedes and follows each part (e.g. if the first name
+follows the last name, you probably want a comma before the `first'
+part: "Smith, John" rather than "Smith John")
+
+=item *
+
+the text that precedes and follows each token (e.g. if the first name is
+abbreviated, you may want a period after each token: "J. R. Smith"
+rather than "J R Smith")
+
+=item *
+
+whether the tokens of each part are abbreviated
+
+=item *
+
+the method used to join the tokens of each part together
+
+=item *
+
+the method used to join each part to the following part
+
+=back
+
+There are I<two> join methods for each part: one between the tokens
+within the part, and one between the part and the next part.  The first
+allows you, for example, to change C<"J R Smith"> (first name
+abbreviated with no post-token text but tokens joined by a space) to
+C<"JR Smith"> (the same, but first-name tokens jammed together).  The
+second is mainly used to ensure that `von' and `last' parts may be
+joined with a tie: C<"de~Roche"> rather than C<"de Roche">.
+
+The join methods are:
+
+=over 4
+
+=item C<BTJ_MAYTIE>
+
+Insert a "discretionary tie" between tokens: either a space or a "tie"
+is inserted, depending on context.  (A tie, otherwise known as an
+unbreakable space, is always C<"~">, as in TeX.)
+
+=item C<BTJ_SPACE>
+
+Always insert a space between tokens.
+
+=item C<BTJ_FORCETIE>
+
+Always insert a tie (C<"~">) between tokens.
+
+=item C<BTJ_NOTHING>
+
+Insert nothing between tokens---just jam them together.
+
+=back
+
+With C<BTJ_MAYTIE>, the choice between a space and a tie follows BibTeX.
+Within a part, a tie is used after the first token if it is less than
+three characters long, and before the last token.  Between parts, a tie
+is used only if the preceding part consists of a single token less than
+three characters long.  In all other cases, a space is used.
+
+=head2 Defaults
+
+C<new> sets up the whole format, based on the PARTS and ABBREV_FIRST
+arguments, so that customization is rarely needed:
+
+=over 4
+
+=item *
+
+The token join method is C<BTJ_MAYTIE> for all parts.
+
+=item *
+
+The part join method is C<BTJ_SPACE> for the `first', `last', and `jr'
+parts.  If the `von' part immediately precedes the `last' part (which
+will almost always be the case), C<BTJ_MAYTIE> is used to join `von' to
+`last'; otherwise `von' also gets C<BTJ_SPACE>.
+
+=item *
+
+The `von', `last', and `jr' parts are not abbreviated; the `first' part
+is abbreviated if ABBREV_FIRST is true.
+
+=item *
+
+All the surrounding text starts out empty.  If ABBREV_FIRST is true, the
+post-token text for the first name is C<".">, which changes
+C<"J R Smith"> to C<"J. R. Smith">.
+
+If `jr' immediately follows `last' (almost always the case), the
+pre-part text for `jr' is C<", "> and the part join method for `last' is
+C<BTJ_NOTHING>, so you get C<"John Smith, Jr">.  Because the C<", "> is
+associated with the `jr' part, it is not printed when there is no `jr'
+part.
+
+Likewise, if `first' immediately follows `jr' or `last' (as in
+"last name first" formats), the pre-part text for `first' is C<", ">
+and the part join method of the preceding part is C<BTJ_NOTHING>.
+
+=back
+
+So if you only need C<"fvlj"> and C<"vljf"> part orders, only want to
+abbreviate the first name, and want periods after abbreviated tokens,
+ties in the "right" places and commas in the conventional places, you
+don't need to customize anything.  For something out of the
+ordinary---for instance, abbreviated tokens jammed together with no
+punctuation, or abbreviated last names---use C<set_text> and
+C<set_options>.
 
 =head1 METHODS
 
@@ -110,9 +226,8 @@ with periods after each token and discretionary ties between tokens (defaults
 to false).  All intra- and inter-token punctuation and spacing is independently
 controllable with the C<set_text> and C<set_options> methods, although these
 will rarely be necessary---sensible defaults are chosen for everything, based
-on the PARTS and ABBREV_FIRST values that you supply.  See the description of
-C<bt_create_name_format()> in L<bt_format_names> for full details of the
-choices made.
+on the PARTS and ABBREV_FIRST values that you supply.  See L</Defaults>
+for full details of the choices made.
 
 =cut
 
@@ -123,7 +238,7 @@ sub new
    $parts ||= "fvlj";
    $abbrev_first = defined($abbrev_first)? $abbrev_first : 0;
 
-   die unless $parts =~ /^[fvlj]{1,4}$/;
+   croak "invalid name format \"$parts\"" unless $parts =~ /^[fvlj]{1,4}$/;
 
    $class = ref ($class) || $class;
    my $self = bless {}, $class;
@@ -134,9 +249,7 @@ sub new
 
 sub DESTROY
 {
-   my $self = shift;
-   free ($self->{'_cstruct'}) 
-      if defined $self->{'_cstruct'};
+   # the C structure is freed with its Perl wrapper
 }
 
 
@@ -156,7 +269,7 @@ like C<"J R Smith">.  (Normally, abbreviated first names will have a
 period after each token: C<"J. R. Smith">.)  Note that supplying
 C<undef> for the other three values leaves them unchanged.
 
-See L<bt_format_names> for full information on formatting names.
+See L</"FORMATTING RULES"> for full information on formatting names.
 
 =cut
 
@@ -164,25 +277,8 @@ sub set_text
 {
    my ($self, $part, $pre_part, $post_part, $pre_token, $post_token) = @_;
 
-   # Engage in a little conspiracy with the XS code (_set_text) and the
-   # underlying C function (bt_set_format_text) here.  In particular,
-   # neither of those functions copy the strings we pass in here -- they
-   # just copy the C pointers.  Ultimately, those refer back to the Perl
-   # strings that we're passing in now.  Thus, if those Perl strings
-   # were to go away (ref count drop to zero), then the C code might
-   # have dangling pointers to free'd strings -- oops!  The solution is
-   # to keep references of those Perl strings here, so that their ref
-   # count can never drop to zero without our assent.  Every time
-   # set_text is called, the old references are overridden (ref count
-   # drops), and when the NameFormat object is destroyed, we destroy
-   # them (ref count drops).  Other than that, there will always be some
-   # reference to the strings passed in to set_text.
-
-   # XXX what if some of these are undef?
-
-   $self->{'textrefs'} = [\$pre_part, \$post_part, \$pre_token, \$post_token];
-
-   _set_text ($self->{'_cstruct'}, 
+   # The C code keeps its own copies of these strings
+   _set_text ($self->{'_cstruct'},
               $part,
               $pre_part,
               $post_part,
@@ -245,12 +341,9 @@ sub apply
       croak "invalid Name object: no C structure";
    my $format_struct = $self->{'_cstruct'} ||
       croak "invalid NameFormat object: no C structure";
- 
-   my $ans = format_name ($name_struct, $format_struct);
-
-   $ans = Text::BibTeX->_process_result($ans, $name->{binmode}, $name->{normalization});
-   
-   return $ans;
+   my $utf8 = ($name->{binmode} // 'utf-8') eq 'utf-8';
+   my $ans = format_name ($name_struct, $format_struct, $utf8 ? 1 : 0);
+   return $utf8 ? Text::BibTeX::_normalise($name->{normalization} // 'NFC', $ans) : $ans;
 }
 
 =back
@@ -302,11 +395,11 @@ either case, the result with the example name and format shown is
 
 Note the strategic insertion of TeX "ties" (non-breakable spaces) at
 sensitive spots in the name.  (The exact rules for insertion of
-discretionary ties are given in L<bt_format_names>.)
+discretionary ties are given in L</"FORMATTING RULES">.)
 
 =head1 SEE ALSO
 
-L<Text::BibTeX::Entry>, L<Text::BibTeX::Name>, L<bt_format_names>.
+L<Text::BibTeX::Entry>, L<Text::BibTeX::Name>.
 
 =head1 AUTHOR
 

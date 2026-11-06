@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Component;
 use Chandra::Element;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 BEGIN {
     Object::Proto::define('Chandra::Nav',
@@ -218,6 +218,47 @@ Chandra::Nav - Navigation component (sidebar/topbar)
     $app->css(Chandra::Nav->css);
     $app->set_content('<div style="display:flex;height:100vh;"><div id="nav"></div><div id="content" style="flex:1;padding:20px;"></div></div>');
     $nav->mount($app, '#nav');
+
+=head1 METHODS
+
+=over 4
+
+=item C<new(items => \@items, type => 'sidebar', collapsible => 0, collapsed => 0)>
+
+Each item is a hash with a C<label>, a C<route>, an optional C<icon> and
+C<badge>, or C<separator>. The type is C<sidebar> or C<topbar>.
+
+=item C<render>
+
+The navigation, with a toggle when a sidebar is collapsible.
+
+=item C<on_navigate($route)>
+
+Marks the route active, navigates the app when it can, and updates.
+
+=item C<on_toggle>
+
+Collapses or expands, and updates.
+
+=item C<css>
+
+The navigation's stylesheet.
+
+=item C<prototype>, C<set_prototype>
+
+Object::Proto's prototype accessors.
+
+=back
+
+=head1 SLOT ACCESSORS
+
+=over 4
+
+=item C<items>, C<type>, C<collapsible>, C<collapsed> - the slots as methods
+
+=item C<nav_items>, C<nav_type>, C<nav_collapsible>, C<nav_collapsed>, C<nav__active>, C<nav__cid>, C<nav__app>, C<nav__selector>, C<nav__mounted>, C<nav__children>, C<nav__parent> - the slot functions
+
+=back
 
 =head1 SEE ALSO
 

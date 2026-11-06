@@ -583,7 +583,7 @@ sub close {
    my ($self, $message) = @_;
 
    my $was_connected = $self->{connected};
-   # The close event runs after outstanding operations have been failed.
+   # the close event runs after outstanding operations have been failed.
    my $outstanding = scalar keys %{$self->{operations} || {}};
    ++$self->{generation};
    $self->_shutdown;

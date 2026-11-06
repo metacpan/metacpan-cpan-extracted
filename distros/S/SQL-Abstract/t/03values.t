@@ -86,8 +86,9 @@ for my $record (@data) {
 # This is an intentional test making sure literal ? remains untouched.
 # It is rather impractical in the field, as the user will have to insert
 # a bindvalue for the literal position(s) in the correct offset of \@bind
+# yfunc uses the old plain-arrayref literal, which needs array_datatypes => 0
 {
-  my $sql = SQL::Abstract->new;
+  my $sql = SQL::Abstract->new(array_datatypes => 0);
 
   my $data = {
     event => 'rapture',
@@ -113,6 +114,20 @@ for my $record (@data) {
     [@bind],
     'values() output matches that of initial bind'
   ) || diag "Corresponding SQL statement: $stmt";
+}
+
+{
+  my $sqla = SQL::Abstract->new;
+
+  my @subq = $sqla->select(
+    "Bar", [qw/x y/], { x => { ">" => { -ident => "y"} } }
+  );
+  my ($sql, @bind) = $sqla->insert("Foo(a, b)", \ \@subq);
+  is_same_sql_bind ($sql, \@bind,
+    "INSERT INTO Foo(a, b) SELECT x, y FROM Bar where x > y",
+    [],
+    "insert-select",
+  );
 }
 
 done_testing;

@@ -214,7 +214,7 @@ ok $success && (grep $_->{name} eq "exec", @$tools)
    "module discovery lists core filesystem tools";
 my @probes = map JSON::XS::decode_json ($_), split /\n/, read_file "$dir/sandbox.log";
 ok (grep {
-   index (join ("\0", @$_), "--setenv\0PATH\0/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin") >= 0
+   index (join ("\0", @$_), "--setenv\0PATH\0/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin") >= 0
 } @probes), "sandbox PATH prefers base-system bin/sbin pairs over local programs";
 ok (grep { $_->[-30] eq "perl" && $_->[-29] eq "-e"
    && $_->[-28] =~ /use 5\.008004/ } @probes),
@@ -263,6 +263,8 @@ $result = call workdirs => {};
 ok !@{$result->{structuredContent}{workdir_vcs}{"$dir/work"}},
    "workdir detection reflects metadata removal on next listing";
 
+$result = call "file-read" => { path => "" };
+ok $result->{isError}, "empty filenames remain invalid";
 $result = call "file-read" => { path => "read" };
 !$result->{isError} or die JSON::XS::encode_json $result;
 ok MIME::Base64::decode_base64 ($result->{structuredContent}{data}) eq "one\ntwo\nthree\n",
@@ -406,25 +408,40 @@ undef $eviction_deadline;
 ok !(kill 0 => $cached_pid), "evicting an incompatible cached worker terminates and reaps it";
 
 SKIP: {
-   skip "extended GNU find test (PERL_ANYEVENT_MCP_TESTS=1)", 1
+   skip "extended GNU find test (PERL_ANYEVENT_MCP_TESTS=1)", 3
       unless ($ENV{PERL_ANYEVENT_MCP_TESTS} || 0) >= 1;
-   skip "GNU find is unavailable", 1 unless $utility{find};
+   skip "GNU find is unavailable", 3 unless $utility{find};
 
    $result = call list => {};
    ok $result->{content}[0]{text} =~ /\tnew\n/, "compact listing preserved";
+   $result = call list => { path => "" };
+   ok !$result->{isError} && $result->{content}[0]{text} =~ /\tnew\n/,
+      "empty list path selects workdir";
+   mkdir "$dir/work/0" or die $!;
+   write_file "$dir/work/0/zero", "zero\n";
+   $result = call list => { path => "0" };
+   ok !$result->{isError} && $result->{content}[0]{text} =~ /\tzero\n/
+      && $result->{content}[0]{text} !~ /\tnew\n/,
+      "directory named 0 is not treated as empty";
 }
 SKIP: {
-   skip "extended GNU find/grep tests (PERL_ANYEVENT_MCP_TESTS=1)", 7
+   skip "extended GNU find/grep tests (PERL_ANYEVENT_MCP_TESTS=1)", 9
       unless ($ENV{PERL_ANYEVENT_MCP_TESTS} || 0) >= 1;
-   skip "GNU find/grep are unavailable", 7 unless $utility{find} && $utility{grep};
+   skip "GNU find/grep are unavailable", 9 unless $utility{find} && $utility{grep};
 
    $result = call find => { name => "rea" };
    ok $prompts[-1]{tool} eq "find" && !exists $prompts[-1]{dimensions}{subject}{value}
       && !exists $prompts[-1]{subjects} && $prompts[-1]{paths}[0] eq "$dir/work"
       && $result->{content}[0]{text} =~ /\tread\n/,
       "filesystem prompts show affected paths without authorization scopes";
+   $result = call find => { path => "", name => "rea" };
+   ok !$result->{isError} && $result->{content}[0]{text} =~ /\tread\n/,
+      "empty find path selects workdir";
    $result = call grep => { path => ".", pattern => "two" };
    ok $result->{structuredContent}{stdout} =~ /read:2:two/, "grep worker result";
+   $result = call grep => { path => "", pattern => "two" };
+   ok !$result->{isError} && $result->{structuredContent}{stdout} =~ /read:2:two/,
+      "empty grep path selects workdir";
    $result = call grep => { path => "read", pattern => "absent-grep-pattern-2026" };
    ok !$result->{isError} && $result->{structuredContent}{stdout} eq ""
       && $result->{structuredContent}{stderr} eq "",
@@ -659,7 +676,13 @@ ok $tool{"vcs-diff"}{inputSchema}{properties}{cwd}{default} eq "."
    && $tool{"vcs-status"}{inputSchema}{properties}{cwd}{default} eq "."
    && $tool{"vcs-log"}{inputSchema}{properties}{cwd}{default} eq ".",
    "all VCS tools advertise cwd default";
+$result = call "vcs-status" => { backend => "git", cwd => "" };
+ok !$result->{isError} && read_file ("$dir/vcs-cwd.log") eq "$dir/work",
+   "empty VCS cwd selects workdir";
 my $before_vcs = read_file "$dir/vcs.log";
+$result = call "vcs-status" => { backend => "git", files => [""] };
+ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs,
+   "empty VCS filename remains invalid";
 $result = call "vcs-status" => { backend => "git", cwd => "../home" };
 ok $result->{isError} && read_file ("$dir/vcs.log") eq $before_vcs,
    "lexical cwd escape is rejected before execution";
@@ -1343,12 +1366,15 @@ ok $stderr =~ /Permission rules: \Q$dir\E\/config\/anyevent-mcp\/rules\/fs-defau
    "HTTP startup identifies the live permission rule file";
 
 # Program mounts are merged with named-instance overrides; no implicit /opt.
-File::Path::mkpath (["$dir/shared", "$dir/only", "$dir/suppressed"], 0, 0700);
+File::Path::mkpath (["$dir/shared", "$dir/only", "$dir/suppressed", "$dir/optional"], 0, 0700);
 write_file "$dir/config/anyevent-mcp/global.ini", <<EOF;
 [program mcp-fs]
 prepend-path = $dir/bin
 mount.aa = ro:$dir/suppressed
 mount.bb = rw:$dir/shared
+mount-try.missing = ro:$dir/optional-later
+mount-try.present = rw:$dir/optional
+mount-try.suppressed = ro:$dir/suppressed
 env.aa = MCP_TEST_SUPPRESSED=program
 env.bb = MCP_TEST_EXPLICIT=a value=with equals
 env.cc = MCP_TEST_INHERIT
@@ -1357,6 +1383,7 @@ executable.perl = $^X
 [instance mounttest]
 prepend-path =
 mount.aa =
+mount-try.suppressed =
 env.aa =
 env.bb = MCP_TEST_EXPLICIT=instance value=with equals
 mount.cc = ro:$dir/only
@@ -1391,15 +1418,24 @@ sub private_tmp {
    0
 }
 $result = call workdirs => {};
-ok join (",", map $_->[0], @{$result->{structuredContent}{mounts}}) eq "mount.bb,mount.cc"
+ok join (",", map $_->[0], @{$result->{structuredContent}{mounts}})
+      eq "mount-try.missing,mount-try.present,mount.bb,mount.cc"
    && !(grep $_ eq "/opt", @{$result->{structuredContent}{runtime_paths}}),
-   "instance suppresses inherited mount; /opt is not automatic";
+   "instance suppresses inherited required/optional mounts; /opt is not automatic";
 $result = call exec => { argv => [$^X, "-e", "print 1"], reason => "mount read" };
 my $argv = sandbox_args ();
 ok !$result->{isError} && mount_for ($argv, "$dir/shared") eq "--bind"
    && mount_for ($argv, "$dir/only") eq "--ro-bind"
    && !mount_for ($argv, "$dir/suppressed") && private_tmp ($argv),
    "ordinary grants get writable and read-only mounts with private tmp";
+ok !-e "$dir/optional-later" && mount_for ($argv, "$dir/optional-later") eq "--ro-bind-try"
+   && mount_for ($argv, "$dir/optional") eq "--bind-try",
+   "missing and existing optional mounts are passed directly to bubblewrap";
+File::Path::mkpath ("$dir/optional-later", 0, 0700);
+$result = call exec => { argv => [$^X, "-e", "print 1"], reason => "mount appears" };
+$argv = sandbox_args ();
+ok !$result->{isError} && mount_for ($argv, "$dir/optional-later") eq "--ro-bind-try",
+   "optional mount is evaluated per sandbox call, not captured at startup";
 ok scalar (grep $_ eq "--file", @$argv),
    "ordinary grants supply synthetic passwd";
 $result = call exec => { argv => [$^X, "-e", "print 2"], reason => "read host",
@@ -1407,6 +1443,7 @@ $result = call exec => { argv => [$^X, "-e", "print 2"], reason => "read host",
 $argv = sandbox_args ();
 ok !$result->{isError} && mount_for ($argv, "/") eq "--ro-bind-try"
    && mount_for ($argv, "$dir/shared") eq "--bind"
+   && mount_for ($argv, "$dir/optional") eq "--bind-try"
    && !mount_for ($argv, "$dir/only") && !private_tmp ($argv),
    "world-read retains writable exception and host tmp";
 ok !(grep $_ eq "--file", @$argv),
@@ -1416,6 +1453,7 @@ $result = call exec => { argv => [$^X, "-e", "print 3"], reason => "write host",
 $argv = sandbox_args ();
 ok !$result->{isError} && mount_for ($argv, "/") eq "--bind-try"
    && !mount_for ($argv, "$dir/shared") && !mount_for ($argv, "$dir/only")
+   && !mount_for ($argv, "$dir/optional")
    && !private_tmp ($argv), "world-write ignores configured mounts and private tmp";
 ok !(grep $_ eq "--file", @$argv),
    "world-write leaves host passwd visible";
@@ -1436,7 +1474,7 @@ sub sandbox_env {
    \%env
 }
 my $child_env = sandbox_env $argv;
-ok $child_env->{PATH} eq "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin",
+ok $child_env->{PATH} eq "/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin",
    "empty instance prepend-path overrides program setting and restores the base PATH";
 ok $child_env->{MCP_TEST_EXPLICIT} eq "instance value=with equals",
    "instance environment overrides preserve literal spaces and equals signs";
@@ -1507,7 +1545,7 @@ $client = AnyEvent::MCP::Client::JSONL->new (
 );
 $result = call workdirs => {};
 my $program_path = sandbox_env (sandbox_args ());
-ok !$result->{isError} && $program_path->{PATH} eq "$dir/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin",
+ok !$result->{isError} && $program_path->{PATH} eq "$dir/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin",
    "program prepend-path appends one separator before the fixed PATH";
 $client->close;
 
@@ -1527,7 +1565,7 @@ $client = AnyEvent::MCP::Client::JSONL->new (
 );
 $result = call "file-read" => { path => "read" };
 my $inside_worker = sandbox_args ();
-ok sandbox_env ($inside_worker)->{PATH} eq "$dir/sandbox-bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin",
+ok sandbox_env ($inside_worker)->{PATH} eq "$dir/sandbox-bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin",
    "trailing colons in prepend-path do not create empty PATH entries";
 ok !$result->{isError} && $inside_worker->[-3] eq "$dir/sandbox-bin/inside-perl",
    "worker uses the executable found only in the sandbox PATH";

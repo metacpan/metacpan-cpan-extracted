@@ -43,6 +43,7 @@ on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Find';
 	requires 'File::Temp';
+	requires 'POSIX';
 	requires 'Test::Exception';
 	requires 'Test::Mockingbird::TimeTravel', '0.14';
 	requires 'Test::Most';

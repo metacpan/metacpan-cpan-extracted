@@ -8,6 +8,7 @@ use Test2::Bundle::More;
 use JSON::MaybeXS;
 use Path::Tiny;
 use Module::Runtime qw( require_module );
+use Langertha::Reasoning;
 
 # karr k209/k215 review (I1) / ADR 0023 k209 Update: the thinking:{type:...}
 # object is the spelling of MiniMax's cloud API and Kimi's Messages face, not a
@@ -33,7 +34,21 @@ for my $key ( sort keys %$want ) {
   my $body = $canon->decode( $engine->$kind( [ { role => 'user', content => 'hi' } ] )->content );
   delete $body->{stream_options} if $kind eq 'chat_stream_request';
   my $got = $canon->encode($body);
-  is( $got, $want->{$key}, "unchanged since 4e7f9d8: $key" );
+  my $expected = $want->{$key};
+  # k382: LlamaCpp and SGLang moved to the chat_template_kwargs reasoning wire,
+  # an intended change that is not the thinking:{type} toggle. Their effort
+  # spelling is re-derived from the serializer; every other field stays the
+  # pre-k209 snapshot, and the thinking key is still forbidden below.
+  my $moved = $engine->reasoning_wire_format eq 'chat_template_kwargs';
+  if ($moved) {
+    my $base = $canon->decode($expected);
+    delete $base->{reasoning_effort};
+    $expected = $canon->encode( { %$base, ( $effort ne 'bare'
+      ? Langertha::Reasoning->new( effort => $effort )->to('chat_template_kwargs') : () ) } );
+  }
+  is( exists $body->{thinking} ? 1 : 0, exists $canon->decode( $want->{$key} )->{thinking} ? 1 : 0,
+    "thinking key present only where the pre-k209 body had it: $key" );
+  is( $got, $expected, ( $moved ? "pre-k209 body plus the chat_template_kwargs wire" : "unchanged since 4e7f9d8" ) . ": $key" );
 }
 
 done_testing;

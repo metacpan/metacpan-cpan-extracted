@@ -1,0 +1,23 @@
+# build output
+^blib/
+^pm_to_blib$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^LinkedList-Single-.*\.tar\.gz$
+# the top-level copies of version/*/{lib,t} made by Makefile.PL
+^lib/
+^t/
+# examples are development material (./examples is a symlink)
+^examples$
+^version/[^/]+/Examples/
+^version/[^/]+/examples/
+# session cruft
+^version/[^/]+/\.prove$
+^restart$
+^resume$
+# vcs and editor
+^\.git/
+^\.claude
+~$
+\.old$

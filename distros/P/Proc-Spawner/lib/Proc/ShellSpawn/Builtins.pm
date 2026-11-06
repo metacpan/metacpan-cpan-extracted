@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Builtins;   # builtins run by the large subset: one function per builtin (B1-B3 of "Shell Corpus Gaps")
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use strict; use warnings; use feature 'current_sub';
 use Proc::ShellSpawn;
 BEGIN { no strict 'refs'; *$_ = \&{"Proc::ShellSpawn::$_"} for qw(defer fail msg put var spawn find_cmd) }
@@ -40,13 +40,20 @@ sub b_interactive {   # nothing (the default), or as dash, which has none of the
 # ------------------------------------------------------------------ B3: as dash
 sub b_jobs {   # dash's format in sh -c: "[N] + Running", padded to column 33, without the command's text; -l adds the
   # process ID, -p prints it alone.  In a pipeline element or $( ) the shell's jobs are listed too, as bash does (rule E)
-  my ($c, $argv, $env, $k) = @_; my $f = join '', map /^-([lp]+)\z/ ? $1 : '', @$argv[1 .. $#$argv];
-  my @j = (@{$c->{sh}{ljobs} // []}, @{$c->{sh}{jobl}}); my $t = '';
-  for my $i (0 .. $#j) { next if defined $j[$i]{st}; my $pid = $j[$i]{first} // $j[$i]{pids}[0] // 0;
-    if ($f =~ /p/) { $t .= "$pid\n"; next }
+  # Operands %N, %%, %+, %- (post-0.04) list those jobs, in that order; one that does not exist: dash's message, status 2.
+  my ($c, $argv, $env, $k) = @_; my @a = @$argv[1 .. $#$argv]; my $f = '';
+  $f .= $1 while @a && $a[0] =~ /^-([lp]+)\z/ && shift @a;
+  my @j = (@{$c->{sh}{ljobs} // []}, @{$c->{sh}{jobl}}); my $st = 0;
+  my $line = sub { my $i = shift; my $pid = $j[$i]{first} // $j[$i]{pids}[0] // 0; return "$pid\n" if $f =~ /p/;
     my $h = sprintf "[%d] %s %s", $i + 1, $i == $#j ? '+' : $i == $#j - 1 ? '-' : ' ', $f =~ /l/ ? "$pid " : '';
-    $t .= sprintf "%s%-*s\n", $h, 33 - length $h, 'Running' }
-  put($c, 1, $t, done($k, 0)) }
+    sprintf "%s%-*s\n", $h, 33 - length $h, 'Running' };
+  my @out = map +[1, $line->($_)], grep !defined $j[$_]{st}, 0 .. $#j;
+  if (@a) { @out = ();
+    for (@a) { my $i = /^%([0-9]+)\z/ ? $1 - 1 : $_ eq '%-' ? $#j - 1 : $#j;
+      if ($i >= 0 && $i <= $#j && !defined $j[$i]{st}) { push @out, [1, $line->($i)] }
+      else { push @out, [2, "jobs: No such job: $_"]; $st = 2 } } }
+  sub { my $next = __SUB__; my $o = shift @out or return $k->($st);
+    $o->[0] == 1 ? put($c, 1, $o->[1], $next) : msg($c, $o->[1], $next) }->() }
 sub b_bg { my ($c, $argv, $env, $k) = @_; my $j = $argv->[1];
   msg($c, defined $j ? "$argv->[0]: job $j not created under job control" : "$argv->[0]: No current job", done($k, 2)) }
 *b_fg = \&b_bg;
@@ -80,16 +87,27 @@ sub b_times {   # the shell's own and its children's user and system time
   my $f = sub { my $s = shift; sprintf '%dm%.6fs', int($s / 60), $s - 60 * int($s / 60) };
   put($c, 1, join(' ', map $f->($_), @t[0, 1]) . "\n" . join(' ', map $f->($_), @t[2, 3]) . "\n", done($k, 0)) }
 
-# ulimit, reading only: dash's letters and units; the limits of this Perl process, from /proc/self/limits (Linux).
+# ulimit, reading only: dash's letters and units; the limits of this Perl process, from /proc/self/limits (Linux), or
+# else from a shell's ulimit (dash, bash --posix, ksh or sh, in /bin first; POSIX units: blocks of 512 bytes for -f and
+# -c, KiB for -s -d -m -l -v).
 my %UL = (t => ['Max cpu time', 1], f => ['Max file size', 512], d => ['Max data size', 1024], s => ['Max stack size', 1024],
           c => ['Max core file size', 512], m => ['Max resident set', 1024], l => ['Max locked memory', 1024],
           n => ['Max open files', 1], v => ['Max address space', 1024]);
+sub ulimit_shell {   # a shell to ask: dash, bash (--posix: its -f and -c count 512 bytes, as POSIX), ksh, sh; in /bin first, then on PATH
+  my $c = shift; my @n = qw(dash bash ksh sh);
+  for my $d ('/bin', grep length, split /:/, Proc::ShellSpawn::var($c, 'PATH') // '') { -x "$d/$_" && !-d _ and return "$d/$_" for @n }
+  undef }
 sub b_ulimit {
   my ($c, $argv, $env, $k) = @_; my ($hard, $r) = (0, 'f');
   for (@$argv[1 .. $#$argv]) { $hard = 1 if /H[a-zA-Z]*\z/ && !/S[^H]*\z/; $r = $1 if /([nsctvlmdf])/ }
-  open my $fh, '<', '/proc/self/limits' or return Proc::ShellSpawn::Large::unsupported($c, "'ulimit' (no /proc/self/limits)");
+  open my $fh, '<', '/proc/self/limits' or do {   # no /proc (FreeBSD, RT #182479): a shell's ulimit, as a child has our limits
+    my $sh = ulimit_shell($c);
+    require Proc::ShellSpawn::Large;   # (unsupported lives there; this module may run without it)
+    return Proc::ShellSpawn::Large::unsupported($c, "'ulimit' (no /proc/self/limits, and no shell to ask)") unless $sh;
+    return Proc::ShellSpawn::spawn($c, $c->{map}, [$sh, $sh =~ m{/bash\z} ? '--posix' : (), '-c', 'ulimit ' . ($hard ? '-H ' : '') . "-$r"], {}, $k) };
   my ($name, $div) = @{$UL{$r}}; my $v;
   while (<$fh>) { next unless /^\Q$name\E\s{2,}(\S+)\s+(\S+)/; $v = $hard ? $2 : $1; last }
+  require Proc::ShellSpawn::Large;   # (unsupported lives there; this module may run without it)
   return Proc::ShellSpawn::Large::unsupported($c, "'ulimit -$r'") unless defined $v;
   put($c, 1, ($v eq 'unlimited' ? $v : int($v / $div)) . "\n", done($k, 0)) }
 

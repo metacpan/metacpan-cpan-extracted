@@ -1,0 +1,122 @@
+=head1 NAME
+
+bt_input - input/parsing functions in B<btparse> library
+
+=head1 SYNOPSIS
+
+   typedef long (*bt_read_fn) (void *userdata, char *buf, size_t n);
+
+   bt_parser * bt_parser_new_reader (bt_read_fn read, void *userdata,
+                                     const char *filename, unsigned flags);
+   bt_parser * bt_parser_new_string (const char *text, size_t len,
+                                     const char *filename, int line,
+                                     unsigned flags);
+   void        bt_parser_free (bt_parser *parser);
+   void        bt_parser_set_macros (bt_parser *parser, bt_macros *macros);
+   boolean     bt_parser_eof (bt_parser *parser);
+   boolean     bt_parser_read_error (bt_parser *parser);
+
+   AST * bt_parse_entry (bt_parser *parser, bt_errors *errs,
+                         btshort options, boolean *status);
+
+=head1 DESCRIPTION
+
+The functions described here are used to read and parse BibTeX data,
+converting it from raw text to abstract-syntax trees (ASTs).
+
+All parsing state lives in a C<bt_parser> object, so any number of
+inputs can be parsed at the same time, and from different threads (as
+long as each parser is only used by one thread at a time).  Nothing is
+ever printed: errors and warnings are appended to a C<bt_errors> list
+(see L<btparse/"ERROR HANDLING">).
+
+=over 4
+
+=item bt_parser_new_reader ()
+
+   bt_parser * bt_parser_new_reader (bt_read_fn read, void *userdata,
+                                     const char *filename, unsigned flags);
+
+Creates a parser that reads its input by calling C<read(userdata, buf,
+n)>, which should put up to C<n> bytes into C<buf> and return the number
+of bytes read, 0 at end of input, or -1 on a read error.  The parser
+reads ahead only as far as it needs to, so the input may be a pipe or a
+network stream.  (The Perl interface uses this to read through PerlIO.)
+
+C<filename> is used in error messages, and may be C<NULL>.  C<flags> may
+include C<BTP_UTF8> to have the input validated as UTF-8: invalid byte
+sequences are replaced with U+FFFD (with a warning), so that every string
+in the resulting AST is valid UTF-8.  Without C<BTP_UTF8>, bytes are
+passed through untouched.  A UTF-8 byte order mark at the start of the
+input is always ignored.
+
+=item bt_parser_new_string ()
+
+   bt_parser * bt_parser_new_string (const char *text, size_t len,
+                                     const char *filename, int line,
+                                     unsigned flags);
+
+Creates a parser for the C<len> bytes at C<text> (which are copied).
+C<line> is the line number of the start of the text, for error messages.
+
+=item bt_parser_set_macros ()
+
+   void bt_parser_set_macros (bt_parser *parser, bt_macros *macros);
+
+Sets the macro table used to expand macros and to store the definitions
+from C<@string> entries (see L<bt_macros>).  The table is not owned by the
+parser.
+
+=item bt_parse_entry ()
+
+   AST * bt_parse_entry (bt_parser *parser, bt_errors *errs,
+                         btshort options, boolean *status);
+
+Scans and parses the next BibTeX entry.  C<options> are the
+post-processing options applied to the entry (see L<bt_postprocess>);
+C<@string> definitions are stored in the parser's macro table unless
+C<BTO_NOSTORE> is given.  C<*status> is set to C<TRUE> if the entry
+parsed successfully or with only minor warnings, and C<FALSE> if there
+were any serious lexical or syntactic errors.  All errors are appended to
+C<errs> (which may be C<NULL> to discard them).
+
+Returns the AST of the entry, or C<NULL> at end of input.  Free it with
+C<bt_free_ast()>; it refers to the parser's copy of the filename, so it
+must not outlive the parser.
+
+After a syntax error the parser recovers as BibTeX does: errors within a
+field skip to the next field, and anything worse skips to the next C<@>
+at top level.  An entry is returned whenever one was started, even if it
+had errors, so you would usually call it like this:
+
+   while ((entry = bt_parse_entry (parser, &errs, 0, &ok)))
+   {
+      if (ok)
+      {
+         /* ... process entry ... */
+      }
+      bt_free_ast (entry);
+   }
+
+If the input contains no entries at all, the first call reports a syntax
+error ("expected '@'").
+
+=item bt_parser_eof ()
+
+True once all of the input has been consumed.
+
+=item bt_parser_read_error ()
+
+True if the read callback reported an error.
+
+=back
+
+=head1 SEE ALSO
+
+L<btparse>, L<bt_postprocess>, L<bt_traversal>
+
+=head1 AUTHOR
+
+Greg Ward <gward@python.net>
+
+=cut

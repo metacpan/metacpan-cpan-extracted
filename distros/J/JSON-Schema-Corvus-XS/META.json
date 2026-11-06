@@ -28,13 +28,13 @@
       "configure" : {
          "requires" : {
             "Alien::Base::Wrapper" : "2.38",
-            "Alien::CorvusJsonSchema" : "v0.1.0",
+            "Alien::CorvusJsonSchema" : "v0.1.2",
             "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::CorvusJsonSchema" : "v0.1.0",
+            "Alien::CorvusJsonSchema" : "v0.1.2",
             "JSON::PP" : "2.27",
             "perl" : "5.026"
          }
@@ -57,6 +57,6 @@
          "web" : "https://github.com/corvus-dotnet/Corvus.JsonSchema/tree/main/src-perl/JSON-Schema-Corvus-XS"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

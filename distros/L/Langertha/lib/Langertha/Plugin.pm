@@ -1,6 +1,6 @@
 package Langertha::Plugin;
 # ABSTRACT: Base class for plugins
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose;
 use Future::AsyncAwait;
 
@@ -13,11 +13,13 @@ has host => (
 
 
 around BUILDARGS => sub {
-  my ( $orig, $class, %args ) = @_;
-  if ($args{raider} && !$args{host}) {
-    $args{host} = delete $args{raider};
+  my ( $orig, $class, @args ) = @_;
+  # Let Moose normalize first: new() also takes one HashRef.
+  my $args = $class->$orig(@args);
+  if ($args->{raider} && !$args->{host}) {
+    $args->{host} = delete $args->{raider};
   }
-  return $class->$orig(%args);
+  return $args;
 };
 
 sub raider {
@@ -90,7 +92,7 @@ Langertha::Plugin - Base class for plugins
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -248,7 +250,7 @@ instantiation.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -265,7 +267,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

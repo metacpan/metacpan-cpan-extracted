@@ -1,5 +1,27 @@
 Revision history for Class-Abstract
 
+0.03	Thu Nov  5 09:51:37 AM EST 2026
+	[ Incompatible Changes ]
+	- $config{harness_bypass} now defaults to 0: enforcement is no longer
+	  switched off when HARNESS_ACTIVE is set, so test suites catch
+	  accidental instantiation of abstract classes.  Set it back to 1, or
+	  use local $Class::Abstract::BYPASS = 1, to restore the old behaviour.
+	[ Bug Fixes ]
+	- Bump minimum Test::Mockingbird, fixes RT#178677
+	- is_abstract(), new() and check_abstract() no longer create the
+	  package they are asked about in the symbol table
+	- Class::Abstract->is_abstract($obj) now checks the object's class
+	  (it used to check the stringified reference and always return 0)
+	- is_abstract() croaks on an unblessed reference, as new() does
+	- Objects blessed into package '0' are accepted as invocants
+	- undef elements in @ISA no longer cause warnings
+	[ Enhancements ]
+	- check_abstract()'s unblessed-reference message names the reftype
+	- POD rewritten: per-routine examples, API specifications, messages
+	  and Z specifications; LIMITATIONS section
+	[ Tests ]
+	- New t/locales.t; regression tests for all of the above
+
 0.02	Thu Jun 11 10:07:13 EDT 2026
 	[ Bug Fixes ]
 	- Added Test::Mockingbird prereq to testing

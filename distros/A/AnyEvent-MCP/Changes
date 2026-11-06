@@ -1,5 +1,115 @@
 Revision history for AnyEvent::MCP
 
+0.81  Thu 05 Nov 2026 04:51:59 CET
+	- keep OAuth2 tests working without optional Mail::IMAPTalk,
+	  IO::Socket::SSL or Authen::SASL; skip only worker-specific checks.
+	- support optional `mount-try.SUFFIX = ro:/path` or `rw:/path` in
+	  mcp-fs configuration. Pass these directly as bubblewrap
+	  --ro-bind-try/--bind-try for each invocation, without startup path
+	  checks, locally and remotely; required mount.* entries are unchanged.
+	- support one remote host per mcp-fs instance with -h/--host and
+	  -e/--rsh; resolve remote workdirs and available tools in a single
+	  startup probe, then execute existing workers through a binary-framed
+	  remote Perl launcher without installing any MCP modules remotely.
+	- use logical absolute pathnames (without resolving symlinks) as compact
+	  workdir IDs across hosts; qualify remote permission scopes independently.
+	  Named profiles remain shared between instances. Report cached remote
+	  VCS markers and remote umask.
+	- reserve -h for application-specific options; --help remains common.
+	- test remote workers, external GNU utilities, permission isolation,
+	  shell argument quoting and startup probing using a mock remote shell
+	  and bubblewrap, including unsandboxed/auto behavior. Verify matching
+	  workdir IDs for identical logical paths across local and remote
+	  instances.
+	- make mock remote-agent tests independent of a local SSH_AUTH_SOCK
+	  inherited from the test runner (including CPAN Testers).
+	- document --eager when starting mcp-webbrowser through multibroker;
+	  defer possible downstream preferences for --eager and --hidden.
+
+0.8   Thu 05 Nov 2026 01:52:48 CET
+	- INCOMPATIBLE CHANGE: due to the added user management, existing
+          url tokens have been invalidated.
+        - limit distribution permission normalization to its staging
+          directory, and supply proper CPAN author and abstract metadata.
+        - give shared command-line switches their own reference in
+          Server::Simple; use individually indexed POD items for executable
+          options and application-specific shared-option behavior.
+        - refresh the introductory guide and mcp-imap/mcp-http manuals
+          with first-use workflows, OAuth2 setup, mailbox/search examples
+          and reverse-TLS troubleshooting; correct stale retry documentation.
+        - extend mcp-imap SEARCH filters with recursive AND/OR/NOT, header,
+          text/body, date, size and flag criteria; use explicitly quoted
+          IMAP arguments and bounded filter complexity.
+        - capture deliberately triggered connection errors in test assertions,
+          avoiding noisy successful test runs.
+        - expose IMAP LSUB to inspect subscribed mailboxes, alongside
+          subscribe/unsubscribe; return the same format as LIST.
+        - remove superseded IMAP OAuth provider and pagination prototypes
+          and their obsolete reference tests.
+        - defer outgoing mail submission research (mcp-smtp or mcp-imap)
+          in TODO.md.
+        - retry reverse connections only for TCP connection refusal and
+          unexpected disconnects; report and stop on other TCP errors or
+          TLS handshake/verification failures.
+        - force scalar context when checking Mail::IMAPTalk results;
+          list context truncated LIST responses and could corrupt SEARCH
+          results. Test with context-sensitive IMAP mocks.
+        - report HTTPS reverse-connection handshake failures rather than
+          silently retrying; send credentials only after verified TLS succeeds.
+        - omit pointless mailbox permission dimension for mcp-imap mailboxes.
+        - clarify expected OAuth redirect error page and account selection.
+        - implement mcp-imap OAuth2 authorization-code login with PKCE,
+          human-pasted headless browser redirect, HTTPS token exchange,
+          refresh-token persistence/rotation and IMAP SASL XOAUTH2.
+          Keep interactive credentials outside MCP tools and argv.
+        - omit unnecessary shell quotes in mcp-imap providers commands.
+        - expand mcp-imap providers with Thunderbird ISPDB domain search,
+          provider-hosted HTTPS autoconfig lookup and ISPDB fallback,
+          password-based IMAP alternatives and provider setup instructions;
+          continue printing optional OAuth configuration without saving it.
+	- add per-downstream --hidden to mcp-multibroker, omitting a
+	  server's tools from normal discovery while retaining explicit
+	  list-tools, discover-brokers and call-tool access.
+	- number the user management test consecutively as t/27_users.t.
+	- tidy Perl import grouping, internal comments and source layout
+	  in the command-line tools and library modules.
+	- stop imposing an IMAP account file mode check; access is governed
+	  by ordinary filesystem permissions.
+	- use the permission engine's literal matching convention for exact
+	  user identities and test positive permission-scope validation.
+	- reject invalid browser WebSocket credentials via the documented
+	  handshake exception interface, producing one specific warning.
+	- apply the same handshake rejection handling to Vim WebSocket
+	  connections, including peer and invalid-token/path warnings.
+	- document user-management scopes and URL examples in command help.
+        - add scoped, revocable MCP users with HKDF-derived credentials,
+	  an implicit global default user, and atomic user management;
+	  list effective user URLs with --print-url[=USER], also accepting
+	  --print-urls, without binding the advertised listener port.
+	- associate HTTP credentials with per-request users, bind user
+	  identity to persistent permissions and permission continuations,
+	  and delegate original users through trusted multibrokers.
+	- select the effective connect_user (default: default) for reverse
+	  MCP, private Vim and browser connections, independently of normal
+	  authenticated HTTP tool calls.
+	- treat empty directory paths as "." in mcp-fs list, find, grep and
+	  VCS cwd, without accepting empty filenames.
+	- support opportunistic HTTP/HTTPS and reverse MCP connections on the
+	  same listener, TLS certificate/key CLI options, and dual URL discovery;
+	  support verified HTTPS for outgoing reverse connections.
+	- treat idle HTTP disconnects as normal EOF while retaining errors
+	  for clients disconnecting during request headers or bodies.
+	- identify failing MCP connections by client name, remote address
+	  and connection id, including modern per-request client metadata.
+	- trace local multibroker prompt starts, outcomes and cancellations
+	  with elapsed time to diagnose disappearing permission dialogs.
+	- use an 8 MiB default MCP message size across JSONL and HTTP
+	  clients and servers, allowing large base64 tool requests through
+	  mcp-multibroker; log server transport errors at warn level
+	  instead of silently closing connections.
+	- load AnyEvent::Log at compile time so its format_time call is parsed
+	  as a function, fixing activity logging on Perl 5.10.
+
 0.71  Fri 30 Oct 2026 18:01:51 CET
 	- make multibroker-spawned children ask for permissions through MCP,
 	  independently of the multibroker's own permission prompt mode.

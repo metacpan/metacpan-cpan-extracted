@@ -61,6 +61,20 @@ my @tests = (
       },
       {
               func   => 'select',
+              args   => ['test', '*', { a => 'boom' } , []],
+              stmt   => 'SELECT * FROM test WHERE ( a = ? )',
+              stmt_q => 'SELECT * FROM `test` WHERE ( `a` = ? )',
+              bind   => ['boom']
+      },
+      {
+              func   => 'select',
+              args   => ['test', '*', { a => 'boom' } , {}],
+              stmt   => 'SELECT * FROM test WHERE ( a = ? )',
+              stmt_q => 'SELECT * FROM `test` WHERE ( `a` = ? )',
+              bind   => ['boom']
+      },
+      {
+              func   => 'select',
               args   => ['test', '*', { a => ['boom', 'bang'] }],
               stmt   => 'SELECT * FROM test WHERE ( ( ( a = ? ) OR ( a = ? ) ) )',
               stmt_q => 'SELECT * FROM `test` WHERE ( ( ( `a` = ? ) OR ( `a` = ? ) ) )',
@@ -331,13 +345,13 @@ my @tests = (
               stmt_q => 'SELECT * FROM `test` WHERE ( `a` < to_date(?, \'MM/DD/YY\') AND `b` = ? )',
               bind   => ['02/02/02', 8],
       },
-      { #TODO in SQLA >= 2.0 it will die instead (we kept this just because old SQLA passed it through)
+      { # a plain hashref bind value (e.g. a Pg json/jsonb column) is passed
+        # through as a bind value, without warning (GH#18, RT#120676)
               func   => 'insert',
               args   => ['test', {a => 1, b => 2, c => 3, d => 4, e => { answer => 42 }}],
               stmt   => 'INSERT INTO test (a, b, c, d, e) VALUES (?, ?, ?, ?, ?)',
               stmt_q => 'INSERT INTO `test` (`a`, `b`, `c`, `d`, `e`) VALUES (?, ?, ?, ?, ?)',
               bind   => [qw/1 2 3 4/, { answer => 42}],
-              warns  => qr/HASH ref as bind value in insert is not supported/i,
       },
       {
               func   => 'update',
@@ -885,18 +899,30 @@ for my $t (@tests) {
       ) || diag dumper({ args => $t->{args}, result => $stmt });
     }
     else {
+      # Watchdog against infinite recursion. The alarm is generous so slow
+      # smokers don't trip it, and it is always disarmed before the local
+      # handler goes away: a leftover alarm would hit the default handler
+      # and kill the whole test (on Win32 the alarm is only delivered when
+      # perl polls its message queue, so it often lands outside the scope).
       lives_ok(sub {
-        alarm(1); local $SIG{ALRM} = sub {
+        local $SIG{ALRM} = sub {
           no warnings 'redefine';
           my $orig = Carp->can('caller_info');
           local *Carp::caller_info = sub { return if $_[0] > 20; &$orig };
           print STDERR "ARGH ($SQL::Abstract::Default_Scalar_To): ".Carp::longmess();
           die "timed out";
         };
-        warnings_like(
-          sub { $cref->() },
-          $t->{warns} || [],
-        ) || diag dumper({ args => $t->{args}, result => $stmt });
+        alarm(30);
+        my $ok = eval {
+          warnings_like(
+            sub { $cref->() },
+            $t->{warns} || [],
+          ) || diag dumper({ args => $t->{args}, result => $stmt });
+          1;
+        };
+        my $err = $@;
+        alarm(0);
+        die $err unless $ok;
       }) || diag dumper({ args => $t->{args}, result => $stmt, threw => $@ });
 
       is_same_sql_bind(

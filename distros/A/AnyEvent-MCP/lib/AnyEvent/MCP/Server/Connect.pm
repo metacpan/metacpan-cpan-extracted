@@ -5,7 +5,8 @@ AnyEvent::MCP::Server::Connect - reverse-connecting MCP JSONL server
 =head1 DESCRIPTION
 
 This JSONL server connects to a multibroker's HTTP/extension listener using
-C<connect =E<gt> "http://host:port/token/alias">. It sends
+C<connect =E<gt> "http://host:port/token/alias"> or
+C<"https://host:port/token/alias">. It sends
 C<["mcp-connect", token, alias]> and then ordinary MCP JSONL messages.
 The TCP initiator remains the MCP server; the multibroker is the MCP client.
 
@@ -26,8 +27,9 @@ use this object directly if your application already owns its event loop.
    AE::cv->recv;
 
 C<$tools> is an L<AnyEvent::MCP::Server::Toolset> registered by your
-application. The URL identifies a raw-TCP extension listener, despite
-its C<http://> spelling; it is not an HTTP POST endpoint. See
+application. The URL identifies a raw extension listener, not an HTTP POST
+endpoint. HTTPS verifies the server certificate and hostname before sending
+the JSON hello. See
 L<mcp-multibroker/Reverse connections> for setting up the other side.
 
 =head1 METHODS
@@ -36,9 +38,10 @@ L<mcp-multibroker/Reverse connections> for setting up the other side.
 
 =item $server->start
 
-Attempt a connection immediately. Retry failures every second, up to sixty
-attempts, and start a new retry period after an established connection closes.
-Exhaustion closes the server. Outstanding requests are cancelled, not replayed.
+Attempt a connection immediately. Retry refused TCP connections every second,
+up to sixty attempts. Other failures during connection setup, including failed
+TLS verification, close the server immediately. Unexpected disconnects after
+establishment start a new retry period. Requests are cancelled, not replayed.
 
 =item $server->close
 
@@ -57,6 +60,7 @@ use AnyEvent::MCP::Extension ();
 use AnyEvent::Socket ();
 use AnyEvent ();
 use JSON::XS ();
+use Errno qw(ECONNREFUSED);
 use Scalar::Util qw(weaken);
 
 sub new {
@@ -68,6 +72,7 @@ sub new {
    weaken (my $weak = $self);
    $self->{on_connection_close} = sub {
       $on_close->(@_) if $on_close;
+      delete $weak->{tls_connecting} if $weak;
       $weak->start if $weak && !$weak->{_closed};
    };
 
@@ -83,28 +88,52 @@ sub start {
    weaken $self;
    $self->{retry} = AE::timer 0, 1, sub {
       return unless $self;
-      return if $self->{connector};
+      return if $self->{connector} || $self->{tls_connecting};
 
       if (++$self->{attempts} > 60) {
-         AE::log warn => "MCP reverse connection: giving up after sixty attempts";
+         AE::log error => "MCP reverse connection: giving up after sixty attempts";
          $self->close;
          return
       }
 
-      my ($host, $port, $token, $alias) = @{$self->{endpoint}};
+      my ($host, $port, $token, $alias, $scheme) = @{$self->{endpoint}};
       $self->{connector} = AnyEvent::Socket::tcp_connect $host, $port, sub {
          delete $self->{connector} if $self;
          my ($fh) = @_;
          return unless $self && !$self->{_closed};
 
          unless ($fh) {
-            AE::log debug => "MCP reverse connection '$alias': $!";
+            if ($! == ECONNREFUSED) {
+               AE::log debug => "MCP reverse connection '$alias': $!";
+               return
+            }
+            AE::log error => "MCP reverse connection '$alias': TCP connection failed: $!";
+            $self->close;
             return
          }
 
-         delete $self->{retry};
          my $handle = $self->accept ($fh);
-         $handle->push_write (JSON::XS::encode_json (["mcp-connect", $token, $alias]) . "\n");
+         my $hello = JSON::XS::encode_json (["mcp-connect", $token, $alias]) . "\n";
+         if ($scheme eq "https") {
+            $self->{tls_connecting} = 1;
+            $handle->on_starttls (sub {
+               my ($handle, $ok, $error) = @_;
+               delete $self->{tls_connecting} if $self;
+               return unless $self && !$self->{_closed};
+               unless ($ok) {
+                  AE::log error => "MCP reverse connection '$alias': HTTPS handshake failed: $error";
+                  $self->close;
+                  return
+               }
+               delete $self->{retry};
+               $handle->push_write ($hello);
+            });
+            $handle->{peername} = $host;
+            $handle->starttls ("connect", { verify => 1, verify_peername => "https" });
+         } else {
+            delete $self->{retry};
+            $handle->push_write ($hello);
+         }
       }, sub { 1 };
    };
 }

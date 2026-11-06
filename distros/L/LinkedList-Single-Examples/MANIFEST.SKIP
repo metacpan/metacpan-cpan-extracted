@@ -17,6 +17,6 @@
 ^plan/
 # vcs and editor
 ^\.git/
-^\.claude
+(^|/)\.claude(/|$)
 ~$
 \.old$

@@ -16,7 +16,7 @@ use Devel::XSCover::XS ();
 use Devel::XSCover::Gcov ();
 use Devel::XSCover::DB ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our (%DEFAULTS);
 
@@ -43,8 +43,29 @@ sub new {
     return $self;
 }
 
+sub defaults_from_file {
+    my ($class, @argv) = @_;
+    my $dir = '.';
+    for my $i (0 .. $#argv - 1) {
+        $dir = $argv[$i + 1] if $argv[$i] eq '-dir' || $argv[$i] eq '--dir';
+    }
+    my $file = File::Spec->catfile($dir, '.xs_cover');
+    open my $fh, '<', $file or return;
+    my @words;
+    while (my $line = <$fh>) {
+        $line =~ s/#.*//;
+        for my $word (split ' ', $line) {
+            $word =~ s/^(['"])(.*)\1$/$2/;
+            push @words, $word;
+        }
+    }
+    close $fh;
+    return @words;
+}
+
 sub new_from_argv {
     my ($class, @argv) = @_;
+    unshift @argv, $class->defaults_from_file(@argv);
     my %opt = (test => [], plain => [], ignore => []);
     my $parser = Getopt::Long::Parser->new(config => [qw(no_ignore_case)]);
     $parser->getoptionsfromarray(\@argv, \%opt, qw(
@@ -122,7 +143,9 @@ sub run {
     warn "xs_cover: the tests failed with status $status, reporting what ran\n" if $status;
     my @maps   = Devel::XSCover::XS->new(dir => $self->{dir}, skip => $self->skip_dirs)->read;
     my $reader = Devel::XSCover::Gcov->new(%common, gcov => $build->gcov_command, conditions => $build->conditions, flow => $build->flow_kind, ignore => $self->{ignore},
-        generated => [ map { $_->{c} } @maps ], skip => $self->skip_dirs, save => $self->gcov_dir($test->db_path));
+        generated => [ map { $_->{c} } @maps ], xsubs => { map { my $m = $_; map { $_ => $m->{xsubs}{$_}{file} } keys %{ $m->{xsubs} } } @maps },
+        inverse => { map { %{ $_->{inverse} || {} } } @maps },
+        skip => $self->skip_dirs, save => $self->gcov_dir($test->db_path));
     my @objects = $reader->read;
     my $writer  = Devel::XSCover::DB->new(%common, db => $test->db_path);
     my $entries = $writer->entries($writer->merge(@objects), @maps);
@@ -312,6 +335,17 @@ C<silent>.
 
 Parses a command line in the form L<xs_cover> takes and returns the object. Prints
 the usage and exits for C<-h>, prints the version and exits for C<-v>.
+A F<.xs_cover> file in the distribution directory (the one C<-dir> names, or the
+current one) holds defaults: its words, split on whitespace with a C<#> starting a
+comment and quotes around a word dropped, go before the command line, so a pattern
+in the file and one on the command line both apply and a single-valued option on
+the command line wins.
+
+=head2 defaults_from_file
+
+    my @words = Devel::XSCover->defaults_from_file(@ARGV);
+
+The words of the distribution's F<.xs_cover>, or nothing when there is no such file.
 
 =head2 run
 

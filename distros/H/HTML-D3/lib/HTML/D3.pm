@@ -19,11 +19,15 @@ HTML::D3 - A simple Perl module for generating charts using D3.js.
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
+
+# A Content-Security-Policy nonce: base64 or base64url, so it cannot end the
+# attribute it is written into.
+my $NONCE_RE = qr{\A[A-Za-z0-9+/_=-]+\z};
 
 =head1 SYNOPSIS
 
@@ -93,6 +97,15 @@ Accepts the following optional arguments:
 It is plain text, escaped when it is written to the page: C<E<lt>> and C<&> appear
 as themselves, and HTML in a title is shown rather than obeyed.
 
+=item * C<nonce> - A Content-Security-Policy nonce.  Every C<E<lt>scriptE<gt>>
+element the object writes, inline or not, then carries C<nonce="...">, so a page
+whose policy is C<script-src 'nonce-...'> runs the chart without
+C<'unsafe-inline'>.  It must be made of the characters a base64 or base64url
+nonce uses (C<A-Z a-z 0-9 + / _ - =>), so it cannot end the attribute.  Give a
+fresh one for each response, and never add it to markup afterwards: a nonce put
+on every C<E<lt>scriptE<gt>> of a finished page would bless one injected through
+the data as well.  Without it the elements are written as before.
+
 =item * C<responsive> - If true, SVG elements are rendered with
 C<viewBox> and C<width="100%"> instead of fixed pixel dimensions, so the
 chart scales fluidly with its container; with no C<height> attribute, the
@@ -126,6 +139,10 @@ sub new
 			}, responsive => {
 				type => 'boolean',
 				optional => 1,
+			}, nonce => {
+				type => 'string',
+				optional => 1,
+				matches => $NONCE_RE,
 			}
 		}
 	});
@@ -149,6 +166,7 @@ sub new
 		height     => $params->{height} || 600,
 		title      => $params->{title}  || 'Chart',
 		responsive => $params->{responsive} || 0,
+		(defined($params->{nonce}) ? (nonce => $params->{nonce}) : ()),
 	}, $class;
 }
 
@@ -374,7 +392,7 @@ sub render_bar_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const svg = d3.select("#chart");
@@ -496,7 +514,7 @@ sub render_animated_bar_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const svg = d3.select("#chart");
@@ -613,7 +631,7 @@ sub render_line_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const svg = d3.select("#chart");
@@ -738,7 +756,7 @@ sub render_animated_line_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const svg = d3.select("#chart");
@@ -903,7 +921,7 @@ sub render_pie_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const width = $self->{width};
@@ -1067,7 +1085,7 @@ sub render_animated_pie_chart {
 <body>
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 
 	const width = $self->{width};
@@ -1409,7 +1427,7 @@ LEGEND_JS
     <svg id="$svg_id" $svg_attrs></svg>
 $legend_div_html</div>
 <div class="bi-pie-tooltip" id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
     const data = $json_data;
 
     function esc(s) {
@@ -1710,7 +1728,7 @@ LEGBLOCK
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function() {
     var data = $json_data;
     var cellPad = $cell_padding;
@@ -2253,7 +2271,7 @@ JS
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function() {
     var data     = $json_data;
     var innerW   = $inner_w;
@@ -2345,7 +2363,7 @@ sub render_line_chart_with_tooltips
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@{[ $self->_title_html() ]}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
 	    position: absolute;
@@ -2363,7 +2381,7 @@ sub render_line_chart_with_tooltips
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 	$ESC_JS
 
@@ -2451,7 +2469,7 @@ splicing directly into a Mojolicious TT (or any other) layout.
 
 The caller is responsible for loading D3 in the page C<<head>>, e.g.:
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
 
 =head3 Arguments
 
@@ -2566,7 +2584,7 @@ sub render_line_chart_snippet
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div class="tooltip" id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
     const data = $json_data;
     $ESC_JS
 
@@ -2853,7 +2871,7 @@ PLAIN
 <button id="$rst_id">Reset zoom</button>
 <svg id="$svg_id" $svg_attrs></svg>
 <div class="tooltip" id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
     const allData     = $json_data;
     $ESC_JS
     let   currentData = allData.slice();
@@ -3006,7 +3024,7 @@ sub render_multi_series_line_chart_with_tooltips
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@{[ $self->_title_html() ]}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
 	    position: absolute;
@@ -3024,7 +3042,7 @@ sub render_multi_series_line_chart_with_tooltips
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 	$ESC_JS
 
@@ -3175,7 +3193,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@{[ $self->_title_html() ]}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
     <style>
 	.tooltip {
 	    position: absolute;
@@ -3194,7 +3212,7 @@ sub render_multi_series_line_chart_with_animated_tooltips
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
 	const data = $json_data;
 	$ESC_JS
 
@@ -3347,7 +3365,7 @@ sub render_multi_series_line_chart_with_legends {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@{[ $self->_title_html() ]}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .tooltip {
             position: absolute;
@@ -3374,7 +3392,7 @@ sub render_multi_series_line_chart_with_legends {
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
         const data = $json_data;
         $ESC_JS
 
@@ -3558,7 +3576,7 @@ sub render_multi_series_line_chart_with_interactive_legends
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@{[ $self->_title_html() ]}</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         .tooltip {
             position: absolute;
@@ -3585,7 +3603,7 @@ sub render_multi_series_line_chart_with_interactive_legends
     <h1 style="text-align: center;">@{[ $self->_title_html() ]}</h1>
     <svg id="chart" ${\ $self->_svg_attrs() }></svg>
     <div class="tooltip" id="tooltip"></div>
-    <script>
+    <script@{[ $self->_nonce_attr ]}>
         const data = $json_data;
         $ESC_JS
 
@@ -3947,7 +3965,7 @@ ANIM
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var series = $json_data;
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
@@ -4344,7 +4362,7 @@ LEG
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function() {
     var data = $json_data;
     var margin = { top: $margin_top, right: $margin_right, bottom: $margin_bottom, left: $margin_left };
@@ -4607,7 +4625,7 @@ SORT
     <tbody>
     $tbody_html</tbody>
 </table>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function() {
     var allData = $json_data;
     var table = d3.select("#$table_id");
@@ -4851,7 +4869,7 @@ RECTS
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var data = $json_data;
     $ESC_JS
@@ -5082,7 +5100,7 @@ sub render_combo_snippet
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var data = $json_data;
     $ESC_JS
@@ -5503,7 +5521,7 @@ LBLJS
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var rawData = $json_data;
     $ESC_JS
@@ -5746,7 +5764,7 @@ XLB
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var bins = $json_data;
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
@@ -5893,7 +5911,7 @@ XLB
 </style>
 <svg id="$svg_id" $svg_attrs></svg>
 <div id="$tip_id"></div>
-<script>
+<script@{[ $self->_nonce_attr ]}>
 (function(){
     var values = $json_data;
     var margin = {top:$margin_top,right:$margin_right,bottom:$margin_bottom,left:$margin_left};
@@ -6061,6 +6079,15 @@ sub _css_colour
 	return $colour =~ m{\A[#0-9A-Za-z_ (),.%/-]+\z} ? $colour : undef;
 }
 
+# The nonce attribute for each <script> the object writes, with its leading
+# space, or nothing.  new() has already checked the characters.
+sub _nonce_attr
+{
+	my $self = shift;
+
+	return defined($self->{nonce}) ? qq{ nonce="$self->{nonce}"} : '';
+}
+
 # The chart's title as text for the page.  The object keeps what it was given.
 sub _title_html
 {
@@ -6111,7 +6138,7 @@ sub _head
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>@{[ $self->_title_html() ]}</title>
-	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<script@{[ $self->_nonce_attr ]} src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 HTML
 	return $html;

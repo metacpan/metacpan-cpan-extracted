@@ -1,5 +1,14 @@
 Revision history for HTML-D3 - Visualise various charts using D3
 
+0.30	Thu Nov  5 10:40:00 AM EST 2026
+	[ New Features ]
+	- new() takes nonce: every <script> the object writes, inline or not and
+	  from every renderer, then carries nonce="...", so a page whose
+	  Content-Security-Policy allows scripts only by nonce runs the chart
+	  without 'unsafe-inline'.  A value that is not base64 or base64url is
+	  refused, so it cannot end the attribute.  Without the option nothing
+	  changes.  t/nonce.t checks every renderer
+
 0.29	Tue Nov  3 01:29:31 PM EST 2026
 	[ New Features ]
 	- render_treemap_snippet colours tiles by a second measure: a row or node

@@ -1,6 +1,6 @@
 package Langertha::Role::PluginHost;
 # ABSTRACT: Role for objects that host plugins (Raider, Engine)
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
 use Future::AsyncAwait;
 use Log::Any qw( $log );
@@ -175,7 +175,7 @@ Langertha::Role::PluginHost - Role for objects that host plugins (Raider, Engine
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 DESCRIPTION
 
@@ -284,7 +284,7 @@ C<_plugin_pipeline_tool_call> remains an alias of this method.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -301,7 +301,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

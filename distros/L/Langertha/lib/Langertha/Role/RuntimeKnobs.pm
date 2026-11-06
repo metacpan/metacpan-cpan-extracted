@@ -1,6 +1,6 @@
 package Langertha::Role::RuntimeKnobs;
 # ABSTRACT: Role for a self-hosted engine with per-request prefix-cache runtime knobs
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
 use Carp qw( croak );
 use Langertha::Runtime::Knobs;
@@ -125,7 +125,7 @@ Langertha::Role::RuntimeKnobs - Role for a self-hosted engine with per-request p
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head2 prefix_cache_salt
 
@@ -221,7 +221,7 @@ L</knobs_kwargs_for> with no per-request overrides.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -238,7 +238,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

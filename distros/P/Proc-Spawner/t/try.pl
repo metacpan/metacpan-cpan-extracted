@@ -5,6 +5,10 @@ use Proc::ShellSpawn;
 my %P = (small => 'Proc::ShellSubset::Small', base => 'Proc::ShellSubset', large => 'Proc::ShellSubset::Large');
 my $pm = $P{$ENV{PARSER} // 'large'} // die "PARSER: small, base or large\n"; eval "require $pm; 1" or die $@;
 $Proc::ShellSpawn::TRACE = sub { print STDERR "  # $_[0]\n" } if $ENV{TRACE} && $ENV{TRACE} ne 'dot';
+if (my $bl = $ENV{RECBUILTIN}) {   # measurement (large-subset-runcompare.pl -q): log each builtin call: HANDLER \035 N=V \036 ... \035 ARGV joined by \037
+  open my $bh, '>>', $bl or die "$bl: $!"; select((select($bh), $| = 1)[0]);
+  $Proc::ShellSpawn::ONBUILTIN = sub { my ($h, $a, $e) = @_;
+    print $bh join("\035", $h, join("\036", map "$_=$e->{$_}", sort keys %$e), join("\037", @$a)), "\n" } }
 my ($st, $err) = Proc::ShellSpawn::run(shift);
 defined $st or die "outside the subset: $err->{error} at $err->{pos}\n";
 if (my $s = $Proc::ShellSpawn::SIGNALLED) { local $SIG{$s} = 'DEFAULT'; kill $s, $$; sleep 1 }   # die by it, as sh -c would

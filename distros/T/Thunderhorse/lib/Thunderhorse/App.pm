@@ -1,5 +1,5 @@
 package Thunderhorse::App;
-$Thunderhorse::App::VERSION = '0.106';
+$Thunderhorse::App::VERSION = '0.107';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -193,6 +193,7 @@ async sub pagi ($self, $scope, $receive, $send)
 	# copy scope since we are modifying it
 	$scope = {$scope->%*};
 	my $ctx = $scope->{thunderhorse} = $self->_build_context($scope, $receive, $send);
+	weaken $scope->{thunderhorse};
 
 	# query router for matches
 	my $req = $ctx->req;

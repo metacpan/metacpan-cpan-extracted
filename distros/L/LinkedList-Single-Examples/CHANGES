@@ -1,3 +1,12 @@
+- v2.0.1 Wed Nov  5 2026
+
+* The SEE ALSO of LinkedList::Single::Examples lists each example with
+  a one- or two-line description of what it illustrates. Documentation
+  only: Examples.pm is v2.0.1, no example code changed.
+
+* The prerequisite in the POD is LinkedList::Single v2.1.0, as in
+  Makefile.PL.
+
 - v2.0.0 Sun Nov  1 2026
 
 * First release of LinkedList::Single::Examples, split from the

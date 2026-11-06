@@ -981,11 +981,18 @@ then wrapped in the cast: rnorm(n => 2**32 + 2) returned 2 values, rbinom()
 drew as if size were 5 when given 2**32 + 5, and sample() answered 2**32 + 1
 with a single element instead of croaking.*/
 #define SV_COUNT_MAX ((NV)281474976710656.0)   // 2^48
-/*sv_count_arg() with its two upper bounds spelled out: `nvmax` is the sanity
-bound compared in NV, and `cap` the largest value the caller can use, compared
-after the cast. A caller whose argument is a quantity rather than an element
-count (rbinom's `size`, a trial count) passes NV_INF for the first.*/
-PERL_STATIC_INLINE size_t sv_count_arg_to(pTHX_ SV *sv, const char *fname, const char *what, UV min, NV nvmax, size_t cap){
+/*sv_count_arg() with its two upper bounds spelled out, read as a UV: `nvmax`
+is the sanity bound compared in NV, and `cap` the largest value the caller can
+use, compared after the cast.
+
+A caller whose argument is a quantity rather than an element count
+(rbinom's `size`, a trial count) passes NV_INF for the first and keeps the UV.
+The two are different widths on a 32-bit perl built -Duse64bitint
+(i686-linux-64int, 5.44.0-i686-64int here): UV is 64 bits there and size_t 32,
+so up to 0.3416 this returned a size_t and refused rbinom(size => 1e15) on
+exactly those perls.  An element count is still bounded by SIZE_MAX, which
+sv_count_arg() passes as `cap`.*/
+PERL_STATIC_INLINE UV sv_uv_arg_to(pTHX_ SV *sv, const char *restrict fname, const char *restrict what, UV min, NV nvmax, UV cap){
 	if (!sv || !SvOK(sv))
 		usage_croak(aTHX_ fname, "%s is undef", what);
 	if (!sv_is_numeric_arg(aTHX_ sv))
@@ -996,16 +1003,20 @@ PERL_STATIC_INLINE size_t sv_count_arg_to(pTHX_ SV *sv, const char *fname, const
 	if (v < (NV)min)
 		usage_croak(aTHX_ fname, "%s must be an integer >= %" UVuf ", not %" NVgf,
 		            what, min, v);
-	if (v > nvmax || v >= (NV)SIZE_MAX + 1.0)
+	/*UV_MAX + 1 is a power of two, so it is exact in every NV even where
+	UV_MAX itself is not; below it the cast cannot overflow.*/
+	if (v > nvmax || v >= (NV)UV_MAX + 1.0)
 		usage_croak(aTHX_ fname, "%s is too large: %" NVgf, what, v);
-	const size_t r = (size_t)v;   // truncates toward zero, as R's as.integer() does
+	const UV r = (UV)v;   // truncates toward zero, as R's as.integer() does
 	if (r > cap)
 		usage_croak(aTHX_ fname, "%s is too large: %" NVgf " (the most this perl allows is %" UVuf ")",
-		            what, v, (UV)cap);
+		            what, v, cap);
 	return r;
 }
 PERL_STATIC_INLINE size_t sv_count_arg(pTHX_ SV *sv, const char *fname, const char *what, UV min){
-	return sv_count_arg_to(aTHX_ sv, fname, what, min, SV_COUNT_MAX, SIZE_MAX);
+	/*SIZE_MAX <= UV_MAX on every perl, so the cap survives the widening and
+	the result the narrowing back.*/
+	return (size_t)sv_uv_arg_to(aTHX_ sv, fname, what, min, SV_COUNT_MAX, (UV)SIZE_MAX);
 }
 
 /*Croak, rather than let perl exit, when n numbers will not fit in memory.
@@ -1968,13 +1979,13 @@ typedef struct {
 	NV   p, q, np, r, g, qn; //p = min(prob, 1 - prob), q = 1 - p
 	NV   c, fm, npq, p1, p2, p3, p4, xl, xll, xlr, xm, xr;
 	NV   dn; //size, as an NV
-	IV   n; //n = size, as an index
+	IV   n; //n = size; rbinom() caps size at IV_MAX, so this cannot wrap
 	IV   m; //the mode; only set on the BTPE branch
 	bool reflect; //prob > 0.5: the answer is n - ix
 	bool small; //n*p < 30: take the inverse-CDF branch
 } BinomCtx;
 
-static void binom_setup(BinomCtx *B, size_t size, NV prob) {
+static void binom_setup(BinomCtx *restrict B, UV size, NV prob) {
 	Zero(B, 1, BinomCtx);
 	B->n  = (IV)size;
 	B->dn = (NV)size;
@@ -2016,7 +2027,7 @@ static void binom_setup(BinomCtx *B, size_t size, NV prob) {
 	}
 }
 
-static size_t binom_draw(pTHX_ const BinomCtx *B, size_t size, NV prob) {
+static UV binom_draw(pTHX_ const BinomCtx *restrict B, UV size, NV prob) {
 	IV ix = 0;
 	if (prob <= 0.0) return 0;
 	if (prob >= 1.0) return size;
@@ -2090,7 +2101,7 @@ static size_t binom_draw(pTHX_ const BinomCtx *B, size_t size, NV prob) {
 		}
 	}
  finis:
-	return B->reflect ? (size_t)(B->n - ix) : (size_t)ix;
+	return B->reflect ? (UV)(B->n - ix) : (UV)ix;
 }
 
 /*DBL_EPSILON, deliberately, on every build -- these two are R's numbers and
@@ -22216,6 +22227,19 @@ breaks them.  It was a selection sort, O(m^2) in the m = k(k-1)/2 pairs and so
 O(k^4) in the groups: 3.16 s at k = 400.
 
 ord is SAVEFREEPV()d, so the caller is inside ENTER/LEAVE.*/
+/*Sidak's 1 - (1 - p)^m, as -expm1(m * log1p(-p)).
+
+The literal form cancels: 1 - p rounds to 1 once p is below NV_EPSILON / 2, so
+up to 0.3415 every Sidak and Holm-Sidak adjustment of a p-value under about
+1e-16 came back as exactly 0 -- dunn_test() on four well-separated groups of
+200 reported 0 where Bonferroni gave 2.96e-17 -- and one of 1e-10 kept only
+about six correct digits.  statsmodels' multipletests() uses this same form
+for 's' and 'hs'.  p = 1 still gives 1, since log1p(-1) is -Inf.  The result
+is 0.0 minus expm1() rather than its negation so that p = 0 gives +0, not -0.*/
+static NV dunn_sidak(NV p, NV m) {
+	return 0.0 - nv_expm1(m * nv_log1p(-p));
+}
+
 static void dunn_padjust(pTHX_ const NV *restrict p, size_t m, const char *restrict meth, NV *restrict adj) {
 	if (!dunn_meth_known(meth))	//before the allocation, so the croak leaks nothing
 		croak("dunn_test: unknown method '%s' (none, bonferroni, sidak, holm, hs, bh, by)", meth);
@@ -22235,13 +22259,13 @@ static void dunn_padjust(pTHX_ const NV *restrict p, size_t m, const char *restr
 	} else if (strEQ(meth, "bonferroni")) {
 		for (size_t i = 0; i < mf; i++) { NV v = ord[i].v * M; adj[ord[i].i] = v < 1.0 ? v : 1.0; }
 	} else if (strEQ(meth, "sidak")) {
-		for (size_t i = 0; i < mf; i++) { NV v = 1.0 - nv_pow(1.0 - ord[i].v, M); adj[ord[i].i] = v < 1.0 ? v : 1.0; }
+		for (size_t i = 0; i < mf; i++) { NV v = dunn_sidak(ord[i].v, M); adj[ord[i].i] = v < 1.0 ? v : 1.0; }
 	} else if (strEQ(meth, "holm")) {
 		NV cummax = 0.0;
 		for (size_t i = 0; i < mf; i++) { NV v = ord[i].v * (NV)(mf - i); if (v > cummax) cummax = v; adj[ord[i].i] = cummax < 1.0 ? cummax : 1.0; }
 	} else if (strEQ(meth, "hs")) {   //Holm-Sidak
 		NV cummax = 0.0;
-		for (size_t i = 0; i < mf; i++) { NV v = 1.0 - nv_pow(1.0 - ord[i].v, (NV)(mf - i)); if (v > cummax) cummax = v; adj[ord[i].i] = cummax < 1.0 ? cummax : 1.0; }
+		for (size_t i = 0; i < mf; i++) { NV v = dunn_sidak(ord[i].v, (NV)(mf - i)); if (v > cummax) cummax = v; adj[ord[i].i] = cummax < 1.0 ? cummax : 1.0; }
 	} else if (strEQ(meth, "bh")) {
 		NV cummin = 1.0;
 		for (size_t i = mf; i-- > 0; ) { NV v = ord[i].v * M / ((NV)i + 1.0); if (v < cummin) cummin = v; adj[ord[i].i] = cummin < 1.0 ? cummin : 1.0; }
@@ -33103,7 +33127,8 @@ SV* rbinom(...)
 		usage_croak(aTHX_ "rbinom", "arguments must be name => value pairs");
 	args_get_magic(aTHX_ ax, items);
 	//Parse named arguments
-	size_t n = 0, size = 0;
+	size_t n = 0;
+	UV size = 0;	//a trial count, not an element count: see below
 	NV prob = 0.5;
 	bool n_set = FALSE, size_set = FALSE, prob_set = FALSE;
 	bool na = FALSE;	//a fractional size or a NaN prob: R's rbinom() gives NA for every draw
@@ -33116,11 +33141,13 @@ SV* rbinom(...)
 			n = sv_count_arg(aTHX_ val, "rbinom", "n", 0);
 			n_set = TRUE;
 		} else if (strEQ(key, "size")) {
-			/*size is a trial count, not an element count, so SV_COUNT_MAX does
-			not apply: R draws from rbinom(3, 1e15, 0.3). binom_draw() carries
-			the variate in an IV, so IV_MAX is exactly the most it can do on
-			this build: 2**63 - 1 where ivsize is 8, 2**31 - 1 on 5.44.0-i686.*/
-			size = sv_count_arg_to(aTHX_ val, "rbinom", "size", 0, NV_INF, (size_t)IV_MAX);
+			/*size is a trial count, not an element count, so neither
+			SV_COUNT_MAX nor SIZE_MAX applies: R draws from rbinom(3, 1e15, 0.3).
+			BinomCtx carries it, and binom_draw() the variate, in an IV, so
+			IV_MAX is exactly the most this build can do: 2**63 - 1 where ivsize
+			is 8 (5.44.0-i686-64int included, whose size_t is 32 bits), and
+			2**31 - 1 on 5.44.0-i686.*/
+			size = sv_uv_arg_to(aTHX_ val, "rbinom", "size", 0, NV_INF, (UV)IV_MAX);
 			/*sv_count_arg() truncates, so 2.5 drew from size 2.  R's rbinom()
 			refuses a size that is not a whole number with NA.*/
 			if (SvNV(val) != (NV)size) na = TRUE;

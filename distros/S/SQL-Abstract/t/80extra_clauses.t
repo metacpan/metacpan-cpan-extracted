@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 use SQL::Abstract::Test import => [ qw(is_same_sql_bind is_same_sql) ];
 use SQL::Abstract;
 
@@ -36,12 +37,16 @@ is_same_sql_bind(
   [ [ 'Rock' ], 3 ]
 );
 
-($sql) = $sqlac->select({
+($sql, @bind) = $sqlac->select({
   select => [ 'a' ],
   from => [ { -values => [ [ 1, 2 ], [ 3, 4 ] ] }, -as => [ qw(t a b) ] ],
 });
 
-is_same_sql($sql, q{SELECT a FROM (VALUES (1, 2), (3, 4)) AS t(a,b)});
+is_same_sql_bind(
+  $sql, \@bind,
+  q{SELECT a FROM (VALUES (?, ?), (?, ?)) AS t(a,b)},
+  [ 1, 2, 3, 4 ],
+);
 
 ($sql) = $sqlac->update({
   update => 'employees',
@@ -118,6 +123,20 @@ is_same_sql_bind(
   $sql, \@bind,
   q{INSERT INTO eh VALUES (?, ?), (?, ?), (?, ?)},
   [ 1..6 ],
+);
+
+# an undef in a row is a NULL value and must keep its placeholder and its
+# bind slot, otherwise SQL and bind list get out of step (RT#137357)
+($sql, @bind) = $sqlac->insert({
+  into => 'eh',
+  fields => [ qw(a b c) ],
+  rowvalues => [ [ 1, undef, \'now()' ], [ 3, undef, \'now()' ] ]
+});
+
+is_same_sql_bind(
+  $sql, \@bind,
+  q{INSERT INTO eh (a, b, c) VALUES (?, ?, now()), (?, ?, now())},
+  [ 1, undef, 3, undef ],
 );
 
 is_same_sql(
@@ -471,5 +490,45 @@ is_same_sql_bind(
     15031
     )]
 );
+
+# RT#148271: the -join arrayref form accepted only bare 'as' / 'on' keys and
+# silently dropped the dashed spellings, even though the from_list it lives
+# in is written with -as / -join
+{
+  my $expect = q{SELECT email FROM users AS u JOIN user_roles AS roles ON roles.user_id = u.rowid};
+  for my $keys ([ 'as', 'on' ], [ '-as', '-on' ]) {
+    my ($as, $on) = @$keys;
+    is_same_sql(
+      scalar $sqlac->select({
+        select => 'email',
+        from => [
+          { users => { -as => 'u' } },
+          -join => [ user_roles => $as => 'roles' => $on => { 'roles.user_id' => 'u.rowid' } ],
+        ],
+      }),
+      $expect,
+      "-join accepts $as / $on",
+    );
+  }
+
+  throws_ok {
+    $sqlac->select({
+      select => 'email',
+      from => [ 'users', -join => [ 'user_roles', 'oops', 'roles' ] ],
+    })
+  } qr/Unknown key 'oops' in -join/, 'unknown -join key is an error, not silently ignored';
+}
+
+# RT#148271: passing the clauses as a flat list instead of a hashref used to
+# be taken as the (source, fields, where, order) positional form and produced
+# garbage SQL like "SELECT email FROM select WHERE ? ORDER BY users, -join, ..."
+throws_ok {
+  $sqlac->select(
+    select => [ qw(email user_id name) ],
+    from => [ 'users', -join => [ 'user_roles', on => { 'user_roles.user_id' => 'users.id' } ] ],
+    where => { name => { -like => 'Ovid%' } },
+    order_by => 'name',
+  )
+} qr/select\(\) takes a single hashref/, 'a flat clause list to select() is an error';
 
 done_testing;

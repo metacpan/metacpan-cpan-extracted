@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App::FileSync &mdash; file synchronisation without a daemon</title>
+<meta name="description" content="App::FileSync keeps a directory on each client in step with one master copy on a server. No daemon, no database, no web interface: a short-lived command run from cron or the Windows Task Scheduler.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="App::FileSync &mdash; file synchronisation without a daemon">
+<meta property="og:description" content="App::FileSync keeps a directory on each client in step with one master copy on a server. No daemon, no database, no web interface: a short-lived command run from cron or the Windows Task Scheduler.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	"name": "App::FileSync",
+	"description": "App::FileSync keeps a directory on each client in step with one master copy on a server. No daemon, no database, no web interface: a short-lived command run from cron or the Windows Task Scheduler.",
+	"applicationCategory": "DeveloperApplication",
+	"operatingSystem": "Linux, macOS, Windows",
+	"programmingLanguage": "Perl",
+	"softwareVersion": "0.002.0",
+	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+	"url": "https://metacpan.org/dist/App-FileSync",
+	"sameAs": [
+		"https://github.com/nigelhorne/App-FileSync",
+		"https://github.com/nigelhorne/App-FileSync/issues"
+	],
+	"author": { "@type": "Person", "name": "Nigel Horne" },
+	"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html" aria-current="page">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<section class="hero">
+		<h1>Keep a directory in step with a master copy.</h1>
+		<p class="lede">App::FileSync keeps a directory on each client in step with one
+		master copy on the server. Clients never talk to each other: each pushes its
+		changes to the master and pulls everyone else's from it, so a change made on
+		one client reaches the others on their next run.</p>
+		<ul class="badges">
+			<li>version 0.002.0</li>
+			<li>Perl 5.14+</li>
+			<li>GPL-2.0</li>
+			<li>no daemon</li>
+		</ul>
+	</section>
+
+	<p>Any number of clients can share a repo this way, and a separate machine can
+	hold a replica of the master. Every run is a short-lived CLI process suitable
+	for cron or the Windows Task Scheduler: there is no daemon, no database and no
+	web interface.</p>
+
+<pre class="diagram"><code>   laptop  ──┐
+   desktop ──┼──  push / pull  ──▶  master on the server
+   tablet  ──┘                          │
+                                        └──▶  replica (optional, pull-only)</code></pre>
+
+	<h2>Why it is built this way</h2>
+
+	<ul class="grid">
+		<li class="card">
+			<h3>No daemon to supervise</h3>
+			<p>Every run is a short-lived process. Cron or the Task Scheduler starts it,
+			it finishes, and nothing is left listening.</p>
+		</li>
+		<li class="card">
+			<h3>Only changes move</h3>
+			<p>A size-and-mtime cache decides what to send. Data frames are deflated
+			when that helps, and files of at least 64&nbsp;KiB go as rsync-style block
+			deltas when the other side holds an older copy.</p>
+		</li>
+		<li class="card">
+			<h3>Conflicts are kept</h3>
+			<p>The newer mtime wins; the loser is preserved beside it as
+			<code>report.conflict-laptop-1-20261022T101500Z.txt</code>, never silently
+			discarded.</p>
+		</li>
+		<li class="card">
+			<h3>Deletions are recoverable</h3>
+			<p>Removed files go to a per-repo trash, kept for 30 days by default.
+			<code>filesync restore</code> puts a path back, or lists every version.</p>
+		</li>
+		<li class="card">
+			<h3>Snapshots for replicas</h3>
+			<p>A replica can take a daily snapshot of its tree, by hard link or by
+			copy, and roll back to a date. Fourteen are kept by default.</p>
+		</li>
+		<li class="card">
+			<h3>Boring to operate</h3>
+			<p>JSON configuration and run logs you can read with <code>cat</code>,
+			people-readable messages from a catalogue, and distinct exit codes for
+			cron.</p>
+		</li>
+	</ul>
+
+	<h2>A repo in six commands</h2>
+
+	<p>Two machines are involved: the server, which holds the master, and each
+	client, which holds a copy. Install App::FileSync on both. The example keeps
+	the master in the server account's home directory, so nothing runs as root.</p>
+
+<pre><code># on the server, once
+filesync-admin --root ~/filesync repo create documents
+
+# on the server, once: filesync-server needs the same --root
+cat &gt; ~/bin/filesync-server-home &lt;&lt;'EOF'
+#!/bin/sh
+exec /usr/local/bin/filesync-server --root "$HOME/filesync" "$@"
+EOF
+chmod +x ~/bin/filesync-server-home
+
+# on each client, once
+filesync init --repo documents --root /home/foo/Documents \
+        --server foo@srv --server-command /home/foo/bin/filesync-server-home
+
+# on each client, whenever you like
+filesync sync --repo documents --dry-run
+filesync sync --repo documents</code></pre>
+
+	<p>The client reports its host name as its id; there is nothing else to name.
+	An id is not a login, and it does not divide the repo: every client of a repo
+	syncs the whole tree.</p>
+
+	<h2>Where to go next</h2>
+
+	<ul class="grid">
+		<li class="card">
+			<h3><a href="quickstart.html">Quick start</a></h3>
+			<p>Server and client setup, the first sync, cron, Windows, and a
+			backup-and-restore drill.</p>
+		</li>
+		<li class="card">
+			<h3><a href="commands.html">Commands</a></h3>
+			<p>Every option of <code>filesync</code>, <code>filesync-admin</code>
+			and <code>filesync-server</code>, and what each exit code means.</p>
+		</li>
+		<li class="card">
+			<h3><a href="settings.html">Settings</a></h3>
+			<p>Process-wide settings, the client's repo list, the server's per-repo
+			policy, and where each value came from.</p>
+		</li>
+		<li class="card">
+			<h3><a href="how-it-works.html">How it works</a></h3>
+			<p>The session, the line-delimited JSON protocol, deltas, conflicts,
+			locking and the layout on disk.</p>
+		</li>
+	</ul>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

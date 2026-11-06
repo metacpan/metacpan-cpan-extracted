@@ -50,5 +50,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-OSM
   homepage: https://metacpan.org/pod/HTML::OSM
   repository: git://github.com/nigelhorne/HTML-OSM.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

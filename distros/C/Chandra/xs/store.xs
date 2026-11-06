@@ -58,6 +58,7 @@ CODE:
     int  not_hash = 0;
     HV  *parent;
 
+    # uncoverable condition left count:2
     if (!data_svp || !SvROK(*data_svp)) {
         RETVAL = SvREFCNT_inc(def);
         goto done_get;
@@ -67,6 +68,7 @@ CODE:
     key_str = SvPV(key, key_len);
     parent  = chandra_store_traverse(aTHX_ data_hv, key_str, key_len,
                                      0, &leaf_sv, &not_hash);
+    # uncoverable condition left count:2
     if (!parent || !leaf_sv) {
         RETVAL = SvREFCNT_inc(def);
         goto done_get;
@@ -102,6 +104,7 @@ CODE:
     int  not_hash = 0;
     HV  *parent;
 
+    # uncoverable condition left count:2
     if (!data_svp || !SvROK(*data_svp))
         croak("Chandra::Store: internal error: _data missing");
     data_hv = (HV *)SvRV(*data_svp);
@@ -110,8 +113,11 @@ CODE:
     parent  = chandra_store_traverse(aTHX_ data_hv, key_str, key_len,
                                      1, &leaf_sv, &not_hash);
     if (!parent) {
+        # uncoverable branch false
+        # uncoverable condition right count:1
         if (not_hash)
             croak("Chandra::Store: intermediate key is not a hash");
+        # uncoverable statement
         croak("Chandra::Store: cannot traverse path '%s'", key_str);
     }
 
@@ -121,6 +127,7 @@ CODE:
         (void)hv_store(parent, lstr, (I32)llen, SvREFCNT_inc(value), 0);
     }
 
+    # uncoverable condition right count:1
     if (as_svp && SvTRUE(*as_svp))
         chandra_store_save_c(aTHX_ self_hv);
 
@@ -147,12 +154,18 @@ CODE:
     HV  *parent;
 
     RETVAL = 0;
+    # uncoverable branch true
+    # uncoverable condition left count:1
+    # uncoverable condition left count:2
     if (!data_svp || !SvROK(*data_svp)) goto done_has;
     data_hv = (HV *)SvRV(*data_svp);
 
     key_str = SvPV(key, key_len);
     parent  = chandra_store_traverse(aTHX_ data_hv, key_str, key_len,
                                      0, &leaf_sv, &not_hash);
+    # uncoverable branch true
+    # uncoverable condition left count:1
+    # uncoverable condition left count:2
     if (!parent || !leaf_sv) goto done_has;
 
     {
@@ -184,12 +197,18 @@ CODE:
     HV  *parent;
     int  did_delete = 0;
 
+    # uncoverable branch true
+    # uncoverable condition left count:1
+    # uncoverable condition left count:2
     if (!data_svp || !SvROK(*data_svp)) goto done_del;
     data_hv = (HV *)SvRV(*data_svp);
 
     key_str = SvPV(key, key_len);
     parent  = chandra_store_traverse(aTHX_ data_hv, key_str, key_len,
                                      0, &leaf_sv, &not_hash);
+    # uncoverable branch false
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     if (parent && leaf_sv) {
         STRLEN llen;
         const char *lstr = SvPV(leaf_sv, llen);
@@ -197,6 +216,10 @@ CODE:
         if (removed) did_delete = 1;
     }
 
+    # uncoverable branch true count:2 class:ignore_covered_err
+    # uncoverable branch true count:3 class:ignore_covered_err
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (did_delete && as_svp && SvTRUE(*as_svp))
         chandra_store_save_c(aTHX_ self_hv);
 
@@ -221,8 +244,10 @@ CODE:
     HV  *pairs_hv;
     HE  *he;
 
+    # uncoverable condition left count:2
     if (!SvROK(pairs_sv) || SvTYPE(SvRV(pairs_sv)) != SVt_PVHV)
         croak("Chandra::Store::set_many: argument must be a hashref");
+    # uncoverable condition left count:2
     if (!data_svp || !SvROK(*data_svp))
         croak("Chandra::Store: internal error: _data missing");
 
@@ -239,9 +264,12 @@ CODE:
         HV  *parent   = chandra_store_traverse(aTHX_ data_hv, kstr, klen,
                                                 1, &leaf_sv, &not_hash);
         if (!parent) {
+            # uncoverable branch false
+            # uncoverable condition right count:1
             if (not_hash)
                 croak("Chandra::Store::set_many: intermediate key '%s' is not a hash",
                       kstr);
+            # uncoverable statement
             croak("Chandra::Store::set_many: cannot traverse path '%s'", kstr);
         }
         {
@@ -251,6 +279,7 @@ CODE:
         }
     }
 
+    # uncoverable condition right count:1
     if (as_svp && SvTRUE(*as_svp))
         chandra_store_save_c(aTHX_ self_hv);
 
@@ -268,6 +297,7 @@ CODE:
 {
     HV  *self_hv  = (HV *)SvRV(self);
     SV **data_svp = hv_fetchs(self_hv, "_data", 0);
+    # uncoverable condition right count:2
     if (data_svp && SvROK(*data_svp)) {
         RETVAL = SvREFCNT_inc(*data_svp);
     } else {
@@ -287,6 +317,7 @@ CODE:
     HV  *self_hv = (HV *)SvRV(self);
     SV **as_svp  = hv_fetchs(self_hv, "_auto_save", 0);
     (void)hv_stores(self_hv, "_data", newRV_noinc((SV *)newHV()));
+    # uncoverable condition right count:1
     if (as_svp && SvTRUE(*as_svp))
         chandra_store_save_c(aTHX_ self_hv);
     RETVAL = SvREFCNT_inc(self);

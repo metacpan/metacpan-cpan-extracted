@@ -1,5 +1,11 @@
 Revision history for module Map::Tube::Plugin::Graph
 
+1.3.0   2026-11-06
+        This release entirely belongs to @GWS.
+        - Replaced protection against malicious output file names
+          by mechanism lifted from Map::Tube::CLI, which is much more robust.
+        - Replaced File::Spec, File::Temp by Path::Tiny in tests.
+
 1.2.2   2026-10-14
         - Makefile.PL: Added Path::Tiny to build requirements.
 

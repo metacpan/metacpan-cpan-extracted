@@ -24,11 +24,11 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # CDN URLs pinned to tested versions.  Override via constructor params to use
 # a self-hosted copy or a different version.
@@ -42,6 +42,9 @@ Readonly::Scalar my $GPX_JS_URL              => 'https://cdnjs.cloudflare.com/aj
 Readonly::Scalar my $TILE_URL                => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 Readonly::Scalar my $TILE_ATTRIBUTION        => '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 Readonly::Scalar my $NOMINATIM_HOST          => 'nominatim.openstreetmap.org/search';
+# A Content-Security-Policy nonce: base64 or base64url, so it cannot end the
+# attribute it is written into.
+Readonly::Scalar my $NONCE_RE                => qr{\A[A-Za-z0-9+/_=-]+\z};
 
 # Rendering defaults, also used when a stored value is unusable at render time
 Readonly::Scalar my $DEFAULT_ZOOM   => 12;
@@ -130,6 +133,17 @@ trusted text.
 C<email> is added to every Nominatim request the module makes, as the
 Nominatim usage policy asks of heavy users.  It is not put into the rendered
 page, so the in-page search box sends no address.
+
+=item * Content-Security-Policy
+
+C<nonce> puts C<nonce="..."> on every C<< <script> >> that C<onload_render()>
+writes, the Leaflet and plugin scripts in the head as well as the map's own,
+so a page whose policy allows scripts only by nonce draws the map without
+C<'unsafe-inline'>.  It must be base64 or base64url (C<A-Z a-z 0-9 + / _ - =>),
+so it cannot end the attribute; C<onload_render()> checks it again, because a
+config file or a clone skips C<new()>'s check.  Give a fresh one for each
+response.  The C<< <style> >> blocks carry none: the policy's C<style-src>
+needs C<'unsafe-inline'> anyway for the styles Leaflet sets.
 
 =item * Search box
 
@@ -268,6 +282,7 @@ merging C<%overrides> onto the existing object's state without re-validating.
     logger                  => { type => object,                    optional },
     max_zoom                => { type => integer, min => 0, max => 28, optional },
     min_interval            => { type => number,  min => 0,         optional },
+    nonce                   => { type => string, matches => qr/\A[A-Za-z0-9+\/_=-]+\z/, optional },
     scale                   => { type => boolean,                   optional },
     search                  => { type => boolean,                   optional },
     tile_attribution        => { type => string,                    optional },
@@ -349,6 +364,7 @@ sub new
 			logger                  => { type => 'object',                         optional => 1 },
 			max_zoom                => { type => 'integer', min => $ZOOM_MIN, max => $MAX_ZOOM_LIMIT, optional => 1 },
 			min_interval            => { type => 'number',  min => 0,              optional => 1 },
+			nonce                   => { type => 'string',  matches => $NONCE_RE,  optional => 1 },
 			scale                   => { type => 'boolean',                        optional => 1 },
 			search                  => { type => 'boolean',                        optional => 1 },
 			tile_attribution        => { type => 'string',                         optional => 1 },
@@ -1025,6 +1041,7 @@ replacement gives a warning.
   | No map data provided                             | No markers, circle markers, GeoJSON, heatmap, GPX, or choropleth added yet |
   | center() must be called when no point markers are provided | Non-marker-only render needs explicit centre |
   | Skipping invalid coordinate: (LAT, LON)          | Warning: a marker is not numeric or out of range; it is left off the map |
+  | onload_render: invalid nonce                     | nonce from a config file or clone is not base64 or base64url |
   | onload_render: invalid zoom 'Z', using 12        | Warning: zoom from a config file or clone is out of range |
   | onload_render: invalid max_zoom 'Z', ignoring it | Warning: max_zoom from a config file or clone is not an integer from 0 to 28 |
   | onload_render: invalid width 'W', using 600px    | Warning: width is not a CSS length |
@@ -1104,6 +1121,14 @@ sub onload_render
 	                     || @$circle_markers) {
 		$self->{logger}->error('No map data provided') if $self->{logger};
 		croak 'No map data provided';
+	}
+
+	# A nonce from a config file or a clone skipped new()'s check, and is
+	# written into an attribute.
+	my $nonce_attr = '';
+	if(defined(my $nonce = $self->{'nonce'})) {
+		croak 'onload_render: invalid nonce' if ref($nonce) || $nonce !~ $NONCE_RE;
+		$nonce_attr = qq{ nonce="$nonce"};
 	}
 
 	# Config-file and clone values skip new()'s schema, so check zoom again
@@ -1204,18 +1229,18 @@ sub onload_render
 		qw(css_url js_url cluster_css_url cluster_default_css_url cluster_js_url heatmap_js_url gpx_js_url);
 	my $head = qq{
 		<link rel="stylesheet" href="$url{css_url}" />
-		<script src="$url{js_url}"></script>
+		<script$nonce_attr src="$url{js_url}"></script>
 	};
 
 	if($self->{cluster}) {
 		$head .= qq{
 		<link rel="stylesheet" href="$url{cluster_css_url}" />
 		<link rel="stylesheet" href="$url{cluster_default_css_url}" />
-		<script src="$url{cluster_js_url}"></script>
+		<script$nonce_attr src="$url{cluster_js_url}"></script>
 		};
 	}
-	$head .= qq{\t\t<script src="$url{heatmap_js_url}"></script>\n} if @$heatmap_layers;
-	$head .= qq{\t\t<script src="$url{gpx_js_url}"></script>\n}     if @$gpx_tracks;
+	$head .= qq{\t\t<script$nonce_attr src="$url{heatmap_js_url}"></script>\n} if @$heatmap_layers;
+	$head .= qq{\t\t<script$nonce_attr src="$url{gpx_js_url}"></script>\n}     if @$gpx_tracks;
 
 	if($search) {
 		$head .= qq{
@@ -1246,7 +1271,7 @@ sub onload_render
 	$body .= qq{
 		<button id="reset-button">Reset Map</button>
 		<div id="map"></div>
-		<script>
+		<script$nonce_attr>
 			var map = L.map('map').setView([$center_lat, $center_lon], $zoom);
 			L.tileLayer('$tile_url', {
 				attribution: '$tile_attribution'$max_zoom_js

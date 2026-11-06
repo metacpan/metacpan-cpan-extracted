@@ -7,7 +7,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(load_material interpolate_material);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf8
 

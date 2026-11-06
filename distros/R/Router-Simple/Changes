@@ -1,5 +1,12 @@
 Revision history for Perl module Router::Simple
 
+0.18 2026-11-05T09:46:23Z
+
+    - Anchor route regexps at the end of the string with \z instead of $,
+      so that a path, method or host with a trailing newline no longer
+      matches. (polamjag)
+    - Require perl 5.10.
+
 0.17 2014-12-02T06:58:23Z
 
     commit 35bb954a60cdd9225858b522f118d5851f69e3ce

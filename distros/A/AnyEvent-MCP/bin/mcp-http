@@ -31,6 +31,36 @@ Redirects and retries are disabled. HTTPS verifies certificates.
 Network access is NOT sandboxed; permitted names can reach local or
 private hosts. HTTP failures do not prove that a write did not happen.
 
+=head1 FIRST USE
+
+Configure your MCP client to launch:
+
+   mcp-http --stdio --name web
+
+Or combine it with other servers:
+
+   mcp-multibroker --stdio web --- mcp-http --name web --stdio ---
+
+Ask the assistant:
+
+   Fetch https://example.org/ and report the status and page title.
+   Do not submit forms or send any modifying requests.
+
+The C<request> tool receives arguments such as:
+
+   {"url": "https://example.org/", "method": "GET", "max_bytes": 8192}
+
+The first request asks for permission to GET that URL. An approval for
+GET does not authorize POST, and an approval for an exact URL need not
+authorize its whole hostname. Review broader scope choices carefully,
+especially on hosts serving private or local resources.
+
+To carry a session between requests, supply the returned C<cookie_jar>
+to the next call. To inspect a large text response without returning it
+all, use C<grep> or C<regex> and a suitable C<max_bytes>. Redirect
+responses are returned to the caller; they are not followed. Repeating
+a failed modifying request can repeat its side effects.
+
 =head1 TOOL
 
 =over
@@ -53,25 +83,32 @@ not organizational or public-suffix boundaries. No sandbox grants.
 
 =head1 OPTIONS
 
-Common options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+The following switch is specific to C<mcp-http>.
 
 =over
 
 =item --ask MODE
 
-Use helper (default), tty, yad, mcp or auto.
+Select permission prompt handling: C<helper> (default) uses the local
+permission helper; C<tty> or C<yad> selects only that interface;
+C<mcp> forwards prompts to the MCP client; C<auto> uses client forms
+when advertised, otherwise the local helper.
 
 =back
 
 =cut
 
 use common::sense;
-use AnyEvent::HTTP ();
-use AnyEvent::MCP ();
-use AnyEvent::MCP::Server::Permissions ();
+
 use MIME::Base64 ();
 use Encode ();
 use JSON::XS ();
+
+use AnyEvent::HTTP ();
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Server::Permissions ();
 
 use AnyEvent::MCP::Server::Simple;
 

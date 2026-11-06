@@ -38,6 +38,7 @@ t/manifest.t
 t/metrics.t
 t/modules-used.t
 t/multiple.t
+t/nonce.t
 t/no404s.t
 t/noplan.t
 t/page-escaping.t

@@ -1,5 +1,5 @@
 package Thunderhorse::Router::Location;
-$Thunderhorse::Router::Location::VERSION = '0.106';
+$Thunderhorse::Router::Location::VERSION = '0.107';
 use v5.40;
 use Mooish::Base -standard;
 

@@ -43,6 +43,7 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 |---|---|---|---|
 | arrays: list assignment, `${a[i]}`, `${#a[*]}`, `$PIPESTATUS` | `a=(x y); echo ${a[1]}` | syntax error or "Bad substitution" / works | array, pipestatus |
 | assigning an array element | `a[1]=x` | "not found" / works | elemassign |
+| unsetting an array element | `unset a[1]` | "bad variable name", the shell stops / works ("not an array variable" for a plain variable, status 1) | unsetarr (post4-0.04; probe unsetarr) |
 | `[[ … ]]` | `[[ a == a* ]]` | "not found" / works | dbracket |
 | `(( … ))` as a command | `((x=1+1))` | a nested subshell, nothing printed / works | dparen |
 | `for ((…))` | `for ((i=0;i<2;i++))` | syntax error / works | forarith |
@@ -74,7 +75,7 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | bash signal names in `trap` | `SIGINT`, `ERR`, `DEBUG` | "bad trap" / works | trapsigint, traperr, trapdebug |
 | job specs | `kill %1` after `cmd &` | "No such process" / works | job |
 | a function named after a keyword or special builtin | `local() { …; }`; `source() { …; }` | syntax error / works; works / error | fnlocal, fnsource |
-| a read-only bash variable as an assignment | `UID=5 echo hi` | works / "readonly variable" | uidset |
+| a read-only bash variable as an assignment | `UID=5 echo hi` | works / "readonly variable" | uidset (for `UID`: uidassign, rule E as dash since post-0.04; reading `$UID` where the string does not set it: uidread) |
 | `return` outside a function | `echo a; return; echo b` | ends quietly / error | return |
 
 ## 4. Blatant: both run it, the results differ (basis: probe, except where marked J)
@@ -94,12 +95,12 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | a pattern component that can match `.` or `..` | `echo .*` | includes `.` and `..` / leaves them out | dots |
 | `[^…]` in a pattern | `case b in [^a])` | `^` is literal / negation | caret |
 | `${#@}`, `${#*}` | `set -- a b; echo ${#@}` | `3` / `2` | atlen |
-| a pattern operator on `$@`, `$*` | `"${@#?}"` | on the joined string / on each | atpat |
+| a pattern operator on `$@`, `$*` | `"${@#?}"` | on the joined string / on each | atpat (rule E as bash since post-0.04) |
 | an escaped `"` in backquotes inside `"${…}"` | ``"${x:-`echo \"q\"`}"`` | `q` / `"q"` | bqdq |
 | bash's own variables | `$RANDOM`, `$SECONDS`, `$BASH_VERSION`, `$EUID`, `$UID`, `$HOSTNAME`, `$OSTYPE` | unset / set | bashvar, seconds |
 | `$_` | `true foo; echo "$_"` | from the environment / `foo` | underscore |
 | `$-` (open) | `echo "$-"` | empty / `hBc`; but a test for `*i*` gives the same answer | dashvar |
-| `$LINENO` (open) | `echo "$LINENO"` | empty in `-c` / `1`; that dash's manual documents it is unchecked | lineno |
+| `$LINENO` | `echo "$LINENO"` | empty in `-c` / `1`; that dash's manual documents it is unchecked | lineno (rule E as bash since post-0.04) |
 
 ## 5. Both shells refuse, or misbehave alike (all **J**)
 
@@ -116,7 +117,7 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 | `unset` of another function's local | probe unsetloc | dash removes it; bash shows the outer value | unsetloc |
 | `$@` assigned to a variable | `x=$@` | the separator, only when `IFS` does not start with a space | atjoin |
 | an assignment with an expansion, plus a redirection (**J**) | `x=$(echo e >&2; echo v) 2>/dev/null` | dash redirects before expanding, bash after | (Y1 text) |
-| `~` or `cd` with `HOME` unset | `unset HOME; echo ~` | only when `HOME` is unset | tildehome, cdhome |
+| `~` or `cd` with `HOME` unset | `unset HOME; echo ~` | only when `HOME` is unset | tildehome, cdhome (`~`: nohome, rule E as bash since post-0.04) |
 | `${x:?msg}` | `echo ${zz:?unset}` | both stop when `x` is unset; status 2 / 127 | qmark |
 | an assignment to a read-only variable | `readonly r=1; r=2` | both stop; status 2 / 127 | readonlyas |
 | `command -v` of a missing command | `command -v nosuch` | status 127 / 1, false in both | cmdvst |
@@ -146,18 +147,18 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 
 It is made by `doc/large-subset/tools/large-subset-features.pl -n`. That script holds the table of features: each feature's verdict, basis and the text pattern that finds it. It looks only at the string's text and at the shells' `-n`, never at our parser. Patterns can miss a use, or see one that is not there. Known misses so far: `x+=1`, `~+`, and `${1//…}`; the corpus measurement adds ShellCheck's codes, which catch these.
 
-Totals for 0.04, over 1,092 tests, each parsed by the large parser with no options (0.03: 1,066 tests, 667 / 126 / 0 / 102 / 4 / 18 / 3 / 9 / 28 / 1 / 0 / 108 in the order of this table):
+Totals for post4-0.04, over 1,117 tests, each parsed by the large parser with no options (post3-0.04: 1,112 tests, 714 / 110 / 0 / 95 / 1 / 15 / 0 / 2 / 59 / 8 / 0 / 108; post2-0.04: 1,107 tests, 702 / 117 / 0 / 95 / 1 / 15 / 0 / 2 / 59 / 8 / 0 / 108; post-0.04: 1,104 tests, 698 / 118 / 0 / 95 / 3 / 15 / 0 / 2 / 57 / 8 / 0 / 108; 0.04: 1,092 tests, 689 / 121 / 0 / 97 / 3 / 16 / 0 / 3 / 48 / 7 / 0 / 108 as published, 690 / 120 / … recounted with post-0.04's counting script, one test apart; 0.03: 1,066 tests, 667 / 126 / 0 / 102 / 4 / 18 / 3 / 9 / 28 / 1 / 0 / 108; all in the order of this table):
 
 | | the large parser accepts | rejects |
 |---|---|---|
-| both shells parse, no difference found | 689 | **121** |
-| both parse, a blatant difference | 0 | 97 |
-| both parse, a subtle difference | 3 | 16 |
-| both parse, an open verdict (postponed) | 0 | 3 |
-| both parse, only a class-X difference (a program we run, or a decision of the user, also by rule E) | 48 | 7 |
+| both shells parse, no difference found | 719 | **108** |
+| both parse, a blatant difference | 0 | 96 |
+| both parse, a subtle difference | 1 | 15 |
+| both parse, an open verdict (postponed) | 0 | 2 |
+| both parse, only a class-X difference (a program we run, or a decision of the user, also by rule E) | 60 | 8 |
 | a shell refuses to parse it | 0 | 108 |
 
-The **121** are the work list for the tests (many are deliberate rejections, such as `ulimit -n 10`, `jobs -l`, or an alias inside a compound command): both shells parse them and the detector finds no difference, so either our parser must accept them, or the detector misses a difference (for example `${foo$n}`, which both shells parse but neither can run). Examples: `pwd --help`, `cd -P -`, `exec` alone, `exit 07`, `# note` alone, and `${x:-~}`.
+The **108** are the work list for the tests (many are deliberate rejections, such as `ulimit -n 10`, `jobs -l`, or an alias inside a compound command): both shells parse them and the detector finds no difference, so either our parser must accept them, or the detector misses a difference (for example `${foo$n}`, which both shells parse but neither can run). Examples: `pwd --help`, `cd -P -`, `exec` alone, `exit 07`, `# note` alone, and `${x:-~}`.
 
 No test is accepted with a blatant difference any more: the 26 of the first count (early-post-0.02, 2026-11-02) were class X (`echo -e`, `[ a == b ]`, `printf -v`, `time`, `kill %1`), which the rule "the program beats the shells' difference" now covers.
 

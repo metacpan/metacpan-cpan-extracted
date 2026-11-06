@@ -274,6 +274,9 @@ sub rpc {
    my $version = $meta->{"io.modelcontextprotocol/protocolVersion"}
       || $context{protocol_version} || $peer->{protocol_version};
 
+   $peer->{client_info} = $meta->{"io.modelcontextprotocol/clientInfo"}
+      if $version && $version ge "2026" && ref $meta->{"io.modelcontextprotocol/clientInfo"} eq "HASH";
+
    if ($method eq "initialize") {
       $version = $params->{protocolVersion};
 
@@ -319,12 +322,30 @@ sub rpc {
       }
    }
 
+   my $user = $context{user};
+   my $ask = $self->{permissions} && $self->{permissions}{ask};
+   my $trust = defined $ask && !ref $ask && (
+      $ask eq "mcp"
+      || $ask eq "auto" && $version ge "2026"
+         && ref $meta->{"io.modelcontextprotocol/clientCapabilities"} eq "HASH"
+         && ref $meta->{"io.modelcontextprotocol/clientCapabilities"}{elicitation} eq "HASH"
+         && (!keys %{$meta->{"io.modelcontextprotocol/clientCapabilities"}{elicitation}}
+            || ref $meta->{"io.modelcontextprotocol/clientCapabilities"}{elicitation}{form} eq "HASH")
+   );
+   if ($trust && exists $meta->{"anyevent-mcp/user"}) {
+      $user = $meta->{"anyevent-mcp/user"};
+      return $self->_rpc_error ($reply, $id, -32602, "Invalid delegated user")
+         if defined $user && (ref $user
+            || $user !~ /\A(?:global|program|instance):[A-Za-z_][A-Za-z0-9_-]*\z/);
+   }
+
    my $req = AnyEvent::MCP::Server::Request->new (
       server           => $self,
       peer             => $peer,
       id               => $id,
       method           => $method,
       params           => $params,
+      user             => $user,
       protocol_version => $version,
       on_reply         => sub {
          my ($req, $result) = @_;

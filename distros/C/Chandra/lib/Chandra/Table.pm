@@ -7,7 +7,7 @@ use Cpanel::JSON::XS ();
 use Chandra::Component;
 use Chandra::Element;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 BEGIN {
     Object::Proto::define('Chandra::Table',
@@ -414,9 +414,11 @@ sub render {
                     tag => 'select', class => 'chandra-table-filter',
                     'data-action' => "filter:$key",
                 });
-                $select->add_child(Chandra::Element->new({
+                my $all = Chandra::Element->new({
                     tag => 'option', data => "All $col->{label}",
-                })->attribute('value', ''));
+                });
+                $all->attribute('value', '');
+                $select->add_child($all);
                 for my $opt (@{$col->{filter_options}}) {
                     my $option = Chandra::Element->new({ tag => 'option', data => $opt });
                     $option->attribute('value', $opt);
@@ -506,6 +508,81 @@ Chandra::Table - Sortable, filterable, paginated data grid component
 
 C<Chandra::Table> is a L<Chandra::Component> subclass providing a
 data grid. Renders using L<Chandra::Element> for proper event wiring.
+
+=head1 METHODS
+
+=over 4
+
+=item C<new(columns => \@columns, data => \@rows, %options)>
+
+A column is a hash with a C<key>, a C<label>, and any of C<sortable>,
+C<filterable>, C<filter_options>, C<width>, C<type> (C<boolean>) and
+C<render> (a code reference given the value and the row). The options are
+C<page_size>, C<selectable> (C<single> or C<multi>), C<striped>,
+C<empty_message>, C<loading>, C<on_row_click>, C<on_sort> and
+C<on_selection>.
+
+=item C<set_data(\@rows)>
+
+Replaces the rows, goes back to the first page, clears the selection and
+updates when mounted.
+
+=item C<selected_rows>
+
+The indexes of the selected rows on the current page.
+
+=item C<on_sort_column($key)>
+
+Sorts by that column, flipping the direction on the same column again.
+
+=item C<on_filter($key, $value)>
+
+Filters a column, or clears its filter when the value is empty.
+
+=item C<on_page($page)>
+
+Goes to that page, clamped to the pages there are.
+
+=item C<on_select_row($index)>
+
+Selects a row, replacing the selection in single mode and toggling it in
+multi mode.
+
+=item C<on_click_row($index)>
+
+Runs C<on_row_click> with the row.
+
+=item C<on_select_all>
+
+Selects every row on the page, or clears them when they all are.
+
+=item C<to_csv>
+
+The sorted rows as CSV, quoting as needed.
+
+=item C<render>
+
+The filters, the table and its pagination.
+
+=item C<css>
+
+The table's stylesheet.
+
+=item C<prototype>, C<set_prototype>
+
+Object::Proto's prototype accessors.
+
+=back
+
+=head1 SLOT ACCESSORS
+
+=over 4
+
+=item C<columns>, C<data>, C<page_size>, C<selectable>, C<striped>, C<on_row_click>, C<on_sort>, C<on_selection>, C<empty_message>, C<loading> - the slots as methods
+
+=item C<tbl_columns>, C<tbl_data>, C<tbl_page_size>, C<tbl_selectable>, C<tbl_striped>, C<tbl_on_row_click>, C<tbl_on_sort>, C<tbl_on_selection>, C<tbl_empty_message>, C<tbl_loading>, C<tbl__current_page>, C<tbl__sort_key>, C<tbl__sort_dir>, C<tbl__filters>, C<tbl__selected>, C<tbl__cid>, C<tbl__app>, C<tbl__selector>, C<tbl__mounted>, C<tbl__children>, C<tbl__parent> - the slot functions
+
+=back
 
 =head1 SEE ALSO
 

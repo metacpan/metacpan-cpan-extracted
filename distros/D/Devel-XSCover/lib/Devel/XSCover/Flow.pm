@@ -6,12 +6,13 @@ use warnings;
 
 use File::Spec ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
-our ($DECISION);
+our ($DECISION, $DIRECTIVE);
 
 BEGIN {
-    $DECISION = qr/\b(?:if|while|for|switch)\s*\(/;
+    $DECISION  = qr/\b(?:if|while|for|switch)\s*\(/;
+    $DIRECTIVE = qr/^\s*#\s*(?:if|ifdef|ifndef|elif|else|endif|define|undef|include|line|pragma|error|warning)\b/;
 }
 
 sub new {
@@ -25,7 +26,7 @@ sub new {
 }
 
 sub parse_llvm {
-    my ($self, $text, $files) = @_;
+    my ($self, $text, $files, $xsubs) = @_;
     my (@functions, $fn, $block);
     for my $line (split /\n/, $text) {
         if ($line =~ /^===== (.*) \((\d+)\) @ (.*):(\d+)\s*$/) {
@@ -50,7 +51,7 @@ sub parse_llvm {
             next;
         }
     }
-    my %name = $self->_llvm_files(\@functions, $files);
+    my %name = $self->_llvm_files(\@functions, $files, $xsubs);
     my %flow = (complete => 1, files => {});
     for my $f (@functions) {
         for my $b (values %{ $f->{blocks} }) {
@@ -70,13 +71,22 @@ sub parse_llvm {
 }
 
 sub _llvm_files {
-    my ($self, $functions, $files) = @_;
-    my (%name, %lines);
+    my ($self, $functions, $files, $xsubs) = @_;
+    my (%name, %lines, %own);
     for my $f (@$functions) {
         for my $b (values %{ $f->{blocks} }) {
             for my $index (keys %{ $b->{lines} }) {
                 $lines{$index}{$_} = 1 for @{ $b->{lines}{$index} };
-                $name{$index} = $f->{file} if !defined $name{$index} && grep { $_ == $f->{line} } @{ $b->{lines}{$index} };
+                $own{ $f->{ident} }{$index} = 1 if grep { $_ == $f->{line} } @{ $b->{lines}{$index} };
+                $name{$index} = $f->{file} if !defined $name{$index} && $own{ $f->{ident} }{$index};
+            }
+        }
+    }
+    for my $f (@$functions) {
+        my $body = $xsubs && $xsubs->{ $f->{name} } or next;
+        for my $b (values %{ $f->{blocks} }) {
+            for my $index (keys %{ $b->{lines} }) {
+                $name{$index} = $body if !defined $name{$index} && !$own{ $f->{ident} }{$index};
             }
         }
     }
@@ -122,7 +132,7 @@ sub parse_gcc {
 }
 
 sub decisions {
-    my ($self, $flow) = @_;
+    my ($self, $flow, $inverse) = @_;
     my %out;
     for my $file (sort keys %{ $flow->{files} }) {
         my $lines = $flow->{files}{$file};
@@ -130,6 +140,9 @@ sub decisions {
         open my $fh, '<', $path or next;
         my @src = <$fh>;
         close $fh;
+        if (my $to = $inverse && $inverse->{$file}) {
+            @src = map { $src[ ($to->{$_} // $_) - 1 ] // "\n" } 1 .. @src;
+        }
         my @found;
         for my $r ($self->ranges(\@src)) {
             my $arms = $self->_arms($flow, $lines, $r);
@@ -188,6 +201,20 @@ sub _arms {
         unshift @arms, $body;
     }
     return \@arms;
+}
+
+sub dropped {
+    my ($self, $src) = @_;
+    my (%dropped, $in_body);
+    my $n = 0;
+    for my $text (@$src) {
+        $n++;
+        $in_body = 1 if !$in_body && $text =~ /^MODULE\s*=/;
+        next unless $in_body && $text =~ /^\s*#/;
+        next if $text =~ $DIRECTIVE;
+        $dropped{$n} = 1;
+    }
+    return \%dropped;
 }
 
 sub ranges {
@@ -316,14 +343,16 @@ C<dir> is where the source files are read from for the decisions.
 
 =head2 parse_llvm
 
-    my $graph = $flow->parse_llvm($text, $files);
+    my $graph = $flow->parse_llvm($text, $files, $xsubs);
 
 Reads what C<llvm-cov gcov --dump> prints: every function with its blocks, each
 block's count, its arcs with their counts, and its lines by file. The dump names a
 file by an index, so a function's own file, given in its header, names the index its
-first line is under, and an index no function starts in is matched to the file of
-the gcov text (C<$files>, as L<Devel::XSCover::Gcov> parsed it) whose executable
-lines it shares most of.
+first line is under. C<$xsubs>, the XS map's table of C wrapper name to the F<.xs> file
+holding its body, names the other index of each XSUB wrapper, and an index still
+unnamed is matched to the file of the gcov text (C<$files>, as
+L<Devel::XSCover::Gcov> parsed it) whose executable lines it shares most of. With
+many XS files of similar shape the table is what tells them apart.
 
 =head2 parse_gcc
 
@@ -352,6 +381,20 @@ with one way out, as clang places the C<if> statement's merge block and a macro'
 arms, stands for where its chain of such blocks ends: the arcs into it count towards
 that destination, its own arc not again. Returns a hash of file to a list
 of C<{ line, arms }>, decisions with fewer than two arms left out.
+C<$inverse>, when given, is the XS map's table per file from the line gcov reports to
+the line written (xsubpp drops a C<#> comment line from an XSUB body without a
+C<#line>, so the two differ by the comment lines above, within the body): the
+source of such a file is read in the lines gcov reports, so that its decisions sit
+where the graph has them, and the XS map moves them to the lines written afterwards.
+
+=head2 dropped
+
+    my $dropped = $flow->dropped(\@lines);
+
+The lines of an XS file that xsubpp drops from its output without a C<#line> to say
+so: from the first C<MODULE => line on, every line starting with C<#> that is not a
+preprocessor directive, such as a C<# uncoverable> mark. Returns a hash of line
+number to 1.
 
 =head2 ranges
 

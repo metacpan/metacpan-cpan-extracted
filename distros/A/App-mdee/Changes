@@ -1,5 +1,26 @@
 Revision history for Perl extension App-mdee
 
+1.16 2026-11-06T05:31:34Z
+
+    - Take * and ** as emphasis only where CommonMark does: "L*=50, a*=68"
+      is no longer shown in italic.  As in pandoc, this also rejects
+      delimiters between Japanese text and its punctuation, such as a
+      closing ** after a corner bracket; cjk_friendly=1 (--config
+      cjk_friendly=1) takes the rules of markdown-cjk-friendly instead
+    - Make h4 to h6 bold, and give h4 a double underline with the new
+      default theme doubleline, in the terminals known to show ESC[4:2m.
+      h3 has the same color as h2
+    - Remove the escape sequences of the file other than colors, also in
+      their 8-bit forms, so that a file cannot change the window title or
+      the clipboard; a theme name with a slash is not looked up
+    - --theme and --no-theme on the command line override default[theme]
+      of config.sh, and the md_config and pass_md entries of config.sh are
+      given only once
+    - Fold a quote line whose marker color has a colon, such as ESC[4:3m
+    - Add --ts as a short name of --table-style
+    - Compile on perl 5.26 again; require Text::ANSI::Fold 2.38 and
+      Term::ANSIColor::Concise 3.03
+
 1.15 2026-11-03T10:24:15Z
 
     - Add --refill (-r), which joins the lines of the paragraphs that a

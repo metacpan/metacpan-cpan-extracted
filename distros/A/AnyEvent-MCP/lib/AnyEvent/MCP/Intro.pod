@@ -57,6 +57,13 @@ C<AnyEvent::WebSocket::Message>. C<mcp-vim> needs them only for browser
 connections, not for ordinary Vim clients. Both modules are recommended
 rather than required by the distribution.
 
+C<mcp-imap> needs C<Mail::IMAPTalk>, C<IO::Socket::SSL>,
+C<AnyEvent::Fork::RPC> and C<Term::ReadKey>. OAuth2 login additionally
+needs C<Authen::SASL>; provider autoconfiguration uses C<XML::LibXML>.
+Install these optional modules with your Perl's package manager or CPAN
+client before using that server. C<mcp-http> needs no additional modules
+beyond the distribution's required dependencies.
+
 Use the same Perl installation for dependency installation, building and
 running the servers. A module installed for the system Perl might not be
 available to a Perl installed under C</opt>. C<make install> needs write
@@ -64,7 +71,8 @@ access to the selected Perl's installation directories; use an appropriate
 local Perl installation or run that final step with the required privileges.
 
 Installation puts C<mcp-fs>, C<mcp-multibroker>, C<mcp-vim>, C<mcp-webbrowser>,
-C<mcp-ask-user>, C<anyevent-mcp> and C<anyevent-mcp-askpermission> in the
+C<mcp-imap>, C<mcp-http>, C<mcp-ask-user>, C<anyevent-mcp>,
+C<anyevent-mcp-askpermission> and C<anyevent-mcp-form-elicitation> in the
 selected executable directory. Make that directory available in the
 environment of your MCP client, or configure absolute executable paths.
 A desktop application need not have the same C<PATH> as your shell.
@@ -88,6 +96,8 @@ the tools you want:
    mcp-vim --stdio
    mcp-webbrowser --stdio
    mcp-ask-user --stdio
+   mcp-http --stdio
+   mcp-imap --stdio --name personal
 
 C<--stdio> means the MCP client launches the process. Do not start a
 separate copy in a terminal. For HTTP clients, use a running server and
@@ -107,6 +117,13 @@ L</CONNECTED BROWSER PAGES>.
 C<mcp-ask-user> lets the assistant ask you questions through a local
 YAD or terminal dialog, or through the client's native form UI; see
 L</Ask the client's human a question>.
+
+C<mcp-http> makes HTTP(S) requests with method- and URL-scoped permissions.
+It does not follow redirects automatically; see L</Use an HTTP request tool>.
+
+C<mcp-imap> reads, searches and manages mailboxes. Configure the account
+interactively before starting the server; see L</Read and organize mail>
+and L<mcp-imap> for OAuth2 and account management.
 
 To offer several servers over one MCP connection, use C<mcp-multibroker>.
 It combines these servers with each other or with third-party MCP servers,
@@ -645,14 +662,20 @@ Append an alias to the returned credential-bearing URL:
 The filesystem server initiates the TCP connection but remains the MCP server.
 The multibroker authenticates the same token used for HTTP, registers the
 alias and discovers the tools. A configured or connected alias cannot be
-replaced. After disconnecting, the server retries once per second for sixty
-attempts. Pending calls fail and are never replayed. Remote registration does
-not grant the multibroker spawned-child shutdown authority.
+replaced. An unexpected disconnect starts a new connection period; refused TCP
+connections retry once per second, at most sixty times. Other TCP errors and
+TLS verification failures log an error and stop. Pending calls fail and are
+never replayed. Remote registration does not grant spawned-child shutdown
+authority to the multibroker.
 
-The hello is a raw JSON line, followed by ordinary MCP JSONL on the same socket;
-the HTTP-shaped URL is an address and credential, not an HTTP request.
-The bundled connector supports plain C<http://> endpoints. An HTTP listener is
-already active by default when the upstream connection is HTTP.
+The hello is a raw JSON line, followed by ordinary MCP JSONL on the same
+socket; the HTTP-shaped URL is an address and credential, not an HTTP request.
+C<https://> reverse URLs enable verified TLS; C<http://> uses plaintext.
+A certificate mismatch is an error, not a reason to fall back to HTTP.
+With C<--tls-cert> and C<--tls-key> on the listener, C<--print-url> gives
+HTTPS and HTTP URL prefixes. For HTTPS, use a trusted certificate whose
+hostname matches the URL. An HTTP listener is already active by default
+when upstream is HTTP.
 
 =head2 Add an HTTP child
 
@@ -766,6 +789,93 @@ response as JSON on stdout. C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> selects
 a replacement executable. See L<anyevent-mcp-form-elicitation> for supported fields
 and L<mcp-ask-user> for question arguments and result fields.
 
+=head1 MAIL AND HTTP TOOLS
+
+=head2 Read and organize mail
+
+Configure an IMAP account interactively before starting its MCP server.
+Look up provider setup instructions and candidate login commands:
+
+   mcp-imap --name personal providers alice@example.net
+
+Replace the example address. Provider OAuth client registrations may not
+be usable by unrelated applications. For ordinary password or app-password
+authentication, a manual login looks like:
+
+   mcp-imap --name personal login method password \
+      server imap.example.net user alice@example.net tls ssl port 993
+
+The password is requested on the terminal, never as a command argument.
+For OAuth2, use a provider-approved registration and the suggested
+C<login method oauth2> parameters. Authorize the intended mail account in
+a browser, then paste the entire final redirect URL in the terminal.
+An error page at the unserved loopback redirect is expected. See
+L<mcp-imap> for OAuth options, refresh tokens and other restrictions.
+
+After login, configure your MCP client to launch:
+
+   mcp-imap --stdio --name personal
+
+Or combine it with other servers:
+
+   mcp-multibroker --stdio mail --- mcp-imap --name personal --stdio ---
+
+The prefix C<mail> produces tools such as C<mail.lsub> and
+C<mail.messages>; C<personal> selects the account and its permission rules.
+For example, ask your assistant:
+
+   List my subscribed mailboxes, then show five recent messages in INBOX,
+   with their senders and subjects. Do not change any flags.
+
+C<lsub> lists subscriptions; C<mailboxes> lists all available folders.
+The C<mailbox> tool can subscribe and unsubscribe, without changing access
+rights or deleting messages.
+
+To search, pass a C<filter> to C<messages>, for example:
+
+   {
+     "mailbox": "INBOX",
+     "limit": 20,
+     "filter": {
+       "since": "1-Nov-2026",
+       "any": [
+         {"from": "alice@example.net"},
+         {"subject": "invoice"}
+       ],
+       "not": {"deleted": true}
+     }
+   }
+
+Filter keys are ANDed; C<any> adds OR, C<all> groups AND, and C<not>
+negates a group. Searches scan bounded UID windows. If the result says
+C<incomplete>, continue with C<next_cursor>, even for an empty page.
+Use the returned mailbox, UIDVALIDITY and UID together for later operations.
+Read tools never mark messages Seen.
+
+Changing flags, moving messages and expunging require separate permissions.
+Marking C<\\Deleted> does not remove a message permanently; expunging does.
+After an interrupted write, inspect the mailbox before attempting it again.
+APPEND stores mail (including drafts) but does not send it. See
+L<mcp-imap/TOOLS> for complete operations and limits.
+
+=head2 Use an HTTP request tool
+
+Launch C<mcp-http --stdio> or combine it as C<web --- mcp-http --stdio --->.
+For example, ask your assistant:
+
+   Fetch https://example.org/ and show the status and page title.
+   Do not send a modifying request.
+
+A C<request> call can use:
+
+   {"url": "https://example.org/", "method": "GET", "max_bytes": 8192}
+
+Permissions distinguish HTTP methods and URL scopes; allowing a GET does
+not authorize a POST. C<grep> and C<regex> can filter response text, while
+C<cookie_jar> must be passed between calls by the caller. Redirects and
+automatic retries are disabled. See L<mcp-http> for response limits and
+network trust boundaries.
+
 =head1 CONNECTED BROWSER PAGES
 
 C<mcp-webbrowser> is the browser-page counterpart to C<mcp-vim>. It exposes
@@ -813,12 +923,18 @@ The HTTP server also accepts C</TOKEN> and the corresponding bare path
 without the final slash when the endpoint is configured with one. This
 works around clients (observed with Claude) that drop the final slash
 from a configured URL.
-All accepted tokens authenticate the same operations; they are not separate
-users or permission levels. Permissions still govern the tool operation.
+Managed tokens authenticate distinct users for saved permissions. Existing
+rules without match.user still apply to every user.
 
-By default, the master secret and server name determine one stable token
-and a port in 16384..32767. Changing a server's name changes its derived
-credentials and default port. Changing or losing the master secret changes
+To add a user and obtain their multibroker URL:
+
+   anyevent-mcp create-user chatgpt
+   mcp-multibroker --print-url=chatgpt
+
+An implicit global C<default> user starts at generation 1. The program,
+instance, user and generation derive its token; the program, instance and
+master secret determine a stable port in 16384..32767. Revoke a user to
+disable its token; create it again to rotate the generation. Losing the master secret changes
 all derived credentials. Keep an existing C<[global]> secret when editing
 other configuration.
 
@@ -829,8 +945,10 @@ To configure explicit tokens:
 
 Replace those placeholders with actual unguessable URL-safe tokens.
 Repeated C<--token> options replace the whole configured list and the
-derived default. The first token appears in C<--print-url>; all are accepted.
-mcp-vim also accepts its token set for Vim and browser WebSocket connections.
+derived managed users. In this mode C<--print-url> lists all enabled
+users; explicit tokens still print the first accepted token.
+Vim editors, browser tabs, and reverse servers need the effective
+C<connect_user> token (default C<default>), not an arbitrary named user's token.
 
 If C<--print-url> disagrees with the client's URL, compare the name,
 command-line overrides, user and configuration environment with the running
@@ -994,6 +1112,12 @@ C<--print-url> exits without starting it. Loopback binds accept local
 connections only; hosted or remote clients need the appropriate route or
 tunnel. An occupied port causes a listener error, so check the server log.
 
+For reverse C<--connect> servers, check the connecting process's log as
+well as the multibroker. C<https://> requires a certificate trusted by
+the connecting process and a hostname matching the URL. A TLS error
+stops that reverse server immediately; it does not retry with plaintext.
+TCP connection refusal is retried for up to sixty attempts.
+
 =head2 Authentication fails
 
 Obtain the URL with the same name, bind/token overrides and configuration
@@ -1004,6 +1128,12 @@ A clean URL needs an accepted bearer token.
 A multibroker child credential is not necessarily the upstream listener's
 credential. C<--bearer> after a child pair and C<--token> before the pairs
 configure different sides of the connection.
+
+For IMAP OAuth2, obtaining an access token does not by itself prove that
+IMAP authentication will work. Check the authorized browser account,
+requested IMAP scope and saved C<user> name. Copy the complete redirected
+address-bar URL after authorization, even when the browser displays an
+unreachable loopback page.
 
 If the server warns that it cannot save the master secret, another process
 may derive a different token. Check write access to the global configuration.

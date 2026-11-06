@@ -1,0 +1,17 @@
+# Samples left out by hand as noise (the user, 2026-11-03: "mark them as noise ... forcefully, and list in the docs"):
+# SOURCE<TAB>ID<TAB>REASON. Read by large-subset-drops.pl, which writes them into drops.tsv. Only what is plainly not
+# a command line as written: a placeholder where a value belongs, alternatives written a|b|c, a here-document cut off.
+tldr	TL:common/exit.md:12	tldr: a placeholder where a value belongs
+tldr	TL:common/jobs.md:12	tldr: a placeholder where a value belongs
+tldr	TL:common/odpscmd-inst.md:20	tldr: a placeholder where a value belongs
+tldr	TL:common/return.md:14	tldr: a placeholder where a value belongs
+tldr	TL:common/shift.md:12	tldr: a placeholder where a value belongs
+tldr	TL:common/wait.md:9	tldr: a placeholder where a value belongs
+tldr	TL:common/wait.md:25	tldr: a placeholder where a value belongs
+nl2bash	NB:1863	NL2Bash: a placeholder where a value belongs
+tldr	TL:common/duf.md:29	tldr: alternatives written a|b|c, not a pipeline
+tldr	TL:linux/mate-search-tool.md:20	tldr: alternatives written a|b|c, not a pipeline
+tldr	TL:linux/winedump.md:16	tldr: alternatives written a|b|c, not a pipeline
+nl2bash	NB:8029	NL2Bash: a here-document whose body was cut off
+nl2bash	NB:8030	NL2Bash: a here-document whose body was cut off
+nl2bash	NB:8035	NL2Bash: a here-document whose body was cut off

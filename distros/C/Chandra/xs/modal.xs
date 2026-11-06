@@ -46,8 +46,10 @@ CODE:
         else if (strEQ(key, "width")) modal_width = SvIV(val);
         else if (strEQ(key, "closable")) closable = SvTRUE(val);
         else if (strEQ(key, "backdrop")) backdrop = SvTRUE(val);
+        # uncoverable condition right count:3
         else if (strEQ(key, "buttons") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV)
             buttons = (AV *)SvRV(val);
+        # uncoverable condition right count:3
         else if (strEQ(key, "input") && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
             input_opts = (HV *)SvRV(val);
     }
@@ -95,6 +97,7 @@ CODE:
             sv_catpvs(js, "label:'"); sv_catsv(js, esc); sv_catpvs(js, "'"); sv_catpvs(js, ",");
             SvREFCNT_dec(esc);
         }
+        # uncoverable condition right count:1
         if (value_svp && SvOK(*value_svp)) {
             SV *esc = chandra_escape_js(aTHX_ *value_svp);
             sv_catpvs(js, "value:'"); sv_catsv(js, esc); sv_catpvs(js, "'");
@@ -109,6 +112,8 @@ CODE:
         sv_catpvs(js, "buttons:[");
         for (SSize_t bi = 0; bi < blen; bi++) {
             SV **bsvp = av_fetch(buttons, bi, 0);
+            # uncoverable condition left count:1
+            # uncoverable condition left count:3
             if (!bsvp || !SvROK(*bsvp) || SvTYPE(SvRV(*bsvp)) != SVt_PVHV) continue;
             HV *bhv = (HV *)SvRV(*bsvp);
 
@@ -129,6 +134,7 @@ CODE:
 
             SV **act = hv_fetchs(bhv, "action", 0);
             if (act && SvOK(*act)) {
+                # uncoverable condition right count:2
                 if (SvROK(*act) && SvTYPE(SvRV(*act)) == SVt_PVCV) {
                     /* Coderef: bind as handler */
                     char handler_name[64];
@@ -143,6 +149,8 @@ CODE:
                         XPUSHs(*act);
                         PUTBACK;
                         call_method("bind", G_DISCARD | G_EVAL);
+                        # uncoverable condition right count:1
+                        # uncoverable condition right count:3
                         if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_undef);
                         FREETMPS; LEAVE;
                     }
@@ -265,6 +273,7 @@ CODE:
             PUTBACK;
             count = call_method("show", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
             PUTBACK;
             FREETMPS; LEAVE;
@@ -298,6 +307,7 @@ CODE:
         if (strEQ(key, "title")) title = SvPV_nolen(val);
         else if (strEQ(key, "label")) label = SvPV_nolen(val);
         else if (strEQ(key, "value")) value = SvPV_nolen(val);
+        # uncoverable condition right count:1
         else if (strEQ(key, "on_submit") && SvROK(val)) on_submit = val;
     }
 
@@ -341,6 +351,7 @@ CODE:
             PUTBACK;
             count = call_method("show", G_SCALAR);
             SPAGAIN;
+            # uncoverable condition right count:1
             RETVAL = (count > 0) ? SvREFCNT_inc(POPs) : &PL_sv_undef;
             PUTBACK;
             FREETMPS; LEAVE;

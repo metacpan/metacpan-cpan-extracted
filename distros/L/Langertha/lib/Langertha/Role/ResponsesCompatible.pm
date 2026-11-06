@@ -1,6 +1,6 @@
 package Langertha::Role::ResponsesCompatible;
 # ABSTRACT: Role for the Open-Responses wire envelope (input/instructions/output[])
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
 use Carp qw( croak carp );
 use JSON::MaybeXS;
@@ -345,7 +345,7 @@ sub chat_response {
     my %extra = $self->_responses_extra_fields($data);
     my $citations = $self->_responses_merge_citations( delete $extra{citations}, $out{citations} );
 
-    # Normalize usage to chat-style keys (Langertha::Usage / Goldmine read
+    # Normalize usage to chat-style keys (Langertha::Usage / consumers read
     # prompt_tokens/completion_tokens off the %{} overload), while carrying the
     # Responses-native detail blocks through verbatim: input_tokens_details holds
     # the automatic prompt-cache read/write counts, and Langertha::Usage->from_hash
@@ -728,7 +728,7 @@ Langertha::Role::ResponsesCompatible - Role for the Open-Responses wire envelope
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head1 SYNOPSIS
 
@@ -972,7 +972,7 @@ the provider's error code and message, which fails the stream.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -989,7 +989,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

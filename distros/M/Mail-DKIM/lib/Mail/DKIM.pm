@@ -1,7 +1,7 @@
 package Mail::DKIM;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 #require 5.010;
@@ -23,7 +23,7 @@ Mail::DKIM - Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Bron Gondwana <brong@fastmailteam.com> (ARC)
 
 =head1 CONTRIBUTORS
 
-=for stopwords Aaron Thompson Bron Gondwana Christian Jaeger Damien MASCRÉ Giovanni jasonlong José Borges Ferreira Marc Bradshaw Martijn van de Streek Martin H. Sluka Matthäus Wander Mohammad S Anwar
+=for stopwords Aaron Thompson Bron Gondwana Christian Jaeger Damien MASCRÉ Giovanni jasonlong José Borges Ferreira Marc Bradshaw Marcel Telka Martijn van de Streek Martin H. Sluka Matthäus Wander Mohammad S Anwar Sidney Markowitz
 
 =over 4
 
@@ -163,6 +163,14 @@ Marc Bradshaw <marc@fastmailteam.com>
 
 =item *
 
+Marc Bradshaw <marc@marcbradshaw.net>
+
+=item *
+
+Marcel Telka <marcel@telka.sk>
+
+=item *
+
 Martijn van de Streek <martijn@vandestreek.net>
 
 =item *
@@ -176,6 +184,10 @@ Matthäus Wander <mail@wander.science>
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Sidney Markowitz <sidney@apache.org>
 
 =back
 

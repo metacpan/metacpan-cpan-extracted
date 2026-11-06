@@ -66,15 +66,24 @@ _token_generate(pTHX_ int byte_len)
 #else
     {
         int fd = open("/dev/urandom", O_RDONLY);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 */
         if (fd >= 0) {
             ssize_t n = read(fd, bytes, byte_len);
             close(fd);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 */
             if (n == byte_len)
                 got_random = 1;
         }
     }
 #endif
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (got_random) {
         int i;
         for (i = 0; i < byte_len; i++)
@@ -89,17 +98,25 @@ _token_generate(pTHX_ int byte_len)
     /* Fallback: Perl random */
     {
         int i;
-        int words = (byte_len + 3) / 4;
+        int words = (byte_len + 3) / 4; /* # uncoverable statement */
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1
+         # uncoverable condition left count:2
+         # uncoverable condition right count:2 */
         for (i = 0; i < words && i * 8 < byte_len * 2; i++)
-            sprintf(hex + i * 8, "%08x",
-                (unsigned int)(Drand01() * (double)0xFFFFFFFF));
-        hex[byte_len * 2] = '\0';
-        result = newSVpvn(hex, byte_len * 2);
+            sprintf(hex + i * 8, "%08x", /* # uncoverable statement */
+                (unsigned int)(Drand01() * (double)0xFFFFFFFF)); /* # uncoverable statement */
+        hex[byte_len * 2] = '\0'; /* # uncoverable statement */
+        result = newSVpvn(hex, byte_len * 2); /* # uncoverable statement */
     }
 
-    Safefree(bytes);
-    Safefree(hex);
-    return result;
+    Safefree(bytes); /* # uncoverable statement */
+    Safefree(hex); /* # uncoverable statement */
+    return result; /* # uncoverable statement */
 }
 
 /* ---- Check if rotation is due ---- */

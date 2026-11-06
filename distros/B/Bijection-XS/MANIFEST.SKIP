@@ -1,0 +1,17 @@
+# What is not shipped. REGEXES, not globs.
+^\.git
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^lib/Bijection/XS\.c$
+\.o$
+\.bs$
+\.gcda$
+\.gcno$
+^Bijection-XS-
+\.tar\.gz$
+^ignore\.txt$
+\bcover_db\b
+~$

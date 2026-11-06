@@ -69,12 +69,10 @@ DESCRIPTION
         $sth->execute(@bind);
 
   Inserting and Updating Arrays
-    If your database has array types (like for example Postgres), activate
-    the special option "array_datatypes => 1" when creating the
-    "SQL::Abstract" object. Then you may use an arrayref to insert and
-    update database array types:
+    An arrayref as a column value in "insert" or "update" is one bind value,
+    for databases with array types (like for example Postgres):
 
-        my $sql = SQL::Abstract->new(array_datatypes => 1);
+        my $sql = SQL::Abstract->new;
         my %data = (
             planets => [qw/Mercury Venus Earth Mars/]
         );
@@ -145,6 +143,23 @@ DESCRIPTION
 
     Easy, eh?
 
+  SQL::Abstract, DBIx::Class and DBIO
+    For a long time this module was best known as the SQL generator behind
+    DBIx::Class. That is no longer the case: since version 0.082842 (2020)
+    DBIx::Class builds its SQL with SQL::Abstract::Classic, a frozen copy of
+    the 1.x line of this module, and does not use SQL::Abstract at all.
+    Changes made here therefore do not reach DBIx::Class.
+
+    DBIO, a fork of DBIx::Class, does use this module: its SQL maker
+    (DBIO::SQLMaker) is built on SQL::Abstract 2.x, and its pretty-printing
+    query trace uses SQL::Abstract::Tree.
+
+    The "DBIx::Class::*" modules shipped in this distribution
+    (DBIx::Class::SQLMaker::Role::SQLA2Passthrough and
+    DBIx::Class::Storage::Debug::PrettyPrint) are optional helpers for
+    DBIx::Class users who want SQL::Abstract 2.x features anyway; they need
+    DBIx::Class installed and are not loaded otherwise.
+
 METHODS
     The methods are simple. There's one for every major SQL operation, and a
     constructor you use first. The arguments are specified in a similar
@@ -152,9 +167,9 @@ METHODS
     and simplify things.
 
   new(option => 'value')
-    The "new()" function takes a list of options and values, and returns a
-    new SQL::Abstract object which can then be used to generate SQL through
-    the methods below. The options accepted are:
+    The new() function takes a list of options and values, and returns a new
+    SQL::Abstract object which can then be used to generate SQL through the
+    methods below. The options accepted are:
 
     case
         If set to 'lower', then SQL will be generated in all lowercase. By
@@ -181,6 +196,31 @@ METHODS
         You can also override the comparison on an individual basis - see
         the huge section on "WHERE CLAUSES" at the bottom.
 
+    array_as_in
+        Off by default. When set to a true value, an arrayref of plain
+        values given for a column is rendered with "IN" instead of a chain
+        of equalities joined by "OR":
+
+            my $sql = SQL::Abstract->new(array_as_in => 1);
+
+            $sql->where({ id => [1, 2, 3] });
+            # WHERE id IN ( ?, ?, ? )             instead of
+            # WHERE ( id = ? OR id = ? OR id = ? )
+
+            $sql->where({ id => [1, 2, undef] });
+            # WHERE ( id IN ( ?, ? ) OR id IS NULL )
+
+        Both forms select the same rows, but some databases (MySQL in
+        particular) plan a long "OR" chain much worse than the equivalent
+        "IN" list.
+
+        The rewrite only happens when the result means exactly the same as
+        the default expansion, so everything else is left as it is: a single
+        value ("id = ?"), an empty arrayref, an arrayref starting with
+        "-and", elements that are hashrefs, literal SQL or other unblessed
+        references, a "cmp" other than "=", and "logic => 'and'". An
+        explicit "{ '=' => [ ... ] }" is not rewritten either.
+
     sqltrue, sqlfalse
         Expressions for inserting boolean values within SQL statements. By
         default these are "1=1" and "1=0". They are used by the special
@@ -193,10 +233,11 @@ METHODS
         for arrays, and "and" for hashes. This means that a WHERE array of
         the form:
 
-            @where = (
+            my @where = (
                 event_date => {'>=', '2/13/99'},
                 event_date => {'<=', '4/24/03'},
             );
+            my ($stmt, @bind) = $sql->where(\@where);
 
         will generate SQL like this:
 
@@ -214,8 +255,8 @@ METHODS
         The logic can also be changed locally by inserting a modifier in
         front of an arrayref:
 
-            @where = (-and => [event_date => {'>=', '2/13/99'},
-                               event_date => {'<=', '4/24/03'} ]);
+            my @where = (-and => [event_date => {'>=', '2/13/99'},
+                                  event_date => {'<=', '4/24/03'} ]);
 
         See the "WHERE CLAUSES" section for explanations.
 
@@ -232,15 +273,15 @@ METHODS
 
             WHERE upper(keywords) like upper('MaKe iT CAse inSeNSItive')
 
-        The conversion can be "upper()", "lower()", or any other SQL
-        function that can be applied symmetrically to fields (actually
-        SQL::Abstract does not validate this option; it will just pass
-        through what you specify verbatim).
+        The conversion can be upper(), lower(), or any other SQL function
+        that can be applied symmetrically to fields (actually SQL::Abstract
+        does not validate this option; it will just pass through what you
+        specify verbatim).
 
     bindtype
         This is a kludge because many databases suck. For example, you can't
-        just bind values using DBI's "execute()" for Oracle "CLOB" or "BLOB"
-        fields. Instead, you have to use "bind_param()":
+        just bind values using DBI's execute() for Oracle "CLOB" or "BLOB"
+        fields. Instead, you have to use bind_param():
 
             $sth->bind_param(1, 'reg data');
             $sth->bind_param(2, $lots, {ora_type => ORA_CLOB});
@@ -264,7 +305,7 @@ METHODS
             );
 
         You can then iterate through this manually, using DBI's
-        "bind_param()".
+        bind_param().
 
             $sth->prepare($stmt);
             my $i = 1;
@@ -284,7 +325,7 @@ METHODS
         Now, why would you still use SQL::Abstract if you have to do this
         crap? Basically, the advantage is still that you don't have to care
         which fields are or are not included. You could wrap that above
-        "for" loop in a simple sub called "bind_fields()" or something and
+        "for" loop in a simple sub called bind_fields() or something and
         reuse it repeatedly. You still get a layer of abstraction over
         manual SQL specification.
 
@@ -324,12 +365,13 @@ METHODS
         are strongly encouraged to specify the escape character explicitly.
 
     name_sep
-        This is the character that separates a table and column name. It is
-        necessary to specify this when the "quote_char" option is selected,
-        so that tables and column names can be individually quoted like
-        this:
+        This is the character that separates a table and column name. With
+        "quote_char" set, each part gets its own quotes:
 
           SELECT `table`.`one_field` FROM `table` WHERE `table`.`other_field` = 1
+
+        Defaults to ".". Set it to an empty string to quote a dotted name
+        like "table.one_field" as a single identifier.
 
     injection_guard
         A regular expression "qr/.../" that is applied to any "-function"
@@ -343,15 +385,30 @@ METHODS
         If the expression matches an exception is thrown. Note that literal
         SQL supplied via "\'...'" or "\['...']" is not checked in any way.
 
-        Defaults to checking for ";" and the "GO" keyword (TransactSQL)
+        Defaults to checking for ";" and the "GO" keyword (TransactSQL).
+
+        This default is deliberately minimal and is not a general-purpose
+        SQL injection filter. It does not catch parentheses, comment
+        introducers ("--", "/*") or most other injection payloads, and by
+        design cannot see into literal SQL. Identifiers are not quoted
+        unless you set "quote_char". The only robust protection is therefore
+        to pass untrusted input as bind values (which become "?"
+        placeholders), never as hash keys (column/operator names) or as
+        literal SQL, and to set "quote_char" when identifiers may originate
+        from user input. If your application does route untrusted data
+        through identifiers, supply a stricter "injection_guard" of your
+        own.
 
     array_datatypes
-        When this option is true, arrayrefs in INSERT or UPDATE are
-        interpreted as array datatypes and are passed directly to the DBI
-        layer. When this option is false, arrayrefs are interpreted as
-        literal SQL, just like refs to arrayrefs (but this behavior is for
-        backwards compatibility; when writing new queries, use the
-        "reference to arrayref" syntax for literal SQL).
+        On by default: an arrayref as a column value in INSERT or UPDATE
+        (and in "values") is one bind value, an array datatype passed
+        directly to the DBI layer. Literal SQL is "\[ $sql, @bind ]".
+
+        "array_datatypes => 0" restores the behaviour from before 2.000002:
+        the arrayref is literal SQL, its first element goes into the SQL
+        text and the rest become bind values. Do not use it with data that
+        can come from outside - a JSON array or a repeated form field turns
+        into an arrayref, and its first element ends up in the SQL as-is.
 
     special_ops
         Takes a reference to a list of "special operators" to extend the
@@ -432,11 +489,23 @@ METHODS
     returning
         See the "returning" option to insert.
 
-  where(\%where, $order)
+  where($where, $order)
     This is used to generate just the WHERE clause. For example, if you have
     an arbitrary data structure and know what the rest of your SQL is going
     to look like, but want an easy way to produce a WHERE clause, use this.
     It returns an SQL WHERE clause and list of bind values.
+
+        my ($stmt, @bind) = $sql->where(\%where);           # conditions ANDed
+        my ($stmt, @bind) = $sql->where(\@where);           # conditions ORed
+        my ($stmt, @bind) = $sql->where(\%where, \@order);  # plus ORDER BY
+
+    $where
+        The WHERE part, most often a hashref, but can also be an arrayref or
+        a plain scalar -- see section WHERE clause for details.
+
+    $order
+        Optional ORDER BY part, a scalar, a hashref or an arrayref -- see
+        section ORDER BY clause for details.
 
   values(\%data)
     This just returns the values from the hash %data, in the same order that
@@ -556,8 +625,12 @@ WHERE CLAUSES
 
         my($stmt, @bind) = $sql->where(\%where);
 
-    However, note that the %where hash can be used directly in any of the
-    other functions as well, as described above.
+    and after each @where array, likewise:
+
+        my($stmt, @bind) = $sql->where(\@where);
+
+    However, note that the %where hash or @where array can be used directly
+    in any of the other functions as well, as described above.
 
   Key-value pairs
     So, let's get started. To begin, a simple hash:
@@ -649,7 +722,7 @@ WHERE CLAUSES
 
     To get an OR instead, you can combine it with the arrayref idea:
 
-        my %where => (
+        my %where = (
              user => 'nwiger',
              priority => [ { '=', 2 }, { '>', 5 } ]
         );
@@ -690,10 +763,9 @@ WHERE CLAUSES
 
     Normally, these would be joined by "OR", but the modifier tells it to
     use "AND" instead. (Hint: You can use this in conjunction with the
-    "logic" option to "new()" in order to change the way your queries work
-    by default.) Important: Note that the "-modifier" goes INSIDE the
-    arrayref, as an extra first element. This will NOT do what you think it
-    might:
+    "logic" option to new() in order to change the way your queries work by
+    default.) Important: Note that the "-modifier" goes INSIDE the arrayref,
+    as an extra first element. This will NOT do what you think it might:
 
         priority => -and => [{'!=', 2}, {'!=', 1}]   # WRONG!
 
@@ -728,6 +800,18 @@ WHERE CLAUSES
     If the argument to "-in" is an empty array, 'sqlfalse' is generated (by
     default: "1=0"). Similarly, "-not_in => []" generates 'sqltrue' (by
     default: "1=1").
+
+    An "undef" element stands for "NULL", which "IN" can never match, so it
+    is turned into a separate "IS NULL" test:
+
+        status => { -in     => [ 'a', 'b', undef ] }
+        # ( status IN ( ?, ? ) OR status IS NULL )
+
+        status => { -not_in => [ 'a', 'b', undef ] }
+        # ( status NOT IN ( ?, ? ) AND status IS NOT NULL )
+
+    (Older versions died on such a list with an "!!!AUDIT YOUR CODE AND
+    DATA!!!" exception.)
 
     In addition to the array you can supply a chunk of literal sql or
     literal sql with bind:
@@ -844,9 +928,9 @@ WHERE CLAUSES
 
     This data structure would create the following:
 
-        $stmt = "WHERE ( user = ? AND ( status LIKE ? OR status LIKE ? ) )
-                    OR ( user = ? AND status = ? ) )";
-        @bind = ('nwiger', 'pending', 'dispatched', 'robot', 'unassigned');
+        $stmt = "WHERE ( ( status LIKE ? OR status LIKE ? ) AND user = ? )
+                    OR ( status = ? AND user = ? )";
+        @bind = ('pending%', 'dispatched', 'nwiger', 'unassigned', 'robot');
 
     Clauses in hashrefs or arrayrefs can be prefixed with an "-and" or "-or"
     to change the logic inside:
@@ -986,7 +1070,7 @@ WHERE CLAUSES
     Postgres you can use something like this:
 
         my %where = (
-           date_column => \[ "= date '2008-09-30' - ?::integer", 10 ]
+           date_column => { '=' => \[ "date '2008-09-30' - ?::integer", 10 ] }
         )
 
     This would create:
@@ -1003,8 +1087,13 @@ WHERE CLAUSES
     So if "bindtype" is set to "columns" the above example will look like:
 
         my %where = (
-           date_column => \[ "= date '2008-09-30' - ?::integer", [ {} => 10 ] ]
+           date_column => { '=' => \[ "date '2008-09-30' - ?::integer", [ {} => 10 ] ] }
         )
+
+    You may also see the operator written inside the literal, as in
+    "date_column => \[ "= date '2008-09-30' - ?::integer", 10 ]". That still
+    works and produces the same SQL, but keeping the operator outside makes
+    it clear what the literal is compared with.
 
     Literal SQL is especially useful for nesting parenthesized clauses in
     the main SQL query. Here is a first example:
@@ -1013,25 +1102,27 @@ WHERE CLAUSES
                                    100, "foo%");
       my %where = (
         foo => 1234,
-        bar => \["IN ($sub_stmt)" => @sub_bind],
+        bar => { -in => \[ $sub_stmt, @sub_bind ] },
       );
 
     This yields:
 
-      $stmt = "WHERE (foo = ? AND bar IN (SELECT c1 FROM t1
-                                                 WHERE c2 < ? AND c3 LIKE ?))";
-      @bind = (1234, 100, "foo%");
+      $stmt = "WHERE (bar IN (SELECT c1 FROM t1 WHERE c2 < ? AND c3 LIKE ?)
+                      AND foo = ?)";
+      @bind = (100, "foo%", 1234);
 
-    Other subquery operators, like for example "> ALL" or "NOT IN", are
-    expressed in the same way. Of course the $sub_stmt and its associated
-    bind values can be generated through a former call to "select()" :
+    Other subquery operators are expressed in the same way, for example "bar
+    => { -not_in => \[ $sub_stmt, @sub_bind ] }", or "bar => { '>' => \[
+    "ALL ($sub_stmt)", @sub_bind ] }" for "> ALL". Of course the $sub_stmt
+    and its associated bind values can be generated through a former call to
+    select() :
 
       my ($sub_stmt, @sub_bind)
          = $sql->select("t1", "c1", {c2 => {"<" => 100},
                                      c3 => {-like => "foo%"}});
       my %where = (
         foo => 1234,
-        bar => \["> ALL ($sub_stmt)" => @sub_bind],
+        bar => { '>' => \[ "ALL ($sub_stmt)", @sub_bind ] },
       );
 
     In the examples above, the subquery was used as an operator on a column;
@@ -1039,7 +1130,7 @@ WHERE CLAUSES
     hash, like an EXISTS subquery:
 
       my ($sub_stmt, @sub_bind)
-         = $sql->select("t1", "*", {c1 => 1, c2 => \"> t0.c0"});
+         = $sql->select("t1", "*", {c1 => 1, c2 => { '>' => { -ident => 't0.c0' } }});
       my %where = ( -and => [
         foo   => 1234,
         \["EXISTS ($sub_stmt)" => @sub_bind],
@@ -1053,9 +1144,9 @@ WHERE CLAUSES
 
     Observe that the condition on "c2" in the subquery refers to column
     "t0.c0" of the main query: this is *not* a bind value, so we have to
-    express it through a scalar ref. Writing "c2 => {">" => "t0.c0"}" would
-    have generated "c2 > ?" with bind value "t0.c0" ... not exactly what we
-    wanted here.
+    mark it as an identifier with "-ident". Writing "c2 => {">" => "t0.c0"}"
+    would have generated "c2 > ?" with bind value "t0.c0" ... not exactly
+    what we wanted here.
 
     Finally, here is an example where a subquery is used for expressing
     unary negation:
@@ -1154,7 +1245,45 @@ ORDER BY CLAUSES
           \'colE DESC',               |     colE DESC,
           \[ 'FUNC(colF, ?)', $x ],   |     FUNC(colF, ?)
         ]                             |   /* ...with $x bound to ? */
+                                      |
+        { -asc => 'colA',             | ORDER BY colA ASC NULLS FIRST
+          -nulls => 'first' }         |
+                                      |
+        { -desc => [qw/colA colB/],   | ORDER BY colA DESC NULLS LAST,
+          -nulls => 'last' }          |          colB DESC NULLS LAST
         ===============================================================
+
+    The "-nulls" key ("first" or "last") adds "NULLS FIRST" or "NULLS LAST"
+    to every column of its "-asc" / "-desc" hash, and needs exactly one of
+    the two next to it. Not every database knows this syntax (PostgreSQL,
+    Oracle and SQLite 3.30+ do, MySQL does not).
+
+  CAVEAT: untrusted input in ORDER BY
+    Everything in an order by clause is an identifier or literal SQL, never
+    a bind value - a placeholder can only stand for a value, not for a
+    column to sort by. Without "quote_char" the column names go into the
+    statement exactly as given, so passing a user-supplied sort column
+    straight through is an SQL injection:
+
+        $sql->select('users', '*', { id => 1 }, [ $cgi->param('sort') ]);
+        # sort = "1, (SELECT password FROM users LIMIT 1)"
+        # ... ORDER BY 1, (SELECT password FROM users LIMIT 1)
+
+    The safe way is to map the request onto a fixed list of columns you
+    allow:
+
+        my %sortable = (name => 'name', created => 'created_at');
+        my $col = $sortable{ $cgi->param('sort') } || 'name';
+        my $dir = $cgi->param('desc') ? '-desc' : '-asc';
+        $sql->select('users', '*', { id => 1 }, { $dir => $col });
+
+    Setting "quote_char" also helps: every name is then quoted (with
+    embedded quote characters doubled), so the input above becomes one odd,
+    non-existent column name instead of a subquery. It does not stop a user
+    from sorting by any existing column, though, so keep the allow-list for
+    anything that comes from outside. The default "injection_guard" does
+    check unquoted order by columns, but it only rejects ";" and "GO", so it
+    lets the example above through.
 
 OLD EXTENSION SYSTEM
   SPECIAL OPERATORS
@@ -1231,6 +1360,15 @@ OLD EXTENSION SYSTEM
 
       ]);
 
+    which is then used like any other operator:
+
+      my ($stmt, @bind) = $sqlmaker->where({
+        field => { match => [ 'word1', 'word2', 'word3' ] },
+      });
+
+      # $stmt = "WHERE MATCH (field) AGAINST (?, ?, ?)"
+      # @bind = ('word1', 'word2', 'word3')
+
   UNARY OPERATORS
       my $sqlmaker = SQL::Abstract->new(unary_ops => [
          {
@@ -1258,7 +1396,7 @@ OLD EXTENSION SYSTEM
 
     handler
         Either a coderef or a plain scalar method name. In both cases the
-        expected return is $sql.
+        expected return is "($sql, @bind)".
 
         When supplied with a method name, it is simply called on the
         SQL::Abstract object as:
@@ -1273,6 +1411,24 @@ OLD EXTENSION SYSTEM
         When supplied with a coderef, it is called as:
 
          $coderef->($self, $op, $arg)
+
+    For example, a "SOUNDEX" operator:
+
+      my $sqlmaker = SQL::Abstract->new(unary_ops => [
+        {regex => qr/^soundex$/i,
+         handler => sub {
+           my ($self, $op, $arg) = @_;
+           my ($placeholder) = $self->_convert('?');
+           return ($self->_sqlcase('soundex') . "($placeholder)",
+                   $self->_bindtype($op, $arg));
+         }
+        },
+      ]);
+
+      my ($stmt, @bind) = $sqlmaker->where({ name => { soundex => 'Robert' } });
+
+      # $stmt = "WHERE name = SOUNDEX(?)"
+      # @bind = ('Robert')
 
 NEW METHODS (EXPERIMENTAL)
     See SQL::Abstract::Reference for the "expr" versus "aqt" concept and an
@@ -1472,23 +1628,11 @@ HOW TO CONTRIBUTE
     Contributions are always welcome, in all usable forms (we especially
     welcome documentation improvements). The delivery methods include git-
     or unified-diff formatted patches, GitHub pull requests, or plain bug
-    reports either via RT or the Mailing list. Contributors are generally
-    granted full access to the official repository after their first several
-    patches pass successful review.
+    reports via RT. For discussion, find us on IRC in "#dbio" on
+    "irc.perl.org".
 
-    This project is maintained in a git repository. The code and related
-    tools are accessible at the following locations:
-
-    *   Official repo: <git://git.shadowcat.co.uk/dbsrgits/SQL-Abstract.git>
-
-    *   Official gitweb:
-        <http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/SQL-Abstrac
-        t.git>
-
-    *   GitHub mirror: <https://github.com/dbsrgits/sql-abstract>
-
-    *   Authorized committers:
-        <ssh://dbsrgits@git.shadowcat.co.uk/SQL-Abstract.git>
+    This project is maintained in a git repository at
+    <https://github.com/dbsrgits/sql-abstract>.
 
 CHANGES
     Version 1.50 was a major internal refactoring of "SQL::Abstract". Great
@@ -1532,7 +1676,7 @@ ACKNOWLEDGEMENTS
     idea who they are! But the people I do know are:
 
         Ash Berlin (order_by hash term support)
-        Matt Trout (DBIx::Class support)
+        Matt S Trout (DBIx::Class support, long-time maintainer)
         Mark Stosberg (benchmarking)
         Chas Owens (initial "IN" operator support)
         Philip Collins (per-field SQL functions)
@@ -1548,19 +1692,22 @@ ACKNOWLEDGEMENTS
     Thanks!
 
 SEE ALSO
-    DBIx::Class, DBIx::Abstract, CGI::FormBuilder, HTML::QuickTable.
+    DBIO, SQL::Abstract::Classic, DBIx::Class, DBIx::Abstract,
+    CGI::FormBuilder, HTML::QuickTable.
 
 AUTHOR
-    Copyright (c) 2001-2007 Nathan Wiger <nwiger@cpan.org>. All Rights
-    Reserved.
+    Originally written by Nathan Wiger <nwiger@gmail.com> (2001-2007).
 
-    This module is actively maintained by Matt Trout
-    <mst@shadowcatsystems.co.uk>
+SUPPORT
+    Maintainer: Torsten Raudssus <torsten@raudssus.de>
 
-    For support, your best bet is to try the "DBIx::Class" users mailing
-    list. While not an official support venue, "DBIx::Class" makes heavy use
-    of "SQL::Abstract", and as such list members there are very familiar
-    with how to create queries.
+    IRC: join "#dbio" on "irc.perl.org" (<irc://irc.perl.org/#dbio>).
+
+    Bugs: <https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract>
+
+COPYRIGHT
+    Copyright (c) 2001-2026 Nathan Wiger and the SQL::Abstract contributors
+    (see "ACKNOWLEDGEMENTS" and the git history).
 
 LICENSE
     This module is free software; you may copy this under the same terms as

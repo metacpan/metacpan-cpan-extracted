@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Sub::Util: '0'
   Test::More: '0.96'
   utf8: '0'
 configure_requires:
@@ -26,7 +27,7 @@ resources:
   bugtracker: https://github.com/fastmail/JSCalendar-Duration/issues
   homepage: https://github.com/fastmail/JSCalendar-Duration
   repository: https://github.com/fastmail/JSCalendar-Duration.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -347,7 +348,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.005'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

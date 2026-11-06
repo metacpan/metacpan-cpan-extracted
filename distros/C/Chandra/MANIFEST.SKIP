@@ -1,0 +1,20 @@
+# What is not shipped. REGEXES, not globs.
+^\.git
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^Install/
+^Chandra\.c$
+\.o$
+\.bs$
+\.gcda$
+\.gcno$
+\.gcov$
+^Chandra-
+\.tar\.gz$
+^MANIFEST\.bak$
+^plan/
+^cover_db
+~$

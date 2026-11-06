@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "HTTP::Body",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "File::Spec" => 0,
     "File::Temp" => "0.14",
     "HTTP::Message" => 0,
     "IO::File" => "1.14"
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => "0.86"
   },
-  "VERSION" => "1.24",
+  "VERSION" => "1.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Digest::MD5" => 0,
   "Encode" => 0,
+  "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => "0.14",
   "HTTP::Message" => 0,

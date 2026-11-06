@@ -121,7 +121,7 @@ request and cannot route subsequent requests independently.
 
 =item max_size => $bytes
 
-Limits incoming headers and request bodies, defaulting to 1 MiB.
+Limits incoming headers and request bodies, defaulting to 8 MiB.
 
 =item origins => [$origin...]
 
@@ -136,6 +136,19 @@ require authentication; the subsequent POST still does.
 AnyEvent::Handle constructor options, such as C<tls>, C<tls_ctx>, C<timeout>
 or C<on_starttls>. The socket and the read/error/EOF handlers belong to this
 class.
+
+=item tls_cert => $file
+
+Serve HTTP and HTTPS opportunistically on the same port. FILE contains
+a PEM certificate chain and optionally its private key. The TLS context
+is loaded once when listening starts. TLS needs L<Net::SSLeay>.
+
+=item tls_key => $file
+
+PEM private key for C<tls_cert>. If only one TLS option is supplied, its
+file must contain both certificate and private key. On accepted connections,
+C<< $handle->{tls} >> identifies encrypted traffic. Plain HTTP remains
+available; TLS is not required of clients.
 
 =item tokens => [$token, ...]
 
@@ -162,8 +175,8 @@ address. Otherwise a wildcard uses the nodename from C<uname>.
 
 =item url_scheme => $scheme
 
-Overrides the advertised scheme; otherwise TLS handle options select
-C<https>, and plain handles select C<http>.
+Overrides the advertised scheme; otherwise TLS credentials or handle options
+select C<https>, and plain handles select C<http>.
 
 =back
 
@@ -283,9 +296,24 @@ sub new {
    $class->SUPER::new (host => "127.0.0.1", port => 0, path => "/mcp/", origins => ["*"], %kv)
 }
 
+sub _tls_context {
+   my ($self) = @_;
+
+   return unless defined $self->{tls_cert} || defined $self->{tls_key};
+
+   $self->{_tls_context} ||= do {
+      require AnyEvent::TLS;
+      AnyEvent::TLS->new (
+         cert_file => $self->{tls_cert} // $self->{tls_key},
+         (defined $self->{tls_key} ? (key_file => $self->{tls_key}) : ()),
+      )
+   }
+}
+
 sub listen {
    my ($self, $host, $port, %handle) = @_;
 
+   $self->_tls_context;
    delete $self->{_closed};
    $host = $self->{host} unless defined $host;
    $port = $self->{port} unless defined $port;
@@ -297,7 +325,10 @@ sub listen {
    weaken $self;
 
    $self->{listener} = AnyEvent::Socket::tcp_server $host, $port, sub {
-      $self->accept ($_[0], %handle) if $self;
+      return unless $self;
+      my ($socket, $host, $port) = @_;
+      my $handle = $self->accept ($socket, %handle);
+      $handle->{mcp_remote} = AnyEvent::Socket::format_hostport ($host, $port);
    }, sub {
       $self->{port} = $_[2] if $self;
       ()
@@ -322,7 +353,8 @@ sub url {
 
    my $port = $self->{port} or die "HTTP port is not known\n";
    my $scheme = $self->{url_scheme}
-      || (($self->{listen_handle} || $self->{handle} || {})->{tls} ? "https" : "http");
+      || (defined $self->{tls_cert} || defined $self->{tls_key}
+         || ($self->{listen_handle} || $self->{handle} || {})->{tls} ? "https" : "http");
    my $path = $with_token && $self->{tokens} && @{$self->{tokens}}
       ? $self->_token_path ($self->{tokens}[0]) : $self->{path};
 
@@ -336,7 +368,7 @@ sub accept {
    weaken $self;
 
    my $handle = AnyEvent::Handle->new (
-      rbuf_max => $self->{max_size} || 1024 * 1024,
+      rbuf_max => $self->{max_size} || 8 * 1024 * 1024,
       %{$self->{handle}},
       %handle,
       fh       => $socket,
@@ -350,16 +382,20 @@ sub accept {
 
    $handle->{mcp_peer} = {};
    $self->{connections}{$handle} = $handle;
+   $handle->push_read (tls_autostart => $self->_tls_context, "accept")
+      if (defined $self->{tls_cert} || defined $self->{tls_key}) && !$handle->{tls};
+
    if ($self->{on_extension}) {
       $handle->rtimeout (15);
-      $handle->push_read (chunk => 1, sub {
-         my ($handle, $first) = @_;
-         return unless $self;
-         $handle->{rbuf} = $first . $handle->{rbuf};
+      $handle->on_read (sub {
+         my ($handle) = @_;
 
-         if ($first eq "[") {
+         $handle->on_read (undef);
+         return unless $self;
+
+         if (substr ($handle->{rbuf}, 0, 1) eq "[") {
             require AnyEvent::MCP::Extension;
-            AnyEvent::MCP::Extension::accept ($handle, $self->{tokens} || [], sub {
+            AnyEvent::MCP::Extension::accept ($handle, $self->{connect_tokens} || $self->{tokens} || [], sub {
                my ($handle, $hello) = @_;
                return $handle->destroy unless $self;
                delete $self->{connections}{$handle};
@@ -367,7 +403,7 @@ sub accept {
             }, sub { $self->_close ($_[0]) if $self });
          } else {
             $handle->rtimeout (0);
-            $self->_read ($handle);
+            $self->_read ($handle, 1);
          }
       });
    } else {
@@ -407,43 +443,51 @@ sub _parse_request_headers {
 }
 
 sub _read {
-   my ($self, $handle) = @_;
+   my ($self, $handle, $immediate) = @_;
 
    weaken $self;
 
-   $handle->push_read (line => "\r\n\r\n", sub {
-      my ($handle, $header) = @_;
+   if ($immediate) {
+      $handle->push_read (line => "\r\n\r\n", sub {
+         my ($handle, $header) = @_;
 
-      return unless $self;
+         return unless $self;
 
-      my $hdr = _parse_request_headers ($header);
-      $handle->{mcp_close} = $self->{connection_close}
-         || !$hdr || $hdr->{http_version} =~ m{\A1\.0+\z}
-         || $hdr->{connection} =~ /\bclose\b/i;
+         my $hdr = _parse_request_headers ($header);
+         $handle->{mcp_close} = $self->{connection_close}
+            || !$hdr || $hdr->{http_version} =~ m{\A1\.0+\z}
+            || $hdr->{connection} =~ /\bclose\b/i;
 
-      return $self->_respond ($handle, 400, "Bad Request", "") unless $hdr;
+         return $self->_respond ($handle, 400, "Bad Request", "") unless $hdr;
 
-      $hdr->{"content-length"} = 0 unless defined $hdr->{"content-length"};
-      return $self->_respond ($handle, 400, "Bad Request", "")
-         if exists $hdr->{"transfer-encoding"}
-            || $hdr->{"content-length"} !~ /\A[0-9]+\z/;
+         $hdr->{"content-length"} = 0 unless defined $hdr->{"content-length"};
+         return $self->_respond ($handle, 400, "Bad Request", "")
+            if exists $hdr->{"transfer-encoding"}
+               || $hdr->{"content-length"} !~ /\A[0-9]+\z/;
 
-      return $self->_respond ($handle, 413, "Content Too Large", "")
-         if $hdr->{"content-length"} > ($self->{max_size} || 1024 * 1024);
+         return $self->_respond ($handle, 413, "Content Too Large", "")
+            if $hdr->{"content-length"} > ($self->{max_size} || 8 * 1024 * 1024);
 
-      if ($hdr->{expect}) {
-         return $self->_respond ($handle, 417, "Expectation Failed", "")
-            unless lc $hdr->{expect} eq "100-continue";
+         if ($hdr->{expect}) {
+            return $self->_respond ($handle, 417, "Expectation Failed", "")
+               unless lc $hdr->{expect} eq "100-continue";
 
-         $handle->push_write ("HTTP/1.1 100 Continue\r\n\r\n");
-      }
+            $handle->push_write ("HTTP/1.1 100 Continue\r\n\r\n");
+         }
 
-      $handle->push_read (chunk => $hdr->{"content-length"}, sub {
-         my ($handle, $body) = @_;
+         $handle->push_read (chunk => $hdr->{"content-length"}, sub {
+            my ($handle, $body) = @_;
 
-         $self->_request ($handle, $hdr, $body) if $self;
+            $self->_request ($handle, $hdr, $body) if $self;
+         });
       });
-   });
+   } else {
+      $handle->on_read (sub {
+         my ($handle) = @_;
+         $handle->on_read (undef);
+         $self->_read ($handle, 1) if $self;
+      });
+   }
 }
 
 sub _request {
@@ -463,11 +507,12 @@ sub _request {
       return if $hook->($self, { %$hdr, body => $body }, $reply);
    }
 
-   # Some MCP clients strip a trailing slash from the configured URL.
+   # some MCP clients strip a trailing slash from the configured URL.
    my $uri = $hdr->{uri};
    $uri .= "/" if $self->{path} =~ m{/$} && $uri !~ m{/$};
-   my $token_path = $self->{tokens}
-      && grep $uri eq $self->_token_path ($_), @{$self->{tokens}};
+   my ($path_token) = $self->{tokens}
+      ? grep $uri eq $self->_token_path ($_), @{$self->{tokens}} : ();
+   my $token_path = defined $path_token;
 
    return $self->_respond ($handle, 404, "Not Found", "")
       unless $uri eq $self->{path} || $token_path;
@@ -492,17 +537,21 @@ sub _request {
    return $self->_respond ($handle, 405, "Method Not Allowed", "")
       unless $hdr->{method} eq "POST";
 
+   my $authenticated = $path_token;
    if ($self->{tokens}) {
-      my $authenticated = $token_path;
       my $authorization = $hdr->{authorization};
 
       if ($authorization =~ /\ABearer ([^\s]+)\z/i) {
          my $token = $1;
-         $authenticated ||= grep $_ eq $token, @{$self->{tokens}};
+         if (grep $_ eq $token, @{$self->{tokens}}) {
+            return $self->_respond ($handle, 401, "Unauthorized", "")
+               if defined $authenticated && $authenticated ne $token;
+            $authenticated = $token;
+         }
       }
 
       return $self->_respond ($handle, 401, "Unauthorized", "")
-         unless $authenticated;
+         unless defined $authenticated;
    }
 
    return $self->_respond ($handle, 415, "Unsupported Media Type", "")
@@ -562,6 +611,7 @@ sub _request {
       $self->_respond ($handle, $status, $reason, defined $response ? JSON::XS::encode_json $response : "");
    },
       peer             => $handle->{mcp_peer},
+      user             => defined $authenticated ? $self->{token_users}{$authenticated} : undef,
       protocol_version => $hdr->{"mcp-protocol-version"} || "2025-03-26",
    );
 }

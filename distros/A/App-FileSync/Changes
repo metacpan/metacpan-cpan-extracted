@@ -1,5 +1,17 @@
 Revision history for App-FileSync
 
+0.002.0	Wed Nov  4 09:44:06 PM EST 2026
+	[ Enhancements ]
+	- Created a website
+	- "filesync sync --quiet" prints nothing for a repo where nothing
+	  happened, instead of an all-zero summary and transfer line, so a
+	  cron job that finds nothing to do stays silent.
+	[ Bug Fixes ]
+	- t/locales.t failed its three system-locale subtests on Windows: it
+	  passed a multi-line child program to "perl -e", which Windows cut at
+	  the first newline, and imported LC_MESSAGES, which Windows' POSIX
+	  lacks.  The child is now a script file and falls back to LC_CTYPE.
+
 0.001.5 Sun Oct 25 12:53:45 PM EDT 2026
 	[ Bug Fixes ]
 	- Log::Abstraction 0.36 is now required, because the client logs its

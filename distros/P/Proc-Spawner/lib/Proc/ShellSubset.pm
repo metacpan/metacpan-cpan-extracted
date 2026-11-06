@@ -1,5 +1,5 @@
 package Proc::ShellSubset;  # Parser for the Bourne-shell subset of doc/parsers/shell-subset-spec.md
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use strict; use warnings; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::parse($string, %opt) returns a List, or { error => '...', pos => N, last => N, tree => List }:
@@ -32,6 +32,8 @@ use strict; use warnings; use List::Util qw(pairs pairvalues);
 #          | [ '~', 'user' or '' ] | [ '*', 'pattern text' ]
 #          | [ '{', Word, Word, ... ] | [ '{..', from, to ]
 
+our ($CUT, $SRC, $LOFF, @ASH) = (0, '', 0);   # P1, set by Proc::ShellSubset::Large: stop after this line; the text; lines before
+sub opos { my $q = shift; $q -= $$_[1] for grep $$_[0] <= $q, @ASH; P($q) }   #   it; [where, how much] alias values moved the rest (B1)
 our (%O, $M, @OPEN, $ATT, $LAST, $LOOP, $FORALL, $RLIT);   # options; position map of a backquote's inside;
     # arrays being filled (for the partial tree); how many of them are in the tree; end of the last top-level chain;
     # depth of the loops around the current command in its shell; Proc::ShellSubset::Large: 'for NAME' loops over "$@",
@@ -82,7 +84,10 @@ sub list {   # up to ')' (subshell, $()), a word in $t ('\}', 'then', 'elif|else
     push @$l, my $c = []; andor($c);
     if    (/\G$B&(?!&)/gc)          { push @$c, '&' }
     elsif (!/\G$B(?:;(?!;)|\n)/gc) { /\G$B/gc, /$e/ ? last : U() }
-    $LAST = pos if $top }
+    $LAST = pos if $top;
+    if ($top && $CUT && substr($_, pos() - 1, 1) eq "\n" and /\G$BN/gc, !/$e/) {   # P1 (Proc::ShellSubset::Large): an alias
+      my $p = opos(pos);                                                      #   definition known only when it runs: the rest
+      push @$l, [[{ rest => substr($SRC, $p), lineoff => $LOFF + (substr($SRC, 0, $p) =~ tr/\n//) }]]; last } }   #   of the text, parsed then
   $l }
 
 sub shell {   # a list that runs in a shell of its own: the loops around it don't count, and exec is checked at its end
@@ -221,7 +226,8 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
     br  => sub {
       $x eq 'r' and return $RLIT ? push(@s, [q => '[']) : E('pattern in a redirection target', $p);
       push @s, $x eq 'e' ? [u => '['] : /\G(!?\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[$1"]
-        : $RLIT && /\G\^(\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[!$1"]   # Large: [^...] negates (rule E)
+        : $RLIT && /\G\^(\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[^$1"]   # Large: [^...] negates (rule E; the executor reads it)
+        : $RLIT && bracket(\@s, $p) ? ()                     # Large: quotes, expansions, '/' inside (post4-0.04)
         : /\G(?:\\.|'[^']*'|"(?:[^"\\]|\\.)*"|[^ \t\n;&|()<>\\'"])*?\]/s   # a ] later in the word, past quotes
           ? E('bracket expression with a quote, expansion or slash', $p) : [g => '['] },
     cb  => sub {   # a '{' not followed by '}'
@@ -237,7 +243,7 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
       return push @s, [u => '~'] if @s && !($ta && $s[-1][0] eq 'u' && ($s[-1][1] =~ /:\z/ || @s == 1 && $x eq 'a'));
       E('~ in a brace alternative', $p) if $x eq 'b';
       /\G((?:[A-Za-z0-9._][A-Za-z0-9._-]*)?)$te/gc or E('unsupported ~ form', $p);
-      E('~ without HOME', $p) if $1 eq '' && !defined $ENV{HOME};
+      E('~ without HOME', $p) if $1 eq '' && !defined $ENV{HOME} && !$Proc::ShellSubset::TILDEPW;
       push @s, [x => ['~', $1]] },
     ca  => sub { E("unquoted '^'", $p) if $O{nocaret}; push @s, [u => '^'] },   # ordinary unless nocaret (C3)
     lit => sub { push @s, [u => shift] },
@@ -250,6 +256,22 @@ sub word {   # $x: a(rgument), e(nv value), r(edirection target), b(race alterna
     while $k =~ /([ug]*g[ug]*)|./g;           # unquoted text next to a pattern character joins it
   dots(@v) and E("pattern that may match '.' or '..'", $p0) unless $RLIT;   # dash: yes, bash 5.2: no (U2); Large: never (rule E)
   mkword(@v) }
+
+sub bracket {   # Large, after '[' (post4-0.04): a bracket expression with quoted members, expansions or '/', as both
+  my ($s, $p, $xq) = @_; my $p0 = pos; my @b = [g => '['];   # shells: quoted characters are members, not operators;
+  push @b, [g => $1] if /\G([!^])/gc;                           # an unquoted expansion's characters are active.  Pushes its
+  push @b, [g => ']'] if /\G\]/gc;                        # Parts on @$s and returns 1; or 0 with pos unchanged, if
+  until (/\G\]/gc) {                                      # the word ends first (then the '[' is literal)
+    my $q = pos;
+    if    (/\G(\[:[a-z]+:\])/gc) { push @b, [g => $1] }
+    elsif (/\G([^\] \t\n;&|()<>'"\\\$`{}^,\[\x00-\x1f\x7f]+|\[)/gc) { push @b, [g => $1] }
+    elsif (/\G'([^']*)'/gc) { push @b, [q => $1] }
+    elsif (/\G\\([^\n])/gc) { push @b, [q => $1] }
+    elsif (/\G"/gc) { push @b, [q => '']; dq(\@b, $q) }
+    elsif (/\G([\$`])/gc) { push @b, [x => $EX{$1}->($xq // '', $q)] }   # $xq: inside "${...}"
+    elsif (/\G[{}^,]/) { E('bracket expression with a quote, expansion or slash', $p) }
+    else { pos = $p0; return 0 } }
+  push @$s, @b, [g => ']']; 1 }
 
 sub dots {   # can a pattern in these Parts match a whole file name component '.' or '..'? (U2)
   my ($re, $g) = ('', 0);   # the component so far as a regex (only the character '.' matters); has it a pattern?

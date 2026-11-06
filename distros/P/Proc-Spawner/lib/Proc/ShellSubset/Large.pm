@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Large;  # The large subset (doc/large-subset/large-subset-spec.md): Proc::ShellSubset, and where it rejects, a wider grammar
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use strict; use warnings; use Proc::ShellSubset; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::Large::parse($string, %opt) returns a List, or { error, pos, last, tree } as Proc::ShellSubset::parse does.
@@ -34,7 +34,7 @@ sub treecheck {   # rules for commands the base grammar accepts too: each argv w
   while (@todo) { my $x = shift @todo;
     if (ref $x eq 'ARRAY') { push @todo, @$x }
     elsif (ref $x eq 'HASH') {
-      if (ref $x->{argv} eq 'ARRAY' && @{$x->{argv}} && !ref $x->{argv}[0] and my $c = $Proc::ShellSubset::TREECHK{$x->{argv}[0]}) {
+      if (ref $x->{argv} eq 'ARRAY' && @{$x->{argv}} && !ref $x->{argv}[0] && !$x->{fn} and my $c = $Proc::ShellSubset::TREECHK{$x->{argv}[0]}) {
         my $why = $c->(@{$x->{argv}}[1 .. $#{$x->{argv}}]); return $why if $why }
       push @todo, values %$x } }
   '' }
@@ -43,17 +43,26 @@ package    # hidden from the PAUSE indexer: the module Proc::ShellSubset lives i
   Proc::ShellSubset;   # the replacements run inside Proc::ShellSubset, with its variables
 our (%O, $M, @OPEN, $ATT, $LAST, $LOOP, $FORALL, $RLIT, %KW, %BI, %SH, $NM, $END, $B, $BN, %EX, $PIECE);
 our ($FUNC, @HD, $AP, $NOAT, %LOC, %UNSET) = 0;
+our ($SUBLOOP, $LN, $SRC, $LOFF, $CUT, @ASH) = (0, 0, '', 0, 0);   # loops around the subshell we are in (they end it: break, continue as dash, rule E);
+             #   whether $LINENO is used here, and the text, for line numbers (G8, rule E)
+sub lineof { $LOFF + 1 + (substr($SRC, 0, opos(shift)) =~ tr/\n//) }   # LOFF: lines before this text (the rest of a text, P1)
+our %FDEF;   # 3A (post-0.04): names this text defines as functions somewhere; commands by these names are left
+             #   to run time, where a function defined by then comes before the builtin (POSIX order)
 our (%ALIAS, @AEXP, $ANEXT);   # B1: alias name -> [[position from which it holds, value or undef], ...] in this text;
     # aliases being expanded [name, end position]; where the word after an alias whose value ends in a blank starts   # depth of function bodies; here-document bodies not yet used;
     # position of the command; true where "$@" would join with IFS (dash) or blanks (bash); names made local; unset
-my ($o_command, $o_word, $o_bq) = (\&command, \&word, \&bq);   # the originals, called by the replacements
+my ($o_command, $o_word, $o_bq, $o_shell) = (\&command, \&word, \&bq, \&shell);   # the originals, called by the replacements
+our $TILDEPW;   # G16: true while the large grammar parses
 my @INTER = qw(history fc bind help compopt logout);   # B2: interactive only; caller's option interactive => reject|nop|dash
 my %LBI = map +($_ => 1), qw(chdir source let declare typeset shopt enable builtin caller dirs pushd popd disown
   mapfile readarray suspend compgen complete), @INTER;                 # builtins the large subset still leaves to sh
 my %OWN = map +($_ => 1), qw(: . break cd command continue eval exec exit export getopts local read readonly
   return set shift trap umask unset wait alias unalias jobs fg bg hash type times ulimit), @INTER;   # builtins it runs itself
 my %NOFN = map +($_ => 1), qw(break continue eval exec exit export readonly return set shift times trap unset
-  local source cd);   # no function by these names: special builtins (dash: also local, bash: source); cd: a node
+  local source alias unalias);   # no function by these names: special builtins (dash: also local, bash: source);
+             #   alias, unalias: aliases are a parse-time matter here (B1), so a call must be known to be the builtin
+our %REGBI = map +($_ => 1), qw(cd getopts read umask wait jobs fg bg hash type ulimit);   # regular builtins we run, which
+             #   'command NAME' and a not-yet-defined function by that name reach at run time (3A, post-0.04)
 my %TS = map +($_ => 1), qw(0 EXIT HUP INT QUIT ABRT FPE KILL PIPE ALRM TERM USR1 USR2 STOP);   # trap signals: names in
 my %SIGN; { require Config; my @n = split ' ', $Config::Config{sig_name}; my @v = split ' ', $Config::Config{sig_num};
   @SIGN{@v} = @n; $SIGN{0} = 'EXIT' }   # any case, or their numbers here (P6); KILL and STOP: nothing to do
@@ -85,10 +94,14 @@ my %SETOK = map +($_ => 1), qw(PS1 PS4 HOSTNAME PIPESTATUS BASH);   # shell-set 
 
 our %TREECHK;   # checks applied to the whole tree, also where the base grammar accepted the string (see Large::treecheck)
 # P5: [ and test are the program (coreutils), which decides every form; R1: except a literal < or > argument, which both
-# shells take as a string comparison and the program refuses: rejected unless the caller sets the option test_lt_gt.
+# shells take as a string comparison and the program refuses.  Rule F (the user, 2026-11-03; post2-0.04): where the program
+# is wrong, we may do better: 's1 < s2' and 's1 > s2' alone (also after '!') are compared by the executor itself, by bytes as
+# both shells (POSIX 2024 adds them); other forms with < or > stay rejected unless the caller sets the option test_lt_gt.
 my $TOP = qr/^(?:!?=|==|<|>|-(?:eq|ne|lt|le|gt|ge|nt|ot|ef|a|o)|!|\()\z/;   # what may stand before an operand
 $TREECHK{$_} = sub { my @a = @_; pop @a if @a && !ref $a[-1] && $a[-1] eq ']';
   return '' if $O{test_lt_gt};
+  my @o = $a[0] && !ref $a[0] && $a[0] eq '!' ? @a[1 .. $#a] : @a;
+  return '' if @o == 3 && !ref $o[1] && $o[1] =~ /^[<>]\z/;   # rule F: the executor compares (Proc::ShellSpawn::Large::b_test)
   for my $i (1 .. $#a - 1) { next if ref $a[$i] || $a[$i] !~ /^[<>]\z/ || !ref $a[$i - 1] && $a[$i - 1] =~ $TOP;
     return "'$a[$i]' between two operands in '[' or 'test' (both shells compare strings, the program [ refuses; option test_lt_gt)" }
   '' } for '[', 'test';
@@ -97,9 +110,11 @@ sub xstatus { @_ > 1 || @_ && !ref $_[0] && $_[0] !~ /^(?:0|[1-9][0-9]{0,8})\z/ 
 my %CHK = (   # literal arguments of the builtins run by the large subset: (arguments) -> reason to reject, or ''
   '.'     => sub { @_ == 1 ? '' : "'.' with other than one argument" },
   exit    => \&xstatus,
-  alias   => sub { (grep ref || /=/ && !/^[A-Za-z0-9_.\-]+=/, @_) ? "unsupported 'alias' argument" : '' },   # B1
+  alias   => sub { (grep !ref && /=/ && !/^[A-Za-z0-9_.\-]+=/, @_) ? "unsupported 'alias' argument" : '' },   # B1; a word with an
+                                                                                                             #   expansion: P1
   unalias => sub { @_ == 1 && !ref $_[0] && $_[0] eq '-a' || @_ && !grep(ref || /^-|=/, @_) ? '' : "unsupported 'unalias' form" },
-  jobs    => sub { (grep ref || !/^-[lp]+\z/, @_) ? "unsupported 'jobs' form" : '' },   # B3: as dash; -p, -l (rule E)
+  jobs    => sub { my @a = @_; shift @a while @a && !ref $a[0] && $a[0] =~ /^-[lp]+\z/;   # B3: as dash; -p, -l (rule E);
+    (grep ref || !/^%(?:[1-9][0-9]*|[%+-])\z/, @a) ? "unsupported 'jobs' form" : '' },  #   then %N, %%, %+, %- (post-0.04)
   times   => sub { @_ ? "unsupported 'times' form" : '' },
   hash    => sub { (grep ref || /^-/ && $_ ne '-r', @_) ? "unsupported 'hash' form" : '' },
   type    => sub { @_ && !grep(ref || /^-/, @_) ? '' : "unsupported 'type' form" },
@@ -115,13 +130,14 @@ my %CHK = (   # literal arguments of the builtins run by the large subset: (argu
   wait    => sub { (grep !ref && !/^[0-9]+\z/, @_) ? "unsupported 'wait' argument" : '' },
   umask   => sub { @_ > 1 || @_ && !ref $_[0] && $_[0] !~ /^(?:[0-7]{1,4}|-S|[ugoa]*[-+=][rwx]*(?:,[ugoa]*[-+=][rwx]*)*)\z/ ? "unsupported 'umask' form" : '' },   # -S alone (P4); symbolic (post4-0.03)
   command => sub { my $f = $_[0] // return q{};   # command alone; command -v NAME; command [-p] PROGRAM ...: no builtin
-    shift, $f = $_[0] // return "unsupported 'command' form" if $f eq '-p';                       # -p (P4)
-    ref $f || $f eq '-v' && @_ == 2 || $f !~ /^-/ && !$OWN{$f} && !$LBI{$f} ? '' : "unsupported 'command' form" },
+    my $dp = $f eq '-p' and shift, $f = $_[0] // return "unsupported 'command' form";            # -p (P4)
+    ref $f || $f eq '-v' && @_ == 2 || $f !~ /^-/ && (!$OWN{$f} || $REGBI{$f} && !$dp) && !$LBI{$f} ? '' : "unsupported 'command' form" },
   getopts => sub { @_ < 2 ? "'getopts' without a variable name" : ref $_[1] ? ''
     : $_[1] =~ /^$NM\z/ ? vname($_[1], $AP) && '' : "unsupported 'getopts' name" },
   unset   => sub { my $f = ($_[0] // '') =~ /^-[vf]\z/ && shift;
     @_ or return "'unset' without a name";
-    for (@_) { next if ref; /^$NM\z/ or return "unsupported 'unset' argument"; $f eq '-f' or $UNSET{vname($_, $AP)} //= $AP } '' },
+    for (@_) { if (ref) { return "unsupported 'unset' argument" if grep +(ref ? $$_[0] eq '*' && $$_[1] : $_) =~ /[\[\]]/, @$_; next }   # foo[$i]: bash's array
+               /^$NM\z/ or return "unsupported 'unset' argument"; $f eq '-f' or $UNSET{vname($_, $AP)} //= $AP } '' },
   set     => sub { @_ or return "'set' without arguments (it lists)";
     while (defined(my $o = shift)) { return '' if ref $o || $o eq '--' || $o !~ /^[-+]/;   # operands follow
       if ($o =~ /^[-+]o\z/) { my $n = shift; return '' if ref $n;
@@ -130,7 +146,7 @@ my %CHK = (   # literal arguments of the builtins run by the large subset: (argu
       elsif ($o !~ /^[-+][eufCab]+\z/ && $o ne '+m') { return "unsupported 'set' option '$o'" } } '' },   # -b, +m: nothing (P6)
   trap    => sub { @_ >= 2 or return "'trap' with fewer than two arguments (it lists)";
     my $x = shift; return "unsupported 'trap' form" if !ref $x && $x =~ /^-.|^[0-9]+\z/;   # trap 1 2: a signal
-    return 'trap action outside the subset' if !ref $x && $x =~ /\S/ && $x ne '-' && ref large($x, %O) ne 'ARRAY';
+    return 'trap action outside the subset' if !ref $x && $x =~ /\S/ && $x ne '-' && ref large($x, %O, nolineno => 1) ne 'ARRAY';
     (grep !ref && !trapsig($_), @_) ? "unsupported signal for 'trap'" : '' });
 
 sub large {   # the large grammar: Proc::ShellSubset::parse with replacements
@@ -139,7 +155,13 @@ sub large {   # the large grammar: Proc::ShellSubset::parse with replacements
   my ($t, $map, @hd) = $why ? () : eval { hdcut($s) }; $why //= $@ if ref $@;
   return { error => $$why[0], pos => $$why[1], last => 0, tree => [] } if $why;
   local (@HD, $FUNC, $NOAT, %LOC, %UNSET, $FORALL, $RLIT) = (@hd); ($FUNC, $FORALL, $RLIT) = (0, 1, 1);
+  local %FDEF = map +($_ => 1), grep $OWN{$_} || $LBI{$_} || $CHK{$_} || $TREECHK{$_},   # 3A: names with checks of their own;
+    $s =~ /(?:^|[\s;&|(){}])($NM)[ \t]*\([ \t]*\)/g;                       #   a loose scan: a false hit only defers checks
   local %BI = %LBI; local %SH = %SH; delete @SH{qw(IFS OPTIND OLDPWD PPID)};   # PPID: both shells set it (post4-0.03)
+  local ($SUBLOOP, $LN, $SRC, $LOFF, $CUT, @ASH) = (0, $s =~ /LINENO/ && !$o{nolineno}, $s, $o{lineoff} // 0, 0); $LN ? delete $SH{LINENO} : ($SH{LINENO} = 1);   # G8: not in eval or trap text
+  delete $SH{UID} if $s =~ /(?:^|[\s;&|(){}])UID=/;   # G15 (rule E, as dash): an ordinary variable where the text sets it
+  local $TILDEPW = 1;   # G16 (rule E, as bash): ~ without HOME is the home in the password file
+  local *shell = sub { local $SUBLOOP = $SUBLOOP + ($LOOP // 0); $o_shell->(@_) };
   delete @BI{@INTER} unless ($o{interactive} // 'nop') eq 'reject';
   local %ALIAS = map +($_ => [[0, $o{aliases}{$_}]]), keys %{$o{aliases} // {}}; local (@AEXP, $ANEXT);
   local *P = sub { my $p = shift; $M ? $$M[$p] // $$M[-1] : $map ? $$map[$p] // $$map[-1] : $p };
@@ -149,7 +171,7 @@ sub large {   # the large grammar: Proc::ShellSubset::parse with replacements
   local $PIECE = $LPIECE;
   my $r = parse($t, %o);
   if (ref $r eq 'ARRAY') {   # bodies read for a << that turned out to be text; unset of a name some function made local
-    @HD and return { error => 'here-document body not used', pos => $HD[0][2], last => 0, tree => $r };
+    @HD && !$CUT and return { error => 'here-document body not used', pos => $HD[0][2], last => 0, tree => $r };
     my ($n) = grep $LOC{$_}, sort { $UNSET{$a} <=> $UNSET{$b} } keys %UNSET;
     return { error => "unset of '$n', which a function makes local", pos => $UNSET{$n}, last => 0, tree => $r } if $n }
   $r->{last} = $$map[$r->{last}] if ref $r eq 'HASH' && $map;
@@ -195,7 +217,12 @@ sub hdcut {   # cut out the here-document bodies, and each \-newline outside '..
   $t .= substr $s, $at; push @m, $at .. length($s);
   ($t, \@m, @hd) }
 
-sub l_vname { my ($n, $p) = @_; E("assignment to '$n'", $p) if $n =~ /^(?:HOME|CDPATH|PPID)\z/; $SETOK{$n} ? $n : name($n, $p) }
+sub settable {   # post-0.04: a name known only at run time (read $v, export "$v"): may the large subset set it?
+  my $n = shift; return 0 unless $n =~ /^$NM\z/ && $n !~ /^(?:CDPATH|PPID|LINENO)\z/;
+  return 1 if $SETOK{$n};
+  local %SH = %SH; delete @SH{qw(IFS OPTIND OLDPWD PPID UID)};   # as large() does (UID: G15, where a string sets it)
+  local %O; eval { name($n, 0); 1 } }
+sub l_vname { my ($n, $p) = @_; E("assignment to '$n'", $p) if $n =~ /^(?:CDPATH|PPID|LINENO)\z/; $SETOK{$n} ? $n : name($n, $p) }   # HOME: post-0.04
 
 sub l_word { local $NOAT = $NOAT || $_[0] =~ /[er]/; &$o_word }   # a setting's value, a redirection target
 
@@ -207,12 +234,13 @@ sub bqdq {   # after '`' inside "${...}" or a here-document: \" there is " in ba
 sub l_command {   # NAME() COMPOUND-COMMAND is a function definition (F1); anything else as in Proc::ShellSubset
   my $pl = shift; my $p = pos;
   unless (/\G($NM)$B\($B\)$BN/gc) {
-    my $c = $o_command->($pl);
+    my $i = @$pl; my $c = $o_command->($pl);
+    $pl->[$i]{line} = lineof($p) if $LN && ref $pl->[$i] eq 'HASH';   # G8: the line where the command starts
     E("'\$\@' as the word of 'case'", $p) if ref $c && exists $c->{case} && at_in($c->{case});   # joined: IFS or blank
     return $c }
   my $n = $1; E("function named '$n'", $p) if $KW{$n} || $NOFN{$n};
   /\G(?=[{(]|(?:if|while|until|for|case)$END)/ or E('function body not a compound command', pos);
-  my @b; push @$pl, my $c = { func => $n, body => \@b }; local $FUNC = $FUNC + 1; local $LOOP = 0;
+  my @b; push @$pl, my $c = { func => $n, body => \@b }; local $FUNC = $FUNC + 1; local ($LOOP, $SUBLOOP) = (0, 0);
   { local $OPEN[@OPEN] = \@b; $o_command->(\@b) } $c->{body} = $b[0];
   $c }
 
@@ -252,15 +280,18 @@ sub l_simple {
     if (!@av) { @r && !@env or E("'exec' without a command", $p0); return %$c = (exec => 1, redir => \@r) }
     E("unsupported 'exec' form", $ap[0]) if !ref $av[0] && ($av[0] =~ /^-/ || $OWN{$av[0]} || $LBI{$av[0]});
     $c->{exec} = 1 }
+  elsif (!ref($av[0]) && $FDEF{$av[0]}) { $c->{fn} = 1 }                # 3A: maybe a function; else the builtin's checks at run time
   elsif (!ref(my $n = $av[0])) {                                          # a literal name; else decided at run time
     local $AP = $ap[0];
     if ($n =~ /^(?:break|continue)\z/) {
-      E("'$n' outside a loop", $AP) unless $LOOP;
-      E("unsupported '$n' form", $AP) if @env || @r || @av > 2 || @av == 2 && ($av[1] !~ /^[1-9][0-9]*\z/ || $av[1] > $LOOP) }
+      E("'$n' outside a loop", $AP) unless $LOOP + $SUBLOOP;   # in a subshell inside a loop: it ends the subshell (as dash)
+      E("unsupported '$n' form", $AP) if @env || @r || @av > 2 || @av == 2 && ($av[1] !~ /^[1-9][0-9]*\z/ || $av[1] > $LOOP + $SUBLOOP) }
     elsif ($n eq 'read') {                                                 # read [-r] [-p PROMPT] NAME... (-p: P6)
       my $i = 1; while (!ref $av[$i] && ($av[$i] // '') =~ /^-(r*)(p?)\z/ && "$1$2" ne '') { $i += $2 ? 2 : 1 }
       $i <= $#av or E("'read' without a variable name", $AP);
-      for my $j ($i .. $#av) { $av[$j] =~ /^$NM\z/ or E("unsupported 'read' argument", $ap[$j]); vname($av[$j], $ap[$j]) } }
+      for my $j ($i .. $#av) {
+        if (ref $av[$j]) { E("unsupported 'read' argument", $ap[$j]) if grep +(ref ? $$_[0] eq '*' && $$_[1] : $_) =~ /[\[\]]/, @{$av[$j]}; next }   # a name from an
+        $av[$j] =~ /^$NM\z/ or E("unsupported 'read' argument", $ap[$j]); vname($av[$j], $ap[$j]) } }       #   expansion: checked at run time (post-0.04)
     elsif ($BI{$n}) { E("builtin '$n'", $AP) }
     elsif ($n =~ /^(?:export|readonly|local)\z/) {
       @dv && !@env && !@r or E(@dv ? "settings or redirections on '$n'" : "'$n' without arguments, or quoted", $AP);
@@ -274,7 +305,8 @@ sub l_simple {
         or E('unsupported cd form', $AP);                                  # 'cd -' is allowed (F12), but not after options
       return %$c = (cd => $av[$i], $phys ? (cd_p => 1) : (), @av > $i + 1 ? (cd_extra => 1) : (), @r ? (redir => \@r) : ()) }   # more operands: an error, as bash (rule E)
     if (my $chk = $CHK{$n}) { E($_, $AP) for grep $_, $chk->(@av[1 .. $#av]) }
-    alias_def($n, $p0, \@env, \@r, @av[1 .. $#av]) if $n eq 'unalias' || $n eq 'alias' && grep /=/, @av[1 .. $#av] }   # listing: anywhere
+    if ($n eq 'unalias' || $n eq 'alias' && grep ref || /=/, @av[1 .. $#av]) {                     # listing: anywhere
+      (grep ref, @av[1 .. $#av]) ? ($CUT = 1) : alias_def($n, $p0, \@env, \@r, @av[1 .. $#av]) } }   # P1: known only when it runs
   $c->{env} = \@env if @env; $c->{redir} = \@r if @r;
   $c }
 
@@ -285,13 +317,13 @@ sub alias_expand {   # B1: if the word at pos is an alias in force here, put its
   return 0 if grep $$_[0] eq $n, @AEXP;                               # not again inside its own value
   my $v = alias_at($n, $p); return 0 unless defined $v;
   E("alias '$n' whose value starts with a keyword", $p) if $v =~ /^[ \t]*(\S+)/ && $KW{$1};
-  substr($_, $p, length $n) = $v; pos = $p; push @AEXP, [$n, $p + length $v];
+  substr($_, $p, length $n) = $v; pos = $p; push @AEXP, [$n, $p + length $v]; push @ASH, [$p + length $v, length($v) - length $n];
   $ANEXT = $v =~ /[ \t]\z/ ? $p + length $v : undef; 1 }
 sub alias_def {   # B1: alias NAME=VALUE / unalias: only as a whole top-level command, so that it surely runs before
   my ($n, $p0, $env, $r, @a) = @_;                                    #   the lines after it, where the aliases hold
   my $before = substr $_, 0, $p0;
-  E("'$n' inside a compound command, a function, an and-or list or a pipeline (whether it runs is known only when it runs)", $p0)
-    unless @OPEN == 4 && !$FUNC && !@$env && !@$r && $before =~ /(?:\A|\n|[^;];)[ \t]*\z/ && /\G[ \t]*(?:#[^\n]*)?(?:\n|;(?!;)|\z)/;
+  return $CUT = 1   # P1 (the user, 2026-11-03: "go with better aliases"): whether it runs is known only when it runs,
+    unless @OPEN == 4 && !$FUNC && !@$env && !@$r && $before =~ /(?:\A|\n|[^;];)[ \t]*\z/ && /\G[ \t]*(?:#[^\n]*)?(?:\n|;(?!;)|\z)/;   #   so the text after
   my $e = index $_, "\n", pos; $e = length($_) + 1 if $e < 0;          # from the next line on
   if ($n eq 'alias') { for (@a) { push @{$ALIAS{$1}}, [$e, $2] if /^([^=]+)=(.*)\z/s } }
   else { push @{$ALIAS{$_}}, [$e, undef] for $a[0] eq '-a' ? keys %ALIAS : @a } }
@@ -325,10 +357,10 @@ sub l_dollar {   # after '$': Proc::ShellSubset's forms, plus $1 $# $@ $* $$ and
   if (/\G(?|\{($PN)\}|($NM|[0-9?!#\$@*]))/gc) {
     E("'\$\@' where it is not split (dash joins with IFS, bash with blanks)", $p) if $1 eq '@' && $NOAT;
     return [$q . '$', name("$1", $p)] }
-  return [$q . '${#', name("$1", $p)] if /\G\{#($NM|[0-9]+)\}/gc;
+  return [$q . '${#', name("$1", $p)] if /\G\{#($NM|[0-9]+|[#?!\$])\}/gc;   # ${##} ${#?} ${#!} ${#$}: both shells (post-0.04)
   if (!/\G\{#/ && /\G\{($PN)(:?[-+=?]|%%?|##?)/gc) {                    # not ${##} ${#-} ...: lengths in sh
     my ($n, $op) = ($1, $2);
-    E("'$op' on '\$$n' (dash: on the joined string, bash: on each)", $p) if $n =~ /[@*]/ && $op =~ /[%#]/;
+
     E("'\$\@' where it is not split (dash joins with IFS, bash with blanks)", $p) if $n eq '@' && $NOAT;
     $op =~ /=/ ? $n =~ /^$NM\z/ ? vname($n, $p) : E("assignment to '\$$n'", $p) : name($n, $p);
     local $NOAT = $NOAT || $q || $op =~ /=/;
@@ -346,7 +378,9 @@ sub pword {   # the Word of ${NAME OP word}, up to its '}'; $pat: a % or # form,
     elsif (/\G'/gc) { push @s, $q && !$pat ? [u => "'"] : /\G([^']*)'/gc ? [q => $1] : E('unterminated quote', $p) }
     elsif (/\G"/gc) { push @s, [q => '']; dq(\@s, $p) }
     elsif ($pat && /\G([*?])/gc) { push @s, [g => $1] }
-    elsif ($pat && /\G\[/gc) { push @s, /\G(!?\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[$1"] : [u => '['] }
+    elsif ($pat && /\G\[/gc) { push @s, /\G(!?\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[$1"]
+                                 : bracket(\@s, $p, $q) ? () : [u => '['] }   # quotes, expansions inside (post4-0.04)
+    elsif (!$pat && /\G([*?\[])/gc) { push @s, [u => $1] }   # ${x:-a?}: active only where the ${...} is unquoted (post4-0.04)
     else  { E(/\G\z/ ? "unterminated '\${'" : 'unsupported character in a ${...} word', $p) } }
   my $k = join '', map $$_[0], @s; my @v;
   if ($pat) { push @v, defined $1 ? ['*', join '', map $$_[1], splice @s, 0, length $1] : (shift @s)->[1]

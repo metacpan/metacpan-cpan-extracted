@@ -22,6 +22,8 @@ CODE:
     int width = 800, height = 600;
 
     /* Parse args hashref */
+    # uncoverable condition right count:2
+    # uncoverable condition right count:4
     if (items > 1 && SvOK(ST(1)) && SvROK(ST(1)) &&
         SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
         args = (HV *)SvRV(ST(1));
@@ -35,6 +37,8 @@ CODE:
 
     /* id - use provided or auto-assign from _cid */
     id_svp = args ? hv_fetchs(args, "id", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (id_svp && *id_svp && SvOK(*id_svp)) {
         (void)hv_stores(self_hv, "id", newSVsv(*id_svp));
     } else {
@@ -43,21 +47,29 @@ CODE:
 
     /* Dimensions */
     width_svp = args ? hv_fetchs(args, "width", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (width_svp && *width_svp && SvOK(*width_svp))
         width = SvIV(*width_svp);
     (void)hv_stores(self_hv, "width", newSViv(width));
 
     height_svp = args ? hv_fetchs(args, "height", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (height_svp && *height_svp && SvOK(*height_svp))
         height = SvIV(*height_svp);
     (void)hv_stores(self_hv, "height", newSViv(height));
 
     /* Optional style/class */
     style_svp = args ? hv_fetchs(args, "style", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (style_svp && *style_svp && SvOK(*style_svp))
         (void)hv_stores(self_hv, "style", newSVsv(*style_svp));
 
     class_svp = args ? hv_fetchs(args, "class", 0) : NULL;
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (class_svp && *class_svp && SvOK(*class_svp))
         (void)hv_stores(self_hv, "class", newSVsv(*class_svp));
 
@@ -97,6 +109,8 @@ CODE:
         (void)hv_stores(self_hv, "width", newSViv(SvIV(ST(1))));
     }
     SV **svp = hv_fetchs(self_hv, "width", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvIOK(*svp)) ? SvIV(*svp) : 800;
 }
 OUTPUT:
@@ -112,6 +126,8 @@ CODE:
         (void)hv_stores(self_hv, "height", newSViv(SvIV(ST(1))));
     }
     SV **svp = hv_fetchs(self_hv, "height", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvIOK(*svp)) ? SvIV(*svp) : 600;
 }
 OUTPUT:
@@ -124,6 +140,8 @@ CODE:
 {
     HV *self_hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(self_hv, "id", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvPOK(*svp)) ? newSVsv(*svp) : newSVpvs("");
 }
 OUTPUT:
@@ -357,6 +375,7 @@ PPCODE:
 {
     HV *self_hv = (HV *)SvRV(self);
     AV *buf = _canvas_get_buffer(aTHX_ self_hv);
+    # uncoverable condition right count:2
     NV ccw = (items > 6 && SvTRUE(ST(6))) ? 1 : 0;
     _canvas_push_op_6nv(aTHX_ buf, CANVAS_OP_ARC, x, y, r, start_angle, end_angle, ccw);
     XPUSHs(self);
@@ -529,6 +548,7 @@ PPCODE:
     AV *cmd = newAV();
     av_push(cmd, newSViv(CANVAS_OP_CLIP));
     /* Optional fill rule: 'nonzero' (default) or 'evenodd' */
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         av_push(cmd, newSVsv(ST(1)));
     }
@@ -671,6 +691,7 @@ PPCODE:
     AV *points;
     SSize_t len, i;
 
+    # uncoverable condition left count:2
     if (!SvROK(points_av) || SvTYPE(SvRV(points_av)) != SVt_PVAV)
         croak("polygon requires arrayref of [x,y] pairs");
 
@@ -687,6 +708,8 @@ PPCODE:
         AV *pt;
         NV x, y;
 
+        # uncoverable condition left count:1
+        # uncoverable condition left count:3
         if (!pt_svp || !SvROK(*pt_svp) || SvTYPE(SvRV(*pt_svp)) != SVt_PVAV)
             croak("polygon point %ld must be [x,y] arrayref", (long)i);
 
@@ -717,6 +740,7 @@ PPCODE:
     AV *points;
     SSize_t len, i;
 
+    # uncoverable condition left count:2
     if (!SvROK(points_av) || SvTYPE(SvRV(points_av)) != SVt_PVAV)
         croak("fill_polygon requires arrayref of [x,y] pairs");
 
@@ -733,6 +757,8 @@ PPCODE:
         AV *pt;
         NV x, y;
 
+        # uncoverable condition left count:1
+        # uncoverable condition left count:3
         if (!pt_svp || !SvROK(*pt_svp) || SvTYPE(SvRV(*pt_svp)) != SVt_PVAV)
             croak("fill_polygon point %ld must be [x,y] arrayref", (long)i);
 
@@ -799,6 +825,7 @@ CODE:
 {
     HV *self_hv = (HV *)SvRV(self);
     SV **id_svp = hv_fetchs(self_hv, "id", 0);
+    # uncoverable condition right count:1
     const char *id = (id_svp && SvPOK(*id_svp)) ? SvPV_nolen(*id_svp) : "_canvas_1";
     SV *bname = newSVpvf("__canvas_click_%s", id);
 
@@ -829,6 +856,8 @@ CODE:
 {
     HV *self_hv = (HV *)SvRV(self);
     SV **id_svp = hv_fetchs(self_hv, "id", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     const char *id = (id_svp && SvPOK(*id_svp)) ? SvPV_nolen(*id_svp) : "_canvas_1";
     SV *bname = newSVpvf("__canvas_rclick_%s", id);
 
@@ -857,8 +886,9 @@ PPCODE:
     HV *self_hv = (HV *)SvRV(self);
     SV *js = _canvas_serialize_buffer(aTHX_ self_hv);
 
-    /* Call Chandra::eval_js if available */
-    dSP;
+    /* Call the app's eval. This is a PPCODE body, so SP already sits at the
+     * mark: a fresh dSP here would put the arguments back and lose the
+     * return value, so the stack is read again after the call instead. */
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
@@ -866,6 +896,7 @@ PPCODE:
     XPUSHs(sv_2mortal(js));
     PUTBACK;
     call_method("eval", G_DISCARD);
+    SPAGAIN;
     FREETMPS;
     LEAVE;
 

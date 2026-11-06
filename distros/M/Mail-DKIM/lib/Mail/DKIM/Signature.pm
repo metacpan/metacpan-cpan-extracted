@@ -1,7 +1,7 @@
 package Mail::DKIM::Signature;
 use strict;
 use warnings;
-our $VERSION = '1.20240923'; # VERSION
+our $VERSION = '1.20261105'; # VERSION
 # ABSTRACT: represents a DKIM-Signature header
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -450,7 +450,7 @@ sub headerlist {
 
     if ( wantarray and $h ) {
         my @list = split /:/, $h;
-        @list = map { s/^\s+|\s+$//g; $_ } @list;
+        @list = map { s/^\s+//; s/\s+$//; $_ } @list;    # not s/^\s+|\s+$//g, quadratic
         return @list;
     }
     elsif (wantarray) {
@@ -620,7 +620,7 @@ Mail::DKIM::Signature - represents a DKIM-Signature header
 
 =head1 VERSION
 
-version 1.20240923
+version 1.20261105
 
 =head1 CONSTRUCTORS
 

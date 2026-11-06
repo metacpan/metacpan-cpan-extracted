@@ -270,7 +270,7 @@ subtest 'a transfer refuses arguments it cannot use' => sub {
     eval { $db->download('cdn_ip_v1', 'csvgz') };
     like($@, qr/expected a destination path/, 'download needs somewhere to write');
     eval { $db->download('', 'csvgz', '/tmp/x') };
-    like($@, qr/expected a dataset id/, 'and a dataset id');
+    like($@, qr/expected a dataset ID/, 'and a dataset ID');
     eval { $db->download_bytes('cdn_ip_v1') };
     like($@, qr/expected a format/, 'download_bytes needs a format');
     eval { $db->download_bytes('cdn_ip_v1', 'csvgz', retres => 1) };

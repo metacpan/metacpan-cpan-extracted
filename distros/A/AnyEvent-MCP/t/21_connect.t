@@ -1,7 +1,8 @@
 use common::sense;
-BEGIN { delete $ENV{http_proxy} }
+BEGIN { delete $ENV{http_proxy}; $ENV{PERL_ANYEVENT_LOG} = "filter=error log=error" }
 use Test::More;
 use AnyEvent ();
+use AnyEvent::Log ();
 use AnyEvent::Handle ();
 use AnyEvent::Socket ();
 use AnyEvent::Util ();
@@ -13,6 +14,7 @@ use AnyEvent::MCP::Server::Toolset ();
 use File::Temp ();
 use File::Path ();
 use JSON::XS ();
+use Errno qw(ECONNREFUSED EHOSTUNREACH);
 
 sub wait_for {
    my ($start) = @_;
@@ -28,16 +30,52 @@ sub wait_for {
 }
 
 is_deeply [AnyEvent::MCP::Extension::parse_url ("http://[::1]:1234/cookie/files")],
-   ["::1", 1234, "cookie", "files"], "extension URL carries host, token and alias";
+   ["::1", 1234, "cookie", "files", "http"], "extension URL carries host, token and alias";
 is_deeply [AnyEvent::MCP::Extension::parse_url ("http://[::1]/cookie/files")],
-   ["::1", 80, "cookie", "files"], "extension URL defaults to port 80";
+   ["::1", 80, "cookie", "files", "http"], "extension URL defaults to port 80";
 is_deeply [AnyEvent::MCP::Extension::parse_url ("http://abc:443/_BDPejql_VZnuBaUwnD3n7znlOp863kgQSMmr2voTCc/abc")],
-   ["abc", 443, "_BDPejql_VZnuBaUwnD3n7znlOp863kgQSMmr2voTCc", "abc"],
+   ["abc", 443, "_BDPejql_VZnuBaUwnD3n7znlOp863kgQSMmr2voTCc", "abc", "http"],
    "extension URL accepts an explicit port and underscore-prefixed token";
+is_deeply [AnyEvent::MCP::Extension::parse_url ("https://[::1]/cookie/files")],
+   ["::1", 443, "cookie", "files", "https"], "HTTPS extension URL defaults to port 443";
 eval { AnyEvent::MCP::Extension::parse_url ("http://localhost:0/cookie/files") };
 ok $@, "extension URL rejects port zero";
 eval { AnyEvent::MCP::Extension::parse_url ("http://localhost:1234/cookie/") };
 ok $@, "extension URL requires an alias";
+
+{
+   my @errors;
+   my $ctx = AnyEvent::Log::ctx "AnyEvent::MCP::Server::Connect";
+   local $ctx->[3] = sub { push @errors, shift; 1 };
+
+   for my $case (
+      ["refused", ECONNREFUSED, 0],
+      ["unreachable", EHOSTUNREACH, 1],
+   ) {
+      my ($label, $errno, $fatal) = @$case;
+      my $reverse = AnyEvent::MCP::Server::Connect->new (
+         connect => "http://127.0.0.1:31740/cookie/test", toolsets => [],
+      );
+      {
+         no warnings "redefine";
+         local *AnyEvent::Socket::tcp_connect = sub {
+            my $cb = $_[2];
+            AE::timer 0, 0, sub { $! = $errno; $cb->() }
+         };
+         $reverse->start;
+         my $cv = AE::cv;
+         my $timer = AE::timer 0.05, 0, sub { $cv->send };
+         $cv->recv;
+      }
+      is !!$reverse->{_closed}, !!$fatal, "$label TCP error " . ($fatal ? "stops" : "allows") . " retries";
+      is !!$reverse->{retry}, !$fatal, "$label TCP error leaves appropriate retry timer";
+      $reverse->close;
+   }
+
+   is scalar @errors, 2, "both expected connection diagnostics were captured";
+   like $errors[0], qr/Connection refused/, "retryable refusal is reported at debug level";
+   like $errors[1], qr/TCP connection failed: No route to host/, "failure has a useful diagnostic";
+}
 
 # hello parsing must not lose a subsequent MCP message read from the same socket.
 {

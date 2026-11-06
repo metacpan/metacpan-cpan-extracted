@@ -90,8 +90,10 @@ tool-calling. Their canonical vocabulary lives in **ADR 0009** and **ADR 0012**
 (not restated here); named only so the parallel is explicit:
 
 **reasoning_wire_format** / **Langertha::Reasoning**:
-The per-engine reasoning dialect (`openai` | `anthropic` | `gemini` | `responses`)
-and the value object that clamps + places `reasoning_effort` onto it. Deliberately
+The per-engine reasoning dialect (`openai` | `anthropic` | `gemini` | `responses` |
+`chat_template_kwargs`; `ollama` is called directly by the native Ollama engine)
+and the value object that clamps + places `reasoning_effort` onto it (unclamped on
+`chat_template_kwargs`, ADR 0040). Deliberately
 separate from `tool_wire_format` — engines sharing one tool dialect diverge on
 reasoning (DeepSeek/MiniMax/Groq are all `tool_wire_format=openai`).
 

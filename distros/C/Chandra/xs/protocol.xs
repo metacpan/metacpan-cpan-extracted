@@ -48,6 +48,8 @@ CODE:
     }
 
     /* Validate handler */
+    # uncoverable condition left count:2
+    # uncoverable condition left count:3
     if (!SvOK(handler) || !SvROK(handler) || SvTYPE(SvRV(handler)) != SVt_PVCV) {
         croak("register() requires a handler coderef");
     }
@@ -55,6 +57,8 @@ CODE:
     /* Get and clean scheme: strip :// and : suffixes */
     scheme = SvPV(scheme_sv, scheme_len);
     clean_len = scheme_len;
+    # uncoverable condition right count:3
+    # uncoverable condition right count:4
     if (clean_len > 3 && scheme[clean_len - 3] == ':' && scheme[clean_len - 2] == '/' && scheme[clean_len - 1] == '/') {
         clean_len -= 3;
     } else if (clean_len > 1 && scheme[clean_len - 1] == ':') {
@@ -68,6 +72,7 @@ CODE:
 
     /* Store handler in protocols hash */
     protocols_svp = hv_fetchs(hv, "protocols", 0);
+    # uncoverable condition right count:2
     if (protocols_svp && SvROK(*protocols_svp)) {
         protocols_hv = (HV *)SvRV(*protocols_svp);
         (void)hv_store(protocols_hv, clean_scheme, clean_len, newSVsv(handler), 0);
@@ -76,6 +81,7 @@ CODE:
     /* Create XS callback with CvXSUBANY for handler + JSON encoder */
     {
         SV **app_svp = hv_fetchs(hv, "app", 0);
+        # uncoverable condition right count:2
         if (app_svp && SvOK(*app_svp)) {
             ProtocolBindCtx *ctx;
             CV *wrapper_cv;
@@ -119,6 +125,7 @@ PPCODE:
     SV **protocols_svp;
 
     protocols_svp = hv_fetchs(hv, "protocols", 0);
+    # uncoverable condition right count:2
     if (protocols_svp && SvROK(*protocols_svp)) {
         HV *protocols_hv = (HV *)SvRV(*protocols_svp);
         I32 num_keys = hv_iterinit(protocols_hv);
@@ -155,8 +162,11 @@ CODE:
 
     scheme = SvPV(scheme_sv, scheme_len);
     clean_len = scheme_len;
+    # uncoverable condition right count:3
+    # uncoverable condition right count:4
     if (clean_len > 3 && scheme[clean_len - 3] == ':' && scheme[clean_len - 2] == '/' && scheme[clean_len - 1] == '/') {
         clean_len -= 3;
+    # uncoverable condition right count:1
     } else if (clean_len > 1 && scheme[clean_len - 1] == ':') {
         clean_len -= 1;
     }
@@ -167,6 +177,7 @@ CODE:
     clean_scheme[clean_len] = '\0';
 
     protocols_svp = hv_fetchs(hv, "protocols", 0);
+    # uncoverable condition right count:2
     if (protocols_svp && SvROK(*protocols_svp)) {
         HV *protocols_hv = (HV *)SvRV(*protocols_svp);
         RETVAL = hv_exists(protocols_hv, clean_scheme, clean_len) ? &PL_sv_yes : &PL_sv_no;
@@ -188,11 +199,14 @@ CODE:
 
     /* Check _injected flag */
     injected_svp = hv_fetchs(hv, "_injected", 0);
+    # uncoverable condition right count:1
     if (injected_svp && SvTRUE(*injected_svp)) {
         RETVAL = SvREFCNT_inc(self);
     } else {
         /* Check protocols not empty */
         protocols_svp = hv_fetchs(hv, "protocols", 0);
+        # uncoverable condition left count:1
+        # uncoverable condition left count:2
         if (!protocols_svp || !SvROK(*protocols_svp) || HvUSEDKEYS((HV *)SvRV(*protocols_svp)) == 0) {
             /* No protocols registered - return without setting flag */
             RETVAL = SvREFCNT_inc(self);
@@ -349,6 +363,7 @@ CODE:
             /* Call $self->{app}->eval($js) */
             {
                 SV **app_svp = hv_fetchs(hv, "app", 0);
+                # uncoverable condition right count:2
                 if (app_svp && SvOK(*app_svp)) {
                     dSP;
                     ENTER;
@@ -381,6 +396,8 @@ CODE:
     SV **protocols_svp;
 
     protocols_svp = hv_fetchs(hv, "protocols", 0);
+    # uncoverable condition left count:1
+    # uncoverable condition left count:2
     if (!protocols_svp || !SvROK(*protocols_svp) || HvUSEDKEYS((HV *)SvRV(*protocols_svp)) == 0) {
         RETVAL = newSVpvs("");
     } else {

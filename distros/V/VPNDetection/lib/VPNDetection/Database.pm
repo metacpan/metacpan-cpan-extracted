@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.10.2';
+our $VERSION = '3.10.3';
 
 # The formats a dataset is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -20,7 +20,7 @@ use constant STANDINGS => qw(expired licensed unlicensed);
 use constant LICENSE_TYPES => qw(evaluation standard redistribute);
 
 # The dataset FAMILIES your organization is licensed to download. A license
-# covers a family, while a download names one of its versions, so the ids the
+# covers a family, while a download names one of its versions, so the IDs the
 # download and checksum calls take come from each family's `versions`.
 sub list {
     my $self = shift;
@@ -126,7 +126,7 @@ sub download {
 sub download_p {
     my ($self, $id, $format, $path, %options) = @_;
     # Everything a caller can get wrong is refused before the file is opened, so
-    # a mistyped id cannot leave a stray .part behind.
+    # a mistyped ID cannot leave a stray .part behind.
     _assert_dataset('download', $id, $format);
     $self->{client}->_check_options('database->download', \%options, 'retries');
     Carp::croak('database->download: expected a destination path')
@@ -257,7 +257,7 @@ sub _body_p {
 
 sub _assert_dataset {
     my ($method, $id, $format) = @_;
-    Carp::croak("database->$method: expected a dataset id") if !defined $id || !length $id;
+    Carp::croak("database->$method: expected a dataset ID") if !defined $id || !length $id;
     Carp::croak("database->$method: expected a format") if !defined $format || !length $format;
     Carp::croak("database->$method: '$format' is not a published format; expected one of "
         . join(', ', FORMATS)) unless $FORMAT{$format};

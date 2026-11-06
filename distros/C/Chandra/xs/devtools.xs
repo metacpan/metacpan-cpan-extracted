@@ -41,6 +41,8 @@ CODE:
     (void)hv_stores(hv, "enabled", newSViv(1));
 
     app_svp = hv_fetchs(hv, "app", 0);
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (app_svp && *app_svp && SvOK(*app_svp))
         app_sv = *app_svp;
 
@@ -106,10 +108,13 @@ CODE:
     SV *app_sv;
     SV **app_svp;
 
+    # uncoverable condition right count:2
     if (items > 1 && SvOK(ST(1))) {
         app_sv = ST(1);
     } else {
         app_svp = hv_fetchs(hv, "app", 0);
+        # uncoverable condition right count:2
+        # uncoverable condition right count:3
         app_sv = (app_svp && *app_svp && SvOK(*app_svp)) ? *app_svp : NULL;
     }
 
@@ -160,6 +165,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "enabled", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && *svp && SvTRUE(*svp)) ? 1 : 0;
 }
 OUTPUT:
@@ -176,6 +183,8 @@ CODE:
     (void)hv_stores(hv, "enabled", newSViv(0));
 
     app_svp = hv_fetchs(hv, "app", 0);
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (app_svp && *app_svp && SvOK(*app_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -201,6 +210,8 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (app_svp && *app_svp && SvOK(*app_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -226,6 +237,8 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (app_svp && *app_svp && SvOK(*app_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -251,6 +264,8 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
+    # uncoverable condition right count:2
+    # uncoverable condition right count:3
     if (app_svp && *app_svp && SvOK(*app_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -278,6 +293,11 @@ CODE:
     SV **enabled_svp = hv_fetchs(hv, "enabled", 0);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
+    # uncoverable condition right count:4
+    # uncoverable condition right count:5
+    # uncoverable condition right count:6
     if (enabled_svp && *enabled_svp && SvTRUE(*enabled_svp) &&
         app_svp && *app_svp && SvOK(*app_svp)) {
         STRLEN mlen;
@@ -343,6 +363,11 @@ CODE:
     SV **enabled_svp = hv_fetchs(hv, "enabled", 0);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
+    # uncoverable condition right count:4
+    # uncoverable condition right count:5
+    # uncoverable condition right count:6
     if (enabled_svp && *enabled_svp && SvTRUE(*enabled_svp) &&
         app_svp && *app_svp && SvOK(*app_svp)) {
         STRLEN mlen;

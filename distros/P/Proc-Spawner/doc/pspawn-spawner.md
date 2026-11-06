@@ -50,7 +50,7 @@ The rules, as decided on the page "Child Exit Wake-up":
 - **R1.** Every callback runs from the queue, one at a time: never inside a signal handler, never inside another callback. A child that ends while a callback runs is noticed, and its `on_exit` queued, only after that callback returns.
 - **D2.** A callback never waits: `wait_until` called from inside one dies with "wait inside a reaction".
 - **D1.** While `wait_until` runs, SIGCHLD has a C handler (from the binding) that writes one byte into a pipe; the loop `select`s on that pipe. No Perl code runs inside the signal, and no wake-up is lost. Without the C function (another binding), a deferred Perl handler is used, and `select` wakes every 50 ms.
-- **D3.** SIGCHLD is ours only while `wait_until` runs; the previous handler is put back afterwards.
+- **D3.** SIGCHLD is ours only while `wait_until` runs; the previous handler is put back afterwards. (Since post-0.04, `Proc::ShellSpawn` installs a deferred SIGCHLD handler of its own between `run()` calls while background jobs remain, the user's choice B of question K3; it calls `Proc::Spawner::poll()`. `Proc::Spawner` itself still keeps D3.)
 
 ## 2. Proc::Spawner::Graph: the executable graph
 
@@ -121,6 +121,23 @@ In 0.03 (2026-11-03), `t/dash.t` gives: `largebattery.txt` 111 of 114 agree with
   - `Proc::ShellSpawn::run`: SIGINT, SIGQUIT and SIGPIPE ignored while it runs; traps set in `%SIG` while it runs (`trap`, in `Proc::ShellSpawn::Large`), put back after it.
 - posix_spawn also cannot make a child **ignore** a signal (it inherits what Perl ignores), nor set **resource limits** or the **nice** value.
 
-- Windows (W1–W3), to be written in `Proc::Spawner` now that it exists; cannot be tested here.
+- Windows (W1–W3, section 8), to be written in `Proc::Spawner` now that it exists; cannot be tested here.
 - Known issue X15: the shell layer still breaks some cycles by hand (contexts in their scopes). The two new modules have none.
 - `Proc::Spawner` is still loaded from `lib/`, not packaged as a distribution; the binding `PosixSpawn` is separate.
+
+## 8. Windows (decided 2026-11-02, not written yet; in the distribution since post-0.04: no CPAN release had it, it was only in the Project's later copy of 0.01; checked against CPAN's 0.01 to 0.04 on 2026-11-05)
+
+The user's rule: **what Windows can do fully and natively is implemented; everything else is reported as not implemented**, so the caller's `unsupported` hash (or `%Proc::Spawner::UNSUPPORTED`) decides between drop and fail, and a caller may use a workaround that is safe only in single-threaded execution (as the umask is set around the call on Linux). No "approximate" category.
+
+- **Implemented** (per-call parameters of `CreateProcessW`, or preparation that touches nothing shared, or nothing to do):
+  - the child's fds 0–2 (`STARTUPINFO` with `STARTF_USESTDHANDLES`, as Perl's own `do_spawnvp_handles()` in `win32/win32.c`);
+  - "only these handles", and so `close`, `closefrom` (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`);
+  - `chdir` (`lpCurrentDirectory`); `fchdir` (the directory handle's path);
+  - a file "opened in the child" (opened by the parent, its relative path taken from the child's directory);
+  - `search` (our own lookup through PATH and PATHEXT);
+  - `pidfd` (the process handle that `CreateProcess` returns); `pgroup => 0` (`CREATE_NEW_PROCESS_GROUP`);
+  - `sigdefault`, `resetids` (nothing is inherited, there is no set-user-id).
+  - fds 3 and up through the C runtime's `lpReserved2`: per call and thread-safe, but only children built on that runtime read it; decided earlier as W1–W3 (Go), with programs known to ignore it (`java`, `javaw`) refused such fds.
+- **Not implemented:** `umask`, a non-empty `sigmask`, ignoring signals in the child, `pgroup => PGID` (joining a group), `setsid`, `tcsetpgrp`, `sched`, `cgroup`.
+- **Already defined by Perl on Windows, so used as they are:** the command line built from the argument list (`create_command_line()`, the quoting of multi-arg `system`), the status (`((U8) exitcode) << 8`, from `win32_waitpid()`), and waiting for children (`win32_msgwait()` over the process handles).
+- **Testing on Linux "as on Windows":** a runtime list of what the platform lacks (empty on Linux, the list above on Windows, settable in tests), consulted where the XS now consults the missing extensions; a test then runs the batteries with the Windows list. argv and exit statuses need no test of ours: they are Perl's.

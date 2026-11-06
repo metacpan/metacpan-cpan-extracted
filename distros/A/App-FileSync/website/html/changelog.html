@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes &mdash; App::FileSync</title>
+<meta name="description" content="Release history for App::FileSync, from the first draft to 0.002.0.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="changelog.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Changes &mdash; App::FileSync">
+<meta property="og:description" content="Release history for App::FileSync, from the first draft to 0.002.0.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html" aria-current="page">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Changes</h1>
+
+	<p class="lede">Revision history, newest first. The authoritative list is the
+	<code>Changes</code> file in the distribution.</p>
+
+	<h2 id="v0-002-0">0.002.0 <span class="muted">&mdash; 4 November 2026</span></h2>
+
+	<h3>Enhancements</h3>
+	<ul>
+		<li>Created this website.</li>
+		<li><code>filesync sync --quiet</code> prints nothing for a repo where
+		nothing happened, instead of an all-zero summary and transfer line, so a
+		cron job that finds nothing to do stays silent.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li>The system-locale tests in <code>t/locales.t</code> failed on Windows:
+		they passed a multi-line child program to <code>perl -e</code>, which
+		Windows cut at the first newline, and imported <code>LC_MESSAGES</code>,
+		which Windows' POSIX lacks. The child is now a script file and falls back
+		to <code>LC_CTYPE</code>.</li>
+	</ul>
+
+	<h2 id="v0-001-5">0.001.5 <span class="muted">&mdash; 25 October 2026</span></h2>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li><code>Log::Abstraction</code> 0.36 is now required, because the client
+		logs its run summary as structured fields in a trailing hashref. An older
+		copy, which the installer accepted, turned that into
+		<code>sync finishedHASH(0x...)</code> in the log file and an empty entry in
+		an array logger, so the counts were lost and the settings test failed its
+		seven logger assertions.</li>
+	</ul>
+
+	<h2 id="v0-001-4">0.001.4 <span class="muted">&mdash; 25 October 2026</span></h2>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li><code>t/ssh.t</code>: the stand-in for ssh now names the perl running the
+		tests on its first line instead of <code>#!/usr/bin/env perl</code>. The
+		transport starts that file as a program, so the kernel picked whichever perl
+		came first on <code>PATH</code> &mdash; on a smoke tester the system perl,
+		which cannot see the modules the build installed &mdash; and the
+		<code>filesync-server</code> it then ran died with <code>Can't locate
+		Params/Validate/Strict.pm</code> against a build that never lacked it. The
+		Windows wrapper already named <code>$^X</code>.</li>
+	</ul>
+
+	<h3>Tests</h3>
+	<ul>
+		<li><code>t/ssh.t</code> checks the interpreter line of the stand-in it
+		writes, so the <code>PATH</code>-dependent first line cannot come back
+		unnoticed.</li>
+	</ul>
+
+	<h2 id="v0-001-3">0.001.3 <span class="muted">&mdash; 25 October 2026</span></h2>
+
+	<h3>Documentation</h3>
+	<ul>
+		<li>More improvements.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li>Bump the minimum <code>Config::Abstraction</code>.</li>
+	</ul>
+
+	<h2 id="v0-001-2">0.001.2 <span class="muted">&mdash; 24 October 2026</span></h2>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li><code>filesync-admin repo create</code> names the server root and the
+		directory that blocks it when the root cannot be written, and says to chown
+		it to the running account or use <code>--root</code> elsewhere. It used to
+		report only <code>Permission denied</code> against a path below the
+		root.</li>
+		<li>That advice is given only when a directory really is unwritable, so a
+		full disk or a root that is a file keeps its own error.</li>
+	</ul>
+
+	<h3>Documentation</h3>
+	<ul>
+		<li>The examples are split by machine &mdash; what to run on the server, on
+		each client, and from cron &mdash; and keep the master in a home directory,
+		so nothing needs sudo.</li>
+		<li>What a <code>/srv/filesync</code> root needs instead, the wrapper that
+		adds <code>--root</code> to <code>filesync-server</code>, and the ssh key the
+		first sync requires.</li>
+		<li>The backup and restore commands follow the example's master layout, and
+		make the backup directory before cron mirrors into it.</li>
+		<li>The synopsis creates the repo first, so it runs as printed.</li>
+	</ul>
+
+	<h2 id="v0-001-1">0.001.1 <span class="muted">&mdash; 24 October 2026</span></h2>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li>Build: test on Windows with Perl 5.42 again. Its
+		<code>B::Hooks::EndOfScope</code> faults at exit, so the plain-Perl hook is
+		used there.</li>
+		<li><code>filesync</code>, <code>filesync-server</code> and
+		<code>filesync-admin</code> select that hook for themselves on 5.42 for
+		Windows, so it no longer has to be set to run them; an implementation already
+		in the environment is left alone. A test checks the choice in a child
+		process that starts without the variable.</li>
+		<li>Security: an ssh server of the form <code>-v@host</code> (or a program
+		name starting with <code>-</code>) is refused; it was passed to ssh as an
+		option.</li>
+		<li>Security: client and repo names that are not plain ids
+		(<code>../x</code>, over 64 characters) are refused by the server, admin and
+		client.</li>
+		<li>Server: a conflict copy is kept under the planned name whether or not
+		the client names it, and any other name is refused; acks are accepted only
+		for actions the client applies; get validates its offset and caps its size;
+		an upload larger than announced is refused and discarded.</li>
+		<li>Ignore: building a matcher no longer modifies the caller's pattern list
+		(which turned <code>!keep.tmp</code> into <code>keep.tmp</code> and could
+		delete the file remotely); <code>/top</code> anchors to the root;
+		<code>build/</code> matches at any depth.</li>
+		<li>Trash: same-day versions sort numerically and are no longer capped at
+		<code>.99</code>. Each client repo has its own local trash; restore still
+		finds files in the old shared one.</li>
+		<li>Admin: <code>journal_read</code> works when the server root contains
+		spaces.</li>
+		<li>All messages come from a catalogue
+		(<code>App::FileSync::I18N::en</code>) and can be translated; errors no
+		longer show Perl file and line numbers unless <code>FILESYNC_TRACE</code> is
+		set.</li>
+		<li>Internals: new <code>Args</code>, <code>Base</code>,
+		<code>Constants</code>, <code>I18N</code>, <code>IO</code> and
+		<code>Platform</code> modules; private subs are enforced with
+		Sub::Private; full POD.</li>
+		<li>Removed the unused POSIX and Encode prerequisites.</li>
+		<li>Build: requires Perl 5.14; declares ExtUtils::MakeMaker 6.64 as a
+		configure prerequisite so test prerequisites are honoured; the gzip and (on
+		macOS) gtar dist settings are now actually applied; <code>t/</code> and
+		<code>xt/</code> are not indexed; bug tracker link added.</li>
+		<li><code>$VERSION</code> is a version object
+		(<code>version-&gt;declare</code>), so every tool reads 0.001.1 as the
+		dotted version v0.1.1.</li>
+		<li>Every module and program carries the same GPL v2 licence notice.</li>
+	</ul>
+
+	<h2 id="v0-001-0">0.001.0 <span class="muted">&mdash; 23 October 2026</span></h2>
+	<ul>
+		<li>First draft.</li>
+	</ul>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

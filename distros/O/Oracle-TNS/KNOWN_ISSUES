@@ -1,0 +1,113 @@
+Known issues of Oracle::TNS
+
+DATA CHANGED WITHOUT ERROR
+
+These inputs are accepted, but the result does not mean the same as the
+input. Avoid them until fixed.
+
+    1. Values containing a backslash are built without quotes:
+
+         (DIRECTORY="C:\Oracle\Wallet")  ->  (DIRECTORY=C:\Oracle\Wallet)
+
+       Oracle Net reserves "\" as an escape character, so the path may be
+       read differently.
+
+    2. Values containing a single quote are built without quotes:
+
+         (SERVICE_NAME="o'brien")  ->  (SERVICE_NAME=o'brien)
+
+       Oracle Net reserves "'" as well.
+
+    3. Single-quoted values are not recognized, the quotes are kept as part
+       of the value:
+
+         (SERVICE_NAME='sales db')  ->  { SERVICE_NAME => "'sales db'" }
+
+       and built back as (SERVICE_NAME="'sales db'"). Oracle Net allows
+       both single and double quotes.
+
+    4. tns_parse_connect(): Easy Connect Plus parameters after "?" are kept
+       as part of SERVICE_NAME:
+
+         u@host:1521/sales?sdu=16384  ->  SERVICE_NAME => 'sales?sdu=16384'
+
+    5. tns_parse_connect(): a comma-separated host list without ports is
+       taken as one host:
+
+         u@h1,h2/svc  ->  HOST => 'h1,h2'
+
+REJECTED WITH AN ERROR
+
+These inputs are valid for Oracle, but are rejected (or, for 6, accepted
+although invalid). No data is changed.
+
+    6. tns_parse() accepts more than one top-level group, e.g. a descriptor
+       closed too early by a misplaced ")", so that a group follows it:
+       "(DESCRIPTION=(ADDRESS=...))(CONNECT_DATA=...)". tns_parse_names()
+       rejects the same text.
+
+    7. A double quote inside a single-quoted value, 'CN="x, y",O=z', is
+       rejected. tns_build() also rejects values with double quotes instead
+       of writing them single-quoted.
+
+    8. tns_parse_connect(): Easy Connect with several hosts and ports,
+       h1:1521,h2,h3:1522/svc, is rejected.
+
+    9. tns_parse_connect(): Easy Connect address lists separated by ";",
+       h1:1521;h2:1522/svc, are rejected.
+
+   10. tns_parse_connect(): the protocol prefix, tcps://host:1522/svc, is
+       rejected, including the Oracle Autonomous Database URLs.
+
+   11. tns_parse_connect(): empty service name, host//inst1, is rejected.
+
+   12. tns_parse_connect(): the DBD::Oracle DRCP form user@DB:POOLED is
+       rejected.
+
+AUTHOR TESTS IN xt/
+
+xt/test_samples.pl checks Oracle::TNS against real-world descriptors,
+tnsnames.ora entries and connect strings collected from the Oracle Net
+documentation, DBD::Oracle and other sources. The sources are listed in
+the head of the file. It is not run by "make test", run it with:
+
+    prove -l xt/*.pl
+
+The test has its own small reference parser, written after the Oracle Net
+syntax rules and independent of Oracle::TNS. For every sample it checks:
+
+    * Oracle::TNS accepts exactly the samples the reference parser accepts,
+      the Oracle docs contain a few samples with unbalanced parentheses,
+      these must be rejected
+
+    * the built string keeps all data, compared with the reference parser,
+      ignoring key order except for DESCRIPTION, ADDRESS and ADDRESS_LIST,
+      where the order matters
+
+    * the built string is valid strict Oracle Net syntax, i.e. values with
+      reserved characters ( ) = \ " ' # or whitespace are quoted
+
+    * the built string parses back to the same tree
+
+for both single line and indented output. All valid samples are also
+combined into one tnsnames.ora file and checked the same way. Connect
+strings are checked that user, password and target are kept, and that no
+Easy Connect Plus syntax ends up inside HOST or SERVICE_NAME.
+
+The test is expected to fail until the issues above are fixed. Failing
+tests and the issues they show:
+
+    DEVART sqlnet.ora wallet, quoted backslash path           1
+    SYN92 quoted backslash                                    1
+    SYN92 single-quoted value, tnsnames.ora: Q1               3
+    NAME19 ezconnect plus params, EZC23 example 1, 2          4
+    NET112 ENABLE (unbalanced in docs)                        6
+    SYN92 double quote inside single quotes                   7
+    NAME19 ezconnect plus hosts                               8
+    EZC23 example 3 address lists                             9
+    NAME19 ezconnect plus tcps, tcps dn, DEVART adb tcps url  10
+    NAME19 ezconnect empty service                            11
+    DBDORA DRCP alias:POOLED                                  12
+
+Issues 2 and 5 have no sample of their own, they were found by reading the
+code while checking the samples.

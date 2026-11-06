@@ -1,5 +1,5 @@
 package HTTP::Body;
-$HTTP::Body::VERSION = '1.24';
+$HTTP::Body::VERSION = '1.25';
 use strict;
 
 use Carp       qw[ ];
@@ -29,13 +29,13 @@ HTTP::Body - HTTP Body Parser
 =head1 SYNOPSIS
 
     use HTTP::Body;
-    
+
     sub handler : method {
         my ( $class, $r ) = @_;
 
         my $content_type   = $r->headers_in->get('Content-Type');
         my $content_length = $r->headers_in->get('Content-Length');
-        
+
         my $body   = HTTP::Body->new( $content_type, $content_length );
         my $length = $content_length;
 
@@ -44,21 +44,23 @@ HTTP::Body - HTTP Body Parser
             $r->read( my $buffer, ( $length < 8192 ) ? $length : 8192 );
 
             $length -= length($buffer);
-            
+
             $body->add($buffer);
         }
-        
-        my $uploads     = $body->upload;     # hashref
-        my $params      = $body->param;      # hashref
-        my $param_order = $body->param_order # arrayref
-        my $body        = $body->body;       # IO::Handle
+
+        my $uploads     = $body->upload;      # hashref
+        my $params      = $body->param;       # hashref
+        my $param_order = $body->param_order; # arrayref
+        my $raw         = $body->body;        # IO::Handle
     }
 
 =head1 DESCRIPTION
 
 HTTP::Body parses chunks of HTTP POST data and supports
 application/octet-stream, application/json, application/x-www-form-urlencoded,
-and multipart/form-data.
+multipart/form-data, and XForms submissions (multipart/related and
+application/xml).  A body of any other content type is handled like
+application/octet-stream.
 
 Chunked bodies are supported by not passing a length value to new().
 
@@ -96,6 +98,21 @@ add croak.  The default for both is 1000.
 The largest header block a multipart part may have, in bytes and in lines; a
 larger one makes add croak.  The defaults are 32768 and 100.
 
+=item $HTTP::Body::max_chunk_line_size
+
+The largest chunk-size line (size, extensions and CRLF) of a chunked body, in
+bytes; a longer one makes add croak.  The default is 1024.  A chunked body
+whose framing is malformed (a line that is no chunk-size line, a size that does
+not fit an integer, chunk data not followed by CRLF) makes add croak as well.
+
+=item $HTTP::Body::max_trailer_size
+
+=item $HTTP::Body::max_trailer_lines
+
+The largest trailer of a chunked body (its header lines and the blank line
+that ends it), in bytes, and the most header lines it may have; a larger one
+makes add croak.  The defaults are 32768 and 100.
+
 =back
 
 =head1 METHODS
@@ -132,6 +149,11 @@ sub new {
         cleanup        => 0,
         buffer         => '',
         chunk_buffer   => '',
+        chunk_remaining => 0,
+        chunk_crlf     => 0,
+        chunk_eof      => 0,
+        chunk_trailer  => undef,
+        chunk_trailer_lines => 0,
         body           => undef,
         chunked        => !defined $content_length,
         content_length => defined $content_length ? $content_length : -1,
@@ -179,95 +201,169 @@ sub DESTROY {
 
 =item add
 
-Add string to internal buffer. Will call spin unless done. returns
-length before adding self.
+Feeds the next piece of the body to the parser, which parses as much of it as
+it can unless it is done already.  Data beyond the content length is ignored.
+
+With a content length, add returns the number of bytes still expected as a
+negative number, and 0 once the body is complete.  For a chunked body it
+returns nothing.
+
+add croaks when one of the limits under L</Limits> is exceeded, and when the
+framing of a chunked body is malformed.
 
 =cut
 
-# chunk-size [ chunk-ext ] CRLF.  The atomic group keeps the size digits from
-# backtracking into the rest of the line, which took quadratic time on a line
-# that does not end in CRLF.
-my $chunk_size_line = qr/^(?>([\da-fA-F]+))[^\n]*\x0D\x0A/;
+# chunk-size [ chunk-ext ] CRLF, matched against one line at a time.  The
+# atomic group keeps the size digits from backtracking into the rest of the
+# line, and the line length limit bounds what the rest can cost.
+my $chunk_size_line = qr/^(?>([\da-fA-F]+))[^\n]*\x0D\x0A\z/;
+
+our $max_chunk_line_size = 1024;
+our $max_trailer_size    = 32 * 1024;
+our $max_trailer_lines   = 100;
 
 sub add {
     my $self = shift;
 
     if ( $self->{chunked} ) {
-        $self->{chunk_buffer} .= $_[0];
 
-        # Stop once the zero-length chunk has ended the chunked stream: any
-        # trailing bytes (e.g. trailing headers) must not be reparsed as
-        # further chunks.  This is separate from the body parser's own state,
-        # which for multipart reaches 'done' at the closing boundary, before
-        # the zero chunk that records the final content length.
-        while ( !$self->{chunk_eof}
-            && $self->{chunk_buffer} =~ $chunk_size_line ) {
-            my $chunk_len  = hex($1);
-            # Length of the chunk-size line itself; the pattern is anchored at ^.
-            my $header_len = $+[0];
+        # Nothing after the blank line that ends the trailer belongs to the
+        # body: it must neither be reparsed nor pile up in the buffer.
+        return if $self->{chunk_eof};
 
-            if ( $chunk_len == 0 ) {
-                # Strip chunk len
-                substr( $self->{chunk_buffer}, 0, $header_len, '' );
+        $self->{chunk_buffer} .= $_[0] if defined $_[0];
 
-                # End of data, there may be trailing headers
-                if (  my ($headers) = $self->{chunk_buffer} =~ m/(.*)\x0D\x0A/s ) {
-                    if ( my $message = HTTP::Message->parse( $headers ) ) {
+        while ( !$self->{chunk_eof} ) {
+
+            # Inside a chunk: pass its data on as it arrives, so that a chunk
+            # never needs as much memory as it is long.
+            if ( $self->{chunk_remaining} ) {
+                my $take = length $self->{chunk_buffer};
+                $take = $self->{chunk_remaining} if $take > $self->{chunk_remaining};
+
+                # wait for more calls to add()
+                return unless $take;
+
+                my $data = substr( $self->{chunk_buffer}, 0, $take, '' );
+                $self->{chunk_remaining} -= $take;
+                $self->{length}          += $take;
+
+                # Once the body parser is done (multipart is, at its close
+                # delimiter) the rest of the body is consumed but not kept.
+                unless ( $self->{state} eq 'done' ) {
+                    $self->{buffer} .= $data;
+                    $self->spin;
+                }
+
+                next;
+            }
+
+            # The CRLF that ends the data of the chunk just read.
+            if ( $self->{chunk_crlf} ) {
+                return if length( $self->{chunk_buffer} ) < 2;
+
+                unless ( substr( $self->{chunk_buffer}, 0, 2, '' ) eq "\x0D\x0A" ) {
+                    Carp::croak('Chunk data not followed by CRLF');
+                }
+
+                $self->{chunk_crlf} = 0;
+            }
+
+            # After the last chunk: the trailer, header lines up to a blank
+            # line that ends the body.  It is collected until then.
+            if ( defined $self->{chunk_trailer} ) {
+                my $line = $self->_chunk_line(
+                    $max_trailer_size ? $max_trailer_size - length $self->{chunk_trailer} : undef,
+                    "Chunked body trailer exceeds $max_trailer_size bytes",
+                );
+
+                # wait for the rest of the line
+                return unless defined $line;
+
+                if ( $line =~ /^\x0D?\x0A\z/ ) {
+                    if ( my $message = HTTP::Message->parse( $self->{chunk_trailer} ) ) {
                         $self->{trailing_headers} = $message->headers;
                     }
-                }
 
-                $self->{chunk_buffer} = '';
-                $self->{chunk_eof}    = 1;
+                    $self->{chunk_buffer}  = '';
+                    $self->{chunk_trailer} = undef;
+                    $self->{chunk_eof}     = 1;
 
-                # Set content_length equal to the amount of data we read,
-                # so the spin methods can finish up.
-                $self->{content_length} = $self->{length};
-            }
-            else {
-                # Make sure we have the whole chunk body plus its trailing CRLF
-                # beyond the chunk-size line before we consume it. The old test
-                # measured the whole buffer, size line included, so a read that
-                # split a chunk left the parser taking it short and reparsing the
-                # leftover bytes as the next chunk-size line (never completing).
-                if ( length( $self->{chunk_buffer} ) >= $header_len + $chunk_len + 2 ) {
-                    # Strip chunk len
-                    substr( $self->{chunk_buffer}, 0, $header_len, '' );
-
-                    # Pull chunk data out of chunk buffer into real buffer
-                    $self->{buffer} .= substr $self->{chunk_buffer}, 0, $chunk_len, '';
-
-                    # Strip remaining CRLF
-                    $self->{chunk_buffer} =~ s/^\x0D\x0A//;
-
-                    $self->{length} += $chunk_len;
-                }
-                else {
-                    # Not enough data for this chunk, wait for more calls to add()
                     return;
                 }
+
+                # HTTP::Headers takes time quadratic in the number of fields
+                # of one name, so the number of lines is limited as well.
+                if ( $max_trailer_lines && ++$self->{chunk_trailer_lines} > $max_trailer_lines ) {
+                    Carp::croak("Chunked body trailer exceeds $max_trailer_lines lines");
+                }
+
+                $self->{chunk_trailer} .= $line;
+
+                # trailing_headers parses the trailer again when asked
+                delete $self->{trailing_headers};
+
+                next;
             }
-            
-            unless ( $self->{state} eq 'done' ) {
-                $self->spin;
+
+            # A chunk-size line.
+            my $line = $self->_chunk_line(
+                $max_chunk_line_size || undef,
+                "Chunk size line exceeds $max_chunk_line_size bytes",
+            );
+
+            # wait for the rest of the line
+            return unless defined $line;
+
+            unless ( $line =~ $chunk_size_line ) {
+                Carp::croak('Invalid chunk size line');
             }
+
+            # hex() of a size that does not fit an integer warns and returns a
+            # float, which no buffer length would ever reach.
+            ( my $digits = $1 ) =~ s/^0+//;
+            if ( length($digits) > 15 ) {
+                Carp::croak('Chunk size too large');
+            }
+
+            my $chunk_len = hex($digits);
+
+            if ( $chunk_len == 0 ) {
+                # End of data: set content_length equal to the amount of data
+                # we read, so the spin methods can finish up.
+                $self->{content_length} = $self->{length};
+
+                unless ( $self->{state} eq 'done' ) {
+                    $self->spin;
+                }
+
+                # The trailer follows, up to a blank line.
+                $self->{chunk_trailer} = '';
+
+                next;
+            }
+
+            $self->{chunk_remaining} = $chunk_len;
+            $self->{chunk_crlf}      = 1;
         }
-        
+
         return;
     }
     
     my $cl = $self->content_length;
 
     if ( defined $_[0] ) {
-        $self->{length} += length( $_[0] );
-        
+        # A copy: the caller's buffer is left alone, and may be read-only.
+        my $data = $_[0];
+        $self->{length} += length($data);
+
         # Don't allow buffer data to exceed content-length
         if ( $self->{length} > $cl ) {
-            $_[0] = substr $_[0], 0, $cl - $self->{length};
+            $data = substr $data, 0, $cl - $self->{length};
             $self->{length} = $cl;
         }
-        
-        $self->{buffer} .= $_[0];
+
+        $self->{buffer} .= $data;
     }
 
     unless ( $self->state eq 'done' ) {
@@ -275,6 +371,23 @@ sub add {
     }
 
     return ( $self->length - $cl );
+}
+
+# Takes the next line, LF included, off the chunk buffer, or returns nothing
+# while it is incomplete.  Its length is checked before it is complete, so
+# that an endless line can not grow the buffer: longer than $room bytes, it
+# croaks with $error.  An undefined $room is no limit.
+sub _chunk_line {
+    my ( $self, $room, $error ) = @_;
+
+    my $eol      = index( $self->{chunk_buffer}, "\x0A" );
+    my $line_len = $eol >= 0 ? $eol + 1 : length $self->{chunk_buffer};
+
+    Carp::croak($error) if defined $room && $line_len > $room;
+
+    return if $eol < 0;
+
+    return substr( $self->{chunk_buffer}, 0, $line_len, '' );
 }
 
 =item body
@@ -344,9 +457,8 @@ sub init {
 
 =item length
 
-Returns the total length of data we expect to read if known.
-In the case of a chunked request, returns the amount of data
-read so far.
+Returns the number of bytes of the body read so far, up to the content length.
+Of a chunked body only the chunk data counts.
 
 =cut
 
@@ -357,12 +469,30 @@ sub length {
 =item trailing_headers
 
 If a chunked request body had trailing headers, trailing_headers will
-return an HTTP::Headers object populated with those headers.
+return an HTTP::Headers object populated with those headers.  The trailer is
+read up to the blank line that ends it, also when it arrives in later calls to
+add than the last, zero-size chunk; until then, trailing_headers returns the
+header lines that have arrived so far.  The body itself is done at the last
+chunk.
 
 =cut
 
 sub trailing_headers {
-    return shift->{trailing_headers};
+    my $self = shift;
+
+    # A trailer still being read gives the lines that have arrived of it, as
+    # some clients never send its blank line.  It is parsed when asked for,
+    # not again for every line that arrives.
+    if (   !$self->{trailing_headers}
+        && defined $self->{chunk_trailer}
+        && length $self->{chunk_trailer} )
+    {
+        if ( my $message = HTTP::Message->parse( $self->{chunk_trailer} ) ) {
+            $self->{trailing_headers} = $message->headers;
+        }
+    }
+
+    return $self->{trailing_headers};
 }
 
 =item spin
@@ -523,7 +653,10 @@ before 1.23 did.
 =item $HTTP::Body::MultiPart::basename_regexp
 
 The regexp used to work out the uploaded file's extension.  It only matters
-when C<file_temp_suffix> is undefined.
+when C<file_temp_suffix> is undefined, and is matched against the last 255
+bytes of the uploaded file's basename, which is as long as a suffix can be.
+The default, C<qr/[^.]+(\.[^\\\/]+)$/>, is not run as a regexp: as long as the
+variable still holds it, a string search with the same result is used.
 
 =item $HTTP::Body::MultiPart::file_temp_template
 

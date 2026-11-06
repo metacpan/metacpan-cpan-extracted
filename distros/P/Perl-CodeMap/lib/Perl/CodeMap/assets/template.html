@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="author" content="Scott Muller">
+<title>{{TITLE}} · Perl CodeMap</title>
+<!-- STYLE -->
+</head>
+<body>
+<main class="layout">
+<header class="header">
+  <div><p class="eyebrow">Perl CodeMap · Static analysis</p>
+  <h1 id="heading">{{TITLE}}</h1>
+  <p class="lede">Explore package architecture, module dependencies and syntax-highlighted source — entirely offline.</p></div>
+  <button class="btn" type="button" id="theme">Switch theme</button>
+</header>
+<div id="stats" class="stats" aria-label="Project statistics"></div>
+<section aria-labelledby="graph-heading">
+  <div class="section-heading"><div><h2 id="graph-heading">How the packages fit together</h2><p class="hint">Dependency layers are arranged from foundations to dependents. Select a namespace or package to explore.</p></div></div>
+  <div id="legend" class="legend"></div>
+  <div class="toolbar"><span id="breadcrumb" class="crumb">Namespace overview</span>
+    <button class="btn" id="home" type="button">Overview</button>
+    <button class="btn" id="back" type="button">Back</button>
+    <button class="btn" id="prev" type="button">Previous</button>
+    <span id="page" class="count"></span>
+    <button class="btn" id="next" type="button">Next</button></div>
+  <div class="graphbox"><svg id="map" role="img" aria-label="Interactive dependency graph"></svg></div>
+  <p id="graph-status" class="hint" aria-live="polite"></p>
+</section>
+<section aria-labelledby="explorer-heading">
+  <h2 id="explorer-heading">Source explorer</h2>
+  <div class="toolbar searchbar"><input id="q" type="search" placeholder="Search packages, files or subroutines" aria-label="Search all symbols">
+    <label><input id="public" type="checkbox"> Names not starting with _</label></div>
+  <div class="browser">
+    <aside class="browser-col"><input id="pkgq" class="package-filter" type="search" placeholder="Filter package names" aria-label="Filter package names"><div id="pkgs"></div></aside>
+    <div id="files" class="browser-col"></div>
+    <div id="fns" class="browser-col"></div>
+  </div>
+</section>
+<div id="warning" class="warning" hidden role="status"></div>
+<p id="footer" class="footer"></p>
+<noscript><p class="warning">Enable JavaScript to explore the dependency map and source files. No network connection is required.</p></noscript>
+</main>
+<div id="source-modal" class="overlay" hidden>
+  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="source-title">
+    <div class="source-head"><div class="source-caption"><strong id="source-title"></strong><span id="source-line"></span></div>
+      <div class="source-actions"><label>Go to line <input id="source-jump" type="number" min="1" value="1" aria-label="Go to line"></label>
+        <button class="btn" type="button" id="source-go">Go</button>
+        <a id="source-external" target="_blank" rel="noopener noreferrer" hidden>Open in repository</a>
+        <button class="btn" type="button" id="source-copy">Copy link</button>
+        <button class="btn" type="button" id="source-close">Close</button></div></div>
+    <div class="source-scroll"><div id="source-lines" class="source-lines"></div></div>
+    <div class="source-foot"><span id="source-range"></span><span>
+      <button class="btn" type="button" id="source-prev">Previous lines</button>
+      <button class="btn" type="button" id="source-next">Next lines</button>
+    </span></div>
+  </section>
+</div>
+<!-- JSON -->
+<!-- JS -->
+</body>
+</html>

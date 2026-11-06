@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-17'; # DATE
+our $DATE = '2026-11-06'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.609'; # VERSION
+our $VERSION = '0.610'; # VERSION
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -62,7 +62,7 @@ Complete::App::perlmv - Completion routines related to App::perlmv
 
 =head1 VERSION
 
-This document describes version 0.609 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2023-11-17.
+This document describes version 0.610 of Complete::App::perlmv (from Perl distribution App-perlmv), released on 2026-11-06.
 
 =head1 FUNCTIONS
 
@@ -122,7 +122,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

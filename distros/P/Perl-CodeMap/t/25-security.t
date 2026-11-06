@@ -1,0 +1,28 @@
+use strict;
+use warnings;
+use Test::More;
+use File::Temp qw(tempdir);
+use File::Path qw(make_path);
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Perl::CodeMap;
+
+my $base=tempdir(CLEANUP=>1);
+make_path("$base/root/Demo");
+open my $inside,'>',"$base/root/Demo/Valid.pm" or die $!;
+print {$inside} "package Demo::Valid;\n1;\n"; close $inside;
+open my $outside,'>',"$base/secret.pm" or die $!;
+print {$outside} "A_PRIVATE_VALUE_NOT_FOR_REPORTS\n"; close $outside;
+symlink("$base/secret.pm","$base/root/Demo/Link.pm") or die $!;
+my @paths=('Demo/Valid.pm','../secret.pm','/etc/passwd','Demo/Link.pm','Demo/../../secret.pm');
+my $data={pkgs=>[{path=>'Demo::Valid',imports=>[],files=>[map {{path=>$_,name=>$_,funcs=>[],lines=>1}} @paths]}],sources=>{}};
+my $cm=Perl::CodeMap->new(root=>"$base/root",parser=>'lite');
+is($cm->hydrate_sources($data,"$base/root"),1,'hydrate only valid in-root source');
+ok(exists $data->{sources}{'Demo/Valid.pm'},'valid source accepted');
+ok(!exists $data->{sources}{'../secret.pm'},'parent traversal rejected');
+ok(!exists $data->{sources}{'/etc/passwd'},'absolute path rejected');
+ok(!exists $data->{sources}{'Demo/Link.pm'},'symlink rejected');
+ok(!exists $data->{sources}{'Demo/../../secret.pm'},'nested traversal rejected');
+my $str=join('',values %{$data->{sources}});
+unlike($str,qr/A_PRIVATE_VALUE_NOT_FOR_REPORTS/,'external content never embedded');
+done_testing;

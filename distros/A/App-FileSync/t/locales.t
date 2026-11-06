@@ -184,8 +184,15 @@ subtest 'catalogue completeness' => sub {
 # "local $! = ENOENT; "$!"" - never POSIX::strerror - so both sides go through
 # the same layer and cannot diverge on a C library that translates
 # differently.
+#
+# The child is a script file, not "perl -e": on Windows a list-form pipe open
+# joins its arguments into one command line, which cuts a multi-line -e
+# program at its first newline ("syntax error at -e line 1, at EOF").
+# Windows' POSIX has no LC_MESSAGES either, so the child falls back to
+# LC_CTYPE for its report of the locale in effect.
 
-my $missing = File::Spec->catfile(tempdir(CLEANUP => 1), 'no-such-file');
+my $scratch = tempdir(CLEANUP => 1);
+my $missing = File::Spec->catfile($scratch, 'no-such-file');
 
 for my $locale ('en_US.UTF-8', 'de_DE.UTF-8', 'ja_JP.UTF-8') {
 	subtest "system locale $locale" => sub {
@@ -193,11 +200,12 @@ for my $locale ('en_US.UTF-8', 'de_DE.UTF-8', 'ja_JP.UTF-8') {
 use strict;
 use warnings;
 use Errno qw(ENOENT);
-use POSIX qw(setlocale LC_MESSAGES);
+use POSIX ();
 use App::FileSync::IO qw(read_text);
 my $expected = do { local $! = ENOENT; "$!" };
 my $error = eval { read_text($ARGV[0]); 1 } ? 'no error' : "$@";
-my $in_effect = setlocale(LC_MESSAGES) // 'C';
+my $in_effect = eval { POSIX::setlocale(POSIX::LC_MESSAGES()) }
+	// eval { POSIX::setlocale(POSIX::LC_CTYPE()) } // 'C';
 print "EXPECTED=$expected\nERROR=$error\nLOCALE=$in_effect\n";
 CHILD
 		local $ENV{LC_ALL} = $locale;
@@ -208,7 +216,12 @@ CHILD
 		# to C; the test still holds, so keep the output quiet.
 		local $ENV{PERL_BADLANG} = 0;
 
-		open my $pipe, '-|', $^X, "-I$lib", '-e', $child, $missing or die "cannot start perl: $!";
+		my $script = File::Spec->catfile($scratch, 'child.pl');
+		open my $out, '>', $script or die "cannot write $script: $!";
+		print {$out} $child;
+		close $out;
+
+		open my $pipe, '-|', $^X, "-I$lib", $script, $missing or die "cannot start perl: $!";
 		my $output = do { local $/; <$pipe> };
 		close $pipe;
 
@@ -219,7 +232,8 @@ CHILD
 		ok(defined $expected && length $expected, 'Perl describes ENOENT');
 		isnt($error, 'no error', 'reading a missing file raises');
 		like($error, qr/\A\QCannot read $missing: \E/, 'the message is the catalogued one (English: no catalogue for this language ships)');
-		like($error, qr/\Q$expected\E/, "it carries Perl's own ENOENT text ($expected)");
+		my $enoent = $expected // '';
+		like($error, qr/\Q$enoent\E/, "it carries Perl's own ENOENT text ($enoent)");
 		unlike($error, qr/ at \S+ line \d+.*\n.* at \S+ line \d+/s, 'no stack trace without FILESYNC_TRACE');
 
 		# The checks above hold under any locale, so they always run; this one

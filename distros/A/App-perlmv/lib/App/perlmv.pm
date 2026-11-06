@@ -3,9 +3,9 @@
 package App::perlmv;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-17'; # DATE
+our $DATE = '2026-11-06'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.609'; # VERSION
+our $VERSION = '0.610'; # VERSION
 
 use 5.010001;
 use strict;
@@ -44,7 +44,8 @@ sub new {
         codes           => [],
         dry_run         => 0,
         homedir         => $homedir,
-        sort_mode       => 1, # 1=sort ascibetically, -1=reverse, 0=no sort
+        sort            => 'name', # other choices: mtime (ascending=oldest first), size (ascending=smallest first)
+        sort_mode       => 1, # 1=sort ascending, -1=reverse/descending, 0=no sort
         overwrite       => 0,
         process_dir     => 1,
         process_symlink => 1,
@@ -110,6 +111,7 @@ sub parse_opts {
         'R|recursive'     => \$self->{ 'recursive'     },
         'r|reverse'       => sub { $self->{sort_mode} = -1 },
         's|show=s'        => \$self->{ 'show'          },
+        'sort=s'          => \$self->{ 'sort'          },
         'T|no-sort'       => sub { $self->{sort_mode} =  0 },
         'v|verbose'       => \$self->{ 'verbose'       },
         'w|write=s'       => \$self->{ 'write'         },
@@ -253,7 +255,7 @@ Options:
  -r  (--reverse) reverse order of processing (by default asciibetically)
  -S  (--no-symlinks) Do not process symlinks
  -s <NAME> (--show) Show source code for scriptlet
- -T  (--no-sort) do not sort files (default is sort ascibetically)
+ -T  (--no-sort) do not sort files (default is sort ascendingly)
  -V  (--version) Print version and exit
  -v  (--verbose) Verbose
  -w <NAME> (--write) Write code specified in -e as scriptlet
@@ -262,6 +264,8 @@ Options:
      as the first argument, and there is no -e specified.
  -a <arg=value> (--arg) Supply arguments for code/scriptlet.
 
+ --sort <SORT> sort criteria, default is 'name' (asciibetical), other choices:
+     'mtime', 'size'.
 USAGE
 
     exit 0;
@@ -437,9 +441,14 @@ sub run_code {
 
 sub _sort {
     my $self = shift;
-    $self->{sort_mode} == -1 ? (reverse sort @_) :
-        $self->{sort_mode} == 1 ? (sort @_) :
-            @_;
+    return @_ if !$self->{sort_mode};
+    if ($self->{sort} eq 'size') {
+        sort { ((-s $a) <=> (-s $b)) * $self->{sort_mode} } @_;
+    } elsif ($self->{sort} eq 'mtime') {
+        sort { ((-M $b) <=> (-M $a)) * $self->{sort_mode} } @_;
+    } else {
+        sort { ($a cmp $b) * $self->{sort_mode} } @_;
+    }
 }
 
 sub process_items {
@@ -646,7 +655,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.609 of App::perlmv (from Perl distribution App-perlmv), released on 2023-11-17.
+This document describes version 0.610 of App::perlmv (from Perl distribution App-perlmv), released on 2026-11-06.
 
 =for Pod::Coverage ^(.*)$
 
@@ -668,9 +677,13 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Sawyer X Steven Haryanto
+=for stopwords perlancar (on netbook-dell-xps13) Sawyer X Steven Haryanto PC)
 
 =over 4
+
+=item *
+
+perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 =item *
 
@@ -678,7 +691,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =item *
 
-Steven Haryanto <stevenharyanto@gmail.com>
+Steven Haryanto (on PC) <stevenharyanto@gmail.com>
 
 =item *
 
@@ -706,7 +719,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2022, 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

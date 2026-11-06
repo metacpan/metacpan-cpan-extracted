@@ -6,7 +6,7 @@ use warnings;
 # Load XS functions from Chandra bootstrap
 use Chandra ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 1;
 

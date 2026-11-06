@@ -56,7 +56,7 @@ my %META = (
       web => 'https://github.com/dbsrgits/sql-abstract',
       type => 'git',
     },
-    x_IRC => 'irc://irc.perl.org/#dbix-class',
+    x_IRC => 'irc://irc.perl.org/#dbio',
     bugtracker => {
       web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract',
       mailto => 'bug-SQL-Abstract@rt.cpan.org',
@@ -64,7 +64,10 @@ my %META = (
     license => [ 'http://dev.perl.org/licenses/' ],
   },
   no_index => {
-    package => [ 'DBIx::Class::Storage::Debug::PrettyPrint' ],
+    package => [
+      'DBIx::Class::Storage::Debug::PrettyPrint',
+      'DBIx::Class::SQLMaker::Role::SQLA2Passthrough',
+    ],
     directory => [ 't', 'xt', 'examples' ],
   },
 );

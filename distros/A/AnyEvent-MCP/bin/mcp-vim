@@ -233,12 +233,12 @@ listener URL have independent credentials.
 =head1 CONNECTIONS AND AUTHENTICATION
 
 By default, the broker derives a stable port in the 16384..32767 range
-from its service-instance name, defaulting to C<default>. By default
-its token is derived from the private global AnyEvent::MCP master
-secret. Configured C<tokens> or repeated C<--token> options replace that
-default. Every accepted token authenticates MCP HTTP, browser WebSocket
-connections and the private Vim/broker protocol. Keep these tokens
-private.
+from its service-instance name, defaulting to C<default>. Managed users
+have individually derived tokens. All enabled users may authenticate MCP
+requests, but only C<connect_user> (default C<default>) may register Vim
+editors or XPCSE WebSockets. Configured C<tokens> or repeated C<--token>
+options replace managed credentials and admit those explicit tokens for all
+connection types. Keep tokens private.
 
 By default the TCP listener binds IPv4 loopback on the name-derived port.
 C<bind> in C<[instance NAME]> or C<--bind> overrides the address and port.
@@ -247,8 +247,8 @@ C<--stdio>, or C<PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL=stdio>, additionally
 serves MCP over stdin/stdout. The TCP listener remains active. In this mode
 the process exits after stdio closes and pending responses have drained.
 
-C<--print-url> prints the URL prefix (without a Vim target name) and
-exits, without opening the listener. Normal startup does not print
+C<--print-url> prints enabled user URLs, annotating the connect user;
+C<--print-url=USER> selects one. Neither starts a listener. Normal startup does not print
 the credential. Use the same C<HOME> and C<XDG_CONFIG_HOME> as the
 running broker, for example when checking the URL of a systemd service
 account. Changing the global master secret changes derived tokens and
@@ -311,13 +311,9 @@ loading behaviour; these permissions do not sandbox Vim.
 
 =head1 OPTIONS
 
-Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-Here C<--bind> and C<--token> also govern private Vim/WebSocket connections;
-C<--stdio> and C<--connect> retain that listener. C<--print-url> reports
-the credential-bearing URL prefix without Vim target. C<--tool-help> lists
-registered tools without starting MCP listener. For example,
-C<--auto-allow '*,write'> allows buffer edits, but not C<save>,
-C<open> or unrestricted C<exec>.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+The following switch is specific to C<mcp-vim>.
 
 =over
 
@@ -326,6 +322,39 @@ C<open> or unrestricted C<exec>.
 Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
 C<auto>. tty/yad force local interface; mcp delegates to client,
 auto prefers native elicitation when offered. See L</PERMISSIONS>.
+
+=back
+
+=head2 Shared-option behavior
+
+=over
+
+=item --bind ADDRESS[:PORT]
+
+Also selects the address and port for private Vim and browser WebSockets.
+
+=item --token TOKEN
+
+Also authenticates private Vim and browser WebSocket connections.
+
+=item --stdio
+
+The private Vim/WebSocket listener remains active while MCP uses stdio.
+
+=item --connect URL
+
+The private Vim/WebSocket listener remains active while MCP connects
+outward to a multibroker.
+
+=item --print-url[=USER]
+
+Prints the credential-bearing URL prefix for Vim clients. Append a
+Vim target as described in L</FIRST USE>.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+For example, C<--auto-allow '*,write'> allows buffer edits, but not
+C<save>, C<open> or unrestricted C<exec>.
 
 =back
 
@@ -341,22 +370,20 @@ there is no separate install-time cookie generation step.
 use common::sense;
 
 use Getopt::Long ();
-use AnyEvent::MCP::Config ();
-
 use MIME::Base64 ();
-
 use Socket ();
 use POSIX ();
-
 use JSON::XS ();
 
 use AnyEvent ();
 use AnyEvent::Socket ();
 use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
 use AnyEvent::MCP::Extension ();
 use AnyEvent::MCP::Server::HTTP ();
 use AnyEvent::MCP::Server::Toolset ();
 use AnyEvent::MCP::Server::Permissions ();
+
 use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
 
 our $PORT;
@@ -397,9 +424,12 @@ $stored->{section}{global}{secret} eq $config->{section}{global}{secret}
    or die "mcp-vim: MCP master secret is not persistently stored in $config->{file}\n";
 
 $http{tokens} = \@tokens if @tokens;
+$http{connect_tokens} = \@tokens if @tokens;
+delete $http{token_users} if @tokens;
 my @accepted_tokens = @{$http{tokens}};
+my @connect_tokens = @{$http{connect_tokens}};
 /\A[A-Za-z0-9_.~-]+\z/ or die "Invalid mcp-vim token\n" for @accepted_tokens;
-my %accepted_token = map { $_ => 1 } @accepted_tokens;
+my %connect_token = map { $_ => 1 } @connect_tokens;
 
 $NICK //= (POSIX::uname)[1] || die "cannot determine mcp-vim hostname\n";
 
@@ -812,7 +842,7 @@ sub xpcse::send_data {
 
    unless (exists $save->{credit}) {
       $save->{credit} = 10e6;
-      # Trailing flag is ignored by current browser clients.
+      # trailing flag is ignored by current browser clients.
       $self->send_json ([upload => $save->{hdrs}, $save->{force}]);
    }
 
@@ -1210,7 +1240,7 @@ sub normalize_udiff {
       my $j = $i + 1;
 
       # GNU patch mishandles hunks with more prefix than suffix context.
-      # Make the first context line an identity change without losing it.
+      # make the first context line an identity change without losing it.
       # see https://unix.stackexchange.com/questions/414542/does-patch-work-with-asymmetric-context
       splice @line, $i + 1, 1, "-$1", "+$1"
          if $line[$i + 1] =~ /^ (.*)\z/;
@@ -1230,7 +1260,7 @@ sub normalize_udiff {
          } elsif ($tag eq "+") {
             ++$new_count;
          } elsif ($line[$j] eq "\\ No newline at end of file") {
-            # Marker belongs to the preceding body line and counts neither side.
+            # marker belongs to the preceding body line and counts neither side.
          } else {
             die "normalize_udiff: bad hunk line '$line[$j]'\n";
          }
@@ -1596,6 +1626,7 @@ my $mcp = AnyEvent::MCP::Server::HTTP->new (
    permissions      => $permissions,
    path             => "/",
    tokens           => \@accepted_tokens,
+   token_users      => $http{token_users},
    max_size         => 100e6,
    origins          => ["*"],
    connection_close => 1,
@@ -1645,7 +1676,7 @@ sub accept_json {
       on_eof   => sub { $_[0]->destroy },
    );
 
-   AnyEvent::MCP::Extension::accept ($hdl, \@accepted_tokens, sub {
+   AnyEvent::MCP::Extension::accept ($hdl, \@connect_tokens, sub {
       my ($hdl, $hello) = @_;
 
       @$hello == 6 && $hello->[0] eq "mcp-vim"
@@ -1674,19 +1705,20 @@ sub accept_ws {
    # tcp_server has already formatted the numeric address for us.
    my $peer = AnyEvent::Socket::format_hostport $peer_host, $peer_port;
 
-   my $origin;
+   my ($origin, $rejection);
 
    my $ws_server = new AnyEvent::WebSocket::Server
       max_payload_size => 1000e6,
       handshake => sub {
          my ($req, $res) = @_;
 
-         if ($req->{resource_name} !~ m%^/([^/]+)/+(.+)\z%s || !$accepted_token{$1}) {
-            AE::log notice => "illegal websocket connect from $peer";
-            return;
+         my ($cookie, $target) = $req->{resource_name} =~ m%^/([^/]+)/+(.+)\z%s;
+         unless (defined $cookie && $connect_token{$cookie}) {
+            $rejection = defined $cookie ? "invalid token" : "invalid path";
+            die "Vim WebSocket handshake rejected\n";
          }
 
-         $origin = $2;
+         $origin = $target;
 
          AE::log info => "websocket connect for $origin";
          #$res->subprotocol ($prot);
@@ -1701,6 +1733,10 @@ sub accept_ws {
    $ws_server->establish ($fh)->cb (sub {
       if (my $conn = eval { $_[0]->recv }) {
          xpcse->new ({ conn => $conn, origin => $origin });
+      } elsif ($rejection) {
+         AE::log warn => "Vim WebSocket rejected: $rejection ($peer)";
+      } else {
+         AE::log warn => "Vim WebSocket establishment failed from $peer: $@";
       }
    });
 }

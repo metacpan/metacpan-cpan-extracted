@@ -201,6 +201,12 @@ helper settings and without interface fallback. C<auto> uses modern MCP form eli
 advertised for the request, otherwise the helper. C<mcp> requires modern
 form elicitation and fails when unavailable. A declined prompt never
 falls back to a different approval mechanism.
+Choosing C<mcp> also trusts that MCP client to assert the original user
+whose saved permission rules are evaluated, even for calls whose rules
+already allow or deny without asking. C<auto> grants that identity trust
+only where its modern elicitation path was selected. C<helper>, C<tty>
+and C<yad> do not trust client-supplied user assertions. Avoid C<mcp>
+and C<auto> with clients not trusted to make permission decisions.
 
 =item ask => $callback->($prepared, $done->($success, $decision))
 
@@ -488,7 +494,6 @@ sub _rule {
       $compiled->{matches}{$name} = _regex ($rule->{$key});
    }
 
-
    if (exists $rule->{"sandbox-grants"}) {
       die "Invalid rule sandbox-grants\n" if ref $rule->{"sandbox-grants"};
       $compiled->{sandbox_grants} = $self->closure ([length $rule->{"sandbox-grants"}
@@ -542,7 +547,6 @@ sub _read_rules {
    };
 
    $valid ? \@rules : []
-
 }
 
 sub _write {
@@ -617,7 +621,7 @@ sub check {
          for values %{$request->{details}};
    }
 
-   # Use the dispatched tool name, never the request's display label.
+   # use the dispatched tool name, never the request's display label.
    my $tool_name = $tool // "";
    $tool_name =~ y/_/-/;
    for my $rule (@{$self->{auto_rules}}) {
@@ -648,7 +652,9 @@ sub check {
       # an exact-file denial applies even when a multi-path operation requests
       # additional sandbox authority for its other paths.
       next if !exists $rule->{path} && exists $rule->{sandbox_grants}
-         && grep !$rule->{sandbox_grants}{$_}, keys %$need;
+         && ($rule->{decision} eq "deny"
+            ? (grep !$need->{$_}, keys %{$rule->{sandbox_grants}})
+            : (grep !$rule->{sandbox_grants}{$_}, keys %$need));
 
       return {
          decision       => $rule->{decision},
@@ -775,8 +781,31 @@ sub _call {
    delete @params{qw(inputResponses requestState _meta)};
    # _meta is per-request context, not stable operation identity: retries can
    # carry different client capabilities, progress tokens and clientInfo.
-   # bind the one-use token to the protocol version and semantic parameters.
-   JSON::XS->new->canonical->encode ([$req->{protocol_version}, $req->{method}, \%params])
+   # bind the continuation to its authenticated user as well as the call.
+   JSON::XS->new->canonical->encode ([$req->{user}, $req->{protocol_version}, $req->{method}, \%params])
+}
+
+sub _user_request {
+   my ($req, $request) = @_;
+
+   my $dimensions = $request->{dimensions} || {};
+   ref $dimensions eq "HASH" or die "Invalid permission dimensions\n";
+   $dimensions = { %$dimensions };
+   delete $dimensions->{user};
+
+   if (defined (my $user = $req->{user})) {
+      $dimensions->{user} = {
+         label   => "User",
+         value   => $user,
+         choices => [
+            { label => "This user", match => $user },
+            { label => "All users", match => "^" },
+         ],
+         default => $user,
+      };
+   }
+
+   +{ %$request, dimensions => $dimensions }
 }
 
 sub _remember {
@@ -896,6 +925,7 @@ sub _resume {
 sub require_permission {
    my ($self, $req, $request) = @_;
 
+   $request = _user_request ($req, $request);
    my $grant = $self->check ($request, $req->{tool});
 
    return $grant->{sandbox_grants} if $grant->{decision} eq "allow";
@@ -916,6 +946,7 @@ sub require_permission {
 sub require {
    my ($self, $req, $request, $done) = @_;
 
+   $request = _user_request ($req, $request);
    my $grant = eval { $self->check ($request, $req->{tool}) };
 
    return $done->(0, "$@") if $@;

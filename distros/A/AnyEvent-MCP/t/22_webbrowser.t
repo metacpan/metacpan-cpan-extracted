@@ -189,6 +189,9 @@ sub connect_page {
 my ($bad, $header) = upgrade "wrong", "bad";
 unlike $header, qr/101/, "bad token cannot upgrade";
 close $bad->{socket};
+my ($invalid_target, $invalid_header) = upgrade "primary", "%ZZ";
+unlike $invalid_header, qr/101/, "invalid target cannot upgrade";
+close $invalid_target->{socket};
 my ($early) = upgrade "primary", "early";
 send_ws $early, ["state", { url => "https://page.example/", title => "early" }];
 my $closed = read_ws $early;
@@ -550,6 +553,12 @@ close $in;
 waitpid $pid, 0;
 $pid = undef;
 my $errors = do { local $/; <$err> };
+like $errors, qr/Browser WebSocket rejected: invalid token/,
+   "rejected browser token has a specific warning without exposing the token";
+like $errors, qr/Browser WebSocket rejected: invalid target/,
+   "invalid browser target has a specific warning";
+unlike $errors, qr/handshake response was undef|warn main:\s*\n/,
+   "expected handshake rejections do not produce exception traces or empty warnings";
 like $errors, qr/tab: session started \("https:\/\/page\.example\/"\)/,
    "new browser tab session is operationally logged";
 like $errors, qr/other: connected \(revision 1\)/,

@@ -3,7 +3,9 @@ abstract: 'Graph plugin for Map::Tube.'
 author:
   - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
 build_requires:
-  Path::Tiny: '0.146'
+  File::Find: '0'
+  File::Temp: '0'
+  File::Which: '0'
   Test::Lib: '0'
   Test::More: '0'
 configure_requires:
@@ -22,11 +24,12 @@ no_index:
 provides:
   Map::Tube::Plugin::Graph:
     file: lib/Map/Tube/Plugin/Graph.pm
-    version: v1.2.2
+    version: v1.3.0
   Map::Tube::Plugin::Graph::Utils:
     file: lib/Map/Tube/Plugin/Graph/Utils.pm
-    version: v1.2.2
+    version: v1.3.0
 requires:
+  Carp: '0'
   File::Which: '1.21'
   Graph: '0.9732'
   GraphViz2: '2.63'
@@ -34,11 +37,12 @@ requires:
   MIME::Base64: '3.14'
   Map::Tube: v5.1.0
   Map::Tube::Exception: '3.18'
-  Moo::Role: '2.000000'
+  Moo::Role: '2'
+  Path::Tiny: '0.146'
   namespace::autoclean: '0.28'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/manwar/Map-Tube-Plugin-Graph/issues
   repository: https://github.com/manwar/Map-Tube-Plugin-Graph.git
-version: v1.2.2
+version: v1.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

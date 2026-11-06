@@ -10,6 +10,6 @@
 feature:dashflags	`$-`: empty in dash -c, "hBc" in bash; a test for *i* (interactive) gives the same answer in both.
 	Claude's reading: blatant for printing it, no difference for the usual test; the detector cannot tell the two.
 	Rule E: no plainly logical choice (each shell lists its own options); stays rejected.
-feature:lineno	`$LINENO`: empty in dash -c, 1 in bash. Whether dash's manual promises it in -c strings: not checked
-	(dash's manual page is not installed here).  Rule E: as bash (the line number: category info); not implemented yet,
-	so it stays rejected.
+feature:lineno	X E:info
+test:LS:299	- P:fnkill
+sample:shellcheck:SC:Checks/Commands.hs:prop_checkUnsetGlobs5	B P:unsetbad

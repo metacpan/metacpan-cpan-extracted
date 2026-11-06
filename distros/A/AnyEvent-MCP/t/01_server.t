@@ -6,6 +6,7 @@ use AnyEvent::MCP::Server ();
 use AnyEvent::MCP::Server::Toolset ();
 use AnyEvent::MCP::Server::JSONL ();
 use AnyEvent::MCP::Server::HTTP ();
+use Errno ();
 use JSON::XS ();
 use Socket;
 
@@ -139,9 +140,12 @@ ok $legacy_peer->{aemcp_multibroker}, "legacy initialization negotiates multibro
 my $modern_peer = {};
 my $modern_discover = message (105, "server/discover");
 $modern_discover->{params}{_meta}{"io.modelcontextprotocol/clientCapabilities"} = $aemcp_caps;
+$modern_discover->{params}{_meta}{"io.modelcontextprotocol/clientInfo"} = { name => "modern-client" };
 $server->rpc ($modern_discover, sub { $response = shift }, peer => $modern_peer);
 ok $modern_peer->{aemcp_multibroker},
    "modern discovery negotiates multibroker extension from per-request capabilities";
+is $modern_peer->{client_info}{name}, "modern-client",
+   "modern per-request client identity available for connection diagnostics";
 
 my $request = $server->rpc (message (2, "tools/call", { name => "echo", arguments => { a => 42 } }),
    sub { $response = shift });
@@ -502,5 +506,59 @@ undef $release;
 undef $on_slow;
 $http->close;
 $client->destroy;
+
+# an idle HTTP connection can close normally, but EOF during a request is an error.
+my $short_body = post (message (72, "ping"));
+chop $short_body;
+for my $case (
+   ["idle", "", 0],
+   ["partial header", "POST /mcp/ HTTP/1.1\r\n", 1],
+   ["partial body", $short_body, 1],
+) {
+   my ($name, $input, $incomplete) = @$case;
+   socketpair my $a, my $b, AF_UNIX, SOCK_STREAM, PF_UNSPEC or die $!;
+   my $cv = AE::cv;
+   my $timeout = AE::timer 10, 0, sub { $cv->croak ("HTTP $name EOF timeout") };
+   my @errors;
+   my $http = AnyEvent::MCP::Server::HTTP->new (
+      auth => "none", toolsets => [$toolset],
+      on_connection_error => sub {
+         push @errors, 0 + $!;
+         $cv->send ("error");
+      },
+   );
+   my $handle = $http->accept ($a);
+   my $on_eof = $handle->{on_eof};
+   $handle->on_eof (sub { $on_eof->(@_); $cv->send ("eof") });
+
+   is syswrite ($b, $input), length $input, "$name input delivered" if length $input;
+   close $b;
+   is $cv->recv, $incomplete ? "error" : "eof", "$name EOF classification";
+   is_deeply \@errors, $incomplete ? [0 + Errno::EPIPE ()] : [], "$name transport errors";
+   $http->close;
+}
+
+socketpair $a, $b, AF_UNIX, SOCK_STREAM, PF_UNSPEC or die $!;
+my $eof_cv = AE::cv;
+my $eof_timeout = AE::timer 10, 0, sub { $eof_cv->croak ("keep-alive EOF timeout") };
+my @keepalive_errors;
+$http = AnyEvent::MCP::Server::HTTP->new (
+   auth => "none", toolsets => [$toolset],
+   on_connection_error => sub { push @keepalive_errors, 0 + $!; $eof_cv->send ("error") },
+);
+my $server_handle = $http->accept ($a);
+undef $a;
+my $on_eof = $server_handle->{on_eof};
+$server_handle->on_eof (sub { $on_eof->(@_); $eof_cv->send ("eof") });
+$client = AnyEvent::Handle->new (fh => $b, on_error => sub { die $_[2] });
+undef $b;
+$client->push_write (post (message (73, "ping")));
+http_read ($client, sub {
+   like $_[0], qr/HTTP\/1\.1 200 OK/, "keep-alive response completed before disconnect";
+   $client->destroy;
+});
+is $eof_cv->recv, "eof", "completed keep-alive request closes without error";
+is_deeply \@keepalive_errors, [], "completed keep-alive request has no transport warnings";
+$http->close;
 
 done_testing;

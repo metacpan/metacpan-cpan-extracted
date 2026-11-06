@@ -123,7 +123,7 @@ sub _expand_select {
   return $exp unless my $setop = (my $sel = $exp->{-select})->{setop};
   if (my @keys = grep $sel->{$_}, @$before_setop) {
     my %inner; @inner{@keys} = delete @{$sel}{@keys};
-    unshift @{(values(%$setop))[0]{queries}},
+    unshift @{(values(%$setop))[0]->{queries}},
       { -select => \%inner };
   }
   return $exp;
@@ -157,6 +157,8 @@ sub _expand_from_list {
   return { -from_list => \@list };
 }
 
+my %known_join_keys = map +($_ => 1), qw(from type to as on using);
+
 sub _expand_join {
   my ($self, undef, $args) = @_;
   my %proto = (
@@ -164,6 +166,15 @@ sub _expand_join {
       ? %$args
       : (to => @$args)
   );
+  # accept the dashed spellings (-as, -on, ...) as well, since a from_list
+  # is written with -as and -join; and refuse anything unknown instead of
+  # silently dropping it on render (RT#148271)
+  for my $k (keys %proto) {
+    (my $bare = $k) =~ s/^-//;
+    $self->sqla->puke("Unknown key '$k' in -join (known: from, type, to, as, on, using)")
+      unless $known_join_keys{$bare};
+    $proto{$bare} = delete $proto{$k} if $bare ne $k;
+  }
   if (my $as = delete $proto{as}) {
     $proto{to} = $self->expand_expr(
                    { -as => [ { -from_list => $proto{to} }, $as ] }
@@ -363,12 +374,11 @@ __END__
 
 =head1 NAME
 
-SQL::Abstract::ExtraClauses - new/experimental additions to L<SQL::Abstract>
+SQL::Abstract::Plugin::ExtraClauses - new/experimental additions to L<SQL::Abstract>
 
 =head1 SYNOPSIS
 
-  my $sqla = SQL::Abstract->new;
-  SQL::Abstract::ExtraClauses->apply_to($sqla);
+  my $sqla = SQL::Abstract->new->plugin('+ExtraClauses');
 
 =head1 WARNING
 
@@ -473,7 +483,8 @@ Given a hashref, the 'as' key is if presented expanded to wrap the 'to'.
 If present the 'using' key is expanded as a list of idents.
 
 Known keys are: 'from' (the left hand side), 'type' ('left', 'right', or
-nothing), 'to' (the right hand side), 'on' and 'using'.
+nothing), 'to' (the right hand side), 'on' and 'using'. Each key may also be
+spelled with a leading dash ('-as', '-on', ...); any other key is an error.
 
   # expr
   { -join => {

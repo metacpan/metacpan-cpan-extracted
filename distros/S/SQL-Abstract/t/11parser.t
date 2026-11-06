@@ -1035,35 +1035,29 @@ is_deeply( $sqlat->parse("META SELECT * * FROM (SELECT *, FROM foobar baz buzz) 
         "AND",
         [
           [
-            "NOT",
-            []
-          ],
-          [
-            "NOT",
-            []
-          ],
-          [
-            "NOT EXISTS",
+            "-MISC",
             [
               [
-                "-PAREN",
+                "NOT",
+                []
+              ],
+              [
+                "NOT",
+                []
+              ],
+              [
+                "NOT EXISTS",
                 [
                   [
-                    "SELECT",
+                    "-PAREN",
                     [
                       [
-                        "-LIST",
+                        "SELECT",
                         [
                           [
                             "-LITERAL",
                             [
-                              "'cr"
-                            ]
-                          ],
-                          [
-                            "-LITERAL",
-                            [
-                              "ap'"
+                              "'cr,ap'"
                             ]
                           ]
                         ]
@@ -1071,8 +1065,8 @@ is_deeply( $sqlat->parse("META SELECT * * FROM (SELECT *, FROM foobar baz buzz) 
                     ]
                   ]
                 ]
-              ]
-            ]
+              ],
+            ],
           ],
           [
             "-MISC",
@@ -1100,23 +1094,23 @@ is_deeply( $sqlat->parse("META SELECT * * FROM (SELECT *, FROM foobar baz buzz) 
                   "STUFF"
                 ]
               ],
-            ],
-          ],
-          [
-            'moar',
-            [
               [
-                '-PAREN',
+                'moar',
                 [
                   [
-                    '-LITERAL',
+                    '-PAREN',
                     [
-                      'stuff'
+                      [
+                        '-LITERAL',
+                        [
+                          'stuff'
+                        ]
+                      ]
                     ]
-                 ]
+                  ]
                 ]
-              ]
-            ]
+              ],
+            ],
           ],
           [
             "NOT",
@@ -1359,5 +1353,129 @@ warnings_are {
 
   is( $sqlat->unparse($tree), $sql, 'roundtrip ok');
 } [], 'no recursion warnings on insane SQL';
+
+# Oracle spells the set difference operator MINUS rather than EXCEPT
+# (RT#134245)
+for my $kw (qw(EXCEPT MINUS)) {
+  is_deeply($sqlat->parse("SELECT a FROM x $kw SELECT a FROM y"), [
+    [ SELECT => [ [ -LITERAL => [ 'a' ] ] ] ],
+    [ FROM => [ [ -LITERAL => [ 'x' ] ] ] ],
+    [ $kw => [] ],
+    [ SELECT => [ [ -LITERAL => [ 'a' ] ] ] ],
+    [ FROM => [ [ -LITERAL => [ 'y' ] ] ] ],
+  ], "$kw parsed as an expression start keyword");
+}
+
+# BETWEEN joins its two bounds with an AND, but the RHS parse stops at
+# that AND - the upper bound must be pulled back in and grouped under the
+# BETWEEN as AND[low, high], not left leaking out as a sibling of the
+# BETWEEN in the enclosing expression. (The previous re-parse guard here
+# compared an arrayref node to the string '-LITERAL' and so never fired.)
+is_deeply($sqlat->parse('x BETWEEN 1 AND 5'), [
+  [ BETWEEN => [
+    [ -LITERAL => [ 'x' ] ],
+    [ AND => [ [ -LITERAL => [ '1' ] ], [ -LITERAL => [ '5' ] ] ] ],
+  ] ],
+], 'BETWEEN groups both of its bounds under itself');
+
+is_deeply($sqlat->parse('x NOT BETWEEN ? AND ?'), [
+  [ 'NOT BETWEEN' => [
+    [ -LITERAL => [ 'x' ] ],
+    [ AND => [ [ -PLACEHOLDER => [ '?' ] ], [ -PLACEHOLDER => [ '?' ] ] ] ],
+  ] ],
+], 'NOT BETWEEN groups both of its bounds under itself');
+
+# a BETWEEN embedded in a longer AND chain must keep the following
+# conditions as siblings, not swallow them into the BETWEEN
+is_deeply($sqlat->parse('a = 1 AND x BETWEEN 1 AND 5 AND b = 2'), [
+  [ AND => [
+    [ '=' => [ [ -LITERAL => [ 'a' ] ], [ -LITERAL => [ '1' ] ] ] ],
+    [ BETWEEN => [
+      [ -LITERAL => [ 'x' ] ],
+      [ AND => [ [ -LITERAL => [ '1' ] ], [ -LITERAL => [ '5' ] ] ] ],
+    ] ],
+    [ '=' => [ [ -LITERAL => [ 'b' ] ], [ -LITERAL => [ '2' ] ] ] ],
+  ] ],
+], 'BETWEEN in an AND chain does not swallow the following conditions');
+
+# ... and all of the above still round-trip back to their original SQL
+for my $sql (
+  'x BETWEEN 1 AND 5',
+  'x NOT BETWEEN ? AND ?',
+  'a = 1 AND x BETWEEN 1 AND 5 AND b = 2',
+) {
+  is($sqlat->unparse($sqlat->parse($sql)), $sql, "BETWEEN roundtrip: $sql");
+}
+
+# Separators inside quoted strings and identifiers (commas, parenthesis,
+# whitespace, keywords) must not split them up (RT#132994, RT#105625)
+is_deeply($sqlat->parse("SELECT 'a,b', c FROM t"), [
+  [ SELECT => [ [ -LIST => [
+    [ -LITERAL => [ "'a,b'" ] ],
+    [ -LITERAL => [ 'c' ] ],
+  ] ] ] ],
+  [ FROM => [ [ -LITERAL => [ 't' ] ] ] ],
+], 'comma inside a string literal is not a list separator');
+
+is_deeply($sqlat->parse("SELECT x FROM t WHERE a = 'x AND y'"), [
+  [ SELECT => [ [ -LITERAL => [ 'x' ] ] ] ],
+  [ FROM => [ [ -LITERAL => [ 't' ] ] ] ],
+  [ WHERE => [ [ '=' => [
+    [ -LITERAL => [ 'a' ] ],
+    [ -LITERAL => [ "'x AND y'" ] ],
+  ] ] ] ],
+], 'keyword inside a string literal is not a keyword');
+
+for my $sql (
+  "SELECT 'a,b', c FROM t",
+  "SELECT 'it''s (x)' FROM t",
+  "SELECT N'a b' FROM t",
+  "SELECT 'a'||'b' FROM t",
+  "SELECT x FROM t WHERE d = '2020-01-01'::date",
+  'SELECT "a b", `c d` FROM t',
+  "SELECT x FROM t WHERE r && tstzrange( '[)' )",
+) {
+  is($sqlat->unparse($sqlat->parse($sql)), $sql, "quoted roundtrip: $sql");
+}
+
+# An unknown operator followed by a function call is two nodes; next to an
+# AND/OR they must stay one operand instead of getting an AND between them
+is_deeply($sqlat->parse('SELECT 1 FROM a WHERE b.x <@ f( 1 ) AND b.y = 2')->[2], [
+  WHERE => [ [ AND => [
+    [ -MISC => [
+      [ -LITERAL => [ 'b.x' ] ],
+      [ -LITERAL => [ '<@' ] ],
+      [ f => [ [ -PAREN => [ [ -LITERAL => [ '1' ] ] ] ] ] ],
+    ] ],
+    [ '=' => [ [ -LITERAL => [ 'b.y' ] ], [ -LITERAL => [ '2' ] ] ] ],
+  ] ] ],
+], 'unknown operator before a function is one AND operand');
+
+for my $sql (
+  'SELECT 1 FROM a WHERE b.x <@ f( 1 ) AND b.y = 2',
+  'SELECT 1 FROM a WHERE b.y = 2 AND b.x <@ f( 1 )',
+  'SELECT 1 FROM a WHERE b.x <@ f( 1 ) OR b.x <@ g( 2 ) OR c = 3',
+) {
+  is($sqlat->unparse($sqlat->parse($sql)), $sql, "unknown op roundtrip: $sql");
+}
+
+{
+  my $sql = <<'SQL';
+SELECT me.foo_id, me.name, related.name
+FROM foo me
+LEFT JOIN foo_bar ON (
+foo_bar.active <@ tstzrange(now(), NULL, '(]')
+AND foo_bar.foo_id = me.foo_id
+)
+LEFT JOIN bar related ON related.bar_id = foo_bar.bar_id
+WHERE related.value > 1;
+SQL
+  my $formatted = eval { SQL::Abstract::Tree->new({
+    profile => 'console_monochrome', fill_in_placeholders => 0,
+  })->format($sql) };
+  is($@, '', 'Postgres range literal with mismatched brackets parses');
+  like($formatted, qr/tstzrange\( now\(\s*\), NULL, '\(\]' \)/,
+    'range literal survives formatting unchanged');
+}
 
 done_testing;

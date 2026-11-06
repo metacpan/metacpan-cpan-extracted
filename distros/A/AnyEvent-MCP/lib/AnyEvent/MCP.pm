@@ -194,8 +194,9 @@ letter or underscore followed by ASCII letters, digits, underscores or
 hyphens. Their C<--bind ADDRESS[:PORT]> overrides the configured C<bind>.
 The default bind address is IPv4 loopback with a port derived from the program,
 instance name and master secret in the range 16384..32767; C<:0> requests an ephemeral
-port. C<--print-url> prints the URL using the first accepted token without
-listening. Named server settings also include C<path>, C<url_host>,
+port. C<--print-url> prints enabled user URLs, and C<--print-url=USER>
+prints just the chosen user's URLs, without listening.
+Named server settings also include C<path>, C<url_host>,
 C<url_scheme> and C<tokens>. C<tokens> is a comma-separated list of
 URL-safe strings. Repeated C<--token TOKEN> options override this list.
 Automatic permission defaults use C<auto-rule.SUFFIX = allow|deny
@@ -203,11 +204,21 @@ TOOL[,ACTION[,CAPABILITY]]> in program/instance sections, sorted by suffix.
 Instance entries override matching keys or suppress them with empty values.
 Command-line automatic rules are evaluated before configured defaults.
 All accepted tokens work in the URL path or Authorization bearer header.
-Without configured tokens, one token is derived from the program and instance
-name. All derivation contexts have a fixed C<anyevent-mcp> namespace prefix.
+Without configured tokens, enabled users in C<[global]>,
+C<[program PROGRAM]> and C<[instance NAME]> each have derived credentials,
+with later scopes overriding earlier ones. A missing global
+C<user.default> is equivalent to C<user.default = 1>. Positive
+generations are enabled; negative generations are revoked and retain
+their counter for later rotation. Zero is invalid. The principal used
+for permissions is C<global:USER>, C<program:USER>, or C<instance:USER>.
+All derivation contexts have the C<anyevent-mcp> namespace prefix.
+The C<connect_user> setting (default: C<default>) chooses which user's
+token may attach Vim editor, browser WebSocket or reverse-MCP connections.
+Disabling that user prevents new auxiliary connections, without stopping
+other enabled users from making MCP requests.
 
 C<mcp_start> resolves named settings and requires the selected token for
-HTTP requests. Explicit tokens replace the derived default.
+HTTP requests. Explicit tokens replace the derived managed users.
 The low-level HTTP transport does not resolve configuration itself.
 Simple's stdio startup does not access global HTTP configuration.
 Applications can still load it for their own settings; C<mcp-fs>, for
@@ -445,7 +456,7 @@ package AnyEvent::MCP;
 
 use common::sense;
 
-our $VERSION = 0.71;
+our $VERSION = 0.81;
 
 sub json_class {
    our $JSON_CLASS ||= eval { require JSON::XS; "JSON::XS" }
@@ -544,7 +555,7 @@ sub normalize_udiff {
       my $j = $i + 1;
 
       # GNU patch mishandles hunks with more prefix than suffix context.
-      # Make the first context line an identity change without losing it.
+      # make the first context line an identity change without losing it.
       # see https://unix.stackexchange.com/questions/414542/does-patch-work-with-asymmetric-context
       splice @line, $i + 1, 1, "-$1", "+$1"
          if $line[$i + 1] =~ /^ (.*)\z/;
@@ -564,7 +575,7 @@ sub normalize_udiff {
          } elsif ($tag eq "+") {
             ++$new_count;
          } elsif ($line[$j] eq "\\ No newline at end of file") {
-            # Marker belongs to the preceding body line and counts neither side.
+            # marker belongs to the preceding body line and counts neither side.
          } else {
             die "normalize_udiff: bad hunk line '$line[$j]'\n";
          }

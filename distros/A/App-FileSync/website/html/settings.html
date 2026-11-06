@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings &mdash; App::FileSync</title>
+<meta name="description" content="Process-wide settings, the client's repo list, the server's per-repo policy, and every place App::FileSync keeps state.">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="settings.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::FileSync">
+<meta property="og:title" content="Settings &mdash; App::FileSync">
+<meta property="og:description" content="Process-wide settings, the client's repo list, the server's per-repo policy, and every place App::FileSync keeps state.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::FileSync</span>
+			<span class="brand-tag">file synchronisation without a daemon</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Overview</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="install.html">Install</a>
+			<a href="commands.html">Commands</a>
+			<a href="settings.html" aria-current="page">Settings</a>
+			<a href="how-it-works.html">How it works</a>
+			<a href="limitations.html">Limitations</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Settings</h1>
+
+	<p class="lede">Two layers: settings that apply to the whole process, and
+	configuration that applies to one repo. The process layer is read through
+	Object::Configure, so a file, a universal section and environment variables can
+	each contribute; the repo layer is plain JSON written by the tools.</p>
+
+	<div class="toc">
+		<p>On this page</p>
+		<ul>
+			<li><a href="#process">Process settings</a></li>
+			<li><a href="#precedence">Precedence</a></li>
+			<li><a href="#provenance">Where a value came from</a></li>
+			<li><a href="#client">Client configuration</a></li>
+			<li><a href="#policy">Server repo policy</a></li>
+			<li><a href="#paths">Paths</a></li>
+		</ul>
+	</div>
+
+	<h2 id="process">Process settings</h2>
+
+	<p>The settings file is <code>~/.conf/app-filesync.json</code> when it exists,
+	or the path in <code>FILESYNC_SETTINGS</code>. The section key is
+	<code>App__FileSync</code>, and a <code>UNIVERSAL</code> section in the same
+	directory applies to every class that uses Object::Configure. Environment
+	variables named <code>App__FileSync__KEY</code> override the file.</p>
+
+<pre><code># ~/.conf/app-filesync.json
+{ "App__FileSync": {
+    "log_level"       : "debug",
+    "log_format"      : "%level%: %message%",
+    "log_file"        : "/home/foo/.filesync/filesync.log",
+    "ssh_identity"    : "~/.ssh/filesync_ed25519",
+    "ssh_known_hosts" : "~/.ssh/filesync_known_hosts",
+    "server_command"  : "/usr/local/bin/filesync-server"
+} }
+
+# or, for one run
+export App__FileSync__log_level=debug</code></pre>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Key</th><th>Default</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><code>log_level</code></td>
+				<td><code>warning</code></td>
+				<td>One of <code>trace</code>, <code>debug</code>, <code>info</code>,
+				<code>notice</code>, <code>warning</code>, <code>error</code>,
+				<code>critical</code>, <code>alert</code>, <code>emergency</code>
+				(and the usual short spellings). An unknown level is an error.</td>
+			</tr>
+			<tr>
+				<td><code>log_format</code></td>
+				<td><code>%level%: %message%</code></td>
+				<td>A Log::Abstraction format string.</td>
+			</tr>
+			<tr>
+				<td><code>log_file</code></td>
+				<td>empty (standard error)</td>
+				<td>Send diagnostics to this file instead. Leading directories are
+				created.</td>
+			</tr>
+			<tr>
+				<td><code>ssh_identity</code></td>
+				<td>empty (ssh's default)</td>
+				<td>The default identity file for every SSH repo.</td>
+			</tr>
+			<tr>
+				<td><code>ssh_known_hosts</code></td>
+				<td>empty (ssh's default)</td>
+				<td>The default known-hosts file for every SSH repo.</td>
+			</tr>
+			<tr>
+				<td><code>server_command</code></td>
+				<td><code>filesync-server</code></td>
+				<td>The program the client runs over ssh, unless the repo names
+				another.</td>
+			</tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>Command output &mdash; sync summaries, plans, <code>--json</code> &mdash; is
+	written to standard output by the commands themselves. The logger carries
+	diagnostics on standard error, so a cron job can separate the two.
+	<code>--verbose</code> raises the level to <code>debug</code> and
+	<code>--quiet</code> lowers it to <code>error</code> for that run, overriding
+	the file.</p>
+
+	<h2 id="precedence">Precedence</h2>
+
+	<p>Lowest to highest:</p>
+
+	<ol>
+		<li>the built-in default;</li>
+		<li>the <code>UNIVERSAL</code> section;</li>
+		<li>the <code>App__FileSync</code> section of the settings file or
+		<code>FILESYNC_SETTINGS</code>;</li>
+		<li>the environment variables (universal ones first, class ones last);</li>
+		<li><code>--verbose</code> or <code>--quiet</code> on the command line,
+		which describe this run only.</li>
+	</ol>
+
+	<p>For a repo, a value recorded by <code>filesync init</code> &mdash;
+	<code>--identity</code>, <code>--known-hosts</code>,
+	<code>--server-command</code> &mdash; wins over the process setting, so one
+	machine can point at another identity without repeating the common settings.
+	<code>port</code> and <code>host_key_checking</code> exist per repo only:
+	there is no process-wide layer, and ssh's own default applies when the repo
+	leaves them out.</p>
+
+	<h2 id="provenance">Where a value came from</h2>
+
+	<p><code>filesync settings</code> prints every effective value together with
+	the layer that supplied it, which is usually faster than reconstructing the
+	merge by hand:</p>
+
+<pre><code>$ filesync settings
+settings file: /home/foo/.conf/app-filesync.json
+
+log_level        debug                 /home/foo/.conf/app-filesync.json [App__FileSync]
+log_format       %level%: %message%    built-in default
+log_file         /home/foo/f.log       App__FileSync__log_file
+ssh_identity     ~/.ssh/id_ed25519     built-in default
+ssh_known_hosts                        built-in default
+server_command   /usr/local/bin/filesync-server  /home/foo/.conf/app-filesync.json [App__FileSync]</code></pre>
+
+	<p>The source is reported as <code>default</code>, <code>file</code>,
+	<code>env</code>, <code>merged</code> or <code>repo</code> in the JSON form.
+	A value that no modelled layer accounts for is reported as
+	<code>merged</code> rather than claimed as a default.
+	<code>filesync settings --config FILE</code> reads another settings file, and
+	<code>--json</code> returns the report as data.</p>
+
+	<h2 id="client">Client configuration</h2>
+
+	<p>The client keeps one JSON file listing its repos,
+	<code>~/.filesync/config.json</code> or the path in
+	<code>FILESYNC_CONFIG</code>. <code>filesync init</code> writes it atomically;
+	editing it by hand is fine, but keep the ids plain.</p>
+
+<pre><code>{
+  "version"   : 1,
+  "client_id" : "laptop",
+  "ssh"       : { "command" : "ssh", "extra_args" : [] },
+  "repos"     : {
+    "documents" : {
+      "root"          : "/home/foo/Documents",
+      "transport"     : "ssh",
+      "server"        : "foo@srv",
+      "role"          : "client",
+      "identity"      : "~/.ssh/filesync_ed25519",
+      "known_hosts"   : "~/.ssh/filesync_known_hosts",
+      "server_command": "/home/foo/bin/filesync-server-home",
+      "snapshot_mode" : "hardlink"
+    }
+  }
+}</code></pre>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Key</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>client_id</code></td><td>This machine's id, the host name unless <code>--id</code> was given. It names this client's base, journal entries and conflict copies.</td></tr>
+			<tr><td><code>repos.NAME.root</code></td><td>The local directory, which must contain the <code>.filesync-root</code> marker.</td></tr>
+			<tr><td><code>repos.NAME.transport</code></td><td><code>ssh</code> or <code>local</code>.</td></tr>
+			<tr><td><code>repos.NAME.server</code></td><td>The ssh host, as <code>host</code> or <code>user@host</code>.</td></tr>
+			<tr><td><code>repos.NAME.remote_repo</code></td><td>The repo name on the server, when it differs from this key.</td></tr>
+			<tr><td><code>repos.NAME.role</code></td><td><code>client</code> or <code>replica</code>; only a replica may take snapshots.</td></tr>
+			<tr><td><code>repos.NAME.identity</code></td><td>ssh identity file for this repo.</td></tr>
+			<tr><td><code>repos.NAME.known_hosts</code></td><td>ssh known-hosts file for this repo.</td></tr>
+			<tr><td><code>repos.NAME.port</code></td><td>ssh port; repo only, default 22.</td></tr>
+			<tr><td><code>repos.NAME.host_key_checking</code></td><td><code>yes</code> or <code>no</code>; repo only, default <code>yes</code>.</td></tr>
+			<tr><td><code>repos.NAME.server_command</code></td><td>The server program for this repo, such as the wrapper that adds <code>--root</code>.</td></tr>
+			<tr><td><code>repos.NAME.snapshot_mode</code></td><td><code>hardlink</code> or <code>copy</code>.</td></tr>
+			<tr><td><code>repos.NAME.snapshot_keep</code></td><td>How many snapshots to keep; default 14.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>A configuration written by a newer release is read as-is: unknown keys are
+	kept and ignored, and there is no schema version check beyond
+	<code>version</code>. A missing file is an empty configuration rather than an
+	error.</p>
+
+	<h2 id="policy">Server repo policy</h2>
+
+	<p>Each repo has a policy at
+	<code>ROOT/.filesync/repos/REPO/config.json</code>, created by
+	<code>filesync-admin repo create</code> and printed by <code>repo show</code>.
+	It holds the retention and deletion limits, the ignore list, and the admitted
+	clients.</p>
+
+<pre><code>{
+  "version"            : 1,
+  "name"               : "documents",
+  "created"            : "2026-10-23 19:44:45 UTC",
+  "trash_days"         : 30,
+  "max_deletes"        : 200,
+  "max_delete_percent" : 10,
+  "conflicts"          : "inline",
+  "preserve_mode"      : true,
+  "allow_symlinks"     : false,
+  "clients"            : { "laptop" : { "role" : "client" } },
+  "ignore"             : [ ".filesync-root", ".filesync-tmp-*",
+                           ".filesync-snapshots", "*.swp", "*~", ".#*",
+                           "#*#", ".DS_Store", "._*", "Thumbs.db",
+                           "desktop.ini", "*.crdownload", "*.part" ]
+}</code></pre>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Key</th><th>Default</th><th>Meaning</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>trash_days</code></td><td>30</td><td>How long the server keeps deleted files.</td></tr>
+			<tr><td><code>max_deletes</code></td><td>200</td><td>Most files one session may delete.</td></tr>
+			<tr><td><code>max_delete_percent</code></td><td>10</td><td>Largest fraction of known files one session may delete.</td></tr>
+			<tr><td><code>conflicts</code></td><td><code>inline</code></td><td>Keep the losing version beside the winner.</td></tr>
+			<tr><td><code>preserve_mode</code></td><td><code>true</code></td><td>Carry permission bits between POSIX systems.</td></tr>
+			<tr><td><code>allow_symlinks</code></td><td><code>false</code></td><td>Whether the tree may contain symlinks.</td></tr>
+			<tr><td><code>clients</code></td><td>empty</td><td>Admitted client ids and their roles. An empty table admits every client.</td></tr>
+			<tr><td><code>ignore</code></td><td>the list above</td><td>Patterns excluded on both sides. <code>--ignore</code> replaces the list; a trailing <code>/</code> matches at any depth, and a leading <code>/</code> anchors to the root.</td></tr>
+		</tbody>
+	</table>
+	</div>
+
+	<p>The reserved entries are not negotiable: the root marker, temporary files
+	and snapshots must never enter a manifest, so they are excluded whatever the
+	policy says.</p>
+
+	<h2 id="paths">Paths</h2>
+
+	<div class="table-wrap">
+	<table>
+		<thead>
+			<tr><th>Path</th><th>Where</th><th>Holds</th></tr>
+		</thead>
+		<tbody>
+			<tr><td><code>~/.conf/app-filesync.json</code></td><td>client and server</td><td>Process settings, unless <code>FILESYNC_SETTINGS</code> names another file.</td></tr>
+			<tr><td><code>~/.filesync/config.json</code></td><td>client</td><td>The repo list, unless <code>FILESYNC_CONFIG</code> names another file.</td></tr>
+			<tr><td><code>~/.filesync/cache/REPO.json</code></td><td>client</td><td>The size-and-mtime cache and the last-run summary.</td></tr>
+			<tr><td><code>~/.filesync/logs/REPO.jsonl</code></td><td>client</td><td>One JSON object per run attempt.</td></tr>
+			<tr><td><code>~/.filesync/</code></td><td>client</td><td>Also the per-repo lock and the local trash. <code>FILESYNC_HOME</code> moves the whole directory.</td></tr>
+			<tr><td><code>ROOT/.filesync-root</code></td><td>client</td><td>The marker that proves the sync root is the registered tree and is mounted.</td></tr>
+			<tr><td><code>ROOT/master/REPO/</code></td><td>server</td><td>The master tree.</td></tr>
+			<tr><td><code>ROOT/.filesync/repos/REPO/config.json</code></td><td>server</td><td>The repo policy and admitted clients.</td></tr>
+			<tr><td><code>ROOT/.filesync/repos/REPO/</code></td><td>server</td><td>The index, per-client bases, server trash and journal.</td></tr>
+			<tr><td><code>ROOT/.filesync-snapshots/</code></td><td>replica</td><td>Daily snapshots, one directory per date.</td></tr>
+		</tbody>
+	</table>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::FileSync 0.002.0 &middot; Copyright 2026 Nigel Horne &middot; GPL-2.0</p>
+		<p><a href="https://metacpan.org/dist/App-FileSync">CPAN</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync">GitHub</a> &middot;
+		<a href="https://github.com/nigelhorne/App-FileSync/issues">Issues</a> &middot;
+		<a href="changelog.html">Changes</a></p>
+	</div>
+</footer>
+</body>
+</html>

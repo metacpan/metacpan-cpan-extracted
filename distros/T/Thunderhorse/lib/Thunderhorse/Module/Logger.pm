@@ -1,5 +1,5 @@
 package Thunderhorse::Module::Logger;
-$Thunderhorse::Module::Logger::VERSION = '0.106';
+$Thunderhorse::Module::Logger::VERSION = '0.107';
 use v5.40;
 use Mooish::Base -standard;
 

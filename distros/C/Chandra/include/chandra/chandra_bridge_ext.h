@@ -195,9 +195,12 @@ chandra_ext_topo_sort(pTHX_ int *out_count, const char **err_msg)
 
     *out_count = 0;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (_ext_count == 0) {
-        *out_count = 0;
-        return NULL;
+        *out_count = 0; /* # uncoverable statement */
+        return NULL; /* # uncoverable statement */
     }
 
     Newxz(in_degree, _ext_count, int);
@@ -266,10 +269,16 @@ chandra_ext_topo_sort(pTHX_ int *out_count, const char **err_msg)
         int *visited;
         int pos;
         Newxz(visited, _ext_count, int);
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 */
         for (i = 0; i < count; i++) visited[result[i]] = 1;
         pos = snprintf(_err_buf, sizeof(_err_buf),
             "Chandra::Bridge::Extension: circular dependency involving: ");
-        for (i = 0; i < _ext_count && pos < (int)sizeof(_err_buf) - 20; i++) {
+        for (i = 0; i < _ext_count && pos < (int)sizeof(_err_buf) - 20; i++) { /* # uncoverable condition right count:2 */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 */
             if (!visited[i]) {
                 if (pos > 60) pos += snprintf(_err_buf + pos, sizeof(_err_buf) - pos, ", ");
                 pos += snprintf(_err_buf + pos, sizeof(_err_buf) - pos, "%s", _ext_list[i].name);

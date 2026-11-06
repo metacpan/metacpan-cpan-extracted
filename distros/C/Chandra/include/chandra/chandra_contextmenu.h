@@ -25,11 +25,17 @@ _cm_register_actions(pTHX_ HV *self_hv, AV *items_av, HV *actions_hv)
         HV *item_hv;
         SV **action_svp, **sub_svp;
 
+        /*
+         # uncoverable condition left count:1
+         # uncoverable condition left count:3 */
         if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
             continue;
         item_hv = (HV *)SvRV(*elem);
 
         action_svp = hv_fetchs(item_hv, "action", 0);
+        /*
+         # uncoverable condition right count:2
+         # uncoverable condition right count:3 */
         if (action_svp && SvROK(*action_svp) && SvTYPE(SvRV(*action_svp)) == SVt_PVCV) {
             IV id = _cm_next_id(aTHX_ self_hv);
             char id_str[32];
@@ -39,6 +45,9 @@ _cm_register_actions(pTHX_ HV *self_hv, AV *items_av, HV *actions_hv)
         }
 
         sub_svp = hv_fetchs(item_hv, "submenu", 0);
+        /*
+         # uncoverable condition right count:2
+         # uncoverable condition right count:3 */
         if (sub_svp && SvROK(*sub_svp) && SvTYPE(SvRV(*sub_svp)) == SVt_PVAV) {
             _cm_register_actions(aTHX_ self_hv, (AV *)SvRV(*sub_svp), actions_hv);
         }
@@ -59,6 +68,9 @@ _cm_items_to_js(pTHX_ SV *js, AV *items_av)
         SV **disabled_svp, **checkable_svp, **checked_svp;
         SV **icon_svp, **shortcut_svp, **id_svp;
 
+        /*
+         # uncoverable condition left count:1
+         # uncoverable condition left count:3 */
         if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
             continue;
         item_hv = (HV *)SvRV(*elem);
@@ -67,7 +79,7 @@ _cm_items_to_js(pTHX_ SV *js, AV *items_av)
         sv_catpvs(js, "{");
 
         sep_svp = hv_fetchs(item_hv, "separator", 0);
-        if (sep_svp && SvTRUE(*sep_svp)) {
+        if (sep_svp && SvTRUE(*sep_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvs(js, "sep:1}");
             continue;
         }
@@ -82,38 +94,41 @@ _cm_items_to_js(pTHX_ SV *js, AV *items_av)
         }
 
         id_svp = hv_fetchs(item_hv, "_id", 0);
-        if (id_svp && SvOK(*id_svp)) {
+        if (id_svp && SvOK(*id_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvf(js, ",id:%ld", (long)SvIV(*id_svp));
         }
 
         disabled_svp = hv_fetchs(item_hv, "disabled", 0);
-        if (disabled_svp && SvTRUE(*disabled_svp)) {
+        if (disabled_svp && SvTRUE(*disabled_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvs(js, ",dis:1");
         }
 
         checkable_svp = hv_fetchs(item_hv, "checkable", 0);
-        if (checkable_svp && SvTRUE(*checkable_svp)) {
+        if (checkable_svp && SvTRUE(*checkable_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvs(js, ",chk:1");
             checked_svp = hv_fetchs(item_hv, "checked", 0);
-            if (checked_svp && SvTRUE(*checked_svp))
+            if (checked_svp && SvTRUE(*checked_svp)) /* # uncoverable condition right count:1 */
                 sv_catpvs(js, ",ckd:1");
         }
 
         icon_svp = hv_fetchs(item_hv, "icon", 0);
-        if (icon_svp && SvOK(*icon_svp)) {
+        if (icon_svp && SvOK(*icon_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvs(js, ",ico:'");
             sv_catpvn(js, SvPV_nolen(*icon_svp), SvCUR(*icon_svp));
             sv_catpvs(js, "'");
         }
 
         shortcut_svp = hv_fetchs(item_hv, "shortcut", 0);
-        if (shortcut_svp && SvOK(*shortcut_svp)) {
+        if (shortcut_svp && SvOK(*shortcut_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvs(js, ",sc:'");
             sv_catpvn(js, SvPV_nolen(*shortcut_svp), SvCUR(*shortcut_svp));
             sv_catpvs(js, "'");
         }
 
         sub_svp = hv_fetchs(item_hv, "submenu", 0);
+        /*
+         # uncoverable condition right count:2
+         # uncoverable condition right count:3 */
         if (sub_svp && SvROK(*sub_svp) && SvTYPE(SvRV(*sub_svp)) == SVt_PVAV) {
             sv_catpvs(js, ",sub:");
             _cm_items_to_js(aTHX_ js, (AV *)SvRV(*sub_svp));

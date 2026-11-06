@@ -102,11 +102,11 @@ $DEBUG = 1;
     # test 11... to 16
 
     ## This in raw mode
-    my $name8     = Text::BibTeX::Name->new('Šomeone Smith');
+    my $name8     = Text::BibTeX::Name->new({binmode => 'bytes'}, 'Šomeone Smith');
     my $formatter = Text::BibTeX::NameFormat->new('f', 1);
     is NFC(decode('UTF-8',$formatter->apply($name8))), 'Š.', "raw test 1";
 
-    my $name9   = Text::BibTeX::Name->new('Šomeone-Šomething Smith');
+    my $name9   = Text::BibTeX::Name->new({binmode => 'bytes'}, 'Šomeone-Šomething Smith');
     is NFC(decode('UTF-8',$formatter->apply($name9))), 'Š.-Š.', "raw test 2";
 
     $formatter = Text::BibTeX::NameFormat->new('f', 1);

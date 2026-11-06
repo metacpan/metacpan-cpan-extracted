@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 ## Version
 
-Version 0.010.0
+Version 0.011.1
 
 ## Synopsis
 
@@ -14,6 +14,7 @@ Version 0.010.0
 use Database::Join;
 
 # Step 1: create each component database the normal way
+# See Database::Abstraction
 my $customers = Database::Customers->new(directory => '/data');
 my $loyalty   = Database::Loyalty->new(directory  => '/data');
 

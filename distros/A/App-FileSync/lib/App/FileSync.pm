@@ -21,7 +21,7 @@ use App::FileSync::Constants qw($MAX_ID_LENGTH $SECONDS_PER_DAY);
 use App::FileSync::I18N qw(message throw);
 use App::FileSync::IO qw(write_atomic read_text set_mtime);
 
-use version; our $VERSION = version->declare('0.001.5');
+use version; our $VERSION = version->declare('0.002.0');
 
 our @EXPORT_OK = qw(
 	json_encode json_decode
@@ -79,7 +79,7 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 =head1 VERSION
 
-0.001.5
+0.002.0
 
 =head1 SYNOPSIS
 
@@ -828,7 +828,7 @@ answer a password prompt.
 =head2 From cron
 
 	# crontab -e, on each client
-	* * * * * /usr/local/bin/filesync sync --repo documents --quiet >/dev/null
+	* * * * * ionice -c3 /usr/local/bin/filesync sync --repo documents --quiet >/dev/null
 
 The summary line is dropped so cron does not mail on every successful run;
 diagnostics still go to standard error, so a failure is mailed.  Every attempt,
@@ -877,7 +877,7 @@ once - rsync creates the last component only - then let cron keep it in step:
 	mkdir -p /home/foo/backups/documents
 
 	# crontab -e, on the server
-	* * * * * rsync -a --delete --exclude '.filesync-tmp-*' \
+	* * * * * ionice -c3 rsync -a --delete --exclude '.filesync-tmp-*' \
 	    /home/foo/filesync/master/documents/ /home/foo/backups/documents/
 
 Filesync writes each file to a temporary name and renames it into place, so the

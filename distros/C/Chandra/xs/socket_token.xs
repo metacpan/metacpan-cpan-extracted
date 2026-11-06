@@ -53,6 +53,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **len_svp = hv_fetchs(hv, "_length", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     int len = (len_svp && SvOK(*len_svp)) ? SvIV(*len_svp) : 32;
     RETVAL = _token_generate(aTHX_ len);
 }
@@ -73,20 +75,33 @@ CODE:
 
     RETVAL = 0;
 
+    # uncoverable condition left count:1
     if (!token_sv || !SvOK(token_sv) || !SvCUR(token_sv))
         goto done;
 
     /* Check if fully expired */
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     if (exp_svp && SvOK(*exp_svp) && _token_expired(SvNV(*exp_svp)))
         goto done;
 
     /* Check current token */
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     if (cur_svp && SvOK(*cur_svp) && sv_eq(token_sv, *cur_svp)) {
         RETVAL = 1;
         goto done;
     }
 
     /* Check previous token during grace period */
+    # uncoverable branch true count:1 class:ignore_covered_err
+    # uncoverable branch true count:3 class:ignore_covered_err
+    # uncoverable branch true count:4 class:ignore_covered_err
+    # uncoverable branch true count:5 class:ignore_covered_err
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
+    # uncoverable condition right count:4
+    # uncoverable condition right count:5
     if (prev_svp && SvOK(*prev_svp) && SvCUR(*prev_svp) &&
         grace_svp && SvOK(*grace_svp) &&
         _token_in_grace(SvNV(*grace_svp))) {
@@ -109,6 +124,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_current", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvREFCNT_inc(*svp) : &PL_sv_undef;
 }
 OUTPUT:
@@ -139,14 +156,23 @@ CODE:
     SV **rot_svp  = hv_fetchs(hv, "_rotation", 0);
     SV **grace_svp = hv_fetchs(hv, "_grace", 0);
     SV **cb_svp   = hv_fetchs(hv, "_on_rotate", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     int len  = (len_svp && SvOK(*len_svp)) ? SvIV(*len_svp) : 32;
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     NV ttl   = (ttl_svp && SvOK(*ttl_svp)) ? SvNV(*ttl_svp) : 3600.0;
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     NV rot   = (rot_svp && SvOK(*rot_svp)) ? SvNV(*rot_svp) : 1800.0;
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     NV grace = (grace_svp && SvOK(*grace_svp)) ? SvNV(*grace_svp) : 60.0;
     NV now   = _token_now();
     SV *new_token;
 
     /* Move current → previous */
+    # uncoverable condition right count:2
     if (cur_svp && SvOK(*cur_svp))
         (void)hv_stores(hv, "_previous", newSVsv(*cur_svp));
     else
@@ -163,6 +189,8 @@ CODE:
     (void)hv_stores(hv, "_grace_until", newSVnv(now + grace));
 
     /* Fire on_rotate callback */
+    # uncoverable condition right count:1
+    # uncoverable condition right count:3
     if (cb_svp && SvOK(*cb_svp) && SvROK(*cb_svp)) {
         dSP;
         ENTER; SAVETMPS;
@@ -271,6 +299,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_ttl", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvNV(*svp) : 0;
 }
 OUTPUT:
@@ -283,6 +313,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_rotation", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvNV(*svp) : 0;
 }
 OUTPUT:
@@ -295,6 +327,8 @@ CODE:
 {
     HV *hv = (HV *)SvRV(self);
     SV **svp = hv_fetchs(hv, "_grace", 0);
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     RETVAL = (svp && SvOK(*svp)) ? SvNV(*svp) : 0;
 }
 OUTPUT:

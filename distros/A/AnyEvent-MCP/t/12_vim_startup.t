@@ -26,7 +26,7 @@ sub run_vim {
 
 my ($status, $url, $err) = run_vim ("--print-url");
 is $status, 0, "print-url exits successfully";
-like $url, qr{\Ahttp://127\.0\.0\.1:[0-9]+/[A-Za-z0-9_-]{43}/\n\z},
+like $url, qr{\Ahttp://127\.0\.0\.1:[0-9]+/[A-Za-z0-9_-]{43}/  \# user global:default \(connect\)\n\z},
    "print-url emits a cookie-bearing URL prefix";
 is $err, "", "print-url has no diagnostics on success";
 
@@ -37,12 +37,12 @@ my ($default_port, $cookie);
 {
    local $0 = "mcp-vim";
    $default_port = $config->server_port ("default");
-   $cookie = $config->credential ("token", "default");
+   $cookie = $config->user_credentials ("default")->[0][2];
 }
 like $url, qr{\Ahttp://127\.0\.0\.1:$default_port/},
    "default port is derived from the service name";
 # token is derived in the broker program domain above.
-like $url, qr{\Q/$cookie/\E\n\z}, "cookie derives from global master secret";
+like $url, qr{\Q/$cookie/\E  \# user global:default \(connect\)\n\z}, "cookie derives from global master secret";
 
 my ($again_status, $again_url) = run_vim ("--print-url");
 is $again_status, 0, "second invocation exits successfully";
@@ -57,7 +57,7 @@ print {$legacy} "\n[instance default]\nbind = 127.0.0.1:31749\n";
 close $legacy or die $!;
 ($status, $url, $err) = run_vim ("--print-url");
 is $status, 0, "named bind setting accepted";
-is $url, "http://127.0.0.1:31749/$cookie/\n",
+is $url, "http://127.0.0.1:31749/$cookie/  # user global:default (connect)\n",
    "named bind overrides derived port";
 
 open my $fh, ">>", $file or die $!;

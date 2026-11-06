@@ -37,6 +37,7 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `t/08_refill_join.t` - `refill_block` unit tests (joining rules; no pandoc needed)
 - `t/09_refill.t` - `refill=1` through greple: joining, folding of the joined lines, tables above them, with each available parser (skipped without one)
 - `t/11_quote_fold.t` - long block quote lines are folded with the quote marker repeated on the continuation lines, with and without color
+- `t/14_escape.t` - control characters and escape sequences of the file are removed, colors stay
 - `t/10_blocks.t` - `App::Greple::md::Blocks`: both parsers report the same paragraph lines (skipped without one)
 - `t/Util.pm` - Test helper for greple-based tests
 - `t/runner/` - Submodule (p5-script-runner) for finding greple path
@@ -83,11 +84,11 @@ md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
 
 #### Chaining Themes
 
-The `--theme` option is an array (`@` type). The default is `(hashed nomark markcell)`, declared as a Bash array before `OPTS` (the OPTS default is empty; getoptlong.sh preserves pre-declared arrays). Themes support comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
+The `--theme` option is an array with a callback (`@!` type). The default is `(hashed nomark markcell doubleline)`, declared as a Bash array before `OPTS` (the OPTS default is empty; getoptlong.sh preserves pre-declared arrays). Themes support comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
 
 ```bash
-mdee file.md                        # default: hashed + nomark + markcell
-mdee --theme=warm file.md           # hashed,nomark,markcell (default) + warm
+mdee file.md                        # default: hashed + nomark + markcell + doubleline
+mdee --theme=warm file.md           # the default themes + warm
 mdee --no-theme file.md             # no theme (show all markup)
 mdee --no-theme --theme=warm        # warm only (clear default first)
 ```
@@ -423,6 +424,10 @@ ATX headings ([CommonMark](https://spec.commonmark.org/0.31.2/#atx-headings)), f
 
 Inline code ([CommonMark Code Spans](https://spec.commonmark.org/0.31.2/#code-spans)) uses the `$CODE` pattern, which matches both single and multi-backtick spans. For multi-backtick (2+), optional leading/trailing spaces are stripped per CommonMark spec.
 
+### Control Characters in the File
+
+`begin()` first calls `remove_controls`, so that a Markdown file from someone else cannot send anything but colors to the terminal: OSC (title, clipboard, hyperlink), DCS, CSI other than SGR, other escape sequences, C0 controls except `\t \n \f \r`, DEL and C1. OSC and CSI use `$osc_re` and `$csi_re` of Text::ANSI::Fold, which also take the 8-bit forms; `$STRING` has the same form for DCS, SOS, PM and APC. ECMA-48 ends these with ST only; BEL is taken too, as in `$osc_re`, because terminals use it. A string sequence without a terminator, or with a control character that a command string cannot have, loses only its introducer, and its text stays. SGR stays, because a colored file is a reasonable input, except `\e[256m`, the mark of `protect()`: `\e[256mN\e[m` in a file would bring back protected text or die in `restore()`. The file name label is printed by greple and is not covered. Theme names with `/` are rejected by `load_theme_file`, so that `--theme` cannot run a file outside the theme directories.
+
 ### Text Folding (md module)
 
 Text folding is handled within the `App::Greple::md` module using `-Mtee` to pipe matched regions through `ansifold`. The md module defines `--fold-by` as a greple option in its `__DATA__` section, and `--fold` is dynamically defined in `finalize()` via `$mod->setopt()` as a command option alias. The module option `--fold` enables folding via config.
@@ -560,7 +565,7 @@ Config parameters from mdee:
 - `table=1`: Enable table formatting (default enabled in md module)
 - `table_trim=1`: Enable cell whitespace trimming (default enabled in md module)
 - `rule=1`: Enable box-drawing characters (default enabled in md module)
-- `table_style` (from `--table-style`; the default `lattice` is not passed, and mdee turns `pipe`, its older name, into `lattice`; the md module takes both): `lattice` has column separators. `3line` and `simple` have none: `format_table` formats the block as in rule mode, so that `fix_separator` puts `┼` at the column boundaries and the header rule stays per column, then blanks `│ ┼ ├ ┤` to spaces. `3line` adds a `─` rule of the table's visible width (`ansi_width` of the first line) above and below; `simple` adds a copy of the header rule below, as in `pandoc -t ansi`. With `rule=0` these rules are drawn with `-`. The name `grid` is left for a future style with an outer frame, as in Pandoc's grid tables.
+- `table_style` (from `--table-style`, `--ts`; the default `lattice` is not passed, and mdee turns `pipe`, its older name, into `lattice`; the md module takes both): `lattice` has column separators. `3line` and `simple` have none: `format_table` formats the block as in rule mode, so that `fix_separator` puts `┼` at the column boundaries and the header rule stays per column, then blanks `│ ┼ ├ ┤` to spaces. `3line` adds a `─` rule of the table's visible width (`ansi_width` of the first line) above and below; `simple` adds a copy of the header rule below, as in `pandoc -t ansi`. With `rule=0` these rules are drawn with `-`. The name `grid` is left for a future style with an outer frame, as in Pandoc's grid tables.
 - `table_width=$width`: Fit tables into the fold width (passed whenever fold is enabled); over-wide columns are wrapped by ansicolumn (`-w`). `0` disables.
 - `table_cell=SPEC`: Per-column widths for ansicolumn `--cell`, colon-separated (`0:10:<20`) because commas separate config parameters; md module converts to commas and prepends `0,` in non-trim mode for the phantom first column. Not passed by mdee; set via `--config`.
 - `table_wrap_mark=STRING`: Mark for continuation lines of wrapped cells (default none; the `markwrap` theme sets `›` U+203A).
@@ -632,6 +637,7 @@ Bold/italic/strike patterns use `$SKIP_CODE` as first alternative to skip code s
 
 - `(?<![\\\w])` / `(?!\w)`: Word boundaries for `_`/`__` (prevents `foo_bar_baz`)
 - `(?<!\*)` / `(?!\*)`: Distinguishes `*italic*` from `**bold**`
+- `flanking($delim)`: returns the opener and closer patterns of `*` or `**`, left-flanking and right-flanking as in CommonMark (so `L*=50, a*=68` is not italic, while `2*3*4` is), or by the markdown-cjk-friendly rules with `cjk_friendly=1`; see "Flanking Rules and Japanese Text" under Limitations
 - `mark_color($type, $text)`: Uses `${type}_mark` if in colormap, falls back to `emphasis_mark`
 - `/p` flag with `${^MATCH}`: Safe alternative to `$&` (used by `$SKIP_CODE`)
 
@@ -694,7 +700,7 @@ Key format: `option_name | short_opt  spec  # comment`
 
 - `[&REQUIRE]=version`: Minimum getoptlong.sh version
 - `[&USAGE]="..."`: Usage message for --help
-- If a function with the same name as an option exists, it's called after parsing (callback)
+- A function with the same name as an option is called only when the spec has `!` (`@!`, `%!`, `:!`); without it, the function is left alone
 - Invocation: `. getoptlong.sh OPTS "$@"`
 
 ## Limitations
@@ -716,6 +722,32 @@ Only HTML comments starting at the beginning of a line are highlighted. Inline c
 Emphasis patterns do not span multiple lines. Multi-line bold or italic text is not supported.
 
 `***bold italic***` and `___bold italic___` are supported as a combined pattern (processed before bold and italic, result is `protect()`ed). Other nested forms (e.g., `**bold _italic_**`) are not supported.
+
+#### Flanking Rules and Japanese Text
+
+[CommonMark 0.31.2](https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis) lets `*` open emphasis only when it is *left-flanking*: not followed by whitespace, and either not followed by punctuation or preceded by whitespace or punctuation; a closer must be *right-flanking*, the mirror image. Its punctuation is Unicode punctuation and symbols (`P` and `S` categories), so `「 」 。 、 （ ）` count as punctuation as much as `=` does.
+
+Japanese has no spaces between words, so a `*` often stands between a kanji and a bracket, or between a full stop and a kana, and the spec then refuses it, as it refuses `L*=50`. pandoc (`-f commonmark` and `-f gfm`) renders these as written (checked 2026-11-06); GitHub follows the same spec (GFM) but was not checked:
+
+| Text | CommonMark (default) | `cjk_friendly=1` |
+|---|---|---|
+| `L*=50, a*=68` | not italic | not italic |
+| `日本語の*強調*です` | italic | italic |
+| `日本語の*「強調」*です` | not italic | italic |
+| `日本語の*強調。*です` | not italic | italic |
+| `日本語の**「強調」**です` | not bold | bold |
+
+mdee follows CommonMark by default because it is also used to check text that pandoc will process: emphasis that mdee shows and pandoc does not would hide the mistake. Before 2026-11-06 mdee had no flanking rules at all; `L*=50, a*=68` in the Term::ANSIColor::Concise manual was shown with `=50, a` in italic and the two `*` hidden.
+
+[markdown-cjk-friendly](https://github.com/tats-u/markdown-cjk-friendly) ([specification](https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md), [CommonMark issue #650](https://github.com/commonmark/commonmark-spec/issues/650)) is one person's proposal of amendments, not part of CommonMark. `cjk_friendly=1` (`mdee --config cjk_friendly=1`, or `md_config+=(cjk_friendly=1)` in config.sh) takes its rules for `*` and `**`: CJK punctuation does not count as punctuation, and a CJK character on the other side is as good as whitespace. A CJK character is one whose East Asian Width is W, F or H and that is not an emoji by default (`Emoji_Presentation`; left out on a perl without the property), or Hangul. The variation selector parts of the proposal are not implemented. `flanking()` builds the opener and closer patterns from the config each time the step runs.
+
+The effect on existing text: in the Markdown files under `~/Git/tecolicom` (2026-11-06) 346 `**...**` spans in 132 files (worktree copies included) are bold without the rules and not bold with CommonMark's. In 216 the delimiter is next to CJK punctuation (`。` 135, `「` 28, `）` 23, `」` 22, `、` 6); in 111 it is next to `-`, as in the Chinese README files of greple modules (`使用**--xlate-fold**选项`). With `cjk_friendly=1` these are bold again, the `-` cases because a CJK character is on the other side. Two of them are in Zenn articles not yet published (`gomi-rule-limit.md:216`, `gomi-course-merger-border.md:128`); zenn.dev does not show them in bold either (checked by the author, 2026-11-06). `*` alone is rare in that position (`*（` once).
+
+`***` (`bold_italic`), `_` and `__` do not use `flanking()`; `_` and `__` keep their word-boundary rule.
+
+Links and code spans are `protect()` placeholders when the emphasis steps run, so `flanking()` takes the start of a placeholder (`\e[256m`) and its end (`\e[m`) as punctuation, standing for the `[`, `)` and backticks around them in the text: `**[link](url)**も` is not bold, as in CommonMark. CommonMark pairs a closer with the nearest opener before it (the delimiter stack); the bold pattern does the same by not letting the content contain an opener, so in `**C#**や**F#**は` only `や` is bold, the `**` after `#` being able to open only.
+
+Checked on 2026-11-06 against markdown-it 14 with and without markdown-it-cjk-friendly, on the 139 lines of the proposal's `testcases/*.md` (strong, korean, non-bmp, pseudo-emoji, gfm-non-cjk) and a few of our own: the emphasized spans agree in both modes, except for variation selectors after a CJK character (`葛󠄀**(…)**城市`, 4 lines; not implemented), backslash escapes (`` \` ``, not processed by mdee) and the nesting order of `***x***` (italic inside bold or bold inside italic, same look).
 
 ### Links
 

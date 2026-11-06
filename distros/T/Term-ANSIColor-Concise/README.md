@@ -16,7 +16,7 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
                    'Flashing Underlined Bold Italic Gold on Gray10 Bar');
 
     say ansi_color('<red>+l20-s10', 'Lightened desaturated red');
-    say ansi_color('hsl(240,100,50)=y70c', 'Blue set to 70% luminance then complemented');
+    say ansi_color('hsl(240,100,50)=y70+c', 'Blue set to 70% luminance then complemented');
     say ansi_color('lab(50,20,-30)+h60', 'Lab color with hue shifted 60 degrees');
 
 <div>
@@ -25,71 +25,25 @@ Term::ANSIColor::Concise - Produce ANSI terminal sequence by concise notation
 
 # VERSION
 
-Version 3.02
+Version 3.04
 
 # DESCRIPTION
 
-This module provides a simple concise format to describe complicated
-colors and effects for ANSI terminals.  These notations are supposed to
-be used in command line option parameters.
+This module provides a concise notation to describe colors and effects
+for ANSI terminals.  The notation is meant to be used in parameters of
+command line options.  A string in this notation is called a _color
+spec_ in this document; see ["COLOR SPEC"](#color-spec).
 
-This module used to be a part of [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap) module, which
-provides an easy handling interface for command line options.
+By default, colors are produced as ANSI 256 color sequences: eight
+standard colors, eight high intensity colors, 6x6x6 216 colors and 24
+gray scales.  Colors given in other forms, such as RGB values or color
+names, are converted to the nearest of the 216 colors, or to one of
+the gray scales if all RGB values are the same.  For a terminal which
+can display 24bit colors, 24bit sequences can be produced instead; see
+["ENVIRONMENT"](#environment).
 
-## COLOR SPECIFICATIONS
-
-Colors can be specified using various formats and color spaces:
-
-### RGB Colors
-
-- Hexadecimal format
-
-        FF0000        # Red (6 digits)
-        #F00          # Red (3 digits)
-        #FF0000       # Red (with # prefix)
-
-- Decimal format  
-
-        rgb(255,0,0)  # Red using RGB values (0-255)
-        (255,0,0)     # Red (rgb prefix optional)
-
-### Other Color Spaces
-
-- HSL (Hue, Saturation, Lightness)
-
-        hsl(0,100,50)     # Red: hue=0°, saturation=100%, lightness=50%
-        hsl(120,100,50)   # Green: hue=120°, saturation=100%, lightness=50%
-        hsl(240,100,50)   # Blue: hue=240°, saturation=100%, lightness=50%
-
-- LCH (Lightness, Chroma, Hue) - CIE LCHab
-
-        lch(50,130,0)     # Red: lightness=50, chroma=130, hue=0°
-        lch(87,119,136)   # Green: lightness=87, chroma=119, hue=136°
-        lch(32,133,306)   # Blue: lightness=32, chroma=133, hue=306°
-
-- Lab (Lightness, a\*, b\*) - CIE Lab
-
-        lab(50,68,48)     # Red: L*=50, a*=68, b*=48
-        lab(87,-79,80)    # Green: L*=87, a*=-79, b*=80  
-        lab(32,79,-108)   # Blue: L*=32, a*=79, b*=-108
-
-### Named Colors
-
-    <red>             # Named color (see COLOR NAMES section)
-    <lightblue>       # Color name with modifier
-    <gray50>          # Grayscale levels
-
-## 256 or 24bit COLORS
-
-By default, this library produces ANSI 256 color sequence.  That is
-eight standard colors, eight high intensity colors, 6x6x6 216 colors,
-and gray scales in 24 steps.
-
-Colors described by 12bit/24bit RGB values are converted to 6x6x6 216
-colors, or 24 gray scales if all RGB values are the same.
-
-For a terminal which can display 24bit colors, full-color sequence can
-be produced.  See ["ENVIRONMENT"](#environment) section.
+This module used to be a part of [Getopt::EX::Colormap](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AColormap), which
+provides an interface to handle colors in command line options.
 
 # FUNCTION
 
@@ -100,29 +54,27 @@ be produced.  See ["ENVIRONMENT"](#environment) section.
 
     In the result, the given _text_ is enclosed by appropriate open/close
     sequences.  The close sequence can vary according to the open sequence.
-    See ["RESET SEQUENCE"](#reset-sequence) section.
+    See ["RESET SEQUENCE"](#reset-sequence).
 
-    If _text_ already contains colored areas, the color specifications
-    are applied accumulatively. For example, if an underline instruction
-    is given for a string of red text, both specifications will be in
-    effect.
+    If _text_ already contains colored areas, the color spec is applied
+    accumulatively.  For example, if an underline is given for a string
+    of red text, both are in effect.
 
-    The _spec_ and _text_ pairs can be repeated any number of times. In
+    The _spec_ and _text_ pairs can be repeated any number of times.  In
     scalar context, the results from each pair are returned as a
-    concatenated string. When used in array context, results are
-    returned as a list.
+    concatenated string.  In list context, they are returned as a list.
 
 - **ansi\_color**(\[ _spec1_, _spec2_, ... \], _text_)
 
-    If the _spec_ parameter is an ARRAYREF, multiple _spec_s can be specified
+    If the _spec_ parameter is an ARRAYREF, multiple _spec_s can be given
     at once.  This is not useful for text color specs because they can be
     simply joined, but may be useful when mixed with ["FUNCTION SPEC"](#function-spec).
 
 - **ansi\_color\_24**(_spec_, _text_)
 - **ansi\_color\_24**(\[ _spec1_, _spec2_, ... \], _text_)
 
-    Function **ansi\_color\_24** always produces 24bit color sequences for
-    12bit/24bit color specs.
+    Same as **ansi\_color**, but always produces 24bit color sequences for
+    colors given in RGB, other color spaces or names.
 
 - **cached\_ansi\_color**(_cache_, _spec_, _text_)
 
@@ -130,7 +82,7 @@ be produced.  See ["ENVIRONMENT"](#environment) section.
     used to cache data.  If you are concerned about cache mismatch situations,
     use this interface with an original cache.
 
-- **ansi\_pair**(_color\_spec_)
+- **ansi\_pair**(_spec_)
 
     Produces introducer and recovery sequences for the given spec.
 
@@ -138,18 +90,16 @@ be produced.  See ["ENVIRONMENT"](#environment) section.
     sequence.  This gives a hint that the sequence is necessary for empty strings.
     See ["RESET SEQUENCE"](#reset-sequence).
 
-- **ansi\_code**(_color\_spec_)
+- **ansi\_code**(_spec_)
 
     Produces introducer sequence for the given spec.  Reset code can be obtained
     by **ansi\_code("Z")**.
 
 - **csi\_code**(_name_, _params_)
 
-    Produce CSI (Control Sequence Introducer) sequence by name with
-    numeric parameters.  Parameter _name_ is one of standard (ICH, CUU,
-    CUD, CUF, CUB, CNL, CPL, CHA, CUP, ED, EL, IL, DL, DCH, SU, SD, ECH,
-    VPA, VPR, HVP, SGR, DSR, SCP, RCP) or non-standard (CPR, STBM, CSI,
-    OSC, RIS, DECSC, DECRC, DECEC, DECDC).
+    Produces a CSI (Control Sequence Introducer) sequence by name with
+    numeric parameters.  _name_ is one of the names listed in ["CSI
+    SEQUENCES and OTHERS"](#csi-sequences-and-others).
 
 - **csi\_report**(_name_, _n_, _string_)
 
@@ -166,18 +116,21 @@ be produced.  See ["ENVIRONMENT"](#environment) section.
 
 # COLOR SPEC
 
-At first the color is considered as foreground, and slash (`/`)
-switches foreground and background.  You can declare any number of
-components in arbitrary order, and sequences will be produced in the
-order of their presence.  So if they conflicts, the later one
-overrides the earlier.
+A color spec is a combination of the components described below.  Any
+number of components can be given in any order, and the sequences are
+produced in the order of their presence.  So if they conflict, the
+later one overrides the earlier.
 
-Color specification is a combination of following components:
+A color is taken as foreground at first, and slash (`/`) switches
+foreground and background.  So `R/W` is red text on white.
+
+Modifiers described in ["COLOR ADJUSTMENT"](#color-adjustment) can follow a color given
+in RGB, other color spaces or names.
 
 ## BASIC 8+8
 
 Single uppercase character representing 8 colors, and alternative
-(usually brighter) colors in lowercase :
+(usually brighter) colors in lowercase:
 
     R  r  Red
     G  g  Green
@@ -188,41 +141,9 @@ Single uppercase character representing 8 colors, and alternative
     K  k  Black
     W  w  White
 
-## EFFECTS and CONTROLS
-
-Single case-insensitive character for special effects.  Numbers
-indicate SGR (Select Graphic Rendition) parameter values:
-
-    N    None
-    Z  0 Zero (reset)
-    D  1 Double-struck (boldface)
-    P  2 Pale (faint/dim)
-    I  3 Italic
-    U  4 Underline
-    F  5 Flash (blink: slow)
-    Q  6 Quick (blink: rapid)
-    S  7 Stand-out (reverse video)
-    H  8 Hide (concealed)
-    X  9 Cross-out (strikethrough)
-
-    E    Erase Line (fill by background color)
-
-    ;    No effect
-    /    Toggle foreground/background
-    ^    Reset to foreground
-    ~    Cancel following effect
-
-Tilde (`~`) negates following effect; `~S` reset the effect of `S`.
-There is a discussion about negation of `D` (Track Wikipedia link in
-SEE ALSO), and Apple\_Terminal (v2.10 433) does not reset at least.
-
-Single `E` is an abbreviation for `{EL}` (Erase Line).  This is
-different from other attributes, but have an effect of painting the
-rest of line by background color.
-
 ## 6x6x6 216 COLORS
 
-Combination of 0..5 for 216 RGB values :
+Combination of 0..5 for 216 RGB values:
 
     Deep          Light
     <----------------->
@@ -249,28 +170,96 @@ aliases for `000` and `555`.
 
 ## RGB
 
-12bit/24bit RGB :
+12bit/24bit RGB:
 
-    (255,255,255)      : 24bit decimal RGB colors
-    #000000 .. #FFFFFF : 24bit hex RGB colors
+    rgb(255,0,0)       : 24bit decimal RGB (0-255)
+    (255,0,0)          : same, rgb can be omitted
+    #000000 .. #FFFFFF : 24bit hex RGB
     #000    .. #FFF    : 12bit hex RGB 4096 colors
 
-> Beginning `#` can be omitted in 24bit hex RGB notation.  So 6
-> consecutive digits means 24bit color, and 3 digits means 6x6x6 color,
-> if they do not begin with `#`.
+The leading `#` can be omitted in 24bit hex RGB notation.  So 6
+consecutive digits mean a 24bit color, and 3 digits mean a 6x6x6
+color, if they do not begin with `#`.
 
-## COLOR NAMES
+## OTHER COLOR SPACES
 
-Color names enclosed by angle bracket :
+- HSL (Hue, Saturation, Lightness)
+
+        hsl(0,100,50)     # Red: hue=0°, saturation=100%, lightness=50%
+        hsl(120,100,50)   # Green: hue=120°, saturation=100%, lightness=50%
+        hsl(240,100,50)   # Blue: hue=240°, saturation=100%, lightness=50%
+
+- LCH (Lightness, Chroma, Hue) - CIE LCHab
+
+        lch(50,130,0)     # Red: lightness=50, chroma=130, hue=0°
+        lch(87,119,136)   # Green: lightness=87, chroma=119, hue=136°
+        lch(32,133,306)   # Blue: lightness=32, chroma=133, hue=306°
+
+- Lab (Lightness, a\*, b\*) - CIE Lab
+
+        lab(50,68,48)     # Red: L*=50, a*=68, b*=48
+        lab(87,-79,80)    # Green: L*=87, a*=-79, b*=80
+        lab(32,79,-108)   # Blue: L*=32, a*=79, b*=-108
+
+See [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject) for these color spaces.
+
+## NAMED COLORS
+
+Color names enclosed by angle brackets:
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
     <aliceblue> <honeydew> <hotpink> <moccasin>
-    <medium_aqua_marine>
+    <medium_aqua_marine> <gray50>
 
 These colors are defined in 24bit RGB.  Names are case insensitive and
 underscore (`_`) is ignored, but space and punctuation are not
 allowed.  So `<aliceblue>`, `<AliceBlue>`, `<ALICE_BLUE>` are all valid but `<Alice Blue>` is not.  See ["COLOR NAMES"](#color-names)
-section for detail.
+for the list.
+
+## EFFECTS and CONTROLS
+
+Single case-insensitive character for special effects.  Numbers
+indicate SGR (Select Graphic Rendition) parameter values:
+
+    N    None
+    Z  0 Zero (reset)
+    D  1 Double-struck (boldface)
+    P  2 Pale (faint/dim)
+    I  3 Italic
+    U  4 Underline
+    F  5 Flash (blink: slow)
+    Q  6 Quick (blink: rapid)
+    S  7 Stand-out (reverse video)
+    H  8 Hide (concealed)
+    X  9 Cross-out (strikethrough)
+
+    E    Erase Line (fill by background color)
+
+    ;    No effect
+    /    Toggle foreground/background
+    ^    Reset to foreground
+    ~    Cancel following effect
+
+Tilde (`~`) negates the following effect; `~S` resets the effect of
+`S`.  The negation of `D` is discussed in the Wikipedia page in
+["SEE ALSO"](#see-also); at least Apple\_Terminal (v2.10 433) does not reset it.
+
+A colon after an effect, with the digits and colons that follow it, is
+put into its SGR parameter: `U:3` produces `ESC[4:3m`.  This is the
+form of a parameter in ECMA-48, and the text is not checked.  Its
+meaning comes from the terminals.  The one in common use is the
+underline style: terminals that support it commonly take 1 for
+straight, 2 for double, 3 for curly, 4 for dotted, 5 for dashed and 0
+for none.  A terminal without support may show something quite
+different: Apple\_Terminal (v2.14 455.1) ignores the colons and shows
+`ESC[4:3m` as `ESC[43m`, with a yellow background.
+
+Put `;` before a color that starts with a digit, as in `U:3;555`.  A
+negated effect such as `~U` takes no colon.
+
+`E` is an abbreviation for `{EL}` (Erase Line).  It is not an
+attribute of the text, but paints the rest of the line by the
+background color.
 
 ## CSI SEQUENCES and OTHERS
 
@@ -314,10 +303,16 @@ optional parentheses.  For example, color spec `DK/544` can be
 described as `{SGR1;30;48;5;224}` or more readable
 `{SGR(1,30,48,5,224)}`.
 
+The parameters of `SGR` can also have colons, as in `{SGR4:2}` or
+`{SGR(4:3,58:2::255:0:0)}`, which produces
+`ESC[4:3;58:2::255:0:0m`.  They are passed as they are.  See the
+notes on `U:3` in ["EFFECTS and CONTROLS"](#effects-and-controls) for what terminals do with
+them.  Other names do not take colons.
+
 Some other escape sequences are supported in the form of `{NAME}`.
-These sequences do not start with CSI, and do not take parameters.
-VT100 compatible terminals usually support these, and do not support
-`SCP` and `RCP` CSI codes.
+These do not take parameters.  VT100 compatible terminals usually
+support `DECSC` and `DECRC`, and do not support the `SCP` and
+`RCP` CSI codes.
 
     CSI      Control Sequence Introducer
     OSC      Operating System Command
@@ -337,29 +332,30 @@ VT100 compatible terminals usually support these, and do not support
      /M     /505      /#F0F     /(255,0,255)  /<magenta>
     K/W  000/555  #000/#FFF  #000000/#FFFFFF  <black>/<white>
     R/G  500/050  #F00/#0F0  #FF0000/#00FF00  <red>/<green>
-    W/w  L03/L20  #333/#ccc  #333333/#cccccc  <gray20>/<gray80>
+         L05/L21  #333/#CCC  #333333/#CCCCCC  <gray20>/<gray80>
 
 # COLOR ADJUSTMENT
 
-Colors can be dynamically adjusted using modifier characters appended after
-color specifications. These modifiers allow you to adjust various color
-properties such as luminance, lightness, saturation, and hue.
+A color given in RGB, other color spaces or names can be adjusted by
+modifiers that follow it, such as luminance, lightness, saturation and
+hue.  Basic 8+8 colors (`R`, `G`, `B`, etc.), 6x6x6 216 colors
+(`555`, etc.) and gray scales (`L10`, etc.) do not take modifiers.
 
-**Note:** Modifiers can only be used with full color specifications:
-hex (`#FF0000`), RGB (`rgb(255,0,0)`), HSL, LCH, Lab, or named colors
-(`<red>`).  Basic 8+8 colors (`R`, `G`, `B`, etc.) and 6x6x6 216
-colors (`555`, etc.) do not support modifiers.
+    <red>+l20-s10       # lighter and less saturated red
+    hsl(240,100,50)=y70 # blue set to luminance 70
 
 ## MODIFIER SYNTAX
 
-Color modifiers use the format: `[OPERATION][PARAMETER][VALUE]`
+A modifier is an operation character, a parameter character and an
+optional value: `[OPERATION][PARAMETER][VALUE]`.  The operation is
+required even for a parameter that takes no value, as in `+i`:
+`<red>i` is red with the italic effect `I`.
 
-- **Operations**
-    - `+` - Add value (relative adjustment)
-    - `-` - Subtract value (relative adjustment)  
-    - `=` - Set absolute value
-    - `*` - Multiply by percentage (value/100)
-    - `%` - Modulo operation
+- `+` - Add value (relative adjustment)
+- `-` - Subtract value (relative adjustment)
+- `=` - Set absolute value
+- `*` - Multiply by percentage (value/100)
+- `%` - Add value, and take the result modulo 100
 
 ## ADJUSTABLE PARAMETERS
 
@@ -370,7 +366,7 @@ Color modifiers use the format: `[OPERATION][PARAMETER][VALUE]`
         <blue>=l75    # Set blue lightness to 75
         <orange>*l120 # Multiply orange lightness by 1.2
 
-- **y** - Luminance (brightness perception: 0-100)
+- **y** - Luminance (perceived brightness: 0-100)
 
         <red>+y10     # Increase red luminance by 10
         <blue>-y20    # Decrease blue luminance by 20
@@ -382,37 +378,43 @@ Color modifiers use the format: `[OPERATION][PARAMETER][VALUE]`
         <yellow>-s30  # Decrease yellow saturation by 30
         <magenta>=s0  # Set magenta saturation to 0 (grayscale)
 
-- **h** - Hue (HSL hue shift in degrees: 0-360)
+- **h** - Hue (HSL hue shift in degrees)
 
         <red>+h60     # Shift red hue by 60 degrees
         <cyan>-h120   # Shift cyan hue by -120 degrees
-        <purple>=h180 # Set purple hue to 180 degrees
-
-- **c** - Complement (180 degree hue shift)
-
-        <red>c        # Get complement of red (cyan)
 
 - **r** - Rotate Hue (LCH hue rotation, preserving luminance)
 
         <red>+r60     # Rotate red hue by 60 degrees in LCH space
-        <blue>=r180   # Rotate to 180 degrees (complement with luminance preserved)
+        <blue>+r180   # Opposite hue with the luminance preserved
+
+- **c** - Complement (180 degree hue shift in HSL)
+
+        <red>+c       # Get complement of red (cyan)
 
 - **i** - Inverse (RGB inversion)
 
-        <red>i        # Invert red to cyan
-        <blue>i       # Invert blue to yellow
+        <red>+i       # Invert red to cyan
+        <blue>+i      # Invert blue to yellow
 
 - **g** - Luminance Grayscale (convert to grayscale using luminance)
 
-        <red>g        # Convert red to luminance-based grayscale
+        <red>+g       # Convert red to luminance-based grayscale
 
 - **G** - Lightness Grayscale (convert to grayscale using lightness)
 
-        <red>G        # Convert red to lightness-based grayscale
+        <red>+G       # Convert red to lightness-based grayscale
 
-The color adjustment functionality is implemented through the 
-[Term::ANSIColor::Concise::Transform](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATransform) module and uses 
+The parameters `h`, `r` and `c` shift the hue: `-` shifts it
+backwards, and the other operations shift it forwards.  `=h180` does
+not set the hue to 180, but shifts it by 180 degrees.
+
+The color adjustment is implemented by the
+[Term::ANSIColor::Concise::Transform](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATransform) module, which uses
 [Term::ANSIColor::Concise::ColorObject](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3AColorObject) for color space conversions.
+
+See ["LABEL COLOR FOR A BACKGROUND"](#label-color-for-a-background) for an example of modifiers that
+make a text color from its background color.
 
 # COLOR NAMES
 
@@ -522,10 +524,10 @@ variable `$_` set as the target text.
 
 # RESET SEQUENCE
 
-This module produces _RESET_ and _Erase Line_ sequence to recover
-from colored text.  This is preferable to clear background color set
-by scrolling in the middle of colored text at the bottom of the
-terminal.
+This module produces _RESET_ and _Erase Line_ sequences to recover
+from colored text.  The _Erase Line_ clears the background color
+that the terminal leaves on the new line when it scrolls in the middle
+of colored text at the bottom of the screen.
 
 However, on some terminals, including Apple\_Terminal, the _Erase Line_
 sequence clears the text at the cursor position when it is at the
@@ -568,7 +570,7 @@ produced with the RESET code.  See ["RESET SEQUENCE"](#reset-sequence).
 
 # COLOR TABLE
 
-The color table can be shown by the [Term::ANSIColor::Concise::Table](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATable) module.  
+The color table can be shown by the [Term::ANSIColor::Concise::Table](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise%3A%3ATable) module.
 The following command will show the table of 256 colors.
 
     $ perl -MTerm::ANSIColor::Concise::Table=:all -e colortable
@@ -580,6 +582,74 @@ The following command will show the table of 256 colors.
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/tecolicom/Term-ANSIColor-Concise/main/images/colortable-rev-s.png">
 </div>
+
+# LABEL COLOR FOR A BACKGROUND
+
+The modifier `+r90%y50` makes the color of a label from the color of
+its background, as in a table of color samples:
+
+    <color>+r90%y50/<color>
+
+`%y50` adds 50 to the luminance modulo 100, which puts the text in the
+other half of the luminance range.  `+r90` rotates the hue, and keeps
+the luminance that `%y50` starts from.  The background is the subject
+and the label only describes it, so the label should be readable
+without standing out, in an even tone over all backgrounds.  The aim is
+not the highest contrast.
+
+The tables below show the measurements behind this choice, for 960
+background colors: hue 0 to 330 by 30, saturation 20, 50, 80 and 100,
+and lightness 0 to 95 by 5, in 24bit mode.  `Contrast` is the WCAG
+contrast ratio between text and background, with the number of
+backgrounds below 4.5.  `Vivid` is the median CIELAB chroma of the
+text on backgrounds of saturation 100 and lightness 30 to 70.
+
+The rotation angle has almost no effect on the contrast, so it can be
+chosen by appearance.  Vividness is at its lowest at 60 and 90 degrees,
+and at its highest at 180 degrees, where saturated text on a saturated
+background is hard on the eyes.  With 90 degrees, text on a blue
+background has a red tint.
+
+    Modifier       Contrast     Median  <4.5  Vivid
+    %y50           4.38 - 5.89    5.24    14   28.0
+    +r30%y50       4.39 - 5.92    5.24    14   27.5
+    +r60%y50       4.39 - 5.89    5.24    14   24.5
+    +r90%y50       4.39 - 5.92    5.25    14   24.5
+    +r120%y50      4.38 - 5.91    5.25    15   26.0
+    +r150%y50      4.39 - 5.90    5.24    15   34.4
+    +r180%y50      4.38 - 5.89    5.25    15   48.0
+    +r210%y50      4.38 - 5.92    5.24    14   42.4
+    +r240%y50      4.38 - 5.90    5.24    13   42.1
+    +r270%y50      4.39 - 5.92    5.24    14   38.3
+    +r300%y50      4.38 - 5.91    5.25    15   34.4
+    +r330%y50      4.39 - 5.90    5.24    14   31.7
+
+The other candidates do not keep the contrast as even.  Hue rotation in
+HSL (`+c`) changes the luminance, and some text becomes unreadable.
+Lower saturation (`*s50`) changes the luminance after `%y50` has set
+it.  Gray text has no color at all.  Black or white text, whichever is
+higher, gives the most contrast but the widest range.
+
+    Modifier        Contrast      Median  <4.5  Vivid
+    +c%y50          1.01 - 18.92    4.69   429   28.8
+    %y50*s50        3.67 -  7.71    5.35    47   17.3
+    +g%y50          4.21 -  5.89    5.16    49    0.0
+    black or white  4.59 - 21.00   12.05     0      -
+
+For text to be read for its own sake, this is not enough: it does not
+fully meet the WCAG recommendations for normal text.
+`+r90%y50` is below 4.5 (level AA) on 14 of the 960 backgrounds, by at
+most 0.11, all of them at luminance 48 to 50, where white text reaches
+only 4.5 to 4.8.  It reaches 7 (level AAA) on none, while black or white
+reaches it on 762; on the other 198 no color can.  Other offsets are
+worse: `%y48` is below 4.5 on 138 backgrounds and `%y52` on 65.  Use
+black or white text where the recommendations have to be met, though
+the text then stands out against the background.
+
+Contrast ratio and chroma are only guides to how the colors look.  To
+compare them on your terminal, use `t/cmap` in the distribution:
+
+    t/cmap -m '%y50' -m '+r90%y50' -m '+r180%y50' -Z 100
 
 # SEE ALSO
 
@@ -594,13 +664,13 @@ You can handle user options like this:
     use Getopt::Long;
     my @opt_colormap;
     GetOptions('colormap|cm:s' => @opt_colormap);
-    
+
     require Getopt::EX::Colormap;
     my %label = ( FILE => 'DR', LINE => 'Y', TEXT => '' );
     my @index = qw( /544 /545 /445 /455 /545 /554 );
     my $cm = Getopt::EX::Colormap
         ->new(HASH => \%label, LIST => \@index)
-        ->load_params(@opt_colormap);  
+        ->load_params(@opt_colormap);
 
 And then program can use it in two ways:
 
@@ -625,8 +695,8 @@ this module's capabilities and would be a good use case.
 
 ## [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject)
 
-For detailed information about color spaces other than RGB (such as HSL, 
-LCH, Lab, YIQ, etc.), refer to [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject) which provides 
+For detailed information about color spaces other than RGB (such as HSL,
+LCH, Lab, YIQ, etc.), refer to [Graphics::ColorObject](https://metacpan.org/pod/Graphics%3A%3AColorObject) which provides
 comprehensive color space conversion capabilities used by this module.
 
 ## OTHERS
@@ -653,7 +723,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright ©︎ 2015-2025 Kazumasa Utashiro
+Copyright ©︎ 2015-2026 Kazumasa Utashiro
 
 # LICENSE
 

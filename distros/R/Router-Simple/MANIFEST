@@ -24,6 +24,7 @@ t/11_ext_regexp.t
 t/12_paren_warnings.t
 t/13_method_not_allowed.t
 t/14_ending_slash.t
+t/15_trailing_newline.t
 xt/02_perlcritic.t
 xt/04_synopsis.t
 META.yml

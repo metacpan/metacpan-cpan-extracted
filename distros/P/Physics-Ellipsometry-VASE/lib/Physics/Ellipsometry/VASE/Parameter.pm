@@ -6,7 +6,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(param params_to_pdl pdl_to_params make_fit_model get_values);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf8
 

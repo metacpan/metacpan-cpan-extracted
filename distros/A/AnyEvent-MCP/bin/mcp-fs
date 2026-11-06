@@ -8,6 +8,7 @@ mcp-fs - filesystem and command tools with optional sandboxing
 
    mcp-fs --stdio /path/to/workdir
    mcp-fs --name project --bind 127.0.0.1:31741 /path/to/workdir
+   mcp-fs --stdio --host kaos --rsh rsh /root/src
 
 =head1 DESCRIPTION
 
@@ -30,6 +31,12 @@ sandbox grants.
 You can connect an MCP client directly over HTTP or stdin/stdout, or run
 the server through C<mcp-multibroker>. See L<AnyEvent::MCP::Intro> for a
 walkthrough from installation to a first filesystem request.
+
+With C<--host>, the same tools operate on a remote host over SSH (or the
+command selected by C<--rsh>). Only Perl 5.8.4 and the tools used by the
+requested operations are needed remotely; neither mcp-fs nor its CPAN
+modules must be installed there. Each server instance uses one host, with
+any number of workdirs on that host.
 
 =head1 FIRST USE
 
@@ -63,6 +70,25 @@ and run:
 
 This uses the current directory as the workdir. It tests the sandbox,
 not client connectivity or permission prompting.
+
+=head2 Remote workdirs
+
+To use an existing directory on another machine:
+
+   mcp-fs --stdio --host server.example.org /srv/project
+   mcp-fs --stdio -h kaos -e rsh /root/src /srv/projects
+
+Workdir arguments are ordinary absolute paths on that host, without a
+C<host:> prefix. Omitting C<--host> retains local operation, regardless of
+C<--rsh>. The remote shell is started locally, outside the operation
+sandbox. Its connection does not require the remote operation's C<network>
+grant. Combine unrelated hosts through C<mcp-multibroker>.
+
+Remote request cancellation and timeouts terminate the local remote-shell
+process, but may leave the remote worker running. After a connection failure,
+the outcome of a modifying operation may be unknown; inspect the remote
+filesystem before retrying it. Reliable remote process termination is not
+yet implemented.
 
 =head1 TOOLS
 
@@ -171,6 +197,11 @@ for C<--exec-cmd>). GNU find, grep, patch and sed are optional; tools
 requiring an unavailable utility are omitted. Use C<tools/list> to see
 which tools are available.
 
+Remote startup resolves workdirs, HOME, required mounts, executable
+locations and VCS markers once; C<workdirs> thereafter uses this snapshot.
+Optional C<mount-try> paths are instead passed to bubblewrap for every
+invocation. Restart mcp-fs to refresh the workdir configuration and tools.
+
 =head1 CONNECTIONS
 
 HTTP is the default and does not print its URL on startup. C<--print-url>
@@ -181,16 +212,9 @@ See L<AnyEvent::MCP/GLOBAL CONFIGURATION> for named HTTP settings.
 
 =head1 OPTIONS
 
-Common server options: L<AnyEvent::MCP::Server::Simple/mcp_getoptions>.
-The default instance name is C<default>; C<--name> also selects filesystem
-permission file C<rules/fs-NAME.ini>. C<--print-url> needs no WORKDIR,
-while C<--tool-help> requires the usual WORKDIR arguments to report
-tools available with selected configuration and installed utilities.
-
-For example, C<--auto-allow '*,inspect,workdir-read'> together with
-C<--auto-allow '*,read,workdir-read'> approves only those action classes
-within workdir-read authority. C<--auto-allow '*,*,workdir-write'> approves
-any action requiring at most workdir-write authority, including read.
+Shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+The following switches are specific to C<mcp-fs>.
 
 =over
 
@@ -201,6 +225,7 @@ workdir; no MCP listener or permission rules. Supply command and arguments
 after optional C<--> delimiter. Without command, run C<$SHELL> or C</bin/sh>.
 C<--sandbox none> runs with normal host-user privileges.
 Example: C<mcp-fs --exec-cmd workdir-read -- ls>.
+C<--exec-cmd> is local-only; it cannot be combined with C<--host>.
 
 =item --ask MODE
 
@@ -208,6 +233,21 @@ Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp>, C<auto>.
 Local helper keeps decisions local; tty/yad force interface without fallback.
 C<mcp> asks client; C<auto> prefers client elicitation when advertised,
 otherwise local helper. Overrides C<PERL_ANYEVENT_MCP_PERMISSION_ASK>.
+
+=item -h, --host HOST
+
+Run filesystem operations on HOST instead of the local machine. Empty or
+omitted HOST selects local operation. All workdirs belong to this one host.
+Remote workdir paths must be absolute. Host identity qualifies permission
+scopes, not workdir IDs, which are based only on resolved pathnames.
+
+=item -e, --rsh COMMAND
+
+Remote shell command, default C<ssh>. Like rsync's C<-e>, COMMAND may include
+arguments. Only used with C<--host>; C<rsh> is also supported.
+The command is split into arguments locally without a local shell. The
+remote shell receives fixed, quoted Perl code; operation arguments travel
+over stdin using length-prefixed binary frames.
 
 =item --sandbox MODE
 
@@ -225,11 +265,44 @@ Relevant with C<--sandbox bwrap> or C<--sandbox auto>.
 
 =back
 
+=head2 Shared-option behavior
+
+=over
+
+=item --name NAME
+
+Also selects permission profile C<fs-NAME> and its rule file,
+C<rules/fs-NAME.ini>. Default instance name: C<default>.
+
+=item --print-url[=USER]
+
+Does not require a WORKDIR argument.
+
+=item --tool-help
+
+Requires normal WORKDIR arguments, since available tools depend on the
+selected workdirs and installed utilities.
+
+=item --auto-allow TOOL[,ACTION[,CAPABILITY]]
+
+For example, combining C<--auto-allow '*,inspect,workdir-read'> with
+C<--auto-allow '*,read,workdir-read'> approves only those two actions
+within read-only workdir authority. C<--auto-allow '*,*,workdir-write'>
+approves any action requiring at most workdir-write authority,
+including reads.
+
+=back
+
 Rules reside in C<$XDG_CONFIG_HOME/anyevent-mcp/rules/fs-NAME.ini>,
 or the corresponding C<$HOME/.config> path. The rules filename shares the
 service-instance name but has an C<fs> namespace. The default instance uses
 C<rules/fs-default.ini>. The rules path is printed on stderr when starting
 HTTP; normal startup leaves stdout untouched.
+Local and remote instances with the same C<--name> intentionally share
+the same rule profile. Remote requests additionally provide a host dimension,
+and their selected-workdir match includes remote host identity. Use different
+instance names or C<match.host> to separate approvals for different hosts.
+Unscoped rules apply across hosts sharing the profile.
 
 =head1 TRUSTED CONFIGURATION
 
@@ -239,7 +312,8 @@ on the executable basename, while C<[instance NAME]> overrides them for
 C<--name NAME>. A symlinked executable therefore has its own program defaults.
 
    [program mcp-fs]
-   mount.opt = ro:/opt
+   mount-try.opt = ro:/opt
+   mount-try.perl = ro:/opt/perl
    prepend-path = /opt/bin:/opt/sbin
    mount.shared = rw:/srv/shared
    env.cvs = CVS_RSH=/my/cvs/rsh
@@ -259,11 +333,14 @@ Automatic permission rules can also be configured:
 
 These apply to every named mcp-fs instance; CLI auto-rules are evaluated first.
 
-C<mount.SUFFIX> entries are applied in alphabetical key order after
-the private sandbox mounts. The suffix is an arbitrary stable name;
-an empty instance value suppresses an inherited entry. Paths must be
-absolute and exist. A colon after C<ro:> or C<rw:> starts the literal
-pathname; no separate quoting or escaping syntax is used.
+C<mount.SUFFIX> entries require the named path to exist at startup.
+C<mount-try.SUFFIX> entries use bubblewrap's C<--ro-bind-try> or
+C<--bind-try> instead: an absent path is skipped by bubblewrap at each
+invocation, without a startup existence check. Both kinds are applied in
+alphabetical key order after the private sandbox mounts. The suffix is an
+arbitrary stable name; an empty instance value suppresses an inherited
+entry. Paths must be absolute. A colon after C<ro:> or C<rw:> starts the
+literal pathname; no separate quoting or escaping syntax is used.
 
 C<env.SUFFIX> entries contain C<NAME=value> to set a literal value, or
 C<NAME> to inherit that variable from the server environment if present.
@@ -276,15 +353,16 @@ custom executables outside the runtime/workdir mounts need configured mounts.
 
 C<prepend-path> adds colon-separated directories before the bubblewrapped
 worker's fixed C<PATH> of
-C</bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin>.
+C</usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin>.
 Trailing colons are ignored, so both C</opt/bin> and C</opt/bin:> work.
 The server's C<PATH> is not inherited. An empty instance value restores the
 fixed default rather than the program value. C<--sandbox=none> continues to
 use the host environment. Directories outside the normal runtime mounts
 still need a configured mount to be accessible.
 
-Configured mounts grant baseline access to every sandbox invocation,
-independently of tool permission grants. With C<world-read>, only C<rw:>
+Configured mounts grant baseline access to every sandbox invocation
+(when present for C<mount-try>), independently of tool permission grants.
+With C<world-read>, only C<rw:>
 exceptions are applied over the read-only host filesystem. With
 C<world-write>, these configured mounts are ignored. Baseline execution
 paths include C</usr>, C</bin>, system libraries and selected system
@@ -334,8 +412,12 @@ string containing that ID, or an exact configured or resolved workdir path.
 C<workdirs> returns C<workdirs> and C<resolved_workdirs> objects keyed by ID,
 not arrays indexed by argument position. IDs are shared across server
 instances in C<$XDG_CONFIG_HOME/anyevent-mcp/fs-workdir-ids.json>, or under
-C<$HOME/.config> when XDG_CONFIG_HOME is unset. Resolved absolute paths
-determine IDs; permission-rule identities remain the verbatim arguments.
+C<$HOME/.config> when XDG_CONFIG_HOME is unset. IDs use the logical
+absolute pathname, without resolving symlinks (relative local arguments
+are made absolute against the server's working directory). The same logical
+pathname on local and remote servers receives the same ID, even when it
+resolves to different physical directories. Permission-rule identities
+remain the verbatim arguments; each server interprets IDs in its own workdirs.
 
 The registry stores C<ID =E<gt> [workdir, last_use]> pairs, with C<last_use>
 as a Unix timestamp. Starting
@@ -365,6 +447,10 @@ to a host-side loopback server requires C<network>.
 
 C<ssh-agent> implies C<network>. It exposes the server's C<SSH_AUTH_SOCK>
 at C</run/anyevent-mcp/ssh-agent> and sets the child's variable to that path.
+In remote mode it uses the remote shell's agent socket, when available (for
+example through SSH agent forwarding), rather than mounting the local socket
+path. SSH authentication used to reach the host is separate from the
+worker's C<ssh-agent> and C<network> grants.
 It also exposes C<~/.ssh/known_hosts> read-only if present, without mounting
 the rest of HOME. Private key files and SSH user configuration are not exposed.
 An unset or empty C<SSH_AUTH_SOCK> exposes no socket, allowing rsh-based CVS;
@@ -393,6 +479,8 @@ match C<action>, C<sandbox-grants>, and C<match.workdir> when selected-workdir
 authority is required. All-workdirs-only requests have no workdir identity.
 Rules without C<match.workdir> can apply to any selected workdir if their sandbox
 grants cover the request; dialog-generated workdir rules select exact or any.
+In remote mode, C<match.host> also identifies the remote host and transport.
+Instances with the same name share a rule file, including broad unscoped rules.
 Requested paths are shown in the approval dialog for information only.
 Exec additionally offers persistent
 command/argv scopes as C<match.subject>. When stdin is provided, exec attaches display-only
@@ -461,6 +549,8 @@ use Getopt::Long ();
 use Cwd ();
 use File::Basename ();
 use File::Spec::Unix ();
+use Text::ParseWords ();
+use IPC::Open2 ();
 use POSIX ();
 use Fcntl qw(F_SETFD);
 use Scalar::Util qw(weaken);
@@ -510,6 +600,8 @@ my $server_options = mcp_getoptions ({
    option_heading => "Filesystem options:",
    options => [
       ["--ask MODE", "Ask for permission via helper (default), tty, yad, mcp, or auto"],
+      ["-h, --host HOST", "Run on one remote host (default: local)"],
+      ["-e, --rsh COMMAND", "Remote shell command (default: ssh)"],
       ["--sandbox MODE", "Use bwrap (default), auto, or none (unsandboxed)"],
       ["--bwrap PATH", "Path to the bubblewrap executable"],
       ["--exec-cmd GRANT,...", "Run a command directly with the named grants"],
@@ -522,6 +614,8 @@ my $server_options = mcp_getoptions ({
 },
    "sandbox=s"       => \$sandbox_mode,
    "ask=s"           => \my $ask,
+   "host|h=s"        => \my $host,
+   "rsh|e=s"         => \my $rsh,
    "exec-cmd=s"      => \my $exec_cmd,
    "bwrap=s"         => \my $bwrap,
 );
@@ -538,6 +632,16 @@ die "--ask must be helper, tty, yad, mcp, or auto\n"
 $sandbox_mode =~ /\A(?:bwrap|auto|none)\z/
    or die "--sandbox must be bwrap, auto, or none\n";
 
+$host //= "";
+$host !~ m{[\s/\0]} && $host !~ /\A-/
+   or die "invalid remote host\n";
+$rsh //= "ssh";
+my @rsh = Text::ParseWords::shellwords ($rsh);
+@rsh or die "empty remote shell command\n";
+my $remote = length $host;
+!($remote && defined $exec_cmd)
+   or die "--host cannot be combined with --exec-cmd\n";
+
 my $program_name = AnyEvent::MCP::Config::program_name ();
 my $config_file = AnyEvent::MCP::Config::_file ();
 my $config = -e $config_file ? AnyEvent::MCP::Config->global : undef;
@@ -546,17 +650,17 @@ my %settings = $config ? (
    %{ $config->{section}{"instance $name"} },
 ) : ();
 
-my $sandbox_path = "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin";
+my $sandbox_path = "/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin";
 (my $prepend = $settings{"prepend-path"} // "") =~ s/:+\z//;
 $sandbox_path = "$prepend:$sandbox_path" if length $prepend;
 
 my @mount;
-for my $key (sort grep /\Amount\./, keys %settings) {
+for my $key (sort grep /\Amount(?:-try)?\./, keys %settings) {
    my $value = $settings{$key};
    next unless length $value;
    my ($mode, $path) = $value =~ /\A(ro|rw):(\/.*)\z/
       or die "invalid $key mount '$value'\n";
-   -e $path or die "invalid $key mount path '$path'\n";
+   -e $path or die "invalid $key mount path '$path'\n" unless $remote || $key =~ /\Amount-try\./;
    push @mount, [$key, $mode, $path];
 }
 
@@ -569,21 +673,103 @@ for my $key (sort grep /\Aenv\./, keys %settings) {
    push @environment, [$name, $text];
 }
 
+# SSH and rsh execute their command through a remote shell. Only this fixed
+# launcher goes through that shell; all executable arguments are framed on stdin.
+my $remote_launcher = q{#perl
+   use 5.008004;
+   use POSIX ();
+   use Fcntl qw(F_SETFD);
+   binmode STDIN;
+   my $read = sub {
+      my ($length) = @_;
+      my $data = "";
+      while (length $data < $length) {
+         my $got = sysread STDIN, my $part, $length - length $data;
+         defined $got or die "remote stdin: $!\n";
+         $got or die "short remote startup frame\n";
+         $data .= $part;
+      }
+      $data
+   };
+   my $length = unpack "N", $read->(4);
+   $length <= 1048576 or die "remote startup frame too large\n";
+   my ($home, @command) = unpack "(w/a*)*", $read->($length);
+   @command or die "empty remote command\n";
+   my $agent_index;
+   if (length $home) {
+      for my $i (1 .. $#command - 1) {
+         last if $command[$i] eq "--";
+         if ($command[$i - 1] eq "--ro-bind"
+             && $command[$i] eq "__MCP_REMOTE_AGENT__"
+             && $command[$i + 1] eq "/run/anyevent-mcp/ssh-agent") {
+            $agent_index = $i;
+            last;
+         }
+      }
+   }
+   if (defined $agent_index) {
+      my $source = $ENV{SSH_AUTH_SOCK};
+      if (length $source) {
+         $source =~ m{\A/} && -S $source
+            or die "remote SSH_AUTH_SOCK must name an absolute socket\n";
+         $command[$agent_index] = $source;
+      } else {
+         splice @command, $agent_index - 1, 3;
+         for (my $i = 0; $i < @command; ++$i) {
+            last if $command[$i] eq "--";
+            if ($command[$i] eq "--setenv" && $command[$i + 1] eq "SSH_AUTH_SOCK") {
+               splice @command, $i, 3;
+               last;
+            }
+         }
+      }
+   }
+   my $passwd_fd;
+   if (length $home) {
+      pipe (my $rd, my $wr) or die "passwd pipe: $!\n";
+      print {$wr} "sandbox:x:$<:" . POSIX::getgid () . ":Sandbox:$home:/bin/sh\n"
+         or die "passwd pipe: $!\n";
+      close $wr or die "passwd pipe: $!\n";
+      if (fileno ($rd) != 3) {
+         POSIX::dup2 (fileno ($rd), 3) == 3 or die "passwd dup2: $!\n";
+         close $rd;
+         open $rd, "<&=3" or die "passwd fd: $!\n";
+      }
+      defined fcntl ($rd, F_SETFD, 0) or die "passwd fcntl: $!\n";
+      $passwd_fd = $rd;
+   }
+   exec {$command[0]} @command;
+   die "remote exec $command[0]: $!\n";
+};
+
+sub shell_quote {
+   my ($text) = @_;
+   $text =~ s/'/'"'"'/g;
+   "'$text'"
+}
+
+my $remote_command = shell_quote ($settings{"executable.perl"} || "perl")
+   . " -e " . shell_quote ($remote_launcher);
+
+sub fs_remote_frame {
+   pack "N/a*", pack "(w/a*)*", @_
+}
+
 my ($find, $grep, $patch, $perl, $sed);
 my %vcs_program;
 
 $bwrap //= $settings{"executable.bwrap"} || "bwrap";
 
-if ($sandbox_mode ne "none") {
+if ($sandbox_mode ne "none" && !$remote) {
    my $name = $bwrap;
    $bwrap = find_executable $name;
    die "bubblewrap executable not found: $name\n"
       if !$bwrap && $sandbox_mode eq "bwrap";
-} else {
+} elsif ($sandbox_mode eq "none") {
    undef $bwrap;
 }
 
-my @runtime_path = grep -e, qw(
+my @runtime_path = qw(
    /usr
    /bin
    /sbin
@@ -602,6 +788,7 @@ my @runtime_path = grep -e, qw(
    /etc/hosts
    /etc/resolv.conf
 );
+@runtime_path = grep -e, @runtime_path unless $remote;
 
 my (@workdir, @workdir_identity);
 if (defined $exec_cmd) {
@@ -611,8 +798,14 @@ if (defined $exec_cmd) {
    @workdir_identity = @workdir;
 } else {
    for my $path (@ARGV) {
-      my $workdir = Cwd::abs_path $path;
-      -d $workdir or die "invalid workdir '$path'\n";
+      my $workdir;
+      if ($remote) {
+         $path =~ m{\A/} or die "remote workdirs must be absolute paths\n";
+         $workdir = $path;
+      } else {
+         $workdir = Cwd::abs_path $path;
+         -d $workdir or die "invalid workdir '$path'\n";
+      }
       utf8::decode $workdir or die "workdir is not UTF-8\n";
       my $identity = $path;
       utf8::decode $identity or die "workdir identity is not UTF-8\n";
@@ -642,12 +835,126 @@ unless (defined $exec_cmd) {
    }
 }
 
+my (%remote_program, @remote_vcs_marker, $remote_umask);
+if ($remote) {
+   # Probe once per startup; the local MCP frontend keeps the result.
+   # No remote package beyond core Perl, nor a remote installed mcp-fs.
+   my $probe = q{#perl
+      use 5.008004;
+      use Cwd ();
+      binmode STDOUT;
+
+      my ($path, $mode, $bwrap_name, $nwork) = splice @ARGV, 0, 4;
+      my @work = splice @ARGV, 0, $nwork;
+      my $nmount = shift @ARGV;
+      my @mount = splice @ARGV, 0, $nmount;
+      my $nrun = shift @ARGV;
+      my @runtime = splice @ARGV, 0, $nrun;
+      $ENV{PATH} = $path;
+
+      my $find_executable = sub {
+         my ($name) = @_;
+         my @path = $name =~ m{/} ? ($name)
+            : map { (length $_ ? $_ : ".") . "/$name" } split /:/, $ENV{PATH}, -1;
+         for (@path) {
+            next unless -f $_ && -x _;
+            return m{\A/} ? $_ : Cwd::getcwd () . "/$_";
+         }
+         ""
+      };
+
+      my $home = $ENV{HOME} || (getpwuid $<)[7];
+      $home =~ m{\A/} && -d $home or die "remote HOME is not an absolute directory\n";
+      $home = Cwd::abs_path $home or die "cannot resolve remote HOME\n";
+      my @resolved = map {
+         my $path = Cwd::abs_path $_;
+         -d $path or die "invalid remote workdir '$_'\n";
+         $path
+      } @work;
+      -e $_ or die "invalid remote mount '$_'\n" for @mount;
+
+      my $bwrap = $mode eq "none" ? "" : $find_executable->($bwrap_name);
+      $bwrap or die "remote bubblewrap executable not found: $bwrap_name\n"
+         if $mode eq "bwrap";
+
+      my %marker = (cvs => "CVS", git => ".git", hg => ".hg", svn => ".svn");
+      my @markers = map {
+         my $dir = $_;
+         join ",", grep {
+            lstat "$dir/$marker{$_}" && (-d _ || -l _ || ($_ eq "git" && -f _))
+         } sort keys %marker
+      } @resolved;
+
+      my %test = (
+         find  => [[qw(--version)], qr/^find \(GNU findutils\)/m],
+         grep  => [[qw(--version)], qr/^grep \(GNU grep\)/m],
+         patch => [[qw(--version)], qr/^GNU patch /m],
+         sed   => [[qw(--version)], qr/\(GNU sed\)/],
+      );
+      my @program;
+      while (@ARGV) {
+         my ($name, $wanted, $explicit) = splice @ARGV, 0, 3;
+         my $found = $find_executable->($wanted);
+         if ($found && !$explicit && $test{$name}) {
+            my ($args, $match) = @{$test{$name}};
+            my $ok = open my $fh, "-|", $found, @$args;
+            if ($ok) {
+               my $output = do { local $/; <$fh> };
+               $ok = close $fh && $output =~ $match;
+            }
+            $found = "" unless $ok;
+         }
+         push @program, $found;
+      }
+
+      print pack "N/a*", pack "(w/a*)*",
+         $home, $bwrap, scalar umask, @resolved, @markers,
+         (map { -e $_ ? $_ : "" } @runtime), @program;
+   };
+
+   my @names = qw(perl find grep patch sed git svn cvs hg);
+   my @args = (
+      $sandbox_path, $sandbox_mode, $bwrap, scalar @workdir,
+      @workdir, scalar (grep $_->[0] =~ /\Amount\./, @mount), (map $_->[2], grep $_->[0] =~ /\Amount\./, @mount),
+      scalar @runtime_path, @runtime_path,
+      (map { ($_, $settings{"executable.$_"} || $_, length $settings{"executable.$_"} ? 1 : 0) } @names),
+   );
+   my @command = ($settings{"executable.perl"} || "perl", "-e", $probe, @args);
+   my $pid = IPC::Open2::open2 (my $out, my $in, @rsh, $host, $remote_command);
+   binmode $in;
+   binmode $out;
+   print {$in} fs_remote_frame ("", @command) or die "remote probe input: $!\n";
+   close $in or die "remote probe input: $!\n";
+   my $output = do { local $/; <$out> };
+   close $out;
+   waitpid $pid, 0;
+   $? == 0 or die "remote probe failed (wait status $?)\n";
+   my $declared = unpack "N", substr $output, 0, 4;
+   length ($output) >= 4 && length ($output) == $declared + 4
+      or die "invalid remote probe frame (received " . length ($output)
+         . " bytes, declared $declared, first bytes " . unpack ("H*", substr ($output, 0, 16)) . ")\n";
+   my @values = unpack "(w/a*)*", substr $output, 4;
+   my $expected = 3 + 2 * @workdir + @runtime_path + @names;
+   @values == $expected or die "invalid remote probe result\n";
+   $home = shift @values;
+   $bwrap = shift @values;
+   $remote_umask = shift @values;
+   @workdir = splice @values, 0, @workdir;
+   @remote_vcs_marker = map { [length $_ ? split /,/, $_ : ()] } splice @values, 0, @workdir;
+   @runtime_path = grep length, splice @values, 0, @runtime_path;
+   @remote_program{@names} = @values;
+   for ($home, @workdir, @runtime_path, values %remote_program) {
+      utf8::decode $_ or die "remote path is not UTF-8\n";
+   }
+}
+
 my ($workdir_ids, $workdir_refresh);
 
 unless (defined $exec_cmd) {
+   # IDs represent logical pathnames, not physical symlink destinations.
    $workdir_ids = AnyEvent::MCP::Workdirs->new (
       file => "$config_home/anyevent-mcp/fs-workdir-ids.json",
-      paths => \@workdir,
+      paths => [map File::Spec::Unix->rel2abs ($_), @workdir_identity],
    );
 
    my $interval = .75 * $workdir_ids->{expiry};
@@ -691,7 +998,7 @@ my %sandbox_grant_description = (
 
 my @exec_default_sandbox_grants = ("workdir-read");
 
-my $umask = umask;
+my $umask = $remote ? $remote_umask : umask;
 
 my $permissions;
 $permissions = AnyEvent::MCP::Server::Permissions->new (
@@ -809,6 +1116,15 @@ sub fs_effective_grants {
 sub fs_permission_dimensions {
    my ($workdir, $subject, $choices) = @_;
    my %dimensions;
+
+   if ($remote) {
+      my $host_id = "remote $rsh $host";
+      $dimensions{host} = {
+         label => "Host", value => $host_id,
+         choices => [{ label => "This remote host and transport", match => $host_id }],
+      };
+      $workdir = "$host_id:$workdir" if defined $workdir;
+   }
 
    $dimensions{workdir} = {
       label => "Workdir", value => $workdir,
@@ -933,7 +1249,7 @@ sub fs_sandbox {
       if ($have->{"shared-tmp"} && !$have->{"world-write"}) {
          push @command, "--bind-try", $tmp, $tmp;
       } elsif (!$have->{"world-read"}
-         && !(grep $_->[2] eq $tmp, @mount)) {
+         && !(grep $_->[2] eq $tmp && $_->[0] =~ /\Amount\./, @mount)) {
          push @command, "--tmpfs", $tmp;
       }
    }
@@ -951,7 +1267,8 @@ sub fs_sandbox {
       for my $entry (@mount) {
          my ($key, $mode, $path) = @$entry;
          next if $mode eq "ro" && ($have->{"world-read"} || fs_writable $workdir, $path, $have);
-         push @command, ($mode eq "rw" ? "--bind" : "--ro-bind"), $path, $path;
+         push @command, ($mode eq "rw" ? "--bind" : "--ro-bind")
+            . ($key =~ /\Amount-try\./ ? "-try" : ""), $path, $path;
       }
    }
 
@@ -960,7 +1277,10 @@ sub fs_sandbox {
 
    my $agent_socket;
    if ($have->{"ssh-agent"}) {
-      if (length $ENV{SSH_AUTH_SOCK}) {
+      if ($remote) {
+         $agent_socket = "/run/anyevent-mcp/ssh-agent";
+         push @command, "--ro-bind", "__MCP_REMOTE_AGENT__", $agent_socket;
+      } elsif (length $ENV{SSH_AUTH_SOCK}) {
          $ENV{SSH_AUTH_SOCK} =~ m{\A/} && -S $ENV{SSH_AUTH_SOCK}
             or die "SSH_AUTH_SOCK must name an absolute existing socket\n";
          my $source = $ENV{SSH_AUTH_SOCK};
@@ -1073,26 +1393,28 @@ my $probe = q{#perl
 
 my @names = qw(perl find grep patch sed git svn cvs hg);
 my $perl_name = $settings{"executable.perl"} || "perl";
-my @command = ($bwrap ? (fs_sandbox $workdir[0], []) : (),
-   $perl_name, "-e", $probe,
-   map { ($_, $settings{"executable.$_"} || $_, length $settings{"executable.$_"} ? 1 : 0) } @names);
-my $pid = open my $fh, "-|";
-defined $pid or die "Perl probe fork: $!\n";
+my %program = %remote_program;
+unless ($remote) {
+   my @command = ($bwrap ? (fs_sandbox $workdir[0], []) : (),
+      $perl_name, "-e", $probe,
+      map { ($_, $settings{"executable.$_"} || $_, length $settings{"executable.$_"} ? 1 : 0) } @names);
+   my $pid = open my $fh, "-|";
+   defined $pid or die "Perl probe fork: $!\n";
 
-unless ($pid) {
-   my $passwd_fd = fs_passwd_fd () if $bwrap;
-   exec {$command[0]} @command;
-   warn "exec $command[0]: $!\n";
-   POSIX::_exit 126;
+   unless ($pid) {
+      my $passwd_fd = fs_passwd_fd () if $bwrap;
+      exec {$command[0]} @command;
+      warn "exec $command[0]: $!\n";
+      POSIX::_exit 126;
+   }
+
+   my $output = do { local $/; <$fh> };
+   close $fh or die "Perl '$perl_name' cannot run in the worker environment\n";
+   my @paths = split /\0/, $output, -1;
+   @paths == @names + 1 && pop @paths eq ""
+      or die "invalid Perl executable probe response\n";
+   @program{@names} = @paths;
 }
-
-my $output = do { local $/; <$fh> };
-close $fh or die "Perl '$perl_name' cannot run in the worker environment\n";
-my @paths = split /\0/, $output, -1;
-@paths == @names + 1 && pop @paths eq ""
-   or die "invalid Perl executable probe response\n";
-my %program;
-@program{@names} = @paths;
 $program{perl} or die "Perl interpreter not found inside the sandbox\n";
 ($find, $grep, $patch, $perl, $sed) = @program{qw(find grep patch perl sed)};
 warn "$_: not detected or wrong version\n"
@@ -1108,6 +1430,12 @@ AnyEvent::detect; # proc_spawn creates child watchers after they might have died
 # the independent child watcher remains alive until the child is reaped.
 sub proc_spawn {
    my ($program, @argv) = @_;
+
+   my $remote_input;
+   if ($remote) {
+      $remote_input = fs_remote_frame ($bwrap ? $home : "", $program, @argv);
+      ($program, @argv) = (@rsh, $host, $remote_command);
+   }
 
    my ($parent, $child) = AnyEvent::Util::portable_socketpair
       or die "socketpair: $!\n";
@@ -1127,8 +1455,8 @@ sub proc_spawn {
       close $child;
       close $child_error;
 
-      my $passwd_fd = fs_passwd_fd () if $bwrap;
-      AnyEvent::Util::close_all_fds_except (0, 1, 2, ($bwrap ? 3 : ()));
+      my $passwd_fd = fs_passwd_fd () if $bwrap && !$remote;
+      AnyEvent::Util::close_all_fds_except (0, 1, 2, ($bwrap && !$remote ? 3 : ()));
 
       exec {$program} $program, @argv;
       print STDERR "exec $program: $!\n";
@@ -1152,6 +1480,7 @@ sub proc_spawn {
 
    $io->{proc}     = $proc;
    $io->{proc_err} = $err;
+   $io->push_write ($remote_input) if $remote;
 
    $io
 }
@@ -1185,8 +1514,8 @@ sub proc_on_exit {
    $proc->{done} = $done;
 }
 
-# Run a one-shot subprocess, leaving output interpretation to the caller.
-# The stream callbacks consume rbuf and may return true to terminate the child.
+# run a one-shot subprocess, leaving output interpretation to the caller.
+# the stream callbacks consume rbuf and may return true to terminate the child.
 sub proc_run {
    my ($req, $command, $input, $timeout, $on_stdout, $on_stderr, $done) = @_;
 
@@ -1265,7 +1594,7 @@ sub proc_run {
    proc_on_exit $proc, $complete;
 }
 
-# Run a subprocess and collect bounded output.
+# run a subprocess and collect bounded output.
 sub fs_run {
    my ($req, $command, $input, $timeout, $byte_limit, $line_limit, $done) = @_;
 
@@ -1580,7 +1909,7 @@ sub fs_command {
 
    my @command = ((fs_sandbox $workdir, $grants),
       $bwrap ? @$argv
-         : ($^X, "-e", 'chdir shift or die "chdir: $!"; exec @ARGV; die "exec: $!";', $workdir, @$argv));
+         : ($remote ? $perl : $^X, "-e", 'chdir shift or die "chdir: $!"; exec @ARGV; die "exec: $!";', $workdir, @$argv));
    my ($stdout, $stderr) = ("", "");
    my ($stdout_cut, $stderr_cut);
 
@@ -1681,7 +2010,7 @@ sub fs_result {
 }
 
 mcp_tool workdirs =>
-   "List workdirs, local VCS markers (no parent/recursive search), available VCS clients, sandbox grants, trusted mounts, runtime paths.",
+   "List workdirs, VCS markers (remote snapshot at startup), available VCS clients, sandbox grants, trusted mounts, runtime paths.",
    {
       type                 => "object",
       properties           => {},
@@ -1692,16 +2021,17 @@ mcp_tool workdirs =>
 
       AE::log debug => "fs workdirs";
 
-      # report local metadata markers, not an inferred repository for the tree.
+      # report metadata markers, not an inferred repository for the tree.
       my %marker = (cvs => "CVS", git => ".git", hg => ".hg", svn => ".svn");
       my %workdir_vcs = map {
          my $i = $_;
-         ($workdir_identity[$i] => [grep {
+         ($workdir_identity[$i] => $remote ? $remote_vcs_marker[$i] : [grep {
             lstat "$workdir[$i]/$marker{$_}" && (-d _ || -l _ || ($_ eq "git" && -f _))
          } sort keys %marker])
       } 0 .. $#workdir;
 
       $req->reply (fs_result +{
+         ($remote ? (host => $host, rsh => $rsh) : ()),
          workdirs                   => { map { $workdir_ids->{ids}[$_] => $workdir_identity[$_] } reverse 0 .. $#workdir },
          resolved_workdirs          => { map { $workdir_ids->{ids}[$_] => $workdir[$_] } 0 .. $#workdir },
          workdir_vcs                => \%workdir_vcs,
@@ -1787,7 +2117,7 @@ sub fs_list_find {
    my $tool = $recurse ? "find" : "list";
 
    my ($workdir, $identity) = fs_workdir $args->{workdir};
-   my $path = fs_path $workdir, $args->{path} // ".";
+   my $path = fs_path $workdir, length $args->{path} ? $args->{path} : ".";
    my $limit = $args->{limit} // 200;
    $limit <= 1000
       or die "invalid limit\n";
@@ -1889,7 +2219,7 @@ $find && mcp_tool list =>
       properties           => {
          path   => {
             type        => "string",
-            description => "Directory; default: selected workdir.",
+            description => "Directory; omitted/empty = .",
          },
          limit  => {
             type    => "integer",
@@ -1917,7 +2247,7 @@ $find && mcp_tool find =>
       properties           => {
          path   => {
             type        => "string",
-            description => "Search root; default: selected workdir.",
+            description => "Search root; omitted/empty = .",
          },
          name   => {
             type        => "string",
@@ -2459,7 +2789,7 @@ my $file_patch = q{#perl
       }
    };
 
-   # Deliberately self-contained: patch validation must not load host modules.
+   # deliberately self-contained: patch validation must not load host modules.
    my $check_patch_output = sub {
       my ($status, $output, @max_offset) = @_;
       my (@hunks, @unparsed);
@@ -2681,7 +3011,7 @@ $find && $grep && mcp_tool grep =>
       properties           => {
          path    => {
             type        => "string",
-            description => "Search root; default: selected workdir.",
+            description => "Search root; omitted/empty = .",
          },
          pattern => {
             type      => "string",
@@ -2712,7 +3042,7 @@ $find && $grep && mcp_tool grep =>
       my ($req, $args) = @_;
 
       my ($workdir, $identity) = fs_workdir $args->{workdir};
-      my $path = fs_path $workdir, $args->{path} // ".";
+      my $path = fs_path $workdir, length $args->{path} ? $args->{path} : ".";
       my $mode = $args->{mode} // "fixed";
       $mode eq "fixed" or $mode eq "pcre"
          or die "invalid grep mode\n";
@@ -3002,8 +3332,8 @@ for my $operation (qw(diff status log)) {
          type => "object",
          properties => {
             workdir => $workdir_schema,
-            cwd => { type => "string", default => ".", minLength => 1,
-               description => "cwd relative to workdir; must stay inside. Mount boundary unchanged." },
+            cwd => { type => "string", default => ".",
+               description => "cwd relative to workdir; empty = .; must stay inside. Mount boundary unchanged." },
             backend => { type => "string", enum => [qw(git svn cvs hg)] },
             files => { type => "array", items => { type => "string" }, default => [] },
             %output_schema,
@@ -3021,7 +3351,7 @@ for my $operation (qw(diff status log)) {
             or die "$backend executable is unavailable\n";
          my $output = fs_output_options $args;
          my ($workdir, $identity) = fs_workdir $args->{workdir};
-         my $cwd = fs_path $workdir, $args->{cwd} // ".";
+         my $cwd = fs_path $workdir, length $args->{cwd} ? $args->{cwd} : ".";
          fs_inside $cwd, $workdir or die "VCS cwd must stay within the selected workdir\n";
          my $files = $args->{files} // [];
          ref $files eq "ARRAY" or die "files must be an array of filenames\n";
@@ -3075,7 +3405,6 @@ for my $operation (qw(diff status log)) {
 mcp_config
    name        => $name,
    idle_exit   => 300,
-   max_size    => 8 * 1024 * 1024, # 4 MiB binary stdin expands to ~5.6 MiB of Base64 JSON.
    server_name    => "mcp-fs",
    server_version => 0,
    permissions => $permissions,

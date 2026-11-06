@@ -5,7 +5,7 @@
 # Coverage targets (from Devel::Cover analysis):
 #   Line 233  bran/cond -- import() caller guard (empty/undef caller)
 #   Line 348  cond l&&!r -- new('') defined-but-empty class name
-#   Line 352  cond l&&!r -- new() production context: harness_bypass=1,
+#   Line 352  cond l&&!r -- new() context: harness_bypass=1 (pre-0.03 default),
 #                           HARNESS_ACTIVE unset, BYPASS=0
 #   Line 420  cond l&&!r -- check_abstract('') defined-but-empty class name
 #   Line 423  cond l&&!r -- check_abstract() same production context
@@ -204,7 +204,7 @@ subtest 'check_abstract("") -- defined-but-empty class name croaks' => sub {
 # SECTION 3: Production scenario
 #
 # The 'l&&!r' condition for the bypass guard in new() and check_abstract() is:
-#   $config{harness_bypass} is truthy (default=1)
+#   $config{harness_bypass} is truthy (set explicitly; the pre-0.03 default)
 #   $ENV{HARNESS_ACTIVE} is NOT set (empty string or undef)
 #
 # This is the real-world production scenario: code runs outside a test harness
@@ -219,7 +219,7 @@ subtest 'production scenario -- enforcement fires with defaults outside harness'
 	diag 'Testing production context: BYPASS=0, harness_bypass=1, HARNESS_ACTIVE=""'
 		if $ENV{TEST_VERBOSE};
 
-	# new(): BYPASS=0, harness_bypass=1 (default), HARNESS_ACTIVE="" (not in harness)
+	# new(): BYPASS=0, harness_bypass=1 (pre-0.03 default), HARNESS_ACTIVE="" (not in harness)
 	{
 		local $Class::Abstract::BYPASS                 = 0;
 		local $Class::Abstract::config{harness_bypass} = $config{harness_bypass_on};

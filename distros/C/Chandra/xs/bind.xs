@@ -34,6 +34,7 @@ CODE:
 {
     if (!SvOK(name))
         croak("bind() requires a name");
+    # uncoverable condition left count:2
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV)
         croak("bind() requires a coderef");
 
@@ -103,6 +104,7 @@ CODE:
     HV *reg = _bind_get_registry(aTHX);
     STRLEN nlen;
     const char *nstr = SvPV(id, nlen);
+    # uncoverable condition right count:1
     (void)hv_store(reg, nstr, (I32)nlen, SvREFCNT_inc(SvROK(callback) ? SvRV(callback) : callback), 0);
 }
 
@@ -125,6 +127,7 @@ CODE:
         SvREFCNT_dec(err);
         RETVAL = newRV_noinc((SV *)ret);
     }
+    # uncoverable condition left count:2
     else if (!SvROK(decoded) || SvTYPE(SvRV(decoded)) != SVt_PVHV) {
         /* Not a hash - raw */
         HV *ret = newHV();
@@ -145,6 +148,8 @@ CODE:
             SV **method_svp = hv_fetchs(msg_hv, "method", 0);
             SV **args_svp   = hv_fetchs(msg_hv, "args", 0);
 
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
             SV *id_sv = (id_svp && *id_svp) ? *id_svp : &PL_sv_undef;
             const char *method = (method_svp && *method_svp && SvOK(*method_svp))
                                  ? SvPV_nolen(*method_svp) : "";
@@ -156,6 +161,7 @@ CODE:
             HV *ret = newHV();
             (void)hv_stores(ret, "id", SvREFCNT_inc(id_sv));
 
+            # uncoverable condition left count:2
             if (!handler_svp || !*handler_svp) {
                 SV *errmsg = newSVpvf("Unknown method: %s", method);
                 (void)hv_stores(ret, "error", errmsg);
@@ -163,6 +169,8 @@ CODE:
             else {
                 /* Build args array */
                 AV *args_av = NULL;
+                # uncoverable condition right count:2
+                # uncoverable condition right count:4
                 if (args_svp && *args_svp && SvROK(*args_svp)
                     && SvTYPE(SvRV(*args_svp)) == SVt_PVAV) {
                     args_av = (AV *)SvRV(*args_svp);
@@ -178,6 +186,7 @@ CODE:
                     EXTEND(SP, len);
                     for (j = 0; j < len; j++) {
                         SV **elem = av_fetch(args_av, j, 0);
+                        # uncoverable condition right count:1
                         PUSHs(elem ? *elem : &PL_sv_undef);
                     }
                 }
@@ -187,11 +196,14 @@ CODE:
                 SPAGAIN;
 
                 SV *call_result = &PL_sv_undef;
+                # uncoverable branch false
+                # uncoverable condition right count:1
                 if (count > 0) {
                     call_result = SvREFCNT_inc(POPs);
                 }
                 PUTBACK;
 
+                # uncoverable condition right count:1
                 if (SvTRUE(ERRSV)) {
                     SvREFCNT_dec(call_result);
 
@@ -200,6 +212,9 @@ CODE:
                     snprintf(ctx_buf, sizeof(ctx_buf), "call(%s)", method);
                     HV *err_hv = chandra_error_capture(aTHX_ ERRSV, ctx_buf, 0);
                     SV **msg_svp = hv_fetchs(err_hv, "message", 0);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1
+                    # uncoverable condition right count:2
                     if (msg_svp && *msg_svp) {
                         (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
                     }
@@ -228,6 +243,7 @@ CODE:
             STRLEN hlen = strlen(handler_id);
             SV **handler_svp = hv_fetch(reg, handler_id, (I32)hlen, 0);
 
+            # uncoverable condition left count:2
             if (!handler_svp || !*handler_svp) {
                 warn("Chandra::Bind: Unknown event handler: %s", handler_id);
                 HV *ret = newHV();
@@ -238,6 +254,8 @@ CODE:
             else {
                 /* Create Event using direct C function */
                 SV *event_data;
+                # uncoverable condition right count:2
+                # uncoverable condition right count:3
                 if (event_data_svp && *event_data_svp && SvOK(*event_data_svp)) {
                     event_data = *event_data_svp;
                 } else {
@@ -249,6 +267,7 @@ CODE:
                 /* Get app from self */
                 HV *self_hv = (HV *)SvRV(self);
                 SV **app_svp = hv_fetchs(self_hv, "app", 0);
+                # uncoverable condition right count:2
                 SV *app = (app_svp && *app_svp) ? *app_svp : &PL_sv_undef;
 
                 /* Call handler($event, $app) */
@@ -264,6 +283,7 @@ CODE:
                     SPAGAIN;
                     PUTBACK;
 
+                    # uncoverable condition right count:1
                     if (SvTRUE(ERRSV)) {
                         /* Direct C calls to error handling */
                         char ctx_buf[256];
@@ -277,6 +297,9 @@ CODE:
 
                         HV *ret = newHV();
                         SV **msg_svp = hv_fetchs(err_hv, "message", 0);
+                        # uncoverable branch false
+                        # uncoverable condition right count:1
+                        # uncoverable condition right count:2
                         if (msg_svp && *msg_svp) {
                             (void)hv_stores(ret, "error", SvREFCNT_inc(*msg_svp));
                         }

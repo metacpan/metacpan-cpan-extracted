@@ -7,17 +7,17 @@ AnyEvent::MCP::Config - named servers and derived MCP credentials
    use AnyEvent::MCP::Config;
 
    my $config = AnyEvent::MCP::Config->global;
-   my $token = $config->credential ("token", "agni");
+   my $token = $config->user_credentials ("agni")->[0][2];
    my $url = $config->http_url ("agni", undef, path => "/");
 
 =head1 DESCRIPTION
 
 An MCP server and its clients often need matching credentials. Rather than
 maintaining a separate password for each server and user, this module can
-derive them from one private master secret. The invoked program basename,
-instance name, optional username and credential purpose each contribute to
-the result. Instances default to C<default>; different programs still derive
-different credentials for that instance name.
+derive them from one private master secret. Users are defined by
+C<user.NAME = GENERATION> in C<[global]>, C<[program PROGRAM]> or
+C<[instance NAME]>, in that order of precedence. An absent global
+C<user.default> is implicitly enabled at generation 1.
 
 The shared file format is described in L<AnyEvent::MCP/GLOBAL CONFIGURATION>.
 Loading this module does not read any files. The first call to C<global>
@@ -100,7 +100,9 @@ changes every result derived from it.
 
 Derives a 32-byte credential, returned as unpadded URL-safe Base64.
 C<$purpose> is C<token>. C<$name> is the instance name, and C<$username>
-is optional. The default server credential is derived with no username.
+is optional. This is the older unmanaged derivation API; its result is not
+automatically accepted by a server. Managed credentials are enumerated by
+C<user_credentials>.
 
 Credentials use the context C<("anyevent-mcp", "token", PROGRAM, NAME, USER)>.
 PROGRAM is the invoked basename, with a trailing C<.pl> or C<.perl> removed.
@@ -108,6 +110,26 @@ Changing the program or instance name changes the credential.
 A credential derived with C<$username> is B<not> automatically accepted
 by the server. This method neither requires a server section nor configures
 authentication.
+
+=item $users = $config->users ($instance, $program)
+
+Return effective user definitions keyed by username, each with C<scope>
+(global, program or instance) and signed C<generation>. Inheritance is
+global, program, instance; a negative generation disables without fallback.
+
+=item $credentials = $config->user_credentials ($instance, $program)
+
+Return enabled users as C<[[USERNAME, PRINCIPAL, TOKEN]...]> with default
+first. The principal is C<global:NAME>, C<program:NAME>, or C<instance:NAME>.
+HKDF context includes program, instance, scope, user and generation. Rotating
+a generation changes the token but preserves saved user permissions.
+
+=item $user = $config->connect_user ($instance, $program)
+
+Return the username allowed to register private Vim, browser WebSocket, or
+multibroker reverse-MCP connections. C<connect_user> inherits through the
+usual scopes and defaults to C<default>. Revoking that user disables these
+connections until its generation is renewed or another user is selected.
 
 =item $program = AnyEvent::MCP::Config::program_name ()
 
@@ -164,14 +186,16 @@ C<auth =E<gt> "none"> do not require that persistence check.
 package AnyEvent::MCP::Config;
 
 use common::sense;
-use AnyEvent::MCP ();
+
 use Digest::SHA ();
 use MIME::Base64 ();
 use File::Basename ();
 use File::Path ();
 use Fcntl qw(O_WRONLY O_RDWR O_CREAT O_EXCL LOCK_EX);
 use Errno qw(ENOENT);
+
 use AnyEvent::Socket ();
+use AnyEvent::MCP ();
 
 our @ISA = qw(AnyEvent::MCP::Base);
 
@@ -220,7 +244,6 @@ sub _read {
       my $section = $self->{section}{$name || "global"} ||= {};
       %$section = (%$section, %$kv);
    }, $self->{file};
-
 }
 
 sub _ensure_secret {
@@ -349,10 +372,72 @@ sub credential {
    $credential
 }
 
+sub users {
+   my ($self, $name, $program) = @_;
+
+   $name = server_name $name;
+   $program //= program_name;
+   my %users = (default => { scope => "global", generation => 1 });
+
+   for my $entry (
+      ["global", $self->{section}{global}],
+      ["program", $self->{section}{"program $program"}],
+      ["instance", $self->{section}{"instance $name"}],
+   ) {
+      my ($scope, $section) = @$entry;
+      next unless $section;
+
+      for my $key (grep /\Auser\./, keys %$section) {
+         my ($user) = $key =~ /\Auser\.([A-Za-z_][A-Za-z0-9_-]*)\z/
+            or die "Invalid MCP user '$key'\n";
+         my $generation = $section->{$key};
+         $generation =~ /\A-?[1-9][0-9]*\z/ && length $generation < 18
+            or die "Invalid MCP user generation for '$key'\n";
+         $users{$user} = { scope => $scope, generation => $generation };
+      }
+   }
+
+   \%users
+}
+
+sub user_credentials {
+   my ($self, $name, $program) = @_;
+
+   $name = server_name $name;
+   $program //= program_name;
+   my $users = $self->users ($name, $program);
+   my @credentials;
+
+   for my $user (sort { ($a ne "default") <=> ($b ne "default") || $a cmp $b } keys %$users) {
+      my $info = $users->{$user};
+      next unless $info->{generation} > 0;
+      my $token = MIME::Base64::encode_base64 ($self->derive_secret (
+         32, "user-token-v1", AnyEvent::MCP::utf8enc ($program),
+         AnyEvent::MCP::utf8enc ($name), $info->{scope},
+         AnyEvent::MCP::utf8enc ($user), "$info->{generation}"
+      ), "");
+      $token =~ y!+/=!-_!d;
+      push @credentials, [$user, "$info->{scope}:$user", $token];
+   }
+
+   \@credentials
+}
+
+sub connect_user {
+   my ($self, $name, $program) = @_;
+
+   $name = server_name $name;
+   $program //= program_name;
+   my $user = $self->{section}{"instance $name"}{connect_user}
+      // $self->{section}{"program $program"}{connect_user}
+      // $self->{section}{global}{connect_user} // "default";
+   server_name $user
+}
+
 sub http_getopt {
    my ($name, $bind, $print_url, $tokens) = @_;
 
-   "name=s" => $name, "bind=s" => $bind, "print-url" => $print_url, "token=s@" => $tokens
+   "name=s" => $name, "bind=s" => $bind, "print-url|print-urls:s" => $print_url, "token=s@" => $tokens
 }
 
 sub auto_rules {
@@ -415,7 +500,7 @@ sub http_settings {
 
    my %kv = (
       (map { exists $settings->{$_} ? ($_ => $settings->{$_}) : () }
-         qw(path url_host url_scheme)),
+         qw(path url_host url_scheme tls_cert tls_key)),
       name => $name,
       host => $host,
       port => $service,
@@ -432,9 +517,16 @@ sub http_settings {
       $kv{host} = AnyEvent::Socket::format_address $address;
    }
 
-   $kv{tokens} = [exists $settings->{tokens}
-      ? split /\s*,\s*/, $settings->{tokens}, -1
-      : $self->credential ("token", $name)];
+   if (exists $settings->{tokens}) {
+      $kv{tokens} = [split /\s*,\s*/, $settings->{tokens}, -1];
+      $kv{connect_tokens} = $kv{tokens};
+   } else {
+      my $credentials = $self->user_credentials ($name);
+      $kv{tokens} = [map $_->[2], @$credentials];
+      $kv{token_users} = { map { $_->[2] => $_->[1] } @$credentials };
+      my $connect = $self->connect_user ($name);
+      $kv{connect_tokens} = [map $_->[2], grep $_->[0] eq $connect, @$credentials];
+   }
 
    %kv
 }
@@ -448,7 +540,8 @@ sub http_url {
    if (($options{auth} || "") ne "none"
       && !exists $options{tokens}
       && !exists $self->{section}{"instance $name"}{tokens}
-      && !exists $self->{section}{"program " . program_name ()}{tokens}) {
+      && !exists $self->{section}{"program " . program_name ()}{tokens}
+      && !exists $self->{section}{global}{tokens}) {
       my $stored = (ref $self)->new (file => $self->{file});
       $stored->{section}{global}{secret} eq $self->{section}{global}{secret}
          or die "MCP master secret is not persistently stored in $self->{file}\n";

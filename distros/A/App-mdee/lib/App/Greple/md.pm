@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.15";
+our $VERSION = "1.16";
 
 =encoding utf-8
 
@@ -51,6 +51,10 @@ background color.
 For a complete Markdown viewing experience with line folding,
 multi-column output, and themes, see L<App::mdee>, which uses this
 module as its highlighting engine.
+
+Control characters and escape sequences in the file, which could change
+the title or the clipboard or clear the screen, are removed before
+anything else, and so are not shown.  Colors stay.
 
 =head1 COMMAND OPTIONS
 
@@ -259,6 +263,8 @@ Available parameters:
     osc8            OSC 8 hyperlinks (default: 1)
     heading_markup  inline markup in headings (default: 0)
                     0=off, 1/all=all, or colon-separated steps
+    cjk_friendly    markdown-cjk-friendly rules for * and **
+                    emphasis (default: 0)
     tick_open       inline code open marker (default: `)
     tick_close      inline code close marker (default: ´)
     nofork          nofork+raw mode for code ref calls (default: 1)
@@ -313,10 +319,10 @@ Colors follow L<Term::ANSIColor::Concise> format.
     LABEL   LIGHT                    DARK
     h1      L25D/${base};E           L00D/${base};E
     h2      L25D/${base}+y20;E       L00D/${base}-y15;E
-    h3      L25DN/${base}+y30        L00DN/${base}-y25
+    h3      L25DN/${base}+y20        L00DN/${base}-y15
     h4      ${base}UD                ${base}UD
-    h5      ${base}U                 ${base}U
-    h6      ${base}                  ${base}
+    h5      ${base}UD                ${base}UD
+    h6      ${base}D                 ${base}D
 
 =head2 Inline Formatting
 
@@ -336,6 +342,14 @@ to C<emphasis_mark>.  Define them via C<--cm> to override per type:
 
     greple -Mmd --cm emphasis_mark=R -- file.md    # all markers red
     greple -Mmd --cm bold_mark=G -- file.md        # bold markers green
+
+C<*> and C<**> start and end emphasis as in CommonMark: a delimiter
+next to a letter on one side and punctuation on the other does not
+count, so C<L*=50, a*=68> is not italic.  In Japanese text this also
+rejects C<日本語の*「強調」*です> and C<日本語の**強調。**です>, as
+pandoc does.  With C<cjk_friendly=1>, the rules of
+L<markdown-cjk-friendly|https://github.com/tats-u/markdown-cjk-friendly>
+are used instead, and these are emphasis.
 
 =head2 Code
 
@@ -404,6 +418,16 @@ ANSI-aware text folding used for line wrapping in list items.
 Finds the paragraphs for C<refill=1> with L<CommonMark>,
 L<Markdown::Perl> or L<pandoc|https://pandoc.org>.
 
+=item L<CommonMark Spec 0.31.2, Emphasis and strong emphasis|https://spec.commonmark.org/0.31.2/#emphasis-and-strong-emphasis>
+
+The rules that C<*> and C<**> follow by default.
+
+=item L<CommonMark CJK-friendly Amendments|https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md>
+
+The rules that C<cjk_friendly=1> follows.  The proposal comes from
+L<commonmark-spec issue #650, Emphasis with CJK punctuation|https://github.com/commonmark/commonmark-spec/issues/650>,
+open since 2020.
+
 =back
 
 =head1 AUTHOR
@@ -420,6 +444,7 @@ it under the same terms as Perl itself.
 =cut
 
 use URI::Escape;
+use Text::ANSI::Fold qw($csi_re $osc_re);
 use Text::ANSI::Fold::Util qw(ansi_width);
 use Getopt::EX::Config;
 use Getopt::EX::Colormap;
@@ -461,6 +486,7 @@ my $config = Getopt::EX::Config->new(
     table_style     => 'lattice', # lattice (or pipe): column separators; 3line, simple: spaces and rules only
     nofork          => 1,        # use nofork+raw for code ref calls
     heading_markup  => 0,        # inline formatting in headings
+    cjk_friendly    => 0,        # markdown-cjk-friendly rules for * and ** emphasis
     tick_open       => '`',      # inline code open marker
     tick_close      => "\x{b4}", # inline code close marker (´)
     hashed          => { h1 => 0, h2 => 0, h3 => 0, h4 => 0, h5 => 0, h6 => 0 },
@@ -488,10 +514,10 @@ my %default_colors = (
     image_link      => 'I',
     h1              => 'L25D/${base};E',
     h2              => 'L25D/${base}+y20;E',
-    h3              => 'L25DN/${base}+y30',
+    h3              => 'L25DN/${base}+y20',
     h4              => '${base}UD',
-    h5              => '${base}U',
-    h6              => '${base}',
+    h5              => '${base}UD',
+    h6              => '${base}D',
     bold            => 'D',
     italic          => 'I',
     strike          => 'X',
@@ -508,10 +534,10 @@ my %dark_overrides = (
     code_inline     => 'L25/L05',
     h1              => 'L00D/${base};E',
     h2              => 'L00D/${base}-y15;E',
-    h3              => 'L00DN/${base}-y25',
+    h3              => 'L00DN/${base}-y15',
     h4              => '${base}UD',
-    h5              => '${base}U',
-    h6              => '${base}',
+    h5              => '${base}UD',
+    h6              => '${base}D',
     emphasis_mark   => 'L10',
 );
 
@@ -546,7 +572,7 @@ sub finalize {
                        "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
                        "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s",
-                       "heading_markup|hm:s", "tick_open=s", "tick_close=s",
+                       "heading_markup|hm:s", "cjk_friendly!", "tick_open=s", "tick_close=s",
                        "hashed=s%",
                        "colormap|cm=s" => \@opt_cm,
                        "show=s%" => \%show);
@@ -713,6 +739,32 @@ my $CODE = qr{(?x)
 # patterns from matching inside them.
 my $SKIP_CODE = qr{$CODE (*SKIP)(*FAIL)}x;
 
+# Delimiters of * and ** emphasis (CommonMark 0.31.2, 6.2): an opener
+# must be left-flanking and a closer right-flanking, so that
+# "L*=50, a*=68" is not italic.  Punctuation is Unicode punctuation and
+# symbols.  An opener after $tight (neither a space nor punctuation)
+# cannot have punctuation after it, and a closer before $tight cannot
+# have punctuation before it.
+#
+# With cjk_friendly=1 the amendments of markdown-cjk-friendly apply:
+# CJK punctuation does not count, and a CJK character is as good as a
+# space on the other side, so that "日本語の*「強調」*です" is italic.
+# See CLAUDE.md.
+my $EMOJI = eval q{ qr/\p{Emoji_Presentation}/ } // qr/(?!)/;  # not in old perl
+my $CJK   = qr/(?:(?!$EMOJI)[\p{EA=W}\p{EA=F}\p{EA=H}]|\p{Hangul})/;
+
+sub flanking {
+    my $d = quotemeta shift;
+    my($punct, $tight) = $config->{cjk_friendly}
+        ? (qr/(?!$CJK)[\p{P}\p{S}]/, qr/(?!$CJK)[^\s\p{P}\p{S}]/)
+        : (qr/[\p{P}\p{S}]/,         qr/[^\s\p{P}\p{S}]/);
+    # A link or a code span is a protect() placeholder by now; its
+    # ends stand for the punctuation that delimits it in the text.
+    my($ps, $pe) = (qr/\e\[256m/, qr/\e\[m/);
+    (qr/(?:(?<!$tight)|(?<=$pe)|(?!$d(?:$punct|$ps)))$d(?=\S)/,
+     qr/(?<=\S)(?:(?<!$punct)(?<!$pe)|(?!$d(?!$ps)$tight))$d/);
+}
+
 #
 # colorize() - the main function
 #
@@ -827,7 +879,9 @@ my %colorize = (
     }),
 
     bold => Step(bold => sub {
-        s{$SKIP_CODE|(?<!\\)(?<m>\*\*)(?<t>.*?)(?<!\\)\g{m}}{
+        my($open, $close) = flanking('**');
+        # no opener inside, so that a closer pairs with the nearest opener
+        s{$SKIP_CODE|(?<!\\)(?<m>$open)(?<t>(?:(?!$open).)*?)(?<!\\)$close}{
             mark_color('bold', $+{m}) . md_color('bold', $+{t}) . mark_color('bold', $+{m})
         }gep;
         s{$SKIP_CODE|(?<![\\\w])(?<m>__)(?<t>.*?)(?<!\\)\g{m}(?!\w)}{
@@ -836,10 +890,11 @@ my %colorize = (
     }),
 
     italic => Step(italic => sub {
+        my($open, $close) = flanking('*');
         s{$SKIP_CODE|(?<![\\\w])(?<m>_)(?<t>(?:(?!_).)+)(?<!\\)\g{m}(?!\w)}{
             mark_color('italic', $+{m}) . md_color('italic', $+{t}) . mark_color('italic', $+{m})
         }gep;
-        s{$SKIP_CODE|(?<![\\*])(?<m>\*)(?<t>(?:(?!\*).)+)(?<!\\)\g{m}(?!\*)}{
+        s{$SKIP_CODE|(?<![\\*])(?<m>$open)(?<t>(?:(?!\*).)+)(?<!\\)$close(?!\*)}{
             mark_color('italic', $+{m}) . md_color('italic', $+{t}) . mark_color('italic', $+{m})
         }gep;
     }),
@@ -1062,7 +1117,32 @@ sub refill_regions {
 }
 
 
+# What a file must not send to the terminal: everything but colors, and the
+# mark of protect(), which would bring back or look for protected text.
+my $STRING = qr{
+    (?: \e [PX^_] | [\x90\x98\x9e\x9f] )            # DCS, SOS, PM, APC
+    (?: [^\x00-\x07\x0e-\x1f\x7f-\x9f]*+ (?: \e\\ | \x9c | \a ) )?
+}x;
+my $CONTROLS = qr{
+    \e \[ (?! 256m ) [0-9:;]* m (*SKIP)(*FAIL)
+  |
+    $osc_re
+  |
+    $STRING
+  |
+    $csi_re
+  |
+    \e [\x20-\x2f]* [\x30-\x7e]
+  |
+    [\x00-\x08\x0b\x0e-\x1f\x7f-\x9f]
+}x;
+
+sub remove_controls {
+    s/$CONTROLS//g;
+}
+
 sub begin {
+    remove_controls();
     @refill_lines = @table_shift = ();
     refill()       if $config->{refill};
     colorize()     if $config->{colorize};
@@ -1201,7 +1281,7 @@ option default \
 
 define {CODE_BLOCK}  ^ {0,3}(?<bt>(?<fc>[`~])\g{fc}{2,}+)(.*)\n((?s:.*?))^ {0,3}\g{bt}\g{fc}*+\h*$
 define {COMMENT}     ^<!--(?![->])(?s:.+?)-->
-define {SGR}         (?:\e\[[\d;]*[mK])*
+define {SGR}         (?:\e\[[\d:;]*[mK])*
 define {SGR_END}     (?:\e\[[0;]*[mK])*
 define {LIST_MARKER} (?:[*-]|(?:\d+|#)[.)])
 define {LIST_ITEM}   ^\h*{LIST_MARKER}\h+.*\n

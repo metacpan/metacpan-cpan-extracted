@@ -73,5 +73,17 @@ File::Path::make_path($sbin);
     is_deeply([Devel::XSCover->report_inc], [], 'and none when the report module is not beside it');
 }
 
+{
+    my $dist = File::Spec->catdir($tmp, "defaults");
+    File::Path::make_path($dist);
+    open my $fh, ">", File::Spec->catfile($dist, ".xs_cover") or die;
+    print $fh "# the dist's own defaults\n-ignore 'include/vendor' -report text # trailing\n-timeout 30\n";
+    close $fh;
+    my $here = Devel::XSCover->new_from_argv(qw(-ignore ^src/old), "-dir", $dist, qw(-report html_basic));
+    is_deeply([$here->ignores], ["include/vendor", "^src/old"], "the file's ignore comes before the command line's");
+    is($here->report_name, "html_basic", "a single-valued option on the command line wins");
+    is($here->timeout, 30, "and one from the file alone holds");
+    is_deeply([Devel::XSCover->defaults_from_file(qw(-dir), File::Spec->catdir($tmp, "nowhere"))], [], "no file, no words");
+}
 
 done_testing;

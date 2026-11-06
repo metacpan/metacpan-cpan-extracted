@@ -7,7 +7,7 @@ use Chandra;
 use Chandra::Component;
 use Chandra::Element;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 BEGIN {
     Object::Proto::define('Chandra::Tabs',
@@ -40,6 +40,7 @@ sub render {
         });
 
         $btn->add_child(Chandra::Element->new({
+            # uncoverable condition false
             tag => 'span', data => $tab->{label} // "Tab $i",
         }));
 
@@ -156,6 +157,55 @@ Chandra::Tabs - Tab component
 
     $app->css(Chandra::Tabs->css);
     $tabs->mount($app, '#content');
+
+=head1 METHODS
+
+=over 4
+
+=item C<new(tabs => \@tabs, on_change => sub { ... })>
+
+Each tab is a hash with a C<label>, a C<content> (html or code returning
+html) and an optional C<badge>.
+
+=item C<render>
+
+The tab headers and the active tab's content.
+
+=item C<on_select_tab($index)>
+
+Makes that tab active, runs C<on_change> with the index and label, and
+updates. An index outside the tabs is ignored.
+
+=item C<active_index>
+
+The index of the active tab.
+
+=item C<css>
+
+The tabs' stylesheet.
+
+=item C<prototype>, C<set_prototype>
+
+Object::Proto's prototype accessors.
+
+=back
+
+=head1 SLOT ACCESSORS
+
+Functions with the C<tabs_> prefix and methods of the slot's name:
+C<tabs_tabs>, C<tabs_on_change>, C<tabs__active_index>, and the component
+slots C<tabs__cid>, C<tabs__app>, C<tabs__selector>, C<tabs__mounted>,
+C<tabs__children> and C<tabs__parent>.
+
+=over 4
+
+=item C<tabs> - the tabs
+
+=item C<on_change> - the change callback
+
+=item C<tabs_tabs>, C<tabs_on_change>, C<tabs__active_index>, C<tabs__cid>, C<tabs__app>, C<tabs__selector>, C<tabs__mounted>, C<tabs__children>, C<tabs__parent> - the slot functions
+
+=back
 
 =head1 SEE ALSO
 

@@ -277,3 +277,7 @@ reasoning control, and `MiniMax`'s layer-2 clear on the OpenAI face is unchanged
 still unreachable; it needs a reasoning wire mapping and stays open on karr k209. Source:
 MiniMax `openapi-chat-anthropic.json`, advisor-verified 2026-09-25 — documentation only, not
 live-verified.
+
+## Update (k382 — new tag value `chat_template_kwargs` and the `thinking_enabled` switch → ADR 0040)
+
+A sixth `reasoning_wire_format`, `chat_template_kwargs` (default on LlamaCpp and SGLang, opt-in elsewhere), and the tri-state `thinking_enabled` control, layered as one concern with `reasoning_effort`, are recorded in ADR 0040.

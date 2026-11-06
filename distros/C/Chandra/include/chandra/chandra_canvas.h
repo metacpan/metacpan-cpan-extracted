@@ -63,6 +63,9 @@ static AV *
 _canvas_get_buffer(pTHX_ HV *self)
 {
     SV **buf_svp = hv_fetchs(self, "_buffer", 0);
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (buf_svp && *buf_svp && SvROK(*buf_svp)) {
         return (AV *)SvRV(*buf_svp);
     }
@@ -200,6 +203,10 @@ static const char *
 _canvas_nv_str(pTHX_ AV *cmd, SSize_t idx, char *buf)
 {
     SV **svp = av_fetch(cmd, idx, 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     if (svp && *svp) {
         STRLEN len;
         const char *pv = SvPV(*svp, len);
@@ -210,8 +217,8 @@ _canvas_nv_str(pTHX_ AV *cmd, SSize_t idx, char *buf)
             buf[CANVAS_NV_BUFSZ - 1] = '\0';
         }
     } else {
-        buf[0] = '0';
-        buf[1] = '\0';
+        buf[0] = '0'; /* # uncoverable statement */
+        buf[1] = '\0'; /* # uncoverable statement */
     }
     return buf;
 }
@@ -229,7 +236,7 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
     if (!op_svp || !SvIOK(*op_svp)) return;
     op = SvIV(*op_svp);
 
-    switch (op) {
+    switch (op) { /* # uncoverable branch true count:38 */
         case CANVAS_OP_CLEAR:
             sv_catpvf(js, "%s.clearRect(0,0,%s.canvas.width,%s.canvas.height);",
                       ctx, ctx, ctx);
@@ -276,6 +283,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.fillRect(%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -289,6 +300,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.strokeRect(%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -302,6 +317,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.clearRect(%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -321,7 +340,7 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
         case CANVAS_OP_MOVE_TO:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
-            if (v1 && v2)
+            if (v1 && v2) /* # uncoverable condition right count:2 */
                 sv_catpvf(js, "%s.moveTo(%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
                           _canvas_nv_str(aTHX_ cmd, 2, b2));
@@ -330,7 +349,7 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
         case CANVAS_OP_LINE_TO:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
-            if (v1 && v2)
+            if (v1 && v2) /* # uncoverable condition right count:2 */
                 sv_catpvf(js, "%s.lineTo(%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
                           _canvas_nv_str(aTHX_ cmd, 2, b2));
@@ -343,6 +362,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5 */
             if (v1 && v2 && v3 && v4 && v5)
                 sv_catpvf(js, "%s.arc(%s,%s,%s,%s,%s%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -358,6 +382,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.rect(%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -385,7 +413,7 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
         case CANVAS_OP_TRANSLATE:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
-            if (v1 && v2)
+            if (v1 && v2) /* # uncoverable condition right count:2 */
                 sv_catpvf(js, "%s.translate(%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
                           _canvas_nv_str(aTHX_ cmd, 2, b2));
@@ -400,7 +428,7 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
         case CANVAS_OP_SCALE:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
-            if (v1 && v2)
+            if (v1 && v2) /* # uncoverable condition right count:2 */
                 sv_catpvf(js, "%s.scale(%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
                           _canvas_nv_str(aTHX_ cmd, 2, b2));
@@ -410,6 +438,9 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3 */
             if (v1 && v2 && v3)
                 sv_catpvf(js, "%s.beginPath();%s.arc(%s,%s,%s,0,6.283185307);%s.fill();",
                           ctx, ctx,
@@ -422,6 +453,9 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3 */
             if (v1 && v2 && v3)
                 sv_catpvf(js, "%s.beginPath();%s.arc(%s,%s,%s,0,6.283185307);%s.stroke();",
                           ctx, ctx,
@@ -437,6 +471,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5 */
             if (v1 && v2 && v3 && v4 && v5)
                 sv_catpvf(js, "%s.arcTo(%s,%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -453,6 +492,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5
+             # uncoverable condition right count:6 */
             if (v1 && v2 && v3 && v4 && v5 && v6)
                 sv_catpvf(js, "%s.bezierCurveTo(%s,%s,%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -468,6 +513,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.quadraticCurveTo(%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -491,6 +540,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5
+             # uncoverable condition right count:6 */
             if (v1 && v2 && v3 && v4 && v5 && v6)
                 sv_catpvf(js, "%s.transform(%s,%s,%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -508,6 +563,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5
+             # uncoverable condition right count:6 */
             if (v1 && v2 && v3 && v4 && v5 && v6)
                 sv_catpvf(js, "%s.setTransform(%s,%s,%s,%s,%s,%s);", ctx,
                           _canvas_nv_str(aTHX_ cmd, 1, b1),
@@ -539,6 +600,10 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4 */
             if (v1 && v2 && v3 && v4)
                 sv_catpvf(js, "%s.beginPath();%s.moveTo(%s,%s);%s.lineTo(%s,%s);%s.stroke();",
                           ctx, ctx,
@@ -554,6 +619,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5 */
             if (v1 && v2 && v3 && v4 && v5)
                 sv_catpvf(js, "%s.beginPath();%s.roundRect(%s,%s,%s,%s,%s);%s.stroke();",
                           ctx, ctx,
@@ -570,6 +640,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
+            /*
+             # uncoverable condition right count:2
+             # uncoverable condition right count:3
+             # uncoverable condition right count:4
+             # uncoverable condition right count:5 */
             if (v1 && v2 && v3 && v4 && v5)
                 sv_catpvf(js, "%s.beginPath();%s.roundRect(%s,%s,%s,%s,%s);%s.fill();",
                           ctx, ctx,
@@ -593,7 +668,7 @@ _canvas_serialize_buffer(pTHX_ HV *self)
     SV *js;
     SSize_t i, len;
 
-    if (!id_svp || !SvPOK(*id_svp)) {
+    if (!id_svp || !SvPOK(*id_svp)) { /* # uncoverable condition left count:2 */
         croak("Canvas id not set");
         return &PL_sv_undef;
     }
@@ -610,6 +685,9 @@ _canvas_serialize_buffer(pTHX_ HV *self)
     len = av_len(buf) + 1;
     for (i = 0; i < len; i++) {
         SV **cmd_svp = av_fetch(buf, i, 0);
+        /*
+         # uncoverable condition right count:1
+         # uncoverable condition right count:3 */
         if (cmd_svp && SvROK(*cmd_svp) && SvTYPE(SvRV(*cmd_svp)) == SVt_PVAV) {
             _canvas_cmd_to_js(aTHX_ js, (AV *)SvRV(*cmd_svp), ctx_var);
         }
@@ -632,23 +710,32 @@ _canvas_gen_html(pTHX_ HV *self)
     const char *id;
     int width, height;
 
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     id = (id_svp && SvPOK(*id_svp)) ? SvPV_nolen(*id_svp) : "_canvas_1";
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     width = (width_svp && SvIOK(*width_svp)) ? SvIV(*width_svp) : 800;
+    /*
+     # uncoverable condition right count:1
+     # uncoverable condition right count:2 */
     height = (height_svp && SvIOK(*height_svp)) ? SvIV(*height_svp) : 600;
 
     sv_catpvf(html, " id=\"%s\" width=\"%d\" height=\"%d\"", id, width, height);
 
-    if (style_svp && SvPOK(*style_svp))
+    if (style_svp && SvPOK(*style_svp)) /* # uncoverable condition right count:2 */
         sv_catpvf(html, " style=\"%s\"", SvPV_nolen(*style_svp));
 
-    if (class_svp && SvPOK(*class_svp))
+    if (class_svp && SvPOK(*class_svp)) /* # uncoverable condition right count:2 */
         sv_catpvf(html, " class=\"%s\"", SvPV_nolen(*class_svp));
 
     sv_catpvs(html, "></canvas>");
 
     {
         SV **hclick_svp = hv_fetchs(self, "_has_click", 0);
-        if (hclick_svp && SvTRUE(*hclick_svp)) {
+        if (hclick_svp && SvTRUE(*hclick_svp)) { /* # uncoverable condition right count:2 */
             sv_catpvf(html,
                 "<script>(function(){"
                 "var cv=document.getElementById('%s');"

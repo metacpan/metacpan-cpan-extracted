@@ -1,7 +1,8 @@
 package Langertha::Role::ReasoningEffort;
 # ABSTRACT: Role for an engine with a request-side reasoning-effort control
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
+use Carp qw( carp );
 use Langertha::Reasoning;
 
 has reasoning_effort => (
@@ -16,6 +17,28 @@ has thinking_budget => (
   isa       => 'Int',
   predicate => 'has_thinking_budget',
 );
+
+
+has thinking_enabled => (
+  is        => 'ro',
+  isa       => 'Bool',
+  predicate => 'has_thinking_enabled',
+);
+
+# The engine attributes are one layer: a contradicting pair croaks at
+# construction already, not first at the request build (karr k382), with the
+# value object's message. $orig has already turned a list or a HashRef into one
+# HashRef. AnthropicBase's `effort` alias of reasoning_effort is mapped by its
+# own BUILDARGS wrapper, which may run after this one, so read the alias too.
+around BUILDARGS => sub {
+  my ( $orig, $class, @args ) = @_;
+  my $args = $class->$orig(@args);
+  Langertha::Reasoning->assert_switch_agrees(
+    $args->{thinking_enabled},
+    defined $args->{reasoning_effort} ? $args->{reasoning_effort} : $args->{effort},
+  );
+  return $args;
+};
 
 
 has thinking_display => (
@@ -50,25 +73,11 @@ sub reasoning_kwargs_for {
   return ()
     unless $self->supports('reasoning_effort') || $self->supports('thinking_budget');
 
-  # Per-request controls (chat_f, karr #46) beat the engine attributes on a
-  # per-key basis: %args may carry effort / thinking_budget (or the canonical
-  # control names reasoning_effort / thinking_budget, so the whole controls
-  # hash can be passed wholesale), and any key it does not carry falls back
-  # to the configured attribute.
-  my %merged = (
-    ( $self->has_reasoning_effort ? ( effort => $self->reasoning_effort ) : () ),
-    ( $self->has_thinking_budget  ? ( thinking_budget => $self->thinking_budget ) : () ),
-    ( $self->has_thinking_display ? ( thinking_display => $self->thinking_display ) : () ),
-    ( exists $args{effort} ? ( effort => $args{effort} ) : () ),
-    ( exists $args{reasoning_effort} ? ( effort => $args{reasoning_effort} ) : () ),
-    ( exists $args{thinking_budget} ? ( thinking_budget => $args{thinking_budget} ) : () ),
-    ( exists $args{thinking_display} ? ( thinking_display => $args{thinking_display} ) : () ),
-  );
+  my %merged = $self->_reasoning_controls_for(%args);
   return () unless %merged;
-  return Langertha::Reasoning->new(
-    ( exists $merged{effort} ? ( effort => $merged{effort} ) : () ),
-    ( exists $merged{thinking_budget} ? ( thinking_budget => $merged{thinking_budget} ) : () ),
-    ( exists $merged{thinking_display} ? ( thinking_display => $merged{thinking_display} ) : () ),
+  my $fmt = $self->reasoning_wire_format;
+  my $reasoning = Langertha::Reasoning->new(
+    %merged,
     ( $self->can('chat_model') ? ( model => $self->chat_model ) : () ),
     # The thinking on/off toggle (MiniMax, both Kimi faces) is an
     # endpoint's spelling, not a model's: an engine opts in with
@@ -76,7 +85,74 @@ sub reasoning_kwargs_for {
     # model's id like any unlisted id (ADR 0023 k209 Update, review I1).
     ( $self->can('_reasoning_thinking_toggle') && $self->_reasoning_thinking_toggle
       ? ( thinking_toggle => 1 ) : () ),
-  )->to( $self->reasoning_wire_format );
+  );
+  $self->_warn_thinking_enabled_dropped( $fmt, $reasoning->thinking_enabled )
+    if $reasoning->drops_thinking_enabled_on($fmt);
+  return $reasoning->to($fmt);
+}
+
+# Per-request controls (chat_f, karr #46) beat the engine attributes. %args may
+# carry effort / thinking_enabled / thinking_budget / thinking_display (or the
+# canonical control name reasoning_effort, so the whole controls hash can be
+# passed wholesale). thinking_budget and thinking_display layer per key: a key
+# %args does not carry falls back to its attribute. effort and thinking_enabled are
+# ONE concern (karr k382): a per-request value for either replaces both engine
+# attributes, so engine reasoning_effort=high + per-request thinking_enabled=0
+# is thinking off, not a contradiction. Only a contradiction within one layer
+# croaks (Langertha::Reasoning BUILD). An undef per-request value counts as not
+# set, so it neither replaces the engine values nor is sent. thinking_enabled=0
+# without an effort is resolved to effort 'none' here as well as in
+# Langertha::Reasoning (Langertha::Reasoning::normalize_off_switch, not on a
+# budget generation), so readers of the resolved effort (Engine::OpenAI's ADR
+# 0025 temperature gate, DeepSeek) see the off switch.
+sub _reasoning_controls_for {
+  my ( $self, %args ) = @_;
+  my $request_sets_switch =
+    grep { defined $args{$_} } qw( effort reasoning_effort thinking_enabled );
+  my $attr = sub {
+    my ( $name, $key ) = @_;
+    my $predicate = 'has_' . $name;
+    return $self->$predicate ? ( $key => $self->$name ) : ();
+  };
+  my %merged = (
+    ( $request_sets_switch ? (
+      ( map { defined $args{$_} ? ( $_ => $args{$_} ) : () } qw( effort thinking_enabled ) ),
+      ( defined $args{reasoning_effort} ? ( effort => $args{reasoning_effort} ) : () ),
+    ) : (
+      $attr->( reasoning_effort => 'effort' ),
+      $attr->( thinking_enabled => 'thinking_enabled' ),
+    ) ),
+    $attr->( thinking_budget  => 'thinking_budget' ),
+    $attr->( thinking_display => 'thinking_display' ),
+    ( map { exists $args{$_} ? ( $_ => $args{$_} ) : () } qw( thinking_budget thinking_display ) ),
+  );
+  my $model = $self->can('chat_model') ? $self->chat_model : undef;
+  my $normalized = Langertha::Reasoning->normalize_off_switch(
+    { %merged, ( defined $model ? ( model => $model ) : () ) } );
+  $merged{effort} = $normalized->{effort} if defined $normalized->{effort};
+  return %merged;
+}
+
+# A switch without an effort level that has no wire form here (karr k382):
+# thinking_enabled => 1 on a wire without a level-free on-switch, or => 0 on a
+# budget generation (Gemini 2.5), which takes no effort. Never croak: one
+# request matrix runs over every engine (Holmgang), so the switch is dropped
+# with a carp, once per engine instance, value and wire.
+sub _warn_thinking_enabled_dropped {
+  my ( $self, $fmt, $on ) = @_;
+  $on = 1 unless defined $on;
+  my $model = $self->can('chat_model') ? ( $self->chat_model // '' ) : '';
+  my $message = ( ref $self ) . ': dropping thinking_enabled => ' . ( $on ? 1 : 0 )
+    . ( $on
+      ? " -- reasoning wire '" . $fmt . "' has no thinking on-switch without an "
+        . "effort level; set reasoning_effort (e.g. 'medium') to turn thinking on"
+      : " -- model '" . $model . "' takes a thinking budget, not an effort level, "
+        . "so reasoning wire '" . $fmt . "' has no off switch for it; configure "
+        . 'thinking_budget instead' );
+  my $once = 'thinking_enabled=' . ( $on ? 1 : 0 ) . ' wire=' . $fmt . ' model=' . $model;
+  return $self->_langertha_carp( $message, $once ) if $self->can('_langertha_carp');
+  carp $message;
+  return;
 }
 
 
@@ -101,7 +177,7 @@ Langertha::Role::ReasoningEffort - Role for an engine with a request-side reason
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head2 reasoning_effort
 
@@ -127,6 +203,35 @@ C<thinking_budget> on such a model croaks before the request is built
 unset, no budget field is emitted. (Anthropic legacy C<budget_tokens> is
 deliberately not modeled: it 400s on current Claude families.)
 
+=head2 thinking_enabled
+
+Optional explicit thinking on/off switch without an effort level (karr k382),
+for servers whose chat template takes a boolean (C<enable_thinking> on
+llama.cpp, SGLang and other C<chat_template_kwargs> endpoints). Tri-state: unset
+(the default, nothing sent), C<0> or C<1>.
+
+C<0> means the same as C<< reasoning_effort =E<gt> 'none' >> on every wire, and
+so it cannot disable thinking where effort C<none> cannot: Gemini 3/4 raise it
+to their floor level, OpenAI and Responses models without C<none> (gpt-6,
+legacy gpt-5) drop it, GPT-OSS on Ollama raises it to C<low>. On a Gemini 2.5
+model (thinking budget, no effort) it is dropped with a carp, once per engine;
+a L</thinking_budget> there still goes out.
+
+C<1> without a L</reasoning_effort> is sent only on the C<chat_template_kwargs>
+wire (C<enable_thinking =E<gt> true>), on the thinking-toggle endpoints
+(MiniMax, Kimi: the model's on-type), on DeepSeek V3.x (C<thinking> enabled)
+and on native Ollama (C<think =E<gt> true>, not GPT-OSS); on every other wire
+nothing is sent and the engine carps once.
+
+It is the same concern as L</reasoning_effort>. Within one layer the two must
+agree -- C<< thinking_enabled =E<gt> 0 >> with an effort other than C<none>, or
+C<< thinking_enabled =E<gt> 1 >> with C<none>, croaks: for the engine
+attributes at construction, for the per-request controls when the request is
+built (L<Langertha::Reasoning/assert_switch_agrees>). Across layers a per-request control (chat_f)
+carrying either C<reasoning_effort> or C<thinking_enabled> replaces B<both>
+engine attributes, so C<< reasoning_effort =E<gt> 'high' >> on the engine plus a
+per-request C<< thinking_enabled =E<gt> 0 >> turns thinking off without a croak.
+
 =head2 thinking_display
 
 Optional Anthropic thinking-visibility control (C<summarized> | C<omitted> |
@@ -144,10 +249,28 @@ beats this attribute.
     reasoning_wire_format => 'anthropic'
 
 The per-engine enum naming which reasoning dialect this engine speaks —
-C<openai> | C<anthropic> | C<gemini> | C<responses>. Drives the value-object
-dispatch in L</reasoning_kwargs>. The default follows the engine base-class
-hierarchy: C<OpenAIBase> leaves it at C<openai>, C<AnthropicBase> overrides to
-C<anthropic>, C<Gemini> to C<gemini>, C<OpenAIResponses> to C<responses>.
+C<openai> | C<anthropic> | C<gemini> | C<responses> | C<chat_template_kwargs>
+(C<ollama> exists on L<Langertha::Reasoning/to> but the native Ollama engine
+calls it directly). Drives the value-object dispatch in L</reasoning_kwargs>.
+The default follows the engine base-class hierarchy: C<OpenAIBase> leaves it at
+C<openai>, C<AnthropicBase> overrides to C<anthropic>, C<Gemini> to C<gemini>,
+C<OpenAIResponses> to C<responses>, C<LlamaCpp> and C<SGLang> to
+C<chat_template_kwargs> (L<Langertha::Reasoning/to_chat_template_kwargs>).
+
+Any other OpenAI-compatible engine opts in at construction, e.g. for a
+self-hosted server behind a generic base URL whose chat template reads
+C<enable_thinking>:
+
+    my $engine = Langertha::Engine::OpenAI->new(
+        url                   => 'http://gpu-box:8000/v1',
+        api_key               => 'unused',
+        model                 => 'Qwen/Qwen3-32B',
+        reasoning_wire_format => 'chat_template_kwargs',
+        reasoning_effort      => 'none',
+    );
+
+The opt-in stays explicit: C<api.openai.com> rejects request fields it does
+not know, so C<chat_template_kwargs> is never sent by default.
 
 =head2 reasoning_kwargs_for
 
@@ -156,12 +279,16 @@ C<anthropic>, C<Gemini> to C<gemini>, C<OpenAIResponses> to C<responses>.
 
 Returns the body kwargs to merge into a chat request for the reasoning
 control, serialized for L</reasoning_wire_format> via L<Langertha::Reasoning>.
-C<%args> may carry C<effort> and/or C<thinking_budget> (or the canonical
-control names C<reasoning_effort> / C<thinking_budget>, so the whole controls
-hash from chat_f can be passed wholesale); keys it does not carry fall back to
-the engine attributes, so a per-request control (chat_f, karr #46) beats the
-configured attribute on a per-key basis. Empty list when neither a per-request
-value nor an attribute is set, when the value is unsupported on the engine's
+C<%args> may carry C<effort>, C<thinking_enabled>, C<thinking_budget> and/or
+C<thinking_display> (or the canonical control name C<reasoning_effort>, so the
+whole controls hash from chat_f can be passed wholesale); keys it does not
+carry fall back to the engine attributes, so a per-request control (chat_f,
+karr #46) beats the configured attribute. C<thinking_budget> and
+C<thinking_display> layer per key; C<effort> and C<thinking_enabled> layer as
+one concern -- a per-request value for either replaces both attributes (see
+L</thinking_enabled>). A C<thinking_enabled =E<gt> 1> without an effort on a
+wire that cannot carry it is dropped with a carp, once per engine. Empty list
+when neither a per-request value nor an attribute is set, when the value is unsupported on the engine's
 wire, or when the engine advertises neither C<reasoning_effort> nor
 C<thinking_budget> (L<Langertha::Role::Capabilities/supports>) -- clearing
 those flags is how an engine says it takes no reasoning control, and nothing
@@ -197,7 +324,7 @@ L</reasoning_kwargs_for> with no per-request overrides.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -214,7 +341,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

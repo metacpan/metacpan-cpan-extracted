@@ -36,6 +36,7 @@ WriteMakefile(
 		'Data::Reuse' => 0,	# Required for result-set memory deduplication; see also RT#100461
 		# 'Error' => 0,
 		'DBD::SQLite::Constants' => 0,
+		'DBD::CSV' => 0.64,	# CSV/PSV/TSV, the default format; 0.64+ (SQL::Statement 1.414+) for SELECT DISTINCT
 		'File::Spec' => 0,
 		'File::Temp' => 0,
 		'List::Util' => 1.33,
@@ -46,6 +47,8 @@ WriteMakefile(
 		'Scalar::Util' => 0,
 		'Sub::Private' => 0.09,
 		'Sub::Protected' => 0,
+		'Text::xSV::Slurp' => 0,	# the CSV/PSV slurp path, taken for every file under max_slurp_size
+		'XML::Simple' => 0,	# XML files
 		# Core modules required lazily at runtime — not listed as deps because
 		# MIN_PERL_VERSION (5.010) guarantees their presence on all targets:
 		#   DB_File      (core since 5.004; used by BerkeleyDB backend)
@@ -53,7 +56,6 @@ WriteMakefile(
 		#   IO::Compress::Gzip (core since 5.9.4; used in t/ fixture creation)
 	}, TEST_REQUIRES => {
 		'CHI' => 0,
-		'DBD::CSV' => 0.64,	# 0.64+ (SQL::Statement 1.414+) required for correct SELECT DISTINCT
 		'DBD::XMLSimple' => 0.07,
 		'DBM::Deep' => 0,
 		'Excel::Writer::XLSX' => 0,
@@ -90,9 +92,7 @@ WriteMakefile(
 		'Test::Warn' => 0,
 		'Test::Which' => 0,
 		'Test::Without::Module' => 0,
-		'Text::xSV::Slurp' => 0,
 		'Time::HiRes' => 0,
-		'XML::Simple' => 0,
 		'YAML::XS' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Database-Abstraction-*' },
@@ -103,7 +103,6 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		recommends => {
 			# Optional runtime backends — lazy-loaded; install for full functionality
-			'DBD::CSV' => 0.64,		# CSV/PSV/TSV DBI backend; 0.64+ required for SELECT DISTINCT
 			'DBD::Excel' => 0,		# .xls (old binary Excel) backend
 			'DBD::MariaDB' => 0,		# MariaDB/MySQL backend (preferred over DBD::mysql for MariaDB)
 			'DBM::Deep' => 0,		# .dbm/.deep/magic-byte .db backend
@@ -115,8 +114,6 @@ WriteMakefile(
 			'Redis::Fast' => 0,		# Redis backend (XS, preferred)
 			'Redis' => 0,			# Redis backend (pure-Perl fallback)
 			'Spreadsheet::ParseXLSX' => 0,	# .xlsx (OOXML Excel) backend
-			'Text::xSV::Slurp' => 0,	# CSV/PSV slurp backend
-			'XML::Simple' => 0,		# XML backend
 		},
 		resources => {
 			repository => {

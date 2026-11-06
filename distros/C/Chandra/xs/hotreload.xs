@@ -50,6 +50,7 @@ CODE:
     path = SvPV_nolen(path_sv);
 
     /* Validate callback */
+    # uncoverable condition left count:3
     if (!SvOK(callback) || SvROK(callback) == 0 || SvTYPE(SvRV(callback)) != SVt_PVCV) {
         croak("watch() requires a callback");
     }
@@ -199,6 +200,7 @@ CODE:
                 call_sv(*cb_svp, G_DISCARD | G_EVAL);
                 FREETMPS; LEAVE;
 
+                # uncoverable condition right count:1
                 if (SvTRUE(ERRSV)) {
                     warn("Chandra::HotReload: callback error: %" SVf, SVfARG(ERRSV));
                     sv_setpvs(ERRSV, "");

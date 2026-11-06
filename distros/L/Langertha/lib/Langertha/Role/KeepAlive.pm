@@ -1,6 +1,6 @@
 package Langertha::Role::KeepAlive;
 # ABSTRACT: Role for engines that support keep-alive duration
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 use Moose::Role;
 
 has keep_alive => (
@@ -43,7 +43,7 @@ Langertha::Role::KeepAlive - Role for engines that support keep-alive duration
 
 =head1 VERSION
 
-version 0.504
+version 0.505
 
 =head2 keep_alive
 
@@ -92,7 +92,7 @@ L<Langertha::Role::Capabilities>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/langertha/issues>.
 
 =head2 IRC
@@ -109,7 +109,7 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus L<https://raudssus.de/>.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

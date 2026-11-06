@@ -58,7 +58,7 @@ Readonly::Hash my %MANDATORY_OP_SQL => (
 	contains => 'LIKE',
 );
 
-use version; our $VERSION = version->declare('0.010.1');
+use version; our $VERSION = version->declare('0.011.1');
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -111,7 +111,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.010.1
+Version 0.011.1
 
 =head1 SYNOPSIS
 
@@ -120,6 +120,7 @@ B<Basic two-database join>
     use Database::Join;
 
     # Step 1: create each component database the normal way
+    # See Database::Abstraction
     my $customers = Database::Customers->new(directory => '/data');
     my $loyalty   = Database::Loyalty->new(directory  => '/data');
 

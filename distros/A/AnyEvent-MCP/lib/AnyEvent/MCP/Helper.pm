@@ -39,12 +39,14 @@ C<anyevent-mcp-form-elicitation> implements the standard form request/response c
 package AnyEvent::MCP::Helper;
 
 use common::sense;
-use AnyEvent::MCP ();
+
+use JSON::XS ();
+use Scalar::Util qw(weaken);
+
 use AnyEvent ();
 use AnyEvent::Util ();
 use AnyEvent::Handle ();
-use JSON::XS ();
-use Scalar::Util qw(weaken);
+use AnyEvent::MCP ();
 
 our @ISA = qw(AnyEvent::MCP::Base);
 
