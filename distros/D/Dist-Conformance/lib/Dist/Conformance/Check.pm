@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.002;
+package Dist::Conformance::Check 0.003;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -91,7 +91,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -293,6 +293,10 @@ F<.claude/settings.json> enables the plugins.
 =item L<Dist::Conformance::Check::Workflows>
 
 The CI workflows exist.
+
+=item L<Dist::Conformance::Check::SystemPackages>
+
+The system packages and archives that F<metamerge.yml> declares are valid.
 
 =back
 

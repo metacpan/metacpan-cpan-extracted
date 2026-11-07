@@ -144,6 +144,41 @@ is(
 	"CCISS WARNING - /dev/sda RAID 5 ok, connector 1I box 1 bay 4 predictive failure, $dir/dev/sg0 write cache temporarily disabled\n",
 	'predictive failure and cache'
 );
+is(
+	$run->( 'cciss', '-C' )->{stdout},
+	"CCISS WARNING - /dev/sda RAID 5 ok, connector 1I box 1 bay 4 predictive failure, $dir/dev/sg0 write cache temporarily disabled\n",
+	'--ignore-cache, predictive failure still WARNING'
+);
+
+# only the cache with trouble
+$output->( 'sg0', $h240 . "   Write cache temporarily disabled\n", 1 );
+is( $run->('cciss')->{code}, 1, 'cache trouble is WARNING' );
+is(
+	$run->( 'cciss', '--ignore-cache' )->{stdout},
+	"CCISS OK - /dev/sda RAID 5 ok, 4 drives ok, $dir/dev/sg0 write cache temporarily disabled\n",
+	'--ignore-cache'
+);
+is(
+	$run->( 'cciss', '-C', '-o' )->{stdout},
+	"CCISS OK - /dev/sda RAID 5 ok, 4 drives ok, $dir/dev/sg0 write cache temporarily disabled\n",
+	'--ignore-cache with --output, no output as OK'
+);
+
+# --output and --always-output
+$output->( 'sg0', $degraded, 1 );
+is(
+	$run->( 'cciss', '-o' )->{stdout},
+	"CCISS CRITICAL - /dev/sda RAID 5 using interim recovery mode, failed connector 1I box 1 bay 2\n$dir/dev/sg0:\n"
+		. $degraded,
+	'--output when not OK'
+);
+$output->( 'sg0', $h240 );
+is( $run->( 'cciss', '--output' )->{stdout}, "CCISS OK - /dev/sda RAID 5 ok, 4 drives ok\n", '--output when OK' );
+is(
+	$run->( 'cciss', '-O' )->{stdout},
+	"CCISS OK - /dev/sda RAID 5 ok, 4 drives ok\n$dir/dev/sg0:\n" . $h240,
+	'--always-output when OK'
+);
 
 # a enclosure
 $output->(
@@ -222,6 +257,9 @@ is(
 		"CCISS CRITICAL - /dev/ciss0 RAID 5 ok, 4 drives ok, /dev/ciss1 RAID 5 using interim recovery mode, failed connector 1I box 1 bay 2\n",
 		'FreeBSD'
 	);
+	$result = $run->( 'cciss', '-o' )->{stdout};
+	like( $result, qr{^\Q$dir\E/dev/ciss1:$}m, '--output, the controller not OK' );
+	unlike( $result, qr{^\Q$dir\E/dev/ciss0:$}m, '--output, not the controller OK' );
 	local $Monitoring::Sneck::Checks::cciss::DEV = $dir . '/nope';
 	is( $run->('cciss')->{stdout}, "CCISS OK - no Smart Array controllers\n", 'FreeBSD, no ciss' );
 }

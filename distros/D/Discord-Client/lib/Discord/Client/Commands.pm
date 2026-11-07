@@ -9,7 +9,7 @@ use JSON::PP ();
 use Scalar::Util qw(blessed looks_like_number);
 use Discord::Client::Error;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 my %OPTION_TYPES = (
     subcommand => 1,
     group => 2,

@@ -92,31 +92,67 @@ yet implemented.
 
 =head1 TOOLS
 
-C<workdirs> reports configured workdirs and available sandbox grants.
-C<list> and C<find> enumerate directory entries; C<stat> returns lstat
-metadata without following symlinks. C<file-read> reads byte ranges and
-returns Base64 data; C<read-lines> reads LF-delimited lines with selectable
-UTF-8, Latin-1 or Base64 representation. C<grep> searches files using a
-literal pattern or PCRE. C<file-write> writes Base64 bytes at an offset
-without implicit truncation; C<path-op> performs pathname mutations;
-C<file-patch> applies a unified diff to a single file.
+The filesystem tools are:
 
-C<exec> runs an argv array, not a shell command string. To use shell
-syntax, explicitly invoke a shell in that array. C<stdin_encoding> selects
-C<utf-8> (default), C<latin1> or C<base64>. The 4 MiB limit applies to
-the resulting stdin bytes. Stdout and stderr are decoded as
-UTF-8, with a raw capture limit of 1 MiB per stream; use the byte-range tools
-for binary file contents. Its optional
-C<sandbox_grants> B<replaces> the default C<workdir-read> grant rather than
-adding to it. Explicitly passing an empty array therefore asks for no
-grants. Command exit codes are normal tool results, not transport errors.
-On timeout, output collection stops and C<truncated> is true; C<exit> and
-C<signal> still describe the reaped child.
+=over
+
+=item C<workdirs>
+
+Report configured workdirs and available sandbox grants, without starting a worker.
+
+=item C<list>, C<find>
+
+Enumerate directory entries.
+
+=item C<stat>
+
+Return lstat metadata without following symlinks.
+
+=item C<file-read>
+
+Read byte ranges and return Base64 data.
+
+=item C<read-lines>
+
+Read LF-delimited lines with selectable UTF-8, Latin-1 or Base64 representation.
+
+=item C<grep>
+
+Search files using a literal pattern or PCRE.
+
+=item C<file-write>
+
+Write Base64 bytes at an offset without implicit truncation.
+
+=item C<path-op>
+
+Perform pathname mutations.
+
+=item C<file-patch>
+
+Apply a unified diff to a single file.
+
+=item C<exec>
+
+Run an argv array, not a shell command string. To use shell syntax,
+explicitly invoke a shell in that array.
+
+=back
+
+For C<exec>, C<stdin_encoding> selects C<utf-8> (default), C<latin1>
+or C<base64>. The 4 MiB limit applies to the resulting stdin bytes.
+Stdout and stderr are decoded as UTF-8, with a raw capture limit of
+1 MiB per stream; use the byte-range tools for binary file contents.
+Its optional C<sandbox_grants> B<replaces> the default C<workdir-read>
+grant rather than adding to it. Explicitly passing an empty array
+therefore asks for no grants. Command exit codes are normal tool results,
+not transport errors. On timeout, output collection stops and
+C<truncated> is true; C<exit> and C<signal> still describe the reaped child.
+
 Perl is required for normal server operation; missing optional GNU utilities
-can cause their tools to be omitted.
-The command requested by C<exec> is resolved when the worker runs; it need
-not be present when the server starts. Inspect C<tools/list> rather than
-assuming every tool is present.
+can cause their tools to be omitted. The command requested by C<exec>
+is resolved when the worker runs; it need not be present when the server
+starts. Inspect C<tools/list> rather than assuming every tool is present.
 
 =head2 Command output
 
@@ -239,15 +275,16 @@ otherwise local helper. Overrides C<PERL_ANYEVENT_MCP_PERMISSION_ASK>.
 Run filesystem operations on HOST instead of the local machine. Empty or
 omitted HOST selects local operation. All workdirs belong to this one host.
 Remote workdir paths must be absolute. Host identity qualifies permission
-scopes, not workdir IDs, which are based only on resolved pathnames.
+scopes, not workdir IDs, which use logical pathnames without following symlinks.
 
 =item -e, --rsh COMMAND
 
 Remote shell command, default C<ssh>. Like rsync's C<-e>, COMMAND may include
 arguments. Only used with C<--host>; C<rsh> is also supported.
 The command is split into arguments locally without a local shell. The
-remote shell receives fixed, quoted Perl code; operation arguments travel
-over stdin using length-prefixed binary frames.
+remote shell invokes a short Perl loader. The launcher source is transferred
+over stdin, followed by length-prefixed binary startup frames; subsequent
+worker input remains on the same stream.
 
 =item --sandbox MODE
 
@@ -299,10 +336,14 @@ service-instance name but has an C<fs> namespace. The default instance uses
 C<rules/fs-default.ini>. The rules path is printed on stderr when starting
 HTTP; normal startup leaves stdout untouched.
 Local and remote instances with the same C<--name> intentionally share
-the same rule profile. Remote requests additionally provide a host dimension,
-and their selected-workdir match includes remote host identity. Use different
-instance names or C<match.host> to separate approvals for different hosts.
-Unscoped rules apply across hosts sharing the profile.
+the same rule profile. Permission requests include a host dimension: C<local>
+for local execution, or C<remote HOST> using C<--host> independently of
+C<--rsh>. New persistent rules default to this host, but may match all hosts.
+The workdir matcher is simply the logical path, independent of host. Existing
+rules lacking C<match.host> continue to apply across local and remote hosts;
+only newly saved host-specific rules restrict this.
+Use different instance names or C<match.host> to separate approvals for
+different hosts. Unscoped rules apply across hosts sharing the profile.
 
 =head1 TRUSTED CONFIGURATION
 
@@ -324,6 +365,15 @@ C<--name NAME>. A symlinked executable therefore has its own program defaults.
    prepend-path =
    mount.extra = ro:/srv/project-tools
 
+To override settings for one invocation, use the common C<-s> / C<--set>
+option rather than editing the file:
+
+   mcp-fs --stdio -s executable.perl=/opt/perl/bin/perl \
+     -s prepend-path=/opt/perl/bin /srv/project
+
+Command-line settings take precedence over program and instance settings;
+repeated keys use their last value. See L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+
 Automatic permission rules can also be configured:
 
    [program mcp-fs]
@@ -331,52 +381,71 @@ Automatic permission rules can also be configured:
    auto-rule.20 = allow *,write,workdir-write
    auto-rule.30 = deny *,exec,*
 
-These apply to every named mcp-fs instance; CLI auto-rules are evaluated first.
+The supported configuration entries are:
 
-C<mount.SUFFIX> entries require the named path to exist at startup.
-C<mount-try.SUFFIX> entries use bubblewrap's C<--ro-bind-try> or
-C<--bind-try> instead: an absent path is skipped by bubblewrap at each
-invocation, without a startup existence check. Both kinds are applied in
-alphabetical key order after the private sandbox mounts. The suffix is an
-arbitrary stable name; an empty instance value suppresses an inherited
-entry. Paths must be absolute. A colon after C<ro:> or C<rw:> starts the
-literal pathname; no separate quoting or escaping syntax is used.
+=over
 
-C<env.SUFFIX> entries contain C<NAME=value> to set a literal value, or
-C<NAME> to inherit that variable from the server environment if present.
-Values may contain spaces and equals signs; there is no shell expansion.
-Entries are applied in alphabetical key order after the default environment.
-An empty instance entry suppresses the corresponding program entry.
-C<SSH_AUTH_SOCK> is managed exclusively by the C<ssh-agent> grant, even
-when listed in these settings. Environment settings do not expose paths;
-custom executables outside the runtime/workdir mounts need configured mounts.
+=item C<auto-rule.SUFFIX>
 
-C<prepend-path> adds colon-separated directories before the bubblewrapped
-worker's fixed C<PATH> of
-C</usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin>.
+Automatic permission rules apply to every named mcp-fs instance;
+CLI auto-rules are evaluated first.
+
+=item C<mount.SUFFIX>
+
+A required sandbox mount. The named path must exist at startup.
+
+=item C<mount-try.SUFFIX>
+
+An optional sandbox mount, using bubblewrap's C<--ro-bind-try> or
+C<--bind-try>. An absent path is skipped by bubblewrap at each invocation,
+without a startup existence check.
+
+Both mount kinds are applied in alphabetical key order after the private
+sandbox mounts. The suffix is an arbitrary stable name; an empty instance
+value suppresses an inherited entry. Paths must be absolute. A colon after
+C<ro:> or C<rw:> starts the literal pathname; no separate quoting or escaping
+syntax is used.
+
+=item C<env.SUFFIX>
+
+Specify C<NAME=value> to set a literal value, or C<NAME> to inherit that
+variable from the server environment if present. Values may contain spaces
+and equals signs; there is no shell expansion. Entries are applied in
+alphabetical key order after the default environment. An empty instance
+entry suppresses the corresponding program entry. C<SSH_AUTH_SOCK> is managed
+exclusively by the C<ssh-agent> grant, even when listed in these settings.
+Environment settings do not expose paths; custom executables outside the
+runtime/workdir mounts need configured mounts.
+
+=item C<prepend-path>
+
+Add colon-separated directories before the bubblewrapped worker's fixed
+C<PATH> of C</usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin>.
 Trailing colons are ignored, so both C</opt/bin> and C</opt/bin:> work.
 The server's C<PATH> is not inherited. An empty instance value restores the
 fixed default rather than the program value. C<--sandbox=none> continues to
 use the host environment. Directories outside the normal runtime mounts
 still need a configured mount to be accessible.
 
-Configured mounts grant baseline access to every sandbox invocation
-(when present for C<mount-try>), independently of tool permission grants.
-With C<world-read>, only C<rw:>
-exceptions are applied over the read-only host filesystem. With
-C<world-write>, these configured mounts are ignored. Baseline execution
-paths include C</usr>, C</bin>, system libraries and selected system
-configuration, but not C</opt>. Shared host temporary directories require
-C<shared-tmp>, a configured mount, or a C<world-*> grant.
+=item C<executable.find>, C<executable.grep>, C<executable.patch>,
+C<executable.perl>, C<executable.sed>, C<executable.bwrap>
 
-C<executable.find>, C<executable.grep>, C<executable.patch>,
-C<executable.perl>, C<executable.sed>, and C<executable.bwrap>
-override automatic executable discovery. Explicit choices must resolve to
+Override automatic executable discovery. Explicit choices must resolve to
 executable files and are trusted instead of version-probed, except for
 C<executable.perl>, which must satisfy the Perl minimum version.
 C<executable.perl> defaults to C<perl> in the worker's C<PATH>;
 the other worker executables are discovered there too. C<--bwrap>
 overrides C<executable.bwrap> and is located on the host.
+
+=back
+
+Configured mounts grant baseline access to every sandbox invocation
+(when present for C<mount-try>), independently of tool permission grants.
+With C<world-read>, only C<rw:> exceptions are applied over the read-only
+host filesystem. With C<world-write>, these configured mounts are ignored.
+Baseline execution paths include C</usr>, C</bin>, system libraries and
+selected system configuration, but not C</opt>. Shared host temporary
+directories require C<shared-tmp>, a configured mount, or a C<world-*> grant.
 
 Defaults also include alternatives, font configuration, local timezone,
 TLS certificate stores, NSS configuration and DNS configuration where
@@ -396,13 +465,86 @@ the backend for a VCS command.
 
 =head1 SANDBOX GRANTS
 
-C<workdir-read> and C<workdir-write> expose only the selected workdir;
-write implies read. C<all-workdirs-read> and C<all-workdirs-write>
-expose every configured workdir. C<all-workdirs-read> combined with
-C<workdir-write> mounts all workdirs read-only except the selected one,
-which is writable. C<all-workdirs-write> makes all writable.
-Configured workdirs are mounted using resolved absolute paths, but their
-permission-rule identities are verbatim command-line arguments.
+=over
+
+=item C<workdir-read>
+
+Read access to the selected workdir.
+
+=item C<workdir-write>
+
+Write access to the selected workdir; implies C<workdir-read>.
+
+=item C<all-workdirs-read>
+
+Read access to every configured workdir.
+
+=item C<all-workdirs-write>
+
+Write access to every configured workdir; implies read access.
+
+=item C<homedir-read>
+
+Read access to HOME.
+
+=item C<homedir-write>
+
+Write access to HOME; implies read access.
+
+=item C<world-read>
+
+Read access to the host filesystem.
+
+=item C<world-write>
+
+Write access to the host filesystem; implies C<world-read>.
+
+=item C<network>
+
+Enable networking outside the sandbox's network namespace. Without this
+grant, bubblewrap uses a separate network namespace. Loopback connections
+between processes in that same sandbox work, but its C<127.0.0.1> is not
+the host's C<127.0.0.1>. Connecting to a host-side loopback server requires
+C<network>.
+
+=item C<shared-tmp>
+
+Expose the host's C</tmp> and C</var/tmp>.
+
+=item C<long-running>
+
+Allow C<exec> timeouts over 300 seconds.
+
+=item C<host-proc>
+
+Host-process access, available only without bubblewrap.
+
+=item C<ssh-agent>
+
+Implies C<network>. Exposes the server's C<SSH_AUTH_SOCK> at
+C</run/anyevent-mcp/ssh-agent> and sets the child's variable to that path.
+In remote mode it uses the remote shell's agent socket, when available
+(for example through SSH agent forwarding), rather than mounting the local
+socket path. SSH authentication used to reach the host is separate from
+the worker's C<ssh-agent> and C<network> grants.
+
+Also exposes C<~/.ssh/known_hosts> read-only if present, without mounting
+the rest of HOME. Private key files and SSH user configuration are not exposed.
+An unset or empty C<SSH_AUTH_SOCK> exposes no socket, allowing rsh-based CVS;
+a configured socket must be an absolute path naming an existing socket node.
+Socket replacement requires a new invocation; an existing bind mount keeps
+the old node. Agent access permits authentication, not retrieval of private keys.
+
+=back
+
+C<all-workdirs-read> combined with C<workdir-write> mounts all workdirs
+read-only except the selected one, which is writable. C<all-workdirs-write>
+makes all writable. Configured workdirs are mounted using resolved absolute
+paths, but their permission-rule identities are verbatim command-line
+arguments.
+
+=head2 Workdir selection
+
 Persistent permission rules default to the selected workdir, with an explicit
 option to match any configured workdir, including future additions. This
 controls reuse of the rule, not the workdirs accessible in one operation.
@@ -434,29 +576,6 @@ interpreted as arbitrary filesystem paths. Unknown or ambiguous selectors
 fail. With only one workdir, the field may be omitted.
 Overlapping workdirs have unspecified mount order and access effects;
 do not rely on overlapping workdir boundaries for isolation.
-C<homedir-read> and C<homedir-write> similarly control HOME.
-C<world-read> and C<world-write> expose the host filesystem, with write
-implying read. C<network> and C<shared-tmp> independently enable networking
-and the host's C</tmp> and C</var/tmp>. C<long-running> permits exec timeouts
-over 300 seconds. C<host-proc> is unavailable with bubblewrap; direct execution has host-process access.
-
-Without C<network>, bubblewrap uses a separate network namespace. Loopback
-connections between processes in that same sandbox work without this grant,
-but the sandbox's C<127.0.0.1> is not the host's C<127.0.0.1>. Connecting
-to a host-side loopback server requires C<network>.
-
-C<ssh-agent> implies C<network>. It exposes the server's C<SSH_AUTH_SOCK>
-at C</run/anyevent-mcp/ssh-agent> and sets the child's variable to that path.
-In remote mode it uses the remote shell's agent socket, when available (for
-example through SSH agent forwarding), rather than mounting the local socket
-path. SSH authentication used to reach the host is separate from the
-worker's C<ssh-agent> and C<network> grants.
-It also exposes C<~/.ssh/known_hosts> read-only if present, without mounting
-the rest of HOME. Private key files and SSH user configuration are not exposed.
-An unset or empty C<SSH_AUTH_SOCK> exposes no socket, allowing rsh-based CVS;
-a configured socket must be an absolute path naming an existing socket node.
-Socket replacement requires a new invocation; an existing bind mount keeps
-the old node. Agent access permits authentication, not retrieval of private keys.
 
 =head1 LIMITATIONS
 
@@ -469,17 +588,42 @@ C<--proc> option, which does not support C<subset=pid>.
 =head1 PERMISSIONS
 
 L<AnyEvent::MCP::Server::Permissions> applies ordered allow, deny and ask
-decisions to server-defined action classes. C<inspect> groups stat/list/find;
-C<read> groups file-read/read-lines/grep; C<write> groups file-write/file-patch;
-C<manage> covers path-op, and C<exec> covers command execution. C<file-write>
-may create files despite being in the write class; manage refers specifically
-to pathname operations rather than an exclusive right to create files.
+decisions to these action classes:
+
+=over
+
+=item C<inspect>
+
+C<stat>, C<list>, C<find>.
+
+=item C<read>
+
+C<file-read>, C<read-lines>, C<grep>.
+
+=item C<write>
+
+C<file-write>, C<file-patch>.
+
+=item C<manage>
+
+C<path-op>.
+
+=item C<exec>
+
+Command execution.
+
+=back
+
+C<file-write> may create files despite being in the write class; manage
+refers specifically to pathname operations rather than an exclusive right
+to create files.
 Filesystem operations have no path-based persistent subjects: their rules
 match C<action>, C<sandbox-grants>, and C<match.workdir> when selected-workdir
 authority is required. All-workdirs-only requests have no workdir identity.
 Rules without C<match.workdir> can apply to any selected workdir if their sandbox
 grants cover the request; dialog-generated workdir rules select exact or any.
-In remote mode, C<match.host> also identifies the remote host and transport.
+The independent C<match.host> dimension matches C<local>, a remote host,
+or all hosts, independently of the remote transport.
 Instances with the same name share a rule file, including broad unscoped rules.
 Requested paths are shown in the approval dialog for information only.
 Exec additionally offers persistent
@@ -748,8 +892,18 @@ sub shell_quote {
    "'$text'"
 }
 
+# Keep the remote command short (rsh limits its size). The tiny loader reads
+# exactly the launcher source; unlike parsing a script from stdin, it cannot
+# buffer bytes intended for the eventual exec'd worker.
+my $remote_loader = q{binmode STDIN; my $n = shift; my $s;
+   while (length $s < $n) {
+      sysread STDIN, my $p, $n - length $s or die "short remote source\n";
+      $s .= $p;
+   }
+   eval $s; die $@ if $@;
+};
 my $remote_command = shell_quote ($settings{"executable.perl"} || "perl")
-   . " -e " . shell_quote ($remote_launcher);
+   . " -e " . shell_quote ($remote_loader) . " " . length $remote_launcher;
 
 sub fs_remote_frame {
    pack "N/a*", pack "(w/a*)*", @_
@@ -923,7 +1077,7 @@ if ($remote) {
    my $pid = IPC::Open2::open2 (my $out, my $in, @rsh, $host, $remote_command);
    binmode $in;
    binmode $out;
-   print {$in} fs_remote_frame ("", @command) or die "remote probe input: $!\n";
+   print {$in} $remote_launcher, fs_remote_frame ("", @command) or die "remote probe input: $!\n";
    close $in or die "remote probe input: $!\n";
    my $output = do { local $/; <$out> };
    close $out;
@@ -1117,14 +1271,14 @@ sub fs_permission_dimensions {
    my ($workdir, $subject, $choices) = @_;
    my %dimensions;
 
-   if ($remote) {
-      my $host_id = "remote $rsh $host";
-      $dimensions{host} = {
-         label => "Host", value => $host_id,
-         choices => [{ label => "This remote host and transport", match => $host_id }],
-      };
-      $workdir = "$host_id:$workdir" if defined $workdir;
-   }
+   my $host_id = $remote ? "remote $host" : "local";
+   $dimensions{host} = {
+      label => "Host", value => $host_id,
+      choices => [
+         { label => "This host", match => $host_id },
+         { label => "All hosts", match => "^" },
+      ],
+   };
 
    $dimensions{workdir} = {
       label => "Workdir", value => $workdir,
@@ -1421,8 +1575,8 @@ warn "$_: not detected or wrong version\n"
    for grep !$program{$_}, qw(find grep patch sed);
 %vcs_program = map { ($_ => $program{$_}) } qw(git svn cvs hg);
 
-warn "mcp-fs: SANDBOX NONE - workers run with full host-user privileges\n"
-   unless $bwrap;
+AE::log warn => "bubblewrap unavailable, running without sandbox"
+   if $sandbox_mode eq "auto" && !$bwrap;
 
 AnyEvent::detect; # proc_spawn creates child watchers after they might have died
 
@@ -1433,7 +1587,7 @@ sub proc_spawn {
 
    my $remote_input;
    if ($remote) {
-      $remote_input = fs_remote_frame ($bwrap ? $home : "", $program, @argv);
+      $remote_input = $remote_launcher . fs_remote_frame ($bwrap ? $home : "", $program, @argv);
       ($program, @argv) = (@rsh, $host, $remote_command);
    }
 

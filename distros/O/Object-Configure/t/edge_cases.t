@@ -11,8 +11,6 @@ use Scalar::Util qw(blessed isweak);
 use Errno qw(EACCES ENOENT);
 use Readonly;
 
-# Test::Returns is a non-indexed local dev library
-use lib '/home/njh/src/njh/Test-Returns/lib';
 use Test::Returns;
 
 Readonly my $VERY_DEEP_RECURSION => 50;   # nested hash depth for stack-pressure test

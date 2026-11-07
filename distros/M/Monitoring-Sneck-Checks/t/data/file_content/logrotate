@@ -1,0 +1,3 @@
+#!/bin/sh
+# /etc/nope
+/usr/sbin/logrotate /etc/logrotate.conf

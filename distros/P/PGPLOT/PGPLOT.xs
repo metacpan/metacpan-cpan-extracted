@@ -306,7 +306,7 @@ pgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,plot)
   CODE:
     DEBUG_PRINT(pgconx);
     pgfunname[0] = plot;
-    cpgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,(void(*)(void))pgfunplot);
+    cpgconx(a,idim,jdim,i1,i2,j1,j2,c,nc,pgfunplot);
 
 
 void

@@ -8,7 +8,7 @@ use JSON::PP ();
 
 use Discord::Client::Intents ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # Pure protocol decision logic: no sockets, event loop, timers, or callbacks.
 # Each method returns a list reference of declarative actions for an IO driver.

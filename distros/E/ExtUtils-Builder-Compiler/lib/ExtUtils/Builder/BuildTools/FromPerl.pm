@@ -1,5 +1,5 @@
 package ExtUtils::Builder::BuildTools::FromPerl;
-$ExtUtils::Builder::BuildTools::FromPerl::VERSION = '0.037';
+$ExtUtils::Builder::BuildTools::FromPerl::VERSION = '0.038';
 use strict;
 use warnings;
 
@@ -136,7 +136,7 @@ ExtUtils::Builder::BuildTools::FromPerl - compiler configuration, derived from p
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

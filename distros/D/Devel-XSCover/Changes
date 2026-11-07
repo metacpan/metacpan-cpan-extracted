@@ -1,5 +1,8 @@
 Revision history for Devel-XSCover
 
+0.09    2026-11-06
+	- An overload entry xsubpp registers
+
 0.08    2026-11-06
 	- A .xs_cover file in the distribution holds default options, read before the command line
 	- Name the llvm flow dump's file index of an XSUB body from the XS map, where many XS files of similar shape fooled the matching by shared lines (Chandra, 30 XS files)

@@ -42,5 +42,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-abstract.git
-version: '2.000002'
+version: '2.000003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

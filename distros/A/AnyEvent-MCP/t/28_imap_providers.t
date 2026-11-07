@@ -69,48 +69,59 @@ is scalar @{$server->{servers}}, 0, "unresolved hostname placeholder is not inve
 is_deeply AnyEvent::MCP::IMAP::Providers::parse_index ('["a.com","b.de","invalid/x"]'),
    [qw(a.com b.de)], "ISPDB directory index parsed and validated";
 
-my ($jsfh, $jsfile) = tempfile ();
-my ($xmlfh, $xmlfile) = tempfile ();
-print $jsfh $source;
-print $xmlfh $xml;
-close $jsfh;
-close $xmlfh;
+SKIP: {
+   skip "mcp-imap CLI dependencies unavailable", 18
+      unless eval {
+         require AnyEvent::Fork::Early;
+         require AnyEvent::Fork;
+         require AnyEvent::Fork::RPC;
+         require Term::ReadKey;
+         1
+      };
 
-sub run_cli {
-   my (@args) = @_;
-   open my $fh, "-|", $^X, "-Ilib", "bin/mcp-imap",
-      "--name", "sample", "--provider-file", $jsfile,
-      "--ispdb-file", $xmlfile, "providers", @args
-      or die "Cannot execute mcp-imap: $!";
-   my $out = do { local $/; <$fh> };
-   close $fh;
-   ($out, $? >> 8)
+   my ($jsfh, $jsfile) = tempfile ();
+   my ($xmlfh, $xmlfile) = tempfile ();
+   print $jsfh $source;
+   print $xmlfh $xml;
+   close $jsfh;
+   close $xmlfh;
+   
+   sub run_cli {
+      my (@args) = @_;
+      open my $fh, "-|", $^X, "-Ilib", "bin/mcp-imap",
+         "--name", "sample", "--provider-file", $jsfile,
+         "--ispdb-file", $xmlfile, "providers", @args
+         or die "Cannot execute mcp-imap: $!";
+      my $out = do { local $/; <$fh> };
+      close $fh;
+      ($out, $? >> 8)
+   }
+   
+   my ($out, $status) = run_cli ();
+   is $status, 0, "provider list succeeded";
+   like $out, qr/example\.com/, "list contains domain";
+   like $out, qr/imap\.example\.net/, "list contains IMAP host";
+   unlike $out, qr/^\s+smtp\.example\.com/m, "list excludes SMTP hostname";
+   
+   ($out, $status) = run_cli ("alice\@example.com");
+   is $status, 0, "provider command succeeded";
+   like $out, qr/^\s+method oauth2/m, "suggests method oauth2";
+   like $out, qr/^\s+server imap\.example\.com/m, "uses ISPDB hostname";
+   like $out, qr/^\s+user alice\@example\.com/m, "substitutes email address";
+   like $out, qr/^\s+oauth-scope 'mail\.read offline_access'/m, "uses IMAP scope plus extra";
+   like $out, qr/^\s+oauth-client-id 'client'\\''123'/m, "shell-quotes client id";
+   like $out, qr/^mcp-imap --name sample login/m, "unquotes safe account name";
+   like $out, qr/^\s+oauth-redirect-uri http:\/\/127\.0\.0\.1:1/m, "defaults to blocked loopback port";
+   like $out, qr/# OAuth2:/, "OAuth command identified";
+   like $out, qr/# Password:\nmcp-imap --name sample login/, "password fallback has runnable syntax";
+   like $out, qr/# Password:\nmcp-imap --name sample login \\\n  method password/m,
+      "password fallback explicitly selects method";
+   unlike $out, qr/# Password:\nmcp-imap.*?method oauth2/s, "password fallback avoids OAuth keys";
+   
+   ($out, $status) = run_cli ("example");
+   is $status, 0, "ambiguous search lists candidates";
+   like $out, qr/Specify a domain or email/, "ambiguous search does not invent a choice";
 }
-
-my ($out, $status) = run_cli ();
-is $status, 0, "provider list succeeded";
-like $out, qr/example\.com/, "list contains domain";
-like $out, qr/imap\.example\.net/, "list contains IMAP host";
-unlike $out, qr/^\s+smtp\.example\.com/m, "list excludes SMTP hostname";
-
-($out, $status) = run_cli ("alice\@example.com");
-is $status, 0, "provider command succeeded";
-like $out, qr/^\s+method oauth2/m, "suggests method oauth2";
-like $out, qr/^\s+server imap\.example\.com/m, "uses ISPDB hostname";
-like $out, qr/^\s+user alice\@example\.com/m, "substitutes email address";
-like $out, qr/^\s+oauth-scope 'mail\.read offline_access'/m, "uses IMAP scope plus extra";
-like $out, qr/^\s+oauth-client-id 'client'\\''123'/m, "shell-quotes client id";
-like $out, qr/^mcp-imap --name sample login/m, "unquotes safe account name";
-like $out, qr/^\s+oauth-redirect-uri http:\/\/127\.0\.0\.1:1/m, "defaults to blocked loopback port";
-like $out, qr/# OAuth2:/, "OAuth command identified";
-like $out, qr/# Password:\nmcp-imap --name sample login/, "password fallback has runnable syntax";
-like $out, qr/# Password:\nmcp-imap --name sample login \\\n  method password/m,
-   "password fallback explicitly selects method";
-unlike $out, qr/# Password:\nmcp-imap.*?method oauth2/s, "password fallback avoids OAuth keys";
-
-($out, $status) = run_cli ("example");
-is $status, 0, "ambiguous search lists candidates";
-like $out, qr/Specify a domain or email/, "ambiguous search does not invent a choice";
 
 is AnyEvent::MCP::IMAP::Providers::quote ("'"), q(''\'''), "POSIX shell quoting";
 is AnyEvent::MCP::IMAP::Providers::quote ("http://127.0.0.1:1"), "http://127.0.0.1:1",

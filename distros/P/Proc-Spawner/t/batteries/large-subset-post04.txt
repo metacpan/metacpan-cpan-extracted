@@ -35,3 +35,4 @@ trap "echo e" EXIT; kill -0 $$; echo "after $?"
 eval ""; eval '# c'; set --; eval $@; echo "st=$?"
 @N# only comments@N
 kill; echo "st=$?"; kill -9; kill -s HUP; kill --; set --; kill $(echo); echo "st=$?"
+printf '%0.s-' 1 2 3; echo; printf '[%05s][%0c][%-05s][%0b][%05d]' x y z w 7; echo; printf '%%0s %s' a; echo; printf '%0*s|' 4 a; echo

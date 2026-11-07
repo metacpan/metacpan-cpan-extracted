@@ -1,5 +1,91 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.08  2026-11-06
+      - Since 0.07: Windows (EXPERIMENTAL): win_spawn.h compared with Perl's
+        own spawn and fixed; the module built with MinGW-w64 against
+        Strawberry Perl 5.38.2 and run under Wine; batch files; the options of
+        %Proc::Spawner::WINDOWS.  Fixed on every system: spawn's result in
+        scalar context when a setting is missing.  The figures of post4-0.04
+        hold (the measured files differ only in $VERSION); digest of the code
+        they depend on: 3956c46c16d3290baf27f9475da8b72d431f17a194b2ba9fba91e3e0fe863bb8.
+      - Windows, run under Wine with Strawberry Perl 5.38.2 (Spawner.dll built
+        with MinGW-w64): spawn, waitpid, options work.  New: batch files run
+        through the system's cmd.exe, arguments quoted as Rust's standard
+        library does since BatBadBut (CR, LF refused); %Proc::Spawner::WINDOWS:
+        new_group (Ctrl-C reaches the parent, not the children; default on),
+        kill_with_parent (a job object that ends the children with the parent;
+        default on), new_console (as Perl's spawn; default on); console
+        pseudo-handles of Windows 7 kept out of the handle list.  Fixed: spawn
+        returned its count of results in scalar context when a setting was
+        missing (now the pid); Proc::Spawner no longer uses fcntl and SIGCHLD
+        on Windows (the loop polls there).  doc/pspawn-spawner.md, section 8:
+        how the child sees its arguments, Perl's system against ours.
+      - win_spawn.h compared with Perl's own spawn on Windows (win32/win32.c of
+        perl 5.38.2) and fixed: PATHEXT's extensions before the bare name, and
+        quoted PATH entries, as Perl's qualified_path(); cmd.exe /c quoted as
+        Perl's create_command_line() does; the environment block sorted, with
+        the drives' directories (=C:) kept; E2BIG over 32766 characters;
+        strings not held as UTF-8 read in the ANSI code page (as Perl's
+        CreateProcessA); the default environment and directory are Perl's
+        (PerlEnv_get_childenv, PerlEnv_get_childdir); its own allocator on the
+        process heap (found by compiling against Strawberry Perl 5.38.2, where
+        malloc and free are Perl's macros).  Spawner.dll compiles and links
+        with MinGW-w64 against Strawberry Perl's headers and libperl538.a; not
+        yet loaded.  Open questions and the deliberate differences:
+        doc/pspawn-spawner.md, section 8.
+
+0.07  2026-11-05
+      - Since 0.06: what the spawn primitive lacks is done around the call
+        ($Proc::Spawner::MISSING; t/missing-matrix.pl); win_spawn.h, posix_spawn
+        for Windows (not yet built into the module); Z0 (printf's 0 flag with
+        %s); the atomic calls measured.  The figures of post4-0.04 hold (the
+        measured files differ only in $VERSION); digest of the code they
+        depend on: 3f1c152adeabd6730535ae4380824c41e45c896190d612e75e08f956c15af270.
+      - win_spawn.h: posix_spawn for Windows on CreateProcessW (the user,
+        2026-11-05; EXPERIMENTAL, not yet built into the module: that needs a
+        Windows Perl).  Spawner.xs includes it under _WIN32 and #defines the
+        posix_spawn names to it (#define posix_spawn win_posix_spawn and so
+        on), so __posix_spawn is one source; no SIGCHLD helpers there.  The
+        child's fds 0-2 through STARTUPINFO, fds 3 and up through the C
+        runtime's lpReserved2 table, exactly the handles it should have
+        through PROC_THREAD_ATTRIBUTE_HANDLE_LIST (inheritable copies made for
+        the call); the file actions in order (open by the parent, relative to
+        the child's directory; chdir, fchdir, closefrom); argv quoted as the C
+        runtime parses it back; posix_spawnp through PATH and PATHEXT;
+        pgroup 0 as CREATE_NEW_PROCESS_GROUP; ENOTSUP for a non-empty sigmask,
+        a group to join, setsid, sched.  Checked with MinGW-w64 (gcc 13.2)
+        under Wine 9.0: argv round trips, fd 3, chdir, dup2, closefrom, a new
+        group, the refusals, and the #define layer of Spawner.xs; compiled
+        (not linked) for x86, x64 and ARM64 with clang.  Not done yet: the
+        Perl side on Windows (waiting for a child through the kept process
+        handle, __win_spawn_handle; no SIGCHLD).
+      - Proc::Spawner::spawn does what the spawn primitive lacks around the
+        call (the user, 2026-11-05: as a Windows port will have to):
+        $Proc::Spawner::MISSING, a bitmap of the settings the primitive lacks
+        (this libc's gaps, plus PROC_SPAWNER_MISSING for tests).  chdir,
+        fchdir, the fd actions (dup2, close, open, closefrom), sigmask,
+        sigdefault, pgroup => PGID, resetids, search and pidfd are done in
+        this process around the call and undone; setsid, tcsetpgrp,
+        pgroup => 0, sched and cgroup are unsupported (drop or fail).  New
+        XSUBs __native, __set_cloexec, __dup_high, __fchdir, __pidfd_open,
+        __fd_limit.  t/missing-matrix.pl runs the suite once per entry of the
+        bitmap, and with the Windows gaps; doc/pspawn-spawner.md, section 8.
+        t/spawner.t: a test of pgroup => PGID; pgroup => 0 and setsid are
+        skipped where unsupported.
+      - Z0 (the user, 2026-11-05): printf's 0 flag with %s, %c or %b (printf
+        '%0.s-' 1 2 3, a common way to repeat a character; %05s) is dropped
+        before the program printf runs, so it pads with blanks, as glibc's
+        printf(3) and both shells; coreutils refuses it ("invalid conversion
+        specification").  The flag is undefined there in C and POSIX
+        (large-subset-state.md, section 1).
+      - large-subset-builtins.pl: a command name starting with - or + is
+        quoted, and plain names after export, readonly, unset, local stay bare
+        (else the call is no longer the one that ran); -reuse OLD.jsonl.
+        Results in large-subset-state.md section 7: of 25,490 atomic calls
+        where no program runs, none where dash and bash agree and ours
+        differs; the external calls: one (the broken pipe of echo).
+        doc/large-subset/tools/large-subset-builtins-differences.tsv.
+
 0.06  2026-11-05
       - Since 0.05, the same day: the fixes for systems without /proc, and the
         measurement of the atomic calls extended.  The figures of post4-0.04

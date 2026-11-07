@@ -25,15 +25,22 @@ and browse to localhost:3000.
 Building a distribution
 -----------------------
 ```
-# (bump VERSION)
+ # (first ensure new work committed, then..)
+
+ rm *Tables*tar.gz
+
+ # (bump VERSION in lib/Mojolicious/Plugin/Tables.pm)
+ git add            lib/Mojolicious/Plugin/Tables.pm
+ git commit -m 'Build version X.YY'
+ git log >CHANGES
+ git add CHANGES
+ git commit -m 'Built version X.YY'
+ # (git push)
+
  perl Makefile.PL 
  make test
  make manifest
  make dist
+
  mojo cpanify -u USER -p PASS *Tables*tar.gz
- git commit -m 'Build version X.YY'
- git log >CHANGES
- git add CHANGES lib/Mojolicious/Plugin/Tables.pm
- git commit -m 'Built version X.YY'
-# (git push)
 ```

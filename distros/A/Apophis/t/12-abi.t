@@ -15,6 +15,7 @@ use Apophis;
 # ever disagree is that blobs written one way become unreachable the other.
 
 my $dir = tempdir(CLEANUP => 1);
+open my $null, "<", File::Spec->devnull or die "devnull: $!";
 
 # ---------------------------------------------------------------- the table
 
@@ -36,7 +37,25 @@ my $store = Apophis->new(namespace => 'abi-test', store_dir => $dir);
 
 my $content = "the quick brown fox jumps over the lazy dog\n" x 40;
 
-my ($c_id, $c_path) = Apophis::_abi_selftest($store, \$content);
+my $copy = File::Spec->catfile($dir, 'a-copy-of-the-content');
+open my $out, '>', $copy or die "$copy: $!";
+print $out $content;
+close $out;
+open my $in, '<', $copy or die "$copy: $!";
+
+my ($c_id, $c_path, $c_ns, $fh_id, $short_rc, $probe_rc, $probe_dirlen, $null_rc) = Apophis::_abi_selftest($store, \$content, 'abi-test', $in);
+
+is($c_ns, $store->namespace,
+    'derive_ns on the namespace string gives the namespace new() derived, so a '
+  . 'consumer with only the string reaches the same store');
+is($fh_id, $c_id,
+    'identify_fh over a handle on the same bytes gives the same id as identify '
+  . 'over the scalar, chunking and namespace prefix included');
+is($short_rc, -1, 'build_path reports a short id as -1 rather than croaking, so a consumer can refuse it');
+is($probe_rc, 3, 'store_of asked for the namespace alone, the directory alone or its length alone says it is a store each time');
+is($probe_dirlen, length $dir, 'and asked for the directory length alone gives it');
+is($null_rc, 0, 'store_of on a NULL pointer says it is no store, so a consumer need not check first');
+close $in;
 
 like($c_id, qr/^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
     'the table produces a well-formed v5 UUID');
@@ -61,7 +80,7 @@ is(${ $store->fetch($p_id) }, $content,
 # The other direction: a blob the Perl API wrote must be found by the C path.
 my $other = "written by the Perl API\n";
 my $o_id  = $store->store(\$other);
-my ($o_c_id, $o_c_path) = Apophis::_abi_selftest($store, \$other);
+my ($o_c_id, $o_c_path) = Apophis::_abi_selftest($store, \$other, "abi-test", $null);
 
 is($o_c_id, $o_id, 'a blob stored through Perl is identified identically in C');
 is($o_c_path, $store->path_for($o_id), '...and resolves to the one file');
@@ -72,7 +91,7 @@ is($o_c_path, $store->path_for($o_id), '...and resolves to the one file');
 # the property Punk::Plugin::Blob's per-tenant namespacing rests on, and it
 # has to hold on the C path too or the tenancy story is only true in Perl.
 my $other_ns = Apophis->new(namespace => 'abi-test-2', store_dir => $dir);
-my ($n_id) = Apophis::_abi_selftest($other_ns, \$content);
+my ($n_id) = Apophis::_abi_selftest($other_ns, \$content, "abi-test-2", $null);
 
 isnt($n_id, $c_id,
     'the same bytes under a different namespace get a different id through '
@@ -83,8 +102,12 @@ isnt($n_id, $c_id,
 # store_of has to be safe to call on anything, because a consumer probes with
 # it before deciding whether it can use the C path at all. A croak there would
 # turn a fall-back into a fatal error.
-for my $not_a_store ([], {}, \"scalar", undef, 'Apophis', 42) {
-    my $ok = eval { Apophis::_abi_selftest($not_a_store, \"x"); 1 };
+my $undef_dir = Apophis->new(namespace => 'abi-test');
+$undef_dir->{store_dir} = undef;
+for my $not_a_store ([], {}, \"scalar", undef, 'Apophis', 42, bless([], 'Apophis'), bless({}, 'Apophis'),
+                     bless({ _ns_bytes => 'short', store_dir => $dir }, 'Apophis'),
+                     bless({ _ns_bytes => undef, store_dir => $dir }, 'Apophis'), $undef_dir) {
+    my $ok = eval { Apophis::_abi_selftest($not_a_store, \"x", "x", $null); 1 };
     ok(!$ok, 'a non-store is refused rather than crashed on');
     like($@, qr/not a store/, '...with an error saying so');
 }
@@ -92,15 +115,24 @@ for my $not_a_store ([], {}, \"scalar", undef, 'Apophis', 42) {
 # An object with no store_dir is not a usable store either, and store_of says
 # so by returning false rather than by croaking somewhere further in.
 my $dirless = Apophis->new(namespace => 'abi-test');
-my $ok = eval { Apophis::_abi_selftest($dirless, \"x"); 1 };
+my $ok = eval { Apophis::_abi_selftest($dirless, \"x", "x", $null); 1 };
 ok(!$ok, 'a store with no store_dir is refused - there is nowhere to write');
+
+$ok = eval { Apophis::_abi_selftest($store, 'not a reference', 'x', $null); 1 };
+ok(!$ok, 'the content must come as a reference');
+like($@, qr/^Apophis::_abi_selftest: content must be a scalar reference/, '...and the complaint says so');
+
+my $far = Apophis->new(namespace => 'abi-test', store_dir => File::Spec->catdir($dir, 'z' x 4200));
+$ok = eval { Apophis::_abi_selftest($far, \"x", 'x', $null); 1 };
+ok(!$ok, 'a store whose paths cannot fit the buffer is refused by the length build_path reports');
+like($@, qr/^Apophis::_abi_selftest: path too long/, '...which is the check a consumer must make too');
 
 # ------------------------------------------------------------- idempotence
 
 # Content addressing is idempotent, so running the C path twice must be a
 # no-op rather than a second write. This is what makes the whole scheme safe
 # to retry.
-my ($again_id, $again_path) = Apophis::_abi_selftest($store, \$content);
+my ($again_id, $again_path) = Apophis::_abi_selftest($store, \$content, "abi-test", $null);
 is($again_id, $c_id, 'storing the same content again gives the same id');
 is($again_path, $c_path, '...to the same path');
 is(${ $store->fetch($c_id) }, $content, '...and has not corrupted the blob');

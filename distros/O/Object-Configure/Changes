@@ -1,6 +1,35 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
-0.24	Thu Aug 20 02:41:40 PM EDT 2026
+0.25	Fri Nov  6 10:54:40 AM EST 2026
+	[ Bug Fixes ]
+	- Tests no longer hard-code a "use lib" path to a local Test::Returns
+	  checkout.  Where that path existed but was unreadable, require() died
+	  with "Permission denied" instead of falling back to the installed
+	  Test::Returns, so t/domain.t, t/data-flow.t, t/edge_cases.t, t/path.t
+	  and t/transaction.t failed to install.  Test::Returns is now loaded
+	  from @INC like any other dependency.
+	- t/unit.t: skip the alarm() remaining-time check on MSWin32, where
+	  alarm() always returns 0.
+	- Corrected the documented enable_hot_reload() fork error message to
+	  match the one actually thrown ("Failed to fork config watcher: ...").
+
+	[ Enhancements ]
+	- The module now uses autodie.  kill() and fork() are exempted where
+	  failure is expected or handled locally, so disable_hot_reload() still
+	  cleans up if the watcher has already exited.
+	- Added an AUTHOR section to the POD.
+
+	[ Packaging ]
+	- MIN_PERL_VERSION raised to 5.010: the code uses the // operator.
+	- Declared runtime dependencies that were missing or listed only as test
+	  dependencies: autodie, IPC::System::Simple, List::Util 1.33,
+	  File::stat, POSIX, Time::HiRes.
+	- Declared test dependencies Test::Exception and Test::More; removed
+	  ExtUtils::MakeMaker from the runtime prerequisites.
+	- Test::Memory::Cycle is now a recommended test dependency.
+	- LICENSE metadata is now gpl_2, matching the POD.
+
+0.24	2026-08-20T14:41:40-04:00
 	[ Enhancements ]
 	- configure() now validates the class name against /\A[A-Za-z_]\w*(?:::\w+)*\z/
 	  and croaks on invalid input, preventing taint-mode failures and injection
@@ -15,10 +44,10 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	  preventing integer-wrap and busy-poll from a caller-supplied zero/negative value.
 	- Memoised _get_inheritance_chain() with %_chain_cache (keyed by class name):
 	  repeated calls for the same class return immediately, eliminating redundant
-	  mro::get_linear_isa traversals. Benchmarks show ~7× speedup on repeated calls.
+	  mro::get_linear_isa traversals. Benchmarks show ~7x speedup on repeated calls.
 	- Memoised _find_class_config_file() with %_find_cache (keyed by NUL-joined
 	  class+base+dirs): eliminates repeated filesystem probes for the same ancestor
-	  class. Benchmarks show ~27× speedup on repeated calls.
+	  class. Benchmarks show ~27x speedup on repeated calls.
 	- Replaced grep { $_ eq 'UNIVERSAL' } @mro with List::Util::any (XS,
 	  short-circuits on first match).
 	- _find_class_config_file() now copies $dir to a local scalar before stripping
@@ -32,7 +61,7 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	- Fixed instantiate(): 'class' key was read from %params but not deleted, causing
 	  it to propagate through configure() as a spurious config key and end up in the
 	  blessed object's hash, polluting its namespace. Changed $params->{'class'} to
-	  delete $params->{'class'} (D~ data-flow anomaly — dead store without delete).
+	  delete $params->{'class'} (D~ data-flow anomaly - dead store without delete).
 	- Fixed class-name validation regex: \w+ after :: permitted digit-first components
 	  (e.g. Bad::1Bad was accepted). Corrected to [A-Za-z_]\w* so each :: component
 	  must start with a letter or underscore, matching Perl's actual identifier rules.
@@ -89,7 +118,7 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	  _deep_merge non-mutation of inputs, carp_on_warn propagation, weak-ref GC
 	  lifecycle, reload_config() dead-ref pruning, caller params non-mutation,
 	  _config_file set-once semantics, %_config_file_stats synchronous population,
-	  env_prefix :: → __ conversion, %tracked_files duplicate-file guard, O~ file
+	  env_prefix :: -> __ conversion, %tracked_files duplicate-file guard, O~ file
 	  descriptor leak check (/proc/self/fd), $@/$_ non-pollution, _build_logger()
 	  paths (undef/NULL/passthrough), and instantiate() 'class' key non-leakage.
 	- Expanded t/integration.t from 19 to 27 subtests: added optional-deps subtest
@@ -128,19 +157,19 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	- Added t/path.t: 52 CFG path-coverage subtests exhausting every branching path
 	  through configure(), register_object(), reload_config(), enable_hot_reload(),
 	  disable_hot_reload(), _build_logger(), _find_class_config_file(), _deep_merge(),
-	  _reload_object_config(), and _reconfigure_logger() — including signal-handler
+	  _reload_object_config(), and _reconfigure_logger() - including signal-handler
 	  chaining, config_path env-only stat branch, and injected upstream failures.
 	- Added t/transaction.t: 14 multi-step lifecycle subtests verifying state
 	  consistency at every phase boundary and correct behaviour on mid-flight
 	  failures: configure() full pipeline (T1), C::A failure rollback (T2),
-	  env-override precedence chain file<env (T3), register→reload→update
+	  env-override precedence chain file<env (T3), register->reload->update
 	  synchronous hot-reload flow (T4), GC weak-ref pruning on reload (T5),
 	  multi-object reload with partial GC (T6), same-class push semantics (T7),
 	  nonexistent-config resilience (T8), _reload_object_config exception isolation
 	  (T9), instantiate() lifecycle (T10-T11), and enable/disable watcher lifecycle
 	  including idempotency (T12-T14).
 
-0.23	Sun Jun 28 09:55:21 EDT 2026
+0.23	2026-06-28T09:55:21-04:00
 	[ Refactoring ]
 	- Replaced hand-rolled _walk_isa / _get_inheritance_chain with mro::get_linear_isa
 	  (handles diamond inheritance correctly; UNIVERSAL appended manually when absent).
@@ -165,7 +194,7 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	- Fixed _reload_object_config() logger-key match from /^logger/ to eq 'logger':
 	  keys like 'logger.file' are flat config values, not logger specs, and must
 	  not be processed through _reconfigure_logger().
-	- Fixed warn → carp in reload_config() for package-correct stack traces.
+	- Fixed warn -> carp in reload_config() for package-correct stack traces.
 
 	[ CI ]
 	- Bumped App::Test::Generator to 0.41 in both dashboard.yml and mutate.yml.
@@ -188,12 +217,12 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	[ Bug Fixes ]
 	- Fixed https://github.com/nigelhorne/Object-Configure/issues/4
 
-0.21	Thu May 21 07:55:13 EDT 2026
+0.21	2026-05-21T07:55:13-04:00
 
 	[Bug Fixes]
 	- Bump minimum version of Params::Get and Config::Abstraction
 
-0.20	Tue May 19 08:51:20 EDT 2026
+0.20	2026-05-19T08:51:20-04:00
 
 	[Enhancement]
 	- Improve the method documentation
@@ -249,7 +278,7 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 		Specification (Z notation). Added comprehensive white-box test suite
 		(t/function.t) covering all public and private functions.
 
-0.19	Fri Dec 12 08:07:32 EST 2025
+0.19	2025-12-12T08:07:32-05:00
 
 	[Enhancement]
 	- Added UNIVERSAL configuration inheritance support.
@@ -261,18 +290,18 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	(t/universal.t) to verify UNIVERSAL inheritance across multiple classes
 	and inheritance levels. Updated POD with UNIVERSAL CONFIGURATION section.
 
-0.18	Thu Dec 11 11:58:01 EST 2025
+0.18	2025-12-11T11:58:01-05:00
 	If a parent class hierachy can't be found, ensure we still load the given path/file
 
-0.17	Sat Dec  6 21:31:58 EST 2025
+0.17	2025-12-06T21:31:58-05:00
 	Load in parents classes as well
 	Don't assume English - fixes https://www.cpantesters.org/cpan/report/b1624b76-ad2b-11f0-852b-311a6e8775ea
 
-0.16	Thu Oct 16 19:10:49 EDT 2025
+0.16	2025-10-16T19:10:49-04:00
 	Set croak_on_error
 	Latest testing console
 
-0.15	Wed Sep 17 07:28:24 EDT 2025
+0.15	2025-09-17T07:28:24-04:00
 	Allow the logger to be NULL, in which case nothing is set up
 	Scalar::Utils was used but not imported
 	instantiate: avoid double blessing
@@ -280,52 +309,52 @@ Revision history for Object::Configure - Runtime Configuration for an Object
 	Pass schema through to Config::Abstraction
 	Added configuration hot reloading without restarting the application (not supported on Windows)
 
-0.14	Wed Aug 27 13:16:36 EDT 2025
+0.14	2025-08-27T13:16:36-04:00
 	Allow the params to be undef
 
-0.13	Wed Aug 20 09:39:00 EDT 2025
+0.13	2025-08-20T09:39:00-04:00
 	Ensure it works with Log::Abstraction 0.25 and bump to use that
 		Also fixes https://github.com/nigelhorne/Object-Configure/issues/2
 
-0.12	Fri Aug  1 08:20:23 EDT 2025
+0.12	2025-08-01T08:20:23-04:00
 	Use Return::Set
 	Allow carp_on_warn to be read from the configuration file, and change the default to 0
 
-0.11	Mon Jul 21 08:06:15 EDT 2025
+0.11	2025-07-21T08:06:15-04:00
 	Avoid encapsulating Log::Abstraction within Log::Abstraction
 
-0.10	Wed Jun 18 14:54:59 EDT 2025
+0.10	2025-06-18T14:54:59-04:00
 	Use Config::Abstraction 0.10 to test environment settings
 
-0.09	Wed Jun 18 09:09:58 EDT 2025
+0.09	2025-06-18T09:09:58-04:00
 	Fix tests in other languages
 
-0.08	Fri Jun  6 08:35:54 EDT 2025
+0.08	2025-06-06T08:35:54-04:00
 	Removed a bunch of unneeded pre-reqs
 	Added the instantiate method
 
-0.07	Thu May 29 09:35:38 EDT 2025
+0.07	2025-05-29T09:35:38-04:00
 	Renamed from Class::Debug to Object::Configure
 	Get the Abstract from the PM file
 	Give better error message
 
-0.06	Thu May 22 21:11:29 EDT 2025
+0.06	2025-05-22T21:11:29-04:00
 	Ensure loggers aren't lost when it's a simple list
 
-0.05	Tue May 20 21:21:09 EDT 2025
+0.05	2025-05-20T21:21:09-04:00
 	Fix CI
 
-0.04	Tue May 20 21:14:56 EDT 2025
+0.04	2025-05-20T21:14:56-04:00
 	Try harder to avoid a logger hash within a logger hash
 
-0.03	Fri May 16 11:45:00 EDT 2025
+0.03	2025-05-16T11:45:00-04:00
 	Added CI support
 	Added better reporting on error
 	Use the features of Config::Abstraction 0.25
 
-0.02	Wed May  7 17:08:29 EDT 2025
+0.02	2025-05-07T17:08:29-04:00
 	Fix the return value
 	Added testing
 
-0.01	Wed May  7 16:42:04 EDT 2025
+0.01	2025-05-07T16:42:04-04:00
         First draft

@@ -1,3 +1,6 @@
+2.37 2026-11-06
+- fix C declarations to match Giza's correct `const` practice (#21) - thanks @sebastic for report
+
 2.36 2026-08-09
 - remove NO_INIT from the in/out NPT argument of pglcur, pgncur, pgncurse
   and pgolin so the documented "should be zero on first call" input value

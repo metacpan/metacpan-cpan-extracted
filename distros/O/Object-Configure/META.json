@@ -4,9 +4,9 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,35 +34,40 @@
          "requires" : {
             "Carp" : "0",
             "Config::Abstraction" : "0.38",
-            "ExtUtils::MakeMaker" : "6.64",
             "File::Spec" : "0",
+            "File::stat" : "0",
+            "IPC::System::Simple" : "0",
+            "List::Util" : "1.33",
             "Log::Abstraction" : "0.26",
+            "POSIX" : "0",
             "Params::Get" : "0.13",
             "Readonly" : "0",
             "Return::Set" : "0",
             "Scalar::Util" : "0",
+            "Time::HiRes" : "0",
+            "autodie" : "0",
             "mro" : "0",
-            "perl" : "5.008"
+            "perl" : "5.010"
          }
       },
       "test" : {
+         "recommends" : {
+            "Test::Memory::Cycle" : "0"
+         },
          "requires" : {
             "Errno" : "0",
             "File::Temp" : "0",
-            "File::stat" : "0",
             "IO::Handle" : "0",
-            "IPC::System::Simple" : "0",
-            "POSIX" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Exception" : "0",
             "Test::Mockingbird" : "0.1",
+            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
             "Test::Returns" : "0",
             "Test::Without::Module" : "0",
-            "Time::HiRes" : "0",
-            "YAML::XS" : "0",
-            "autodie" : "0"
+            "YAML::XS" : "0"
          }
       }
    },
@@ -81,6 +86,6 @@
          "x_repository" : "https://github.com/nigelhorne/Object-Configure"
       }
    },
-   "version" : 0.24,
+   "version" : 0.25,
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

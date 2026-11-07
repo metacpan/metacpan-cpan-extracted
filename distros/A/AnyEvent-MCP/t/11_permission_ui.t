@@ -297,6 +297,42 @@ $decision = prompt $workdir_request,
 is $decision->{rule}{"match.workdir"}, "/projects/one",
    "YAD workdir scope defaults to the selected workdir";
 
+my $fixed_host = {
+   %$request,
+   dimensions => { host => {
+      label => "Host", value => "remote ssh buildhost",
+      choices => [{ label => "This remote host", match => "remote ssh buildhost" }],
+   } },
+};
+my $host_schema = AnyEvent::MCP::Permissions::Ask::schema ($fixed_host, "rule",
+   { decision => "allow-always" });
+ok !exists $host_schema->{properties}{dim_host},
+   "native rule form omits a single-option host scope";
+$decision = prompt $fixed_host,
+   { status => 8, output => "\x1f\n" },
+   { status => 8, output => "TRUE\x1fFALSE\x1f1\x1f\n" };
+is $decision->{rule}{"match.host"}, "remote ssh buildhost",
+   "YAD rule automatically retains the only host scope";
+{
+   open my $log, "<", "$dir/log" or die $!;
+   my $line;
+   $line = $_ while <$log>;
+   close $log;
+   my $args = $json->decode ($line);
+   ok !(grep $_ eq "--field=Host scope:CB", @$args),
+      "YAD omits the one-option host selector";
+}
+$decision = AnyEvent::MCP::Permissions::Ask::build ($fixed_host,
+   { decision => "allow-always", sandbox_grants => ["read"] }, "rule",
+   { decision => "allow-always" });
+is $decision->{rule}{"match.host"}, "remote ssh buildhost",
+   "native rule also retains the implicit host scope";
+eval { AnyEvent::MCP::Permissions::Ask::build ($fixed_host,
+   { decision => "allow-always", sandbox_grants => ["read"], dim_host => "remote ssh elsewhere" },
+   "rule", { decision => "allow-always" }) };
+like $@, qr/Persistent dimension scope was not offered/,
+   "implicit host scope cannot be overridden";
+
 my $unsafe = prompt {
    %$request,
    sandbox_implementation => "NONE - UNSANDBOXED (full host-user privileges)",

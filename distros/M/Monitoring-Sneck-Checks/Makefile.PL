@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
 		'Pod::Usage'             => '0',
 		'Proc::ProcessTable'     => '0',
 		'Time::HiRes'            => '0',
+		'Time::Piece::Guess'     => '0',
 		'URI'                    => '0',
 		'XML::LibXML'            => '0',
 	},

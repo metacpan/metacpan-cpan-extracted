@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+die("wanted db --summary, got @ARGV\n") if "@ARGV" ne "db --summary";
+print "No Memory errors.\n\nNo PCIe AER errors.\n\nNo MCE errors.\n";

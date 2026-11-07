@@ -13,6 +13,7 @@ use Monitoring::Sneck::Checks::swraid;
 use Monitoring::Sneck::Checks::conntrack;
 use Monitoring::Sneck::Checks::systemd_failed;
 use Monitoring::Sneck::Checks::service;
+use Monitoring::Sneck::Checks::linux_ras;
 
 my $dir   = TestTmp::dir();
 my $data  = $FindBin::Bin . '/data';
@@ -166,5 +167,25 @@ is(
 	);
 }
 like( $run->( 'service', '-s', 'nginx', '-j', 'www' )->{stderr}, qr/--jail is only for freebsd/, '--jail on Linux' );
+
+# linux_ras
+local $Monitoring::Sneck::Checks::linux_ras::RAS_MC_CTL = $data . '/linux_ras/ras-mc-ctl';
+is( $run->('linux_ras')->{stdout}, "LINUX_RAS OK - no errors logged by rasdaemon\n", 'no errors' );
+{
+	local $Monitoring::Sneck::Checks::linux_ras::RAS_MC_CTL = $data . '/linux_ras/ras-mc-ctl_errors';
+	is(
+		$run->('linux_ras')->{stdout},
+		"LINUX_RAS CRITICAL - rasdaemon has logged errors\nMCE records summary:\n\t1 Corrected error\n",
+		'errors follow the status line'
+	);
+}
+{
+	local $Monitoring::Sneck::Checks::linux_ras::RAS_MC_CTL = $data . '/linux_ras/ras-mc-ctl_failing';
+	is(
+		$run->('linux_ras')->{stdout},
+		"LINUX_RAS UNKNOWN - ras-mc-ctl exited 1, Error: can not open database\n",
+		'ras-mc-ctl failing'
+	);
+}
 
 done_testing();

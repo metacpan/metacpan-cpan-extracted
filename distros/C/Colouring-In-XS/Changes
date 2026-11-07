@@ -1,5 +1,10 @@
 Revision history for Colouring-In-XS
 
+0.13    2026-11-06
+        - Stringifying a colour no longer warns of an uninitialized value.
+        - Tests cover every line of the XS and the headers under Devel::XSCover.
+        - include_dir, set_messages and get_message documented.
+
 0.12    2026-10-23
         - The method rewrite no longer hangs compiling a loop.
 

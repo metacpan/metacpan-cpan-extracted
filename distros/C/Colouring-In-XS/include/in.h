@@ -43,7 +43,7 @@ static SV * xs_new(SV * class, HV * hash) {
 
 static int numIs(SV * num) {
 	dTHX;
-	if (!num || !SvOK(num)) return 0;
+	if (!num || !SvOK(num)) return 0; /* # uncoverable condition left count:1 */
 	/* looks_like_number is Perl's portable, bounds-safe numeric test
 	 * (handles ints, floats, scientific notation, Unicode digits). The
 	 * previous hand-rolled scanner had an unbounded write into a

@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "CPAN::Meta" : "0",
             "Capture::Tiny" : "0.28",
+            "File::Find" : "0",
             "Test::More" : "0"
          }
       },
@@ -33,18 +35,16 @@
       },
       "runtime" : {
          "recommends" : {
+            "Map::Tube::Plugin::FuzzyFind" : "v0.80.0",
+            "Map::Tube::Plugin::Graph" : "v1.3.0",
             "Unicode::Collate" : "0"
          },
          "requires" : {
-            "Carp" : "0",
-            "Encode::Locale" : "1.05",
-            "MIME::Base64" : "3.14",
             "Map::Tube" : "v5.1.0",
             "Map::Tube::Exception" : "3.25",
             "Module::Pluggable" : "5.1",
             "Moo" : "2.000000",
             "MooX::Options" : "4.023",
-            "Path::Tiny" : "0",
             "Text::ASCIITable" : "0.22",
             "Try::Tiny" : "0",
             "Types::Standard" : "1.000005",
@@ -52,16 +52,24 @@
             "perl" : "5.014",
             "utf8::all" : "0.024"
          }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Version" : "0"
+         }
       }
    },
    "provides" : {
       "Map::Tube::CLI" : {
          "file" : "lib/Map/Tube/CLI.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.1.0"
       },
       "Map::Tube::CLI::Option" : {
          "file" : "lib/Map/Tube/CLI/Option.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -75,6 +83,6 @@
          "web" : "https://github.com/manwar/Map-Tube-CLI"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

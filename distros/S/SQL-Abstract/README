@@ -401,8 +401,9 @@ METHODS
 
     array_datatypes
         On by default: an arrayref as a column value in INSERT or UPDATE
-        (and in "values") is one bind value, an array datatype passed
-        directly to the DBI layer. Literal SQL is "\[ $sql, @bind ]".
+        (and in "values" and "generate") is one bind value, an array
+        datatype passed directly to the DBI layer. Literal SQL is "\[ $sql,
+        @bind ]".
 
         "array_datatypes => 0" restores the behaviour from before 2.000002:
         the arrayref is literal SQL, its first element goes into the SQL
@@ -544,6 +545,11 @@ METHODS
 
     You get the idea. Strings get their case twiddled, but everything else
     remains verbatim.
+
+    In a hashref or an arrayref, an arrayref is one bind value, as in
+    "insert" and "update" (see "array_datatypes"). Literal SQL is "\$sql" or
+    "\[ $sql, @bind ]". The second calling form puts every value into the
+    SQL text as-is, so use it only with values you trust.
 
 EXPORTABLE FUNCTIONS
   is_plain_value

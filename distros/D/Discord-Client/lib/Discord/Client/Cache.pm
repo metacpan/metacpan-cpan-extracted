@@ -7,7 +7,7 @@ use Carp qw(croak);
 use JSON::PP ();
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ( $class, %args ) = @_;

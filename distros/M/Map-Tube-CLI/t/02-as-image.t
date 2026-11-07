@@ -18,7 +18,7 @@ my $cli;
 eval { $cli = Map::Tube::CLI->new( map => 'London', generate_map => 1 ) };
 ok($cli, 'Instantiating map tube client (1)');
 if ($cli) {
-  my $fname = 'London.png';
+  my $fname = 'London_Tube.png';
   unlink($fname);
   $cli->run( );
   ok(-s $fname, 'Generating PNG image of whole map');
@@ -28,10 +28,20 @@ if ($cli) {
 eval { $cli = Map::Tube::CLI->new( map => 'London', generate_map => 1, line => 'Bakerloo' ) };
 ok($cli, 'Instantiating map tube client (2)');
 if ($cli) {
-  my $fname = 'Bakerloo.png';
+  my $fname = 'London_Tube_Bakerloo.png';
   unlink($fname);
   $cli->run( );
   ok(-s $fname, 'Generating PNG image of one line');
+  unlink($fname);
+}
+
+eval { $cli = Map::Tube::CLI->new( map => 'London', generate_map => 1, line => 'Bakerloo', image => 'test.png' ) };
+ok($cli, 'Instantiating map tube client (3)');
+if ($cli) {
+  my $fname = 'test.png';
+  unlink($fname);
+  $cli->run( );
+  ok(-s $fname, 'Generating PNG image of one line with given output name');
   unlink($fname);
 }
 

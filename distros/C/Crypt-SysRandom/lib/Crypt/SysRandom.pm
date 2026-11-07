@@ -1,19 +1,21 @@
 package Crypt::SysRandom;
-$Crypt::SysRandom::VERSION = '0.007';
+$Crypt::SysRandom::VERSION = '0.008';
 use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT_OK = 'random_bytes';
+our @EXPORT_OK = qw/random_bytes random_hex random_base64 random_base64url random_uuid/;
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 use Carp ();
 use Errno ();
+use MIME::Base64 3.11 ();
+
+my $rtl_gen_random = 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)';
 
 if (eval { require Crypt::SysRandom::XS }) {
 	*random_bytes = \&Crypt::SysRandom::XS::random_bytes;
-} elsif (eval { require Win32::API }) {
-	my $genrand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)')
-		or die "Could not import SystemFunction036: $^E";
+} elsif (my $genrand = eval { require Win32::API; Win32::API->new('advapi32', $rtl_gen_random) }) {
 	sub random_bytes_win32 {
 		my ($count) = @_;
 		return '' if $count == 0;
@@ -22,8 +24,7 @@ if (eval { require Crypt::SysRandom::XS }) {
 		return $buffer;
 	}
 	*random_bytes = \&random_bytes_win32;
-} elsif (-e '/dev/urandom') {
-	open my $fh, '<:raw', '/dev/urandom' or die "Couldn't open /dev/urandom: $!";
+} elsif (open my $fh, '<:raw', '/dev/urandom') {
 	sub random_bytes_urandom {
 		my ($count) = @_;
 		my ($result, $offset) = ('', 0);
@@ -37,10 +38,29 @@ if (eval { require Crypt::SysRandom::XS }) {
 	}
 	*random_bytes = \&random_bytes_urandom;
 } else {
-	die "No source of randomness found";
+	die "No source of randomness found, consider installing Crypt::SysRandom::XS";
 }
 
 delete @Crypt::SysRandom::{qw(random_bytes_win32 random_bytes_urandom)};
+
+sub random_hex {
+	return unpack 'H*', random_bytes(@_);
+}
+
+sub random_base64 {
+	return MIME::Base64::encode_base64(random_bytes(@_), '');
+}
+
+sub random_base64url {
+	return MIME::Base64::encode_base64url(random_bytes(@_));
+}
+
+sub random_uuid {
+	my $random = random_bytes(16);
+	vec($random, 35, 2) = 2; # Variant marker, must be 2 per RFC 9562
+	vec($random, 13, 4) = 4; # Version marker, we're doing UUIDv4
+	return join '-', unpack 'H8H4H4H4H12', $random;
+}
 
 1;
 
@@ -58,7 +78,7 @@ Crypt::SysRandom - Perl interface to system randomness
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -67,13 +87,29 @@ version 0.007
 
 =head1 DESCRIPTION
 
-This module uses whatever interface is available to procure cryptographically random data from the system.
+This module uses whatever interface is available to procure cryptographically random data from the system. All functions are optionally exported.
 
 =head1 FUNCTIONS
 
 =head2 random_bytes($count)
 
-This will fetch a string of C<$count> random bytes containing cryptographically secure random date.
+This will fetch a string of C<$count> random bytes containing cryptographically secure random data.
+
+=head2 random_hex($count)
+
+This will fetch a string of C<$count> random bytes containing cryptographically secure random data and hex encode it (so the result will be twice as many bytes).
+
+=head2 random_base64($count)
+
+This will fetch a string of C<$count> random bytes containing cryptographically secure random data and base64 encode it (so the result will be about 33% larger).
+
+=head2 random_base64url($count)
+
+This will fetch a string of C<$count> random bytes containing cryptographically secure random data and base64url encode it (so the result will be about 33% larger).
+
+=head2 random_uuid()
+
+This will generate a cryptographically random UUIDv4.
 
 =head1 Backends
 

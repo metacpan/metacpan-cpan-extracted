@@ -1,5 +1,19 @@
 Revision history for Apophis
 
+1.01    2026-11-06
+        - Croak on a store path that does not fit the buffer, with room for
+          its .tmp and .meta suffixes, instead of writing to a truncated one.
+        - Report a read that failed, which PerlIO returns as nothing read,
+          as the error it is: fetch croaks and meta gives undef.
+        - Drive derive_ns, identify_fh, the partial store_of probes and the
+          short-id refusal of the C ABI from the self test.
+        - Tests for every error path, the whole XS covered under xs_cover.
+        - Under use Apophis a call to identify, store, exists, fetch, verify
+          or remove compiles to a custom op, which runs the body with no sub
+          call when the method is this module's and falls back to entersub
+          otherwise. no Apophis turns it off.
+        - The op_ methods are aliases of those six. _make_op is gone.
+
 0.06    2026-08-31
         - Move Apophis.xs to the top of the dist and drop the XSMULTI
           build, which dlltool could not link on Strawberry.

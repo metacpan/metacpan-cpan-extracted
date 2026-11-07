@@ -1,6 +1,7 @@
 use v5.26;
 use warnings;
 use Test2::V1;
+use Future;
 use lib 't/lib';
 use TestDiscordREST qw(client response error);
 
@@ -44,6 +45,30 @@ T2->subtest(
         $http->respond( response( 200, {} ), 1 );
         T2->ok( $second_request->is_done, 'next request completes' );
         $rest->close;
+    }
+);
+
+T2->subtest(
+    'chained request cancellation settles once and releases transport capacity',
+    sub {
+        my ( $rest, $http ) = client( max_in_flight => 1 );
+
+        # Keep only the chained Future, as model operations do, while another route waits.
+        my $chained = $rest->request( 'GET', '/channels/123' )->then( sub { Future->done(@_) } );
+        my $next = $rest->request( 'GET', '/channels/999' );
+        my $settled = 0;
+        $chained->on_ready( sub { ++$settled } );
+        $chained->cancel;
+
+        # Inward cancellation must not re-enter the Future being cancelled on its way out.
+        T2->ok( $chained->is_cancelled, 'the chained operation is cancelled' );
+        T2->is( $settled, 1, 'completion is reported once' );
+        T2->ok( $http->call(0)->{future}->is_cancelled, 'the transport is cancelled' );
+        T2->is( $http->count, 2, 'the waiting route starts' );
+        $http->respond( response( 200, {} ), 1 );
+        T2->ok( $next->is_done, 'the waiting request completes' );
+        T2->is( $rest->stats->{pending}, 0, 'no requests remain queued' );
+        $rest->close->get;
     }
 );
 

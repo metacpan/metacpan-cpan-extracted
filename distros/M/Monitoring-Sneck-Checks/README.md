@@ -36,6 +36,7 @@ sneck_check --list-checks
 - dns :: A DNS lookup, its answers, and how long it took.
 - dns_sync :: That a zone's nameservers all answer, are authoritative, and have the same serial.
 - file_age :: How old and how big a file is.
+- file_content :: A file being there, or not, with lines that must or must not match regexes, and being executable.
 - file_handles :: Open files against the system wide limit.
 - file_mode :: The mode, owner, and group of files.
 - hosts :: /etc/hosts, and names in it mapping to the right address.
@@ -45,11 +46,13 @@ sneck_check --list-checks
 - interface :: Network interfaces being up, at speed and full duplex, with the right MTU, and errors and drops per second.
 - jails :: FreeBSD jails running, every one in jail.conf if wanted, and vm-bhyve VMs.
 - kernel_modules :: Kernel modules loaded or not, and kept from loading through modprobe.d, as CIS wants.
+- linux_ras :: Hardware errors rasdaemon has logged, memory, PCIe, and machine checks.
 - listening :: Ports being listened on, and optionally nothing else.
 - load :: The load averages, optionally per CPU.
 - log :: New lines in a log matching a regex, with rotation handled and matches held for a while.
 - memory :: How much memory is used, optionally counting the ZFS ARC as available.
 - mount :: That fstab's file systems are mounted, and not gone read only.
+- mtime :: Files changed at, before, or after a time, such as binaries older than a known good build.
 - neighbors :: How full the ARP and NDP neighbor tables are, and if they filled since the last run.
 - ntp :: How far the local clock is off from a NTP server.
 - oom :: Processes killed by the OOM killer since the last run, held for a while if wanted.

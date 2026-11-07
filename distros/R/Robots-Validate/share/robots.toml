@@ -2305,6 +2305,14 @@ domain=[
 agents="Baiduspider"
 domain=".crawl.baidu.com"
 
+[bakenbot]
+## Date: 2026-11-06
+## About: https://baken.dev/bakenbot
+
+agents="BakenBot"
+domain=".baken.dev"
+network=[ "213.239.220.146", "2a01:4f8:a0:70c4::2" ]
+
 [banquisebot]
 ## Date: 2026-10-19
 ## About: https://www.banquise.ca/bot
@@ -2396,6 +2404,13 @@ network=[
   "67.199.248.0/24",
   "199.91.151.0/24",
 ]
+
+[bitmoversbot]
+## Date: 2026-10-30
+## About: https://bitmovers.co.uk/crawler
+## Network: https://bitmovers.co.uk/crawler/ips.json
+agents="BitMoversBot"
+network="84.18.244.40/32"
 
 [bitsightbot]
 ## About: https://www.bitsight.com
@@ -2806,6 +2821,14 @@ network=[
   "18.227.226.255/32",
 ]
 
+[cl0qcrawler]
+## Date: 2026-11-05
+## About: https://cl0q.com/bot/
+## Network: https://cl0q.com/bot/ips.json
+
+agents=[ "cl0q-crawler", "cl0q-discovery", "cl0q-favicon" ]
+network=[ "143.110.230.182" ]
+
 [clueweb]
 ## About: https://boston.lti.cs.cmu.edu/CMU-ClueWeb-Crawler/
 agents="ClueWeb-Crawler"
@@ -2967,6 +2990,11 @@ network=[
   "103.241.52.5/32",
   "92.118.208.185/32"
 ]
+
+[dnscrawler]
+## Note: the UA string contains a link to a web server at the specific IP, e.g. https://crawler-us-ma-001.dns-stats.info/
+agents="dns-crawler"
+domain=".dns-stats.info"
 
 [domainprint]
 ## Date: 2026-09-10
@@ -4063,6 +4091,12 @@ network=[
   "2406:da18:800::/38",
   "2605:9f80:8000::/35",
 ]
+
+
+[getagentsradar]
+## About: https://getagents.io
+agents="GetAgentsRadar"
+domain=".getagents.io"
 
 [google]
 ## Date: 2026-09-25
@@ -6950,6 +6984,19 @@ network=[
   "193.224.0.0/15",
 ]
 
+[pactmeshbot]
+## Date: 2026-11-01
+## About: https://bot.pactmesh.net/
+## Network: https://bot.pactmesh.net/ips.json
+## Query: .ipv4[], .ipv6[]
+
+agents="PactMeshBot"
+domain=".bot.pactmesh.net"
+network=[
+  "152.53.51.107",
+  "2a0a:4cc0:80:12ae:74f9:34ff:fe45:7aa5"
+]
+
 [partnex]
 ## About: https://getpartnex.com/bot
 agents="PartnexRadarBot"
@@ -7043,6 +7090,7 @@ network=[
 ]
 
 [puritybot]
+## Date: 2026-10-29
 ## About: https://puri.li/bot
 
 agents="PurityBot"
@@ -7062,7 +7110,7 @@ network=[
 ]
 
 [qwant]
-## Date: 2026-09-25
+## Date: 2026-10-29
 ## About: https://help.qwant.com/hc/en-us/articles/51146433634833-The-Qwant-bot-QwantBot-and-the-robots-txt-file
 ## Network: https://help.qwant.com/hc/article_attachments/51147492481937
 
@@ -7071,6 +7119,14 @@ domain=".qwant.com"
 network=[
   "194.187.171.0/24",
 ]
+
+[ricciutibot]
+## Date: 2026-10-29
+## About: https://search.caioricciuti.com/bot
+## Network: https://search.caioricciuti.com/bot/ips.json
+
+agents="RicciutiBot"
+network="91.99.61.80/32"
 
 [riverbot]
 ## Date: 2026-10-24
@@ -8688,6 +8744,18 @@ network=[
   "211.249.46.208/29",
   "211.249.46.216/30",
   "211.249.46.220/32",
+]
+
+[yioopbot]
+## Date: 2026-11-02
+## About: https://www.yioop.com/bot
+
+agents="YioopBot"
+network=[
+  "173.13.143.73/32",
+  "173.13.143.74/31",
+  "173.13.143.76/31",
+  "173.13.143.78/32"
 ]
 
 [youbot]

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package Dist::Conformance::Program 0.002;
+package Dist::Conformance::Program 0.003;
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -11,15 +11,18 @@ use re '/aasx';
 use Cpanel::JSON::XS();
 use Getopt::Long();
 use List::Util();
+use Mojo::File();
 use Pod::Usage();
 
 use Dist::Conformance();
+use Dist::Conformance::Check::SystemPackages();
 use Dist::Conformance::Schema();
 
 
 
 sub main (@arguments) {
     my $command = shift @arguments // 'help';
+    return report_packages(@arguments) if $command eq 'packages';
     my %options = ( root => q{.} );
     my $parsed  = Getopt::Long::GetOptionsFromArray( \@arguments, \%options, qw{root=s json dry-run offline cache=s standards=s} );
     return show_synopsis(2) if !$parsed || @arguments;
@@ -38,6 +41,42 @@ sub main (@arguments) {
     }
     print {*STDOUT} $output or return 2;
     return $status;
+}
+
+
+sub report_packages (@arguments) {
+    my %options = ( packager => 'deb', 'os-release' => '/etc/os-release' );
+    my $parsed  = Getopt::Long::GetOptionsFromArray( \@arguments, \%options, qw{packager=s distro=s release=s codename=s os-release=s programs sources needs} );
+    return show_synopsis(2) if !$parsed || @arguments > 1 || ( grep { $options{$_} } qw{programs sources needs} ) > 1;
+    my $lines = eval { packages_lines( $arguments[0] // q{.}, \%options ) };
+    if ( !defined $lines ) {
+        warn "conformance: $@";
+        return 2;
+    }
+    print {*STDOUT} map { "$_\n" } @$lines or return 2;
+    return 0;
+}
+
+
+sub packages_lines ( $directory, $options ) {
+    my $packager = $options->{packager};
+    die "$packager is not the name of a packager\n" if !Dist::Conformance::Schema::matches( { pattern => $Dist::Conformance::Check::SystemPackages::PACKAGER }, $packager );
+    my $declared = Dist::Conformance::Check::SystemPackages->declared($directory);
+    return [] if !%{ $declared->{packages} };
+
+    my %host = ( distro => 'ID', release => 'VERSION_ID', codename => 'VERSION_CODENAME' );
+    if ( List::Util::any { !defined $options->{$_} } keys %host ) {
+        my $file       = $options->{'os-release'};
+        my $text       = eval { Mojo::File->new($file)->slurp } // die( "Cannot read $file: " . Dist::Conformance::Schema::first_line($@) . "\n" );
+        my $os_release = Dist::Conformance::Check::SystemPackages::os_release($text);
+        $options->{$_} //= $os_release->{ $host{$_} } for keys %host;
+    }
+    my $resolved = Dist::Conformance::Check::SystemPackages->resolve( $declared, packager => $packager, map { $_ => $options->{$_} } keys %host );
+    die join( q{}, map { "The dependency $_ has no package for $packager\n" } @{ $resolved->{unresolved} } ) if @{ $resolved->{unresolved} };
+    return $resolved->{programs}                                                                             if $options->{programs};
+    return $resolved->{packages}                                                                             if !$options->{sources} && !$options->{needs};
+    my $json = Cpanel::JSON::XS->new->utf8->canonical;
+    return [ map { $json->encode($_) } @{ $resolved->{ $options->{sources} ? 'sources' : 'needs' } } ];
 }
 
 
@@ -109,12 +148,13 @@ conformance - Check a repository against its flavor of the standards, and bring 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
     conformance check  [--root DIR] [--json] [--offline] [--cache DIR] [--standards DIR]
     conformance update [--root DIR] [--dry-run] [--json] [--offline] [--cache DIR] [--standards DIR]
+    conformance packages [--packager NAME] [--distro ID --release VERSION_ID --codename CODENAME] [--os-release FILE] [--programs | --sources | --needs] [DIR]
     conformance help
 
 =head1 DESCRIPTION
@@ -129,6 +169,15 @@ holds, and L<Dist::Conformance::Check> what each check looks at.
 =head2 main
 
 C<(@arguments)>.  Runs the program, and returns its exit status.
+
+=head2 report_packages
+
+C<(@arguments)>.  Runs C<packages>, and returns its exit status.
+
+=head2 packages_lines
+
+C<($directory, \%options)>.  The lines that C<packages> prints.  Dies with the
+reason when it cannot print them.
 
 =head2 report_check
 
@@ -168,6 +217,38 @@ files that the checks can write, and installs the git hooks.  Prints one line
 for each change, and each thing that only a person can do.  With C<--dry-run>
 it changes nothing, and prints what it would change.  Exits 0 when it ran,
 whatever it left for a person; run C<check> afterwards to see what still fails.
+
+=item packages
+
+Prints what the checkout in DIR declares in F<metamerge.yml> for this host:
+the names of the packages for the packager C<--packager>, default C<deb>, one
+on each line.  DIR defaults to the current directory.
+L<Dist::Conformance::Check::SystemPackages> says what the declaration holds,
+and how it resolves for a host.
+
+The host is C<--distro>, C<--release> and C<--codename>, which are the C<ID>,
+C<VERSION_ID> and C<VERSION_CODENAME> of F</etc/os-release>.  Each one that is
+not given is read from that file, or from the file of C<--os-release>.
+
+With C<--programs> it prints the tests of the dependencies instead, one on
+each line.  With C<--sources> it prints each source that a package comes
+from, with its suites resolved, and with C<--needs> each dependency, with its
+package, source and test, as one JSON object on each line.
+
+It reads only F<metamerge.yml> and F</etc/os-release>: it needs no
+F<.conformance.yml>, no standards and no network, so a script can run it on a
+host that it provisions, such as:
+
+    apt-get install -y $(conformance packages /bogus/checkout)
+
+It prints nothing else on standard output.  When the checkout declares
+nothing, it prints nothing, reads no F</etc/os-release>, and exits 0.  It
+prints nothing, and exits 2 with the reason on standard error, in these
+cases: the declaration is not valid, F</etc/os-release> cannot be read, a
+source needs a codename that the host does not have, or a dependency has no
+package for the host.  The message for the last case is
+C<The dependency NAME has no package for PACKAGER>, because a host must not
+go on without it.
 
 =item help
 

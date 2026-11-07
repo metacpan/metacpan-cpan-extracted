@@ -8,13 +8,14 @@ use Colouring::In::XS;
 # The method rewrite walks a sub's ops by op_next, and a loop's ops lead back
 # round to its start: 0.11 never finished compiling a `while` loop. A spin in C
 # cannot be interrupted, so each case compiles in a child, given 15 seconds.
+# The child exits the ordinary way so that a coverage run gets its counters.
 sub compiles {
     my ($code, $name) = @_;
     my $pid = fork;
     die "fork: $!" unless defined $pid;
     if (!$pid) {
         my $ok = eval "$code; 1";
-        POSIX::_exit($ok ? 0 : 2);
+        exit($ok ? 0 : 2);
     }
     my $waited = 0;
     while ($waited < 150) {

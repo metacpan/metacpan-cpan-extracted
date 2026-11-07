@@ -1,0 +1,180 @@
+class	samples	call	dash	bash	ours	examples
+all three differ	1	. 'script'	2 |/usr/bin/dash: 1: /usr/bin/script: Syntax error: word unexpected (e	126 |/usr/bin/bash: line 1: .: /usr/bin/script: cannot execute binary 	248 |Proc::ShellSubset::Large: the text of '. script' is not supported	SC:Checks/Commands.hs:prop_checkSourceArgs2
+all three differ	1	bind '-f' '/var/tmp/runcompare/w0/run/home/.inputrc'	127 |/usr/bin/dash: 1: bind: not found\n	1 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n/us	0 |	NB:5298
+all three differ	1	bind '-l'	127 |/usr/bin/dash: 1: bind: not found\n	0 abort\naccept-line\nalias-expand-line\narrow-key-prefix\nbackward-by	0 |	NB:11817
+all three differ	1	bind '-q' 'command'	127 |/usr/bin/dash: 1: bind: not found\n	1 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n/us	0 |	TL:common/bind.md:12
+all three differ	1	bind '-q' 'complete'	127 |/usr/bin/dash: 1: bind: not found\n	0 complete can be invoked via "\C-i", "\M-\M-\000".\n|/usr/bin/bash: l	0 |	NB:6920
+all three differ	1	compopt	127 |/usr/bin/dash: 1: compopt: not found\n	1 |/usr/bin/bash: line 1: compopt: not currently executing completion 	0 |	TL:common/compopt.md:18
+all three differ	1	compopt '-o'	127 |/usr/bin/dash: 1: compopt: not found\n	2 |/usr/bin/bash: line 1: compopt: -o: option requires an argument\nco	0 |	TL:common/compopt.md:14
+all three differ	1	compopt 'command'	127 |/usr/bin/dash: 1: compopt: not found\n	1 |/usr/bin/bash: line 1: compopt: command: no completion specificatio	0 |	TL:common/compopt.md:10
+all three differ	1	fc '--help'	127 |/usr/bin/dash: 1: fc: not found\n	2 fc: fc [-e ename] [-lnr] [first] [last] or fc -s [pat=rep] [command]	0 |	TL:common/fc.md:37
+all three differ	1	fc '-s' 'string1=string2'	127 |/usr/bin/dash: 1: fc: not found\n	1 |/usr/bin/bash: line 1: fc: no command found\n	0 |	TL:common/fc.md:33
+all three differ	1	help '('	127 |/usr/bin/dash: 1: help: not found\n	0 (( ... )): (( expression ))\n    Evaluate arithmetic expression.\n  	0 |	TL:common/help.md:24
+all three differ	1	help '[['	127 |/usr/bin/dash: 1: help: not found\n	0 [[ ... ]]: [[ expression ]]\n    Execute conditional command.\n    \	0 |	TL:common/help.md:20
+all three differ	1	help 'bind'	127 |/usr/bin/dash: 1: help: not found\n	0 bind: bind [-lpsvPSVX] [-m keymap] [-f filename] [-q name] [-u name]	0 |	TL:common/bind.md:24
+all three differ	1	help 'case'	127 |/usr/bin/dash: 1: help: not found\n	0 case: case WORD in [PATTERN [| PATTERN]...) COMMANDS ;;]... esac\n  	0 |	TL:common/case.md:24
+all three differ	1	help 'cd'	127 |/usr/bin/dash: 1: help: not found\n	0 cd: cd [-L|[-P [-e]] [-@]] [dir]\n    Change the shell working direc	0 |	TL:common/help.md:28
+all three differ	1	help 'enable'	127 |/usr/bin/dash: 1: help: not found\n	0 enable: enable [-a] [-dnps] [-f filename] [name ...]\n    Enable and	0 |	TL:common/enable.md:24
+all three differ	1	help 'for'	127 |/usr/bin/dash: 1: help: not found\n	0 for: for NAME [in WORDS ... ] ; do COMMANDS; done\n    Execute comma	0 |	TL:common/help.md:16
+all three differ	1	help 'function'	127 |/usr/bin/dash: 1: help: not found\n	0 function: function name { COMMANDS ; } or name () { COMMANDS ; }\n  	0 |	TL:common/function.md:21
+all three differ	1	help 'mapfile'	127 |/usr/bin/dash: 1: help: not found\n	0 mapfile: mapfile [-d delim] [-n count] [-O origin] [-s count] [-t] [	0 |	TL:common/readarray.md:32
+all three differ	1	help 'shopt'	127 |/usr/bin/dash: 1: help: not found\n	0 shopt: shopt [-pqsu] [-o] [optname ...]\n    Set and unset shell opt	0 |	TL:common/shopt.md:25
+all three differ	1	help 'test'	127 |/usr/bin/dash: 1: help: not found\n	0 test: test [expr]\n    Evaluate conditional expression.\n    \n    E	0 |	TL:common/test.md:34
+all three differ	1	help 'trap'	127 |/usr/bin/dash: 1: help: not found\n	0 trap: trap [-lp] [[arg] signal_spec ...]\n    Trap signals and other	0 |	TL:linux/trap.md:36
+all three differ	1	help 'ulimit'	127 |/usr/bin/dash: 1: help: not found\n	0 ulimit: ulimit [-SHabcdefiklmnpqrstuvxPRT] [limit]\n    Modify shell	0 |	TL:common/ulimit.md:29
+all three differ	1	help 'while'	127 |/usr/bin/dash: 1: help: not found\n	0 while: while COMMANDS; do COMMANDS-2; done\n    Execute commands as 	0 |	TL:common/help.md:12
+all three differ	1	history '-d'	127 |/usr/bin/dash: 1: history: not found\n	2 |/usr/bin/bash: line 1: history: -d: option requires an argument\nhi	0 |	TL:common/history.md:16
+all three differ	1	history '-d' ''	127 |/usr/bin/dash: 1: history: not found\n	1 |/usr/bin/bash: line 1: history: : history position out of range\n	0 |	NB:1460
+all three differ	1	history '-d' '1006'	127 |/usr/bin/dash: 1: history: not found\n	1 |/usr/bin/bash: line 1: history: 1006: history position out of range	0 |	NB:1469
+all three differ	1	history '-d' '1007'	127 |/usr/bin/dash: 1: history: not found\n	1 |/usr/bin/bash: line 1: history: 1007: history position out of range	0 |	NB:1469
+all three differ	1	history '-d' '1008'	127 |/usr/bin/dash: 1: history: not found\n	1 |/usr/bin/bash: line 1: history: 1008: history position out of range	0 |	NB:1469
+all three differ	1	history '-d' 'offset'	127 |/usr/bin/dash: 1: history: not found\n	1 |/usr/bin/bash: line 1: history: offset: history position out of ran	0 |	TL:common/history.md:28
+all three differ	1	history '-n'	127 |/usr/bin/dash: 1: history: not found\n	1 |	0 |	NB:11906
+all three differ	1	history '-r'	127 |/usr/bin/dash: 1: history: not found\n	1 |	0 |	NB:7017
+all three differ	1	history '-r' ''	127 |/usr/bin/dash: 1: history: not found\n	1 |	0 |	NB:7016
+all three differ	1	history '-r' '.cwdhist'	127 |/usr/bin/dash: 1: history: not found\n	1 |	0 |	NB:119
+all three differ	1	logout 'exit_code'	127 |/usr/bin/dash: 1: logout: not found\n	1 |/usr/bin/bash: line 1: logout: not login shell: use `exit'\n	0 |	TL:common/logout.md:12
+all three differ	1	times	0 0m0.000000s 0m0.000000s\n0m0.000000s 0m0.000000s\n|	0 0m0.001s 0m0.000s\n0m0.000s 0m0.000s\n|	0 0m0.030000s 0m0.010000s\n0m0.000000s 0m0.000000s\n|	TL:common/times.md:10
+all three differ	2	history '-w'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	TL:common/history.md:24,NB:9582
+all three differ	3	bind '-P'	127 |/usr/bin/dash: 1: bind: not found\n	0 \nabort can be found on "\C-g", "\C-x\C-g", "\M-\C-g".\naccept-line 	0 |	NB:11884,NB:11864,NB:11872
+all three differ	3	bind '-p'	127 |/usr/bin/dash: 1: bind: not found\n	0 \n"\C-g": abort\n"\C-x\C-g": abort\n"\M-\C-g": abort\n"\C-j": accept	0 |	NB:10721,NB:11875,TL:common/bind.md:8
+all three differ	3	cd '-'	0 /var/tmp/runcompare/builtins/run\n|	1 |/usr/bin/bash: line 1: cd: OLDPWD not set\n	0 |	SC:Analytics.hs:prop_checkCdAndBack4,NB:4727,TL:common/cd.md:24
+all three differ	3	help	127 |/usr/bin/dash: 1: help: not found\n	0 GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)\nThese she	0 |	TL:common/help.md:8,TL:common/volta.md:28,TL:common/dmd.md:20
+all three differ	3	logout	127 |/usr/bin/dash: 1: logout: not found\n	1 |/usr/bin/bash: line 1: logout: not login shell: use `exit'\n	0 |	TL:common/logout.md:8,TL:common/arthas.md:17,NB:1859
+bash=ours, dash differs	1	HISTTIMEFORMAT='%s ' history '2'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:9146
+bash=ours, dash differs	1	bind '"\C-i":complete'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:9759
+bash=ours, dash differs	1	bind '"\eY": "\e2\e."'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:11907
+bash=ours, dash differs	1	bind '"\e[24~":"\C-k \C-upwd\n"'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:10086
+bash=ours, dash differs	1	bind '"\e[24~":"foobar"'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:9761
+bash=ours, dash differs	1	bind '"\e[24~":"pwd\n"'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:9762
+bash=ours, dash differs	1	bind '"e":self-insert'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:11737
+bash=ours, dash differs	1	bind '-X'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	TL:common/bind.md:20
+bash=ours, dash differs	1	bind '-m' 'vi-insert' '"{" "\C-v{}\ei"'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:12607
+bash=ours, dash differs	1	bind '-r' '\e'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:7330
+bash=ours, dash differs	1	bind '-x' '"\eW":"who"'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	NB:10703
+bash=ours, dash differs	1	bind '-x' '"key_sequence":command'	127 |/usr/bin/dash: 1: bind: not found\n	0 |/usr/bin/bash: line 1: bind: warning: line editing not enabled\n	0 |	TL:common/bind.md:16
+bash=ours, dash differs	1	fc	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:9
+bash=ours, dash differs	1	fc '-e' 'emacs'	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:13
+bash=ours, dash differs	1	fc '-l'	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:17
+bash=ours, dash differs	1	fc '-l' '-r'	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:21
+bash=ours, dash differs	1	fc '416' '420'	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:29
+bash=ours, dash differs	1	fc 'number'	127 |/usr/bin/dash: 1: fc: not found\n	0 |	0 |	TL:common/fc.md:25
+bash=ours, dash differs	1	history '-a'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:118
+bash=ours, dash differs	1	history '-cr'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:583
+bash=ours, dash differs	1	history '-r' 'file.txt'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:120
+bash=ours, dash differs	1	history '-s' ''	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:8052
+bash=ours, dash differs	1	history '-s' 'command'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	TL:common/history.md:32
+bash=ours, dash differs	1	history '-s' 'echo whatever you "want your" command to be'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:8053
+bash=ours, dash differs	1	history '20'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	TL:common/history.md:12
+bash=ours, dash differs	1	history '300'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:8950
+bash=ours, dash differs	1	return '0'	0 |	2 |/usr/bin/bash: line 1: return: can only `return' from a function or	2 |sh: return: can only `return' from a function or sourced script\n	SC:Checks/Commands.hs:prop_checkReturn4
+bash=ours, dash differs	1	return '1'	1 |	2 |/usr/bin/bash: line 1: return: can only `return' from a function or	2 |sh: return: can only `return' from a function or sourced script\n	SC:Checks/Commands.hs:prop_checkReturn2
+bash=ours, dash differs	1	set '-o' 'history'	2 |/usr/bin/dash: 1: set: Illegal option -o history\n	0 |	0 |	NB:1716
+bash=ours, dash differs	2	history '-c'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	TL:common/history.md:20,NB:582
+bash=ours, dash differs	2	history '10'	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	NB:6194,NB:6193
+bash=ours, dash differs	3	return	0 |	2 |/usr/bin/bash: line 1: return: can only `return' from a function or	2 |sh: return: can only `return' from a function or sourced script\n	SC:Analytics.hs:prop_checkUseBeforeDefinition7,SC:Checks/Commands.hs:prop_checkReturn1,SC:Checks/Commands.hs:prop_checkReturn3
+bash=ours, dash differs	31	history	127 |/usr/bin/dash: 1: history: not found\n	0 |	0 |	TL:common/history.md:8,NB:6180,NB:6531
+dash=ours, bash differs	1	'%'	127 |/usr/bin/dash: 1: %: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %: not found\n	TL:common/%.md:8
+dash=ours, bash differs	1	'%' 'expression2'	127 |/usr/bin/dash: 1: %: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %: not found\n	TL:common/expr.md:24
+dash=ours, bash differs	1	'%-'	127 |/usr/bin/dash: 1: %-: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %-: not found\n	TL:common/%.md:12
+dash=ours, bash differs	1	'%1'	127 |/usr/bin/dash: 1: %1: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %1: not found\n	TL:common/%.md:28
+dash=ours, bash differs	1	'%?string'	127 |/usr/bin/dash: 1: %?string: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %?string: not found\n	TL:common/%.md:24
+dash=ours, bash differs	1	'%hoogle' 'identifier'	127 |/usr/bin/dash: 1: %hoogle: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %hoogle: not found\n	TL:common/ptghci.md:29
+dash=ours, bash differs	1	'%n'	127 |/usr/bin/dash: 1: %n: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %n: not found\n	TL:common/%.md:16
+dash=ours, bash differs	1	'%past'	127 |/usr/bin/dash: 1: %past: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %past: not found\n	TL:common/ptghci.md:17
+dash=ours, bash differs	1	'%past' '-n' 'number'	127 |/usr/bin/dash: 1: %past: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %past: not found\n	TL:common/ptghci.md:21
+dash=ours, bash differs	1	'%rerun' '3,4-5,p8'	127 |/usr/bin/dash: 1: %rerun: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %rerun: not found\n	TL:common/ptghci.md:25
+dash=ours, bash differs	1	'%string'	127 |/usr/bin/dash: 1: %string: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %string: not found\n	TL:common/%.md:20
+dash=ours, bash differs	1	'%style' 'style_name'	127 |/usr/bin/dash: 1: %style: not found\n	1 |/usr/bin/bash: line 1: fg: no job control\n	127 |sh: %style: not found\n	TL:common/ptghci.md:33
+dash=ours, bash differs	1	. 'foo.sh'	2 |/usr/bin/dash: 1: .: foo.sh: not found\n	1 |/usr/bin/bash: line 1: .: foo.sh: file not found\n	2 |sh: .: cannot open foo.sh: No such file\n	SC:Analytics.hs:prop_checkCommandWithTrailingSymbol7
+dash=ours, bash differs	1	. 'path/to/file'	2 |/usr/bin/dash: 1: .: cannot open path/to/file: No such file\n	1 |/usr/bin/bash: line 1: path/to/file: No such file or directory\n	2 |sh: .: cannot open path/to/file: No such file\n	TL:common/source.md:24
+dash=ours, bash differs	1	. 'path/to/installation/activate'	2 |/usr/bin/dash: 1: .: cannot open path/to/installation/activate: No 	1 |/usr/bin/bash: line 1: path/to/installation/activate: No such file 	2 |sh: .: cannot open path/to/installation/activate: No such file\n	TL:common/kerl.md:12
+dash=ours, bash differs	1	. 'path/to/virtual_environment/bin/activate'	2 |/usr/bin/dash: 1: .: cannot open path/to/virtual_environment/bin/ac	1 |/usr/bin/bash: line 1: path/to/virtual_environment/bin/activate: No	2 |sh: .: cannot open path/to/virtual_environment/bin/activate: No suc	TL:common/venv.md:12
+dash=ours, bash differs	1	alias '-g' 'X2=| cut -d'\'' '\'' -f2'	1 |alias: -g not found\n	2 |/usr/bin/bash: line 1: alias: -g: invalid option\nalias: usage: ali	1 |alias: -g not found\n	NB:12424
+dash=ours, bash differs	1	alias '-g' 'X=| cut -d'\'' '\'' -f2'	1 |alias: -g not found\n	2 |/usr/bin/bash: line 1: alias: -g: invalid option\nalias: usage: ali	1 |alias: -g not found\n	NB:12423
+dash=ours, bash differs	1	alias '-g' 'vv='	1 |alias: -g not found\n	2 |/usr/bin/bash: line 1: alias: -g: invalid option\nalias: usage: ali	1 |alias: -g not found\n	NB:12479
+dash=ours, bash differs	1	alias '-s' 'ps=screen -d -m okular'	1 |alias: -s not found\n	2 |/usr/bin/bash: line 1: alias: -s: invalid option\nalias: usage: ali	1 |alias: -s not found\n	NB:12466
+dash=ours, bash differs	1	alias '-s' 'py='	1 |alias: -s not found\n	2 |/usr/bin/bash: line 1: alias: -s: invalid option\nalias: usage: ali	1 |alias: -s not found\n	NB:12484
+dash=ours, bash differs	1	bg '%'	2 |/usr/bin/dash: 1: bg: No current job\n	1 |/usr/bin/bash: line 1: bg: no job control\n	2 |sh: bg: job % not created under job control\n	NB:9080
+dash=ours, bash differs	1	bg '%' 'so' 'it' 'wont' 'die' 'when' 'you' 'logoff'	2 |/usr/bin/dash: 1: bg: No current job\n	1 |/usr/bin/bash: line 1: bg: no job control\n	2 |sh: bg: job % not created under job control\n	NB:5767
+dash=ours, bash differs	1	bg '%1' '[puts' 'the' 'job' 'in' 'the' 'background]'	2 |/usr/bin/dash: 1: bg: No such job: %1\n	1 |/usr/bin/bash: line 1: bg: no job control\n	2 |sh: bg: job %1 not created under job control\n	NB:6914
+dash=ours, bash differs	1	bg '%job_number'	2 |/usr/bin/dash: 1: bg: No such job: %job_number\n	1 |/usr/bin/bash: line 1: bg: no job control\n	2 |sh: bg: job %job_number not created under job control\n	TL:common/bg.md:13
+dash=ours, bash differs	1	cd '-P' ''	0 |	1 |/usr/bin/bash: line 1: cd: : No such file or directory\n	0 |	NB:353
+dash=ours, bash differs	1	cd '-P' 'xyz'	2 |/usr/bin/dash: 1: cd: can't cd to xyz\n	1 |/usr/bin/bash: line 1: cd: xyz: No such file or directory\n	2 |sh: cd: can't cd to xyz\n	NB:502
+dash=ours, bash differs	1	cd '../../.../..'	0 |	1 |/usr/bin/bash: line 1: cd: ../../.../..: No such file or directory\	0 |	SC:Analytics.hs:prop_checkUncheckedPopd13
+dash=ours, bash differs	1	cd '.tar.gz'	2 |/usr/bin/dash: 1: cd: can't cd to .tar.gz\n	1 |/usr/bin/bash: line 1: cd: .tar.gz: No such file or directory\n	2 |sh: cd: can't cd to .tar.gz\n	NB:359
+dash=ours, bash differs	1	cd '/SomeWhere/Else'	2 |/usr/bin/dash: 1: cd: can't cd to /SomeWhere/Else\n	1 |/usr/bin/bash: line 1: cd: /SomeWhere/Else: No such file or directo	2 |sh: cd: can't cd to /SomeWhere/Else\n	NB:11071
+dash=ours, bash differs	1	cd '/cygdrive/c/Program Files (x86)/$dollarsign'	2 |/usr/bin/dash: 1: cd: can't cd to /cygdrive/c/Program Files (x86)/$	1 |/usr/bin/bash: line 1: cd: /cygdrive/c/Program Files (x86)/$dollars	2 |sh: cd: can't cd to /cygdrive/c/Program Files (x86)/$dollarsign\n	NB:4737
+dash=ours, bash differs	1	cd '/home/www'	2 |/usr/bin/dash: 1: cd: can't cd to /home/www\n	1 |/usr/bin/bash: line 1: cd: /home/www: No such file or directory\n	2 |sh: cd: can't cd to /home/www\n	NB:3643
+dash=ours, bash differs	1	cd '/lib/modules//'	2 |/usr/bin/dash: 1: cd: can't cd to /lib/modules//\n	1 |/usr/bin/bash: line 1: cd: /lib/modules//: No such file or director	2 |sh: cd: can't cd to /lib/modules//\n	NB:354
+dash=ours, bash differs	1	cd '/nfs/office/'	2 |/usr/bin/dash: 1: cd: can't cd to /nfs/office/\n	1 |/usr/bin/bash: line 1: cd: /nfs/office/: No such file or directory\	2 |sh: cd: can't cd to /nfs/office/\n	NB:12360
+dash=ours, bash differs	1	cd '/path/to/pdf'	2 |/usr/bin/dash: 1: cd: can't cd to /path/to/pdf\n	1 |/usr/bin/bash: line 1: cd: /path/to/pdf: No such file or directory\	2 |sh: cd: can't cd to /path/to/pdf\n	NB:355
+dash=ours, bash differs	1	cd '/some/dir'	2 |/usr/bin/dash: 1: cd: can't cd to /some/dir\n	1 |/usr/bin/bash: line 1: cd: /some/dir: No such file or directory\n	2 |sh: cd: can't cd to /some/dir\n	NB:9798
+dash=ours, bash differs	1	cd '/some/where/long'	2 |/usr/bin/dash: 1: cd: can't cd to /some/where/long\n	1 |/usr/bin/bash: line 1: cd: /some/where/long: No such file or direct	2 |sh: cd: can't cd to /some/where/long\n	NB:4738
+dash=ours, bash differs	1	cd '/the/project/root//data'	2 |/usr/bin/dash: 1: cd: can't cd to /the/project/root//data\n	1 |/usr/bin/bash: line 1: cd: /the/project/root//data: No such file or	2 |sh: cd: can't cd to /the/project/root//data\n	NB:4733
+dash=ours, bash differs	1	cd '/var/cron/tabs'	2 |/usr/bin/dash: 1: cd: can't cd to /var/cron/tabs\n	1 |/usr/bin/bash: line 1: cd: /var/cron/tabs: No such file or director	2 |sh: cd: can't cd to /var/cron/tabs\n	NB:1926
+dash=ours, bash differs	1	cd '/var/tmp/runcompare/w0/run/home/bin/FilesDvorak/'	2 |/usr/bin/dash: 1: cd: can't cd to /var/tmp/runcompare/w0/run/home/b	1 |/usr/bin/bash: line 1: cd: /var/tmp/runcompare/w0/run/home/bin/File	2 |sh: cd: can't cd to /var/tmp/runcompare/w0/run/home/bin/FilesDvorak	NB:3160
+dash=ours, bash differs	1	cd '/var/tmp/runcompare/w0/run/home/src'	2 |/usr/bin/dash: 1: cd: can't cd to /var/tmp/runcompare/w0/run/home/s	1 |/usr/bin/bash: line 1: cd: /var/tmp/runcompare/w0/run/home/src: No 	2 |sh: cd: can't cd to /var/tmp/runcompare/w0/run/home/src\n	SC:Analytics.hs:prop_checkUncheckedCd1
+dash=ours, bash differs	1	cd '/var/tmp/runcompare/w1/run/home/mydir'	2 |/usr/bin/dash: 1: cd: can't cd to /var/tmp/runcompare/w1/run/home/m	1 |/usr/bin/bash: line 1: cd: /var/tmp/runcompare/w1/run/home/mydir: N	2 |sh: cd: can't cd to /var/tmp/runcompare/w1/run/home/mydir\n	NB:4768
+dash=ours, bash differs	1	cd '/var/tmp/runcompare/w1/run/home/src'	2 |/usr/bin/dash: 1: cd: can't cd to /var/tmp/runcompare/w1/run/home/s	1 |/usr/bin/bash: line 1: cd: /var/tmp/runcompare/w1/run/home/src: No 	2 |sh: cd: can't cd to /var/tmp/runcompare/w1/run/home/src\n	SC:Analytics.hs:prop_checkUncheckedCd2
+dash=ours, bash differs	1	cd '/var/tmp/runcompare/w2/run/home/src'	2 |/usr/bin/dash: 1: cd: can't cd to /var/tmp/runcompare/w2/run/home/s	1 |/usr/bin/bash: line 1: cd: /var/tmp/runcompare/w2/run/home/src: No 	2 |sh: cd: can't cd to /var/tmp/runcompare/w2/run/home/src\n	SC:Analytics.hs:prop_checkUncheckedCd3
+dash=ours, bash differs	1	cd 'A'	2 |/usr/bin/dash: 1: cd: can't cd to A\n	1 |/usr/bin/bash: line 1: cd: A: No such file or directory\n	2 |sh: cd: can't cd to A\n	NB:9796
+dash=ours, bash differs	1	cd 'B'	2 |/usr/bin/dash: 1: cd: can't cd to B\n	1 |/usr/bin/bash: line 1: cd: B: No such file or directory\n	2 |sh: cd: can't cd to B\n	NB:9797
+dash=ours, bash differs	1	cd 'bar1'	2 |/usr/bin/dash: 1: cd: can't cd to bar1\n	1 |/usr/bin/bash: line 1: cd: bar1: No such file or directory\n	2 |sh: cd: can't cd to bar1\n	NB:10012
+dash=ours, bash differs	1	cd 'path/to/directory'	2 |/usr/bin/dash: 1: cd: can't cd to path/to/directory\n	1 |/usr/bin/bash: line 1: cd: path/to/directory: No such file or direc	2 |sh: cd: can't cd to path/to/directory\n	TL:common/cd.md:8
+dash=ours, bash differs	1	cd 'path/to/subdirectory'	2 |/usr/bin/dash: 1: cd: can't cd to path/to/subdirectory\n	1 |/usr/bin/bash: line 1: cd: path/to/subdirectory: No such file or di	2 |sh: cd: can't cd to path/to/subdirectory\n	TL:common/dvc-init.md:16
+dash=ours, bash differs	1	cd 'path/to/test_directory'	2 |/usr/bin/dash: 1: cd: can't cd to path/to/test_directory\n	1 |/usr/bin/bash: line 1: cd: path/to/test_directory: No such file or 	2 |sh: cd: can't cd to path/to/test_directory\n	TL:linux/tmt-try.md:12
+dash=ours, bash differs	1	cd 'tmp'	2 |/usr/bin/dash: 1: cd: can't cd to tmp\n	1 |/usr/bin/bash: line 1: cd: tmp: No such file or directory\n	2 |sh: cd: can't cd to tmp\n	SC:Analytics.hs:prop_checkCdAndBack8
+dash=ours, bash differs	1	cd '~username'	2 |/usr/bin/dash: 1: cd: can't cd to ~username\n	1 |/usr/bin/bash: line 1: cd: ~username: No such file or directory\n	2 |sh: cd: can't cd to ~username\n	TL:common/cd.md:20
+dash=ours, bash differs	1	command '-v' 'command_name'	127 |	1 |	127 |	TL:common/command.md:16
+dash=ours, bash differs	1	fg '%job_number'	2 |/usr/bin/dash: 1: fg: No such job: %job_number\n	1 |/usr/bin/bash: line 1: fg: no job control\n	2 |sh: fg: job %job_number not created under job control\n	TL:common/fg.md:13
+dash=ours, bash differs	1	fg '1'	2 |/usr/bin/dash: 1: fg: No such job: 1\n	1 |/usr/bin/bash: line 1: fg: no job control\n	2 |sh: fg: job 1 not created under job control\n	NB:4697
+dash=ours, bash differs	1	fg '2'	2 |/usr/bin/dash: 1: fg: No such job: 2\n	1 |/usr/bin/bash: line 1: fg: no job control\n	2 |sh: fg: job 2 not created under job control\n	NB:4700
+dash=ours, bash differs	1	time 'command'	127 |/usr/bin/dash: 1: time: not found\n	0 |\nreal	0m0.000s\nuser	0m0.000s\nsys	0m0.000s\n	127 |sh: time: not found\n	TL:common/time.md:10
+dash=ours, bash differs	1	time 'find' '.' '-type' 'f' '-exec' 'stat' '{}' '+'	127 |/usr/bin/dash: 1: time: not found\n	0   File: ./.hidden\n  Size: 2         	Blocks: 8          IO Block: 4	127 |sh: time: not found\n	NB:1578
+dash=ours, bash differs	1	time 'find' '/'	127 |/usr/bin/dash: 1: time: not found\n	1 /\n/etc\n/etc/rc2.d\n/etc/rc2.d/S01redis-server\n/etc/rc2.d/S01dbus\	127 |sh: time: not found\n	NB:7296
+dash=ours, bash differs	1	time 'find' '/usr/src' '-name' '*.html' '-exec' 'grep' '-H' 'foo' '{}'...	127 |/usr/bin/dash: 1: time: not found\n	0 |\nreal	0m0.002s\nuser	0m0.002s\nsys	0m0.000s\n	127 |sh: time: not found\n	NB:5505
+dash=ours, bash differs	1	time 'ls' '-l'	127 |/usr/bin/dash: 1: time: not found\n	0 total 24\n-rw-r--r-- 1 rc9 rc9   11 Nov  5 15:05 a.txt\n-rw-r--r-- 1	127 |sh: time: not found\n	NB:5485
+dash=ours, bash differs	1	time 'read'	127 |/usr/bin/dash: 1: time: not found\n	1 |\nreal	0m0.000s\nuser	0m0.000s\nsys	0m0.000s\n	127 |sh: time: not found\n	TL:common/time.md:14
+dash=ours, bash differs	1	time 'sleep' '10'	127 |/usr/bin/dash: 1: time: not found\n	124 |	127 |sh: time: not found\n	SC:Checks/Commands.hs:prop_checkTimeParameters2
+dash=ours, bash differs	2	alias '-p'	1 |alias: -p not found\n	0 |	1 |alias: -p not found\n	NB:6225,SC:Checks/Commands.hs:prop_checkAliasesExpandEarly2
+dash=ours, bash differs	2	bg	2 |/usr/bin/dash: 1: bg: No current job\n	1 |/usr/bin/bash: line 1: bg: no job control\n	2 |sh: bg: No current job\n	NB:9079,TL:common/bg.md:9
+dash=ours, bash differs	2	cd '/cygdrive/c/Program Files (x86)'	2 |/usr/bin/dash: 1: cd: can't cd to /cygdrive/c/Program Files (x86)\n	1 |/usr/bin/bash: line 1: cd: /cygdrive/c/Program Files (x86): No such	2 |sh: cd: can't cd to /cygdrive/c/Program Files (x86)\n	NB:4735,NB:4736
+dash=ours, bash differs	2	cd '/nfs//office/'	2 |/usr/bin/dash: 1: cd: can't cd to /nfs//office/\n	1 |/usr/bin/bash: line 1: cd: /nfs//office/: No such file or directory	2 |sh: cd: can't cd to /nfs//office/\n	NB:12304,NB:9869
+dash=ours, bash differs	2	cd 'a.txt'	2 |/usr/bin/dash: 1: cd: can't cd to a.txt\n	1 |/usr/bin/bash: line 1: cd: a.txt: Not a directory\n	2 |sh: cd: can't cd to a.txt\n	SC:Analytics.hs:prop_checkCdAndBack1,SC:Analytics.hs:prop_checkCdAndBack2
+dash=ours, bash differs	2	cd 'b.txt'	2 |/usr/bin/dash: 1: cd: can't cd to b.txt\n	1 |/usr/bin/bash: line 1: cd: b.txt: Not a directory\n	2 |sh: cd: can't cd to b.txt\n	SC:Analytics.hs:prop_checkCdAndBack1,SC:Analytics.hs:prop_checkCdAndBack2
+dash=ours, bash differs	2	cd 'c.log'	2 |/usr/bin/dash: 1: cd: can't cd to c.log\n	1 |/usr/bin/bash: line 1: cd: c.log: Not a directory\n	2 |sh: cd: can't cd to c.log\n	SC:Analytics.hs:prop_checkCdAndBack1,SC:Analytics.hs:prop_checkCdAndBack2
+dash=ours, bash differs	2	cd 'empty'	2 |/usr/bin/dash: 1: cd: can't cd to empty\n	1 |/usr/bin/bash: line 1: cd: empty: Not a directory\n	2 |sh: cd: can't cd to empty\n	SC:Analytics.hs:prop_checkCdAndBack1,SC:Analytics.hs:prop_checkCdAndBack2
+dash=ours, bash differs	2	cd 'file.txt'	2 |/usr/bin/dash: 1: cd: can't cd to file.txt\n	1 |/usr/bin/bash: line 1: cd: file.txt: Not a directory\n	2 |sh: cd: can't cd to file.txt\n	SC:Analytics.hs:prop_checkCdAndBack1,SC:Analytics.hs:prop_checkCdAndBack2
+dash=ours, bash differs	2	cd '~'	2 |/usr/bin/dash: 1: cd: can't cd to ~\n	1 |/usr/bin/bash: line 1: cd: ~: No such file or directory\n	2 |sh: cd: can't cd to ~\n	NB:4739,NB:4740
+dash=ours, bash differs	2	time 'find' '/usr/src' '-name' '*.html'	127 |/usr/bin/dash: 1: time: not found\n	0 |\nreal	0m0.002s\nuser	0m0.001s\nsys	0m0.000s\n	127 |sh: time: not found\n	NB:5506,NB:980
+dash=ours, bash differs	3	time 'false'	127 |/usr/bin/dash: 1: time: not found\n	1 |\nreal	0m0.000s\nuser	0m0.000s\nsys	0m0.000s\n	127 |sh: time: not found\n	SC:Analytics.hs:prop_checkExtraMaskedReturns38,SC:Analytics.hs:prop_checkExtraMaskedReturns36,SC:Analytics.hs:prop_checkExtraMaskedReturns37
+dash=ours, bash differs	3	time 'ls'	127 |/usr/bin/dash: 1: time: not found\n	0 a.txt\nb.txt\nc.log\ndir\nempty\nfile.txt\nhome\n|\nreal	0m0.002s\nu	127 |sh: time: not found\n	NB:8214,NB:8207,NB:8208
+dash=ours, bash differs	4	fg	2 |/usr/bin/dash: 1: fg: No current job\n	1 |/usr/bin/bash: line 1: fg: no job control\n	2 |sh: fg: No current job\n	TL:common/fg.md:9,NB:4696,NB:9019
+dash=ours, bash differs	4	time	127 |/usr/bin/dash: 1: time: not found\n	0 |user	0m0.00s\nsys	0m0.00s\n	127 |sh: time: not found\n	TL:linux/btrfs-filesystem.md:32,TL:linux/lsns.md:20,TL:linux/mkswap.md:21
+dash=ours, bash differs	5	cd 'foo'	2 |/usr/bin/dash: 1: cd: can't cd to foo\n	1 |/usr/bin/bash: line 1: cd: foo: No such file or directory\n	2 |sh: cd: can't cd to foo\n	NB:501,SC:Analytics.hs:prop_checkUncheckedCd5,SC:Analytics.hs:prop_checkUncheckedCd7
+dash=ours, bash differs	5	time 'sleep' '1'	127 |/usr/bin/dash: 1: time: not found\n	0 |\nreal	0m1.002s\nuser	0m0.001s\nsys	0m0.000s\n	127 |sh: time: not found\n	SC:Checks/Commands.hs:prop_checkTimedCommand3,NB:7890,NB:4440
+dash=ours, bash differs	6	shift	2 |/usr/bin/dash: 1: shift: can't shift that many\n	1 |/usr/bin/bash: line 1: shift: shift count out of range\n	2 |sh: shift: can't shift that many\n	TL:common/ppmfade.md:12,TL:common/ppmfade.md:16,TL:common/ppmfade.md:20
+messages: neither	1	'' '!=' 'foo' ']'	127 |/usr/bin/dash: 1: : Permission denied\n	127 |/usr/bin/bash: line 1: : command not found\n	127 |sh: : not found\n	SC:Analytics.hs:prop_checkOrNeq3
+messages: neither	1	eval 'app' '--foo='\''lolbar'\'''	127 |/usr/bin/dash: 1: eval: app: not found\n	127 |/usr/bin/bash: line 1: app: command not found\n	127 |sh: app: not found\n	SC:Analytics.hs:prop_checkQuotesInLiterals5
+messages: neither	2	'' ''	127 |/usr/bin/dash: 1: : Permission denied\n	127 |/usr/bin/bash: line 1: : command not found\n	127 |sh: : not found\n	PB:README.md:1646,PS:README.md:980
+messages: neither	2	command ''	127 |/usr/bin/dash: 1: : Permission denied\n	127 |/usr/bin/bash: line 1: : command not found\n	127 |sh: : not found\n	PS:README.md:965,PB:README.md:1596
+ours rejects it alone	1	alias '=foo'	1 |alias: =foo not found\n	1 |/usr/bin/bash: line 1: alias: =foo: not found\n	255 |outside the subset: unsupported 'alias' argument at 0\n	SC:Checks/Commands.hs:prop_checkAliasesUsesArgs2
+ours rejects it alone	1	break '2'	0 |	0 |	255 |outside the subset: 'break' outside a loop at 0\n	TL:common/break.md:12
+ours rejects it alone	1	command '-with' '-flags'	2 |/usr/bin/dash: 1: command: Illegal option -w\n	2 |/usr/bin/bash: line 1: command: -w: invalid option\ncommand: usage:	255 |outside the subset: unsupported 'command' form at 0\n	TL:common/exec.md:8
+ours rejects it alone	1	local s='a b'	2 |/usr/bin/dash: 1: local: not in a function\n	1 |/usr/bin/bash: line 1: local: can only be used in a function\n	255 |outside the subset: 'local' outside a function at 0\n	SC:Analytics.hs:prop_checkSpacefulnessCfg53
+ours rejects it alone	1	read ''	2 |/usr/bin/dash: 1: read: : bad variable name\n	1 |/usr/bin/bash: line 1: read: `': not a valid identifier\n	255 |outside the subset: unsupported 'read' argument at 5\n	SC:Checks/Commands.hs:prop_checkReadExpansions5
+ours rejects it alone	1	read '-p' ''	2 |/usr/bin/dash: 1: read: arg count\n	1 |	255 |outside the subset: 'read' without a variable name at 0\n	NB:6952
+ours rejects it alone	1	read '-r'	2 |/usr/bin/dash: 1: read: arg count\n	1 |	255 |outside the subset: 'read' without a variable name at 0\n	SC:Checks/Commands.hs:prop_checkReadExpansions2
+ours rejects it alone	1	set '-o' ''	2 |/usr/bin/dash: 1: set: Illegal option -o \n	0 allexport      	off\nbraceexpand    	on\nemacs          	off\nerrexi	255 |outside the subset: unsupported 'set -o' form at 0\n	SC:Checks/ShellSupport.hs:prop_checkBashisms90
+ours rejects it alone	1	shift '[n]'	2 |/usr/bin/dash: 1: shift: Illegal number: [n]\n	1 |/usr/bin/bash: line 1: shift: [n]: numeric argument required\n	255 |outside the subset: unsupported 'shift' form at 0\n	NB:9215
+ours rejects it alone	1	trap 'echo a.txt'	1 |trap: echo a.txt: bad trap\n	2 |trap: usage: trap [-lp] [[arg] signal_spec ...]\n	255 |outside the subset: 'trap' with fewer than two arguments (it list	SC:Checks/Commands.hs:prop_checkTrapQuotes1a
+ours rejects it alone	1	unset HOME LANG LC_ALL LOGNAME PATH PWD REALDIR REALNAMES RECBUILTIN R...	0 |	0 |	255 |outside the subset: shell-set variable 'SHELL' at 0\n	NB:9521
+ours rejects it alone	2	.	0 |	2 |/usr/bin/bash: line 1: .: filename argument required\n.: usage: . f	255 |outside the subset: '.' with other than one argument at 0\n	NB:6758,NB:6759
+ours rejects it alone	2	break	0 |	0 |	255 |outside the subset: 'break' outside a loop at 0\n	SC:Analytics.hs:prop_checkLoopKeywordScope4,TL:common/break.md:8
+ours rejects it alone	2	read	2 |/usr/bin/dash: 1: read: arg count\n	1 |	255 |outside the subset: 'read' without a variable name at 0\n	SC:Checks/Commands.hs:prop_checkReadExpansions7,SC:Checks/Commands.hs:prop_checkReadExpansions1
+ours rejects it alone	2	read '-p' 'Please Enter a Message: '	2 |/usr/bin/dash: 1: read: arg count\n	1 |	255 |outside the subset: 'read' without a variable name at 0\n	NB:6954,NB:6951
+ours rejects it alone	2	shift '-1'	2 |/usr/bin/dash: 1: shift: Illegal number: -1\n	1 |/usr/bin/bash: line 1: shift: -1: shift count out of range\n	255 |outside the subset: unsupported 'shift' form at 0\n	NB:9212,NB:9213
+ours rejects it alone	3	continue	0 |	0 |	255 |outside the subset: 'continue' outside a loop at 0\n	PS:README.md:659,TL:common/continue.md:8,SC:Analytics.hs:prop_checkCdAndBack2
+ours rejects it alone	3	set	0 HOME='/var/tmp/runcompare/builtins/run/home'\nIFS=' 	\n'\nLANG='C'\n	0 BASH=/usr/bin/bash\nBASHOPTS=checkwinsize:cmdhist:complete_fullquote	255 |outside the subset: 'set' without arguments (it lists) at 0\n	NB:1872,NB:8235,NB:1871
+ours rejects it alone	5	unset	0 |	0 |	255 |outside the subset: 'unset' without a name at 0\n	NB:9520,NB:9526,NB:9506

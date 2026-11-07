@@ -16,7 +16,7 @@ use Discord::Client::Gateway::Session;
 use Discord::Client::Gateway::IdentifyLimiter;
 use Discord::Client::Gateway::WebSocket;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # Connection-local send limits; protocol traffic shares this window with application writes.
 use constant {

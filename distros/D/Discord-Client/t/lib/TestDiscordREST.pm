@@ -14,7 +14,7 @@ sub client {
     my (%args) = @_;
 
     # Inject transport and time so retries and deadlines never depend on wall-clock waits.
-    my $clock = bless { now => 0, timers => [] }, 'TestDiscordREST::Clock';
+    my $clock = TestDiscordREST::Clock->new;
     my $http = bless { calls => [] }, 'TestDiscordREST::HTTP';
     my $rest = Discord::Client::REST->new(
         token => 'FAKE_TEST_TOKEN',
@@ -70,6 +70,10 @@ sub respond {
 }
 
 package TestDiscordREST::Clock;
+
+sub new {
+    return bless { now => 0, timers => [] }, $_[0];
+}
 
 sub delay {
     my ( $self, $after ) = @_;

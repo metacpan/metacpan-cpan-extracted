@@ -12,7 +12,7 @@ use URI::Escape qw(uri_escape_utf8);
 use Discord::Client::Error;
 use Discord::Client::REST;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ( $class, %args ) = @_;

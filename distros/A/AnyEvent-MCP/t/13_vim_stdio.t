@@ -42,9 +42,10 @@ sub start_child {
 
 sub rpc {
    my ($in, $out, $id, $method, $params) = @_;
+   local $SIG{PIPE} = "IGNORE";
    print {$in} JSON::XS::encode_json ({
       jsonrpc => "2.0", id => $id, method => $method, params => $params,
-   }), "\n" or die "cannot send JSONL test request: $!";
+   }), "\n" or return;
    return unless IO::Select->new ($out)->can_read (30);
    my $line = <$out>;
    return unless defined $line;
@@ -71,6 +72,16 @@ for my $use_env (0, 1) {
       protocolVersion => "2025-11-25",
       capabilities => {}, clientInfo => { name => "stdio-test", version => "0" },
    });
+   unless ($init) {
+      close $in;
+      my $exit = wait_exit ($pid);
+      my $stderr = do { local $/; <$err> };
+      diag "$kind: mcp-vim child exit=$exit, stderr: " . ($stderr // "");
+      fail "$kind: JSONL initialize response";
+      close $out;
+      close $err;
+      next;
+   }
 
    is $init->{id}, 1, "$kind: JSONL initialize response";
    ok !$init->{error} && $init->{result}{serverInfo},

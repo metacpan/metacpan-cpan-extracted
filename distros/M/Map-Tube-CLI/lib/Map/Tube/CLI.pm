@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.2');
+our $VERSION   = qv('v1.1.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,15 +13,12 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version v1.0.2
+Version v1.1.0
 
 =cut
 
-use 5.006;
+use 5.014;
 use utf8::all;
-use Carp qw(croak);
-use Data::Dumper;
-use MIME::Base64;
 use Map::Tube::Utils qw(is_valid_color);
 use Map::Tube::Exception::FoundUnsupportedMap;
 use Map::Tube::Exception::InvalidBackgroundColor;
@@ -95,7 +92,8 @@ BEGIN {
         'YEKATERINBURG'   => 'Map::Tube::Yekaterinburg',
     );
 
-    sub _supported_maps { return { %SUPPORTED_MAPS } }
+    sub supported_maps { return { %SUPPORTED_MAPS } }
+
 }
 
 # Only the officially supported maps are scanned and loaded. Everything else
@@ -103,12 +101,12 @@ BEGIN {
 # missing dependency of an unrelated module cannot produce warnings here.
 use Module::Pluggable
     search_path => [ 'Map::Tube' ],
-    only        => [ values %{ _supported_maps() } ],
+    only        => [ values %{ supported_maps() } ],
     require     => 1,
     inner       => 0,
     max_depth   => 3;
 
-use Path::Tiny;
+# use Path::Tiny;
 use Text::ASCIITable;
 use Try::Tiny;
 use Moo;
@@ -133,14 +131,20 @@ You can list all command line options by giving the C<-h> flag.
         -e --end=String      End station name
         -p --preferred       Show preferred route
         -g --generate_map    Generate map as image
-        -l --line=String     Line name to map
+        -i --image=String    Name of image file or format (optional; default
+                             format: PNG)
+        --layout=String      Layout strategy for image (default: dot)
         -b --bgcolor=String  Map background color
+        -l --line=String     Line name to map
         --line_mappings      Generate line mappings as table
         --line_notes         Generate line notes
         -M --list_maps       List supported maps
         -L --list_lines      List lines in given map
         -S --list_stations   List stations in given map
-        -t --tabular         Show route as table (not as list)
+        -F --fuzzy           Fuzzy station name matching (on by default if
+                             needed; switch off with --no-fuzzy)
+        -P --penalty=Real    Change hop count penalty for line changes (default: 0.5)
+        -t --tabular         Show routes and notes in tabular format
         -f --force           Force unsupported map (map name becomes case sensitive)
         -D --debug           Run in debug mode
         -V --version         Show version information
@@ -152,7 +156,9 @@ You can list all command line options by giving the C<-h> flag.
 
 =head1 COMMON USAGES
 
-=head2 Shortest Route
+=head2 Finding the Shortest Route
+
+=head3 Shortest Route
 
 You can ask for the shortest route in the London Tube Map as below: (Under Windows use double quotes.)
 
@@ -160,7 +166,13 @@ You can ask for the shortest route in the London Tube Map as below: (Under Windo
 
     Baker Street (Bakerloo, Circle, Hammersmith & City, Jubilee, Metropolitan), Finchley Road (Jubilee, Metropolitan), Wembley Park (Jubilee, Metropolitan)
 
-=head2 Preferred Shortest Route
+If any of the station names does not exist literally (up to capitalisation),
+fuzzy matching will be attempted. If this yields unique stations, they will be
+used. Otherwise, the candidate stations are displayed and no route will be
+calculated. You can always force fuzzy matching by adding the "--fuzzy"
+command line argument.
+
+=head3 Preferred Shortest Route
 
 Now a request for the preferred route:
 
@@ -168,7 +180,7 @@ Now a request for the preferred route:
 
     Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
-=head2 Preferred Shortest Route in Tabular Form
+=head3 Preferred Shortest Route in Tabular Form
 
 And a request for the preferred route displayed as a table: (This also shows the use of short options.)
 
@@ -185,7 +197,72 @@ And a request for the preferred route displayed as a table: (This also shows the
 
     Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
-=head2 Generate Full Map
+=head3 Handling of Tube Line Changes
+
+Counting the number of hops is one valid way to measure the distance between two stations.
+Practically speaking, however, having to change lines will add to the perceived distance.
+To account for this, Map::Tube puts a penalty of one half hop on each line change required,
+i.e., routes with fewer line changes are slightly more welcome. You can either switch off
+this behaviour by
+
+    $ map-tube -m London -s 'Baker Street' -e 'Euston Square' --penalty 0
+
+or put an even heavier penalty on line changes:
+
+    $ map-tube -m London -s 'Baker Street' -e 'Euston Square' --penalty 2
+
+(In this particular case, the output will be identical because there are no line changes involved.)
+
+=head3 Station Names
+
+Ideally you will know the exact names of the stations, like in the
+examples above. If you don't, you can always get a full list of station
+names with the C<--list-stations> argument (cf. below). But Map::Tube
+tries to help you if it cannot find the exact station name (case never
+matters anyway). In this case, it will try to find a similar name.
+(What exactly is meant by "similar" is a bit involved; never mind.) If
+it finds a unique candidate, it will use that and notify you that it did
+some guessing:
+
+    $ map-tube -m London -s Baker -e 'Euston Square'
+    Metro Map London: Route from Baker Street (guessed) to Euston Square.
+
+    .--------------------------------------------------------------------.
+    | Station Name          | Lines                                      |
+    +-----------------------+--------------------------------------------+
+    | Baker Street          | Circle, Hammersmith and City, Metropolitan |
+    | Great Portland Street | Circle, Hammersmith and City, Metropolitan |
+    | Euston Square         | Circle, Hammersmith and City, Metropolitan |
+    '-----------------------+--------------------------------------------'
+
+If no clear best guess can be found, you will be offered with some possibilities:
+
+    $ map-tube -m London -s "Back Street" -e 'Euston Square'
+    Map::Tube::CLI::run(): ERROR: Invalid Station Name [Back Street]; maybe one of Baker Street
+    (Bakerloo, Circle, Hammersmith and City, Jubilee, Metropolitan), Becontree (District),
+    Bond Street (Central, Elizabeth, Jubilee), Old Street (Northern), Wood Street (Weaver)?
+    (status: 101) file C:/Strawberry/perl/site/lib/Map/Tube/CLI.pm on line 454
+
+You can also use regular expressions:
+
+    $ map-tube -m London -s "Bak.*St.*" -e 'Euston Square'
+    Metro Map London: Route from Baker Street (guessed) to Euston Square.
+
+    .--------------------------------------------------------------------.
+    | Station Name          | Lines                                      |
+    +-----------------------+--------------------------------------------+
+    | Baker Street          | Circle, Hammersmith and City, Metropolitan |
+    | Great Portland Street | Circle, Hammersmith and City, Metropolitan |
+    | Euston Square         | Circle, Hammersmith and City, Metropolitan |
+    '-----------------------+--------------------------------------------'
+
+If you can always force fuzzy matching with the argument C<--fuzzy>, or you can
+completely disable it with C<--no-fuzzy>.
+
+
+=head2 Images of Maps
+
+=head3 Generate an Image of the Full Map
 
 To generate a graphical representation of the entire map, follow the command
 below. This will generate a PNG file named after the map in your current working
@@ -197,7 +274,32 @@ In case you want a different background color to the map then you can try this:
 
     $ map-tube --map Delhi --bgcolor gray --generate_map
 
-=head2 Generate Just a Line Map
+The output file name is chosen automatically according to the map. It will be displayed
+on the console. If you want a different file name, do this:
+
+    $ map-tube --map Delhi --generate_map --image Delhicious.png
+
+This allows you also to pick other output formats than PNG. E.g., you might
+want a vector graphics file:
+
+    $ map-tube --map Delhi --generate_map --image Delhivector.svg
+
+Or if you are happy with the default file name but still want to have a non-standard format:
+
+    $ map-tube --map Delhi --generate_map --image pdf
+
+Which output formats you can choose depends on your particular GraphViz
+installation, so check the GraphViz documentation.
+
+There is a number of different approaches to the layout of such
+diagrams, and GraphViz offers several (again, consult the GraphvIz
+documentation). The default is C<dot>, but often C<neato> or C<sfdp>
+also offer good representations. Which one is "best" is a matter of
+taste and also depends on the map at hand.  Try this:
+
+    $ map-tube --map Delhi --generate_map --layout neato
+
+=head3 Generate Just a Line Map
 
 To generate a graphical representation of just a particular line, follow
 the command below. This will generate a PNG file named after the line in your
@@ -210,23 +312,38 @@ In case you want a different background color to the map then you can try this:
 
     $ map-tube --map London --line DLR --bgcolor yellow --generate_map
 
-=head2 Generate Line Mappings as a Table
+=head2 Additional Information on Lines, Stations, and Maps
+
+=head3 Generate Line Mappings as a Table
+
+This will show all stops on the given lane, as far as possible in the correct order:
 
     $ map-tube --map London --line Bakerloo --line_mappings
 
-=head2 Generate Line Notes
+All that has been said above about output file names, image formats and layout algorithms
+applies also to line maps.
+
+=head3 Generate Line Notes
+
+This will show which other lines are serving the stations on the given line.
+Stations are ordered alphabetically. Only stations that are served by at least
+one additional line are shown.
 
     $ map-tube --map London --line Bakerloo --line_notes
 
-=head2 List the Lines for the Given Map
+It can also be displayed in tabular form:
+
+    $ map-tube --map London --line Bakerloo --line_notes --tabular
+
+=head3 List the Lines for the Given Map
 
     $ map-tube --map London --list_lines
 
-=head2 List the Stations for the Given Map
+=head3 List the Stations for the Given Map
 
     $ map-tube --map London --list_stations
 
-=head2 List all Supported Maps
+=head3 List all Supported Maps
 
 This will show you a list of all officially supported maps. It will also show you
 which of these maps are not currently installed on your machine.
@@ -240,7 +357,7 @@ privately created maps: (This is also helpful while developing a new map.)
 
     $ map-tube --map 'Slippery Rock' --start 'College Park' --end 'Greyhound station' --force
 
-=head2 General Error
+=head2 Error Handling
 
 If encountering an invalid map or a missing map (i.e not installed), you get an error
 message like below:
@@ -248,7 +365,7 @@ message like below:
     $ map-tube --map xYz --start 'Baker Street' --end 'Euston Square'
     ERROR: Unsupported Map [xYz].
 
-This will produce a similar message if you do not have the tube map of Kazan installed;
+The following will produce a similar message if you do not have the tube map of Kazan installed;
 if you do have it, it will notify you that the starting station does not exist in this map:
 
     $ map-tube --map Kazan --start 'Baker Street' --end 'Euston Square'
@@ -258,12 +375,14 @@ if you do have it, it will notify you that the starting station does not exist i
 
 The command line parameter C<map> can take one of the following map names. It is
 case insensitive, i.e. 'London' and 'lOndOn' are the same.
-Use the C<--list_maps> option describe above to get an up-to-date version of this list.
+Use the C<--list_maps> option described above to get an up-to-date version of this list.
 Use the C<--force> option described above to use locally installed maps that are not on
 that list.
 
-You could use L<Task::Map::Tube::Bundle> to install the supported maps. Please make
-sure you have the latest maps when you install.
+Note that not all officially supported maps might be available at your site. The
+C<--list-maps> option will show which aren't. You can either install any missing map
+from CPAN, or you could use L<Task::Map::Tube::Bundle> to install the supported maps.
+Please make sure you have the latest maps when you install.
 
 =over 4
 
@@ -297,8 +416,6 @@ sure you have the latest maps when you install.
 
 =item * L<Hamburg|Map::Tube::Hamburg>
 
-=item * L<Hannover|Map::Tube::Hannover>
-
 =item * L<Hongkong|Map::Tube::Hongkong>
 
 =item * L<Kazan|Map::Tube::Kazan>
@@ -313,7 +430,7 @@ sure you have the latest maps when you install.
 
 =item * L<KualaLumpur|Map::Tube::KualaLumpur>
 
-=item * L<London|Map::Tube::Leipzig>
+=item * L<Leipzig|Map::Tube::Leipzig>
 
 =item * L<London|Map::Tube::London>
 
@@ -388,21 +505,19 @@ sure you have the latest maps when you install.
 sub BUILD {
     my ($self) = @_;
 
-    my $plugins = [ plugins ];
-    my $map = $self->{map};
-    if ($map) {
-        foreach my $plugin (@$plugins) {
-            my $key = _map_key($plugin);
-            if (defined $key && (uc($map) eq $key)) {
-                $self->{maps}->{uc($key)} = $plugin->new;
-            }
-        }
+    my $plugins     = [ plugins ];
+    my $map_name    = $self->{map};
+    my $map_uc_name = uc($map_name//'');
+    my $all_maps    = supported_maps();
+    if (defined $map_name && exists $all_maps->{$map_uc_name}) {
+        my $map_full_name = $all_maps->{$map_uc_name};
+        $self->{maps}->{$map_uc_name} = $_->new for ( grep { defined($_) && ($_ eq $map_full_name)} @$plugins);
     }
 
     if ($self->force) {
-        if ($map =~ /^[A-Za-z]+$/) {
+        if ($map_name =~ /^[-_A-Za-z0-9]+$/) {
             # Unsupported maps are not loaded by Module::Pluggable, so load it here.
-            my $class = "Map::Tube::$map";
+            my $class = "Map::Tube::$map_name";
             (my $file = "$class.pm") =~ s{::}{/}g;
             unless (eval { require $file; 1 }) {
                 my $error  = $@ || 'unknown error';
@@ -412,11 +527,11 @@ sub BUILD {
 
                 Map::Tube::Exception::FoundUnsupportedMap->throw({
                     method      => __PACKAGE__."::BUILD",
-                    message     => "ERROR: Can't load forced map [$map]: $error",
+                    message     => "ERROR: Can't load forced map [$map_name]: $error",
                     filename    => $caller[1],
                     line_number => $caller[2] });
             }
-            $self->{maps}->{uc($map)} = $class->new;
+            $self->{maps}->{$map_uc_name} = $class->new;
         }
         else {
             my @caller = caller(0);
@@ -424,20 +539,21 @@ sub BUILD {
 
             Map::Tube::Exception::FoundUnsupportedMap->throw({
                 method      => __PACKAGE__."::BUILD",
-                message     => "ERROR: Can't force invalid map [$map].",
+                message     => "ERROR: Can't force invalid map name [$map_name].",
                 filename    => $caller[1],
                 line_number => $caller[2] });
         }
     }
 
     $self->_validate_param;
+
 }
 
 =head1 METHODS
 
 =head2 run()
 
-This is the only method provided by the package L<Map::Tube::CLI>. It does not
+This is the main method provided by the package L<Map::Tube::CLI>. It does not
 expect any parameter. Here is the code from the supplied C<map-tube> script.
 
     use strict; use warnings;
@@ -452,12 +568,12 @@ sub run {
 
     my $map_obj = $self->map ? $self->{maps}->{uc($self->map)} : undef;
 
-    # Handle these two options first because map name may not be present:
+    # Handle these options first because map name may not be present and is not needed:
     if ($self->version) {
         print _prepare_version_info($map_obj, $self->map), "\n";
         return;
     }
-    elsif ($self->list_maps) {
+    if ($self->list_maps) {
         my $map_list = _prepare_map_list();
         if ($self->tabular) {
             my $map_table = Text::ASCIITable->new;
@@ -472,23 +588,46 @@ sub run {
         }
         return;
     }
+    if (defined $self->penalty) {
+        if ($map_obj->can('line_change_penalty')) {
+            $map_obj->line_change_penalty($self->penalty)
+        } else {
+            warn "Your Map::Tube does not support line change penalties. Please upgrade.\n";
+        }
+    }
 
     if ($self->generate_map) {
         $map_obj->bgcolor($self->bgcolor) if defined $self->bgcolor;
-        my $image_file = _clean_path( ( $self->line // $self->map ) . '.png' );
-        my $image_data = $map_obj->as_image($self->line);
-
-        open(my $IMAGE, '>', $image_file);
-        binmode($IMAGE);
-        print $IMAGE decode_base64($image_data);
-        close($IMAGE);
+        my %graph_args = ( line_name=>$self->line, output_file=>undef );
+        if ($self->image) {
+            my %img_formats = map { lc($_) => 1 } $map_obj->list_formats();
+            if ( exists $img_formats{lc($self->image)} ) {
+                $graph_args{format} = lc($self->image);
+            }
+            else {
+                $graph_args{output_file} = $self->image;
+                if ( $self->image =~ /.([^.]+)$/ && exists $img_formats{lc($1)} ) {
+                    $graph_args{format} = lc($1);
+                }
+            }
+        }
+        $graph_args{driver} = $self->layout if $self->layout;
+        if ($map_obj->can('render')) {
+            my (undef, $fname) = $map_obj->render(%graph_args);
+            print "Image written to $fname\n" if $fname;
+        }
+        else {
+            warn "You do not seem to have Map::Tube::Plugin::Graph installed.\n";
+        }
     }
     elsif ($self->line_mappings) {
-        printf("\n=head1 DESCRIPTION\n\n%s Metro Map: %s Line.\n\n", $self->map, $self->line);
+        printf("\n=head1 DESCRIPTION\n\n%s Metro Map: %s Line.\n\n", $self->map, $self->line) unless $self->tabular;
         print _prepare_line_mappings($map_obj, $self->line);
     }
     elsif ($self->line_notes) {
-        print _prepare_line_notes($map_obj, $self->map, $self->line);
+        printf "\n=head1 NOTE\n\n=over 2\n" unless $self->tabular;
+        print $self->_prepare_line_notes($map_obj);
+        print "\n=back\n" unless $self->tabular;
     }
     elsif ($self->list_lines) {
         print join(",\n", sort @{$map_obj->get_lines}), "\n";
@@ -508,7 +647,8 @@ sub run {
             for my $station(@{$route->nodes()}) {
                 $route_table->addRow($station->name, join(', ', @{ $station->line }));
             }
-            printf("Metro Map %s: Route from %s to %s.\n\n", $self->map, $self->start, $self->end);
+            printf("Metro Map %s: Route from %s%s to %s%s.\n\n", $self->map,
+                   $self->start, $self->{start_remark}//'', $self->end, $self->{end_remark}//'');
             print $route_table;
         } else {
             no warnings;
@@ -524,6 +664,20 @@ sub run {
         print "$@\n" if $@;
     }
 }
+
+=head2 supported_maps()
+
+This method will produce information on the maps that are generally
+recognized by the package L<Map::Tube::CLI>.  It does not expect any
+parameter.  It will return a reference to a hash whose keys are plain
+text city names (in ALL-CAPS) and whose values are the names of the
+modules that implement the maps.
+
+Note that "generally recognized" does not imply that the city/module in question
+is actually available on your machine.
+
+=cut
+
 
 #
 #
@@ -543,27 +697,20 @@ sub _prepare_line_mappings {
 }
 
 sub _prepare_line_notes {
-    my ($map, $map_name, $line_name) = @_;
+    my ($self, $map) = @_;
+    my $map_name = $self->map;
+    my $line_name = $self->line;
 
-    my $line_map_notes = {};
-    foreach my $station (map { $_->name } @{ $map->get_stations($line_name) }) {
-        _add_notes($map, $line_name, $line_map_notes, $station);
-    }
+    my $line_name_uc = uc($line_name);
+    my $line_package = { map  { $_->{name} => 1 }
+                         grep { $line_name_uc ne uc($_->name) &&  scalar(@{$_->get_stations}) }
+                         @{$map->get_lines}
+                       };
 
-    my $all_lines = $map->get_lines;
-    my $line_package = {};
-    foreach my $line (@$all_lines) {
-        my $_line_name = $line->name;
-        next if (uc($line_name) eq uc($_line_name));
-        next unless (scalar(@{$line->get_stations}));
-        $line_package->{$_line_name} = 1;
-    }
+    my $notes = $self->tabular ? Text::ASCIITable->new : "";
+    $notes->setCols("Line $line_name Station",'is also served by line(s)') if $self->tabular;
 
-    my $notes = "\n";
-    $notes   .= "=head1 NOTE\n\n";
-    $notes   .= "=over 2\n";
-
-    my @stations = keys %$line_map_notes;
+    my @stations = map { $_->name } @{ $map->get_stations($line_name) };
     if ( eval { require Unicode::Collate; 1 } ) {
         my $collator = Unicode::Collate->new(level => 1);
         @stations = $collator->sort(@stations);
@@ -572,19 +719,21 @@ sub _prepare_line_notes {
     }
 
     foreach my $station (@stations) {
-        my $delim = ' ';
-        my $lines   = $line_map_notes->{$station};
-        my $_notes .= sprintf("\n=item * The station \"%s\" is also part of\n", $station);
-        foreach my $line (@$lines) {
-            next unless (exists $line_package->{$line});
-            $_notes .= sprintf("        %s L<%s Line|Map::Tube::%s::Line::%s>\n",
-                               $delim, $line, $map_name, _guess_package_name($line));
-            $delim = '|';
+        my @lines = grep { $_ ne $line_name && exists $line_package->{$_} } map { $_->name } @{ $map->get_node_by_name($station)->line };
+        next unless @lines;
+        if ($self->tabular) {
+            $notes->addRow($station, join(", ", @lines));
         }
-        $notes .= $_notes if $delim;
+        else {
+            my $delim = ' ';
+            foreach my $line (@lines) {
+                $notes .= sprintf("\n=item * The station \"%s\" is also part of\n", $station) if $delim eq ' ';
+                $notes .= sprintf("        %s L<%s Line|Map::Tube::%s::Line::%s>\n",
+                                  $delim, $line, $map_name, _guess_package_name($line));
+                $delim = '|';
+            }
+        }
     }
-
-    $notes .= "\n=back\n";
 
     return $notes;
 }
@@ -593,7 +742,7 @@ sub _prepare_version_info {
    my ($map, $map_name) = @_;
     my $msg = "Map::Tube::CLI version $VERSION, Map::Tube version: $Map::Tube::VERSION";
     if ($map_name) {
-        my $supported_maps  = _supported_maps();
+        my $supported_maps  = supported_maps();
         my $map_module_name = $supported_maps->{uc($map_name)} // ( 'Map::Tube::' . $map_name );
         my $version_ref     = $map_module_name . '::VERSION';
         my $map_desc        = $map ? $map->name() // $map_name : '';
@@ -608,11 +757,11 @@ sub _prepare_version_info {
 }
 
 sub _prepare_map_list {
-    my $supported_maps  = _supported_maps();
+    my $supported_maps  = supported_maps();
     my %plugins = map { $_ => 1 } plugins;
     my @map_list;
     for my $map ( sort values %$supported_maps ) {
-        my $map_name = '(not installed)';
+        my $map_name = '(not installed or not loadable)';
         if (exists $plugins{$map}) {
             try {
                 $map_name = $map->new->name();
@@ -662,31 +811,68 @@ sub _guess_package_name {
     return $_name;
 }
 
-sub _add_notes {
-    my ($map_object, $line_name, $notes, $station_name) = @_;
-
-    my $station_lines = $map_object->get_node_by_name($station_name)->line;
-    my $lines = [];
-    foreach my $line (@$station_lines) {
-        my $_line_name = $line->name;
-        next if ($_line_name eq $line_name);
-        push @$lines, $_line_name;
+sub _identify_station {
+    my ($self, $station) = @_;
+    my @caller = caller(1);
+    @caller = caller(3) if $caller[3] eq '(eval)';
+    my $map_obj = $self->{maps}->{uc($self->map)};
+    my $remark = '';
+    my $station_node;
+    try {
+        $station_node = $map_obj->get_node_by_name($station) unless $self->fuzzy;
+    } catch {
+    };
+    if (!defined $station_node) {
+       if ((!defined $self->fuzzy || $self->fuzzy) && $map_obj->can('fuzzy_find')) {
+            # Try fuzzy matching.
+            # Different strategies depending on whether we have a common regex meta character ( '.', '?', '*', '+', '[' ).
+            my @fuzzy_methods;
+            push( @fuzzy_methods, 'start', 'in' ) unless $station =~ /[?*+\[]/;
+            push( @fuzzy_methods, 'regex' )       if     $station =~ /^[^?*].*[.?*+\[]/;
+            push( @fuzzy_methods, 'levenshtein', 'doublemetaphone', 'ngrams' ) unless $station =~/[?*+\[]/;
+            my @stations;
+            for my $method (@fuzzy_methods) {
+                @stations = $map_obj->fuzzy_find(search=>$station, objects=>'stations', method=>$method);
+                last if @stations;
+            }
+            if (@stations == 1) {
+                $station = $stations[0]->name();
+                $remark = ' (guessed)';
+            }
+            elsif (@stations == 0) {
+                Map::Tube::Exception::InvalidStationName->throw({
+                    method      => __PACKAGE__."::run",
+                    message     => ( $self->fuzzy
+                                     ? "ERROR: No Fuzzy Match for Station Name [$station]."
+                                     : "ERROR: Invalid Station Name [$station]."
+                                   ),
+                    filename    => $caller[1],
+                    line_number => $caller[2] });
+            }
+            else {
+                @stations = ( ( map { $_ ->name() } @stations[0..9] ), '...' ) if @stations > 10;
+                Map::Tube::Exception::InvalidStationName->throw({
+                    method      => __PACKAGE__."::run",
+                    message     => ( $self->fuzzy
+                                     ? ( "ERROR: Station Not Identified; maybe one of " . join(', ', @stations ) . "?" )
+                                     : ( "ERROR: Invalid Station Name [$station]; maybe one of " . join(', ', @stations ) . "?" )
+                                   ),
+                    filename    => $caller[1],
+                    line_number => $caller[2] });
+            }
+        }
+        else {
+            warn "You do not seem to have Map::Tube::Plugin::FuzzyFind installed, " .
+                 "so you must enter station names correctly.\n" unless $map_obj->can('fuzzy_find');
+            Map::Tube::Exception::InvalidStationName->throw({
+                method      => __PACKAGE__."::run",
+                message     => "ERROR: Invalid Station Name [$station].",
+                filename    => $caller[1],
+                line_number => $caller[2] });
+        }
     }
-    return unless (scalar(@$lines));
 
-    $notes->{$station_name} = $lines;
-}
-
-sub _map_key {
-    my ($name) = @_;
-    return unless defined $name;
-
-    my $maps = _supported_maps();
-    foreach my $map (keys %$maps) {
-        return $map if ($maps->{$map} eq $name);
-    }
-
-    return;
+    return ( $station, $remark );
 }
 
 sub _validate_param {
@@ -710,10 +896,8 @@ sub _validate_param {
         line_number => $caller[2] })
         unless (defined $map);
 
-    my $supported_maps = _supported_maps();
-    if ($self->force) {
-        $supported_maps->{uc($map)} //= 'Map::Tube::'. $map;
-    }
+    my $supported_maps = supported_maps();
+    $supported_maps->{uc($map)} //= 'Map::Tube::'. $map if $self->force;
 
     Map::Tube::Exception::FoundUnsupportedMap->throw({
         method      => __PACKAGE__."::_validate_param",
@@ -764,7 +948,7 @@ sub _validate_param {
             || $self->list_lines
             || $self->list_stations) {
 
-        # warn "--line option will be ignored" if defined $line;     # *** Should we warn if the --line option has been used for no good? ***
+        warn "--line option will be ignored" if defined $line;     # --line option has been used for no good
 
         Map::Tube::Exception::MissingStationName->throw({
             method      => __PACKAGE__."::_validate_param",
@@ -772,6 +956,7 @@ sub _validate_param {
             filename    => $caller[1],
             line_number => $caller[2] })
             unless defined $start;
+        ($self->{start}, $self->{start_remark}) = $self->_identify_station($start);
 
         Map::Tube::Exception::MissingStationName->throw({
             method      => __PACKAGE__."::_validate_param",
@@ -779,59 +964,19 @@ sub _validate_param {
             filename    => $caller[1],
             line_number => $caller[2] })
             unless defined $end;
+        ($self->{end}, $self->{end_remark}) = $self->_identify_station($end);
 
-        Map::Tube::Exception::InvalidStationName->throw({
-            method      => __PACKAGE__."::_validate_param",
-            message     => "ERROR: Invalid Station Name [$start].",
-            filename    => $caller[1],
-            line_number => $caller[2] })
-            unless defined $self->{maps}->{uc($map)}->get_node_by_name($start);
-
-        Map::Tube::Exception::InvalidStationName->throw({
-            method      => __PACKAGE__."::_validate_param",
-            message     => "ERROR: Invalid Station Name [$end].",
-            filename    => $caller[1],
-            line_number => $caller[2] })
-            unless defined $self->{maps}->{uc($map)}->get_node_by_name($end);
     }
 
 }
-
-sub _clean_path {
-    my ($tainted_path) = @_;
-
-    # Force string value (in case of malicious use of dualvars):
-    $tainted_path = "$tainted_path";
-
-    # Basic file name cleaning; printable characters only
-    $tainted_path =~ /^([[:print:]]+)$/
-        or croak "Non-printable characters detected in file name";
-    my $clean_path = $1;
-
-    # Exclude redirection characters ( < | > ) from path
-    $clean_path =~ s/[<>\|]//g;
-
-    # Reduce to basename (no paths allowed):
-    # This ensures the user cannot use "../../" to escape the current directory
-    $clean_path = path($clean_path)->basename;
-
-    # Confirm it's a regular file, if it already exists:
-    # We check here so the error message contains the simple name, not the absolute path.
-    if (-e $clean_path && !-f $clean_path) {
-        croak "File exists but is not a regular file: $clean_path";
-    }
-
-    # Canonicalize path (Now safe to make absolute for internal use):
-    $clean_path = path($clean_path)->realpath;
-
-    # Return cleaned path
-    return $clean_path;
-}
-
 
 =head1 AUTHOR
 
 Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 CONTRIBUTORS
+
+Gisbert W. Selke, C<< <gws at cpan.org> >>
 
 =head1 REPOSITORY
 

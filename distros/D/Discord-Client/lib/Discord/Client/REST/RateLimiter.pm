@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use JSON::PP ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # Internal scheduler. One request per bucket avoids speculative quota use and
 # out-of-order updates; unrelated buckets can still make progress concurrently.

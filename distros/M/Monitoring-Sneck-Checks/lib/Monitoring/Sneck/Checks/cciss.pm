@@ -12,11 +12,11 @@ Monitoring::Sneck::Checks::cciss - checks HP Smart Array controllers, through cc
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 # Where things are. Set by tests. CCISS_VOL_STATUS undef means the first of
 # CCISS_VOL_STATUS_PATHS that is there.
@@ -66,6 +66,7 @@ sub _any {
     cciss|perl:cciss
     cciss_sg0|perl:cciss -d /dev/sg0
     cciss_bsd|perl:cciss -d /dev/ciss0
+    cciss_no_battery|perl:cciss -C -o
 
 =head1 DESCRIPTION
 
@@ -81,7 +82,8 @@ enclosure with a fan, power supply, temperature, or door alert.
 - WARNING :: A volume ready for recovery, recovering, expanding, queued
 for expansion, not yet available, or that was overheated in the past.
 A spare rebuilding. A drive in S.M.A.R.T. predictive failure. Cache
-trouble, such as the write cache disabled or a battery problem.
+trouble, such as the write cache disabled or a battery problem, unless
+--ignore-cache is given.
 
 - UNKNOWN :: cciss_vol_status not being there, or saying nothing about
 a controller.
@@ -107,9 +109,16 @@ This needs root, to open the devices.
 /dev/cciss/c0d0, or /dev/ciss0, instead of finding them, and without
 looking at the vendor. May be given more than once.
 
+- -C, --ignore-cache :: Cache trouble is still said, but is OK.
+
+- -o, --output :: After the status line, include the output of
+cciss_vol_status for each controller.
+
+- -O, --always-output :: As --output, but for every controller.
+
 =cut
 
-sub option_spec { return ('device|d=s@') }
+sub option_spec { return ( 'device|d=s@', 'ignore-cache|C', 'output|o', 'always-output|O' ) }
 
 =head1 METHODS
 
@@ -139,13 +148,17 @@ sub check {
 
 	my @codes;
 	my @parts;
+	my @details;
 	foreach my $device (@devices) {
-		my ( $code, $says ) = $self->controller_status( $command, $device );
+		my ( $code, $says, $output ) = $self->controller_status( $command, $device );
 		push( @codes, $code );
 		push( @parts, $says );
+		if ( $self->opt('always-output') || ( $self->opt('output') && $code != $self->OK ) ) {
+			push( @details, $device . ':', split( /\n/, $output ) );
+		}
 	}
 
-	return $self->finish( $self->worst(@codes), join( ', ', @parts ) );
+	return $self->finish( $self->worst(@codes), join( ', ', @parts ), @details );
 } ## end sub check
 
 =head2 controllers
@@ -184,10 +197,10 @@ sub controllers {
 
 =head2 controller_status
 
-Runs cciss_vol_status -u -s -V on a controller and returns the code
-and what to say about it.
+Runs cciss_vol_status -u -s -V on a controller and returns the code,
+what to say about it, and what cciss_vol_status printed.
 
-    my ( $code, $says ) = $check->controller_status( '/usr/bin/cciss_vol_status', '/dev/sg0' );
+    my ( $code, $says, $output ) = $check->controller_status( '/usr/bin/cciss_vol_status', '/dev/sg0' );
 
 =cut
 
@@ -200,7 +213,7 @@ sub controller_status {
 	if ( !defined( $found->{controller} ) && !defined( $found->{volumes}[0] ) ) {
 		my $first = ( grep { /\S/ } split( /\n/, $output ) )[0] // '';
 		$first =~ s/\A\s+|\s+\z//g;
-		return ( $self->UNKNOWN, $device . ' said nothing, exited ' . $exit . ', "' . $first . '"' );
+		return ( $self->UNKNOWN, $device . ' said nothing, exited ' . $exit . ', "' . $first . '"', $output );
 	}
 
 	my @codes = ( $self->OK );
@@ -251,12 +264,16 @@ sub controller_status {
 		push( @codes, $self->CRITICAL );
 		push( @parts, 'enclosure ' . $enclosure->{name} . ' ' . lc( $enclosure->{status} ) );
 	}
+	foreach my $trouble ( @{ $found->{cache} } ) {
+		push( @codes, $self->WARNING ) if !$self->opt('ignore-cache');
+		push( @parts, $device . ' ' . lc($trouble) );
+	}
 	foreach my $problem ( @{ $found->{problems} } ) {
 		push( @codes, $self->WARNING );
 		push( @parts, $device . ' ' . lc($problem) );
 	}
 
-	return ( $self->worst(@codes), join( ', ', @parts ) );
+	return ( $self->worst(@codes), join( ', ', @parts ), $output );
 } ## end sub controller_status
 
 # Parses the output of cciss_vol_status -u -s -V for one controller.
@@ -272,7 +289,8 @@ sub controller_status {
 #       spare messages, failed and replacement, array refs of drive locations, and failed_count.
 #     - drives :: Array ref of hash refs of location and status, OK or predictive failure.
 #     - enclosures :: Array ref of hash refs of name and status.
-#     - problems :: Array ref of cache trouble and drives that could not be read.
+#     - cache :: Array ref of cache trouble, such as 'Write cache temporarily disabled'.
+#     - problems :: Array ref of other trouble, such as 'could not read a drive'.
 #
 # Example...
 #
@@ -282,7 +300,7 @@ sub controller_status {
 sub _parse {
 	my ($output) = @_;
 
-	my %found   = ( volumes => [], drives => [], enclosures => [], problems => [] );
+	my %found   = ( volumes => [], drives => [], enclosures => [], cache => [], problems => [] );
 	my $section = '';
 	foreach my $line ( split( /\n/, $output ) ) {
 		if ( $line =~ /\AController: (.*?)\s*\z/ ) {
@@ -330,7 +348,7 @@ sub _parse {
 				push( @{$list}, $location ) if !grep { $_ eq $location } @{$list};
 			}
 		} elsif ( ( my $trimmed = $line =~ s/\A\s+|\s+\z//gr ) =~ $CACHE_TROUBLE ) {
-			push( @{ $found{problems} }, $trimmed =~ s/:\z//r );
+			push( @{ $found{cache} }, $trimmed =~ s/:\z//r );
 		} elsif ( $line =~ /\ACannot get device information for/ ) {
 			push( @{ $found{problems} }, 'could not read a drive' );
 		} elsif ( $line =~ /\A\S/ ) {

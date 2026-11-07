@@ -36,5 +36,12 @@ is($line{'Spike::More::triple'}, 4, 'triple in the included file');
 is($line{'Spike::More::never'}, 28, 'never');
 is_deeply([$spike->find_declaration(['Spike.xs', 'xs/more.xs'], 'Spike::More::child_only')], ['xs/more.xs', 12], 'the fallback by name in the right PACKAGE');
 is_deeply([$spike->find_declaration(['Spike.xs', 'xs/more.xs'], 'Spike::nothing')], [], 'and nothing for a name that is not there');
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    is_deeply([$spike->find_declaration(['Spike.xs', 'xs/more.xs'], 'Spike::()')], [], 'an overload table entry is no declaration');
+    is_deeply([$spike->find_declaration(['Spike.xs', 'xs/more.xs'], 'Spike::(""')], [], 'nor is an overload method');
+    is_deeply(\@warnings, [], 'and neither warns');
+}
 
 done_testing;

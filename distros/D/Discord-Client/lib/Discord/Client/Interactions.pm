@@ -10,7 +10,7 @@ use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 use Discord::Client::Error;
 use Discord::Client::Interaction;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ( $class, %args ) = @_;

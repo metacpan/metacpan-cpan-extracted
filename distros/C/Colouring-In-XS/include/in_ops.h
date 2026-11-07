@@ -582,7 +582,11 @@ static void colouring_peep(pTHX_ OP *o) {
 	OP *orig = o;
 	HV *seen;
 
-	/* chain to any previous peep first */
+	/* chain to any previous peep first, and there is always one, since perl
+	 * starts PL_peepp at its own optimizer */
+	/*
+	 # uncoverable branch false
+	 # uncoverable condition right */
 	if (colouring_prev_peep)
 		colouring_prev_peep(aTHX_ o);
 
@@ -605,10 +609,15 @@ static void colouring_peep(pTHX_ OP *o) {
 		if (!(o->op_flags & OPf_STACKED))
 			continue;
 
-		/* Find the last child of entersub — should be the method op */
+		/* Find the last child of entersub - should be the method op. An
+		 * entersub always has a child, its pushmark, so this guard is for
+		 * form. */
 		first = cUNOPo->op_first;
+		/*
+		 # uncoverable branch true
+		 # uncoverable condition left */
 		if (!first)
-			continue;
+			continue; /* # uncoverable statement */
 
 		/* Walk to last sibling */
 		cv_op = first;

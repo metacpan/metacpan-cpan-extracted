@@ -1,14 +1,14 @@
 ---
 abstract: Basic information about the system
 author:
-  - H.Merijn Brand <hmbrand@cpan.org>
+  - H.Merijn Brand <perl5@tux.freedom.nl>
   - Abe Timmerman <abeltje@cpan.org>
 build_requires:
   perl: '5.008'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150013
+generated_by: Author, CPAN::Meta::Converter version 2.150015
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: System-Info
 provides:
   System::Info:
     file: lib/System/Info.pm
-    version: '0.068'
+    version: '0.069'
   System::Info::AIX:
     file: lib/System/Info/AIX.pm
     version: '0.050'
@@ -47,7 +47,7 @@ provides:
     version: '0.050'
   System::Info::Linux:
     file: lib/System/Info/Linux.pm
-    version: '0.054'
+    version: '0.055'
   System::Info::Solaris:
     file: lib/System/Info/Solaris.pm
     version: '0.050'
@@ -58,7 +58,7 @@ provides:
     file: lib/System/Info/Windows.pm
     version: '0.051'
 recommends:
-  Test::More: '1.302219'
+  Test::More: '1.302226'
 requires:
   POSIX: '0'
   Test::More: '0.88'
@@ -69,4 +69,4 @@ resources:
   bugtracker: https://github.com/Tux/System-Info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/System-Info
-version: '0.068'
+version: '0.069'

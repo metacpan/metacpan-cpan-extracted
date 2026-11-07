@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.038     2026-11-06 22:02:51+01:00 Europe/Brussels
+          - Link loadable objects against a shared libperl on Android
+
 0.037     2026-06-01 12:05:26+02:00 Europe/Brussels
           - Lowercase nologo argument to MSVC
 

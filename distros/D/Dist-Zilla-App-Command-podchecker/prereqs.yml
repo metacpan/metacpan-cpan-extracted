@@ -1,0 +1,15 @@
+# Read by [PrereqsFile] in dist.ini, for prerequisites [AutoPrereqs] cannot find
+# in the code.  The perl floor is here as well as on the use line of every file,
+# so the metadata states it even where one file leaves that line out.
+runtime:
+  requires:
+    perl: '5.022'
+    # The first release on Pod::Simple, which has output_fh, source_filename
+    # and parse_string_document.
+    Pod::Checker: '1.70'
+test:
+  requires:
+    # The dist.ini of the fixture in the test loads them, so AutoPrereqs cannot
+    # see them.
+    Dist::Zilla::Plugin::PodWeaver: '0'
+    Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'

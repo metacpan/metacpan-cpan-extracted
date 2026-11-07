@@ -29,11 +29,11 @@ sub load ( $source, $name ) { return Dist::Conformance::Flavor->load( $source, $
 
 subtest 'load: the fixture flavors' => sub {
     my $strict = load( $FIXTURES, 'troglodyne-5.040' );
-    is( $strict->lineage,                           [qw{troglodyne troglodyne-5.040}],                                                                         'a flavor comes after the one it extends' );
-    is( $strict->description,                       'A troglodyne distribution that declares use 5.040 or later',                                              'the description is its own' );
-    is( $strict->variables,                         { PERL_FLOOR => '5.040' },                                                                                 'its variables' );
-    is( [ $strict->check_names ],                   [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig ToolConfiguration Workflows}], 'its checks and those it extends, by name' );
-    is( $strict->checks->{CriticProfile}{template}, 'templates/perlcriticrc',                                                                                  'the strict profile' );
+    is( $strict->lineage,                           [qw{troglodyne troglodyne-5.040}],                                                                                        'a flavor comes after the one it extends' );
+    is( $strict->description,                       'A troglodyne distribution that declares use 5.040 or later',                                                             'the description is its own' );
+    is( $strict->variables,                         { PERL_FLOOR => '5.040' },                                                                                                'its variables' );
+    is( [ $strict->check_names ],                   [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig SystemPackages ToolConfiguration Workflows}], 'its checks and those it extends, by name' );
+    is( $strict->checks->{CriticProfile}{template}, 'templates/perlcriticrc',                                                                                                 'the strict profile' );
 
     my $compat = load( $FIXTURES, 'troglodyne-compat' );
     is( $compat->checks->{CriticProfile}{template}, 'templates/perlcriticrc.compat', 'the compat flavor names the other profile' );

@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.054";
+our $VERSION = "0.055";
 
 =head1 NAME
 
@@ -74,9 +74,8 @@ sub _lsb_release {
     $ENV{SMOKE_USE_ETC} and return;
 
     $os->{DISTRIB_ID} || $os->{DISTRIB_RELEASE} || $os->{DISTRIB_CODENAME}
-	or return;
+	and return;
 
-    #use DP;die DDumper $os;
     open my $ch, "lsb_release -a 2>&1 |" or return;
     my %map = (
 	"LSB Version"		=> "don't care",

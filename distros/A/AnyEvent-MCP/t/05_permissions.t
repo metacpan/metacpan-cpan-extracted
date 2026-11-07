@@ -49,6 +49,67 @@ my $request = {
 my $p = AnyEvent::MCP::Server::Permissions->new (sandbox_grants => $graph);
 ok !-e "$dir/anyevent-mcp", "unnamed permissions access no configuration";
 ok keys (%{$p->closure (["all"])}) == 3, "capability implication closure";
+
+my $host_p = AnyEvent::MCP::Server::Permissions->new (
+   file => "$dir/host-rules.ini", sandbox_grants => $graph,
+);
+my $host_request = {
+   action => "read", sandbox_grants => ["read"], reason => "read remote files",
+   dimensions => {
+      host => {
+         label => "Host", value => "remote alpha",
+         choices => [
+            { label => "This host", match => "remote alpha" },
+            { label => "All hosts", match => "^" },
+         ],
+      },
+      workdir => {
+         label => "Workdir", value => "/work",
+         choices => [
+            { label => "This configured workdir", match => "/work" },
+            { label => "Any configured workdir", match => "^" },
+         ],
+      },
+   },
+};
+my $host_prepared = $host_p->check ($host_request)->{request};
+my $host_decision = AnyEvent::MCP::Permissions::Ask::build ($host_prepared,
+   { decision => "allow-always", sandbox_grants => ["read"], dim_host => "^", dim_workdir => "/work" },
+   "rule", { decision => "allow-always" });
+$host_p->resolve ($host_request, { request => $host_prepared, decision => $host_decision });
+my $second_host = with_dim ($host_request, "host", "remote beta", [
+   { label => "This host", match => "remote beta" },
+   { label => "All hosts", match => "^" },
+]);
+is $host_p->check ($second_host)->{decision}, "allow",
+   "all-host rule matches the same workdir on another remote host";
+my $local_request = with_dim ($host_request, "host", "local", [
+   { label => "This host", match => "local" },
+   { label => "All hosts", match => "^" },
+]);
+is $host_p->check ($local_request)->{decision}, "allow",
+   "all-host workdir rule also matches local execution";
+is $host_p->check (with_dim ($second_host, "workdir", "/other"))->{decision}, "ask",
+   "all-host choice does not broaden an exact workdir scope";
+$host_p->save ([{ decision => "allow", action => "read",
+   "match.host" => "remote alpha", "match.workdir" => "/work", "sandbox-grants" => "read" }]);
+is $host_p->check ($second_host)->{decision}, "ask",
+   "exact-host rule does not grant authority on another remote host";
+is $host_p->check ($local_request)->{decision}, "ask",
+   "remote host-specific rule does not grant authority locally";
+$host_p->save ([{ decision => "allow", action => "read",
+   "match.workdir" => "/work", "sandbox-grants" => "read" }]);
+is $host_p->check ($second_host)->{decision}, "allow",
+   "old workdir-only rules remain valid across remote hosts";
+is $host_p->check ($local_request)->{decision}, "allow",
+   "old workdir-only rules still apply locally";
+$host_p->save ([{ decision => "allow", action => "read",
+   "match.host" => "local", "match.workdir" => "/work", "sandbox-grants" => "read" }]);
+is $host_p->check ($second_host)->{decision}, "ask",
+   "new local host-specific rule does not grant access remotely";
+is $host_p->check ($local_request)->{decision}, "allow",
+   "new local host-specific rule applies to local workdir";
+
 my $grant = $p->check ($request);
 ok $grant->{decision} eq "ask", "default asks";
 ok join (",", @{$grant->{request}{sandbox_grant_choices}}) eq "all,read,write", "offered all sandbox_grants";

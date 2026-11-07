@@ -1,4 +1,4 @@
-Proc-Spawner version 0.06 (EXPERIMENTAL)
+Proc-Spawner version 0.08 (EXPERIMENTAL)
 ========================================
 
 Compiles and runs shell one-liners (or portable shell scripts) from Perl
@@ -15,7 +15,7 @@ to descendants.)
   Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large
                          parsers of three sizes of the shell language
 
-HOW CLOSE TO DASH AND BASH (0.06; doc/large-subset/large-subset-state.md)
+HOW CLOSE TO DASH AND BASH (0.08; doc/large-subset/large-subset-state.md)
 
 Of 41,952 shell strings from six public collections (tldr, NL2Bash,
 ShellCheck's tests, the bash Cookbook, the pure sh and bash bibles), the

@@ -7,5 +7,5 @@ use Test::DescribeMe qw(author);
 use Test::Needs 'Test::Strict';
 
 Test::Strict->import();
-all_perl_files_ok();
+all_perl_files_ok('lib', 't');	# xt/ holds auto-generated mutant stubs
 warnings_ok('lib/Object/Configure.pm');

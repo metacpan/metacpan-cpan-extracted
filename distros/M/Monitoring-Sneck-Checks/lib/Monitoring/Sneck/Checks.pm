@@ -11,11 +11,11 @@ Monitoring::Sneck::Checks - nagios style checks run as Perl inside of sneck
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.1';
 
 # Seconds a check is given if run is not told otherwise.
 our $TIMEOUT = 30;
@@ -74,6 +74,8 @@ The checks that come with it are...
 
 - file_age :: L<Monitoring::Sneck::Checks::file_age>, file age and size.
 
+- file_content :: L<Monitoring::Sneck::Checks::file_content>, a file being there and what is in it.
+
 - file_handles :: L<Monitoring::Sneck::Checks::file_handles>, open files against the system limit.
 
 - file_mode :: L<Monitoring::Sneck::Checks::file_mode>, the mode, owner, and group of files.
@@ -92,6 +94,8 @@ The checks that come with it are...
 
 - kernel_modules :: L<Monitoring::Sneck::Checks::kernel_modules>, kernel modules being loaded or not.
 
+- linux_ras :: L<Monitoring::Sneck::Checks::linux_ras>, hardware errors rasdaemon has logged.
+
 - listening :: L<Monitoring::Sneck::Checks::listening>, what ports are listened on.
 
 - load :: L<Monitoring::Sneck::Checks::load>, the load averages.
@@ -101,6 +105,8 @@ The checks that come with it are...
 - memory :: L<Monitoring::Sneck::Checks::memory>, how much memory is used.
 
 - mount :: L<Monitoring::Sneck::Checks::mount>, file systems being mounted and writable.
+
+- mtime :: L<Monitoring::Sneck::Checks::mtime>, file mtimes against a time.
 
 - neighbors :: L<Monitoring::Sneck::Checks::neighbors>, how full the ARP and NDP neighbor tables are.
 

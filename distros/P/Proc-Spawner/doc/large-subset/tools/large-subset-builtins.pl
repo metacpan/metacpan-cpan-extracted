@@ -17,7 +17,8 @@
 # taken one by one); a name a function may have (b_late) is taken where it runs: as the builtin, or as the function.
 # A side effect inside an expansion (: $((z=3))) is not in the expanded words, so it is lost when the call runs alone.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
-my ($LIST, $DB); GetOptions('l=s' => \$LIST, 'db=s' => \$DB) && @ARGV == 1 or die "usage: $0 [-l LIST.tsv] [-db DB.jsonl] QDIR\n";
+my ($LIST, $DB, $REUSE); GetOptions('l=s' => \$LIST, 'db=s' => \$DB, 'reuse=s' => \$REUSE) && @ARGV == 1
+  or die "usage: $0 [-l LIST.tsv] [-db DB.jsonl] [-reuse OLD-DB.jsonl] QDIR\n";   # -reuse: the answers of calls an earlier run has
 $> == 0 or die "run as root\n";
 my $DIST = abs_path('.'); -e "$DIST/blib/arch/auto/Proc/Spawner/Spawner.so" or die "run make first, in the distribution's directory\n";
 my %SKIP = map +($_ => 1), qw(Proc::ShellSpawn::Large::call Proc::ShellSpawn::Large::b_late);
@@ -33,8 +34,9 @@ for my $f (glob "$ARGV[0]/run-*.jsonl") { open my $in, '<', $f or die;
       my @a = split /\037/, $argv, -1; my @e = grep length, split /\036/, $env;
       if (@a && $TOOL{$a[0]}) { $skipped{"coreutils $a[0]"}++; next }
       my $t = join ' ', (map { my ($n, $v) = split /=/, $_, 2; "$n=" . q1($v) } @e), !@a ? () :
-        ($a[0] =~ /^[A-Za-z0-9_.:-]+\z/ ? $a[0] : q1($a[0])),
-        !@a ? () : map { $a[0] =~ /^(?:export|readonly|local)\z/ && /^([A-Za-z_]\w*)=(.*)\z/s ? "$1=" . q1($2) : q1($_) } @a[1 .. $#a];   # NAME='value'   # the name bare: the parser takes a quoted export for no declaration
+        ($a[0] =~ /^[A-Za-z0-9_.:][A-Za-z0-9_.:-]*\z/ ? $a[0] : q1($a[0])),   # a name starting with - or +: quoted, or sh -c reads an option
+        !@a ? () : map { $a[0] =~ /^(?:export|readonly|local|unset)\z/ && /^([A-Za-z_]\w*)(?:=(.*))?\z/s
+                         ? defined $2 ? "$1=" . q1($2) : $1 : q1($_) } @a[1 .. $#a];   # NAME='value', or NAME bare: the parser takes a quoted one for no name   # the name bare: the parser takes a quoted export for no declaration
       next if $seen{$t}++; $calls{$t}++; $kind{$t} = $h; push @{$samples{$t}}, $s->{id} if @{$samples{$t} // []} < 3 } } }
 print STDERR scalar(keys %calls), " distinct calls; left out: ", join(', ', map "$_ $skipped{$_}", sort keys %skipped) || 'none', "\n";
 
@@ -62,9 +64,11 @@ sub msgs { my ($e, $sh) = @_; $e =~ s/$PFX{$sh}//g; join '', sort split //, $e =
 
 my (%cls, %name, @list); my $j = JSON::PP->new->utf8->canonical; my $db;
 open $db, '>', $DB or die "$DB: $!" if $DB;
+my %old; if ($REUSE) { open my $in, '<', $REUSE or die "$REUSE: $!\n";
+  while (<$in>) { my $x = decode_json($_); $old{$x->{text}} = { map +($_ => $x->{$_}), qw(dash bash ours) } } }
 for my $t (sort keys %calls) {
-  my %r = (dash => run1('/usr/bin/dash', '-c', $t), bash => run1('/usr/bin/bash', '--posix', '-c', $t),
-           ours => run1($^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t));
+  my %r = %{ $old{$t} // { dash => run1('/usr/bin/dash', '-c', $t), bash => run1('/usr/bin/bash', '--posix', '-c', $t),
+           ours => run1($^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl", $t) } };
   my ($d, $b, $o) = @r{qw(dash bash ours)};
   my $eq = sub { my ($x, $y) = @_; $x->{status} eq $y->{status} && $x->{out} eq $y->{out} && $x->{files} eq $y->{files} };
   my ($db_, $do, $bo) = ($eq->($d, $b), $eq->($d, $o), $eq->($b, $o));

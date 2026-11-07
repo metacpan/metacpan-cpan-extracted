@@ -20,7 +20,11 @@ t/10-edge-cases.t
 t/11-custom-ops.t
 include/ap_abi.h
 include/ap_abi_impl.h
+include/xop_compat.h
+bench/ops.pl
 t/12-abi.t
+t/13-errors.t
+t/14-filesystem.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

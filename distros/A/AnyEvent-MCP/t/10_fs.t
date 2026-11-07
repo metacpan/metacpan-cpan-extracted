@@ -1202,6 +1202,7 @@ $client = AnyEvent::MCP::Client::JSONL->new (
             ($meta->{stage} eq "rule" ? (
                sandbox_grants => join (",", @{$request->{sandbox_grants}}),
                dim_subject => $request->{dimensions}{subject}{choices}[0]{match},
+               dim_host => $request->{dimensions}{host}{choices}[0]{match},
             ) : ()),
          },
       });
@@ -1266,10 +1267,22 @@ ok !$result->{isError} && read_file ("$dir/work/auto-test") eq "auto"
    "auto mode without bubblewrap requests full authority and runs directly";
 $client->close;
 my $unsandboxed_stderr = read_file "$dir/unsandboxed.stderr";
-my @unsandboxed_warning = $unsandboxed_stderr =~
-   /(mcp-fs: SANDBOX NONE - workers run with full host-user privileges\n)/g;
-is scalar @unsandboxed_warning, 2,
-   "both unsandboxed startup modes emit the expected warning";
+unlike $unsandboxed_stderr, qr/SANDBOX NONE|bubblewrap unavailable/,
+   "explicit none and default-filtered auto modes produce no sandbox warning";
+
+my @warn_server = @captured_server;
+$warn_server[4] = "$dir/auto-warning.stderr";
+$client = AnyEvent::MCP::Client::JSONL->new (
+   command => [@warn_server, "--stdio", "--ask", "mcp",
+      "--sandbox=auto", "--bwrap", "$dir/nonexistent-bwrap", "$dir/work"],
+   env => { %env, PERL_ANYEVENT_LOG => "filter=warn log=warn" },
+   client_capabilities => { elicitation => { form => {} } },
+   on_request => $direct_answer,
+);
+$result = call workdirs => {};
+$client->close;
+like read_file ("$dir/auto-warning.stderr"), qr/warn .*bubblewrap unavailable, running without sandbox/,
+   "auto fallback emits a warning when logging warnings is enabled";
 
 my $old_sandbox_log = read_file "$dir/sandbox.log";
 $client = AnyEvent::MCP::Client::JSONL->new (
@@ -1600,5 +1613,27 @@ close $config_out or die $!;
    ok close $fh && $output eq "exec-cmd-ok",
       "--exec-cmd works without a usable worker Perl";
 }
+
+$client = AnyEvent::MCP::Client::JSONL->new (
+   command => [$^X, "-Ilib", "bin/mcp-fs", "--name", "missing-perl",
+      "--stdio", "--ask", "mcp", "--bwrap", "$dir/bwrap",
+      "-s", "executable.perl=$^X", "--set", "prepend-path=$dir/bin",
+      "-s", "mount.aa=", "-s", "mount.cli=ro:$dir/only", "$dir/work"],
+   env => \%env, client_capabilities => { elicitation => { form => {} } },
+   on_request => $direct_answer,
+);
+$result = call workdirs => {};
+ok $result->{structuredContent}{workdirs}{1} eq "$dir/work",
+   "-s executable.perl overrides an unusable instance Perl path";
+ok +(grep $_->[0] eq "mount.cli", @{$result->{structuredContent}{mounts}})
+   && !(grep $_->[0] eq "mount.aa", @{$result->{structuredContent}{mounts}}),
+   "CLI settings add and suppress mounts after program and instance defaults";
+$result = call exec => { argv => [$^X, "-e", "print 7"], reason => "CLI configuration override" };
+my $set_worker = sandbox_args ();
+ok !$result->{isError}
+   && sandbox_env ($set_worker)->{PATH} eq "$dir/bin:/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin"
+   && mount_for ($set_worker, "$dir/only") eq "--ro-bind",
+   "CLI prepend-path and mount overrides configure the worker sandbox";
+$client->close;
 
 done_testing;

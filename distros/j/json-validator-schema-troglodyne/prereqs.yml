@@ -1,0 +1,6 @@
+# Read by [PrereqsFile] in dist.ini, for what [AutoPrereqs] cannot know.
+runtime:
+  requires:
+    # The oldest release that the tests passed on.  The module relies on parts
+    # of it that are private, which its POD names.
+    JSON::Validator: '5.19'

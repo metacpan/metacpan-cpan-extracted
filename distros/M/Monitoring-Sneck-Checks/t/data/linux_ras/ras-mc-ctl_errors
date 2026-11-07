@@ -1,0 +1,3 @@
+#!/usr/bin/env perl
+die("wanted db --summary, got @ARGV\n") if "@ARGV" ne "db --summary";
+print "No Memory errors.\n\nMCE records summary:\n\t1 Corrected error\n";

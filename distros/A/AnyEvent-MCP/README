@@ -196,7 +196,8 @@ YOUR FIRST FILESYSTEM SERVER
 
     Choose "Allow once" for the first operation. The worker then runs with
     the requested sandbox grants. A denial is a tool failure that the LLM
-    should report, rather than an empty file or a disconnected server.
+    should report, rather than an empty file or a disconnected server. See
+    "Your first permission dialog" for a walkthrough.
 
     For a slightly larger task, ask:
 
@@ -246,12 +247,13 @@ YOUR FIRST FILESYSTEM SERVER
 
     IDs are shared across filesystem servers in
     "$XDG_CONFIG_HOME/anyevent-mcp/fs-workdir-ids.json", or under
-    "$HOME/.config" by default. They identify resolved absolute paths and
-    survive restarts and argument reordering. Startup resolves IDs once and
-    reserves new allocations under the lock. A timer runs immediately and
-    every 5.25 days to reread the registry and refresh the server's fixed
-    assignments. Other entries expire after seven days and their IDs may be
-    reused. Restart servers after manually changing the registry.
+    "$HOME/.config" by default. They identify logical absolute pathnames
+    without resolving symlinks, and survive restarts and argument
+    reordering. Startup resolves IDs once and reserves new allocations under
+    the lock. A timer runs immediately and every 5.25 days to reread the
+    registry and refresh the server's fixed assignments. Other entries
+    expire after seven days and their IDs may be reused. Restart servers
+    after manually changing the registry.
 
     "workdir-read" exposes the selected workdir read-only. "workdir-write"
     makes it writable and implies read access. A path in another configured
@@ -419,6 +421,64 @@ PERMISSIONS IN PRACTICE
     checks decide whether a tool may perform an operation. A correct token
     therefore does not prevent permission prompts.
 
+  Your first permission dialog
+    Try the read-only request in "Make a useful request". When "mcp-fs" asks
+    to list the project directory, the YAD window shows the server, tool,
+    action, paths and "Required grants". Read these before choosing
+    anything. For a "list" request, expect action "inspect" and normally the
+    "workdir-read" grant. "inspect" permits inspection operations;
+    "workdir-read" gives the worker read access to the selected workdir, not
+    just the displayed path. The action and the sandbox access are separate
+    decisions.
+
+    The displayed paths or command subject describe what is requested *now*.
+    The "Reason" field is an explanation supplied with the request, not a
+    security guarantee. Check the requested grants as well: "network",
+    "world-write", "ssh-agent" or other grants may give the worker access
+    unrelated to the displayed file. An "UNSANDBOXED" warning means the
+    worker has the full privileges of your host user, regardless of the
+    apparently narrow request.
+
+    For this first listing, choose "Allow once" if the request matches what
+    you asked the assistant to do. That authorizes this tool call, not the
+    whole conversation. If the assistant subsequently reads the README, that
+    is a different action ("read") and may prompt again. Choose "Deny once",
+    or close the window, if anything is unexpected. Denial is safe: the
+    operation does not run, and you can reconsider after seeing or changing
+    the request.
+
+    Once you understand a recurring request, "Allow always..." opens a
+    second window, "Create MCP permission rule". This window is about
+    *future* requests, not just the current one. Check:
+
+    Sandbox grants
+        The checked grants are what the saved allowance can cover. They
+        initially include the requested grants; adding others broadens the
+        rule, and removing a necessary grant may make it insufficient.
+
+    Scope
+        Each offered scope controls where or to whom the rule applies. For
+        example, a workdir scope may match this workdir or any workdir. In
+        mcp-fs, the independent host scope defaults to this host, including
+        for local execution. Choose all hosts only when intended. Older
+        saved rules without "match.host" continue to apply across hosts.
+        Choose the narrow scope you actually intend. Filesystem allow rules
+        generally do not bind to the particular displayed filename.
+
+    Rule lifetime
+        "Indefinite" is the default. "900 seconds" and "16 hours" limit how
+        long the rule will apply to future requests.
+
+    "Save rule" makes the decision persistent; "Back" returns to the
+    original prompt without saving. For a command execution request, inspect
+    the command and, when present, "View stdin..." before deciding. Its
+    "Subject scope" can select "exact executable and argv", "this
+    executable, arbitrary argv", or "any command"; the last two authorize
+    substantially more than the displayed command. Even an exact-argv rule
+    does not constrain stdin: allowing "perl -" permanently may allow a
+    different script next time. If in doubt, use "Allow once" rather than
+    saving a broad "exec" rule.
+
   What the prompt means
     The prompt describes an action, paths or command, a reason and sandbox
     grants. For filesystem tools, the actions are:
@@ -443,8 +503,9 @@ PERMISSIONS IN PRACTICE
     lifetimes are stored as "expires" Unix timestamps. Expired rules
     disappear on every read; the next ordinary save removes them from disk.
     Expiry affects future permission checks, not operations already
-    authorized. Filesystem allow rules can select grants and the selected
-    workdir when the authority depends on it. Deny rules can also select an
+    authorized. Filesystem allow rules can select grants, the host and the
+    selected workdir when the authority depends on it. Workdir scopes
+    contain plain paths, independent of host. Deny rules can also select an
     exact affected path. Exec offers persistent command/argv subjects.
 
     For exec, "View stdin..." lets you inspect supplied input without

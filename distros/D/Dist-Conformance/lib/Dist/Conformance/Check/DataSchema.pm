@@ -1,6 +1,6 @@
-package Dist::Conformance::Check::DataSchema 0.002;
+package Dist::Conformance::Check::DataSchema 0.003;
 
-# ABSTRACT: A JSON or YAML file parses and matches a schema
+# ABSTRACT: A JSON, YAML or INI file parses and matches a schema
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -13,9 +13,10 @@ use Dist::Conformance::Schema();
 my %PARSER = (
     json => \&Dist::Conformance::Schema::parse_json,
     yaml => \&Dist::Conformance::Schema::parse_yaml,
+    ini  => \&Dist::Conformance::Schema::parse_ini,
 );
 
-my %FORMAT_OF_EXTENSION = ( json => 'json', yml => 'yaml', yaml => 'yaml' );
+my %FORMAT_OF_EXTENSION = ( json => 'json', yml => 'yaml', yaml => 'yaml', ini => 'ini' );
 
 sub config_schema ($) {
     return {
@@ -34,7 +35,7 @@ sub from_config ( $class, %arguments ) {
     my $where = $arguments{where} // "the check $arguments{name}";
     my $self  = $class->SUPER::from_config(%arguments);
     my $file  = $self->config->{file};
-    die "$where is not valid:\n  /format: $file does not end in .json, .yml or .yaml, so give json or yaml\n" if !defined $self->file_format;
+    die "$where is not valid:\n  /format: $file does not end in .json, .yml, .yaml or .ini, so give json, yaml or ini\n" if !defined $self->file_format;
     return $self;
 }
 
@@ -64,11 +65,11 @@ __END__
 
 =head1 NAME
 
-Dist::Conformance::Check::DataSchema - A JSON or YAML file parses and matches a schema
+Dist::Conformance::Check::DataSchema - A JSON, YAML or INI file parses and matches a schema
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -76,8 +77,27 @@ Some programs read a configuration file that a person writes by hand, and
 ignore a key that they do not know without a word.  In such a file a
 misspelling turns a rule off.  F<.perl-slop.json> of the perl-slop plugin is
 one, as above.  This check reports C<missing> when the file is absent.  It
-fails when the file does not parse as a JSON object or a YAML mapping, or does
-not match C<schema>, and passes otherwise.
+fails when the file does not parse as a JSON object, a YAML mapping or an INI
+file, or does not match C<schema>, and passes otherwise.
+
+An INI file, such as F<dist.ini>, is a hash of its sections by their whole
+header, as L<Dist::Conformance::Schema/parse_ini> says.  So a schema can refuse
+a key of a plugin:
+
+    checks:
+      GithubMetaFromRemote:
+        module: DataSchema
+        file: dist.ini
+        schema:
+          type: object
+          patternProperties:
+            '\AGithubMeta(?:\s*/.*)?\z':
+              type: object
+              properties:
+                user:
+                  not: {}
+                  x-errorMessage:
+                    not: overrides the account in the URL of the origin remote
 
 The schema is in the flavor, so that it changes in the same commit as the
 standards that describe the file.  It is an OpenAPI v3 schema, as
@@ -99,6 +119,9 @@ C<json> or C<yaml>: C<format>, or the format that the extension of C<file>
 says.  Undefined when neither says one.
 
 =head2 check
+
+C<($snapshot)>.  The status and the message that L</DESCRIPTION> says, for the
+file in C<$snapshot>.
 
 =head1 IN A FLAVOR
 
@@ -130,9 +153,10 @@ Required.  The schema that its content must match.
 
 =item format
 
-C<json> or C<yaml>: how to parse the file.  Default C<json> for a file whose
-name ends in F<.json>, and C<yaml> for one whose name ends in F<.yml> or
-F<.yaml>.  A file with any other name needs it.
+C<json>, C<yaml> or C<ini>: how to parse the file.  Default C<json> for a file
+whose name ends in F<.json>, C<yaml> for one whose name ends in F<.yml> or
+F<.yaml>, and C<ini> for one whose name ends in F<.ini>.  A file with any other
+name needs it.
 
 =item missing
 

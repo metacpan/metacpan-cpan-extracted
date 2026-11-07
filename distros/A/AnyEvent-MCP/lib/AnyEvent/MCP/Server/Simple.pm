@@ -799,6 +799,16 @@ Tokens work both as credential-bearing URL components and with the
 C<Authorization: Bearer TOKEN> header.
 Example: C<--token first --token second>.
 
+=item -s, --set KEY=VALUE
+
+Override one trusted configuration entry for the selected instance in this
+process. Applied after C<[program NAME]> and C<[instance NAME]> defaults,
+without changing the configuration file. Repeat to override multiple entries;
+the last assignment to a key wins. Empty values suppress inherited settings,
+and additional equals signs belong to the value. The supported keys depend
+on the server (for example, C<executable.perl> and C<prepend-path> in
+L<mcp-fs>). Example: C<-s executable.perl=/opt/perl/bin/perl>.
+
 =item --stdio
 
 Serve MCP JSONL on stdin/stdout rather than the default HTTP listener.
@@ -900,7 +910,7 @@ my %config = (
          defined $handle->{mcp_remote} ? "remote=$handle->{mcp_remote}" : (),
          defined $name && !ref $name ? "client=" . JSON::XS::encode_json (substr $name, 0, 80) : (),
       );
-      AE::log warn => "MCP connection " . join (" ", @details) . ": $error";
+      AE::log trace => "MCP connection " . join (" ", @details) . ": $error";
    },
 );
 my $toolset = AnyEvent::MCP::Server::Toolset->new;
@@ -1094,6 +1104,7 @@ sub _mcp_help {
       ["--tls-cert FILE", "PEM certificate (and optionally key) for HTTPS"],
       ["--tls-key FILE", "PEM private key (or combined key/certificate PEM)"],
       ["--token TOKEN", "Set an accepted token (repeatable; replaces defaults)"],
+      ["-s, --set KEY=VALUE", "Override a trusted instance setting (repeatable)"],
       ["--stdio", "Serve MCP on stdin/stdout; other listeners may remain"],
       ["--connect URL", "Connect to a multibroker at http[s]://host:port/token/alias"],
       ["--custom-instructions TEXT", "Describe when this server instance should be used"],
@@ -1142,6 +1153,7 @@ sub mcp_getoptions {
    my %url = (%config, %settings);
    delete @url{qw(name bind stdio)};
    my @auto_rules;
+   my %set;
 
    Getopt::Long::GetOptions (
       AnyEvent::MCP::Config::http_getopt (\my $name, \my $bind, \my $print_url, \my @tokens),
@@ -1152,6 +1164,11 @@ sub mcp_getoptions {
       "custom-instructions=s" => \my $custom_instructions,
       "auto-allow=s" => sub { push @auto_rules, ["allow", $_[1]] },
       "auto-deny=s"  => sub { push @auto_rules, ["deny", $_[1]] },
+      "set|s=s" => sub {
+         my ($key, $value) = $_[1] =~ /\A([^\s=]+)=(.*)\z/;
+         defined $value or die "Invalid --set KEY=VALUE\n";
+         $set{$key} = $value;
+      },
       "tool-help" => \my $tool_help,
       "quiet" => \my $silent,
       "help" => \my $help,
@@ -1164,6 +1181,11 @@ sub mcp_getoptions {
    }
 
    $name = AnyEvent::MCP::Config::server_name ($name // $settings{name} // $config{name});
+   if (%set) {
+      my $instance = AnyEvent::MCP::Config->global->{section}{"instance $name"} ||= {};
+      %$instance = (%$instance, %set);
+   }
+
    _mcp_log_init ($name, $silent);
    my %server = (
       %settings,

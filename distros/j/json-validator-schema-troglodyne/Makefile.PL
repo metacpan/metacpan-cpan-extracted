@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "json::validator::schema::troglodyne",
   "PREREQ_PM" => {
     "Data::Validate::Email" => 0,
+    "JSON::Validator" => "5.19",
     "JSON::Validator::Schema::OpenAPIv3" => 0,
     "List::Util" => 0,
     "parent" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.000",
+  "VERSION" => "1.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::Validator" => "5.19",
   "JSON::Validator::Schema::OpenAPIv3" => 0,
   "List::Util" => 0,
   "Test::More" => 0,

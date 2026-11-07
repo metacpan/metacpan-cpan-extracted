@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # Keep Discord bit positions explicit, including gaps reserved by the protocol.
 my %BITS = (

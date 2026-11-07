@@ -1,6 +1,13 @@
 Revision history for Monitoring-Sneck-Checks
 
-0.0.2   unreleased
+0.1.1   2026-11-06/12:30
+        - local.t: fall back to numeric IDs for file_mode owner/group
+
+0.1.0   2026-11-06/11:00
+        - cciss: add --ignore-cache, --output, and --always-output
+        - add file_content, linux_ras, and mtime
+
+0.0.2   2026-11-02/17:00
         - tests use t/tmp and t/data, not the system temp directory
         - use static files instead of writing stuff out for test data
 

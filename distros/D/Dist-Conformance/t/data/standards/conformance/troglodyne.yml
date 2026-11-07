@@ -42,6 +42,7 @@ checks:
           type: object
         before_commit:
           type: object
+  SystemPackages: {}
   ClaudeSettings:
     file: .claude/settings.json
     missing: info

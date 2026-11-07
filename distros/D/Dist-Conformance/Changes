@@ -1,5 +1,30 @@
 Revision history for Dist-Conformance
 
+0.003 2026-11-06 TEODESIAN
+    - DataSchema reads an INI file, such as dist.ini, as a hash of its
+      sections by their whole header.  A key that a section repeats is the
+      list of its values, as Dist::Zilla reads it.  A file whose name ends in
+      .ini is read so by default, and format: ini says it for any other.
+      So a flavor can refuse a key of a plugin, such as user under
+      [GithubMeta].
+    - New check SystemPackages: a repository declares the packages of the
+      operating system that it needs in metamerge.yml.  x_system_packages
+      names each dependency, with its package for each packager, a package
+      for a distro or a release of one, and a test that must run once it is
+      installed.  x_system_sources holds the third-party archives of deb,
+      each with the full fingerprint of its signing key.  The check refuses
+      a name that is not a plain package name, such as a deb name that ends
+      in -, which apt reads as a removal, a source that is not declared,
+      and an archive that nothing installs from.
+      Dist::Conformance::Check::SystemPackages->declared returns the
+      validated declaration of a snapshot or a directory, and ->resolve
+      what one host installs, and which dependencies it cannot resolve.
+      conformance packages prints the packages, tests, sources or needs for
+      the host of /etc/os-release, for a shell script, and exits 2 when a
+      dependency has no package for the host.
+    - Dist::Conformance::Schema::refuse dies with the message of validate,
+      for an error that a schema cannot express.
+
 0.002 2026-11-04 TEODESIAN
     - CriticProfile compares the policies of the profile with those of its
       template, and fails with the name of each policy that the template

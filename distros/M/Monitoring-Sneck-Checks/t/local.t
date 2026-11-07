@@ -15,8 +15,8 @@ my $run  = sub {
 # file_mode, owned by whoever checked this out, its mode set as each case needs
 my $file = $data . '/file_mode/secret';
 my ( $uid, $gid ) = ( stat($file) )[ 4, 5 ];
-my $user  = getpwuid($uid);
-my $group = getgrgid($gid);
+my $user  = getpwuid($uid) // $uid;
+my $group = getgrgid($gid) // $gid;
 chmod( 0600, $file ) or die($!);
 my $return = $run->( 'file_mode', '-f', $file, '-m', '0600', '-o', $user );
 is( $return->{code},   0,                                                                  'mode and owner' );

@@ -1,3 +1,63 @@
+commit d0302fadf7242c9bc6f26ce233fb2e71b0f431a7
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 6 17:08:18 2026 +0000
+
+    Build version 1.08
+
+commit e101cfc17af03a0c11c62a4fc3ad7dd7eff49e6a
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 6 17:07:26 2026 +0000
+
+    fix build instructions yet again
+
+commit bd47821d4e3a23b227365b106cba261b8bc33837
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 6 16:58:40 2026 +0000
+
+    fix build instructions again
+
+commit e43b483245d347746003d183293fce4b60af1e6b
+Author: Frank Carnovale <frankc@dbnet.com.au>
+Date:   Fri Nov 6 16:33:53 2026 +0000
+
+    provide deployed-under-path config option
+
+commit 2a011d89b0064b7275aa5774e124becf88b258fd
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:28:33 2021 +0100
+
+    Built version 1.07
+
+commit 28e3529e25d7bdc4c926dcd988696881e396b015
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:27:26 2021 +0100
+
+    Build version 1.07
+
+commit 523b62a6f21c177c092321d4316b51909d1e57a0
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:22:55 2021 +0100
+
+    fix build instructions
+
+commit b4694899648b6208d641b0048d0ec2ffd252a236
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:12:50 2021 +0100
+
+    Built version 1.06
+
+commit 808a137f0fcbdf025ccdb7e9c65f6b3c969bee97
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:09:47 2021 +0100
+
+    support new Mojolicious backward-breaking "format" rules
+
+commit 8b43a4bc86a0fde297588636a5b01d1af03312eb
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat May 16 12:53:25 2020 +0100
+
+    Built version 1.05
+
 commit 9b1b03c97bf3282ca02650dac922576d479bd590
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Sat May 16 12:52:14 2020 +0100

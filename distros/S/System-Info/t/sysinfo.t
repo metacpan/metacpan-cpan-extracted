@@ -14,6 +14,7 @@ BEGIN { use_ok "System::Info", qw( sysinfo sysinfo_hash si_uname ) }
 ok (defined &sysinfo,  "sysinfo  imported");
 ok (defined &si_uname, "si_uname imported");
 
+
 {   local $^O = "Generic";
     ok (my $si = System::Info->new, "new instance");
 
@@ -53,8 +54,18 @@ ok (defined &si_uname, "si_uname imported");
 {   my $si = System::Info->new;
     isa_ok ($si, "System::Info::Base");
 
-    my $si_uname = join " " => map $si->$_ => qw( host os cpu ncpu cpu_type );
-    is ($si->si_uname, $si_uname,              "si_uname");
+    my @si = qw( host os cpu ncpu cpu_type );
+    my %si = map { $_ => $si->$_ } @si;
+    my $si_uname = join " " => @si{@si};
+
+    # "cpu" might include *current* CPU speed, so do not compare two calls
+    like (si_uname, qr{^\Q$si{host}\E    \s+
+                        \Q$si{os}\E      \s+
+                          .*             \s+
+                        \Q$si{ncpu}\E    \s+
+                        \Q$si{cpu_type}\E $}x, "si_uname");
+
+    is ($si->si_uname, $si_uname,              "si_uname ()");
     is ($si->si_uname, $si->si_uname ("a"),    "si_uname (a)");
     is ($si->si_uname ("rubbish"), $si_uname,  "si_uname (rubbish)");
 
@@ -103,6 +114,10 @@ ok (defined &si_uname, "si_uname imported");
     is ($si->si_uname (qw( c p )), "$si->{_ncpu} $si->{_cpu_type}", "si_uname (c, p)");
     is ($si->si_uname (qw( c p )), $si->si_uname ("c p"),           "si_uname (c p)");
     is ($si->si_uname (qw( p c )), $si->si_uname ("c p"),           "si_uname (c p)");
+
+
+    is ($si->get_core_count, $si->{_ncore}, "get_core_count");
+
     }
 
 done_testing;

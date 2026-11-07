@@ -78,6 +78,10 @@ loopback certificates. Normal tests must not contact Discord or need credentials
 With controlled clocks, check Future
 completion before inspecting a failure so a regression fails instead of hanging.
 
+Cancellation checks should cover both the pure Perl and optional `Future::XS`
+implementations. With `Future::XS` installed, run `prove -lr t` normally and
+with `PERL_FUTURE_NO_XS=1` to exercise both implementations.
+
 Update relevant documentation with code changes.
 Record published releases in `Changes`; keep development notes out of it.
 Run `prove -lr t` before submitting a pull request.

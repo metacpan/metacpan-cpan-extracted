@@ -1,5 +1,36 @@
 Revision history for AnyEvent::MCP
 
+0.82  Fri 06 Nov 2026 15:53:46 CET
+	- add a first-permission-dialog walkthrough to Intro.pod, explaining
+	  one-time versus persistent grants, rule scopes and exec stdin risks;
+	  correct its description of logical workdir IDs.
+	- add common repeatable -s/--set KEY=VALUE process-local overrides
+	  for trusted instance configuration, after program/instance defaults.
+	- key remote mcp-fs host permissions by --host alone, independent of
+	  --rsh; add independent local/remote host scopes (this host by
+	  default, or all hosts), retaining old unscoped saved rules.
+	  Workdir scopes remain plain paths, independent of host.
+	- omit single-choice permission scope selectors from native, YAD and
+	  terminal rule dialogs, automatically retaining the sole match in
+	  saved rules without broadening their applicability.
+	- log rejected HTTP requests (status 400 and above) with method,
+	  status and peer information, without leaking URL tokens; demote
+	  ordinary connection/TLS errors to trace.
+	- do not warn on routine GET / requests; keep the normal 404
+	  response without exposing a server-identification page.
+	- preserve mcp-vim subprocess stderr when its JSONL initialization
+	  fails, instead of hiding the failure behind EOF and SIGPIPE.
+	- bootstrap remote mcp-fs over a short Perl command, streaming the
+	  launcher source over stdin. Avoid rsh command length limits and
+	  preserve worker input across exec by using exact sysread.
+	- format mcp-fs sandbox grants, tools, trusted configuration keys
+	  and permission action classes as individually searchable POD items.
+	- give the mock remote filesystem test its running Perl interpreter
+	  explicitly, rather than assuming it is in a fixed Unix PATH.
+	- avoid locale-dependent TCP error strings in reverse-connection tests,
+	  and skip mcp-imap provider CLI tests when optional fork modules
+	  are unavailable while retaining standalone provider parser tests.
+
 0.81  Thu 05 Nov 2026 04:51:59 CET
 	- keep OAuth2 tests working without optional Mail::IMAPTalk,
 	  IO::Socket::SSL or Authen::SASL; skip only worker-specific checks.

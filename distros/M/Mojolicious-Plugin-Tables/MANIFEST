@@ -1,4 +1,3 @@
-.travis.yml
 bin/tables
 CHANGES
 lib/Mojolicious/Plugin/Tables.pm

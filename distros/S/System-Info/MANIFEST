@@ -700,6 +700,8 @@ t/etc/suse-15.6/os-release
 t/etc/suse-16.0/DISTNAME
 t/etc/suse-16.0/issue
 t/etc/suse-16.0/os-release
+t/etc/suse-16.1/DISTNAME
+t/etc/suse-16.1/os-release
 t/etc/suse-42.1/DISTNAME
 t/etc/suse-42.1/issue
 t/etc/suse-42.1/os-release

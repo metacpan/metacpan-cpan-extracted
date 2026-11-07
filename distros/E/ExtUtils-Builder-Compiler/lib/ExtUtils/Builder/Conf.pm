@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.037';
+$ExtUtils::Builder::Conf::VERSION = '0.038';
 use strict;
 use warnings;
 
@@ -276,7 +276,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

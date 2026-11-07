@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Discord::Client::Model';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 sub channel_id { $_[0]->get('channel_id') }
 sub content { $_[0]->get('content') }
 

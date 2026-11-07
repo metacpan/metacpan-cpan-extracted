@@ -60,7 +60,7 @@ my %WriteMakefileArgs = (
     # MakeMaker does not scan XS #includes, so an edit to include/*.h would
     # otherwise rebuild nothing and the change would silently not happen.
     depend   => { 'Apophis$(OBJ_EXT)' =>
-                  'include/ap_abi.h include/ap_abi_impl.h' },
+                  'include/ap_abi.h include/ap_abi_impl.h include/xop_compat.h' },
 
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Apophis-* Apophis.c Apophis.bs Install' },

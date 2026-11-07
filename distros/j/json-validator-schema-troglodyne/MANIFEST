@@ -9,6 +9,7 @@ Makefile.PL
 README
 dist.ini
 lib/JSON/Validator/Schema/Troglodyne.pm
+prereqs.yml
 t/00-compile.t
 t/author-critic.t
 t/author-distmeta.t

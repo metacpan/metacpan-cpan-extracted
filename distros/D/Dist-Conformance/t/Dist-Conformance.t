@@ -29,10 +29,10 @@ sub statuses ($results) {
 
 subtest 'check: an empty repository' => sub {
     my $results = Dist::Conformance->new( root => repo('troglodyne-5.040') )->check;
-    is( [ map { $_->{check} } @$results ], [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig ToolConfiguration Workflows}], 'every check of the flavor, by name' );
+    is( [ map { $_->{check} } @$results ], [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig SystemPackages ToolConfiguration Workflows}], 'every check of the flavor, by name' );
     is(
         statuses($results),
-        { ClaudeMd => 'fail', ClaudeSettings => 'info', CriticProfile => 'fail', DistFiles => 'info', GitHooks => 'fail', PerlSlopConfig => 'info', ToolConfiguration => 'fail', Workflows => 'info' },
+        { ClaudeMd => 'fail', ClaudeSettings => 'info', CriticProfile => 'fail', DistFiles => 'info', GitHooks => 'fail', PerlSlopConfig => 'info', SystemPackages => 'pass', ToolConfiguration => 'fail', Workflows => 'info' },
         'with the statuses that the flavor gives a miss'
     );
     ok( Dist::Conformance::failed($results), 'and it failed' );
@@ -106,8 +106,8 @@ subtest update => sub {
     my $conformance = Dist::Conformance->new( root => $root );
     my $results     = $conformance->update;
     my %by          = map { $_->{check} => $_ } @$results;
-    is( [ sort keys %by ],                                   [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig ToolConfiguration Workflows}], 'every check ran its update' );
-    is( [ map { $_->{path} } @{ $by{DistFiles}{changes} } ], [qw{Changes prereqs.yml weaver.ini}],                                                                      'a variable of the flavor and of the repository fill a template together' );
+    is( [ sort keys %by ],                                   [qw{ClaudeMd ClaudeSettings CriticProfile DistFiles GitHooks PerlSlopConfig SystemPackages ToolConfiguration Workflows}], 'every check ran its update' );
+    is( [ map { $_->{path} } @{ $by{DistFiles}{changes} } ], [qw{Changes prereqs.yml weaver.ini}],                                                                                     'a variable of the flavor and of the repository fill a template together' );
     like( $root->child('prereqs.yml')->slurp, qr/perl:\ '5[.]040'/,                    'the flavor sets the floor' );
     like( $root->child('weaver.ini')->slurp,  qr/A[.]\ Tester\ <tester\@test[.]test>/, 'and the repository the author' );
     is( $by{ClaudeMd}{changes},            [], 'CLAUDE.md is not written' );

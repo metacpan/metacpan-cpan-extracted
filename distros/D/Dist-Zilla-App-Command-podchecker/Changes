@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-App-Command-podchecker
+
+0.001 2026-11-06 TEODESIAN
+    - Initial release.  dzil podchecker runs the plugins of a distribution
+      in memory, and checks the POD of each file as the build weaves it.
+      The idea and the order of the plugin phases come from
+      Dist::Zilla::App::Command::podpreview, by Peter Shangov.

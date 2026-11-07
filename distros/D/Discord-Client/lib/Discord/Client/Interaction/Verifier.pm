@@ -7,7 +7,7 @@ use Carp qw(croak);
 use Crypt::PK::Ed25519;
 use Time::HiRes qw(time);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ( $class, %args ) = @_;

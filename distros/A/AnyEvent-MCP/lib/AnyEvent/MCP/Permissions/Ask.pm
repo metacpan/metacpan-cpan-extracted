@@ -38,8 +38,9 @@ attaches that message to a successful tool result. Only the C<always>
 choices lead to a second form for persistent rule grants, scopes and lifetime;
 C<back> returns to the first form. The local graphical helper can
 complete this two-screen flow without a network round-trip; the terminal
-helper offers a C<m> shortcut to edit the denial reason. Decisions are
-validated again by the permission engine before use.
+helper offers a C<m> shortcut to edit the denial reason. A dimension with only
+one possible scope is saved automatically without asking the user to select it.
+Decisions are validated again by the permission engine before use.
 
 The typical place to use C<elicitation> is in an
 L<AnyEvent::MCP::Client/on_request> callback:
@@ -204,6 +205,7 @@ sub schema {
       }
       for my $name (sort keys %{$request->{dimensions} || {}}) {
          my $dim = $request->{dimensions}{$name};
+         next if @{$dim->{choices}} == 1;
          $schema->{properties}{"dim_$name"} = {
             type    => "string",
             title   => "$dim->{label} scope",
@@ -352,7 +354,8 @@ sub build {
       $rule->{expires} = time + $lifetime unless $lifetime eq "indefinite";
       for my $name (keys %{$prepared->{dimensions} || {}}) {
          my $dim = $prepared->{dimensions}{$name};
-         my $selected = $answer->{"dim_$name"};
+         my $selected = $answer->{"dim_$name"}
+            // (@{$dim->{choices}} == 1 ? $dim->{choices}[0]{match} : undef);
          die "Persistent dimension scope was not offered\n"
             unless defined $selected && !ref $selected
                && grep $_->{match} eq $selected, @{$dim->{choices}};

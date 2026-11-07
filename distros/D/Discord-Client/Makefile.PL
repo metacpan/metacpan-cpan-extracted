@@ -7,7 +7,7 @@ WriteMakefile(
     NAME => 'Discord::Client',
     VERSION_FROM => 'lib/Discord/Client.pm',
     ABSTRACT => 'Discord client for Perl using IO::Async and Future',
-    AUTHOR => 'Takuya Oshima',
+    AUTHOR => 'Takuya Oshima <admin@viasnake.com>',
     LICENSE => 'apache_2_0',
     MIN_PERL_VERSION => '5.026',
     CONFIGURE_REQUIRES => {

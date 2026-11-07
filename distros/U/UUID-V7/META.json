@@ -29,7 +29,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Crypt::SysRandom::XS" : "0.011"
+         },
          "requires" : {
+            "Carp" : "0",
             "Crypt::SysRandom" : "0",
             "Exporter" : "0",
             "POSIX::RT::Clock" : "0",
@@ -45,6 +49,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.006"
          }
       }
@@ -52,7 +57,7 @@
    "provides" : {
       "UUID::V7" : {
          "file" : "lib/UUID/V7.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -66,7 +71,7 @@
          "web" : "https://github.com/Leont/uuid-v7"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

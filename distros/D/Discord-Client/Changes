@@ -1,4 +1,10 @@
 Revision history for Discord-Client
 
+0.002  2026-11-07
+    Fix a Future::XS crash when cancelling chained REST requests.
+    Stabilize HTTP and Gateway integration tests and bound asynchronous waits.
+    Test both Future::XS and pure Perl implementations in CI.
+    Add author contact details to distribution metadata.
+
 0.001  2026-11-04
     Initial release

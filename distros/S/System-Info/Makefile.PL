@@ -60,7 +60,8 @@ sub postamble {
     join "\n" =>
 	'cover test_cover:',
 	'	ccache -C',
-	'	cover -test',
+	'	env AUTOMATED_TESTING=1 cover -test -jobs 17',
+	'	cover -report html -ignore doc/make-doc.pl',
 	'',
 	'leakcheck:',
 	"	$valgrind",

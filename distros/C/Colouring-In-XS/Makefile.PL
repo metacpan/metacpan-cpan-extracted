@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    macro => { TARFLAGS => "--format=ustar -c -v -f" },
     clean => { FILES => 'Colouring-In-XS-* lib/Colouring/In/XS.c' },
 );
 

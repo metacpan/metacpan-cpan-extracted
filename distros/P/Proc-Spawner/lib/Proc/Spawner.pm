@@ -28,7 +28,8 @@ package Proc::Spawner;
 #        posix_spawn cannot ignore a signal in the child (it inherits what Perl ignores), nor set
 #        resource limits or the nice value.
 #   spawn(FILE, ARGV, ENVP, ACTIONS, ATTR, UNSUPPORTED)  the raw call, see the POD at the end.  Meant to
-#        have one interface on POSIX and on Windows; here an alias of the XSUB __posix_spawn.  UNSUPPORTED
+#        have one interface on POSIX and on Windows: it wraps the XSUB __posix_spawn (on Windows: win_spawn.h's
+#        posix_spawn on CreateProcessW) and does what that lacks around the call ($MISSING, below).  UNSUPPORTED
 #        (optional): { OPTION => 'drop' | 'fail' }, what a port lacking an option (Windows) does with it;
 #        options not listed there take %UNSUPPORTED's value, and '*' there covers the rest.  It applies here
 #        too, to the posix_spawn extensions this build's libc lacks (chdir, fchdir, closefrom, tcsetpgrp,
@@ -57,16 +58,136 @@ use strict; use warnings;
 use POSIX ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
-*spawn = \&__posix_spawn;   # the raw call; a Windows port would put its own here
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
+
+# ------------------------------------------------------------------ settings the spawn primitive lacks (EXPERIMENTAL, post-0.06)
+# $MISSING: a bitmap of the settings the primitive (posix_spawn here; CreateProcessW in a Windows port) does not do itself:
+# what this build's libc lacks, plus $ENV{PROC_SPAWNER_MISSING} (names, for tests: the suite runs "as if").  spawn
+# does the missing ones in this process, around the call, and undoes them after (bullet-proof only with one thread):
+#   chdir, fchdir            this process changes directory, then comes back
+#   dup2, close, open,       this process arranges its own fds as the child should have them (close: close-on-exec),
+#   closefrom                then puts them back; one missing means all four, and chdir and fchdir too (the order)
+#   sigmask                  this process's mask, set around the call (the child inherits it)
+#   sigdefault               an ignored signal's action set back to the default around the call
+#   pgroup => PGID (> 0)     this process joins the group around the call (the child inherits it)
+#   resetids                 the effective ids set to the real ones around the call
+#   search                   PATH looked up here; pidfd: pidfd_open right after the call
+# Not possible so: setsid (no way back), tcsetpgrp and pgroup => 0 (the child's pid is known only after), sched
+# and cgroup (not undone reliably): these are unsupported (drop or fail, as UNSUPPORTED says).  While this
+# process's fds or directory are changed, every signal is blocked, so no handler of ours sees them; the child's mask
+# is set by the primitive.  If sigmask is missing too, signals cannot be blocked without the child inheriting it: then
+# a handler that runs in that moment sees the changed fds.
+our @FEATURES = qw(chdir fchdir dup2 close open closefrom tcsetpgrp sigmask sigdefault pgroup setsid resetids sched cgroup pidfd search);
+our %BIT; @BIT{@FEATURES} = map 1 << $_, 0 .. $#FEATURES;
+our %NATIVE = map +($_ => 1), __native();
+our %EMULABLE = map +($_ => 1), qw(chdir fchdir dup2 close open closefrom sigmask sigdefault pgroup resetids search pidfd);
+our $MISSING = 0; $MISSING |= $BIT{$_} for grep !$NATIVE{$_}, @FEATURES;
+for (split /[\s,]+/, $ENV{PROC_SPAWNER_MISSING} // '') {
+  next unless length; exists $BIT{$_} or die "Proc::Spawner: PROC_SPAWNER_MISSING: unknown setting '$_' (known: @FEATURES)\n";
+  $MISSING |= $BIT{$_} }
+sub missing { my $m = @_ ? shift : $MISSING; grep $m & $BIT{$_}, @FEATURES }   # the names in a bitmap
+
+sub spawn {   # the raw call: the primitive (__posix_spawn), with what it lacks done around it
+  my ($file, $argv, $envp, $acts, $attr, $uns) = @_;
+  return __posix_spawn(@_) unless $MISSING && (!defined $uns || ref $uns eq 'HASH');   # (its errors)
+  my %m = map +($_ => 1), missing();
+  ref $acts eq 'ARRAY' && (!defined $attr || ref $attr eq 'HASH') or return __posix_spawn(@_);   # its errors
+  my %at = %{$attr // {}}; my @acts = @$acts;
+  if (grep $m{$_}, qw(dup2 close open closefrom)) { $m{$_} = 1 for qw(dup2 close open closefrom chdir fchdir) }
+  my $refuse = sub {   # an unsupported setting: true (and $! = ENOTSUP) to fail, false to drop it
+    my $n = shift; my $v = ($uns && $uns->{$n}) // $UNSUPPORTED{$n} // $UNSUPPORTED{'*'} // 'fail';
+    $v eq 'drop' ? 0 : do { $! = POSIX::ENOTSUP(); 1 } };
+  for my $n (qw(setsid sched cgroup)) {
+    next unless $m{$n} && ($n eq 'setsid' ? $at{$n} : defined $at{$n});
+    return if $refuse->($n); delete $at{$n} }
+  if ($m{pgroup} && defined $at{pgroup} && !$at{pgroup}) { return if $refuse->('pgroup'); delete $at{pgroup} }
+  if ($m{tcsetpgrp} && grep ref eq 'ARRAY' && ($_->[0] // '') eq 'tcsetpgrp', @acts) {
+    return if $refuse->('tcsetpgrp'); @acts = grep !(ref eq 'ARRAY' && ($_->[0] // '') eq 'tcsetpgrp'), @acts }
+  my %kind = (chdir => 'dir', fchdir => 'dir', dup2 => 'fd', close => 'fd', open => 'fd', closefrom => 'fd');
+  my (@here, @there);   # actions done here (in order), and those left to the primitive
+  for my $x (@acts) { my $k = ref $x eq 'ARRAY' ? $x->[0] // '' : ''; if ($m{$k} && $kind{$k}) { push @here, $x } else { push @there, $x } }
+  if (@here && @there) {   # what is done here happens first: so no action done there may come before one done here
+    my %pos; @pos{map 0 + $_, @acts} = 0 .. $#acts;
+    my $first_there = (sort { $a <=> $b } map $pos{0 + $_}, @there)[0];
+    my $last_here = (sort { $b <=> $a } map $pos{0 + $_}, @here)[0];
+    if ($first_there < $last_here) { $! = POSIX::EINVAL(); return } }   # (start() puts chdir first)
+  my $sigmask = $m{sigmask} ? delete $at{sigmask} : undef;
+  my $sigdef = $m{sigdefault} ? delete $at{sigdefault} : undef;
+  my $pg = $m{pgroup} && defined $at{pgroup} ? delete $at{pgroup} : undef;
+  my $reset = $m{resetids} && delete $at{resetids};
+  my $pidfd = $m{pidfd} && delete $at{pidfd};
+  if ($m{search} && delete $at{search} and $file !~ m{/}) {
+    my ($p) = grep -x && !-d, map +(length ? $_ : '.') . "/$file", split /:/, $ENV{PATH} // '', -1;
+    defined $p or do { $! = POSIX::ENOENT(); return }; $file = $p }
+  my @undo; my $err; my @r;
+  my $ok = eval {
+    if (!$m{sigmask} && (@here || $sigdef || defined $pg || $reset)) {   # no handler of ours while this process is changed
+      my ($all, $old) = (POSIX::SigSet->new, POSIX::SigSet->new); $all->fillset;
+      POSIX::sigprocmask(POSIX::SIG_BLOCK(), $all, $old); unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
+    if ($sigmask) {
+      my ($set, $old) = (POSIX::SigSet->new(signums($sigmask)), POSIX::SigSet->new);
+      POSIX::sigprocmask(POSIX::SIG_SETMASK(), $set, $old) or die $!; unshift @undo, sub { POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old) } }
+    for my $sig ($sigdef ? signums($sigdef) : ()) {
+      my $old = POSIX::SigAction->new; POSIX::sigaction($sig, undef, $old);
+      next unless ($old->{HANDLER} // '') eq 'IGNORE';   # a caught signal is reset by exec anyway
+      POSIX::sigaction($sig, POSIX::SigAction->new('DEFAULT')) or die $!; unshift @undo, sub { POSIX::sigaction($sig, $old) } }
+    if (defined $pg) { my $old = getpgrp; POSIX::setpgid(0, $pg) or die $!; unshift @undo, sub { POSIX::setpgid(0, $old) } }
+    if ($reset) {
+      if ($> != $<) { my $e = $>; $> = $<; $> == $< or die $!; unshift @undo, sub { $> = $e } }
+      my ($eg, $rg) = ((split ' ', $))[0], (split ' ', $()[0]);
+      if ($eg != $rg) { my $o = $); $) = $rg; unshift @undo, sub { $) = $o } } }
+    emulate_actions(\@here, \@undo) if @here;
+    @r = __posix_spawn($file, $argv, $envp, \@there, \%at, $uns); $err = $!;
+    if (@r && $pidfd) { my $fd = __pidfd_open($r[0]); push @r, $fd >= 0 ? $fd : undef }
+    1 };
+  $err = $@ =~ /^Proc::Spawner: errno (\d+)/ ? $1 : ($! + 0 || POSIX::EINVAL()) unless $ok;
+  $_->() for @undo;
+  $! = $err; $ok && @r or return; wantarray ? @r : $r[0] }   # (scalar context: the pid, as the XSUB gives it)
+
+sub emulate_actions {   # the file actions, done on this process's own fds in order; the way back pushed on @$undo
+  my ($acts, $undo) = @_;
+  my $top = 10; for my $x (@$acts) { for (@$x[1 .. $#$x]) { $top = $_ + 1 if defined && /^[0-9]+\z/ && $_ >= $top } }
+  my (%flag, %save, %ours);   # an fd's close-on-exec before (-1: was not open); its contents before (a copy; undef: none)
+  my $die = sub { die "Proc::Spawner: errno " . (0 + $!) . "\n" };
+  my $flag_touch = sub { my $fd = shift; $flag{$fd} //= __fd_cloexec($fd) };
+  my $content_touch = sub { my $fd = shift; return if exists $save{$fd}; $flag_touch->($fd);
+    $save{$fd} = $flag{$fd} >= 0 ? do { my $c = __dup_high($fd, $top + 1000); $c >= 0 or $die->(); $ours{$c} = 1; $c } : undef };
+  my $here;   # this process's directory before
+  unshift @$undo, sub {   # contents first, then the flags, then the directory
+    for my $fd (keys %save) { my $c = $save{$fd}; defined $c ? (POSIX::dup2($c, $fd), POSIX::close($c)) : POSIX::close($fd) }
+    for my $fd (keys %flag) { __set_cloexec($fd, $flag{$fd}) if $flag{$fd} >= 0 }
+    if ($here) { __fchdir($here); POSIX::close($here) } };
+  for my $x (@$acts) {
+    my ($op, @a) = @$x;
+    if ($op eq 'chdir' || $op eq 'fchdir') {
+      $here //= do { my $h = POSIX::open('.', POSIX::O_RDONLY()); defined $h or $die->(); __set_cloexec($h, 1); $ours{$h} = 1; $h };
+      ($op eq 'chdir' ? chdir $a[0] : __fchdir($a[0])) or $die->() }
+    elsif ($op eq 'dup2') {
+      my ($from, $to) = @a;
+      if ($from == $to) { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() }; $flag_touch->($to); __set_cloexec($to, 0) }
+      else { __fd_cloexec($from) >= 0 or do { $! = POSIX::EBADF(); $die->() }; $content_touch->($to); defined POSIX::dup2($from, $to) or $die->() } }
+    elsif ($op eq 'close') { $flag_touch->($a[0]); __set_cloexec($a[0], 1) if __fd_cloexec($a[0]) >= 0 }
+    elsif ($op eq 'closefrom') {
+      for my $fd ($a[0] .. __fd_limit() - 1) { next if $ours{$fd} || __fd_cloexec($fd) < 0; $flag_touch->($fd); __set_cloexec($fd, 1) } }
+    elsif ($op eq 'open') {
+      my ($fd, $path, $fl, $mode) = @a; $content_touch->($fd);
+      my $o = POSIX::open($path, $fl, $mode // 0666); defined $o or $die->();
+      if ($o == $fd) { __set_cloexec($fd, 0) } else { my $r = POSIX::dup2($o, $fd); my $e = $!; POSIX::close($o); defined $r or do { $! = $e; $die->() } } }
+    else { $! = POSIX::EINVAL(); $die->() } } }
 
 our $TRACE;    # undef, or a code ref given one line per operation
 our $CAUSE;    # the caller's: a call queued keeps the value current when it was queued, and runs with it
 our $REACTING = 0;   # true while a queued call runs
 my $CHLD_C = defined &Proc::Spawner::chld_to_fd;
-our $TICK = $CHLD_C ? undef : 0.05;
+our %WINDOWS = (   # Windows only (EXPERIMENTAL, post-0.07): how every child is started (win_spawn.h, WIN_OPT_*)
+  new_group => 1,          # in a process group of its own: Ctrl-C at the console reaches the parent, not the children
+  kill_with_parent => 1,   # in a job object that Windows ends when this process ends, however it ends
+  new_console => 1);       # a child with none of fds 0-2 gets a console of its own (as Perl's own spawn does)
+our $WIN = $^O eq 'MSWin32';   # EXPERIMENTAL (post-0.07): no SIGCHLD, no fcntl, and select only on sockets: the loop polls
+                               # for ended children every $TICK; on_read and on_write of pipes are not done there yet
+our $TICK = $CHLD_C && !$WIN ? undef : 0.05;
 
 sub tr_ { $TRACE->(join '', @_) if $TRACE }
 
@@ -104,9 +225,9 @@ sub start {
 # ------------------------------------------------------------------ the loop
 sub defer { push @Q, [$CAUSE, @_] }
 pipe $SELF_R, $SELF_W or die "pipe: $!";
-for ($SELF_R, $SELF_W) { fcntl($_, F_SETFD, FD_CLOEXEC); fcntl($_, F_SETFL, fcntl($_, F_GETFL, 0) | O_NONBLOCK) }
-my $CHLD = POSIX::SigAction->new(sub { syswrite $SELF_W, 'x' }, POSIX::SigSet->new, POSIX::SA_RESTART());
-$CHLD->safe(1);   # the fallback: deferred; POSIX::sigaction's immediate default corrupts the heap (S2)
+unless ($WIN) { for ($SELF_R, $SELF_W) { fcntl($_, F_SETFD, FD_CLOEXEC); fcntl($_, F_SETFL, fcntl($_, F_GETFL, 0) | O_NONBLOCK) } }
+my $CHLD = $WIN ? undef : POSIX::SigAction->new(sub { syswrite $SELF_W, 'x' }, POSIX::SigSet->new, POSIX::SA_RESTART());
+$CHLD->safe(1) if $CHLD;   # the fallback: deferred; POSIX::sigaction's immediate default corrupts the heap (S2)
 
 sub reap {   # our children only: waitpid(-1) would take statuses that are not ours (C2)
   for my $p (keys %KID) {
@@ -120,9 +241,9 @@ sub wait_until {
   my $done = shift;
   die "Proc::Spawner: wait inside a reaction\n" if $REACTING;   # D2
   my $old = POSIX::SigAction->new;
-  ($CHLD_C ? Proc::Spawner::chld_to_fd(fileno $SELF_W) : POSIX::sigaction(POSIX::SIGCHLD(), $CHLD, $old)) unless $DEPTH;
+  ($CHLD_C ? Proc::Spawner::chld_to_fd(fileno $SELF_W) : POSIX::sigaction(POSIX::SIGCHLD(), $CHLD, $old)) unless $DEPTH || $WIN;
   my $ok = eval { local $DEPTH = $DEPTH + 1; turn() until $done->(); 1 };
-  ($CHLD_C ? Proc::Spawner::chld_restore() : POSIX::sigaction(POSIX::SIGCHLD(), $old)) unless $DEPTH;
+  ($CHLD_C ? Proc::Spawner::chld_restore() : POSIX::sigaction(POSIX::SIGCHLD(), $old)) unless $DEPTH || $WIN;
   die $@ unless $ok }
 
 sub turn {   # one queued call, or one round of waiting (at most $timeout seconds; default $TICK): false if nothing happened
@@ -130,6 +251,7 @@ sub turn {   # one queued call, or one round of waiting (at most $timeout second
   if (@Q) { my ($cause, $k, @a) = @{shift @Q}; local ($CAUSE, $REACTING) = ($cause, 1); $k->(@a); return 1 }
   reap(); return 1 if @Q;
   die "Proc::Spawner: nothing left to wait for\n" unless %KID || %RD || %WR;
+  if ($WIN) { select undef, undef, undef, $timeout // $TICK; return 0 }   # (no select on pipes there: polling only)
   my $rin = ''; vec($rin, $_, 1) = 1 for fileno $SELF_R, map $_->[0], values %RD;
   my $win = ''; vec($win, $_->[0], 1) = 1 for values %WR;
   my $n = select my $rout = $rin, my $wout = $win, undef, $timeout;
@@ -161,7 +283,7 @@ sub fd_of { ref $_[0] ? fileno $_[0] : $_[0] }
 sub on_read { my ($fd, $n, $cb) = @_; $RD{++$ID} = [fd_of($fd), $n, $cb]; $ID }
 sub on_write {   # $chunk: at most so many bytes per write (a blocking pipe: PIPE_BUF, which a writable pipe takes at once)
   my ($fd, $bytes, $cb, $chunk) = @_;
-  fcntl($fd, F_SETFL, fcntl($fd, F_GETFL, 0) | O_NONBLOCK) if ref $fd;
+  fcntl($fd, F_SETFL, fcntl($fd, F_GETFL, 0) | O_NONBLOCK) if ref $fd && !$WIN;
   $WR{++$ID} = [fd_of($fd), $bytes, $cb, $chunk]; $ID }
 
 1;

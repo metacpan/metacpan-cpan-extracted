@@ -4,6 +4,7 @@ use warnings FATAL => 'all';
 use re '/aasx';
 use Test2::V0;
 use Capture::Tiny();
+use Cwd();
 use FindBin();
 use FindBin::libs;
 
@@ -92,6 +93,98 @@ subtest 'errors' => sub {
     is( run_main(qw{check --bogus})->{status}, 2, 'and so does an unknown option' );
     is( run_main(qw{check extra})->{status},   2, 'and an extra argument' );
     like( run_main('nonsense')->{err}, qr/Usage:/, 'with the usage on standard error' );
+};
+
+my $METAMERGE = <<'YAML';
+x_system_packages:
+  Ssl:
+    deb:
+      name: libssl3
+      ubuntu/24.04: libssl3t64
+      debian/13: ~
+    rpm: openssl-libs
+    test: openssl version
+  ffmpeg:
+    deb:
+      name: ffmpeg
+      source: jellyfin
+    rpm: ffmpeg-free
+    test: ffmpeg -version
+x_system_sources:
+  deb:
+    - name: jellyfin
+      uri: https://repo.test.test/ubuntu
+      suites: ['{codename}']
+      components: [main]
+      key: https://repo.test.test/key.gpg
+      fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567
+      distros: [ubuntu, debian]
+YAML
+
+subtest 'packages' => sub {
+    my $root = Fixture::checkout(
+        'metamerge.yml' => $METAMERGE,
+        'noble'         => qq{ID=ubuntu\nVERSION_ID="24.04"\nVERSION_CODENAME='noble'\n},
+        'bookworm'      => "ID=debian\nVERSION_ID=\"12\"\nVERSION_CODENAME=bookworm\n",
+        'fedora'        => "ID=fedora\nVERSION_ID=41\n",
+    );
+    my @noble  = ( '--os-release', $root->child('noble') );
+    my @debian = ( '--os-release', $root->child('bookworm') );
+    is( run_main( 'packages', @noble, $root ),                                                                                { out => "libssl3t64\nffmpeg\n", err => q{}, status => 0 }, 'the deb packages of the host of the os-release, one per line, and nothing else' );
+    is( run_main( 'packages', @debian, $root )->{out},                                                                        "libssl3\nffmpeg\n",                                        'and of another host' );
+    is( run_main( qw{packages --distro debian --release 13 --codename trixie --os-release /bogus/os-release}, $root )->{out}, "ffmpeg\n",                                                 'the host can be given, and then no os-release is read, and a null needs no package' );
+    is( run_main( 'packages', @noble, qw{--distro debian}, $root )->{out},                                                    "libssl3\nffmpeg\n",                                        'an option replaces one value of the os-release' );
+    is( run_main( qw{packages --packager rpm --os-release}, $root->child('fedora'), $root )->{out},                           "openssl-libs\nffmpeg-free\n",                              'or those of another packager' );
+    is( run_main( qw{packages --programs}, @noble, $root )->{out},                                                            "openssl version\nffmpeg -version\n",                       'the tests, with --programs' );
+
+    my $sources = run_main( qw{packages --sources}, @noble, $root );
+    is( $sources->{status}, 0, '--sources exits 0' );
+    is(
+        [ map { Dist::Conformance::Schema::parse_json( $_, 'a line' ) } split /\n/, $sources->{out} ],
+        [ { name => 'jellyfin', uri => 'https://repo.test.test/ubuntu', suites => ['noble'], components => ['main'], key => 'https://repo.test.test/key.gpg', fingerprint => '0123456789ABCDEF0123456789ABCDEF01234567' } ],
+        'and prints each source that a package comes from as a line of JSON, resolved'
+    );
+    is(
+        [ map { Dist::Conformance::Schema::parse_json( $_, 'a line' ) } split /\n/,        run_main( qw{packages --needs --distro debian --release 13 --codename trixie}, $root )->{out} ],
+        [ { name => 'Ssl', package => undef, source => undef, test => 'openssl version' }, { name => 'ffmpeg', package => 'ffmpeg', source => 'jellyfin', test => 'ffmpeg -version' } ],
+        '--needs prints each dependency as a line of JSON'
+    );
+    is( run_main( qw{packages --sources --programs}, @noble, $root )->{status}, 2, 'only one of --programs, --sources and --needs' );
+    is( run_main( qw{packages --sources --needs},    @noble, $root )->{status}, 2, 'at once' );
+
+    my $cwd = Cwd::getcwd();
+    chdir $root or die "Cannot chdir to $root: $!";
+    my $here = run_main( 'packages', @noble );
+    chdir $cwd or die "Cannot chdir to $cwd: $!";
+    is( $here->{out}, "libssl3t64\nffmpeg\n", 'the directory defaults to the current one' );
+
+    is( run_main( qw{packages --os-release /bogus/os-release}, Fixture::checkout() ), { out => q{}, err => q{}, status => 0 }, 'no declaration prints nothing, reads no os-release, and exits 0' );
+    is( run_main( qw{packages --programs}, @noble, Fixture::checkout( 'metamerge.yml' => "x_system_packages: { Xz: { deb: xz-utils } }\n" ) ), { out => q{}, err => q{}, status => 0 }, 'and no tests print none' );
+
+    my $unresolved = run_main( qw{packages --packager pkg}, @noble, $root );
+    is( $unresolved, { out => q{}, err => "conformance: The dependency Ssl has no package for pkg\nThe dependency ffmpeg has no package for pkg\n", status => 2 }, 'a dependency without a package for the host exits 2, and prints nothing' );
+    is( run_main( qw{packages --programs --packager pkg},   @noble,                 $root )->{status}, 2,                                                             'whatever it prints' );
+    is( run_main( qw{packages --packager deb --os-release}, $root->child('fedora'), $root )->{err},    "conformance: The dependency ffmpeg has no package for deb\n", 'and so does one whose source is not for the host' );
+
+    my $no_os = run_main( qw{packages --os-release /bogus/os-release}, $root );
+    is( $no_os->{status}, 2,   'an os-release that cannot be read exits 2' );
+    is( $no_os->{out},    q{}, 'and prints no package' );
+    like( $no_os->{err}, qr{\Aconformance:\ Cannot\ read\ /bogus/os-release:}, 'and says so' );
+
+    my $no_codename = run_main( qw{packages --distro ubuntu --release 24.04 --os-release}, Fixture::checkout( 'os-release' => "ID=ubuntu\n" )->child('os-release'), $root );
+    is( $no_codename->{status}, 2, 'a source that needs a codename that the host does not have exits 2' );
+    like( $no_codename->{err}, qr{needs\ the\ codename}, 'and says so' );
+
+    my $bad = run_main( 'packages', @noble, Fixture::checkout( 'metamerge.yml' => "x_system_packages:\n  Dep: { deb: ffmpeg- }\n" ) );
+    is( $bad->{status}, 2,   'an invalid declaration exits 2' );
+    is( $bad->{out},    q{}, 'and prints no package' );
+    like( $bad->{err}, qr{\Aconformance:\ \S+\ is\ not\ valid:\n\ \ /x_\w+/Dep/deb:}, 'and says why on standard error' );
+
+    my $packager = run_main( qw{packages --packager ../deb}, @noble, $root );
+    is( $packager->{status}, 2, 'a packager that is not a name exits 2' );
+    like( $packager->{err}, qr{\Aconformance:\ [.][.]/deb\ is\ not\ the\ name}, 'and says so' );
+    is( run_main( 'packages', @noble, $root, $root )->{status}, 2, 'and so does a second directory' );
+    is( run_main( qw{packages --bogus}, $root )->{status}, 2, 'and an unknown option' );
 };
 
 subtest 'help' => sub {

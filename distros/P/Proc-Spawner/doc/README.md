@@ -41,5 +41,7 @@ Every measured figure in these documents (corpus acceptance, the yardsticks, bat
 | post4-0.04 | post3-0.04 plus bracket expressions with quotes, expansions or `/`, `* ? [` in a `${x:-word}`, `unset NAME[…]` rejected (X26); measured 2026-11-05 (`large-subset/large-subset-state.md`, section 3) |
 | 0.05 | the release of 2026-11-05: post4-0.04 with the version number 0.05; the figures of post4-0.04 hold for it (the measured files differ only in `$VERSION`) |
 | 0.06 | the release of 2026-11-05 (later): 0.05 plus the fixes for systems without `/proc` (RT #182479, known issue X28) and the measurement of the atomic calls extended; the figures of post4-0.04 hold for it |
+| 0.07 | the release of 2026-11-05 (evening): 0.06 plus what the spawn primitive lacks done around the call, `win_spawn.h` (not yet built), Z0, the measurement of the atomic calls; the figures of post4-0.04 hold for it |
+| 0.08 | the release of 2026-11-06: 0.07 plus the Windows work (`win_spawn.h` compared with Perl's spawn, built against Strawberry Perl and run under Wine, batch files, `%Proc::Spawner::WINDOWS`), spawn's scalar result fixed; the figures of post4-0.04 hold for it |
 
 Measured again on 2026-11-03: the corpus figures of 0.01 (`large-subset/large-subset-ceiling.md` (in Proc-Spawner 0.03), section 3) and every figure of 0.03 (in `doc/large-subset/large-subset-state.md` of the Proc-Spawner-0.03 distribution). Every figure was measured on one of the states in this table; pre-0.01 covers many states, so its figures also carry their dates.

@@ -6,25 +6,22 @@ build_requires:
   Errno: '0'
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
-  File::stat: '0'
   IO::Handle: '0'
-  IPC::System::Simple: '0'
-  POSIX: '0'
   Test::DescribeMe: '0'
+  Test::Exception: '0'
   Test::Mockingbird: '0.1'
+  Test::More: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
   Test::Returns: '0'
   Test::Without::Module: '0'
-  Time::HiRes: '0'
   YAML::XS: '0'
-  autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -36,18 +33,23 @@ no_index:
 requires:
   Carp: '0'
   Config::Abstraction: '0.38'
-  ExtUtils::MakeMaker: '6.64'
   File::Spec: '0'
+  File::stat: '0'
+  IPC::System::Simple: '0'
+  List::Util: '1.33'
   Log::Abstraction: '0.26'
+  POSIX: '0'
   Params::Get: '0.13'
   Readonly: '0'
   Return::Set: '0'
   Scalar::Util: '0'
+  Time::HiRes: '0'
+  autodie: '0'
   mro: '0'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Object-Configure
   homepage: https://metacpan.org/pod/Object::Configure
   repository: git://github.com/nigelhorne/Object-Configure.git
-version: 0.24
+version: 0.25
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

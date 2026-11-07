@@ -1,0 +1,392 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use FindBin qw($Bin);
+
+# Run from a checkout without installing: prefer the lib/ beside this script.
+BEGIN {
+	unshift @INC, "$Bin/../lib" if -d "$Bin/../lib/App/WebPerimeterScan";
+}
+
+use Getopt::Long;
+use POSIX qw(strftime);
+use Readonly;
+
+use App::WebPerimeterScan;
+use App::WebPerimeterScan::I18N;
+use App::WebPerimeterScan::Ports;
+use App::WebPerimeterScan::Report;
+use App::WebPerimeterScan::Scope;
+
+# -v and -V must stay distinct; Getopt::Long ignores case by default.
+Getopt::Long::Configure(qw(no_ignore_case));
+
+# Exit statuses, as documented in the usage text.
+Readonly::Scalar my $EXIT_CLEAN   => 0;
+Readonly::Scalar my $EXIT_FINDING => 1;
+Readonly::Scalar my $EXIT_USAGE   => 2;
+
+Readonly::Hash my %FORMAT => (
+	text => \&App::WebPerimeterScan::Report::as_text,
+	json => \&App::WebPerimeterScan::Report::as_json,
+	html => \&App::WebPerimeterScan::Report::as_html,
+);
+
+# --fail-on accepts every severity, plus "never".
+Readonly::Scalar my $NEVER => 'never';
+Readonly::Hash my %FAIL_ON => map { $_ => 1 } @App::WebPerimeterScan::Findings::SEVERITIES, $NEVER;
+
+Readonly::Scalar my $MIN_PORT => 1;
+Readonly::Scalar my $MAX_PORT => 65_535;
+Readonly::Scalar my $PORT_SEPARATOR => qr/[,\s]+/;
+
+my %opt = (
+	format  => 'text',
+	fail_on => 'high',
+);
+
+GetOptions(
+	'scope|s=s'             => \$opt{scope},
+	'authorized|authorised' => \$opt{authorized},
+	'format|f=s'            => \$opt{format},
+	'output|o=s'            => \$opt{output},
+	'ports=s'               => \$opt{ports},
+	'docroot=s@'            => \$opt{docroot},
+	'source=s@'             => \$opt{source},
+	'timeout=i'             => \$opt{timeout},
+	'connect-timeout=i'     => \$opt{connect_timeout},
+	'delay=f'               => \$opt{delay},
+	'depth|d=i'             => \$opt{depth},
+	'max-urls=i'            => \$opt{max_urls},
+	'no-path-probes'        => sub { $opt{path_probes} = 0 },
+	'reflection-probe'      => \$opt{reflection},
+	'allow-private'         => \$opt{allow_private},
+	'dry-run'               => \$opt{dry_run},
+	'fail-on=s'             => \$opt{fail_on},
+	'color|colour!'         => \$opt{color},	# either spelling, and --no-colour
+	'verbose|v'             => \$opt{verbose},
+	'help|h'                => \$opt{help},
+	'version|V'             => \$opt{version},
+) or usage($EXIT_USAGE);
+
+usage($EXIT_CLEAN) if $opt{help};
+
+if($opt{version}) {
+	print msg('cli.version', { version => $App::WebPerimeterScan::VERSION }), "\n";
+	exit $EXIT_CLEAN;
+}
+
+# Every option is checked before anything is sent: a typo in --fail-on used
+# to be noticed only after the whole scan had run.
+usage($EXIT_USAGE) unless $opt{scope};
+fail('cli.bad_format') unless $FORMAT{ $opt{format} };
+fail('cli.bad_fail_on') unless $FAIL_ON{ $opt{fail_on} };
+
+my $ports = parse_ports($opt{ports});
+
+for my $option (qw(docroot source)) {
+	for my $dir (@{ $opt{$option} || [] }) {
+		fail('cli.not_directory', { option => $option, dir => $dir }) unless -d $dir;
+	}
+}
+
+my $scope = eval {
+	App::WebPerimeterScan::Scope->new(allow_private => $opt{allow_private} ? 1 : 0)->load_file($opt{scope});
+} or fail_with($@);
+
+if($opt{dry_run}) {
+	dry_run($scope, $ports);
+	exit $EXIT_CLEAN;
+}
+
+unless($opt{authorized}) {
+	print STDERR msg('cli.unauthorized');
+	exit $EXIT_USAGE;
+}
+
+# Only the options actually given are passed, so the defaults live in one
+# place: %App::WebPerimeterScan::config.
+my %scan_options = (
+	scope       => $scope,
+	ports       => $ports,
+	docroots    => $opt{docroot},
+	source_dirs => $opt{source},
+	(map { defined $opt{$_} ? ($_ => $opt{$_}) : () } qw(timeout connect_timeout delay depth max_urls path_probes)),
+	(map { $opt{$_} ? ($_ => 1) : () } qw(reflection verbose)),
+);
+delete @scan_options{ grep { !defined $scan_options{$_} } keys %scan_options };
+
+my $scanner = App::WebPerimeterScan->new(%scan_options);
+my $findings = $scanner->run;
+
+my $rendered = $FORMAT{ $opt{format} }->($findings,
+	version      => "$App::WebPerimeterScan::VERSION",
+	generated    => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime),
+	scope_source => $scope->source,
+	requests     => $scanner->http->requests,
+	hosts        => $scanner->host_reports,
+	# Colour is for a terminal; a file or a pipe gets plain text.
+	(defined $opt{color} ? (color => $opt{color} ? 1 : 0) : $opt{output} ? (color => 0) : ()),
+);
+
+if($opt{output}) {
+	# autodie reports a failed open or close with the file name and reason.
+	open my $fh, '>', $opt{output};
+	print {$fh} $rendered;
+	close $fh;
+	print msg('cli.written', { file => $opt{output} }), "\n" unless $opt{verbose};
+} else {
+	print $rendered;
+}
+
+exit $EXIT_CLEAN if $opt{fail_on} eq $NEVER;
+exit(@{ $findings->at_or_above($opt{fail_on}) } ? $EXIT_FINDING : $EXIT_CLEAN);
+
+# msg
+# Purpose:     catalogue text for the command line.
+# Entry:       as App::WebPerimeterScan::I18N::i18n.
+# Exit:        the rendered string.
+# Side effects: none.
+sub msg
+{
+	my ($key, $args) = @_;
+
+	return App::WebPerimeterScan::I18N->i18n($key, $args);
+}
+
+# fail
+# Purpose:     report a usage or setup error and exit 2.
+# Entry:       $key is a catalogue key.
+# Exit:        never returns.
+# Side effects: prints to STDERR; exits.
+sub fail
+{
+	my ($key, $args) = @_;
+
+	print STDERR msg('cli.error', { error => msg($key, $args) }), "\n";
+	exit $EXIT_USAGE;
+}
+
+# fail_with
+# Purpose:     report an exception as a setup error and exit 2.
+# Entry:       $error is $@.
+# Exit:        never returns.
+# Side effects: prints to STDERR; exits.
+sub fail_with
+{
+	my ($error) = @_;
+
+	print STDERR msg('cli.error', { error => App::WebPerimeterScan::I18N::clean_error($error) }), "\n";
+	exit $EXIT_USAGE;
+}
+
+# parse_ports
+# Purpose:     turn --ports into a list of port numbers.
+# Entry:       $list is the option value or undef.
+# Exit:        arrayref of integers, or undef for the default list.
+# Side effects: exits 2 on a value that is not a port number.
+sub parse_ports
+{
+	my ($list) = @_;
+
+	return undef unless defined $list;
+
+	my @ports = grep { length } split $PORT_SEPARATOR, $list;
+	for my $port (@ports) {
+		fail('cli.bad_port', { port => $port })
+			unless $port =~ /\A\d+\z/ && $port >= $MIN_PORT && $port <= $MAX_PORT;
+	}
+
+	return [ map { $_ + 0 } @ports ];
+}
+
+# dry_run
+# Purpose:     show what would be scanned without sending anything.
+# Entry:       $scope is loaded; $ports from parse_ports.
+# Exit:        nothing useful.
+# Side effects: prints to STDOUT; DNS lookups for the private check.
+sub dry_run
+{
+	my ($scope, $ports) = @_;
+
+	print msg('cli.dry_run.header'), "\n";
+	for my $entry (@{ $scope->hosts }) {
+		my $where = $entry->{port} ? "$entry->{host}:$entry->{port}" : $entry->{host};
+		my $key = $scope->is_private_target($entry->{host}) ? 'cli.dry_run.private' : 'cli.dry_run.host';
+		print msg($key, { where => $where }), "\n";
+	}
+
+	print "\n", msg('cli.dry_run.ports', { ports => join(',', @{ $ports || \@App::WebPerimeterScan::Ports::DEFAULT_PORTS }) }), "\n";
+	print msg('cli.dry_run.docroots', { dirs => join(', ', @{ $opt{docroot} }) }), "\n" if $opt{docroot};
+	print msg('cli.dry_run.source', { dirs => join(', ', @{ $opt{source} }) }), "\n" if $opt{source};
+
+	return;
+}
+
+# usage
+# Purpose:     print the usage text and exit.
+# Entry:       $status is the exit status.
+# Exit:        never returns.
+# Side effects: prints to STDERR; exits.
+sub usage
+{
+	my ($status) = @_;
+
+	print STDERR msg('cli.usage');
+	exit $status;
+}
+
+__END__
+
+=head1 NAME
+
+webperimeter - check your own web perimeter the way an outsider sees it
+
+=head1 SYNOPSIS
+
+	webperimeter --scope scope.txt --authorized [options]
+	webperimeter --scope scope.txt --dry-run
+	webperimeter --help
+
+Scan every host in F<scope.txt> and print a text report:
+
+	webperimeter --scope scope.txt --authorized
+
+See what would be scanned, without sending anything to the hosts:
+
+	webperimeter --scope scope.txt --dry-run
+
+Save a JSON report, and fail a deployment job on any medium or worse
+finding:
+
+	webperimeter --scope scope.txt --authorized -f json -o report.json --fail-on medium
+
+A quick check of the web ports only, with no sensitive-path probes:
+
+	webperimeter --scope scope.txt --authorized --ports 80,443 --max-urls 1 --no-path-probes
+
+Scan a test server on this machine, and point findings at its files:
+
+	webperimeter --scope lab.txt --authorized --allow-private \
+	    --docroot /srv/www/lab --source ~/src/lab/lib
+
+=head1 DESCRIPTION
+
+This is the command-line front end to L<App::WebPerimeterScan>.
+C<--help> lists every option.
+
+The scope file lists the hosts you are allowed to test; its format is
+described in L<App::WebPerimeterScan::Scope>.  Nothing is sent to any host
+unless you also give C<--authorized>, which states that you have permission
+to test every host in the file.
+
+Every option is checked before any traffic is sent, so a typo stops the
+command at once instead of after a long scan.
+
+=head1 EXIT STATUS
+
+	0  the scan ran, and nothing reached the --fail-on level
+	   (also for --help, --version and --dry-run)
+	1  the scan ran, and at least one finding reached the --fail-on level
+	2  the command line or the scope file is wrong, or --authorized is
+	   missing; nothing was sent
+
+The default C<--fail-on> level is C<high>.  C<--fail-on never> always
+exits 0 after a scan.
+
+=head1 COMMON PITFALLS
+
+=over 4
+
+=item * B<C<--dry-run> still looks up names.>  It sends nothing to the
+hosts, but it resolves each name in DNS to show whether it is private.
+
+=item * B<Exit status 0 is not "secure".>  It means that no finding reached
+the C<--fail-on> level.  A host that could not be scanned is reported as
+C<scan-error> or C<host-unreachable> at high severity, so it fails the
+default level; with C<--fail-on critical> it does not.
+
+=item * B<C<--output> prints one line.>  With C<-o FILE>, the report goes
+to the file and "Report written to FILE" goes to STDOUT (not with
+C<--verbose>).
+
+=item * B<Colour is automatic.>  The text report is coloured when STDOUT is
+a terminal and C<-o> is not given.  Use C<--no-color> (or C<--no-colour>)
+to turn it off, or C<--color> (or C<--colour>) to force it.
+
+=item * B<Private addresses need C<--allow-private>.>  Without it, a host
+that resolves to C<127.0.0.1>, C<10.0.0.0/8> and the like is refused, and
+the refusal is a high-severity finding.
+
+=item * B<C<--docroot> and C<--source> must be directories on this
+machine.>  A path that is not a directory is a usage error (exit 2).
+
+=back
+
+=head1 ENCODING
+
+The reports are written as bytes, exactly as the scanner made them.  Text
+from web pages is UTF-8 when the site is, so the report is correct UTF-8
+for such sites; view it in a UTF-8 terminal.  Save the scope file as UTF-8;
+international host names may be written as they are, and are reported in
+their ASCII (Punycode) form.  See L<App::WebPerimeterScan::Scope/ENCODING>.  Messages are in
+English; error messages from the operating system follow your locale.
+
+=head1 STATE DIAGRAM
+
+	  webperimeter [options]
+	        |
+	        v
+	  +----------------+
+	  | PARSE OPTIONS  |
+	  +----------------+
+	        |--- unknown option -> usage; exit 2
+	        |--- --help         -> help; exit 0
+	        |--- --version      -> version; exit 0
+	        v
+	  +----------------+
+	  | VALIDATE       |--- no --scope, bad --format, bad --fail-on,
+	  +----------------+    bad port, docroot or source not a directory
+	        |                 -> message; exit 2
+	        v
+	  +----------------+
+	  | LOAD SCOPE     |--- file unreadable, or no usable line
+	  +----------------+       -> message; exit 2
+	        |
+	        |--- --dry-run -> list hosts, ports and directories; exit 0
+	        v
+	  +----------------+
+	  | AUTHORISED?    |--- no --authorized -> explanation; exit 2
+	  +----------------+
+	        |
+	        v
+	  +----------------+
+	  | SCAN           |  App::WebPerimeterScan->run (traffic is sent)
+	  +----------------+
+	        |
+	        v
+	  +----------------+
+	  | REPORT         |  text, json or html; to STDOUT or to --output
+	  +----------------+
+	        |
+	        v
+	  +----------------+
+	  | EXIT           |  1 if a finding reached --fail-on, else 0
+	  +----------------+
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::AutoDetect::C;
-$ExtUtils::Builder::AutoDetect::C::VERSION = '0.037';
+$ExtUtils::Builder::AutoDetect::C::VERSION = '0.038';
 use parent 'ExtUtils::Builder::BuildTools::FromPerl';
 
 1;
@@ -18,7 +18,7 @@ ExtUtils::Builder::AutoDetect::C - Backwards compatability shim for ExtUtils::Bu
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 DESCRIPTION
 

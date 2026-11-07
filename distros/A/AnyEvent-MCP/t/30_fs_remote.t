@@ -43,6 +43,7 @@ mkdir "$dir/optional" or die $!;
 mkdir "$dir/config/anyevent-mcp" or die $!;
 put "$dir/config/anyevent-mcp/global.ini", <<EOF;
 [program mcp-fs]
+executable.perl = $^X
 mount.required = ro:$dir/required
 mount-try.missing = ro:$dir/optional-later
 mount-try.present = rw:$dir/optional
@@ -53,6 +54,7 @@ put "$dir/rsh", "#!$^X\n" . q{
    my $host = shift;
    $host eq "mock" || $host eq "mock2" or die "wrong remote host $host\n";
    @ARGV == 1 or die "wrong remote shell argv\n";
+   length ($ARGV[0]) < 256 or die "remote command exceeds rsh length limit\n";
    # An ssh-agent used locally for transport authentication is not forwarded
    # automatically. The mock must emulate a remote environment without it.
    delete $ENV{SSH_AUTH_SOCK};
@@ -218,7 +220,7 @@ $client->close;
 
 mkdir "$dir/config/anyevent-mcp/rules" or die $!;
 put "$dir/config/anyevent-mcp/rules/fs-default.ini",
-   "[rule]\ndecision=allow\naction=read\nsandbox-grants=workdir-read\n";
+   "[rule]\ndecision=allow\naction=read\nmatch.workdir=$dir/work\nsandbox-grants=workdir-read\n";
 # The same named profile intentionally applies to local and remote instances.
 my $shared = AnyEvent::MCP::Client::JSONL->new (
    command => [@base[0..3], "--ask", "mcp", @base[6..$#base], "$dir/work"],
@@ -230,11 +232,7 @@ ok !$r->{isError} && MIME::Base64::decode_base64 ($r->{structuredContent}{data})
 $shared->close;
 
 my @prompts;
-my $prompted = AnyEvent::MCP::Client::JSONL->new (
-   command => [@base[0..3], "--ask", "mcp", "--name", "remote-prompt",
-      @base[6..$#base], "$dir/work"],
-   env => \%env, client_capabilities => { elicitation => { form => {} } },
-   on_request => sub {
+my $answer_prompt = sub {
       my ($client, $req) = @_;
       my $request = $req->{params}{_meta}{"anyevent-mcp/permission"}{request};
       push @prompts, $request;
@@ -243,14 +241,39 @@ my $prompted = AnyEvent::MCP::Client::JSONL->new (
             decision => "allow-once", sandbox_grants => join ",", @{$request->{sandbox_grants}},
          },
       });
-   },
+};
+my $prompted = AnyEvent::MCP::Client::JSONL->new (
+   command => [@base[0..3], "--ask", "mcp", "--name", "remote-prompt",
+      @base[6..$#base], "$dir/work"],
+   env => \%env, client_capabilities => { elicitation => { form => {} } },
+   on_request => $answer_prompt,
 );
 $r = call $prompted, "file-read" => { path => "renamed" };
 ok !$r->{isError} && @prompts == 1, "remote read requests permission";
-like $prompts[0]{dimensions}{host}{value}, qr/remote .* mock\z/, "remote host is a permission dimension";
-like $prompts[0]{dimensions}{workdir}{value}, qr/remote .* mock:.*work\z/,
-   "remote workdir scope cannot accidentally match a local workdir rule";
+is $prompts[0]{dimensions}{host}{value}, "remote mock",
+   "remote host permission identity excludes transport";
+is_deeply $prompts[0]{dimensions}{host}{choices}, [
+   { label => "This host", match => "remote mock" },
+   { label => "All hosts", match => "^" },
+], "host scope offers a specific host and an explicit all-hosts choice";
+is $prompts[0]{dimensions}{workdir}{value}, "$dir/work",
+   "remote workdir is a plain logical path, independent of host";
 $prompted->close;
+
+my $alternate_rsh = AnyEvent::MCP::Client::JSONL->new (
+   command => [@base[0..3], "--ask", "mcp", "--name", "remote-prompt",
+      "-h", "mock", "-e", "$dir/rsh -x", "--bwrap", "$dir/bwrap", "$dir/work"],
+   env => \%env, client_capabilities => { elicitation => { form => {} } },
+   on_request => $answer_prompt,
+);
+$r = call $alternate_rsh, "file-read" => { path => "renamed" };
+ok !$r->{isError} && @prompts == 2,
+   "same remote host remains accessible using another remote-shell command";
+is $prompts[1]{dimensions}{host}{value}, $prompts[0]{dimensions}{host}{value},
+   "host permission identity is unchanged across remote transports";
+is $prompts[1]{dimensions}{workdir}{value}, $prompts[0]{dimensions}{workdir}{value},
+   "remote workdir permission identity is unchanged across transports";
+$alternate_rsh->close;
 
 my $other = AnyEvent::MCP::Client::JSONL->new (
    command => [@base[0..5], "-h", "mock2", "-e", "$dir/rsh -x", "--bwrap", "$dir/bwrap", "$dir/work"],
@@ -273,6 +296,30 @@ $r = call $local, workdirs => {};
 is_deeply $r->{structuredContent}{resolved_workdirs}, { 1 => "$dir/work" },
    "local and remote instances compress the same logical pathname to the same ID";
 $local->close;
+
+my $local_old_rule = AnyEvent::MCP::Client::JSONL->new (
+   command => [@base[0..3], "--ask", "mcp", "--bwrap", "$dir/bwrap", "$dir/work"],
+   env => \%env,
+);
+$r = call $local_old_rule, "file-read" => { path => "renamed" };
+ok !$r->{isError}, "old workdir-only saved rule applies both locally and remotely";
+$local_old_rule->close;
+
+my $local_prompt = AnyEvent::MCP::Client::JSONL->new (
+   command => [@base[0..3], "--ask", "mcp", "--name", "remote-prompt",
+      "--bwrap", "$dir/bwrap", "$dir/work"],
+   env => \%env, client_capabilities => { elicitation => { form => {} } },
+   on_request => $answer_prompt,
+);
+$r = call $local_prompt, "file-read" => { path => "renamed" };
+ok !$r->{isError} && @prompts == 3, "new local approval requests a host dimension";
+is $prompts[2]{dimensions}{host}{value}, "local", "local host has its own permission identity";
+is_deeply $prompts[2]{dimensions}{host}{choices}, [
+   { label => "This host", match => "local" },
+   { label => "All hosts", match => "^" },
+], "new local rule defaults to this host but may cover all hosts";
+is $prompts[2]{dimensions}{workdir}{value}, "$dir/work", "local workdir uses the same plain path";
+$local_prompt->close;
 
 symlink "$dir/work", "$dir/alias" or die "remote workdir symlink: $!";
 my $aliased = AnyEvent::MCP::Client::JSONL->new (

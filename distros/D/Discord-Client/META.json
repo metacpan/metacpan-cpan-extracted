@@ -1,10 +1,10 @@
 {
    "abstract" : "Discord client for Perl using IO::Async and Future",
    "author" : [
-      "Takuya Oshima"
+      "Takuya Oshima <admin@viasnake.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "apache_2_0"
    ],
@@ -80,6 +80,6 @@
          "web" : "https://github.com/viasnake/Discord-Client"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

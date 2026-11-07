@@ -53,4 +53,24 @@ _test(\%input, \%data, qr/no email/i, "Bogus email results in failure");
 $input{foo} = [];
 _test(\%input, \%data, qr/wrong type/i, "Bogus email type results in failure");
 
+# x-errorMessage
+my $dependency = {
+    type             => 'object',
+    minProperties    => 1,
+    required         => ['test'],
+    not              => { required => ['test'], maxProperties => 1 },
+    properties       => { test => { type => 'string' }, deb => { type => 'object', minProperties => 1 } },
+    'x-errorMessage' => { not => 'names no packager', minProperties => 'is empty', required => 'needs a test' },
+};
+my $declaration = { type => 'object', additionalProperties => $dependency };
+sub errors_of {
+    my ($doc) = @_;
+    return [ map { "$_" } validate( $doc, $declaration ) ];
+}
+is_deeply( errors_of( { ffmpeg => { test => 'x' } } ), ['/ffmpeg: names no packager'], 'the message of not replaces Should not match' );
+is_deeply( errors_of( { ffmpeg => {} } ), [ '/ffmpeg: is empty', '/ffmpeg/test: needs a test' ], 'each keyword that fails gets its own message, and required goes to the missing property' );
+is_deeply( errors_of( { ffmpeg => { test => 'x', deb => {} } } ), ['/ffmpeg/deb: Not enough properties: 0/1.'], 'a deeper error of a named keyword keeps its own message' );
+is_deeply( errors_of( { ffmpeg => { test => 'x', deb => [] } } ), ['/ffmpeg/deb: Expected object - got array.'], 'an error of a keyword that the hash does not name keeps its own message' );
+is_deeply( errors_of( { ffmpeg => { test => 'x', deb => { a => 1 } } } ), [], 'valid data has no errors' );
+
 done_testing();

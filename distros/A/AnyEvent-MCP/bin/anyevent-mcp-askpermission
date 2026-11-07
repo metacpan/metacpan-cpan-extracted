@@ -29,8 +29,9 @@ GTK labels when present, including the multibroker alias when available.
 The requested sandbox grants appear together on one line. The initial YAD
 form also has a C<Denial reason (optional)> field above four choices:
 C<Deny once>, C<Deny always...>, C<Allow always...>, C<Allow once>.
-The persistent rule editor creates a selector for every named permission
-dimension and uses the server's labels and offered matchers. For example,
+The persistent rule editor creates a selector for each named permission
+dimension with multiple offered scopes, using the server's labels and matchers.
+Single-choice scopes are applied automatically without a selector. For example,
 the workdir dimension may offer this workdir or any configured workdir.
 The scopes affect saved rule matching, not the current call's sandbox grants.
 One-time decisions are on the outside; C<Deny once>
@@ -272,6 +273,7 @@ my $request = do { local $/; JSON::XS::decode_json (scalar <STDIN>) };
 die "Invalid permission request\n" unless $request->{version} == 1;
 my $dimensions = $request->{dimensions} || {};
 my @dimensions = sort keys %$dimensions;
+my @selectable_dimensions = grep @{$dimensions->{$_}{choices}} > 1, @dimensions;
 my %decisions = (d => "deny-once", n => "deny-always", o => "allow-once", a => "allow-always");
 my $persistent = !grep !@{$dimensions->{$_}{choices}}, @dimensions;
 my @deny_paths = grep defined && !ref, @{$request->{paths} || []};
@@ -301,7 +303,7 @@ sub rule_dialog {
          ("--field=$dim->{label} scope:CB", join "\x1f",
             map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) }
                0 .. $#{$dim->{choices}})
-      } @dimensions),
+      } @selectable_dimensions),
       (!$allow && @deny_paths ? ("--field=Deny file scope:CB", join "\x1f",
          (map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": Exact file " . $json->encode ($deny_paths[$_]) }
             0 .. $#deny_paths),
@@ -321,7 +323,7 @@ sub rule_dialog {
       }
       $answer{sandbox_grants} = \@grants;
    }
-   for my $name (@dimensions) {
+   for my $name (@selectable_dimensions) {
       my $index = shift @values;
       die "Invalid YAD dimension scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
          && $index <= @{$dimensions->{$name}{choices}};
@@ -506,7 +508,7 @@ sub terminal {
             ? ($caps eq "-" ? () : split /\s*,\s*/, $caps, -1)
             : @{$request->{sandbox_grants}}];
       }
-      for my $name (@dimensions) {
+      for my $name (@selectable_dimensions) {
          my $dim = $dimensions->{$name};
          print {$tty} "$dim->{label} scope:\n",
             map { ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) . "\n" }

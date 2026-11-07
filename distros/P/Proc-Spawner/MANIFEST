@@ -17,11 +17,12 @@ doc/large-subset/large-subset-logical.md
 doc/large-subset/large-subset-spec.md
 doc/large-subset/large-subset-state.md
 doc/large-subset/large-subset-state.md.html
+doc/large-subset/tools/large-subset-builtins-differences.tsv
 doc/large-subset/tools/large-subset-builtins.pl
 doc/large-subset/tools/large-subset-drops.pl
 doc/large-subset/tools/large-subset-extract.pl
-doc/large-subset/tools/large-subset-noise.txt
 doc/large-subset/tools/large-subset-features.pl
+doc/large-subset/tools/large-subset-noise.txt
 doc/large-subset/tools/large-subset-remeasure.pl
 doc/large-subset/tools/large-subset-reparse.pl
 doc/large-subset/tools/large-subset-run-differences.tsv
@@ -69,6 +70,8 @@ t/batteries/battery.txt
 t/batteries/fdbattery.txt
 t/batteries/large-subset-b13.txt
 t/batteries/large-subset-e.txt
+t/batteries/large-subset-p6.txt
+t/batteries/large-subset-post04.txt
 t/batteries/largebattery.txt
 t/batteries/pspawn-d2.txt
 t/batteries/pspawn-l10.txt
@@ -76,10 +79,12 @@ t/batteries/sigenv.txt
 t/batteries/t1.txt
 t/batteries/t2.txt
 t/batteries/t3.txt
+t/between.t
 t/dash-known.txt
 t/dash.t
 t/fds
 t/graph.t
+t/missing-matrix.pl
 t/parser/large-subset-crosscheck.pl
 t/parser/large-subset-shells.tsv
 t/parser/large-subset-tests.pl
@@ -96,8 +101,6 @@ t/sgraph/ex6.sg
 t/sgraph/graph2dot.pl
 t/sgraph/reporter
 t/sgraph/run-graph.pl
-t/between.t
 t/spawner.t
 t/try.pl
-t/batteries/large-subset-p6.txt
-t/batteries/large-subset-post04.txt
+win_spawn.h

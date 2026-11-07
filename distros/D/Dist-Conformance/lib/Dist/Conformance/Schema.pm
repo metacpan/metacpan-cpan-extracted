@@ -1,6 +1,6 @@
-package Dist::Conformance::Schema 0.002;
+package Dist::Conformance::Schema 0.003;
 
-# ABSTRACT: Parse YAML and JSON, and validate the result against a schema
+# ABSTRACT: Parse YAML, JSON and INI, and validate the result against a schema
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -41,8 +41,13 @@ sub encode_json ($data) {
 sub validate ( $data, $schema, $where ) {
     my $copy   = Clone::clone($data);
     my @errors = errors( $copy, $schema );
-    die join( "\n", "$where is not valid:", map { "  $_" } @errors ), "\n" if @errors;
+    refuse( $where, @errors ) if @errors;
     return $copy;
+}
+
+
+sub refuse ( $where, @errors ) {
+    die join( "\n", "$where is not valid:", map { "  $_" } @errors ), "\n";
 }
 
 
@@ -68,11 +73,29 @@ sub relative_path ( $path, $inside ) {
 }
 
 
+sub parse_ini ( $text, $where ) {
+    my $data = eval { Dist::Conformance::Schema::INIReader->read_string($text) };
+    die( "$where does not parse as INI: " . first_line($@), "\n" ) if !defined $data;
+    return $data;
+}
+
+
 sub first_line ($text) {
     my ($line) = split /\n/, $text // q{};
     $line //= q{};
     $line =~ s/\ at\ \S+\ line\ \d+[.]?\z//;
     return $line;
+}
+
+# Config::INI::Reader keeps the last value of a repeated key, so it collects each repeat into a list.
+package Dist::Conformance::Schema::INIReader 0.003 {
+    use parent 'Config::INI::Reader';
+
+    sub set_value ( $self, $name, $value ) {
+        my $values = $self->{ __PACKAGE__ . '/values' }{ $self->current_section }{$name} //= [];
+        push @$values, $value;
+        return $self->SUPER::set_value( $name, @$values == 1 ? $value : [@$values] );
+    }
 }
 
 __END__
@@ -83,11 +106,11 @@ __END__
 
 =head1 NAME
 
-Dist::Conformance::Schema - Parse YAML and JSON, and validate the result against a schema
+Dist::Conformance::Schema - Parse YAML, JSON and INI, and validate the result against a schema
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -141,6 +164,12 @@ as the JSON pointer of the key and what is wrong with it, such as
 C</checks/ClaudeMd/file: Expected string - got array.>  The caller's data is not
 changed.
 
+=head2 refuse
+
+C<($where, @errors)>.  Dies with the message of L</validate>: C<$where is not
+valid:>, and then each error on a line of its own.  For a check of the data
+that a schema cannot express, so that its errors read as those of the schema.
+
 =head2 errors
 
 C<($data, $schema)>.  The errors of C<$data> against C<$schema>, each as a
@@ -158,6 +187,15 @@ matches it.
 C<($path, $inside)>.  Returns C<$path> when it matches L</$PATH>.  Otherwise
 dies with C<$path is not a relative path inside $inside>.  Every read and write
 of a path that a flavor names goes through it.
+
+=head2 parse_ini
+
+C<($text, $where)>.  The same as L</parse_yaml>, for an INI file such as
+F<dist.ini>.  Returns a hash of sections by their whole header, such as
+C<GithubMeta> or C<Git::Commit / Release>, each a hash of its keys.  The keys
+before the first header are in the section C<_>.  A key that a section gives
+more than once, such as C<run> in C<[Run::Test]>, has the list of its values,
+in order, as Dist::Zilla reads it.  Any other key has its value.
 
 =head2 first_line
 

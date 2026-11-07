@@ -1,0 +1,54 @@
+---
+abstract: 'Check the POD of a distribution as its build weaves it'
+author:
+  - 'George S. Baugh <george@troglodyne.net>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::More: '0'
+  re: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-podchecker
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+  package:
+    - Dist::Zilla::App::Command::podchecker::Checker
+provides:
+  Dist::Zilla::App::Command::podchecker:
+    file: lib/Dist/Zilla/App/Command/podchecker.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::App: '0'
+  Pod::Checker: '1.70'
+  parent: '0'
+  perl: '5.022'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-App-Command-podchecker/issues
+  homepage: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-App-Command-podchecker
+  repository: https://github.com/Troglodyne-Internet-Widgets/Dist-Zilla-App-Command-podchecker.git
+version: '0.001'
+x_contributors:
+  - 'troglodyne-robot <trogbot@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

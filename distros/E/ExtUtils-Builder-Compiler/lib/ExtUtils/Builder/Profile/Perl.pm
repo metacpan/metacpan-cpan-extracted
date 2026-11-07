@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Profile::Perl;
-$ExtUtils::Builder::Profile::Perl::VERSION = '0.037';
+$ExtUtils::Builder::Profile::Perl::VERSION = '0.038';
 use strict;
 use warnings;
 
@@ -54,7 +54,8 @@ sub process_linker {
 		});
 	}
 	my $os = _get_var($config, $opts, 'osname');
-	if ($linker->type eq 'executable' or $linker->type eq 'shared-library' or ($linker->type eq 'loadable-object' and $needs_relinking{$os})) {
+	my $needs_libperl = $needs_relinking{$os} || ($os eq 'android' && _get_var($config, $opts, 'useshrplib') eq 'true');
+	if ($linker->type eq 'executable' or $linker->type eq 'shared-library' or ($linker->type eq 'loadable-object' and $needs_libperl)) {
 		my ($libperl, $libext, $so) = map { _get_var($config, $opts, $_) } qw/libperl lib_ext so/;
 		my ($lib) = $libperl =~ / \A (?:lib)? ( \w* perl \w* ) (?: \. $so | $libext) \b /msx;
 		$linker->add_libraries([$lib], ranking => sub { $_[0] - 1 });
@@ -86,7 +87,7 @@ ExtUtils::Builder::Profile::Perl - A profile for compiling and linking against p
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 

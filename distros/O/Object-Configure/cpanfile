@@ -1,16 +1,21 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.008';
+requires 'perl', '5.010';
 
 requires 'Carp';
 requires 'Config::Abstraction', '0.38';
-requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'File::Spec';
+requires 'File::stat';
+requires 'IPC::System::Simple';   # Needed by autodie's :system (via :all)
+requires 'List::Util', '1.33';   # any()
 requires 'Log::Abstraction', '0.26';
+requires 'POSIX';
 requires 'Params::Get', '0.13';
 requires 'Readonly';
 requires 'Return::Set';
 requires 'Scalar::Util';
+requires 'Time::HiRes';
+requires 'autodie';
 requires 'mro';
 
 on 'configure' => sub {
@@ -20,20 +25,18 @@ on 'configure' => sub {
 on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Temp';
-	requires 'File::stat';
 	requires 'IO::Handle';
-	requires 'IPC::System::Simple';
-	requires 'POSIX';
 	requires 'Test::DescribeMe';
+	requires 'Test::Exception';
 	requires 'Test::Mockingbird', '0.10';
+	requires 'Test::More';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
 	requires 'Test::Returns';
 	requires 'Test::Without::Module';
-	requires 'Time::HiRes';
 	requires 'YAML::XS';
-	requires 'autodie';
+	recommends 'Test::Memory::Cycle';   # t/function.t skips without it
 };
 
 on 'develop' => sub {

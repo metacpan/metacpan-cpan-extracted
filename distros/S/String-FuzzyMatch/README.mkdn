@@ -1,0 +1,133 @@
+
+[![Windows](https://github.com/Corion/String-FuzzyMatch/workflows/windows/badge.svg)](https://github.com/Corion/String-FuzzyMatch/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/String-FuzzyMatch/workflows/macos/badge.svg)](https://github.com/Corion/String-FuzzyMatch/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/String-FuzzyMatch/workflows/linux/badge.svg)](https://github.com/Corion/String-FuzzyMatch/actions?query=workflow%3Alinux)
+
+# NAME
+
+String::FuzzyMatch - match strings fuzzily
+
+# SYNOPSIS
+
+    my $filter = String::FuzzyFind->new(
+        highlight_start => '[',
+        highlight_end => ']',
+    );
+
+    $filter->filter( 'ab', ['aab','abc','acb','cba','aaa', 'abab'] );
+    # ['aab','abc','acb','abab' ]
+
+    # By default ignores diacritics and case in haystack
+    $filter->( 'ab', ['Aäb','abc','Äbc','äcb','cba','aaa'] );
+    # ['Aäb','abc','Äbc','äcb' ]
+
+    # By default respects diacritics in needle
+    $filter->( 'äb', ['aäb','abc','Äbc','äcb','cba','aaa'] );
+    # ['aäb','Äbc','äcb' ]
+
+    # Ignore diacritics in needle as well
+    my $ignore_diacritics = String::FuzzyFind->new(
+        ignore_diacritics_lhs => 1,
+    );
+    $ignore_diacritics->( 'äb', ['aäb','abc','äbc','Äcb','cba','aaa'] );
+    # ['aäb','abc','äbc','Äcb']
+
+
+    $filter->highlight( 'ab', 'äcb' );
+    # '[ä]c[b]'
+
+    $filter->highlight( 'ab', 'äb/c' );
+    # '[äb]/c'
+
+    # HTML highlighting
+    my $html = String::FuzzyFind->new(
+        highlight_start => '<highlight>',
+        highlight_end => '</highlight>',
+    );
+    $html->highlight( 'ab', 'äcb' );
+    # '<highlight>ä</highlight>c<highlight>b</highlight>'
+
+# DESCRIPTION
+
+This module fuzzily matches strings. All characters of the search string
+("needle") must occur in sequence in the strings in the search list
+("haystack"). So filtering by `ab` will find `a/b`, `aaaab`
+and `cranberry`.
+
+The searcher expects Unicode strings and matches using Unicode semantics.
+The filter by default ignores diacritics and case in the haystack
+and case in the needle, searching for `abba` will also find `ÄBBA`
+by default.
+
+This search approach is heavily inspired by the
+filtering in [fzf](https://junegunn.github.io/fzf/) but does not
+implement any of the advanced query language.
+
+## `new`
+
+Creates a new filter
+
+    my $filter = String::FuzzyFilter->new();
+
+- **highlight**, **highlight\_start**, **highlight\_end**
+
+        highlight => '_'
+
+    String to use for highlighting. Default `[` and `]`.
+
+- **highlight\_cb**
+
+        highlight_cb =>  sub( $match ) { return "->$match<-" }
+
+    Callback to return a highlighted match.
+    Default: `undef`.
+
+- **match**
+
+        match => 'caption'
+
+    Key of the hash to use for matching, if haystack contains only hashrefs. Can
+    be a scalar or a callback. Default: `undef`.
+
+## `->filter $needle, $haystack`
+
+    my $results = $filter->filter( 'ab', ['ABBA','cabbage','all/users/ben','Änderungen (bearbeitet)','nobody'] );
+    # ['ABBA','cabbage','all/users/ben','Änderungen (bearbeitet)']
+
+Filters a list by the query given as string. All strings are assumed
+to be Unicode strings.
+
+## `->highlight $needle, $str`
+
+Returns a string with the matched parts of a string highlighted.
+
+    my $higlighted = $filter->highlight( 'ab', 'all/users/ben' );
+    # '[a]ll/users/[b]en'
+
+Note that the returned string will be in NFD.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/String-FuzzyMatch](https://github.com/Corion/String-FuzzyMatch).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/String-FuzzyMatch/issues](https://github.com/Corion/String-FuzzyMatch/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2026-2026 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

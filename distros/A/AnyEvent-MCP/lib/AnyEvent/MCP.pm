@@ -456,7 +456,7 @@ package AnyEvent::MCP;
 
 use common::sense;
 
-our $VERSION = 0.81;
+our $VERSION = 0.82;
 
 sub json_class {
    our $JSON_CLASS ||= eval { require JSON::XS; "JSON::XS" }

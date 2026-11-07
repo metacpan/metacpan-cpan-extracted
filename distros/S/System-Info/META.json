@@ -1,41 +1,31 @@
 {
-   "release_status" : "stable",
-   "dynamic_config" : 1,
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "repository" : {
-         "web" : "https://github.com/Tux/System-Info",
-         "url" : "https://github.com/Tux/System-Info",
-         "type" : "git"
-         },
-      "x_IRC" : "irc://irc.perl.org/#perl-qa",
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/System-Info/issues"
-         }
-      },
-   "author" : [
-      "H.Merijn Brand <hmbrand@cpan.org>",
-      "Abe Timmerman <abeltje@cpan.org>"
+   "license" : [
+      "perl_5"
       ],
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.008"
+            }
+         },
       "test" : {
          "requires" : {
             "Test::More" : "0.88",
             "Test::Warnings" : "0"
             },
          "recommends" : {
-            "Test::More" : "1.302219"
+            "Test::More" : "1.302226"
             }
          },
-      "build" : {
+      "configure" : {
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
+            },
          "requires" : {
-            "perl" : "5.008"
+            "ExtUtils::MakeMaker" : "0"
+            },
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.78"
             }
          },
       "runtime" : {
@@ -43,82 +33,92 @@
             "perl" : "5.008003",
             "POSIX" : "0"
             }
-         },
-      "configure" : {
-         "suggests" : {
-            "ExtUtils::MakeMaker" : "7.76"
-            },
-         "recommends" : {
-            "ExtUtils::MakeMaker" : "7.22"
-            },
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
          }
       },
-   "license" : [
-      "perl_5"
-      ],
+   "release_status" : "stable",
    "provides" : {
-      "System::Info::Irix" : {
-         "file" : "lib/System/Info/Irix.pm",
-         "version" : "0.050"
-         },
-      "System::Info::Haiku" : {
-         "file" : "lib/System/Info/Haiku.pm",
-         "version" : "0.050"
-         },
-      "System::Info::BSD" : {
-         "version" : "0.051",
-         "file" : "lib/System/Info/BSD.pm"
+      "System::Info::Linux" : {
+         "file" : "lib/System/Info/Linux.pm",
+         "version" : "0.055"
          },
       "System::Info::Base" : {
-         "file" : "lib/System/Info/Base.pm",
-         "version" : "0.050"
+         "version" : "0.050",
+         "file" : "lib/System/Info/Base.pm"
          },
       "System::Info::Solaris" : {
          "file" : "lib/System/Info/Solaris.pm",
          "version" : "0.050"
          },
-      "System::Info::Darwin" : {
-         "version" : "0.057",
-         "file" : "lib/System/Info/Darwin.pm"
-         },
-      "System::Info::Generic" : {
+      "System::Info::AIX" : {
          "version" : "0.050",
-         "file" : "lib/System/Info/Generic.pm"
-         },
-      "System::Info::Cygwin" : {
-         "file" : "lib/System/Info/Cygwin.pm",
-         "version" : "0.050"
+         "file" : "lib/System/Info/AIX.pm"
          },
       "System::Info::HPUX" : {
          "version" : "0.051",
          "file" : "lib/System/Info/HPUX.pm"
          },
-      "System::Info::VMS" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/VMS.pm"
-         },
       "System::Info" : {
-         "version" : "0.068",
+         "version" : "0.069",
          "file" : "lib/System/Info.pm"
-         },
-      "System::Info::Linux" : {
-         "file" : "lib/System/Info/Linux.pm",
-         "version" : "0.054"
-         },
-      "System::Info::AIX" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/AIX.pm"
          },
       "System::Info::Windows" : {
          "file" : "lib/System/Info/Windows.pm",
          "version" : "0.051"
+         },
+      "System::Info::Haiku" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Haiku.pm"
+         },
+      "System::Info::Cygwin" : {
+         "file" : "lib/System/Info/Cygwin.pm",
+         "version" : "0.050"
+         },
+      "System::Info::Generic" : {
+         "file" : "lib/System/Info/Generic.pm",
+         "version" : "0.050"
+         },
+      "System::Info::VMS" : {
+         "file" : "lib/System/Info/VMS.pm",
+         "version" : "0.050"
+         },
+      "System::Info::Darwin" : {
+         "file" : "lib/System/Info/Darwin.pm",
+         "version" : "0.057"
+         },
+      "System::Info::Irix" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Irix.pm"
+         },
+      "System::Info::BSD" : {
+         "version" : "0.051",
+         "file" : "lib/System/Info/BSD.pm"
          }
       },
+   "author" : [
+      "H.Merijn Brand <perl5@tux.freedom.nl>",
+      "Abe Timmerman <abeltje@cpan.org>"
+      ],
+   "dynamic_config" : 1,
    "abstract" : "Basic information about the system",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/Tux/System-Info",
+         "type" : "git",
+         "web" : "https://github.com/Tux/System-Info"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/System-Info/issues"
+         },
+      "x_IRC" : "irc://irc.perl.org/#perl-qa"
+      },
+   "version" : "0.069",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
    "generated_by" : "Author",
-   "version" : "0.068",
    "name" : "System-Info"
    }

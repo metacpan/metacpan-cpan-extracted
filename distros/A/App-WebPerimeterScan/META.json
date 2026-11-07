@@ -1,0 +1,95 @@
+{
+   "abstract" : "check your own web perimeter the way an outsider sees it",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-WebPerimeterScan",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Validate::IP" : "0.31",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "Errno" : "0",
+            "Fcntl" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "2.5",
+            "HTML::Parser" : "3.71",
+            "HTML::SimpleLinkExtor" : "1.2",
+            "IO::Select" : "1.17",
+            "IO::Socket::INET" : "1.31",
+            "IO::Socket::SSL" : "2",
+            "IPC::System::Simple" : "1.3",
+            "JSON::PP" : "4",
+            "Net::SSLeay" : "1.92",
+            "Object::Configure" : "0.24",
+            "POSIX" : "0",
+            "Params::Get" : "0.17",
+            "Params::Validate::Strict" : "0.41",
+            "Readonly" : "2.05",
+            "Scalar::Util" : "0",
+            "Socket" : "2.02",
+            "Sub::Private" : "0.09",
+            "Sub::Protected" : "0.03",
+            "Term::ANSIColor" : "0",
+            "Time::HiRes" : "1.97",
+            "Time::Local" : "1.28",
+            "URI" : "1.7",
+            "autodie" : "2.37",
+            "parent" : "0",
+            "perl" : "5.026",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Fatal" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nigelhorne/App-WebPerimeterScan/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/App-WebPerimeterScan.git",
+         "web" : "https://github.com/nigelhorne/App-WebPerimeterScan"
+      }
+   },
+   "version" : "0.001.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

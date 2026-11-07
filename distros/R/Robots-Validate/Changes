@@ -1,5 +1,17 @@
 Revision history for Robots-Validate:
 
+v0.4.14   2026-11-06 17:42:12+00:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - BakenBot
+    - BitMoversBot
+    - cl0q-crawler
+    - dns-crawler
+    - GetAgentsRadar
+    - PactMeshBot
+    - RicciutiBot
+    - YioopBot
+
 v0.4.13   2026-10-29 10:12:50+00:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

@@ -83,6 +83,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbio"
    },
-   "version" : "2.000002",
+   "version" : "2.000003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

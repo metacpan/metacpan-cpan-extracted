@@ -96,9 +96,19 @@ SKIP: { skip 'no chdir in this libc', 1 unless has([[chdir => '/']], {});
   my $sh = sub { my $cmd = shift; capture(['/bin/sh', '-c', $cmd], @_) };
   my ($o) = capture([$PERL, '-e', $SIGPEEK], {}, sigmask => ['USR1']);   # (sh would clear its mask)
   like $o, qr/blk=1/, 'sigmask: USR1 blocked in the child';
-  ($o) = capture([$PERL, '-e', 'print getpgrp(), " $$\n"'], {}, pgroup => 0);
-  my ($pg, $pid) = split ' ', $o; is $pg, $pid, 'pgroup => 0: a new group led by the child';
+  SKIP: { skip 'pgroup => 0: not done by this spawn', 1 unless $has->([], { pgroup => 0 });
+    ($o) = capture([$PERL, '-e', 'print getpgrp(), " $$\n"'], {}, pgroup => 0);
+    my ($pg, $pid) = split ' ', $o; is $pg, $pid, 'pgroup => 0: a new group led by the child' }
+  { # pgroup => PGID: joins an existing group (a helper that made its own); emulated where missing
+    pipe my $hr, my $hw or die;
+    my $done; my $helper = Proc::Spawner::start($PERL, [$PERL, '-e', 'setpgrp(0, 0); $| = 1; print "go\n"; sleep 10'], undef, { 1 => fileno $hw },
+                                 on_exit => sub { $done = 1 });
+    close $hw; my $go = <$hr>;
+    ($o) = capture([$PERL, '-e', 'print getpgrp(), "\n"'], {}, pgroup => $helper);
+    is $o, "$helper\n", 'pgroup => PGID: joins that group'; is getpgrp(), getpgrp(0), 'and ours unchanged';
+    kill 'TERM', $helper; Proc::Spawner::wait_until(sub { $done }) }
   SKIP: { my ($p) = prog_or_undef('ps') or skip 'no ps in PATH', 1;   # the session id: ps (POSIX has no getsid in Perl)
+    skip 'setsid: not done by this spawn', 1 unless $has->([], { setsid => 1 });
     ($o) = capture(['/bin/sh', '-c', 'echo $$ $(' . $p . ' -o pgid= -o sid= -p $$ 2>/dev/null)'], {}, setsid => 1);
     my ($pid2, $pg2, $sid2) = split ' ', $o; defined $sid2 or skip "ps -o sid= gave nothing: $o", 1;
     is "$pg2 $sid2", "$pid2 $pid2", 'setsid: a new session' }
@@ -118,8 +128,9 @@ SKIP: { skip 'no chdir in this libc', 1 unless has([[chdir => '/']], {});
   ok !eval { Proc::Spawner::start($TRUE, ['true'], undef, {}, sigdefault => ['NOSUCH']); 1 } && $@ =~ /unknown signal/,
     'an unknown signal name dies' }
 
-{ # the raw call: spawn is the XSUB __posix_spawn, with an optional UNSUPPORTED hash
-  is \&Proc::Spawner::spawn, \&Proc::Spawner::__posix_spawn, 'spawn is an alias of __posix_spawn';
+{ # the raw call: spawn wraps the XSUB __posix_spawn, with an optional UNSUPPORTED hash
+  ok defined &Proc::Spawner::__posix_spawn && \&Proc::Spawner::spawn != \&Proc::Spawner::__posix_spawn,
+    'spawn wraps __posix_spawn (what it lacks is done around the call)';
   my $pid = Proc::Spawner::spawn($TRUE, ['true'], undef, [], {}, { sched => 'drop' });
   ok scalar(@{[Proc::Spawner::spawn($TRUE, ['true'], undef, [], { pidfd => 1 }, { pidfd => 'drop' })]}) >= 1, 'an option marked drop never fails';
   ok $pid, 'spawn takes an UNSUPPORTED hash'; waitpid $pid, 0;

@@ -6,7 +6,7 @@ use warnings;
 
 use File::Spec ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our ($DECISION, $DIRECTIVE);
 

@@ -14,6 +14,7 @@
 #include "XSUB.h"
 
 #include "ppport.h"
+#include "xop_compat.h"
 
 #include <sys/stat.h>
 #include <errno.h>
@@ -169,6 +170,22 @@ apophis_build_path(char *out, size_t out_size,
                     (int)id_len, id);
 }
 
+/* The same for the XSUBs, which have nowhere to report a truncated path: a
+ * path that does not fit, with room left for the .tmp.<pid> and .meta
+ * suffixes written beside it, is a different file, so it croaks. */
+#define APOPHIS_PATH_ROOM 24
+
+static int
+apophis_path(char *out, size_t out_size,
+             const char *store_dir, STRLEN store_len,
+             const char *id, STRLEN id_len)
+{
+    int len = apophis_build_path(out, out_size, store_dir, store_len, id, id_len);
+    if (len < 0 || (size_t)len + APOPHIS_PATH_ROOM >= out_size) /* # uncoverable condition left count:1 */
+        croak("Apophis: path too long");
+    return len;
+}
+
 /* Build path for .meta sidecar */
 static int
 apophis_build_meta_path(char *out, size_t out_size,
@@ -190,9 +207,6 @@ apophis_mkdir_p(const char *path)
     size_t len;
 
     len = strlen(path);
-    if (len >= sizeof(buf))
-        croak("Apophis: path too long");
-
     memcpy(buf, path, len + 1);
 
     for (p = buf + 1; *p; p++) {
@@ -254,9 +268,12 @@ apophis_atomic_write(pTHX_ const char *path,
     written = PerlIO_write(fh, content, content_len);
     PerlIO_close(fh);
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (written != (SSize_t)content_len) {
-        unlink(tmp_path);
-        croak("Apophis: short write to '%s'", tmp_path);
+        unlink(tmp_path); /* # uncoverable statement */
+        croak("Apophis: short write to '%s'", tmp_path); /* # uncoverable statement */
     }
 
     if (apophis_rename(tmp_path, path) != 0) {
@@ -322,9 +339,13 @@ apophis_meta_read(pTHX_ const char *meta_path)
     if (!fh) return NULL;
 
     buf = (char *)malloc((size_t)st.st_size + 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!buf) { PerlIO_close(fh); return NULL; }
 
     nread = PerlIO_read(fh, buf, (Size_t)st.st_size);
+    if (PerlIO_error(fh)) nread = -1;
     PerlIO_close(fh);
 
     if (nread < 0) { free(buf); return NULL; }
@@ -390,10 +411,224 @@ apophis_get_store_dir(pTHX_ HV *self, HV *opts, STRLEN *len_out)
 
 
 /* ================================================================== */
-/* Custom Ops - bypass method dispatch for hot-path operations         */
+/* The six fused bodies                                                */
+/*                                                                     */
+/* identify, store, exists, fetch, verify and remove each have one     */
+/* body here. The XSUB of that name runs it, and so does the custom op */
+/* a call to it compiles to under `use Apophis`. `who` is the name a   */
+/* croak reports. `args` and `items` are the XSUB's stack, for the     */
+/* key/value options after the positional arguments; the op passes     */
+/* NULL and 2, since it only stands for a call with none.              */
 /* ================================================================== */
 
-/* Forward declarations */
+static HV *
+apophis_self_hv(pTHX_ const char *who, SV *self)
+{
+    if (!sv_isobject(self))
+        croak("%s: not an object", who);
+    return (HV *)SvRV(self);
+}
+
+/* The trailing key/value pairs as a mortal HV, or NULL when there are
+ * none. When `meta` is given, a `meta` hashref goes there instead. */
+static HV *
+apophis_opts(pTHX_ const char *who, SV **args, I32 items, HV **meta)
+{
+    HV *opts;
+    I32 i;
+
+    if (items <= 2)
+        return NULL;
+    if ((items - 2) % 2 != 0)
+        croak("%s: odd number of optional arguments", who);
+    opts = (HV *)sv_2mortal((SV *)newHV());
+    for (i = 2; i < items; i += 2) {
+        STRLEN klen;
+        const char *k = SvPV(args[i], klen);
+        SV *v = args[i + 1];
+        if (meta && strEQ(k, "meta") && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV)
+            *meta = (HV *)SvRV(v);
+        else
+            (void)hv_store(opts, k, klen, SvREFCNT_inc(v), 0);
+    }
+    return opts;
+}
+
+static const char *
+apophis_content_of(pTHX_ const char *who, SV *content_ref, STRLEN *len)
+{
+    if (!SvROK(content_ref))
+        croak("%s: argument must be a scalar reference", who);
+    return SvPV(SvRV(content_ref), *len);
+}
+
+static void
+apophis_do_identify(pTHX_ const char *who, SV *self, SV *content_ref, unsigned char *uuid)
+{
+    HV *hv = apophis_self_hv(aTHX_ who, self);
+    const unsigned char *ns = apophis_get_ns(aTHX_ hv);
+    STRLEN content_len;
+    const char *content = apophis_content_of(aTHX_ who, content_ref, &content_len);
+
+    apophis_identify_content(uuid, ns, content, content_len);
+}
+
+/* Writes the id, HORUS_FMT_STR_LEN bytes and a NUL, into id_str. */
+static void
+apophis_do_store(pTHX_ const char *who, SV *self, SV *content_ref, SV **args, I32 items, char *id_str)
+{
+    HV *hv = apophis_self_hv(aTHX_ who, self);
+    const unsigned char *ns = apophis_get_ns(aTHX_ hv);
+    STRLEN content_len, store_dir_len;
+    const char *content = apophis_content_of(aTHX_ who, content_ref, &content_len);
+    HV *meta = NULL;
+    HV *opts = apophis_opts(aTHX_ who, args, items, &meta);
+    const char *store_dir;
+    unsigned char uuid[16];
+    char path[APOPHIS_PATH_MAX];
+    int path_len;
+    apophis_stat_t st;
+
+    apophis_identify_content(uuid, ns, content, content_len);
+    horus_format_uuid(id_str, uuid, HORUS_FMT_STR);
+
+    store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
+    path_len = apophis_path(path, sizeof(path), store_dir, store_dir_len, id_str, HORUS_FMT_STR_LEN);
+
+    if (apophis_stat(path, &st) != 0) {
+        apophis_ensure_parent_dir(path);
+        apophis_atomic_write(aTHX_ path, content, content_len);
+    }
+
+    if (meta) {
+        char meta_path[APOPHIS_PATH_MAX];
+        apophis_build_meta_path(meta_path, sizeof(meta_path), path, path_len);
+        apophis_meta_write(aTHX_ meta_path, meta);
+    }
+}
+
+/* The sharded path of an id under the store, for the four methods that
+ * take an id and options. Gives the id's bytes back for verify. */
+static int
+apophis_id_path(pTHX_ const char *who, HV *hv, SV *id, SV **args, I32 items,
+                char *path, size_t path_size, const char **id_str, STRLEN *id_len)
+{
+    HV *opts = apophis_opts(aTHX_ who, args, items, NULL);
+    STRLEN store_dir_len;
+    const char *store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
+
+    *id_str = SvPV(id, *id_len);
+    return apophis_path(path, path_size, store_dir, store_dir_len, *id_str, *id_len);
+}
+
+static bool
+apophis_do_exists(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
+{
+    const char *id_str;
+    STRLEN id_len;
+    char path[APOPHIS_PATH_MAX];
+    apophis_stat_t st;
+
+    apophis_id_path(aTHX_ who, apophis_self_hv(aTHX_ who, self), id, args, items, path, sizeof(path), &id_str, &id_len);
+    return apophis_stat(path, &st) == 0;
+}
+
+/* A new reference to the content, or &PL_sv_undef when there is none. */
+static SV *
+apophis_do_fetch(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
+{
+    const char *id_str;
+    STRLEN id_len;
+    char path[APOPHIS_PATH_MAX];
+    apophis_stat_t st;
+    PerlIO *fh;
+    SV *content;
+    SSize_t nread;
+
+    apophis_id_path(aTHX_ who, apophis_self_hv(aTHX_ who, self), id, args, items, path, sizeof(path), &id_str, &id_len);
+    if (apophis_stat(path, &st) != 0)
+        return &PL_sv_undef;
+
+    fh = PerlIO_open(path, "rb");
+    if (!fh)
+        croak("%s: cannot open '%s': %s", who, path, strerror(errno));
+
+    content = newSV((STRLEN)st.st_size + 1);
+    SvPOK_on(content);
+    nread = PerlIO_read(fh, SvPVX(content), (Size_t)st.st_size);
+    if (PerlIO_error(fh))
+        nread = -1;
+    PerlIO_close(fh);
+
+    if (nread < 0) {
+        SvREFCNT_dec(content);
+        croak("%s: read error on '%s'", who, path);
+    }
+    SvCUR_set(content, (STRLEN)nread);
+    *SvEND(content) = '\0';
+    return newRV_noinc(content);
+}
+
+static bool
+apophis_do_verify(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
+{
+    const char *id_str;
+    STRLEN id_len;
+    char path[APOPHIS_PATH_MAX];
+    PerlIO *fh;
+    unsigned char uuid[16];
+    char recomputed[HORUS_FMT_STR_LEN + 1];
+    HV *hv = apophis_self_hv(aTHX_ who, self);
+    const unsigned char *ns = apophis_get_ns(aTHX_ hv);
+
+    apophis_id_path(aTHX_ who, hv, id, args, items, path, sizeof(path), &id_str, &id_len);
+    fh = PerlIO_open(path, "rb");
+    if (!fh)
+        return FALSE;
+
+    apophis_identify_stream(aTHX_ uuid, ns, fh);
+    PerlIO_close(fh);
+    horus_format_uuid(recomputed, uuid, HORUS_FMT_STR);
+    return id_len == HORUS_FMT_STR_LEN && memcmp(id_str, recomputed, HORUS_FMT_STR_LEN) == 0;
+}
+
+static bool
+apophis_do_remove(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
+{
+    const char *id_str;
+    STRLEN id_len;
+    char path[APOPHIS_PATH_MAX];
+    char meta_path[APOPHIS_PATH_MAX];
+    int path_len, removed;
+
+    path_len = apophis_id_path(aTHX_ who, apophis_self_hv(aTHX_ who, self), id, args, items, path, sizeof(path), &id_str, &id_len);
+    removed = unlink(path) == 0;
+
+    /* The sidecar goes too. It need not be there. */
+    apophis_build_meta_path(meta_path, sizeof(meta_path), path, path_len);
+    unlink(meta_path);
+    return removed ? TRUE : FALSE;
+}
+
+
+/* ================================================================== */
+/* Custom ops                                                          */
+/*                                                                     */
+/* Under `use Apophis`, a call to one of the six methods above with    */
+/* exactly its arguments compiles to a custom op in place of the       */
+/* entersub. The op keeps entersub's kids, so the method is still      */
+/* looked up at run time and the invocant decides. When it resolves    */
+/* to this module's own XSUB, the op runs the body straight off the    */
+/* stack: no sub call, no @_, and a result written into the pad slot   */
+/* the call site owns. Anything else, a method a subclass overrode, a  */
+/* wrapped sub, a call that turns out to carry options, runs           */
+/* pp_entersub itself, so it behaves exactly as it would have.         */
+/* ================================================================== */
+
+#define AP_HINT_KEY "Apophis/ops"
+
+enum { AP_IDENTIFY, AP_STORE, AP_EXISTS, AP_FETCH, AP_VERIFY, AP_REMOVE, AP_NOPS };
+
 static OP *pp_apophis_identify(pTHX);
 static OP *pp_apophis_store(pTHX);
 static OP *pp_apophis_exists(pTHX);
@@ -401,329 +636,263 @@ static OP *pp_apophis_fetch(pTHX);
 static OP *pp_apophis_verify(pTHX);
 static OP *pp_apophis_remove(pTHX);
 
-/* XOP structs for debug names (5.14+ only) */
-#if PERL_VERSION >= 14
-static XOP apophis_xop_identify;
-static XOP apophis_xop_store;
-static XOP apophis_xop_exists;
-static XOP apophis_xop_fetch;
-static XOP apophis_xop_verify;
-static XOP apophis_xop_remove;
-#endif
+typedef struct {
+    const char *name;
+    STRLEN      len;
+    int         which;
+} ap_name_t;
 
-/*
- * pp_apophis_identify - Custom op: content → UUID v5 string
- *
- * Stack input:  self_sv, content_ref_sv
- * Stack output: uuid_string_sv
- *
- * Fuses: namespace extraction + SHA-1 + v5 stamp + format
- * Zero intermediate SVs, no method dispatch overhead.
- */
-static OP *
-pp_apophis_identify(pTHX) {
-    dSP;
-    SV *content_ref_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const unsigned char *ns;
-    SV *content_sv;
-    const char *content;
-    STRLEN content_len;
-    unsigned char uuid[16];
+/* The method names a call site may use, and the op each stands for. The
+ * op_ names are the aliases below, kept from when they were the only way
+ * to the fused bodies. */
+static const ap_name_t ap_names[] = {
+    { "identify",    8,  AP_IDENTIFY }, { "op_identify", 11, AP_IDENTIFY },
+    { "store",       5,  AP_STORE    }, { "op_store",    8,  AP_STORE    },
+    { "exists",      6,  AP_EXISTS   }, { "op_exists",   9,  AP_EXISTS   },
+    { "fetch",       5,  AP_FETCH    }, { "op_fetch",    8,  AP_FETCH    },
+    { "verify",      6,  AP_VERIFY   }, { "op_verify",   9,  AP_VERIFY   },
+    { "remove",      6,  AP_REMOVE   }, { "op_remove",   9,  AP_REMOVE   },
+};
 
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_identify: not an object");
-    hv = (HV *)SvRV(self_sv);
-    ns = apophis_get_ns(aTHX_ hv);
+static const char *const ap_method[AP_NOPS] = {
+    "identify", "store", "exists", "fetch", "verify", "remove",
+};
 
-    if (!SvROK(content_ref_sv))
-        croak("Apophis: pp_identify: argument must be a scalar reference");
-    content_sv = SvRV(content_ref_sv);
-    content = SvPV(content_sv, content_len);
+/* The name a croak reports, by op and by whether the call used the op_
+ * alias, which is the XSUB's ix. */
+static const char *const ap_who[AP_NOPS][2] = {
+    { "Apophis::identify", "Apophis::op_identify" },
+    { "Apophis::store",    "Apophis::op_store"    },
+    { "Apophis::exists",   "Apophis::op_exists"   },
+    { "Apophis::fetch",    "Apophis::op_fetch"    },
+    { "Apophis::verify",   "Apophis::op_verify"   },
+    { "Apophis::remove",   "Apophis::op_remove"   },
+};
 
-    apophis_identify_content(uuid, ns, content, content_len);
+static OP *(*const ap_pp[AP_NOPS])(pTHX) = {
+    pp_apophis_identify, pp_apophis_store, pp_apophis_exists,
+    pp_apophis_fetch, pp_apophis_verify, pp_apophis_remove,
+};
 
-    EXTEND(SP, 1);
-    PUSHs(sv_2mortal(apophis_uuid_to_sv(aTHX_ uuid)));
-    PUTBACK;
-    return NORMAL;
-}
+static const char *const ap_xop_name[AP_NOPS] = {
+    "apophis_identify", "apophis_store", "apophis_exists",
+    "apophis_fetch", "apophis_verify", "apophis_remove",
+};
 
-/*
- * pp_apophis_store - Custom op: fused identify + mkdir + atomic write
- *
- * Stack input:  self_sv, content_ref_sv
- * Stack output: uuid_string_sv
- *
- * Fuses the entire store pipeline into a single op:
- *   1. Extract namespace bytes from object
- *   2. SHA-1 hash content → UUID v5
- *   3. Compute 2-level sharded path
- *   4. stat() for CAS dedup check
- *   5. mkdir -p parent directories
- *   6. Atomic write (temp + rename)
- *   7. Format and return UUID string
- */
-static OP *
-pp_apophis_store(pTHX) {
-    dSP;
-    SV *content_ref_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const unsigned char *ns;
-    SV *content_sv;
-    const char *content;
-    STRLEN content_len;
-    unsigned char uuid[16];
-    char id_str[HORUS_FMT_STR_LEN + 1];
-    const char *store_dir;
-    STRLEN store_dir_len;
-    char path[APOPHIS_PATH_MAX];
-    apophis_stat_t st;
+static const char *const ap_xop_desc[AP_NOPS] = {
+    "Apophis fused identify (SHA-1, UUID v5)",
+    "Apophis fused store (identify, mkdir, atomic write)",
+    "Apophis fused exists (path, stat)",
+    "Apophis fused fetch (path, stat, read)",
+    "Apophis fused verify (read, re-hash, compare)",
+    "Apophis fused remove (path, unlink, sidecar)",
+};
 
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_store: not an object");
-    hv = (HV *)SvRV(self_sv);
-    ns = apophis_get_ns(aTHX_ hv);
+/* The C function behind each method's XSUB, taken at boot. A CV on the
+ * stack is ours when it runs one of these, which holds in every thread
+ * and survives nothing but a redefinition. */
+static XSUBADDR_t ap_xsub[AP_NOPS];
+static XOP        ap_xop[AP_NOPS];
 
-    if (!SvROK(content_ref_sv))
-        croak("Apophis: pp_store: argument must be a scalar reference");
-    content_sv = SvRV(content_ref_sv);
-    content = SvPV(content_sv, content_len);
-
-    /* Identify */
-    apophis_identify_content(uuid, ns, content, content_len);
-    horus_format_uuid(id_str, uuid, HORUS_FMT_STR);
-
-    /* Get store_dir from object */
-    store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-
-    /* Build sharded path */
-    apophis_build_path(path, sizeof(path),
-                       store_dir, store_dir_len,
-                       id_str, HORUS_FMT_STR_LEN);
-
-    /* CAS dedup: only write if not already stored */
-    if (apophis_stat(path, &st) != 0) {
-        apophis_ensure_parent_dir(path);
-        apophis_atomic_write(aTHX_ path, content, content_len);
-    }
-
-    EXTEND(SP, 1);
-    PUSHs(sv_2mortal(newSVpvn(id_str, HORUS_FMT_STR_LEN)));
-    PUTBACK;
-    return NORMAL;
-}
-
-/*
- * pp_apophis_exists - Custom op: UUID → boolean existence check
- *
- * Stack input:  self_sv, id_sv
- * Stack output: bool_sv
- *
- * Fuses: path computation + stat() into a single op.
- */
-static OP *
-pp_apophis_exists(pTHX) {
-    dSP;
-    SV *id_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const char *store_dir;
-    STRLEN store_dir_len;
-    const char *id_str;
-    STRLEN id_len;
-    char path[APOPHIS_PATH_MAX];
-    apophis_stat_t st;
-
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_exists: not an object");
-    hv = (HV *)SvRV(self_sv);
-
-    store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-    id_str = SvPV(id_sv, id_len);
-
-    apophis_build_path(path, sizeof(path),
-                       store_dir, store_dir_len, id_str, id_len);
-
-    EXTEND(SP, 1);
-    PUSHs(apophis_stat(path, &st) == 0 ? &PL_sv_yes : &PL_sv_no);
-    PUTBACK;
-    return NORMAL;
-}
-
-/*
- * pp_apophis_fetch - Custom op: UUID → content scalar ref or undef
- *
- * Stack input:  self_sv, id_sv
- * Stack output: \$content or undef
- *
- * Fuses: path computation + stat + open + read into a single op.
- */
-static OP *
-pp_apophis_fetch(pTHX) {
-    dSP;
-    SV *id_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const char *store_dir;
-    STRLEN store_dir_len;
-    const char *id_str;
-    STRLEN id_len;
-    char path[APOPHIS_PATH_MAX];
-    apophis_stat_t st;
-
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_fetch: not an object");
-    hv = (HV *)SvRV(self_sv);
-
-    store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-    id_str = SvPV(id_sv, id_len);
-
-    apophis_build_path(path, sizeof(path),
-                       store_dir, store_dir_len, id_str, id_len);
-
-    EXTEND(SP, 1);
-    if (apophis_stat(path, &st) != 0) {
-        PUSHs(&PL_sv_undef);
-    } else {
-        PerlIO *fh = PerlIO_open(path, "rb");
-        if (!fh)
-            croak("Apophis: pp_fetch: cannot open '%s': %s",
-                  path, strerror(errno));
-
-        SV *content = newSV((STRLEN)st.st_size + 1);
-        SvPOK_on(content);
-        SSize_t nread = PerlIO_read(fh, SvPVX(content), (Size_t)st.st_size);
-        PerlIO_close(fh);
-
-        if (nread < 0) {
-            SvREFCNT_dec(content);
-            croak("Apophis: pp_fetch: read error on '%s'", path);
-        }
-        SvCUR_set(content, (STRLEN)nread);
-        *SvEND(content) = '\0';
-
-        PUSHs(sv_2mortal(newRV_noinc(content)));
-    }
-    PUTBACK;
-    return NORMAL;
-}
-
-/*
- * pp_apophis_verify - Custom op: fused re-read + re-hash + compare
- *
- * Stack input:  self_sv, id_sv
- * Stack output: bool_sv
- *
- * Fuses: path computation + open + streaming SHA-1 + format + memcmp.
- */
-static OP *
-pp_apophis_verify(pTHX) {
-    dSP;
-    SV *id_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const unsigned char *ns;
-    const char *store_dir;
-    STRLEN store_dir_len;
-    const char *id_str;
-    STRLEN id_len;
-    char path[APOPHIS_PATH_MAX];
-    PerlIO *fh;
-    unsigned char uuid[16];
-    char recomputed[HORUS_FMT_STR_LEN + 1];
-
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_verify: not an object");
-    hv = (HV *)SvRV(self_sv);
-    ns = apophis_get_ns(aTHX_ hv);
-
-    store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-    id_str = SvPV(id_sv, id_len);
-
-    apophis_build_path(path, sizeof(path),
-                       store_dir, store_dir_len, id_str, id_len);
-
-    EXTEND(SP, 1);
-    fh = PerlIO_open(path, "rb");
-    if (!fh) {
-        PUSHs(&PL_sv_no);
-    } else {
-        apophis_identify_stream(aTHX_ uuid, ns, fh);
-        PerlIO_close(fh);
-
-        horus_format_uuid(recomputed, uuid, HORUS_FMT_STR);
-        PUSHs((id_len == HORUS_FMT_STR_LEN &&
-               memcmp(id_str, recomputed, HORUS_FMT_STR_LEN) == 0)
-              ? &PL_sv_yes : &PL_sv_no);
-    }
-    PUTBACK;
-    return NORMAL;
-}
-
-/*
- * pp_apophis_remove - Custom op: fused path + unlink + meta cleanup
- *
- * Stack input:  self_sv, id_sv
- * Stack output: bool_sv
- *
- * Fuses: path computation + unlink + meta sidecar cleanup.
- */
-static OP *
-pp_apophis_remove(pTHX) {
-    dSP;
-    SV *id_sv = POPs;
-    SV *self_sv = POPs;
-    HV *hv;
-    const char *store_dir;
-    STRLEN store_dir_len;
-    const char *id_str;
-    STRLEN id_len;
-    char path[APOPHIS_PATH_MAX];
-    int path_len;
-    char meta_path[APOPHIS_PATH_MAX];
-    int removed;
-
-    if (!sv_isobject(self_sv))
-        croak("Apophis: pp_remove: not an object");
-    hv = (HV *)SvRV(self_sv);
-
-    store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-    id_str = SvPV(id_sv, id_len);
-
-    path_len = apophis_build_path(path, sizeof(path),
-                                   store_dir, store_dir_len,
-                                   id_str, id_len);
-
-    removed = (unlink(path) == 0);
-
-    apophis_build_meta_path(meta_path, sizeof(meta_path),
-                            path, path_len);
-    unlink(meta_path);  /* ignore error — may not exist */
-
-    EXTEND(SP, 1);
-    PUSHs(removed ? &PL_sv_yes : &PL_sv_no);
-    PUTBACK;
-    return NORMAL;
-}
-
-/*
- * apophis_make_custom_op - Create a custom OP node
- *
- * Used by the optimize/import system to inject custom ops into optrees.
- */
-static OP *
-apophis_make_custom_op(pTHX_ OP *(*pp_func)(pTHX))
+static bool
+ap_ops_in_scope(pTHX)
 {
-    OP *op;
-    NewOp(1101, op, 1, OP);
-    op->op_type = OP_CUSTOM;
-    op->op_ppaddr = pp_func;
-    op->op_next = op;  /* will be linked by caller */
-    op->op_flags = OPf_WANT_SCALAR;
-    return op;
+    SV **ent = hv_fetchs(GvHV(PL_hintgv), AP_HINT_KEY, 0);
+    return ent && SvTRUE(*ent);
+}
+
+/* entersub's own check has run. A method call to one of the names, with
+ * no more kids than the invocant and the one argument, becomes the op. */
+static Perl_check_t ap_next_ck_entersub;
+
+static OP *
+ap_ck_entersub(pTHX_ OP *o)
+{
+    OP *kid, *last = NULL;
+    SV *meth;
+    const char *name;
+    STRLEN len;
+    int nkids = 0;
+    size_t i;
+
+    o = ap_next_ck_entersub(aTHX_ o);
+    if (o->op_type != OP_ENTERSUB
+        || (o->op_private & (OPpENTERSUB_AMPER | OPpENTERSUB_DB))
+        || !ap_ops_in_scope(aTHX))
+        return o;
+
+    /* The kids, or the nulled list that holds them, as ck_subr reads them. */
+    kid = cUNOPo->op_first;
+    if (!OpHAS_SIBLING(kid))
+        kid = cUNOPx(kid)->op_first;
+    for (; kid; kid = OpSIBLING(kid)) {
+        last = kid;
+        nkids++;
+    }
+    /* pushmark, the invocant, the argument, the method */
+    if (last->op_type != OP_METHOD_NAMED || nkids > 4)
+        return o;
+
+#if PERL_VERSION_GE(5,22,0)
+    meth = cMETHOPx_meth(last);
+#else
+    meth = cSVOPx_sv(last);
+#endif
+    name = SvPV(meth, len);
+    for (i = 0; i < sizeof(ap_names) / sizeof(*ap_names); i++) {
+        if (len == ap_names[i].len && memEQ(name, ap_names[i].name, len)) {
+            o->op_type   = OP_CUSTOM;
+            o->op_ppaddr = ap_pp[ap_names[i].which];
+#if PERL_VERSION_GE(5,16,0)
+            /* A perl that gives entersub a pad slot of its own, as 5.40
+             * and 5.42 do, never reaches the allocation.
+             # uncoverable branch true
+             # uncoverable condition left count:1 */
+            if (!o->op_targ)
+                o->op_targ = pad_alloc(OP_ENTERSUB, SVs_PADTMP); /* # uncoverable statement */
+#endif
+            break;
+        }
+    }
+    return o;
+}
+
+/* Above the mark sit the invocant, the argument and the CV the method
+ * resolved to. The op takes the call when that CV is the XSUB it stands
+ * for, and then only. */
+static bool
+ap_op_mine(pTHX_ SV **mark, SV **sp, int which)
+{
+    SV *cv = *sp;
+    return sp - mark == 3
+        && SvTYPE(cv) == SVt_PVCV
+        && CvISXSUB((CV *)cv)
+        && CvXSUB((CV *)cv) == ap_xsub[which];
+}
+
+static const char *
+ap_op_who(SV *cv, int which)
+{
+    return ap_who[which][CvXSUBANY((CV *)cv).any_i32 ? 1 : 0];
+}
+
+/* The call site's pad slot, which the check above saw to. */
+static SV *
+ap_op_targ(pTHX)
+{
+    return PAD_SV(PL_op->op_targ);
+}
+
+/* The call is over. Its three values go, and the result takes their
+ * place unless nothing wanted one. */
+static OP *
+ap_op_leave(pTHX_ I32 markix, SV *result)
+{
+    dSP;
+    const I32 gimme = GIMME_V;
+
+    SP = PL_stack_base + markix;
+    if (gimme != G_VOID)
+        *++SP = result;
+    PUTBACK;
+    return NORMAL;
+}
+
+/* The mark is kept as an index: a body may read a tied or overloaded
+ * argument, and that can move the stack. */
+#define AP_OP_PROLOGUE(which)                                   \
+    dSP;                                                        \
+    const I32 markix = TOPMARK;                                 \
+    SV **mark = PL_stack_base + markix;                         \
+    const char *who;                                            \
+    if (!ap_op_mine(aTHX_ mark, SP, (which)))                   \
+        return PL_ppaddr[OP_ENTERSUB](aTHX);                    \
+    who = ap_op_who(*SP, (which));                              \
+    (void)POPMARK
+
+static OP *
+pp_apophis_identify(pTHX)
+{
+    unsigned char uuid[16];
+    char buf[HORUS_FMT_STR_LEN + 1];
+    SV *result;
+    AP_OP_PROLOGUE(AP_IDENTIFY);
+
+    apophis_do_identify(aTHX_ who, mark[1], mark[2], uuid);
+    horus_format_uuid(buf, uuid, HORUS_FMT_STR);
+    result = ap_op_targ(aTHX);
+    sv_setpvn(result, buf, HORUS_FMT_STR_LEN);
+    return ap_op_leave(aTHX_ markix, result);
+}
+
+static OP *
+pp_apophis_store(pTHX)
+{
+    char id_str[HORUS_FMT_STR_LEN + 1];
+    SV *result;
+    AP_OP_PROLOGUE(AP_STORE);
+
+    apophis_do_store(aTHX_ who, mark[1], mark[2], NULL, 2, id_str);
+    result = ap_op_targ(aTHX);
+    sv_setpvn(result, id_str, HORUS_FMT_STR_LEN);
+    return ap_op_leave(aTHX_ markix, result);
+}
+
+static OP *
+pp_apophis_exists(pTHX)
+{
+    AP_OP_PROLOGUE(AP_EXISTS);
+    return ap_op_leave(aTHX_ markix,
+        apophis_do_exists(aTHX_ who, mark[1], mark[2], NULL, 2) ? &PL_sv_yes : &PL_sv_no);
+}
+
+static OP *
+pp_apophis_fetch(pTHX)
+{
+    AP_OP_PROLOGUE(AP_FETCH);
+    return ap_op_leave(aTHX_ markix,
+        sv_2mortal(apophis_do_fetch(aTHX_ who, mark[1], mark[2], NULL, 2)));
+}
+
+static OP *
+pp_apophis_verify(pTHX)
+{
+    AP_OP_PROLOGUE(AP_VERIFY);
+    return ap_op_leave(aTHX_ markix,
+        apophis_do_verify(aTHX_ who, mark[1], mark[2], NULL, 2) ? &PL_sv_yes : &PL_sv_no);
+}
+
+static OP *
+pp_apophis_remove(pTHX)
+{
+    AP_OP_PROLOGUE(AP_REMOVE);
+    return ap_op_leave(aTHX_ markix,
+        apophis_do_remove(aTHX_ who, mark[1], mark[2], NULL, 2) ? &PL_sv_yes : &PL_sv_no);
+}
+
+/* Once for the process: the XSUBs behind the names, the ops' names for
+ * B and the debugger, and the hook on entersub's check. */
+static void
+ap_boot_ops(pTHX)
+{
+    int i;
+
+    for (i = 0; i < AP_NOPS; i++) {
+        CV *cv = get_cv(form("Apophis::%s", ap_method[i]), 0);
+        ap_xsub[i] = CvXSUB(cv);
+        XopENTRY_set(&ap_xop[i], xop_name, ap_xop_name[i]);
+        XopENTRY_set(&ap_xop[i], xop_desc, ap_xop_desc[i]);
+        XopENTRY_set(&ap_xop[i], xop_class, OA_UNOP);
+        Perl_custom_op_register(aTHX_ ap_pp[i], &ap_xop[i]);
+    }
+#if PERL_VERSION_GE(5,16,0)
+    wrap_op_checker(OP_ENTERSUB, ap_ck_entersub, &ap_next_ck_entersub);
+#else
+    if (!ap_next_ck_entersub) {
+        ap_next_ck_entersub = PL_check[OP_ENTERSUB];
+        PL_check[OP_ENTERSUB] = ap_ck_entersub;
+    }
+#endif
 }
 
 
@@ -743,38 +912,7 @@ apophis_make_custom_op(pTHX_ OP *(*pp_func)(pTHX))
 MODULE = Apophis  PACKAGE = Apophis
 
 BOOT:
-#if PERL_VERSION >= 14
-    /* Register custom ops with debug names */
-    XopENTRY_set(&apophis_xop_identify, xop_name, "apophis_identify");
-    XopENTRY_set(&apophis_xop_identify, xop_desc, "Apophis content identification (SHA-1 → UUID v5)");
-    XopENTRY_set(&apophis_xop_identify, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_identify, &apophis_xop_identify);
-
-    XopENTRY_set(&apophis_xop_store, xop_name, "apophis_store");
-    XopENTRY_set(&apophis_xop_store, xop_desc, "Apophis fused store (identify + mkdir + atomic write)");
-    XopENTRY_set(&apophis_xop_store, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_store, &apophis_xop_store);
-
-    XopENTRY_set(&apophis_xop_exists, xop_name, "apophis_exists");
-    XopENTRY_set(&apophis_xop_exists, xop_desc, "Apophis fused existence check (path + stat)");
-    XopENTRY_set(&apophis_xop_exists, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_exists, &apophis_xop_exists);
-
-    XopENTRY_set(&apophis_xop_fetch, xop_name, "apophis_fetch");
-    XopENTRY_set(&apophis_xop_fetch, xop_desc, "Apophis fused fetch (path + stat + read)");
-    XopENTRY_set(&apophis_xop_fetch, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_fetch, &apophis_xop_fetch);
-
-    XopENTRY_set(&apophis_xop_verify, xop_name, "apophis_verify");
-    XopENTRY_set(&apophis_xop_verify, xop_desc, "Apophis fused verify (read + re-hash + compare)");
-    XopENTRY_set(&apophis_xop_verify, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_verify, &apophis_xop_verify);
-
-    XopENTRY_set(&apophis_xop_remove, xop_name, "apophis_remove");
-    XopENTRY_set(&apophis_xop_remove, xop_desc, "Apophis fused remove (path + unlink + meta cleanup)");
-    XopENTRY_set(&apophis_xop_remove, xop_class, OA_BASEOP);
-    Perl_custom_op_register(aTHX_ pp_apophis_remove, &apophis_xop_remove);
-#endif
+    ap_boot_ops(aTHX);
 
 # ------------------------------------------------------------------ #
 # new(class, %args) -> blessed object                                  #
@@ -855,25 +993,12 @@ SV *
 identify(self, content_ref)
         SV *self
         SV *content_ref
+    ALIAS:
+        op_identify = 1
     PREINIT:
-        HV *hv;
-        const unsigned char *ns;
-        SV *content_sv;
-        const char *content;
-        STRLEN content_len;
         unsigned char uuid[16];
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::identify: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        if (!SvROK(content_ref))
-            croak("Apophis::identify: argument must be a scalar reference");
-        content_sv = SvRV(content_ref);
-        content = SvPV(content_sv, content_len);
-
-        apophis_identify_content(uuid, ns, content, content_len);
+        apophis_do_identify(aTHX_ ap_who[AP_IDENTIFY][ix], self, content_ref, uuid);
         RETVAL = apophis_uuid_to_sv(aTHX_ uuid);
     OUTPUT:
         RETVAL
@@ -948,7 +1073,7 @@ path_for(self, id, ...)
         store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
         id_str = SvPV(id, id_len);
 
-        path_len = apophis_build_path(path, sizeof(path),
+        path_len = apophis_path(path, sizeof(path),
                                        store_dir, store_dir_len,
                                        id_str, id_len);
         RETVAL = newSVpvn(path, path_len);
@@ -963,75 +1088,12 @@ SV *
 store(self, content_ref, ...)
         SV *self
         SV *content_ref
+    ALIAS:
+        op_store = 1
     PREINIT:
-        HV *hv;
-        HV *opts = NULL;
-        HV *meta = NULL;
-        const unsigned char *ns;
-        SV *content_sv;
-        const char *content;
-        STRLEN content_len;
-        unsigned char uuid[16];
         char id_str[HORUS_FMT_STR_LEN + 1];
-        const char *store_dir;
-        STRLEN store_dir_len;
-        char path[APOPHIS_PATH_MAX];
-        int path_len;
-        apophis_stat_t st;
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::store: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        if (!SvROK(content_ref))
-            croak("Apophis::store: argument must be a scalar reference");
-        content_sv = SvRV(content_ref);
-        content = SvPV(content_sv, content_len);
-
-        /* Parse opts */
-        if (items > 2) {
-            int i;
-            if ((items - 2) % 2 != 0)
-                croak("Apophis::store: odd number of optional arguments");
-            opts = newHV();
-            sv_2mortal((SV *)opts);
-            for (i = 2; i < items; i += 2) {
-                STRLEN klen;
-                const char *k = SvPV(ST(i), klen);
-                SV *v = ST(i+1);
-                if (strEQ(k, "meta") && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV) {
-                    meta = (HV *)SvRV(v);
-                } else {
-                    hv_store(opts, k, klen, SvREFCNT_inc(v), 0);
-                }
-            }
-        }
-
-        /* Identify content */
-        apophis_identify_content(uuid, ns, content, content_len);
-        horus_format_uuid(id_str, uuid, HORUS_FMT_STR);
-
-        /* Build path */
-        store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
-        path_len = apophis_build_path(path, sizeof(path),
-                                       store_dir, store_dir_len,
-                                       id_str, HORUS_FMT_STR_LEN);
-
-        /* CAS dedup: skip if already exists */
-        if (apophis_stat(path, &st) != 0) {
-            apophis_ensure_parent_dir(path);
-            apophis_atomic_write(aTHX_ path, content, content_len);
-        }
-
-        /* Write metadata sidecar if provided */
-        if (meta) {
-            char meta_path[APOPHIS_PATH_MAX];
-            apophis_build_meta_path(meta_path, sizeof(meta_path),
-                                    path, path_len);
-            apophis_meta_write(aTHX_ meta_path, meta);
-        }
-
+        apophis_do_store(aTHX_ ap_who[AP_STORE][ix], self, content_ref, &ST(0), items, id_str);
         RETVAL = newSVpvn(id_str, HORUS_FMT_STR_LEN);
     OUTPUT:
         RETVAL
@@ -1044,65 +1106,10 @@ SV *
 fetch(self, id, ...)
         SV *self
         SV *id
-    PREINIT:
-        HV *hv;
-        HV *opts = NULL;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        PerlIO *fh;
-        apophis_stat_t st;
-        SV *content;
-        SSize_t nread;
+    ALIAS:
+        op_fetch = 1
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::fetch: not an object");
-        hv = (HV *)SvRV(self);
-
-        if (items > 2) {
-            int i;
-            if ((items - 2) % 2 != 0)
-                croak("Apophis::fetch: odd number of optional arguments");
-            opts = newHV();
-            sv_2mortal((SV *)opts);
-            for (i = 2; i < items; i += 2) {
-                STRLEN klen;
-                const char *k = SvPV(ST(i), klen);
-                hv_store(opts, k, klen, SvREFCNT_inc(ST(i+1)), 0);
-            }
-        }
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        /* Check existence */
-        if (apophis_stat(path, &st) != 0) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            /* Read entire file */
-            fh = PerlIO_open(path, "rb");
-            if (!fh)
-                croak("Apophis::fetch: cannot open '%s': %s",
-                      path, strerror(errno));
-
-            content = newSV((STRLEN)st.st_size + 1);
-            SvPOK_on(content);
-            nread = PerlIO_read(fh, SvPVX(content), (Size_t)st.st_size);
-            PerlIO_close(fh);
-
-            if (nread < 0) {
-                SvREFCNT_dec(content);
-                croak("Apophis::fetch: read error on '%s'", path);
-            }
-            SvCUR_set(content, (STRLEN)nread);
-            *SvEND(content) = '\0';
-
-            RETVAL = newRV_noinc(content);
-        }
+        RETVAL = apophis_do_fetch(aTHX_ ap_who[AP_FETCH][ix], self, id, &ST(0), items);
     OUTPUT:
         RETVAL
 
@@ -1114,39 +1121,10 @@ bool
 exists(self, id, ...)
         SV *self
         SV *id
-    PREINIT:
-        HV *hv;
-        HV *opts = NULL;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        apophis_stat_t st;
+    ALIAS:
+        op_exists = 1
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::exists: not an object");
-        hv = (HV *)SvRV(self);
-
-        if (items > 2) {
-            int i;
-            if ((items - 2) % 2 != 0)
-                croak("Apophis::exists: odd number of optional arguments");
-            opts = newHV();
-            sv_2mortal((SV *)opts);
-            for (i = 2; i < items; i += 2) {
-                STRLEN klen;
-                const char *k = SvPV(ST(i), klen);
-                hv_store(opts, k, klen, SvREFCNT_inc(ST(i+1)), 0);
-            }
-        }
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        RETVAL = (apophis_stat(path, &st) == 0) ? TRUE : FALSE;
+        RETVAL = apophis_do_exists(aTHX_ ap_who[AP_EXISTS][ix], self, id, &ST(0), items);
     OUTPUT:
         RETVAL
 
@@ -1158,49 +1136,10 @@ bool
 remove(self, id, ...)
         SV *self
         SV *id
-    PREINIT:
-        HV *hv;
-        HV *opts = NULL;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        int path_len;
-        char meta_path[APOPHIS_PATH_MAX];
-        int removed;
+    ALIAS:
+        op_remove = 1
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::remove: not an object");
-        hv = (HV *)SvRV(self);
-
-        if (items > 2) {
-            int i;
-            if ((items - 2) % 2 != 0)
-                croak("Apophis::remove: odd number of optional arguments");
-            opts = newHV();
-            sv_2mortal((SV *)opts);
-            for (i = 2; i < items; i += 2) {
-                STRLEN klen;
-                const char *k = SvPV(ST(i), klen);
-                hv_store(opts, k, klen, SvREFCNT_inc(ST(i+1)), 0);
-            }
-        }
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        path_len = apophis_build_path(path, sizeof(path),
-                                       store_dir, store_dir_len,
-                                       id_str, id_len);
-
-        removed = (unlink(path) == 0);
-
-        /* Also remove metadata sidecar if it exists */
-        apophis_build_meta_path(meta_path, sizeof(meta_path),
-                                path, path_len);
-        unlink(meta_path);  /* ignore error — may not exist */
-
-        RETVAL = removed ? TRUE : FALSE;
+        RETVAL = apophis_do_remove(aTHX_ ap_who[AP_REMOVE][ix], self, id, &ST(0), items);
     OUTPUT:
         RETVAL
 
@@ -1212,54 +1151,10 @@ bool
 verify(self, id, ...)
         SV *self
         SV *id
-    PREINIT:
-        HV *hv;
-        HV *opts = NULL;
-        const unsigned char *ns;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        PerlIO *fh;
-        unsigned char uuid[16];
-        char recomputed[HORUS_FMT_STR_LEN + 1];
+    ALIAS:
+        op_verify = 1
     CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::verify: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        if (items > 2) {
-            int i;
-            if ((items - 2) % 2 != 0)
-                croak("Apophis::verify: odd number of optional arguments");
-            opts = newHV();
-            sv_2mortal((SV *)opts);
-            for (i = 2; i < items; i += 2) {
-                STRLEN klen;
-                const char *k = SvPV(ST(i), klen);
-                hv_store(opts, k, klen, SvREFCNT_inc(ST(i+1)), 0);
-            }
-        }
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        fh = PerlIO_open(path, "rb");
-        if (!fh) {
-            RETVAL = FALSE;
-        } else {
-            apophis_identify_stream(aTHX_ uuid, ns, fh);
-            PerlIO_close(fh);
-
-            horus_format_uuid(recomputed, uuid, HORUS_FMT_STR);
-            RETVAL = (id_len == HORUS_FMT_STR_LEN &&
-                      memcmp(id_str, recomputed, HORUS_FMT_STR_LEN) == 0)
-                     ? TRUE : FALSE;
-        }
+        RETVAL = apophis_do_verify(aTHX_ ap_who[AP_VERIFY][ix], self, id, &ST(0), items);
     OUTPUT:
         RETVAL
 
@@ -1326,7 +1221,7 @@ store_many(self, refs, ...)
             apophis_identify_content(uuid, ns, content, content_len);
             horus_format_uuid(id_str, uuid, HORUS_FMT_STR);
 
-            apophis_build_path(path, sizeof(path),
+            apophis_path(path, sizeof(path),
                                store_dir, store_dir_len,
                                id_str, HORUS_FMT_STR_LEN);
 
@@ -1388,7 +1283,7 @@ find_missing(self, ids, ...)
             if (!svp || !SvOK(*svp)) continue;
 
             id_str = SvPV(*svp, id_len);
-            apophis_build_path(path, sizeof(path),
+            apophis_path(path, sizeof(path),
                                store_dir, store_dir_len, id_str, id_len);
 
             if (apophis_stat(path, &st) != 0) {
@@ -1435,7 +1330,7 @@ meta(self, id, ...)
 
         store_dir = apophis_get_store_dir(aTHX_ hv, opts, &store_dir_len);
         id_str = SvPV(id, id_len);
-        path_len = apophis_build_path(path, sizeof(path),
+        path_len = apophis_path(path, sizeof(path),
                                        store_dir, store_dir_len,
                                        id_str, id_len);
         apophis_build_meta_path(meta_path, sizeof(meta_path),
@@ -1449,296 +1344,6 @@ meta(self, id, ...)
         }
     OUTPUT:
         RETVAL
-
-# ------------------------------------------------------------------ #
-# Custom op direct invocation XSUBs                                    #
-#                                                                      #
-# These call the pp_ functions directly, giving the same speedup      #
-# as injected custom ops but accessible as regular function calls.     #
-# ------------------------------------------------------------------ #
-
-# op_identify($self, \$content) -> UUID string
-# Calls pp_apophis_identify directly — no method dispatch.
-
-SV *
-op_identify(self, content_ref)
-        SV *self
-        SV *content_ref
-    PREINIT:
-        HV *hv;
-        const unsigned char *ns;
-        SV *content_sv;
-        const char *content;
-        STRLEN content_len;
-        unsigned char uuid[16];
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_identify: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        if (!SvROK(content_ref))
-            croak("Apophis::op_identify: argument must be a scalar reference");
-        content_sv = SvRV(content_ref);
-        content = SvPV(content_sv, content_len);
-
-        apophis_identify_content(uuid, ns, content, content_len);
-        RETVAL = apophis_uuid_to_sv(aTHX_ uuid);
-    OUTPUT:
-        RETVAL
-
-# op_store($self, \$content) -> UUID string
-# Fused identify + mkdir + atomic write — single call, no intermediates.
-
-SV *
-op_store(self, content_ref)
-        SV *self
-        SV *content_ref
-    PREINIT:
-        HV *hv;
-        const unsigned char *ns;
-        SV *content_sv;
-        const char *content;
-        STRLEN content_len;
-        unsigned char uuid[16];
-        char id_str[HORUS_FMT_STR_LEN + 1];
-        const char *store_dir;
-        STRLEN store_dir_len;
-        char path[APOPHIS_PATH_MAX];
-        apophis_stat_t st;
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_store: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        if (!SvROK(content_ref))
-            croak("Apophis::op_store: argument must be a scalar reference");
-        content_sv = SvRV(content_ref);
-        content = SvPV(content_sv, content_len);
-
-        apophis_identify_content(uuid, ns, content, content_len);
-        horus_format_uuid(id_str, uuid, HORUS_FMT_STR);
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len,
-                           id_str, HORUS_FMT_STR_LEN);
-
-        if (apophis_stat(path, &st) != 0) {
-            apophis_ensure_parent_dir(path);
-            apophis_atomic_write(aTHX_ path, content, content_len);
-        }
-
-        RETVAL = newSVpvn(id_str, HORUS_FMT_STR_LEN);
-    OUTPUT:
-        RETVAL
-
-# op_exists($self, $id) -> bool
-# Fused path computation + stat — single call.
-
-bool
-op_exists(self, id)
-        SV *self
-        SV *id
-    PREINIT:
-        HV *hv;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        apophis_stat_t st;
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_exists: not an object");
-        hv = (HV *)SvRV(self);
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        RETVAL = (apophis_stat(path, &st) == 0) ? TRUE : FALSE;
-    OUTPUT:
-        RETVAL
-
-# op_fetch($self, $id) -> \$content or undef
-# Fused path computation + stat + read — single call.
-
-SV *
-op_fetch(self, id)
-        SV *self
-        SV *id
-    PREINIT:
-        HV *hv;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        PerlIO *fh;
-        apophis_stat_t st;
-        SV *content;
-        SSize_t nread;
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_fetch: not an object");
-        hv = (HV *)SvRV(self);
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        if (apophis_stat(path, &st) != 0) {
-            RETVAL = &PL_sv_undef;
-        } else {
-            fh = PerlIO_open(path, "rb");
-            if (!fh)
-                croak("Apophis::op_fetch: cannot open '%s': %s",
-                      path, strerror(errno));
-
-            content = newSV((STRLEN)st.st_size + 1);
-            SvPOK_on(content);
-            nread = PerlIO_read(fh, SvPVX(content), (Size_t)st.st_size);
-            PerlIO_close(fh);
-
-            if (nread < 0) {
-                SvREFCNT_dec(content);
-                croak("Apophis::op_fetch: read error on '%s'", path);
-            }
-            SvCUR_set(content, (STRLEN)nread);
-            *SvEND(content) = '\0';
-
-            RETVAL = newRV_noinc(content);
-        }
-    OUTPUT:
-        RETVAL
-
-# op_verify($self, $id) -> bool
-# Fused read + streaming SHA-1 + compare — single call.
-
-bool
-op_verify(self, id)
-        SV *self
-        SV *id
-    PREINIT:
-        HV *hv;
-        const unsigned char *ns;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        PerlIO *fh;
-        unsigned char uuid[16];
-        char recomputed[HORUS_FMT_STR_LEN + 1];
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_verify: not an object");
-        hv = (HV *)SvRV(self);
-        ns = apophis_get_ns(aTHX_ hv);
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        apophis_build_path(path, sizeof(path),
-                           store_dir, store_dir_len, id_str, id_len);
-
-        fh = PerlIO_open(path, "rb");
-        if (!fh) {
-            RETVAL = FALSE;
-        } else {
-            apophis_identify_stream(aTHX_ uuid, ns, fh);
-            PerlIO_close(fh);
-
-            horus_format_uuid(recomputed, uuid, HORUS_FMT_STR);
-            RETVAL = (id_len == HORUS_FMT_STR_LEN &&
-                      memcmp(id_str, recomputed, HORUS_FMT_STR_LEN) == 0)
-                     ? TRUE : FALSE;
-        }
-    OUTPUT:
-        RETVAL
-
-# op_remove($self, $id) -> bool
-# Fused path + unlink + meta cleanup — single call.
-
-bool
-op_remove(self, id)
-        SV *self
-        SV *id
-    PREINIT:
-        HV *hv;
-        const char *store_dir;
-        STRLEN store_dir_len;
-        const char *id_str;
-        STRLEN id_len;
-        char path[APOPHIS_PATH_MAX];
-        int path_len;
-        char meta_path[APOPHIS_PATH_MAX];
-        int removed;
-    CODE:
-        if (!sv_isobject(self))
-            croak("Apophis::op_remove: not an object");
-        hv = (HV *)SvRV(self);
-
-        store_dir = apophis_get_store_dir(aTHX_ hv, NULL, &store_dir_len);
-        id_str = SvPV(id, id_len);
-        path_len = apophis_build_path(path, sizeof(path),
-                                       store_dir, store_dir_len,
-                                       id_str, id_len);
-
-        removed = (unlink(path) == 0);
-
-        apophis_build_meta_path(meta_path, sizeof(meta_path),
-                                path, path_len);
-        unlink(meta_path);  /* ignore error — may not exist */
-
-        RETVAL = removed ? TRUE : FALSE;
-    OUTPUT:
-        RETVAL
-
-# ------------------------------------------------------------------ #
-# Custom op introspection and testing                                  #
-# ------------------------------------------------------------------ #
-
-# _make_op($type) -> confirmation string
-# Creates a custom OP node and returns its pp_addr name for testing.
-
-SV *
-_make_op(type)
-        const char *type
-    CODE:
-        if (strEQ(type, "identify")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_identify);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_identify[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else if (strEQ(type, "store")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_store);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_store[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else if (strEQ(type, "exists")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_exists);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_exists[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else if (strEQ(type, "fetch")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_fetch);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_fetch[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else if (strEQ(type, "verify")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_verify);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_verify[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else if (strEQ(type, "remove")) {
-            OP *op = apophis_make_custom_op(aTHX_ pp_apophis_remove);
-            RETVAL = newSVpvf("CUSTOM_OP@apophis_remove[%p]", (void *)op->op_ppaddr);
-            FreeOp(op);
-        } else {
-            croak("Apophis::_make_op: unknown type '%s'", type);
-        }
-    OUTPUT:
-        RETVAL
-
 
 # ------------------------------------------------------------------ #
 # The public C ABI (ap_abi.h)                                          #
@@ -1759,46 +1364,101 @@ _abi_ptr()
     OUTPUT:
         RETVAL
 
-# _abi_selftest($store, \$content) -> ($id, $path)
+# _abi_selftest($store, \$content, $name, $fh)
+#   -> ($id, $path, $ns_of_name, $id_of_fh, $short_id_rc, $probe_rc, $probe_dirlen)
 #
 # Drives the table through its own function pointers, so the suite exercises
 # the ABI the way a consumer does rather than the way the XSUBs do. Writes the
 # blob, exactly as store() would. The test compares both answers against the
 # Perl API - two implementations of one algorithm agreeing is the assertion,
-# not an assumption.
+# not an assumption. The rest of the table rides along: the namespace derived
+# from $name, the id of what $fh reads, build_path's refusal of a short id, and
+# store_of asked for part of the store, as a consumer probing with NULLs does.
 
 void
-_abi_selftest(self, content_ref)
+_abi_selftest(self, content_ref, name, fh_sv)
         SV *self
         SV *content_ref
+        SV *name
+        SV *fh_sv
     PREINIT:
         const ap_abi *A = &AP_ABI;
         const unsigned char *ns = NULL;
+        const unsigned char *ns_only = NULL;
         const char *dir = NULL;
+        const char *dir_only = NULL;
         STRLEN dirlen = 0;
+        STRLEN only_len = 0;
         const char *content;
         STRLEN content_len;
+        const char *name_str;
+        STRLEN name_len;
         unsigned char id[16];
+        unsigned char ns_bytes[16];
+        unsigned char fh_id[16];
         char id_str[HORUS_FMT_STR_LEN + 1];
+        char ns_str[HORUS_FMT_STR_LEN + 1];
+        char fh_str[HORUS_FMT_STR_LEN + 1];
         char path[APOPHIS_PATH_MAX];
         int path_len;
+        int short_rc;
+        int probe_rc;
+        int null_rc;
     PPCODE:
         if (!A->store_of(aTHX_ self, &ns, &dir, &dirlen))
             croak("Apophis::_abi_selftest: not a store");
         if (!SvROK(content_ref))
             croak("Apophis::_abi_selftest: content must be a scalar reference");
         content = SvPV(SvRV(content_ref), content_len);
+        name_str = SvPV(name, name_len);
+
+        probe_rc = A->store_of(aTHX_ self, &ns_only, NULL, NULL)
+                 + A->store_of(aTHX_ self, NULL, &dir_only, NULL)
+                 + A->store_of(aTHX_ self, NULL, NULL, &only_len);
+        null_rc  = A->store_of(aTHX_ NULL, &ns_only, &dir_only, &only_len);
+
+        A->derive_ns(ns_bytes, name_str, name_len);
+        A->format_id(ns_str, ns_bytes);
 
         A->identify(id, ns, content, content_len);
         A->format_id(id_str, id);
 
+        short_rc = A->build_path(path, sizeof(path), dir, dirlen, id_str, 3);
         path_len = A->build_path(path, sizeof(path), dir, dirlen,
                                  id_str, HORUS_FMT_STR_LEN);
-        if (path_len < 0 || (size_t)path_len >= sizeof(path))
+        if (path_len < 0 || (size_t)path_len >= sizeof(path)) /* # uncoverable condition left count:1 */
             croak("Apophis::_abi_selftest: path too long");
 
         A->write_atomic(aTHX_ path, content, content_len);
 
-        EXTEND(SP, 2);
+        A->identify_fh(aTHX_ fh_id, ns, IoIFP(sv_2io(fh_sv)));
+        A->format_id(fh_str, fh_id);
+
+        EXTEND(SP, 8);
         PUSHs(sv_2mortal(newSVpvn(id_str, HORUS_FMT_STR_LEN)));
         PUSHs(sv_2mortal(newSVpvn(path, path_len)));
+        PUSHs(sv_2mortal(newSVpvn(ns_str, HORUS_FMT_STR_LEN)));
+        PUSHs(sv_2mortal(newSVpvn(fh_str, HORUS_FMT_STR_LEN)));
+        PUSHs(sv_2mortal(newSViv(short_rc)));
+        PUSHs(sv_2mortal(newSViv(probe_rc)));
+        PUSHs(sv_2mortal(newSVuv(only_len)));
+        PUSHs(sv_2mortal(newSViv(null_rc)));
+
+# _abi_write($path, \$content)
+#
+# The table's write_atomic on a path of the caller's choosing, as a consumer
+# that built its own path would call it.
+
+void
+_abi_write(path, content_ref)
+        const char *path
+        SV *content_ref
+    PREINIT:
+        const char *content;
+        STRLEN content_len;
+    PPCODE:
+        if (!SvROK(content_ref))
+            croak("Apophis::_abi_write: content must be a scalar reference");
+        content = SvPV(SvRV(content_ref), content_len);
+        AP_ABI.write_atomic(aTHX_ path, content, content_len);
+        XSRETURN_EMPTY;

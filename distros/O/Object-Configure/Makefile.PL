@@ -25,42 +25,51 @@ WriteMakefile(
 	AUTHOR	=> 'Nigel Horne <njh@nigelhorne.com>',	# Author information
 	ABSTRACT_FROM	=> 'lib/Object/Configure.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) && ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-		? ('LICENSE'=> 'GPL')
+		? ('LICENSE'=> 'gpl_2')
 		: ()),
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {			# Dependencies (with versions)
+		'autodie' => 0,
 		'Carp' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'Config::Abstraction' => 0.38,
 		'File::Spec' => 0,
+		'File::stat' => 0,
+		'IPC::System::Simple' => 0,	# Needed by autodie's :system (via :all)
+		'List::Util' => 1.33,	# any()
 		'Log::Abstraction' => 0.26,
 		'mro' => 0,
 		'Params::Get' => 0.13,
+		'POSIX' => 0,
 		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
+		'Time::HiRes' => 0,
 	}, TEST_REQUIRES => {
-		'autodie' => 0,
 		'Errno' => 0,
 		'File::Temp' => 0,
-		'File::stat' => 0,
 		'IO::Handle' => 0,
-		'IPC::System::Simple' => 0,
-		'POSIX' => 0,
 		'Test::DescribeMe' => 0,
+		'Test::Exception' => 0,
 		'Test::Mockingbird' => 0.10,
+		'Test::More' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Returns' => 0,
 		'Test::Without::Module' => 0,
-		'Time::HiRes' => 0,
 		'YAML::XS' => 0,
 	}, dist => $dist,
 	clean	 => { FILES => 'Object-Configure-*', },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
+		prereqs => {
+			test => {
+				recommends => {
+					'Test::Memory::Cycle' => 0,	# t/function.t skips without it
+				},
+			},
+		},
 		resources => {
 			homepage => 'https://metacpan.org/pod/Object::Configure',
 			repository => {
@@ -77,5 +86,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION => '5.008'
+	MIN_PERL_VERSION => '5.010'	# The // operator needs 5.10
 );

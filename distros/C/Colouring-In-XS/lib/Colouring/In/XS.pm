@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 require XSLoader;
 XSLoader::load('Colouring::In::XS', $VERSION);
@@ -21,10 +21,8 @@ sub import {
 
 sub include_dir {
         my $dir = $INC{'Colouring/In/XS.pm'};
-        # Installed: .../Colouring/In/XS.pm → .../Colouring/In/XS/include
         (my $installed = $dir) =~ s{XS\.pm$}{XS/include};
         return $installed if -d $installed;
-        # Development: lib/Colouring/In/XS.pm → include
         (my $dev = $dir) =~ s{lib/Colouring/In/XS\.pm$}{include};
         return $dev if -d $dev;
         return $installed;
@@ -58,7 +56,7 @@ Colouring::In::XS - color or colour.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
@@ -305,6 +303,34 @@ Validate that the passed colour is a color.
 
 	my $valid = $colour->validate('#abc'); # valid
 	my $invalid = $colour->validate('#xyz'); # invalid
+
+=cut
+
+=head2 include_dir
+
+Returns the directory holding colouring.h, the C colour library this module
+is built on, for another XS module to compile against.
+
+	my $dir = Colouring::In::XS->include_dir;
+
+=cut
+
+=head2 set_messages
+
+Stores a hash reference of messages for validate to use. A hash reference as
+the last argument of the use line is passed here.
+
+	Colouring::In::XS::set_messages({ VALIDATE => 'yes', VALIDATE_ERROR => 'no' });
+
+	use Colouring::In::XS { VALIDATE => 'yes', VALIDATE_ERROR => 'no' };
+
+=cut
+
+=head2 get_message
+
+Returns the stored message for a key, or undef when there is none.
+
+	my $message = Colouring::In::XS::get_message('VALIDATE');
 
 =cut
 

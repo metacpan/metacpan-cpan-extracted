@@ -50,6 +50,7 @@
             "Pod::Usage" : "0",
             "Proc::ProcessTable" : "0",
             "Time::HiRes" : "0",
+            "Time::Piece::Guess" : "0",
             "URI" : "0",
             "XML::LibXML" : "0",
             "perl" : "5.014"
@@ -68,6 +69,6 @@
          "web" : "https://github.com/VVelox/Monitoring-Sneck-Checks"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

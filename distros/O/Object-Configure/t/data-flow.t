@@ -20,7 +20,6 @@ use File::Spec;
 use Scalar::Util qw(blessed isweak weaken refaddr);
 use Readonly;
 
-use lib '/home/njh/src/njh/Test-Returns/lib';
 use Test::Returns;
 
 BEGIN { use_ok('Object::Configure') }

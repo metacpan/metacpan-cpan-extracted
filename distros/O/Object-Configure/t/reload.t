@@ -11,6 +11,7 @@ use File::Temp qw(tempfile tempdir);
 use File::Spec;
 use Time::HiRes qw(sleep);
 use IO::Handle;
+use POSIX ();
 
 BEGIN { use_ok('Object::Configure'); }
 
@@ -342,5 +343,28 @@ END {
 	eval { Object::Configure::disable_hot_reload(); };
 	eval { Object::Configure::restore_signal_handlers(); };
 }
+
+# Regression: under autodie, kill() on a watcher that has already exited
+# threw "No such process" and left %_config_watchers populated
+subtest 'disable_hot_reload() copes with a watcher that has already exited' => sub {
+	plan tests => 2;
+
+	SKIP: {
+		skip 'Hot reload is not supported on Windows', 2 if $^O eq 'MSWin32';
+
+		my $pid = fork();
+		die "fork: $!" unless defined $pid;
+		if($pid == 0) {
+			POSIX::_exit(0);
+		}
+		waitpid($pid, 0);	# reaped, so kill() will fail with ESRCH
+
+		local %Object::Configure::_config_watchers = (pid => $pid);
+
+		lives_ok { Object::Configure::disable_hot_reload() }
+			'no exception when the watcher is already gone';
+		ok(!%Object::Configure::_config_watchers, 'watcher state cleared');
+	}
+};
 
 done_testing();

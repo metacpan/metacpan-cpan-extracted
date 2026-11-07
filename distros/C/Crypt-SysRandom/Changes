@@ -1,5 +1,9 @@
 Revision history for Crypt-SysRandom
 
+0.008     2026-11-06 17:02:33+01:00 Europe/Brussels
+          - Add random_hex, random_base64, random_base64url and
+          random_uuid functions
+
 0.007     2025-02-05 21:07:16+01:00 Europe/Brussels
           - Put implementations into named subs
 

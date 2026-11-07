@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Discord::Client::Model';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 sub username { $_[0]->get('username') }
 sub mention { '<@' . $_[0]->id . '>' }
 

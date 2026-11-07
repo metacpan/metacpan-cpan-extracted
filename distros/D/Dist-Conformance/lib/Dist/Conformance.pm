@@ -1,4 +1,4 @@
-package Dist::Conformance 0.002;
+package Dist::Conformance 0.003;
 
 # ABSTRACT: Whether the development harness of a repository conforms to its standards, and bringing it up to date
 
@@ -62,7 +62,7 @@ sub skipped ($self) {
     );
     if (@wrong) {
         my $name = $flavor->name;
-        die join( "\n", "$Dist::Conformance::Config::FILE is not valid:", map { "  $_: names a check that the flavor $name does not run" } @wrong ), "\n";
+        Dist::Conformance::Schema::refuse( $Dist::Conformance::Config::FILE, map { "$_: names a check that the flavor $name does not run" } @wrong );
     }
     return { map { $_ => 1 } @{ $config->{skip} } };
 }
@@ -160,7 +160,7 @@ Dist::Conformance - Whether the development harness of a repository conforms to 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ use Devel::XSCover::XS ();
 use Devel::XSCover::Gcov ();
 use Devel::XSCover::DB ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our (%DEFAULTS);
 
@@ -92,6 +92,11 @@ sub tests   { @{ $_[0]{test} } }
 sub plains  { @{ $_[0]{plain} } }
 sub timeout { $_[0]{timeout} || 0 }
 sub ignores { @{ $_[0]{ignore} } }
+
+sub ignored {
+    my ($self, $path) = @_;
+    return scalar grep { $path =~ /$_/ } $self->ignores;
+}
 sub keep    { $_[0]{keep} ? 1 : 0 }
 sub dry     { $_[0]{dry} ? 1 : 0 }
 sub silent  { $_[0]{silent} ? 1 : 0 }
@@ -141,7 +146,7 @@ sub run {
     $self->_say("xs_cover: removed $stale stale counter file" . ($stale == 1 ? '' : 's') . ' left by an earlier run') if $stale;
     $status = $test->run;
     warn "xs_cover: the tests failed with status $status, reporting what ran\n" if $status;
-    my @maps   = Devel::XSCover::XS->new(dir => $self->{dir}, skip => $self->skip_dirs)->read;
+    my @maps   = grep { !$self->ignored($_->{c}) } Devel::XSCover::XS->new(dir => $self->{dir}, skip => $self->skip_dirs)->read;
     my $reader = Devel::XSCover::Gcov->new(%common, gcov => $build->gcov_command, conditions => $build->conditions, flow => $build->flow_kind, ignore => $self->{ignore},
         generated => [ map { $_->{c} } @maps ], xsubs => { map { my $m = $_; map { $_ => $m->{xsubs}{$_}{file} } keys %{ $m->{xsubs} } } @maps },
         inverse => { map { %{ $_->{inverse} || {} } } @maps },
@@ -446,6 +451,14 @@ The seconds a test run may take, zero for no limit.
 =head2 ignores
 
 The patterns added to the default ignore list, as a list.
+
+=head2 ignored
+
+    if ($xs_cover->ignored('t/consumer/Consumer.c')) { ... }
+
+True when a path matches one of those patterns. The XS maps of a generated C
+file that does are left out, so a test's own XS module is neither a source
+of the report nor a subroutine in it.
 
 =head2 keep
 

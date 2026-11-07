@@ -19,7 +19,6 @@ use Scalar::Util qw(blessed isweak weaken);
 use Readonly;
 use POSIX        qw(WNOHANG);
 
-use lib '/home/njh/src/njh/Test-Returns/lib';
 use Test::Returns;
 
 BEGIN { use_ok('Object::Configure') }

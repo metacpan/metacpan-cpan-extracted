@@ -13,7 +13,7 @@ use Discord::Client::Gateway::IdentifyLimiter;
 use Discord::Client::REST;
 use Discord::Client::Error;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ( $class, %args ) = @_;

@@ -7,7 +7,7 @@ use warnings;
 use File::Find ();
 use File::Spec ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our ($KEYWORDS);
 
@@ -149,6 +149,7 @@ sub declaration_line {
 sub find_declaration {
     my ($self, $files, $perl_name) = @_;
     my ($package, $sub) = $perl_name =~ /^(?:(.*)::)?(\w+)$/;
+    return unless defined $sub;
     $package //= '';
     for my $file (@$files) {
         my $current = '';

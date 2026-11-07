@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ToolConfiguration 0.002;
+package Dist::Conformance::Check::ToolConfiguration 0.003;
 
 # ABSTRACT: The configuration files of the tools exist
 
@@ -50,7 +50,7 @@ Dist::Conformance::Check::ToolConfiguration - The configuration files of the too
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

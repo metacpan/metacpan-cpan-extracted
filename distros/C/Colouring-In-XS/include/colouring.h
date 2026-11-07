@@ -113,7 +113,11 @@ static colouring_rgba_t colouring_hex2rgb(const char *hex) {
     int l;
     c.a = 1.0;
 
-    /* skip leading '#' if present */
+    /* skip leading '#' if present; colouring_parse only sends a string that
+     * has one, a caller of this function alone may not */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right */
     if (hex[0] == '#') hex++;
     l = (int)strlen(hex);
 

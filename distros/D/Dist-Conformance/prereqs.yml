@@ -4,3 +4,5 @@
 runtime:
   requires:
     perl: '5.040'
+    # x-errorMessage, which a schema of a flavor can use.
+    JSON::Validator::Schema::Troglodyne: '1.001'

@@ -31,7 +31,6 @@ use File::Temp   qw(tempdir);
 use Scalar::Util qw(blessed);
 use Carp         qw(croak);
 use Readonly;
-use lib '/home/njh/src/njh/Test-Returns/lib';
 use Test::Returns;
 
 use Object::Configure;

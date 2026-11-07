@@ -15,6 +15,7 @@ lib/Monitoring/Sneck/Checks/disk.pm
 lib/Monitoring/Sneck/Checks/dns.pm
 lib/Monitoring/Sneck/Checks/dns_sync.pm
 lib/Monitoring/Sneck/Checks/file_age.pm
+lib/Monitoring/Sneck/Checks/file_content.pm
 lib/Monitoring/Sneck/Checks/file_handles.pm
 lib/Monitoring/Sneck/Checks/file_mode.pm
 lib/Monitoring/Sneck/Checks/hosts.pm
@@ -24,11 +25,13 @@ lib/Monitoring/Sneck/Checks/https_cert.pm
 lib/Monitoring/Sneck/Checks/interface.pm
 lib/Monitoring/Sneck/Checks/jails.pm
 lib/Monitoring/Sneck/Checks/kernel_modules.pm
+lib/Monitoring/Sneck/Checks/linux_ras.pm
 lib/Monitoring/Sneck/Checks/listening.pm
 lib/Monitoring/Sneck/Checks/load.pm
 lib/Monitoring/Sneck/Checks/log.pm
 lib/Monitoring/Sneck/Checks/memory.pm
 lib/Monitoring/Sneck/Checks/mount.pm
+lib/Monitoring/Sneck/Checks/mtime.pm
 lib/Monitoring/Sneck/Checks/neighbors.pm
 lib/Monitoring/Sneck/Checks/ntp.pm
 lib/Monitoring/Sneck/Checks/oom.pm
@@ -83,6 +86,8 @@ t/data/containers/docker_denied
 t/data/file_age/age
 t/data/file_age/db-2026-10-30.sql
 t/data/file_age/db-2026-10-31.sql
+t/data/file_content/logrotate
+t/data/file_content/logrotate_not_executable
 t/data/file_handles/proc/sys/fs/file-nr
 t/data/file_mode/secret
 t/data/hosts/bad_hosts
@@ -97,11 +102,15 @@ t/data/kernel_modules/kldstat
 t/data/kernel_modules/modprobe.d/cis.conf
 t/data/kernel_modules/modules/6.12.48/modules.builtin
 t/data/kernel_modules/proc/modules
+t/data/linux_ras/ras-mc-ctl
+t/data/linux_ras/ras-mc-ctl_errors
+t/data/linux_ras/ras-mc-ctl_failing
 t/data/mount/fstab
 t/data/mount/fstab.freebsd
 t/data/mount/mount
 t/data/mount/proc/mounts
 t/data/mount/proc_ro/mounts
+t/data/mtime/app
 t/data/packages/pkg
 t/data/packages/status
 t/data/pid_file/junk.pid

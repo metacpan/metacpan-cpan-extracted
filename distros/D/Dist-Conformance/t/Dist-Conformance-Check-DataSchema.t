@@ -29,15 +29,31 @@ subtest check => sub {
 };
 
 subtest format => sub {
-    is( check_of( Fixture::checkout( 'conf.yml' => "before_edit: {}\n" ), file => 'conf.yml' ),                [ 'pass', 'valid' ],                                                                                                  'a .yml file is read as YAML' );
-    is( check_of( Fixture::checkout( 'conf.YAML' => "before_edit: []\n" ), file => 'conf.YAML' ),              [ 'fail', match(qr/\/before_edit:\ Expected\ object/) ],                                                              'and so is a .yaml file, whatever its case' );
-    is( check_of( Fixture::checkout( 'conf.yml' => "- a\n" ), file => 'conf.yml' ),                            [ 'fail', 'conf.yml does not hold a mapping at its top level' ],                                                      'YAML that is not a mapping fails' );
-    is( check_of( Fixture::checkout( '.perl-slop.json' => "before_edit: {}\n" ) ),                             [ 'fail', match(qr/does\ not\ parse\ as\ JSON/) ],                                                                    'a .json file is read as JSON, even when it holds YAML' );
-    is( check_of( Fixture::checkout( '.perl-slop.json' => "before_edit: {}\n" ), format => 'yaml' ),           [ 'pass', 'valid' ],                                                                                                  'unless format says otherwise' );
-    is( check_of( Fixture::checkout( 'config' => '{"before_edit":{}}' ), file => 'config', format => 'json' ), [ 'pass', 'valid' ],                                                                                                  'a file with no extension takes a format' );
-    is( dies { config_check( file => 'config' ) },                                                             "the check DataSchema is not valid:\n  /format: config does not end in .json, .yml or .yaml, so give json or yaml\n", 'and cannot be read without one' );
-    like( dies { config_check( file   => 'conf.ini' ) }, qr/\/format:\ conf[.]ini\ /,  'nor can one with an extension that names no format' );
-    like( dies { config_check( format => 'toml' ) },     qr/\/format:\ Not\ in\ enum/, 'a format that the check does not parse is refused' );
+    is( check_of( Fixture::checkout( 'conf.yml' => "before_edit: {}\n" ), file => 'conf.yml' ),                [ 'pass', 'valid' ],                                                                                                             'a .yml file is read as YAML' );
+    is( check_of( Fixture::checkout( 'conf.YAML' => "before_edit: []\n" ), file => 'conf.YAML' ),              [ 'fail', match(qr/\/before_edit:\ Expected\ object/) ],                                                                         'and so is a .yaml file, whatever its case' );
+    is( check_of( Fixture::checkout( 'conf.yml' => "- a\n" ), file => 'conf.yml' ),                            [ 'fail', 'conf.yml does not hold a mapping at its top level' ],                                                                 'YAML that is not a mapping fails' );
+    is( check_of( Fixture::checkout( '.perl-slop.json' => "before_edit: {}\n" ) ),                             [ 'fail', match(qr/does\ not\ parse\ as\ JSON/) ],                                                                               'a .json file is read as JSON, even when it holds YAML' );
+    is( check_of( Fixture::checkout( '.perl-slop.json' => "before_edit: {}\n" ), format => 'yaml' ),           [ 'pass', 'valid' ],                                                                                                             'unless format says otherwise' );
+    is( check_of( Fixture::checkout( 'config' => '{"before_edit":{}}' ), file => 'config', format => 'json' ), [ 'pass', 'valid' ],                                                                                                             'a file with no extension takes a format' );
+    is( dies { config_check( file => 'config' ) },                                                             "the check DataSchema is not valid:\n  /format: config does not end in .json, .yml, .yaml or .ini, so give json, yaml or ini\n", 'and cannot be read without one' );
+    like( dies { config_check( file   => 'conf.toml' ) }, qr/\/format:\ conf[.]toml\ /, 'nor can one with an extension that names no format' );
+    like( dies { config_check( format => 'toml' ) },      qr/\/format:\ Not\ in\ enum/, 'a format that the check does not parse is refused' );
+};
+
+subtest ini => sub {
+    my %dist_ini = (
+        file   => 'dist.ini',
+        schema => {
+            type              => 'object',
+            properties        => { 'Run::Test'                 => { type => 'object', properties => { run  => { type => 'array' } } } },
+            patternProperties => { '\AGithubMeta(?:\s*/.*)?\z' => { type => 'object', properties => { user => { not  => {} } } } },
+        },
+    );
+    my $ini = "name = Foo\n[Run::Test]\nrun = a\nrun = b\n[GithubMeta]\nissues = 1\n";
+    is( check_of( Fixture::checkout( 'dist.ini' => $ini ),                              %dist_ini ), [ 'pass', 'valid' ],                                            'a .ini file is read as INI, with a repeated key as a list' );
+    is( check_of( Fixture::checkout( 'dist.ini' => "${ini}user = someone\n" ),          %dist_ini ), [ 'fail', match(qr{\ /GithubMeta/user:\ }) ],                   'and a key that the schema refuses is named, with its section' );
+    is( check_of( Fixture::checkout( 'dist.ini' => "[GithubMeta / Meta]\nuser = x\n" ), %dist_ini ), [ 'fail', match(qr{\ /GithubMeta\ ~1\ Meta/user:\ }) ],         'a section of a plugin with a name of its own is a key of its own' );
+    is( check_of( Fixture::checkout( 'dist.ini' => "[GithubMeta\n" ),                   %dist_ini ), [ 'fail', match(qr/\Adist[.]ini\ does\ not\ parse\ as\ INI/) ], 'and one that does not parse fails' );
 };
 
 subtest update => sub {

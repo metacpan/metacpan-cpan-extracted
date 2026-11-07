@@ -585,12 +585,17 @@ subtest 'configure() - API: does not clobber caller $@' => sub {
 subtest 'configure() - API: does not clobber alarm()' => sub {
 	plan tests => 2;
 
-	alarm(120);
-	lives_ok { Object::Configure::configure('Test::AlarmCheck', {}) }
-		'configure() runs successfully while alarm is active';
-	my $remaining = alarm(0);    # cancel and capture remaining time
+	SKIP: {
+		# Win32's alarm() emulation always returns 0 instead of the time remaining
+		skip 'alarm() does not report remaining time on Windows', 2 if $^O eq 'MSWin32';
 
-	ok($remaining > 0, 'alarm() countdown not reset by configure()');
+		alarm(120);
+		lives_ok { Object::Configure::configure('Test::AlarmCheck', {}) }
+			'configure() runs successfully while alarm is active';
+		my $remaining = alarm(0);    # cancel and capture remaining time
+
+		ok($remaining > 0, 'alarm() countdown not reset by configure()');
+	}
 };
 
 # --- _config_files arrayref metadata ---

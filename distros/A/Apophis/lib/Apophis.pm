@@ -4,10 +4,19 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load('Apophis', $VERSION);
+
+sub import { $^H{'Apophis/ops'} = 1; return }
+
+sub unimport { delete $^H{'Apophis/ops'}; return }
+
+for my $name (qw(identify store exists fetch verify remove)) {
+    no strict 'refs';
+    *{"B::Deparse::pp_apophis_$name"} = sub { $_[0]->pp_entersub($_[1], $_[2]) };
+}
 
 1;
 
@@ -21,7 +30,7 @@ Apophis - Content addressable storage with deterministic UUID v5 identifiers
 
 =head1 VERSION
 
-Version 0.05
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -159,6 +168,41 @@ Returns the subset of IDs that do not exist in the store.
     my $ns = $ca->namespace();
 
 Returns the namespace UUID string.
+
+=head1 CUSTOM OPS
+
+    use Apophis;
+    my $id = $ca->store(\$content);     # a custom op, not a sub call
+
+    { no Apophis; $ca->store(\$content) }   # an ordinary method call
+
+Under C<use Apophis>, a call to C<identify>, C<store>, C<exists>, C<fetch>,
+C<verify> or C<remove> with its one argument is compiled to a custom op in
+place of the usual C<entersub>. The op keeps the kids of the call it
+replaced, so the method is still looked up on the invocant at run time.
+When it resolves to this module's own XSUB, the op runs the body straight off
+the stack: no sub call, no C<@_>, and the result is written into the pad slot
+the call site already owns, so a call makes no new value to return.
+
+When it resolves to anything else, the op runs C<entersub> itself and the
+call behaves exactly as it would have. That covers a subclass that overrides
+the method, a sub installed over it, and a call that turns out to carry
+options, which the op does not take. A call made with C<&>, through a code
+ref, or with the method name in a variable is never converted. Nor is one
+compiled under the debugger.
+
+The conversion is lexical. C<no Apophis> ends it for the rest of the block
+or file, and C<use Apophis ()> loads the module without it. Calls compiled
+before the module was loaded stay ordinary calls.
+
+The C<op_identify>, C<op_store>, C<op_exists>, C<op_fetch>, C<op_verify> and
+C<op_remove> methods are aliases of the six, kept from when they were the
+only way to the fused bodies. They take the same options and are converted
+the same way.
+
+B names the ops C<apophis_identify> and so on from perl 5.14, and
+C<B::Deparse> shows each as the method call it was. F<bench/ops.pl> measures
+each op against the same call made as an ordinary method call.
 
 =head1 C ABI
 

@@ -268,10 +268,11 @@ package AnyEvent::MCP::Server::HTTP;
 
 use common::sense;
 use parent "AnyEvent::MCP::Server";
+use AnyEvent::Log ();
 use AnyEvent::Handle ();
 use AnyEvent::Socket ();
 use JSON::XS ();
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(refaddr weaken);
 use POSIX ();
 
 sub new {
@@ -454,6 +455,8 @@ sub _read {
          return unless $self;
 
          my $hdr = _parse_request_headers ($header);
+         $handle->{mcp_method} = $hdr ? substr ($hdr->{method}, 0, 32) : "-";
+         $handle->{mcp_root_get} = $hdr && $hdr->{method} eq "GET" && $hdr->{uri} eq "/";
          $handle->{mcp_close} = $self->{connection_close}
             || !$hdr || $hdr->{http_version} =~ m{\A1\.0+\z}
             || $hdr->{connection} =~ /\bclose\b/i;
@@ -639,6 +642,12 @@ sub _respond {
             $extra .= "$name: $value\r\n";
          }
       }
+   }
+
+   if ($status >= 400 && !$handle->{mcp_root_get}) {
+      AE::log warn => "MCP HTTP id=" . sprintf ("%x", refaddr $handle)
+         . (defined $handle->{mcp_remote} ? " remote=$handle->{mcp_remote}" : "")
+         . ": " . ($handle->{mcp_method} // "-") . " $status";
    }
 
    my $close = $handle->{mcp_close} || $status != 200 && $status != 202;

@@ -23,7 +23,7 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
 our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and Proc::ShellSubset::Large
   # (empty, post4-0.04: a string with no command, or only comments, runs as nothing, status 0, as in both shells; also eval '')
@@ -626,10 +626,19 @@ sub x_simple {
         $ONBUILTIN->($e->[0], \@argv, {%env}) if $ONBUILTIN;   # (measurement: doc/large-subset/tools/large-subset-builtins.pl)
         if ($SPECIAL{$argv[0]}) { setvar($c, $_, $env{$_}) or return for sort keys %env; %env = () }   # these settings stay
         return handler($e->[0])->($d, \@argv, \%env, sub { release_ctx($d); $k->(@_) }, $e->[1]) }
+      @argv = printf_zero(@argv) if $argv[0] eq 'printf';
       my $node = spawn($c, $m, \@argv, \%env, $k);
       $c->{sh}{job}{first} //= $node->{pid} if $node && $c->{sh}{job};
       release($_) for @$opened; after_start($tail) }) }) }) }
 
+sub printf_zero {   # the 0 flag of %s, %c, %b dropped from printf's format, as both shells (glibc's printf(3) ignores it; the
+  my @a = @_;       # flag is undefined for them in C and POSIX); the program printf (coreutils) refuses it (decision Z0, 2026-11-05)
+  my $i = ($a[1] // '') eq '--' ? 2 : 1;
+  return @a unless defined $a[$i] && $a[$i] !~ /^-/;   # printf -v ...: the program's, as decided (Q2)
+  $a[$i] =~ s{%(%|([-+ #0']*)(\*|[0-9]*)((?:\.(?:\*|[0-9]*))?)([a-zA-Z]))}{
+    my ($all, $fl, $w, $p, $cv) = ($1, $2, $3, $4, $5);
+    defined $cv && $cv =~ /^[scb]\z/ ? '%' . ($fl =~ tr/0//dr) . $w . $p . $cv : "%$all" }ge;
+  @a }
 sub builtin {   # : exit break continue read
   my ($c, $argv, $env, $k) = @_; my $m = $c->{map};
   my ($n, @a) = @$argv;

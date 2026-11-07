@@ -97,6 +97,8 @@ unshare -n perl $T/large-subset-runcompare.pl -j 4 samples.jsonl samples.tsv run
 unshare -n perl $T/large-subset-runcompare.pl -q -j 4 samples.jsonl samples.tsv qdir   # ours only, the programs' calls logged
 perl $T/large-subset-runreport.pl -q qdir -l $T/large-subset-run-differences.tsv rundir   # with and without coreutils
 unshare -n perl $T/large-subset-threeway.pl -l $T/large-subset-threeway-differences.tsv -db $T/large-subset-threeway-db.jsonl qdir
+unshare -n perl $T/large-subset-builtins.pl -l builtins.tsv -db builtins.jsonl qdir   # about 45 minutes; -reuse OLD.jsonl skips known calls
+perl $T/large-subset-runreport.pl -x -q qdir rundir                                     # the external calls
 ```
 
 ## 4. Record C: the shells' verdict on every parser test

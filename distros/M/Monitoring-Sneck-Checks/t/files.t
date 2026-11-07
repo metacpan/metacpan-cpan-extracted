@@ -5,6 +5,7 @@ use warnings;
 use FindBin;
 use lib $FindBin::Bin . '/lib';
 use Test::More;
+use POSIX ();
 use FakeDNS;
 use Monitoring::Sneck::Checks;
 
@@ -98,5 +99,46 @@ is(
 is( $run->( 'file_age', '-n', $data . '/file_age/backup-*', '-i' )->{code},    0, 'nothing matching with -i' );
 is( $run->( 'file_age', '-n', $data . '/file_age/db-*', '-f', $file )->{code}, 3, '--newest and --file' );
 is( $run->('file_age')->{code},                                                3, 'neither' );
+
+# file_content
+my $logrotate = $data . '/file_content/logrotate';
+$return = $run->( 'file_content', '-f', $logrotate, '-x', '-r', '/etc/logrotate\.conf' );
+is( $return->{code},   0,                                                     'file_content OK' );
+is( $return->{stdout}, 'FILE_CONTENT OK - ' . $logrotate . " looks good\n",   'file_content output' );
+is( $run->( 'file_content', '-f', $logrotate, '-r', '/etc/nope' )->{code}, 2, 'commented lines are skipped' );
+is( $run->( 'file_content', '-f', $logrotate, '-C', '^$', '-r', '/etc/nope' )->{code}, 0, '--comment' );
+is( $run->( 'file_content', '-f', $logrotate, '-R', 'logrotate\.conf' )->{code},       2, '--not-regex' );
+is( $run->( 'file_content', '-f', $data . '/file_content/nope' )->{code},              2, 'missing is CRITICAL' );
+is( $run->( 'file_content', '-f', $data . '/file_content/nope', '-A' )->{code},        0, '--absent, missing' );
+is( $run->( 'file_content', '-f', $logrotate, '-A' )->{code},                          2, '--absent, there' );
+is( $run->( 'file_content', '-f', $logrotate, '-A', '-x' )->{code}, 3, '--absent with others is UNKNOWN' );
+is( $run->( 'file_content', '-f', $logrotate, '-r', '(' )->{code},  3, 'bad regex is UNKNOWN' );
+like(
+	$run->( 'file_content', '-f', $data . '/file_content/logrotate_not_executable', '-x' )->{stdout},
+	qr/\AFILE_CONTENT CRITICAL - .* is not executable\n\z/,
+	'--executable'
+);
+
+# mtime, git not keeping mtimes, so they are set here
+my $app = $data . '/mtime/app';
+utime( 0, 1_000_000_000, $app );
+$return = $run->( 'mtime', '-m', '2023-06-22T00:00', '-f', $app );
+is( $return->{code},   2, 'mtime older is CRITICAL for le' );
+is( $return->{stdout}, "MTIME CRITICAL - mtime at or before 2023-06-22T00:00: $app\n",   'mtime output' );
+is( $run->( 'mtime', '-m', '2023-06-22T00:00', '-e', 'gt', '-f', $app )->{code},      0, 'mtime gt' );
+is( $run->( 'mtime', '-m', '2023-06-22T00:00', '-f', $data . '/mtime/nope' )->{code}, 3, 'mtime missing file' );
+is( $run->( 'mtime', '-m', 'nope', '-f', $app )->{code},                              3, 'mtime bad time' );
+is( $run->( 'mtime', '-m', '2023-06-22T00:00', '-e', 'eq', '-f', $app )->{code},      3, 'mtime bad equality' );
+is( $run->( 'mtime', '-m', '2023-06-22T00:00' )->{code},                              3, 'mtime without --file' );
+{
+	# a time without a zone is UTC, whatever the local zone is
+	local $ENV{TZ} = 'America/Chicago';
+	POSIX::tzset();
+	utime( 0, 1687392000, $app );
+	is( $run->( 'mtime', '-m', '2023-06-22T00:00', '-f', $app )->{code}, 2, 'mtime at the time, as UTC' );
+	utime( 0, 1687392001, $app );
+	is( $run->( 'mtime', '-m', '2023-06-22T00:00', '-f', $app )->{code}, 0, 'mtime a second after, as UTC' );
+}
+POSIX::tzset();
 
 done_testing();

@@ -103,8 +103,8 @@ SV *
 toCSS(self, ...)
 	SV * self
 	CODE:
-		int r = items > 1 ? SvIV(ST(1)) : 0;
-		int s = items > 2 ? SvIV(ST(2)) : 0;
+		int r = items > 1 && SvOK(ST(1)) ? SvIV(ST(1)) : 0;
+		int s = items > 2 && SvOK(ST(2)) ? SvIV(ST(2)) : 0;
 		colouring_rgba_t c = xs_extract_rgba(self);
 		double alpha = colouring_round(c.a, r);
 		if (alpha == 1) {
@@ -407,7 +407,7 @@ get_message(msg)
 		STRLEN klen;
 		const char * key = SvPV(msg, klen);
 		SV ** slot = msgs ? hv_fetch(msgs, key, klen, 0) : NULL;
-		RETVAL = (slot && *slot) ? newSVsv(*slot) : &PL_sv_undef;
+		RETVAL = (slot && *slot) ? newSVsv(*slot) : &PL_sv_undef; /* # uncoverable condition right count:2 */
 	OUTPUT:
 		RETVAL
 

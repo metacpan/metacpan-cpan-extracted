@@ -1,5 +1,5 @@
 package ExtUtils::Builder::BuildTools::Base;
-$ExtUtils::Builder::BuildTools::Base::VERSION = '0.037';
+$ExtUtils::Builder::BuildTools::Base::VERSION = '0.038';
 use strict;
 use warnings;
 
@@ -94,7 +94,7 @@ ExtUtils::Builder::BuildTools::Base - A base class for BuildTools implementation
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 DESCRIPTION
 

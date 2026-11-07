@@ -1,0 +1,16 @@
+^\.git
+^Makefile$
+^Makefile\.old$
+^blib/
+^pm_to_blib$
+^MYMETA\.
+^lib/Colouring/In/XS\.c$
+\.o$
+\.bs$
+\.gcda$
+\.gcno$
+^Colouring-In-XS-
+\.tar\.gz$
+\bcover_db\b
+\bcover_db\.gcov\b
+~$

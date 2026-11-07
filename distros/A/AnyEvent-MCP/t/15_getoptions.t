@@ -108,6 +108,8 @@ like $out, qr/--name NAME\s+Select named configuration/,
    "common --name option documented";
 like $out, qr/--token TOKEN\s+Set an accepted token/,
    "common repeatable token option documented";
+like $out, qr/-s, --set KEY=VALUE\s+Override a trusted instance setting/,
+   "shared short and long configuration override documented";
 
 unlike $out, qr/--listen/, "common parser does not advertise --listen";
 ($status, $out, $err) = command ($script, "--listen");
@@ -135,6 +137,35 @@ close $fh or die $!;
 is $status, 0, "named endpoint URL discovery succeeds";
 is $out, "http://127.0.0.1:31740/static/named/\n",
    "shared print-url retains named server path";
+
+($status, $out, $err) = command ('mcp_getoptions;', "--name", "named",
+   "--set", "path=/overridden/", "--bind", ":31740",
+   "--token", "static", "--print-url");
+is $status, 0, "--set overrides instance configuration for URL discovery";
+is $out, "http://127.0.0.1:31740/static/overridden/\n",
+   "shared configuration override affects the effective endpoint path";
+
+my $set_probe = 'mcp_getoptions; my $c = AnyEvent::MCP::Config->global; '
+   . 'print join "\\n", map { $c->{section}{"instance named"}{$_} } '
+   . 'qw(path executable.perl prepend-path), "\\n";';
+($status, $out, $err) = command ($set_probe, "--name", "named",
+   "--set", "path=/first/", "-s", "path=/last/",
+   "-s", "executable.perl=/special/perl=debug", "--set", "prepend-path=");
+is $status, 0, "repeated -s/--set accepts trusted instance keys";
+is $out, "/last/\n/special/perl=debug\n\n",
+   "last assignment wins; values retain equals signs and may be empty";
+
+($status, $out) = command ('mcp_getoptions;', "--name", "named",
+   "--bind", ":31740", "--token", "static", "--print-url");
+is $out, "http://127.0.0.1:31740/static/named/\n",
+   "process-local --set changes are not written back to global.ini";
+
+($status, $out, $err) = command ('mcp_getoptions;', "--set", "invalid");
+ok $status && $err =~ /Invalid --set KEY=VALUE/,
+   "--set rejects a missing equals sign";
+($status, $out, $err) = command ('mcp_getoptions;', "-s", "invalid key=value");
+ok $status && $err =~ /Invalid --set KEY=VALUE/,
+   "-s rejects whitespace in configuration keys";
 
 open $fh, ">>", "$dir/anyevent-mcp/global.ini" or die $!;
 print {$fh} "\n[instance secured]\ntls_cert = cert.pem\n";
@@ -449,14 +480,84 @@ my $error_probe = q{
    };
 };
 {
-   local $ENV{PERL_ANYEVENT_LOG} = "filter=warn";
+   local $ENV{PERL_ANYEVENT_LOG} = "filter=debug";
    ($status, $out, $err) = command ($error_probe);
 }
 is $status, 0, "connection error log probe exits cleanly";
+unlike $err, qr/MCP connection/, "connection errors are silent at debug level";
+{
+   local $ENV{PERL_ANYEVENT_LOG} = "filter=trace";
+   ($status, $out, $err) = command ($error_probe);
+}
+is $status, 0, "trace connection error log probe exits cleanly";
 like $err, qr/MCP connection id=[a-f0-9]+ remote=127\.0\.0\.1:12345 client="two\\nlines": Broken pipe\n/,
-   "connection errors identify the remote endpoint and escaped client name";
+   "trace connection errors identify the remote endpoint and escaped client name";
 like $err, qr/MCP connection id=[a-f0-9]+: Broken pipe\n/,
    "unidentified connections still receive a connection id";
+
+my $http_probe = q{
+   use AnyEvent;
+   use AnyEvent::Handle;
+   use AnyEvent::MCP::Server::HTTP;
+   use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
+
+   my $server = AnyEvent::MCP::Server::HTTP->new (
+      tokens => ["real-token"],
+      on_http_request => sub {
+         my ($server, $req, $reply) = @_;
+         return 0 unless $req->{uri} eq "/health";
+         $reply->(200, "OK", {}, "ok");
+         1
+      },
+   );
+   my $timeout = AE::timer 5, 0, sub { die "HTTP probe timed out\n" };
+
+   for my $request (
+      "GET / HTTP/1.1\r\nContent-Length: 0\r\n\r\n",
+      "GET /guess-token/mcp/ HTTP/1.1\r\nContent-Length: 0\r\n\r\n",
+      "POST /mcp/ HTTP/1.1\r\nContent-Length: 0\r\nAuthorization: Bearer wrong-token\r\n\r\n",
+      "POST /real-token/mcp/ HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: 1\r\n\r\n!",
+      "GET /health HTTP/1.1\r\nContent-Length: 0\r\n\r\n",
+      "malformed\r\n\r\n",
+   ) {
+      socketpair my $a, my $b, AF_UNIX, SOCK_STREAM, PF_UNSPEC or die $!;
+      my $handle = $server->accept ($a);
+      $handle->{mcp_remote} = "192.0.2.1:1234";
+      my $client = AnyEvent::Handle->new (fh => $b, on_error => sub { die $_[2] });
+      my $done = AE::cv;
+
+      $client->push_write ($request);
+      $client->push_read (line => "\r\n\r\n", sub {
+         my ($handle, $header) = @_;
+         die "GET / must return 404\n"
+            if $request =~ m{\AGET / HTTP/} && $header !~ m{\AHTTP/1\.1 404 };
+         my ($length) = $header =~ /Content-Length: ([0-9]+)/i;
+         defined $length or die "HTTP response missing content length\n";
+         $handle->push_read (chunk => $length, sub { $done->send });
+      });
+
+      $done->recv;
+      $client->destroy;
+   }
+
+   $server->close;
+};
+{
+   local $ENV{PERL_ANYEVENT_LOG} = "filter=warn";
+   ($status, $out, $err) = command ($http_probe);
+}
+is $status, 0, "HTTP rejection log probe exits cleanly";
+like $err, qr/MCP HTTP id=[a-f0-9]+ remote=192\.0\.2\.1:1234: GET 404\n/,
+   "unknown endpoint logged with method, peer and status";
+like $err, qr/MCP HTTP id=[a-f0-9]+ remote=192\.0\.2\.1:1234: POST 401\n/,
+   "rejected bearer token logged";
+like $err, qr/MCP HTTP id=[a-f0-9]+ remote=192\.0\.2\.1:1234: POST 400\n/,
+   "invalid JSON request logged";
+like $err, qr/MCP HTTP id=[a-f0-9]+ remote=192\.0\.2\.1:1234: - 400\n/,
+   "malformed HTTP request logged without method";
+is scalar (() = $err =~ /MCP HTTP id=/g), 4, "GET / and successful HTTP responses are not logged";
+unlike $err, qr/real-token|wrong-token|guess-token|\/health/,
+   "HTTP log omits credential-bearing paths and Authorization headers";
 
 ($status, $out, $err) = command ($log_probe, "--quiet");
 is $status, 0, "--quiet exits normally";

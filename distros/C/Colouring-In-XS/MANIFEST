@@ -7,6 +7,7 @@ lib/Colouring/In/XS.pm
 lib/Colouring/In/XS.xs
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 META.json			Module JSON meta-data (added by MakeMaker)
 META.yml			Module YAML meta-data (added by MakeMaker)
 README
@@ -30,6 +31,11 @@ t/18-desaturate.t
 t/19-greyscale.t
 t/20-method-name-collision.t
 t/21-peep-loop.t
+t/22-methods.t
+t/23-by-name.t
+t/24-parse-edges.t
+t/25-messages.t
+t/26-include-dir.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

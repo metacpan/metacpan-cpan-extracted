@@ -140,4 +140,57 @@ The user's rule: **what Windows can do fully and natively is implemented; everyt
   - fds 3 and up through the C runtime's `lpReserved2`: per call and thread-safe, but only children built on that runtime read it; decided earlier as W1–W3 (Go), with programs known to ignore it (`java`, `javaw`) refused such fds.
 - **Not implemented:** `umask`, a non-empty `sigmask`, ignoring signals in the child, `pgroup => PGID` (joining a group), `setsid`, `tcsetpgrp`, `sched`, `cgroup`.
 - **Already defined by Perl on Windows, so used as they are:** the command line built from the argument list (`create_command_line()`, the quoting of multi-arg `system`), the status (`((U8) exitcode) << 8`, from `win32_waitpid()`), and waiting for children (`win32_msgwait()` over the process handles).
+- **What spawn does when the primitive lacks a setting (post-0.06; the user, 2026-11-05).** `$Proc::Spawner::MISSING` is a bitmap of the settings the primitive does not do itself: what this build's libc lacks (`Proc::Spawner::__native()` lists what it has), plus `PROC_SPAWNER_MISSING` (names, for tests). `Proc::Spawner::spawn` (which wraps the XSUB `__posix_spawn`) does each missing one in this process, around the call, and undoes it afterwards; this is bullet-proof only with one thread, as the umask always was. A setting that cannot be done so is unsupported: dropped or failed, as `UNSUPPORTED` says.
+
+| Setting | posix_spawn (glibc 2.39) | Windows, natively (`CreateProcessW`) | When missing: done around the call |
+|---|---|---|---|
+| `dup2`, `close`, `open`, `closefrom` (the child's fds) | yes (`closefrom`: 2.34) | fds 0-2 (`STARTUPINFO`), the handle list (`close`, `closefrom`), a file opened by the parent; fds 3 and up through the C runtime's `lpReserved2` | this process arranges its own fds as the child should have them (`close`: close-on-exec), saving and putting back what it changes; one of the four missing means all four, and `chdir`, `fchdir` too (the actions keep their order) |
+| `chdir`, `fchdir` | 2.29, 2.29 | `lpCurrentDirectory` (`fchdir`: the directory handle's path) | this process changes directory and comes back (through an fd of `.`) |
+| `search` | `posix_spawnp` | our own lookup through PATH and PATHEXT | PATH looked up here |
+| `pidfd` | `pidfd_spawn` (2.39) | the process handle | `pidfd_open` right after the call (Linux 5.3); none: the pid alone |
+| `sigdefault` | yes | nothing to do (nothing is inherited) | an ignored signal set back to its default around the call |
+| `sigmask` | yes | no signals | this process's mask set around the call |
+| `pgroup => PGID` (joining a group) | yes | no | this process joins the group around the call |
+| `pgroup => 0` (a new group) | yes | `CREATE_NEW_PROCESS_GROUP` | not possible (the child's pid is known only after): unsupported |
+| `resetids` | yes | nothing to do (no set-user-id) | the effective ids set to the real ones around the call |
+| `setsid` | 2.26 | no | not possible (no way back): unsupported |
+| `tcsetpgrp` | 2.35 | no | not possible (the child's group is known only after): unsupported |
+| `sched`, `cgroup` | yes, 2.35 | no | not undone reliably: unsupported |
+| `umask` | (none) | (none) | always set around the call |
+
+**The Windows primitive (post-0.06, EXPERIMENTAL, not yet built into the module).** `win_spawn.h` is `posix_spawn` on `CreateProcessW`, in plain C; `Spawner.xs` includes it under `_WIN32` and `#define`s the `posix_spawn` names to it, so `__posix_spawn` stays one source. It does the Windows column of the table above: the child's fds 0-2 through `STARTUPINFO`, fds 3 and up through the C runtime's `lpReserved2` table, exactly the handles the child should have through `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (inheritable copies made for the call, so the parent's handles keep their flags); the file actions in order on a table of the child's fds (an `open` by the parent, relative to the child's directory); argv quoted as the C runtime parses it back; `posix_spawnp` through PATH and PATHEXT (a relative program name is taken from the child's directory, after `chdir`, as glibc does); `pgroup => 0` as `CREATE_NEW_PROCESS_GROUP`; `ENOTSUP` for the rest. The process handle is kept, so the exit code survives until the child is waited for (`__win_spawn_handle`, `__win_spawn_forget`). Checked with MinGW-w64 under Wine; compiled for x86, x64 and ARM64. Still to do on Windows: building the module with a Windows Perl, waiting for children through the kept handles, and the event loop without SIGCHLD.
+
+**Compared with Perl's own spawn on Windows** (`do_spawnvp_handles()`, `create_command_line()`, `qualified_path()`, `win32_waitpid()`, `win32_kill()` in `win32/win32.c` of perl 5.38.2; 2026-11-05). Fixed in `win_spawn.h` and `Spawner.xs` after the comparison:
+- the program without an extension: PATHEXT's extensions first, the bare name last (Perl tries `.exe` first; a bare `prog`, say an MSYS script beside `prog.exe`, cannot be run); a quoted PATH entry (`"C:\a;b"`) is one entry, as Perl reads it;
+- `cmd.exe /c` (or `/x/c`) with two or more words after it: the rest gets one more pair of quotes, which cmd strips by its own rules, as Perl does;
+- the environment block sorted by name, ignoring case, with the parent's hidden `=C:` entries (each drive's directory) kept;
+- a command line over 32766 characters: `E2BIG`;
+- strings: Perl's own `CreateProcessA` takes bytes in the ANSI code page; so a string Perl does not hold as UTF-8 is read as ANSI, one it holds as UTF-8 as UTF-8;
+- the child's default environment and directory are Perl's (`PerlEnv_get_childenv`, `PerlEnv_get_childdir`), which with pseudo-forks can differ from the process's;
+- memory: compiled against Strawberry Perl 5.38.2 (`PERL_IMPLICIT_SYS`), `malloc` and `free` are Perl's macros for the interpreter's allocator; `win_spawn.h` now allocates on the process heap itself (it mixed allocators before). `Spawner.dll` then compiles and links against Strawberry Perl's headers and `libperl538.a` with MinGW-w64; it has not been loaded yet.
+
+Run under Wine with Strawberry Perl 5.38.2 (the user's approval, 2026-11-05): `Spawner.dll` built with MinGW-w64 against its headers and `libperl538.a` loads; `Proc::Spawner::spawn` starts Windows' `perl.exe`, an `open` action gives it a file as stdout, Perl's own `waitpid` reaps it (status 3), and `%Proc::Spawner::WINDOWS` works. This found two faults, fixed: `spawn` gave the count of its results, not the pid, in scalar context (its wrapper; on Linux only when a setting is missing); `Proc::Spawner` used `fcntl` and `SIGCHLD` at load time. On Windows the loop now polls for ended children every `$TICK`; Perl's `select` there works on sockets only, so `on_read`, `on_write` of pipes are not done yet.
+
+How the child sees its arguments (a Windows `perl.exe` printing `@ARGV`; given: `a b`, `q"x`, `c\\`, the empty string, `x "y" z`, `tail\`, `d\"e`, `%PATH%`, `a&b`):
+
+| Started by | The child's `@ARGV` |
+|---|---|
+| Perl's own `system LIST` | two arguments: `[a b] [qx c\\ " x y z tail\ d"e %PATH% a&b]` (quotes taken as quoting, the empty one gone; a `-e` program with `"` in it does not even compile) |
+| `Proc::Spawner::spawn` | all nine, as given |
+
+Choices (the user, 2026-11-05), in `%Proc::Spawner::WINDOWS` (`win_spawn.h`: `WIN_OPT_*`), every child:
+- **`new_group`** (default on): `CREATE_NEW_PROCESS_GROUP`. Ctrl-C at the console reaches the parent, not the children: the parent is the one to be killed, and it is to kill its children (the user).
+- **`kill_with_parent`** (default on): the child is in a job object (`JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`) whose only handle is the parent's, so Windows ends the children when the parent ends, however it ends. The child is started suspended, put in the job, then resumed, so nothing it starts escapes. Checked under Wine (a child that would write a file after 3 seconds: killed when the parent exits; with the option off, it writes it). Before Windows 8, a parent that is in a job already cannot put its children in another one: they then run outside it.
+- **`new_console`** (default on, as Perl): a child with none of fds 0-2 gets a console of its own (`CREATE_NEW_CONSOLE`); off: it shares ours with no standard handles.
+
+**Batch files** (`.bat`, `.cmd`) run (the user: most arguments can be passed safely, and the others can be recognized): through the system's `cmd.exe /e:ON /v:OFF /d /c ""SCRIPT" ARGS"` (not a cmd.exe found on PATH), each argument quoted for cmd as Rust's standard library does since BatBadBut (CVE-2024-24576): quoted unless it has only letters, digits and `#$*+-./:?@\_`; `"` doubled; `%` written `%%cd:~,%`, which cmd expands to a single `%`, so no `%NAME%` is expanded; a trailing `\` quotes it too. Refused (`EINVAL`): an argument with CR or LF (cmd ends the line there), a script path with `"` or ending in `\`. The script sees each argument as cmd shows it (`%1` with the quotes, `%~1` without). Under Wine, `& | < >` and quotes arrive literally and nothing else runs; `%` does not (Wine's cmd reads `%%` on a command line as one `%`, real cmd does not); not checked on real Windows.
+
+**Unicode:** the child is started with `CreateProcessW` (UTF-16 command line, environment and paths), Perl's own with `CreateProcessA` (the ANSI code page). A string Perl holds as UTF-8 therefore reaches the child as it is, whatever the code page; one it holds as bytes is read in the ANSI code page, as Perl's spawn reads it.
+
+**Windows versions:** the explicit handle list needs Vista; Windows 7's console handles are pseudo-handles that the list refuses, so they are left out of it (the child reaches the console through `STARTUPINFO`); nested job objects need Windows 8. Not tested before Windows 10 (Wine 9 imitates 10).
+
+Still not done: `Win32::SetChildShowWindow` (Perl's `w32_showwindow`); releasing the kept process handle after `waitpid` (`__win_spawn_forget`); waiting for more than 64 children at once; the loop's pipes (`select`); the inheritable copies of handles exist during the call, so another thread's `CreateProcess` with inheritance could take them (one thread assumed).
+
+While this process's fds or directory are changed, every signal is blocked, so no handler of ours sees them; the child's mask is set by the primitive. If `sigmask` is missing too, the signals cannot be blocked without the child inheriting that: then a handler running in that moment would see the changed fds. Tests: `t/missing-matrix.pl` runs the whole suite once per entry of the bitmap, then with all emulable settings missing, with the Windows column's gaps, and with everything missing.
+
 - **Testing on Linux "as on Windows":** a runtime list of what the platform lacks (empty on Linux, the list above on Windows, settable in tests), consulted where the XS now consults the missing extensions; a test then runs the batteries with the Windows list. argv and exit statuses need no test of ours: they are Perl's.

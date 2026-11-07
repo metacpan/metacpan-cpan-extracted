@@ -51,6 +51,7 @@
       "runtime" : {
          "requires" : {
             "Data::Validate::Email" : "0",
+            "JSON::Validator" : "5.19",
             "JSON::Validator::Schema::OpenAPIv3" : "0",
             "List::Util" : "0",
             "parent" : "0",
@@ -72,22 +73,25 @@
    "provides" : {
       "JSON::Validator::Schema::Troglodyne" : {
          "file" : "lib/JSON/Validator/Schema/Troglodyne.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/teodesian/perl-json-validator-schema-troglodyne/issues"
+         "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-json-validator-schema-troglodyne/issues"
       },
-      "homepage" : "https://github.com/teodesian/perl-json-validator-schema-troglodyne",
+      "homepage" : "https://github.com/Troglodyne-Internet-Widgets/perl-json-validator-schema-troglodyne",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/teodesian/perl-json-validator-schema-troglodyne.git",
-         "web" : "https://github.com/teodesian/perl-json-validator-schema-troglodyne"
+         "url" : "https://github.com/Troglodyne-Internet-Widgets/perl-json-validator-schema-troglodyne.git",
+         "web" : "https://github.com/Troglodyne-Internet-Widgets/perl-json-validator-schema-troglodyne"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
+   "x_contributors" : [
+      "troglodyne-robot <trogbot@troglodyne.net>"
+   ],
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
    "x_spdx_expression" : "MIT"

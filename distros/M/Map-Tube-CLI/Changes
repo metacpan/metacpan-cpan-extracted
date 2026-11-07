@@ -1,8 +1,24 @@
 Revision history for Map::Tube::CLI
 
+v1.1.0 Sat Nov 07 2026
+      This release entirely belongs to @GWS.
+      - Added option --fuzzy/-F for fuzzy station name matching (on by default
+        if needed). --no-fuzzy for switching off fuzzy matching for good.
+      - Added option --penalty/-p to change hop count penalty for line changes.
+      - Added option --image/-i for specifying imgae ouptput name or format.
+      - Added option --layout for specifying mimage layout engine.
+      - Option --tabular/-t now also acts on display of line notes.
+      - Show more helpful information if some required plugin has not been installed.
+      - Promoted private method _supported_maps() to public method supported_maps().
+      - Moved all output file name handling to Map::Tube::Plugin::Graph.
+      - More minor code optimisations.
+      - Bumped required Perl version to 5.014 (in accordance with Map::Tube itself).
+      - Adapted tests.
+      - Adapted documentation.
+
 v1.0.2 Sat Oct 31 2026
-       - Added support for Map::Tube::Hannover.
-       - Removed generated files: META.json and META.yml
+      - Added support for Map::Tube::Hannover.
+      - Removed generated files: META.json and META.yml
 
 v1.0.1 Tue Oct 20 2026
       - Map::Tube::CLI now loads only the officially supported maps (the

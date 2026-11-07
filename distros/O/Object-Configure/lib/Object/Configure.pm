@@ -2,6 +2,7 @@ package Object::Configure;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
 use Carp;
 use Config::Abstraction 0.38;
@@ -32,14 +33,14 @@ Readonly my $DEFAULT_INTERVAL => 10;   # default hot-reload poll interval in sec
 # Used in two places; kept as a constant so both guards are always in sync.
 Readonly my $RE_PATH_TRAVERSAL => qr{(?:\A|/)\.\.(?:/|\z)};
 
-# Global registry — intentionally package-level so that the END block and
+# Global registry - intentionally package-level so that the END block and
 # signal handlers installed in one call site share state with all others.
 # This is a deliberate singleton design; see LIMITATIONS for the trade-offs.
 our %_object_registry   = ();
 our %_config_watchers   = ();
 our %_config_file_stats = ();
 
-# Memoization caches — keyed by inputs; valid for the process lifetime because
+# Memoization caches - keyed by inputs; valid for the process lifetime because
 # Perl @ISA hierarchies and filesystem layouts are stable after module load.
 # Both caches include undef sentinels (use exists, not defined, to check hits).
 our %_chain_cache = ();  # class         => [UNIVERSAL, ..., Class] (base-first)
@@ -54,11 +55,11 @@ Object::Configure - Runtime Configuration for an Object
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 =head1 DESCRIPTION
 
@@ -587,7 +588,7 @@ sub configure {
 	my $config_file = $params->{'config_file'};
 	my $config_dirs = $params->{'config_dirs'};
 
-	# SECURITY (S1 — path traversal): reject config_file paths containing ".." segments
+	# SECURITY (S1 - path traversal): reject config_file paths containing ".." segments
 	# before they reach Config::Abstraction.  The pen-test suite confirmed C::A parses
 	# /etc/passwd as a colon-delimited conf file, injecting every user account as a
 	# config key.  The ".." guard blocks the traversal vector; direct absolute paths to
@@ -694,7 +695,7 @@ sub configure {
 		my $merged_config = {};
 
 		# Iterate base-first so that each more-specific class overrides the more
-		# general one: UNIVERSAL → GrandParent → Parent → Child.
+		# general one: UNIVERSAL -> GrandParent -> Parent -> Child.
 		foreach my $ancestor_class (@inheritance_chain) {
 			my $section_name = $ancestor_class;
 			$section_name =~ s/::/__/g;
@@ -720,7 +721,7 @@ sub configure {
 
 		$params = _deep_merge($merged_config, $params);
 
-		# SECURITY (S1 extension — config_path traversal + taint):
+		# SECURITY (S1 extension - config_path traversal + taint):
 		# config_path arrives from Config::Abstraction, which reads %ENV.  Under
 		# taint mode (-T) the value is tainted; any syscall with a tainted argument
 		# is fatal.  Apply the same $RE_PATH_TRAVERSAL guard as config_file (line 491)
@@ -737,7 +738,7 @@ sub configure {
 	}
 
 	my $croak_on_error = exists($params->{'croak_on_error'}) ? $params->{'croak_on_error'} : 1;
-	my $carp_on_warn   = exists($params->{'carp_on_warn'})   ? $params->{'carp_on_warn'}   : 0;
+	my $carp_on_warn = exists($params->{'carp_on_warn'}) ? $params->{'carp_on_warn'}   : 0;
 
 	# User-supplied logger always wins over config-file logger.
 	# $array_logger is defined when the caller passed an arrayref; it was deleted from
@@ -875,7 +876,7 @@ Fork a background watcher that sends SIGUSR1 to the parent whenever a tracked
 configuration file changes on disk.  Objects registered via C<register_object()>
 then have their configuration reloaded automatically.
 
-B<Unix only.>  On Windows this function is a silent no-op (SIGUSR1 does not exist).
+B<UNIX only.>  On Windows this function is a silent no-op (SIGUSR1 does not exist).
 
 =head3 Arguments
 
@@ -918,7 +919,7 @@ on mtime change.
 
 =over 4
 
-=item * C<Object::Configure: fork failed: OS-ERROR> -- C<fork()> returned C<undef>.
+=item * C<Failed to fork config watcher: OS-ERROR> -- C<fork()> returned C<undef>.
 Check system resource limits (C<ulimit -u>).
 
 =back
@@ -984,6 +985,9 @@ sub enable_hot_reload {
 
 	return if %_config_watchers;	# already watching; avoid double-fork
 
+	# Handle fork failure ourselves so the documented croak message is used
+	no autodie qw(fork);
+
 	if(my $pid = fork()) {
 		$_config_watchers{pid}      = $pid;
 		$_config_watchers{callback} = $callback;
@@ -1042,11 +1046,15 @@ B<Blocking>: this function may take up to five seconds if the watcher ignores SI
 =cut
 
 sub disable_hot_reload {
+	# The watcher may already have exited, so a failed kill() is expected
+	# and must not stop %_config_watchers from being cleared
+	no autodie qw(kill);
+
 	## MUTANT_SKIP_BEGIN
 	if(my $pid = $_config_watchers{pid}) {
-		# SECURITY (S3 — PID safety):
-		#   $pid > 1  excludes PID 0 (sends SIGTERM to whole process group — DoS)
-		#             and PID 1 (init — catastrophic as root).
+		# SECURITY (S3 - PID safety):
+		#   $pid > 1  excludes PID 0 (sends SIGTERM to whole process group - DoS)
+		#             and PID 1 (init - catastrophic as root).
 		#   $pid != $$ prevents self-signaling if %_config_watchers is corrupted.
 		# Exploit mechanism: if global state is poisoned with pid=0 or pid=1,
 		# kill('TERM', 0) signals every process in the group; kill('TERM', 1) kills
@@ -1184,7 +1192,7 @@ Nothing (void).
 =item * Pushes a weak reference to C<$obj> onto C<$_object_registry{$class}>.
 
 =item * On the first call ever (for any class): saves the current C<$SIG{USR1}>
-and installs Object::Configure's handler.  On Unix, the handler calls
+and installs Object::Configure's handler.  On UNIX, the handler calls
 C<reload_config()> then chains to the prior handler.  On Windows, signal
 installation is skipped but C<$_original_usr1_handler> is still set.
 
@@ -1307,7 +1315,7 @@ Nothing (void).
 
 =over 4
 
-=item * Sets C<$SIG{USR1}> back to its saved value (Unix only).
+=item * Sets C<$SIG{USR1}> back to its saved value (UNIX only).
 
 =item * Sets C<$_original_usr1_handler> to C<undef>.
 
@@ -1557,6 +1565,9 @@ sub _find_class_config_file {
 sub _run_config_watcher {
 	my ($interval, $callback) = @_;
 
+	# If the parent has gone, signalling it fails; don't die noisily in the child
+	no autodie qw(kill);
+
 	# SECURITY (S5): re-validate $interval in the child process.
 	# If the parent's fork() fires before enable_hot_reload() applies its own guard
 	# (race) or state is corrupted between fork and here, sleep(0) or sleep(-1) would
@@ -1619,7 +1630,7 @@ sub _reload_object_config {
 		$config_file = $obj->{_config_file} || $obj->{config_file};
 	}
 
-	# SECURITY (S1 — path traversal): an attacker who modifies $obj->{_config_file}
+	# SECURITY (S1 - path traversal): an attacker who modifies $obj->{_config_file}
 	# (e.g., via a deserialization gadget or a malicious config merge) can redirect
 	# hot-reload to read arbitrary system files.  Reject paths with ".." segments here
 	# so that even a corrupted object cannot force a traversal read.
@@ -1742,7 +1753,7 @@ instance-level isolation.  A proper fix would wrap state in an object and allow
 multiple independent C<Object::Configure> instances, but that would break the
 existing constructor-call API (C<configure($class, \%params)>).
 
-=item * B<Hot reload is Unix-only.> SIGUSR1 does not exist on Windows.
+=item * B<Hot reload is UNIX-only.> SIGUSR1 does not exist on Windows.
 All signal-related paths are guarded with C<$^O ne 'MSWin32'>, so the module
 loads on Windows but silently skips hot-reload registration.
 
@@ -1984,6 +1995,10 @@ or by e-mail: C<bug-object-configure at rt.cpan.org>
 You will be notified automatically of progress on your report.
 
     perldoc Object::Configure
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 LICENCE AND COPYRIGHT
 
