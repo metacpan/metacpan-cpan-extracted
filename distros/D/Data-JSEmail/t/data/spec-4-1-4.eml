@@ -1,0 +1,79 @@
+From: list@example.com
+To: member@example.org
+Subject: RFC 8621 S4.1.4 example structure
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <spec-414@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="L0"
+
+--L0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+A list header
+--L0
+Content-Type: multipart/mixed; boundary="L1"
+
+--L1
+Content-Type: multipart/alternative; boundary="L2"
+
+--L2
+Content-Type: multipart/mixed; boundary="L3a"
+
+--L3a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+B text before the image
+--L3a
+Content-Type: image/jpeg
+Content-Disposition: inline
+Content-Transfer-Encoding: base64
+
+/9j/4AAQ
+--L3a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+D text after the image
+--L3a--
+--L2
+Content-Type: multipart/related; boundary="L3b"
+
+--L3b
+Content-Type: text/html; charset=us-ascii
+
+<p>E html with <img src="cid:f@example.com"></p>
+--L3b
+Content-Type: image/jpeg
+Content-ID: <f@example.com>
+Content-Transfer-Encoding: base64
+
+/9j/4AAQ
+--L3b--
+--L2--
+--L1
+Content-Type: image/jpeg
+Content-Disposition: attachment
+Content-Transfer-Encoding: base64
+
+/9j/4AAQ
+--L1
+Content-Type: application/x-excel
+Content-Transfer-Encoding: base64
+
+0M8R4KGxGuE=
+--L1
+Content-Type: message/rfc822
+
+From: someone@example.net
+Subject: J
+
+J body
+--L1--
+--L0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+K list footer
+--L0--

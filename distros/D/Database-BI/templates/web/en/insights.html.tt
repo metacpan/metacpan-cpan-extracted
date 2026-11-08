@@ -124,7 +124,7 @@
 </div>
 <div id="summary-box" role="region" aria-live="polite"></div>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function() {
 	var btn = document.getElementById('btn-summarize');
 	if (!btn) return;
@@ -162,7 +162,9 @@
 				box.appendChild(p);
 				var sm = document.createElement('small');
 				sm.className = 'summary-source';
-				sm.textContent = 'Source: ' + (data.source || 'template')
+				sm.textContent = 'Source: ' + (data.source === 'template_limited'
+				               ? 'template (the AI provider was asked as often as this server allows this hour)'
+				               : (data.source || 'template'))
 				               + (data.cached ? ' (cached)' : '');
 				box.appendChild(sm);
 			}

@@ -1,0 +1,29 @@
+From: list@example.com
+To: member@example.org
+Subject: Digest
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <digest-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="dm"
+
+--dm
+Content-Type: text/plain; charset=us-ascii
+
+Today's digest.
+--dm
+Content-Type: multipart/digest; boundary="dd"
+
+--dd
+
+From: one@example.net
+Subject: One
+
+First.
+--dd
+
+From: two@example.net
+Subject: Two
+
+Second.
+--dd--
+--dm--

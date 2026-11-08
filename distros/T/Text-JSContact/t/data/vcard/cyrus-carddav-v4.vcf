@@ -1,0 +1,42 @@
+BEGIN:VCARD
+VERSION:4.0
+PRODID:-//CyrusIMAP.org//Cyrus 3.13.0//EN
+UID:urn:uuid:b55f4f4c-3a1e-4a46-8f45-5c9a7a54e3c1
+KIND:individual
+REV:20261001T121314Z
+CREATED:20250101T000000Z
+LANGUAGE:en
+FN:Dr. Jane Doe-Smith
+N;SORT-AS="Doe-Smith,Jane":Doe-Smith;Jane;Ann;Dr.;PhD;;
+NICKNAME;PROP-ID=nick1;TYPE=home:Janie
+EMAIL;PROP-ID=e1;TYPE=work;PREF=1:jane.doe@work.example
+EMAIL;PROP-ID=e2;TYPE=home:jane@home.example
+TEL;PROP-ID=p1;VALUE=uri;TYPE=cell,voice;PREF=1:tel:+1-555-555-0101
+TEL;PROP-ID=p2;VALUE=uri;TYPE=work,fax:tel:+1-555-555-0102
+ADR;PROP-ID=a1;TYPE=work;PREF=1;LABEL="100 Main St\nSpringfield, IL 62701";
+ GEO="geo:39.7817,-89.6501";TZ=America/Chicago;CC=US:;Suite 5;100 Main St;
+ Springfield;IL;62701;USA
+ORG;PROP-ID=o1;SORT-AS="Acme":Acme Widgets;Research;Lab 2
+TITLE;PROP-ID=t1:Principal Scientist
+ROLE;PROP-ID=r1:Team lead
+BDAY;PROP-ID=bday:--0412
+ANNIVERSARY;PROP-ID=wed:20100612
+NOTE;PROP-ID=n1;CREATED=20250102T030405Z;AUTHOR-NAME=Assistant:Call after 10am.
+IMPP;PROP-ID=im1;SERVICE-TYPE=XMPP;USERNAME=jane:xmpp:jane@chat.example
+SOCIALPROFILE;PROP-ID=sp1;SERVICE-TYPE=Mastodon:https://social.example/@jane
+PHOTO;PROP-ID=ph1;MEDIATYPE=image/jpeg:https://photos.example/jane.jpg
+URL;PROP-ID=u1;TYPE=work:https://acme.example/~jane
+CALURI;PROP-ID=c1;PREF=1:https://cal.example/jane
+CALADRURI;PROP-ID=s1:mailto:jane-cal@work.example
+FBURL;PROP-ID=f1;MEDIATYPE=text/calendar:https://cal.example/jane/freebusy.ifb
+KEY;PROP-ID=k1;MEDIATYPE=application/pgp-keys:https://keys.example/jane.asc
+LANG;PROP-ID=l1;TYPE=work;PREF=1:en
+LANG;PROP-ID=l2;PREF=2:de
+GENDER:F
+GRAMGENDER:feminine
+PRONOUNS;PROP-ID=pr1;PREF=1:she/her
+CATEGORIES:work,research
+RELATED;TYPE=colleague:urn:uuid:4e1a2b3c-0000-4000-8000-000000000001
+X-CYRUS-SPECIAL;X-VENDOR-PARAM=keep:opaque value
+JSPROP;JSPTR="example.com:foo":"bar"
+END:VCARD

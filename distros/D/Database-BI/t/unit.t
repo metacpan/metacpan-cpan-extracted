@@ -291,6 +291,8 @@ Readonly my %MESSAGE_FILES => (
 	Dashboard  => 'lib/Database/BI/Controller/Dashboard.pm',
 	DataSource => 'lib/Database/BI/Model/DataSource.pm',
 	Geocode    => 'lib/Database/BI/Model/Geocode.pm',
+	Password   => 'lib/Database/BI/Password.pm',
+	PasswordCommand => 'lib/Database/BI/Command/password.pm',
 );
 my %DICTIONARY;
 for my $module (sort keys %MESSAGE_FILES) {
@@ -308,11 +310,11 @@ for my $module (sort keys %MESSAGE_FILES) {
 
 # Those the POD documents that are not messages.
 $ledger{"api.$_"} = "documented behaviour: $_" for qw(
-	Util.parse_number Calc.new Calc.error Calc.has_error Calc.evaluate Calc.span_interval Calc.date_normalise Calc.compile_pattern Calc.capture_of
+	Util.parse_number Util.iso_datetime Util.minute_stamp Util.iso8601_utc Calc.new Calc.error Calc.has_error Calc.evaluate Calc.span_interval Calc.date_normalise Calc.compile_pattern Calc.capture_of
 	Extract.new Extract.path Extract.get Extract.put Extract.evict
 	Tutorial.intro Tutorial.chapters Tutorial.faq Tutorial.glossary Tutorial.parts
 	Tutorial.covered_routes Tutorial.exempt_routes Tutorial.chapter_for_action
-	DataSource.sqlite_tables DataSource.dbi_source DataSource.aggregate DataSource.updated DataSource.schema DataSource.count
+	DataSource.sqlite_tables DataSource.dbi_source DataSource.aggregate DataSource.updated DataSource.schema DataSource.count DataSource.json_lists
 	Geocode.shared_cache_from_models Geocode.models_with_shared_cache
 	BI.startup Globals
 	analyses.list analyses.create analyses.get analyses.update analyses.patch analyses.delete
@@ -1601,11 +1603,11 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		            ->status_is(200, '200 for valid loc= geocode')
 		            ->content_type_like(qr{text/html}, 'response is HTML');
 		# Place names appear only inside map_body (Leaflet popup HTML), which
-		# needs HTML::OSM 0.13 or later: below that floor the page reports the
+		# needs HTML::OSM 0.14 or later: below that floor the page reports the
 		# renderer and draws nothing.  Skip this single assertion then.
 		SKIP: {
-			eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-				or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
+			eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+				or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 1;
 			$res->content_like(qr/$MAP_PLACE/i, 'place name appears in response');
 		}
 		delete $ledger{'GET./map.200.loc'};
@@ -2340,6 +2342,128 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		delete $ledger{'api.Util.parse_number'};
 	};
 
+	subtest 'A filter that names an unknown operator or column is refused' => sub {
+		my $f = sub { 'f=' . url_escape($_[0]) };
+		$t->get_ok('/view/sales?' . $f->('region:gtx:North'))->status_is(400);
+		message_ok('Dashboard', 'error_filter_op', $t->tx->res->body,
+			['gtx', 'region:gtx:North', 'eq, ne, contains, starts, lt, le, gt, ge, empty, notempty, between, in']);
+		$t->get_ok('/view/sales?' . $f->('regoin:eq:North'))->status_is(400);
+		message_ok('Dashboard', 'error_filter_column', $t->tx->res->body, ['regoin', 'regoin:eq:North', undef]);
+		like $t->tx->res->body, qr/the columns are: .*\bregion\b/, '... naming the columns there are';
+		$t->get_ok('/bar?l=table:sales&cat=region&' . $f->('regoin:eq:North'))->status_is(400, 'a chart too');
+		$t->get_ok('/view/sales?range=last_30_days&rcol=nosuch')->status_is(400);
+		message_ok('Dashboard', 'error_range_column_unknown', $t->tx->res->body, ['nosuch', 'nosuch', undef]);
+		$t->get_ok('/view/sales?' . $f->('region:eq:North'))->status_is(200, 'a filter on a column there still works');
+		$t->get_ok('/view/sales?c=' . url_escape('twice:amount*2') . '&' . $f->('twice:gt:0'))
+			->status_is(200, 'and on a calculated field of the request');
+	};
+
+	subtest 'Password and the password command raise their own messages' => sub {
+		require Database::BI::Password;
+		require Database::BI::Command::password;
+		my $hash = \&Database::BI::Password::hash_password;
+		my $err = sub { my ($code) = @_; local $@; eval { $code->(); 1 } and return; return without_location($@) };
+
+		message_ok('Password', 'error_password_required', $err->(sub { $hash->('') }));
+		message_ok('Password', 'error_password_rounds', $err->(sub { $hash->('x', rounds => 5) }), [10_000, 100_000_000]);
+		message_ok('Password', 'error_password_salt', $err->(sub { $hash->('x', salt => 'short') }), [16]);
+		require Crypt::URandom;	# before the mock, or loading it puts urandom back
+		mock 'Crypt::URandom::urandom' => sub { 'abc' };
+		message_ok('Password', 'error_password_random', $err->(sub { $hash->('x', rounds => 10_000) }), [3, 16]);
+		restore_all();
+		like $hash->('x', rounds => 10_000), qr/\Apbkdf2-sha256\$10000\$/, 'and a salt from Crypt::URandom';
+
+		my $cmd = Database::BI::Command::password->new(app => $t->app);
+		is $err->(sub { $cmd->run('extra') }), $cmd->usage, 'an argument: the usage, and nothing else';
+		like $cmd->usage, qr/database-bi password/, '... which shows how it is run';
+
+		my @typed;
+		mock 'Database::BI::Command::password::_read_secret' => sub { shift @typed };
+		mock 'Database::BI::Command::password::_interactive' => sub { 1 };
+		@typed = ('one pass', 'another');
+		message_ok('PasswordCommand', 'error_mismatch', $err->(sub { $cmd->run }));
+		@typed = ('one pass');
+		message_ok('PasswordCommand', 'error_mismatch', $err->(sub { $cmd->run }));
+		@typed = ('');
+		message_ok('PasswordCommand', 'error_no_password', $err->(sub { $cmd->run }));
+		@typed = ('one pass', 'one pass');
+		my $out = '';
+		{
+			open my $fh, '>', \$out or BAIL_OUT('no in-memory handle');
+			my $old = select $fh;
+			my $ok = eval { $cmd->run; 1 };
+			select $old;
+			ok $ok, 'the same twice at a terminal: a hash';
+		}
+		my ($made) = $out =~ /password_hash => '([^']+)'/;
+		ok $made && Database::BI::Password::verify_password('one pass', $made), '... of that password';
+		mock 'Database::BI::Command::password::_interactive' => sub { 0 };
+		@typed = ('piped');
+		$out = '';
+		{
+			open my $fh, '>', \$out or BAIL_OUT('no in-memory handle');
+			my $old = select $fh;
+			ok eval { $cmd->run; 1 }, 'from a pipe it is asked once';
+			select $old;
+		}
+		is scalar(@typed), 0, '... and read once';
+		restore_all();
+	};
+
+	subtest 'Util.minute_stamp and Util.iso8601_utc' => sub {
+		my $stamp = \&Database::BI::Util::minute_stamp;
+		my $iso   = \&Database::BI::Util::iso8601_utc;
+		is $stamp->(gmtime 0), '1970-01-01 00:00', 'the epoch, to the minute';
+		is $stamp->(gmtime 1_794_060_309), '2026-11-07 14:05', 'a day this year';
+		is $stamp->(5, 4, 3, 2, 0, 99), '1999-01-02 03:04', 'a list as localtime gives it';
+		is $stamp->(), '', 'nothing given';
+		is $stamp->(1, 2, 3), '', 'too few values';
+		is $iso->(0), '1970-01-01T00:00:00Z', 'the epoch in UTC';
+		is $iso->(1_794_060_309), '2026-11-07T14:05:09Z', 'to the second';
+		like $iso->(), qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/, 'now, when no time is given';
+		SKIP: {
+			# The same as strftime gives, where strftime can be asked.
+			skip 'POSIX::strftime is not asked on Windows', 2 if $^O eq 'MSWin32';
+			require POSIX;
+			my $t = 1_794_060_309;
+			is $stamp->(localtime $t), POSIX::strftime('%Y-%m-%d %H:%M', localtime $t), 'as strftime, local time';
+			is $iso->($t), POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime $t), 'as strftime, UTC';
+		}
+		# And nothing else formats a time with strftime, outside comments and POD.
+		my @calls;
+		for my $file (Mojo::File->new('lib')->list_tree->grep(qr/\.pm\z/)->each,
+				map { Mojo::File->new("script/$_") } qw(database-bi bi-extract bi-geocode bi-alert)) {
+			(my $code = $file->slurp) =~ s/\r\n/\n/g;
+			$code =~ s/^=\w.*?(?:^=cut\n|\z)//msg;
+			$code =~ s/^__END__\n.*//ms;
+			my $n = 0;
+			for my $line (split /\n/, $code) {
+				$n++;
+				(my $bare = $line) =~ s/#.*//;
+				push @calls, "$file:$n" if $bare =~ /\bstrftime\b/;
+			}
+		}
+		is_deeply \@calls, [], 'lib/ and script/ call no strftime';
+		delete $ledger{'api.Util.minute_stamp'};
+		delete $ledger{'api.Util.iso8601_utc'};
+	};
+
+	subtest 'Util.iso_datetime' => sub {
+		my $fn = \&Database::BI::Util::iso_datetime;
+		is_deeply [ $fn->('2026-11-06') ], [ '2026-11-06', undef, undef, undef ], 'a date';
+		is_deeply [ $fn->('2026-11-06 09:15') ], [ '2026-11-06', '09', '15', undef ], 'a space and no seconds';
+		is_deeply [ $fn->('2026-11-06T23:30:00.250Z') ], [ '2026-11-06', '23', '30', '00' ],
+			'a fraction and Z are accepted, and the time is as written';
+		is_deeply [ $fn->("2026-11-06T23:30:00$_") ], [ '2026-11-06', '23', '30', '00' ], "an offset written $_"
+			for qw(+01:00 +0100 -05 z);
+		is_deeply [ $fn->('2026-11-06T23:30:00,5') ], [ '2026-11-06', '23', '30', '00' ], 'a comma before the fraction';
+		is_deeply [ $fn->($_) ], [], "not ISO: $_"
+			for ('06/11/2026', '2026-11-06Z', '2026-11-06T25', '2026-11-06T23:30:00.Z', '2026-11-06T23:30Q', '');
+		is_deeply [ $fn->(undef) ], [], 'missing';
+		is_deeply [ $fn->([]) ], [], 'a reference';
+		delete $ledger{'api.Util.iso_datetime'};
+	};
+
 	subtest 'Calc -- the documented constructor, accessors and evaluate' => sub {
 		my $good = Database::BI::Calc->new(expr => 'amount * 2', columns => ['amount']);
 		isa_ok $good, 'Database::BI::Calc';
@@ -2524,6 +2648,20 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my $two = unit_sqlite('two.sqlite', 'CREATE TABLE alpha (id INTEGER)', 'CREATE TABLE beta (id INTEGER)');
 		message_ok(DataSource => 'error_table_not_found', $err->(directory => $dir_of->($two), table => 'two', internal_table => 'gamma'), [undef, 'gamma']);
 
+		my $bad_json = unit_csv('broken.json', '{"rows": [');
+		message_ok(DataSource => 'error_json_invalid', $err->(directory => $dir_of->($bad_json), table => 'broken'), [$bad_json, undef]);
+		my $no_rows = unit_csv('scalars.json', '[1, 2, 3]');
+		message_ok(DataSource => 'error_json_no_rows', $err->(directory => $dir_of->($no_rows), table => 'scalars'), [$no_rows]);
+		my $lists = unit_csv('lists.json', '{"findings": [{"a": 1}], "hosts": [{"b": 2}]}');
+		message_ok(DataSource => 'error_json_list_not_found',
+			$err->(directory => $dir_of->($lists), table => 'lists', internal_table => 'ports'), [$lists, 'ports']);
+		is_deeply(Database::BI::Model::DataSource->json_lists($lists),
+			[ { name => 'findings', columns => ['a'] }, { name => 'hosts', columns => ['b'] } ],
+			'json_lists: each list of objects, with its columns, in file order');
+		is_deeply(Database::BI::Model::DataSource->json_lists(unit_csv('plain.json', '[{"a": 1}]')), [],
+			'json_lists: a file that is a list of rows holds no lists');
+		delete $ledger{'api.DataSource.json_lists'};
+
 		my $odd = unit_sqlite('odd.sqlite', 'CREATE TABLE "bad name" (id INTEGER)', 'CREATE TABLE good (id INTEGER)');
 		my $unsafe = $err->(directory => $dir_of->($odd), table => 'odd', internal_table => 'bad name');
 		like $unsafe, qr/\AThe table "bad name" in /, 'error_table_name_unsafe says which table';
@@ -2652,7 +2790,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		};
 		my $res = $geo->resolve_column([ { c => 'Paris' }, { c => '' }, { c => '12' } ], 'c');
 		my %by  = map { $_->{key} => $_->{text} } grep { ref } @{ $res->{messages} // [] };
-		my $why = join ', ',
+		$why = join ', ',
 			sprintf($DICTIONARY{Geocode}{warn_map_rows_why_empty}, 1),
 			sprintf($DICTIONARY{Geocode}{warn_map_rows_why_refused}, 1);
 		message_ok(Geocode => 'warn_map_rows_skipped', $by{warn_map_rows_skipped}, [1, 3, 2, $why]);
@@ -2954,7 +3092,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my $embed = $tm->get_ok("/embed/$id?token=$share->{token}")->tx->res;
 		like $embed->body, qr/id="vis-0|<svg|d3\./, 'the embed draws the chart';
 		like $embed->body, qr/By region/, 'under its title';
-		like $embed->body, qr/<script src="[^"]*d3/, 'and loads what draws it';
+		like $embed->body, qr/<script\b[^>]*\ssrc="[^"]*d3/, 'and loads what draws it';
 		unlike $embed->body, qr/No visuals to display/, 'rather than saying there is nothing';
 		is $embed->headers->header('X-Frame-Options'), 'SAMEORIGIN', 'embedding is opt-in';
 		delete $ledger{'api.share.embed'};
@@ -3135,6 +3273,42 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		my $outdir = tempdir(CLEANUP => 1);
 		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.txt')->status_is(415);
 		message_ok(Dashboard => 'error_ext_required', $tm->tx->res->json->{error});
+		my $hidden = File::Spec->catdir($outdir, '.settings');
+		mkdir $hidden or BAIL_OUT("cannot make $hidden: $!");
+		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($hidden) . '&filename=x.json')->status_is(403);
+		message_ok(Dashboard => 'error_hidden_target', $tm->tx->res->json->{error},
+			[Mojo::File->new($hidden)->child('x.json')->to_string]);
+		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.csv', { Origin => 'https://evil.example' })
+			->status_is(403);
+		message_ok(Dashboard => 'error_cross_site', $tm->tx->res->json->{error}, ['https://evil.example']);
+		$tm->get_ok('/preferences', { Host => 'evil.example' })->status_is(403);
+		message_ok(Dashboard => 'error_host_refused', $tm->tx->res->body, ['evil.example']);
+
+		{
+			local $ENV{MOJO_REVERSE_PROXY} = 1;
+			my $tr = Test::Mojo->new('Database::BI', { model_dir => tempdir(CLEANUP => 1) });
+			$tr->get_ok('/preferences', { 'X-Forwarded-For' => '192.168.1.20' })->status_is(403);
+			message_ok(Dashboard => 'error_remote_needs_password', $tr->tx->res->body);
+		}
+
+		{
+			my $root = tempdir(CLEANUP => 1);
+			my $tf = Test::Mojo->new('Database::BI', { model_dir => tempdir(CLEANUP => 1), file_roots => [$root] });
+			$tf->get_ok('/api/dirs?path=/etc')->status_is(403);
+			message_ok(Dashboard => 'error_outside_roots', $tf->tx->res->json->{error}, ['/etc']);
+		}
+
+		# The login, on only with password_hash.
+		require Database::BI::Password;
+		my $tl = Test::Mojo->new('Database::BI', { model_dir => tempdir(CLEANUP => 1), export_dirs => [ tempdir(CLEANUP => 1) ],
+			password_hash => Database::BI::Password::hash_password('pw', rounds => 10_000) });
+		$tl->get_ok('/calc/list')->status_is(401);
+		message_ok(Dashboard => 'error_login_required', $tl->tx->res->json->{error});
+		$tl->post_ok('/login' => form => { password => 'no' })->status_is(401);
+		message_ok(Dashboard => 'error_login_failed', $tl->tx->res->dom->at('#login-error')->text);
+		$tl->post_ok('/login' => form => { password => 'no' }) for 2 .. 10;
+		$tl->post_ok('/login' => form => { password => 'pw' })->status_is(429);
+		message_ok(Dashboard => 'error_login_locked', $tl->tx->res->dom->at('#login-error')->text, [15]);
 
 		$tm->get_ok('/import')->status_is(200);
 		message_ok(Dashboard => 'error_url_required', $tm->tx->res->body, [], 1);
@@ -3342,11 +3516,23 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		message_ok(Dashboard => 'error_url_fetch', $tm->tx->res->body, ['http://example.invalid/t.html', undef], 1);
 		restore_all();
 
-		mock('Mojo::File::spurt' => $boom);
+		# The export is written to a temporary file beside its name, then renamed.
+		mock('Database::BI::Controller::Dashboard::tempfile' => $boom);
 		my $outdir = tempdir(CLEANUP => 1);
 		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.csv')->status_is(500);
 		message_ok(Dashboard => 'error_write_failed', $tm->tx->res->json->{error}, [undef]);
 		restore_all();
+		SKIP: {
+			skip 'no symlinks here', 2 unless eval { symlink("$outdir/elsewhere.csv", "$outdir/link.csv") };
+			$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=link.csv')->status_is(403);
+			# Named as the app joins it (Mojo::File, so with \ on Windows).
+			message_ok(Dashboard => 'error_export_not_file', $tm->tx->res->json->{error},
+				[Mojo::File->new($outdir)->child('link.csv')->to_string]);
+		}
+		$tm->app->config->{export_dirs} = [ tempdir(CLEANUP => 1) ];
+		$tm->post_ok("/export?l=$SPEC&dir=" . $e->($outdir) . '&filename=x.csv')->status_is(403);
+		message_ok(Dashboard => 'error_outside_export_dirs', $tm->tx->res->json->{error}, [$outdir]);
+		delete $tm->app->config->{export_dirs};
 
 		mock('Mojo::Upload::move_to' => $boom);
 		$tm->post_ok('/upload' => form => { file => { content => "a,b\n1,2\n", filename => 'x.csv' } })->status_is(500);
@@ -3382,9 +3568,9 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		SKIP: {
 			# The key on the map, and what it says when nothing in it is in
 			# view, need an HTML::OSM that draws one
-			unless (eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }) {
+			unless (eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }) {
 				delete $ledger{'msg.Dashboard.map_legend_empty'};
-				skip 'the key on a map needs HTML::OSM 0.13', 1;
+				skip 'the key on a map needs HTML::OSM 0.14', 1;
 			}
 			$tm->get_ok("/map?$l&lat=lat&lon=lon&series=place")->status_is(200);
 			my ($empty) = $tm->tx->res->body =~ /var legendEmpty = '([^']*)'/;
@@ -3459,6 +3645,12 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(422);
 		message_ok(Dashboard => 'ask_invalid_spec', $tm->tx->res->json->{error}, ['nope']);
 		restore_all();
+		$tm->post_ok("/api/ask?l=$SPEC&q=" . ('x' x 501))->status_is(400);
+		message_ok(Dashboard => 'ask_question_too_long', $tm->tx->res->json->{error}, [500]);
+		$tm->app->config->{ai_calls_per_hour} = 1;	# the calls above used it up
+		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(429);
+		message_ok(Dashboard => 'ai_limit_reached', $tm->tx->res->json->{error}, [1]);
+		delete $tm->app->config->{ai_calls_per_hour};
 		delete $tm->app->config->{ai_api_key};
 
 		# A canvas older than its data says so.

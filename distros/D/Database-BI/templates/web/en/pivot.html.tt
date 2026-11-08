@@ -210,7 +210,7 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
 </nav>
 [%- END -%]
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Pivot table: click-to-sort and (flat header only) drag-to-reorder columns
 // ---------------------------------------------------------------------------

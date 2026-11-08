@@ -13,16 +13,16 @@
   - ARGV and ENV: the expanded words and the settings written before the command;
   - DATA: what the command table stored with the name.
 - IDs from other documents:
-  - A4, A5 and U2: the run-time rules and a parser rule of `claude/large-subset-spec.md`;
+  - A4, A5 and U2: the run-time rules and a parser rule of [`claude/large-subset-spec.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-spec.md);
   - B1, D1–D3 and R2: items of the page "Child Exit Wake-up";
-  - E21, X2 and X15: `claude/pspawn-known-issues.md`.
+  - E21, X2 and X15: [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md).
 - Files named in section 7 are in the bundle's top directory.
 
 Code: `lib/ShellSpawn.pm` (the executor, also `claude/pspawn-ShellSpawn.pm`) and the new `lib/ShellSpawn/Large.pm` (also `claude/pspawn-ShellSpawn-Large.pm`), in the bundle `claude/pspawn-tree.tar.gz-base64.txt`. The bundle's `parser/` now holds `ShellSubsetLarge.pm` too.
 
 ## 1. What the executor runs now
 
-`ShellSpawn::run(STRING, parser => CODE)` parses STRING with CODE, which returns a tree or an error hash; the same CODE reads the text of `eval`, `.` and trap actions. `run(TREE)` takes a ready tree. The user's decision of 2026-11-01 (19:39): the caller passes the parser, with a reasonable default. The default (Claude's choice, EXPERIMENTAL): the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall` that the caller has already loaded; if none is, `ShellSubset` is loaded. The executor loads no parser otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`). `try.pl` takes `PARSER=small`, `base` or `large` (default `large`). The large subset is `claude/large-subset-spec.md`: functions, `local`, `return`, `export`, `readonly`, `exec` anywhere and with redirections only, here-documents, positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
+`ShellSpawn::run(STRING, parser => CODE)` parses STRING with CODE, which returns a tree or an error hash; the same CODE reads the text of `eval`, `.` and trap actions. `run(TREE)` takes a ready tree. The user's decision of 2026-11-01 (19:39): the caller passes the parser, with a reasonable default. The default (Claude's choice, EXPERIMENTAL): the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall` that the caller has already loaded; if none is, `ShellSubset` is loaded. The executor loads no parser otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`). [`try.pl`](../t/try.pl) takes `PARSER=small`, `base` or `large` (default `large`). The large subset is [`claude/large-subset-spec.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-spec.md): functions, `local`, `return`, `export`, `readonly`, `exec` anywhere and with redirections only, here-documents, positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
 
 ## 2. The extension points
 
@@ -42,7 +42,7 @@ The functions a handler may use (the "context API") are the executor's own: `var
 
 ## 3. What went into the core, and why
 
-These change behaviour in many places, not at one node, so they are hooks in `ShellSpawn.pm`:
+These change behaviour in many places, not at one node, so they are hooks in [`ShellSpawn.pm`](../lib/Proc/ShellSpawn.pm):
 - **Parameters:** `$0` (`sh`), `$1`…, `$#`, `$$` (the PID of the Perl process, read once at the start of `run()`, the same in subshells), `$*`, and `"$@"`, which makes one field per parameter. A function call gets its own parameters.
 - **The new `${…}` forms.** `${N%p}` and the like use the same pattern code as `case`. In an unquoted `${N:-w}`, quoted text (`["'", …]` parts) is not split.
 - **`$(( ))`:** assignments (`= += -= *= /= %= <<= >>= &= ^= |=`), positional parameters, `$#`, `$$`.
@@ -74,7 +74,7 @@ These change behaviour in many places, not at one node, so they are hooks in `Sh
 - `kill -SIG … $$`:
   - a trap for SIG runs it;
   - `trap '' SIG` ignores it;
-  - otherwise the whole string ends: `run()` returns 128 + the signal number and sets `$ShellSpawn::SIGNALLED`. `try.pl` then kills itself with that signal, so its caller sees a death by the signal, as with `sh -c`.
+  - otherwise the whole string ends: `run()` returns 128 + the signal number and sets `$ShellSpawn::SIGNALLED`. [`try.pl`](../t/try.pl) then kills itself with that signal, so its caller sees a death by the signal, as with `sh -c`.
 - Traps for real signals are installed in `%SIG` while `run()` runs, as deferred handlers. They queue the action, which runs between two reactions. `run()` puts the old settings back.
 - A signal ignored with `trap '' SIG` stays ignored in children.
 - Error messages follow dash's wording ("x: is read only", "shift: can't shift that many", "x: parameter not set", "Illegal option -x", …), with the prefix `sh:`.
@@ -96,27 +96,27 @@ To reject one of these, say which. D1 falls back to B1's stop-gap by removing th
 
 ## 7. Tests (2026-11-01)
 
-- **`largebattery.txt`:** 103 lines of the new constructs, compared with dash by `compare.pl`. `compare.pl` now reads `@N` as a newline and `@T` as a tab, for here-documents. **99 agree** (evening, after the fixes L1–L5 and the parser's `for NAME` without `in`, `claude/large-subset-forall.patch`). The other 4:
+- **[`largebattery.txt`](../t/batteries/largebattery.txt):** 103 lines of the new constructs, compared with dash by `compare.pl`. `compare.pl` now reads `@N` as a newline and `@T` as a tab, for here-documents. **99 agree** (evening, after the fixes L1–L5 and the parser's `for NAME` without `in`, `claude/large-subset-forall.patch`). The other 4:
   - two strings the parser rejects: `$((y=2, 3))`, and settings before `export`;
   - `$0` is `sh` by the spec, while dash names itself;
   - a builtin left to sh, named only at run time, stops with status 2 (A4).
-- **The older batteries, with the large grammar** (pre-0.01; the counts of 0.03 are in `pspawn-spawner.md`, section 5):
-  - `battery.txt` 42/43 (was 41: `wait` now works);
-  - `sigenv.txt` 12/12 (was 11: `umask`);
-  - `t1.txt` 39/45 (was 35);
-  - `fdbattery.txt` 14/14, `t2.txt` 42/44 (the known flaky order), `t3.txt` 16/17 (`echo .*`, U2).
+- **The older batteries, with the large grammar** (pre-0.01; the counts of 0.03 are in [`pspawn-spawner.md`](pspawn-spawner.md), section 5):
+  - [`battery.txt`](../t/batteries/battery.txt) 42/43 (was 41: `wait` now works);
+  - [`sigenv.txt`](../t/batteries/sigenv.txt) 12/12 (was 11: `umask`);
+  - [`t1.txt`](../t/batteries/t1.txt) 39/45 (was 35);
+  - [`fdbattery.txt`](../t/batteries/fdbattery.txt) 14/14, [`t2.txt`](../t/batteries/t2.txt) 42/44 (the known flaky order), [`t3.txt`](../t/batteries/t3.txt) 16/17 (`echo .*`, U2).
 - **Other checks:**
   - `hyg.pl`: parent fds unchanged, no zombies.
   - `mem.pl`: flat.
-  - `sigprobe/mem-large.pl`: 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of `claude/pspawn-known-issues.md`.
-  - `sigprobe/exec-stress.pl`: passes.
+  - [`sigprobe/mem-large.pl`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-tree/sigprobe/mem-large.pl): 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md).
+  - [`sigprobe/exec-stress.pl`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-tree/sigprobe/exec-stress.pl): passes.
   - `large-subset-difffuzz.pl` (the ShellSubsetLarge session's random strings, run under dash and the executor): 1,800 strings, 1,636 in the subset, 7 differ. Five differ only in the order of lines from parallel pipeline elements (X13), one only in a message prefix in the middle of a line (the script strips prefixes only at line starts), and one is X2 (`$!` of a job that starts no process).
   - Parser tests (pre-0.01): 222/0, 612/0, 142/0.
 
 ## 8. Not done, limits
 
 - **Reference cycles broken by hand.** The executor still breaks some of its own cycles by hand at the end of a run (`release_all`, `%$c = ()` in `run`), against the user's rule (known issue X15). They go away in the restructuring below.
-- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit Wake-up", R2). Done 2026-11-02: `claude/pspawn-spawner.md`.
+- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit Wake-up", R2). Done 2026-11-02: [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md).
 - **Word-part handlers** return one string (section 2).
 - **`exec` with redirections only,** inside a group or `if` that has redirections of its own, changes only that group's fds; in dash it changes the shell's.
 - **`$!`** is empty when a background job starts no process before the `&` returns (X2). So `(exit 3) & wait $!` differs from dash.

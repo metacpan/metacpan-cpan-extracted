@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use File::Temp ();
 use Dist::Zilla::Tester;
 
 # Pins the plugin set the [@DBIO] bundle wires up, and how it differs between a
@@ -15,7 +16,7 @@ sub tzil_for {
   my ($bundle_args) = @_;
   Dist::Zilla::Tester->from_config(
     { dist_root => '/tmp/dbio-dzil-corpus-does-not-exist' },
-    { add_files => {
+    { tempdir_root => File::Temp::tempdir(CLEANUP => 1), add_files => {
         'source/dist.ini' => join("\n",
           'name = DBIO-Test',
           'author = Test <test@example.com>',
@@ -51,7 +52,10 @@ for my $p (qw(
   Dist::Zilla::Plugin::DBIO::GatherSkills
   Dist::Zilla::Plugin::ShareDir
   Dist::Zilla::Plugin::Git::GatherDir
-  Dist::Zilla::Plugin::PruneCruft
+  Dist::Zilla::Plugin::DBIO::LicenseFile
+  Dist::Zilla::Plugin::TestRelease
+  Dist::Zilla::Plugin::Test::ChangesHasContent
+  Dist::Zilla::Plugin::InstallRelease
   Dist::Zilla::Plugin::PodWeaver
   Dist::Zilla::Plugin::Prereqs::FromCPANfile
   Dist::Zilla::Plugin::Git::Check
@@ -78,13 +82,13 @@ ok ! $core->{'Dist::Zilla::Plugin::RewriteVersion::Transitional'},
 # --- versioning policy: only the main module is versioned (driver) ---
 {
   my $rw = $driver->{'Dist::Zilla::Plugin::RewriteVersion::Transitional'};
-  is_deeply $rw->finder, [':MainModule'],
-    'driver: RewriteVersion only patches :MainModule';
-  ok ! $rw->global, 'driver: RewriteVersion not global (sub-modules unversioned)';
+  is_deeply $rw->finder, [':InstallModules'],
+    'driver: RewriteVersion patches :InstallModules';
+  ok $rw->global, 'driver: RewriteVersion global';
 
   my $bump = $driver->{'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional'};
-  is_deeply $bump->finder, [':MainModule'],
-    'driver: BumpVersionAfterRelease only patches :MainModule';
+  is_deeply $bump->finder, [':InstallModules'],
+    'driver: BumpVersionAfterRelease patches :InstallModules';
 }
 
 # --- share_skill is forwarded to DBIO::GatherSkills as its 'skill' list ---
@@ -101,6 +105,42 @@ ok ! $core->{'Dist::Zilla::Plugin::RewriteVersion::Transitional'},
   # (it falls back to deriving owned skills from the dist name at build time).
   is_deeply $driver->{'Dist::Zilla::Plugin::DBIO::GatherSkills'}->skill, [],
     'no share_skill -> empty explicit skill list (name-rule fallback)';
+}
+
+# --- PruneCruft is gone: what is tracked is what ships ---
+ok ! $driver->{'Dist::Zilla::Plugin::PruneCruft'}, 'driver: no PruneCruft';
+ok ! $core->{'Dist::Zilla::Plugin::PruneCruft'},   'core: no PruneCruft';
+
+# --- Git::GatherDir: tracked files incl. dotfiles, only build products out ---
+for my $set ([driver => $driver], [core => $core]) {
+  my ($label, $plugins) = @$set;
+  my $gd = $plugins->{'Dist::Zilla::Plugin::Git::GatherDir'};
+  ok $gd->include_dotfiles, "$label: GatherDir includes dotfiles";
+  is_deeply [ sort @{ $gd->exclude_filename } ],
+    [ sort qw(META.yml META.json MANIFEST README README.md .karr) ],
+    "$label: GatherDir excludes only the generated files and .karr";
+  is_deeply $gd->exclude_match, [], "$label: GatherDir has no exclude_match";
+}
+
+# --- LicenseFile follows heritage ---
+ok ! by_class( tzil_for('') )->{'Dist::Zilla::Plugin::DBIO::LicenseFile'}->heritage,
+  'LicenseFile: heritage off by default';
+ok   by_class( tzil_for('heritage = 1') )->{'Dist::Zilla::Plugin::DBIO::LicenseFile'}->heritage,
+  'LicenseFile: heritage = 1 reaches the plugin';
+
+# --- release chain: the three checks run before ConfirmRelease ---
+for my $set ([driver => tzil_for('')], [core => tzil_for('core = 1')]) {
+  my ($label, $tzil) = @$set;
+  my @order = map { ref $_ } @{ $tzil->plugins };
+  my %pos; @pos{@order} = (0 .. $#order);
+  my $confirm = $pos{'Dist::Zilla::Plugin::ConfirmRelease'};
+  ok defined $confirm, "$label: ConfirmRelease present";
+  for my $p (qw(TestRelease Test::ChangesHasContent InstallRelease)) {
+    my $pos = $pos{"Dist::Zilla::Plugin::$p"};
+    ok defined $pos && $pos < $confirm, "$label: $p runs before ConfirmRelease";
+  }
+  my ($install) = grep { ref $_ eq 'Dist::Zilla::Plugin::InstallRelease' } @{ $tzil->plugins };
+  is $install->install_command, 'cpanm .', "$label: InstallRelease uses cpanm .";
 }
 
 done_testing;

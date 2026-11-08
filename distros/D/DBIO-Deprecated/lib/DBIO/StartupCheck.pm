@@ -4,15 +4,12 @@ package DBIO::StartupCheck;
 use strict;
 use warnings;
 
-# Deliberately explicit $VERSION -- unlike normal DBIO sub-modules, which
-# carry none (only the dist's main module does, bumped by dzil). This
-# tombstone needs its own hard-coded, higher $VERSION so PAUSE indexes THIS
-# module as canonical for the name: PAUSE resolves each module name to
-# whichever shipped distribution carries the highest $VERSION, and DBIO
-# core's last CPAN release to ship this module was 0.900000. Do NOT "clean
-# this up" to match the no-$VERSION sub-module convention -- doing so hands
-# the PAUSE index entry back to the stale, superseded release.
-our $VERSION = '0.900001';
+# Last release that shipped this name: DBIO (core) 0.900000.
+# The PAUSE takeover is decided by THIS dist's release version -- the build
+# stamps that into every module and into META "provides" -- not by the
+# literal below, which RewriteVersion::Transitional rewrites (and inserts,
+# if missing) at build time. See DBIO::Deprecated, "HOW THE TAKEOVER WORKS".
+our $VERSION = '0.900004';
 
 # "Removed, no successor" tombstone: unlike a rename, there is nothing to
 # redirect to -- say so plainly instead of pointing at a replacement module.
@@ -36,7 +33,7 @@ DBIO::StartupCheck - REMOVED -- no replacement, see DBIO::Deprecated
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

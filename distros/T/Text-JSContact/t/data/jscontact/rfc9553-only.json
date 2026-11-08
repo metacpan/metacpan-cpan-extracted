@@ -1,0 +1,81 @@
+{
+   "@type" : "Card",
+   "addresses" : {
+      "a1" : {
+         "@type" : "Address",
+         "components" : [
+            {
+               "@type" : "AddressComponent",
+               "kind" : "number",
+               "value" : "54321"
+            },
+            {
+               "@type" : "AddressComponent",
+               "kind" : "name",
+               "value" : "Oak St"
+            },
+            {
+               "@type" : "AddressComponent",
+               "kind" : "locality",
+               "value" : "Reston"
+            }
+         ],
+         "contexts" : {
+            "billing" : true
+         }
+      }
+   },
+   "calendars" : {
+      "cal1" : {
+         "@type" : "Calendar",
+         "kind" : "calendar",
+         "uri" : "https://cal.example.com/cal"
+      },
+      "fb1" : {
+         "@type" : "Calendar",
+         "kind" : "freeBusy",
+         "uri" : "https://cal.example.com/busy"
+      }
+   },
+   "directories" : {
+      "d1" : {
+         "@type" : "Directory",
+         "kind" : "directory",
+         "listAs" : 1,
+         "uri" : "https://directory.example.com"
+      }
+   },
+   "localizations" : {
+      "yue" : {
+         "name/components/0/phonetic" : "syun1",
+         "name/components/1/phonetic" : "zung1saan1"
+      }
+   },
+   "name" : {
+      "components" : [
+         {
+            "@type" : "NameComponent",
+            "kind" : "surname",
+            "value" : "孫"
+         },
+         {
+            "@type" : "NameComponent",
+            "kind" : "given",
+            "value" : "中山"
+         }
+      ],
+      "full" : "孫中山",
+      "isOrdered" : true
+   },
+   "phones" : {
+      "p1" : {
+         "@type" : "Phone",
+         "features" : {
+            "main-number" : true
+         },
+         "number" : "+1 555 0100"
+      }
+   },
+   "uid" : "urn:uuid:9553abcd-0000-4000-8000-000000000001",
+   "version" : "2.0"
+}

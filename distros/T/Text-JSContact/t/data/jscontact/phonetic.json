@@ -1,0 +1,16 @@
+{
+  "@type": "Card",
+  "version": "2.0",
+  "uid": "urn:uuid:9b0e71c0-0000-4000-8000-000000000001",
+  "name": {
+    "full": "Johnny Appleseed",
+    "components": [
+      { "@type": "NameComponent", "kind": "surname", "value": "Appleseed" },
+      { "@type": "NameComponent", "kind": "given", "value": "Johnny" }
+    ],
+    "phoneticComponents": [
+      { "@type": "NameComponent", "kind": "given", "value": "JAH-nee", "phonetic": "ipa" },
+      { "@type": "NameComponent", "kind": "surname", "value": "APP-ul-seed", "phonetic": "ipa" }
+    ]
+  }
+}

@@ -17,8 +17,9 @@ use File::Spec;
 use Readonly;
 use Data::Walk;
 use Try::Tiny;
+use Data::Dumper;
 
-our $VERSION = 1.15;
+our $VERSION = 1.16;
 
 our $override;
 my $JSON_OBJ   = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -190,17 +191,17 @@ sub _override_dbi_execute {
 
             my $sql = $sth->{Statement} // $sth->{Database}->{Statement} // '';
             $sql = $self->_normalize_sql($sql);
-            my $retval = $orig_execute->( $sth, @args );
 
             my $col_names;
+            my $retval;
+            my $error;
             try {
+                $retval    = $orig_execute->( $sth, @args );
                 $col_names = $sth->{NAME}
                   if $sql !~ m/^INSERT|^UPDATE|^DELETE/i;
             }
             catch {
-                my $error = $_;
-
-                # say STDERR $error;
+                $error = $_;
             };
 
             my $rows       = $sth->rows();
@@ -223,16 +224,19 @@ sub _override_dbi_execute {
               if ref $self->{bind_params}
               && scalar @{ $self->{bind_params} } > 0;
 
-            if ( $self->{bind_named_params} && scalar keys %{ $self->{bind_named_params} } ) {
+            if ( $self->{bind_named_params}
+                && scalar keys %{ $self->{bind_named_params} } )
+            {
                 my %seen  = ();
                 my @order = grep { !$seen{$_}++ } ( $sql =~ m/(:\w+)/g );
-                $query_data->{bound_params} = [ map { $self->{bind_named_params}->{$_} } @order ];
+                $query_data->{bound_params} =
+                  [ map { $self->{bind_named_params}->{$_} } @order ];
             }
 
             # query failed:
-            if ( !$retval ) {
-                $query_data->{failure} = [ 5, 'Ooops!' ];
-                $query_data->{results} = undef;
+            if ($error) {
+                $query_data->{failure} = [ $sth->err, $sth->errstr // $error ];
+                $query_data->{results} = DBD::Mock::NULL_RESULTSET;
             }
 
             push @{ $self->{result} }, $query_data
@@ -253,13 +257,14 @@ sub _override_dbi_mocked_execute {
     my $mocked_dbi_execute = shift;
 
     my $orig_mocked_dbi_execute = \&$mocked_dbi_execute;
-
     $self->get_override_object()->replace(
         $mocked_dbi_execute,
         sub {
             my ( $sth, @params ) = @_;
 
-            if ( $self->{bind_named_params} && scalar keys %{ $self->{bind_named_params} } ) {
+            if ( $self->{bind_named_params}
+                && scalar keys %{ $self->{bind_named_params} } )
+            {
                 my %seen  = ();
                 my $sql   = $sth->{Statement} // $sth->{Database}->{Statement} // '';
                 my @order = grep { !$seen{$_}++ } ( $sql =~ m/(:\w+)/g );
@@ -268,7 +273,23 @@ sub _override_dbi_mocked_execute {
 
             $self->{bind_named_params} = {};
             $self->{bind_parmas}       = [];
-            return $orig_mocked_dbi_execute->( $sth, @params );
+
+            my $session       = $sth->{Database}->{mock_session};
+            my $current_state = undef;
+
+            if ( $session && exists $session->{state_index} ) {
+                my $idx = $session->{state_index};
+                $current_state = $session->{states}->[$idx];
+            }
+            my $r = $orig_mocked_dbi_execute->( $sth, @params );
+
+            if ( $current_state && $current_state->{failure} ) {
+                my ( $err_code, $err_msg ) = @{ $current_state->{failure} };
+                $sth->set_err( $err_code, $err_msg );
+                return undef;
+            }
+
+            return $r;
         }
     );
 }
@@ -386,7 +407,11 @@ sub _override_dbi_fetchrow_hashref {
         sub {
             my ($sth) = @_;
 
-            my $retval = $orig_selectrow_hashref->($sth);
+            my $retval;
+            if ( !$DBI::errstr ) {
+                $retval = $orig_selectrow_hashref->($sth);
+            }
+
             $self->{result}->[-1]->{col_names} = $sth->{NAME};
             if ( ref $retval && !defined $self->{result}->[-1]->{results} ) {
                 my $query_results = $self->_set_hashref_response( $sth, $retval );

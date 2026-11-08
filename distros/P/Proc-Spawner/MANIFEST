@@ -5,6 +5,7 @@ META.yml                                 Module YAML meta-data (added by MakeMak
 Makefile.PL
 README
 Spawner.xs
+TODO
 doc/README.md
 doc/large-subset/README.md
 doc/large-subset/dialect-cases/cases.txt
@@ -13,10 +14,13 @@ doc/large-subset/dialect-cases/large-subset-dialect-results2.txt
 doc/large-subset/dialect-cases/results.txt
 doc/large-subset/dialect-cases/run-cases.sh
 doc/large-subset/large-subset-dialect-features.md
+doc/large-subset/large-subset-environment.md
 doc/large-subset/large-subset-logical.md
+doc/large-subset/large-subset-provenance.tsv
 doc/large-subset/large-subset-spec.md
 doc/large-subset/large-subset-state.md
 doc/large-subset/large-subset-state.md.html
+doc/large-subset/tools/large-subset-blocks.pl
 doc/large-subset/tools/large-subset-builtins-differences.tsv
 doc/large-subset/tools/large-subset-builtins.pl
 doc/large-subset/tools/large-subset-drops.pl
@@ -51,6 +55,7 @@ doc/parsers/tools/top5.pl
 doc/parsers/tools/verify.pl
 doc/parsers/tools/verify.txt
 doc/perl-signals-findings.md
+doc/perl-win32-system-bugs.md
 doc/pspawn-design.md
 doc/pspawn-extensions.md
 doc/pspawn-graph.md
@@ -103,4 +108,5 @@ t/sgraph/reporter
 t/sgraph/run-graph.pl
 t/spawner.t
 t/try.pl
+t/windows.t
 win_spawn.h

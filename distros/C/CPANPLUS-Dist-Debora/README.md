@@ -24,7 +24,7 @@ On Debian-based systems, the following packages are required:
 
 * perl
 * build-essential
-* debhelper (version 12 or better)
+* debhelper
 * fakeroot
 * sudo
 
@@ -52,7 +52,7 @@ Type the following command to see the module usage information:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 Andreas Vögele
+Copyright (C) 2026 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

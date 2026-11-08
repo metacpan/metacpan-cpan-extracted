@@ -397,18 +397,14 @@ subtest '_write_sqlite_db -- tmpfile is unlinked after successful write' => sub 
 	SKIP: {
 		eval { require DBI; DBI->install_driver('SQLite') }
 			or skip 'DBD::SQLite not available', 1;
-		my $captured_path;
-		# Mock the imported tempfile() alias so we can capture the temp path.
-		mock 'Database::BI::Controller::Dashboard::tempfile' => sub {
-			require File::Temp;
-			my ($fh, $path) = File::Temp::tempfile(@_);
-			$captured_path = $path;
-			return ($fh, $path);
-		};
+		# The file is made by Database::Join::Catalog in TMPDIR: point that at
+		# an empty folder and look for leftovers, rather than wrapping
+		# tempfile() (a wrapper that called File::Temp::tempfile recursed
+		# without end once Catalog, loaded after the mock, imported it).
+		my $tmp = tempdir(CLEANUP => 1);
+		local $ENV{TMPDIR} = $tmp;
 		eval { $WRITE_SQLITE->(undef, \@RECS, \@COLS) };
-		restore_all();
-		ok defined($captured_path) && !-e $captured_path,
-			'tmpfile unlinked after successful _write_sqlite_db';
+		is_deeply [ glob("$tmp/*") ], [], 'tmpfile unlinked after successful _write_sqlite_db';
 	}
 };
 
@@ -420,8 +416,8 @@ subtest '_write_sqlite_db -- DBI connect failure produces croak' => sub {
 		eval { $WRITE_SQLITE->(undef, \@RECS, \@COLS) };
 		$err = $@;
 		restore_all();
-		like $err, qr/DBI connect failed/,
-			'croak message contains "DBI connect failed" when connect returns undef';
+		like $err, qr/gave no reason/,
+			'a connect that returns undef still croaks, with a message';
 	}
 };
 
@@ -443,14 +439,13 @@ subtest '_write_sqlite_db -- empty column list croaks before touching filesystem
 		eval { $WRITE_SQLITE->(undef, \@RECS, []) };
 		$err = $@;
 		like $err, qr/no columns/i, 'croak message mentions "no columns"';
-		# Verify no tmpfile was leaked: the guard fires before tempfile() is called.
-		# We verify indirectly by confirming no exception path was taken via the
-		# tmpfile mock (no path captured means tempfile was never reached).
+		# Verify no tmpfile was made: the guard fires before the writer runs.
 		my $called;
-		mock 'Database::BI::Controller::Dashboard::tempfile' => sub { $called = 1 };
+		require Database::Join::Catalog;
+		mock 'Database::Join::Catalog::sqlite_bytes' => sub { $called = 1 };
 		eval { $WRITE_SQLITE->(undef, \@RECS, []) };
 		restore_all();
-		ok !$called, 'tempfile() not called when column list is empty (D~ guard fires first)';
+		ok !$called, 'the writer is not called when column list is empty (D~ guard fires first)';
 	}
 };
 
@@ -458,13 +453,8 @@ subtest '_write_sqlite_db -- tmpfile unlinked even when DBI work throws (O~ fix)
 	SKIP: {
 		eval { require DBI; DBI->install_driver('SQLite') }
 			or skip 'DBD::SQLite not available', 2;
-		my $captured_path;
-		mock 'Database::BI::Controller::Dashboard::tempfile' => sub {
-			require File::Temp;
-			my ($fh, $path) = File::Temp::tempfile(@_);
-			$captured_path = $path;
-			return ($fh, $path);
-		};
+		my $tmp = tempdir(CLEANUP => 1);
+		local $ENV{TMPDIR} = $tmp;
 		# Force $dbh->do() to throw by injecting a bad column name that SQLite rejects.
 		# We use Test::Mockingbird to make do() die after the DBI connect succeeds.
 		mock 'DBI::db::do' => sub { die "simulated do() failure\n" };
@@ -473,8 +463,7 @@ subtest '_write_sqlite_db -- tmpfile unlinked even when DBI work throws (O~ fix)
 		$err = $@;
 		restore_all();
 		like $err, qr/simulated do\(\) failure/, 'exception from do() propagates via croak';
-		ok defined($captured_path) && !-e $captured_path,
-			'tmpfile unlinked even when DBI do() throws (O~ fix)';
+		is_deeply [ glob("$tmp/*") ], [], 'tmpfile unlinked even when DBI do() throws (O~ fix)';
 	}
 };
 
@@ -1018,9 +1007,9 @@ subtest '_build_export_url -- multiple filter specs produce multiple &f= params'
 #
 # $url U (regex to extract $host) -> $host D -> multiple U (guard checks)
 # $packed D (inet_aton result) -> U (unpack) -> $n D -> U (range checks)
-# The D~ anomaly from CLAUDE.md: non-standard IPv4 encodings (octal, hex,
-# decimal integer) pass through because $host doesn't match the dotted-quad
-# regex; the authoritative block is at the network-egress firewall layer.
+# Non-standard IPv4 encodings (octal, hex, decimal integer, short forms) are
+# read as the resolver reads them, so they are blocked like the dotted form.
+# Names are checked when fetched, by Database::BI::SafeUA (t/safe-ua.t).
 # ======================================================================
 
 subtest '_is_safe_url -- localhost variants are blocked' => sub {
@@ -1062,13 +1051,10 @@ subtest '_is_safe_url -- non-HTTP schemes fail host-extraction and return 0' => 
 	ok !$IS_SAFE->('file:///etc/passwd'),    'file: scheme blocked';
 };
 
-subtest '_is_safe_url -- non-standard IPv4 encodings pass through (documented)' => sub {
-	# Octal/hex/decimal-int IPv4 forms do NOT match the dotted-quad regex
-	# (/\A\d{1,3}(?:\.\d{1,3}){3}\z/) so they skip the range checks and return 1.
-	# This is documented behaviour in CLAUDE.md: the authoritative block is the
-	# egress firewall.  These tests document the current behaviour, not a bug.
-	ok $IS_SAFE->('http://0177.0.0.1/'),     'octal 127.0.0.1 passes (documented gap)';
-	ok $IS_SAFE->('http://2130706433/'),     'decimal-int 127.0.0.1 passes (documented)';
+subtest '_is_safe_url -- non-standard IPv4 encodings are blocked' => sub {
+	# These once passed: only the dotted form was range-checked.
+	ok !$IS_SAFE->('http://0177.0.0.1/'),     'octal 127.0.0.1 blocked';
+	ok !$IS_SAFE->('http://2130706433/'),     'decimal-int 127.0.0.1 blocked';
 };
 
 # ======================================================================

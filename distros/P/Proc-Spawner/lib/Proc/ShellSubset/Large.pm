@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Large;  # The large subset (doc/large-subset/large-subset-spec.md): Proc::ShellSubset, and where it rejects, a wider grammar
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use strict; use warnings; use Proc::ShellSubset; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::Large::parse($string, %opt) returns a List, or { error, pos, last, tree } as Proc::ShellSubset::parse does.

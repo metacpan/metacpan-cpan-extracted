@@ -61,7 +61,7 @@ subtest 'Validate data with registered rules' => sub {
     }, 'Should appluy changes to values' );
 };
 
-subtest 'list_of, or and aliases pass the same arguments to rules as validate()' => sub {
+subtest 'list_of, or and aliases pass the value and the fields next to it to rules' => sub {
     my @calls;
     my $validator = Validator::LIVR->new({
         list    => { list_of => ['my_spy', 'my_spy'] },
@@ -81,17 +81,19 @@ subtest 'list_of, or and aliases pass the same arguments to rules as validate()'
     });
     $validator->register_aliased_rule({ name => 'my_spied_alias', rules => ['my_spy'] });
 
-    my $output = $validator->validate({ list => ['a'], any => 'b', aliased => 'c', empty => [1, 2] });
+    my $input = { list => ['a'], any => 'b', aliased => 'c', empty => [1, 2] };
+    my $output = $validator->validate($input);
 
     is_deeply($output, { list => ['a!!'], any => 'b!', aliased => 'c!', empty => [undef, undef] }, 'Should apply rules');
 
-    # Fields are validated in hash order, so the calls are sorted
+    # Fields are validated in hash order, so the calls are sorted. Items of list_of have no
+    # fields next to them, "or" and aliases are transparent (LIVR 2.5, section 2.5)
     is_deeply([ sort { $a->[0] cmp $b->[0] } @calls ], [
-        [ 'a',  { field => 'a' } ],
-        [ 'a!', { field => 'a' } ],
-        [ 'b',  { field => 'b' } ],
-        [ 'b',  { field => 'b' } ],
-        [ 'c',  { value => 'c' } ],
+        [ 'a',  {} ],
+        [ 'a!', {} ],
+        [ 'b',  $input ],
+        [ 'b',  $input ],
+        [ 'c',  $input ],
     ], 'Should pass the value and all values to each rule' );
 };
 

@@ -22,3 +22,6 @@
     - Fix bug in capturing named params
 1.14   2026-04-14
     - refactor _override_dbi_fecth
+1.16  2026-11-07
+    - capture erro code and message
+    - set error code ad message in mocks

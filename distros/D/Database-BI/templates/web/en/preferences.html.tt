@@ -70,7 +70,7 @@
   so that they look the same to whoever receives them.</p>
 </section>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var status = document.getElementById('pref-status');
   var radios = document.querySelectorAll('input[name="theme"]');

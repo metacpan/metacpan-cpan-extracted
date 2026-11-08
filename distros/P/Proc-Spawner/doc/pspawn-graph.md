@@ -2,7 +2,7 @@
 
 **Status: experimental, free to change without ceremony** (your notes on N7–N10 and W1–W3 of the page "Spawn Graph Notation", 2026-11-01). Decided there: N2, N3, N5–N10 and W1 Go; W2 option C; W3 Go, as part of `Proc::Spawner`. N1 has a note with a question and no mark; N4 is unmarked. Written 2026-11-01.
 
-**Correction, 2026-11-01 13:22:** the first version of this doc described a graph that only mirrored and drew the executor. The user wanted the graph, with on-exit information per node, to be what is executed. **Done 2026-11-02:** the graph is now `lib/Proc/Spawner/Graph.pm`, and it is what runs; the design is in `claude/pspawn-spawner.md`. Sections 2, 5 and 6 below are updated; sections 1, 3 and 4 still hold.
+**Correction, 2026-11-01 13:22:** the first version of this doc described a graph that only mirrored and drew the executor. The user wanted the graph, with on-exit information per node, to be what is executed. **Done 2026-11-02:** the graph is now [`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm), and it is what runs; the design is in [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md). Sections 2, 5 and 6 below are updated; sections 1, 3 and 4 still hold.
 
 The graph sits between the shell layer (the executor `ShellSpawn`, which runs ShellSubset parse trees) and the future module `Proc::Spawner`. It is not limited to topologies that sh can make (R1).
 
@@ -18,7 +18,7 @@ In code a process node is exactly the per-child "handout list" (its final fd tab
 
 ## 2. Code
 
-`lib/Proc/Spawner/Graph.pm` (since 2026-11-02; it replaces `lib/SpawnGraph.pm`). The full list of calls is in `claude/pspawn-spawner.md`, section 2. In short: `new_pipe`, `file_end`, `parent_end`, `hold`, `release` for ends; `start(…, on_exit => HANDLER)` for processes; `perl_read`, `perl_write` for Perl's own use of ends; `parse(TEXT)` for the notation of N7 (section 4); `to_dot(GRAPH, CAPTION)` for pictures (N8, N9); `run(GRAPH, bin => DIR)` for hand-written graphs (section 5). The translation of a fd table into posix_spawn file actions is in `lib/Proc/Spawner.pm`.
+[`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm) (since 2026-11-02; it replaces `lib/SpawnGraph.pm`). The full list of calls is in [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md), section 2. In short: `new_pipe`, `file_end`, `parent_end`, `hold`, `release` for ends; `start(…, on_exit => HANDLER)` for processes; `perl_read`, `perl_write` for Perl's own use of ends; `parse(TEXT)` for the notation of N7 (section 4); `to_dot(GRAPH, CAPTION)` for pictures (N8, N9); `run(GRAPH, bin => DIR)` for hand-written graphs (section 5). The translation of a fd table into posix_spawn file actions is in [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm).
 
 In the executor (`lib/ShellSpawn.pm`):
 
@@ -46,13 +46,13 @@ PROC: ARGV ... | EDGES | after PROC WORD | STATE
 Perl: WHAT | <END                          the parent itself reading an end
 ```
 
-Arguments are split at blanks; quoting is not done yet. `sgraph/graph2dot.pl FILE.sg` draws a file; its output is pixel-identical to the prototype's for Examples 1–6.
+Arguments are split at blanks; quoting is not done yet. [`sgraph/graph2dot.pl`](../t/sgraph/graph2dot.pl) `FILE.sg` draws a file; its output is pixel-identical to the prototype's for Examples 1–6.
 
 ## 5. Running hand-written graphs
 
 `Proc::Spawner::Graph::run` starts each process with exactly its edges; fds 0–2 not among them are the parent's. A process with `after P WORD` is started by P's on-exit handler (`Proc::Spawner::Graph::then`): WORD `fail` needs a non-zero status, `ok` zero, anything else any status. A process that will never start is marked `never` and gives up its ends. A state written in the notation (`running`, `exited 0`) is for drawing only; `run` starts from scratch. The parent closes its copy of an end once no process left to start uses it.
 
-`sgraph/run-graph.pl FILE.sg …` runs graphs with every program replaced by `sgraph/reporter`, through symlinks named after the programs. The reporter records its argv, every open fd (what it is, its access mode, close-on-exec), SigIgn, SigBlk, process group and session. It then writes its name to every fd it may write, closes those, and reads every readable pipe or file to its end. The checker compares each process's fds with its edges. Pipes are matched to inodes one to one. It also checks that each pipe carried the names of exactly the processes that write into it.
+[`sgraph/run-graph.pl`](../t/sgraph/run-graph.pl) `FILE.sg …` runs graphs with every program replaced by `sgraph/reporter`, through symlinks named after the programs. The reporter records its argv, every open fd (what it is, its access mode, close-on-exec), SigIgn, SigBlk, process group and session. It then writes its name to every fd it may write, closes those, and reads every readable pipe or file to its end. The checker compares each process's fds with its edges. Pipes are matched to inodes one to one. It also checks that each pipe carried the names of exactly the processes that write into it.
 
 Result, 2026-11-01, and again 2026-11-02 on the new engine: Examples 1–6 of the page, 17 of 17 processes as drawn, including the loop of Example 2, the fds 3 and 4 of Example 3, `after P1 fail` in Example 1 and Perl's own read in Example 4. With the fd-table translation deliberately broken, the checker reports 0 of 6.
 
@@ -60,4 +60,4 @@ Result, 2026-11-01, and again 2026-11-02 on the new engine: Examples 1–6 of th
 
 - N4 (`keep` edges), unmarked.
 - Windows (W1–W3), in `Proc::Spawner` now that it exists; none of it can be tested here. W2 is option C: fds 3 and up go through the C runtime's reserved field, and a program on a list of names known to ignore that field (starting with `java`, `javaw`; changeable through the API) is refused such an fd at once.
-- Corpus testing with the reporter (X12 in `claude/pspawn-known-issues.md`): the reporter exists now; the corpora are still to be restored.
+- Corpus testing with the reporter (X12 in [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md)): the reporter exists now; the corpora are still to be restored.

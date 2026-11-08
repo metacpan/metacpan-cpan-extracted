@@ -41,7 +41,7 @@ VCARD
 my $card = vcard_to_jscontact($vcard);
 ok($card, 'parsed vCard to JSContact');
 is($card->{'@type'}, 'Card', '@type is Card');
-is($card->{version}, '1.0', 'version is 1.0');
+is($card->{version}, '2.0', 'version is 2.0 (RFC 9982)');
 is($card->{uid}, 'urn:uuid:1234-5678', 'uid preserved');
 
 # Name

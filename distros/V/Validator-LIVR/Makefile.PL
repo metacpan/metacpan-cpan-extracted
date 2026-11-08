@@ -19,12 +19,14 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More'      => '0.96', # subtests without a plan
         'Test::Exception' => '0',
+        'Test::MockTime'  => '0', # fixes the current date of "today" in tests
         'JSON'            => '0'
     },
     PREREQ_PM => {
         # Core modules, but some systems install them separately
         'Carp'         => '0',
         'Scalar::Util' => '0',
+        'JSON::PP'     => '0', # booleans of the "boolean" rule, in the core since Perl 5.14
     },
     ( $mm < 6.46
         ? ()

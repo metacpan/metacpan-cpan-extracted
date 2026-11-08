@@ -5,6 +5,7 @@ author:
 build_requires:
   JSON: '0'
   Test::Exception: '0'
+  Test::MockTime: '0'
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,10 +22,11 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  JSON::PP: '0'
   Scalar::Util: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/koorchik/Validator-LIVR/issues
   repository: https://github.com/koorchik/Validator-LIVR
-version: '2.1'
+version: '2.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,6 +21,7 @@ WriteMakefile(
         'Email::MIME'                          => 0,
         'Email::MIME::ContentType'             => 0,
         'Email::MIME::Header::AddressList'     => 0,
+        'Email::Address::XS'                   => 0,
         'Encode'                               => 0,
         'Encode::MIME::Header'                 => 0,
         'Unicode::Normalize'                   => 0,

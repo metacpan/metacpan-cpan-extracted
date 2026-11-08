@@ -786,19 +786,18 @@ subtest '_csv_row path-E: undef field -> empty string in output' => sub {
 	subtest '_write_sqlite_db path-B: DBI connect fails -> tmpfile unlinked + croak' => sub {
 		SKIP: {
 			eval { require DBI } or skip 'DBI not available', 2;
+			# Point TMPDIR at an empty folder and see that nothing is left in it.
+			# (Wrapping File::Temp::tempfile in a mock that called
+			# File::Temp::tempfile recursed without end once the writer moved to
+			# Database::Join::Catalog, loaded after the mock: it ate all memory.)
+			require Database::Join::Catalog;
+			my $tmp = tempdir(CLEANUP => 1);
+			local $ENV{TMPDIR} = $tmp;
 			mock 'DBI::connect' => sub { die "cannot connect\n" };
-			my $tmpfile_created;
-			mock 'File::Temp::tempfile' => sub {
-				my (undef, $file) = File::Temp::tempfile(SUFFIX => '.db', UNLINK => 0);
-				$tmpfile_created = $file;
-				open my $fh, '>', $file or die "open: $!";
-				return ($fh, $file);
-			};
 			throws_ok { $WRITE_SQLITE->($dummy_self, [], [qw(id val)]) }
-				qr/DBI connect failed/,
+				qr/cannot connect/,
 				'path B: DBI connect failure -> croak';
-			ok !-f $tmpfile_created, 'path B: tmpfile was unlinked during cleanup'
-				if defined $tmpfile_created;
+			is_deeply [ glob("$tmp/*") ], [], 'path B: the temporary file was removed';
 			restore_all;
 		}
 	};

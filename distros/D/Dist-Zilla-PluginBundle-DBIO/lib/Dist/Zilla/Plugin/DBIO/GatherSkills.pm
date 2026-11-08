@@ -1,5 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::GatherSkills;
 # ABSTRACT: Ship a distribution's own agent skills as a sharedir (share/skills/)
+our $VERSION = '0.900004';
 use Moose;
 use Path::Tiny;
 use Dist::Zilla::File::InMemory;
@@ -42,17 +43,29 @@ sub _owned {
 sub gather_files {
   my ($self) = @_;
   my $base = path($self->from);
+  my $explicit = @{ $self->skill } ? 1 : 0;
 
   for my $name ($self->_owned) {
     my $dir = $base->child($name);
     unless ($dir->is_dir) {
-      $self->log("owned skill '$name' not found under @{[$self->from]} -- skipping");
+      my $missing = "owned skill '$name' not found under @{[$self->from]}";
+      # An explicitly declared skill (share_skill=/skill=) that is not on disk
+      # is fatal: a build without a prior skilletor sync must fail loud, not
+      # silently ship a dist missing a declared skill. The name-derived fallback
+      # (empty skill list) stays a silent skip -- there "nothing matches" is a
+      # valid answer, not an error.
+      $self->log_fatal($missing) if $explicit;
+      $self->log("$missing -- skipping");
       next;
     }
 
     my $iter = $dir->iterator({ recurse => 1 });
     while (my $file = $iter->()) {
       next unless $file->is_file;
+      # skilletor writes a per-skill .gitignore (content "*") into every
+      # installed skill dir; it is management state, not skill content, and must
+      # never be shipped into the tarball. Everything else ships unchanged.
+      next if $file->basename eq '.gitignore';
       my $rel = $file->relative($base);          # e.g. dbio-db2/SKILL.md
       $self->add_file(Dist::Zilla::File::InMemory->new(
         name    => "share/skills/$rel",
@@ -79,7 +92,7 @@ Dist::Zilla::Plugin::DBIO::GatherSkills - Ship a distribution's own agent skills
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 DESCRIPTION
 

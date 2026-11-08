@@ -39,6 +39,7 @@
             "DateTime::Format::ISO8601::Format" : "0",
             "DateTime::Format::Mail" : "0",
             "Digest::SHA" : "0",
+            "Email::Address::XS" : "0",
             "Email::MIME" : "0",
             "Email::MIME::ContentType" : "0",
             "Email::MIME::Header::AddressList" : "0",
@@ -54,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

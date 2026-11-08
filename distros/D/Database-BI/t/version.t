@@ -27,4 +27,26 @@ Test::Version->import();
 # and produced no plan, and reports a failure for a distribution in perfect
 # health.
 version_all_ok('lib');
+
+# Test::Version reads $VERSION only.  The =head1 VERSION paragraph is what
+# MetaCPAN shows, and Calc.pm and DataSource.pm said 0.012.0 there for nine
+# releases while their $VERSION moved on; every module also carries
+# Database::BI's version.
+use File::Find;
+my $want;
+find({ no_chdir => 1, wanted => sub {
+	return unless /\.pm\z/;
+	my $text = do { local $/; open my $fh, "<", $_ or BAIL_OUT("$_: $!"); <$fh> };
+	my ($code) = $text =~ /our\s+\$VERSION\s*=\s*(?:version->declare\()?'([^']+)'/;
+	$want = $code if m{lib/Database/BI\.pm\z};
+	if (my ($pod) = $text =~ /^=head1 VERSION\s*\n\s*\n\s*(\S+)/m) {
+		is $pod, $code, "$_: =head1 VERSION is its \$VERSION";
+	}
+} }, 'lib');
+find({ no_chdir => 1, wanted => sub {
+	return unless /\.pm\z/;
+	my $text = do { local $/; open my $fh, "<", $_ or BAIL_OUT("$_: $!"); <$fh> };
+	my ($code) = $text =~ /our\s+\$VERSION\s*=\s*(?:version->declare\()?'([^']+)'/;
+	is $code, $want, "$_: \$VERSION is Database::BI's";
+} }, 'lib');
 done_testing();

@@ -53,6 +53,11 @@
 use strict;
 use warnings;
 
+# Database::BI's own modules from a source folder, as the other scripts do;
+# installed, they are on @INC already.
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
 use Getopt::Long qw(GetOptions :config no_ignore_case);
 use POSIX	qw(_exit);
 use File::Spec;
@@ -68,7 +73,7 @@ use Scalar::Util qw(looks_like_number);
 # ---------------------------------------------------------------------------
 
 my ($opt_analysis, $opt_thresholds, $opt_model_dir, $opt_data_dir, $opt_dry_run,
-    $opt_help, $opt_suppress, $opt_state_file, $opt_recovery, $opt_notify);
+	$opt_help, $opt_suppress, $opt_state_file, $opt_recovery, $opt_notify);
 
 GetOptions(
 	'analysis|a=s@'   => \$opt_analysis,
@@ -194,16 +199,19 @@ for my $id (@analysis_ids) {
 		exit 2;
 	}
 
-	my $file_path;
+	# table:<name>/<table> and path:<file>#<table> name one table of a file.
+	my ($file_path, $internal);
 	if ($spec =~ /\Atable:(.+)\z/) {
 		my $table = $1;
-		for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db)) {
+		($table, $internal) = ($1, $2) if $table =~ m{\A([^/]+)/(.+)\z};
+		for my $ext (qw(csv tsv psv xlsx xml sql sqlite sqlite3 db json)) {
 			my $p = File::Spec->catfile($data_dir, "$table.$ext");
 			if (-f $p) { $file_path = $p; last }
 		}
 	}
 	elsif ($spec =~ /\Apath:(.+)\z/) {
-		$file_path = $1;
+		require Database::BI::Model::DataSource;
+		($file_path, $internal) = Database::BI::Model::DataSource::split_path($1);
 	}
 
 	unless (defined $file_path && -f $file_path) {
@@ -220,6 +228,7 @@ for my $id (@analysis_ids) {
 			file   => $file_path,
 			table  => do { (my $t = $file_path) =~ s/.*\///; $t =~ s/\.[^.]+\z//; $t },
 			directory => do { (my $d = $file_path) =~ s|/[^/]+\z||; $d },
+			defined $internal ? (internal_table => $internal) : (),
 		);
 		$records = $src->fetch_all // [];
 		$columns = $src->columns // [sort keys %{ $records->[0] // {} }];
@@ -818,3 +827,105 @@ sub save_state {
 	}
 	return 1;
 }
+
+__END__
+
+=head1 NAME
+
+bi-alert - check the measures of saved Database::BI canvases against thresholds
+
+=head1 SYNOPSIS
+
+    bi-alert --analysis <id> [--analysis <id> ...]
+             [--threshold <alias>:<op>:<value>] [--threshold <analysis>:<alias>:<op>:<value> ...]
+             [--suppress <duration>] [--state-file <path>] [--recovery]
+             [--notify-cmd <command>]
+             [--model-dir <dir>] [--data-dir <dir>] [--dry-run]
+
+=head1 DESCRIPTION
+
+Works out the measures of one or more saved canvases (analyses), prints a
+digest of each to STDOUT, and exits 1 when a threshold is crossed.  It sends
+nothing anywhere unless told to: pipe STDOUT into mail or a webhook, or give
+C<--notify-cmd>.  Scheduling is cron's.
+
+Each (analysis, threshold) pair is a check of its own, with its own line, its
+own throttle and its own recovery.  C<--suppress> announces a crossing at most
+once a period; C<--recovery> announces the end of one too.  Their memory is a
+small JSON file in the model folder, written only when either is used.
+
+    bi-alert --analysis abc123 --threshold count:gt:1000 --suppress 1h \
+             --notify-cmd 'mail -s "$BI_ALERT_SUBJECT" oncall@example.com'
+
+C<--notify-cmd> runs through the shell once per run, only when something is
+announced, with the run's text on STDIN and C<BI_ALERT_EVENT>
+(C<crossed> or C<recovery>), C<BI_ALERT_SUBJECT> and C<BI_ALERT_MESSAGE_FILE>
+in its environment.  C<bi-alert --help> lists every detail.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--analysis>, B<-a> I<id>
+
+A saved canvas.  Required, and repeatable.
+
+=item B<--threshold>, B<-t> I<measure>:I<op>:I<value>
+
+A measure alias, an operator (C<gt ge lt le eq ne>) and a value.  Repeatable;
+prefix it with C<< <analysis>: >> to check an analysis other than the first.
+
+=item B<--suppress>, B<-s> I<duration>
+
+Announce a threshold at most once per period (C<30>, C<30s>, C<15m>, C<6h>,
+C<2d>, C<1w>).
+
+=item B<--state-file> I<path>
+
+Where the throttle keeps its memory (default:
+F<< <model-dir>/alerts-state.json >>).
+
+=item B<--recovery>, B<-r>
+
+Announce the end of a crossing as well as its start (exit 3).
+
+=item B<--notify-cmd> I<command>
+
+Run this when something is announced.
+
+=item B<--model-dir>, B<-m> I<dir>
+
+The folder holding F<analyses.json> (default: F<.bi>).
+
+=item B<--data-dir>, B<-d> I<dir>
+
+The data folder (default: F<data>).
+
+=item B<--dry-run>, B<-n>
+
+Report only: record nothing and run no command.
+
+=item B<--help>, B<-h>
+
+Show the full usage.
+
+=back
+
+=head1 EXIT STATUS
+
+0 when nothing is announced, 1 when a crossing is announced, 2 on an error, 3
+when only a recovery is announced (1 wins when a run announces both).
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

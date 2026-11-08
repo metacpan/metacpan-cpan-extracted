@@ -35,7 +35,7 @@ my $ical = $jscal->eventsToVCalendar({
 });
 is_deeply([attendees($ical)], ['mailto:alice@example.com', 'mailto:bob@example.com'],
   'participants without attendee role become ATTENDEEs; organizer-only does not');
-like($ical, qr/^ORGANIZER;CN=Org:mailto:org\@example\.com\r?$/m, 'organizer still written');
+like($ical, qr/^ORGANIZER;CN=Org;JSID=org:mailto:org\@example\.com\r?$/m, 'organizer still written');
 like($ical, qr/^ATTENDEE;[^\n]*ROLE=OPT-PARTICIPANT[^\n]*:mailto:bob/m, 'optional role kept');
 
 # an organizer who has replied is also an ATTENDEE

@@ -41,6 +41,23 @@ use Config;
 use Test::More;
 use Stats::LikeR qw(quantile p_adjust scale prcomp);
 
+# AddressSanitizer holds freed memory back from reuse in its quarantine (256 MB
+# by default), so under it RSS grows with every buffer a call frees, leak or
+# not: with libasan preloaded, the 60 dying quantile() calls below grew it by
+# 280 MB, where without it they grow it by nothing. The runtime is found as a
+# mapped libasan (gcc links it dynamically, into perl or into LikeR.so alone),
+# in perl's own flags (clang links it statically into a perl built with it), or
+# in LD_PRELOAD.
+sub asan_loaded {
+	return 1 if defined $ENV{LD_PRELOAD} && $ENV{LD_PRELOAD} =~ /asan/;
+	return 1 if "$Config{ccflags} $Config{ldflags}" =~ /-fsanitize=address/;
+	open my $fh, '<', '/proc/self/maps' or return 0;
+	while (my $map = <$fh>) {
+		return 1 if $map =~ m{/lib(?:clang_rt\.)?asan};
+	}
+	return 0;
+}
+
 my $HAVE_LEAKTRACE;
 BEGIN {
 	if (eval { require Test::LeakTrace; 1 }) {
@@ -143,6 +160,7 @@ sub dies_like {
 	no_leaks_ok { quantile([1 .. 10], probs => [undef, 0.5, 0.25]) } 'quantile: nor with an undef prob';
 	SKIP: {
 		skip 'no /proc/self/statm to read the resident size from', 1 unless -r '/proc/self/statm';
+		skip 'AddressSanitizer\'s quarantine grows RSS whether or not memory leaks', 1 if asan_loaded();
 		my $rss = sub { open my $f, '<', '/proc/self/statm' or return 0; my @f = split ' ', scalar <$f>; return $f[1] };
 		# 2e5 values is a 1.6 MB buffer per call on a double build; 60 calls
 		# lost 96 MB before 0.331.  Measured since: no growth at all after

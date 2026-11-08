@@ -5,11 +5,13 @@ use utf8;
 
 use Test::Most;
 use Test::WWW::Mechanize;
+use Plack::Builder;
+use Plack::Test::Server;
 
 use FindBin     qw($Bin);
 use Path::Class qw(file dir);
 use lib file( $Bin, 'tlib' )->stringify;
-use JSON;
+use JSON::XS;
 
 use_ok('Async::Microservice::HelloWorld')       or die;
 use_ok('Test::Async::Microservice::HelloWorld') or die;
@@ -66,6 +68,49 @@ subtest 'redirect' => sub {
     is( $mech->base, $service_url, 'redirected to root path' );
 };
 
+subtest 'custom api_prefix' => sub {
+    {
+        package Test::Async::Microservice::CustomPrefix;
+        use Moose;
+        with qw(Async::Microservice);
+
+        sub service_name {'asmi-custom-prefix'}
+        sub get_routes {
+            return (
+                'hello' => { defaults => { GET => 'GET_hello' } },
+            );
+        }
+        sub GET_hello {
+            return [ 200, [], 'hello custom prefix' ];
+        }
+
+        __PACKAGE__->meta->make_immutable;
+    }
+
+    my $service = Test::Async::Microservice::CustomPrefix->new(
+        api_prefix => '/search_1'
+    );
+    my $app = sub { $service->plack_handler(@_) };
+    my $srv = Plack::Test::Server->new(
+        builder {
+            enable 'Plack::Middleware::ContentLength';
+            $app;
+        }
+    );
+    my $custom_base = 'http://127.0.0.1:' . $srv->port . '/search_1/';
+
+    my $custom_mech = Test::WWW::Mechanize->new();
+    $custom_mech->get('http://127.0.0.1:' . $srv->port . '/');
+    is( $custom_mech->base, $custom_base,
+        'redirected to configured api_prefix' );
+
+    $custom_mech->get_ok( $custom_base . 'hello',
+        'route matched under configured api_prefix' )
+        or diag( $custom_mech->content );
+    is( $custom_mech->content, 'hello custom prefix',
+        'expected route response' );
+};
+
 subtest 'want_json' => sub {
     subtest 'accept application/json' => sub {
         my $dt_data;
@@ -74,7 +119,7 @@ subtest 'want_json' => sub {
         is( $mech->res->header('Content-Type'),
             'application/json', 'content type is application/json' )
             or return;
-        lives_ok( sub { $dt_data = JSON->new->decode( $mech->content ) },
+        lives_ok( sub { $dt_data = JSON::XS->new->decode( $mech->content ) },
             'json content' )
             or diag( $mech->content );
     };

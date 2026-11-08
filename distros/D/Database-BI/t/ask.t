@@ -452,4 +452,54 @@ SKIP: {
 	}
 }
 
+# ---------------------------------------------------------------------------
+# Section 8: the key is spent sparingly -- a question has a length cap, and a
+# process makes at most ai_calls_per_hour provider calls, Ask and Summary
+# together.  Each app has its own count, so a fresh one is built here.
+# ---------------------------------------------------------------------------
+
+SKIP: {
+	skip 'data/sales.csv not found', 1 unless -f 'data/sales.csv';
+	subtest 'the AI routes are limited' => sub {
+		require File::Temp;
+		my $u = Test::Mojo->new('Database::BI', {
+			model_dir => File::Temp::tempdir(CLEANUP => 1), ai_api_key => 'fake-test-key', ai_calls_per_hour => 3,
+		});
+		my $asked = 0;
+		my $reply = mock_llm_response('{"kind":"bar","title":"T","encode":{"cat":"region","val":"amount"}}');
+		no warnings 'redefine';
+		local *LWP::UserAgent::request = sub { $asked++; $reply->(@_) };
+		use warnings 'redefine';
+
+		$u->post_ok('/api/ask', form => { l => 'table:sales', q => 'x' x 501 })->status_is(400)
+			->json_like('/error' => qr/longer than 500 characters/);
+		is $asked, 0, 'a question over 500 characters is not sent';
+		$u->post_ok('/api/ask', form => { l => 'table:sales', q => 'x' x 500 })->status_is(200, '500 characters is not too long');
+		$u->post_ok('/api/ask', form => { l => 'table:sales', q => "bar $_" })->status_is(200) for 1 .. 2;
+		is $asked, 3, 'three calls, the hour\'s budget';
+		$u->post_ok('/api/ask', form => { l => 'table:sales', q => 'one more' })->status_is(429)
+			->json_like('/error' => qr/asked 3 times in the last hour.*ai_calls_per_hour/);
+		is $asked, 3, 'the fourth is not sent';
+
+		$u->post_ok('/api/summary', form => { l => 'table:sales', ai => 1, f => 'region:eq:North' })->status_is(200)
+			->json_is('/source' => 'template_limited', 'a summary falls back to the template');
+		$u->post_ok('/api/summary', form => { l => 'table:sales', ai => 1, f => 'region:eq:North' })
+			->json_is('/cached' => 0, 'and that is not cached, so it asks again once the hour has room');
+		is $asked, 3, 'nor does it call the provider';
+		$u->post_ok('/api/summary', form => { l => 'table:sales', f => 'region:eq:North' })->status_is(200)
+			->json_is('/source' => 'template', 'without ai=1 nothing is limited');
+
+		my $v = Test::Mojo->new('Database::BI', {
+			model_dir => File::Temp::tempdir(CLEANUP => 1), ai_api_key => 'fake-test-key', ai_calls_per_hour => 0,
+		});
+		$v->post_ok('/api/ask', form => { l => 'table:sales', q => "bar $_" })->status_is(200) for 1 .. 4;
+		is $asked, 7, 'ai_calls_per_hour 0: no limit';
+
+		for my $bad (-1, 'ten', 1.5, [60]) {
+			throws_ok { Test::Mojo->new('Database::BI', { ai_calls_per_hour => $bad }) } qr/ai_calls_per_hour/,
+				'ai_calls_per_hour ' . (ref $bad ? 'list' : $bad) . ' stops the start';
+		}
+	};
+}
+
 done_testing;

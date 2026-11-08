@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::DBIO;
 # ABSTRACT: Dist::Zilla plugin bundle for DBIO distributions
-our $VERSION = '0.900003';
+our $VERSION = '0.900004';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -67,35 +67,26 @@ sub configure {
   my $holder = $self->copyright_holder // $author;
   $self->add_plugins([ 'DBIO::SetMeta' => { author => $author, holder => $holder } ]);
 
-  # LICENSE is always committed in the repo and gathered from git.
-  my @exclude_filenames = qw(
-    META.yml META.json MANIFEST README CLAUDE.md .proverc
-  );
-
-  my @exclude_match;
-
-  if ($self->core) {
-    push @exclude_filenames, qw(
-      README.md Dockerfile .mailmap .dir-locals.el .gitattributes
-      Features_09 TODO
-    );
-    push @exclude_match, qw(
-      ^maint/ ^inc/ ^cover_db/ ^\.claude/ ^t/var/ docker-compose
-    );
-  }
-
+  # What is tracked in git ships; only build products stay out. LICENSE is a
+  # committed file gathered here and checked by DBIO::LicenseFile.
   $self->add_plugins([ 'Git::GatherDir' => {
-    exclude_filename => \@exclude_filenames,
-    @exclude_match ? ( exclude_match => \@exclude_match ) : (),
+    include_dotfiles => 1,
+    exclude_filename => [qw( META.yml META.json MANIFEST README README.md .karr )],
   }]);
-
-  $self->add_plugins('PruneCruft');
+  $self->add_plugins([ 'DBIO::LicenseFile' => { heritage => $self->heritage } ]);
 
   # Ship this dist's own agent skills as a sharedir (see DBIO::Skills).
   # Authored under .claude/skills/, copied into share/skills/ at build time.
   $self->add_plugins([ 'DBIO::GatherSkills' =>
     @{ $self->share_skill } ? { skill => $self->share_skill } : {} ]);
   $self->add_plugins('ShareDir');
+
+  # Snapshot the full agent context (.claude/.codex/CLAUDE.md/...) into the build
+  # under misc/agent-context/ for build provenance (not installed). This is
+  # separate from GatherSkills above: GatherSkills ships only the owned dbio-*
+  # skills as an installed runtime sharedir; GatherAgentContext records the whole
+  # as-built context, including skilletor-installed (git-ignored) skills.
+  $self->add_plugins('GatherAgentContext');
 
   # Metadata
   $self->add_plugins(qw(
@@ -111,9 +102,9 @@ sub configure {
     $self->add_plugins('VersionFromMainModule');
   } else {
     $self->add_bundle('@Git::VersionManager' => {
-      'RewriteVersion::Transitional.global' => 0,
-      'RewriteVersion::Transitional.finder' => [':MainModule'],
-      'BumpVersionAfterRelease.finder'      => [':MainModule'],
+      'RewriteVersion::Transitional.global' => 1,
+      'RewriteVersion::Transitional.finder' => [':InstallModules'],
+      'BumpVersionAfterRelease.finder'      => [':InstallModules'],
       'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
       'Git::NextVersion.first_version' => '0.900000',
       'Git::Tag.tag_format' => 'v%V',
@@ -129,11 +120,18 @@ sub configure {
   ]);
 
   # Tests
-  # CoverageTest must run before ExtraTests: it gathers xt/release/coverage.t
-  # which ExtraTests then promotes into t/ for the release test suite.
+  # ExtraTests promotes the xt/ files gathered by CoverageTest and
+  # PodCheckerTest into t/. The order here is only for readability: munging
+  # runs after all gathering.
   $self->add_plugins([ 'DBIO::CoverageTest' => {
     coverage_threshold => $self->coverage_threshold,
   }]);
+  # PodCheckerTest gathers xt/author/pod-checker.t, promoted the same way: a
+  # Pod::Checker run over the built (woven) POD under AUTHOR_TESTING.
+  $self->add_plugins('DBIO::PodCheckerTest');
+  # Core only: nothing rewrites the modules other than the main one, so a
+  # test fails when one deviates from the main module's $VERSION (k14).
+  $self->add_plugins('DBIO::VersionLockstepTest') if $self->core;
   $self->add_plugins('ExtraTests');
 
   # Build — core uses MakeMaker::Awesome
@@ -151,7 +149,7 @@ sub configure {
   ));
 
   # Repository metadata — derived offline from the git remote
-  # (Codeberg/Forgejo or GitHub), no API token. Replaces [GithubMeta] and the
+  # (Codeberg, or a Forgejo instance via host=), no API token. Replaces [GithubMeta] and the
   # external Dist::Zilla::Plugin::Codeberg::Meta.
   $self->add_plugins([ 'DBIO::CodebergMeta' => { issues => 1 } ]);
 
@@ -169,11 +167,17 @@ sub configure {
   ]);
 
   # Release workflow
+  my @release_checks = (
+    'TestRelease',
+    'Test::ChangesHasContent',
+    [ 'InstallRelease' => { install_command => 'cpanm .' } ],
+  );
   if ($self->core) {
     $self->add_plugins([ 'NextRelease' => {
       format => '%-9v %{yyyy-MM-dd}d',
     }]);
     $self->add_plugins(
+      @release_checks,
       'ConfirmRelease',
       'UploadToCPAN',
       [ 'Git::Commit' => { allow_dirty => [qw( dist.ini Changes cpanfile )] } ],
@@ -182,6 +186,7 @@ sub configure {
     );
   } else {
     $self->add_plugins(
+      @release_checks,
       'ConfirmRelease',
       'UploadToCPAN',
       [ 'Git::Push' => { push_to => 'origin' } ],
@@ -205,7 +210,7 @@ Dist::Zilla::PluginBundle::DBIO - Dist::Zilla plugin bundle for DBIO distributio
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -239,17 +244,21 @@ Every distribution using C<[@DBIO]> gets an automatic code-coverage test
 
 =over 4
 
-=item * L<Dist::Zilla::Plugin::Git::GatherDir> — gathers files from git
+=item * L<Dist::Zilla::Plugin::Git::GatherDir> — gathers the tracked files (see L</The tarball>)
+
+=item * L<Dist::Zilla::Plugin::DBIO::LicenseFile> — checks the committed F<LICENSE> (see L</LICENSE>)
 
 =item * L<Dist::Zilla::Plugin::MetaProvides::Package> + L<Dist::Zilla::Plugin::Prereqs::FromCPANfile> — metadata from cpanfile
 
 =item * L<Dist::Zilla::Plugin::PodWeaver> — POD generation via C<@DBIO> or C<@DBIO::Heritage>
 
-=item * L<Dist::Zilla::Plugin::ExtraTests> — moves F<xt/> tests into F<t/> for release
+=item * L<Dist::Zilla::Plugin::ExtraTests> — promotes F<xt/author/>, F<xt/release/> and F<xt/smoke/> tests into F<t/> for release; tests lying flat in F<xt/> are not promoted and are therefore not covered by the release gate
 
-=item * L<Dist::Zilla::Plugin::DBIO::CoverageTest> — generates F<xt/release/coverage.t>, a coverage gate that reads F<cover_db/> after C<HARNESS_PERL_SWITCHES=-MDevel::Cover>. Default skip-with-diagnose on a missing run; C<COVERAGE_STRICT=1> or C<RELEASE=1> turns the same gap into a failure.
+=item * L<Dist::Zilla::Plugin::DBIO::CoverageTest> — generates F<xt/release/coverage.t>, a coverage gate that reads F<cover_db/> after C<HARNESS_PERL_SWITCHES=-MDevel::Cover>. A missing F<cover_db/> skips the test, even under C<COVERAGE_STRICT=1> or C<RELEASE=1>; a score below the threshold passes with a diagnostic by default and fails under C<COVERAGE_STRICT=1> or C<RELEASE=1>.
 
-=item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (Codeberg/Forgejo or GitHub)
+=item * L<Dist::Zilla::Plugin::DBIO::PodCheckerTest> — generates F<xt/author/pod-checker.t>, a L<Pod::Checker> run over the built (woven) POD under F<lib/> and F<bin/>. Any Pod::Checker error — above all an unresolved internal link — fails C<dzil test> and C<dzil release>; skipped on a plain install.
+
+=item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (codeberg.org only; no resources for other hosts)
 
 =item * L<Dist::Zilla::Plugin::MetaResources> — sets the family-wide IRC channel META resource (C<x_IRC = irc://irc.perl.org/#dbio>) for every distribution; fixed, not per-dist configurable
 
@@ -257,20 +266,58 @@ Every distribution using C<[@DBIO]> gets an automatic code-coverage test
 
 =back
 
-The C<LICENSE> file must be committed in the repository. It is included in
-the distribution as-is. No license file is generated during the build.
-Heritage distributions use the original DBIx::Class license with DBIO
-attribution. Non-heritage distributions use a standard Perl_5 license.
+=head2 The tarball
+
+What is tracked in git is what ships. L<Dist::Zilla::Plugin::Git::GatherDir>
+gathers every tracked file, dotfiles included, for core and drivers alike;
+only what the build generates itself stays out (F<META.yml>, F<META.json>,
+F<MANIFEST>, F<README>, F<README.md>), plus F<.karr>. There is no
+C<PruneCruft> and no exclude list: a file that should not ship is not tracked.
+Untracked files, such as the git-ignored skills skilletor installs, are never
+gathered by it.
+
+=head2 LICENSE
+
+The F<LICENSE> file is committed in the repository and gathered like any other
+tracked file; no license file is generated during the build.
+L<Dist::Zilla::Plugin::DBIO::LicenseFile> then checks it and aborts the build
+when it is missing or deviates. Non-heritage distributions must carry the
+standard Perl_5 license text of the dist (C<dzil genlicense> writes it);
+heritage distributions must carry the fixed DBIx::Class license with the DBIO
+attribution preamble, which the plugin holds as its reference text.
+
+=head2 Release checks
+
+Before L<Dist::Zilla::Plugin::ConfirmRelease>, for core and drivers alike:
+
+=over 4
+
+=item * L<Dist::Zilla::Plugin::TestRelease> — runs the tests of the built dist and stops the release when they fail
+
+=item * L<Dist::Zilla::Plugin::Test::ChangesHasContent> — fails when F<Changes> has no entry under C<{{$NEXT}}>
+
+=item * L<Dist::Zilla::Plugin::InstallRelease> — installs the released dist locally with C<cpanm .>
+
+=back
 
 =head2 Versioning
 
 Version is read from the main module's C<$VERSION> via
 L<Dist::Zilla::Plugin::VersionFromMainModule> (core) or via
 L<Dist::Zilla::PluginBundle::Git::VersionManager> (drivers).
-Only the main module carries C<$VERSION> — sub-modules are not versioned.
 
-L<RewriteVersion::Transitional> is configured with C<global = 0> and
-C<finder = [:MainModule]> so only the main module is patched on version bump.
+For drivers, L<RewriteVersion::Transitional> is configured with C<global = 1>
+and C<finder = [:InstallModules]>, so B<every> module under F<lib/> is
+versioned: each C<.pm> carries its own literal C<$VERSION> assignment, and all
+of them are rewritten in lockstep on version bump.
+
+Core versions only from the main module (VersionFromMainModule) and rewrites
+no other file, yet every core module carries a literal C<$VERSION>. For
+C<core = 1> the bundle therefore adds
+L<Dist::Zilla::Plugin::DBIO::VersionLockstepTest>: a test that fails when a
+module under F<lib/> has no C<$VERSION> or one that differs from the main
+module's. At a version bump the core raises every module by hand; the test
+fails the build until none is left behind. Non-core distributions do not get it.
 
 =head2 Heritage distributions (C<heritage = 1>)
 
@@ -285,7 +332,8 @@ Uses L<Dist::Zilla::Plugin::VersionFromMainModule> (version from C<$VERSION>
 in the main module) and L<Dist::Zilla::Plugin::MakeMaker::Awesome> instead
 of the standard MakeMaker. Also enables L<Dist::Zilla::Plugin::ExecDir> for
 F<bin/>. The release workflow uses NextRelease + Git::Commit/Tag/Push
-directly rather than C<@Git::VersionManager>.
+directly rather than C<@Git::VersionManager>. It also gets
+L<Dist::Zilla::Plugin::DBIO::VersionLockstepTest> (see L</Versioning>).
 
 =head1 ATTRIBUTES
 

@@ -3,7 +3,7 @@ package Database::BI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 use Carp                qw(croak);
 use Database::BI::Util  qw(urlencode);
@@ -251,7 +251,9 @@ sub _build_url {
 			return '/view/' . urlencode($1);
 		}
 		(my $path = $spec_key) =~ s/\Apath://;
-		return '/open?path=' . urlencode($path);
+		require Database::BI::Model::DataSource;
+		my ($file, $internal) = Database::BI::Model::DataSource::split_path($path);
+		return '/open?path=' . urlencode($file) . (defined $internal ? '&it=' . urlencode($internal) : '');
 	}
 
 	my $route  = $KIND_ROUTE{$kind} // $kind;

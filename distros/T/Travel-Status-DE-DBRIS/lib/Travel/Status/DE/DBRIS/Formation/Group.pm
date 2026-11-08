@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use List::Util qw(uniq);
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 Travel::Status::DE::DBRIS::Formation::Group->mk_ro_accessors(
 	qw(designation name train_no train_type description desc_short destination has_sectors model series start_percent end_percent)
@@ -234,7 +234,7 @@ my %ice_name = (
 	1523 => 'Hansestadt Greifswald',
 	1524 => 'Hansestadt Rostock',
 	1807 => 'Nationalpark Schleswig-Holsteinisches Wattenmeer',
-    1817 => 'Wetterau',
+	1817 => 'Wetterau',
 	2853 => 'Nationalpark Sächsische Schweiz',
 	2865 => 'Remstal',
 	2868 => 'Nationalpark Niedersächsisches Wattenmeer',
@@ -296,6 +296,7 @@ my %ice_name = (
 	9217 => 'Hansestadt Rostock',
 	9218 => 'Ludwigslust',
 	9220 => 'Steiermark',
+	9222 => 'Quedlinburg',
 	9223 => '75 Jahre Bundespolizei',
 	9226 => 'Schwäbisch Hall',
 	9228 => 'Potsdam',
@@ -308,6 +309,7 @@ my %ice_name = (
 	9237 => 'Spree',
 	9457 => 'Bundesrepublik Deutschland',
 	9459 => 'Knuffingen',
+	9477 => 'Görlitz',
 	9481 => 'Rheinland-Pfalz',
 	9485 => 'Karriere-ICE',
 	9488 => 'Würzburg',
@@ -321,7 +323,8 @@ my %ice_name = (
 my %model_name = (
 	'011'      => [ 'ICE T',    'ÖBB 4011' ],
 	'023'      => [ 'CFL KISS', 'CFL 2300' ],
-	'091'      => ['ICE L'],
+	'1990'     => ['ComfortJet'],
+	'8091'     => ['ICE L'],
 	'401'      => [ 'ICE 1',        'BR 401' ],
 	'402'      => [ 'ICE 2',        'BR 402' ],
 	'403.S1'   => [ 'ICE 3',        'BR 403, 1. Serie' ],
@@ -356,7 +359,7 @@ my %model_name = (
 	'464'      => [ 'Mireo Smart',         'BR 464' ],
 	'475'      => [ 'TGV',                 'BR 475' ],
 	'501'      => [ 'SMILE',               'RABe 501' ],
-	'503'	   => [ 'Astoro',              'RABe 503' ],
+	'503'      => [ 'Astoro',              'RABe 503' ],
 	'526'      => [ 'FLIRT Akku',          'BR 526' ],
 	'563'      => [ 'Mireo Plus B',        'BR 563' ],
 	'612'      => [ 'RegioSwinger',        'BR 612' ],
@@ -367,6 +370,7 @@ my %model_name = (
 	'632'      => [ 'Link II',             'BR 632' ],
 	'633'      => [ 'Link III',            'BR 633' ],
 	'640'      => [ 'LINT 27',             'BR 640' ],
+	'641'      => [ 'A TER',               'BR 641' ],
 	'642'      => [ 'Desiro Classic',      'BR 642' ],
 	'643'      => [ 'TALENT',              'BR 643' ],
 	'644'      => [ 'TALENT',              'BR 644' ],
@@ -466,7 +470,8 @@ sub parse_model {
 	my %ml = (
 		'011'      => 0,
 		'023'      => 0,
-		'091'      => 0,
+		'1990'     => 0,
+		'8091'     => 0,
 		'401'      => 0,
 		'402'      => 0,
 		'403.S1'   => 0,
@@ -511,6 +516,7 @@ sub parse_model {
 		'632'      => 0,
 		'633'      => 0,
 		'640'      => 0,
+		'641'      => 0,
 		'642'      => 0,
 		'643'      => 0,
 		'644'      => 0,
@@ -528,12 +534,12 @@ sub parse_model {
 		}
 
 		if ( $carriage->country == 80 ) {
-			if (   $carriage->model == 91
-				or $carriage->model == 491
-				or $carriage->model == 791
-				or $carriage->model == 891 )
+			if (   $carriage->model4 eq '8091'
+				or $carriage->model4 eq '8491'
+				or $carriage->model4 eq '1791'
+				or $carriage->model4 eq '2891' )
 			{
-				$ml{'091'}++;
+				$ml{'8091'}++;
 			}
 			elsif ( $carriage->model == 401
 				or ( $carriage->model >= 801 and $carriage->model <= 804 ) )
@@ -604,16 +610,16 @@ sub parse_model {
 			elsif ( $carriage->model == 429 or $carriage->model == 829 ) {
 				$ml{'429'}++;
 			}
-			elsif (substr( $carriage->uic_id, 5, 4 ) eq '1430'
-				or substr( $carriage->uic_id, 5, 4 ) eq '1830' )
+			elsif ($carriage->model4 eq '1430'
+				or $carriage->model4 eq '1830' )
 			{
 				$ml{'1430'}++;
 			}
 			elsif ( $carriage->model == 430 or $carriage->model == 431 ) {
 				$ml{'430'}++;
 			}
-			elsif (substr( $carriage->uic_id, 5, 4 ) eq '1440'
-				or substr( $carriage->uic_id, 5, 4 ) eq '1441' )
+			elsif ($carriage->model4 eq '1440'
+				or $carriage->model4 eq '1441' )
 			{
 				$ml{'1440'}++;
 			}
@@ -653,12 +659,6 @@ sub parse_model {
 			elsif ( $carriage->model == 475 ) {
 				$ml{'475'}++;
 			}
-			elsif ( $carriage->model == 501 ) {
-				$ml{'501'}++;
-			}
-			elsif ( $carriage->model == 503 or $carriage->model == 610 ) {
-				$ml{'503'}++;
-			}
 			elsif ( $carriage->model == 526 ) {
 				$ml{'526'}++;
 			}
@@ -689,6 +689,9 @@ sub parse_model {
 			elsif ( $carriage->model == 640 ) {
 				$ml{'640'}++;
 			}
+			elsif ( $carriage->model == 641 ) {
+				$ml{'641'}++;
+			}
 			elsif ( $carriage->model == 642 ) {
 				$ml{'642'}++;
 			}
@@ -711,14 +714,40 @@ sub parse_model {
 				$ml{'IC2.TWIN'}++;
 			}
 		}
+
+		# Österreich
 		elsif ( $carriage->country == 81 ) {
-			if ( substr( $carriage->uic_id, 4, 4 ) eq '4011' ) {
+			if ( $carriage->model4 eq '4011' ) {
 				$ml{'011'}++;
 			}
 		}
+
+		# Luxemburg
 		elsif ( $carriage->country == 82 ) {
 			if ( $carriage->model == 23 ) {
 				$ml{'023'}++;
+			}
+		}
+
+		# Schweiz
+		elsif ( $carriage->country == 85 ) {
+			if ( $carriage->model == 501 ) {
+				$ml{'501'}++;
+			}
+			elsif ( $carriage->model == 503 or $carriage->model == 610 ) {
+				$ml{'503'}++;
+			}
+		}
+
+		# Tschechische Republik
+		elsif ( $carriage->country == 54 ) {
+			if (   $carriage->model4 eq '1990'
+				or $carriage->model4 eq '2090'
+				or $carriage->model4 eq '8090'
+				or $carriage->model4 eq '8490'
+				or $carriage->model4 eq '8590' )
+			{
+				$ml{'1990'}++;
 			}
 		}
 	}
@@ -726,7 +755,7 @@ sub parse_model {
 	my @likelihood = reverse sort { $ml{$a} <=> $ml{$b} } keys %ml;
 
 	# Less than two carriages are generally inconclusive.
-	# Exceptions: BR 631 (Link I), 640 (LINT 27, 650 (RS1)
+	# Exceptions: BR 631 (Link I), 640 (LINT 27), 641 (A TER), 650 (RS1)
 	# only have a single carriage
 	if (
 		$ml{ $likelihood[0] } < 2
@@ -734,6 +763,7 @@ sub parse_model {
 			(
 				   $likelihood[0] eq '631'
 				or $likelihood[0] eq '640'
+				or $likelihood[0] eq '641'
 				or $likelihood[0] eq '650'
 			)
 			and @carriages == 1

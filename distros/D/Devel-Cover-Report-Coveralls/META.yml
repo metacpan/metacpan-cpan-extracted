@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.21, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Devel::Cover::Report::Coveralls:
     file: lib/Devel/Cover/Report/Coveralls.pm
-    version: '0.32'
+    version: v1.0.0
 requires:
   Devel::Cover: '1.02'
   HTTP::Tiny: '0.043'
@@ -36,12 +36,12 @@ requires:
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
   YAML: '0'
-  perl: '5.008005'
+  perl: '5.020'
 resources:
   bugtracker: https://github.com/kan/coveralls-perl/issues
   homepage: https://github.com/kan/coveralls-perl
   repository: https://github.com/kan/coveralls-perl.git
-version: '0.32'
+version: 1.0.0
 x_contributors:
   - 'Andreas Vögele <andreas@andreasvoegele.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
@@ -52,5 +52,7 @@ x_contributors:
   - 'Songmu <y.songmu@gmail.com>'
   - 'Tobias Bossert <tobias.bossert@fastpath.ch>'
   - 'bayashi <bayashi@cpan.org>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  - 'chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>'
+  - 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

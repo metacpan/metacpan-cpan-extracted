@@ -1,0 +1,56 @@
+Revision history for Ekorn-Pipeline
+
+Unreleased
+
+v0.1.1 2026-11-08
+
+    The pipeline from DBIx-Squirrel v2.0.2, on its own, so that any
+    function can take stages from its caller.
+
+    It ships three roadmap items, settled after v0.1.0's trial: a
+    pipeline's stages can be spliced into another, with the stages
+    method (2026-0001); an iterator ends once a stage dies (2026-0002);
+    and a pipeline's count in scalar context is promised (2026-0003).
+
+    - Requires Perl 5.36 or later.
+    - Ekorn::Pipeline runs values through a list of stages, each a code
+      reference given one value, in $_ and as its argument, and
+      returning nothing (a filter), one value (a map) or several (a
+      flatMap). A pipeline is called with values, or pulls them from a
+      source with an iterator, calling it only as results are wanted.
+    - Once a stage dies, an iterator has ended, as a pushed run has:
+      every call after returns an empty list, and neither the source
+      nor any end function is called again. In v0.1.0's trial it
+      carried on, without the value that died. (roadmap 2026-0002)
+    - Called in scalar context, a pipeline returns how many results
+      came out, as an array would; the POD now promises it.
+      (roadmap 2026-0003)
+    - A pipeline's stages method returns its stages, so they can be
+      spliced into another pipeline, or given to any function that
+      takes stages, running as if listed there. (roadmap 2026-0001)
+    - SECURITY.md says how to report a vulnerability, privately, and
+      CONTRIBUTING.md how to report a bug or ask for a feature; the
+      distribution takes issues, not pull requests.
+    - Ekorn::Pipeline::Stop ends a pipeline early, passing on any
+      values it carries, after which the source isn't called again. A
+      stop not made by throw, and so not an array, carries nothing.
+    - Ekorn::Pipeline::Gather makes a stage afresh for each run, with
+      an optional end function, called once the values run out.
+    - Ekorn::Pipeline::Pipes gives a class pipe and tap methods, which
+      run the object through stages.
+    - Canned stages: take, drop, take_while and drop_while in
+      Ekorn::Pipeline::Stages::Flow; batch and collect in
+      Ekorn::Pipeline::Stages::Batch; peek, count_into and dump_to in
+      Ekorn::Pipeline::Stages::Taps.
+    - A stage that dies is named by its place, at the caller's line, and
+      so are mistakes in making a pipeline or a canned stage.
+    - Modules of stages can live under any namespace: general stages
+      under Ekorn::Pipeline::Stages, and those for one kind of value or
+      source with the module that knows about it, built from Gather,
+      Stop and croakf, which reports at the caller's line.
+    - Versions: a v0.1.x only fixes or adds. A change to how stages
+      behave, or a public name dropped or renamed, waits for v0.2.0.
+    - A how-to, docs/HOWTO.md, with recipes for callers, function
+      authors and stage authors, and a reference, docs/REFERENCE.md,
+      describing every module and how a pipeline behaves, with notes
+      for stage authors. Both are on GitHub, linked from the README.

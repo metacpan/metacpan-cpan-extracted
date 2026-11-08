@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Moose;
 use namespace::autoclean;
@@ -52,6 +52,34 @@ has 'base_url' => (
     lazy     => 1,
     builder  => '_build_base_url'
 );
+has '_http_base_params' => (
+    is       => 'ro',
+    isa      => 'HashRef',
+    required => 1,
+    lazy     => 1,
+    builder  => '_build_http_base_params'
+);
+has 'http_host' => (
+    is       => 'ro',
+    isa      => 'Maybe[Str]',
+    required => 1,
+    lazy     => 1,
+    default  => sub { return $_[0]->_http_base_params->{host}; },
+);
+has 'http_port' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    lazy     => 1,
+    default  => sub { return $_[0]->_http_base_params->{port}; },
+);
+has 'http_schema' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    lazy     => 1,
+    default  => sub { return $_[0]->_http_base_params->{schema}; },
+);
 has 'want_json' => (
     is       => 'ro',
     isa      => 'Bool',
@@ -65,9 +93,27 @@ has 'jsonp' => (
     required => 1,
 );
 has 'using_frontend_proxy' => (
-    is      => 'ro',
-    isa     => 'Bool',
-    default => 0,
+    is       => 'ro',
+    isa      => 'Bool',
+    required => 1,
+);
+has 'server_host' => (
+    is       => 'ro',
+    isa      => 'Maybe[Str]',
+    required => 0,
+    default  => undef,
+);
+has 'server_port' => (
+    is       => 'ro',
+    isa      => 'Maybe[Int]',
+    required => 0,
+    default  => undef,
+);
+has 'server_scheme' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 0,
+    default  => 'http',
 );
 has 'pending_ref' => (
     is       => 'ro',
@@ -83,7 +129,6 @@ has 'request_start' => (
 has 'request_timeout' => ( is => 'ro', isa => 'Num', required => 1 );
 has '_warn_running_too_long' => (
     is      => 'ro',
-    isa     => 'ArrayRef',
     lazy    => 1,
     builder => '_build_warn_running_too_long'
 );
@@ -96,64 +141,119 @@ after 'BUILD' => sub {
 
 sub _build_base_url {
     my ($self) = @_;
-    return URI->new('/') if !$self->using_frontend_proxy;
 
-    my $https_on = '';
-    $https_on = $self->headers->header('HTTP_X_FORWARDED_HTTPS')
-        if $self->headers->header('HTTP_X_FORWARDED_HTTPS');
-    $https_on = 'ON'
-        if $self->headers->header('HTTP_X_FORWARDED_PROTO')
-        && $self->headers->header('HTTP_X_FORWARDED_PROTO') eq
-        'https';    # Pound
-    my $url_scheme = ( $https_on && uc $https_on eq 'ON' ? 'https' : 'http' );
-    my $default_port = $url_scheme eq 'https' ? 443 : 80;
-
-    my $redirect_host;
-    my $redirect_port = $default_port;
-    if ( $self->headers->header('HTTP_X_FORWARDED_HOST') ) {
-
-        # in apache1 ServerName example.com:443
-        if ( $self->headers->header('HTTP_X_FORWARDED_SERVER') ) {
-            my ( $host, ) =
-                $self->headers->header('HTTP_X_FORWARDED_SERVER') =~
-                /([^,\s]+)$/;
-            if ( $host =~ /^(.+):(\d+)$/ ) {
-                $redirect_port = $2;
-                $host          = $1;
-            }
-            $redirect_host = $host;
-        }
-        my ( $host, ) =
-            $self->headers->header('HTTP_X_FORWARDED_HOST') =~ /([^,\s]+)$/;
-        if ( $host =~ /^(.+):(\d+)$/ ) {
-            $redirect_port = $2;
-            $host          = $1;
-        }
-        elsif ( $self->headers->header('HTTP_X_FORWARDED_PORT') ) {
-
-            # in apache2 httpd.conf (RequestHeader set X-Forwarded-Port 8443)
-            $redirect_port = $self->headers->header('HTTP_X_FORWARDED_PORT');
-        }
-        $redirect_host = $host;
-    }
-
-    unless ($redirect_host) {
+    unless ( $self->http_host ) {
         $log->warn(
-            'using front-end proxy but no host information in headers, check if your proxy is configured to send correct headers'
+            'no host information in headers; unable to build absolute base URL'
         );
         return URI->new('/');
     }
 
     my $redirect_host_port;
-    if (   ( ( $redirect_port eq '80' ) && ( $url_scheme eq 'http' ) )
-        || ( ( $redirect_port eq '443' ) && ( $url_scheme eq 'https' ) ) ) {
-        $redirect_host_port = $redirect_host;
+    if (
+        ( ( $self->http_port eq '80' ) && ( $self->http_schema eq 'http' ) )
+        ||
+        ( ( $self->http_port eq '443' ) && ( $self->http_schema eq 'https' ) )
+        ) {
+        $redirect_host_port = $self->http_host;
     }
     else {
-        $redirect_host_port = $redirect_host . ':' . $redirect_port;
+        $redirect_host_port = $self->http_host . ':' . $self->http_port;
     }
 
-    return URI->new( $url_scheme . '://' . $redirect_host_port . '/' );
+    return URI->new( $self->http_schema . '://' . $redirect_host_port . '/' );
+}
+
+sub _build_http_base_params {
+    my ($self) = @_;
+
+    my $url_scheme = $self->server_scheme || 'http';
+    my $redirect_host;
+    my $redirect_port = 80;
+
+    my $parse_host_port = sub {
+        my ($host_header_value) = @_;
+        return unless defined $host_header_value;
+        my ($host) = $host_header_value =~ /([^,\s]+)$/;
+        return unless defined $host;
+        if ( $host =~ /^(.+):(\d+)$/ ) {
+            return ( $1, $2 );
+        }
+        return ( $host, undef );
+    };
+
+    if ( $self->using_frontend_proxy ) {
+        my $https_on = '';
+        $https_on = $self->headers->header('HTTP_X_FORWARDED_HTTPS')
+            if $self->headers->header('HTTP_X_FORWARDED_HTTPS');
+        $https_on = 'ON'
+            if $self->headers->header('HTTP_X_FORWARDED_PROTO')
+            && $self->headers->header('HTTP_X_FORWARDED_PROTO') eq
+            'https';    # Pound
+        $url_scheme =
+            ( $https_on && uc $https_on eq 'ON' ? 'https' : 'http' );
+        my $default_port = $url_scheme eq 'https' ? 443 : 80;
+        $redirect_port = $default_port;
+
+        if ( $self->headers->header('HTTP_X_FORWARDED_HOST') ) {
+
+            # in apache1 ServerName example.com:443
+            if ( $self->headers->header('HTTP_X_FORWARDED_SERVER') ) {
+                my ( $host, $port ) =
+                    $parse_host_port->(
+                    $self->headers->header('HTTP_X_FORWARDED_SERVER') );
+                if ($host) {
+                    $redirect_host = $host;
+                    $redirect_port = $port if defined $port;
+                }
+            }
+            my ( $host, $port ) =
+                $parse_host_port->(
+                $self->headers->header('HTTP_X_FORWARDED_HOST') );
+            if ($host) {
+                $redirect_host = $host;
+                if ( defined $port ) {
+                    $redirect_port = $port;
+                }
+                elsif ( $self->headers->header('HTTP_X_FORWARDED_PORT') ) {
+
+                    # in apache2 httpd.conf (RequestHeader set X-Forwarded-Port 8443)
+                    $redirect_port =
+                        $self->headers->header('HTTP_X_FORWARDED_PORT');
+                }
+            }
+        }
+        else {
+            my ( $host, $port ) = $parse_host_port->( $self->headers->header('Host') );
+            if ($host) {
+                $log->warn(
+                    'using front-end proxy but missing forwarded host headers; falling back to Host header'
+                );
+                $redirect_host = $host;
+                $redirect_port = $port if defined $port;
+            }
+        }
+    }
+    else {
+        if ( defined $self->server_host && length $self->server_host ) {
+            $redirect_host = $self->server_host;
+            $redirect_port = $self->server_port if defined $self->server_port;
+        }
+        else {
+            my ( $host, $port ) =
+                $parse_host_port->( $self->headers->header('Host') );
+            if ($host) {
+                $redirect_host = $host;
+                $redirect_port = $port if defined $port;
+            }
+        }
+    }
+
+    return {
+        host   => $redirect_host,
+        port   => '' . $redirect_port,
+        schema => $url_scheme,
+    };
 }
 
 sub _build_warn_running_too_long {
@@ -443,6 +543,13 @@ it provides request information and response helper methods.
     plack_respond
     static_dir
     base_url
+    using_frontend_proxy
+    server_host
+    server_port
+    server_scheme
+    http_host
+    http_port
+    http_schema
     want_json
     content
     json_content
@@ -477,6 +584,62 @@ C<application/javascript> instead of C<application/json>.
 =head2 redirect($location_path)
 
 Send redirect.
+
+=head2 using_frontend_proxy
+
+Controls whether proxy-forwarded headers are trusted for base URL parsing.
+
+When true, C<http_host>, C<http_port>, and C<http_schema> are parsed from
+forwarded headers. If forwarded host headers are missing, parsing falls back
+to C<Host> and emits a warning.
+
+When false, C<http_host>/C<http_port>/C<http_schema> are taken from trusted
+server fields (C<server_host>/C<server_port>/C<server_scheme>) when present,
+otherwise host/port fall back to C<Host> and scheme defaults to C<http>.
+
+=head2 server_host
+
+Trusted server host for non-proxy mode (typically C<SERVER_NAME> from PSGI
+environment).
+
+=head2 server_port
+
+Trusted server port for non-proxy mode (typically C<SERVER_PORT> from PSGI
+environment).
+
+=head2 server_scheme
+
+Trusted server scheme for non-proxy mode (typically C<psgi.url_scheme> from
+PSGI environment).
+
+=head2 http_host
+
+Returns parsed host value used to build C<base_url>.
+
+When C<using_frontend_proxy> is true, this comes from forwarded host headers,
+with C<Host> fallback and warning if forwarded host headers are missing.
+
+When C<using_frontend_proxy> is false, this comes from C<server_host> when
+available, otherwise from C<Host>.
+
+=head2 http_port
+
+Returns parsed port value used to build C<base_url>.
+
+When C<using_frontend_proxy> is true, this comes from forwarded headers
+(or C<Host> fallback when forwarded host headers are missing).
+
+When C<using_frontend_proxy> is false, this comes from C<server_port> when
+available, otherwise from C<Host> when present, else defaults to C<80>.
+
+=head2 http_schema
+
+Returns parsed scheme value used to build C<base_url>.
+
+When C<using_frontend_proxy> is true, this is derived from forwarded HTTPS/
+proto headers.
+
+When C<using_frontend_proxy> is false, this comes from C<server_scheme>.
 
 =head2 static_ft($file_name, $content_cb)
 

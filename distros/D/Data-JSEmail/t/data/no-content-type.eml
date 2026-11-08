@@ -1,0 +1,7 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: No Content-Type
+Date: not a date at all
+Message-ID: <nct-1@example.com>
+
+A message with no MIME headers at all.

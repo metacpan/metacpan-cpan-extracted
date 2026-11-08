@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:3c3a5b0e-6f1d-4a0c-9d5e-altid000001
+FN;ALTID=1;LANGUAGE=en:Jean Dupont
+FN;ALTID=1;LANGUAGE=fr:Jean Dupont
+N:Dupont;Jean;;;
+TITLE;ALTID=1;LANGUAGE=en:Boss
+TITLE;ALTID=1;LANGUAGE=fr:Patron
+NOTE;ALTID=2;LANGUAGE=en:Speaks French and English.
+NOTE;ALTID=2;LANGUAGE=fr:Parle français et anglais.
+EMAIL;PID=1.1:jean.dupont@example.com
+CLIENTPIDMAP:1;urn:uuid:53e374d9-337e-4727-8803-a1e9c14e0556
+SOURCE:https://dir.example.com/addrbook/jdoe/Jean%20Dupont.vcf
+END:VCARD

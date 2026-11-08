@@ -36,36 +36,36 @@
             "Geo::Coder::Free" : "0.48",
             "Geo::Coder::List" : "0.39",
             "Geo::Coder::OSM" : "0.03",
-            "HTML::OSM" : "0.13",
-            "LWP::UserAgent::Throttled" : "0.14"
+            "HTML::OSM" : "0.14",
+            "LWP::UserAgent::Throttled" : "0.14",
+            "Text::CSV_XS" : "0"
          },
          "requires" : {
             "CGI::Info" : "0",
             "CGI::Lingua" : "0.85",
             "CHI" : "0",
             "Carp" : "0",
+            "Crypt::URandom" : "0",
             "Cwd" : "0",
-            "DBI" : "0",
             "DB_File" : "0",
-            "Database::Abstraction" : "0.54",
-            "Database::Join" : "v0.9.0",
+            "Database::Abstraction" : "0.55",
+            "Database::Join" : "v0.11.1",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
+            "Encode" : "0",
             "Excel::Writer::XLSX" : "1.07",
             "File::Path" : "2.07",
             "File::Spec" : "3.40",
-            "File::Temp" : "0.2308",
-            "HTML::D3" : "0.29",
+            "HTML::D3" : "0.30",
             "HTML::TableExtract" : "0",
             "HTML::TagCloud" : "0.38",
+            "HTTP::Message" : "0",
             "HTTP::Request" : "0",
             "IPC::System::Simple" : "0",
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Cached" : "0",
             "List::Util" : "1.40",
             "MIME::Base64" : "3.11",
-            "Mojo::Base" : "0",
-            "Mojo::JSON" : "0",
             "Mojolicious" : "9.49",
             "Mojolicious::Plugin::Buffer" : "v0.1.1",
             "Mojolicious::Plugin::TemplateToolkit" : "0",
@@ -79,6 +79,7 @@
             "Spreadsheet::ParseXLSX" : "0",
             "Sub::Protected" : "0.03",
             "Text::CSV" : "0",
+            "URI" : "0",
             "perl" : "5.028000",
             "version" : "0.77"
          }
@@ -90,7 +91,7 @@
          },
          "requires" : {
             "DBD::CSV" : "0",
-            "Encode" : "0",
+            "DBI" : "0",
             "JSON::MaybeXS" : "0",
             "Test::DescribeMe" : "0",
             "Test::Memory::Cycle" : "0",
@@ -117,6 +118,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.020.0",
+   "version" : "0.021.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

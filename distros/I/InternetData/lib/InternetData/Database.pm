@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.11.7';
+our $VERSION = '1.12.0';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -107,8 +107,12 @@ sub download_url_p {
     my ($self, $id, $format, %options) = @_;
     _assert_database('download_url', $id, $format);
     my $client = $self->{client};
-    $client->_check_options('database->download_url', \%options, 'retries', 'timeout');
-    my $url = $client->_url('/api/v2/database/download', id => $id, format => $format);
+    $client->_check_options('database->download_url', \%options, 'build', 'retries', 'timeout');
+    my $build = $options{build};
+    Carp::croak("InternetData::database->download_url: build must be a build's name, a string")
+        if ref $build;
+    my $url = $client->_url('/api/v2/database/download', id => $id, format => $format,
+        defined $build && length $build ? (build => $build) : ());
     my $retries = defined $options{retries} ? $options{retries} : $client->{retries};
     return $client->_retry_p($retries, sub {
         $client->_get_p($url, $options{timeout})->then(sub {
@@ -139,7 +143,7 @@ sub download_p {
     # Everything a caller can get wrong is refused before the file is opened, so
     # a mistyped ID cannot leave a stray .part behind.
     _assert_database('download', $id, $format);
-    $self->{client}->_check_options('database->download', \%options, 'retries');
+    $self->{client}->_check_options('database->download', \%options, 'build', 'retries');
     Carp::croak('database->download: expected a destination path')
         if !defined $path || !length $path;
 
@@ -198,7 +202,7 @@ sub _new {
 sub _transfer_p {
     my ($self, $method, $id, $format, $options, $on_chunk) = @_;
     my $client = $self->{client};
-    $client->_check_options("database->$method", $options, 'retries');
+    $client->_check_options("database->$method", $options, 'build', 'retries');
     my $retries = defined $options->{retries} ? $options->{retries} : $client->{retries};
     my $delivered = 0;
     my $count = sub {
@@ -427,6 +431,18 @@ GiB. Reach for it at the small end, where the bytes go straight into a parser,
 and use L<download|/"download($id, $format, $path)"> for anything you have not
 measured; L<metadata|/"metadata($id)"> publishes the size per format without
 transferring anything, which is how you find out which end you are at.
+
+=head2 Downloading a named build
+
+Each of the three downloads the build that is live unless the C<build> option
+names one, as a C<database.updated> webhook gives it (C<20261105.0t53s5>), so the
+file is the one whose C<sha256> the webhook carries:
+
+    $client->database->download('vpn_ip_v1', 'mmdb', './vpn_ip_v1.mmdb',
+        build => $event->{data}{build});
+
+An empty C<build> is the live one too. A build is kept 7 days; past that the call
+dies with a C<bad_request> L<InternetData::Error> whose message is C<BUILD_GONE>.
 
 =head1 TRANSFERS
 

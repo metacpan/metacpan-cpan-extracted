@@ -63,6 +63,17 @@
     }
 
     .site-nav a:hover { text-decoration: underline; }
+    .site-nav-logout { display: inline; margin: 0; }
+    .site-nav-logout button {
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      font-weight: 600;
+      color: var(--accent-text, #2c3e7a);
+      cursor: pointer;
+    }
+    .site-nav-logout button:hover { text-decoration: underline; }
 
     /* The chapter that helps with the page that is open. */
     .site-nav-help {
@@ -768,6 +779,28 @@
       transition: background 0.12s;
     }
     .btn-refresh:hover { background: var(--hover-bg, #f0f0f0); }
+    .btn-refresh:disabled { opacity: 0.5; cursor: progress; }
+    .print-status:empty { display: none; }
+    .print-status { font-size: 0.8rem; color: var(--text-secondary, #444); }
+
+    /* Print button: the view's rows in a table only the printed page shows.
+       While it prints, nothing else on the page is printed. */
+    @media screen {
+      #bi-print { display: none; }
+    }
+    @media print {
+      body.bi-printing > *:not(#bi-print) { display: none !important; }
+      body.bi-printing { margin: 0; padding: 0; }
+      #bi-print table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+      #bi-print th, #bi-print td {
+        border: 1px solid var(--border-strong, #888);
+        padding: 2pt 4pt;
+        text-align: left;
+        vertical-align: top;
+      }
+      #bi-print thead { display: table-header-group; }
+      #bi-print tr { break-inside: avoid; }
+    }
 
     /* Graph page layout */
     .graph-title {
@@ -1413,17 +1446,22 @@
          title="Open this page's chapter in a new tab (F1)"
          aria-label="Help for this page: [% tutorial_chapter_title | html %]">Help: [% tutorial_chapter_title | html %]</a>
       [%- END %]
+      [%- IF logged_in %]
+      <form class="site-nav-logout" method="post" action="/logout">
+        <button id="site-nav-logout" type="submit" title="End this session; the next page asks for the password">Log out</button>
+      </form>
+      [%- END %]
     </nav>
   </header>
   <main>
     [% content %]
   </main>
-  <footer><a href="https://github.com/nigelhorne/Database-BI" target="_blank">Database::BI</a></footer>
+  <footer><a href="https://github.com/nigelhorne/Database-BI" target="_blank" rel="noopener">Database::BI</a></footer>
 
     <!-- F1 is the standard Help key.  It follows the header's Help link, or
        the tutorial top when this page has no chapter.  Both links carry
        target="_blank", so the current table or chart view is not lost. -->
-  <script>
+  <script nonce="[% csp_nonce | html %]">
   (function () {
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'F1' || e.repeat) return;
@@ -1449,7 +1487,7 @@
     </div>
   </div>
 
-  <script>
+  <script nonce="[% csp_nonce | html %]">
   (function () {
     var overlay   = document.getElementById('drop-overlay');
     var overlayTxt = document.getElementById('drop-overlay-text');
@@ -1708,7 +1746,7 @@
   </div>
   <div id="atc-status"></div>
 </div>
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   'use strict';
   var btn    = document.getElementById('add-to-canvas-btn');
@@ -1932,7 +1970,7 @@ remembered: the next chart page of the same kind opens at the size this one was 
 forget it, use the Reset size button in the page's export bar, which puts the chart back at the
 size the server sent.</p>
 <p class="sr-only" id="chart-resize-status" role="status" aria-live="polite"></p>
-<script>
+<script nonce="[% csp_nonce | html %]">
 /* Chart resize handle -- injected after D3 and the viewBox-widening JS
    (graph.html.tt setTimeout 0) have both run.  Wraps each chart SVG in a
    relative-positioned div and appends a draggable triangle grip at the
@@ -2215,5 +2253,24 @@ size the server sent.</p>
 }());
 </script>
 [% END %]
+<script nonce="[% csp_nonce | html %]">
+/* Buttons that once carried an onclick attribute.  The Content-Security-Policy
+   runs only scripts that carry this page's nonce, which an attribute cannot,
+   so each is bound here instead. */
+(function () {
+  var copy = document.getElementById('btn-copy-chart-link');
+  if (copy) {
+    copy.addEventListener('click', function () {
+      navigator.clipboard.writeText(window.location.href).then(function () {
+        var t = copy.textContent;
+        copy.textContent = 'Copied!';
+        setTimeout(function () { copy.textContent = t; }, 1500);
+      }).catch(function () {});
+    });
+  }
+  var back = document.getElementById('btn-error-back');
+  if (back) back.addEventListener('click', function () { history.back(); });
+}());
+</script>
 </body>
 </html>

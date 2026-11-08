@@ -39,7 +39,7 @@ use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-use version; our $VERSION = version->declare('0.020.0');
+use version; our $VERSION = version->declare('0.021.0');
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -171,13 +171,15 @@ sub _message {
 	return { 'key' => $key, 'text' => $self->_msg($key, @args) };
 }
 
+=encoding utf8
+
 =head1 NAME
 
 Database::BI::Model::Geocode - Resolve a location column to coordinates, once per distinct value
 
 =head1 VERSION
 
-0.020.0
+0.021.0
 
 =head1 SYNOPSIS
 
@@ -2103,8 +2105,6 @@ C<429 Too Many Requests>) or not at all.  The places are in C<not_attempted>,
 uncached, and the next request asks again.
 
 =back
-
-=encoding utf8
 
 =head1 FORMAL SPECIFICATION
 

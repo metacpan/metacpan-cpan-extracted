@@ -98,8 +98,8 @@
   <p class="map-progress-note" id="map-progress-note"></p>
   <noscript><p class="map-progress-note"><a class="map-retry" href="[% geocode_wait_url | html %]">Look them up and draw the map</a> (the page waits until they are all done).</p></noscript>
 </div>
-<script type="application/json" id="map-pending">[% geocode_pending_json %]</script>
-<script>
+<script nonce="[% csp_nonce | html %]" type="application/json" id="map-pending">[% geocode_pending_json %]</script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var box = document.getElementById('map-progress');
   if (!box) return;

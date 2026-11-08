@@ -1,0 +1,18 @@
+# Build products
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+\.o$
+^eText\.c$
+^eText\.bs$
+^MANIFEST\.bak$
+# The distribution being built
+^etext-[\d.]+
+# The Tcl/Tk flavour of the sources: kept in the repository, not shipped
+^pTk/
+# Editors, version control
+~$
+^\.git
+^\.gitignore$

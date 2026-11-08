@@ -1,0 +1,35 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: Related HTML with inline images
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <related-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="outer"
+
+--outer
+Content-Type: text/plain; charset=us-ascii
+
+A logo and a chart.
+--outer
+Content-Type: multipart/related; boundary="inner"; type="text/html"
+
+--inner
+Content-Type: text/html; charset=us-ascii
+
+<html><body><img src="cid:logo@example.com"> A logo and a <img src="cid:chart@example.com"> chart.</body></html>
+--inner
+Content-Type: image/png
+Content-ID: <logo@example.com>
+Content-Disposition: inline
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgo=
+--inner
+Content-Type: image/gif; name="chart.gif"
+Content-ID: <chart@example.com>
+Content-Location: http://example.com/chart.gif
+Content-Transfer-Encoding: base64
+
+R0lGODlhAQABAAAAACw=
+--inner--
+--outer--

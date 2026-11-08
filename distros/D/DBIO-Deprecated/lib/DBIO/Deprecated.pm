@@ -1,5 +1,5 @@
 package DBIO::Deprecated;
-our $VERSION = '0.900001';
+our $VERSION = '0.900004';
 # ABSTRACT: Registry of CPAN redirect stubs for renamed/retired DBIO modules
 
 use strict;
@@ -20,7 +20,7 @@ DBIO::Deprecated - Registry of CPAN redirect stubs for renamed/retired DBIO modu
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -41,10 +41,12 @@ releases does: either way, the old name simply stops appearing in anything
 newer, and PAUSE keeps pointing at the last release that had it.
 
 This distribution fixes that with the standard CPAN redirect-takeover
-pattern: it ships a small stub package under the OLD module name, with an
-explicit C<$VERSION> set strictly higher than the last CPAN release that
+pattern: it ships a small stub package under the OLD module name and is
+released at a version strictly higher than the last CPAN release that
 shipped that name. PAUSE then indexes I<this> distribution as canonical for
-the old name. The stub does nothing at runtime except C<die> immediately on
+the old name. The deciding version is this distribution's own release
+version, not a literal hand-written into the stub -- see L</HOW THE TAKEOVER
+WORKS>. The stub does nothing at runtime except C<die> immediately on
 load -- naming the replacement module and distribution when there is one, or
 saying plainly that the module was removed with no replacement -- so
 C<cpanm Old::Module::Name> (or a cpanfile pinning it) now installs a clear,
@@ -60,6 +62,58 @@ or removal happens -- including how to audit the family for orphaned module
 names -- see the C<dbio-deprecated> skill
 (C<.claude/skills/dbio-deprecated/SKILL.md> in this repo; packaged into the
 sharedir at build time).
+
+=head1 HOW THE TAKEOVER WORKS
+
+What decides the takeover is the release version of B<this distribution> --
+not the C<$VERSION> literal written into an individual tombstone file.
+
+C<DBIO-Deprecated> is a non-core dist, so C<[@DBIO]>
+(L<Dist::Zilla::PluginBundle::DBIO>) builds it through
+C<@Git::VersionManager> with C<RewriteVersion::Transitional> configured
+C<global = 1> and finder C<[:InstallModules]>. That finder covers every
+shipped module, so the dist version is stamped into all of them at build
+time: a hand-written literal in a tombstone is B<overwritten>, and a
+tombstone with no C<$VERSION> line at all has one B<inserted>. The literal
+is a record, not a lever -- editing it up or down changes nothing about what
+is released.
+
+What PAUSE reads is the C<provides> block of the built C<META>. That block
+comes from C<MetaProvides::Package>, which runs with C<inherit_version = 1>
+(its default): every package in the dist is listed at the B<distribution's>
+version, whatever its file says. Both paths agree, and both name the same
+number.
+
+That distribution version comes from the C<$VERSION> literal in this module,
+F<lib/DBIO/Deprecated.pm> (the bundle's fallback provider being
+C<Git::NextVersion>) -- the one version in this dist that is maintained
+deliberately. It is kept in step with the coordinated family release
+version; the per-module numbers are stamped in bulk and are never computed
+per tombstone.
+
+=head2 The operating rule when adding a tombstone
+
+For the tombstones already shipped here, nothing is left to defend against:
+none of the old names exists in its origin distribution's current HEAD any
+more, and two of those distributions (C<DBIO-MySQL-Async>,
+C<DBIO-PostgreSQL-Async>) no longer exist as repositories at all. A later
+release of an origin distribution cannot re-claim a name it no longer ships,
+so an existing tombstone here cannot be overtaken. (A name that comes back
+live in another dist is the one exception: it must lose its tombstone, and
+F<t/03-no-live-collision.t> fails when that happens.)
+
+The risk is a B<new> tombstone. It inherits whatever version this
+distribution is released at, so if C<DBIO-Deprecated> lags behind the
+family, that version can be B<lower> than the origin distribution's release
+that last shipped the orphaned name -- and the takeover then fails silently:
+the build is clean, the tests pass, and PAUSE simply keeps pointing at the
+stale code.
+
+So when adding a tombstone: establish the origin release (recorded in each
+tombstone's C<$VERSION> comment, and in the table below) and check that the
+B<next release version of this distribution> is strictly higher than it. If
+it is not, raise this distribution's version -- writing a bigger number into
+the stub does not help, because the build overwrites it.
 
 =head1 CURRENT TOMBSTONES
 
@@ -80,15 +134,20 @@ sharedir at build time).
   DBIO::PostgreSQL::Async::TransactionContext       DBIO::PostgreSQL::EV::TransactionContext      DBIO-PostgreSQL-EV
 
   From dbio core (dist DBIO, last released with these names 0.900000):
-  DBIO::Test::Future                                DBIO::Future::Immediate                       DBIO
   DBIO::StartupCheck                                (removed, no replacement)                     --
+  DBIO::Schema::Versioned                           (removed, no replacement)                     --
+
+  From dbio core (dist DBIO, last released with these names 0.900002):
+  DBIO::Version                                     (removed, no replacement)                     --
+  DBIO::Version::Table                              (removed, no replacement)                     --
+  DBIO::ResultSourceHandle                          (removed, no replacement)                     --
 
   From dbio-dzil (dist Dist-Zilla-PluginBundle-DBIO, same-distribution rename, last released 0.900001):
   Dist::Zilla::Plugin::DBIO::SetCopyrightHolder     Dist::Zilla::Plugin::DBIO::SetMeta            Dist-Zilla-PluginBundle-DBIO
 
 =head1 SEE ALSO
 
-L<DBIO::MySQL::EV>, L<DBIO::PostgreSQL::EV>, L<DBIO::Future::Immediate>,
+L<DBIO::MySQL::EV>, L<DBIO::PostgreSQL::EV>, L<DBIO::DeploymentHandler>,
 L<Dist::Zilla::Plugin::DBIO::SetMeta>, L<DBIO>
 
 =head1 AUTHOR

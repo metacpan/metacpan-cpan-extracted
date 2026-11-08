@@ -3,12 +3,18 @@ package Validator::LIVR::Rules::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.21';
+
+# The fields next to an item of list_of: none. Items have no containing object, so
+# equal_to_field and the references of required_if and when see a missing value there
+my $NO_FIELDS = {};
+
+# Arguments after the ones a rule takes are ignored: the rule builders are always the last one
 
 sub nested_object {
-    my ($livr, $rule_builders) = @_;
+    my ( $livr, $rule_builders ) = ( $_[0], $_[-1] );
 
-    my $validator = Validator::LIVR->new($livr)->register_rules(%$rule_builders)->prepare();
+    my $validator = Validator::LIVR->_new_with_rules( $livr, $rule_builders )->prepare();
 
     return sub {
         my ( $nested_object, $params, $output_ref ) = @_;
@@ -32,15 +38,13 @@ sub list_of {
     my ( $rules, $rule_builders );
 
     if (ref $_[0] eq 'ARRAY') {
-        ( $rules, $rule_builders ) = @_;
+        ( $rules, $rule_builders ) = ( $_[0], $_[-1] );
     } else {
         $rules = [@_];
         $rule_builders = pop @$rules;
     }
 
-    my $livr =  { field => $rules };
-
-    my $validator = Validator::LIVR->new($livr)->register_rules(%$rule_builders)->prepare();
+    my $item_rule = Validator::LIVR->_new_with_rules( { field => $rules }, $rule_builders )->_field_rule('field');
 
     return sub {
         my ( $values, $params, $output_ref ) = @_;
@@ -48,19 +52,22 @@ sub list_of {
 
         return 'FORMAT_ERROR' unless ref($values) eq 'ARRAY';
 
-        my ( @results, @errors );
+        my ( @results, @errors, $has_errors );
 
         foreach my $val (@$values) {
-            if ( my $result = $validator->validate( {field => $val} ) ) {
-                push @results, $result->{field};
-                push @errors, undef;
-            } else {
-                push @errors, $validator->get_errors()->{field};
+            my $output = $val;
+
+            if ( my $err_code = $item_rule->( $val, $NO_FIELDS, \$output ) ) {
+                push @errors, $err_code;
                 push @results, undef;
+                $has_errors = 1;
+            } else {
+                push @results, $output;
+                push @errors, undef;
             }
         }
 
-        if ( grep {$_} @errors ) {
+        if ( $has_errors ) {
             return \@errors;
         } else {
             $$output_ref = \@results;
@@ -71,9 +78,9 @@ sub list_of {
 
 
 sub list_of_objects {
-    my ($livr, $rule_builders) = @_;
+    my ( $livr, $rule_builders ) = ( $_[0], $_[-1] );
 
-    my $validator = Validator::LIVR->new($livr)->register_rules(%$rule_builders)->prepare();
+    my $validator = Validator::LIVR->_new_with_rules( $livr, $rule_builders )->prepare();
 
     return sub {
         my ( $objects, $params, $output_ref ) = @_;
@@ -103,11 +110,11 @@ sub list_of_objects {
 }
 
 sub list_of_different_objects {
-    my ( $selector_field, $livrs, $rule_builders ) = @_;
+    my ( $selector_field, $livrs, $rule_builders ) = ( @_[ 0, 1 ], $_[-1] );
 
     my %validators;
     foreach my $selector_value ( keys %$livrs ) {
-        my $validator = Validator::LIVR->new( $livrs->{$selector_value} )->register_rules(%$rule_builders)->prepare();
+        my $validator = Validator::LIVR->_new_with_rules( $livrs->{$selector_value}, $rule_builders )->prepare();
 
         $validators{$selector_value} = $validator;
     }
@@ -149,11 +156,11 @@ sub list_of_different_objects {
 
 
 sub variable_object {
-    my ( $selector_field, $livrs, $rule_builders ) = @_;
+    my ( $selector_field, $livrs, $rule_builders ) = ( @_[ 0, 1 ], $_[-1] );
 
     my %validators;
     foreach my $selector_value ( keys %$livrs ) {
-        my $validator = Validator::LIVR->new( $livrs->{$selector_value} )->register_rules(%$rule_builders)->prepare();
+        my $validator = Validator::LIVR->_new_with_rules( $livrs->{$selector_value}, $rule_builders )->prepare();
 
         $validators{$selector_value} = $validator;
     }
@@ -184,29 +191,31 @@ sub livr_or { # we call it livr_or to avoid conflicts with the "or" operator
     my @rule_sets = @_;
     my $rule_builders = pop @rule_sets;
 
-    my @validators = map {
-        Validator::LIVR->new( { field => $_ } )->register_rules(%$rule_builders)->prepare()
-    } @rule_sets;
+    # One validator for all rule sets, a field for each
+    my %livr = map { ( "or$_" => $rule_sets[$_] ) } 0 .. $#rule_sets;
+    my $validator = Validator::LIVR->_new_with_rules( \%livr, $rule_builders )->prepare();
+    my @field_rules = map { $validator->_field_rule("or$_") } 0 .. $#rule_sets;
 
     return sub {
-        my ($value, undef, $output_ref) = @_;
+        my ($value, $params, $output_ref) = @_;
 
-        # Empty values go to the rule sets too, so "required" and "not_empty" in them work
+        # Empty values go to the rule sets too, so "required" and "not_empty" in them work.
+        # The rule sets are transparent: their rules see the fields next to the field
         my $last_error;
 
-        for my $validator (@validators) {
-            my $result = $validator->validate({ field => $value });
+        for my $field_rule (@field_rules) {
+            my $output = $value;
+            my $err_code = $field_rule->( $value, $params, \$output );
 
-            if ($result) {
-                $$output_ref = $result->{field};
+            if ( !$err_code ) {
+                $$output_ref = $output;
                 return;
-            } else {
-                $last_error = $validator->get_errors()->{field};
             }
+
+            $last_error = $err_code;
         }
 
-        return $last_error if $last_error;
-        return;
+        return $last_error;
     }
 }
 

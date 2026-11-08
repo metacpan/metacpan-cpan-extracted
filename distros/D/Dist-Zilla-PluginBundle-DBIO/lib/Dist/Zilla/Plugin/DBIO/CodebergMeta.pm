@@ -1,5 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::CodebergMeta;
-# ABSTRACT: Add Codeberg (or any git forge) repository metadata to META.{json,yml}
+# ABSTRACT: Add Codeberg (or a Forgejo instance via host=) repository metadata to META.{json,yml}
+our $VERSION = '0.900004';
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
 
@@ -140,11 +141,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::DBIO::CodebergMeta - Add Codeberg (or any git forge) repository metadata to META.{json,yml}
+Dist::Zilla::Plugin::DBIO::CodebergMeta - Add Codeberg (or a Forgejo instance via host=) repository metadata to META.{json,yml}
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 DESCRIPTION
 

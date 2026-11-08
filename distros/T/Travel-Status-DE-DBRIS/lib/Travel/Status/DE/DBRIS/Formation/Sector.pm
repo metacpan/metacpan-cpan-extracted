@@ -7,7 +7,7 @@ use utf8;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 Travel::Status::DE::DBRIS::Formation::Sector->mk_ro_accessors(
 	qw(name start_percent end_percent length_percent start_meters end_meters length_meters)

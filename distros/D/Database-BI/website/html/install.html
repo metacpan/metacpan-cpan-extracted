@@ -67,18 +67,18 @@
 		</tr>
 		<tr>
 			<td>Database::Abstraction</td>
-			<td>0.54</td>
-			<td>Reads the data files; 0.54 reads a table named <code>data</code>, so a file from Export &gt; SQLite opens again.</td>
+			<td>0.55</td>
+			<td>Reads the data files; 0.55 requires the CSV and XML readers it loads, so an install without test modules still reads them; 0.54 reads a table named <code>data</code>, so a file from Export &gt; SQLite opens again.</td>
 		</tr>
 		<tr>
 			<td>Database::Join</td>
-			<td>0.009.0</td>
-			<td>Left joins, with spill-to-SQLite for large results.</td>
+			<td>0.011.1</td>
+			<td>Left joins, with spill-to-SQLite for large results; 0.011.0 lists a database's tables and columns and writes Export &gt; SQLite files, so Database::BI needs no database driver of its own.</td>
 		</tr>
 		<tr>
 			<td>HTML::D3</td>
-			<td>0.29</td>
-			<td>The chart snippets. 0.29 colours treemap tiles by a measure, colours a combo chart from a scheme and escapes the text in tooltips; 0.27 stops a label ending the script it is written into.</td>
+			<td>0.30</td>
+			<td>The chart snippets. 0.30 puts the page's Content-Security-Policy nonce on its scripts; 0.29 colours treemap tiles by a measure, colours a combo chart from a scheme and escapes the text in tooltips; 0.27 stops a label ending the script it is written into.</td>
 		</tr>
 		<tr>
 			<td>HTML::TagCloud</td>
@@ -91,7 +91,7 @@
 
 <p>
 	Some modules are recommended rather than required, so the application installs,
-	starts and tests without them. <strong>HTML::OSM</strong> (0.13 or later) draws
+	starts and tests without them. <strong>HTML::OSM</strong> (0.14 or later) draws
 	maps, with a scale bar, a key on the map that follows the view, and a first
 	view that fits every marker. A place column is turned into coordinates by <strong>Geo::Coder::List</strong>
 	(0.39 or later), which asks <strong>Geo::Coder::Free</strong> (0.48 or later) and
@@ -143,9 +143,12 @@ hypnotoad -s script/database-bi</code></pre>
 	With no arguments the launcher starts the development server itself; any other
 	Mojolicious command word (<code>routes</code>, <code>get</code>, &hellip;) is
 	passed through to the application. The preforking server is the one to put
-	behind a reverse proxy for long-running use. It listens on port 8080 and ignores
+	behind a reverse proxy for long-running use; give it <code>proxy =&gt; 1</code>
+	in its <code>hypnotoad</code> settings so it knows which requests came over
+	https. It listens on port 8080 of this machine only and ignores
 	<code>MOJO_LISTEN</code>; set the port in <code>database_bi.conf</code>, as
-	<code>hypnotoad =&gt; { listen =&gt; ['http://*:3000'] }</code>. It keeps its
+	<code>hypnotoad =&gt; { listen =&gt; ['http://*:8080'] }</code>, where
+	<code>*</code> opens it to every machine. It keeps its
 	process id in <code>script/hypnotoad.pid</code> unless <code>pid_file</code> says
 	otherwise.
 </p>
@@ -162,8 +165,135 @@ hypnotoad -s script/database-bi</code></pre>
 	that is missing, cannot be read or is of an unsupported type, prints the reason
 	and exits with status 2 before any server starts.
 </p>
+<p id="listen">
+	The development server and <code>script/database-bi daemon</code> listen on
+	<code>http://127.0.0.1:3000</code>, so only this machine can reach them: unless
+	you <a href="#login">set a password</a>, there is no login. To change the port,
+	or let other machines in, set <code>listen</code> in <code>database_bi.conf</code>:
+</p>
+<pre><code>{ listen =&gt; 'http://127.0.0.1:8000' }   # another port, this machine only
+{ listen =&gt; 'http://*:3000' }           # every machine that can reach this one
+{ listen =&gt; ['http://127.0.0.1:3000', 'http://[::1]:3000'] }   # IPv6 loopback too</code></pre>
 <p>
-	<code>MOJO_LISTEN</code> chooses the port. <code>script/database-bi daemon</code>
+	<code>MOJO_LISTEN</code> and <code>daemon -l</code> still win over it.
+	<code>morbo script/database-bi</code> opens its port before it reads the
+	configuration, so give it <code>-l</code>, or run the launcher instead.
+	A <code>listen</code> that is not an <code>http://</code> or
+	<code>https://</code> location stops the start.
+</p>
+<p>
+	Anywhere but this machine needs a password. A <code>listen</code> (or
+	<code>MOJO_LISTEN</code>, <code>-l</code>, or hypnotoad's own) that is not
+	<code>127.0.0.1</code>, <code>[::1]</code> or <code>localhost</code> stops the
+	start unless <a href="#login"><code>password_hash</code></a> is set, and says
+	what to change. So does a bare <code>morbo script/database-bi</code>, which
+	listens everywhere. Behind a reverse proxy, without a password, a request the
+	proxy brings from another machine is refused (403).
+</p>
+<h3 id="login">Logging in</h3>
+<p>
+	With <code>password_hash</code> set, every page asks for a password first.
+	Make the line with
+</p>
+<pre><code>script/database-bi password</code></pre>
+<p>
+	It asks for the password twice, without showing it, and prints a line such as
+	<code>password_hash =&gt; 'pbkdf2-sha256$200000$...',</code> to put in
+	<code>database_bi.conf</code>. Only the hash is kept (PBKDF2-HMAC-SHA256, with a
+	random salt); a plain password there stops the start. A new line logs every
+	session out.
+</p>
+<pre><code>{
+    password_hash    =&gt; 'pbkdf2-sha256$200000$...',
+    export_dirs      =&gt; ['/srv/reports/exports'],  # required with a password
+    login_expiration =&gt; 8 * 60 * 60,            # seconds idle before logging out (the default)
+    secrets          =&gt; ['a long random string'], # or each restart logs everyone out
+}</code></pre>
+<p>
+	There is one password, not one per person. A browser is sent to the Log in
+	page and then back to the page it asked for; a script or download gets 401.
+	Log out is at the top of every page. Share and embed links still work without
+	it, since their signed, expiring token is their permission. They are signed
+	with <code>share_secret</code> if set (16 characters or more), else with a key
+	made from <code>secrets</code>; with neither, a restart ends every link. The session cookie
+	is HttpOnly, SameSite=Lax, and Secure over https. Over plain http the password
+	crosses the network as it is typed, so put a server that other machines reach
+	behind https. Ten wrong passwords from one address in 15 minutes lock it out for
+	the rest of the 15 minutes.
+</p>
+<p id="other-sites">
+	Without a password, whatever reaches the server can read files and save
+	exports wherever it can; with one, a logged-in browser carries the login to
+	every request it sends. Listening on <code>127.0.0.1</code> keeps other
+	machines out, but not other sites' pages open in your browser, so each
+	request is checked first and refused (403) when another site made it:
+</p>
+<ul>
+	<li>A save or other change is refused when the browser says another site
+		sent it (<code>Sec-Fetch-Site</code>, or else <code>Origin</code>). Scripts
+		such as <code>curl</code> send neither, and still work.</li>
+	<li>Any request is refused when it names the server by a host name other than
+		<code>localhost</code>; an IP address is fine. This stops a site whose name
+		has been pointed at <code>127.0.0.1</code> (DNS rebinding). To use a name,
+		list it: <code>{ allowed_hosts =&gt; ['bi.example.com'] }</code>, or
+		<code>['*']</code> for any. Behind a trusted reverse proxy only that list
+		is checked, so set it there too.</li>
+</ul>
+<p id="local-users">
+	Listening on <code>127.0.0.1</code> keeps other machines out, not other people
+	on this one. Any account on the same machine, or a container sharing its
+	network, can reach the server and read, list and save files as you. On a
+	machine with other users, <a href="#login">set a password</a> even when it
+	listens on this machine only.
+</p>
+<h3 id="file-roots">Which folders it may use</h3>
+<p>
+	Browsing, opening files, the Export panel's folder list, a <code>path:</code>
+	source in a table, chart, merge or canvas, and saving an export reach the whole
+	filesystem, as far as the account running the server can. To fence them in:
+</p>
+<pre><code>{ file_roots =&gt; ['/srv/reports', 'shared'] }   # 'shared' is under the application home</code></pre>
+<p>
+	<code>data_dir</code> and <code>uploads_dir</code> are always included.
+	Browsing starts at your home folder if it is inside, else at the first root,
+	and goes no higher. Anything outside is refused (403), whether it is there or
+	not, so nothing is learnt about it; a link inside that points outside counts as
+	outside. A root that is not an existing folder stops the start. Remote files,
+	Redis and MariaDB are not affected.
+</p>
+<p>
+	Saving replaces a file of the same name, and some <code>.json</code> files are
+	settings other programs obey, such as a project's <code>package.json</code>. A
+	server other people use keeps exports to folders of their own, so with a
+	password set this is required, and the server does not start without it:
+</p>
+<pre><code>{ export_dirs =&gt; ['/srv/reports/exports'] }</code></pre>
+<p>
+	Exports are then saved only there, and the Export panel opens there. An export
+	never replaces a link or a folder, so a link cannot carry it elsewhere.
+</p>
+<p>
+	Export also refuses a folder or file whose name starts with a dot, such as
+	<code>~/.config</code>: those hold other programs' settings.
+</p>
+<h3 id="url-fetch">Which addresses it may fetch</h3>
+<p>
+	Import from a web page and a <code>url:</code> source make the server fetch a
+	URL, so it refuses one that leads to this machine, a private network, or a
+	cloud's metadata service on <code>169.254.169.254</code>. What counts is the
+	address the name resolves to: <code>localtest.me</code>, whose DNS answers
+	<code>127.0.0.1</code>, is refused, and so is <code>http://2130706433/</code>,
+	which is <code>127.0.0.1</code> written another way. The server connects to
+	the address it checked, and checks every redirect too. To read from an intranet
+	site, name it:
+</p>
+<pre><code>{ url_private_hosts =&gt; ['reports.corp.example', '*.corp.example'] }</code></pre>
+<p>
+	This is not a firewall: if the server's machine can reach something it should
+	not, block that with rules on outgoing connections.
+</p>
+<p>
+	<code>script/database-bi daemon</code>
 	ignores a file named after it, and so does <code>hypnotoad</code>; to show a
 	database from either, set <code>BI_OPEN</code>:
 </p>
@@ -278,11 +408,121 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			</td>
 		</tr>
 		<tr>
+			<td><code>file_roots</code></td>
+			<td>unset (everything)</td>
+			<td>
+				The folders readers may browse, open and save into, besides
+				<code>data_dir</code> and <code>uploads_dir</code>. See
+				<a href="#file-roots">Which folders it may use</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>password_hash</code></td>
+			<td>unset</td>
+			<td>
+				Turns on the login. Made by <code>script/database-bi password</code>;
+				needs <code>export_dirs</code>. See <a href="#login">Logging in</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>share_secret</code></td>
+			<td>unset</td>
+			<td>
+				The key share and embed links are signed with, at least 16 characters.
+				Unset, a key made from <code>secrets</code>; with neither, a restart
+				ends every link.
+			</td>
+		</tr>
+		<tr>
+			<td><code>login_expiration</code></td>
+			<td><code>28800</code></td>
+			<td>Seconds a login lasts after the last request (at least 60).</td>
+		</tr>
+		<tr>
+			<td><code>export_dirs</code></td>
+			<td>unset</td>
+			<td>
+				The only folders exports are saved in, such as
+				<code>['/srv/reports/exports']</code>. Unset, any folder
+				<code>file_roots</code> allows. Required when <code>password_hash</code> is set. See <a href="#file-roots">Which folders it may use</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>allowed_hosts</code></td>
+			<td>unset</td>
+			<td>
+				Host names the server answers to besides <code>localhost</code> and IP
+				addresses, such as <code>['bi.example.com', '*.corp.example']</code>, or
+				<code>['*']</code> for any. See <a href="#other-sites">Requests from other sites</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>url_private_hosts</code></td>
+			<td>unset</td>
+			<td>
+				Intranet names a <code>url:</code> source or Import from a web page may
+				fetch although they resolve to a private address, such as
+				<code>['reports.corp.example', '*.corp.example']</code>. See
+				<a href="#url-fetch">Which addresses it may fetch</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>listen</code></td>
+			<td><code>http://127.0.0.1:3000</code></td>
+			<td>
+				Where the development server and <code>daemon</code> listen; this
+				machine only unless it says <code>*</code>. hypnotoad has its own,
+				defaulting to <code>http://127.0.0.1:8080</code>. See
+				<a href="#listen">Run it</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>cross_origin_opener_policy</code></td>
+			<td><code>same-origin</code></td>
+			<td>
+				The Cross-Origin-Opener-Policy header on pages; <code>''</code> or
+				<code>0</code> for none. See <a href="#csp">Content-Security-Policy</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>permissions_policy</code></td>
+			<td>every unused feature off</td>
+			<td>
+				The Permissions-Policy header; <code>''</code> or <code>0</code> for none.
+				See <a href="#csp">Content-Security-Policy</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>strict_transport_security</code></td>
+			<td><code>max-age=31536000</code></td>
+			<td>
+				The Strict-Transport-Security header sent over https; <code>''</code> or
+				<code>0</code> for none. See <a href="#csp">Content-Security-Policy</a>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>embed_frame_ancestors</code></td>
+			<td>unset</td>
+			<td>
+				Other sites that may show a canvas's <code>/embed/</code> page in a frame.
+				See <a href="#embed">Embedding a canvas on another site</a>.
+			</td>
+		</tr>
+		<tr>
 			<td><code>ai_api_key</code></td>
 			<td>unset</td>
 			<td>
 				Enables the natural-language question and summary endpoints. Off
 				unless you set it; prompts carry column names and aggregate text only.
+			</td>
+		</tr>
+		<tr>
+			<td><code>ai_calls_per_hour</code></td>
+			<td><code>60</code></td>
+			<td>
+				The most calls each server process makes to the AI provider in any hour,
+				questions and summaries together, since each spends <code>ai_api_key</code>;
+				<code>0</code> for no limit. Questions are at most 500 characters.
 			</td>
 		</tr>
 	</tbody>
@@ -309,7 +549,114 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 	needed to draw a map can stay on the local network.
 </p>
 
+<h2 id="csp">Content-Security-Policy</h2>
+<p>
+	Every HTML page is sent with a <code>Content-Security-Policy</code> header.
+	The pages show cells from files this application did not write, so the policy
+	backs up the escaping. Scripts, stylesheets and images may come only from this
+	site and from the hosts named by <code>d3_url</code>, the
+	<code>leaflet_*_url</code> keys, <code>tile_url</code> and
+	<code>tile_sources</code>. With the defaults those are cdnjs.cloudflare.com,
+	unpkg.com and OpenStreetMap's tile servers, so moving a library with the keys
+	above moves the policy with it.
+</p>
+<p>
+	A page's scripts may talk only to this site (<code>connect-src 'self'</code>),
+	and no other site may show a page in a frame
+	(<code>frame-ancestors 'self'</code>). JSON replies and downloads carry no policy.
+	Every page also carries <code>X-Frame-Options: SAMEORIGIN</code>, whatever the
+	keys below say, so framing by another site is refused even with a report-only
+	policy, a policy of your own, or none, and in browsers that read only that header.
+</p>
+<p>
+	Every reply also carries <code>Referrer-Policy: strict-origin-when-cross-origin</code>.
+	Table specs, filter values and share tokens travel in the address, so another
+	site, a CDN or the tile server is sent only this server's origin, never the
+	whole address. It is not <code>no-referrer</code>, because OpenStreetMap asks
+	pages that use its tiles to send one.
+</p>
+<p>
+	Every reply also carries <code>X-Content-Type-Options: nosniff</code>, so a
+	browser takes it for the type it names and never guesses that a CSV export
+	is a web page. Libraries you serve yourself from <code>public/</code> keep
+	working, because <code>.js</code> and <code>.css</code> files are sent as what
+	they are. One served some other way must be sent as <code>text/javascript</code>
+	or <code>text/css</code>, or the browser will not load it.
+</p>
+<p>
+	Every page carries <code>Cross-Origin-Opener-Policy: same-origin</code>, so a
+	window another site opened, or one a page opened on another site, gets no handle
+	on the page. <code>cross_origin_opener_policy</code> sets another value, such as
+	<code>same-origin-allow-popups</code>, or turns it off with <code>''</code> or
+	<code>0</code>. No <code>Cross-Origin-Embedder-Policy</code> is sent: it would
+	refuse the libraries and map tiles that other servers send.
+</p>
+<p>
+	Every reply also carries a <code>Permissions-Policy</code> that turns off the
+	browser features no page uses, such as the camera, the microphone, location,
+	payment and reading the clipboard, so a script that got in cannot ask for them.
+	Writing to the clipboard stays, for the Copy link buttons.
+	<code>permissions_policy</code> replaces the value, as
+	<code>'camera=(), geolocation=(self)'</code>, or turns it off with <code>''</code>
+	or <code>0</code>.
+</p>
+<p>
+	A reply to an https request carries <code>Strict-Transport-Security: max-age=31536000</code>,
+	so a browser that reached the server over https keeps to https for a year. It
+	binds this host only. <code>strict_transport_security</code> sets another value,
+	such as <code>'max-age=63072000; includeSubDomains'</code>, or turns it off with
+	<code>''</code> or <code>0</code>; a value a browser would not read stops the
+	application at startup. Nothing is sent over http, to <code>localhost</code> or
+	to an IP address: the header binds a host on every port, so it would move every
+	other server on the machine to https. Behind a proxy that ends TLS, start the
+	server with <code>MOJO_REVERSE_PROXY=1</code> (or <code>hypnotoad =&gt; { proxy =&gt; 1 }</code>)
+	and have the proxy send <code>X-Forwarded-Proto: https</code>, or have the proxy
+	send the header itself.
+</p>
+<p>
+	An inline script runs only if it carries the request's nonce, a random value
+	made for each request and named in the policy. Every <code>&lt;script&gt;</code>
+	the pages write carries it, and so do those HTML::D3 and HTML::OSM write. A
+	script that came in with a cell's text cannot know it, so it does not run, and
+	neither does an <code>onclick</code> or <code>onerror</code> attribute.
+	Style attributes are still allowed. Two keys change the policy:
+</p>
+<pre><code>{
+    content_security_policy_report_only => 1,   # report breaches, block nothing
+    content_security_policy => "default-src 'self'; script-src 'self' 'nonce-{nonce}'",
+}</code></pre>
+<p>
+	<code>content_security_policy</code> is the whole policy, sent as written except
+	that <code>{nonce}</code> becomes the request's nonce; without it no inline script
+	runs. Set to <code>''</code> or <code>0</code> it sends no header. A policy written
+	out in full is not updated when the library keys change.
+</p>
+
+<h3 id="embed">Embedding a canvas on another site</h3>
+<p>
+	By default only pages of this site may show a canvas's <code>/embed/</code> page
+	in a frame. <code>embed_frame_ancestors</code> names other sites that may:
+</p>
+<pre><code>{ embed_frame_ancestors => [ 'https://intranet.example.com', 'https://*.corp.example' ] }</code></pre>
+<p>
+	Each entry is an origin: <code>http</code> or <code>https</code>, a host (a
+	<code>*</code> may stand for its first label only) and an optional port, with
+	no path. Anything else stops the application at startup. The sites are allowed
+	on <code>/embed/</code> and no other page, and however the policy above is
+	configured, an enforced <code>frame-ancestors</code> names them, so naming one
+	site never lets every site in. A policy written out with its own
+	<code>frame-ancestors</code> is left to say who may. Browsers that know only
+	<code>X-Frame-Options</code> still refuse the frame. The canvas's Share panel
+	names the sites its embed code works on.
+</p>
+
 <h2>Command-line tools</h2>
+<p>
+	The scripts are installed with the distribution, each with a manual page
+	(<code>man bi-geocode</code>, <code>man bi-extract</code>,
+	<code>man bi-alert</code>, <code>man database-bi</code>). In a source folder
+	they are under <code>script/</code>.
+</p>
 
 <h3><code>script/bi-geocode</code></h3>
 <p>

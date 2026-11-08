@@ -1,5 +1,46 @@
 Revision history for DBIO-Deprecated
 
+0.900004  2026-11-08
+    * Tombstones
+        - Four new tombstones for modules removed from DBIO core without a
+          successor: DBIO::Version, DBIO::Version::Table,
+          DBIO::ResultSourceHandle and DBIO::Schema::Versioned. Each dies on
+          load and says the module was removed. For versioned deployments
+          use DBIO::DeploymentHandler with your driver's
+          DBIO::<Driver>::Deploy class.
+        - Released above the core release that last shipped these names,
+          the dist takes over their PAUSE index entries; installing one of
+          them fetches the stub, not the superseded core distribution.
+        - The DBIO::Test::Future tombstone is withdrawn: DBIO core ships
+          that name as a real module. Install or upgrade DBIO after
+          DBIO-Deprecated to get the core module back on disk.
+        - The dist ships sixteen tombstones in all.
+
+    * Takeover
+        - The takeover depends on this dist's release version: the build
+          stamps it into every module and into the META provides block.
+          The $VERSION literal in a tombstone file is a record only.
+        - The operating rule for adding a tombstone is that this dist's
+          next release version is strictly higher than the core release
+          that last shipped the name; each stub names that release.
+
+    * Tests
+        - t/02-version-guard.t fails when a tombstone has no origin release
+          line, or when its origin release is not below the dist version.
+          The origin releases are read from the stubs themselves.
+        - t/03-no-live-collision.t fails when a tombstone name exists as a
+          real package in another dist of the family.
+
+    * Documentation
+        - DBIO::Deprecated explains the takeover in "HOW THE TAKEOVER
+          WORKS"; the tombstone comments and README follow it.
+
+    * Packaging
+        - Every module carries $VERSION in step with the coordinated family
+          release.
+        - LICENSE holds the text dzil genlicense writes; SECURITY.md is
+          part of the dist.
+
 0.900001  2026-07-12
     First release. Permanent home for CPAN redirect ("tombstone") stub
     modules covering DBIO modules that were renamed or retired -- whether

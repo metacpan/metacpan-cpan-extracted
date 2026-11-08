@@ -675,7 +675,7 @@ subtest 'D3 can be served from the deployment itself' => sub {
 	for my $path ('/bar', '/pie') {
 		$t->get_ok("$path?l=" . url_escape("path:$csv") . '&cat=region&val=amount')
 		  ->status_is(200)
-		  ->content_like(qr{<script src="/static/d3/d3\.min\.js"></script>},
+		  ->content_like(qr{<script\b[^>]*\ssrc="/static/d3/d3\.min\.js"></script>},
 			"$path loads D3 from the configured URL")
 		  ->content_unlike(qr{cdnjs\.cloudflare\.com|d3js\.org},
 			"$path asks no CDN for D3");

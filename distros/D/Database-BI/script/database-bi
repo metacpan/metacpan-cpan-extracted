@@ -31,7 +31,7 @@ sub _names_a_database {
 
 	return 0 if $arg =~ /\A-/;
 	(my $name = $arg) =~ s/-/_/g;
-	for my $namespace (@{ Mojolicious::Commands->new->namespaces }) {
+	for my $namespace (@{ Mojolicious::Commands->new->namespaces }, 'Database::BI::Command') {
 		my $class = "${namespace}::$name";
 		return 0 if $name =~ /\A\w+\z/ && !Mojo::Loader::load_class($class);
 	}
@@ -84,6 +84,12 @@ if (@ARGV && _names_a_database($ARGV[0])) {
 # @ARGV empty, and sets MOJO_APP_LOADER.  It must not get the development server,
 # which never returns.  Morbo's run exits, so start_app is reached only otherwise.
 if (!@ARGV && !defined $ENV{MOJO_APP_LOADER}) {
+	# Morbo opens the port before the application is loaded, so load it once
+	# here: its startup reads config listen into MOJO_LISTEN (this machine
+	# only, unless the configuration says otherwise), and a configuration
+	# that does not start stops here rather than in every restart.
+	require Mojo::Server;
+	Mojo::Server->new->build_app('Database::BI');
 	require Mojo::Server::Morbo;
 	Mojo::Server::Morbo->new(silent => 1)
 		->run(File::Spec->catfile($FindBin::RealBin, $FindBin::Script));
@@ -92,3 +98,49 @@ if (!@ARGV && !defined $ENV{MOJO_APP_LOADER}) {
 # This must stay the last statement: a loading server takes the file's value as
 # the application, and refuses anything else.
 Mojolicious::Commands->start_app('Database::BI');
+
+__END__
+
+=head1 NAME
+
+database-bi - start Database::BI, or run one of its commands
+
+=head1 SYNOPSIS
+
+    database-bi                       # development server, 127.0.0.1:3000
+    database-bi data/store.db         # the same, and / shows that database
+    database-bi password              # print a password_hash line for the config
+    hypnotoad database-bi             # production server, 127.0.0.1:8080
+    database-bi daemon -l http://127.0.0.1:8080
+
+=head1 DESCRIPTION
+
+Starts the L<Database::BI> web application.  With no arguments it runs the
+reloading development server (morbo) on the address in the configuration's
+C<listen>, by default C<http://127.0.0.1:3000>.  With one data file it does the
+same and the home page opens that file.  Any other first argument is a
+Mojolicious command (C<daemon>, C<routes>, C<get>, ...) or C<password>, which
+reads a password and prints the C<password_hash> line for F<database_bi.conf>.
+
+Without C<password_hash> the server listens on this machine only: a listen
+address that is not loopback refuses to start.  See L<Database::BI> for the
+configuration.
+
+=head1 EXIT STATUS
+
+0 when a command succeeds; 2 when the arguments name more than one database or
+a file that cannot be opened, before any server starts.
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

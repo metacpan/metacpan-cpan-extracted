@@ -4,15 +4,12 @@ package DBIO::MySQL::Async;
 use strict;
 use warnings;
 
-# Deliberately explicit $VERSION -- unlike normal DBIO sub-modules, which
-# carry none (only the dist's main module does, bumped by dzil). This
-# tombstone needs its own hard-coded, higher $VERSION so PAUSE indexes THIS
-# module as canonical for the name: PAUSE resolves each module name to
-# whichever shipped distribution carries the highest $VERSION, and the old
-# DBIO-MySQL-Async dist's last CPAN release was 0.900000. Do NOT "clean this
-# up" to match the no-$VERSION sub-module convention -- doing so hands the
-# PAUSE index entry back to the stale, superseded distribution.
-our $VERSION = '0.900001';
+# Last release that shipped this name: DBIO-MySQL-Async 0.900000.
+# The PAUSE takeover is decided by THIS dist's release version -- the build
+# stamps that into every module and into META "provides" -- not by the
+# literal below, which RewriteVersion::Transitional rewrites (and inserts,
+# if missing) at build time. See DBIO::Deprecated, "HOW THE TAKEOVER WORKS".
+our $VERSION = '0.900004';
 
 die __PACKAGE__ . " has been renamed to DBIO::MySQL::EV and this module is"
   . " retired. Install DBIO-MySQL-EV instead:\n"
@@ -33,7 +30,7 @@ DBIO::MySQL::Async - RENAMED -- see DBIO::MySQL::EV (dist DBIO-MySQL-EV)
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

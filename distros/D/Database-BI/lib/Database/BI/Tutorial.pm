@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -53,7 +53,7 @@ my @CHAPTERS = (
 			'Click the card. The file opens as a table.',
 			'You can also drop a file onto the page. The program opens it at once.',
 		],
-		tip   => 'The program reads CSV, TSV, PSV, XLSX, XML, SQLite and Berkeley DB files. Start with a CSV file if you can.',
+		tip   => 'The program reads CSV, TSV, PSV, XLSX, XML, JSON, SQLite and Berkeley DB files. Start with a CSV file if you can.',
 		try   => { href => '/', label => 'Open the home page' },
 		routes => [ '/' ],
 	},
@@ -151,11 +151,15 @@ my @CHAPTERS = (
 			'Choose a column. The comparison options change to match the column type.',
 			'For a date column a date picker appears. For a number column a number box appears. For text, type a value.',
 			'To keep rows between two dates, choose Date range and pick a start and an end date.',
+			'For a number column, such as a year, choose between and type the lowest and highest value.',
+			'The two values can be in either order.',
 			'To keep just a recent window instead, pick a Time range such as the last 30 days.',
+			'Time range is shown only when the table has a date or time column.',
 			'Choose the column that window applies to, then click Apply range.',
 			'Press Enter or click Apply filter.',
 			'Each active filter is shown as a small label in the toolbar. Click the x on a label to remove it.',
 			'For more rules, click Merge / Filter... and use the Filter results section.',
+			'A link whose filter names a column the table does not have shows an error that lists the columns.',
 		],
 		tip   => 'A filter does not change your file. It only changes what you see and what you export. A time range is worked out from today every time.',
 		routes => [ '/view/:table' ],
@@ -738,7 +742,7 @@ my @CHAPTERS = (
 			'Click Run it to open that chart.',
 			'Click Save to canvas to keep it as a card on a new canvas.',
 		],
-		tip   => 'Ask appears only when the person who runs the program has set an AI key. Only the column names and their types are sent, never your rows.',
+		tip   => 'Ask appears only when the person who runs the program has set an AI key. Only the column names and their types are sent, never your rows. A question can be up to 500 characters.',
 	},
 
 	# ---------------------------------------------------------------
@@ -756,6 +760,20 @@ my @CHAPTERS = (
 			'Click Save. The program writes a new file. Your source file is not changed.',
 		],
 		tip   => 'Export includes your joins, filters and duplicate setting.',
+		routes => [ '/export' ],
+	},
+	{
+		id    => 'print',
+		part  => 'Save and share',
+		title => 'Print the table',
+		lead  => 'Print puts the header row and every row of the table on paper, not only the page on the screen.',
+		steps => [
+			'Arrange the table the way you want it. Move or delete columns, and click a header to sort.',
+			'Click Print, to the right of Refresh.',
+			'Your browser opens its print window. Choose a printer, or save the page as a PDF.',
+			'A table of more than 10,000 rows asks first, because it can be hundreds of pages.',
+		],
+		tip   => 'Print uses the same rows as Export, so your joins and filters are included. A row that you deleted from the screen is still printed.',
 		routes => [ '/export' ],
 	},
 	{
@@ -877,8 +895,9 @@ my @CHAPTERS = (
 			'Click Share... in the canvas toolbar.',
 			'Click Make a link, then Copy link. The link is now on your clipboard.',
 			'Send the link by email or in a message.',
-			'To show the canvas inside another page of this site, click Copy embed code instead.',
+			'To show the canvas inside another page of this site, click Copy embed code instead. The panel names any other sites where it works.',
 			'The link stops working after 30 days. Click Make a new link to create another.',
+			'If the panel says a restart ends the link, the server forgets its links when it stops.',
 		],
 		tip   => 'The link gives read-only access. To keep a copy of the canvas, click Download as JSON. Import canvas on the Canvases page reads it back.',
 		routes => [],
@@ -919,6 +938,23 @@ my @CHAPTERS = (
 		try   => { href => '/preferences', label => 'Open your preferences' },
 		routes => [ '/preferences' ],
 	},
+	{
+		id    => 'log-in',
+		part  => 'Help',
+		title => 'Log in',
+		lead  => 'A program shared by several people can ask for a password before it shows anything.',
+		steps => [
+			'If a Log in page appears, type the password and click Log in.',
+			'Whoever runs the program chose the password. Ask them for it.',
+			'After you log in, the page you asked for opens.',
+			'Click Log out at the top of any page when you have finished.',
+			'If you do nothing for a working day, you are logged out by yourself.',
+			'After ten wrong passwords, the page asks you to wait a few minutes.',
+		],
+		tip   => 'Share and embed links still work without the password, until they expire. Anyone holding one sees that canvas.',
+		try   => { href => '/login', label => 'Open the Log in page' },
+		routes => [ '/login' ],
+	},
 
 	# ---------------------------------------------------------------
 	# For maintainers
@@ -929,7 +965,7 @@ my @CHAPTERS = (
 		title => 'Alert when a number crosses a limit',
 		lead  => 'The bi-alert script checks a canvas measure and signals when it crosses a threshold.',
 		steps => [
-			'Find the script at script/bi-alert in the application folder.',
+			'The script is installed as bi-alert. In a copy of the source it is script/bi-alert.',
 			'Run bi-alert --help to see all options.',
 			'Pass --analysis with the canvas id and --threshold with the measure, comparison and value.',
 			'For example: bi-alert --analysis abc123 --threshold count:gt:0 exits with code 1 when count is above 0.',
@@ -952,7 +988,7 @@ my @CHAPTERS = (
 		title => 'Look up place names before anyone opens the map',
 		lead  => 'The bi-geocode script finds the coordinates of every place in a column and keeps them for the map.',
 		steps => [
-			'Find the script at script/bi-geocode in the application folder.',
+			'The script is installed as bi-geocode. In a copy of the source it is script/bi-geocode.',
 			'Pass --spec with the table, and --col with the column that holds the place names.',
 			'Give --col twice for a place split over two columns, such as --col Address --col Country.',
 			'For example: bi-geocode --spec table:virginia_counties --col county --region US.',
@@ -1014,7 +1050,7 @@ my @FAQ = (
 	},
 	{
 		question => 'The table says its extract is stale.',
-		answer   => 'The file has changed since its fast copy was made, so the file itself was read. Run script/bi-extract --all to make the copy again.',
+		answer   => 'The file has changed since its fast copy was made, so the file itself was read. Run bi-extract --all to make the copy again.',
 	},
 	{
 		question => 'An extracted column says (unparseable).',
@@ -1029,12 +1065,60 @@ my @FAQ = (
 		answer   => 'The file has changed, and a saved column can no longer be worked out. The note names it. Click the panel the note names, then correct or delete it.',
 	},
 	{
+		question => 'A chart or map is blank after D3 or Leaflet was moved to another server.',
+		answer   => 'The pages only load scripts from the servers in the configuration. Set d3_url or the leaflet keys to the new address, and the page allows it.',
+	},
+	{
+		question => 'Can I show a canvas on another web site?',
+		answer   => 'Only on the sites that whoever runs the program has listed. The Share panel names them. On any other site the canvas is refused, so send the share link instead.',
+	},
+	{
+		question => 'Can someone on another computer open it?',
+		answer   => 'Only with a password. At first the program answers only the computer it runs on. Whoever runs it can set a password, then open it to others.',
+	},
+	{
+		question => 'The page says the server does not answer to that name.',
+		answer   => 'Open it as localhost or by its number address instead. To use a name, whoever runs the program adds it to allowed_hosts in the configuration file.',
+	},
+	{
+		question => 'A folder or file says it is not available here.',
+		answer   => 'Whoever runs the program has chosen which folders it may use, and that one is outside them. Choose a file or folder inside, or ask them to add it.',
+	},
+	{
+		question => 'Import from a web page refuses the address.',
+		answer   => 'The page is on this computer or a private network, and the program only reads pages on the public internet. Whoever runs it can name intranet sites it may read.',
+	},
+	{
+		question => 'Export says exports are saved only in the export folders.',
+		answer   => 'Whoever runs the program has chosen the folders exports go to. The Export panel opens on one of them, so save there.',
+	},
+	{
+		question => 'Export will not save into a folder whose name starts with a dot.',
+		answer   => 'Those folders hold settings for other programs, so saving there is refused. Choose another folder.',
+	},
+	{
+		question => 'Export says the name is already there and is not a plain file.',
+		answer   => 'A folder or a link has that name, and Export only replaces an ordinary file. Type another file name.',
+	},
+	{
+		question => 'Ask says the AI has been asked too often this hour.',
+		answer   => 'Whoever runs the program limits how often it asks the AI each hour. Try again later. Insights still work, without the AI wording.',
+	},
+	{
 		question => 'A chart says it cannot be drawn.',
 		answer   => 'The page says why, for example a column that the view does not have. Click Back, then choose other columns.',
 	},
 	{
 		question => 'The program will not open my file.',
-		answer   => 'Check the end of the file name. The program reads CSV, TSV, PSV, XLSX, XML, SQLite and Berkeley DB files.',
+		answer   => 'Check the end of the file name. The program reads CSV, TSV, PSV, XLSX, XML, JSON, SQLite and Berkeley DB files.',
+	},
+	{
+		question => 'My JSON file shows a list of tables, not rows.',
+		answer   => 'The file holds more than one list of rows, such as findings and hosts. Each list is a table. Click the one you want.',
+	},
+	{
+		question => 'The program says my JSON file holds no table.',
+		answer   => 'It needs a list of objects, or an object that holds one. A value inside a row that holds more data is shown as JSON text.',
 	},
 	{
 		question => 'The page is dark, but my saved chart is white.',
@@ -1158,6 +1242,7 @@ my %ACTION_CHAPTERS = (
 	catalog_view   => 'catalog',
 	canvases_view  => 'canvas',
 	preferences    => 'preferences',
+	login_form     => 'log-in',
 );
 
 my %EXEMPT_ROUTES = (

@@ -1,0 +1,9 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: HTML only
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <html-1@example.com>
+MIME-Version: 1.0
+Content-Type: text/html; charset=us-ascii
+
+<html><head><title>T</title></head><body><p>Only&nbsp;<b>HTML</b> here.</p></body></html>

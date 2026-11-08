@@ -1,5 +1,140 @@
 Revision history for Perl extension Text::JSCalendar
 
+0.10  2026-11-07
+	- NormaliseEvent (and so CompareEvents) keeps what it does not know
+	  instead of deleting it.  It used to delete every key missing from
+	  its table, so every recurrenceOverrides patch normalised to {}
+	  ({"excluded":true} compared equal to an RDATE), every alert trigger
+	  to {} (any two alert offsets compared equal), and every @type was
+	  stripped (an Event compared equal to a Task).  Now:
+	  * unknown keys are kept, at every level
+	  * override patches keep their contents; a patch value at a known
+	    object path (participants/p1, alerts/a1/trigger, locations, ...)
+	    is normalised as that object, and a patched value is never
+	    dropped for being the default, since in a patch it overrides
+	    the master
+	  * an OffsetTrigger drops relativeTo "start" and an implied @type;
+	    an AbsoluteTrigger or unknown trigger is kept whole
+	  * @type is dropped only where the position implies it (Location,
+	    Participant, Alert, NDay, ...); the Event or Task keeps it
+	  * defaults follow jscalendarbis-22: status "confirmed", duration
+	    "PT0S", descriptionContentType "text/plain", interval 1, and
+	    scheduleAgent "server" (RFC 8984); participant kind has no
+	    default, so "individual" no longer equals an unset kind
+	  * a JSON false is now dropped where false is the default
+	    (showWithoutTime, expectReply); it used to be kept because
+	    JSON booleans are references
+	  * a null map or array is dropped as before, but a malformed
+	    value (a map that is not an object) is kept rather than dropped
+	- t/icalfiles.t marks two round trips TODO that the old
+	  NormaliseEvent hid (override patches lost on the way back)
+	- add t/normalise.t
+	- add t/roundtrip.t: JSCalendar -> iCalendar -> JSCalendar is the
+	  identity for hand-written Events and Tasks using every converted
+	  property (testdata/roundtrip/*.json), and iCalendar -> JSCalendar
+	  -> iCalendar -> JSCalendar is stable for every .ics under testdata,
+	  including the jscalendar-icalendar-29 examples
+	  (tools/extract-icalendar-examples.pl).  Known conversion bugs are
+	  TODO tests, each with its cause
+	- MANIFEST lists the tests and test data added since 0.08
+	- one bad component no longer costs the whole calendar.  The reader
+	  converts each VEVENT/VTODO on its own, and each VALARM and RRULE
+	  in it: a component that cannot be converted is dropped (an RRULE
+	  with FREQ=FORTNIGHTLY used to confess, a VALARM without ACTION to
+	  die on lc undef, each taking every event with it).  The writer
+	  likewise writes each object, and each alert, on its own.  What was
+	  dropped is reported by the new errors() method (uid, component,
+	  id, message), reset by each vcalendarToEvents, eventsToVCalendar
+	  or _argsToVCalendar call; their return values are unchanged
+	- add t/isolation.t
+	- no process-wide side effects:
+	  * loading the module no longer replaces $SIG{__WARN__} for the
+	    whole process; the Data::ICal "Unknown property" carps are
+	    caught only while the module itself is writing
+	  * the module uses plain warnings, not FATAL => 'all' (a warning
+	    in it, such as an alert of an untitled event, killed the
+	    caller); the warnings that then showed are fixed: an untitled
+	    event's alarm has a DESCRIPTION again, a SEQUENCE, PRIORITY,
+	    PERCENT-COMPLETE or SIZE that is not an integer is ignored
+	  * the MIME::Types cache is private, not $::MimeTypes
+	  * $ENV{JMAP_ALWAYS_FULL} (write whole objects in override
+	    patches) is gone; nothing set it
+	  * nothing goes to STDERR: a second component of one UID without
+	    RECURRENCE-ID (which used to Dumper both events), DTEND with
+	    DURATION, an all-day DTSTART with a time zone, and a mandatory
+	    property Data::ICal finds missing are reported by the new
+	    warnings() method, the same shape as errors(); an unknown
+	    VALARM ACTION drops the alarm and is an errors() entry
+	- add t/side-effects.t
+	- the master the reader makes up for stand-alone recurrence instances
+	  is marked with the vendor-specific property
+	  "jscalendar.fastmail.com:syntheticMaster": true (the constant
+	  SYNTHETIC_MASTER; isSyntheticMaster($Event) tests it), and the
+	  writer goes by that alone.  It used to guess, taking any object
+	  with organizerCalendarAddress and no participants for a synthetic
+	  master and silently not writing it, so a real event of that shape
+	  was lost.  A marked master writes each of its instances as a
+	  RECURRENCE-ID component (an empty patch too, not an RDATE; an
+	  excluded one not at all) and no component of its own; every
+	  instance of it is an override, even one that patches nothing; and
+	  it starts at its earliest instance, not at whichever came first
+	  in the file, so that it reads back the same
+	- add t/synthetic-master.t
+	- eventsToVCalendar (and _argsToVCalendar) no longer changes its
+	  input: matching recurrenceRule's interval, count and byX numbers
+	  against a pattern stringified them in the caller's objects, which
+	  then encoded as JSON strings ("interval": "2")
+	- add t/no-mutation.t
+	- new public API for what consumers had to rebuild themselves:
+	  * occurrences($Event, after => $from, before => $to, max => $n):
+	    the recurrence ids in [after, before), in order: the start
+	    (always the first occurrence), every date-time of the
+	    recurrenceRule (jscalendarbis-22 3.3.3.1, with every rule
+	    property the module reads, firstDayOfWeek, byYearDay, byWeekNo,
+	    bySecond and skip included; rscale must be gregorian), plus
+	    added recurrenceOverrides keys, minus excluded ones.  A rule of
+	    its own, not DateTime::Event::ICal (which, among other things,
+	    loses most occurrences of a weekly rule with an interval and
+	    byMonth); bounded by max (default 5000) and by 400 years
+	    without a match
+	  * instance($Event, $recurrenceId): that occurrence as an object
+	    of its own, the override patch applied with the module's own
+	    PatchObject code (participants/p1/participationStatus and the
+	    like), recurrenceId and recurrenceIdTimeZone set; undef if
+	    excluded
+	- add t/occurrences.t
+	- declare Data::ICal as a prerequisite, and stop loading XML::Spice and
+	  URI::Escape, which nothing used (a CPAN install without XML::Spice
+	  failed)
+
+0.09  2026-11-07
+	- follows jscalendarbis-22, jscalendar-icalendar-29 and
+	  icalendar-jscalendar-extensions-09
+	- participant keys travel in the JSID parameter of ATTENDEE and
+	  ORGANIZER, so an override patching participants/<key>/... still
+	  finds its participant after a round trip
+	- write each DELEGATED-TO/-FROM address as its own quoted value
+	- links follow their rel: enclosure (the default when rel is unset)
+	  is ATTACH, icon is IMAGE, the first describedby is URL, anything
+	  else is LINK with LINKREL; title is FILENAME on ATTACH and IMAGE and
+	  LABEL on URL and LINK.  Every non-enclosure link used to become URL,
+	  so two of them made two URL properties.  URL reads as describedby,
+	  LINK is read, IMAGE DISPLAY and SIZE are read, and every link is
+	  keyed by its JSID
+	- a floating time leaves timeZone unset instead of null
+	- an unknown CLASS is private (it was public)
+	- showWithoutTime no longer turns a timed event into a DATE one: DATE
+	  only with no timeZone and no time of day; otherwise the time and
+	  zone stay and SHOW-WITHOUT-TIME;VALUE=BOOLEAN:TRUE is written
+	- a Task alert relative to end without a due is made relative to start
+	- SENT-BY converts to the participant's sentBy, and the ORGANIZER's
+	  also to the Event or Task sentBy, both ways
+	- COLOR: an unreadable value is dropped instead of dying (which lost
+	  the whole calendar); only valid COLOR values are written
+	- RDATE;VALUE=PERIOD keeps the period's length as the override's
+	  duration
+	- add t/links.t, t/jscalendar-29.t, t/participant-jsid.t
+
 0.08  2026-10-22
 	- security: recurrenceOverrides patches could rewrite top-level-only
 	  properties when writing iCalendar, e.g. "uid" (exception emitted

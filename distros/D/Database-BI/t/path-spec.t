@@ -37,7 +37,12 @@ my $model_dir = Mojo::File->new(File::Temp::tempdir(CLEANUP => 1));
 $real->child('sales.csv')->spew("id,region,email,amount\n1,North,ann\@x.com,10\n2,South,bob\@y.org,5\n");
 
 my $via_link  = $link->child('sales.csv')->to_string;
-my $canonical = Mojo::File->new($via_link)->realpath->to_string;
+# The resolved spelling is the real folder's, not realpath through the link:
+# Windows' realpath leaves a symlink alone, so it would name the link, the
+# very spelling canonical_spec exists to replace (a CPAN Testers failure on
+# Strawberry Perl 5.42).  realpath still resolves the tempdir itself (macOS's
+# /var is /private/var).
+my $canonical = $real->child('sales.csv')->realpath->to_string;
 isnt($via_link, $canonical, 'the file has two spellings');
 
 my $t = Test::Mojo->new('Database::BI', {

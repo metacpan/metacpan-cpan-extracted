@@ -1,0 +1,17 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Apple Inc.//Mac OS X 14.4//EN
+N:;;;;
+FN:Café Müller GmbH
+ORG:Café Müller GmbH;Küche
+X-ABShowAs:COMPANY
+item1.EMAIL;type=INTERNET;type=WORK;type=pref:küche@café.example
+item1.X-ABLabel:Bestellungen
+item2.TEL;type=MAIN:+49 30 5550 0000
+item2.X-ABLabel:_$!<Main>!$_
+item3.ADR;type=WORK;type=pref:;;Straße des 17. Juni 1;Berlin;;10623;Deutschland
+item3.X-ABADR:de
+item3.X-ABLabel:Laden
+NOTE:Öffnungszeiten: Mo–Fr 8–18 Uhr
+UID:2F1E0D9C-8B7A-4695-A4B3-C2D1E0F9A8B7
+END:VCARD

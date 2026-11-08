@@ -24,6 +24,7 @@
          "requires" : {
             "JSON" : "0",
             "Test::Exception" : "0",
+            "Test::MockTime" : "0",
             "Test::More" : "0.96"
          }
       },
@@ -35,6 +36,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "JSON::PP" : "0",
             "Scalar::Util" : "0",
             "perl" : "5.010"
          }
@@ -49,6 +51,6 @@
          "url" : "https://github.com/koorchik/Validator-LIVR"
       }
    },
-   "version" : "2.1",
+   "version" : "2.21",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -240,11 +240,11 @@
 <h2 id="sharing">Sharing and embedding</h2>
 <dl class="spec">
 	<dt><code>/a/:id</code></dt>
-	<dd>The canvas itself, with cross-filter, drill, parameter and range parameters.</dd>
+	<dd>The canvas itself, with cross-filter, drill, parameter and range parameters. With a <a href="install.html#login">password</a> set, it needs the login.</dd>
 	<dt><code>/share/:id</code></dt>
-	<dd>A share link, signed with an HMAC-SHA256 token, for handing a canvas to someone who should not need an account. The canvas toolbar's <b>Share&hellip;</b> panel makes one, valid for 30 days.</dd>
+	<dd>A share link, signed with an HMAC-SHA256 token, for handing a canvas to someone who should not need an account. The canvas toolbar's <b>Share&hellip;</b> panel makes one, valid for 30 days. It opens without the login. The key is <code>share_secret</code>, else one made from <code>secrets</code>; with neither, a restart ends every link, and the panel says so.</dd>
 	<dt><code>/embed/:id</code></dt>
-	<dd>A page with no navigation, for putting the canvas inside another page; the Share panel gives its <code>&lt;iframe&gt;</code> code. It is sent with <code>X-Frame-Options: SAMEORIGIN</code>, so only pages served from the same site can frame it. Each card is drawn through its own failure: one card that cannot be drawn says so and leaves the others. It stays in the light colours, because it sits on a page whose colours it cannot know.</dd>
+	<dd>A page with no navigation, for putting the canvas inside another page; the Share panel gives its <code>&lt;iframe&gt;</code> code. Like every page, it is sent with <code>X-Frame-Options: SAMEORIGIN</code> and with <code>frame-ancestors 'self'</code> in its <a href="install.html#csp">Content-Security-Policy</a>, so only pages served from the same site can frame it, unless <a href="install.html#embed"><code>embed_frame_ancestors</code></a> names other sites that may. Each card is drawn through its own failure: one card that cannot be drawn says so and leaves the others. It stays in the light colours, because it sits on a page whose colours it cannot know.</dd>
 	<dt><code>/catalog</code></dt>
 	<dd>Every saved canvas in one place, as cards that open.</dd>
 </dl>

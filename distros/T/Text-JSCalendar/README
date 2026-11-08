@@ -5,9 +5,9 @@ DESCRIPTION
 Text::JSCalendar provides bidirectional conversion between iCalendar
 (RFC 5545) and JSCalendar, following the latest drafts:
 
-  - draft-ietf-calext-jscalendar-icalendar (mapping specification)
-  - draft-ietf-calext-jscalendarbis (JSCalendar data model)
-  - draft-ietf-calext-icalendar-jscalendar-extensions (new iCal properties)
+  - draft-ietf-calext-jscalendar-icalendar-29 (mapping specification)
+  - draft-ietf-calext-jscalendarbis-22 (JSCalendar data model)
+  - draft-ietf-calext-icalendar-jscalendar-extensions-09 (new iCal properties)
 
 METHODS
 

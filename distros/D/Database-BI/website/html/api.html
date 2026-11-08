@@ -48,6 +48,14 @@
 	</p>
 </div>
 
+<p>
+	With <a href="install.html#login"><code>password_hash</code></a> set, every
+	endpoint here needs the login: a request without the session cookie gets 401
+	<code>{ "error": ... }</code>. A write sent by another site's page is refused
+	with 403 either way (<a href="install.html#other-sites">Requests from other
+	sites</a>).
+</p>
+
 <h2 id="canvases">Saved canvases</h2>
 <div class="table-wrap">
 <table>
@@ -248,7 +256,7 @@ DELETE /api/analyses/:id/visuals/:visual</code></pre>
 	<dt><code>GET /api/columns?table=&hellip;</code> or <code>?path=&hellip;</code></dt>
 	<dd>The column names of a source, used to populate the join panel without a page reload.</dd>
 	<dt><code>GET /api/dirs?path=&hellip;</code></dt>
-	<dd>Subdirectories of a path, for the export panel's inline browser.</dd>
+	<dd>Subdirectories of a path, for the export panel's inline browser. With <code>export_dirs</code> set it starts at the first and lists only those folders and below; with <code>file_roots</code>, only those. A path outside is 403 (<a href="install.html#file-roots">Which folders it may use</a>).</dd>
 	<dt><code>GET /api/stat?path=&hellip;</code></dt>
 	<dd><code>{ exists, path, mtime, size }</code>, plus <code>table_count</code> for a valid SQLite file.</dd>
 	<dt><code>GET /api/range?l=&hellip;</code></dt>
@@ -258,13 +266,16 @@ DELETE /api/analyses/:id/visuals/:visual</code></pre>
 		A question in words, answered with an analysis spec and a URL. The model
 		sees column names and types only &mdash; never rows or file paths. 503 when
 		no key is configured, 422 when the question cannot be mapped to valid
-		columns.
+		columns. 400 when the question is over 500 characters, and 429 once the
+		server has made <code>ai_calls_per_hour</code> provider calls in the last hour
+		(default 60, shared with the summary).
 	</dd>
 	<dt><code>POST /api/summary</code></dt>
 	<dd>
 		A narrative summary from deterministic sentences, works offline, with an
 		optional polished version when <code>ai=1</code> and a key is set. Cached
-		for an hour.
+		for an hour. Past <code>ai_calls_per_hour</code> it gives the deterministic
+		text, with <code>source</code> <code>template_limited</code>, uncached.
 	</dd>
 </dl>
 

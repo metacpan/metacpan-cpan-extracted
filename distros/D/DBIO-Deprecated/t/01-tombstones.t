@@ -18,9 +18,12 @@ my %tombstone = (
   'DBIO::PostgreSQL::Async::Pool'           => { type => 'renamed', match => qr/DBIO::PostgreSQL::EV::Pool\b/ },
   'DBIO::PostgreSQL::Async::Storage'        => { type => 'renamed', match => qr/DBIO::PostgreSQL::EV::Storage\b/ },
   'DBIO::PostgreSQL::Async::TransactionContext' => { type => 'renamed', match => qr/DBIO::PostgreSQL::EV::TransactionContext\b/ },
-  'DBIO::Test::Future'                      => { type => 'renamed', match => qr/DBIO::Future::Immediate\b/ },
   'Dist::Zilla::Plugin::DBIO::SetCopyrightHolder' => { type => 'renamed', match => qr/Dist::Zilla::Plugin::DBIO::SetMeta\b/ },
   'DBIO::StartupCheck'                      => { type => 'removed', match => qr/removed/i },
+  'DBIO::Version'                           => { type => 'removed', match => qr/removed/i },
+  'DBIO::Version::Table'                    => { type => 'removed', match => qr/removed/i },
+  'DBIO::ResultSourceHandle'                => { type => 'removed', match => qr/removed/i },
+  'DBIO::Schema::Versioned'                 => { type => 'removed', match => qr/removed/i },
 );
 
 plan tests => 3 * scalar keys %tombstone;

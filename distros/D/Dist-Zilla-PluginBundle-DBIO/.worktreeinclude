@@ -1,0 +1,11 @@
+# >>> skilletor >>>
+/.agents/skills/
+/.claude/agents/**/.local.*
+/.claude/rules/**/.local.*
+/.claude/skilletor.local.json
+/.claude/skilletor.lock.json
+/.claude/skills/
+/.codex/agents/**/.local.*
+/.codex/skilletor-rules.md
+/.hermes/skills/
+# <<< skilletor <<<

@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.12.0 - 2026-11-07
+
+### Features
+
+- Download a named build: download_url, download and download_bytes take build ([`ab10310`](https://github.com/internetdata/sdk-perl/commit/ab10310794abd214a032af61092d7e7efd2007ee))
+
 ## 1.11.7 - 2026-11-06
 
 ### Fixes

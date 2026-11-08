@@ -6,9 +6,10 @@ use warnings;
 use Carp	qw(croak);
 use POSIX	qw(floor ceil);
 use Readonly;
+use Database::BI::Util ();
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -398,7 +399,9 @@ sub _epoch_of {
 #
 # Purpose: Read one cell as a point in time.  Three shapes are recognised, in
 #          this order: an ISO date, or an ISO timestamp with 'T' or a space
-#          between the date and the time; ten digits, an epoch in seconds; and
+#          between the date and the time (a fraction of a second and a zone
+#          are accepted and not applied: Database::BI::Util::iso_datetime);
+#          ten digits, an epoch in seconds; and
 #          thirteen digits, an epoch in milliseconds.  Only the digit count
 #          separates the last two, so it is the rule -- and it is documented,
 #          because nothing in the value itself says which one it is.
@@ -408,9 +411,9 @@ sub _parse_time {
 	(my $s = $value) =~ s/\A\s+|\s+\z//g;
 	return undef unless length $s;
 
-	if (my ($y, $mon, $day, $h, $mi, $sec)
-		= $s =~ /\A(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?\z/)
-	{
+	my ($ymd, $h, $mi, $sec) = Database::BI::Util::iso_datetime($s);
+	if (defined $ymd) {
+		my ($y, $mon, $day) = split /-/, $ymd;
 		my $epoch = _epoch_of($y + 0, $mon + 0, $day + 0,
 			($h // 0) + 0, ($mi // 0) + 0, ($sec // 0) + 0);
 		return undef unless defined $epoch;
@@ -1253,7 +1256,7 @@ Database::BI::Calc - Safe recursive-descent expression evaluator for Database::B
 
 =head1 VERSION
 
-0.012.0
+0.021.0
 
 =head1 SYNOPSIS
 

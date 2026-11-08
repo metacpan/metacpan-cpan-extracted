@@ -16,7 +16,7 @@
     backgrounds out of a print by default, which would leave pale text on white
     paper.  embed.html.tt does not use this file: an embedded canvas sits on
     someone else's page, whose colours it cannot know. -%]
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var KEY  = 'bi-pref:theme';
   var root = document.documentElement;

@@ -1,0 +1,30 @@
+* means corrected
+
+1) Additional element of a block can hide a cursor.
+2)* If part of long hierarchy of radicals disappears on the right,
+anything disappears. (* Was: wrong interaction of wrapped lines with
+tcl layout. *)
+3) Algorithm for layout can become exponential if it tries to wrap
+around n levels of IBTrees to fit into space.
+4) Change ArgAppendCopy to ArgAppendShadow? (incr refcount instead of copy?)
+5)* (2.00) Text indices counted bytes; Perl/Tk 804 stores text as UTF-8,
+so a non-ASCII character occupied several index positions ("1.0+1c"
+after a 3-byte character was in the middle of it).  (* Indices count
+characters now, inside blocks too; t/utf8.t compares with Tk::Text. *)
+6) (2.00) The Tcl/Tk flavour of the sources is unmaintained.
+7)* (2.00) "search" did not skip elided text; undoing the deletion of
+a block restored its text, not the block; "dump" did not look into
+blocks.  (* All three done, the undo of a deletion that cuts a block
+included; undo re-creates embedded images and windows too.  A window
+given with -window was destroyed with the deletion, as in Tk, and
+comes back as an empty window segment. *)
+8)* (2.00) Deleting all of a block except its head, or all except its
+tail (which deletes the block, as documented), crashed.  (* Fixed. *)
+9)* (2.00) An embedded window inside a block could not be addressed by
+name or by index: "index" by its name gave the position inside the
+block, "window cget" and "window configure" looked on the outer line
+only.  (* Fixed. *)
+10) (2.00) Display lines never span logical lines (an elided newline
+does not merge two lines, as it does in Tk 8.5), and a space at the
+right margin needs a pixel of room to stay on its line (Tk 8.4's rule;
+Tk 8.5 lets it hang over).  Known differences from Tk 8.5, kept.

@@ -1,0 +1,66 @@
+Proc-Spawner: what is open, in one place
+========================================
+
+0.09, 2026-11-08.  Every postponed thing, by who has to act.  The full
+records behind each line: doc/pspawn-known-issues.md (X..., section "Open"),
+doc/large-subset/large-subset-state.md (sections 4-6),
+doc/large-subset/large-subset-environment.md (X27), doc/pspawn-spawner.md
+(section 8: Windows), Changes.  Keep this file current: when an item is
+decided or done, remove it here and record it where it belongs.
+
+A. WAITING FOR THE USER'S DECISION
+
+ 1. X27: what to do with each code of the run's environment.
+    Read: doc/large-subset/large-subset-environment.md, section 3, "At a
+    glance" (every code in one line, how many samples, whether the run could
+    control it); the record per sample: large-subset-provenance.tsv.
+    Act: per code, one of: nothing / fixtures / chosen values / stand-ins
+    for programs / a second run / leave the samples out.  The cheapest:
+    echo (98 samples: one more run with POSIXLY_CORRECT=1), locale (11: a
+    second locale), path-tmp (207: a fresh tmpfs on /tmp per run),
+    path-random (25: a fixed file over /dev/urandom).
+ 2. X27: should "strict" mean "on any platform"?  The subset's own programs
+    echo, printf, test, [, true, false (X21) do not exist on Windows; 142
+    strict samples use one.  Act: yes (a code for them) or no.
+ 3. P2 and P4 (large-subset-state.md, sections 4-5): ${...} forms both
+    shells refuse; messages with our name and line, and $-.
+ 4. Windows: how the event loop reads pipes (Perl's select takes sockets
+    only): polling with PeekNamedPipe, overlapped I/O, or threads
+    (pspawn-spawner.md, section 8).
+ 5. X2: $! of a background job that starts no process (design question K4).
+ 6. X7: run() ignores SIGINT and SIGQUIT while it runs, as Perl's system
+    does: say if not wanted.
+ 7. Perl's Windows bugs drafted in doc/perl-win32-system-bugs.md (argv
+    quoting, the cmd.exe retry, batch files): file them, or ask.
+ 8. Run 0.07 (repository ilyaz-ai/run; CPAN has 0.06): to be released
+    before a Proc-Spawner that needs it (M2, the primitive system1).  Also
+    delete the branch run of this repository on GitHub (the proxy refuses
+    deletions here); its contents are in ilyaz-ai/run.
+ 9. X22 (bash's own bug): report it to bug-bash, if wanted.
+
+B. WORK (no decision needed)
+
+ - The parser's work list (large-subset-state.md, section 4, 44 samples):
+   the real gaps alias :=, export ${foo?}, command -, unset -f ls /bin/ls.
+ - cd - with OLDPWD unset (dash prints the directory; ours prints nothing);
+   exec foo's message lacks "exec: " (X5's kind).
+ - X30: $LINENO makes parsing quadratic (count the lines once).
+ - X1: a background job still running at the end (tail -F x | tee -a y &).
+ - X3 brace expansion; X4 redir_strict; X6 no default PATH; X9 the virtual
+   directory passed as a path; X15 reference cycles left in the shell layer;
+   X17 messages inside eval; X24 a trap that re-sends its own signal.
+ - Settings posix_spawn lacks (M1, M2; pspawn-spawner.md, section 8): a
+   helper program that sets in the child what cannot be done around the
+   call (setsid, pgroup 0, tcsetpgrp, sched, cgroup).
+ - Windows: more than 64 children; Win32::SetChildShowWindow;
+   Proc::ShellSpawn there (paths, /bin/sh assumptions, X21's programs);
+   building through Makefile.PL there; a priority class for nice, job
+   limits for rlimit.
+ - X10: only Linux is tested (and Windows under Wine).
+ - X32: without /proc, Perl's own writes into a pipe the caller gave can
+   block if a child fills the pipe between select and the write (possible,
+   not observed; no test yet).
+
+C. WATCH (seen once, not reproduced)
+
+ - X8, X13, X20.

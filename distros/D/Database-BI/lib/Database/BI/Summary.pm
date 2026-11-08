@@ -3,7 +3,7 @@ package Database::BI::Summary;
 use strict;
 use warnings;
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 use Carp        qw(croak);
 use Digest::MD5 qw(md5_hex);
@@ -26,6 +26,9 @@ my %_cache;   # fingerprint => { text, source, ts }
 #   ai_config   optional hashref { provider, api_key, model }
 #   use_ai      1 to request LLM polish (honoured only when ai_config is set
 #               and ai_config->{api_key} is non-empty)
+#   ai_allowed  optional code ref, called just before a provider call (not
+#               for a cached answer); false means do not call, so the
+#               template text is returned, uncached, as 'template_limited'
 # ---------------------------------------------------------------------------
 sub generate {
 	my (%args) = @_;
@@ -45,6 +48,10 @@ sub generate {
 	}
 
 	my ($text, $source);
+	if ($use_ai && ref($args{ai_allowed}) eq 'CODE' && !$args{ai_allowed}->()) {
+		# Not cached: once the limit lifts, the same summary may ask again.
+		return { text => _template_summary($insights, $label, $row_count), source => 'template_limited', cached => 0 };
+	}
 	if ($use_ai) {
 		eval { ($text, $source) = _llm_summary($insights, $label, $row_count, $ai_config) };
 		if ($@) {
@@ -258,18 +265,21 @@ C<ai_config-E<gt>{api_key}> is non-empty.
 	    row_count => 'integer',   # optional; rows analysed (default 0)
 	    use_ai    => 'boolean',   # optional; ask for LLM prose
 	    ai_config => 'hashref',   # optional; { api_key, model, provider }
+	    ai_allowed => 'coderef',  # optional; asked before each provider call; false: do not call
 	}
 
 =head4 OUTPUT
 
 	{
 	    text   => 'string',                                  # 2-4 sentences
-	    source => 'template' | 'template_fallback' | 'llm',
+	    source => 'template' | 'template_fallback' | 'template_limited' | 'llm',
 	    cached => 0 | 1,
 	}
 
 C<generate> does not croak.  A failed provider call gives the template text
-with C<source =E<gt> 'template_fallback'>.  The same insights, label, row count
+with C<source =E<gt> 'template_fallback'>.  When C<ai_allowed> returns false
+the provider is not called: the template text comes back with
+C<source =E<gt> 'template_limited'> and is not cached.  The same insights, label, row count
 and C<use_ai> within an hour return the cached text with C<cached =E<gt> 1>.
 
 =head1 AUTHOR

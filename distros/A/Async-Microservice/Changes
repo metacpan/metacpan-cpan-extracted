@@ -1,3 +1,11 @@
+0.09    2026-11-07
+    - fix dependency on undeclared JSON (thanks to Slaven Rezic)
+    - fix constrain check in _warn_running_too_long()
+    - improve base URL header parsing and document proxy/Host behavior
+    - add http_host, http_port and http_schema lazy-built accessors
+    - honor $ENV{USING_FRONTEND_PROXY} when parsing headers
+    - add api_prefix accessor and use it for request matching
+
 0.08    2026-03-25
     - fix process name setting
 

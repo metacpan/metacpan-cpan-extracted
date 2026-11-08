@@ -31,7 +31,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
 use Getopt::Long qw(GetOptions :config no_ignore_case);
-use POSIX qw(strftime);
+use Database::BI::Util qw(minute_stamp);
 
 my (@opt_spec, $opt_all, $opt_remove, $opt_list, $opt_data_dir, $opt_model_dir, $opt_help);
 
@@ -100,7 +100,7 @@ for my $spec (@specs) {
 		printf "%s: %d row%s, %d column%s -> %s (built %s)\n",
 			$spec, $built->{rows}, ($built->{rows} == 1 ? '' : 's'),
 			$built->{columns}, ($built->{columns} == 1 ? '' : 's'),
-			$built->{path}, strftime('%Y-%m-%d %H:%M', localtime $built->{built});
+			$built->{path}, minute_stamp(localtime $built->{built});
 	} else {
 		(my $e = $@ // 'unknown error') =~ s/(?:\s+at \S.*? line \d+\.?)+\s*\z//;
 		print STDERR "bi-extract: $e\n";
@@ -130,3 +130,87 @@ Exit codes:
   2 = bad arguments
 USAGE
 }
+
+__END__
+
+=head1 NAME
+
+bi-extract - build the extracts of Database::BI's accelerated datasets
+
+=head1 SYNOPSIS
+
+    bi-extract --spec <spec> [--spec <spec> ...]
+    bi-extract --all
+    bi-extract --remove --spec <spec>
+    bi-extract --list
+    options: [--data-dir <dir>] [--model-dir <dir>]
+
+=head1 DESCRIPTION
+
+An accelerated dataset is read from a SQLite copy of itself, an extract, for as
+long as the extract still matches the file it was built from.  This marks a
+dataset accelerated and builds its extract, rebuilds every accelerated
+dataset's extract, or stops accelerating one, and prints what it did.
+
+An extract is a cache under F<< <model_dir>/extracts/ >>.  Deleting that folder
+loses nothing: the application reads each file again until this is rerun.
+Nothing is ever written under C<data_dir>.  Run it from the application's
+folder, or give C<--data-dir> and C<--model-dir>.
+
+Suitable for cron, after the data files are refreshed:
+
+    15 2 * * * cd /opt/myapp && bi-extract --all
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--spec>, B<-s> I<spec>
+
+Accelerate a dataset and build its extract: C<table:name> in C<data_dir>, or
+C<path:/abs/file>.  Repeatable.
+
+=item B<--all>, B<-a>
+
+Rebuild the extract of every accelerated dataset.
+
+=item B<--remove>, B<-r>
+
+With C<--spec>: stop accelerating it, and remove its extract.
+
+=item B<--list>, B<-l>
+
+Print the accelerated datasets.
+
+=item B<--data-dir>, B<-d> I<dir>
+
+The data folder (default: the application's, usually F<data>).
+
+=item B<--model-dir>, B<-m> I<dir>
+
+The model store folder (default: the application's, usually F<.bi>).
+
+=item B<--help>, B<-h>
+
+Show the usage.
+
+=back
+
+=head1 EXIT STATUS
+
+0 on success, 1 when an extract could not be built (the others still are), 2
+for bad arguments.
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

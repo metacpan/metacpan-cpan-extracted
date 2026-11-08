@@ -32,6 +32,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Run" : "0.07"
+         },
          "requires" : {
             "perl" : "5.020"
          }
@@ -43,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

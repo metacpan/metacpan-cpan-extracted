@@ -1,5 +1,57 @@
 Release history for Dist-Zilla-PluginBundle-DBIO
 
+0.900004  2026-11-08
+    * Tarball
+        - What is tracked in git ships, for core and drivers alike,
+          dotfiles and agent setup included. Only META.yml, META.json,
+          MANIFEST, README, README.md and .karr stay out.
+        - GatherAgentContext snapshots the agent context into
+          misc/agent-context/ of the tarball as build provenance.
+
+    * Release
+        - TestRelease, Test::ChangesHasContent and InstallRelease
+          (cpanm .) run before ConfirmRelease, for core and drivers.
+        - New plugin DBIO::LicenseFile checks the committed LICENSE
+          against the dist's license, with heritage = 1 against the
+          DBIx::Class text. A missing or deviating file stops the build.
+
+    * Versioning
+        - Every module under lib/ carries a literal $VERSION that is
+          rewritten and bumped in step on release (drivers).
+        - Core generates xt/author/version-lockstep.t, which fails and
+          names each module whose $VERSION is missing or differs from
+          the main module's.
+
+    * Tests
+        - New plugin DBIO::PodCheckerTest generates
+          xt/author/pod-checker.t. It runs Pod::Checker over the built
+          POD and fails on any error, such as an unresolved internal
+          link.
+        - The generated coverage.t scores a plain coverage run by merging
+          the runs of a fresh cover_db; a missing cover_db fails under
+          RELEASE=1 and skips otherwise. Unblessed statement entries
+          count as not covered.
+
+    * Skills
+        - DBIO::GatherSkills leaves skilletor's per-skill .gitignore out
+          of share/skills/. A skill named by share_skill or skill whose
+          directory is missing stops the build.
+
+    * Pod::Weaver
+        - @DBIO and @DBIO::Heritage collect =seealso into a SEE ALSO
+          section after the other body sections and before AUTHOR.
+
+    * Documentation
+        - README and bundle POD describe the implemented bundle: the
+          coverage gate, Codeberg-only DBIO::CodebergMeta, the
+          [ExtraTests] promotion of xt/author, xt/release and xt/smoke,
+          and DBIO::SetMeta.
+
+    * Dependencies
+        - Requires Dist::Zilla::Plugin::InstallRelease, LicenseFile,
+          Test::ChangesHasContent, TestRelease and GatherAgentContext;
+          the tests use Pod::Simple.
+
 0.900003  2026-07-12
     - IRC channel set centrally for the whole DBIO family via [MetaResources]: every [@DBIO] dist gets x_IRC = irc://irc.perl.org/#dbio in its META, fixed and not per-dist configurable (no more per-dist irc = lines needed)
     - DBIO::CoverageTest generates xt/release/coverage.t for every [@DBIO] dist: statement-coverage gate reading cover_db/ with default threshold 80%, overridable via coverage_threshold = N in dist.ini, set to 0 to disable; default skip-with-diagnose, COVERAGE_STRICT=1 or RELEASE=1 turns a coverage gap into a failure

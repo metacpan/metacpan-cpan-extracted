@@ -23,7 +23,7 @@
 	"applicationCategory": "DeveloperApplication",
 	"operatingSystem": "Linux, macOS, Windows",
 	"programmingLanguage": "Perl",
-	"softwareVersion": "0.020.0",
+	"softwareVersion": "0.021.0",
 	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
 	"url": "https://metacpan.org/dist/Database-BI",
 	"sameAs": [
@@ -225,6 +225,11 @@ hypnotoad script/database-bi   # preforking server for real use</code></pre>
 <p>
 	Then put your data files in <code>data/</code> beside the launcher, or point
 	<code>data_dir</code> at a directory of your own, and open the home page.
+	The server answers only this machine, at <code>http://localhost:3000</code>;
+	To open it to others, set a password with
+	<a href="install.html#login"><code>script/database-bi password</code></a> and an
+	<a href="install.html#file-roots">export folder</a>, then change
+	<a href="install.html#listen"><code>listen</code></a>.
 	<a href="install.html#run">Naming one database</a> shows it there instead.
 	The application ships a tutorial in plain English at <code>/tutorial</code>;
 	it assumes no Perl and is the place to start.
@@ -258,7 +263,7 @@ hypnotoad script/database-bi   # preforking server for real use</code></pre>
 	A choice takes effect at once, with no Save button, and pages open in other
 	tabs follow it. Saved charts and printed pages always use the light colours,
 	so they look the same to whoever receives them, and so does a canvas embedded
-	in another site, whose colours it cannot know.
+	in another page, whose colours it cannot know.
 </p>
 
 <div class="note">

@@ -12,7 +12,8 @@
  *                           call (the parent's own handles keep their flags): so close and closefrom are exact
  *   the file actions        run in order on a table of the child's fds, starting from the parent's fds 0-2 (an fd of
  *                           3 or more that no action names is not inherited); open: by the parent, relative to the
- *                           child's directory; chdir, fchdir: lpCurrentDirectory
+ *                           child's directory, /dev/null (any case) being NUL as in Perl's open; chdir, fchdir:
+ *                           lpCurrentDirectory
  *   argv                    one command line, quoted as the Microsoft C runtime parses it back (CommandLineToArgvW)
  *   envp                    a UTF-16 block (CREATE_UNICODE_ENVIRONMENT); NULL: the parent's
  *   strings                 UTF-8 (paths, argv, envp), turned into UTF-16
@@ -427,7 +428,8 @@ static int win_spawn(pid_t *pid, const char *file, int search, const win_file_ac
             wchar_t *w = win_wide(x->path), *n; DWORD acc, disp, attr = FILE_ATTRIBUTE_NORMAL; HANDLE h;
             SECURITY_ATTRIBUTES sec = { sizeof sec, NULL, FALSE };
             if (!w) { rc = errno; break; }
-            n = win_join(cwd, w); win_free(w);
+            /* /dev/null, in any case, is NUL, as Perl's own open makes it (win32_open in win32/win32.c) */
+            n = _stricmp(x->path, "/dev/null") == 0 ? win_wcsdup(L"NUL") : win_join(cwd, w); win_free(w);
             if (!n) { rc = ENOMEM; break; }
             switch (x->oflag & (O_RDONLY | O_WRONLY | O_RDWR)) {
             case O_WRONLY: acc = GENERIC_WRITE; break;

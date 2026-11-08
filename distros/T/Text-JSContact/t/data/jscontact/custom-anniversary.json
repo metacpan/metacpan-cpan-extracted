@@ -1,0 +1,10 @@
+{
+  "@type": "Card",
+  "version": "2.0",
+  "uid": "urn:uuid:c0570a77-0000-4000-8000-000000000001",
+  "name": { "full": "Custom Dates" },
+  "anniversaries": {
+    "ann1": { "@type": "Anniversary", "kind": "started at orchard", "date": "2019-02-01" },
+    "ann2": { "@type": "Anniversary", "kind": "birth", "date": "0000-07-04" }
+  }
+}

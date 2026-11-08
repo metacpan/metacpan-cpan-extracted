@@ -14,11 +14,15 @@ data/virginia_counties.csv
 lib/Database/BI.pm
 lib/Database/BI/Ask.pm
 lib/Database/BI/Calc.pm
+lib/Database/BI/Command/password.pm
 lib/Database/BI/Controller/Dashboard.pm
 lib/Database/BI/Extract.pm
 lib/Database/BI/Insights.pm
 lib/Database/BI/Model/DataSource.pm
 lib/Database/BI/Model/Geocode.pm
+lib/Database/BI/Password.pm
+lib/Database/BI/SafeUA.pm
+lib/Database/BI/Sessions.pm
 lib/Database/BI/Summary.pm
 lib/Database/BI/Tutorial.pm
 lib/Database/BI/Util.pm
@@ -36,6 +40,7 @@ t/ask.t
 t/basic.t
 t/bi-geocode.t
 t/binned.t
+t/bom.t
 t/breadcrumb.t
 t/calc.t
 t/canvas-cross-row.t
@@ -43,6 +48,7 @@ t/canvas-text.t
 t/catalog.t
 t/cgi_security.t
 t/cross-row-ui.t
+t/csp.t
 t/cross-row.t
 t/data-dir-invariant.t
 t/data-flow.t
@@ -52,6 +58,7 @@ t/extract-cli.t
 t/extract.t
 t/filter.t
 t/field-extract.t
+t/file-roots.t
 t/function.t
 t/geocode-online.t
 t/geocode-real.t
@@ -62,11 +69,14 @@ t/treemap-combo-colour.t
 t/html-lang.t
 t/insights.t
 t/integration.t
+t/json.t
 t/language-fallback.t
 t/launcher.t
+t/login.t
 t/lib/BI/Test/Command.pm
 t/lib/BI/Test/Marionette.pm
 t/lib/BI/Test/Nominatim.pm
+t/lib/BI/Test/WinRealpath.pm
 t/locales.t
 t/lookup.t
 t/manifest.t
@@ -75,6 +85,7 @@ t/mariadb.t
 t/mariadb_live.t
 t/model.t
 t/mutant_killers.t
+t/no-direct-dbi.t
 t/path-spec.t
 t/path.t
 t/pod.t
@@ -82,6 +93,7 @@ t/recommended-versions.t
 t/redis.t
 t/redis_live.t
 t/rls.t
+t/safe-ua.t
 t/scatter.t
 t/sqlite-table-names.t
 t/summary.t
@@ -117,6 +129,7 @@ templates/web/en/layouts/chart_export.html.tt
 templates/web/en/layouts/default.html.tt
 templates/web/en/layouts/theme.html.tt
 templates/web/en/layouts/view_context.html.tt
+templates/web/en/login.html.tt
 templates/web/en/map.html.tt
 templates/web/en/not_found.html.tt
 templates/web/en/pie.html.tt

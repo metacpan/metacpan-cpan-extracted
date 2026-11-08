@@ -24,11 +24,11 @@
 [% ELSE %]
 <p class="empty-state">
   No data files found in the <code>data/</code> directory.<br>
-  Add a <code>.csv</code>, <code>.tsv</code>, <code>.psv</code>, <code>.xml</code>, <code>.sql</code>, <code>.db</code> or <code>.xlsx</code> file there and restart, or drop a file below.
+  Add a <code>.csv</code>, <code>.tsv</code>, <code>.psv</code>, <code>.xml</code>, <code>.json</code>, <code>.sql</code>, <code>.db</code> or <code>.xlsx</code> file there and restart, or drop a file below.
 </p>
 [% END %]
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // Hover tooltips for db-cards in the "choose a database" list.
 // Shows file type (with table count for SQLite), modified date, and size.
 (function () {
@@ -127,7 +127,7 @@
 <div class="home-drop-zone" id="home-drop-zone" aria-label="Drop a database file here to open it">
   <span class="home-drop-zone-icon" aria-hidden="true">&#x1F4C2;</span>
   <span>Drop a database file to open it</span>
-  <span class="home-drop-hint">CSV &middot; TSV &middot; PSV &middot; XML &middot; SQLite (.sql) &middot; Berkeley DB (.db) &middot; XLSX</span>
+  <span class="home-drop-hint">CSV &middot; TSV &middot; PSV &middot; XML &middot; JSON &middot; SQLite (.sql) &middot; Berkeley DB (.db) &middot; XLSX</span>
 </div>
 
 <div class="home-action-cards">
@@ -154,7 +154,7 @@
           For a table on a configured MariaDB server:<br>
           <code>mariadb:server/table</code><br><br>
           Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-          .sqlite3), Berkeley DB (.db), XML, Redis, MariaDB.
+          .sqlite3), Berkeley DB (.db), XML, JSON, Redis, MariaDB.
         </div>
       </div>
       <div class="action-url-row">
@@ -221,7 +221,7 @@
 
 </div>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   try {
     function fmtDate(iso) {
@@ -406,7 +406,7 @@
 </script>
 
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var btn = document.getElementById('btn-clear-uploads');
   if (!btn) return;

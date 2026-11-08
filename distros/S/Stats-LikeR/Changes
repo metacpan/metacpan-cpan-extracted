@@ -1,5 +1,53 @@
 Revision history for Stats-LikeR
 
+0.3417 2026-11-07 CST (Claude Opus 5.5 helped)
+
+ [read_table()]
+
+ - A line end inside a quoted field is kept as the bytes the file holds.
+   The parser cut each line's end off before reading it and gave a line
+   that ended inside a quote a bare "\n" back, so a CR LF in a quoted
+   field came back as LF alone: "a\r\nb" read as "a\nb", and a value
+   holding CR LF did not survive write_table() -> read_table(). pandas
+   3.0.4 keeps those bytes; R 4.6.1's read.csv() turns each CR into an LF.
+
+ - The same holds in a file whose lines end in a bare CR: a quoted
+   "x\ry" now reads as "x\ry", as pandas reads it, where it was "x\ny".
+
+ [ptukey(), qtukey()]
+
+ - Both accept lower and log, as pt() and the other distribution
+   functions do, beside lower_tail and log_p. Up to 0.3416 they croaked
+   with "unknown argument 'lower'".
+
+ [Tests]
+
+ - t/crlf_quoted.tukey_aliases.regressions.t pins both: five quoted
+   strings with CR, LF and CR LF read back unchanged, as pandas reads
+   them, a write_table() round trip, a leak check, and each alias against
+   its long name. Against 0.3416 it fails all but the leak check and the
+   two strings without CR LF.
+
+ - The three resident-memory checks in t/audit.2026-10-20.A.t and
+   t/audit.2026-10-20.E.t are skipped under AddressSanitizer. Its
+   quarantine holds freed memory back from reuse, so resident memory
+   grows with every buffer a call frees, leak or not: with libasan
+   preloaded they grew by 280, 104 and 66 MB, and failed.
+
+ [Distribution]
+
+ - lib/Stats/LikeR.pm.orig, a 770 KB editing backup, is no longer in the
+   tarball. It was tracked in git, [PruneFiles] keeps all of lib/, and so
+   0.3415 and 0.3416 shipped it, and `make install` copied it into
+   site_perl beside the module.
+
+ [Build]
+
+ - LikeR.xs compiles clean under -Wshadow and -Wformat=2 as well: two
+   variables in csort() and filter() no longer shadow outer ones, and the
+   one non-literal format, the NV helper that keeps gcc from misreading
+   quadmath's %Qg, now says so to the compiler.
+
 0.3416 2026-11-05 CST (Claude Opus 5.5 helped)
 
  [dunn_test()]

@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::DBIO;
 # ABSTRACT: Pod::Weaver configuration for DBIO distributions
-our $VERSION = $Dist::Zilla::PluginBundle::DBIO::VERSION;
+our $VERSION = '0.900004';
 use strict;
 use warnings;
 
@@ -36,6 +36,23 @@ sub mvp_bundle_config {
 
     [ '@DBIO/Leftovers', _exp('Leftovers'), {} ],
     [ '@DBIO/Postlude',  _exp('Region'),    { region_name => 'postlude' } ],
+
+    # After Leftovers on purpose: SEE ALSO closes the body, so it has to come
+    # after the unnamed =head1 sections (CAPABILITIES, ESCAPE HATCHES, ...)
+    # that reach the output through Leftovers, not before them.
+    #
+    # new_command = pod because the =seealso blocks in the family carry no
+    # argument text. Collect renames the collected command rather than
+    # dropping it, so the default (head2) would emit a bare "=head2" -- an
+    # empty heading, rendered as <h2 id=""></h2>. "=pod" inside an already
+    # open POD block is a documented no-op and leaves the =over/=item list
+    # directly under the SEE ALSO header.
+    [ '@DBIO/SeeAlso', _exp('Collect'), {
+      header      => 'SEE ALSO',
+      command     => 'seealso',
+      new_command => 'pod',
+    } ],
+
     [ '@DBIO/Authors',   _exp('Authors'),   {} ],
 
     [ '@DBIO/Legal', _exp('GenerateSection'), {
@@ -71,7 +88,7 @@ Pod::Weaver::PluginBundle::DBIO - Pod::Weaver configuration for DBIO distributio
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -87,8 +104,8 @@ Or explicitly:
 =head1 DESCRIPTION
 
 L<Pod::Weaver> configuration for all DBIO distributions. Supports
-inline C<=attr> and C<=method> commands that are collected into
-B<ATTRIBUTES> and B<METHODS> sections.
+inline C<=attr>, C<=method> and C<=seealso> commands that are collected
+into B<ATTRIBUTES>, B<METHODS> and B<SEE ALSO> sections.
 
 =head1 COMMANDS
 
@@ -101,6 +118,21 @@ Collected into an B<ATTRIBUTES> section.
 
 Documents methods. Place after C<sub> definitions.
 Collected into a B<METHODS> section.
+
+=head2 =seealso
+
+Cross-references. Written without argument text, followed by an
+C<=over>/C<=item> list. Collected into a B<SEE ALSO> section placed at
+the end of the body, after the sections C<[Leftovers]> emits and before
+B<AUTHOR>/B<COPYRIGHT AND LICENSE>.
+
+  =seealso
+
+  =over 4
+
+  =item * L<DBIO::PostgreSQL> - Base PostgreSQL driver component
+
+  =back
 
 =head1 COPYRIGHT NOTICE
 

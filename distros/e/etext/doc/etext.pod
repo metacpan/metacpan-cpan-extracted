@@ -44,7 +44,19 @@ I<id> C<t>.
 =item Window
 
 The contents is a list of the name of the window and the script to
-create the window, the class is C<Tk::Text::EmbWin> with I<id> C<W>.
+create the window, followed by the options of the window as
+option/value pairs: C<-window> (the path name, if the window exists),
+C<-create> (if there is a script), C<-align>, C<-padx>, C<-pady> and
+C<-stretch>; the class is C<Tk::Text::EmbWin> with I<id> C<W>.  Undo
+re-creates the window segment from the options.
+
+=item Image
+
+The contents is a list of the name of the image in the widget,
+followed by its options as option/value pairs: C<-image> (if it has
+one), C<-align>, C<-padx> and C<-pady>; the class is
+C<Tk::Text::EmbImage> with I<id> C<I>.  Undo re-creates the image
+from the name and the options.
 
 =item block
 
@@ -544,10 +556,6 @@ prohibited for I<empty> blocks.
 =item B<names>
 
 Returns list of names of currently defined I<block types>.
-
-=item B<rename> I<index name>
-
-Change the name of the block containing position I<index> to be I<name>.
 
 =item B<split> I<index ?level?>
 

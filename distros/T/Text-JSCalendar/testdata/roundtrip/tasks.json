@@ -1,0 +1,30 @@
+{
+  "task-due": {
+    "@type": "Task", "uid": "task-due@example.com", "updated": "2025-01-01T00:00:00Z",
+    "title": "File taxes", "start": "2025-03-01T09:00:00", "due": "2025-04-15T17:00:00",
+    "timeZone": "America/New_York", "estimatedDuration": "PT3H", "percentComplete": 40,
+    "progress": "in-process", "priority": 1
+  },
+  "task-completed": {
+    "@type": "Task", "uid": "task-done@example.com", "updated": "2025-01-01T00:00:00Z",
+    "title": "Done", "start": "2025-03-01T09:00:00", "timeZone": "Europe/Berlin", "progress": "completed",
+    "percentComplete": 100
+  },
+  "task-cancelled": {
+    "@type": "Task", "uid": "task-cancelled@example.com", "updated": "2025-01-01T00:00:00Z",
+    "title": "Never mind", "start": "2025-03-01T09:00:00", "timeZone": "Europe/Berlin", "progress": "cancelled"
+  },
+  "task-alert-due": {
+    "@type": "Task", "uid": "task-alert@example.com", "updated": "2025-01-01T00:00:00Z",
+    "title": "Due soon", "start": "2025-03-01T09:00:00", "due": "2025-03-05T17:00:00",
+    "timeZone": "Europe/Berlin",
+    "alerts": {
+      "due": { "@type": "Alert", "action": "display",
+        "trigger": { "@type": "OffsetTrigger", "offset": "-PT1H", "relativeTo": "end" } }
+    }
+  },
+  "task-no-start": {
+    "@type": "Task", "uid": "task-nostart@example.com", "updated": "2025-01-01T00:00:00Z",
+    "title": "Whenever", "due": "2025-03-05T17:00:00", "timeZone": "Europe/Berlin"
+  }
+}

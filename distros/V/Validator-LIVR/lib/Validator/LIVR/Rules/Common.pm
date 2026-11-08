@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Common;
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.21';
 
 sub required {
     return sub {

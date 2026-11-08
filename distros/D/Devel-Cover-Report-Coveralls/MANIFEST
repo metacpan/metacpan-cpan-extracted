@@ -1,8 +1,11 @@
+AGENTS.md
 Build.PL
-Changes
+CHANGELOG.md
 LICENSE
 META.json
 README.md
+RELEASE.md
+SECURITY.md
 cpanfile
 lib/Devel/Cover/Report/Coveralls.pm
 minil.toml

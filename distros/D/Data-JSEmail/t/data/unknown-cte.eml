@@ -1,0 +1,10 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: Unknown transfer encoding
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <ucte-1@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: x-uuencode
+
+begin 644 x

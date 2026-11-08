@@ -6,6 +6,9 @@ use warnings;
 use Mojo::Base 'Mojolicious', -strict, -signatures;
 
 use Carp qw(croak);
+use Mojo::File ();
+use Mojo::URL;
+use Database::BI::Sessions;
 use CHI	();
 use File::Spec ();
 use Readonly;
@@ -13,7 +16,57 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-use version; our $VERSION = version->declare('0.020.0');
+use version; our $VERSION = version->declare('0.021.0');
+
+# The roadmap after 0.021.0, from its gap analysis (2026-11-06).
+#
+# Features:
+# TODO: Time zones.  A timestamp's Z or offset is accepted and ignored (times
+#	are compared as written).  Normalise to UTC or a configured zone, with
+#	Time range and span= buckets aware of it.
+# TODO: More JSON: JSON Lines (.jsonl, .ndjson); optional dot-path flattening
+#	of nested objects (address.city) instead of JSON text; reading a large
+#	file as a stream rather than all at once.
+# TODO: Ranges for historical data: windows anchored to the data rather than
+#	to today ("the first decade in the data"), and decade and century span=
+#	buckets for year columns.
+# TODO: Multi-sheet XLSX: ?sheet= and a sheet picker, through the /tables
+#	cards that JSON and SQLite use.
+# TODO: A better Print: a heading naming the view's filters and range, a
+#	"print the rows shown" mode, and a server-side PDF for views too large
+#	for the browser to lay out (Print asks first past 10,000 rows).
+# TODO: Encoding on upload: detect Windows-1252 (a BOM is read past since
+#	0.021.0) and say which encoding was used.
+# TODO: Alerts in the app: a canvas panel to set bi-alert's thresholds and
+#	see recent alerts, so they do not need cron.
+# TODO: More databases: PostgreSQL through Database::Join::Catalog, as MariaDB
+#	is, and a columnar backend (DuckDB or Parquet) for files too large for
+#	SQLite extracts.
+#
+# Technical debt:
+# TODO: Dashboard.pm is over 15,000 lines.  Split it by area (charts, canvas,
+#	model stores, export and access, geo) into controllers of their own;
+#	the routes stay here.
+# TODO: One validated filter representation.  f= is split in _filter_request,
+#	_apply_filter_spec, _filter_specs_to_criteria, _fetch_page and the
+#	canvas, each with its own rules; parse it once into a typed form at the
+#	boundary.
+# TODO: One date reader.  _is_iso_date, _to_iso_date, _date_key,
+#	_time_columns, Calc::date_normalise and the browser's biDetectColType
+#	each recognise dates differently (the browser takes DD-Mon-YYYY, the
+#	server's filter does not).  Share one definition.
+# TODO: Move dashboard.html.tt's inline script into static files (allowed by
+#	script-src 'self') so it can be unit-tested, not only run in Playwright.
+# TODO: Loading Dashboard.pm during the compile phase runs Sub::Protected's
+#	CHECK, which alone turned the SQL path's sums into JSON strings
+#	(t/time-bucket.t).  The server never loads it that way; find which
+#	protected sub is responsible.
+# TODO: Async work: long joins and geocoding block a worker.  Use
+#	Mojo::IOLoop->subprocess, or the server-sent-events streaming, for
+#	progress and free workers.
+# TODO: Generated CI: the Windows cpanm retry, and the cache that never fills
+#	on Windows (installs go into Perl's own site folder), belong in App::GHGen's
+#	template, not in perl-ci.yml, which it overwrites.
 
 # Default config values used by the Config plugin and referenced explicitly
 # in startup() so callers always get a resolved value.
@@ -28,6 +81,57 @@ Readonly my $DEFAULT_CACHE_TTL_URL => '15 min';
 # (leaflet_*_url), so an offline installation can point them at its own copies.
 Readonly my $DEFAULT_D3_URL => 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js';
 
+# Where HTML::OSM fetches Leaflet and its tiles when the config names no
+# other.  Only their origins matter: they go into the Content-Security-Policy.
+Readonly my $DEFAULT_LEAFLET_URL => 'https://unpkg.com/';
+Readonly my $DEFAULT_TILE_URL    => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+# How long a login lasts after the last request: a working day.
+Readonly my $DEFAULT_LOGIN_EXPIRATION => 8 * 60 * 60;
+
+# Where a server started without -l or MOJO_LISTEN listens: this machine only.
+# Config listen (morbo, daemon, prefork) and hypnotoad => { listen } (hypnotoad)
+# change the port, or open it to other machines with 'http://*:3000'.
+Readonly my $DEFAULT_LISTEN           => 'http://127.0.0.1:3000';
+Readonly my $DEFAULT_HYPNOTOAD_LISTEN => 'http://127.0.0.1:8080';
+
+# What a Content-Security-Policy nonce may be made of (base64 or base64url);
+# anything else reaching the policy is dropped.
+Readonly my $NONCE_RE => qr{\A[A-Za-z0-9+/_=-]+\z};
+
+# The Referer a page sends: the whole URL to this site, only the origin to
+# another, and nothing from https to http.  Specs, filter values and share
+# tokens travel in the query string, and an older browser's default sends all
+# of it to the CDNs, the tile servers and any site a reader follows a link to.
+# OpenStreetMap's tile policy asks pages for a Referer, so it is not none.
+Readonly my $REFERRER_POLICY => 'strict-origin-when-cross-origin';
+
+# Permissions-Policy: every powerful browser feature off, for this site and
+# any frame it holds, but writing to the clipboard, which the Copy link
+# buttons do.  Only names Chromium knows: it logs an error for any other.
+Readonly my @PERMISSIONS_DENIED => qw(
+	accelerometer autoplay browsing-topics camera clipboard-read display-capture
+	encrypted-media fullscreen gamepad geolocation gyroscope hid
+	identity-credentials-get idle-detection local-fonts magnetometer microphone
+	midi otp-credentials payment picture-in-picture publickey-credentials-create
+	publickey-credentials-get screen-wake-lock serial storage-access usb
+	window-management xr-spatial-tracking
+);
+Readonly my $DEFAULT_PERMISSIONS_POLICY =>
+	join(', ', (map { "$_=()" } @PERMISSIONS_DENIED), 'clipboard-write=(self)');
+
+# Cross-Origin-Opener-Policy for a page: a window another site opened, or a
+# window a page opens on another site, gets no handle on the page.  No page
+# opens a window or reads window.opener; links out are rel="noopener" anyway.
+Readonly my $DEFAULT_COOP => 'same-origin';
+Readonly my %COOP_VALUES  => map { $_ => 1 } qw(same-origin same-origin-allow-popups noopener-allow-popups unsafe-none);
+
+# Strict-Transport-Security, sent on replies to https requests: a year, and
+# this host only.  includeSubDomains and preload reach other sites of the same
+# domain, and are hard to take back, so they are for the configuration to add.
+Readonly my $DEFAULT_HSTS => 'max-age=31536000';
+Readonly my $HSTS_RE      => qr{\Amax-age=\d{1,10}(?:\s*;\s*includeSubDomains)?(?:\s*;\s*preload)?\z}i;
+
 # Transport-layer upload size cap (bytes).  Mojolicious enforces this before
 # the request body is read into memory, so an oversized upload never reaches
 # the controller.  Must match $MAX_UPLOAD_BYTES in Dashboard.pm.
@@ -40,7 +144,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.020.0
+0.021.0
 
 =head1 DESCRIPTION
 
@@ -94,12 +198,17 @@ B<Quick-filter bar> -- a column/operator/value row below the toolbar lets
 the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: C<eq>,
-C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<empty>,
+C<ne>, C<contains>, C<starts>, C<lt>, C<le>, C<gt>, C<ge>, C<between>, C<empty>,
 C<notempty>; and C<in>, which a link can carry but the bar does not offer: any
 value of a JSON list, as in C<f=place:in:["Paris","Rome"]>.  Filters are
 applied server-side after all joins.  C<lt>, C<le>,
 C<gt> and C<ge> compare numbers, reading C<$1,234.56> and C<(1,234.56)> as
 numbers too; a blank or a word in the cell matches none of them.
+An operator that is none of these (operators are lower case) is a C<400> that
+lists them, and so is a filter, or a time range's C<rcol=>, on a column the
+view does not have (the message lists the columns): neither is taken as a
+filter that keeps every row, or none.  A canvas card's own saved filters are
+the exception: one on a column its dataset no longer has is ignored.
 
 =item *
 
@@ -217,6 +326,17 @@ B<Export> -- the toolbar export panel writes the current logical view
 
 =item *
 
+B<Print> -- the Print button, to the right of Refresh, prints the header row
+and every row of the current view, not just the page on screen: the rows the
+Export panel would save (after joins, filters, calculated and cross-row
+columns, and dedup), read from C<GET /export?format=json>, with the columns in
+the order the table shows them and sorted as it is sorted.  Nothing else on
+the page is printed, and the header row repeats on each printed page.  A row
+deleted from the page with Delete selected is still printed; a deleted column
+is not.
+
+=item *
+
 B<URL import> -- C</import> fetches an HTML table from any public URL and
 renders it in the browser without saving to disc.
 
@@ -243,14 +363,17 @@ All file data is returned as Perl character strings.  CSV/PSV/TSV files are
 read by L<Text::xSV::Slurp> or L<DBD::CSV>, both of which pass bytes
 through without re-encoding; the application serves the resulting page as
 C<text/html; charset=UTF-8>, so full Unicode is displayed correctly as
-long as the source file itself is UTF-8.
+long as the source file itself is UTF-8.  A UTF-8 byte-order mark at the
+start of a CSV, TSV, PSV or JSON file (Excel's "CSV UTF-8" writes one) is
+read past, so it is not part of the first column's name.
 
 Filter values (C<f=col:op:val>) are decoded from the URL by Mojolicious
 before reaching the controller and are compared against cell values as
 Perl character strings.  Unicode characters in filter values are therefore
 supported transparently.
 
-URL-imported HTML tables are fetched with L<LWP::UserAgent::Cached>;
+URL-imported HTML tables are fetched with L<Database::BI::SafeUA> (see
+L</Which addresses it may fetch>);
 L<Database::Abstraction> uses the page's own charset declaration to decode
 the body.  If the remote page declares an incorrect charset, cell values
 may contain mojibake -- this is a limitation of the source data, not the
@@ -262,7 +385,9 @@ B<Start the development server (restarts automatically when you edit a file):>
 
     script/database-bi
 
-C<morbo script/database-bi> does the same thing, and
+C<morbo -l http://127.0.0.1:3000 script/database-bi> does the same thing (a bare
+C<morbo script/database-bi> listens on every interface, so it starts only with a
+password set), and
 C<script/database-bi daemon> starts a plain server with no file watcher; any
 other Mojolicious command word (C<routes>, C<get>, ...) is passed to the
 application.
@@ -277,7 +402,9 @@ a join cannot be given on the command line, so open one and use Merge or Combine
 in the browser.  A file that is missing, cannot be read or is of an unsupported
 type is the same error, before the server starts.  A remote path, Redis spec or
 MariaDB spec is accepted as it would be by C</open>, and is checked when it is first shown.
-Use C<MOJO_LISTEN> to choose the port.  A plain server does the same with
+It listens on port 3000 of this machine only (C<http://127.0.0.1:3000>); see
+L</Who can reach the server> to change the port or open it to other machines.
+A plain server does the same with
 C<BI_OPEN=/full/path/store.db script/database-bi daemon>; a file named after
 C<daemon> is ignored.
 
@@ -286,8 +413,9 @@ B<Start the production server:>
     hypnotoad script/database-bi      # start, or restart with no downtime
     hypnotoad -s script/database-bi   # stop
 
-It listens on port 8080 and ignores C<MOJO_LISTEN>; set the port and anything
-else in C<database_bi.conf>, under C<< hypnotoad => { listen => ['http://*:3000'] } >>.
+It listens on port 8080 of this machine only and ignores C<MOJO_LISTEN>; set the
+port and anything else in C<database_bi.conf>, under
+C<< hypnotoad => { listen => ['http://*:8080'] } >> (C<*> opens it to every machine).
 It keeps its process id in F<script/hypnotoad.pid> unless C<pid_file> says
 otherwise.  It takes no database on its command line: use
 C<BI_OPEN=/full/path/store.db hypnotoad script/database-bi>.
@@ -329,6 +457,13 @@ the card grid, so a browser that withholds C<Referer> always sees the database.
 Renders the tutorial that is part of the application.  The chapters are data
 in L<Database::BI::Tutorial>, not in this POD.
 
+=item C<GET /login>, C<POST /login>, C<POST /logout>
+
+The login, when C<password_hash> is set (see L</Logging in>).  C<GET /login>
+shows the form (with C<return=>, the page to go back to: a path on this site),
+C<POST /login> takes C<password=> and C<return=>, and C<POST /logout> ends the
+session.  With no password set, C</login> says there is nothing to log in to.
+
 =item C<GET /preferences>
 
 Sets the reader's preferences: the theme, one of light, dark or the same as the
@@ -341,6 +476,14 @@ canvases stay light.
 Opens the named table from C<data_dir>.  Accepts C<?f=col:op:val>
 (repeatable) to pre-filter results, and C<?range=name&rcol=column> to keep
 only a relative window of rows (see L</Relative time ranges>).
+
+C<?f=col:between:lo:hi> keeps the rows whose C<col> lies from C<lo> to C<hi>,
+both included, whichever bound is written first.  Two numbers (a range of
+years, C<Year:between:1880:1900>) compare as numbers; two dates or timestamps
+compare as times (C<when:between:2026-11-01T09:00:00:2026-11-01T17:00:00>
+splits at the colon between them); any other pair compares as text, ignoring
+case.  The filter row offers it for date columns (two
+date boxes) and number columns (two number boxes).
 
 A name that is not a table in C<data_dir> is a C<404> page that says so ("There
 is no table called ..."), with the breadcrumb and site navigation; it does not
@@ -372,7 +515,10 @@ Spec formats:
 
   table:name                         named table from data_dir
   table:file/table                   a table inside a multi-table SQLite file
+                                     (or a list in a JSON file) in data_dir
   path:/abs/path/to/file.csv         absolute local path
+  path:/abs/path/to/file.db#table    one table of such a file anywhere else;
+                                     a file whose own name has a # is that file
   /../hostname/dir/file.csv          remote file via SFTP
   redis:tablename|redis://host:port  Redis hash store (requires Redis module)
   mariadb:server/table               a table on a server in mariadb_servers
@@ -382,7 +528,7 @@ Spec formats:
 
 Returns C<{ "columns": [...] }> for a table (C<?table=name> or
 C<?table=file/table> for a table inside a multi-table SQLite file) or file
-(C<?path=/abs/path>).  Used by the join UI to populate the right-key
+(C<?path=/abs/path>, or C<?spec=path:/abs/path#table> for one of its tables).  Used by the join UI to populate the right-key
 dropdown without a page reload.
 
 =item C<GET /export>
@@ -429,7 +575,8 @@ home, and returns JSON C<{ url, path }>.
 =item C<GET /import>
 
 Fetches an HTML table from a public URL (C<?url=>) and renders it as a
-data grid.  An optional C<?t=> parameter (zero-based integer) selects
+data grid.  A URL that leads to this machine or a private network is refused
+(see L</Which addresses it may fetch>).  An optional C<?t=> parameter (zero-based integer) selects
 which HTML table on the page to display when the page contains multiple
 tables.
 
@@ -725,7 +872,7 @@ together with C<series=>, or a transposed lat/lon pair.  The page never shows
 the L<HTML::OSM> Nominatim search box (C<search =E<gt> 0> is always passed), so
 nothing typed on the map is sent anywhere.  With C<loc=>, a place the local
 data does not know is sent to Nominatim, as the place name alone; set
-C<map_geocode_online> to 0 to keep every lookup local.  L<HTML::OSM> 0.13 or
+C<map_geocode_online> to 0 to keep every lookup local.  L<HTML::OSM> 0.14 or
 later is the renderer; an older optional install still returns the page with a
 warning.
 
@@ -812,9 +959,11 @@ while the canvas is filtered or parameterised is drawn through the same state
 as the cards already on screen.  The visual is rendered against the canvas's
 datasets, joins and calculated fields before it is stored, so an unknown
 column or an undrawable visual is rejected with C<400> and nothing is appended.
-Returns C<201 { id, visual, kind, title, html, head, cf_col }>, where
+Returns C<201 { id, visual, kind, title, html, head, nonce, cf_col }>, where
 C<visual> is the new visual's index, C<head> is any stylesheet and script the
-page must add once to draw the card (Leaflet, for a map), and C<cf_col> is the
+page must add once to draw the card (Leaflet, for a map), C<nonce> is the
+Content-Security-Policy nonce the scripts in C<html> carry (the canvas page
+runs only those, giving each its own nonce), and C<cf_col> is the
 column the card's marks cross-filter by.  The card is left unplaced in
 C<layout>; it is auto-placed after the saved cards until the reader moves or
 resizes it.
@@ -861,7 +1010,9 @@ the redrawn card matches the page it is on.  The visual keeps its index, so
 its layout position, size and title are unchanged.  The replacement is
 rendered before it is stored, so an unknown column or an undrawable map is a
 C<400> and the saved visual is left alone.  Returns
-C<{ id, visual, kind, title, html, head, cf_col }>.
+C<{ id, visual, kind, title, html, head, nonce, cf_col }>; C<nonce> is the one
+the scripts in C<html> carry, which the canvas page gives its own when it runs
+them.
 
 =item C<DELETE /api/analyses/:id>
 
@@ -1012,8 +1163,15 @@ Natural language to analysis spec (Phase 5.1).  Body params: C<l=E<lt>specE<gt>>
 (required), C<q=E<lt>questionE<gt>> (required), repeatable C<f=> filters.
 Returns C<{ spec, url, valid =E<gt> 1 }> on success.  The model receives only
 column names and types -- never raw row data or file paths.  Returns 503 when
-C<ai_api_key> is not configured; 400 for missing params; 422 for an
-unparseable or invalid-column spec; 502 for a provider error.
+C<ai_api_key> is not configured; 400 for missing params or a question over 500
+characters; 422 for an unparseable or invalid-column spec; 502 for a provider
+error; 429 once the hour's provider calls are used up (C<ai_calls_per_hour>,
+below).
+
+Every call spends C<ai_api_key>, so each server process makes at most
+C<ai_calls_per_hour> provider calls (default 60; C<0> for no limit) in any
+hour, counting C</api/ask> and C</api/summary> together.  Like the other
+routes, both need the login when C<password_hash> is set.
 
 =item C<POST /api/summary>
 
@@ -1023,7 +1181,9 @@ C<ai_api_key> config).  Returns C<{ text, source, cached }>.  Two paths:
 deterministic template sentences (always available, works offline) and
 optional LLM-polished prose when C<ai=1> is passed and C<ai_api_key> is
 set.  Only aggregate insight facts are sent to the LLM.  Results are cached
-in-process for one hour keyed on the analysis fingerprint.
+in-process for one hour keyed on the analysis fingerprint.  Once the hour's
+provider calls are used up (C<ai_calls_per_hour>), C<ai=1> gives the template
+text with C<source =E<gt> 'template_limited'>, not cached.
 
 =back
 
@@ -1089,6 +1249,12 @@ all show the same rows, and one chip in the toolbar names the window with an
 C<x> to remove it.  Filters the reader wrote are untouched: the range travels in
 the URL as itself, so submitting a panel form or reopening a link does not turn
 it into frozen dates.
+
+The table page offers Time range in its filter bar only when one of the columns
+on the page holds dates or date-times (C<YYYY-MM-DD>, the same with a time after
+C<T> or a space, or C<M/D/YYYY>) in every non-empty cell, and its column menu
+lists only those columns.  A range already in force stays in the bar, so it can
+be changed or removed.
 
 A window narrower than a day (C<last_24_hours>) is compared to the second, so
 it is exact only on a column that holds a time as well as a date.  A
@@ -1278,6 +1444,195 @@ application directory is read-only can stage uploads somewhere writable:
 
     { uploads_dir => '/var/tmp/database-bi-uploads' }
 
+=head2 Who can reach the server
+
+A server started by C<script/database-bi> (with no arguments, a database, or
+C<daemon> or C<prefork>) listens on C<http://127.0.0.1:3000>, so only this
+machine can reach it: unless a password is set (see L</Logging in>), there
+is no login, and Mojolicious on its own would listen on every interface.
+C<listen> changes that:
+
+    { listen => 'http://127.0.0.1:8000' }             # another port, still this machine only
+    { listen => 'http://*:3000' }                     # every machine that can reach this one
+    { listen => ['http://127.0.0.1:3000', 'http://[::1]:3000'] }  # IPv6 loopback too
+
+It takes a location, several separated by commas, or a list.  A location
+that is not C<http://> or C<https://> stops the start.  C<MOJO_LISTEN> and the
+C<-l> option of C<daemon> and C<prefork> still win over it.
+C<morbo script/database-bi> opens its port before it loads the application, so
+it does not read C<listen>; give it C<-l>, or run C<script/database-bi>.
+
+Anywhere but this machine needs a password: a C<listen> (or C<MOJO_LISTEN>, or
+C<-l>, or under hypnotoad its own C<listen>) that is not loopback stops the start
+unless C<password_hash> is set (see L</Logging in>).  The message says what to
+change.  The defaults are loopback, so they start as before.
+
+C<hypnotoad> reads its own C<< hypnotoad => { listen } >>, which defaults to
+C<http://127.0.0.1:8080>, this machine only:
+
+    { hypnotoad => { listen => ['http://*:8080'] } }  # every machine
+
+Behind a reverse proxy on the same machine, leave both at their defaults.  The
+proxy can still bring other machines' requests in, so without a password a
+request from an address that is not loopback is refused (C<403>), including one
+a trusted proxy names in C<X-Forwarded-For>.  For the public, set a password.
+
+B<This machine is not one person.>  Loopback keeps other machines out, not
+other people on this one: any account on the same machine, or a container that
+shares its network, can reach C<127.0.0.1:3000>, and read, list and save files
+as the account running the server.  On a machine with other users, set a
+password even when it listens on this machine only.
+
+=head2 Which folders it may use
+
+C</browse>, C</open>, the Export panel's folder list (C</api/dirs>), a C<path:>
+data source anywhere (a table, a chart, a merge, a canvas card) and
+C<POST /export> reach the whole filesystem, as far as the account running the
+server can.  C<file_roots> fences them in:
+
+    { file_roots => ['/srv/reports', 'shared'] }   # 'shared' is under the application home
+
+C<data_dir> and C<uploads_dir> are always among them.  Browsing starts at the
+home folder if it is inside, else at the first root, and stops at the roots.  A
+folder or file outside is refused (C<403>, or a C<path:> source is not found),
+whether or not it is there, so the refusal says nothing about what is outside;
+a link inside that leads outside is outside.  A path that climbs out with C<..>
+past what exists is refused too.  A root that is not a folder that exists stops
+the start.  Remote files (C</../host/...>), Redis and MariaDB are not files on
+this machine, and are not affected; neither are the command-line tools.
+
+Saving is the riskier half: an export replaces a C<.csv>, C<.json> or C<.sql>
+file of the same name, and some such files are settings another program obeys
+(a project's F<package.json> names commands that C<npm> runs).  A server other
+people use keeps exports to folders of their own, so with C<password_hash> set,
+C<export_dirs> is required, and the start stops without it:
+
+    { export_dirs => ['/srv/reports/exports'] }   # a relative one is under the application home
+
+C<POST /export> then saves only in them (or below them), and the Export panel
+opens on the first and lists no other.  Reading is unaffected: that is
+C<file_roots>.  An export folder that does not exist, is outside C<file_roots>
+or is a dot-folder stops the start.  Whatever is set, an export never replaces
+a link, a folder or anything else that is not a plain file, so a link inside
+the allowed folders cannot carry it outside them; it is written beside its name
+and renamed into place, so nobody reads half a file, and a file it replaces
+keeps its permissions.
+
+=head2 Requests from other sites
+
+Unless a password is set (see L</Logging in>), there is no login: whatever can
+reach the server can read any file it can (C</open>) and write exports into
+any folder it can (C<POST /export>).  Even with one, a logged-in reader's
+browser carries the login to every request it sends here.  Listening
+on this machine only keeps other machines out, but not the pages of other
+sites open in the reader's browser.  So every request is checked first, and
+refused with C<403> when another site's page made it:
+
+=over 4
+
+=item * A write (any method but C<GET>, C<HEAD> and C<OPTIONS>) is refused when
+the browser's C<Sec-Fetch-Site> says it came from another site, or, without
+that header, when its C<Origin> is not this server.  A form posted from
+another site needs no permission from this one, so this is what stops it.  A
+script such as C<curl> sends neither header and is let through.
+
+=item * Any request is refused when its C<Host> is a name other than
+C<localhost> or C<*.localhost>, and is not an IP address.  A page whose own
+name has been made to resolve to C<127.0.0.1> (DNS rebinding) counts as this
+server to the browser, but it still sends its own name.  To reach the server
+by a name, list it:
+
+    { allowed_hosts => ['bi.example.com', '*.corp.example'] }   # '*' for any name
+
+Behind a trusted reverse proxy, the C<Host> is whatever the proxy sends, so it
+is checked only when C<allowed_hosts> is set; set it there too.
+
+=back
+
+C<POST /export> also refuses a folder or file whose name starts with a dot
+(F<~/.config>, F<.vscode/settings.json>), since those hold other programs'
+settings.  The folder list in the Export panel leaves them out already.
+
+=head2 Which addresses it may fetch
+
+C</import> and a C<url:> data source make the server fetch a URL, so a page
+could point it at what only the server can reach: a service on this machine, a
+database on the office network, or a cloud's metadata service on
+C<169.254.169.254>, which hands out its credentials.  So the server refuses a
+URL that leads to this machine, a private or shared network
+(C<10.0.0.0/8>, C<172.16.0.0/12>, C<192.168.0.0/16>, C<100.64.0.0/10>,
+C<fc00::/7>), link-local addresses, multicast or a reserved range.
+
+It is what the name I<resolves to> that counts, not how the URL reads:
+C<http://localtest.me/> and C<http://127.0.0.1.nip.io/> are names whose DNS
+answers C<127.0.0.1>, and C<http://2130706433/> or C<http://0x7f000001/> are
+C<127.0.0.1> written another way; all are refused.  An address is looked up
+once, checked, and that address is the one connected to, so a name that answers
+differently the second time (DNS rebinding) gains nothing.  Each redirect is
+checked the same way, and at most 5 are followed.  Over C<https> the
+certificate must still be the site's.  The refusal says why, for example
+C<localtest.me is 127.0.0.1, which is this machine>.
+
+To read from an intranet site, name it:
+
+    { url_private_hosts => ['reports.corp.example', '*.corp.example'] }
+
+Those names may resolve to a private address; every other name is still
+checked, and an address written as such (C<http://10.1.2.3/>) is never let
+through.  A name that is not a host name, or C<*> alone, stops the start.
+This check is not a firewall: where the server's machine can reach something it
+should not, rules on outgoing connections are the stronger defence.
+
+=head2 Logging in
+
+With C<password_hash> set, every page asks for a password first.  A server
+other machines can reach must have one (see L</Who can reach the server>); on
+this machine alone it is optional.  Make the line with
+
+    script/database-bi password
+
+which asks for the password twice (without showing it) and prints
+
+    password_hash => 'pbkdf2-sha256$200000$...',
+
+to put in C<database_bi.conf>.  Only the hash is kept: PBKDF2-HMAC-SHA256 with
+a random salt (L<Database::BI::Password>).  A plain password there stops the
+start, so it is never left in the file by mistake.  To change the password,
+make a new line; every session is then logged out.
+
+There is one password, not one per person.  A browser asking for a page is
+sent to C</login> and, once the password is right, back to that page; any other
+request (a script, a panel's request, a download) gets C<401> until it carries a
+logged-in session.  C<POST /logout>, the Log out button at the top of each page,
+ends it.  C</share/:id> and C</embed/:id> need no login: their signed, expiring
+token is their permission, so anyone holding the link sees that canvas, and
+only that one, for 30 days.  The canvas itself (C</a/:id>) and the rest still
+ask for the password.
+
+The token is signed with C<share_secret> when it is set (at least 16
+characters), else with a key derived from C<secrets>.  Without either, the key
+is new at each start, so a restart ends every share link, and the Share panel
+says so; set C<secrets> (which keeps logins too) or C<share_secret> to keep
+them.  Changing either ends the links made with the old one.  Before 0.021.0 a
+missing C<share_secret> meant a fixed key, the same on every install, with which
+anyone could sign a link to any canvas; that key in C<share_secret> stops the
+start.
+
+    {
+        password_hash    => 'pbkdf2-sha256$200000$...',
+        export_dirs      => ['/srv/reports/exports'],   # required with a password
+        login_expiration => 8 * 60 * 60,   # seconds idle before logging out; the default
+        secrets          => ['a long random string'],  # or each restart logs everyone out
+    }
+
+The session is a cookie signed with C<secrets>: C<HttpOnly>, C<SameSite=Lax>,
+and C<Secure> whenever the request came over https (directly, or through a
+trusted proxy that says so), so it is never sent back over plain http.  Over
+plain http anyone on the network path can read the password and the cookie: a
+server other machines reach should be behind https.  Ten wrong passwords from
+one address within 15 minutes lock that address out for the rest of the 15
+minutes (C<429>); each server process counts its own.
+
 =head2 MariaDB and MySQL servers
 
 A server is opened by name.  Each entry of C<mariadb_servers> is one database:
@@ -1389,6 +1744,123 @@ alternative: each distinct value takes the next colour from C<scheme=>,
 cycling through the palette, and the legend lists the categories.  C<color=>
 and C<series=> are mutually exclusive.
 
+=head2 Content-Security-Policy
+
+Every HTML page is sent with a C<Content-Security-Policy> header.  The pages
+show cells from files this application did not write, so the policy backs up
+the escaping.  Scripts, stylesheets and images may come only from this site
+and from the hosts that C<d3_url>, the C<leaflet_*_url> keys, C<tile_url> and
+C<tile_sources> name.  The defaults allow cdnjs.cloudflare.com, unpkg.com and
+OpenStreetMap's tile servers.  A page's scripts may talk only to this site
+(C<connect-src 'self'>), and no other site may show a page in a frame
+(C<frame-ancestors 'self'>).  JSON replies and downloads carry no policy.
+
+Every HTML page also carries C<X-Frame-Options: SAMEORIGIN>, whatever the
+policy keys below say.  A report-only policy only reports C<frame-ancestors>,
+a policy written out in full may leave it out, and older browsers read only
+this header, so framing by another site is refused in each of those cases.
+
+Every reply carries C<Referrer-Policy: strict-origin-when-cross-origin>.  A
+request a page starts sends its whole URL to this site, only the origin to
+another, and nothing from https to http.  Specs, filter values and share
+tokens travel in the query string, and an older browser's default would send
+all of it to the CDNs, the tile servers and any site a reader follows a link
+to.  It is not C<no-referrer>, because OpenStreetMap's tile policy asks pages
+for a C<Referer>.
+
+Every reply also carries C<X-Content-Type-Options: nosniff>, so a browser
+takes it for what its C<Content-Type> says and never guesses.  A guess could
+read a CSV export, or text from a data file, as HTML or script.  A
+self-hosted library under C<public/> keeps working, because Mojolicious names
+C<.js> and C<.css> files for what they are; one served some other way must be
+sent as C<text/javascript> or C<text/css>, or the browser will not load it.
+
+Every page carries C<Cross-Origin-Opener-Policy: same-origin>: a window that
+another site opened, or that a page opened on another site, gets no handle on
+the page through C<window.opener>.  No page opens a window or reads an
+opener, and every link to a new window is C<rel="noopener">.
+C<cross_origin_opener_policy> sets another of C<same-origin>,
+C<same-origin-allow-popups>, C<noopener-allow-popups> and C<unsafe-none>, or
+C<''> or C<0> for none; any other value stops the application at startup.  No
+C<Cross-Origin-Embedder-Policy> is sent: it would refuse the libraries and
+tiles the CDNs and OpenStreetMap serve, and nothing here needs the isolation
+it gives.
+
+Every reply carries a C<Permissions-Policy> that turns off the browser
+features no page uses: the camera, the microphone, location, payment, USB,
+serial and HID devices, screen capture, full screen, reading the clipboard and
+the rest, for this site and any frame it holds.  Writing to the clipboard
+stays (C<clipboard-write=(self)>), for the Copy link buttons.  A script that
+got in cannot ask the reader for any of them.  C<permissions_policy> replaces
+the value (C<''> or C<0> for none); one that cannot be a header value stops
+the application at startup:
+
+    { permissions_policy => 'camera=(), geolocation=(self)' }
+
+A reply to a request that came over https carries
+C<Strict-Transport-Security: max-age=31536000>, so the browser comes back over
+https for a year.  It binds this host only; set C<strict_transport_security>
+to add C<includeSubDomains> or C<preload>, which reach every site of the
+domain and are hard to take back, or to C<''> or C<0> to send none.  A value
+a browser would not read stops the application at startup:
+
+    { strict_transport_security => 'max-age=63072000; includeSubDomains' }
+
+Over http no such header is sent, since a browser ignores it there, and none
+is sent to C<localhost> or to an IP address: it binds the host, not the port,
+so from C<https://localhost:8443> it would send every other server on that
+machine to https, and browsers ignore it for an address.  Behind a proxy that
+ends TLS, a request is https only when Mojolicious is told to trust the proxy
+(C<MOJO_REVERSE_PROXY=1>, or C<< hypnotoad => { proxy => 1 } >>) and the proxy
+sends C<X-Forwarded-Proto: https>; otherwise the proxy must send the header
+itself.
+
+An inline script runs only if it carries the request's nonce, a random value
+made for each request and named in the policy (C<'nonce-...'>).  Every
+C<E<lt>scriptE<gt>> the templates write carries it, and so do those that
+L<HTML::D3> (0.30 or later) and L<HTML::OSM> (0.14 or later) write, because
+the application passes it to them.  A script that came in with a cell's text
+cannot know it, so it does not run; nor does an C<onclick> or C<onerror>
+attribute, which no nonce can cover, so the pages use none.  Style attributes
+are still allowed (C<style-src 'unsafe-inline'>).
+
+A canvas card added without a reload arrives as JSON with the nonce its
+scripts were written with.  The page runs only the scripts that carry it, and
+gives each the page's own nonce.  A page kept in the page cache is stored with
+its header, so the nonce in each still matches when it is served again.
+
+Two keys change the policy:
+
+    {
+        content_security_policy_report_only => 1,  # report breaches, block nothing
+        content_security_policy => "default-src 'self'; script-src 'self' 'nonce-{nonce}'",
+    }
+
+C<content_security_policy> is the whole policy, sent as written except that
+C<{nonce}> becomes the request's nonce; without it no inline script runs.  Set
+to C<''> or C<0> it sends no header.  A policy written out in full is not
+updated when the library keys change.
+
+=head3 Embedding a canvas on another site
+
+By default only pages of this site may show C</embed/:id> in a frame.
+C<embed_frame_ancestors> names other sites that may:
+
+    { embed_frame_ancestors => [ 'https://intranet.example.com', 'https://*.corp.example' ] }
+
+Each entry is an origin: C<http> or C<https>, a host (a C<*> may stand for its
+first label only) and an optional port, with no path.  Anything else stops the
+application at startup, because a security setting that does not do what it
+says should not be dropped quietly.  The sites are added to that page's
+C<frame-ancestors>, and to no other page's.  With a report-only policy, with
+none, or with one written out without C<frame-ancestors>, the page carries a
+second, enforced policy of C<frame-ancestors> alone, so naming one site never
+lets every site in.  A policy written out with its own C<frame-ancestors> is
+left to say who may.  C<X-Frame-Options: SAMEORIGIN> stays: browsers that know
+C<frame-ancestors> follow it instead, and those that know only the older
+header refuse the frame.  The canvas's Share panel names the sites its embed
+code works on.
+
 =head1 METHODS
 
 =head2 startup
@@ -1415,6 +1887,24 @@ Nothing useful is returned.  By the time it returns, the application has:
 
 =over 4
 
+=item * the login session (L<Database::BI::Sessions>), and C<require_login> in
+front of every route but the login, share and embed links (see
+L</Logging in>); a C<password_hash> that is not a hash, or a C<login_expiration>
+under 60 seconds, croaks; so does a C<listen> other machines could reach when
+there is no password, and a password without C<export_dirs>;
+
+=item * a C<file_roots> that is not a list of folders that exist croaks (see
+L</Which folders it may use>); so does a C<url_private_hosts> that is not a
+list of host names (see L</Which addresses it may fetch>);
+
+=item * the C<before_dispatch> hook that refuses requests from other sites (see
+L</Requests from other sites>); an C<allowed_hosts> that is not a list of host
+names croaks;
+
+=item * C<MOJO_LISTEN> set from C<listen> (default C<http://127.0.0.1:3000>) when it
+was unset, and C<< hypnotoad => { listen } >> defaulted to C<http://127.0.0.1:8080>
+(see L</Who can reach the server>); a C<listen> that is not a location croaks;
+
 =item * a 50 MiB limit on request bodies (an upload over it is answered C<413>);
 
 =item * Template Toolkit registered as handler C<tt>, and the Buffer plugin
@@ -1436,8 +1926,16 @@ the application does not start.
 
 =head1 COMMAND-LINE TOOLS
 
-Two maintenance scripts ship in C<script/>; both use the same data and model
-directories as the web application and are safe to run from cron.
+The scripts in C<script/> are installed with the distribution, each with a
+manual page (C<man bi-extract>, C<man bi-geocode>, C<man bi-alert>,
+C<man database-bi>).  The maintenance scripts use the same data and model
+directories as the web application, found from the folder they are run in or
+given with C<--data-dir> and C<--model-dir>, and are safe to run from cron.
+
+=head2 script/database-bi password
+
+Asks for a password (twice, without echo, at a terminal; once from a pipe) and
+prints the C<password_hash> line for C<database_bi.conf>.  See L</Logging in>.
 
 =head2 script/bi-geocode
 
@@ -1604,7 +2102,8 @@ run the server from.  An absolute path works on any system:
 =item B<The download_dir default is computed once at startup>
 
 When the application starts, it picks the export directory in this order:
-C<~/Downloads> (if it exists), then C<$HOME>, then the system temp directory.
+the first of C<export_dirs> (if set, as its real path), C<~/Downloads> (if it exists), then
+C<$HOME>, then the system temp directory.
 This value is fixed for the life of the process.  Renaming or creating
 C<~/Downloads> after the server starts has no effect.  To force a different
 default, set it before starting:
@@ -1621,14 +2120,25 @@ serves.  To add German support: (1) create C<templates/web/de/>, (2) copy and
 translate the C<.html.tt> files from C<templates/web/en/>, then (3) set the
 config.
 
-=item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx>
+=item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json>
 
 The application recognises C<.csv>, C<.db>, C<.sql>, C<.sqlite>, C<.sqlite3>,
-C<.xml>, C<.psv>, C<.tsv>, and C<.xlsx> files.  All three SQLite extensions
+C<.xml>, C<.psv>, C<.tsv>, C<.xlsx> and C<.json> files.  All three SQLite extensions
 (C<.sql>, C<.sqlite>, C<.sqlite3>) are treated identically -- C<inventory.sqlite>
 and C<inventory.sqlite3> are both opened as SQLite databases without renaming.
 Excel C<.xlsx> files are read by L<Database::Abstraction>, using
 C<Spreadsheet::ParseXLSX>.
+
+A C<.json> file is a table when it is a list of objects (each one a row), an
+object of objects (each key a row, shown in a column C<id>, or C<key> when the
+rows have an C<id> of their own), or an object holding lists of objects, as a
+report does: C<{"tool": "scan", "findings": [...], "hosts": [...]}>.  Each
+such list is a table, as a SQLite file's tables are: a file with more than one
+opens on C</tables>, with a card for each, and other values beside the lists
+(a date, a count, an object of totals) are left out.  A cell holding an object
+or a list shows as its JSON text, C<true> and C<false> as words and C<null> as
+an empty cell, and the columns are in the order the file first names them.  A
+file of another format with the same name in the same folder is the one read.
 
 URLs will work.
 For example enter
@@ -1669,6 +2179,11 @@ with columns C<entry>, C<name>, and C<score>.
 
 =item *
 
+The login is one shared password.  There are no accounts, so every reader who
+knows it can do everything, and the log cannot say who did what.
+
+=item *
+
 Only read operations on data files are supported.  Write-back (editing
 cell values in the browser and saving them to the data file) is not
 implemented.
@@ -1693,11 +2208,13 @@ that gives it a usable name.
 
 =item *
 
-A relative time range is resolved against the server's clock and compares the
-column as a string, like every other filter.  A column holding a time zone
-offset or a non-ISO timestamp is read as far as its C<YYYY-MM-DD> prefix, so
-C<last_24_hours> is exact only for a column whose values are ISO
-C<YYYY-MM-DDTHH:MM:SS> (a space instead of the C<T> is accepted too).
+A relative time range is resolved against the server's clock.  An ISO
+timestamp, C<YYYY-MM-DDTHH:MM:SS> (a space instead of the C<T>, no seconds, a
+fraction of a second, and a trailing C<Z> or offset such as C<+01:00> are all
+accepted), is read as written: the zone is not applied, so
+C<2026-11-06T13:00:00Z> and C<2026-11-06T13:00:00+05:00> are the same time to
+a filter.  A non-ISO timestamp is read as far as its C<YYYY-MM-DD> prefix, so
+C<last_24_hours> is exact only for ISO timestamps in the server's zone.
 
 =item *
 
@@ -1730,17 +2247,15 @@ works correctly in production without any special workarounds.
 
 Features planned for future releases (post-0.019.0).  Items are ordered by
 priority.  Items shipped before this release (XLSX export, the copy-link
-button, the column statistics panel, folder filter/join propagation and the
-aggregate/measure layer) are no longer listed.
+button, the column statistics panel, folder filter/join propagation, the
+aggregate/measure layer and the C<between> and C<in> filter operators) are no
+longer listed.
 
 =over 4
 
 =item * B<Multi-sheet XLSX> (Medium) -- C<_detect_file_info> reads only the
 first worksheet.  A C<?sheet=> URL param with a sheet-name picker would
 expose the full workbook.
-
-=item * B<C<between> and C<in (a,b,c)> filter operators> (Low) -- Would
-reduce multi-filter chains for common range and set queries.
 
 =item * B<SSE streaming for large join results> (Low) -- The join pipeline
 blocks the HTTP response until all rows are assembled.  Mojolicious supports
@@ -1787,10 +2302,6 @@ data is shipped or downloaded.
 # E. [NEW 0.010.0] Multi-sheet XLSX (Medium priority)
 #    _detect_file_info reads only worksheet index 0.  A ?sheet= URL param
 #    with a sheet-name picker would expose the full workbook.
-#
-# G. [NEW 0.010.0] between / in(a,b,c) filter operators (Low priority)
-#    Would reduce multi-f= chains for common range and set queries.  The
-#    operator allowlist in _apply_filter_spec is the only required change.
 #
 # H. [NEW 0.010.0] SSE streaming for large join results (Low priority)
 #    The join pipeline blocks the HTTP response until all rows are assembled.
@@ -1850,9 +2361,49 @@ sub startup ($self) {
 	# secrets => [...] keeps lists valid across restarts, and without one each
 	# start makes its own.  This runs before hypnotoad forks, so every worker
 	# shares it.
+	# The sites that may frame /embed/.  A mistake here is a security setting
+	# that does not do what it says, so it stops the start rather than being
+	# dropped quietly.
+	_check_embed_frame_ancestors($self->config('embed_frame_ancestors'));
+	_check_strict_transport_security($self->config('strict_transport_security'));
+	_check_permissions_policy($self->config('permissions_policy'));
+	_check_cross_origin_opener_policy($self->config('cross_origin_opener_policy'));
+	_check_allowed_hosts($self->config('allowed_hosts'));
+	_check_file_roots($self->config('file_roots'), $self->home);
+	_check_url_private_hosts($self->config('url_private_hosts'));
+	_check_share_secret($self->config('share_secret'));
+	_check_export_dirs($self, $self->config('export_dirs'));
+	croak 'ai_calls_per_hour: give a whole number of provider calls an hour, or 0 for no limit'
+		if defined $self->config('ai_calls_per_hour') && $self->config('ai_calls_per_hour') !~ /\A\d+\z/;
+	_check_login($self->config('password_hash'), $self->config('login_expiration'));
+	_require_export_dirs_with_password($self->config('password_hash'), $self->config('export_dirs'));
+
+	# Only this machine can reach a server unless the configuration says
+	# otherwise.  Mojolicious's own default is every interface, which put an
+	# application with no login on the local network.  -l and MOJO_LISTEN still
+	# win: the daemon and prefork commands read MOJO_LISTEN only when started,
+	# after this, and -l replaces it.
+	my @listen = _listen_locations($self->config('listen'));
+	$ENV{MOJO_LISTEN} = join(',', @listen) unless length($ENV{MOJO_LISTEN} // '');
+	_default_hypnotoad_listen($self->config);
+	_require_password_if_open($self, $ENV{MOJO_LISTEN}, $self->config->{hypnotoad});
+
+	# script/database-bi password makes the password_hash line.
+	push @{ $self->commands->namespaces }, 'Database::BI::Command';
+
 	my $secrets = $self->config('secrets');
 	$self->secrets((ref($secrets) eq 'ARRAY' && @{$secrets})
 		? $secrets : [ Mojo::Util::generate_secret() ]);
+
+	# The login session (see "Logging in").  The cookie is signed with the
+	# secrets, HttpOnly, SameSite=Lax, and Secure whenever the request came over
+	# https; it lasts login_expiration seconds from the last request.  With no
+	# secrets => [...] each start makes a new key, so a restart logs everyone out.
+	$self->sessions(Database::BI::Sessions->new(
+		cookie_name        => 'database_bi',
+		default_expiration => $self->config('login_expiration') // $DEFAULT_LOGIN_EXPIRATION,
+		samesite           => 'Lax',
+	));
 
 	# Cap inbound request body size.  When the limit fires, Mojolicious sets
 	# req->is_limit_exceeded and still dispatches to the controller (with partial
@@ -1863,9 +2414,21 @@ sub startup ($self) {
 	# Default export/save directory: ~/Downloads when it exists, else HOME,
 	# else system tmpdir.  Resolved once per process and stored as a stash
 	# default so every action can read $self->stash('download_dir').
+	# With export_dirs, the first of them: the panel would open on a refusal.
+	# Resolved as the export checks resolve it (_real_folders), so the panel
+	# opens on the folder spelled as /api/dirs and the rest of the application
+	# spell it (on Windows, child() joins with \, realpath gives /, and a
+	# link is followed by hand).
 	my $home   = $ENV{HOME} // '';
 	my $dl_dir = ($home && -d "$home/Downloads") ? "$home/Downloads"
 	           : ($home || File::Spec->tmpdir());
+	my $exports = $self->config('export_dirs');
+	if (ref($exports) eq 'ARRAY' && @{$exports}) {
+		my $first = $exports->[0];
+		my $dir   = File::Spec->file_name_is_absolute($first) ? Mojo::File->new($first) : $self->home->child($first);
+		require Database::BI::Controller::Dashboard;
+		$dl_dir   = (-e "$dir" ? Database::BI::Controller::Dashboard::_resolved_path("$dir") : undef) // "$dir";
+	}
 	$self->defaults(download_dir => $dl_dir);
 
 	# Register the TT plugin as 'tt' (not the default 'tt2') so that template
@@ -1912,6 +2475,122 @@ sub startup ($self) {
 		) : ()),
 	});
 
+	# The Content-Security-Policy nonce for this request.  Every <script> the
+	# templates write carries it, as do those HTML::D3 and HTML::OSM write
+	# (given nonce => $c->csp_nonce), and the policy runs no inline script
+	# without it.  It is made before the action runs, so a template rendered
+	# before anything asked for it still has one, and it is fresh for every
+	# request: markup that reached a page through its data cannot know it.
+	$self->hook(before_dispatch => sub {
+		shift->stash(csp_nonce => _new_nonce());
+	});
+	# Refuse what another site's page asks of this one through the reader's
+	# browser: a form posted from there, or a page whose name was made to
+	# resolve to this machine (DNS rebinding).  Nothing here asks who the
+	# reader is, so this is what stands between another site and POST /export,
+	# which writes files, and /open, which reads them.  A refusal is 403, as
+	# JSON for a write (the panels read JSON back) and as text otherwise.
+	$self->hook(before_dispatch => sub {
+		my $c = shift;
+		require Database::BI::Controller::Dashboard;
+		my $refusal = Database::BI::Controller::Dashboard::request_refusal($c) // return;
+		$c->stash(buffer => 0);
+		return $c->render(json => { error => $refusal }, status => 403)
+			if $c->req->method !~ /\A(?:GET|HEAD)\z/;
+		$c->res->headers->content_type('text/plain; charset=utf-8');
+		return $c->render(data => Mojo::Util::encode('UTF-8', $refusal), status => 403);
+	});
+	$self->helper(csp_nonce => sub {
+		my $c = shift;
+		my $nonce = $c->stash('csp_nonce');
+		$c->stash(csp_nonce => ($nonce = _new_nonce())) unless defined $nonce;
+		return $nonce;
+	});
+
+	# A Content-Security-Policy on every HTML reply.  The pages draw cells from
+	# files nobody here wrote, so the policy is the second line behind the
+	# escaping: script runs only from this site, the hosts the configuration
+	# names, and inline blocks that carry this request's nonce; style and
+	# images come only from this site and those hosts; nothing a page runs may
+	# send data to another server, and no other site may frame a page.  Built
+	# per reply from the config, as d3_url is, so a test can change it.
+	#
+	# Mojolicious runs after_dispatch hooks last registered first, so this runs
+	# before Buffer's: a page Buffer keeps in its page cache is stored with the
+	# header, and when it is served again Buffer puts back the header with the
+	# body, so the nonce in each still matches the other.  The header is left
+	# alone when it is already there for that reason.
+	$self->hook(after_dispatch => sub {
+		my $c = shift;
+
+		my $headers = $c->res->headers;
+
+		# On every reply, not only pages: a download opened in the browser, or
+		# a JSON reply viewed there, can follow a link too.
+		$headers->header('Referrer-Policy' => $REFERRER_POLICY)
+			unless defined $headers->header('Referrer-Policy');
+
+		# The browser features no page uses are turned off, so a script that
+		# got in cannot ask the reader for the camera, a location or a payment.
+		if (defined(my $features = _permissions_policy($c->app->config))) {
+			$headers->header('Permissions-Policy' => $features)
+				unless defined $headers->header('Permissions-Policy');
+		}
+
+		# Over https, the browser is told to come back only over https.  Sent on
+		# every such reply, as browsers read it from any of them.
+		if (defined(my $hsts = _strict_transport_security($c))) {
+			$headers->header('Strict-Transport-Security' => $hsts)
+				unless defined $headers->header('Strict-Transport-Security');
+		}
+
+		# A reply is what its Content-Type says, on every reply: a browser that
+		# guessed could take a CSV export or an uploaded file's text for HTML or
+		# script, and run what a cell holds.  Every route names its type, and
+		# the static files have theirs from their extensions.
+		$headers->header('X-Content-Type-Options' => 'nosniff')
+			unless defined $headers->header('X-Content-Type-Options');
+
+		return unless ($headers->content_type // '') =~ m{\Atext/html\b}i;
+
+		# Framing is refused whatever the policy says.  frame-ancestors does
+		# that in the policy, but a report-only policy only reports it, a
+		# policy of the deployment's own may leave it out, and '' sends none;
+		# older browsers read only this header.  Where both are sent, a
+		# browser that knows frame-ancestors follows it and ignores this.
+		$headers->header('X-Frame-Options' => 'SAMEORIGIN')
+			unless defined $headers->header('X-Frame-Options');
+
+		# A page keeps its window to itself: another site that opened it, or
+		# that it opened, cannot reach it through window.opener.  For pages
+		# only, as it is a property of the document a window shows.
+		if (defined(my $coop = _cross_origin_opener_policy($c->app->config))) {
+			$headers->header('Cross-Origin-Opener-Policy' => $coop)
+				unless defined $headers->header('Cross-Origin-Opener-Policy');
+		}
+
+		# /embed/ stashes the other sites embed_frame_ancestors allows.
+		my $framers = $c->stash('csp_frame_ancestors');
+		$framers = [] unless ref $framers eq 'ARRAY';
+
+		my $policy = _content_security_policy($c->app->config, $c->csp_nonce, $framers);
+		my $report_only = $c->app->config('content_security_policy_report_only');
+		my $name = $report_only ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
+		$headers->header($name => $policy) if defined $policy && !defined $headers->header($name);
+
+		# Allowing other sites to frame /embed/ must never allow every site.
+		# Unless an enforced policy above already says who may, a policy of
+		# frame-ancestors alone is added: with report-only, no policy, or one
+		# written out without it, the page would otherwise rely on
+		# X-Frame-Options, which these browsers ignore once frame-ancestors is
+		# anywhere.  (Browsers that know only X-Frame-Options refuse the frame.)
+		if (@{$framers}) {
+			my $enforced = $report_only ? undef : $policy;
+			$headers->add('Content-Security-Policy' => _frame_ancestors_directive($framers))
+				unless defined $enforced && $enforced =~ /(?:\A|;)\s*frame-ancestors\b/i;
+		}
+	});
+
 	# A relative time range named in the URL (?range=last_30_days&rcol=when)
 	# becomes the f= filters every data route already applies, so the table
 	# view, every chart, the pivot, stats, insights, the exports and a saved
@@ -1924,6 +2603,16 @@ sub startup ($self) {
 
 		require Database::BI::Controller::Dashboard;
 		return Database::BI::Controller::Dashboard::_time_range_request($c);
+	});
+
+	# A filter whose operator is not one the pipeline knows is refused here,
+	# for every route, rather than keeping every row and saying nothing.
+	$self->hook(before_dispatch => sub {
+		my $c = shift;
+		return if $c->res->code;	# already answered (a range refused above)
+
+		require Database::BI::Controller::Dashboard;
+		return Database::BI::Controller::Dashboard::_filter_request($c);
 	});
 
 	# Cross-row columns (?cs=/by=/order=) are part of the view: the table page
@@ -1988,12 +2677,13 @@ sub startup ($self) {
 		# scripts do not send -- gets the error page instead: the trail back to
 		# the table, and the reason, escaped by the template.  Everything else
 		# keeps the plain text below.
-		if (defined $args->{text} && ($args->{status} // 0) == 400
+		my $status = $args->{status} // 0;
+		if (defined $args->{text} && ($status == 400 || $status == 403)
 			&& $c->req->method eq 'GET'
 			&& ($c->req->headers->accept // '') =~ m{\btext/html\b}
 			&& $c->req->url->path->to_string !~ m{\A/api/}) {
 			$c->stash(
-				title     => 'This page cannot be drawn',
+				title     => $status == 403 ? 'This is not available here' : 'This page cannot be drawn',
 				error_msg => delete $args->{text},
 				error_400 => 1,
 			);
@@ -2020,6 +2710,22 @@ sub startup ($self) {
 		$c->stash(d3_url =>
 			(defined $d3_url && !ref $d3_url && length $d3_url)
 				? $d3_url : $DEFAULT_D3_URL);
+
+		# Time range filters on a date or time column, so the table page
+		# offers it only when the rows drawn have one (seven actions render
+		# that page; this is the one place they all pass).  A range already
+		# in force keeps its column, so it can be changed or removed even
+		# when it leaves no rows to judge by.
+		if (($args->{template} // '') =~ m{/dashboard\z}) {
+			require Database::BI::Controller::Dashboard;
+			my $columns = $args->{columns} // $c->stash('columns');
+			my $records = $args->{records} // $c->stash('records');
+			my @time = @{ Database::BI::Controller::Dashboard::_time_columns($columns, $records) };
+			my $active = $c->stash('time_range');
+			push @time, $active->{col}
+				if ref($active) eq 'HASH' && !grep { $_ eq $active->{col} } @time;
+			$args->{time_columns} = \@time;
+		}
 
 		# Mojolicious's own 404 page has no navigation and no breadcrumb; an
 		# HTML one is drawn from our not_found template instead.  Its first
@@ -2089,6 +2795,7 @@ sub startup ($self) {
 				url           => $opts{url},
 				cache         => $chi,
 				cache_ttl_url => $cache_ttl_url,
+				private_hosts => $c->app->config('url_private_hosts') // [],
 				exists $opts{html_table_index}
 					? (html_table_index => $opts{html_table_index})
 					: (),
@@ -2126,6 +2833,18 @@ sub startup ($self) {
 	});
 
 	my $r = $self->routes();
+
+	# Reached without logging in: the login itself, and the share and embed
+	# links, whose signed, expiring token is their own permission.  Everything
+	# else goes through require_login, which lets every request in when no
+	# password_hash is set.
+	$r->get('/login')    ->to('Dashboard#login_form');
+	$r->post('/login')   ->to('Dashboard#login');
+	$r->post('/logout')  ->to('Dashboard#logout');
+	$r->get('/share/:id')->to('Dashboard#share_view');
+	$r->get('/embed/:id')->to('Dashboard#embed_view');
+	$r = $r->under('/')->to('Dashboard#require_login');
+
 	$r->get('/')->to('Dashboard#index');
 	$r->get('/tutorial')->to('Dashboard#tutorial');
 	$r->get('/preferences')->to('Dashboard#preferences');
@@ -2200,8 +2919,6 @@ sub startup ($self) {
 	# extracts, catalog, sharing, embedding, per-visual downloads
 	$r->get('/canvases')                      ->to('Dashboard#canvases_view');
 	$r->get('/catalog')                       ->to('Dashboard#catalog_view');
-	$r->get('/share/:id')                     ->to('Dashboard#share_view');
-	$r->get('/embed/:id')                     ->to('Dashboard#embed_view');
 	$r->get('/a/:id/visual/:n/:fmt')          ->to('Dashboard#visual_download');
 	$r->post('/api/analyses/:id/share')       ->to('Dashboard#analyses_share');
 
@@ -2257,6 +2974,521 @@ sub _evict_old_uploads {
 			unlink $entry->to_string;
 		}
 	});
+}
+
+# _cross_origin_opener_policy( \%config ) -> $value | undef
+#
+# Purpose: The Cross-Origin-Opener-Policy header a page carries.
+# Entry:   The config.  cross_origin_opener_policy is one of %COOP_VALUES
+#          ('' or 0 sends none); without it, $DEFAULT_COOP.
+# Exit:    The value, or undef for none.  One changed after startup to a value
+#          not in the list is not sent.
+sub _cross_origin_opener_policy {
+	my ($config) = @_;
+	my $value = ($config // {})->{cross_origin_opener_policy};
+	return $DEFAULT_COOP unless defined $value;
+	return if ref $value || !length($value) || $value eq '0';
+	return $COOP_VALUES{$value} ? $value : undef;
+}
+
+# _check_cross_origin_opener_policy( $value ) -> void
+#
+# Purpose: Refuse a cross_origin_opener_policy a browser would not read.
+# Entry:   The config value.
+# Exit:    Returns; croaks on anything but undef, '', 0 or a known value.
+sub _check_cross_origin_opener_policy {
+	my ($value) = @_;
+	return if !defined $value || (!ref $value && (!length($value) || $value eq '0' || $COOP_VALUES{$value}));
+	croak sprintf("cross_origin_opener_policy: '%s' is not one of %s, or 0 for none",
+		ref $value ? ref $value : $value, join(', ', sort keys %COOP_VALUES));
+}
+
+# _permissions_policy( \%config ) -> $value | undef
+#
+# Purpose: The Permissions-Policy header every reply carries.
+# Entry:   The config.  permissions_policy is the value to send, as written
+#          ('' or 0 sends none); without it, $DEFAULT_PERMISSIONS_POLICY.
+# Exit:    The value, or undef for none.  One changed after startup to text
+#          that is not printable ASCII is not sent (_check_permissions_policy
+#          refuses it at startup), so it cannot carry a line break.
+sub _permissions_policy {
+	my ($config) = @_;
+	my $value = ($config // {})->{permissions_policy};
+	return $DEFAULT_PERMISSIONS_POLICY unless defined $value;
+	return if ref $value || !length($value) || $value eq '0';
+	return $value =~ /\A[\x20-\x7e]+\z/ ? $value : undef;
+}
+
+# _check_permissions_policy( $value ) -> void
+#
+# Purpose: Refuse a permissions_policy that cannot be a header value.
+# Entry:   The config value.
+# Exit:    Returns; croaks on a reference or on text that is not printable
+#          ASCII.  The features themselves are the browser's to judge.
+sub _check_permissions_policy {
+	my ($value) = @_;
+	return if !defined $value || (!ref $value && $value =~ /\A(?:[\x20-\x7e]*)\z/);
+	croak 'permissions_policy must be a header value, such as "camera=(), geolocation=()", or 0 for none';
+}
+
+# _strict_transport_security( $c ) -> $value | undef
+#
+# Purpose: The Strict-Transport-Security header for this reply, if any.
+# Entry:   The controller.  Config strict_transport_security is the value to
+#          send ('' or 0 sends none); without it, $DEFAULT_HSTS.
+# Exit:    The value, or undef when none is to be sent.
+#
+# Only a request that came over https gets it: a browser ignores the header
+# over http, and a reply that came through a proxy is https only when
+# Mojolicious is told to trust the proxy (MOJO_REVERSE_PROXY=1, hypnotoad's
+# proxy => 1) and the proxy says X-Forwarded-Proto: https.  Never for
+# localhost or an IP address: the header binds the host, not the port, so
+# from https://localhost:8443 it would send every other server on that
+# machine, morbo included, to https; and RFC 6797 has browsers ignore it for
+# an IP address.  A value the configuration changed to after startup is sent
+# only if it is still well formed.
+sub _strict_transport_security {
+	my ($c) = @_;
+	return unless $c->req->is_secure;
+
+	my $host = lc($c->req->url->to_abs->host // '');
+	return if $host eq '' || $host eq 'localhost' || $host =~ /\.localhost\z/
+		|| $host =~ /\A\d{1,3}(?:\.\d{1,3}){3}\z/ || $host =~ /:/ || $host =~ /\A\[/;
+
+	my $value = $c->app->config('strict_transport_security');
+	return $DEFAULT_HSTS unless defined $value;
+	return if ref $value || !length($value) || $value eq '0';
+	return $value =~ $HSTS_RE ? $value : undef;
+}
+
+# _check_strict_transport_security( $value ) -> void
+#
+# Purpose: Refuse a strict_transport_security that a browser would not read.
+# Entry:   The config value: undef, '' or 0 (none), or a header value.
+# Exit:    Returns; croaks on anything else.
+sub _check_strict_transport_security {
+	my ($value) = @_;
+	return if !defined $value || (!ref $value && (!length($value) || $value eq '0'));
+	return if !ref $value && $value =~ $HSTS_RE;
+	croak sprintf("strict_transport_security: '%s' is not a header value such as 'max-age=31536000'"
+		. ' (optionally with includeSubDomains and preload), or 0 for none', ref $value ? ref $value : $value);
+}
+
+# _require_export_dirs_with_password( $hash, $export_dirs ) -> void
+#
+# Purpose: A server with a login is one other people use, so their exports
+#          must be kept to folders of their own.  Anywhere else, an export can
+#          replace a .json or .csv another program obeys (a project's
+#          package.json names commands npm runs) as the account running the
+#          server.
+# Entry:   Config password_hash and export_dirs (already checked).
+# Exit:    Returns; croaks when there is a password and no export_dirs.
+sub _require_export_dirs_with_password {
+	my ($hash, $dirs) = @_;
+	return unless defined $hash && !ref $hash && length $hash;
+	return if ref($dirs) eq 'ARRAY' && @{$dirs};
+	croak "export_dirs: with password_hash set, other people can save exports, so keep them to folders of their own: "
+		. "add export_dirs => ['/srv/reports/exports'] to database_bi.conf (see \"Which folders it may use\" in perldoc Database::BI)";
+}
+
+# _check_login( $hash, $expiration ) -> void
+#
+# Purpose: Refuse a login configuration that would not do what it says.
+# Entry:   Config password_hash (undef or '' for no login, else a hash made by
+#          script/database-bi password) and login_expiration (undef, or
+#          seconds, a whole number from 60).
+# Exit:    Returns; croaks otherwise.  A plain password in password_hash is
+#          refused rather than hashed here, so it is never left in the file.
+sub _check_login {
+	my ($hash, $expiration) = @_;
+	if (defined $hash && (ref $hash || length $hash)) {
+		require Database::BI::Password;
+		croak 'password_hash: not a hash made by "script/database-bi password" (put the line it prints in database_bi.conf, not the password itself)'
+			unless Database::BI::Password::is_password_hash($hash);
+	}
+	croak sprintf("login_expiration: '%s' is not a number of seconds from 60", ref($expiration) || $expiration)
+		if defined $expiration && (ref $expiration || $expiration !~ /\A\d+\z/ || $expiration < 60);
+	return;
+}
+
+# _require_password_if_open( $app, $listen, $hypnotoad ) -> void
+#
+# Purpose: Refuse to start where other machines could reach the server with no
+#          password: everything it can read and write would then be theirs.
+# Entry:   The application, MOJO_LISTEN as startup left it, and the hypnotoad
+#          settings (used instead under hypnotoad).
+# Exit:    Returns when every location is loopback or a password_hash is set;
+#          croaks otherwise.  The defaults (127.0.0.1, no password) start.
+#
+# A bare "morbo script/database-bi" listens on every interface (morbo opens
+# the port before it loads the application, so config listen never reaches
+# it), and now stops here; the message says to give it -l.
+sub _require_password_if_open {
+	my ($app, $listen, $hypnotoad) = @_;
+	my $hash = $app->config('password_hash');
+	return if defined $hash && length $hash;
+
+	# Under hypnotoad (which sets HYPNOTOAD_APP) its own listen applies, and
+	# MOJO_LISTEN does not.
+	my @places = split /,/, $listen // '';
+	@places = @{ $hypnotoad->{listen} }
+		if $ENV{HYPNOTOAD_APP} && ref($hypnotoad) eq 'HASH' && ref($hypnotoad->{listen}) eq 'ARRAY';
+	for my $place (@places) {
+		my $host = lc(Mojo::URL->new($place)->host // '');
+		next if $host eq 'localhost' || $host =~ /\A127\./ || $host eq '[::1]' || $host eq '::1';
+		(my $shown = $place) =~ s/\?.*//;
+		croak "listen: $shown can be reached from other machines, and there is no password. "
+			. 'Set password_hash (make it with "script/database-bi password"), '
+			. 'or listen on this machine only: listen => \'http://127.0.0.1:3000\' '
+			. '(for hypnotoad, hypnotoad => { listen => [\'http://127.0.0.1:8080\'] }; for morbo, -l http://127.0.0.1:3000)';
+	}
+	return;
+}
+
+# _check_url_private_hosts( $value ) -> void
+#
+# Purpose: Refuse a url_private_hosts that is not a list of host names.
+# Entry:   Config url_private_hosts: undef, or names ('reports.corp.example',
+#          or '*.corp.example' for its subdomains) that a url: source or
+#          /import may fetch although they resolve to a private address.
+# Exit:    Returns; croaks otherwise.  '*' alone is refused: it would turn the
+#          check off for every name, which is what egress rules are for.
+sub _check_url_private_hosts {
+	my ($value) = @_;
+	return unless defined $value;
+	croak "url_private_hosts: give a list of host names, such as ['reports.corp.example']"
+		unless ref($value) eq 'ARRAY';
+	for my $name (@{$value}) {
+		croak sprintf("url_private_hosts: '%s' is not a host name such as 'reports.corp.example' or '*.corp.example'",
+			ref($name) || $name // 'undef')
+			unless defined $name && !ref $name
+				&& $name =~ /\A(?:\*\.)?[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+\z/;
+	}
+	return;
+}
+
+# _check_share_secret( $value ) -> void
+#
+# Purpose: Refuse a share_secret that would not keep share links private.
+# Entry:   Config share_secret: undef or '' (a key derived from secrets), or
+#          the key share and embed tokens are signed with.
+# Exit:    Returns; croaks on a reference, fewer than 16 characters, or the
+#          fixed string versions before 0.021.0 used when none was set, which
+#          anyone can read in the source.
+sub _check_share_secret {
+	my ($value) = @_;
+	return unless defined $value && (ref $value || length $value);
+	croak 'share_secret: give a string of at least 16 characters, or leave it out' if ref $value;
+	croak 'share_secret: that is the default from the source, which anyone can read; choose another'
+		if $value eq 'BI_DEFAULT_INSECURE_SECRET';
+	croak 'share_secret: give at least 16 characters, so a share link cannot be forged by guessing it'
+		if length($value) < 16;
+	return;
+}
+
+# _check_file_roots( $value, $home ) -> void
+#
+# Purpose: Refuse a file_roots that would not fence what it says.
+# Entry:   Config file_roots: undef or [] (the whole filesystem), or a list of
+#          folders, each absolute or relative to the application home.
+# Exit:    Returns; croaks on anything but a list of folders that exist, since
+#          a mistyped root would otherwise leave readers with nothing, or a
+#          list that is not one would leave them everything.
+sub _check_file_roots {
+	my ($value, $home) = @_;
+	return unless defined $value;
+	croak "file_roots: give a list of folders, such as ['/srv/data']" unless ref($value) eq 'ARRAY';
+	for my $root (@{$value}) {
+		croak sprintf("file_roots: '%s' is not a folder name", ref($root) || $root // 'undef')
+			unless defined $root && !ref $root && length $root;
+		my $dir = File::Spec->file_name_is_absolute($root) ? $root : $home->child($root)->to_string;
+		croak "file_roots: '$root' is not a folder that exists" unless -d $dir;
+	}
+	return;
+}
+
+# _check_export_dirs( $app, $value ) -> void
+#
+# Purpose: Refuse an export_dirs that would not confine exports as it says.
+# Entry:   Config export_dirs: undef or [] (anywhere file_roots allows), or a
+#          list of folders, relative ones under the application home.
+# Exit:    Returns; croaks on what is not such a list, a folder that does not
+#          exist, or one outside file_roots, where nothing could be saved.
+sub _check_export_dirs {
+	my ($app, $value) = @_;
+	return unless defined $value;
+	croak "export_dirs: give a list of folders, such as ['/srv/exports']" unless ref($value) eq 'ARRAY';
+	for my $dir (@{$value}) {
+		croak sprintf("export_dirs: '%s' is not a folder name", ref($dir) || $dir // 'undef')
+			unless defined $dir && !ref $dir && length $dir;
+		my $path = File::Spec->file_name_is_absolute($dir) ? $dir : $app->home->child($dir)->to_string;
+		croak "export_dirs: '$dir' is not a folder that exists" unless -d $path;
+		require Database::BI::Controller::Dashboard;
+		my $roots = $app->config('file_roots');
+		if (ref($roots) eq 'ARRAY' && @{$roots}) {
+			my @real = Database::BI::Controller::Dashboard::_real_folders($app->build_controller, $roots,
+				Database::BI::Controller::Dashboard::_data_dir_for($app), $app->_uploads_dir);
+			croak "export_dirs: '$dir' is outside file_roots, so nothing could be saved there"
+				unless Database::BI::Controller::Dashboard::_inside_any($path, @real);
+		}
+		croak "export_dirs: '$dir' is a dot-folder, where exports are never saved"
+			if grep { /\A\./ && $_ ne '.' && $_ ne '..' } File::Spec->splitdir(Mojo::File->new($path)->realpath->to_string);
+	}
+	return;
+}
+
+# _check_allowed_hosts( $value ) -> void
+#
+# Purpose: Refuse an allowed_hosts the request check could not use.
+# Entry:   Config allowed_hosts: undef, or a list of host names, each a name
+#          such as 'bi.example.com', '*.example.com' for its subdomains, or
+#          '*' for every name.
+# Exit:    Returns; croaks on anything else, since a list that does not say
+#          what was meant either locks everyone out or lets the wrong site in.
+sub _check_allowed_hosts {
+	my ($value) = @_;
+	return unless defined $value;
+	croak "allowed_hosts: give a list of host names, such as ['bi.example.com']"
+		unless ref($value) eq 'ARRAY';
+	for my $name (@{$value}) {
+		croak sprintf("allowed_hosts: '%s' is not a host name such as 'bi.example.com', '*.example.com' or '*'",
+			ref($name) || $name // 'undef')
+			unless defined $name && !ref $name
+				&& $name =~ /\A(?:\*|(?:\*\.)?[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*)\z/;
+	}
+	return;
+}
+
+# _listen_locations( $value ) -> @locations
+#
+# Purpose: Where a server started without -l or MOJO_LISTEN listens.
+# Entry:   Config listen: undef, a location such as 'http://*:3000', several
+#          separated by commas, or an arrayref of them.
+# Exit:    The locations, $DEFAULT_LISTEN when none is given; croaks on
+#          anything that is not a location, since a server that listens
+#          somewhere other than intended is a security setting gone wrong.
+sub _listen_locations {
+	my ($value) = @_;
+	return ($DEFAULT_LISTEN) unless defined $value;
+
+	my @locations = ref($value) eq 'ARRAY' ? @{$value} : ref($value) ? ($value) : split(/,/, $value);
+	croak "listen: give one or more locations, such as 'http://127.0.0.1:3000' or 'http://*:3000'"
+		unless @locations;
+	for my $location (@locations) {
+		croak sprintf("listen: '%s' is not a location such as 'http://127.0.0.1:3000' or 'http://*:3000'",
+			ref($location) || $location // 'undef')
+			unless defined $location && !ref $location && $location =~ m{\Ahttps?://[^\s,]+\z};
+	}
+	return @locations;
+}
+
+# _default_hypnotoad_listen( $config ) -> void
+#
+# Purpose: Make hypnotoad listen on this machine only unless told otherwise.
+# Entry:   The application's config hashref.
+# Exit:    hypnotoad => { listen } is $DEFAULT_HYPNOTOAD_LISTEN when it was
+#          unset; a hypnotoad entry that is not a hash is left for hypnotoad.
+#
+# Hypnotoad reads hypnotoad => { listen } after loading the application, and
+# ignores MOJO_LISTEN; without one it would listen on every interface.
+sub _default_hypnotoad_listen {
+	my ($config) = @_;
+	my $hypnotoad = $config->{hypnotoad} //= {};
+	return unless ref($hypnotoad) eq 'HASH';
+	$hypnotoad->{listen} //= [$DEFAULT_HYPNOTOAD_LISTEN];
+	return;
+}
+
+# _new_nonce() -> $nonce
+#
+# Purpose: A fresh Content-Security-Policy nonce.
+# Exit:    22 base64url characters, 132 random bits.
+#
+# generate_secret is base64url of 128 bytes from Crypt::URandom (a weaker
+# generator only when that is missing); the page writes the nonce on every
+# <script>, so a prefix keeps it short while still unguessable.
+sub _new_nonce {
+	return substr(Mojo::Util::generate_secret(), 0, 22);
+}
+
+# _content_security_policy( \%config, $nonce, \@framers ) -> $policy | undef
+#
+# Purpose: The Content-Security-Policy header every HTML reply carries.
+# Entry:   The application's config, the request's nonce (see csp_nonce), and
+#          the other origins that may frame this reply (only /embed/ has any).
+#          content_security_policy, when set to a string, is the whole policy,
+#          sent as written but for {nonce}, which becomes the nonce; set to ''
+#          or 0 it turns the header off.  Otherwise the policy is built from
+#          d3_url, the five leaflet_*_url keys, tile_url and tile_sources.
+# Exit:    The header's value, or undef for none.
+#
+# script-src has no 'unsafe-inline': an inline script runs only if it carries
+# the nonce, so one that came in with a cell's text does not.  style-src keeps
+# it, for the style attributes the templates write and the styles Leaflet and
+# D3 set, which is a much smaller risk.  The hosts in script-src are what let a
+# <script src> run without a nonce of its own, as the canvas page's card
+# scripts load Leaflet.
+#
+# Leaflet's marker images are found beside its stylesheet, so the stylesheet's
+# host is allowed images too.  unpkg.com stays in script-src even when the
+# Leaflet keys point elsewhere: HTML::OSM loads leaflet.heat from there, and
+# no key moves it.  The pins themselves are data: URIs (_marker_icon in the controller), and a
+# chart export draws its copy through a data: or blob: image.
+sub _content_security_policy {
+	my ($config, $nonce, $framers) = @_;
+	$config //= {};
+	$nonce = undef unless defined $nonce && $nonce =~ $NONCE_RE;
+
+	my $set = $config->{content_security_policy};
+	if (defined $set && !ref $set) {
+		return undef unless length($set) && $set ne '0';
+		$set =~ s/\{nonce\}/$nonce \/\/ ''/ge;
+		return $set;
+	}
+
+	my $from = sub {
+		my ($key, $default) = @_;
+		my $url = $config->{$key};
+		$url = $default unless defined $url && !ref $url && length $url;
+		return _csp_source($url);
+	};
+
+	my @script = ($from->('d3_url', $DEFAULT_D3_URL),
+		map { $from->($_, $DEFAULT_LEAFLET_URL) } qw(leaflet_js_url leaflet_cluster_js_url));
+	push @script, _csp_source($DEFAULT_LEAFLET_URL);
+	my @style = map { $from->($_, $DEFAULT_LEAFLET_URL) }
+		qw(leaflet_css_url leaflet_cluster_css_url leaflet_cluster_default_css_url);
+	my $sources = $config->{tile_sources};
+	my @tiles = ($from->('tile_url', $DEFAULT_TILE_URL),
+		ref $sources eq 'HASH'
+			? map { _csp_source(ref $_ eq 'HASH' ? $_->{url} : undef) } @{$sources}{sort keys %{$sources}}
+			: ());
+
+	my $list = sub {
+		my %seen;
+		return join ' ', grep { defined && !$seen{$_}++ } @_;
+	};
+
+	return join '; ',
+		"default-src 'self'",
+		'script-src ' . $list->("'self'", (defined $nonce ? "'nonce-$nonce'" : ()), @script),
+		'style-src '  . $list->("'self'", "'unsafe-inline'", @style),
+		'img-src '    . $list->("'self'", 'data:', 'blob:', @tiles, @style),
+		"font-src 'self' data:",
+		"connect-src 'self'",
+		"object-src 'none'",
+		"base-uri 'self'",
+		"form-action 'self'",
+		_frame_ancestors_directive($framers);
+}
+
+# _frame_ancestors_directive( \@framers ) -> $directive
+#
+# Purpose: frame-ancestors for a reply: this site, and the origins given.
+sub _frame_ancestors_directive {
+	my ($framers) = @_;
+	return join ' ', 'frame-ancestors', "'self'", @{ $framers // [] };
+}
+
+# _embed_frame_ancestors( \%config ) -> @origins
+#
+# Purpose: The other sites that may frame /embed/, from embed_frame_ancestors.
+# Entry:   The config.  The key is a list of origins, or one as a string.
+# Exit:    Each as a CSP source ("https://intranet.example.com"), lower case,
+#          without a trailing slash and without repeats.  An entry that is not
+#          an origin is left out (startup refuses one; see
+#          _check_embed_frame_ancestors), so a list changed after startup
+#          cannot put anything else into the header.
+sub _embed_frame_ancestors {
+	my ($config) = @_;
+	my $value = ($config // {})->{embed_frame_ancestors};
+	my @list = ref $value eq 'ARRAY' ? @{$value} : defined $value && !ref $value ? ($value) : ();
+	my %seen;
+	return grep { defined && !$seen{$_}++ } map { _frame_origin($_) } @list;
+}
+
+# _check_embed_frame_ancestors( $value ) -> void
+#
+# Purpose: Refuse an embed_frame_ancestors that does not name origins.
+# Entry:   The config value: undef, an origin, or a list of them.
+# Exit:    Returns; croaks naming the first entry that is not an origin.
+sub _check_embed_frame_ancestors {
+	my ($value) = @_;
+	return unless defined $value;
+	croak 'embed_frame_ancestors must be a list of origins, such as [ \'https://intranet.example.com\' ]'
+		if ref $value && ref $value ne 'ARRAY';
+	for my $entry (ref $value ? @{$value} : $value) {
+		next if defined _frame_origin($entry);
+		croak sprintf("embed_frame_ancestors: '%s' is not an origin such as https://intranet.example.com"
+			. ' (a scheme, a host and an optional port, with no path)', $entry // 'undef');
+	}
+	return;
+}
+
+# _frame_origin( $entry ) -> $source | undef
+#
+# Purpose: One embed_frame_ancestors entry as a CSP source, if it is an origin.
+# Entry:   A string.
+# Exit:    "scheme://host[:port]", lower case, or undef.
+#
+# Only http and https origins: a scheme on its own (https:), *, 'none' or
+# 'self' would let far more than one site in, or say something else entirely,
+# and a path would be ignored by the browser.  A wildcard is allowed as the
+# first label only (https://*.example.com), which is all CSP allows.
+sub _frame_origin {
+	my ($entry) = @_;
+	return unless defined $entry && !ref $entry;
+	my ($scheme, $host, $port) = $entry =~ m{
+		\A\s*(https?)://
+		((?:\*\.)?[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*)
+		(?::(\d{1,5}))?
+		/?\s*\z
+	}xi or return;
+	return if defined $port && ($port == 0 || $port > 65_535);
+	return lc("$scheme://$host") . (defined $port ? ":$port" : '');
+}
+
+# _csp_source( $url ) -> $source | undef
+#
+# Purpose: The CSP source expression that allows $url.
+# Entry:   A URL from the config: absolute (http, https or scheme-relative), or
+#          a path, which is this site.
+# Exit:    "https://host[:port]", "'self'", or undef when it names nothing a
+#          policy can allow.
+#
+# Only the origin is kept: a source with a path would allow that one file, and
+# tile URLs carry {z}/{x}/{y}.  A placeholder in the first label of the host
+# ({s}.tile.openstreetmap.org) becomes CSP's wildcard; one anywhere else cannot
+# be written as a host, so the whole scheme is allowed rather than the tiles
+# broken.
+sub _csp_source {
+	my ($url) = @_;
+	return unless defined $url && !ref $url && length $url;
+
+	if ($url !~ m{\A(?:[A-Za-z][A-Za-z0-9+.-]*:)?//}) {
+		# A path on this site; any other scheme (data:, javascript:) is none.
+		return $url =~ m{\A[A-Za-z][A-Za-z0-9+.-]*:} ? undef : "'self'";
+	}
+	my ($scheme, $authority) = $url =~ m{\A(?:([A-Za-z][A-Za-z0-9+.-]*):)?//([^/?#]*)};
+	$scheme = lc($scheme // '');
+	return if length $scheme && $scheme !~ /\Ahttps?\z/;
+	my $prefix = length $scheme ? "$scheme://" : '';
+	my $whole  = length $scheme ? "$scheme:" : undef;
+
+	$authority =~ s/\A.*@//;
+	my ($host, $port) = $authority =~ /\A([^:]+)(?::(.*))?\z/
+		or return $whole;
+	my @labels = split /\./, $host, -1;
+	$labels[0] = '*' if @labels > 1 && $labels[0] =~ /\{/;
+	for my $i (0 .. $#labels) {
+		next if $i == 0 && $labels[0] eq '*';
+		return $whole unless $labels[$i] =~ /\A[A-Za-z0-9-]+\z/;
+	}
+	if (defined $port) {
+		return $whole unless $port =~ /\A(?:\d{1,5}|\{[^}]*\})\z/;
+		$port = $port =~ /\{/ ? '*' : $port;
+	}
+	return $prefix . lc(join '.', @labels) . (defined $port ? ":$port" : '');
 }
 
 =head1 SEE ALSO

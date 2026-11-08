@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -19,11 +19,13 @@ use Mojo::JSON		qw(encode_json decode_json from_json to_json);
 use Mojo::Parameters;
 use Mojo::URL;
 use Mojo::Util		qw(url_escape encode xml_escape hmac_sha1_sum secure_compare);
+use Digest::SHA ();
+use Scalar::Util ();
+use Database::BI::Password ();
 use File::Path		qw(remove_tree);
 use File::Spec;
 use File::Temp		qw(tempfile tempdir);
 use Readonly;
-use Socket		qw(inet_aton);
 use Sub::Protected;
 use version ();
 
@@ -63,7 +65,7 @@ Readonly my %SEQUENTIAL_SCHEMES => map { $_ => 1 } qw(YlOrRd Blues Greens Purple
 Readonly my $DEFAULT_SEQUENTIAL_SCHEME  => 'YlOrRd';
 Readonly my $DEFAULT_CATEGORICAL_SCHEME => 'tableau10';
 
-Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx );
+Readonly my @SUPPORTED_EXT => qw( csv db sql sqlite sqlite3 xml tsv psv xlsx json );
 # Use \z (absolute end-of-string) not $ (which permits a trailing \n before \z).
 # A query param decoded from "file.csv%0A" has basename "sales.csv\n"; without \z
 # that passes the extension guard and reaches realpath with an embedded newline.
@@ -105,9 +107,9 @@ Readonly my $MARIADB_SERVER_RE => qr{\Amariadb:([A-Za-z_][A-Za-z0-9_]*)\z};
 # because the [...] notation would be ambiguous in the path syntax).
 Readonly my $REMOTE_HOST_RE => qr/\A(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\@)?[a-zA-Z0-9][a-zA-Z0-9._-]*\z/;
 
-# The tile layer HTML::OSM 0.10 hardcodes.  HTML::OSM >= 0.13 is required;
-# 0.12 introduced search => 0, max_zoom, and tile_url (0.11), and 0.13 the scale
-# bar, the key on the map and fit.
+# The tile layer HTML::OSM 0.10 hardcodes.  HTML::OSM >= 0.14 is required;
+# 0.12 introduced search => 0, max_zoom, and tile_url (0.11), 0.13 the scale
+# bar, the key on the map and fit, and 0.14 the nonce on its scripts.
 Readonly my $DEFAULT_TILE_URL => 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 # The language the distribution ships templates for.  It is what a request falls
@@ -121,7 +123,8 @@ Readonly my $DEFAULT_LANGUAGE => 'en';
 # building a map, and reports a missing or old renderer instead of a 500.
 # 0.13 draws the scale bar and the key on the map, listing only what is in view
 # (scale, legend, and group on each marker), and opens on every marker (fit).
-Readonly my $MIN_HTML_OSM_VERSION => '0.13';
+# 0.14 puts the Content-Security-Policy nonce on its scripts (nonce).
+Readonly my $MIN_HTML_OSM_VERSION => '0.14';
 
 # ---------------------------------------------------------------------------
 # I18N message dictionary for all user-visible strings in this controller.
@@ -136,10 +139,20 @@ Readonly my %MESSAGES => (
 	error_no_path          => 'No path specified',
 	error_not_found        => 'File or directory not found: %s',
 	error_dir_not_found    => 'Directory not found: %s',
+	error_login_required   => 'Log in first: this server asks for a password.',
+	error_login_failed     => 'That is not the password.',
+	error_login_locked     => 'Too many wrong passwords from this address. Try again in %d minutes.',
+	error_hidden_target    => 'Refused to save into "%s": a hidden file or folder (one whose name starts with a dot) holds settings, not exports.',
+	error_outside_roots    => 'Refused: "%s" is outside the folders this server may use (file_roots in database_bi.conf).',
+	error_outside_export_dirs => 'Refused: exports are saved only in the export folders (export_dirs in database_bi.conf), and "%s" is not one of them.',
+	error_export_not_file  => 'Refused: "%s" is already there and is not a plain file, so an export does not replace it.',
+	error_remote_needs_password => 'Refused: this server has no password, so it answers only the machine it runs on. Whoever runs it can set one with "script/database-bi password".',
+	error_cross_site       => 'Refused: this request came from another site (%s). Only pages of this application can change what it keeps or write files.',
+	error_host_refused     => 'Refused: this server does not answer to the name "%s". Open it as localhost or by its IP address, or add the name to allowed_hosts in database_bi.conf.',
 	error_write_failed     => 'Write failed: %s',
 	error_ext_required     => 'Use a .csv, .sql, or .json filename extension',
 	error_upload_none      => 'No file received',
-	error_upload_ext       => 'Unsupported file type. Accepted: CSV, TSV, PSV, XML, SQLite (.sql, .sqlite, .sqlite3), Berkeley DB (.db), XLSX',
+	error_upload_ext       => 'Unsupported file type. Accepted: CSV, TSV, PSV, XML, JSON, SQLite (.sql, .sqlite, .sqlite3), Berkeley DB (.db), XLSX',
 	error_upload_too_large => 'File too large (maximum %s MiB)',
 	error_upload_save      => 'Could not save uploaded file',
 	error_uploads_clear    => 'Could not clear the uploaded files',
@@ -213,9 +226,9 @@ Readonly my %MESSAGES => (
 	error_map_coordinate_range  => 'Column "%s" holds only values outside the range of %s; check that lat= and lon= are not swapped',
 	error_map_coordinate_numeric => 'Columns "%s" and "%s" hold no numeric coordinate pairs; a map needs numbers, or loc=<column> to geocode places',
 	error_map_no_markers        => 'No row has a location that could be plotted',
-	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.13 or later, and it is not installed',
+	error_map_renderer_missing  => 'Drawing a map needs HTML::OSM 0.14 or later, and it is not installed',
 	error_map_renderer_failed   => 'The map could not be drawn; the server log has the reason',
-	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.13 or later, but the installed HTML::OSM is %s',
+	error_map_renderer_old      => 'Drawing a map needs HTML::OSM 0.14 or later, but the installed HTML::OSM is %s',
 	warn_join_schema_mismatch   => 'Column "%s" has type %s in %s but %s in %s; the join keeps both columns, so check which one a calculation uses',
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
@@ -229,6 +242,8 @@ Readonly my %MESSAGES => (
 	insights_insufficient_data  => 'Insufficient data for this insight type (need more rows or periods)',
 	ask_unavailable    => 'Ask a question is not available: no AI provider is configured',
 	ask_no_question    => 'Please enter a question',
+	ask_question_too_long => 'The question is longer than %d characters; please shorten it',
+	ai_limit_reached   => 'The AI provider has been asked %d times in the last hour, the most this server allows (ai_calls_per_hour); please try again later',
 	ask_provider_error => 'AI provider error; could not generate an analysis',
 	ask_unparseable    => 'Could not parse a valid visualization from the response; please rephrase your question',
 	ask_invalid_spec   => 'Generated spec contains an unknown column: %s',
@@ -241,6 +256,9 @@ Readonly my %MESSAGES => (
 	error_agg_fn                => 'Unknown aggregate function "%s"; expected one of: %s, or p1 to p100 for a percentile',
 	error_range_name            => 'Unknown time range "%s"; expected one of: %s',
 	error_range_column          => 'A time range is applied to one column: add rcol=<column> to the URL',
+	error_filter_op             => 'Unknown filter operator "%s" in f=%s; expected one of: %s',
+	error_filter_column         => 'There is no column called "%s" to filter on (f=%s); the columns are: %s',
+	error_range_column_unknown  => 'There is no column called "%s" for the time range (rcol=%s); the columns are: %s',
 	error_span_interval         => 'Unknown time bucket "%s" for span=; use a count and one of s, m, h, d, w, mon, q or y, for example 1h or 15m',
 	error_span_no_column        => 'A time bucket needs one column to bucket: add tcol=<column>, or name exactly one of the dimensions this page already takes',
 	error_span_tcol_orphan      => 'tcol=%s names the column to bucket, but span=<interval> is missing',
@@ -281,8 +299,8 @@ Readonly my $DEFAULT_MARKER_COLOR  => '#3388ff'; # Leaflet default blue
 # this grey when the colour says something else (a colour column)
 Readonly my $MAP_SIZE_KEY_COLOR  => '#888888';
 Readonly my %NAMED_COLORS          => map { $_ => 1 } qw(
-    red orange yellow green teal cyan blue navy purple
-    magenta pink brown maroon olive silver gray grey gold lime white black
+	red orange yellow green teal cyan blue navy purple
+	magenta pink brown maroon olive silver gray grey gold lime white black
 );
 Readonly my $MAX_PREFIX_LEN        => 20;
 Readonly my $DEFAULT_PER_PAGE      => 200;
@@ -403,6 +421,14 @@ Readonly my @TIME_RANGES => (
 );
 Readonly my %TIME_RANGE => map { $_->{name} => $_ } @TIME_RANGES;
 
+# The operators an f= filter may name (_apply_filter_spec), as written: an
+# operator in capitals is refused with the rest, not read as another one.
+Readonly my @FILTER_OPS => qw(eq ne contains starts lt le gt ge empty notempty between in);
+Readonly my %FILTER_OP  => map { $_ => 1 } @FILTER_OPS;
+
+# How many column names a refusal lists before it says how many more there are.
+Readonly my $FILTER_COLUMNS_LISTED => 20;
+
 # Allowed strptime-style date format patterns for the /dates/save endpoint, and
 # the two time patterns that may be given beside one of them for a column that
 # holds a clock time as well as a date.
@@ -413,6 +439,13 @@ Readonly my %ALLOWED_TIME_PATTERNS => map { $_ => 1 }
 
 # Default share token lifetime: 30 days in seconds.
 Readonly my $SHARE_TOKEN_TTL => 30 * 86_400;
+
+# The AI routes spend the configured ai_api_key on every call.  A question is
+# at most this long, and each server process makes at most ai_calls_per_hour
+# provider calls in any hour (0: no limit).
+Readonly my $ASK_MAX_QUESTION      => 500;
+Readonly my $AI_CALLS_PER_HOUR     => 60;
+Readonly my $AI_WINDOW_S           => 3600;
 
 # ---------------------------------------------------------------------------
 # Protected helpers
@@ -506,56 +539,247 @@ sub _i18n :Protected ($self, $key, @args) {
 	return @args ? sprintf($tmpl, @args) : $tmpl;
 }
 
+# _file_roots($self) -> @roots
+#
+# Purpose: The folders a reader may browse, open files in and export to.
+# Entry:   Config file_roots: unset or [] for the whole filesystem, else a list
+#          of folders (a relative one is under the application home).
+# Exit:    () when unrestricted; otherwise the realpath of each root that
+#          exists, plus data_dir and uploads_dir, which the application itself
+#          uses (the home page lists data_dir; dropped files go to uploads_dir).
+sub _file_roots :Protected ($self) {
+	my $roots = $self->app->config('file_roots');
+	return () unless ref($roots) eq 'ARRAY' && @{$roots};
+	return _real_folders($self, $roots, _data_dir_for($self->app), $self->app->_uploads_dir);
+}
+
+# _export_dirs($self) -> @realpaths
+#
+# Config export_dirs, as realpaths: the only folders POST /export may write
+# in, and the Export panel may list, when set.  Empty when unset.
+sub _export_dirs :Protected ($self) {
+	my $dirs = $self->app->config('export_dirs');
+	return () unless ref($dirs) eq 'ARRAY' && @{$dirs};
+	return _real_folders($self, $dirs);
+}
+
+# _real_folders($self, \@configured, @always) -> @realpaths
+#
+# The configured folders (relative ones under the application home) and
+# @always, resolved, without repeats.  A list none of which resolves gives a
+# folder that cannot exist, so that it fences everything out rather than
+# nothing.  Resolved as a requested path is (_resolved_path), so a folder
+# configured through a link is compared as the folder it leads to: on
+# Windows realpath keeps the link, while _resolved_path follows it, and every
+# path inside such a folder was refused.
+sub _real_folders {
+	my ($self, $list, @always) = @_;
+	my $home = $self->app->home;
+	my @dirs = map { File::Spec->file_name_is_absolute($_) ? Mojo::File->new($_) : $home->child($_) }
+		grep { defined && !ref && length } @{$list};
+	my (%seen, @real);
+	for my $dir (@dirs, @always) {
+		next unless -e "$dir";
+		my $real = _resolved_path("$dir") // next;
+		push @real, $real unless $seen{$real}++;
+	}
+	return @real ? @real : ('/nonexistent-file-root');
+}
+
+# _inside_any($path, @folders) -> 1 | 0
+#
+# Whether a path, resolved as _resolved_path does, is one of the folders or
+# inside one.
+sub _inside_any {
+	my ($path, @folders) = @_;
+	my $abs = defined $path && length $path ? _resolved_path($path) : undef;
+	return 0 unless defined $abs;
+	$abs = _path_key($abs);
+	for my $root (map { _path_key($_) } @folders) {
+		return 1 if $root eq '/' || $abs eq $root
+			|| index($abs, $root =~ m{/\z} ? $root : "$root/") == 0;
+	}
+	return 0;
+}
+
+# _path_key($path) -> $string
+#
+# A path in the form two spellings of one place share, for comparing.  On
+# Windows, Cwd::realpath gives C:/dir while File::Spec gives C:\dir, and names
+# are not case-sensitive, so separators become / and letters lower case.
+sub _path_key {
+	my ($path) = @_;
+	return $path unless $^O eq 'MSWin32';
+	(my $key = $path) =~ tr{\\}{/};
+	return lc $key;
+}
+
+# _outside_export_dirs($self, $path) -> $message | undef
+#
+# Purpose: Refuse an export folder outside config export_dirs.
+# Exit:    undef when export_dirs is unset or the folder is inside one.
+sub _outside_export_dirs :Protected ($self, $path) {
+	my @dirs = _export_dirs($self) or return undef;
+	return undef if _inside_any($path, @dirs);
+	return sprintf($MESSAGES{error_outside_export_dirs}, $path // '');
+}
+
+# _resolved_path($path) -> $absolute | undef
+#
+# Purpose: Where a path really leads, whether or not it exists, so that a
+#          path outside the roots is refused the same way whether it names
+#          something or not (else the refusal would say what exists there).
+# Entry:   A path as given.
+# Exit:    The realpath of its longest existing part, with the rest appended;
+#          undef when the rest climbs with '..', which cannot be followed
+#          without the folders it would climb out of, or when, on Windows,
+#          the links it goes through loop.
+sub _resolved_path {
+	my ($path) = @_;
+	my $abs = File::Spec->rel2abs($path);
+	# Cwd::realpath on Windows leaves a symlink as it is (Strawberry Perl
+	# 5.42 gives the link's own path back), so a link inside file_roots or
+	# export_dirs that points outside would be taken as inside.  The links are
+	# followed first, as _canonical_path does; a chain that loops is refused.
+	if ($^O eq 'MSWin32') {
+		$abs = _follow_links($abs) // return undef;
+	}
+	my @parts = File::Spec->splitdir($abs);
+	my @rest;
+	while (@parts) {
+		my $try = File::Spec->catdir(@parts);
+		$try = File::Spec->rootdir unless length $try;
+		if (-e $try) {
+			my $real = eval { Mojo::File->new($try)->realpath->to_string } // return undef;
+			return undef if grep { $_ eq '..' } @rest;
+			return @rest ? File::Spec->catdir($real, @rest) : $real;
+		}
+		unshift @rest, pop @parts;
+	}
+	return undef;
+}
+
+# _outside_roots($self, $path) -> $message | undef
+#
+# Purpose: Refuse a local path outside config file_roots.
+# Entry:   A path a request named (a file or a folder).
+# Exit:    undef when there are no roots or the path is inside one; otherwise
+#          error_outside_roots naming the path as it was given.
+sub _outside_roots :Protected ($self, $path) {
+	my @roots = _file_roots($self) or return undef;
+	return undef if _inside_any($path, @roots);
+	return sprintf($MESSAGES{error_outside_roots}, $path // '');
+}
+
+# _first_root($self) -> $folder
+#
+# Where /browse and /api/dirs start with no path=: the home folder, unless
+# that is outside the roots, when the first root is.
+sub _first_root :Protected ($self) {
+	my $home = $ENV{HOME} // File::Spec->rootdir;
+	return $home unless _outside_roots($self, $home);
+	return (_file_roots($self))[0];
+}
+
+# request_refusal($c) -> $message | undef
+#
+# Purpose: Refuse a request that a hostile web page made through the reader's
+#          browser.  The application has no login, so whatever can reach it
+#          can write files (POST /export) and read any file (/open); listening
+#          on 127.0.0.1 keeps other machines out but not other sites' pages.
+# Entry:   A controller of the application, before dispatch.
+# Exit:    The refusal message, or undef to let the request through.
+#
+# Three checks:
+#   * No password, so only this machine: a request from an address that is
+#     not loopback (as a trusted proxy reports it) is refused.
+#   * DNS rebinding.  A page on evil.example whose name is made to resolve to
+#     127.0.0.1 is the same origin as this server to the browser, so it can
+#     read the replies too.  It still names its own host, so the Host must be
+#     localhost, *.localhost, an IP address, or a name in config allowed_hosts
+#     (['*'] lets every name in).  Behind a trusted reverse proxy, whose Host is
+#     whatever the proxy sends, only allowed_hosts is checked, when it is set.
+#   * Cross-site writes.  A form POST from another site needs no preflight.
+#     For any method but GET, HEAD and OPTIONS, Sec-Fetch-Site (set by the
+#     browser, not the page) must be same-origin or none; without it, an
+#     Origin must name this host and port.  A request with neither is a
+#     script or an old browser, and is let through: it is not a page of
+#     another site acting with the reader's browser.
+sub request_refusal {
+	my ($c) = @_;
+	my $req = $c->req;
+
+	# With no password, only this machine.  Startup already refuses to listen
+	# anywhere else, but a reverse proxy on this machine can still bring other
+	# machines' requests in; trusted, it names them in X-Forwarded-For, which
+	# is what remote_address then reads.  A Unix socket has no address, and is
+	# this machine.
+	my $hash = $c->app->config('password_hash');
+	unless (defined $hash && length $hash) {
+		my $from = $c->tx->remote_address // '';
+		return $MESSAGES{error_remote_needs_password}
+			unless $from eq '' || $from =~ /\A(?:::ffff:)?127\./i || $from eq '::1';
+	}
+
+	my $host = lc($req->url->to_abs->host // '');
+	if (length $host) {
+		my $allowed = $c->app->config('allowed_hosts');
+		my @allowed = ref($allowed) eq 'ARRAY' ? map { lc } grep { defined && !ref } @{$allowed} : ();
+		my $listed  = grep { $_ eq '*' || $_ eq $host || (/\A\*(\..+)\z/ && substr($host, -length $1) eq $1) } @allowed;
+		my $local   = $host eq 'localhost' || $host =~ /\.localhost\z/
+			|| $host =~ /\A\d{1,3}(?:\.\d{1,3}){3}\z/ || $host =~ /[:\[]/;
+		my $ok = $req->reverse_proxy ? (!@allowed || $listed) : ($local || $listed);
+		return sprintf($MESSAGES{error_host_refused}, $host) unless $ok;
+	}
+
+	return if $req->method =~ /\A(?:GET|HEAD|OPTIONS)\z/;
+
+	my $headers = $req->headers;
+	my $site    = lc($headers->header('Sec-Fetch-Site') // '');
+	if (length $site) {
+		return if $site eq 'same-origin' || $site eq 'none';
+		return sprintf($MESSAGES{error_cross_site}, $site);
+	}
+	my $origin = $headers->origin;
+	return unless defined $origin;
+	my $from = lc(Mojo::URL->new($origin)->host_port // '');
+	my $to   = lc($req->url->to_abs->host_port // '');
+	my $fwd  = $req->reverse_proxy ? lc($headers->header('X-Forwarded-Host') // '') : '';
+	return if length($from) && ($from eq $to || (length($fwd) && $from eq $fwd));
+	return sprintf($MESSAGES{error_cross_site}, $origin);
+}
+
 # _is_safe_url($url) -> bool
 #
-# Purpose: SSRF guard.  Blocks the most dangerous classes of Server-Side Request
-#          Forgery targets: loopback aliases (localhost, 127/8) and literal
-#          private/link-local/CGNAT IPv4 addresses in the URL host component.
+# Purpose: The quick SSRF check on a URL a request names (/import, url:
+#          specs), before anything is fetched, so the reader is told at once.
+# Entry:   The URL.
+# Exit:    0 for anything but http(s), no host, localhost or *.localhost, or a
+#          host written as an address that is not public; else 1.
 #
-# Design rationale for scope:
-#   Resolving hostnames via DNS and checking the result is ineffective: a
-#   separate DNS lookup happens at LWP connect time (TOCTOU / DNS rebinding
-#   window).  The authoritative defence against hostname-based SSRF is a
-#   network-layer egress firewall.  This function handles the Perl-layer
-#   interception for the most common patterns that operators cannot easily
-#   filter at the network level: bare loopback aliases and literal private IPs
-#   hard-coded by an attacker.
-#
-# Blocked targets:
-#   localhost / 127.0.0.0/8 / 0.0.0.0 / ::1  -- loopback aliases
-#   10.0.0.0/8    -- RFC 1918 private (literal IP)
-#   172.16.0.0/12 -- RFC 1918 private (literal IP)
-#   192.168.0.0/16-- RFC 1918 private (literal IP)
-#   169.254.0.0/16-- link-local; AWS/GCP/Azure metadata endpoint (literal IP)
-#   100.64.0.0/10 -- CGNAT / Tailscale shared space (literal IP)
-#
-# Hostname-based targets (e.g. http://internal.corp.example.com/) are allowed
-# at this layer; block them with egress firewall rules instead.
+# It reads the URL as LWP will (URI: so http://user@127.0.0.1/ is host
+# 127.0.0.1), and an address in every spelling the resolver accepts
+# (2130706433, 0x7f000001, 0177.0.0.1, 127.1, [::ffff:127.0.0.1]).  It does not
+# look names up: a name such as localtest.me, or one whose DNS answers
+# 127.0.0.1, is refused when it is fetched, by Database::BI::SafeUA, which
+# resolves each request (and each redirect), checks every address, and
+# connects to the one it checked, so a second DNS answer cannot differ.
 sub _is_safe_url {
-	my $url = $_[0];
-
-	return 0 unless $url =~ m{\Ahttps?://([^/:?\[\]#]+)}i;
-	my $host = lc $1;
-
-	# Block well-known loopback aliases.
-	return 0 if $host eq 'localhost'
-	          || $host =~ /\A127\./
-	          || $host eq '0.0.0.0'
-	          || $host eq '::1';
-
-	# For literal IPv4 addresses only: check private/link-local/CGNAT ranges.
-	# Skipping DNS for hostname targets avoids a live network call in tests and
-	# removes the TOCTOU window that makes DNS-resolved checks illusory anyway.
-	return 1 unless $host =~ /\A\d{1,3}(?:\.\d{1,3}){3}\z/;
-
-	my $packed = inet_aton($host) or return 1;
-	my $n = unpack 'N', $packed;
-
-	return 0 if ($n & 0xFF000000) == 0x0A000000;	# 10/8
-	return 0 if ($n & 0xFFF00000) == 0xAC100000;	# 172.16/12
-	return 0 if ($n & 0xFFFF0000) == 0xC0A80000;	# 192.168/16
-	return 0 if ($n & 0xFFFF0000) == 0xA9FE0000;	# 169.254/16 (link-local / metadata)
-	return 0 if ($n & 0xFFC00000) == 0x64400000;	# 100.64/10 (CGNAT)
+	my ($url) = @_;
+	return 0 unless defined $url && $url =~ m{\Ahttps?://}i;
+	require URI;
+	require Database::BI::SafeUA;
+	my $uri  = URI->new($url);
+	my $host = eval { lc($uri->host // '') } // '';
+	$host =~ s/\.\z//;
+	return 0 unless length $host;
+	# A host that is neither a name nor an IPv6 address is not a URL LWP
+	# would read the same way (http://::1/ has the host ':').
+	return 0 unless $host =~ /\A[a-z0-9_](?:[a-z0-9_.-]*[a-z0-9_])?\z/
+		|| ($host =~ /:/ && defined Database::BI::SafeUA::numeric_host($host));
+	return 0 if $host eq 'localhost' || $host =~ /\.localhost\z/;
+	my $ip = Database::BI::SafeUA::numeric_host($host);
+	return 0 if defined $ip && Database::BI::SafeUA::blocked_address($ip);
 	return 1;
 }
 
@@ -697,7 +921,8 @@ sub _crumb_parent :Protected ($self, $url) {
 	if ($path eq '/tables') {
 		my $spec = $q->param('l') // '';
 		return undef unless $spec =~ /\Apath:(.+)\z/;
-		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($1)->dirname->to_string));
+		my ($file) = _split_path($1);
+		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($file)->dirname->to_string));
 	}
 	# A canvas came from where its back= says, else from the list of canvases.
 	if ($path =~ m{\A/a/}) {
@@ -753,6 +978,7 @@ sub _crumb_label :Protected ($self, $url) {
 	return 'Canvases' if $path eq '/canvases';
 	return 'Tutorial' if $path eq '/tutorial';
 	return 'Preferences' if $path eq '/preferences';
+	return 'Log in'      if $path eq '/login';
 	if ($path =~ m{\A/a/([A-Za-z0-9_-]+)}) {
 		my $a = $self->_read_analyses->{$1};
 		return (ref $a eq 'HASH' && length($a->{name} // '')) ? $a->{name} : 'Canvas';
@@ -768,9 +994,29 @@ sub _crumb_label :Protected ($self, $url) {
 sub _crumb_spec_name {
 	my ($spec) = @_;
 	$spec //= '';
+	if ($spec =~ m{\Apath:(.+)\z}) {
+		my ($file, $internal) = _split_path($1);
+		my $name = Mojo::File->new($file)->basename;
+		return defined $internal ? "$name: $internal" : $name;
+	}
+	return _crumb_spec_name_other($spec);
+}
+
+# _split_path($path) -> ($file, $internal)
+#
+# Purpose: What follows "path:" in a spec: the file, and the table it names
+#          after a "#" (Database::BI::Model::DataSource::split_path).
+sub _split_path {
+	my ($path) = @_;
+	require Database::BI::Model::DataSource;
+	return Database::BI::Model::DataSource::split_path($path);
+}
+
+sub _crumb_spec_name_other {
+	my ($spec) = @_;
+	$spec //= '';
 	return "$1: $2" if $spec =~ m{\Atable:([^/]+)/(.+)\z};
 	return $1       if $spec =~ m{\Atable:(.+)\z};
-	return Mojo::File->new($1)->basename if $spec =~ m{\Apath:(.+)\z};
 	if ($spec =~ m{\Aurl:(.+)\z}i) {
 		my $host = Mojo::URL->new($1)->host;
 		return $host // $1;
@@ -1110,7 +1356,9 @@ sub _accel_file :Protected ($self, $spec) {
 		return $file;
 	}
 	if ($spec =~ m{\Apath:(?!/\.\./)(.+)\z}) {
-		my $file = eval { Mojo::File->new($1)->realpath };
+		my ($path) = _split_path($1);
+		return undef if _outside_roots($self, $path);
+		my $file = eval { Mojo::File->new($path)->realpath };
 		return (defined $file && -f $file && $file->basename =~ $EXT_RE) ? $file->to_string : undef;
 	}
 	return undef;
@@ -1150,7 +1398,7 @@ sub _accelerated_source :Protected ($self, $spec) {
 		spec       => $spec,
 		state      => ($src ? 'fresh' : 'stale'),
 		built      => $built,
-		built_text => (defined $built && $built =~ /\A\d+\z/ ? POSIX::strftime('%Y-%m-%d %H:%M', localtime $built) : ''),
+		built_text => (defined $built && $built =~ /\A\d+\z/ ? Database::BI::Util::minute_stamp(localtime $built) : ''),
 	}) unless $self->stash('acceleration');
 	return $src;
 }
@@ -1264,7 +1512,8 @@ sub _open_spec :Protected ($self, $spec) {
 	# An accelerated dataset whose extract still matches its file is read from
 	# the extract, under the file's own label.
 	if (my $fast = _accelerated_source($self, $spec)) {
-		my $label = $spec =~ m{\Atable:(.+)\z} ? lc $1 : Mojo::File->new($spec =~ s/\Apath://r)->basename;
+		my $label = $spec =~ m{\Atable:(.+)\z} ? lc $1
+			: do { my ($f, $i) = _split_path($spec =~ s/\Apath://r); $i // Mojo::File->new($f)->basename };
 		return ($fast, $label);
 	}
 	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
@@ -1278,7 +1527,10 @@ sub _open_spec :Protected ($self, $spec) {
 		};
 		return ($src, defined $internal ? $internal : $table) if $src && !$@;
 	} elsif ($spec =~ /\Apath:(.+)\z/) {
-		my $path_arg = $1;
+		# path:<file>#<table> names one table of the file, as table:<file>/<table>
+		# does in data_dir.
+		my ($path_arg, $internal) = _split_path($1);
+		my @it = defined $internal ? (internal_table => $internal) : ();
 		# Remote path: /../hostname/dir/file -- delegate to DataSource with host param.
 		# No EXT_RE check: security comes from REMOTE_HOST_RE.  The original
 		# extension (if any) is passed as file_ext so _init_backend tries it first.
@@ -1288,16 +1540,17 @@ sub _open_spec :Protected ($self, $spec) {
 			return () unless $host =~ $REMOTE_HOST_RE;
 			my ($table, $ext) = $file =~ /\A(.+)\.([^.]+)\z/ ? ($1, $2) : ($file, undef);
 			my $src = eval { $self->open_table($table, directory => $dir_part, host => $host,
-				defined $ext ? (file_ext => $ext) : ()) };
-			return ($src, $file) if $src && !$@;
+				defined $ext ? (file_ext => $ext) : (), @it) };
+			return ($src, $internal // $file) if $src && !$@;
 			return ();
 		}
+		return () if _outside_roots($self, $path_arg);
 		my $file = eval { Mojo::File->new($path_arg)->realpath };
 		if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
 			my $dir = $file->dirname->to_string;
 			(my $table = $file->basename) =~ s/\.[^.]+\z//;
-			my $src = eval { $self->open_table($table, directory => $dir) };
-			return ($src, $file->basename) if $src && !$@;
+			my $src = eval { $self->open_table($table, directory => $dir, @it) };
+			return ($src, $internal // $file->basename) if $src && !$@;
 		}
 	} elsif($spec =~ $URL_SPEC_RE) {
 		my $url = $1;
@@ -1393,7 +1646,10 @@ sub _spec_to_url :Protected ($self, $spec) {
 		}
 		return "/view/$table";
 	}
-	return '/open?path=' . url_escape($1) if $spec =~ /\Apath:(.+)\z/;
+	if ($spec =~ /\Apath:(.+)\z/) {
+		my ($file, $internal) = _split_path($1);
+		return '/open?path=' . url_escape($file) . (defined $internal ? '&it=' . url_escape($internal) : '');
+	}
 	return '/import?url=' . url_escape($1) if $spec =~ $URL_SPEC_RE;
 	return '/' if $spec =~ $REDIS_SPEC_RE;
 	return '/open?path=' . url_escape($spec) if $spec =~ $MARIADB_SPEC_RE;
@@ -1467,8 +1723,11 @@ sub _get_columns {
 #       empty (cell eq ''), notempty (cell ne '')
 #     List (val = a JSON array of strings; compared as eq is):
 #       in -- lc(cell) is one of them; a val that is not such an array matches nothing
-#     Range (val = lo:hi, string comparison -- correct for ISO YYYY-MM-DD dates):
-#       between -- lo le cell le hi
+#     Range (val = lo:hi, both ends included, whichever is written first;
+#       see _between_bounds for where a timestamp's colons leave it):
+#       between -- two numbers compare as numbers, two dates or timestamps
+#       as times (at the precision of the bounds), anything else as text,
+#       case-insensitively
 #   Boundary rules for numeric operators:
 #     le/ge include the boundary value; lt/gt exclude it.
 #   contains/starts with empty val ('') match every record (index always 0).
@@ -1487,9 +1746,11 @@ sub _get_columns {
 #          plain string, so the date comparisons can be used instead of the
 #          string ones.  A bare date (YYYY-MM-DD) qualifies, and so does an ISO
 #          timestamp (YYYY-MM-DDTHH:MM:SS) or the same with a space separator,
-#          which is what CSV exports and SQLite text columns usually hold.
+#          which is what CSV exports and SQLite text columns usually hold, and
+#          one with a fraction of a second or a zone (Z, +01:00), which is what
+#          JSON APIs write.  The time is taken as written (Util::iso_datetime).
 sub _is_iso_date {
-	return defined($_[0]) && $_[0] =~ /\A\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?\z/;
+	return scalar(() = Database::BI::Util::iso_datetime($_[0])) ? 1 : 0;
 }
 
 # Convert M/D/YYYY or YYYY-MM-DD to YYYY-MM-DD; returns undef for other formats.
@@ -1505,6 +1766,44 @@ sub _to_iso_date {
 	return;
 }
 
+# _time_columns(\@columns, \@records) -> \@names
+#
+# Purpose: The columns a time range can be applied to: those whose every
+#          non-empty cell on the page is a date or a date and time that the
+#          range filter reads (_to_iso_date: YYYY-MM-DD, with an optional
+#          "THH:MM[:SS]" or " HH:MM[:SS]", or M/D/YYYY), with a month and day
+#          that can exist, and at least one such cell.  The dashboard offers
+#          Time range only when this is not empty, and lists only these.
+# Entry:   $columns is the page's column order; $records its rows (hashes).
+# Exit:    Returns the qualifying names, in column order; [] when there are
+#          none, no rows, or either argument is not an array.
+# Notes:   It reads the rows drawn on the page, as the table's own date
+#          detection does: reading every row of the view for this would cost a
+#          second pass over the data on every page.
+sub _time_columns {
+	my ($columns, $records) = @_;
+	return [] unless ref($columns) eq 'ARRAY' && ref($records) eq 'ARRAY';
+	my @found;
+	COLUMN: for my $col (@{$columns}) {
+		next unless defined $col;
+		my $seen = 0;
+		for my $row (@{$records}) {
+			next unless ref($row) eq 'HASH';
+			my $v = $row->{$col};
+			next unless defined $v;
+			$v =~ s/\A\s+|\s+\z//g;
+			next unless length $v;
+			my $iso = _to_iso_date($v);
+			next COLUMN unless defined $iso;
+			my ($m, $d) = $iso =~ /\A\d{4}-(\d{2})-(\d{2})/;
+			next COLUMN unless $m >= 1 && $m <= 12 && $d >= 1 && $d <= 31;
+			$seen = 1;
+		}
+		push @found, $col if $seen;
+	}
+	return \@found;
+}
+
 # _date_key($value, $precision) -> comparable key | undef
 #
 # Purpose: Put a cell and a filter bound on the same footing so that a
@@ -1517,8 +1816,7 @@ sub _to_iso_date {
 sub _date_key {
 	my ($value, $precision) = @_;
 	return undef unless defined $value;
-	my ($day, $hour, $min, $sec) =
-		$value =~ /\A(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?\z/;
+	my ($day, $hour, $min, $sec) = Database::BI::Util::iso_datetime($value);
 	return undef unless defined $day;
 	return $day if $precision < 19;
 	return sprintf '%sT%s:%s:%s', $day, $hour // '00', $min // '00', $sec // '00';
@@ -1617,11 +1915,11 @@ sub _time_range_bounds {
 #
 # Purpose: Express a window as the f= filters the pipeline applies.
 # Notes:   Two bounds -- col:ge:lo and col:le:hi -- rather than one between
-#          spec.  A between value is "lo:hi" and its separator is a colon, so
-#          it cannot carry a bound with a time in it (last_24_hours ends in
-#          HH:MM:SS), and a colon in a column value would end the operator
-#          field early.  Two specs are inclusive at both ends exactly once,
-#          whatever precision the bounds carry.
+#          spec.  A between value is "lo:hi", and its colon has to be found
+#          among a timestamp's own (_between_bounds; last_24_hours ends in
+#          HH:MM:SS); one bound per spec needs no such search.  Two specs are
+#          inclusive at both ends exactly once, whatever precision the bounds
+#          carry.
 sub _time_range_specs {
 	my ($col, $lo, $hi) = @_;
 	return [] unless length($col // '') && length($lo // '') && length($hi // '');
@@ -1726,6 +2024,73 @@ sub _time_range_request ($c) {
 	return 1;
 }
 
+# _filter_request($c) -> bool
+#
+# Purpose: Refuse an f= filter whose operator is not one _apply_filter_spec
+#          knows.  Until 0.021.0 such a filter kept every row, with nothing to
+#          say it had done nothing (f=amount:GT:5, f=amount:gtx:5).  Registered
+#          as a before_dispatch hook in Database::BI::startup beside the time
+#          range's, so every route that reads f= refuses it the same way.
+# Entry:   $c -- the controller for the request.
+# Exit:    True when every filter names a known operator, or has no column or
+#          operator at all (such a spec has always been skipped); otherwise
+#          renders 400 (error_filter_op, which lists the operators) and
+#          returns false.
+# Notes:   A filter on a column the view does not have is refused later, once
+#          the columns are known (_unknown_filter_column).  A canvas card's own
+#          stored filters never come through here: they are ignored when stale,
+#          by design.
+sub _filter_request ($c) {
+	for my $spec (@{ $c->every_param('f') // [] }) {
+		my ($col, $op) = split /:/, $spec, 3;
+		next unless length($col // '') && defined $op && length $op;
+		next if $FILTER_OP{$op};
+		$c->render(
+			text   => sprintf($MESSAGES{error_filter_op}, $op, $spec, join(', ', @FILTER_OPS)),
+			status => 400,
+		);
+		return 0;
+	}
+	return 1;
+}
+
+# _unknown_filter_column($self, \@columns, \%later) -> $message | undef
+#
+# Purpose: The refusal for a filter, or the time range, on a column the view
+#          does not have.  Such a filter used to read every cell as empty and
+#          keep no rows (or every row, for ne and empty), so a mistyped name
+#          looked like an empty file.
+# Entry:   \@columns -- the view's columns at the filter stage; \%later -- the
+#          columns stages 6 and 7 will add (a filter on one waits for them).
+# Exit:    undef when every filter names a column there, or when the columns
+#          are not known (no list, or an empty one: a URL source's cache, or
+#          a view with no rows); else the error_filter_column message (or
+#          error_range_column_unknown for rcol=), naming the columns there.
+# Notes:   A plain function, like _reduce_records, which calls it; _fetch_page
+#          calls it too, for the table pages.
+sub _unknown_filter_column {
+	my ($self, $columns, $later) = @_;
+	return undef unless ref $columns eq 'ARRAY' && @{$columns};
+	my %known = ((map { $_ => 1 } @{$columns}), %{ $later // {} });
+	my $listed = sub {
+		my @names = @{$columns};
+		return join(', ', @names) if @names <= $FILTER_COLUMNS_LISTED;
+		return join(', ', @names[0 .. $FILTER_COLUMNS_LISTED - 1])
+			. sprintf(' and %d more', @names - $FILTER_COLUMNS_LISTED);
+	};
+	for my $spec (@{ $self->every_param('f') // [] }) {
+		my ($col, $op) = split /:/, $spec, 3;
+		next unless length($col // '') && defined $op && length $op;
+		next if $known{$col};
+		return sprintf($MESSAGES{error_filter_column}, $col, $spec, $listed->());
+	}
+	my $range = $self->stash('time_range');
+	if (ref $range eq 'HASH' && !$known{ $range->{col} // '' }) {
+		return sprintf($MESSAGES{error_range_column_unknown}, $range->{col}, $range->{col}, $listed->());
+	}
+	return undef;
+}
+
 # _filter_in_values($val) -> @strings
 #
 # The values an f=col:in:<val> filter lists: $val is a JSON array, and only its
@@ -1740,25 +2105,72 @@ sub _filter_in_values {
 	return map { $_ // '' } grep { !ref } @{$list};
 }
 
+# _between_bounds($val) -> ($lo, $hi) | ()
+#
+# Purpose: Split a between value, "lo:hi", into its two bounds.  The
+#          separator is a colon, and a timestamp holds colons of its own, so
+#          the split is made where both sides read as dates or timestamps if
+#          there is such a place, and at the first colon otherwise.
+# Input:   $val - the filter value.
+# Output:  The two bounds, both non-empty, in the order written; the empty
+#          list when there is no colon or either side is empty.
+sub _between_bounds {
+	my ($val) = @_;
+	return () unless defined $val;
+	my @at;
+	my $pos = -1;
+	push @at, $pos while ($pos = index($val, ':', $pos + 1)) != -1;
+	return () unless @at;
+	for my $i (@at) {
+		my ($lo, $hi) = (substr($val, 0, $i), substr($val, $i + 1));
+		return ($lo, $hi) if _is_iso_date($lo) && _is_iso_date($hi);
+	}
+	my ($lo, $hi) = (substr($val, 0, $at[0]), substr($val, $at[0] + 1));
+	return () unless length $lo && length $hi;
+	return ($lo, $hi);
+}
+
 sub _apply_filter_spec {
 	my ($records, $spec) = @_;
 	my ($col, $op, $val) = split /:/, $spec, 3;
 	return $records unless length($col // '') && defined $op && length $op;
 	$val //= '';
 	my $lval    = lc $val;	# precompute once; avoids O(N) redundant lc() inside grep
-	my $is_date = _is_iso_date($val)
-		|| ($op eq 'between' && $val =~ /\A\d{4}-\d{2}-\d{2}:/);
+	my $between = $op eq 'between';
+	my ($lo, $hi) = $between ? _between_bounds($val) : ();
+	# A between is about times only when both its bounds are.
+	my $is_date = $between
+		? (defined $lo && _is_iso_date($lo) && _is_iso_date($hi))
+		: _is_iso_date($val);
 	# Compare at the precision the bound names: a bound with a time in it asks
 	# about the second, a bare date asks about the day.  Without this, a date
 	# bound compared against a column of timestamps drops every row on the
 	# boundary day, because the cell string carries more characters than the
 	# bound and "2026-10-27T09:15:00" sorts after "2026-10-27".
-	my $prec = ($is_date && $val =~ /\A\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/) ? 19 : 10;
-	my $nval = $is_date ? (_date_key($val, $prec) // $val) : $val;
+	my $prec = ($is_date && (grep { defined((Database::BI::Util::iso_datetime($_))[1]) }
+		$between ? ($lo, $hi) : ($val))) ? 19 : 10;
+	my $nval = $is_date && !$between ? (_date_key($val, $prec) // $val) : $val;
 	# An order is a statement about numbers.  A blank or a word has no place in
 	# one, so it matches none of the four, rather than counting as zero.
 	my $by_number = !$is_date && $op =~ /\A(?:lt|le|gt|ge)\z/;
 	my $num_val   = $by_number ? _numeric_cell($val) : undef;
+	# A between of two numbers (a range of years, of prices) compares as
+	# numbers, inclusive at both ends and whichever bound is written first;
+	# "9" sorts after "10" as text.  Anything else keeps the text comparison.
+	# Dates and text likewise: the bounds are put in order before they are
+	# used, so "2026-12-31:2026-01-01" is the year, not nothing.
+	my ($num_lo, $num_hi);
+	if ($between && defined $lo) {
+		if ($is_date) {
+			($lo, $hi) = map { _date_key($_, $prec) // $_ } $lo, $hi;
+		} else {
+			($num_lo, $num_hi) = (_numeric_cell($lo), _numeric_cell($hi));
+			($num_lo, $num_hi) = (undef, undef) unless defined $num_lo && defined $num_hi;
+			($lo, $hi) = (lc $lo, lc $hi);
+		}
+		($num_lo, $num_hi) = ($num_hi, $num_lo) if defined $num_lo && $num_lo > $num_hi;
+		($lo, $hi) = ($hi, $lo) if $lo gt $hi;
+	}
 	my %in_set    = $op eq 'in' ? (map { lc($_) => 1 } _filter_in_values($val)) : ();
 	return [grep {
 		my $cell  = $_->{$col} // '';
@@ -1780,9 +2192,13 @@ sub _apply_filter_spec {
 		$op eq 'empty'    ? $cell eq ''                                         :
 		$op eq 'notempty' ? $cell ne ''                                         :
 		$op eq 'in'       ? $in_set{ lc($cell) }                                 :
+		$op eq 'between' && defined $num_lo ? do {
+			my $n = _numeric_cell($cell);
+			defined $n && $n >= $num_lo && $n <= $num_hi
+		} :
 		$op eq 'between'  ? do {
-			my ($lo, $hi) = split /:/, $val, 2;
-			length($lo // '') && length($hi // '') && $ncell ge $lo && $ncell le $hi
+			my $key = $is_date ? $ncell : lc $cell;
+			defined $lo && $key ge $lo && $key le $hi
 		} :
 		1
 	} @$records];
@@ -2322,6 +2738,9 @@ sub _reduce_records {
 	# every filter that can run first does, and the rest run last.
 	my $crossing = (!$opts || !$opts->{no_cross_row}) && length($self->param('cs') // '');
 	my %written  = $crossing ? map { $_ => 1 } _cross_row_written($self) : ();
+	if (defined(my $why = _unknown_filter_column($self, $columns, \%written))) {
+		croak $why;
+	}
 	my @late;
 	for my $s (@{ _filter_specs($self) }) {
 		if ($written{ (split /:/, $s, 2)[0] // '' }) {
@@ -2524,7 +2943,9 @@ sub _filter_specs_to_criteria {
 		}
 
 		if ($op eq 'eq' || $op eq 'ne') {
-			if ($val =~ /[%_]/) {
+			# A date compares by the day in Perl (a timestamp cell is on the
+			# day it names); LIKE would want the cell to be the date exactly.
+			if ($val =~ /[%_]/ || _is_iso_date($val)) {
 				push @residual, $spec;
 			} else {
 				$criteria{$col} = ($op eq 'eq')
@@ -2793,7 +3214,7 @@ sub _grouped_totals :Protected ($self, $pipeline, $spec) {
 	# See: https://rt.cpan.org/Ticket/Display.html?id=181946
 	# Skip the push path whenever any 'by' column has a blank or undef value so
 	# DBD::CSV/SQL::Statement is never asked to GROUP BY a null key.
-	# TODO: remove this guard once SQL-Statement RT#181946 is fixed (last checked: 1.414).
+	# TODO: remove this guard once SQL-Statement RT#181946 is fixed (last checked: 1.414, still the latest release, 2026-11-06).
 	my $has_null_by_key = @$by && do {
 		my $found;
 		KEY_SCAN: for my $row (@$records) {
@@ -3072,6 +3493,11 @@ sub _fetch_page :Protected ($self, $source, $params) {
 
 	# A filter on a column stages 6 and 7 write waits for them.  See _reduce_records.
 	my %written = $cross ? map { $_ => 1 } _cross_row_written($self) : ();
+	my @filter_cols = @cols_so_far ? @cols_so_far : _get_columns($source, $all);
+	if (defined(my $why = _unknown_filter_column($self, \@filter_cols, \%written))) {
+		$refuse->($why);
+		return ();
+	}
 	my @late    = grep { $written{ (split /:/, $_, 2)[0] } } @f_specs;
 	$all = _apply_filter_spec($all, $_) for grep { !$written{ (split /:/, $_, 2)[0] } } @f_specs;
 
@@ -3216,64 +3642,25 @@ sub _list_dir :Protected ($self, $dir, $want_files) {
 	};
 }
 
-# _write_sqlite_db($self, $records, $columns) -> $raw_bytes
+# _write_sqlite_db($self, $records, $columns, $table) -> $raw_bytes
 #
-# Purpose: Write $records to an in-process SQLite database (single table named
-#          "data"; every column declared TEXT) and return the raw file bytes.
-#          The temporary file is created, written, read, and then unlinked in
-#          one synchronous sequence.  Used by both _render_sqlite (HTTP download)
-#          and export_write (filesystem write) to eliminate code duplication.
+# Purpose: $records as a SQLite database of one table, every column TEXT, as
+#          the file's bytes.  Used by both _render_sqlite (HTTP download) and
+#          export_write (filesystem write); Database::Join::Catalog writes it.
 # Entry:   $records is an arrayref of hashrefs; $columns is an arrayref of names;
 #          $table names the table, "data" unless given.  An extract passes
 #          "extract", which Database::Abstraction before 0.54 needed (it could
 #          not read a table called "data"); extracts already built use it.
-# Exit:    Returns scalar binary string.  Croaks on any DBI error.
-# Side Effects: Creates and unlinks one temporary file under system tmpdir.
+# Exit:    Returns scalar binary string.  Croaks when it cannot be written.
+# Side Effects: Catalog makes and removes one temporary file under tmpdir.
 sub _write_sqlite_db :Protected ($self, $records, $columns, $table = 'data') {
-	# D~ fix: an empty column list produces "CREATE TABLE data ()" which is
-	# invalid SQLite syntax.  Croak before touching the filesystem.
+	# D~ fix: an empty column list would be "CREATE TABLE data ()", which is
+	# invalid SQLite syntax; this message is the one readers have seen.
 	croak 'Cannot export SQLite: result set has no columns'
 		unless @$columns;
 
-	require DBI;
-	my ($tmp_fh, $tmpfile) = tempfile(SUFFIX => '.db', UNLINK => 0);
-	close $tmp_fh;
-
-	my $dbh = eval { DBI->connect("dbi:SQLite:dbname=$tmpfile", '', '', {
-		RaiseError => 1, AutoCommit => 1,
-	}) };
-	# Guard both the eval-caught die ($@) and the undef-without-die edge case.
-	if ($@ || !$dbh) {
-		unlink $tmpfile;
-		croak "DBI connect failed: $@";
-	}
-
-	# O~ fix: wrap all DBI work in eval so any mid-flight exception still
-	# triggers cleanup (disconnect + unlink) before the error propagates.
-	eval {
-		my @quoted = map { (my $c = $_) =~ s/"/""/g; qq{"$c"} } @$columns;
-		(my $t = $table) =~ s/"/""/g;
-		$dbh->do(qq{CREATE TABLE "$t" (} . join(', ', map { "$_ TEXT" } @quoted) . ')');
-		if (@$records) {
-			my $ph  = join(', ', ('?') x scalar @$columns);
-			my $sth = $dbh->prepare(
-				qq{INSERT INTO "$t" (} . join(', ', @quoted) . ") VALUES ($ph)"
-			);
-			for my $row (@$records) {
-				$sth->execute(map { $row->{$_} } @$columns);
-			}
-		}
-		$dbh->disconnect;
-	};
-	if (my $err = $@) {
-		eval { $dbh->disconnect };	# best-effort; may already be disconnected
-		unlink $tmpfile;
-		croak $err;
-	}
-
-	my $data = Mojo::File->new($tmpfile)->slurp;
-	unlink $tmpfile;
-	return $data;
+	require Database::Join::Catalog;
+	return Database::Join::Catalog->sqlite_bytes(table => $table, columns => $columns, rows => $records);
 }
 
 # _run_pipeline_source($self) -> ($src, $records, \@columns, $left_label) or ()
@@ -4253,7 +4640,8 @@ sub _follow_links {
 sub canonical_spec {
 	my ($spec) = @_;
 	return $spec unless defined $spec && $spec =~ m{\Apath:(?!/\.\./)([^\n]+)\z};
-	my $path = $1;
+	my ($path, $internal) = _split_path($1);
+	my $tail = defined $internal ? "#$internal" : '';
 	# Windows' realpath leaves a symlink as it is, so a file reached through
 	# one would be filed under a second key; follow the links first, as
 	# _canonical_path does.
@@ -4263,7 +4651,7 @@ sub canonical_spec {
 	}
 	return $spec unless -e $path;
 	my $real = eval { Mojo::File->new($path)->realpath->to_string };
-	return (defined $real && length $real) ? "path:$real" : $spec;
+	return (defined $real && length $real) ? "path:$real$tail" : $spec;
 }
 
 # _inside_dir($path, $dir) -> $bool
@@ -4380,9 +4768,13 @@ sub _write_models :Protected ($self, $models) {
 # Entry:   $path is the store about to be written; it need not exist.
 # Exit:    A file holding anything but a JSON object is renamed to
 #          <path>.corrupt.<time>, for its owner to repair.
+#          Only a plain file: a folder (or anything else) of that name is left
+#          where it is, and the write then fails as it should.  Linux will not
+#          read a folder, but the BSDs read its raw entries, which never parse,
+#          so a folder was moved aside there and the write went ahead.
 # Side Effects: Renames the file and logs where it went.
 sub _set_aside_corrupt_store :Protected ($self, $path) {
-	return unless -s $path;
+	return unless -f $path && -s _;
 
 	my $json = eval { Mojo::File->new($path)->slurp };
 	return unless defined $json;
@@ -4953,6 +5345,9 @@ sub analyses_add_visual ($self) {
 			title  => ($vis->{title} // $rendered->{title} // 'Visual ' . ($index + 1)),
 			html   => $rendered->{html},
 			head   => ($rendered->{head} // ''),
+			# The nonce the card's scripts were written with: the page runs
+			# only those that carry it (runCardScripts in canvas.html.tt).
+			nonce  => $self->csp_nonce,
 			# The column a chart's marks filter by, so the card appended in
 			# place is a cross-filter control like the cards around it.
 			cf_col => (_vis_cf_col($vis) // ''),
@@ -5082,6 +5477,9 @@ sub analyses_update_visual ($self) {
 			title  => ($vis->{title} // $rendered->{title} // 'Visual ' . ($index + 1)),
 			html   => $rendered->{html},
 			head   => ($rendered->{head} // ''),
+			# The nonce the card's scripts were written with: the page runs
+			# only those that carry it (runCardScripts in canvas.html.tt).
+			nonce  => $self->csp_nonce,
 			cf_col => (_vis_cf_col($vis) // ''),
 		},
 	);
@@ -5715,7 +6113,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		# max_items; the seed has to carry it or a seeded canvas draws every
 		# category where the page drew the top few and Other.
 		my $max_bars = int($options->{max_items} // $options->{max_bars} // 0);
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_bar_chart_snippet(\@bars, {
 				orientation => $orient,
 				x_label     => $cat_col,
@@ -5751,7 +6149,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		$title ||= "$m->{label} by $cat_col";
 		my @slices = map { [_decode_cell($_->{$cat_col}), $_->{value}] } @$agg;
 		my $scheme = _categorical_scheme($options->{scheme});
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_pie_chart_snippet(\@slices, {
 				donut        => $options->{donut} ? 1 : 0,
 				legend       => 1,
@@ -5822,7 +6220,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			} ($m ? sort @names : @names);
 
 			$title ||= $m ? "$m->{label} by $x_col and $series_col" : "$y_col vs $x_col by $series_col";
-			$sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			$sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 				->render_multi_series_line_chart_snippet(\@series_data, { id => $svg_id });
 		} else {
 			my @pairs;
@@ -5834,7 +6232,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			return { error => 'No plottable data' } unless @pairs;
 
 			$title ||= $m ? "$m->{label} by $x_col" : "$y_col vs $x_col";
-			$sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+			$sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 				->render_zoomable_line_chart_snippet(\@pairs, { id => $svg_id });
 		}
 		my $html = $sn->{html};
@@ -5880,7 +6278,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		return { error => 'No plottable data' } unless @points;
 
 		$title ||= "$y_col vs $x_col";
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_scatter_chart_snippet(\@points, {
 				x_label => $x_col,
 				y_label => $y_col,
@@ -5940,7 +6338,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 
 		$title ||= "$m->{label} by $x_col and $y_col";
 		my $scheme = _sequential_scheme($options->{scheme});
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_heatmap_snippet(\@triples, {
 				x_label      => $x_col,
 				y_label      => $y_col,
@@ -5988,7 +6386,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		$title ||= "$m->{label} by $cat_col and $seg_col";
 		my $scheme = _categorical_scheme($options->{scheme});
 		my $orient = (_chart_orientation($options) eq 'horizontal') ? 'h' : 'v';
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_stacked_bar_snippet(\@data, {
 				scheme  => $scheme,
 				x_label => $cat_col,
@@ -6049,7 +6447,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			: ($bar_m->{fn} eq 'count')
 				? "Count by $x_col"
 				: "$bar_m->{fn} of $bar_col and $line_col by $x_col";
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_combo_snippet(\@data, {
 				bar_label  => $bar_col,
 				line_label => $line_col,
@@ -6110,7 +6508,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 			+{ path => 'Root/' . _decode_cell($_->{$cat_col}), value => $_->{value},
 			   (defined $cv ? (color_value => $cv) : ()) }
 		} @$agg;
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_treemap_snippet(\@tiles, {
 				scheme => $scheme,
 				id     => $svg_id,
@@ -6176,7 +6574,7 @@ sub _render_visual_markup :Protected ($self, $vis, $records, $columns, $src, $vi
 		}
 
 		$title ||= "Distribution of $col";
-		my $sn = HTML::D3->new(title => $title, width => 480, height => 320, responsive => 1)
+		my $sn = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 480, height => 320, responsive => 1)
 			->render_histogram_snippet(\@bin_data, {
 				binned  => 1,
 				x_label => $col,
@@ -6476,7 +6874,7 @@ sub canvas_render ($self) {
 			$freshness_stale = 1;
 			$freshness_msg   = $MESSAGES{freshness_stale_msg};
 			require POSIX;
-			$freshness_source_mtime = POSIX::strftime('%Y-%m-%d %H:%M UTC', gmtime($newest_src_mtime));
+			$freshness_source_mtime = Database::BI::Util::minute_stamp(gmtime($newest_src_mtime)) . ' UTC';
 		}
 	}
 
@@ -6788,6 +7186,8 @@ sub canvas_render ($self) {
 			title        => $a->{name},
 			canvas_id    => $id,
 			canvas_name  => $a->{name},
+			# The other sites the Share panel's embed code works on.
+			embed_origins => [ Database::BI::_embed_frame_ancestors($self->app->config) ],
 			canvas_data_url  => ($self->_analysis_to_url($a) // ''),
 			canvas_columns_json => $canvas_columns_json,
 			canvas_page_aliases_json => $canvas_page_aliases_json,
@@ -7105,6 +7505,158 @@ sub is_supported_file ($path) {
 	return (defined $path && $path =~ $EXT_RE) ? 1 : 0;
 }
 
+=head2 require_login / login_form / login / logout
+
+The login, on only when config C<password_hash> is set (see
+L<Database::BI/Logging in>).  C<require_login> is the C<under> every route but
+C</login>, C</logout>, C</share/:id> and C</embed/:id> passes through; the
+others are C<GET /login>, C<POST /login> and C<POST /logout>.
+
+A session is logged in when its C<login> value is this password's mark (an
+HMAC of the hash, keyed by the first secret), so a new password logs every
+session out.  Wrong passwords are counted per remote address, in each server
+process: the tenth within 15 minutes locks that address out for the rest of
+the 15 minutes (C<429>), whether or not the next one is right.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  require_login:  any request
+  GET  /login:    return=  string, optional; a path on this site (default /)
+  POST /login:    password= string; return= as above
+  POST /logout:   none
+
+=head4 OUTPUT
+
+  require_login:  true when login is off or the session is logged in.  Otherwise
+                  a browser's GET for a page is redirected (302) to
+                  /login?return=<the page>, and anything else gets
+                  401 application/json { "error": error_login_required }.
+  GET  /login:    200 text/html, the form; 302 to return= when logged in; with
+                  login off, 200 and a page that says no password is set.
+  POST /login:    302 to return= when the password is right; 401 text/html, the
+                  form with error_login_failed, when not; 429 with
+                  error_login_locked after too many.
+  POST /logout:   302 to /login (to / when login is off), the session ended.
+
+return= is followed only when it is a path on this site (one /, not // or /\);
+anything else goes to /.
+
+=cut
+
+# Wrong passwords per application (a test runs several) and remote address:
+# epoch seconds of each, newest last.
+my %LOGIN_FAILURES;
+Readonly my $LOGIN_WINDOW   => 15 * 60;
+Readonly my $LOGIN_ATTEMPTS => 10;
+
+# _login_mark($self, $hash) -> $mark
+#
+# What a logged-in session holds: not the hash, which the readable cookie
+# would hand to anyone who saw it, but an HMAC of it keyed by the secret.
+sub _login_mark ($self, $hash) {
+	return Digest::SHA::hmac_sha256_hex($hash, $self->app->secrets->[0]);
+}
+
+# _login_return($value) -> $path
+#
+# Where to go after logging in: a path on this site, never another site
+# (//evil.example and /\evil.example are other sites to a browser).
+sub _login_return {
+	my ($value) = @_;
+	return '/' unless defined $value && $value =~ m{\A/(?![/\\])} && $value !~ /[\x00-\x20\x7f\\]/;
+	return '/' if $value =~ m{\A/log(?:in|out)\b};
+	return $value;
+}
+
+# _login_hash($self) -> $hash | undef
+sub _login_hash ($self) {
+	my $hash = $self->app->config('password_hash');
+	return (defined $hash && length $hash) ? $hash : undef;
+}
+
+sub _logged_in ($self) {
+	my $hash = $self->_login_hash // return 1;
+	return secure_compare($self->session('login') // '', $self->_login_mark($hash)) ? 1 : 0;
+}
+
+sub require_login ($self) {
+	return 1 unless defined $self->_login_hash;
+	if ($self->_logged_in) {
+		$self->stash(logged_in => 1);
+		return 1;
+	}
+
+	my $req = $self->req;
+	$self->stash(buffer => 0);
+	if ($req->method =~ /\A(?:GET|HEAD)\z/ && ($req->headers->accept // '') =~ m{text/html}
+			&& $req->url->path->to_string !~ m{\A/api/}) {
+		my $url = Mojo::URL->new('/login')->query(return => $req->url->path_query);
+		$self->redirect_to($url);
+		return undef;
+	}
+	$self->render(json => { error => $MESSAGES{error_login_required} }, status => 401);
+	return undef;
+}
+
+sub _render_login ($self, %args) {
+	my ($platform, $language) = $self->_resolve_template;
+	$self->stash(buffer => 0);
+	return $self->render(
+		template    => "$platform/$language/login",
+		handler     => 'tt',
+		format      => 'html',
+		title       => 'Log in',
+		language    => $language,
+		return_to   => _login_return(scalar $self->param('return')),
+		login_error => $args{error} // '',
+		login_off   => $args{login_off} ? 1 : 0,
+		status      => $args{status} // 200,
+	);
+}
+
+sub login_form ($self) {
+	# With no password set the page says so, rather than offering a form that
+	# could never succeed.
+	return $self->_render_login(login_off => 1) unless defined $self->_login_hash;
+	return $self->redirect_to(_login_return(scalar $self->param('return'))) if $self->_logged_in;
+	return $self->_render_login;
+}
+
+sub login ($self) {
+	my $hash = $self->_login_hash;
+	return $self->redirect_to('/') unless defined $hash;
+
+	my $who      = $self->tx->remote_address // '';
+	my $now      = time;
+	my $failures = $LOGIN_FAILURES{ Scalar::Util::refaddr($self->app) } //= {};
+	for my $addr (keys %{$failures}) {
+		$failures->{$addr} = [ grep { $_ > $now - $LOGIN_WINDOW } @{ $failures->{$addr} } ];
+		delete $failures->{$addr} unless @{ $failures->{$addr} };
+	}
+	my $seen = $failures->{$who} // [];
+	if (@{$seen} >= $LOGIN_ATTEMPTS) {
+		my $minutes = int(($seen->[0] + $LOGIN_WINDOW - $now + 59) / 60) || 1;
+		return $self->_render_login(error => sprintf($MESSAGES{error_login_locked}, $minutes), status => 429);
+	}
+
+	unless (Database::BI::Password::verify_password(scalar($self->param('password')) // '', $hash)) {
+		push @{ $failures->{$who} //= [] }, $now;
+		$self->app->log->warn("Wrong password from $who");
+		return $self->_render_login(error => $MESSAGES{error_login_failed}, status => 401);
+	}
+
+	delete $failures->{$who};
+	$self->session(login => $self->_login_mark($hash));
+	return $self->redirect_to(_login_return(scalar $self->param('return')));
+}
+
+sub logout ($self) {
+	$self->session(expires => 1);
+	return $self->redirect_to(defined $self->_login_hash ? '/login' : '/');
+}
+
 =head2 preferences
 
 C<GET /preferences> -- Render the page where a reader sets their preferences:
@@ -7395,8 +7947,8 @@ None; errors render as 404.
 =head3 FORMAL SPECIFICATION
 
   browse == lambda self .
-    let dir = realpath(param('path') // HOME) in
-    pre  is_dir(dir)
+    let dir = realpath(param('path') // first_root) in
+    pre  inside(dir, file_roots) /\ is_dir(dir)
     post render(browse, dirs: subdirs(dir), files: supported_files(dir))
 
 =head3 EXAMPLE
@@ -7410,7 +7962,10 @@ None; errors render as 404.
 sub browse ($self) {
 	my ($platform, $language) = $self->_resolve_template;
 
-	my $raw_path = $self->param('path') // $ENV{HOME} // '/';
+	my $raw_path = $self->param('path') // _first_root($self);
+	if (my $refusal = _outside_roots($self, $raw_path)) {
+		return $self->render(text => $refusal, status => 403);
+	}
 	my $dir      = eval { Mojo::File->new($raw_path)->realpath };
 	return $self->reply->not_found unless defined $dir && -d $dir;
 
@@ -7435,12 +7990,13 @@ sub browse ($self) {
 			unshift @crumbs, { name => $name, href => '/browse?path=' . url_escape($f->to_string) };
 			my $parent = $f->dirname;
 			last if $parent->to_string eq $f->to_string;
+			last if _outside_roots($self, $parent->to_string);
 			$f = $parent;
 		}
 	}
 
 	my $parent      = $dir->dirname;
-	my $parent_href = $parent->to_string ne $dir->to_string
+	my $parent_href = $parent->to_string ne $dir->to_string && !_outside_roots($self, $parent->to_string)
 		? '/browse?path=' . url_escape($parent->to_string)
 		: undef;
 
@@ -7699,6 +8255,13 @@ sub open_file ($self) {
 		);
 	}
 
+	# A path that names a table after a "#", as a spec does, is that table.
+	my ($named_file, $named_it) = _split_path($file_path);
+	$file_path = $named_file if defined $named_it;
+	if (my $refusal = _outside_roots($self, $file_path)) {
+		return $self->render(text => $refusal, status => 403);
+	}
+
 	my $file = eval { Mojo::File->new($file_path)->realpath };
 	return $self->reply->not_found
 		unless defined $file && -f $file && $file->basename =~ $EXT_RE;
@@ -7709,7 +8272,7 @@ sub open_file ($self) {
 	my $filename = $file->basename;
 	my $lspec    = 'path:' . $file->to_string;
 
-	my $it = $self->param('it');	# optional: select a specific internal table
+	my $it = $self->param('it') // $named_it;	# optional: select a specific internal table
 
 	# A table opened from the schema browser belongs to a file in data_dir.  Name
 	# it as table:store/sales so the join, filter and export panels keep the
@@ -7719,6 +8282,9 @@ sub open_file ($self) {
 		my $file_dir = eval { $file->dirname->realpath };
 		$lspec = "table:$table/$it" if $data_dir && $file_dir && "$file_dir" eq "$data_dir";
 	}
+	# Elsewhere the spec names the table after a "#", so the panels and charts
+	# keep it too.
+	$lspec .= "#$it" if defined $it && length $it && $it !~ /[#\n]/ && $lspec =~ /\Apath:/;
 
 	# Allow the tables view to override the default "Back to browser" link.
 	my $back_override = _safe_back_url($self->param('back'));
@@ -7971,6 +8537,7 @@ None produced by this action directly; internal errors yield a 404.
 sub columns_api ($self) {
 	my $table_name = $self->param('table');
 	my $path       = $self->param('path');
+	my $path_internal;
 
 	# Accept the unified spec format used by /join and /graph:
 	# "table:name" or "path:/abs/path" -- mirrors _open_spec's parsing.
@@ -7979,7 +8546,7 @@ sub columns_api ($self) {
 		if ($spec =~ m{\Atable:([A-Za-z_][A-Za-z0-9_]*(?:/[A-Za-z_][A-Za-z0-9_]*)?)\z}) {
 			$table_name = $1;
 		} elsif ($spec =~ /\Apath:(.+)\z/s) {
-			$path = $1;
+			($path, $path_internal) = _split_path($1);
 		}
 	}
 
@@ -8004,14 +8571,18 @@ sub columns_api ($self) {
 			if ($host =~ $REMOTE_HOST_RE) {
 				my ($tbl, $ext) = $file =~ /\A(.+)\.([^.]+)\z/ ? ($1, $2) : ($file, undef);
 				$source = eval { $self->open_table($tbl, directory => $dir_part, host => $host,
-					defined $ext ? (file_ext => $ext) : ()) };
+					defined $ext ? (file_ext => $ext) : (),
+					defined $path_internal ? (internal_table => $path_internal) : ()) };
 			}
+		} elsif (my $refusal = _outside_roots($self, $path)) {
+			return $self->render(json => { error => $refusal }, status => 403);
 		} else {
 			my $file = eval { Mojo::File->new($path)->realpath };
 			if (defined $file && -f $file && $file->basename =~ $EXT_RE) {
 				my $dir = $file->dirname->to_string;
 				(my $tbl = $file->basename) =~ s/\.[^.]+\z//;
-				$source = eval { $self->open_table($tbl, directory => $dir) };
+				$source = eval { $self->open_table($tbl, directory => $dir,
+					defined $path_internal ? (internal_table => $path_internal) : ()) };
 			}
 		}
 	}
@@ -8069,14 +8640,14 @@ sub range_api ($self) {
 	return $self->render(json => { min => undef, max => undef })
 		unless $records && grep { $_ eq $col } @$columns;
 
-	my $iso_re = qr/\A\d{4}-\d{2}-\d{2}\z/;
 	my $mdy_re = qr|\A(\d{1,2})/(\d{1,2})/(\d{4})\z|;
 	my @dates;
 	for my $rec (@$records) {
 		my $v = $rec->{$col} // '';
 		next unless length $v;
-		if ($v =~ $iso_re) {
-			push @dates, $v;
+		# A timestamp counts as the day it names, as the filters read it.
+		if (defined(my $day = (Database::BI::Util::iso_datetime($v))[0])) {
+			push @dates, $day;
 		} elsif (my @m = ($v =~ $mdy_re)) {
 			push @dates, sprintf '%04d-%02d-%02d', $m[2], $m[0], $m[1];
 		}
@@ -8522,7 +9093,8 @@ C<POST /export> -- Write the current logical view to a chosen filesystem path.
   l=         string   (required) Left table spec.
   j=         string   (repeatable) Join steps.
   f=         string   (repeatable) Filter specs.
-  dir=       string   Target directory (must exist; resolved via realpath).
+  dir=       string   Target directory (must exist; resolved via realpath).  Inside
+                      config file_roots and export_dirs when they are set.
   filename=  string   Output filename including extension.  Extension determines
                       format: C<.csv> -> RFC 4180 CSV; C<.sql> -> SQLite;
                       C<.json> -> JSON array of row objects.
@@ -8554,6 +9126,12 @@ C<report.txt>, C<report> (no extension), empty string.
 =head4 OUTPUT
 
   200 application/json   { "saved": "/abs/path/to/file" }
+  403 application/json   { "error": "..." }  -- a hidden target; dir outside
+                                                  file_roots or export_dirs; a name
+                                                  that is a link, folder or anything
+                                                  but a plain file; or a request
+                                                  another site's page made
+  401 application/json   { "error": "..." }  -- password_hash set, not logged in
   404 application/json   { "error": "..." }  -- bad dir or table not found
   415 application/json   { "error": "..." }  -- unsupported extension
   500 application/json   { "error": "..." }  -- write failure
@@ -8561,8 +9139,28 @@ C<report.txt>, C<report> (no extension), empty string.
 =head3 MESSAGES
 
   error_dir_not_found   -- realpath of dir failed or result is not a directory.
-  error_ext_required    -- filename extension is not .csv or .sql.
+  error_ext_required    -- filename extension is not .csv, .sql or .json.
+  error_hidden_target   -- the directory, after realpath, or the filename has a
+                           part starting with a dot (~/.config, .vscode/,
+                           .profile.json): those hold settings, and
+                           GET /api/dirs never offers them.
+  error_outside_roots   -- dir is outside config file_roots.
+  error_outside_export_dirs
+                        -- dir is outside config export_dirs.
+  error_export_not_file -- the name is already a link, a folder or another
+                           non-file: a link could lead the export anywhere.
+  error_cross_site, error_host_refused
+                        -- from request_refusal, before this action runs.
   error_write_failed    -- DBI or filesystem write threw.
+
+A refusal names the folder as C<dir> spelled it, though the checks are made
+on its realpath.  The C<saved> path of a success is the realpath: where the
+file is.
+
+The file is written to a temporary file (C<.bi-export-XXXXXXXX>) in C<dir> and
+renamed over the name, so a reader never sees half a file and a link made
+after the check is replaced, not followed.  It gets the replaced file's mode,
+or C<0666 & ~umask> for a new one; on failure the temporary file is removed.
 
 =head3 FORMAL SPECIFICATION
 
@@ -8586,6 +9184,9 @@ sub export_write ($self) {
 	my $dir      = $self->param('dir')      // '';
 	my $filename = $self->param('filename') // '';
 
+	if (my $refusal = _outside_roots($self, $dir) // _outside_export_dirs($self, $dir)) {
+		return $self->render(json => { error => $refusal }, status => 403);
+	}
 	my $dest_dir = eval { Mojo::File->new($dir)->realpath };
 	unless (defined $dest_dir && -d $dest_dir) {
 		return $self->render(
@@ -8599,6 +9200,21 @@ sub export_write ($self) {
 
 	# Strip any path separators the browser might include.
 	($filename) = $filename =~ m{([^/\\]+)\z};
+
+	# A dot-folder or dot-file holds some program's settings (~/.config, a
+	# .vscode/settings.json), which a .json export could replace.  The folder
+	# list the panel offers (GET /api/dirs) leaves them out too.
+	# The checks read the resolved folder; a refusal names the one the reader
+	# asked for, as every other message does (macOS's tempdir is under /var,
+	# a link to /private/var, so the two differ there).
+	my $asked = Mojo::File->new($dir);
+	my @names = (File::Spec->splitdir($dest_dir->to_string), $filename // '');
+	if (grep { /\A\./ && $_ ne '.' && $_ ne '..' } @names) {
+		return $self->render(
+			json   => { error => $self->_i18n('error_hidden_target', $asked->child($filename // '')->to_string) },
+			status => 403,
+		);
+	}
 	my $format;
 	if    ($filename && $filename =~ /\.csv\z/i)  { $format = 'csv';    }
 	elsif ($filename && $filename =~ /\.sql\z/i)  { $format = 'sqlite'; }
@@ -8616,21 +9232,38 @@ sub export_write ($self) {
 		unless $records;
 
 	my $dest = $dest_dir->child($filename);
-	eval {
-		if ($format eq 'csv') {
-			$dest->spurt(_serialize_csv($records, $columns));
-		}
-		elsif ($format eq 'json') {
-			$dest->spurt(encode_json($records));
-		}
-		else {
-			$dest->spurt($self->_write_sqlite_db($records, $columns));
-		}
+	# A link (or a folder, a pipe) already at the name is not replaced: written
+	# through, a link inside the folders would put the export wherever it
+	# points, outside file_roots or export_dirs, or into a dot-file.
+	if (-l $dest || (-e $dest && !-f $dest)) {
+		return $self->render(json => { error => sprintf($MESSAGES{error_export_not_file}, $asked->child($filename)->to_string) }, status => 403);
+	}
+	my $tmp;
+	my $ok = eval {
+		my $bytes = $format eq 'csv' ? _serialize_csv($records, $columns)
+		          : $format eq 'json' ? encode_json($records)
+		          : $self->_write_sqlite_db($records, $columns);
+		# Written beside it and renamed over it: a rename replaces whatever
+		# is at the name, a link made since the check included, and never
+		# follows it, and a reader never sees half a file.
+		(my $fh, $tmp) = tempfile('.bi-export-XXXXXXXX', DIR => $dest_dir->to_string, UNLINK => 0);
+		binmode $fh;
+		print {$fh} $bytes or croak "$tmp: $!";
+		close $fh or croak "$tmp: $!";
+		# tempfile makes it 0600: give it the mode of the file it replaces, as
+		# writing over that one did, or the mode a new file gets.
+		my @old = stat $dest->to_string;
+		chmod(@old ? $old[2] & oct('7777') : 0666 & ~umask(), $tmp);
+		rename $tmp, $dest->to_string or croak "$dest: $!";
+		undef $tmp;
+		1;
 	};
+	my $err = $@;
+	unlink $tmp if defined $tmp;
 	return $self->render(
-		json   => { error => $self->_i18n('error_write_failed', _tidy_error($@)) },
+		json   => { error => $self->_i18n('error_write_failed', _tidy_error($err)) },
 		status => 500,
-	) if $@;
+	) unless $ok;
 
 	$self->render(json => { saved => $dest->to_string });
 }
@@ -8643,30 +9276,35 @@ C<GET /api/dirs> -- Return a JSON directory listing for the export panel.
 
 =head4 INPUT
 
-  ?path=   string   Directory to list (default: $HOME).  Returns 404 when not
-                    a directory.  Hidden entries (names starting with ".") are
-                    excluded.
+  ?path=   string   Directory to list.  Default: the first config export_dirs
+                    entry, else $HOME if it is inside file_roots, else the first
+                    root.  Returns 404 when not a directory.  Hidden entries
+                    (names starting with ".") are excluded.
 
 =head4 OUTPUT
 
   200 application/json
     {
       "path":   "/abs/path",
-      "parent": "/abs/parent" or null (at filesystem root),
+      "parent": "/abs/parent" or null (at the filesystem root, or when the
+                 parent is outside file_roots or export_dirs),
       "dirs":   [ { "name": "alpha", "path": "/abs/path/alpha" }, ... ]
     }
 
+  403 application/json   { "error": "..." }  -- path outside file_roots or
+                                                  export_dirs, whether or not it
+                                                  exists
   404 application/json   { "error": "Not a directory" }
 
 =head3 MESSAGES
 
-None beyond the 404 response.
+  error_outside_roots, error_outside_export_dirs -- the 403 above.
 
 =head3 FORMAL SPECIFICATION
 
   dirs_api == lambda self .
-    let dir = realpath(param('path') // HOME) in
-    pre  is_dir(dir)
+    let dir = realpath(param('path') // first(export_dirs) // first_root) in
+    pre  inside(dir, file_roots) /\ inside(dir, export_dirs) /\ is_dir(dir)
     post render_json({ path: dir, parent: parent(dir), dirs: subdirs(dir) })
 
 =head3 EXAMPLE
@@ -8676,17 +9314,22 @@ None beyond the 404 response.
 =cut
 
 sub dirs_api ($self) {
-	my $raw = $self->param('path') // $ENV{HOME} // '/';
+	my $raw = $self->param('path') // (_export_dirs($self))[0] // _first_root($self);
+	if (my $refusal = _outside_roots($self, $raw) // _outside_export_dirs($self, $raw)) {
+		return $self->render(json => { error => $refusal }, status => 403);
+	}
 	my $dir = eval { Mojo::File->new($raw)->realpath };
 	return $self->render(json => { error => 'Not a directory' }, status => 404)
 		unless defined $dir && -d $dir;
 
 	my $listing = $self->_list_dir($dir, 0);
 	my $parent  = $dir->dirname;
+	my $up      = $parent->to_string ne $dir->to_string && !_outside_roots($self, $parent->to_string)
+		&& !_outside_export_dirs($self, $parent->to_string);
 
 	$self->render(json => {
 		path   => $dir->to_string,
-		parent => ($parent->to_string ne $dir->to_string ? $parent->to_string : undef),
+		parent => ($up ? $parent->to_string : undef),
 		dirs   => $listing->{dirs},
 	});
 }
@@ -8753,9 +9396,10 @@ sub stat_api ($self) {
 
 	my $file = eval { Mojo::File->new($path)->realpath };
 	# Restrict to files with a supported data extension so stat_api cannot be
-	# used as a filesystem oracle to probe /etc/shadow, /root/.ssh/, etc.
+	# used as a filesystem oracle to probe /etc/shadow, /root/.ssh/, etc.; and,
+	# with file_roots, to files inside them, said the same way.
 	return $self->render(json => { exists => \0, path => $path })
-		unless defined $file && -f $file && $file->basename =~ $EXT_RE;
+		unless defined $file && -f $file && $file->basename =~ $EXT_RE && !_outside_roots($self, $path);
 
 	my @s = stat $file->to_string;
 
@@ -8765,17 +9409,8 @@ sub stat_api ($self) {
 	my $table_count;
 	if ($file->basename =~ /\.(?:sql|sqlite|sqlite3|db)\z/i) {
 		eval {
-			require DBI;
-			my $dbh = DBI->connect(
-				'dbi:SQLite:dbname=' . $file->to_string,
-				'', '',
-				{ RaiseError => 1, PrintError => 0, AutoCommit => 1 },
-			);
-			my $tbls = $dbh->selectcol_arrayref(
-				q{SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'}
-			);
-			$table_count = scalar @{ $tbls // [] };
-			$dbh->disconnect;
+			require Database::Join::Catalog;
+			$table_count = scalar @{ Database::Join::Catalog->tables(file => $file->to_string) };
 		};
 	}
 
@@ -9070,7 +9705,7 @@ sub graph_view ($self) {
 				status => 200,
 			) unless @series_data;
 			$point_count = scalar @series_data;
-			$chart_html = HTML::D3->new(title => $title, width => 1100, height => 580)
+			$chart_html = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 1100, height => 580)
 				->render_multi_series_line_chart_snippet(\@series_data, { animated => 1 })->{html};
 		} else {
 			my @pairs = map {
@@ -9081,7 +9716,7 @@ sub graph_view ($self) {
 				status => 200,
 			) unless @pairs;
 			$point_count = scalar @pairs;
-			$chart_html = HTML::D3->new(title => $title, width => 1100, height => 580)
+			$chart_html = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 1100, height => 580)
 				->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 })->{html};
 		}
 		utf8::decode($chart_html) unless utf8::is_utf8($chart_html);
@@ -9144,7 +9779,7 @@ sub graph_view ($self) {
 
 		require HTML::D3;
 		my $title   = "$y_col vs $x_col by $series_col";
-		my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
+		my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 1100, height => 580)
 			->render_multi_series_line_chart_snippet(\@series_data, { animated => 1 });
 
 		my $chart_html = $snippet->{html};
@@ -9230,7 +9865,7 @@ sub graph_view ($self) {
 
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 1100, height => 580)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 1100, height => 580)
 		->render_zoomable_line_chart_snippet(\@pairs, { animated => 1 });
 
 	my $chart_html = $snippet->{html};
@@ -9358,7 +9993,7 @@ sub pie_view ($self) {
 	require HTML::D3;
 	my $scheme  = _categorical_scheme($self->param('scheme'));
 	my $title   = $count_mode ? "Count by $cat_col" : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 600, height => 500)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 600, height => 500)
 		->render_pie_chart_snippet(\@slices, {
 			animated     => 1,
 			donut        => $donut,
@@ -9536,7 +10171,7 @@ sub heatmap_view ($self) {
 	require HTML::D3;
 	my $title   = length($val_col) ? "$val_col by $x_col and $y_col"
 	                                : "Count by $x_col and $y_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 900, height => 500)
 		->render_heatmap_snippet(\@triples, {
 			x_label      => $x_col,
 			y_label      => $y_col,
@@ -9717,7 +10352,7 @@ sub bar_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col"
 	                          : "$val_col by $cat_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 800, height => 480)
 		->render_bar_chart_snippet(\@bars, {
 			animated     => 1,
 			orientation  => $orientation,
@@ -9983,7 +10618,9 @@ sub folder_view ($self) {
 =head2 tables_view
 
 C<GET /tables> -- Schema browser for multi-table databases (SQLite, etc.).
-Lists all internal tables with their columns; clicking a table opens it.
+Lists all internal tables with their columns; clicking a table opens it.  A
+JSON file that is an object holding lists of objects has one table per list
+(see L<Database::BI::Model::DataSource/json_lists>).
 
 =head3 API SPECIFICATION
 
@@ -9991,7 +10628,7 @@ Lists all internal tables with their columns; clicking a table opens it.
 
   ?l=   string   Required.  Table spec: "table:name" (data_dir) or
                  "path:/abs/path" (filesystem path).  The file must be a
-                 SQLite database.
+                 SQLite database or a .json file.
 
 =head4 OUTPUT
 
@@ -10016,7 +10653,7 @@ sub tables_view ($self) {
 	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
 		my $table_name = lc $1;
 		my $data_dir   = _data_dir_for($self->app);
-		for my $ext (qw(sql sqlite sqlite3 db)) {
+		for my $ext (qw(sql sqlite sqlite3 db json)) {
 			my $p = $data_dir->child("$table_name.$ext");
 			if (-f $p) {
 				$file_path = $p->to_string;
@@ -10028,10 +10665,13 @@ sub tables_view ($self) {
 		$back_url  = '/';
 		$back_label = 'Home';
 	} elsif ($spec =~ /\Apath:(.+)\z/) {
-		my $path_arg = $1;
+		my ($path_arg) = _split_path($1);
+		if (my $refusal = _outside_roots($self, $path_arg)) {
+			return $self->render(text => $refusal, status => 403);
+		}
 		my $file = eval { Mojo::File->new($path_arg)->realpath };
 		return $self->reply->not_found
-			unless defined $file && -f $file && $file->basename =~ /\.(?:sql|sqlite|sqlite3|db)\z/i;
+			unless defined $file && -f $file && $file->basename =~ /\.(?:sql|sqlite|sqlite3|db|json)\z/i;
 		$file_path  = $file->to_string;
 		($db_label  = $file->basename) =~ s/\.[^.]+\z//;
 		$back_url   = '/browse?path=' . url_escape($file->dirname->to_string);
@@ -10126,27 +10766,20 @@ sub tables_view ($self) {
 		return $self->reply->not_found;
 	}
 
-	if (defined $file_path) { eval {
-		require DBI;
-		my $dbh = DBI->connect(
-			"dbi:SQLite:dbname=$file_path", q{}, q{},
-			{ RaiseError => 1, PrintError => 0, AutoCommit => 1 });
-		my $tnames = $dbh->selectcol_arrayref(
-			q{SELECT name FROM sqlite_master }
-			. q{WHERE type='table' AND name NOT LIKE 'sqlite_%' }
-			. q{ORDER BY name});
-		for my $tname (@{ $tnames // [] }) {
-			my @cols;
-			my $sth = eval { $dbh->prepare("PRAGMA table_info(\"$tname\")") };
-			if ($sth) {
-				$sth->execute;
-				while (my $row = $sth->fetchrow_hashref) {
-					push @cols, $row->{name};
-				}
-			}
+	if (defined $file_path) {
+		# A JSON file's tables are its lists of objects; a SQLite file's are
+		# listed by Database::Join.
+		my $schema = $file_path =~ /\.json\z/i
+			? eval { Database::BI::Model::DataSource->json_lists($file_path) }
+			: eval { require Database::Join::Catalog; Database::Join::Catalog->schema(file => $file_path) };
+		return $self->reply->not_found unless $schema;
+		for my $table_info (@{$schema}) {
+			my $tname = $table_info->{name};
+			my @cols  = @{ $table_info->{columns} };
 			# Database::Abstraction refuses this name, so the card says so
-			# rather than linking to an error.
-			if ($tname !~ $TABLE_NAME_RE) {
+			# rather than linking to an error.  A JSON list's name never
+			# reaches SQL, so any name opens.
+			if ($tname !~ $TABLE_NAME_RE && $file_path !~ /\.json\z/i) {
 				(my $safe = $tname) =~ s/[^A-Za-z0-9_]/_/g;
 				$safe = "_$safe" unless $safe =~ /\A[A-Za-z_]/;
 				push @tables, { name => $tname, columns => \@cols, unusable => 1, safe_name => $safe };
@@ -10158,8 +10791,7 @@ sub tables_view ($self) {
 				. '&back_label=' . url_escape(ucfirst($db_label) . ' schema');
 			push @tables, { name => $tname, columns => \@cols, href => $open_url };
 		}
-		$dbh->disconnect;
-	}; return $self->reply->not_found if $@; }
+	}
 
 	$self->render(
 		template   => "$platform/$language/tables",
@@ -11224,7 +11856,7 @@ sub scatter_view ($self) {
 
 	require HTML::D3;
 	my $title   = "$y_col vs $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 800, height => 480)
 		->render_scatter_chart_snippet(\@points, {
 			animated           => 1,
 			x_label            => $x_col,
@@ -11345,7 +11977,7 @@ sub stacked_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Count by $cat_col and $seg_col"
 	                          : "$val_col by $cat_col and $seg_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 900, height => 500)
 		->render_stacked_bar_snippet(\@data, {
 			orient  => ($orient eq 'h') ? 'h' : 'v',
 			x_label => $cat_col,
@@ -11465,7 +12097,7 @@ sub combo_view ($self) {
 	my $eff_bar_lbl  = $bar_label  || $bar_col;
 	my $eff_line_lbl = $line_label || $line_col;
 	my $title        = "$eff_bar_lbl and $eff_line_lbl by $x_col";
-	my $snippet = HTML::D3->new(title => $title, width => 900, height => 500)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 900, height => 500)
 		->render_combo_snippet(\@data, {
 			bar_label  => $eff_bar_lbl,
 			line_label => $eff_line_lbl,
@@ -11645,7 +12277,7 @@ sub treemap_view ($self) {
 	require HTML::D3;
 	my $title   = $count_mode ? "Treemap of $cat_col by count" : "Treemap of $cat_col by $val_col";
 	$title     .= " coloured by $color_m->{label}" if $color_m;
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 500)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 800, height => 500)
 		->render_treemap_snippet(\@data, {
 			scheme => $scheme,
 			($color_m ? (color_scheme => $color_scheme, color_label => $color_m->{label}) : ()),
@@ -11771,7 +12403,7 @@ sub histogram_view ($self) {
 
 	require HTML::D3;
 	my $title   = "Distribution of $col";
-	my $snippet = HTML::D3->new(title => $title, width => 800, height => 480)
+	my $snippet = HTML::D3->new(nonce => $self->csp_nonce, title => $title, width => 800, height => 480)
 		->render_histogram_snippet(\@bin_data, {
 			binned  => 1,
 			x_label => $col,
@@ -12517,6 +13149,8 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			my %key = $self->_map_key($color_col, $color_rules, $color_default,
 				defined($options->{scheme}), $size_col, $size_range);
 			$osm_args{scale} = 1;
+			# Every <script> the map writes carries the page's nonce.
+			$osm_args{nonce} = $self->csp_nonce;
 			# Without a zoom the map opens on every marker, as the panel promises
 			$osm_args{fit} = 1 unless defined $options->{zoom};
 			%osm_args = (%osm_args, %key) if @{ $key{legend} // [] };
@@ -13400,9 +14034,7 @@ sub _color_hex {
 #
 # When a geocode cache was built, in the form the model store records.
 sub _iso8601_utc {
-	require POSIX;
-
-	return POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
+	return Database::BI::Util::iso8601_utc();
 }
 
 # _catalog_entry($self, $mf, $analyses) -> \%entry
@@ -13415,7 +14047,7 @@ sub _catalog_entry :Protected ($self, $mf, $analyses) {
 	my $mtime = (stat($path))[9] // 0;
 
 	require POSIX;
-	my $mtime_str = $mtime ? POSIX::strftime('%Y-%m-%d %H:%M UTC', gmtime($mtime)) : '';
+	my $mtime_str = $mtime ? Database::BI::Util::minute_stamp(gmtime($mtime)) . ' UTC' : '';
 
 	# Find which analyses reference this file.
 	# Normalize path separators so that Windows paths stored with backslashes
@@ -13521,13 +14153,30 @@ sub canvases_view ($self) {
 }
 
 # _share_secret($self) -> $secret_string
+#
+# The key share and embed tokens are signed with: config share_secret, else
+# one derived from the application's first secret.  It used to fall back to a
+# fixed string, the same on every install, so anyone could sign a token for
+# any canvas, with any expiry, and read it without the password.  The first
+# secret is random for each start unless config secrets sets it, so without
+# either a restart ends every link (_share_links_last says which).  It is
+# derived, not the secret itself, so a token is never a signature that the
+# session cookie or a map list would also accept.
 sub _share_secret :Protected ($self) {
 	my $s = $self->app->config('share_secret') // '';
-	unless (length $s) {
-		carp 'share_secret not configured; using insecure default';
-		$s = 'BI_DEFAULT_INSECURE_SECRET';
-	}
-	return $s;
+	return $s if !ref($s) && length $s;
+	require Digest::SHA;
+	return Digest::SHA::hmac_sha256_hex('Database::BI share tokens', $self->app->secrets->[0]);
+}
+
+# _share_links_last($self) -> 1 | 0
+#
+# Whether a share link outlives a restart: true when share_secret or secrets
+# is configured, so the key is the same next time.
+sub _share_links_last :Protected ($self) {
+	my $s       = $self->app->config('share_secret') // '';
+	my $secrets = $self->app->config('secrets');
+	return (!ref($s) && length $s) || (ref($secrets) eq 'ARRAY' && @{$secrets}) ? 1 : 0;
 }
 
 # _make_share_token($self, $id, $expires) -> $token_string
@@ -13555,7 +14204,12 @@ sub _verify_share_token :Protected ($self, $id, $token) {
 	require Digest::SHA;
 	my $secret   = $self->_share_secret;
 	my $expected = Digest::SHA::hmac_sha256_hex("$id|$expires", $secret);
-	return undef unless $hmac eq $expected;
+	return undef unless length($hmac) == length($expected);
+	# Every character is compared, so the time taken says nothing about how
+	# much of a guessed signature was right.
+	my $diff = 0;
+	$diff |= ord(substr($hmac, $_, 1)) ^ ord(substr($expected, $_, 1)) for 0 .. length($expected) - 1;
+	return undef if $diff;
 	return 1;
 }
 
@@ -13573,7 +14227,10 @@ sub analyses_share ($self) {
 	my $token   = $self->_make_share_token($id, $expires);
 	my $url     = $self->req->url->base->to_string . "/share/$id?token=" . url_escape($token);
 
-	$self->render(json => { token => $token, url => $url, expires => $expires });
+	$self->render(json => {
+		token => $token, url => $url, expires => $expires,
+		lasts_restart => $self->_share_links_last ? Mojo::JSON::true() : Mojo::JSON::false(),
+	});
 }
 
 # GET /share/:id?token=...
@@ -13622,8 +14279,14 @@ sub embed_view ($self) {
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
-	# X-Frame-Options: embed is opt-in.
+	# Every HTML page gets this from the after_dispatch hook in Database::BI;
+	# the page made to be framed says it itself, so it never depends on that.
+	# The sites embed_frame_ancestors names are allowed by frame-ancestors,
+	# which the browsers that know it follow in place of this header; those
+	# that know only this header refuse them, which is the safe way to fail.
 	$self->res->headers->header('X-Frame-Options' => 'SAMEORIGIN');
+	my @framers = Database::BI::_embed_frame_ancestors($self->app->config);
+	$self->stash(csp_frame_ancestors => \@framers) if @framers;
 
 	my @visuals = @{ $a->{visuals} // [] };
 	unless (@visuals) {
@@ -13745,6 +14408,8 @@ sub ask_api ($self) {
 	my $question = $self->param('q') // '';
 	return $self->render(json => { error => $MESSAGES{ask_no_question} }, status => 400)
 		unless length $question;
+	return $self->render(json => { error => sprintf($MESSAGES{ask_question_too_long}, $ASK_MAX_QUESTION) }, status => 400)
+		if length($question) > $ASK_MAX_QUESTION;
 
 	my ($src, $records, $columns, $left_label) = $self->_run_pipeline_source;
 	return $self->render(json => { error => 'Could not open data source' }, status => 404)
@@ -13763,6 +14428,9 @@ sub ask_api ($self) {
 		api_key  => $api_key,
 		model    => $self->app->config('ai_model')    // 'claude-haiku-5-5',
 	};
+
+	return $self->render(json => { error => sprintf($MESSAGES{ai_limit_reached}, _ai_calls_per_hour($self)) }, status => 429)
+		unless _ai_call_allowed($self);
 
 	my $result = Database::BI::Ask::ask(
 		question  => $question,
@@ -13840,9 +14508,37 @@ sub summary_api ($self) {
 		row_count => $row_count,
 		use_ai    => $use_ai,
 		ai_config => $ai_config,
+		ai_allowed => sub { _ai_call_allowed($self) },
 	);
 
 	return $self->render(json => $result);
+}
+
+# _ai_calls_per_hour($c) -> $n
+#
+# Config ai_calls_per_hour, else $AI_CALLS_PER_HOUR; 0 means no limit.
+sub _ai_calls_per_hour {
+	my ($c) = @_;
+	my $n = $c->app->config('ai_calls_per_hour');
+	return defined($n) && $n =~ /\A\d+\z/ ? $n : $AI_CALLS_PER_HOUR;
+}
+
+# _ai_call_allowed($c) -> 1 | 0
+#
+# Takes one provider call from this process's budget: the times of the calls
+# in the last hour, kept per application (tests build many in one process).
+# Returns 0, taking nothing, when the hour's calls are used up.
+my %AI_CALLS;
+sub _ai_call_allowed {
+	my ($c) = @_;
+	my $max = _ai_calls_per_hour($c);
+	return 1 unless $max;
+	my $now   = time;
+	my $calls = $AI_CALLS{ Scalar::Util::refaddr($c->app) } //= [];
+	@{$calls} = grep { $_ > $now - $AI_WINDOW_S } @{$calls};
+	return 0 if @{$calls} >= $max;
+	push @{$calls}, $now;
+	return 1;
 }
 
 # insights_view($self)
@@ -14548,7 +15244,7 @@ C<geocode=wait>, waits for the lookups as before.
 
 The map page never shows the L<HTML::OSM> Nominatim search box: C<search => 0>
 is always passed, so nothing typed on the page leaves the reader's machine.
-L<HTML::OSM> 0.13 or later is the renderer; with an older optional install (or
+L<HTML::OSM> 0.14 or later is the renderer; with an older optional install (or
 none at all) the page still renders the marker count and a warning, rather than
 failing.
 
@@ -14780,7 +15476,9 @@ rasterise their own SVG in the browser.
 
 =head4 INPUT / OUTPUT
 
-  POST /api/analyses/:id/share   -> 200 { token, url, expires }, 400 invalid id, 404 unknown
+  POST /api/analyses/:id/share   -> 200 { token, url, expires, lasts_restart }, 400 invalid id, 404 unknown
+                                    (lasts_restart: false when neither share_secret nor
+                                    secrets is set, so a restart ends the link)
   GET  /share/:id?token=...      -> 200 text/html, 400 invalid id, 401 missing token,
                                     403 bad or expired token, 404 unknown or no visuals
   GET  /embed/:id?token=...      -> as /share/:id, plus 422 when the data cannot be opened;
@@ -14835,14 +15533,19 @@ returned.  Absent when C<ai_api_key> is not configured.
 =head4 INPUT
 
   l        spec    Required.  Left table spec.
-  q        string  Required.  The question.
+  q        string  Required.  The question.  At most 500 characters.
   f        string  Optional, repeatable.  Result filters.
 
 =head4 OUTPUT
 
   200 application/json  { spec, url, valid => 1 }
-  400 application/json  { error }
+  400 application/json  { error } (missing l or q; q over 500 characters:
+                                   ask_question_too_long)
+  401 application/json  { error } (password_hash set, not logged in)
   404 application/json  { error } (unopenable source)
+  429 application/json  { error } (ai_calls_per_hour provider calls already made
+                                   in the last hour, shared with summary_api:
+                                   ai_limit_reached)
   503 application/json  { error } (no ai_api_key)
 
 =head2 summary_api
@@ -14862,8 +15565,13 @@ paths).  Results are cached in-process for one hour.
 
 =head4 OUTPUT
 
-  200 application/json  { summary, facts, ai => 0|1 }
+  200 application/json  { text, source, cached }
+        source: template (no ai, or no key), llm, template_fallback (the
+                provider failed), or template_limited (ai_calls_per_hour
+                reached: the template text, not cached)
+        cached: 1 when the text came from the hour's cache, which costs no call
   400 application/json  { error }
+  401 application/json  { error } (password_hash set, not logged in)
   404 application/json  { error }
 
 =head2 geo_list / geo_save / geo_delete
@@ -15082,6 +15790,52 @@ the extract it replaces.  The extract's table is C<extract>, not C<data>:
 L<Database::Abstraction> cannot read a table called C<data>.  The file's column
 order is stored with it and passed back as C<column_order>, because a SQLite
 backend lists columns alphabetically.
+
+=cut
+
+=head2 request_refusal
+
+A package function, not a route: the first C<before_dispatch> hook in
+L<Database::BI> calls it for every request, and answers C<403> with its message
+when it returns one.  It keeps other machines away when there is no password,
+and keeps another site's page, acting through the reader's browser (where a
+logged-in session goes with it), away from C<POST /export> (which writes
+files), C</open> (which reads them) and every other route.
+
+=over 4
+
+=item * B<No password, this machine only.>  With no C<password_hash>, a request
+whose remote address is not loopback (C<127.0.0.0/8>, C<::1>) is refused, as is
+one a trusted reverse proxy says came from such an address.  Startup already
+refuses to listen anywhere else without a password; this catches a proxy on
+this machine that brings other machines' requests in.
+
+=item * B<DNS rebinding.>  The C<Host> must be C<localhost>, a name ending in
+C<.localhost>, an IP address, or a name in config C<allowed_hosts>
+(C<*.example.com> for its subdomains, C<*> for every name).  Behind a trusted
+reverse proxy (C<MOJO_REVERSE_PROXY>, hypnotoad's C<proxy>), only a configured
+C<allowed_hosts> is checked.
+
+=item * B<Cross-site writes.>  For every method but C<GET>, C<HEAD> and
+C<OPTIONS>: a C<Sec-Fetch-Site> must be C<same-origin> or C<none>; without one,
+an C<Origin> must name this host and port (or, behind a trusted proxy,
+C<X-Forwarded-Host>).  A request with neither header did not come from a page,
+and is let through.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	($c)   # a controller of the application
+
+=head4 OUTPUT
+
+	undef                       # let the request through
+	error_remote_needs_password (string) # no password, and not from this machine
+	error_host_refused (string) # the Host is not one this server answers to
+	error_cross_site (string)   # another site's page sent a write
 
 =cut
 

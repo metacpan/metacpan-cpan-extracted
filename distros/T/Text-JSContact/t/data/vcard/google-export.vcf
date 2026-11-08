@@ -1,0 +1,32 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:Alice Example
+N:Example;Alice;;;
+NICKNAME:Ally
+EMAIL;TYPE=INTERNET;TYPE=HOME:alice.example@gmail.example
+EMAIL;TYPE=INTERNET;TYPE=WORK:alice@corp.example
+TEL;TYPE=CELL:+1 650-555-0123
+TEL;TYPE=WORK:+1 650-555-0199
+item1.TEL:+1 650-555-0100
+item1.X-ABLabel:Grandma's house
+ADR;TYPE=HOME:;;1600 Amphitheatre Pkwy;Mountain View;CA;94043;United States
+item2.ORG:Example Corp
+item2.X-ABLabel:
+item3.TITLE:Staff Engineer
+item3.X-ABLabel:
+BDAY:1990-04-01
+item4.URL:https\://alice.example.com/
+item4.X-ABLabel:_$!<HomePage>!$_
+item5.X-ABDATE:2015-09-12
+item5.X-ABLabel:_$!<Anniversary>!$_
+item6.X-ABDATE:2018-05-05
+item6.X-ABLabel:First marathon
+item7.X-ABRELATEDNAMES:Bob Example
+item7.X-ABLabel:_$!<Spouse>!$_
+item8.IMPP:xmpp:alice@jabber.example
+item8.X-ABLabel:Jabber
+NOTE:Met at the 2019 conference\, talked about Perl.
+CATEGORIES:myContacts,starred,Running club
+PHOTO:https://lh3.googleusercontent.com/contacts/AG6tpzE-example
+X-GOOGLE-ETAG:"%EgcBAj0LPzcuGgQBAgUHIgxUUk1ITzZhZjlSOD0="
+END:VCARD

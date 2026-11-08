@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Moose::Role;
 requires qw(get_routes service_name);
@@ -23,6 +23,12 @@ has 'api_version' => (
     is      => 'ro',
     isa     => 'Int',
     default => 1,
+);
+has 'api_prefix' => (
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub { return '/v' . $_[0]->api_version; },
 );
 has 'jsonp' => (
     is      => 'rw',
@@ -48,7 +54,7 @@ has 'static_path' => ( is => 'ro', isa => 'Str', default => 'static' );
 has 'using_frontend_proxy' => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0,
+    default => sub { $ENV{USING_FRONTEND_PROXY} // 0 },
 );
 
 has 'router' => (
@@ -112,6 +118,9 @@ sub plack_handler {
         static_dir           => $self->static_dir,
         jsonp                => $self->jsonp,
         using_frontend_proxy => $self->using_frontend_proxy,
+        server_host          => $env->{SERVER_NAME},
+        server_port          => $env->{SERVER_PORT},
+        server_scheme        => $env->{'psgi.url_scheme'} || 'http',
         pending_ref          => \$self->{pending_req},
         request_timeout      => $self->request_timeout,
     );
@@ -133,16 +142,16 @@ sub plack_handler {
             return $this_req->respond( 429, [], 'too many requests' );
         }
 
-        # API version
-        my ( $version, $sub_path_info );
-        if ( $this_req->path =~ qr{^/v(\d+?)(/.*)$} ) {
-            $version       = $1;
-            $sub_path_info = $2;
+        # API prefix
+        my $sub_path_info;
+        my $api_prefix = quotemeta( $self->api_prefix );
+        if ( $this_req->path =~ qr{^$api_prefix(/.*)$} ) {
+            $sub_path_info = $1;
         }
 
-        # without version path redirect to the latest version
-        return $this_req->redirect( '/v' . $self->api_version . '/' )
-            unless $version;
+        # without configured API prefix redirect to the API root
+        return $this_req->redirect( $self->api_prefix . '/' )
+            unless defined $sub_path_info;
 
         if ( my $match = $self->router->match($sub_path_info) ) {
             my $func = $match->{mapping}->{ $this_req->method };
@@ -301,10 +310,25 @@ See L<https://time.meon.eu/> and the code in L<Async::Microservice::Time>.
 
 =head1 ATTRIBUTES
 
+=head2 api_prefix
+
+API path prefix used for request routing and redirects.
+
+Defaults to C<'/v1'> (built from C<api_version>). You can override it in the
+constructor, for example C<'/search_1'>.
+
 =head2 static_path
 
 URL path prefix for OpenAPI files. Defaults to C<'static'>. Can be overridden
 by passing it to the constructor.
+
+=head2 using_frontend_proxy
+
+Controls whether proxy-forwarded headers are trusted for base URL parsing.
+
+Defaults to C<< $ENV{USING_FRONTEND_PROXY} // 0 >>.
+
+See L<Async::MicroserviceReq/using_frontend_proxy> for more details.
 
 =head2 file_placeholder
 

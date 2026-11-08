@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>[% title | html %]</title>
-<script src="[% d3_url | html %]"></script>
+<script nonce="[% csp_nonce | html %]" src="[% d3_url | html %]"></script>
 [% card_head %]
 <style>
 *, *::before, *::after { box-sizing: border-box; }

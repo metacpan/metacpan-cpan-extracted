@@ -11,5 +11,30 @@ t/injection.t
 t/online-services.t
 t/patch.t
 t/rfc9555.t
+t/uri-values.t
+t/rfc9982.t
+t/roundtrip-vcard.t
+t/data/vcard/apple-company.vcf
+t/data/vcard/apple-group.vcf
+t/data/vcard/apple-ios-person.vcf
+t/data/vcard/cyrus-carddav-v4.vcf
+t/data/vcard/google-export.vcf
+t/data/vcard/rfc6350-altid.vcf
+t/data/vcard/rfc6350-s8.vcf
+t/data/vcard/rfc9555-examples.vcf
+t/data/vcard/rfc9555-group.vcf
+t/data/vcard/rfc9555-phonetic.vcf
+t/roundtrip-jscontact.t
+t/data/jscontact/custom-anniversary.json
+t/data/jscontact/full.json
+t/data/jscontact/group.json
+t/data/jscontact/labels.json
+t/data/jscontact/phonetic.json
+t/data/jscontact/rfc9553-dates.json
+t/data/jscontact/rfc9553-only.json
+t/data/jscontact/utf8.json
+t/patch-minimal.t
+t/deterministic.t
+t/original.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

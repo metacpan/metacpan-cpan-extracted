@@ -185,8 +185,8 @@ $t->app->config->{geocoder} = $stub;
 # the renderer in the page and draws nothing, so every assertion here about
 # markers, popups and Leaflet assets would fail for a reason the file cannot
 # test.  The degraded page is covered by the in-process stand-in instead.
-my $have_map_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
-plan skip_all => 'HTML::OSM 0.13 or later is needed to draw a map'
+my $have_map_renderer = eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 };
+plan skip_all => 'HTML::OSM 0.14 or later is needed to draw a map'
 	unless $have_map_renderer;
 
 # ===========================================================================
@@ -392,7 +392,7 @@ subtest 'A saved map visual renders on a canvas with unique Leaflet ids' => sub 
 		{ 'Content-Type' => 'application/json' },
 		encode_json({ kind => 'map', encode => { lat => 'lat', lon => 'lon' }, title => 'Third map' }),
 	)->status_is(201)->json_is('/visual' => 2)
-	 ->json_like('/html' => qr{<script>\s*\(function \(\) \{},
+	 ->json_like('/html' => qr{<script\b[^>]*>\s*\(function \(\) \{},
 		'a map card returned to a page comes back scoped, like every other card');
 
 	$t->get_ok("/a/$cid")->status_is(200);
@@ -408,11 +408,11 @@ subtest 'A saved map visual renders on a canvas with unique Leaflet ids' => sub 
 	# A map card's script is scoped like every other card's -- two maps on one
 	# page are two scripts declaring the same names -- and it is scoped where
 	# every card is, by the renderer, so once rather than once per layer.
-	my ($script) = $body =~ m{(<script>(?:(?!</script>).)*L\.map\('map-0'\).*?</script>)}s;
+	my ($script) = $body =~ m{(<script\b[^>]*>(?:(?!</script>).)*L\.map\('map-0'\).*?</script>)}s;
 	ok($script, 'the first map\'s own script is found');
 	is(scalar(() = ($script // '') =~ /\(function \(\) \{/g), 1,
 		'and it is closed over one function of its own, not two');
-	like($script // '', qr{\A<script>\s*\(function \(\) \{},
+	like($script // '', qr{\A<script\b[^>]*>\s*\(function \(\) \{},
 		'which is the outermost thing it does');
 	like($body, qr/class="canvas-map"/, 'the map element carries the card class');
 	unlike($body, qr/L\.map\('map'\)/, 'the shared HTML::OSM id is not left behind');
@@ -847,7 +847,7 @@ sub _fake_renderer {
 subtest 'a missing HTML::OSM degrades instead of returning 500' => sub {
 	_fake_renderer(0, undef)
 		->status_is(200, 'the map page still renders')
-		->content_like(qr/HTML::OSM 0\.13 or later/,
+		->content_like(qr/HTML::OSM 0\.14 or later/,
 			'the warning names the version that is required')
 		->content_like(qr/and it is not installed/,
 			'the warning says the module is not installed')
@@ -859,10 +859,10 @@ subtest 'a missing HTML::OSM degrades instead of returning 500' => sub {
 			'and the rows without a coordinate are still counted');
 };
 
-subtest 'an HTML::OSM older than 0.13 degrades instead of returning 500' => sub {
+subtest 'an HTML::OSM older than 0.14 degrades instead of returning 500' => sub {
 	_fake_renderer(0, '0.11')
 		->status_is(200, 'the map page still renders')
-		->content_like(qr/HTML::OSM 0\.13 or later/,
+		->content_like(qr/HTML::OSM 0\.14 or later/,
 			'the warning names the version that is required')
 		->content_like(qr/installed HTML::OSM is 0\.11/,
 			'the warning names the version that is installed')
@@ -956,7 +956,7 @@ subtest 'a canvas map card is coloured and sized as the map it was saved from' =
 
 	$t->get_ok("/a/$cid")->status_is(200);
 	my $body = $t->tx->res->body;
-	my @scripts = $body =~ m{(<script>(?:(?!</script>).)*?L\.map\('map-\d'\).*?</script>)}sg;
+	my @scripts = $body =~ m{(<script\b[^>]*>(?:(?!</script>).)*?L\.map\('map-\d'\).*?</script>)}sg;
 	is(scalar @scripts, 3, 'three map cards');
 	like($scripts[0], qr/%23ff0000/, 'the coloured card colours a marker by its rule');
 	like($scripts[0], qr/%2300ff00/, 'and the rest by its default');
@@ -1212,7 +1212,7 @@ subtest 'A browser is shown the map at once, with the places to look up listed' 
 	unlike($body, qr/class="map-notes"/, 'the notes wait until the places are looked up');
 	like($body, qr{fetch\('/geo/lookup'}, 'the page posts to /geo/lookup');
 
-	my ($json) = $body =~ m{<script type="application/json" id="map-pending">(.*?)</script>}s;
+	my ($json) = $body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
 	ok(defined($json), 'the places are listed for the script');
 	my $pending = decode_json($json // '[]');
 	is_deeply([ map { $_->{place} } @{$pending} ], [qw(Walmer Sandwich)], 'in the order of their rows');
@@ -1289,7 +1289,7 @@ subtest '/geo/lookup: a place that cannot be looked up now is held, not remember
 
 	# Listed by the page while there is a geocoder to ask...
 	$t->get_ok($url, $html)->status_is(200);
-	my ($json) = $t->tx->res->body =~ m{<script type="application/json" id="map-pending">(.*?)</script>}s;
+	my ($json) = $t->tx->res->body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
 	my ($item) = @{ decode_json($json // '[]') };
 	is($item->{place}, 'Nowhere Yet', 'the page lists the place');
 

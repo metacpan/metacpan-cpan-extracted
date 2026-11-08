@@ -2,6 +2,16 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.11.0 - 2026-11-07
+
+### Features
+
+- Download the build a database.updated webhook names ([`5cc9d6e`](https://github.com/vpndetection-io/sdk-perl/commit/5cc9d6e58cebea3c07a658c83eb3316c0554de67))
+
+### Fixes
+
+- Re-pin the spec to 2026.11.05: the download's build parameter ([`f7b0582`](https://github.com/vpndetection-io/sdk-perl/commit/f7b05829b93452a3f022aba1f9164cd6afe7cdae))
+
 ## 3.10.3 - 2026-11-05
 
 ### Fixes

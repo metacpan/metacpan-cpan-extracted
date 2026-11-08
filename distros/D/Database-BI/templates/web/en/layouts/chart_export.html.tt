@@ -11,8 +11,29 @@
 
     biBrandSvg, biBrandCanvas: put the name the page footer shows in the bottom
     right of a saved chart, in a strip of its own below everything else, so it
-    cannot land on an axis label.  The PDF's copy is a link. -%]
-<script>
+    cannot land on an axis label.  The PDF's copy is a link.
+
+    The export buttons name their function in data-export (biBarExportPNG,
+    say) rather than in an onclick attribute, which the Content-Security-Policy
+    would not run.  Only a name of that shape is called, so markup that reached
+    the page cannot use the attribute to call anything else. -%]
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var EXPORT_NAME = /^bi[A-Za-z]*Export(?:SVG|PNG|PDF)$/;
+  function bindExports() {
+    Array.prototype.forEach.call(document.querySelectorAll('button[data-export]'), function (b) {
+      var name = b.getAttribute('data-export');
+      if (!EXPORT_NAME.test(name)) return;
+      b.addEventListener('click', function () {
+        if (typeof window[name] === 'function') window[name]();
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindExports);
+  else bindExports();
+}());
+</script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var PDF_SCALE = 3;
   var PX_TO_PT  = 0.75;

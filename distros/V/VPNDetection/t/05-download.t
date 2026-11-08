@@ -96,6 +96,40 @@ subtest 'the bytes variant agrees with the streamed copy' => sub {
     is($bytes, do { local $/; <$fh> }, 'and the same bytes');
 };
 
+subtest 'the link is for the live build unless a build is given' => sub {
+    my $origin = origin_for(\&whole_dataset);
+    my ($dir, $path) = temp_path();
+    my $db = VPNDetection->new(base_url => $origin->url)->database;
+
+    $db->download_url('cdn_ip_v1', 'csvgz');
+    $db->download_url('cdn_ip_v1', 'csvgz', build => '20261105.0t53s5');
+    $db->download('cdn_ip_v1', 'csvgz', $path, build => '20261105.0t53s5');
+    $db->download_bytes('cdn_ip_v1', 'csvgz', build => '20261105.0t53s5');
+
+    my @minted = grep { $_->{path} eq '/api/v1/database/download' } $origin->requests;
+    is_deeply([map { $_->{query} } @minted], [
+        { id => 'cdn_ip_v1', format => 'csvgz' },
+        ({ id => 'cdn_ip_v1', format => 'csvgz', build => '20261105.0t53s5' }) x 3,
+    ], 'each call asks for the build it was given, and none without one');
+};
+
+subtest 'a build no longer kept is a bad_request with its 410, sent once' => sub {
+    # A pruned build is gone for good, so asking again cannot help.
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        $c->render(status => 410, json => { rc => 'BUILD_GONE' });
+    });
+    my $db = VPNDetection->new(base_url => $origin->url, retries => 3)->database;
+
+    my $bytes = eval { $db->download_bytes('cdn_ip_v1', 'csvgz', build => '20261029.abc123') };
+
+    ok(!defined $bytes, 'nothing was downloaded');
+    isa_ok($@, 'VPNDetection::Error', 'it failed with');
+    is($@->kind, 'bad_request', 'a bad_request');
+    is($@->status, 410, 'carrying the 410');
+    is_deeply([$origin->paths], ['/api/v1/database/download'], 'asked for once');
+};
+
 subtest 'a truncated transfer fails loudly and leaves nothing behind' => sub {
     # Announces the whole dataset, sends a third of it, then hangs up. Nothing in
     # the protocol distinguishes that from a complete body except the length that

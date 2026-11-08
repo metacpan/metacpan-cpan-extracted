@@ -1,0 +1,65 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6
+KIND:individual
+PRODID:ACME Contacts App version 1.23.5
+REV:19951031T222710Z
+CREATED:19940930T143510Z
+LANGUAGE:de-AT
+FN:John Q. Public, Esq.
+N;SORT-AS="Stevenson,John Philip":
+ Stevenson;John;Philip,Paul;Dr.;Jr.,M.D.,A.C.P.;;Jr.
+NICKNAME:Johnny
+GRAMGENDER:NEUTER
+PRONOUNS;PREF=2:they/them
+PRONOUNS;PREF=1:xe/xir
+PHOTO:https://www.example.com/pub/photos/jqpublic.gif
+LOGO:https://www.example.com/pub/logos/abccorp.jpg
+SOUND:CID:JOHNQPUBLIC.19960229T080000.xyzMail@example.com
+BDAY:19531015T231000Z
+BIRTHPLACE:
+ 123 Main Street\nAny Town, CA 91921-1234\nU.S.A.
+DEATHDATE:19960415
+DEATHPLACE:
+ 5 Court Street\nNew England, ND 58647\nU.S.A.
+ANNIVERSARY:19860201
+ADR;TYPE=work;CC=US:
+ ;;54321 Oak St;Reston;VA;20190;USA;;;;54321;Oak St;;;;;;
+EMAIL;TYPE=work:jqpublic@xyz.example.com
+EMAIL;PREF=1:jane_doe@example.com
+IMPP;PREF=1:xmpp:alice@example.com
+LANG;TYPE=work;PREF=1:en
+LANG;TYPE=work;PREF=2:fr
+LANG;TYPE=home:fr
+SOCIALPROFILE;SERVICE-TYPE=Mastodon:https://example.com/@foo
+TEL;PROP-ID=PHONE-A;VALUE=uri;PREF=1;TYPE="voice,home"
+ :tel:+1-555-555-5555;ext=5555
+TEL;PROP-ID=PHONE-B;VALUE=uri;TYPE=home
+ :tel:+33-01-23-45-67
+CONTACT-URI;PREF=1:mailto:contact@example.com
+ORG;SORT-AS="ABC":ABC\, Inc.;North American Division;Marketing
+RELATED;TYPE=friend:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf7
+RELATED;TYPE=contact:https://example.com/directory/john.vcf
+RELATED;VALUE=text:Please contact my deputy John for any inquiries.
+TITLE:Research Scientist
+EXPERTISE;LEVEL=beginner;INDEX=2:Chinese literature
+EXPERTISE;INDEX=1;LEVEL=expert:chemistry
+HOBBY;INDEX=1;LEVEL=high:reading
+HOBBY;INDEX=2;LEVEL=high:sewing
+INTEREST;INDEX=1;LEVEL=medium:r&b music
+INTEREST;INDEX=2;LEVEL=high:rock&roll music
+ORG-DIRECTORY;INDEX=1:https://directory.mycompany.example.com
+ORG-DIRECTORY;PREF=1:ldap://ldap.tech.example/o=Tech,ou=Engineering
+SOURCE:https://dir.example.com/addrbook/jdoe/Jean%20Dupont.vcf
+CATEGORIES:internet,IETF,Industry,Information Technology
+NOTE;CREATED=20221123T150132Z;AUTHOR-NAME="John":
+ Office hours are from 0800 to 1715 EST\, Mon-Fri.
+URL:https://example.org/restaurant.french/~chezchic.html
+KEY:https://www.example.com/keys/jdoe.cer
+CALADRURI;PREF=1:mailto:janedoe@example.com
+CALADRURI:https://example.com/calendar/jdoe
+CALURI;PREF=1:https://cal.example.com/calA
+CALURI;MEDIATYPE=text/calendar:https://ftp.example.com/calA.ics
+FBURL;PREF=1:https://www.example.com/busy/janedoe
+FBURL;MEDIATYPE=text/calendar:https://example.com/busy/project-a.ifb
+END:VCARD

@@ -18,28 +18,27 @@ WriteMakefile(
 	AUTHOR		=> 'Nigel Horne <njh@nigelhorne.com>',
 	LICENSE		  => 'gpl_2',
 	MIN_PERL_VERSION => '5.028000',	# sub NAME :Attr ($sig) -- attributes before the signature -- needs 5.28
-	EXE_FILES	=> ['script/database-bi'],
+	EXE_FILES	=> [qw(script/database-bi script/bi-extract script/bi-geocode script/bi-alert)],	# each has POD, so each gets a man page
 	PREREQ_PM => {
 		'Carp'		=> 0,
 		'Cwd'		=> 0,		# For realpath() in the data_dir guard (Dashboard.pm)
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
 		'CGI::Lingua'		=> '0.85',
-		'Database::Abstraction'	=> '0.54',	# 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
-		'Database::Join' => '0.009.0',	# 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
-		'DBI'		=> 0,
+		'Database::Abstraction'	=> '0.55',	# 0.55 requires the CSV and XML readers it loads (DBD::CSV, Text::xSV::Slurp, XML::Simple); 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
+		'Database::Join' => '0.011.1',	# 0.011.1: a driver failure always has a message; 0.011.0 added Database::Join::Catalog, through which every table list, column list and SQLite write goes; 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'Net::SFTP::Foreign' => 0,
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
 		'File::Spec'	=> '3.40',
-		'File::Temp'	=> '0.2308',	# Before this, on a BSD, a new temporary file was held under an exclusive lock, so Database::Join's SQLite spill hung and failed with "database is locked"
 		'List::Util'	=> '1.40',
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
-		'Mojo::Base' => 0,
-		'Mojo::JSON' => 0,
-		'HTML::D3' => '0.29',	# 0.29 colours treemap tiles by a measure, takes a combo scheme and escapes tooltip text; 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
+		'HTML::D3' => '0.30',	# 0.30 puts a Content-Security-Policy nonce on its scripts; 0.29 colours treemap tiles by a measure, takes a combo scheme and escapes tooltip text; 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TagCloud' => '0.38',	# word cloud page (/wordcloud)
 		'HTML::TableExtract'	=> 0,
 		'HTTP::Request'			=> 0,		# Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
+		'HTTP::Message'			=> 0,		# HTTP::Response, for SafeUA's refusals (the dist HTTP::Request comes from)
+		'URI'				=> 0,		# _is_safe_url's early check of an import URL
+		'Encode'			=> 0,		# Extract.pm and Summary.pm (core, listed for completeness)
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
@@ -49,9 +48,10 @@ WriteMakefile(
 		'Mojolicious::Plugin::TemplateToolkit' => 0,
 		'Params::Get'	=> 0.17,
 		'Params::Validate::Strict'	=> '0.41',
+		'Crypt::URandom'	=> 0,		# The login's password salt (script/database-bi password); Windows has no /dev/urandom
 		'Digest::MD5'		=> 0,		# For Extract.pm fingerprinting (Phase 4.1)
-		'Digest::SHA'		=> 0,		# For HMAC-SHA256 share tokens in Dashboard.pm (Phase 4.6; core since Perl 5.10)
-		'MIME::Base64'		=> '3.11',	# For encode_base64url/decode_base64url in share tokens (Phase 4.6)
+		'Digest::SHA'		=> 0,		# HMAC-SHA256 share tokens, and the login's PBKDF2 password hash (core since Perl 5.10)
+		'MIME::Base64'		=> '3.11',	# encode_base64url/decode_base64url in share tokens; the stored password hash
 		'Readonly'		=> 0,
 		'Socket'	=> '2.010',
 		'Excel::Writer::XLSX'	=> '1.07',
@@ -61,8 +61,8 @@ WriteMakefile(
 		'Text::CSV'	=> 0,		# Files with no header row; script/bi-alert's fallback reader when Database::Abstraction cannot open the file
 		'version'        => '0.77',
 	}, TEST_REQUIRES => {
+		'DBI' => 0,	# SQLite fixtures; the application itself uses Database::Join::Catalog
 		'DBD::CSV' => 0,
-		'Encode' => 0,
 		'JSON::MaybeXS' => 0,	# The browser tests speak Marionette and decode its frames
 		'Test::DescribeMe' => 0,	# Author tests (t/pod.t, t/manifest.t, t/version.t) declare themselves with this; the tools they need are optional and skipped without them
 		'Test::Memory::Cycle' => 0,
@@ -114,7 +114,9 @@ WriteMakefile(
 					'DBD::MariaDB' => 0,
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
-					'HTML::OSM' => '0.13'
+					'HTML::OSM' => '0.14',
+					# script/bi-alert reads CSV faster with it, and falls back to Text::CSV.
+					'Text::CSV_XS' => 0
 				}
 			}, test => {
 				recommends => {

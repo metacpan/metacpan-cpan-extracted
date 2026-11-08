@@ -56,7 +56,7 @@
          value="[% stats_percentile %]">
   <button type="submit" class="btn-secondary">Apply</button>
 </form>
-<script>
+<script nonce="[% csp_nonce | html %]">
 // The page can be opened from a filtered table, so keep the rest of the query
 // string: the level is the only thing this control changes.
 (function () {

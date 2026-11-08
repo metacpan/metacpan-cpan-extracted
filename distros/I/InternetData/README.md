@@ -76,6 +76,14 @@ my $url = $client->database->download_url($id, 'csvgz');
 
 `download_url` hands back the link rather than the bytes, so you choose how to move the file, hand it to a downloader, or pass it on without passing on your API key. The link is presigned and authorizes itself; it authorizes the START of a transfer, so one already running is not interrupted when it lapses. The client never follows that redirect for you. `download` and `download_bytes` do follow it, and that second request carries no API key: object storage has no business holding your credential.
 
+Each of the three downloads the build that is live unless you name one. A `database.updated` webhook names the build it announces and carries its `sha256`, so a receiver that downloads after the next publish asks for that build to get the file the hash is of:
+
+```perl
+$client->database->download('vpn_ip_v1', 'mmdb', './vpn_ip_v1.mmdb', build => $event->{data}{build});
+```
+
+A build is kept 7 days. Past that the call dies with a `bad_request` whose message is `BUILD_GONE`, and downloading without `build` fetches the live one.
+
 The per-request timeout that bounds an API call is lifted for a transfer. `retries` covers the transfer only until its first byte reaches you: object storage failing before then is retried like any server error, but a transfer that dies part way is not repeated, since a second copy would append to the bytes already written.
 
 A format is `csvgz` or `mmdb`, and `InternetData::Database::FORMATS` lists them. Anything else is refused before a request is made.

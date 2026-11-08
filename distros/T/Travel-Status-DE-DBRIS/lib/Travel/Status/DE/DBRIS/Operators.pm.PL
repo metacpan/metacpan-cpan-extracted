@@ -23,7 +23,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 # Automatically generated, see share/stations.json
 my %admin_id_to_operator = (

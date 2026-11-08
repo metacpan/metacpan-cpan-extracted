@@ -1,0 +1,38 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    },
+    "dbio-core": {
+      "git": "https://codeberg.org/dbio/dbio.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr",
+      "dbio-consolidate-release@dbio-core",
+      "dbio-coordination@dbio-core",
+      "dbio-perl-pod@dbio-core",
+      "dbio-perl-release@dbio-core",
+      "dbio-perl-syntax@dbio-core"
+    ],
+    "agents": [
+      "dbio-release-manager@dbio-core"
+    ],
+    "rules": [
+      "dbio-rules@dbio-core"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

@@ -5,66 +5,93 @@ use lib '../lib';
 
 use Test::More;
 
+# Before Validator::LIVR: it replaces the "time" of the modules loaded after it
+use Test::MockTime qw/set_fixed_time restore_time/;
+
 use FindBin qw/$Bin/;
 use JSON;
 use Term::ANSIColor;
 use File::Find;
 use Validator::LIVR;
 
-iterate_test_data('test_suite/positive' => sub {
+# The LIVR 2.0 test suite, and the LIVR 2.5 draft test suite with the same layout
+foreach my $suite ( 'test_suite', 'test_suite_2.5' ) {
+    iterate_test_data("$suite/positive" => sub {
+        my $data = shift;
+
+        my $validator = new_validator($data);
+        my $output = $validator->validate( $data->{input} );
+
+        ok(! $validator->get_errors(), 'Validator should contain no errors' ) or diag explain {
+            got_errors => $validator->get_errors(),
+            test_data  => $data,
+        };
+
+        is_deeply( $output, $data->{output}, 'Validator should return validated data' );
+    });
+
+
+    iterate_test_data("$suite/negative" => sub {
+        my $data = shift;
+
+        my $validator = new_validator($data);
+        my $output = $validator->validate( $data->{input} );
+
+        ok(!$output, 'Validator should return false');
+
+        is_deeply( $validator->get_errors(), $data->{errors}, 'Validator should contain valid errors' )
+            or (diag(explain({ got_errors => $validator->get_errors(), test_data => $data })) && exit);
+    });
+
+
+    iterate_test_data("$suite/aliases_positive" => sub {
+        my $data = shift;
+
+        my $validator = new_validator($data);
+        my $output = $validator->validate( $data->{input} );
+
+        ok(! $validator->get_errors(), 'Validator should contain no errors' ) or diag explain $validator->get_errors();
+        is_deeply( $output, $data->{output}, 'Validator should return validated data' );
+    });
+
+
+    iterate_test_data("$suite/aliases_negative" => sub {
+        my $data = shift;
+
+        my $validator = new_validator($data);
+        my $output = $validator->validate( $data->{input} );
+
+        ok(!$output, 'Validator should return false');
+
+        is_deeply( $validator->get_errors(), $data->{errors}, 'Validator should contain valid errors' );
+    });
+}
+
+
+# Schemas that must not build: the case passes when prepare() dies
+iterate_test_data('test_suite_2.5/schema_errors' => sub {
     my $data = shift;
 
-    my $validator = Validator::LIVR->new( $data->{rules} );
-    my $output = $validator->validate( $data->{input} );
-
-    ok(! $validator->get_errors(), 'Validator should contain no errors' ) or diag explain {
-        got_errors => $validator->get_errors(),
-        test_data  => $data,
-    };
-
-    is_deeply( $output, $data->{output}, 'Validator should return validated data' );
-});
-
-
-iterate_test_data('test_suite/negative' => sub {
-    my $data = shift;
-
-    my $validator = Validator::LIVR->new( $data->{rules} );
-    my $output = $validator->validate( $data->{input} );
-
-    ok(!$output, 'Validator should return false');
-
-    is_deeply( $validator->get_errors(), $data->{errors}, 'Validator should contain valid errors' )
-        or (diag(explain({ got_errors => $validator->get_errors(), test_data => $data })) && exit);
-});
-
-
-iterate_test_data('test_suite/aliases_positive' => sub {
-    my $data = shift;
-
-    my $validator = Validator::LIVR->new( $data->{rules} );
-    $validator->register_aliased_rule($_) for @{ $data->{aliases} };
-    my $output = $validator->validate( $data->{input} );
-
-    ok(! $validator->get_errors(), 'Validator should contain no errors' ) or diag explain $validator->get_errors();
-    is_deeply( $output, $data->{output}, 'Validator should return validated data' );
-});
-
-
-iterate_test_data('test_suite/aliases_negative' => sub {
-    my $data = shift;
-
-    my $validator = Validator::LIVR->new( $data->{rules} );
-    $validator->register_aliased_rule($_) for @{ $data->{aliases} };
-
-    my $output = $validator->validate( $data->{input} );
-
-    ok(!$output, 'Validator should return false');
-
-    is_deeply( $validator->get_errors(), $data->{errors}, 'Validator should contain valid errors' );
+    my $is_built = eval { new_validator($data)->prepare(); 1 };
+    ok( !$is_built, 'Building the validator should die' ) or diag explain $data->{rules};
 });
 
 done_testing;
+
+# A validator with the aliases of the case. options.json fixes the current time, such as
+# "2026-10-18T12:00:00Z", until the next case
+sub new_validator {
+    my $data = shift;
+
+    restore_time();
+    set_fixed_time( $data->{options}{now}, '%Y-%m-%dT%H:%M:%SZ' ) if $data->{options} && $data->{options}{now};
+
+    my $validator = Validator::LIVR->new( $data->{rules} );
+
+    $validator->register_aliased_rule($_) for @{ $data->{aliases} || [] };
+
+    return $validator;
+}
 
 sub iterate_test_data {
     my ( $dir_basename, $cb ) = @_;
@@ -74,7 +101,7 @@ sub iterate_test_data {
     note( colored($dir_fullname, 'yellow bold') );
 
     opendir( my $dh, $dir_fullname );
-    my @tests = sort grep { /^[^.]/ } readdir($dh);
+    my @tests = sort grep { /^[^.]/ && -d "$dir_fullname/$_" } readdir($dh);
     closedir $dh;
 
     foreach my $test_name (@tests) {

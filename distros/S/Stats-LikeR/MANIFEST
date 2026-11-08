@@ -11,7 +11,6 @@ README
 README.md
 SECURITY.md
 lib/Stats/LikeR.pm
-lib/Stats/LikeR.pm.orig
 lib/Stats/LikeR/Usage.pm
 ppport.h
 t/01.t
@@ -104,6 +103,7 @@ t/coxph.R.R
 t/coxph.R.t
 t/coxph_extended.R.R
 t/coxph_extended.R.t
+t/crlf_quoted.tukey_aliases.regressions.t
 t/croak.leaks.t
 t/croak.messages.t
 t/csort.AoA.t

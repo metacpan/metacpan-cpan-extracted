@@ -768,9 +768,77 @@ subtest '_apply_filter_spec -- between operator (date range, string comparison)'
 	is scalar(@$bad), 0,                     'between with no hi value returns empty';
 };
 
+subtest '_apply_filter_spec -- between operator on numbers compares as numbers' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
+	my @rows = map { { year => $_ } } ('1844', '1885', '1900', '1912', '', 'unknown', '9', '10', '-3', '(2)');
+	my $years = sub { [ map { $_->{year} } @{ $fn->(\@rows, $_[0]) } ] };
+
+	is_deeply $years->('year:between:1880:1900'), [ '1885', '1900' ],
+		'a range of years keeps the years inside it, both ends included';
+	is_deeply $years->('year:between:1900:1880'), [ '1885', '1900' ],
+		'the bounds may be written either way round';
+	is_deeply $years->('year:between:9:10'), [ '9', '10' ],
+		'9 to 10 is two numbers, not an empty text range ("9" sorts after "10")';
+	is_deeply $years->('year:between:-5:0'), [ '-3', '(2)' ],
+		'negative bounds and accounting negatives are numbers too';
+	is_deeply $years->('year:between:1880:'), [],
+		'a range missing a bound keeps nothing';
+	is_deeply [ map { $_->{name} } @{ $fn->([ map { { name => $_ } } qw(apple kiwi pear) ], 'name:between:b:l') } ],
+		[ 'kiwi' ], 'a range of words still compares as text';
+};
+
+subtest '_apply_filter_spec -- between of dates, timestamps and text, either way round' => sub {
+	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
+	my $pick = sub {
+		my ($col, $rows, $spec) = @_;
+		return [ map { $_->{$col} } @{ $fn->([ map { { $col => $_ } } @{$rows} ], $spec) } ];
+	};
+	my @days = qw(2025-12-31 2026-01-01 2026-06-15 2026-12-31 2027-01-01);
+	is_deeply $pick->('d', \@days, 'd:between:2026-12-31:2026-01-01'),
+		[ qw(2026-01-01 2026-06-15 2026-12-31) ],
+		'dates written latest first are the same range, not an empty one';
+	is_deeply $pick->('d', [ '1/1/2026', '7/4/2026', '1/2/2027' ], 'd:between:2026-12-31:2026-01-01'),
+		[ '1/1/2026', '7/4/2026' ], 'M/D/YYYY cells against reversed ISO bounds';
+
+	my @times = qw(2026-11-01T08:59:59 2026-11-01T09:00:00 2026-11-01T12:30:00
+		2026-11-01T17:00:00 2026-11-01T17:00:01);
+	is_deeply $pick->('t', \@times, 't:between:2026-11-01T09:00:00:2026-11-01T17:00:00'),
+		[ qw(2026-11-01T09:00:00 2026-11-01T12:30:00 2026-11-01T17:00:00) ],
+		'timestamp bounds: split at the colon between them, both ends included';
+	is_deeply $pick->('t', \@times, 't:between:2026-11-01T17:00:00:2026-11-01T09:00:00'),
+		[ qw(2026-11-01T09:00:00 2026-11-01T12:30:00 2026-11-01T17:00:00) ],
+		'timestamp bounds written latest first';
+	is_deeply $pick->('t', \@times, 't:between:2026-11-01 12:00:2026-11-01'),
+		[ qw(2026-11-01T08:59:59 2026-11-01T09:00:00) ],
+		'a timestamp and a bare date, reversed: midnight (the date) to noon';
+	is_deeply $pick->('t', \@times, 't:between:2026-11-01:2026-11-01'),
+		\@times, 'two bare dates on timestamps keep the whole day';
+	is_deeply $pick->('d', \@days, 'd:between:abc:2026-01-01'),
+		[ qw(2026-01-01 2026-06-15 2026-12-31 2027-01-01) ],
+		'a date and a word is a text range (reversed, and "abc" sorts after every date)';
+
+	my @words = qw(apple Banana kiwi Lemon pear);
+	is_deeply $pick->('w', \@words, 'w:between:l:b'), [ qw(Banana kiwi) ],
+		'words written latest first';
+	is_deeply $pick->('w', \@words, 'w:between:B:LEMON'), [ qw(Banana kiwi Lemon) ],
+		'text bounds ignore case, as eq and contains do';
+	is_deeply $pick->('w', \@words, 'w:between::'), [ ], 'two empty bounds keep nothing';
+	is_deeply $pick->('w', \@words, 'w:between:'), [ ], 'no bounds keep nothing';
+
+	my $split = \&Database::BI::Controller::Dashboard::_between_bounds;
+	is_deeply [ $split->('2026-11-01T09:00:00:2026-11-01T17:00') ],
+		[ '2026-11-01T09:00:00', '2026-11-01T17:00' ], '_between_bounds: two timestamps';
+	is_deeply [ $split->('a:b:c') ], [ 'a', 'b:c' ], '_between_bounds: otherwise the first colon';
+	is_deeply [ $split->('a') ], [ ], '_between_bounds: no colon';
+	is_deeply [ $split->(':b') ], [ ], '_between_bounds: an empty side';
+	is_deeply [ $split->(undef) ], [ ], '_between_bounds: undef';
+};
+
 subtest '_apply_filter_spec -- unknown operator passes all rows through' => sub {
 	my $fn = \&Database::BI::Controller::Dashboard::_apply_filter_spec;
 	my $records = [{ x => 1 }, { x => 2 }];
+	# A request never gets this far with one: _filter_request refuses it
+	# before dispatch (400).  The function itself still keeps every row.
 	my $out = $fn->($records, 'x:totally_unknown_op:1');
 	is scalar(@$out), 2, 'unknown operator is a pass-through (all rows kept)';
 };
@@ -6853,24 +6921,44 @@ sub croak_rethrow {
 
 	# week() is worked out in Perl, because strftime('%V') is '' on Windows.
 	# Where %V works, the two must agree, above all around the new year.
-	subtest 'Calc::_iso_week -- agrees with strftime %V' => sub {
+	# The ISO week by another reckoning: the week that holds this week's
+	# Thursday, counted in the Thursday's own year.
+	sub iso_week_by_thursday {
+		my ($epoch) = @_;
+		my @g     = gmtime $epoch;
+		my $thu   = $epoch + (4 - ($g[6] || 7)) * 86_400;
+		return int((gmtime $thu)[7] / 7) + 1;
+	}
+
+	subtest 'Calc::_iso_week -- agrees with the Thursday rule (and strftime %V)' => sub {
 		require Time::Local;
-		plan skip_all => "strftime has no %V here"
-			unless (POSIX::strftime('%V', gmtime(0)) // '') =~ /\A\d+\z/;
-		my $bad = 0;
+		# strftime is asked only off Windows: there, perl 5.38's
+		# POSIX::strftime never returned (for %V, and for a plain
+		# %Y-%m-%dT%H:%M:%SZ too), and the CI job sat until its limit.  The
+		# application no longer calls it (Util::minute_stamp, iso8601_utc).
+		my $strftime = $^O ne 'MSWin32'
+			&& (POSIX::strftime('%V', gmtime(0)) // '') =~ /\A\d+\z/;
+		my ($bad, $bad_strftime) = (0, 0);
 		for my $year (1999 .. 2030) {
 			for my $k (1 .. 7) {
 				for my $md ([1, $k], [12, 32 - $k]) {
-					my @g = gmtime Time::Local::timegm(0, 0, 12, $md->[1], $md->[0] - 1, $year);
-					my $want = POSIX::strftime('%V', @g) + 0;
-					my $got  = Database::BI::Calc::_iso_week($g[5] + 1900, $g[6], $g[7]);
-					next if $got == $want;
-					$bad++;
-					diag("$year-$md->[0]-$md->[1]: $got, not $want");
+					my $epoch = Time::Local::timegm(0, 0, 12, $md->[1], $md->[0] - 1, $year);
+					my @g     = gmtime $epoch;
+					my $got   = Database::BI::Calc::_iso_week($g[5] + 1900, $g[6], $g[7]);
+					my $want  = iso_week_by_thursday($epoch);
+					if ($got != $want) {
+						$bad++;
+						diag("$year-$md->[0]-$md->[1]: $got, not $want");
+					}
+					$bad_strftime++ if $strftime && $want != POSIX::strftime('%V', @g);
 				}
 			}
 		}
 		is $bad, 0, 'the first and last seven days of 1999 to 2030';
+		SKIP: {
+			skip 'strftime %V is not asked here', 1 unless $strftime;
+			is $bad_strftime, 0, 'and the Thursday rule agrees with strftime %V';
+		}
 	};
 
 	subtest 'Calc functions -- dates' => sub {
@@ -7954,6 +8042,27 @@ sub croak_rethrow {
 			is $F{_inside_dir}->($F{_canonical_path}->($base->child('abs', 'deep')), $base->child('abs')->to_string), 0,
 				'so a link cannot make the outside look inside';
 		}
+
+		# As on Strawberry Perl 5.42: realpath gives a path through a link back
+		# as it is.  file_roots and export_dirs (_inside_any, through
+		# _resolved_path) must still see where the link goes, or a link inside
+		# a root would open, or write, a file outside it.
+		{
+			no warnings 'redefine';
+			local $^O = 'MSWin32';
+			local *Mojo::File::realpath = sub { Mojo::File->new(File::Spec->rel2abs("$_[0]")) };
+			my $resolved = \&Database::BI::Controller::Dashboard::_resolved_path;
+			my $inside   = \&Database::BI::Controller::Dashboard::_inside_any;
+			is $resolved->($base->child('abs', 'deep', 'f.csv')->to_string), $base->child('real', 'deep', 'f.csv')->to_string,
+				'_resolved_path follows a link where realpath leaves it';
+			is $resolved->($base->child('abs', 'not', 'yet')->to_string), $base->child('real', 'not', 'yet')->to_string,
+				'and one below which names do not exist yet';
+			is $resolved->($base->child('loop1', 'f.csv')->to_string), undef, 'a loop is refused';
+			is $inside->($base->child('abs', 'deep', 'f.csv')->to_string, $base->child('abs')->to_string), 0,
+				'so a link inside a root to a file outside it is outside';
+			is $inside->($base->child('abs', 'deep', 'f.csv')->to_string, $base->child('real')->to_string), 1,
+				'and the folder it leads to has it';
+		}
 	};
 
 	subtest 'Dashboard::_calc_models_path -- never inside the data' => sub {
@@ -8061,6 +8170,34 @@ sub croak_rethrow {
 		$tm->app->log->unsubscribe(message => $sub);
 		ok((grep { /Cannot write/ } @logged), 'it says so in the log');
 		is_deeply [ map { $_->basename } grep { $_->basename ne 'analyses.json' } @{ $dir->list({ dir => 1 }) } ], [], 'and leaves no temp file behind';
+	};
+
+	subtest 'a folder where a store should be is not set aside as corrupt' => sub {
+		# Why: Linux will not read a folder, but the BSDs read its raw entries
+		# (a CPAN tester's DragonFly 6.4 did).  Those never parse, so the folder
+		# was renamed to <store>.corrupt.<time> and the write it was blocking
+		# went ahead.  This makes slurp do here what it does there.
+		no warnings 'redefine';
+		my $slurp = \&Mojo::File::slurp;
+		local *Mojo::File::slurp = sub { -d ${ $_[0] } ? "\x01\x00\x00\x00. ..\x00" : $slurp->(@_) };
+		my $tm  = isolated_app();
+		my $c   = dash_controller($tm->app, '/');
+		my $dir = Mojo::File->new($tm->app->config->{model_dir});
+		$dir->make_path;
+		for my $store ([ 'models.json', \&Database::BI::Controller::Dashboard::_write_models, {} ],
+				[ 'analyses.json', \&Database::BI::Controller::Dashboard::_write_analyses, { a => {} } ]) {
+			my ($name, $wr, $data) = @{$store};
+			$dir->child($name)->make_path;
+			my @logged;
+			$tm->app->log->level('warn');
+			my $sub = $tm->app->log->on(message => sub { push @logged, $_[2] });
+			lives_ok { $wr->($c, $data) } "$name: a save that cannot complete does not die";
+			$tm->app->log->unsubscribe(message => $sub);
+			ok -d $dir->child($name), "$name: the folder is where it was";
+			ok !(grep { /\.corrupt\./ } map { $_->basename } @{ $dir->list({ dir => 1 }) }), "$name: and was not moved aside";
+			ok !(grep { /could not be parsed/ } @logged), "$name: nor called corrupt in the log";
+		}
+		is Database::BI::Controller::Dashboard::_write_models($c, {}), 0, 'and the model store says the write failed';
 	};
 
 	subtest 'Dashboard::_gen_analysis_id' => sub {
@@ -8596,7 +8733,17 @@ sub croak_rethrow {
 		is $vf->(dash_controller($other->app, '/'), 'abc', $tok), undef, 'signed with another secret';
 
 		delete $tm->app->config->{share_secret};
-		warning_like { Database::BI::Controller::Dashboard::_share_secret($c) } qr/share_secret not configured/, 'running with no secret is announced';
+		my $derived;
+		warning_is { $derived = Database::BI::Controller::Dashboard::_share_secret($c) } undef, 'no share_secret: nothing to warn of';
+		isnt $derived, 'BI_DEFAULT_INSECURE_SECRET', 'and not the fixed key every install once shared';
+		isnt $derived, $tm->app->secrets->[0], 'nor the session key itself';
+		like $derived, qr/\A[0-9a-f]{64}\z/, 'but one derived from it';
+		my $fresh = isolated_app();
+		delete $fresh->app->config->{share_secret};
+		isnt Database::BI::Controller::Dashboard::_share_secret(dash_controller($fresh->app, '/')), $derived,
+			'another start (another random secret) has another key';
+		$tm->app->config->{share_secret} = [];
+		is Database::BI::Controller::Dashboard::_share_secret($c), $derived, 'a share_secret that is not a string is not used';
 	};
 
 	# ------------------------------------------------------------------------
@@ -9232,6 +9379,8 @@ sub croak_rethrow {
 			return Stub::STH->new(names => $self->{names});
 		}
 		sub primary_key { return @{ $_[0]{primary} // [] } }
+		# As DBD::MariaDB quotes: Database::Join::Catalog names the table through it.
+		sub quote_identifier { (my $n = $_[1]) =~ s/`/``/g; return "`$n`" }
 		sub selectall_arrayref {
 			my $self = shift;
 			die "SELECT command denied\n" if $self->{denied};
@@ -9261,8 +9410,8 @@ sub croak_rethrow {
 	# Purpose: the settings come from configuration but end up in a DSN string,
 	# so each part is checked before it is spliced in; and nothing in an error
 	# may repeat the password.
-	subtest 'DataSource::_mariadb_connect -- the settings are checked first' => sub {
-		my $fn = \&Database::BI::Model::DataSource::_mariadb_connect;
+	subtest 'DataSource::_mariadb_dsn -- the settings are checked first' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_mariadb_dsn;
 		throws_ok { $fn->($DSX{server}, undef) }
 			qr/\ADataSource: no MariaDB server is called "mock"; add it to mariadb_servers/, 'no settings';
 		throws_ok { $fn->($DSX{server}, 'database=shop') } qr/no MariaDB server is called/, 'settings that are not a hash';
@@ -9277,30 +9426,29 @@ sub croak_rethrow {
 		require DBI;
 		local $INC{'DBD/MariaDB.pm'} = __FILE__;
 		Test::Mockingbird::mock('DBI::connect', sub { die "Access denied for user\n" });
-		throws_ok { $fn->($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
-			qr/\ADataSource: cannot connect to MariaDB server "mock": /, 'a refused connection names the server';
-		throws_ok { $fn->($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
+		throws_ok { $ds->mariadb_tables($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
+			qr/\ADataSource: cannot connect to MariaDB server "mock": Access denied for user/, 'a refused connection names the server';
+		throws_ok { $ds->mariadb_tables($DSX{server}, { database => $DSX{database}, password => $DSX{password} }) }
 			qr/\A(?!.*\Q$DSX{password}\E)/s, 'and never the password';
 		Test::Mockingbird::unmock('DBI::connect');
 	};
 
-	subtest 'DataSource::_mariadb_connect -- a connection' => sub {
-		my $fn  = \&Database::BI::Model::DataSource::_mariadb_connect;
+	subtest 'DataSource::_mariadb_dsn -- what connects, without connecting' => sub {
+		my $fn  = \&Database::BI::Model::DataSource::_mariadb_dsn;
 		my $dbh = Stub::DBH->new;
 		$with_dbi->($dbh, sub {
 			my ($calls) = @_;
 			my @got = $fn->($DSX{server}, { database => $DSX{database}, username => 'u', password => $DSX{password} });
-			is $got[0], $dbh, 'the handle';
-			like $got[1], $DSX{dsn_re}, 'a DSN built only from checked parts, with a time-out';
-			is_deeply [ @got[2, 3] ], [ 'u', $DSX{password} ], 'and the credentials it used';
-			is $calls->[0][3]{RaiseError}, 1, 'errors are raised, so none is missed';
+			like $got[0], $DSX{dsn_re}, 'a DSN built only from checked parts, with a time-out';
+			is_deeply [ @got[1, 2] ], [ 'u', $DSX{password} ], 'and the credentials';
+			is scalar @{$calls}, 0, 'nothing is connected: Database::Join::Catalog and Database::Abstraction do that';
 		});
 	};
 
 	# Purpose: the driver is optional; without one the reader is told what to
 	# install rather than seeing a Perl error.
-	subtest 'DataSource::_mariadb_connect -- no driver' => sub {
-		my $fn = \&Database::BI::Model::DataSource::_mariadb_connect;
+	subtest 'DataSource::_mariadb_dsn -- no driver' => sub {
+		my $fn = \&Database::BI::Model::DataSource::_mariadb_dsn;
 		local @INC = (sub { my (undef, $file) = @_; die "hidden\n" if $file =~ m{\ADBD/(?:MariaDB|mysql)\.pm\z}; return }, @INC);
 		local $INC{'DBD/MariaDB.pm'};
 		local $INC{'DBD/mysql.pm'};

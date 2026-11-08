@@ -1865,8 +1865,8 @@ subtest '/map loc= path: geocoder called, markers + counts correct' => sub {
 	# Both distinct non-skipped places appear in map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+			or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 2;
 		like $body, qr/Ramsgate/i, 'Ramsgate marker present in response';
 		like $body, qr/Margate/i,  'Margate marker present in response';
 	}
@@ -2037,8 +2037,8 @@ subtest '/map lat/lon path: duplicate coordinates collapse to one marker' => sub
 	# Rows 1+2 share a coordinate -> one marker; row 3 is separate; row 4 is unusable.
 	# The lat values appear inside the Leaflet JS in map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+			or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 2;
 		like $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat present in response';
 		like $body, qr/$MARGATE_LAT/,  'Margate lat present in response';
 	}
@@ -2057,8 +2057,8 @@ subtest '/map lat/lon path: f= filter applied before marker construction' => sub
 	# Only row 1 (name=A) survives the filter.
 	# Lat values appear in the Leaflet JS inside map_body, which requires HTML::OSM.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 2;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+			or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 2;
 		like   $body, qr/$RAMSGATE_LAT/, 'Ramsgate lat in response after filter';
 		unlike $body, qr/$MARGATE_LAT/,  'Margate lat absent after name:eq:A filter';
 	}
@@ -2171,8 +2171,8 @@ subtest '/map popup= column appears in marker label HTML' => sub {
 	# Popup column names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+			or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 1;
 		like $body, qr/amount/i, 'amount column referenced in map output (popup)';
 	}
 
@@ -2296,7 +2296,7 @@ subtest '/map: an older HTML::OSM => 200 with the older-renderer warning' => sub
 		'the older install is reported as such, not as a missing module';
 	like $body, qr/installed HTML::OSM is 0\.11/,
 		'the warning names the version that is installed';
-	like $body, qr/HTML::OSM 0\.13 or later/,
+	like $body, qr/HTML::OSM 0\.14 or later/,
 		'and the version that is needed';
 };
 
@@ -2306,7 +2306,7 @@ subtest '/map: a missing HTML::OSM => 200 with the not-installed warning' => sub
 	like $body, qr/data-key="error_map_renderer_missing"/,
 		'the missing renderer is reported as not installed';
 	like $body, qr/and it is not installed/, 'the warning says so';
-	like $body, qr/HTML::OSM 0\.13 or later/, 'and names the version that is needed';
+	like $body, qr/HTML::OSM 0\.14 or later/, 'and names the version that is needed';
 	unlike $body, qr/installed HTML::OSM is/, 'it does not claim a version is installed';
 };
 
@@ -2350,8 +2350,8 @@ subtest '/map: ?c= calculated field applied before geocoding' => sub {
 	# City names appear inside map_body (Leaflet popup HTML),
 	# which is only rendered when HTML::OSM is installed.
 	SKIP: {
-		eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 }
-			or skip 'HTML::OSM 0.13 or later is needed for marker HTML', 1;
+		eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 }
+			or skip 'HTML::OSM 0.14 or later is needed for marker HTML', 1;
 		like $body, qr/ramsgate/i, 'ramsgate appears in the map output';
 	}
 
@@ -3668,28 +3668,6 @@ subtest 'An export to a directory that refuses new files' => sub {
 	ok(-s File::Spec->catfile($dir, 'out.csv'), 'with something in it');
 };
 
-# On a BSD, File::Temp before 0.2308 opens a new file with O_EXLOCK, and SQLite then
-# cannot write to it: every Merge that spills waits out the busy timeout and fails
-# with "database is locked".  Other systems have no O_EXLOCK, so there the second half
-# always passes, and the declared minimum is what holds this.
-subtest 'A temporary file from File::Temp can be written by SQLite' => sub {
-	Readonly my $FLOOR    => '0.2308';
-	Readonly my $QUICK_MS => 100;
-
-	for my $file (qw(Makefile.PL cpanfile)) {
-		next unless -r $file;
-		my ($declared) = Mojo::File->new($file)->slurp =~ /'File::Temp'\s*(?:=>|,)\s*'([\d.]+)'/;
-		cmp_ok($declared // 0, '>=', $FLOOR, "$file asks for a File::Temp that does not lock its files");
-	}
-
-	plan skip_all => 'DBD::SQLite is not available' unless eval { DBI->install_driver('SQLite'); 1 };
-	my $tmp = File::Temp->new(SUFFIX => '.db', UNLINK => 1);
-	my $dbh = DBI->connect('dbi:SQLite:dbname=' . $tmp->filename, '', '', { RaiseError => 1, PrintError => 0 });
-	$dbh->sqlite_busy_timeout($QUICK_MS);
-	ok(eval { $dbh->do('CREATE TABLE t (a TEXT)'); 1 }, 'a table can be made in it') or diag($@);
-	$dbh->disconnect;
-};
-
 # HTML::D3 writes a chart's labels into a script.  Before 0.27 it left "</" as it was,
 # so a cell could end that script and start its own.
 subtest 'A cell holding a script tag cannot end the script of a chart' => sub {
@@ -4005,8 +3983,8 @@ subtest 'A URL source: a failure is not cached, so the source can recover' => su
 
 subtest 'A URL source: the client is given a timeout, and is asked once' => sub {
 	my $tm = _isolated_app();
-	require LWP::UserAgent::Cached;
-	my $ua_new = spy('LWP::UserAgent::Cached::new');
+	require Database::BI::SafeUA;
+	my $ua_new = spy('LWP::UserAgent::new');
 	my $gets = 0;
 	my $guard = mock_scoped('LWP::UserAgent', get => sub {
 		$gets++;
@@ -4023,8 +4001,9 @@ subtest 'A URL source: the client is given a timeout, and is asked once' => sub 
 	restore_all();
 
 	is($gets, 1, 'a timeout is not retried while the reader waits');
-	ok(scalar @calls, 'the client came from the library that caches');
-	my (undef, undef, %args) = @{ $calls[0] // [] };
+	my ($call) = grep { ($_->[1] // '') eq 'Database::BI::SafeUA' } @calls;
+	ok($call, 'the client is the one that will not reach this machine or a private network');
+	my (undef, undef, %args) = @{ $call // [] };
 	cmp_ok($args{timeout} // 0, '>', 0, 'and has a timeout');
 	cmp_ok($args{timeout} // 0, '<=', $CONFIG{max_timeout_s}, "of at most $CONFIG{max_timeout_s}s");
 };
@@ -4148,7 +4127,7 @@ subtest 'A geocoder that throws: the request fails, and leaves nothing behind' =
 };
 
 subtest 'A map renderer that fails mid-request is not a crash' => sub {
-	plan skip_all => 'needs HTML::OSM 0.13 or later' unless eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
+	plan skip_all => 'needs HTML::OSM 0.14 or later' unless eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 };
 	my $tm = _isolated_app();
 	my $places = _csv_file(tempdir(CLEANUP => 1), 'coords.csv', 'id,lat,lon', '1,51.3,1.4');
 	my $guard = mock_scoped('HTML::OSM', new => sub { die "tile server unreachable\n" });

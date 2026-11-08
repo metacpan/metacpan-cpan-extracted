@@ -13,9 +13,12 @@ use Validator::LIVR::Rules::Special;
 use Validator::LIVR::Rules::Meta;
 use Validator::LIVR::Rules::Modifiers;
 
-our $VERSION = '2.1';
+our $VERSION = '2.21';
 
-my %DEFAULT_RULES = (
+# Rule builders of new validators. The hash is never changed in place: register_default_rules()
+# makes a new one. So new() does not copy it, and a validator keeps the rules of the time it
+# was created
+my $DEFAULT_RULES = {
     'required'         => \&Validator::LIVR::Rules::Common::required,
     'not_empty'        => \&Validator::LIVR::Rules::Common::not_empty,
     'not_empty_list'   => \&Validator::LIVR::Rules::Common::not_empty_list,
@@ -57,9 +60,66 @@ my %DEFAULT_RULES = (
     'remove'           =>  \&Validator::LIVR::Rules::Modifiers::remove,
     'leave_only'       =>  \&Validator::LIVR::Rules::Modifiers::leave_only,
     'default'          =>  \&Validator::LIVR::Rules::Modifiers::default,
-);
+
+    # LIVR 2.5, loaded on first use
+    'boolean'          => _lazy_rule( Types => 'boolean' ),
+    'not_one_of'       => _lazy_rule( Types => 'not_one_of' ),
+    'max_decimals'     => _lazy_rule( Types => 'max_decimals' ),
+    'digits'           => _lazy_rule( Types => 'digits' ),
+    'starts_with'      => _lazy_rule( Types => 'starts_with' ),
+    'ends_with'        => _lazy_rule( Types => 'ends_with' ),
+    'contains'         => _lazy_rule( Types => 'contains' ),
+    'any'              => _lazy_rule( Types => 'any' ),
+
+    'iso_datetime'     => _lazy_rule( DateTime => 'iso_datetime' ),
+    'iso_time'         => _lazy_rule( DateTime => 'iso_time' ),
+
+    'required_if'      => _lazy_rule( Conditional => 'required_if' ),
+    'when'             => _lazy_rule( Conditional => 'when' ),
+
+    'values'           => _lazy_rule( Collection => 'livr_values' ),
+    'keys'             => _lazy_rule( Collection => 'livr_keys' ),
+    'list_length'      => _lazy_rule( Collection => 'list_length' ),
+    'unique'           => _lazy_rule( Collection => 'unique' ),
+    'split'            => _lazy_rule( Collection => 'livr_split' ),
+
+    'uuid'             => _lazy_rule( Format => 'uuid' ),
+    'ip'               => _lazy_rule( Format => 'ip' ),
+    'cidr'             => _lazy_rule( Format => 'cidr' ),
+    'hostname'         => _lazy_rule( Format => 'hostname' ),
+    'base64'           => _lazy_rule( Format => 'base64' ),
+    'hex'              => _lazy_rule( Format => 'livr_hex' ),
+    'digest'           => _lazy_rule( Format => 'digest' ),
+    'mongo_id'         => _lazy_rule( Format => 'mongo_id' ),
+    'hex_color'        => _lazy_rule( Format => 'hex_color' ),
+    'mac'              => _lazy_rule( Format => 'mac' ),
+    'e164'             => _lazy_rule( Format => 'e164' ),
+    'semver'           => _lazy_rule( Format => 'semver' ),
+    'jwt'              => _lazy_rule( Format => 'jwt' ),
+    'luhn'             => _lazy_rule( Format => 'luhn' ),
+    'credit_card'      => _lazy_rule( Format => 'credit_card' ),
+    'iban'             => _lazy_rule( Format => 'iban' ),
+};
 
 my $IS_DEFAULT_AUTO_TRIM = 0;
+
+# A rule builder that loads the module of the rule on first use. A schema uses a few of the
+# LIVR 2.5 rules, and loading all of them would make "use Validator::LIVR" twice as slow
+sub _lazy_rule {
+    my ( $module, $name ) = @_;
+    my $file = "Validator/LIVR/Rules/$module.pm";
+    my $builder;
+
+    return sub {
+        $builder ||= do {
+            require $file;
+            no strict 'refs';
+            \&{"Validator::LIVR::Rules::${module}::$name"};
+        };
+
+        goto &$builder;
+    };
+}
 
 sub new {
     my ($class, $livr_rules, $is_auto_trim) = @_;
@@ -68,7 +128,8 @@ sub new {
         is_prepared        => 0,
         livr_rules         => $livr_rules,
         validators         => {},
-        validator_builders => {%DEFAULT_RULES}, # checked by register_default_rules()
+        validator_builders => $DEFAULT_RULES, # copied by the first register_rules()
+        is_builders_shared => 1,
         errors             => undef,
         is_auto_trim       => ( $is_auto_trim // $IS_DEFAULT_AUTO_TRIM )
     }, $class;
@@ -79,12 +140,14 @@ sub new {
 sub register_default_rules {
     my ( $class, %rules ) = @_;
 
+    my %default_rules = %$DEFAULT_RULES;
     foreach my $rule_name ( keys %rules ) {
         my $rule_builder = $rules{$rule_name};
         croak "RULE_BUILDER [$rule_name] SHOULD BE A CODEREF" unless ref($rule_builder) eq 'CODE';
 
-        $DEFAULT_RULES{$rule_name} = $rule_builder;
+        $default_rules{$rule_name} = $rule_builder;
     }
+    $DEFAULT_RULES = \%default_rules;
 
     return $class;
 }
@@ -93,13 +156,13 @@ sub register_aliased_default_rule {
     my ( $class, $alias ) = @_;
 
     die 'Alias name required' unless $alias->{name};
-    $DEFAULT_RULES{ $alias->{name} } = $class->_build_aliased_rule($alias);
+    $DEFAULT_RULES = { %$DEFAULT_RULES, $alias->{name} => $class->_build_aliased_rule($alias) };
 
     return $class;
 }
 
 sub get_default_rules {
-    return {%DEFAULT_RULES};
+    return {%$DEFAULT_RULES};
 }
 
 sub default_auto_trim {
@@ -111,7 +174,11 @@ sub prepare {
     my $self = shift;
 
     my $all_rules = $self->{livr_rules};
-    my $rule_builders = $self->get_rules();
+
+    # Rule builders get the hash, and metarules give it to their validators: a later
+    # register_rules() copies it
+    my $rule_builders = $self->{validator_builders};
+    $self->{is_builders_shared} = 1;
 
     # Not "each": when a rule dies, it leaves the iterator in the middle of the hash,
     # and the next prepare() would skip the fields up to that rule
@@ -191,11 +258,17 @@ sub get_errors {
 sub register_rules {
     my ( $self, %rules ) = @_;
 
+    my $builders = $self->{validator_builders};
+
     foreach my $rule_name ( keys %rules ) {
         my $rule_builder = $rules{$rule_name};
         croak "RULE_BUILDER [$rule_name] SHOULD BE A CODEREF" unless ref($rule_builder) eq 'CODE';
 
-        $self->{validator_builders}{$rule_name} = $rule_builder;
+        # Metarules register all rules of their validator, usually the same ones
+        next if $builders->{$rule_name} && $builders->{$rule_name} == $rule_builder;
+
+        $builders = $self->_own_builders();
+        $builders->{$rule_name} = $rule_builder;
     }
 
     return $self;
@@ -205,7 +278,7 @@ sub register_aliased_rule {
     my ( $self, $alias ) = @_;
 
     die 'Alias name required' unless $alias->{name};
-    $self->{validator_builders}{ $alias->{name} } = $self->_build_aliased_rule($alias);
+    $self->_own_builders()->{ $alias->{name} } = $self->_build_aliased_rule($alias);
 
     return $self;
 }
@@ -214,6 +287,62 @@ sub get_rules {
     my $self = shift;
 
     return { %{$self->{validator_builders}} };
+}
+
+# The rule builders of the validator, copied if they are shared with other validators
+sub _own_builders {
+    my $self = shift;
+
+    if ( $self->{is_builders_shared} ) {
+        $self->{validator_builders} = { %{ $self->{validator_builders} } };
+        $self->{is_builders_shared} = 0;
+    }
+
+    return $self->{validator_builders};
+}
+
+# For metarules: a validator with the rules of the validator that builds it, as
+# new($livr_rules)->register_rules(%$rule_builders), without copying the rules
+sub _new_with_rules {
+    my ( $class, $livr_rules, $rule_builders, $is_auto_trim ) = @_;
+
+    my $self = $class->new( $livr_rules, $is_auto_trim );
+    $self->{validator_builders} = $rule_builders;
+
+    return $self;
+}
+
+# All rules of a field as one rule, sub { my ($value, $all_values, $output_ref) = @_; ... },
+# that applies them as validate() does. It returns the first error, or sets the output. The
+# caller sets $$output_ref to the value before the call. Metarules and aliases validate values
+# with it: without the hashes of validate(), and with $all_values of their caller
+sub _field_rule {
+    my ( $self, $field_name ) = @_;
+    $self->prepare() unless $self->{is_prepared};
+
+    my $validators   = $self->{validators}{$field_name} || [];
+    my $is_auto_trim = $self->{is_auto_trim};
+
+    # A field without rules is not in the output of validate()
+    return sub { ${ $_[2] } = undef; return } if !@$validators;
+
+    return $validators->[0] if @$validators == 1 && !$is_auto_trim;
+
+    return sub {
+        my ( $value, $all_values, $output_ref ) = @_;
+        $value = $self->_auto_trim($value) if $is_auto_trim;
+
+        foreach my $v_cb (@$validators) {
+            my $result = $value;
+            my $err_code = $v_cb->( $value, $all_values, \$result );
+            return $err_code if $err_code;
+
+            $value = $result if defined $result;
+        }
+
+        $$output_ref = $value;
+        return;
+    };
 }
 
 sub _parse_rule {
@@ -239,9 +368,12 @@ sub _parse_rule {
 
 sub _build_validator {
     my ($self, $name, $args, $rule_builders) = @_;
-    die "Rule [$name] not registered\n" unless $self->{validator_builders}->{$name};
+    $rule_builders //= $self->{validator_builders};
 
-    return $self->{validator_builders}->{$name}->( @$args, $rule_builders // $self->get_rules() );
+    my $rule_builder = $rule_builders->{$name};
+    die "Rule [$name] not registered\n" unless $rule_builder;
+
+    return $rule_builder->( @$args, $rule_builders );
 }
 
 sub _build_aliased_rule {
@@ -251,22 +383,23 @@ sub _build_aliased_rule {
     die 'Alias rules required' unless $alias->{rules};
 
     my $livr = { value => $alias->{rules} };
+    my $error = $alias->{error};
 
-     return sub {
-        my $rule_builders = shift;
-        my $validator = __PACKAGE__->new($livr)->register_rules(%$rule_builders)->prepare();
+    return sub {
+        my $rule_builders = $_[-1];
+        my $field_rule = __PACKAGE__->_new_with_rules( $livr, $rule_builders )->_field_rule('value');
 
+        # Aliases are transparent: their rules see the fields next to the field that uses the alias
         return sub {
-            my ($value, $params, $output_ref) = @_;
+            my ($value, $all_values, $output_ref) = @_;
 
-            my $result = $validator->validate( { value => $value } );
-
-            if ( $result ) {
-                $$output_ref = $result->{value};
-                return;
-            } else {
-                return $alias->{error} || $validator->get_errors()->{value};
+            my $output = $value;
+            if ( my $err_code = $field_rule->( $value, $all_values, \$output ) ) {
+                return $error || $err_code;
             }
+
+            $$output_ref = $output;
+            return;
         };
     };
 }
@@ -339,8 +472,10 @@ L<a dozen languages|https://livr-spec.org/introduction/implementations.html>,
 one rule set can check a form in the browser with JavaScript and again on the
 server with Perl.
 
-This module implements L<LIVR 2.0|https://livr-spec.org> and passes the
-test suite of the specification.
+This module implements L<LIVR 2.0|https://livr-spec.org> and
+L<LIVR 2.5|https://github.com/koorchik/LIVR/blob/master/drafts/v2.5.md>, and
+passes the test suites of both. The rules added in LIVR 2.5 are in
+L</LIVR 2.5 rules>.
 
 =over 4
 
@@ -523,12 +658,16 @@ Error: C<FORMAT_ERROR>.
 
 =item C<< { eq => $value } >>
 
-The value is equal to C<$value>.
+The value is equal to C<$value>, compared as strings: C<2> equals C<"2">, and
+a boolean such as C<JSON::PP::true> equals C<"true">. As in Validator::LIVR 2.0,
+true also equals C<"1"> and false C<"0">. The output is C<$value>.
 Error: C<NOT_ALLOWED_VALUE>.
 
 =item C<< { one_of => [ @values ] } >>
 
-The value is equal to one of C<@values>.
+The value is equal to one of C<@values>, compared as in C<eq>. As in
+Validator::LIVR 2.0, a boolean value also equals C<1> or C<"1"> (true) and C<0>
+or C<"0"> (false). The output is that one of C<@values>.
 Error: C<NOT_ALLOWED_VALUE>.
 
 =item C<< { min_length => $length } >>
@@ -626,11 +765,17 @@ address. Domain names in other languages work in decoded strings, not in UTF-8
 bytes.
 Error: C<WRONG_URL>.
 
-=item C<iso_date>
+=item C<iso_date>, C<< { iso_date => { min => $date, max => $date } } >>
 
 A date as C<YYYY-MM-DD> that exists in the calendar: C<2024-02-29> is valid,
 C<2025-02-29> is not.
 Error: C<WRONG_DATE>.
+
+LIVR 2.5: the bounds C<min> and C<max>, both optional and inclusive, are dates
+or C<today>, C<yesterday> and C<tomorrow>: the current date in UTC, from the
+system time (see L</Testing rules with the current date>). An argument that is
+not a hash dies; LIVR 2.0 ignored it. A boolean gives C<WRONG_DATE>.
+Errors: C<WRONG_DATE>, C<DATE_TOO_EARLY>, C<DATE_TOO_LATE>, C<FORMAT_ERROR>.
 
 =item C<< { equal_to_field => $field } >>
 
@@ -691,6 +836,10 @@ list of rules. When all of them fail, the error is the error of the last one.
 
 =back
 
+The rules of C<or> and of aliases see the fields next to the field, so
+C<equal_to_field> works in them. The items of C<list_of> have no fields next to
+them.
+
 =head2 Modifiers
 
 L<Specification|https://livr-spec.org/validation-rules/modifiers.html>
@@ -725,6 +874,142 @@ Removes all characters except the ones in C<$chars>.
 Sets C<$value> when the field is missing or empty.
 
 =back
+
+=head2 LIVR 2.5 rules
+
+L<LIVR 2.5 specification|https://github.com/koorchik/LIVR/blob/master/drafts/v2.5.md>,
+L<all rules on the site|https://livr-spec.org/validation-rules.html>
+
+The rules added in LIVR 2.5. They are loaded on first use, so they do not
+slow down C<use Validator::LIVR>. They check their arguments when the validator
+is built: L</prepare> dies on a wrong argument, such as C<< { boolean => 1 } >>
+or C<< { digest => 'MD5' } >>, or on C<undef> or an empty list in place of
+rules in C<when>, C<values> and C<keys> (use C<any> for no rules), and on
+C<undef> or a list in their lists of rules, such as C<< [ 'required', [] ] >>.
+Arguments after the ones a rule takes are ignored, and a number and a string
+with that number are the same argument. C<undef> is an argument too, and no LIVR 2.5 rule takes it:
+C<< { boolean => undef } >> dies, like C<< { boolean => [undef] } >>. The LIVR 2.0
+rules and custom rules get C<undef> as an argument, as before, and
+C<< { iso_date => undef } >> stays C<iso_date>, as LIVR 2.0 ignored its arguments.
+
+They compare and check the string form of a value: a boolean, such as
+C<JSON::PP::true>, is C<true> or C<false>. Format and checksum rules return
+their own error code for a boolean, and C<FORMAT_ERROR> for a hash or a list.
+
+=over 4
+
+=item C<boolean>
+
+C<true>, C<false>, C<1>, C<0>, C<"1">, C<"0">, C<"true"> or C<"false">. The
+output is C<JSON::PP::true> or C<JSON::PP::false>.
+Errors: C<NOT_BOOLEAN>, C<FORMAT_ERROR>.
+
+=item C<< { not_one_of => [ @values ] } >>
+
+The value is none of C<@values>.
+Errors: C<NOT_ALLOWED_VALUE>, C<FORMAT_ERROR>.
+
+=item C<< { max_decimals => $count } >>
+
+A number with at most C<$count> digits after the decimal point; trailing zeros
+do not count. The output is a number.
+Errors: C<TOO_MANY_DECIMALS>, C<NOT_NUMBER>, C<FORMAT_ERROR>.
+
+=item C<digits>
+
+ASCII digits, the leading zeros are kept: the output is a string.
+Errors: C<NOT_DIGITS>, C<FORMAT_ERROR>.
+
+=item C<< { starts_with => [ @strings ] } >>, C<< { ends_with => [ @strings ] } >>, C<< { contains => [ @strings ] } >>
+
+The value starts with, ends with or contains one of C<@strings>.
+Errors: C<WRONG_FORMAT>, C<FORMAT_ERROR>.
+
+=item C<iso_datetime>, C<< { iso_datetime => { min => $bound, max => $bound } } >>
+
+A date and a time with an offset, such as C<2026-10-29T10:00+02:00>. The output
+is the time in UTC, C<2026-10-29T08:00:00.000Z>. A bound is a datetime, a date
+(its start as C<min>, its end as C<max>) or C<today>, C<yesterday> and
+C<tomorrow>.
+Errors: C<WRONG_DATETIME>, C<DATETIME_TOO_EARLY>, C<DATETIME_TOO_LATE>, C<FORMAT_ERROR>.
+
+=item C<iso_time>, C<< { iso_time => { min => $time, max => $time } } >>
+
+C<HH:MM>, C<HH:MM:SS> or C<HH:MM:SS.fraction>. With C<min> greater than C<max>
+the range goes over midnight.
+Errors: C<WRONG_TIME>, C<TIME_TOO_EARLY>, C<TIME_TOO_LATE>, C<FORMAT_ERROR>.
+
+=item C<< { required_if => { $reference => $value, ... } } >>
+
+The field is required when all referenced fields have the given values, or one
+of the values of a list. A reference is a field name or a path, such as
+C<address/country>.
+Error: C<REQUIRED>.
+
+=item C<< { when => [ $reference, $condition, $rules_if_true, $rules_if_false ] } >>, C<< { when => [ $reference, { $value => $rules, ... } ] } >>
+
+Validates the field with rules that depend on another field: on whether it
+passes the C<$condition> rules, or on its value.
+
+    vat_number => { when => [ 'type', { eq => 'company' }, [ 'required', 'string' ], { eq => '' } ] },
+
+Errors: C<NOT_ALLOWED_VALUE> and the errors of the rules.
+
+=item C<< { values => \@rules } >>, C<< { keys => \@rules } >>
+
+A hash with every value or every key validated with the rules. A wrong key gets
+C<WRONG_KEY>.
+Errors: C<WRONG_KEY>, C<FORMAT_ERROR> and the errors of the rules.
+
+=item C<any>
+
+Any value, the hashes and lists too, stays in the output unchanged.
+
+=item C<< { list_length => $length } >>, C<< { list_length => [ $min, $max ] } >>, C<< { list_length => { min => $min, max => $max } } >>
+
+A list with that number of items.
+Errors: C<TOO_FEW_ITEMS>, C<TOO_MANY_ITEMS>, C<FORMAT_ERROR>.
+
+=item C<unique>, C<< { unique => [ @keys ] } >>
+
+A list without duplicates, or of hashes without duplicate values of C<@keys>.
+Errors: C<NOT_UNIQUE_ITEMS>, C<FORMAT_ERROR>.
+
+=item C<< { split => $separator } >>
+
+A modifier: splits a string into a list, C<"1,2,3"> into C<["1", "2", "3"]>.
+A number or a boolean is split in its string form, a list stays as it is.
+
+=item Formats
+
+C<uuid> (or C<< { uuid => [ 'v4', 'v7' ] } >>), C<ip> (or C<< { ip => 'v4' } >>,
+C<< { ip => 'v6' } >>), C<cidr> (the same), C<hostname>, C<base64> (or
+C<< { base64 => 'url' } >>), C<hex>, C<< { digest => [ 'md5', 'sha256' ] } >>
+(also C<sha1>, C<sha384>, C<sha512>), C<mongo_id>, C<hex_color>, C<mac> (or
+C<< { mac => 64 } >>), C<e164>, C<semver> and C<jwt>.
+Errors: C<WRONG_UUID>, C<WRONG_IP>, C<WRONG_CIDR>, C<WRONG_HOSTNAME>,
+C<WRONG_BASE64>, C<WRONG_HEX>, C<WRONG_DIGEST>, C<WRONG_MONGO_ID>,
+C<WRONG_HEX_COLOR>, C<WRONG_MAC>, C<WRONG_E164>, C<WRONG_SEMVER>, C<WRONG_JWT>,
+C<FORMAT_ERROR>.
+
+=item Checksums
+
+C<luhn>, C<credit_card> and C<iban>. The value is checked as it is: remove
+spaces before, with C<< { remove => ' -' } >>.
+Errors: C<WRONG_CHECKSUM>, C<WRONG_CREDIT_CARD_NUMBER>, C<WRONG_IBAN>, C<FORMAT_ERROR>.
+
+=back
+
+=head2 Testing rules with the current date
+
+The bounds C<today>, C<yesterday> and C<tomorrow> read the system time with
+C<time>. To fix it in tests, load L<Test::MockTime> before the first validator
+with such a bound is built:
+
+    use Test::MockTime qw(set_fixed_time);
+    use Validator::LIVR;
+
+    set_fixed_time('2026-10-18T12:00:00Z', '%Y-%m-%dT%H:%M:%SZ');
 
 =head1 CLASS METHODS
 
@@ -867,7 +1152,7 @@ Here is how C<max_number> could be written:
     });
 
 The builder gets the arguments of the rule, then a hashref of all rule builders
-of the validator:
+of the validator, which the builder must not change:
 
     'my_rule'                         # ( $rule_builders )
     { my_rule => $arg }               # ( $arg, $rule_builders )
@@ -885,8 +1170,8 @@ The value of the field, as the previous rules of the field left it.
 =item C<$all_values>
 
 The hash that has the field, to compare it with other fields, as
-C<equal_to_field> does. Inside C<list_of>, C<or> and aliases, rules check the
-value on its own, so this hash has no other fields.
+C<equal_to_field> does. Inside C<or> and aliases, it is the hash of the field
+that uses them. Inside C<list_of>, C<values> and C<keys>, it is empty.
 
 =item C<$output_ref>
 
@@ -917,7 +1202,10 @@ as metarules do:
 The built-in rules are short and make good examples:
 L<Validator::LIVR::Rules::Common>, L<Validator::LIVR::Rules::String>,
 L<Validator::LIVR::Rules::Numeric>, L<Validator::LIVR::Rules::Special>,
-L<Validator::LIVR::Rules::Meta> and L<Validator::LIVR::Rules::Modifiers>.
+L<Validator::LIVR::Rules::Meta> and L<Validator::LIVR::Rules::Modifiers>. The
+LIVR 2.5 rules are in L<Validator::LIVR::Rules::Types>,
+L<Validator::LIVR::Rules::DateTime>, L<Validator::LIVR::Rules::Conditional>,
+L<Validator::LIVR::Rules::Collection> and L<Validator::LIVR::Rules::Format>.
 
 =head1 SEE ALSO
 

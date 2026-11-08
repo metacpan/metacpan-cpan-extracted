@@ -1,0 +1,9 @@
+BEGIN:VCARD
+VERSION:4.0
+UID:urn:uuid:5a6b7c8d-0000-4000-8000-phonetic0001
+LANGUAGE:zh-Hant
+FN:孫中山
+N;ALTID=1;LANGUAGE=zh-Hant:孫;中山;文,逸仙;;
+N;ALTID=1;PHONETIC=jyut;
+ SCRIPT=Latn;LANGUAGE=yue:syun1;zung1saan1;man4,jat6sin1;;
+END:VCARD

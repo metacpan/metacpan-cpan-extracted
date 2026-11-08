@@ -4,22 +4,12 @@ package Dist::Zilla::Plugin::DBIO::SetCopyrightHolder;
 use strict;
 use warnings;
 
-# Deliberately explicit $VERSION -- unlike normal DBIO sub-modules, which
-# carry none (only the dist's main module does, bumped by dzil). This
-# tombstone needs its own hard-coded, higher $VERSION so PAUSE indexes THIS
-# module as canonical for the name: PAUSE resolves each module name to
-# whichever shipped distribution carries the highest $VERSION, and the
-# Dist-Zilla-PluginBundle-DBIO release that last shipped this package
-# (v0.900001, whose containing file declared $VERSION = '0.900001') no
-# longer ships it as of the SAME distribution's later releases -- this is a
-# same-distribution rename, not a cross-distribution one, but PAUSE indexes
-# per MODULE NAME, so it orphans just the same. 0.900002 clears that release
-# generously (the inner package itself carried no $VERSION of its own in
-# that release, so 0.900001 would already be enough, but the file it lived
-# in did -- go one better to be unambiguous). Do NOT "clean this up" to
-# match the no-$VERSION sub-module convention -- doing so hands the PAUSE
-# index entry back to the stale, superseded release.
-our $VERSION = '0.900002';
+# Last release that shipped this name: Dist-Zilla-PluginBundle-DBIO 0.900001.
+# The PAUSE takeover is decided by THIS dist's release version -- the build
+# stamps that into every module and into META "provides" -- not by the
+# literal below, which RewriteVersion::Transitional rewrites (and inserts,
+# if missing) at build time. See DBIO::Deprecated, "HOW THE TAKEOVER WORKS".
+our $VERSION = '0.900004';
 
 die __PACKAGE__ . " has been renamed to Dist::Zilla::Plugin::DBIO::SetMeta"
   . " and this module is retired. Upgrade Dist-Zilla-PluginBundle-DBIO"
@@ -41,7 +31,7 @@ Dist::Zilla::Plugin::DBIO::SetCopyrightHolder - RENAMED -- see Dist::Zilla::Plug
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Special;
 use strict;
 use warnings;
 
-our $VERSION = '2.1';
+our $VERSION = '2.21';
 
 # From 0 to 255. Leading zeros are allowed, as Validator::LIVR 2.0 allowed them in URLs
 my $IPV4_OCTET = qr/25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9]/;
@@ -98,10 +98,19 @@ my $ISO_DATE_RE = qr#^
 \z#x;
 
 sub iso_date {
+    # LIVR 2.5: the first argument, if any, is an object with the bounds "min" and "max".
+    # LIVR 2.0 ignored any argument. { iso_date => undef } has no arguments
+    if ( @_ > 2 || @_ == 2 && defined( $_[0] ) ) {
+        require Validator::LIVR::Rules::DateTime;
+        goto &Validator::LIVR::Rules::DateTime::iso_date;
+    }
+
     return sub {
         my $value = shift;
         return if !defined($value) || $value eq '';
-        return 'FORMAT_ERROR' if ref($value);
+
+        # LIVR 2.5: a boolean is a primitive value, not a date
+        return ref($value) =~ /Boolean/ ? 'WRONG_DATE' : 'FORMAT_ERROR' if ref($value);
 
         if ( $value =~ $ISO_DATE_RE ) {
             my ( $year, $month, $day ) = @+{qw/year month day/};

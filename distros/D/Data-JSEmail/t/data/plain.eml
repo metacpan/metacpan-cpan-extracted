@@ -1,0 +1,24 @@
+Return-Path: <alice@example.com>
+Received: from mx.example.com (mx.example.com [192.0.2.1])
+	by mail.example.org with ESMTP id 12345
+	for <bob@example.org>; Sat, 07 Nov 2026 10:00:00 +0000
+From: Alice Example <alice@example.com>
+To: Bob <bob@example.org>, carol@example.org
+Cc: "Smith, Dave" <dave@example.net>
+Subject: Plain
+ text message
+Date: Sat, 07 Nov 2026 09:59:58 +1100
+Message-ID: <plain-1@example.com>
+In-Reply-To: <parent@example.com>
+References: <grandparent@example.com>
+ <parent@example.com>
+X-Custom: first
+X-Custom:  second value 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+Hello Bob,
+
+This is a   plain
+text message.

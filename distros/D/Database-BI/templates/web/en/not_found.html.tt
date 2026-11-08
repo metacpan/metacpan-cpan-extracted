@@ -12,7 +12,7 @@
 	<p class="not-found-msg">[% error_msg.length ? error_msg : 'There is nothing at this address.' | html %]</p>
 	[%- IF error_400 -%]
 	<p class="not-found-hint">Go back and change what was asked for, or open the table the trail above names.</p>
-	<p><button type="button" class="btn" id="btn-error-back" onclick="history.back()">&larr; Back</button> <a href="/" class="btn">Go to Home</a></p>
+	<p><button type="button" class="btn" id="btn-error-back">&larr; Back</button> <a href="/" class="btn">Go to Home</a></p>
 	[%- ELSE -%]
 	<p><a href="/" class="btn">Go to Home</a> <a href="/browse" class="btn">Open a file</a></p>
 	[%- END -%]

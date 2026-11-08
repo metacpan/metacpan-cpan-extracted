@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.020.0
+0.021.0
 
 ## Description
 
@@ -42,12 +42,17 @@ Multiple joins can be chained.
 the user add filter conditions without opening any panel.  Pressing Enter
 applies the filter.  Each active filter chip has an individual remove (x)
 button so conditions can be dropped one at a time.  Operators: `eq`,
-`ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `empty`,
+`ne`, `contains`, `starts`, `lt`, `le`, `gt`, `ge`, `between`, `empty`,
 `notempty`; and `in`, which a link can carry but the bar does not offer: any
 value of a JSON list, as in `f=place:in:["Paris","Rome"]`.  Filters are
 applied server-side after all joins.  `lt`, `le`,
 `gt` and `ge` compare numbers, reading `$1,234.56` and `(1,234.56)` as
 numbers too; a blank or a word in the cell matches none of them.
+An operator that is none of these (operators are lower case) is a `400` that
+lists them, and so is a filter, or a time range's `rcol=`, on a column the
+view does not have (the message lists the columns): neither is taken as a
+filter that keeps every row, or none.  A canvas card's own saved filters are
+the exception: one on a column its dataset no longer has is ignored.
 - **Combine (UNION ALL)** -- the "Combine data" panel stacks rows from a
 second (or further) file beneath the current rows, using a unified column
 set and leaving blanks where a source file lacks a column.
@@ -132,6 +137,14 @@ data" panel is open the dropped file populates the right-table path field.
 - **Export** -- the toolbar export panel writes the current logical view
 (after joins, filters, and dedup) to a chosen filesystem path as CSV
 (`.csv`), SQLite (`.sql`), or JSON (`.json`).
+- **Print** -- the Print button, to the right of Refresh, prints the header row
+and every row of the current view, not just the page on screen: the rows the
+Export panel would save (after joins, filters, calculated and cross-row
+columns, and dedup), read from `GET /export?format=json`, with the columns in
+the order the table shows them and sorted as it is sorted.  Nothing else on
+the page is printed, and the header row repeats on each printed page.  A row
+deleted from the page with Delete selected is still printed; a deleted column
+is not.
 - **URL import** -- `/import` fetches an HTML table from any public URL and
 renders it in the browser without saving to disc.
 - **Redis data source** (optional) -- when the `Redis` or `Redis::Fast` module
@@ -153,14 +166,17 @@ All file data is returned as Perl character strings.  CSV/PSV/TSV files are
 read by [Text::xSV::Slurp](https://metacpan.org/pod/Text%3A%3AxSV%3A%3ASlurp) or [DBD::CSV](https://metacpan.org/pod/DBD%3A%3ACSV), both of which pass bytes
 through without re-encoding; the application serves the resulting page as
 `text/html; charset=UTF-8`, so full Unicode is displayed correctly as
-long as the source file itself is UTF-8.
+long as the source file itself is UTF-8.  A UTF-8 byte-order mark at the
+start of a CSV, TSV, PSV or JSON file (Excel's "CSV UTF-8" writes one) is
+read past, so it is not part of the first column's name.
 
 Filter values (`f=col:op:val`) are decoded from the URL by Mojolicious
 before reaching the controller and are compared against cell values as
 Perl character strings.  Unicode characters in filter values are therefore
 supported transparently.
 
-URL-imported HTML tables are fetched with [LWP::UserAgent::Cached](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3ACached);
+URL-imported HTML tables are fetched with [Database::BI::SafeUA](https://metacpan.org/pod/Database%3A%3ABI%3A%3ASafeUA) (see
+["Which addresses it may fetch"](#which-addresses-it-may-fetch));
 [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) uses the page's own charset declaration to decode
 the body.  If the remote page declares an incorrect charset, cell values
 may contain mojibake -- this is a limitation of the source data, not the
@@ -174,7 +190,9 @@ application.
 script/database-bi
 ```
 
-`morbo script/database-bi` does the same thing, and
+`morbo -l http://127.0.0.1:3000 script/database-bi` does the same thing (a bare
+`morbo script/database-bi` listens on every interface, so it starts only with a
+password set), and
 `script/database-bi daemon` starts a plain server with no file watcher; any
 other Mojolicious command word (`routes`, `get`, ...) is passed to the
 application.
@@ -191,7 +209,9 @@ a join cannot be given on the command line, so open one and use Merge or Combine
 in the browser.  A file that is missing, cannot be read or is of an unsupported
 type is the same error, before the server starts.  A remote path, Redis spec or
 MariaDB spec is accepted as it would be by `/open`, and is checked when it is first shown.
-Use `MOJO_LISTEN` to choose the port.  A plain server does the same with
+It listens on port 3000 of this machine only (`http://127.0.0.1:3000`); see
+["Who can reach the server"](#who-can-reach-the-server) to change the port or open it to other machines.
+A plain server does the same with
 `BI_OPEN=/full/path/store.db script/database-bi daemon`; a file named after
 `daemon` is ignored.
 
@@ -202,8 +222,9 @@ hypnotoad script/database-bi      # start, or restart with no downtime
 hypnotoad -s script/database-bi   # stop
 ```
 
-It listens on port 8080 and ignores `MOJO_LISTEN`; set the port and anything
-else in `database_bi.conf`, under `hypnotoad => { listen => ['http://*:3000'] }`.
+It listens on port 8080 of this machine only and ignores `MOJO_LISTEN`; set the
+port and anything else in `database_bi.conf`, under
+`hypnotoad => { listen => ['http://*:8080'] }` (`*` opens it to every machine).
 It keeps its process id in `script/hypnotoad.pid` unless `pid_file` says
 otherwise.  It takes no database on its command line: use
 `BI_OPEN=/full/path/store.db hypnotoad script/database-bi`.
@@ -251,6 +272,13 @@ perl Makefile.PL
     Renders the tutorial that is part of the application.  The chapters are data
     in [Database::BI::Tutorial](https://metacpan.org/pod/Database%3A%3ABI%3A%3ATutorial), not in this POD.
 
+- `GET /login`, `POST /login`, `POST /logout`
+
+    The login, when `password_hash` is set (see ["Logging in"](#logging-in)).  `GET /login`
+    shows the form (with `return=`, the page to go back to: a path on this site),
+    `POST /login` takes `password=` and `return=`, and `POST /logout` ends the
+    session.  With no password set, `/login` says there is nothing to log in to.
+
 - `GET /preferences`
 
     Sets the reader's preferences: the theme, one of light, dark or the same as the
@@ -263,6 +291,14 @@ perl Makefile.PL
     Opens the named table from `data_dir`.  Accepts `?f=col:op:val`
     (repeatable) to pre-filter results, and `?range=name&rcol=column` to keep
     only a relative window of rows (see ["Relative time ranges"](#relative-time-ranges)).
+
+    `?f=col:between:lo:hi` keeps the rows whose `col` lies from `lo` to `hi`,
+    both included, whichever bound is written first.  Two numbers (a range of
+    years, `Year:between:1880:1900`) compare as numbers; two dates or timestamps
+    compare as times (`when:between:2026-11-01T09:00:00:2026-11-01T17:00:00`
+    splits at the colon between them); any other pair compares as text, ignoring
+    case.  The filter row offers it for date columns (two
+    date boxes) and number columns (two number boxes).
 
     A name that is not a table in `data_dir` is a `404` page that says so ("There
     is no table called ..."), with the breadcrumb and site navigation; it does not
@@ -297,7 +333,10 @@ perl Makefile.PL
     ```
     table:name                         named table from data_dir
     table:file/table                   a table inside a multi-table SQLite file
+                                       (or a list in a JSON file) in data_dir
     path:/abs/path/to/file.csv         absolute local path
+    path:/abs/path/to/file.db#table    one table of such a file anywhere else;
+                                       a file whose own name has a # is that file
     /../hostname/dir/file.csv          remote file via SFTP
     redis:tablename|redis://host:port  Redis hash store (requires Redis module)
     mariadb:server/table               a table on a server in mariadb_servers
@@ -308,7 +347,7 @@ perl Makefile.PL
 
     Returns `{ "columns": [...] }` for a table (`?table=name` or
     `?table=file/table` for a table inside a multi-table SQLite file) or file
-    (`?path=/abs/path`).  Used by the join UI to populate the right-key
+    (`?path=/abs/path`, or `?spec=path:/abs/path#table` for one of its tables).  Used by the join UI to populate the right-key
     dropdown without a page reload.
 
 - `GET /export`
@@ -357,7 +396,8 @@ perl Makefile.PL
 - `GET /import`
 
     Fetches an HTML table from a public URL (`?url=`) and renders it as a
-    data grid.  An optional `?t=` parameter (zero-based integer) selects
+    data grid.  A URL that leads to this machine or a private network is refused
+    (see ["Which addresses it may fetch"](#which-addresses-it-may-fetch)).  An optional `?t=` parameter (zero-based integer) selects
     which HTML table on the page to display when the page contains multiple
     tables.
 
@@ -681,7 +721,7 @@ perl Makefile.PL
     the [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) Nominatim search box (`search => 0` is always passed), so
     nothing typed on the map is sent anywhere.  With `loc=`, a place the local
     data does not know is sent to Nominatim, as the place name alone; set
-    `map_geocode_online` to 0 to keep every lookup local.  [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.13 or
+    `map_geocode_online` to 0 to keep every lookup local.  [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.14 or
     later is the renderer; an older optional install still returns the page with a
     warning.
 
@@ -768,9 +808,11 @@ perl Makefile.PL
     as the cards already on screen.  The visual is rendered against the canvas's
     datasets, joins and calculated fields before it is stored, so an unknown
     column or an undrawable visual is rejected with `400` and nothing is appended.
-    Returns `201 { id, visual, kind, title, html, head, cf_col }`, where
+    Returns `201 { id, visual, kind, title, html, head, nonce, cf_col }`, where
     `visual` is the new visual's index, `head` is any stylesheet and script the
-    page must add once to draw the card (Leaflet, for a map), and `cf_col` is the
+    page must add once to draw the card (Leaflet, for a map), `nonce` is the
+    Content-Security-Policy nonce the scripts in `html` carry (the canvas page
+    runs only those, giving each its own nonce), and `cf_col` is the
     column the card's marks cross-filter by.  The card is left unplaced in
     `layout`; it is auto-placed after the saved cards until the reader moves or
     resizes it.
@@ -817,7 +859,9 @@ perl Makefile.PL
     its layout position, size and title are unchanged.  The replacement is
     rendered before it is stored, so an unknown column or an undrawable map is a
     `400` and the saved visual is left alone.  Returns
-    `{ id, visual, kind, title, html, head, cf_col }`.
+    `{ id, visual, kind, title, html, head, nonce, cf_col }`; `nonce` is the one
+    the scripts in `html` carry, which the canvas page gives its own when it runs
+    them.
 
 - `DELETE /api/analyses/:id`
 
@@ -968,8 +1012,15 @@ perl Makefile.PL
     (required), `q=<question>` (required), repeatable `f=` filters.
     Returns `{ spec, url, valid => 1 }` on success.  The model receives only
     column names and types -- never raw row data or file paths.  Returns 503 when
-    `ai_api_key` is not configured; 400 for missing params; 422 for an
-    unparseable or invalid-column spec; 502 for a provider error.
+    `ai_api_key` is not configured; 400 for missing params or a question over 500
+    characters; 422 for an unparseable or invalid-column spec; 502 for a provider
+    error; 429 once the hour's provider calls are used up (`ai_calls_per_hour`,
+    below).
+
+    Every call spends `ai_api_key`, so each server process makes at most
+    `ai_calls_per_hour` provider calls (default 60; `0` for no limit) in any
+    hour, counting `/api/ask` and `/api/summary` together.  Like the other
+    routes, both need the login when `password_hash` is set.
 
 - `POST /api/summary`
 
@@ -979,7 +1030,9 @@ perl Makefile.PL
     deterministic template sentences (always available, works offline) and
     optional LLM-polished prose when `ai=1` is passed and `ai_api_key` is
     set.  Only aggregate insight facts are sent to the LLM.  Results are cached
-    in-process for one hour keyed on the analysis fingerprint.
+    in-process for one hour keyed on the analysis fingerprint.  Once the hour's
+    provider calls are used up (`ai_calls_per_hour`), `ai=1` gives the template
+    text with `source => 'template_limited'`, not cached.
 
 ### Breadcrumbs and Missing Pages
 
@@ -1047,6 +1100,12 @@ all show the same rows, and one chip in the toolbar names the window with an
 `x` to remove it.  Filters the reader wrote are untouched: the range travels in
 the URL as itself, so submitting a panel form or reopening a link does not turn
 it into frozen dates.
+
+The table page offers Time range in its filter bar only when one of the columns
+on the page holds dates or date-times (`YYYY-MM-DD`, the same with a time after
+`T` or a space, or `M/D/YYYY`) in every non-empty cell, and its column menu
+lists only those columns.  A range already in force stays in the bar, so it can
+be changed or removed.
 
 A window narrower than a day (`last_24_hours`) is compared to the second, so
 it is exact only on a column that holds a time as well as a date.  A
@@ -1250,6 +1309,208 @@ application directory is read-only can stage uploads somewhere writable:
 { uploads_dir => '/var/tmp/database-bi-uploads' }
 ```
 
+### Who Can Reach the Server
+
+A server started by `script/database-bi` (with no arguments, a database, or
+`daemon` or `prefork`) listens on `http://127.0.0.1:3000`, so only this
+machine can reach it: unless a password is set (see ["Logging in"](#logging-in)), there
+is no login, and Mojolicious on its own would listen on every interface.
+`listen` changes that:
+
+```perl
+{ listen => 'http://127.0.0.1:8000' }             # another port, still this machine only
+{ listen => 'http://*:3000' }                     # every machine that can reach this one
+{ listen => ['http://127.0.0.1:3000', 'http://[::1]:3000'] }  # IPv6 loopback too
+```
+
+It takes a location, several separated by commas, or a list.  A location
+that is not `http://` or `https://` stops the start.  `MOJO_LISTEN` and the
+`-l` option of `daemon` and `prefork` still win over it.
+`morbo script/database-bi` opens its port before it loads the application, so
+it does not read `listen`; give it `-l`, or run `script/database-bi`.
+
+Anywhere but this machine needs a password: a `listen` (or `MOJO_LISTEN`, or
+`-l`, or under hypnotoad its own `listen`) that is not loopback stops the start
+unless `password_hash` is set (see ["Logging in"](#logging-in)).  The message says what to
+change.  The defaults are loopback, so they start as before.
+
+`hypnotoad` reads its own `hypnotoad => { listen }`, which defaults to
+`http://127.0.0.1:8080`, this machine only:
+
+```perl
+{ hypnotoad => { listen => ['http://*:8080'] } }  # every machine
+```
+
+Behind a reverse proxy on the same machine, leave both at their defaults.  The
+proxy can still bring other machines' requests in, so without a password a
+request from an address that is not loopback is refused (`403`), including one
+a trusted proxy names in `X-Forwarded-For`.  For the public, set a password.
+
+**This machine is not one person.**  Loopback keeps other machines out, not
+other people on this one: any account on the same machine, or a container that
+shares its network, can reach `127.0.0.1:3000`, and read, list and save files
+as the account running the server.  On a machine with other users, set a
+password even when it listens on this machine only.
+
+### Which Folders It May Use
+
+`/browse`, `/open`, the Export panel's folder list (`/api/dirs`), a `path:`
+data source anywhere (a table, a chart, a merge, a canvas card) and
+`POST /export` reach the whole filesystem, as far as the account running the
+server can.  `file_roots` fences them in:
+
+```perl
+{ file_roots => ['/srv/reports', 'shared'] }   # 'shared' is under the application home
+```
+
+`data_dir` and `uploads_dir` are always among them.  Browsing starts at the
+home folder if it is inside, else at the first root, and stops at the roots.  A
+folder or file outside is refused (`403`, or a `path:` source is not found),
+whether or not it is there, so the refusal says nothing about what is outside;
+a link inside that leads outside is outside.  A path that climbs out with `..`
+past what exists is refused too.  A root that is not a folder that exists stops
+the start.  Remote files (`/../host/...`), Redis and MariaDB are not files on
+this machine, and are not affected; neither are the command-line tools.
+
+Saving is the riskier half: an export replaces a `.csv`, `.json` or `.sql`
+file of the same name, and some such files are settings another program obeys
+(a project's `package.json` names commands that `npm` runs).  A server other
+people use keeps exports to folders of their own, so with `password_hash` set,
+`export_dirs` is required, and the start stops without it:
+
+```perl
+{ export_dirs => ['/srv/reports/exports'] }   # a relative one is under the application home
+```
+
+`POST /export` then saves only in them (or below them), and the Export panel
+opens on the first and lists no other.  Reading is unaffected: that is
+`file_roots`.  An export folder that does not exist, is outside `file_roots`
+or is a dot-folder stops the start.  Whatever is set, an export never replaces
+a link, a folder or anything else that is not a plain file, so a link inside
+the allowed folders cannot carry it outside them; it is written beside its name
+and renamed into place, so nobody reads half a file, and a file it replaces
+keeps its permissions.
+
+### Requests From Other Sites
+
+Unless a password is set (see ["Logging in"](#logging-in)), there is no login: whatever can
+reach the server can read any file it can (`/open`) and write exports into
+any folder it can (`POST /export`).  Even with one, a logged-in reader's
+browser carries the login to every request it sends here.  Listening
+on this machine only keeps other machines out, but not the pages of other
+sites open in the reader's browser.  So every request is checked first, and
+refused with `403` when another site's page made it:
+
+- A write (any method but `GET`, `HEAD` and `OPTIONS`) is refused when
+the browser's `Sec-Fetch-Site` says it came from another site, or, without
+that header, when its `Origin` is not this server.  A form posted from
+another site needs no permission from this one, so this is what stops it.  A
+script such as `curl` sends neither header and is let through.
+- Any request is refused when its `Host` is a name other than
+`localhost` or `*.localhost`, and is not an IP address.  A page whose own
+name has been made to resolve to `127.0.0.1` (DNS rebinding) counts as this
+server to the browser, but it still sends its own name.  To reach the server
+by a name, list it:
+
+    ```perl
+    { allowed_hosts => ['bi.example.com', '*.corp.example'] }   # '*' for any name
+    ```
+
+    Behind a trusted reverse proxy, the `Host` is whatever the proxy sends, so it
+    is checked only when `allowed_hosts` is set; set it there too.
+
+`POST /export` also refuses a folder or file whose name starts with a dot
+(`~/.config`, `.vscode/settings.json`), since those hold other programs'
+settings.  The folder list in the Export panel leaves them out already.
+
+### Which Addresses It May Fetch
+
+`/import` and a `url:` data source make the server fetch a URL, so a page
+could point it at what only the server can reach: a service on this machine, a
+database on the office network, or a cloud's metadata service on
+`169.254.169.254`, which hands out its credentials.  So the server refuses a
+URL that leads to this machine, a private or shared network
+(`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `100.64.0.0/10`,
+`fc00::/7`), link-local addresses, multicast or a reserved range.
+
+It is what the name _resolves to_ that counts, not how the URL reads:
+`http://localtest.me/` and `http://127.0.0.1.nip.io/` are names whose DNS
+answers `127.0.0.1`, and `http://2130706433/` or `http://0x7f000001/` are
+`127.0.0.1` written another way; all are refused.  An address is looked up
+once, checked, and that address is the one connected to, so a name that answers
+differently the second time (DNS rebinding) gains nothing.  Each redirect is
+checked the same way, and at most 5 are followed.  Over `https` the
+certificate must still be the site's.  The refusal says why, for example
+`localtest.me is 127.0.0.1, which is this machine`.
+
+To read from an intranet site, name it:
+
+```perl
+{ url_private_hosts => ['reports.corp.example', '*.corp.example'] }
+```
+
+Those names may resolve to a private address; every other name is still
+checked, and an address written as such (`http://10.1.2.3/`) is never let
+through.  A name that is not a host name, or `*` alone, stops the start.
+This check is not a firewall: where the server's machine can reach something it
+should not, rules on outgoing connections are the stronger defence.
+
+### Logging In
+
+With `password_hash` set, every page asks for a password first.  A server
+other machines can reach must have one (see ["Who can reach the server"](#who-can-reach-the-server)); on
+this machine alone it is optional.  Make the line with
+
+```
+script/database-bi password
+```
+
+which asks for the password twice (without showing it) and prints
+
+```perl
+password_hash => 'pbkdf2-sha256$200000$...',
+```
+
+to put in `database_bi.conf`.  Only the hash is kept: PBKDF2-HMAC-SHA256 with
+a random salt ([Database::BI::Password](https://metacpan.org/pod/Database%3A%3ABI%3A%3APassword)).  A plain password there stops the
+start, so it is never left in the file by mistake.  To change the password,
+make a new line; every session is then logged out.
+
+There is one password, not one per person.  A browser asking for a page is
+sent to `/login` and, once the password is right, back to that page; any other
+request (a script, a panel's request, a download) gets `401` until it carries a
+logged-in session.  `POST /logout`, the Log out button at the top of each page,
+ends it.  `/share/:id` and `/embed/:id` need no login: their signed, expiring
+token is their permission, so anyone holding the link sees that canvas, and
+only that one, for 30 days.  The canvas itself (`/a/:id`) and the rest still
+ask for the password.
+
+The token is signed with `share_secret` when it is set (at least 16
+characters), else with a key derived from `secrets`.  Without either, the key
+is new at each start, so a restart ends every share link, and the Share panel
+says so; set `secrets` (which keeps logins too) or `share_secret` to keep
+them.  Changing either ends the links made with the old one.  Before 0.021.0 a
+missing `share_secret` meant a fixed key, the same on every install, with which
+anyone could sign a link to any canvas; that key in `share_secret` stops the
+start.
+
+```perl
+{
+    password_hash    => 'pbkdf2-sha256$200000$...',
+    export_dirs      => ['/srv/reports/exports'],   # required with a password
+    login_expiration => 8 * 60 * 60,   # seconds idle before logging out; the default
+    secrets          => ['a long random string'],  # or each restart logs everyone out
+}
+```
+
+The session is a cookie signed with `secrets`: `HttpOnly`, `SameSite=Lax`,
+and `Secure` whenever the request came over https (directly, or through a
+trusted proxy that says so), so it is never sent back over plain http.  Over
+plain http anyone on the network path can read the password and the cookie: a
+server other machines reach should be behind https.  Ten wrong passwords from
+one address within 15 minutes lock that address out for the rest of the 15
+minutes (`429`); each server process counts its own.
+
 ### MariaDB and MySQL Servers
 
 A server is opened by name.  Each entry of `mariadb_servers` is one database:
@@ -1367,6 +1628,131 @@ alternative: each distinct value takes the next colour from `scheme=`,
 cycling through the palette, and the legend lists the categories.  `color=`
 and `series=` are mutually exclusive.
 
+### Content-Security-Policy
+
+Every HTML page is sent with a `Content-Security-Policy` header.  The pages
+show cells from files this application did not write, so the policy backs up
+the escaping.  Scripts, stylesheets and images may come only from this site
+and from the hosts that `d3_url`, the `leaflet_*_url` keys, `tile_url` and
+`tile_sources` name.  The defaults allow cdnjs.cloudflare.com, unpkg.com and
+OpenStreetMap's tile servers.  A page's scripts may talk only to this site
+(`connect-src 'self'`), and no other site may show a page in a frame
+(`frame-ancestors 'self'`).  JSON replies and downloads carry no policy.
+
+Every HTML page also carries `X-Frame-Options: SAMEORIGIN`, whatever the
+policy keys below say.  A report-only policy only reports `frame-ancestors`,
+a policy written out in full may leave it out, and older browsers read only
+this header, so framing by another site is refused in each of those cases.
+
+Every reply carries `Referrer-Policy: strict-origin-when-cross-origin`.  A
+request a page starts sends its whole URL to this site, only the origin to
+another, and nothing from https to http.  Specs, filter values and share
+tokens travel in the query string, and an older browser's default would send
+all of it to the CDNs, the tile servers and any site a reader follows a link
+to.  It is not `no-referrer`, because OpenStreetMap's tile policy asks pages
+for a `Referer`.
+
+Every reply also carries `X-Content-Type-Options: nosniff`, so a browser
+takes it for what its `Content-Type` says and never guesses.  A guess could
+read a CSV export, or text from a data file, as HTML or script.  A
+self-hosted library under `public/` keeps working, because Mojolicious names
+`.js` and `.css` files for what they are; one served some other way must be
+sent as `text/javascript` or `text/css`, or the browser will not load it.
+
+Every page carries `Cross-Origin-Opener-Policy: same-origin`: a window that
+another site opened, or that a page opened on another site, gets no handle on
+the page through `window.opener`.  No page opens a window or reads an
+opener, and every link to a new window is `rel="noopener"`.
+`cross_origin_opener_policy` sets another of `same-origin`,
+`same-origin-allow-popups`, `noopener-allow-popups` and `unsafe-none`, or
+`''` or `0` for none; any other value stops the application at startup.  No
+`Cross-Origin-Embedder-Policy` is sent: it would refuse the libraries and
+tiles the CDNs and OpenStreetMap serve, and nothing here needs the isolation
+it gives.
+
+Every reply carries a `Permissions-Policy` that turns off the browser
+features no page uses: the camera, the microphone, location, payment, USB,
+serial and HID devices, screen capture, full screen, reading the clipboard and
+the rest, for this site and any frame it holds.  Writing to the clipboard
+stays (`clipboard-write=(self)`), for the Copy link buttons.  A script that
+got in cannot ask the reader for any of them.  `permissions_policy` replaces
+the value (`''` or `0` for none); one that cannot be a header value stops
+the application at startup:
+
+```perl
+{ permissions_policy => 'camera=(), geolocation=(self)' }
+```
+
+A reply to a request that came over https carries
+`Strict-Transport-Security: max-age=31536000`, so the browser comes back over
+https for a year.  It binds this host only; set `strict_transport_security`
+to add `includeSubDomains` or `preload`, which reach every site of the
+domain and are hard to take back, or to `''` or `0` to send none.  A value
+a browser would not read stops the application at startup:
+
+```perl
+{ strict_transport_security => 'max-age=63072000; includeSubDomains' }
+```
+
+Over http no such header is sent, since a browser ignores it there, and none
+is sent to `localhost` or to an IP address: it binds the host, not the port,
+so from `https://localhost:8443` it would send every other server on that
+machine to https, and browsers ignore it for an address.  Behind a proxy that
+ends TLS, a request is https only when Mojolicious is told to trust the proxy
+(`MOJO_REVERSE_PROXY=1`, or `hypnotoad => { proxy => 1 }`) and the proxy
+sends `X-Forwarded-Proto: https`; otherwise the proxy must send the header
+itself.
+
+An inline script runs only if it carries the request's nonce, a random value
+made for each request and named in the policy (`'nonce-...'`).  Every
+`<script>` the templates write carries it, and so do those that
+[HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3) (0.30 or later) and [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) (0.14 or later) write, because
+the application passes it to them.  A script that came in with a cell's text
+cannot know it, so it does not run; nor does an `onclick` or `onerror`
+attribute, which no nonce can cover, so the pages use none.  Style attributes
+are still allowed (`style-src 'unsafe-inline'`).
+
+A canvas card added without a reload arrives as JSON with the nonce its
+scripts were written with.  The page runs only the scripts that carry it, and
+gives each the page's own nonce.  A page kept in the page cache is stored with
+its header, so the nonce in each still matches when it is served again.
+
+Two keys change the policy:
+
+```perl
+{
+    content_security_policy_report_only => 1,  # report breaches, block nothing
+    content_security_policy => "default-src 'self'; script-src 'self' 'nonce-{nonce}'",
+}
+```
+
+`content_security_policy` is the whole policy, sent as written except that
+`{nonce}` becomes the request's nonce; without it no inline script runs.  Set
+to `''` or `0` it sends no header.  A policy written out in full is not
+updated when the library keys change.
+
+#### Embedding a Canvas on Another Site
+
+By default only pages of this site may show `/embed/:id` in a frame.
+`embed_frame_ancestors` names other sites that may:
+
+```perl
+{ embed_frame_ancestors => [ 'https://intranet.example.com', 'https://*.corp.example' ] }
+```
+
+Each entry is an origin: `http` or `https`, a host (a `*` may stand for its
+first label only) and an optional port, with no path.  Anything else stops the
+application at startup, because a security setting that does not do what it
+says should not be dropped quietly.  The sites are added to that page's
+`frame-ancestors`, and to no other page's.  With a report-only policy, with
+none, or with one written out without `frame-ancestors`, the page carries a
+second, enforced policy of `frame-ancestors` alone, so naming one site never
+lets every site in.  A policy written out with its own `frame-ancestors` is
+left to say who may.  `X-Frame-Options: SAMEORIGIN` stays: browsers that know
+`frame-ancestors` follow it instead, and those that know only the older
+header refuse the frame.  The canvas's Share panel names the sites its embed
+code works on.
+
 ## Methods
 
 ### Startup
@@ -1393,6 +1779,20 @@ public D3 URL.
 
 Nothing useful is returned.  By the time it returns, the application has:
 
+- the login session ([Database::BI::Sessions](https://metacpan.org/pod/Database%3A%3ABI%3A%3ASessions)), and `require_login` in
+front of every route but the login, share and embed links (see
+["Logging in"](#logging-in)); a `password_hash` that is not a hash, or a `login_expiration`
+under 60 seconds, croaks; so does a `listen` other machines could reach when
+there is no password, and a password without `export_dirs`;
+- a `file_roots` that is not a list of folders that exist croaks (see
+["Which folders it may use"](#which-folders-it-may-use)); so does a `url_private_hosts` that is not a
+list of host names (see ["Which addresses it may fetch"](#which-addresses-it-may-fetch));
+- the `before_dispatch` hook that refuses requests from other sites (see
+["Requests from other sites"](#requests-from-other-sites)); an `allowed_hosts` that is not a list of host
+names croaks;
+- `MOJO_LISTEN` set from `listen` (default `http://127.0.0.1:3000`) when it
+was unset, and `hypnotoad => { listen }` defaulted to `http://127.0.0.1:8080`
+(see ["Who can reach the server"](#who-can-reach-the-server)); a `listen` that is not a location croaks;
 - a 50 MiB limit on request bodies (an upload over it is answered `413`);
 - Template Toolkit registered as handler `tt`, and the Buffer plugin
 (see ["Compression and the page cache"](#compression-and-the-page-cache));
@@ -1408,8 +1808,16 @@ the application does not start.
 
 ## Command-Line Tools
 
-Two maintenance scripts ship in `script/`; both use the same data and model
-directories as the web application and are safe to run from cron.
+The scripts in `script/` are installed with the distribution, each with a
+manual page (`man bi-extract`, `man bi-geocode`, `man bi-alert`,
+`man database-bi`).  The maintenance scripts use the same data and model
+directories as the web application, found from the folder they are run in or
+given with `--data-dir` and `--model-dir`, and are safe to run from cron.
+
+### Script/Database-Bi Password
+
+Asks for a password (twice, without echo, at a terminal; once from a pipe) and
+prints the `password_hash` line for `database_bi.conf`.  See ["Logging in"](#logging-in).
 
 ### Script/Bi-Geocode
 
@@ -1588,7 +1996,8 @@ the same and shows that database, with a command word it runs that command, and 
 - **The download\_dir default is computed once at startup**
 
     When the application starts, it picks the export directory in this order:
-    `~/Downloads` (if it exists), then `$HOME`, then the system temp directory.
+    the first of `export_dirs` (if set, as its real path), `~/Downloads` (if it exists), then
+    `$HOME`, then the system temp directory.
     This value is fixed for the life of the process.  Renaming or creating
     `~/Downloads` after the server starts has no effect.  To force a different
     default, set it before starting:
@@ -1607,14 +2016,25 @@ the same and shows that database, with a command word it runs that command, and 
     translate the `.html.tt` files from `templates/web/en/`, then (3) set the
     config.
 
-- **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx**
+- **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json**
 
     The application recognises `.csv`, `.db`, `.sql`, `.sqlite`, `.sqlite3`,
-    `.xml`, `.psv`, `.tsv`, and `.xlsx` files.  All three SQLite extensions
+    `.xml`, `.psv`, `.tsv`, `.xlsx` and `.json` files.  All three SQLite extensions
     (`.sql`, `.sqlite`, `.sqlite3`) are treated identically -- `inventory.sqlite`
     and `inventory.sqlite3` are both opened as SQLite databases without renaming.
     Excel `.xlsx` files are read by [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction), using
     `Spreadsheet::ParseXLSX`.
+
+    A `.json` file is a table when it is a list of objects (each one a row), an
+    object of objects (each key a row, shown in a column `id`, or `key` when the
+    rows have an `id` of their own), or an object holding lists of objects, as a
+    report does: `{"tool": "scan", "findings": [...], "hosts": [...]}`.  Each
+    such list is a table, as a SQLite file's tables are: a file with more than one
+    opens on `/tables`, with a card for each, and other values beside the lists
+    (a date, a count, an object of totals) are left out.  A cell holding an object
+    or a list shows as its JSON text, `true` and `false` as words and `null` as
+    an empty cell, and the columns are in the order the file first names them.  A
+    file of another format with the same name in the same folder is the one read.
 
     URLs will work.
     For example enter
@@ -1653,6 +2073,8 @@ the same and shows that database, with a command word it runs that command, and 
 
 ## Limitations
 
+- The login is one shared password.  There are no accounts, so every reader who
+knows it can do everything, and the log cannot say who did what.
 - Only read operations on data files are supported.  Write-back (editing
 cell values in the browser and saving them to the data file) is not
 implemented.
@@ -1665,11 +2087,13 @@ better opened through a view that narrows it.
 - A MariaDB table or view whose name holds anything but letters, digits and
 underscores cannot be opened.  `/tables` shows it with a `CREATE VIEW` statement
 that gives it a usable name.
-- A relative time range is resolved against the server's clock and compares the
-column as a string, like every other filter.  A column holding a time zone
-offset or a non-ISO timestamp is read as far as its `YYYY-MM-DD` prefix, so
-`last_24_hours` is exact only for a column whose values are ISO
-`YYYY-MM-DDTHH:MM:SS` (a space instead of the `T` is accepted too).
+- A relative time range is resolved against the server's clock.  An ISO
+timestamp, `YYYY-MM-DDTHH:MM:SS` (a space instead of the `T`, no seconds, a
+fraction of a second, and a trailing `Z` or offset such as `+01:00` are all
+accepted), is read as written: the zone is not applied, so
+`2026-11-06T13:00:00Z` and `2026-11-06T13:00:00+05:00` are the same time to
+a filter.  A non-ISO timestamp is read as far as its `YYYY-MM-DD` prefix, so
+`last_24_hours` is exact only for ISO timestamps in the server's zone.
 - Multi-table left joins are performed in memory by [Database::Join](https://metacpan.org/pod/Database%3A%3AJoin).  All
 component tables are fetched into RAM before the merge; this is not
 suitable for files that do not fit in the process's available memory.
@@ -1691,14 +2115,13 @@ works correctly in production without any special workarounds.
 
 Features planned for future releases (post-0.019.0).  Items are ordered by
 priority.  Items shipped before this release (XLSX export, the copy-link
-button, the column statistics panel, folder filter/join propagation and the
-aggregate/measure layer) are no longer listed.
+button, the column statistics panel, folder filter/join propagation, the
+aggregate/measure layer and the `between` and `in` filter operators) are no
+longer listed.
 
 - **Multi-sheet XLSX** (Medium) -- `_detect_file_info` reads only the
 first worksheet.  A `?sheet=` URL param with a sheet-name picker would
 expose the full workbook.
-- **`between` and `in (a,b,c)` filter operators** (Low) -- Would
-reduce multi-filter chains for common range and set queries.
 - **SSE streaming for large join results** (Low) -- The join pipeline
 blocks the HTTP response until all rows are assembled.  Mojolicious supports
 server-sent events, which could progressively stream rows to a JS table

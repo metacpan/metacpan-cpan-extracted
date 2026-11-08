@@ -25,7 +25,7 @@
 .cv-import-msg { margin-left: 0.5rem; }
 .cv-import-msg.is-error { color: var(--danger-fg, #c0392b); }
 </style>
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   var inp = document.getElementById('cv-import-file');
   var msg = document.getElementById('cv-import-msg');
@@ -53,7 +53,7 @@
 }());
 </script>
 [%- END -%]
-<script>
+<script nonce="[% csp_nonce | html %]">
 /* Saved canvases section -- fetches /api/analyses and renders db-card tiles.
  * Supports Ctrl/Cmd+click or drag to multi-select, then Delete to bulk-remove. */
 (function () {

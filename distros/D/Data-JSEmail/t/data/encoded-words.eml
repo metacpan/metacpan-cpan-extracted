@@ -1,0 +1,16 @@
+From: =?KOI8-R?B?6dfBziDwxdTSz9c=?= <ivan@example.ru>
+To: =?ISO-2022-JP?B?GyRCOzNFREJATzobKEI=?= <yamada@example.jp>,
+ =?windows-1252?Q?Fran=E7ois?= <francois@example.fr>
+Cc: =?UTF-8?Q?Smith=2C_John?= <john@example.com>, =?Shift_JIS?B?g2WDWINn?= <test@example.jp>
+Subject: =?UTF-8?B?R3LDvMOfZQ==?= =?ISO-8859-1?Q?_aus_M=FCnchen?=
+Comments: =?GB2312?B?xOO6ww==?= world
+Keywords: not=?UTF-8?Q?encoded?=here
+X-NFC: =?UTF-8?Q?e=CC=81t=C3=A9?=
+X-Unknown-Charset: =?x-no-such-charset?Q?abc?=
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <ew-1@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Gr=FC=DFe.

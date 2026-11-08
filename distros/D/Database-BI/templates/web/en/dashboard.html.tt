@@ -272,6 +272,9 @@
   <button class="btn-export-open" id="btn-export-open" type="button">&#x2193; Export&hellip;</button>
   <button class="btn-refresh" id="btn-refresh" type="button"
           title="Reload the data from disc - use this after the source file has changed">&#x21BB; Refresh</button>
+  <button class="btn-refresh btn-print" id="btn-print" type="button"
+          title="Print the header row and every row of this view, in the order and with the columns the table shows">&#x2399; Print</button>
+  <span class="print-status" id="print-status" role="status" aria-live="polite"></span>
   <button class="btn-delete-sel" id="btn-delete-sel" type="button" hidden
           title="Remove the selected rows and/or columns from this view">&#x1F5D1; Delete selected</button>
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
@@ -362,6 +365,7 @@
   <button id="dash-f-apply" class="btn-dash-filter-apply">Apply filter</button>
 
 
+  [%- IF time_columns.size -%]
   <span class="toolbar-sep" role="separator" aria-hidden="true"></span>
   <label for="dash-range-preset" class="dash-f-range-label">Time range</label>
   <select id="dash-range-preset"
@@ -373,12 +377,13 @@
   </select>
   <select id="dash-range-col" aria-label="Column the time range applies to">
     <option value="">&#x2014; column &#x2014;</option>
-    [%- FOREACH col IN columns -%]
+    [%- FOREACH col IN time_columns -%]
     <option value="[% col | html %]"[% IF time_range and time_range.col == col %] selected[% END %]>[% col | html %]</option>
     [%- END -%]
   </select>
   <button id="dash-range-apply" class="btn-dash-filter-apply" type="button"
           title="Apply the time range to this view">Apply range</button>
+  [%- END -%]
 </div>
 [%- END -%]
 
@@ -437,7 +442,7 @@
 <div class="join-panel" id="join-panel"
      data-current-label="[% title | html %]"
      hidden>
-  <script>window.__biFilters = [% filters_json %];</script>
+  <script nonce="[% csp_nonce | html %]">window.__biFilters = [% filters_json %];</script>
   <form id="join-form" method="get" action="/join" novalidate>
     <input type="hidden" name="l" value="[% left_spec | html %]">
     [%- FOREACH jspec IN current_joins -%]
@@ -484,7 +489,7 @@
             For a table on a configured MariaDB server:<br>
             <code>mariadb:server/table</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML, Redis, MariaDB.
+            .sqlite3), Berkeley DB (.db), XML, JSON, Redis, MariaDB.
           </div>
         </div>
       </div>
@@ -582,7 +587,7 @@
             For a table on a configured MariaDB server:<br>
             <code>mariadb:server/table</code><br><br>
             Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
-            .sqlite3), Berkeley DB (.db), XML, Redis, MariaDB.
+            .sqlite3), Berkeley DB (.db), XML, JSON, Redis, MariaDB.
           </div>
         </div>
       </div>
@@ -1526,7 +1531,7 @@
   <div class="ask-q-row">
     <input type="text" id="ask-q-inp" class="ask-q-input"
            placeholder="e.g. show me sales by region as a pie chart"
-           autocomplete="off" style="flex:1;min-width:0">
+           autocomplete="off" maxlength="500" style="flex:1;min-width:0">
     <button id="btn-ask-submit" class="btn-primary" disabled style="white-space:nowrap">Ask</button>
   </div>
   <div id="ask-result" hidden style="margin-top:0.85rem">
@@ -1875,7 +1880,7 @@ dragging it moves it.</p>
 <p class="empty-state">No records found in <strong>[% table | html %]</strong>.</p>
 [% END %]
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // One toolbar panel open at a time.  BI_PANELS is the only list of them:
 // opening a panel calls biClosePanels(itself), which hides every other one.
 // Merge, Combine and Export disable their own button while their panel is
@@ -1915,6 +1920,99 @@ function parseAccounting(v) {
   return isNaN(n) ? NaN : (neg ? -Math.abs(n) : n);
 }
 
+// Returns a YYYYMMDD integer sort key for recognised date strings, else null.
+// Handles YYYY-MM-DD (ISO) and M/D/YYYY or D/M/YYYY slash formats.
+// monthFirst: true = M/D/YYYY, false = D/M/YYYY.
+function biDateKey(s, monthFirst) {
+  var m;
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) return +m[1] * 10000 + +m[2] * 100 + +m[3];
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    var p1 = +m[1], p2 = +m[2], yr = +m[3];
+    return monthFirst ? yr * 10000 + p1 * 100 + p2
+                      : yr * 10000 + p2 * 100 + p1;
+  }
+  return null;
+}
+
+// biValueComparator(values, asc) -> function (a, b)
+// How a column of cell texts sorts: as dates when every non-empty value is
+// one, else as numbers when every one is, else as text.  The table's own sort
+// and Print both use it, so a print is in the order the table shows.
+function biValueComparator(values, asc) {
+  var nonEmpty = values.filter(function (v) { return v !== ''; });
+
+  // Detect date columns: every non-empty value must match a known date pattern.
+  var isDate = nonEmpty.length > 0 && nonEmpty.every(function (v) {
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
+  });
+  var monthFirst = true;
+  if (isDate) {
+    // Auto-detect M/D/YYYY vs D/M/YYYY: scan for a value that disambiguates.
+    for (var di = 0; di < nonEmpty.length; di++) {
+      var dm = nonEmpty[di].match(/^(\d{1,2})\/(\d{1,2})\/\d{4}$/);
+      if (!dm) continue;
+      if (+dm[1] > 12) { monthFirst = false; break; }
+      if (+dm[2] > 12) { monthFirst = true;  break; }
+    }
+  }
+
+  var numeric = !isDate && nonEmpty.length > 0 && nonEmpty.every(function (v) {
+    return !isNaN(parseAccounting(v));
+  });
+
+  return function (av, bv) {
+    var cmp;
+    if (isDate) {
+      var ak = biDateKey(av, monthFirst), bk = biDateKey(bv, monthFirst);
+      cmp = (ak === null ? -Infinity : ak) - (bk === null ? -Infinity : bk);
+    } else if (numeric) {
+      var an = parseAccounting(av), bn = parseAccounting(bv);
+      cmp = (isNaN(an) ? -Infinity : an) - (isNaN(bn) ? -Infinity : bn);
+    } else {
+      cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
+    }
+    return asc ? cmp : -cmp;
+  };
+}
+
+// biViewParams() -> URLSearchParams
+// The parameters that make this view, for a request that reads its rows
+// (Export saves them, Print prints them).  l= comes from the join form, since
+// /view/<table> has none in its URL; the rest reflect the rendered view, so
+// they are read from the URL.  A new view parameter is added here.
+function biViewParams() {
+  var params = new URLSearchParams();
+  var lInp = document.querySelector('#join-form input[name="l"]');
+  if (lInp) params.set('l', lInp.value);
+
+  var urlP = new URLSearchParams(location.search);
+  urlP.getAll('j').forEach(function (v) { params.append('j', v); });
+  if (urlP.get('jtype')) params.set('jtype', urlP.get('jtype'));
+  urlP.getAll('c').forEach(function (v) { params.append('c', v); });
+  urlP.getAll('f').forEach(function (v) { params.append('f', v); });
+  if (urlP.get('d')) params.set('d', '1');
+  // A relative range travels as itself, so the rows are the ones this view is
+  // showing rather than the ones a frozen date pair would match.
+  if (urlP.get('range')) params.set('range', urlP.get('range'));
+  if (urlP.get('rcol'))  params.set('rcol',  urlP.get('rcol'));
+  // The time bucket an aggregated view was showing travels the same way, so
+  // the rows hold the bucket column the page drew rather than the raw
+  // timestamps behind it.
+  ['span', 'tcol', 'as'].forEach(function (k) {
+    if (urlP.get(k)) params.set(k, urlP.get(k));
+  });
+  // A cross-row column is part of the view too, so the rows hold the column
+  // the table is showing rather than the rows it was worked out from.  All
+  // three repeat (several columns, one order each), so they travel as lists.
+  // So is a lookup turned on or off for this view (lk=, nolk=).
+  ['cs', 'order', 'by', 'lk', 'nolk'].forEach(function (k) {
+    urlP.getAll(k).forEach(function (v) { params.append(k, v); });
+  });
+  return params;
+}
+
 // Scan the rendered rows of a named column and return {min, max} ISO dates,
 // or null when the column has no parseable date values.
 // Used as an instant first estimate; /api/range supplies the full-dataset answer.
@@ -1951,6 +2049,23 @@ function biApplyRange(inputs, range) {
   var lo = range ? range.min : '';
   var hi = range ? range.max : '';
   inputs.forEach(function (inp) { inp.min = lo; inp.max = hi; });
+}
+
+// Type the [from, to] boxes of a between for a column of colType: two
+// numbers for a number column (a range of years, say), two dates otherwise.
+// Switching type drops the bounds the other type set, which mean nothing in
+// the new one; a box that already has its type is left alone, value and all.
+function biRangeInputs(inputs, colType) {
+  var type = colType === 'numeric' ? 'number' : 'date';
+  inputs.forEach(function (inp, i) {
+    if (inp.type === type) return;
+    inp.value = '';
+    inp.removeAttribute('min');
+    inp.removeAttribute('max');
+    inp.type = type;
+    inp.placeholder = type === 'number' ? (i ? 'to' : 'from') : '';
+    inp.setAttribute('aria-label', (i ? 'To ' : 'From ') + (type === 'number' ? 'number' : 'date'));
+  });
 }
 
 // Set min/max on date inputs for colName: disable inputs while fetching the
@@ -2257,68 +2372,27 @@ function biDetectColType(colName) {
 
   // --- Sort ---
 
-  // Returns a YYYYMMDD integer sort key for recognised date strings, else null.
-  // Handles YYYY-MM-DD (ISO) and M/D/YYYY or D/M/YYYY slash formats.
-  // monthFirst: true = M/D/YYYY, false = D/M/YYYY.
-  function biDateKey(s, monthFirst) {
-    var m;
-    m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (m) return +m[1] * 10000 + +m[2] * 100 + +m[3];
-    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m) {
-      var p1 = +m[1], p2 = +m[2], yr = +m[3];
-      return monthFirst ? yr * 10000 + p1 * 100 + p2
-                        : yr * 10000 + p2 * 100 + p1;
-    }
-    return null;
-  }
-
   function sortByCol(idx, asc) {
-    var tbody    = table.tBodies[0];
-    var rows     = Array.from(tbody.rows);
-    var nonEmpty = rows.map(function (r) {
-      return r.cells[idx + SEL] ? r.cells[idx + SEL].textContent.trim() : '';
-    }).filter(function (v) { return v !== ''; });
-
-    // Detect date columns: every non-empty value must match a known date pattern.
-    var isDate = nonEmpty.length > 0 && nonEmpty.every(function (v) {
-      return /^\d{4}-\d{2}-\d{2}$/.test(v) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v);
-    });
-    var monthFirst = true;
-    if (isDate) {
-      // Auto-detect M/D/YYYY vs D/M/YYYY: scan for a value that disambiguates.
-      for (var di = 0; di < nonEmpty.length; di++) {
-        var dm = nonEmpty[di].match(/^(\d{1,2})\/(\d{1,2})\/\d{4}$/);
-        if (!dm) continue;
-        if (+dm[1] > 12) { monthFirst = false; break; }
-        if (+dm[2] > 12) { monthFirst = true;  break; }
-      }
-    }
-
-    var numeric = !isDate && nonEmpty.length > 0 && nonEmpty.every(function (v) {
-      return !isNaN(parseAccounting(v));
-    });
-
-    rows.sort(function (a, b) {
-      var av  = a.cells[idx + SEL] ? a.cells[idx + SEL].textContent.trim() : '';
-      var bv  = b.cells[idx + SEL] ? b.cells[idx + SEL].textContent.trim() : '';
-      var cmp;
-      if (isDate) {
-        var ak = biDateKey(av, monthFirst), bk = biDateKey(bv, monthFirst);
-        cmp = (ak === null ? -Infinity : ak) - (bk === null ? -Infinity : bk);
-      } else if (numeric) {
-        var an = parseAccounting(av), bn = parseAccounting(bv);
-        cmp = (isNaN(an) ? -Infinity : an) - (isNaN(bn) ? -Infinity : bn);
-      } else {
-        cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
-      }
-      return asc ? cmp : -cmp;
-    });
+    var tbody = table.tBodies[0];
+    var rows  = Array.from(tbody.rows);
+    function text(r) { return r.cells[idx + SEL] ? r.cells[idx + SEL].textContent.trim() : ''; }
+    var cmp = biValueComparator(rows.map(text), asc);
+    rows.sort(function (a, b) { return cmp(text(a), text(b)); });
     rows.forEach(function (r) { tbody.appendChild(r); });
     headers.forEach(function (h, i) {
       h.setAttribute('aria-sort', i === idx ? (asc ? 'ascending' : 'descending') : 'none');
     });
   }
+
+  // What Print needs to lay its rows out as the table shows them: the columns
+  // in their order (a deleted column is gone), and the column sorted by.
+  window.biTableState = function () {
+    return {
+      columns: headers.map(function (h) { return h.textContent.trim(); }),
+      sortCol: sortColIdx >= 0 && headers[sortColIdx] ? headers[sortColIdx].textContent.trim() : null,
+      sortAsc: sortAsc
+    };
+  };
 
   // --- Restore saved state on load ---
 
@@ -2510,7 +2584,7 @@ function biDetectColType(colName) {
 
   // Operator definitions -- three sets, chosen by column type.
   var OPS_STRING  = [['eq','equals'],['ne','not equal to'],['contains','matches'],['starts','starts with'],['empty','is empty'],['notempty','is not empty']];
-  var OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['empty','is empty'],['notempty','is not empty']];
+  var OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['between','between'],['empty','is empty'],['notempty','is not empty']];
   var OPS_DATE    = [['eq','on date'],['ne','not on date'],['lt','before'],['le','on or before'],['gt','after'],['ge','on or after'],['between','date range'],['empty','is empty'],['notempty','is not empty']];
   var OPS = OPS_STRING; // default for join panel (kept for external callers)
 
@@ -2612,6 +2686,11 @@ function biDetectColType(colName) {
     toInp.className = 'filter-to-inp';
     toInp.style.display = 'none';
 
+    // A between on a number column takes two numbers, on a date column two
+    // dates: the same pair of boxes, typed to suit.  Set before a prefill,
+    // which a date box would refuse.
+    biRangeInputs([fromInp, toInp], rowColType);
+
     if (prefill.op === 'between' && prefill.val) {
       var bparts = prefill.val.split(':');
       fromInp.value = bparts[0] || '';
@@ -2625,12 +2704,13 @@ function biDetectColType(colName) {
       var isList    = op === 'in';
       var isDate    = rowColType === 'date' && !isList;
       var isNumeric = rowColType === 'numeric' && !isList;
+      var isRange   = (isDate || isNumeric) && isBetween;
       valInp.style.display  = (!isDate && !isNumeric && !isUnary) ? '' : 'none';
-      numInp.style.display  = (isNumeric && !isUnary)             ? '' : 'none';
+      numInp.style.display  = (isNumeric && !isUnary && !isBetween) ? '' : 'none';
       dateInp.style.display = (isDate && !isUnary && !isBetween)  ? '' : 'none';
-      fromInp.style.display = (isDate && isBetween)               ? '' : 'none';
-      sepSpan.style.display = (isDate && isBetween)               ? '' : 'none';
-      toInp.style.display   = (isDate && isBetween)               ? '' : 'none';
+      fromInp.style.display = isRange                             ? '' : 'none';
+      sepSpan.style.display = isRange                             ? '' : 'none';
+      toInp.style.display   = isRange                             ? '' : 'none';
       checkApply();
     }
 
@@ -2640,14 +2720,15 @@ function biDetectColType(colName) {
               : rowColType === 'numeric' ? OPS_NUMERIC
               : OPS_STRING;
       rebuildRowOps(ops, opSel.value);
+      biRangeInputs([fromInp, toInp], rowColType);
       if (rowColType === 'date') applyRowDateRange(colSel.value);
       toggleValInp();
       checkApply();
     });
     opSel.addEventListener('change', toggleValInp);
     toggleValInp();
-    fromInp.addEventListener('change', function () { if (fromInp.value) toInp.min   = fromInp.value; });
-    toInp.addEventListener('change',   function () { if (toInp.value)   fromInp.max = toInp.value;   });
+    fromInp.addEventListener('change', function () { if (fromInp.value && fromInp.type === 'date') toInp.min   = fromInp.value; });
+    toInp.addEventListener('change',   function () { if (toInp.value && toInp.type === 'date')   fromInp.max = toInp.value;   });
 
     var rmBtn = document.createElement('button');
     rmBtn.type = 'button';
@@ -2862,7 +2943,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Refresh button -- reload the page so the server re-reads the source file(s)
 // ---------------------------------------------------------------------------
@@ -2870,6 +2951,117 @@ function biDetectColType(colName) {
   var btn = document.getElementById('btn-refresh');
   if (!btn) return;
   btn.addEventListener('click', function () { location.reload(); });
+}());
+
+// ---------------------------------------------------------------------------
+// Print button -- the header row and every row of the view, not just this
+// page of it: the rows come from GET /export?format=json with the view's own
+// parameters, are laid out with the table's columns and sort, and are printed
+// from a table that only the printed page shows.
+// ---------------------------------------------------------------------------
+(function () {
+  var btn    = document.getElementById('btn-print');
+  var status = document.getElementById('print-status');
+  if (!btn) return;
+  var label = btn.innerHTML;
+  // Past this many rows the reader is asked first: laying out a table of
+  // that size takes the browser a long time, and it prints hundreds of
+  // pages.  The count is known only once the rows are here (no page shows a
+  // total), so the question comes after the fetch, before the table is built.
+  var PRINT_CONFIRM_ROWS = 10000;
+
+  function say(msg) { if (status) status.textContent = msg; }
+
+  function cellText(v) {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'object') return JSON.stringify(v);
+    return String(v);
+  }
+
+  function build(rows) {
+    var state   = window.biTableState ? window.biTableState() : null;
+    var columns = state && state.columns.length ? state.columns
+                : (rows.length ? Object.keys(rows[0]) : []);
+    var texts = rows.map(function (r) {
+      return columns.map(function (c) { return cellText(r[c]); });
+    });
+    if (state && state.sortCol !== null) {
+      var at = columns.indexOf(state.sortCol);
+      if (at >= 0) {
+        var cmp = biValueComparator(texts.map(function (t) { return t[at]; }), state.sortAsc);
+        texts.sort(function (a, b) { return cmp(a[at], b[at]); });
+      }
+    }
+
+    var old = document.getElementById('bi-print');
+    if (old) old.parentNode.removeChild(old);
+    var wrap  = document.createElement('div');
+    wrap.id   = 'bi-print';
+    var table = document.createElement('table');
+    var head  = table.createTHead().insertRow();
+    columns.forEach(function (c) {
+      var th = document.createElement('th');
+      th.textContent = c;
+      head.appendChild(th);
+    });
+    var body = table.createTBody();
+    var frag = document.createDocumentFragment();
+    texts.forEach(function (t) {
+      var tr = document.createElement('tr');
+      t.forEach(function (v) {
+        var td = document.createElement('td');
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      frag.appendChild(tr);
+    });
+    body.appendChild(frag);
+    wrap.appendChild(table);
+    document.body.appendChild(wrap);
+    return texts.length;
+  }
+
+  function done() {
+    document.body.classList.remove('bi-printing');
+    var old = document.getElementById('bi-print');
+    if (old) old.parentNode.removeChild(old);
+  }
+  window.addEventListener('afterprint', done);
+
+  btn.addEventListener('click', function () {
+    btn.disabled  = true;
+    btn.innerHTML = '&#x2399; Preparing&hellip;';
+    say('');
+    var params = biViewParams();
+    params.set('format', 'json');
+    fetch('/export?' + params.toString(), { headers: { Accept: 'application/json' } })
+      .then(function (r) {
+        if (!r.ok) return Promise.reject('The rows could not be read (HTTP ' + r.status + ').');
+        return r.json();
+      })
+      .then(function (rows) {
+        if (!Array.isArray(rows)) return Promise.reject('The rows could not be read.');
+        if (rows.length > PRINT_CONFIRM_ROWS
+            && !window.confirm('This view has ' + rows.length + ' rows, which is a lot of pages '
+              + 'and may take the browser a while to lay out. Print them all?')) {
+          done();
+          say('Not printed. Filter the view to print fewer rows.');
+          return;
+        }
+        var n = build(rows);
+        document.body.classList.add('bi-printing');
+        say('Printing ' + n + ' row' + (n === 1 ? '' : 's') + '.');
+        window.print();
+      })
+      .catch(function (err) {
+        done();
+        say(typeof err === 'string' ? err : 'The rows could not be read.');
+      })
+      .finally(function () {
+        btn.disabled  = false;
+        btn.innerHTML = label;
+      });
+  });
 }());
 
 // Copy-link button -- copies the current URL (including all ?f= params) to the clipboard
@@ -2961,7 +3153,7 @@ function biDetectColType(colName) {
     var quickTo     = document.getElementById('dash-f-to');
 
     var Q_OPS_STRING  = [['eq','equals'],['ne','not equal to'],['contains','matches'],['starts','starts with'],['empty','is empty'],['notempty','is not empty']];
-    var Q_OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['empty','is empty'],['notempty','is not empty']];
+    var Q_OPS_NUMERIC = [['eq','equals'],['ne','not equals'],['lt','<'],['le','<='],['gt','>'],['ge','>='],['between','between'],['empty','is empty'],['notempty','is not empty']];
     var Q_OPS_DATE    = [['eq','on date'],['ne','not on date'],['lt','before'],['le','on or before'],['gt','after'],['ge','on or after'],['between','date range'],['empty','is empty'],['notempty','is not empty']];
 
     var quickColType = 'string';
@@ -2982,12 +3174,13 @@ function biDetectColType(colName) {
       var isUnary   = op === 'empty' || op === 'notempty';
       var isDate    = quickColType === 'date';
       var isNumeric = quickColType === 'numeric';
+      var isRange   = (isDate || isNumeric) && isBetween;
       quickVal.style.display  = (!isDate && !isNumeric && !isUnary) ? '' : 'none';
-      quickNum.style.display  = (isNumeric && !isUnary)             ? '' : 'none';
+      quickNum.style.display  = (isNumeric && !isUnary && !isBetween) ? '' : 'none';
       quickDate.style.display = (isDate && !isUnary && !isBetween)  ? '' : 'none';
-      quickFrom.style.display = (isDate && isBetween)               ? '' : 'none';
-      quickSep.style.display  = (isDate && isBetween)               ? '' : 'none';
-      quickTo.style.display   = (isDate && isBetween)               ? '' : 'none';
+      quickFrom.style.display = isRange                             ? '' : 'none';
+      quickSep.style.display  = isRange                             ? '' : 'none';
+      quickTo.style.display   = isRange                             ? '' : 'none';
     }
 
     function applyQuickDateRange(col) {
@@ -3001,13 +3194,14 @@ function biDetectColType(colName) {
               : quickColType === 'numeric' ? Q_OPS_NUMERIC
               : Q_OPS_STRING;
       rebuildQuickOps(ops, quickOpSel.value);
+      biRangeInputs([quickFrom, quickTo], quickColType);
       if (quickColType === 'date') applyQuickDateRange(col);
       toggleQuickInputs();
     });
     quickOpSel.addEventListener('change', toggleQuickInputs);
     toggleQuickInputs();
-    quickFrom.addEventListener('change', function () { if (quickFrom.value) quickTo.min = quickFrom.value; });
-    quickTo.addEventListener('change',   function () { if (quickTo.value)   quickFrom.max = quickTo.value; });
+    quickFrom.addEventListener('change', function () { if (quickFrom.value && quickFrom.type === 'date') quickTo.min = quickFrom.value; });
+    quickTo.addEventListener('change',   function () { if (quickTo.value && quickTo.type === 'date')   quickFrom.max = quickTo.value; });
 
     applyBtn.addEventListener('click', function () {
       var col = quickColSel.value;
@@ -3108,16 +3302,10 @@ function biDetectColType(colName) {
       .catch(function () {});
   }
 
-  // A range needs a column.  Offer the first one that looks like a date, so
-  // the common case is one click rather than two.
-  if (!colSel.value) {
-    var dateCol = '';
-    for (var i = 0; i < colSel.options.length && !dateCol; i++) {
-      var v = colSel.options[i].value;
-      if (v && biDetectColType(v) === 'date') dateCol = v;
-    }
-    if (dateCol) colSel.value = dateCol;
-  }
+  // A range needs a column.  The server lists only the date and time
+  // columns, so the first one is preselected: the common case is one click
+  // rather than two.
+  if (!colSel.value && colSel.options.length > 1) colSel.selectedIndex = 1;
 
   presetSel.addEventListener('change', function () {
     ask(presetSel.value, colSel.value);
@@ -3147,7 +3335,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Combine panel -- stack rows from another file beneath the current view
 // ---------------------------------------------------------------------------
@@ -3241,7 +3429,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Graph panel -- line chart of X vs Y using HTML::D3 / D3.js
 // ---------------------------------------------------------------------------
@@ -3393,7 +3581,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Pie chart panel
 // ---------------------------------------------------------------------------
@@ -3475,7 +3663,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Heatmap panel
 // ---------------------------------------------------------------------------
@@ -3614,7 +3802,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Stacked bar chart panel
 // ---------------------------------------------------------------------------
@@ -3658,7 +3846,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Scatter plot panel
 // ---------------------------------------------------------------------------
@@ -3784,7 +3972,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Combo bar+line chart panel
 // ---------------------------------------------------------------------------
@@ -3862,7 +4050,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Treemap panel
 // ---------------------------------------------------------------------------
@@ -3917,7 +4105,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Histogram panel
 // ---------------------------------------------------------------------------
@@ -3999,7 +4187,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Word cloud panel
 // ---------------------------------------------------------------------------
@@ -4087,7 +4275,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Cross-row columns panel
 // ---------------------------------------------------------------------------
@@ -4257,7 +4445,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Map panel
 // ---------------------------------------------------------------------------
@@ -4594,7 +4782,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Folder view panel
 // ---------------------------------------------------------------------------
@@ -4629,7 +4817,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Stats button -- navigate directly to /stats with current l= and f= params
 // ---------------------------------------------------------------------------
@@ -4791,7 +4979,7 @@ function biDetectColType(colName) {
 [%- END -%]
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Pivot table panel
 // ---------------------------------------------------------------------------
@@ -5048,7 +5236,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Calculated columns panel
 // ---------------------------------------------------------------------------
@@ -5137,7 +5325,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Group values panel
 // ---------------------------------------------------------------------------
@@ -5262,7 +5450,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Date format panel
 // ---------------------------------------------------------------------------
@@ -5406,7 +5594,7 @@ function biDetectColType(colName) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // A button in a note that names a toolbar panel opens it, as its toolbar button does.
 document.querySelectorAll('button[data-open]').forEach(function (b) {
   b.addEventListener('click', function () {
@@ -5416,7 +5604,7 @@ document.querySelectorAll('button[data-open]').forEach(function (b) {
 });
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Shared by the Lookups and Extract fields panels: a saved definition's row
 // in the panel's list, and a POST to the model store that reports a refusal
@@ -5457,7 +5645,7 @@ function biModelPost(url, body, errEl, done) {
 }
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Lookups panel -- /lookups/list, /lookups/save, /lookups/delete
 // ---------------------------------------------------------------------------
@@ -5607,7 +5795,7 @@ function biModelPost(url, body, errEl, done) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Extract fields panel -- /extract/list, /extract/save, /extract/delete
 // ---------------------------------------------------------------------------
@@ -5679,7 +5867,7 @@ function biModelPost(url, body, errEl, done) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Save-analysis panel -- POST /api/analyses and redirect to /a/:id
 // ---------------------------------------------------------------------------
@@ -5801,7 +5989,7 @@ function biModelPost(url, body, errEl, done) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Export panel -- save to a user-chosen directory on the server filesystem
 // ---------------------------------------------------------------------------
@@ -5933,39 +6121,10 @@ function biModelPost(url, body, errEl, done) {
     btnSave.textContent = 'Saving...';
     resultEl.hidden     = true;
 
-    // Collect the current view's l=, j=, f= params.
-    var params = new URLSearchParams();
+    // The view's parameters, and where to save it.
+    var params = biViewParams();
     params.set('dir',      dir);
     params.set('filename', filename);
-
-    // l= comes from the join-form hidden input (not always in the URL).
-    var lInp = document.querySelector('#join-form input[name="l"]');
-    if (lInp) params.set('l', lInp.value);
-
-    // j=, c=, f=, and d= reflect the already-rendered view, so read from the URL.
-    var urlP = new URLSearchParams(location.search);
-    urlP.getAll('j').forEach(function (v) { params.append('j', v); });
-    if (urlP.get('jtype')) params.set('jtype', urlP.get('jtype'));
-    urlP.getAll('c').forEach(function (v) { params.append('c', v); });
-    urlP.getAll('f').forEach(function (v) { params.append('f', v); });
-    if (urlP.get('d')) params.set('d', '1');
-    // A relative range travels as itself, so the file holds the same rows this
-    // view is showing rather than the ones a frozen date pair would match.
-    if (urlP.get('range')) params.set('range', urlP.get('range'));
-    if (urlP.get('rcol'))  params.set('rcol',  urlP.get('rcol'));
-    // The time bucket an aggregated view was showing travels the same way, so
-    // the saved file holds the bucket column the page drew rather than the raw
-    // timestamps behind it.
-    ['span', 'tcol', 'as'].forEach(function (k) {
-      if (urlP.get(k)) params.set(k, urlP.get(k));
-    });
-    // A cross-row column is part of the view too, so the file holds the column
-    // the table is showing rather than the rows it was worked out from.  All
-    // three repeat (several columns, one order each), so they travel as lists.
-    // So is a lookup turned on or off for this view (lk=, nolk=).
-    ['cs', 'order', 'by', 'lk', 'nolk'].forEach(function (k) {
-      urlP.getAll(k).forEach(function (v) { params.append(k, v); });
-    });
 
     fetch('/export', {
       method: 'POST',
@@ -6010,7 +6169,7 @@ function biModelPost(url, body, errEl, done) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // Drag-and-drop integration with the shared overlay (default.html.tt)
 (function () {
   var panel        = document.getElementById('join-panel');
@@ -6039,7 +6198,7 @@ function biModelPost(url, body, errEl, done) {
 }());
 </script>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 // ---------------------------------------------------------------------------
 // Row highlight: applied when ?hl_col=, ?hl_op=, ?hl_val= are present in the
 // URL.  Used by the insights drill-down so the specific outlier row stands out
@@ -6102,7 +6261,7 @@ function biModelPost(url, body, errEl, done) {
      data-name="[% title | html %]"
      data-path="[% file_path | html %]"
      hidden></div>
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   try {
     var u      = new URL(location.href);
@@ -6159,7 +6318,7 @@ function biModelPost(url, body, errEl, done) {
      data-name="[% title | html %]"
      data-url="[% source_url | html %]"
      hidden></div>
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
   try {
     var u      = new URL(location.href);

@@ -1,4 +1,4 @@
-Proc-Spawner version 0.08 (EXPERIMENTAL)
+Proc-Spawner version 0.09 (EXPERIMENTAL)
 ========================================
 
 Compiles and runs shell one-liners (or portable shell scripts) from Perl
@@ -15,7 +15,11 @@ to descendants.)
   Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large
                          parsers of three sizes of the shell language
 
-HOW CLOSE TO DASH AND BASH (0.08; doc/large-subset/large-subset-state.md)
+WHAT IS OPEN: the file TODO lists every postponed thing in one place, first
+the decisions waiting for the author (with where to read and how to act),
+then the work, then what to watch.
+
+HOW CLOSE TO DASH AND BASH (0.09; doc/large-subset/large-subset-state.md)
 
 Of 41,952 shell strings from six public collections (tldr, NL2Bash,
 ShellCheck's tests, the bash Cookbook, the pure sh and bash bibles), the
@@ -41,6 +45,12 @@ not found".  Where dash and bash differ, the subset follows dash in 971,
 bash in 98, and neither in 170 (mostly $0, dates, random data).  The 7
 where ours differs: printf -v (2, decided), printf '%0.s' (1, open), echo
 into a broken pipe in a subshell (1), and 3 that depend on chance.
+Of the 40,410, 365 are shown not to depend on that environment at all, and
+34,293 more not under named assumptions (mostly that a program does the same
+in each run), so their agreement is a real one; the other 5,752 may depend on
+files, variables, programs' output or status, /tmp and the like (known issue
+X27: doc/large-subset/large-subset-environment.md, and a record by snippet ID,
+doc/large-subset/large-subset-provenance.tsv).
 
 For the programs alone, each call the strings make was also run as dash's
 builtin, as bash's builtin and as the program: of 757 calls (1,268 uses),
@@ -53,7 +63,8 @@ the program).  Section 7 has them all, with the decisions taken so far.
 Tested on Linux with glibc 2.39 (also built as if some or all of the
 extensions were missing: PROC_SPAWNER_WITHOUT="PIDFD_SPAWN ..." perl Makefile.PL),
 and with /proc hidden, as on FreeBSD (RT #182479; FreeBSD itself is not tested
-here): without /proc, t/graph.t and two batteries of t/dash.t are skipped.  Parts that flip process-wide
+here): without /proc, t/graph.t and two batteries of t/dash.t are skipped,
+and Perl's own writes into a pipe the caller gave may block (known issue X32).  Parts that flip process-wide
 state for a while (umask, signal actions) are bullet-proof only in
 non-threaded execution.
 
@@ -69,11 +80,14 @@ To install this module type the following:
 DEPENDENCIES
 
 Only modules that come with Perl.  Building needs a C compiler.
-Makefile.PL finds which posix_spawn extensions the libc has (chdir, fchdir,
-closefrom, tcsetpgrp, pidfd_spawn, cgroup) by compiling a call to each; an
-option the libc lacks fails with ENOTSUP, or is dropped, as
-%Proc::Spawner::UNSUPPORTED says.  The shell layer needs chdir (glibc 2.29
-or later); without it t/dash.t is skipped.
+Makefile.PL finds whether the libc has posix_spawn, and which of its
+extensions (chdir, fchdir, closefrom, tcsetpgrp, pidfd_spawn, cgroup), by
+compiling a call to each.  What the libc lacks is done in Perl's process
+around the call where that can be undone (chdir, the fds, the signal mask,
+...); the rest fails with ENOTSUP, or is dropped, as
+%Proc::Spawner::UNSUPPORTED says.  Without posix_spawn the primitive is fork
+and exec.  Resource limits, ignored signals and the nice value, which
+posix_spawn has no option for, are set around the call too.
 
 Tests: t/spawner.t (Proc::Spawner and the graph), t/graph.t (hand-written
 graphs), t/parsers.t (1,117 strings through the parsers), and t/dash.t

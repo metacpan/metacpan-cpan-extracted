@@ -1,0 +1,27 @@
+{
+  "@type": "Card",
+  "version": "2.0",
+  "uid": "urn:uuid:1abe1abe-0000-4000-8000-000000000001",
+  "name": { "full": "Label Everything" },
+  "emails": {
+    "e1": { "@type": "EmailAddress", "address": "a@example.com", "label": "Bills" }
+  },
+  "phones": {
+    "p1": { "@type": "Phone", "number": "+1 555 0100", "label": "Boat" }
+  },
+  "addresses": {
+    "a1": { "@type": "Address", "components": [ { "@type": "AddressComponent", "kind": "locality", "value": "Hobart" } ], "label": "Holiday house" }
+  },
+  "onlineServices": {
+    "os1": { "@type": "OnlineService", "uri": "xmpp:a@example.com", "label": "Old Jabber" }
+  },
+  "media": {
+    "m1": { "@type": "Media", "kind": "photo", "uri": "https://example.com/a.jpg", "label": "Profile" }
+  },
+  "links": {
+    "l1": { "@type": "Link", "uri": "https://example.com/blog", "label": "Blog" }
+  },
+  "calendars": {
+    "c1": { "@type": "Calendar", "uri": "https://cal.example.com/a", "label": "Team" }
+  }
+}

@@ -1,0 +1,9 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: Unknown charset
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <uc-1@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=x-no-such-charset
+
+Plain ASCII under an unknown charset.

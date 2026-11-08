@@ -46,6 +46,24 @@ SKIP: { skip 'no chdir in this libc', 1 unless has([[chdir => '/']], {});
 { local $SIG{USR1} = 'IGNORE';   # a Perl child reports what it inherited (no /proc needed)
   ($out) = capture([$PERL, '-e', $SIGPEEK], {}); like $out, qr/ign=1/, 'an ignored signal stays ignored';
   ($out) = capture([$PERL, '-e', $SIGPEEK], {}, sigdefault => ['USR1']); like $out, qr/ign=0/, 'sigdefault' }
+{ # what posix_spawn has no option for (M1, post-0.08): set around the call and put back; unsupported where it cannot be
+  my $act = sub { my $o = POSIX::SigAction->new; POSIX::sigaction(POSIX::SIGUSR1(), undef, $o); $o->{HANDLER} };
+  SKIP: { skip 'sigignore: not done by this spawn', 4 unless $has->([], { sigignore => [POSIX::SIGUSR1()] });
+    my $before = $act->();
+    ($out) = capture([$PERL, '-e', $SIGPEEK], {}, sigignore => ['USR1']); like $out, qr/ign=1 blk=0/, 'sigignore';
+    is $act->(), $before, 'sigignore: ours put back';
+    ok !Proc::Spawner::spawn($TRUE, ['true'], undef, [], { sigignore => [POSIX::SIGUSR1()], sigdefault => [POSIX::SIGUSR1()] })
+       && $! == POSIX::EINVAL(), 'sigignore and sigdefault of one signal: EINVAL';
+    ok !$has->([], { sigignore => [POSIX::SIGCHLD()] }), 'sigignore of SIGCHLD: unsupported (our other children would be reaped)' }
+  SKIP: { skip 'rlimit: not done by this spawn', 2 unless $has->([], { rlimit => [] });
+    my $sh_n = sub { my ($o) = capture(['/bin/sh', '-c', 'ulimit -n'], {}, @_); chomp $o; $o };
+    my $ours = $sh_n->();
+    skip "rlimit: our NOFILE limit is $ours", 2 unless $ours =~ /^[0-9]+$/ && $ours > 64;
+    is $sh_n->(rlimit => { NOFILE => 64 }), 64, 'rlimit: NOFILE in the child'; is $sh_n->(), $ours, 'rlimit: ours put back' }
+  SKIP: { skip 'nice: not done by this spawn, or not undone without privilege here', 2 unless $has->([], { nice => 3 });
+    my $ours = getpriority(0, 0);
+    ($out) = capture([$PERL, '-e', 'print getpriority(0, 0), "\n"'], {}, nice => 3);
+    is $out, ($ours + 3 > 19 ? 19 : $ours + 3) . "\n", 'nice'; is getpriority(0, 0), $ours, 'nice: ours put back' } }
 
 { # a write larger than a pipe holds, without blocking us; the reader takes it all
   pipe my $r, my $w or die; pipe my $r2, my $w2 or die;

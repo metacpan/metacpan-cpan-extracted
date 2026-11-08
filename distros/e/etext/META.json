@@ -1,0 +1,71 @@
+{
+   "abstract" : "A Tk text widget with nestable \"blocks\" (editable formulas)",
+   "author" : [
+      "Ilya Zakharevich <ilyaz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "Tk",
+      "text",
+      "widget",
+      "block",
+      "formula",
+      "equation",
+      "editor"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "etext",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "utils",
+         "demo"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Tk" : "804.027"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Tk" : "804.027",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ilyaz-ai/etext/issues"
+      },
+      "homepage" : "https://github.com/ilyaz-ai/etext",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ilyaz-ai/etext.git",
+         "web" : "https://github.com/ilyaz-ai/etext"
+      }
+   },
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

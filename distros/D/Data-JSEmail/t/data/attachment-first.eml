@@ -1,0 +1,18 @@
+From: Alice <alice@example.com>
+To: Bob <bob@example.org>
+Subject: Attachment before the body
+Date: Sat, 07 Nov 2026 10:00:00 +0000
+Message-ID: <attfirst-1@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="af"
+
+--af
+Content-Type: text/plain; charset=us-ascii; name="secret.txt"
+Content-Disposition: attachment; filename="secret.txt"
+
+ATTACHMENT TEXT that is not the body.
+--af
+Content-Type: text/plain; charset=us-ascii
+
+The real body.
+--af--

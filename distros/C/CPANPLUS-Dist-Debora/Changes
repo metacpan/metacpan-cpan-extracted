@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.019  2026-11-05 22:04:30 CET
+
+  - Add --nosignature to rpm command
+
 0.018  2025-07-30 11:31:29 CEST
 
   - Handle release candidate versions

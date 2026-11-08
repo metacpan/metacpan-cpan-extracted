@@ -348,11 +348,24 @@ static void usage_croak(pTHX_ const char *restrict fn, const char *restrict pat,
 attribute of its own, so an NVgf format written at the call site draws the same
 bogus warning pair described above; taking the format as an ordinary argument
 keeps the checker out of it. my_snprintf() is the portable spelling here --
-plain snprintf() cannot print an NV on a quadmath build.*/
+plain snprintf() cannot print an NV on a quadmath build.
+
+The price is -Wformat-nonliteral (in -Wformat=2) on the call below, which is
+silenced for this function alone: its one caller passes a literal. diagnostic
+push/pop is gcc 4.6 and clang; any other compiler compiles it unguarded.*/
+#if defined(__clang__) || (defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)))
+#  define LIKER_NONLITERAL_FMT_OK 1
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
 static int snprintf_nv(char *buf, Size_t buflen, const char *fmt, NV x)
 {
 	return my_snprintf(buf, buflen, fmt, x);
 }
+#ifdef LIKER_NONLITERAL_FMT_OK
+#  pragma GCC diagnostic pop
+#  undef LIKER_NONLITERAL_FMT_OK
+#endif
 /*Compare a NUL-terminated string against a lowercase ASCII literal, ignoring
 case. strcasecmp() would do this, but it is declared in <strings.h>, which is
 POSIX-only -- MSVC ships neither the header nor the function, so a build there
@@ -25084,19 +25097,19 @@ CODE:
 	if (items < 3)
 		usage_croak(aTHX_ "ptukey", "q, nmeans and df are all required");
 	const NV q = SvNV(ST(0)), nmeans = SvNV(ST(1)), df = SvNV(ST(2));
-	/*ptukey(q, nmeans, df, nranges => 1, lower_tail => 1, log_p => 0)
+	/*ptukey(q, nmeans, df, nranges => 1, lower => 1, log => 0)
 	Studentized range CDF, as in R's ptukey(), for one q: unlike R's, it does
 	not take a vector.*/
 	NV nranges = 1.0;
-	bool lower_tail = TRUE, log_p = 0;
+	bool lower_tail = TRUE, log_p = FALSE;	//lower_tail and log_p also answer to lower and log, as pt() does
 	if ((items - 3) % 2 != 0)
 		usage_croak(aTHX_ "ptukey", "arguments after q, nmeans and df must be name => value pairs");
 	for (int i = 3; i < items; i += 2) {
 		const char *key = SvPV_nolen(ST(i));
 		SV *val = ST(i + 1);
 		if      (strEQ(key, "nranges"))    nranges    = SvNV(val);
-		else if (strEQ(key, "lower_tail")) lower_tail = SvTRUE(val) ? 1 : 0;
-		else if (strEQ(key, "log_p"))      log_p      = SvTRUE(val) ? 1 : 0;
+		else if (strEQ(key, "lower") || strEQ(key, "lower_tail")) lower_tail = cBOOL(SvTRUE(val));
+		else if (strEQ(key, "log")   || strEQ(key, "log_p"))      log_p      = cBOOL(SvTRUE(val));
 		else usage_croak(aTHX_ "ptukey", "unknown argument '%s'", key);
 	}
 	/*NaN in is NaN out, as R's ptukey() has it. Up to 0.331 a NaN q went
@@ -25120,18 +25133,18 @@ CODE:
 		usage_croak(aTHX_ "qtukey", "p, nmeans and df are all required");
 	NV p = SvNV(ST(0));	//not const: log_p and lower_tail rewrite it below
 	const NV nmeans = SvNV(ST(1)), df = SvNV(ST(2));
-	/*qtukey(p, nmeans, df, nranges => 1, lower_tail => 1, log_p => 0)
+	/*qtukey(p, nmeans, df, nranges => 1, lower => 1, log => 0)
 	Inverse studentized range CDF, as in R's qtukey().*/
 	NV nranges = 1.0;
-	bool lower_tail = TRUE, log_p = 0;
+	bool lower_tail = TRUE, log_p = FALSE;	//lower_tail and log_p also answer to lower and log, as pt() does
 	if ((items - 3) % 2 != 0)
 		usage_croak(aTHX_ "qtukey", "arguments after p, nmeans and df must be name => value pairs");
 	for (int i = 3; i < items; i += 2) {
 		const char *key = SvPV_nolen(ST(i));
 		SV *val = ST(i + 1);
 		if      (strEQ(key, "nranges"))    nranges    = SvNV(val);
-		else if (strEQ(key, "lower_tail")) lower_tail = SvTRUE(val) ? 1 : 0;
-		else if (strEQ(key, "log_p"))      log_p      = SvTRUE(val) ? 1 : 0;
+		else if (strEQ(key, "lower") || strEQ(key, "lower_tail")) lower_tail = cBOOL(SvTRUE(val));
+		else if (strEQ(key, "log")   || strEQ(key, "log_p"))      log_p      = cBOOL(SvTRUE(val));
 		else usage_croak(aTHX_ "qtukey", "unknown argument '%s'", key);
 	}
 	/*A NaN anywhere, and a p outside [0, 1] -- a log p above 0 -- is NaN, as
@@ -25489,24 +25502,24 @@ PPCODE:
 			cs_key *keys;
 			Newx(keys, cap, cs_key);
 			SAVEFREEPV(keys);
-			size_t i = 0;	//read after the walk: the number of rows
+			size_t nrow = 0;	//read after the walk: the number of rows
 			HE *he;
 			ITER_KEEP_BEGIN(src_hv);
 			hv_iterinit(src_hv);
 			while ((he = hv_iternext(src_hv))) {
-				if (i == cap) continue;	//keys past the sized buffer are dropped, but a tied walk still runs to its end
+				if (nrow == cap) continue;	//keys past the sized buffer are dropped, but a tied walk still runs to its end
 				SV *k = hv_iterkeysv(he);
-				keys[i].sv = k;
-				keys[i].p  = SvPV_const(k, keys[i].len);
-				keys[i].u8 = cBOOL(SvUTF8(k));
-				i++;
+				keys[nrow].sv = k;
+				keys[nrow].p  = SvPV_const(k, keys[nrow].len);
+				keys[nrow].u8 = cBOOL(SvUTF8(k));
+				nrow++;
 			}
 			ITER_KEEP_END;
-			n = (SSize_t)i;
+			n = (SSize_t)nrow;
 /*Sort the row names bytewise, so the rows are built in an order that does not
  depend on perl's hash order. This was an insertion sort, quadratic in the row
  count: 82 s for a 200000-row HoH, all of it here.*/
-			qsort(keys, i, sizeof(cs_key), cs_key_cmp);
+			qsort(keys, nrow, sizeof(cs_key), cs_key_cmp);
 /*Materialize each HoH row as a fresh AoH row that also carries
  its outer key under the row-name column, so the name survives
  into either output shape.  The row *container* is a private
@@ -26497,8 +26510,8 @@ ITER_KEEP_END, so the count is read in one scope and the walk runs in a second.*
 				}
 				if (!kr) continue;
 				if (outh) {
-					STRLEN kl; const char *k = HePV(e, kl);
-					(void)hv_store(outh, k, HeUTF8(e) ? -(I32)kl : (I32)kl, kr, FLT_HE_HASH(inhv, e));
+					STRLEN kl; const char *kpv = HePV(e, kl);
+					(void)hv_store(outh, kpv, HeUTF8(e) ? -(I32)kl : (I32)kl, kr, FLT_HE_HASH(inhv, e));
 				} else av_push(outa, kr);
 			}
 			ITER_KEEP_END;
@@ -28923,12 +28936,14 @@ rows came back as one long header and the table as [].*/
 		lineno++;
 		line = SvPVX(line_sv);
 		len  = SvCUR(line_sv);
-		bool had_nl = 0;	//only the file's last line can lack its line end
+/*The line end stays in the buffer, past len, so that a line ending inside a
+quote can hand its own bytes on to the field below.*/
+		const char *eol = line + len;	//the line end that was cut off: "\n", "\r\n", "\r" or none
 		if (len && line[len-1] == (cr_eol ? '\r' : '\n')) {
-			had_nl = 1;
 			len--;
 			if (!cr_eol && len && line[len-1] == '\r')
 				len--;
+			eol = line + len;
 		}
 /*A UTF-8 byte-order mark is not part of the first field.  Excel's "CSV UTF-8"
 export writes one, and without this the first column came back named
@@ -29152,9 +29167,14 @@ the search resumes after it.*/
 				}
 			}
 		}
+/*A line end inside a quote is data, and the field gets the bytes the file
+holds, as pandas 3.0.4 keeps them; R 4.6.1's read.csv turns each CR into a LF
+instead.  Up to 0.3416 this was always "\n", so "a\r\nb" came back "a\nb".  A
+file ending inside the quote gets no line end it did not have.*/
 		if (in_quotes) {
-			if (had_nl)	//a file ending inside the quote gets no newline it did not have
-				sv_catpvn(field, "\n", 1);
+			const char *const end = SvPVX(line_sv) + SvCUR(line_sv);
+			if (end > eol)
+				sv_catpvn(field, eol, (STRLEN)(end - eol));
 			if (!span_line) {
 				span_line = q_line;
 				span_mid  = q_mid;

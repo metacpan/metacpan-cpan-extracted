@@ -32,10 +32,27 @@ require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use utf8;
+use Config;
 use Test::More;
 use Tie::Array;
 use Tie::Hash;
 use Stats::LikeR qw(ks_test oneway_test shapiro_test);
+
+# AddressSanitizer holds freed memory back from reuse in its quarantine (256 MB
+# by default), so under it RSS grows with every buffer a call frees, leak or
+# not: with libasan preloaded, the two checks below grew it by 104 MB and 66
+# MB, past their 20 MB limit. The runtime is found as a mapped libasan (gcc
+# links it dynamically, into perl or into LikeR.so alone), in perl's own flags
+# (clang links it statically into a perl built with it), or in LD_PRELOAD.
+sub asan_loaded {
+	return 1 if defined $ENV{LD_PRELOAD} && $ENV{LD_PRELOAD} =~ /asan/;
+	return 1 if "$Config{ccflags} $Config{ldflags}" =~ /-fsanitize=address/;
+	open my $fh, '<', '/proc/self/maps' or return 0;
+	while (my $map = <$fh>) {
+		return 1 if $map =~ m{/lib(?:clang_rt\.)?asan};
+	}
+	return 0;
+}
 
 # Imported at compile time, because no_leaks_ok's block form needs its
 # prototype visible when the file is parsed. Same shape as t/croak.leaks.t.
@@ -210,6 +227,7 @@ my %R = (
 SKIP: {
 	skip 'reads /proc/self/statm (Linux)', 2 unless $^O eq 'linux' && -r '/proc/self/statm';
 	skip 'Devel::Cover slows this past usefulness', 2 if $INC{'Devel/Cover.pm'};
+	skip 'AddressSanitizer\'s quarantine grows RSS whether or not memory leaks', 2 if asan_loaded();
 	require POSIX;
 	my $page = POSIX::sysconf(POSIX::_SC_PAGESIZE()) || 4096;
 	my $rss = sub {

@@ -18,6 +18,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
+        'Data::ICal' => 0,
         'DateTime::TimeZone' => 0,
         'Data::ICal::TimeZone' => '1.23',
         'DateTime::Format::ISO8601' => '0.08',

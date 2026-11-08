@@ -67,8 +67,8 @@
 			<td><code>/../[user@]host/dir/file.csv</code>, fetched over SFTP.</td>
 		</tr>
 		<tr>
-			<td>A table in a multi-table SQLite file</td>
-			<td><code>?it=&lt;table&gt;</code>, or <code>/tables?l=</code> to browse the schema first.</td>
+			<td>A table in a multi-table SQLite file, or a list in a JSON file</td>
+			<td><code>?it=&lt;table&gt;</code>, or <code>/tables?l=</code> to browse the schema first. In a link or a merge, <code>table:file/table</code> names one in <code>data_dir</code> and <code>path:/abs/path#table</code> one anywhere else, so its charts and panels keep it.</td>
 		</tr>
 		<tr>
 			<td>A table on a web page</td>
@@ -92,12 +92,24 @@
 <p>
 	Recognised extensions are <code>csv</code>, <code>psv</code>, <code>tsv</code>,
 	<code>sql</code>, <code>sqlite</code>, <code>sqlite3</code>, <code>db</code>,
-	<code>xml</code>, <code>xlsx</code> and JSON. A file whose columns cannot be
+	<code>xml</code>, <code>xlsx</code> and <code>json</code>. A file whose columns cannot be
 	identified is read as header-less and given synthetic column names rather
 	than silently losing its first row. Nor are rows lost when a column is
 	mostly empty: a bank export whose cheque-number column is filled in only
 	now and then still shows every transaction, and a filter such as
-	<em>is not empty</em> on that column picks out the cheques.
+	<em>is not empty</em> on that column picks out the cheques. A UTF-8
+	byte-order mark at the start of a file, which Excel's <em>CSV UTF-8</em>
+	writes, is read past, so it never becomes part of the first column's name.
+</p>
+<p>
+	A JSON file is a table when it is a list of objects, an object of objects
+	(each key a row, in a column <code>id</code>), or an object holding lists of
+	objects, as a scan report or an API reply does:
+	<code>{"tool": "scan", "findings": [...], "hosts": [...]}</code>. Each list is
+	a table, so a file with more than one opens on the Tables page with a card
+	for each, as a SQLite file with several tables does. Values beside the lists,
+	such as a date or a count, are left out. A cell holding an object or a list
+	shows as its JSON text, and the columns keep the order the file gives them.
 </p>
 <p id="mariadb">
 	A <strong>MariaDB or MySQL server</strong> is opened by name. Add it to
@@ -147,6 +159,9 @@
 		<strong>Narrow.</strong> Filters (<code>f=col:op:value</code>) and a
 		relative time range (<code>range=</code>, <code>rcol=</code>) are applied
 		after the joins and before anything is aggregated.
+		<code>Year:between:1880:1900</code> keeps the rows from 1880 to 1900,
+		both included, whichever bound is written first; the filter row offers
+		<em>between</em> for number columns as well as dates.
 	</li>
 	<li>
 		<strong>Add cross-row columns.</strong> A running total, rank or z-score is
@@ -167,13 +182,24 @@
 	<dd>
 		<code>eq</code>, <code>ne</code>, <code>contains</code>,
 		<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
-		<code>ge</code>, <code>empty</code>, <code>notempty</code>, and
+		<code>ge</code>, <code>between</code>, <code>empty</code>,
+		<code>notempty</code>, and
 		<code>in</code>, any value of a JSON list
 		(<code>f=place:in:["Paris","Rome"]</code>), which a map uses to link to
 		the rows it could not plot. String
 		comparisons are case-insensitive. The four order operators compare numbers,
 		reading <code>$1,234.56</code> and <code>(1,234.56)</code> as numbers too; a
 		blank or a word in the cell matches none of them.
+		<code>between</code> takes <code>lo:hi</code> in either order: two numbers
+		compare as numbers, two dates or timestamps as times, anything else as text.
+	</dd>
+	<dt>Mistakes</dt>
+	<dd>
+		An operator that is not one of these (they are lower case), and a filter
+		on a column the view does not have, are a 400 whose message lists the
+		operators or the columns; they used to keep every row, or none, as if the
+		filter had worked. A canvas card's own saved filter on a column its
+		dataset no longer has is ignored instead.
 	</dd>
 	<dt>Dates</dt>
 	<dd>
@@ -210,6 +236,8 @@ this_year, last_year</code></pre>
 	and a saved canvas all show the same rows. Filters you wrote are untouched.
 	Entries whose window falls entirely outside the data are disabled in the
 	filter bar, with the column's earliest and latest value in the tooltip.
+	The filter bar offers Time range only when the table has a column of dates
+	or dates and times, and its column menu lists only those columns.
 </p>
 <p>
 	An unknown <code>range=</code> is a 400 rather than a silently unfiltered
@@ -385,6 +413,22 @@ POST /export  l=...&amp;dir=/tmp&amp;filename=out.csv</code></pre>
 	table's label. JSON is available from the pivot and from a canvas card, and
 	XLSX from the pivot.
 </p>
+<p>
+	<strong>Print</strong>, to the right of Refresh on a table, prints the same
+	rows: the header row and every row of the view, not only the page on screen,
+	with the columns in the order the table shows and sorted as it is sorted.
+	Nothing else on the page is printed, and the header row repeats on each
+	printed page. A row deleted from the screen with <em>Delete selected</em> is
+	still printed; a deleted column is not. A view of more than 10,000 rows asks
+	before it is laid out.
+</p>
+<p>
+	<code>POST /export</code> saves into a folder on the server, so it keeps to
+	<code>file_roots</code> and <code>export_dirs</code> when they are set (and
+	<code>export_dirs</code> must be set with a password), never into a dot-folder,
+	and never over a link or a folder of that name. See
+	<a href="install.html#file-roots">Which folders it may use</a>.
+</p>
 
 <h2>Limits worth knowing</h2>
 <ul class="plain">
@@ -405,10 +449,11 @@ POST /export  l=...&amp;dir=/tmp&amp;filename=out.csv</code></pre>
 		this is built for.
 	</li>
 	<li>
-		A relative range compares the column as a string, like every other filter.
-		A timestamp with an offset is read as far as its <code>YYYY-MM-DD</code>
-		prefix, so <code>last_24_hours</code> is exact on an ISO
-		<code>YYYY-MM-DDTHH:MM:SS</code> column.
+		An ISO timestamp is read as written: a fraction of a second, a trailing
+		<code>Z</code> or an offset such as <code>+01:00</code> is accepted, and the
+		zone is not applied. A non-ISO timestamp is read as far as its
+		<code>YYYY-MM-DD</code> prefix, so <code>last_24_hours</code> is exact on ISO
+		timestamps in the server's zone.
 	</li>
 	<li>
 		Upload staging is managed: subdirectories older than 24 hours are evicted

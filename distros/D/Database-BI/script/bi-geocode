@@ -40,7 +40,7 @@ use Getopt::Long qw(GetOptions :config no_ignore_case);
 use File::Spec;
 use Mojo::JSON qw(decode_json encode_json);
 use Mojo::File;
-use POSIX qw(strftime);
+use Database::BI::Util qw(iso8601_utc);
 
 # ---------------------------------------------------------------------------
 # Parse arguments
@@ -48,8 +48,8 @@ use POSIX qw(strftime);
 
 my @opt_cols;
 my ($opt_spec, $opt_data_dir, $opt_model_dir,
-    $opt_openaddr, $opt_region, $opt_dry_run, $opt_verbose, $opt_help,
-    $opt_offline, $opt_online_max);
+	$opt_openaddr, $opt_region, $opt_dry_run, $opt_verbose, $opt_help,
+	$opt_offline, $opt_online_max);
 
 GetOptions(
 	'spec|s=s'       => \$opt_spec,
@@ -91,11 +91,14 @@ my $model_dir = $opt_model_dir // '.bi';
 
 require Database::BI::Model::DataSource;
 
-my ($table, $path, $url);
+# table:<name>/<table> and path:<file>#<table> name one table of a file.
+my ($table, $path, $url, $internal);
 if ($opt_spec =~ /\Atable:(.+)\z/) {
 	$table = $1;
+	($table, $internal) = ($1, $2) if $table =~ m{\A([^/]+)/(.+)\z};
 } elsif ($opt_spec =~ /\Apath:(.+)\z/) {
-	$path = $1;
+	require Database::BI::Model::DataSource;
+	($path, $internal) = Database::BI::Model::DataSource::split_path($1);
 } elsif ($opt_spec =~ /\Aurl:(.+)\z/) {
 	$url = $1;
 } else {
@@ -108,6 +111,7 @@ my $source = eval {
 		Database::BI::Model::DataSource->new(
 			table     => $table,
 			directory => $data_dir,
+			defined $internal ? (internal_table => $internal) : (),
 		);
 	} elsif (defined $path) {
 		# As the map page opens it: the table is the file's name without its
@@ -117,6 +121,7 @@ my $source = eval {
 		Database::BI::Model::DataSource->new(
 			table     => $stem,
 			directory => $f->dirname->to_string,
+			defined $internal ? (internal_table => $internal) : (),
 		);
 	} else {
 		Database::BI::Model::DataSource->new(url => $url);
@@ -225,7 +230,7 @@ if ($counts->{attempted} // 0) {
 	my $updated = Database::BI::Model::Geocode->models_with_shared_cache(
 		$models, $result->{cache},
 		(defined($backend) ? (backend => $backend) : ()),
-		built => strftime('%Y-%m-%dT%H:%M:%SZ', gmtime),
+		built => iso8601_utc(),
 	);
 
 	eval {
@@ -286,3 +291,104 @@ Exit codes:
   2 = bad arguments or data source error
 USAGE
 }
+
+__END__
+
+=head1 NAME
+
+bi-geocode - fill Database::BI's geocode cache for a column of places
+
+=head1 SYNOPSIS
+
+    bi-geocode --spec <spec> --col <column> [--col <column> ...]
+               [--data-dir <dir>] [--model-dir <dir>]
+               [--openaddr <path>] [--region <CC>]
+               [--offline] [--online-max <n>]
+               [--dry-run] [--verbose]
+
+=head1 DESCRIPTION
+
+Opens a dataset, looks up every distinct value of the named column (or of
+several, C<--col> repeated, joined with C<", ">: an address, then its country),
+and writes the coordinates into the shared geocode cache in the model store.
+Map pages for the dataset then draw from the cache without asking a geocoder.
+
+Places are looked up in L<Geo::Coder::Free>'s local data first, then on
+OpenStreetMap (Nominatim) at one a second, with no limit unless
+C<--online-max> sets one: the map page asks Nominatim for at most
+C<map_geocode_online_max> places, and this is how the rest are found.
+C<--offline> keeps every lookup local.  A second run on a warm cache looks up
+nothing more, and says so.  Geocoding needs Geo::Coder::Free and
+Geo::Coder::List, which are recommended rather than required.
+
+    0 2 * * * cd /opt/myapp && bi-geocode --spec table:customers --col city --region US
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--spec>, B<-s> I<spec>
+
+The dataset: C<table:name>, C<path:/abs/path> or C<url:...>.  Required.
+
+=item B<--col>, B<-c> I<column>
+
+A column holding place names.  Required; repeat it for a place spread across
+columns (C<--col Address --col Country>).
+
+=item B<--data-dir>, B<-d> I<dir>
+
+The data folder (default: F<data>).
+
+=item B<--model-dir>, B<-m> I<dir>
+
+The model store folder (default: F<.bi>).
+
+=item B<--openaddr>, B<-o> I<path>
+
+An OpenAddresses data folder for Geo::Coder::Free.
+
+=item B<--region>, B<-r> I<CC>
+
+An ISO 3166-1 alpha-2 region hint, such as C<US> or C<GB>.
+
+=item B<--offline>
+
+Use the local data only, never OpenStreetMap.
+
+=item B<--online-max> I<n>
+
+Look up at most I<n> places on OpenStreetMap.
+
+=item B<--dry-run>, B<-n>
+
+Look places up but do not write the cache.
+
+=item B<--verbose>, B<-v>
+
+Print progress to STDERR.
+
+=item B<--help>, B<-h>
+
+Show the usage.
+
+=back
+
+=head1 EXIT STATUS
+
+0 on success, 1 when the column is not found or there are no rows, 2 for bad
+arguments or a data source that cannot be read.
+
+=head1 AUTHOR
+
+Nigel Horne C<< <njh@nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

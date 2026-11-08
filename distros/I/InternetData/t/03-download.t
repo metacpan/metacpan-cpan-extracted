@@ -162,6 +162,54 @@ subtest 'object storage failing before the first byte is retried, and the file h
     is(-s $path, length $DATABASE, 'with exactly one copy on disk');
 };
 
+subtest 'a build goes on the download request, and none without one' => sub {
+    my $origin = origin_for(\&whole_database);
+    my $client = client_for($origin);
+    my ($dir, $path) = temp_path();
+    my $named = '20261105.0t53s5';
+
+    $client->database->download_url('bogon_ip_v1', 'csvgz', build => $named);
+    $client->database->download_bytes('bogon_ip_v1', 'csvgz', build => $named);
+    $client->database->download('bogon_ip_v1', 'csvgz', $path, build => $named);
+    $client->database->download_url('bogon_ip_v1', 'csvgz', build => '');
+    $client->database->download_bytes('bogon_ip_v1', 'csvgz');
+
+    my @asked = map { $_->{query} }
+        grep { $_->{path} eq '/api/v2/database/download' } $origin->requests;
+    my %with_build = (id => 'bogon_ip_v1', format => 'csvgz', build => $named);
+    my %live = (id => 'bogon_ip_v1', format => 'csvgz');
+    is_deeply(\@asked, [\%with_build, \%with_build, \%with_build, \%live, \%live],
+        'the named build on each call that named it, and on no other');
+};
+
+subtest 'a build that is no string is refused before any request' => sub {
+    my $origin = origin_for(\&whole_database);
+    my $client = client_for($origin);
+
+    for my $call (
+        sub { $client->database->download_url('bogon_ip_v1', 'csvgz', build => ['x']) },
+        sub { $client->database->download_bytes('bogon_ip_v1', 'csvgz', build => {}) },
+    ) {
+        ok(!eval { $call->(); 1 }, 'refused');
+        like($@, qr/build must be a build's name/, 'naming the option');
+    }
+    is($origin->count, 0, 'with nothing sent');
+};
+
+subtest 'a gone build is a bad_request, asked once' => sub {
+    my $origin = InternetDataTest::Origin->new(sub {
+        shift->render(json => { rc => 'BUILD_GONE' }, status => 410);
+    });
+    my $client = client_for($origin, retries => 3);
+
+    ok(!eval { $client->database->download_url('bogon_ip_v1', 'csvgz', build => '20261029.aaaaaa'); 1 },
+        'refused');
+    is($@->kind, 'bad_request', 'classified as bad_request');
+    is($@->message, 'BUILD_GONE', "carrying the API's rc");
+    is($@->retryable, 0, 'not worth retrying');
+    is($origin->count, 1, 'and asked exactly once');
+};
+
 subtest 'a database the organization does not license is refused once' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         shift->render(json => { rc => 'NOT_LICENSED' }, status => 403);

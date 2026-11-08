@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-     my $oidc = Browser::OIDC->new($base_url);
+     my $oidc = Browser::OIDC->new_from_discovery($base_url);
      my $token = $oidc->get_token(
              client_id => 'me',
              scope     => [ 'email' ],
@@ -18,12 +18,19 @@ DESCRIPTION
 
 METHODS
 
- new
+ new_from_discovery
 
      my $oidc = Browser::OIDC->new($base_url);
 
     This creates a new Browser::OIDC object. This will fetch the
     configuration for the given $base_url.
+
+ new_from_config
+
+     my $oidc = Browser::OIDC->new($config);
+
+    This creates a new Browser::OIDC object. This use a OIDC discovery
+    configuration instead of fetching it.
 
  get_token
 
@@ -47,6 +54,11 @@ METHODS
 
       This list will be the scopes of the request. 'openid' is
       automatically added to this list so does not need to be given.
+
+    nonce
+
+      The nonce used in the request. If none if given one will be generated
+      automatically.
 
     message
 
@@ -81,8 +93,6 @@ METHODS
       Hint to the Authorization Server about the login identifier the
       End-User might use to log in (if necessary).
 
-    nonce
-
  issuer
 
      $oidc->issuer;
@@ -101,6 +111,13 @@ METHODS
      $oidc->scopes_supported;
 
     This returns the list of supported scopes.
+
+ jwks
+
+     my $keyset = $oidc->jwks;
+
+    This returns a JSON Web Key Set as a hash, with keys as a arrayref of
+    JWK entries.
 
 TODO
 

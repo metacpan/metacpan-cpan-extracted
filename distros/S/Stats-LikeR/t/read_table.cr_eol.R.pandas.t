@@ -42,8 +42,7 @@
 # Up to 0.33 the LF made the whole file read as LF-terminated: the first read
 # back as the one row a, b1, "x\ny2", z.
 #
-# The rest -- a compressed CR file, a commented-out header, a quoted field that
-# runs over a line end, a regex sep, and where the start-of-file test draws its
+# The rest -- a compressed CR file, a commented-out header, a regex sep, and where the start-of-file test draws its
 # lines -- are carried by neither suite and are here because they are what
 # _eol_is_cr() and the parser's cr_eol mode have to get right.
 require 5.010;
@@ -155,10 +154,12 @@ is_deeply read_table(fixture("# id\tv\r1\t2\r"), sep => "\t"), [ { id => 1, v =>
 	'a commented-out header is recovered';
 is_deeply read_table(fixture("\xEF\xBB\xBFid,v\r1,2\r")), [ { id => 1, v => 2 } ],
 	'a byte-order mark is dropped';
-# The CR inside the quotes is a line end of the file, so it comes back as the
-# "\n" a quoted LF or CRLF line break does.
+# A line end inside quotes is data, kept as the bytes the file holds, so the CR
+# comes back as a CR. pandas 3.0.4 reads it so (pd.read_csv(f, dtype=str,
+# keep_default_na=False) gives v = 'x\ry'); R 4.6.1's read.csv gives "x\ny",
+# which this file pinned up to 0.3416, when every quoted line end became "\n".
 is_deeply read_table(fixture(qq{id,v\r1,"x\ry"\r2,z\r})),
-	[ { id => 1, v => "x\ny" }, { id => 2, v => 'z' } ],
+	[ { id => 1, v => "x\ry" }, { id => 2, v => 'z' } ],
 	'a quoted field that runs over a line end';
 is_deeply read_table(fixture("id,v\r1,NA\r"), 'na_strings' => 'NA'),
 	[ { id => 1, v => undef } ], 'na_strings';

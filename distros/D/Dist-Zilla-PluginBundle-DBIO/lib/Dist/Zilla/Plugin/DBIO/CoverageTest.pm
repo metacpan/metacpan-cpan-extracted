@@ -1,5 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::CoverageTest;
 # ABSTRACT: Generate xt/release/coverage.t from a Devel::Cover DB
+our $VERSION = '0.900004';
 use Moose;
 use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -41,6 +42,7 @@ use strict;
 use warnings;
 use FindBin;
 use Cwd;
+use Scalar::Util 'blessed';
 use Test::More;
 
 # Resolve the dist root: the parent of t/ when the test was rewritten from
@@ -55,6 +57,13 @@ chdir $dist_root or die "chdir $dist_root: $!"
 my $THRESHOLD = __THRESHOLD__;
 
 if (! -d 'cover_db') {
+  # A release without a coverage run is a failed release: the gate must not
+  # pass by having nothing to look at.
+  if ($ENV{RELEASE}) {
+    fail('No cover_db/ under RELEASE=1 -- run with HARNESS_PERL_SWITCHES=-MDevel::Cover');
+    done_testing;
+    exit;
+  }
   plan skip_all => 'No cover_db/ -- run with HARNESS_PERL_SWITCHES=-MDevel::Cover';
 }
 
@@ -68,6 +77,10 @@ my $db = Devel::Cover::DB->new(db => 'cover_db');
 unless ($db->is_valid) {
   plan skip_all => 'cover_db/ is not a valid Devel::Cover database';
 }
+
+# A coverage run leaves runs/ only; the merged database is what `cover` makes.
+# Do the merge here, so a fresh cover_db is scored rather than skipped (k12).
+$db->merge_runs;
 
 # Materialise the merged run data. Devel::Cover::DB->cover is lazy: it
 # reads structure + runs on first call and returns a Cover handle.
@@ -98,7 +111,7 @@ for my $file (sort $cover->items) {
     # a statement with val > 0 was executed.
     for my $stmt (@$loc_data) {
       $c_total++;
-      $c_covered++ if ref($stmt) && $stmt->can('val') && $stmt->val > 0;
+      $c_covered++ if blessed($stmt) && $stmt->can('val') && $stmt->val > 0;
     }
   }
 
@@ -116,7 +129,7 @@ if (!$total) {
 my $overall = sprintf '%.1f', 100 * $covered / $total;
 
 my $strict = $ENV{COVERAGE_STRICT} || $ENV{RELEASE};
-my @diag = map { "  $_->{file}: $_->{pct}%$_->{note}" } @per_module;
+my @diag = map { "  $_->{file}: $_->{pct}%" . (defined $_->{note} ? " ($_->{note})" : '') } @per_module;
 
 if ($overall + 0 >= $THRESHOLD) {
   pass("statement coverage $overall% >= $THRESHOLD%");
@@ -166,7 +179,7 @@ Dist::Zilla::Plugin::DBIO::CoverageTest - Generate xt/release/coverage.t from a 
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -175,14 +188,18 @@ F<dzil test>, reads F<cover_db/> and checks that statement coverage of the
 modules under F<lib/> meets a threshold. The threshold is configurable
 via the C<coverage_threshold> option (default 80).
 
-By default the test emits a TAP skip when coverage is below the threshold
-so a missing or low-coverage run never blocks `dzil test` for developers.
-Set C<COVERAGE_STRICT=1> or C<RELEASE=1> in the environment to flip the
-same gap into a failure -- that is how `dzil release` enforces coverage.
+The test merges the runs of a fresh F<cover_db/> itself (C<merge_runs>), so
+a plain coverage run without a prior C<cover> is scored. A missing
+F<cover_db/> fails under C<RELEASE=1> -- a release without a coverage run is
+a failed release -- and skips otherwise (as do an invalid database, a missing
+L<Devel::Cover::DB>, or no F<lib/> file exercised). By default a score below the threshold passes with a diagnostic, so a low-coverage
+run never blocks C<dzil test> for developers. Set C<COVERAGE_STRICT=1> or
+C<RELEASE=1> in the environment to turn that below-threshold score into a
+failure. With a threshold of 0 the test is a no-op skip.
 
-The test must be installed by F<[ExtraTests]> before it counts as a real
-release test, so this plugin is wired into F<[@DBIO]> B<before>
-F<[ExtraTests]> in F<Dist::Zilla::PluginBundle::DBIO>.
+F<[ExtraTests]> rewrites the gathered F<xt/release/coverage.t> into
+F<t/release-coverage.t>, guarded by C<RELEASE_TESTING>. The order of the two
+plugins in F<[@DBIO]> does not matter, since munging runs after all gathering.
 
 =head1 ATTRIBUTES
 

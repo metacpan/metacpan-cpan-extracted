@@ -1,0 +1,40 @@
+---
+abstract: 'A Tk text widget with nestable "blocks" (editable formulas)'
+author:
+  - 'Ilya Zakharevich <ilyaz@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Tk: '804.027'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Tk
+  - text
+  - widget
+  - block
+  - formula
+  - equation
+  - editor
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: etext
+no_index:
+  directory:
+    - t
+    - inc
+    - utils
+    - demo
+requires:
+  Tk: '804.027'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/ilyaz-ai/etext/issues
+  homepage: https://github.com/ilyaz-ai/etext
+  repository: https://github.com/ilyaz-ai/etext.git
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

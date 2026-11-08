@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,74 +17,84 @@ name: DBIO-Deprecated
 provides:
   DBIO::Deprecated:
     file: lib/DBIO/Deprecated.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::MySQL::Async:
     file: lib/DBIO/MySQL/Async.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::MySQL::Async::Pool:
     file: lib/DBIO/MySQL/Async/Pool.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::MySQL::Async::QueryExecutor:
     file: lib/DBIO/MySQL/Async/QueryExecutor.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::MySQL::Async::Storage:
     file: lib/DBIO/MySQL/Async/Storage.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::MySQL::Async::TransactionContext:
     file: lib/DBIO/MySQL/Async/TransactionContext.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::PostgreSQL::Async:
     file: lib/DBIO/PostgreSQL/Async.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::PostgreSQL::Async::ConnectInfo:
     file: lib/DBIO/PostgreSQL/Async/ConnectInfo.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::PostgreSQL::Async::Pool:
     file: lib/DBIO/PostgreSQL/Async/Pool.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::PostgreSQL::Async::Storage:
     file: lib/DBIO/PostgreSQL/Async/Storage.pm
-    version: '0.900001'
+    version: '0.900004'
   DBIO::PostgreSQL::Async::TransactionContext:
     file: lib/DBIO/PostgreSQL/Async/TransactionContext.pm
-    version: '0.900001'
+    version: '0.900004'
+  DBIO::ResultSourceHandle:
+    file: lib/DBIO/ResultSourceHandle.pm
+    version: '0.900004'
+  DBIO::Schema::Versioned:
+    file: lib/DBIO/Schema/Versioned.pm
+    version: '0.900004'
   DBIO::StartupCheck:
     file: lib/DBIO/StartupCheck.pm
-    version: '0.900001'
-  DBIO::Test::Future:
-    file: lib/DBIO/Test/Future.pm
-    version: '0.900001'
+    version: '0.900004'
+  DBIO::Version:
+    file: lib/DBIO/Version.pm
+    version: '0.900004'
+  DBIO::Version::Table:
+    file: lib/DBIO/Version/Table.pm
+    version: '0.900004'
   Dist::Zilla::Plugin::DBIO::SetCopyrightHolder:
     file: lib/Dist/Zilla/Plugin/DBIO/SetCopyrightHolder.pm
-    version: '0.900001'
+    version: '0.900004'
 requires:
   perl: '5.020'
 resources:
+  IRC: irc://irc.perl.org/#dbio
   bugtracker: https://codeberg.org/dbio/dbio-deprecated/issues
   homepage: https://codeberg.org/dbio/dbio-deprecated
   repository: https://codeberg.org/dbio/dbio-deprecated.git
-version: '0.900001'
+version: '0.900004'
 x_Dist_Zilla:
   perl:
-    version: '5.036000'
+    version: '5.040001'
   plugins:
     -
       class: Dist::Zilla::Plugin::DBIO::SetMeta
       name: '@DBIO/DBIO::SetMeta'
-      version: ~
+      version: '0.900004'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
-            - .proverc
-            - CLAUDE.md
+            - .karr
             - MANIFEST
             - META.json
             - META.yml
             - README
+            - README.md
           exclude_match: []
-          include_dotfiles: 0
+          include_dotfiles: 1
           prefix: ''
           prune_directory: []
           root: .
@@ -93,29 +103,33 @@ x_Dist_Zilla:
       name: '@DBIO/Git::GatherDir'
       version: '2.052'
     -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@DBIO/PruneCruft'
-      version: '6.037'
+      class: Dist::Zilla::Plugin::DBIO::LicenseFile
+      name: '@DBIO/DBIO::LicenseFile'
+      version: '0.900004'
     -
       class: Dist::Zilla::Plugin::DBIO::GatherSkills
       name: '@DBIO/DBIO::GatherSkills'
-      version: ~
+      version: '0.900004'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DBIO/ShareDir'
-      version: '6.037'
+      version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::GatherAgentContext
+      name: '@DBIO/GatherAgentContext'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DBIO/MetaJSON'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DBIO/MetaYAML'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DBIO/MetaConfig'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -124,7 +138,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.037'
+              version: '6.040'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -132,7 +146,7 @@ x_Dist_Zilla:
           inherit_version: 1
           meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000037'
+          Module::Metadata: '1.000038'
           version: '0.006'
       name: '@DBIO/MetaProvides::Package'
       version: '2.004003'
@@ -147,15 +161,15 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@DBIO/@Git::VersionManager/pluginbundle version'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':MainModule'
-          global: 0
+            - ':InstallModules'
+          global: 1
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
       name: '@DBIO/@Git::VersionManager/RewriteVersion::Transitional'
@@ -186,7 +200,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -199,11 +213,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900001
+          tag: v0.900004
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -214,7 +228,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':MainModule'
+            - ':InstallModules'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -223,7 +237,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DBIO/@Git::VersionManager/NextRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -240,7 +254,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -259,100 +273,112 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@DBIO/SingleEncoding'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Name
               name: '@DBIO/Name'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Version
               name: '@DBIO/Version'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@DBIO/Prelude'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@DBIO/Synopsis'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@DBIO/Description'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@DBIO/Overview'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Generic
               name: '@DBIO/Stability'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Collect
               name: '@DBIO/Attributes'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Collect
               name: '@DBIO/Methods'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@DBIO/Leftovers'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Region
               name: '@DBIO/Postlude'
-              version: '4.020'
+              version: '4.022'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: '@DBIO/SeeAlso'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::Authors
               name: '@DBIO/Authors'
-              version: '4.020'
+              version: '4.022'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DBIO/Legal'
-              version: '4.020'
+              version: '4.022'
       name: '@DBIO/PodWeaver'
       version: '4.010'
     -
       class: Dist::Zilla::Plugin::DBIO::CoverageTest
       name: '@DBIO/DBIO::CoverageTest'
-      version: ~
+      version: '0.900004'
+    -
+      class: Dist::Zilla::Plugin::DBIO::PodCheckerTest
+      name: '@DBIO/DBIO::PodCheckerTest'
+      version: '0.900004'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@DBIO/MakeMaker'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@DBIO/Readme'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DBIO/ManifestSkip'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DBIO/Manifest'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::DBIO::CodebergMeta
       name: '@DBIO/DBIO::CodebergMeta'
-      version: ~
+      version: '0.900004'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DBIO/MetaResources'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -366,7 +392,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@DBIO/Git::Check'
       version: '2.052'
@@ -374,18 +400,30 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@DBIO/Git::CheckFor::CorrectBranch'
-      version: '0.014'
+      version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DBIO/TestRelease'
+      version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@DBIO/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@DBIO/InstallRelease'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DBIO/ConfirmRelease'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DBIO/UploadToCPAN'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -394,59 +432,59 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.39.5
+          git_version: 2.47.3
           repo_root: .
       name: '@DBIO/Git::Push'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.037'
+      version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.037'
+      version: '6.040'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: '6.037'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+    version: '6.040'
+x_generated_by_perl: v5.40.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

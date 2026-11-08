@@ -7,7 +7,7 @@ use Carp ();
 
 use VPNDetection::Error;
 
-our $VERSION = '3.10.3';
+our $VERSION = '3.11.0';
 
 # The formats a dataset is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -96,8 +96,11 @@ sub download_url_p {
     my ($self, $id, $format, %options) = @_;
     _assert_dataset('download_url', $id, $format);
     my $client = $self->{client};
-    $client->_check_options('database->download_url', \%options, 'retries', 'timeout');
-    my $url = $client->_url('/api/v1/database/download', id => $id, format => $format);
+    $client->_check_options('database->download_url', \%options, 'build', 'retries', 'timeout');
+    my $url = $client->_url(
+        '/api/v1/database/download', id => $id, format => $format,
+        defined $options{build} ? (build => $options{build}) : (),
+    );
     my $retries = defined $options{retries} ? $options{retries} : $client->{retries};
     return $client->_retry_p($retries, sub {
         $client->_get_p($url, $options{timeout})->then(sub {
@@ -128,7 +131,7 @@ sub download_p {
     # Everything a caller can get wrong is refused before the file is opened, so
     # a mistyped ID cannot leave a stray .part behind.
     _assert_dataset('download', $id, $format);
-    $self->{client}->_check_options('database->download', \%options, 'retries');
+    $self->{client}->_check_options('database->download', \%options, 'build', 'retries');
     Carp::croak('database->download: expected a destination path')
         if !defined $path || !length $path;
 
@@ -187,7 +190,7 @@ sub _new {
 sub _transfer_p {
     my ($self, $method, $id, $format, $options, $on_chunk) = @_;
     my $client = $self->{client};
-    $client->_check_options("database->$method", $options, 'retries');
+    $client->_check_options("database->$method", $options, 'build', 'retries');
     my $retries = defined $options->{retries} ? $options->{retries} : $client->{retries};
     my $delivered = 0;
     my $count = sub {
@@ -360,7 +363,7 @@ itself:
         ],
     }
 
-The id every other method takes is C<< $version->{id} >>, never C<< $family->{base} >>.
+The ID every other method takes is C<< $version->{id} >>, never C<< $family->{base} >>.
 
 =head2 metadata($id)
 
@@ -385,6 +388,13 @@ A time-limited URL for one dataset file. The API answers C<302> and this returns
 the C<Location>; the bytes are yours to transfer however suits a file that can
 run to gigabytes. The link authorizes the START of a transfer, so one already
 running is not interrupted when it lapses.
+
+C<build> names one build of the dataset, as a C<database.updated> webhook gives
+it, so the file is the one whose C<sha256> the webhook carries; without it, the
+build that is live. A build is kept 7 days, and one pruned since is a
+C<bad_request> with status 410. C<download> and C<download_bytes> take it too.
+
+    $db->download_url('vpn_ip_extended_v1', 'mmdb', build => '20261105.0t53s5');
 
 =head2 download($id, $format, $path)
 

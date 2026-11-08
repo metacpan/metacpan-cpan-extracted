@@ -175,7 +175,7 @@ The caller then runs the string with `/bin/sh -c` (Q2).
 
 ## 8. Parse tree (Perl data structure)
 
-Implemented in `ShellSubset.pm`: `ShellSubset::parse($string, %options)` returns a List, or the hash of section 7. Strings inside arrays are operators or literal text; references are nodes. A hash key appears only when it has content.
+Implemented in [`ShellSubset.pm`](../../lib/Proc/ShellSubset.pm): `ShellSubset::parse($string, %options)` returns a List, or the hash of section 7. Strings inside arrays are operators or literal text; references are nodes. A hash key appears only when it has content.
 
 ```perl
 List     = [ AndOr, ... ]

@@ -1,9 +1,11 @@
 use ExtUtils::MakeMaker;
 use ExtUtils::CBuilder; use File::Temp 'tempdir'; use File::Spec; use Config;
 
-# The posix_spawn extensions this libc has.  They are functions, not macros, so #ifdef cannot see them:
-# compile and link a call to each, as autoconf would.  PROC_SPAWNER_WITHOUT="NAME ..." skips some (tests).
+# posix_spawn, and the extensions of it this libc has.  They are functions, not macros, so #ifdef cannot see them:
+# compile and link a call to each, as autoconf would.  PROC_SPAWNER_WITHOUT="NAME ..." skips some (tests).  Without
+# POSIX_SPAWN itself the primitive is fork and exec (decision M2), every setting done around it.
 my %PROBE = (
+  POSIX_SPAWN     => 'pid_t p; posix_spawn_file_actions_t f; posix_spawnattr_t a; return posix_spawn(&p, "/bin/true", &f, &a, 0, 0);',
   ADDCHDIR_NP     => 'posix_spawn_file_actions_t f; return posix_spawn_file_actions_addchdir_np(&f, "/");',
   ADDFCHDIR_NP    => 'posix_spawn_file_actions_t f; return posix_spawn_file_actions_addfchdir_np(&f, 0);',
   ADDCLOSEFROM_NP => 'posix_spawn_file_actions_t f; return posix_spawn_file_actions_addclosefrom_np(&f, 3);',
@@ -24,7 +26,7 @@ for my $n (sort grep !$without{$_}, keys %PROBE) {
                          $Config{gccversion} ? (extra_compiler_flags => '-Werror=implicit-function-declaration') : ());
     $cb->link_executable(objects => [$o], exe_file => "$dir/$n$Config{_exe}") } }
 open STDERR, '>&', $err or die;
-print "posix_spawn extensions found: ", join(' ', @have) || 'none', "\n";
+print "posix_spawn and extensions found: ", join(' ', @have) || 'none', "\n";
 
 WriteMakefile(
   NAME             => 'Proc::Spawner',
@@ -37,4 +39,6 @@ WriteMakefile(
   DEFINE           => join(' ', map "-DHAVE_$_", @have),
   CONFIGURE_REQUIRES => { 'ExtUtils::CBuilder' => 0, 'ExtUtils::MakeMaker' => 0 },
   TEST_REQUIRES    => { 'Test::More' => 0 },
+  META_MERGE       => { 'meta-spec' => { version => 2 },   # Run: only where there is neither posix_spawn nor fork (M2)
+                        prereqs => { runtime => { recommends => { Run => '0.07' } } } },
 );

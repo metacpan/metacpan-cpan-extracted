@@ -1,0 +1,4 @@
+		$lwp_options{ssl_opts}{SSL_ciphersuites}
+		  = 'TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384:TLS_AES_128_CCM_SHA256:TLS_AES_128_CCM_8_SHA256';
+		$lwp_options{ssl_opts}{SSL_version}    = 'TLSv1_3';
+		$lwp_options{ssl_opts}{SSL_ecdh_curve} = 'X25519:prime256v1:secp384r1';

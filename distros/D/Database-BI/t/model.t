@@ -438,7 +438,7 @@ subtest 'A canvas loads D3 from the configured URL' => sub {
 
 	$t->get_ok("/a/$cid")->status_is(200);
 	my $page = $t->tx->res->body;
-	like $page, qr{<script src="/static/d3/d3\.min\.js"></script>},
+	like $page, qr{<script\b[^>]*\ssrc="/static/d3/d3\.min\.js"></script>},
 		'the canvas loads D3 from the configured URL';
 	unlike $page, qr{cdnjs\.cloudflare\.com|d3js\.org},
 		'and asks no CDN for D3';
@@ -1018,14 +1018,14 @@ subtest '3.3: every card\'s chart script has a scope of its own' => sub {
 		{ 'Content-Type' => 'application/json' },
 		encode_json({ kind => 'pie', encode => { cat => 'region', value => 'amount' }, title => 'More slices' })
 	)->status_is(201)->tx->res->json->{html};
-	like $added, qr{<script>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
+	like $added, qr{<script\b[^>]*>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
 		'a card added after the page is up is given a scope too';
 
 	my $repaired = $t->patch_ok("/api/analyses/$cid/visuals/0",
 		{ 'Content-Type' => 'application/json' },
 		encode_json({ cross_row => {} })
 	)->status_is(200)->tx->res->json->{html};
-	like $repaired, qr{<script>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
+	like $repaired, qr{<script\b[^>]*>\s*\(function \(\) \{\n.*?\bconst\s+svg\b}s,
 		'as is one whose plan is repaired in place';
 };
 
@@ -2506,8 +2506,10 @@ subtest '3.2: the first-visit tip names both grips and is dismissed for good' =>
 	like $b, qr/\.visual-card\.pointing \.visual-resize-handle/, 'and the marked grip is tinted';
 	like $b, qr/\.canvas-hint\[hidden\] \{ display: none; \}/, 'the hidden tip takes no room';
 
-	my ($print_css) = $b =~ m{\@media print \{(.*?)\n\}}s;
-	ok $print_css, 'the page has a print stylesheet' or return;
+	# The layout has a print block of its own (the table's Print), so every
+	# one on the page is looked at, not only the first.
+	my $print_css = join "\n", $b =~ m{\@media print \{(.*?)\n\s*\}}sg;
+	ok length $print_css, 'the page has a print stylesheet' or return;
 	like $print_css, qr/\.canvas-hint/, 'the tip is not printed';
 };
 

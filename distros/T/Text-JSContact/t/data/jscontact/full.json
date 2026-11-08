@@ -1,0 +1,152 @@
+{
+  "@type": "Card",
+  "version": "2.0",
+  "uid": "urn:uuid:9f0c1b2a-3d4e-4f50-8a6b-7c8d9e0f1a2b",
+  "kind": "individual",
+  "prodId": "-//Example Corp//Round Trip Test 1.0//EN",
+  "updated": "2026-10-01T12:13:14Z",
+  "created": "2025-01-02T03:04:05Z",
+  "language": "en-AU",
+  "name": {
+    "full": "Dr. Mary Ann Smith-Jones Jr. PhD",
+    "components": [
+      { "@type": "NameComponent", "kind": "surname", "value": "Smith" },
+      { "@type": "NameComponent", "kind": "surname", "value": "Jones" },
+      { "@type": "NameComponent", "kind": "given", "value": "Mary" },
+      { "@type": "NameComponent", "kind": "given2", "value": "Ann" },
+      { "@type": "NameComponent", "kind": "title", "value": "Dr." },
+      { "@type": "NameComponent", "kind": "credential", "value": "PhD" },
+      { "@type": "NameComponent", "kind": "surname2", "value": "Garcia" },
+      { "@type": "NameComponent", "kind": "generation", "value": "Jr." }
+    ],
+    "sortAs": { "surname": "Smith-Jones", "given": "Mary" }
+  },
+  "nicknames": {
+    "nick1": { "@type": "Nickname", "name": "Mags", "contexts": { "private": true }, "pref": 1 },
+    "nick2": { "@type": "Nickname", "name": "Doc", "contexts": { "work": true } }
+  },
+  "emails": {
+    "e1": { "@type": "EmailAddress", "address": "mary@work.example", "contexts": { "work": true }, "pref": 1 },
+    "e2": { "@type": "EmailAddress", "address": "mags@home.example", "contexts": { "private": true }, "pref": 2 },
+    "e3": { "@type": "EmailAddress", "address": "mary@elsewhere.example" }
+  },
+  "phones": {
+    "p1": { "@type": "Phone", "number": "+61 2 5550 0001", "contexts": { "work": true }, "features": { "voice": true }, "pref": 1 },
+    "p2": { "@type": "Phone", "number": "+61 400 555 002", "features": { "mobile": true, "text": true } },
+    "p3": { "@type": "Phone", "number": "+61 2 5550 0003", "contexts": { "private": true }, "features": { "fax": true } },
+    "p4": { "@type": "Phone", "number": "tel:+61-2-5550-0004", "features": { "video": true, "pager": true, "textphone": true } }
+  },
+  "addresses": {
+    "a1": {
+      "@type": "Address",
+      "components": [
+        { "@type": "AddressComponent", "kind": "name", "value": "100 Harris St" },
+        { "@type": "AddressComponent", "kind": "apartment", "value": "Level 3" },
+        { "@type": "AddressComponent", "kind": "locality", "value": "Pyrmont" },
+        { "@type": "AddressComponent", "kind": "region", "value": "NSW" },
+        { "@type": "AddressComponent", "kind": "postcode", "value": "2009" },
+        { "@type": "AddressComponent", "kind": "country", "value": "Australia" }
+      ],
+      "full": "Level 3, 100 Harris St\nPyrmont NSW 2009\nAustralia",
+      "coordinates": "geo:-33.8688,151.1957",
+      "timeZone": "Australia/Sydney",
+      "countryCode": "AU",
+      "contexts": { "work": true },
+      "pref": 1
+    },
+    "a2": {
+      "@type": "Address",
+      "components": [
+        { "@type": "AddressComponent", "kind": "name", "value": "1 Example Rd" },
+        { "@type": "AddressComponent", "kind": "locality", "value": "Newtown" },
+        { "@type": "AddressComponent", "kind": "country", "value": "Australia" }
+      ],
+      "contexts": { "private": true }
+    }
+  },
+  "organizations": {
+    "o1": {
+      "@type": "Organization",
+      "name": "Example Research Pty Ltd",
+      "sortAs": "Example Research",
+      "units": [
+        { "@type": "OrgUnit", "name": "Sciences", "sortAs": "Sci" },
+        { "@type": "OrgUnit", "name": "Lab 4" }
+      ],
+      "contexts": { "work": true }
+    }
+  },
+  "titles": {
+    "t1": { "@type": "Title", "kind": "title", "name": "Chief Scientist" },
+    "t2": { "@type": "Title", "kind": "role", "name": "Safety warden" }
+  },
+  "anniversaries": {
+    "ann1": { "@type": "Anniversary", "kind": "birth", "date": "1980-05-17" },
+    "ann2": { "@type": "Anniversary", "kind": "wedding", "date": "2010-11-20" },
+    "ann3": { "@type": "Anniversary", "kind": "death", "date": "2099-01-01" }
+  },
+  "notes": {
+    "n1": {
+      "@type": "Note",
+      "note": "Line one; with punctuation, commas\nand a second line\\backslash.",
+      "created": "2025-03-04T05:06:07Z",
+      "author": { "name": "Assistant", "uri": "mailto:assistant@work.example" }
+    },
+    "n2": { "@type": "Note", "note": "Plain note" }
+  },
+  "onlineServices": {
+    "os1": { "@type": "OnlineService", "service": "XMPP", "uri": "xmpp:mary@chat.example", "user": "mary", "contexts": { "work": true }, "pref": 1 },
+    "os2": { "@type": "OnlineService", "service": "Mastodon", "uri": "https://social.example/@mags" },
+    "os3": { "@type": "OnlineService", "service": "Skype", "user": "mags.smith" }
+  },
+  "media": {
+    "m1": { "@type": "Media", "kind": "photo", "uri": "https://photos.example/mary.jpg", "mediaType": "image/jpeg", "pref": 1 },
+    "m2": { "@type": "Media", "kind": "photo", "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "mediaType": "image/png" },
+    "m3": { "@type": "Media", "kind": "logo", "uri": "https://example.com/logo.svg" },
+    "m4": { "@type": "Media", "kind": "sound", "uri": "https://example.com/mary.ogg", "mediaType": "audio/ogg" }
+  },
+  "links": {
+    "l1": { "@type": "Link", "uri": "https://mary.example/", "contexts": { "private": true }, "pref": 1 },
+    "l2": { "@type": "Link", "kind": "contact", "uri": "mailto:contact@work.example" },
+    "l3": { "@type": "Link", "kind": "freeBusy", "uri": "https://cal.example/mary/fb.ifb", "mediaType": "text/calendar" }
+  },
+  "calendars": {
+    "c1": { "@type": "Calendar", "uri": "https://cal.example/mary/", "pref": 1, "contexts": { "work": true } },
+    "c2": { "@type": "Calendar", "uri": "webcal://cal.example/mary.ics", "mediaType": "text/calendar" }
+  },
+  "schedulingAddresses": {
+    "s1": { "@type": "SchedulingAddress", "uri": "mailto:mary-cal@work.example", "pref": 1 },
+    "s2": { "@type": "SchedulingAddress", "uri": "https://cal.example/mary/inbox" }
+  },
+  "cryptoKeys": {
+    "k1": { "@type": "CryptoKey", "uri": "https://keys.example/mary.asc", "mediaType": "application/pgp-keys", "pref": 1 },
+    "k2": { "@type": "CryptoKey", "uri": "https://keys.example/mary.cer", "contexts": { "work": true } }
+  },
+  "directories": {
+    "d1": { "@type": "Directory", "kind": "entry", "uri": "https://dir.example/mary.vcf" },
+    "d2": { "@type": "Directory", "kind": "directory", "uri": "ldap://ldap.example/o=Example", "pref": 1 }
+  },
+  "preferredLanguages": {
+    "lang1": { "@type": "LanguagePref", "language": "en", "contexts": { "work": true }, "pref": 1 },
+    "lang2": { "@type": "LanguagePref", "language": "fr", "pref": 2 }
+  },
+  "personalInfo": {
+    "pi1": { "@type": "PersonalInfo", "kind": "expertise", "value": "chemistry", "level": "high", "listAs": 1 },
+    "pi2": { "@type": "PersonalInfo", "kind": "hobby", "value": "sailing", "level": "medium" },
+    "pi3": { "@type": "PersonalInfo", "kind": "interest", "value": "jazz", "level": "low", "listAs": 2 }
+  },
+  "keywords": { "colleague": true, "lab": true, "sailing club": true },
+  "members": { "urn:uuid:00000000-0000-4000-8000-000000000001": true },
+  "relatedTo": {
+    "urn:uuid:00000000-0000-4000-8000-000000000002": { "@type": "Relation", "relation": { "spouse": true } },
+    "urn:uuid:00000000-0000-4000-8000-000000000003": { "@type": "Relation", "relation": { "colleague": true, "friend": true } },
+    "urn:uuid:00000000-0000-4000-8000-000000000004": { "@type": "Relation" }
+  },
+  "speakToAs": {
+    "grammaticalGender": "feminine",
+    "pronouns": {
+      "pr1": { "@type": "Pronouns", "pronouns": "she/her", "pref": 1 },
+      "pr2": { "@type": "Pronouns", "pronouns": "they/them", "contexts": { "work": true }, "pref": 2 }
+    }
+  }
+}

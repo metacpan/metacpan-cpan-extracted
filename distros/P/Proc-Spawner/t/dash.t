@@ -5,7 +5,7 @@
 use strict; use warnings;
 use Test::More; use Cwd 'abs_path'; use File::Temp 'tempdir'; use File::Copy 'copy';
 grep -x "$_/dash", split /:/, $ENV{PATH} // '' or plan skip_all => 'no dash in PATH';
-use Proc::Spawner;   # the shell layer needs posix_spawn's chdir extension
+use Proc::Spawner;   # the shell layer needs chdir in the child: posix_spawn's extension, or done around the call (0.07)
 my $p = Proc::Spawner::spawn('/bin/true', ['true'], undef, [[chdir => '/']], {}) or plan skip_all => "no posix_spawn chdir in this libc: $!";
 waitpid $p, 0;
 my $top = abs_path('.'); my %known;

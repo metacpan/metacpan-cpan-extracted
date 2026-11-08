@@ -1,5 +1,142 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.09  2026-11-08
+      - Since 0.08: what posix_spawn has no option for (rlimit, sigignore,
+        nice: M1); no posix_spawn at all (M2): fork and exec, and where there
+        is no fork either, Run 0.07 (repository ilyaz-ai/run; to be released
+        first, recommended in META) applies the redirections around Perl's
+        own spawn; Windows: the kept process handle released, sigignore of
+        PIPE and INT, t/windows.t; ulimit through getrlimit; X29 fixed, X31
+        fixed, X32 recorded; known issue X27 classified; TODO; the documents
+        cross-linked.  The figures of post4-0.04 hold (the measured files
+        differ only in $VERSION); digest of the code they depend on:
+        80e40b1ce413ea4c39203a0c5bbd134b800477da8641dca26dc55aa01e693d41.
+      - Known issue X32 (ours; possible, not observed): without /proc, Perl's
+        own writes into a pipe the caller gave are blocking writes of
+        PIPE_BUF bytes after select, and block if a child fills the pipe in
+        between.  In the known issues, Proc::Spawner's LIMITATIONS, README
+        and TODO.
+      - The Markdown documents link to each other and to the files they name
+        (398 links, relative; none broken): a path or file name in a code
+        span became a link, a script followed by its arguments links its
+        name.  Mentions of the old Project's files link to the branch
+        project-2026-11-03 where they are there (19, checked through the
+        GitHub API; the repository is private, so they work for those who
+        can see it).  doc/perl-win32-system-bugs.md now ships (a shipped
+        document links to it), so every relative link of a shipped document
+        points into the distribution.
+      - M1 (the user, 2026-11-06: what posix_spawn has no option for, done
+        around the call where it can be undone, failed for the rest): new
+        settings sigignore (signals the child ignores), rlimit (its resource
+        limits) and nice (an increment), in start and spawn.  The XSUB sets
+        them in this process right around its call, in C, with every signal
+        blocked, and puts them back right after.  Unsupported (dropped or
+        failed with ENOTSUP, as UNSUPPORTED says): a hard limit lower than
+        ours without CAP_SYS_RESOURCE, a higher nice value without the right
+        to lower it back, a CPU limit this process has used up, ignoring
+        SIGCHLD; all three on Windows.  Checked as root (here without
+        CAP_SYS_RESOURCE) and as an unprivileged user; t/spawner.t.  A memory
+        limit below what this process uses makes glibc's posix_spawn fail
+        with ENOMEM (documented).
+      - M2 (the user, 2026-11-06: no posix_spawn at all, as Run 0.06's
+        forkless mode): Makefile.PL probes posix_spawn itself; without it,
+        or with PROC_SPAWNER_MISSING=posix_spawn, the primitive is the new
+        XSUB __spawn_nowait, fork and exec in C with nothing in between, and
+        every other setting is done around the call.  The whole suite passes
+        so, and a build without posix_spawn passes t/spawner.t and t/dash.t.
+        t/missing-matrix.pl: profile "no posix_spawn"; the Windows profile
+        has the M1 settings.
+      - Stale since 0.07: "the shell layer needs posix_spawn's chdir"
+        (README, X10, t/dash.t).  chdir is done around the call where the
+        libc lacks it; checked by building without chdir and fchdir: t/dash.t
+        passes, 13 of 13.
+      - M2, no fork either (the user, 2026-11-07): the redirections are
+        delegated to Run 0.07 (repository ilyaz-ai/run; to be released
+        first), whose start() applies them around Perl's own spawn, system {
+        FILE } 1, ARGV (P_NOWAIT), as on OS/2, Win32 and VMS, and puts our
+        fds back ($Proc::Spawner::PRIMITIVE 'system1'; chdir and fchdir are
+        done here).  PROC_SPAWNER_MISSING="posix_spawn fork" selects it on
+        Linux too, where Run emulates the spawn by fork and exec: the whole
+        suite passes so.  The arguments go to Perl as they are: Perl's command
+        line on Windows does not quote them as the C runtime parses them back
+        (❰BUG❱ in Perl; doc/perl-win32-system-bugs.md, to be reported), so the
+        tests of exact argv and of batch files are TODO there (the user: no
+        bug-for-bug workaround).  The program is looked up here (posix_spawn's
+        meaning of FILE and search).  The child sees fds 0-2 only (dup2 or
+        open onto fd 3 and up unsupported); pidfd, a non-empty sigmask,
+        fchdir, a group to join unsupported; at most 64 children (EAGAIN).
+        New t/windows.t (Windows only): both primitives under Wine with
+        Strawberry Perl 5.38.2, 13 passing, and the 2 TODO with system1.
+        OS/2 and VMS not tested.  A Run that is missing or too old is now an
+        error of spawn (before: any exception inside became EINVAL).
+      - Windows, both primitives: sigignore of PIPE (no SIGPIPE there) and of
+        INT in a new process group (Ctrl-C is off there) need nothing; other
+        signals stay unsupported (Perl's kill ends a Windows child, or sends
+        Ctrl-Break, which it cannot ignore).
+      - ulimit (the shell layer) reads the limits with getrlimit, through
+        Proc::Spawner's XSUB, instead of /proc/self/limits or, without /proc,
+        asking a shell (the user, 2026-11-07: the module has XS anyway).  Same
+        output as dash for -n -Hn -f -s -c -t -v -l -m -d; t/dash.t passes
+        with /proc hidden too.
+      - X29 ❰BUG❱ (ours; 0.07, 0.08): where the fd actions are done around the
+        call, the copies of our fds went above an open action's flags plus
+        1000, beyond the common limit of 1024 fds, and the call failed with
+        EINVAL; now just above the highest fd the actions name (the 1000 was
+        never needed).  Found on Windows; checked on Linux with ulimit -n 1024.
+      - Windows: __dup_high (a copy of an fd above a number) works there.
+      - Windows: the process handle kept for a child's exit code is released
+        once the loop has the status (Proc::Spawner::reaped, also for callers
+        of the raw spawn who wait themselves).  Checked under Wine with
+        Strawberry Perl 5.38.2: the handle is gone after the status (0.08:
+        still open); 1,100 children in a row give their status.
+      - X31 (ours; only in the Windows code, which no release builds yet):
+        Proc::Spawner's open action on Windows (win_spawn.h) did not map
+        /dev/null to NUL, as Perl's own open does.  Fixed; checked under Wine
+        from a directory on C: (on Wine's Z:, the Linux root, the bug hides):
+        a test program of win_spawn.h failed before and passes after, and
+        t/windows.t (new test) passes with both primitives.  Perl's other
+        Windows special cases checked against ours: nothing else missing.
+      - X11 and X12 closed (the user, 2026-11-07): the Windows primitive
+        exists (win_spawn.h; M2's system1), and the corpora were run through
+        the executor by the run-time comparison of post4-0.04.
+      - TODO: every open thing in one place, by who has to act (the
+        decisions waiting for the author first); linked from README.
+      - Known issue X27 classified (the user's method, 2026-11-07: parse
+        all the samples in one batch, split them into atomic blocks marked
+        with their samples, and pass only what is shown unaffected, so that
+        a pass is definite).  New doc/large-subset/tools/
+        large-subset-blocks.pl sorts the 40,410 accepted samples from the
+        parse trees alone, programs taken as real and opaque, into strict
+        (365: nothing in the environment can change the comparison, given
+        only how the shell is started), held (2: the same, under assumptions
+        known to hold in every tested environment, such as /dev/null),
+        almost strict (34,291: the same under named assumptions, mostly that
+        a program does the same in each run and the shells look it up
+        alike) and undecided (5,752,
+        each with the codes of what it may depend on: files, variables, a
+        program's output or status taken by the shell, /tmp, ...).  $? takes
+        the status of what ran before it, set -e makes every later status
+        decide (the user, 2026-11-07); absolute paths are told apart by the
+        area they are in (path-tmp, path-system, ...), and whether the run
+        could control it; /dev/null is an assumption known to hold in every
+        environment tested (the level "held": dash and bash have it, ours on
+        Windows gets NUL, X31).  The record,
+        one line per sample by snippet ID with a short code, is
+        doc/large-subset/large-subset-provenance.tsv; the codes, how to
+        remake it and the findings: doc/large-subset/
+        large-subset-environment.md.  Checked by 84 probes, by reading all
+        strict samples and random others, and against the run's
+        differences.  It replaces the first version of the same day, which
+        tagged what it recognised and passed the rest (81.4 %): its passes
+        were not definite.
+      - The batch check (-batch): the samples joined into one text parse as
+        they do alone, but for the 198 that change how the text after them
+        parses (functions, aliases, P1, a trailing backslash, exec) and 2
+        whose arithmetic text keeps its trailing blank (large grammar) or not
+        (base grammar), same value.  New known issue X30 (ours): with $LINENO
+        in a text, the parse time grows with the square of its length (the
+        joined text: 89 s, 8.4 s without the one $LINENO).
+
 0.08  2026-11-06
       - Since 0.07: Windows (EXPERIMENTAL): win_spawn.h compared with Perl's
         own spawn and fixed; the module built with MinGW-w64 against

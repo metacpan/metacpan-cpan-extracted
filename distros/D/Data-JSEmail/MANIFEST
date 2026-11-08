@@ -5,5 +5,31 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 t/cyrus-jmap.t
+t/bare-addresses.t
+t/encoding-problem.t
+t/eai-addresses.t
+t/corpus.t
+t/header-forms.t
+t/roundtrip.t
+t/globals.t
+t/header-codec.t
+t/lib/JSEmailTest.pm
+t/data/alternative-html-only.eml
+t/data/alternative.eml
+t/data/attachment-first.eml
+t/data/bad-boundary.eml
+t/data/digest.eml
+t/data/eai.eml
+t/data/encoded-words.eml
+t/data/html-only.eml
+t/data/mixed-attachments.eml
+t/data/no-content-type.eml
+t/data/plain.eml
+t/data/related.eml
+t/data/rfc2231.eml
+t/data/rfc822.eml
+t/data/spec-4-1-4.eml
+t/data/unknown-charset.eml
+t/data/unknown-cte.eml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

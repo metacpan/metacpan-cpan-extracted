@@ -23,17 +23,17 @@ Where both shells agree, our parser must accept the form; for example, items P1�
 
 Every verdict carries a **basis**:
 
-- **P:ID** (set in stone): a probe run in both shells shows it. ID names the probe in `doc/large-subset/dialect-cases/cases.txt` or `large-subset-dialect-probes2.txt`. Each probe runs in `dash -c` and in `bash --posix -c`, in a fresh empty folder, with stdin from `/dev/null`. A probe settles "one shell refuses what the other runs" and "the results differ".
+- **P:ID** (set in stone): a probe run in both shells shows it. ID names the probe in [`doc/large-subset/dialect-cases/cases.txt`](dialect-cases/cases.txt) or [`large-subset-dialect-probes2.txt`](dialect-cases/large-subset-dialect-probes2.txt). Each probe runs in `dash -c` and in `bash --posix -c`, in a fresh empty folder, with stdin from `/dev/null`. A probe settles "one shell refuses what the other runs" and "the results differ".
 - **P:-n** (set in stone): a shell refuses to parse the string.
 - **M:N** (set in stone): item N of "Bash POSIX Mode" (section 6.11 of the Bash Reference Manual of bash 5.2.21, from the Debian package `bash-doc`; gnu.org is not reachable from Claude's workspace).
 - **SC:CODE**: ShellCheck 0.11.0 says dash lacks the construct, so dash fails. Not probed one by one.
-- **J** (a judgement by Claude, 2026-11-02, not yet reviewed by the user): the probe shows a difference, but whether it is blatant or subtle is not settled by the probe alone. Such verdicts are kept, as free-form text, in `tools/large-subset-verdicts.txt` and count as open until the user rules.
+- **J** (a judgement by Claude, 2026-11-02, not yet reviewed by the user): the probe shows a difference, but whether it is blatant or subtle is not settled by the probe alone. Such verdicts are kept, as free-form text, in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt) and count as open until the user rules.
 
-When the user rules on a verdict, `tools/large-subset-verdicts.txt` records the ruling in short form, with the basis "user"; no rescan is needed.
+When the user rules on a verdict, [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt) records the ruling in short form, with the basis "user"; no rescan is needed.
 
 **Both shells refusing** (the user, 2026-11-02): "both shell refusing means that we should better refuse this too". Such forms are counted as blatant, so they stay outside both yardsticks.
 
-**Class X** (the user, 2026-11-02): for the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`), the program beats the shells' difference. Those differences are marked X and exclude nothing. The order of all rules is in `large-subset-state.md`, section 2.
+**Class X** (the user, 2026-11-02): for the commands the subset runs as programs (`echo`, `printf`, `test`, `[`, `kill`, `time`), the program beats the shells' difference. Those differences are marked X and exclude nothing. The order of all rules is in [`large-subset-state.md`](large-subset-state.md), section 2.
 
 dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and bash results are separated by "/".
 
@@ -104,9 +104,9 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 
 ## 5. Both shells refuse, or misbehave alike (all **J**)
 
-- **`local` outside a function** (probe localout): both give an error. dash stops; bash goes on with the rest of the string (`local` is not a POSIX special builtin, so M:24 does not apply). Open verdict, in `tools/large-subset-verdicts.txt`.
+- **`local` outside a function** (probe localout): both give an error. dash stops; bash goes on with the rest of the string (`local` is not a POSIX special builtin, so M:24 does not apply). Open verdict, in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt).
 - **A special builtin's error** (probes shiftover, exportbad): `shift 3` with too few arguments, `export "1x=2"`. Both give an error; dash stops, bash goes on. The manual (M:24) says: "If a POSIX special builtin returns an error status, a non-interactive shell exits." So bash does not match its documentation: blatant, basis M:24. **❰BUG❱ bash 5.2.21** (known issue X22). `set -o nosuch` and `unset -x` do stop bash. This cannot be found from a string's text, so the detector does not flag it.
-- **`kill -SIGHUP`** (probe killsig): both refuse. This matches bash's manual (M:38: "The `kill` builtin does not accept signal names with a `SIG` prefix"), so it is no bash bug. Both refusing: we refuse too. But the subset runs the program `kill`, which accepts the prefix; which rule wins is a question in `large-subset-state.md`, section 2.
+- **`kill -SIGHUP`** (probe killsig): both refuse. This matches bash's manual (M:38: "The `kill` builtin does not accept signal names with a `SIG` prefix"), so it is no bash bug. Both refusing: we refuse too. But the subset runs the program `kill`, which accepts the prefix; which rule wins is a question in [`large-subset-state.md`](large-subset-state.md), section 2.
 - **`>&3` with fd 3 not open** (probe dupnum): both refuse, with statuses 2 / 1. Counted **subtle**: the same refusal, differing only in the status.
 
 ## 6. Subtle (basis: probe, except where marked J)
@@ -133,19 +133,19 @@ dash 0.5.12 and `bash --posix` 5.2.21 throughout. In the tables, the dash and ba
 
 ## 8. The per-test record
 
-`t/parser/large-subset-shells.tsv` gives each test of the four parser test files one line:
+[`t/parser/large-subset-shells.tsv`](../../t/parser/large-subset-shells.tsv) gives each test of the four parser test files one line:
 
 | Column | Meaning |
 |---|---|
 | file | the test file |
-| id | the test's snippet ID (`doc/parsers/shell-subset-test-provenance.md`) |
+| id | the test's snippet ID ([`doc/parsers/shell-subset-test-provenance.md`](../parsers/shell-subset-test-provenance.md)) |
 | expected | `ok` or `rej`, as in the test file |
 | parse | which shells parse the string (`-n`): `both`, `dash`, `bash` or `none` |
 | verdict | `B` blatant, `S` subtle, `X` only differences that a program we run decides, `O` open (a postponed verdict), `-` no difference found |
 | features | each difference found, as `id:verdict:basis`; for example, `echobs:X:P:echobs` or `scope:O:open` |
 | note | a free-form verdict for this one test, if any |
 
-It is made by `doc/large-subset/tools/large-subset-features.pl -n`. That script holds the table of features: each feature's verdict, basis and the text pattern that finds it. It looks only at the string's text and at the shells' `-n`, never at our parser. Patterns can miss a use, or see one that is not there. Known misses so far: `x+=1`, `~+`, and `${1//…}`; the corpus measurement adds ShellCheck's codes, which catch these.
+It is made by [`doc/large-subset/tools/large-subset-features.pl`](tools/large-subset-features.pl) `-n`. That script holds the table of features: each feature's verdict, basis and the text pattern that finds it. It looks only at the string's text and at the shells' `-n`, never at our parser. Patterns can miss a use, or see one that is not there. Known misses so far: `x+=1`, `~+`, and `${1//…}`; the corpus measurement adds ShellCheck's codes, which catch these.
 
 Totals for post4-0.04, over 1,117 tests, each parsed by the large parser with no options (post3-0.04: 1,112 tests, 714 / 110 / 0 / 95 / 1 / 15 / 0 / 2 / 59 / 8 / 0 / 108; post2-0.04: 1,107 tests, 702 / 117 / 0 / 95 / 1 / 15 / 0 / 2 / 59 / 8 / 0 / 108; post-0.04: 1,104 tests, 698 / 118 / 0 / 95 / 3 / 15 / 0 / 2 / 57 / 8 / 0 / 108; 0.04: 1,092 tests, 689 / 121 / 0 / 97 / 3 / 16 / 0 / 3 / 48 / 7 / 0 / 108 as published, 690 / 120 / … recounted with post-0.04's counting script, one test apart; 0.03: 1,066 tests, 667 / 126 / 0 / 102 / 4 / 18 / 3 / 9 / 28 / 1 / 0 / 108; all in the order of this table):
 
@@ -162,4 +162,4 @@ The **108** are the work list for the tests (many are deliberate rejections, suc
 
 No test is accepted with a blatant difference any more: the 26 of the first count (early-post-0.02, 2026-11-02) were class X (`echo -e`, `[ a == b ]`, `printf -v`, `time`, `kill %1`), which the rule "the program beats the shells' difference" now covers.
 
-A column `note` carries a free-form verdict for one test ("test:ID" in `tools/large-subset-verdicts.txt`); none is set yet.
+A column `note` carries a free-form verdict for one test ("test:ID" in [`tools/large-subset-verdicts.txt`](tools/large-subset-verdicts.txt)); none is set yet.

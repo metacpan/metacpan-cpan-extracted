@@ -1,5 +1,19 @@
 Revision history for Browser-OIDC
 
+0.003     2026-11-07 20:31:29+0100
+          - Split new into new_from_discovery and new_from_config (BREAKING)
+          - Always add nonce to authorization request
+          - Don't send any client_secret in authorization request
+          - Force certificate verification in HTTPS requests
+          - Always include PKCE
+          - Harden response checking code
+          - Add userinfo method to TokenResponse
+          - Add timeout to local HTTP daemon
+          - URI escape basic authentication id and secret
+          - Handle failure to open browser more gracefully
+          - Handle authorization server issuer identification
+          - Mandate use of client_id
+
 0.002     2026-09-15 13:11:47+0200
           - Add TokenResponse class
           - Use a lot more of the Open ID Connect configuration

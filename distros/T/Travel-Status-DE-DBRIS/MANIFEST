@@ -21,6 +21,7 @@ scripts/makedeb-docker-helper
 scripts/publish-deb
 scripts/publish-docker
 share/admin-id-to-operator.json
+tls.txt
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t

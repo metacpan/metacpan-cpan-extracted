@@ -1,5 +1,55 @@
 Revision history for Database-BI
 
+0.021.0	Sat Nov  7 03:26:25 PM EST 2026
+	[ Security ]
+	- Optional login (password_hash, made by script/database-bi password),
+	  with session expiry and lockout.
+	- Listens on 127.0.0.1 by default; listening elsewhere, or answering
+	  another machine, needs password_hash.
+	- file_roots confines the folders readers may browse, open and export
+	  to; export_dirs confines exports, and is required with a password.
+	- Exports no longer write through a link, into a dot-folder or over a
+	  non-file.
+	- Cross-site writes and unexpected Host headers (DNS rebinding) are
+	  refused; allowed_hosts adds names.
+	- /import and url: sources refuse local and private-network addresses;
+	  url_private_hosts allows intranet names.
+	- Share and embed tokens are no longer signed with a fixed key.
+	- /api/ask and /api/summary are bounded (ai_calls_per_hour, default 60).
+	- Content-Security-Policy with script nonces, and the usual hardening
+	  headers; embed_frame_ancestors allows framing of /embed/.
+	- A setting that would not do what it says stops the start.
+	[ Enhancements ]
+	- .json files open like any other file: a list of objects, an object of
+	  objects, or an object of such lists (one card each on /tables).
+	- Print prints every row of the view, as the table shows it; past
+	  10,000 rows it asks first.
+	- Time range is offered only when the view has a date or time column.
+	- "between" works on number columns too, and its bounds may be written
+	  either way round.
+	- path:<file>#<table> names one table of a file outside data_dir.
+	- bi-extract, bi-geocode and bi-alert are installed, with manual pages.
+	- Now required: Database::Abstraction 0.55, Database::Join 0.011.1
+	  (DBI is no longer a runtime prerequisite), HTML::D3 0.30 and
+	  Crypt::URandom.  File::Temp 0.2308 is no longer needed.
+	[ Bug fixes ]
+	- An unknown filter operator, or a filter or time range on a missing
+	  column, is now a 400 that says so, instead of silently keeping every
+	  row or none.
+	- Timestamps ending in Z, an offset or a fraction of a second are read
+	  as dates and times (as written; the zone is not applied).
+	- A UTF-8 byte-order mark (Excel's "CSV UTF-8") is no longer part of
+	  the first column's name.
+	- Windows: file_roots and export_dirs work, including folders named
+	  through a link; Perl 5.38 no longer hangs where a time is shown
+	  (POSIX::strftime did not return there).
+	- The BSDs: a folder where a store file should be is no longer moved
+	  aside as corrupt.
+	- bi-alert finds the modules when run from a source folder.
+	- Tests no longer fail where paths are spelt differently (Windows,
+	  macOS) or hang on Windows CI; a Platform paths workflow simulates
+	  both on Linux.
+
 0.020.0	Wed Nov  4 09:25:26 PM EST 2026
 	[ Enhancements ]
 	- The line graph panel has Lines by, which draws one line for each value of a

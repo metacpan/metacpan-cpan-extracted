@@ -1,0 +1,269 @@
+2.01 (2026-11-07):
+	The first release of the modernized distribution (the 2.00 entry
+	below, the development history of the port, was never released
+	under that number).  The release layout: the user documentation
+	(README.md, Changes, BUGS, doc/etext.pod) is inside the
+	distribution; Makefile.PL declares the prerequisites (Perl 5.10,
+	Tk 804.027, Test::More) and the metadata (CPAN META spec 2:
+	license, repository, bug tracker; the bundled FreezeThaw and
+	Text::TeX under utils/ are not indexed); the Tcl/Tk flavour of the
+	sources is not shipped (it stays in the repository).  Since the
+	2.00 entry was written: undo re-creates embedded images and
+	windows; embedded windows inside blocks can be addressed by name
+	and index; "display linestart", "display lineend" and "+N display
+	lines", with Home and End on the display line (all described
+	under 2.00 below).  The reports for upstream (Perl/Tk, Tcl/Tk) are
+	in upstream/reports/ of the repository, one file per report.
+2.00 (2026-11, not released):
+	The Perl extension (Tk::eText) made to build and work with
+	today's Perl (5.38) and Perl/Tk (804.036):
+	- standalone ExtUtils::MakeMaker/Tk::MMutil build against the
+	  installed Perl/Tk, no Tk build tree needed; loaded with
+	  XSLoader; all internal symbols prefixed (eTextSyms.h) so that
+	  they cannot clash with Tk's own text widget;
+	- Tk-b9 "Lang" layer replaced by the Tk 804 API (Tcl_Obj
+	  arguments and results, Tcl_ListObjGetElements, Perl regexps
+	  via Tcl_GetRegExpFromObj, Tcl_ObjSetVar2 for -count);
+	- XFontStruct/TkMeasureChars/TkDisplayChars replaced by Tk_Font,
+	  Tk_MeasureChars, Tk_DrawChars, Tk_UnderlineChars, with tab and
+	  newline handling done by the widget, as in Tk 8.4;
+	- Tk::eText is a subclass of Tk::Text and gets all its bindings;
+	  the demo moved to demo/etext.pl and ported (Tk 804 has no
+	  Menubar with a command() method; option names need dashes;
+	  ornaments are Unicode characters now);
+	- automated tests in t/ (t/basic.t, t/leak.t).
+	Memory leaks fixed:
+	- each call of the block layout callback leaked a reference to
+	  the widget (hence the widget's Perl object could never be
+	  freed); the cursor blink re-lays-out the line it is on, so
+	  with the cursor in a block this leaked twice a second;
+	- TkTextRedrawRegion leaked an X region per call (focus change,
+	  expose);
+	- "block list" leaked one scalar per call, and every typed
+	  element of the result leaked its payload;
+	- the embedded-window element of "block list" leaked a widget
+	  reference.
+	Other fixes:
+	- search -nocase works for exact (non-regexp) searches (the
+	  lower-casing of the pattern had been disabled);
+	- "block configure" default of -layoutdepth is -1, as documented;
+	- "block data" is available as a method (blockData);
+	- Tcl_IntResults with a single value aborts in Tk 804; replaced.
+	Fixes after a review of the port (t/regress.t covers them):
+	- "tag prevrange" crashed whenever the last toggle of the tag was
+	  not on the first line of its B-tree node (NULL dereference, or an
+	  index past the end of the line); the backward search is reworked:
+	  only lines of the outermost tree count against its line budget,
+	  it leaves a block into the enclosing line, and compares the stop
+	  position with external offsets.  Verified against "tag ranges"
+	  for every index/stop position in a dozen block layouts.  (Where
+	  Tk's own text widget returns a range starting before index2,
+	  contrary to its documentation, eText follows the documentation.)
+	- "search -nocase": the lower-casing of the extracted line wrote
+	  through a pointer taken before the buffer was appended to (which
+	  reallocates it under Perl/Tk): heap corruption on any line longer
+	  than the initial buffer.
+	- A layout callback returning a single row (all an -empty block
+	  needs) was rejected ("List of wrong size").
+	- "block delete" / widget destruction did not release the block's
+	  callbacks and -layoutwidths (a -layoutcmd closure kept the widget
+	  alive); tag -data was never released; "dump -command" given twice
+	  leaked the first callback; "block list" could leak a pending value
+	  before an embedded window, and returned the block instance data
+	  by alias (modifying the result modified the block).
+	- "window cget -align" died with "Modification of a read-only
+	  value" (and printed "centre" for "center"); "tag bind" queried
+	  without a binding croaked with an empty message; "dump" read past
+	  the argument vector when the last argument began with "-";
+	  "search -nocase" leaked the pattern copy on an invalid index.
+	- A display line too narrow for one character split a multi-byte
+	  character (whole UTF-8 characters are forced now, as in Tk 8.4).
+	- Build: MakeMaker ran eTextSyms.PL during every "make" and, on a
+	  fresh checkout, replaced the symbol-prefix header by an empty one
+	  (so the next build would have clashed with Tk's text widget); the
+	  script is no longer run automatically, is idempotent, and refuses
+	  to write an empty header.  One uncast allocation that GCC 14
+	  rejects.  Dead Tcl-only compatibility macros removed.
+	- editXxx/imageXxx methods now reach the explicit "not implemented"
+	  message; the demo honours $ENV{kprefix}; POD file references.
+	Features of the modern Tk text widget, added later in 2.00 (each
+	with a test that compares the behaviour with Tk's own text widget
+	on the same text where that is possible):
+	- text indices count characters, not bytes (Perl/Tk 804 stores
+	  text as UTF-8): the Tk 8.4 design - byte offsets inside, the
+	  conversion at the "line.char" boundary - extended to count into
+	  blocks (the dummy position at the start of a block is one
+	  character); search -count and -nocase, dump, "block of", bbox,
+	  wordstart/wordend follow.  A match inside a block was reported
+	  one position too far (TkIBTreeTextAppend).  t/utf8.t.
+	- the -elide tag option: hidden text takes no room, inside blocks
+	  too (a hidden block disappears, hidden text inside a block
+	  narrows it).  search does not skip elided text.  t/elide.t.
+	- the image subcommand (embedded images, Tk 8.4's tkTextImage.c);
+	  images work inside blocks and appear in "block list" as
+	  Tk::Text::EmbImage; "dump -image" reports the image's name in
+	  the widget, as documented.  t/image.t.
+	- the edit subcommand (undo, redo, reset, separator, modified),
+	  -undo, -maxundo, -autoseparators, <<Modified>>; the stack
+	  (tkTextUndo.c) records the changes themselves and the widget
+	  applies them with its own procedures.  The text of a deleted
+	  block comes back as text when undone.  <<Undo>> and <<Redo>> are
+	  bound.  (Perl/Tk's Tk::Text records nothing: "edit undo" there
+	  always says "nothing to undo".)  t/edit.t.
+	- the demo's TeX symbol tables (utils/Text/TeX.pm) give Unicode
+	  characters instead of codes in 8-bit X11 symbol fonts, with
+	  reverse maps (%char2tex, %tex_by_char) for the TeX export; the
+	  sample document demo/save.tsf is converted; Save/Load use UTF-8.
+	  t/tex.t, t/demo.t (which drives the demo under X).
+	Fixes and additions after that:
+	- "tag nextrange" missed a range starting at index1 inside a block
+	  (it looked for the on-toggle in the outer line); the forward tag
+	  search compared a stop position inside a block with internal
+	  offsets (TkBTreeNextTag, the "XXXX Wrong" of 1997); TkTextRedrawTag
+	  handed internal indices to the display-line search.  t/regress.t
+	  sweeps nextrange over the block layouts too (6,456 queries).
+	- search leaves elided text out unless -elide is given, and so does
+	  the selection, as in Tk 8.4 (the line extraction skips elided
+	  segments and blocks under TKT_GET_NOELIDE); search -count counts
+	  the characters of the matched text.
+	- "+N lines" keeps the character position (Tk keeps the byte offset,
+	  TK_BUGS.md A5).
+	- dump looks into blocks: the elements inside a block are reported
+	  with external indices, between "block" and "blockend" elements
+	  (the -block switch, part of -all).  t/dump.t.
+	- undo re-creates the blocks (leaves, nesting, instance data), tags
+	  and marks of a deleted range that does not cut a block, from what
+	  "block list" reports, with the tag toggles where they were; a
+	  deletion that cuts a block (which the widget dissolves) comes back
+	  as text; windows and images are not re-created.  "block data"
+	  accepts the start position of an empty or top-level block.  The
+	  demo has -undo on: Control-z undoes, formulas included.
+	- TK_BUGS.md: A4 (search -nocase and case-changing lengths), A5,
+	  B6 (booleans), C4 (Tk::Text's undo records nothing), C5 (dump
+	  -image), D5.
+	The next batch:
+	- undo of a deletion that cut blocks re-creates them.  Such a
+	  deletion is recorded as the "block list" of the smallest range
+	  around it that cuts no block, with the size of what the
+	  dissolution of the cut blocks leaves behind (TkIBTreeCutRange);
+	  the undo takes those remains out and re-inserts the list, redo
+	  repeats the original deletion.  Found on the way: a right-gravity
+	  mark in a re-created range drifted to the end of the insertion
+	  (text inserted at an index goes before the right-gravity marks
+	  there; such marks get their gravity back only at the end now);
+	  deleting all of a block but its head, or all but its tail (which
+	  deletes the block, as documented), crashed: TkBTreeKillBlockProc
+	  freed the lone newline of an emptied block while the outer line
+	  still linked to it, and TkBTreeDeleteChars rebalanced from a line
+	  of the destroyed block.  t/edit.t (a dozen layouts: the text,
+	  "dump -all" and the block list before and after), t/regress.t.
+	- the "display" and "any" index modifiers of Tk 8.5: "+N display
+	  indices" (or chars) steps over elided text, "display wordstart"
+	  and "display wordend" see the visible characters only ("any"
+	  means the plain modifier; "indices" is accepted as a synonym of
+	  "chars").  The widget's cursor keys (Left, Right, Home, End,
+	  the word keys, the Emacs ones) use them, so
+	  the insertion cursor skips elided text, as in Tk 8.5, where
+	  Tk::Text's can sit in it.  Tk 8.6's "display wordend" walks into
+	  elided text (TK_BUGS.md A6); etext's does not.  t/elide.t (every
+	  position of a text with elided ranges, compared with wish if it
+	  is installed; blocks; the keys).
+	- undo re-creates embedded images and windows (Tk's text widget
+	  restores neither): the Tk::Text::EmbImage and Tk::Text::EmbWin
+	  elements of "block list" carry the options as option/value
+	  pairs, and the undo creates the segment again through the image
+	  or window command.  An image whose Tk image is gone comes back
+	  empty; a window given with -window was destroyed with the
+	  deletion (as in Tk) and comes back as an empty window segment,
+	  one with -create is created again when displayed; either way
+	  the segment keeps its unit of index space, so the recorded
+	  indices of the other changes stay right.  This covers images
+	  and windows among the remains of a cut block.  t/edit.t.
+	- an embedded window inside a block can be addressed by name and
+	  by index: "index" by the window's name gave the position inside
+	  the block, and "window cget"/"window configure" could not find
+	  the segment there.  t/regress.t.
+	- "display linestart", "display lineend" and "+N display lines"
+	  (Tk 8.5): the display line containing an index is found by
+	  laying the logical line out from its start; "display lines"
+	  keeps the x position, as the Up and Down keys do, passes over
+	  entirely elided lines and stops at the last display line of
+	  the text (Tk 8.6's answer past the end depends on the x
+	  position, TK_BUGS.md A7).  Display lines never span logical
+	  lines here: a line whose newline is elided still ends a display
+	  line (Tk 8.5 merges it with the next one; the answers differ
+	  only around an elided newline), and the widget wraps as Tk 8.4
+	  does (a space at the right margin needs a pixel of room, Tk 8.5
+	  lets it hang over).  Home and End go to the first and the last
+	  visible position of the display line (Tk 8.5).  t/elide.t:
+	  every position of a wrapped text with elided ranges compared
+	  with wish 8.6.14 for display linestart, lineend and -2..2
+	  display lines (1126 queries), after checking that the two wrap
+	  alike.
+
+Alpha3:
+	Empty blocks implemented, minor bugs and documentation corrections.
+0.4:
+	Too many. (Some of these could be present in ALpha3 too).
+	New style of horizontal offset added. 
+	New interface for layoutCmd added. 3 styles: 1 element, 7
+	elements, 13 elements (last ones recognized, but not supported).
+	New style of addline and deletelines.
+	Works with Perl.
+	First argument to layout callback now contains widget name too. 
+	Used in Equation to get width of the screen.
+	Deletion works better, now deletes as deep a split as needed.
+0.4.1:
+	Now patches one file in Tk only. Now recompile of Tk should be
+	_very_ quick (reinstall can be slow).
+0.4.2:
+	One file was (erroneously) a link outside the tree. The rest
+	of links should be corrected.
+0.4.3:
+	A warning for missing file busted the test on different sites.
+0.4.4:
+	(Under Perl:)  Now the second component of the first argument of
+	layoutCallback is not the name of the widget, but actual reference to
+	the widget. However, a patch to tkGlue.c is needed. Not released
+	because of this.
+0.4.5:
+	One minor bug corrected, updated to sync with Tk-b8 and tk4.0p1.
+	No recompile of Tk is necessary.
+0.4.6:
+	Selection bug corrected, Tab works again (ListFactoryAppendList 
+	added), environment variable `kprefix' denotes prefixes for
+	special keys (default `Control-Meta-').
+0.4.7:
+	Hidden leaves where not hidden from BBox and Measure.
+	Perl demo updated (now only the pedestal is missing).
+	Doc brushed up by Norm Shelley.
+0.5.0:
+	Selection and search work. `txtWgt config -getFlags 1' works.
+0.5.1:
+	Note that case conversion during extraction works with DStrings only. 
+	Verbose mode works, making it possible to have Load/Save in
+		Perl demo.
+	Temporarily verbose output is put on 'block list' subcommand.
+	Menubar added to Perl demo. (TeX from selection is not working so far).
+	Minimal TeX import added.
+0.5.2:
+	Minor documentation fixes. Table block coded in Perl demo.
+	Algorithm of finding @x,y may return start and end of a block now.
+	One could not render a block with data.
+	Block insertion could eat the last fake line into block.
+	Makefile.PL (for Perl build) updated for Tk-b10-tobe.
+0.5.3:
+	Warning from gcc -Wall -Wno-comment -Wno-unused corrected.
+
+MarkFindPrev need additional work: there are two modes for going out
+of tree: when we did not reach the target position, and when we did.
+TkIBTreeLastLine???
+TagRootPtr... TkBTreeStartSearch TkBTreePrevTag
+Methods.def manually created.
+
+0.6.1:
+	Bug with tags togglecount when going out of IBTree corrected.
+	Cleaned up Makefile.PL (might break the install if inside Tk tree).
+
+0.6.2:
+	Should work inside Tk directory too.

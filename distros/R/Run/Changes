@@ -11,3 +11,103 @@ Revision history for Perl extension Run.
 	invalidates FOO.  Changed to open().
 
 	Some tests still do not work right.
+
+0.04:	Redirections rewritten.  The flakiness had these causes:
+	- process_close_in_kid() returned false for an empty list, so
+	  redirecting fd N failed silently whenever N was the lowest free fd;
+	- fd numbers were created by dup()ing up to N and never closed, so
+	  each run changed which fds the next run found free;
+	- a saved copy of one target could land on a later target, and the
+	  guard against it compared a filehandle with fd numbers;
+	- restoring with $^F back at 2 set close-on-exec on restored fds and
+	  could move them; with $^F raised, leaked fds lost it instead
+	  (hence "redir.t no. 13 is fragile with this");
+	- the original F_GETFD result "0 but true" was passed to F_SETFD as a
+	  string, i.e. as a pointer;
+	- hash order decided the order of redirections at one level;
+	- ">&=N" filenames were opened before outer redirections were applied;
+	- "Bad file number" was matched in $! (Linux says "Bad file descriptor").
+	Now: applied in the kid after fork; with $Run::Wraparound, applied in
+	the parent around the spawn and restored exactly.  Ordered lists,
+	">&N" and ">&-".  New test t/fdtable.t.
+
+0.05:	new_pipeline: "a | b | c".  Elements other than simple commands
+	(and, or, chain, pipeline) run in this process, which keeps the
+	write end open until their last command has ended, as needed for
+	"{ a || b } | c"; with fork, a second such element runs in a forked
+	copy.
+	Fixes:
+	- new_system/new_spawn with one element ran it as a shell string;
+	  now always "exec { PROG } LIST".  The exported spawn() is
+	  unchanged;
+	- {filename => NAME, mode => OP} opens NAME literally with sh's
+	  < > >| >> <> (2-argument open misread "-", "&1", leading blanks,
+	  and had no "<>");
+	- $data->{result} was set only on failure and never reset; now the
+	  $? of every system, 0 included, or -1 when nothing started (also
+	  when a new_redir target cannot be opened);
+	- new_chain failed if any command failed; now the last one decides;
+	- new_readpipe and new_readpipe_split never reaped their kid (its
+	  pid no longer appears in the caller's $data->{pids});
+	- an exec failure was reported twice (also as a warning under -w);
+	  messages no longer show a stale $!.
+	Not tested: the list form "system { PROG } 1, LIST" on OS/2, Win32
+	and VMS.
+	New tests t/fixes.t and t/pipeline.t.
+
+0.06:	Forkless mode made testable on Unix.  $Run::Forkless (true on OS/2,
+	Win32, VMS; $Run::Wraparound is the old name) routes every process
+	start through one primitive, spawn_nowait(), as spawnvp(P_NOWAIT):
+	"system 1, ..." there, fork+exec with nothing in between on Unix.
+	Nothing else forks when forkless; new_system is spawn_nowait plus
+	waitpid.  New test t/forkless.t checks that every fork comes from
+	spawn_nowait, and runs each kind of node forkless.
+	Fix, found that way: fork_kid's exec-error pipe, created inside the
+	wraparound, could land on a fd that apply() had closed under a Perl
+	handle; PerlIO then counted two owners, never closed it, and the
+	parent hung reading the pipe (depended on which fds were free; seen
+	in t/fdtable.t under prove).  Its handles are now closed at the
+	fd level too (close_fd).
+
+0.07  2026-11-07
+	For Proc::Spawner, which delegates its redirections to
+	Run where there is neither posix_spawn nor fork.
+	- Run::start(SPAWN, \@ARGS, REDIRS, \@ERRS, PROG) is public: PROG
+	  (optional) is the program to run when it is not $ARGS[0], as
+	  "system { PROG } LIST"; also through launch(), spawn_nowait() and
+	  fork_kid().  REDIRS may be what redir_list() takes; files it opens
+	  are closed after the start.
+	- Redirection specs {fd => M} (a copy of fd M as it is at that point)
+	  and {close => 1}, instead of the 2-argument strings ">&M", ">&-".
+	- Win32: Perl has no fcntl there, and close-on-exec is a handle that
+	  is not inherited; read and set through Win32API::File (which comes
+	  with Perl there): copies above a number by dup (no F_DUPFD),
+	  is_cloexec read, not inferred.  Before, the forkless code died there
+	  at the first fcntl.  Checked under Wine with Strawberry Perl 5.38.2:
+	  a program other than argv[0], a file on fd 1 with 2>&1, fd 0
+	  closed, a missing program, our fds put back.  Arguments go to Perl
+	  as they are: Perl's command line does not quote them as the C
+	  runtime parses them back (a bug of Perl's, to be reported).
+	- $Run::AsWin32 (true on Win32; RUN_AS_WIN32=1 or set it on Unix, for
+	  debugging): the Win32 code paths, with FD_CLOEXEC standing in for
+	  the handle's inheritance on Unix (os_inherit()), so all but the
+	  Win32API::File calls run and are tested there.  The whole suite
+	  passes so, and Proc::Spawner's through Run; a dup loop broken on
+	  purpose fails t/win32.t on Linux.
+	New tests: t/start.t (also: a file start() opens is closed again;
+	checked to fail when the handle is kept), t/win32.t (Win32 only; under
+	Wine 13 pass and the argv test is TODO; with 0.06 it dies at the
+	first copy of an fd: "Your vendor has not defined Fcntl macro F_DUPFD";
+	on Unix it runs with $Run::AsWin32), t/as-win32.t (every other test
+	file again with RUN_AS_WIN32=1, one test per file; skipped on Win32).
+	- The documentation brought up to date: the three layers (spawn, the
+	  command trees, Run::start), every constructor and the keys of run's
+	  data (errs, env, redir, pids, result), all the redirection specs,
+	  Win32; spawn returns undef on failure (not 0, as it said).  README
+	  rewritten; Makefile.PL with abstract, author, prerequisites (Perl
+	  5.10.1), repository.
+	- Licence stated: the same terms as Perl itself (GPL 1 or later, or
+	  the Artistic License); before, no version said.
+	- Tests quiet under prove: t/forkless.t's meant "exit 1" no longer
+	  prints its message, t/win32.t's line about the mode is a note, and
+	  t/as-win32.t shows a file's STDERR only when that file fails.

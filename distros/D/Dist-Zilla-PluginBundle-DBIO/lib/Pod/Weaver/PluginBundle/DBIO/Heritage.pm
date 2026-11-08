@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::DBIO::Heritage;
 # ABSTRACT: Pod::Weaver configuration for DBIO heritage distributions
-our $VERSION = $Dist::Zilla::PluginBundle::DBIO::VERSION;
+our $VERSION = '0.900004';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ Pod::Weaver::PluginBundle::DBIO::Heritage - Pod::Weaver configuration for DBIO h
 
 =head1 VERSION
 
-version 0.900003
+version 0.900004
 
 =head1 SYNOPSIS
 

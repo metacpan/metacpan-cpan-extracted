@@ -71,3 +71,35 @@ v2.1 2026-10-19
  - New documentation: a quick tour, all rules with their error codes, "prepare" and
    how to write rules in Perl
  - Bugs are reported in GitHub Issues, and META links to them
+
+v2.2 2026-11-07
+ - The rules of the LIVR 2.5 draft (https://github.com/koorchik/LIVR/blob/master/drafts/v2.5.md):
+   boolean, not_one_of, max_decimals, digits, starts_with, ends_with, contains, iso_datetime,
+   iso_time, required_if, when, values, keys, any, list_length, unique, split, uuid, ip, cidr,
+   hostname, base64, hex, digest, mongo_id, hex_color, mac, e164, semver, jwt, luhn,
+   credit_card and iban. They are loaded on first use, so "use Validator::LIVR" is not slower.
+   They check their arguments in prepare(): a wrong argument dies, also undef
+   ({ boolean => undef }) and undef or an empty list in place of rules
+ - "iso_date" takes { min => ..., max => ... } with dates, "today", "yesterday" and "tomorrow"
+   in UTC. Any other argument dies: before, it was ignored. { iso_date => undef } stays
+   "iso_date". A boolean gives WRONG_DATE, not FORMAT_ERROR
+ - "like": "$" matches only at the end of the value, as the LIVR specification
+   requires. "^[0-9]{5}$" accepted "12345\n" with a trailing newline.
+ - The rules of "or" and of aliases see the fields next to the field, so "equal_to_field"
+   works in them. In "list_of", "equal_to_field" sees no other fields: before, it saw the
+   item itself as the field "field"
+ - "eq" and "one_of" compare booleans as strings: { eq => JSON::PP::true } accepts true and
+   "true", so ["boolean", { eq => JSON::PP::true }] works. What they accepted before still
+   passes: "1" for true and "0" for false, and in "one_of" a boolean for 1 or 0
+ - "eq" outputs the value of the rule, as the specification and "one_of" do: { eq => 2 }
+   outputs the number 2 for "2"
+ - nested_object, list_of, list_of_objects, variable_object and list_of_different_objects with
+   an extra argument lost the custom rules, "like" with an extra argument lost its flags
+ - Updated the test suite to the current LIVR test suite, and added the LIVR 2.5 draft test
+   suite in t/test_suite_2.5. Tests need Test::MockTime
+ - Faster: building a validator does not copy the table of rules, "list_of", "or" and aliases
+   validate values without a validator call
+
+v2.21 2026-11-07
+ - Docs: LIVR 2.5 is released, not a draft. Validator::LIVR implements LIVR 2.0 and
+   LIVR 2.5, the documentation links the LIVR 2.5 specification and the rules on the site

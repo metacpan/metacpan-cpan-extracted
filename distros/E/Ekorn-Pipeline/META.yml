@@ -1,0 +1,60 @@
+---
+abstract: 'run values through a list of stages'
+author:
+  - 'Iain Campbell <cpanic@cpan.org>'
+build_requires:
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Ekorn-Pipeline
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Ekorn::Pipeline:
+    file: lib/Ekorn/Pipeline.pm
+    version: v0.1.1
+  Ekorn::Pipeline::Errors:
+    file: lib/Ekorn/Pipeline/Errors.pm
+  Ekorn::Pipeline::Gather:
+    file: lib/Ekorn/Pipeline/Gather.pm
+  Ekorn::Pipeline::Pipes:
+    file: lib/Ekorn/Pipeline/Pipes.pm
+  Ekorn::Pipeline::Stages::Batch:
+    file: lib/Ekorn/Pipeline/Stages/Batch.pm
+  Ekorn::Pipeline::Stages::Flow:
+    file: lib/Ekorn/Pipeline/Stages/Flow.pm
+  Ekorn::Pipeline::Stages::Taps:
+    file: lib/Ekorn/Pipeline/Stages/Taps.pm
+  Ekorn::Pipeline::Stop:
+    file: lib/Ekorn/Pipeline/Stop.pm
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  experimental: '0'
+  namespace::clean: '0'
+  perl: v5.36.0
+resources:
+  bugtracker: https://github.com/nukopian/Ekorn-Pipeline/issues
+  homepage: https://github.com/nukopian/Ekorn-Pipeline
+  repository: https://github.com/nukopian/Ekorn-Pipeline.git
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

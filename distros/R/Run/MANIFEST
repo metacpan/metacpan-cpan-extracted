@@ -7,3 +7,12 @@ t/chain.t
 t/pipe.t
 t/redir.t
 t/redir_mayfail.t
+t/fdtable.t
+t/fixes.t
+t/pipeline.t
+t/forkless.t
+t/start.t
+t/win32.t
+t/as-win32.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

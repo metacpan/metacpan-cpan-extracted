@@ -35,10 +35,26 @@ DESCRIPTION
 
 ATTRIBUTES
 
+ api_prefix
+
+    API path prefix used for request routing and redirects.
+
+    Defaults to '/v1' (built from api_version). You can override it in the
+    constructor, for example '/search_1'.
+
  static_path
 
     URL path prefix for OpenAPI files. Defaults to 'static'. Can be
     overridden by passing it to the constructor.
+
+ using_frontend_proxy
+
+    Controls whether proxy-forwarded headers are trusted for base URL
+    parsing.
+
+    Defaults to $ENV{USING_FRONTEND_PROXY} // 0.
+
+    See "using_frontend_proxy" in Async::MicroserviceReq for more details.
 
  file_placeholder
 
@@ -166,6 +182,13 @@ ATTRIBUTES
         plack_respond
         static_dir
         base_url
+        using_frontend_proxy
+        server_host
+        server_port
+        server_scheme
+        http_host
+        http_port
+        http_schema
         want_json
         content
         json_content
@@ -200,6 +223,64 @@ METHODS
  redirect($location_path)
 
     Send redirect.
+
+ using_frontend_proxy
+
+    Controls whether proxy-forwarded headers are trusted for base URL
+    parsing.
+
+    When true, http_host, http_port, and http_schema are parsed from
+    forwarded headers. If forwarded host headers are missing, parsing falls
+    back to Host and emits a warning.
+
+    When false, http_host/http_port/http_schema are taken from trusted
+    server fields (server_host/server_port/server_scheme) when present,
+    otherwise host/port fall back to Host and scheme defaults to http.
+
+ server_host
+
+    Trusted server host for non-proxy mode (typically SERVER_NAME from PSGI
+    environment).
+
+ server_port
+
+    Trusted server port for non-proxy mode (typically SERVER_PORT from PSGI
+    environment).
+
+ server_scheme
+
+    Trusted server scheme for non-proxy mode (typically psgi.url_scheme
+    from PSGI environment).
+
+ http_host
+
+    Returns parsed host value used to build base_url.
+
+    When using_frontend_proxy is true, this comes from forwarded host
+    headers, with Host fallback and warning if forwarded host headers are
+    missing.
+
+    When using_frontend_proxy is false, this comes from server_host when
+    available, otherwise from Host.
+
+ http_port
+
+    Returns parsed port value used to build base_url.
+
+    When using_frontend_proxy is true, this comes from forwarded headers
+    (or Host fallback when forwarded host headers are missing).
+
+    When using_frontend_proxy is false, this comes from server_port when
+    available, otherwise from Host when present, else defaults to 80.
+
+ http_schema
+
+    Returns parsed scheme value used to build base_url.
+
+    When using_frontend_proxy is true, this is derived from forwarded
+    HTTPS/ proto headers.
+
+    When using_frontend_proxy is false, this comes from server_scheme.
 
  static_ft($file_name, $content_cb)
 

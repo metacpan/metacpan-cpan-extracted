@@ -1290,7 +1290,7 @@ button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decora
 	        title="A read-only link or an embed code for people who do not use this application, or the canvas as a file">&#x1F4E4; Share&hellip;</button>
 	<div class="ac-panel" id="share-panel" role="dialog" aria-labelledby="share-heading" hidden>
 		<h3 id="share-heading">Share this canvas</h3>
-		<p class="ac-help">Anyone with the read-only link can see the canvas, but not change it, until the link expires. The embed code shows it inside another page of this site.</p>
+		<p class="ac-help">Anyone with the read-only link can see the canvas, but not change it, until the link expires. The embed code shows it inside another page of this site[% IF embed_origins.size %], or of [% embed_origins.join(', ') | html %][% END %].</p>
 		<label class="ac-field">Read-only link
 			<input type="text" id="share-url" readonly placeholder="Make a link first">
 		</label>
@@ -1379,7 +1379,7 @@ button.ac-cs-chip-text:hover, button.ac-cs-chip-text:focus-visible { text-decora
 <!-- D3 before the cards: each card's chart snippet is an inline script that
      runs while the card is parsed, so D3 has to be loaded by then.  Appending a
      card in place re-runs the same snippet after the page is up. -->
-<script src="[% d3_url | html %]"></script>
+<script nonce="[% csp_nonce | html %]" src="[% d3_url | html %]"></script>
 <div class="canvas-grid" id="canvas-grid" data-canvas-id="[% canvas_id | html %]"[% IF sharing_mode %] data-read-only="1"[% END %]
 [% IF drill_name.length %]     data-drill-name="[% drill_name | html %]" data-drill-level="[% drill_level %]" data-drill-max="[% drill_max %]" data-drill-col="[% drill_col | html %]"[% END %]>
 [% FOREACH v IN visuals %]
@@ -1523,9 +1523,14 @@ the width and height it was left at, and the same size is written on the card it
 menu, so it reads without the menu being opened.</p>
 [% END %]
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
 	'use strict';
+
+	/* This page's Content-Security-Policy nonce, given to the card scripts
+	 * runCardScripts re-creates.  Read from this element, not written into the
+	 * script, so the page's text holds it only in nonce attributes. */
+	var PAGE_NONCE = (document.currentScript && document.currentScript.nonce) || '';
 
 	/* ---- dragging a card to a grid cell (3.2) ----
 	 *
@@ -2572,7 +2577,10 @@ menu, so it reads without the menu being opened.</p>
 					embedInp.value = '<iframe src="' + embed.replace(/&/g, '&amp;').replace(/"/g, '&quot;')
 						+ '" width="100%" height="600" style="border:0"></iframe>';
 					expEl.textContent = 'The link works until '
-						+ new Date(res.j.expires * 1000).toLocaleDateString() + '.';
+						+ new Date(res.j.expires * 1000).toLocaleDateString()
+						+ (res.j.lasts_restart === false
+							? ', or until the server restarts: it keeps links only when share_secret or secrets is set in database_bi.conf.'
+							: '.');
 					expEl.hidden = false;
 					copyBtn.disabled = copyEmb.disabled = false;
 					makeBtn.textContent = 'Make a new link';
@@ -3578,13 +3586,24 @@ menu, so it reads without the menu being opened.</p>
 		}
 
 		/* A <script> inserted as markup is inert: re-create it so the browser runs
-		 * the chart or map init it carries, keeping the order the markup has. */
-		function runCardScripts(card) {
+		 * the chart or map init it carries, keeping the order the markup has.
+		 * The Content-Security-Policy runs only scripts with this page's nonce,
+		 * so each copy is given it -- but only a script that came with the
+		 * nonce of the reply it arrived in (the reply's nonce): HTML::D3 and
+		 * HTML::OSM write that, and markup that reached the card through its
+		 * data cannot know it.  Anything else is dropped, not run. */
+		function runCardScripts(card, nonce) {
 			Array.prototype.slice.call(card.querySelectorAll('script')).forEach(function (old) {
+				var own = old.nonce || old.getAttribute('nonce') || '';
+				if (!nonce || own !== nonce) {
+					old.parentNode.removeChild(old);
+					return;
+				}
 				var script = document.createElement('script');
 				Array.prototype.forEach.call(old.attributes, function (attr) {
-					script.setAttribute(attr.name, attr.value);
+					if (attr.name !== 'nonce') script.setAttribute(attr.name, attr.value);
 				});
+				script.nonce = PAGE_NONCE;
 				script.textContent = old.textContent;
 				old.parentNode.replaceChild(script, old);
 			});
@@ -3665,7 +3684,7 @@ menu, so it reads without the menu being opened.</p>
 					announceLibMissing(lib || DRAW_LIBS.map, json.kind, title);
 					return;
 				}
-				runCardScripts(card);
+				runCardScripts(card, json.nonce);
 				setTimeout(function () {
 					initCrossFilters(card);
 					initDownloadButtons(card);
@@ -3914,7 +3933,7 @@ menu, so it reads without the menu being opened.</p>
 							announceLibMissing(DRAW_LIBS.map, 'map', title, 'could not be redrawn:');
 							return;
 						}
-						runCardScripts(card);
+						runCardScripts(card, json.nonce);
 						setTimeout(function () {
 							initCrossFilters(card);
 							initDownloadButtons(card);
@@ -4290,12 +4309,19 @@ menu, so it reads without the menu being opened.</p>
 				if (dl) dl.setAttribute('data-title', title);
 			};
 
-			var crRunScripts = function (card) {
+			/* As runCardScripts: only a script with the reply's nonce runs. */
+			var crRunScripts = function (card, nonce) {
 				Array.prototype.slice.call(card.querySelectorAll('script')).forEach(function (old) {
+					var own = old.nonce || old.getAttribute('nonce') || '';
+					if (!nonce || own !== nonce) {
+						old.parentNode.removeChild(old);
+						return;
+					}
 					var script = document.createElement('script');
 					Array.prototype.forEach.call(old.attributes, function (attr) {
-						script.setAttribute(attr.name, attr.value);
+						if (attr.name !== 'nonce') script.setAttribute(attr.name, attr.value);
 					});
+					script.nonce = PAGE_NONCE;
 					script.textContent = old.textContent;
 					old.parentNode.replaceChild(script, old);
 				});
@@ -5053,7 +5079,7 @@ menu, so it reads without the menu being opened.</p>
 
 					/* The libraries this card was drawn with are already on the
 					 * page: a plan changes the numbers in a view, not the view. */
-					crRunScripts(card);
+					crRunScripts(card, json.nonce);
 					setTimeout(function () {
 						initCrossFilters(card);
 						initDownloadButtons(card);

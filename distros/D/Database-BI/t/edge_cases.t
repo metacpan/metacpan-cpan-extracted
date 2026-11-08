@@ -86,15 +86,21 @@ subtest '_is_safe_url -- public IPs and hostnames are allowed' => sub {
 	ok  $IS_SAFE_URL->('https://api.example.org/data'),'https public hostname allowed';
 };
 
-subtest '_is_safe_url -- non-standard IP representations pass Perl layer (documented bypass)' => sub {
-	# These non-decimal IP representations are NOT blocked at the Perl layer by
-	# design; see the _is_safe_url comment: "The authoritative defence against
-	# hostname-based SSRF is a network-layer egress firewall."
-	ok  $IS_SAFE_URL->('http://0177.0.0.1/'),          'octal 0177.0.0.1 passes Perl layer (documented)';
-	ok  $IS_SAFE_URL->('http://2130706433/'),           'decimal int 127.0.0.1 passes Perl layer (documented)';
-	ok  $IS_SAFE_URL->('http://0x7f000001/'),           'hex int 127.0.0.1 passes Perl layer (documented)';
-	diag 'NOTE: above URLs may still reach loopback; egress firewall must block them'
-		if $ENV{TEST_VERBOSE};
+subtest '_is_safe_url -- non-standard IP representations are blocked' => sub {
+	# These once passed: only the dotted form was range-checked.  They are read
+	# as the resolver reads them, so each is the address it spells.
+	ok !$IS_SAFE_URL->('http://0177.0.0.1/'),          'octal 0177.0.0.1 blocked';
+	ok !$IS_SAFE_URL->('http://2130706433/'),           'decimal int 127.0.0.1 blocked';
+	ok !$IS_SAFE_URL->('http://0x7f000001/'),           'hex int 127.0.0.1 blocked';
+	ok !$IS_SAFE_URL->('http://127.1/'),                'short form 127.1 blocked';
+	ok !$IS_SAFE_URL->('http://10.1/'),                 'short form 10.1 (10.0.0.1) blocked';
+	ok !$IS_SAFE_URL->('http://user@127.0.0.1/'),       'userinfo before the host is not the host';
+	ok !$IS_SAFE_URL->('http://localhost./'),           'a trailing dot';
+	ok !$IS_SAFE_URL->('http://app.localhost/'),        '*.localhost';
+	ok !$IS_SAFE_URL->('http://[::ffff:127.0.0.1]/'),   'IPv4-mapped IPv6';
+	ok !$IS_SAFE_URL->('http://[fe80::1]/'),            'IPv6 link-local';
+	ok $IS_SAFE_URL->('http://[2606:4700::1111]/'),     'a public IPv6 address passes';
+	ok $IS_SAFE_URL->('http://localtest.me/'),          'a name passes here: SafeUA checks what it resolves to';
 };
 
 subtest '_is_safe_url -- non-http/https schemes are rejected' => sub {
@@ -530,10 +536,17 @@ subtest 'GET /view/sales?f=:eq:val -- empty column name is harmless' => sub {
 	  ->content_unlike(qr/500 Internal Server Error/, 'no 500 for missing column in f=');
 };
 
-subtest 'GET /view/sales?f=col:badop:val -- unknown operator is harmless' => sub {
+subtest 'GET /view/sales?f=col:badop:val -- unknown operator is a 400, not a 500' => sub {
 	$t->get_ok('/view/sales?f=' . url_escape('region:badop:North'))
-	  ->status_is(200)
+	  ->status_is(400)
 	  ->content_unlike(qr/500 Internal Server Error/, 'no 500 for unknown operator');
+};
+
+subtest 'GET /view/sales?f=nosuch:eq:x -- unknown column is a 400, not an empty table' => sub {
+	$t->get_ok('/view/sales?f=' . url_escape('nosuch:eq:x'))
+	  ->status_is(400)
+	  ->content_like(qr/no column called "nosuch"/)
+	  ->content_unlike(qr/500 Internal Server Error/, 'no 500 for unknown column');
 };
 
 subtest 'GET /view/sales -- many f= params are handled without crash' => sub {
@@ -1026,6 +1039,14 @@ subtest 'GET /pie -- very long category name does not crash the page' => sub {
 # location by supplying ../../etc/passwd.csv as the filename.
 # ---------------------------------------------------------------------------
 
+# same_dir($path) -> $string: a folder as the platform spells it.  On Windows
+# the saved path comes back with backslashes and Mojo's realpath gives forward
+# slashes (and either may differ in case), though both name one folder.
+sub same_dir {
+	my $dir = File::Spec->canonpath("$_[0]");
+	return $^O eq 'MSWin32' ? lc $dir : $dir;
+}
+
 subtest 'POST /export -- filename with ../ is sanitized to basename only' => sub {
 	my $out_dir = tempdir(CLEANUP => 1);
 
@@ -1039,7 +1060,10 @@ subtest 'POST /export -- filename with ../ is sanitized to basename only' => sub
 
 	my $saved = $t->tx->res->json('/saved');
 	# The saved path must be inside $out_dir, not two levels up.
-	like $saved, qr{\Q$out_dir\E}, 'saved path is inside the requested output dir';
+	# saved is the file's realpath, so compare it with the folder's: under a
+	# linked TMPDIR (macOS's /var is /private/var) the spellings differ.
+	is(same_dir(Mojo::File->new($saved)->dirname), same_dir(Mojo::File->new($out_dir)->realpath),
+		'saved path is inside the requested output dir');
 	unlike $saved, qr{\.\.},       'saved path contains no .. components';
 };
 
@@ -1054,7 +1078,8 @@ subtest 'POST /export -- absolute path as filename is stripped to basename' => s
 
 	my $saved = $t->tx->res->json('/saved');
 	# Must land inside the specified output directory.
-	like $saved, qr{\Q$out_dir\E}, 'absolute-path filename written inside the output dir only';
+	is(same_dir(Mojo::File->new($saved)->dirname), same_dir(Mojo::File->new($out_dir)->realpath),
+		'absolute-path filename written inside the output dir only');
 };
 
 # ---------------------------------------------------------------------------
@@ -2494,8 +2519,8 @@ subtest '_map_popup -- globals and context' => sub {
 };
 
 subtest 'GET /map -- many rows at one place: capped, escaped, linked' => sub {
-	plan skip_all => 'HTML::OSM 0.13 is needed to draw a map'
-		unless eval { require HTML::OSM; HTML::OSM->VERSION(0.13); 1 };
+	plan skip_all => 'HTML::OSM 0.14 is needed to draw a map'
+		unless eval { require HTML::OSM; HTML::OSM->VERSION(0.14); 1 };
 	my $rows = $EDGE{popup_limit} * 4;
 	my $dir  = tempdir(CLEANUP => 1);
 	Mojo::File->new("$dir/stack.csv")->spew("lat,lon,who\n"

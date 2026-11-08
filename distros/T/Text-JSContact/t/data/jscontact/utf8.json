@@ -1,0 +1,34 @@
+{
+  "@type": "Card",
+  "version": "2.0",
+  "uid": "urn:uuid:07f8a1b2-0000-4000-8000-000000000001",
+  "name": {
+    "full": "Zoë Ångström-Müller",
+    "components": [
+      { "@type": "NameComponent", "kind": "surname", "value": "Ångström-Müller" },
+      { "@type": "NameComponent", "kind": "given", "value": "Zoë" }
+    ]
+  },
+  "nicknames": { "n1": { "@type": "Nickname", "name": "Zoë" } },
+  "emails": { "e1": { "@type": "EmailAddress", "address": "zoë@exämple.com" } },
+  "addresses": {
+    "a1": {
+      "@type": "Address",
+      "components": [
+        { "@type": "AddressComponent", "kind": "name", "value": "Straße des 17. Juni 1" },
+        { "@type": "AddressComponent", "kind": "locality", "value": "Berlin" }
+      ],
+      "full": "Straße des 17. Juni 1, Berlin"
+    }
+  },
+  "organizations": {
+    "o1": { "@type": "Organization", "name": "Café Ünïcode GmbH", "units": [ { "@type": "OrgUnit", "name": "Küche" } ] }
+  },
+  "titles": { "t1": { "@type": "Title", "kind": "title", "name": "Köchin" } },
+  "notes": { "n1": { "@type": "Note", "note": "日本語のメモ", "author": { "name": "Jörg" } } },
+  "personalInfo": { "pi1": { "@type": "PersonalInfo", "kind": "hobby", "value": "Bücher" } },
+  "keywords": { "Freundin": true, "Küche": true },
+  "relatedTo": { "Jörg Müller": { "@type": "Relation" } },
+  "speakToAs": { "pronouns": { "pr1": { "@type": "Pronouns", "pronouns": "sie/ihr" } } },
+  "onlineServices": { "os1": { "@type": "OnlineService", "service": "Signal", "user": "zoë" } }
+}

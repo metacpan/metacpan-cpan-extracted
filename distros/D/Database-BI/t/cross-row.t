@@ -636,8 +636,8 @@ subtest 'a filter on a cross-row column selects rows and leaves their totals alo
 	is_deeply [ map { $_->[ _col($page, 'half') ] } @{ $page->{rows} } ], [ 50, 75 ],
 		'and the table page can filter on a field over the column';
 
-	$t->get_ok('/view/orders?' . $over->('ytd:gt:50'))->status_is(200);
-	is_deeply _table($t->tx->res->body)->{rows}, [], 'with no cs= the name is an unknown column, and matches nothing';
+	$t->get_ok('/view/orders?' . $over->('ytd:gt:50'))->status_is(400)
+		->content_like(qr/no column called "ytd"/, 'with no cs= the name is an unknown column, and is refused');
 };
 
 # --- calculated fields on every table page ------------------------------------

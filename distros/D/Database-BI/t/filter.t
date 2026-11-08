@@ -166,16 +166,21 @@ subtest 'filter op: notempty' => sub {
 };
 
 # ---------------------------------------------------------------------------
-# Catch-all: unknown operator => passes all rows (falls through to 1)
+# An unknown operator is refused (400), not read as "keep every row"
 # ---------------------------------------------------------------------------
 
-subtest 'filter op: unknown falls through (all rows pass)' => sub {
-	# Proof: the ternary chain ends with bare 1 for any unrecognised $op.
-	# All 6 rows are returned; Alice Smith and Bob Jones both appear.
+subtest 'filter op: unknown is refused, and says which operators there are' => sub {
+	# Until 0.021.0 the ternary chain's final 1 kept all 6 rows, and nothing
+	# said the filter had done nothing.
 	$t->get_ok('/view/sales?f=' . url_escape('region:XUNKNOWNX:North'))
-	  ->status_is(200)
-	  ->content_like(qr/Alice Smith/)
-	  ->content_like(qr/Bob Jones/);
+	  ->status_is(400)
+	  ->content_like(qr/Unknown filter operator "XUNKNOWNX"/)
+	  ->content_like(qr/eq, ne, contains/)
+	  ->content_unlike(qr/Alice Smith/);
+	$t->get_ok('/view/sales?f=' . url_escape('region:EQ:North'))
+	  ->status_is(400, 'an operator in capitals is not taken for another');
+	$t->get_ok('/bar?l=table:sales&cat=region&f=' . url_escape('region:gtx:North'))
+	  ->status_is(400, 'a chart refuses it too');
 };
 
 # ---------------------------------------------------------------------------

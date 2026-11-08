@@ -3,16 +3,26 @@ package Database::BI::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.020.0';
+our $VERSION = '0.021.0';
 
 use Exporter qw(import);
 use Readonly;
 
-our @EXPORT_OK = qw( urlencode parse_number );
+our @EXPORT_OK = qw( urlencode parse_number iso_datetime minute_stamp iso8601_utc );
 
 # A list rather than any three capitals, or 'SKU 100' would be read as 100.
 Readonly my $CURRENCY_CODES => join '|', qw(AUD BRL CAD CHF CNY DKK EUR GBP HKD INR JPY MXN NOK NZD SEK SGD USD ZAR);
 Readonly my $INFINITY       => 9**9**9;
+
+# A date, or a date and a time with T or a space between them; the time may
+# carry seconds, a fraction of a second, and a zone (Z, or an offset such as
+# +01:00, +0100 or +01).  The last three are what JSON APIs and exports write.
+Readonly my $ISO_DATETIME_RE => qr{
+	\A (\d{4}-\d{2}-\d{2})
+	(?: [T ] (\d{2}) : (\d{2}) (?: : (\d{2}) (?: [.,] \d+ )? )?
+		(?: [Zz] | [+-] \d{2} (?: :? \d{2} )? )? )?
+	\z
+}x;
 
 # urlencode($str) -> $encoded
 #
@@ -57,6 +67,37 @@ sub parse_number {
 	# 1e999 spells a number, but infinity is no use to a total or an axis.
 	return undef if abs($number) == $INFINITY;
 	return $number;
+}
+
+# iso_datetime($value) -> ($day, $hour, $minute, $second) | ()
+#
+# The one reading of an ISO date or timestamp, for the filters, the time range
+# and the formulas alike.  A time is taken as written: a fraction of a second
+# and a zone are accepted and set aside, so 2026-11-06T23:30:00Z is 23:30 on
+# the 6th, the day the table shows, for every reader.
+sub iso_datetime {
+	my ($value) = @_;
+	return () unless defined $value && !ref $value;
+	my ($day, $hour, $minute, $second) = $value =~ $ISO_DATETIME_RE or return ();
+	return ($day, $hour, $minute, $second);
+}
+
+# minute_stamp(@tm) -> 'YYYY-MM-DD HH:MM'
+# iso8601_utc($epoch) -> 'YYYY-MM-DDTHH:MM:SSZ'
+#
+# Written with sprintf rather than POSIX::strftime: on Windows, perl 5.38's
+# strftime did not return (CI sat in t/function.t until the job's limit),
+# and these fixed formats need nothing from the C library.
+sub minute_stamp {
+	my @tm = @_;
+	return '' unless @tm >= 6;
+	return sprintf '%04d-%02d-%02d %02d:%02d', $tm[5] + 1900, $tm[4] + 1, $tm[3], $tm[2], $tm[1];
+}
+
+sub iso8601_utc {
+	my ($epoch) = @_;
+	my @tm = gmtime(defined $epoch ? $epoch : time);
+	return sprintf '%04d-%02d-%02dT%02d:%02d:%02dZ', $tm[5] + 1900, $tm[4] + 1, $tm[3], $tm[2], $tm[1], $tm[0];
 }
 
 1;
@@ -124,6 +165,72 @@ Read a table cell as a number, or say it is not one.
 A number, or C<undef> if the value is missing, empty, holds anything other
 than a number and its currency or thousands formatting, or is too large to be
 finite.
+
+=head2 iso_datetime
+
+Read an ISO 8601 date or timestamp.
+
+    iso_datetime('2026-11-06');                  # ('2026-11-06', undef, undef, undef)
+    iso_datetime('2026-11-06 09:15');            # ('2026-11-06', '09', '15', undef)
+    iso_datetime('2026-11-06T23:30:00.250Z');    # ('2026-11-06', '23', '30', '00')
+    iso_datetime('2026-11-06T23:30:00+01:00');   # ('2026-11-06', '23', '30', '00')
+    iso_datetime('06/11/2026');                  # ()
+
+The time is the one written in the value: a fraction of a second and a zone
+(C<Z>, C<+01:00>, C<+0100>, C<+01>) are accepted and not applied, so a
+timestamp falls on the day it names, the one the table shows.  The month and
+day are not checked against a calendar; the callers that need a real day check
+it themselves.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    $value: string, optional
+
+=head4 OUTPUT
+
+A list: the day (C<YYYY-MM-DD>), then the hour, minute and second as written
+(two digits each, C<undef> when absent), or the empty list when the value is
+not an ISO date or timestamp.
+
+=head2 minute_stamp
+
+A time to the minute, from the list C<localtime> or C<gmtime> gives.
+
+    minute_stamp(localtime $mtime);   # '2026-11-07 14:05'
+    minute_stamp(gmtime $mtime) . ' UTC';
+
+It is C<POSIX::strftime('%Y-%m-%d %H:%M', ...)> written out: on Windows,
+perl 5.38's C<strftime> did not return.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    @tm: the list from localtime or gmtime (at least six values)
+
+=head4 OUTPUT
+
+A string, C<YYYY-MM-DD HH:MM>; the empty string when fewer than six values
+are given.
+
+=head2 iso8601_utc
+
+A moment as ISO 8601 in UTC, to the second.
+
+    iso8601_utc();             # now, '2026-11-07T14:05:09Z'
+    iso8601_utc(0);            # '1970-01-01T00:00:00Z'
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    $epoch: integer, optional (default: now)
+
+=head4 OUTPUT
+
+A string, C<YYYY-MM-DDTHH:MM:SSZ>.
 
 =head1 AUTHOR
 

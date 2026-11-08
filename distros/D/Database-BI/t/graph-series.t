@@ -50,6 +50,8 @@ sub series_of {
 sub without_data {
 	my ($body) = @_;
 	$body =~ s/^\s*(?:const allData|var series)\s*=.*$//mg;
+	# Each request has its own Content-Security-Policy nonce.
+	$body =~ s/\bnonce="[^"]*"/nonce=""/g;
 	return $body;
 }
 

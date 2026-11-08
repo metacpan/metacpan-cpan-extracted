@@ -1,0 +1,1048 @@
+{
+  "times-zoned": {
+    "@type": "Event",
+    "uid": "times-zoned@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "created": "2024-12-01T08:30:00Z",
+    "sequence": 3,
+    "title": "Zoned",
+    "description": "In Berlin",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H30M"
+  },
+  "times-utc": {
+    "@type": "Event",
+    "uid": "times-utc@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "UTC",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Etc/UTC",
+    "duration": "PT45M"
+  },
+  "times-floating": {
+    "@type": "Event",
+    "uid": "times-floating@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Floating",
+    "start": "2025-03-10T09:00:00",
+    "duration": "PT2H"
+  },
+  "times-zero-duration": {
+    "@type": "Event",
+    "uid": "times-zero@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Instant",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin"
+  },
+  "times-endtimezone": {
+    "@type": "Event",
+    "uid": "times-endtz@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Flight",
+    "start": "2025-03-10T18:00:00",
+    "timeZone": "America/New_York",
+    "endTimeZone": "Europe/London",
+    "duration": "PT7H"
+  },
+  "swt-date": {
+    "@type": "Event",
+    "uid": "swt-date@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "All day",
+    "start": "2025-03-10T00:00:00",
+    "duration": "P2D",
+    "showWithoutTime": true
+  },
+  "swt-timed": {
+    "@type": "Event",
+    "uid": "swt-timed@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Shown without time",
+    "start": "2025-03-10T08:00:00",
+    "timeZone": "America/Chicago",
+    "duration": "PT12H",
+    "showWithoutTime": true
+  },
+  "swt-floating-time": {
+    "@type": "Event",
+    "uid": "swt-floating@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Floating, shown without time",
+    "start": "2025-03-10T08:00:00",
+    "duration": "PT4H",
+    "showWithoutTime": true
+  },
+  "misc-scalars": {
+    "@type": "Event",
+    "uid": "misc@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Titel",
+    "description": "Beschreibung",
+    "locale": "de",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "privacy": "private",
+    "color": "darkred",
+    "priority": 5,
+    "status": "tentative",
+    "freeBusyStatus": "free",
+    "keywords": {
+      "work": true,
+      "planning": true
+    }
+  },
+  "misc-secret-cancelled": {
+    "@type": "Event",
+    "uid": "secret@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Secret",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "privacy": "secret",
+    "status": "cancelled",
+    "color": "#1A2B3C",
+    "priority": 9
+  },
+  "misc-html-description": {
+    "@type": "Event",
+    "uid": "html@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Styled",
+    "description": "<p>Hello <b>there</b></p>",
+    "descriptionContentType": "text/html",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H"
+  },
+  "misc-relatedto": {
+    "@type": "Event",
+    "uid": "related@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Related",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "relatedTo": {
+      "parent@example.com": {
+        "@type": "Relation",
+        "relation": {
+          "parent": true
+        }
+      },
+      "child@example.com": {
+        "@type": "Relation",
+        "relation": {
+          "child": true
+        }
+      },
+      "next@example.com": {
+        "@type": "Relation",
+        "relation": {
+          "next": true,
+          "first": true
+        }
+      }
+    }
+  },
+  "misc-method-prodid": {
+    "@type": "Event",
+    "uid": "method@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "prodId": "-//Example//Roundtrip//EN",
+    "method": "request",
+    "title": "Method",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H"
+  },
+  "participants": {
+    "@type": "Event",
+    "uid": "participants@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Meeting",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "The Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true,
+          "attendee": true
+        },
+        "participationStatus": "accepted",
+        "kind": "individual"
+      },
+      "alice": {
+        "@type": "Participant",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "calendarAddress": "mailto:alice@example.com",
+        "roles": {
+          "attendee": true
+        },
+        "participationStatus": "tentative",
+        "scheduleAgent": "client",
+        "scheduleUpdated": "2025-01-02T03:04:05Z",
+        "sentBy": "alice-assistant@example.com"
+      },
+      "bob": {
+        "@type": "Participant",
+        "name": "Bob",
+        "email": "bob@example.com",
+        "calendarAddress": "mailto:bob@example.com",
+        "roles": {
+          "attendee": true,
+          "optional": true
+        },
+        "participationStatus": "delegated",
+        "delegatedTo": {
+          "mailto:carol@example.com": true
+        }
+      },
+      "carol": {
+        "@type": "Participant",
+        "name": "Carol",
+        "email": "carol@example.com",
+        "calendarAddress": "mailto:carol@example.com",
+        "roles": {
+          "attendee": true
+        },
+        "participationStatus": "needs-action",
+        "delegatedFrom": {
+          "mailto:bob@example.com": true
+        }
+      },
+      "room": {
+        "@type": "Participant",
+        "name": "Room 101",
+        "email": "room101@example.com",
+        "calendarAddress": "mailto:room101@example.com",
+        "roles": {
+          "attendee": true,
+          "informational": true
+        },
+        "kind": "resource"
+      }
+    }
+  },
+  "participants-expectreply": {
+    "@type": "Event",
+    "uid": "rsvp@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "RSVP",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "participants": {
+      "alice": {
+        "@type": "Participant",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "calendarAddress": "mailto:alice@example.com",
+        "roles": {
+          "attendee": true
+        },
+        "expectReply": true
+      }
+    }
+  },
+  "participants-schedulesequence": {
+    "@type": "Event",
+    "uid": "schedseq@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Schedule sequence",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "participants": {
+      "alice": {
+        "@type": "Participant",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "calendarAddress": "mailto:alice@example.com",
+        "roles": {
+          "attendee": true
+        },
+        "scheduleSequence": 2
+      }
+    }
+  },
+  "participants-owner-chair": {
+    "@type": "Event",
+    "uid": "ownerchair@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Owner and chair",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true,
+          "attendee": true,
+          "chair": true
+        }
+      }
+    }
+  },
+  "participants-hashed-keys": {
+    "@type": "Event",
+    "uid": "hashed@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Keys from addresses",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:org@example.com",
+    "participants": {
+      "fc24c1da2a291d1adc07717fbac7a2fca5c2f1c0": {
+        "@type": "Participant",
+        "name": "Org",
+        "email": "org@example.com",
+        "calendarAddress": "mailto:org@example.com",
+        "roles": {
+          "owner": true
+        }
+      },
+      "dave": {
+        "@type": "Participant",
+        "name": "Dave",
+        "email": "dave@example.com",
+        "calendarAddress": "mailto:dave@example.com",
+        "roles": {
+          "attendee": true
+        }
+      }
+    }
+  },
+  "participants-organizer-sentby": {
+    "@type": "Event",
+    "uid": "orgsentby@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Sent by a secretary",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "sentBy": "secretary@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true
+        },
+        "sentBy": "secretary@example.com"
+      },
+      "eve": {
+        "@type": "Participant",
+        "name": "Eve",
+        "email": "eve@example.com",
+        "calendarAddress": "mailto:eve@example.com",
+        "roles": {
+          "attendee": true
+        }
+      }
+    }
+  },
+  "participants-same-address-names": {
+    "@type": "Event",
+    "uid": "samename@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Organizer is also an attendee",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true
+        }
+      },
+      "boss-attending": {
+        "@type": "Participant",
+        "name": "Boss (attending)",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "attendee": true
+        }
+      }
+    }
+  },
+  "participants-chair-not-attendee": {
+    "@type": "Event",
+    "uid": "chair@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Chair only",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true
+        }
+      },
+      "chair": {
+        "@type": "Participant",
+        "name": "Chair",
+        "email": "chair@example.com",
+        "calendarAddress": "mailto:chair@example.com",
+        "roles": {
+          "chair": true
+        }
+      }
+    }
+  },
+  "organizer-without-participants": {
+    "@type": "Event",
+    "uid": "orgonly@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Organizer only",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com"
+  },
+  "links": {
+    "@type": "Event",
+    "uid": "links@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Links",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "links": {
+      "agenda": {
+        "@type": "Link",
+        "href": "https://example.com/agenda.pdf",
+        "rel": "enclosure",
+        "title": "agenda.pdf",
+        "contentType": "application/pdf",
+        "size": 12345
+      },
+      "logo": {
+        "@type": "Link",
+        "href": "https://example.com/logo.png",
+        "rel": "icon",
+        "contentType": "image/png",
+        "title": "logo.png",
+        "display": {
+          "badge": true,
+          "graphic": true
+        }
+      },
+      "about": {
+        "@type": "Link",
+        "href": "https://example.com/about",
+        "rel": "describedby",
+        "title": "About"
+      },
+      "about2": {
+        "@type": "Link",
+        "href": "https://example.com/about2",
+        "rel": "describedby",
+        "title": "More"
+      },
+      "alt": {
+        "@type": "Link",
+        "href": "https://example.com/alt",
+        "rel": "alternate",
+        "contentType": "text/html",
+        "title": "Alternate"
+      }
+    }
+  },
+  "links-rel-unset": {
+    "@type": "Event",
+    "uid": "links-norel@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Link without rel",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "links": {
+      "file": {
+        "@type": "Link",
+        "href": "https://example.com/file.txt",
+        "contentType": "text/plain"
+      }
+    }
+  },
+  "links-data-uri": {
+    "@type": "Event",
+    "uid": "links-data@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Inline attachment",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "links": {
+      "inline": {
+        "@type": "Link",
+        "href": "data:text/plain;base64,aGVsbG8=",
+        "rel": "enclosure",
+        "contentType": "text/plain"
+      }
+    }
+  },
+  "location-single": {
+    "@type": "Event",
+    "uid": "loc1@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "One place",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "locations": {
+      "location": {
+        "@type": "Location",
+        "name": "Room 101"
+      }
+    }
+  },
+  "location-geo": {
+    "@type": "Event",
+    "uid": "locgeo@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Coordinates",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "locations": {
+      "location": {
+        "@type": "Location",
+        "coordinates": "geo:52.52,13.405"
+      }
+    }
+  },
+  "locations-several": {
+    "@type": "Event",
+    "uid": "locs@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Several places",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "locations": {
+      "l1": {
+        "@type": "Location",
+        "name": "Room 101",
+        "description": "First floor"
+      },
+      "l2": {
+        "@type": "Location",
+        "name": "Room 202"
+      },
+      "l3": {
+        "@type": "Location",
+        "name": "Brandenburger Tor",
+        "coordinates": "geo:52.5163,13.3777",
+        "locationTypes": {
+          "landmark": true
+        }
+      }
+    }
+  },
+  "virtual-locations": {
+    "@type": "Event",
+    "uid": "vloc@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Call",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "virtualLocations": {
+      "v1": {
+        "@type": "VirtualLocation",
+        "name": "Video",
+        "uri": "https://video.example.com/room",
+        "features": {
+          "video": true,
+          "audio": true
+        }
+      },
+      "v2": {
+        "@type": "VirtualLocation",
+        "name": "Dial in",
+        "uri": "tel:+1-555-0100",
+        "features": {
+          "phone": true
+        }
+      }
+    }
+  },
+  "virtual-location-description": {
+    "@type": "Event",
+    "uid": "vlocdesc@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Call",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "virtualLocations": {
+      "v1": {
+        "@type": "VirtualLocation",
+        "uri": "https://video.example.com/room",
+        "description": "PIN 1234"
+      }
+    }
+  },
+  "alerts": {
+    "@type": "Event",
+    "uid": "alerts@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Alerts",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "alerts": {
+      "before-start": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT15M",
+          "relativeTo": "start"
+        }
+      },
+      "after-start": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "PT5M",
+          "relativeTo": "start"
+        }
+      },
+      "before-end": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT10M",
+          "relativeTo": "end"
+        }
+      },
+      "after-end": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "PT1H",
+          "relativeTo": "end"
+        }
+      },
+      "day-before": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-P1D",
+          "relativeTo": "start"
+        }
+      },
+      "absolute": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "AbsoluteTrigger",
+          "when": "2025-03-09T18:00:00Z"
+        }
+      },
+      "acknowledged": {
+        "@type": "Alert",
+        "action": "display",
+        "acknowledged": "2025-03-10T08:46:00Z",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT15M",
+          "relativeTo": "start"
+        }
+      }
+    }
+  },
+  "alerts-email": {
+    "@type": "Event",
+    "uid": "alerts-email@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Email alert",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true,
+          "attendee": true
+        }
+      }
+    },
+    "alerts": {
+      "mail": {
+        "@type": "Alert",
+        "action": "email",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT30M",
+          "relativeTo": "start"
+        }
+      }
+    }
+  },
+  "alerts-untitled": {
+    "@type": "Event",
+    "uid": "alerts-untitled@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "alerts": {
+      "a": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT15M",
+          "relativeTo": "start"
+        }
+      }
+    }
+  },
+  "rrule-weekly": {
+    "@type": "Event",
+    "uid": "rr-weekly@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Weekly",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "weekly",
+      "interval": 2,
+      "firstDayOfWeek": "su",
+      "count": 10,
+      "byDay": [
+        {
+          "@type": "NDay",
+          "day": "mo"
+        },
+        {
+          "@type": "NDay",
+          "day": "we"
+        }
+      ]
+    }
+  },
+  "rrule-monthly": {
+    "@type": "Event",
+    "uid": "rr-monthly@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Monthly",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "monthly",
+      "byDay": [
+        {
+          "@type": "NDay",
+          "day": "mo",
+          "nthOfPeriod": 2
+        },
+        {
+          "@type": "NDay",
+          "day": "fr",
+          "nthOfPeriod": -1
+        }
+      ],
+      "until": "2025-12-31T23:59:59"
+    }
+  },
+  "rrule-monthly-setpos": {
+    "@type": "Event",
+    "uid": "rr-setpos@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Last weekday",
+    "start": "2025-03-31T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "monthly",
+      "byDay": [
+        {
+          "@type": "NDay",
+          "day": "mo"
+        },
+        {
+          "@type": "NDay",
+          "day": "tu"
+        },
+        {
+          "@type": "NDay",
+          "day": "we"
+        },
+        {
+          "@type": "NDay",
+          "day": "th"
+        },
+        {
+          "@type": "NDay",
+          "day": "fr"
+        }
+      ],
+      "bySetPosition": [
+        -1
+      ],
+      "byMonthDay": [
+        -1,
+        -2,
+        -3,
+        28,
+        29,
+        30,
+        31
+      ]
+    }
+  },
+  "rrule-yearly": {
+    "@type": "Event",
+    "uid": "rr-yearly@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Yearly",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT1H",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "yearly",
+      "byMonth": [
+        "3",
+        "10"
+      ],
+      "byWeekNo": [
+        11,
+        -1
+      ],
+      "byYearDay": [
+        69,
+        -100
+      ],
+      "count": 5
+    }
+  },
+  "rrule-hourly": {
+    "@type": "Event",
+    "uid": "rr-hourly@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Hourly",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT10M",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "hourly",
+      "interval": 3,
+      "byHour": [
+        9,
+        12,
+        15
+      ],
+      "byMinute": [
+        0,
+        30
+      ],
+      "bySecond": [
+        0
+      ],
+      "count": 20
+    }
+  },
+  "rrule-daily-allday-until": {
+    "@type": "Event",
+    "uid": "rr-daily@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Daily",
+    "start": "2025-03-10T00:00:00",
+    "duration": "P1D",
+    "showWithoutTime": true,
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "daily",
+      "until": "2025-03-20T00:00:00"
+    }
+  },
+  "rrule-rscale": {
+    "@type": "Event",
+    "uid": "rr-rscale@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Leap month",
+    "start": "2025-03-10T00:00:00",
+    "duration": "P1D",
+    "showWithoutTime": true,
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "yearly",
+      "rscale": "chinese",
+      "skip": "forward",
+      "byMonth": [
+        "5L"
+      ]
+    }
+  },
+  "overrides": {
+    "@type": "Event",
+    "uid": "overrides@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Standup",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT15M",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "daily",
+      "count": 10
+    },
+    "recurrenceOverrides": {
+      "2025-03-11T09:00:00": {
+        "excluded": true
+      },
+      "2025-03-12T09:00:00": {
+        "title": "Standup (long)",
+        "duration": "PT45M"
+      },
+      "2025-03-13T09:00:00": {
+        "start": "2025-03-13T10:00:00"
+      },
+      "2025-03-25T09:00:00": {}
+    }
+  },
+  "overrides-participants": {
+    "@type": "Event",
+    "uid": "overrides-part@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Weekly 1:1",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT30M",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "weekly"
+    },
+    "organizerCalendarAddress": "mailto:boss@example.com",
+    "participants": {
+      "boss": {
+        "@type": "Participant",
+        "name": "Boss",
+        "email": "boss@example.com",
+        "calendarAddress": "mailto:boss@example.com",
+        "roles": {
+          "owner": true,
+          "attendee": true
+        },
+        "participationStatus": "accepted"
+      },
+      "alice": {
+        "@type": "Participant",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "calendarAddress": "mailto:alice@example.com",
+        "roles": {
+          "attendee": true
+        },
+        "participationStatus": "accepted"
+      }
+    },
+    "recurrenceOverrides": {
+      "2025-03-17T09:00:00": {
+        "participants/alice/participationStatus": "declined"
+      }
+    }
+  },
+  "overrides-alerts": {
+    "@type": "Event",
+    "uid": "overrides-alerts@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Reminder",
+    "start": "2025-03-10T09:00:00",
+    "timeZone": "Europe/Berlin",
+    "duration": "PT30M",
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "weekly"
+    },
+    "alerts": {
+      "a1": {
+        "@type": "Alert",
+        "action": "display",
+        "trigger": {
+          "@type": "OffsetTrigger",
+          "offset": "-PT15M",
+          "relativeTo": "start"
+        }
+      }
+    },
+    "recurrenceOverrides": {
+      "2025-03-17T09:00:00": {
+        "alerts/a1/trigger/offset": "-PT1H"
+      }
+    }
+  },
+  "overrides-allday": {
+    "@type": "Event",
+    "uid": "overrides-allday@example.com",
+    "updated": "2025-01-01T00:00:00Z",
+    "title": "Holiday",
+    "start": "2025-03-10T00:00:00",
+    "duration": "P1D",
+    "showWithoutTime": true,
+    "recurrenceRule": {
+      "@type": "RecurrenceRule",
+      "frequency": "weekly"
+    },
+    "recurrenceOverrides": {
+      "2025-03-17T00:00:00": {
+        "excluded": true
+      },
+      "2025-03-24T00:00:00": {
+        "title": "Moved holiday",
+        "start": "2025-03-25T00:00:00"
+      }
+    }
+  }
+}

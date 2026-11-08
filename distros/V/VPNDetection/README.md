@@ -223,6 +223,13 @@ my $written = $db->download($id, 'mmdb', "./$id.mmdb");    # streamed to disk
 
 `download` holds nothing beyond one chunk however large the database is, writes through a neighboring `.part` file so a transfer that dies half way leaves nothing that reads as a whole database, and raises rather than accepts a body that stops early. `download_bytes` holds the **whole file in memory**, and the catalog runs from `cdn_ip_v1` at 10 KB to `resproxy_ip_90d_v1` at 1.79 GB, so use `download` for anything you have not measured.
 
+From 3.11.0, each of the three takes `build`, the build a `database.updated` webhook names, so the file is the one whose `sha256` the webhook carries rather than whatever is live by the time you ask. Without it you get the live build. A build is kept 7 days, and one pruned since is a `bad_request` with status 410:
+
+```perl
+my $data = $event->{data};    # a database.updated webhook's
+$db->download($data->{dataset}, 'mmdb', "./$data->{dataset}.mmdb", build => $data->{build});
+```
+
 A format is `csvgz` or `mmdb`, and `VPNDetection::Database::FORMATS` lists them. Anything else is refused before a request is made.
 
 ### Sign in with OAuth (device flow)

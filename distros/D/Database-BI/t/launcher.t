@@ -303,4 +303,127 @@ SKIP: {
 	like $output, qr/\bDatabase::BI\b/, 'and gives the application';
 }
 
+# ---------------------------------------------------------------------------
+# Only this machine can reach a server unless the configuration says otherwise
+# ---------------------------------------------------------------------------
+
+# Mojolicious listens on every interface by default, which put an application
+# with no login on the local network.  Startup now fills MOJO_LISTEN from config
+# listen (default http://127.0.0.1:3000) when it is unset, and hypnotoad's
+# listen from http://127.0.0.1:8080.
+subtest 'where a server listens' => sub {
+	my $listen_of = sub {
+		my ($config) = @_;
+		delete local $ENV{MOJO_LISTEN};
+		my $t = Test::Mojo->new('Database::BI', $config);
+		return ($ENV{MOJO_LISTEN}, $t->app->config->{hypnotoad});
+	};
+
+	my ($env, $hypnotoad) = $listen_of->({});
+	is $env, 'http://127.0.0.1:3000', 'morbo, daemon and prefork: this machine only, port 3000';
+	is_deeply $hypnotoad, { listen => ['http://127.0.0.1:8080'] }, 'hypnotoad: this machine only, port 8080';
+
+	# Every interface needs a password (t/login.t checks the refusal).
+	my $hash = do { require Database::BI::Password; Database::BI::Password::hash_password('pw', rounds => 10_000) };
+	($env) = $listen_of->({ listen => 'http://*:3000', password_hash => $hash, export_dirs => [$tmp] });
+	is $env, 'http://*:3000', 'listen opens it to every machine';
+	($env) = $listen_of->({ listen => ['http://127.0.0.1:4000', 'http://[::1]:4000'] });
+	is $env, 'http://127.0.0.1:4000,http://[::1]:4000', 'or names several places';
+	($env) = $listen_of->({ listen => 'http://127.0.0.1:4000,http://[::1]:4000' });
+	is $env, 'http://127.0.0.1:4000,http://[::1]:4000', 'separated by commas, as MOJO_LISTEN is';
+
+	(undef, $hypnotoad) = $listen_of->({ hypnotoad => { listen => ['http://*:8080'], workers => 2 } });
+	is_deeply $hypnotoad, { listen => ['http://*:8080'], workers => 2 }, "hypnotoad's own listen is kept";
+	(undef, $hypnotoad) = $listen_of->({ hypnotoad => { workers => 2 } });
+	is_deeply $hypnotoad, { listen => ['http://127.0.0.1:8080'], workers => 2 },
+		'and the rest of its settings with the default';
+
+	{
+		local $ENV{MOJO_LISTEN} = 'http://127.0.0.1:4001';
+		Test::Mojo->new('Database::BI', { listen => 'http://*:3000', password_hash => $hash, export_dirs => [$tmp] });
+		is $ENV{MOJO_LISTEN}, 'http://127.0.0.1:4001', 'MOJO_LISTEN beats the configuration';
+	}
+
+	for my $case (['ftp://example.com', 'another scheme'], ['http://*:3000 junk', 'a space'], ['', 'empty'],
+			[[], 'an empty list'], [[undef], 'an undefined place'], [{ port => 3000 }, 'a hash'],
+			[['http://*:3000', \1], 'a reference in the list']) {
+		my ($bad, $name) = @{$case};
+		delete local $ENV{MOJO_LISTEN};
+		throws_ok { Test::Mojo->new('Database::BI', { listen => $bad }) } qr/\Alisten: /,
+			"listen as $name stops the start";
+		ok !defined $ENV{MOJO_LISTEN}, '... and listens nowhere';
+	}
+};
+
+# The address another machine would reach this one by, if it has one.
+# Connecting a UDP socket sends nothing: it only picks the interface.
+sub _non_loopback_address {
+	require IO::Socket::INET;
+	my $socket = IO::Socket::INET->new(Proto => 'udp', PeerAddr => '192.0.2.1', PeerPort => 9) or return;
+	my $address = $socket->sockhost;
+	return (defined $address && $address !~ /\A(?:127\.|0\.)/) ? $address : undef;
+}
+
+SKIP: {
+	skip 'morbo does not support fork emulation', 1 if $Config{d_pseudofork};
+	my $address = _non_loopback_address();
+	skip 'this machine has no address but loopback', 1 unless $address;
+
+	# Started with no -l and no MOJO_LISTEN; the configuration names the port.
+	my $hash = do { require Database::BI::Password; Database::BI::Password::hash_password('pw', rounds => 10_000) };
+	my $reaches = sub {
+		my ($command, $where, $password) = @_;
+		my $port   = Mojo::IOLoop::Server->generate_port;
+		my $config = File::Spec->catfile($tmp, 'listen.conf');
+		open my $cfh, '>', $config or BAIL_OUT("cannot write $config: $!");
+		print {$cfh} "{ listen => ['http://$where:$port']", ($password ? ", password_hash => '$hash', export_dirs => ['$tmp']" : ''), " }\n";
+		close $cfh;
+
+		local $ENV{MOJO_CONFIG}    = $config;
+		local $ENV{MOJO_LOG_LEVEL} = 'fatal';
+		delete local @ENV{qw(MOJO_LISTEN BI_OPEN)};
+		my $pid = fork // BAIL_OUT("cannot fork: $!");
+		if (!$pid) {
+			open STDOUT, '>', File::Spec->devnull or POSIX::_exit(1);
+			open STDERR, '>', File::Spec->devnull or POSIX::_exit(1);
+			exec($^X, $launcher, @{$command}) or POSIX::_exit(1);
+		}
+
+		my $ua = Mojo::UserAgent->new(connect_timeout => 1, inactivity_timeout => 30);
+		my ($local, $remote, $exited);
+		for (1 .. 60) {
+			$local = eval { $ua->head("http://127.0.0.1:$port/preferences")->res->code };
+			last if $local;
+			if (waitpid($pid, WNOHANG) == $pid) { $exited = 1; last }
+			select undef, undef, undef, 0.5;
+		}
+		return (undef, undef, 1) if $exited;
+		$remote = eval { $ua->head("http://$address:$port/preferences")->res->code };
+
+		kill 'TERM', $pid;
+		for (1 .. 40) {
+			last if waitpid($pid, WNOHANG) == $pid;
+			select undef, undef, undef, 0.25;
+		}
+		kill 'KILL', $pid if kill 0, $pid;
+		return ($local, $remote);
+	};
+
+	for my $command ([], ['daemon']) {
+		my $name = @{$command} ? 'daemon' : 'the launcher (morbo)';
+		my ($local, $remote) = $reaches->($command, '127.0.0.1');
+		is $local, 200, "$name on 127.0.0.1 answers this machine";
+		ok !$remote, "and not $address";
+
+		# Every interface needs a password: without one the server does not start.
+		my $exited;
+		($local, $remote, $exited) = $reaches->($command, '*');
+		ok $exited && !$local, "$name on * with no password does not start";
+
+		($local, $remote) = $reaches->($command, '*', 1);
+		is $local,  401, "$name on * with a password answers this machine, and asks for the password";
+		is $remote, 401, "and $address, the same way";
+	}
+}
+
 done_testing();

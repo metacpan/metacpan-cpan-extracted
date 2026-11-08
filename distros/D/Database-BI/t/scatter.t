@@ -64,6 +64,8 @@ sub chart_spec_of {
 sub without_data {
 	my ($body) = @_;
 	$body =~ s/^\s*var data = .*$//m;
+	# Each request has its own Content-Security-Policy nonce.
+	$body =~ s/\bnonce="[^"]*"/nonce=""/g;
 	return $body;
 }
 

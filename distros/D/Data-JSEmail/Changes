@@ -1,5 +1,57 @@
 Revision history for Perl extension Data::JSEmail
 
+0.06  2026-11-07
+	- run every entry point (parse, parse_email, make) with the
+	  Email::MIME globals the module is written against (STRICT_PARAMS
+	  0, PRE_2231_FORM 1, GROUCHY 0) localised, so results no longer
+	  depend on what the caller set; add t/globals.t
+	- parse never dies on malformed MIME: a multipart whose boundary
+	  never appears, or one nested or split past Email::MIME's
+	  MAX_DEPTH/MAX_PARTS, becomes one application/octet-stream leaf
+	  holding its content, and a part that cannot be read is an opaque
+	  leaf; the rest of the message parses as before
+	- one header-forms codec, public: header_value($form, $raw_values,
+	  all => 0|1) (get), format_header($form, $value) (create, its
+	  inverse), header_form_allowed($field, $form) (the RFC 8621 S4.1.2
+	  table), header_property($headers, $prop) and
+	  parse_header_property($prop); see HEADER FORMS in the POD
+	- make takes header:{name}:as{form}[:all] properties directly, on the
+	  Email and on body parts, and refuses forms a field does not allow;
+	  names are quoted/escaped, non-ASCII names and text RFC 2047
+	  encoded, groups written for asGroupedAddresses
+	- make writes a Raw header:{name} value as given; it was RFC
+	  2047-encoded when it had a leading space
+	- make writes every convenience property through format_header:
+	  sentAt is now an RFC 5322 Date (it was written in RFC 3339 form,
+	  which parses back as null), and a subject that looks like an
+	  encoded-word is encoded
+	- parse: the convenience properties are computed from the Raw values
+	  like header:{name}:as{form} (last instance, decoded once), and
+	  address names are decoded once (they were decoded by Email::MIME,
+	  then again by asText); add t/header-codec.t
+	- make: one leaf-part encoder for bodyStructure leaves and for the
+	  textBody, htmlBody and attachments shorthand.  It fixes: a non-text
+	  blob leaf in bodyStructure written raw with no
+	  Content-Transfer-Encoding, so the final CRLF rewrite corrupted
+	  binary octets (now base64); a textBody or text leaf given by blobId
+	  UTF-8 encoded a second time (blob octets are now written as they
+	  are, with the charset given, or the blob type's, or us-ascii/UTF-8
+	  when the octets are); a bodyValues attachment with non-ASCII text
+	  dying "Wide character"; text lines over 998 octets written 7bit
+	  (now quoted-printable).  header:* properties on a shorthand
+	  attachment are now written on it
+
+0.05  2026-11-07
+	- flag an unknown Content-Transfer-Encoding as an encoding problem
+	  (RFC 8621 S4.1.4): it came back undecoded and unflagged
+	- make: keep mailboxes whose email has no '@' (RFC 8621 S4.1.2.3);
+	  Email::MIME dropped them, leaving an empty From:, To:, ...
+	- escape '"' and '\' in a display name; a name with a quote made a
+	  broken header
+	- asAddresses/asGroupedAddresses: decode a UTF-8 addr-spec once
+	  (RFC 6532); it was written out double-encoded
+	- add t/encoding-problem.t, t/bare-addresses.t, t/eai-addresses.t
+
 0.04  2026-08-31
 	- clarify licensing: same terms as Perl itself (Artistic License 1.0
 	  or GPL version 1 or later)

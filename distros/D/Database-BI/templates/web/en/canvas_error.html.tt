@@ -51,7 +51,7 @@
 .btn-danger:hover { filter: brightness(1.1); }
 </style>
 
-<script>
+<script nonce="[% csp_nonce | html %]">
 (function () {
 	var btn = document.getElementById('canvas-error-delete');
 	if (!btn) return;

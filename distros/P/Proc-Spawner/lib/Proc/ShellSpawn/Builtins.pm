@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Builtins;   # builtins run by the large subset: one function per builtin (B1-B3 of "Shell Corpus Gaps")
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use strict; use warnings; use feature 'current_sub';
 use Proc::ShellSpawn;
 BEGIN { no strict 'refs'; *$_ = \&{"Proc::ShellSpawn::$_"} for qw(defer fail msg put var spawn find_cmd) }
@@ -87,28 +87,20 @@ sub b_times {   # the shell's own and its children's user and system time
   my $f = sub { my $s = shift; sprintf '%dm%.6fs', int($s / 60), $s - 60 * int($s / 60) };
   put($c, 1, join(' ', map $f->($_), @t[0, 1]) . "\n" . join(' ', map $f->($_), @t[2, 3]) . "\n", done($k, 0)) }
 
-# ulimit, reading only: dash's letters and units; the limits of this Perl process, from /proc/self/limits (Linux), or
-# else from a shell's ulimit (dash, bash --posix, ksh or sh, in /bin first; POSIX units: blocks of 512 bytes for -f and
-# -c, KiB for -s -d -m -l -v).
-my %UL = (t => ['Max cpu time', 1], f => ['Max file size', 512], d => ['Max data size', 1024], s => ['Max stack size', 1024],
-          c => ['Max core file size', 512], m => ['Max resident set', 1024], l => ['Max locked memory', 1024],
-          n => ['Max open files', 1], v => ['Max address space', 1024]);
-sub ulimit_shell {   # a shell to ask: dash, bash (--posix: its -f and -c count 512 bytes, as POSIX), ksh, sh; in /bin first, then on PATH
-  my $c = shift; my @n = qw(dash bash ksh sh);
-  for my $d ('/bin', grep length, split /:/, Proc::ShellSpawn::var($c, 'PATH') // '') { -x "$d/$_" && !-d _ and return "$d/$_" for @n }
-  undef }
+# ulimit, reading only: dash's letters and units; the limits of this Perl process, from getrlimit (Proc::Spawner's
+# XSUB; post-0.08: before, /proc/self/limits or a shell's ulimit).  POSIX units: blocks of 512 bytes for -f and -c,
+# KiB for -s -d -m -l -v.
+my %UL = (t => ['CPU', 1], f => ['FSIZE', 512], d => ['DATA', 1024], s => ['STACK', 1024], c => ['CORE', 512],
+          m => ['RSS', 1024], l => ['MEMLOCK', 1024], n => ['NOFILE', 1], v => ['AS', 1024]);
 sub b_ulimit {
   my ($c, $argv, $env, $k) = @_; my ($hard, $r) = (0, 'f');
   for (@$argv[1 .. $#$argv]) { $hard = 1 if /H[a-zA-Z]*\z/ && !/S[^H]*\z/; $r = $1 if /([nsctvlmdf])/ }
-  open my $fh, '<', '/proc/self/limits' or do {   # no /proc (FreeBSD, RT #182479): a shell's ulimit, as a child has our limits
-    my $sh = ulimit_shell($c);
-    require Proc::ShellSpawn::Large;   # (unsupported lives there; this module may run without it)
-    return Proc::ShellSpawn::Large::unsupported($c, "'ulimit' (no /proc/self/limits, and no shell to ask)") unless $sh;
-    return Proc::ShellSpawn::spawn($c, $c->{map}, [$sh, $sh =~ m{/bash\z} ? '--posix' : (), '-c', 'ulimit ' . ($hard ? '-H ' : '') . "-$r"], {}, $k) };
-  my ($name, $div) = @{$UL{$r}}; my $v;
-  while (<$fh>) { next unless /^\Q$name\E\s{2,}(\S+)\s+(\S+)/; $v = $hard ? $2 : $1; last }
+  my ($name, $div) = @{$UL{$r}};
+  my %res = defined &Proc::Spawner::__rlimits ? Proc::Spawner::__rlimits() : ();   # (none on Windows)
+  my @v = defined $res{$name} ? Proc::Spawner::__getrlimit($res{$name}) : ();
   require Proc::ShellSpawn::Large;   # (unsupported lives there; this module may run without it)
-  return Proc::ShellSpawn::Large::unsupported($c, "'ulimit -$r'") unless defined $v;
+  return Proc::ShellSpawn::Large::unsupported($c, "'ulimit -$r'") unless @v;
+  my $v = $v[$hard ? 1 : 0];
   put($c, 1, ($v eq 'unlimited' ? $v : int($v / $div)) . "\n", done($k, 0)) }
 
 1;
@@ -135,7 +127,7 @@ table, bash sorted). Defining or removing an alias inside C<eval> or C<.> text s
 
 =item C<jobs>, C<bg>, C<fg>, C<hash>, C<type>, C<times>, C<ulimit> (reading only)
 
-As dash 0.5.12 does in C<sh -c>, texts and statuses included. C<ulimit> reads F</proc/self/limits> (Linux).
+As dash 0.5.12 does in C<sh -c>, texts and statuses included. C<ulimit> asks getrlimit (through L<Proc::Spawner>).
 
 =item C<history>, C<fc>, C<bind>, C<help>, C<compopt>, C<logout>
 
