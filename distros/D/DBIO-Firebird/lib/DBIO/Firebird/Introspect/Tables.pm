@@ -1,8 +1,10 @@
 package DBIO::Firebird::Introspect::Tables;
-# ABSTRACT: Introspect Firebird tables and views via rdb$tables
+# ABSTRACT: Introspect Firebird tables and views via rdb$relations
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
 
 
 
@@ -26,7 +28,20 @@ sub fetch {
     $tables{$name} = {
       table_name => $name,
       kind       => $kind,
+      ( $kind eq 'view' ? ( view_source => "$row->{'rdb$view_source'}" ) : () ),
     };
+  }
+
+  my $pk = $dbh->prepare(q{
+    SELECT rdb$relation_name, rdb$constraint_name
+    FROM rdb$relation_constraints
+    WHERE rdb$constraint_type = 'PRIMARY KEY'
+  });
+  $pk->execute;
+  while (my $row = $pk->fetchrow_hashref) {
+    my ($table, $name) = map { my $v = $row->{$_}; $v =~ s/\s+$//; $v }
+      'rdb$relation_name', 'rdb$constraint_name';
+    $tables{$table}{primary_key_name} = $name if exists $tables{$table};
   }
 
   return \%tables;
@@ -42,11 +57,11 @@ __END__
 
 =head1 NAME
 
-DBIO::Firebird::Introspect::Tables - Introspect Firebird tables and views via rdb$tables
+DBIO::Firebird::Introspect::Tables - Introspect Firebird tables and views via rdb$relations
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -59,7 +74,11 @@ Fetches Firebird table and view metadata via C<rdb$relations>.
     my $tables = DBIO::Firebird::Introspect::Tables->fetch($dbh);
 
 Returns a hashref keyed by table name. Each value has: C<table_name>,
-C<kind> (C<table> or C<view>).
+C<kind> (C<table> or C<view>) and, for a view, C<view_source>, the text of
+C<rdb$relations.rdb$view_source> as the server holds it (the query after
+C<AS>, no trailing semicolon). A table with a primary key has its
+constraint name as C<primary_key_name> (C<INTEG_E<lt>nE<gt>> unless it was
+named), which the diff needs to drop the key.
 
 =head1 AUTHOR
 

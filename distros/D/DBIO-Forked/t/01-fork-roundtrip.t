@@ -63,6 +63,32 @@ my $storage = DBIO::Forked::Storage->new($schema);
   ok($f->is_failed, 'is_failed is true for an errored future');
 }
 
+# --- update/delete resolve the affected-row COUNT, a plain scalar -------------
+# A real DBI storage's update()/delete() return ($rv, $sth, @bind) in list
+# context and $rv in scalar context (DBIO::Storage::DBI::_execute). The child
+# must ask for the count, or the statement handle -- full of code refs -- goes
+# into Storable and the Future fails with "cannot serialize" although the
+# statement ran. The contract (DBIO::Storage::Async::update_async, which
+# Row::update_async relies on for "row not found") is the count alone.
+{
+  package t::Mock::DBI::Storage;
+  sub new { bless {}, shift }
+  sub update { shift; return wantarray ? (3, sub { 'sth' }, 'bind') : 3 }
+  sub delete { shift; return wantarray ? (1, sub { 'sth' }, 'bind') : 1 }
+
+  package main;
+  my $dbi_schema = t::Mock::Schema->new(t::Mock::DBI::Storage->new);   # held: the backend keeps it weakly
+  my $dbi = DBIO::Forked::Storage->new($dbi_schema);
+
+  my @upd = eval { $dbi->update_async('artist', { x => 1 }, { y => 2 })->get };
+  is($@, '', 'update_async whose sync update returns a statement handle in list context does not fail');
+  is_deeply(\@upd, [ 3 ], 'update_async resolves with the affected-row count alone');
+
+  my @del = eval { $dbi->delete_async('artist', { y => 2 })->get };
+  is($@, '', 'delete_async whose sync delete returns a statement handle in list context does not fail');
+  is_deeply(\@del, [ 1 ], 'delete_async resolves with the affected-row count alone');
+}
+
 # --- no zombies left behind --------------------------------------------------
 {
   my $reaped = waitpid(-1, WNOHANG);

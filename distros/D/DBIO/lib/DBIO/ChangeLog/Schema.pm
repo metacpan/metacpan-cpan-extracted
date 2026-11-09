@@ -4,6 +4,8 @@ package DBIO::ChangeLog::Schema;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Schema';
 
 use DBIO::ChangeLog::Set;
@@ -203,12 +205,12 @@ DBIO::ChangeLog::Schema - Schema-level change tracking component
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
   package MyApp::Schema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
 
   __PACKAGE__->load_components('ChangeLog::Schema');
 

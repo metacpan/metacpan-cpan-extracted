@@ -5,12 +5,22 @@ use Test::Exception;
 
 use DBIO::Test;
 
+# DBIO::Test::Schema keeps no driver in its class: this file runs it on
+# PostgreSQL (core ADR 0067).
+DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
+
 my $main_pid = $$;
 
 my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 
 plan skip_all => 'Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test'
       . ' (note: creates and drops a table named cd!)' unless ($dsn && $user);
+
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 # README: If you set the env var to a number greater than 10,
 #   we will use that many children

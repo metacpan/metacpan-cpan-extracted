@@ -4,6 +4,8 @@ package DBIO::MSSQL::Storage::Sybase::NoBindVars;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/
   DBIO::Storage::DBI::NoBindVars
   DBIO::MSSQL::Storage::Sybase
@@ -36,7 +38,7 @@ DBIO::MSSQL::Storage::Sybase::NoBindVars - Support for Microsoft SQL Server via 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -52,6 +54,22 @@ passed as placeholders. Because that renders prepared statement caching
 useless, caching is explicitly disabled.
 
 In all other respects it behaves as L<DBIO::MSSQL::Storage::Sybase>.
+
+=over
+
+=item * B<populate in void context> inserts row by row, in one transaction.
+Core's fast path prepares one statement and executes it once per row, which
+values written into the statement cannot do; it throws "Unable to invoke
+fast-path insert without storage placeholder support" for every data set. A row the server refuses rolls the data set back.
+
+=item * B<The values are core's literal>: nothing here refuses a character
+beyond ASCII (L<DBIO::MSSQL::Storage::Sybase/STRINGS BEYOND ASCII>), writes a
+binary value or rewrites an empty string -- there are no binds to look at. An
+empty string for an integer column is written without quotes
+(C<VALUES ( )>) and refused by the server, Msg 102, loudly and without a row
+(the literal is core's).
+
+=back
 
 =head1 SEE ALSO
 

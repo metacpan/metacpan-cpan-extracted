@@ -5,7 +5,7 @@ use Test::More;
 use mro ();
 use B ();
 
-# Offline regression for karr #16: the ASE trait classes
+# Offline regression for karr k16: the ASE trait classes
 # (IdentityRetrieval, BulkInsert, TxnManager, LOBWriter) override methods that
 # also live in the deep DBIO::Storage::DBI hierarchy reached via
 # DBIO::Sybase::Storage. If they are linearised AFTER core in the C3 MRO their

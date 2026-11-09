@@ -3,7 +3,12 @@ package DBIO::Cake;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
+use Carp ();
 use Scalar::Util ();
+use DBIO::Util ();
 
 our @EXPORT;
 our %EXPORT_TAGS;
@@ -55,6 +60,9 @@ my @other_funcs = qw(
   @table_funcs, @relationship_funcs,
   @cascade_funcs, @other_funcs,
 );
+
+
+sub type_function_names { return @col_types }
 
 # Per-caller options storage
 my %CALLER_OPTS;
@@ -172,6 +180,7 @@ sub _resolve_driver_defaults {
   my $storage_class = DBIO::Storage::DBI->driver_storage_class($driver_name)
     or return;
 
+  DBIO::Util::assert_class_name($storage_class);
   eval "require $storage_class; 1" or return;
   return $storage_class if $storage_class->can('cake_defaults');
   return;
@@ -595,19 +604,75 @@ sub view {
 
 # --- Indexes ---
 
+# What a driver block of idx may hold, per driver. The driver names are
+# DBIO::ResultSource->index_declaration_drivers; this is the keys of each.
+my %IDX_DRIVER_KEYS = (
+  pg     => [qw(where using with expression)],
+  sqlite => [qw(where expression)],
+  mysql  => [qw(using)],
+  oracle     => [qw(expression)],
+  mssql      => [qw(kind)],
+  firebird   => [],
+  sybase     => [],
+  informix   => [],
+  duckdb     => [qw(expression)],
+  clickhouse => [qw(type granularity expression)],
+);
+
+sub _idx_driver_names { DBIO::ResultSource->index_declaration_drivers }
+
+# Refuses an option idx would store and never read, so a misplaced
+# `using => 'gin'` or `unique => 1` cannot silently yield a plain index.
+sub _check_idx_keys {
+  my ($name, $options) = @_;
+  my $list = sub { join ', ', map "'$_'", @_ };
+  my @drivers = _idx_driver_names();
+  my @top     = (qw(type options), @drivers);
+
+  for my $key (sort keys %$options) {
+    next if grep { $_ eq $key } @top;
+    my ($home) = grep {
+      my $d = $_; grep { $_ eq $key } @{ $IDX_DRIVER_KEYS{$d} || [] }
+    } @drivers;
+    my $hint = defined $home
+      ? "; put '$key' inside $home => { ... }"
+      : $key eq 'unique'
+        ? "; use type => 'unique'"
+        : '';
+    Carp::croak("idx: index '$name': unknown key '$key' (valid keys: "
+      . $list->(@top) . ")$hint");
+  }
+
+  for my $drv (@drivers) {
+    next unless exists $options->{$drv};
+    Carp::croak("idx: index '$name': $drv must be a hashref, $drv => { ... }")
+      unless ref $options->{$drv} eq 'HASH';
+    my @valid = @{ $IDX_DRIVER_KEYS{$drv} || [] };
+    for my $key (sort keys %{ $options->{$drv} }) {
+      next if grep { $_ eq $key } @valid;
+      Carp::croak("idx: index '$name': unknown key '$key' in $drv => { ... } "
+        . "(valid keys: " . $list->(@valid) . ")");
+    }
+  }
+}
+
 sub idx {
   my ($name, $fields, %options) = @_;
   my $class = _caller_class();
 
-  my $source = $class->result_source_instance;
-  my $indexes = $source->{_cake_indexes} ||= [];
-  push @$indexes, {
-    name   => $name,
-    fields => $fields,
-    %options,
-  };
+  _check_idx_keys($name, \%options);
 
-  $class->_install_index_hooks($source);
+  my %driver = map { $_ => $options{$_} }
+    grep { exists $options{$_} } _idx_driver_names();
+
+  my $source = $class->result_source_instance;
+  $source->add_index_declaration({
+    name    => $name,
+    columns => $fields,
+    type    => $options{type},
+    options => $options{options},
+    (%driver ? (driver => \%driver) : ()),
+  });
 }
 
 # --- Timestamp column helpers ---
@@ -641,7 +706,7 @@ DBIO::Cake - DDL-like DSL for defining DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -683,7 +748,7 @@ PostgreSQL-specific example:
   col deleted_at => timestamp null;
 
   primary_key 'id';
-  idx user_tags => ['tags'], using => 'gin';
+  idx user_tags => ['tags'], pg => { using => 'gin' };
 
   1;
 
@@ -711,6 +776,18 @@ When you C<use DBIO::Cake>, it automatically:
 =item * Cleans up exported symbols after the scope ends (via L<namespace::clean>)
 
 =back
+
+=head1 METHODS
+
+=head2 type_function_names
+
+    my @names = DBIO::Cake->type_function_names;
+
+The names of the column type functions Cake exports (C<integer>, C<varchar>,
+C<timestamp>, ...), the words that stand for a type in C<col NAME =E<gt> TYPE>.
+Column modifiers, relationship functions and the table functions are not
+among them. L<DBIO::Generate::Style::Cake> writes a column's type as a bare
+word for exactly these names and as a string for every other type.
 
 =head1 COMMA-FREE SYNTAX
 
@@ -784,118 +861,400 @@ C<default_value>. This is a shorthand for C<default(\...)>:
 For literal SQL defaults, use a reference to a string. For Perl-side defaults,
 use C<default($value)> without a reference.
 
+=head1 COLUMN DECLARATION
+
+=head2 col
+
+  col $name => @type_and_modifiers;
+
+Adds one column to the result class. The list after the name is what the
+type functions and modifiers below return; C<col> turns it into the column
+info hashref:
+
+=over 4
+
+=item * a scalar reference anywhere in the list becomes C<default_value>
+(see L</Scalar references as defaults>)
+
+=item * dotted keys are nested: C<< 'extra.unsigned' => 1 >> becomes
+C<< extra => { unsigned => 1 } >>
+
+=item * C<is_nullable> defaults to 0 -- columns are NOT NULL unless marked
+C<null>
+
+=item * with C<-retrieve_defaults>, a column with a C<default_value> gets
+C<retrieve_on_insert> (unless set explicitly)
+
+=item * an active inflation import option (e.g. C<-inflate_json>) adds the
+column attributes the storage's type registry declares for that data type,
+without overriding ones given explicitly
+
+=item * the timestamp and UUID defaults of L</SMART DEFAULTS> are applied
+
+=back
+
 =head1 COLUMN TYPES
 
 All type functions return flat key-value lists and pass through C<@_>,
-enabling the comma-free syntax.
+enabling the comma-free syntax. Each entry names the C<data_type> it sets.
+Where a function takes a size-like argument, it is recognised only when it
+looks like a number, so C<varchar null> still works.
 
 =head2 Integer types
-
-C<integer>, C<tinyint>, C<smallint>, C<bigint>
 
   col id    => integer auto_inc;
   col count => bigint;
 
-=head2 Serial types (auto-increment shortcuts)
+=over 4
 
-C<serial>, C<bigserial>, C<smallserial>
+=item integer
+
+C<integer>.
+
+=item tinyint
+
+C<tinyint>.
+
+=item smallint
+
+C<smallint>.
+
+=item bigint
+
+C<bigint>.
+
+=back
+
+=head2 Serial types (auto-increment shortcuts)
 
   col id => serial;   # integer + auto_inc in one
 
-=head2 Numeric types
+=over 4
 
-C<numeric($precision, $scale)>, C<decimal($precision, $scale)>
+=item serial
+
+C<serial>, plus C<< is_auto_increment => 1 >>.
+
+=item bigserial
+
+C<bigserial>, plus C<< is_auto_increment => 1 >>.
+
+=item smallserial
+
+C<smallserial>, plus C<< is_auto_increment => 1 >>.
+
+=back
+
+=head2 Numeric types
 
   col price => numeric(10, 2);
 
+=over 4
+
+=item numeric
+
+C<numeric>. C<numeric($precision)> sets C<< size => [$precision] >>,
+C<numeric($precision, $scale)> sets C<< size => [$precision, $scale] >>.
+
+=item decimal
+
+C<decimal>, with the same optional precision and scale as L</numeric>.
+
+=back
+
 =head2 Floating point types
 
-C<real> (alias: C<float4>), C<double> (alias: C<float8>), C<float($bits)>
+=over 4
+
+=item real
+
+=item float4
+
+C<real> (C<float4> is an alias).
+
+=item double
+
+=item float8
+
+C<double precision> (C<float8> is an alias).
+
+=item float
+
+C<float>; C<float($bits)> also sets C<size>.
+
+=back
 
 =head2 String types
-
-C<char($size)>, C<varchar($size)>
 
   col code => char(3);
   col name => varchar(100), null;
 
-=head2 Text types
+=over 4
 
-C<text>, C<tinytext>, C<mediumtext>, C<longtext>
+=item char
+
+C<char>, C<size> from the argument (default 1).
+
+=item varchar
+
+C<varchar>, C<size> from the argument (default 255).
+
+=back
+
+=head2 Text types
 
   col bio => text null;
 
+=over 4
+
+=item text
+
+=item tinytext
+
+=item mediumtext
+
+=item longtext
+
+C<text>, C<tinytext>, C<mediumtext>, C<longtext>.
+
+=back
+
 =head2 Binary types
 
-C<blob>, C<tinyblob>, C<mediumblob>, C<longblob>, C<bytea>
+=over 4
+
+=item blob
+
+=item tinyblob
+
+=item mediumblob
+
+=item longblob
+
+=item bytea
+
+C<blob>, C<tinyblob>, C<mediumblob>, C<longblob>, C<bytea>.
+
+=back
 
 =head2 Boolean
 
-C<boolean> (alias: C<bool>)
-
   col active => boolean default(1);
 
-=head2 Date/Time types
+=over 4
 
-C<date>, C<datetime>, C<timestamp>, C<time>, C<timetz>, C<timestamptz>,
-C<interval>
+=item boolean
+
+=item bool
+
+C<boolean> (C<bool> is an alias).
+
+=back
+
+=head2 Date/Time types
 
   col created_at => timestamp;             # auto set_on_create
   col updated_at => timestamp on_update;   # auto set_on_create + set_on_update
   col deleted_at => timestamp null;        # no auto-set
   col birthday   => date null;
 
-=head2 Enum
+=over 4
 
-C<enum(@values)>
+=item date
+
+C<date>.
+
+=item datetime
+
+=item timestamp
+
+=item time
+
+C<datetime>, C<timestamp>, C<time>. An optional first argument that is a
+plain string and not a lowercase word (e.g. C<timestamp 'UTC'>) sets
+C<timezone>.
+
+=item timetz
+
+C<time with time zone>.
+
+=item timestamptz
+
+C<timestamp with time zone>.
+
+=item interval
+
+C<interval>.
+
+=back
+
+=head2 Enum and set
 
   col role => enum(qw( admin moderator user guest ));
 
-=head2 UUID
+=over 4
 
-C<uuid>
+=item enum
+
+=item set
+
+C<enum> / C<set>, with the arguments as the list of allowed values in
+C<< extra => { list => [...] } >>. Unlike the other type functions these
+take no further options: every argument is a value, so modifiers must be
+separated by a comma (C<< enum(qw(a b)), null >>).
+
+=back
+
+=head2 UUID
 
   col id => uuid;   # auto retrieve_on_insert
 
-=head2 JSON
+=over 4
 
-C<json>, C<jsonb>
+=item uuid
+
+C<uuid>.
+
+=back
+
+=head2 JSON
 
   col metadata => jsonb null;
 
 With C<-inflate_json>, json/jsonb columns are automatically serialized.
 
-=head2 Array (PostgreSQL)
+=over 4
 
-C<array($type)>
+=item json
+
+=item jsonb
+
+C<json>, C<jsonb>.
+
+=back
+
+=head2 Array (PostgreSQL)
 
   col tags => array(text), null;
 
-=head2 Vector / AI (pgvector)
+=over 4
 
-C<vector($dims)>, C<halfvec($dims)>, C<sparsevec($dims)>
+=item array
+
+C<array($type)> sets C<data_type> to C<$type> followed by C<[]> (C<text[]>
+above); the element type may be given as a type function call or as a type
+name. C<array(\%info)> instead sets C<< data_type => 'ARRAY' >> and merges
+C<%info> in.
+
+=back
+
+=head2 Vector / AI (pgvector)
 
   col embedding => vector(1536);
 
+=over 4
+
+=item vector
+
+=item halfvec
+
+=item sparsevec
+
+C<vector>, C<halfvec>, C<sparsevec>; the optional dimension argument sets
+C<size>.
+
+=back
+
 =head2 Full-text search (PostgreSQL)
 
-C<tsvector>, C<tsquery>
+=over 4
+
+=item tsvector
+
+=item tsquery
+
+C<tsvector>, C<tsquery>.
+
+=back
 
 =head2 Network types (PostgreSQL)
 
-C<inet>, C<cidr>, C<macaddr>, C<macaddr8>
+=over 4
+
+=item inet
+
+=item cidr
+
+=item macaddr
+
+=item macaddr8
+
+C<inet>, C<cidr>, C<macaddr>, C<macaddr8>.
+
+=back
 
 =head2 Geometric types (PostgreSQL)
 
-C<point>, C<line>, C<lseg>, C<box>, C<path>, C<polygon>, C<circle>
+=over 4
+
+=item point
+
+=item line
+
+=item lseg
+
+=item box
+
+=item path
+
+=item polygon
+
+=item circle
+
+C<point>, C<line>, C<lseg>, C<box>, C<path>, C<polygon>, C<circle>.
+
+=back
 
 =head2 Range types (PostgreSQL)
 
-C<int4range>, C<int8range>, C<numrange>, C<tsrange>, C<tstzrange>, C<daterange>
+=over 4
+
+=item int4range
+
+=item int8range
+
+=item numrange
+
+=item tsrange
+
+=item tstzrange
+
+=item daterange
+
+C<int4range>, C<int8range>, C<numrange>, C<tsrange>, C<tstzrange>,
+C<daterange>.
+
+=back
 
 =head2 Other
 
-C<money>, C<xml>, C<hstore>, C<bit($size)>, C<varbit($size)>
+=over 4
+
+=item money
+
+=item xml
+
+=item hstore
+
+C<money>, C<xml>, C<hstore>.
+
+=item bit
+
+=item varbit
+
+C<bit>, C<varbit>; the optional size argument sets C<size>.
+
+=back
 
 =head1 COLUMN MODIFIERS
 
@@ -973,6 +1332,23 @@ Adds a unique constraint.
   might_have bio    => 'MyApp::Schema::Result::Bio', 'author_id';
   many_to_many roles => 'actor_roles', 'role';
 
+=over 4
+
+=item belongs_to
+
+=item has_one
+
+=item has_many
+
+=item might_have
+
+=item many_to_many
+
+Call the class method of the same name (see L<DBIO::Relationship>) on the
+result class, with all arguments unchanged.
+
+=back
+
 =head2 rel_one
 
 Like C<belongs_to> but forces C<join_type =E<gt> 'left'>.
@@ -1031,28 +1407,44 @@ just add this one line and you're done.
 
   idx name_idx => ['name'];
   idx composite_idx => ['last_name', 'first_name'], type => 'unique';
-  idx tags_idx => ['tags'], using => 'gin';
+  idx tags_idx => ['tags'], pg => { using => 'gin' };
   idx draft_only => ['key'],
       type => 'unique',
       pg   => { where => 'version IS NULL' };
 
-Declares an index. Cake installs two hooks on the Result class so that
-C<idx> works transparently in both deployment pipelines:
+The options are C<type>, C<options> and one block per driver: C<pg> takes a
+hashref with C<where>, C<using>, C<with> and C<expression>, C<sqlite> takes
+C<where> and C<expression>, C<mysql> takes C<using>. Any other key, in either
+place, is rejected when the class loads, naming the index and the key.
 
-=over
+Declares an index. The declaration is stored on the result source in its
+canonical form, C<< { name, columns, unique, type, options, driver } >>, and
+every driver reads it from there with
+L<index_declarations|DBIO::ResultSource/index_declarations>:
 
-=item * C<sqlt_deploy_hook> — B<DEPRECATED> hook for legacy
-deployment. The C<options> key passes producer-specific options through.
+  for my $idx (MyApp::Schema::Result::User->result_source_instance
+                 ->index_declarations) {
+    # $idx->{name}, $idx->{columns}, $idx->{unique}, $idx->{driver}{pg}
+  }
 
-=item * C<pg_indexes> — used by L<DBIO::PostgreSQL::DDL> when the schema
-loads the C<PostgreSQL> component. The C<pg> key carries
-PostgreSQL-specific options (C<where>, C<using>, C<with>, C<expression>)
-and is passed through to the native PG DDL emitter.
+C<type =E<gt> 'unique'> makes the entry C<unique>, and a block is carried as
+C<< driver =E<gt> { pg =E<gt> { ... } } >>, the block of the driver that
+understands it.
 
-=back
+A schema is bound to one driver and a block is that driver's: the driver reads
+its entries with
+L<index_declarations_for|DBIO::ResultSource/index_declarations_for>, which
+refuses an entry that only carries another driver's block (a partial unique
+index declared for C<pg> is not a plain unique index on C<sqlite>) and an
+unknown key in its own block. An empty own block, C<< sqlite =E<gt> {} >>, says
+that the plain index is wanted. A class that has to serve two drivers is two
+schema classes sharing the source's columns. Declaring the same name twice replaces the earlier
+declaration. C<indices> from L<DBIO::ResultSourceProxy> fills the same
+declaration list.
 
-If the class already defines C<pg_indexes> by hand, those definitions
-are preserved and Cake-declared indexes are merged on top.
+A driver reads the declarations from the source; the Result class gets no
+index method of its own from them. An index a driver namespace declares by hand
+(C<pg_index> for PostgreSQL) stays valid beside them.
 
 =head3 PostgreSQL partial indexes
 

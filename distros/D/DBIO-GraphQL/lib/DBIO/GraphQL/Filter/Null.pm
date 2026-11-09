@@ -3,6 +3,8 @@ package DBIO::GraphQL::Filter::Null;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::GraphQL::Filter';
 
 use GraphQL::Type::InputObject;
@@ -39,7 +41,7 @@ DBIO::GraphQL::Filter::Null - No-op filter adapter - disables filtering entirely
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

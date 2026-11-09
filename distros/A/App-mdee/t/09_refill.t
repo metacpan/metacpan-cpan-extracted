@@ -137,6 +137,12 @@ my $md = md_file($input);
 
 my $toml = md_file(qq(+++\ntitle = "x"\n+++\n\npara a\npara b\n));
 
+# YAML front matter with a list, as Qiita CLI writes it: libcmark reads
+# the lines as paragraphs and list items
+my $yaml_text = "---\ntitle: x\ntags:\n  - a\n  - b\nprivate: false\nid: null\n---\npara a\npara b\n";
+my $yaml = md_file($yaml_text);
+my $yaml_dots = md_file($yaml_text =~ s/\n---\npara/\n...\npara/r);
+
 for my $parser (@parsers) {
 note "refill_parser=$parser";
 my $config = "refill=1,refill_parser=$parser";
@@ -148,6 +154,13 @@ subtest 'join paragraphs' => sub {
     is(plain($out), $input, 'refill=0 leaves the text as it is');
     $out = run("'-Mmd::config(colorize=0,table=0,$config)' $toml")->stdout;
     is(plain($out), qq(+++\ntitle = "x"\n+++\n\npara a para b\n), 'TOML front matter is left as it is');
+    for my $f ([ $yaml, "---" ], [ $yaml_dots, "..." ]) {
+        $out = run("'-Mmd::config(colorize=0,table=0,$config)' $f->[0]")->stdout;
+        is(plain($out), $yaml_text =~ s{\n---\npara a\npara b}{\n$f->[1]\npara a para b}r,
+           "YAML front matter ending with $f->[1] is left as it is");
+    }
+    $out = run("'-Mmd::config(colorize=0,table=0,$config,front_matter=0)' $toml")->stdout;
+    is(plain($out), qq(+++ title = "x" +++\n\npara a para b\n), 'front_matter=0 joins the TOML lines as a paragraph');
 };
 
 my $sentence = 'the quick brown fox jumps over the lazy dog and runs away';  # 58 chars

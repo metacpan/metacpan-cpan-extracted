@@ -13,7 +13,7 @@ use namespace::clean;
 
 use overload '&{}' => sub ($self, @) { $self->{call} }, fallback => 1;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 # Croak at the line that called Ekorn::Pipeline.
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
@@ -359,6 +359,10 @@ indented. An exception object is passed on as it is.
 L<Ekorn::Pipeline::Gather>, L<Ekorn::Pipeline::Stop>,
 L<Ekorn::Pipeline::Pipes>, and L<DBIx::Squirrel>, where the pipeline
 began
+
+L<Ekorn::Pipeline::Manual::HowTo> shows how to do common tasks, one
+recipe at a time, and L<Ekorn::Pipeline::Manual::Reference> describes
+every module, function and method in full.
 
 =head1 AUTHOR
 

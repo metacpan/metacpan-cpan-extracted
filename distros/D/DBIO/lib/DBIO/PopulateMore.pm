@@ -5,7 +5,9 @@ package DBIO::PopulateMore;
 use strict;
 use warnings;
 
-use Scalar::Util qw(refaddr weaken);
+our $VERSION = '0.900004';
+
+use Scalar::Util qw(refaddr);
 use namespace::clean;
 
 
@@ -31,61 +33,10 @@ sub populate_more {
     }
   }
 
-  my %rs_index;
-  my %seen;
-  weaken(my $weak_self = $self);
-
-  my $visit;
-  my $dispatch;
-
-  # Visitor: recursively walk data structures, inflating !-prefixed values
-  $visit = sub {
-    my ($target) = @_;
-    if (ref $target eq 'ARRAY') {
-      my $addr = refaddr $target;
-      return $seen{$addr} if defined $seen{$addr};
-      my $new = $seen{$addr} = [];
-      @$new = map { $visit->($_) } @$target;
-      return $new;
-    } elsif (ref $target eq 'HASH') {
-      my $addr = refaddr $target;
-      return $seen{$addr} if defined $seen{$addr};
-      my $new = $seen{$addr} = {};
-      %$new = map { $_ => $visit->($target->{$_}) } keys %$target;
-      return $new;
-    } elsif (defined $target && $target =~ $MATCH_CONDITION) {
-      return $dispatch->($1);
-    } else {
-      return $target;
-    }
-  };
-
-  # Dispatcher: route !Name:args to the correct inflator
-  $dispatch = sub {
-    my ($arg) = @_;
-    my ($name, $command) = ($arg =~ /^(\w+):(\S.*)$/);
-
-    if ($name eq 'Index') {
-      return $rs_index{$command}
-        || $weak_self->throw_exception("Bad Index in fixture: $command");
-    } elsif ($name eq 'Env') {
-      return $ENV{$command}
-        // $ENV{uc $command}
-        // $weak_self->throw_exception("No match for $command in \%ENV");
-    } elsif ($name eq 'Find') {
-      my ($source, $id) = split(/\./, $command, 2);
-      my $rs = $weak_self->resultset($source)
-        or $weak_self->throw_exception("Can't find resultset for $source");
-      if ($id =~ /^\[(.+)\]$/) {
-        my %keys = map { split(/=/, $_, 2) } split(/,/, $1);
-        $id = \%keys;
-      }
-      return $rs->find($id)
-        || $weak_self->throw_exception("Can't find result for '$id' in '$source'");
-    } else {
-      $weak_self->throw_exception("Unknown inflator: $name");
-    }
-  };
+  # The state is passed explicitly to the visitor and the dispatcher: they
+  # are plain subs, not closures holding themselves, so nothing outlives a
+  # populate_more that dies half way.
+  my $state = { schema => $self, seen => {}, rs_index => {} };
 
   for my $definition (@definitions) {
     my ($source, $info) = %$definition;
@@ -93,7 +44,7 @@ sub populate_more {
       ? @{$info->{fields}}
       : ($info->{fields});
 
-    my $data = $visit->($info->{data});
+    my $data = _populate_more_visit($state, $info->{data});
 
     while (my ($rs_key, $values) = each %$data) {
       my @values = ref $values eq 'ARRAY' ? @$values : ($values);
@@ -104,15 +55,62 @@ sub populate_more {
       }
 
       my $new = $self->resultset($source)->update_or_create(\%create);
-      $rs_index{"$source.$rs_key"} = $new;
+      $state->{rs_index}{"$source.$rs_key"} = $new;
     }
   }
 
-  # Break circular refs to avoid leaks
-  undef $visit;
-  undef $dispatch;
+  return %{ $state->{rs_index} };
+}
 
-  return %rs_index;
+# Visitor: recursively walk data structures, inflating !-prefixed values
+sub _populate_more_visit {
+  my ($state, $target) = @_;
+  my $seen = $state->{seen};
+  if (ref $target eq 'ARRAY') {
+    my $addr = refaddr $target;
+    return $seen->{$addr} if defined $seen->{$addr};
+    my $new = $seen->{$addr} = [];
+    @$new = map { _populate_more_visit($state, $_) } @$target;
+    return $new;
+  } elsif (ref $target eq 'HASH') {
+    my $addr = refaddr $target;
+    return $seen->{$addr} if defined $seen->{$addr};
+    my $new = $seen->{$addr} = {};
+    %$new = map { $_ => _populate_more_visit($state, $target->{$_}) } keys %$target;
+    return $new;
+  } elsif (defined $target && $target =~ $MATCH_CONDITION) {
+    return _populate_more_dispatch($state, $1);
+  } else {
+    return $target;
+  }
+}
+
+# Dispatcher: route !Name:args to the correct inflator
+sub _populate_more_dispatch {
+  my ($state, $arg) = @_;
+  my $schema = $state->{schema};
+  my ($name, $command) = ($arg =~ /^(\w+):(\S.*)$/);
+
+  if ($name eq 'Index') {
+    return $state->{rs_index}{$command}
+      || $schema->throw_exception("Bad Index in fixture: $command");
+  } elsif ($name eq 'Env') {
+    return $ENV{$command}
+      // $ENV{uc $command}
+      // $schema->throw_exception("No match for $command in \%ENV");
+  } elsif ($name eq 'Find') {
+    my ($source, $id) = split(/\./, $command, 2);
+    my $rs = $schema->resultset($source)
+      or $schema->throw_exception("Can't find resultset for $source");
+    if ($id =~ /^\[(.+)\]$/) {
+      my %keys = map { split(/=/, $_, 2) } split(/,/, $1);
+      $id = \%keys;
+    }
+    return $rs->find($id)
+      || $schema->throw_exception("Can't find result for '$id' in '$source'");
+  } else {
+    $schema->throw_exception("Unknown inflator: $name");
+  }
 }
 
 1;
@@ -129,18 +127,19 @@ DBIO::PopulateMore - Enhanced populate with cross-source references
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
   package MyApp::Schema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
 
   # Can be loaded as a component or used standalone
   __PACKAGE__->load_components(qw/PopulateMore/);
 
-  # Or use directly on any schema instance:
-  # DBIO::PopulateMore->populate_more($schema, [...])
+  # Or use directly on any schema instance, without loading the component
+  # (note the function-call form -- the schema is the invocant):
+  # DBIO::PopulateMore::populate_more($schema, [...]);
 
 Then:
 
@@ -185,7 +184,9 @@ Values starting with C<!> are processed by inflator plugins:
 
 =item C<!Env:VAR_NAME> - Substitute from C<%ENV>
 
-=item C<!Find:Source.[key=val]> - Look up an existing row
+=item C<!Find:Source.[key=val]> - Look up an existing row; the C<key=val> pairs
+(or a single primary key value) give every column of one unique constraint, as
+for L<DBIO::ResultSet/find>
 
 =back
 
@@ -194,6 +195,11 @@ Values starting with C<!> are processed by inflator plugins:
 =head2 populate_more
 
 Populate multiple sources with optional cross-source references and inflators.
+
+Each row is written with L<DBIO::ResultSet/update_or_create>: the fields of a
+row give every column of exactly one unique constraint of its source, that
+constraint finds an existing row, and the other fields are the data the row is
+updated or created with.
 
 =head1 AUTHOR
 

@@ -2,6 +2,9 @@ package DBIO::Test::SQLMRebase;
 # ABSTRACT: Test SQLMaker subclass with select call counting
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 our @ISA = qw( DBIO::SQLMaker::ClassicExtensions SQL::Abstract );
@@ -27,7 +30,7 @@ DBIO::Test::SQLMRebase - Test SQLMaker subclass with select call counting
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

@@ -4,6 +4,8 @@ package DBIO::Skills;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use File::ShareDir ();
 use File::Spec;
 
@@ -73,9 +75,9 @@ sub skill {
 
   for my $dist (sort keys %_loaded_dist) {
     my $map = _scan_dist($dist);
-    # Most sharedir dir names are canonical (dbio-...), but a few family
-    # skills are not (e.g. 'karr'); try the canonical form first, then the
-    # literal name as given.
+    # Sharedir dir names are canonical (dbio-...) for the skills the family
+    # ships; a dist may still carry one under another name, so try the
+    # canonical form first, then the literal name as given.
     for my $key ($want, $name) {
       return _slurp($map->{$key}) if $map->{$key};
     }
@@ -107,7 +109,7 @@ DBIO::Skills - Runtime access to the AI agent skills bundled with DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -144,8 +146,10 @@ distribution's sharedir become available — no skill is ever named in code.
 =over 4
 
 =item * Shared family skills — owned by, and shipped from, the C<DBIO> core
-distribution (C<dbio-coordination>, C<dbio-core>, C<dbio-driver-development>,
-C<dbio-perl-syntax>, C<dbio-perl-class-patterns>, C<dbio-moo-moose>, C<karr>).
+distribution (C<dbio-core>, C<dbio-coordination>, C<dbio-driver-development>,
+C<dbio-perl-syntax>, C<dbio-perl-class-patterns>, C<dbio-perl-pod>,
+C<dbio-moo-moose>,
+C<dbio-adr>, C<dbio-codeberg-user-issues>, C<dbio-consolidate-release>).
 
 =item * The C<[@DBIO]> release skill (C<dbio-perl-release>) — owned by the
 C<Dist-Zilla-PluginBundle-DBIO> distribution.
@@ -161,8 +165,8 @@ C<dbio-E<lt>driverE<gt>-database> (the underlying database).
 You do B<not> need any special tooling. Clone a repository and you get normal
 files. Edit a skill's C<SKILL.md> where it lives in the repo you are working
 in and commit it. Shared family skills are canonical in the C<dbio> core repo;
-make the change there (or note it) so it propagates. Maintainers reconcile the
-hardlinks at release time with the C<manage-skills> tool.
+make the change there (or note it); the other repositories install them from
+core with C<skilletor> and pick the change up on their next C<skilletor sync>.
 
 =head1 METHODS
 

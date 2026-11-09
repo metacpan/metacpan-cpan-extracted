@@ -51,11 +51,14 @@ t/locales.t
 t/logger.t
 t/manifest.t
 t/metrics.t
+t/minimal-deps.t
+t/mmdb.t
 t/modules-used.t
 t/mutant_killers.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
+t/noshadow.t
 t/pod-cm.t
 t/pod-snippets.t
 t/pod-spelling.t

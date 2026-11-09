@@ -3,10 +3,13 @@ package DBIO::Generate;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/Class::Accessor::Grouped/;
 use mro 'c3';
 use Carp::Clan qw/^DBIO/;
-use DBIO::Util qw(dir_path mkpath write_file);
+use DBIO::Util qw(dir_path parent_dir mkpath write_file);
 use Lingua::EN::Inflect::Phrase ();
 use DBIO::Generate::Relationships ();
 use namespace::clean;
@@ -56,6 +59,7 @@ my %STYLE_CLASS = (
   moo    => 'DBIO::Generate::Style::Moo',
 );
 
+
 sub new {
   my ($class, %args) = @_;
   my $self = bless {}, $class;
@@ -69,15 +73,9 @@ sub new {
   $self->allow_extra_m2m_cols( $args{allow_extra_m2m_cols} // 0 );
   $self->quiet( $args{quiet} // 0 );
   for my $k (keys %args) {
-    $self->$k($args{$k}) if $self->can($k) && !overridden($self, $k);
+    $self->$k($args{$k}) if $self->can($k);
   }
   return $self;
-}
-
-sub overridden {
-  my ($self, $name) = @_;
-  return $self->$name if eval { $self->can($name) && !$self->can($name)->can('__is_accessor') };
-  return;
 }
 
 
@@ -90,15 +88,30 @@ sub dump {
   my $style_class = $STYLE_CLASS{ $self->style // 'vanilla' }
     or croak "Unknown style '" . ($self->style//'') . "'";
 
+  DBIO::Util::assert_class_name($style_class);
   eval "require $style_class" or croak "Cannot load $style_class: $@";
 
   my @keys = @{ $introspect->table_keys };
+  my $introspected = scalar @keys;
 
   @keys = $self->_filter_keys(@keys);
+
+  # An empty schema is legitimate, so this is not fatal -- but staying silent
+  # is exactly how a broken introspection run reaches the user as a successful
+  # "Done." with no files written at all (Codeberg #15).
+  if (!@keys && !$self->quiet) {
+    warn $introspected
+      ? "DBIO::Generate: all $introspected introspected tables were filtered out by "
+        . "constraint/exclude -- no Result classes written\n"
+      : "DBIO::Generate: " . ref($introspect) . " reported no tables or views -- "
+        . "no Result classes written. Check the DSN, the connecting user's "
+        . "permissions, and whether the database is actually empty.\n";
+  }
 
   my %moniker_for = map { $_ => $self->_moniker_for($_) } @keys;
   my %class_for   = map { $moniker_for{$_} => $self->_class_for($moniker_for{$_}) } @keys;
   my %pk_for      = map { $moniker_for{$_} => ($introspect->table_pk_info($_) // []) } @keys;
+  my %cols_for    = map { $moniker_for{$_} => ($introspect->table_columns($_) // []) } @keys;
 
   my @rel_tables;
   for my $key (@keys) {
@@ -115,7 +128,7 @@ sub dump {
     rel_collision_map    => $self->rel_collision_map,
     allow_extra_m2m_cols => $self->allow_extra_m2m_cols,
     quiet                => $self->quiet,
-  )->generate_code(\@rel_tables, \%class_for, \%pk_for);
+  )->generate_code(\@rel_tables, \%class_for, \%pk_for, \%cols_for);
 
   for my $key (@keys) {
     my $moniker = $moniker_for{$key};
@@ -238,7 +251,9 @@ sub _write_class {
     return;
   }
 
-  mkpath($dir);
+  # $dir is the class path without the .pm -- only its parent is a directory;
+  # mkpath($dir) would litter an empty Result/Artist/ next to Result/Artist.pm
+  mkpath(parent_dir($file));
   write_file($file, $code);
   warn "Wrote $file\n" unless $self->quiet;
 }
@@ -257,9 +272,26 @@ DBIO::Generate - Driver-agnostic Result class generator for DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
+
+=head2 new
+
+    my $gen = DBIO::Generate->new(%args);
+
+Constructs the generator. Applies a handful of defaults explicitly
+(C<dump_directory>, C<result_base_class>, C<use_namespaces>, C<generate_pod>,
+C<style>, C<moniker_parts>, C<moniker_part_separator>,
+C<allow_extra_m2m_cols>, C<quiet>), then assigns every remaining C<%args> key
+that has a matching accessor (see the C<mk_group_accessors> list above).
+
+Earlier revisions asked a now-removed C<overridden()> helper whether to skip a
+key here; the helper always returned C<undef> (the implementation relied on a
+C<__is_accessor> flag the codebase never set), so the C<!overridden(...)>
+check was always true and the assignment was always performed. The explicit
+assignments above it make the duplicate harmless, but carrying the dead check
+forward only invited future regressions.
 
 =head2 dump
 

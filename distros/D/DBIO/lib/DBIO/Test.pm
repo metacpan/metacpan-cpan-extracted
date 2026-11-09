@@ -4,8 +4,11 @@ package DBIO::Test;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Test::Schema;
 use Carp;
+use DBIO::Exception ();
 use namespace::clean;
 
 
@@ -47,6 +50,9 @@ sub import {
 sub init_schema {
   my $self = shift;
   my %args = @_;
+  # What the caller names, before replicated => 1 turns it into a
+  # replicated storage_type that names a driver only when this did.
+  my $driver_given = defined $args{storage_type};
   %args = %{ __PACKAGE__->normalize_init_schema_args(\%args) };
 
   my $schema;
@@ -58,7 +64,14 @@ sub init_schema {
   }
 
   if ($args{dsn} || $args{connect_info}) {
-    # Real database connection
+    # Real database connection. A schema always has a driver (ADR 0067), and
+    # DBIO::Test::Schema keeps none in its class: the caller names it.
+    DBIO::Exception->throw(
+      'DBIO::Test->init_schema with a dsn or connect_info needs the driver: '
+    . "pass storage_type (for example storage_type => 'DBIO::PostgreSQL::Storage'). "
+    . 'DBIO::Test::Schema declares none, and a schema always has one (ADR 0067).'
+    ) unless $driver_given;
+
     my @connect = $args{connect_info}
       ? @{$args{connect_info}}
       : ($args{dsn}, $args{user}||'', $args{pass}||'', {
@@ -67,7 +80,9 @@ sub init_schema {
         });
 
     $schema = DBIO::Test::Schema->clone;
-    $schema->storage_type($args{storage_type}) if $args{storage_type};
+    $schema->storage_type(
+      __PACKAGE__->_real_storage_type($args{storage_type})
+    );
     $schema = $schema->connect(@connect);
 
     if ($args{replicant_connect_info} && $schema->storage->isa('DBIO::Replicated::Storage')) {
@@ -77,25 +92,41 @@ sub init_schema {
   else {
     # Fake storage -- no database needed
     require DBIO::Test::Storage;
-    $schema = DBIO::Test::Schema->connect(
-      sub { }, # dummy connect coderef, Storage overrides everything
-    );
     my ($storage_class, $storage_args) = $args{storage_type}
       ? __PACKAGE__->_normalize_storage_type($args{storage_type})
       : (undef, {});
 
-    my $storage;
+    my $replicated = $storage_class
+      && $storage_class eq 'DBIO::Replicated::Storage';
 
-    if ($storage_class && $storage_class eq 'DBIO::Replicated::Storage') {
-      require DBIO::Replicated::Storage;
-
-      my %replicated_args = %{ $storage_args || {} };
-      my $backend_storage_class = delete $replicated_args{backend_storage_class};
-      my $backend_storage_type  = delete $replicated_args{backend_storage_type};
+    my ($backend_storage_class, %replicated_args);
+    if ($replicated) {
+      %replicated_args = %{ $storage_args || {} };
+      $backend_storage_class = delete $replicated_args{backend_storage_class};
+      my $backend_storage_type = delete $replicated_args{backend_storage_type};
 
       $backend_storage_class ||= $backend_storage_type
         ? __PACKAGE__->_build_fake_storage_class($backend_storage_type)
         : 'DBIO::Test::Storage';
+    }
+
+    # The fake storage is the driver of the mock suite, declared like any
+    # other before connecting (ADR 0067): DBIO::Test::Storage, or the hybrid
+    # of it over a requested driver storage, which is a DBIO::Test::Storage.
+    my $fake_class = $replicated ? $backend_storage_class
+      : $storage_class ? __PACKAGE__->_build_fake_storage_class($storage_class)
+      : 'DBIO::Test::Storage';
+
+    $schema = DBIO::Test::Schema->clone;
+    $schema->storage_type("+$fake_class");
+    $schema = $schema->connect(
+      sub { }, # dummy connect coderef, Storage overrides everything
+    );
+
+    my $storage;
+
+    if ($replicated) {
+      require DBIO::Replicated::Storage;
 
       $storage = DBIO::Replicated::Storage->new($schema, {
         %replicated_args,
@@ -110,9 +141,7 @@ sub init_schema {
       ]);
     }
     else {
-      my $effective_class = $storage_class
-        ? __PACKAGE__->_build_fake_storage_class($storage_class)
-        : 'DBIO::Test::Storage';
+      my $effective_class = $fake_class;
 
       $storage = $effective_class->new($schema);
 
@@ -369,6 +398,25 @@ sub _normalize_storage_type {
   return ($storage_type, {});
 }
 
+# The storage_type for the real-database path. A replicated one runs its
+# backends on the driver replicated => 1 was given (ADR 0067): the
+# backend_storage_type normalize_init_schema_args records becomes the
+# backend_storage_class DBIO::Replicated::Storage builds them from, unless
+# that is given itself. Any other storage_type is used as given.
+sub _real_storage_type {
+  my ($class, $storage_type) = @_;
+
+  my ($storage_class, $args) = $class->_normalize_storage_type($storage_type);
+  return $storage_type
+    unless ref $storage_type and $storage_class eq 'DBIO::Replicated::Storage';
+
+  my %replicated_args = %{ $args || {} };
+  my $backend = delete $replicated_args{backend_storage_type};
+  $replicated_args{backend_storage_class} //= $backend if defined $backend;
+
+  return [ "+$storage_class", \%replicated_args ];
+}
+
 
 sub normalize_init_schema_args {
   my ($class, $args) = @_;
@@ -459,7 +507,7 @@ DBIO::Test - Test utilities for DBIO and DBIO driver distributions
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -515,11 +563,23 @@ Options:
 
 =item dsn, user, pass
 
-Connect to a real database instead of using the fake storage.
+Connect to a real database instead of using the fake storage. Needs
+C<storage_type>, the driver's storage class: L<DBIO::Test::Schema> declares no
+driver, and a schema always has one (ADR 0067), so without it C<init_schema>
+throws.
+
+=item connect_info
+
+Arrayref of the arguments for C<< $schema->connect >>, used as given in
+place of C<dsn>, C<user> and C<pass>. Also selects the real-database path.
 
 =item no_deploy
 
 Skip deploying the test schema tables (via C<< $schema->deploy >>).
+
+=item deploy_args
+
+Hashref handed to L</deploy_schema> as its deploy arguments.
 
 =item no_populate
 
@@ -531,10 +591,15 @@ Return the schema class without connecting.
 
 =item storage_type
 
-Override the storage class used by the schema.
+The storage class the schema declares as its driver.
 
 When used together with C<dsn>/C<connect_info>, this behaves like
-L<DBIO::Schema/storage_type>.
+L<DBIO::Schema/storage_type>, and it is required there. With C<replicated>,
+the master and the replicants are storages of it.
+
+Without a real C<dsn> the schema declares L<DBIO::Test::Storage>, the fake
+driver of the mock suite, before it connects -- or, with this option, the
+hybrid below, which is a L<DBIO::Test::Storage> too.
 
 When used without a real C<dsn>, C<init_schema()> creates a hybrid storage
 class combining L<DBIO::Test::Storage> (fake execution) and the requested
@@ -569,7 +634,17 @@ C<< $schema->storage->connect_replicants >> when C<replicated> is enabled.
 
 =item connect_opts
 
-Extra hashref merged into connect options.
+Extra hashref merged into the connect options. Consumed only on the
+real-database path when it is given as C<dsn> (a C<connect_info> arrayref is
+used as given) and on the replicated
+fake-storage path; the default (non-replicated) fake-storage backend builds no
+connect options and ignores it.
+
+=item quote_char, name_sep
+
+Override the identifier quoting of the default (non-replicated) fake storage,
+which otherwise takes it from its storage class. An empty C<quote_char> means
+no quoting. C<name_sep> applies only while a quote character is in effect.
 
 =back
 
@@ -607,8 +682,10 @@ Anything under C<DBIO::Test::*> is reusable support code for driver
 distributions and plugins.
 
 Intentionally broken fixtures used to trigger edge cases belong under
-C<t/lib/TestDBIO/Broken/*> only, and must not live in installed
-C<DBIO::Test::*> namespaces.
+C<t/lib/TestDBIO/Broken/*>, not in installed C<DBIO::Test::*> namespaces.
+Four such fixtures are installed all the same:
+C<DBIO::Test::SyntaxErrorComponent1> to C<3> and C<DBIO::Test::ErrorComponent>,
+which F<t/90ensure_class_loaded.t> loads to see the load fail.
 
 =head1 CORE VS EXTERNAL TESTS
 

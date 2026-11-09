@@ -209,10 +209,10 @@ eval {
     { join => { cd_to_producer => 'producer' } }
   );
   is ($bob_prod->count, 4, 'Bob produced a total of 4 CDs');
-  ok ($bob_prod->find ({ title => 'Greatest hits 1'}), '1st Bob production name correct');
-  ok ($bob_prod->find ({ title => 'Greatest hits 6'}), '2nd Bob production name correct');
-  ok ($bob_prod->find ({ title => 'Greatest hits 2'}), '3rd Bob production name correct');
-  ok ($bob_prod->find ({ title => 'Greatest hits 7'}), '4th Bob production name correct');
+  ok ($bob_prod->search ({ title => 'Greatest hits 1'})->single, '1st Bob production name correct');
+  ok ($bob_prod->search ({ title => 'Greatest hits 6'})->single, '2nd Bob production name correct');
+  ok ($bob_prod->search ({ title => 'Greatest hits 2'})->single, '3rd Bob production name correct');
+  ok ($bob_prod->search ({ title => 'Greatest hits 7'})->single, '4th Bob production name correct');
 
   is (
     $bob_prod->search ({ 'artist.name' => 'james' }, { join => 'artist' })->count,

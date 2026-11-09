@@ -1,6 +1,11 @@
 package DBIO::Test::MooSchema::Result::CD;
 # ABSTRACT: Moo-enabled test result class for the cd table
 
+use strict;
+use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Moo;
 
 __PACKAGE__->table('cd');
@@ -41,7 +46,7 @@ DBIO::Test::MooSchema::Result::CD - Moo-enabled test result class for the cd tab
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

@@ -4,6 +4,8 @@ package DBIO::ResultSource::RowParser::Util;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Util 'perlstring';
 
 use constant HAS_DOR => ( $] < 5.010 ? 0 : 1 );
@@ -15,7 +17,7 @@ our @EXPORT_OK = qw(
 );
 
 # working title - we are hoping to extract this eventually...
-our $null_branch_class = 'DBIx::ResultParser::RelatedNullBranch';
+our $null_branch_class = 'DBIO::ResultParser::RelatedNullBranch';
 
 
 sub __wrap_in_strictured_scope {
@@ -385,7 +387,7 @@ DBIO::ResultSource::RowParser::Util - Assemble row-parser source code for simple
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

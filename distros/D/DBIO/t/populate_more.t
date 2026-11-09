@@ -45,6 +45,7 @@ use DBIO::Test::Storage;
 TestDBIO::PopMore::Schema->register_class(Gender => 'TestDBIO::PopMore::Schema::Result::Gender');
 TestDBIO::PopMore::Schema->register_class(Person => 'TestDBIO::PopMore::Schema::Result::Person');
 
+TestDBIO::PopMore::Schema->storage_type('+DBIO::Test::Storage');
 my $schema  = TestDBIO::PopMore::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 my $storage = $schema->storage;

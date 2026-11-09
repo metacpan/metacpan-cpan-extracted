@@ -1,6 +1,6 @@
 # ADR 0015 — Agent/skill infrastructure: hardlinked invariants, repo-specific workers, model pinning
 
-- Status: accepted
+- Status: accepted — the hardlink distribution is superseded by ADR 0058 (skilletor); repo-specific workers and model pinning stand
 - Date: 2026-06-20
 - Tags: infra, tooling, agents, skills, hardlink, model
 
@@ -21,7 +21,7 @@ and one was actively broken:
 - **The shared rules already proved the right mechanism.** `.claude/rules/dbio-rules.md` is
   hardlinked into all 17 repos (one inode, 17 links) — change the home, every repo sees it.
   The invariant agents were simply never enrolled in that scheme.
-- **Agents inherited the session model and died at boot (karr #43).** An agent with no
+- **Agents inherited the session model and died at boot (k43).** An agent with no
   `model:` frontmatter inherits the parent session model. On `opus-4-8[1m]` (the 1M-context
   tier) the briefing-heavy `dbio-worker` failed to start — 0 tokens, "Usage credits required
   for 1M context". A per-call `model:` override did not help; the start-time tier is what gates.
@@ -52,7 +52,7 @@ Hardlinking the invariants is the family's own proven method (`dbio-rules.md`): 
 truth, zero drift, no sync tooling to maintain. Naming repo-specific workers with a `-<db>`
 suffix removes the real hazard the user named: identical names over divergent content collide
 the moment agents are referenced cross-repo or synced. Pinning `model:` explicitly is the
-direct fix for karr #43 — the boot-time credit gate is driven by the *inherited* tier, and
+direct fix for that boot failure — the boot-time credit gate is driven by the *inherited* tier, and
 only frontmatter `model:` (not a per-call override) changes it.
 
 ## Consequences
@@ -73,4 +73,4 @@ only frontmatter `model:` (not a per-call override) changes it.
 
 A relink/verify tool (re-establish the hardlink groups for the invariant agents +
 `dbio-rules.md` from core, assert one inode per group; run after edits and after clone/pull)
-remains unbuilt — owned by the agent-infrastructure thread under karr #43.
+remains unbuilt — owned by the agent-infrastructure thread under k43.

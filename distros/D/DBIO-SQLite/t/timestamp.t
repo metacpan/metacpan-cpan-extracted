@@ -43,6 +43,7 @@ use DateTime;
 {
   package TSTest::Schema;
   use base 'DBIO::Schema';
+  __PACKAGE__->load_components('SQLite');
   __PACKAGE__->register_class(Article => 'TSTest::Schema::Article');
 }
 

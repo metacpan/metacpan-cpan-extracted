@@ -1,7 +1,8 @@
 use strict; use warnings;
 use File::Find;
+use FindBin;
 my %have;
-my $root = '/storage/raid/home/getty/dev/perl/dbio-dev/dbio';
+my $root = "$FindBin::Bin/..";
 find(sub {
   my $f = $File::Find::name;
   if ($f =~ m{/DBIO/(.+?)\.(?:pm|pod)$}) {

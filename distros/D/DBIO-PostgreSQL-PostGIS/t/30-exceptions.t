@@ -126,7 +126,7 @@ subtest 'decode_hex: underrun' => sub {
 }
 
 {
-  # DBIO::PostgreSQL::PostGIS::Storage is now a plain storage LAYER (core #70):
+  # DBIO::PostgreSQL::PostGIS::Storage is now a plain storage LAYER (core k70):
   # it no longer subclasses a driver storage, so it carries neither `new` nor
   # `throw_exception`. Mirror the composed reality (layer over driver storage)
   # by inheriting the layer first, then the real PostgreSQL driver storage --

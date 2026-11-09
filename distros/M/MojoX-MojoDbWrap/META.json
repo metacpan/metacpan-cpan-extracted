@@ -31,16 +31,27 @@
       },
       "develop" : {
          "requires" : {
+            "DBD::Pg" : "v3.20.2",
+            "DBD::SQLite" : "1.78",
+            "DBI" : "1.656",
             "Dist::Milla" : "v1.0.22",
             "Mojo::Pg" : "5.0",
             "Mojo::SQLite" : "4.000000",
-            "Path::Tiny" : "0.084",
-            "Template::Perlish" : "1.52",
-            "Test::Pod" : "1.51",
-            "Test::Pod::Coverage" : "1.04"
+            "Mojolicious" : "9.48",
+            "Path::Tiny" : "0.150",
+            "Template::Perlish" : "1.64",
+            "Test::Pod" : "1.52",
+            "Test::Pod::Coverage" : "1.10",
+            "URI" : "5.36"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "DBD::Pg" : "v3.20.2",
+            "DBD::SQLite" : "1.78",
+            "Mojo::Pg" : "5.0",
+            "Mojo::SQLite" : "4.000000"
+         },
          "requires" : {
             "Moo" : "2.005005",
             "Ouch" : "0.0501",
@@ -50,13 +61,29 @@
       },
       "test" : {
          "requires" : {
-            "Path::Tiny" : "0.084",
             "Test::Exception" : "0.43"
          }
       }
    },
+   "provides" : {
+      "MojoX::MojoDbWrap" : {
+         "file" : "lib/MojoX/MojoDbWrap.pm",
+         "version" : "0.100"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.006",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/polettix/MojoX-MojoDbWrap/issues"
+      },
+      "homepage" : "https://codeberg.org/polettix/MojoX-MojoDbWrap",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/polettix/MojoX-MojoDbWrap.git",
+         "web" : "https://codeberg.org/polettix/MojoX-MojoDbWrap"
+      }
+   },
+   "version" : "0.100",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

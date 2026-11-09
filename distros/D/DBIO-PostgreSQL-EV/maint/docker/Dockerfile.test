@@ -186,8 +186,8 @@ RUN PERL_DL_NONLAZY=1 perl -e 'use EV::Pg; \
 # EXTRA_LIB_DIR lets the caller mount a directory of in-development Perl
 # modules at run time and have it prepended to @INC. The typical case is a
 # newer DBIO::PostgreSQL checked out alongside this repo (the version on
-# CPAN lags behind and lacks the async_backend hook this distribution's
-# live tests rely on). The entrypoint script wires the path into
+# CPAN lags behind and may predate the 'ev' async-mode registration this
+# distribution's live tests rely on). The entrypoint script wires the path into
 # PERL5LIB; prove then sees the local checkout first.
 ENV EXTRA_LIB_DIR=/extra-lib
 COPY maint/docker/entrypoint.sh /usr/local/bin/entrypoint.sh

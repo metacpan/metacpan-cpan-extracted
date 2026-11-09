@@ -10,13 +10,13 @@ my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw(DSN USER PASS)};
 plan skip_all => 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run this test'
   unless $dsn && $user;
 
-require DBI;
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
-my $dbh = DBI->connect($dsn, $user, $pass, {
-  AutoCommit => 1,
-  RaiseError => 1,
-  PrintError => 0,
-});
+my $dbh = LiveServer->control_dbh;
 
 my $schema_name = 'dbio_generate_live';
 

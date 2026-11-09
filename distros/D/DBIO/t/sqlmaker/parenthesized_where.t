@@ -44,7 +44,7 @@ my $sm = DBIO::SQLMaker->new(quote_char => '"', name_sep => '.');
     'resultset as_query: WHERE is parenthesized end-to-end';
 }
 
-# karr #26 regression: the WHERE clause must carry EXACTLY ONE canonical paren
+# Regression, ADR 0004: the WHERE clause must carry EXACTLY ONE canonical paren
 # layer, never the doubled 'WHERE ( ( ... ) )'. The override in
 # DBIO::SQLMaker::new routes the SELECT WHERE through SQL::Abstract::where(),
 # which wraps its result in '( ... )'; for an -and/-or top-level node the
@@ -66,8 +66,8 @@ my $sm = DBIO::SQLMaker->new(quote_char => '"', name_sep => '.');
     'IN list'          => { id => { -in => [ 1, 2, 3 ] } },
     'BETWEEN (expand_op)'
                        => { cdid => { -between => [ 1, 10 ] } },
-    # exact shape reported in karr #26
-    'karr #26 shape'   => { -and => [
+    # the exact shape originally reported
+    'reported shape' => { -and => [
                               artist => 'x',
                               { cdid  => { -between => [ 1, 10 ] } },
                               { title => { '!=' => 'y' } },
@@ -82,7 +82,7 @@ my $sm = DBIO::SQLMaker->new(quote_char => '"', name_sep => '.');
     'nested group'          => 'WHERE ( ( "a" = ? AND "b" = ? ) OR "c" = ? )',
     'IN list'               => 'WHERE ( "id" IN ( ?, ?, ? ) )',
     'BETWEEN (expand_op)'   => 'WHERE ( "cdid" BETWEEN ? AND ? )',
-    'karr #26 shape'        => 'WHERE ( "artist" = ? AND ( "cdid" BETWEEN ? AND ? ) AND "title" != ? )',
+    'reported shape'      => 'WHERE ( "artist" = ? AND ( "cdid" BETWEEN ? AND ? ) AND "title" != ? )',
   );
 
   for my $name (sort keys %where_for) {

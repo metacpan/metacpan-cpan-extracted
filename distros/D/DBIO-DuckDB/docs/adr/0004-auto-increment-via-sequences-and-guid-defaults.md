@@ -19,7 +19,7 @@ Two engine facts forced concrete decisions in `DBIO::DuckDB::DDL`:
   manual inserts that supply small literal IDs would therefore collide with a
   sequence starting at 1.
 - A GUID-family key (`uuid`/`guid`/`uniqueidentifier`) maps to DuckDB's native
-  `UUID` type, which cannot take an **integer** `nextval()` default. Karr #6
+  `UUID` type, which cannot take an **integer** `nextval()` default. Karr k6
   recorded a real deploy failure: the core test schema's `artist_guid` /
   `money_test` tables were rejected by DuckDB's strict type checking when an
   upper-cased fallthrough type or an integer sequence default was emitted for a

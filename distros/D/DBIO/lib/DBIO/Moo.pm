@@ -4,11 +4,17 @@ package DBIO::Moo;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Util ();
 
 sub import {
   my ($class) = @_;
   my $caller = caller;
+
+  # Enable strict and warnings in caller
+  strict->import;
+  warnings->import;
 
   # Activate Moo in the caller package
   eval "package $caller; use Moo; 1" or die $@;  ## no critic
@@ -41,7 +47,7 @@ DBIO::Moo - Enable Moo attributes in DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -76,6 +82,10 @@ without conflict.
 When you C<use DBIO::Moo>:
 
 =over 4
+
+=item * C<strict> and C<warnings> are enabled in the calling file, as
+C<use Moo> itself and L<DBIO::Cake> do -- the class needs no
+C<use strict; use warnings;> of its own.
 
 =item * L<Moo> is activated (C<use Moo>) in the calling package.
 
@@ -195,7 +205,7 @@ exactly what C<use DBIO::Moo> does, spelled out explicitly:
 
   package MyApp::Schema::Result::Artist;
 
-  # 1. Activate Moo
+  # 1. Activate Moo (this also enables strict and warnings)
   use Moo;
 
   # 2. Set DBIO::Core as the base class

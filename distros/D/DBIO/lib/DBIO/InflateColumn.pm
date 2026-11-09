@@ -4,6 +4,8 @@ package DBIO::InflateColumn;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Row';
 use DBIO::Util qw(is_literal_value);
 use namespace::clean;
@@ -137,7 +139,7 @@ DBIO::InflateColumn - Automatically create references from column data
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -152,8 +154,6 @@ version 0.900002
       ...
     },
   });
-
-See F<t/serialize/01-inflatecolumn.t> for a runnable example.
 
 =head1 DESCRIPTION
 
@@ -209,8 +209,6 @@ the result object itself.
 In this example, calls to an event's C<insert_time> accessor return a
 L<DateTime> object. This L<DateTime> object is later "deflated" back
 to the integer epoch representation when used in the database layer.
-For a much more thorough handling of the above example, please see
-L<DBIO::DateTime::Epoch>
 
 =head2 get_inflated_column
 

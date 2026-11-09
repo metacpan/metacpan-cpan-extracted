@@ -251,7 +251,9 @@ SKIP: {
     if ($kid == 0) {
         quiet_child(stderr => $err);
         require Hyperman;
-        Hyperman->run(app => sub { [200, [], ["uid=$< euid=$>"]] }, host => '127.0.0.1',
+        # POSIX, not $< and $>: perl cached those before 5.16, so a setuid
+        # done in C left them reading the startup uid
+        Hyperman->run(app => sub { [200, [], ['uid=' . POSIX::getuid() . ' euid=' . POSIX::geteuid()]] }, host => '127.0.0.1',
                       port => $p5, workers => 2, user => 'nobody');
         exit 0;
     }

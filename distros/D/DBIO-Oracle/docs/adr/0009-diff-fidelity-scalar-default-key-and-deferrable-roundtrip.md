@@ -46,7 +46,7 @@ else:
   (`CASE WHEN cc.deferrable = 'DEFERRABLE' THEN 1 ELSE 0 END`,
   `Introspect/ForeignKeys.pm:40`) and carries `is_deferrable` through to the
   model (`ForeignKeys.pm:80-89`). The FK grouping itself uses core's
-  `_aggregate_by_ordered` (two-level: by `from_table`, then by `fk_name`, because
+  `_aggregate_by_ordered` (two-level: by `from_table`, then by `constraint_name`, because
   two FKs in different tables can share a name, `ForeignKeys.pm:69-91`) — only the
   `is_deferrable` attribute is the Oracle-specific addition core's default drops.
 
@@ -66,7 +66,7 @@ FK attribute Oracle's deploy/runtime behaviour (`with_deferred_fk_checks`,
 `DEFERRABLE` DDL) actually depends on, and core's default contract drops it;
 overriding the introspect carries it through without forcing a core change. This
 is a deliberate, scoped divergence from the generic introspect defaults (the
-pre-squash audit, karr #8 Seams B/C/E, explicitly chose "adopt core, keep these
+pre-squash audit, karr k8 Seams B/C/E, explicitly chose "adopt core, keep these
 two").
 
 ## Consequences

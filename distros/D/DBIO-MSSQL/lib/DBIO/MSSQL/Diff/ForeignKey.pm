@@ -4,9 +4,11 @@ package DBIO::MSSQL::Diff::ForeignKey;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Diff::Op';
 
-use DBIO::SQL::Util qw(_quote_ident);
+use DBIO::MSSQL::DDL qw(_quote_ident _quote_table);
 use DBIO::Diff::Compare qw(changed_fields);
 
 
@@ -16,9 +18,15 @@ __PACKAGE__->mk_diff_accessors(qw/table_name constraint_name fk_info/);
 sub diff {
   my ($class, $source, $target, $source_tables, $target_tables) = @_;
 
+  # core visits the tables of the target only: give every table the source
+  # has foreign keys for an entry there, empty when the target has none
+  $source = { %{ $source // {} } };
+  $target = { %{ $target // {} } };
+  $target->{$_} //= [] for keys %$source;
+
   return $class->diff_nested($source, $target,
     index_by      => 'constraint_name',
-    scope         => 'both',
+    scope         => 'all',
     source_tables => $source_tables,
     target_tables => $target_tables,
     changed_when  => sub {
@@ -49,7 +57,7 @@ sub diff {
 
 sub as_sql {
   my ($self) = @_;
-  my $tbl  = _quote_ident($self->table_name);
+  my $tbl  = _quote_table($self->table_name);
   my $name = _quote_ident($self->constraint_name);
 
   if ($self->action eq 'add') {
@@ -58,7 +66,7 @@ sub as_sql {
     my $to   = join(', ', map { _quote_ident($_) } @{ $info->{to_columns} });
     my $sql  = sprintf
       'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s(%s)',
-      $tbl, $name, $from, _quote_ident($info->{to_table}), $to;
+      $tbl, $name, $from, _quote_table($info->{to_table}), $to;
     $sql .= " ON DELETE $info->{on_delete}"
       if $info->{on_delete} && $info->{on_delete} ne 'NO ACTION';
     $sql .= " ON UPDATE $info->{on_update}"
@@ -89,14 +97,21 @@ DBIO::MSSQL::Diff::ForeignKey - Diff operations for MSSQL foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Represents a foreign key diff operation: C<ADD CONSTRAINT> or
-C<DROP CONSTRAINT>. FKs on a brand-new table are created inline by
-L<DBIO::MSSQL::Diff::Table>; this module handles FK changes on tables that
-exist in both source and target. Built on L<DBIO::Diff::Op>.
+C<DROP CONSTRAINT>. All of them are standalone statements: a brand-new table
+is created without its foreign keys by L<DBIO::MSSQL::Diff::Table> and gets
+them here, and a table that is dropped gets its foreign keys dropped here so
+that tables referencing each other can go (L<DBIO::MSSQL::Diff> orders the
+phases). Built on L<DBIO::Diff::Op>.
+
+A table that has foreign keys on one side only is compared against none on the
+other: the walk of the core visits the tables of the target, so a table whose
+last foreign key was removed would otherwise never be visited and the
+constraint would stay.
 
 FK identity is by C<constraint_name>. MSSQL has no C<ALTER> for a foreign
 key, so a definition change becomes a drop-then-add pair. Local and remote

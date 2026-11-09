@@ -4,11 +4,12 @@ package DBIO::DB2::Diff::ForeignKey;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Diff::Op';
 
-use DBIO::SQL::Util qw(_quote_ident);
+use DBIO::DB2::DDL qw(_fk_constraint_clause _db2_quote_ident _db2_quote_table);
 use DBIO::Diff::Compare qw(changed_fk_fields);
-use DBIO::DB2::DDL qw(_fk_constraint_clause);
 
 
 __PACKAGE__->mk_diff_accessors(qw/table_name constraint_name fk_info/);
@@ -46,8 +47,8 @@ sub diff {
 
 sub as_sql {
   my ($self) = @_;
-  my $tbl  = _quote_ident($self->table_name);
-  my $name = _quote_ident($self->constraint_name);
+  my $tbl  = _db2_quote_table($self->table_name);
+  my $name = _db2_quote_ident($self->constraint_name);
 
   if ($self->action eq 'add') {
     # Same FK clause body as the inline create path -- single source of truth
@@ -79,7 +80,7 @@ DBIO::DB2::Diff::ForeignKey - Diff operations for DB2 foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

@@ -66,3 +66,58 @@ not move the FreeTDS fixups into `Storage::ASE` directly.
 - FreeTDS is explicitly **experimental** (TEXT/IMAGE will not work); the
   `_rebless` path emits a one-time warning unless `DBIO_SYBASE_FREETDS_NOWARN`
   is set. That warning is part of the contract, not noise.
+
+## Addendum 2026-10-07 — stage 1 has a second entry for a declared driver (karr k64, core ADR 0059)
+
+The Context above describes the storage as it comes in from the DSN: the
+generic class, sent through the registry and `_rebless`. A schema that
+**declares** the driver — the `Sybase` component or `-syb` — pins
+`DBIO::Sybase::Storage` and is never sent that way. Under core ADR 0059 such a
+storage adapts itself through `_adapt_to_access_path`, and for this driver
+that hook is the second entry to stage 1:
+
+- on a `dbi:Sybase:` DSN the declared base becomes
+  `DBIO::Sybase::Storage::ASE` **without `sp_server_info`** — the schema has
+  said what the server is. "Server type is genuinely runtime data" holds for
+  the DSN detection only;
+- it never becomes `DBIO::MSSQL::Storage::Sybase`. A server DBD::Sybase found
+  to be Microsoft SQL Server at login (`syb_server_version_string`) is reported
+  through core's `_driver_mismatch`;
+- the placeholder decision that followed the rebless
+  (`auto_cast` / `::ASE::NoBindVars`) is one body,
+  `ASE::_adapt_to_placeholder_support`, called from `ASE::_rebless` and from
+  the hook. It no longer calls itself after moving to `NoBindVars`; as written
+  before, that call never returned.
+
+The dispatch by `sp_server_info`, the open seam for other server types and
+stage 2 are unchanged. The one-time FreeTDS warning now comes from the shared
+body, on both entries.
+
+Open, and not decided here: stage 2 builds the trait class over whatever class
+the storage has. For a storage with layers (`DBIO::Storage::Composed`) that is
+the composed class, so `DBIO::Sybase::Storage::FreeTDS` is linearised **ahead**
+of the layers and the composition registry no longer knows the instance's
+class. *Decided by the addendum below.*
+
+## Addendum 2026-10-25 — storage layers stay ahead of the FreeTDS trait class (karr k77)
+
+Decision (maintainer, 2026-10-25): **layers first.** Storage layers
+(`register_storage_layer`) stay ahead of the driver, and the driver includes
+the FreeTDS trait class synthesised at runtime.
+
+- When `ref $self` is a `DBIO::Storage::Composed` class (`composition_of`),
+  stage 2 builds the trait over the composition's **base**:
+  `<base>::FreeTDS` with `@ISA = (<base>, DBIO::Sybase::Storage::FreeTDS,
+  <rest of base's linear ISA>)`, c3. The layers are then set over it again
+  with `DBIO::Storage::Composed->recompose(ref $self, $trait_class)` and the
+  instance is blessed into the class that returns. A storage without layers is
+  handled as before.
+- Consequences: `composition_of(ref $storage)` knows the class (base
+  `<ASE class>::FreeTDS`, layers unchanged); a layer method that the FreeTDS
+  class has too (e.g. `set_textsize`) is asked first.
+- No second `_init` call (karr k68): the chain goes on with `next::method`.
+- `DBIO::MSSQL::Storage::Sybase` (dbio-mssql) inherits this `_init`, so its
+  layered storage behaves the same under FreeTDS; no change is needed there
+  (`t/59-component-rebless.t`, section 7b).
+- This changes a runtime `@ISA`; it is recorded here as the card and ADR the
+  house rule on composition seams requires.

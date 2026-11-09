@@ -1,6 +1,6 @@
 # ADR 0033 — update_or_create DWIM-splits an unresolvable relation sub-hash from the main-row search
 
-- Status: accepted
+- Status: superseded by [ADR 0034](0034-guard-non-concrete-relation-conditions-at-resolver-boundary.md)
 - Date: 2026-07-11
 - Tags: resultset, update_or_create, find, relationships, dwim, ergonomics
 

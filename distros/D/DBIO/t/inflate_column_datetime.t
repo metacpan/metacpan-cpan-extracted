@@ -2,6 +2,14 @@ use strict;
 use warnings;
 
 use Test::More;
+
+# InflateColumn::DateTime is an optional path: it needs the recommends-only
+# (karr k87) DateTime + DateTime::Format::Strptime stack.
+BEGIN {
+  eval { require DateTime; require DateTime::Format::Strptime; 1 }
+    or plan skip_all => "DateTime / DateTime::Format::Strptime not installed: $@";
+}
+
 use DateTime;
 
 use DBIO::Test::Storage;
@@ -55,6 +63,7 @@ use DBIO::Storage::DateTimeFormat;
 
 TestDBIO::ICDT::Schema->register_class(Event => 'TestDBIO::ICDT::Schema::Result::Event');
 
+TestDBIO::ICDT::Schema->storage_type('+DBIO::Test::Storage');
 my $schema  = TestDBIO::ICDT::Schema->connect(sub { });
 my $storage = DBIO::Test::Storage->new($schema);
 $storage->datetime_parser_type('TestDBIO::ICDT::Format');

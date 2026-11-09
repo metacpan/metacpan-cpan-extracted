@@ -4,6 +4,8 @@ package DBIO::Schema;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 use DBIO::Carp;
@@ -11,6 +13,7 @@ use Try::Tiny;
 use Scalar::Util qw/weaken blessed/;
 use DBIO::Util qw(refcount quote_sub is_exception scope_guard old_mro file_path);
 use DBIO::Skills;
+use DBIO::Deploy::Base ();
 use DBIO::Storage::Composed;
 use Devel::GlobalDestruction;
 use namespace::clean;
@@ -18,6 +21,11 @@ use namespace::clean;
 __PACKAGE__->mk_classdata('class_mappings' => {});
 __PACKAGE__->mk_classdata('source_registrations' => {});
 __PACKAGE__->mk_classdata('storage_type' => '::DBI');
+# What a declared driver that does not fit what it meets leads to (ADR 0059):
+# a warning by default, an error with driver_strict, nothing without
+# driver_warnings. Read by DBIO::Storage::DBI::_driver_mismatch.
+__PACKAGE__->mk_classdata('driver_strict' => 0);
+__PACKAGE__->mk_classdata('driver_warnings' => 1);
 __PACKAGE__->mk_classdata('storage');
 __PACKAGE__->mk_classdata('exception_action');
 __PACKAGE__->mk_classdata('stacktrace' => ($ENV{DBIO_TRACE} || 0));
@@ -81,7 +89,6 @@ sub _ns_get_rsrc_instance {
     );
   };
 }
-
 
 sub load_namespaces {
   my ($class, %args) = @_;
@@ -252,7 +259,12 @@ sub resultset {
 }
 
 
-sub sources { keys %{shift->source_registrations} }
+# Through an array, not `sort ...` as the last expression: sort in scalar
+# context is undefined, and the count is what this returned there all along.
+sub sources {
+  my @source_names = sort keys %{shift->source_registrations};
+  return @source_names;
+}
 
 
 sub source {
@@ -323,9 +335,12 @@ sub _min { my $m = shift; $m = $_ < $m ? $_ : $m for @_; $m }
 
 # --- DateTime convenience methods ---
 
+
 sub datetime_parser { shift->storage->datetime_parser }
 
+
 sub parse_datetime { shift->datetime_parser->parse_datetime(@_) }
+
 
 sub format_datetime { shift->datetime_parser->format_datetime(@_) }
 
@@ -407,19 +422,17 @@ sub connection {
     $self->skills(delete $arg->{skills});
   }
 
-  my ($storage_class, $args) = ref $self->storage_type
-    ? $self->_normalize_storage_type($self->storage_type)
-    : ($self->storage_type, undef)
-  ;
+  my ($storage_class, $args) = $self->_resolved_storage_type;
 
-  $storage_class =~ s/^\+//;
-  $storage_class =~ s/^::/DBIO::Storage::/;
+  # No schema without a driver (ADR 0067): refused before any storage is built.
+  $self->_refuse_undeclared_driver($storage_class);
 
   # Compose any registered storage extension layers over the resolved base
   # storage class (one behaviour, one transport -- see DBIO::Storage::Composed).
-  # The synthesised class is what actually gets instantiated below; the driver
-  # rebless (DBIO::Storage::DBI::_determine_driver) re-composes the same layers
-  # over the concrete driver class. Skipped cleanly when nothing is registered.
+  # The synthesised class is what actually gets instantiated below; when the
+  # declared driver adapts to its access path (_adapt_to_access_path, during
+  # DBIO::Storage::DBI::_determine_driver) the same layers are re-composed over
+  # the adapted class. Skipped cleanly when nothing is registered.
   my @storage_layers = @{ $self->storage_layers };
   $storage_class = DBIO::Storage::Composed->compose($storage_class, \@storage_layers)
     if @storage_layers;
@@ -437,6 +450,42 @@ sub connection {
   $storage->connect_info(\@info);
   $self->storage($storage);
   return $self;
+}
+
+# The storage class storage_type names, with its +/:: prefix resolved, and its
+# constructor arguments (undef for a plain class name).
+sub _resolved_storage_type {
+  my $self = shift;
+
+  my ($storage_class, $args) = ref $self->storage_type
+    ? $self->_normalize_storage_type($self->storage_type)
+    : ($self->storage_type, undef)
+  ;
+
+  $storage_class =~ s/^\+//;
+  $storage_class =~ s/^::/DBIO::Storage::/;
+
+  return ($storage_class, $args);
+}
+
+# A schema always has a driver (ADR 0067): a storage class resolving to the
+# generic DBIO::Storage::DBI declares none, and is refused. $hint is added to
+# the message by a caller that knows more (DBIO::Replicated).
+sub _refuse_undeclared_driver {
+  my ($self, $storage_class, $hint) = @_;
+
+  return unless $storage_class eq 'DBIO::Storage::DBI';
+
+  my $class = ref $self || $self;
+  $self->throw_exception(
+    "Schema class $class declares no driver: its storage class is the "
+  . 'generic DBIO::Storage::DBI, and a schema always has a driver (ADR 0067). '
+  . "Declare it with use DBIO 'Schema', -<driver> (for example -pg), or with "
+  . "the driver's component (__PACKAGE__->load_components('PostgreSQL')) or "
+  . "storage_type (the driver's storage class, also on a clone before "
+  . 'connecting). DBIO->driver_for($dsn) names the driver of a DSN.'
+  . ( defined $hint ? " $hint" : '' )
+  );
 }
 
 sub _normalize_storage_type {
@@ -618,7 +667,7 @@ sub throw_exception {
     my $guard = scope_guard {
       return if $guard_disarmed;
       local $SIG{__WARN__};
-      Carp::cluck("
+      DBIO::Util::masked_cluck("
                     !!! DBIO INTERNAL PANIC !!!
 
 The exception_action() handler installed on '$self'
@@ -669,7 +718,14 @@ This guard was activated beginning"
     };
   }
 
-  DBIO::Exception->throw($args[0], $self->stacktrace);
+  # The trace masks the password the storage already holds, and asks nothing
+  # for it: no broker is called on this path.
+  my $storage = ref $self ? $self->storage : undef;
+  my $held = $storage && $storage->can('_held_connect_info')
+    ? $storage->_held_connect_info
+    : undef;
+
+  DBIO::Exception->throw($args[0], $self->stacktrace, $held);
 }
 
 
@@ -691,9 +747,12 @@ sub deploy {
   # properly and avoid the lossy abstract-DDL roundtrip.
   if ($self->storage->can('dbio_deploy_class')
       and my $deploy_class = $self->storage->dbio_deploy_class) {
+    DBIO::Util::assert_class_name($deploy_class);
     eval "require $deploy_class; 1"
       or $self->throw_exception("Cannot load $deploy_class: $@");
-    return $deploy_class->new(schema => $self)->install;
+    return $deploy_class->new(
+      schema => $self, DBIO::Deploy::Base->deploy_args($sqltargs),
+    )->install;
   }
 
   $self->storage->deploy($self, undef, $sqltargs, $dir);
@@ -732,7 +791,7 @@ sub ddl_filename {
 
 sub thaw {
   my ($self, $obj) = @_;
-  local $DBIO::ResultSourceHandle::thaw_schema = $self;
+  local $DBIO::ResultSource::thaw_schema = $self;
   return Storable::thaw($obj);
 }
 
@@ -744,7 +803,7 @@ sub freeze {
 
 sub dclone {
   my ($self, $obj) = @_;
-  local $DBIO::ResultSourceHandle::thaw_schema = $self;
+  local $DBIO::ResultSource::thaw_schema = $self;
   return Storable::dclone($obj);
 }
 
@@ -900,12 +959,12 @@ DBIO::Schema - Schema class and connection container for DBIO applications
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
   package Library::Schema;
-  use base qw/DBIO::Schema/;
+  use DBIO 'Schema', -pg;
 
   # load all Result classes in Library/Schema/Result/
   __PACKAGE__->load_namespaces();
@@ -928,7 +987,7 @@ version 0.900002
 
   # fetch objects using Library::Schema::Result::DVD
   my $resultset = $schema1->resultset('DVD')->search( ... );
-  my @dvd_objects = $schema2->resultset('DVD')->search( ... );
+  my @dvd_objects = $schema2->resultset('DVD')->search( ... )->all;
 
 See F<t/39load_namespaces_1.t> for a runnable example.
 
@@ -997,7 +1056,10 @@ name.
 
   my @source_names = $schema->sources;
 
-Lists names of all the sources registered on this Schema object.
+Lists names of all the sources registered on this Schema object, sorted by
+name. The order is the same in every process, so text written by walking the
+list (one statement per table, say) does not change from one run to the next.
+In scalar context, returns the number of sources.
 
 =head2 source
 
@@ -1013,6 +1075,378 @@ Lists names of all the sources registered on this Schema object.
 
 Returns the L<DBIO::ResultSource> object for the registered
 source name.
+
+=head2 datetime_parser
+
+  my $parser = $schema->datetime_parser;
+
+Returns the datetime parser of the schema's storage. Equivalent to calling
+C<< $schema->storage->datetime_parser >>; see
+L<DBIO::Storage::DBI/datetime_parser>.
+
+=head2 parse_datetime
+
+  my $dt = $schema->parse_datetime($string);
+
+Shortcut for C<< $schema->datetime_parser->parse_datetime(@args) >>.
+
+=head2 format_datetime
+
+  my $string = $schema->format_datetime($dt);
+
+Shortcut for C<< $schema->datetime_parser->format_datetime(@args) >>.
+
+=head2 skills
+
+  MyApp::Schema->skills({ 'mysql-database' => $markdown });
+  my $overrides = $schema->skills;
+
+Class data holding this schema's skill overrides: a hashref mapping skill
+names (the leading C<dbio-> is optional) to markdown text, or C<undef> when
+none are set. L</skill> consults it before the bundled skills. A class written
+with C<use DBIO 'Schema'> can declare the map with the C<skills> / C<skill>
+keywords (see L<DBIO/USE-AS-PRAGMA>).
+
+A C<skills> key in a hashref passed to L</connect> sets the overrides for
+that schema object only. It replaces the class-level map there rather than
+being merged into it, and is removed from the hashref before the connect info
+reaches the storage:
+
+  my $schema = MyApp::Schema->connect($dsn, $user, $pass, {
+    skills => { core => $markdown },
+  });
+
+=head2 skill
+
+  my $markdown = $schema->skill('mysql-database');
+
+Return the markdown text of the named agent skill (see L<DBIO::Skills>). The
+leading C<dbio-> is optional. A per-schema override set via the C<skills>
+class data (or the C<skills> connect option) wins; otherwise the skill is
+resolved from the bundled sharedirs of the loaded DBIO distributions,
+including this schema's own driver.
+
+=head1 SETUP METHODS
+
+=head2 load_namespaces
+
+=over 4
+
+=item Arguments: %options?
+
+=back
+
+  package MyApp::Schema;
+  __PACKAGE__->load_namespaces();
+
+  __PACKAGE__->load_namespaces(
+     result_namespace => 'Res',
+     resultset_namespace => 'RSet',
+     default_resultset_class => '+MyApp::Othernamespace::RSet',
+  );
+
+With no arguments, this method uses L<Module::Find> to load all of the
+Result and ResultSet classes under the namespace of the schema from
+which it is called.  For example, C<My::Schema> will by default find
+and load Result classes named C<My::Schema::Result::*> and ResultSet
+classes named C<My::Schema::ResultSet::*>.
+
+ResultSet classes are associated with Result class of the same name.
+For example, C<My::Schema::Result::CD> will get the ResultSet class
+C<My::Schema::ResultSet::CD> if it is present.
+
+Both Result and ResultSet namespaces are configurable via the
+C<result_namespace> and C<resultset_namespace> options.
+
+Another option, C<default_resultset_class> specifies a custom default
+ResultSet class for Result classes with no corresponding ResultSet.
+
+All of the namespace and classname options are by default relative to
+the schema classname.  To specify a fully-qualified name, prefix it
+with a literal C<+>.  For example, C<+Other::NameSpace::Result>.
+
+=head3 Warnings
+
+You will be warned if ResultSet classes are discovered for which there
+are no matching Result classes like this:
+
+  load_namespaces found ResultSet class '$classname' with no corresponding Result class
+
+If a ResultSource instance is found to already have a ResultSet class set
+using L<resultset_class|DBIO::ResultSource/resultset_class> to some
+other class, you will be warned like this:
+
+  We found ResultSet class '$rs_class' matching '$result_class', but it seems
+  that you had already set the '$result_class' resultet to '$rs_set' instead
+
+=head3 Examples
+
+  # load My::Schema::Result::CD, My::Schema::Result::Artist,
+  #    My::Schema::ResultSet::CD, etc...
+  My::Schema->load_namespaces;
+
+  # Override everything to use ugly names.
+  # In this example, if there is a My::Schema::Res::Foo, but no matching
+  #   My::Schema::RSets::Foo, then Foo will have its
+  #   resultset_class set to My::Schema::RSetBase
+  My::Schema->load_namespaces(
+    result_namespace => 'Res',
+    resultset_namespace => 'RSets',
+    default_resultset_class => 'RSetBase',
+  );
+
+  # Put things in other namespaces
+  My::Schema->load_namespaces(
+    result_namespace => '+Some::Place::Results',
+    resultset_namespace => '+Another::Place::RSets',
+  );
+
+To search multiple namespaces for either Result or ResultSet classes,
+use an arrayref of namespaces for that option.  In the case that the
+same result (or resultset) class exists in multiple namespaces, later
+entries in the list of namespaces will override earlier ones.
+
+  My::Schema->load_namespaces(
+    # My::Schema::Results_C::Foo takes precedence over My::Schema::Results_B::Foo :
+    result_namespace => [ 'Results_A', 'Results_B', 'Results_C' ],
+    resultset_namespace => [ '+Some::Place::RSets', 'RSets' ],
+  );
+
+=head2 load_classes
+
+=over 4
+
+=item Arguments: @classes?, { $namespace => [ @classes ] }+
+
+=back
+
+L</load_classes> is an alternative method to L</load_namespaces>, both of
+which serve similar purposes, each with different advantages and disadvantages.
+In the general case you should use L</load_namespaces>, unless you need to
+be able to specify that only specific classes are loaded at runtime.
+
+With no arguments, this method uses L<Module::Find> to find all classes under
+the schema's namespace. Otherwise, this method loads the classes you specify
+(using L<use>), and registers them (using L</"register_class">).
+
+It is possible to comment out classes with a leading C<#>, but note that perl
+will think it's a mistake (trying to use a comment in a qw list), so you'll
+need to add C<no warnings 'qw';> before your load_classes call.
+
+If any classes found do not appear to be Result class files, you will
+get the following warning:
+
+   Failed to load $comp_class. Can't find source_name method. Is
+   $comp_class really a full DBIO result class? Fix it, move it elsewhere,
+   or make your load_classes call more specific.
+
+Example:
+
+  My::Schema->load_classes(); # loads My::Schema::CD, My::Schema::Artist,
+                              # etc. (anything under the My::Schema namespace)
+
+  # loads My::Schema::CD, My::Schema::Artist, Other::Namespace::Producer but
+  # not Other::Namespace::LinerNotes nor My::Schema::Track
+  My::Schema->load_classes(qw/ CD Artist #Track /, {
+    Other::Namespace => [qw/ Producer #LinerNotes /],
+  });
+
+=head2 storage_type
+
+=over 4
+
+=item Arguments: $storage_type|{$storage_type, \%args}
+
+=item Return Value: $storage_type|{$storage_type, \%args}
+
+=item Default value: DBIO::Storage::DBI
+
+=back
+
+Set the storage class that will be instantiated when L</connect> is called.
+If the classname starts with C<::>, the prefix C<DBIO::Storage> is
+assumed by L</connect>.
+
+This is where a schema B<declares its driver>, and a schema always does. It
+is seldom set by hand: loading a driver's component
+(C<< __PACKAGE__->load_components('PostgreSQL') >>) or using its shortcut
+(C<< use DBIO 'Schema', -pg >>, L<DBIO/apply_driver>) pins the driver's base
+storage class here -- L<DBIO::PostgreSQL::Storage>, L<DBIO::MySQL::Storage>,
+L<DBIO::SQLite::Storage>, each shipped by its own driver distribution.
+
+A declared storage class stands, whatever DSN the schema is connected with.
+The driver adapts itself to the access path of the connection within its own
+classes (L<DBIO::Storage::DBI/_adapt_to_access_path>, ADR 0059); the storage
+never becomes the class of another driver. What does not fit -- a DSN through
+the DBD of another driver, a server the driver notices is not its engine --
+is reported as L</driver_strict> and L</driver_warnings> say.
+
+Left at the default, the generic L<DBIO::Storage::DBI>, the schema declares no
+driver, and L</connection> refuses it before building a storage (ADR 0067). A
+storage class set here before connecting -- on the class or on a clone -- is a
+declaration: that is how a schema shared by several drivers, such as a test
+schema, gets its driver per use. Which driver a DSN leads to is answered by
+L<DBIO/driver_for>, and L<DBIO/schema_for> builds a connected schema with that
+driver.
+
+If your storage type requires instantiation arguments, those are
+defined as a second argument in the form of a hashref and the entire
+value needs to be wrapped into an arrayref or a hashref.  We support
+both types of refs here in order to play nice with your
+Config::[class] or your choice. See
+L<DBIO::Replicated::Storage> for an example of this.
+
+=head2 driver_strict
+
+=over 4
+
+=item Arguments: boolean
+
+=item Default value: false
+
+=back
+
+Makes a declared driver that does not fit what it meets an error: with it
+set, what L</driver_warnings> would warn about throws, at the first use of the
+storage that needs the driver. It wins over C<< driver_warnings(0) >>.
+
+Two things are reported, and neither costs a question to the server: the DSN
+leads through a DBD that belongs to another driver (a schema declaring
+L<DBIO::PostgreSQL> connected with C<dbi:mysql:>), or the driver notices, from
+what it knows anyway, that the server is not its engine. Only registered
+driver classes are checked against the DBD: a DBD no driver is registered for
+is not judged, nor is a storage class of no registered driver's ancestry (a
+private subclass of L<DBIO::Storage::DBI> set as L</storage_type> by hand). A
+related family is none of the two: a schema declaring MySQL connected through
+L<DBD::MariaDB> is fine.
+
+Settable on the schema class and on a connected schema; the storage reads it
+when it has something to report (L<DBIO::Storage::DBI/_driver_mismatch>). A
+storage a driver builds without a schema (a writer or bulk storage) reads the
+switches of the schema of the storage it was built from.
+
+This is an accessor of the schema, not a connect attribute: it is refused in
+the attributes of C<connect>, and the error names the accessor.
+
+  package My::Schema;
+  use DBIO 'Schema', -pg;
+  __PACKAGE__->driver_strict(1);
+
+=head2 driver_warnings
+
+=over 4
+
+=item Arguments: boolean
+
+=item Default value: true
+
+=back
+
+Whether a declared driver that does not fit what it meets warns (see
+L</driver_strict> for what is reported). Set it to false to silence these
+warnings; L</driver_strict> turns them into errors and wins over this. Like
+L</driver_strict> it is a schema accessor and no connect attribute.
+
+=head2 exception_action
+
+=over 4
+
+=item Arguments: $code_reference
+
+=item Return Value: $code_reference
+
+=item Default value: None
+
+=back
+
+When L</throw_exception> is invoked and L</exception_action> is set to a code
+reference, this reference will be called instead of
+L<DBIO::Exception/throw>, with the exception message passed as the only
+argument.
+
+Your custom throw code B<must> rethrow the exception, as L</throw_exception> is
+an integral part of DBIO's internal execution control flow.
+
+Example:
+
+   package My::Schema;
+   use DBIO 'Schema', -pg;
+   use My::ExceptionClass;
+   __PACKAGE__->exception_action(sub { My::ExceptionClass->throw(@_) });
+   __PACKAGE__->load_classes;
+
+   # or:
+   my $schema_obj = My::Schema->connect( .... );
+   $schema_obj->exception_action(sub { My::ExceptionClass->throw(@_) });
+
+=head2 stacktrace
+
+=over 4
+
+=item Arguments: boolean
+
+=back
+
+Whether L</throw_exception> should include stack trace information.
+Defaults to false normally, but defaults to true if C<$ENV{DBIO_TRACE}>
+is true.
+
+The trace shows every live frame with its arguments, and a schema is
+connected by handing it the password as an argument. The password is not part
+of the trace: it is shown as C<***> in L</connect> and L</connection> -- in
+whichever class's C<connection> the frame is -- and wherever an argument of
+another frame repeats it, in the frames of your own code that called
+L</connect> too. So is a password inside an argument -- the value of a
+C<password>, C<passwd>, C<pwd> or C<pass> key, or the password of a URI, in a
+DSN first of all -- as in the messages about a connection
+(L<DBIO::Storage::DBI/connect_info>). The frames, the files and lines, the
+rest of the DSN, the user name and every other argument stay as they are.
+
+What is masked is what DBIO can find in the arguments of the live frames: the
+arguments of L</connect> and L</connection>, and a C<dbi:> DSN followed by a
+user name and a password in any other frame. A password that reaches DBIO in
+no argument -- from a L<DBIO::AccessBroker>, a connection coderef or the
+environment -- and that your own code passes around as an argument is not
+known to it, nor is one your code holds in another shape than the one it
+connects with. A trace L</throw_exception> writes also masks the password
+the schema's storage holds from C<connect_info>, in any frame; it is read
+from the storage as it is, and no AccessBroker is asked for it. As in a message, a password is masked wherever an argument
+repeats it, however short it is; one that is also the user name masks that
+too. And every argument is looked through, whatever it holds: an SQL statement
+among them reads C<password = ***> where it said C<password = ?>.
+
+All of this is about the trace DBIO writes. A trace L<Carp> writes of its own
+accord -- every C<croak> under C<$Carp::Verbose> (C<perl -MCarp=verbose>), or
+a C<confess> in code that is not DBIO's -- is not built by DBIO
+(L<DBIO::Util/masked_longmess> builds its own) and shows its arguments as Carp
+does. Where DBIO hands such a text on with the connect
+info at hand -- the C<DBI Connection failed> exception of a connection that
+cannot be opened, L<DBI>'s own error after it -- the password is masked in it
+as well, escaped or shortened as Carp shows an argument.
+
+=head2 sqlt_deploy_hook
+
+=over
+
+=item Arguments: $sqlt_schema
+
+=back
+
+An optional sub which you can declare in your own Schema class that will get
+called during deployment of the schema via L</deploy>.
+
+B<DEPRECATED:> This hook was designed for the legacy SQL::Translator deploy
+path and is a B<no-op> in core DBIO. L</deployment_statements> reads a
+pre-existing DDL file or throws, so nothing invokes it generically; it fires
+only if your storage's native Deploy class chooses to invoke it. It is retained
+for API compatibility.
+
+For an example of what you can do with this, see
+L<DBIO::Manual::Cookbook/Adding Indexes And Functions To Your SQL>.
+
+If you want to execute post-deploy statements which can not be generated
+automatically, the currently suggested method is to overload L</deploy> and use
+L<dbh_do|DBIO::Storage::DBI/dbh_do>.
 
 =head2 class
 
@@ -1131,9 +1565,25 @@ Similar to L</connect> except sets the storage object and connection
 data in-place on the Schema class. You should probably be calling
 L</connect> to get a proper Schema object instead.
 
+=head3 A schema always has a driver
+
+A schema whose L</storage_type> resolves to the generic L<DBIO::Storage::DBI>
+declares no driver, and C<connection> throws before any storage is built,
+naming the schema class and the ways to declare one (ADR 0067). This holds for
+every schema class, also one made with C<use base 'DBIO::Schema'>, with or
+without sources. There is no warning mode and no guess from the DSN.
+
 =head3 Overloading
 
 Overload C<connection> to change the behaviour of C<connect>.
+
+=head3 The C<skills> key
+
+A C<skills> key in a hashref among the arguments is not a connection setting:
+C<connection> takes it out of that hashref and stores it as this schema
+instance's skill overrides (see L</skill>). The hashref is the caller's own
+and is changed in place, so the key is gone from it afterwards; pass a copy if
+the same hashref is used for another connection.
 
 =head2 register_storage_layer
 
@@ -1203,19 +1653,19 @@ will produce the output
 
 =head2 svp_begin
 
-Creates a new savepoint (does nothing outside a transaction).
+Creates a new savepoint (throws an exception outside a transaction).
 Equivalent to calling $schema->storage->svp_begin.  See
 L<DBIO::Storage/"svp_begin"> for more information.
 
 =head2 svp_release
 
-Releases a savepoint (does nothing outside a transaction).
+Releases a savepoint (throws an exception outside a transaction).
 Equivalent to calling $schema->storage->svp_release.  See
 L<DBIO::Storage/"svp_release"> for more information.
 
 =head2 svp_rollback
 
-Rollback to a savepoint (does nothing outside a transaction).
+Rollback to a savepoint (throws an exception outside a transaction).
 Equivalent to calling $schema->storage->svp_rollback.  See
 L<DBIO::Storage/"svp_rollback"> for more information.
 
@@ -1255,8 +1705,18 @@ default behavior will provide a detailed stack trace.
 =back
 
 Deploys the schema to the current storage. If the storage class provides
-a native Deploy class (via L<DBIO::Storage::DBI/dbio_deploy_class>),
-uses that. Otherwise throws an exception.
+a native Deploy class (via its C<dbio_deploy_class> hook),
+uses that. The native path takes the option C<add_drop_table> out of
+C<\%sqlt_args> (the declared views and tables are dropped, in the same batch,
+before the install DDL) and refuses every other key, C<version> included -- the
+native install always installs the current state of the schema -- by throwing
+(L<DBIO::Deploy::Base/deploy_args>); it ignores C<$dir>. Otherwise falls back to
+the storage's C<deploy>, handing it C<\%sqlt_args> and C<$dir>:
+L<DBIO::Storage::DBI> runs the statements of an existing DDL file in C<$dir>
+(default C<./>, named by L</ddl_filename>) and throws if there is no such
+file -- it does not generate DDL (see
+L<DBIO::Storage::DBI/deployment_statements>). C<< $storage->deploy >> routes
+to the native Deploy class itself, so calling it directly installs the same way.
 
 =head2 deployment_statements
 
@@ -1270,8 +1730,10 @@ uses that. Otherwise throws an exception.
 
 A convenient shortcut to
 C<< $self->storage->deployment_statements($self, @args) >>.
-Returns the statements used by L</deploy> and
-L<DBIO::Storage/deploy>.
+Returns the contents of the existing DDL file named for these arguments
+(see L</ddl_filename>) and throws when there is none. It does not generate
+SQL; L</deploy> installs through the storage's native Deploy class and falls
+back to this file only when the storage has none.
 
 =head2 create_ddl_dir
 
@@ -1299,33 +1761,24 @@ an SQL file based on the Schema for each of the specified database types.
 
 =back
 
-  my $filename = $table->ddl_filename($type, $version, $dir, $preversion)
+  my $filename = $schema->ddl_filename($type, $version, $dir, $preversion)
 
-This method is called by C<create_ddl_dir> to compose a file name out of
-the supplied directory, database type and version number. The default file
+This method is called by L<DBIO::Storage::DBI/deployment_statements> to
+compose the name of the DDL file it reads, out of the supplied directory,
+database type and version number. The default file
 name format is: C<$dir$schema-$version-$type.sql>.
 
 You may override this method in your schema if you wish to use a different
 format.
 
- WARNING
-
- Prior to DBIO version 0.08100 this method had a different signature:
-
-    my $filename = $table->ddl_filename($type, $dir, $version, $preversion)
-
- In recent versions variables $dir and $version were reversed in order to
- bring the signature in line with other Schema/Storage methods. If you
- really need to maintain backward compatibility, you can do the following
- in any overriding methods:
-
-    ($dir, $version) = ($version, $dir) if ($DBIO::VERSION < 0.08100);
-
 =head2 thaw
 
 Provided as the recommended way of thawing schema objects. You can call
 C<Storable::thaw> directly if you wish, but the thawed objects will not have a
-reference to any schema, so are rather useless.
+reference to any schema, so are rather useless. Thaw only data of your own,
+from a source you trust: Storable creates objects of whatever class the data
+names. The classes of a thawed source are checked against the result classes
+of the sources registered on this schema.
 
 =head2 freeze
 
@@ -1344,7 +1797,8 @@ it is just provided here for symmetry.
 
 Recommended way of dcloning L<DBIO::Row> and L<DBIO::ResultSet>
 objects so their references to the schema object
-(which itself is B<not> cloned) are properly maintained.
+(which itself is B<not> cloned) are properly maintained. Clone only your own
+objects: C<dclone> goes through the same Storable thaw as L</thaw>.
 
 =head2 schema_version
 
@@ -1402,244 +1856,6 @@ Removes the L<DBIO::ResultSource> from the schema for the given source name.
 
 As L</register_source> but should be used if the result class already
 has a source and you want to register an extra one.
-
-=head2 load_namespaces
-
-Loads result and resultset classes from the configured namespaces and
-registers them on the schema class.
-
-The complete option semantics are documented in the C<load_namespaces>
-reference section above.
-
-=head2 skill
-
-  my $markdown = $schema->skill('mysql-database');
-
-Return the markdown text of the named agent skill (see L<DBIO::Skills>). The
-leading C<dbio-> is optional. A per-schema override set via the L</skills>
-attribute wins; otherwise the skill is resolved from the bundled sharedirs of
-the loaded DBIO distributions, including this schema's own driver.
-
-=head1 SETUP METHODS
-
-=head2 load_namespaces
-
-=over 4
-
-=item Arguments: %options?
-
-=back
-
-  package MyApp::Schema;
-  __PACKAGE__->load_namespaces();
-
-  __PACKAGE__->load_namespaces(
-     result_namespace => 'Res',
-     resultset_namespace => 'RSet',
-     default_resultset_class => '+MyApp::Othernamespace::RSet',
-  );
-
-With no arguments, this method uses L<Module::Find> to load all of the
-Result and ResultSet classes under the namespace of the schema from
-which it is called.  For example, C<My::Schema> will by default find
-and load Result classes named C<My::Schema::Result::*> and ResultSet
-classes named C<My::Schema::ResultSet::*>.
-
-ResultSet classes are associated with Result class of the same name.
-For example, C<My::Schema::Result::CD> will get the ResultSet class
-C<My::Schema::ResultSet::CD> if it is present.
-
-Both Result and ResultSet namespaces are configurable via the
-C<result_namespace> and C<resultset_namespace> options.
-
-Another option, C<default_resultset_class> specifies a custom default
-ResultSet class for Result classes with no corresponding ResultSet.
-
-All of the namespace and classname options are by default relative to
-the schema classname.  To specify a fully-qualified name, prefix it
-with a literal C<+>.  For example, C<+Other::NameSpace::Result>.
-
-=head3 Warnings
-
-You will be warned if ResultSet classes are discovered for which there
-are no matching Result classes like this:
-
-  load_namespaces found ResultSet class $classname with no corresponding Result class
-
-If a ResultSource instance is found to already have a ResultSet class set
-using L<resultset_class|DBIO::ResultSource/resultset_class> to some
-other class, you will be warned like this:
-
-  We found ResultSet class '$rs_class' for '$result_class', but it seems
-  that you had already set '$result_class' to use '$rs_set' instead
-
-=head3 Examples
-
-  # load My::Schema::Result::CD, My::Schema::Result::Artist,
-  #    My::Schema::ResultSet::CD, etc...
-  My::Schema->load_namespaces;
-
-  # Override everything to use ugly names.
-  # In this example, if there is a My::Schema::Res::Foo, but no matching
-  #   My::Schema::RSets::Foo, then Foo will have its
-  #   resultset_class set to My::Schema::RSetBase
-  My::Schema->load_namespaces(
-    result_namespace => 'Res',
-    resultset_namespace => 'RSets',
-    default_resultset_class => 'RSetBase',
-  );
-
-  # Put things in other namespaces
-  My::Schema->load_namespaces(
-    result_namespace => '+Some::Place::Results',
-    resultset_namespace => '+Another::Place::RSets',
-  );
-
-To search multiple namespaces for either Result or ResultSet classes,
-use an arrayref of namespaces for that option.  In the case that the
-same result (or resultset) class exists in multiple namespaces, later
-entries in the list of namespaces will override earlier ones.
-
-  My::Schema->load_namespaces(
-    # My::Schema::Results_C::Foo takes precedence over My::Schema::Results_B::Foo :
-    result_namespace => [ 'Results_A', 'Results_B', 'Results_C' ],
-    resultset_namespace => [ '+Some::Place::RSets', 'RSets' ],
-  );
-
-=head2 load_classes
-
-=over 4
-
-=item Arguments: @classes?, { $namespace => [ @classes ] }+
-
-=back
-
-L</load_classes> is an alternative method to L</load_namespaces>, both of
-which serve similar purposes, each with different advantages and disadvantages.
-In the general case you should use L</load_namespaces>, unless you need to
-be able to specify that only specific classes are loaded at runtime.
-
-With no arguments, this method uses L<Module::Find> to find all classes under
-the schema's namespace. Otherwise, this method loads the classes you specify
-(using L<use>), and registers them (using L</"register_class">).
-
-It is possible to comment out classes with a leading C<#>, but note that perl
-will think it's a mistake (trying to use a comment in a qw list), so you'll
-need to add C<no warnings 'qw';> before your load_classes call.
-
-If any classes found do not appear to be Result class files, you will
-get the following warning:
-
-   Failed to load $comp_class. Can't find source_name method. Is
-   $comp_class really a full DBIO result class? Fix it, move it elsewhere,
-   or make your load_classes call more specific.
-
-Example:
-
-  My::Schema->load_classes(); # loads My::Schema::CD, My::Schema::Artist,
-                              # etc. (anything under the My::Schema namespace)
-
-  # loads My::Schema::CD, My::Schema::Artist, Other::Namespace::Producer but
-  # not Other::Namespace::LinerNotes nor My::Schema::Track
-  My::Schema->load_classes(qw/ CD Artist #Track /, {
-    Other::Namespace => [qw/ Producer #LinerNotes /],
-  });
-
-=head2 storage_type
-
-=over 4
-
-=item Arguments: $storage_type|{$storage_type, \%args}
-
-=item Return Value: $storage_type|{$storage_type, \%args}
-
-=item Default value: DBIO::Storage::DBI
-
-=back
-
-Set the storage class that will be instantiated when L</connect> is called.
-If the classname starts with C<::>, the prefix C<DBIO::Storage> is
-assumed by L</connect>.
-
-You want to use this to set subclasses of L<DBIO::Storage::DBI>
-in cases where the appropriate subclass is not autodetected.
-
-Most database-specific storage classes now ship in separate DBIO driver
-distributions (for example L<DBIO::PostgreSQL::Storage>,
-L<DBIO::MySQL::Storage>, L<DBIO::SQLite::Storage>). If these distributions
-are installed, L<DBIO::Storage::DBI> will usually autodetect and load the
-correct storage based on your DSN.
-
-If your storage type requires instantiation arguments, those are
-defined as a second argument in the form of a hashref and the entire
-value needs to be wrapped into an arrayref or a hashref.  We support
-both types of refs here in order to play nice with your
-Config::[class] or your choice. See
-L<DBIO::Replicated::Storage> for an example of this.
-
-=head2 exception_action
-
-=over 4
-
-=item Arguments: $code_reference
-
-=item Return Value: $code_reference
-
-=item Default value: None
-
-=back
-
-When L</throw_exception> is invoked and L</exception_action> is set to a code
-reference, this reference will be called instead of
-L<DBIO::Exception/throw>, with the exception message passed as the only
-argument.
-
-Your custom throw code B<must> rethrow the exception, as L</throw_exception> is
-an integral part of DBIO's internal execution control flow.
-
-Example:
-
-   package My::Schema;
-   use base qw/DBIO::Schema/;
-   use My::ExceptionClass;
-   __PACKAGE__->exception_action(sub { My::ExceptionClass->throw(@_) });
-   __PACKAGE__->load_classes;
-
-   # or:
-   my $schema_obj = My::Schema->connect( .... );
-   $schema_obj->exception_action(sub { My::ExceptionClass->throw(@_) });
-
-=head2 stacktrace
-
-=over 4
-
-=item Arguments: boolean
-
-=back
-
-Whether L</throw_exception> should include stack trace information.
-Defaults to false normally, but defaults to true if C<$ENV{DBIO_TRACE}>
-is true.
-
-=head2 sqlt_deploy_hook
-
-=over
-
-=item Arguments: $sqlt_schema
-
-=back
-
-An optional sub which you can declare in your own Schema class that will get
-called during deployment of the schema via L</deploy>.
-
-For an example of what you can do with this, see
-L<DBIO::Manual::Cookbook/Adding Indexes And Functions To Your SQL>.
-
-Note that sqlt_deploy_hook is called by L</deployment_statements>, which in turn
-is called before L</deploy>. Therefore the hook can be used only to manipulate
-the deployment process before SQL is generated. If you want to execute
-post-deploy statements which can not be generated automatically, the currently
-suggested method is to overload L</deploy> and use L<dbh_do|DBIO::Storage::DBI/dbh_do>.
 
 =head1 AUTHOR
 

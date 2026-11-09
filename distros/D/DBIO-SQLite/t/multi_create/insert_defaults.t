@@ -2,34 +2,41 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 use DBIO::SQLite::Test;
 use DBIO::Util 'sigwarn_silencer';
 
 my $schema = DBIO::SQLite::Test->init_schema();
 
-# Attempt sequential nested find_or_create with autoinc
+# Attempt sequential nested create with autoinc
 # As a side effect re-test nested default create (both the main object and the relation are {})
 my $bookmark_rs = $schema->resultset('Bookmark');
 my $last_bookmark = $bookmark_rs->search ({}, { order_by => { -desc => 'id' }, rows => 1})->single;
 my $last_link = $bookmark_rs->search_related ('link', {}, { order_by => { -desc => 'link.id' }, rows => 1})->single;
 
-# find_or_create a bookmark-link combo with data for a non-existing link
-my $o1 = $bookmark_rs->find_or_create ({ link => { url => 'something-weird' } });
+# create a bookmark-link combo with data for a non-existing link
+# (a find_or_create without a covered unique constraint throws, ADR 0070)
+my $o1 = $bookmark_rs->create ({ link => { url => 'something-weird' } });
 is ($o1->id, $last_bookmark->id + 1, '1st bookmark ID');
 is ($o1->link->id, $last_link->id + 1, '1st related link ID');
 
-# find_or_create a bookmark-link combo without any data at all (default insert)
+# create a bookmark-link combo without any data at all (default insert)
 # should extend this test to all available Storage's, and fix them accordingly
-my $o2 = $bookmark_rs->find_or_create ({ link => {} });
+my $o2 = $bookmark_rs->create ({ link => {} });
 is ($o2->id, $last_bookmark->id + 2, '2nd bookmark ID');
 is ($o2->link->id, $last_link->id + 2, '2nd related link ID');
 
 # make sure the pre-existing link has only one related bookmark
 is ($last_link->bookmarks->count, 1, 'Expecting only 1 bookmark and 1 link, someone mucked with the table!');
 
-# find_or_create a bookmark withouyt any data, but supplying an existing link object
-# should return $last_bookmark
-my $o0 = $bookmark_rs->find_or_create ({ link => $last_link });
+# find_or_create does not identify a row by a relationship: the link does not
+# cover a unique constraint of Bookmark, so it throws instead of guessing
+throws_ok {
+  $bookmark_rs->find_or_create ({ link => $last_link });
+} qr/find_or_create\(\) needs a condition that gives every column of one unique constraint of source 'Bookmark' a concrete value/;
+
+# search identifies the row given a relationship, should return $last_bookmark
+my $o0 = $bookmark_rs->search ({ link => $last_link->id })->single;
 is_deeply ({ $o0->columns}, {$last_bookmark->columns}, 'Correctly identify a row given a relationship');
 
 # inject an additional bookmark and repeat the test
@@ -38,7 +45,7 @@ my $o3 = $last_link->create_related ('bookmarks', {});
 is ($o3->id, $last_bookmark->id + 3, '3rd bookmark ID');
 
 local $SIG{__WARN__} = sigwarn_silencer( qr/Query returned more than one row/ );
-my $oX = $bookmark_rs->find_or_create ({ link => $last_link });
+my $oX = $bookmark_rs->search ({ link => $last_link->id })->single;
 is_deeply ({ $oX->columns}, {$last_bookmark->columns}, 'Correctly identify a row given a relationship');
 
 done_testing;

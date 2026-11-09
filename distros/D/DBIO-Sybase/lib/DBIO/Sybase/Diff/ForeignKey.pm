@@ -4,8 +4,11 @@ package DBIO::Sybase::Diff::ForeignKey;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Diff::Compare qw(changed_fk_fields);
-use DBIO::SQL::Util ();
+use DBIO::Sybase::Quote ();
+use DBIO::Sybase::DDL ();
 
 
 # Stable identity for a per-constraint FK entry: the relationship tuple.
@@ -32,15 +35,26 @@ sub _fk_name {
 }
 
 sub diff {
-  my ($class, $source, $target) = @_;
+  my ($class, $source, $target, $source_tables, $target_tables) = @_;
   $source //= {};
   $target //= {};
   my @ops;
 
+  my $by_table = defined $source_tables && defined $target_tables;
+  my @tables = $by_table ? sort(keys %$target_tables) : sort(keys %$target);
+
   # FK adds (and the create half of an alter) go in the target's tables.
-  for my $table (sort keys %$target) {
-    # Tables present only in the target are created (with their FKs) elsewhere.
-    next unless exists $source->{$table};
+  for my $table (@tables) {
+    if ($by_table && !exists $source_tables->{$table}) {
+      # A new table: its CREATE TABLE carries no FK, they are all added here.
+      push @ops, map {
+        DBIO::Sybase::Diff::ForeignKey::Create->new(
+          action => 'create', table => $table, fk => $_,
+        )
+      } @{ $target->{$table} // [] };
+      next;
+    }
+    next unless $by_table || exists $source->{$table};
 
     my %s_idx = map { _fk_key($_) => $_ } @{ $source->{$table} // [] };
     my %t_idx = map { _fk_key($_) => $_ } @{ $target->{$table} // [] };
@@ -82,21 +96,23 @@ __PACKAGE__->mk_diff_accessors(qw(table fk));
 sub as_sql {
   my $self = shift;
   my $fk   = $self->fk;
-  my $tbl  = DBIO::SQL::Util::_quote_ident($self->table);
-  my $name = DBIO::SQL::Util::_quote_ident(
+  my $tbl  = DBIO::Sybase::Quote::quote_ident($self->table);
+  my $name = DBIO::Sybase::Quote::quote_ident(
     DBIO::Sybase::Diff::ForeignKey::_fk_name($self->table, $fk));
-  my $from = join ', ', map { DBIO::SQL::Util::_quote_ident($_) } @{ $fk->{from_columns} };
-  my $to   = join ', ', map { DBIO::SQL::Util::_quote_ident($_) } @{ $fk->{to_columns} };
-  my $ref  = DBIO::SQL::Util::_quote_ident($fk->{to_table});
+  my $from = join ', ', map { DBIO::Sybase::Quote::quote_ident($_) } @{ $fk->{from_columns} };
+  my $to   = join ', ', map { DBIO::Sybase::Quote::quote_ident($_) } @{ $fk->{to_columns} };
+  my $ref  = DBIO::Sybase::Quote::quote_ident($fk->{to_table});
+
+  # ASE has no referential actions (Msg 156): refuse, never append ON ..
+  my $what = "foreign key '"
+    . DBIO::Sybase::Diff::ForeignKey::_fk_name($self->table, $fk) . "'";
+  DBIO::Sybase::DDL::_check_fk_action($what, $self->table, 'ON UPDATE', $fk->{on_update}, $fk->{from_columns});
+  DBIO::Sybase::DDL::_check_fk_action($what, $self->table, 'ON DELETE', $fk->{on_delete}, $fk->{from_columns});
 
   my $sql = sprintf
     'ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)',
     $tbl, $name, $from, $ref, $to;
-  $sql .= " ON UPDATE $fk->{on_update}"
-    if $fk->{on_update} && uc($fk->{on_update}) ne 'NO ACTION';
-  $sql .= " ON DELETE $fk->{on_delete}"
-    if $fk->{on_delete} && uc($fk->{on_delete}) ne 'NO ACTION';
-  return $sql;
+  return "$sql;";
 }
 sub summary {
   my $self = shift;
@@ -111,10 +127,10 @@ __PACKAGE__->mk_diff_accessors(qw(table fk));
 
 sub as_sql {
   my $self = shift;
-  my $tbl  = DBIO::SQL::Util::_quote_ident($self->table);
-  my $name = DBIO::SQL::Util::_quote_ident(
+  my $tbl  = DBIO::Sybase::Quote::quote_ident($self->table);
+  my $name = DBIO::Sybase::Quote::quote_ident(
     DBIO::Sybase::Diff::ForeignKey::_fk_name($self->table, $self->fk));
-  return "ALTER TABLE $tbl DROP CONSTRAINT $name";
+  return "ALTER TABLE $tbl DROP CONSTRAINT $name;";
 }
 sub summary {
   my $self = shift;
@@ -136,14 +152,23 @@ DBIO::Sybase::Diff::ForeignKey - Diff Sybase ASE foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
-Compares two foreign-key sets and generates FK-level diff operations for
-tables that exist on both sides. FKs on a brand-new table are the table's
-own concern; FKs on a dropped table vanish with it. This module only
-reconciles FK changes on tables retained across the diff.
+Compares two foreign-key sets and generates FK-level diff operations. Given
+the two table models (as L<DBIO::Sybase::Diff> passes them), it walks every
+table of the target: a retained table has its FKs reconciled -- a table
+without any FK on one side counts as an empty list there, not as absent -- and
+a brand-new table gets every FK of its own as an C<ADD CONSTRAINT>, which
+L<DBIO::Sybase::Diff> runs after all C<CREATE TABLE>s. FKs on a dropped table
+vanish with it.
+
+The diff reads the table models next to the FK models, so a table missing from
+either FK model is still diffed: the first FK added to a table, the last one
+dropped from it, and the FKs of a new table (which C<CREATE TABLE> does not
+carry) all reach the diff. Called without table models (the unit-level form),
+a table is still diffed only when both FK models name it.
 
 The introspected per-constraint FK shape (produced by
 L<DBIO::Sybase::Introspect/_group_fks_by_constraint>) is
@@ -164,6 +189,13 @@ source entry also lacks a name, C<DROP> falls back to the same generated name.
 
 Sybase ASE cannot alter an FK constraint in place, so an attribute change
 becomes a drop-then-add pair.
+
+ASE has no referential actions (Msg 156, for C<NO ACTION> too), so a create
+whose model carries an C<on_update> or C<on_delete> other than C<NO ACTION>
+(undef and the empty string mean none) throws a L<DBIO::Exception> from
+C<as_sql>, naming constraint, table, event and value, instead of writing
+C<ON DELETE ...> the server refuses. L<DBIO::Sybase::DDL> refuses
+the same declaration at install time.
 
 =head1 AUTHOR
 

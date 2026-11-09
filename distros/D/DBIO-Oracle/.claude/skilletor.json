@@ -1,0 +1,61 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    },
+    "dbio-core": {
+      "git": "https://codeberg.org/dbio/dbio.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr",
+      "dbio-adr@dbio-core",
+      "dbio-codeberg-user-issues@dbio-core",
+      "dbio-consolidate-release@dbio-core",
+      "dbio-coordination@dbio-core",
+      "dbio-core@dbio-core",
+      "dbio-driver-development@dbio-core",
+      "dbio-perl-class-patterns@dbio-core",
+      "dbio-perl-pod@dbio-core",
+      "dbio-perl-release@dbio-core",
+      "dbio-perl-syntax@dbio-core"
+    ],
+    "agents": [
+      "dbio-adr-auditor@dbio-core",
+      "dbio-release-manager@dbio-core",
+      "karr-coordinator@dbio-core",
+      "dbio-driver-worker@dbio-core"
+    ],
+    "rules": [
+      "dbio-rules@dbio-core"
+    ]
+  },
+  "vars": {
+    "driver": "oracle",
+    "dist_label": "DBIO driver for Oracle Database",
+    "worker_skills": [
+      "dbio-coordination",
+      "dbio-core",
+      "dbio-driver-development",
+      "dbio-oracle",
+      "dbio-oracle-database",
+      "dbio-perl-class-patterns",
+      "dbio-perl-syntax",
+      "dbio-perl-pod",
+      "kanban-issues-karr-ticket"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

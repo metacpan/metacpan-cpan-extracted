@@ -1,5 +1,157 @@
 Revision history for DBIO-Sybase
 
+0.900004  2026-11-08
+    * Breaking Changes
+        - Every connection sets string_rtruncation on, so a string too long
+          for its column is an error (Msg 9502) and nothing is written; code
+          cuts its strings itself.
+        - Under FreeTDS a bind value with a character beyond ASCII for a
+          character column is refused before anything is sent, naming table
+          and column; the client library cannot convert it.
+
+    * Storage
+        - A schema that declares the driver (load_components('Sybase') or
+          use DBIO 'Schema', -syb) gets DBIO::Sybase::Storage::ASE at its
+          first use, without asking the server what it is, and takes the
+          placeholder decision (auto_cast or ::ASE::NoBindVars) once. A server
+          DBD::Sybase found to be Microsoft SQL Server is reported through
+          core's driver-mismatch check, for a pinned ::ASE storage as well.
+        - Connection parameters without a DSN give
+          dbi:Sybase:host=..;port=..;database=.., parts not given left out.
+          Host without port and port without host throw. A HostBound view
+          binds its host and port into host=/port= and refuses server=NAME.
+        - ;maxConnect=N and the bulk storage's ;bulkLogin=1 reach the DSN
+          through _finish_connect_dsn, also under an AccessBroker.
+        - Under FreeTDS the storage layers stay ahead of the FreeTDS class,
+          and _init runs once per connect.
+        - Connecting to ASE works when core calls cursor_class on the storage
+          class. Sub::Util names the generated subs; Sub::Name is not used.
+        - Insert, update and populate of TEXT/IMAGE content connect before
+          they use the writer storage, so they work as the first action of a
+          schema pinned to ::ASE.
+        - Under FreeTDS BEGIN TRAN and COMMIT throw while a statement handle
+          is active, naming the open cursor. ROLLBACK finishes the handles and
+          rolls back on the same connection. A COMMIT refused because of an
+          open cursor ends the transaction like any failed outermost commit.
+          DBIO::MSSQL::Storage::Sybase shares this.
+        - supports_exists_query is declared (results_exist and its siblings
+          work), transactional_ddl is 0, and rand uses NEWID(). intersect_all
+          and except_all are refused, as ASE has no ALL form. Set
+          _use_intersect_except to 0 for releases before ASE 16.0 SP03.
+        - $rs->explain works: the showplan messages are read through
+          _execute_sth, and messages that are not showplan reach a
+          pre-installed syb_err_handler.
+        - The text of an ASE or client library error names no value.
+          The type, column, constraint, table, message number and the count
+          of bind values stay; the value of a conversion error (Msg 247,
+          249, to_numeric()), the value the server or the library converted
+          it to, and the key of a duplicate-key message read ***. This holds
+          for the insert, update, populate and bulk paths, the NoBindVars
+          class, the TEXT/IMAGE writer and the cs_convert warning, which
+          reaches the caller's __WARN__ handler masked. $dbh->errstr keeps
+          the engine's text. A TEXT/IMAGE write that finds no row names
+          the key columns, not their values.
+
+    * LOB columns
+        - The placeholder for TEXT/IMAGE content is the literal '', so an
+          empty LOB holds one space (IMAGE: 0x20) and no apostrophes. A
+          populate of LOB columns only is a statement without placeholders.
+        - insert returns the values given, not the placeholders; create({})
+          keeps the column's DEFAULT and returns a row holding only the
+          primary key.
+        - populate() with undef and valued rows in one LOB column sets each
+          row to NULL or its value. A content-only update returns the row
+          count, so $row->update works.
+        - The data of the caller (%h, row arrays) stays untouched.
+        - Writing LOB content through FreeTDS is refused before anything is
+          sent, naming table and column (FreeTDS has no ct_data_info).
+
+    * SQL
+        - order_by supports -nulls => 'first' | 'last', emulated with a CASE
+          sort in front of the column, also in limit and prefetch subqueries.
+
+    * Introspect
+        - The ASE system catalog is read (sysobjects, syscolumns, systypes,
+          sysindexes, sysreferences, syscomments), as ASE has no
+          INFORMATION_SCHEMA. Columns carry size, precision and scale in
+          characters, binary and varbinary lengths included.
+        - Views are read with their definition and their dependencies into
+          the model key views.
+
+    * DDL
+        - Column types: the declared size is honoured, an arrayref size reads
+          as its width, integer and bigint map by width (INT, BIGINT),
+          uniqueidentifier is VARCHAR(36), character and char varying are
+          CHAR and VARCHAR, mediumtext is TEXT, double is DOUBLE PRECISION and
+          CURRENT_TIMESTAMP is getdate(). Other type names pass through with
+          their size.
+        - Refused with a DBIO::Exception naming table, column and reason:
+          enum, a bit with a size, a nullable bit, is_auto_increment on a type
+          ASE takes no IDENTITY on, and a foreign key with an on_delete or
+          on_update action, as ASE has none.
+        - A column is written in ASE's clause order, name TYPE [DEFAULT ...]
+          NULL | NOT NULL, with the nullability explicit. A column_info
+          without is_nullable is NOT NULL. Defaults are quoted by type,
+          numeric and bit unquoted, an embedded ' doubled.
+        - install writes the foreign keys, the unique constraints (as UNIQUE
+          INDEX) and the declared indexes (Cake idx, indices; as CREATE
+          [UNIQUE] INDEX), refusing declarations ASE cannot hold.
+        - Names that are ASE keywords or no simple identifier are written in
+          square brackets, in DDL and Diff alike; names starting with # or @
+          or holding a dot are refused. DBIO::Sybase::Quote holds the keyword
+          list.
+
+    * Diff
+        - Column statements follow ASE's grammar: ADD, MODIFY and REPLACE
+          column DEFAULT as a statement of its own, DROP column bare. ADD and
+          MODIFY render the full type and state the nullability. A change of
+          the default alone is the REPLACE only.
+        - Every statement ends on a semicolon, as core splits migrations on
+          it. Index drops come before the column diff.
+        - A table the diff creates gets no ADD for its columns. Primary keys
+          are compared by their ordered column list, foreign keys also on
+          tables with none on one side.
+        - The diff creates, drops and changes views through
+          DBIO::Sybase::Diff::View, in dependency order.
+        - A default dropped from the schema is removed with REPLACE col
+          DEFAULT NULL. Expression defaults compare by their SQL, and the
+          server-named primary-key index is left out of the comparison.
+        - Refused before the first statement, naming table and column: a NOT
+          NULL column added with an expression default or without a default,
+          and a NOT NULL change over NULLs.
+
+    * Deploy
+        - apply and upgrade are those of DBIO::Deploy::Base: a lossy column
+          change runs with allow_destructive => 1 only, and Column::Alter
+          answers lossy (tinyint, smallint and int widenings are lossless).
+        - CREATE and DROP DATABASE of the temporary database run from master
+          and switch the handle back. It is sized from the schema
+          (temp_db_size => 'NNM' sets it), set to abort tran on log full,
+          numbered per process and named within ASE's 30 characters. A refused
+          DROP is repeated while the database is in use.
+        - _create_temp_db and _drop_temp_db refuse a handle with AutoCommit
+          off instead of ending its transaction.
+        - A diff that copies data needs the database option select
+          into/bulkcopy/pllsort; see "Data-copying ALTER TABLE" in
+          DBIO::Sybase::Deploy.
+
+    * Test
+        - DBIO::Sybase::Test::Conformance answers the DDL, Diff (table
+          version 4) and Bind lists of core's conformance table; what ASE
+          cannot do is a declared refusal or deviation.
+
+    * Documentation
+        - The README covers the async posture (sync only; forked and
+          immediate), live tests with a throwaway ASE pod
+          (maint/k8s/ase.yaml), the IDENTITY read-back and the ways a storage
+          reaches the ASE class. POD and ADRs name the statements the diff
+          emits.
+
+    * Packaging
+        - Requires DBIO 0.900004. Test::Exception is declared in the cpanfile
+          test block. Every module carries $VERSION in step with the
+          distribution.
+
 0.900001  2026-07-12
     * Storage
         - DBIO::Sybase::Storage::_rebless now reblesses Microsoft SQL Server
@@ -55,3 +207,4 @@ Revision history for DBIO-Sybase
         - Native Sybase ASE DDL generation, deduping sources that share a
           physical table, skipping subquery and view sources, dereferencing
           literal table names, and emitting CREATE VIEW for non-virtual views
+</content>

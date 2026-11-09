@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use DBIO::Optional::Dependencies ();
-use Scope::Guard ();
+use DBIO::Util 'scope_guard';
 use List::Util 'shuffle';
 use Try::Tiny;
 use DBIO::Test;
@@ -20,6 +20,15 @@ my $env2optdep = {
   DBIO_TEST_FIREBIRD => 'test_rdbms_firebird',
   DBIO_TEST_FIREBIRD_INTERBASE => 'test_rdbms_firebird_interbase',
   DBIO_TEST_FIREBIRD_ODBC => 'test_rdbms_firebird_odbc',
+};
+
+# A schema always has a driver (core ADR 0067). DBIO::Test::Schema is shared and
+# keeps none in its class, so each leg declares the storage of its DBD on a
+# clone: the native ones their own, the ODBC one the Firebird ODBC transport.
+my $prefix2storage = {
+  DBIO_TEST_FIREBIRD           => '+DBIO::Firebird::Storage',
+  DBIO_TEST_FIREBIRD_INTERBASE => '+DBIO::Firebird::Storage::InterBase',
+  DBIO_TEST_FIREBIRD_ODBC      => '+DBIO::Firebird::Storage::ODBC',
 };
 
 plan skip_all => join (' ',
@@ -62,14 +71,15 @@ for my $prefix (shuffle keys %$env2optdep) { SKIP: {
 
   note "Testing with ${prefix}_DSN";
 
-  $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
+  my $declared = DBIO::Test::Schema->clone(storage_type => $prefix2storage->{$prefix});
+  $schema = $declared->connect($dsn, $user, $pass, {
     auto_savepoint  => 1,
     quote_names     => 1,
     ($dsn !~ /ODBC/ ? (on_connect_call => 'use_softcommit') : ()),
   });
   my $dbh = $schema->storage->dbh;
 
-  my $sg = Scope::Guard->new(sub { cleanup($schema) });
+  my $sg = scope_guard { cleanup($schema) };
 
   eval { $dbh->do(q[DROP TABLE "artist"]) };
   $dbh->do(<<EOF);
@@ -204,7 +214,7 @@ EOF
     is eval { $ars->search({ name => 'foo' })->first->rank }, 4;
   } 'Can update a column';
 
-  my ($updated) = $schema->resultset('Artist')->search({name => 'foo'});
+  my $updated = $schema->resultset('Artist')->search({name => 'foo'})->first;
   is eval { $updated->rank }, 4, 'and the update made it to the database';
 
 # test LIMIT support

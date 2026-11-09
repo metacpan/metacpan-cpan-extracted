@@ -19,5 +19,5 @@ my @dsn = ($normal_schema->storage->_dbi_connect_info->[0], undef, undef, {
 my $code_ref_schema = $normal_schema->connect(sub { DBI->connect(@dsn); });
 
 # Stolen from 60core.t - this just verifies things seem to work at all
-my @art = $code_ref_schema->resultset("Artist")->search({ }, { order_by => 'name DESC'});
+my @art = $code_ref_schema->resultset("Artist")->search({ }, { order_by => 'name DESC'})->all;
 cmp_ok(@art, '==', 3, "Three artists returned");

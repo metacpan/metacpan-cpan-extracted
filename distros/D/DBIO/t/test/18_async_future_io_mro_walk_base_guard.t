@@ -7,7 +7,7 @@ use DBIO::Storage::Async;
 use DBIO::Storage::DBI;
 use DBIO::Test::Storage;
 
-# karr #67 -- ADR 0030, second future_io refinement: the generic-base STOP
+# ADR 0030, second future_io refinement: the generic-base STOP
 # boundary.
 #
 # See t/test/17_async_future_io_mro_walk.t for the rest of the MRO-walk RED
@@ -18,7 +18,7 @@ use DBIO::Test::Storage;
 # BEFORE the generic DBIO::Storage::DBI base itself (concretely: stop when
 # $pkg eq 'DBIO::Storage::DBI', never probing 'DBIO::Storage::DBI::Async' or
 # anything further up). A hypothetical generic add-on that claims future_io
-# for every driver by planting a base-level ::Async is EXACTLY what karr #65
+# for every driver by planting a base-level ::Async is EXACTLY what ADR 0030
 # already banned for the registry/explicit-registration path; this walk must
 # not reopen that hole by convention.
 #

@@ -9,12 +9,15 @@ BEGIN {
     or plan skip_all => 'Moo not installed';
 }
 
-use DBIO::Test::Schema::MooCake;
+use DBIO::Test::MooCakeSchema;
 
 # -----------------------------------------------------------------------
 # Connect to in-memory SQLite and deploy
 # -----------------------------------------------------------------------
-my $schema = DBIO::Test::Schema::MooCake->connect('dbi:SQLite::memory:', '', '', {
+# the shared schema declares no driver; this use declares SQLite
+my $schema = DBIO::Test::MooCakeSchema->clone;
+$schema->storage_type('DBIO::SQLite::Storage');
+$schema = $schema->connect('dbi:SQLite::memory:', '', '', {
   quote_names => 0,
 });
 $schema->deploy;
@@ -88,7 +91,7 @@ subtest 'CD: create with has_many relationship' => sub {
 
 subtest 'CD uses default ResultSet' => sub {
   isa_ok( $cd_rs, 'DBIO::ResultSet' );
-  ok( !$cd_rs->isa('DBIO::Test::Schema::MooCake::ResultSet::CD'),
+  ok( !$cd_rs->isa('DBIO::Test::MooCakeSchema::ResultSet::CD'),
     'no custom CD ResultSet' );
 };
 

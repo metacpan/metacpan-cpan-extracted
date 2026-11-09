@@ -4,6 +4,8 @@ package DBIO::Firebird::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -39,14 +41,14 @@ sub fetch {
     $cname =~ s/\s+$//;
 
     $by_constraint{$cname} //= {
-      fk_id        => $cname,
-      from_table   => $table,
-      from_columns => [],
-      to_table     => $to_table,
-      to_columns   => [],
-      on_update    => _trim($row->{'rdb$update_rule'}),
-      on_delete    => _trim($row->{'rdb$delete_rule'}),
-      match        => _trim($row->{'rdb$match_option'}),
+      constraint_name => $cname,
+      from_table      => $table,
+      from_columns    => [],
+      to_table        => $to_table,
+      to_columns      => [],
+      on_update       => _trim($row->{'rdb$update_rule'}),
+      on_delete       => _trim($row->{'rdb$delete_rule'}),
+      match           => _trim($row->{'rdb$match_option'}),
     };
     my $col = $row->{from_column};
     $col =~ s/\s+$//;
@@ -104,7 +106,7 @@ DBIO::Firebird::Introspect::ForeignKeys - Introspect Firebird foreign keys via r
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -119,7 +121,7 @@ grouped by constraint name.
     my $fks = DBIO::Firebird::Introspect::ForeignKeys->fetch($dbh, $tables);
 
 Returns a hashref keyed by table name, each value an arrayref of FK
-hashrefs with: C<fk_id>, C<from_columns>, C<to_table>, C<to_columns>,
+hashrefs with: C<constraint_name>, C<from_columns>, C<to_table>, C<to_columns>,
 C<on_update>, C<on_delete>, C<match>.
 
 =head1 AUTHOR

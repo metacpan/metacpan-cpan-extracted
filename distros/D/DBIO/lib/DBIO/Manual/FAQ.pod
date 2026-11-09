@@ -13,7 +13,7 @@ DBIO::Manual::FAQ - Frequently Asked Questions (in theory)
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -153,10 +153,11 @@ relationship in the fullest sense.  For more info, read the documentation on L<D
 
 =item .. stop DBIO from attempting to cascade deletes on my has_many and might_have relationships?
 
-By default, DBIO cascades deletes and updates across
-C<has_many> and C<might_have> relationships. You can disable this
-behaviour on a per-relationship basis by supplying
-C<< cascade_delete => 0 >> in the relationship attributes.
+By default, DBIO cascades deletes across C<has_many>, C<has_one>
+and C<might_have> relationships, and updates across C<has_one> and
+C<might_have> relationships. You can disable this behaviour on a
+per-relationship basis by supplying C<< cascade_delete => 0 >> (or
+C<< cascade_update => 0 >>) in the relationship attributes.
 
 The cascaded operations are performed after the requested delete or
 update, so if your database has a constraint on the relationship, it
@@ -245,11 +246,13 @@ for the join used by each relationship.
 
 =item .. create joins with conditions other than column equality?
 
-Currently, L<DBIO> can only create join conditions using
-equality, so you're probably better off creating a C<view> in your
-database, and using that as your source. A C<view> is a stored SQL
-query, which can be accessed similarly to a table, see your database
-documentation for details.
+Declare the relationship with a custom join condition: a coderef
+that returns an L<SQL::Abstract> structure, which is used as the C<ON>
+clause of the join. See L<DBIO::Relationship::Base/Custom join conditions>.
+
+Alternatively, create a C<view> in your database and use that as your
+source. A C<view> is a stored SQL query, which can be accessed similarly
+to a table, see your database documentation for details.
 
 =item .. search with an SQL function on the left hand side?
 
@@ -270,11 +273,12 @@ documentation.
 To make Oracle behave like most RDBMS use on_connect_do to issue
 alter session statements on database connection establishment:
 
- ->on_connect_do("ALTER SESSION SET NLS_COMP = 'LINGUISTIC'");
- ->on_connect_do("ALTER SESSION SET NLS_SORT = '<NLS>_CI'");
- e.g.
- ->on_connect_do("ALTER SESSION SET NLS_SORT = 'BINARY_CI'");
- ->on_connect_do("ALTER SESSION SET NLS_SORT = 'GERMAN_CI'");
+ $schema = MyApp::Schema->connect($dsn, $user, $pass, {
+   on_connect_do => [
+     "ALTER SESSION SET NLS_COMP = 'LINGUISTIC'",
+     "ALTER SESSION SET NLS_SORT = '<NLS>_CI'",   # e.g. 'BINARY_CI', 'GERMAN_CI'
+   ],
+ });
 
 =item .. format a DateTime object for searching?
 
@@ -348,7 +352,7 @@ See also L<DBIO::Manual::Cookbook/Retrieve one and only one row from a resultset
 A less readable way is to ask a regular search to return 1 row, using
 L<DBIO::ResultSet/slice>:
 
-  ->search->(undef, { order_by => "id DESC" })->slice(0)
+  ->search(undef, { order_by => "id DESC" })->slice(0)->single
 
 which (if supported by the database) will use LIMIT/OFFSET to hint to the
 database that we really only need one row. This can result in a significant
@@ -403,7 +407,7 @@ primary key field from the sequence. To help DBIO find the next
 key value, you can tell it the name of the sequence in the
 C<column_info> supplied with C<add_columns>.
 
- ->add_columns({ id => { sequence => 'mysequence', auto_nextval => 1 } });
+ ->add_columns( id => { sequence => 'mysequence', auto_nextval => 1 } );
 
 =item .. insert many rows of data efficiently?
 
@@ -420,11 +424,13 @@ the rows at once.
 
 =item .. update a column using data from another column?
 
-To stop the column name from being quoted, you'll need to tell DBIO
-that the right hand side is an SQL identifier (it will be quoted
-properly if you have quoting enabled):
+A column value is a value, so copying another column is written as explicit
+literal SQL. The identifier is quoted in the literal itself:
 
- ->update({ somecolumn => { -ident => 'othercolumn' } })
+ ->update({ somecolumn => \[ '"othercolumn"' ] }, { all => 1 })
+
+The C<< { all => 1 } >> is for a resultset without a condition (every row of
+the table); after a C<search> it is not needed.
 
 This method will not retrieve the new value and put it in your Row
 object. To fetch the new value, use the C<discard_changes> method on
@@ -441,31 +447,19 @@ the Row.
 
 To update and refresh at once, chain your calls:
 
-  $result->update({ 'somecolumn' => { -ident => 'othercolumn' } })->discard_changes;
+  $result->update({ 'somecolumn' => \[ '"othercolumn"' ] })->discard_changes;
 
 =item .. store JSON/YAML in a column and have it deflate/inflate automatically?
 
-You can use L<DBIO::InflateColumn> to accomplish YAML/JSON storage transparently.
+Load L<DBIO::InflateColumn::Serializer> and name a serializer class for the
+column:
 
-If you want to use JSON, then in your table schema class, do the following:
+ __PACKAGE__->load_components('InflateColumn::Serializer');
+ __PACKAGE__->add_columns(
+     my_column => { data_type => 'text', serializer_class => 'JSON' },
+ );
 
- use JSON;
-
- __PACKAGE__->add_columns(qw/ ... my_column ../)
- __PACKAGE__->inflate_column('my_column', {
-     inflate => sub { jsonToObj(shift) },
-     deflate => sub { objToJson(shift) },
- });
-
-For YAML, in your table schema class, do the following:
-
- use YAML;
-
- __PACKAGE__->add_columns(qw/ ... my_column ../)
- __PACKAGE__->inflate_column('my_column', {
-     inflate => sub { YAML::Load(shift) },
-     deflate => sub { YAML::Dump(shift) },
- });
+See L<DBIO::InflateColumn::Serializer> for the available serializer classes.
 
 This technique is an easy way to store supplemental unstructured data in a table. Be
 careful not to overuse this capability, however. If you find yourself depending more
@@ -562,7 +556,8 @@ See also L<DBIO::Relationship/has_many>.
 
 =item See the SQL statements my code is producing?
 
-Set the shell environment variable C<DBIO_TRACE> to a true value.
+Set the shell environment variable C<DBIO_TRACE> to C<1> for the statements,
+or to C<2> to see the (redacted, 32-character) bind values as well.
 
 For more info see L<DBIO::Storage> for details of how
 to turn on debugging in the environment, pass your own filehandle to
@@ -583,9 +578,9 @@ it should operate on, for example to delete or update.  However, a
 UNIQUE constraint on one or more columns allows DBIO to uniquely
 identify the row, so you can tell L<DBIO::ResultSource> these
 columns act as a primary key, even if they don't from the database's
-point of view:
+point of view. In the Result class:
 
- $resultset->set_primary_key(@column);
+ __PACKAGE__->set_primary_key(@columns);
 
 =item How do I make my program start faster?
 

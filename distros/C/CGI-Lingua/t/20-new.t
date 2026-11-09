@@ -31,7 +31,7 @@ LANGUAGES: {
 	}
 
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
-        delete $ENV{'REMOTE_ADDR'};
+	delete $ENV{'REMOTE_ADDR'};
 	my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
@@ -39,7 +39,7 @@ LANGUAGES: {
 	ok($l->requested_language() eq 'Unknown');
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = '';
-        $ENV{'REMOTE_ADDR'} = '66.249.67.232';	# Google
+	$ENV{'REMOTE_ADDR'} = '66.249.67.232';	# Google
 	$l = CGI::Lingua->new({supported_languages => ['en', 'fr', 'en-gb', 'en-us']});
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
@@ -50,7 +50,7 @@ LANGUAGES: {
 	}
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-gb,en;q=0.5';
-        delete $ENV{'REMOTE_ADDR'};
+	delete $ENV{'REMOTE_ADDR'};
 	$l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
 	ok(defined $l);
 	ok($l->isa('CGI::Lingua'));
@@ -75,7 +75,7 @@ LANGUAGES: {
 	ok($l->language() eq 'Unknown');
 	ok(defined $l->requested_language());
 
-        $ENV{'REMOTE_ADDR'} = '212.159.106.41';
+	$ENV{'REMOTE_ADDR'} = '212.159.106.41';
 	$l = CGI::Lingua->new({
 		supported => ['en', 'fr', 'en-gb', 'en-us'],
 		logger => Test::Log::Abstraction->new()

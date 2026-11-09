@@ -83,3 +83,13 @@ Shipped and test-pinned in `t/20-cypher.t`, hence **accepted**.
   query text, knowingly, not via `\%params`.
 - `JSON::MaybeXS` is pinned (`cpanfile`, `1.004008`) and used canonical+utf8 so
   the encoded bind is stable and round-trips through AGE's `agtype` parser.
+
+## Addendum 2026-10-05 — References by name
+
+The decision and its security boundary are unchanged. The line references above
+(`Storage.pm:116-117`, `:126`, `:9-11`, `:122-124`, `:125-126`) are obsolete.
+The graph-name check, the inlined literal and the single JSON `agtype` bind all
+live in `_cypher_sql_bind` in `lib/DBIO/PostgreSQL/Age/Storage.pm`; the
+canonical utf8 `JSON::MaybeXS` instance is the module-level `$JSON` in that
+file. `cypher` calls `_cypher_sql_bind` first, so the validation still runs
+before any SQL is built or executed.

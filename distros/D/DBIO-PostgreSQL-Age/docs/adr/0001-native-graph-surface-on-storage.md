@@ -94,3 +94,24 @@ live create/match/param in `t/10-age-live.t`), hence **accepted**.
 - `_cypher_sql_bind` is the offline-test seam: any change to the emitted AGE SQL
   must keep `t/20-cypher.t` honest, and the security boundary it enforces is the
   subject of ADR 0002.
+
+## Addendum 2026-10-05 — Wording and references brought up to date
+
+The decision stands (graph surface as direct methods on the AGE storage, no
+`age_*` prefix). Corrections to the text above:
+
+- "Storage subclass" / "subclass" is outdated wording: `DBIO::PostgreSQL::Age::Storage`
+  is a storage **layer** composed over the resolved PostgreSQL driver storage
+  (see the addendum of 2026-10-05 in ADR 0003). The "storage is an
+  `DBIO::PostgreSQL::Age::Storage`" argument for the no-prefix choice still holds
+  for the layer's own methods.
+- The line references (`Storage.pm:97-106`, `:119`, `:66-85`, `:110-129`) are
+  obsolete; the subs are `cypher`, `create_graph`, `drop_graph` and
+  `_cypher_sql_bind` in `lib/DBIO/PostgreSQL/Age/Storage.pm`.
+- The surface has grown since: `cypher` takes an optional fifth `\%opts`
+  argument, and `auto_decode => 1` applies `decode_agtype` to every cell of the
+  result rows. `decode_agtype` is also callable directly to decode a single
+  agtype text value. The default (no option) still returns raw agtype strings,
+  so "the caller owns agtype decoding" holds unless `auto_decode` is requested.
+- `cypher_async`, `create_graph_async` and `drop_graph_async` exist as async
+  counterparts of the three methods.

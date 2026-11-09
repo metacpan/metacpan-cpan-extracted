@@ -4,6 +4,8 @@ package DBIO::Storage::DBI::Cursor;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Cursor';
 
 use Try::Tiny;
@@ -131,6 +133,15 @@ sub all {
 }
 
 
+sub is_exhausted { $_[0]->{_done} ? 1 : 0 }
+
+
+sub position { $_[0]->{_pos} || 0 }
+
+
+sub mark_exhausted { $_[0]->{_done} = 1 }
+
+
 sub sth {
   my $self = shift;
 
@@ -207,7 +218,7 @@ DBIO::Storage::DBI::Cursor - Object representing a query cursor on a resultset.
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -278,6 +289,25 @@ values (the result of L<DBI/fetchrow_array> method).
 
 Returns a list of arrayrefs of column values for all rows in the
 L<DBIO::ResultSet>.
+
+=head2 is_exhausted
+
+Returns true once the cursor has yielded its final row via L</next> (or was
+explicitly retired via L</mark_exhausted>) without an intervening L</reset>;
+false otherwise. Reads the internal C<_done> flag.
+
+=head2 position
+
+Returns the number of rows handed out via L</next> since the cursor was
+created or last L</reset>; C<0> if none have been fetched yet. Reads the
+internal C<_pos> counter.
+
+=head2 mark_exhausted
+
+Flags the cursor as fully consumed I<without> resetting it, so a subsequent
+L</next> returns nothing. Sets the internal C<_done> flag. Lets the collapse
+fast-path in L<DBIO::ResultSet> retire a cursor after draining it via a
+stealth L</all>.
 
 =head2 sth
 

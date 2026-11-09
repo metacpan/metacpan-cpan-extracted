@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use FindBin;
 use Cwd;
+use Scalar::Util 'blessed';
 use Test::More;
 
 # Resolve the dist root: the parent of t/ when the test was rewritten from
@@ -24,6 +25,13 @@ chdir $dist_root or die "chdir $dist_root: $!"
 my $THRESHOLD = 80;
 
 if (! -d 'cover_db') {
+  # A release without a coverage run is a failed release: the gate must not
+  # pass by having nothing to look at.
+  if ($ENV{RELEASE}) {
+    fail('No cover_db/ under RELEASE=1 -- run with HARNESS_PERL_SWITCHES=-MDevel::Cover');
+    done_testing;
+    exit;
+  }
   plan skip_all => 'No cover_db/ -- run with HARNESS_PERL_SWITCHES=-MDevel::Cover';
 }
 
@@ -37,6 +45,10 @@ my $db = Devel::Cover::DB->new(db => 'cover_db');
 unless ($db->is_valid) {
   plan skip_all => 'cover_db/ is not a valid Devel::Cover database';
 }
+
+# A coverage run leaves runs/ only; the merged database is what `cover` makes.
+# Do the merge here, so a fresh cover_db is scored rather than skipped (k12).
+$db->merge_runs;
 
 # Materialise the merged run data. Devel::Cover::DB->cover is lazy: it
 # reads structure + runs on first call and returns a Cover handle.
@@ -67,7 +79,7 @@ for my $file (sort $cover->items) {
     # a statement with val > 0 was executed.
     for my $stmt (@$loc_data) {
       $c_total++;
-      $c_covered++ if ref($stmt) && $stmt->can('val') && $stmt->val > 0;
+      $c_covered++ if blessed($stmt) && $stmt->can('val') && $stmt->val > 0;
     }
   }
 
@@ -85,7 +97,7 @@ if (!$total) {
 my $overall = sprintf '%.1f', 100 * $covered / $total;
 
 my $strict = $ENV{COVERAGE_STRICT} || $ENV{RELEASE};
-my @diag = map { "  $_->{file}: $_->{pct}%$_->{note}" } @per_module;
+my @diag = map { "  $_->{file}: $_->{pct}%" . (defined $_->{note} ? " ($_->{note})" : '') } @per_module;
 
 if ($overall + 0 >= $THRESHOLD) {
   pass("statement coverage $overall% >= $THRESHOLD%");

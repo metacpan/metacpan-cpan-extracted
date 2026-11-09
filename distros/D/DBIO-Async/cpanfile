@@ -1,6 +1,6 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900001';
+requires 'DBIO', '0.900004';
 requires 'Future', '0.52';
 requires 'Future::IO', '0.23';
 

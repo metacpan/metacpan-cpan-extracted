@@ -4,6 +4,8 @@ package DBIO::PostgreSQL::Introspect::Schemas;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::PostgreSQL::Introspect ();
 
 
@@ -20,6 +22,7 @@ sub fetch {
     WHERE 1=1
   };
   $sql .= DBIO::PostgreSQL::Introspect->system_schema_filter('n');
+  $sql .= DBIO::PostgreSQL::Introspect->extension_member_filter('pg_namespace', 'n.oid');
 
   my @bind;
   if ($filter && @$filter) {
@@ -57,12 +60,20 @@ DBIO::PostgreSQL::Introspect::Schemas - Introspect PostgreSQL schemas (namespace
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Fetches PostgreSQL schema (namespace) metadata from C<pg_catalog.pg_namespace>.
-System schemas (C<pg_*> and C<information_schema>) are excluded.
+System schemas (C<pg_*> and C<information_schema>) are excluded, and so is a
+schema an installed extension owns (a C<pg_depend> row of deptype C<e>): one
+the extension's script created, which C<DROP EXTENSION> takes with it. A
+schema C<CREATE EXTENSION> itself creates because the control file names it
+(C<schema = ...>) is not owned by the extension -- C<DROP EXTENSION> leaves it
+behind -- and is reported like any other. The dependency runs the other way,
+the extension on the schema, which is why L<DBIO::PostgreSQL::Diff> creates a
+schema ahead of the extensions and drops it after them
+(L<DBIO::PostgreSQL::Diff/ORDER OF OPERATIONS>).
 
 =head1 METHODS
 

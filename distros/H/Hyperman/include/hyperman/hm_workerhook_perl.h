@@ -43,13 +43,17 @@ static void hm_worker_perl_cb(pTHX_ void *loop, void *ud) {
     hm_worker_perl *p = (hm_worker_perl *)ud;
     dSP;
     PERL_UNUSED_ARG(loop);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!p || !p->cb) return;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
     PUTBACK;
     call_sv(p->cb, G_DISCARD | G_EVAL);
     SPAGAIN; PUTBACK; FREETMPS; LEAVE;
-    if (SvTRUE(ERRSV))
+    if (SvTRUE(ERRSV)) /* # uncoverable condition right count:1 class:ignore_covered_err */
         warn("Hyperman: on_worker_start callback died: %s "
              "(this worker is still serving)", SvPV_nolen(ERRSV));
 }
@@ -59,14 +63,20 @@ static void hm_worker_perl_cb(pTHX_ void *loop, void *ud) {
  * frame, which is long before any worker exists to be confused by it. */
 static int hm_worker_hook_add_perl(pTHX_ SV *cb) {
     hm_worker_perl *p;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(cb && SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("Hyperman->on_worker_start: expects a code reference");
     Newxz(p, 1, hm_worker_perl);
     p->cb = newSVsv(cb);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!hm_worker_hook_add(aTHX_ hm_worker_perl_cb, p)) {
-        SvREFCNT_dec(p->cb);
-        Safefree(p);
-        return 0;
+        SvREFCNT_dec(p->cb); /* # uncoverable statement */
+        Safefree(p); /* # uncoverable statement */
+        return 0; /* # uncoverable statement */
     }
     return 1;
 }

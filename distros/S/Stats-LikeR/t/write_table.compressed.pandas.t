@@ -57,9 +57,9 @@ BEGIN {
 my $dir = File::Temp::tempdir(CLEANUP => 1);
 sub path { File::Spec->catfile($dir, @_) }
 
-# The line end a plain write_table file gets: PerlIO_open()'s default layers,
-# which are :crlf where perl is a CRLF shop (Windows), and a compressed file
-# holds the same text. Literals below are written with \n and put through nl().
+# The row end a write_table file gets: "\r\n" where perl is a CRLF shop
+# (Windows), which is where a '>' open gets :crlf, and "\n" elsewhere; a
+# compressed file holds the same text. Literals below are written with \n and put through nl().
 my $NL = do {
 	open my $fh, '>', path('nl.probe') or die "cannot write a probe: $!\n";
 	my $crlf = grep { $_ eq 'crlf' } PerlIO::get_layers($fh);

@@ -395,6 +395,9 @@ t/test_suite_2.5/negative/34-iban/rules.json
 t/test_suite_2.5/negative/35-object_or_list/errors.json
 t/test_suite_2.5/negative/35-object_or_list/input.json
 t/test_suite_2.5/negative/35-object_or_list/rules.json
+t/test_suite_2.5/negative/36-url/errors.json
+t/test_suite_2.5/negative/36-url/input.json
+t/test_suite_2.5/negative/36-url/rules.json
 t/test_suite_2.5/positive/01-boolean/input.json
 t/test_suite_2.5/positive/01-boolean/output.json
 t/test_suite_2.5/positive/01-boolean/rules.json
@@ -502,6 +505,9 @@ t/test_suite_2.5/positive/34-iban/rules.json
 t/test_suite_2.5/positive/35-object_or_list/input.json
 t/test_suite_2.5/positive/35-object_or_list/output.json
 t/test_suite_2.5/positive/35-object_or_list/rules.json
+t/test_suite_2.5/positive/36-url/input.json
+t/test_suite_2.5/positive/36-url/output.json
+t/test_suite_2.5/positive/36-url/rules.json
 t/test_suite_2.5/schema_errors/001-boolean_with_argument/rules.json
 t/test_suite_2.5/schema_errors/002-boolean_with_list_argument/rules.json
 t/test_suite_2.5/schema_errors/003-not_one_of_without_values/rules.json

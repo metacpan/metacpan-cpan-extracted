@@ -1,5 +1,123 @@
 Revision history for DBIO-Async
 
+0.900004  2026-11-08
+    * Timeouts and limits
+        - The connect option statement_timeout (seconds, 0 or absent for
+          none) bounds the time a statement may take on the wire, pooled and
+          pinned. A statement that runs out is cancelled, its connection is
+          retired and the caller's Future fails with "statement timed out
+          after N seconds (statement_timeout)", never naming SQL or binds.
+        - The connect option max_pending_pinned bounds the statements that
+          wait on a pinned connection; the statement over the limit fails at
+          once and the queue stays as it was.
+        - Both are checked on connect, the message naming the option and its
+          form, never the value. The options of core's pool (acquire_timeout,
+          max_waiters, reset_timeout) reach it as well; see the POD section
+          TIMEOUTS AND LIMITS and ADR 0010.
+
+    * Trace
+        - The trace of a statement runs through the debug object of the
+          owning storage and its redact_bind_value hook, as the sync path
+          does, and reaches its debugfh. DBIO_TRACE=1 shows the SQL,
+          DBIO_TRACE=2 and up the bind values too, redacted and cut to 32
+          characters each (ADR 0009).
+        - The redact_bind_value hook is handed the column name and the bind
+          attributes, so an encode_column bind shows as *** and a hook can
+          decide by column. query_end is called when the statement has
+          settled, pooled and pinned. _query_async and _query_async_pinned
+          take the optional $bind_attrs for the trace; the wire gets the bare
+          values.
+
+    * Pool
+        - A blocking call that has to wait for a pool connection waits: the
+          pool answers core's _new_waiter seam with the new
+          DBIO::Async::Future, whose await drives Future::IO on the
+          implementation that is loaded. A blocking wait that dies withdraws
+          its waiter, so the pool never hands a connection to a Future nobody
+          reads (ADR 0008, refines ADR 0001).
+        - Readiness is gated at core's _connection_ready_future seam. A
+          connection retired while it comes up lets go of its readiness poll
+          and fails its readiness wait, so core offers the slot to the next
+          caller.
+        - An idle connection whose server session ended is retired before it
+          is handed out: the pool asks the new storage seam
+          _idle_connection_alive, which answers without a round trip and
+          defaults to true.
+
+    * Storage
+        - A pooled statement hands the lease of its borrow back with the
+          connection, so a statement that completes after its connection went
+          on cannot put the connection on the idle list a second time.
+        - The storage holds every statement it put on the wire until it
+          settles. A query whose Future is dropped (create_async in void
+          context) is carried through, its connection handed back once or
+          retired. A statement in flight when the storage is disconnected or
+          its pool shut down fails, saying its connection was closed under it
+          and that whether it took effect is unknown (ADR 0007).
+        - A connection the pool closed is sent nothing more, and a forked
+          child settles nothing of its parent's statements.
+        - A pooled query cancelled in flight retires its connection, so the
+          next borrower never gets a busy connection with a result unread.
+        - A dispatch that dies synchronously, or a seam that returns no
+          Future, fails the query with an error naming the backend class and
+          the seam; the connection is released and the queue keeps running.
+        - The driver seam _conn_error_is_fatal($conn, $error) classifies a
+          failed query's connection: a true answer retires the connection.
+          Nothing more is sent on a pinned connection reported dead, and core
+          sends no ROLLBACK on it (ADR 0006).
+        - Statements on one pinned connection are serialised: a statement is
+          dispatched once the one before it has settled, in issue order, so
+          two statements issued on a transaction context without awaiting the
+          first never share the wire. A synchronous statement inside a
+          transaction block is dispatched at once (see the POD section THE
+          PINNED STATEMENT QUEUE).
+        - A bind arrayref and the collect callback hold no SQL or binds
+          beyond the dispatch. Transaction-context seams answer
+          with defaults, and the Future::IO watcher seam mints its Futures
+          through future_class.
+
+    * Connect info
+        - _async_broker_conninfo reads every built-in AccessBroker answer: a
+          DBI-form list with its DBIO-private attributes stripped, a hash of
+          connection parameters with a dbname turned into a DSN through the
+          owning sync storage, a hash with a dsn, or a [ \%conninfo, \%opts ]
+          pair. Any other answer croaks naming its shape, never its values.
+        - The DBD attributes given beside the broker are merged into every
+          connection built from such an answer; different values for one
+          setting throw naming it. A broker's DSN-dbname takes host and port
+          out of the DBD attributes, and a host or port set beside it refuses
+          the connection, naming the keys.
+        - A connection opened after the broker was detached croaks "has no
+          AccessBroker attached to ask for connect info".
+
+    * LISTEN/NOTIFY
+        - The Future::IO listen seams are implemented here once for every
+          future_io driver: _listen_delay, _listen_watch, _listen_unwatch and
+          _notify_send. A driver adds _listen_drain and _notify_sql and
+          declares listen and notify itself (ADR 0005).
+        - The watch loop runs socket-driven by default, or timer-driven when
+          _listen_poll_interval returns a positive number of seconds, for
+          emulations. A callback that unlistens or reconnects mid-batch stops
+          the batch, and a forked child never reads the parent's socket.
+
+    * Future::IO
+        - The POD section FUTURE::IO IMPLEMENTATIONS states what the built-in
+          implementation and IO::Async do with the transport's polls
+          (Future::IO 0.23, IO::Async 0.805): a poll cancelled from another
+          poll's callback, a cancelled poll's watch, a blocking call in a
+          callback. The transport works around none of it.
+
+    * Documentation
+        - ADRs 0001 to 0004 carry dated addenda that match the code; ADR 0003
+          says what the pipeline bracket guarantees, ADR 0002 that pipeline
+          and txn_do_async are not plain delegations of the context.
+        - The README and POD describe the synopsis, the seams (with =method
+          headings for the driver seams) and the base class the entry point
+          derives from as they are.
+
+    * Dependencies
+        - Requires DBIO 0.900004.
+
 0.900001  2026-07-12
     First release. The shared, loop-agnostic async layer for DBIO drivers.
 

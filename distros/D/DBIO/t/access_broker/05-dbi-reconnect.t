@@ -53,7 +53,7 @@ require DBI;
 
 my @connect_calls;
 {
-  no warnings 'redefine';
+  no warnings qw(redefine once);
   local *DBI::connect = sub {
     push @connect_calls, [@_];
     return TestDBH->new;
@@ -74,20 +74,29 @@ is $connect_calls[1][1], 'dbi:SQLite:dbname=:memory:3',
 is $connect_calls[0][2], 'user_2', 'first DBI connect uses fresh broker username';
 is $connect_calls[1][2], 'user_3', 'second DBI connect uses refreshed broker username';
 is $broker->{calls}, 3, 'broker was consulted on initial normalize and both connects';
+# karr k266 replaced the claim "the storage keeps the most recent
+# broker-derived DBI connect info": a copy of an answer the broker may have
+# rotated away is only ever stale, and holding the password is a risk for
+# nothing. The storage holds nothing; _dbi_connect_info is the broker's
+# answer of the moment it is read (so it asks the broker once more).
+is $storage->{_dbi_connect_info}, undef,
+  'storage holds no copy of the broker-derived DBI connect info';
 is_deeply(
   $storage->_dbi_connect_info,
   [
-    'dbi:SQLite:dbname=:memory:3',
-    'user_3',
-    'pass_3',
+    'dbi:SQLite:dbname=:memory:4',
+    'user_4',
+    'pass_4',
     {
       AutoCommit         => 1,
       PrintError         => 0,
       RaiseError         => 1,
-      ShowErrorStatement => 1,
+      ShowErrorStatement => 0,
     },
   ],
-  'storage keeps the most recent broker-derived DBI connect info',
+  '... reading _dbi_connect_info gives the broker\'s current answer, not the last connection\'s',
 );
+is $broker->{calls}, 4, '... asking the broker once for the read';
+is $storage->{_dbi_connect_info}, undef, '... and keeps nothing of it';
 
 done_testing;

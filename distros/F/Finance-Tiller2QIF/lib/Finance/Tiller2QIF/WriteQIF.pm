@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::WriteQIF;
 # ABSTRACT: Write transactions to QIF format
-$Finance::Tiller2QIF::WriteQIF::VERSION = '1.21';
+$Finance::Tiller2QIF::WriteQIF::VERSION = '1.23';
 =encoding utf8
 
 =head1 DESCRIPTION

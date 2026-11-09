@@ -12,6 +12,12 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok();
 
 __END__
+GeoIP
+GeoLite
+MaxMind
+mmdb
+libmaxminddb
+geoipupdate
 AnnoCPAN
 CGI
 CPAN

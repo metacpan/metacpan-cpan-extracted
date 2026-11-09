@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Artwork_to_Artist;
 # ABSTRACT: Test result class for the artwork_to_artist table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Test::BaseResult';
@@ -70,7 +73,7 @@ DBIO::Test::Schema::Artwork_to_Artist - Test result class for the artwork_to_art
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

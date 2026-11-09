@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 sub integer {
     return sub {

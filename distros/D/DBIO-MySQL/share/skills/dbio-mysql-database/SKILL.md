@@ -1,6 +1,6 @@
 ---
 name: dbio-mysql-database
-description: "MySQL and MariaDB knowledge for Perl driver development (DBD::mysql, storage engines, charset, MariaDB differences)"
+description: Use when you need MySQL or MariaDB specifics for driver work — DBD::mysql, storage engines, character sets, the MariaDB differences.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet

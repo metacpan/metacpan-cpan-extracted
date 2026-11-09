@@ -3,13 +3,15 @@ package DBIO::Storage::TxnScopeGuard;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Try::Tiny;
 use Scalar::Util qw(weaken blessed refaddr);
 use DBIO;
 use DBIO::Util qw(is_exception is_windows);
 use DBIO::Carp;
 use namespace::clean;
-
 
 sub new {
   my ($class, $storage) = @_;
@@ -41,22 +43,18 @@ sub new {
   $guard;
 }
 
-
 sub commit {
   my $self = shift;
 
   $self->{storage}->throw_exception("Refusing to execute multiple commit/rollbacks on scope guard $self")
     if $self->{inactivated};
 
-  # FIXME - this assumption may be premature: a commit may fail and a rollback
-  # *still* be necessary. Currently I am not aware of such scenarious, but I
-  # also know the deferred constraint handling is *severely* undertested.
-  # Making the change of "fire txn and never come back to this" in order to
-  # address RT#107159, but this *MUST* be reevaluated later.
+  # A commit that fails ends the transaction: txn_commit resets the storage's
+  # transaction state, tries the rollback itself and rethrows the commit's
+  # error (karr k372). Nothing is left for the guard to roll back.
   $self->{inactivated} = 1;
   $self->{storage}->txn_commit;
 }
-
 
 sub rollback {
   my $self = shift;
@@ -112,21 +110,33 @@ sub DESTROY {
     ) ) {
       # append our text - THIS IS A TEMPORARY FIXUP!
       # a real stackable exception object is in the works
-      if (ref $exception eq 'DBIO::Exception') {
+      # DBIO::Exception::Server is what the synchronous HandleError throws for
+      # a refused statement (ADR 0062); it has the same {msg} and is ours
+      if (ref $exception eq 'DBIO::Exception'
+        or ref $exception eq 'DBIO::Exception::Server'
+      ) {
         $exception->{msg} = "Transaction aborted: $exception->{msg} "
           ."Rollback failed: ${rollback_exception}";
       }
-      elsif ($exception) {
-        $exception = "Transaction aborted: ${exception} "
-          ."Rollback failed: ${rollback_exception}";
-      }
       else {
+        # Nothing else takes the news along. The inside of a foreign object,
+        # or of a DBIO::Exception subclass, is not ours to write into, and
+        # what gets assigned to $@ below is replaced by the exception in
+        # flight once the stack has unwound. The warning always arrives.
         carp (join ' ',
           "********************* ROLLBACK FAILED!!! ********************",
           "\nA rollback operation failed after the guard went out of scope.",
           'This is potentially a disastrous situation, check your data for',
           "consistency: $rollback_exception"
+          . ( $exception
+            ? "\nThe guard went out of scope while this exception was in flight: $exception"
+            : ''
+          )
         );
+
+        $exception = "Transaction aborted: ${exception} "
+          ."Rollback failed: ${rollback_exception}"
+          if $exception;
       }
     }
   }
@@ -148,7 +158,7 @@ DBIO::Storage::TxnScopeGuard - Scope-based transaction handling
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -185,23 +195,49 @@ Commit the transaction, and stop guarding the scope. If this method is not
 called and this object goes out of scope (e.g. an exception is thrown) then
 the transaction is rolled back, via L<DBIO::Storage/txn_rollback>
 
+If the commit itself fails, the guard is spent all the same and the commit's
+error is thrown: the storage has already reset its transaction state (depth 0),
+tried a rollback and, when that failed as well, discarded the handle (see
+L<DBIO::Storage/txn_commit>). A following statement does not run inside the
+failed transaction.
+
 =head2 rollback
 
 Roll back the transaction, and stop guarding the scope. You can use this to
 avoid the warning when the scope guard goes out of scope, for deliberate
 rollbacks.
 
-=head2 new
+=head1 WHEN THE ROLLBACK FAILS
 
-Begins a transaction and returns a scope guard bound to the supplied storage.
+The rollback a guard issues on going out of scope can fail in turn, and then
+the transaction may still be open on the connection. Where that is reported
+depends on the exception in flight at that point, which to the guard is an
+exception in C<$@> that was not there when the guard was created:
 
-=head2 commit
+=over 4
 
-Commits the transaction and inactivates the guard.
+=item *
 
-=head2 rollback
+Exactly a L<DBIO::Exception>, not a subclass of it: its message becomes
+C<Transaction aborted: $message Rollback failed: $rollback_error>. The caller
+catches the same object, and nothing is warned.
 
-Rolls back the transaction and inactivates the guard.
+=item *
+
+Any other exception - a string, an object of another class, a subclass of
+L<DBIO::Exception>: the guard cannot write into it, so it warns
+C<ROLLBACK FAILED> with the rollback error and the text of that exception.
+An exception that is unwinding the stack reaches the caller as it was thrown.
+
+=item *
+
+No exception: the guard warns C<ROLLBACK FAILED> with the rollback error.
+
+=back
+
+The C<DBIO::Storage::NESTED_ROLLBACK_EXCEPTION> a rollback raises inside an
+enclosing transaction without savepoints (see L<DBIO::Storage/txn_rollback>)
+is not a failure and is not reported: the enclosing transaction rolls back.
 
 =head1 SEE ALSO
 

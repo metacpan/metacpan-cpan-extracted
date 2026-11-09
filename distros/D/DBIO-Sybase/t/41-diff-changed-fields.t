@@ -15,9 +15,13 @@ use_ok 'DBIO::Sybase::Diff::Column';
 use_ok 'DBIO::Sybase::Diff::Index';
 use DBIO::Diff::Compare qw(changed_column_fields changed_index_fields);
 
+# `size` is modelled deliberately (karr k32): changed_column_fields compares it
+# as a `dim` field, so a helper that never produced one left the size axis of
+# the sameness gate untested here.
 sub col {
   my ($name, %o) = @_;
   +{ column_name => $name, data_type => $o{type} // 'integer',
+     size => $o{size},
      not_null => $o{not_null} // 0, default_value => $o{default} };
 }
 sub idx {
@@ -38,6 +42,28 @@ sub idx {
   );
   ok(scalar(@diff), 'differing columns => non-empty changed-field list (truthy)');
   ok((grep { $_ eq 'data_type' } @diff), 'data_type reported as changed');
+}
+{
+  # size is compared as a `dim` field -- order-preserving, so [10,2] and [2,10]
+  # differ -- and it obeys the same desired-state skip as the scalar fields:
+  # a target leaving it undef prescribes nothing and the live width stands.
+  my @same = changed_column_fields(
+    col('name', type => 'varchar', size => 64),
+    col('name', type => 'varchar', size => 64),
+  );
+  is_deeply(\@same, [], 'equal sizes => no changed fields');
+
+  my @wider = changed_column_fields(
+    col('name', type => 'varchar', size => 64),
+    col('name', type => 'varchar', size => 128),
+  );
+  is_deeply(\@wider, ['size'], 'size-only change reported, and only size');
+
+  my @unprescribed = changed_column_fields(
+    col('name', type => 'varchar', size => 64),
+    col('name', type => 'varchar'),
+  );
+  is_deeply(\@unprescribed, [], 'a target prescribing no size leaves the live width alone');
 }
 {
   my $same = idx('ix', unique => 1, columns => ['a', 'b']);

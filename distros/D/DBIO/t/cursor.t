@@ -15,7 +15,7 @@ use DBIO::Test;
 #
 # Mock-only (CLAUDE.md): DBIO::Test::Storage's fake cursor returns exactly the
 # raw arrayrefs registered via ->mock, after routing the select args through
-# $storage->_select_args (karr #55), so the round trip we assert is the same
+# $storage->_select_args, so the round trip we assert is the same
 # raw-value contract a real DBIO::Storage::DBI::Cursor exposes.
 
 my $schema  = DBIO::Test->init_schema(no_deploy => 1);
@@ -57,7 +57,7 @@ subtest 'cursor->all yields every row as an arrayref of raw values' => sub {
   ], 'all returns the full row set, each row a raw-value arrayref';
 };
 
-subtest 'the captured SQL is the SQL a real cursor would have run (karr #55)' => sub {
+subtest 'the captured SQL is the SQL a real cursor would have run' => sub {
   $storage->reset_captured;
   $storage->mock(qr/SELECT.*FROM cd\b/is, [ [ 1, 'x', '1999' ] ]);
 

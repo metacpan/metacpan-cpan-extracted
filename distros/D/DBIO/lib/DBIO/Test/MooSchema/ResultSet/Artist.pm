@@ -1,11 +1,13 @@
 package DBIO::Test::MooSchema::ResultSet::Artist;
 # ABSTRACT: Custom Moo-based ResultSet for the artist source
 
+our $VERSION = '0.900004';
+
 use Moo;
 extends 'DBIO::ResultSet';
 
 # For Moo extending a non-Moo class: pass constructor args through unchanged.
-# DBIO::ResultSet::new takes ($source_handle, \%attrs) — no filtering needed.
+# DBIO::ResultSet::new takes ($result_source, \%attrs) — no filtering needed.
 sub FOREIGNBUILDARGS { my ($class, @args) = @_; return @args }
 
 # ResultSet-level Moo attribute
@@ -34,7 +36,7 @@ DBIO::Test::MooSchema::ResultSet::Artist - Custom Moo-based ResultSet for the ar
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

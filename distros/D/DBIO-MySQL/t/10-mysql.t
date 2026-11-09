@@ -16,7 +16,18 @@ my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_MYSQL_${_}" } qw/DSN USER PASS/}
 plan skip_all => 'Set $ENV{DBIO_TEST_MYSQL_DSN}, _USER and _PASS to run this test'
   unless ($dsn && $user);
 
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, { quote_names => 1 });
+# A schema always declares its driver (core ADR 0067), and DBIO::Test::Schema
+# keeps none in its class: declare the storage class the DSN's DBD is
+# registered for -- DBIO::MySQL::Storage::MariaDB for a dbi:MariaDB: DSN.
+my $test_schema = DBIO::Test::Schema->clone;
+$test_schema->storage_type(
+  $dsn =~ /\Adbi:MariaDB:/i ? '+DBIO::MySQL::Storage::MariaDB' : '+DBIO::MySQL::Storage'
+);
+
+# the process whose END block may drop the test tables (see END below)
+my $OPENER = $$;
+
+my $schema = $test_schema->connect($dsn, $user, $pass, { quote_names => 1 });
 
 my $dbh = $schema->storage->dbh;
 
@@ -48,7 +59,7 @@ $dbh->do("CREATE TABLE books (id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, so
 
 # make sure sqlt_type overrides work (::Storage::DBI::mysql does this)
 {
-  my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+  my $schema = $test_schema->connect($dsn, $user, $pass);
 
   ok (!$schema->storage->_dbh, 'definitely not connected');
   is ($schema->storage->sqlt_type, 'MySQL', 'sqlt_type correct pre-connection');
@@ -86,7 +97,8 @@ lives_ok {
   });
 } 'Limited FOR UPDATE select works';
 
-# shared lock (FOR SHARE)
+# shared lock -- FOR SHARE or LOCK IN SHARE MODE, whichever this server has
+# (karr #30: the spelling follows the server, not the DBD driver)
 lives_ok {
   $schema->txn_do (sub {
     isa_ok (
@@ -94,7 +106,7 @@ lives_ok {
       'DBIO::Test::Schema::Artist',
     );
   });
-} 'FOR SHARE select works';
+} 'shared-lock select works';
 
 my $test_type_info = {
     'artistid' => {
@@ -130,12 +142,13 @@ $schema->populate ('Owners', [
   [qw/3   boggle/],
 ]);
 
-$schema->populate ('BooksInLibrary', [
-  [qw/source  owner title   /],
-  [qw/Library 1     secrets1/],
-  [qw/Eatery  1     secrets2/],
-  [qw/Library 2     secrets3/],
-]);
+# The Eatery row lies outside the scope of BooksInLibrary (source = Library),
+# so it goes in through the storage, past the resultset.
+$schema->storage->insert($schema->source('BooksInLibrary'), $_) for (
+  { id => 1, source => 'Library', owner => 1, title => 'secrets1' },
+  { id => 2, source => 'Eatery',  owner => 1, title => 'secrets2' },
+  { id => 3, source => 'Library', owner => 2, title => 'secrets3' },
+);
 
 #
 # try a distinct + prefetch on tables with identically named columns
@@ -216,7 +229,7 @@ lives_ok { $cd->set_producers ([ $producer ]) } 'set_relationship doesnt die';
 # with it (ribasushi, 2009/07/03)
 
 NULLINSEARCH: {
-    my $ansi_schema = DBIO::Test::Schema->connect ($dsn, $user, $pass, { on_connect_call => 'set_strict_mode' });
+    my $ansi_schema = $test_schema->connect ($dsn, $user, $pass, { on_connect_call => 'set_strict_mode' });
 
     $ansi_schema->resultset('Artist')->create ({ name => 'last created artist' });
 
@@ -240,7 +253,7 @@ NULLINSEARCH: {
 
 # check for proper grouped counts
 {
-  my $ansi_schema = DBIO::Test::Schema->connect ($dsn, $user, $pass, {
+  my $ansi_schema = $test_schema->connect ($dsn, $user, $pass, {
     on_connect_call => 'set_strict_mode',
     quote_char => '`',
   });
@@ -319,7 +332,7 @@ ZEROINSEARCH: {
   };
 
   my $rs = $schema->resultset ('CD');
-  $rs->delete;
+  $rs->delete({ all => 1 });
   for my $y (keys %$cds_per_year) {
     for my $c (1 .. $cds_per_year->{$y} ) {
       $rs->create ({ title => "CD $y-$c", artist => 1, year => "$y-01-01" });
@@ -370,7 +383,7 @@ ZEROINSEARCH: {
 
 # make sure find hooks determine driver
 {
-  my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+  my $schema = $test_schema->connect($dsn, $user, $pass);
   $schema->resultset("Artist")->find(4);
   isa_ok($schema->storage->sql_maker, 'DBIO::MySQL::SQLMaker');
 }
@@ -379,7 +392,7 @@ ZEROINSEARCH: {
 # DBD::MariaDB uses mariadb_auto_reconnect, DBD::mysql uses mysql_auto_reconnect
 {
   local $ENV{MOD_PERL} = 'boogiewoogie';
-  my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+  my $schema = $test_schema->connect($dsn, $user, $pass);
   my $is_mariadb = $schema->storage->_get_dbh->{Driver}{Name} eq 'MariaDB';
   my $ar_attr = $is_mariadb ? 'mariadb_auto_reconnect' : 'mysql_auto_reconnect';
   ok (! $schema->storage->_get_dbh->{$ar_attr}, 'auto_reconnect unset regardless of ENV' );
@@ -394,7 +407,7 @@ ZEROINSEARCH: {
     skip 'DBD::MariaDB fork+auto_reconnect behaves differently', 6
       if $is_mariadb;
 
-    my $schema_autorecon = DBIO::Test::Schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
+    my $schema_autorecon = $test_schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
     my $orig_dbh = $schema_autorecon->storage->_get_dbh;
     weaken $orig_dbh;
 
@@ -469,8 +482,14 @@ ZEROINSEARCH: {
 # (artist/cd/producer/owners/books have different schemas than the
 # round-trip fixture). Drop the test tables at END if any of the
 # tables we create still exist.
+#
+# Only in the process that created them: the child forked in the
+# auto_reconnect section leaves through exit 0, which runs END blocks too, and
+# unguarded it dropped artist before the parent looked up the child's row
+# (karr k57).
 END {
   return unless $dsn;
+  return unless defined $OPENER && $$ == $OPENER;
   my $dbh = eval { $schema->storage->dbh } or return;
   for my $t (qw(cd_to_producer cd producer books owners artist)) {
     eval { $dbh->do("DROP TABLE IF EXISTS $t") };

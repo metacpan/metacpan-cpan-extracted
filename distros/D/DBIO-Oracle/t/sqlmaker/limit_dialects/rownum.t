@@ -262,7 +262,7 @@ my $rs_selectas_rel = $s->resultset('BooksInLibrary')->search( { -exists => $sub
 # directly to the outer "books me" via books.owner; the previously expected auto
 # "LEFT JOIN books books ON books.owner = owner.id" was a core correlation bug --
 # it shadowed the outer "books me" by SQL lexical scoping and silently
-# de-correlated the EXISTS. Fixed in core karr #25, so the join is gone here.
+# de-correlated the EXISTS. Fixed in core karr k25, so the join is gone here.
 # What this test owns is the Oracle rows-only wrap: ... ) me WHERE ROWNUM <= ?.
 is_same_sql_bind(
   $rs_selectas_rel->as_query,

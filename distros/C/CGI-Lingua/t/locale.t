@@ -21,7 +21,7 @@ if(-e 't/online.enabled') {
 		$ENV{'IGNORE_WIN32_LOCALE'} = 1;
 	}
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
-        delete $ENV{'REMOTE_ADDR'};
+	delete $ENV{'REMOTE_ADDR'};
 
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.19) Gecko/20110707 Firefox/3.6.19';
 	my $l = new_ok('CGI::Lingua' => [
@@ -44,7 +44,7 @@ if(-e 't/online.enabled') {
 	ok(uc($l[0]->code_alpha2()) eq 'EN');
 	ok(uc($l->locale()->code_alpha2()) eq 'GB');
 
-        delete $ENV{'REMOTE_ADDR'};
+	delete $ENV{'REMOTE_ADDR'};
 	$ENV{'HTTP_USER_AGENT'} = 'Java';
 	$l = new_ok('CGI::Lingua' => [
 		supported => ['en', 'en-us']

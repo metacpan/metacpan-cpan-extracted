@@ -38,7 +38,7 @@ like($ops[0]->summary, qr/\+table: public\.users/, 'create summary');
 
 is(scalar @ops, 1, 'one table to drop');
 is($ops[0]->action, 'drop', 'action is drop');
-like($ops[0]->as_sql, qr/^DROP TABLE auth\.sessions CASCADE;$/, 'drop table DDL with CASCADE');
+like($ops[0]->as_sql, qr/^DROP TABLE auth\.sessions;$/, 'drop table DDL, written without CASCADE (nothing outside the model goes with it)');
 like($ops[0]->summary, qr/-table: auth\.sessions/, 'drop summary');
 
 # No changes when same

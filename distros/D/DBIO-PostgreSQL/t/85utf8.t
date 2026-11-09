@@ -9,6 +9,12 @@ my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 plan skip_all => 'Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test'
   unless $dsn && $user;
 
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+
 use DBIO::Core;
 use DBIO::Schema;
 
@@ -16,7 +22,7 @@ use DBIO::Schema;
 
 {
   package UTF8TestSchema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
 }
 
 {

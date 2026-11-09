@@ -1,12 +1,13 @@
 #!/usr/bin/perl
-# large-subset-runcompare.pl (post4-0.04, 2026-11-05): run every corpus sample the large parser accepts in dash,
-# bash --posix and Proc::ShellSpawn, and record what each did, for large-subset-runreport.pl to compare.
+# large-subset-runcompare.pl (post4-0.04, 2026-11-05; -env, -base, post-0.09): run every corpus sample the large parser
+# accepts in dash, bash --posix and Proc::ShellSpawn, and record what each did, for large-subset-runreport.pl to compare.
 #
 # Usage (as root, from the distribution's directory, after make):
-#   perl doc/large-subset/tools/large-subset-runcompare.pl [-j 4] [-n MAX] [-only ID,...] samples.jsonl samples.tsv OUTDIR
+#   perl doc/large-subset/tools/large-subset-runcompare.pl [-j 4] [-n MAX] [-only ID,...|@FILE] [-env V,...] [-base DIR]
+#        samples.jsonl samples.tsv OUTDIR
 # samples.tsv is large-subset-yardsticks.pl -o's output (its column 'large' says which samples the parser accepts).
 # OUTDIR gets run-K.jsonl per worker (one line per sample); a rerun skips the samples already there, so it can be
-# stopped and started again.
+# stopped and started again.  -only @FILE: the IDs one per line (the first field of a line; '#' lines skipped).
 #
 # Isolation (no sample can harm the machine or another sample):
 # - each worker K runs as its own unprivileged user rcK (made if missing), with no network (unshare -n), CPU,
@@ -16,14 +17,62 @@
 #   its name and arguments to the run's log; for the names in %REAL (the programs we run in place of builtins,
 #   and tools that only read or print) it then runs the real program, otherwise it exits 0 with no output.
 # So the three shells see the same files, the same environment and the same "programs", and only the shells differ.
+# Ours runs from a copy of lib/, blib/ and t/try.pl made at the start (BASE/dist), so lib/ may be edited during a run.
+#
+# -env V,...: the run's environment changed for every run of the three shells (known issue X27: tries the other case of
+# an assumption, or fixes what the runs would otherwise share; large-subset-environment.md, section 9).  The variants
+# (%ENVV below) that mount do so as root in a mount namespace of each run's own, before dropping to rcK, so nothing
+# outside the run sees them.  BASE (-base, default /var/tmp/runcompare) holds the recorders, the copy and the runs'
+# directories: it must not lie under what a variant hides (with tmp or private, use for instance -base /runcompare).
+# The stand-in variants take their answer from this script's own environment, with a default: fail STANDIN_STATUS
+# (default 1), output STANDIN_OUTPUT (default "one  two\n*\n\nlast"), mtime FIXTURE_MTIME (seconds since 1970, default
+# 1577836800, 2020-01-01 00:00:00 UTC).  So  STANDIN_STATUS=2 perl large-subset-runcompare.pl -env fail ...  tries
+# status 2.  The values used are written to OUTDIR/env.txt.
+# -run DIR (post-0.09): ours goes through Run (DIR: Run's blib/lib, or the directory of Run.pm), as where there is neither
+# posix_spawn nor fork (M2, Proc::Spawner's primitive 'system1'): PROC_SPAWNER_MISSING="posix_spawn fork", which t/try.pl
+# takes out of the environment once the modules are loaded (TRY_HIDE), so that the samples do not see it.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
-my ($J, $MAX, $ONLY, $Q) = (4, 0, '', 0);   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
+my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB) = (4, 0, '', 0, '', '/var/tmp/runcompare', '');   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
 #     and every builtin call (t/try.pl, RECBUILTIN; for large-subset-builtins.pl)
-GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q) && @ARGV == 3 or die "usage: $0 [-j N] [-n MAX] [-only IDS] [-q] samples.jsonl samples.tsv OUTDIR\n";
+GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB) && @ARGV == 3
+  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] samples.jsonl samples.tsv OUTDIR\n";
+!length $RUNLIB or -e "$RUNLIB/Run.pm" or die "-run $RUNLIB: no Run.pm there\n";
+# The variants of -env: what each does, and the code of large-subset-provenance.tsv it is for.
+my %ENVV = (
+  posix   => 'POSIXLY_CORRECT=1 in the environment (code echo: the other case)',
+  utf8    => 'LANG and LC_ALL C.UTF-8 in place of C (code locale: the other case)',
+  sigpipe => 'SIGPIPE ignored, as inherited by the shells (code pipeline: the other case)',
+  noproc  => 'an empty tmpfs over /proc (code devfd: the other case; as on a system without /proc)',
+  tmp     => 'a fresh tmpfs on /tmp, /var/tmp and /dev/shm (code path-tmp: the runs no longer meet there)',
+  random  => 'one fixed file of 1 MiB over /dev/urandom and /dev/random (code path-random: the same bytes in every run)',
+  private => 'an empty tmpfs over /home, /root, /mnt, /media, /srv and /var (codes path-home, path-mnt, path-var)',
+  dev     => 'a private /dev: only null, zero, full, tty, random, urandom, ptmx, pts, shm and the links fd, stdin, stdout, stderr (code path-dev)',
+  fail    => 'every program the run only logs (not %REAL) exits with STANDIN_STATUS in place of 0 (code prog-status: another answer)',
+  output  => 'every program the run only logs (not %REAL) prints STANDIN_OUTPUT in place of nothing (code prog-output: another answer)',
+  mtime   => 'every file and directory of the run\'s copy of the fixture gets the times FIXTURE_MTIME (code time: ls -l, stat)');
+# The stand-ins' answers and the fixture's time (see above): from this script's environment, else the defaults.
+my %STANDIN = (STANDIN_STATUS => $ENV{STANDIN_STATUS} // 1, STANDIN_OUTPUT => $ENV{STANDIN_OUTPUT} // "one  two\n*\n\nlast",
+               FIXTURE_MTIME => $ENV{FIXTURE_MTIME} // 1577836800);
+$STANDIN{STANDIN_STATUS} =~ /^(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\z/ or die "STANDIN_STATUS: 0 to 255\n";
+$STANDIN{FIXTURE_MTIME} =~ /^[0-9]+\z/ or die "FIXTURE_MTIME: seconds since 1970\n";
+my %ENV_ON = map +($_ => 1), grep length, split /,/, $ENVL;
+for (sort keys %ENV_ON) { $ENVV{$_} or die "-env $_: unknown; known: ", join(', ', sort keys %ENVV), "\n" }
+die "-q needs /proc (its recorder reads its caller's name there): not with -env noproc\n" if $Q && $ENV_ON{noproc};
 my ($SJ, $ST, $OUT) = @ARGV; make_path($OUT); $OUT = abs_path($OUT);
 $> == 0 or die "run as root (it makes the users rcK and drops to them)\n";
 my $DIST = abs_path('.'); -e "$DIST/blib/arch/auto/Proc/Spawner/Spawner.so" or die "run make first\n";
-my $BASE = '/var/tmp/runcompare'; make_path($BASE); chmod 0755, $BASE;
+$BASE =~ m{^/} or die "-base: an absolute path\n";
+for my $m (($ENV_ON{tmp} || $ENV_ON{private} ? qw(/tmp /var/tmp /dev/shm) : ()), ($ENV_ON{private} ? qw(/home /root /mnt /media /srv /var) : ()),
+           ($ENV_ON{dev} ? '/dev' : ()), ($ENV_ON{noproc} ? '/proc' : ())) {
+  "$BASE/" =~ m{^\Q$m\E/} and die "-base $BASE lies under $m, which -env $ENVL hides: choose another (-base /runcompare)\n" }
+make_path($BASE); chmod 0755, $BASE;
+my $COPY = "$BASE/dist"; remove_tree($COPY); make_path("$COPY/t");   # ours runs from this copy
+system('cp', '-a', "$DIST/lib", "$DIST/blib", $COPY) == 0 && system('cp', '-a', "$DIST/t/try.pl", "$COPY/t/") == 0 or die "copy to $COPY failed\n";
+if (length $RUNLIB) { make_path("$COPY/run"); system('cp', '-a', "$RUNLIB/Run.pm", "$COPY/run/") == 0 or die "copy of Run.pm failed\n" }
+system('chmod', '-R', 'a+rX', $COPY) == 0 or die;
+my $RANDOM = "$BASE/random";   # -env random: 1 MiB, the same everywhere (SHA-256 of "x27-random-N", N = 0, 1, ...)
+if ($ENV_ON{random}) { require Digest::SHA; open my $o, '>:raw', $RANDOM or die "$RANDOM: $!";
+  print $o Digest::SHA::sha256("x27-random-$_") for 0 .. 32767; close $o; chmod 0444, $RANDOM }
 my $LIMIT = 4000;   # characters of each output kept
 
 # %QUIET: the programs Proc::ShellSpawn runs in place of the shells' builtins (R-program): run, not logged, since the
@@ -42,7 +91,8 @@ l=$n; for a in "$@"; do l="$l$(printf '\037')$a"; done
 if [ -n "$RECPARENT" ]; then read p < /proc/$PPID/comm; l="$p$(printf '\035')$l"; fi   # -q: who called it (perl, xargs, env, ...)
 printf '%s\n' "$l" >> "$RECLOG"   # one write, so that pipeline elements do not mix their lines
 case " $REALNAMES " in *" $n "*) exec "$REALDIR/$n" "$@";; esac
-exit 0
+printf '%s' "${STANDIN_OUTPUT-}"   # -env output: the stand-in's answer (else nothing)
+exit "${STANDIN_STATUS:-0}"        # -env fail
 SH
 my %seen;
 for my $d (qw(/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin)) {
@@ -61,11 +111,17 @@ my %done;   # restart: samples already in a run-K.jsonl
 for my $f (glob "$OUT/run-*.jsonl") { open my $in, '<', $f or die; while (<$in>) { $done{$1} = 1 if /^\{"id":"((?:[^"\\]|\\.)*)"/ } }
 my %acc; { open my $in, '<', $ST or die "$ST: $!"; my $h = <$in>; chomp $h; my @h = split /\t/, $h; my %c; @c{@h} = 0 .. $#h;
   while (<$in>) { chomp; my @f = split /\t/, $_, -1; $acc{$f[$c{id}]} = [$f[$c{verdict}], $f[$c{features}]] if $f[$c{large}] } }
-my %only = map +($_ => 1), grep length, split /,/, $ONLY;
+my %only = map +($_ => 1), grep length, $ONLY =~ /^\@(.*)/s ? do { open my $in, '<', $1 or die "$1: $!"; map { /^([^#\t\n][^\t\n]*)/ ? $1 : () } <$in> }
+                                                         : split /,/, $ONLY;
 my @todo; { open my $in, '<', $SJ or die "$SJ: $!";
   while (<$in>) { my $s = decode_json($_); next unless $acc{$s->{id}} && !$done{$s->{id}} && (!%only || $only{$s->{id}});
     push @todo, $s; last if $MAX && @todo >= $MAX } }
-print STDERR scalar(@todo), " samples to run, ", scalar(keys %done), " done before\n";
+print STDERR scalar(@todo), " samples to run, ", scalar(keys %done), " done before", (%ENV_ON ? ", -env " . join(',', sort keys %ENV_ON) : ''), "\n";
+if (length $RUNLIB) { require Digest::SHA; open my $e, '>', "$OUT/run.txt" or die;
+  print $e "ours through Run: PROC_SPAWNER_MISSING=\"posix_spawn fork\"; Run.pm sha256 ", Digest::SHA->new(256)->addfile("$COPY/run/Run.pm")->hexdigest, "\n"; close $e }
+if (%ENV_ON) { open my $e, '>', "$OUT/env.txt" or die; print $e map "$_: $ENVV{$_}\n", sort keys %ENV_ON;
+  my %used = (fail => 'STANDIN_STATUS', output => 'STANDIN_OUTPUT', mtime => 'FIXTURE_MTIME');
+  print $e map { my $v = $used{$_}; $v ? "$v=" . JSON::PP->new->allow_nonref->encode("$STANDIN{$v}") . "\n" : () } sort keys %ENV_ON; close $e }
 
 my @kids;
 for my $k (0 .. $J - 1) {
@@ -80,30 +136,39 @@ sub worker {
   open my $out, '>>', "$OUT/run-$k.jsonl" or die; select((select($out), $| = 1)[0]);
   for my $s (@$list) {
     my %rec = (id => $s->{id}, src => $s->{src}, text => $s->{text}, verdict => $acc{$s->{id}}[0], features => $acc{$s->{id}}[1]);
-    for my $sh (($Q ? () : ([dash => '/usr/bin/dash', '-c'], [bash => '/usr/bin/bash', '--posix', '-c'])),
-                [ours => $^X, "-I$DIST/blib/lib", "-I$DIST/blib/arch", "$DIST/t/try.pl"]) {
-      my ($name, @cmd) = @$sh; $rec{$name} = run1($W, $u, $s->{text}, @cmd) }
+    for my $sh (($Q ? () : ([dash => {}, '/usr/bin/dash', '-c'], [bash => {}, '/usr/bin/bash', '--posix', '-c'])),
+                [ours => (length $RUNLIB ? {PROC_SPAWNER_MISSING => 'posix_spawn fork', TRY_HIDE => 'PROC_SPAWNER_MISSING'} : {}),
+                 $^X, "-I$COPY/blib/lib", "-I$COPY/blib/arch", (length $RUNLIB ? "-I$COPY/run" : ()), "$COPY/t/try.pl"]) {
+      my ($name, $xenv, @cmd) = @$sh; $rec{$name} = run1($W, $u, $s->{text}, $xenv, @cmd) }
     print $out $j->encode(\%rec), "\n"; $n++ }
   close $out }
 
 sub run1 {   # one shell, one sample, in a fresh copy of the fixture
-  my ($W, $u, $text, @cmd) = @_;
+  my ($W, $u, $text, $xenv, @cmd) = @_;   # $xenv: variables for this shell alone (-run)
   system('pkill', '-9', '-u', $u); remove_tree($W); make_path("$W/run");
   for my $f (sort keys %FIXTURE) { my ($d) = $f =~ m{^(.*)/}; make_path("$W/run/$d") if $d;
     open my $o, '>', "$W/run/$f" or die; print $o $FIXTURE{$f}; close $o }
   system('chown', '-R', "$u:$u", $W); chmod 0755, $W;
-  for my $lf ("$W/log", "$W/blog") { open my $l, '>', $lf or die; close $l; system('chown', "$u:$u", $lf) }
+  if ($ENV_ON{mtime}) { my $t = $STANDIN{FIXTURE_MTIME}; my @all = ("$W/run");   # after chown, which changes only ctime
+    for (my $i = 0; $i < @all; $i++) { next if -l $all[$i] || !-d _; opendir my $dh, $all[$i] or die; push @all, map "$all[$i]/$_", grep !/^\.\.?\z/, readdir $dh }
+    utime $t, $t, @all or die "utime: $!" }
+  for my $lf ("$W/log", "$W/blog", "$W/out", "$W/err") { open my $l, '>', $lf or die; close $l; system('chown', "$u:$u", $lf) } # out, err: the run's own, so that /dev/stdout, /dev/stderr (reopened by path on Linux) are writable
   my %env = (($Q ? (RECPARENT => 1, RECBUILTIN => "$W/blog") : ()), PATH => $Q ? $REC : "$QDIR:$REC", HOME => "$W/run/home", LANG => 'C', LC_ALL => 'C', USER => $u, LOGNAME => $u, TERM => 'dumb',
-             SHELL => '/bin/sh', RECLOG => "$W/log", REALDIR => $REALDIR, REALNAMES => join(' ', sort keys %REAL), TMPDIR => "$W/run");
+             SHELL => '/bin/sh', RECLOG => "$W/log", REALDIR => $REALDIR, REALNAMES => join(' ', sort keys %REAL), TMPDIR => "$W/run",
+             ($ENV_ON{posix} ? (POSIXLY_CORRECT => 1) : ()), ($ENV_ON{utf8} ? (LANG => 'C.UTF-8', LC_ALL => 'C.UTF-8') : ()),
+             ($ENV_ON{fail} ? (STANDIN_STATUS => $STANDIN{STANDIN_STATUS}) : ()), ($ENV_ON{output} ? (STANDIN_OUTPUT => $STANDIN{STANDIN_OUTPUT}) : ()), %$xenv);
   my $pid = fork // die;
   unless ($pid) {
+    if (%ENV_ON && !eval { environment(); 1 }) { open my $f, '>', "$W/envfail"; print $f $@; close $f; require POSIX; POSIX::_exit(125) }
     chdir "$W/run" or die; %ENV = %env;
+    $SIG{PIPE} = 'IGNORE' if $ENV_ON{sigpipe};   # inherited through exec by prlimit, setpriv, timeout and the shell
     open STDIN, '<', '/dev/null'; open STDOUT, '>', "$W/out"; open STDERR, '>', "$W/err";
     exec '/usr/bin/prlimit', '--cpu=10', '--fsize=20000000', '--nproc=400', '--',
          '/usr/bin/setpriv', "--reuid=$u", "--regid=$u", '--clear-groups', '--inh-caps=-all', '--',
          '/usr/bin/timeout', '-k', '1', '5', @cmd, $text;
     exit 127 }
-  waitpid $pid, 0; my $st = $? >> 8; $st = 'signal ' . ($? & 127) if $? & 127;
+  waitpid $pid, 0; -e "$W/envfail" and die "-env failed in the run's child: ", slurp("$W/envfail");
+  my $st = $? >> 8; $st = 'signal ' . ($? & 127) if $? & 127;
   system('pkill', '-9', '-u', $u);
   my %r = (status => $st, out => slurp("$W/out"), err => slurp("$W/err"), rec => slurp("$W/log"), $Q ? (builtins => slurp("$W/blog")) : ());
   my @files; my $walk; $walk = sub { my ($d, $p) = @_; opendir my $dh, $d or return;
@@ -113,6 +178,24 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
       else { push @files, "$p$n " . (-s $f // '?') . ' ' . substr(Digest_sha($f), 0, 12) } } };
   $walk->("$W/run", ''); $r{files} = join "\n", @files;
   \%r }
+
+sub environment {   # -env, in the run's child, as root: a mount namespace of its own, then the variants' mounts
+  my @m = grep $ENV_ON{$_}, qw(private dev tmp random noproc); @m or return;
+  syscall(272, 0x00020000) == 0 or die "unshare(CLONE_NEWNS): $!\n";   # x86_64 Linux: SYS_unshare, CLONE_NEWNS
+  my $mt = sub { system('mount', @_) == 0 or die "mount @_: failed\n" };
+  $mt->('--make-rprivate', '/');
+  my $empty = sub { make_path($_[0]); $mt->('-t', 'tmpfs', '-o', "mode=$_[1]", 'none', $_[0]) };   # make_path: /var/tmp under private's /var
+  if ($ENV_ON{private}) { for (qw(/home /root /mnt /media /srv /var)) { $empty->($_, '0755') if -d $_ } }
+  if ($ENV_ON{dev}) {
+    my $keep = "$BASE/devkeep$$"; make_path($keep); $mt->('--rbind', '/dev', $keep);
+    $empty->('/dev', '0755');
+    for my $n (qw(null zero full tty random urandom ptmx)) { open my $t, '>', "/dev/$n" or die; close $t; $mt->('--bind', "$keep/$n", "/dev/$n") }
+    for my $d (qw(pts shm)) { make_path("/dev/$d") } chmod 01777, '/dev/shm'; $mt->('--rbind', "$keep/pts", '/dev/pts');
+    symlink '/proc/self/fd', '/dev/fd'; symlink "/proc/self/fd/$_->[1]", "/dev/$_->[0]" for [stdin => 0], [stdout => 1], [stderr => 2];
+    $mt->('--make-rprivate', $keep); system('umount', '-l', $keep); rmdir $keep }
+  if ($ENV_ON{tmp}) { $empty->($_, '1777') for qw(/tmp /var/tmp /dev/shm) }
+  if ($ENV_ON{random}) { $mt->('--bind', $RANDOM, $_) for qw(/dev/urandom /dev/random) }
+  if ($ENV_ON{noproc}) { $empty->('/proc', '0555') } }
 
 sub slurp { my $f = shift; open my $i, '<:raw', $f or return ''; local $/; my $t = <$i> // ''; length $t > $LIMIT ? substr($t, 0, $LIMIT) . "\n[...cut]" : $t }
 sub Digest_sha { require Digest::SHA; my $d = Digest::SHA->new(256); open my $i, '<:raw', shift or return '?'; $d->addfile($i); $d->hexdigest }

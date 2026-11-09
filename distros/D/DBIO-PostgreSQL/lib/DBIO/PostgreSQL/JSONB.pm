@@ -4,6 +4,8 @@ package DBIO::PostgreSQL::JSONB;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::PostgreSQL::JSONB::Op ();
 
 use Exporter 'import';
@@ -30,7 +32,7 @@ DBIO::PostgreSQL::JSONB - JSONB path expression helpers for DBIO::PostgreSQL que
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -38,15 +40,15 @@ version 0.900001
 
   # Equality — single key
   $rs->search( jsonb('me.data', 'status')->eq('active') );
-  # WHERE (me.data->>'status') = ?
+  # WHERE (me.data->>?) = ?
 
   # Equality — nested path
   $rs->search( jsonb('me.config', 'theme', 'color')->eq('dark') );
-  # WHERE (me.config#>>'{theme,color}') = ?
+  # WHERE (me.config#>>?::text[]) = ?
 
   # Inequality
   $rs->search( jsonb('me.data', 'role')->ne('guest') );
-  # WHERE (me.data->>'role') != ?
+  # WHERE (me.data->>?) != ?
 
   # Numeric comparisons (value extracted as text — cast in SQL if needed)
   $rs->search( jsonb('me.stats', 'score')->gt(100) );
@@ -102,13 +104,15 @@ produce a condition fragment suitable for passing to C<search()>.
 C<$column> may include a table alias prefix (e.g. C<'me.data'>).
 
   # Single-level: uses ->>
-  jsonb('me.data', 'status')        # (me.data->>'status')
+  jsonb('me.data', 'status')        # (me.data->>?)
 
   # Multi-level: uses #>>
-  jsonb('me.config', 'theme', 'color')  # (me.config#>>'{theme,color}')
+  jsonb('me.config', 'theme', 'color')  # (me.config#>>?::text[])
 
-Path elements containing single quotes are escaped with standard SQL
-C<''> doubling.
+The path elements are data: each travels as a bind (C<bind: status>,
+C<bind: {"theme","color"}>). C<$column> is code: letters, digits, underscores
+and dots, and any other form throws a L<DBIO::Exception>. Do not build it from
+user input.
 
 =head1 SEE ALSO
 

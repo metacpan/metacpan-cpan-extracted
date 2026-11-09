@@ -1,6 +1,6 @@
 ---
 name: dbio-db2-database
-description: "IBM Db2 (LUW) knowledge for Perl driver development (DBD module, SQL dialect, types, identity, transactions, pagination)"
+description: Use when you need IBM Db2 LUW specifics for driver work — DBD module, SQL dialect, types, identity, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -20,8 +20,9 @@ registers via `__PACKAGE__->register_driver('DB2' => ...)` in `DBIO::DB2::Storag
 
 ## Edition / version notes
 
-LUW (Linux/Unix/Windows) is the target. Pagination branches on version:
-DB2 5.4+ supports `ROW_NUMBER() OVER()`; older versions only `FETCH FIRST`.
+LUW (Linux/Unix/Windows) is the target. Pagination does not depend on the server
+version: `DBIO::DB2::SQLMaker::apply_limit` branches on whether the query has an
+offset — `ROW_NUMBER() OVER()` with one, `FETCH FIRST` without (ADR 0003).
 Default port 50000 (TCPIP). `sysibm.sysdummy1` is the one-row dual-equivalent.
 
 ## Type system
@@ -78,7 +79,7 @@ Db2 is transactional (ACID). `COMMIT` / `ROLLBACK`. Savepoints:
 -- no offset (FETCH FIRST, _FetchFirst):
 SELECT ... FETCH FIRST 10 ROWS ONLY
 
--- with offset (ROW_NUMBER, _RowNumberOver, DB2 5.4+):
+-- with offset (ROW_NUMBER, _RowNumberOver):
 SELECT * FROM (
   SELECT inner.*, ROW_NUMBER() OVER (...) AS rno FROM (...) inner
 ) WHERE rno BETWEEN offset+1 AND offset+rows

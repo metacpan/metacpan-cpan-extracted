@@ -1,8 +1,25 @@
 # ADR 0002 — Test-deploy-and-compare via SAVEPOINT on the live connection, not a throwaway database
 
-- Status: accepted
+- Status: superseded by ADR 0010
 - Date: 2026-06-22
 - Tags: deploy, diff, oracle, savepoint, drivers
+
+> **Overtaken 2026-10-25 by [ADR 0010](0010-temporary-user-test-deploy-and-compare.md) — this decision is no longer what the code does.**
+> Its load-bearing assumption (Consequences: the test-deploy DDL can be rolled
+> back within the savepoint) does not hold on Oracle: the implicit commit of
+> the first `CREATE TABLE` erases the savepoint, the test deploy stays in the
+> live schema and a transaction the caller has open is committed (karr k36,
+> measured live in `t/54-deploy-live.t`, section 4). From 2026-10-06 to
+> 2026-10-25 `diff`, `upgrade` and `_build_target_model` refused with a DBIO
+> exception instead of running the strategy below. Since 2026-10-25 they run
+> again, and `DBIO::Oracle::Deploy` derives from
+> `DBIO::Deploy::Base::TempDatabase` after all: the throwaway is a temporary
+> Oracle **user**, made and dropped on a connection of its own (ADR 0010).
+> The reasoning below that closes the temp-database path ("an application
+> connection cannot `CREATE DATABASE`", "creating and dropping users per deploy
+> is privileged") stays true as a cost, and is now accepted with a privilege
+> check up front. The text below is kept unchanged as the record of what was
+> decided and why.
 
 ## Context
 
@@ -31,9 +48,8 @@ it. (Note Oracle DDL normally auto-commits — see Consequences.)
 
 `DBIO::Oracle::Deploy` extends `DBIO::Deploy::Base` (**not** `TempDatabase`) and
 supplies the three class-name hooks (`_ddl_class`, `_introspect_class`,
-`_diff_class`, `Deploy.pm:55-57`) plus an Oracle-specific `_build_target_model`
-that runs the test deploy **inside a SAVEPOINT on the live connection**
-(`Deploy.pm:70-89`):
+`_diff_class`) plus an Oracle-specific `_build_target_model`
+that runs the test deploy **inside a SAVEPOINT on the live connection**:
 
 1. `SAVEPOINT _dbio_deploy` on the live `$dbh`.
 2. Inside an `eval`: execute the install DDL, then introspect the result via
@@ -59,7 +75,7 @@ app session, no `:memory:`. DB2 reached for a temp schema because DB2 schemas ar
 cheap namespaces; Oracle schemas are user accounts, so that path is closed too —
 leaving the transaction-scoped savepoint as the honest minimum.
 
-The unconditional rollback-in-`eval` (`Deploy.pm:84-85`) is deliberate: the test
+The unconditional rollback-in-`eval` is deliberate: the test
 deploy mutates the *live* connection, so a half-applied deploy must never persist
 or leak into the user's session, and the restore must run even on the failure
 path before the original error is re-raised.

@@ -21,7 +21,7 @@ the constraint/index/generator detail the diff needs.
 
 `DBIO::Firebird::Introspect` (subclass of `DBIO::Introspect::Base`) reads the
 live database through the `rdb$` system tables via thin per-artifact fetch
-helpers, and `_build_model` (`Introspect.pm:33-55`) assembles a model with
+helpers, and `_build_model` (`Introspect.pm`) assembles a model with
 **exactly five top-level sections**, each keyed by bare (unqualified) table
 name — Firebird has no schemas:
 
@@ -47,12 +47,12 @@ The normalized generation contract (`table_keys`, `table_columns_info`,
 `table_pk_info`, `table_uniq_info`, `table_fk_info`, `table_is_view`, ...) is
 inherited unchanged from `DBIO::Introspect::Base`, because the assembled model
 follows the base's canonical single-schema shape — no Firebird-specific
-override of the contract methods is needed (recorded in karr #2).
+override of the contract methods is needed (recorded in karr k2).
 
 ### Sub-decision A — `FetchHashKeyName = 'NAME_lc'`
 
 `_build_model` forces `local $dbh->{FetchHashKeyName} = 'NAME_lc'`
-(`Introspect.pm:38-40`) for the whole build. Firebird returns result-column
+(`Introspect.pm`) for the whole build. Firebird returns result-column
 names **upper-cased**, but the fetch helpers read **lower-case** `rdb$` keys
 from `fetchrow_hashref` (e.g. `$row->{'rdb$relation_name'}`). Forcing
 lower-cased hash keys reconciles the two so the helpers' hash lookups hit.
@@ -70,11 +70,11 @@ helpers:
 - `Introspect::Indexes` **deliberately excludes** constraint-backed indexes:
   after fetching from `rdb$indices`, it queries `rdb$relation_constraints` for
   `PRIMARY KEY`/`UNIQUE` index names and skips them
-  (`Introspect/Indexes.pm:61-83`), so only explicit `CREATE INDEX` objects land
+  (`fetch` in `Introspect/Indexes.pm`), so only explicit `CREATE INDEX` objects land
   in `indexes`.
 
 Only the constraints feed `table_uniq_info`; the standalone unique indexes stay
-in `indexes` (recorded in karr #4, the `table_uniq_info` gap).
+in `indexes` (recorded in karr k4, the `table_uniq_info` gap).
 
 ## Rationale
 

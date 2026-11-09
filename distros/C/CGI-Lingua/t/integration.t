@@ -91,6 +91,7 @@ sub _inject_ipcountry {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;     # GEO_ABSENT
 	$l->{_have_geoipfree} = 0;     # GEO_ABSENT
+	$l->{_have_mmdb} = 0;
 }
 
 # Simulate "Geo::IP present" - bypasses the lazy-require + db-file guard in
@@ -103,6 +104,7 @@ sub _inject_geoip {
 	$l->{_have_geoip}     = 1;     # GEO_PRESENT
 	$l->{_geoip}          = bless {}, 'Geo::IP';
 	$l->{_have_geoipfree} = 0;     # GEO_ABSENT
+	$l->{_have_mmdb} = 0;
 }
 
 # Simulate "Geo::IPfree present" - bypasses the lazy-require guard.
@@ -114,6 +116,7 @@ sub _inject_geoipfree {
 	$l->{_have_ipcountry} = 0;     # GEO_ABSENT
 	$l->{_have_geoip}     = 0;     # GEO_ABSENT
 	$l->{_have_geoipfree} = 1;     # GEO_PRESENT
+	$l->{_have_mmdb} = 0;
 	$l->{_geoipfree}      = bless {}, 'Geo::IPfree';
 }
 
@@ -310,6 +313,7 @@ subtest 'IP fallback: dont_use_ip suppresses country-based language detection' =
 	$l->{_have_ipcountry} = 0;    # GEO_ABSENT - force "no IP::Country" path
 	$l->{_have_geoip}     = 0;    # GEO_ABSENT - force "no Geo::IP" path
 	$l->{_have_geoipfree} = 0;    # GEO_ABSENT - force "no Geo::IPfree" path
+	$l->{_have_mmdb} = 0;
 	is($l->language(), 'Unknown', 'dont_use_ip: language() returns Unknown with no header');
 	ok(!defined $l->country(),    'dont_use_ip does not prevent country() call itself');
 };
@@ -518,6 +522,7 @@ subtest 'spy: LWP::Simple::WithCache::get called when IP::Country is absent (geo
 		$l->{_have_ipcountry} = 0;    # GEO_ABSENT
 		$l->{_have_geoip}     = 0;    # GEO_ABSENT
 		$l->{_have_geoipfree} = 0;    # GEO_ABSENT
+		$l->{_have_mmdb} = 0;
 
 		# Spy on the mocked LWP::Simple::WithCache::get (which currently returns undef).
 		# Suppress the prototype mismatch warning that fires because WithCache
@@ -561,6 +566,7 @@ subtest 'optional: IP::Country absent - country() falls through to geoplugin JSO
 		$l->{_have_ipcountry} = 0;    # GEO_ABSENT (confirmed by blocked module)
 		$l->{_have_geoip}     = 0;    # GEO_ABSENT
 		$l->{_have_geoipfree} = 0;    # GEO_ABSENT
+		$l->{_have_mmdb} = 0;
 
 		# Override the global no-op LWP mock to return a real-looking JSON body.
 		Test::Mockingbird::mock('LWP::Simple::WithCache', 'get',
@@ -610,6 +616,7 @@ subtest 'optional: IP::Country absent + geoplugin fails - Whois is attempted' =>
 	$l->{_have_ipcountry} = 0;    # GEO_ABSENT
 	$l->{_have_geoip}     = 0;    # GEO_ABSENT
 	$l->{_have_geoipfree} = 0;    # GEO_ABSENT
+	$l->{_have_mmdb} = 0;
 
 	# Whois call is globally mocked to a no-op; spy on it to verify it fires.
 	my $whois_spy = Test::Mockingbird::spy('CGI::Lingua', '_resolve_country_via_whois');
@@ -1177,7 +1184,7 @@ my $HAS_WHOIS = eval { require Net::Whois::IP; require Net::Whois::IANA; 1 };
 # Make country() go straight to geoplugin and then a real (mocked) Whois.
 sub _web_chain {
 	my ($l, %whois) = @_;
-	$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = $l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
 	Test::Mockingbird::unmock('CGI::Lingua', '_resolve_country_via_whois');
 	Test::Mockingbird::mock('Net::Whois::IP', 'whoisip_query', $whois{ip} || sub { undef });
 	Test::Mockingbird::mock('Net::Whois::IANA', 'new', $whois{iana_new}) if $whois{iana_new};
@@ -1330,7 +1337,7 @@ subtest 'sabotage: a failing object does not affect a healthy one' => sub {
 	{
 		local %ENV = (REMOTE_ADDR => $IP{PUBLIC});
 		$broken = _spied_obj(supported => ['en']);
-		$broken->{_have_ipcountry} = $broken->{_have_geoip} = $broken->{_have_geoipfree} = 0;
+		$broken->{_have_mmdb} = $broken->{_have_ipcountry} = $broken->{_have_geoip} = $broken->{_have_geoipfree} = 0;
 		ok(!defined($broken->country()), 'broken request: no country');
 	}
 	{

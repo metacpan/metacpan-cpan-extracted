@@ -517,7 +517,7 @@ is ($tkfks->count, $tkfk_cnt -= 1, 'Only one row deleted');
       'artist.name' => 'partytimecity',
     }, {
       join => 'artist',
-    })->as_subselect_rs->delete;
+    })->as_subselect_rs->delete({ all => 1 });
   }, [[
     '
       DELETE FROM "main"."cd"

@@ -4,16 +4,20 @@ package DBIO::DeploymentHandler::VersionStorage::Standard::Component;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Carp;
 use DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult;
 
 use namespace::clean;
+
 
 sub attach_version_storage {
    $_[0]->register_class(
       __VERSION => 'DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult'
    );
 }
+
 
 sub connection  {
   my $self = shift;
@@ -53,7 +57,31 @@ DBIO::DeploymentHandler::VersionStorage::Standard::Component - Attach this compo
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 DESCRIPTION
+
+Schema component. Load it into a schema that is managed by
+L<DBIO::DeploymentHandler>:
+
+  __PACKAGE__->load_components(
+    '+DBIO::DeploymentHandler::VersionStorage::Standard::Component'
+  );
+
+=head1 METHODS
+
+=head2 attach_version_storage
+
+Registers L<DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult>
+as the C<__VERSION> source of the schema.
+
+=head2 connection
+
+Component override. After the normal C<connection>, calls
+L</attach_version_storage>, then -- unless the connect attributes carry
+C<ignore_version> or C<DBIO_NO_VERSION_CHECK> is set in the environment --
+carps if the database has no version table ("unversioned") or if its latest
+version differs from the schema version. Returns the schema.
 
 =head1 AUTHOR
 

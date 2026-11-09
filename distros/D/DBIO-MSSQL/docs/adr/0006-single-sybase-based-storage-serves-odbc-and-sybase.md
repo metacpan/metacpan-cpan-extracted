@@ -1,6 +1,6 @@
 # ADR 0006 — One Sybase-based Storage serves both DBD::ODBC and DBD::Sybase
 
-- Status: accepted
+- Status: superseded by [ADR 0007](0007-dedicated-odbc-storage-class-over-transport-neutral-base.md)
 - Date: 2026-06-20
 - Tags: storage, rebless, registry, odbc, sybase
 
@@ -52,4 +52,4 @@ through the Sybase-derived class keeps a single source of truth.
   repo: it lives in `dbio/lib/DBIO/Storage/DBI.pm:1239,1299`. It is recorded in
   **core ADR 0016**
   (`dbio/docs/adr/0016-mssql-connector-registry-reblesses-to-sybase-storage.md`),
-  backfilled from karr ticket `dbio` (core board) #49.
+  backfilled from karr ticket `dbio` (core board) k49.

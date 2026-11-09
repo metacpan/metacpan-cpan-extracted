@@ -151,3 +151,103 @@ Relates to ADR 0021 (the spelling drift that motivates
 driver-name-string-matches being a wrong-shape contract), ADR 0024 (the
 contract-version mechanism that records this bump), and the F02 / F10 / F12
 flaws from the CurtisPoe review of DBIO core.
+
+## Addendum 2026-07-29 — the capability is per connection, atomicity is per statement
+
+Decision §2 makes `_execute_ddl` bracket the DDL body in `txn_do` exactly when
+the storage reports `transactional_ddl`. That reads the engine as uniform: either
+its DDL participates in transactions or it does not. PostgreSQL falsifies it, and
+k132 (this addendum) records the correction rather than filing it as an
+implementation detail, because it changes what the capability means.
+
+### What the boolean cannot say
+
+`ALTER TYPE ... ADD VALUE` on PostgreSQL is not transactional even though every
+other statement the driver emits is. Before server 12 the engine rejects it
+outright inside a transaction block; from 12 on it accepts it, but the new enum
+value stays unusable until that transaction commits — so an upgrade that adds a
+value and then references it (a column default, a data migration) fails either
+way. `apply()` hands the **whole** diff to `_execute_ddl` as one batch, so a
+driver facing this had exactly two options under §2, both wrong: declare the
+capability and ship an upgrade path that breaks on enum changes, or refuse it and
+give up atomicity for every deploy the engine could have run atomically. That is
+what blocked dbio-postgresql k50.
+
+Other engines have their own such statements (`CREATE INDEX CONCURRENTLY`,
+`VACUUM`); which of them a driver actually emits is per-driver work.
+
+### The rule
+
+A second, finer question sits under the capability:
+`_ddl_statement_is_transactional($stmt)` on
+`DBIO::Storage::DBI::Capabilities`, **default true**. It is asked once per
+statement, and only on a storage that already reports `transactional_ddl` — a
+driver cannot switch the grouping on by defining the hook alone.
+
+`_execute_ddl` groups consecutive statements by the answer, preserving order:
+each run of transaction-safe statements gets one `txn_do`, a statement that
+answered false runs on its own outside any transaction. A batch where everything
+answers true produces a single run and is byte-identical to the §2 behaviour, so
+a driver that never defines the hook sees no change whatsoever.
+
+Three alternatives were weighed. **All-or-nothing per batch** — one disqualifying
+statement drops the bracket for everything — is the cheapest and was rejected as
+too blunt: a single enum value would cost an entire upgrade its atomicity.
+**Op-driven marking**, where a diff op declares itself non-transactional, models
+the problem most cleanly but only covers `apply`; `install` has a plain DDL string
+with no ops behind it, so it would need one of the other two underneath anyway.
+Grouping was chosen because it keeps atomicity everywhere it is still available
+and needs no knowledge of ops.
+
+### What it costs
+
+A split batch is no longer one transaction. A failure in a later run leaves the
+earlier ones applied — the same partial-application state §2 accepts on
+non-transactional engines, and the `__VERSION` gate in `DBIO::DeploymentHandler`
+is the same recovery story: a re-run recomputes the diff against live state and
+picks up the remainder. Core announces a split once per deploy class, keyed on
+the class rather than the message, since the statement counts in the text vary
+from batch to batch and would otherwise re-arm the one-shot.
+
+### Contract version
+
+No bump; stays **1.2**. Per the in-cycle rule recorded in
+`t/test/12_contract_version.t`, 1.2 has never been released — the last CPAN
+release, 0.900002, carries 1.1 — so this hook joins the generation that has not
+shipped yet rather than opening a 1.3 no consumer could distinguish. The hook is
+additive with a default that reproduces existing behaviour exactly, and no driver
+in the family declares `$TESTED_AGAINST_CONTRACT`, so nothing can compare against
+a 1.2 that lacked it.
+
+Relates to k131 (the ownership condition on the same bracket, a fix rather
+than a decision) and to ADR 0024 (the contract-version mechanism).
+
+### Async parity (k199)
+
+`DBIO::Storage::Async::deploy_async` is the Future-side mirror of
+`_execute_ddl`. It already probed the connection-level capability
+(`_use_transactional_ddl`) but ignored the per-statement half above: on a
+transactional engine it wrapped the **whole** batch in one `txn_do_async`, so a
+statement the hook declares non-transactional (PostgreSQL `ALTER TYPE ... ADD
+VALUE` under `dbio-postgresql-ev`) still ran between `BEGIN` and `COMMIT`.
+
+The async path now asks the **same** `_ddl_statement_is_transactional` hook —
+on the owning sync storage (`_owner_storage`), the storage
+`_use_transactional_ddl` already delegates to and the one carrying the
+capability — and reuses the **same** grouping (`_group_ddl_statements`) so the
+runs come out in the same order and grouping as the sync deploy. Each
+transaction-safe run is bracketed in one `txn_do_async` on a pinned connection;
+a non-transactional run executes on its own pooled connection, outside any
+transaction. A batch where everything is transaction-safe is one run, identical
+to bracketing the whole loop, so nothing changes for a driver that never
+defines the hook. A split is announced once per class, and the `__VERSION` gate
+is the same recovery story. Each connection — pinned txn or pooled outlier — is
+released exactly once on both the success and failure paths.
+
+This is a parity fix, not a new decision: no capability, hook, or contract
+change. `DBIO::Storage::Async` is not one of the contract-versioned base
+classes, so the contract stays **1.2**. Regression coverage:
+`t/test/19_async_deploy.t` (mock-only, fake async transport) pins the
+`[txn] [outlier] [txn]` grouping, consecutive-outlier coalescing, the
+hook-default single-run case, and exactly-once connection release on the error
+paths, all by connection identity rather than counters alone.

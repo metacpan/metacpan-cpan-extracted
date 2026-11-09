@@ -8,7 +8,7 @@ use_ok 'DBIO::MSSQL::Diff::Index';
 use_ok 'DBIO::MSSQL::Diff::ForeignKey';
 use_ok 'DBIO::MSSQL::Diff';
 
-# --- Diff::Table create with columns + PK + FK + identity ---
+# --- Diff::Table create with columns + PK + identity ---
 {
   my @ops = DBIO::MSSQL::Diff::Table->diff(
     {},
@@ -20,11 +20,6 @@ use_ok 'DBIO::MSSQL::Diff';
         { column_name => 'title',     data_type => 'varchar', size => 255, not_null => 1 },
       ],
     },
-    {
-      book => [
-        { from_columns => ['author_id'], to_table => 'author', to_columns => ['id'] },
-      ],
-    },
   );
   is(scalar @ops, 1, 'one create op');
   is($ops[0]->action, 'create', 'create action');
@@ -33,7 +28,9 @@ use_ok 'DBIO::MSSQL::Diff';
   like($sql, qr/id int NOT NULL IDENTITY\(1,1\)/,     'inline identity');
   like($sql, qr/title nvarchar\(255\) NOT NULL/,      'varchar maps to sized nvarchar');
   like($sql, qr/PRIMARY KEY \(id\)/,                  'inline PK');
-  like($sql, qr/FOREIGN KEY \(author_id\) REFERENCES author\(id\)/, 'inline FK');
+  # karr k71: the table is created without its FK; the FK is a standalone
+  # ADD CONSTRAINT after every table exists (Diff::ForeignKey, ordered by Diff)
+  unlike($sql, qr/FOREIGN KEY/, 'no inline FK: it is added after all tables exist');
   is($ops[0]->summary, '+ table: book', 'create summary');
 }
 
@@ -66,6 +63,11 @@ use_ok 'DBIO::MSSQL::Diff';
 }
 
 # --- Diff::Column alter (type changed) ---
+#     karr k31: the assertion used to stop at 'a bigint;'. Same property --
+#     a type change renders one ALTER COLUMN to the new type -- but the
+#     statement now spells the nullability out, because "ANSI_NULL defaults are
+#     always on for ALTER COLUMN; if not specified, the column is nullable":
+#     the old form silently made every retyped NOT NULL column nullable.
 {
   my @ops = DBIO::MSSQL::Diff::Column->diff(
     { t => [ { column_name => 'a', data_type => 'int' } ] },
@@ -74,10 +76,22 @@ use_ok 'DBIO::MSSQL::Diff';
   );
   is(scalar @ops, 1, 'one alter op');
   is($ops[0]->action, 'alter', 'alter action');
-  like($ops[0]->as_sql, qr/ALTER TABLE t ALTER COLUMN a bigint;/, 'alter type SQL');
+  is($ops[0]->as_sql, 'ALTER TABLE t ALTER COLUMN a bigint NULL;', 'alter type SQL');
 }
 
 # --- Diff::Column alter (nullability changed) ---
+#     karr k31, CLAIM REPLACED. This asserted
+#         qr/ALTER TABLE t ALTER COLUMN a NOT NULL;/
+#     and the property it was sampling is the right one: a nullability-only
+#     drift is detected and rendered as one ALTER COLUMN that makes t.a NOT
+#     NULL. The spelling it pinned was not -- Transact-SQL has no typeless
+#     ALTER COLUMN ("If you specify NULL or NOT NULL with ALTER COLUMN, you
+#     must also specify new_data_type ... If the data type, precision, and
+#     scale aren't changing, specify the current column values"), so the test
+#     could stay green while every statement it described was rejected. The
+#     assertion below measures the same property against a statement that
+#     parses, and tightened to an exact match so a future regression cannot
+#     hide in a substring.
 {
   my @ops = DBIO::MSSQL::Diff::Column->diff(
     { t => [ { column_name => 'a', data_type => 'int', not_null => 0 } ] },
@@ -85,7 +99,7 @@ use_ok 'DBIO::MSSQL::Diff';
     { t => {} }, { t => {} },
   );
   is($ops[0]->action, 'alter', 'alter action');
-  like($ops[0]->as_sql, qr/ALTER TABLE t ALTER COLUMN a NOT NULL;/, 'alter NOT NULL SQL');
+  is($ops[0]->as_sql, 'ALTER TABLE t ALTER COLUMN a int NOT NULL;', 'alter NOT NULL SQL');
 }
 
 # --- Diff::Column drop ---
@@ -112,7 +126,7 @@ use_ok 'DBIO::MSSQL::Diff';
   is(scalar @ops, 1, 'one create op');
   is($ops[0]->action, 'create', 'create action');
   is($ops[0]->as_sql,
-    'CREATE UNIQUE INDEX idx_email ON t NONCLUSTERED (email);',
+    'CREATE UNIQUE NONCLUSTERED INDEX idx_email ON t (email);',
     'create index SQL');
   is($ops[0]->summary, '  +index: idx_email on t', 'create index summary');
 }
@@ -140,8 +154,23 @@ use_ok 'DBIO::MSSQL::Diff';
   like($ops[1]->as_sql, qr/\(a, b\)/, 'recreated with new columns');
 }
 
+# --- Diff::Index recreate on kind change (nonclustered -> clustered) ---
+#     (karr k16) 'kind' must be part of the comparison spec, not just
+#     read by as_sql -- otherwise a clustered/nonclustered flip on an
+#     unchanged name/columns/uniqueness is never detected as a change.
+{
+  my @ops = DBIO::MSSQL::Diff::Index->diff(
+    { t => { idx => { is_unique => 0, kind => 'nonclustered', columns => ['a'] } } },
+    { t => { idx => { is_unique => 0, kind => 'clustered',    columns => ['a'] } } },
+  );
+  is(scalar @ops, 2, 'kind-only change -> two ops (drop + create)');
+  is($ops[0]->action, 'drop',   'first is drop');
+  is($ops[1]->action, 'create', 'second is create');
+  is($ops[1]->as_sql, 'CREATE CLUSTERED INDEX idx ON t (a);', 'recreated with new kind, CLUSTERED before INDEX');
+}
+
 # --- Diff::Index: no standalone DROP INDEX when the owning table is dropped ---
-#     (karr #15) The table is present in source tables, absent from target
+#     (karr k15) The table is present in source tables, absent from target
 #     tables -> DROP TABLE removes its indexes, so the standalone DROP INDEX
 #     must be suppressed.
 {
@@ -155,7 +184,7 @@ use_ok 'DBIO::MSSQL::Diff';
 }
 
 # --- Diff::Index guard: do NOT over-suppress. A table that survives but loses
-#     one of its indexes must still get the standalone DROP INDEX (karr #15). ---
+#     one of its indexes must still get the standalone DROP INDEX (karr k15). ---
 {
   my @ops = DBIO::MSSQL::Diff::Index->diff(
     { t => { idx_email => { columns => ['email'] } } },
@@ -255,8 +284,8 @@ use_ok 'DBIO::MSSQL::Diff';
   like($ops[1]->as_sql, qr/REFERENCES new\(id\)/, 're-added against new table');
 }
 
-# --- Diff::ForeignKey: FK on a brand-new table is NOT emitted here
-#     (Diff::Table creates it inline) ---
+# --- Diff::ForeignKey: FK on a brand-new table IS emitted here (karr k71):
+#     Diff::Table creates the table without it ---
 {
   my @ops = DBIO::MSSQL::Diff::ForeignKey->diff(
     {},
@@ -264,7 +293,8 @@ use_ok 'DBIO::MSSQL::Diff';
     {},                                  # source has no tables
     { fresh => { table_name => 'fresh' } },
   );
-  is(scalar @ops, 0, 'no standalone FK op for a brand-new table');
+  is(scalar @ops, 1, 'standalone FK add for a brand-new table');
+  is($ops[0]->action, 'add', '... an add');
 }
 
 # --- Index column order is significant (drop+create on reorder) ---
@@ -294,6 +324,66 @@ use_ok 'DBIO::MSSQL::Diff';
   my $diff = DBIO::MSSQL::Diff->new(source => $source, target => $target);
   like($diff->as_sql, qr/ALTER TABLE cd ADD CONSTRAINT FK_cd_artist FOREIGN KEY/,
     'orchestrator emits standalone FK add for existing table');
+}
+
+# --- Views are not tables (karr k45). The introspected model keeps views in
+#     `tables` with kind => 'view'; the diff used to emit CREATE TABLE for a
+#     declared one, DROP TABLE for a live-only one and ALTER TABLE / CREATE
+#     INDEX against a view. The model carries no view definition, so a view is
+#     left out of the diff and named in the summary.
+{
+  my @ops = DBIO::MSSQL::Diff::Table->diff(
+    { old_v => { table_name => 'old_v', kind => 'view' } },
+    { v     => { table_name => 'v',     kind => 'view' } },
+    { v     => [ { column_name => 'a', data_type => 'int' } ] },
+  );
+  is(scalar @ops, 0, 'Diff::Table: no CREATE TABLE / DROP TABLE for a view');
+
+  @ops = DBIO::MSSQL::Diff::Table->diff(
+    { t => { table_name => 't', kind => 'table' }, old_v => { table_name => 'old_v', kind => 'view' } },
+    { t => { table_name => 't', kind => 'table' }, n => { table_name => 'n', kind => 'table' },
+      v => { table_name => 'v', kind => 'view' } },
+    { n => [ { column_name => 'id', data_type => 'int' } ] },
+  );
+  is_deeply([ map { $_->action . ' ' . $_->table_name } @ops ], ['create n'],
+    'Diff::Table: a table beside a view is still diffed');
+
+  my %views = (
+    s => { v => { table_name => 'v', kind => 'view' }, t => { table_name => 't', kind => 'table' } },
+    t => { v => { table_name => 'v', kind => 'view' }, t => { table_name => 't', kind => 'table' } },
+  );
+  @ops = DBIO::MSSQL::Diff::Column->diff(
+    { v => [ { column_name => 'a', data_type => 'int' } ] },
+    { v => [ { column_name => 'a', data_type => 'int' }, { column_name => 'b', data_type => 'int' } ] },
+    $views{s}, $views{t},
+  );
+  is(scalar @ops, 0, 'Diff::Column: no ALTER TABLE ... ADD/DROP COLUMN on a view');
+
+  @ops = DBIO::MSSQL::Diff::Index->diff(
+    { v => { ix_old => { columns => ['a'] } } },
+    { v => { ix_new => { columns => ['b'] } } },
+    $views{s}, $views{t},
+  );
+  is(scalar @ops, 0, 'Diff::Index: no CREATE/DROP INDEX on a view');
+
+  @ops = DBIO::MSSQL::Diff::Column->diff(
+    { t => [] }, { t => [ { column_name => 'b', data_type => 'int' } ] },
+    $views{s}, $views{t},
+  );
+  is(scalar @ops, 1, 'Diff::Column: the table beside the view is still diffed');
+}
+
+# --- Full orchestrator: views are diffed by Diff::View (karr k82; t/125 has
+#     the statements). A view in both models with the same body is no change.
+{
+  my $mk = sub { my ($name, $def) = @_; +{ tables => { $name => { table_name => $name, kind => 'view', definition => $def } },
+    columns => { $name => [ { column_name => 'a', data_type => 'int' } ] }, indexes => {}, foreign_keys => {} } };
+  my $diff = DBIO::MSSQL::Diff->new(
+    source => $mk->('v', 'CREATE VIEW [dbo].[v] AS SELECT 1 AS a'),
+    target => $mk->('v', "CREATE VIEW v AS\nSELECT   1 AS a;"));
+  ok(!$diff->has_changes, 'a view with the same body: no operation');
+  unlike($diff->as_sql, qr/TABLE|INDEX/, 'views alone: no table SQL');
+  ok(!$diff->can('skipped_views'), 'skipped_views is gone: views are diffed');
 }
 
 done_testing;

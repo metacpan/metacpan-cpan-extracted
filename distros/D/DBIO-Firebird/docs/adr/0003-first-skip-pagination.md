@@ -10,7 +10,7 @@ Firebird has no `LIMIT`/`OFFSET` keyword. It slices a result set with
 `SELECT FIRST n SKIP m ...`, placed immediately after `SELECT`. The default
 DBIO SQL maker emits the SQL-standard `LIMIT ? OFFSET ?`
 (`DBIO::SQLMaker::ClassicExtensions::apply_limit`,
-`lib/DBIO/SQLMaker/ClassicExtensions.pm:617` in dbio core), which Firebird does
+in `lib/DBIO/SQLMaker/ClassicExtensions.pm` of dbio core), which Firebird does
 not understand.
 
 Upstream DBIx::Class expressed Firebird's slicing by setting
@@ -24,7 +24,7 @@ the SQLMaker subclass.
 
 `DBIO::Firebird::SQLMaker` (subclass of `DBIO::SQLMaker`) overrides
 `apply_limit` to emit FIRST/SKIP, replacing the upstream `'FirstSkip'` dialect
-string with a method override (`lib/DBIO/Firebird/SQLMaker.pm:32-35`):
+string with a method override (`apply_limit` in `lib/DBIO/Firebird/SQLMaker.pm`):
 
     sub apply_limit {
       my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
@@ -32,10 +32,10 @@ string with a method override (`lib/DBIO/Firebird/SQLMaker.pm:32-35`):
     }
 
 `_FirstSkip` is the inherited implementation from core's
-`DBIO::SQLMaker::ClassicExtensions` (`ClassicExtensions.pm:725`); this driver
+`DBIO::SQLMaker::ClassicExtensions` (`_FirstSkip`); this driver
 selects it by override rather than by registering a dialect name. The SQL maker
 class is wired in once on the shared storage base
-(`Storage/Common.pm:18`, `sql_maker_class('DBIO::Firebird::SQLMaker')`), so
+(`Storage/Common.pm`, `sql_maker_class('DBIO::Firebird::SQLMaker')`), so
 both the Firebird and InterBase backends use it.
 
 ## Rationale

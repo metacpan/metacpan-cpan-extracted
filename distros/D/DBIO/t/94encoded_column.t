@@ -27,6 +27,7 @@ use DBIO::Test::Storage;
       size                => 255,
       is_nullable         => 1,
       encode_column       => 1,
+      encode_class        => 'Digest',
       encode_check_method => 'check_password',
       encode_args         => {
         algorithm   => 'SHA-256',
@@ -39,6 +40,7 @@ use DBIO::Test::Storage;
 
 TestDBIO::Encoded::Schema->register_class(User => 'TestDBIO::Encoded::Schema::Result::User');
 
+TestDBIO::Encoded::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = TestDBIO::Encoded::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 
@@ -57,8 +59,8 @@ my $second = $schema->resultset('User')->new_result({ password => 's3cret' });
 my $second_encoded = $second->get_column('password');
 isnt($second_encoded, $encoded, 'salting generates different hashes for same plaintext');
 
-$user->password($encoded);
-is($user->get_column('password'), $encoded, 'pre-encoded values are not re-encoded');
+$user->set_column(password => $encoded);
+is($user->get_column('password'), $encoded, 'set_column stores a ready-made value as it is');
 
 $user->password(undef);
 ok(!defined $user->get_column('password'), 'undef values remain undef');

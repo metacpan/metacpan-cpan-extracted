@@ -13,7 +13,7 @@ DBIO::Manual::ResultClass - Representing a single result (row) from a DB query
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ version 0.900002
 
   __PACKAGE__->table('tracks');
 
-  __PACKAGE__->add_columns({
+  __PACKAGE__->add_columns(
     id => {
       data_type => 'int',
       is_auto_increment => 1,
@@ -39,12 +39,12 @@ version 0.900002
       data_type => 'int',
       is_nullable => 1,
     },
-  });
+  );
 
   __PACKAGE__->set_primary_key('id');
   __PACKAGE__->add_unique_constraint(u_title => ['cd_id', 'title']);
 
-See F<t/53-test-schema-fixtures.t> for a runnable example.
+See F<examples/Schema/MyApp/Schema/Result/Track.pm> for a runnable example.
 
 =head1 DESCRIPTION
 

@@ -4,6 +4,8 @@ package DBIO::Storage::DBI::AutoCast;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
 
@@ -52,7 +54,7 @@ DBIO::Storage::DBI::AutoCast - Storage component for RDBMS requiring explicit pl
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -70,7 +72,7 @@ throw implicit type conversion errors.
 
 As long as a column L<data_type|DBIO::ResultSource/add_columns> is
 defined and resolves to a base RDBMS native type via
-L<_native_data_type|DBIO::Storage::DBI/_native_data_type> as
+L<_native_data_type|DBIO::Storage::DBI::DataTypeClassifier/_native_data_type> as
 defined in your Storage driver, the placeholder for this column will be
 converted to:
 

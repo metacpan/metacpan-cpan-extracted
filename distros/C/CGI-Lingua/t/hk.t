@@ -44,7 +44,7 @@ unless(-e 't/online.enabled') {
 	}
 	delete $ENV{'HTTP_ACCEPT_LANGUAGE'};
 
-        $ENV{'REMOTE_ADDR'} = '218.213.130.87';
+	$ENV{'REMOTE_ADDR'} = '218.213.130.87';
 
 	my $l = new_ok('CGI::Lingua' => [
 		supported => ['en', 'fr', 'en-gb', 'en-us'],

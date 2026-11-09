@@ -9,7 +9,7 @@ col name     => text;
 
 primary_key 'artistid';
 
-unique 'name';
+unique ['name'];
 
 has_many cds => 'MyApp::SchemaCake::Result::Cd', 'artistid';
 

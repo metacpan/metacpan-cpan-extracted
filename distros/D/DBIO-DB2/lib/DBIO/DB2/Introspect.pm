@@ -1,8 +1,10 @@
 package DBIO::DB2::Introspect;
-# ABSTRACT: Introspect a DB2 database via SYSCAT + information_schema
+# ABSTRACT: Introspect a DB2 database via SYSCAT
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
 
 use base 'DBIO::Introspect::Base';
 
@@ -10,6 +12,7 @@ use DBIO::DB2::Introspect::Tables;
 use DBIO::DB2::Introspect::Columns;
 use DBIO::DB2::Introspect::Indexes;
 use DBIO::DB2::Introspect::ForeignKeys;
+use DBIO::DB2::Introspect::UniqueConstraints;
 
 
 sub schema { $_[0]->{schema} // 'USER' }
@@ -24,13 +27,28 @@ sub _build_model {
   my $columns = DBIO::DB2::Introspect::Columns->fetch($dbh, $schema, $tables);
   my $indexes = DBIO::DB2::Introspect::Indexes->fetch($dbh, $schema, $tables);
   my $fks     = DBIO::DB2::Introspect::ForeignKeys->fetch($dbh, $schema, $tables);
+  my $ucs     = DBIO::DB2::Introspect::UniqueConstraints->fetch($dbh, $schema, $tables);
 
   return {
-    tables       => $tables,
-    columns      => $columns,
-    indexes      => $indexes,
-    foreign_keys => $fks,
+    tables             => $tables,
+    columns            => $columns,
+    indexes            => $indexes,
+    foreign_keys       => $fks,
+    unique_constraints => $ucs,
   };
+}
+
+
+sub table_uniq_info {
+  my ($self, $key) = @_;
+  my $model   = $self->model;
+  my $indexes = $model->{indexes}{$key} || {};
+  return [
+    map { [ @$_ ] } @{ $model->{unique_constraints}{$key} || [] },
+    map { [ $_ => $indexes->{$_}{columns} ] }
+      grep { $indexes->{$_}{is_unique} && ($indexes->{$_}{origin} || '') ne 'pk' }
+      sort keys %$indexes
+  ];
 }
 
 
@@ -71,16 +89,16 @@ __END__
 
 =head1 NAME
 
-DBIO::DB2::Introspect - Introspect a DB2 database via SYSCAT + information_schema
+DBIO::DB2::Introspect - Introspect a DB2 database via SYSCAT
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 C<DBIO::DB2::Introspect> reads the live state of a DB2 database via
-C<SYSCAT> and C<information_schema>, returning a unified model hashref.
+C<SYSCAT>, returning a unified model hashref.
 It is the source side of the test-deploy-and-compare strategy used by
 L<DBIO::DB2::Deploy>.
 
@@ -90,11 +108,16 @@ L<DBIO::DB2::Deploy>.
 Model shape mirrors L<DBIO::DuckDB::Introspect>:
 
     {
-        tables       => { $name => { ... } },
-        columns      => { $table => [ { ... }, ... ] },
-        indexes      => { $table => { $name => { ... } } },
-        foreign_keys => { $table => [ { ... }, ... ] },
+        tables             => { $name => { ... } },   # a view also has view_definition
+        columns            => { $table => [ { ... }, ... ] },
+        indexes            => { $table => { $name => { ... } } },   # incl. the PK index, origin 'pk'
+        foreign_keys       => { $table => [ { ... }, ... ] },
+        unique_constraints => { $table => [ [ $name, \@columns ], ... ] },
     }
+
+C<unique_constraints> is the optional section of the
+L<DBIO::Introspect::Base> contract (ADR 0009). The index Db2 keeps behind a
+C<UNIQUE> constraint is part of the constraint and not in C<indexes>.
 
 =head1 ATTRIBUTES
 
@@ -103,6 +126,12 @@ Model shape mirrors L<DBIO::DuckDB::Introspect>:
 DB2 schema to introspect. Defaults to C<USER> (current user's schema).
 
 =head1 METHODS
+
+=head2 table_uniq_info
+
+The C<UNIQUE> constraints, then the unique indexes made with
+C<CREATE UNIQUE INDEX> (the index behind the primary key is in the model with
+C<< origin => 'pk' >>, and left out here, ADR 0011).
 
 =head2 table_fk_info
 
@@ -114,13 +143,20 @@ The L<DBIO::Introspect::Base> contract used by L<DBIO::Generate> is satisfied
 by the base-class defaults: the native model built by C<_build_model> already
 uses the canonical shape (bare table-name keys; C<columns> with
 C<column_name>/C<data_type>/C<size>/C<not_null>/C<default_value>/C<is_pk>/
-C<pk_position>/C<is_auto_increment>; C<indexes> with C<origin> marking the PK
+C<pk_position>/C<is_auto_increment> in the normalized form
+L<DBIO::DB2::Introspect::Columns> describes -- lower-case C<data_type>, the
+declared C<size> (absent for a type Db2 declares without one), the C<default_value>
+as a value or a SCALAR reference for an expression -- plus the internal
+C<catalog_type>/C<catalog_size>/C<catalog_default> that only the diff reads
+(ADR 0013); C<indexes> with C<origin> marking the PK
 index; C<tables> with C<kind>). So C<table_keys>, C<table_columns>,
 C<table_columns_info>, C<table_pk_info>, C<table_uniq_info> and C<table_is_view>
 are inherited unchanged.
 
-Only C<table_fk_info> is overridden: DB2 carries the constraint name and the
-referenced schema, which the generic default drops.
+C<table_fk_info> and C<table_uniq_info> are overridden: DB2 carries the
+constraint name and the referenced schema, which the generic default drops; and
+the base takes the C<unique_constraints> section as the whole answer, which here
+would lose the unique indexes of C<db2_indexes>.
 
 =head1 AUTHOR
 

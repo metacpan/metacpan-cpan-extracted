@@ -22,7 +22,7 @@ use Scalar::Util 'refaddr';
 
 # This must be kept in sync with the version in lib/App/UpdateConfig.pm (the
 # script cannot use that module as it must work as a standalone file).
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 # With --help, prints the entire documentation, through perldoc when available.
 sub print_usage {
@@ -327,6 +327,7 @@ sub need_perm_update {
 # others store their value directly (an empty string for `optional` directives
 # without a value).
 my %DIRECTIVES = (
+  'APPEND' => {key => 'append', flag => 1},
   'BASE' => {key => 'base', multiple => 1},
   'COMMENTS CHAR' => {key => 'comments_char'},
   'DIR' => {key => 'dir'},
@@ -349,16 +350,31 @@ my %DIRECTIVES = (
   'SYMLINK' => {key => 'symlink'},
 );
 
-# The directives that can't be used with SYMLINK in a fragment (they are
-# ignored when they are inherited from its directories).
-my @NON_SYMLINK_DIRECTIVES = (
-  'COMMENTS CHAR',
-  'ENTIRE FILE',
-  'IS PREFIX',
-  'MAKE EXECUTABLE',
-  'MERGE',
-  'MERGE ARRAYS',
-  'PERM'
+# For some directives, the directives that can't be used with them when they are
+# set as deep (see add_conf). These directives are ignored when they are set in
+# a parent directory of the one setting the key directive.
+my %EXCLUDED_DIRECTIVES = (
+  'APPEND' => [
+    'COMMENTS CHAR',
+    'ENTIRE FILE',
+    'IS PREFIX',
+    'MAKE EXECUTABLE',
+    'MERGE',
+    'MERGE ARRAYS',
+    'NEED ROOT',
+    'PERM',
+    'POST UPDATE'
+  ],
+  'SYMLINK' => [
+    'APPEND',
+    'COMMENTS CHAR',
+    'ENTIRE FILE',
+    'IS PREFIX',
+    'MAKE EXECUTABLE',
+    'MERGE',
+    'MERGE ARRAYS',
+    'PERM'
+  ],
 );
 # Longest names first, so that a directive is not matched by its prefix (e.g.
 # MERGE ARRAYS by MERGE).
@@ -479,6 +495,7 @@ sub parse_file_conf {
   my %conf = defined $name ? %{get_inherited_conf($name, $dir_confs // {})} : (depth => {});
   add_conf(\%conf, $own, defined $name ? get_name_depth($name) : 0);
   validate_symlink_conf(\%conf, $content) if exists $conf{symlink};
+  remove_excluded_directives(\%conf, 'APPEND') if exists $conf{append};
   # MERGE ARRAYS can be set in a directory for its fragments that use MERGE,
   # and COMMENTS CHAR for its fragments that don't (unless it is set as deep
   # as MERGE).
@@ -505,20 +522,31 @@ sub parse_file_conf {
   return %conf;
 }
 
+# Removes from the given fragment configuration (see parse_file_conf), which
+# uses the given directive (a key of %EXCLUDED_DIRECTIVES), the directives that
+# are excluded by it and set in a parent directory of the one setting it. Dies
+# if one of these directives is set as deep as it, or deeper.
+sub remove_excluded_directives {
+  my ($conf, $directive) = @_;
+  my $depth = $conf->{depth}{$DIRECTIVES{$directive}{key}};
+  for my $d (@{$EXCLUDED_DIRECTIVES{$directive}}) {
+    my $key = $DIRECTIVES{$d}{key};
+    next if not exists $conf->{$key};
+    die "${directive} cannot be used with ${d}.\n" if $conf->{depth}{$key} >= $depth;
+    delete $conf->{$key};
+  }
+  return;
+}
+
 # Dies if the given fragment configuration (with the SYMLINK directive, see
 # parse_file_conf) and content are invalid for a symbolic link. Removes from the
-# configuration the directives that don't apply to symbolic links and that are
-# inherited from the directories of the fragment, and expands a leading `~` in
-# the destination of the link.
+# configuration the inherited directives that don't apply to symbolic links (see
+# remove_excluded_directives), and expands a leading `~` in the destination of
+# the link.
 sub validate_symlink_conf {
   my ($conf, $content) = @_;
   die "A SYMLINK fragment cannot have any content.\n" if $content =~ m/\S/;
-  for my $d (@NON_SYMLINK_DIRECTIVES) {
-    my $key = $DIRECTIVES{$d}{key};
-    next if not exists $conf->{$key};
-    die "SYMLINK cannot be used with ${d}.\n" if $conf->{depth}{$key} >= $conf->{depth}{symlink};
-    delete $conf->{$key};
-  }
+  remove_excluded_directives($conf, 'SYMLINK');
   $conf->{symlink} =~ s{^~(?=/|$)}{get_home_dir()}e;
   return;
 }
@@ -1074,9 +1102,10 @@ sub get_target {
   return $target;
 }
 
-# Sorts the fragments by their base name and then by their path, ignoring case.
+# Sorts the fragments by their base name and then by their path, ignoring case
+# (and then without ignoring it, so that the order is always the same).
 sub by_fragment_order {
-  return (lc basename($a) cmp lc basename($b)) || (lc $a cmp lc $b);
+  return (lc basename($a) cmp lc basename($b)) || (lc $a cmp lc $b) || ($a cmp $b);
 }
 
 # Returns the description of the given fragment (from its name and content, and
@@ -1097,16 +1126,23 @@ sub prepare_fragment {
   return \%fragment;
 }
 
+# Returns a key identifying the target of the given fragment (from
+# prepare_fragment).
+sub get_target_key {
+  my ($fragment) = @_;
+  return "$fragment->{mode}\0$fragment->{in_path}";
+}
+
 # Dies if some of the given fragments (from prepare_fragment) can't be applied
 # to the same target: when they have the same guard suffix (unless they both
 # use MERGE), when one of them uses ENTIRE FILE or SYMLINK, or when only one of
-# them uses MERGE.
+# them uses MERGE. The APPEND fragments are ignored (see append_fragments).
 sub check_conflicts {
   my (@fragments) = @_;
   my %by_target;
-  for my $f (@fragments) {
+  for my $f (grep { !$_->{conf}{append} } @fragments) {
     my $c = $f->{conf};
-    for my $other (@{$by_target{"$f->{mode}\0$f->{in_path}"}}) {
+    for my $other (@{$by_target{get_target_key($f)}}) {
       my $o = $other->{conf};
       next
           if !$c->{entire_file}
@@ -1118,9 +1154,33 @@ sub check_conflicts {
       die "Fragments '$other->{name}' and '$f->{name}' can't both be applied to "
           ."'$f->{in_path}', use different GUARD SUFFIX directives.\n";
     }
-    push @{$by_target{"$f->{mode}\0$f->{in_path}"}}, $f;
+    push @{$by_target{get_target_key($f)}}, $f;
   }
   return;
+}
+
+# Appends the content of each of the given APPEND fragments (from
+# prepare_fragment) to the content of the ENTIRE FILE fragment, among the given
+# fragments, that has the same target, in the order of the APPEND fragments,
+# separated by an empty line. Returns the other fragments. Dies if there is no
+# such ENTIRE FILE fragment. The fragments must have been validated by
+# check_conflicts.
+sub append_fragments {
+  my (@fragments) = @_;
+  my %entire_files = map { (get_target_key($_) => $_) } grep { $_->{conf}{entire_file} } @fragments;
+  for my $f (grep { $_->{conf}{append} } @fragments) {
+    my $target = $entire_files{get_target_key($f)}
+        // die "Fragment '$f->{name}' uses APPEND, but there is no ENTIRE FILE fragment applied "
+        ."to '$f->{in_path}'.\n";
+    next if $f->{conf}{content} eq '';
+    my $content = \$target->{conf}{content};
+    if (${$content} ne '') {
+      ${$content} .= "\n" if ${$content} !~ m/\n\z/;
+      ${$content} .= "\n";
+    }
+    ${$content} .= $f->{conf}{content};
+  }
+  return grep { !$_->{conf}{append} } @fragments;
 }
 
 # Returns the modifications made to the target of the given ENTIRE FILE fragment
@@ -1220,6 +1280,7 @@ sub main {
     return;
   }
   check_conflicts(@fragments);
+  @fragments = append_fragments(@fragments);
 
   my $need_root = 0;
   for my $f (@fragments) {
@@ -1328,8 +1389,9 @@ target (unless the C<MIRROR> directive is used). A suffix between brackets in
 that name is not part of the target but it is the default guard suffix of the fragment (e.g. F<bashrc [linux]> and
 F<bashrc [macos]> both target F<.bashrc>, with the C<LINUX> and C<MACOS> guard
 suffixes, which are always in upper case). Several fragments can be applied to the same file only if they have
-different guard suffixes (see the C<GUARD SUFFIX> directive) or if they all
-use C<MERGE>, otherwise the program fails without applying any fragment.
+different guard suffixes (see the C<GUARD SUFFIX> directive), if they all
+use C<MERGE>, or if all but one use C<APPEND>, otherwise the program fails
+without applying any fragment.
 
 Similarly, a suffix between brackets at the end of the name of a directory
 (e.g. F<[linux]> or F<work [linux]>) is the default guard suffix of all the
@@ -1441,6 +1503,25 @@ the fragment and continues with the other ones. The C<--force> option
 overwrites the target anyway, and reports it as C<Updated: target (forced)>. A
 target that does not exist is always written.
 
+=item C<APPEND>
+
+Appends the content of the fragment to the content of the C<ENTIRE FILE>
+fragment that has the same target, instead of applying it separately (e.g.
+F<AGENTS.md> with C<ENTIRE FILE>, and F<AGENTS.md [work]> with C<APPEND> and a
+C<REQUIRE> guard). Any number of C<APPEND> fragments can target the same file,
+in which case they are appended in the order in which the fragments are
+processed (see above), whatever their guard suffixes. The content of each
+fragment is separated from the previous one by an empty line (the fragments
+with no content are ignored). The program fails without
+applying any fragment if there is no C<ENTIRE FILE> fragment applied to the
+target (e.g. because of its C<REQUIRE> guards). This directive can be set in a
+F<.update_config> file for all the fragments of a directory. It cannot be used
+with C<COMMENTS CHAR>, C<ENTIRE FILE>, C<IS PREFIX>, C<MAKE EXECUTABLE>,
+C<MERGE>, C<MERGE ARRAYS>, C<NEED ROOT>, C<PERM> or C<POST UPDATE> (the
+directives of the C<ENTIRE FILE> fragment apply to the whole file, these
+directives are ignored when they are set in a parent directory of the one
+setting C<APPEND>).
+
 =item C<MAKE EXECUTABLE>
 
 Makes the target file executable.
@@ -1472,7 +1553,7 @@ link at the target is replaced. Other files are not overwritten (the fragment
 is skipped, the program continues with the other ones), unless the C<--force>
 option is used. A directory is never replaced. The target can't be made of
 commands, and this directive can't be used in a F<.update_config> file, nor
-with C<COMMENTS CHAR>, C<ENTIRE FILE>, C<IS PREFIX>, C<MAKE EXECUTABLE>,
+with C<APPEND>, C<COMMENTS CHAR>, C<ENTIRE FILE>, C<IS PREFIX>, C<MAKE EXECUTABLE>,
 C<MERGE>, C<MERGE ARRAYS> or C<PERM> (these directives are ignored when they
 are set in a parent directory).
 

@@ -19,7 +19,7 @@ LANGUAGES: {
 		$ENV{'IGNORE_WIN32_LOCALE'} = 1;
 	}
 
-        delete($ENV{'REMOTE_ADDR'});
+	delete($ENV{'REMOTE_ADDR'});
 
 	$ENV{'HTTP_ACCEPT_LANGUAGE'} = 'en-us';
 	my $l = new_ok('CGI::Lingua' => [

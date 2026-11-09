@@ -2,10 +2,23 @@
 package DBIO::Test::ErrorComponent;
 # ABSTRACT: Test component that fails to load due to missing true value
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
-# this is missing on purpose
-# 1;
+# DO NOT "FIX" THIS TO 1 — and do not delete it.
+#
+# This fixture exists to make load_optional_class() die with Perl's
+# "did not return a true value" error (t/90ensure_class_loaded.t). Perl emits
+# that same error both for a module with no trailing true value and for one
+# that explicitly returns false, so returning 0 here is what the test needs.
+#
+# The explicit 0 is also load-bearing against version sweeps: without a final
+# statement, whatever the sweep stamps last — e.g. our $VERSION = '...' —
+# becomes the file's return value, which is TRUE, the module loads cleanly and
+# the test silently breaks. Keep this 0 as the last statement in the file.
+0;
 
 __END__
 
@@ -19,7 +32,7 @@ DBIO::Test::ErrorComponent - Test component that fails to load due to missing tr
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

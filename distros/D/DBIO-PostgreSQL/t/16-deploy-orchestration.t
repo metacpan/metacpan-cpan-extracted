@@ -14,10 +14,22 @@ BEGIN {
     or plan skip_all => 'Moo not installed';
 }
 
-use DBI;
 use DBIO::PostgreSQL::DDL;
 use DBIO::PostgreSQL::Deploy;
 use DBIO::PostgreSQL::Introspect;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use PrivatePgDatabase;
+
+# A server that is not there fails the file, with a plan (karr k113).
+LiveServer->require_server;
+
+# The namespace below keeps other tests' tables out of the diff, but not the
+# database-level objects: an extension installed in the shared database (t/48
+# and t/54 leave pgvector there) is outside every schema filter, so "no
+# changes" became a DROP EXTENSION. Hence a database of its own (karr k81).
+($dsn, $user, $pass) = PrivatePgDatabase->create('t16');
 
 # -----------------------------------------------------------------------
 # v1 schema: one table with three columns
@@ -55,11 +67,10 @@ DeployTest::SchemaV1->register_class(Widget => 'DeployTest::SchemaV1::Result::Wi
 # -----------------------------------------------------------------------
 # v2 schema: same table + extra nullable column
 #
-# NOTE: We deliberately do NOT add a brand-new table here, because
-# Diff::Table currently emits an empty CREATE TABLE shell and relies on
-# Diff::Column to populate it -- which doesn't work for serial columns
-# (the implicit sequence isn't created). That is a known gap to fix in
-# the diff engine; this test focuses on what currently works reliably.
+# NOTE: We deliberately do NOT add a brand-new table here; this test
+# focuses on the added column. A new table with a serial column, whose
+# sequence the upgrade has to create, is t/110-diff-sequences-live.t
+# (karr k121).
 # -----------------------------------------------------------------------
 {
   package DeployTest::SchemaV2;
@@ -90,7 +101,7 @@ DeployTest::SchemaV2->register_class(Widget => 'DeployTest::SchemaV2::Result::Wi
 # Cleanup helper
 # -----------------------------------------------------------------------
 sub cleanup {
-  my $h = DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 });
+  my $h = LiveServer->control_dbh(login => [ $dsn, $user, $pass ], attrs => { RaiseError => 0 });
   $h->do("DROP SCHEMA IF EXISTS $NS CASCADE");
   $h->do("CREATE SCHEMA $NS");
   $h->disconnect;
@@ -99,7 +110,7 @@ sub cleanup {
 cleanup();
 END {
   return unless $dsn;
-  my $h = DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 });
+  my $h = eval { LiveServer->dbh_or_die(login => [ $dsn, $user, $pass ], attrs => { RaiseError => 0 }) };
   $h->do("DROP SCHEMA IF EXISTS $NS CASCADE") if $h;
 }
 

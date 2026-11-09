@@ -1,0 +1,82 @@
+# PostgreSQL pod for dbio-postgresql live tests — the manual path.
+#
+# RESOURCE DISCIPLINE — this runs on a small SHARED box (few cores, alongside
+# other DBs and services). The pod carries resources.limits so it can never
+# starve the host. Run ONE test DB at a time, the suite through capped-test,
+# and DELETE the pod when done — a forgotten pod is capped but still noise. See
+# the "Live testing" section in .claude/rules/.local.dbio-rules.md.
+#
+# The image must carry pgvector: several tests (loader, Cake schema
+# generation) need the `vector` extension, so stock `postgres:18` is NOT
+# enough.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/pg-pod.yaml
+#   kubectl wait -n dbio-test --for=condition=Ready pod/dbio-postgresql --timeout=120s
+#   kubectl port-forward -n dbio-test svc/dbio-postgresql 5432:5432 &
+#
+#   DBIO_TEST_PG_DSN='dbi:Pg:dbname=dbio_test;host=127.0.0.1;port=5432' \
+#   DBIO_TEST_PG_USER=dbio \
+#   DBIO_TEST_PG_PASS=dbio_test_secret \
+#     ../dbio/maint/capped-test prove -lr t/
+#
+#   kubectl delete -f maint/k8s/pg-pod.yaml   # ALWAYS clean up
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dbio-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-postgresql
+  namespace: dbio-test
+  labels:
+    app: dbio-postgresql
+    role: dbio-test-db
+spec:
+  containers:
+    - name: postgres
+      image: src.ci/srv/postgres:18
+      resources:
+        requests:
+          cpu: 250m
+          memory: 256Mi
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 1Gi       # headroom for pgvector index builds
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_DB
+          value: dbio_test
+        - name: POSTGRES_USER
+          value: dbio
+        - name: POSTGRES_PASSWORD
+          value: dbio_test_secret
+      readinessProbe:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - dbio
+            - -d
+            - dbio_test
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-postgresql
+  namespace: dbio-test
+spec:
+  selector:
+    app: dbio-postgresql
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP

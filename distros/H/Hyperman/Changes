@@ -1,5 +1,12 @@
 Revision history for Hyperman
 
+0.68	2026-11-08
+        - The refusal of user => with reuseport => 1 on a low port comes
+          before any bind
+
+0.67	2026-11-06
+        - Increase test coverage to 100% 
+
 0.66	2026-11-01
         - TEST: the HTTP/1.1 abort test probes whether this host turns a
           zero-linger close into a reset before asserting one (Cygwin and

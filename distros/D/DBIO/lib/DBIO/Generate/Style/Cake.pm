@@ -3,7 +3,11 @@ package DBIO::Generate::Style::Cake;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Data::Dumper ();
+use DBIO::Cake ();
 use DBIO::Generate::Util ();
 use namespace::clean;
 
@@ -20,7 +24,7 @@ sub emit {
   push @lines, "";
 
   if (my @c = @{ $spec->{components} // [] }) {
-    push @lines, "load_components " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ";";
+    push @lines, "__PACKAGE__->load_components(" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ");";
     push @lines, "";
   }
 
@@ -36,36 +40,42 @@ sub emit {
   }
   push @lines, "";
 
-  my %pk_set = map { $_ => 1 } @{ $spec->{pk} // [] };
   for my $col (@{ $spec->{column_order} // [] }) {
     my $info = $spec->{columns}{$col} // {};
     my $type_str = _cake_type($info);
     my $col_str  = DBIO::Generate::Util::pl_str($col);
-    if ($pk_set{$col}) {
-      push @lines, "primary_column $col_str => $type_str;";
-    }
-    elsif ($info->{is_nullable}) {
-      push @lines, "nullable_column $col_str => $type_str;";
-    }
-    else {
-      push @lines, "column $col_str => $type_str;";
-    }
+    # Cake's DDL form: `col NAME => <type>[, <modifier>...];`. Modifiers follow
+    # the type behind a comma (as the shipped example Results do), so the type
+    # function's explicit arg list is closed before the modifier bareword.
+    my @mods;
+    push @mods, 'auto_inc' if $info->{is_auto_increment};
+    push @mods, 'null'     if $info->{is_nullable};
+    my $line = "col $col_str => $type_str";
+    $line .= ', ' . join(', ', @mods) if @mods;
+    push @lines, "$line;";
   }
   push @lines, "";
 
+  if (my @pk = @{ $spec->{pk} // [] }) {
+    push @lines, "primary_key " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @pk) . ";";
+    push @lines, "";
+  }
+
   for my $uq (@{ $spec->{uniq} // [] }) {
     my ($name, $cols) = @$uq;
-    push @lines, "unique_constraint " . DBIO::Generate::Util::pl_str($name) . " => [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @$cols) . "];";
+    push @lines, "unique " . DBIO::Generate::Util::pl_str($name) . " => [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @$cols) . "];";
   }
   push @lines, "" if @{ $spec->{uniq} // [] };
 
   for my $stmt (@{ $spec->{extra_statements} // [] }) {
     my ($method, @args) = @$stmt;
+    DBIO::Generate::Util::assert_method_name($method, 'extra_statements method');
     push @lines, "$method " . join(', ', map { _dump_val($_) } @args) . ";";
   }
   push @lines, "" if @{ $spec->{extra_statements} // [] };
 
   for my $rel (@{ $spec->{relationships} // [] }) {
+    DBIO::Generate::Util::assert_relationship_method($rel->{method});
     my ($rel_name, $remote_class, $cond, @rest) = @{ $rel->{args} };
     my $cond_str = _dump_inline($cond);
     push @lines, "$rel->{method} " . DBIO::Generate::Util::pl_str($rel_name) . ", " . DBIO::Generate::Util::pl_str($remote_class) . ", $cond_str;";
@@ -77,26 +87,26 @@ sub emit {
   return join("\n", @lines);
 }
 
+my %TYPE_FUNCTION = map { $_ => 1 } DBIO::Cake->type_function_names;
+
 sub _cake_type {
   my ($info) = @_;
   my $dt   = $info->{data_type} // 'varchar';
   my $size = $info->{size};
 
-  # SECURITY: data_type / size are DB-reported and must never be spliced raw.
-  # The bareword DSL type-function form (e.g. `varchar(100)`) is only safe when
-  # the type token is a plain identifier and the size is an integer. For the
-  # common case that holds and we keep the readable DSL form; anything outside
-  # it falls back to explicit, string-literal `data_type => '...'` option pairs,
-  # which Cake's column() accepts identically and which cannot inject code.
+  # A type is data. The bareword DSL form (e.g. `varchar(100)`) is written for
+  # the type functions DBIO::Cake exports and an integer size; every other
+  # type is a string literal in `data_type => '...'` option pairs, which
+  # Cake's column() accepts identically.
   my $safe_size = !defined $size || $size =~ /\A-?[0-9]+\z/;
-  if ($dt =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/ && $safe_size) {
+  if ($safe_size && $TYPE_FUNCTION{$dt}) {
     return defined $size ? "$dt($size)" : $dt;
   }
 
   my $type_str = "data_type => " . DBIO::Generate::Util::pl_str($dt);
   if (defined $size) {
     $type_str .= ", size => "
-      . ($safe_size ? $size : DBIO::Generate::Util::pl_str($size));
+      . DBIO::Generate::Util::pl_val($size);
   }
   return $type_str;
 }
@@ -109,7 +119,7 @@ sub _dump_inline {
   return Data::Dumper::Dumper($val);
 }
 
-sub _dump_val { _dump_inline($_[1]) }
+sub _dump_val { _dump_inline($_[0]) }
 
 1;
 
@@ -125,7 +135,7 @@ DBIO::Generate::Style::Cake - DBIO::Cake DSL emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

@@ -4,6 +4,8 @@ package DBIO::MySQL::Result;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Core';
 
 __PACKAGE__->mk_classdata('_mysql_indexes' => {});
@@ -65,7 +67,7 @@ DBIO::MySQL::Result - MySQL/MariaDB-specific Result component for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -86,10 +88,12 @@ Load it with:
     __PACKAGE__->mysql_charset('utf8mb4');
     __PACKAGE__->mysql_collate('utf8mb4_unicode_ci');
 
+    # CREATE INDEX idx_users_name ON users (name);
     __PACKAGE__->mysql_index('idx_users_name' => {
         columns => ['name'],
     });
 
+    # CREATE FULLTEXT INDEX idx_users_fulltext ON users (bio);
     __PACKAGE__->mysql_index('idx_users_fulltext' => {
         using   => 'FULLTEXT',
         columns => ['bio'],
@@ -123,9 +127,11 @@ C<utf8mb4_unicode_ci> in generated DDL when unset.
 
 =head2 mysql_index
 
+    # CREATE INDEX idx_users_name ON users (name);
     __PACKAGE__->mysql_index('idx_users_name' => {
         columns => ['name'],
     });
+    # CREATE FULLTEXT INDEX idx_users_fulltext ON users (bio);
     __PACKAGE__->mysql_index('idx_users_fulltext' => {
         using   => 'FULLTEXT',
         columns => ['bio'],
@@ -140,7 +146,16 @@ hashref accepts:
 
 =item C<unique> - set to true for a UNIQUE index
 
-=item C<using> - C<BTREE>, C<HASH>, C<FULLTEXT>, or C<SPATIAL>
+=item C<using> - C<BTREE>, C<HASH>, C<FULLTEXT> or C<SPATIAL>, matched
+case-insensitively and always rendered uppercase. The four are not
+rendered alike, because MySQL does not treat them alike: C<BTREE> and
+C<HASH> are index types and render as a trailing C<USING> clause
+(C<CREATE INDEX idx ON t (c) USING BTREE>), while C<FULLTEXT> and
+C<SPATIAL> are index classes and render in front of C<INDEX>
+(C<CREATE FULLTEXT INDEX idx ON t (c)>) -- the server rejects an index
+type on those. Any other value, C<RTREE> included, is refused with an
+exception naming the index when the DDL is generated, rather than
+passed through to fail at the server.
 
 =back
 
@@ -150,7 +165,9 @@ hashref accepts:
 
 Returns a copy of all index definitions registered on this result class.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 

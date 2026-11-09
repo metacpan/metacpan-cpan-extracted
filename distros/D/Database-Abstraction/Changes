@@ -1,5 +1,12 @@
 Revision history for Database-Abstraction
 
+0.56	Sun Nov  8 12:50:38 PM EST 2026
+	[ Bug Fixes ]
+	- A quote inside a quoted CSV, PSV or TSV field written as two quotes
+	  ("Adeste ""Overture""", as RFC 4180 and spreadsheets write it) was
+	  read as two quotes.  The escape is now chosen per file: a backslash
+	  when the file has \" anywhere, as before, else the quote.
+
 0.55	Thu Nov  5 09:07:27 PM EST 2026
 	[ Bug Fixes ]
 	- DBD::CSV (0.64), Text::xSV::Slurp and XML::Simple are now required.

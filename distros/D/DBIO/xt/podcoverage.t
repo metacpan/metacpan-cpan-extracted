@@ -7,8 +7,15 @@ plan skip_all => "Skipping finicky test on older perl"
 
 # This test must run via 'dzil test', not 'prove xt/' directly —
 # PodWeaver must have already processed the source files.
+#
+# The sample must be a file PodWeaver demonstrably gives one of these headings
+# to, or the guard skips everywhere and the test never runs at all — which is
+# what lib/DBIO/Admin.pm did here until k176: it carries no =method/=attr tags,
+# so no weave ever produces the heading and the "built dist" case was
+# indistinguishable from the "raw repo" case. lib/DBIO.pm carries =method tags,
+# so its woven form has =head1 METHODS and its repo form does not.
 do {
-  my $sample = do { local (@ARGV, $/) = 'lib/DBIO/Admin.pm'; <> };
+  my $sample = do { local (@ARGV, $/) = 'lib/DBIO.pm'; <> };
   plan skip_all => 'Run via dzil test — PodWeaver must process files first (prove xt/ not supported)'
     unless $sample =~ /^=head1 (?:ATTRIBUTES|METHODS)/m;
 };
@@ -89,16 +96,6 @@ my $exceptions = {
             no_columns
             one_row
             rand
-        /],
-    },
-    'DBIO::ResultSourceHandle' => {
-        ignore => [qw/
-            schema
-            source_moniker
-            new
-            resolve
-            STORABLE_freeze
-            STORABLE_thaw
         /],
     },
     'DBIO::Storage' => {

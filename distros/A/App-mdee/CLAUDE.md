@@ -4,7 +4,7 @@
 
 em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command implemented as a Bash script. It combines greple for syntax highlighting with nup for multi-column paged output.
 
-**Concept:** mdee shows a `.md` file as it is written, made easier on the eyes with color; it is not a Markdown renderer and does not interpret or reformat the text. Table alignment, list-item folding, hiding markup characters (default themes), closing hashes on h3-h6 and, with `--refill`, joining the lines that pandoc finds to be one paragraph were added later for readability and are the only transformations. Keep new features within this idea: backslash escapes are shown as written, and `--no-theme` gives back the original text in color.
+**Concept:** mdee shows a `.md` file as it is written, made easier on the eyes with color; it is not a Markdown renderer and does not interpret or reformat the text. Table alignment, list-item folding, hiding markup characters (default themes), closing hashes on h3-h6 and, with `--refill`, joining the lines that a Markdown parser (CommonMark, Markdown::Perl or pandoc) finds to be one paragraph were added later for readability and are the only transformations. Keep new features within this idea: backslash escapes are shown as written, and `--no-theme` gives back the original text in color.
 
 ## Dependencies
 
@@ -25,7 +25,8 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `script/mdee` - Main script (Bash) with POD documentation
 - `lib/App/mdee.pm` - Perl module (version info only, generated from script/mdee)
 - `lib/App/Greple/md.pm` - Greple module for Markdown syntax highlighting (bundled)
-- `lib/App/Greple/md/Blocks.pm` - Paragraph positions for `refill`, from the CommonMark module or pandoc
+- `lib/App/Greple/md/Blocks.pm` - Paragraph positions for `refill`, from the CommonMark module, Markdown::Perl or pandoc
+- `lib/App/Greple/md/widen.pm` - A function for `--begin`, a no-break space after characters that macOS terminals draw over two columns (`-t widen`)
 - `t/00_compile.t` - Compile tests for both App::mdee and App::Greple::md
 - `t/01_mdee.t` - mdee command integration tests
 - `t/02_colorize.t` - md module colorize tests (uses t/runner)
@@ -36,8 +37,11 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown *text* viewer command i
 - `t/07_fold_runin.t` - fold_runin/fold_runout reach ansifold (line width with and without run-in)
 - `t/08_refill_join.t` - `refill_block` unit tests (joining rules; no pandoc needed)
 - `t/09_refill.t` - `refill=1` through greple: joining, folding of the joined lines, tables above them, with each available parser (skipped without one)
+- `t/12_widen.t` - `App::Greple::md::widen`, alone and through `--begin`
+- `t/13_begin.t` - the `--begin` option of the md module
 - `t/11_quote_fold.t` - long block quote lines are folded with the quote marker repeated on the continuation lines, with and without color
 - `t/14_escape.t` - control characters and escape sequences of the file are removed, colors stay
+- `t/15_front_matter.t` - front matter is shown as a code block (marks in place of colors), only at the top, not folded; `front_matter=0`
 - `t/10_blocks.t` - `App::Greple::md::Blocks`: both parsers report the same paragraph lines (skipped without one)
 - `t/Util.pm` - Test helper for greple-based tests
 - `t/runner/` - Submodule (p5-script-runner) for finding greple path
@@ -341,7 +345,7 @@ Early-processed regions (code blocks, inline code, comments, links) are replaced
 Steps are organized into three groups:
 
 ```perl
-my @protect_steps = qw(code_blocks comments image_links images links);
+my @protect_steps = qw(front_matter code_blocks comments image_links images links);
 my @inline_steps  = qw(inline_code horizontal_rules bold_italic bold italic strike);
 my @final_steps   = qw(blockquotes);
 ```
@@ -384,6 +388,8 @@ Code-related and emphasis-related theme keys map directly to module labels:
 | `code_block` | `code_block` | Fenced code block body (with `;E`) |
 | `code_inline` | `code_inline` | Inline code body (without `;E`) |
 | `emphasis_mark` | `emphasis_mark` | Emphasis markers (`**`, `*`, `__`, `_`, `~~`) |
+| - | `meta_mark` | Front matter delimiter lines (undefined; falls back to `code_mark`) |
+| - | `meta_block` | Front matter lines (undefined; falls back to `code_block`) |
 
 `emphasis_mark` is the default color for all emphasis markers. Per-type overrides
 (`bold_mark`, `italic_mark`, `strike_mark`) can be defined via `--cm` and take
@@ -424,9 +430,21 @@ ATX headings ([CommonMark](https://spec.commonmark.org/0.31.2/#atx-headings)), f
 
 Inline code ([CommonMark Code Spans](https://spec.commonmark.org/0.31.2/#code-spans)) uses the `$CODE` pattern, which matches both single and multi-backtick spans. For multi-backtick (2+), optional leading/trailing spaces are stripped per CommonMark spec.
 
+### Front Matter
+
+Front matter at the top of the file (`front_matter()`: TOML between `+++` lines, YAML from `---` to `---` or `...`, not with a blank line right after the opening `---`, as pandoc defines it) is shown as a fenced code block: the first step, `front_matter`, colors every line with `meta_block`, the delimiter lines too (their text with `meta_mark` inside, so the background runs over the whole block, unlike a fenced code block); the two labels are undefined by default and fall back to `code_block` and `code_mark` (`fallback_color()`, as `bold_mark` falls back to `emphasis_mark`); they are named `meta_*` because `front_matter` is the config switch and color labels share the config namespace, and protects the whole, so that no other markup applies (a `---` would otherwise be a rule, a `# comment` a heading). It is excluded from folding by `--exclude &__PACKAGE__::front_matter_region`, which finds the region by the line count `$front_lines` that `begin()` sets, because the text is colored by then, and refill leaves it alone. Front matter is not in CommonMark or GFM (checked 2026-11-09); config `front_matter=0` takes the lines as Markdown.
+
 ### Control Characters in the File
 
 `begin()` first calls `remove_controls`, so that a Markdown file from someone else cannot send anything but colors to the terminal: OSC (title, clipboard, hyperlink), DCS, CSI other than SGR, other escape sequences, C0 controls except `\t \n \f \r`, DEL and C1. OSC and CSI use `$osc_re` and `$csi_re` of Text::ANSI::Fold, which also take the 8-bit forms; `$STRING` has the same form for DCS, SOS, PM and APC. ECMA-48 ends these with ST only; BEL is taken too, as in `$osc_re`, because terminals use it. A string sequence without a terminator, or with a control character that a command string cannot have, loses only its introducer, and its text stays. SGR stays, because a colored file is a reasonable input, except `\e[256m`, the mark of `protect()`: `\e[256mN\e[m` in a file would bring back protected text or die in `restore()`. The file name label is printed by greple and is not covered. Theme names with `/` are rejected by `load_theme_file`, so that `--theme` cannot run a file outside the theme directories.
+
+### The `--begin` Option of the md Module
+
+`--begin FUNCTION` before `--` is an option of the md module (`deal_with`, `@opt_begin`), like `--cm`: `begin()` calls each function first, with the text in `$_`, before `refill`, `colorize` and `format_table`. The `--begin` of greple after `--` is too late, because the module's own `--begin` from its default option comes first and `-M` must be at the beginning of the arguments. Functions are parsed once with `parse_func` of Getopt::EX::Func (a public API), `PACKAGE => 'main'` as in greple; a `sub{...}` is allowed. `resolve_function` finds the function and requires its package when it is not defined yet (a function defined by a module given with `-M` is used as it is), so a function in a module of its own needs no `-M`, which would have to come ahead of `-Mmd`. A name without a package is looked for in `main`, as in greple, and then as `App::Greple::md::name::name`. A function or a package that is not found is only warned about and skipped, while a module that exists and does not compile still dies. An extension that needs Perl code is therefore `lib/App/Greple/md/name.pm` with a function `name` and a theme with one line, `--begin '&name'`, not a part of `md.pm`. Perl's `AUTOLOAD` was tried for this and not used: it hides the check that the function exists, and a mistyped call inside `md.pm` would end up in it. In config.sh or a theme: `pass_md+=(--begin 'sub{ ... }')`.
+
+### The `widen` Function (experimental)
+
+`App::Greple::md::widen::widen` is a function for `--begin` (`-t widen`; `chars=2460-24FF:3248-324F` as a parameter). The theme lists the characters in the array `widen_chars` (with `+=`, one entry per line with a comment) and passes them as `chars`, so that config.sh, which is sourced before the themes, can add more with `widen_chars+=(...)`; the list depends on the terminal and its font, not on the code. The default of `chars` in the module (`2460-24FF:1F5D1`) is for greple without mdee. Circled digits (U+2460-U+24FF) have East Asian Width Ambiguous: one column to the tools and to the terminal, while macOS terminals (iTerm2 and Terminal) draw them over two, on top of the next character. The default `chars` is `2460-24FF:1F5D1`: the wastebasket 🗑 (U+1F5D1) has East Asian Width N and no Emoji_Presentation, so it is one column too, and is drawn as a two-column emoji. Menlo has no such glyphs, so a font fallback is the likely reason. Setting the terminal to treat Ambiguous as wide is no answer, because the box-drawing characters of the tables are Ambiguous too. The function adds U+00A0 after each character (after a variation selector U+FE0E or U+FE0F that follows it, possessively, so that the space does not cut the selector off the character), so that every tool counts two columns: a no-break space because `trim` of ansifold removes only ASCII spaces, so the column stays at the end of a folded line; at the end of a table cell it is removed by the cell separator pattern, and the padding of the cell takes its place. Fenced code with an info string, code spans, link destinations and autolinks are passed over by `(*SKIP)(*FAIL)`; fenced code without one is changed, because it is often a figure or an output (the README of OMC has such a figure), while a program must stay as written. It runs before `refill`, as all functions of `--begin` do.
 
 ### Text Folding (md module)
 
@@ -584,7 +602,7 @@ Config parameters from mdee:
 - `refill()` takes the `Para`/`Plain` blocks from the bottom up (so the line numbers above stay valid) and replaces their lines with `refill_block(\@lines, $depth)`, which joins as ansifold's `fill_up` does (nothing after fullwidth punctuation or between two `InConcatScript` characters, one space otherwise; the properties are subs in App::ansifold, so the patterns are compiled at run time after `require`), strips `^\h*(?:>\h?){0,$depth}\h*` from the second line on, and keeps the break after a hard break (two spaces or an odd number of `\` at the end of a line; `\\` is an escaped backslash) and before a line that starts with a list marker (`#.` lists are paragraphs to pandoc), is a horizontal rule, looks like a table row (`format_table` takes three such lines as a table, although GFM reads them as paragraph text), or starts a footnote definition (`[^name]:`, also inside a quote; `cmark` and `mdperl` have no footnotes and report consecutive definitions as one paragraph).
 - The final line numbers of the joined blocks go to `@refill_lines`. `format_table` records `[start line, lines added]` in `@table_shift`, because wrapped cells and `table_style=simple` change the line count (colorize keeps it); the shift is applied per line, since a range may contain a table (a paragraph line right above and below it). `refill_regions()` is a function pattern in `--fold-by` (`--cm N --le &__PACKAGE__::refill_regions`; `-E` would take `&name` as a regex; greple takes `&name` as a function only in a lexical expression, `--le`/`-x`) and returns one region per joined line, shifted by the tables above it. `{LIST_ITEM}` and `refill_regions` may return the same line; greple folds it once. Both arrays are reset in `begin()` for each file.
 - `--autoindent` in `--fold-by` decides the prefix of the continuation lines, with `--keepindent=named` (App::ansifold 1.36): the quote markers are in the named group `(?<q>...)`, with the SGR sequences the `blockquotes` step puts around them, and are repeated on every continuation line; everything else in the match (indent, list marker, definition colon) becomes spaces of the same width, so `> - item` continues as `>   ...`, a list item as `  ...`, and a quoted paragraph keeps its `> `. The `blockquotes` step colors the markers only, not the indent before them, so that `^\h*` before the group matches the indent. The pattern is built in `__DATA__` from the defines `{SGR}` and `{LIST_MARKER}` as `{AUTOINDENT}` (a define is expanded inside the quoted tee argument too), and every part of it may be empty, so that every line matches and sets its own prefix: by design, ansifold keeps the prefix of the last matching line for the lines that do not match (its `ps axgw | ansifold --autoindent '.*TIME (?=COMMAND)'` example takes the indent from the header line for the whole table), which here would have indented a paragraph folded after a list item.
-- `refill_block` keeps the break on both sides of a table-row line and treats a CR before the line break (CRLF file) as part of the line break. `refill()` leaves TOML front matter (`+++` ... `+++` at the top) alone; pandoc's gfm reader takes it as a paragraph, while YAML front matter is metadata to it.
+- `refill_block` keeps the break on both sides of a table-row line and treats a CR before the line break (CRLF file) as part of the line break. `refill()` leaves front matter at the top alone (config `front_matter`, default 1; `0` joins its lines as the parser reports them); the detection is `front_matter()`, and `begin()` keeps its line count in `$front_lines`, TOML (`+++` ... `+++`) and YAML (`---` ... `---` or `...`, not with a blank line right after the opening `---`, as in pandoc): pandoc's gfm reader takes TOML as a paragraph, and libcmark takes YAML as paragraphs and list items (the Qiita CLI front matter has a `tags:` list), while pandoc and Markdown::Perl take YAML as metadata. A block that starts inside the front matter is cut at its end, because libcmark runs a paragraph on past a closing `...`.
 - When fold is off (filter, raw, `--no-fold`) a joined paragraph is one long line.
 - Tests: `t/08_refill_join.t` (unit tests of `refill_block`, no parser needed), `t/10_blocks.t` (both parsers give the same lines on edge cases) and `t/09_refill.t` (greple runs, repeated for each parser that `available()` returns; `skip_all` without one). `t/01_mdee.t` checks the option with a `pandoc` stub that fails and a `CommonMark.pm` that dies, put ahead in PATH and PERL5LIB.
 

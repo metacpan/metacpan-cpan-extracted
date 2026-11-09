@@ -3,6 +3,9 @@ package DBIO::Test::Schema::Year1999CDs;
 ## Used in 104view.t
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -52,7 +55,7 @@ DBIO::Test::Schema::Year1999CDs - Test virtual view result class for 1999 CDs
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

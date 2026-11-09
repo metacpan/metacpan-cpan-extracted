@@ -1,6 +1,6 @@
-# ADR 0007 — Pre-9i `(+)` joins via a version-conditional storage subclass
+# ADR 0007 — Pre-9i `(+)` joins via a separate storage subclass
 
-- Status: accepted
+- Status: accepted (subclass shipped; automatic version-based selection not implemented, karr k34)
 - Date: 2026-06-22
 - Tags: storage, sqlmaker, joins, legacy, oracle, drivers
 
@@ -14,8 +14,10 @@ single method but the whole `select` / `_recurse_from` path — yet everything e
 about Oracle storage (LOB handling, sequences, savepoints, quoting, the SQL
 maker base) is identical regardless of server version.
 
-The version is not known until connect time, so the choice of join dialect has to
-be made dynamically per connection, not statically per distribution.
+The version is not known until connect time, so the choice of join dialect would
+have to be made dynamically per connection, not statically per distribution.
+That runtime choice was the intent of this ADR; it is **not implemented** (see
+Decision).
 
 ## Decision
 
@@ -35,8 +37,11 @@ its own SQLMaker subclass:
   **throw** — Oracle 8 would require a `UNION` of left and right joins, which
   cannot be constructed at the WHERE-clause stage (`Joins.pm:81-83`,
   `Storage/WhereJoins.pm:24-27`).
-- DBIO autodetects the Oracle version and reblesses to this storage automatically
-  for pre-9.0 servers; the modern `DBIO::Oracle::Storage` path is the default.
+- **Not implemented:** no version probe and no rebless to this storage exists in
+  this distribution or in core. The subclass is selected explicitly
+  (`storage_type` set to `+DBIO::Oracle::Storage::WhereJoins`); the modern
+  `DBIO::Oracle::Storage` path is the default. Whether to build the automatic
+  selection is open (karr k34).
 
 ## Rationale
 
@@ -46,8 +51,8 @@ not a flag, not a branch sprinkled through the modern code path. A runtime flag
 would litter the common `select`/FROM rendering with `if pre-9i` branches; a
 separate subclass keeps the modern path branch-free and confines all the legacy
 WHERE-join logic to two files that a maintainer can ignore entirely when working
-on current Oracle. Because the choice depends on the connected server version, it
-must be a runtime rebless, which the driver registry already supports.
+on current Oracle. An automatic choice by server version would have to be a runtime
+rebless, which the driver registry supports but this driver does not use.
 
 Oracle is the only DBIO driver that ships a version-conditional storage subclass,
 because it is the only one whose join *syntax* changed incompatibly across
@@ -59,7 +64,8 @@ honest answer is an exception.
 ## Consequences
 
 - Pre-9i Oracle gets working left/right outer joins through the normal DBIO API
-  with no caller awareness; full outer joins are unsupported and throw.
+  once the caller selects the subclass; full outer joins are unsupported and
+  throw.
 - The legacy path is isolated: changes to modern Oracle join handling live in
   `DBIO::Oracle::SQLMaker`, legacy `(+)` handling lives in
   `DBIO::Oracle::SQLMaker::Joins`, and the only storage difference is the one

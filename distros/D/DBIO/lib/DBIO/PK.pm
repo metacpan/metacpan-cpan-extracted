@@ -4,6 +4,8 @@ package DBIO::PK;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Row/;
 
 
@@ -107,7 +109,7 @@ DBIO::PK - Primary Key class
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -148,9 +150,9 @@ Internal formatter producing a unique identity string for a result object.
 
 =head2 ident_condition
 
-  my $cond = $result_source->ident_condition();
+  my $cond = $result->ident_condition();
 
-  my $cond = $result_source->ident_condition('alias');
+  my $cond = $result->ident_condition('alias');
 
 Produces a condition hash to locate a row based on the primary key(s).
 

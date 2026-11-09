@@ -1,5 +1,139 @@
 Revision history for DBIO-Oracle
 
+0.900004  2026-11-08
+    * Storage
+        - An error text names the error code, the column, the table and the
+          constraint but no value of the statement: Oracle 23ai writes the
+          value into ORA-01722 (the first character), ORA-03302, ORA-03301
+          (the key of the row of ORA-00001), ORA-01438, ORA-61800 and
+          ORA-01428, bound or not, and the storage replaces it with ***
+          whatever its length, also in the errors of populate and
+          insert_bulk. The statement in the message keeps its literals
+          (docs/adr/0012-oracle-error-values-masking.md).
+        - The DSN is built from connection parameters without a DSN
+          (DBIO::AccessBroker::Static, a connect-info hash): without host
+          dbi:Oracle:<dbname>, with host Easy Connect
+          dbi:Oracle://<host>[:<port>][/<dbname>], dbname being the service
+          name. port without host throws.
+        - A DBIO::Replicated replicant (HostBound view) over an Easy Connect
+          DSN connects to the view's host and port and keeps the service. An
+          alias, a SID and a TNS descriptor are refused, naming the form.
+        - A connection sets LongReadLen to 16 MiB (a CLOB or BLOB is read in
+          full; a cut value is an error) and ora_charset and ora_ncharset to
+          AL32UTF8, unless connect_info names them. The ISO NLS date and
+          timestamp formats are the default of every connection, the async
+          pool included.
+        - A one-byte Perl string bound to a character column is upgraded to
+          characters on a copy, so "\x{fc}" is stored as itself. A binary
+          column and a bind without a data type are sent unchanged.
+        - INSERT and UPDATE binding a BLOB or CLOB work on Oracle 23ai; an
+          UPDATE returns the row count. A LOB is compared by value in parts
+          that fit a SQL string (text, and binary as RAW), the empty value
+          as an empty LOB. populate of a LOB column inserts row by row.
+        - create({}) is INSERT ... (col) VALUES (DEFAULT). The sequence
+          behind an auto-increment column is remembered by the storage, so a
+          table dropped and created again in one process works.
+        - DBD::Oracle is loaded where it is needed, so a box without the
+          Oracle client loads the driver and fails at the first LOB bind.
+        - transactional_ddl is 0: the first DDL statement commits the open
+          transaction. DBIO::Oracle::Deploy documents the half-run apply.
+        - A populate in void context turns PrintWarn off on its statement
+          handle, so DBD::Oracle stays quiet on a partial failure.
+
+    * SQL
+        - $rs->except renders MINUS. except_all and intersect_all are refused
+          at query-build time, naming the version boundary (before 21c);
+          DBIO::Oracle::Storage->_use_set_operator_all_family(1) lifts it.
+        - results_exist and its async twins work (FROM DUAL); $rs->rand()
+          orders by DBMS_RANDOM.VALUE; $rs->explain runs EXPLAIN PLAN and
+          SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY) on one connection and needs
+          PLAN_TABLE visible to the session.
+        - prior is a word operator, so { parentid => { -prior => $col } }
+          passes core's check of operator names.
+        - The DDL dialect is oracle: the semicolon after END of a CREATE
+          TRIGGER or a PL/SQL block survives core's statement splitter.
+
+    * DDL
+        - Every identifier is double-quoted as the result class spells it.
+          Unique constraints sit inside CREATE TABLE; index declarations of
+          the result source are written as CREATE [UNIQUE] INDEX, the oracle
+          block taking only expression (function-based index).
+        - An auto-increment column gets its sequence and the BEFORE INSERT
+          trigger; belongs_to becomes a FOREIGN KEY with on_delete, and
+          is_deferrable. Oracle has no ON UPDATE; one other than NO ACTION or
+          RESTRICT is refused.
+        - A missing is_nullable deploys as NOT NULL. DEFAULT is written before
+          NOT NULL; a default_value is a SQL literal.
+        - A table named schema.table is created in that schema, with its
+          sequence, trigger, indexes and foreign keys (see Deploy).
+        - What Oracle cannot hold is refused with a DBIO exception naming
+          table and column before any SQL: enum, set and bit columns, names
+          with a double quote or NUL, an index declaration that meets a unique
+          constraint, unsupported actions (see DBIO::Oracle::DDL, REFUSALS).
+          declared_objects names what an install writes.
+
+    * Types
+        - What a Result class declares, the DDL deploys and the introspection
+          reads back is the declared type, and the second column diff is
+          empty: sizes of VARCHAR2, NVARCHAR2, NCHAR, TIMESTAMP(n) and RAW,
+          character semantics ("20 CHAR"), FLOAT(n), TIMESTAMP WITH LOCAL TIME
+          ZONE, INTERVAL YEAR(n) TO MONTH; integer types are INTEGER, double
+          is BINARY_DOUBLE, long is CLOB.
+        - The column diff does not report what the server cannot keep apart
+          (varchar and varchar2, default precisions, every spelling of
+          "20 CHAR"); CHAR against BYTE stays a change.
+
+    * Introspect
+        - A live Oracle schema is read: rows by lower-case keys, foreign keys
+          of several columns paired by position, long defaults and trigger
+          bodies. Key columns report is_nullable => 0, and primary key
+          columns carry is_pk and pk_position.
+        - IDENTITY columns and columns filled by the install's trigger are
+          is_auto_increment. A string default is read back as declared.
+        - The attribute schemas reads further schemas; their tables are in
+          the model as schema.table. The foreign-key name is constraint_name.
+        - A view carries its definition (all_views.text) and its column names
+          in the model, a view's dependencies in depends_on.
+
+    * Deploy
+        - install, diff, upgrade and apply work. diff and upgrade deploy the
+          desired state into a temporary Oracle user DBIO_TMP_<pid>_<n>,
+          introspect it there and drop it, also on failure; the connected
+          user needs CREATE USER and DROP USER. A table in another schema
+          gets a temporary user of its own. See DBIO::Oracle::Deploy.
+        - install refuses a table in a schema the server does not have,
+          naming user and table; it never creates a user.
+        - apply and upgrade come from DBIO::Deploy::Base. A diff that drops
+          something or may alter stored values runs only with
+          allow_destructive => 1; the rows of the live tables are checked
+          first (NOT NULL column without default on a table with rows, NOT
+          NULL over a NULL, a datatype Oracle does not convert).
+        - $schema->deploy installs through DBIO::Oracle::Deploy alone.
+
+    * Diff
+        - Column changes by size, type or default are written (removing a
+          default is DEFAULT NULL); a changed index is dropped and created.
+          Column statements quote table and column.
+        - Foreign keys and unique constraints of a table both models have
+          are compared and written (DROP CONSTRAINT, ADD CONSTRAINT); a
+          foreign key over a unique constraint the target changes is
+          re-created, one with nothing to point to is refused before the
+          first statement. on_delete RESTRICT is NO ACTION.
+        - Views are created or replaced (CREATE OR REPLACE VIEW with the
+          column list) and dropped, ordered by their dependencies; a cycle or
+          a view without text is refused before the first statement.
+        - A table only the target has is created whole as the install writes
+          it. DROP TABLE drops the install's sequences, DROP COLUMN cascades
+          constraints. A renamed column is dropped and added again.
+
+    * Test support
+        - DBIO::Oracle::Test::Conformance answers the shared DDL, Diff and
+          Bind case tables of core; deviations and refusals are declared in
+          the class. The cleanup drops only what a case created.
+
+    * Dependencies
+        - Requires DBIO >= 0.900004.
+
 0.900001  2026-07-12
     * Fixes
         - SQLMaker's _quote() now allowlists Oracle's hierarchical/row

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper::Concise;
+use Data::Dumper ();
 use Try::Tiny;
 use DBIO::SQLite::Test;
 
@@ -59,11 +59,39 @@ for my $class (keys %expected) { SKIP: {
 
 # Try quote_names with available DBs.
 
+# SQLite is a hard dependency of this distribution and needs no connection
+# configuration, so it is driven directly here instead of through the env-var
+# loop below -- DBIO defines no DBIO_TEST_SQLITE_DSN and nothing reads one.
+# This asserts the live path the class-data checks above cannot: connect with
+# quote_names => 1 on a schema that declares DBIO::SQLite::Storage (a schema
+# always has a driver, core ADR 0067), and have its sql_maker override carry
+# sql_quote_char/sql_name_sep into the maker.
+{
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('DBIO::SQLite::Storage');
+  $schema = $schema->connect('dbi:SQLite::memory:', undef, undef, {
+    quote_names => 1
+  });
+  $schema->storage->ensure_connected;
+  my $sql_maker = $schema->storage->sql_maker;
+
+  my ($exp_quote_char, $exp_name_sep) =
+    @{$expected{'DBIO::SQLite::Storage'}}{qw/quote_char name_sep/};
+
+  my ($quote_char_text, $name_sep_text) = map { dumper($_) }
+    ($exp_quote_char, $exp_name_sep);
+
+  is_deeply $sql_maker->quote_char,
+    $exp_quote_char,
+    "SQLITE quote_char with quote_names => 1 is $quote_char_text";
+
+  is $sql_maker->name_sep,
+    $exp_name_sep,
+    "SQLITE name_sep with quote_names => 1 is $name_sep_text";
+}
+
 # Env var to base class mapping, these are the DBs I actually have.
-# the SQLITE is a fake memory dsn
-local $ENV{DBIO_TEST_SQLITE_DSN} = 'dbi:SQLite::memory:';
 my %dbs = (
-  SQLITE           => 'DBIO::SQLite::Storage',
   ORA              => 'DBIO::Oracle::Storage',
   PG               => 'DBIO::PostgreSQL::Storage',
   MYSQL            => 'DBIO::MySQL::Storage',
@@ -89,7 +117,9 @@ for my $db (sort {
   my $schema;
 
   my $sql_maker = try {
-    $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
+    $schema = DBIO::Test::Schema->clone;
+    $schema->storage_type($dbs{$db});
+    $schema = $schema->connect($dsn, $user, $pass, {
       quote_names => 1
     });
     $schema->storage->ensure_connected;
@@ -110,18 +140,6 @@ for my $db (sort {
   is $sql_maker->name_sep,
     $exp_name_sep,
     "$db name_sep with quote_names => 1 is $name_sep_text";
-
-  # if something was produced - it better be quoted
-  if (
-    # the SQLT producer has no idea what quotes are :/
-    ! grep { $db eq $_ } qw( SYBASE DB2 )
-      and
-    my $ddl = try { $schema->deployment_statements }
-  ) {
-    my $quoted_artist = $sql_maker->_quote('artist');
-
-    like ($ddl, qr/^CREATE\s+TABLE\s+\Q$quoted_artist/msi, "$db DDL contains expected quoted table name");
-  }
 }
 
 done_testing;
@@ -129,9 +147,7 @@ done_testing;
 sub dumper {
   my $val = shift;
 
-  my $dd = DumperObject;
-  $dd->Indent(0);
-  return $dd->Values([ $val ])->Dump;
+  return Data::Dumper->new([ $val ])->Terse(1)->Indent(0)->Dump;
 }
 
 1;

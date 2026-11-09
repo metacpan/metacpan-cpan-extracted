@@ -14,7 +14,7 @@ scan-plan errors in `DBIO::Storage::QueryRewrite` and the connection dump in
 `Indent=1`, `Terse=1`, `Sortkeys=1`.
 
 A live-Oracle test run (23c) surfaced the problem. `dbio-oracle`
-`t/10-oracle.t:428` and `t/20-oracle-core.t:428` ("Partially failed populate
+`t/10-oracle.t` and `t/20-oracle-core.t` ("Partially failed populate
 throws") assert the thrown exception with:
 
 ```perl
@@ -86,7 +86,7 @@ diagnostic-form coupling specifically.
 - **Drivers**: any test that pins a diagnostic's serialization form is relaxed
   to assert intent. Tracked per-driver via karr. First instance:
   `dbio-oracle` "Partially failed populate throws"
-  (`t/10-oracle.t:428`, `t/20-oracle-core.t:428`).
+  (`t/10-oracle.t`, `t/20-oracle-core.t`).
 - **Release ordering**: `dbio-oracle`'s `t/10` & `t/20` need the core release
   that ships the `dump_value` form *and* the relaxed assertion. Until both land,
   those two tests stay red on the form mismatch — the behaviour they verify
@@ -97,5 +97,5 @@ diagnostic-form coupling specifically.
 ## Future architecture work (tracked cross-repo, not here)
 
 - **dbio-oracle**: relax the "Partially failed populate throws" assertion
-  (`t/10-oracle.t:428`, `t/20-oracle-core.t:428`) from the form-pinned regex to
-  an intent assertion. karr ticket pushed to `dbio-oracle` from core #56.
+  (`t/10-oracle.t`, `t/20-oracle-core.t`) from the form-pinned regex to
+  an intent assertion. karr ticket pushed to `dbio-oracle` from core k56.

@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Large;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 # EXPERIMENTAL, awaiting approval: what Proc::ShellSpawn needs to run Proc::ShellSubset::Large trees
 # (doc/large-subset/large-subset-spec.md, sections 4 and 5), as handlers named in Proc::ShellSpawn's tables:
 #   x_NAME(CONTEXT, NODE, TAIL, K)         command nodes { func | export | readonly | local | exec => ... }
@@ -195,7 +195,9 @@ sub b_command {
     my $n = $a[1] // ''; my $sh = $c->{sh};
     return put($c, 1, "$n\n", sub { $k->(0) })
       if $sh->{cmd}{$n} || (Proc::ShellSpawn::cmd_of($n) // ['unsupported'])->[0] !~ /unsupported/ || $Proc::ShellSpawn::SPECIAL{$n} || $ASPROG{$n} || $Proc::ShellSubset::BI{$n};
-    my ($p) = find_cmd($c, $n, var($c, 'PATH')); return defer($k, 127) unless defined $p;
+    my ($p) = find_cmd($c, $n, var($c, 'PATH'));
+    $p //= $n if $Proc::ShellSpawn::INPROC{$n};   # run inside this process, no file (Windows): its name, as for a builtin
+    return defer($k, 127) unless defined $p;
     return put($c, 1, "$p\n", sub { $k->(0) }) }
   return defer($k, 0) unless @a;
   if ($a[0] eq '-p') {   # command -p PROGRAM ... (parser item P4): looked up in a default PATH, run with the PATH it has
@@ -237,6 +239,9 @@ sub b_unset {
   my $f = ($n[0] // '') =~ /^-([vf])\z/ && (shift @n, $1)[1] // 'v';
   for (@n) {
     if ($f eq 'f') { delete $sh->{cmd}{$_}; next }
+    # X35 (the user, 2026-11-08: as dash): a word that is not a name, from an expansion (a literal one the parser
+    # rejects), stops the shell with status 2, as any error of a special builtin; the names before it are already unset
+    return fail($c, 2, "unset: $_: bad variable name") unless /^[A-Za-z_][A-Za-z0-9_]*\z/;
     return fail($c, 2, "unset: $_: is read only") if $sh->{ro}{$_};
     delete $sh->{vars}{$_}; delete $sh->{exp}{$_} }
   defer($k, 0) }

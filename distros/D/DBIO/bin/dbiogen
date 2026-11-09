@@ -8,11 +8,13 @@ use warnings;
 use Getopt::Long;
 use JSON::MaybeXS ();
 use DBI ();
+use DBIO::Util ();
+use DBIO::Componentised ();
 use DBIO::Generate ();
 use DBIO::Introspect::DBI ();
 
 my %opts;
-GetOptions(\%opts, 'o=s@', 'style=s');
+GetOptions(\%opts, 'o=s@', 'style=s', 'password-env=s', 'password-stdin');
 
 my %gen_opts;
 for my $o (@{ $opts{o} || [] }) {
@@ -31,8 +33,18 @@ for my $o (@{ $opts{o} || [] }) {
 
 my ($schema_class, @connect_info) = @ARGV;
 
-die "Usage: dbiogen [--style=cake|candy|vanilla|moose] [-o key=value ...] <schema_class> <dsn> [user] [pass]\n"
+die "Usage: dbiogen [--style=cake|candy|vanilla|moose] [-o key=value ...] [--password-env VAR | --password-stdin] <schema_class> <dsn> [user] [pass]\n"
   unless $schema_class && @connect_info;
+
+# The password comes from the environment or STDIN rather than the arguments
+# (ps and the shell history show those)
+my $password = DBIO::Util::password_from_source(
+  env => $opts{'password-env'}, stdin => $opts{'password-stdin'},
+);
+if (defined $password) {
+  $connect_info[1] //= '';
+  $connect_info[2] = $password;
+}
 
 $gen_opts{dump_directory} ||= './lib';
 $gen_opts{schema_class}   ||= $schema_class;
@@ -44,11 +56,28 @@ if (my $style = $opts{style}) {
 }
 
 # Connect to the database
-my $dbh = DBI->connect(@connect_info)
-  or die "Could not connect to database: " . DBI->errstr . "\n";
+# The connect failure is reported once, below, through the one masking of
+# connect info.
+my $dbh = DBI->connect(@connect_info[0 .. 2], { PrintError => 0 })
+  or die "Could not connect to database: "
+    . DBIO::Util::mask_connect_secrets(DBI->errstr, \@connect_info) . "\n";
 
-# Create DBI introspector
-my $introspect = DBIO::Introspect::DBI->new(dbh => $dbh);
+# Pick the introspector: the installed driver's own if there is one, so the
+# generated classes get information_schema-grade accuracy and driver extras
+# (source_info, view definitions) instead of the generic DBI metadata subset.
+my $introspect_class = delete $gen_opts{introspect_class}
+  || DBIO::Introspect::DBI->class_for_dbh($dbh);
+
+# ensure_class_loaded takes a class name only (DBIO::Util::assert_class_name)
+# and throws for anything else
+eval { DBIO::Componentised->ensure_class_loaded($introspect_class); 1 }
+  or die "Cannot load introspector '$introspect_class': $@";
+
+# STDERR, like DBIO::Generate's own "Wrote ..." progress lines, so the order
+# it is reported in is the order it happened in
+print STDERR "Introspecting with $introspect_class\n" unless $gen_opts{quiet};
+
+my $introspect = $introspect_class->new(dbh => $dbh);
 
 # Create and run the generator
 my $gen = DBIO::Generate->new(%gen_opts);
@@ -71,7 +100,7 @@ dbiogen - Dump a database schema to DBIO Result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -114,7 +143,7 @@ Uses C<use DBIO::Cake> with DDL-like DSL: C<col name =E<gt> varchar(100);>
 
 =item B<candy>
 
-Uses C<use DBIO::Candy> with C<has_column name =E<gt> 'varchar' =E<gt> { size =E<gt> 100 };>
+Uses C<use DBIO::Candy> with C<has_column name =E<gt> data_type =E<gt> 'varchar', size =E<gt> 100;>
 
 =item B<moose>
 
@@ -134,6 +163,18 @@ L<DBIO::Generate> can be passed this way.
 Generated code style. One of C<vanilla> (default), C<cake>, C<candy>, or
 C<moose>. See L</DESCRIPTION> above for a description of each style.
 
+=item B<--password-env=VAR>
+
+The password is the value of the environment variable C<VAR>; the C<password>
+argument is left out. A password given as an argument stands in the argument
+list, which C<ps> and the shell history show: give it by C<--password-env> or
+C<--password-stdin>.
+
+=item B<--password-stdin>
+
+The password is the first line of C<STDIN>; on a terminal it is asked for
+without echo. Not together with C<--password-env>.
+
 =item B<-o key=value>
 
 Pass an option directly to L<DBIO::Generate>. May be given multiple
@@ -145,6 +186,15 @@ Numeric values are coerced to numbers. Examples:
     -o components=["DBIO::InflateColumn::DateTime"]
 
 Any option accepted by L<DBIO::Generate> may be set this way.
+
+=item B<-o introspect_class=CLASS>
+
+Force a specific introspector class instead of the one C<dbiogen> would pick
+itself. By default it uses the installed driver's introspector when there is
+one -- C<DBIO::MySQL::Introspect> for a C<dbi:mysql:> DSN,
+C<DBIO::SQLite::Introspect> for C<dbi:SQLite:>, and so on -- falling back to
+the generic L<DBIO::Introspect::DBI> when the driver distribution is not
+installed. The class in use is printed unless C<-o quiet=1> is given.
 
 =back
 

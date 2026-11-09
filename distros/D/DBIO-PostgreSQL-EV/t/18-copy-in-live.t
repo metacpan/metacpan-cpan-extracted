@@ -3,8 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# LIVE coverage for $storage->copy_in
-# (DBIO::PostgreSQL::EV::Storage::copy_in, Storage.pm:718-757).
+# LIVE coverage for $storage->copy_in (DBIO::PostgreSQL::EV::Storage::copy_in).
 #
 # WHY this is a live test: copy_in dispatches a real `COPY FROM STDIN`
 # protocol over libpq: $pg->query to enter COPY mode, then a stream of
@@ -23,19 +22,21 @@ use Test::Exception;
 #   3. the copy_in Future resolves to a truthy value (currently 1);
 #   4. the pool connection is released after success (no leak);
 #   5. a coderef that dies fails the Future with the die message AND the
-#      pool connection is still released (no leak on error).
+#      pool connection is still released (no leak on error);
+#   6. it is the pool's one connection still, and the next statement runs
+#      on it.
 #
-# Known production limitation: copy_in calls pool->release IMMEDIATELY
-# after $pg->put_copy_end, but the COPY stream is still being processed
-# asynchronously by libpq — the server has not yet sent CommandComplete.
-# The released connection is therefore still in COPY state on the wire.
-# If the same Storage object then runs any other query on the same pool,
-# the next acquire picks the still-busy connection and libpq returns
-# "PQsendQueryParams failed: another command is already in progress".
-# This test therefore verifies row persistence via a SECOND Storage
-# instance (separate pool, fresh connections) and does not assert that
-# the same Storage can immediately run another query. Filed as a karr
-# ticket for follow-up; this test is the regression guard.
+# Everything runs on the one storage that did the COPY, on its one
+# connection -- the failing COPY of section 2 and the DROP at the end too: a
+# connection left in the COPY, or released while the server's answer is still
+# due, refuses the next statement ("another command is already in progress")
+# and fails this file. The connection goes back at the server's answer since
+# karr k13; t/19-copy-in-regression.t is the regression for that, t/74 holds
+# every way a COPY ends.
+#
+# The read of section 1 alone is made by a second storage, on purpose: what a
+# COPY wrote is there for another session -- committed -- and not only for
+# the connection that wrote it.
 
 BEGIN {
   plan skip_all => 'Set DBIO_TEST_PG_DSN to run integration tests'
@@ -46,36 +47,24 @@ use EV;
 use EV::Pg;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (mirrors t/12-/t/13-/t/14-/t/15-/t/16-/t/17-).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use PoolReset;
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
 
 # Drive a Future to completion on the EV loop under a wall-clock guard.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what\n" };
-  alarm 20;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
+  return GuardedWait->until_ready($f, 20, "TIMEOUT awaiting $what\n");
 }
 
 # Raw statement on a pooled connection (DDL setup/teardown + verification).
@@ -91,7 +80,9 @@ sub run_raw {
     });
     return $rf;
   });
-  return await_guarded($f, "run_raw: $sql")->get;
+  my @r = await_guarded($f, "run_raw: $sql")->get;
+  PoolReset->until_reset($storage);   # its connection is idle again (karr k99)
+  return @r;
 }
 
 my $table = 'dbio_copy_in_live';
@@ -106,6 +97,7 @@ run_raw($storage,
 
 # --- 1. bulk load 100 rows; every row round-trips through select_async ---
 
+PoolReset->until_reset($storage);   # the CREATE TABLE's connection is idle again (karr k99)
 my $N = 100;
 my $idle_before = $storage->pool->available;
 
@@ -130,15 +122,15 @@ ok $copy_f->get,       'copy_in Future resolved to a truthy value (currently 1)'
 # then releases it, net-zero change on the idle stack. What we want to
 # assert is: at least one connection is idle (released), and the pool did
 # not spawn an extra connection.
+PoolReset->until_reset($storage);   # idle once its reset is answered (karr k99)
 ok $storage->pool->available >= 1,
   'pool connection released back to idle after copy_in success';
 is $storage->pool->size, 1,
   'copy_in did not spawn an extra connection';
 
-# Verify all 100 rows were persisted. We deliberately use a SECOND
-# Storage instance with a fresh pool here — see the WHY comment at the
-# top of this file for the known production limitation that would make
-# the same-storage read fail with "another command is already in progress".
+# Verify all 100 rows were persisted: read by a SECOND Storage instance with
+# a pool of its own, another session -- the rows are committed, not only
+# there for the connection that wrote them.
 my $verifier = DBIO::PostgreSQL::EV::Storage->new(undef);
 $verifier->connect_info([ \%ci, {} ]);
 
@@ -167,14 +159,11 @@ is $null_count, $N / 2, "exactly $N/2 NULL names round-tripped via backslash-N w
 
 # --- 2. coderef that DIES — Future fails AND connection is still released -
 #
-# We use a fresh Storage instance here so the broken-conn-from-section-1
-# (see the WHY comment at the top) does not poison section 2.
-
-my $storage2 = DBIO::PostgreSQL::EV::Storage->new(undef);
-$storage2->connect_info([ \%ci, {} ]);
+# On the storage of section 1, whose pool holds the one connection that COPY
+# ran on: this COPY takes the same one.
 
 my $f_die = await_guarded(
-  $storage2->copy_in($table, [ 'id', 'name', 'score' ], sub {
+  $storage->copy_in($table, [ 'id', 'name', 'score' ], sub {
     $_[0]->([ 1, 'first', 1 ]);
     $_[0]->([ 2, 'second', 2 ]);
     die "boom-in-copy-coderef\n";
@@ -188,26 +177,24 @@ is +($f_die->failure // ''), "boom-in-copy-coderef\n",
 
 # Critical: even on the error path the pool connection must be released.
 # A regression that skipped pool->release on the die branch would hang
-# forever and only a separate live test could surface it. The pool may
-# have spawned exactly one connection for this copy_in (cold pool) and
-# then released it; what we care about is that the connection made it
-# back to the idle stack instead of being leaked.
-ok $storage2->pool->available >= 1,
+# forever and only a separate live test could surface it. The pool held
+# exactly one connection, idle, before this copy_in took it; what we care
+# about is that the connection made it back to the idle stack instead of
+# being leaked.
+PoolReset->until_reset($storage);
+ok $storage->pool->available >= 1,
   'dying coderef: pool connection released back to idle (no leak on error)';
-$storage2->disconnect;
+is $storage->pool->size, 1,
+  'dying coderef: it is still the one connection, not retired and not a second one';
 
 # --- cleanup --------------------------------------------------------------
 #
-# Use a throwaway Storage for the DROP — $storage's pool conn is still in
-# COPY state (see WHY comment at top), so a direct run_raw would fail with
-# "another command is already in progress".
+# On the same storage, so on the connection the failed COPY ran on: left in
+# the COPY, it would refuse the DROP ("another command is already in
+# progress").
 
-{
-  my $cleanup = DBIO::PostgreSQL::EV::Storage->new(undef);
-  $cleanup->connect_info([ \%ci, {} ]);
-  run_raw($cleanup, "DROP TABLE IF EXISTS $table");
-  $cleanup->disconnect;
-}
+lives_ok { run_raw($storage, "DROP TABLE IF EXISTS $table") }
+  'the next statement runs on the connection the failed COPY ran on';
 $storage->disconnect;
 
 done_testing;

@@ -2,6 +2,9 @@ package DBIO::Test::Schema::FourKeys_to_TwoKeys;
 # ABSTRACT: Test result class for the fourkeys_to_twokeys table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -47,7 +50,7 @@ DBIO::Test::Schema::FourKeys_to_TwoKeys - Test result class for the fourkeys_to_
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

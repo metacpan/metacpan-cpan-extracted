@@ -36,7 +36,7 @@ use DBIO::Storage::DBI;
     my ($self, @args) = @_;
     push @{$self->{calls}}, 'select';
     # ->all yields raw arrayrefs, generated through _select_args exactly like a
-    # real cursor would (karr #55 invariant preserved by the fake cursor).
+    # real cursor would (the fake cursor preserves that invariant).
     my @rows = $self->_sync->select(@args)->all;
     return DBIO::Future::Immediate->done(@rows);
   }

@@ -7,8 +7,12 @@ use Test::Warn;
 use Sub::Name;
 use Config;
 use DBIO::Test;
-use SQL::Abstract::Util 'is_literal_value';
-use DBIO::Util qw( is_exception old_mro sigwarn_silencer modver_gt_or_eq );
+
+# DBIO::Test::Schema keeps no driver in its class: this file runs it on
+# PostgreSQL (core ADR 0067).
+DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
+
+use DBIO::Util qw( is_exception is_literal_value old_mro sigwarn_silencer modver_gt_or_eq );
 
 my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 
@@ -21,6 +25,12 @@ Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test
 'dbio_t_schema_2', 'dbio_t_schema_3', 'dbio_t_schema_4', and 'dbio_t_schema_5')
 EOM
 
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+
 ### load any test classes that are defined further down in the file via BEGIN blocks
 
 our @test_classes; #< array that will be pushed into by test classes defined in this file
@@ -29,7 +39,7 @@ DBIO::Test::Schema->load_classes( map {s/.+:://;$_} @test_classes ) if @test_cla
 ### load PostgreSQL-specific test schema classes
 DBIO::Test::Schema->load_classes({ 'DBIO::PostgreSQL::Test' => ['SequenceTest'] });
 
-###  pre-connect tests (keep each test separate as to make sure rebless() runs)
+###  pre-connect tests (keep each test separate, each on a storage that never connected)
   {
     my $s = DBIO::Test::Schema->connect($dsn, $user, $pass);
 
@@ -41,7 +51,8 @@ DBIO::Test::Schema->load_classes({ 'DBIO::PostgreSQL::Test' => ['SequenceTest'] 
           or skip 'DateTime::Format::Pg not installed', 2;
 
         my $store = ref $s->storage;
-        is($store, 'DBIO::Storage::DBI', 'Started with generic storage');
+        is($store, 'DBIO::PostgreSQL::Storage',
+          'Starts on the declared PostgreSQL storage, before any connection');
 
         my $parser = $s->storage->datetime_parser;
         is( $parser, 'DateTime::Format::Pg', 'datetime_parser is as expected');
@@ -225,7 +236,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning
     lives_ok {
       $arr_rs->update({
         arrayfield => [3, 4],
-      });
+      }, { all => 1 });
     } 'updating arrayref as pg array data';
 
     $arr_rs->create({
@@ -272,22 +283,22 @@ for my $use_insert_returning ($test_server_supports_insert_returning
       );
     } 'searching by arrayref (greater than)';
 
-    # Find using arrays
+    # A single row by an array value (arrayfield is no unique key, so not find)
     lives_ok {
       is_deeply (
-        $arr_rs->find({ arrayfield => { -value => [3,4] } })->arrayfield,
+        $arr_rs->search({ arrayfield => { -value => [3,4] } })->single->arrayfield,
         [3,4],
         'Array value matches implicit equal'
       );
-    } 'find by arrayref';
+    } 'single by arrayref';
 
     lives_ok {
       is_deeply (
-        $arr_rs->find({ arrayfield => { '=' => { -value => [3,4] }} })->arrayfield,
+        $arr_rs->search({ arrayfield => { '=' => { -value => [3,4] }} })->single->arrayfield,
         [3,4],
         'Array value matches explicit equal'
       );
-    } 'find by arrayref (equal)';
+    } 'single by arrayref (equal)';
 
     # test inferred condition for creation
     for my $cond (
@@ -458,7 +469,8 @@ lives_ok { $cds->update({ year => '2010' }) } 'Update on prefetched rs';
   } 'with_deferred_fk_checks code survived';
 
   is eval { $schema->resultset('Track')->find(999)->title }, 'deferred FK track',
-     'code in with_deferred_fk_checks worked';
+     'code in with_deferred_fk_checks worked'
+     or diag $@;
 
   throws_ok {
     $schema->resultset('Track')->create({

@@ -49,7 +49,7 @@ does not have. The Sybase variant is asymmetric because the read path
 genuinely use different formats — the connect-time
 `connect_call_datetime_setup` sets ISO_strict output, but MSSQL wants a plain
 literal on write. (Migration to these base-class subclasses tracked as karr
-`dbio-mssql` #5, resolved.)
+`dbio-mssql` k5, resolved.)
 
 ## Consequences
 

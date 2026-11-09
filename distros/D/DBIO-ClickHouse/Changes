@@ -1,0 +1,111 @@
+Revision history for DBIO-ClickHouse
+
+0.900004  2026-11-08
+    First release: the ClickHouse driver for DBIO, over the MySQL wire
+    protocol (server port 9004) through DBD::mysql or DBD::MariaDB.
+
+    * Transport
+        - DBD::mysql is the standard: it connects to a stock server and to
+          ClickHouse Cloud; connect with mysql_enable_utf8mb4 => 1 for
+          character data.
+        - DBD::MariaDB needs the server to register the character_set_,
+          collation_ and sql_ custom settings prefixes, so it fits servers
+          whose config you control (ADR 0001).
+        - Both DBDs are the access path of DBIO::ClickHouse::Storage, also
+          under driver_strict. The DSN looks like MySQL's, so a schema pins
+          the storage with the component or use DBIO 'Schema', -ch.
+
+    * Storage
+        - DBIO::ClickHouse::Storage quotes with backticks, pings with SELECT
+          1 and answers clickhouse_version.
+        - Inserts fit a database without identity columns: populate is one
+          multi-row INSERT, a UUID primary key marked is_auto_increment is
+          generated client-side, and last_insert_id throws.
+        - Transactions follow ADR 0003: txn_begin, txn_commit and txn_do run
+          without a transaction and warn once, txn_rollback throws, and a
+          scope guard unwinds without a rollback and says so.
+        - No transactional DDL, IF [NOT] EXISTS and EXISTS queries are
+          declared; set operations carry an explicit DISTINCT or ALL, rand
+          is rand(), explain answers the plan (see SET OPERATIONS).
+        - $schema->deploy runs through DBIO::ClickHouse::Deploy, and
+          deployment_statements serves the native DDL layer.
+        - A string that is not a number and an integer outside its column's
+          type range are refused before they are sent, naming table and
+          column; a value with the byte 0x1A is stored as written.
+        - The message of a failed statement names the error code, the type,
+          the column, the constraint, the table and the position of a syntax
+          error, and the number of bind values; the values themselves are
+          replaced by *** wherever the engine quotes them: in the sentence
+          of the error, in the statement it quotes, in the Column values of
+          a violated constraint and in the plan of a failed function. This
+          holds for selects, inserts, the multi-row insert of populate,
+          update and delete alike; $dbh->errstr keeps the raw text
+          (ADR 0008).
+
+    * SQLMaker
+        - The resultset attributes final => 1, prewhere => \%cond and
+          limit_by => { rows => $n, by => $cols } render ClickHouse's
+          clauses; SELECT ... FOR UPDATE is not written.
+
+    * Mutations
+        - update and delete on resultsets and rows render as mutations
+          (ALTER TABLE ... UPDATE / DELETE), with mutations_sync => 1 per
+          statement by default (ADR 0005).
+        - update and delete return -1, row count unknown; a view, a literal
+          SQL source or a join as target and an UPDATE without columns are
+          refused.
+
+    * DDL
+        - DBIO::ClickHouse::DDL maps portable types to Nullable,
+          LowCardinality, Decimal, DateTime64, Date32, UUID, Bool, Enum8/16
+          and Array; a type spelled as ClickHouse spells it is written as is.
+        - clickhouse_table({ engine, order_by, primary_key, partition_by,
+          settings }) on a result class; the default is ENGINE = MergeTree
+          ordered by the primary key.
+        - Canonical index declarations with clickhouse => { type => ... }
+          become data-skipping indexes in CREATE TABLE.
+        - install_ddl refuses what ClickHouse cannot build, naming table and
+          column: unique constraints, foreign key constraints (declare
+          is_foreign_key_constraint => 0), a non-UUID auto-increment column.
+        - A source named database.table or database.view is made in that
+          database, and install refuses a missing database; a view follows
+          the views it reads, a cycle is refused.
+
+    * Introspect
+        - DBIO::ClickHouse::Introspect reads system.tables, system.columns
+          and system.data_skipping_indices into the canonical model, with
+          engine, sorting key, partition key and view definitions.
+
+    * Diff and Deploy
+        - The Diff compares in a scratch database on the same server,
+          dropped in every case, and writes IF [NOT] EXISTS wherever
+          ClickHouse parses it, so a re-applied diff changes nothing.
+        - A change of engine, sorting key, primary key or partition
+          expression is refused with the rebuild steps.
+        - Skipping indexes, views, the SETTINGS of new tables and removed
+          defaults are diffed; a materialized view is refused by name.
+        - apply and upgrade are those of DBIO::Deploy::Base: a lossy column
+          change needs allow_destructive, and a narrowing over NULL rows or a
+          NOT NULL column added over rows is refused before the first
+          statement.
+
+    * Native export
+        - DBIO::ClickHouse::Native turns a source and its rows into the
+          columns and row iterator ClickHouse::Encoder takes, and throws for
+          a value it cannot translate truthfully (ADR 0007).
+
+    * Async
+        - The driver is sync-only (ADR 0006); the forked and immediate
+          adapters apply.
+
+    * Tests
+        - DBIO::ClickHouse::Test::Conformance answers core's shared DDL, Diff
+          and Bind case tables offline and against a server, with
+          DBIO::ClickHouse::Test::Schema as the live fixture.
+        - Live tests run when DBIO_TEST_CLICKHOUSE_DSN is set, each process
+          in a database of its own.
+
+    * Dependencies
+        - Requires DBIO 0.900004, Crypt::URandom, DBI, Try::Tiny,
+          namespace::clean and SQL::Abstract; DBD::mysql and DBD::MariaDB are
+          recommended, ClickHouse::Encoder is suggested and never loaded.

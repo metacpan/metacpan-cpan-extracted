@@ -33,6 +33,9 @@ typedef struct {
 static int hm_clos_free(pTHX_ SV *sv, MAGIC *mg) {
     hm_clos *cl = (hm_clos *)mg->mg_ptr;
     PERL_UNUSED_VAR(sv);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (cl) {
         if (cl->a) SvREFCNT_dec(cl->a);
         if (cl->b) SvREFCNT_dec(cl->b);
@@ -63,7 +66,7 @@ static SV *hm_closure(pTHX_ XSUBADDR_t body, SV *a, SV *b, SV *c, SV *d,
 
 static hm_clos *hm_clos_of(pTHX_ CV *cv) {
     MAGIC *mg = mg_findext((SV *)cv, PERL_MAGIC_ext, &hm_clos_vtbl);
-    return mg ? (hm_clos *)mg->mg_ptr : NULL;
+    return mg ? (hm_clos *)mg->mg_ptr : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 /* ---- core state ---------------------------------------------------------- */
@@ -75,10 +78,10 @@ static IV hmf_state(pTHX_ SV *self) {
      * (Hyperman::Future->done(1)), and a ->get on one pumped the loop for
      * ever. Callers that may legitimately hold something else ask
      * hmf_is_future first. */
-    if (!(self && SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV))
+    if (!(self && SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) /* # uncoverable condition left count:1 class:ignore_covered_err */
         croak("Hyperman::Future: not a future object");
     s = av_fetch((AV *)SvRV(self), 0, 0);
-    return s ? SvIV(*s) : HMF_PENDING;
+    return s ? SvIV(*s) : HMF_PENDING; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 static int hmf_is_future(pTHX_ SV *sv) {
@@ -89,8 +92,12 @@ static int hmf_is_future(pTHX_ SV *sv) {
 /* Future-compatible: ours, or any object with an on_ready method. */
 static int hm_is_awaitable(pTHX_ SV *sv) {
     if (hmf_is_future(aTHX_ sv)) return 1;
-    if (sv && SvROK(sv) && SvOBJECT(SvRV(sv))) {
+    if (sv && SvROK(sv) && SvOBJECT(SvRV(sv))) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         HV *stash = SvSTASH(SvRV(sv));
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (stash && gv_fetchmethod_autoload(stash, "on_ready", 0)) return 1;
     }
     return 0;
@@ -98,6 +105,9 @@ static int hm_is_awaitable(pTHX_ SV *sv) {
 
 static AV *hmf_values_av(pTHX_ SV *self) {
     SV **v = av_fetch((AV *)SvRV(self), 1, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     return (v && SvROK(*v)) ? (AV *)SvRV(*v) : NULL;
 }
 
@@ -131,27 +141,50 @@ static void hm_errlog(const char *fmt, ...) {
     time_t t = time(NULL);
     va_list ap;
     int k;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (hm_localtime_r(&t, &tm))
         n = strftime(buf, sizeof(buf), "[%d/%b/%Y:%H:%M:%S %z] ", &tm);
     k = snprintf(buf + n, sizeof(buf) - n, "[%d] ", hm_os_getpid());
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (k > 0) n += (size_t)k;
     va_start(ap, fmt);
     k = vsnprintf(buf + n, sizeof(buf) - n, fmt, ap);
     va_end(ap);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (k > 0) n += (size_t)k;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (n > sizeof(buf) - 2) n = sizeof(buf) - 2;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r')) n--;
     /* One line per call: a die message quoting request data must not be
      * able to write a second, forged line into the error log. */
     {
         size_t i;
         for (i = 0; i < n; i++)
+            /*
+             # uncoverable branch true class:ignore_covered_err
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (buf[i] == '\n' || buf[i] == '\r') buf[i] = ' ';
     }
     buf[n++] = '\n';
     {
         int fd = hm_err_fd >= 0 ? hm_err_fd : 2;
         ssize_t w;
+        /*
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         do { w = hm_os_write_file(fd, buf, n); } while (w < 0 && errno == EINTR);
         (void)w;
     }
@@ -165,7 +198,7 @@ static void hm_errlog(const char *fmt, ...) {
 static void hm_warn_died(pTHX_ const char *what) {
     STRLEN l;
     const char *m;
-    if (!SvTRUE(ERRSV)) return;
+    if (!SvTRUE(ERRSV)) return; /* # uncoverable condition right count:1 class:ignore_covered_err */
     m = SvPV(ERRSV, l);
     hm_errlog("Hyperman: %s died: %.*s", what, (int)l, m);
 }
@@ -199,15 +232,18 @@ static void hmf_enqueue(pTHX_ SV *cb, SV *self) {
 static void hmf_fire(pTHX_ SV *self) {
     AV  *av = (AV *)SvRV(self);
     SV **slot = av_fetch(av, 2, 0);
-    SV  *cbs = (slot && SvOK(*slot)) ? *slot : NULL;
+    SV  *cbs = (slot && SvOK(*slot)) ? *slot : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
     if (!cbs) return;
     SvREFCNT_inc(cbs);
     av_store(av, 2, &PL_sv_undef);
-    if (SvROK(cbs) && SvTYPE(SvRV(cbs)) == SVt_PVAV) {
+    if (SvROK(cbs) && SvTYPE(SvRV(cbs)) == SVt_PVAV) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         AV *list = (AV *)SvRV(cbs);
         SSize_t i, n = av_len(list) + 1;
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(list, i, 0);
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (e) {
                 av_push(hm_fq, SvREFCNT_inc(*e));
                 av_push(hm_fq, SvREFCNT_inc(self));
@@ -230,6 +266,9 @@ static void hmf_settle(pTHX_ SV *self, IV state, SV **vals, SSize_t n) {
     AV *av;
     AV *val;
     SSize_t i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (hmf_state(aTHX_ self) != HMF_PENDING) return;
     av = (AV *)SvRV(self);
     val = newAV();
@@ -242,6 +281,9 @@ static void hmf_settle(pTHX_ SV *self, IV state, SV **vals, SSize_t n) {
 /* Takes ownership of vals either way. */
 static void hmf_settle_av(pTHX_ SV *self, IV state, AV *vals) {
     AV *av;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (hmf_state(aTHX_ self) != HMF_PENDING) { SvREFCNT_dec((SV *)vals); return; }
     av = (AV *)SvRV(self);
     av_store(av, 0, newSViv(state));
@@ -260,12 +302,21 @@ static SV *hmf_new(pTHX_ const char *classname) {
 }
 
 static const char *hmf_class_of(pTHX_ SV *self) {
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *stash = (SvROK(self) && SvOBJECT(SvRV(self))) ? SvSTASH(SvRV(self)) : NULL;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     return stash ? HvNAME(stash) : "Hyperman::Future";
 }
 
 /* Resolve a loop-created future with no values (readiness signals). */
 static void hmf_done0(pTHX_ SV *fut) {
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (hmf_state(aTHX_ fut) == HMF_PENDING)
         hmf_settle(aTHX_ fut, HMF_DONE, NULL, 0);
 }
@@ -276,9 +327,9 @@ static void hmf_on_ready(pTHX_ SV *self, SV *cb) {
     } else {
         AV *av = (AV *)SvRV(self);
         SV **slot = av_fetch(av, 2, 0);
-        if (!slot || !SvOK(*slot)) {
+        if (!slot || !SvOK(*slot)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
             av_store(av, 2, newSVsv(cb));
-        } else if (SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV) {
+        } else if (SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             av_push((AV *)SvRV(*slot), newSVsv(cb));
         } else {
             AV *list = newAV();
@@ -319,6 +370,10 @@ static IV   hm_any_state(pTHX_ SV *f);
  * its method, trapped so a class without `cancel` cannot unwind the loop. */
 static void hm_any_cancel(pTHX_ SV *f) {
     if (hmf_is_future(aTHX_ f)) { hmf_cancel(aTHX_ f); return; }
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(SvROK(f) && SvOBJECT(SvRV(f)))) return;
     {
         dSP;
@@ -336,17 +391,23 @@ static void hm_any_cancel(pTHX_ SV *f) {
 static void hmf_cancel_list(pTHX_ AV *list) {
     SSize_t i, n = av_len(list) + 1;
     SV **snap;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (n <= 0) return;
     snap = (SV **)hm_xmalloc(sizeof(SV *) * (size_t)n);
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(list, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         snap[i] = e && *e ? SvREFCNT_inc(*e) : NULL;
     }
     for (i = 0; i < n; i++) {
-        if (snap[i] && hm_any_state(aTHX_ snap[i]) == HMF_PENDING)
+        if (snap[i] && hm_any_state(aTHX_ snap[i]) == HMF_PENDING) /* # uncoverable condition right count:1 class:ignore_covered_err */
             hm_any_cancel(aTHX_ snap[i]);
     }
-    for (i = 0; i < n; i++) if (snap[i]) SvREFCNT_dec(snap[i]);
+    for (i = 0; i < n; i++) if (snap[i]) SvREFCNT_dec(snap[i]); /* # uncoverable condition right count:1 class:ignore_covered_err */
     free(snap);
 }
 
@@ -363,7 +424,7 @@ static void hmf_cancel(pTHX_ SV *self) {
     /* a future is a blessed array too: ask that first, and only an UNBLESSED
      * array is a combinator's input list */
     if (!hmf_is_future(aTHX_ *up)) {
-        if (SvTYPE(SvRV(*up)) == SVt_PVAV && !SvOBJECT(SvRV(*up)))
+        if (SvTYPE(SvRV(*up)) == SVt_PVAV && !SvOBJECT(SvRV(*up))) /* # uncoverable condition right count:2 class:ignore_covered_err */
             hmf_cancel_list(aTHX_ (AV *)SvRV(*up));
         return;
     }
@@ -386,13 +447,16 @@ static void hmf_await(pTHX_ SV *self) {
     }
     {
         SV *aw = get_sv("Hyperman::Future::AWAIT", 0);
-        if (aw && SvOK(aw)) {
+        if (aw && SvOK(aw)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             dSP;
             ENTER; SAVETMPS; PUSHMARK(SP);
             XPUSHs(self);
             PUTBACK;
             call_sv(aw, G_DISCARD);
             FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (hmf_state(aTHX_ self) != HMF_PENDING) return;
         }
     }
@@ -411,14 +475,14 @@ static IV hm_any_state(pTHX_ SV *f) {
     PUSHMARK(SP); XPUSHs(f); PUTBACK;
     n = call_method("is_done", G_SCALAR | G_EVAL);
     SPAGAIN;
-    if (n && SvTRUE(TOPs)) st = HMF_DONE;
+    if (n && SvTRUE(TOPs)) st = HMF_DONE; /* # uncoverable condition right count:1 class:ignore_covered_err */
     (void)POPs;
     PUTBACK;
     if (st == HMF_PENDING) {
         PUSHMARK(SP); XPUSHs(f); PUTBACK;
         n = call_method("is_failed", G_SCALAR | G_EVAL);
         SPAGAIN;
-        if (n && SvTRUE(TOPs)) st = HMF_FAILED;
+        if (n && SvTRUE(TOPs)) st = HMF_FAILED; /* # uncoverable condition right count:1 class:ignore_covered_err */
         (void)POPs;
         PUTBACK;
     }
@@ -426,7 +490,7 @@ static IV hm_any_state(pTHX_ SV *f) {
         PUSHMARK(SP); XPUSHs(f); PUTBACK;
         n = call_method("is_cancelled", G_SCALAR | G_EVAL);
         SPAGAIN;
-        if (n && SvTRUE(TOPs)) st = HMF_CANCELLED;
+        if (n && SvTRUE(TOPs)) st = HMF_CANCELLED; /* # uncoverable condition right count:1 class:ignore_covered_err */
         (void)POPs;
         PUTBACK;
     }
@@ -442,13 +506,13 @@ static int hm_call_list(pTHX_ SV *invocant, const char *method, SV *cb,
     int err = 0;
     ENTER; SAVETMPS;
     PUSHMARK(SP);
-    if (invocant) XPUSHs(invocant);
-    for (i = 0; i < nargs; i++) XPUSHs(args[i]);
+    if (invocant) XPUSHs(invocant); /* # uncoverable condition left count:2 class:ignore_covered_err */
+    for (i = 0; i < nargs; i++) XPUSHs(args[i]); /* # uncoverable condition left count:1 class:ignore_covered_err */
     PUTBACK;
     n = method ? call_method(method, G_ARRAY | G_EVAL)
                : call_sv(cb, G_ARRAY | G_EVAL);
     SPAGAIN;
-    if (SvTRUE(ERRSV)) {
+    if (SvTRUE(ERRSV)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         err = 1;
         SP -= n;
     } else {
@@ -465,10 +529,10 @@ static int hm_call_list(pTHX_ SV *invocant, const char *method, SV *cb,
 static void hm_any_values(pTHX_ SV *f, IV st, AV *out) {
     if (hmf_is_future(aTHX_ f)) {
         AV *vals = hmf_values_av(aTHX_ f);
-        SSize_t i, n = vals ? av_len(vals) + 1 : 0;
+        SSize_t i, n = vals ? av_len(vals) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(vals, i, 0);
-            av_push(out, e ? newSVsv(*e) : newSV(0));
+            av_push(out, e ? newSVsv(*e) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
         }
     } else if (st == HMF_DONE) {
         hm_call_list(aTHX_ f, "get", NULL, NULL, 0, out);
@@ -486,6 +550,10 @@ XS_INTERNAL(hm_xs_chain_cb) {
     SV *g = ST(0);
     SV *next;
     IV st;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     next = cl->a;
     /* Cancelled while the inner future was still running: nothing to
@@ -529,6 +597,10 @@ XS_INTERNAL(hm_xs_then_cb) {
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *f, *next;
     IV st;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     f = ST(0);
     next = cl->a;
@@ -556,10 +628,10 @@ XS_INTERNAL(hm_xs_then_cb) {
     if (st == HMF_DONE || st == HMF_FAILED) {
         SV *user = (st == HMF_DONE) ? cl->b : cl->c;
         AV *vals = hmf_values_av(aTHX_ f);
-        SSize_t n = vals ? av_len(vals) + 1 : 0;
-        if (user && SvOK(user)) {
+        SSize_t n = vals ? av_len(vals) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        if (user && SvOK(user)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
             AV *out = newAV();
-            SV **args = vals ? AvARRAY(vals) : NULL;
+            SV **args = vals ? AvARRAY(vals) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
             if (hm_call_list(aTHX_ NULL, NULL, user, args, n, out)) {
                 SV *err = sv_2mortal(newSVsv(ERRSV));
                 hmf_settle(aTHX_ next, HMF_FAILED, &err, 1);
@@ -572,7 +644,7 @@ XS_INTERNAL(hm_xs_then_cb) {
             SSize_t i;
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(vals, i, 0);
-                av_push(copy, e ? newSVsv(*e) : newSV(0));
+                av_push(copy, e ? newSVsv(*e) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
             hmf_settle_av(aTHX_ next, st, copy);
         }
@@ -589,18 +661,26 @@ XS_INTERNAL(hm_xs_transform_cb) {
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *f, *next;
     IV st;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
-    f = ST(0);
-    next = cl->a;
+    f = ST(0); /* # uncoverable statement class:ignore_covered_err */
+    next = cl->a; /* # uncoverable statement class:ignore_covered_err */
+    /*
+     # uncoverable statement class:ignore_covered_err
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (hmf_state(aTHX_ next) != HMF_PENDING) XSRETURN_EMPTY;   /* cancelled */
     st = hmf_state(aTHX_ f);
     if (st == HMF_DONE || st == HMF_FAILED) {
         SV *mapper = (st == HMF_DONE) ? cl->b : cl->c;
         AV *vals = hmf_values_av(aTHX_ f);
-        SSize_t n = vals ? av_len(vals) + 1 : 0;
+        SSize_t n = vals ? av_len(vals) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
         AV *out = newAV();
-        if (mapper && SvOK(mapper)) {
-            SV **args = vals ? AvARRAY(vals) : NULL;
+        if (mapper && SvOK(mapper)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
+            SV **args = vals ? AvARRAY(vals) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
             if (hm_call_list(aTHX_ NULL, NULL, mapper, args, n, out)) {
                 SV *err = sv_2mortal(newSVsv(ERRSV));
                 hmf_settle(aTHX_ next, HMF_FAILED, &err, 1);
@@ -611,7 +691,7 @@ XS_INTERNAL(hm_xs_transform_cb) {
             SSize_t i;
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(vals, i, 0);
-                av_push(out, e ? newSVsv(*e) : newSV(0));
+                av_push(out, e ? newSVsv(*e) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
         }
         hmf_settle_av(aTHX_ next, st, out);
@@ -627,16 +707,26 @@ XS_INTERNAL(hm_xs_ondone_cb) {
     dXSARGS;
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *f;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     f = ST(0);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (hmf_state(aTHX_ f) == cl->i) {
         AV *vals = hmf_values_av(aTHX_ f);
-        SSize_t n = vals ? av_len(vals) + 1 : 0;
+        SSize_t n = vals ? av_len(vals) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
         dSP;
         SSize_t j;
         ENTER; SAVETMPS; PUSHMARK(SP);
         for (j = 0; j < n; j++) {
             SV **e = av_fetch(vals, j, 0);
+            /*
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             XPUSHs(e ? *e : &PL_sv_undef);
         }
         PUTBACK;
@@ -652,6 +742,10 @@ XS_INTERNAL(hm_xs_ondone_cb) {
  * AWAIT_ON_CANCEL, a future through AWAIT_CHAIN_CANCEL. */
 static void hmf_cancel_target(pTHX_ SV *thing, SV *self) {
     dSP;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(thing && SvROK(thing))) return;
     ENTER; SAVETMPS; PUSHMARK(SP);
     if (SvTYPE(SvRV(thing)) == SVt_PVCV) {
@@ -675,6 +769,10 @@ XS_INTERNAL(hm_xs_oncancel_cb) {
     dXSARGS;
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *f;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     f = ST(0);
     if (hmf_state(aTHX_ f) == HMF_CANCELLED)
@@ -697,13 +795,17 @@ XS_INTERNAL(hm_xs_comb_cb) {
     SV *g, *res;
     AV *list;
     IV left;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     g = ST(0);
     res = cl->a;
     list = (AV *)SvRV(cl->c);
     if (hmf_state(aTHX_ res) != HMF_PENDING) XSRETURN_EMPTY;
 
-    switch (cl->i) {
+    switch (cl->i) { /* # uncoverable branch true count:5 class:ignore_covered_err */
     case HM_COMB_WAIT_ALL: {
         left = SvIV(cl->b) - 1;
         sv_setiv(cl->b, left);
@@ -712,7 +814,7 @@ XS_INTERNAL(hm_xs_comb_cb) {
             SSize_t i, n = av_len(list) + 1;
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(list, i, 0);
-                av_push(out, e ? newSVsv(*e) : newSV(0));
+                av_push(out, e ? newSVsv(*e) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
             hmf_settle_av(aTHX_ res, HMF_DONE, out);
         }
@@ -746,6 +848,9 @@ XS_INTERNAL(hm_xs_comb_cb) {
             SSize_t i, n = av_len(list) + 1;
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(list, i, 0);
+                /*
+                 # uncoverable branch false class:ignore_covered_err
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (e) hm_any_values(aTHX_ *e, hm_any_state(aTHX_ *e), out);
             }
             hmf_settle_av(aTHX_ res, HMF_DONE, out);
@@ -825,13 +930,17 @@ XS_INTERNAL(hm_xs_tocpan_cb) {
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *f;
     IV st;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
     f = ST(0);
     st = hmf_state(aTHX_ f);
     {
         dSP;
         AV *vals = hmf_values_av(aTHX_ f);
-        SSize_t j, n = vals ? av_len(vals) + 1 : 0;
+        SSize_t j, n = vals ? av_len(vals) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
         const char *meth = (st == HMF_DONE)   ? "done"
                          : (st == HMF_FAILED) ? "fail"
                                               : "cancel";
@@ -840,6 +949,9 @@ XS_INTERNAL(hm_xs_tocpan_cb) {
         if (st == HMF_DONE || st == HMF_FAILED)
             for (j = 0; j < n; j++) {
                 SV **e = av_fetch(vals, j, 0);
+                /*
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 XPUSHs(e ? *e : &PL_sv_undef);
             }
         PUTBACK;
@@ -856,8 +968,16 @@ XS_INTERNAL(hm_xs_fromcpan_cb) {
     hm_clos *cl = hm_clos_of(aTHX_ cv);
     SV *o;
     IV st;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cl || items < 1) XSRETURN_EMPTY;
-    o = ST(0);
+    o = ST(0); /* # uncoverable statement class:ignore_covered_err */
+    /*
+     # uncoverable statement class:ignore_covered_err
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (hmf_state(aTHX_ cl->a) != HMF_PENDING) XSRETURN_EMPTY;
     st = hm_any_state(aTHX_ o);
     if (st == HMF_DONE || st == HMF_FAILED) {

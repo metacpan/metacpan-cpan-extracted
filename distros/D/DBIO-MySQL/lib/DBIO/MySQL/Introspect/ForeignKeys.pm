@@ -4,6 +4,8 @@ package DBIO::MySQL::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Introspect::Base ();
 use DBIO::MySQL::Introspect::Util ();
 
@@ -19,6 +21,8 @@ sub fetch {
   # resolve on both engines. fetchall_arrayref({}) honours the sth's
   # FetchHashKeyName, which is captured from the dbh at prepare time.
   local $dbh->{FetchHashKeyName} = 'NAME_lc';
+
+  my $mariadb = (scalar($dbh->selectrow_array('SELECT VERSION()')) // '') =~ /mariadb/i ? 1 : 0;
 
   my $sth = $dbh->prepare(q{
     SELECT
@@ -65,13 +69,20 @@ sub fetch {
         from_columns    => [ map { $_->{column_name} }            @$ck_rows ],
         to_table        => $head->{referenced_table_name},
         to_columns      => [ map { $_->{referenced_column_name} }  @$ck_rows ],
-        on_update       => $head->{update_rule},
-        on_delete       => $head->{delete_rule},
+        on_update       => _rule($head->{update_rule}, $mariadb),
+        on_delete       => _rule($head->{delete_rule}, $mariadb),
       };
     }
   }
 
   return \%fks;
+}
+
+# NO ACTION and RESTRICT are one action on a MariaDB (karr k116), two on a MySQL.
+sub _rule {
+  my ($rule, $mariadb) = @_;
+  return 'RESTRICT' if $mariadb && defined $rule && uc $rule eq 'NO ACTION';
+  return $rule;
 }
 
 1;
@@ -88,7 +99,7 @@ DBIO::MySQL::Introspect::ForeignKeys - Introspect MySQL/MariaDB foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -112,6 +123,16 @@ hashref keyed by table name. Each value is an arrayref of foreign key
 hashrefs (one per constraint) with keys: C<constraint_name>,
 C<from_columns> (arrayref), C<to_table>, C<to_columns> (arrayref),
 C<on_update>, C<on_delete>.
+
+C<on_update> and C<on_delete> are what C<information_schema> reports, with one
+exception: on a MariaDB, C<NO ACTION> is read as C<RESTRICT>. MariaDB stores
+C<RESTRICT> where the DDL names no action (what C<install_ddl> writes for
+C<NO ACTION>), but keeps an explicit C<NO ACTION> of a constraint made by hand
+or by another tool; both check at once, and a diff that compared the two words
+would drop and add the same constraint. MySQL reports
+C<NO ACTION> and C<RESTRICT> and they stay two. Which server it is, the
+version string says (C<SELECT VERSION()>), as in
+L<DBIO::MySQL::Introspect::Columns>.
 
 =head1 AUTHOR
 

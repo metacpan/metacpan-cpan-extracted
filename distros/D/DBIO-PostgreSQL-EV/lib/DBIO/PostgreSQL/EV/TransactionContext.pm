@@ -3,59 +3,13 @@ package DBIO::PostgreSQL::EV::TransactionContext;
 
 use strict;
 use warnings;
-use Future ();
-use namespace::clean;
 
-sub new {
-  my ($class, %args) = @_;
-  return bless {
-    storage => $args{storage} // die('storage required'),
-    pg      => $args{pg}      // die('pg required'),
-  }, $class;
-}
+our $VERSION = '0.900004';
+
+use base 'DBIO::Storage::Async::TransactionContext';
 
 
-sub storage { $_[0]->{storage} }
-
-
-sub txn_pg  { $_[0]->{pg}      }
-
-
-sub pool    { $_[0]->{storage}->pool }
-
-
-sub in_txn  { 1 }
-
-
-sub _query_async {
-  my ($self, $sql, $bind) = @_;
-  return $self->{storage}->_query_async_pinned($self->{pg}, $sql, $bind);
-}
-
-# CRUD inside a transaction MUST run on the pinned connection that
-# BEGIN/COMMIT ran on, not a fresh pooled one. Each method routes
-# through the storage's shared CRUD builder with the pinned connection,
-# so SQL generation (insert RETURNING, select_single first-row) is not
-# duplicated. Forwarding to $storage->select_async etc. would acquire a
-# separate pool connection and run the query OUTSIDE the transaction.
-sub select_async        { my $self = shift; $self->{storage}->_run_crud_pinned('select',        $self->{pg}, @_) }
-sub select_single_async { my $self = shift; $self->{storage}->_run_crud_pinned('select_single', $self->{pg}, @_) }
-sub insert_async        { my $self = shift; $self->{storage}->_run_crud_pinned('insert',        $self->{pg}, @_) }
-sub update_async        { my $self = shift; $self->{storage}->_run_crud_pinned('update',        $self->{pg}, @_) }
-sub delete_async        { my $self = shift; $self->{storage}->_run_crud_pinned('delete',        $self->{pg}, @_) }
-sub select             { my $self = shift; $self->select_async(@_)->get        }
-sub select_single      { my $self = shift; $self->select_single_async(@_)->get }
-sub insert             { my $self = shift; $self->insert_async(@_)->get        }
-sub update             { my $self = shift; $self->update_async(@_)->get        }
-sub delete             { my $self = shift; $self->delete_async(@_)->get        }
-
-# Delegations -- mirror the generic DBIO::Storage::Async::TransactionContext
-# contract so a txn coderef can reach the storage's sql_maker/debug and open a
-# pipeline or nested transaction from inside the pinned context.
-sub sql_maker          { my $self = shift; $self->{storage}->sql_maker(@_)          }
-sub debug              { my $self = shift; $self->{storage}->debug(@_)              }
-sub pipeline           { my $self = shift; $self->{storage}->pipeline(@_)           }
-sub txn_do_async       { my $self = shift; $self->{storage}->txn_do_async(@_)       }
+sub txn_pg { $_[0]->txn_conn }
 
 1;
 
@@ -71,32 +25,87 @@ DBIO::PostgreSQL::EV::TransactionContext - Pinned connection context for an asyn
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
+
+=head1 DESCRIPTION
+
+The pinned-connection context L<DBIO::PostgreSQL::EV::Storage> hands to a
+C<txn_do_async> coderef -- see L<DBIO::PostgreSQL::EV::Storage/_txn_context_class>.
+
+Everything it does is B<inherited> from
+L<DBIO::Storage::Async::TransactionContext>, the generic context core ships
+since ADR 0030 §4: C<storage>, C<txn_conn>, C<pool>, C<in_txn>, the
+non-releasing C<_query_async>, the five C<*_async> CRUD methods pinned through
+core's C<_run_crud_pinned> (L<DBIO::Storage::Async/_run_crud>) and their
+blocking C<< ->get >> siblings, the C<sql_maker> / C<debug> / C<pipeline> /
+C<txn_do_async> delegations, and C<_context_active> / C<_invalidate> (ADR
+0045), which context-bound L<DBIO::ResultSet> / L<DBIO::Row> /
+L<DBIO::ResultSetColumn> C<*_async> ops consult before routing onto the
+context.
+
+The blocking siblings wait through L<DBIO::PostgreSQL::EV::Future/await>, and
+the coderef that calls them runs inside the C<BEGIN>'s callback on the pinned
+connection. Every one of them sends its statement on that connection, and a
+wait for it there would make L<EV::Pg> hand the result to the C<BEGIN>'s
+callback and spin, so each is refused: it dies with I<"Blocking wait refused:
+...">, which fails the coderef. Use the C<*_async> methods in the coderef and
+chain with C<then>.
+
+A blocking call on the B<storage> in the coderef -- C<< $storage->select >>
+where C<< $ctx->select_async >> was meant -- does not run on the transaction's
+connection: it takes another one from the pool, and the transaction keeps its
+own until the coderef has returned. With C<< pool_size => 1 >>, or with every
+connection held by a callback the call is nested in, no connection can come
+back while it waits, and it is refused the same way: it dies with I<"Blocking
+wait refused: ...">, is never sent, and the transaction is rolled back
+(L<DBIO::PostgreSQL::EV::Future/await>).
+
+The pinned connection runs its statements one at a time, in the order they
+were issued (L<DBIO::PostgreSQL::EV::Storage/_query_async_pinned>). A
+coderef that dies -- or is refused a blocking wait -- while one of its
+statements is still running therefore rolls back cleanly: core's C<ROLLBACK>
+goes out once that statement has its result, and the connection goes back to
+the pool IDLE. Several C<*_async> calls on the context may be issued without
+waiting for each other; they run one after the other.
+
+Every statement the context hands out counts, awaited or not: core waits for
+all of them before C<COMMIT>, and when one failed it sends C<ROLLBACK> instead
+and the transaction fails with that statement's error -- also when the coderef
+caught the failure (L<DBIO::Storage::Async/txn_do_async>). A
+statement the context never saw -- one in a C<pipeline> batch whose coderef
+dropped its error, or one sent on L</txn_pg> past the context -- still aborts
+the transaction on the server, and PostgreSQL answers the C<COMMIT> with
+C<ROLLBACK>. The transport reports that
+(L<DBIO::PostgreSQL::EV::Storage/_txn_commit_rolled_back>), and the transaction
+fails with I<"COMMIT was answered with ROLLBACK"> instead of resolving as if it
+had committed. From the moment C<COMMIT> or C<ROLLBACK> is sent the
+context refuses every further statement: it would run outside the
+transaction.
+
+This class adds exactly one thing: the L</txn_pg> compatibility alias below.
+The pinning policy this context implements is recorded in ADR 0002; the
+duplicated-context half of that ADR is superseded by core ADR 0030 §4.
+
+The pinned connection is passed to C<new> under the core constructor key
+C<txn_conn>, which L<DBIO::PostgreSQL::EV::Storage/_txn_conn_accessor> names and
+core's C<txn_do_async> builds the context with. The pre-k32 key C<pg> is gone:
+the constructor dies without C<txn_conn>.
 
 =head1 ATTRIBUTES
 
-=head2 storage
+=head2 txn_pg
 
-The parent L<DBIO::PostgreSQL::EV::Storage> instance.
+  my $pg = $ctx->txn_pg;
 
-=head2 pg
-
-The pinned L<EV::Pg> connection handle for the duration of this transaction.
-
-=head2 pool
-
-Shortcut to C<< $self->storage->pool >>.
-
-=head2 in_txn
-
-Always true — indicates we are inside a transaction.
-
-=head1 METHODS
-
-=head2 _query_async
-
-Executes a query on the pinned transaction connection without releasing
-it back to the pool. Uses L<DBIO::PostgreSQL::EV::Storage/_query_async_pinned>.
+Compatibility alias for the inherited
+L<DBIO::Storage::Async::TransactionContext/txn_conn>: the pinned L<EV::Pg>
+connection handle for the duration of this transaction. It is the name this
+driver's own context carried before it became a subclass of the core one, kept
+because it says B<which> kind of handle is pinned -- and because it is load
+bearing: C<t/21-deploy-async-live.t> reaches for it to drive
+C<_execute_ddl_async> on the pinned connection. C<txn_conn> is the name core's
+own code reaches for -- C<deploy_async>'s transactional branch among them -- so
+both answer the same handle.
 
 =head1 AUTHOR
 

@@ -22,7 +22,7 @@ my @cds = $schema->resultset("CD")->search( {},
     { rows => 2,
       offset => 2,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "offset ok" );
 
 # test software-based limiting
@@ -42,7 +42,7 @@ is( $it->next, undef, "software next past end of resultset ok" );
       offset => 2,
       software_limit => 1,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "software offset ok" );
 
 throws_ok {
@@ -56,7 +56,7 @@ throws_ok {
     {
       offset => 2,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "offset with no limit" );
 
 $it = $schema->resultset("CD")->search(

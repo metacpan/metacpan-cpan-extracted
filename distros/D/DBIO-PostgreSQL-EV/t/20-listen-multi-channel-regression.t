@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# Regression test for karr #15:
+# Regression test for karr k15:
 #   "second listen() on same Storage silently breaks notifications"
 #
 # Storage.pm:listen used to register only the first channel correctly.
@@ -35,48 +35,47 @@ use EV;
 use EV::Pg;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (same convention as t/10-t/18).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
 
 # Drive a Future to completion on the EV loop under a wall-clock guard.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what\n" };
-  alarm 15;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
+  return GuardedWait->until_ready($f, 15, "TIMEOUT awaiting $what\n");
+}
+
+# Wait until the dedicated LISTEN connection is open -- and so its first
+# LISTEN has just been sent and is still in flight, the moment the k15 race
+# needs. karr k43: core owns the connection now (ADR 0056), and it is in core's
+# listen state from the connect on; before k43 this polled this transport's
+# own flag $storage->{_listen_connected}. Reading core's state is a test's
+# privilege: awaiting the listen Future instead would wait for the LISTEN to
+# be answered and so step around the race this file exists for.
+sub listen_connected {
+  my ($storage) = @_;
+  return $storage->{_listen} && $storage->{_listen}{conn} ? 1 : 0;
 }
 
 sub await_listen_connected {
   my ($storage, $what) = @_;
   my $deadline = EV::time + 2;
   my $count    = 0;
-  while (!$storage->{_listen_connected}) {
+  while (!listen_connected($storage)) {
     return 0 if EV::time >= $deadline || ++$count > 1000;
     EV::run(EV::RUN_ONCE);
   }
-  die "TIMEOUT waiting for _listen_connected ($what)\n"
-    unless $storage->{_listen_connected};
+  die "TIMEOUT waiting for the listen connection ($what)\n"
+    unless listen_connected($storage);
   return 1;
 }
 
@@ -86,6 +85,7 @@ sub await_listen_connected {
 sub drain_briefly {
   my ($seconds) = @_;
   $seconds //= 0.5;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $w = EV::timer($seconds, 0, sub { EV::unloop });
   $w->start;
   EV::loop;

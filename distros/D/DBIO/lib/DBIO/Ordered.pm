@@ -3,7 +3,11 @@ package DBIO::Ordered;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw( DBIO::Base );
+
 
 sub add_columns {
   my ($self, @cols) = @_;
@@ -174,6 +178,9 @@ sub move_last {
 
 sub move_to {
   my ($self, $to_position) = @_;
+  $self->throw_exception('move_to: position must be a non-negative integer')
+    unless defined $to_position and !ref $to_position
+      and $to_position =~ /\A[0-9]+\z/;
   return 0 if ($to_position < 1);
 
   my $position_column = $self->position_column;
@@ -402,13 +409,19 @@ sub _shift_siblings {
     }
   }
   else {
-    $shift_rs->update({ $position_column => \"$position_column $op 1" });
+    my $quoted = $rsrc->storage->sql_maker->_quote($position_column);
+    $shift_rs->update({ $position_column => \"$quoted $op 1" });
   }
 }
 
 sub _group_rs {
   my $self = shift;
-  return $self->result_source->resultset->search({ $self->_grouping_clause });
+  my $rs = $self->result_source->resultset;
+  # ADR 0045 / karr k325: every sibling resultset and sibling row comes from
+  # here, so this is where a context-bound row hands its pin on (the ->search
+  # below passes it to the clone).
+  $rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+  return $rs->search({ $self->_grouping_clause });
 }
 
 sub _siblings {
@@ -473,7 +486,7 @@ DBIO::Ordered - Maintain a position column over an ordered list of rows
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -538,6 +551,15 @@ supplied. Defaults to C<1>.
 
 =head1 METHODS
 
+=head2 add_columns
+
+Component override: translates the C<position> / C<grouping> /
+C<null_position_value> column-info flags into the internal
+C<_ordered_position> / C<_ordered_grouping> / C<_ordered_null_position_value>
+markers L</position_column>, L</grouping_column> and L</null_position_value>
+read, then delegates to C<next::method>. Called the same way as the plain
+C<add_columns>; not normally called directly.
+
 =head2 position_column
 
   my $col = $self->position_column;
@@ -569,6 +591,11 @@ defaults to C<0>.
 
 Returns an ordered resultset of all other rows in the same group,
 excluding the row this was called on.
+
+Called on a row bound with L<DBIO::Row/with_context>, the resultset is bound
+too. The same holds for L</previous_siblings> and L</next_siblings>, and for
+the rows L</previous_sibling>, L</first_sibling>, L</next_sibling> and
+L</last_sibling> return.
 
 =head2 previous_siblings
 
@@ -623,7 +650,8 @@ Moves to the last position. Returns 1 on success, 0 if already last.
   $item->move_to($position);
 
 Moves to the specified position. Returns 1 on success, 0 if already
-at that position.
+at that position. The position is a non-negative integer; anything else
+(a reference, a fraction, C<undef>) throws.
 
 =head2 move_to_group
 

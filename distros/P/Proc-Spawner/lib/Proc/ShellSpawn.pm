@@ -23,7 +23,7 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
 our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and Proc::ShellSubset::Large
   # (empty, post4-0.04: a string with no command, or only comments, runs as nothing, status 0, as in both shells; also eval '')
@@ -179,6 +179,18 @@ sub put {   # Perl writes $t to the context's fd $fd, then $then->(); never wait
   my $e = $c->{map}{$fd};
   $e ? do { hold($e); on_write($e, $t, sub { release($e); $then->() }) } : defer($then); return }
 sub msg { my ($c, $text, $then) = @_; put($c, 2, "$NAME: $text\n", $then) }   # an error message, to fd 2
+sub write_fd {   # as put, then $k->(ERRNO or undef): EBADF when the fd is closed (and there is something to write)
+  my ($c, $fd, $t, $k) = @_; my $e = $c->{map}{$fd};
+  return defer($k, undef) if $t eq ''; return defer($k, POSIX::EBADF()) unless $e;
+  hold($e); on_write($e, $t, sub { my $err = $! + 0; release($e); $k->($err || undef) }); return }
+
+# Programs run inside this process (Proc::ShellSpawn::Programs, after coreutils 9.4), by name (X21).  Decision IP1 (the
+# user, 2026-11-08: "when a well-debugged builtin is already present, use it.  (By default; Configurable.)"): echo
+# printf test [ true false, on every platform; PROC_SHELLSPAWN_INPROC changes the default (none: the programs; names:
+# only these; all), and %INPROC can be changed at run time.  A name with a '/' is always a program.
+our @INPROC = qw(echo printf test [ true false);
+our %INPROC = map +($_ => 1), map $_ eq 'all' ? @INPROC : $_ eq 'none' ? () : $_,
+  split ' ', $ENV{PROC_SHELLSPAWN_INPROC} // 'all';
 
 sub find_cmd {   # the path to run for $name, or undef and the status (127, 126)
   my ($c, $name, $path) = @_;
@@ -195,6 +207,7 @@ sub find_cmd {   # the path to run for $name, or undef and the status (127, 126)
 sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns its process node or undef
   my ($c, $map, $argv, $env, $k, $search) = @_;   # $search: the PATH to look in, if not the command's own (command -p)
   my %e = (%{$c->{sh}{vars}}{grep $c->{sh}{exp}{$_} && /^[A-Za-z_][A-Za-z_0-9]*\z/, keys %{$c->{sh}{vars}}}, %$env);   # as dash: names only
+  return inproc($c, $map, $argv, \%e, $k) if $INPROC{$argv->[0]};
   my ($path, $st, $what) = find_cmd($c, $argv->[0], $search // $e{PATH});
   $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && $argv->[0] !~ m{/};   # remembered, as dash (hash, type)
   if (!defined $path) {
@@ -214,6 +227,35 @@ sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns
   my ($bad) = grep !is_open($_), map $map->{$_} ? $map->{$_}{fd} : (), sort { $a <=> $b } keys %$map;
   $st = $! == POSIX::ENOENT() ? 127 : 126;
   msg($c, defined $bad ? "$bad: Bad file descriptor" : $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: $err", sub { $k->($st) }) }
+sub inproc {   # a program of %INPROC, run here: its output and messages in the program's order, then $k->(STATUS).  A
+  # write error on stdout, as coreutils: death by SIGPIPE (EPIPE, unless the shell ignores SIGPIPE for its children), else
+  # no more output, the message "NAME: write error: ..." at the end and status 1.  Undef, as spawn for no process started.
+  my ($c, $map, $argv, $env, $k) = @_;
+  require Proc::ShellSpawn::Programs;
+  my $d = { %$c, map => $map }; hold($_) for values %$map;   # (the caller releases its holds when spawn returns)
+  $ONBUILTIN->('Proc::ShellSpawn::inproc', $argv, {%$env}) if $ONBUILTIN;   # (measurement: no program runs)
+  tr_("in-process: @$argv");
+  my %opt = (cwd => $c->{sh}{cwd}, isatty => sub { my $e = $map->{$_[0]}; $e && POSIX::isatty($e->{fd}) });
+  my ($out, $err, $st, $seq) = Proc::ShellSpawn::Programs->can($argv->[0] eq '[' ? 'test' : $argv->[0])->($argv, $env, \%opt);
+  my @seq = grep length $_->[1], @{$seq // [[2, $err], [1, $out]]};
+  my $pipe_dfl = !$IGN0{PIPE} && ($c->{sh}{trap}{PIPE} // 1) ne '' && $^O ne 'MSWin32';
+  my $werr;
+  sub {
+    my $next = __SUB__;
+    my $p = shift @seq;
+    if (!$p) {
+      release($_) for values %$map; return $k->($st) unless $werr;
+      local $! = $werr; return write_fd($d, 2, "$argv->[0]: write error" . ($werr > 0 ? ": $!" : '') . "\n", sub { $k->(1) }) }
+    return $next->() if $p->[0] == 1 && $werr;
+    write_fd($d, $p->[0], $p->[1], sub {
+      my $e = shift;
+      if ($e && $p->[0] == 1) {
+        if ($e == POSIX::EPIPE() && $pipe_dfl) { release($_) for values %$map; return $k->(128 + POSIX::SIGPIPE()) }
+        # the reason only when it failed in the final flush (close_stream: errno 0 after an earlier failure): the last
+        # piece for stdout, short enough for one write of the buffer (glibc's: st_blksize, 4096 for a pipe)
+        $werr = !grep($_->[0] == 1, @seq) && length $p->[1] <= 4096 ? $e : -1 }
+      $next->() }) }->();
+  return }
 sub resume { my ($g, $node, $w, $k) = @_; $k->(defined $w ? status_of($w) : 1) }   # on_exit of our children
 
 # ------------------------------------------------------------------ redirections

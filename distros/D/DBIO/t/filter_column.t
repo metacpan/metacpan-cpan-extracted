@@ -58,6 +58,7 @@ use DBIO::Test::Storage;
 
 TestDBIO::FilterCol::Schema->register_class(Item => 'TestDBIO::FilterCol::Schema::Result::Item');
 
+TestDBIO::FilterCol::Schema->storage_type('+DBIO::Test::Storage');
 my $schema  = TestDBIO::FilterCol::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 my $storage = $schema->storage;

@@ -5,6 +5,7 @@ use Test::More;
 BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
 
 use DBIO::PostgreSQL::EV::TransactionContext;
+use DBIO::PostgreSQL::EV::Storage;
 
 # Minimal mock storage and connection.
 #
@@ -16,9 +17,22 @@ use DBIO::PostgreSQL::EV::TransactionContext;
 # would fail.
 {
   package MockStorage27;
-  sub new { bless { pool => MockPool27->new, _log => [] }, $_[0] }
+  sub new { bless { pool => MockPool27->new, _log => [], _owner_token => \(my $t) }, $_[0] }
   sub pool { $_[0]->{pool} }
   sub sql_maker { 'MockSQLMaker27' }
+
+  # k196 ownership contract (adopted in k38): core's TransactionContext snapshots
+  # the backend's owner token at construction and, on every pinned op, resolves
+  # the backend's owner and has THAT owner prove ownership of the context
+  # (_assert_context_active -> _owner_storage -> _assert_async_context_owner).
+  # This mock is a SINGLE ownership domain: it is its own owner and accepts its
+  # own contexts. The token is a stable per-object ref, identical on every call.
+  # Ownership REJECTION is proven separately by t/28-context-ownership-mock.t;
+  # this file's intent is PINNING, so an accepting owner is correct here and
+  # weakens none of the pinned-seam / pinned-conn assertions below.
+  sub _context_owner_token { $_[0]->{_owner_token} }
+  sub _owner_storage       { $_[0] }
+  sub _assert_async_context_owner { $_[1] }
 
   # Non-pinned path: must NOT be reached by a TransactionContext.
   sub _query_async {
@@ -59,18 +73,53 @@ use DBIO::PostgreSQL::EV::TransactionContext;
 
 my $storage = MockStorage27->new;
 my $pg      = MockConn27->new;
+# karr k32: the constructor key moved from the driver-native 'pg' to core's
+# 'txn_conn'. That is not cosmetics -- core's txn_do_async builds the context as
+# $class->new(storage => ..., $accessor => $conn) with $accessor being
+# _txn_conn_accessor, so the seam's value and this key are the same thing, and
+# the constructor is now core's.
 my $ctx     = DBIO::PostgreSQL::EV::TransactionContext->new(
-  storage => $storage,
-  pg      => $pg,
+  storage  => $storage,
+  txn_conn => $pg,
 );
 
 isa_ok $ctx, 'DBIO::PostgreSQL::EV::TransactionContext';
+isa_ok $ctx, 'DBIO::Storage::Async::TransactionContext';
+
+# The old key is GONE, not merely unused: core's constructor dies without
+# txn_conn. Pinned so a silent revival of the local constructor is caught.
+{
+  my $died = ! eval {
+    DBIO::PostgreSQL::EV::TransactionContext->new(storage => $storage, pg => $pg);
+    1;
+  };
+  ok $died, 'the pre-k32 constructor key pg is refused, not silently accepted';
+}
 
 # in_txn is always true
 ok $ctx->in_txn, 'in_txn returns true';
 
-# txn_pg returns the pinned connection
+# txn_pg returns the pinned connection. This claim is PRESERVED across k32 --
+# it is the one method this class still defines, and it is load bearing:
+# t/21-deploy-async-live.t:271 drives _execute_ddl_async through it.
 is $ctx->txn_pg, $pg, 'txn_pg returns the connection';
+
+# ...and it is an alias for the inherited core accessor, not a second store.
+is $ctx->txn_conn, $pg, 'the inherited txn_conn returns the same connection';
+is $ctx->txn_pg, $ctx->txn_conn, 'txn_pg and txn_conn answer the same handle';
+
+# The seam that names the constructor key and the key actually used must agree;
+# they are one fact, asserted from both sides.
+my $accessor = DBIO::PostgreSQL::EV::Storage->_txn_conn_accessor;
+is $accessor, 'txn_conn',
+  '_txn_conn_accessor names the key this context is built with';
+
+# ADR 0045: inherited for free by becoming a subclass. A context-bound
+# ResultSet/Row consults this before routing an *_async op onto the context.
+ok $ctx->_context_active, '_context_active is true on a live context (ADR 0045)';
+$ctx->_invalidate;
+ok !$ctx->_context_active, '_context_active is false after _invalidate';
+$ctx->{_invalidated} = 0;
 
 # pool delegates to storage
 is $ctx->pool, $storage->pool, 'pool delegates to underlying storage';

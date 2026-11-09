@@ -2,6 +2,9 @@ package DBIO::Test::Schema::CustomSql;
 # ABSTRACT: Test result class using a custom SQL query as source
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::Schema::Artist/;
@@ -31,7 +34,7 @@ DBIO::Test::Schema::CustomSql - Test result class using a custom SQL query as so
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

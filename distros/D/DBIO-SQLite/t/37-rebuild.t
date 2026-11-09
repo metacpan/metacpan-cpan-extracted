@@ -57,27 +57,31 @@ use_ok 'DBIO::SQLite::Diff::Rebuild';
   my $diff = DBIO::SQLite::Diff->new(source => $source, target => $target);
   ok($diff->has_changes, 'nullability change is a change');
 
-  my $sql = $diff->as_sql;
+  # The alter op of the column is not rendered -- on its own it throws (karr
+  # k73) -- the rebuild stands in its place.
+  my $sql;
+  lives_ok { $sql = $diff->as_sql }
+    'the diff renders: the rebuild takes the place of the column op';
 
   like($sql, qr/PRAGMA foreign_keys=OFF/, 'brackets with FK off');
-  like($sql, qr/CREATE TABLE item__dbio_rebuild .*PRIMARY KEY AUTOINCREMENT/s,
+  like($sql, qr/CREATE TABLE "item__dbio_rebuild" .*PRIMARY KEY AUTOINCREMENT/s,
     'rebuild reuses target DDL -- PK + AUTOINCREMENT survive');
   like($sql, qr/val INTEGER NOT NULL/, 'new column constraint in rebuilt table');
-  like($sql, qr/INSERT INTO item__dbio_rebuild \(id, name, val\)/,
+  like($sql, qr/INSERT INTO "item__dbio_rebuild" \("id", "name", "val"\)/,
     'copies the surviving columns');
-  like($sql, qr/SELECT id, name, val FROM item/, 'selects from the old table');
-  like($sql, qr/DROP TABLE item;/,                     'drops the old table');
-  like($sql, qr/ALTER TABLE item__dbio_rebuild RENAME TO item;/, 'renames into place');
+  like($sql, qr/SELECT "id", "name", "val" FROM "item";/, 'selects from the old table');
+  like($sql, qr/DROP TABLE "item";/,                   'drops the old table');
+  like($sql, qr/ALTER TABLE "item__dbio_rebuild" RENAME TO "item";/, 'renames into place');
   like($sql, qr/PRAGMA foreign_keys=ON/,               'restores FK enforcement');
   like($sql, qr/CREATE INDEX idx_item_name/,           're-creates the explicit index');
-  unlike($sql, qr/not supported/, 'no ALTER-unsupported comment when rebuilding');
 
   like($diff->summary, qr/~ table rebuild: item/, 'summary names the rebuild');
 }
 
 # ---------------------------------------------------------------------------
-# Part A2: no captured CREATE sql (e.g. compiled-model path) -> fall back to
-# the per-column alter comment, no rebuild.
+# Part A2: no captured CREATE sql (e.g. compiled-model path) -> no rebuild,
+# and no statement either: the change is refused, naming table, column, change
+# and reason (karr k73). The diff still says what it contains.
 # ---------------------------------------------------------------------------
 {
   my $source = {
@@ -91,9 +95,13 @@ use_ok 'DBIO::SQLite::Diff::Rebuild';
     indexes => {}, foreign_keys => {},
   };
   my $diff = DBIO::SQLite::Diff->new(source => $source, target => $target);
-  like($diff->as_sql, qr/not supported/,
-    'without captured DDL the alter comment stands');
-  unlike($diff->as_sql, qr/__dbio_rebuild/, 'no rebuild attempted');
+  ok(!(grep { $_->isa('DBIO::SQLite::Diff::Rebuild') } @{ $diff->operations }),
+    'without captured DDL no rebuild is attempted');
+  throws_ok { $diff->as_sql }
+    qr/Cannot change column t\.a \(type INTEGER -> TEXT, NOT NULL no -> yes\): SQLite has no ALTER COLUMN, and the target model holds no CREATE TABLE statement to rebuild table t from/,
+    'and the change is refused: table, column, change and reason';
+  ok($diff->has_changes, 'the diff still reports the change');
+  like($diff->summary, qr/~column: t\.a/, 'and its summary names it');
 }
 
 # ---------------------------------------------------------------------------

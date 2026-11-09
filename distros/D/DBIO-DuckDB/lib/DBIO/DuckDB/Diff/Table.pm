@@ -4,23 +4,36 @@ package DBIO::DuckDB::Diff::Table;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Diff::Op';
 
-use DBIO::SQL::Util qw(_quote_ident);
+use DBIO::DuckDB::DDL::Emit qw(quote_ident quote_table);
 use DBIO::DuckDB::DDL::Emit qw(
-  column_def pk_clause fk_clause create_table create_sequence
+  column_def pk_clause unique_clause fk_clause create_table create_sequence
 );
 
-__PACKAGE__->mk_diff_accessors(qw/table_name table_info columns foreign_keys/);
+__PACKAGE__->mk_diff_accessors(qw/table_name table_info columns foreign_keys unique_constraints/);
 
 
 
 sub diff {
-  my ($class, $source, $target, $target_columns, $target_fks) = @_;
+  my ($class, $source, $target, $target_columns, $target_fks, $source_fks, $target_uniques) = @_;
+  $target_uniques //= {};
   $target_columns //= {};
   $target_fks     //= {};
+  $source_fks     //= {};
+
+  # DuckDB enforces foreign keys: a table is created after the tables its keys
+  # point to, and dropped before them (karr k49)
+  my $reads = sub {
+    my ($fks) = @_;
+    return sub { [ map { $_->{to_table} } @{ $fks->{ $_[0] } || [] } ] };
+  };
 
   return $class->diff_toplevel($source, $target,
+    depends        => $reads->($target_fks),
+    source_depends => $reads->($source_fks),
     create => sub {
       my ($name) = @_;
       $class->new(
@@ -29,6 +42,7 @@ sub diff {
         table_info   => $target->{$name},
         columns      => $target_columns->{$name} // [],
         foreign_keys => $target_fks->{$name}     // [],
+        unique_constraints => $target_uniques->{$name} // {},
       );
     },
     drop => sub {
@@ -47,7 +61,7 @@ sub as_sql {
   my ($self) = @_;
 
   if ($self->action eq 'drop') {
-    return sprintf 'DROP TABLE %s;', _quote_ident($self->table_name);
+    return sprintf 'DROP TABLE %s;', quote_table($self->table_name);
   }
 
   my @col_defs;
@@ -74,6 +88,11 @@ sub as_sql {
   }
 
   push @col_defs, pk_clause(@pk_cols) if @pk_cols;
+
+  # the UNIQUE constraints the table has in the target, in the order of
+  # their names (karr k49)
+  my $uniques = $self->unique_constraints || {};
+  push @col_defs, unique_clause(@{ $uniques->{$_}{columns} }) for sort keys %$uniques;
 
   for my $fk (@{ $self->foreign_keys }) {
     push @col_defs, fk_clause(
@@ -112,7 +131,7 @@ DBIO::DuckDB::Diff::Table - Diff operations for DuckDB tables
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -128,7 +147,7 @@ with ALTER TABLE ADD COLUMN).
 
     my @ops = DBIO::DuckDB::Diff::Table->diff(
         $source_tables, $target_tables,
-        $target_columns, $target_fks,
+        $target_columns, $target_fks, $source_fks,
     );
 
 =head2 as_sql

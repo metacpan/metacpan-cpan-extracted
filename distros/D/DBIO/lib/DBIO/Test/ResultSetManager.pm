@@ -2,6 +2,9 @@ package DBIO::Test::ResultSetManager;
 # ABSTRACT: Test schema for ResultSetManager component testing
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Schema';
@@ -22,7 +25,7 @@ DBIO::Test::ResultSetManager - Test schema for ResultSetManager component testin
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

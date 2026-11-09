@@ -40,6 +40,7 @@ unless(-e 't/online.enabled') {
 	# force lookup on Whois
 	$l->{_have_geoip} = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	$l->{_have_ipcountry} = 0;
 
 	SKIP: {

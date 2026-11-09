@@ -2,6 +2,9 @@ package DBIO::Test::Schema::BindType;
 # ABSTRACT: Test result class for the bindtype_test table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -47,7 +50,7 @@ DBIO::Test::Schema::BindType - Test result class for the bindtype_test table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

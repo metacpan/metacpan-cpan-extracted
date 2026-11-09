@@ -13,7 +13,7 @@ DBIO::Manual::Component - Developing DBIO Components
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 WHAT IS A COMPONENT
 
@@ -32,7 +32,7 @@ class:
 
   package My::Schema::Result::Thing;
   use base qw( DBIO::Core );
-  __PACKAGE__->load_components(qw/InflateColumn::DateTime Timestamp/);
+  __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
 
 You usually omit the C<DBIO::> prefix; C<load_components> looks under
 C<DBIO::> by default. To load a component outside that namespace, prefix
@@ -71,6 +71,39 @@ L<DBIO::Row>:
     return $self->next::method(@_);
   }
 
+Work that has to happen B<before> the row is written -- setting a column,
+generating a key, taking a key out of the update hashref -- does not belong in
+C<insert> / C<update> / C<delete>. L<DBIO::Row> has a hook for each,
+C<prepare_insert>, C<prepare_update($upd)> and C<prepare_delete>, which do
+nothing in C<DBIO::Row> and which both the synchronous methods and
+C<insert_async> / C<update_async> / C<delete_async> call, once, before they
+read the columns:
+
+  sub prepare_insert {
+    my $self = shift;
+    $self->slug(lc $self->title) unless defined $self->slug;
+    return $self->next::method(@_);
+  }
+
+  sub prepare_update {
+    my ($self, $upd) = @_;
+    # $upd is the hashref given to update(), or undef; take keys out of it
+    # in place to set them another way
+    $self->touched_at(time);
+    return $self->next::method($upd);
+  }
+
+An override of C<insert>, C<update> or C<delete> is not on the way of the
+C<*_async> methods, which send their statement through the storage backend.
+A class that has one without a C<*_async> sibling in the same package has it
+run: the C<*_async> method goes through the full synchronous method, which on a
+row bound to an async context (L<DBIO::Row/with_context>) is refused, naming
+the class and the method. Override C<insert> and friends for work that
+surrounds the write -- further statements after it, siblings, a transaction
+(L<DBIO::Ordered>, L<DBIO::ChangeLog>) -- and add a C<*_async> beside it if
+that work can be done asynchronously. L<DBIO::Timestamp>,
+L<DBIO::UUIDColumns> and L<DBIO::FilterColumn> use the hooks.
+
 Components loaded earlier sit closer to the front of the C<@ISA> chain.
 If you override C<insert()> but L<DBIO::Row> appears in the chain before
 your component, your override is shadowed. To inspect the actual
@@ -101,6 +134,9 @@ L<DBIO::Relationship> -- Inter-table relationships
 L<DBIO::InflateColumn> -- Per-column inflate/deflate hook used by both
 core and optional components.
 
+L<DBIO::Timestamp> -- C<set_on_create> / C<set_on_update> column flags
+for automatic timestamp maintenance.
+
 =head1 BUILT-IN OPTIONAL COMPONENTS
 
 These ship in the DBIO core distribution and are loaded explicitly via
@@ -110,13 +146,10 @@ L<DBIO::InflateColumn::DateTime> -- Inflate date/time columns to
 L<DateTime> objects.
 
 L<DBIO::InflateColumn::Serializer> -- Serialise complex Perl structures
-into a single column (JSON, Storable, YAML).
+into a single column (JSON, YAML, MessagePack).
 
 L<DBIO::FilterColumn> -- Bidirectional filter callbacks between in-memory
 and storage representations.
-
-L<DBIO::Timestamp> -- C<set_on_create> / C<set_on_update> column flags
-for automatic timestamp maintenance.
 
 L<DBIO::EncodedColumn> -- One-way encode columns such as passwords.
 

@@ -30,7 +30,7 @@ that: its `Deploy.pm` replaced `_temp_connect_info` outright to build the
 handling and the user/password extraction by copy. Worse, the copy **silently
 dropped the coderef-DSN guard** — a duplication regression: the engine-agnostic
 safety check existed in core but was absent from the fork's hand-rolled copy, so
-a coderef DSN would not have been caught there. (karr core#48.)
+a coderef DSN would not have been caught there. (k48.)
 
 ## Decision
 
@@ -42,11 +42,11 @@ else from `_temp_connect_info`.
 - `_temp_connect_info` keeps the shared, engine-agnostic work: connect-info
   shape normalisation, user/password extraction, and the coderef-DSN guard. Its
   final step is `$self->_temp_dsn($dsn, $temp_db)` — the one call a subclass can
-  redirect (`TempDatabase.pm:142-163`).
+  redirect.
 - `_temp_dsn` is the only overridable form-hook. The default is
   **behaviour-preserving**: it builds today's standard form bit-identically —
   rewrite the `database=`/`dbname=` component to `$temp_db` when present, else
-  append `;dbname=$temp_db` (`TempDatabase.pm:182-193`). PostgreSQL and MySQL are
+  append `;dbname=$temp_db`. PostgreSQL and MySQL are
   unchanged.
 - This is a **cross-driver convention**: override the narrow form-hook, never the
   whole `_temp_connect_info`. A driver that reaches for the whole method to

@@ -1,0 +1,29 @@
+---
+abstract: 'LTE EARFCN Channel to Frequency Converter'
+author:
+  - 'Michael R. Davis <mrdvt92@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RF-LTE-EARFCN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Package::New: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-RF-LTE-EARFCN/issues
+  homepage: https://github.com/mrdvt92/perl-RF-LTE-EARFCN
+  repository: https://github.com/mrdvt92/perl-RF-LTE-EARFCN.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,6 +2,9 @@
 package DBIO::Test::ForeignComponent::TestComp;
 # ABSTRACT: Test component loaded as a foreign component
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 sub foreign_test_method { 1 }
@@ -20,7 +23,7 @@ DBIO::Test::ForeignComponent::TestComp - Test component loaded as a foreign comp
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

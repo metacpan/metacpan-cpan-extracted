@@ -4,6 +4,8 @@ package DBIO::Oracle::Storage::AutoIncrement;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Carp;
 
 
@@ -89,6 +91,12 @@ sub _dbh_get_autoinc_seq {
     return $seq_name;
   }
 
+  # No trigger: an IDENTITY column (12c and later) has none. Oracle keeps a
+  # sequence of its own for it, named in all_tab_identity_cols (karr k41).
+  if (my $seq = $self->_dbh_identity_seq($dbh, $source_name, $schema, $table, $ql, $qr, $col)) {
+    return $seq;
+  }
+
   $self->throw_exception(sprintf(
     "No suitable BEFORE INSERT triggers found for column '%s.%s'. "
     . "You need to specify the correct 'sequence' explicitly in '%s's column_info.",
@@ -96,11 +104,52 @@ sub _dbh_get_autoinc_seq {
   ));
 }
 
+# The sequence behind a GENERATED ... AS IDENTITY column, as a quoted
+# "OWNER"."NAME" (a scalar ref, like a quoted sequence from a trigger), or
+# nothing when the column is no IDENTITY column or the server has no such
+# view (before 12c).
+sub _dbh_identity_seq {
+  my ($self, $dbh, $source_name, $schema, $table, $ql, $qr, $col) = @_;
+
+  my $unquote = sub { my $n = shift; $n =~ s/^"|"\z//g; $n };
+  my $owner = ref $schema ? undef : $unquote->($schema);
+  my $tname = $unquote->($table || $source_name);
+  my $cname = $ql ? $col : uc $col;
+
+  # Only "that view does not exist" (a server before 12c, ORA-00942) means no
+  # IDENTITY column; any other error, a lost connection say, goes through.
+  my $row = eval {
+    $dbh->selectrow_arrayref(
+      'SELECT owner, sequence_name FROM all_tab_identity_cols '
+    . 'WHERE table_name = ? AND column_name = ? AND owner = '
+    . ( defined $owner ? '?' : 'USER' ),
+      {}, $tname, $cname, ( defined $owner ? $owner : () ),
+    );
+  };
+  if (my $err = $@) {
+    die $err unless "$err" =~ /ORA-00942/;
+    return;
+  }
+  return unless $row;
+
+  my $seq = qq{"$row->[0]"."$row->[1]"};
+  return \$seq;
+}
+
 sub _dbh_last_insert_id {
   my ($self, $dbh, $source, @columns) = @_;
   my @ids;
   for my $col (@columns) {
-    my $seq = ($source->column_info($col)->{sequence} ||= $self->get_autoinc_seq($source, $col));
+    # A sequence the class declares is used as it is. One that was looked up
+    # is remembered by this storage only: column_info belongs to the result
+    # class, which outlives the connection, and the table may have been
+    # dropped and created again since (a new IDENTITY sequence, ORA-02289).
+    my $seq = $source->column_info($col)->{sequence};
+    unless (defined $seq) {
+      my $sname = $source->name;
+      my $key = join "\0", (ref $sname ? $$sname : $sname), $col;
+      $seq = ($self->{_autoinc_sequence}{$key} ||= $self->get_autoinc_seq($source, $col));
+    }
     push @ids, $self->_sequence_fetch('CURRVAL', $seq);
   }
   return @ids;
@@ -136,12 +185,16 @@ DBIO::Oracle::Storage::AutoIncrement - Auto-increment / sequence detection for O
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Detects Oracle sequences associated with autoincrement columns by inspecting
-BEFORE INSERT triggers in ALL_TRIGGERS.
+BEFORE INSERT triggers in ALL_TRIGGERS. A column without such a trigger is
+looked up in C<ALL_TAB_IDENTITY_COLS> (Oracle 12c and later): the sequence
+Oracle keeps for a C<GENERATED ... AS IDENTITY> column is the one whose
+C<CURRVAL> gives the key of the row just inserted when C<INSERT ... RETURNING>
+is not used.
 
 =head1 AUTHOR
 

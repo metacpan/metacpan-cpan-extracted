@@ -4,6 +4,8 @@ package DBIO::MySQL::Introspect::Indexes;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::MySQL::Introspect::Util ();
 
 
@@ -78,7 +80,7 @@ DBIO::MySQL::Introspect::Indexes - Introspect MySQL/MariaDB indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

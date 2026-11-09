@@ -55,7 +55,7 @@ required small adjustments in the SQLMaker layer."
   `::Classic` provided implicitly must be reproduced explicitly on the
   `SQL::Abstract` base. The canonical case is the `select.where`
   paren-restore, which is its own decision (ADR 0004) and exposed a defect
-  (karr #26).
+  (k26).
 - DBIO must track `SQL::Abstract` `>= 2.000001`; engine-internal changes in
   future `SQL::Abstract` releases land directly on DBIO's SQL generation and
   must be regression-tested against the SQLMaker layer.

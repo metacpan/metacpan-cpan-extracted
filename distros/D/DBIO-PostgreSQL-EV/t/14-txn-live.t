@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# LIVE regression for karr #10: a full txn_do_async round-trip must complete
+# LIVE regression for karr k10: a full txn_do_async round-trip must complete
 # (not hang) for BOTH the commit and the rollback-on-failure path.
 #
 # WHY this is a live test: the bug was a Future-lifetime defect in the
@@ -38,37 +38,26 @@ use DBIO::PostgreSQL::EV::Storage;
 my @warnings;
 $SIG{__WARN__} = sub { push @warnings, $_[0]; warn $_[0] };
 
-# Parse DSN into a libpq conninfo hash (mirrors t/13-cold-pool-live.t).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
 
 # Drive a Future to completion on the EV loop under a wall-clock guard, so a
 # regression that reintroduces the hang fails this test instead of spinning.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what (karr #10 regression: txn hung)\n" };
-  alarm 15;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
+  return GuardedWait->until_ready(
+    $f, 15, "TIMEOUT awaiting $what (karr k10 regression: txn hung)\n",
+  );
 }
 
 # Raw statement on a pooled connection (DDL setup/teardown + verification).
@@ -106,7 +95,7 @@ lives_ok {
     }),
     'txn_do_async COMMIT',
   )->get;
-} 'karr #10: txn_do_async COMMIT round-trip completed without hanging';
+} 'karr k10: txn_do_async COMMIT round-trip completed without hanging';
 ok scalar(@committed), 'COMMIT txn resolved with the coderef result';
 is ref($committed[0]), 'HASH',
   'insert_async inside COMMIT txn resolved with a returned-columns HASHREF (ADR 0031 §3)';
@@ -166,7 +155,7 @@ is scalar(@after_rollback), 0, 'rolled-back write was NOT persisted';
 # --- 5. No "lost a sequence Future" warning on any path --------------------
 
 my @lost = grep { /lost a sequence Future/ } @warnings;
-is scalar(@lost), 0, 'no "lost a sequence Future" warning emitted (karr #10)'
+is scalar(@lost), 0, 'no "lost a sequence Future" warning emitted (karr k10)'
   or diag "Unexpected lost-future warnings:\n@lost";
 
 # --- cleanup ---------------------------------------------------------------

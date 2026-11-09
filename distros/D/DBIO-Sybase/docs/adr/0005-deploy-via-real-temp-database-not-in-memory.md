@@ -39,7 +39,7 @@ rather than re-implementing the orchestration locally.
   hide a diff).
 - The orchestration (introspect-live, deploy-to-temp, introspect-temp, diff,
   drop) is engine-agnostic and now lives in core (adopted from dbio core
-  #12–16). Keeping only the two T-SQL glue methods here avoids re-deriving
+  k12–k16). Keeping only the two T-SQL glue methods here avoids re-deriving
   ~160 lines of deploy/diff/apply/upgrade plumbing that core already owns.
 
 ## Consequences
@@ -57,3 +57,16 @@ rather than re-implementing the orchestration locally.
 - `install` still falls back to the SQL::Translator path
   (`storage->deploy`) because the native `DDL` path is not yet the default for
   fresh installs; the temp-database machinery is exercised by `diff`/`upgrade`.
+  **Amended 2026-10-05 (karr k62):** the fallback is gone — see the addendum at
+  the end of this ADR.
+
+## Addendum 2026-10-05 — `install` runs the native DDL path (karr k62)
+
+The last consequence above described the state when this ADR was written.
+`DBIO::Sybase::Deploy` has no `install` of its own: it inherits `install` from
+`DBIO::Deploy::Base`, which executes the statements of
+`DBIO::Sybase::DDL->install_ddl($schema)` (`_ddl_class` in
+`lib/DBIO/Sybase/Deploy.pm`) against the connected database. No
+SQL::Translator fallback is left on that path. A fresh install touches no temp
+database; the temp-database machinery this ADR decides on serves `diff` and
+`upgrade`, as before. The Decision is unchanged.

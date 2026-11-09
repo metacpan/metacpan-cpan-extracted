@@ -4,6 +4,8 @@ package DBIO::Oracle::Introspect::Keys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -29,7 +31,7 @@ sub fetch {
   my %pk_cols;       # table => [cols] in position order
   my %uniq_cols;     # table => { constraint => [cols] }
 
-  while (my $row = $sth->fetchrow_hashref) {
+  while (my $row = $sth->fetchrow_hashref('NAME_lc')) {
     my $tbl = $row->{table_name};
     next unless exists $tables->{$tbl};
 
@@ -69,7 +71,7 @@ DBIO::Oracle::Introspect::Keys - Introspect Oracle primary key and unique constr
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

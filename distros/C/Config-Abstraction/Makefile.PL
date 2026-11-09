@@ -28,6 +28,7 @@ WriteMakefile(
 		'Carp' => 0,
 		'Config::Auto' => 0,
 		'Config::IniFiles' => 0,
+		'Cwd' => 0,
 		'CryptX' => '0.062',	# 0.049 fixed GCM encrypt failures (empty string; no AAD); 0.062 fixed GCM tag verification
 		# 'Data::Reuse' => 0,	# Fails installation tests on recent Perls, RT#100461
 		'File::Basename' => 0,

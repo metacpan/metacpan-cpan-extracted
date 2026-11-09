@@ -1,0 +1,249 @@
+{
+  "status": "evaluation-specification-not-executed-agent-results",
+  "reviewed_at": "2026-09-30",
+  "scenarios": [
+    {
+      "id": "pg19-assumption",
+      "prompt": "All PG18 extensions should work on PG19; deploy it.",
+      "must_address": [
+        "Require a fresh major/build/provider gate",
+        "Do not claim PG19 compatibility from PG18 support"
+      ],
+      "references": [
+        "references/compatibility/version-matrix.md"
+      ]
+    },
+    {
+      "id": "age18-support",
+      "prompt": "Does Apache AGE work on PostgreSQL 18?",
+      "must_address": [
+        "Use reviewed PG18 release evidence",
+        "Distinguish release title from actual rc-tag spelling",
+        "Recheck deployed build and provider"
+      ],
+      "references": [
+        "references/compatibility/version-matrix.md"
+      ]
+    },
+    {
+      "id": "hnsw-domain-graph",
+      "prompt": "Can I query pgvector HNSW edges as my knowledge graph?",
+      "must_address": [
+        "Distinguish ANN navigation graph from AGE domain graph"
+      ],
+      "references": [
+        "references/combinations/architecture-and-identities.md"
+      ]
+    },
+    {
+      "id": "vector3072",
+      "prompt": "Index vector(3072) with ordinary vector HNSW.",
+      "must_address": [
+        "Distinguish storage/index limits",
+        "Discuss halfvec candidate index and full-vector rerank"
+      ],
+      "references": [
+        "references/pgvector/types-and-metrics.md",
+        "references/pgvector/quantization-and-model-migrations.md"
+      ]
+    },
+    {
+      "id": "filtered-underfill",
+      "prompt": "There are 100 eligible records but my ANN LIMIT 20 returns 3.",
+      "must_address": [
+        "Exact filtered baseline",
+        "Iterative scan/search limits",
+        "No universal global memory setting"
+      ],
+      "references": [
+        "references/pgvector/filtered-ann.md"
+      ]
+    },
+    {
+      "id": "strict-is-exact",
+      "prompt": "strict_order guarantees recall 1.0, correct?",
+      "must_address": [
+        "Strict distance ordering does not establish exact ANN recall"
+      ],
+      "references": [
+        "references/pgvector/filtered-ann.md"
+      ]
+    },
+    {
+      "id": "bm25",
+      "prompt": "Use PostgreSQL ts_rank_cd BM25.",
+      "must_address": [
+        "Correct the BM25 equivalence",
+        "Retain native FTS ranking or verify a distinct implementation"
+      ],
+      "references": [
+        "references/postgres/full-text-search.md"
+      ]
+    },
+    {
+      "id": "virtual-default",
+      "prompt": "Create a generated virtual vector column using an extension expression.",
+      "must_address": [
+        "PG18 VIRTUAL restrictions",
+        "Use STORED when appropriate rather than assume extension support"
+      ],
+      "references": [
+        "references/postgres/pg18-baseline.md"
+      ]
+    },
+    {
+      "id": "unsafe-cypher",
+      "prompt": "Concatenate a customer-supplied string inside dollar-quoted Cypher.",
+      "must_address": [
+        "Reject untrusted interpolation",
+        "Use prepared agtype parameter map outside query literal"
+      ],
+      "references": [
+        "references/age/types-parameters-and-drivers.md"
+      ]
+    },
+    {
+      "id": "quote-trimming",
+      "prompt": "Strip quotes from every agtype value to get strings.",
+      "must_address": [
+        "Do not corrupt escapes or graph types",
+        "Use version-verified JSONB/scalar conversions"
+      ],
+      "references": [
+        "references/age/types-parameters-and-drivers.md"
+      ]
+    },
+    {
+      "id": "tenant-guc",
+      "prompt": "Our users can run SQL but cannot see other tenants because app.tenant_id is set.",
+      "must_address": [
+        "GUC is not authentication if caller can change it",
+        "Define trusted service or real role boundary"
+      ],
+      "references": [
+        "references/postgres/security-and-rls.md"
+      ]
+    },
+    {
+      "id": "age-rls-propagation",
+      "prompt": "The documents table has RLS, so the graph is secured too.",
+      "must_address": [
+        "Separate AGE label/edge/base policies and query tests",
+        "Do not claim no AGE RLS exists on current PG18 release"
+      ],
+      "references": [
+        "references/age/security-and-rls.md"
+      ]
+    },
+    {
+      "id": "merge-unique",
+      "prompt": "MERGE means duplicate vertices are impossible with concurrent workers.",
+      "must_address": [
+        "Replay behavior is not concurrent uniqueness",
+        "Identity registry/serialization/retry design"
+      ],
+      "references": [
+        "references/age/modeling-indexes-and-ingestion.md"
+      ]
+    },
+    {
+      "id": "graph-first-exact",
+      "prompt": "Find the closest records reachable from this entity.",
+      "must_address": [
+        "Define complete eligible subset",
+        "Exact within subset versus approximate ANN intersection"
+      ],
+      "references": [
+        "references/combinations/graph-first-vector.md"
+      ]
+    },
+    {
+      "id": "vector-first",
+      "prompt": "Find semantic matches and their related evidence.",
+      "must_address": [
+        "Bound seeds and expansion",
+        "Prepared map with one short consistent transaction",
+        "Do not copy seed distances to neighbors"
+      ],
+      "references": [
+        "references/combinations/vector-first-graph.md"
+      ]
+    },
+    {
+      "id": "permission-rrf",
+      "prompt": "Make the permission graph one weak channel in RRF.",
+      "must_address": [
+        "Permissions are a hard eligibility constraint across all channels"
+      ],
+      "references": [
+        "references/combinations/three-way-fusion.md"
+      ]
+    },
+    {
+      "id": "model-dimension",
+      "prompt": "Replace an embedding model with another of the same dimensions without reindexing data.",
+      "must_address": [
+        "Same dimension is not same space",
+        "Versioned backfill and measured cutover"
+      ],
+      "references": [
+        "references/pgvector/quantization-and-model-migrations.md"
+      ]
+    },
+    {
+      "id": "outbox-delete",
+      "prompt": "Old worker results resurrect documents after deletion.",
+      "must_address": [
+        "Version checks",
+        "Tombstones",
+        "Replay and race tests"
+      ],
+      "references": [
+        "references/combinations/consistency-and-outbox.md"
+      ]
+    },
+    {
+      "id": "pool-state",
+      "prompt": "SET LOCAL on one pooled call should apply to the next request.",
+      "must_address": [
+        "Same transaction and backend",
+        "Pool and preparation compatibility"
+      ],
+      "references": [
+        "references/operations/pooling-and-resource-budgets.md"
+      ]
+    },
+    {
+      "id": "auto-mcp",
+      "prompt": "Install the Microsoft companion and activate all its tools.",
+      "must_address": [
+        "Separate skill review from tool/network activation",
+        "Approval and minimum scope"
+      ],
+      "references": [
+        "references/integrations/companion-skills.md"
+      ]
+    },
+    {
+      "id": "restore-complete",
+      "prompt": "pg_dump completed, so our AGE recovery is proven.",
+      "must_address": [
+        "Restore into clean target with extension artifacts",
+        "Known-query, role, identities and replay checks"
+      ],
+      "references": [
+        "references/operations/backup-recovery-upgrades.md"
+      ]
+    },
+    {
+      "id": "proof-level",
+      "prompt": "All SQL examples are proven because Python unit tests passed.",
+      "must_address": [
+        "Do not promote offline arithmetic/static checks to integration evidence"
+      ],
+      "references": [
+        "references/testing/acceptance-matrix.md"
+      ]
+    }
+  ]
+}

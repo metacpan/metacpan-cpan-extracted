@@ -23,8 +23,7 @@ for my $dt (qw( bool boolean Bool Boolean BOOLEAN tinyint(1) TINYINT(1) )) {
 }
 
 # Float
-for my $dt (qw( float Float FLOAT double real money decimal numeric
-                DECIMAL NUMERIC )) {
+for my $dt (qw( float Float FLOAT double real )) {
   is(for_column(fake_source($dt), 'col')->name, 'Float',
     "Float for data_type '$dt'");
 }
@@ -34,7 +33,7 @@ is(for_column(fake_source('double precision'), 'col')->name, 'Float',
   "Float for 'double precision'");
 
 # Int
-for my $dt (qw( int integer INT INTEGER bigint smallint tinyint
+for my $dt (qw( int integer INT INTEGER smallint tinyint
                 TINYINT mediumint serial )) {
   is(for_column(fake_source($dt), 'col')->name, 'Int',
     "Int for data_type '$dt'");
@@ -44,9 +43,14 @@ for my $dt (qw( int integer INT INTEGER bigint smallint tinyint
 is(for_column(fake_source('tinyint'), 'col')->name, 'Int',
   'tinyint (no suffix) maps to Int, not Boolean');
 
-# Decimal must be Float, NOT Int
-is(for_column(fake_source('decimal'), 'col')->name, 'Float',
-  'decimal maps to Float, not Int');
+# Types wider than GraphQL's Int (32-bit) or Float (double) keep their
+# exact text: String
+for my $dt ((qw( bigint BIGINT bigserial decimal DECIMAL numeric NUMERIC
+                money )),
+              'decimal(10,2)', 'numeric(20,4)' ) {
+  is(for_column(fake_source($dt), 'col')->name, 'String',
+    "String for data_type '$dt', not Int or Float");
+}
 
 # String fallback
 for my $dt (qw( varchar text char blob date datetime timestamp json uuid )) {

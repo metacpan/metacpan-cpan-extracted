@@ -12,12 +12,25 @@
 # First run is slow: the DB2 server does one-time instance setup (a few
 # minutes); the entrypoint waits for it before running the suite.
 #
+# RESOURCE DISCIPLINE -- small SHARED box (see .claude/rules/.local.dbio-rules.md
+# "Live testing"). BOTH containers carry mem_limit + cpus so they can never
+# starve the host. This matters more here than anywhere else in the family:
+# DB2 is the heaviest engine we test against AND it runs privileged, so an
+# uncapped instance setup is exactly the shape that has OOM-rebooted this box
+# before. The values mirror maint/k8s/db2-pod.yaml. Run this stack alone (no
+# other live DB suite in parallel) and `down -v` when finished.
+#
 # Teardown:  docker compose down -v
 
 services:
   db2:
     image: icr.io/db2_community/db2:latest
     privileged: true            # DB2 community image requires it for instance setup
+    # Resource cap (compose non-swarm keys, honored by `docker compose up`).
+    # Two cores / 2 GiB -- the same bound maint/k8s/db2-pod.yaml sets, and the
+    # most this box can give one engine.
+    mem_limit: 2g
+    cpus: 2.0
     environment:
       LICENSE: accept
       DB2INST1_PASSWORD: dbio
@@ -40,6 +53,10 @@ services:
       DBIO_TEST_DB2_PASS: dbio
       DBIO_CORE: /src/dbio
       DBIO_DB2: /src/dbio-db2
+    # The client container is capped too; server + client together stay within
+    # 3 cores / 3 GiB on the shared box.
+    mem_limit: 1g
+    cpus: 1.0
     volumes:
       - ../../../dbio:/src/dbio:ro         # dbio core (not on CPAN -> mounted)
       - ../..:/src/dbio-db2:ro

@@ -1,6 +1,8 @@
 package DBIO::Test::MooCakeSchema::ResultSet::Artist;
 # ABSTRACT: Custom Moo-based ResultSet for the MooCake artist source
 
+our $VERSION = '0.900004';
+
 use Moo;
 extends 'DBIO::ResultSet';
 
@@ -31,7 +33,7 @@ DBIO::Test::MooCakeSchema::ResultSet::Artist - Custom Moo-based ResultSet for th
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

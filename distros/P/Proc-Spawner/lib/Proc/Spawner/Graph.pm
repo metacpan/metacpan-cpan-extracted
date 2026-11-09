@@ -1,5 +1,5 @@
 package Proc::Spawner::Graph;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 # EXPERIMENTAL.  The companion of Proc::Spawner: the spawn graph, which is what gets executed.  It says,
 # for the current moment, which of our children and which of our own reads and writes use which open
 # file, and carries on each process what to do when it ends.  That reaction may start new processes,
@@ -21,7 +21,8 @@ our $VERSION = '0.09';
 # HANDLER: a code ref, or [NAME, DATA...] with NAME a fully qualified sub name (its module is loaded at
 # first use).  Called from Proc::Spawner's queue, one at a time, never waiting:
 #   on_exit                HANDLER->(GRAPH, PROC, WAIT STATUS or undef, DATA...)
-#   perl_read, perl_write  HANDLER->(GRAPH, BYTES or undef at end of file, DATA...), HANDLER->(GRAPH, DATA...)
+#   perl_read, perl_write  HANDLER->(GRAPH, BYTES or undef at end of file, DATA...), HANDLER->(GRAPH, DATA...) with $! the
+#                          write's error (EPIPE, ...: the rest is dropped), or 0
 # No strong reference cycles: the graph holds its processes, a process its ends and its HANDLER (with
 # its DATA); ends refer back only weakly.  So DATA must not hold the graph: a handler gets it as an argument.
 use strict; use warnings; use feature 'current_sub';
@@ -127,7 +128,7 @@ sub perl_write {   # to a pipe or FIFO through an open file of our own, made non
   my ($g, $e, $bytes, $h) = @_; my ($id, $nb);
   my ($to, $chunk) = !S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0) ? $e->{fd} : $e->{nbw} ? $e->{nbw}
     : sysopen($nb, "/proc/self/fd/$e->{fd}", O_WRONLY|O_NONBLOCK) ? $nb : ($e->{fd}, POSIX::PIPE_BUF());
-  $id = Proc::Spawner::on_write($to, $bytes, sub { undef $nb; delete $g->{io}{$id}; call($h, $g) }, $chunk);
+  $id = Proc::Spawner::on_write($to, $bytes, sub { my $err = shift; undef $nb; delete $g->{io}{$id}; local $! = $err // 0; call($h, $g) }, $chunk);
   $g->{io}{$id} = [$e, '>']; $id }
 
 # An ended process stays while it shares an end, or a pipe, with a process still to run or with one of

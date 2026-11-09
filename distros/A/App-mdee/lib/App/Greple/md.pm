@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.16";
+our $VERSION = "1.17";
 
 =encoding utf-8
 
@@ -38,7 +38,7 @@ B<App::Greple::md> is a L<greple|App::Greple> module for viewing
 Markdown files in the terminal with syntax highlighting.
 
 It colorizes headings, bold, italic, strikethrough, inline code,
-fenced code blocks, HTML comments, blockquotes, horizontal rules,
+fenced code blocks, front matter, HTML comments, blockquotes, horizontal rules,
 links, and images.  Tables are formatted with aligned columns and
 optional Unicode box-drawing borders.  Long lines in list items can
 be folded with proper indentation.  Links become clickable via OSC 8
@@ -68,7 +68,7 @@ and the paragraphs joined by C<--refill>.  Long lines are wrapped
 with proper indentation using L<ansifold(1)|App::ansifold> via
 L<Greple::tee>; the continuation lines of a block quote start with
 the quote marker again.
-Code blocks, HTML comments, and tables are
+Code blocks, front matter, HTML comments, and tables are
 excluded from folding.  The fold width is controlled by the
 C<fold_width> config parameter (default: 80), and the run-in and
 run-out widths for line breaking (kinsoku) by C<fold_runin> and
@@ -77,7 +77,7 @@ C<fold_runout> (default: 4, as in ansifold).
     greple -Mmd -- --fold file.md
     greple -Mmd::config(fold_width=60) -- --fold file.md
 
-Supported list markers: C<*>, C<->, C<1.>, C<1)>, C<#.>, C<#)>.
+Supported list markers: C<*>, C<+>, C<->, C<1.>, C<1)>, C<#.>, C<#)>.
 
 The module option C<--fold> (before C<-->) enables the same folding
 through the config.
@@ -167,6 +167,25 @@ of this module:
     greple -Mmd --cm h1=RD -- --cm B -E foo file.md  # h1 is red, foo blue
     greple -Mmd --cm h1=RD file.md                   # h1: Unknown label
 
+=head2 B<--begin> I<FUNCTION>
+
+Call I<FUNCTION> on the whole text of each file, in C<$_>, before this
+module does anything to it, so that the tables and the folded lines
+follow the change.  I<FUNCTION> is a C<sub{...}> or the name of a
+function, as C<&func(key=value)> or C<&Package::func(key=value)>.  A
+name without a package is looked for in C<main>, and then in the module
+C<App::Greple::md::func>, named after the function.  The package is
+loaded if the function is not defined yet.  A function that is not found
+is reported with a warning and skipped.  The option can be repeated.
+
+    greple -Mmd --begin 'sub{ s/\(C\)/\x{A9}/g }' -- file.md
+
+Unlike the C<--begin> of B<greple> after C<-->, which runs after this
+module, this one runs before it.  In a configuration file or a theme of
+L<mdee>, it is given as C<pass_md+=(--begin '...')>.
+
+L<App::Greple::md::widen> has such a function, C<&widen>.
+
 =head2 B<--heading-markup>[=I<STEPS>], B<--hm>[=I<STEPS>]
 
 Control inline markup processing inside headings.  By default,
@@ -237,6 +256,8 @@ Available parameters:
     refill_parser   cmark (the CommonMark module), mdperl (Markdown::Perl)
                     or pandoc (default: the first that is there, in
                     that order)
+    front_matter    show TOML and YAML front matter as a code block
+                    and leave it alone with refill (default: 1)
     table           table formatting (default: 1)
     table_trim      trim cell whitespace (default: 1)
     table_width     table width in columns; cells of over-wide
@@ -285,8 +306,24 @@ line breaks are kept, and so is the break before a list marker, a
 horizontal rule, a table row or a definition (C<: >).  When folding
 is enabled, the joined lines are folded too.
 
+Front matter (see L</Front Matter>) is left as it is.
+
     greple -Mmd::config(refill=1) file.md
     greple -Mmd::config(refill=1,refill_parser=pandoc) file.md
+
+=head2 Front Matter
+
+Front matter at the top of the file is shown as a code block: every
+line in C<meta_block>, including the delimiter lines, whose text is
+in C<meta_mark>, with no other markup, and it is not folded or joined.
+TOML front matter is between C<+++> lines, and YAML front matter goes
+from a C<---> line to a C<---> or C<...> line, as pandoc takes it (the
+opening line is not followed by a blank line).
+
+Front matter is not part of CommonMark.  pandoc and L<Markdown::Perl>
+take YAML front matter as metadata, while libcmark reads it as a rule,
+paragraphs and list items.  C<front_matter=0> takes the lines as
+Markdown, as libcmark does.
 
 =head2 OSC 8 Hyperlinks
 
@@ -346,8 +383,9 @@ to C<emphasis_mark>.  Define them via C<--cm> to override per type:
 C<*> and C<**> start and end emphasis as in CommonMark: a delimiter
 next to a letter on one side and punctuation on the other does not
 count, so C<L*=50, a*=68> is not italic.  In Japanese text this also
-rejects C<日本語の*「強調」*です> and C<日本語の**強調。**です>, as
-pandoc does.  With C<cjk_friendly=1>, the rules of
+rejects C<日本語の*「強調」*です> and C<日本語の**強調。**です>, as the
+commonmark and gfm readers of pandoc do.  With C<cjk_friendly=1>,
+the rules of
 L<markdown-cjk-friendly|https://github.com/tats-u/markdown-cjk-friendly>
 are used instead, and these are emphasis.
 
@@ -359,12 +397,18 @@ are used instead, and these are emphasis.
     code_info    ${base_name}=y70   L10
     code_block   /L23;E             /L05;E
     code_inline  L00/L23            L25/L05
+    meta_mark    -                  -
+    meta_block   -                  -
 
 Inline code backticks are displayed as C<`contentE<0xb4>> using
 C<code_tick> color.  Multi-backtick delimiters are collapsed to a
 single pair with optional surrounding spaces stripped (per CommonMark).
 The open/close markers can be customized via C<tick_open>/C<tick_close>
 config parameters.
+
+C<meta_mark> and C<meta_block> color the delimiter lines and the
+body of front matter (see L</Front Matter>).  They are undefined by
+default and fall back to C<code_mark> and C<code_block>.
 
 =head2 Block Elements
 
@@ -413,6 +457,11 @@ ANSI-aware column formatting used for table alignment.
 
 ANSI-aware text folding used for line wrapping in list items.
 
+=item L<App::Greple::md::widen>
+
+A function for B<--begin>, for characters that terminals draw over two
+columns.
+
 =item L<App::Greple::md::Blocks>
 
 Finds the paragraphs for C<refill=1> with L<CommonMark>,
@@ -448,12 +497,14 @@ use Text::ANSI::Fold qw($csi_re $osc_re);
 use Text::ANSI::Fold::Util qw(ansi_width);
 use Getopt::EX::Config;
 use Getopt::EX::Colormap;
+use Getopt::EX::Func qw(parse_func);
 use App::Greple::Common qw(FILELABEL);
 use App::Greple::Regions qw(match_regions);
 use App::Greple::md::Blocks qw(blocks);
 
 my @color_labels = qw(
     code_mark code_tick code_info code_block code_inline
+    meta_mark meta_block
     comment link image image_link
     h1 h2 h3 h4 h5 h6
     bold italic strike emphasis_mark
@@ -468,7 +519,8 @@ my $config = Getopt::EX::Config->new(
     colorize        => 1,        # syntax highlighting
     fold            => 0,        # text folding
     refill          => 0,        # join the lines of paragraphs
-    refill_parser   => '',       # cmark (CommonMark module) or pandoc; '' = whichever is there
+    refill_parser   => '',       # cmark (CommonMark module), mdperl (Markdown::Perl) or pandoc; '' = whichever is there
+    front_matter    => 1,        # front matter (+++ TOML, --- YAML) at the top is a code block
     fold_width      => 80,       # fold width
     fold_runin      => 4,        # run-in width in folded lines (ansifold default)
     fold_runout     => 4,        # run-out width in folded lines (ansifold default)
@@ -561,6 +613,7 @@ sub default_theme {
 
 my $cm;
 my @opt_cm;
+my @opt_begin;
 my %show;
 
 sub finalize {
@@ -568,13 +621,14 @@ sub finalize {
     no_user_settings(qw(ansicolumn ansifold));
     $config->deal_with($argv,
                        "mode|m=s", "base_color|B=s",
-                       "colorize!", "nofork!", "fold!", "refill!", "refill_parser=s", "fold_width=i", "fold_runin=i", "fold_runout=i",
+                       "colorize!", "nofork!", "fold!", "refill!", "refill_parser=s", "front_matter!", "fold_width=i", "fold_runin=i", "fold_runout=i",
                        "table!", "table_trim!",
                        "table_width=i", "table_cell=s", "table_wrap_mark=s", "table_cell_mark=s", "rule!", "table_style=s",
                        "table_runin=i", "table_runout=i", "table_boundary=s", "table_linebreak=s",
                        "heading_markup|hm:s", "cjk_friendly!", "tick_open=s", "tick_close=s",
                        "hashed=s%",
                        "colormap|cm=s" => \@opt_cm,
+                       "begin=s" => \@opt_begin,
                        "show=s%" => \%show);
     # --hm with no argument gives "": treat as "all"
     my $hm = $config->{heading_markup};
@@ -671,6 +725,14 @@ sub active {
 sub md_color {
     my($label, $text) = @_;
     $cm->color($label, $text);
+}
+
+# The color of $label, or of $fallback when $label is not defined
+sub fallback_color {
+    my($label, $fallback, $text) = @_;
+    $label = $fallback unless exists $cm->{HASH}{$label}
+                             && $cm->{HASH}{$label} ne '';
+    md_color($label, $text);
 }
 
 sub mark_color {
@@ -798,6 +860,19 @@ sub Step {
 
 my %colorize = (
 
+    front_matter => Step(sub {
+        my $front = front_matter($_) // return;
+        my($open, @body) = split /(?<=\n)/, $front;
+        my $close = pop @body;
+        chomp $open;
+        my $mark  = sub { fallback_color('meta_mark',  'code_mark',  $_[0]) };
+        my $block = sub { fallback_color('meta_block', 'code_block', $_[0]) };
+        substr($_, 0, length $front) = protect(join '',
+            $block->($mark->($open)), "\n",
+            (map { $block->($_) } @body),
+            $block->($mark->($close)));
+    }),
+
     code_blocks => Step(sub {
         # closing fence: the same character, at least as long (CommonMark)
         s{^( {0,3})((`|~)\3{2,})(.*)\n((?s:.*?))^( {0,3})(\2\3*)(\h*)$}{
@@ -915,7 +990,7 @@ my %colorize = (
 #
 
 # Always before headings (protection + links)
-my @protect_steps = qw(code_blocks comments image_links images links);
+my @protect_steps = qw(front_matter code_blocks comments image_links images links);
 
 # Inline steps controlled by heading_markup
 my @inline_steps  = qw(inline_code horizontal_rules bold_italic bold italic strike);
@@ -1057,6 +1132,39 @@ sub refill_block {
 our @refill_lines;
 our @table_shift;
 
+# Front matter at the top of the text: TOML (+++ ... +++) or YAML
+# (--- ... --- or ...).  It is not part of CommonMark: pandoc takes TOML
+# as a paragraph and YAML as metadata, Markdown::Perl takes YAML as
+# metadata, and libcmark takes YAML as paragraphs and list items.  As
+# in pandoc, a blank line right after the opening --- makes it a rule.
+# Returns the front matter without the line break after its last line,
+# or an empty list.  $front_lines is its number of lines, set by
+# begin() before the text is changed, for refill and the fold regions.
+our $front_lines = 0;
+sub front_matter {
+    $config->{front_matter} or return;
+    $_[0] =~ m{
+        \A (?: \+\+\+ \r?\n (?:[^\n]*\n)*? \+\+\+
+             | ---    \r?\n (?!\r?\n) (?:[^\n]*\n)*? (?:---|\.\.\.) )
+        \h* \r? (?=\n|\z)
+    }px ? ${^MATCH} : ();
+}
+
+# The region of the front matter, used by --fold-by as --exclude.  The
+# text is colored by then, so the region is found by its line count.
+sub front_matter_region {
+    my %arg = @_;
+    delete $arg{&FILELABEL};
+    $front_lines or return ();
+    my $pos = 0;
+    for (1 .. $front_lines) {
+        $pos = index($_, "\n", $pos);
+        $pos < 0 and return [ 0, length ];
+        $pos++;
+    }
+    [ 0, $pos ];
+}
+
 # Join the lines of every paragraph (Para) and tight list item or
 # definition (Plain) in $_, from the bottom up so that the line numbers
 # of the blocks above stay valid, and remember where the joined lines
@@ -1066,13 +1174,14 @@ sub refill {
     my @lines = split /\n/, $_, -1;
     my @done;
     my $limit = @lines + 1;
-    # TOML front matter (+++ ... +++) is a paragraph to pandoc
-    my $front = /\A\+\+\+\r?\n(?:[^\n]*\n)*?\+\+\+\r?(?:\n|\z)/p ? (${^MATCH} =~ tr/\n//) : 0;
+    my $front = $front_lines;
     for my $b (sort { $b->{first} <=> $a->{first} }
                grep { $_->{type} eq 'Para' or $_->{type} eq 'Plain' }
                blocks($_, parser => $config->{refill_parser})) {
         my($first, $last) = @{$b}{qw(first last)};
-        next if $last < $first or $last >= $limit or $first <= $front;
+        # libcmark runs a paragraph on past a closing "..."
+        $first = $front + 1 if $first <= $front;
+        next if $last < $first or $last >= $limit;
         $limit = $first;
         my @joined = refill_block([ @lines[$first-1 .. $last-1] ], $b->{depth});
         splice @lines, $first-1, $last-$first+1, @joined;
@@ -1141,9 +1250,52 @@ sub remove_controls {
     s/$CONTROLS//g;
 }
 
+# Find the function of a --begin option and load its package, so that a
+# module does not have to be given with -M ahead of this one.  A name without
+# a package is looked for in main, and then as the function name of the
+# module App::Greple::md::name.  Returns the option with the full name.  A
+# function that does not exist is only reported, and the text is shown
+# without it; a module that exists and does not compile is an error.
+sub resolve_function {
+    my $spec = shift;
+    $spec =~ m{ ^ &? (?<name> \w+ (?: :: \w+ )* ) (?<arg> (?= [(=] | $ ) .* ) }xs or return $spec;
+    my($name, $arg) = @+{qw(name arg)};
+    my @candidate = $name =~ /::/ ? $name : ("main::$name", "App::Greple::md::${name}::$name");
+    no strict q(refs);
+    for my $func (@candidate) {
+        load_package($func =~ s/::\w+$//r) unless defined &$func;
+        return "&$func$arg" if defined &$func;
+    }
+    warn "--begin: $name: function not found\n";
+    return;
+}
+
+sub load_package {
+    my $package = shift;
+    return if $package eq q(main);
+    my $file = $package =~ s{::}{/}gr . q(.pm);
+    return if eval { require $file; 1 };
+    die $@ unless $@ =~ /^Can't locate \Q$file\E /;
+}
+
+# The functions of --begin, parsed once.  The names belong to main, as
+# with the --begin of greple.
+sub begin_functions {
+    state $func = [ map {
+        parse_func({ PACKAGE => 'main' }, $_) or die "$_: function format error\n";
+        my $spec = resolve_function($_);
+        defined $spec ? parse_func({ PACKAGE => 'main' }, $spec) : ();
+    } @opt_begin ];
+    @$func;
+}
+
 sub begin {
     remove_controls();
     @refill_lines = @table_shift = ();
+    for my $func (begin_functions()) {
+        $func->call(@_);
+    }
+    $front_lines = do { my $f = front_matter($_); defined $f ? ($f =~ tr/\n//) + 1 : 0 };
     refill()       if $config->{refill};
     colorize()     if $config->{colorize};
     format_table() if $config->{table};
@@ -1283,7 +1435,7 @@ define {CODE_BLOCK}  ^ {0,3}(?<bt>(?<fc>[`~])\g{fc}{2,}+)(.*)\n((?s:.*?))^ {0,3}
 define {COMMENT}     ^<!--(?![->])(?s:.+?)-->
 define {SGR}         (?:\e\[[\d:;]*[mK])*
 define {SGR_END}     (?:\e\[[0;]*[mK])*
-define {LIST_MARKER} (?:[*-]|(?:\d+|#)[.)])
+define {LIST_MARKER} (?:[*+-]|(?:\d+|#)[.)])
 define {LIST_ITEM}   ^\h*{LIST_MARKER}\h+.*\n
 define {QUOTE_LINE}  ^ {0,3}(?:{SGR}>\h?)+.*\n
 # The prefix of a folded line's continuation lines: the quote markers
@@ -1305,6 +1457,7 @@ option --fold-by \
     -- \
     --exclude {CODE_BLOCK} \
     --exclude {COMMENT} \
+    --exclude &__PACKAGE__::front_matter_region \
     --exclude &__PACKAGE__::table_regions \
     --cm N -E {LIST_ITEM} \
     --cm N -E {DEFINITION} \

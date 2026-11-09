@@ -14,12 +14,15 @@ my @modules = qw(
   DBIO::DB2::Diff::Column
   DBIO::DB2::Diff::ForeignKey
   DBIO::DB2::Diff::Index
+  DBIO::DB2::Diff::Reorg
   DBIO::DB2::Diff::Table
+  DBIO::DB2::Diff::View
   DBIO::DB2::Introspect
   DBIO::DB2::Introspect::Columns
   DBIO::DB2::Introspect::ForeignKeys
   DBIO::DB2::Introspect::Indexes
   DBIO::DB2::Introspect::Tables
+  DBIO::DB2::Test::Conformance
 );
 
 plan tests => scalar @modules;

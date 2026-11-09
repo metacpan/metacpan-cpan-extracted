@@ -1,6 +1,6 @@
 # ADR 0003 — AGE storage extends and re-registers the `Pg` driver, and bootstraps AGE per connection
 
-- Status: accepted
+- Status: superseded in part (see Addendum 2026-10-05; the `connect_call_load_age` decision stays accepted)
 - Date: 2026-06-21
 - Tags: drivers, storage, registry, coexistence, connect-call, age, postgresql
 
@@ -94,3 +94,39 @@ and the connect-call drives that live test. Hence **accepted**.
   future third PG-extension driver should read both this ADR and the postgis
   source before deciding whether to `register_driver`, rather than assume one
   pattern.
+
+## Addendum 2026-10-05 — Correction: AGE is a storage layer, not a `Pg` driver subclass
+
+The text above is kept as the record of what was decided on 2026-06-21. Its first
+decision ("ISA-extend and re-register `Pg`") and the consequence "Loading
+`PostgreSQL::Age` makes AGE storage the `Pg` driver for the process" are
+**superseded**; they do not describe the code any more.
+
+What the code does now:
+
+- `DBIO::PostgreSQL::Age::Storage` is a plain storage **layer**. It has no
+  `use base 'DBIO::PostgreSQL::Storage'` and no `register_driver` call.
+- The `DBIO::PostgreSQL::Age` component's `connection()` only calls
+  `register_storage_layer('DBIO::PostgreSQL::Age::Storage')` and then
+  `next::method`. It sets no `storage_type`.
+- The DSN decides the driver; core composes the layer over the resolved driver
+  storage (C3 class synthesis, `DBIO::Storage::Composed`). An extension never
+  determines the driver: core ADR 0032 section 7 and its addendum of 2026-08-07
+  (owned by core, not restated here).
+- Driver resolution is lazy: it runs on the first `dbh` access, not on
+  `connect`. Until then the composed base is legitimately the generic
+  `DBIO::Storage::DBI`; assertions on the driver must connect first.
+- Consequently the AGE layer no longer takes over `Pg` auto-detection for the
+  process, and plain-PG and AGE schemas can coexist; "last-loaded-wins" and the
+  `storage_type` workaround no longer apply. `t/30-registry.t` pins that loading
+  the AGE storage does not register itself as the `Pg` driver.
+- Because the layer is no longer in a driver's ISA, it also stacks with other
+  storage-layer extensions (e.g. PostGIS) and rides the async transports through
+  its async mirror.
+
+Still valid, unchanged: the per-connection bootstrap as the connect-call
+`connect_call_load_age` (`LOAD 'age'` and `SET search_path` via `_do_query`),
+activated by `{ on_connect_call => 'load_age' }`. The comparison with the PostGIS
+sibling in the Context section is outdated for the same reason. Line references
+(`Storage.pm:7`, `:13`, `:50-54`, `Age.pm:51-55`) are obsolete; refer to the
+modules and subs by name.

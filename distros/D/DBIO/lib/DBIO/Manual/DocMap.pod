@@ -13,7 +13,7 @@ DBIO::Manual::DocMap - Guide to the DBIO documentation set
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 Manuals
 
@@ -32,6 +32,8 @@ version 0.900002
 =item L<DBIO::Manual::Joining> - Joining tables with DBIO.
 
 =item L<DBIO::Manual::Features> - Feature overview with links into the API and manuals.
+
+=item L<DBIO::Manual::AsyncStorage> - Writing an async-capable storage backend: the interface contract for transport authors.
 
 =item L<DBIO::Manual::Glossary> - What do all those terms mean?
 

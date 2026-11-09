@@ -201,6 +201,12 @@ is(body(hit($dbi, path => '/handle')), 'raw=1',
 SKIP: {
     skip 'DBIx::Loop required for the async half', 1
         unless eval { require DBIx::Loop; 1 };
+    # the pool is shared per dsn, so the probe's is the one the app uses
+    if (my $err = loop_pool_error(TxLoop::Model::Order->_instantiate({
+            dsn => $DSN{loop}, backend => 'Punk::Model::DBIx::Loop',
+            workers => 2, attr => { PrintError => 0 } }))) {
+        skip "the async backend's pool could not fork here: $err", 1;
+    }
 
     {
         package TxLoop;

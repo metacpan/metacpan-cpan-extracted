@@ -23,6 +23,7 @@ t/chi.t
 t/comment-spelling.t
 t/csv.t
 t/csv_id.t
+t/csv_quotes.t
 t/data-flow.t
 t/data/numerictest.csv
 t/data/test-1.csv

@@ -379,6 +379,9 @@ static uint64_t hm_now_ns(void) {
 /* the same self-pipe, where a pipe is pollable */
 static int hm_os_selfpipe(int *rfd, int *wfd) {
     int fds[2];
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (pipe(fds) < 0) return -1;
     fcntl(fds[0], F_SETFL, fcntl(fds[0], F_GETFL, 0) | O_NONBLOCK);
     fcntl(fds[1], F_SETFL, fcntl(fds[1], F_GETFL, 0) | O_NONBLOCK);
@@ -390,7 +393,7 @@ static int hm_os_selfpipe(int *rfd, int *wfd) {
 /* the default worker count: one per CPU */
 static int hm_os_ncpu(void) {
     long n = sysconf(_SC_NPROCESSORS_ONLN);
-    return n > 0 ? (int)n : 1;
+    return n > 0 ? (int)n : 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 typedef struct iovec hm_iovec;

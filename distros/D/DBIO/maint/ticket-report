@@ -1,0 +1,915 @@
+#!/usr/bin/env perl
+# maint/ticket-report — one report over every ticket the DBIO family still owes:
+# the karr board of every sibling repo plus the public Codeberg issues and pull
+# requests, gathered in a single read-only pass and written out verbosely enough
+# that a status report can be drafted from the output alone.
+#
+# Why this exists: the family is ~21 independent repos, each with its own karr
+# board (refs/karr/*) and its own public tracker on codeberg.org/dbio. "What is
+# still open?" is therefore 21 `karr list` calls, 21 `fj issue search` calls,
+# and the cross-board bookkeeping nobody does by hand: which claim has expired,
+# which card waits on a card in another repo, which board still carries cards
+# in a status its own config does not know (the legacy `closed` cards that
+# `karr list` counts as open). This script does that sweep and prints one
+# Markdown document, sections ordered from "needs a decision now" to "for the
+# record".
+#
+#   maint/ticket-report                      # Markdown on STDOUT, progress on STDERR
+#   maint/ticket-report > report.md
+#   maint/ticket-report --json               # the collected data instead of Markdown
+#   maint/ticket-report --repo dbio-mysql --repo dbio-mysql-ev
+#   maint/ticket-report --skip dbio-deprecated
+#   maint/ticket-report --pull               # karr sync --pull every board first (serially)
+#   maint/ticket-report --no-codeberg        # boards only; touches no network at all
+#   maint/ticket-report --bodies             # full card and issue bodies, not just excerpts
+#   maint/ticket-report --stale-days 14      # "untouched" threshold (default 30)
+#   maint/ticket-report --root ~/somewhere   # family root other than core's parent dir
+#
+# Codeberg: the house rule (.claude/rules/dbio-rules.md, "Public issues") forbids
+# touching the public tracker without an explicit instruction. Running this
+# script IS that instruction — it reads (`fj issue search`, `fj issue view`,
+# `fj pr search`, `fj pr view`) and never writes anything anywhere. Everything
+# else is a local read of refs/karr/*: KARR_NO_AUTO_FETCH is set so a repo with
+# no local board refs is reported as such instead of being fetched behind your
+# back, and --pull syncs the boards one after the other, never in parallel
+# (rule 8 of the live-testing discipline: N concurrent karr syncs have rebooted
+# this box before).
+#
+# Like capped-test and live-preflight it lives in core only; it finds the
+# family through its own location (maint/../..), so it runs from any directory.
+#
+# Exit status: 0 the report is complete; 1 the report was written but a data
+# source failed — which one is stated at the top of the report and on STDERR;
+# 2 usage error, or karr itself is missing. A 1 is a real report with a named
+# hole, never a silently shortened one.
+
+use strict;
+use warnings;
+use utf8;
+
+use Cwd qw(abs_path);
+use Encode qw(decode);
+use File::Basename qw(basename dirname);
+use File::Temp qw(tempfile);
+use Getopt::Long qw(GetOptions);
+use JSON::PP ();
+use POSIX ();
+use Time::Piece ();
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+# JSON::PP rather than JSON::MaybeXS on purpose: this is a maintainer tool that
+# must run before (or without) the dist's own dependencies being installed.
+
+my %opt = (codeberg => 1, 'stale-days' => 30);
+GetOptions(\%opt,
+  'root=s', 'repo=s@', 'skip=s@', 'pull', 'codeberg!', 'bodies',
+  'stale-days=i', 'json', 'help',
+) or usage(2);
+usage(0) if $opt{help};
+
+sub usage {
+  my ($rc) = @_;
+  my $fh = $rc ? \*STDERR : \*STDOUT;
+  print $fh <<'USAGE';
+usage: maint/ticket-report [options]
+
+  --root DIR         family root (default: the directory core is checked out in)
+  --repo NAME        only this repo (repeatable)
+  --skip NAME        leave this repo out (repeatable)
+  --pull             karr sync --pull every board first, one after the other
+  --no-codeberg      karr boards only; no fj, no network
+  --bodies           full card / issue bodies instead of a first-line excerpt
+  --stale-days N     a card untouched for N days counts as stale (default 30)
+  --json             emit the collected data as JSON instead of Markdown
+  --help             this text
+
+Reads only. Exit 0 complete, 1 complete with a named gap, 2 usage.
+USAGE
+  exit $rc;
+}
+
+$ENV{KARR_NO_AUTO_FETCH} = 1;
+
+my $now       = time;
+my $JSON      = JSON::PP->new->utf8(0)->canonical(1)->pretty;
+my @problems;                       # every hole in the report, verbatim
+my %prio_rank = (critical => 0, high => 1, medium => 2, low => 3);
+
+# ------------------------------------------------------------- small helpers
+
+sub progress { print STDERR "ticket-report: @_\n" }
+sub problem  { push @problems, "@_"; print STDERR "ticket-report: PROBLEM: @_\n" }
+
+# Run a command in a directory, capture STDOUT and STDERR separately, return
+# (stdout, stderr, exit status). No shell is involved anywhere.
+sub run_in {
+  my ($dir, @cmd) = @_;
+  my ($efh, $efile) = tempfile('ticket-report-XXXXXX', TMPDIR => 1);
+  my $pid = open(my $fh, '-|');
+  die "fork: $!\n" unless defined $pid;
+  if (!$pid) {
+    chdir $dir or do { print STDERR "chdir $dir: $!\n"; POSIX::_exit(127) };
+    open STDERR, '>&', $efh or POSIX::_exit(127);
+    { no warnings 'exec'; exec { $cmd[0] } @cmd; }
+    print STDERR "cannot exec $cmd[0]: $!\n";
+    POSIX::_exit(127);
+  }
+  my $out = do { local $/; <$fh> // '' };
+  close $fh;
+  my $status = $? == -1 ? 255 : ($? >> 8);
+  seek $efh, 0, 0;
+  my $err = do { local $/; <$efh> // '' };
+  close $efh;
+  unlink $efile;
+  return (decode('UTF-8', $out), decode('UTF-8', $err), $status);
+}
+
+sub oneline { my ($s) = @_; $s //= ''; $s =~ s/\s+/ /g; $s =~ s/^ | $//g; $s }
+
+sub json_of {
+  my ($text) = @_;
+  my $data = eval { $JSON->decode($text) };
+  return $data;
+}
+
+# fj wraps every field in Unicode bidi isolates (U+2066..U+2069). Strip them
+# before parsing; they carry no information for us.
+sub strip_bidi { my ($s) = @_; $s =~ s/[\x{2066}-\x{2069}]//g; $s }
+
+sub epoch_of {
+  my ($s) = @_;
+  return undef unless defined $s and length $s;
+  for my $fmt ('%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d') {
+    my $t = eval { Time::Piece->strptime($s, $fmt) };
+    return $t->epoch if $t;
+  }
+  return undef;
+}
+
+sub days_since { my ($e) = @_; defined $e ? int(($now - $e) / 86400) : undef }
+
+sub duration_secs {
+  my ($s) = @_;
+  return 3600 unless defined $s and $s =~ /^(\d+)\s*([smhd]?)$/;
+  my %mult = ('' => 1, s => 1, m => 60, h => 3600, d => 86400);
+  return $1 * $mult{$2};
+}
+
+sub fmt_age {
+  my ($secs) = @_;
+  return 'unbekannt' unless defined $secs;
+  return sprintf('%d min', $secs / 60)          if $secs < 3600 * 2;
+  return sprintf('%d h', $secs / 3600)          if $secs < 86400 * 2;
+  return sprintf('%d Tage', $secs / 86400);
+}
+
+sub fmt_days {
+  my ($d) = @_;
+  return 'unbekannt' unless defined $d;
+  return 'heute' if $d == 0;
+  return '1 Tag' if $d == 1;
+  return "$d Tage";
+}
+
+sub short_date { my ($s) = @_; defined $s ? substr($s, 0, 10) : '-' }
+
+sub excerpt {
+  my ($body, $max) = @_;
+  $max //= 220;
+  return q{} unless defined $body;
+  my @para;
+  for my $line (split /\n/, $body) {
+    $line =~ s/^\s*[#>*-]+\s*//;
+    $line =~ s/^\s+|\s+$//g;
+    last if @para && !length $line;
+    next unless length $line;
+    push @para, $line;
+  }
+  my $text = join q{ }, @para;
+  return length $text > $max ? substr($text, 0, $max - 1) . "\x{2026}" : $text;
+}
+
+sub md_cell { my ($s) = @_; $s //= ''; $s =~ s/\|/\\|/g; $s =~ s/\s+/ /g; $s }
+sub plural  { my ($n, $one, $many) = @_; $n == 1 ? "1 $one" : "$n $many" }
+
+sub quote_block {
+  my ($text, $indent) = @_;
+  $indent //= '';
+  return join '', map { "$indent> $_\n" } split /\n/, ($text // '');
+}
+
+# ------------------------------------------------------------ find the family
+
+my $core = abs_path(dirname(abs_path($0)) . '/..');
+my $root = $opt{root} ? abs_path($opt{root}) : dirname($core);
+die "ticket-report: family root $root is not a directory\n" unless -d $root;
+
+my %only = map { $_ => 1 } @{ $opt{repo} || [] };
+my %skip = map { $_ => 1 } @{ $opt{skip} || [] };
+
+opendir my $dh, $root or die "ticket-report: opendir $root: $!\n";
+my @names = sort grep {
+  !/^\./ && -d "$root/$_" && (-d "$root/$_/.git" || -f "$root/$_/.git")
+} readdir $dh;
+closedir $dh;
+
+@names = grep { $only{$_} } @names if %only;
+@names = grep { !$skip{$_} } @names;
+for my $n (keys %only) { problem("--repo $n: kein Git-Repo unter $root") unless -d "$root/$n" }
+
+die "ticket-report: no git repositories under $root\n" unless @names;
+
+# karr must be there; without it there is no report to write at all.
+{
+  my ($out, $err, $st) = run_in($root, 'karr', '--version');
+  if ($st) { print STDERR "ticket-report: karr is not runnable ($err)\n"; exit 2 }
+}
+
+my %tool;
+($tool{karr}) = run_in($root, 'karr', '--version');
+chomp $tool{karr};
+
+my $cb_login;                       # who fj is signed in as, if Codeberg is on
+if ($opt{codeberg}) {
+  # -H: the family root is no git repo, so fj cannot infer the host there.
+  my ($out, $err, $st) = run_in($root, 'fj', 'whoami', '-H', 'codeberg.org');
+  if ($st) {
+    problem("Codeberg: 'fj whoami' schlug fehl (exit $st: " . oneline($err) . ") -- "
+      . "Codeberg-Abschnitte fehlen; 'fj auth login' oder --no-codeberg");
+    $opt{codeberg} = 0;
+  }
+  else {
+    ($cb_login) = strip_bidi($out) =~ /signed into (\S+?)@/;
+    $cb_login //= '?';
+    my ($v) = run_in($root, 'fj', 'version');
+    ($tool{fj}) = oneline($v) =~ /(fj v?[\d.]+)/;
+    $tool{fj} //= 'fj';
+  }
+}
+
+# ------------------------------------------------------------- read one repo
+
+sub read_board {
+  my ($repo) = @_;
+  my $dir = $repo->{path};
+
+  my ($refs, $rerr, $rst) = run_in($dir, 'git', 'for-each-ref', '--count=1', 'refs/karr/');
+  if ($rst) { push @{ $repo->{errors} }, "git for-each-ref: " . oneline($rerr); return }
+  unless (length $refs) {
+    $repo->{no_board} = 1;
+    return;
+  }
+
+  if ($opt{pull}) {
+    progress("$repo->{name}: karr sync --pull");
+    my ($out, $err, $st) = run_in($dir, 'karr', 'sync', '--pull');
+    if ($st) {
+      my $msg = "karr sync --pull: exit $st: " . oneline($err);
+      push @{ $repo->{errors} }, $msg;
+      problem("$repo->{name}: $msg (Bericht nutzt den lokalen Stand)");
+    }
+  }
+
+  my ($cout, $cerr, $cst) = run_in($dir, 'karr', 'config', 'show', '--json');
+  my $cfg = $cst ? undef : json_of($cout);
+  unless ($cfg) {
+    my $msg = "karr config show: exit $cst: " . oneline($cerr || $cout);
+    push @{ $repo->{errors} }, $msg;
+    problem("$repo->{name}: $msg");
+    return;
+  }
+
+  my @statuses = map { ref $_ ? $_->{name} : $_ } @{ $cfg->{statuses} || [] };
+  my %require_claim = map { $_->{name} => 1 }
+    grep { ref $_ && $_->{require_claim} } @{ $cfg->{statuses} || [] };
+  my @work  = grep { $_ ne 'archived' } @statuses;
+  my $final = $work[-1] // 'done';
+
+  $repo->{board} = {
+    name          => $cfg->{board}{name} // $repo->{name},
+    statuses      => \@statuses,
+    order         => { map { $statuses[$_] => $_ } 0 .. $#statuses },
+    known         => { map { $_ => 1 } @statuses },
+    final         => $final,
+    terminal      => { $final => 1, archived => 1 },
+    require_claim => \%require_claim,
+    claim_timeout => duration_secs($cfg->{claim_timeout}),
+    claim_timeout_text => $cfg->{claim_timeout} // '1h',
+    foundation    => {
+      enabled => (defined $cfg->{foundation}{enabled} ? ($cfg->{foundation}{enabled} ? 1 : 0) : 1),
+      reason  => $cfg->{foundation}{reason},
+    },
+  };
+
+  my ($lout, $lerr, $lst) = run_in($dir, 'karr', 'list', '--json', '-n', '0');
+  my $cards = $lst ? undef : json_of($lout);
+  unless (ref $cards eq 'ARRAY') {
+    my $msg = "karr list --json: exit $lst: " . oneline($lerr || $lout);
+    push @{ $repo->{errors} }, $msg;
+    problem("$repo->{name}: $msg");
+    $cards = [];
+  }
+  $repo->{cards} = $cards;
+
+  my ($bout, $berr, $bst) = run_in($dir, 'karr', 'board', '--json');
+  my $board = $bst ? undef : json_of($bout);
+  if ($board) {
+    for my $col (@{ $board->{columns} || [] }) {
+      $repo->{done_count} = $col->{count} if $col->{status} eq $final;
+    }
+    $repo->{total_count} = $board->{total};
+  }
+  else {
+    push @{ $repo->{errors} }, "karr board --json: exit $bst: " . oneline($berr || $bout);
+  }
+}
+
+sub parse_search {
+  my ($text) = @_;
+  my @found;
+  for my $line (split /\n/, strip_bidi($text)) {
+    next unless $line =~ /^#(\d+): (.*) \(by (.*)\)\s*$/;
+    push @found, { number => $1, title => $2, author => $3 };
+  }
+  return @found;
+}
+
+# `fj issue view N` / `fj pr view N`: a title line, a "By USER — State" line,
+# the body as a "> " quoted block, and (issues) a trailing "N comments".
+sub parse_view {
+  my ($text) = @_;
+  my @lines = split /\n/, strip_bidi($text);
+  my %v = (body => '');
+  if (@lines > 1 && $lines[1] =~ /^By (.*?) — (\w+)(?: — (.*))?$/) {
+    @v{qw(author state)} = ($1, $2);
+    $v{diffstat} = $3 if defined $3;
+  }
+  ($v{branches}) = grep { /^From `/ } @lines;
+  my @body = map { my $l = $_; $l =~ s/^> ?//; $l } grep { /^>/ } @lines;
+  $v{body} = join "\n", @body;
+  ($v{comment_count}) = map { /^(\d+) comments?$/ ? $1 : () } @lines;
+  return \%v;
+}
+
+sub parse_comment_authors {
+  my ($text) = @_;
+  my @authors;
+  for my $line (split /\n/, strip_bidi($text)) {
+    if    ($line =~ /^(.*?) \((\S+)\) said:$/) { push @authors, $2 }
+    elsif ($line =~ /^(\S.*?) said:$/)        { push @authors, $1 }
+  }
+  return @authors;
+}
+
+sub read_codeberg {
+  my ($repo) = @_;
+  my $dir = $repo->{path};
+  my $cb  = $repo->{codeberg} = { issues => [], prs => [] };
+
+  my ($url, $uerr, $ust) = run_in($dir, 'git', 'remote', 'get-url', 'origin');
+  chomp $url;
+  if ($ust || $url !~ m{codeberg\.org[:/]([^/]+)/([^/]+?)(?:\.git)?/?$}) {
+    $cb->{skipped} = $ust ? 'kein origin-Remote' : "origin zeigt nicht auf codeberg.org ($url)";
+    return;
+  }
+  $cb->{slug} = "$1/$2";
+
+  my ($out, $err, $st) = run_in($dir, 'fj', 'issue', 'search', '-r', $cb->{slug}, '-s', 'open');
+  if ($st) {
+    $cb->{error} = "fj issue search: exit $st: " . oneline($err);
+    problem("$repo->{name}: Codeberg-Issues nicht lesbar ($cb->{error})");
+  }
+  else {
+    $cb->{issues} = [ parse_search($out) ];
+    for my $i (@{ $cb->{issues} }) {
+      my ($vout, $verr, $vst) = run_in($dir, 'fj', 'issue', 'view', $i->{number}, '-R', 'origin');
+      if ($vst) { $i->{error} = "fj issue view: exit $vst: " . oneline($verr); next }
+      my $v = parse_view($vout);
+      @$i{qw(state body comment_count)} = @$v{qw(state body comment_count)};
+      $i->{comment_count} //= 0;
+      if ($i->{comment_count}) {
+        my ($cout, $cerr, $cst) = run_in($dir, 'fj', 'issue', 'view', $i->{number}, 'comments', '-R', 'origin');
+        my @authors = $cst ? () : parse_comment_authors($cout);
+        $i->{last_comment_by} = $authors[-1] if @authors;
+      }
+      $i->{last_word_is_ours} = (defined $i->{last_comment_by} && defined $cb_login
+        && $i->{last_comment_by} eq $cb_login) ? 1 : 0;
+      $i->{excerpt} = excerpt($i->{body}, 300);
+    }
+  }
+
+  ($out, $err, $st) = run_in($dir, 'fj', 'pr', 'search', '-r', $cb->{slug}, '-s', 'open');
+  if ($st) {
+    $cb->{pr_error} = "fj pr search: exit $st: " . oneline($err);
+    problem("$repo->{name}: Codeberg-PRs nicht lesbar ($cb->{pr_error})");
+  }
+  else {
+    $cb->{prs} = [ parse_search($out) ];
+    for my $p (@{ $cb->{prs} }) {
+      # `fj pr view` takes no -R; it reads the repo from the cwd run_in sets.
+      my ($vout, $verr, $vst) = run_in($dir, 'fj', 'pr', 'view', $p->{number});
+      if ($vst) { $p->{error} = "fj pr view: exit $vst: " . oneline($verr); next }
+      my $v = parse_view($vout);
+      @$p{qw(state body branches diffstat)} = @$v{qw(state body branches diffstat)};
+      $p->{excerpt} = excerpt($p->{body}, 300);
+    }
+  }
+}
+
+# ------------------------------------------------------------ collect it all
+
+my @repos;
+for my $name (@names) {
+  my $repo = { name => $name, path => "$root/$name", errors => [], cards => [] };
+  read_board($repo);
+  if ($repo->{no_board}) {
+    progress("$name: kein karr-Board (keine refs/karr/*)");
+  }
+  elsif ($repo->{board}) {
+    progress(sprintf '%s: Board "%s", %d offen, %s erledigt',
+      $name, $repo->{board}{name}, scalar @{ $repo->{cards} }, $repo->{done_count} // '?');
+  }
+  if ($opt{codeberg}) {
+    read_codeberg($repo);
+    my $cb = $repo->{codeberg};
+    progress("$name: Codeberg " . ($cb->{skipped} ? "übersprungen ($cb->{skipped})"
+      : $cb->{error} ? 'FEHLER'
+      : sprintf('%s, %s', plural(scalar @{ $cb->{issues} }, 'Issue', 'Issues'),
+                          plural(scalar @{ $cb->{prs} }, 'PR', 'PRs'))));
+  }
+  push @repos, $repo;
+}
+
+my %repo_by_name = map { $_->{name} => $_ } @repos;
+
+# ----------------------------------------------------------- derive per card
+
+my %far_cache;
+sub far_card {
+  my ($board, $id) = @_;
+  my $key = "$board#$id";
+  return $far_cache{$key} if exists $far_cache{$key};
+  my $r = $repo_by_name{$board};
+  my $res;
+  if (!$r || !$r->{board}) {
+    $res = { text => "Board '$board' nicht im Scan" };
+  }
+  else {
+    my ($out, $err, $st) = run_in($r->{path}, 'karr', 'show', $id, '--json');
+    my $card = $st ? undef : json_of($out);
+    $card = $card->[0] if ref $card eq 'ARRAY';
+    if (ref $card eq 'HASH' && defined $card->{status}) {
+      my $done = $r->{board}{terminal}{ $card->{status} } ? 1 : 0;
+      $res = {
+        status => $card->{status}, title => $card->{title}, done => $done,
+        text   => sprintf('%s k%d ist %s (%s)', $board, $id,
+                    $done ? 'ERLEDIGT' : 'noch offen', $card->{status}),
+      };
+    }
+    else {
+      $res = { text => "$board k$id nicht gefunden" };
+    }
+  }
+  return $far_cache{$key} = $res;
+}
+
+for my $repo (@repos) {
+  next unless $repo->{board};
+  my $b = $repo->{board};
+  for my $c (@{ $repo->{cards} }) {
+    $c->{created_epoch} = epoch_of($c->{created});
+    $c->{updated_epoch} = epoch_of($c->{updated});
+    $c->{age_days}      = days_since($c->{created_epoch});
+    $c->{idle_days}     = days_since($c->{updated_epoch});
+    $c->{due_epoch}     = epoch_of($c->{due});
+    $c->{overdue}       = (defined $c->{due_epoch} && $c->{due_epoch} < $now) ? 1 : 0;
+    $c->{status_known}  = $b->{known}{ $c->{status} } ? 1 : 0;
+    $c->{requires_claim} = $b->{require_claim}{ $c->{status} } ? 1 : 0;
+    $c->{in_flight}     = ($c->{requires_claim} || $c->{status} eq 'in-progress' || $c->{status} eq 'review') ? 1 : 0;
+    $c->{excerpt}       = excerpt($c->{body});
+    $c->{prio_rank}     = $prio_rank{ $c->{priority} // 'medium' } // 2;
+
+    if (defined $c->{claimed_by} && length $c->{claimed_by}) {
+      my $at  = epoch_of($c->{claimed_at});
+      my $age = defined $at ? $now - $at : undef;
+      $c->{claim} = {
+        by   => $c->{claimed_by},
+        at   => $c->{claimed_at},
+        age  => $age,
+        live => (defined $age && $age <= $b->{claim_timeout}) ? 1 : 0,
+      };
+    }
+
+    for my $t (@{ $c->{tags} || [] }) {
+      if    ($t =~ /^needs:(.+)#(\d+)$/)          { push @{ $c->{needs} }, { board => $1, id => $2 } }
+      elsif ($t =~ /^escalated-from:(.+)#(\d+)$/) { push @{ $c->{escalated_from} }, { board => $1, id => $2 } }
+      elsif ($t =~ /^from:(.+)$/)                 { push @{ $c->{from} }, $1 }
+    }
+    for my $link (@{ $c->{needs} || [] }, @{ $c->{escalated_from} || [] }) {
+      $link->{far} = far_card($link->{board}, $link->{id});
+    }
+  }
+}
+
+# Sort each repo's open cards: board column order (unknown statuses last), then
+# priority, then id.
+for my $repo (@repos) {
+  next unless $repo->{board};
+  my $order = $repo->{board}{order};
+  @{ $repo->{cards} } = sort {
+    (($order->{ $a->{status} } // 999) <=> ($order->{ $b->{status} } // 999))
+      || ($a->{prio_rank} <=> $b->{prio_rank})
+      || ($a->{id} <=> $b->{id})
+  } @{ $repo->{cards} };
+}
+
+# ------------------------------------------------------ family-wide findings
+
+my (@blocked, @in_flight, @decision, @urgent, @due, @stale, @unknown_status,
+    @claim_misplaced, @cross, @disabled, @no_board, %tags, %from_counts);
+
+for my $repo (@repos) {
+  push @no_board, $repo if $repo->{no_board};
+  next unless $repo->{board};
+  push @disabled, $repo unless $repo->{board}{foundation}{enabled};
+  for my $c (@{ $repo->{cards} }) {
+    my $ref = { repo => $repo, card => $c };
+    # A card in a status the board does not know is a hygiene finding, not
+    # work: it goes to 2.8 only, or it would drown every actionable list.
+    unless ($c->{status_known}) { push @unknown_status, $ref; next }
+    push @blocked,   $ref if $c->{blocked};
+    push @in_flight, $ref if $c->{in_flight};
+    push @decision,  $ref if grep { $_ eq 'maintainer-decision' } @{ $c->{tags} || [] };
+    push @urgent,    $ref if $c->{prio_rank} <= 1;
+    push @due,       $ref if defined $c->{due};
+    push @stale,     $ref if defined $c->{idle_days} && $c->{idle_days} >= $opt{'stale-days'};
+    push @claim_misplaced, $ref if $c->{claim} && !$c->{in_flight};
+    push @cross, $ref if $c->{needs} || $c->{escalated_from};
+    $tags{$_}{count}++, $tags{$_}{repos}{ $repo->{name} }++ for @{ $c->{tags} || [] };
+    $from_counts{$_}++ for @{ $c->{from} || [] };
+  }
+}
+
+my @cb_issues = map { my $r = $_; map { { repo => $r, issue => $_ } } @{ $r->{codeberg}{issues} || [] } } @repos;
+my @cb_prs    = map { my $r = $_; map { { repo => $r, pr    => $_ } } @{ $r->{codeberg}{prs}    || [] } } @repos;
+
+my $open_total = 0; $open_total += scalar @{ $_->{cards} } for @repos;
+
+# ------------------------------------------------------------------- output
+
+if ($opt{json}) {
+  my $refs = sub { [ map { { repo => $_->{repo}{name}, id => $_->{card}{id} } } @_ ] };
+  print $JSON->encode({
+    meta => {
+      generated  => POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime $now),
+      root       => $root,
+      pull       => $opt{pull} ? JSON::PP::true : JSON::PP::false,
+      codeberg   => $opt{codeberg} ? JSON::PP::true : JSON::PP::false,
+      codeberg_login => $cb_login,
+      stale_days => $opt{'stale-days'},
+      tools      => \%tool,
+      problems   => \@problems,
+    },
+    repos    => [ map { my %r = %$_; delete $r{path}; \%r } @repos ],
+    findings => {
+      blocked => $refs->(@blocked), in_flight => $refs->(@in_flight),
+      maintainer_decision => $refs->(@decision), urgent => $refs->(@urgent),
+      due => $refs->(@due), stale => $refs->(@stale),
+      unknown_status => $refs->(@unknown_status),
+      claim_outside_flight => $refs->(@claim_misplaced),
+      cross_board => $refs->(@cross),
+      foundation_disabled => [ map { $_->{name} } @disabled ],
+      no_board => [ map { $_->{name} } @no_board ],
+      tags => \%tags,
+    },
+  });
+  exit(@problems ? 1 : 0);
+}
+
+sub card_ref { my ($r) = @_; "**$r->{repo}{name} k$r->{card}{id}**" }
+
+sub card_head {
+  my ($r) = @_;
+  my $c = $r->{card};
+  sprintf '%s (%s · %s) %s', card_ref($r), $c->{status}, $c->{priority} // '-', $c->{title};
+}
+
+sub claim_text {
+  my ($r) = @_;
+  my $c = $r->{card};
+  return 'kein Claim' unless $c->{claim};
+  my $cl = $c->{claim};
+  sprintf 'Claim %s (%s alt, %s, Timeout %s)', $cl->{by}, fmt_age($cl->{age}),
+    $cl->{live} ? 'lebend' : 'ABGELAUFEN', $r->{repo}{board}{claim_timeout_text};
+}
+
+sub say_list {
+  my ($empty, @lines) = @_;
+  print @lines ? join('', map { "$_\n" } @lines) : "$empty\n";
+  print "\n";
+}
+
+my $gen = POSIX::strftime('%Y-%m-%d %H:%M UTC', gmtime $now);
+my $with_board = grep { $_->{board} } @repos;
+
+print "# DBIO-Familie: Ticket-Bericht\n\n";
+print "Erzeugt $gen von `maint/ticket-report`. Wurzel `$root`, "
+  . plural(scalar @repos, 'Repo', 'Repos') . " gesichtet, $with_board mit karr-Board, "
+  . "$open_total offene Karten insgesamt"
+  . (@unknown_status ? ', davon ' . scalar(@unknown_status) . ' in einem dem Board unbekannten Status (siehe 2.8)' : '')
+  . ".\n\n";
+print "Datenquellen: karr-Boards ("
+  . ($opt{pull} ? 'nach `karr sync --pull`' : 'LOKALER Stand, kein Pull -- `--pull` für frische Boards')
+  . "); Codeberg "
+  . ($opt{codeberg} ? "per `fj`, angemeldet als $cb_login" : 'NICHT abgefragt (`--no-codeberg`)')
+  . ". Werkzeuge: " . join(', ', map { $tool{$_} } grep { $tool{$_} } qw(karr fj)) . ".\n\n";
+print "Lesart: karr ist das interne Agenten-Board (Karten `kNN`); Codeberg sind die "
+  . "öffentlichen Tickets echter Menschen (`#NN`). Erledigte und archivierte Karten "
+  . "erscheinen hier nicht, nur ihre Anzahl.\n\n";
+
+if (@problems) {
+  print "## ⚠ Lücken in diesem Bericht\n\n";
+  print "Der Bericht ist unvollständig. Folgende Quellen konnten nicht gelesen werden:\n\n";
+  print "- $_\n" for @problems;
+  print "\n";
+}
+
+# 1 ------------------------------------------------------------------ overview
+
+print "## 1. Überblick\n\n";
+print "| Repo | Board | offen | backlog | todo | in-progress | review | fremder Status | blockiert | lebende Claims | erledigt | Codeberg-Issues | Codeberg-PRs | Foundation |\n";
+print "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|\n";
+my %sum;
+for my $repo (@repos) {
+  my $name = $repo->{name};
+  if ($repo->{no_board}) {
+    print "| $name | *kein Board* | | | | | | | | | | | | |\n";
+    next;
+  }
+  unless ($repo->{board}) {
+    print "| $name | *nicht lesbar* | | | | | | | | | | | | |\n";
+    next;
+  }
+  my %n;
+  for my $c (@{ $repo->{cards} }) {
+    $n{ $c->{status_known} ? $c->{status} : 'fremd' }++;
+    $n{blocked}++ if $c->{blocked};
+    $n{claims}++  if $c->{claim} && $c->{claim}{live};
+  }
+  my $cb = $repo->{codeberg} || {};
+  my ($ni, $np) = ($cb->{skipped} || $cb->{error}) ? ('-', '-')
+    : !$opt{codeberg} ? ('', '') : (scalar @{ $cb->{issues} }, scalar @{ $cb->{prs} });
+  my $f = $repo->{board}{foundation};
+  my @row = (
+    $name, md_cell($repo->{board}{name}), scalar @{ $repo->{cards} },
+    (map { $n{$_} // 0 } qw(backlog todo in-progress review fremd blocked claims)),
+    $repo->{done_count} // '?', $ni, $np,
+    $f->{enabled} ? 'aktiv' : 'AUS (siehe 2.8)',
+  );
+  print '| ' . join(' | ', map { md_cell($_) } @row) . " |\n";
+  $sum{open} += scalar @{ $repo->{cards} };
+  $sum{$_} += $n{$_} // 0 for qw(backlog todo in-progress review fremd blocked claims);
+  $sum{done} += $repo->{done_count} // 0;
+  $sum{issues} += $ni =~ /^\d+$/ ? $ni : 0;
+  $sum{prs}    += $np =~ /^\d+$/ ? $np : 0;
+}
+print '| **Summe** | | ' . join(' | ', (map { $sum{$_} // 0 } qw(open backlog todo in-progress review fremd blocked claims done)),
+  ($opt{codeberg} ? (map { $sum{$_} // 0 } qw(issues prs)) : (q{}, q{}))) . " | |\n\n";
+print "\"Fremder Status\" = Karten in einem Status, den die Board-Konfiguration nicht kennt "
+  . "(meist ein altes `closed`); `karr list` führt sie als offen, siehe 2.8.\n\n";
+
+# 2 ------------------------------------------------------------------ findings
+
+print "## 2. Familienweite Befunde\n\n";
+
+print "### 2.1 Blockierte Karten (" . scalar(@blocked) . ")\n\n";
+print "Blockiert heißt: aus `karr pick` herausgenommen, wartet auf etwas Benanntes. "
+  . "Jede Zeile nennt den Grund, wie er auf der Karte steht.\n\n";
+say_list('Keine blockierte Karte in der Familie.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . "\n  - Grund: " . ($c->{block_reason} // '*(kein Grund hinterlegt)*')
+    . "\n  - zuletzt geändert " . short_date($c->{updated}) . ' (' . fmt_days($c->{idle_days}) . ') · ' . claim_text($_)
+} @blocked);
+
+print "### 2.2 In Arbeit und im Review (" . scalar(@in_flight) . ") -- wer hält was\n\n";
+print "Karten in `in-progress` oder `review`. Ein abgelaufener Claim bedeutet: der "
+  . "Agent hat die Karte nicht zurückgegeben, sie ist aber für `karr pick` wieder frei.\n\n";
+say_list('Nichts in Arbeit, nichts im Review.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . "\n  - " . claim_text($_)
+    . ($c->{started} ? ' · gestartet ' . short_date($c->{started}) : '')
+    . ' · zuletzt ' . short_date($c->{updated}) . ' (' . fmt_days($c->{idle_days}) . ')'
+    . ($c->{blocked} ? "\n  - BLOCKIERT: " . ($c->{block_reason} // '-') : '')
+} @in_flight);
+
+print "### 2.3 Wartet auf eine Maintainer-Entscheidung (" . scalar(@decision) . ")\n\n";
+print "Karten mit dem Tag `maintainer-decision`: Vorlagen liegen, ein Mensch muss entscheiden. "
+  . "Erst die Entscheidung, dann Arbeit.\n\n";
+say_list('Keine Karte trägt `maintainer-decision`.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . "\n  - Tags: " . join(', ', @{ $c->{tags} || [] })
+    . "\n  - " . ($c->{excerpt} || '*(kein Body)*')
+} @decision);
+
+print "### 2.4 Hohe Priorität: critical und high (" . scalar(@urgent) . ")\n\n";
+say_list('Keine offene Karte mit Priorität high oder critical.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . ' · ' . fmt_days($c->{age_days}) . ' alt'
+    . ($c->{blocked} ? ' · BLOCKIERT' : '')
+} sort { $a->{card}{prio_rank} <=> $b->{card}{prio_rank} } @urgent);
+
+print "### 2.5 Mit Fälligkeitsdatum (" . scalar(@due) . ")\n\n";
+say_list('Keine Karte trägt ein Fälligkeitsdatum.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . " · fällig $c->{due}" . ($c->{overdue} ? ' · ÜBERFÄLLIG' : '')
+} sort { ($a->{card}{due_epoch} // 0) <=> ($b->{card}{due_epoch} // 0) } @due);
+
+print "### 2.6 Cross-Board-Abhängigkeiten\n\n";
+print "`needs:BOARD#ID` -- diese Karte wartet auf eine Karte in einem anderen Repo; "
+  . "`escalated-from:BOARD#ID` -- sie wurde von dort aus angelegt. Der Fernstatus ist "
+  . "aufgelöst, damit sichtbar wird, was schon erledigt ist und nur noch nicht zurückgemeldet.\n\n";
+say_list('Keine Karte trägt `needs:` oder `escalated-from:`.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . "\n"
+    . join('', map { "  - wartet auf $_->{board} k$_->{id}: $_->{far}{text}\n" } @{ $c->{needs} || [] })
+    . join('', map { "  - eskaliert aus $_->{board} k$_->{id}: $_->{far}{text}\n" } @{ $c->{escalated_from} || [] })
+    . ($c->{blocked} ? '' : "  - HINWEIS: Karte ist nicht als blockiert markiert\n")
+} @cross);
+if (%from_counts) {
+  print "Herkunft laut `from:`-Tag (Karten, die ein anderes Repo hier angelegt hat):\n\n";
+  print "- aus `$_`: " . plural($from_counts{$_}, 'Karte', 'Karten') . "\n"
+    for sort { $from_counts{$b} <=> $from_counts{$a} || $a cmp $b } keys %from_counts;
+  print "\n";
+}
+
+print "### 2.7 Länger als $opt{'stale-days'} Tage unberührt (" . scalar(@stale) . ")\n\n";
+print "Sortiert nach Stillstand; `updated` ist die letzte Änderung an der Karte selbst.\n\n";
+say_list("Keine Karte ist länger als $opt{'stale-days'} Tage unberührt.", map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . ' · zuletzt ' . short_date($c->{updated}) . ' (' . fmt_days($c->{idle_days}) . ')'
+    . ($c->{blocked} ? ' · blockiert' : '')
+} sort { ($b->{card}{idle_days} // 0) <=> ($a->{card}{idle_days} // 0) } @stale);
+
+print "### 2.8 Board-Hygiene\n\n";
+print "Karten in einem Status, den das Board nicht kennt (" . scalar(@unknown_status) . "). "
+  . "Sie liegen weder in einer Spalte noch gelten sie als erledigt; `karr list` zählt sie mit. "
+  . "Vermutlich Altlasten (`closed`): prüfen und nach `done` oder `archived` bewegen. "
+  . "Sie sind aus 2.1 bis 2.7 und aus dem Tag-Inventar herausgehalten.\n\n";
+say_list('Alle offenen Karten liegen in einem bekannten Status.', map {
+  my $c = $_->{card};
+  '- ' . card_head($_) . ' · zuletzt ' . short_date($c->{updated})
+} @unknown_status);
+print "Claims auf Karten außerhalb von in-progress/review (" . scalar(@claim_misplaced) . "). "
+  . "Ein Claim gehört zu einer Karte in Arbeit; auf einer Backlog-Karte ist er eine "
+  . "halb angefangene Aufnahme.\n\n";
+say_list('Keine.', map { '- ' . card_head($_) . ' · ' . claim_text($_) } @claim_misplaced);
+print "Boards mit `foundation.enabled=0` (" . scalar(@disabled) . ") -- keine automatischen Agentenläufe, Backlog geparkt:\n\n";
+say_list('Keines; jedes Board ist für karr-foundation freigegeben.', map {
+  "- $_->{name}" . ($_->{board}{foundation}{reason} ? ": $_->{board}{foundation}{reason}" : '')
+} @disabled);
+print "Repos ohne karr-Board (" . scalar(@no_board) . "):\n\n";
+say_list('Keines; jedes Repo unter der Wurzel hat ein Board.', map { "- $_->{name}" } @no_board);
+
+if (!$opt{codeberg}) {
+  print "### 2.9 Öffentliche Codeberg-Issues und Pull Requests\n\nNicht abgefragt (`--no-codeberg`).\n\n";
+}
+else {
+  print "### 2.9 Öffentliche Codeberg-Issues (" . scalar(@cb_issues) . " offen) und Pull Requests (" . scalar(@cb_prs) . " offen)\n\n";
+  print "Das sind Menschen, die auf eine Antwort warten. \"Letztes Wort\" nennt den letzten "
+    . "Kommentator; steht es bei uns ($cb_login), wartet das Issue auf den Melder oder auf ein Release.\n\n";
+  say_list('Kein offenes Issue auf Codeberg.', map {
+    my ($r, $i) = ($_->{repo}, $_->{issue});
+    "- **$r->{name} #$i->{number}** $i->{title} · von $i->{author}"
+      . ($i->{error} ? " · $i->{error}"
+        : ' · ' . plural($i->{comment_count} // 0, 'Kommentar', 'Kommentare')
+          . (defined $i->{last_comment_by}
+              ? ", letztes Wort: $i->{last_comment_by}" . ($i->{last_word_is_ours} ? ' (wir)' : ' (NICHT wir)')
+              : ', UNBEANTWORTET'))
+      . ($i->{excerpt} ? "\n  - $i->{excerpt}" : '')
+  } @cb_issues);
+  print "Pull Requests:\n\n";
+  say_list('Kein offener Pull Request auf Codeberg.', map {
+    my ($r, $p) = ($_->{repo}, $_->{pr});
+    "- **$r->{name} PR #$p->{number}** $p->{title} · von $p->{author}"
+      . ($p->{error} ? " · $p->{error}" : '')
+      . ($p->{branches} ? " · $p->{branches}" : '')
+      . ($p->{excerpt} ? "\n  - $p->{excerpt}" : '')
+  } @cb_prs);
+}
+
+my @tag_rows = sort { $tags{$b}{count} <=> $tags{$a}{count} || $a cmp $b }
+  grep { $tags{$_}{count} >= 2 } keys %tags;
+print "### 2.10 Tag-Inventar (Tags auf mindestens zwei offenen Karten)\n\n";
+print "Zeigt die Themencluster, unter denen die offene Arbeit läuft.\n\n";
+say_list('Kein Tag kommt mehr als einmal vor.', map {
+  "- `$_` (" . $tags{$_}{count} . '): ' . join(', ', sort keys %{ $tags{$_}{repos} })
+} @tag_rows);
+
+# 3 ---------------------------------------------------------------- per repo
+
+print "## 3. Repos im Einzelnen\n\n";
+for my $repo (@repos) {
+  my $name = $repo->{name};
+  if ($repo->{no_board}) {
+    print "### $name\n\nKein karr-Board (keine `refs/karr/*` lokal).\n\n";
+    next;
+  }
+  unless ($repo->{board}) {
+    print "### $name\n\nBoard nicht lesbar: " . join('; ', @{ $repo->{errors} }) . "\n\n";
+    next;
+  }
+  my $b  = $repo->{board};
+  my $cb = $repo->{codeberg} || {};
+  print "### $name -- $b->{name}\n\n";
+  print "Board: " . plural(scalar @{ $repo->{cards} }, 'offene Karte', 'offene Karten')
+    . ', ' . ($repo->{done_count} // '?') . ' erledigt'
+    . ($repo->{total_count} ? ", $repo->{total_count} insgesamt" : '')
+    . '; Foundation ' . ($b->{foundation}{enabled} ? 'aktiv' : 'AUS')
+    . "; Claim-Timeout $b->{claim_timeout_text}.";
+  if ($opt{codeberg}) {
+    print ' Codeberg: ' . ($cb->{skipped} ? "übersprungen ($cb->{skipped})"
+      : $cb->{error} ? "FEHLER ($cb->{error})"
+      : "`$cb->{slug}`, " . plural(scalar @{ $cb->{issues} }, 'offenes Issue', 'offene Issues')
+        . ', ' . plural(scalar @{ $cb->{prs} }, 'offener PR', 'offene PRs')) . '.';
+  }
+  print "\n";
+  print "\nProbleme beim Lesen: " . join('; ', @{ $repo->{errors} }) . "\n" if @{ $repo->{errors} };
+  print "\n";
+
+  print "#### Offene Karten\n\n";
+  unless (@{ $repo->{cards} }) { print "Keine.\n\n" }
+  for my $c (@{ $repo->{cards} }) {
+    my $r = { repo => $repo, card => $c };
+    print "- **k$c->{id}** $c->{title}\n";
+    print "  - Status `$c->{status}`" . ($c->{status_known} ? '' : ' (dem Board UNBEKANNT)')
+      . " · Priorität $c->{priority}" . ($c->{class} && $c->{class} ne 'standard' ? " · Klasse $c->{class}" : '')
+      . (@{ $c->{tags} || [] } ? ' · Tags ' . join(', ', @{ $c->{tags} }) : ' · keine Tags') . "\n";
+    print "  - angelegt " . short_date($c->{created}) . ' (' . fmt_days($c->{age_days}) . ')'
+      . ' · zuletzt ' . short_date($c->{updated}) . ' (' . fmt_days($c->{idle_days}) . ')'
+      . ($c->{started} ? ' · gestartet ' . short_date($c->{started}) : '')
+      . (defined $c->{due} ? " · fällig $c->{due}" . ($c->{overdue} ? ' ÜBERFÄLLIG' : '') : '') . "\n";
+    print '  - ' . claim_text($r) . "\n" if $c->{claim};
+    print "  - BLOCKIERT: " . ($c->{block_reason} // '*(kein Grund)*') . "\n" if $c->{blocked};
+    print "  - wartet auf $_->{board} k$_->{id}: $_->{far}{text}\n" for @{ $c->{needs} || [] };
+    print "  - eskaliert aus $_->{board} k$_->{id}: $_->{far}{text}\n" for @{ $c->{escalated_from} || [] };
+    if ($opt{bodies}) {
+      print quote_block($c->{body}, '  ') if defined $c->{body} && length $c->{body};
+    }
+    else {
+      print "  - $c->{excerpt}\n" if length $c->{excerpt};
+    }
+  }
+  print "\n";
+
+  next unless $opt{codeberg} && !$cb->{skipped};
+  print "#### Codeberg\n\n";
+  if ($cb->{error}) { print "$cb->{error}\n\n" }
+  else {
+    print "Keine offenen Issues.\n\n" unless @{ $cb->{issues} };
+    for my $i (@{ $cb->{issues} }) {
+      print "- **#$i->{number}** $i->{title} · von $i->{author}";
+      if ($i->{error}) { print " · $i->{error}\n"; next }
+      print ' · ' . ($i->{state} // 'Open') . ' · ' . plural($i->{comment_count} // 0, 'Kommentar', 'Kommentare')
+        . (defined $i->{last_comment_by} ? ", letztes Wort: $i->{last_comment_by}" . ($i->{last_word_is_ours} ? ' (wir)' : '') : '')
+        . "\n";
+      if ($opt{bodies}) { print quote_block($i->{body}, '  ') if length $i->{body} }
+      elsif (length $i->{excerpt}) { print "  - $i->{excerpt}\n" }
+    }
+  }
+  if ($cb->{pr_error}) { print "$cb->{pr_error}\n" }
+  else {
+    for my $p (@{ $cb->{prs} }) {
+      print "- **PR #$p->{number}** $p->{title} · von $p->{author}"
+        . ($p->{error} ? " · $p->{error}" : '')
+        . ($p->{branches} ? " · $p->{branches}" : '')
+        . ($p->{diffstat} ? " · $p->{diffstat}" : '') . "\n";
+      if ($opt{bodies}) { print quote_block($p->{body}, '  ') if length($p->{body} // '') }
+      elsif (length($p->{excerpt} // '')) { print "  - $p->{excerpt}\n" }
+    }
+  }
+  print "\n";
+}
+
+# 4 ---------------------------------------------------------------- method
+
+print "## 4. Methodik\n\n";
+print "- Repos: jedes Git-Verzeichnis direkt unter der Wurzel; ein Board ist, was `refs/karr/*` hat. "
+  . "Ohne `--pull` ist alles der lokale Stand; eine Karte, die nur auf dem Remote existiert, fehlt hier.\n";
+print "- Offen = alles, was `karr list` zeigt: jede Karte außerhalb der letzten Spalte und außerhalb `archived`. "
+  . "Ein dem Board unbekannter Status zählt deshalb als offen, steht aber nur in der Übersicht und in 2.8.\n";
+print "- Claim lebend/abgelaufen: Alter von `claimed_at` gegen das `claim_timeout` des jeweiligen Boards.\n";
+print "- Unberührt: `updated` älter als $opt{'stale-days'} Tage (`--stale-days`).\n";
+print "- Cross-Board: `needs:`/`escalated-from:`-Tags; der Fernstatus kommt per `karr show` aus dem anderen Repo, "
+  . "erledigt = letzte Spalte oder `archived` des dortigen Boards.\n";
+print "- Codeberg: `fj issue search`/`fj pr search` mit Status open auf dem `origin`-Slug, Details per `fj issue view`. "
+  . "Nur gelesen, nie geschrieben.\n" if $opt{codeberg};
+print "- Body-Auszüge sind die erste nicht-leere Zeile; `--bodies` liefert den vollen Text.\n";
+print "\n";
+
+if (@problems) {
+  print STDERR "ticket-report: Bericht geschrieben, aber " . plural(scalar @problems, 'Quelle fehlt', 'Quellen fehlen') . " (siehe oben)\n";
+  exit 1;
+}
+exit 0;

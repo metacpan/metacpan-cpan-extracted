@@ -5,7 +5,7 @@ use Test::More;
 
 use DBIO::Test;
 
-# karr #51: relationship_info() promotes {source} and {attrs}{accessor} to a
+# ADR 0023: relationship_info() promotes {source} and {attrs}{accessor} to a
 # documented, stable public contract (consumed e.g. by dbio-graphql when it
 # walks relationships to build a schema). This test is the guard that makes the
 # contract fail loudly if it ever regresses.

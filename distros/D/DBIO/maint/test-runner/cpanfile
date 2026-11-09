@@ -1,0 +1,55 @@
+# Pure-Perl dependencies of the family's suites (core + the driver dists'
+# test code). The DBDs are built in the Dockerfile, not here. Installed
+# without tests (cpanm --notest). Core demands SQL::Abstract 2.000002, which is
+# not on CPAN yet: the released one comes along for its dependencies, and
+# run-suite puts ~/dev/sql-abstract/lib ahead of it on PERL5LIB.
+requires 'SQL::Abstract';
+requires 'DBI', '1.643';
+requires 'Sub::Util';
+requires 'Sub::Quote', '2.006009';
+requires 'Sub::Name';
+requires 'Class::Accessor::Grouped', '0.10014';
+requires 'Class::C3::Componentised', '1.001002';
+requires 'File::ShareDir';
+requires 'Carp::Clan', '6.08';
+requires 'Context::Preserve';
+requires 'Devel::GlobalDestruction';
+requires 'Hash::Merge';
+requires 'JSON::MaybeXS';
+requires 'Cpanel::JSON::XS';
+requires 'MRO::Compat';
+requires 'Module::Find';
+requires 'namespace::clean';
+requires 'Sub::Exporter';
+requires 'Try::Tiny';
+requires 'DateTime::Tiny';
+requires 'DateTime';
+requires 'DateTime::Format::Strptime';
+requires 'DateTime::Format::Pg';
+requires 'DateTime::Format::SQLite';
+requires 'DateTime::Format::MySQL';
+requires 'Lingua::EN::Inflect';
+requires 'Lingua::EN::Inflect::Phrase';
+requires 'Lingua::EN::Tagger';
+requires 'String::ToIdentifier::EN';
+requires 'String::ToIdentifier::EN::Unicode';
+requires 'Crypt::URandom';
+requires 'Package::Stash';
+requires 'Math::BigInt';
+requires 'Path::Tiny';
+requires 'Scope::Guard';
+requires 'Moo', '2.000';
+requires 'Moose';
+requires 'MooseX::NonMoose';
+requires 'Future';
+requires 'Future::IO';
+requires 'IO::Async';
+requires 'Future::IO::Impl::IOAsync';
+requires 'EV';
+requires 'SQL::Translator';
+requires 'Test::More', '1.302222';
+requires 'Test::Exception';
+requires 'Test::Warn';
+requires 'Test::Deep', '1.205';
+requires 'Test::Fatal';
+requires 'File::Temp';

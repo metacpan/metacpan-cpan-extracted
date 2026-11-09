@@ -2,8 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-# LIVE storage-layer composition roundtrip against a real PostgreSQL (core karr
-# #70; this dist is the reference future_io transport). End-to-end proof that:
+# LIVE storage-layer composition roundtrip against a real PostgreSQL
+# (core karr k70; this dist is the reference future_io transport).
+# End-to-end proof that:
 #
 #   1. a registered extension storage LAYER's async mirror composes onto the
 #      PostgreSQL future_io transport, and its async method -- issuing SQL with
@@ -11,11 +12,11 @@ use Test::More;
 #      the correct rows (the '?' -> '$N' seam shapes ONCE inside the transport;
 #      the layer never shapes SQL itself);
 #   2. on_connect_do set on the owning sync storage is REPLAYED on the freshly
-#      spawned pooled async connection (karr #68).
+#      spawned pooled async connection (core k68).
 #
 # Gated exactly like the other live tests (t/10-pg.t, t/37): needs DBIO_TEST_PG_*.
-# Skips cleanly with no DB. Run under a live pod with:
-#   DBIO_TEST_KUBECONFIG=~/.kube/config xbin/dbio-pg-k8s prove -lv t/39-storage-layer-composition-live.t
+# Skips cleanly with no DB. Run against a live database with:
+#   capped-test prove -lv t/39-storage-layer-composition-live.t
 
 my ($dsn, $user, $pass) = @ENV{ map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/ };
 
@@ -35,6 +36,11 @@ BEGIN {
 }
 
 use DBIO::Test;
+
+# DBIO::Test::Schema keeps no driver in its class: this file runs it on
+# PostgreSQL (core ADR 0067).
+DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
+
 use DBIO::Storage::Composed;
 
 # The future_io transport base (DBIO::Async::Storage) ships in dbio-async, only a
@@ -43,6 +49,12 @@ use DBIO::Storage::Composed;
 eval { require DBIO::PostgreSQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
+
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 # --- a synthetic extension: a plain sync storage layer + its async mirror ------
 # The async mirror method issues '?' SQL through the INHERITED _query_async. It
@@ -76,7 +88,7 @@ SQL
 
 # --- The async connection, with on_connect_do to replay on pooled conns -------
 # A custom (dotted) session GUC: PostgreSQL accepts it session-level without a
-# prior definition. If the replay (karr #68) fires on the pooled connection, a
+# prior definition. If the replay (core k68) fires on the pooled connection, a
 # later current_setting() over that same connection reads it back.
 my $schema = DBIO::Test::Schema->connect(
   $dsn, $user, $pass,
@@ -114,13 +126,13 @@ $async->insert_async($source, { name => 'John Coltrane' })->get;
   is scalar(@none), 0, 'a non-matching bind returns no rows (the bind really bound)';
 }
 
-# --- 2. on_connect_do replay visible on the pooled async connection (karr #68) -
+# --- 2. on_connect_do replay visible on the pooled async connection (core k68) -
 {
   my @m = $async->_query_async(
     q{SELECT current_setting('dbio_async.marker', true)}, []
   )->get;
   is $m[0][0], 'replayed',
-    'on_connect_do replayed on the freshly-spawned pooled async connection (karr #68)';
+    'on_connect_do replayed on the freshly-spawned pooled async connection (core k68)';
 }
 
 # --- Cleanup -----------------------------------------------------------------

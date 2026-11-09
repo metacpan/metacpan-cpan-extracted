@@ -5,8 +5,8 @@ use Test::More;
 use DBIO::SQLite::Test;
 my $schema = DBIO::SQLite::Test->init_schema();
 
-$schema->resultset('Artist')->delete;
-$schema->resultset('CD')->delete;
+$schema->resultset('Artist')->delete({ all => 1 });
+$schema->resultset('CD')->delete({ all => 1 });
 
 my $artist  = $schema->resultset("Artist")->create({ artistid => 21, name => 'Michael Jackson', rank => 20 });
 my $cd = $artist->create_related('cds', { year => 1975, title => 'Compilation from 1975' });

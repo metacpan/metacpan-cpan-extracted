@@ -4,6 +4,8 @@ package DBIO::MSSQL::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -11,14 +13,20 @@ sub fetch {
   $schema //= 'dbo';
   my %fks;
 
+  # Every column is aliased explicitly and in lower case: an alias is echoed
+  # into the result metadata verbatim, which is the one way to be sure of the
+  # hash keys below without depending on the handle's FetchHashKeyName.
+  # INFORMATION_SCHEMA reports its columns UPPERCASE; unaliased, the key case
+  # in the row hash is decided by the transport, not by this code.
   my $sth = $dbh->prepare(q{
-    SELECT rc.constraint_name,
+    SELECT rc.constraint_name AS constraint_name,
            fk_kcu.table_name AS from_table,
            uk_tc.table_name AS to_table,
+           uk_tc.table_schema AS to_schema,
            fk_kcu.column_name AS from_column,
            uk_kcu.column_name AS to_column,
-           rc.delete_rule,
-           rc.update_rule
+           rc.delete_rule AS delete_rule,
+           rc.update_rule AS update_rule
     FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc
     JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS fk_tc
       ON rc.constraint_name = fk_tc.constraint_name
@@ -31,6 +39,7 @@ sub fetch {
      AND rc.unique_constraint_schema = uk_tc.table_schema
     JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE uk_kcu
       ON uk_kcu.constraint_name = rc.unique_constraint_name
+     AND uk_kcu.constraint_schema = rc.unique_constraint_schema
      AND uk_kcu.ordinal_position = fk_kcu.ordinal_position
     WHERE fk_tc.table_schema = ?
     ORDER BY rc.constraint_name, fk_kcu.ordinal_position
@@ -46,6 +55,7 @@ sub fetch {
         from_table      => $row->{from_table},
         from_columns    => [],
         to_table        => $row->{to_table},
+        to_schema       => $row->{to_schema},
         to_columns      => [],
         on_delete       => uc($row->{delete_rule} // 'NO ACTION'),
         on_update       => uc($row->{update_rule} // 'NO ACTION'),
@@ -79,7 +89,7 @@ DBIO::MSSQL::Introspect::ForeignKeys - Introspect MSSQL foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -95,7 +105,8 @@ and related views.
 Given the tables hashref from L<DBIO::MSSQL::Introspect::Tables>,
 returns a hashref keyed by table name. Each value is an arrayref of
 foreign key hashrefs with keys: C<constraint_name>, C<from_columns>,
-C<to_columns>, C<to_table>, C<to_schema>, C<on_delete>, C<on_update>,
+C<to_columns>, C<to_table>, C<to_schema> (the schema of the referenced table,
+which may be another one than C<$schema>), C<on_delete>, C<on_update>,
 C<is_deferrable>.
 
 =head1 AUTHOR

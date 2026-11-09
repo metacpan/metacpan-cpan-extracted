@@ -62,10 +62,10 @@ producer being faithful — the database itself is the source of truth for the
 target model. This only works because deploy is native (ADR 0006); the two
 decisions are one architecture split across two ADRs.
 
-Heritage.pod states it directly (`lib/DBIO/Manual/Heritage.pod:86-87`): "Every
+Heritage.pod states it directly (`lib/DBIO/Manual/Heritage.pod`): "Every
 driver ships its own native introspection, diff, and deploy modules (the
 test-and-compare strategy) and does not require L<SQL::Translator>"; and
-(`Heritage.pod:117-126`) the native class "deploys by introspecting both the live
+(`Heritage.pod`) the native class "deploys by introspecting both the live
 database and the desired schema and diffing the two models (test-and-compare)."
 
 ## Consequences

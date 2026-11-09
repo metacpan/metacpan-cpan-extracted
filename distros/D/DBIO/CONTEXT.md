@@ -60,7 +60,7 @@ _Avoid_: slave, secondary.
 ## Example dialogue
 
 > **Dev:** "If one Vault role issues a user/password valid on the primary and all replicas, do I hand each replica its own broker?"
-> **Owner:** "No — that is one **Backend identity**, so it is one **AccessBroker**. Replicated owns the **Host** list; a **HostBound view** pairs that one credential with each **Host** at connect time. The broker never sees the list."
+> **Owner:** "No — that is one **Backend identity**, so it is one **AccessBroker**. Replicated owns the **Host** list; you build one **HostBound view** per **Host** from that broker and hand each to its backend, and the view pairs the one credential with its **Host** at connect time. Replicated passes the views through. The broker never sees the list."
 > **Dev:** "So a broker can point at multiple servers?"
 > **Owner:** "A broker never represents multiple **Hosts** — that would be **Topology** in the wrong layer. It represents one credential that Replicated spans across **Hosts**."
 

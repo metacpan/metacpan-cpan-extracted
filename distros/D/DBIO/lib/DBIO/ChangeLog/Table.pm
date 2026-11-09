@@ -4,6 +4,8 @@ package DBIO::ChangeLog::Table;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 
@@ -58,7 +60,7 @@ DBIO::ChangeLog::Table - Shared utilities for changelog table source definitions
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -83,10 +85,6 @@ Validates the definition and returns a plain hashref with C<table>,
 C<columns>, C<column_order>, and C<primary_key> keys.  Used by
 L<DBIO::ChangeLog::Entry> and L<DBIO::ChangeLog::Set> to build their
 source definitions.
-
-=head1 NAME
-
-DBIO::ChangeLog::Table — Shared utilities for changelog source definitions
 
 =head1 AUTHOR
 

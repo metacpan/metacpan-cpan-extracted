@@ -144,4 +144,42 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
   );
 }
 
+# count(undef, \%attrs) / count_async(undef, \%attrs) apply the attributes just
+# as count_rs does (karr k285); count(undef) without attributes is unchanged.
+{
+  my $storage = $schema->storage;
+  my $rs      = $schema->resultset('CD');
+
+  my $run = sub {
+    my ($op, @args) = @_;
+    $storage->reset_captured;
+    $storage->mock(qr/SELECT\s+COUNT/is, [ [ 7 ] ]);
+    my $r = $op eq 'async' ? $rs->count_async(@args)->get : $rs->count(@args);
+    my ($q) = grep { $_->{op} eq 'select' } $storage->captured_queries;
+    return ($q ? $q->{sql} : '', $r);
+  };
+
+  for my $op (qw(sync async)) {
+    my ($sql_group) = $run->($op, undef, { group_by => 'year' });
+    like $sql_group, qr/GROUP BY/i,
+      "$op: count(undef, { group_by }) applies the attributes";
+
+    my ($sql_dist) = $run->($op, undef, { distinct => 1, columns => ['year'] });
+    like $sql_dist, qr/GROUP BY/i,
+      "$op: count(undef, { distinct }) applies the attributes";
+
+    my ($sql_plain) = $run->($op);
+    unlike $sql_plain, qr/GROUP BY|DISTINCT/i,
+      "$op: count() without arguments is unchanged";
+    my ($sql_undef) = $run->($op, undef);
+    is $sql_undef, $sql_plain, "$op: count(undef) without attributes is unchanged";
+  }
+
+  $storage->mock(qr/SELECT\s+COUNT/is, [ [ 7 ] ]);
+  is $rs->count(undef, { rows => 2 }), 2, 'count(undef, { rows }) caps the count';
+  $storage->mock(qr/SELECT\s+COUNT/is, [ [ 7 ] ]);
+  is $rs->count_async(undef, { rows => 2 })->get, 2,
+    'count_async(undef, { rows }) caps the count';
+}
+
 done_testing;

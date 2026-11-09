@@ -1,0 +1,76 @@
+#!/bin/bash
+# run-suite -- run one suite (a driver dist checkout) in the dbio-test-runner image.
+#
+#   maint/test-runner/run-suite [-d DB]... [-n PGNAME] DIR [prove args ...]
+#
+# -d DB loads `dbio-db env DB` (repeatable), -n NAME moves the PostgreSQL DSNs
+# from dbio_test to the database NAME (see env.sh).
+#
+# DIR is the checkout, mounted read-write at the same path and used as the
+# working directory. Without prove args the suite runs as `prove -lr t/`
+# (recursive, serial -- never -j: the files of a live suite share a database).
+#
+# The environment is handed through, not invented: every DBIO_TEST_* variable
+# of the calling shell (plus those -d loads) reaches the container:
+#
+#   maint/test-runner/run-suite -d postgresql -n dbio_core ~/dev/dbio-dev/dbio-postgresql
+#
+# PERL5LIB inside the container: this core checkout's lib first, then the lib
+# of every other checkout under $DBIO_FAMILY_DIR (default ~/dev/dbio-dev) and
+# ~/dev/sql-abstract/lib, all mounted read-only at their host paths.
+#
+# Caps (house rule 9 spirit): --memory (DBIO_TEST_MEMMAX, default 2g) with swap
+# equal to it, --cpus (DBIO_TEST_CPUS, default 2), nice on the docker client.
+# One run per database at a time -- this script does not check that.
+#
+# DBIO_TEST_IMAGE overrides the image (default dbio-test-runner:local).
+
+set -eu
+
+here=$(cd "$(dirname "$0")" && pwd)
+core=$(cd "$here/../.." && pwd)
+family=${DBIO_FAMILY_DIR:-$HOME/dev/dbio-dev}
+image=${DBIO_TEST_IMAGE:-dbio-test-runner:local}
+mem=${DBIO_TEST_MEMMAX:-2g}
+cpus=${DBIO_TEST_CPUS:-2}
+
+. "$here/env.sh"
+set -- "${dbio_args[@]}"
+[ $# -ge 1 ] || { sed -n '2,12p' "$0" >&2; exit 64; }
+dir=$(cd "$1" && pwd); shift
+[ $# -gt 0 ] || set -- -lr t/
+
+for a in "$@"; do
+  case "$a" in
+    -j*|--jobs|--jobs=*) echo "run-suite: no prove -j on live suites" >&2; exit 64;;
+  esac
+done
+
+export DOCKER_HOST=unix:///var/run/docker.sock
+
+perl5lib="$core/lib"
+mounts=()
+[ "$core" = "$dir" ] || mounts+=(-v "$core:$core:ro")
+for d in "$family"/*/; do
+  d=${d%/}
+  [ -d "$d/lib" ] || continue
+  [ "$d" = "$core" ] && continue
+  case "$d" in */dbio-informix) continue;; esac   # runs on the host (Dockerfile)
+  perl5lib="$perl5lib:$d/lib"
+  [ "$d" = "$dir" ] || mounts+=(-v "$d:$d:ro")
+done
+sa="$HOME/dev/sql-abstract"
+if [ -d "$sa/lib" ]; then
+  perl5lib="$perl5lib:$sa/lib"
+  mounts+=(-v "$sa:$sa:ro")
+fi
+
+envargs=()
+while IFS= read -r name; do envargs+=(-e "$name"); done < <(compgen -e | grep '^DBIO_TEST_' || true)
+
+exec nice -n 19 docker run --rm --network host \
+  --memory "$mem" --memory-swap "$mem" --cpus "$cpus" \
+  --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -e "PERL5LIB=$perl5lib" "${envargs[@]}" \
+  "${mounts[@]}" -v "$dir:$dir" -w "$dir" \
+  "$image" prove "$@"

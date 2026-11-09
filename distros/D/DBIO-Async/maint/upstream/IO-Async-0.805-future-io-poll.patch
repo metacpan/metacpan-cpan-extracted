@@ -1,0 +1,235 @@
+diff --git a/MANIFEST b/MANIFEST
+index 531868e..1445219 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -115,6 +115,7 @@ t/62protocol-linestream.t
+ t/63handle-connect.t
+ t/64handle-bind.t
+ t/70future-io.t
++t/71future-io-reentrant.t
+ t/99pod.t
+ t/RoutineTester.pm
+ t/StupidLoop.pm
+diff --git a/lib/Future/IO/Impl/IOAsync.pm b/lib/Future/IO/Impl/IOAsync.pm
+index d76cf82..d696c20 100644
+--- a/lib/Future/IO/Impl/IOAsync.pm
++++ b/lib/Future/IO/Impl/IOAsync.pm
+@@ -63,6 +63,23 @@ sub sleep
+ my %futures_read_by_fileno;  # {fileno} => [@futures]
+ my %futures_write_by_fileno; # {fileno} => [@futures]
+ 
++# Stops watching a handle once nothing waits on it any more. A nested turn of
++# the loop may already have dropped this list and started a new watch for the
++# handle; that one is not ours to remove.
++sub _release_watch
++{
++   my ( $by_fileno, $futures, $fh, $fileno, $on_ready ) = @_;
++
++   return if scalar @$futures;
++   return unless ( $by_fileno->{$fileno} // 0 ) == $futures;
++
++   $loop->unwatch_io(
++      handle => $fh,
++      $on_ready => 1,
++   );
++   delete $by_fileno->{$fileno};
++}
++
+ sub poll
+ {
+    shift;
+@@ -85,18 +102,21 @@ sub poll
+       $loop->watch_io(
+          handle => $fh,
+          on_read_ready => sub {
+-            $futures->[0]->done( POLLIN );
+-            shift @$futures;
++            # Take the future off the list before completing it: a callback
++            # that turns the loop may re-enter this handler, possibly with
++            # nothing left waiting
++            my $first = shift @$futures;
++            $first->done( POLLIN ) if $first;
+ 
+-            return if scalar @$futures;
+-
+-            $loop->unwatch_io(
+-               handle => $fh,
+-               on_read_ready => 1,
+-            );
+-            delete $futures_read_by_fileno{$fileno};
++            _release_watch( \%futures_read_by_fileno, $futures, $fh, $fileno, 'on_read_ready' );
+          },
+       ) if !$was;
++
++      $f->on_cancel( sub {
++         my ( $cancelled ) = @_;
++         @$futures = grep { $_ != $cancelled } @$futures;
++         _release_watch( \%futures_read_by_fileno, $futures, $fh, $fileno, 'on_read_ready' );
++      } );
+    }
+    if( $events & POLLOUT ) {
+       my $futures = $futures_write_by_fileno{$fileno} //= [];
+@@ -107,18 +127,21 @@ sub poll
+       $loop->watch_io(
+          handle => $fh,
+          on_write_ready => sub {
+-            $futures->[0]->done( POLLOUT );
+-            shift @$futures;
++            # Take the future off the list before completing it: a callback
++            # that turns the loop may re-enter this handler, possibly with
++            # nothing left waiting
++            my $first = shift @$futures;
++            $first->done( POLLOUT ) if $first;
+ 
+-            return if scalar @$futures;
+-
+-            $loop->unwatch_io(
+-               handle => $fh,
+-               on_write_ready => 1,
+-            );
+-            delete $futures_write_by_fileno{$fileno};
++            _release_watch( \%futures_write_by_fileno, $futures, $fh, $fileno, 'on_write_ready' );
+          },
+       ) if !$was;
++
++      $f->on_cancel( sub {
++         my ( $cancelled ) = @_;
++         @$futures = grep { $_ != $cancelled } @$futures;
++         _release_watch( \%futures_write_by_fileno, $futures, $fh, $fileno, 'on_write_ready' );
++      } );
+    }
+ 
+    return $f;
+diff --git a/t/71future-io-reentrant.t b/t/71future-io-reentrant.t
+new file mode 100644
+index 0000000..bd501f5
+--- /dev/null
++++ b/t/71future-io-reentrant.t
+@@ -0,0 +1,127 @@
++#!/usr/bin/perl
++
++use v5.14;
++use warnings;
++
++use IO::Async::Test;
++
++use Test2::V0;
++
++use IO::Async::Loop;
++use IO::Async::OS;
++
++use IO::Poll qw( POLLIN POLLOUT );
++use Scalar::Util qw( weaken );
++
++eval { require Future::IO; Future::IO->VERSION( '0.19' );
++       require Future::IO::ImplBase } or
++   plan skip_all => "Future::IO 0.19 is not available";
++require Future::IO::Impl::IOAsync;
++
++testing_loop( IO::Async::Loop->new_builtin );
++
++# A callback of a poll future may turn the loop on the same handle
++
++# read side
++{
++   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
++   $wr->syswrite( "x" );
++
++   my $inner;
++   my $f = Future::IO->poll( $rd, POLLIN );
++   $f->on_done( sub {
++      $wr->syswrite( "y" );
++      $inner = Future::IO->poll( $rd, POLLIN )->get;
++   } );
++
++   ok( lives { wait_for_future $f; $f->get }, 'nested POLLIN poll from a callback' ) or
++      note $@;
++   is( $inner, POLLIN, 'nested POLLIN poll returned the events' );
++
++   my $again = Future::IO->poll( $rd, POLLIN );
++   wait_for_future $again;
++   is( $again->get, POLLIN, 'handle can be polled again afterwards' );
++}
++
++# write side
++{
++   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
++
++   my $inner;
++   my $f = Future::IO->poll( $wr, POLLOUT );
++   $f->on_done( sub {
++      $inner = Future::IO->poll( $wr, POLLOUT )->get;
++   } );
++
++   ok( lives { wait_for_future $f; $f->get }, 'nested POLLOUT poll from a callback' ) or
++      note $@;
++   is( $inner, POLLOUT, 'nested POLLOUT poll returned the events' );
++}
++
++# a nested turn finishes the handle's list, then the callback starts a new poll
++{
++   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
++   $wr->syswrite( "x" );
++
++   my $later;
++   my $f = Future::IO->poll( $rd, POLLIN );
++   $f->on_done( sub {
++      $wr->syswrite( "y" );
++      Future::IO->poll( $rd, POLLIN )->get;
++      $later = Future::IO->poll( $rd, POLLIN );
++   } );
++
++   wait_for_future $f;
++   ok( $later, 'callback started a poll after its nested turn' );
++
++   my $timeout = Future::IO->sleep( 2 );
++   wait_for_future( Future->wait_any( $later, $timeout ) );
++   ok( $later->is_done, 'that poll is still watched and completes' );
++}
++
++# a nested turn while the handle is readable but nothing waits on it
++{
++   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
++   $wr->syswrite( "x" );
++
++   my $f = Future::IO->poll( $rd, POLLIN );
++   $f->on_done( sub {
++      $wr->syswrite( "y" );
++      Future::IO->sleep( 0.1 )->get;
++   } );
++
++   ok( lives { wait_for_future $f; $f->get }, 'nested turn with nobody waiting on the readable handle' ) or
++      note $@;
++
++   my $again = Future::IO->poll( $rd, POLLIN );
++   my $timeout = Future::IO->sleep( 2 );
++   wait_for_future( Future->wait_any( $again, $timeout ) );
++   ok( $again->is_done, 'handle can be polled again afterwards' );
++}
++
++# a cancelled poll releases its watch and its handle
++foreach my $case ( [ read => POLLIN ], [ write => POLLOUT ] ) {
++   my ( $name, $events ) = @$case;
++
++   my ( $rd, $wr ) = IO::Async::OS->pipepair or die "Cannot pipe() - $!";
++   # a quiet pipe for read; a full pipe for write
++   if( $events == POLLOUT ) {
++      $wr->blocking( 0 );
++      1 while $wr->syswrite( "X" x 4096 );
++   }
++   my $fh = $events == POLLIN ? $rd : $wr;
++
++   my $f = Future::IO->poll( $fh, $events );
++   $f->cancel;
++   undef $f;
++
++   my $weak = $fh;
++   weaken $weak;
++   undef $fh;
++   undef $rd;
++   undef $wr;
++
++   ok( !defined $weak, "cancelled $name poll does not keep its handle" );
++}
++
++done_testing;

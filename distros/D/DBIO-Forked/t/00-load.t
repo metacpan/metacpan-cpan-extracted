@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-# Skeleton modules load with only core DBIO + core Perl present.
+# The modules load with only core DBIO + core Perl present.
 use_ok('DBIO::Forked');
 use_ok('DBIO::Forked::Storage');
 use_ok('DBIO::Forked::Future');
@@ -24,15 +24,15 @@ is(
 );
 
 # Activation wiring: new($schema) + connect_info(DBI-form) must not croak,
-# and connect_info round-trips the DBI-form arrayref verbatim.
+# and connect_info answers the form of the DBI-form arrayref (t/13).
 my $storage = DBIO::Forked::Storage->new(undef);
 isa_ok($storage, 'DBIO::Forked::Storage');
 
 my $conninfo = [ 'dbi:SQLite:dbname=:memory:', '', '', { AutoCommit => 1 } ];
 is_deeply(
   $storage->connect_info($conninfo),
-  $conninfo,
-  'connect_info stores and returns the DBI-form connect info',
+  { broker => 0, elements => 4 },
+  'connect_info keeps and returns the form of the DBI-form connect info',
 );
 
 # DBIO::Forked::Future fulfils the core DBIO::Future contract

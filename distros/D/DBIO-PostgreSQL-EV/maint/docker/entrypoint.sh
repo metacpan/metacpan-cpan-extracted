@@ -2,14 +2,14 @@
 # Container entrypoint: prepend $EXTRA_LIB_DIR and /src/lib to @INC
 # then hand off to prove OR perl. $EXTRA_LIB_DIR lets callers mount a
 # directory of in-development Perl modules so live tests pick up the
-# newest DBIO::PostgreSQL (the CPAN version lags behind and lacks
-# async_backend).
+# newest DBIO::PostgreSQL (the CPAN version lags behind and may predate
+# the 'ev' async-mode registration the live tests need).
 #
 # Why -I rather than PERL5LIB: cpanm installs site_perl under
 # /usr/local/share/perl/5.36.0 which Perl walks BEFORE PERL5LIB; setting
 # PERL5LIB only would still resolve DBIO::PostgreSQL from the image's
-# CPAN release and silently disable the async backend. -I puts the
-# mount point at the front of @INC so the dev copy always wins.
+# CPAN release, so { async => 'ev' } would find no registration and croak.
+# -I puts the mount point at the front of @INC so the dev copy always wins.
 #
 # /src/lib is the in-image checkout of this distribution (we COPY it into
 # the image but do not install it -- cpanm --installdeps wouldn't see our

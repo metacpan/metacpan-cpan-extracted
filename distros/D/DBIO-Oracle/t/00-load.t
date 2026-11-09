@@ -8,8 +8,11 @@ my @modules = qw(
   DBIO::Oracle::Deploy
   DBIO::Oracle::Diff
   DBIO::Oracle::Diff::Column
+  DBIO::Oracle::Diff::ForeignKey
   DBIO::Oracle::Diff::Index
   DBIO::Oracle::Diff::Table
+  DBIO::Oracle::Diff::Unique
+  DBIO::Oracle::Diff::View
   DBIO::Oracle::Identifier
   DBIO::Shortcut::ora
   DBIO::Oracle::Introspect
@@ -18,6 +21,7 @@ my @modules = qw(
   DBIO::Oracle::Introspect::Indexes
   DBIO::Oracle::Introspect::Keys
   DBIO::Oracle::Introspect::Tables
+  DBIO::Oracle::Introspect::Views
   DBIO::Oracle::Storage
   DBIO::Oracle::Storage::AutoIncrement
   DBIO::Oracle::Storage::ConnectSetup
@@ -26,7 +30,9 @@ my @modules = qw(
   DBIO::Oracle::Storage::Savepoints
   DBIO::Oracle::Storage::WhereJoins
   DBIO::Oracle::Test::SequenceTest
+  DBIO::Oracle::Test::Conformance
   DBIO::Oracle::Type
+  DBIO::Oracle::Util
 );
 
 my $have_math_base36 = eval { require Math::Base36; 1 };

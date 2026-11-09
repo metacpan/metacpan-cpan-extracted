@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper::Concise;
+use Data::Dumper ();
 use Try::Tiny;
 use DBIO::Test;
 
@@ -104,17 +104,10 @@ for my $db (sort {
     $exp_name_sep,
     "$db name_sep with quote_names => 1 is $name_sep_text";
 
-  # if something was produced - it better be quoted
-  if (
-    # the SQLT producer has no idea what quotes are :/
-    ! grep { $db eq $_ } qw( SYBASE DB2 )
-      and
-    my $ddl = try { $schema->deployment_statements }
-  ) {
-    my $quoted_artist = $sql_maker->_quote('artist');
-
-    like ($ddl, qr/^CREATE\s+TABLE\s+\Q$quoted_artist/msi, "$db DDL contains expected quoted table name");
-  }
+  # The DDL is not asserted here: deployment_statements is the reader of
+  # a pre-existing DDL file and throws without one (ADR 0006, ADR 0064), so it
+  # produced nothing to check. Install DDL belongs to the driver's Deploy class
+  # and is tested in the driver dist.
 }
 
 done_testing;
@@ -122,9 +115,7 @@ done_testing;
 sub dumper {
   my $val = shift;
 
-  my $dd = DumperObject;
-  $dd->Indent(0);
-  return $dd->Values([ $val ])->Dump;
+  return Data::Dumper->new([ $val ])->Terse(1)->Indent(0)->Dump;
 }
 
 1;

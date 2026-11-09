@@ -20,24 +20,28 @@ tests and driver SQL-gen tests must run without a live DB).
 
 ## Decision
 
-Keep every module loadable without DBD::Oracle and load it lazily only at the
-exact point a live LOB bind happens:
+Keep the type logic loadable without DBD::Oracle. `DBIO::Oracle::Type`,
+`DBIO::Oracle::Storage::LOBSupport` (and with it `DBIO::Oracle::Storage`) and
+`DBIO::Oracle::Introspect::Columns` load without it; each `require`s it at the
+call that needs it (pinned offline in `t/67-dbd-oracle-lazy.t`):
 
 - **Pure type functions in `DBIO::Oracle::Type`** — `normalize_type`,
   `map_dbio_type_to_oracle`, `map_dbd_type_to_dbio`, `is_lob_type`,
   `is_text_lob_type` have no DBD::Oracle dependency and are usable offline (by
   `DBIO::Oracle::Diff`, `Introspect::Columns`, the DDL). Only
   `oracle_lob_bind_attrs` touches DBD::Oracle, and it `require`s it lazily at call
-  time (`Type.pm:59-65`; module POD states the split, `Type.pm:7-18`).
+  time (module POD states the split).
 - **Lazy load at the LOB-bind seam** —
   `DBIO::Oracle::Storage::LOBSupport::bind_attribute_by_data_type` does
   `require DBD::Oracle` only inside the `is_lob_type` branch, i.e. only when
-  actually binding a LOB against a real handle (`LOBSupport.pm:31-53`,
-  comment at `38-41`). It also performs a one-time version guard there, rejecting
-  the known-broken DBD::Oracle 1.23 (`LOBSupport.pm:40-48`).
+  actually binding a LOB against a real handle. It also performs a one-time version guard there, rejecting
+  the known-broken DBD::Oracle 1.23.
+- **Lazy load in the column introspection** —
+  `DBIO::Oracle::Introspect::Columns::fetch` does `require DBD::Oracle` before it
+  reads `$DBD::Oracle::VERSION` (the NCHAR size factor).
 - **Single source for the predicates** — `DBIO::Oracle::Storage` exposes thin
   `_is_lob_type` / `_is_text_lob_type` wrappers that delegate to
-  `DBIO::Oracle::Type` (`Storage.pm:282-286`), so the LOB-type checks used all
+  `DBIO::Oracle::Type`, so the LOB-type checks used all
   over `LOBSupport` resolve through the pure module and stay offline-safe.
 
 ## Rationale
@@ -62,15 +66,15 @@ offline never trips it.
 - Offline SQL-generation, identifier-shortening, and diff tests run with no
   Oracle client and no DBD::Oracle installed; only integration tests
   (`DBIO_TEST_ORA_DSN`) and live LOB binds pull DBD::Oracle in.
-- DBD::Oracle is a runtime dependency for live use but must **not** become a
-  load-time `use` anywhere in the tree. New code that touches DBD::Oracle must
-  `require` it lazily at the call that needs it, mirroring `LOBSupport` and
-  `Type::oracle_lob_bind_attrs`.
+- DBD::Oracle is a runtime dependency for live use and should not be a
+  load-time `use`. New code that touches DBD::Oracle must
+  `require` it lazily at the call that needs it, mirroring `LOBSupport`,
+  `Introspect::Columns` and `Type::oracle_lob_bind_attrs`.
 - Type logic that is pure stays in `DBIO::Oracle::Type`; do not add a load-time
   DBD::Oracle dependency to that module or to anything on the SQL-generation /
   diff path.
 - The DBD::Oracle 1.23 BLOB/CLOB breakage is guarded once per process at the bind
-  seam, not at load (`LOBSupport.pm:40-48`).
+  seam, not at load.
 
 ## Related
 

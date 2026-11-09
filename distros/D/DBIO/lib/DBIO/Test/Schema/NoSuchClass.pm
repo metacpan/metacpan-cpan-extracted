@@ -2,6 +2,9 @@ package DBIO::Test::Schema::NoSuchClass;
 # ABSTRACT: Test non-result class for load_classes error testing
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 ## This is purposefully not a real DBIO class
@@ -21,7 +24,7 @@ DBIO::Test::Schema::NoSuchClass - Test non-result class for load_classes error t
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

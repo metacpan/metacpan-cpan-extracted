@@ -99,6 +99,25 @@ Future's `then` must auto-wrap plain returns, or these callbacks break on it.
     needs async cursor iteration, which does not exist yet.
   - *Row-level `update_async`/`delete_async`.* Not added (no caller); only
     `Row::insert_async` was needed (by `create_async`). Same pattern when wanted.
+- **Update 2026-07-20:** the third deferred item has since landed, and the
+  surface grew beyond it. `Row::update_async`/`Row::delete_async` are
+  implemented on the `_row_run_async` pattern, alongside `copy_async`,
+  `insert_or_update_async`/`update_or_insert_async`, `get_from_storage_async`
+  and `discard_changes_async`. `DBIO::ResultSet` gained six composite helpers
+  beyond the original five: `count_literal_async`, `find_or_new_async`,
+  `find_or_create_async`, `update_or_create_async`, `update_or_new_async`,
+  `results_exist_async` (parity-tested in `t/resultset/async_parity_helpers.t`).
+  Still pending: RS-level `update`/`update_all`/`delete`/`delete_all`/`populate`
+  async twins. The first two deferred items (async multi-create cascade,
+  `first_async` over-fetch) remain deferred as described.
+- **Update 2026-08-09 (k102):** `upsert_async` joins the composite
+  helpers (ADR 0036 was written without an async twin; that omission is fixed
+  there). It follows the same `_rs_run_async` three-way dispatch as every
+  method above, with the same shape of degrade this ADR already established
+  for the parts of an operation a single async op cannot express (cascade,
+  fallback, and -- new here -- a result shape with no async transport
+  contract): run the synchronous method and resolve immediately, per
+  `immediate`-mode's own branch, rather than a bolted-on second pattern.
 - No event-loop dependency added to core; all of it is mock-tested with no real DB.
 
 ## Future architecture work (tracked cross-repo, not here)

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Interactive;
 # ABSTRACT: Review and correct an isolated import before publishing it
-$Finance::Tiller2QIF::Interactive::VERSION = '1.21';
+$Finance::Tiller2QIF::Interactive::VERSION = '1.23';
 use 5.036;
 use utf8;
 use warnings FATAL => 'utf8';
@@ -39,7 +39,7 @@ are reported within the session so the user can repair files and retry.
 
 {
   package Finance::Tiller2QIF::Interactive::_DatabaseGuard;
-$Finance::Tiller2QIF::Interactive::_DatabaseGuard::VERSION = '1.21';
+$Finance::Tiller2QIF::Interactive::_DatabaseGuard::VERSION = '1.23';
   sub DESTROY ($self) {
     local $@;
     eval {

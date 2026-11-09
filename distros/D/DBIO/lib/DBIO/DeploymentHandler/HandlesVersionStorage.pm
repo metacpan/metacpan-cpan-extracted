@@ -4,11 +4,37 @@ package DBIO::DeploymentHandler::HandlesVersionStorage;
 use strict;
 use warnings;
 
-# This is an interface - implementing classes must provide:
-#   add_database_version
-#   database_version
-#   delete_database_version
-#   version_storage_is_installed
+our $VERSION = '0.900004';
+
+use DBIO::Exception;
+
+use namespace::clean;
+
+
+my @REQUIRED = qw(
+  add_database_version
+  database_version
+  delete_database_version
+  version_storage_is_installed
+);
+
+sub assert_implemented {
+  my ($class, $target) = @_;
+
+  DBIO::Exception->throw(
+    "$class->assert_implemented called without a target object"
+  ) unless defined $target;
+
+  my @missing = grep { !$target->can($_) } @REQUIRED;
+
+  return 1 unless @missing;
+
+  DBIO::Exception->throw(
+    (ref($target) || $target)
+    . " does not implement the $class interface: missing method(s) "
+    . join(', ', @missing)
+  );
+}
 
 1;
 
@@ -26,7 +52,28 @@ DBIO::DeploymentHandler::HandlesVersionStorage - Interface for version storage m
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 DESCRIPTION
+
+Interface contract for a C<version_storage> collaborator, as consumed by the
+native L<DBIO::DeploymentHandler>. A conforming version storage MUST implement:
+
+  add_database_version
+  database_version
+  delete_database_version
+  version_storage_is_installed
+
+=head1 METHODS
+
+=head2 assert_implemented
+
+  DBIO::DeploymentHandler::HandlesVersionStorage->assert_implemented($version_storage);
+
+Class method. Verifies that C<$target> (a version-storage object or class)
+C<can> every required method. Throws a L<DBIO::Exception> naming B<all>
+missing methods, the target class, and this interface when the contract is
+not satisfied. Returns true otherwise.
 
 =head1 AUTHOR
 

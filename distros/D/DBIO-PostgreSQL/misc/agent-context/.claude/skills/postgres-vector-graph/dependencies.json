@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "manifest_type": "project-specific-descriptive-skill-dependencies",
+  "reviewed_at": "2026-09-30",
+  "automatic_resolution": false,
+  "vendored": false,
+  "default_profile": "standalone",
+  "profiles": {
+    "standalone": {
+      "required": []
+    },
+    "composed": {
+      "required": [
+        "supabase-postgres-best-practices",
+        "pg-graph"
+      ],
+      "on_missing": "Report missing companions and use standalone; do not claim composed profile."
+    }
+  },
+  "companions": [
+    {
+      "id": "supabase-postgres-best-practices",
+      "repository": "https://github.com/supabase/agent-skills",
+      "reviewed_commit": "544bfc56c89afe2b87b20017a59b2c6e9502a1fb",
+      "evidence_date": "2026-09-28",
+      "evidence_scope": "repository activity; selected skill inspected",
+      "path": "skills/supabase-postgres-best-practices",
+      "role": "optional general PostgreSQL review",
+      "upstream_license_observed": "MIT",
+      "install_approval_required": true
+    },
+    {
+      "id": "pg-graph",
+      "repository": "https://github.com/microsoft/postgres-skills",
+      "reviewed_commit": "ffd266746bcea53b6d37a6c95efe1a722350261c",
+      "evidence_date": "2026-09-16",
+      "evidence_scope": "commit affecting selected skill path; selected skill inspected",
+      "path": "plugin/skills/pg-graph",
+      "role": "optional specialized graph companion",
+      "license_action": "Inspect repository and selected-path license at pinned commit before installation or redistribution.",
+      "install_approval_required": true,
+      "warning": "Whole plugin can start @microsoft/postgres-mcp; no tool activation authorized by this manifest."
+    },
+    {
+      "id": "pg-aiguide",
+      "repository": "https://github.com/timescale/pg-aiguide",
+      "reviewed_commit": "b236d3583fb51f5ef009d2c95d4fc361df748280",
+      "evidence_date": "2026-09-25",
+      "evidence_scope": "repository activity; README skill offerings inspected",
+      "upstream_skill_names": [
+        "postgres",
+        "schema-exploration"
+      ],
+      "role": "optional alternative general guide and documentation supplement",
+      "license_action": "Inspect chosen skill path and license at pinned commit.",
+      "install_approval_required": true,
+      "warning": "Remote documentation MCP is optional and requires separate egress/tool review."
+    }
+  ],
+  "resolution_policy": "Use host-supported installation after source review; this file is not an Agent Skills standard dependency mechanism."
+}

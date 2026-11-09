@@ -6,6 +6,10 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+/* av_count() is perl 5.33.1 and later (X36, RT #182809: perl 5.30.3); the same as perl's own there. */
+#ifndef av_count
+#  define av_count(av) ((Size_t)(AvFILL(av) + 1))
+#endif
 #ifdef _WIN32
 /* Windows (EXPERIMENTAL, post-0.06, not yet built): posix_spawn on CreateProcessW, in win_spawn.h; these names make the
    XSUB below one source for both.  What Windows does natively: doc/pspawn-spawner.md, section 8. */
@@ -388,6 +392,7 @@ __posix_spawn(file_sv, argv, envp, actions, attr, unsupported = &PL_sv_undef)
             if ((o = hv_fetch(w, opt[k].k, opt[k].l, 0)))
                 win_spawn_options = SvTRUE(*o) ? (win_spawn_options | opt[k].bit) : (win_spawn_options & ~opt[k].bit);
     }
+    win_spawn_showwindow = w32_use_showwindow ? (int)w32_showwindow : -1;   /* Win32::SetChildShowWindow (post-0.09) */
     {   /* Perl's own idea of the directory (PerlEnv_get_childdir, as Perl's spawn; with pseudo-forks it can differ from
            the process's): first, so that the caller's chdir actions start from it */
         char *d = PerlEnv_get_childdir();
@@ -490,6 +495,32 @@ __posix_spawn(file_sv, argv, envp, actions, attr, unsupported = &PL_sv_undef)
             want_pidfd = 1;
 #else
             rc = missing(aTHX_ unsupported, "pidfd");   /* dropped: only the pid is returned */
+#endif
+#ifdef _WIN32
+        if (!rc && (v = hv_fetchs(at, "win_priority", 0)) && SvOK(*v)) {   /* W4: a priority class, exact */
+            static const struct { const char *n; DWORD f; } pc[] = { { "idle", IDLE_PRIORITY_CLASS },
+                { "below_normal", BELOW_NORMAL_PRIORITY_CLASS }, { "normal", NORMAL_PRIORITY_CLASS },
+                { "above_normal", ABOVE_NORMAL_PRIORITY_CLASS }, { "high", HIGH_PRIORITY_CLASS }, { "realtime", REALTIME_PRIORITY_CLASS } };
+            const char *s = SvPV_nolen(*v); int k;
+            for (rc = EINVAL, k = 0; k < 6; k++) if (strEQ(s, pc[k].n)) { sa.priority_class = pc[k].f; rc = 0; }
+        }
+        if (!rc && (v = hv_fetchs(at, "win_job", 0)) && SvOK(*v)) {   /* W4: limits of a job of the child's own, exact */
+            if (!SvROK(*v) || SvTYPE(SvRV(*v)) != SVt_PVHV) rc = EINVAL;
+            else {
+                HV *j = (HV *)SvRV(*v); HE *e; win_job_limits_t *l = &sa.job;
+                hv_iterinit(j);
+                while (!rc && (e = hv_iternext(j))) {
+                    const char *k = HePV(e, PL_na); SV *x = HeVAL(e);
+                    if (!SvOK(x)) continue;
+                    if (strEQ(k, "ProcessMemoryLimit")) { l->ProcessMemoryLimit = (SIZE_T)SvNV(x); l->flags |= JOB_OBJECT_LIMIT_PROCESS_MEMORY; }
+                    else if (strEQ(k, "JobMemoryLimit")) { l->JobMemoryLimit = (SIZE_T)SvNV(x); l->flags |= JOB_OBJECT_LIMIT_JOB_MEMORY; }
+                    else if (strEQ(k, "PerProcessUserTimeLimit")) { l->PerProcessUserTimeLimit = (LONGLONG)SvNV(x); l->flags |= JOB_OBJECT_LIMIT_PROCESS_TIME; }
+                    else if (strEQ(k, "PerJobUserTimeLimit")) { l->PerJobUserTimeLimit = (LONGLONG)SvNV(x); l->flags |= JOB_OBJECT_LIMIT_JOB_TIME; }
+                    else if (strEQ(k, "ActiveProcessLimit")) { l->ActiveProcessLimit = (DWORD)SvUV(x); l->flags |= JOB_OBJECT_LIMIT_ACTIVE_PROCESS; }
+                    else rc = EINVAL;
+                }
+            }
+        }
 #endif
         if (!rc) rc = posix_spawnattr_setflags(&sa, flags);
     }
@@ -822,6 +853,21 @@ __win_spawn_forget(pid)
     IV pid
   CODE:
     win_spawn_forget((pid_t)pid);
+
+const char *
+__win_priority_class()
+  CODE:
+    /* this process's priority class, by the names win_priority takes (W4: nice is mapped from it) */
+    switch (GetPriorityClass(GetCurrentProcess())) {
+    case IDLE_PRIORITY_CLASS: RETVAL = "idle"; break;
+    case BELOW_NORMAL_PRIORITY_CLASS: RETVAL = "below_normal"; break;
+    case ABOVE_NORMAL_PRIORITY_CLASS: RETVAL = "above_normal"; break;
+    case HIGH_PRIORITY_CLASS: RETVAL = "high"; break;
+    case REALTIME_PRIORITY_CLASS: RETVAL = "realtime"; break;
+    default: RETVAL = "normal";
+    }
+  OUTPUT:
+    RETVAL
 
 #else
 

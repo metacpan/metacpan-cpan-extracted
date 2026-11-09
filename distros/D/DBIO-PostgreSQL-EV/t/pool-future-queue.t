@@ -10,9 +10,9 @@ use DBIO::PostgreSQL::EV::Pool;
 {
   package MockConn;
   sub new { bless { id => $_[1] }, $_[0] }
-  # acquire() now gates on connection readiness (karr #9, hoisted to core
-  # PoolBase in karr #75). This test exercises the waiter/queue mechanics, not
-  # readiness, so report the mock as already connected --
+  # acquire() now gates on connection readiness (karr k9, hoisted to
+  # DBIO::Storage::PoolBase in core k75). This test exercises the waiter/queue
+  # mechanics, not readiness, so report the mock as already connected --
   # _connection_ready_future then resolves immediately and the queue
   # behaviour under test is unchanged.
   sub is_connected { 1 }

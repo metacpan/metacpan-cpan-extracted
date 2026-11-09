@@ -4,10 +4,14 @@ package DBIO::Introspect::Base;
 use strict;
 use warnings;
 
-our $CONTRACT_VERSION = '1.1';
+our $VERSION = '0.900004';
+
+our $CONTRACT_VERSION = '1.2';
+
 
 
 sub contract_version { $CONTRACT_VERSION }
+
 
 sub new {
   my ($class, %args) = @_;
@@ -70,10 +74,16 @@ sub table_columns_info {
   my ($self, $key) = @_;
   my $cols = $self->model->{columns}{$key} || [];
   my %info;
+  # The primary key is folded into is_nullable, the way the
+  # driver introspectors that override this method already did. It states what
+  # DBIO's model holds -- the row's identity cannot be NULL -- and not what the
+  # engine would refuse; ClickHouse and SQLite both permit a key column to hold
+  # NULL under the conditions the POD above names. An engine that permits it
+  # overrides this method (ClickHouse does); there is no flag here. ADR 0038.
   for my $col (@$cols) {
     $info{ $col->{column_name} } = {
       data_type     => $col->{data_type},
-      is_nullable   => $col->{not_null} ? 0 : 1,
+      is_nullable   => (($col->{not_null} || $col->{is_pk}) ? 0 : 1),
       default_value => $col->{default_value},
       (defined $col->{size} ? (size => $col->{size}) : ()),
       (exists $col->{is_auto_increment}
@@ -168,7 +178,7 @@ DBIO::Introspect::Base - Base class for DBIO driver introspectors
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -185,18 +195,34 @@ The connected C<DBI> database handle. Required.
 
 =head1 METHODS
 
+=head2 contract_version
+
+    my $v = $class->contract_version;
+
+Returns C<$CONTRACT_VERSION>, the compatibility version of this base class's
+public interface -- independent of the dist C<$VERSION> and unaffected by a
+release that changes no contract shape. See L</CONTRACT VERSION> above and
+ADR 0024.
+
+=head2 new
+
+    my $intro = $class->new(dbh => $dbh);
+
+Blesses the argument hash directly; no validation. C<dbh> is required.
+
 =head2 model
 
 The introspected database model hashref. Built lazily on first access via
-L</_build_model>. The shape varies by driver.
+C<_build_model>, which every driver subclass implements (the base
+version dies). The shape varies by driver.
 
 =head2 _aggregate_by
 
     my $by_table = $class->_aggregate_by(\@rows, 'table_name');
 
 Groups a flat array of row hashrefs into C<{ $key_value => [\%row, ...] }>.
-Preserves row order within each group. The C<\@rows> arrayref is consumed
-(rows are shifted off); pass a copy if you need the original.
+Preserves row order within each group. The C<\@rows> arrayref is left
+unmodified; a row whose key field is C<undef> is skipped.
 
 =head2 _aggregate_by_ordered
 
@@ -227,12 +253,84 @@ entry in the canonical C<columns> section, in declaration order.
 
 =head2 table_columns_info
 
-    my \%info = %{ $intro->table_columns_info($key) };
+    my $info = $intro->table_columns_info($key);
 
 Hashref C<{ col_name => { data_type, size, is_nullable, default_value,
 is_auto_increment, ... } }>. Default: built from the canonical C<columns>
-section -- C<is_nullable> is the inverse of C<not_null>; C<size> and
-C<is_auto_increment> are included only when present on the column.
+section -- C<size> and C<is_auto_increment> are included only when present on
+the column.
+
+C<is_nullable> is C<0> when the column carries C<not_null> B<or> when it is
+part of the primary key (C<is_pk>), and C<1> otherwise. C<not_null> answers a
+different question -- whether the column carries a C<NOT NULL> attribute --
+and engines keep the primary-key constraint separate from that attribute, so
+SQLite's C<PRAGMA table_info> reports C<notnull = 0> for a key column.
+
+The fold is a statement about B<DBIO's model>, not a claim about what the
+engine would refuse: C<is_pk> marks the column L</table_pk_info> names as the
+row's identity, and an identity that can be NULL is not usable in the Row
+layer. A key column is therefore C<< is_nullable => 0 >> however the model
+spells its attribute, and the two contract methods cannot disagree about the
+same column -- both read C<is_pk> off the same hashref. A model that carries
+no C<is_pk> is unaffected.
+
+That choice has a real cost on an engine that B<does> permit NULL in a key
+column: the base reports C<< is_nullable => 0 >> for a column that holds
+NULLs, L<DBIO::Generate> bakes it into the regenerated result class, and a
+redeploy emits a stricter column than the one introspected. The escape is a
+driver B<override of this method> -- which is what L<DBIO::ClickHouse::Introspect>
+does deliberately, reading nullability out of the type string where ClickHouse
+actually writes it. Two engines are known to permit it, both only under
+precise conditions:
+
+=over 4
+
+=item * B<ClickHouse>, when the table is created with C<< SETTINGS
+allow_nullable_key = 1 >>. MergeTree refuses a C<Nullable> column in the
+sorting key only while that setting sits at its default C<0>.
+
+=item * B<SQLite>, for any C<PRIMARY KEY> on a rowid table other than the
+B<rowid alias> itself. This is SQLite's documented, deliberately-kept bug (see
+"The PRIMARY KEY" in L<https://sqlite.org/lang_createtable.html>): C<CREATE
+TABLE t (name TEXT PRIMARY KEY)> accepts C<INSERT INTO t (name) VALUES (NULL)>
+repeatedly, and the NULLs do not even collide with one another. SQLite states
+the exclusions itself -- it allows the NULL "unless the column is an INTEGER
+PRIMARY KEY or the table is a WITHOUT ROWID table or a STRICT table or the
+column is declared NOT NULL".
+
+B<The declared type does not identify the alias>, and reading the rule as
+"C<INTEGER> means no NULL" is wrong twice over. Only the exact declared type
+C<INTEGER> makes a rowid alias, so C<id INT PRIMARY KEY> is an ordinary
+indexed column with integer affinity -- and stores NULL. And a column-level
+C<PRIMARY KEY DESC> is documented as not producing an alias either, so
+C<id INTEGER PRIMARY KEY DESC> stores NULL as well, while the table-constraint
+spelling C<PRIMARY KEY(id DESC)> does produce one. C<PRAGMA table_info> reports
+C<type=INTEGER notnull=0 pk=1> for the alias and the C<DESC> non-alias alike.
+
+The exact separator is C<PRAGMA index_list>: SQLite materialises every primary
+key as an automatic C<origin = 'pk'> index B<except> the rowid alias, which is
+the rowid itself and needs no index. On a rowid table, "declares a key but has
+no C<pk>-origin index" is therefore the alias, with no parsing of the stored
+C<CREATE TABLE> text. L<DBIO::SQLite::Introspect> overrides this method on
+exactly that test.
+
+A C<WITHOUT ROWID> table needs no case of its own: SQLite reports
+C<notnull = 1> for its key columns itself, so the fold changes nothing there.
+
+=back
+
+B<A driver that takes this escape will make L</table_pk_info> and
+C<is_nullable> disagree, and the Row layer says so.> That is the intended
+outcome, not a defect in the override: introspection reports what the engine
+really stores, L<DBIO::Generate> writes C<< is_nullable => 1 >> into the
+generated result class, and L<DBIO::ResultSource/set_primary_key> then
+C<carp>s that the key includes a nullable column and that Result-object
+operations will fail. The warning is correct -- it is the same model statement
+this fold is made of -- and arriving at load time is the point: the user learns
+that the foreign table is not usable as a DBIO source when they load it, not
+when a row cannot be found later.
+
+Deciding this in the model rather than behind a capability flag: ADR 0038.
 
 =head2 table_pk_info
 
@@ -291,8 +389,11 @@ Comment string for a column, or C<undef>.
     my @stmts = $intro->result_class_extra_statements($key);
 
 Optional hook for driver-specific emitter statements. Each element is an
-arrayref C<[ $method_name, @args ]> which L<DBIO::Generate> emits verbatim
-as C<__PACKAGE__->method_name(@args)>. Defaults to an empty list.
+arrayref C<[ $method_name, @args ]> which L<DBIO::Generate> emits as
+C<__PACKAGE__->method_name(@args)>. The method name is a Perl identifier.
+A plain string argument is emitted as a string literal; an argument that is
+Perl code is a scalar reference (C<\"code">); any other reference is
+serialised as a literal. Defaults to an empty list.
 
 =head1 CONTRACT VERSION
 
@@ -338,9 +439,16 @@ order. Each column: C<column_name>, C<data_type> (bare SQL type), C<size>
 (primary-key membership and 1-based ordinal), and optionally
 C<is_auto_increment>.
 
-=item * C<indexes> -- C<< { $table => { $index_name => { is_unique, columns => [...], origin } } } >>.
+=item * C<indexes> -- C<< { $table => { $index_name => { is_unique, columns => [...], origin, index_type } } } >>.
 C<origin> is C<'pk'> for a primary-key-backed index (skipped by
-L</table_uniq_info>).
+L</table_uniq_info>). C<index_type> is B<optional> -- the engine's index access
+method / class (C<BTREE>, C<FULLTEXT>, C<SPATIAL>, C<HASH>; PostgreSQL
+C<gin>/C<gist>/C<brin>/C<spgist>) -- carried only by drivers that introspect
+and render it. It participates in the canonical index comparison
+(L<DBIO::Diff::Compare/changed_index_fields>) as a I<bilateral> field: a type
+change is a real diff only when B<both> the live and desired sides carry a
+type, so a driver that leaves it C<undef> (the default) never produces a
+phantom index migration for it. See ADR 0052.
 
 =item * C<unique_constraints> -- (optional) C<< { $table => [ [ $name, \@cols ], ... ] } >>.
 When present, it is the authoritative source for L</table_uniq_info>; when

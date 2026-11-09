@@ -2,7 +2,10 @@
 use 5.010;
 use strict;
 use warnings;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
 use Test::More;
+use PunkTest;
 use File::Temp ();
 use Punk::Model;
 
@@ -49,6 +52,10 @@ my $model = T::Model::Row->_instantiate({
     dsn => $dsn, workers => 2, backend => 'Punk::Model::DBIx::Loop' });
 $model->backend->dbh->do(
     'CREATE TABLE rows (id INTEGER PRIMARY KEY, v TEXT)');
+
+if (my $err = loop_pool_error($model)) {
+    plan skip_all => "the async backend's pool could not fork here: $err";
+}
 
 # force the pool up in the parent, and seed rows the children will read
 $model->create({ id => 1, v => 'parent' })->get;

@@ -24,14 +24,16 @@ use DBIO::PostgreSQL::EV::TestHarness;
 # Gate 1: live PG DSN + EV::Pg (the harness's own gate).
 DBIO::PostgreSQL::EV::TestHarness->skip_all_unless_live;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+
+# A server that is not there fails the file, with a plan (karr k113).
+LiveServer->require_server;
+
 # Gate 2: the AGE extension must be available in this cluster.
 {
-  require DBI;
-  my ($dsn, $user, $pass) =
-    @ENV{ map { "DBIO_TEST_PG_$_" } qw/DSN USER PASS/ };
-  my $probe = DBI->connect($dsn, $user, $pass,
-    { AutoCommit => 1, RaiseError => 0, PrintError => 0 });
-  plan skip_all => "cannot connect: $DBI::errstr" unless $probe;
+  my $probe = LiveServer->control_dbh;
   my ($age) = $probe->selectrow_array(
     q{SELECT 1 FROM pg_available_extensions WHERE name = 'age'});
   $probe->disconnect;
@@ -42,8 +44,8 @@ DBIO::PostgreSQL::EV::TestHarness->skip_all_unless_live;
 # composes over the ev transport the harness selects with { async => 'ev' }.
 {
   package T::Age::EvSchema;
-  use base qw( DBIO::PostgreSQL::Age DBIO::Schema );
-  use mro 'c3';
+  use DBIO 'Schema', -pg;   # the schema declares its driver (core ADR 0067)
+  __PACKAGE__->load_components('PostgreSQL::Age');
 }
 
 my $POOL  = 3;

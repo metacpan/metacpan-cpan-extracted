@@ -50,6 +50,7 @@ TestDBIO::CL::Schema->register_class(
 
 # --- Connect with fake storage ---
 
+TestDBIO::CL::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = TestDBIO::CL::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 
@@ -275,6 +276,11 @@ subtest 'changelog accessor' => sub {
 
   my $cl_rs = $artist->changelog;
   isa_ok($cl_rs, 'DBIO::ResultSet', 'changelog returns a ResultSet');
+
+  # ADR 0042 (karr k285): a derived ResultSet comes back in every context
+  my @cl = $artist->changelog;
+  is(scalar @cl, 1, 'changelog in list context returns the one ResultSet');
+  isa_ok($cl[0], 'DBIO::ResultSet', 'changelog in list context');
 };
 
 # --- Test: driver override hooks exist ---

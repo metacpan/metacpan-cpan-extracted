@@ -2,14 +2,14 @@ package DBIO::Storage::DBI::ODBC;
 # ABSTRACT: Base class for ODBC drivers
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
 
 use DBIO::Util 'modver_gt_or_eq';
 use namespace::clean;
-
-
-sub _rebless { shift->_determine_connector_driver('ODBC') }
 
 
 # Whether or not we are connecting via the freetds ODBC driver
@@ -56,6 +56,19 @@ sub _disable_odbc_array_ops {
 }
 
 
+sub _connect_params_dsn {
+  my $self = shift;
+  $self->throw_exception(
+    'Cannot build a DBD::ODBC DSN from connection parameters (dbname, host, '
+  . 'port): DBD::ODBC connects through a data source name (dbi:ODBC:DSN=...) '
+  . 'or a connection string naming the ODBC driver (dbi:ODBC:Driver=...;...), '
+  . 'and connection parameters carry neither. Give the whole DSN instead -- '
+  . 'as dsn, or as a dbname starting with dbi:ODBC: -- or use an AccessBroker '
+  . 'that answers in DBI form ([ $dsn, $user, $password ]).'
+  );
+}
+
+
 1;
 
 # vim:sts=2 sw=2:
@@ -72,18 +85,20 @@ DBIO::Storage::DBI::ODBC - Base class for ODBC drivers
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
-This class simply provides a mechanism for discovering and loading a sub-class
-for a specific ODBC backend.  It should be transparent to the user.
+The base of the ODBC storage classes of drivers that run over L<DBD::ODBC>
+(L<DBIO::MSSQL::Storage::ODBC>, L<DBIO::Firebird::Storage::ODBC>): the ODBC
+transport helpers above, and the refusal to build a DSN from connection
+parameters. It is not a driver and does not find one: an ODBC connection does
+not say which engine is behind it, so a schema declares its driver, and a
+driver that runs over ODBC moves its storage into its own ODBC class in its
+L<DBIO::Storage::DBI/_adapt_to_access_path> (ADR 0059, ADR 0067).
+L<DBIO/driver_for> refuses an ODBC DSN for the same reason.
 
 =head1 METHODS
-
-=head2 _rebless
-
-Resolve and rebless into a backend-specific ODBC storage subclass.
 
 =head2 _using_freetds
 
@@ -98,6 +113,22 @@ when FreeTDS is not in use.
 
 Disable array-operations behavior in DBD::ODBC using version-appropriate
 driver attributes.
+
+=head2 _connect_params_dsn
+
+Refuses. The DSN seam of L<DBIO::Storage::DBI/_connect_params_dsn> (ADR 0057)
+has no form to build for L<DBD::ODBC> out of C<dbname>, C<host> and C<port>:
+DBD::ODBC connects through a data source name (C<dbi:ODBC:DSN=name>,
+configured in F<odbc.ini>) or a connection string that names the ODBC driver
+(C<dbi:ODBC:Driver={...};...>), whose keywords that driver defines -- and
+connection parameters carry neither. Guessing one would connect somewhere
+else, or not at all.
+
+The error names the ways out: the whole DSN, as C<dsn> or as a C<dbname> that
+starts with C<dbi:ODBC:> (L<DBIO::AccessBroker::Static> passes it on), or an
+AccessBroker that answers in DBI form. An engine reached over ODBC whose
+driver knows its ODBC connection string overrides this in its own ODBC
+storage class.
 
 =head1 METHODS
 

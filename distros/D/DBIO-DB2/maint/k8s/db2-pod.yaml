@@ -1,6 +1,6 @@
 # IBM DB2 pod for dbio-db2 integration tests.
 #
-# Mirrors the dbio-postgresql-async/maint/k8s/pg-pod.yaml convention: a single
+# Mirrors the dbio-postgresql/maint/k8s/pg-pod.yaml convention: a single
 # DB pod + Service, reached via port-forward. Unlike Postgres/MySQL you still
 # need DBD::DB2 locally (built against the IBM clidriver) to run prove against
 # it -- see maint/docker/ for a fully containerised alternative that needs no
@@ -10,7 +10,7 @@
 # other DBs and services). DB2 is the heaviest of the test DBs; the pod carries
 # resources.limits so it can never starve the host. Run ONE test DB at a time,
 # `nice` the prove run, and DELETE the pod when done. See the "Live testing"
-# section in .claude/rules/dbio-rules.md.
+# section in .claude/rules/.local.dbio-rules.md.
 #
 # Usage:
 #   kubectl apply -f maint/k8s/db2-pod.yaml
@@ -22,6 +22,14 @@
 #   DBIO_TEST_DB2_USER=db2inst1 \
 #   DBIO_TEST_DB2_PASS=dbio \
 #     nice -n 19 ionice -c3 prove -l -I../dbio/lib t/10-db2.t
+#
+#   # One-time, idempotent: install the EXPLAIN_* tables in SYSTOOLS so
+#   # t/52-explain-query.t's live half can run. A pod has no hook to do this
+#   # after readiness (postStart runs before instance setup); the Docker
+#   # entrypoint (maint/docker/entrypoint.sh) does it for that stack. Without
+#   # it the live half skips with the install statement in the message.
+#   #   CALL SYSPROC.SYSINSTALLOBJECTS ('EXPLAIN', 'C',
+#   #     CAST(NULL AS VARCHAR(128)), CAST(NULL AS VARCHAR(128)))
 #
 #   kubectl delete -f maint/k8s/db2-pod.yaml   # ALWAYS clean up
 ---

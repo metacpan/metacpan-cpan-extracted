@@ -5,12 +5,13 @@ use Test::More;
 use Test::Warn;
 use Test::Exception;
 use DBIO::SQLite::Test;
+use DBIO::Storage::DBI;
 use Data::Dumper;
 
 my $schema = DBIO::SQLite::Test->init_schema( sqlite_use_file => 1 );
 
 is( ref($schema->storage), 'DBIO::SQLite::Storage',
-    'Storage reblessed correctly into DBIO::SQLite::Storage' );
+    'Storage is the declared DBIO::SQLite::Storage' );
 
 my $storage = $schema->storage;
 $storage->ensure_connected;
@@ -77,7 +78,7 @@ my $invocations = {
       dbi_connect_info => [
           'foo',
           'bar',
-          undef,
+          '',
           {
             %{$storage->_default_dbi_connect_attributes || {} },
             PrintError => 0,
@@ -123,7 +124,7 @@ my $invocations = {
       dbi_connect_info => [
           'foo',
           'bar',
-          undef,
+          '',
           {
             %{$storage->_default_dbi_connect_attributes || {} },
             PrintError => 1,
@@ -173,45 +174,39 @@ for my $type (keys %$invocations) {
   );
 }
 
-# make sure connection-less storages do not throw on _determine_driver
-# but work with ENV at the same time
-SKIP: for my $env_dsn (undef, (DBIO::SQLite::Test->_database)[0] ) {
-  skip( 'Subtest relies on being connected to SQLite without overrides', 1 ) if (
-    $ENV{DBIO_TEST_SWAPOUT_SQLAC_WITH}
-      or
-    ( $env_dsn and $env_dsn !~ /\:SQLite\:/ )
-  );
-
+# make sure connection-less storages do not throw on _determine_driver,
+# with DBI_DSN naming a database or not
+for my $env_dsn (undef, (DBIO::SQLite::Test->_database)[0] ) {
   local $ENV{DBI_DSN} = $env_dsn || '';
 
-  my $s = DBIO::Test::Schema->connect();
-  is_deeply (
-    $s->storage->connect_info,
-    [],
-    'Starting with no explicitly passed in connect info'
-  . ($env_dsn ? ' (with DBI_DSN)' : ''),
-  );
+  my $with_env = $env_dsn ? ' (with DBI_DSN)' : '';
 
-  my $sm = $s->storage->sql_maker;
+  # The schema declares its driver (core ADR 0067), so the refusal is the
+  # one of the missing DSN, not the one of the missing driver.
+  my $declared = DBIO::Test::Schema->clone;
+  $declared->storage_type('DBIO::SQLite::Storage');
 
-  ok (! $s->storage->connected, 'Storage does not appear connected after SQLMaker instance is taken');
+  throws_ok {
+    $declared->connect()
+  } qr/Connect info without a DSN \(no arguments\)/,
+  'connect() without arguments refused' . $with_env;
 
-  if ($env_dsn) {
-    isa_ok($sm, 'DBIO::SQLMaker');
+  # a storage that never got connect info
+  my $s = DBIO::Storage::DBI->new(undef);
 
-    ok ( $s->storage->_driver_determined, 'Driver determined (with DBI_DSN)');
-    isa_ok ( $s->storage, 'DBIO::SQLite::Storage' );
-  }
-  else {
-    isa_ok($sm, 'DBIO::SQLMaker');
+  my $sm = $s->sql_maker;
 
-    ok (! $s->storage->_driver_determined, 'Driver undetermined');
+  ok (! $s->connected, 'Storage does not appear connected after SQLMaker instance is taken' . $with_env);
 
-    throws_ok {
-      $s->storage->ensure_connected
-    } qr/You did not provide any connection_info/,
-    'sensible exception on empty conninfo connect';
-  }
+  isa_ok($sm, 'DBIO::SQLMaker');
+
+  ok (! $s->_driver_determined, 'Driver undetermined' . $with_env);
+  is ( ref $s, 'DBIO::Storage::DBI', 'Storage stays the generic one' . $with_env );
+
+  throws_ok {
+    $s->ensure_connected
+  } qr/You did not provide any connection_info/,
+  'sensible exception on empty conninfo connect' . $with_env;
 }
 
 done_testing;

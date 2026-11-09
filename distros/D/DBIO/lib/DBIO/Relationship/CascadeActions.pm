@@ -3,6 +3,9 @@ package DBIO::Relationship::CascadeActions;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Carp;
 use namespace::clean;
 
@@ -91,7 +94,7 @@ DBIO::Relationship::CascadeActions - Cascade delete and update actions across re
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

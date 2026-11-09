@@ -5,7 +5,7 @@ use warnings;
 
 use Validator::LIVR::Rules::Types;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # LIVR 2.5: rules that depend on other fields. A reference, such as "type" or "address/country",
 # is a path from the containing object: the hash that a rule gets as $all_values. That is the

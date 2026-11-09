@@ -58,24 +58,46 @@ my $provider = $storage->_conninfo_provider;
 is ref $provider, 'CODE', 'storage exposes broker-aware conninfo provider';
 is $provider->()->{user}, 'broker_user_4', 'provider fetches fresh conninfo for new pool connections';
 
+# A schema always declares its driver (core ADR 0067): TestSchema declares
+# PostgreSQL with the shortcut, which pins storage_type to the sync
+# DBIO::PostgreSQL::Storage and loads no component. PostgreSQL::EV is loaded
+# after it as a component -- no driver component stands behind it that would
+# set storage_type again, so a connection() hook or class data of
+# DBIO::PostgreSQL::EV that chose a storage would show below.
 {
   package TestSchema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
   __PACKAGE__->load_components('PostgreSQL::EV');
 }
 
-my $schema = TestSchema->connect($broker);
-# PostgreSQL::EV is an inert loadable stub (ADR 0030): loading the
-# component must NOT hijack storage_type to the async class. Async is a
-# per-connection mode reached via { async => 'ev' } at connect (the
-# 'ev' mode resolves to DBIO::PostgreSQL::EV::Storage via the sync
-# DBIO::PostgreSQL::Storage's register_async_mode); without that opt-in
-# the schema gets the ordinary DBI storage, while the broker still
-# flows through connect_info.
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+# The schema connects with a broker that answers the DBI form.
+{
+  package DsnBroker;
+  use base 'DBIO::AccessBroker';
+
+  sub new { bless {}, shift }
+
+  sub connect_info_for {
+    return [ 'dbi:Pg:dbname=dbio_async;host=localhost', 'broker_user', undef, {} ];
+  }
+}
+
+my $dsn_broker = DsnBroker->new;
+my $schema = TestSchema->connect($dsn_broker);
+# DBIO::PostgreSQL::EV is the distribution's overview module -- POD, no
+# methods, no connection() hook -- so loading it as a component must NOT
+# hijack storage_type to the async class. Async is a per-connection mode
+# reached via { async => 'ev' } at connect (the 'ev' mode resolves to
+# DBIO::PostgreSQL::EV::Storage via the sync DBIO::PostgreSQL::Storage's
+# register_async_mode); this broker's answer carries no mode and the connect
+# passes none, so the schema gets the sync driver it declared, while the
+# broker still flows through connect_info.
+is(TestSchema->storage_type, '+DBIO::PostgreSQL::Storage',
+  'loading PostgreSQL::EV as a component leaves the declared storage_type alone');
+isa_ok $schema->storage, 'DBIO::PostgreSQL::Storage';
 ok !$schema->storage->isa('DBIO::PostgreSQL::EV::Storage'),
-  'loading PostgreSQL::EV stub does not hijack storage_type to async';
-is $schema->storage->access_broker, $broker, 'schema connect keeps broker';
+  'loading PostgreSQL::EV as a component does not hijack storage_type to async';
+is $schema->storage->access_broker, $dsn_broker, 'schema connect keeps broker';
 is $schema->storage->access_broker_mode, 'write', 'schema connect defaults broker mode to write';
 
 subtest 'Static broker hashref converts to libpq conninfo string correctly' => sub {

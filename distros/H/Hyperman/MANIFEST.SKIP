@@ -21,3 +21,9 @@
 ^ignore\.txt$
 ^_hypersonic_cache/
 ^Hyperman-[\d.]+
+
+# coverage runs
+^cover_db
+\.gcda$
+\.gcno$
+^Install/

@@ -4,12 +4,15 @@ package DBIO::Exception;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 # load Carp early to prevent tickling of the ::Internal stash being
 # interpreted as "Carp is already loaded" by some braindead loader
 use Carp ();
 $Carp::Internal{ (__PACKAGE__) }++;
 
 use DBIO::Carp ();
+use DBIO::Util ();
 
 use overload
     '""' => sub { shift->{msg} },
@@ -17,7 +20,7 @@ use overload
 
 
 sub throw {
-    my ($class, $msg, $stacktrace) = @_;
+    my ($class, $msg, $stacktrace, $connect_info) = @_;
 
     # Don't re-encapsulate exception objects of any kind
     die $msg if ref($msg);
@@ -36,7 +39,9 @@ sub throw {
         $msg = "${calling}${msg} ${ln}\n";
     }
     else {
-        $msg = Carp::longmess($msg);
+        # the frames are shown with their arguments: no password among them
+        local $DBIO::Util::TRACE_CONNECT_INFO = $connect_info;
+        $msg = DBIO::Util::masked_longmess($msg);
     }
 
     my $self = { msg => $msg };
@@ -64,7 +69,7 @@ DBIO::Exception - Exception objects for DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -81,7 +86,7 @@ overload fallback to give natural boolean/numeric values.
 
 =over 4
 
-=item Arguments: $exception_scalar, $stacktrace
+=item Arguments: $exception_scalar, $stacktrace, \@connect_info
 
 =back
 
@@ -90,6 +95,11 @@ code, and shouldn't be used directly elsewhere.
 
 Expects a scalar exception message. The optional boolean C<$stacktrace>
 causes it to output a full trace similar to L<confess|Carp/DESCRIPTION>.
+Unlike C<confess>, the trace does not quote the password of a connection
+among the arguments of its frames: it is shown as C<***>, see
+L<DBIO::Schema/stacktrace>. The optional C<\@connect_info> is a connect info
+in the DBI form C<[ $dsn, $user, $password, \%attrs ]> that the trace masks
+as well; it is only read, nothing is asked for it.
 
   DBIO::Exception->throw('Foo');
   try { ... } catch { DBIO::Exception->throw(shift) }
@@ -98,6 +108,17 @@ causes it to output a full trace similar to L<confess|Carp/DESCRIPTION>.
 
 This method provides some syntactic sugar in order to
 re-throw exceptions.
+
+=head1 Error texts carry no bind values
+
+The text of an exception about a statement names the statement and the
+number of its bind values, C<[for Statement "..." with N bind values]>, and
+never a value. C<ShowErrorStatement> of the database handle is off, also when
+connect_info sets it. What the caller writes as a literal into the SQL itself
+is part of the statement text; the text the server writes about the error
+(L<DBIO::Exception::Server/detail>) is the business of the driver. An
+exception belongs in a log; to a client goes a message of the application's
+own, not the exception.
 
 =head1 AUTHOR
 

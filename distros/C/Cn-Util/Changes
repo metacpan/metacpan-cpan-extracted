@@ -1,5 +1,29 @@
 Revision history for Cn-Util
 
+0.024 2026-11-08 CST (Claude Opus 5.5 helped)
+
+ [`execute`]
+
+ - Input that the caller had already read ahead from `STDIN` is no longer lost. In `printf 'a\nb\nc\n' | perl -e 'while (<STDIN>) { print; execute("true") }'` only `a` was printed. The command's standard input was the null device, put on fd 0 under perl's buffered `STDIN`; the flush perl does before `system` forks seeks fd 0 and drops the buffer when that seek works, and the null device can seek. The command now reads an empty pipe, which cannot seek, and the `STDIN` handle itself is not reopened.
+
+ - `STDIN` is restored when `Capture::Tiny::capture` dies. It used to stay on the null device for the rest of the program.
+
+ - A return mode with a trailing newline, such as `"exit\n"`, is rejected before the command runs. It used to run the command and then die with "broke pigeonholes".
+
+ - `$die` is read as true or false, as documented. `'yes'` used to die with "isn't numeric", and `2` used to mean "do not die".
+
+ [`format_commas`]
+
+ - Infinity and NaN are returned as perl prints them, rather than as `Inf.NaN`, `-Inf.NaN` and `NaN.NaN`.
+
+ [`ref_to_json_file`]
+
+ - A write that fails, such as on a full disk, dies with "can't write" and the file name. It used to print "Wrote" and return the name of a truncated file on perl 5.20 and earlier, and die with "unable to close filehandle" on later perls.
+
+ [Argument checks]
+
+ - `dir` with an undefined `tests`, `dir`, `regex` or `cpu`, and `structure` with an undefined `output` or `color`, die saying which argument it was, instead of "Use of uninitialized value". `dir` rejects an `on_match` that is not a code reference, which used to die with "Can't use string as a subroutine ref" at the first match.
+
 0.023 2026-11-02 CST (Claude Opus 5.5 helped)
 
  [`dir`]

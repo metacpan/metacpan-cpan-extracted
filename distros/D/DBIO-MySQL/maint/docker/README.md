@@ -1,8 +1,39 @@
-# dbio-mysql — genuine-DBD::mysql test image
+# dbio-mysql — live MySQL server and genuine-DBD::mysql test image
 
-Live-verifies the **DBD::mysql (`mysql_*`) async path** of
-`DBIO::MySQL::Storage::Async` against a real MySQL server, on a host where
-`DBD::mysql` **cannot be built** natively.
+Two jobs, one resource-capped MySQL 8.0 server:
+
+- the database for the **whole live suite run from the host** (over
+  `DBD::MariaDB`), see *Whole live suite from the host* below;
+- live-verifying the **DBD::mysql (`mysql_*`) async path** of
+  `DBIO::MySQL::Storage::Async` against that server, on a host where
+  `DBD::mysql` **cannot be built** natively.
+
+## Whole live suite from the host
+
+```bash
+cd maint/docker && docker compose up -d --wait mysql
+cd ../..
+DBIO_TEST_MYSQL_DSN='dbi:MariaDB:database=dbio_test;host=127.0.0.1;port=3306' \
+DBIO_TEST_MYSQL_USER=dbio DBIO_TEST_MYSQL_PASS=dbio \
+  ../dbio/maint/capped-test prove -lr t/      # serial, never -j
+(cd maint/docker && docker compose down -v)    # ALWAYS
+```
+
+The server is prepared so this needs no manual step (karr k104):
+
+- `--log-bin-trust-function-creators=1` — MySQL 8 runs with the binary log on,
+  and then a user without `SUPER` may not create triggers or stored routines
+  (`t/78` creates a trigger, `t/79` a procedure). The flag lifts only that
+  requirement and keeps the binlog on, as servers in the wild run it.
+- `initdb/dbio-grants.sql` grants `dbio` everything on the databases named
+  `dbio\_k%` (the scratch databases the live tests create, `dbio_k<NN>_<pid>`)
+  and `\_dbio\_tmp\_%` (the diff's temp databases, `DBIO::MySQL::Deploy`).
+  Database-level, by name pattern; no global privilege. Init scripts run only
+  on an empty data dir — another reason for `down -v` after every run.
+
+The port is published on `127.0.0.1:3306` only; a MySQL already listening on
+the host's 3306 conflicts with it. The same suite inside the container, over
+genuine `DBD::mysql`: `docker compose run --rm test t/`.
 
 ## Why this image exists
 
@@ -59,6 +90,8 @@ unsigned `InRelease` outright.)
   if the headers are ever the wrong flavour or `DBD::mysql` won't load.
 - `docker-compose.yml` — brings up ONE resource-capped `mysql:8.0` server, waits
   for it, then runs the test container against a `dbi:mysql:` DSN.
+- `initdb/dbio-grants.sql` — run by the server on an empty data dir: grants
+  `dbio` the scratch and temp databases the live suite creates itself.
 - `entrypoint.sh` — installs any cpanfile-dep delta, waits for the DB via a real
   `DBD::mysql` connect, runs the tests with the mounted dev copies on `@INC`.
 

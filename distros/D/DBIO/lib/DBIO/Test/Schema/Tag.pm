@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Tag;
 # ABSTRACT: Test result class for the tags table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -49,7 +52,7 @@ DBIO::Test::Schema::Tag - Test result class for the tags table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

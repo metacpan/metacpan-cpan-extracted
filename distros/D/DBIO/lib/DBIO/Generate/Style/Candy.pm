@@ -3,6 +3,9 @@ package DBIO::Generate::Style::Candy;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Data::Dumper ();
 use DBIO::Generate::Util ();
 use namespace::clean;
@@ -16,13 +19,15 @@ sub emit {
   push @lines, "package " . DBIO::Generate::Util::assert_pkg($spec->{class}) . ";";
   push @lines, "# ABSTRACT: " . DBIO::Generate::Util::abstract_comment($spec->{moniker});
   push @lines, "";
-  push @lines, "use DBIO::Candy;";
-  push @lines, "";
-
+  # DBIO::Candy loads components through its import, not a bareword
+  # load_components() call (which it does not export).
   if (my @c = @{ $spec->{components} // [] }) {
-    push @lines, "load_components " . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . ";";
-    push @lines, "";
+    push @lines, "use DBIO::Candy -components => [" . join(', ', map { DBIO::Generate::Util::pl_str($_) } @c) . "];";
   }
+  else {
+    push @lines, "use DBIO::Candy;";
+  }
+  push @lines, "";
 
   if ($spec->{is_view}) {
     push @lines, "table_class 'DBIO::ResultSource::View';";
@@ -35,28 +40,21 @@ sub emit {
   }
   push @lines, "";
 
-  my %pk_set = map { $_ => 1 } @{ $spec->{pk} // [] };
   for my $col (@{ $spec->{column_order} // [] }) {
     my $info = $spec->{columns}{$col} // {};
     my $dt   = $info->{data_type} // 'varchar';
     my $size = defined $info->{size} ? $info->{size} : undef;
-    my $dt_str = DBIO::Generate::Util::pl_str($dt);
-    my @extra;
-    push @extra, "is_auto_increment => 1" if $info->{is_auto_increment};
-    push @extra, "is_nullable => 1"       if $info->{is_nullable};
-    my $info_str;
-    if (@extra || defined $size) {
-      my @inner;
-      if (defined $size) {
-        push @inner, "size => " . ($size =~ /\A-?[0-9]+\z/ ? $size : DBIO::Generate::Util::pl_str($size));
-      }
-      push @inner, @extra;
-      $info_str = "$dt_str, { " . join(', ', @inner) . " }";
+    # has_column wraps its trailing args into the column-info hashref
+    # (add_columns($col => { @_ })), so the type and every attribute must be
+    # emitted as a FLAT key/value list -- `data_type => '...', size => N, ...`.
+    # A bare `'type', { ... }` would store { 'type' => {...} } with no data_type.
+    my @info_pairs = ("data_type => " . DBIO::Generate::Util::pl_str($dt));
+    if (defined $size) {
+      push @info_pairs, "size => " . DBIO::Generate::Util::pl_val($size);
     }
-    else {
-      $info_str = $dt_str;
-    }
-    push @lines, "has_column " . DBIO::Generate::Util::pl_str($col) . " => $info_str;";
+    push @info_pairs, "is_auto_increment => 1" if $info->{is_auto_increment};
+    push @info_pairs, "is_nullable => 1"       if $info->{is_nullable};
+    push @lines, "has_column " . DBIO::Generate::Util::pl_str($col) . " => " . join(', ', @info_pairs) . ";";
   }
   push @lines, "";
 
@@ -73,11 +71,13 @@ sub emit {
 
   for my $stmt (@{ $spec->{extra_statements} // [] }) {
     my ($method, @args) = @$stmt;
+    DBIO::Generate::Util::assert_method_name($method, 'extra_statements method');
     push @lines, "$method(" . join(', ', map { _dump_val($_) } @args) . ");";
   }
   push @lines, "" if @{ $spec->{extra_statements} // [] };
 
   for my $rel (@{ $spec->{relationships} // [] }) {
+    DBIO::Generate::Util::assert_relationship_method($rel->{method});
     my ($rel_name, $remote_class, $cond, @rest) = @{ $rel->{args} };
     push @lines, "$rel->{method} " . DBIO::Generate::Util::pl_str($rel_name) . ", " . DBIO::Generate::Util::pl_str($remote_class) . ", " . _dump_inline($cond) . ";";
   }
@@ -96,7 +96,7 @@ sub _dump_inline {
   return Data::Dumper::Dumper($val);
 }
 
-sub _dump_val { _dump_inline($_[1]) }
+sub _dump_val { _dump_inline($_[0]) }
 
 1;
 
@@ -112,7 +112,7 @@ DBIO::Generate::Style::Candy - DBIO::Candy DSL emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

@@ -1,0 +1,45 @@
+diff --git a/Makefile.PL b/Makefile.PL
+index d4460ee..8db9ef5 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -179,9 +179,12 @@ print "Using $infversion from $ID\n";
+ # Unix versions of ESQL/C use .UCx (and .HCx on old HP-UX) to indicate a
+ # 32-bit client, and .FCx to indicate a 64-bit client.  On Windows, .TCx
+ # has indicated 32-bit clients.
+-die "Unexpected ESQL/C version number format $infversion"
+-    unless $infversion =~ m/\d+\.\d+\.([A-Z])[A-Z].*$/;
+-my ($verletter) = $1;
++# CSDK 15.0 and later drop the letter (ESQL/C Version 15.0.1.0) and ship
++# 64-bit clients only on Unix.
++my ($verletter);
++if ($infversion =~ m/\d+\.\d+\.([A-Z])[A-Z].*$/) { $verletter = $1; }
++elsif ($infversion =~ m/Version \d{2,}\.\d+\.\d+\.\d+$/) { $verletter = 'F'; }
++else { die "Unexpected ESQL/C version number format $infversion"; }
+ my ($esql_bits) = 0;
+ $esql_bits = 32 if ($verletter eq 'U');
+ $esql_bits = 32 if ($verletter eq 'H');
+@@ -214,6 +217,8 @@ $effvernum = 960 if ($vernum >= 290 && $vernum < 300);
+ $effvernum = 970 if ($vernum >= 300 && $vernum < 350);
+ $effvernum = 975 if ($vernum >= 350 && $vernum < 400);
+ $effvernum = 980 if ($vernum >= 400 && $vernum < 500);
++# CSDK 15.0 (IDS 15) follows CSDK 4.50 with the same ESQL/C interface.
++$effvernum = 980 if ($vernum >= 1500 && $vernum < 1600);
+ 
+ dbd_ix_die "\n*** ESQL/C version $vernum is no longer supported (by IBM, HCL or DBD::Informix).\n\n"
+     if ($effvernum < 970);
+diff --git a/lib/DBD/Informix/Configure.pm b/lib/DBD/Informix/Configure.pm
+index bdd460d..d5fb97b 100644
+--- a/lib/DBD/Informix/Configure.pm
++++ b/lib/DBD/Informix/Configure.pm
+@@ -166,7 +166,10 @@
+         $vers =~ s/.*INFORMIX-\w+ Version\s+(\d+[.]\d+).*/$1/i;
+         die "Unexpected message from esql script -- $infv\n"
+             unless ($vers =~ /^\d+[.]\d+$/);
+-        $vers =~ s/^([0-9])\./$1/;
++        # CSDK 15.0 and later report ESQL/C as 15.0.1.0: major 15, minor 0.
++        # Keep the old encoding (4.50 -> 450, 9.52 -> 952) and give the
++        # two-digit majors room above it (15.0 -> 1500).
++        $vers = $1 * 100 + $2 if $vers =~ /^(\d+)\.(\d+)$/;
+ 
+         return $infv, $vers;
+     }

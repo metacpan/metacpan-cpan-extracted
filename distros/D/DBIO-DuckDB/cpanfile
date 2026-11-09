@@ -1,6 +1,20 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900001';
+requires 'DBIO', '0.900004';
 requires 'DBD::DuckDB', '0.16';
+requires 'Alien::DuckDB', '0.04';
+
+# Loaded directly by shipped modules (Storage, Deploy, DBIO::DuckDB::Test).
+# DBIO already pulls them in; declared here because this dist uses them
+# itself. The floors are core's own, so they add no constraint of their own.
+requires 'DBI', '1.57';
+requires 'SQL::Abstract', '2.000002';
+requires 'Try::Tiny', '0.32';
+requires 'namespace::clean', '0.27';
+# duckdb_arrow_fetch calls libduckdb's Arrow functions itself; the floors
+# are those of DBD::DuckDB, Math::BigInt is core.
+requires 'FFI::Platypus', '2.00';
+requires 'FFI::CheckLib', '0.30';
+requires 'Math::BigInt', '1.999';
 
 on test => sub {
   requires 'Test::More', '0.98';

@@ -3,6 +3,8 @@ package DBIO::FilterColumn;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Row';
 use DBIO::Util qw(is_literal_value);
 use namespace::clean;
@@ -159,7 +161,7 @@ sub set_filtered_column {
   return $self->{_filtered_column}{$col} = $filtered;
 }
 
-sub update {
+sub prepare_update {
   my ($self, $data, @rest) = @_;
 
   my $colinfos = $self->result_source->columns_info;
@@ -211,7 +213,7 @@ DBIO::FilterColumn - Automatically convert column data
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

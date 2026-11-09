@@ -4,6 +4,8 @@ package DBIO::Test::Schema::Encoded;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->table('encoded');
@@ -52,7 +54,7 @@ DBIO::Test::Schema::Encoded - Test result class for the encoded table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

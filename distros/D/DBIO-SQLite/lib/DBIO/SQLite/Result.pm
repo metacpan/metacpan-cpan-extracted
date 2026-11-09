@@ -4,6 +4,8 @@ package DBIO::SQLite::Result;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 __PACKAGE__->mk_classdata('_sqlite_indexes' => {});
@@ -41,7 +43,7 @@ DBIO::SQLite::Result - SQLite-specific Result component for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -67,6 +69,14 @@ Load it with:
     __PACKAGE__->sqlite_index('idx_users_name_lower' => {
         expression => 'lower(name)',         # expression index
     });
+
+C<sqlite_index> is one way to declare an index, not the only one. The index
+declaration of the result source is canonical (ADR 0061 in core): C<idx> of
+L<DBIO::Cake> and C<indices> write it, and L<DBIO::SQLite::DDL> reads it next
+to C<sqlite_index>. Its own C<< driver => { sqlite => { where, expression } } >>
+block is read; an entry that carries only another driver's block, or an
+unknown key in the sqlite block, is refused. Where both declare the same name,
+the canonical declaration wins.
 
 =head1 METHODS
 
@@ -101,11 +111,13 @@ hashref accepts:
 
 Returns a copy of all index definitions registered on this result class.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 
-=item * L<DBIO::SQLite::DDL> - consumes C<sqlite_indexes> when generating DDL
+=item * L<DBIO::SQLite::DDL> - consumes C<sqlite_indexes> and the canonical index declarations when generating DDL
 
 =item * L<DBIO::PostgreSQL::Result> - the PostgreSQL counterpart
 

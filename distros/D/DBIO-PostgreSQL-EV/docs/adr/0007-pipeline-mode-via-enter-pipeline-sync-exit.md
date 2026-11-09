@@ -3,6 +3,46 @@
 - Status: accepted
 - Date: 2026-06-21
 - Tags: async, pipeline, ev-pg, performance, drivers
+- Re-homed: the generic bracketing decision now lives in `dbio-async`
+  ADR 0003 (this ADR is its origin); the scaffold itself is core's
+  (`DBIO::Storage::Async::pipeline`), and this driver supplies only the three
+  seams.
+
+## Amendment (2026-08-05, karr k27) — the batch coderef receives a pinned context, not the storage
+
+One sentence in *Run the batch* below was never true: that the `*_async` calls
+the caller issues inside the block "queue onto the pipelined connection".
+Nothing made it true. The scaffold called `$coderef->($self)` and set no pinned
+state, so an in-block call went through the pooled seam (`_query_async` →
+`pool->acquire`), took a **different** connection and ran outside the bracket —
+unbatched, and at `pool_size => 1` only after `_pipeline_exit`. The statements
+still executed; the only symptom was that the round trips this ADR exists to
+save were still paid.
+
+Core fixed that structurally (dbio-async karr k7/k6, amended into `dbio-async`
+ADR 0003, core `DBIO` >= 0.900004): `pipeline()` now builds a
+`DBIO::Storage::Async::PipelineContext` around the bracketed connection and
+hands **that** to the coderef. Its CRUD methods route through
+`_run_crud_pinned` → `_query_async_pinned`, i.e. through the pinned seam this
+driver already implements for transactions — and `query_params` on a connection
+in libpq pipeline mode is exactly what queues a statement. See ADR 0003 for the
+mechanism and for what the bracket does *not* guarantee (storage-level and
+ResultSet-level calls inside the block are not batched; a query chained onto an
+in-batch Future fires after the sync).
+
+**No code change in this driver.** `_pipeline_enter` / `_pipeline_sync` /
+`_pipeline_exit` are unchanged and correct; the driver must not record the
+bracketed connection or make `_query_async` consult pipeline state (core no
+longer routes in-batch queries through the pooled seam at all). The one
+obligation this puts on the driver, previously unwritten: `_pipeline_sync` must
+not resolve before the individual batched result Futures have been read off the
+connection, because the scaffold exits pipeline mode and returns the connection
+to the pool in that Future's completion. Ours resolves when EV::Pg acks the
+libpq sync point.
+
+The line references below point at the pre-thin-transport `Storage.pm` that
+still carried its own `pipeline()`; the bracketing lifecycle they describe is
+now core's, unchanged in shape.
 
 ## Context
 
@@ -24,11 +64,11 @@ the user's batch with EV::Pg's three pipeline primitives on one pooled connectio
 
 - **Enter.** Acquire a pooled connection and put it into pipeline mode:
   `$pg->enter_pipeline` (`Storage.pm:450-451`).
-- **Run the batch.** Invoke the user coderef (`Storage.pm:453`). Inside it the
-  caller issues the usual `*_async` calls — which queue onto the pipelined
-  connection — and is expected to hand back an aggregate Future (e.g.
-  `Future->needs_all(@futures)`), per the method's POD example
-  (`Storage.pm:432-444`).
+- **Run the batch.** Invoke the user coderef with a batch context pinned to the
+  bracketed connection (see the amendment above; originally: with the storage
+  itself, `Storage.pm:453`). The calls the caller makes on that context queue
+  onto the pipelined connection, and the caller is expected to hand back an
+  aggregate Future (e.g. `Future->needs_all(@futures)`).
 - **Sync.** Drive the pipeline to completion with
   `$pg->pipeline_sync(\&on_complete)` (`Storage.pm:464`); the callback fires once
   all batched results are in.
@@ -58,9 +98,10 @@ This is shipped, hence **accepted**, not proposed.
 
 ## Consequences
 
-- Many queries issued inside the `pipeline` coderef are sent without per-query
-  round-trip waits and their results gathered in one sync — the intended
-  throughput win over issuing the same `*_async` calls outside a pipeline.
+- Many queries issued **on the batch context** inside the `pipeline` coderef
+  (see the amendment) are sent without per-query round-trip waits and their
+  results gathered in one sync — the intended throughput win over issuing the
+  same `*_async` calls outside a pipeline.
 - One connection is held out of the pool for the whole batch and released exactly
   once, in the `pipeline_sync` callback (`Storage.pm:465-466`) — or, on a
   synchronous throw, in the error branch (`Storage.pm:456-460`). Both paths must

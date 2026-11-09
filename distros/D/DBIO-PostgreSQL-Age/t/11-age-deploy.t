@@ -11,11 +11,12 @@ plan skip_all => 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run this test'
 eval { require DBIO::PostgreSQL::Storage; 1 }
   or plan skip_all => 'DBIO::PostgreSQL not installed';
 
-require DBI;
-my $probe = DBI->connect($dsn, $user, $pass, {
-  AutoCommit => 1, RaiseError => 0, PrintError => 0,
-});
-plan skip_all => "cannot connect: $DBI::errstr" unless $probe;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+
+# A server that is not there fails the file, with a plan (karr k113).
+my $probe = LiveServer->control_dbh;
 
 my ($age_available) = $probe->selectrow_array(
   q{SELECT 1 FROM pg_available_extensions WHERE name = 'age'}
@@ -30,7 +31,7 @@ use_ok('DBIO::PostgreSQL::Age::Storage');
 # Schema bootstrap
 {
   package TestAgeDeploySchema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;   # the schema declares its driver (core ADR 0067)
   __PACKAGE__->load_components('PostgreSQL::Age');
 }
 

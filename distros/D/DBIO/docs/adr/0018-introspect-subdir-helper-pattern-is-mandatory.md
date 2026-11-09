@@ -20,13 +20,13 @@ as a family-wide decision: "The pattern is identical across every DBIO driver �
 core base classes (`DBIO::Introspect::Base`, `DBIO::Diff::Base`) assume this
 decomposition." But a family-wide rule recorded in one driver's repo gives that
 driver no authority over the others, and the rule has already been tested:
-**dbio-mysql** (karr mysql#6) collapsed its `Introspect/` into a single
+**dbio-mysql** (its k6) collapsed its `Introspect/` into a single
 `Introspect.pm`, with the four readers reduced to private `_build_*` methods, and
 recorded that collapse as a conscious local deviation in its own ADR 0006. That
 left MySQL as the lone diverging driver and raised a question that no single
 driver repo can answer: may a driver opt out of the subdir pattern when its
 readers are tightly coupled and there is no sister-engine variant to justify the
-fan-out? (karr core#45.)
+fan-out? (k45.)
 
 By the ownership rule (family-wide → core), the decision and its authority belong
 here, in core — not in the Sybase repo and not negotiable per driver.
@@ -73,10 +73,10 @@ removing the real copy — not by merging the modules.
 
 - Future architecture reviews must not re-propose flattening these submodules in
   any driver; point them here. This supersedes the family-policy question raised
-  in karr core#45, which is resolved in the strict direction (no per-driver
+  in k45, which is resolved in the strict direction (no per-driver
   exception).
 - **dbio-mysql is non-compliant.** Its `Introspect/` is collapsed into a single
-  `Introspect.pm` (four readers as private `_build_*`; karr mysql#6; recorded in
+  `Introspect.pm` (four readers as private `_build_*`; dbio-mysql k6; recorded in
   dbio-mysql ADR 0006). Under this decision MySQL must be **re-split** back into
   `Introspect::{Tables,Columns,Indexes,ForeignKeys}` to match the family, and its
   ADR 0006 is then **superseded**. (Only Introspect is affected — dbio-mysql's

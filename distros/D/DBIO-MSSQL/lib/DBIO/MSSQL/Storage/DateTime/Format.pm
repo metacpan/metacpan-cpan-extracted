@@ -4,6 +4,8 @@ package DBIO::MSSQL::Storage::DateTime::Format;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::DateTimeFormat';
 
 # MSSQL adds a third channel beyond the base datetime/date: smalldatetime
@@ -49,7 +51,7 @@ DBIO::MSSQL::Storage::DateTime::Format - DateTime parser for MSSQL datetime and 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 METHODS
 

@@ -13,7 +13,7 @@ DBIO::Manual::Features - Feature overview with links to the relevant DBIO docume
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 PROJECT
 
@@ -183,6 +183,20 @@ See L<DBIO::Row/delete>
 
 =back
 
+=head2 Untrusted input
+
+The structure of a condition is code: its keys, its operators and its hashes
+decide what the statement does. Only values come from a request.
+
+ # the keys and the operator are written in the program, the value comes in
+ $book_rs->search({ 'me.topic' => $params->{topic} });
+
+The same holds for every attribute (C<order_by>, C<columns>, C<having>,
+C<result_class>, ...). A condition whose structure is not written in the
+program goes through L<DBIO::ResultSet/search_untrusted>, which accepts
+columns of the resultset as keys, scalars as values and a fixed list of
+operators.
+
 =head2 Object-Level Overrides
 
 =over 1
@@ -321,6 +335,57 @@ natively into L<DBIO::Row> and require no C<load_components> call:
 =item L<DBIO::Row/proxy_resultset_method> — expose ResultSet C<with_> methods as row accessors
 
 =back
+
+=head2 Extensibility example: ResultSet helpers (integrated into DBIO::ResultSet)
+
+The C<DBIx::Class::Helper::ResultSet::*> family is integrated natively into
+L<DBIO::ResultSet> and requires no C<load_components> call. Every one of them
+chains, so they compose in any order:
+
+ $rs->where(col1 => 'value')
+    ->order_by(-desc => 'col1')
+    ->group_by('col1')
+    ->having(cnt => { '>' => 3 })
+    ->join('artist')
+    ->offset(20)
+    ->rows(10);
+
+Every helper returns a L<DBIO::ResultSet> in every context (ADR 0042) — no
+method changes its return type based on wantarray, so the chain works inside
+any expression.
+
+=over 1
+
+=item L<DBIO::ResultSet/where>, L<DBIO::ResultSet/having> — condition-only chaining: flat list or a single ref, stacked across calls
+
+=item L<DBIO::ResultSet/order_by> — C<'!col'> or C<< -desc => 'col' >> for DESC
+
+=item L<DBIO::ResultSet/columns>, L<DBIO::ResultSet/add_columns>, L<DBIO::ResultSet/remove_columns>, L<DBIO::ResultSet/no_columns> — shape the projection
+
+=item L<DBIO::ResultSet/distinct>, L<DBIO::ResultSet/group_by>, L<DBIO::ResultSet/prefetch>, L<DBIO::ResultSet/hri> — attribute shortcuts
+
+=item L<DBIO::ResultSet/select>, L<DBIO::ResultSet/as> — the C<select>/C<as> pair as a chain
+
+=item L<DBIO::ResultSet/join> — join a relationship (join type from the relationship's C<join_type> attribute)
+
+=item L<DBIO::ResultSet/rows>, L<DBIO::ResultSet/limit>, L<DBIO::ResultSet/offset>, L<DBIO::ResultSet/limited_page>, L<DBIO::ResultSet/has_rows> — slicing
+
+=item L<DBIO::ResultSet/null>, L<DBIO::ResultSet/not_null>, L<DBIO::ResultSet/like>, L<DBIO::ResultSet/not_like> — a leading dot qualifies with the source alias
+
+=item L<DBIO::ResultSet/search_or> — OR several ResultSets together
+
+=item L<DBIO::ResultSet/union>, L<DBIO::ResultSet/intersect>, L<DBIO::ResultSet/except> (and their C<_all> twins) — set operations
+
+=item L<DBIO::ResultSet/results_exist> — cheaper than C<count> when you only need a boolean
+
+=item L<DBIO::ResultSet/correlate> — a related ResultSet as a correlated subquery
+
+=item L<DBIO::ResultSet/me>, L<DBIO::ResultSet/one_row>, L<DBIO::ResultSet/bare>, L<DBIO::ResultSet/rand>, L<DBIO::ResultSet/explain>
+
+=back
+
+See L<DBIO::Manual::Heritage/ResultSet helpers (was DBIx::Class::Helpers)> for
+what was deliberately left out and why.
 
 =head2 Extensibility example: DBIO::Timestamp
 
@@ -544,8 +609,8 @@ L<DBIO::InflateColumn::DateTime>.
 
  __PACKAGE__->filter_column(
     length => {
-       to_storage   => 'to_metric',
-       from_storage => 'to_imperial',
+       filter_to_storage   => 'to_metric',
+       filter_from_storage => 'to_imperial',
     },
  );
 
@@ -571,14 +636,14 @@ See L<DBIO::ResultSetColumn>
     select   => [
        'price',
        'genre',
-       { max => price },
-       { avg => price },
+       { max => 'price' },
+       { avg => 'price' },
     ],
     as       => [
        qw(price genre max_price avg_price)
     ],
     group_by => [qw(price genre)],
- });
+ })->all;
  for (@res) {
     say $_->price . ' ' . $_->genre;
     say $_->get_column('max_price');
@@ -638,13 +703,16 @@ See L<DBIO::Manual::Cookbook/Subqueries>
  $rs->update({
     # !!! SQL INJECTION VECTOR
     price => \"price + $inc", # DON'T DO THIS
- });
+ }, { all => 1 });
 
 Better:
 
  $rs->update({
     price => \['price + ?', [inc => $inc]],
- });
+ }, { all => 1 });
+
+A resultset without a condition needs C<< { all => 1 } >> for C<update> and
+C<delete> (ADR 0069); a restricted one (after C<search>) needs no option.
 
 See L<SQL::Abstract/Literal SQL with placeholders and bind values (subqueries)>
 

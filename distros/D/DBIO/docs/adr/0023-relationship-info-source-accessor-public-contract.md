@@ -17,12 +17,12 @@ downstream consumer while remaining formally undocumented internals:
 `dbio-graphql` reads exactly these two keys to build its relationship fields:
 `DBIO::GraphQL::Relationship` uses `{source}` to find the target GraphQL type and
 treats `{attrs}{accessor} eq 'multi'` as the plural/List cardinality, single
-otherwise (`dbio-graphql/lib/DBIO/GraphQL/Relationship.pm:60,70`). It had already
+otherwise. It had already
 hardened on its own side — a build-time error naming the relationship/source when
 either key is missing, rather than silently dropping the field (commit
 `dfc1624`) — and recorded that hardening in **dbio-graphql ADR-0007**, which
 deliberately deferred the *core* question to a separate core ticket. That ticket
-is core karr **#51** (`from:dbio-graphql`): a downstream consumer cannot
+is core **k51** (`from:dbio-graphql`): a downstream consumer cannot
 unilaterally declare core internals stable, so it asked core to either bless the
 keys or name a supported alternative.
 
@@ -80,7 +80,7 @@ public-API stewardship rather than a family-policy realignment.
 
 ## Consequences
 
-- **dbio-graphql karr #1 / ADR-0007 are satisfied.** Its defensive build-time
+- **dbio-graphql k1 / ADR-0007 are satisfied.** Its defensive build-time
   guards may stay (belt-and-suspenders) but no longer rest on undocumented
   internals; the keys are now a contract core commits to.
 - **The arity cut is `multi` vs not-`multi` only.** The single-side spellings
@@ -92,4 +92,4 @@ public-API stewardship rather than a family-policy realignment.
 - Other `relationship_info()` keys remain internal and unpromised.
 
 Relates to ADR 0018 (family-policy/ownership pattern), and to dbio-graphql
-ADR-0007, dbio-graphql karr #1, and core karr #51.
+ADR-0007, dbio-graphql k1, and core k51.

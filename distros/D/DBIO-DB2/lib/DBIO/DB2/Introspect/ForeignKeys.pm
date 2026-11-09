@@ -4,6 +4,8 @@ package DBIO::DB2::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Introspect::Base ();
 
 # SYSCAT.REFERENCES stores DELETERULE/UPDATERULE as single-char codes. Normalize
@@ -64,18 +66,16 @@ sub fetch {
   }
   my $groups = DBIO::Introspect::Base->_aggregate_by_ordered(\@rows, '_grp');
 
-  # Parent-PK lookup: DB2 SYSCAT.REFERENCES points at the parent's referenced
-  # key by name, but we resolve the parent primary-key columns directly (kept
-  # DB2-specific multi-step resolution).
-  my $pk_sth = $dbh->prepare(q{
-    SELECT kcu.colname, kcu.colseq
-    FROM syscat.keycoluse kcu
-    JOIN syscat.tabconst tc
-      ON kcu.constname = tc.constname
-        AND kcu.tabschema = tc.tabschema
-        AND kcu.tabname = tc.tabname
-    WHERE tc.tabschema = ? AND tc.tabname = ? AND tc.type = 'P'
-    ORDER BY kcu.colseq
+  # Columns of the referenced key: SYSCAT.REFERENCES.REFKEYNAME names the
+  # parent's key (primary key or UNIQUE constraint) in REFTABSCHEMA.REFTABNAME,
+  # and SYSCAT.KEYCOLUSE holds its columns in COLSEQ order. Resolving the
+  # parent's primary key instead gave the wrong columns for an FK onto a
+  # UNIQUE constraint (karr k45).
+  my $key_sth = $dbh->prepare(q{
+    SELECT colname, colseq
+    FROM syscat.keycoluse
+    WHERE constname = ? AND tabschema = ? AND tabname = ?
+    ORDER BY colseq
   });
 
   for my $pair (@$groups) {
@@ -92,13 +92,13 @@ sub fetch {
       on_delete    => _rule($first->{deleterule}),
     };
 
-    my @pk_cols;
-    if (eval { $pk_sth->execute($fk->{to_schema}, $fk->{to_table}); 1 }) {
-      while (my $r = $pk_sth->fetchrow_hashref) {
-        push @pk_cols, $r->{colname};
+    my @to_cols;
+    if (eval { $key_sth->execute($first->{refkeyname}, $fk->{to_schema}, $fk->{to_table}); 1 }) {
+      while (my $r = $key_sth->fetchrow_hashref) {
+        push @to_cols, $r->{colname};
       }
     }
-    $fk->{to_columns} = \@pk_cols;
+    $fk->{to_columns} = \@to_cols;
     push @{ $fks{ $fk->{from_table} } }, $fk;
   }
 
@@ -119,7 +119,7 @@ DBIO::DB2::Introspect::ForeignKeys - Introspect DB2 foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -135,7 +135,9 @@ grouped by constraint name.
 
 Returns a hashref keyed by table name, each value an arrayref of FK
 hashrefs with: C<constraint_name>, C<from_columns>, C<to_table>,
-C<to_columns>, C<on_update>, C<on_delete>. C<constraint_name> is the
+C<to_columns>, C<on_update>, C<on_delete>. C<to_columns> are the columns of the
+key the FK references (C<SYSCAT.REFERENCES.REFKEYNAME>): the parent's primary
+key or one of its C<UNIQUE> constraints. C<constraint_name> is the
 canonical FK key blessed by core ADR 0021.
 
 =head1 AUTHOR

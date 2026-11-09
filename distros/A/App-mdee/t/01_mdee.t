@@ -231,6 +231,15 @@ subtest 'list marker patterns' => sub {
 
     # #) should fold
     ok($fold_lines->("    #) $long\n") > 1, '#) list item is folded');
+
+    # + (CommonMark bullet) should fold with the continuation indented
+    # under the text; without the md fold the output is still folded,
+    # but from the start of the line
+    my @plus = map { s/\e\[[\d;]*[mK]//gr }
+        $fold_lines->("+ " . join(' ', ('word') x 30) . "\n");
+    ok(@plus > 1, '+ list item is folded');
+    is(scalar(grep { !/^  \S/ } @plus[1..$#plus]), 0,
+       '+ list item continuation lines are indented');
 };
 
 # Test: md module table formatting (actual execution)
@@ -430,7 +439,7 @@ CONF
     # differ from what default[theme] gives
     {
         open my $fh, q(>), "$config_dir/config.sh" or die;
-        print $fh "default[theme]=\x27warm\x27\n";
+        print $fh "default[theme]='warm'\n";
         close $fh;
         my $out = `XDG_CONFIG_HOME=$tmpdir $mdee -d --dryrun --mode=light --no-theme $test_md 2>&1`;
         unlike($out, qr/Coral/, q(--no-theme skips default[theme]));
@@ -438,7 +447,7 @@ CONF
         unlike($out, qr/Coral/, q(--theme skips default[theme]));
         like($out, qr/hashed\.h3=1/, q(--theme still adds to the built-in default));
         open $fh, q(>), "$config_dir/config.sh" or die;
-        print $fh "default[theme]=\x27hashed\x27\n";
+        print $fh "default[theme]='hashed'\n";
         close $fh;
         $out = `XDG_CONFIG_HOME=$tmpdir $mdee -d --dryrun --mode=light --theme=warm $test_md 2>&1`;
         like($out, qr/Coral/, q(the theme given with --theme is applied));
@@ -612,6 +621,19 @@ subtest q(table style option) => sub {
 	my $bad = `$mdee -n --table-style=$style $test_md 2>&1`;
 	like($bad, qr/--table-style: lattice, 3line or simple expected/, qq(--table-style=$style is rejected));
     }
+};
+
+subtest q(widen theme) => sub {
+    my $out = `COLUMNS=200 $mdee -n -t widen $test_md 2>&1`;
+    like($out, qr/--begin '&widen\(chars=2460-24FF:1F5D1\)' --/, q(gives the function and the characters to the md module));
+
+    my $tmp = tempdir(CLEANUP => 1);
+    mkdir "$tmp/mdee";
+    open my $fh, q(>), "$tmp/mdee/config.sh" or die;
+    print $fh "widen_chars+=(3248-324F)\n";
+    close $fh;
+    $out = `XDG_CONFIG_HOME=$tmp COLUMNS=200 $mdee -n -t widen $test_md 2>&1`;
+    like($out, qr/chars=3248-324F:2460-24FF:1F5D1\)/, q(widen_chars of config.sh is added));
 };
 
 subtest q(pass_md in config.sh) => sub {

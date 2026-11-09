@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-# LIVE smoke test for the karr #22 payoff: an async storage extension LAYER
-# composed onto the EV transport by core #70's storage-layer composition just
+# LIVE smoke test for the karr k22 payoff: an async storage extension LAYER
+# composed onto the EV transport by core k70's storage-layer composition just
 # works -- its async method, issuing '?'-dialect SQL through the inherited
 # _query_async, runs end to end over EV::Pg. This is the scenario AGE relies on
 # (its Age async mirror composed onto EV, cypher_async issuing '?' SQL). Here a
@@ -14,6 +14,12 @@ use Test::More;
 use DBIO::PostgreSQL::EV::TestHarness;
 
 BEGIN { DBIO::PostgreSQL::EV::TestHarness->skip_all_unless_live }
+
+# A server that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 # --- A dummy storage extension: a sync layer + its async mirror --------------
 # This mirrors how a real extension (AGE, PostGIS) ships: a plain sync storage
@@ -50,7 +56,7 @@ my $async = $h->async;
 isa_ok $async, 'DBIO::PostgreSQL::EV::Storage',
   'composed async backend is still the EV transport at its base';
 isa_ok $async, 'DBIO::PostgreSQL::EV::TestDummyLayer::Async',
-  'the extension async layer was mirrored and composed onto the transport (core #70)';
+  'the extension async layer was mirrored and composed onto the transport (core k70)';
 can_ok $async, 'dummy_async_double';
 
 # The composed layer's async method, issuing '?' SQL, resolves correctly.

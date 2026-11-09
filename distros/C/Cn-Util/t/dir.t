@@ -181,6 +181,10 @@ throws_ok { dir(dir => $root, tests => 'Z') }
 	qr/Unrecognized characters in tests/, 'rejects invalid test chars';
 throws_ok { dir(dir => $root, regex => '(') }
 	qr/Invalid regex/, 'rejects an uncompilable regex';
+throws_ok { dir(dir => $root, tests => undef) }
+	qr/tests must be defined/, 'rejects tests => undef with its own message';
+throws_ok { dir(dir => $root, on_match => 1) }
+	qr/on_match must be a code reference/, 'rejects an on_match that is not code';
 # The alternation is historical: Util.pm, which this module was before it was
 # Cn::Util, used to `use autodie`, which intercepted opendir and threw "Can't
 # opendir(...)" before the module's own `or die "Cannot open directory"` could

@@ -4,6 +4,33 @@
 - Date: 2026-06-28
 - Tags: async, future, fork, pipe, limits
 
+> **Addendum 2026-09-05 — the premise of the "full `future_class` surface"
+> bullet changed; the decision it supports did not.** That bullet argues from
+> "the ADR-0029 fallback chain makes `DBIO::Forked::Storage` the *live* async
+> backend for every driver". Core has withdrawn ADR 0028 and ADR 0029 and put
+> ADR 0030's explicit per-connection mode in their place:
+> `DBIO::Forked::Storage` registers the `forked` mode on the core base storage
+> class, and is the backend of every connection opened with
+> `connect(..., { async => 'forked' })` — not of every driver automatically.
+> There is no fallback chain and no auto-selection (see the addendum on
+> ADR 0001).
+>
+> **The requirement is unchanged, and it never depended on that chain.** It
+> depends on what core's ResultSet/Row async helpers do once a mode *is* active:
+> they read `$storage->future_class` and call `done` / `fail` on it
+> (`_rs_run_async` in `DBIO::ResultSet`, `_row_run_async` in `DBIO::Row`), and
+> `needs_all` / `and_then` complete the same `future_class` surface core defines
+> (`needs_all` is what core's pipeline collection calls in
+> `DBIO::Storage::Async`). Under `{ async => 'forked' }` that class is
+> `DBIO::Forked::Future`, so it must carry the full surface exactly as decided
+> below. A later reader should not treat the withdrawn ADR 0029 as grounds to
+> trim it back to the minimal `DBIO::Future` contract.
+>
+> One rename from the same core change: the class the bullet below calls
+> `DBIO::Test::Future` is now `DBIO::Future::Immediate` — the production Future
+> of core's `immediate` mode. Read both mentions as naming that class; the
+> compatibility claim is otherwise unchanged.
+
 ## Context
 
 Core `DBIO::Future` is a *contract* (`then` / `catch` / `get` / `is_ready` /
@@ -61,8 +88,23 @@ that contract, and its result is produced in another process, crossing a pipe.
   `Row`/`ResultSet` (which drags a dead-in-the-parent DB handle along). A
   non-serializable return is caught at `Storable::freeze` in the child and
   surfaced as a failed Future with a clear message, not a corrupt blob.
-- `DESTROY` reaps an un-collected child (blocking `waitpid`) so no zombies are
-  left; trade-off: a pathologically stuck child can block at GC time.
+- `DESTROY` ends an un-collected child the way `cancel` does (SIGTERM, a one
+  second grace period polled with `waitpid(WNOHANG)`, then SIGKILL, then reap), so
+  no zombies are left and dropping a Future never waits for the database. `cancel`
+  does the same on request and fails the Future as cancelled; on a resolved Future
+  it does nothing, and only the owning process may call it (karr k27).
+- **A leaf future can carry a deadline** (`timeout` to `new`, set by the storage
+  from `statement_timeout`). The future checks the clock when it is asked: `get`
+  waits on the pipe no longer than the time left, `is_ready`/`is_failed` look at
+  the clock before reporting pending. At the deadline an unreadable pipe ends the
+  child the way `cancel` does and the future fails with `statement_timeout
+  exceeded`; a result that has arrived is taken as it is. Without a caller
+  asking, nothing runs the clock (loop-free); the deadline holds for whoever
+  collects the result (karr k27).
 - `is_ready`/`is_failed` on a derived (`then`/`catch`) future run the callback as
   a side effect at first force. This is the only coherent loop-free semantics
   (the callback has to run *somewhere* without a loop) and runs exactly once.
+- A Future belongs to the process that created it (it records `$$` at
+  construction). Only that process reads the pipe and reaps the child; in another
+  process `get`/`is_ready`/`is_failed` fail with `belongs to process N` and
+  `DESTROY` closes and reaps nothing. A derived future follows its source (karr k26).

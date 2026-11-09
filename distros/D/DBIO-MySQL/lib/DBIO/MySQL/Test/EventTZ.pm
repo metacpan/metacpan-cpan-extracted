@@ -4,6 +4,8 @@ package DBIO::MySQL::Test::EventTZ;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
@@ -37,7 +39,7 @@ DBIO::MySQL::Test::EventTZ - Test result class for MySQL/MariaDB timezone-aware 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

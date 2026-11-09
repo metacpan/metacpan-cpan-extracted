@@ -4,6 +4,8 @@ package DBIO::Core;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 
 __PACKAGE__->load_components(qw/
@@ -29,7 +31,7 @@ DBIO::Core - Standard base class for DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -61,7 +63,7 @@ PostgreSQL-specific example:
   package MyApp::Schema::Result::User;
   use base 'DBIO::Core';
 
-  __PACKAGE__->load_components('InflateColumn::DateTime');
+  __PACKAGE__->load_components('InflateColumn::DateTime', 'InflateColumn::Serializer');
   __PACKAGE__->table('users');
   __PACKAGE__->add_columns(
       id => {
@@ -114,6 +116,8 @@ The bundled components currently are:
 
 =over 4
 
+=item L<DBIO::Timestamp>
+
 =item L<DBIO::InflateColumn>
 
 =item L<DBIO::Relationship> (See also L<DBIO::Relationship::Base>)
@@ -148,7 +152,7 @@ These options work in C<add_columns> regardless of which style you use:
 
 =item C<retrieve_on_insert> -- set to C<1> to fetch the DB-generated value after INSERT (e.g. UUIDs)
 
-=item C<serializer_class> -- e.g. C<'JSON'> for automatic JSON inflate/deflate
+=item C<serializer_class> -- e.g. C<'JSON'> for automatic JSON inflate/deflate (needs the L<DBIO::InflateColumn::Serializer> component loaded)
 
 =item C<is_foreign_key> -- set to C<1> to mark as a foreign key
 

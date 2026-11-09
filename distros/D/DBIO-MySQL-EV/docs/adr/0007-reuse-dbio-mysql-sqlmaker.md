@@ -32,7 +32,7 @@ async driver should instantiate the same MySQL SQLMaker as the sync driver. This
 exactly the lesson the Pg sibling recorded in its ADR 0006 ("Reuse
 DBIO::PostgreSQL::SQLMaker rather than forking the SQLMaker"), where wiring the
 *base* `DBIO::SQLMaker` into the async driver silently dropped all PostgreSQL
-operators (its karr #4).
+operators (its karr k4).
 
 ## Decision
 
@@ -51,7 +51,7 @@ SQLMaker — and must not substitute the base `DBIO::SQLMaker` or a stripped mak
 
 ## Implementation
 
-Implemented in karr #7. The async storage now wires the MySQL maker:
+Implemented in karr k7. The async storage now wires the MySQL maker:
 
 - `use DBIO::MySQL::SQLMaker;` and `sql_maker_class => 'DBIO::MySQL::SQLMaker'`
   (`lib/DBIO/MySQL/Async/Storage.pm:11,44`).

@@ -4,10 +4,9 @@ use warnings;
 
 use Test::More;
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
-
 use DBIO::Storage::Async;
 use DBIO::Storage::PoolBase;
+use DBIO::Test::Future ();
 
 # A rotating credential source: each call yields a freshly-numbered
 # storage-native conninfo hashref, so we can prove the pool pulls fresh
@@ -56,7 +55,7 @@ use DBIO::Storage::PoolBase;
     bless { schema => $schema, _conninfo_provider => undef }, $class;
   }
 
-  sub future_class { 'Future' }
+  sub future_class { 'DBIO::Test::Future' }
 
   sub connect_info {
     my ($self, $info) = @_;
@@ -89,7 +88,10 @@ use DBIO::Storage::PoolBase;
       else {
         $args{conninfo} = $self->{_static_conninfo};
       }
-      MockPool->new(%args);
+      MockPool->new(
+        %args,
+        future_class => $self->future_class,
+      );
     };
   }
 }
@@ -145,7 +147,7 @@ ok !$plain->_conninfo_provider, 'provider torn down on non-broker connect_info';
 {
   package BareAsync;
   use base 'DBIO::Storage::Async';
-  sub future_class { 'Future' }
+  sub future_class { 'DBIO::Test::Future' }
 }
 my $bare = bless {}, 'BareAsync';
 eval { $bare->_async_broker_conninfo('write') };

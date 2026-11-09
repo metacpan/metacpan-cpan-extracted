@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Serialized;
 # ABSTRACT: Test result class for the serialized table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -27,7 +30,7 @@ DBIO::Test::Schema::Serialized - Test result class for the serialized table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

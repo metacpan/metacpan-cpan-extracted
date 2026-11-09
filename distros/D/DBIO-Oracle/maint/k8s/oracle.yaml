@@ -1,0 +1,201 @@
+# Oracle Database 23ai Free pod for dbio-oracle live tests.
+#
+# Image: gvenzl/oracle-free, the "slim-faststart" flavour, which carries a
+# ready-made database instead of building one on first start. Its pluggable
+# database is FREEPDB1; that is the service name the tests connect to.
+#
+# RESOURCE DISCIPLINE -- this runs on a small SHARED box (few cores, alongside
+# other DBs and services). The pod carries resources.limits so it can never
+# starve the host. Run ONE test DB at a time, run the suite through core's
+# maint/capped-test, and DELETE the pod when done -- a forgotten pod is capped
+# but still noise. See the "Live testing" section in
+# .claude/rules/.local.dbio-rules.md.
+#
+# Credentials (throwaway, test only):
+#   ORACLE_PASSWORD     password of SYS and SYSTEM
+#   APP_USER            the user the suite runs as, created in FREEPDB1
+#   APP_USER_PASSWORD   its password
+# They map onto DBIO_TEST_ORA_USER / DBIO_TEST_ORA_PASS below.
+#
+# Rights of the test user (karr k36): diff and upgrade of DBIO::Oracle::Deploy
+# build the desired state in a temporary user, DBIO_TMP_<pid>_<n>, so the user
+# needs CREATE USER, DROP USER and ALTER USER, and, to pass them on to the
+# temporary user, the privileges the install DDL needs WITH ADMIN OPTION:
+# CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW, CREATE TRIGGER,
+# CREATE PROCEDURE, CREATE TYPE, CREATE SYNONYM, UNLIMITED TABLESPACE. The
+# ConfigMap dbio-oracle-initdb below carries the script that grants
+# them; it is mounted into /container-entrypoint-initdb.d, which the image runs
+# once, after it has created APP_USER, on every fresh start of the pod -- so a
+# restarted pod has the rights again. A pod that is already up keeps the rights
+# it has; this file changes nothing in one (apply it to a new pod).
+#
+# Second users (karr k58), the schemas the cross-schema tests write into, made by
+# the second script of the ConfigMap: dbio_x (password dbio_x_secret) and the
+# lower-case user "other" (password other_secret), each with CREATE SESSION and a
+# quota on USERS (dbio_x also CREATE TABLE, CREATE SEQUENCE and CREATE TRIGGER:
+# t/10 and t/20 make their objects in its schema as that user). The test user
+# dbio gets the ANY privileges that writing into their schemas takes: CREATE,
+# ALTER and DROP ANY TABLE, INDEX, SEQUENCE and TRIGGER, SELECT, INSERT, UPDATE,
+# DELETE and COMMENT ANY TABLE, SELECT ANY DICTIONARY. The tests read the second
+# user from DBIO_TEST_ORA_EXTRAUSER_DSN (the DSN of DBIO_TEST_ORA_DSN),
+# DBIO_TEST_ORA_EXTRAUSER_USER=dbio_x and DBIO_TEST_ORA_EXTRAUSER_PASS=dbio_x_secret
+# (t/10-oracle.t, t/20-oracle-core.t, t/84-ddl-cross-schema-live.t) and skip
+# without them. The conformance case ddl-qualified-source-name needs "other"; where
+# it is missing the case stays pending on k58.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/oracle.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-oracle --timeout=360s
+#   kubectl port-forward svc/dbio-oracle 1521:1521 &
+#
+#   DBIO_TEST_ORA_DSN='dbi:Oracle://127.0.0.1:1521/FREEPDB1' \
+#   DBIO_TEST_ORA_USER=dbio \
+#   DBIO_TEST_ORA_PASS=dbio_test_secret \
+#     ../dbio/maint/capped-test prove -lr t/     # serial, capped
+#
+#   kubectl delete -f maint/k8s/oracle.yaml   # ALWAYS clean up
+#
+# The DSN form matters for one file: t/38-connect-params-live.t runs only on
+# the Easy Connect URL form above, dbi:Oracle://<host>:<port>/<service name>,
+# and skips on dbi:Oracle:host=..;port=..;service_name=FREEPDB1. Every other
+# live test takes either. A full live verification runs the suite once with
+# each.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbio-oracle-initdb
+  labels:
+    app: dbio-oracle
+data:
+  01_dbio_privileges.sql: |
+    -- Rights of the test user dbio in FREEPDB1 (karr k36). Runs as SYS after
+    -- the image has created APP_USER. The script may start in CDB$ROOT or in
+    -- the PDB; it makes sure the grants land in FREEPDB1.
+    DECLARE
+      v_target CONSTANT VARCHAR2(30) := 'FREEPDB1';
+    BEGIN
+      IF SYS_CONTEXT('USERENV', 'CON_NAME') <> v_target THEN
+        EXECUTE IMMEDIATE 'ALTER SESSION SET CONTAINER = ' || v_target;
+      END IF;
+
+      -- to make and remove the temporary user
+      EXECUTE IMMEDIATE 'GRANT CREATE USER, DROP USER, ALTER USER TO dbio';
+
+      -- to pass on to it
+      FOR p IN (
+        SELECT column_value AS priv FROM TABLE(sys.odcivarchar2list(
+          'CREATE SESSION', 'CREATE TABLE', 'CREATE SEQUENCE', 'CREATE VIEW',
+          'CREATE TRIGGER', 'CREATE PROCEDURE', 'CREATE TYPE', 'CREATE SYNONYM',
+          'UNLIMITED TABLESPACE'
+        ))
+      ) LOOP
+        EXECUTE IMMEDIATE 'GRANT ' || p.priv || ' TO dbio WITH ADMIN OPTION';
+      END LOOP;
+
+      -- to write into the schema of another user (karr k58, tables named
+      -- schema.table): the ANY privileges
+      FOR p IN (
+        SELECT column_value AS priv FROM TABLE(sys.odcivarchar2list(
+          'CREATE ANY TABLE', 'ALTER ANY TABLE', 'DROP ANY TABLE',
+          'CREATE ANY INDEX', 'ALTER ANY INDEX', 'DROP ANY INDEX',
+          'CREATE ANY SEQUENCE', 'ALTER ANY SEQUENCE', 'DROP ANY SEQUENCE',
+          'CREATE ANY TRIGGER', 'ALTER ANY TRIGGER', 'DROP ANY TRIGGER',
+          'SELECT ANY TABLE', 'INSERT ANY TABLE', 'UPDATE ANY TABLE',
+          'DELETE ANY TABLE', 'COMMENT ANY TABLE', 'SELECT ANY DICTIONARY'
+        ))
+      ) LOOP
+        EXECUTE IMMEDIATE 'GRANT ' || p.priv || ' TO dbio';
+      END LOOP;
+    END;
+    /
+  02_dbio_second_users.sql: |
+    -- The users the cross-schema tests write into (karr k58): t/84, t/85, the
+    -- conformance case ddl-qualified-source-name, t/10 and t/20 read them from
+    -- DBIO_TEST_ORA_EXTRAUSER_*. Runs as SYS after 01; created when missing,
+    -- password and quota set again when they exist, so that a re-run is safe.
+    --   DBIO_X  (unquoted, so it logs in as dbio_x)  password dbio_x_secret
+    --   other   (quoted, lower case, exactly)        password other_secret
+    -- The driver creates no user: these are the schemas it writes into.
+    DECLARE
+      v_target CONSTANT VARCHAR2(30) := 'FREEPDB1';
+
+      PROCEDURE ensure_user(p_user VARCHAR2, p_pass VARCHAR2, p_privs VARCHAR2) IS
+        v_n NUMBER;
+      BEGIN
+        SELECT COUNT(*) INTO v_n FROM dba_users WHERE username = p_user;
+        IF v_n = 0 THEN
+          EXECUTE IMMEDIATE 'CREATE USER "' || p_user || '" IDENTIFIED BY "' || p_pass || '"';
+        ELSE
+          EXECUTE IMMEDIATE 'ALTER USER "' || p_user || '" IDENTIFIED BY "' || p_pass || '"';
+        END IF;
+        EXECUTE IMMEDIATE 'ALTER USER "' || p_user || '" QUOTA UNLIMITED ON USERS';
+        EXECUTE IMMEDIATE 'GRANT ' || p_privs || ' TO "' || p_user || '"';
+      END;
+    BEGIN
+      IF SYS_CONTEXT('USERENV', 'CON_NAME') <> v_target THEN
+        EXECUTE IMMEDIATE 'ALTER SESSION SET CONTAINER = ' || v_target;
+      END IF;
+
+      -- t/10 and t/20 create their tables, sequences and triggers in the schema of
+      -- the second user as that user
+      ensure_user('DBIO_X', 'dbio_x_secret',
+        'CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE TRIGGER');
+      ensure_user('other', 'other_secret', 'CREATE SESSION');
+    END;
+    /
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-oracle
+  labels:
+    app: dbio-oracle
+    role: dbio-test-db
+spec:
+  containers:
+    - name: oracle
+      image: gvenzl/oracle-free:23-slim-faststart
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: "2"          # at most two cores on a shared box
+          memory: 3Gi
+      ports:
+        - containerPort: 1521
+      volumeMounts:
+        - name: initdb
+          mountPath: /container-entrypoint-initdb.d
+          readOnly: true
+      env:
+        - name: ORACLE_PASSWORD
+          value: dbio_test_secret
+        - name: APP_USER
+          value: dbio
+        - name: APP_USER_PASSWORD
+          value: dbio_test_secret
+      readinessProbe:
+        exec:
+          command:
+            - healthcheck.sh
+        initialDelaySeconds: 20
+        periodSeconds: 5
+        failureThreshold: 60
+  volumes:
+    - name: initdb
+      configMap:
+        name: dbio-oracle-initdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-oracle
+spec:
+  selector:
+    app: dbio-oracle
+  ports:
+    - port: 1521
+      targetPort: 1521
+      protocol: TCP

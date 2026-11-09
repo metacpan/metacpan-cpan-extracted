@@ -29,8 +29,11 @@ SQLMaker operator registration.
 
 - **One geometry renderer.** `_geom_arg` turns the user's argument into
   `('SQL fragment', @binds)` (`ResultSet.pm:43-62`): a `\['ST_…', @binds]`
-  REF passes through, a Geometry object becomes `ST_GeomFromText(?, ?)` /
-  `ST_GeomFromText(?)` bound with WKT (+SRID), and a plain EWKT string becomes
+  REF passes through, a Geometry object that carries an `ewkb_hex` becomes
+  `ST_SetSRID(?::geometry, ?)` / `?::geometry` bound with that hex (karr k22:
+  the stored doubles, not their 15-digit WKT), any other Geometry object
+  `ST_GeomFromText(?, ?)` / `ST_GeomFromText(?)` bound with WKT (+SRID), and a
+  plain EWKT string becomes
   `ST_GeomFromEWKT(?)`. This is the offline-testable seam.
 - **Function predicates via `-bool` literal.** `_spatial_search` builds
   `FUNC(me.col, <geom-sql>[, ?…])` and runs it through

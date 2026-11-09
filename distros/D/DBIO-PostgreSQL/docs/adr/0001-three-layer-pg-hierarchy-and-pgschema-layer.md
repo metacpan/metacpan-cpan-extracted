@@ -29,19 +29,21 @@ the object that actually owns it.
 1. **Database layer** — `DBIO::PostgreSQL` (the Schema component). Tracks the
    namespace-level and database-level state as class data:
    `_pg_schema_classes`, `_pg_extensions`, `_pg_search_path`, `_pg_settings`
-   (`PostgreSQL.pm:10-13`), exposed through `pg_schemas` / `pg_extensions` /
-   `pg_search_path` / `pg_settings` (`PostgreSQL.pm:126-193`).
+   (`PostgreSQL.pm`, the `mk_classdata` declarations), exposed through
+   `pg_schemas` / `pg_extensions` / `pg_search_path` / `pg_settings`
+   (`PostgreSQL.pm`, the methods of those names).
 2. **PgSchema layer** — `DBIO::PostgreSQL::PgSchema`. A namespace is a
    first-class subclassable object that holds the schema-scoped types. Enum,
    composite-type and function *definitions* are class data accumulated in
-   package-level hashes (`PgSchema.pm:7`) and read back via `_pg_enum_defs` /
-   `_pg_type_defs` / `_pg_function_defs` (`PgSchema.pm:52-54`); the declarative
-   `pg_enum` / `pg_type` / `pg_function` class methods push into them. These
-   live on the namespace, deliberately **not** on any Result.
+   package-level hashes (`PgSchema.pm`, the three `%_CLASS_*_DEFS`) and read
+   back via `_pg_enum_defs` / `_pg_type_defs` / `_pg_function_defs`
+   (`PgSchema.pm`); the declarative `pg_enum` / `pg_type` / `pg_function` class
+   methods push into them. These live on the namespace, deliberately **not** on
+   any Result.
 3. **Result layer** — `DBIO::PostgreSQL::Result`. A table carries only the
-   namespace it belongs to, via `pg_schema` (`Result.pm:9,48-54`), which flows
-   into `pg_qualified_table` to produce the `schema.table` form
-   (`Result.pm:65-70`).
+   namespace it belongs to, via `pg_schema` (`Result.pm`, `_pg_schema_name` and
+   `pg_schema`), which flows into `pg_qualified_table` to produce the
+   `schema.table` form (`Result.pm`, `pg_qualified_table`).
 
 ## Rationale
 
@@ -62,21 +64,22 @@ not a table, and without the layer everything collapses into `public`.
 - **`schema.name` is the universal model key.** Because objects live in
   namespaces, every introspected artifact is keyed by its qualified name.
   `DBIO::PostgreSQL::Introspect->qualified_key` builds the canonical
-  `"schema.name"` string (`Introspect.pm:140-170`) that indexes tables,
+  `"schema.name"` string (`Introspect.pm`, `qualified_key`) that indexes tables,
   columns, indexes and the rest. This is the single biggest structural
   divergence from the other drivers, whose keys are bare table names — recorded
-  as karr #4 SEAM C ("KEEP ALL 7"): the whole introspection contract diverges
+  as karr k4 SEAM C ("KEEP ALL 7"): the whole introspection contract diverges
   because of qualified keys.
 - **Cross-schema is a first-class case, not an edge case.** A foreign key may
   point into another namespace, so the FK introspection query selects a
-  `remote_schema` alongside `remote_table` (`Introspect/ForeignKeys.pm:46`) and
-  keys the target by its qualified name. A flat-namespace driver never needs
-  this column.
+  `remote_schema` alongside `remote_table` (`Introspect/ForeignKeys.pm`, the
+  query of `fetch`) and keys the target by its qualified name. A flat-namespace
+  driver never needs this column.
 - **DDL emits schema-qualified objects and dedupes physical tables.** View DDL
-  is emitted with its qualified name (`DDL.pm:166`), skipping virtual views and
-  de-duplicating by qualified key (`DDL.pm:162-166`); the same qualified key
-  guards the table walk so that multiple result sources mapping to one physical
-  table emit it only once (`DDL.pm:182-183`).
+  is emitted with its qualified name (`DDL.pm`, the view branch of
+  `install_ddl`), skipping virtual views and de-duplicating by qualified key
+  (`%seen_view` there); the same qualified key guards the table walk so that
+  multiple result sources mapping to one physical table emit it only once
+  (`%seen_table` in `install_ddl`).
 - New PostgreSQL object kinds (types, functions, policies) have an obvious home:
   schema-scoped ones go on `PgSchema`, table-scoped ones (indexes, triggers,
   RLS, CHECK constraints) go on `Result`. Driver authors copying the two-tier
@@ -85,3 +88,22 @@ not a table, and without the layer everything collapses into `public`.
 
 This is the keystone PostgreSQL ADR; the remaining driver ADRs (0002–0005)
 specialise core strategies *within* this three-layer hierarchy.
+
+## Addendum 2026-10-12 (karr k103)
+
+How a PgSchema class and its namespace meet, decided by the maintainer on
+2026-10-12:
+
+- **One source.** The schema class binds a PgSchema class to a namespace with
+  `pg_schema_class(NAME => CLASS)`. A PgSchema class has no name of its own;
+  an instance may be given one, `new(pg_schema_name => ...)`, and reads it
+  back.
+- **Only `pg_schemas` restricts the deploy.** A binding never does. With a
+  `pg_schemas` list declared, a binding must name a schema on it (it is
+  refused otherwise); with none, the bound class is installed after the
+  declared names and the deploy stays unrestricted.
+- **`pg_schemas` keeps the declaration order.** The install script creates
+  schemas and the types of their bindings in that order, so a type that needs
+  a type of another schema is placed by the declaration.
+- **`pg_schemas` is called before `pg_schema_class`.** Once a binding is set,
+  `pg_schemas(LIST)` is refused, naming the bound schemas.

@@ -11,7 +11,7 @@ use DBIO::Test::Schema;
   __PACKAGE__->storage_type('+DBIO::Test::Storage');
 }
 
-my $schema = TestSchema->connect;
+my $schema = TestSchema->connect(sub { }); # the fake storage opens nothing
 
 isa_ok $schema->storage, 'DBIO::Test::Storage', 'absolute +storage_type resolves correctly';
 ok $schema->storage->connected, 'absolute +storage_type schema is connected';

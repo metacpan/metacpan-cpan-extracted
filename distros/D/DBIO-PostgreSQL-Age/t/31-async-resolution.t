@@ -12,7 +12,8 @@ use mro;
 #
 # Pure class/composition assertions: no event loop, no real database. This drives
 # the REAL core resolver (DBIO::Storage::DBI::_async_storage) end-to-end on a
-# layered, driver-reblessed storage; the dsn is a string parse, nothing connects.
+# layered storage over the declared PostgreSQL driver (a storage always has a
+# driver, core ADR 0067); the dsn is a string parse, nothing connects.
 #
 # RED/GREEN discriminator: were the Age async layer absent, the future_io walk
 # would resolve the plain DBIO::PostgreSQL::Storage::Async transport (CRUD only,
@@ -62,16 +63,17 @@ is(
 );
 
 # ---------------------------------------------------------------------------
-# 2. Drive the REAL resolver: a layered schema connected { async => 'future_io' }
-#    resolves the PG transport off the DRIVER and composes the Age async layer
-#    ON TOP. Structural only -- the dsn rebless is a string parse, no DB opened.
+# 2. Drive the REAL resolver: an Age-layered storage over the declared PG driver,
+#    connected { async => 'future_io' }, resolves the PG transport off the DRIVER
+#    and composes the Age async layer ON TOP. Structural only -- the dsn is a
+#    string parse, no DB opened.
 # ---------------------------------------------------------------------------
 {
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
   $schema->register_storage_layer('DBIO::PostgreSQL::Age::Storage');
 
   my $composed_class =
-    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['DBIO::PostgreSQL::Age::Storage']);
+    DBIO::Storage::Composed->compose('DBIO::PostgreSQL::Storage', ['DBIO::PostgreSQL::Age::Storage']);
   my $storage = $composed_class->new($schema);
   $storage->connect_info(
     [ 'dbi:Pg:dbname=dbio_offline_compose', '', '', { async => 'future_io' } ]
@@ -82,11 +84,11 @@ is(
   ok !$err, 'future_io resolution over a layered Age storage does not croak'
     or diag "died with: $err";
 
-  # Sync storage reblessed onto the PG driver, keeping its Age sync layer.
+  # The sync storage stays on its declared PG driver, keeping its Age sync layer.
   isa_ok $storage, 'DBIO::PostgreSQL::Storage',
-    'sync storage reblessed onto the PostgreSQL driver';
+    'sync storage stays on the declared PostgreSQL driver';
   isa_ok $storage, 'DBIO::PostgreSQL::Age::Storage',
-    'sync storage kept its Age layer through the driver rebless';
+    'sync storage kept its Age layer through the async resolution';
 
   # The composed async backend: transport base + the Age async layer on top.
   ok $async, 'an async backend was resolved';

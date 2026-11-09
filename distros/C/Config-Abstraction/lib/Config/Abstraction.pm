@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Cwd ();
 use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
@@ -24,6 +25,10 @@ Readonly::Scalar my $_HEX_KEY_LEN     => 64;	# 32 bytes expressed as hexadecimal
 Readonly::Scalar my $_B64_KEY_MIN     => 43;	# minimum base64/base64url chars for 32 bytes
 Readonly::Scalar my $_B64_KEY_MAX     => 44;	# maximum base64/base64url chars for 32 bytes
 
+# The running script, resolved when the module is loaded, while a relative $0
+# still means what it did when the program started.  Undef under perl -e and
+# the like.  _load_config() never reads this file as configuration.
+Readonly::Scalar my $_RUNNING_SCRIPT => ((defined($0) && (-f $0)) ? Cwd::abs_path($0) : undef);
 
 =head1 NAME
 
@@ -31,11 +36,11 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.41
+Version 0.42
 
 =cut
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 =head1 SYNOPSIS
 
@@ -320,7 +325,8 @@ C<local.xml>, C<base.ini>, and C<local.ini>.
 
 If C<config_file> or C<config_files> is set, those files are loaded last.
 
-If no C<config_dirs> is given, try hard to find the files in various places.
+If no C<config_dirs> is given,
+C<Config::Abstraction> tries hard to find the files in various places.
 
 The value of C<config_dirs> can be overridden at runtime by the environment variable CONFIG_DIR
 (note that is just one directory, hence it's CONFIG_DIR not CONFIG_DIRS).
@@ -377,6 +383,11 @@ Put the more important files later,
 since later files override earlier ones.
 
 Considers the files C<default> and C<$script_name> before looking at C<config_file> and C<config_files>.
+
+The running script itself is never read as configuration, even when one of the
+configuration directories is the directory it is in, and neither is any file
+that starts with C<#!>, since such a file is a program rather than
+configuration, and the Perl parser would run it.
 
 =item * C<data>
 
@@ -1350,15 +1361,36 @@ sub _load_config
 		my $script_name = $self->{'script_name'};
 		for my $config_file ('default', $script_name, "$script_name.cfg", "$script_name.conf", "$script_name.config", $self->{'config_file'}, @{$self->{'config_files'}}) {
 			next unless defined($config_file);
-			# Note that loading $script_name in the current directory could mean loading the script as its own config.
-			# This test is not foolproof, buyer beware
-			next if(($config_file eq $script_name) && ((length($effective_dir) == 0) || ($effective_dir eq File::Spec->curdir())));
 			my $path = length($effective_dir) ? File::Spec->catfile($effective_dir, $config_file) : $config_file;
 			if($logger) {
 				$logger->debug(ref($self), ' ', __LINE__, ": Looking for configuration $path");
 			}
 			if((-f $path) && (-r $path)) {
+				# Never read the running script as its own configuration.  Its
+				# name is on the list above, and the Config::Auto fallback below
+				# would eval it as Perl, running the program again inside
+				# itself.  Comparing real paths catches every way of reaching
+				# it - CONFIG_DIR set to the script's own directory, a symlink,
+				# a relative path - where comparing names in the current
+				# directory only caught one.
+				if(defined($_RUNNING_SCRIPT) && (my $real_path = Cwd::abs_path($path))) {
+					if($real_path eq $_RUNNING_SCRIPT) {
+						if($logger) {
+							$logger->debug(ref($self), ' ', __LINE__, ": Skipping $path: it is the running script");
+						}
+						next;
+					}
+				}
 				my $data = read_file($path);
+				# A file that starts with #! is a program, not configuration,
+				# whatever it is called and wherever it is: for example a copy
+				# of the script.  It must never reach the Perl parsers below.
+				if($data =~ /\A#!/) {
+					if($logger) {
+						$logger->debug(ref($self), ' ', __LINE__, ": Skipping $path: it is a program (starts with #!)");
+					}
+					next;
+				}
 				my $raw_content = $data;
 				if($logger) {
 					$logger->debug(ref($self), ' ', __LINE__, ": Loading data from $path");

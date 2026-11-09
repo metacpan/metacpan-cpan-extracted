@@ -1,56 +1,12 @@
 package DBIO::MySQL::SQLMaker::MariaDB;
-# ABSTRACT: SQLMaker subclass for MariaDB's SQL syntax quirks
+# ABSTRACT: Deprecated alias of DBIO::MySQL::SQLMaker
 
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::MySQL::SQLMaker';
-
-
-# Reuse the parent's lock_modifiers (NOWAIT / SKIP LOCKED) but override
-# the lock_types mapping: 'share' means LOCK IN SHARE MODE on MariaDB.
-my $lock_types = {
-  update => 'FOR UPDATE',
-  share  => 'LOCK IN SHARE MODE',
-};
-
-my $lock_modifiers = {
-  nowait      => 'NOWAIT',
-  skip_locked => 'SKIP LOCKED',
-};
-
-sub _lock_select {
-  my ($self, $type) = @_;
-
-  if (ref $type eq 'HASH') {
-    my $lock_type = $type->{type};
-    my $tables    = $type->{of};
-    my $modifier  = $type->{modifier};
-
-    my $lock_clause = $lock_types->{$lock_type}
-      || $self->throw_exception("Unknown SELECT .. FOR type '$lock_type' requested");
-
-    if ($tables) {
-      my @table_list = ref $tables eq 'ARRAY' ? @$tables : ($tables);
-      if (@table_list) {
-        my $quoted_tables = join(', ', map { $self->_quote($_) } @table_list);
-        $lock_clause .= " OF $quoted_tables";
-      }
-    }
-
-    if ($modifier) {
-      my $mod_sql = $lock_modifiers->{$modifier}
-        || $self->throw_exception("Unknown lock modifier '$modifier' requested");
-      $lock_clause .= " $mod_sql";
-    }
-
-    return " $lock_clause";
-  }
-
-  my $sql = $lock_types->{$type}
-    || $self->throw_exception("Unknown SELECT .. FOR type '$type' requested");
-  return " $sql";
-}
 
 
 1;
@@ -63,30 +19,49 @@ __END__
 
 =head1 NAME
 
-DBIO::MySQL::SQLMaker::MariaDB - SQLMaker subclass for MariaDB's SQL syntax quirks
+DBIO::MySQL::SQLMaker::MariaDB - Deprecated alias of DBIO::MySQL::SQLMaker
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
-C<DBIO::MySQL::SQLMaker::MariaDB> is a SQLMaker subclass for MariaDB.
-It is used automatically by L<DBIO::MySQL::Storage::MariaDB>.
+B<Deprecated. This class adds nothing and exists only so that an explicit
+C<< sql_maker_class => 'DBIO::MySQL::SQLMaker::MariaDB' >> in existing
+configuration keeps working.> Use L<DBIO::MySQL::SQLMaker>; a connection made
+through either of this dist's schema components already does.
 
-MariaDB's locking syntax differs from MySQL 8.0+: it only supports
-C<LOCK IN SHARE MODE>, not C<FOR SHARE>. This subclass overrides
-C<_lock_select> so that C<< for =E<gt> 'share' >> emits
-C<LOCK IN SHARE MODE> when talking to MariaDB, while still accepting
-the same DSL the MySQL parent uses.
+It used to exist for one thing: MariaDB has no C<FOR SHARE>, so it overrode
+C<_lock_select> to spell C<< for => 'share' >> as C<LOCK IN SHARE MODE>, and
+L<DBIO::MySQL::Storage::MariaDB> selected it as its C<sql_maker_class>.
 
-=seealso
+That put an B<engine> question on a B<DBD> class, and got two of the four
+DBD/engine combinations wrong (this dist's ADR 0003). L<DBD::MariaDB> connects
+to MySQL servers, where the override then produced C<LOCK IN SHARE MODE OF `t`
+NOWAIT> -- rejected, because on MySQL the legacy spelling is exactly the one
+that carries neither C<OF> nor a modifier. And L<DBD::mysql> connects to
+MariaDB servers, which do not reach this class: a schema declares its driver,
+and one that loads the MySQL component keeps L<DBIO::MySQL::Storage>. They
+were handed the C<FOR SHARE> that MariaDB has in no version.
+
+The decision now belongs to the server: L<DBIO::MySQL::Storage/_lock_dialect>
+reads the product and version and hands the answer to
+L<DBIO::MySQL::SQLMaker/_lock_select>, which renders it. So this subclass
+overrides nothing -- and a configuration still naming it inherits the correct,
+server-keyed behaviour instead of the old fixed one.
+
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 
-=item * L<DBIO::MySQL::SQLMaker> - MySQL parent class
+=item * L<DBIO::MySQL::SQLMaker> - the class this one is now an empty alias of
 
-=item * L<DBIO::MySQL::Storage::MariaDB> - consumer of this SQLMaker
+=item * L<DBIO::MySQL::Storage> - decides the lock dialect from the server
+
+=item * L<DBIO::MySQL::Storage::MariaDB> - the DBD::MariaDB binding, and nothing else
 
 =back
 

@@ -10,6 +10,16 @@ use Test::More;
 # a real DB. Here the mock pool's acquire() returns a *real* done Future
 # wrapping a mock connection — exactly the core PoolBase contract — so
 # select_async/insert_async/etc. run through acquire->then end to end.
+#
+# CORE k193 ADOPTION (ref "fix(async): restore select preparation parity"):
+# Async SELECT preparation was lifted to DBIO::Storage::Async and routed through
+# the owning sync storage's _select_args seam. To exercise that path offline
+# without standing up a real DBIO::PostgreSQL::Storage + DBD::Pg, the test
+# attaches a minimal mock owner (FacadeMockOwner, below) that returns the
+# canonical (op, from, select, where, attrs) tuple the inherited runner hands
+# straight to sql_maker->select(@_). The test's other assertions (Future-as-
+# conn dispatch, $N placeholder translation, acquire/release balance) are
+# unchanged -- they test *this* transport's shape, not the sync driver's.
 
 # Mock EV::Pg so we don't need real PostgreSQL. Set up before Storage's
 # runtime `require EV::Pg` in listen().
@@ -56,6 +66,7 @@ use DBIO::PostgreSQL::EV::Storage;
   sub acquire     { $_[0]->{acquired}++; Future->done($_[0]->{conn}) }
   sub acquire_txn { $_[0]->acquire }
   sub release     { $_[0]->{released}++ }
+  sub _lease      { 1 }   # the lease of a borrow (core k275, karr k89)
   sub shutdown    {}
 }
 
@@ -65,6 +76,32 @@ $storage->connect_info([ { host => 'localhost', dbname => 'test' } ]);
 my $pool = FacadeMockPool->new;
 $storage->{pool} = $pool;
 my $conn = $pool->{conn};
+
+# Mock owning sync storage: returns the canonical _select_args tuple so the
+# core k193 prepare-args path is satisfied without needing a live DBD::Pg. The
+# exact SQL content is the real DBIO::PostgreSQL::SQLMaker's choice -- the mock
+# preserves the args shape, the maker does the rendering; positional '?'
+# placeholders then pass through EV::Storage::_transform_sql, which the
+# assertions below exercise. See k193 in the test header above.
+{
+  package FacadeMockOwner;
+  sub new     { my $class = shift; bless { @_ }, $class }
+  # The transport takes its quoting from the owner's SQL maker (karr k88):
+  # a sync PostgreSQL storage's, with nothing said, quotes with " and . .
+  sub sql_maker { DBIO::PostgreSQL::SQLMaker->new(quote_char => '"', name_sep => '.') }
+  sub _select_args {
+    my ($self, $ident, $select, $where, $attrs) = @_;
+    # Mirrors DBIO::Storage::DBI::_select_args for the trivial non-complex-
+    # prefetch case: ('select', from, select, where, attrs). _prepare_select_args_async
+    # shifts 'select' and forwards the rest to sql_maker->select(@args).
+    return ('select', $ident, $select, $where, $attrs || {});
+  }
+}
+# Held in a lexical so the weakened back-reference on $storage stays alive
+# across the test scope -- DBIO::Storage::Async::_owner_storage weaken()s the
+# assignment, which de-refs back to undef the moment a bare temporary dies.
+my $mock_owner = FacadeMockOwner->new;
+$storage->_owner_storage($mock_owner);
 
 # --- select_async ---
 
@@ -124,7 +161,7 @@ ok $storage->delete_async('artist', { id => 1 })->is_done,
 like $conn->{queries}[-1], qr/^DELETE/i, 'DELETE dispatched';
 
 # --- positional placeholders: SQL reaching libpq must use $N, never '?' ---
-# karr #7: the maker emits '?', libpq needs '$N'. The mock above records every
+# karr k7: the maker emits '?', libpq needs '$N'. The mock above records every
 # SQL string dispatched to query_params; assert each bound statement was
 # translated. This is the offline guard the original facade test lacked (it
 # mocked libpq, so a '?' that a real server rejects sailed through unnoticed).

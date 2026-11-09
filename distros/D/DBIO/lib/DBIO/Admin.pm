@@ -4,11 +4,14 @@ package DBIO::Admin;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use Carp ();
 use JSON::MaybeXS;
 use Try::Tiny;
 use Scalar::Util 'blessed';
 use namespace::clean;
+
 
 
 sub new {
@@ -20,7 +23,7 @@ sub new {
     $self->{$attr} = $args{$attr} if exists $args{$attr};
   }
 
-  for my $attr (qw/force quiet _confirm trace/) {
+  for my $attr (qw/force quiet _confirm trace all dry_run/) {
     $self->{$attr} = $args{$attr} ? 1 : 0 if exists $args{$attr};
   }
 
@@ -49,10 +52,12 @@ sub new {
   return $self;
 }
 
+
 sub schema_class { $_[0]->{schema_class} }
 sub config_stanza { $_[0]->{config_stanza} }
 sub sql_dir { $_[0]->{sql_dir} }
 sub config_file { $_[0]->{config_file} }
+
 
 sub resultset {
   if (@_ > 1) {
@@ -62,6 +67,7 @@ sub resultset {
   return $_[0]->{resultset};
 }
 
+
 sub force {
   if (@_ > 1) {
     $_[0]->{force} = $_[1];
@@ -69,6 +75,29 @@ sub force {
   }
   return $_[0]->{force};
 }
+
+
+sub dry_run {
+  if (@_ > 1) {
+    $_[0]->{dry_run} = $_[1] ? 1 : 0;
+    return $_[0];
+  }
+  return $_[0]->{dry_run};
+}
+
+
+sub all {
+  if (@_ > 1) {
+    $_[0]->{all} = $_[1] ? 1 : 0;
+    return $_[0];
+  }
+  return $_[0]->{all};
+}
+
+sub _all_option {
+  return $_[0]->{all} ? { all => 1 } : undef;
+}
+
 
 sub quiet {
   if (@_ > 1) {
@@ -78,6 +107,7 @@ sub quiet {
   return $_[0]->{quiet};
 }
 
+
 sub mode {
   if (@_ > 1) {
     $_[0]->{mode} = $_[1];
@@ -85,6 +115,7 @@ sub mode {
   }
   return $_[0]->{mode};
 }
+
 
 sub where {
   if (@_ > 1) {
@@ -94,6 +125,7 @@ sub where {
   return $_[0]->{where};
 }
 
+
 sub set {
   if (@_ > 1) {
     $_[0]->{set} = _coerce_hashref($_[1]);
@@ -102,6 +134,7 @@ sub set {
   return $_[0]->{set};
 }
 
+
 sub attrs {
   if (@_ > 1) {
     $_[0]->{attrs} = _coerce_hashref($_[1]);
@@ -109,6 +142,7 @@ sub attrs {
   }
   return $_[0]->{attrs};
 }
+
 
 sub trace {
   my ($self, @args) = @_;
@@ -119,6 +153,7 @@ sub trace {
   }
   return $self->{trace};
 }
+
 
 sub schema {
   my ($self) = @_;
@@ -141,6 +176,7 @@ sub _build_schema {
   return $schema;
 }
 
+
 sub connect_info {
   my ($self) = @_;
   $self->{connect_info} ||= $self->_build_connect_info;
@@ -151,6 +187,7 @@ sub _build_connect_info {
   my ($self) = @_;
   return $self->_find_stanza($self->config, $self->config_stanza);
 }
+
 
 sub config {
   my ($self) = @_;
@@ -172,19 +209,41 @@ sub _build_config {
   return $cfg;
 }
 
+
 sub upgrade {
   my ($self) = @_;
   my $mode = lc($self->mode || 'auto');
   Carp::croak("Unsupported mode '$mode' (expected auto|native)")
     unless $mode =~ /\A(?:auto|native)\z/;
 
-  my $native = $self->_upgrade_native;
-  return $native if defined $native;
+  my $deploy = $self->_native_deploy
+    or Carp::croak('No native upgrade path available for this schema/driver');
 
-  Carp::croak('No native upgrade path available for this schema/driver');
+  my $diff = $deploy->diff;
+  return unless $diff->has_changes;
+
+  if ($self->dry_run) {
+    print "Summary:\n", $diff->summary, "\n\nSQL:\n", $diff->as_sql, "\n";
+    return $diff;
+  }
+
+  my $allow = $self->force ? 1 : 0;
+  # A refusing diff goes straight to apply, which throws; asking first would
+  # offer a release that does not exist.
+  my $refused = @{ $diff->classify->{refused} || [] };
+  if (!$allow && !$refused && (my @risky = $diff->destructive_operations)) {
+    print "This upgrade drops or may alter stored data:\n",
+          (map { '  ' . $_->summary . "\n" } @risky);
+    return 0 unless $self->_confirm;
+    $allow = 1;
+  }
+
+  $deploy->apply($diff, allow_destructive => $allow);
+  return $diff;
 }
 
-sub _upgrade_native {
+# The Deploy object of the schema's driver, or undef without a native path.
+sub _native_deploy {
   my ($self) = @_;
   my $schema = $self->schema;
 
@@ -192,17 +251,18 @@ sub _upgrade_native {
   if ($schema->can('pg_deploy')) {
     _require_module('DBIO::PostgreSQL::Deploy',
       'Native PostgreSQL upgrade requires DBIO-PostgreSQL (install DBIO::PostgreSQL)');
-    my $deploy = $schema->pg_deploy;
-    return $deploy->upgrade;
+    return $schema->pg_deploy;
   }
 
   return undef;
 }
 
+
 sub deploy {
   my ($self, $args) = @_;
   return $self->schema->deploy($args, $self->sql_dir);
 }
+
 
 sub insert {
   my ($self, $rs, $set) = @_;
@@ -216,6 +276,7 @@ sub insert {
   print ''.ref($resultset).' ID: '.join(',', $obj->id)."\n" if !$self->quiet;
   return $obj;
 }
+
 
 sub update {
   my ($self, $rs, $set, $where) = @_;
@@ -237,8 +298,9 @@ sub update {
   }
 
   return 0 unless $self->force || $self->_confirm;
-  return $resultset->update_all($set);
+  return $resultset->update_all($set, $self->_all_option);
 }
+
 
 sub delete {
   my ($self, $rs, $where, $attrs) = @_;
@@ -260,8 +322,9 @@ sub delete {
   }
 
   return 0 unless $self->force || $self->_confirm;
-  return $resultset->delete_all;
+  return $resultset->delete_all($self->_all_option);
 }
+
 
 sub select {
   my ($self, $rs, $where, $attrs) = @_;
@@ -399,8 +462,14 @@ sub _build_json_decoder {
       allow_barekey     => 1,
       allow_singlequote => 1,
       relaxed           => 1,
+      canonical         => 1,
+      convert_blessed   => 1,
     );
-  } || JSON::MaybeXS->new(relaxed => 1);
+  } || JSON::MaybeXS->new(
+    relaxed         => 1,
+    canonical       => 1,
+    convert_blessed => 1,
+  );
 }
 
 sub _require_module {
@@ -427,7 +496,7 @@ DBIO::Admin - Lightweight schema administration helper for DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -459,6 +528,178 @@ Supported operations:
 =item * C<select>, C<insert>, C<update>, C<delete>
 
 =back
+
+=head1 ATTRIBUTES
+
+=head2 schema_class
+
+The schema class to connect with. Read-only.
+
+=head2 config_stanza
+
+C<::>-separated path into the configuration naming the entry whose
+C<connect_info> to use (see L</connect_info>). Read-only.
+
+=head2 sql_dir
+
+Directory handed to L<DBIO::Schema/deploy> as its second argument by
+L</deploy>. Read-only.
+
+=head2 config_file
+
+Configuration file loaded through L<Config::Any> when no C<config> was given.
+Read-only.
+
+=head2 resultset
+
+Default source name for L</insert>, L</update>, L</delete> and L</select>.
+Read/write; the setter returns the object for chaining.
+
+=head2 force
+
+When true, L</update>, L</delete> and L</upgrade> run without asking for
+confirmation; for L</upgrade> it is the release of a destructive diff.
+Read/write; the setter returns the object.
+
+=head2 dry_run
+
+When true, L</upgrade> prints the summary and the SQL of the diff and executes
+nothing. Read/write; the setter returns the object. C<dbioadmin> sets it with
+C<--dry-run>.
+
+=head2 all
+
+When true, L</update> and L</delete> may run without a condition and change
+every row of the source (ADR 0069); the release is handed to
+L<DBIO::ResultSet/update> and L<DBIO::ResultSet/delete>. Without it a
+statement without a condition throws, as in the core. Read/write; the setter
+returns the object. C<dbioadmin> sets it with C<--all>.
+
+=head2 quiet
+
+When true, L</insert>, L</update> and L</delete> print nothing. Read/write;
+the setter returns the object.
+
+=head2 mode
+
+Upgrade mode, C<auto> (default) or C<native>; see L</MODES>. Read/write; the
+setter returns the object.
+
+=head2 where
+
+Default search condition for L</update>, L</delete> and L</select>.
+Read/write; the setter accepts a hashref or JSON string and returns the
+object.
+
+=head2 set
+
+Default column values for L</insert> and L</update>. Read/write; the setter
+accepts a hashref or JSON string and returns the object.
+
+=head2 attrs
+
+Default search attributes for L</delete> and L</select>. Read/write; the
+setter accepts a hashref or JSON string and returns the object.
+
+=head2 trace
+
+When true, storage debugging (SQL tracing) is enabled on the schema. The
+setter also switches C<< $schema->storage->debug >> immediately (connecting
+the schema if needed) and returns the object.
+
+=head2 schema
+
+The connected schema. Built lazily from L</schema_class> and L</connect_info>
+unless one was passed to L</new>: for a known DSN driver (Pg, SQLite, MySQL,
+MariaDB, Oracle, DB2, Informix, Firebird, Sybase, MSSQL) it first croaks if
+no matching DBIO driver distribution is installed, then connects with
+C<ignore_version> set.
+
+=head2 connect_info
+
+Connection arguments for L</schema>. Built lazily from L</config> by
+walking L</config_stanza> (and descending into its C<connect_info> key if
+present). May resolve to an arrayref (passed through as-is) or a hashref
+with C<dsn>, C<user>, C<password> and further attributes.
+
+=head2 config
+
+The parsed configuration hashref. Built lazily by loading L</config_file>
+through L<Config::Any> (which must be installed).
+
+=head1 METHODS
+
+=head2 new
+
+  my $admin = DBIO::Admin->new(%args);
+
+Accepted arguments: C<schema_class>, C<resultset>, C<config_stanza>,
+C<sql_dir>, C<config_file>, C<mode> (stored as given); C<force>, C<quiet>,
+C<trace>, C<all>, C<dry_run> (stored as booleans); C<where>, C<set>, C<attrs> (hashrefs, or JSON
+strings that are decoded -- the decoder is relaxed and, where supported,
+accepts bare keys and single quotes); C<connect_info> (arrayref, hashref, or a
+JSON string); C<config> (hashref or JSON string); and a ready C<schema>.
+C<schema_class> is loaded immediately (croaking if it cannot be); C<mode>
+defaults to C<auto>.
+
+=head2 upgrade
+
+Runs the native upgrade path for the schema's driver: computes the diff of the
+live database against the schema class and applies it
+(L<DBIO::Deploy::Base/apply>). Returns the diff, or false when the database
+was already up to date or the run was not confirmed.
+Currently the native path is the PostgreSQL one, used when the schema
+C<can('pg_deploy')> (requires DBIO-PostgreSQL). Croaks on an unknown L</mode>,
+or when no native upgrade path is available.
+
+A diff that drops or may alter stored data (a table, schema, type, extension
+or column the schema class does not declare, a possibly lossy type change) is
+announced with the C<summary> of those operations and runs after the
+confirmation C<YES> on STDIN, as L</update> and L</delete> do; L</force> gives
+the release without asking (C<dbioadmin --force>). Operations the deploy
+refuses are never applied, with or without L</force>.
+
+With L</dry_run> the summary and the SQL of the diff are printed and nothing is
+executed (C<dbioadmin --dry-run>); the diff is returned.
+
+=head2 deploy
+
+  $admin->deploy(\%sqlt_args);
+
+Calls C<< $schema->deploy($args, $admin->sql_dir) >>.
+
+=head2 insert
+
+  my $row = $admin->insert($source, \%set);
+
+Inserts one row into C<$source> (default L</resultset>) with the values
+C<%set> (default L</set>), prints its id unless L</quiet>, and returns the
+row object. Croaks if either is missing.
+
+=head2 update
+
+  my $n = $admin->update($source, \%set, \%where);
+
+Updates every row of C<$source> matching C<%where> via C<update_all>.
+Arguments default to L</resultset>, L</set> and L</where>. Unless L</quiet>,
+prints how many records will be modified; unless L</force>, asks on STDIN for
+C<YES> first and returns 0 if not confirmed.
+
+=head2 delete
+
+  my $n = $admin->delete($source, \%where, \%attrs);
+
+Deletes every row of C<$source> matching C<%where> / C<%attrs> via
+C<delete_all>. Arguments default to L</resultset>, L</where> and L</attrs>;
+announcement and confirmation work as in L</update>.
+
+=head2 select
+
+  my $data = $admin->select($source, \%where, \%attrs);
+
+Returns an arrayref of arrayrefs: the first row holds the source's column
+names, each further row the raw column values of one matching record.
+Arguments default to L</resultset>, L</where> and L</attrs>.
 
 =head1 SEE ALSO
 

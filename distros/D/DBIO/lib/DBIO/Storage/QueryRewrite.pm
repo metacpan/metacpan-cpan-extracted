@@ -4,11 +4,13 @@ package DBIO::Storage::QueryRewrite;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage';
 use mro 'c3';
 
 use Scalar::Util 'blessed';
-use DBIO::Util qw(UNRESOLVABLE_CONDITION serialize dump_value);
+use DBIO::Util qw(UNRESOLVABLE_CONDITION serialize);
 use DBIO::Util qw(is_plain_value is_literal_value);
 use DBIO::Carp;
 use namespace::clean;
@@ -27,7 +29,18 @@ sub _prune_unused_joins {
       and
     ref $attrs->{from}[1] eq 'ARRAY'
       and
-    $self->_use_join_optimizer
+    # _adjust_select_args_for_complex_prefetch forces the optimizer on for the
+    # inner subquery and off again once that {from} is pruned, and it needs a
+    # dynamically scoped switch to do it. It used to local()ise the raw
+    # _use_join_optimizer slot, i.e. the private storage of an accessor in the
+    # dbms_capability group -- which stopped working the moment capabilities
+    # became delegable (on a replicated storage the read goes to the
+    # master backend and never sees a slot set here). The override is its own
+    # slot now: join pruning is a core query rewrite, not an engine fact, so it
+    # has no business borrowing a capability's storage.
+    ( exists $self->{_join_optimizer_override}
+        ? $self->{_join_optimizer_override}
+        : $self->_use_join_optimizer )
   );
 
   my $orig_aliastypes = $self->_resolve_aliastypes_from_select_args($attrs);
@@ -188,7 +201,7 @@ sub _adjust_select_args_for_complex_prefetch {
   my $inner_subq = do {
 
     # must use it here regardless of user requests (vastly gentler on optimizer)
-    local $self->{_use_join_optimizer} = 1;
+    local $self->{_join_optimizer_override} = 1;
 
     # throw away multijoins since we def. do not care about those inside the subquery
     ($inner_attrs->{from}, my $inner_aliastypes) = $self->_prune_unused_joins ({
@@ -229,7 +242,7 @@ sub _adjust_select_args_for_complex_prefetch {
 
     # we already optimized $inner_attrs->{from} above
     # and already local()ized
-    $self->{_use_join_optimizer} = 0;
+    $self->{_join_optimizer_override} = 0;
 
     # generate the subquery
     $self->_select_args_to_query (
@@ -471,7 +484,7 @@ sub _resolve_aliastypes_from_select_args {
       );
 
       if (ref $_) {
-        $self->throw_exception("Unexpected ref in scan-plan: " . dump_value($v) );
+        $self->throw_exception("Unexpected " . ref($_) . " reference in scan-plan");
       }
 
       push @nv, $_;
@@ -655,13 +668,14 @@ sub _group_over_selection {
         map { ref $_ eq 'ARRAY' ? $_ : [ $_ ] } $sql_maker->_order_by_chunks($attrs->{order_by})
       ];
 
-      my ($chunk, $is_desc) = $sql_maker->_split_order_chunk($order_chunks->[$o_idx][0]);
+      my ($chunk, $is_desc, $nulls) = $sql_maker->_split_order_chunk($order_chunks->[$o_idx][0]);
 
       $new_order_by[$o_idx] = \[
-        sprintf( '%s( %s )%s',
+        sprintf( '%s( %s )%s%s',
           $self->_minmax_operator_for_datatype($chunk_ci->{data_type}, $is_desc),
           $chunk,
           ($is_desc ? ' DESC' : ''),
+          ($nulls ? " NULLS $nulls" : ''),
         ),
         @ {$order_chunks->[$o_idx]} [ 1 .. $#{$order_chunks->[$o_idx]} ]
       ];
@@ -1015,6 +1029,17 @@ sub _extract_colinfo_of_stable_main_source_order_by_portion {
 # things to tackle when we get access to a formalized AST. Note that this code
 # is covered by a *ridiculous* amount of tests, so starting with porting this
 # code would be a rather good exercise
+# A collapsed condition is FALSE when it is exactly { -or => [] }; a condition
+# that collapsed to nothing is TRUE. The same truth rule as the SQLMaker
+# (ADR 0069): a FALSE part restricts, a TRUE part drops out.
+sub _is_false_cond {
+  my ($c) = @_;
+  return (
+    ref $c eq 'HASH' and keys %$c == 1
+      and ref $c->{-or} eq 'ARRAY' and ! @{ $c->{-or} }
+  ) ? 1 : 0;
+}
+
 
 sub _collapse_cond {
   my ($self, $where, $where_is_anded_array) = @_;
@@ -1047,8 +1072,8 @@ sub _collapse_cond {
         }
       }
       elsif (ref $chunk eq 'ARRAY') {
-        push @pairs, -or => $chunk
-          if @$chunk;
+        # [] is FALSE and stays (ADR 0069)
+        push @pairs, -or => $chunk;
       }
       elsif ( ! length ref $chunk) {
 
@@ -1069,7 +1094,12 @@ sub _collapse_cond {
       or return;
 
     # Consolidate various @conds back into something more compact
+    my $has_false;
     for my $c (@conds) {
+      # FALSE once is FALSE
+      if (_is_false_cond($c)) {
+        next if $has_false++;
+      }
       if (ref $c ne 'HASH') {
         push @{$fin->{-and}}, $c;
       }
@@ -1105,6 +1135,7 @@ sub _collapse_cond {
   elsif (ref $where eq 'ARRAY') {
     # we are always at top-level here, it is safe to dump empty *standalone* pieces
     my $fin_idx;
+    my $has_true;
 
     for (my $i = 0; $i <= $#$where; $i++ ) {
 
@@ -1120,8 +1151,10 @@ sub _collapse_cond {
         $self->throw_exception("Unsupported top-level op/arg pair: [ $logic_mod => $where->[$i] ]")
           unless ref $where->[$i] eq 'HASH' or ref $where->[$i] eq 'ARRAY';
 
-        my $sub_elt = $self->_collapse_cond({ $logic_mod => $where->[$i] })
-          or next;
+        my $sub_elt = $self->_collapse_cond({ $logic_mod => $where->[$i] });
+        # nothing left is TRUE: it makes the or TRUE; FALSE drops out
+        if (! $sub_elt) { $has_true = 1; next }
+        next if _is_false_cond($sub_elt);
 
         my @keys = keys %$sub_elt;
         if ( @keys == 1 and $keys[0] !~ /^\-/ ) {
@@ -1132,19 +1165,27 @@ sub _collapse_cond {
         }
       }
       elsif (! length ref $where->[$i] ) {
-        my $sub_elt = $self->_collapse_cond({ @{$where}[$i, $i+1] })
-          or next;
+        my $sub_elt = $self->_collapse_cond({ @{$where}[$i, $i+1] });
+        if (! $sub_elt) { $has_true = 1; next }
+        next if _is_false_cond($sub_elt);
 
         $fin_idx->{ "COL_$where->[$i]_" . serialize $sub_elt } = $sub_elt;
         $i++;
       }
       else {
-        $fin_idx->{ "SER_" . serialize $where->[$i] } = $self->_collapse_cond( $where->[$i] ) || next;
+        my $sub_elt = $self->_collapse_cond( $where->[$i] );
+        if (! $sub_elt) { $has_true = 1; next }
+        next if _is_false_cond($sub_elt);
+        $fin_idx->{ "SER_" . serialize $where->[$i] } = $sub_elt;
       }
     }
 
-    if (! $fin_idx) {
+    if ($has_true) {
       return;
+    }
+    elsif (! $fin_idx) {
+      # an or of nothing (or of FALSE only) is FALSE
+      return { -or => [] };
     }
     elsif ( keys %$fin_idx == 1 ) {
       $fin = (values %$fin_idx)[0];
@@ -1299,14 +1340,9 @@ sub _collapse_cond_unroll_pairs {
 
             # extra sanity check
             if (keys %$p > 1) {
-              require Data::Dumper;
-              local $Data::Dumper::Indent = 1;
-              local $Data::Dumper::Terse = 1;
-              local $Data::Dumper::Sortkeys = 1;
-              local $Data::Dumper::Deepcopy = 1;
               $self->throw_exception(
-                "Internal error: unexpected collapse unroll:"
-              . Data::Dumper::Dumper { in => { $lhs => $rhs }, out => $p }
+                "Internal error: unexpected collapse unroll for '$lhs' into "
+              . scalar(keys %$p) . ' pairs'
               );
             }
 
@@ -1489,7 +1525,7 @@ DBIO::Storage::QueryRewrite - SQL analysis and query rewrite utilities
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -1531,6 +1567,12 @@ C<SELECT me.*, other.* FROM ( SELECT me.* FROM ... ) JOIN other ON ...>
 =head2 _extract_colinfo_of_stable_main_source_order_by_portion
 
 =head2 _collapse_cond
+
+Collapses a condition to the form that holds its definitive parts. Its empty
+pieces follow the truth rule of the SQLMaker (ADR 0069): a FALSE part (C<[]>,
+C<< -or => [] >>) restricts and stays as C<< -or => [] >>, a TRUE part (C<{}>,
+C<< -and => [] >>) drops out; a condition that is TRUE as a whole collapses to
+nothing.
 
 =head2 _collapse_cond_unroll_pairs
 

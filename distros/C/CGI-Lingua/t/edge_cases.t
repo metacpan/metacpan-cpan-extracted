@@ -67,6 +67,7 @@ sub _inject_ipcountry {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 }
 
 # -------------------------------------------------------------------------------
@@ -495,6 +496,7 @@ subtest 'cache: numeric country code triggers warning' => sub {
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	$l->country();
 
 	ok((grep { ref($_) ? $_->{warning} =~ /numeric/i : /numeric/i } @warnings),
@@ -522,6 +524,7 @@ subtest 'cache: numeric country removed under correct namespaced key (bug fix)' 
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	$l->country();
 
 	ok(!defined $cache->get($poison_key),
@@ -547,6 +550,7 @@ subtest 'cache: country() called twice with numeric-poisoned cache warns only on
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 
 	$l->country();    # first call - detects and removes poison
 	my $warn_count_after_first = scalar grep {
@@ -671,6 +675,7 @@ subtest 'geo: geoplugin returns empty JSON object - country() returns undef' => 
 		$l->{_have_ipcountry} = 0;
 		$l->{_have_geoip}     = 0;
 		$l->{_have_geoipfree} = 0;
+		$l->{_have_mmdb} = 0;
 
 		my $cc = $l->country();
 		# {} has no geoplugin_countryCode key - Whois (no-op mock) is tried next.
@@ -696,6 +701,7 @@ subtest 'geo: geoplugin returns malformed JSON - country() survives' => sub {
 		$l->{_have_ipcountry} = 0;
 		$l->{_have_geoip}     = 0;
 		$l->{_have_geoipfree} = 0;
+		$l->{_have_mmdb} = 0;
 
 		my $cc;
 		lives_ok { $cc = $l->country() }
@@ -723,6 +729,7 @@ subtest 'geo: geoplugin returns numeric country code - discarded with warning' =
 		$l->{_have_ipcountry} = 0;
 		$l->{_have_geoip}     = 0;
 		$l->{_have_geoipfree} = 0;
+		$l->{_have_mmdb} = 0;
 		$l->country();
 
 		ok((grep { ref($_) ? $_->{warning} =~ /numeric/i : /numeric/i } @warnings),
@@ -1085,7 +1092,7 @@ subtest 'REMOTE_ADDR: boundary and ambiguous addresses' => sub {
 	for my $ip ('0.0.0.0', '255.255.255.255', '::', '::ffff:255.255.255.255', '010.008.0.1', "8.8.8.8\x00") {
 		local %ENV = (REMOTE_ADDR => $ip);
 		my $l = _spied([$LANG{EN}]);
-		$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+		$l->{_have_mmdb} = $l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
 		my $cc;
 		lives_ok { $cc = $l->country() } 'lives for ' . unpack('H*', $ip);
 		ok(!defined($cc) || $cc =~ /^[a-z]{2}\z/, 'and gives undef or a real code');
@@ -1333,7 +1340,7 @@ subtest 'cache: poisoned entries never become answers' => sub {
 	my $cache = CHI->new(driver => 'Memory', global => 0);
 	$cache->set($_ => $poison{$_}) for keys %poison;
 	my $l = _spied([$LANG{EN}], cache => $cache);
-	$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = $l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
 
 	my $cc = $l->country();
 	ok(!defined($cc) || $cc =~ /^[a-z]{2}\z/, 'country() is not the poisoned value');
@@ -1406,7 +1413,7 @@ subtest 'upstream: HTTP 500 bodies and dropped connections' => sub {
 	for my $why (sort keys %bodies) {
 		local %ENV = (REMOTE_ADDR => $IP{PUBLIC});
 		my $l = _spied([$LANG{EN}]);
-		$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+		$l->{_have_mmdb} = $l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
 		{
 			local $SIG{__WARN__} = sub { };
 			Test::Mockingbird::mock('LWP::Simple::WithCache', 'get', $bodies{$why});

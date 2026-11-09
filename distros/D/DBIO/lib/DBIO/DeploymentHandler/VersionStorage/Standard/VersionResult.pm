@@ -4,9 +4,11 @@ package DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Core';
 
-my $table = 'dbix_class_deploymenthandler_versions';
+my $table = 'dbio_deploymenthandler_versions';
 
 __PACKAGE__->table($table);
 
@@ -32,6 +34,7 @@ __PACKAGE__->add_columns (
 __PACKAGE__->set_primary_key('id');
 __PACKAGE__->add_unique_constraint(['version']);
 __PACKAGE__->resultset_class('DBIO::DeploymentHandler::VersionStorage::Standard::VersionResultSet');
+
 
 sub sqlt_deploy_hook {
   my ( $self, $sqlt_table ) = @_;
@@ -59,7 +62,15 @@ DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult - The typical w
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 METHODS
+
+=head2 sqlt_deploy_hook
+
+L<SQL::Translator> deploy hook for the legacy deploy path: when the table is
+deployed under a different name than C<dbio_deploymenthandler_versions>,
+renames the table's constraints to match.
 
 =head1 AUTHOR
 

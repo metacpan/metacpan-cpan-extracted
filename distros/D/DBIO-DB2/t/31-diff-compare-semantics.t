@@ -38,13 +38,13 @@ use DBIO::Diff::Compare qw(changed_column_fields changed_index_fields);
   is_deeply(\@changed, ['not_null'], 'only not_null reported changed');
 }
 
-# --- changed_column_fields: desired-state semantics (target omits field) ---
+# --- changed_column_fields: a default the target no longer declares is removed (core k367) ---
 {
   my @changed = changed_column_fields(
     { data_type => 'integer', default_value => '5' },
     { data_type => 'integer' },
   );
-  is(scalar @changed, 0, 'omitted target field is "don\'t care" -> no change');
+  is_deeply(\@changed, ['default_value'], 'live default, target without one -> default_value changed');
 }
 
 # --- changed_index_fields: identical => empty list ---

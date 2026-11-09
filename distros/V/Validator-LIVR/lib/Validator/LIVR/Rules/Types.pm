@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Types;
 use strict;
 use warnings;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # Perl 5.36 and later tell numbers from strings with builtin::created_as_number
 BEGIN { warnings->unimport('experimental::builtin') if $] >= 5.036 }

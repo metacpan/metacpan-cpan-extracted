@@ -2,6 +2,9 @@ package DBIO::Test::Util;
 # ABSTRACT: Utility functions for DBIO test suite
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use DBIO::Test::Util::UmaskGuard;
@@ -47,7 +50,9 @@ if (DEBUG_TEST_CONCURRENCY_LOCKS) {
   my $oc = DBI->can('connect');
   no warnings 'redefine';
   *DBI::connect = sub {
-    DBIO::Test::Util::dbg("Connecting to $_[1]");
+    DBIO::Test::Util::dbg(
+      'Connecting to ' . DBIO::Util::mask_connect_secrets($_[1], [ @_[1 .. $#_] ])
+    );
     goto $oc;
   }
 }
@@ -225,7 +230,7 @@ DBIO::Test::Util - Utility functions for DBIO test suite
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

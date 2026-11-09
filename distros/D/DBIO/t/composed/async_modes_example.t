@@ -1,7 +1,7 @@
-# ABSTRACT: karr #71 -- the DBIO::Storage::Async "layered schema across async
+# ABSTRACT: the DBIO::Storage::Async "layered schema across async
 # transports" example, proven with SYNTHETIC stand-ins (mock-only, no real DB,
 # no downstream deps). This is the suite backing for the worked narrative in the
-# DBIO::Storage::Async POD (karr #72 convention: every synopsis has a test).
+# DBIO::Storage::Async POD (house convention: every synopsis has a test).
 #
 # The POD example names AGE / PostGIS / EV -- downstream dists core cannot depend
 # on -- so here we reproduce only the MECHANISM the example relies on:
@@ -9,7 +9,7 @@
 #   POD example                          this test
 #   -----------                          ---------
 #   DBIO::PostgreSQL::Age    (graph)  -> T::AME::GraphLayer  (+ ::Async mirror)
-#   DBIO::PostgreSQL::PostGIS (spat)  -> T::AME::SpatialLayer (sync-only, NO ::Async)
+#   DBIO::PostgreSQL::PostGIS (spat)  -> T::AME::SpatialLayer (declared sync-only)
 #   future_io transport (convention)  -> T::AME::Storage::Async
 #   ev transport (registry)           -> T::AME::EV::Storage
 #   AGE's on_connect_replay need      -> capability 'on_connect_replay'
@@ -63,9 +63,20 @@ use DBIO::Test::Storage;
     return $self->_query_async("CYPHER $query", []);
   }
 }
-# spatial-ish: sync-only -- NO ::Async sibling, so it never composes onto an
-# async backend (geometry CRUD flows through the transport unchanged).
-{ package T::AME::SpatialLayer;      sub ensure_spatial { 'ensured' } }
+# spatial-ish: sync-only -- NO ::Async sibling, and it SAYS so by defining
+# async_layer_class returning undef, exactly as the real PostGIS layer does
+# (dbio-postgresql-postgis k8). It never composes onto an async backend
+# (geometry CRUD flows through the transport unchanged).
+#
+# Before karr k159 step 3 this stand-in only lacked the sibling and was skipped
+# silently; that claim is REPLACED, not kept: a silent layer without a sibling
+# is now refused (t/composed/async_mirror.t scenario 5), so the stand-in follows
+# the real layer and declares.
+{
+  package T::AME::SpatialLayer;
+  sub ensure_spatial    { 'ensured' }
+  sub async_layer_class { undef }     # stated: deliberately sync-only
+}
 
 # --- the driver stand-in + its transports ----------------------------------
 # T::AME::Storage stands in for a concrete PostgreSQL storage. It is a

@@ -6,12 +6,19 @@ use DBIO::Schema::ModelCompiler ();
 use DBIO::PostgreSQL::Adapter ();
 use DBIO::PostgreSQL::Introspect ();
 use DBIO::PostgreSQL::Diff ();
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use PrivatePgDatabase;
 
 unless ($ENV{DBIO_TEST_PG_DSN}) {
-  plan skip_all => 'DBIO_TEST_PG_DSN not set';
+  plan skip_all => 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run this test';
 }
 
-# Regression for ticket #9: target_from_compiled used to drop the
+# A server that is not there fails the file, with a plan (karr k113).
+LiveServer->require_server;
+
+# Regression for ticket k9: target_from_compiled used to drop the
 # `default_value` field entirely (and mis-render auto_increment), so the
 # round-trip diff against the introspected source spuriously flagged every
 # default-bearing column for DROP DEFAULT.
@@ -35,9 +42,12 @@ unless ($ENV{DBIO_TEST_PG_DSN}) {
   __PACKAGE__->register_class(T => 'Roundtrip::Result::T');
 }
 
-my $schema = Roundtrip::Schema->connect(
-  $ENV{DBIO_TEST_PG_DSN}, $ENV{DBIO_TEST_PG_USER}, $ENV{DBIO_TEST_PG_PASS},
-);
+# The end-to-end diff below compares the WHOLE introspected database with the
+# compiled target, so it runs in a database of its own: anything else
+# installed in the shared one -- pgvector, left there by t/48 and t/54 -- is a
+# difference too. Dropping that database at the end also replaces the table
+# cleanup this file used to do in the shared one (karr k81).
+my $schema = Roundtrip::Schema->connect(PrivatePgDatabase->create('t29'));
 
 # Deploy via DDL so the live (source) DB reflects exactly what DBIO would
 # produce. target_from_compiled must then match the introspected result.
@@ -97,19 +107,5 @@ ok !$diff->has_changes, 'round-trip diff is empty for a default-bearing schema'
     diag 'SQL: ' . $diff->as_sql;
     diag 'Summary: ' . $diff->summary;
   };
-
-# Cleanup
-$dbh->do('DROP TABLE IF EXISTS roundtrip_defaults CASCADE');
-
-END {
-  return unless $ENV{DBIO_TEST_PG_DSN};
-  my $h = eval { DBI->connect(
-    $ENV{DBIO_TEST_PG_DSN}, $ENV{DBIO_TEST_PG_USER}, $ENV{DBIO_TEST_PG_PASS},
-    { RaiseError => 0, PrintError => 0 }
-  ) };
-  return unless $h;
-  eval { $h->do('DROP TABLE IF EXISTS roundtrip_defaults CASCADE') };
-  $h->disconnect;
-}
 
 done_testing;

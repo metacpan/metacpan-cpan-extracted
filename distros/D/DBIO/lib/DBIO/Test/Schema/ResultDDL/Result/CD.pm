@@ -1,5 +1,8 @@
 package DBIO::Test::Schema::ResultDDL::Result::CD;
 # ABSTRACT: Test Cake result class for the cd table
+
+our $VERSION = '0.900004';
+
 use DBIO::Cake;
 table 'cd';
 col id        => integer, unsigned, auto_inc;
@@ -22,7 +25,7 @@ DBIO::Test::Schema::ResultDDL::Result::CD - Test Cake result class for the cd ta
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

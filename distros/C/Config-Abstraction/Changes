@@ -1,5 +1,22 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.42	Sun Nov  8 02:18:25 PM EST 2026
+	[ Bug Fixes ]
+	- The running script is never read as its own configuration file.  The
+	  script's name is one of the files looked for in each configuration
+	  directory, and a file that no other parser understood fell through to
+	  Config::Auto, which evals it as Perl, so the program ran again inside
+	  itself while it was still loading, with any errors silently discarded.
+	  The old guard only skipped the script's name in '' or '.', so
+	  CONFIG_DIR=$(pwd), an absolute path or a symlink got past it.  Files are
+	  now compared by real path with the running script ($0, resolved when the
+	  module is loaded).
+	- A file that starts with #! is never read as configuration, whatever it
+	  is called, since it is a program and the Perl parser would run it.
+	[ Enhancements ]
+	- Cwd is now declared in PREREQ_PM.
+	- New test t/self-load.t.
+
 0.41	Mon Oct  5 09:35:23 PM EDT 2026
 	[ Bug Fixes ]
 	- Fix encrypt_value() dying with "encrypt_add/gcm_process failed: Invalid

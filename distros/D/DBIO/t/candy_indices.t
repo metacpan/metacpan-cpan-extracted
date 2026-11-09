@@ -20,15 +20,15 @@ use Test::More;
 }
 
 my $source = TestIdx::Result::Artist->result_source_instance;
-my $idxs   = $source->{_cake_indexes};
+my $idxs   = $source->{_index_declarations};
 
-ok $idxs, '_cake_indexes populated by indices()';
+ok $idxs, '_index_declarations populated by indices()';
 is scalar(@$idxs), 2, 'two indexes registered';
 
 my %by_name = map { $_->{name} => $_ } @$idxs;
-is_deeply $by_name{name_idx}{fields}, ['name'],
+is_deeply $by_name{name_idx}{columns}, ['name'],
   'scalar field promoted to single-element arrayref';
-is_deeply $by_name{name_city_idx}{fields}, ['name', 'city'],
+is_deeply $by_name{name_city_idx}{columns}, ['name', 'city'],
   'arrayref fields preserved';
 
 # --- Hashref form is equivalent ---
@@ -44,10 +44,10 @@ is_deeply $by_name{name_city_idx}{fields}, ['name', 'city'],
   indices({ a_idx => 'a' });
 }
 
-is scalar(@{ TestIdx::Result::HashForm->result_source_instance->{_cake_indexes} }),
+is scalar(@{ TestIdx::Result::HashForm->result_source_instance->{_index_declarations} }),
   1, 'hashref form accepted';
 
-# --- Multiple calls accumulate, hooks installed once ---
+# --- Multiple calls accumulate ---
 
 {
   package TestIdx::Result::Multi;
@@ -63,43 +63,29 @@ is scalar(@{ TestIdx::Result::HashForm->result_source_instance->{_cake_indexes} 
 }
 
 my $multi_src = TestIdx::Result::Multi->result_source_instance;
-is scalar(@{ $multi_src->{_cake_indexes} }), 2,
-  'separate indices() calls accumulate';
-ok $multi_src->{_cake_hook_installed},
-  'sqlt_deploy_hook flag set';
-ok $multi_src->{_cake_pg_indexes_installed},
-  'pg_indexes flag set';
+is_deeply [ map $_->{name}, $multi_src->index_declarations ],
+  [qw(idx_a idx_b)],
+  'separate indices() calls accumulate in index_declarations';
 
-ok(TestIdx::Result::Multi->can('sqlt_deploy_hook'),
-  'sqlt_deploy_hook installed on class');
-ok(TestIdx::Result::Multi->can('pg_indexes'),
-  'pg_indexes installed on class');
+# --- No derived method on the class ---
 
-# --- sqlt_deploy_hook actually pushes into the SQLT table ---
-
-{
-  package FakeSQLTTable;
-  sub new { bless { added => [] }, shift }
-  sub add_index { my $self = shift; push @{ $self->{added} }, { @_ } }
-  sub added { $_[0]->{added} }
+for my $class (qw(TestIdx::Result::Multi TestIdx::Result::Artist)) {
+  ok !$class->can('sqlt_deploy_hook'),
+    "$class: no sqlt_deploy_hook derived from the declarations";
+  ok !$class->can('pg_indexes'),
+    "$class: no pg_indexes derived from the declarations";
 }
 
-my $fake = FakeSQLTTable->new;
-TestIdx::Result::Artist->sqlt_deploy_hook($fake);
+# --- The canonical declaration carries the shape a driver reads ---
 
-is scalar(@{ $fake->added }), 2, 'two add_index calls from hook';
-my %added = map { $_->{name} => $_ } @{ $fake->added };
-is_deeply $added{name_idx}{fields}, ['name'], 'name_idx fields passed through';
-is_deeply $added{name_city_idx}{fields}, ['name', 'city'],
-  'name_city_idx fields passed through';
-
-# --- pg_indexes returns the right shape for native PG deploy ---
-
-my $pg = TestIdx::Result::Artist->pg_indexes;
-is_deeply $pg->{name_idx},      { columns => ['name'] },
-  'pg_indexes entry for scalar field';
-is_deeply $pg->{name_city_idx}, { columns => ['name', 'city'] },
-  'pg_indexes entry for compound index';
+{
+  my %decl = map { $_->{name} => $_ }
+    TestIdx::Result::Artist->result_source_instance->index_declarations;
+  is_deeply $decl{name_idx}{columns}, ['name'],
+    'declaration for scalar field';
+  is_deeply $decl{name_city_idx}{columns}, ['name', 'city'],
+    'declaration for compound index';
+}
 
 # indices is inherited from DBIO::ResultSourceProxy, so it stays
 # available as a class method even after Candy's namespace::clean runs.

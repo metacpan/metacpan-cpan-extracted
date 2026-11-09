@@ -1,6 +1,11 @@
 package DBIO::Test::MooseSchema::Result::CD;
 # ABSTRACT: Moose-enabled test result class for the cd table
 
+use strict;
+use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Moose;
 
 __PACKAGE__->table('cd');
@@ -48,7 +53,7 @@ DBIO::Test::MooseSchema::Result::CD - Moose-enabled test result class for the cd
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

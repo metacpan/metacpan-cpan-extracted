@@ -36,6 +36,7 @@ TestDBIO::CLUpdate::Schema->register_class(
 
 # --- Connect with fake storage ---
 
+TestDBIO::CLUpdate::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = TestDBIO::CLUpdate::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 $schema->_changelog_sources_registered(0);

@@ -9,12 +9,15 @@ BEGIN {
     or plan skip_all => 'Moose and MooseX::NonMoose not installed';
 }
 
-use DBIO::Test::Schema::MooseSugar;
+use DBIO::Test::MooseSugarSchema;
 
 # -----------------------------------------------------------------------
 # Connect to in-memory SQLite and deploy
 # -----------------------------------------------------------------------
-my $schema = DBIO::Test::Schema::MooseSugar->connect('dbi:SQLite::memory:', '', '', {
+# the shared schema declares no driver; this use declares SQLite
+my $schema = DBIO::Test::MooseSugarSchema->clone;
+$schema->storage_type('DBIO::SQLite::Storage');
+$schema = $schema->connect('dbi:SQLite::memory:', '', '', {
   quote_names => 0,
 });
 $schema->deploy;
@@ -91,17 +94,17 @@ subtest 'CD: create with has_many relationship' => sub {
 
 subtest 'CD uses default ResultSet' => sub {
   isa_ok( $cd_rs, 'DBIO::ResultSet' );
-  ok( !$cd_rs->isa('DBIO::Test::Schema::MooseSugar::ResultSet::CD'),
+  ok( !$cd_rs->isa('DBIO::Test::MooseSugarSchema::ResultSet::CD'),
     'no custom CD ResultSet' );
 };
 
 subtest 'make_immutable: Result classes' => sub {
-  ok( DBIO::Test::Schema::MooseSugar::Result::Artist->meta->is_immutable, 'Artist immutable' );
-  ok( DBIO::Test::Schema::MooseSugar::Result::CD->meta->is_immutable,     'CD immutable' );
+  ok( DBIO::Test::MooseSugarSchema::Result::Artist->meta->is_immutable, 'Artist immutable' );
+  ok( DBIO::Test::MooseSugarSchema::Result::CD->meta->is_immutable,     'CD immutable' );
 };
 
 subtest 'make_immutable: schema class' => sub {
-  ok( DBIO::Test::Schema::MooseSugar->meta->is_immutable, 'schema class immutable' );
+  ok( DBIO::Test::MooseSugarSchema->meta->is_immutable, 'schema class immutable' );
 };
 
 subtest 'schema verbose Moose attr' => sub {

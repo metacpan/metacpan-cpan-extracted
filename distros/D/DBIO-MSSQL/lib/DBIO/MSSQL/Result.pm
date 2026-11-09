@@ -4,6 +4,8 @@ package DBIO::MSSQL::Result;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Core';
 
 __PACKAGE__->mk_classdata('_mssql_indexes' => {});
@@ -41,7 +43,7 @@ DBIO::MSSQL::Result - MSSQL-specific Result component for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -90,6 +92,10 @@ hashref accepts:
 
 =item C<kind> - C<clustered> or C<nonclustered>
 
+=item C<where> - SQL predicate string of a filtered index
+(C<CREATE INDEX ... WHERE E<lt>predicateE<gt>>); refused when empty, not a string,
+or on a C<clustered> index
+
 =back
 
 =head2 mssql_indexes
@@ -99,7 +105,9 @@ hashref accepts:
 Returns a copy of all index definitions registered on this result class.
 Consumed by L<DBIO::MSSQL::DDL>.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 

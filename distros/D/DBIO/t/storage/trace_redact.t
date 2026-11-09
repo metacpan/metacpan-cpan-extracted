@@ -47,7 +47,7 @@ use DBIO::Test;
 
     my $stats = $schema->storage->debugobj;
     $stats->debugfh($fh);
-    $schema->storage->debug(1);
+    $schema->storage->debug(2);
 
     $schema->resultset('Artist')->create({
         name => 'plaintext-name-1',
@@ -79,7 +79,7 @@ use DBIO::Test;
 
     my $stats = $schema->storage->debugobj;
     $stats->debugfh($fh);
-    $schema->storage->debug(1);
+    $schema->storage->debug(2);
 
     $schema->resultset('Artist')->create({
         name => 'redacted-name-2',
@@ -127,7 +127,7 @@ use DBIO::Test;
 
     my $stats = $schema->storage->debugobj;
     $stats->debugfh($fh);
-    $schema->storage->debug(1);
+    $schema->storage->debug(2);
 
     # rank defaults to 13, but the column appears in the bind list and
     # should pass through unchanged.
@@ -153,6 +153,7 @@ use DBIO::Test;
     # Direct unit test of _format_for_trace with a hand-built bind array.
     my $schema = DBIO::Test->init_schema;
     my $storage = $schema->storage;
+    $storage->debug(2);
 
     my @captured;
     DBIO::Storage::DBI->redact_bind_value(sub {
@@ -186,6 +187,32 @@ use DBIO::Test;
             [ 'name', 'visible' ],
         ],
         'redactor received (colname, value) for each bind, with undef for nameless binds',
+    );
+}
+
+# --- 5. Display-only: the bind handed to execute is the same with and without the hook (ADR 0025) ---
+
+{
+    my $run = sub {
+        my ($hook) = @_;
+        my $schema = DBIO::Test->init_schema;
+        DBIO::Storage::DBI->redact_bind_value($hook);
+        my $storage = $schema->storage;
+        $storage->debugfh(do { open my $fh, '>', \my $sink; $fh });
+        $storage->debug(2);
+        $schema->resultset('Artist')->create({ name => 'bind-identity-5' });
+        $storage->debug(0);
+        DBIO::Storage::DBI->redact_bind_value(sub { return $_[1] });
+        return [ $storage->captured_sql_bind ];
+    };
+
+    my $plain  = $run->(sub { return $_[1] });
+    my $masked = $run->(sub { return '***' });
+
+    ok(scalar(@$plain), 'a statement was captured');
+    is_deeply(
+        $masked, $plain,
+        'SQL and bind captured at execute are identical with a masking hook and with the identity hook',
     );
 }
 

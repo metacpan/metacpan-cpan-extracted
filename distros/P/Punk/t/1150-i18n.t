@@ -505,8 +505,16 @@ SKIP: {
     my $rss = sub { my $k = `ps -o rss= -p $$` || ''; $k =~ /(\d+)/ ? $1 : 0 };
     skip 'ps -o rss is not usable here', 1 unless $rss->() > 0;
 
-    my $body = '{' . join(',', map { qq{"k$_":"v$_ padding padding padding"} }
-                                1 .. 500);
+    # A few long values rather than many short ones. What a leak would keep
+    # is the frozen block, so its size is the signature: 24 values of 4 KB
+    # freeze to ~100 KB, and a leaked block is ~10 MB over 100 boots. With
+    # 500 short values the signature was 2.5 MB, and the boot made hundreds
+    # of small transient allocations on the way to it. An allocator that
+    # places chunks at random (OpenBSD's) then leaves pages of each boot's
+    # transient strings pinned under its few permanent ones: 2 MB over 100
+    # boots there, indistinguishable from the leak this gate is for.
+    my $pad  = 'padding ' x 500;
+    my $body = '{' . join(',', map { qq{"k$_":"v$_ $pad"} } 1 .. 24);
     my %d;
     for my $case (qw(early late)) {
         $d{$case} = File::Temp::tempdir(CLEANUP => 1);
@@ -540,10 +548,10 @@ SKIP: {
                . 'after-it-is-built %d KB, difference %d KB',
                $grew{early}, $grew{late}, $extra;
 
-    # A leaked block would be ~25 KB x 100. The observed difference is
-    # tens of KB, so this bound is loose by two orders of magnitude and
-    # still catches the failure it exists for.
-    cmp_ok($extra, '<', 2048,
+    # A leaked block would be ~100 KB x 100. The observed difference is a
+    # few hundred KB on macOS, so this bound sits well above the noise and
+    # far under the failure it exists for.
+    cmp_ok($extra, '<', 4096,
         'failing validation after the block is built leaks no more than '
       . 'failing before it exists');
 }

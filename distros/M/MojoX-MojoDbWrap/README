@@ -4,74 +4,76 @@ NAME
 
 VERSION
 
-    This document describes MojoX::MojoDbWrap version 0.006.
+    This document describes MojoX::MojoDbWrap version 0.100.
 
 SYNOPSIS
 
        use MojoX::MojoDbWrap;
     
-       # use anything good for Mojo::Pg or Mojo::SQLite constructor
+       # anything good for the Mojo::Pg or Mojo::SQLite constructor
        my $wrap = MojoX::MojoDbWrap->new(
-          db_url         => $db_url,  # e.g. 'postgres://...'
-          migrations_for => { Pg => ..., SQLite => ... },
-       );
-    
-       # if using a different class, create an object and pass it as db_url
-       my $mdb = My::Class->new(...);
-       my $wrap = MojoX::MojoDbWrap->new(
-          db_url => $mdb,
-          migrations_for => { ... },
-          inserter_for => {
-             'My::Class' => sub ($wrapper, $tablish, $data, $opts) { ... },
+          db_url         => $db_url,  # e.g. 'postgresql://...' or a file
+          migrations_for => {
+             'Mojo::Pg'     => $pg_migrations,
+             'Mojo::SQLite' => $sqlite_migrations,
           },
        );
-       # Alternatively, My::Class must implement method
-       # "insert_returning_id" accepting the same parameters as the inserter
-       # above
     
-       say $wrap->mdb_module; # "Mojo::Pg" or "Mojo::SQLite" or...
-       say $wrap->mdb_class;  # ditto, but the class is also `require`d
+       # run the migrations for the selected class, if any
+       $wrap->init;
     
-       # get the underlying instance of Mojo::Pg or Mojo::SQLite or ... object
+       say $wrap->mdb_class;  # "Mojo::Pg" or "Mojo::SQLite" or...
+       say $wrap->mdb_module; # ditto, it's an alias
+    
+       # get the underlying Mojo::Pg or Mojo::SQLite or ... object
        my $mojodb = $wrap->mdb;
     
-       # get the `db` for actual query calling (like calling the underlying
-       # instances's `db` method)
+       # get the `db` for actual queries (same as `$wrap->mdb->db`)
        my $db = $wrap->db;
     
-       # assuming a column called `id`, get the id of the element corresponding
-       # to a condition. The `$condition` is something good for a `select` on
-       # the `$wrap->db` instance.
-       my $id_existing = $wrap->id_of($table, $conditon);
+       # assuming an identifier column called `id`, get the identifier of
+       # the record matching a condition (good for a `select` on `$db`)
+       my $id_existing = $wrap->id_of($table, $condition);
     
-       # if the identifier column is called in another way, pass it with the
-       # table name like this:
-       my $id_existing = $wrap->id_of([$table, $id_column_name], $condition);
-       # also with optional $options as last parameter
+       # if the identifier column has another name, pass it with the table
+       # name like this (works for all methods taking a table)
+       my $id_existing = $wrap->id_of([$table, $id_column], $condition);
     
-       # ensure there's something - either get the id, or insert stuff and
-       # get the id back anyway
+       # either get the identifier of an existing record, or insert a new
+       # record and get its identifier
        my $id_ensure = $wrap->id_or_insert($table, $condition, $default);
     
-       # wrapper around $wrap->mdb->db->select(...)
-    $wrap->select(@select_args...);
+       # insert a new record, get its identifier back
+       my $id_new = $wrap->insert($table, \%data);
     
-       # do the init with the relevant migration, if provided
-       $wrap->init;
+       # insert a new record, or update the existing one with the same
+       # value(s) in the "conflicting" column(s); get the identifier back
+       my $id_up = $wrap->upsert($table, \%data, { conflicting => 'name' });
+       my $id_up2 = $wrap->upsert($table, \%data, { conflicting => [qw< a b >] });
+    
+       # all of the above accept db in the final options, e.g. to work
+       # inside a transaction started on that db
+       my $db = $wrap->db;
+       my $tx = $db->begin;
+       my $id_tx = $wrap->insert($table, \%data, { db => $db });
+       my $id_tx2 = $wrap->upsert($table, \%data, { conflicting => 'name', db => $db });
+       $tx->commit;
     
        # extensibility
        my $wrap = MojoX::MojoDbWrap->new(
           db_url => $whatever,
           wrappers => [
              {
-                class => 'My::Class1',
+                class  => 'My::Class1',
                 create => sub ($class, $db_url) { ... },
-                insert => sub (@args) { ... },
+                insert => sub ($wrap, $tablish, $data, $opts) {
+                   my ($db, $db_opts) = $wrap->db_and_opts($opts, 'My::Class1');
+                   ...
+                },
              },
-             {
-                class => 'My::Class1',
+             {  # without insert, default_inserter is used
+                class  => 'My::Class2',
                 create => sub ($class, $db_url) { ... },
-                insert => sub (@args) { ... },
              },
              ...
           ],
@@ -80,18 +82,84 @@ SYNOPSIS
 DESCRIPTION
 
     This module acts as a light wrapper around classes like Mojo::Pg or
-    Mojo::SQLite, which provide a much overlapping interface with the
-    notable difference regarding how to take the identifier of a new record
-    upon its creation. While at it, this class also provides a couple of
-    useful functions like select.
+    Mojo::SQLite, which provide a largely overlapping interface, so that
+    the same code can work with either of them. On top of this, it provides
+    a few handy methods for common operations, like getting the identifier
+    of a record ("id_of"), inserting a record and getting its identifier
+    back ("insert"), doing both as needed ("id_or_insert"), and inserting
+    or updating a record ("upsert").
+
+    Identifiers of inserted records are taken via RETURNING, which is
+    supported by PostgreSQL and by SQLite 3.35.0 or later. This is correct
+    also when an insertion turns into an update due to on_conflict, which
+    would not be the case with SQLite's last_insert_id.
+
+    The wrapped object is created lazily, i.e. upon the first call to a
+    method needing it.
+
+    Methods taking a table also accept a tablish, i.e. either a string with
+    the name of the table, or an array reference holding the name of the
+    table and the name of the identifier column. When only the name of the
+    table is provided (as a string, or as the only item of the array
+    reference), the identifier column is assumed to be id.
+
+    All methods operating on records ("id_of", "id_or_insert", "insert" and
+    "upsert") accept option db in their final options hash reference, to
+    run their queries on a specific database handle. This is how to work
+    inside a transaction: start it with my $tx = $db->begin and pass the
+    same $db, keeping it in a variable until the transaction ends
+    (transaction objects only hold a weak reference to their handle). It
+    also pins a connection without any transaction, e.g. for temporary
+    tables, per-connection settings or an in-memory SQLite database.
+    Without db, a handle is taken via "db". This is important, because each
+    call to "db" can return a different connection, outside of any
+    transaction; with SQLite and an in-memory database, a different
+    connection is even a different (empty) database! See "db_and_opts".
+
+    Errors are thrown as Ouch exceptions. In particular, passing final
+    options that are neither undef nor a hash reference to any of the
+    methods above (or to "default_inserter") throws an exception with code
+    400, whose message starts with the name of the method. The same happens
+    for options holding key -asc or -desc, i.e. an old-style sort
+    specification that SQL::Abstract::Pg would still accept in place of
+    options: put it inside option order_by instead, e.g. { order_by => {
+    -desc => 'id' } }.
+
+    Make sure to read "SECURITY CONSIDERATIONS" too.
 
 INTERFACE
 
  db
 
-       my $db = $wrap->new;
+       my $db = $wrap->db;
 
     Same as $wrap->mdb->db.
+
+ db_and_opts
+
+       my ($db, $db_opts) = $wrap->db_and_opts($opts); # OR
+       my ($db, $db_opts) = $wrap->db_and_opts($opts, $name);
+
+    Get the database handle to use for the operation, along with a copy of
+    the options in $opts (a hash reference, or undef) without key db. The
+    handle is the value for key db if present, or a fresh one from "db"
+    otherwise.
+
+    An exception with code 400 is thrown, whose message is prefixed with
+    $name, if $opts:
+
+      * is neither undef nor a hash reference;
+
+      * holds key -asc or -desc (an old-style sort specification, see
+      "DESCRIPTION");
+
+      * holds key db with an undefined value (which would otherwise
+      silently lead to a fresh connection, outside of any transaction).
+
+    By default, $name is the name of the calling sub (or db_and_opts when
+    called outside of any sub, including directly from an eval block),
+    which can be __ANON__; pass something meaningful when calling from an
+    anonymous sub, e.g. a custom inserter (see "new").
 
  db_url
 
@@ -99,59 +167,119 @@ INTERFACE
 
     The URL provided in "new".
 
+ default_inserter
+
+       my $id = $wrap->default_inserter($tablish, $data, $opts);
+
+    Insert a new record based on hash reference $data, returning the value
+    of the identifier column of the inserted (or updated) record, using
+    RETURNING. This is the inserter used for Mojo::Pg, Mojo::SQLite and any
+    wrapper in wrappers (see "new") that does not provide its own insert.
+
+    $opts is an optional hash reference with options for the insert method
+    of the db object (e.g. on_conflict), plus option db (see
+    "db_and_opts"); option returning is always overridden.
+
+    Returns undef if no record is returned, e.g. when on_conflict is undef
+    (i.e. DO NOTHING) and there is a conflict.
+
+    It can also be called as a plain function from a custom insert sub,
+    with the same arguments it receives:
+
+       insert => sub ($wrap, $tablish, $data, $opts) {
+          ...
+          return MojoX::MojoDbWrap::default_inserter(@_);
+       },
+
  id_of
 
        my $id = $wrap->id_of($tablish, $cond);  # OR
        my $id = $wrap->id_of($tablish, $cond, $opts);
 
-    Get the identifier of a record result of searching for condition $cond,
-    optionally with options in $opts.
+    Get the identifier of a record matching condition $cond, optionally
+    with options in hash reference $opts (e.g. order_by), both passed to
+    the select method of the db object. Option db selects the database
+    handle, see "db_and_opts". Option limit is set to 1 when the wrapper
+    supports it (see can_limit in "new"; it is supported for Mojo::Pg and
+    Mojo::SQLite), as only the first matching record is used; use order_by
+    to choose which one. Otherwise, the options are passed as they are,
+    including any limit provided by the caller. Returns undef if no record
+    matches.
 
-    Parameter $tablish can either be a string, holding the name of the
-    table where to run the query, or an array reference that is supposed to
-    carry two strings, the first being the table name and the second being
-    the name of the identifier column.
+    An undefined $cond leads to an exception with code 400, as it would
+    match every record, i.e. return an arbitrary identifier. The same
+    happens for a $cond that is not a reference: it would be bound as WHERE
+    ?, so that e.g. "1" would match every record too. With Mojo::Pg and
+    Mojo::SQLite (more precisely, when the wrapped object has method
+    abstract), the same happens for any $cond generating no WHERE clause,
+    e.g. {}, [] or { -or => [] }. See "SECURITY CONSIDERATIONS".
+
+    $opts must be an options hash: a sort specification on its own, i.e. a
+    string, an array reference or a hash reference with key -asc or -desc
+    (which the select method of the db object would accept in place of
+    options), leads to an exception with code 400. Pass it as option
+    order_by instead:
+
+       my $id = $wrap->id_of($table, $cond, { order_by => { -desc => 'id' } });
 
  id_or_insert
 
        my $id = $wrap->id_or_insert($tablish, $cond, $default); # OR
        my $id = $wrap->id_or_insert($tablish, $cond, $default, $opts);
 
-    Retrieve the identifier of the record result of searching for condition
-    $cond, creating the record in case it is missing with values in
-    $default.
+    Retrieve the identifier of the record matching condition $cond,
+    inserting a record with values in $default in case it is missing. $cond
+    is checked as in "id_of".
 
-    $opts is an optional hash that can contain options associated to keys
-    select (for searching the identifier using "id_of") and insert (in case
-    we need to insert a new record using $default).
+    $opts is an optional hash reference that can contain options associated
+    to keys select (for searching the identifier using "id_of") and insert
+    (for inserting a new record using $default), as well as db (see
+    "db_and_opts"). The same database handle is used for all queries in the
+    call, overriding any db inside the select and insert options, which
+    must be hash references if present. Any other key in $opts leads to an
+    exception with code 400 (as does a non-hash value for select or
+    insert): e.g. on_conflict must go inside insert, not at the top level.
+    The select options follow the same rules as the options of "id_of", so
+    a sort specification goes inside order_by.
 
-    Parameter $tablish is the same as in "id_of" (and used to call that
-    method).
+    Unless on_conflict is set in the insert options, the insertion is done
+    with on_conflict set to undef (i.e. DO NOTHING). This way, if another
+    process inserts the same record between the search and the insertion,
+    no exception is thrown; the search is tried again instead. After three
+    unsuccessful rounds (i.e. three searches and three insertions), an
+    exception with code 409 is thrown. In practice this means that $default
+    conflicts (on some unique key) with an existing record that does not
+    match $cond: make sure $cond covers the unique keys of $default. The
+    exception carries no data, and the conflicting constraint is not known,
+    because DO NOTHING does not report it.
 
  init
 
        $wrap->init; # OR
        $wrap->init($name);
 
-    If available via "migrations_for", runs the migrations based on the
-    specific class. $name defaults to the string migrations.
+    If available via "migrations_for", runs the migrations for the specific
+    class (see "mdb_class"), using $name as the name of the migrations.
+    $name defaults to the string migrations.
+
+    Returns the object itself.
 
  insert
 
        my $id = $wrap->insert($tablish, $data); # OR
        my $id = $wrap->insert($tablish, $data, $opts);
 
-    Insert a new record based on $data, returning the identifier of that
-    new record.
+    Insert a new record based on hash reference $data, returning the
+    identifier of that new record.
 
-    $opts is an optional hash that can contain options associated to keys
-    select (for searching the identifier using "id_of") and insert (in case
-    we need to insert a new record using $default).
+    $opts is an optional hash reference with options for the insert method
+    of the db object, e.g. on_conflict, plus option db (see "db_and_opts").
+    With the default inserter (see "default_inserter"), if on_conflict
+    leads to an update of an existing record, the identifier of that record
+    is returned; if it leads to doing nothing, undef is returned.
 
-    Parameter $tablish is the same as in "id_of"; in particular, the newly
-    inserted record is supposed to have an id column by default, but you
-    can pass an array reference with the first parameter as the table name
-    and the second parameter as the identifier column name to change this.
+    The insertion is done by the insert sub of the selected wrapper, see
+    "new".
 
  mdb
 
@@ -163,18 +291,18 @@ INTERFACE
 
  mdb_class
 
-       my $mdb = $wrap->mdb_class;
+       my $class = $wrap->mdb_class;
 
-    The class of the wrapped object. Technically the wrapped object might
-    be of another class, this is what is passed in the class slot of the
-    selected wrapper in wrappers as passed to "new".
+    The class of the wrapped object, as set in the class slot of the
+    selected wrapper (see "new"). Technically, the wrapped object might be
+    of another class.
 
-    The value of this method is used to select the relevant migration when
+    The value of this method is used to select the relevant migrations when
     calling "init".
 
  mdb_module
 
-       my $mdb = $wrap->mdb_module;
+       my $class = $wrap->mdb_module;
 
     Alias for "mdb_class".
 
@@ -182,9 +310,10 @@ INTERFACE
 
        my $hashref = $wrap->migrations_for;
 
-    Retrieve a hash reference with keys corresponding to the supported
-    classes for wrapped objects, and values corresponding to the
-    migrations.
+    Retrieve a hash reference with keys corresponding to classes of wrapped
+    objects (e.g. Mojo::Pg, Mojo::SQLite, see "mdb_class"), and values
+    corresponding to the migrations as strings (see e.g. "from_string" in
+    Mojo::Pg::Migrations).
 
  new
 
@@ -197,17 +326,26 @@ INTERFACE
 
     Parameter db_url is in general supposed to be a string that can be used
     to instantiate a Mojo::Pg object (if it starts with postgres:// or
-    postgresql://) or a Mojo::SQLite object (any other string). These are
-    the two classes wrapped by default.
+    postgresql://, in any case) or a Mojo::SQLite object (any other string
+    accepted by "new" in Mojo::SQLite, e.g. a file path or :memory:). These
+    are the two classes wrapped by default.
 
     Parameter wrappers allows providing a list of wrappers in case you want
     to support further classes too. This list is given as an array
-    reference holding hashes with the following keys:
+    reference holding hash references with the following keys:
+
+    can_limit
+
+      a true value if the select method of the db object supports option
+      limit, as with Mojo::Pg and Mojo::SQLite (which have it set). When
+      true, "id_of" sets limit to 1. Optional, defaults to false, so a
+      custom wrapper (even one for a subclass of Mojo::Pg or Mojo::SQLite)
+      has to set it explicitly to get LIMIT 1.
 
     class
 
       the name of the class, which in case of selection will also be used
-      to select a migration.
+      to select the migrations (see "init"). Required.
 
     create
 
@@ -219,9 +357,13 @@ INTERFACE
       with $class the same as class above and $db_url the same as the
       parameter db_url.
 
-      The sub can return either undef, in case it is not capable of
+      The sub can return either a false value, in case it is not capable of
       handling $db_url, or an object that becomes the wrapped instance (as
-      returned by "mdb").
+      returned by "mdb"). Required.
+
+      The object must provide a db method returning a database handle, as
+      Mojo::Pg and Mojo::SQLite do; it is called by "db", which is used by
+      all methods operating on records, including "insert".
 
     insert
 
@@ -230,49 +372,195 @@ INTERFACE
 
          $sub->($wrap, $tablish, $data, $opts)
 
-      where $wrap is a reference to the MojoX::MojoDbWrap object, $tablish
-      is the name of the table or an array with the name of the table and
-      the name of the identifier column (much like "id_of" and
-      "id_or_insert"), $data is the data to use for the insert and $opts
-      are any insert options passed by "id_or_insert".
+      where $wrap is the MojoX::MojoDbWrap object, $tablish is the name of
+      the table or an array reference with the name of the table and the
+      name of the identifier column (see "DESCRIPTION"), $data is the data
+      to insert and $opts is a hash reference with insert options, derived
+      from the ones passed to "insert", "upsert" (which turns conflicting
+      into on_conflict) or "id_or_insert".
 
-      The return value must be the identifier of the newly inserted record.
+      When called by the methods of this module, $opts always holds key db
+      with the database handle to use, which must be honored to work inside
+      transactions and must not reach the insert method of the db object:
+      use "db_and_opts" to get both the handle and the remaining options.
+      Also note that "id_or_insert" sets on_conflict to undef (i.e. DO
+      NOTHING) by default, which a custom inserter for a backend not
+      supporting it has to ignore or translate.
 
-    When needed the wrapper instantiation, items in wrappers are used in
-    succession to call the create sub, until one returns a true value that
-    is taken as the wrapped object. If none is matched, Mojo::Pg and
-    Mojo::SQLite are tried last, in ths order.
+      The return value must be the identifier of the newly inserted (or
+      updated) record, or undef if no record was inserted.
 
- select
+      Optional, defaults to "default_inserter", which requires support for
+      RETURNING.
 
-       my $x = $wrap->select(@args);
+    The hash references in wrappers are copied, so they are not modified.
+    An exception with code 400 is thrown if wrappers is not an array
+    reference, or any of its items is not a hash reference or lacks a
+    required key, or has a non-code value for create or insert.
 
-    Wrapper around $wrap->mdb->db->select(@args).
+    When the wrapped object is needed, the create subs of the items in
+    wrappers are called in order, until one returns a true value, which is
+    taken as the wrapped object. Mojo::Pg and Mojo::SQLite are always tried
+    last, in this order; Mojo::SQLite declines URLs it cannot parse, e.g.
+    mysql://....
+
+    If no item accepts db_url, an exception with code 400 and message
+    unsupported DB URL is thrown. The URL is neither part of the message
+    nor attached as exception data, as it might hold a password and
+    exceptions often end up in logs.
+
+    Mojo::Pg and Mojo::SQLite are not hard dependencies, and each is loaded
+    only when its turn comes. If the needed one is not installed, the error
+    from require is thrown as is (not as an Ouch exception). As
+    Mojo::SQLite is the last resort, this means that without it any db_url
+    not accepted by previous items leads to that error, even one that would
+    be unsupported anyway (e.g. mysql://...).
 
  upsert
 
-       $wrap->upsert($tablish, $data, $opts);
+       my $id = $wrap->upsert($tablish, $data, $opts);
 
-    Insert a new record, or update it if already present.
+    Insert a new record, or update it if already present, returning its
+    identifier (see "insert"). Option db is supported as in "insert".
 
-    $tablish is the same as "id_of", i.e. either a column name or an array
-    reference with the table name and the identifier column name.
-
-    The assumption is that there is a single column where the conflict in
-    insertion can arise and that column name is passed as the value of key
+    The assumption is that a conflict in the insertion can arise on a
+    single column, or on a set of columns (e.g. a UNIQUE constraint). Pass
+    its name, or an array reference with their names, as the value of key
     conflicting in $opts, like this:
 
        $wrap->upsert($tablish, $data, { conflicting => 'name', ... });
+       $wrap->upsert($tablish, $data, { conflicting => [qw< a b >], ... });
 
-    This will generate an on_conflict option passed to "insert", setting
-    all values except the conflicting one. If you need a more nuanced
-    upsert, generate the on_conflict option yourself and pass it in the
-    $opts (it's still suggested to call this method instead of insert
-    directly, so that you're explicit about your goal).
+    This generates an on_conflict option for "insert", setting all values
+    in $data except the conflicting ones. If $data only holds the
+    conflicting columns, the update sets the (first) conflicting column to
+    its own value, so that the identifier of the existing record is still
+    returned. Note that this is an update anyway, e.g. for triggers.
+
+    All conflicting columns must have a defined value in $data: as NULL
+    values never conflict, a new record would be inserted every time.
+
+    If you need a more nuanced upsert, generate the on_conflict option
+    yourself and pass it in $opts without conflicting (it's still advisable
+    to call this method instead of "insert", so that you're explicit about
+    your goal).
+
+    An exception with code 400 is thrown when:
+
+      * neither conflicting nor on_conflict is provided, as this would be a
+      plain "insert";
+
+      * both conflicting and on_conflict are provided;
+
+      * conflicting is an empty array reference;
+
+      * conflicting is provided and $data is not a hash reference (the
+      column names are needed);
+
+      * any conflicting column is missing or undef in $data.
+
+SECURITY CONSIDERATIONS
+
+    First of all, read the "COPYRIGHT AND LICENSE" section below very
+    carefully, then read on here.
+
+    With that as a basic foundation, this module tries to do its best to
+    avoid introducing any security issue, as well as trying to catch some
+    issues that might arise from the inputs it receives.
+
+    Some notes that you should keep in mind:
+
+      * You are supposed to validate all input parameters, especially those
+      that will be passed down to other modules that do what I mean, like
+      SQL::Abstract or its derivatives.
+
+      * The condition parameter in "id_of" and "id_or_insert" should be
+      used to pinpoint at most one record. If it matches multiple ones, you
+      are probably doing something wrong; at the very least, you can't be
+      sure to receive a consistent response from your queries, unless you
+      also set option order_by (in "id_of", or in the select options of
+      "id_or_insert").
+
+      * Again on the condition parameter, an undefined value or a value
+      that is not a reference leads to an exception with code 400: the
+      latter would be bound as WHERE ?, so that e.g. "1" would match every
+      record. Moreover, if the wrapped object supports method abstract (as
+      Mojo::Pg and Mojo::SQLite do), the object it returns is assumed to
+      support SQL::Abstract's interface, including a where method. In this
+      case, the module calls it to generate a WHERE clause and checks
+      whether it is empty, throwing an exception with code 400 if it is.
+      This still leaves you wide margins to shoot yourself in the foot,
+      though, like providing an always-true condition. Again, read the
+      bullet immediately before this.
+
+      * Conditions, data and options are passed to SQL::Abstract::Pg as
+      they are. Table and column names are quoted, and plain values are
+      bound as placeholders, so values can safely come from users. The
+      structure must not: nested hashes from untrusted inputs (e.g. from
+      decoded JSON) are read as operators like { name => { -like => '%' }
+      }, and SQL::Abstract lets almost any operator text through to the
+      query, i.e. this is SQL injection. Build conditions and data in your
+      code, from scalar values, e.g. { email => "$email" }, and never pass
+      an untrusted hash reference as it is.
+
+      * Exceptions thrown by this module never hold the DB URL, which might
+      hold a password (see "new"); connection errors from DBI show the
+      database, host and user name, but not the password. The URL is still
+      available via "db_url", and the password via the wrapped object (e.g.
+      "password" in Mojo::Pg): beware of dumping them, e.g. in logs. The
+      create subs of custom wrappers receive the URL too: keep it out of
+      their exceptions.
+
+      * Errors from the database are thrown as they are, and can hold
+      values from your data, e.g. PostgreSQL's Key (email)=(...) already
+      exists: beware of exposing them, e.g. in HTTP responses or logs.
+
+      * Parameters "db_url", "migrations_for" and wrappers (see "new") must
+      come from trusted sources, like your configuration or code:
+      migrations are run as SQL, wrappers are code, and both Mojo::Pg and
+      Mojo::SQLite turn the query string of the URL into options for DBI,
+      e.g. ?RaiseError=0.
 
 BUGS AND LIMITATIONS
 
-    Minimul perl version 5.24.
+    Minimum perl version 5.24.
+
+    Getting identifiers uses RETURNING, so SQLite 3.35.0 or later is
+    needed. Please send requests/patches if you need support for something
+    older; most probably you will have to code a custom inserter anyway.
+
+    The test suite runs tests against PostgreSQL only if environment
+    variable TEST_PG is set to a connection URL, e.g.:
+
+       TEST_PG=postgresql://user@localhost:5432/test prove -l t
+
+    The tests create a schema with a unique name, and drop it at the end.
+
+    Please report any bug or feature request through the repository of the
+    project, available at https://codeberg.org/polettix/MojoX-MojoDbWrap.
+
+AI ASSISTANCE
+
+    This module was developed with the assistance of artificial
+    intelligence (Anthropic Claude Opus 5.5, through Claude Code). The AI
+    was used after release 0.006 to:
+
+      * Write and run new tests (including the test library module
+      t/lib/MojoDbWrapTests.pm).
+
+      * Conduct code and security reviews, assisting in understanding the
+      issues and checking their implementation.
+
+      * Write most of the documentation: POD, Changes, and many commit
+      messages. Some parts were written with the "AUTHOR".
+
+    Code has generally been written by the "AUTHOR" or, in small parts, by
+    the AI, then reviewed and corrected by the "AUTHOR", who is responsible
+    for the module, within the terms of "COPYRIGHT AND LICENSE".
+
+    Contributions by the AI can be found in the code repository, where
+    AI-assisted commits carry a Co-Authored-By trailer; see "BUGS AND
+    LIMITATIONS".
 
 AUTHOR
 

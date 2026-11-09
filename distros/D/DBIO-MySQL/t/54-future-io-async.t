@@ -6,9 +6,9 @@ use Test::Exception;
 # ADR 0030/0031 (core karr #65 + dbio-mysql karr #18): the future_io async mode
 # resolves its transport adapter by CONVENTION -- ref($storage) . '::Async' --
 # off the concrete MySQL driver storage. This dist ships that adapter,
-# DBIO::MySQL::Storage::Async (over DBD::MariaDB's mariadb_async binding), plus
-# the thin DBIO::MySQL::Storage::MariaDB::Async that the MariaDB-DSN convention
-# resolves to.
+# DBIO::MySQL::Storage::Async (over the async binding of each connection's own
+# DBD, karr k60), plus the empty DBIO::MySQL::Storage::MariaDB::Async that the
+# convention resolves to for the MariaDB storage class.
 #
 # These are pure class/registry/introspection assertions: no event loop, no
 # real database, no Future::IO dep. The live roundtrip lives in
@@ -92,11 +92,16 @@ is(
 #    coderef against the base's croaking one proves the override concretely.
 # -----------------------------------------------------------------------
 {
-  # Seams the dbio-async Future::IO base (DBIO::Async::Storage) leaves croaking:
+  # Seams the dbio-async Future::IO base (DBIO::Async::Storage) leaves croaking.
+  # _txn_context_class / _txn_conn_accessor are deliberately NOT here: since
+  # dbio-async k13 the base answers both with the future_io defaults, and its
+  # POD says so ("The transaction-context seams are not among them"). Demanding
+  # an override for them would demand the very repetition k47 removed -- what
+  # they answer is asserted in section 5 instead.
   my @async_base_seams = qw(
     _submit_query _collect_result _normalize_conninfo
     _create_pool_connection _shutdown_pool_connection
-    _conn_ready _conn_fileno _txn_context_class _txn_conn_accessor
+    _conn_ready _conn_fileno
   );
   # Seams the Model-B base (DBIO::Storage::Async) leaves croaking:
   my @orch_base_seams = qw( sql_maker_class _transform_sql _post_insert_sql );
@@ -116,26 +121,39 @@ is(
 }
 
 # -----------------------------------------------------------------------
-# 4b. The DBD-specific async primitives carry the DBD::mysql binding on the
-#     base and are overridden with DBD::MariaDB's mariadb_* binding on the
-#     MariaDB subclass -- so each DSN flavour drives its own DBD's async API
-#     (the async analogue of the sync mysql_insertid / mariadb_insertid split).
+# 4b. The DBD-specific async primitives answer for the DBD of the CONNECTION
+#     they are handed, on either class (karr k60, ADR 0007 addendum
+#     2026-10-04). Until k60 this section claimed the opposite -- the base
+#     carries the DBD::mysql binding and the MariaDB subclass overrides it --
+#     and that class binding was the defect: the schema component pins the
+#     class for every DSN, so under load_components('MySQL') + dbi:MariaDB:
+#     the class and the DBD disagree. What is pinned instead: the subclass has
+#     no primitive of its own (an override there is a class binding again),
+#     and both classes arm the statement the way the handle's DBD wants it.
+#     The end-to-end proof is t/66-future-io-dbd-per-connection.t.
 # -----------------------------------------------------------------------
 {
   my @dbd_primitives = qw(
     _async_prepare_attrs _conn_socket_fd _async_ready _async_result _async_insertid
+    _mysql_auto_reconnect_attr
   );
   for my $prim (@dbd_primitives) {
     my $base = DBIO::MySQL::Storage::Async->can($prim);
     my $mdb  = DBIO::MySQL::Storage::MariaDB::Async->can($prim);
-    ok $base && $mdb && $base != $mdb,
-      "$prim is overridden on the MariaDB subclass (drives its own DBD binding)";
+    ok $base && $mdb && $base == $mdb,
+      "$prim: the MariaDB convention class resolves to the base's -- no class decides the DBD";
   }
 
-  is_deeply(DBIO::MySQL::Storage::Async->_async_prepare_attrs, { async => 1 },
-    'base arms DBD::mysql async with { async => 1 }');
-  is_deeply(DBIO::MySQL::Storage::MariaDB::Async->_async_prepare_attrs, { mariadb_async => 1 },
-    'MariaDB subclass arms DBD::MariaDB async with { mariadb_async => 1 }');
+  for my $class (qw( DBIO::MySQL::Storage::Async DBIO::MySQL::Storage::MariaDB::Async )) {
+    is_deeply(
+      $class->_async_prepare_attrs({ dbh => { Driver => { Name => 'mysql' } } }),
+      { async => 1 },
+      "$class arms a DBD::mysql connection with { async => 1 }");
+    is_deeply(
+      $class->_async_prepare_attrs({ dbh => { Driver => { Name => 'MariaDB' } } }),
+      { mariadb_async => 1 },
+      "$class arms a DBD::MariaDB connection with { mariadb_async => 1 }");
+  }
 }
 
 # -----------------------------------------------------------------------
@@ -149,6 +167,16 @@ is( DBIO::MySQL::Storage::Async->_txn_context_class, 'DBIO::Async::TransactionCo
   '_txn_context_class is the future_io transaction context' );
 is( DBIO::MySQL::Storage::Async->_txn_conn_accessor, 'txn_conn',
   '_txn_conn_accessor matches the generic pinned-connection key' );
+
+# ... and it answers that by INHERITING the base's default rather than repeating
+# it (karr k47 / dbio-async k13): a second copy here is only a place to drift.
+for my $seam (qw( _txn_context_class _txn_conn_accessor )) {
+  is( DBIO::MySQL::Storage::Async->can($seam), DBIO::Async::Storage->can($seam),
+    "$seam resolves to the dbio-async base default -- inherited, not repeated" );
+  no strict 'refs';
+  ok !defined *{"DBIO::MySQL::Storage::Async::$seam"}{CODE},
+    "... with nothing of its own in this adapter";
+}
 
 # -----------------------------------------------------------------------
 # 6. _transform_sql: identity -- MySQL keeps standard '?' placeholders
@@ -181,13 +209,17 @@ is(
     primary_columns => ['artistid'],
   });
 
-  my $storage = bless { _last_insert_id => 42 }, 'DBIO::MySQL::Storage::Async';
+  # What _collect_result leaves behind for an INSERT that generated 42: the
+  # statement's own id for this method, and the same id for last_insert_id
+  # (two slots since karr k69 -- t/70 runs the real path through both).
+  my $storage = bless { _statement_insert_id => 42, _last_insert_id => 42 },
+    'DBIO::MySQL::Storage::Async';
   my $ret = $storage->_insert_returned_columns($source, { name => 'Miles' }, 1);
   is_deeply $ret, { name => 'Miles', artistid => 42 },
     'the auto-increment id is folded onto the autoinc PK column, overlaid on the insert data';
 
   # No id generated (explicit PK supplied) -> supplied data untouched.
-  my $storage2 = bless { _last_insert_id => 0 }, 'DBIO::MySQL::Storage::Async';
+  my $storage2 = bless { _statement_insert_id => 0 }, 'DBIO::MySQL::Storage::Async';
   my $ret2 = $storage2->_insert_returned_columns(
     $source, { artistid => 7, name => 'Given' }, 1,
   );
@@ -195,6 +227,64 @@ is(
     'no generated id -> the supplied insert data is returned untouched';
 
   is $storage->last_insert_id, 42, 'last_insert_id exposes the captured id for legacy callers';
+}
+
+# -----------------------------------------------------------------------
+# 8. Pool connections are opened fork-safe and without auto-reconnect
+#    (karr k55), on both DBD bindings. AutoInactiveDestroy: a forked child
+#    that drops its copy of a pool handle must not end the parent's session
+#    -- core's pool refuses the physical teardown outside the owning pid, the
+#    handle's own DESTROY is this transport's half. Auto-reconnect: a pooled
+#    session silently rebuilt mid-transaction loses the transaction with no
+#    error (ADR 0005), and DBD::mysql switches it ON by itself under mod_perl
+#    or CGI. As in the sync storage, an explicit value in the connect
+#    attributes is the user's informed choice and wins; the listen connection
+#    alone forces it off even then, because core must see its death.
+#    DBI->connect is replaced for the block: what is pinned is what the
+#    transport asks the DBD for.
+# -----------------------------------------------------------------------
+{
+  my @connects;
+  no warnings 'redefine';
+  { package K55::FakeDBH; sub do { 1 } }
+  local *DBI::connect = sub {
+    my ($class, $dsn, $user, $pass, $attrs) = @_;
+    push @connects, { %$attrs };
+    return bless {}, 'K55::FakeDBH';
+  };
+
+  for my $case (
+    [ 'DBIO::MySQL::Storage::Async',          'dbi:mysql:database=t',
+      'mysql_auto_reconnect',   'mariadb_auto_reconnect' ],
+    [ 'DBIO::MySQL::Storage::MariaDB::Async', 'dbi:MariaDB:database=t',
+      'mariadb_auto_reconnect', 'mysql_auto_reconnect' ],
+  ) {
+    my ($class, $dsn, $attr, $other) = @$case;
+
+    @connects = ();
+    my $conn = $class->_create_pool_connection(
+      { dsn => $dsn, user => 'u', password => 'p', attrs => { LongReadLen => 4096 } },
+    );
+    is ref($conn->{dbh}), 'K55::FakeDBH', "$class: _create_pool_connection opens a DBD handle";
+    is scalar(@connects), 1, '... with one DBI->connect';
+    is $connects[0]{AutoInactiveDestroy}, 1,
+      '... AutoInactiveDestroy => 1: a forked child dropping its copy leaves the session alone';
+    is $connects[0]{$attr}, 0, "... $attr => 0: no silent reconnect under a pinned transaction";
+    ok !exists $connects[0]{$other}, '... and no attribute of the other DBD';
+    is $connects[0]{LongReadLen}, 4096, '... the caller\'s DBD attributes passed through';
+
+    @connects = ();
+    $class->_create_pool_connection({ dsn => $dsn, attrs => { $attr => 1 } });
+    is $connects[0]{$attr}, 1,
+      "... an explicit $attr => 1 in the connect attributes is honoured, as in the sync storage (ADR 0005)";
+    is $connects[0]{AutoInactiveDestroy}, 1, '... still fork-safe';
+
+    @connects = ();
+    my $storage = bless { _conninfo => { dsn => $dsn, attrs => { $attr => 1 } } }, $class;
+    $storage->_listen_open->get;
+    is $connects[0]{$attr}, 0,
+      "... while the listen connection forces $attr off even then -- core must see it die";
+  }
 }
 
 done_testing;

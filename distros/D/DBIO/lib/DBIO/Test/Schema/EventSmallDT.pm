@@ -4,6 +4,8 @@ package DBIO::Test::Schema::EventSmallDT;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
@@ -31,7 +33,7 @@ DBIO::Test::Schema::EventSmallDT - Test result class for the event_small_dt tabl
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

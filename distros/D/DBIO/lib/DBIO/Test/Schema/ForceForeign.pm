@@ -2,6 +2,9 @@ package DBIO::Test::Schema::ForceForeign;
 # ABSTRACT: Test result class for the forceforeign table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -45,7 +48,7 @@ DBIO::Test::Schema::ForceForeign - Test result class for the forceforeign table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

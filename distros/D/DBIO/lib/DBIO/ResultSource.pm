@@ -4,10 +4,11 @@ package DBIO::ResultSource;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::ResultSource::RowParser DBIO::Base/;
 
 use DBIO::ResultSet;
-use DBIO::ResultSourceHandle;
 
 use DBIO::Carp;
 use DBIO::Util 'UNRESOLVABLE_CONDITION';
@@ -15,6 +16,7 @@ use DBIO::Util qw(is_literal_value);
 use Devel::GlobalDestruction;
 use Try::Tiny;
 use Scalar::Util qw/blessed weaken isweak/;
+use Storable ();
 
 use namespace::clean;
 
@@ -43,6 +45,7 @@ sub new {
   $new->{_ordered_columns} = [ @{$new->{_ordered_columns}||[]}];
   $new->{_columns} = { %{$new->{_columns}||{}} };
   $new->{_relationships} = { %{$new->{_relationships}||{}} };
+  $new->{_index_declarations} = [ @{$new->{_index_declarations}||[]} ];
   $new->{name} ||= "!!NAME NOT SET!!";
   $new->{_columns_info_loaded} ||= 0;
   return $new;
@@ -335,6 +338,124 @@ sub unique_constraints {
 }
 
 
+sub add_index_declaration {
+  my ($self, $decl) = @_;
+
+  $self->throw_exception('add_index_declaration() expects a hashref')
+    unless ref $decl eq 'HASH';
+
+  my $name = $decl->{name};
+  $self->throw_exception('add_index_declaration(): the index needs a name')
+    unless defined $name and length $name and !ref $name;
+
+  my $cols = $decl->{columns};
+  $cols = [ $cols ] if defined $cols and !ref $cols and length $cols;
+  $self->throw_exception(
+    "add_index_declaration(): index '$name' needs columns, a column name or an arrayref of them"
+  ) unless ref $cols eq 'ARRAY'
+    and @$cols
+    and !grep { !defined $_ or ref $_ or !length $_ } @$cols;
+
+  my $driver = $decl->{driver};
+  if (defined $driver) {
+    $self->throw_exception(
+      "add_index_declaration(): index '$name': driver must be a hashref, driver => { pg => { ... } }"
+    ) unless ref $driver eq 'HASH';
+    my %known = map { $_ => 1 } $self->index_declaration_drivers;
+    for my $drv (sort keys %$driver) {
+      $self->throw_exception(
+        "add_index_declaration(): index '$name': unknown driver block '$drv' "
+        . "(accepted: " . join(', ', map "'$_'", $self->index_declaration_drivers) . ")"
+      ) unless $known{$drv};
+      $self->throw_exception(
+        "add_index_declaration(): index '$name': driver block '$drv' must be a hashref"
+      ) unless ref $driver->{$drv} eq 'HASH';
+    }
+  }
+
+  my $entry = Storable::dclone({
+    name    => $name,
+    columns => $cols,
+    unique  => (
+      ($decl->{unique} or ($decl->{type} // '') =~ /^unique$/i) ? 1 : 0
+    ),
+    type    => $decl->{type},
+    options => $decl->{options},
+    driver  => $driver || {},
+  });
+
+  my $list = $self->{_index_declarations} ||= [];
+  my ($pos) = grep { $list->[$_]{name} eq $name } 0 .. $#$list;
+  if (defined $pos) {
+    $list->[$pos] = $entry;
+  }
+  else {
+    push @$list, $entry;
+  }
+
+  return;
+}
+
+
+sub index_declarations {
+  my $self = shift;
+  return map { Storable::dclone($_) } @{ $self->{_index_declarations} || [] };
+}
+
+
+sub index_declaration_drivers { qw(pg sqlite mysql oracle mssql sybase firebird clickhouse duckdb db2 informix) }
+
+
+sub index_declarations_for {
+  my ($self, $driver, $allowed) = @_;
+
+  $self->throw_exception(
+    "index_declarations_for(): '" . ($driver // 'undef') . "' is not a driver "
+    . "name, expected one of "
+    . join(', ', map "'$_'", $self->index_declaration_drivers)
+  ) unless defined $driver and grep { $_ eq $driver } $self->index_declaration_drivers;
+  $self->throw_exception(
+    "index_declarations_for('$driver'): expects the allowed keys of the "
+    . "driver block as an arrayref"
+  ) unless ref $allowed eq 'ARRAY';
+
+  my %allowed = map { $_ => 1 } @$allowed;
+  my $label = $self->source_name;
+  $label = $self->name unless defined $label;
+  $label = 'source' if ref $label;
+
+  my @out;
+  for my $idx ($self->index_declarations) {
+    my $blocks = $idx->{driver} || {};
+    my $own    = $blocks->{$driver};
+
+    if (!$own) {
+      if (my @foreign = sort keys %$blocks) {
+        $self->throw_exception(
+          "$label: index '$idx->{name}' carries only the "
+          . join(', ', map "'$_'", @foreign)
+          . " block and none for '$driver'; declare $driver => { ... } "
+          . "for it, or $driver => {} for the plain index"
+        );
+      }
+    }
+    else {
+      for my $key (sort keys %$own) {
+        next if $allowed{$key};
+        $self->throw_exception(
+          "$label: index '$idx->{name}': unknown key '$key' in its "
+          . "'$driver' block (valid keys: "
+          . join(', ', map "'$_'", sort keys %allowed) . ")"
+        );
+      }
+    }
+    push @out, $idx;
+  }
+
+  return @out;
+}
+
+
 sub unique_constraint_names {
   my ($self) = @_;
 
@@ -407,7 +528,7 @@ sub schema {
               . "(source '$name' is not associated with a schema).";
 
       $err .= ' You need to use $schema->thaw() or manually set'
-            . ' $DBIO::ResultSourceHandle::thaw_schema while thawing.'
+            . ' $DBIO::ResultSource::thaw_schema while thawing.'
         if $_[0]->{_detached_thaw};
 
       DBIO::Exception->throw($err);
@@ -441,35 +562,24 @@ sub add_relationship {
                   attrs => $attrs };
   $self->_relationships(\%rels);
 
+  # No definition-time resolution of the related source (ADR 0054). Only the
+  # local, self-contained checks above run here (join condition present;
+  # foreign./self. prefixing). The related source named by $f_source_name is
+  # deliberately NOT resolved at declaration time: relationships are declared
+  # while the schema is still being composed, when the far side is routinely
+  # not registered yet (forward and circular references are normal), and on a
+  # standalone prototype source there is neither a schema nor storage to
+  # resolve against. Resolution is lazy -- it happens on first use, when
+  # related_source/_resolve_join run against a fully-composed schema.
   return $self;
-
-# XXX disabled. doesn't work properly currently. skip in tests.
-
-  my $f_source = $self->schema->source($f_source_name);
-  unless ($f_source) {
-    $self->ensure_class_loaded($f_source_name);
-    $f_source = $f_source_name->result_source;
-    #my $s_class = ref($self->schema);
-    #$f_source_name =~ m/^${s_class}::(.*)$/;
-    #$self->schema->register_class(($1 || $f_source_name), $f_source_name);
-    #$f_source = $self->schema->source($f_source_name);
-  }
-  return unless $f_source; # Can't test rel without f_source
-
-  try { $self->_resolve_join($rel, 'me', {}, []) }
-  catch {
-    # If the resolve failed, back out and re-throw the error
-    delete $rels{$rel};
-    $self->_relationships(\%rels);
-    $self->throw_exception("Error creating relationship $rel: $_");
-  };
-
-  1;
 }
 
 
+# Through an array, not `return sort ...`: sort in scalar context is
+# undefined, and the count is what this returned there all along.
 sub relationships {
-  return keys %{shift->_relationships};
+  my @rel_names = sort keys %{shift->_relationships};
+  return @rel_names;
 }
 
 
@@ -765,6 +875,90 @@ sub _pk_depends_on {
   }
 
   return 1;
+}
+
+# True for a relationship that holds this row's foreign key (belongs_to): the
+# related row exists before this one, so multi-create may look it up.
+sub _relationship_depends_on {
+  my ($self, $rel_name) = @_;
+
+  my $relinfo = $self->relationship_info($rel_name);
+  return $relinfo && $relinfo->{attrs}{is_depends_on} ? 1 : 0;
+}
+
+# The columns of this source a relationship with a hash condition sets on a
+# row of this source, as the foreign key side of the condition names them.
+# A condition of any other kind names none here: its columns are known only
+# when it is resolved against a value.
+sub _relationship_self_columns {
+  my ($self, $rel_name) = @_;
+
+  my $cond = ( $self->relationship_info($rel_name) || {} )->{cond};
+  return () unless ref $cond eq 'HASH';
+
+  return map { ! ref $_ && $_ =~ /^self\.(.+)/ ? $1 : () } values %$cond;
+}
+
+# Mass assignment (ADR 0071): throws for the first column of the list that is
+# marked is_guarded.
+sub _assert_columns_not_guarded {
+  my ($self, @cols) = @_;
+
+  my $columns = $self->_columns;
+  for my $col (@cols) {
+    $self->throw_exception(sprintf(
+      "Column '%s' of source '%s' is guarded (is_guarded) and takes no value "
+    . "from new_result, create, update(\\%%hash), update_or_create, populate or multi-create",
+      $col, $self->source_name,
+    )) if $columns->{$col} and $columns->{$col}{is_guarded};
+  }
+
+  return;
+}
+
+# Throws unless the relationship takes data in multi-create.
+sub _assert_relationship_not_guarded {
+  my ($self, $rel_name) = @_;
+
+  my $relinfo = $self->relationship_info($rel_name);
+
+  $self->throw_exception(sprintf(
+    "Relationship '%s' of source '%s' is guarded (is_guarded) and takes no data in multi-create",
+    $rel_name, $self->source_name,
+  )) if $relinfo and $relinfo->{attrs}{is_guarded};
+
+  return;
+}
+
+# Mass assignment (ADR 0071): the values the caller assigns ({ column =>
+# value }) agree with the equality conditions of the resultset ({ column =>
+# value }, undef for IS NULL): the same value, NULL for NULL. A condition that
+# is not a plain value (a literal) is not compared.
+sub _assert_scope_agrees {
+  my ($self, $assigned, $scope) = @_;
+
+  for my $col (sort keys %$assigned) {
+    next unless exists $scope->{$col};
+
+    my ($fixed, $got) = ($scope->{$col}, $assigned->{$col});
+    next if ref $fixed;
+
+    next if ! defined $fixed and ! defined $got;
+    next if defined $fixed and defined $got and ! ref $got and $fixed eq $got;
+
+    # the text names the column and whether a value or NULL is meant, never
+    # a value: the values are the caller's and the condition's
+    $self->throw_exception(sprintf(
+      "create on a scoped resultset: '%s' is fixed to %s by the condition, got %s",
+      $col,
+      ! defined $fixed ? 'NULL' : 'a value',
+      ! defined $got ? 'NULL'
+        : ref $got ? 'a ' . ref($got) . ' value'
+        : defined $fixed ? 'another value' : 'a value',
+    ));
+  }
+
+  return;
 }
 
 sub _resolve_condition {
@@ -1269,19 +1463,6 @@ sub related_class {
   return $self->schema->class($self->relationship_info($rel)->{source});
 }
 
-
-sub handle {
-  return DBIO::ResultSourceHandle->new({
-    source_moniker => $_[0]->source_name,
-
-    # so that a detached thaw can be re-frozen
-    $_[0]->{_detached_thaw}
-      ? ( _detached_source  => $_[0]          )
-      : ( schema            => $_[0]->schema  )
-    ,
-  });
-}
-
 my $global_phase_destroy;
 sub DESTROY {
   ### NO detected_reinvoked_destructor check
@@ -1332,11 +1513,75 @@ sub DESTROY {
   return;
 }
 
-sub STORABLE_freeze { Storable::nfreeze($_[0]->handle) }
+# Schema instance to (re)attach to while thawing. Localized by
+# $schema->thaw / $schema->dclone (see DBIO::Schema); left unset for a
+# schema-less Storable::dclone, which then resolves a detached source.
+our $thaw_schema;
+
+sub STORABLE_freeze {
+  my ($self) = @_;
+
+  # A ResultSource is not serialized directly (it may carry CODErefs in
+  # relationship definitions and a schema backref). Freeze only the minimal
+  # identity needed to re-resolve the canonical source on thaw.
+  Storable::nfreeze({
+    source_moniker => $self->source_name,
+    _frozen_from_class => $self->{_detached_thaw}
+      ? $self->result_class
+      : $self->schema->class($self->source_name),
+  });
+}
+
 
 sub STORABLE_thaw {
   my ($self, $cloning, $ice) = @_;
-  %$self = %{ (Storable::thaw($ice))->resolve };
+
+  my $frozen = Storable::thaw($ice);
+  my $moniker = $frozen->{source_moniker};
+  my $from_class = $frozen->{_frozen_from_class};
+
+  DBIO::Util::assert_class_name($from_class);
+
+  my $resolved;
+  if ($thaw_schema) {
+    DBIO::Exception->throw(
+      "Thaw failed - class '$from_class' is not the result class of a source registered on the schema"
+    ) unless grep { $_ and $_->result_class eq $from_class }
+      values %{ $thaw_schema->source_registrations };
+
+    $resolved = $thaw_schema->source($moniker);
+  }
+  elsif ($from_class->isa('DBIO::ResultSourceProxy') and my $rs = $from_class->result_source_instance) {
+    # A class-level result source only counts as a resolution channel if it
+    # holds an actual schema *instance*. A schema *class name* is not good
+    # enough: that is what compose_namespace leaves on the composed result
+    # classes, and such a source has no storage, so resolving through it hands
+    # out a half-attached source that blows up with an obscure "method call on
+    # an undefined value" the first time anything storage-dependent runs.
+    my $leaked_schema = try { $rs->schema };
+
+    if (blessed $leaked_schema) {
+      $resolved = $leaked_schema->source($moniker);
+    }
+    else {
+      # Detached: metadata still works, every storage-dependent operation
+      # throws a pointed exception naming $schema->thaw / $thaw_schema. Copy
+      # rather than brand the shared class-level source itself.
+      $resolved = bless {
+        %$rs,
+        schema => undef,
+        source_name => $moniker,
+        _detached_thaw => 1,
+      }, ref $rs;
+    }
+  }
+  else {
+    DBIO::Exception->throw(
+      "Thaw failed - original result class '$from_class' does not exist on this system"
+    );
+  }
+
+  %$self = %$resolved;
 }
 
 
@@ -1364,7 +1609,7 @@ DBIO::ResultSource - Metadata object describing a table, view, or query source
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -1568,6 +1813,19 @@ Set this to a true value for a column that contains a key from a
 foreign table, defaults to false. This is currently only used to
 create tables from your schema, see L<DBIO::Schema/deploy>.
 
+=item is_guarded
+
+   { is_guarded => 1 }
+
+Set this to a true value for a column that no hash of values takes: a
+hashref given to L<DBIO::ResultSet/new_result>, L<DBIO::ResultSet/create>,
+L<DBIO::Row/update>, L<DBIO::ResultSet/update_or_create>,
+L<DBIO::ResultSet/populate> or a multi-create structure throws when it
+assigns this column, also when a relationship value of the hash sets it as
+foreign key. The accessor, L<DBIO::Row/set_column> and C<update> without a
+hash set it. A value the resultset's own condition holds is inherited, it is
+no assignment of the caller's. Defaults to false.
+
 =item default_value
 
    { default_value => \'now()' }
@@ -1613,6 +1871,14 @@ L<data_type|DBIO::ResultSource/data_type> whose values you want to
 automatically generate using C<NEWID()>, unless they are a primary key in which
 case this will be done anyway.
 
+A storage that can do neither -- its engine has no sequences, and the column
+is not a GUID column of a storage that generates GUIDs
+(L<DBIO::Storage::DBI::UniqueIdentifier>) -- refuses to insert a row that
+leaves such a column out: it throws an exception naming the column and the
+storage class, before anything is sent to the database. Give the column a
+value, or do not set C<auto_nextval>. Literal SQL does not count as a value
+here: where the value comes from a sequence, the fetched value replaces it.
+
 =item extra
 
 Arbitrary extra non-generic data to add to the column. For example:
@@ -1655,6 +1921,15 @@ Convenience wrapper for removing a single column via L</remove_columns>.
 
 Returns a new resultset instance for this source, seeded with schema defaults
 and source-level C<resultset_attributes>.
+
+=head2 STORABLE_thaw
+
+The L<Storable> hook that turns the frozen identity of a source back into the
+source. Thaw only data of your own, from a source you trust -- Storable
+creates objects of whatever class the data names. The class the data names
+is checked: it is a class name, and with a schema (L<DBIO::Schema/thaw>,
+L<DBIO::Schema/dclone>) it is the result class of one of the schema's
+registered sources; without a schema it is a loaded result class (a DBIO::ResultSourceProxy).
 
 =head2 has_column
 
@@ -1910,6 +2185,146 @@ source.
 The hash is keyed by constraint name, and contains an arrayref of
 column names as values.
 
+=head2 add_index_declaration
+
+=over 4
+
+=item Arguments: \%declaration
+
+=item Return Value: not defined
+
+=back
+
+  $source->add_index_declaration({
+    name    => 'artist_name_city',
+    columns => ['name', 'city'],
+    unique  => 1,
+    driver  => { pg => { where => 'city IS NOT NULL' } },
+  });
+
+Declares a secondary index on this source. This is the one canonical place
+for index declarations: L<DBIO::Cake/idx> and
+L<DBIO::ResultSourceProxy/indices> fill it, and a driver reads it back with
+L</index_declarations>.
+
+The keys are
+
+=over 4
+
+=item name
+
+Required. The index name; a second declaration with the same name replaces
+the first one at its position.
+
+=item columns
+
+Required. A column name or an arrayref of column names. A single name is
+promoted to a one-element arrayref.
+
+=item unique
+
+True for a unique index. A C<type> that matches C<unique> (any case) sets it
+as well.
+
+=item type
+
+Optional, kept as given.
+
+=item options
+
+Optional, kept as given.
+
+=item driver
+
+Optional hashref of per-driver blocks, keyed by driver name, each a hashref.
+The accepted names are those of L</index_declaration_drivers>. A schema is
+bound to one driver, so its driver reads its own block through
+L</index_declarations_for>.
+
+=back
+
+The entry is stored as
+C<< { name, columns => [...], unique => 0|1, type, options, driver => {...} } >>
+with C<type> and C<options> C<undef> when not given.
+
+Throws on a missing name, on missing or empty C<columns>, and on a
+C<driver> that is not a hashref of hashrefs or names a driver other than
+those of L</index_declaration_drivers>. The columns are not checked
+against the source, so an index may be declared before its columns are.
+
+=head2 index_declarations
+
+=over 4
+
+=item Arguments: none
+
+=item Return Value: @declarations
+
+=back
+
+  for my $idx ($source->index_declarations) {
+    # $idx->{name}, $idx->{columns}, $idx->{unique}, $idx->{driver}{pg}, ...
+  }
+
+The index declarations of this source, in declaration order, as the
+canonical entries L</add_index_declaration> stores. The entries are copies:
+changing them does not change the source.
+
+=head2 index_declaration_drivers
+
+=over 4
+
+=item Arguments: none
+
+=item Return Value: @driver_names
+
+=back
+
+The driver names an index declaration may carry a block for: C<pg>,
+C<sqlite>, C<mysql>, C<oracle>, C<mssql>, C<sybase>, C<firebird>,
+C<clickhouse>, C<duckdb>, C<db2>, C<informix>. This is the one list; L</add_index_declaration>,
+L<DBIO::Cake/idx> and L</index_declarations_for> go by it.
+
+=head2 index_declarations_for
+
+=over 4
+
+=item Arguments: $driver, \@allowed_keys
+
+=item Return Value: @declarations
+
+=back
+
+  for my $idx ($source->index_declarations_for('sqlite', [qw(where expression)])) {
+    my $own = $idx->{driver}{sqlite} || {};
+    # build CREATE [UNIQUE] INDEX from $idx->{columns}, $idx->{unique}, $own
+  }
+
+The index declarations of this source for the driver C<$driver>, in
+declaration order, as copies, like L</index_declarations>. This is the reader
+a driver's DDL emitter uses: a schema is bound to one driver, and an index
+declaration is driver-specific, so the entries are checked for that driver
+before any index is emitted. It throws, naming the source, the index and the
+driver, when
+
+=over 4
+
+=item *
+
+an entry carries only the block of another driver and none of C<$driver>'s.
+The row- or expression-defining part of it is not this driver's to guess;
+an empty own block (C<< sqlite =E<gt> {} >>) says that the plain index is
+wanted.
+
+=item *
+
+the entry's own block holds a key that is not in C<\@allowed_keys>.
+
+=back
+
+An entry without any driver block is a plain index and is returned as is.
+C<$driver> must be one of L</index_declaration_drivers>.
+
 =head2 unique_constraint_names
 
 =over 4
@@ -2019,12 +2434,9 @@ temporary usage via L<DBIO::ResultSet/result_class>.
 
 =back
 
-Returns a resultset for the given source. This will initially be created
-on demand by calling
+Returns a resultset for the given source, freshly created on each call by
 
   $self->resultset_class->new($self, $self->resultset_attributes)
-
-but is cached from then on unless resultset_class changes.
 
 =head2 resultset_class
 
@@ -2128,7 +2540,7 @@ This is useful if you want to refer to a result source by a name other than
 its class name.
 
   package ArchivedBooks;
-  use base qw/DBIO/;
+  use base qw/DBIO::Core/;
   __PACKAGE__->table('books_archive');
   __PACKAGE__->source_name('Books');
 
@@ -2265,8 +2677,14 @@ relationship.
 
 =back
 
-Throws an exception if the condition is improperly supplied, or cannot
-be resolved.
+Throws an exception if no join condition is supplied, or -- when the
+condition is a hashref -- if its keys are not prefixed with C<foreign.>
+or its values with C<self.>. These are the only checks performed here: the
+related source named by C<$f_source_name> is B<not> resolved or validated at
+this point. During schema construction the related source is routinely not
+registered yet (forward and circular references are normal), so relationship
+declarations are recorded as given and the related source is resolved lazily
+on first use. See ADR 0054.
 
 =head2 relationships
 
@@ -2280,7 +2698,10 @@ be resolved.
 
   my @rel_names = $source->relationships();
 
-Returns all relationship names for this source.
+Returns all relationship names for this source, sorted by name. The order is
+the same in every process, so text written by walking the list (the foreign
+keys of a C<CREATE TABLE>, say) does not change from one run to the next. In
+scalar context, returns the number of relationships.
 
 =head2 relationship_info
 
@@ -2376,21 +2797,6 @@ Returns the result source object for the given relationship.
 =back
 
 Returns the class name for objects in the given relationship.
-
-=head2 handle
-
-=over 4
-
-=item Arguments: none
-
-=item Return Value: L<$source_handle|DBIO::ResultSourceHandle>
-
-=back
-
-Obtain a new L<result source handle instance|DBIO::ResultSourceHandle>
-for this source. Used as a serializable pointer to this resultsource, as it is not
-easy (nor advisable) to serialize CODErefs which may very well be present in e.g.
-relationship definitions.
 
 =head2 throw_exception
 

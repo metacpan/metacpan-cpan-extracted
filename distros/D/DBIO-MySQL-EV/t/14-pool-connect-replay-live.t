@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Future;
 
 # LIVE test for the karr #19 WP3 / karr #18 / core #68 pool-connect replay:
 # on_connect_do AND on_connect_call must run on EVERY freshly-spawned EV pool
@@ -60,6 +61,25 @@ for my $i (0 .. $#per_conn) {
   is $row->[1], 'call-ran',
     "connection $i: on_connect_call replayed on this pooled connection";
 }
+
+# dbio_rows: the runner hands the rows of a statement back (karr k99).
+my @rows_per_conn = $h->run_on_each_pooled_connection(1, sub {
+  my ($conn, $harness) = @_;
+  # The harness awaits what the coderef returns, so hand it a done Future.
+  return Future->done([
+    $harness->async->_run_pool_connect_statement($conn,
+      q{SELECT 7 AS a, 'x' AS b UNION ALL SELECT 8, 'y' ORDER BY a}, { dbio_rows => 1 }),
+    $harness->async->_run_pool_connect_statement($conn,
+      q{SELECT 7 + ?}, { dbio_rows => 1 }, 1),
+    [ $harness->async->_run_pool_connect_statement($conn, q{SELECT 1}, {}) ],
+  ]);
+});
+my ($bare, $bound, $none) = @{ $rows_per_conn[0][0] };
+is_deeply [ map { [ @$_ ] } @$bare ], [ [ 7, 'x' ], [ 8, 'y' ] ],
+  'dbio_rows: the runner returns the rows of a bindless statement';
+is_deeply [ map { [ @$_ ] } @$bound ], [ [ 8 ] ],
+  'dbio_rows: the runner returns the rows of a bound statement';
+is_deeply $none, [], 'without dbio_rows the runner returns nothing';
 
 $h->disconnect;
 

@@ -11,7 +11,7 @@ col year     => datetime, null;
 
 primary_key 'cdid';
 
-unique 'title', 'artistid';
+unique ['title', 'artistid'];
 
 belongs_to artist => 'MyApp::SchemaCake::Result::Artist', 'artistid';
 has_many   tracks => 'MyApp::SchemaCake::Result::Track',  'cdid';

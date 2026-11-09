@@ -20,6 +20,7 @@ my $lingua = new_ok('CGI::Lingua' => [
 $lingua->{_have_ipcountry} = 0;
 $lingua->{_have_geoip} = 0;
 $lingua->{_have_geoipfree} = 0;
+$lingua->{_have_mmdb} = 0;
 
 cmp_ok($lingua->country(), 'eq', 'gb');
 

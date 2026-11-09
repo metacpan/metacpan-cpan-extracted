@@ -1,11 +1,12 @@
 package DBIO::PostgreSQL::PostGIS;
 # ABSTRACT: PostGIS spatial extension support for DBIO::PostgreSQL
-our $VERSION = '0.900001';
+our $VERSION = '0.900004';
 
 use strict;
 use warnings;
 
 use base 'DBIO::Base';
+use DBIO::Exception ();
 use DBIO::PostgreSQL::PostGIS::Geometry ();
 use DBIO::PostgreSQL::PostGIS::ResultSet ();
 
@@ -58,7 +59,15 @@ sub register_column {
         my ($value, $obj) = @_;
         return undef unless defined $value;
         if (ref($value) && $value->isa('DBIO::PostgreSQL::PostGIS::Geometry')) {
-          return $value->ewkt // $value->wkt // $value->ewkb_hex;
+          # A value that came from the database goes back as the EWKB hex
+          # it arrived as. The EWKT of such an object is rebuilt from the
+          # decoded coordinates and holds Perl's printing of each double,
+          # not the double.
+          my $why = $value->_unwritable_reason;
+          DBIO::Exception->throw($why) if defined $why;
+          my $hex = $value->ewkb_hex;
+          return $hex if defined $hex && length $hex;
+          return $value->ewkt;
         }
         # Already an EWKT/WKT/EWKB-hex string — pass through.
         return $value;
@@ -82,9 +91,13 @@ DBIO::PostgreSQL::PostGIS - PostGIS spatial extension support for DBIO::PostgreS
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
+
+  package MyApp::DB;
+  use DBIO Schema => -pg;
+  __PACKAGE__->pg_extensions('postgis');
 
   package MyApp::Schema::Result::Place;
   use base 'DBIO::Core';
@@ -129,7 +142,9 @@ PostGIS spatial type handling to L<DBIO> result classes:
 
 Columns with C<< data_type => 'geometry' >> or C<< 'geography' >> are
 automatically inflated to L<DBIO::PostgreSQL::PostGIS::Geometry>
-objects on read and deflated back to EWKT on write.
+objects on read and deflated on write: to the EWKB hex the object
+carries if it was read from the database, to EWKT if it was built in
+Perl (see L</register_column>).
 
 =item *
 
@@ -138,21 +153,30 @@ L<DBIO::PostgreSQL::PostGIS::ResultSet>.
 
 =back
 
-The schema-level storage extensions (C<ensure_postgis>, C<postgis_version>,
-the PostGIS-aware deploy class) live on the
-L<DBIO::PostgreSQL::PostGIS::Storage> B<layer>. Loading this component
-registers that layer (via L<DBIO::Schema/register_storage_layer>), so it is
-composed over the resolved driver storage (see L<DBIO::Storage::Composed>).
-Loading the component is all you do:
+=head2 Activating PostGIS
 
-  package MyApp::Schema;
-  use DBIO 'Schema';
-  __PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
+PostGIS is a database extension, and a schema states that its database has it
+in its list of extensions (ADR 0066), not by loading this component:
 
-To pull in the storage layer without the result-class geometry inflation
-(unusual), register it directly instead of loading the component:
+  package MyApp::DB;
+  use DBIO Schema => -pg;
+  __PACKAGE__->pg_extensions('postgis');                      # or
+  __PACKAGE__->pg_extensions(postgis => { schema => 'gis' });
 
-  __PACKAGE__->register_storage_layer('DBIO::PostgreSQL::PostGIS::Storage');
+The driver resolves the name to L<DBIO::PostgreSQL::PostGIS::Extension>. That
+class carries the model rules (the geometry type and SRID of a column; the
+verdict on a change of them: another SRID is converted with C<ST_Transform>,
+another type is refused), names the storage layer
+(L<DBIO::PostgreSQL::PostGIS::Storage>: C<ensure_postgis>, C<postgis_version>)
+and names this component as the inflation. C<postgis_topology> is its own
+extension with its own class, L<DBIO::PostgreSQL::PostGIS::Topology::Extension>.
+The C<::Deploy> and C<::Introspect> classes of this distribution are stubs.
+
+This component is the result side. Loading it in a result class gives the
+inflation and the resultset helpers above. Loading it on a schema registers the
+storage layer too, which the driver does for a declared C<postgis> anyway
+(registering twice is a no-op); the layer is composed over the resolved driver
+storage (see L<DBIO::Storage::Composed>).
 
 =head1 METHODS
 
@@ -160,8 +184,60 @@ To pull in the storage layer without the result-class geometry inflation
 
 Hooks into the column registration chain. When a column declares
 C<< data_type => 'geometry' >> or C<< 'geography' >>, registers
-inflate/deflate handlers that round-trip
-L<DBIO::PostgreSQL::PostGIS::Geometry> objects through EWKT.
+inflate/deflate handlers for L<DBIO::PostgreSQL::PostGIS::Geometry>
+objects.
+
+B<Inflate> takes whichever text form the database returned: EWKB hex
+(what PostGIS sends for a plain C<SELECT geom>), EWKT (C<SRID=N;...>, as
+from C<ST_AsEWKT>), or plain WKT, which gets the column's C<srid>.
+
+Only C<NULL> inflates to C<undef>. Every other value inflates to a
+Geometry object, and that includes the geometry types this distribution
+names and does not decode: C<CIRCULARSTRING>, C<COMPOUNDCURVE>,
+C<CURVEPOLYGON>, C<MULTICURVE>, C<MULTISURFACE>, C<POLYHEDRALSURFACE>,
+C<TIN>, C<TRIANGLE>, and a C<GEOMETRYCOLLECTION> holding one of them.
+Such an object has its C<ewkb_hex>, the C<srid> and the
+C<geometry_type> of the value (C<circularstring>, ...) and no
+coordinates -- C<coordinates>, C<wkt>, C<bbox> and the like return
+C<undef>, see L<DBIO::PostgreSQL::PostGIS::Geometry/from_ewkb_hex>. It
+is written back as its hex like any other read value, so the row stays
+readable, and its geometry can be copied to another row, without Perl
+knowing its coordinates. The alternative, an inflater that throws on
+such a value, would make every row holding one unreadable.
+
+B<Deflate> writes a Geometry object in the most faithful form it has:
+
+=over 4
+
+=item *
+
+An object that carries EWKB hex -- every value inflated from a plain
+C<SELECT> does -- is written as that hex, unchanged. Reading a geometry
+and writing it to another row (C<< $b->geom($a->geom); $b->update >>, or
+a C<create> with it) therefore stores the same geometry: same type, same
+Z/M dimension, the same doubles bit for bit. PostGIS takes the hex for
+C<geometry> and C<geography> columns alike.
+
+=item *
+
+An object without hex (an empty C<ewkb_hex> is no hex; built with
+C<point>, C<linestring>, C<polygon>, C<from_wkt>, C<from_ewkt>,
+C<from_geojson>, ...) is written as EWKT, C<SRID=N;WKT>, or as bare WKT
+when it has no SRID.
+
+=item *
+
+An object with none of these -- no hex, no WKT and no coordinates, or
+coordinates without a C<geometry_type> to build a WKT under -- B<throws> a
+L<DBIO::Exception> that says what is missing. It is not written as
+C<NULL>: C<NULL> is what C<undef> stands for, and an object is not
+C<undef>. (It was written as C<NULL>, or, for coordinates without a type,
+as C<()>, which the server refuses.)
+
+=back
+
+A plain string is passed through as it is, whichever of the three forms
+it holds.
 
 Override the auto-detection by setting C<< inflate_geometry => 0 >>
 explicitly on the column.
@@ -174,13 +250,19 @@ PostGIS helpers, subclass L<DBIO::PostgreSQL::PostGIS::ResultSet> and set
 C<resultset_class> to your subclass — the promotion guard skips any class
 that already inherits from C<DBIO::PostgreSQL::PostGIS::ResultSet>.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 
 =item * L<DBIO::PostgreSQL> - Base PostgreSQL driver component
 
 =item * L<DBIO::PostgreSQL::PostGIS::Geometry> - Lightweight geometry value object
+
+=item * L<DBIO::PostgreSQL::PostGIS::Extension> - The extension class: model rules for deploy, introspection and diff
+
+=item * L<DBIO::PostgreSQL::PostGIS::Topology::Extension> - The postgis_topology extension
 
 =item * L<DBIO::PostgreSQL::PostGIS::Storage> - Storage layer with spatial methods
 

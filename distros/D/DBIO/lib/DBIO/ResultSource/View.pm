@@ -4,6 +4,8 @@ package DBIO::ResultSource::View;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::ResultSet;
 
 use base qw/DBIO::Base/;
@@ -44,7 +46,7 @@ DBIO::ResultSource::View - ResultSource object representing a view
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -138,7 +140,7 @@ The constructor.
 Having created the MyApp::Schema::Year2000CDs schema as shown in the SYNOPSIS
 above, you can then:
 
-  $2000_cds = $schema->resultset('Year2000CDs')
+  @cds_2000 = $schema->resultset('Year2000CDs')
                      ->search()
                      ->all();
   $count    = $schema->resultset('Year2000CDs')
@@ -157,7 +159,7 @@ and ensuring you have is_virtual set to true:
 
 You could now say:
 
-  $2001_cds = $schema->resultset('Year2000CDs')
+  @cds_2001 = $schema->resultset('Year2000CDs')
                      ->search({}, { bind => [2001] })
                      ->all();
   $count    = $schema->resultset('Year2000CDs')

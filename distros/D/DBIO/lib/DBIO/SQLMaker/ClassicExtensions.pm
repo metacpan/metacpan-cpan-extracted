@@ -4,10 +4,13 @@ package DBIO::SQLMaker::ClassicExtensions;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 # to pull in CAG and the frame-boundary-markers
 use base 'DBIO::Base';
 use DBIO::Carp;
+use DBIO::Util ();
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors (simple => qw/quote_char name_sep/);
@@ -171,6 +174,23 @@ sub insert {
 # optimized due to hotttnesss
 #  my ($self, $table, $data, $options) = @_;
 
+  # ADR 0036: $options->{on_conflict} is the atomic-upsert transport. Only a
+  # driver SQLMaker can render it -- the clause has to be placed by engine
+  # grammar (before RETURNING on PostgreSQL, no conflict target at all on
+  # MySQL), so there is no generic tail to append here. A driver override
+  # consumes the key (deletes it from $options) and assembles its own
+  # statement; if the structure reaches this generic path it means the
+  # storage declared supports_upsert but its SQL generator does not
+  # implement the clause, which must be loud rather than silently dropped.
+  if ( ($_[3]||{})->{on_conflict} ) {
+    $_[0]->throw_exception(
+      ref($_[0]) . " does not implement the 'on_conflict' insert option "
+    . '(atomic upsert). A driver SQLMaker that supports it overrides insert(), '
+    . 'consumes $options->{on_conflict} and renders the engine clause itself. '
+    . 'See ADR 0036.'
+    );
+  }
+
   # FIXME SQLMaker will emit INSERT INTO $table ( ) VALUES ( )
   # which is sadly understood only by MySQL. Change default behavior here,
   # until we fold the extra pieces into SQLMaker properly
@@ -190,6 +210,103 @@ sub insert {
   }
 
   next::method(@_);
+}
+
+
+sub _upsert_attempted_sql {
+  my ($self, $col) = @_;
+
+  $self->throw_exception(
+    ref($self) . ' does not implement _upsert_attempted_sql -- the reference '
+  . 'to the row an upsert tried to insert (PostgreSQL EXCLUDED."col", SQLite '
+  . 'excluded."col", MySQL VALUES(col) / new.col) is engine grammar, so core '
+  . 'has no default for it. A driver SQLMaker whose storage declares '
+  . 'supports_upsert renders the token itself. See ADR 0036.'
+  );
+}
+
+
+sub _upsert_condition_sql {
+  my ($self, $cond, $table) = @_;
+
+  # { -attempted => $col } can sit at ANY depth of a condition. Rather than
+  # walking the condition here and re-deriving which positions take an operand
+  # and which take "operator plus operand", the marker is registered as an
+  # SQL::Abstract operator for the duration of this one call: the expansion
+  # pass already visits every node, so it substitutes at every depth, in nested
+  # -and/-or, in -in lists, inside -between and inside functions.
+  #
+  # make_unop_expander is what makes the bare right-hand-side position come out
+  # right. { rank => { -attempted => 'rank' } } is the caller saying "equal to
+  # the attempted value", and the expander turns that position into a
+  # comparison before the node is rendered (SQL::Abstract.pm:370 -- it
+  # dispatches to _expand_hashpair_cmp whenever the key is defined), instead of
+  # the '"rank" EXCLUDED."rank"' a raw literal substitution would produce.
+  # That is why a -literal is correct in every position here and no -ident
+  # detour is needed.
+  #
+  # local, not a constructor registration: -attempted means nothing in a
+  # SELECT, and leaking the operator into every where() would let it render a
+  # pseudo-row reference in statements that have no attempted row.
+  local $self->{expand_op}{attempted} = $self->make_unop_expander(sub {
+    my ($self, $op, $col) = @_;
+
+    # One place for the marker's payload rule, however deep the node sat: the
+    # expander is the single door every -attempted in the condition comes
+    # through.
+    $self->throw_exception(
+      '{ -attempted => $column } takes a plain column name, nothing else'
+    ) unless defined $col and ! length ref $col;
+
+    return { -literal => [ $self->_upsert_attempted_sql($col) ] };
+  });
+
+  # k205: qualify the stored-side columns with the target table.
+  #
+  # The vocabulary above lets a *bare* column mean the *stored* row -- the row
+  # the statement collided with -- while the marker spells the *attempted* row.
+  # But in an ON CONFLICT DO UPDATE branch both correlations are in scope at
+  # once (the target table and the attempted pseudo-row, PostgreSQL EXCLUDED /
+  # SQLite excluded), and a bare column reaches the engine unqualified: with the
+  # same name carried by both sides the engine cannot tell them apart, and
+  # PostgreSQL rejects it outright ("column reference is ambiguous", karr k205).
+  # This premise -- "an unqualified stored column renders correctly on its own"
+  # -- is exactly what ADR 0036 section 1 assumed and k205 disproves for the
+  # *conditional* branch.
+  #
+  # So when the caller passes the target table, every bare (single-part) column
+  # in the condition is qualified with it. It rides the SAME expansion pass as
+  # the marker above, so "at any depth" holds by construction rather than by a
+  # hand-written walk. Left untouched, deliberately: an already-qualified ident
+  # (it carries its own table part -> more than one part) and the attempted-row
+  # marker (which expanded to a -literal above, never an ident). So an EXCLUDED
+  # reference is byte-for-byte unchanged, and a caller that passes no table --
+  # including the unconditional upsert, which never reaches this method -- gets
+  # the pre-k205 rendering.
+  #
+  # This is determinate for ON CONFLICT precisely because there is exactly one
+  # target correlation plus the one pseudo-row; MERGE's two named source/target
+  # aliases are a different, broader question (karr k172) and are not touched here.
+  if (defined $table and length $table) {
+    my @target = @{ $self->_expand_ident(ident => $table)->{-ident} };
+    my $expand_ident = $self->{expand_op}{ident};
+
+    local $self->{expand_op}{ident} = sub {
+      my ($self, $name, $body, $k) = @_;
+      my $expanded = $self->$expand_ident($name, $body, $k);
+
+      return { -ident => [ @target, @{ $expanded->{-ident} } ] }
+        if ref $expanded eq 'HASH'
+        and ref $expanded->{-ident} eq 'ARRAY'
+        and @{ $expanded->{-ident} } == 1;
+
+      return $expanded;
+    };
+
+    return $self->_recurse_where($cond);
+  }
+
+  return $self->_recurse_where($cond);
 }
 
 
@@ -227,6 +344,8 @@ sub _recurse_fields {
        .' or { select => [ qw/' . (join ' ', @$rhs) . '/ ], distinct => 1 }'
       );
     }
+
+    DBIO::Util::assert_function_name($func, "select");
 
     my ($rhs_sql, @rhs_bind) = $self->_recurse_fields($rhs);
     my $select = sprintf ('%s( %s )%s',
@@ -346,11 +465,13 @@ sub _split_order_chunk {
   my ($self, $chunk) = @_;
 
   # strip off sort modifiers, but always succeed, so $1 gets reset
-  $chunk =~ s/ (?: \s+ (ASC|DESC) )? \s* $//ix;
+  $chunk =~ s/ (?: \s+ (ASC|DESC) )? (?: \s+ NULLS \s+ (FIRST|LAST) )? \s* $//ix;
+  my ($dir, $nulls) = ($1, $2);
 
   return (
     $chunk,
-    ( $1 and uc($1) eq 'DESC' ) ? 1 : 0,
+    ( $dir and uc($dir) eq 'DESC' ) ? 1 : 0,
+    ( $nulls ? uc($nulls) : undef ),
   );
 }
 
@@ -803,10 +924,14 @@ sub _prep_for_skimming_limit {
     for my $ch ($self->_order_by_chunks ($inner_order)) {
       $ch = $ch->[0] if ref $ch eq 'ARRAY';
 
-      ($ch, my $is_desc) = $self->_split_order_chunk($ch);
+      ($ch, my $is_desc, my $nulls) = $self->_split_order_chunk($ch);
 
-      # !NOTE! outside chunks come in reverse order ( !$is_desc )
-      push @out_chunks, { ($is_desc ? '-asc' : '-desc') => \$ch };
+      # !NOTE! outside chunks come in reverse order ( !$is_desc ),
+      # and so does the position of the NULLs
+      push @out_chunks, {
+        ($is_desc ? '-asc' : '-desc') => \$ch,
+        ( $nulls ? ( -nulls => ($nulls eq 'FIRST' ? 'last' : 'first') ) : () ),
+      };
     }
 
     $sq_attrs->{order_by_middle} = $self->_order_by (\@out_chunks);
@@ -973,17 +1098,22 @@ sub _GenericSubQ {
   my $main_alias = $rs_attrs->{alias};
   my $main_tbl_name = $main_rsrc->name;
 
-  my (@unqualified_names, @qualified_names, @is_desc, @new_order_by);
+  my (@unqualified_names, @qualified_names, @is_desc, @nulls_first, @new_order_by);
 
   for my $bit (@order_bits) {
 
-    ($bit, my $is_desc) = $self->_split_order_chunk($bit);
+    ($bit, my $is_desc, my $nulls) = $self->_split_order_chunk($bit);
 
     push @is_desc, $is_desc;
+    # an explicit NULLS position wins, otherwise ASC has NULLs first
+    push @nulls_first, $nulls ? ($nulls eq 'FIRST' ? 1 : 0) : ($is_desc ? 0 : 1);
     push @unqualified_names, $usable_order_colinfo->{$bit}{-colname};
     push @qualified_names, $usable_order_colinfo->{$bit}{-fq_colname};
 
-    push @new_order_by, { ($is_desc ? '-desc' : '-asc') => $usable_order_colinfo->{$bit}{-fq_colname} };
+    push @new_order_by, {
+      ($is_desc ? '-desc' : '-asc') => $usable_order_colinfo->{$bit}{-fq_colname},
+      ( $nulls ? ( -nulls => lc $nulls ) : () ),
+    };
   };
 
   my (@where_cond, @skip_colpair_stack);
@@ -1005,8 +1135,8 @@ sub _GenericSubQ {
 
       $cur_cond = [
         {
-          ($is_desc[$i] ? $subq_col : $main_col) => { '!=', undef },
-          ($is_desc[$i] ? $main_col : $subq_col) => undef,
+          ($nulls_first[$i] ? $main_col : $subq_col) => { '!=', undef },
+          ($nulls_first[$i] ? $subq_col : $main_col) => undef,
         },
         {
           $subq_col => { '!=', undef },
@@ -1234,7 +1364,7 @@ DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -1280,6 +1410,68 @@ Currently the enhancements over L<SQL::Abstract> are:
 =head2 _lock_select
 
 =head2 insert
+
+=head2 _upsert_attempted_sql
+
+  my $sql = $sqlmaker->_upsert_attempted_sql('updated_at');
+  # EXCLUDED."updated_at"   -- PostgreSQL
+  # excluded."updated_at"   -- SQLite
+
+Renders core's engine-neutral C<< { -attempted => $column } >> marker — the
+value the statement B<tried to insert> — as the engine's own reference to that
+pseudo-row. The one engine-specific piece of an upsert condition, and the only
+thing L</_upsert_condition_sql> is parameterized over.
+
+B<Core has no default.> ADR 0036 pins the split: core stays abstract about the
+token and the I<driver> SQLMaker renders it, so there is nothing generic to
+fall back on here and guessing one engine's spelling for another is worse than
+throwing. The throw is a developer-facing guard for a driver that declared
+C<supports_upsert> without spelling its token; it is not reachable from the
+public API, because core never routes an C<on_conflict> structure to a SQLMaker
+whose storage has not declared the capability.
+
+A driver implements it once and uses it for both places the marker can appear —
+the C<set> list and the conditional branch — so the two halves of the same
+statement can never spell it differently.
+
+=head2 _upsert_condition_sql
+
+  my ($sql, @bind) = $sqlmaker->_upsert_condition_sql(\%cond, $table);
+
+Renders the condition of an upsert's conditional conflict branch — C<update_where>,
+ADR 0036 section 1. Returns the bare condition without the C<WHERE> keyword,
+like C<_recurse_where> does, plus its bind values; the driver's own conflict
+builder splices both in where its grammar wants them.
+
+C<$table> is the target table the statement inserts into. Pass it and every
+bare (stored-side) column in the condition is qualified with it (see below); it
+is optional, and omitting it renders the pre-k205 unqualified condition.
+
+Two vocabularies, both engine-neutral:
+
+=over
+
+=item * an B<unqualified column> is the B<stored> row — the row the statement
+collided with. In an C<ON CONFLICT DO UPDATE> branch that row shares the scope
+with the attempted-values pseudo-row (C<EXCLUDED> / C<excluded>), so a bare
+column is B<ambiguous> to the engine — PostgreSQL rejects it outright ("column
+reference is ambiguous"). Given C<$table>, every bare (single-part)
+column is therefore qualified with the target table, at B<any> depth. An
+already-qualified column (it carries its own table part) and the
+C<< { -attempted } >> marker are left exactly as they are.
+
+=item * C<< { -attempted => $column } >> is the value the statement B<tried to
+insert>, rendered by L</_upsert_attempted_sql>. Unlike in the C<set> list,
+where it is only ever a top-level value, here it may appear at B<any> depth.
+
+=back
+
+  # with $table = 'artist':
+  { updated_at => { '<' => { -attempted => 'updated_at' } } }
+  # "artist"."updated_at" < EXCLUDED."updated_at"   -- the last-write-wins guard
+
+A literal (C<< \'excluded.rank > artist.rank' >> or C<< \[ $sql, @bind ] >>)
+passes through untouched, for conditions the abstract form cannot express.
 
 =head2 _recurse_fields
 

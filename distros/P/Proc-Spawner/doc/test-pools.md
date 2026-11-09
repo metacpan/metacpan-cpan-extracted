@@ -90,11 +90,12 @@ perl $T/large-subset-yardsticks.pl -v -c sc-cache.jsonl -o samples.tsv samples.j
 
 The figures and what they mean: [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md). The history of the filters: [`doc/large-subset/large-subset-ceiling.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-ceiling.md) (in Proc-Spawner 0.03).
 
-**Behaviour** (post4-0.04; [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md), section 7): run every accepted sample in dash, `bash --posix` and ours, about 21 minutes. As root (it makes the users `rc0`…`rc3` and runs the samples as them), with no network, after `make`:
+**Behaviour** (post4-0.04, run again post-0.09; [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md), section 7): run every accepted sample in dash, `bash --posix` and ours, about 55 minutes (each run in a mount namespace of its own: a fresh `/tmp`, a fixed `/dev/urandom`, fixed file times; without `-env`, 21 minutes, as post4-0.04). As root (it makes the users `rc0`…`rc3` and runs the samples as them), with no network, after `make`:
 
 ```sh
-unshare -n perl $T/large-subset-runcompare.pl -j 4 samples.jsonl samples.tsv rundir    # restartable: it skips what rundir has
-unshare -n perl $T/large-subset-runcompare.pl -q -j 4 samples.jsonl samples.tsv qdir   # ours only, the programs' calls logged
+E='-env tmp,random,mtime -base /runcompare'   # the table of post-0.09
+unshare -n perl $T/large-subset-runcompare.pl -j 4 $E samples.jsonl samples.tsv rundir    # restartable: it skips what rundir has
+unshare -n perl $T/large-subset-runcompare.pl -q -j 4 $E samples.jsonl samples.tsv qdir   # ours only, the programs' calls logged
 perl $T/large-subset-runreport.pl -q qdir -l $T/large-subset-run-differences.tsv rundir   # with and without coreutils
 unshare -n perl $T/large-subset-threeway.pl -l $T/large-subset-threeway-differences.tsv -db $T/large-subset-threeway-db.jsonl qdir
 unshare -n perl $T/large-subset-builtins.pl -l builtins.tsv -db builtins.jsonl qdir   # about 45 minutes; -reuse OLD.jsonl skips known calls

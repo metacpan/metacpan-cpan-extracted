@@ -2,6 +2,9 @@ package DBIO::Storage::BlockRunner;
 # ABSTRACT: Execute code blocks with transaction wrapping and retry logic
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use DBIO::Exception;
@@ -181,8 +184,10 @@ sub _run {
     # something above threw an error (could be the begin, the code or the commit)
     if ( is_exception $run_err ) {
 
-      # attempt a rollback if we did begin in the first place
-      if ($txn_begin_ok) {
+      # roll back the transaction this runner began while it is still open; a
+      # failed commit of the outermost transaction has ended it already, and
+      # its error reaches the caller as it is (karr k372)
+      if ($txn_begin_ok and $storage->transaction_depth > $txn_init_depth) {
         # some DBDs go crazy if there is nothing to roll back on, perform a soft-check
         my $rollback_exception = $storage->_seems_connected
           ? (! eval { $storage->txn_rollback; 1 }) ? $@ : ''
@@ -221,6 +226,7 @@ sub _run {
         $run_err,
       ) if $self->retry_debug;
 
+      $storage->_abandon_handle_before_reconnect;
       $storage->ensure_connected;
       # if txn_depth is > 1 this means something was done to the
       # original $dbh, otherwise we would not get past the preceding if()
@@ -251,7 +257,7 @@ DBIO::Storage::BlockRunner - Execute code blocks with transaction wrapping and r
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 

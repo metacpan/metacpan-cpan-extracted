@@ -4,6 +4,10 @@ package DBIO::Diff::Op;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
+use Scalar::Util ();
+
 use base 'Class::Accessor::Grouped';
 
 __PACKAGE__->mk_group_accessors(simple => 'action');
@@ -34,18 +38,54 @@ sub summary_prefix {
 }
 
 
+# Internal: stable topological order of @names; a name comes after the names
+# it depends on. Names caught in a cycle follow alphabetically at the end.
+sub _order_by_dependency {
+  my ($depends, @names) = @_;
+  @names = sort @names;
+  return @names unless $depends;
+
+  my %in = map { $_ => 1 } @names;
+  my %deps;
+  for my $n (@names) {
+    my $d = ref($depends) eq 'CODE' ? $depends->($n) : $depends->{$n};
+    $deps{$n} = [ grep { $_ ne $n && $in{$_} } @{ $d || [] } ];
+  }
+
+  my (@ordered, %done);
+  my @rest = @names;
+  while (@rest) {
+    my $at;
+    for my $i (0 .. $#rest) {
+      next if grep { !$done{$_} } @{ $deps{ $rest[$i] } };
+      $at = $i;
+      last;
+    }
+    last unless defined $at;
+    my ($n) = splice @rest, $at, 1;
+    $done{$n} = 1;
+    push @ordered, $n;
+  }
+  return (@ordered, @rest);
+}
+
 sub diff_toplevel {
   my ($class, $source, $target, %cb) = @_;
   $source ||= {};
   $target ||= {};
 
   my @ops;
-  for my $name (sort keys %$target) {
-    next if exists $source->{$name};
+  my @create = _order_by_dependency($cb{depends},
+    grep { !exists $source->{$_} } keys %$target);
+  for my $name (@create) {
     push @ops, $cb{create}->($name) if $cb{create};
   }
-  for my $name (sort keys %$source) {
-    next if exists $target->{$name};
+
+  my $drop_depends = $cb{source_depends} || $cb{depends};
+  my @drop = _order_by_dependency($drop_depends,
+    grep { !exists $target->{$_} } keys %$source);
+  @drop = reverse @drop if $drop_depends;
+  for my $name (@drop) {
     push @ops, $cb{drop}->($name) if $cb{drop};
   }
   return @ops;
@@ -80,7 +120,14 @@ sub diff_nested {
 
   my @ops;
 
-  for my $table (sort keys %$target) {
+  # Under 'both' the tables of the source count too: a table that lost its
+  # last member is missing from the target hash, but its on_gone is due.
+  my %walk = map { $_ => 1 } keys %$target;
+  if ($scope eq 'both') {
+    $walk{$_} = 1 for keys %$source;
+  }
+
+  for my $table (sort keys %walk) {
     if ($scope eq 'both') {
       next unless exists $src_tables->{$table} && exists $tgt_tables->{$table};
     }
@@ -130,8 +177,9 @@ sub diff_nested {
 sub should_emit_if_exists {
   my ($storage) = @_;
   return 0 unless $storage;
-  return 0 unless ref($storage) && $storage->can('_use_if_exists');
-  return $storage->_use_if_exists ? 1 : 0;
+  return 0 unless Scalar::Util::blessed($storage)
+    && $storage->can('_use_supports_if_exists');
+  return $storage->_use_supports_if_exists ? 1 : 0;
 }
 
 1;
@@ -148,7 +196,7 @@ DBIO::Diff::Op - Base class for DBIO driver diff operation objects
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -172,8 +220,8 @@ drop; no in-place change).
 
 =item * L</diff_nested> -- the create/change/drop walk for members nested under
 tables (columns, indexes, foreign keys), parameterized by a per-engine
-"did this member change?" predicate (e.g. the C<is_same_*> functions from
-L<DBIO::Diff::Compare>) and per-engine op-construction callbacks.
+"did this member change?" predicate (e.g. the C<changed_*_fields> functions
+from L<DBIO::Diff::Compare>) and per-engine op-construction callbacks.
 
 =item * L</summary_prefix> -- the C<+>/C<->/C<~> action glyph used in summaries.
 
@@ -218,6 +266,8 @@ Pass an C<< action => glyph >> map to override. Unknown actions default to C<~>.
     my @ops = $class->diff_toplevel($source, $target,
       create => sub { my ($name) = @_; $class->new(action => 'create', ...) },
       drop   => sub { my ($name) = @_; $class->new(action => 'drop',   ...) },
+      depends        => { orders => ['customers'] },   # optional
+      source_depends => { orders => ['customers'] },   # optional, for the drops
     );
 
 The create/drop walk for a flat collection keyed by name (the table-level
@@ -227,6 +277,17 @@ each name present only in C<$source> the C<drop> callback is invoked. Names
 present in both are left untouched (table identity has no in-place change here;
 column/index/fk changes are handled by L</diff_nested>). Names are walked in
 sorted order. Each callback may return zero or more ops; all are collected.
+
+C<depends> is optional. Given, it orders the walk by dependency instead of
+alphabetically: a hashref C<< { $name => [ @names_it_reads ] } >> or a coderef
+called with C<$name> returning that list (e.g. the tables a table's foreign
+keys point to). Creates then come with the names read first, drops in the
+reverse order (readers before the names they read). Only dependencies inside
+the set being created or dropped count; the order is stable (sorted among
+the names that are free to go) and a cycle does not die -- the names left in
+it follow alphabetically at the end. The drops use C<source_depends> when
+given (the dependencies as the source model has them) and C<depends>
+otherwise. Without either option the walk is the plain alphabetical one.
 
 =head2 diff_nested
 
@@ -252,7 +313,8 @@ For each retained table, every member in the target is matched against the
 source by name: present only in the target -> C<on_new>; present in both and
 C<changed_when> returns true -> C<on_changed>; present only in the source ->
 C<on_gone>. C<changed_when> is the per-engine seam -- pass one of the
-C<is_same_*> predicates from L<DBIO::Diff::Compare> (they return the list of
+C<changed_column_fields> / C<changed_index_fields> / C<changed_fk_fields>
+functions from L<DBIO::Diff::Compare> (they return the list of
 changed fields, hence are true exactly when the member changed). C<skip>, if
 given, drops a member from consideration on both sides (used to ignore
 auto-generated primary-key / unique indexes).
@@ -262,7 +324,9 @@ C<scope> selects which tables are walked:
 =over 4
 
 =item * C<both> (default) -- only tables present in B<both> C<source_tables> and
-C<target_tables>. Members of brand-new tables are emitted inline by the
+C<target_tables>. The tables walked are those of C<$source> and of C<$target>:
+a table that lost its last member is missing from C<$target>, and its members
+still reach C<on_gone>. Members of brand-new tables are emitted inline by the
 table-create op, and members of dropped tables vanish with the table, so they
 are skipped here. Pass the model C<tables> sections as C<source_tables> /
 C<target_tables> (they default to C<$source> / C<$target> if omitted).
@@ -280,17 +344,22 @@ zero or more ops; all are collected.
 
     return 1 if DBIO::Diff::Op::should_emit_if_exists($storage);
 
-F12 helper: returns true iff the connected storage's C<_use_if_exists>
+F12 helper: returns true iff the connected storage's C<supports_if_exists>
 capability is truthy (L<DBIO::Storage::DBI::Capabilities>). Per-driver
 C<as_sql> methods call this to decide whether to emit C<IF [NOT] EXISTS>
 guards (C<CREATE TABLE IF NOT EXISTS>, C<DROP TABLE IF EXISTS>,
 C<ALTER TABLE ... ADD COLUMN IF NOT EXISTS>) so that re-applying a diff
 after a partial failure no-ops instead of erroring out.
 
+The probe is the capability's C<_use_supports_if_exists> accessor -- the
+one drivers register through (C<< __PACKAGE__->_use_supports_if_exists(0|1) >>).
+Reading it I<is> the two-tier read: C<get_use_dbms_capability> returns the
+driver's explicit C<_use_> value when one is set, and otherwise falls
+through to C<_supports_supports_if_exists> / C<_determine_supports_supports_if_exists>,
+so a driver that declares the capability either way is honoured here.
+
 Returns false (conservative) when C<$storage> is missing, the storage
-lacks the capability probe, or the capability is 0. Per-driver adoption
-of this helper is a follow-up; the 41 driver C<as_sql> files are not
-modified in this commit.
+lacks the capability probe, or the capability is 0.
 
 =head1 AUTHOR
 

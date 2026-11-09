@@ -1,5 +1,19 @@
 Revision history for Perl extension App-mdee
 
+1.17 2026-11-09T09:21:16Z
+
+    - Show front matter at the top of a file (YAML between --- lines,
+      TOML between +++ lines) as one block in the new colors meta_mark
+      and meta_block, which default to those of code blocks, and leave it
+      alone with --refill: it was shown, and joined, as Markdown.
+      --config front_matter=0 takes it as Markdown again
+    - Fold list items with the + marker
+    - Add --begin to the md module, which calls a function on the text
+      before it is formatted, and the theme widen, which uses it to add
+      a no-break space after circled digits and the wastebasket, for
+      macOS terminals that draw them over two columns
+    - Correct the manual where it said that --refill needs pandoc
+
 1.16 2026-11-06T05:31:34Z
 
     - Take * and ** as emphasis only where CommonMark does: "L*=50, a*=68"

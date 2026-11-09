@@ -105,11 +105,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.55
+Version 0.56
 
 =cut
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 =head1 DESCRIPTION
 
@@ -683,6 +683,11 @@ Name of the key column.  Default is C<entry>.
 Field separator for CSV/PSV files.
 Default is C<!> - pass C<< sep_char => ',' >>
 for standard comma-separated files.
+
+A quote inside a quoted field may be written as two quotes
+(C<"a ""b"" c">, as RFC 4180 and spreadsheets write it) or with a backslash
+(C<"a \"b\" c">).  Each file is read with the one it uses: a backslash when
+the file holds a backslash before a quote anywhere, otherwise the quote.
 
 =item * C<max_slurp_size>
 
@@ -1449,6 +1454,7 @@ sub _open :Protected
 		if(defined($slurp_file) && (-r $slurp_file)) {
 			close($fin) if(defined($fin));
 			my $sep_char = $params->{'sep_char'};
+			my $escape_char = $self->_csv_escape_char($slurp_file);
 
 			$self->_debug(__LINE__, ' of ', __PACKAGE__, ": slurp_file = $slurp_file, sep_char = $sep_char");
 
@@ -1479,7 +1485,7 @@ sub _open :Protected
 				empty_is_undef => 1,
 				binary => 1,
 				f_file => $slurp_file,
-				escape_char => '\\',
+				escape_char => $escape_char,
 				sep_char => $sep_char,
 				# Don't do this, causes "Bizarre copy of HASH
 				#	in scalar assignment in error_diag
@@ -1522,7 +1528,7 @@ sub _open :Protected
 							blank_is_undef => 1,
 							empty_is_undef => 1,
 							binary => 1,
-							escape_char => '\\',
+							escape_char => $escape_char,
 						},
 						# string => \join('', grep(!/^\s*(#|$)/, <DATA>))
 						file => $slurp_file
@@ -4910,6 +4916,32 @@ sub _quote_identifier
 		return $dbh->quote_identifier($name);
 	}
 	return qq{"$name"};
+}
+
+# The escape character a CSV/PSV/TSV file is written with.  RFC 4180 (and
+# every spreadsheet) writes a quote inside a quoted field as two quotes,
+# "Adeste ""Overture""", which a backslash escape reads back as two quotes;
+# other files write it \", which a quote escape cannot read at all.  So: a
+# backslash before a quote anywhere means backslash, the escape this module
+# always used; else two quotes in a row mean a quote; else backslash.  An
+# empty quoted field ("") reads the same either way.  Stops at the first
+# backslash-quote, else reads the file once.
+sub _csv_escape_char
+{
+	my ($self, $file) = @_;
+
+	my $fh;
+	do { no autodie qw(open); open $fh, '<:raw', $file } or return '\\';
+	my $doubled = 0;
+	while(my $line = <$fh>) {
+		if($line =~ /\\"/) {
+			close $fh;
+			return '\\';
+		}
+		$doubled ||= ($line =~ /""/);
+	}
+	close $fh;
+	return $doubled ? '"' : '\\';
 }
 
 # Determine whether a given file is a valid Berkeley DB file.

@@ -4,6 +4,8 @@ package DBIO::PK::Auto;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Core/;
 
 1;
@@ -20,7 +22,7 @@ DBIO::PK::Auto - Automatic primary key class (compatibility shim)
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

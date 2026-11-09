@@ -4,11 +4,14 @@ package DBIO::Diff::Compare;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
   norm norm_type arr_differ changed_fields
   changed_column_fields changed_index_fields changed_fk_fields
+  column_change_lossy
 );
 
 
@@ -87,27 +90,99 @@ sub changed_fields {
     next if $skip->($field);
     push @changed, $field if arr_differ($old->{$field}, $new->{$field});
   }
+  for my $field (@{ $spec{mutual} || [] }) {
+    # Bilateral: a difference only when BOTH sides carry a value. undef on
+    # either side means that participant has no opinion (e.g. a driver that
+    # does not introspect index_type), so it is never a change -- a typeless
+    # driver produces no phantom diff. Compared as a type token. ADR 0052.
+    next unless defined $old->{$field} && defined $new->{$field};
+    push @changed, $field if norm_type($old->{$field}) ne norm_type($new->{$field});
+  }
 
   return @changed;
 }
 
 
+# Internal: true when a live default value is a real default. An absent one and
+# a literal NULL (plain or as a \'NULL' ref) are none.
+sub _has_default {
+  my ($v) = @_;
+  $v = $$v if ref($v) eq 'SCALAR' || ref($v) eq 'REF';
+  return defined $v && uc(norm($v)) ne 'NULL' ? 1 : 0;
+}
+
 sub changed_column_fields {
   my ($old, $new) = @_;
-  return changed_fields($old, $new,
+  $old ||= {};
+  $new ||= {};
+  my @changed = changed_fields($old, $new,
     type   => ['data_type'],
     scalar => ['not_null', 'default_value'],
     dim    => ['size'],
     desired_state => 1,
   );
+  # A default the target no longer declares is a change: the live column
+  # carries one (a live DEFAULT NULL is none), the target leaves it undef.
+  # Placed where the scalar pass puts default_value, after not_null.
+  if (!defined $new->{default_value} && _has_default($old->{default_value})) {
+    my $at = (grep { $changed[$_] eq 'not_null' } 0 .. $#changed)[0];
+    splice @changed, defined $at ? $at + 1 : 0, 0, 'default_value';
+  }
+  # is_auto_increment follows the desired-state rule (a target that leaves it
+  # undef prescribes nothing), but a prescribed flag compares as a bool: an
+  # explicit 0 equals a live column that carries no flag.
+  push @changed, 'is_auto_increment'
+    if defined $new->{is_auto_increment}
+    && (($old->{is_auto_increment} // 0) ? 1 : 0) != ($new->{is_auto_increment} ? 1 : 0);
+  return @changed;
+}
+
+
+# Internal: the components of a size as a list of numbers, or undef when the
+# value is absent or not numeric.
+sub _size_parts {
+  my ($v) = @_;
+  return undef unless defined $v;
+  my @p = ref($v) eq 'ARRAY' ? @$v : split /\s*,\s*/, $v;
+  s/^\s+|\s+$//g for grep { defined } @p;
+  @p = grep { defined $_ && length $_ } @p;
+  return undef unless @p;
+  return undef if grep { !/\A[0-9]+\z/ } @p;
+  return \@p;
+}
+
+sub column_change_lossy {
+  my ($old, $new, $pairs) = @_;
+  $old ||= {};
+  $new ||= {};
+  $pairs ||= {};
+
+  my $ot = lc norm_type($old->{data_type});
+  my $nt = defined $new->{data_type} ? lc norm_type($new->{data_type}) : $ot;
+
+  if ($ot ne $nt) {
+    return $pairs->{"$ot->$nt"} ? 0 : 1;
+  }
+
+  return 0 unless defined $new->{size};     # prescribes nothing
+  my $np = _size_parts($new->{size});
+  my $op = _size_parts($old->{size});
+  return 0 if !defined $op && !defined $np && norm($old->{size}) eq norm($new->{size});
+  return 1 unless defined $op && defined $np;
+  return 1 if @$op != @$np;
+  for my $i (0 .. $#$np) {
+    return 1 if $i == 1 ? $np->[$i] != $op->[$i] : $np->[$i] < $op->[$i];
+  }
+  return 0;
 }
 
 
 sub changed_index_fields {
   my ($old, $new) = @_;
   return changed_fields($old, $new,
-    bool  => ['is_unique'],
-    array => ['columns'],
+    bool   => ['is_unique'],
+    array  => ['columns'],
+    mutual => ['index_type'],
   );
 }
 
@@ -134,7 +209,7 @@ DBIO::Diff::Compare - Engine-agnostic comparison helpers for DBIO diff operation
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -160,14 +235,16 @@ Nothing here is exported by default; import what you need:
 
     use DBIO::Diff::Compare qw(changed_column_fields changed_fields);
 
-=func norm
+=head1 METHODS
+
+=head2 norm
 
     my $s = norm($value);
 
 Normalizes a scalar for string comparison: C<undef> becomes the empty string,
 everything else is returned unchanged.
 
-=func norm_type
+=head2 norm_type
 
     my $t = norm_type($data_type);
 
@@ -177,7 +254,7 @@ C<'CHARACTER VARYING'> compare equal). C<undef> becomes the empty string.
 Engine-specific type I<aliasing> (e.g. C<int> vs C<integer>) is not done here --
 layer it on top in the driver.
 
-=func arr_differ
+=head2 arr_differ
 
     if (arr_differ($old_cols, $new_cols)) { ... }
 
@@ -187,7 +264,7 @@ empty array. Use this for collections where membership matters but order does
 not; for ordered collections (composite-key column lists, C<[precision, scale]>
 pairs) use a C<dim> field in L</changed_fields> instead.
 
-=func changed_fields
+=head2 changed_fields
 
     my @changed = changed_fields($old, $new,
       type   => ['data_type'],
@@ -218,6 +295,17 @@ absent flag and an explicit C<0> compare equal.
 =item * C<dim> -- order-I<preserving> comparison of a scalar or arrayref
 (stringified), for ordered lists and C<[precision, scale]> pairs.
 
+=item * C<mutual> -- B<bilateral> token comparison: compared like C<type>
+(whitespace-collapsed, case-insensitive via L</norm_type>), but B<only when
+both sides carry a value>. C<undef> on B<either> side means that participant
+has no opinion, so the field is not compared and never diffs. This is
+deliberately I<not> the desired-state rule below: a C<mutual> field does not
+treat "target set, live C<undef>" as a change. It exists for advisory metadata
+that is only meaningful when both models actually know it -- an engine's index
+access method / class (C<index_type>: C<BTREE>, C<FULLTEXT>, C<SPATIAL>,
+C<HASH>, C<GIN>, C<GiST>, ...), where a driver that does not introspect the type
+must never manufacture a phantom migration for it. See ADR 0052.
+
 =back
 
 B<Desired-state contract (always on).> Any C<scalar>/C<type>/C<dim>/C<array>
@@ -230,12 +318,15 @@ introspect -- otherwise every upgrade emits a phantom C<ALTER>. The rule fires
 B<only> when the target side is C<undef>: if both sides are set and differ it is
 a real change, and if the target prescribes a value the live DB lacks
 (target set, live C<undef>) it is also a real change. C<bool> fields are never
-skipped (C<undef> there is a real value: C<0>).
+skipped (C<undef> there is a real value: C<0>). C<mutual> fields follow their
+own, stricter rule (see the group list above): they skip whenever B<either>
+side is C<undef>, so unlike a C<scalar>/C<type> field they do B<not> treat
+"target set, live C<undef>" as a change.
 
 A C<< desired_state => 1 >> key is still accepted for back-compat but is now
 B<vestigial> -- the contract is always on, so passing it has no effect.
 
-=func changed_column_fields
+=head2 changed_column_fields
 
     my @changed = changed_column_fields($old_info, $new_info);
     if (@changed) { ... column changed ... }
@@ -244,20 +335,70 @@ Compares two column info hashrefs from the canonical model shape and returns
 the list of changed field names (empty list = identical). The desired-state
 contract of L</changed_fields> applies: a field the target C<$new> leaves
 C<undef> is treated as "don't care". Compares C<data_type> as a type,
-C<not_null> and C<default_value> as scalars, and C<size> order-preservingly
-(it may be a scalar length or a C<[precision, scale]> pair).
+C<not_null> and C<default_value> as scalars (the one exception to the
+skip: a live column that carries a default the target no longer declares --
+C<default_value> C<undef> -- reports C<default_value> as changed, so the
+default is removed; a live C<DEFAULT NULL> counts as no default),
+C<is_auto_increment> as a flag
+that follows the desired-state rule (a target that leaves it C<undef>
+prescribes nothing and is not compared; a prescribed one compares as a bool,
+so a target C<1> against a live C<0> or C<undef>, or an explicit target C<0>
+against a live C<1>, is a change, while an explicit C<0> equals an absent
+flag), and C<size> order-preservingly (it may be a scalar length or a C<[precision, scale]> pair).
 
-=func changed_index_fields
+=head2 column_change_lossy
+
+    my $lossy = column_change_lossy($old_info, $new_info, \%lossless_pairs);
+    my $lossy = column_change_lossy($old_info, $new_info, { 'integer->bigint' => 1 });
+
+True when changing a column from C<$old> to C<$new> may alter or lose stored
+values, false when every stored value survives. The column operations of a
+driver answer their C<lossy> method (L<DBIO::Diff::Base/destructive_operations>)
+with it.
+
+A change is lossless when
+
+=over 4
+
+=item * C<data_type> is the same after L</norm_type> and the C<size> of the
+target is in every component at least that of the live column, the scale
+(the second component of a C<[precision, scale]> pair) being equal; or
+
+=item * the pair of types is one the driver names in C<\%lossless_pairs>, a
+hash whose keys are C<< old->new >> in lower case (C<integer-E<gt>bigint>) and
+whose true values mark a widening that keeps every value. The size is not
+looked at for such a pair.
+
+=back
+
+Everything else is lossy. A C<data_type> the target leaves C<undef> prescribes
+nothing and counts as the live one; a target without C<size> keeps the live
+size. A live column without C<size> against a target with one is lossy (the
+values may not fit). C<size> is a number, a string C<"p,s"> or an array
+reference C<[p, s]>; sizes of different shape (a number against a pair) are
+lossy.
+
+=head2 changed_index_fields
 
     my @changed = changed_index_fields($old_info, $new_info);
 
 Compares two index info hashrefs from the canonical model shape: C<is_unique>
-(as a bool) and the C<columns> list (order-independently, matching the
-historical MySQL behaviour). A driver for which index column I<order> is
-significant should compare C<columns> as a C<dim> field via L</changed_fields>
-instead.
+(as a bool), the C<columns> list (order-independently, matching the historical
+MySQL behaviour), and C<index_type> (as a C<mutual> field). A driver for which
+index column I<order> is significant should compare C<columns> as a C<dim> field
+via L</changed_fields> instead.
 
-=func changed_fk_fields
+C<index_type> is the engine's index access method / class -- C<BTREE>,
+C<FULLTEXT>, C<SPATIAL>, C<HASH> on MySQL; C<btree>, C<hash>, C<gin>, C<gist>,
+C<brin>, C<spgist> on PostgreSQL -- carried optionally by drivers that
+introspect and render it. Because it is a C<mutual> field, it is compared
+B<only when both sides carry a type>: a switch such as C<BTREE> to C<FULLTEXT>
+on otherwise-identical columns is a real change, but a driver that does not
+introspect the type (C<index_type> C<undef> on one or both sides) never
+produces a phantom diff for it. The C<undef> default is exactly what keeps a
+typeless driver's index diff unchanged. See ADR 0052.
+
+=head2 changed_fk_fields
 
     my @changed = changed_fk_fields($old_info, $new_info);
 

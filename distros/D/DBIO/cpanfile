@@ -1,4 +1,13 @@
-requires 'perl', '5.008001';
+# The DBIO family standard is Perl 5.20 -- every driver dist already
+# requires it, core was the last holdout (karr k174).
+#
+# This is a POLICY floor, set deliberately above the measured one. Core
+# carried 5.008001 verbatim from the DBIx::Class fork commit and the number
+# had been untrue for a long time before it was raised: 151 uses of the
+# defined-or operator (// and //=, added in perl 5.10.0) across 33 shipped
+# modules mean core does not compile on 5.8 at all. Measured floor of the
+# code is therefore 5.10.0; 5.020 keeps the whole family on one number.
+requires 'perl', '5.020';
 
 # DBI itself should be capable of installation and execution in pure-perl
 # mode. However it has never been tested yet, so consider XS for the time
@@ -11,35 +20,68 @@ requires 'perl', '5.008001';
 requires 'DBI', '1.57';
 
 # XS (or XS-dependent) libs
-requires 'Sub::Util', '1.40';
+requires 'Sub::Util', '1.70';
+requires 'Sub::Quote', '2.006009';             # DBIO::Util (hard use)
 
 # pure-perl (FatPack-able) libs
-requires 'Class::Accessor::Grouped', '0.10012';
+requires 'Class::Accessor::Grouped', '0.10014';
 requires 'File::ShareDir', '0';                 # DBIO::Skills sharedir lookup
-requires 'Class::C3::Componentised', '1.0009';
-requires 'Context::Preserve', '0.01';
-requires 'Devel::GlobalDestruction', '0.09';
-requires 'Hash::Merge', '0.12';
+requires 'Class::C3::Componentised', '1.001002';
+requires 'Carp::Clan', '6.08';                  # DBIO::Generate schema loader (hard use)
+requires 'Context::Preserve', '0.03';
+requires 'Devel::GlobalDestruction', '0.14';
+requires 'Digest::SHA', '0';                    # DBIO::Util trace fingerprint
+requires 'Hash::Merge', '0.302';
 requires 'JSON::MaybeXS', '0';
-requires 'MRO::Compat', '0.12';
-requires 'Module::Find', '0.07';
-requires 'namespace::clean', '0.24';
-requires 'SQL::Abstract', '2.000001';
-requires 'Sub::Exporter', '0.982';
-requires 'Try::Tiny', '0.07';
+requires 'MRO::Compat', '0.15';
+requires 'Module::Find', '0.17';
+requires 'namespace::clean', '0.27';
+requires 'SQL::Abstract', '2.000003';
+requires 'Sub::Exporter', '0.991';
+requires 'Try::Tiny', '0.32';
 
-# DateTime support (used by InflateColumn::DateTime)
-requires 'DateTime', '0.55';
-requires 'DateTime::Format::Strptime', '1.2';
+# Lightweight default timestamp value class for DBIO::Timestamp
+# (Codeberg #9): get_timestamp returns timestamp_class->now, default
+# DateTime::Tiny — no compile-time dependency on the full DateTime stack.
+requires 'DateTime::Tiny', '1.08';
+
+# DateTime support (used by InflateColumn::DateTime and the driver datetime
+# format base DBIO::Storage::DateTimeFormat)
+#
+# No core module hard-`use`s DateTime or DateTime::Format::Strptime at compile
+# time any more. DateTime::Format::Strptime is loaded lazily, at first actual
+# parse/format inside DBIO::Storage::DateTimeFormat (karr k87), so a bare
+# install that never inflates datetimes carries neither module. Both are needed
+# only for optional runtime paths — DateTime::Tiny's ->DateTime inflation,
+# DBIO::Timestamp with timestamp_class('DateTime'), InflateColumn::DateTime
+# interop, and driver strptime-pattern parsing — and therefore stay `recommends`,
+# not `requires`.
+recommends 'DateTime', '0.55';
+recommends 'DateTime::Format::Strptime', '1.2';
 
 # Optional: DBIO::Candy -autotable pluralization
 recommends 'Lingua::EN::Inflect', '0';
 
-# Recommended for stronger salt generation in DBIO::EncodedColumn.
-recommends 'Crypt::URandom', '0';
+# Salt source of DBIO::EncodedColumn; encoding throws without it.
+requires 'Crypt::URandom', '0';
+
+# DBIO::EncodedColumn classes: Bcrypt (the default class) and Argon2. The
+# module of the chosen class has to be installed, or the Result class does not
+# load; the same modules verify the hashes.
+suggests 'Crypt::Bcrypt', '0';
+suggests 'Crypt::Argon2', '0';
+
+# Optional: DBIO::InflateColumn::Serializer::YAML; 1.25 added
+# $YAML::LoadBlessed, which the unfreezer sets alongside $YAML::LoadCode
+suggests 'YAML', '1.25';
 
 # Optional: default future_class of DBIO::Storage::PoolBase (async drivers only)
 suggests 'Future', '0';
+
+# Optional: live-test cluster tooling (DBIO::Test::Kubernetes, xbin/k8s-test);
+# the Job delete with a propagationPolicy needs Kubernetes::REST >= 1.109
+suggests 'Kubernetes::REST', '1.109';
+suggests 'IO::K8s', '0';
 
 # Optional OO framework integration (only needed if you use DBIO::Moo or DBIO::Moose)
 suggests 'Moo', '2.000';
@@ -53,11 +95,11 @@ requires 'String::ToIdentifier::EN', '0';
 requires 'String::ToIdentifier::EN::Unicode', '0';
 
 on 'test' => sub {
-  requires 'File::Temp', '0.22';
-  requires 'Test::Deep', '0.101';
-  requires 'Test::Exception', '0.31';
-  requires 'Test::Warn', '0.21';
-  requires 'Test::More', '0.94';
+  requires 'File::Temp', '0.2312';
+  requires 'Test::Deep', '1.205';
+  requires 'Test::Exception', '0.43';
+  requires 'Test::Warn', '0.37';
+  requires 'Test::More', '1.302222';
 
   # needed for testing only, not for operation
   # we will move away from this dep eventually, perhaps to DBD::CSV or something
@@ -70,14 +112,10 @@ on 'test' => sub {
 
   # this is already a dep of n::c, but just in case - used by t/55namespaces_cleaned.t
   # remove and do a manual glob-collection if n::c is no longer a dep
-  requires 'Package::Stash', '0.28';
+  requires 'Package::Stash', '0.40';
 
   # Optional: core runtime uses the native deploy path (no SQL::Translator),
   # but a few tests exercise the legacy SQLT deploy hook end-to-end. They skip
   # cleanly when it is absent; recommending it lets capable smokers cover it.
   recommends 'SQL::Translator', '0';
-};
-
-on 'develop' => sub {
-  requires 'Dist::Zilla::PluginBundle::DBIO', '0.900003';
 };

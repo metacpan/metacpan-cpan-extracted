@@ -33,6 +33,32 @@ until perl -MDBI -e '
 done
 echo "==> DB2 reachable after $((tries*5))s"
 
+echo "==> Installing EXPLAIN tables (SYSTOOLS) if missing"
+# t/52-explain-query.t's live half runs EXPLAIN PLAN SELECTION FOR, whose
+# FIRST statement writes the plan into the EXPLAIN_* tables -- without them
+# it dies with SQL0219N / SQLSTATE 42704. SYSPROC.SYSINSTALLOBJECTS installs
+# them once, under SYSTOOLS. Idempotent: skip the call when EXPLAIN_INSTANCE
+# is already there, then re-check to prove the call actually landed.
+perl -MDBI -e '
+    use strict; use warnings;
+    my ($dsn,$u,$p) = @ENV{qw/DBIO_TEST_DB2_DSN DBIO_TEST_DB2_USER DBIO_TEST_DB2_PASS/};
+    my $dbh = DBI->connect($dsn, $u, $p, { RaiseError => 1, PrintError => 0 });
+    my $check = sub {
+        $dbh->selectrow_array(
+            "SELECT COUNT(*) FROM SYSCAT.TABLES"
+          . " WHERE TABSCHEMA = ? AND TABNAME = ?",
+          undef, "SYSTOOLS", "EXPLAIN_INSTANCE");
+    };
+    exit 0 if $check->();
+    $dbh->do("CALL SYSPROC.SYSINSTALLOBJECTS ("
+        . "'EXPLAIN', 'C',"
+        . " CAST(NULL AS VARCHAR(128)), CAST(NULL AS VARCHAR(128)))");
+    die "EXPLAIN table bootstrap failed: "
+      . "SYSTOOLS.EXPLAIN_INSTANCE is still absent\n"
+      unless $check->();
+  '
+echo "==> EXPLAIN tables ready"
+
 cd "$DBIO_DB2"
 # With explicit args, run exactly those test files; otherwise run the whole
 # suite (offline tests pass too, the integration ones now have a live DB2).

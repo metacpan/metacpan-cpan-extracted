@@ -1,0 +1,1 @@
+run_id,query_id,tenant_slice,space_id,filter_selectivity,cache_state,concurrency,index_type,search_budget,graph_hops,candidate_count,result_count,recall_at_k,ndcg_at_k,queue_ms,vector_ms,lexical_ms,graph_ms,total_ms,temp_bytes,notes

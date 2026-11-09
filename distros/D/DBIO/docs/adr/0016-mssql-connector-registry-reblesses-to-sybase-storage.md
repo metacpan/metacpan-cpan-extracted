@@ -1,6 +1,6 @@
 # ADR 0016 — MSSQL connector registry reblesses to Sybase-derived storage
 
-- Status: accepted
+- Status: superseded by [ADR 0035](0035-mssql-odbc-reblesses-to-dedicated-odbc-storage-class.md)
 - Date: 2026-06-20
 - Tags: storage, rebless, registry, connector, mssql, sybase, odbc, tds, backfill
 
@@ -12,7 +12,7 @@ detection axes (`lib/DBIO/Storage/DBI.pm`): a *driver registry* keyed on the DBD
 driver name (`Pg`, `mysql`, `Sybase`, `ODBC`, …) consulted by `_determine_driver`,
 and a *connector registry* keyed on the normalized `SQL_DBMS_NAME` of the engine
 *behind* a generic connector, consulted by `_determine_connector_driver` for
-secondary detection (`DBI.pm:1424-1460`).
+secondary detection.
 
 Microsoft SQL Server is reachable two ways: via `DBD::Sybase`/FreeTDS (its native
 TDS-protocol client) and via `DBD::ODBC` (a generic connector that does not tell
@@ -28,13 +28,14 @@ Both MSSQL connection paths rebless into a single Sybase-derived concrete class,
 `DBIO::MSSQL::Storage::Sybase`. There is **no** pure-ODBC MSSQL storage class.
 
 - **The connector registry maps `Microsoft_SQL_Server` → Sybase storage.** The
-  baked-in connector registry in core (`DBI.pm:1238-1241`) contains
+  baked-in connector registry in core (the `%_connector_registry` hash in
+  `lib/DBIO/Storage/DBI.pm`) contains
   `'Microsoft_SQL_Server' => 'DBIO::MSSQL::Storage::Sybase'`, and the
-  `register_connector_driver` POD example shows the same pairing
-  (`DBI.pm:1298-1300`). An `dbi:ODBC:` connection first reblesses to
+  `register_connector_driver` POD example shows the same pairing.
+  An `dbi:ODBC:` connection first reblesses to
   `DBIO::Storage::DBI::ODBC`, whose `_rebless` calls
-  `_determine_connector_driver('ODBC')` (`ODBC.pm:19`); that reads `SQL_DBMS_NAME`,
-  normalizes non-word characters to `_` (`DBI.pm:1437`, "Microsoft SQL Server" →
+  `_determine_connector_driver('ODBC')` (in `lib/DBIO/Storage/DBI/ODBC.pm`); that reads `SQL_DBMS_NAME`,
+  normalizes non-word characters to `_` (in `_determine_connector_driver`, "Microsoft SQL Server" →
   `Microsoft_SQL_Server`), looks it up in the connector registry, and reblesses
   into `DBIO::MSSQL::Storage::Sybase`.
 - **The DBD::Sybase path converges on the same class.** A `dbi:Sybase:` connection
@@ -44,14 +45,15 @@ Both MSSQL connection paths rebless into a single Sybase-derived concrete class,
   class.
 - **Sybase is the common base, MSSQL specifics mix in.**
   `DBIO::MSSQL::Storage::Sybase` (in the `dbio-mssql` dist) multiply-inherits
-  `DBIO::Sybase::Storage` *and* `DBIO::MSSQL::Storage` (`Sybase.pm:7-10`):
+  `DBIO::Sybase::Storage` *and* `DBIO::MSSQL::Storage` (in
+  `lib/DBIO/MSSQL/Storage/Sybase.pm`):
   the TDS/Sybase client behaviour is the base, the MSSQL dialect, identity-insert,
   GUID and DateTime concerns mix in on top. `DBIO::MSSQL::Storage` itself is an
-  abstract base (UniqueIdentifier + IdentityInsert, `Storage.pm:7-10`), never a
+  abstract base (UniqueIdentifier + IdentityInsert, in `lib/DBIO/MSSQL/Storage.pm`), never a
   rebless target.
 - **The registry entry is core-owned.** The `dbio-mssql` dist registers only the
   synthetic `MSSQL` DBD-driver name onto its base class
-  (`__PACKAGE__->register_driver('MSSQL' => __PACKAGE__)`, `MSSQL/Storage.pm:25`);
+  (`__PACKAGE__->register_driver('MSSQL' => __PACKAGE__)` in `lib/DBIO/MSSQL/Storage.pm`);
   it does **not** call `register_connector_driver`. The
   `Microsoft_SQL_Server → DBIO::MSSQL::Storage::Sybase` mapping is hard-wired in
   the core connector registry, so the decision lives here.
@@ -85,8 +87,10 @@ rebless target, the driver dist supplies the class.
 - The mapping is overridable at runtime — `register_connector_driver` lets a
   consumer point `Microsoft_SQL_Server` at a different class — but the shipped
   default is core-owned, not contributed by `dbio-mssql`. Changing the default
-  target is a core change to `DBI.pm:1239`.
-- The further FreeTDS placeholder/NoBindVars rebless (`Sybase.pm:34-58`, to
+  target is a core change to the `%_connector_registry` mapping in
+  `lib/DBIO/Storage/DBI.pm`.
+- The further FreeTDS placeholder/NoBindVars rebless (in
+  `DBIO::MSSQL::Storage::Sybase`'s `_rebless`, to
   `DBIO::MSSQL::Storage::Sybase::NoBindVars`) is a *third*, dist-local rebless step
   layered on top of this decision; it is owned by `dbio-mssql`, not by the core
   registry, and is out of scope for this ADR.

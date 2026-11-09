@@ -4,6 +4,8 @@ package DBIO::DuckDB::Introspect::Tables;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -11,19 +13,23 @@ sub fetch {
   $schema //= 'main';
 
   my $sql = q{
-    SELECT table_name, table_type
-    FROM information_schema.tables
-    WHERE table_schema = ?
-      AND table_name NOT LIKE 'sqlite_%'
+    SELECT t.table_name, t.table_type, v.view_definition
+    FROM information_schema.tables t
+    LEFT JOIN information_schema.views v
+      ON v.table_catalog = t.table_catalog
+     AND v.table_schema = t.table_schema
+     AND v.table_name = t.table_name
+    WHERE t.table_schema = ?
+      AND t.table_name NOT LIKE 'sqlite_%'
   };
   my @bind = ($schema);
 
   if (defined $catalog) {
-    $sql .= q{ AND table_catalog = ?};
+    $sql .= q{ AND t.table_catalog = ?};
     push @bind, $catalog;
   }
 
-  $sql .= q{ ORDER BY table_name};
+  $sql .= q{ ORDER BY t.table_name};
 
   my $sth = $dbh->prepare($sql);
   $sth->execute(@bind);
@@ -36,6 +42,7 @@ sub fetch {
       table_name => $row->{table_name},
       kind       => $kind,
       schema     => $schema,
+      ( $kind eq 'view' ? ( view_definition => $row->{view_definition} ) : () ),
     };
   }
 
@@ -56,7 +63,7 @@ DBIO::DuckDB::Introspect::Tables - Introspect DuckDB tables and views
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -71,7 +78,9 @@ Skips system schemas (C<information_schema>, C<pg_catalog>).
     my $tables = DBIO::DuckDB::Introspect::Tables->fetch($dbh, $schema, $catalog);
 
 Returns a hashref keyed by table name. Each value has: C<table_name>,
-C<kind> (C<table> or C<view>), C<schema>.
+C<kind> (C<table> or C<view>), C<schema>. A view also has
+C<view_definition>, the text DuckDB keeps of its query; the diff compares it
+(L<DBIO::DuckDB::Diff::View>).
 
 When C<$catalog> is defined an C<AND table_catalog = ?> clause is added.
 

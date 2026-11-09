@@ -36,14 +36,17 @@ is(SkillTestSchema->skill('postgresql-database'), undef,
   'non-overridden skill with no sharedir -> undef');
 
 # --- connect-time override is instance-level and shadows the class default ---
-SKIP: {
-  eval { require DBD::SQLite; 1 }
-    or skip 'DBD::SQLite required for the connect path', 2;
+{
+  # Mock storage: the override is read by Schema::connection, independent of
+  # any database; the fake storage keeps the connect path off a real DBD.
+  require DBIO::Test::Storage;
+  SkillTestSchema->storage_type('+DBIO::Test::Storage');
 
   my $schema = SkillTestSchema->connect(
-    'dbi:SQLite::memory:', '', '',
+    sub { },
     { skills => { core => "CONN-CORE\n" } },
   );
+  isa_ok($schema->storage, 'DBIO::Test::Storage', 'connected on the mock storage');
 
   is($schema->skill('core'), "CONN-CORE\n",
     'connect-time skills override wins on the connected instance');

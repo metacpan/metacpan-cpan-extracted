@@ -4,6 +4,8 @@ package DBIO::Candy::Exports;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use Sub::Util ();
 
 our %methods;
@@ -12,7 +14,10 @@ our %aliases;
 sub export_methods        { $methods{scalar caller(0)} = $_[0] }
 sub export_method_aliases { $aliases{scalar caller(0)} = $_[0] }
 
+
 sub get_methods_for { $methods{$_[0]} }
+
+
 sub get_aliases_for { $aliases{$_[0]} }
 
 use Sub::Exporter -setup => {
@@ -41,7 +46,7 @@ DBIO::Candy::Exports - Create sugar for DBIO components
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -75,6 +80,24 @@ L<DBIO::Candy> will export into result classes that load those components.
 
 =head1 METHODS
 
+=head2 get_methods_for
+
+    my $arrayref = DBIO::Candy::Exports::get_methods_for($package);
+
+Returns the arrayref most recently registered for C<$package> via
+L</export_methods>, or C<undef> if that package never called it. Called by
+L<DBIO::Candy> while composing sugar for a result class; not normally called
+directly.
+
+=head2 get_aliases_for
+
+    my $hashref = DBIO::Candy::Exports::get_aliases_for($package);
+
+Returns the hashref most recently registered for C<$package> via
+L</export_method_aliases>, or C<undef> if that package never called it.
+Called by L<DBIO::Candy> while composing sugar for a result class; not
+normally called directly.
+
 =head2 export_methods
 
  export_methods [qw( foo bar baz )];
@@ -84,10 +107,11 @@ Define methods that get exported as subroutines of the same name.
 =head2 export_method_aliases
 
  export_method_aliases {
-   old_method_name => 'new_sub_name',
+   new_sub_name => 'existing_method_name',
  };
 
-Define methods that get exported as subroutines of a different name.
+Define methods that get exported as subroutines of a different name. The key
+is the name of the exported subroutine, the value the method it calls.
 
 =head1 AUTHOR
 

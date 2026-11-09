@@ -24,7 +24,16 @@ $ENV{NLS_LANG} = 'AMERICAN_AMERICA.WE8ISO8859P1';
 $ENV{NLS_SORT} = "BINARY";
 $ENV{NLS_COMP} = "BINARY";
 
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+# DBIO::Test::Schema is shared by the driver suites and declares no driver; a
+# schema always has one (core ADR 0067). Each connect here declares Oracle's
+# storage on a clone, so the shared class stays without one.
+sub oracle_schema {
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('+DBIO::Oracle::Storage');
+  return $schema->connect(@_);
+}
+
+my $schema = oracle_schema($dsn, $user, $pass);
 
 # older oracles do not support a TIMESTAMP datatype
 my $timestamp_datatype = ($schema->storage->_server_info->{normalized_dbms_version}||0) < 9
@@ -42,7 +51,7 @@ my $q = $schema->storage->sql_maker->quote_char || '';
 #$dbh->do("alter session set nls_timestamp_format = 'YYYY-MM-DD HH24:MI:SSXFF'");
 
 eval {
-  $dbh->do("DROP TABLE ${q}event${q}");
+  $dbh->do("DROP TABLE ${q}event${q} PURGE");
 };
 $dbh->do(<<EOS);
   CREATE TABLE ${q}event${q} (
@@ -120,7 +129,7 @@ done_testing;
 END {
   if($schema && (my $dbh = $schema->storage->dbh)) {
     my $q = $schema->storage->sql_maker->quote_char || '';
-    $dbh->do("DROP TABLE ${q}event${q}");
+    $dbh->do("DROP TABLE ${q}event${q} PURGE");
   }
   undef $schema;
 }

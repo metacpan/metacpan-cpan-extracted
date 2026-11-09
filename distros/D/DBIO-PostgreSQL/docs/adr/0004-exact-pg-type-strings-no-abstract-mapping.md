@@ -27,20 +27,23 @@ adapter; everything else passes through verbatim.
 
 - **Base types via the adapter (single source of truth).** Only types that
   `DBIO::Schema::Type::is_base_type` recognises are canonicalised and resolved
-  through `DBIO::PostgreSQL::Adapter->to_native` (`DDL.pm:383-387`). The adapter
-  maps the portable base set to PostgreSQL natives — e.g. `integer → bigint`,
-  `timestamp → timestamptz`, `blob → bytea`, and builds `numeric(p,s)` /
-  `character(n)` from precision/scale/size (`Adapter.pm:9-27`).
-- **Everything else passes verbatim in DDL emit.** `_pg_column_type` returns the
-  declared string untouched for enums (`pg_enum_type`), composites
+  through `DBIO::PostgreSQL::Adapter->to_native` (`DDL.pm`, `_pg_column_type`,
+  the base-type branch). The adapter maps the portable base set to PostgreSQL
+  natives — e.g. `integer → bigint`, `timestamp → timestamptz`, `blob → bytea`,
+  and builds `numeric(p,s)` / `character(n)` from precision/scale/size
+  (`Adapter.pm`, `%NATIVE` and `to_native`).
+- **Everything else passes verbatim in DDL emit.** `_pg_column_type` returns
+  the declared string untouched for enums (`pg_enum_type`), composites
   (`pg_type_name`), arrays (anything ending `[]`), and any parameterised /
   extension type (anything ending `(...)` — `numeric(p,s)`, `vector(1536)`)
-  (`DDL.pm:368-381`); a legacy-alias map only normalises PG-dialect spellings to
-  their canonical PG names, never to an abstract type (`DDL.pm:389-422`).
+  (`DDL.pm`, `_pg_column_type`); a legacy-alias map only normalises PG-dialect
+  spellings to their canonical PG names, never to an abstract type (`%type_map`
+  in `_pg_column_type`).
 - **Introspect reads the exact PostgreSQL type.** Column, type, function and
   sequence introspection take the type straight from
-  `pg_catalog.format_type(...)` (`Introspect/Columns.pm:38`, and the same call
-  in `Introspect/Types.pm`, `Introspect/Functions.pm`, `Introspect/Sequences.pm`).
+  `pg_catalog.format_type(...)` (`Introspect/Columns.pm`, the query of `fetch`,
+  and the same call in `Introspect/Types.pm`, `Introspect/Functions.pm`,
+  `Introspect/Sequences.pm`).
 - **Comparison is PG-string to PG-string.** Diff compares the introspected
   PostgreSQL type strings directly; there is no lossy translation step on either
   side.

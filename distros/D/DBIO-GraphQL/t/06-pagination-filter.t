@@ -8,7 +8,6 @@ use My::Schema;
 use My::Test qw(deploy_schema);
 use DBIO::GraphQL;
 use DBIO::GraphQL::Filter::Search;
-use GraphQL::Execution qw(execute);
 
 my $db = My::Schema->connect('dbi:SQLite:dbname=:memory:');
 deploy_schema($db);
@@ -26,11 +25,11 @@ for my $i (1..10) {
 }
 
 my $r = DBIO::GraphQL->to_graphql($db);
-my ($schema, $ctx) = @{$r}{qw(schema context)};
+my ($exec, $ctx) = @{$r}{qw(execute context)};
 
 sub gql {
   my ($q, $v) = @_;
-  return execute($schema, $q, undef, $ctx, $v // {});
+  return $exec->($q, undef, $ctx, $v // {});
 }
 
 # Connection wrapper shape
@@ -131,7 +130,7 @@ sub gql {
     id => 2, title => 'B', author_id => 1, price => undef,
   });
   my $r2 = DBIO::GraphQL->to_graphql($db2);
-  my $res = execute($r2->{schema},
+  my $res = $r2->{execute}->(
     '{ allBooks(filter: { price: { isNull: true } }) { total nodes { id } } }',
     undef, $r2->{context}, {});
   ok(!$res->{errors}, 'filter isNull: no errors')
@@ -147,7 +146,7 @@ sub gql {
   $db2->resultset('Book')->create({ id => 2, title => 'The Silmarillion', author_id => 1 });
   $db2->resultset('Book')->create({ id => 3, title => 'Foundation',    author_id => 1 });
   my $r2 = DBIO::GraphQL->to_graphql($db2);
-  my $res = execute($r2->{schema},
+  my $res = $r2->{execute}->(
     '{ allBooks(filter: { title: { contains: "Hobbit" } }) { total nodes { title } } }',
     undef, $r2->{context}, {});
   ok(!$res->{errors}, 'filter contains: no errors');
@@ -184,6 +183,18 @@ sub gql {
 
   ok(!$res->{errors}, 'offset page 2: no errors');
   is($res->{data}{allBooks}{nodes}[0]{id}, 4, 'page 2 starts at id=4');
+}
+
+# hasNextPage under offset pagination: true while rows remain beyond the page
+{
+  my $mid = gql('{ allBooks(page: { skip: 3, take: 3 }) { hasNextPage nodes { id } } }');
+  ok(!$mid->{errors}, 'offset hasNextPage (middle): no errors');
+  is(scalar @{$mid->{data}{allBooks}{nodes}}, 3, 'middle page still returns take rows');
+  is($mid->{data}{allBooks}{hasNextPage}, 1, 'offset: hasNextPage true when rows remain');
+
+  my $last = gql('{ allBooks(page: { skip: 8, take: 2 }) { hasNextPage nodes { id } } }');
+  is(scalar @{$last->{data}{allBooks}{nodes}}, 2, 'last page returns its rows');
+  is($last->{data}{allBooks}{hasNextPage}, 0, 'offset: hasNextPage false on exact last page');
 }
 
 # Cursor pagination
@@ -232,6 +243,69 @@ sub gql {
   is(scalar @{$conn3->{nodes}}, 2,  '2 nodes on final page'         );
   is($conn3->{hasNextPage},     0,  'hasNextPage false on last page');
   ok(!defined $conn3->{nextCursor}, 'nextCursor null on last page'  );
+}
+
+# Cursor + orderBy (karr k6). WHY: a cursor names a position in ascending
+# primary-key order and in no other. Served under any other order, nextCursor
+# does not lead to the next page - with id DESC it led straight back to the
+# first one, an endless loop for a client that follows it. Such a combination
+# is refused before any row is delivered; offset pagination is the way to
+# page through another order.
+for my $order (
+  [ 'orderBy: { field: "id", direction: DESC }',    'primary key DESC'   ],
+  [ 'orderBy: { field: "title", direction: ASC }',  'non-key column ASC' ],
+  [ 'orderBy: { field: "title" }',                  'non-key column, no direction' ],
+) {
+  my ($order_arg, $what) = @$order;
+  my $res = gql("{ allBooks(cursor: { first: 4 }, $order_arg) {
+    total hasNextPage nextCursor nodes { id }
+  } }");
+
+  like(($res->{errors} // [])->[0]{message} // '',
+    qr/^DBIO::GraphQL: cursor pagination .* ascending primary-key order.*\bpage\b/,
+    "cursor + orderBy $what: refused, and the message points to page");
+  ok(!defined $res->{data}{allBooks},
+    "cursor + orderBy $what: no rows and no nextCursor delivered");
+}
+
+# ... while an orderBy that is the ascending primary-key order stays usable
+# with a cursor, and the cursor advances under it.
+for my $order_arg (
+  'orderBy: { field: "id", direction: ASC }',
+  'orderBy: { field: "id" }',
+) {
+  my $res1 = gql("{ allBooks(cursor: { first: 4 }, $order_arg) {
+    hasNextPage nextCursor nodes { id }
+  } }");
+  ok(!$res1->{errors}, "cursor + $order_arg page 1: no errors")
+    or diag explain $res1->{errors};
+  is_deeply([ map { $_->{id} } @{ $res1->{data}{allBooks}{nodes} } ],
+    [ 1 .. 4 ], "cursor + $order_arg: page 1 is ids 1-4");
+
+  my $res2 = gql(
+    "query(\$c: String) { allBooks(cursor: { after: \$c, first: 4 }, $order_arg) {
+      hasNextPage nextCursor nodes { id }
+    } }",
+    { c => $res1->{data}{allBooks}{nextCursor} }
+  );
+  ok(!$res2->{errors}, "cursor + $order_arg page 2: no errors")
+    or diag explain $res2->{errors};
+  is_deeply([ map { $_->{id} } @{ $res2->{data}{allBooks}{nodes} } ],
+    [ 5 .. 8 ], "cursor + $order_arg: page 2 is ids 5-8");
+}
+
+# The refusal is about cursor only: the same orderBy keeps working with
+# offset pagination, which is what the message sends the client to.
+{
+  my $res = gql('{ allBooks(
+    page:    { skip: 3, take: 3 }
+    orderBy: { field: "id", direction: DESC }
+  ) { total hasNextPage nodes { id } } }');
+
+  ok(!$res->{errors}, 'page + orderBy DESC: no errors')
+    or diag explain $res->{errors};
+  is_deeply([ map { $_->{id} } @{ $res->{data}{allBooks}{nodes} } ],
+    [ 7, 6, 5 ], 'page + orderBy DESC: second page in descending order');
 }
 
 # Filter + pagination combined

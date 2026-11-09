@@ -24,26 +24,23 @@ into bounded chunks compared with AND.
 
 `DBIO::Oracle::Storage::LOBSupport::_prep_for_execute` detects LOB binds in the
 WHERE clause and rewrites each `<col> = ?` predicate into an AND of 2000-byte
-chunk comparisons (`Storage/LOBSupport.pm:55-146`):
+chunk comparisons:
 
 - It runs only for `update` / `select` / `delete` (insert is passed straight
-  through, `LOBSupport.pm:59`); for `update` it splits SET binds off from WHERE
-  binds first and refuses complex multi-WHERE clauses
-  (`LOBSupport.pm:76-94`).
+  through); for `update` it splits SET binds off from WHERE
+  binds first and refuses complex multi-WHERE clauses.
 - For each LOB bind it splits the bound value into 2000-char parts
   (`unpack '(a2000)*'`) and, for part *i*, emits
   `UTL_RAW.CAST_TO_VARCHAR2(RAWTOHEX(DBMS_LOB.SUBSTR(<col>, 2000, <offset>))) = ?`
-  joined with `AND` inside parentheses, replacing the original `<col> = ?`
-  (`LOBSupport.pm:99-130`). Each chunk becomes its own bind, tagged with
+  joined with `AND` inside parentheses, replacing the original `<col> = ?`. Each chunk becomes its own bind, tagged with
   `_ora_lob_autosplit_part => <i>` and `dbd_attrs => undef`.
 - The chunk-part tag drives a separate cache decision: `_dbh_execute` disables
   statement-handle caching for the duration when any bind's
   `_ora_lob_autosplit_part` exceeds `__cache_queries_with_max_lob_parts` (= 2)
-  (`Storage.pm:34`, `133-161`) — i.e. multi-chunk LOB comparisons run uncached.
+  — i.e. multi-chunk LOB comparisons run uncached.
 
 Binding itself is handled by `bind_attribute_by_data_type` returning
-`ora_type => ORA_BLOB/ORA_CLOB` for LOB columns (`LOBSupport.pm:31-53`,
-delegating to `DBIO::Oracle::Type::oracle_lob_bind_attrs`).
+`ora_type => ORA_BLOB/ORA_CLOB` for LOB columns (delegating to `DBIO::Oracle::Type::oracle_lob_bind_attrs`).
 
 ## Rationale
 
@@ -73,10 +70,9 @@ cache decision; the two must stay in sync.
   update/select/delete, with no caller awareness of the rewrite.
 - Multi-chunk LOB comparisons are **uncached** by design — a deliberate
   throughput trade to keep placeholder counts correct and avoid cursor
-  exhaustion. The threshold lives in `__cache_queries_with_max_lob_parts`
-  (`Storage.pm:34`).
+  exhaustion. The threshold lives in `__cache_queries_with_max_lob_parts`.
 - `update` with a complex multi-WHERE clause involving LOB columns is explicitly
-  unsupported and throws (`LOBSupport.pm:77-78`).
+  unsupported and throws.
 - The rewrite, the chunk tag, and the cache-disable in `_dbh_execute` are a
   single mechanism spread across `LOBSupport.pm` and `Storage.pm`; changing the
   chunk size, the tag name, or the threshold requires touching all three in

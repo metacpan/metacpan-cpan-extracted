@@ -4,6 +4,8 @@ package DBIO::ResultSourceProxy;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 use DBIO::ResultSource::Table;
@@ -14,9 +16,6 @@ use namespace::clean;
 __PACKAGE__->mk_group_accessors('inherited_ro_instance' => 'source_name');
 
 __PACKAGE__->mk_classdata(table_class => 'DBIO::ResultSource::Table');
-
-__PACKAGE__->mk_classdata('table_alias'); # FIXME: Doesn't actually do
-                                          # anything yet!
 
 sub get_inherited_ro_instance {  shift->get_inherited(@_) }
 
@@ -165,75 +164,14 @@ sub indices {
   my %args = @_ == 1 && ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
 
   my $source = $class->result_source_instance;
-  my $list = $source->{_cake_indexes} ||= [];
   for my $name (sort keys %args) {
-    my $fields = $args{$name};
-    $fields = [ $fields ] unless ref $fields eq 'ARRAY';
-    push @$list, { name => $name, fields => $fields };
+    $source->add_index_declaration({
+      name    => $name,
+      columns => $args{$name},
+    });
   }
 
-  $class->_install_index_hooks($source);
   return;
-}
-
-# Idempotent installer for the two deploy paths that pick up the
-# _cake_indexes source slot: the SQL::Translator hook (legacy drivers)
-# and the native PostgreSQL pg_indexes class method. Shared with
-# DBIO::Cake's idx() so both DSLs end up with the same hook layout.
-sub _install_index_hooks {
-  my ($class, $source) = @_;
-
-  unless ($source->{_cake_hook_installed}) {
-    $source->{_cake_hook_installed} = 1;
-    my $orig_hook = $class->can('sqlt_deploy_hook');
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"${class}::sqlt_deploy_hook"} = sub {
-      my ($self_or_class, $sqlt_table) = @_;
-      $orig_hook->($self_or_class, $sqlt_table) if $orig_hook;
-      my $src = $self_or_class->isa('DBIO::ResultSource')
-        ? $self_or_class
-        : $self_or_class->result_source_instance;
-      my $idxs = $src->{_cake_indexes} || [];
-      for my $idx (@$idxs) {
-        $sqlt_table->add_index(
-          name   => $idx->{name},
-          fields => $idx->{fields},
-          (exists $idx->{type}    ? (type    => $idx->{type})    : ()),
-          (exists $idx->{options} ? (options => $idx->{options}) : ()),
-        );
-      }
-    };
-  }
-
-  unless ($source->{_cake_pg_indexes_installed}) {
-    $source->{_cake_pg_indexes_installed} = 1;
-    my $orig_pg_indexes = $class->can('pg_indexes');
-    no strict 'refs';
-    no warnings 'redefine';
-    *{"${class}::pg_indexes"} = sub {
-      my $invocant = shift;
-      my $src = (ref $invocant && $invocant->isa('DBIO::ResultSource'))
-        ? $invocant
-        : (ref $invocant ? ref($invocant) : $invocant)->result_source_instance;
-      my %result = $orig_pg_indexes ? %{ $orig_pg_indexes->($invocant, @_) || {} } : ();
-      my $idxs = $src->{_cake_indexes} || [];
-      for my $idx (@$idxs) {
-        my %entry = (
-          columns => $idx->{fields},
-          (($idx->{type} // '') =~ /^unique$/i ? (unique => 1) : ()),
-        );
-        if (my $pg = $idx->{pg}) {
-          $entry{where}      = $pg->{where}      if exists $pg->{where};
-          $entry{using}      = $pg->{using}      if exists $pg->{using};
-          $entry{with}       = $pg->{with}       if exists $pg->{with};
-          $entry{expression} = $pg->{expression} if exists $pg->{expression};
-        }
-        $result{$idx->{name}} = \%entry;
-      }
-      return \%result;
-    };
-  }
 }
 
 1;
@@ -250,7 +188,7 @@ DBIO::ResultSourceProxy - Proxy result source methods onto a result class
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 
@@ -280,11 +218,20 @@ also accepted:
 
   __PACKAGE__->indices({ name_idx => 'name' });
 
-The indexes are picked up by both the SQL::Translator deploy path (via
-C<sqlt_deploy_hook>) and the native PostgreSQL deploy path (via
-C<pg_indexes>). Equivalent to the L<DBICx::Indexing> component on
-DBIx::Class. The richer L<DBIO::Cake/idx> DSL shares the same underlying
-hook installer.
+Each index is stored on the result source as a canonical declaration,
+C<< { name, columns, unique, ... } >>, which a driver reads with
+L<index_declarations|DBIO::ResultSource/index_declarations> (see
+L<DBIO::ResultSource/add_index_declaration>). Declaring the same name again
+replaces the earlier declaration. Equivalent to the L<DBICx::Indexing>
+component on DBIx::Class. The richer L<DBIO::Cake/idx> DSL fills the same
+declaration list.
+
+C<indices> declares plain indexes and carries no driver block; the entry is
+valid for every driver. Use L<DBIO::Cake/idx> for a C<pg>, C<sqlite> or
+C<mysql> block.
+
+The class itself gets no index method from the declaration; a driver reads
+the declarations from the source.
 
 =head1 AUTHOR
 

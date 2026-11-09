@@ -4,7 +4,10 @@ package DBIO::Candy;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Candy::Exports ();
+use DBIO::Util ();
 use MRO::Compat;
 use Sub::Exporter 'build_exporter';
 use Carp 'croak';
@@ -40,11 +43,15 @@ my @methods = qw(
    cols_updated_created
 );
 
+
 sub base { return $_[1] || 'DBIO::Core' }
+
 
 sub perl_version { return $_[1] }
 
+
 sub autotable { $_[1] }
+
 
 sub experimental { $_[1] }
 
@@ -68,6 +75,7 @@ my $decamelize = sub {
    }ge;
    $s;
 };
+
 
 sub gen_table {
    my ( $self, $class, $version ) = @_;
@@ -135,6 +143,7 @@ sub import {
    goto $import
 }
 
+
 sub gen_custom_imports {
   my ($self, $inheritor) = @_;
   my @methods;
@@ -149,6 +158,7 @@ sub gen_custom_imports {
   }
   return(\@methods, \%aliases)
 }
+
 
 sub parse_arguments {
   my $self = shift;
@@ -201,6 +211,7 @@ sub parse_arguments {
     experimental => $experimental,
   };
 }
+
 
 sub gen_primary_column {
   my ($self, $inheritor, $set_table) = @_;
@@ -274,6 +285,7 @@ sub gen_proxy {
   }
 }
 
+
 sub installer {
   my ($self) = @_;
   sub {
@@ -283,11 +295,13 @@ sub installer {
   }
 }
 
+
 sub set_base {
    my ($self, $inheritor, $base) = @_;
 
    # inlined from parent.pm
    for ( my @useless = $self->base($base) ) {
+      DBIO::Util::assert_class_name($_);
       s{::|'}{/}g;
       require "$_.pm"; # dies if the file is not found
    }
@@ -301,6 +315,7 @@ sub set_base {
       @{"$inheritor\::ISA"} = (@{"$inheritor\::ISA"}, @new) if @new;
    }
 }
+
 
 sub gen_INIT {
   my ($self, $perl_version, $custom_aliases, $custom_methods, $inheritor, $experimental) = @_;
@@ -346,7 +361,7 @@ DBIO::Candy - Sugar syntax for defining DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -389,7 +404,7 @@ version 0.900002
 PostgreSQL-specific example:
 
  package MyApp::Schema::Result::User;
- use DBIO::Candy -components => ['InflateColumn::DateTime'];
+ use DBIO::Candy -components => ['InflateColumn::DateTime', 'InflateColumn::Serializer'];
 
  table 'users';
 
@@ -476,6 +491,103 @@ aliases some method names for clarity
 cleans the namespace after export via L<namespace::clean>
 
 =back
+
+=head1 METHODS
+
+=head2 base
+
+  sub base { $_[1] || 'MyApp::Schema::Result' }
+
+Class-method hook, called with the C<-base> import value. Returns the parent
+class(es) to add to the result class; the default returns that value or
+L<DBIO::Core>. Override in a subclass to change the default (see
+L</SETTING DEFAULT IMPORT OPTIONS>).
+
+=head2 perl_version
+
+Hook called with the C<-perl5> import value (already converted to a number
+from a v-string). A true return enables C<< use feature ":5.$n" >> in the
+result class. The default returns its argument.
+
+=head2 autotable
+
+Hook called with the C<-autotable> import value. A true return makes Candy
+set the table name from the class name on the first sugar call, using
+L</gen_table>. The default returns its argument.
+
+=head2 experimental
+
+Hook called with the C<-experimental> import value. A true return must be an
+arrayref of feature names, which are passed to L<experimental>. The default
+returns its argument.
+
+=head2 gen_table
+
+  my $table = $candy->gen_table($class, $version);
+
+Derives a table name from a result class name: takes the part after
+C<::Result::> (croaking on any other naming scheme), strips C<::> and
+decamelizes. C<$version> C<'singular'> returns that; C<1> additionally
+pluralizes through L<Lingua::EN::Inflect>. See L</AUTOTABLE VERSIONS>.
+
+=head2 gen_custom_imports
+
+  my ($methods, $aliases) = $candy->gen_custom_imports($result_class);
+
+Walks the linearised C<@ISA> of the result class and collects the extra
+methods and aliases every class in it registered through
+L<DBIO::Candy::Exports>. Returns an arrayref of method names and a hashref of
+alias to method.
+
+=head2 parse_arguments
+
+  my $args = $candy->parse_arguments(\@import_args);
+
+Splits the import list into the known options (C<-base>, C<-autotable>,
+C<-perl5>, C<-experimental>, C<-components>, each taking the following value)
+and everything else. Returns C<< { base, autotable, perl_version,
+components, experimental, rest => [...] } >>; one-character C<-autotable> and
+C<-perl5> values (v-strings) are converted with C<ord>.
+
+=head2 gen_primary_column
+
+=head2 gen_unique_column
+
+=head2 gen_has_column
+
+=head2 gen_indices
+
+=head2 gen_proxy
+
+=head2 gen_rename_proxy
+
+Generator hooks for L<Sub::Exporter>: each returns a generator that builds the
+exported sugar sub for one result class (L</primary_column>,
+L</unique_column>, L</has_column>, L</indices>, the plain method proxies of
+L</IMPORTED SUBROUTINES>, and the renamed ones of L</IMPORTED ALIASES>).
+Every generated sub first applies the autotable name (once), then calls the
+corresponding class method on the result class.
+
+=head2 installer
+
+Returns the L<Sub::Exporter> installer: the default installer, followed by
+L<namespace::clean> on every installed sugar sub, so none of them remains a
+method of the result class.
+
+=head2 set_base
+
+  $candy->set_base($result_class, $base);
+
+Loads the class(es) L</base> returns for C<$base> and appends them to the
+result class's C<@ISA>, skipping any already present (idempotent, so a
+reload does not duplicate them).
+
+=head2 gen_INIT
+
+Returns the C<INIT> collector run on every import: turns on C<strict> and
+C<warnings>, enables the requested C<:5.N> feature bundle and experimental
+features (dying unless the latter is an arrayref), and sets the result
+class's MRO to C<c3>.
 
 =head1 IMPORT OPTIONS
 
@@ -581,10 +693,10 @@ Defines a column and adds a unique constraint on it in a single call.
 
 Declares one or more secondary indexes on the table. Field lists may be a
 single column name or an arrayref of column names. Equivalent to the
-L<DBICx::Indexing> component on DBIx::Class. The indexes are picked up by
-both the SQL::Translator deploy path (via C<sqlt_deploy_hook>) and the
-native PostgreSQL deploy path (via C<pg_indexes>), so they end up in the
-generated DDL regardless of which deploy method is in use.
+L<DBICx::Indexing> component on DBIx::Class. Each index is stored as a
+canonical declaration on the result source
+(L<DBIO::ResultSource/index_declarations>), which the native driver deploy path
+reads.
 
 =head1 SETTING DEFAULT IMPORT OPTIONS
 

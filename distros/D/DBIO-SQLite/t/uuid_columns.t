@@ -3,13 +3,6 @@ use warnings;
 
 use Test::More;
 use DBIO::SQLite::Test;
-eval { require Data::UUID }
-  || eval { require UUID }
-  || eval { require UUID::Random };
-
-plan skip_all => 'No UUID module available (Data::UUID, UUID, or UUID::Random)'
-  unless $INC{'Data/UUID.pm'} || $INC{'UUID.pm'} || $INC{'UUID/Random.pm'};
-
 my $schema = DBIO::SQLite::Test->init_schema();
 
 # Create a simple in-memory table for UUID testing

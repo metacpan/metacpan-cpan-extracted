@@ -12,6 +12,10 @@ lib/MojoX/MojoDbWrap.pm
 lib/MojoX/MojoDbWrap.pod
 t/00-load.t
 t/01-sqlite.t
+t/02-pg.t
+t/03-wrappers.t
+t/04-no-sqlite.t
 t/author-pod-syntax.t
 t/author-pod-version.t
+t/lib/MojoDbWrapTests.pm
 t/release-pod-coverage.t

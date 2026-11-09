@@ -8,16 +8,23 @@ use DBIO::Storage::DBI::IdentityInsert;
 use DBIO::Storage::DBI::UniqueIdentifier;
 use DBIO::Storage::DBI::AutoCast;
 
-# karr #19: method sections sat inside unterminated POD blocks (=method with
-# no =cut before the sub), so the subs were never compiled. ODBC::_rebless
-# then resolved to the inherited no-op and connector detection (ODBC ->
-# MSSQL/Firebird backend subclass) never ran. Same pattern buried
+# Method sections sat inside unterminated POD blocks (=method with no =cut
+# before the sub), so the subs were never compiled. The same pattern buried
 # IdentityInsert/AutoCast::_prep_for_execute and the UniqueIdentifier
-# helpers — exactly the MSSQL code paths the live tests saw missing.
+# helpers -- exactly the MSSQL code paths the live tests saw missing.
+#
+# The connector detection is retired (ADR 0067): the ODBC class finds no engine.
+# What it keeps are the transport helpers the ODBC storages of drivers inherit.
+
+ok(!DBIO::Storage::DBI->can('_determine_connector_driver'),
+  'the connector detection is gone');
+eval { DBIO::Storage::DBI->register_connector_driver(Some_Engine => 'Some::Storage') };
+isa_ok $@, 'DBIO::Exception', 'register_connector_driver, retired, throws';
+like "$@", qr/register_connector_driver is retired \(ADR 0067\)/, '... naming the decision';
 
 my %own_methods = (
   'DBIO::Storage::DBI::ODBC' =>
-    [qw/_rebless _using_freetds _using_freetds_version _disable_odbc_array_ops/],
+    [qw/_using_freetds _using_freetds_version _disable_odbc_array_ops _connect_params_dsn/],
   'DBIO::Storage::DBI::IdentityInsert' => [qw/_prep_for_execute/],
   'DBIO::Storage::DBI::UniqueIdentifier' => [qw/_is_guid_type _prefetch_autovalues/],
   'DBIO::Storage::DBI::AutoCast' => [qw/_prep_for_execute connect_call_set_auto_cast/],

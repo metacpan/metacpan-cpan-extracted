@@ -36,11 +36,12 @@ use Test::Exception;
 # silently ignored — the production PG behaviour we care about, regardless
 # of which channel is used.
 #
-# The "wait until the dedicated LISTEN connection is up" step polls
-# $storage->{_listen_connected} on the EV loop. This is an internal flag
-# driven by Storage's on_connect callback (Storage.pm:618-623); we read it
-# directly because there is no public wait-for-connect hook and adding one
-# purely for this test would expand the API surface.
+# The "wait until LISTEN is in effect" step awaits the Future listen()
+# returns (core ADR 0056, karr k43). Before k43 this file polled the internal
+# flag $storage->{_listen_connected}, because there was no public hook; the
+# listen Future is that hook now, and it resolves only once the server has
+# answered the LISTEN -- not merely once the socket is up -- so the first
+# NOTIFY below can no longer race the LISTEN.
 
 BEGIN {
   plan skip_all => 'Set DBIO_TEST_PG_DSN to run integration tests'
@@ -51,56 +52,24 @@ use EV;
 use EV::Pg;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (mirrors t/12-/t/13-/t/14-/t/15-).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
 
 # Drive a Future to completion on the EV loop under a wall-clock guard, so a
 # regression that reintroduces a listen/notify hang fails this test loud.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what\n" };
-  alarm 15;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
-}
-
-# Wait until the dedicated LISTEN connection has finished its async connect,
-# i.e. $storage->{_listen_connected} becomes truthy. Polled on the EV loop
-# with a 2-second deadline so a regression that never connects times out
-# instead of hanging the suite forever. We tick EV::run ONCE per iteration
-# instead of using EV::loop, because EV::loop blocks until EV::unloop and
-# would deadlock if no callback ever fires.
-sub await_listen_connected {
-  my ($storage, $what) = @_;
-  my $deadline = EV::time + 2;
-  my $count    = 0;
-  while (!$storage->{_listen_connected}) {
-    return 0 if EV::time >= $deadline || ++$count > 1000;
-    EV::run(EV::RUN_ONCE);
-  }
-  die "TIMEOUT waiting for _listen_connected ($what)\n"
-    unless $storage->{_listen_connected};
-  return 1;
+  return GuardedWait->until_ready($f, 15, "TIMEOUT awaiting $what\n");
 }
 
 # --- bring up two Storage instances bound to the same DB -------------------
@@ -114,12 +83,13 @@ $sender->connect_info([ \%ci, {} ]);
 # --- 1. one-shot notify round-trip ----------------------------------------
 
 my @received;
-$listener->listen('test_ch' => sub {
+my $lf = $listener->listen('test_ch' => sub {
   my ($ch, $payload, $pid) = @_;
   push @received, [ $ch, $payload, $pid ];
 });
 
-await_listen_connected($listener, 'listen test_ch');
+await_guarded($lf, 'listen test_ch');
+ok $lf->is_done, 'listen Future resolved: LISTEN is in effect';
 
 # Send a notify from the other storage. notify() is a normal pooled call.
 my $nf = await_guarded($sender->notify('test_ch', 'hello-async'), 'notify #1');
@@ -171,6 +141,7 @@ ok $nf3->is_done, 'notify Future on unlistened channel still resolves';
 # against EV::time only progresses while the loop is already active. After
 # the previous notify Future has resolved and no I/O is pending, EV::run
 # would block indefinitely.
+EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
 my $drain_w = EV::timer(+0.2, 0, sub { EV::unloop });
 $drain_w->start;
 EV::loop;
@@ -186,6 +157,7 @@ await_guarded($sender->notify('test_ch', 'after-unlisten'), 'notify after unlist
 # Drain briefly so a misbehaving listener has a chance to misbehave, then
 # assert silence. Timer-driven (see section 3 for why a busy-poll would
 # block once the EV loop is idle).
+EV::now_update();
 my $drain_w2 = EV::timer(+0.2, 0, sub { EV::unloop });
 $drain_w2->start;
 EV::loop;

@@ -2,6 +2,9 @@ package DBIO::Test::Schema::ArtistSubclass;
 # ABSTRACT: Test result subclass of the artist table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Test::Schema::Artist';
@@ -22,7 +25,7 @@ DBIO::Test::Schema::ArtistSubclass - Test result subclass of the artist table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

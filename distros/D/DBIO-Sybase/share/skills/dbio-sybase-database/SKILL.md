@@ -1,6 +1,6 @@
 ---
 name: dbio-sybase-database
-description: "Sybase ASE / SAP ASE knowledge for Perl driver development (DBD::Sybase/FreeTDS, SQL dialect, types, IDENTITY, transactions, pagination)"
+description: Use when you need Sybase ASE or SAP ASE specifics for driver work — DBD::Sybase and FreeTDS, dialect, types, IDENTITY, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -24,22 +24,23 @@ FreeTDS detection: `$dbh->{syb_oc_version} =~ /freetds/i`. The driver mixes in
 
 | Concern | OpenClient | FreeTDS |
 |---------|-----------|---------|
-| TEXT/IMAGE columns | works | **do not work** |
+| TEXT/IMAGE columns | works | content **cannot be written** (no `ct_send_data`); `undef` (NULL) and `''` (stored as one space / `0x20`) go through |
 | `$dbh->{LongReadLen}` | works | unavailable → `SET TEXTSIZE n` (default 32768) |
 | Transactions | `syb_chained_txn`=1 (`SET CHAINED`) | explicit `BEGIN TRAN`/`COMMIT`/`ROLLBACK` |
-| Statement caching | works | disabled for FreeTDS > 0.82 (buggy) |
+| Statement caching | works | disabled for FreeTDS <= 0.82 (buggy); newer FreeTDS keeps it |
 | `maxConnect` DSN | patched to 256 to avoid exhaustion | same |
 
 ## ASE Version Notes
 
 If the server lacks placeholder support the storage reblesses to
-`...::ASE::NoBindVars`; typeless placeholders trigger `auto_cast(1)`. Server type is
+`...::ASE::NoBindVars` (which always disables statement caching); placeholders
+without typeless-placeholder support trigger `auto_cast(1)`. Server type is
 probed at first use via `sp_server_info @attribute_id=1` (`SQL_Server` → `ASE`).
 
 ## Type System
 
 Driver type mapping (`DBIO::Sybase::DDL::sybase_column_type`, logical → ASE):
-integer/bigint → `INT`; smallint/tinyint → `SMALLINT`; serial/bigserial → `BIGINT`;
+integer/serial → `INT`; bigint/bigserial → `BIGINT`; smallint/tinyint → `SMALLINT`;
 varchar/nvarchar → `VARCHAR(255)`; char/nchar → `CHAR(1)`; text/long/clob → `TEXT`;
 date/timestamp/datetime → `DATETIME`; smalldatetime → `SMALLDATETIME`;
 bytea/blob → `IMAGE`; numeric/decimal → `NUMERIC(18,6)`; float/real → `FLOAT`;
@@ -50,9 +51,11 @@ double precision → `DOUBLE PRECISION`; boolean → `BIT`.
   (`_writer_storage`), separate from the main insert. Set `syb_binary_images = 1`
   (via `connect_call_blob_setup`) to get raw binary instead of hex.
 - **datetime / smalldatetime** — `SMALLDATETIME` has only minute precision.
-  Driver sets `syb_date_fmt('ISO_strict')` for output and `SET DATEFORMAT mdy`
-  for input. Custom format class parses `%Y-%m-%dT%H:%M:%S.%3NZ`, formats
-  `%m/%d/%Y %H:%M:%S.%3N`.
+  `on_connect_call => 'datetime_setup'` sets the output format with
+  `syb_date_fmt('ISO_strict')`; only a DBD::Sybase too old to have
+  `syb_date_fmt` gets `SET DATEFORMAT mdy` instead, with a warning — one or the
+  other, never both. Custom format class parses `%Y-%m-%dT%H:%M:%S.%3NZ`,
+  formats `%m/%d/%Y %H:%M:%S.%3N`.
 
 ## Identity (autoincrement)
 
@@ -66,7 +69,7 @@ not a sequence. There is no `SCOPE_IDENTITY()` equivalent.
 - Inserting an explicit identity value requires `SET IDENTITY_INSERT` (via
   `DBIO::Storage::DBI::IdentityInsert`); updating one requires identity-update flags.
 - Identity columns are detected in introspection from `syscolumns.status & 128`
-  (bit `0x80`) — INFORMATION_SCHEMA does not expose this.
+  (bit `0x80`).
 - `INSERT ... DEFAULT VALUES` is unsupported; the driver emits explicit `DEFAULT`
   per column instead (skipping identity, timestamp, computed columns).
 
@@ -90,9 +93,11 @@ SELECT ...
 SET ROWCOUNT 0
 ```
 This only applies when there is a limit **and no offset** (`_prep_for_execute`).
-There is no native `OFFSET`; offset pagination must be emulated (`ROW_NUMBER()`
-windowing on newer ASE, or client-side skip). ASE also supports `TOP n`, but the
-driver uses `SET ROWCOUNT`.
+There is no native `OFFSET`; with an offset, `DBIO::Sybase::SQLMaker::apply_limit`
+emulates it through the `GenericSubQ` dialect — a correlated
+`WHERE (SELECT COUNT(*) ...) BETWEEN ? AND ?` over a stable main-source order.
+It throws without an `order_by`, and when the order is based on sources other
+than the main one. ASE also supports `TOP n`, but the driver uses `SET ROWCOUNT`.
 
 ## Identifier Quoting + Case Sensitivity
 
@@ -108,14 +113,21 @@ on the connection rather than assuming UTF-8.
 
 ## Introspection Catalog
 
-Driver reads mostly via `INFORMATION_SCHEMA` views (TABLES, COLUMNS,
-KEY_COLUMN_USAGE, TABLE_CONSTRAINTS, REFERENTIAL_CONSTRAINTS, STATISTICS), with one
-drop to the native system catalog for identity detection:
-`syscolumns` JOIN `sysobjects` (type `'U'`) JOIN `sysusers`, testing
-`c.status & 128`. Other native catalog tables: `sysobjects`, `sysindexes`.
-FKs are readable and emitted in DDL (`ON DELETE`/`ON UPDATE` rules). Unique
-constraints are emitted as `CREATE UNIQUE INDEX`, not inline constraints; ASE does
-not support `CHECK` constraints the way other engines do.
+ASE has **no** `INFORMATION_SCHEMA` views (Msg 208 on 16.0) — that is SQL Server
+and ANSI. The driver reads the system catalog (karr k48):
+
+| What | Catalog | Detail |
+|------|---------|--------|
+| tables/views | `sysobjects` type `U`/`V` + `sysusers` (owner) | skip the system view `sysquerymetrics` |
+| columns | `syscolumns` + `systypes` **on `usertype`** | `type` gives `intn`/`numericn` for nullable columns; `status & 8` nullable, `status & 0x80` identity; `length` (halve for `uni*`), `prec`/`scale` |
+| defaults | `syscomments` where `id = syscolumns.cdefault` | text `DEFAULT  'x' ` (or `create default d as …`), split over rows |
+| indexes | `sysindexes` indid 1..250, `index_col(tbl, indid, n, uid)` until NULL | `status & 2` unique, `& 2048` PK constraint (server-named `tbl_<objid>`); `keycnt` counts the row id on nonclustered |
+| FKs | `sysreferences` `fokey1..16`/`refkey1..16` → `col_name()` | no `ON DELETE/UPDATE` in ASE (Msg 156) |
+| view text | `syscomments` (whole `CREATE VIEW`, 255-char rows) | order `colid2, colid` |
+
+Index names created with a quoted identifier keep the quotes in `sysindexes.name`.
+Unique constraints are emitted as `CREATE UNIQUE INDEX`, not inline constraints; ASE
+does not support `CHECK` constraints the way other engines do.
 
 ## Testing Env Vars
 

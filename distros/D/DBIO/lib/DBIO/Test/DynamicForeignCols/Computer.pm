@@ -2,6 +2,9 @@ package DBIO::Test::DynamicForeignCols::Computer;
 # ABSTRACT: Test result class for dynamic foreign column resolution
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Core';
@@ -28,7 +31,7 @@ DBIO::Test::DynamicForeignCols::Computer - Test result class for dynamic foreign
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

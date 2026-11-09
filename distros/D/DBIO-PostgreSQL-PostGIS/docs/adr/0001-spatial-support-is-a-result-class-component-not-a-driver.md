@@ -29,14 +29,17 @@ Ship spatial support as a **result-class component**, loaded with
   (`PostGIS.pm:8`), matching the `DBIO::PostgreSQL` component pattern. It loads
   the `InflateColumn` component (`PostGIS.pm:12`) and hooks
   `register_column`/`connection`.
-- Storage extensions are opt-in by setting `storage_type` to
-  `+DBIO::PostgreSQL::PostGIS::Storage`; the component's `connection` method
-  sets that storage_type when the component is loaded (`PostGIS.pm:14-18`). The
-  Storage subclasses `DBIO::PostgreSQL::Storage` and only *adds* the spatial
-  helpers `ensure_postgis` / `postgis_version` (`Storage.pm:7,24-48`).
+- The component's `connection` method registers
+  `DBIO::PostgreSQL::PostGIS::Storage` as a storage layer via
+  `register_storage_layer` (`PostGIS.pm`); the DSN decides the driver and core
+  composes the layer over it. The Storage is a plain method package, not a
+  `DBIO::PostgreSQL::Storage` subclass and not a `storage_type`; it only *adds*
+  the spatial helpers `ensure_postgis` / `postgis_version`. (The original
+  decision set `storage_type` to a Storage subclass; superseded by the
+  storage-layer migration, see Changes 0.900001 and ADR 0032 §7 in core.)
 - The driver is **not** re-registered. A prior `register_driver('Pg')` global
   side-effect on the Storage class was deliberately removed because it clobbered
-  the family-wide Pg mapping owned by core (karr #2, finding 3); the
+  the family-wide Pg mapping owned by core (karr k2, finding 3); the
   driver-registry mechanism stays core's, and this distribution does not touch
   it.
 
@@ -45,7 +48,7 @@ Ship spatial support as a **result-class component**, loaded with
 PostGIS is the same engine with extra column types, so layering on the pg
 driver means one connection, one dialect, one introspection/deploy pipeline —
 the component contributes only what is genuinely new (type inflation and spatial
-query helpers) and inherits everything else by subclassing pg's Storage. Owning
+query helpers) and inherits everything else from the pg driver the layer is composed over. Owning
 a second `Pg` driver would have meant re-implementing or shadowing the pg
 driver's registration for no behavioural gain, and the removed
 `register_driver` side-effect is the concrete evidence of why that path is
@@ -65,9 +68,8 @@ This shape is shipped and exercised (`t/00-load.t`, `t/20-inflate.t`,
   distribution must never re-introduce a `register_driver` call; that contract
   is owned by core/`dbio-postgresql`, not here.
 - Storage spatial helpers (`ensure_postgis`, `postgis_version`) are reachable
-  only when `storage_type` resolves to the PostGIS Storage subclass; the
-  component wires that on load, but a schema that sets `storage_type` by hand
-  must point at `+DBIO::PostgreSQL::PostGIS::Storage`.
+  once the component's `connection` has registered the storage layer; no
+  `storage_type` is set anywhere, so a schema must not set one by hand.
 - The Deploy/Introspect augmentation (which conforms to a core/`dbio-postgresql`
   contract, not a local decision) is layered the same way — see the cross-repo
-  notes on `dbio-postgresql` (karr #1), not a local ADR.
+  notes on `dbio-postgresql` (karr k1), not a local ADR.

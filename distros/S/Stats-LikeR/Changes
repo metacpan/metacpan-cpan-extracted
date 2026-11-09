@@ -1,5 +1,30 @@
 Revision history for Stats-LikeR
 
+0.3418 2026-11-08 CST (Claude Opus 5.5 helped)
+
+ [read_table(), write_table()]
+
+ - Both open a delimited file binary on every platform. On MSWin32 they
+   opened it in text mode, so perl's :crlf layer rewrote line ends inside
+   quoted fields as well as between rows. read_table() turned a quoted
+   CR LF in a plain file into LF while the same file gzipped kept it, and
+   write_table() turned a quoted LF into CR LF, so "1\r\n2" reached the
+   file as "1\r\r\n2". 0.3417 failed three test files on a Strawberry
+   Perl 5.42.3 smoker for this. write_table() now writes the row end
+   itself, CR LF on Windows as before and LF elsewhere, and a field's
+   bytes as they are, as pandas' to_csv() does. A .gz or .bz2 file is
+   written the same way, through a plain :perlio buffer in place of the
+   :crlf one 0.321 put there to match the text-mode plain file.
+
+ [Tests]
+
+ - t/crlf_quoted.tukey_aliases.regressions.t checks the bytes
+   write_table() writes for a quoted LF and CR LF, and that read_table()
+   reads both back. With PERLIO=:unix:crlf, which gives text-mode opens
+   Windows' layer on Linux, the installed 0.3417 fails the same subtests
+   the smoker did; this build passes all of them but the row-end check,
+   which needs a perl built with PERLIO_USING_CRLF.
+
 0.3417 2026-11-07 CST (Claude Opus 5.5 helped)
 
  [read_table()]

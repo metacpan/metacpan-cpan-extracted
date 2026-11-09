@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage::Savepoints;
 use strict;
 use warnings;
 
-
+our $VERSION = '0.900004';
 
 
 sub _exec_svp_begin {
@@ -22,7 +22,8 @@ sub _exec_svp_rollback {
 
 # DBD::Oracle warns loudly on partial execute_for_fetch failures
 sub _dbh_execute_for_fetch {
-  local $_[1]->{PrintWarn} = 0;
+  # arguments: ($self, $source, $sth, ...) -- the attribute is the sth's
+  local $_[2]->{PrintWarn} = 0;
   shift->next::method(@_);
 }
 
@@ -40,13 +41,13 @@ DBIO::Oracle::Storage::Savepoints - Savepoint management for Oracle
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Oracle savepoint operations and DBD::Oracle quirks. Oracle automatically
 releases a savepoint when you start another one with the same name, so
-L</_exec_svp_release> is a no-op.
+C<_exec_svp_release> is a no-op.
 
 =head1 AUTHOR
 

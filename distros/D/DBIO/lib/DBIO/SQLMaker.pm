@@ -4,12 +4,16 @@ package DBIO::SQLMaker;
 use strict;
 use warnings;
 
-our $CONTRACT_VERSION = '1.1';
+our $VERSION = '0.900004';
+
+our $CONTRACT_VERSION = '1.3';
 
 use base qw(
   DBIO::SQLMaker::ClassicExtensions
   SQL::Abstract
 );
+
+use DBIO::Exception ();
 
 sub contract_version { $CONTRACT_VERSION }
 
@@ -31,6 +35,8 @@ sub new {
   # DBIO::Oracle SQLMakers) -- the two go together.
   $opts{warn_once_on_nest}      = 1;
   $opts{disable_old_special_ops} = 1;
+  # an arrayref is a value (an array data type), never literal SQL
+  $opts{array_datatypes} = 1;
   $opts{render_clause}{'select.where'} ||= sub {
     my ($sql, @bind) = $_[0]->where($_[2]);
     s/\A\s+//, s/\s+\Z// for $sql;
@@ -40,13 +46,178 @@ sub new {
     # wrapper produces a redundant second layer: 'WHERE ( ( ... ) )'. Collapse
     # that one redundant layer back to the canonical 'WHERE ( ... )'. Only the
     # outer pair added by where() is touched; the already-wrapped condition and
-    # every nested group are left exactly as rendered (see ADR 0004 / karr #26).
+    # every nested group are left exactly as rendered (see ADR 0004).
     $sql = "$1 " . __unwrap_redundant_paren($2)
       if $sql =~ /\A(WHERE)\s+(\(.*\))\z/si;
     return [ $sql, @bind ];
   };
 
   return $self->next::method(\%opts);
+}
+
+# The operator of a condition, { column => { OPERATOR => value } }, is checked
+# at its raw name, before SQL::Abstract cuts a prefix off it (see
+# "operator_words"). A word is an entry of that list (case does not matter,
+# '_' equals ' ', a leading '-' is allowed); a symbol consists of the symbol
+# characters alone and holds no comment opener. The same rule holds for the
+# first element of -op => [ OP, ... ]; a numeric suffix (-like_1) is cut off
+# as SQL::Abstract does and the name without it is checked.
+sub operator_words {
+  return (
+    'like', 'not like', 'ilike', 'not ilike',
+    'in', 'not in', 'between', 'not between', 'is', 'is not',
+    'similar to', 'not similar to',
+    'regexp', 'not regexp', 'rlike', 'not rlike',
+    # the operators SQL::Abstract knows as special operators
+    'ident', 'value', 'nest', 'bind', 'and', 'or',
+    # core's own marker of the upsert condition ("attempted" in ADR 0036)
+    'attempted',
+  );
+}
+
+sub _operator_word_set {
+  my $self = shift;
+  return $self->{_dbio_operator_word_set} ||= {
+    map { __normalize_operator_word($_) => 1 } $self->operator_words
+  };
+}
+
+sub __normalize_operator_word {
+  my $w = lc $_[0];
+  $w =~ s/\A-(?=.)//s;
+  $w =~ s/[_ ]+/ /g;
+  return $w;
+}
+
+sub _assert_operator_name {
+  my ($self, $raw) = @_;
+
+  if (defined $raw and ! ref $raw) {
+    return if $raw =~ m{\A[-+*/<>=~!@#%^&|`?]+\z}
+      and $raw !~ m{--|/\*};
+
+    # a numeric suffix is cut off by SQL::Abstract (-like_1, -like1); the
+    # word without it is the name that is checked
+    (my $word = $raw) =~ s/ _? \d+ \z//x;
+    return if $word =~ /\A-?[A-Za-z][A-Za-z_ ]*\z/
+      and $self->_operator_word_set->{ __normalize_operator_word($word) };
+  }
+
+  DBIO::Exception->throw( sprintf (
+    "'%s' is not an operator of a condition: an operator is a symbol of the "
+    . "characters + - * / < > = ~ ! @ # %% ^ & | ` ? (without '--' and '/*') "
+    . "or a word of the list of %s->operator_words",
+    ( defined $raw ? ( ref $raw ? DBIO::Util::refdesc($raw) : $raw ) : 'undef' ),
+    ref $self || $self,
+  ));
+}
+
+# -op => [ OP, ... ] in a raw condition: the same rule, at the raw name. The
+# names the generator itself renders (is_null, not, ',', ...) are the keys of
+# its render_op and expand_op tables; they pass.
+sub _expand_op {
+  my ($self, undef, $args) = @_;
+  my $op = ref $args eq 'ARRAY' ? $args->[0] : undef;
+  $self->_assert_operator_name($op)
+    unless defined $op and ! ref $op
+      and ( $self->{render_op}{$op} or $self->{expand_op}{$op} );
+  return shift->next::method(@_);
+}
+
+sub _expand_hashtriple {
+  $_[0]->_assert_operator_name($_[2]);
+  return shift->next::method(@_);
+}
+
+# The truth value of a condition (see "search" in DBIO::ResultSet). Every node
+# of a condition is TRUE, FALSE or SQL; SELECT, UPDATE and DELETE build their
+# WHERE through the same three clause hooks below, so they read it alike.
+sub __literal_is {
+  my ($node, $sql) = @_;
+  return (
+    ref $node eq 'HASH' and keys %$node == 1
+      and ref $node->{-literal} eq 'ARRAY' and @{ $node->{-literal} } == 1
+      and defined $node->{-literal}[0] and $node->{-literal}[0] eq $sql
+  ) ? 1 : 0;
+}
+
+sub _expand_op_andor {
+  my ($self, $logop, $v, $k) = @_;
+
+  if (! defined $k) {
+    # an empty group: -and is TRUE, -or (and [] as a whole) is FALSE
+    if (ref $v eq 'HASH' ? ! %$v : ref $v eq 'ARRAY' ? ! @$v : 0) {
+      return $logop eq 'or' ? $self->sqlfalse : $self->sqltrue;
+    }
+
+    # an empty member of a list is a truth value of its own: {} is TRUE, [] is
+    # FALSE (a bare key takes the element after it as its value, so skip both)
+    if (ref $v eq 'ARRAY') {
+      my @members = @$v;
+      my @out;
+      while (@members) {
+        my $m = shift @members;
+        if (! ref $m) {
+          push @out, $m, (@members ? shift @members : ());
+        }
+        elsif (ref $m eq 'HASH' and ! %$m) {
+          push @out, $self->sqltrue;
+        }
+        elsif (ref $m eq 'ARRAY' and ! @$m) {
+          push @out, $self->sqlfalse;
+        }
+        else {
+          push @out, $m;
+        }
+      }
+      $v = \@out;
+    }
+  }
+
+  my $aqt = $self->SUPER::_expand_op_andor($logop, $v, $k);
+
+  # fold: a group with a FALSE member is FALSE (and), with a TRUE member TRUE (or);
+  # the neutral members (TRUE in an and, FALSE in an or) drop out
+  return $aqt unless (
+    ref $aqt eq 'HASH' and keys %$aqt == 1 and ref $aqt->{-op} eq 'ARRAY'
+      and $aqt->{-op}[0] eq $logop and ($logop eq 'and' or $logop eq 'or')
+  );
+
+  my ($op, @members) = @{ $aqt->{-op} };
+  my ($neutral, $dominant) = $logop eq 'and'
+    ? ($self->{sqltrue}, $self->{sqlfalse})
+    : ($self->{sqlfalse}, $self->{sqltrue})
+  ;
+
+  return $logop eq 'and' ? $self->sqlfalse : $self->sqltrue
+    if grep { __literal_is($_, $dominant) } @members;
+
+  my @kept = grep { ! __literal_is($_, $neutral) } @members;
+  return $aqt if @kept == @members;
+
+  return $logop eq 'and' ? $self->sqltrue : $self->sqlfalse unless @kept;
+  return { -op => [ $op, @kept ] };
+}
+
+# a WHERE that is TRUE is no restriction: it renders as nothing
+sub _where_truth {
+  my ($self, $key, $aqt) = @_;
+  return ($key, __literal_is($aqt, $self->{sqltrue}) ? undef : $aqt);
+}
+
+sub _expand_select_clause_where {
+  my $self = shift;
+  return $self->_where_truth($self->SUPER::_expand_select_clause_where(@_));
+}
+
+sub _expand_update_clause_where {
+  my $self = shift;
+  return $self->_where_truth($self->SUPER::_expand_update_clause_where(@_));
+}
+
+sub _expand_delete_clause_where {
+  my $self = shift;
+  return $self->_where_truth($self->SUPER::_expand_delete_clause_where(@_));
 }
 
 # Given the 'WHERE ( <inner> )' block that where() added (passed in with its
@@ -94,7 +265,7 @@ DBIO::SQLMaker - An SQL::Abstract-based SQL maker class
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 

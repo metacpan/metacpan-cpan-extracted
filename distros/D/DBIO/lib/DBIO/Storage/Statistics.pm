@@ -4,7 +4,10 @@ package DBIO::Storage::Statistics;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Util qw(sigwarn_silencer qsub);
+use Fcntl qw(O_WRONLY O_APPEND O_CREAT);
 use IO::Handle ();
 use Time::HiRes ();
 
@@ -59,8 +62,10 @@ sub _build_debugfh {
   my $debug_env = $ENV{DBIO_TRACE};
 
   if (defined($debug_env) and ($debug_env =~ /=(.+)$/)) {
-    open ($fh, '>>', $1)
-      or die("Cannot open trace file $1: $!\n");
+    # A trace file is opened for append and created for its owner alone (0600)
+    my $file = $1;
+    sysopen ($fh, $file, O_WRONLY | O_APPEND | O_CREAT, 0600)
+      or die("Cannot open trace file $file: $!\n");
   }
   else {
     open ($fh, '>&STDERR')
@@ -197,7 +202,7 @@ DBIO::Storage::Statistics - SQL Statistics
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

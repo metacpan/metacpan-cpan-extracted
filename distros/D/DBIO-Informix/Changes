@@ -1,0 +1,76 @@
+Revision history for DBIO-Informix
+
+0.900004  2026-11-08
+    First release: the IBM Informix driver for DBIO, over DBD::Informix.
+
+    * Storage
+        - DBIO::Informix::Storage is the registered driver for dbi:Informix:
+          DSNs; a schema declares it with use DBIO 'Schema', -ix or
+          load_components('Informix').
+        - Auto-increment values come from ix_sqlerrd; savepoints, deferred
+          foreign key checks and DELIMIDENT quoting are set up at connect.
+        - connect_call_datetime_setup and DateTime inflation through
+          DBIO::Storage::DateTimeFormat.
+        - transactional_ddl and supports_exists_query are declared; UNION,
+          INTERSECT and EXCEPT run, INTERSECT ALL, EXCEPT ALL, rand and
+          explain are refused with the reason.
+        - Connection parameters of an AccessBroker build
+          dbi:Informix:database@server; host is the DBSERVERNAME, and a port
+          is refused because it belongs to sqlhosts.
+        - TEXT and BYTE parameters bind with their type, a value that is no
+          number is refused for a numeric column, and a TEXT or BYTE compared
+          with a bound value is refused.
+
+    * SQLMaker
+        - DBIO::Informix::SQLMaker writes no SELECT ... FOR UPDATE, writes
+          INSERT ... DEFAULT VALUES in the Informix form and reads a ? inside
+          a /* */ comment as text.
+
+    * Types
+        - DBIO::Informix::Types maps syscolumns.coltype to logical types and
+          back, with DATETIME and INTERVAL qualifiers, boolean, blob, clob,
+          SERIAL, SERIAL8 and BIGSERIAL.
+
+    * DDL
+        - DBIO::Informix::DDL writes the install DDL from the result classes:
+          a name that is not all lower case is quoted, CURRENT_TIMESTAMP and
+          the other defaults become Informix words, VARCHAR above 255 is
+          LVARCHAR.
+        - Unique constraints, foreign keys (ON DELETE CASCADE) and declared
+          indexes are written; foreign keys follow the tables, in the column
+          order of their target key, and a view follows the views it reads.
+        - Refused with table, column and reason: other foreign key actions,
+          bit and enum, dotted names, two declarations over the same columns
+          and a foreign key whose target only a unique index covers.
+
+    * Introspect
+        - DBIO::Informix::Introspect reads the catalog into the canonical
+          model: sizes, defaults with their qualifiers, primary key order,
+          unique constraints, foreign keys and views with their definition.
+
+    * Diff
+        - DBIO::Informix::Diff compares tables, columns, indexes, primary
+          keys, unique constraints, foreign keys (by content) and views and
+          writes the Informix ALTER TABLE forms.
+        - Operations run in the order the server takes: foreign key and
+          index drops first, a replaced primary key before the keys on it,
+          new indexes and foreign keys last.
+        - A name that is a table in the database and a view in the schema is
+          refused.
+
+    * Deploy
+        - DBIO::Informix::Deploy compares in a throwaway database created
+          WITH LOG on a connection of its own and dropped in every case; the
+          live DSN is dbi:Informix:database[@server].
+        - apply and upgrade are those of DBIO::Deploy::Base, with
+          allow_destructive and dry_run; a change that keeps every stored
+          value runs as it is, a NOT NULL column without a value to start
+          from is refused before the first statement.
+
+    * Tests
+        - DBIO::Informix::Test::Conformance answers core's shared DDL, Diff
+          and Bind case tables offline and against a server.
+
+    * Dependencies
+        - Requires DBIO 0.900004, DBD::Informix and Context::Preserve;
+          DateTime::Format::Strptime is recommended.

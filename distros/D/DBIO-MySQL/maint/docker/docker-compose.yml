@@ -1,36 +1,73 @@
-# Live future_io verification stack for dbio-mysql over GENUINE DBD::mysql.
+# Live verification stack for dbio-mysql: one MySQL 8.0 server for the whole
+# live suite, plus a GENUINE DBD::mysql client container.
+#
+# Whole live suite from the host (DBD::MariaDB) -- see README.md:
+#
+#   cd maint/docker && docker compose up -d --wait mysql
+#   ... run the suite against 127.0.0.1:3306 as dbio/dbio ...
+#   docker compose down -v          # ALWAYS clean up (frees the capped DB)
+#
+# DBD::mysql flavour, inside the client container:
 #
 #   cd maint/docker
 #   docker compose up --build --abort-on-container-exit --exit-code-from test
 #   docker compose down -v          # ALWAYS clean up (frees the capped DB)
 #
-# Brings up ONE resource-capped MySQL 8.0 server, then runs
-# t/55-future-io-live.t inside a Perl container that has genuine Oracle
-# libmysqlclient + DBD::mysql baked (the host cannot build DBD::mysql -- see
-# Dockerfile.test). The test connects with a dbi:mysql: DSN, so it exercises the
-# DBD::mysql (mysql_*) async binding of DBIO::MySQL::Storage::Async end to end.
+# The mysql service is prepared so the WHOLE live suite runs as user dbio with
+# no manual step (karr k104): see its command flag and initdb/dbio-grants.sql.
+# The test service runs t/55-future-io-live.t inside a Perl container that has
+# genuine Oracle libmysqlclient + DBD::mysql baked (the host cannot build
+# DBD::mysql -- see Dockerfile.test). It connects with a dbi:mysql: DSN, so it
+# exercises the DBD::mysql (mysql_*) async binding of DBIO::MySQL::Storage::Async
+# end to end.
 #
-# RESOURCE DISCIPLINE -- small SHARED box (see .claude/rules/dbio-rules.md
+# RESOURCE DISCIPLINE -- small SHARED box (see .claude/rules/.local.dbio-rules.md
 # "Live testing"). BOTH containers carry mem_limit + cpus so they can never
-# starve the host; there is exactly ONE database. Run this stack alone (no other
-# live DB suite in parallel) and `down -v` when finished. The mysql:8.0 image and
+# starve the host; there is exactly ONE database. Run ONE live suite against it
+# at a time and `down -v` when finished. The mysql:8.0 image and
 # mysql_native_password default match maint/k8s (dbio-mysql-ev) and the k8s pod
-# xbin/dbio-mysql-k8s spins up -- this compose file is the DBD::mysql-flavoured,
-# self-contained alternative for the host where DBD::mysql will not build.
+# xbin/dbio-mysql-k8s spins up -- this compose file is the self-contained
+# alternative, and the only DBD::mysql-flavoured one for the host where
+# DBD::mysql will not build.
 
 services:
   mysql:
-    image: mysql:8.0
+    # PINNED to 8.0.30 — mysql:8.0.31+ is built on Oracle Linux 9 / newer glibc
+    # and requires the x86-64-v2 CPU baseline, which the shared test-cluster
+    # node lacks: floating mysql:8.0 CrashLoops with "Fatal glibc error: CPU
+    # does not support x86-64-v2". 8.0.30 is the last v1-compatible 8.0.x. See
+    # core k206 (commit 69fcbf48). Do NOT float back to mysql:8.0.
+    image: mysql:8.0.30
     # mysql_native_password as the default auth plugin: the genuine DBD::mysql
     # client then authenticates over a plain TCP connection without the
     # caching_sha2_password public-key exchange. Matches maint/k8s/mysql-pod.yaml
     # (dbio-mysql-ev).
-    command: ["--default-authentication-plugin=mysql_native_password"]
+    #
+    # --log-bin-trust-function-creators=1: MySQL 8 has the binary log on, and
+    # then a user without SUPER may not create triggers or stored routines
+    # (t/78 creates a trigger, t/79 a procedure). Chosen over --skip-log-bin
+    # because it keeps MySQL 8's default -- binlog on, as servers in the wild
+    # run -- and lifts only the SUPER requirement for the non-SUPER user dbio.
+    command:
+      - "--default-authentication-plugin=mysql_native_password"
+      - "--log-bin-trust-function-creators=1"
     environment:
       MYSQL_DATABASE: dbio_test
       MYSQL_USER: dbio
       MYSQL_PASSWORD: dbio
       MYSQL_ROOT_PASSWORD: dbioroot
+    # Grants dbio the scratch databases the live suite creates itself
+    # (dbio_k<NN>_<pid>) and the diff's temp databases (_dbio_tmp_<pid>_<time>,
+    # DBIO::MySQL::Deploy). Init scripts run only on an EMPTY data dir, i.e. on
+    # the first `up` after a `down -v` -- one more reason to always `down -v`.
+    # The image creates MYSQL_USER before it runs them, so 'dbio'@'%' exists.
+    volumes:
+      - ./initdb/dbio-grants.sql:/docker-entrypoint-initdb.d/dbio-grants.sql:ro
+    # Published for a host-side run (DBD::MariaDB) without an override file.
+    # Loopback only: nothing is exposed off the box. Conflicts with a MySQL
+    # already listening on the host's 3306.
+    ports:
+      - "127.0.0.1:3306:3306"
     # Resource cap (compose non-swarm keys, honored by `docker compose up`):
     # at most one core and 1 GiB on the shared box.
     mem_limit: 1g

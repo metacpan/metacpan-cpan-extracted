@@ -148,7 +148,7 @@ use Test::More;
       pg      => { where => 'version IS NULL' };
 }
 
-# --- VersionedMerge: Cake idx + hand-written pg_indexes coexist ---
+# --- VersionedMerge: Cake idx beside a hand-written pg_indexes ---
 {
   package TestComp::Result::VersionedMerge;
   use DBIO::Cake;
@@ -158,7 +158,7 @@ use Test::More;
   col key => varchar(50);
   primary_key 'id';
 
-  # Hand-written pg_indexes BEFORE any idx() call — Cake must merge, not replace.
+  # Hand-written pg_indexes BEFORE any idx() call — Cake must leave it alone.
   sub pg_indexes {
     return {
       manual_idx => { columns => ['key'], using => 'hash' },
@@ -370,75 +370,45 @@ use Test::More;
 # --- idx with options/pg (partial unique indexes) ---------
 {
   my $src = TestComp::Result::Versioned->result_source_instance;
-  my $idxs = $src->{_cake_indexes} || [];
+  my $idxs = $src->{_index_declarations} || [];
   is(scalar @$idxs, 2, 'Versioned: two indexes registered');
 
   my ($published) = grep { $_->{name} eq 'versioned_published' } @$idxs;
   ok($published, 'Versioned: published index present');
   is($published->{type}, 'unique', 'Versioned: published is unique');
-  is_deeply($published->{fields}, ['key', 'version'],
+  is_deeply($published->{columns}, ['key', 'version'],
     'Versioned: published fields');
   is_deeply($published->{options},
     [{ where => 'version IS NOT NULL' }],
     'Versioned: published options pass through');
-  is_deeply($published->{pg},
+  is_deeply($published->{driver}{pg},
     { where => 'version IS NOT NULL' },
     'Versioned: published pg pass through');
 
   my ($draft) = grep { $_->{name} eq 'versioned_draft' } @$idxs;
   ok($draft, 'Versioned: draft index present');
-  is_deeply($draft->{pg}, { where => 'version IS NULL' },
+  is_deeply($draft->{driver}{pg}, { where => 'version IS NULL' },
     'Versioned: draft pg pass through');
 
-  # SQLT path: end-to-end via sqlt_deploy_hook
-  SKIP: {
-    eval { require SQL::Translator::Schema::Table; 1 }
-      or skip "SQL::Translator not available: $@", 3;
-
-    my $sqlt_table = SQL::Translator::Schema::Table->new(name => 'versioned');
-    $sqlt_table->add_field(name => 'id',      data_type => 'integer');
-    $sqlt_table->add_field(name => 'key',     data_type => 'varchar');
-    $sqlt_table->add_field(name => 'version', data_type => 'integer');
-    TestComp::Result::Versioned->sqlt_deploy_hook($sqlt_table);
-
-    my @sqlt_indexes = $sqlt_table->get_indices;
-    is(scalar @sqlt_indexes, 2, 'sqlt_table: two indexes added');
-    my ($sqlt_pub) = grep { $_->name eq 'versioned_published' } @sqlt_indexes;
-    ok($sqlt_pub, 'sqlt: published index present');
-    my @opts = $sqlt_pub->options;
-    is_deeply(\@opts, [{ where => 'version IS NOT NULL' }],
-      'sqlt: published options reached the SQLT::Index');
-  }
-
-  # PG native path: pg_indexes method was installed by Cake
-  ok(TestComp::Result::Versioned->can('pg_indexes'),
-    'Cake installed pg_indexes on class');
-  my $pg = TestComp::Result::Versioned->pg_indexes;
-  is_deeply($pg->{versioned_published}, {
-    unique  => 1,
-    columns => ['key', 'version'],
-    where   => 'version IS NOT NULL',
-  }, 'pg_indexes: published entry');
-  is_deeply($pg->{versioned_draft}, {
-    unique  => 1,
-    columns => ['key'],
-    where   => 'version IS NULL',
-  }, 'pg_indexes: draft entry');
+  # No class method is derived from the declarations
+  ok(!TestComp::Result::Versioned->can('pg_indexes'),
+    'Cake installs no pg_indexes on the class');
+  ok(!TestComp::Result::Versioned->can('sqlt_deploy_hook'),
+    'Cake installs no sqlt_deploy_hook on the class');
 }
 
-# --- pg_indexes merging with pre-existing manual method ---
+# --- a hand-written pg_indexes is left alone, declarations stay separate ---
 {
-  my $pg = TestComp::Result::VersionedMerge->pg_indexes;
-  ok($pg->{manual_idx}, 'pg_indexes: pre-existing manual entry preserved');
-  is_deeply($pg->{manual_idx},
-    { columns => ['key'], using => 'hash' },
-    'pg_indexes: manual entry unchanged');
-  ok($pg->{cake_idx}, 'pg_indexes: cake-declared entry also present');
-  is_deeply($pg->{cake_idx}, {
-    unique  => 1,
-    columns => ['key'],
-    where   => 'key IS NOT NULL',
-  }, 'pg_indexes: cake entry merged correctly');
+  is_deeply(TestComp::Result::VersionedMerge->pg_indexes,
+    { manual_idx => { columns => ['key'], using => 'hash' } },
+    'pg_indexes: hand-written method unchanged by idx()');
+  my @decl = TestComp::Result::VersionedMerge->result_source_instance
+    ->index_declarations;
+  is_deeply([ map $_->{name}, @decl ], ['cake_idx'],
+    'idx() entry is in index_declarations only');
+  is_deeply($decl[0]{driver}{pg}, { where => 'key IS NOT NULL' },
+    'cake entry: pg block kept');
+  is($decl[0]{unique}, 1, 'cake entry: unique');
 }
 
 # --- Namespace cleanup ---

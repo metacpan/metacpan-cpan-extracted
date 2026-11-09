@@ -4,6 +4,8 @@ package DBIO::Oracle::Storage::WhereJoins;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw( DBIO::Oracle::Storage );
 use mro 'c3';
 
@@ -24,7 +26,7 @@ DBIO::Oracle::Storage::WhereJoins - Oracle joins in WHERE syntax support (instea
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -43,8 +45,8 @@ Left and right outer joins are supported via Oracle's C<(+)> syntax. Full
 outer joins are not supported because Oracle requires a C<UNION> of left and
 right joins, which cannot be constructed at the WHERE-clause stage.
 
-DBIO autodetects the Oracle version and uses this storage automatically for
-pre-9.0 servers. See L<DBIO::Oracle::SQLMaker::Joins> for the SQL generation
+This storage is not selected automatically for pre-9.0 servers; set
+C<storage_type> to C<+DBIO::Oracle::Storage::WhereJoins> explicitly. See L<DBIO::Oracle::SQLMaker::Joins> for the SQL generation
 details.
 
 =head1 SEE ALSO

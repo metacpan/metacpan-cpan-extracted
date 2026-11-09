@@ -3,62 +3,13 @@ package DBIO::MySQL::EV::TransactionContext;
 
 use strict;
 use warnings;
-use Future ();
-use namespace::clean;
 
-sub new {
-  my ($class, %args) = @_;
-  return bless {
-    storage => $args{storage} // die('storage required'),
-    mdb     => $args{mdb}     // die('mdb required'),
-  }, $class;
-}
+our $VERSION = '0.900004';
+
+use base 'DBIO::Storage::Async::TransactionContext';
 
 
-sub storage { $_[0]->{storage} }
-
-
-sub txn_mdb { $_[0]->{mdb} }
-
-
-sub pool { $_[0]->{storage}->pool }
-
-
-sub in_txn { 1 }
-
-
-sub _query_async {
-  my ($self, $sql, $bind) = @_;
-  return $self->{storage}->_query_async_pinned($self->{mdb}, $sql, $bind);
-}
-
-# Explicit delegation of the public API. The autoloaded version was
-# fragile: it silently forwarded typos, bypassing can() and method
-# checks. Each method below is the contract a txn_do_async callback
-# is allowed to call on the context.
-#
-# CRUD inside a transaction MUST run on the pinned connection that
-# BEGIN/COMMIT ran on, not a fresh pooled one. Each CRUD method routes
-# through the storage's shared CRUD builder with the pinned connection
-# (txn_mdb), so SQL generation (insert + LAST_INSERT_ID, select_single
-# first-row) is not duplicated. Forwarding to $storage->select_async etc.
-# would acquire a separate pool connection and run the query OUTSIDE the
-# transaction.
-
-sub select_async        { my $s = shift; $s->{storage}->_run_crud_pinned('select',        $s->{mdb}, @_) }
-sub select_single_async { my $s = shift; $s->{storage}->_run_crud_pinned('select_single', $s->{mdb}, @_) }
-sub insert_async        { my $s = shift; $s->{storage}->_run_crud_pinned('insert',        $s->{mdb}, @_) }
-sub update_async        { my $s = shift; $s->{storage}->_run_crud_pinned('update',        $s->{mdb}, @_) }
-sub delete_async        { my $s = shift; $s->{storage}->_run_crud_pinned('delete',        $s->{mdb}, @_) }
-sub select              { my $s = shift; $s->select_async(@_)->get        }
-sub select_single       { my $s = shift; $s->select_single_async(@_)->get }
-sub insert              { my $s = shift; $s->insert_async(@_)->get        }
-sub update              { my $s = shift; $s->update_async(@_)->get        }
-sub delete              { my $s = shift; $s->delete_async(@_)->get        }
-sub sql_maker           { my $s = shift; $s->{storage}->sql_maker(@_)           }
-sub debug               { my $s = shift; $s->{storage}->debug(@_)               }
-sub pipeline            { my $s = shift; $s->{storage}->pipeline(@_)            }
-sub txn_do_async        { my $s = shift; $s->{storage}->txn_do_async(@_)        }
+sub txn_mdb { $_[0]->txn_conn }
 
 1;
 
@@ -74,33 +25,61 @@ DBIO::MySQL::EV::TransactionContext - Pinned connection context for an async MyS
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
+
+=head1 DESCRIPTION
+
+The pinned-connection context L<DBIO::MySQL::EV::Storage> hands to a
+C<txn_do_async> coderef -- see L<DBIO::MySQL::EV::Storage/_txn_context_class>.
+
+Everything it does is B<inherited> from
+L<DBIO::Storage::Async::TransactionContext>, the generic context core ships
+since ADR 0030 §4: C<storage>, C<txn_conn>, C<pool>, C<in_txn>, the
+non-releasing C<_query_async>, the five C<*_async> CRUD methods pinned through
+L<DBIO::MySQL::EV::Storage/_run_crud_pinned> and their blocking C<< ->get >>
+siblings, the C<sql_maker> / C<debug> delegations, C<pipeline> (runs on the
+pinned C<txn_conn> in core -- here it returns a failed Future, because
+this transport has no pipeline seam, ADR 0009), C<txn_do_async> (refuses a
+nested transaction), and C<_context_active> / C<_invalidate>
+(ADR 0045), which
+context-bound L<DBIO::ResultSet> / L<DBIO::Row> / L<DBIO::ResultSetColumn>
+C<*_async> ops consult before routing onto the context.
+
+The blocking siblings wait through L<DBIO::MySQL::EV::Future/await>. The
+coderef that calls them runs from the idle watcher that settles the C<BEGIN>'s
+Future, outside every callback of the pinned connection, so a statement it sends
+-- with or without bind values -- goes out at once and a blocking call waiting
+for it returns: C<< $ctx->select >> without a C<WHERE> works in the coderef,
+inside the transaction (until then such a call was refused).
+
+A blocking call on the B<storage> in the coderef -- C<< $storage->select >>
+where C<< $ctx->select_async >> was meant -- does not run on this context's
+connection but on another one from the pool. When the callbacks it runs inside
+hold every connection of the pool, it is refused the same way and does not run
+(L<DBIO::MySQL::EV::Future/await>).
+
+This class adds exactly one thing: the L</txn_mdb> compatibility alias below.
+The pinning policy this context implements is recorded in ADR 0002; the
+duplicated-context half of that ADR is superseded by core ADR 0030 §4.
+
+The pinned connection is passed to C<new> under the core constructor key
+C<txn_conn>, which L<DBIO::MySQL::EV::Storage/_txn_conn_accessor> names and
+core's C<txn_do_async> builds the context with. The pre-k31 key C<mdb> is gone:
+the constructor dies without C<txn_conn>.
 
 =head1 ATTRIBUTES
 
-=head2 storage
-
-The parent L<DBIO::MySQL::EV::Storage> instance.
-
 =head2 txn_mdb
 
-The pinned L<EV::MariaDB> connection handle for the duration of this transaction.
+  my $mdb = $ctx->txn_mdb;
 
-=head2 pool
-
-Shortcut to C<< $self->storage->pool >>.
-
-=head2 in_txn
-
-Always true — indicates we are inside a transaction.
-
-=head1 METHODS
-
-=head2 _query_async
-
-Forwards query execution to the underlying storage using the pinned
-transaction connection (C<txn_mdb>) via
-L<DBIO::MySQL::EV::Storage/_query_async_pinned> (no release).
+Compatibility alias for the inherited
+L<DBIO::Storage::Async::TransactionContext/txn_conn>: the pinned
+L<EV::MariaDB> connection handle for the duration of this transaction. It is
+the name this driver's own context carried before it became a subclass of the
+core one, kept because it says B<which> kind of handle is pinned. C<txn_conn>
+is the name core's own code reaches for -- C<deploy_async>'s transactional
+branch among them -- so both answer the same handle.
 
 =head1 AUTHOR
 

@@ -1,0 +1,170 @@
+{
+  "agents/dbio-adr-auditor": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "agents/.local.dbio-adr-auditor.md": "sha256:d6081eb5249228df3e9ba5538e821e4754f4966e9116217f7bd0e72781a23b23"
+    }
+  },
+  "agents/dbio-driver-worker": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "agents/.local.dbio-driver-worker.md": "sha256:ff42b26798941533ff03cb9ce8603de1057c0f7b2a0275c35a344807a4458b7f"
+    }
+  },
+  "agents/dbio-release-manager": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "agents/.local.dbio-release-manager.md": "sha256:a0215c92960e786ce30fbc2a5c8284113d00d8182ab1e8f8962e06955d6ce6e1"
+    }
+  },
+  "agents/karr-coordinator": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "agents/.local.karr-coordinator.md": "sha256:66a8f2c63e2d632238327d7480a2b552174c0a8b1792bf8a40742eb309ce055a"
+    }
+  },
+  "rules/dbio-rules": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "rules/.local.dbio-rules.md": "sha256:c02ee3a9c10bfc79b5899806c8b0add6b047cb5a097e4bedc8783d213651bef8"
+    }
+  },
+  "skills/dbio-adr": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-adr/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-adr/SKILL.md": "sha256:695d4e046e9224d5ea45c0da9f554934126243aeddc64b147a0a5e592f3059b8"
+    }
+  },
+  "skills/dbio-codeberg-user-issues": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-codeberg-user-issues/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-codeberg-user-issues/SKILL.md": "sha256:9b069abe81d3fc80adb67d4264addfbaed1bbedde27a8e7659ae109ffcb30aca"
+    }
+  },
+  "skills/dbio-consolidate-release": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-consolidate-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-consolidate-release/SKILL.md": "sha256:63887a0a9aeab60b767db0e0ff6c99f8466f431b3884f1aa1fed7c7545652bdf"
+    }
+  },
+  "skills/dbio-coordination": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-coordination/SKILL.md": "sha256:ed2347c9990e8c21bce4390462da93cc01ce4435c46c764885976fee93961b6a"
+    }
+  },
+  "skills/dbio-core": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-core/SKILL.md": "sha256:d74c50fe942e2437ea03c9cc679b48b5e814743d56b205ae80362c0d05e8cbf9"
+    }
+  },
+  "skills/dbio-driver-development": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-driver-development/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-driver-development/SKILL.md": "sha256:905f11054ddcbefc5ae8bff78f3b919be139e4c02ac123c72740097d224030d2",
+      "skills/dbio-driver-development/references/async-transport.md": "sha256:eef22b5e626602bbed381cd653377cba25e357e418b289b08b1d9a062bd30c1f",
+      "skills/dbio-driver-development/references/deploy-introspect-diff.md": "sha256:d3b94d166a24b3f17373e6ed1fbf2c9ebfc602b4a96d03cf5f589069c2fa81f6",
+      "skills/dbio-driver-development/references/extension-layers.md": "sha256:f77ccd27c0b7086a3211f3b1c5dc1d5542cf8fd991efbcfed998b4757333eec4",
+      "skills/dbio-driver-development/references/live-testing.md": "sha256:b512122f7cc8d7014fc027dad7655938e020722e389e31f79601f03ddb766df6",
+      "skills/dbio-driver-development/references/storage-class.md": "sha256:3b24d2865e6f478418b07f54fce760474919e09b207d6cbe56d61d6d56b31c04",
+      "skills/dbio-driver-development/references/storage-seams.md": "sha256:c20a95191e4b9e9fe2e814baf938d19189c401ca3ec3640204b548f008f458c1"
+    }
+  },
+  "skills/dbio-perl-class-patterns": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-perl-class-patterns/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-perl-class-patterns/SKILL.md": "sha256:951102cfb3495f444ab940d2e541eac373daa599b9c7ac3632d8e14053091234"
+    }
+  },
+  "skills/dbio-perl-pod": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-perl-pod/SKILL.md": "sha256:ffd323a96fdb048358270349a146c0335e02aa9654e6b9026ca67bbabba1b74e"
+    }
+  },
+  "skills/dbio-perl-release": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-perl-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-perl-release/SKILL.md": "sha256:88d41995f66fcb1fc9ab968014e906285f66a57bb701d9c22dbd7e3ed6c356b6"
+    }
+  },
+  "skills/dbio-perl-syntax": {
+    "source": "dbio-core",
+    "version": "local",
+    "files": {
+      "skills/dbio-perl-syntax/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-perl-syntax/SKILL.md": "sha256:459ed6ed8ae462bf2af5e055acd5b3a0f57a5d8579ffc14e0567f96efa0071d9"
+    }
+  },
+  "skills/dbio-postgresql": {
+    "source": "dbio-postgresql",
+    "version": "local",
+    "files": {
+      "skills/dbio-postgresql/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-postgresql/SKILL.md": "sha256:b96808e3048008034eeb9795995233175cedbd8a90fefef9e1d4ab7ffe1f5bca"
+    }
+  },
+  "skills/dbio-postgresql-database": {
+    "source": "dbio-postgresql",
+    "version": "local",
+    "files": {
+      "skills/dbio-postgresql-database/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/dbio-postgresql-database/SKILL.md": "sha256:d3adac98c0fdda8dd65783d19cba3dfa5002f03e8b5707dc71dfdd6c460748b4"
+    }
+  },
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
+    }
+  },
+  "skills/kanban-issues-karr-coordination": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-coordination/SKILL.md": "sha256:60296bb91931ad9e2b90eb5b187716b810feb55c4f99c670fb0505bc5753d0c9",
+      "skills/kanban-issues-karr-coordination/references/cards.md": "sha256:ed1ed17fdffa756e8ee8ff5d72a3a22c3e414abdaadc9b0fc0ba08e176d95340",
+      "skills/kanban-issues-karr-coordination/references/claims.md": "sha256:81459998fe329f30bc6c10fcf750955fa2b6134e13093e59df5970c335e3aadb",
+      "skills/kanban-issues-karr-coordination/references/config.md": "sha256:1220e5d2069af5b760fc76572dbedeccda00f0ee51c3c770040a454671c15430",
+      "skills/kanban-issues-karr-coordination/references/cross-board.md": "sha256:7ece9e04470ebcd738dbd20b4ea372cbb730de10af27ab33ce0eb068be453a8d",
+      "skills/kanban-issues-karr-coordination/references/queries.md": "sha256:0c4c38c7aa36f050a61f4abdc79a2531b58b0148e57ca9e56581a31a5e9d63c8",
+      "skills/kanban-issues-karr-coordination/references/setup.md": "sha256:d90667962ec6301eb994d5a463f9441979711c031e67073dac3f98d584983a61",
+      "skills/kanban-issues-karr-coordination/references/storage.md": "sha256:4e50a5927f3a1582e4f08a8bbfad1d10a78cae386636f0007c498a85d9a823bf"
+    }
+  },
+  "skills/kanban-issues-karr-ticket": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-ticket/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-ticket/SKILL.md": "sha256:a8885a983ac394c3e604e8a06fc483f5f953888a863373671df1bf460d1e9f93"
+    }
+  }
+}

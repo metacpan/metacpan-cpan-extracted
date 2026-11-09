@@ -4,7 +4,10 @@ package DBIO::Replicated::Backend::Master;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Replicated::Backend';
+
 
 sub new {
   my ($class, %args) = @_;
@@ -26,7 +29,13 @@ DBIO::Replicated::Backend::Master - Master backend wrapper
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 METHODS
+
+=head2 new
+
+Same as L<DBIO::Replicated::Backend/new>, with C<kind> forced to C<master>.
 
 =head1 AUTHOR
 

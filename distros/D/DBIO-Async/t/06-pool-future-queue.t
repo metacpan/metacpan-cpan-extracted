@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
+use Future;
 
 use DBIO::Async::Pool;
 use DBIO::Async::Storage;

@@ -37,7 +37,7 @@ while (my $r = $rs_title->next) {
 
 is_deeply (\@all_titles, \@nexted_titles, 'next works');
 
-is_deeply( [ sort $rs_year->func('DISTINCT') ], [ 1997, 1998, 1999, 2001 ],  "wantarray context okay");
+is_deeply( [ sort $rs_year->func_rs('DISTINCT')->get_column('year')->all ], [ 1997, 1998, 1999, 2001 ],  "wantarray context okay");
 ok ($max_year->next == $rs_year->max, q/get_column (\'FUNC') ok/);
 
 cmp_ok($rs_year->max, '==', 2001, "max okay for year");
@@ -58,7 +58,7 @@ warnings_exist (sub {
 # test distinct propagation
 is_deeply (
   [sort $rs->search ({}, { distinct => 1 })->get_column ('year')->all],
-  [sort $rs_year->func('distinct')],
+  [sort $rs_year->func_rs('distinct')->get_column('year')->all],
   'distinct => 1 is passed through properly',
 );
 
@@ -239,8 +239,9 @@ is_same_sql_bind (
 
   is ($track_counts_per_cd_via_group_by->max, 4, 'Correct max tracks per cd');
   is ($track_counts_per_cd_via_group_by->min, 3, 'Correct min tracks per cd');
+  my $avg_tracks_per_cd = $track_counts_per_cd_via_group_by->func('avg');
   is (
-    sprintf('%0.1f', $track_counts_per_cd_via_group_by->func('avg') ),
+    sprintf('%0.1f', $avg_tracks_per_cd),
     '3.2',
     'Correct avg tracks per cd'
   );

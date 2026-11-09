@@ -29,7 +29,7 @@ A second, smaller gap: `DBIO::DB2::Introspect::ForeignKeys` keyed the FK name
 in the model as `fk_id`, an underscore-free local spelling that did not match
 the `constraint_name` key that core ADR 0021 blessed as the canonical
 foreign-key name. DB2 was named in ADR 0021 as a per-driver realignment
-follow-up (karr #12).
+follow-up (karr k12).
 
 ## Decision
 
@@ -66,7 +66,7 @@ follow-up (karr #12).
    brand-new tables (created inline by `DBIO::DB2::Diff::Table`) and on dropped
    tables (they vanish with the table).
 
-4. **`fk_id` → `constraint_name` model-key realignment (completes karr #12).**
+4. **`fk_id` → `constraint_name` model-key realignment (completes karr k12).**
    `DBIO::DB2::Introspect::ForeignKeys` now keys the FK name as
    `constraint_name`, conforming to the core ADR 0021 canonical key, and
    `table_fk_info` reads it from there.
@@ -104,7 +104,7 @@ cross-driver siblings.
   scheme in `DBIO::DB2::DDL` without re-deploying would make the differ see a
   renamed FK as drop+add. The name generator is the single source
   (`_fk_constraint_name`).
-- karr #12 is complete: the model now uses the canonical `constraint_name` key;
+- karr k12 is complete: the model now uses the canonical `constraint_name` key;
   no `fk_id` consumer remains.
 
 ## Related

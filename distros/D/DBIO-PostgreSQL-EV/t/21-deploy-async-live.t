@@ -17,7 +17,7 @@ use Test::Exception;
 #      all preceding statements on the first failure, not just the bad one.
 #   3. The Future-chaining across BEGIN -> N DDLs -> COMMIT/ROLLBACK does
 #      not leak "lost a sequence Future" warnings (the same lifetime defect
-#      karr #10 caught in the txn_do_async path -- deploy_async inherits the
+#      karr k10 caught in the txn_do_async path -- deploy_async inherits the
 #      shape).
 #
 # A mock libpq could prove the SQL string is right but nothing about whether
@@ -44,27 +44,17 @@ use EV::Pg;
 use Future;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (mirrors t/12..18).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
+
 my $user = $ENV{DBIO_TEST_PG_USER} || '';
 my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
-
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
 
 # Capture warnings so we can assert the "lost a sequence Future" regression
 # never returns on the deploy_async path. Re-emit anything unexpected so
@@ -72,15 +62,17 @@ $ci{password} = $pass if length $pass;
 my @warnings;
 $SIG{__WARN__} = sub { push @warnings, $_[0]; warn $_[0] };
 
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
+
 # Drive a Future to completion on the EV loop under a wall-clock guard, so
 # a regression that reintroduces a hang fails this test instead of spinning.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what (karr #10 regression: deploy hung)\n" };
-  alarm 20;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
+  return GuardedWait->until_ready(
+    $f, 20, "TIMEOUT awaiting $what (karr k10 regression: deploy hung)\n",
+  );
 }
 
 # Raw statement on a pooled connection (DDL setup/teardown + verification).
@@ -172,7 +164,7 @@ my $schema = DeployTest::Schema->connect($ENV{DBIO_TEST_PG_DSN}, $user, $pass, {
   RaiseError => 1,
   async      => 'ev',   # ADR 0030: async is explicit per-connection -- without
                         # this ->async is undef (EV is a thin transport over the
-                        # core per-connection model since karr #22).
+                        # core per-connection model since karr k22).
 });
 
 # --- 1. deploy_async on an empty DB ---------------------------------------

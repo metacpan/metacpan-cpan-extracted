@@ -1,6 +1,8 @@
 package DBIO::Test::MooseSugarSchema::Result::CD;
 # ABSTRACT: Moose + Cake test result class for the cd table (no custom ResultSet)
 
+our $VERSION = '0.900004';
+
 use DBIO::Moose;
 use DBIO::Cake;
 
@@ -45,7 +47,7 @@ DBIO::Test::MooseSugarSchema::Result::CD - Moose + Cake test result class for th
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

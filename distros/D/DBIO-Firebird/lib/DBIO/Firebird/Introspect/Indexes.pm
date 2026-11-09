@@ -4,6 +4,8 @@ package DBIO::Firebird::Introspect::Indexes;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -84,7 +86,7 @@ DBIO::Firebird::Introspect::Indexes - Introspect Firebird indexes via rdb$indice
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

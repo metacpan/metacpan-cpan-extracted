@@ -7,6 +7,78 @@
   decision, DB-agnostic framing; the per-driver `txn_pg`/`txn_mdb` accessors
   collapse to a unified `txn_conn`).
 
+## Amendment (2026-09-05, k14) — re-homed to core (ADR 0030 §4), and the context does not delegate its CRUD
+
+The policy stands entirely: one connection is taken from `acquire_txn`, wrapped
+in a context, handed to the callback in place of the storage, queried through a
+non-releasing path, and released exactly once at the transaction boundary. Core
+ADR 0030 §4 lifted the *implementation* of all five bullets into
+`DBIO::Storage::Async` — `txn_do_async` there is the BEGIN/COMMIT/ROLLBACK
+machinery, and `DBIO::Storage::Async::TransactionContext` is the generic
+context. What this dist still supplies is the transport half:
+`_query_async_pinned` in `DBIO::Async::Storage`, which runs the query on the
+pinned handle and deliberately does not release it, plus the two seams that name
+the context — `_txn_context_class` and `_txn_conn_accessor`, which since karr
+k13 answer with this transport's own defaults instead of being adapter
+obligations.
+
+One bullet described a mechanism core did not keep, and a consequence rests on
+it, so it is corrected here rather than left to be read literally. The context
+does **not** "delegate each public async/sync method back to storage" with only
+a private `_query_async` differing. Its five `*_async` methods each call the
+storage's `_run_crud_pinned` with the pinned connection *directly* — forwarding
+to `$storage->select_async` would acquire a second, pooled connection and run
+the statement outside the transaction, which is the exact failure this ADR
+exists to prevent. Only `sql_maker`, `debug`, `pipeline` and `txn_do_async` are
+plain delegations, and it is that list the second consequence's warning applies
+to. A private `_query_async` does still exist on the context and does still
+route through `_query_async_pinned`, but CRUD no longer travels through it; the
+shared `_run_crud_pinned` builder is what keeps INSERT post-processing and
+`select_single`'s first-row handling from being written twice.
+
+The dependency recorded in the last consequence is unchanged and now spans two
+dists: `acquire_txn` is core `PoolBase`'s, `DBIO::Async::Pool` does not override
+it, and a change to its checkout/affinity semantics would still move this
+layer's transaction isolation with it.
+
+## Amendment (2026-09-25, k21) — `pipeline` and `txn_do_async` are no longer delegations (core k213)
+
+The 2026-09-05 amendment names `sql_maker`, `debug`, `pipeline` and
+`txn_do_async` as the context's plain delegations. Two of those four were
+exactly the escape this ADR exists to prevent: each forwarded to the storage,
+and the storage took a **second** connection from the pool. Core karr k213
+(core ADR 0045, addendum 2026-09-25) closed both; only `sql_maker` and `debug`
+are plain delegations now.
+
+- **`$ctx->pipeline` runs on the pinned `txn_conn`.** Core extracted the
+  bracketing scaffold into `DBIO::Storage::Async::_pipeline_on_conn($conn,
+  $coderef, $release)`. The pooled `pipeline` passes a release; the context
+  passes none, so the connection stays pinned and is still released exactly
+  once, at the transaction boundary — the "release exactly once" bullet holds
+  unchanged. The batch rides `_query_async_pinned`, the transport half this
+  dist supplies, so nothing here changed.
+- **`$ctx->txn_do_async` refuses with a `DBIO::Exception`.** A correct nested
+  transaction is a savepoint on the pinned connection, and the async layer has
+  no savepoint seam. The only other thing it could do is an independent
+  transaction on a second connection, which commits past an outer rollback and
+  can deadlock on the outer transaction's locks. That stays reachable when
+  asked for by name: `$ctx->storage->txn_do_async`. Async savepoints, if
+  wanted, are their own ticket.
+
+The second consequence's warning — a public storage method missing from the
+context is missing inside the callback — still stands, but it now reads the
+other way round for anything that takes a connection: *forwarding* such a
+method to the storage is the bug, not the fix. A method that acquires from the
+pool must be given a pinned variant on the context, as CRUD and `pipeline`
+were, or refuse, as `txn_do_async` does.
+
+`DBIO::Async::TransactionContext` still defines no sub of its own
+(`t/13-seam-ownership.t` §4); both changes arrive by inheritance from core's
+generic context. Core pins the claims in
+`t/test/36_async_txn_context_pins_nested.t`; the pipeline half changes what the
+wire sees (pipeline mode inside an open transaction) and is mock-verified only
+until a live driver run confirms it.
+
 ## Context
 
 Core ADR 0014 (async storage interface) provides the *seam* for transaction

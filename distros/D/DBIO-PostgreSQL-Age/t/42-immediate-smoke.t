@@ -21,8 +21,8 @@ use DBIO::PostgreSQL::Age::Storage;
 # ===========================================================================
 {
   package T::AgeImmSchema;
-  use base qw( DBIO::PostgreSQL::Age DBIO::Schema );
-  use mro 'c3';
+  use DBIO 'Schema', -pg;   # the schema declares its driver (core ADR 0067)
+  __PACKAGE__->load_components('PostgreSQL::Age');
 }
 {
   my $schema = T::AgeImmSchema->connect(

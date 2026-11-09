@@ -5,10 +5,20 @@ use Test::More;
 use Try::Tiny;
 use DBIO::Test;
 
+# DBIO::Test::Schema keeps no driver in its class: this file runs it on
+# PostgreSQL (core ADR 0067).
+DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
+
 my ($dsn, $dbuser, $dbpass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 
 plan skip_all => 'Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test'
   unless ($dsn && $dbuser);
+
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 my $schema = DBIO::Test::Schema->connect($dsn, $dbuser, $dbpass, { AutoCommit => 1 });
 
@@ -107,7 +117,7 @@ my $new;
 
   $schema->storage->_dbh(undef);
   my $rs = $schema->resultset('BindType');
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   $rs->populate([
     [qw/id bytea/],
@@ -119,8 +129,8 @@ my $new;
 
   is($rs->count, $cnt, 'All rows were correctly inserted');
   for (1..$cnt) {
-    my $r = $rs->find({ bytea => "pop_${_}_" . $big_long_string });
-    is ($r->id, $_, "Row $_ found after find() on the blob");
+    my $r = $rs->search({ bytea => "pop_${_}_" . $big_long_string })->single;
+    is ($r->id, $_, "Row $_ found by the blob");
 
   }
 }

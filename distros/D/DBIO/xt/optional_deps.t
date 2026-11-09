@@ -48,42 +48,52 @@ is_deeply(
   'No extra DBIO modules loaded as side effects',
 );
 
-my $sqlt_dep = DBIO::Optional::Dependencies->req_list_for ('deploy');
+# The deploy group is deliberately empty: core deploys through the storage's
+# native Deploy class (DBIO::Schema/deploy -> dbio_deploy_class) and no longer
+# generates DDL through SQL::Translator, so deploy() pulls in no optional
+# module at all. Reintroducing an external DDL generator must fail here.
 is_deeply (
-  [ keys %$sqlt_dep ],
-  [ 'SQL::Translator' ],
-  'Correct deploy() dependency list',
+  DBIO::Optional::Dependencies->req_list_for ('deploy'),
+  {},
+  'deploy() needs no optional modules (native Deploy, no SQL::Translator)',
 );
 
+ok (
+  DBIO::Optional::Dependencies->req_ok_for ('deploy'),
+  'empty deploy() requirement group is satisfied unconditionally',
+);
+
+# The missing-dependency machinery itself is exercised on a group that does
+# declare a versioned requirement - the whole suite relies on it for skip_all.
 # make module loading impossible, regardless of actual libpath contents
 {
   local @INC = (sub { die('Optional Dep Test') } );
 
   ok (
-    ! DBIO::Optional::Dependencies->req_ok_for ('deploy'),
-    'deploy() deps missing',
+    ! DBIO::Optional::Dependencies->req_ok_for ('admin_script'),
+    'admin_script deps missing',
   );
 
   like (
-    DBIO::Optional::Dependencies->req_missing_for ('deploy'),
-    qr/^SQL::Translator \>\= \d/,
+    DBIO::Optional::Dependencies->req_missing_for ('admin_script'),
+    qr/^Text::CSV \>\= \d/,
     'expected missing string contents',
   );
 
   like (
-    DBIO::Optional::Dependencies->req_errorlist_for ('deploy')->{'SQL::Translator'},
+    DBIO::Optional::Dependencies->req_errorlist_for ('admin_script')->{'Text::CSV'},
     qr/Optional Dep Test/,
     'custom exception found in errorlist',
   );
 }
 
 #make it so module appears loaded
-$INC{'SQL/Translator.pm'} = 1;
-$SQL::Translator::VERSION = 999;
+$INC{'Text/CSV.pm'} = 1;
+$Text::CSV::VERSION = 999;
 
 ok (
-  ! DBIO::Optional::Dependencies->req_ok_for ('deploy'),
-  'deploy() deps missing cached properly',
+  ! DBIO::Optional::Dependencies->req_ok_for ('admin_script'),
+  'admin_script deps missing cached properly',
 );
 
 #reset cache
@@ -91,18 +101,18 @@ ok (
 
 
 ok (
-  DBIO::Optional::Dependencies->req_ok_for ('deploy'),
-  'deploy() deps present',
+  DBIO::Optional::Dependencies->req_ok_for ('admin_script'),
+  'admin_script deps present',
 );
 
 is (
-  DBIO::Optional::Dependencies->req_missing_for ('deploy'),
+  DBIO::Optional::Dependencies->req_missing_for ('admin_script'),
   '',
   'expected null missing string',
 );
 
 is_deeply (
-  DBIO::Optional::Dependencies->req_errorlist_for ('deploy'),
+  DBIO::Optional::Dependencies->req_errorlist_for ('admin_script'),
   {},
   'expected empty errorlist',
 );

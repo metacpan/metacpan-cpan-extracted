@@ -6,9 +6,9 @@ use Test::Exception;
 
 # Live PostGIS deploy round-trip. Verifies that the temp-DB deploy path
 # (install -> introspect-live + deploy-temp + introspect-temp -> diff)
-# runs through DBIO::PostgreSQL::PostGIS::Introspect, so a geometry column
-# with a type/srid modifier deploys and diffs cleanly (no spurious diff,
-# no crash from the introspector factory).
+# runs through the driver's Deploy class with postgis declared in the schema's
+# extension list (ADR 0066), so a geometry column with a type/srid modifier
+# deploys and diffs cleanly (no spurious diff, no crash).
 #
 # Gated on DBIO_TEST_PG_DSN; skips quietly without a PostGIS-capable DB.
 
@@ -25,16 +25,7 @@ BEGIN {
 }
 
 use DBI;
-use DBIO::PostgreSQL::PostGIS::Deploy;
-use DBIO::PostgreSQL::PostGIS::Introspect;
-
-# --- cheap, DB-free guard: the introspect-class hook -----------------------
-is(
-  DBIO::PostgreSQL::PostGIS::Deploy->_introspect_class,
-  'DBIO::PostgreSQL::PostGIS::Introspect',
-  '_introspect_class hook selects the PostGIS introspector',
-);
-
+use DBIO::PostgreSQL::Deploy;
 eval { require DBD::Pg; 1 } or plan skip_all => 'DBD::Pg not available';
 
 my $probe = eval {
@@ -55,8 +46,8 @@ my $NS = 'dbio_postgis_deploy_test';
   # PostgreSQL supplies pg_schemas/pg_search_path and chooses the driver
   # storage (storage_type). PostgreSQL::PostGIS no longer races storage_type:
   # it registers a storage LAYER (register_storage_layer) that composes OVER
-  # the driver storage (core #70), so the live storage isa both and its
-  # dbio_deploy_class override selects the PostGIS deploy class.
+  # the driver storage (core k70). The Deploy class is the driver's; PostGIS
+  # reaches it through the declared pg_extensions below.
   __PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
   __PACKAGE__->pg_schemas('dbio_postgis_deploy_test');
   __PACKAGE__->pg_search_path('dbio_postgis_deploy_test', 'public');
@@ -103,15 +94,16 @@ my @connect = ($dsn, $user, $pass, {
 my $schema = DeployGisTest::Schema->connect(@connect);
 $schema->storage->dbh->do("SET search_path TO $NS, public");
 
-# Storage routes to the PostGIS deploy class
+# The Deploy class has one owner, the driver storage -- the PostGIS layer does
+# not name one.
 is(
   $schema->storage->dbio_deploy_class,
-  'DBIO::PostgreSQL::PostGIS::Deploy',
-  'storage selects the PostGIS deploy class',
+  'DBIO::PostgreSQL::Deploy',
+  'storage selects the driver\'s deploy class',
 );
 
 my $deploy = $schema->storage->dbio_deploy_class->new(schema => $schema);
-isa_ok($deploy, 'DBIO::PostgreSQL::PostGIS::Deploy');
+isa_ok($deploy, 'DBIO::PostgreSQL::Deploy');
 
 lives_ok { $deploy->install } 'install lives with a geometry column';
 
@@ -124,10 +116,9 @@ my ($exists) = $schema->storage->dbh->selectrow_array(
 ok($exists, 'geometry column present after install');
 
 # The critical round-trip: diff deploys the model to a temp DB and
-# introspects both sides through PostGIS::Introspect. The geometry column
+# introspects both sides. The geometry column
 # must NOT show up in the diff -- that proves the geometry(Point,4326)
-# modifier survives the round-trip and the introspector factory neither
-# crashed nor picked the wrong (non-PostGIS) class.
+# modifier survives the round-trip.
 #
 # We assert specifically on our table/column rather than has_changes,
 # because a PostGIS-enabled database may carry extra extensions

@@ -2,6 +2,9 @@ package DBIO::Oracle::SQLMaker::Joins;
 # ABSTRACT: Pre-ANSI Joins-via-Where-Clause Syntax for Oracle
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw( DBIO::Oracle::SQLMaker );
@@ -122,7 +125,7 @@ DBIO::Oracle::SQLMaker::Joins - Pre-ANSI Joins-via-Where-Clause Syntax for Oracl
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -130,8 +133,8 @@ L<DBIO::Oracle::SQLMaker> subclass that generates Oracle's pre-ANSI
 WHERE-clause join syntax (C<table1, table2 WHERE table1.id = table2.id>)
 instead of standard C<JOIN ... ON> syntax.
 
-This is used automatically by L<DBIO::Oracle::Storage::WhereJoins> for
-Oracle databases older than version 9.0. Left and right outer joins are
+This is used by L<DBIO::Oracle::Storage::WhereJoins>, which must be selected
+explicitly for Oracle databases older than version 9.0. Left and right outer joins are
 supported via Oracle's C<(+)> syntax. Full outer joins are not supported.
 
 =head1 SEE ALSO

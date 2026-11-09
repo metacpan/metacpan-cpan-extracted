@@ -81,7 +81,7 @@ SCHEMA_POPULATE1: {
 
   ARTIST1CDS: {
 
-    my ($cd1, $cd2, $cd3) = $artist1->cds->search(undef, {order_by=>'year ASC'});
+    my ($cd1, $cd2, $cd3) = $artist1->cds->search(undef, {order_by=>'year ASC'})->all;
 
     isa_ok $cd1, 'DBIO::Test::CD';
     isa_ok $cd2, 'DBIO::Test::CD';
@@ -98,7 +98,7 @@ SCHEMA_POPULATE1: {
 
   ARTIST3CDS: {
 
-    my ($cd1) = $artist3->cds->search(undef, {order_by=>'year ASC'});
+    my ($cd1) = $artist3->cds->search(undef, {order_by=>'year ASC'})->all;
 
     isa_ok $cd1, 'DBIO::Test::CD';
 
@@ -108,7 +108,7 @@ SCHEMA_POPULATE1: {
 
   ARTIST4CDS: {
 
-    my ($cd1) = $undef->cds->search(undef, {order_by=>'year ASC'});
+    my ($cd1) = $undef->cds->search(undef, {order_by=>'year ASC'})->all;
 
     isa_ok $cd1, 'DBIO::Test::CD';
 
@@ -190,7 +190,7 @@ ARRAY_CONTEXT: {
 
     ## Did the cds get expected information?
 
-    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year'});
+    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year'})->all;
 
     ok( $cd1->title eq "My First CD", "Got Expected CD Title");
     ok( $cd2->title eq "Yet More Tweeny-Pop crap", "Got Expected CD Title");
@@ -265,7 +265,7 @@ ARRAY_CONTEXT: {
 
     ## Did the cds get expected information?
 
-    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'});
+    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'})->all;
 
     ok( $cd1->title eq "PK_My First CD", "Got Expected CD Title");
     ok( $cd2->title eq "PK_Yet More Tweeny-Pop crap", "Got Expected CD Title");
@@ -450,7 +450,7 @@ VOID_CONTEXT: {
 
     ## Did the cds get expected information?
 
-    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'});
+    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'})->all;
 
     ok( $cd1->title eq "VOID_PK_My First CD", "Got Expected CD Title");
     ok( $cd2->title eq "VOID_PK_Yet More Tweeny-Pop crap", "Got Expected CD Title");
@@ -484,7 +484,7 @@ VOID_CONTEXT: {
     my ($cdA, $cdB) = $cd_rs->search(
       {title=>[sort map {$_->{title}} @$cds]},
       {order_by=>'title ASC'},
-    );
+    )->all;
 
     isa_ok($cdA, 'DBIO::Test::CD', 'Created CD');
     isa_ok($cdA->artist, 'DBIO::Test::Artist', 'Set Artist');
@@ -526,7 +526,7 @@ VOID_CONTEXT: {
     my ($cdA, $cdB, $cdC) = $cd_rs->search(
       {title=>[sort map {$_->{title}} @$cds]},
       {order_by=>'title ASC'},
-    );
+    )->all;
 
     isa_ok($cdA, 'DBIO::Test::CD', 'Created CD');
     isa_ok($cdA->artist, 'DBIO::Test::Artist', 'Set Artist');
@@ -613,7 +613,7 @@ VOID_CONTEXT: {
 
     ## Did the cds get expected information?
 
-    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'});
+    my ($cd1, $cd2) = $girl->cds->search({},{order_by=>'year ASC'})->all;
 
     ok($cd1, "Got a got CD");
     ok($cd2, "Got a got CD");

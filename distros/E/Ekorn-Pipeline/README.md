@@ -338,10 +338,9 @@ place of its own copy.
 
 ## Documentation
 
-[The how-to](https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/HOWTO.md)
-shows how to do common tasks, one recipe at a time, for callers,
-function authors and stage authors.
-[The reference](https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/REFERENCE.md)
+[The how-to](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AManual%3A%3AHowTo) shows how to do common
+tasks, one recipe at a time, for callers, function authors and stage
+authors. [The reference](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AManual%3A%3AReference)
 describes every module, function and method, and how a pipeline
 behaves, in full, with notes for stage authors. Each module's POD,
 starting with [Ekorn::Pipeline](https://metacpan.org/pod/Ekorn%3A%3APipeline), says the same more briefly, and is

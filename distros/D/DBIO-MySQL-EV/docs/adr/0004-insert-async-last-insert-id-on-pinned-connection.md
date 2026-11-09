@@ -22,7 +22,7 @@ caller between the two statements, the returned id would be wrong or another
 session's. The naive shapes are race conditions: releasing the connection right
 after the INSERT *starts* (so it is reusable while the key read is still in
 flight), and dispatching the key read as a fire-and-forget side-effect so the
-caller's Future resolves before the id is actually known (karr #5).
+caller's Future resolves before the id is actually known (karr k5).
 
 ## Decision
 
@@ -56,7 +56,7 @@ chaining (`->then`, key read's `on_ready` for release) is what makes both true a
 once: the connection is pinned across the pair and only handed back after the id is
 read, so no other caller can interpose an INSERT on it and poison
 `LAST_INSERT_ID()`, and the caller's Future carries a settled, correct id. This is
-precisely the fix recorded in karr #5 — before it, the connection was released
+precisely the fix recorded in karr k5 — before it, the connection was released
 after the INSERT was merely *started*, and the key read was a fire-and-forget
 side-effect, making `last_insert_id` a race. The failure-release branch exists
 because a failed INSERT Future never fires `on_done`, so without an explicit
@@ -79,7 +79,7 @@ caller's Future), hence **accepted**, not proposed.
 - The connection is held across the INSERT/key-read pair and released exactly once,
   after the key read settles (`Storage.pm:266`) or on INSERT failure
   (`Storage.pm:269`) — never between the two statements. Any refactor that releases
-  earlier reintroduces the karr #5 race: `LAST_INSERT_ID()` could read another
+  earlier reintroduces the karr k5 race: `LAST_INSERT_ID()` could read another
   session's value.
 - `last_insert_id` is only valid immediately after the insert Future settles; it is
   stored on the storage instance (`_last_insert_id`), so concurrent inserts on the

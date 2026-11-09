@@ -4,6 +4,8 @@ package DBIO::Relationship::Helpers;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 
 __PACKAGE__->load_components(qw/
@@ -27,7 +29,7 @@ DBIO::Relationship::Helpers - Load all standard relationship declaration compone
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

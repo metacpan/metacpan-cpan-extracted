@@ -33,6 +33,7 @@ TestDBIO::CLCustom::Schema->register_class(
 
 # --- Connect with fake storage ---
 
+TestDBIO::CLCustom::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = TestDBIO::CLCustom::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 $schema->_changelog_sources_registered(0);
@@ -156,6 +157,7 @@ subtest 'log_event triggers changelog_notify callback' => sub {
 
   # Override changelog_notify via package-level method override
   no strict 'refs';
+  no warnings 'redefine';
   my $orig = \&{'TestDBIO::CLCustom::Schema::Result::Document::changelog_notify'};
   *{'TestDBIO::CLCustom::Schema::Result::Document::changelog_notify'} = sub {
     my ($self, $event, $entry) = @_;

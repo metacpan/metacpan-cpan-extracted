@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1.7
+#
+# Client image for the OTHER end of the EV::Pg range (karr k77): EV::Pg 0.02
+# against the libpq 15 Debian 12 ships. Dockerfile.test covers 0.07 / libpq 17.
+#
+# No source is baked in: the tree under test and the family checkouts are
+# mounted at run time (see README, "EV::Pg 0.02 on libpq 15").
+#
+#   docker build --memory 2g -f maint/docker/Dockerfile.libpq15 -t dbio-pgev-libpq15 maint/docker
+
+FROM debian:bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+         perl cpanminus build-essential pkg-config libpq-dev libssl-dev \
+         libdbd-pg-perl libev-perl libfuture-perl libmoo-perl \
+         libtest-exception-perl ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# The 0.02 line, built against the system libpq 15 (pg_config --version).
+RUN cpanm --notest --from https://cpan.metacpan.org/ https://cpan.metacpan.org/authors/id/E/EG/EGOR/EV-Pg-0.02.tar.gz
+
+ENTRYPOINT ["prove"]

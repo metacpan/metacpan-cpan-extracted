@@ -1,9 +1,52 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900001';
-requires 'DBIO::PostgreSQL', '0.900001';
+requires 'DBIO', '0.900004';
+# LISTEN/NOTIFY (karr k43) is core's API now: this transport only fills its
+# seams, so it needs a core carrying the listen contract (core k219) and its
+# k222 refinement (the connection counts as watched from the _listen_watch
+# call on). That core still reports 0.900004, so no version can express it
+# yet; t/38 and t/39 skip when the installed core predates it.
+# The COMMIT-answered-with-ROLLBACK seam (karr k53) needs a core carrying
+# k236 (txn_do_async waits on every statement and rolls back on failure) and
+# k237 (a late statement on the context is refused there); that core also
+# still reports 0.900004.
+# Connect options beside an AccessBroker (karr k60): connect_info reads them
+# through core's _access_broker_call_options and _access_broker_pool_size, so
+# it needs a core carrying k243 and k245 -- on an older one every connect_info
+# call dies for want of those methods. That core also still reports 0.900004.
+# No password in a message (karr k78): connect info goes into a message through
+# DBIO::Util::mask_connect_secrets, so this needs a core carrying k297 -- on an
+# older one such a message dies for want of the function. t/66 and t/67 hold
+# what a core carrying k298 does with a broker's hash answer. That core also
+# still reports 0.900004.
+# A wait with a timeout in a test file (karr k88, t/lib/GuardedWait.pm) is
+# core's DBIO::Test::AsyncHarness::await, which gives the process alarm back
+# since core k300; on an older core t/79 fails. That core also still reports
+# 0.900004.
+# The channel rule (karr k55) is DBIO::PostgreSQL::Util::quote_channel, so this
+# needs a DBIO::PostgreSQL carrying dbio-postgresql k82; that one also still
+# reports 0.900004, so no version can express it yet.
+# The placeholder rule (karr k88) is DBIO::PostgreSQL::Util::number_placeholders,
+# so this needs a DBIO::PostgreSQL carrying dbio-postgresql k120; that one also
+# still reports 0.900004, so no version can express it yet. The same function
+# reads \? as a literal question mark and refuses a statement that mixes $N and
+# ? (karr k84; dbio-postgresql k120, 469ece2), so t/03, t/24 and t/85 need that
+# change too. DBD::Pg 3.7.1, which the \? escape needs over the dbh, is
+# dbio-postgresql's pin.
+# The transport's quoting follows the owning sync storage's SQL maker (karr
+# k88): t/102 compares the two on any DBIO::PostgreSQL, and its expectations
+# for quote_names => 0 alone and an empty quote_char alone need one carrying
+# dbio-postgresql k121 (bf640c4) -- skipped, with the reason, on an older one.
+# Server errors are masked by DBIO::PostgreSQL::Util::mask_error_details and
+# mask_detail_values (karr k99, dbio-postgresql k155); that one also still
+# reports 0.900004, so no version can express it yet.
+requires 'DBIO::PostgreSQL', '0.900004';
+requires 'EV', '4.11';
 requires 'EV::Pg', '>= 0.02, < 0.08';
 requires 'Future', '0.49';
+# set_subname for the copy_in writer, so a refusal there names the caller's
+# place (karr k88); the same pin as DBIO core's.
+requires 'Sub::Util', '1.70';
 
 on test => sub {
   requires 'Test::More', '0.98';

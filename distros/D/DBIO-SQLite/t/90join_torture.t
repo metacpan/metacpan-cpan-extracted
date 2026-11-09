@@ -59,15 +59,15 @@ lives_ok (sub {
 
 }, 'Complex join parsed/executed properly');
 
-my @rs1a_results = $schema->resultset("Artist")->search_related('cds', {title => 'Forkful of bees'}, {order_by => 'title'});
+my @rs1a_results = $schema->resultset("Artist")->search_related('cds', {title => 'Forkful of bees'}, {order_by => 'title'})->all;
 is($rs1a_results[0]->title, 'Forkful of bees', "bare field conditions okay after search related");
 my $rs1 = $schema->resultset("Artist")->search({ 'tags.tag' => 'Blue' }, { join => {'cds' => 'tracks'}, prefetch => {'cds' => 'tags'} });
 my @artists = $rs1->all;
 cmp_ok(@artists, '==', 2, "Two artists returned");
 
 my $rs2 = $rs1->search({ artistid => '1' }, { join => {'cds' => {'cd_to_producer' => 'producer'} } });
-my @artists2 = $rs2->search({ 'producer.name' => 'Matt S Trout' });
-my @cds = $artists2[0]->cds;
+my @artists2 = $rs2->search({ 'producer.name' => 'Matt S Trout' })->all;
+my @cds = $artists2[0]->cds->all;
 cmp_ok(scalar @cds, '==', 1, "condition based on inherited join okay");
 
 my $rs3 = $rs2->search_related('cds');
@@ -141,7 +141,7 @@ lives_ok (sub {
     {'me.id' => 1},
     {
     prefetch => [ 'parent', { 'children' => 'parent' } ],
-    });
+    })->all;
 
 }, 'pathological prefetch ok');
 

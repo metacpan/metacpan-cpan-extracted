@@ -27,10 +27,10 @@ exposing one pure function `shorten($name, \@keywords?)`
 (`Identifier.pm:37-96`), and have every layer route through it:
 
 - **Query time** — `DBIO::Oracle::SQLMaker::_shorten_identifier` delegates to
-  `DBIO::Oracle::Identifier::shorten` (`SQLMaker.pm:172-175`); it is invoked from
+  `DBIO::Oracle::Identifier::shorten`; it is invoked from
   `_quote` for both the string path and the SQL::Abstract v2 arrayref-segment
-  path (`SQLMaker.pm:149-170`, see ADR 0005), from `_unqualify_colname`, and via
-  `DBIO::Oracle::Storage::relname_to_table_alias` (`Storage.pm:175-180`).
+  path (see ADR 0005), from `_unqualify_colname`, and via
+  `DBIO::Oracle::Storage::relname_to_table_alias`.
 - **Deploy time** — `DBIO::Oracle::DDL` calls the same module when emitting
   generated sequence and index names.
 

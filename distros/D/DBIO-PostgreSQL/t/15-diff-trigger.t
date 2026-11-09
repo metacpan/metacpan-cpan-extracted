@@ -80,11 +80,15 @@ is($ops[1]->action, 'create');
 is($ops[2]->trigger_name, 'trg_x', 'trg_x dropped last');
 is($ops[2]->action, 'drop');
 
-# Missing definition in create → comment fallback
-@ops = DBIO::PostgreSQL::Diff::Trigger->diff(
+# Missing definition in create: there is no statement, so there is no
+# operation. It used to be a comment in the place of the statement, which
+# Deploy skipped together with the statement behind it (karr k120,
+# t/100-diff-no-statement.t).
+@ops = eval { DBIO::PostgreSQL::Diff::Trigger->diff(
   {},
   { 'public.t' => { t1 => {} } },
-);
-like($ops[0]->as_sql, qr/^-- CREATE TRIGGER t1 ON public\.t/, 'missing definition → comment');
+) };
+like($@, qr/\Arefusing to diff: trigger t1 on public\.t /, 'missing definition is refused, naming trigger and table');
+is(scalar @ops, 0, '... and no operation is built for it');
 
 done_testing;

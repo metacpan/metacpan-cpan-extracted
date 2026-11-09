@@ -32,10 +32,10 @@ sub fixture {
 	close $fh or die "cannot close \"$path\": $!\n";
 	return $path;
 }
-# No binmode: write_table opens its file in text mode, so on Windows each line
-# ends "\r\n", as R's write.csv does there, and the :crlf layer that '<' gets on
-# that platform folds them back to the "\n" the fixtures are written with.
-# Reading raw is what failed 0.320 on Strawberry Perl 5.42.2.
+# No binmode: on Windows write_table ends each row "\r\n", as R's write.csv
+# does there, and the :crlf layer that '<' gets on that platform folds them back
+# to the "\n" the fixtures are written with. Reading raw is what failed 0.320 on
+# Strawberry Perl 5.42.2.
 sub slurp_text {
 	my ($path) = @_;
 	open my $fh, '<', $path or die "cannot read \"$path\": $!\n";

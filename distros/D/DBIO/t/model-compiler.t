@@ -10,11 +10,14 @@ use DBIO::Schema::ModelCompiler ();
     integer => 'BIGINT', text => 'CLOB', boolean => 'BOOL',
     double  => 'DBL', blob => 'BIN', timestamp => 'TS',
   );
+  # Like an engine whose timestamp takes a fractional-seconds precision: the
+  # size of a timestamp goes into the native type when the column carries one.
   sub to_native {
     my ($self, $col) = @_;
     my $b = $col->{base_type};
     return "CHAR($col->{size})"                 if $b eq 'char';
     return "NUM($col->{precision},$col->{scale})" if $b eq 'numeric';
+    return "TS($col->{size})" if $b eq 'timestamp' && defined $col->{size};
     return $N{$b};
   }
 }
@@ -29,6 +32,9 @@ use DBIO::Schema::ModelCompiler ();
     name   => { data_type => 'char', size => 64 },
     bio    => { data_type => 'text', is_nullable => 1 },
     status => { data_type => 'char', size => 8, default_value => 'new' },
+    seen    => { data_type => 'timestamp',   size => 3 },
+    synced  => { data_type => 'timestamptz', size => 0 },
+    created => { data_type => 'datetime' },
   );
   __PACKAGE__->set_primary_key('id');
 
@@ -37,6 +43,7 @@ use DBIO::Schema::ModelCompiler ();
   __PACKAGE__->register_class(User => 'T::Result::User');
 }
 
+T::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = T::Schema->connect(sub { die "compile() must not connect" });
 my $model  = DBIO::Schema::ModelCompiler
   ->new(adapter => Fake::Adapter->new)
@@ -56,5 +63,13 @@ is( $col{bio}{native_type},   'CLOB',     'text -> CLOB' );
 is( $col{bio}{not_null},      0,          'bio nullable' );
 is( $col{status}{default},   'new',      'default value carried through' );
 is( $col{id}{not_null},       1,          'pk column not null' );
+
+# The compiled type of a timestamp is the type the same column is deployed
+# as: an adapter that writes the precision gets it. Without it the compiled
+# model says TS where the table says TS(3), and a diff between the two
+# proposes to alter a column nobody changed.
+is( $col{seen}{native_type},    'TS(3)', 'timestamp size 3 -> TS(3): the precision reaches the adapter' );
+is( $col{synced}{native_type},  'TS(0)', 'timestamptz size 0 -> TS(0): 0 is a precision' );
+is( $col{created}{native_type}, 'TS',    'datetime without size -> TS' );
 
 done_testing;

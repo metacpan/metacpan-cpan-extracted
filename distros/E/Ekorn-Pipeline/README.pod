@@ -387,10 +387,9 @@ place of its own copy.
 
 =head2 Documentation
 
-L<The how-to|https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/HOWTO.md>
-shows how to do common tasks, one recipe at a time, for callers,
-function authors and stage authors.
-L<The reference|https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/REFERENCE.md>
+L<The how-to|Ekorn::Pipeline::Manual::HowTo> shows how to do common
+tasks, one recipe at a time, for callers, function authors and stage
+authors. L<The reference|Ekorn::Pipeline::Manual::Reference>
 describes every module, function and method, and how a pipeline
 behaves, in full, with notes for stage authors. Each module's POD,
 starting with L<Ekorn::Pipeline>, says the same more briefly, and is

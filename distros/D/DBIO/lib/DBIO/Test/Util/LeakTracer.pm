@@ -2,6 +2,9 @@ package DBIO::Test::Util::LeakTracer;
 # ABSTRACT: Memory leak detection and tracing for DBIO tests
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use Carp;
@@ -379,7 +382,7 @@ DBIO::Test::Util::LeakTracer - Memory leak detection and tracing for DBIO tests
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

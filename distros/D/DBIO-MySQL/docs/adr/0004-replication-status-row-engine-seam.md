@@ -1,8 +1,44 @@
 # ADR 0004 — `_replication_status_row` is the single replication-state seam
 
-- Status: accepted
+- Status: accepted; the placement of the verb amended 2026-08-05 (see below)
 - Date: 2026-06-20
 - Tags: storage, replication, mariadb, seam, backfill
+
+## Amendment (2026-08-05, karr #30) — the verb is a server fact, and the row keys are not identical
+
+The seam itself stands: `_replication_status_row` is still the single place a
+`SHOW ... STATUS` is issued, and `is_replicating` / `lag_behind_master` still
+contain no SQL. Two things below are wrong and are now fixed.
+
+1. **The override was on the wrong class.** Putting the modern verb in
+   `DBIO::MySQL::Storage::MariaDB` keyed it to the *DBD driver*, not to the
+   server. `DBD::MariaDB` reaches MySQL servers (that is how this dist's live
+   suite reaches MySQL) and `DBD::mysql` reaches MariaDB ones, and a MariaDB
+   server under `load_components('MySQL')` never reaches the subclass at all —
+   this storage has no `_rebless`. Both products renamed the statement, at
+   different releases, so the verb now comes from
+   `DBIO::MySQL::Storage::_replication_status_statement`, decided from
+   `_is_mariadb` plus the server version: `SHOW REPLICA STATUS` from MySQL
+   8.0.22 and from MariaDB 10.5.1, `SHOW SLAVE STATUS` below either boundary.
+   MySQL 8.4 **removed** the legacy spelling, so the parent's unconditional
+   `SHOW SLAVE STATUS` was a syntax error there.
+
+2. **"The row keys are identical" is false on MySQL.** MySQL renamed the
+   *output* with the statement — "only the terminology used for the statement
+   and its output has changed" (Reference Manual 15.7.7.36) — so
+   `SHOW REPLICA STATUS` there answers with `Replica_IO_Running`,
+   `Replica_SQL_Running` and `Seconds_Behind_Source`. MariaDB's alias keeps the
+   `Slave_` / `Seconds_Behind_Master` names. So the subclass's own override made
+   `is_replicating` read a `Slave_IO_Running` that a MySQL 8.0.22+ replica no
+   longer returns: the statement succeeded and the answer was silently wrong.
+   `is_replicating` and `lag_behind_master` now read both spellings, and answer
+   `undef` — core's "this driver cannot say" — for a row carrying neither.
+
+The `// SHOW SLAVE STATUS` fallback is gone with the override. It was never the
+protection it looked like: with `RaiseError` on, an unknown statement throws
+rather than returning `undef`, so the second arm ran only for a server that
+answered the *modern* statement with no row, i.e. one that is not a replica.
+The version gate replaces it. Pinned offline by `t/30-server-dialect.t`.
 
 ## Context
 

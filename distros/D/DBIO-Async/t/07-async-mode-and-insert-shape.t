@@ -2,8 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
-
 use Future;
 use DBIO::SQLMaker;          # the skeleton's sql_maker_class default needs it loaded
 use DBIO::Storage::DBI;      # for the resolver assertion below
@@ -16,7 +14,7 @@ use DBIO::Async::Storage;
 # resolved Future.
 
 # -----------------------------------------------------------------------
-# 1. ADR 0030 refinement (karr #65): `use DBIO::Async` no longer globally
+# 1. ADR 0030 refinement (core k65): `use DBIO::Async` no longer globally
 #    registers future_io on the core base. The mode's transport adapter is
 #    resolved per driver by CONVENTION (ref($storage) . '::Async') in core, so
 #    there is no generic future_io registration to find here. DBIO::Async::Storage
@@ -61,6 +59,20 @@ is(
   sub _pipeline_enter           { }
   sub _pipeline_sync            { Future->done }
   sub _pipeline_exit            { }
+
+  # k193 (core "restore select preparation parity"): the async SELECT path now
+  # prepares its arguments through the OWNING sync storage's _select_args, so
+  # join pruning / complex-prefetch rewriting is not duplicated. This mock is
+  # its own owner and supplies a minimal _select_args that mirrors the real
+  # return shape (op name first, then the prepared select args the async
+  # SQLMaker consumes). The insert path -- what this file actually asserts on --
+  # does not touch it; without it the read-side guard (test 4) throws
+  # "async SELECT requires its owning sync storage".
+  sub _owner_storage { $_[0] }
+  sub _select_args {
+    my ($self, @args) = @_;
+    return ('select', @args);
+  }
 
   our $LAST_SQL;
 

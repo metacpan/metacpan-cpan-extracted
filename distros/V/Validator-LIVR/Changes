@@ -103,3 +103,11 @@ v2.2 2026-11-07
 v2.21 2026-11-07
  - Docs: LIVR 2.5 is released, not a draft. Validator::LIVR implements LIVR 2.0 and
    LIVR 2.5, the documentation links the LIVR 2.5 specification and the rules on the site
+
+v2.22 2026-11-08
+ - Security fix in "url"
+ - "url" checks the host and the port as LIVR 2.5 specifies now: it rejects a dot after the
+   host, such as "https://www.google." or "http://example.com./path", host labels longer
+   than 63 characters, ports above 65535 and a ":" without a port. Hosts without a dot,
+   such as "intranet", any IPv4 address and a user with a password pass as before
+ - Updated the LIVR 2.5 test suite to the current one, with the new "url" cases

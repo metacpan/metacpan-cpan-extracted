@@ -44,6 +44,56 @@ DuckDB enforces FKs and the DDL can emit them in a parent-PK-ordered form.
   emit FKs (in parent-PK column order) and a `Diff/ForeignKey.pm` becomes
   safe to add.
 
+## Addendum 2026-10-20 (karr k48)
+
+The maintainer confirmed (3): FK changes on existing tables are not diffed,
+and neither as a report-only diff nor via a table rebuild. The gap is named
+in `CLAUDE.md` and the `DBIO::DuckDB::Diff` POD. Independent of that,
+`Introspect::ForeignKeys` returns the live name as `constraint_name`
+(ADR 0021 in core) instead of `fk_id`. The install DDL still writes no FKs.
+
+## Addendum 2026-10-25 — DuckDB enforces foreign keys; the DDL writes them (karr k49)
+
+Premise (1) and (3) no longer hold, and the decision above is replaced by the
+maintainer's decision of 2026-10-25, taken with the Conformance lists of core
+(ADR 0060). Measured on libduckdb 1.5.3: DuckDB **does** enforce a foreign key
+on insert and delete. It still takes a key only to the columns of a PRIMARY KEY
+or UNIQUE constraint of the parent **in that constraint's own order**
+(`does not have a primary key or unique constraint on the columns b,a`), it
+has no `ALTER TABLE ... ADD / DROP FOREIGN KEY`, and its parser refuses
+`ON DELETE / ON UPDATE CASCADE`, `SET NULL` and `SET DEFAULT`
+(`FOREIGN KEY constraints cannot use CASCADE, SET NULL or SET DEFAULT`; RESTRICT
+and NO ACTION are taken).
+
+Decision:
+
+1. `DBIO::DuckDB::DDL` writes the `FOREIGN KEY` clause of every `belongs_to`
+   that is a foreign key constraint. The column pairs are laid out in the order
+   of the parent's key, which is what the old objection ("alphabetically sorted
+   conditions") needed; the same key declared twice is written once; a parent
+   column set that is neither the PRIMARY KEY nor a UNIQUE constraint is
+   refused, naming both tables and the columns. Tables come after the tables
+   their keys point to (the existing dependency order); a circle of keys is
+   refused naming the relationship, since both tables are created whole and no
+   key can be added later.
+2. `CASCADE`, `SET NULL` and `SET DEFAULT` are refused before the first
+   statement, with table and columns, not silently dropped.
+3. (Superseded 2026-10-26 by ADR 0010: the table is rebuilt; only a table
+   another table points to, or one that points to itself, is refused.)
+   A foreign key to add to or drop from a table that exists is refused by
+   `Deploy->diff` (and `apply`), before any statement, naming the table and the
+   key. This replaces the decision of addendum 2026-10-20 ("not diffed"): a
+   difference that can neither be applied nor ignored is reported. A table the
+   diff creates brings its keys, after the tables they point to, and a table is
+   dropped before the tables it points to.
+4. Introspection reads a key through `duckdb_constraints()`, which keeps the
+   column lists in order and side by side; the joins of `information_schema`
+   paired every key column with every parent column.
+
+The test fixture of core declares CASCADE / SET NULL and a circle of keys
+(`cd` and `track`); `DBIO::DuckDB::Test->init_schema` takes those off its own
+copy of the sources, the fixture classes are untouched.
+
 ## Future architecture work (tracked cross-repo, not here)
 
 The same review found that the `install`/`apply`/`upgrade` Deploy

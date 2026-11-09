@@ -29,7 +29,7 @@ use DBIO::SQLite::Test;
   my $track = $cd->tracks->find_or_create({
     position => 127,
     title    => 'Single Accessor'
-  });
+  }, { key => 'track_cd_position' });
   is($track->get_column('cd'), $cd->cdid, 'track matches CD before update');
 
   my $another_cd = $schema->resultset("CD")->find(5);

@@ -43,7 +43,8 @@ my $rstorage = $schema->storage;
 # ---------------------------------------------------------------------------
 # Guard unit tests: a broker is a CredentialSource, not an options hash. The
 # Replicated connect paths must pass it through by identity, never copy/merge
-# it (which would splat the blessed object into key/value pairs).
+# it (which would splat the blessed object into key/value pairs); options go
+# beside it.
 # ---------------------------------------------------------------------------
 {
   my $broker = DBIO::AccessBroker::Static->new(
@@ -58,12 +59,15 @@ my $rstorage = $schema->storage;
   is_deeply $opts->{master_connect_opts}, {},
     'broker guts were not splatted into master_connect_opts';
 
-  # Master opts that the merge would normally fold into a replicant options hash.
+  # Master opts go beside the broker (karr k246), never into it.
   $rstorage->_master_connect_info_opts({ AutoCommit => 1 });
+  my %broker_guts = %$broker;
   my $merged = $rstorage->_merge_replicant_connect_info([$broker]);
-  is scalar(@$merged), 1, '_merge_replicant_connect_info keeps the broker single';
   is refaddr($merged->[0]), refaddr($broker),
-    '_merge_replicant_connect_info passes the broker through by identity (no master-opt merge)';
+    '_merge_replicant_connect_info passes the broker through by identity';
+  is_deeply $merged->[1], { AutoCommit => 1 },
+    '... with the master opts in a plain hash beside it';
+  is_deeply {%$broker}, \%broker_guts, '... and none merged into the broker itself';
 }
 
 # ---------------------------------------------------------------------------

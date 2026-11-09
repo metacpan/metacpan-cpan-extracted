@@ -122,9 +122,10 @@ subtest 'the bytes variant agrees with the streamed copy' => sub {
 subtest 'a truncated transfer fails loudly and leaves nothing behind' => sub {
     # Announces the whole file, sends a third of it, then hangs up. Nothing in the
     # protocol distinguishes that from a complete body except the length that was
-    # promised: Mojo only synthesizes `Premature connection close` when no status
-    # was parsed, so a client that does not check writes a short file and reports
-    # success.
+    # promised: before 9.54 Mojo only synthesizes `Premature connection close` when
+    # no status was parsed, so a client that does not check writes a short file
+    # and reports success. From 9.54 it rejects, and the message must still say
+    # how far the body got.
     my $origin = origin_for(sub {
         my ($c) = @_;
         $c->res->headers->content_type('application/octet-stream');

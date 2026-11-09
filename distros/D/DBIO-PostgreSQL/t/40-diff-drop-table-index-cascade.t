@@ -4,7 +4,7 @@ use Test::More;
 
 use DBIO::PostgreSQL::Diff;
 
-# Regression for karr #32.
+# Regression for karr k32.
 #
 # When DBIO::PostgreSQL::Diff reconciles a live schema that contains a table
 # NOT present in the target (a table removed from the app's DBIO classes, or an
@@ -58,13 +58,13 @@ ok $diff->has_changes, 'diff detects the removed table';
 
 my $sql = $diff->as_sql;
 
-like   $sql, qr/DROP TABLE public\.leftover CASCADE;/,
-  'DROP TABLE ... CASCADE is emitted for the removed table';
-unlike $sql, qr/DROP INDEX\s+leftover_pkey/,
-  'no standalone DROP INDEX for the dropped table (CASCADE already covers it)';
+like   $sql, qr/DROP TABLE public\.leftover;/,
+  'DROP TABLE is emitted for the removed table, without CASCADE';
+unlike $sql, qr/DROP INDEX\s+(?:public\.)?leftover_pkey/,
+  'no standalone DROP INDEX for the dropped table (the index of the table goes with it)';
 
 # The DROP TABLE must be the only drop statement in the output — the whole point
-# is that the CASCADE handles the index, so apply() never issues the redundant
+# is that the DROP TABLE takes the index, so apply() never issues the redundant
 # (and failing) DROP INDEX.
 my @drop_index = ($sql =~ /(DROP INDEX[^\n;]*)/g);
 is scalar(@drop_index), 0, 'zero DROP INDEX statements in the full-schema sync';
@@ -94,7 +94,7 @@ my $tgt2 = {
 
 my $sql2 = DBIO::PostgreSQL::Diff->new( source => $src2, target => $tgt2 )->as_sql;
 unlike $sql2, qr/DROP TABLE/, 'surviving table is not dropped';
-like   $sql2, qr/DROP INDEX\s+idx_users_email/,
+like   $sql2, qr/DROP INDEX\s+public\.idx_users_email;/,
   'secondary index of a surviving table is still dropped standalone';
 
 done_testing;

@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use Scalar::Util ();
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
+use Future;
 
 use DBIO::Async::TransactionContext;
 
@@ -16,10 +17,35 @@ use DBIO::Async::TransactionContext;
 # would fail.
 {
   package MockStorage5;
-  sub new { bless { pool => MockPool5->new, _log => [] }, $_[0] }
+  sub new { bless { pool => MockPool5->new, _log => [], _owner_token => \(my $t) }, $_[0] }
   sub pool { $_[0]->{pool} }
   sub sql_maker { 'MockSQLMaker5' }
   sub _txn_conn_accessor { 'txn_conn' }
+
+  # k196 / ADR 0045 §4 ownership contract (adopted from core 0.900004): core's
+  # generic TransactionContext snapshots the backend's owner token at
+  # construction and, on every pinned op, resolves the backend's owner and has
+  # THAT owner prove ownership of the context (_assert_context_active ->
+  # _owner_storage -> _assert_async_context_owner). This mock is a SINGLE
+  # ownership domain: it is its own owner, with a stable per-object token. The
+  # ownership check is the FAITHFUL token comparison core's DBIO::Storage::DBI
+  # runs -- same generation accepted, a context from a different backend
+  # refused -- not an unconditional accept, so the pinning assertions below
+  # genuinely depend on the ownership machinery and the refusal is provable
+  # (see the "foreign context" block at the end of this file).
+  sub _context_owner_token { $_[0]->{_owner_token} }
+  sub _owner_storage       { $_[0] }
+  sub _assert_async_context_owner {
+    my ($self, $ctx) = @_;
+    die "async context ownership cannot be proven\n"
+      unless Scalar::Util::blessed($ctx) && $ctx->can('_context_owner_token');
+    my $ours   = $self->_context_owner_token;
+    my $theirs = $ctx->_context_owner_token;
+    die "async context does not belong to this storage generation\n"
+      unless $ours && $theirs
+          && Scalar::Util::refaddr($ours) == Scalar::Util::refaddr($theirs);
+    return $ctx;
+  }
 
   # Non-pinned path: must NOT be reached by a TransactionContext.
   sub _query_async {
@@ -108,5 +134,43 @@ is_deeply $single, ['row'], 'select_single_async returns the first row';
 $storage->{_log} = [];
 $ctx->insert('artist', { name => 'sync' });
 is $storage->{_log}[-1]{seam}, 'pinned', 'sync insert() also pins the connection';
+
+# --- Ownership refusal (k196 / ADR 0045 §4). ---
+#
+# The accepting owner above is only half the contract: a context minted against
+# ONE backend generation must be REFUSED by another. Because the mock owner runs
+# core's real token comparison rather than an unconditional accept, this refusal
+# is exercised through the very seam the pinning path relies on. Two distinct
+# backend objects carry distinct tokens, so a context of storage B is not owned
+# by storage A.
+{
+  my $other   = MockStorage5->new;
+  my $ctx_other = DBIO::Async::TransactionContext->new(
+    storage  => $other,
+    txn_conn => MockConn5->new,
+  );
+
+  isnt Scalar::Util::refaddr($storage->_context_owner_token),
+       Scalar::Util::refaddr($other->_context_owner_token),
+    'two backend generations carry distinct ownership tokens';
+
+  # Same-generation context is accepted (the property the pinning path uses).
+  my $ok = eval { $storage->_assert_async_context_owner($ctx); 1 };
+  ok $ok, 'a context of this backend generation is accepted';
+
+  # A foreign-generation context is refused, with the generation-mismatch message.
+  my $refused = eval { $storage->_assert_async_context_owner($ctx_other); 1 };
+  ok !$refused, 'a foreign-generation context is refused';
+  like $@, qr/does not belong to this storage generation/,
+    '... with the generation-mismatch reason';
+
+  # A context-shaped object with no ownership evidence fails closed.
+  my $impostor = eval {
+    $storage->_assert_async_context_owner(bless {}, 'NotAContext5'); 1
+  };
+  ok !$impostor, 'an object carrying no ownership token fails closed';
+  like $@, qr/ownership cannot be proven/,
+    '... rather than being silently accepted';
+}
 
 done_testing;

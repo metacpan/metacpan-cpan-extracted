@@ -4,6 +4,8 @@ package DBIO::SQLite::Test;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Test;
 use DBIO::Test::Schema;
 use Carp;
@@ -70,14 +72,27 @@ sub _sqlite_dbname {
 }
 
 
+# Arguments of init_schema that steer the helper itself. They are not
+# connect attributes and must never reach connect(): the storage rejects a
+# connect attribute it does not know (karr k76).
+my @HELPER_ARGS = qw(
+  dsn connect_info user pass connect_opts
+  no_deploy no_populate no_connect deploy_args
+  storage_type replicated replicant_connect_info compose_connection
+  sqlite_use_file
+);
+
 sub _database {
   my $self = shift;
   my %args = @_;
 
+  my %connect_attrs = %args;
+  delete @connect_attrs{@HELPER_ARGS};
+
   if ($ENV{DBIO_TEST_DSN}) {
     return (
       (map { $ENV{"DBIO_TEST_${_}"} // '' } qw/DSN DBUSER DBPASS/),
-      { AutoCommit => 1, %args },
+      { AutoCommit => 1, %connect_attrs },
     );
   }
 
@@ -106,7 +121,7 @@ sub _database {
         $dbh->do('PRAGMA reverse_unordered_selects = ON');
       }
     },
-    %args,
+    %connect_attrs,
   });
 }
 
@@ -114,7 +129,14 @@ sub _database {
 sub init_schema {
   my $self = shift;
   my %args = @_;
+
+  # A schema always has a driver (core ADR 0067), and DBIO::Test::Schema
+  # keeps none in its class: this helper declares SQLite unless the caller
+  # names a storage_type. Set before the normalization, so that
+  # replicated => 1 runs its backends on it as well.
+  $args{storage_type} //= 'DBIO::SQLite::Storage';
   %args = %{ DBIO::Test->normalize_init_schema_args(\%args) };
+  $args{storage_type} = $self->_backend_storage_class($args{storage_type});
 
   my $schema;
 
@@ -145,6 +167,27 @@ sub init_schema {
   }
 
   return $schema;
+}
+
+# normalize_init_schema_args records the driver of replicated => 1 as
+# backend_storage_type; DBIO::Replicated::Storage builds its master and
+# replicants from backend_storage_class. Hand the driver on under that name,
+# unless the caller gave backend_storage_class itself. Any other storage_type
+# is returned as given.
+sub _backend_storage_class {
+  my ($self, $storage_type) = @_;
+
+  return $storage_type unless ref $storage_type eq 'HASH';
+
+  my ($storage_class, $args) = %$storage_type;
+  (my $plain = $storage_class) =~ s/^\+//;
+  return $storage_type unless $plain eq 'DBIO::Replicated::Storage';
+
+  my %replicated_args = %{ $args || {} };
+  my $backend = delete $replicated_args{backend_storage_type};
+  $replicated_args{backend_storage_class} //= $backend if defined $backend;
+
+  return { $storage_class => \%replicated_args };
 }
 
 sub _cleanup_dbfile {
@@ -179,7 +222,7 @@ DBIO::SQLite::Test - SQLite-specific test utilities for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -217,6 +260,12 @@ Returns the database name — either a file path or C<:memory:>.
 Returns a list of C<($dsn, $user, $pass, \%opts)> suitable for
 C<< $schema->connect() >>.
 
+The arguments are those of L</init_schema>. The ones that steer the helper
+itself (C<no_deploy>, C<no_populate>, C<storage_type>, C<sqlite_use_file>,
+...) are consumed here and left out of the connect attributes; everything
+else (C<quote_names>, C<auto_savepoint>, C<on_connect_do>, C<AutoCommit>,
+DBI attributes) is passed on to the connection.
+
 =head2 init_schema
 
   my $schema = DBIO::SQLite::Test->init_schema(%opts);
@@ -234,9 +283,16 @@ Use a file-based SQLite database instead of C<:memory:>.
 
 =back
 
+The schema declares L<DBIO::SQLite::Storage> as its driver unless
+C<storage_type> names another storage class: a schema always has a driver
+(core ADR 0067), and L<DBIO::Test::Schema> keeps none in its class.
+
 Shared L<DBIO::Test> options such as C<replicated =E<gt> 1> are normalized
 before the SQLite-specific connection is built, so driver tests can opt
-into replicated coverage without rebuilding their schema setup.
+into replicated coverage without rebuilding their schema setup. The master
+and every replicant are storages of the declared driver: the helper passes
+it on as C<backend_storage_class>, unless a full replicated C<storage_type>
+gives one itself.
 
 =head1 AUTHOR
 

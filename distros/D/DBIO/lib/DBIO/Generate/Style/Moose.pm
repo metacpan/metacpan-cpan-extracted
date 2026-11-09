@@ -3,6 +3,9 @@ package DBIO::Generate::Style::Moose;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Data::Dumper ();
 use DBIO::Generate::Util ();
 use namespace::clean;
@@ -65,11 +68,13 @@ sub emit {
 
   for my $stmt (@{ $spec->{extra_statements} // [] }) {
     my ($method, @args) = @$stmt;
+    DBIO::Generate::Util::assert_method_name($method, 'extra_statements method');
     push @lines, "__PACKAGE__->$method(" . join(', ', map { _dump_val($_) } @args) . ");";
   }
   push @lines, "" if @{ $spec->{extra_statements} // [] };
 
   for my $rel (@{ $spec->{relationships} // [] }) {
+    DBIO::Generate::Util::assert_relationship_method($rel->{method});
     my ($rel_name, $remote_class, $cond, @rest) = @{ $rel->{args} };
     my $cond_str = _dump_inline($cond);
     my $rest_str = @rest ? ', ' . join(', ', map { _dump_inline($_) } @rest ) : '';
@@ -112,7 +117,7 @@ DBIO::Generate::Style::Moose - Moose-style emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

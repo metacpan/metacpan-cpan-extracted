@@ -3,6 +3,30 @@
 - Status: accepted
 - Date: 2026-06-30
 - Tags: packaging, naming, ev-pg, async, drivers
+- Superseded in part: the `async_backend` opt-in named below is superseded by
+  core ADR 0030 (see the Amendment); the rename itself stands
+
+## Amendment (2026-09-05, karr k31) — the `async_backend` opt-in is superseded by core ADR 0030
+
+The rename this ADR decides is in force and unchanged. Its *Demo / opt-in*
+decision bullet and the matching *Consequences* entry are not: both describe the
+mechanics of core ADR 0029 — a pluggable `async_backend` on the sync storage,
+defaulting to a forked fallback — which core has since **withdrawn**. No
+`async_backend` method exists any more, and there is no default async backend.
+
+What holds instead, per core ADR 0030: async is an explicit **per-connection**
+mode, chosen at `connect` with `{ async => 'ev' }` and fixed for the life of that
+storage instance. The `ev` mode is registered by the sync driver —
+`DBIO::PostgreSQL::Storage` calls
+`register_async_mode( ev => 'DBIO::PostgreSQL::EV::Storage' )` — and core
+resolves it by walking the *storage* MRO, so this distribution's schema
+component takes no part in it. Nothing degrades: without the opt-in a `*_async`
+call croaks, and so does a requested mode whose backend is not installed
+(ADR 0030 §3). `demo/dbio-demo-async` accordingly opts in **at** `connect`, not
+after it.
+
+Read the `async_backend` sentences below for the record; do not implement from
+them.
 
 ## Context
 

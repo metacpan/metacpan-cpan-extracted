@@ -5,6 +5,7 @@ use_ok $_ for qw(
     App::mdee
     App::Greple::md
     App::Greple::md::Blocks
+    App::Greple::md::widen
 );
 
 done_testing;

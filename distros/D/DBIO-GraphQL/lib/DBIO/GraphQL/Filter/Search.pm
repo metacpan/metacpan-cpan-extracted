@@ -3,6 +3,8 @@ package DBIO::GraphQL::Filter::Search;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::GraphQL::Filter';
 
 # Inherits type_for / to_search / _compile / _compile_column from
@@ -24,7 +26,7 @@ DBIO::GraphQL::Filter::Search - Default filter adapter - per-source nested-DBIO-
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

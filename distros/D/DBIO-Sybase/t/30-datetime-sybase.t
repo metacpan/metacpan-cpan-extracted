@@ -26,17 +26,22 @@ if (not ($dsn && $user)) {
 DBIO::Test::Schema->load_classes('EventSmallDT');
 
 my @storage_types = (
-  'DBI::Sybase::ASE',
-  'DBI::Sybase::ASE::NoBindVars',
+  'DBIO::Sybase::Storage::ASE',
+  'DBIO::Sybase::Storage::ASE::NoBindVars',
 );
 my $schema;
 
 for my $storage_type (@storage_types) {
   $schema = DBIO::Test::Schema->clone;
 
-  unless ($storage_type eq 'DBI::Sybase::ASE') { # autodetect
-    $schema->storage_type("::$storage_type");
-  }
+  # The ASE pass declares the driver's base class, as the Sybase component
+  # and -syb do: the storage becomes the ASE class at the first use. A schema
+  # always declares its driver (core ADR 0067, karr k90).
+  $schema->storage_type(
+    $storage_type eq 'DBIO::Sybase::Storage::ASE'
+      ? '+DBIO::Sybase::Storage'
+      : "+$storage_type"
+  );
   $schema->connection($dsn, $user, $pass, {
     on_connect_call => 'datetime_setup',
   });
@@ -45,7 +50,7 @@ for my $storage_type (@storage_types) {
 
   $schema->storage->ensure_connected;
 
-  isa_ok( $schema->storage, "DBIO::Storage::$storage_type" );
+  isa_ok( $schema->storage, $storage_type );
 
   eval { $schema->storage->dbh->do("DROP TABLE track") };
   $schema->storage->dbh->do(<<"SQL");

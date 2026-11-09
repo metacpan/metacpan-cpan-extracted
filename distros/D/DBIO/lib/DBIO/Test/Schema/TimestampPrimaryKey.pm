@@ -2,6 +2,9 @@ package DBIO::Test::Schema::TimestampPrimaryKey;
 # ABSTRACT: Test result class for timestamp primary key handling
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -32,7 +35,7 @@ DBIO::Test::Schema::TimestampPrimaryKey - Test result class for timestamp primar
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

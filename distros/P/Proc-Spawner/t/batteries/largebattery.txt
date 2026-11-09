@@ -112,3 +112,9 @@ x=$(head -c 10000000 /dev/zero & umask; wait); echo ${#x}
 x=$(printf "a\0b\n\0\n"); echo ${#x}
 x=1 y=2 2>f >&2; echo "$x $y"; cat f
 x=1 > /nonexist/f; echo "$? [$x]"
+n=a.b; unset $n; echo after
+x=1; y=2; n="x a.b y"; (unset $n; echo in); echo "st=$? x=$x y=$y"
+f() { n=a.b; unset $n; echo in; }; f; echo after
+n=a.b; unset -f $n; echo "after $?"
+n=''; unset "$n"; echo after
+x=1; n=x; unset $n; echo "ok [$x] $?"

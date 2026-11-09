@@ -94,9 +94,12 @@ my %LEDGER = map { $_ => 1 } (
 	q{new: warn "Ignoring '...' in the supported list: not a language code"},
 	'language: warn "lang parameter contains invalid characters; ignoring"',
 	'language: warn "HTTP_ACCEPT_LANGUAGE contains invalid characters; ignoring"',
+	'language: warn "LC_ALL contains invalid characters; ignoring"',
+	'language: warn "LC_MESSAGES contains invalid characters; ignoring"',
 	'language: warn "LANG contains invalid characters; ignoring"',
 	'language: warn "Resetting country code to GB for ..."',
 	q{country: warn "Can't open ... with Geo::IP; not using it"},
+	q{country: warn "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"},
 	'new: warn "Discarding malformed cache entry for ..."',
 	# Language accessors
 	'language: returns language name',
@@ -144,6 +147,7 @@ my %LEDGER = map { $_ => 1 } (
 	'time_zone: warn "ip-api.com returned unparseable JSON: ..."',
 	'time_zone: warn "DateTime::TimeZone::Local failed: ..."',
 	q{time_zone: warn "Discarding malformed timezone '...'"},
+	q{time_zone: warn "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"},
 	'time_zone: returns IANA zone name',
 	'time_zone: returns undef',
 	# Text direction
@@ -638,6 +642,7 @@ subtest 'country: public IP resolved via IP::Country returns lowercase code' => 
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	is($l->country(), $CC{US}, 'IP::Country result returned as lowercase');
 	Test::Mockingbird::restore_all();
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub { });
@@ -653,6 +658,7 @@ subtest 'country: result stored in cache for public IP' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	$l->country();
 	is($cache->get('CGI::Lingua:country:' . $IP{PUBLIC}), $CC{GB},
 		'Country stored in cache under documented key pattern');
@@ -670,6 +676,7 @@ subtest 'country: HK remapped to CN (legacy Whois behaviour)' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	is($l->country(), $CC{CN}, 'HK remapped to CN');
 	Test::Mockingbird::restore_all();
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub { });
@@ -686,6 +693,7 @@ subtest 'country: cached value returned on second call without re-lookup' => sub
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	$l->country();    # first call
 	my $c1 = $call_count;
 	$l->country();    # second call - must use object-level cache
@@ -721,6 +729,7 @@ subtest 'locale: returns Locale::Object::Country for well-known country code' =>
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $locale = $l->locale();
 	if(defined $locale) {
 		isa_ok($locale, 'Locale::Object::Country',
@@ -878,6 +887,7 @@ subtest 'integration: country mocked via IP::Country, language from header' => s
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	is($l->language(), 'English', 'language() from header');
 	is($l->country(),  $CC{US},   'country() from IP::Country mock');
 	# Suppress the prototype mismatch warning when restoring LWP::Simple::WithCache::get
@@ -938,7 +948,7 @@ sub _spied {
 # the (mocked) geoplugin service; the documented test pattern for this module.
 sub _web_only {
 	my $l = shift;
-	$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = $l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
 	return $l;
 }
 
@@ -1507,6 +1517,8 @@ subtest 'ledger input warnings: supported list, lang parameter, header, LANG' =>
 	my %case = (
 		'lang parameter'       => [ { HTTP_ACCEPT_LANGUAGE => 'en' }, info => Unit::HostileInfo->new() ],
 		'HTTP_ACCEPT_LANGUAGE' => [ { HTTP_ACCEPT_LANGUAGE => "en\r\nstats" } ],
+		'LC_ALL'               => [ { LC_ALL => 'fr;rm -rf /', LANG => 'fr_FR.UTF-8' } ],
+		'LC_MESSAGES'          => [ { LC_MESSAGES => "fr\nX", LANG => 'fr_FR.UTF-8' } ],
 		'LANG'                 => [ { LANG => 'en;rm -rf /' } ],
 	);
 	for my $what (sort keys %case) {
@@ -1551,6 +1563,39 @@ subtest 'ledger country: unreadable GeoIP.dat is skipped' => sub {
 	ok($spy->logged('warn', qr/^Can't open \Q$dat\E with Geo::IP; not using it$/), 'exact warning');
 	_hit($key);
 	_unmock_all();
+};
+
+subtest 'ledger country, time_zone: unreadable GeoIP2 database is skipped' => sub {
+	my @keys = (
+		q{country: warn "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"},
+		q{time_zone: warn "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"},
+	);
+	unless(eval { require IP::Geolocation::MMDB; 1 } || eval { require MaxMind::DB::Reader; 1 }) {
+		_cannot_reach($_, 'neither IP::Geolocation::MMDB nor MaxMind::DB::Reader is installed') for @keys;
+		plan(skip_all => $SKIPPED{$keys[0]});
+	}
+	require File::Temp;
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $mmdb = "$dir/GeoLite2-City.mmdb";
+	open(my $fh, '>', $mmdb) or die "$mmdb: $!";
+	print {$fh} 'not a MaxMind database';
+	close $fh;
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP2_MMDB = ($mmdb);
+	local %ENV = (REMOTE_ADDR => $IP{PUBLIC});
+	my $exact = qr/^Can't open \Q$mmdb\E with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it$/;
+
+	my ($l, $spy) = _spied(['en']);
+	$l->{_have_ipcountry} = $l->{_have_geoip} = $l->{_have_geoipfree} = 0;
+	lives_ok { $l->country() } 'country() lives';
+	ok($spy->logged('warn', $exact), 'country: exact warning');
+	_hit($keys[0]);
+
+	($l, $spy) = _spied(['en']);
+	$l->{_have_geoip} = 0;
+	lives_ok { $l->time_zone() } 'time_zone() lives';
+	ok($spy->logged('warn', $exact), 'time_zone: exact warning');
+	_hit($keys[1]);
 };
 
 subtest 'API ledger: every documented state was produced' => sub {

@@ -7,16 +7,19 @@ my @modules = qw(
   DBIO::Shortcut::fb
   DBIO::Firebird::Storage
   DBIO::Firebird::Storage::InterBase
+  DBIO::Firebird::Storage::ODBC
   DBIO::Firebird::Storage::Common
   DBIO::Firebird::SQLMaker
   DBIO::Firebird::DateTime::Format
   DBIO::Firebird::Type
+  DBIO::Firebird::Util
   DBIO::Firebird::DDL
   DBIO::Firebird::Deploy
   DBIO::Firebird::Diff
   DBIO::Firebird::Diff::Column
   DBIO::Firebird::Diff::Index
   DBIO::Firebird::Diff::Table
+  DBIO::Firebird::Diff::View
   DBIO::Firebird::Introspect
   DBIO::Firebird::Introspect::Columns
   DBIO::Firebird::Introspect::ForeignKeys

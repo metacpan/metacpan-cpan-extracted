@@ -8,6 +8,7 @@ my @modules = qw(
   DBIO::Sybase::Storage::ASE
   DBIO::Sybase::Storage::ASE::NoBindVars
   DBIO::Sybase::Storage::FreeTDS
+  DBIO::Sybase::Util
   DBIO::Shortcut::syb
 );
 

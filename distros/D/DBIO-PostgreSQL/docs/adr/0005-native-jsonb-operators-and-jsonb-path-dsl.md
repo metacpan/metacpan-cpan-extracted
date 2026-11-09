@@ -26,19 +26,22 @@ ship a public path-extraction DSL for comparing fields inside a JSONB value.
 
 - **Operator registration via `expand_op`.** `DBIO::PostgreSQL::SQLMaker`
   declares the JSONB operator set `@>` `<@` `@?` `@@` `?` `?|` `?&`
-  (`SQLMaker.pm:13-21`) and, in its constructor, wires each one into
+  (`SQLMaker.pm`, `%JSONB_OP`) and, in its constructor, wires each one into
   `$opts{expand_op}{$op}` wrapping the handler's output in a `-literal` node
-  (`SQLMaker.pm:31-37`). This is precisely the `expand_op` path core ADR 0004
+  (`SQLMaker.pm`, `new`). This is precisely the `expand_op` path core ADR 0004
   mandates — the base `DBIO::SQLMaker` having disabled the old special-ops
   system.
 - **`?`/`?|`/`?&` rewritten to functions.** Because a literal `?` would be eaten
   by DBI's placeholder parser, `_where_op_jsonb_exists` emits
   `jsonb_exists(col, ?)`, `jsonb_exists_any(col, ARRAY[...])`, and
   `jsonb_exists_all(col, ARRAY[...])` instead of the raw operators
-  (`SQLMaker.pm:122-140`). The remaining operators (`@>`, `<@`, `@?`, `@@`) are
-  emitted as-is with `::jsonb` / `::jsonpath` casts.
+  (`SQLMaker.pm`). The remaining operators (`@>`, `<@`, `@?`, `@@`) are
+  emitted as operators with `::jsonb` / `::jsonpath` casts; the `?` of `@?`
+  is written `\?`, a question mark that is no placeholder, so the statement
+  reads `@\? ?::jsonpath`, `as_query` shows that, and the server gets `@?`
+  (karr k120).
 - **Public `jsonb()` path DSL.** `DBIO::PostgreSQL::JSONB` exports a `jsonb`
-  function (`JSONB.pm:10-15`) returning an operator object;
+  function (`JSONB.pm`) returning an operator object;
   `jsonb($col, @path)->eq(...)` (and `ne`/`gt`/`like`/`is_null`/`as_order`/…)
   builds a text-extraction path expression (`->>` single-level, `#>>`
   multi-level) suitable for `search()`. This covers per-field comparison, which

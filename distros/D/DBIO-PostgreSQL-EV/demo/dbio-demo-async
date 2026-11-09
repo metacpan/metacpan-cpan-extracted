@@ -76,9 +76,9 @@ package Demo::Schema::Result::Track {
 package Demo::Schema {
   use DBIO Schema => -pg;
   # ONE schema, both modes. `-pg` pins storage_type to DBIO::PostgreSQL::Storage
-  # (the sync DBI/DBD::Pg storage). The sync driver no longer auto-routes async
-  # to this dist -- its default async backend is the forked fallback -- so the
-  # demo opts into DBIO::PostgreSQL::EV::Storage explicitly after connect (below).
+  # (the sync DBI/DBD::Pg storage), which is also the class that registers the
+  # 'ev' async mode. Async itself is an explicit per-connection choice (core
+  # ADR 0030): the demo asks for it with { async => 'ev' } at connect (below).
   # load_components('PostgreSQL') then layers in the PostgreSQL schema
   # component (provides pg_install_ddl -> native DDL generator), which
   # deploy_async consumes.
@@ -114,34 +114,37 @@ banner("DBIO Async Demo (PostgreSQL + EV::Pg)");
 show("DSN:", $dsn);
 
 # Event-loop glue must be present for the async ops + the await() pump below.
-# The EV::Pg async backend (DBIO::PostgreSQL::EV::Storage) is opted into
-# explicitly after connect (below) and loaded lazily on first use -- we only
-# need the dist installed, not loaded here.
+# The EV::Pg async backend (DBIO::PostgreSQL::EV::Storage) is resolved from the
+# { async => 'ev' } mode below and loaded lazily on first use -- we only need
+# the dist installed, not loaded here.
 eval { require AnyEvent; require EV; require EV::Pg; require Future; require Time::HiRes; 1 }
   or die "AnyEvent / EV / EV::Pg / Future / Time::HiRes required -- EV::Pg comes with EV::Pg\n";
 
 step("Connecting (ONE schema -- sync DBI + lazy async EV::Pg backend)");
+# { async => 'ev' } is the whole opt-in (core ADR 0030): it is a DBIO-private
+# connect attribute, stripped out before DBI sees the rest, and it fixes the
+# async mode for the life of this storage instance. DBIO::PostgreSQL::Storage
+# registered 'ev' => DBIO::PostgreSQL::EV::Storage, so core resolves it by
+# walking the storage MRO on the first async access. Drop the attribute and
+# every *_async call below croaks instead of degrading -- there is no fallback.
 my $schema  = Demo::Schema->connect($dsn, $user, $pass, {
   AutoCommit => 1,
   RaiseError => 1,
+  async      => 'ev',
 });
 my $storage = $schema->storage;
-
-# Opt into the EV::Pg async backend explicitly. The sync driver no longer
-# defaults its async backend to this dist (its default is now the forked
-# fallback), so EV is opt-in. Must run before the first *_async call -- and
-# before the future_class gate below, which only reads 'Future' once the EV
-# backend has resolved.
-$storage->async_backend('DBIO::PostgreSQL::EV::Storage');
 
 say "  Connected.";
 show("Storage:", ref $storage);
 show("Future class:", $storage->future_class);
 
-# Hard verification gate. The SAME schema must give a sync DBI storage whose
-# pluggable async backend resolved to the real EV::Pg one: future_class flips
-# from DBIO::Test::Future (degrade) to Future. If it didn't resolve, the async
-# ops below would silently block the event loop instead of running async.
+# Hard verification gate. The SAME schema must still give the SYNC DBI storage
+# -- the async backend is embedded in it, not swapped for it -- and that
+# storage must resolve the 'ev' mode to the real EV::Pg backend. future_class
+# proves the second half: it delegates to the resolved backend, so it reads
+# 'Future' only once DBIO::PostgreSQL::EV::Storage is behind it (a sync
+# instance would answer DBIO::Future::Immediate). Resolution is lazy, so this
+# is also where a missing dist or an unregistered mode surfaces -- loudly.
 die "wrong storage: ", ref($storage),
     " (expected DBIO::PostgreSQL::Storage)\n"
   unless ref($storage) eq 'DBIO::PostgreSQL::Storage';

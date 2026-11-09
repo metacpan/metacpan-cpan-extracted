@@ -1,5 +1,38 @@
 Revision history for CGI-Lingua
 
+0.88	Sun Nov  8 10:34:04 AM EST 2026
+	[ Incompatible changes ]
+	- The locale is read as POSIX does: LC_ALL, then LC_MESSAGES, then LANG,
+	  the first that is set deciding.  LC_ALL=C now means no language even
+	  when LANG names one
+	[ Enhancement ]
+	- country() and time_zone() use a MaxMind GeoIP2 or GeoLite2 database
+	  (.mmdb) before any other local source, read with IP::Geolocation::MMDB
+	  or MaxMind::DB::Reader.  The files are looked for in @GEOIP2_MMDB,
+	  which by default covers /var/lib/GeoIP (where geoipupdate writes),
+	  /usr/share/GeoIP and /usr/local/share/GeoIP; a City database also
+	  gives the time zone
+	[ Bug Fixes ]
+	- A locale such as LANG=en_US.UTF-8 now chooses English (United States);
+	  it was passed on as written and matched no language.  C and POSIX
+	  name no language, and a modifier (de_DE@euro, sr_RS@latin) is allowed
+	- CGI::Lingua no longer uses autodie, whose qw(:all) needed the
+	  undeclared IPC::System::Simple.  Object::Configure 0.25 is now the
+	  minimum, because 0.24 had the same problem
+	- perl Makefile.PL --no-online-tests is honoured when a local geo
+	  database is installed, and a GeoIP2 or GeoLite2 .mmdb file now counts
+	  as one
+	- Without Data::Validate::IP (always the case on Windows), country()
+	  found no country for an IPv6 address on Windows: the check used
+	  Socket::inet_pton, which there fails until a socket has been opened.
+	  IPv6 addresses are now checked in Perl, and an IPv4 address with a
+	  leading zero (010.8.8.8) is refused, as Data::Validate::IP does
+	[ Tests ]
+	- t/mmdb.t builds small .mmdb files and tests both readers
+	- t/30-basics.t no longer fails when the on-line tests are disabled
+	- t/minimal-deps.t loads the module with only its prerequisites
+	- Added t/noshadow.t
+
 0.87	Fri Oct  9 04:54:52 PM EDT 2026
 	[ Incompatible changes ]
 	- Entries of the supported list that are not language tags (e.g.

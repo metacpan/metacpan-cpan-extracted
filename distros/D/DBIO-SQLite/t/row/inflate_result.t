@@ -57,6 +57,7 @@ sub do_admin_stuff {
 package My::Schema;
 
 use base qw/DBIO::Schema/;
+__PACKAGE__->load_components('SQLite');
 
 My::Schema->register_class( Admin => 'My::Schema::Result::User::Admin' );
 My::Schema->register_class( User  => 'My::Schema::Result::User' );

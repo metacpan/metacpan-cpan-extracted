@@ -25,6 +25,7 @@ on develop => sub {
     requires 'Software::License';
     requires 'Test2::Harness';
     requires 'Test2::Plugin::Cover';
+    requires 'Test::Spellunker';
     requires 'UUID';
     requires 'Version::Next';
 };

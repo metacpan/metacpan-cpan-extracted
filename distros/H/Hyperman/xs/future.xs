@@ -15,7 +15,7 @@ new(class)
     CODE:
     {
         const char *name;
-        if (SvROK(class) && SvOBJECT(SvRV(class)))
+        if (SvROK(class) && SvOBJECT(SvRV(class))) /* # uncoverable condition right count:2 class:ignore_covered_err */
             name = HvNAME(SvSTASH(SvRV(class)));
         else
             name = SvPV_nolen(class);
@@ -44,6 +44,8 @@ fail(self, ...)
         AWAIT_FAIL = 1
     CODE:
         PERL_UNUSED_VAR(ix);
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (hmf_state(aTHX_ self) == HMF_PENDING) {
             if (items > 1) {
                 hmf_settle(aTHX_ self, HMF_FAILED, &ST(1), items - 1);
@@ -63,7 +65,7 @@ done_future(class, ...)
         AWAIT_NEW_DONE = 1
     CODE:
     {
-        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class))) /* # uncoverable statement class:ignore_covered_err */
                                         : SvPV_nolen(class);
         PERL_UNUSED_VAR(ix);
         RETVAL = hmf_new(aTHX_ name);
@@ -79,7 +81,7 @@ fail_future(class, ...)
         AWAIT_NEW_FAIL = 1
     CODE:
     {
-        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class))) /* # uncoverable statement class:ignore_covered_err */
                                         : SvPV_nolen(class);
         PERL_UNUSED_VAR(ix);
         RETVAL = hmf_new(aTHX_ name);
@@ -245,24 +247,28 @@ get(self)
         }
         if (st == HMF_FAILED) {
             AV *fav = hmf_values_av(aTHX_ self);
-            SV **e = fav ? av_fetch(fav, 0, 0) : NULL;
+            SV **e = fav ? av_fetch(fav, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (e) croak_sv(sv_mortalcopy(*e));
-            croak("Failed");
+            croak("Failed"); /* # uncoverable statement */
         }
         if (st == HMF_CANCELLED)
             croak("Hyperman::Future was cancelled");
         {
             AV *rav = hmf_values_av(aTHX_ self);
-            SSize_t n = rav ? av_len(rav) + 1 : 0;
+            SSize_t n = rav ? av_len(rav) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
             if (GIMME_V == G_ARRAY) {
                 SSize_t i;
                 EXTEND(SP, n);
                 for (i = 0; i < n; i++) {
                     SV **e = av_fetch(rav, i, 0);
-                    PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef);
+                    PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
                 }
             } else if (n) {
                 SV **e = av_fetch(rav, 0, 0);
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
                 XPUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef);
             } else {
                 XPUSHs(&PL_sv_undef);
@@ -278,19 +284,25 @@ failure(self)
         PUTBACK;
         hmf_await(aTHX_ self);
         SPAGAIN;
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (hmf_state(aTHX_ self) != HMF_FAILED) XSRETURN_EMPTY;
         {
             AV *fav = hmf_values_av(aTHX_ self);
-            SSize_t n = fav ? av_len(fav) + 1 : 0;
+            SSize_t n = fav ? av_len(fav) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
             if (GIMME_V == G_ARRAY) {
                 SSize_t i;
                 EXTEND(SP, n);
                 for (i = 0; i < n; i++) {
                     SV **e = av_fetch(fav, i, 0);
-                    PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef);
+                    PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
                 }
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             } else if (n) {
                 SV **e = av_fetch(fav, 0, 0);
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
                 XPUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef);
             }
         }
@@ -303,11 +315,11 @@ _values(self)
     PPCODE:
     {
         AV *rav = hmf_values_av(aTHX_ self);
-        SSize_t i, n = rav ? av_len(rav) + 1 : 0;
+        SSize_t i, n = rav ? av_len(rav) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
         EXTEND(SP, n);
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(rav, i, 0);
-            PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef);
+            PUSHs(e ? sv_mortalcopy(*e) : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
         }
     }
 
@@ -323,9 +335,12 @@ then(self, ...)
         SV *on_done = NULL, *on_fail = NULL;
         SV *cb;
         if (ix == 0) {   /* then($ok?, $err?) */
-            if (items > 1 && SvOK(ST(1))) on_done = ST(1);
-            if (items > 2 && SvOK(ST(2))) on_fail = ST(2);
+            if (items > 1 && SvOK(ST(1))) on_done = ST(1); /* # uncoverable condition right count:1 class:ignore_covered_err */
+            if (items > 2 && SvOK(ST(2))) on_fail = ST(2); /* # uncoverable condition right count:2 class:ignore_covered_err */
         } else {         /* else($err) */
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (items > 1 && SvOK(ST(1))) on_fail = ST(1);
         }
         RETVAL = hmf_new(aTHX_ hmf_class_of(aTHX_ self));
@@ -421,7 +436,7 @@ as_cpan_future(self)
         PUTBACK;
         n = call_method("new", G_SCALAR);
         SPAGAIN;
-        cf = n ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        cf = n ? SvREFCNT_inc(POPs) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK; FREETMPS; LEAVE;
         cb = hm_closure(aTHX_ hm_xs_tocpan_cb, cf, NULL, NULL, NULL, 0, 0);
         hmf_on_ready(aTHX_ self, cb);
@@ -437,7 +452,7 @@ from_future(class, other)
     SV *other
     CODE:
     {
-        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class)))
+        const char *name = (SvROK(class) && SvOBJECT(SvRV(class))) ? HvNAME(SvSTASH(SvRV(class))) /* # uncoverable statement class:ignore_covered_err */
                                         : SvPV_nolen(class);
         SV *cb;
         RETVAL = hmf_new(aTHX_ name);

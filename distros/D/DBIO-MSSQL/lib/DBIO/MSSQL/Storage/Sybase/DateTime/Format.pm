@@ -4,6 +4,8 @@ package DBIO::MSSQL::Storage::Sybase::DateTime::Format;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::DateTimeFormat';
 
 # Asymmetric: DBD::Sybase with syb_date_fmt('ISO_strict') emits ISO on read,
@@ -26,7 +28,7 @@ DBIO::MSSQL::Storage::Sybase::DateTime::Format - DateTime parser for MSSQL via D
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

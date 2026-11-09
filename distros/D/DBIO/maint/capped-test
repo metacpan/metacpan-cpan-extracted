@@ -1,0 +1,346 @@
+#!/usr/bin/env perl
+# maint/capped-test — run a test suite inside a memory- and CPU-capped cgroup, so
+# that a test run can never take the host down with it.
+#
+# This exists because the shared box this family is developed on has been
+# frozen repeatedly, and every time the first suspicion fell on "the tests".
+# For the suite as written that is wrong: the whole core suite (226 files, 28k
+# tests) peaks at ~183 MB -- less than a third of a single editor/agent process.
+#
+# The point of this wrapper is therefore not that tests are heavy. It is that
+# "the tests are innocent" should be a structural fact rather than a measurement
+# somebody has to repeat after every incident. A run started through here is
+# confined by the kernel: if it ever does go wrong, the cgroup kills the
+# offending process and the host stays up.
+#
+# Both halves of that sentence need a limit. The scope gets MemoryMax (RAM,
+# default 2G) AND MemorySwapMax=0 (no swap at all). The second one is not
+# optional on a host that has swap, and this one does (15 GB RAM, ~14 GB swap,
+# part of it zram): with RAM capped and swap left open, a runaway run is not
+# killed at the cap, it is paged out. Measured 2026-10-07, an endlessly
+# recursing test sat at memory.current = 2.0G -- exactly its cap -- while
+# memory.swap.current grew to 2.9G and kept growing; zram filled to 98% and
+# the whole machine stalled until somebody killed the run by hand. With swap
+# at 0 there is nowhere to go: at the cap the kernel's OOM killer ends the
+# process that is eating the memory. Under prove that is the one test file,
+# which fails with "wait status 9" while the rest of the suite carries on.
+#
+# Swap is fixed at 0, with no switch: a run that legitimately needs more room
+# gets it as RAM, via DBIO_TEST_MEMMAX. There is no time limit either; where
+# one is wanted, `timeout N maint/capped-test ...` ends the run with it.
+#
+#   maint/capped-test                    # default: prove -lr t/
+#   maint/capped-test prove -lr t/sqlmaker/
+#   maint/capped-test dzil test
+#   DBIO_TEST_MEMMAX=4G maint/capped-test dzil test    # a live driver suite
+#
+# It wraps a command in whatever directory it is called from, so like
+# live-preflight it lives in core only and the driver dists reach it by path
+# rather than keeping 21 copies in sync:
+#
+#   cd ../dbio-postgresql && ../dbio/maint/capped-test dzil test
+#
+# It always adds `nice -n 19 ionice -c3` as well, per the "Live testing —
+# resource discipline" section of .claude/rules/dbio-rules.md, which this script
+# enforces. For live runs it is the second half of a pair: `maint/live-preflight`
+# looks at the databases the run goes against, this caps what the run may consume
+# on the machine it runs on.
+#
+# Exit status: the test command's own, unchanged, so this is a drop-in prefix.
+# Exit 99 — and only 99 — means the cap could NOT be established and the run was
+# never started. It is deliberately not 1 or 2: those are ordinary prove/dzil
+# outcomes, and "the guard did not engage" must never be mistakable for "some
+# tests failed". A wrapper that silently degrades to an uncapped run is worse
+# than no wrapper, because it is trusted.
+#
+# "Established" is read back, not assumed: systemd-run accepts a limit it then
+# does not enforce. So the command is not started by systemd-run directly but
+# by this script again, inside the scope (--in-scope below), which reads
+# memory.max and memory.swap.max of the cgroup it actually landed in and execs
+# the command only if both hold what was asked for -- and the same goes for the
+# CPU quota, which is read back from cpu.max.
+#
+# That in-scope stage stays alive around the command (it does not exec it), for
+# one more reason: the peak. systemd logs "memory peak" only when it tears the
+# scope down, and for a run of well under a second that line is not reliably in
+# the journal by the time anybody looks (k295: `prove -l t/00-load.t` reported
+# "peak (unknown)"). memory.peak of the scope's cgroup is there as long as the
+# scope is, so the in-scope stage reads it after the command has ended and hands
+# it to the outer stage. The journal remains the fallback where the kernel has
+# no memory.peak.
+
+use strict;
+use warnings;
+
+use Cwd ();
+use Fcntl ();
+use IO::Handle ();
+use POSIX ();
+
+my $MEMMAX   = $ENV{DBIO_TEST_MEMMAX}   || '2G';
+my $CPUQUOTA = $ENV{DBIO_TEST_CPUQUOTA} || '200%';
+
+sub die_uncappable {
+  my ($why) = @_;
+  print STDERR "capped-test: REFUSING to start -- $why\n";
+  print STDERR "capped-test: an uncapped run on this box is exactly what has\n";
+  print STDERR "             frozen it before. Fix the above, or run the suite\n";
+  print STDERR "             by hand and accept that nothing is protecting the host.\n";
+  exit 99;
+}
+
+sub first_line {
+  my ($file) = @_;
+  open my $fh, '<', $file or return;
+  my $line = <$fh> // '';
+  close $fh;
+  chomp $line;
+  return $line;
+}
+
+# ----------------------------------------- inside the scope: do the limits hold?
+
+# The second stage. Nobody calls this by hand; the systemd-run call at the
+# bottom does, as
+#
+#   capped-test --in-scope UNIT READY_FD MEMORY_MAX_BYTES COMMAND...
+#
+# so that what gets checked is the cgroup the command is about to run in, not a
+# property list systemd was handed. Everything it finds wrong is exit 99, and
+# the command is not started.
+if (@ARGV and $ARGV[0] eq '--in-scope') {
+  my (undef, $unit, $ready_fd, $want_mem, $want_cpu, @cmd) = @ARGV;
+
+  my $cgroup = '';
+  if (open my $fh, '<', '/proc/self/cgroup') {
+    /^0::(\S+)/ and $cgroup = $1 while <$fh>;
+    close $fh;
+  }
+  die_uncappable("systemd-run did not put the run into $unit.scope (it is in "
+    . ($cgroup || 'no cgroup v2 group') . ")")
+    unless $cgroup =~ m{/\Q$unit\E\.scope$};
+
+  my $dir = "/sys/fs/cgroup$cgroup";
+
+  my $mem = first_line("$dir/memory.max");
+  die_uncappable("memory.max of $unit.scope is " . ($mem // 'not readable')
+    . ", not $want_mem -- MemoryMax was accepted and is not in force")
+    unless defined $mem and $mem eq $want_mem;
+
+  # CPUQuota=200% is cpu.max "200000 100000" (quota and period, microseconds).
+  # Like MemoryMax it is accepted by systemd-run whether or not the cpu
+  # controller was delegated to the user slice, so it is read back as well.
+  my $cpu = first_line("$dir/cpu.max");
+  die_uncappable("cpu.max of $unit.scope is " . ($cpu // 'not readable')
+    . ", not $want_cpu -- CPUQuota was accepted and is not in force")
+    unless defined $cpu and $cpu eq $want_cpu;
+
+  # A kernel without swap accounting has no memory.swap.max to write to, and
+  # systemd then drops MemorySwapMax with nothing but a log line. Whether that
+  # matters depends on the host: with no swap device there is nothing a run
+  # could be paged out to, and the RAM cap alone already means "killed at the
+  # cap". With swap and no way to close it off, this is the 2026-10-07 incident
+  # with a wrapper in front of it -- refuse.
+  my $swap = first_line("$dir/memory.swap.max");
+  if (defined $swap) {
+    die_uncappable("memory.swap.max of $unit.scope is $swap, not 0"
+      . " -- MemorySwapMax was accepted and is not in force")
+      unless $swap eq '0';
+  }
+  elsif (host_has_swap()) {
+    die_uncappable("$unit.scope has no memory.swap.max and this host has swap"
+      . " -- at the cap the run would be paged out, not killed");
+  }
+  else {
+    print STDERR "capped-test: no memory.swap.max here, and no swap on this host to cap\n";
+  }
+
+  # Tell the outer capped-test that the command really is being started: from
+  # its side a systemd-run that failed and a test run that failed are both just
+  # a non-zero exit.
+  open my $ready, '>&=', $ready_fd
+    or die_uncappable("lost the handle back to the outer capped-test: $!");
+  syswrite $ready, '1';
+
+  # Not exec: this process has to outlive the command to read the peak. Signals
+  # sent to the scope's main process (timeout(1), a kill) are passed on to it.
+  my $pid = fork;
+  unless (defined $pid) {
+    print STDERR "capped-test: cannot fork: $!\n";
+    exit 127;
+  }
+  if (!$pid) {
+    { no warnings 'exec'; exec { $cmd[0] } @cmd }
+    print STDERR "capped-test: cannot run $cmd[0]: $!\n";
+    POSIX::_exit(127);
+  }
+  $SIG{$_} = sub { kill $_[0], $pid } for qw(TERM INT HUP QUIT);
+  waitpid $pid, 0;
+  my $wait = $?;
+  $SIG{$_} = 'DEFAULT' for qw(TERM INT HUP QUIT);
+
+  my $peak = first_line("$dir/memory.peak");
+  syswrite $ready, "P$peak\n" if defined $peak and $peak =~ /^\d+$/;
+  close $ready;
+
+  # The command's end, as it was: its exit status, or the same signal.
+  if ($wait & 127) {
+    my $sig = $wait & 127;
+    POSIX::sigaction($sig, POSIX::SigAction->new('DEFAULT'));
+    kill $sig, $$;
+    sleep 1;
+  }
+  exit($wait >> 8);
+}
+
+sub host_has_swap {
+  return 0 unless -e '/proc/swaps';             # kernel built without swap
+  open my $fh, '<', '/proc/swaps' or return 1;  # cannot tell: assume the bad case
+  my @lines = <$fh>;
+  close $fh;
+  return @lines > 1;                            # anything below the header line
+}
+
+my @cmd = @ARGV ? @ARGV : (qw(prove -lr t/));
+
+# ------------------------------------------------- can we actually cap anything?
+
+die_uncappable('systemd-run is not in PATH')
+  unless grep { -x "$_/systemd-run" } split /:/, ($ENV{PATH} || '');
+
+die_uncappable('no user systemd session (XDG_RUNTIME_DIR unset)')
+  unless $ENV{XDG_RUNTIME_DIR};
+
+# A --user scope can only enforce MemoryMax if the memory controller has been
+# delegated down to the user slice. Without the delegation systemd-run happily
+# accepts -p MemoryMax= and then enforces nothing at all, which is the silent
+# failure this check exists for.
+my $uid   = $<;
+my $ctrls = "/sys/fs/cgroup/user.slice/user-$uid.slice/cgroup.controllers";
+if (open my $fh, '<', $ctrls) {
+  my $line = <$fh> // '';
+  close $fh;
+  die_uncappable("the memory cgroup controller is not delegated to user-$uid.slice"
+    . " (has: " . join(' ', split ' ', $line) . ")")
+    unless $line =~ /\bmemory\b/;
+}
+else {
+  die_uncappable("cannot read $ctrls -- is this a cgroup v2 host?");
+}
+
+# The in-scope check compares memory.max against a number, so the size has to be
+# one this script can turn into that number -- which also keeps "infinity" and
+# percentages, both of which systemd would take, from passing as a cap.
+my %unit_power = ('' => 0, K => 1, M => 2, G => 3, T => 4);
+my $mem_bytes = $MEMMAX =~ /^(\d+)([KMGT]?)$/ ? $1 * 1024 ** $unit_power{$2} : 0;
+my $page      = POSIX::sysconf(POSIX::_SC_PAGESIZE()) || 4096;
+$mem_bytes -= $mem_bytes % $page;   # the kernel stores whole pages
+die_uncappable("DBIO_TEST_MEMMAX=$MEMMAX is not a size that can be checked"
+  . " against the cgroup (use e.g. 512M or 4G)")
+  unless $mem_bytes;
+
+# systemd's CPUQuota is a percentage of one CPU; the kernel's cpu.max is quota
+# and period (systemd's default period, 100 ms).
+my $cpu_max = $CPUQUOTA =~ /^([1-9]\d*)%$/ ? ($1 * 1000) . ' 100000' : '';
+die_uncappable("DBIO_TEST_CPUQUOTA=$CPUQUOTA is not a percentage that can be"
+  . " checked against the cgroup (use e.g. 200%)")
+  unless $cpu_max;
+
+# ------------------------------------------------------------------- run it
+
+my $unit = "dbio-capped-test-$$";
+
+# The in-scope stage writes one byte here right before it execs the command.
+pipe(my $ready_r, my $ready_w) or die_uncappable("pipe: $!");
+fcntl($ready_w, Fcntl::F_SETFD(), 0) or die_uncappable("fcntl: $!");   # survive exec
+
+print STDERR "capped-test: MemoryMax=$MEMMAX MemorySwapMax=0 CPUQuota=$CPUQUOTA nice=19 ionice=idle\n";
+print STDERR "capped-test: @cmd\n\n";
+
+my @wrapped = (
+  'systemd-run', '--user', '--scope', "--unit=$unit", '--quiet',
+  '-p', 'CollectMode=inactive-or-failed',   # an OOM-killed scope ends "failed"; do not keep it
+  '-p', 'MemoryAccounting=yes',
+  '-p', "MemoryMax=$MEMMAX",
+  '-p', 'MemorySwapMax=0',
+  '-p', "CPUQuota=$CPUQUOTA",
+  'nice', '-n', '19', 'ionice', '-c3',
+  $^X, Cwd::abs_path($0), '--in-scope', $unit, fileno($ready_w), $mem_bytes, $cpu_max,
+  @cmd,
+);
+
+my $rc = system(@wrapped);
+my $exec_error = $!;
+my $status = $rc == -1 ? 2 : $rc >> 8;
+my $signal = $rc == -1 ? 0 : $rc & 127;
+
+close $ready_w;
+$ready_r->blocking(0);
+my $from_scope = '';
+while (sysread $ready_r, my $chunk, 4096) { $from_scope .= $chunk }
+unless (length $from_scope) {
+  exit 99 if $status == 99;   # the in-scope stage refused, and has said why
+  die_uncappable("systemd-run did not start the run ("
+    . ($rc == -1 ? "could not be executed: $exec_error"
+      : $signal  ? "signal $signal" : "exit $status")
+    . "); what it printed above is the reason");
+}
+
+# ------------------------------------------------------- what did it consume?
+
+# The in-scope stage read memory.peak of the scope after the command ended and
+# sent it along ("P<bytes>"). That is the figure; it exists for any run, however
+# short (k295). Only where the kernel gives no memory.peak does this fall back
+# to what systemd logs when the scope goes away ("Consumed ... memory peak"),
+# which on a short run journalctl may get to before systemd has written it:
+# nine tries at 0.2s is ~2s of patience, a read against the local journal, not a
+# wait loop against a cluster. The journal is also where an OOM kill is recorded.
+sub human_bytes {
+  my ($bytes) = @_;
+  my @unit = ('B', 'K', 'M', 'G', 'T');
+  my $i = 0;
+  while ($bytes >= 1024 and $i < $#unit) { $bytes /= 1024; $i++ }
+  return $i ? sprintf('%.1f%s', $bytes, $unit[$i]) : "${bytes}B";
+}
+
+my ($peak, $oom);
+$peak = human_bytes($1) if $from_scope =~ /P(\d+)\n/;
+
+for (1 .. ($peak ? ($signal || $status ? 1 : 0) : 9)) {
+  no warnings 'exec';
+  my $out = '';
+  if (open my $fh, '-|', qw(journalctl --user -b 0 --no-pager -o cat),
+      '--since', "\@$^T", '-g', $unit) {
+    local $/;
+    $out = <$fh> // '';
+    close $fh;
+  }
+  $oom ||= $out =~ /killed by the OOM killer|result 'oom-kill'/;
+  if (!$peak and $out =~ /([\d.]+[KMG]?) memory peak/) { $peak = $1; last }
+  last if $peak;
+  select undef, undef, undef, 0.2;
+}
+
+print STDERR "\ncapped-test: peak "
+  . ($peak // '(unknown: no memory.peak in the scope and systemd logged no figure)')
+  . " of $MEMMAX allowed\n";
+
+if ($signal or $status) {
+  # At the cap the kernel kills the process that holds the memory -- with swap
+  # at 0 there is nothing else it can do. That does not reliably look like a
+  # kill from out here: under prove the victim is one test file, and prove then
+  # exits 1 as it does after any failed test. systemd's record of the scope
+  # ($oom) settles it when the journal can be read; without it anything
+  # non-zero still gets the reminder, phrased so a genuine test failure is not
+  # misread as an OOM.
+  my $killed = ($oom or $signal == 9 or $status == 137);
+  print STDERR "capped-test: the run "
+    . ($killed ? "was KILLED -- it hit the $MEMMAX cap.\n"
+               : "failed (exit " . ($signal ? "signal $signal" : $status) . ").\n");
+  print STDERR "             The host is fine either way -- the cap confines the\n";
+  print STDERR "             run, not the box. If this was memory and the suite\n";
+  print STDERR "             legitimately needs more, raise it explicitly:\n";
+  print STDERR "             DBIO_TEST_MEMMAX=4G maint/capped-test @cmd\n";
+}
+
+exit($signal ? 128 + $signal : $status);

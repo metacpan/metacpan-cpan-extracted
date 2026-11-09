@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # t/50-arrow.t — DBIO::DuckDB::Storage escape hatches: duckdb_appender,
-# duckdb_arrow_fetch, duckdb_read_csv, duckdb_version.
+# duckdb_arrow_fetch (the shape; the types are t/68), duckdb_read_csv, duckdb_version.
 
 use strict;
 use warnings;
@@ -33,17 +33,22 @@ $app->flush;
 my ($n) = $storage->dbh->selectrow_array('SELECT COUNT(*) FROM cd');
 is $n, 1000, 'appender loaded 1000 rows';
 
-# --- Arrow fetch (DBI fallback for now) -------------------------------
+# --- Arrow fetch: columnar, names / formats / columns / rows -----------
+# (every type: t/68-arrow-fetch.t)
 
-my $rows = $storage->duckdb_arrow_fetch(
-  q{SELECT (CAST(year AS INTEGER) / 10) * 10 AS decade, COUNT(*) AS n
+my $t = $storage->duckdb_arrow_fetch(
+  q{SELECT (CAST(year AS INTEGER) // 10) * 10 AS decade, COUNT(*) AS n
     FROM cd GROUP BY decade ORDER BY decade},
   [],
 );
-is ref $rows, 'ARRAY', 'arrow_fetch returns arrayref';
-ok scalar @$rows, 'arrow_fetch returned rows';
-ok exists $rows->[0]{decade}, 'decade key present';
-ok exists $rows->[0]{n},      'count key present';
+is ref $t, 'HASH', 'arrow_fetch returns a hash reference';
+is_deeply $t->{names}, [qw(decade n)], 'column names, in result order';
+is_deeply $t->{formats}, [qw(i l)], 'Arrow formats: INTEGER and BIGINT';
+is $t->{rows}, 5, 'five decades';
+is_deeply $t->{columns}, [
+  [ 1970, 1980, 1990, 2000, 2010 ],
+  [ 200, 200, 200, 200, 200 ],
+], 'one array of values per column';
 
 # --- read_csv helper --------------------------------------------------
 

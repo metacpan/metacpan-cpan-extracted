@@ -10,7 +10,7 @@ col title   => text;
 
 primary_key 'trackid';
 
-unique 'title', 'cdid';
+unique ['title', 'cdid'];
 
 belongs_to cd => 'MyApp::SchemaCake::Result::Cd', 'cdid';
 

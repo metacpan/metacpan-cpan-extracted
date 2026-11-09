@@ -32,6 +32,13 @@ plan skip_all => 'DBIO_TEST_MYSQL_DSN not set'
   __PACKAGE__->register_class(Thing => 'RT::Result::Thing');
 }
 
+# A schema always declares its driver (core ADR 0067): the component of the
+# storage class the DSN's DBD is registered for -- MySQL::MariaDB for a
+# dbi:MariaDB: DSN.
+RT::Schema->load_components(
+  $ENV{DBIO_TEST_MYSQL_DSN} =~ /\Adbi:MariaDB:/i ? 'MySQL::MariaDB' : 'MySQL'
+);
+
 my $schema = RT::Schema->connect(
   $ENV{DBIO_TEST_MYSQL_DSN},
   $ENV{DBIO_TEST_MYSQL_USER},

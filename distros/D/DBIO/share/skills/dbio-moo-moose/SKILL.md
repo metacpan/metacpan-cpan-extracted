@@ -1,6 +1,6 @@
 ---
 name: dbio-moo-moose
-description: "Minimal reference for DBIO's optional Moo/Moose bridges and the Moo/Moose code generators. Use only when wiring DBIO::Moo/DBIO::Moose into a result class, or when emitting Moo/Moose result classes via DBIO::Generate."
+description: Use when wiring DBIO::Moo or DBIO::Moose into a result class, or emitting Moo/Moose result classes via DBIO::Generate.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -63,6 +63,8 @@ extends 'DBIO::Core';
 
 Same `emit($class, $spec)` contract as `DBIO::Generate::Style::Vanilla`. Pick the
 style via the generator's style arg; keep the emitter free of a runtime Moo dep.
+
+Both bridges enable `strict` and `warnings` in the caller themselves — do not write them twice.
 
 ## Boundaries
 

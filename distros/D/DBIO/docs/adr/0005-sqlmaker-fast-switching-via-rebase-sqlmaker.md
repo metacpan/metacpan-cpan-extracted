@@ -26,12 +26,12 @@ SQL-generation core of a live `$schema`'s storage onto a requested SQLMaker base
 class — guaranteed by design and by tests to keep working.
 
 - The "nexus class" contract is stated in the SQLMaker POD DESCRIPTION
-  (`lib/DBIO/SQLMaker.pm:43-51`): the indirection is "explicitly maintained in
+  (`lib/DBIO/SQLMaker.pm`): the indirection is "explicitly maintained in
   order to allow swapping out the core of SQL generation within DBIO on
   per-C<$schema> basis without major architectural changes … guaranteed by
   design and tests."
 - `connect_call_rebase_sqlmaker($requested_base_class)`
-  (`lib/DBIO/Storage/DBI.pm:1603-1648`) does the swap mechanically: it is a
+  (in `lib/DBIO/Storage/DBI.pm`) does the swap mechanically: it is a
   *rebase*, not a re-bless. It synthesises a new class
   `"${old}__REBASED_ON__${requested}"`, injects it with `@ISA = ($old,
   $requested)` via `inject_base`, reinitialises C3 MRO, points
@@ -39,10 +39,10 @@ class — guaranteed by design and by tests to keep working.
   so the next access rebuilds through the combined hierarchy.
 - The swap is gated for consistency: the target must descend from
   `DBIO::SQLMaker::ClassicExtensions` and from a `SQL::Abstract` engine
-  (`DBI.pm:1629-1636`), so a rebase can only land on a SQLMaker that already
+  (the gate in `connect_call_rebase_sqlmaker`), so a rebase can only land on a SQLMaker that already
   honours ADR 0002/0004 — it cannot smuggle in an off-hierarchy SQL core.
 - `ClassicExtensions` documents itself as the "quasi-role … mixed in via classic
-  C<@ISA>" and points at this hook (`lib/DBIO/SQLMaker/ClassicExtensions.pm:7-12`).
+  C<@ISA>" and points at this hook (`lib/DBIO/SQLMaker/ClassicExtensions.pm`).
 
 ## Rationale
 
@@ -68,11 +68,11 @@ actually fires on a real `as_query`.
 
 - The SQLMaker stays a deliberately thin nexus. New drivers benefit for free:
   any DBIO SQLMaker subclass is rebase-eligible as long as it keeps the
-  `ClassicExtensions` + `SQL::Abstract` ancestry the gate (`DBI.pm:1629-1636`)
-  requires.
+  `ClassicExtensions` + `SQL::Abstract` ancestry the gate in
+  `connect_call_rebase_sqlmaker` requires.
 - Rebasing is idempotent and ordered: `connect_call_rebase_sqlmaker` returns
   early if the current class already `isa` the requested base
-  (`DBI.pm:1614-1617`), and the synthetic class places the *old* class before
+  (in `connect_call_rebase_sqlmaker`), and the synthetic class places the *old* class before
   the requested one in `@ISA`, so the DBIO `new` override (ADR 0004) keeps
   precedence.
 - The fast-switch contract is load-bearing and test-pinned. `t/sqlmaker/rebase.t`

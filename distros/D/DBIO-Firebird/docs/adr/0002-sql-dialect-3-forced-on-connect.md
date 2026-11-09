@@ -13,7 +13,7 @@ delimited identifiers, the `BIGINT` / `TIMESTAMP` / `TIME` types and exact
 default.**
 
 DBIO::Firebird depends on dialect-3 behaviour throughout: the storage base sets
-the quote char to `"` (`Storage/Common.pm:17`), and the type system and
+the quote char to `"` (`sql_quote_char` in `Storage/Common.pm`), and the type system and
 introspection assume dialect-3 type semantics. Running against the DBD default
 (dialect 1) would break identifier quoting and type handling.
 
@@ -21,7 +21,7 @@ introspection assume dialect-3 type semantics. Running against the DBD default
 
 Force SQL dialect 3 at connect time. `DBIO::Firebird::Storage::InterBase`
 overrides `_init` to call `_set_sql_dialect(3)`
-(`Storage/InterBase.pm:50-71`):
+(`_init` and `_set_sql_dialect` in `Storage/InterBase.pm`):
 
 - `_init` runs `_set_sql_dialect(3)`.
 - `_set_sql_dialect` rewrites the DSN: if the DSN does not already contain
@@ -34,7 +34,7 @@ overrides `_init` to call `_set_sql_dialect(3)`
 
 The in-code comment states the reason plainly: "We want dialect 3 for new
 features and quoting to work, DBD::InterBase uses dialect 1 (interbase compat)
-by default" (`Storage/InterBase.pm:50-51`).
+by default" (comment above `_init` in `Storage/InterBase.pm`).
 
 ## Rationale
 

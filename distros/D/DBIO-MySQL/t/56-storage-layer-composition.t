@@ -15,6 +15,12 @@ use mro;
 # real database. The end-to-end live proof lives in t/57-*-live.t (gated on
 # DBIO_TEST_MYSQL_*). Modelled on the PostgreSQL reference t/38 and core
 # t/composed/async_walk_base.t.
+#
+# The layers compose over the DECLARED driver storage: a schema always has a
+# driver (core ADR 0067), and a storage composed over the generic
+# DBIO::Storage::DBI has none -- it is refused, never moved into the driver the
+# DSN's DBD is registered for (section 4). Before ADR 0067 sections 2 and 3
+# composed over the generic storage and asserted the rebless onto MySQL.
 
 use DBIO::Test;
 use DBIO::Storage::DBI;
@@ -70,21 +76,21 @@ ok !T::MyExt::Storage::Async->isa('DBIO::Storage::Async'),
 }
 
 # ===========================================================================
-# 2. ASYNC composition: a layered schema connected { async => 'future_io' }
-#    resolves the MySQL future_io transport off the DRIVER (not the layer) and
-#    composes the layer's ::Async mirror ON TOP of that transport.
-#    Structural only -- driver rebless is a dsn-string parse, no DB is opened.
+# 2. ASYNC composition: a layered storage over the declared MySQL driver,
+#    connected { async => 'future_io' }, resolves the MySQL future_io transport
+#    off the DRIVER (not the layer) and composes the layer's ::Async mirror ON
+#    TOP of that transport.
+#    Structural only -- driver determination reads the dsn, no DB is opened.
 # ===========================================================================
 {
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
   $schema->register_storage_layer('T::MyExt::Storage');
 
-  # A composed GENERIC storage (base == DBIO::Storage::DBI) bound to the schema,
-  # in future_io mode. The dsn drives the driver rebless to DBIO::MySQL::Storage
-  # (DBI-style parse of 'mysql'); { async } sets the mode. No connection is ever
-  # opened.
+  # A storage composed over the declared driver (base == DBIO::MySQL::Storage),
+  # bound to the schema, in future_io mode. { async } sets the mode. No
+  # connection is ever opened.
   my $composed_class =
-    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['T::MyExt::Storage']);
+    DBIO::Storage::Composed->compose('DBIO::MySQL::Storage', ['T::MyExt::Storage']);
   my $storage = $composed_class->new($schema);
   $storage->connect_info(
     [ 'dbi:mysql:dbname=dbio_offline_compose', '', '', { async => 'future_io' } ]
@@ -95,14 +101,15 @@ ok !T::MyExt::Storage::Async->isa('DBIO::Storage::Async'),
   ok !$err, 'future_io resolution over a layered MySQL storage does not croak'
     or diag "died with: $err";
 
-  # The sync storage reblessed onto the MySQL driver, keeping its layer through
-  # the rebless (the layer is more-specific than the driver in the composed MRO).
+  # The sync storage stays the declared MySQL driver's, keeping its layer
+  # through driver determination (the layer is more-specific than the driver in
+  # the composed MRO).
   isa_ok $storage, 'DBIO::MySQL::Storage',
-    'sync storage reblessed onto the MySQL driver';
+    'sync storage is the declared MySQL driver\'s';
   isa_ok $storage, 'T::MyExt::Storage',
-    'sync storage kept its layer through the driver rebless';
+    'sync storage kept its layer through driver determination';
   ok +(grep { $_ eq 'T::MyExt::Storage' } @{ mro::get_linear_isa(ref $storage) }),
-    'the layer sits in the reblessed storage MRO';
+    'the layer sits in the storage MRO';
 
   # The resolved transport is the MySQL future_io adapter -- found off the
   # driver, NOT the layer's plain ::Async mirror.
@@ -121,9 +128,9 @@ ok !T::MyExt::Storage::Async->isa('DBIO::Storage::Async'),
 }
 
 # ===========================================================================
-# 3. MariaDB flavour: a dbi:MariaDB: dsn reblesses to the MariaDB driver storage
-#    and the walk resolves its MariaDB future_io adapter, still composing the
-#    layer's async mirror on top.
+# 3. MariaDB flavour: a layered storage over the declared MariaDB driver storage
+#    (the DBD::MariaDB binding) with a dbi:MariaDB: dsn resolves its MariaDB
+#    future_io adapter, still composing the layer's async mirror on top.
 # ===========================================================================
 {
   eval { require DBIO::MySQL::Storage::MariaDB::Async; 1 }
@@ -133,8 +140,9 @@ ok !T::MyExt::Storage::Async->isa('DBIO::Storage::Async'),
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
   $schema->register_storage_layer('T::MyExt::Storage');
 
-  my $composed_class =
-    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['T::MyExt::Storage']);
+  my $composed_class = DBIO::Storage::Composed->compose(
+    'DBIO::MySQL::Storage::MariaDB', ['T::MyExt::Storage']
+  );
   my $storage = $composed_class->new($schema);
   $storage->connect_info(
     [ 'dbi:MariaDB:dbname=dbio_offline_compose', '', '', { async => 'future_io' } ]
@@ -146,13 +154,41 @@ ok !T::MyExt::Storage::Async->isa('DBIO::Storage::Async'),
     or diag "died with: $err";
 
   isa_ok $storage, 'DBIO::MySQL::Storage::MariaDB',
-    'sync storage reblessed onto the MariaDB driver';
+    'sync storage is the declared MariaDB driver storage\'s';
   isa_ok $async, 'DBIO::MySQL::Storage::MariaDB::Async',
     'the resolved transport is the MariaDB future_io adapter (convention off the driver)';
   isa_ok $async, 'DBIO::MySQL::Storage::Async',
     '... which is the same MySQL transport (subclass)';
   isa_ok $async, 'T::MyExt::Storage::Async',
     'the async mirror composed the layer ::Async on top of the MariaDB transport';
+}
+
+# ===========================================================================
+# 4. No driver from the DSN (core ADR 0067): a layered storage over the GENERIC
+#    DBIO::Storage::DBI has no driver. With a dbi:mysql: dsn -- the DBD this
+#    driver is registered for -- its driver determination is refused, and the
+#    storage is never moved into DBIO::MySQL::Storage. A core before ADR 0067
+#    still reblesses it; there this section is skipped.
+# ===========================================================================
+SKIP: {
+  skip 'the installed DBIO core predates ADR 0067 (no DBIO->driver_for)', 4
+    unless DBIO->can('driver_for');
+
+  my $schema = DBIO::Test->init_schema(no_deploy => 1);
+  my $composed_class =
+    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['T::MyExt::Storage']);
+  my $storage = $composed_class->new($schema);
+  $storage->connect_info(
+    [ 'dbi:mysql:dbname=dbio_offline_compose', '', '', { async => 'future_io' } ]
+  );
+
+  my $async = eval { $storage->async };
+  like "$@", qr/has no driver.*ADR 0067/s,
+    'a layered generic storage with a dbi:mysql: dsn is refused, naming ADR 0067';
+  ok !$async, '... no async backend is resolved for it';
+  is ref($storage), $composed_class, '... the storage stays in the class it had';
+  ok !$storage->isa('DBIO::MySQL::Storage'),
+    '... never the MySQL driver storage the DBD is registered for';
 }
 
 done_testing;

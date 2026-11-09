@@ -3,6 +3,10 @@ package DBIO::InflateColumn::Serializer;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
+use DBIO::Util ();
 use namespace::clean;
 
 
@@ -14,6 +18,7 @@ sub register_column {
     return unless defined $info->{'serializer_class'};
 
     my $class = "DBIO::InflateColumn::Serializer::$info->{'serializer_class'}";
+    DBIO::Util::assert_class_name($class);
     eval "require ${class};";
     $self->throw_exception("Failed to use serializer_class '${class}': $@") if $@;
 
@@ -45,7 +50,7 @@ DBIO::InflateColumn::Serializer - Inflators to serialize data structures for DBI
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

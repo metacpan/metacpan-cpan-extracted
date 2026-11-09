@@ -90,14 +90,23 @@ use_ok 'DBIO::Sybase::Introspect';
     };
   }
 
-  # Stub dbh for view_definition's selectrow_array.
+  # Stub dbh for view_definition's selectcol_arrayref.
+  #
+  # CLAIM REPLACED (karr k48): this stub used to answer a selectrow_array on
+  # INFORMATION_SCHEMA.VIEWS with the bare SELECT. ASE has no such view; the
+  # definition lives in syscomments as the whole CREATE VIEW statement, split
+  # into rows of at most 255 characters. The stub now returns it that way, so
+  # the assertion below pins joining the rows and stripping the CREATE VIEW
+  # head as well as the trimming it pinned before.
   sub dbh { $_[0]->{dbh} //= bless {}, 'Test::Sybase::MockDBH' }
 
   package Test::Sybase::MockDBH;
-  sub selectrow_array {
+  sub selectcol_arrayref {
     my ($self, $sql, $attr, $schema, $table) = @_;
-    return '  SELECT id FROM artist ;  ' if $table eq 'myview';
-    return undef;
+    die "view_definition must read syscomments: $sql" unless $sql =~ /syscomments/i;
+    return [ '  create view myview as  SELECT id ', 'FROM artist ;  ' ]
+      if $table eq 'myview';
+    return [];
   }
 }
 
@@ -165,7 +174,7 @@ is $fx->table_is_view('myview'), 1, 'view is a view';
 
 # --- view_definition (trimmed; non-views -> undef) ----------------------
 is $fx->view_definition('myview'), 'SELECT id FROM artist',
-  'view_definition trimmed of whitespace + trailing semicolon';
+  'view_definition: syscomments rows joined, CREATE VIEW head, whitespace and trailing semicolon stripped';
 is $fx->view_definition('artist'), undef, 'non-view view_definition undef';
 
 # --- optional: generate-via-introspect (only if DBIO::Generate present) -

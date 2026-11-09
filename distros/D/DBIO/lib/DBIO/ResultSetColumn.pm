@@ -4,9 +4,12 @@ package DBIO::ResultSetColumn;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 use DBIO::Carp;
-use DBIO::Util qw(fail_on_internal_wantarray assert_no_internal_wantarray);
+use DBIO::Util qw(assert_no_list_context assert_function_name);
+use Scalar::Util 'blessed';
 use namespace::clean;
 
 
@@ -85,7 +88,11 @@ sub new {
   return bless {
     _select => $select,
     _as => $column,
-    _parent_resultset => $new_parent_rs
+    _parent_resultset => $new_parent_rs,
+    # A column resultset built from a context-bound resultset inherits the
+    # pinned async context, so $rs->with_context($ctx)->get_column($c)->all_async
+    # fetches on the pinned connection instead of the pool.
+    ( $rs->_async_context ? ( _async_context => $rs->_async_context ) : () ),
   }, $class;
 }
 
@@ -147,12 +154,58 @@ sub single {
 
 
 
+sub single_async {
+  my $self = shift;
+
+  return $self->_rsc_run_async('single',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my $attrs = $self->_resultset->_resolved_attrs;
+      return $backend->select_single_async(
+        $attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs,
+      )->then(sub {
+        my ($raw_row) = @_;
+        return (defined $raw_row && ref $raw_row eq 'ARRAY') ? $raw_row->[0] : $raw_row;
+      });
+    },
+    sub { $self->single },
+  );
+}
+
+
+
+sub all_async {
+  my $self = shift;
+
+  return $self->_rsc_run_async('all',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my $attrs = $self->_resultset->_resolved_attrs;
+      return $backend->select_async(
+        $attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs,
+      )->then(sub {
+        my @raw = @_;
+        return $fc->done( map { $_->[0] } @raw );
+      });
+    },
+    sub { $self->all },
+  );
+}
+
+
+
 sub min {
   return shift->func('MIN');
 }
 
 
 sub min_rs { return shift->func_rs('MIN') }
+
+
+
+sub min_async { return shift->_run_func_async('MIN', 'min') }
 
 
 
@@ -165,6 +218,10 @@ sub max_rs { return shift->func_rs('MAX') }
 
 
 
+sub max_async { return shift->_run_func_async('MAX', 'max') }
+
+
+
 sub sum {
   return shift->func('SUM');
 }
@@ -174,15 +231,20 @@ sub sum_rs { return shift->func_rs('SUM') }
 
 
 
+sub sum_async { return shift->_run_func_async('SUM', 'sum') }
+
+
+
 sub func {
   my ($self,$function) = @_;
+
+  assert_function_name($function, "->func");
+
+  # ADR 0042: func() used to return one value per row in list context.
+  # It now always returns the single scalar and refuses list context.
+  assert_no_list_context('->func') if wantarray;
+
   my $cursor = $self->func_rs($function)->cursor;
-
-  if( wantarray ) {
-    assert_no_internal_wantarray and my $sog = fail_on_internal_wantarray;
-    return map { $_->[ 0 ] } $cursor->all;
-  }
-
   return ( $cursor->next )[ 0 ];
 }
 
@@ -190,6 +252,8 @@ sub func {
 
 sub func_rs {
   my ($self,$function) = @_;
+
+  assert_function_name($function, "->func_rs");
 
   my $rs = $self->{_parent_resultset};
   my $select = $self->{_select};
@@ -203,6 +267,120 @@ sub func_rs {
   $rs->search( undef, {
     columns => { $self->{_as} => { $function => $select } }
   } );
+}
+
+
+
+sub func_async {
+  my ($self, $function) = @_;
+  return $self->_run_func_async($function, 'func');
+}
+
+# Shared by min_async/max_async/sum_async/func_async: builds the resultset
+# func_rs($function) would query and fetches its one aggregate row through
+# select_single_async, bypassing the cursor -- the same shape single_async
+# uses, and the async equivalent of func()'s own scalar-context
+# ($cursor->next)[0] return.
+sub _run_func_async {
+  my ($self, $function, $name) = @_;
+
+  return $self->_rsc_run_async($name,
+    sub {
+      my ($backend, $fc) = @_;
+
+      my $attrs = $self->func_rs($function)->_resolved_attrs;
+      return $backend->select_single_async(
+        $attrs->{from}, $attrs->{select}, $attrs->{where}, $attrs,
+      )->then(sub {
+        my ($raw_row) = @_;
+        return (defined $raw_row && ref $raw_row eq 'ARRAY') ? $raw_row->[0] : $raw_row;
+      });
+    },
+    # scalar: _rsc_run_async's sync fallback runs its closure in list
+    # context (my @r = eval { ... }), and func() now refuses list context
+    # outright (ADR 0042) -- force scalar so the immediate mode keeps working.
+    sub { scalar $self->func($function) },
+  );
+}
+
+# ResultSetColumn-level mirror of DBIO::ResultSet::_rs_run_async /
+# DBIO::Row::_row_run_async (ADR 0030/0031), one tier down: route to a live
+# embedded backend, degrade synchronously in the 'immediate' mode, or croak on
+# a sync instance. RSC has no ResultSet of its own to delegate the dispatch to
+# (it wraps one, via _resultset/_parent_resultset), so it gets its own copy of
+# the three-way contract, exactly as Row does.
+sub _rsc_run_async {
+  my ($self, $name, $backend_build, $sync_run) = @_;
+
+  my $storage = $self->_resultset->result_source->storage;
+  my $fc = $storage->future_class;
+
+  # A pinned context inherited from a context-bound resultset (get_column
+  # on a bound RS) or bound directly wins over the pooled backend, so this
+  # column's single_async/all_async/func_async runs on the pinned connection.
+  # No context => historical path below, unchanged.
+  if (my $ctx = $self->_async_context) {
+    $self->_assert_async_context_active($ctx, $name);
+    $storage->_assert_async_context_owner($ctx);
+    return $backend_build->($ctx, $fc);
+  }
+
+  if (my $backend = $storage->_async_storage) {
+    # A Future derived from the storage's own is reported to the pool (k397).
+    return $backend->can('_note_pooled_derivation')
+      ? $backend->_note_pooled_derivation(sub { $backend_build->($backend, $fc) })
+      : $backend_build->($backend, $fc);
+  }
+
+  $self->throw_exception(
+    "not an async connection -- connect with { async => ... } to use ${name}_async"
+  ) unless defined $storage->_async_mode;
+
+  my @r = eval { $sync_run->() };
+  return $@ ? $fc->fail($@) : $fc->done(@r);
+}
+
+# ADR 0045: the pinned async context bound to this column resultset (undef when
+# unbound). A column resultset produced by ->get_column on a context-bound
+# ResultSet inherits its context (see new()), so a bound $rs->get_column($c)
+# still batches/pins its aggregate fetch. Mirrors the same-named helpers on
+# DBIO::ResultSet / DBIO::Row.
+sub _async_context { $_[0]->{_async_context} }
+
+
+sub with_context {
+  my ($self, $ctx) = @_;
+  $self->throw_exception(
+    'with_context requires an async context object (the one passed to a '
+  . 'txn_do_async / pipeline coderef)'
+  ) unless defined $ctx and blessed($ctx) and $ctx->can('select_async');
+  my $storage = $self->{_parent_resultset}->result_source->storage;
+  $storage->_assert_async_context_owner($ctx);
+  my $clone = bless { %$self }, ref $self;
+  $clone->{_async_context} = $ctx;
+
+  # ADR 0045 / karr k325: func_rs (and min_rs / max_rs / sum_rs) and _resultset
+  # are derived from the parent resultset, so the clone gets a bound clone of
+  # it -- a column bound here then looks the same as one that get_column made
+  # from a bound resultset. The inner resultset is forgotten and built again
+  # from the bound parent on first use. The column this was cloned from keeps
+  # its own parent and stays unbound.
+  $clone->{_parent_resultset} = $self->{_parent_resultset}->with_context($ctx);
+  delete $clone->{_resultset};
+
+  return $clone;
+}
+
+sub _assert_async_context_active {
+  my ($self, $ctx, $name) = @_;
+  return if !$ctx->can('_context_active') || $ctx->_context_active;
+  $self->throw_exception(
+    "the async context bound to this result is no longer active; ${name}_async "
+  . "cannot be routed onto it. Pipeline contexts stop accepting work when their "
+  . "synchronous batch coderef returns; transaction contexts stop on their "
+  . "terminal BEGIN / COMMIT / ROLLBACK path. Issue the async work while its "
+  . "owning context remains active, not from a column held past it."
+  );
 }
 
 
@@ -277,7 +455,7 @@ DBIO::ResultSetColumn - Convenience wrapper for working with a single ResultSet 
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -316,19 +494,78 @@ passed as params. Used internally by L<DBIO::ResultSet/get_column>.
 
 =head2 single
 
+=head2 single_async
+
+=head2 all_async
+
 =head2 min
+
+=head2 min_async
 
 =head2 max
 
+=head2 max_async
+
 =head2 sum
+
+=head2 sum_async
 
 =head2 func
 
 =head2 func_rs
 
+=head2 func_async
+
+=head2 with_context
+
+    $rs->get_column($col)->with_context($ctx)->all_async;
+
+Returns a clone of this column resultset bound to a pinned async context --
+the object handed to a L<DBIO::Storage::Async/txn_do_async> or C<pipeline>
+coderef. Once bound, every C<*_async> method on the clone routes onto the
+context's pinned connection instead of the pool. See
+L<DBIO::ResultSet/with_context> for the full picture; a column resultset
+inherits this binding automatically when produced by C<get_column> or
+C<count_rs> on a context-bound resultset.
+
+The resultsets a bound column hands out -- L</func_rs>, L</min_rs>, L</max_rs>
+and L</sum_rs> -- are bound too, however the column came by its binding. The
+column C<with_context> is called on is left as it was.
+
+In the C<immediate> mode the context C<txn_do_async> hands its coderef is the
+storage itself, and C<with_context> takes it; see
+L<DBIO::ResultSet/with_context> for what is particular to that mode.
+
 =head2 throw_exception
 
 =head2 _resultset
+
+=head1 ASYNC
+
+L</single_async>, L</all_async>, L</min_async>, L</max_async>, L</sum_async>
+and L</func_async> mirror their synchronous counterparts, requiring an async
+connection (C<< connect(..., { async => ... }) >>, see L<DBIO::ResultSet/ASYNC>
+for the full three-way live-backend/C<immediate>/croak contract shared by
+every DBIO C<*_async> method). C<single_async>/C<all_async> route through the
+same backend calls L<DBIO::ResultSet/single_async>/L<DBIO::ResultSet/all_async>
+use, one tier down; C<min_async>/C<max_async>/C<sum_async>/C<func_async> route
+the aggregate through C<func_rs> and the backend's C<select_single_async>,
+bypassing the cursor. One asymmetry worth knowing: if C<func_rs> ends up
+selecting more than one row (e.g. a C<func_async> call over a resultset with
+a C<group_by>, so the "aggregate" is really one value per group),
+C<select_single_async> carps C<"Query returned more than one row...
+DEPRECATED for -E<gt>find and -E<gt>single"> -- naming the wrong methods, since
+it's a shared warning from the storage layer, not written for
+C<min_async>/C<max_async>/C<sum_async>/C<func_async>. The synchronous
+C<func()> has no such warning in this situation: it reads exactly one row off
+the cursor (C<< ($cursor->next)[0] >>) and silently ignores the rest.
+
+L</next>, L</first> and L</reset> have no async twin: they iterate a cursor,
+and there is no async cursor iteration yet -- the same gap ADR 0031 already
+documents for L<DBIO::ResultSet/first_async>'s own over-fetch. This gap
+does not limit C<func_async>, though: C<func> always returns a single
+scalar (L</func>), never a per-row list, so its async twin covers it
+completely.
 
 =head2 as_query
 
@@ -370,7 +607,7 @@ one value.
 
 =back
 
-Returns all values of the column in the resultset (or C<undef> if
+Returns all values of the column in the resultset (an empty list if
 there are none).
 
 Much like L<DBIO::ResultSet/all> but returns values rather
@@ -420,6 +657,23 @@ Much like L<DBIO::ResultSet/single> fetches one and only one column
 value using the cursor directly. If additional rows are present a warning
 is issued before discarding the cursor.
 
+=head2 single_async
+
+  my $future = $rs_column->single_async;
+
+Async variant of L</single>. Requires an async connection (C<< connect(...,
+{ async => ... }) >>); on a sync instance it croaks. In the C<immediate> mode
+it runs synchronously and resolves immediately. See ADR 0030/0031.
+
+=head2 all_async
+
+  my $future = $rs_column->all_async;
+  $future->then(sub { my @values = @_; ... });
+
+Async variant of L</all>. Requires an async connection (C<< connect(...,
+{ async => ... }) >>); on a sync instance it croaks. In the C<immediate> mode
+it runs synchronously and resolves immediately. See ADR 0030/0031.
+
 =head2 min
 
 =over 4
@@ -448,6 +702,16 @@ resultset (or C<undef> if there are none).
   my $rs = $year_col->min_rs();
 
 Wrapper for ->func_rs for function MIN().
+
+=head2 min_async
+
+  my $future = $year_col->min_async;
+
+Async variant of L</min>. Routes the aggregate through C<func_rs('MIN')> and
+the backend's C<select_single_async> (the same shape L</single_async> uses),
+rather than through a cursor. Requires an async connection; on a sync instance
+it croaks. In the C<immediate> mode it runs synchronously and resolves
+immediately. See ADR 0030/0031.
 
 =head2 max
 
@@ -478,6 +742,16 @@ resultset (or C<undef> if there are none).
 
 Wrapper for ->func_rs for function MAX().
 
+=head2 max_async
+
+  my $future = $year_col->max_async;
+
+Async variant of L</max>. Routes the aggregate through C<func_rs('MAX')> and
+the backend's C<select_single_async> (the same shape L</single_async> uses),
+rather than through a cursor. Requires an async connection; on a sync instance
+it croaks. In the C<immediate> mode it runs synchronously and resolves
+immediately. See ADR 0030/0031.
+
 =head2 sum
 
 =over 4
@@ -507,6 +781,16 @@ the resultset. Use on varchar-like columns at your own risk.
 
 Wrapper for ->func_rs for function SUM().
 
+=head2 sum_async
+
+  my $future = $prices_col->sum_async;
+
+Async variant of L</sum>. Routes the aggregate through C<func_rs('SUM')> and
+the backend's C<select_single_async> (the same shape L</single_async> uses),
+rather than through a cursor. Requires an async connection; on a sync instance
+it croaks. In the C<immediate> mode it runs synchronously and resolves
+immediately. See ADR 0030/0031.
+
 =head2 func
 
 =over 4
@@ -525,6 +809,10 @@ value. Produces the following SQL:
 
   SELECT LENGTH( title ) FROM cd me
 
+The function name is an identifier, optionally schema-qualified
+(C<LENGTH>, C<pg_catalog.max>); any other name throws. Write an expression
+as a literal in C<select> (C<\'...'> or C<\[ ... ]>).
+
 =head2 func_rs
 
 =over 4
@@ -535,7 +823,22 @@ value. Produces the following SQL:
 
 =back
 
-Creates the resultset that C<func()> uses to run its query.
+Creates the resultset that C<func()> uses to run its query. The function name is an
+identifier as described at L</func>. A binding made
+with L</with_context> goes with it.
+
+=head2 func_async
+
+  my $future = $rs_column->func_async('LENGTH');
+
+Async variant of L</func>. Routes the aggregate through C<func_rs($function)>
+and the backend's C<select_single_async>, exactly like L</min_async>,
+L</max_async> and L</sum_async>. Like L</func> it returns the single scalar
+value the aggregate produces; there is no per-row list variant to mirror.
+
+Requires an async connection; on a sync instance it croaks. In the
+C<immediate> mode it runs synchronously and resolves immediately. See ADR
+0030/0031.
 
 =head2 throw_exception
 

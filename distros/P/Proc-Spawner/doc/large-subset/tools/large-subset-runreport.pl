@@ -9,6 +9,10 @@
 #   answers itself in place of the program: K0, rule F, kill $$).
 #   -x: also the atomic calls of external programs (not the coreutils ones): every sample that makes some, in the classes
 #   of the main table (the calls compared as a sorted list); where dash and bash agree and ours differs, call by call.
+#   -b BASEDIR (post-0.09, X27): OUTDIR is a run with -env (large-subset-runcompare.pl), BASEDIR one of the same samples
+#   without: a table of each sample's class in BASEDIR against its class in OUTDIR, and every sample whose class changed
+#   or whose result changed (status, out, err, rec, files, in any of the three shells: "same class, other result").
+#   -c FILE: every sample's class, one line each (id, class).
 # Before comparing, each shell's own prefix is taken off its messages ("dash: 1: ", "bash: line 1: ", "bash: ",
 # "sh: 1: ", "sh: ", also after a path, and for dash and bash also inside a line): the wording after it is still
 # compared, but as a multiset of characters, because the shells write a message of a pipeline element in several
@@ -23,8 +27,9 @@
 #           =dash, =bash, neither: dash and bash differ beyond the messages; ours agrees with dash, with bash, or
 #                     with neither (messages ignored here)
 #           timeout   a shell ran out of time (5 s); not compared
-use strict; use warnings; use JSON::PP; use Getopt::Long;
-my ($LIST, $QD, $X); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X) && @ARGV == 1 or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] OUTDIR\n";
+use strict; use warnings; use JSON::PP; use Getopt::Long; binmode STDOUT, ':utf8';
+my ($LIST, $QD, $X, $BD, $CF); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF) && @ARGV == 1
+  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR] [-c CLASSES.tsv] OUTDIR\n";
 my %TOOL = map +($_ => 1), qw(echo printf test [ kill pwd);
 my $CMD = qr/(?:^|[;&|({!`]\s*|\$\(\s*|\b(?:then|do|else|elif|command|exec|time|xargs|env)\s+|&&\s*|\|\|\s*)(?:echo|printf|test|\[|kill|pwd)(?=[\s;&|)`]|\z)/m;
 my %INV;   # sample id => 1 if a coreutils tool is involved
@@ -39,20 +44,23 @@ sub norm { my ($r, $sh) = @_; my %n = %$r;
   $n{err} = join '', sort split //, $n{err} =~ s/\n//gr;   # so the messages compare as a multiset of characters
   $n{rec} = join "\n", sort split /\n/, $n{rec};   # pipeline elements log in any order
   \%n }
-my (%t, %parts, %srcs, @list, $total);
+sub classify { my $s = shift;   # the class of one sample, and the parts that differ
+  my ($d, $b, $o) = map norm($s->{$_}, $_), qw(dash bash ours);
+  my $diff = sub { my ($x, $y) = @_; grep $x->{$_} ne $y->{$_}, @P };
+  my $cls; my @dp;
+  if (grep { $_->{status} =~ /^(?:124|137)\z/ } $d, $b, $o) { $cls = 'timeout' }
+  elsif (!$diff->($d, $b) && !$diff->($d, $o)) {
+    $cls = $d->{err} eq $b->{err} && $d->{err} eq $o->{err} ? 'same' : $o->{err} eq $d->{err} ? 'msg=dash'
+         : $o->{err} eq $b->{err} ? 'msg=bash' : 'msg-own' }
+  elsif (!$diff->($d, $b)) { @dp = $diff->($d, $o); $cls = 'OURS' }
+  else { $cls = !$diff->($o, $d) ? '=dash' : !$diff->($o, $b) ? '=bash' : 'neither'; @dp = $diff->($d, $b) }
+  ($cls, @dp) }
+my (%t, %parts, %srcs, @list, $total, %cls, %res);
 for my $f (glob "$ARGV[0]/run-*.jsonl") {
   open my $in, '<', $f or die;
   while (<$in>) {
     my $s = eval { decode_json($_) } or next; $total++;
-    my ($d, $b, $o) = map norm($s->{$_}, $_), qw(dash bash ours);
-    my $diff = sub { my ($x, $y) = @_; grep $x->{$_} ne $y->{$_}, @P };
-    my $cls; my @dp;
-    if (grep { $_->{status} =~ /^(?:124|137)\z/ } $d, $b, $o) { $cls = 'timeout' }
-    elsif (!$diff->($d, $b) && !$diff->($d, $o)) {
-      $cls = $d->{err} eq $b->{err} && $d->{err} eq $o->{err} ? 'same' : $o->{err} eq $d->{err} ? 'msg=dash'
-           : $o->{err} eq $b->{err} ? 'msg=bash' : 'msg-own' }
-    elsif (!$diff->($d, $b)) { @dp = $diff->($d, $o); $cls = 'OURS' }
-    else { $cls = !$diff->($o, $d) ? '=dash' : !$diff->($o, $b) ? '=bash' : 'neither'; @dp = $diff->($d, $b) }
+    my ($cls, @dp) = classify($s); $cls{$s->{id}} = $cls; $res{$s->{id}} = $s if $BD;
     $t{$s->{src}}{$cls}++; $t{ALL}{$cls}++; $srcs{$s->{src}} = 1;
     if ($QD) { my $g = $INV{$s->{id}} || ($s->{text} // '') =~ $CMD ? 'coreutils involved' : 'no coreutils'; $t{"$g:$s->{src}"}{$cls}++; $t{"$g:ALL"}{$cls}++ }
     if ($cls =~ /^(?:OURS|neither|msg-own)\z/) {
@@ -90,3 +98,19 @@ if ($X) {   # the external calls (not the coreutils ones), as the main table: by
   printf "%-20s %7s %s\n", "dash's calls in them", '', join ' ', map sprintf('%8d', $calls{$_} // 0), @X;
   print "Where dash and bash agree and ours differs, call by call:\n", map "  $_\n", @odd }
 if ($LIST) { open my $o, '>', $LIST or die; print $o "id\tclass\tparts\tverdict\ttext\n", map "$_\n", sort @list }
+if ($CF) { open my $o, '>', $CF or die; print $o "id\tclass\n", map "$_\t$cls{$_}\n", sort keys %cls }
+if ($BD) {   # base run against this (-env) run, sample by sample
+  my (%tr, @chg, $nb); my @C2 = (@C, 'not in base');
+  for my $f (glob "$BD/run-*.jsonl") { open my $in, '<', $f or die;
+    while (<$in>) { my $b = eval { decode_json($_) } or next; my $v = $res{$b->{id}} or next; $nb++;
+      my ($bc) = classify($b); my $vc = $cls{$b->{id}};
+      my %nb = map +($_ => norm($b->{$_}, $_)), qw(dash bash ours); my %nv = map +($_ => norm($v->{$_}, $_)), qw(dash bash ours);
+      my @what = grep { my $p = $_; grep { $nb{$_}{$p} ne $nv{$_}{$p} } qw(dash bash ours) } @P, 'err';   # as compared: rec sorted, err a multiset
+      $tr{$bc}{$vc}++; delete $res{$b->{id}};
+      (my $x = $v->{text} // '') =~ s/\s+/ /g;
+      push @chg, join "\t", $b->{id}, $bc, $vc, join('+', @what), substr($x, 0, 120) if $bc ne $vc || @what } }
+  $tr{'not in base'}{$cls{$_}}++ for keys %res;
+  print "\nAgainst the base run $BD ($nb samples in both): rows the base run's class, columns this run's\n";
+  printf "%-12s %s\n", '', join ' ', map sprintf('%8s', $_), @C;
+  for my $r (grep $tr{$_}, @C2) { printf "%-12s %s\n", $r, join ' ', map sprintf('%8d', $tr{$r}{$_} // 0), @C }
+  print "\nChanged (id, base class, class, what changed in any shell, text):\n", map "  $_\n", sort @chg }

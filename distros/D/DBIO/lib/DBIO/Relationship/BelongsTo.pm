@@ -6,6 +6,9 @@ package DBIO::Relationship::BelongsTo;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Try::Tiny;
 use namespace::clean;
 
@@ -18,9 +21,14 @@ our %_pod_inherit_config =
 sub belongs_to {
   my ($class, $rel, $f_class, $cond, $attrs) = @_;
 
-  # assume a foreign key constraint unless defined otherwise
-  $attrs->{is_foreign_key_constraint} = 1
-    if not exists $attrs->{is_foreign_key_constraint};
+  # assume a foreign key constraint unless defined otherwise; remember when
+  # it was asked for, so a driver can refuse an explicit one it cannot create
+  if (exists $attrs->{is_foreign_key_constraint}) {
+    $attrs->{_explicit_foreign_key_constraint} = 1;
+  }
+  else {
+    $attrs->{is_foreign_key_constraint} = 1;
+  }
   $attrs->{undef_on_null_fk} = 1
     if not exists $attrs->{undef_on_null_fk};
 
@@ -116,7 +124,7 @@ DBIO::Relationship::BelongsTo - Declare a foreign-key relationship to a parent r
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

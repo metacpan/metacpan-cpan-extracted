@@ -54,6 +54,7 @@ use DBIO::Storage::DBI::AutoCast;
 
 TestDBIO::AutoCast::Schema->register_class(Widget => 'TestDBIO::AutoCast::Schema::Result::Widget');
 
+TestDBIO::AutoCast::Schema->storage_type('+DBIO::Test::Storage::AutoCastProbe');
 my $schema  = TestDBIO::AutoCast::Schema->connect(sub { });
 my $storage = DBIO::Test::Storage::AutoCastProbe->new($schema);
 $schema->storage($storage);

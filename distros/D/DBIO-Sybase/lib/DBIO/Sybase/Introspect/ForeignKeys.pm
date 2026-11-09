@@ -4,6 +4,8 @@ package DBIO::Sybase::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -11,45 +13,36 @@ sub fetch {
   $schema //= 'dbo';
   my %foreign_keys;
 
-  my $sth = $dbh->prepare(q{
-    SELECT
-      tc.table_name,
-      tc.constraint_name,
-      kcu.column_name,
-      rc2.table_name  AS ref_table_name,
-      kcu2.column_name AS ref_column_name,
-      rc.update_rule,
-      rc.delete_rule
-    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
-    JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu
-      ON tc.constraint_name = kcu.constraint_name
-     AND tc.table_schema    = kcu.table_schema
-     AND tc.table_name      = kcu.table_name
-    JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc
-      ON tc.constraint_name = rc.constraint_name
-     AND tc.table_schema    = rc.constraint_schema
-    JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu2
-      ON rc.unique_constraint_name = kcu2.constraint_name
-     AND rc.unique_constraint_schema = kcu2.table_schema
-    JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc2
-      ON rc.unique_constraint_name = tc2.constraint_name
-     AND rc.unique_constraint_schema = tc2.table_schema
-    WHERE tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_schema = ?
-    ORDER BY tc.table_name, tc.constraint_name, kcu.ordinal_position
-  });
-  $sth->execute($schema);
+  my $keys = join ', ',
+    (map { "col_name(r.tableid, r.fokey$_) AS fk$_" } 1 .. 16),
+    (map { "col_name(r.reftabid, r.refkey$_) AS rk$_" } 1 .. 16);
 
-  while (my $row = $sth->fetchrow_hashref) {
+  my $rows = $dbh->selectall_arrayref(qq{
+    SELECT o.name AS table_name,
+           object_name(r.constrid) AS constraint_name,
+           object_name(r.reftabid) AS ref_table_name,
+           r.keycnt, $keys
+    FROM sysreferences r
+    JOIN sysobjects o ON o.id = r.tableid
+    JOIN sysusers   u ON u.uid = o.uid
+    WHERE u.name = ?
+      AND r.pmrydbname IS NULL
+      AND r.frgndbname IS NULL
+    ORDER BY o.name, object_name(r.constrid)
+  }, { Slice => {} }, $schema);
+
+  for my $row (@$rows) {
     next unless exists $tables->{ $row->{table_name} };
-    push @{ $foreign_keys{ $row->{table_name} } }, {
-      constraint_name    => $row->{constraint_name},
-      column_name        => $row->{column_name},
-      ref_table_name    => $row->{ref_table_name},
-      ref_column_name   => $row->{ref_column_name},
-      update_rule       => $row->{update_rule},
-      delete_rule       => $row->{delete_rule},
-    };
+    for my $n (1 .. ($row->{keycnt} // 0)) {
+      push @{ $foreign_keys{ $row->{table_name} } }, {
+        constraint_name => $row->{constraint_name},
+        column_name     => $row->{"fk$n"},
+        ref_table_name  => $row->{ref_table_name},
+        ref_column_name => $row->{"rk$n"},
+        update_rule     => 'NO ACTION',
+        delete_rule     => 'NO ACTION',
+      };
+    }
   }
 
   return \%foreign_keys;
@@ -69,12 +62,24 @@ DBIO::Sybase::Introspect::ForeignKeys - Introspect Sybase ASE foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
-Fetches foreign key metadata via C<INFORMATION_SCHEMA.TABLE_CONSTRAINTS>
-and C<INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE>.
+Fetches foreign key metadata from the ASE system catalog: C<sysreferences>
+(one row per constraint, key columns as colids C<fokey1..16> /
+C<refkey1..16>, resolved with C<col_name()>), joined to C<sysobjects> /
+C<sysusers> for the owner of the referencing table. SAP ASE has no
+C<INFORMATION_SCHEMA> views.
+
+ASE has no declarative referential actions -- C<ON DELETE> / C<ON UPDATE> is
+a syntax error (Msg 156, ASE 16.0 SP02); a reference always restricts. Both
+rules are therefore reported as C<NO ACTION>, which
+L<DBIO::Sybase::Diff::ForeignKey> renders as no clause. A schema that
+declares any other action is refused by L<DBIO::Sybase::DDL>, so
+the two sides of a deploy diff never disagree on one. References into
+another database (C<pmrydbname> / C<frgndbname> set) are skipped: their
+colids and table ids belong to that database's catalog.
 
 =head1 METHODS
 
@@ -84,7 +89,9 @@ and C<INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE>.
 
 Given the tables hashref from L<DBIO::Sybase::Introspect::Tables>,
 returns a hashref keyed by table name. Each value is an arrayref of
-foreign key hashrefs.
+per-column rows (C<constraint_name>, C<column_name>, C<ref_table_name>,
+C<ref_column_name>, C<update_rule>, C<delete_rule>) in key order, which
+L<DBIO::Sybase::Introspect> groups into one entry per constraint.
 
 =head1 AUTHOR
 

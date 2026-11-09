@@ -4,6 +4,8 @@ package DBIO::ResultClass::HashRefInflator;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 ##############
 # NOTE
@@ -62,7 +64,7 @@ DBIO::ResultClass::HashRefInflator - Get raw hashrefs from a resultset
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

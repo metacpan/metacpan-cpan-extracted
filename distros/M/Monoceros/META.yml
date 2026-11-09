@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Monoceros:
     file: lib/Monoceros.pm
-    version: '0.29'
+    version: '0.30'
   Monoceros::Server:
     file: lib/Monoceros/Server.pm
   Plack::Handler::Monoceros:
@@ -49,10 +49,10 @@ resources:
   bugtracker: https://github.com/kazeburo/Monoceros/issues
   homepage: https://github.com/kazeburo/Monoceros
   repository: https://github.com/kazeburo/Monoceros.git
-version: '0.29'
+version: '0.30'
 x_contributors:
   - 'Michael Kröll <michael.kroell@geizhals.at>'
   - 'Michael Kröll <pepl@cpan.org>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

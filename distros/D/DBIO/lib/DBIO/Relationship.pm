@@ -4,6 +4,8 @@ package DBIO::Relationship;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 
 __PACKAGE__->load_own_components(qw/
@@ -27,7 +29,7 @@ DBIO::Relationship - Relationship declaration helpers for DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -45,7 +47,7 @@ version 0.900002
   ## Using relationships
   $schema->resultset('Actor')->find({ id => 1})->roles();
   $schema->resultset('Role')->find({ id => 1 })->actorroles->search_related('actor', { Name => 'Fred' });
-  $schema->resultset('Actor')->add_to_roles({ Name => 'Sherlock Holmes'});
+  $schema->resultset('Actor')->find({ id => 1 })->add_to_roles({ Name => 'Sherlock Holmes'});
 
 See L<DBIO::Manual::Cookbook> for more.
 
@@ -113,6 +115,16 @@ all without manual join bookkeeping or multiple fetches.
 This module documents the common relationship declaration helpers. For the
 lower-level API, plus the full family of C<*_related> methods that appear as a
 result, see L<DBIO::Relationship::Base>.
+
+=head2 Guarded relationships
+
+A relationship declared with C<< is_guarded => 1 >> in its attribute hash takes
+no data in multi-create: a hashref (or an arrayref of hashrefs) given under its
+name to L<DBIO::ResultSet/create>, L<DBIO::ResultSet/new_result>,
+L<DBIO::ResultSet/populate> and the other calls that build rows from a hash
+throws. A related object is no multi-create and is set as ever. A guarded
+foreign key I<column> (L<DBIO::ResultSource/is_guarded>) is guarded for the
+relationship values that set it as well.
 
 =head1 METHODS
 
@@ -231,6 +243,22 @@ C<belongs_to> accessor is called when any part of the foreign key IS NULL. To
 disable this behavior, pass C<< undef_on_null_fk => 0 >> in the C<\%attrs>
 hashref.
 
+C<< $book->author_async >> -- an async twin of the accessor, resolving to a
+L<DBIO::Future> -- is generated alongside C<< $book->author >> for every
+C<belongs_to> (also L</might_have> and L</has_one>) whose accessor name does
+I<not> collide with an actual column name (a colliding name gets the
+inflate/deflate C<filter> accessor instead, which has no async twin). It
+shares the sync accessor's own C<< $self->{_relationship_data} >> cache in both
+directions -- a cache hit from either accessor is a cache hit for the other
+-- and the same C<undef_on_null_fk> short-circuit (no query for a
+definitely-NULL foreign key). It takes no arguments; use the sync accessor's
+setter form (C<< $book->author($obj) >>) to change the relationship. Like
+every other DBIO C<*_async> method it requires an async connection
+(C<< connect(..., { async => ... }) >>): it croaks on a sync instance, and
+degrades to a synchronous call wrapped in an immediately-resolved Future in
+the C<immediate> mode. There is no async twin for C<has_many>/C<many_to_many>
+relationship accessors -- compose C<< ->${rel}_rs->all_async >> instead.
+
 NOTE: If you are used to L<Class::DBI> relationships, this is the equivalent
 of C<has_a>.
 
@@ -261,9 +289,9 @@ specifies a reference to a join condition.
 
 This argument is the name of the method you can call on a
 L<Result|DBIO::Manual::ResultClass> object to retrieve a resultset of the related
-class restricted to the ones related to the result object. In list
-context it returns the result objects. This is often called the
-C<relation(ship) name>.
+class restricted to the ones related to the result object. This
+accessor returns a resultset and throws in list context (ADR 0042). This
+is often called the C<relation(ship) name>.
 
 Use this accessor_name in L<DBIO::ResultSet/join>
 or L<DBIO::ResultSet/prefetch> to join to the foreign table
@@ -315,15 +343,16 @@ more info see L<DBIO::Relationship::Base/condition>.
   my $booklist = $author->books;
 
   # resultset of Books belonging to author, restricted by author name
-  my $booklist = $author->books({
-    name => { LIKE => '%macaroni%' },
-    { prefetch => [qw/book/],
-  });
+  my $booklist = $author->books(
+    { name => { LIKE => '%macaroni%' } },
+    { prefetch => [qw/book/] },
+  );
 
   # array of Book objects belonging to author
-  my @book_objs = $author->books;
+  my @book_objs = $author->books->all;
 
-  # force resultset even in list context
+  # the accessor returns a resultset and throws in list context (ADR 0042);
+  # books_rs returns the same resultset in every context
   my $books_rs = $author->books;
   ( $books_rs ) = $obj->books_rs;
 
@@ -336,8 +365,9 @@ Three methods are created when you create a has_many relationship.
 The first method is the expected accessor method, C<$accessor_name()>.
 The second is almost exactly the same as the accessor method but "_rs"
 is added to the end of the method name, eg C<$accessor_name_rs()>.
-This method works just like the normal accessor, except that it always
-returns a resultset, even in list context. The third method, named C<<
+This method works just like the normal accessor, except that it returns
+the resultset in every context, where the accessor throws in list
+context (ADR 0042). The third method, named C<<
 add_to_$rel_name >>, will also be added to your Row items; this allows
 you to insert new related items, using the same mechanism as in
 L<DBIO::Relationship::Base/"create_related">.
@@ -355,6 +385,9 @@ If you copy an object in a class with a C<has_many> relationship, all
 the related objects will be copied as well. To turn this behaviour off,
 pass C<< cascade_copy => 0 >> in the C<$attr> hashref. The behaviour
 defaults to C<< cascade_copy => 1 >>.
+
+A C<has_many> declared with a coderef condition defaults both
+C<cascade_delete> and C<cascade_copy> to 0.
 
 See L<DBIO::Relationship::Base/attributes> for documentation on
 relationship methods and valid relationship attributes. Also see
@@ -433,7 +466,8 @@ more info see L<DBIO::Relationship::Base/condition>.
 If you update or delete an object in a class with a C<might_have>
 relationship, the related object will be updated or deleted as well. To
 turn off this behavior, add C<< cascade_delete => 0 >> to the C<$attr>
-hashref.
+hashref. A C<might_have> declared with a coderef condition defaults
+both C<cascade_update> and C<cascade_delete> to 0.
 
 The cascaded operations are performed after the requested delete or
 update, so if your database has a constraint on the relationship, it
@@ -454,9 +488,13 @@ you shouldn't do that. The warning will look something like:
   "might_have/has_one" must not be on columns with is_nullable set to true (MySchema::SomeClass/key)
 
 If you must be naughty, you can suppress the warning by setting
-C<DBIO_DONT_VALIDATE_RELS> (legacy alias: C<DBIC_DONT_VALIDATE_RELS>)
+C<DBIO_DONT_VALIDATE_RELS>
 environment variable to a true value.  Otherwise,
 you probably just meant to use C<DBIO::Relationship/belongs_to>.
+
+C<< $author->pseudonym_async >> is generated alongside the sync accessor --
+see L</belongs_to> for the shared C<*_async> accessor contract (caching,
+C<undef_on_null_fk>, argument/connection requirements).
 
 =head2 has_one
 
@@ -551,6 +589,10 @@ current table allows nulls (i.e., has the C<is_nullable> attribute set to a
 true value), than warnings might apply just as with
 L<DBIO::Relationship/might_have>.
 
+C<< $book->isbn_async >> is generated alongside the sync accessor -- see
+L</belongs_to> for the shared C<*_async> accessor contract (caching,
+C<undef_on_null_fk>, argument/connection requirements).
+
 =head2 many_to_many
 
 =over 4
@@ -565,9 +607,10 @@ L<Glossary|DBIO::Manual::Glossary/Relationship bridge>.
 
 C<many_to_many> is not strictly a relationship in its own right. Instead, it is
 a bridge between two resultsets which provide the same kind of convenience
-accessors as true relationships provide. Although the accessor will return a
-resultset or collection of objects just like has_many does, you cannot call
-C<related_resultset> and similar methods which operate on true relationships.
+accessors as true relationships provide. Although the accessor always
+returns a resultset and throws in list context (ADR 0042), just like
+has_many does, you cannot call C<related_resultset> and similar methods
+which operate on true relationships.
 
 =over
 
@@ -630,10 +673,18 @@ To use many_to_many, existing relationships from the original table to the link
 table, and from the link table to the end table must already exist, these
 relation names are then used in the many_to_many call.
 
-In the above example, the Actor class will have 3 many_to_many accessor methods
-set: C<roles>, C<add_to_roles>, C<set_roles>, and similarly named accessors
+In the above example, the Actor class will have 5 many_to_many accessor methods
+set: C<roles>, C<roles_rs>, C<add_to_roles>, C<set_roles>, C<remove_from_roles>,
+and similarly named accessors
 will be created for the Role class for the C<actors> many_to_many
 relationship.
+
+C<add_to_roles> given a hashref of the foreign row's data links an existing row
+only when the link table's relationship to the foreign table is a C<belongs_to>
+and the hashref gives every column of a unique constraint of the foreign class
+(see L<DBIO::ResultSet/find>); any other data creates the foreign row, as
+multi-create does in L<DBIO::ResultSet/create>. A related object is linked as
+it is.
 
 See L<DBIO::Relationship::Base/attributes> for documentation on
 relationship methods and valid relationship attributes. Also see

@@ -4,9 +4,11 @@ package DBIO::DuckDB::Diff::Index;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Diff::Op';
 
-use DBIO::SQL::Util qw(_quote_ident);
+use DBIO::DuckDB::DDL::Emit qw(quote_ident);
 use DBIO::DuckDB::DDL::Emit qw(create_index);
 use DBIO::Diff::Compare qw(changed_index_fields);
 
@@ -20,7 +22,7 @@ sub diff {
   # Tables present in the source model but absent from the target are being
   # dropped in this same pass. DuckDB's DROP TABLE removes the table's own
   # indexes, so a later standalone DROP INDEX for one of them must be
-  # suppressed (karr #8).
+  # suppressed (karr k8).
   $source_tables //= {};
   $target_tables //= {};
   my %dropped_table = map { $_ => 1 }
@@ -57,7 +59,7 @@ sub diff {
     on_gone => sub {
       my ($table_name, $name, $old) = @_;
       # Skip when the owning table is itself being dropped this pass; DuckDB's
-      # DROP TABLE already removes this index (karr #8).
+      # DROP TABLE already removes this index (karr k8).
       return () if $dropped_table{$table_name};
       $class->new(
         action     => 'drop',
@@ -85,7 +87,7 @@ sub as_sql {
       unique  => $self->index_info->{is_unique},
     );
   }
-  return sprintf 'DROP INDEX %s;', _quote_ident($self->index_name);
+  return sprintf 'DROP INDEX %s;', quote_ident($self->index_name);
 }
 
 
@@ -109,7 +111,7 @@ DBIO::DuckDB::Diff::Index - Diff operations for DuckDB indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

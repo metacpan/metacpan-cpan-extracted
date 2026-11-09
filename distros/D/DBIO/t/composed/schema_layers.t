@@ -1,4 +1,4 @@
-# ABSTRACT: karr #70 WP1 -- DBIO::Schema->register_storage_layer + connection() composition
+# ABSTRACT: DBIO::Schema->register_storage_layer + connection() composition
 use strict;
 use warnings;
 
@@ -6,14 +6,17 @@ use Test::More;
 
 use DBIO::Schema;
 use DBIO::Storage::Composed;
+use DBIO::Test::Storage;
 
 # --- two plain layer packages -------------------------------------------
 { package T::SL::LayerA; sub tag_a { 'a' } }
 { package T::SL::LayerB; sub tag_b { 'b' } }
 
 # --- two independent schema classes -------------------------------------
-{ package T::SL::Schema; use base 'DBIO::Schema'; }
-{ package T::SL::Other;  use base 'DBIO::Schema'; }
+# Each declares the fake driver of the mock suite: a schema always has a
+# driver (ADR 0067), and the layers compose over the declared storage class.
+{ package T::SL::Schema; use base 'DBIO::Schema'; __PACKAGE__->storage_type('+DBIO::Test::Storage'); }
+{ package T::SL::Other;  use base 'DBIO::Schema'; __PACKAGE__->storage_type('+DBIO::Test::Storage'); }
 
 # --- default + append + order -------------------------------------------
 is_deeply(T::SL::Schema->storage_layers, [], 'storage_layers defaults to []');
@@ -49,7 +52,7 @@ my $storage = $schema->storage;
 
 isa_ok $storage, 'T::SL::LayerA',       'connected storage composed with layer A';
 isa_ok $storage, 'T::SL::LayerB',       'connected storage composed with layer B';
-isa_ok $storage, 'DBIO::Storage::DBI',  'composed over the generic base storage';
+isa_ok $storage, 'DBIO::Test::Storage', 'composed over the declared storage class';
 can_ok $storage, 'tag_a';
 can_ok $storage, 'tag_b';
 
@@ -61,8 +64,8 @@ is_deeply([ DBIO::Storage::Composed->layers_of(ref $storage) ],
 
 # --- a schema with no layers gets a plain, uncomposed storage -----------
 my $plain = T::SL::Other->connect(sub {});
-is ref($plain->storage), 'DBIO::Storage::DBI',
-  'a schema with no registered layers gets the bare base storage (no composition)';
+is ref($plain->storage), 'DBIO::Test::Storage',
+  'a schema with no registered layers gets the bare declared storage (no composition)';
 
 # --- register is callable on an instance too ----------------------------
 { package T::SL::LayerC; sub tag_c { 'c' } }

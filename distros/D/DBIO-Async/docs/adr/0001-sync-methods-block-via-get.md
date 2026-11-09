@@ -6,6 +6,44 @@
 - Origin: re-homed and generalized from `dbio-postgresql-async` ADR 0001 (same
   decision, DB-agnostic framing).
 
+## Amendment (2026-09-05, k14) — the decision stands; its implementation is core's since ADR 0030 §4
+
+Nothing below is retracted: a sync storage method still *is* its async sibling
+run to completion, and `future_class` still is CPAN `Future`. What moved is
+where that is written. Core ADR 0030 §4 lifted the Model-B orchestration into
+`DBIO::Storage::Async`, which is where the one-line wrappers now live — and
+there are seven of them, not six: `select`, `select_single`, `insert`, `update`,
+`delete`, `txn_do` and `deploy`, the last of which this ADR never listed.
+`DBIO::Async::Storage` writes none of them and inherits all seven, so the
+*Decision* reads as a property of the class a `future_io` adapter inherits from,
+not of a file in this dist.
+
+The same is true of the second paragraph: the sync wrappers a `txn_do_async`
+callback reaches for belong to core's generic
+`DBIO::Storage::Async::TransactionContext`. `DBIO::Async::TransactionContext` is
+an empty subclass that exists to be *named* — by `_txn_context_class` in
+`DBIO::Async::Storage`, and by the driver adapters and tests that refer to it.
+
+What this dist still owns is the half the *Consequences* hinge on: `future_class`
+is defined here, in `DBIO::Async::Storage`, and still answers `'Future'`. The
+coupling recorded there — the sync wrappers require `future_class->get` to have
+blocking semantics — is therefore ours to keep, and it is the reason a
+`future_io` transport may not swap in a promise type whose `->get` does not
+block.
+
+One name is stale rather than wrong: core's no-loop Future class is
+`DBIO::Future::Immediate`, not `DBIO::Test::Future`. Core ADR 0030 turned the
+former silent degrade into the deliberately named `immediate` mode and renamed
+the class with it; the *Consequences* sentence contrasting it with the real
+`Future` still says exactly what it meant to say.
+
+## Amendment (2026-10-09, k30) — `->get` on a wait for the pool drives Future::IO
+
+With the pool exhausted the sync call is queued on a pool waiter, and `->get` on
+a plain pending `Future` croaks. The pool's waiter is now `DBIO::Async::Future`,
+whose `await` drives `Future::IO`, and a wait that dies withdraws its waiter:
+see ADR 0008. The decision stands; this is the case it did not cover.
+
 ## Context
 
 Core ADR 0014 (async storage interface) establishes the *other* direction of the

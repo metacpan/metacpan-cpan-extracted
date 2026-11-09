@@ -2,6 +2,9 @@ package DBIO::Test::Schema::LinerNotes;
 # ABSTRACT: Test result class for the liner_notes table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -35,7 +38,7 @@ DBIO::Test::Schema::LinerNotes - Test result class for the liner_notes table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

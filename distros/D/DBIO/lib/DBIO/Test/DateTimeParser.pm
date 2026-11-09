@@ -4,6 +4,8 @@ package DBIO::Test::DateTimeParser;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 sub new { bless {}, shift }
 
 sub parse_datetime { $_[1] }
@@ -28,7 +30,7 @@ DBIO::Test::DateTimeParser - Minimal datetime parser for DBIO offline test stora
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

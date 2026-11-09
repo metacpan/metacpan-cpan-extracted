@@ -3,6 +3,62 @@
 - Status: accepted
 - Date: 2026-06-21
 - Tags: async, listen-notify, pool, ev-pg, drivers
+- Superseded in part: the driver-owned `listen` / `unlisten` / `notify` and the
+  buffering and serialising *machinery* described below are superseded by core
+  ADR 0056 (see the Amendment); the split itself -- a dedicated connection for
+  LISTEN, a pooled `pg_notify` for NOTIFY -- stands
+
+## Amendment (2026-09-27, karr k43) — the API and the machinery are core's, this dist fills the seams
+
+The decision this ADR records is in force and unchanged: LISTEN runs on one
+dedicated connection outside the pool, NOTIFY on a pooled connection as
+`SELECT pg_notify($1, $2)` with channel and payload bound. What is superseded
+is *who implements the rest*.
+
+Core ADR 0056 made LISTEN/NOTIFY a core async contract. `listen`, `unlisten`,
+`notify`, `listen_alive`, `listen_reconnect`, the hooks `on_listen_error` /
+`on_listen_reconnect` and the backoff settings are defined once in
+`DBIO::Storage::Async`, and so are the channel registry, the queue that runs one
+channel operation at a time on the listen connection, reconnect with backoff,
+re-subscribing every channel and the fork guard. `DBIO::PostgreSQL::EV::Storage`
+no longer overrides `listen` / `unlisten` / `notify` (or `disconnect`, which it
+overrode only to finish its LISTEN connection); it fills the listen seams with
+EV::Pg: `_listen_open` / `_listen_close`, `_listen_subscribe` /
+`_listen_unsubscribe`, `_listen_watch` / `_listen_unwatch`, `_listen_probe`,
+`_listen_delay` and `_notify_send`.
+
+Read as superseded, therefore:
+
+- **Buffering until connected is the open's Future, not a pending list.**
+  `_listen_open` resolves on EV::Pg's `on_connect` and core subscribes only
+  after that, so nothing is still sent on a handle that is not connected -- the
+  guarantee this ADR's *Rationale* asks for -- but `_listen_pending` is gone.
+- **The k15 serialiser is core's queue.** `_dispatch_listen_queue` and its
+  `_listen_dispatching` flag are gone. That also ends the defect k46 found in
+  them: a synchronous croak from EV::Pg's `query` (*"not connected"*, *"another
+  command is already in progress"*) left the flag set, and every later
+  LISTEN / UNLISTEN waited in the queue forever. The seam turns such a croak
+  into a failed Future, and core probes the connection and heals or reports.
+- **The connection heals.** EV::Pg's `on_error` used to `warn` and nothing
+  more; a dead LISTEN connection stayed dead. It now goes to core's
+  `_listen_lost`: close, report, wait the backoff (an EV timer), reconnect,
+  LISTEN every channel again, fire `on_listen_reconnect`.
+- **The connection is fork-safe and rotates credentials.** It is built by
+  `DBIO::PostgreSQL::EV::Pool::_new_connection`, like a pooled one, so it closes
+  fork-safe (karr k45), and from the same per-spawn conninfo path (ADR 0009), so
+  every reconnect uses the broker's current credentials.
+- **The channel is quoted as one identifier.** It went through the SQLMaker's
+  `_quote`, which splits on the name separator, so a channel with a `.` was sent
+  as a qualified name the server rejects. `_pg_quote_channel` quotes it whole
+  and refuses a name over 63 bytes rather than letting PostgreSQL truncate it --
+  the rules of the `future_io` transport (dbio-postgresql k77).
+
+The *Consequences* change accordingly: `disconnect` still ends the LISTEN
+connection, but it is core's `disconnect` that does; and a subscription is
+still not active the instant `listen` returns, but `listen` now returns a
+Future that resolves once the LISTEN is in effect, so a caller can wait for it
+instead of guessing. The `Storage.pm:NNN` references below point at the file as
+it was on 2026-06-21.
 
 ## Context
 

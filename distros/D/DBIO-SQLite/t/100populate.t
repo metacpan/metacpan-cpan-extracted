@@ -37,6 +37,10 @@ my $artist = $schema->resultset ('Artist')
                 ->first;
 my $ex_title = $artist->cds->first->title;
 
+my @titles = ('Huey', 'Dewey', $ex_title, 'Louie');
+my ($failing_row) = grep { $titles[$_] eq $ex_title } 0..$#titles;
+$failing_row++;
+
 throws_ok ( sub {
   my $i = 600;
   $schema->populate('CD', [
@@ -46,9 +50,18 @@ throws_ok ( sub {
         title => $_,
         year => 2009,
       }
-    } ('Huey', 'Dewey', $ex_title, 'Louie')
+    } @titles
   ])
-}, qr/\Qexecute_for_fetch() aborted with '\E.+\Q' at populate slice:\E/ms, 'Readable exception thrown for failed populate');
+}, qr/\Qexecute_for_fetch() aborted with '\E.+\Q' at row $failing_row of the populate data (columns: artist, title, year)\E/ms, 'Readable exception thrown for failed populate');
+
+# the message names the row and the columns, never the values of the row
+{
+  my $msg = "$@";
+  unlike $msg, qr/\Q$ex_title\E/, 'populate exception does not leak the title';
+  unlike $msg, qr/\b2009\b/, 'populate exception does not leak the year';
+  my $aid = $artist->id;
+  unlike $msg, qr/\b\Q$aid\E\b/, 'populate exception does not leak the artist id';
+}
 
 ## make sure populate honors fields/orders in list context
 ## schema order
@@ -188,7 +201,7 @@ is($links[2]->title, undef);
 # populate with literals
 {
   my $rs = $schema->resultset('Link');
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test populate with all literal sql (no binds)
 
@@ -204,7 +217,7 @@ is($links[2]->title, undef);
     $_->title eq "The 'best of' cpan",
   } $rs->all), 5, 'populate with all literal SQL');
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test mixed binds with literal sql
 
@@ -220,13 +233,13 @@ is($links[2]->title, undef);
     $_->title eq "The 'best of' cpan",
   } $rs->all), 5, 'populate with all literal SQL');
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 }
 
 # populate with literal+bind
 {
   my $rs = $schema->resultset('Link');
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test populate with all literal/bind sql
   $rs->populate([
@@ -241,7 +254,7 @@ is($links[2]->title, undef);
     $_->title eq "The 'best of' cpan",
   } $rs->all), 5, 'populate with all literal/bind');
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test populate with mix literal and literal/bind
   $rs->populate([
@@ -256,7 +269,7 @@ is($links[2]->title, undef);
     $_->title eq "The 'best of' cpan",
   } $rs->all), 5, 'populate with all literal/bind SQL');
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test mixed binds with literal sql/bind
 
@@ -266,14 +279,14 @@ is($links[2]->title, undef);
   } } (1 .. 5) ]);
 
   for (1 .. 5) {
-    ok($rs->find({ url => "cpan.org_$_" }), "Row $_ correctly created with dynamic literal/bind populate" );
+    ok($rs->search({ url => "cpan.org_$_" })->single, "Row $_ correctly created with dynamic literal/bind populate" );
   }
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 }
 
 my $rs = $schema->resultset('Artist');
-$rs->delete;
+$rs->delete({ all => 1 });
 throws_ok {
     # this warning is correct, but we are not testing it here
     # what we are after is the correct exception when an int
@@ -460,7 +473,7 @@ warnings_like {
     for my $type (qw(AoA AoH)) {
 
       # test void ctx
-      $rs->delete;
+      $rs->delete({ all => 1 });
       $rs->populate($args->{$tst}{$type});
       is_deeply(
         $rs->all_hri,
@@ -469,7 +482,7 @@ warnings_like {
       );
 
       # test scalar ctx
-      $rs->delete;
+      $rs->delete({ all => 1 });
       my $dummy = $rs->populate($args->{$tst}{$type});
       is_deeply(
         $rs->all_hri,
@@ -478,7 +491,7 @@ warnings_like {
       );
 
       # test list ctx
-      $rs->delete;
+      $rs->delete({ all => 1 });
       my @dummy = $rs->populate($args->{$tst}{$type});
       is_deeply(
         $rs->all_hri,
@@ -488,7 +501,7 @@ warnings_like {
     }
 
     # test create() as we have everything set up already
-    $rs->delete;
+    $rs->delete({ all => 1 });
     $rs->create($_) for @{$args->{$tst}{AoH}};
 
     is_deeply(
@@ -503,7 +516,7 @@ warnings_like {
     'Arguments fed to populate()/create() unchanged'
   );
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 } [], 'Data integrity warnings gone as planned';
 
 $schema->is_executed_sql_bind(

@@ -5,6 +5,7 @@ use Test::More;
 use Test::Exception;
 use Test::Warn;
 use Try::Tiny;
+use DBI ();
 
 use DBIO::Optional::Dependencies ();
 plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_odbc')
@@ -16,6 +17,11 @@ my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_MSSQL_ODBC_${_}" } qw/DSN USER P
 
 plan skip_all => 'Set $ENV{DBIO_TEST_MSSQL_ODBC_DSN}, _USER and _PASS to run this test'
   unless ($dsn && $user);
+
+# A schema always declares its driver (core ADR 0067): the shared test schema
+# gets it here. At its first use the storage adapts to the access path of the
+# DSN (DBIO::MSSQL::Storage::_adapt_to_access_path).
+DBIO::Test::Schema->storage_type('+DBIO::MSSQL::Storage');
 
 {
   my $srv_ver = DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->_server_info->{dbms_version};
@@ -134,7 +140,7 @@ SQL
 
         my $artist_rs = $schema->resultset('Artist');
 
-        $artist_rs->delete;
+        $artist_rs->delete({ all => 1 });
 
         $artist_rs->create({ name => "Artist$_" }) for (1..3);
 
@@ -155,7 +161,7 @@ SQL
 
         is_deeply \@result, \@map, "multiple active statements in $opts_name";
 
-        $artist_rs->delete;
+        $artist_rs->delete({ all => 1 });
 
         is($artist_rs->count, 0, '$dbh still viable');
       } "Multiple active statements survive $opts_name";
@@ -224,7 +230,10 @@ SQL
       lives_ok ( sub {
         # start a new connection, make sure rebless works
         my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, $opts);
-        $schema->populate ('BooksInLibrary', [
+        # BooksInLibrary keeps to source = Library; the Eatery rows lie outside
+        # that scope, so they go in through a resultset over the bare source.
+        my $books = $schema->source('BooksInLibrary');
+        $books->resultset_class->new($books, {})->populate([
           [qw/source  owner title   /],
           [qw/Library 1     secrets0/],
           [qw/Library 1     secrets1/],
@@ -243,180 +252,166 @@ SQL
       }, 'populate without PKs supplied ok' );
     }
 
-# test simple, complex LIMIT and limited prefetch support, with both dialects and quote combinations (if possible)
-    for my $dialect (
-      'Top',
-      ($schema->storage->_server_info->{normalized_dbms_version} || 0 ) >= 9
-        ? ('RowNumberOver')
-        : ()
-      ,
-    ) {
-      for my $quoted (0, 1) {
+# test simple, complex LIMIT and limited prefetch support, with and without
+# quoting. There is one limit dialect to test: DBIO::MSSQL::SQLMaker->apply_limit
+# renders ROW_NUMBER() OVER() whatever the connect info says -- nothing reads
+# the DBIx::Class limit_dialect attribute any more (DBIO::Manual::Heritage
+# "apply_limit replaces limit_dialect"). The SQL itself is pinned offline in
+# t/sqlmaker/limit_dialects/rno.t and t/40-sqlmaker-mssql-torture.t; here the
+# server answers it, including a limit that ends past the resultset.
+    for my $quoted (0, 1) {
 
-        $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
-            limit_dialect => $dialect,
-            %$opts,
-            $quoted
-              ? ( quote_char => [ qw/ [ ] / ], name_sep => '.' )
-              : ()
-            ,
-          });
+      $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
+          %$opts,
+          $quoted
+            ? ( quote_char => [ qw/ [ ] / ], name_sep => '.' )
+            : ()
+          ,
+        });
 
-        my $test_type = "Dialect:$dialect Quoted:$quoted";
+      my $test_type = "Quoted:$quoted";
 
-        # basic limit support
-        {
-          my $art_rs = $schema->resultset ('Artist');
-          $art_rs->delete;
-          $art_rs->create({ name => 'Artist ' . $_ }) for (1..6);
+      # basic limit support
+      {
+        my $art_rs = $schema->resultset ('Artist');
+        $art_rs->delete({ all => 1 });
+        $art_rs->create({ name => 'Artist ' . $_ }) for (1..6);
 
-          my $it = $schema->resultset('Artist')->search( {}, {
-            rows => 4,
-            offset => 3,
-            order_by => 'artistid',
-          });
+        my $it = $schema->resultset('Artist')->search( {}, {
+          rows => 4,
+          offset => 3,
+          order_by => 'artistid',
+        });
 
-          is( $it->count, 3, "$test_type: LIMIT count ok" );
+        is( $it->count, 3, "$test_type: LIMIT count ok" );
 
-          local $TODO = "Top-limit does not work when your limit ends up past the resultset"
-            if $dialect eq 'Top';
-
-          is( $it->next->name, 'Artist 4', "$test_type: iterator->next ok" );
-          $it->next;
-          is( $it->next->name, 'Artist 6', "$test_type: iterator->next ok" );
-          is( $it->next, undef, "$test_type: next past end of resultset ok" );
-        }
-
-        # plain ordered subqueries throw
-        throws_ok (sub {
-          $schema->resultset('Owners')->search ({}, { order_by => 'name' })->as_query
-        }, qr/ordered subselect encountered/, "$test_type: Ordered Subselect detection throws ok");
-
-        # make sure ordered subselects *somewhat* work
-        {
-          my $owners = $schema->resultset ('Owners')->search ({}, { order_by => 'name', offset => 2, rows => 3, unsafe_subselect_ok => 1 });
-          my $sealed_owners = $owners->as_subselect_rs;
-
-          is_deeply (
-            [ sort map { $_->name } ($sealed_owners->all) ],
-            [ sort map { $_->name } ($owners->all) ],
-            "$test_type: Sort preserved from within a subquery",
-          );
-        }
-
-        # still even with lost order of IN, we should be getting correct
-        # sets
-        {
-          my $owners = $schema->resultset ('Owners')->search ({}, { order_by => 'name', offset => 2, rows => 3, unsafe_subselect_ok => 1 });
-          my $corelated_owners = $owners->result_source->resultset->search (
-            {
-              id => { -in => $owners->get_column('id')->as_query },
-            },
-            {
-              order_by => 'name' #reorder because of what is shown above
-            },
-          );
-
-          is (
-            join ("\x00", map { $_->name } ($corelated_owners->all) ),
-            join ("\x00", map { $_->name } ($owners->all) ),
-            "$test_type: With an outer order_by, everything still matches",
-          );
-        }
-
-        # make sure right-join-side single-prefetch ordering limit works
-        {
-          my $rs = $schema->resultset ('BooksInLibrary')->search (
-            {
-              'owner.name' => { '!=', 'woggle' },
-            },
-            {
-              prefetch => 'owner',
-              order_by => 'owner.name',
-            }
-          );
-          # this is the order in which they should come from the above query
-          my @owner_names = qw/boggle fISMBoC fREW fRIOUX fROOH fRUE wiggle wiggle/;
-
-          is ($rs->all, 8, "$test_type: Correct amount of objects from right-sorted joined resultset");
-          is_deeply (
-            [map { $_->owner->name } ($rs->all) ],
-            \@owner_names,
-            "$test_type: Prefetched rows were properly ordered"
-          );
-
-          my $limited_rs = $rs->search ({}, {rows => 6, offset => 2, unsafe_subselect_ok => 1});
-          is ($limited_rs->count, 6, "$test_type: Correct count of limited right-sorted joined resultset");
-          is ($limited_rs->count_rs->next, 6, "$test_type: Correct count_rs of limited right-sorted joined resultset");
-
-          $schema->is_executed_querycount( sub {
-            is_deeply (
-              [map { $_->owner->name } ($limited_rs->all) ],
-              [@owner_names[2 .. 7]],
-              "$test_type: Prefetch-limited rows were properly ordered"
-            );
-          }, 1, "$test_type: Only one query with prefetch" );
-
-          is_deeply (
-            [map { $_->name } ($limited_rs->search_related ('owner')->all) ],
-            [@owner_names[2 .. 7]],
-            "$test_type: Rows are still properly ordered after search_related",
-          );
-        }
-
-        # try a ->has_many direction with duplicates
-        my $owners = $schema->resultset ('Owners')->search (
-          {
-            'books.id' => { '!=', undef },
-            'me.name' => { '!=', 'somebogusstring' },
-          },
-          {
-            prefetch => 'books',
-            order_by => [ { -asc => \['name + ?', [ test => 'xxx' ]] }, 'me.id' ], # test bindvar propagation
-            group_by => [ map { "me.$_" } $schema->source('Owners')->columns ], # the literal order_by requires an explicit group_by
-            rows     => 3,  # 8 results total
-            unsafe_subselect_ok => 1,
-          },
-        );
-
-        is ($owners->page(1)->all, 3, "$test_type: has_many prefetch returns correct number of rows");
-        is ($owners->page(1)->count, 3, "$test_type: has-many prefetch returns correct count");
-
-        is ($owners->page(3)->count, 2, "$test_type: has-many prefetch returns correct count");
-        {
-          local $TODO = "Top-limit does not work when your limit ends up past the resultset"
-            if $dialect eq 'Top';
-          is ($owners->page(3)->all, 2, "$test_type: has_many prefetch returns correct number of rows");
-          is ($owners->page(3)->count_rs->next, 2, "$test_type: has-many prefetch returns correct count_rs");
-        }
-
-
-        # try a ->belongs_to direction (no select collapse, group_by should work)
-        my $books = $schema->resultset ('BooksInLibrary')->search (
-          {
-            'owner.name' => [qw/wiggle woggle/],
-          },
-          {
-            distinct => 1,
-            having => \['1 = ?', [ test => 1 ] ], #test having propagation
-            prefetch => 'owner',
-            rows     => 2,  # 3 results total
-            order_by => [{ -desc => 'me.owner' }, 'me.id'],
-            unsafe_subselect_ok => 1,
-          },
-        );
-
-        is ($books->page(1)->all, 2, "$test_type: Prefetched grouped search returns correct number of rows");
-        is ($books->page(1)->count, 2, "$test_type: Prefetched grouped search returns correct count");
-
-        is ($books->page(2)->count, 1, "$test_type: Prefetched grouped search returns correct count");
-        {
-          local $TODO = "Top-limit does not work when your limit ends up past the resultset"
-            if $dialect eq 'Top';
-          is ($books->page(2)->all, 1, "$test_type: Prefetched grouped search returns correct number of rows");
-          is ($books->page(2)->count_rs->next, 1, "$test_type: Prefetched grouped search returns correct count_rs");
-        }
+        is( $it->next->name, 'Artist 4', "$test_type: iterator->next ok" );
+        $it->next;
+        is( $it->next->name, 'Artist 6', "$test_type: iterator->next ok" );
+        is( $it->next, undef, "$test_type: next past end of resultset ok" );
       }
+
+      # plain ordered subqueries throw
+      throws_ok (sub {
+        $schema->resultset('Owners')->search ({}, { order_by => 'name' })->as_query
+      }, qr/ordered subselect encountered/, "$test_type: Ordered Subselect detection throws ok");
+
+      # make sure ordered subselects *somewhat* work
+      {
+        my $owners = $schema->resultset ('Owners')->search ({}, { order_by => 'name', offset => 2, rows => 3, unsafe_subselect_ok => 1 });
+        my $sealed_owners = $owners->as_subselect_rs;
+
+        is_deeply (
+          [ sort map { $_->name } ($sealed_owners->all) ],
+          [ sort map { $_->name } ($owners->all) ],
+          "$test_type: Sort preserved from within a subquery",
+        );
+      }
+
+      # still even with lost order of IN, we should be getting correct
+      # sets
+      {
+        my $owners = $schema->resultset ('Owners')->search ({}, { order_by => 'name', offset => 2, rows => 3, unsafe_subselect_ok => 1 });
+        my $corelated_owners = $owners->result_source->resultset->search (
+          {
+            id => { -in => $owners->get_column('id')->as_query },
+          },
+          {
+            order_by => 'name' #reorder because of what is shown above
+          },
+        );
+
+        is (
+          join ("\x00", map { $_->name } ($corelated_owners->all) ),
+          join ("\x00", map { $_->name } ($owners->all) ),
+          "$test_type: With an outer order_by, everything still matches",
+        );
+      }
+
+      # make sure right-join-side single-prefetch ordering limit works
+      {
+        my $rs = $schema->resultset ('BooksInLibrary')->search (
+          {
+            'owner.name' => { '!=', 'woggle' },
+          },
+          {
+            prefetch => 'owner',
+            order_by => 'owner.name',
+          }
+        );
+        # this is the order in which they should come from the above query
+        my @owner_names = qw/boggle fISMBoC fREW fRIOUX fROOH fRUE wiggle wiggle/;
+
+        is ($rs->all, 8, "$test_type: Correct amount of objects from right-sorted joined resultset");
+        is_deeply (
+          [map { $_->owner->name } ($rs->all) ],
+          \@owner_names,
+          "$test_type: Prefetched rows were properly ordered"
+        );
+
+        my $limited_rs = $rs->search ({}, {rows => 6, offset => 2, unsafe_subselect_ok => 1});
+        is ($limited_rs->count, 6, "$test_type: Correct count of limited right-sorted joined resultset");
+        is ($limited_rs->count_rs->next, 6, "$test_type: Correct count_rs of limited right-sorted joined resultset");
+
+        $schema->is_executed_querycount( sub {
+          is_deeply (
+            [map { $_->owner->name } ($limited_rs->all) ],
+            [@owner_names[2 .. 7]],
+            "$test_type: Prefetch-limited rows were properly ordered"
+          );
+        }, 1, "$test_type: Only one query with prefetch" );
+
+        is_deeply (
+          [map { $_->name } ($limited_rs->search_related ('owner')->all) ],
+          [@owner_names[2 .. 7]],
+          "$test_type: Rows are still properly ordered after search_related",
+        );
+      }
+
+      # try a ->has_many direction with duplicates
+      my $owners = $schema->resultset ('Owners')->search (
+        {
+          'books.id' => { '!=', undef },
+          'me.name' => { '!=', 'somebogusstring' },
+        },
+        {
+          prefetch => 'books',
+          order_by => [ { -asc => \['name + ?', [ test => 'xxx' ]] }, 'me.id' ], # test bindvar propagation
+          group_by => [ map { "me.$_" } $schema->source('Owners')->columns ], # the literal order_by requires an explicit group_by
+          rows     => 3,  # 8 results total
+          unsafe_subselect_ok => 1,
+        },
+      );
+
+      is ($owners->page(1)->all, 3, "$test_type: has_many prefetch returns correct number of rows");
+      is ($owners->page(1)->count, 3, "$test_type: has-many prefetch returns correct count");
+
+      is ($owners->page(3)->count, 2, "$test_type: has-many prefetch returns correct count");
+      is ($owners->page(3)->all, 2, "$test_type: has_many prefetch returns correct number of rows");
+      is ($owners->page(3)->count_rs->next, 2, "$test_type: has-many prefetch returns correct count_rs");
+
+
+      # try a ->belongs_to direction (no select collapse, group_by should work)
+      my $books = $schema->resultset ('BooksInLibrary')->search (
+        {
+          'owner.name' => [qw/wiggle woggle/],
+        },
+        {
+          distinct => 1,
+          having => \['1 = ?', [ test => 1 ] ], #test having propagation
+          prefetch => 'owner',
+          rows     => 2,  # 3 results total
+          order_by => [{ -desc => 'me.owner' }, 'me.id'],
+          unsafe_subselect_ok => 1,
+        },
+      );
+
+      is ($books->page(1)->all, 2, "$test_type: Prefetched grouped search returns correct number of rows");
+      is ($books->page(1)->count, 2, "$test_type: Prefetched grouped search returns correct count");
+
+      is ($books->page(2)->count, 1, "$test_type: Prefetched grouped search returns correct count");
+      is ($books->page(2)->all, 1, "$test_type: Prefetched grouped search returns correct number of rows");
+      is ($books->page(2)->count_rs->next, 1, "$test_type: Prefetched grouped search returns correct count_rs");
     }
 
 
@@ -481,16 +476,6 @@ SQL
       });
 
       {
-        my $freetds_and_dynamic_cursors = 1
-          if $opts_name eq 'use_dynamic_cursors' &&
-            $schema->storage->_using_freetds;
-
-        local $TODO =
-'these tests fail on freetds with dynamic cursors for some reason'
-          if $freetds_and_dynamic_cursors;
-        local $ENV{DBIO_NULLABLE_KEY_NOWARN} = 1
-          if $freetds_and_dynamic_cursors;
-
         my $rs = $schema->resultset('Money');
         my $row;
 
@@ -553,12 +538,17 @@ SQL
 
 done_testing;
 
-# clean up our mess
+# clean up our mess, on a connection of its own: the last iteration of the
+# loop above may have been a skipped one, whose $schema never connected (the
+# order of keys %opts decides), and the tables of an earlier iteration are
+# still there.
 END {
-  if (my $dbh = eval { $schema->storage->_dbh }) {
+  local $?;
+  undef $schema;
+  if (my $dbh = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) }) {
     eval { $dbh->do("DROP TABLE $_") }
       for qw/artist artist_guid money_test books owners/;
+    $dbh->disconnect;
   }
-  undef $schema;
 }
 # vim:sw=2 sts=2

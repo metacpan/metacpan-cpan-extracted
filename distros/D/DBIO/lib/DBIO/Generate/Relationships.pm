@@ -3,6 +3,9 @@ package DBIO::Generate::Relationships;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/Class::Accessor::Grouped/;
 use mro 'c3';
 use Carp::Clan qw/^DBIO/;
@@ -25,6 +28,7 @@ __PACKAGE__->mk_group_accessors(simple => qw/
   _relnames_seen
 /);
 
+
 sub new {
   my ($class, %args) = @_;
   my $self = bless {}, $class;
@@ -39,7 +43,7 @@ sub new {
 
 
 sub generate_code {
-  my ($self, $tables, $class_for, $pk_for) = @_;
+  my ($self, $tables, $class_for, $pk_for, $cols_for) = @_;
 
   $self->_relnames_seen({});
 
@@ -122,8 +126,7 @@ sub generate_code {
     }
   }
 
-  $self->_generate_m2ms(\%all_code, $class_for)
-    unless $self->allow_extra_m2m_cols;
+  $self->_generate_m2ms(\%all_code, $class_for, $pk_for // {}, $cols_for // {});
 
   return \%all_code;
 }
@@ -162,8 +165,11 @@ sub _local_relname {
   return lc($stripped eq lc($local_moniker) ? $remote_moniker : $stripped);
 }
 
+# Link-table recognition mirrors DBIx::Class::Schema::Loader::RelBuilder
+# (_generate_m2ms): exactly two belongs_to, primary key == union of their
+# local columns, and no further column unless allow_extra_m2m_cols (karr k215).
 sub _generate_m2ms {
-  my ($self, $all_code, $class_for) = @_;
+  my ($self, $all_code, $class_for, $pk_for, $cols_for) = @_;
 
   for my $link_moniker (sort keys %$all_code) {
     my @bt = grep { $_->{method} eq 'belongs_to' } @{ $all_code->{$link_moniker} };
@@ -175,8 +181,29 @@ sub _generate_m2ms {
 
     next unless $class_for->{$a_moniker} && $class_for->{$b_moniker};
 
+    my %fk_cols = map { $_ => 1 } map { values %{ $_->{args}[2] } } $a, $b;
+    my @pk      = @{ $pk_for->{$link_moniker} // [] };
+    next unless @pk && @pk == keys %fk_cols && all { $fk_cols{$_} } @pk;
+
+    unless ($self->allow_extra_m2m_cols) {
+      my $cols = $cols_for->{$link_moniker} or next;
+      next unless @$cols == @pk;
+    }
+
+    # The bridge is the has_many on the first side that leads into the link
+    # table over the first belongs_to's columns -- a relationship of
+    # $a_moniker, as many_to_many requires.
+    my %a_link_cols = map { $_ => 1 } values %{ $a->{args}[2] };
+    my $link_class  = $class_for->{$link_moniker};
+    my ($bridge) = grep {
+      $_->{method} eq 'has_many'
+      && $_->{args}[1] eq $link_class
+      && all { (my $c = $_) =~ s/^foreign\.//; $a_link_cols{$c} } keys %{ $_->{args}[2] }
+    } @{ $all_code->{$a_moniker} };
+    next unless $bridge;
+
     my $m2m_relname     = $self->_inflect_plural(lc $b_moniker);
-    my $bridge_relname  = $a->{args}[0];
+    my $bridge_relname  = $bridge->{args}[0];
 
     push @{ $all_code->{$a_moniker} }, {
       method => 'many_to_many',
@@ -253,18 +280,48 @@ DBIO::Generate::Relationships - Relationship inference for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 
+=head2 new
+
+    my $r = DBIO::Generate::Relationships->new(
+      inflect_plural       => \%plural_map,    # or undef
+      inflect_singular     => \%singular_map,  # or undef
+      rel_name_map         => \%map_or_coderef,
+      rel_collision_map    => \%map,           # default {}
+      allow_extra_m2m_cols => 0,               # default 0
+      quiet                => 0,               # default 0
+    );
+
+Builds the relationship inferrer. L<DBIO::Generate> constructs one per run,
+passing its own options of the same names through. C<inflect_plural> /
+C<inflect_singular> are hashrefs of explicit overrides consulted before
+L<Lingua::EN::Inflect::Phrase>; C<rel_name_map> is a hashref (old name to new
+name) or a coderef receiving C<< { name, type, local_moniker, local_columns,
+remote_moniker, remote_columns } >> and returning the new name (C<undef>
+keeps the old one). C<allow_extra_m2m_cols> follows
+L<DBIx::Class::Schema::Loader::Base/allow_extra_m2m_cols>: a table is a link
+table -- and gets a C<many_to_many> on its first side -- when it carries exactly
+two C<belongs_to> relationships and its primary key equals the union of their
+columns; with C<allow_extra_m2m_cols> false (the default) it must also have no
+column beyond that key, with it true extra columns are allowed. The flag only
+ever adds bridges (it used to suppress all of them).
+C<rel_collision_map> and C<quiet> are stored for L<DBIO::Generate> parity but
+not consulted by the inference itself.
+
 =head2 generate_code
 
-    my $code = $r->generate_code($tables, $class_for, $pk_for);
+    my $code = $r->generate_code($tables, $class_for, $pk_for, $cols_for);
 
 Takes an arrayref of [ $moniker, \@fk_info, \@uniq_info ].
 Each FK info hashref must have C<remote_moniker> (not remote_table).
 C<class_for> maps moniker → class name string.
 C<pk_for> maps moniker → PK column arrayref.
+C<cols_for> (optional) maps moniker → column arrayref; it is what lets a link
+table be recognised as having no extra columns. A table without an entry is
+bridged only under C<allow_extra_m2m_cols>.
 
 Returns hashref { $moniker => [ { method, args, extra }, ... ] }.
 

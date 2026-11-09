@@ -64,9 +64,18 @@ is(hit($app, path => '/static/..\\..\\secret')->[0], 404,
 is(hit($app, path => '/static/sub\\../x.txt')->[0], 404,
     'including one mid-path');
 # and a file whose name simply contains a backslash is NOT collateral damage:
-# it splits into ordinary segments, none of which is ".."
-is(hit($app, path => '/static/sub\\x.txt')->[0], 404,
-    'a backslash in a name is still just a name (no such file here)');
+# it splits into ordinary segments, none of which is "..". Where the OS
+# itself reads a backslash as a separator (Windows, and Cygwin on top of it)
+# the same request names sub/x.txt and serves it, still inside the root, so
+# that is the right answer there and not a failure of the guard.
+if ($^O eq 'MSWin32' || $^O eq 'cygwin') {
+    is(hit($app, path => '/static/sub\\x.txt')->[0], 200,
+        'a backslash in a name is the OS separator here, still inside the root');
+}
+else {
+    is(hit($app, path => '/static/sub\\x.txt')->[0], 404,
+        'a backslash in a name is still just a name (no such file here)');
+}
 {
     my $r = hit($app, method => 'HEAD', path => '/static/app.css');
     is($r->[0], 200, 'HEAD serves');

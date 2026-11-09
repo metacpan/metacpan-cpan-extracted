@@ -9,7 +9,7 @@ my $schema = DBIO::SQLite::Test->init_schema();
 my $cd = $schema->resultset('CD')->next;
 $cd->tracks->delete;
 
-$schema->resultset('CD')->related_resultset('tracks')->delete;
+$schema->resultset('CD')->related_resultset('tracks')->delete({ all => 1 });
 
 is $cd->tracks->count, 0, 'No tracks';
 

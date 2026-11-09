@@ -12,10 +12,11 @@ use DBIO::Test;
 for (1..2) {
   my $tmp = File::Temp->new( SUFFIX => '.sqlite', UNLINK => 1 );
   my $schema = DBIO::Test->init_schema(
-    dsn       => 'dbi:SQLite:' . $tmp->filename,
-    user      => '',
-    pass      => '',
-    no_deploy => 1,
+    dsn          => 'dbi:SQLite:' . $tmp->filename,
+    user         => '',
+    pass         => '',
+    storage_type => 'DBIO::SQLite::Storage',
+    no_deploy    => 1,
   );
   $schema->storage->ensure_connected;
   isa_ok ($schema, 'DBIO::Test::Schema');

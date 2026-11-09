@@ -6,6 +6,7 @@ requires 'Carp';
 requires 'Config::Auto';
 requires 'Config::IniFiles';
 requires 'CryptX', '0.062';   # 0.049 fixed GCM encrypt failures (empty string; no AAD); 0.062 fixed GCM tag verification
+requires 'Cwd';
 requires 'File::Basename';
 requires 'File::Slurp';
 requires 'File::Spec';

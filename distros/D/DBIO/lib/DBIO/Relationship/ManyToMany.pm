@@ -4,10 +4,12 @@ package DBIO::Relationship::ManyToMany;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Carp;
 use Sub::Util 'set_subname';
 use Scalar::Util 'blessed';
-use DBIO::Util qw(fail_on_internal_wantarray assert_no_internal_wantarray);
+use DBIO::Util qw(assert_no_list_context);
 use namespace::clean;
 
 our %_pod_inherit_config =
@@ -93,10 +95,11 @@ EOW
 
     my $meth_name = join '::', $class, $meth;
     *$meth_name = set_subname $meth_name, sub {
-      assert_no_internal_wantarray and my $sog = fail_on_internal_wantarray;
       my $self = shift;
-      my $rs = $self->$rs_meth( @_ );
-      return (wantarray ? $rs->all : $rs);
+      # ADR 0042: the m2m accessor used to return the rows in list context.
+      # It now always returns the ResultSet and refuses list context outright.
+      assert_no_list_context("relationship accessor '$meth'") if wantarray;
+      return $self->$rs_meth( @_ );
     };
 
     my $add_meth_name = join '::', $class, $add_meth;
@@ -112,15 +115,27 @@ EOW
       my $f_rel_source_name = $rel_source->relationship_info($f_rel)->{source};
       my $f_rel_rs = $schema->resultset($f_rel_source_name)->search({}, $rel_attrs||{});
 
+      # ADR 0045 / karr k325: the row found or created here is returned, and it
+      # is derived from this one -- called on a context-bound row it keeps the
+      # pin. A row object passed in is handed back as it came.
+      $f_rel_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+      # a row the data identifies is the row to link to only when the link's
+      # relationship is a belongs_to; any other data is created (ADR 0071)
+      my $find = $rel_source->_relationship_depends_on($f_rel);
+      my $find_or_create = sub {
+        ( $find && $f_rel_rs->_find_identified($_[0]) ) || $f_rel_rs->new_result($_[0])->insert
+      };
+
       my $obj;
       if (ref $_[0]) {
         if (ref $_[0] eq 'HASH') {
-          $obj = $f_rel_rs->find_or_create($_[0]);
+          $obj = $find_or_create->($_[0]);
         } else {
           $obj = $_[0];
         }
       } else {
-        $obj = $f_rel_rs->find_or_create({@_});
+        $obj = $find_or_create->({@_});
       }
 
       my $link_vals = @_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {};
@@ -139,6 +154,8 @@ EOW
       my @to_set = (ref($_[0]) eq 'ARRAY' ? @{ $_[0] } : @_);
       # if there is a where clause in the attributes, ensure we only delete
       # rows that are within the where restriction
+      # the delete and the adds commit together or not at all
+      my $guard = $self->result_source->schema->txn_scope_guard;
       if ($rel_attrs && $rel_attrs->{where}) {
         $self->search_related( $rel, $rel_attrs->{where},{join => $f_rel})->delete;
       } else {
@@ -146,6 +163,8 @@ EOW
       }
       # add in the set rel objects
       $self->$add_meth($_, ref($_[1]) ? $_[1] : {}) for (@to_set);
+      $guard->commit;
+      return;
     };
 
     my $remove_meth_name = join '::', $class, $remove_meth;
@@ -184,7 +203,7 @@ DBIO::Relationship::ManyToMany - Declare a many-to-many relationship via a bridg
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
 

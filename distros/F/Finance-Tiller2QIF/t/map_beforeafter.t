@@ -161,7 +161,7 @@ subtest verbose_output => sub {
     'default | source',
   );
   Finance::Tiller2QIF::ReadCSV::Ingest( $csvfile, $db_path );
-  my $out = capture_stdout {
+  my $run_map = sub {
     Finance::Tiller2QIF::Map::Map({
       db_path   => $db_path,
       mapfile   => $mapfile,
@@ -170,6 +170,16 @@ subtest verbose_output => sub {
       verbose   => 1,
     })
   };
+  my $out = '';
+  if ($^O eq 'MSWin32') {
+    # This operation only prints from Perl. Avoid Capture::Tiny's intermittent
+    # Windows tempfile permission errors while still checking the output.
+    open local *STDOUT, '>:encoding(UTF-8)', \$out or die $!;
+    $run_map->();
+  }
+  else {
+    $out = capture_stdout { $run_map->() };
+  }
   like( $out, qr/Running beforemap/,              'verbose reports beforemap start' );
   like( $out, qr/beforemap completed successfully/, 'verbose reports beforemap success' );
   like( $out, qr/Running aftermap/,               'verbose reports aftermap start' );

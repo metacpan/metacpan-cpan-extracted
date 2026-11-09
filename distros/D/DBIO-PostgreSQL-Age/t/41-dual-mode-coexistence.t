@@ -38,13 +38,13 @@ my $GIS_SYNC  = 'DBIO::PostgreSQL::PostGIS::Storage';
 # ONE schema class carrying BOTH extension layers.
 {
   package T::DualSchema;
-  use base qw( DBIO::PostgreSQL::Age DBIO::PostgreSQL::PostGIS DBIO::Schema );
-  use mro 'c3';
+  use DBIO 'Schema', -pg;   # the schema declares its driver (core ADR 0067)
+  __PACKAGE__->load_components('PostgreSQL::Age', 'PostgreSQL::PostGIS');
 }
 
 # Two connections from the SAME class, differing ONLY in async mode. Offline:
-# connect() is lazy and ->async is a dsn-string rebless + class resolution; no
-# database is contacted.
+# connect() is lazy and ->async is a class resolution off the declared driver
+# (the DSN is only parsed); no database is contacted.
 my $dsn = 'dbi:Pg:dbname=dbio_offline_dualmode';
 my $fio_schema = T::DualSchema->connect($dsn, '', '', { async => 'future_io' });
 my $ev_schema  = T::DualSchema->connect($dsn, '', '', { async => 'ev' });

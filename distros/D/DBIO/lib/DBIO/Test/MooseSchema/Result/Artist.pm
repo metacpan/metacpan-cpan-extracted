@@ -1,6 +1,11 @@
 package DBIO::Test::MooseSchema::Result::Artist;
 # ABSTRACT: Moose-enabled test result class for the artist table
 
+use strict;
+use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Moose;
 
 __PACKAGE__->table('artist');
@@ -44,7 +49,7 @@ DBIO::Test::MooseSchema::Result::Artist - Moose-enabled test result class for th
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

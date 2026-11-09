@@ -2,9 +2,13 @@ package DBIO::ResultSet::Pager;
 # ABSTRACT: help when paging through sets of results
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use DBIO::Exception;
+
 
 
 sub new {
@@ -191,7 +195,7 @@ DBIO::ResultSet::Pager - help when paging through sets of results
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -243,15 +247,13 @@ work this out.
 
 =head2 new
 
-This is the constructor, which takes no arguments.
-
-  my $page = DBIO::ResultSet::Pager->new();
-
-There is also an old, deprecated constructor, which currently takes
-two mandatory arguments, the total number of entries and the number of
-entries per page. It also optionally takes the current page number:
+This is the constructor. It takes the total number of entries, the
+number of entries per page and the current page number. All three are
+optional and default to 0, 10 and 1:
 
   my $page = DBIO::ResultSet::Pager->new($total_entries, $entries_per_page, $current_page);
+
+  my $page = DBIO::ResultSet::Pager->new();
 
 =head2 total_entries
 
@@ -407,6 +409,37 @@ Returns the number of entries skipped before the current page.
 
 Changes page size and adjusts current page so the previous first item remains
 visible.
+
+=head1 ASYNC
+
+L<DBIO::ResultSet/pager> itself has no async twin -- it is pure in-memory
+arithmetic once it has a total count, and L</total_entries> already accepts
+either a plain integer or a lazy coderef (no code change needed here). To
+page asynchronously, resolve the total count yourself via
+L<DBIO::ResultSet/count_async> and construct the pager directly with the
+resolved value, mirroring what C<< $rs->pager >> does internally (a separate
+count-only resultset with the paging attrs stripped, so the total reflects
+the whole result set, not just the current page):
+
+  my $count_attrs = { %{ $paged_rs->{attrs} } };
+  delete @{$count_attrs}{qw/rows offset page pager/};
+  my $total_rs = (ref $paged_rs)->new($paged_rs->result_source, $count_attrs);
+
+  # Only if $paged_rs was bound with ->with_context($ctx) (inside a
+  # txn_do_async / pipeline coderef): $paged_rs->pager does this for its
+  # own count, but the hand-built count resultset is unbound, and an
+  # unbound count would run outside that transaction or pipeline. Bind it
+  # to the same $ctx.
+  $total_rs = $total_rs->with_context($ctx);
+
+  $total_rs->count_async->then(sub {
+    my ($resolved_count) = @_;
+    my $pager = DBIO::ResultSet::Pager->new(
+      $resolved_count, $paged_rs->{attrs}{rows}, $paged_rs->{attrs}{page},
+    );
+    # $pager->entries_on_this_page, ->last_page, etc. -- identical to the
+    # sync $rs->pager built from the same total
+  });
 
 =head1 NOTES
 

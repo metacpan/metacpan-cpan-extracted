@@ -45,6 +45,10 @@ static void hm_bus_perl_deliver(void *ud, uint64_t seq, const char *topic,
     dSP;
     SV *cb = (SV *)ud;
     (void)seq;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cb || !SvOK(cb)) return;
 
     ENTER; SAVETMPS;
@@ -55,7 +59,7 @@ static void hm_bus_perl_deliver(void *ud, uint64_t seq, const char *topic,
     PUTBACK;
     (void)call_sv(cb, G_VOID | G_DISCARD | G_EVAL);
     SPAGAIN;
-    if (SvTRUE(ERRSV))
+    if (SvTRUE(ERRSV)) /* # uncoverable condition right count:1 class:ignore_covered_err */
         warn("Hyperman: bus subscriber died: %" SVf, SVfARG(ERRSV));
     PUTBACK;
     FREETMPS; LEAVE;

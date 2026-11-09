@@ -13,9 +13,10 @@ use Finance::Tiller2QIF::DB qw(connect_db);
 
 sub fixture () {
   my $dir = tempdir(CLEANUP => 1);
-  # Match Run's canonical Windows paths so failure-injection targets compare
-  # equal despite File::Temp returning backslash-separated directory names.
-  $dir = path($dir)->realpath->stringify if $^O eq 'MSWin32';
+  # Match Run's canonical paths so failure-injection targets compare equal
+  # despite symlinked temp dirs (macOS /var, BSD) or backslash-separated
+  # directory names from File::Temp on Windows.
+  $dir = path($dir)->realpath->stringify;
   my $f = { dir => $dir, db => "$dir/live.sqlite3", input => "$dir/input.csv",
     output => "$dir/result.qif", mapfile => "$dir/rules.map" };
   Finance::Tiller2QIF::Util::InitDB($f->{db});

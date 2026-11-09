@@ -52,10 +52,39 @@ DeployTest::SchemaV2->register_class(Widget => 'DeployTest::SchemaV2::Result::Wi
 
 # --- DDL generation ---
 my $ddl_v1 = DBIO::SQLite::DDL->install_ddl('DeployTest::SchemaV1');
-like($ddl_v1, qr/CREATE TABLE widget/, 'DDL has CREATE TABLE');
+like($ddl_v1, qr/CREATE TABLE "widget"/, 'DDL has CREATE TABLE');
 like($ddl_v1, qr/INTEGER PRIMARY KEY/, 'INTEGER PRIMARY KEY inline (no AUTOINCREMENT)');
-like($ddl_v1, qr/name VARCHAR/, 'varchar column');
+like($ddl_v1, qr/"name" VARCHAR/, 'varchar column');
 like($ddl_v1, qr/NOT NULL/,     'NOT NULL constraint');
+
+# --- Missing is_nullable means NOT NULL (ADR 0043) ---
+{
+  package DeployTest::SchemaNoNullable;
+  use base 'DBIO::Schema';
+  __PACKAGE__->load_components('SQLite');
+}
+{
+  package DeployTest::SchemaNoNullable::Result::Gadget;
+  use base 'DBIO::Core';
+
+  __PACKAGE__->table('gadget');
+  __PACKAGE__->add_columns(
+    id   => { data_type => 'integer', is_auto_increment => 1 },
+    name => { data_type => 'text' },
+    note => { data_type => 'text', is_nullable => 1 },
+  );
+  __PACKAGE__->set_primary_key('id');
+}
+DeployTest::SchemaNoNullable->register_class(Gadget => 'DeployTest::SchemaNoNullable::Result::Gadget');
+
+my $ddl_nonull = DBIO::SQLite::DDL->install_ddl('DeployTest::SchemaNoNullable');
+my ($name_line) = $ddl_nonull =~ /^(  "name" .*)$/m;
+like($name_line, qr/NOT NULL/,
+  'column without is_nullable deploys NOT NULL (ADR 0043)');
+my ($note_line) = $ddl_nonull =~ /^(  "note" .*)$/m;
+ok(defined $note_line, 'the note column has its line in the DDL');
+unlike($note_line, qr/NOT NULL/,
+  'explicit is_nullable => 1 stays nullable');
 
 # --- Install on fresh in-memory DB ---
 my $schema_v1 = DeployTest::SchemaV1->connect('dbi:SQLite::memory:', '', '', { AutoCommit => 1 });
@@ -90,7 +119,7 @@ my $deploy_v2 = DBIO::SQLite::Deploy->new(schema => $schema_v2_view);
 {
   my $diff = $deploy_v2->diff;
   ok($diff->has_changes, 'diff sees the new column');
-  like($diff->as_sql, qr/ALTER TABLE widget ADD COLUMN description/,
+  like($diff->as_sql, qr/ALTER TABLE "widget" ADD COLUMN "description"/,
     'diff emits ADD COLUMN');
   like($diff->summary, qr/\+column: widget\.description/,
     'summary mentions new column');

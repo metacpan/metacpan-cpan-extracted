@@ -4,12 +4,21 @@ use warnings;
 use Test::More;
 use DBIO::Optional::Dependencies ();
 use DBIO::Test;
-use Scope::Guard ();
+use DBIO::Util 'scope_guard';
 
 my $env2optdep = {
   DBIO_TEST_FIREBIRD => 'test_rdbms_firebird',
   DBIO_TEST_FIREBIRD_INTERBASE => 'test_rdbms_firebird_interbase',
   DBIO_TEST_FIREBIRD_ODBC => 'test_rdbms_firebird_odbc',
+};
+
+# A schema always has a driver (core ADR 0067). DBIO::Test::Schema is shared and
+# keeps none in its class, so each leg declares the storage of its DBD on a
+# clone: the native ones their own, the ODBC one the Firebird ODBC transport.
+my $prefix2storage = {
+  DBIO_TEST_FIREBIRD           => '+DBIO::Firebird::Storage',
+  DBIO_TEST_FIREBIRD_INTERBASE => '+DBIO::Firebird::Storage::InterBase',
+  DBIO_TEST_FIREBIRD_ODBC      => '+DBIO::Firebird::Storage::ODBC',
 };
 
 plan skip_all => join (' ',
@@ -44,13 +53,14 @@ for my $prefix (keys %$env2optdep) { SKIP: {
 
   note "Testing with ${prefix}_DSN";
 
-  $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
+  my $declared = DBIO::Test::Schema->clone(storage_type => $prefix2storage->{$prefix});
+  $schema = $declared->connect($dsn, $user, $pass, {
     quote_char => '"',
     name_sep   => '.',
     on_connect_call => [ 'datetime_setup' ],
   });
 
-  my $sg = Scope::Guard->new(sub { cleanup($schema) } );
+  my $sg = scope_guard { cleanup($schema) };
 
   eval { $schema->storage->dbh->do('DROP TABLE "event"') };
   $schema->storage->dbh->do(<<'SQL');

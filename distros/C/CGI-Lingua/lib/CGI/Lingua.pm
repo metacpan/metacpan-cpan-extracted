@@ -2,11 +2,10 @@ package CGI::Lingua;
 
 use warnings;
 use strict;
-use autodie qw(:all);
 
 use Carp ();	# fully qualified calls: nothing imported into this package
-use Object::Configure 0.23;
-use Params::Get 0.15;	# 0.15 fast-path: unblessed hashref returned directly
+use Object::Configure 0.25;
+use Params::Get 0.17;	# 0.15 fast-path: unblessed hashref returned directly
 use Readonly;
 use Scalar::Util ();	# fully qualified, so $obj->blessed() is not a method
 use JSON::PP ();
@@ -17,7 +16,7 @@ use Class::Autouse qw{
 	I18N::AcceptLanguage
 };
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 # Post-release roadmap (from the 0.87 gap analysis).
 #
@@ -29,9 +28,6 @@ our $VERSION = '0.87';
 # TODO: ip-api.com is plain HTTP and limited to 45 requests a minute; answers
 #	are validated but can be read and altered in transit.  Allow an API key
 #	/ HTTPS provider and add rate limiting or back-off.
-# TODO: Support MaxMind GeoLite2 (GeoIP2::Database::Reader or
-#	IP::Geolocation::MMDB); GeoIP.dat (frozen 2019) and Geo::IPfree (known
-#	wrong entries) are the only local databases today.
 # TODO: Add a timeout option: a slow upstream holds the request for LWP's
 #	default of 180 seconds.
 #
@@ -94,6 +90,20 @@ Readonly my $COUNTRY_RE   => qr/^(?:[a-z]{2}|Unknown)\z/a;
 # $ACCEPT_LANG_MAX bytes.  Captures the untainted value.
 Readonly my $ACCEPT_LANG_RE => qr/^([A-Za-z0-9\-,;=.* \t]{1,$ACCEPT_LANG_MAX})\z/a;
 
+# A locale from LC_ALL, LC_MESSAGES or LANG, as POSIX names them:
+# language[_territory][.codeset][@modifier], e.g. "en_US.UTF-8",
+# "sr_RS@latin", "C".  The characters only; captures the untainted value.
+Readonly my $LOCALE_RE => qr/^([A-Za-z0-9_.\-@]{1,$ACCEPT_LANG_MAX})\z/a;
+
+# The language tag a locale stands for: its language, and its territory if it
+# has one ("en_US.UTF-8" is en-US).  A hyphen is taken too, for "LANG=en-US".
+# "C", "POSIX" and other names that are not a language do not match.
+Readonly my $LOCALE_TAG_RE => qr/^([A-Za-z]{2,3})(?:[_-]([A-Za-z]{2}|[0-9]{3}))?(?:\.[A-Za-z0-9_\-]+)?(?:\@[A-Za-z0-9_\-]+)?\z/a;
+
+# The locale variables, in the order POSIX consults them for the language of
+# messages: the first that is set and not empty decides.
+Readonly my @LOCALE_VARS => qw(LC_ALL LC_MESSAGES LANG);
+
 # A supported-list entry: a language tag such as "en", "en-gb", "es-419" or
 # "zh-Hant" (an underscore is accepted for "en_gb").  "english" is not one.
 Readonly my $SUPPORTED_RE => qr/^[A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})*\z/a;
@@ -101,6 +111,10 @@ Readonly my $SUPPORTED_RE => qr/^[A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})*\z/a;
 # An IP address as accepted from REMOTE_ADDR, before Data::Validate::IP checks
 # it properly: dotted quad, or IPv6 including ::ffff:a.b.c.d.  Captures it.
 Readonly my $IP_SHAPE_RE => qr/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[0-9a-fA-F:]{2,39}|[0-9a-fA-F:]{2,30}:(?:\d{1,3}\.){3}\d{1,3})\z/a;
+
+# An IPv6 address has eight 16-bit groups of one to four hex digits (_is_ipv6)
+Readonly my $IPV6_GROUPS => 8;
+Readonly my $IPV6_GROUP_RE => qr/^[0-9A-Fa-f]{1,4}\z/;
 
 # Fields that DESTROY saves and new() restores, with the shape each must have
 # time_zone(): IANA zone names (e.g. "America/New_York", "Etc/GMT+8", "UTC")
@@ -121,6 +135,22 @@ our @GEOIP_DAT = (
 	'/usr/local/share/GeoIP/GeoIP.dat',
 );
 
+# Where _load_mmdb() looks for a MaxMind GeoIP2 / GeoLite2 database (.mmdb).
+# Unlike GeoIP.dat these are still updated, so country() and time_zone() try
+# one first.  City databases come first because they also hold the time zone.
+# /var/lib/GeoIP is where geoipupdate writes on Debian and Ubuntu.  A package
+# variable so a test or a site can point it elsewhere.
+our @GEOIP2_MMDB = map {
+	my $dir = $_;
+	map { "$dir/$_.mmdb" } qw(GeoIP2-City GeoLite2-City GeoIP2-Country GeoLite2-Country)
+} (($^O eq 'MSWin32') ? ('c:/GeoIP') : ()), '/var/lib/GeoIP', '/usr/share/GeoIP', '/usr/local/share/GeoIP';
+
+# Modules that can read a .mmdb file, in order of preference.  Both have
+# new(file => ...) and record_for_address($ip), returning the same hashes.
+# IP::Geolocation::MMDB wraps the libmaxminddb C library; MaxMind::DB::Reader
+# is the pure-Perl reader that GeoIP2::Database::Reader is built on.
+Readonly my @MMDB_READERS => ('IP::Geolocation::MMDB', 'MaxMind::DB::Reader');
+
 Readonly my %RESTORABLE => (
 	_slanguage               => $NAME_RE,
 	_rlanguage               => $NAME_RE,
@@ -133,7 +163,7 @@ Readonly my %RESTORABLE => (
 # Package-level sentinel for Locale::Object's SQLite database.  undef = not yet
 # probed; 0 = database absent (Windows installers often omit it); 1 = available.
 # Package-level (not per-object) because the database either exists on the
-# filesystem or it doesn't — there is no per-request variability.
+# filesystem or it doesn't -- there is no per-request variability.
 my $_locale_object_db_ok;
 
 # Package-level sentinel for Data::Validate::IP / NetAddr::IP availability.
@@ -175,7 +205,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.87
+Version 0.88
 
 =cut
 
@@ -314,9 +344,16 @@ A language with C<q=0> means "not acceptable" (RFC 7231) and is never chosen.
 Some browsers still send the old tag C<en-uk>; it is treated as C<en-gb>
 (the code for the United Kingdom is C<gb>), with a warning.
 
-=item 3. The C<LANG> environment variable.
+=item 3. The locale: C<LC_ALL>, then C<LC_MESSAGES>, then C<LANG>.
 This is used when you run the program on the command line,
 for example C<LANG=fr_FR.UTF-8>.
+As in POSIX, the first of these that is set and not empty decides, so
+C<LC_ALL=C> means no language even when C<LANG> names one.
+The locale is read as the language tag it stands for:
+C<en_US.UTF-8> is C<en-US> (English, United States) and C<de_DE@euro> is
+C<de-DE>; C<C> and C<POSIX> name no language.
+Before 0.88 the locale was passed on as it was written, and C<en_US.UTF-8>
+matched no language.
 
 =item 4. The visitor's country (see below).
 CGI::Lingua uses the official language of that country.
@@ -339,8 +376,9 @@ L</country> tries these sources in order, and stops at the first answer:
 
 =item 2. C<HTTP_CF_IPCOUNTRY> (set by Cloudflare).
 
-=item 3. A local database: L<IP::Country>, then L<Geo::IP>, then L<Geo::IPfree>,
-if they are installed.
+=item 3. A local database: a MaxMind GeoIP2 or GeoLite2 database (see
+L</@CGI::Lingua::GEOIP2_MMDB>), then L<IP::Country>, then L<Geo::IP>, then
+L<Geo::IPfree>, if they are installed.
 
 =item 4. The geoplugin.net web service.
 
@@ -638,6 +676,7 @@ sub new
 		_info            => $info,
 		_syslog          => $params->{syslog},
 		_dont_use_ip     => $params->{dont_use_ip} || 0,
+		_have_mmdb       => $GEO_UNKNOWN,
 		_have_ipcountry  => $GEO_UNKNOWN,
 		_have_geoip      => $GEO_UNKNOWN,
 		_have_geoipfree  => $GEO_UNKNOWN,
@@ -685,13 +724,13 @@ sub new
 
 	return $self;
 }
-# ── _build_cache_key ──────────────────────────────────────────────────────────
+# -- _build_cache_key ----------------------------------------------------------
 # Purpose:      Produce a deterministic string key for the per-request cache
 #               entry stored in new() and DESTROY().
-# Entry:        $addr  — IP string (not yet taint-checked; used read-only here)
-#               $params — constructor params hashref
-#               $class  — package name
-#               $info   — optional CGI::Info object
+# Entry:        $addr  -- IP string (not yet taint-checked; used read-only here)
+#               $params -- constructor params hashref
+#               $class  -- package name
+#               $info   -- optional CGI::Info object
 # Exit:         A plain string key of the form "ip/lang/lang1/lang2/..."
 sub _build_cache_key
 {
@@ -714,7 +753,7 @@ sub _build_cache_key
 		$key .= "$l/" if length($l);
 	}
 
-	# Fix: was ref($params->{'supported'} eq 'ARRAY') — eq was inside ref(),
+	# Fix: was ref($params->{'supported'} eq 'ARRAY') -- eq was inside ref(),
 	# so ref() always received a boolean (1 or ''), never the arrayref itself.
 	# Only entries that new() would keep are used.
 	my @supported = ref($params->{'supported'}) eq 'ARRAY' ? @{$params->{supported}} : ($params->{'supported'});
@@ -723,11 +762,11 @@ sub _build_cache_key
 	return $key;
 }
 
-# ── _untaint_ip ──────────────────────────────────────────────────────────
+# -- _untaint_ip ----------------------------------------------------------
 # Purpose:      Check that a value has the shape of an IP address and return
 #               an untainted copy.  The single place REMOTE_ADDR is checked,
 #               so country(), time_zone() and the cache key always agree.
-# Entry:        $raw — any scalar.
+# Entry:        $raw -- any scalar.
 # Exit:         The address, or undef.  \z, not $, so "1.2.3.4\n" is refused.
 # Notes:        Shape only: country() then range-checks with is_ipv4/is_ipv6.
 sub _untaint_ip
@@ -737,15 +776,15 @@ sub _untaint_ip
 	return $raw =~ $IP_SHAPE_RE ? $1 : undef;
 }
 
-# ── _cache_call ──────────────────────────────────────────────────────────
+# -- _cache_call ----------------------------------------------------------
 # Purpose:      Call get/set/remove on the caller-supplied cache without
 #               letting a cache failure take down the request.  The cache only
 #               saves time, so a broken backend (full disc, unreachable Redis,
 #               CHI with on_get_error => 'die') must degrade to "not cached".
-# Entry:        $self   — a CGI::Lingua object, or new()'s params hashref
+# Entry:        $self   -- a CGI::Lingua object, or new()'s params hashref
 #                         (used only to find a logger);
-#               $cache  — the cache object; $method — 'get', 'set' or 'remove';
-#               @args   — passed to the method unchanged.
+#               $cache  -- the cache object; $method -- 'get', 'set' or 'remove';
+#               @args   -- passed to the method unchanged.
 # Exit:         The method's scalar result, or undef if it died.
 # Side Effects: Warns "Cache <method> failed: <error>" on failure.
 sub _cache_call
@@ -769,11 +808,11 @@ sub _cache_call
 	return;
 }
 
-# ── _info_lang ───────────────────────────────────────────────────────────
+# -- _info_lang -----------------------------------------------------------
 # Purpose:      Ask the CGI::Info-style object for the lang= parameter without
 #               letting a broken object (an AUTOLOAD that dies) end the request.
-# Entry:        $info — the info object, or undef;
-#               $self — optional object to warn through when the value is bad.
+# Entry:        $info -- the info object, or undef;
+#               $self -- optional object to warn through when the value is bad.
 # Exit:         The validated, untainted lang value, or undef if there is none,
 #               the call died, or the value is not a plausible language list.
 sub _info_lang
@@ -793,12 +832,12 @@ sub _info_lang
 	return undef;
 }
 
-# ── _cache_get_valid ─────────────────────────────────────────────────────
+# -- _cache_get_valid -----------------------------------------------------
 # Purpose:      Read a value from the cache and use it only if it has the
 #               shape CGI::Lingua itself stores.  The cache may be shared or
 #               writable by others; a poisoned entry ("<script>", a hashref,
 #               "../../etc") must never become a language or country.
-# Entry:        $key — full cache key; $re — the pattern the value must match.
+# Entry:        $key -- full cache key; $re -- the pattern the value must match.
 # Exit:         The value, or undef on a miss or a malformed value.
 # Side Effects: A malformed value is removed and "Discarding malformed cache
 #               entry for <key>" is warned (the value itself is not logged:
@@ -841,7 +880,7 @@ sub DESTROY {
 
 	$self->_debug("Storing self in cache as $key");
 
-	# Serialise only the computed state — not loggers, file handles, or
+	# Serialise only the computed state -- not loggers, file handles, or
 	# geo-module objects (they are re-initialised on next construction).
 	# JSON::PP is used instead of Storable so that a compromised cache backend
 	# cannot deliver a blob that executes code via STORABLE_thaw hooks.
@@ -897,6 +936,8 @@ ignores the value, when one of its inputs is not acceptable:
 
     "lang parameter contains invalid characters; ignoring"
     "HTTP_ACCEPT_LANGUAGE contains invalid characters; ignoring"
+    "LC_ALL contains invalid characters; ignoring"
+    "LC_MESSAGES contains invalid characters; ignoring"
     "LANG contains invalid characters; ignoring"
 
 It also warns when it changes the deprecated tag C<en-uk> into C<en-gb>:
@@ -1153,10 +1194,10 @@ sub requested_language {
 	return $self->{_rlanguage};
 }
 
-# ── _find_language ─────────────────────────────────────────────────────────
+# -- _find_language ---------------------------------------------------------
 # Purpose:      Populate _slanguage, _rlanguage, _sublanguage, and the
 #               various code fields by working through the detection pipeline:
-#               Accept-Language header → I18N::AcceptLanguage → IP country.
+#               Accept-Language header -> I18N::AcceptLanguage -> IP country.
 # Entry:        $self->{_slanguage} must be undef (guards repeated calls).
 # Exit:         $self->{_slanguage} is set to a language name or 'Unknown'.
 # Side Effects: Populates _rlanguage, _sublanguage, *_code_alpha2 fields.
@@ -1240,10 +1281,10 @@ sub _find_language
 	$self->_find_language_from_ip($http_accept_language);
 }
 
-# ── _accept_language_match ────────────────────────────────────────────────
+# -- _accept_language_match ------------------------------------------------
 # Purpose:      Run I18N::AcceptLanguage strict matching plus two fallback
 #               left-to-right scan passes against $self->{_supported}.
-# Entry:        $http_accept_language — validated, untainted Accept-Language value.
+# Entry:        $http_accept_language -- validated, untainted Accept-Language value.
 # Exit:         Returns ($matched_code, $requested_sublanguage) or (undef, undef).
 # Side Effects: Logs debug messages.
 sub _accept_language_match
@@ -1282,10 +1323,10 @@ sub _accept_language_match
 	return ($l, $requested_sublanguage);
 }
 
-# ── _sorted_tokens ────────────────────────────────────────────────────────
+# -- _sorted_tokens --------------------------------------------------------
 # Purpose:      Parse an Accept-Language header into tokens sorted by
 #               descending quality value so fallback scans honour q= priority.
-# Entry:        $header — validated Accept-Language string.
+# Entry:        $header -- validated Accept-Language string.
 # Exit:         Arrayref of [$language_tag, $quality] pairs, highest q first.
 sub _sorted_tokens
 {
@@ -1303,11 +1344,11 @@ sub _sorted_tokens
 	return [sort { $b->[1] <=> $a->[1] } @tokens];
 }
 
-# ── _scan_sublanguage_pairs ───────────────────────────────────────────────
+# -- _scan_sublanguage_pairs -----------------------------------------------
 # Purpose:      Walk q-sorted tokens looking for xx-yy pairs; try accepting
 #               the base language xx from the supported list.
-# Entry:        $i18n — I18N::AcceptLanguage instance;
-#               $sorted — arrayref from _sorted_tokens.
+# Entry:        $i18n -- I18N::AcceptLanguage instance;
+#               $sorted -- arrayref from _sorted_tokens.
 # Exit:         ($matched_code, $sublanguage_code) or (undef, undef).
 # Side Effects: Debug logging.
 sub _scan_sublanguage_pairs
@@ -1328,11 +1369,11 @@ sub _scan_sublanguage_pairs
 	return (undef, undef);
 }
 
-# ── _scan_plain_tokens ────────────────────────────────────────────────────
+# -- _scan_plain_tokens ----------------------------------------------------
 # Purpose:      Walk q-sorted tokens that have no sublanguage suffix and try
 #               accepting each against the supported list.
-# Entry:        $i18n — I18N::AcceptLanguage instance;
-#               $sorted — arrayref from _sorted_tokens.
+# Entry:        $i18n -- I18N::AcceptLanguage instance;
+#               $sorted -- arrayref from _sorted_tokens.
 # Exit:         Matched code string, or undef.
 # Side Effects: Debug logging.
 sub _scan_plain_tokens
@@ -1352,11 +1393,11 @@ sub _scan_plain_tokens
 	return;
 }
 
-# ── _resolve_match ────────────────────────────────────────────────────────
+# -- _resolve_match --------------------------------------------------------
 # Purpose:      Given a matched code $l (possibly xx or xx-yy), populate all
 #               of _slanguage, _rlanguage, _sublanguage and their code fields.
-# Entry:        $l — 2-char or xx-yy language code; $requested_sublanguage —
-#               2-char variety code or undef; $http_accept_language — full header.
+# Entry:        $l -- 2-char or xx-yy language code; $requested_sublanguage --
+#               2-char variety code or undef; $http_accept_language -- full header.
 # Exit:         Returns true (1) if the caller should return immediately.
 # Side Effects: Mutates $self->{_slanguage}, _rlanguage, _sublanguage, etc.
 sub _resolve_match
@@ -1366,20 +1407,20 @@ sub _resolve_match
 	$self->_debug("l: $l");
 
 	if($l !~ /^..-../) {
-		# Base-language match (e.g. 'en') — no sublanguage component
+		# Base-language match (e.g. 'en') -- no sublanguage component
 		return $self->_resolve_base_match($l, $requested_sublanguage, $http_accept_language);
 	} elsif($l =~ /(.+)-(..)$/) {
-		# Sublanguage match (e.g. 'en-gb') — resolve both language and variant
+		# Sublanguage match (e.g. 'en-gb') -- resolve both language and variant
 		return $self->_resolve_sublanguage_match($l, $1, $2, $http_accept_language);
 	}
 	return 0;
 }
 
-# ── _resolve_base_match ───────────────────────────────────────────────────
+# -- _resolve_base_match ---------------------------------------------------
 # Purpose:      Handle the case where a base-language code matched (no hyphen).
 #               Sets _slanguage, _rlanguage; appends sublanguage name to rlanguage
 #               when the client requested one we don't support.
-# Entry:        $l — 2-char code; $requested_sublanguage — optional; $header.
+# Entry:        $l -- 2-char code; $requested_sublanguage -- optional; $header.
 # Exit:         1 to signal caller should return, 0 otherwise.
 # Side Effects: Mutates slanguage, rlanguage, slanguage_code_alpha2.
 sub _resolve_base_match
@@ -1423,11 +1464,11 @@ sub _resolve_base_match
 	return 1;
 }
 
-# ── _resolve_sublanguage_match ────────────────────────────────────────────
+# -- _resolve_sublanguage_match --------------------------------------------
 # Purpose:      Handle the case where the full xx-yy code matched in the
 #               supported list.  Resolves the variety name and caches results.
-# Entry:        $l — full code e.g. 'en-gb'; $alpha2 — 'en'; $variety — 'gb';
-#               $header — full Accept-Language value.
+# Entry:        $l -- full code e.g. 'en-gb'; $alpha2 -- 'en'; $variety -- 'gb';
+#               $header -- full Accept-Language value.
 # Exit:         1 to signal caller should return, 0 otherwise.
 # Side Effects: Mutates _slanguage, _rlanguage, _sublanguage and code fields;
 #               writes to cache.
@@ -1444,7 +1485,7 @@ sub _resolve_sublanguage_match
 	# branch for a hyphen-less answer could never run, and was removed.)
 	delete $self->{_slanguage} if $accepts;
 
-	# Accepts returned something but we couldn't resolve a language name —
+	# Accepts returned something but we couldn't resolve a language name --
 	# try harder using the variety code directly
 	$self->{_rlanguage} = $self->_code2language($alpha2);
 	$self->_debug("_rlanguage: $self->{_rlanguage}");
@@ -1516,7 +1557,7 @@ sub _resolve_sublanguage_match
 			if($self->{_cache} && !defined($from_cache)) {
 				# Store "countryname=langcode" so future cache hits return the country
 				# name in the first field.  Previously this stored the language name
-				# ("English=en" for en-gb) which was wrong — the cache-hit branch
+				# ("English=en" for en-gb) which was wrong -- the cache-hit branch
 				# split on = and used the first field as the sublanguage (country) name.
 				$self->_debug("Set variety:$variety to $language_name=$self->{_slanguage_code_alpha2}");
 				$self->_cache_call($self->{_cache}, 'set',
@@ -1536,11 +1577,11 @@ sub _resolve_sublanguage_match
 	return 0;
 }
 
-# ── _find_language_from_ip ────────────────────────────────────────────────
+# -- _find_language_from_ip ------------------------------------------------
 # Purpose:      Fall back to the visitor's IP country when the Accept-Language
 #               header produced no usable match.  Looks up the official language
 #               of the country and checks it against the supported list.
-# Entry:        $http_accept_language — may be undef if no header was present.
+# Entry:        $http_accept_language -- may be undef if no header was present.
 # Exit:         Mutates _slanguage, _rlanguage via _get_closest if a match found.
 # Side Effects: Calls country(); may write to cache.
 sub _find_language_from_ip
@@ -1549,10 +1590,15 @@ sub _find_language_from_ip
 
 	my $country = $self->country();
 
-	# If country() returned nothing, try to derive from the LANG env var
+	# If country() returned nothing, try to derive from the locale's territory
+	# (_what_language gives LANG=fr_FR.UTF-8 as "fr-FR").  Only a locale's
+	# hyphen counts: a header's "fr-CA" is the reader's language, not where
+	# they are, and was never read as a country.
 	if(!defined($country) && (my $c = $self->_what_language())) {
 		if($c =~ /^(..)_(..)/) {
 			$country = $2;
+		} elsif($self->{_what_language_from_locale} && ($c =~ /^[A-Za-z]{2,3}-([A-Za-z]{2})\z/)) {
+			$country = $1;
 		} elsif($c =~ /^(..)$/) {
 			$country = $1;
 		}
@@ -1606,7 +1652,7 @@ sub _find_language_from_ip
 					$code = Locale::Language::language2code($http_accept_language);
 				}
 				unless($code) {
-					# Norwegian (Nynorsk) — strip the parenthetical qualifier
+					# Norwegian (Nynorsk) -- strip the parenthetical qualifier
 					if($self->{_rlanguage} =~ /(.+)\s\(.+/) {
 						if((!defined($http_accept_language)) || ($1 ne $self->{_rlanguage})) {
 							$self->_debug("Call language2code on $1");
@@ -1647,10 +1693,10 @@ sub _find_language_from_ip
 	}
 }
 
-# ── _get_closest ─────────────────────────────────────────────────────────
+# -- _get_closest ---------------------------------------------------------
 # Purpose:      If $language_string matches the base language of any supported
 #               entry, set _slanguage and _slanguage_code_alpha2.
-# Entry:        $language_string — base code e.g. 'en'; $alpha2 — same or variant.
+# Entry:        $language_string -- base code e.g. 'en'; $alpha2 -- same or variant.
 # Exit:         Mutates _slanguage and _slanguage_code_alpha2 on match.
 sub _get_closest
 {
@@ -1666,7 +1712,7 @@ sub _get_closest
 	}
 }
 
-# ── _what_language ────────────────────────────────────────────────────────
+# -- _what_language --------------------------------------------------------
 # Purpose:      Return the raw (validated, untainted) Accept-Language string,
 #               consulting in priority order: cached value, CGI lang= param,
 #               HTTP_ACCEPT_LANGUAGE env var, LANG env var (local/debug mode).
@@ -1692,7 +1738,7 @@ sub _what_language {
 	}
 
 	if(my $raw_lang = $ENV{'HTTP_ACCEPT_LANGUAGE'}) {
-		# Validate and untaint — RFC 7231 §5.3.5 character set plus * wildcard.
+		# Validate and untaint -- RFC 7231 section 5.3.5 character set plus * wildcard.
 		# Spaces and tabs only, not \s: CR and LF would carry header, log-line
 		# and Memcached-command injection into the cache key and messages.
 		if($raw_lang =~ $ACCEPT_LANG_RE) {
@@ -1706,23 +1752,50 @@ sub _what_language {
 		}
 	}
 
-	if(defined($ENV{'LANG'})) {
-		# Running locally (debug mode) — derive from system locale.
-		# Apply the same untainting discipline as HTTP_ACCEPT_LANGUAGE: only
-		# alphanumeric, hyphen, underscore, and dot are legitimate in a POSIX
-		# locale name (e.g. "en_US.UTF-8", "de_DE", "ja").  Anything else is
-		# either malformed or an injection attempt; discard it silently.
-		if($ENV{'LANG'} =~ /^([A-Za-z0-9_.\-]{1,$ACCEPT_LANG_MAX})$/a) {
-			my $rc = $1;    # untainted
-			if(ref($self)) {
-				return $self->{_what_language} = $rc;
-			}
-			return $rc;
-		} elsif(ref($self)) {
-			$self->_warn({ warning => 'LANG contains invalid characters; ignoring' });
+	# Running locally (the command line) - derive from the system locale.
+	# POSIX takes the language of messages from LC_ALL, then LC_MESSAGES,
+	# then LANG: the first that is set and not empty decides, even when it
+	# names no language (LC_ALL=C), so a later one is not consulted.
+	for my $var (@LOCALE_VARS) {
+		my $locale = $ENV{$var};
+		next unless defined($locale) && length($locale);
+
+		# The same untainting discipline as HTTP_ACCEPT_LANGUAGE: only the
+		# characters of a POSIX locale name (e.g. "en_US.UTF-8",
+		# "sr_RS@latin", "ja").  Anything else is malformed or an injection
+		# attempt, and is ignored with a warning.
+		unless($locale =~ $LOCALE_RE) {
+			$self->_warn({ warning => "$var contains invalid characters; ignoring" }) if(ref($self));
+			return;
 		}
+
+		# A locale is not a language tag, and what follows matches tags:
+		# "en_US.UTF-8" read as one names no language at all.  So pass on the
+		# tag the locale stands for, "en-US".  "C" and "POSIX" name none.
+		my $tag = _locale_tag($1);
+		return unless defined($tag);
+		if(ref($self)) {
+			$self->_trace("_what_language set language to $tag from $var");
+			$self->{_what_language_from_locale} = 1;
+			return $self->{_what_language} = $tag;
+		}
+		return $tag;
 	}
 	return;
+}
+
+# -- _locale_tag -----------------------------------------------------------
+# Purpose:      The language tag a POSIX locale name stands for.
+# Entry:        $locale -- an untainted locale name ("en_US.UTF-8", "de_DE@euro",
+#               "fr", "C").
+# Exit:         "en-US", "de-DE", "fr"; undef for a name that is not a
+#               language ("C", "POSIX", "C.UTF-8").
+sub _locale_tag
+{
+	my $locale = $_[0];
+
+	return undef unless(defined($locale) && ($locale =~ $LOCALE_TAG_RE));
+	return defined($2) ? "$1-$2" : $1;
 }
 
 =head2 country
@@ -1743,7 +1816,8 @@ record that says C<US> with the state C<PR> is returned as C<pr> (Puerto Rico
 has its own country code; RT#131347).
 
 See L</Finding the country> for the order in which the sources are tried.
-If you have none of L<IP::Country>, L<Geo::IP> or L<Geo::IPfree> installed,
+If you have no GeoIP2 / GeoLite2 database and none of L<IP::Country>,
+L<Geo::IP> or L<Geo::IPfree> installed,
 every look-up goes over the network, so please use a C<cache> (see L</new>).
 
 The answer is remembered, so a second call on the same object is fast.
@@ -1758,6 +1832,11 @@ Legacy MaxMind F<GeoIP.dat> databases, as used by L<Geo::IP>, are no
 longer updated (Debian's C<geoip-database> package is frozen at
 2019-12-24), so they can give the wrong country for addresses that
 have been reallocated since then.
+A MaxMind GeoLite2 database is free (it needs a MaxMind account), is
+updated twice a week, and is used before any other local database.
+Install L<IP::Geolocation::MMDB> or L<MaxMind::DB::Reader> to read it,
+and keep it up to date with MaxMind's C<geoipupdate> program,
+which writes it to F</var/lib/GeoIP> on Debian and Ubuntu.
 
 =head3 API SPECIFICATION
 
@@ -1799,6 +1878,8 @@ These are warnings. C<country()> does not die.
     "geoplugin lookup failed: ..."
     "Cache get failed: ...", "Cache set failed: ...", "Cache remove failed: ..."
     "Discarding malformed cache entry for ..."
+    "Can't open ... with Geo::IP; not using it"
+    "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"
 
 These are debug messages, sent only to the logger:
 
@@ -1814,15 +1895,17 @@ These are debug messages, sent only to the logger:
        change ::ffff:a.b.c.d into a.b.c.d
     5. Skip private and loopback IPs (return undef)
     6. Check CHI cache; return cached value if present
-    7. Try IP::Country::Fast (local DB, fastest)
-    8. Try Geo::IP (local DB)
-    9. Try Geo::IPfree (local DB, skip $BROKEN_GEOIPFREE)
-    10. Try geoplugin.net JSON API (LWP::Simple::WithCache;
+    7. Try a GeoIP2 / GeoLite2 .mmdb file from @GEOIP2_MMDB (local DB,
+       read with IP::Geolocation::MMDB or MaxMind::DB::Reader)
+    8. Try IP::Country::Fast (local DB)
+    9. Try Geo::IP (local DB)
+    10. Try Geo::IPfree (local DB, skip $BROKEN_GEOIPFREE)
+    11. Try geoplugin.net JSON API (LWP::Simple::WithCache;
         no free tier as of October 2026, so normally yields nothing)
-    11. Last resort: Net::Whois::IP then Net::Whois::IANA
-    12. Sanitise: discard numeric, normalise HK->CN, handle EU special case,
+    12. Last resort: Net::Whois::IP then Net::Whois::IANA
+    13. Sanitise: discard numeric, normalise HK->CN, handle EU special case,
         discard anything that is not two lower-case letters
-    13. Store in CHI cache; return result
+    14. Store in CHI cache; return result
 
 =cut
 
@@ -1852,7 +1935,7 @@ sub country {
 		}
 	}
 
-	# Cloudflare: 'XX' means Cloudflare couldn't determine country — skip it
+	# Cloudflare: 'XX' means Cloudflare couldn't determine country -- skip it
 	if(($ENV{'HTTP_CF_IPCOUNTRY'}) && ($ENV{'HTTP_CF_IPCOUNTRY'} ne 'XX')) {
 		if($ENV{'HTTP_CF_IPCOUNTRY'} =~ /^([A-Z]{2})\z/a) {
 			$self->{_country} = lc($1);
@@ -1919,7 +2002,7 @@ sub country {
 		return undef;
 	}
 
-	# Cache look-up — skip for LAN/loopback (already returned above)
+	# Cache look-up -- skip for LAN/loopback (already returned above)
 	if($self->{_cache}) {
 		$self->{_country} = $self->_cache_call($self->{_cache}, 'get', $CACHE_NS . "country:$ip");
 		if(defined($self->{_country})) {
@@ -1941,25 +2024,39 @@ sub country {
 		$self->_debug("$ip isn't in the cache");
 	}
 
-	# Try IP::Country first (fastest, local database)
-	if($self->{_have_ipcountry} == $GEO_UNKNOWN) {
-		if(eval { require IP::Country::Fast }) {
-			# Require the concrete class directly; IP::Country->import() is not needed
-			# because IP::Country::Fast->new() is a fully-qualified class method call.
-			$self->{_have_ipcountry} = $GEO_PRESENT;
-			$self->{_ipcountry}      = IP::Country::Fast->new();
+	# Try a GeoIP2 / GeoLite2 database first: it is the only local source
+	# that is still updated.  The record comes from a file, so check its
+	# shape like any other upstream answer.
+	if(my $record = $self->_mmdb_record($ip)) {
+		my $cc = (ref($record->{country}) eq 'HASH') ? $record->{country}{iso_code} : undef;
+		if(defined($cc) && !ref($cc) && ($cc =~ /^([A-Za-z]{2})\z/a)) {
+			$self->{_country} = lc($1);
 		} else {
-			$self->{_have_ipcountry} = $GEO_ABSENT;
+			$self->_debug("$ip has no country in the GeoIP2 database");
 		}
 	}
-	$self->_debug("have_ipcountry $self->{_have_ipcountry}");
 
-	if($self->{_have_ipcountry}) {
-		$self->{_country} = $self->{_ipcountry}->inet_atocc($ip);
-		if($self->{_country}) {
-			$self->{_country} = lc($self->{_country});
-		} elsif(is_ipv4($ip)) {
-			$self->_debug("$ip is not known by IP::Country");
+	# Then IP::Country (fast, local database)
+	unless(defined($self->{_country})) {
+		if($self->{_have_ipcountry} == $GEO_UNKNOWN) {
+			if(eval { require IP::Country::Fast }) {
+				# Require the concrete class directly; IP::Country->import() is not needed
+				# because IP::Country::Fast->new() is a fully-qualified class method call.
+				$self->{_have_ipcountry} = $GEO_PRESENT;
+				$self->{_ipcountry}      = IP::Country::Fast->new();
+			} else {
+				$self->{_have_ipcountry} = $GEO_ABSENT;
+			}
+		}
+		$self->_debug("have_ipcountry $self->{_have_ipcountry}");
+
+		if($self->{_have_ipcountry}) {
+			$self->{_country} = $self->{_ipcountry}->inet_atocc($ip);
+			if($self->{_country}) {
+				$self->{_country} = lc($self->{_country});
+			} elsif(is_ipv4($ip)) {
+				$self->_debug("$ip is not known by IP::Country");
+			}
 		}
 	}
 
@@ -1994,7 +2091,7 @@ sub country {
 		}
 	}
 
-	# 'eu' is not a real country — discard
+	# 'eu' is not a real country -- discard
 	if($self->{_country} && ($self->{_country} eq 'eu')) {
 		delete $self->{_country};
 	}
@@ -2074,9 +2171,9 @@ sub country {
 	return $self->{_country};
 }
 
-# ── _resolve_country_via_whois ─────────────────────────────────────────────
+# -- _resolve_country_via_whois ---------------------------------------------
 # Purpose:      Attempt Net::Whois::IP then Net::Whois::IANA as a last resort.
-# Entry:        $ip — validated, untainted IP string.
+# Entry:        $ip -- validated, untainted IP string.
 # Exit:         Sets $self->{_country} if a result was found.
 # Side Effects: Network I/O; logs debug messages.
 sub _resolve_country_via_whois
@@ -2149,11 +2246,11 @@ sub _resolve_country_via_whois
 	}
 }
 
-# ── _clean_country_code ───────────────────────────────────────────────────
-# Purpose:      Strip carriage returns and trailing "#…" comments that some
+# -- _clean_country_code ---------------------------------------------------
+# Purpose:      Strip carriage returns and trailing "#..." comments that some
 #               Whois servers append to their country field
 #               (e.g. "US\r", "GB # United Kingdom").
-# Entry:        $raw — raw country string from a Whois response.
+# Entry:        $raw -- raw country string from a Whois response.
 # Exit:         Cleaned 2-char country code string.
 sub _clean_country_code
 {
@@ -2170,11 +2267,11 @@ sub _clean_country_code
 	return;
 }
 
-# ── _in_baidu_subnet ──────────────────────────────────────────────────────
+# -- _in_baidu_subnet ------------------------------------------------------
 # Purpose:      Pure-Perl fallback check for the Baidu IPv4 subnet
 #               185.10.104.0/22.  Used when Net::Subnet is absent (e.g. on
 #               Windows where its Socket6 dependency fails to build).
-# Entry:        $ip — untainted IPv4 string.
+# Entry:        $ip -- untainted IPv4 string.
 # Exit:         Returns true if $ip is within the /22 block, false otherwise.
 sub _in_baidu_subnet
 {
@@ -2189,11 +2286,11 @@ sub _in_baidu_subnet
 	return (($n & 0xFFFFFC00) == ($net & 0xFFFFFC00));
 }
 
-# ── _handle_eu_country ────────────────────────────────────────────────────
+# -- _handle_eu_country ----------------------------------------------------
 # Purpose:      Resolve the ambiguous 'eu' country code.  RT-86809 shows that
 #               Baidu reports itself as EU when it is actually in CN.  All
 #               other 'eu' addresses are logged as Unknown.
-# Entry:        $ip — validated, untainted IP string.
+# Entry:        $ip -- validated, untainted IP string.
 # Exit:         Sets $self->{_country} to 'cn' or 'Unknown'.
 # Side Effects: Optionally loads Net::Subnet; writes info log entry.
 sub _handle_eu_country
@@ -2217,7 +2314,7 @@ sub _handle_eu_country
 	}
 }
 
-# ── _load_geoip ───────────────────────────────────────────────────────────
+# -- _load_geoip -----------------------------------------------------------
 # Purpose:      Probe for the Geo::IP database file and the Geo::IP module;
 #               set _have_geoip and initialise _geoip on success.
 # Entry:        _have_geoip must be GEO_UNKNOWN.
@@ -2228,7 +2325,7 @@ sub _load_geoip
 	my $self = shift;
 
 	# Check for the database file before even trying to load the module
-	# (avoids noisy errors on Windows — CPANTESTERS report 54117bd0)
+	# (avoids noisy errors on Windows -- CPANTESTERS report 54117bd0)
 	my ($dat) = grep { -f $_ && -r _ } @GEOIP_DAT;
 	unless(defined($dat)) {
 		$self->{_have_geoip} = $GEO_ABSENT;
@@ -2252,6 +2349,63 @@ sub _load_geoip
 		$self->_warn({ warning => "Can't open $dat with Geo::IP; not using it" });
 		$self->{_have_geoip} = $GEO_ABSENT;
 	}
+}
+
+# -- _load_mmdb ------------------------------------------------------------
+# Purpose:      Find a GeoIP2 / GeoLite2 database in @GEOIP2_MMDB and open it
+#               with the first module in @MMDB_READERS that can.
+# Entry:        _have_mmdb must be GEO_UNKNOWN.
+# Exit:         _have_mmdb set to GEO_PRESENT (and _mmdb to the reader) or
+#               GEO_ABSENT.  Warns if a reader is installed but none can open
+#               the file (corrupt or truncated download).
+# Side Effects: Requires the reader modules; opens the .mmdb file.
+sub _load_mmdb
+{
+	my $self = shift;
+
+	$self->{_have_mmdb} = $GEO_ABSENT;
+
+	# Look for the file before loading a module, as _load_geoip() does
+	my ($file) = grep { -f $_ && -r _ } @GEOIP2_MMDB;
+	return unless defined($file);
+
+	my $have_reader = 0;
+	for my $class (@MMDB_READERS) {
+		(my $pm = "$class.pm") =~ s{::}{/}g;
+		next unless eval { local $SIG{__DIE__}; require $pm; 1 };
+		$have_reader = 1;
+
+		# No ->import(): both are used only through new() and methods
+		my $reader = eval { local $SIG{__DIE__}; $class->new(file => $file) };
+		if(Scalar::Util::blessed($reader)) {
+			$self->_debug("Using $file with $class");
+			$self->{_have_mmdb} = $GEO_PRESENT;
+			$self->{_mmdb}      = $reader;
+			return;
+		}
+	}
+	if($have_reader) {
+		# Not $@: MaxMind::DB::Reader's message carries a whole stack trace
+		$self->_warn({ warning => "Can't open $file with " . join(' or ', @MMDB_READERS) . '; not using it' });
+	}
+}
+
+# -- _mmdb_record ----------------------------------------------------------
+# Purpose:      Look an address up in the GeoIP2 / GeoLite2 database.
+# Entry:        $ip, already untainted and validated.
+# Exit:         The record (a hashref, e.g. { country => { iso_code => 'GB' },
+#               location => { time_zone => 'Europe/London' } }), or undef if
+#               there is no database, no record, or the look-up died (an IPv6
+#               address in an IPv4-only database dies in IP::Geolocation::MMDB).
+sub _mmdb_record
+{
+	my ($self, $ip) = @_;
+
+	$self->_load_mmdb() if $self->{_have_mmdb} == $GEO_UNKNOWN;
+	return undef unless $self->{_have_mmdb} == $GEO_PRESENT;
+
+	my $record = eval { local $SIG{__DIE__}; $self->{_mmdb}->record_for_address($ip) };
+	return (ref($record) eq 'HASH') ? $record : undef;
 }
 
 =head2 locale
@@ -2320,7 +2474,19 @@ sub locale {
 	my $self = shift;
 	local ($@, $!);	# evals below must not leak to the caller
 
-	return $self->{_locale} if $self->{_locale};
+	# One store, so a failed search (undef) is tried again next time
+	return $self->{_locale} ||= $self->_find_locale();
+}
+
+# -- _find_locale --------------------------------------------------------------
+#
+# Purpose:      Search for the visitor's Locale::Object::Country, without
+#               remembering it (locale() does that).
+# Entry:        $self -- a CGI::Lingua object.
+# Exit:         A Locale::Object::Country object, or undef.
+# Side effects: May call country(), which caches the country.
+sub _find_locale {
+	my $self = shift;
 
 	# Validate and untaint HTTP_USER_AGENT before passing to any parser.
 	# The User-Agent header is attacker-controlled; apply the same discipline
@@ -2343,7 +2509,6 @@ sub locale {
 			if($candidate =~ /^[a-zA-Z]{2}-([a-zA-Z]{2})$/) {
 				local $SIG{__WARN__} = undef;
 				if(my $c = $self->_code2country($1)) {
-					$self->{_locale} = $c;
 					return $c;
 				}
 			}
@@ -2353,13 +2518,12 @@ sub locale {
 		if(eval { require HTTP::BrowserDetect }) {
 			HTTP::BrowserDetect->import();
 			my $browser = HTTP::BrowserDetect->new($agent);
-			# Validate country() result before use — the return value comes from
+			# Validate country() result before use -- the return value comes from
 			# the third-party module and is not yet untainted or range-checked.
 			if($browser) {
 				my $bc = $browser->country() // '';
 				if($bc =~ /^([A-Za-z]{2})$/a) {
 					if(my $c = $self->_code2country($1)) {
-						$self->{_locale} = $c;
 						return $c;
 					}
 				}
@@ -2378,18 +2542,16 @@ sub locale {
 		};
 		unless($@) {
 			if($c) {
-				$self->{_locale} = $c;
 				return $c;
 			}
 		}
 	}
 
-	# Fourth try: mod_geoip env var — apply the same ISO 3166-1 validation
+	# Fourth try: mod_geoip env var -- apply the same ISO 3166-1 validation
 	# used in country() to guard against spoofed or malformed values
 	if(defined($ENV{'GEOIP_COUNTRY_CODE'})) {
 		if($ENV{'GEOIP_COUNTRY_CODE'} =~ /^([A-Z]{2})\z/a) {
 			if(my $c = $self->_code2country(lc($1))) {
-				$self->{_locale} = $c;
 				return $c;
 			}
 		}
@@ -2402,7 +2564,8 @@ sub locale {
 Returns the visitor's time zone, as an IANA time zone name,
 for example C<'Europe/London'> or C<'America/New_York'>.
 
-When C<REMOTE_ADDR> is set, it uses L<Geo::IP> if a database is installed,
+When C<REMOTE_ADDR> is set, it uses a MaxMind GeoIP2 or GeoLite2 City database
+(see L</@CGI::Lingua::GEOIP2_MMDB>), then L<Geo::IP>, if a database is installed,
 and otherwise asks the ip-api.com web service (this needs
 L<LWP::Simple::WithCache> or L<LWP::Simple>, and L<JSON::Parse>).
 
@@ -2443,16 +2606,18 @@ These are warnings. C<time_zone()> does not die.
     "DateTime::TimeZone::Local failed: ..."
     "Discarding malformed timezone '...'"
     "ip-api.com lookup failed: ..."
+    "Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it"
 
 =head3 PSEUDOCODE
 
     1. Return the remembered answer if there is one
     2. If REMOTE_ADDR is set:
        a. Untaint and validate the IP
-       b. Try Geo::IP->time_zone() (local DB)
-       c. Try LWP::Simple::WithCache + JSON::Parse against ip-api.com
-       d. Fall back to LWP::Simple + JSON::Parse against ip-api.com
-       e. Warn and return undef if neither LWP variant, or JSON::Parse,
+       b. Try location/time_zone in a GeoIP2 / GeoLite2 City .mmdb (local DB)
+       c. Try Geo::IP->time_zone() (local DB)
+       d. Try LWP::Simple::WithCache + JSON::Parse against ip-api.com
+       e. Fall back to LWP::Simple + JSON::Parse against ip-api.com
+       f. Warn and return undef if neither LWP variant, or JSON::Parse,
           is installed (the warning names the missing module)
     3. If REMOTE_ADDR is absent (local/CLI mode):
        a. Read /etc/timezone if readable
@@ -2476,7 +2641,7 @@ sub time_zone {
 	my $raw_ip = $ENV{'REMOTE_ADDR'};
 
 	if(defined $raw_ip) {
-		# Untaint before any external use — kept in sync with country()'s pattern,
+		# Untaint before any external use -- kept in sync with country()'s pattern,
 		# including the mixed-notation branch for ::ffff:a.b.c.d addresses.
 		my $ip = _untaint_ip($raw_ip);
 		unless(defined($ip)) {
@@ -2484,11 +2649,21 @@ sub time_zone {
 			return undef;
 		}
 
-		if($self->{_have_geoip} == $GEO_UNKNOWN) {
-			$self->_load_geoip();
+		# A GeoIP2 / GeoLite2 City database has the zone; a Country one does
+		# not.  The value is checked against $ZONE_RE below.
+		if(my $record = $self->_mmdb_record($ip)) {
+			if(ref($record->{location}) eq 'HASH') {
+				$self->{_timezone} = $record->{location}{time_zone};
+			}
 		}
-		if($self->{_have_geoip} == $GEO_PRESENT) {
-			eval { $self->{_timezone} = $self->{_geoip}->time_zone($ip) };
+
+		unless($self->{_timezone}) {
+			if($self->{_have_geoip} == $GEO_UNKNOWN) {
+				$self->_load_geoip();
+			}
+			if($self->{_have_geoip} == $GEO_PRESENT) {
+				eval { $self->{_timezone} = $self->{_geoip}->time_zone($ip) };
+			}
 		}
 
 		unless($self->{_timezone}) {
@@ -2511,7 +2686,7 @@ sub time_zone {
 					$self->_warn({ warning => "ip-api.com returned unparseable JSON: $@" }) if $@;
 				}
 			} else {
-				# A module is missing — degrade gracefully rather than killing the
+				# A module is missing -- degrade gracefully rather than killing the
 				# entire request with a croak; caller can check for undef.  Name the
 				# module that is really missing: an LWP may be present without JSON::Parse.
 				if(eval { require LWP::Simple::WithCache; 1 } || eval { require LWP::Simple; 1 }) {
@@ -2522,7 +2697,7 @@ sub time_zone {
 			}
 		}
 	} else {
-		# Local connection — read from /etc/timezone or DateTime::TimeZone
+		# Local connection -- read from /etc/timezone or DateTime::TimeZone
 		if(defined(my $tz = $self->_read_zone_file())) {
 			$self->{_timezone} = $tz;
 		} else {
@@ -2554,7 +2729,7 @@ sub time_zone {
 	return $self->{_timezone};
 }
 
-# ── _read_zone_file ──────────────────────────────────────────────────────
+# -- _read_zone_file ------------------------------------------------------
 # Purpose:      Read the system time zone name from $ZONE_FILE (normally
 #               /etc/timezone) for command-line use.
 # Entry:        none.
@@ -2709,26 +2884,26 @@ For full CLDR rules, including fractions, use L<Locale::CLDR>.
 =cut
 
 # CLDR plural category rules (https://unicode.org/cldr/charts/42/supplemental/language_plural_rules.html).
-# Values are coderefs: ($n) → category string.  Languages absent from this
+# Values are coderefs: ($n) -> category string.  Languages absent from this
 # table fall back to the standard one/other rule inside plural_category().
 my %PLURAL_RULES = (
 
-	# ── No plural distinction (always 'other') ────────────────────────────
+	# -- No plural distinction (always 'other') ----------------------------
 	(map { $_ => sub { 'other' } }
 		qw(az bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt lo ms
 		   my nqo root sah ses sg th to vi wo yo zh)),
 
-	# ── Standard: n == 1 → 'one', else 'other' ───────────────────────────
+	# -- Standard: n == 1 -> 'one', else 'other' ---------------------------
 	(map { $_ => sub { int($_[0]) == 1 ? 'one' : 'other' } }
 		qw(af an ast bg bn brx ca cgg da de el en eo es et eu fi
 		   gl gsw gu ha haw hu ia it kcg kk kl lb lg mas ml mn mr
 		   nb nd ne nl nn nyn om or pa pap rm rof rwk saq seh sn so
 		   sq ss ssy st sv sw ta te teo tig tk tl tn ts ur wae xh xog)),
 
-	# ── French / Portuguese-BR: n ≤ 1 → 'one' ────────────────────────────
+	# -- French / Portuguese-BR: n <= 1 -> 'one' ----------------------------
 	(map { $_ => sub { int($_[0]) <= 1 ? 'one' : 'other' } } qw(fr pt_BR)),
 
-	# ── Arabic: zero/one/two/few/many/other ───────────────────────────────
+	# -- Arabic: zero/one/two/few/many/other -------------------------------
 	ar => sub {
 		my $n    = int($_[0]);
 		my $m100 = $n % 100;
@@ -2740,7 +2915,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Hebrew: one/two/many/other ────────────────────────────────────────
+	# -- Hebrew: one/two/many/other ----------------------------------------
 	he => sub {
 		my $n = int($_[0]);
 		return 'one'  if $n == 1;
@@ -2749,7 +2924,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Russian / Ukrainian / Belarusian: one/few/many ────────────────────
+	# -- Russian / Ukrainian / Belarusian: one/few/many --------------------
 	(map { $_ => sub {
 		my $n    = int($_[0]);
 		my $m10  = $n % 10;
@@ -2759,7 +2934,7 @@ my %PLURAL_RULES = (
 		return 'many';
 	} } qw(ru uk be)),
 
-	# ── Polish: one/few/many ──────────────────────────────────────────────
+	# -- Polish: one/few/many ----------------------------------------------
 	pl => sub {
 		my $n    = int($_[0]);
 		my $m10  = $n % 10;
@@ -2769,7 +2944,7 @@ my %PLURAL_RULES = (
 		return 'many';
 	},
 
-	# ── Czech / Slovak: one/few/other ────────────────────────────────────
+	# -- Czech / Slovak: one/few/other ------------------------------------
 	(map { $_ => sub {
 		my $n = int($_[0]);
 		return 'one' if $n == 1;
@@ -2777,7 +2952,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	} } qw(cs sk)),
 
-	# ── Romanian: one/few/other ───────────────────────────────────────────
+	# -- Romanian: one/few/other -------------------------------------------
 	ro => sub {
 		my $n    = int($_[0]);
 		my $m100 = $n % 100;
@@ -2786,7 +2961,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Latvian: zero/one/other ───────────────────────────────────────────
+	# -- Latvian: zero/one/other -------------------------------------------
 	lv => sub {
 		my $n    = int($_[0]);
 		my $m10  = $n % 10;
@@ -2796,7 +2971,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Lithuanian: one/few/other ─────────────────────────────────────────
+	# -- Lithuanian: one/few/other -----------------------------------------
 	lt => sub {
 		my $n    = int($_[0]);
 		my $m10  = $n % 10;
@@ -2806,7 +2981,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Slovenian: one/two/few/other ──────────────────────────────────────
+	# -- Slovenian: one/two/few/other --------------------------------------
 	sl => sub {
 		my $m100 = int($_[0]) % 100;
 		return 'one'   if $m100 == 1;
@@ -2815,7 +2990,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Welsh: zero/one/two/few/many/other ───────────────────────────────
+	# -- Welsh: zero/one/two/few/many/other -------------------------------
 	cy => sub {
 		my $n = int($_[0]);
 		return 'zero'  if $n == 0;
@@ -2826,7 +3001,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Irish: one/two/few/many/other ────────────────────────────────────
+	# -- Irish: one/two/few/many/other ------------------------------------
 	ga => sub {
 		my $n = int($_[0]);
 		return 'one'  if $n == 1;
@@ -2836,7 +3011,7 @@ my %PLURAL_RULES = (
 		return 'other';
 	},
 
-	# ── Maltese: one/two/few/many/other ──────────────────────────────────
+	# -- Maltese: one/two/few/many/other ----------------------------------
 	mt => sub {
 		my $n    = int($_[0]);
 		my $m100 = $n % 100;
@@ -2967,11 +3142,11 @@ sub translation_file
 	return undef;
 }
 
-# ── _printable ────────────────────────────────────────────────────────────
+# -- _printable ------------------------------------------------------------
 # Purpose:      Make a caller-supplied value safe to put in a log message:
 #               control and non-ASCII characters (newlines that would forge
 #               log lines, NULs, terminal escapes) become \xNN.
-# Entry:        $value — any scalar; a reference is shown as its type.
+# Entry:        $value -- any scalar; a reference is shown as its type.
 # Exit:         A printable ASCII string.
 sub _printable
 {
@@ -2982,10 +3157,10 @@ sub _printable
 	return $value;
 }
 
-# ── _code2language ────────────────────────────────────────────────────────
+# -- _code2language --------------------------------------------------------
 # Purpose:      Translate a 2-char language code to its English name, with
 #               optional CHI caching.
-# Entry:        $code — 2-char ISO 639-1 code; must be defined and non-empty.
+# Entry:        $code -- 2-char ISO 639-1 code; must be defined and non-empty.
 # Exit:         Human-readable language name string, or undef.
 # Side Effects: Reads/writes cache.
 sub _code2language
@@ -3008,7 +3183,7 @@ sub _code2language
 		return $from_cache;
 	}
 
-	# Compute, cache, then return the value separately —
+	# Compute, cache, then return the value separately --
 	# CHI->set() is not guaranteed to return the stored value across all drivers
 	$self->_trace('_code2language not in cache, storing');
 	my $name = Locale::Language::code2language($code);
@@ -3018,10 +3193,10 @@ sub _code2language
 	return $name;
 }
 
-# ── _code2country ─────────────────────────────────────────────────────────
+# -- _code2country ---------------------------------------------------------
 # Purpose:      Translate a 2-char country code to a Locale::Object::Country
 #               object, suppressing the expected "No result found" warning.
-# Entry:        $code — 2-char ISO 3166-1 alpha-2 code (any case).
+# Entry:        $code -- 2-char ISO 3166-1 alpha-2 code (any case).
 # Exit:         Locale::Object::Country object, or undef.
 # Side Effects: None beyond the Locale::Object::Country look-up.
 sub _code2country
@@ -3053,12 +3228,12 @@ sub _code2country
 	return $rc;
 }
 
-# ── _country_short_name ───────────────────────────────────────────────────
+# -- _country_short_name ---------------------------------------------------
 # Purpose:      Return the common short English name for an ISO 3166-1 alpha-2
 #               code when Locale::Object's database is unavailable.  Uses
 #               %COUNTRY_SHORT_NAMES overrides for codes where Locale::Codes
 #               returns the full ISO official name rather than the short form.
-# Entry:        $code — 2-char country code (any case).
+# Entry:        $code -- 2-char country code (any case).
 # Exit:         Short name string, or undef.
 sub _country_short_name
 {
@@ -3074,10 +3249,10 @@ sub _country_short_name
 	return Locale::Codes::Country::code2country($lc, 'alpha-2');
 }
 
-# ── _code2countryname ─────────────────────────────────────────────────────
+# -- _code2countryname -----------------------------------------------------
 # Purpose:      Translate a 2-char country code to its English name string,
 #               with optional CHI caching.
-# Entry:        $code — 2-char ISO 3166-1 alpha-2 code.
+# Entry:        $code -- 2-char ISO 3166-1 alpha-2 code.
 # Exit:         Country name string, or undef.
 # Side Effects: Reads/writes cache.
 sub _code2countryname
@@ -3117,11 +3292,11 @@ sub _code2countryname
 	return;
 }
 
-# ── _log ──────────────────────────────────────────────────────────────────
+# -- _log ------------------------------------------------------------------
 # Purpose:      Append a message to $self->{messages} and forward to the
 #               optional logger object.
-# Entry:        $level — log level string (debug/info/notice/warn/trace/error);
-#               @messages — one or more strings to concatenate.
+# Entry:        $level -- log level string (debug/info/notice/warn/trace/error);
+#               @messages -- one or more strings to concatenate.
 # Exit:         void
 # Side Effects: Mutates $self->{messages}; calls logger method if set.
 sub _log
@@ -3144,10 +3319,10 @@ sub _info   { my $self = shift; $self->_log('info',   @_) }
 sub _notice { my $self = shift; $self->_log('notice', @_) }
 sub _trace  { my $self = shift; $self->_log('trace',  @_) }
 
-# ── _warn ─────────────────────────────────────────────────────────────────
+# -- _warn -----------------------------------------------------------------
 # Purpose:      Emit a warning through the logger (if set) or via Carp::carp.
 # Entry:        A single hashref argument: { warning => 'message text' }.
-#               All callers MUST use this structured form — plain-string calls
+#               All callers MUST use this structured form -- plain-string calls
 #               silently lose the message when no logger is configured.
 # Exit:         void
 # Side Effects: Calls logger->warn() or carp().
@@ -3167,11 +3342,11 @@ sub _warn
 	}
 }
 
-# ── _warn_filter ──────────────────────────────────────────────────────────
+# -- _warn_filter ----------------------------------------------------------
 # Purpose:      Build a $SIG{__WARN__} handler that drops warnings matching
 #               $skip and passes every other warning on to the handler that
 #               was active when the filter was built.
-# Entry:        $skip — compiled regex of warnings to drop.
+# Entry:        $skip -- compiled regex of warnings to drop.
 # Exit:         Code reference suitable for "local $SIG{__WARN__} = ...".
 # Notes:        A plain "warn" inside a __WARN__ handler bypasses every handler
 #               and goes straight to STDERR, so the caller's handler (a logger,
@@ -3192,7 +3367,7 @@ sub _warn_filter
 	};
 }
 
-# ── Pure-Perl IP-validation helpers ──────────────────────────────────────────
+# -- Pure-Perl IP-validation helpers ------------------------------------------
 # These are installed into the CGI::Lingua symbol table as is_ipv4() etc. when
 # Data::Validate::IP / NetAddr::IP are unavailable (see country()).
 
@@ -3201,22 +3376,38 @@ sub _is_ipv4 {
 	# /a: without it \d also matches non-ASCII digits such as U+0661, which
 	# then compare as 0 and make "\x{661}.\x{661}.\x{661}.\x{661}" look valid
 	return unless defined($ip) && $ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\z/a;
-	return !(grep { $_ > 255 } ($1, $2, $3, $4));
+	# A leading zero is refused, as Data::Validate::IP does: inet_aton reads
+	# "010" as octal 8, while the range checks here would read it as 10
+	return !(grep { ($_ > 255) || /^0\d/ } ($1, $2, $3, $4));
 }
 
+# RFC 4291 section 2.2 text form, parsed in Perl.  Not Socket::inet_pton: on
+# Windows that is Winsock's InetPton, which fails for every address until
+# WSAStartup has run, and Perl only runs it when the first socket is made, so
+# a CGI script that has not opened a socket saw no IPv6 address as valid.
 sub _is_ipv6 {
 	my $ip = shift;
 	return unless defined($ip) && $ip =~ /:/;
-	# Socket::inet_pton is core since Perl 5.14 and validates IPv6 reliably
-	require Socket;
-	if(defined &Socket::inet_pton) {
-		return defined Socket::inet_pton(Socket::AF_INET6(), $ip);
+
+	# A trailing dotted quad ("::ffff:1.2.3.4") stands for the last two groups
+	if($ip =~ /^(.*:)(\d{1,3}(?:\.\d{1,3}){3})\z/as) {
+		my ($head, $v4) = ($1, $2);
+		return 0 unless _is_ipv4($v4);
+		$ip = "${head}0:0";
 	}
-	# Structural fallback: hex+colons, at least two colons, at most one ::
-	# (tr/// counts characters, not "::" pairs, so count matches of /::/ instead)
-	return ($ip =~ /^[0-9a-fA-F:]+\z/ || $ip =~ /^[0-9a-fA-F:]+:\d{1,3}(?:\.\d{1,3}){3}\z/a)
-		&& (() = $ip =~ /::/g) <= 1
-		&& ($ip =~ tr/://) >= 2;
+	return 0 unless $ip =~ /^[0-9A-Fa-f:]+\z/;
+
+	# At most one "::", which stands for one or more groups of zeros
+	my @halves = split(/::/, $ip, -1);
+	return 0 if(scalar(@halves) > 2);
+	my $groups = 0;
+	for my $half (grep { length } @halves) {
+		for my $group (split(/:/, $half, -1)) {
+			return 0 unless $group =~ $IPV6_GROUP_RE;
+			$groups++;
+		}
+	}
+	return (scalar(@halves) == 2) ? ($groups < $IPV6_GROUPS) : ($groups == $IPV6_GROUPS);
 }
 
 sub _is_private_ip {
@@ -3335,7 +3526,8 @@ C<REMOTE_ADDR> still has the value you want:
 
 If C<HTTP_ACCEPT_LANGUAGE> is longer than 256 characters, or contains a
 character that is not allowed (see L</ENCODING>), the whole header is ignored
-with a warning. CGI::Lingua then uses C<LANG> or the IP address instead.
+with a warning. CGI::Lingua then uses the locale (C<LC_ALL>, C<LC_MESSAGES>,
+C<LANG>) or the IP address instead.
 
 =item * B<The supported list holds tags, not names>
 
@@ -3362,7 +3554,7 @@ On the command line, only smaller look-ups (such as code-to-name) are cached.
 =item * B<Local geo databases can be out of date>
 
 Old F<GeoIP.dat> files can give the wrong country for some addresses
-(see L</country>).
+(see L</country>); use a GeoLite2 database instead.
 
 =back
 
@@ -3379,7 +3571,8 @@ CGI::Lingua works with ASCII text. This table shows what each input accepts.
                             space and tab (never CR or
                             LF); max 256 chars
     lang (CGI::Info)        as HTTP_ACCEPT_LANGUAGE     no: parameter is ignored
-    LANG                    A-Z a-z 0-9 _ . -           no: LANG is ignored
+    LC_ALL, LC_MESSAGES,    A-Z a-z 0-9 _ . - @         no: the variable is
+    LANG                                                ignored
     HTTP_USER_AGENT         printable ASCII             no: user agent ignored
                             (0x20-0x7E), max 512 chars
     REMOTE_ADDR             IPv4 or IPv6 address        no: address is rejected
@@ -3422,6 +3615,23 @@ open is skipped with the warning C<"Can't open ... with Geo::IP; not using it">.
 
     local @CGI::Lingua::GEOIP_DAT = ('/opt/geo/GeoIP.dat');
 
+=item * C<@CGI::Lingua::GEOIP2_MMDB>
+
+The places where L</country> and L</time_zone> look for a MaxMind GeoIP2 or
+GeoLite2 database (a F<.mmdb> file); the first readable regular file is used.
+The default is F<GeoIP2-City.mmdb>, F<GeoLite2-City.mmdb>,
+F<GeoIP2-Country.mmdb> and F<GeoLite2-Country.mmdb>, in that order, in each of
+F</var/lib/GeoIP>, F</usr/share/GeoIP> and F</usr/local/share/GeoIP> (and
+F<c:/GeoIP> first, on Windows). Only a City database holds time zones.
+
+The file is read with L<IP::Geolocation::MMDB> (fast, needs the libmaxminddb
+C library) or, if that is not installed, L<MaxMind::DB::Reader> (pure Perl,
+installed with L<GeoIP2::Database::Reader>). If neither is installed the
+database is not used. A file that neither can open is skipped with the warning
+C<"Can't open ... with IP::Geolocation::MMDB or MaxMind::DB::Reader; not using it">.
+
+    local @CGI::Lingua::GEOIP2_MMDB = ('/srv/geo/GeoLite2-City.mmdb');
+
 =back
 
 =head1 LIMITATIONS
@@ -3458,7 +3668,7 @@ This is a known limitation of the Locale::Object layer.
 
 =item * B<Whois lookups are slow and unreliable>
 
-Without C<IP::Country>, C<Geo::IP>, or C<Geo::IPfree> installed, C<country()>
+Without a GeoIP2 / GeoLite2 database, C<IP::Country>, C<Geo::IP>, or C<Geo::IPfree>, C<country()>
 falls back to Whois queries against live RIPE/ARIN/IANA servers.  These can
 time out under load.  Install at least one local geo-database module and enable
 the CHI cache to avoid this.
@@ -3608,7 +3818,7 @@ You do not need it to use the module.
     │ (slanguage = ⊥) ⇔ (rlanguage = ⊥)
     └───────────────────────────────────────────────────────────────
 
-    request   : ENV ⇸ seq (LANGTAG × ℝ)   -- lang param, Accept-Language or LANG
+    request   : ENV ⇸ seq (LANGTAG × ℝ)   -- lang param, Accept-Language or locale
     negotiate : seq (LANGTAG × ℝ) × seq LANGTAG ⇸ LANGTAG
     geo       : IPADDR ⇸ CC2              -- first answer of the geo sources
     official  : CC2 ⇸ LANGTAG             -- official language of a country
@@ -3759,7 +3969,7 @@ You do not need it to use the module.
     ├───────────────────────────────────────────────────────────────
     │ timezone ≠ ⊥ ⇒ result! = timezone
     │ timezone = ⊥ ∧ env?.REMOTE_ADDR ≠ ⊥ ⇒
-    │     result! = first ⊥-free of ⟨ geoip_tz(ip), ipapi_tz(ip) ⟩
+    │     result! = first ⊥-free of ⟨ mmdb_tz(ip), geoip_tz(ip), ipapi_tz(ip) ⟩
     │ timezone = ⊥ ∧ env?.REMOTE_ADDR = ⊥ ⇒
     │     result! = first ⊥-free of ⟨ etc_timezone, local_tz ⟩
     │ result! ∉ ZONE ⇒ result! = ⊥
@@ -3882,7 +4092,7 @@ Part 2: the country (used by country(), locale(), and the language IP path)
     |  _country = 'xx'     |  (or 'Unknown' for EU addresses)
     +----------------------+
 
-Part 3: each geo module (IP::Country, Geo::IP, Geo::IPfree)
+Part 3: each geo source (GeoIP2 .mmdb, IP::Country, Geo::IP, Geo::IPfree)
 
     +-----------+  first use: module loads   +-----------+
     |  UNKNOWN  |--------------------------->|  PRESENT  |

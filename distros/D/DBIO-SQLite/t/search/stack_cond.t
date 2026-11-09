@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use DBIO::SQLite::Test ':DiffSQL';
-use SQL::Abstract::Util qw(is_plain_value is_literal_value);
+use DBIO::Util qw(is_plain_value is_literal_value);
 use List::Util 'shuffle';
 use Data::Dumper;
 $Data::Dumper::Terse = 1;

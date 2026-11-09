@@ -1,0 +1,136 @@
+diff --git a/MANIFEST b/MANIFEST
+index b469e7f..582cf3f 100644
+--- a/MANIFEST
++++ b/MANIFEST
+@@ -13,6 +13,7 @@ README
+ t/00use.t
+ t/01sleep.t
+ t/02poll.t
++t/03poll-cancel-in-callback.t
+ t/10read.t
+ t/11read_exactly.t
+ t/12read_until_eof.t
+diff --git a/lib/Future/IO.pm b/lib/Future/IO.pm
+index 49ced50..34755d5 100644
+--- a/lib/Future/IO.pm
++++ b/lib/Future/IO.pm
+@@ -878,14 +878,12 @@ sub _await_once
+    }
+    # else just presume it's ready
+ 
+-   # Perl doesn't have an easy construction for iterating an array possibly
+-   # splicing as you go...
+-
+-   my $npollers = @pollers;
+-   # Need to stop after the current set; ignoring any new that were pushed
+-   # while running
+-   for ( my $idx = 0; $idx < $npollers; ) {
+-      my $p = $pollers[$idx];
++   # Only the pollers present now take part in this round; any pushed while
++   # running wait for the next one. A callback may cancel or complete other
++   # pollers of this round (e.g. Future->wait_any cancelling the losers), so
++   # each one is checked again before it is looked at.
++   foreach my $p ( my @round = @pollers ) {
++      next if $p->f->is_ready;
+ 
+       my $fh = $p->fh;
+       my $fileno = $fh->fileno;
+@@ -900,14 +898,9 @@ sub _await_once
+       $revents &= $p->events;
+ 
+       if( $revents ) {
+-         splice @pollers, $idx, 1, ();
+-         $npollers--;
+-
++         @pollers = grep { $_->f != $p->f } @pollers;
+          $p->f->done( $revents );
+       }
+-      else {
+-         $idx++;
+-      }
+ 
+       $fh->blocking(0) if !$do_select and !$was_blocking;
+    }
+diff --git a/t/03poll-cancel-in-callback.t b/t/03poll-cancel-in-callback.t
+new file mode 100644
+index 0000000..7fa5fb3
+--- /dev/null
++++ b/t/03poll-cancel-in-callback.t
+@@ -0,0 +1,77 @@
++#!/usr/bin/perl
++
++use v5.14;
++use warnings;
++
++use Test2::V0;
++
++use Future;
++use Future::IO;
++use IO::Poll qw( POLLIN );
++
++# A callback of one poller may cancel or complete other pollers of the same
++# round. A pending sleep makes the default impl really select().
++
++sub readable_pipe
++{
++   pipe( my ( $rd, $wr ) ) or die "Cannot pipe() - $!";
++   syswrite $wr, "x";
++   return ( $rd, $wr );
++}
++
++# cancelling a later poller (Future->wait_any cancels the losers)
++{
++   my ( $rd1, $wr1 ) = readable_pipe;
++   my ( $rd2, $wr2 ) = readable_pipe;
++
++   my $first  = Future::IO->poll( $rd1, POLLIN );
++   my $second = Future::IO->poll( $rd2, POLLIN );
++
++   my $f = Future->wait_any( $first, $second, Future::IO->sleep( 5 ) );
++
++   ok( lives { $f->get }, 'wait_any over two ready polls survives the round' ) or
++      note $@;
++   ok( $first->is_done,        'first poll is done' );
++   ok( $second->is_cancelled,  'second poll is cancelled' );
++}
++
++# cancelling an earlier poller that was not ready
++{
++   pipe( my ( $idle_rd, $idle_wr ) ) or die "Cannot pipe() - $!";
++   my ( $rd1, $wr1 ) = readable_pipe;
++   my ( $rd2, $wr2 ) = readable_pipe;
++
++   my $idle   = Future::IO->poll( $idle_rd, POLLIN );
++   my $first  = Future::IO->poll( $rd1, POLLIN );
++   my $second = Future::IO->poll( $rd2, POLLIN );
++
++   $first->on_done( sub { $idle->cancel } );
++
++   my $f = Future->wait_all( $first, $second );
++   my $timeout = Future::IO->sleep( 5 );
++
++   ok( lives { Future->wait_any( $f, $timeout )->get }, 'cancelling an earlier poller survives the round' ) or
++      note $@;
++   ok( $idle->is_cancelled, 'idle poll is cancelled' );
++   ok( $second->is_done,    'poll behind the callback is still done' );
++}
++
++# completing a later poller by turning the loop inside a callback
++{
++   my ( $rd1, $wr1 ) = readable_pipe;
++   my ( $rd2, $wr2 ) = readable_pipe;
++
++   my $first  = Future::IO->poll( $rd1, POLLIN );
++   my $second = Future::IO->poll( $rd2, POLLIN );
++
++   my $inner;
++   $first->on_done( sub { $inner = $second->get } );
++
++   my $timeout = Future::IO->sleep( 5 );
++
++   ok( lives { Future->wait_any( $first, $timeout )->get }, 'nested ->get on a later poller survives the round' ) or
++      note $@;
++   is( $inner, POLLIN, 'nested ->get returned the events' );
++}
++
++done_testing;

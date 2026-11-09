@@ -123,8 +123,10 @@ $storage->connect_info([ { host => 'localhost', dbname => 'test' } ]);
 
 # --- 7. Future then auto-wrap (ADR 0031 §4) ---
 
-is $storage->future_class, 'Future',
-  'storage future_class is plain Future (then auto-wrap is native)';
+# A Future subclass since karr k44 (it adds only await), so ->then is still
+# Future's own and auto-wraps a plain return.
+ok $storage->future_class->isa('Future'),
+  'storage future_class is a Future (then auto-wrap is native)';
 
 {
   my $storage = StubStorage22->new(undef);

@@ -1,0 +1,141 @@
+# Microsoft SQL Server 2022 for dbio-mssql integration tests (k3s, single node).
+#
+# Captured from the running cluster object on 2026-07-26 — until then this setup
+# existed only in the cluster and in /tmp, which is why nobody could fix its
+# probe configuration. Every other DBIO driver with a k8s test DB keeps its
+# manifest in maint/k8s/; this brings dbio-mssql in line.
+#
+# RESOURCE DISCIPLINE — this runs on a small SHARED box (few cores, alongside
+# Oracle, k3s and other resident services). The pod carries resources.limits so
+# it can never starve the host. Run ONE test DB at a time and `nice` the prove
+# run. See the "Live testing" section in .claude/rules/dbio-rules.md.
+#
+# Unlike the other drivers' throwaway pods this one is a StatefulSet with a PVC
+# and is meant to stay up between sessions, so there is no "delete when done"
+# step — but do drop any _dbio_* leftover databases a crashed run left behind:
+#
+#   SELECT name FROM sys.databases WHERE name LIKE '[_]dbio[_]%';
+#
+# Usage:
+#   kubectl apply -f maint/k8s/mssql-dev.yaml           # secret: see below
+#   kubectl wait --for=condition=ready pod/mssql-dev-0 -n mssql-dev --timeout=180s
+#
+#   DBIO_TEST_MSSQL_ODBC_DSN='dbi:ODBC:DSN=mssql-dev' \
+#   DBIO_TEST_MSSQL_ODBC_USER=sa DBIO_TEST_MSSQL_ODBC_PASS=... \
+#     nice -n 19 ionice -c3 prove -lr t/
+#
+# The SA password is NOT in this file. Create the secret once, out of band:
+#
+#   kubectl create secret generic mssql-sa -n mssql-dev \
+#     --from-literal=ACCEPT_EULA=Y \
+#     --from-literal=MSSQL_PID=Developer \
+#     --from-literal=MSSQL_SA_PASSWORD='<password>'
+#
+# NOTE ON THE HOST NETWORK (learned the hard way, 2026-07-26): k3s' pod CIDR is
+# 10.42.0.0/16 and its service CIDR 10.43.0.0/16. A docker bridge that grabs a
+# subnet in either range takes over the host route and every probed pod in the
+# cluster goes into CrashLoopBackOff — kubelet can no longer reach any pod IP.
+# If pods start crashing wholesale, check `ip route get <podIP>` before
+# suspecting this manifest.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mssql-dev
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mssql-dev
+  namespace: mssql-dev
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-dev
+  namespace: mssql-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: mssql-dev
+  ports:
+    - name: mssql
+      port: 1433
+      targetPort: 1433
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql-dev
+  namespace: mssql-dev
+spec:
+  replicas: 1
+  serviceName: mssql-dev
+  selector:
+    matchLabels:
+      app: mssql-dev
+  template:
+    metadata:
+      labels:
+        app: mssql-dev
+        role: dbio-test-db
+    spec:
+      serviceAccountName: mssql-dev
+      containers:
+        - name: mssql
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          envFrom:
+            - secretRef:
+                name: mssql-sa
+          ports:
+            - name: mssql
+              containerPort: 1433
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: "2"          # never more than two cores on a shared box
+              memory: 4Gi
+          volumeMounts:
+            - name: mssql-data
+              mountPath: /var/opt/mssql
+          # A startupProbe is what the original spec lacked: without it the
+          # liveness probe starts counting immediately and SIGKILLs a server
+          # that is merely slow to come up (recovering leftover test databases,
+          # a busy host). Startup gets up to 5 minutes here; only once it has
+          # succeeded does liveness begin.
+          startupProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 60
+          readinessProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 10
+            timeoutSeconds: 3      # 1s is too tight for a loaded shared box
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 1433
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 5    # ~2.5min of unreachability before a restart
+  # Must match the live object byte for byte: a StatefulSet only accepts updates
+  # to replicas/template/updateStrategy/revisionHistoryLimit/… — a differing
+  # volumeClaimTemplate makes `kubectl apply` fail outright rather than migrate.
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: mssql-data
+        namespace: mssql-dev
+      spec:
+        accessModes: [ ReadWriteOnce ]
+        storageClassName: local-path
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 20Gi

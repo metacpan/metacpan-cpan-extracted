@@ -233,14 +233,9 @@ subtest 'LANG env-var fallback: POSIX locale form is accepted and used' => sub {
 	my $l = CGI::Lingua->new(supported => ['de', 'en']);
 	my $lang = $l->language();
 
-	# We can't guarantee a match because _what_language returns the raw LANG
-	# string 'de_DE.UTF-8', and _find_language passes it to I18N::AcceptLanguage
-	# which may or may not parse the POSIX form.  What we DO guarantee:
-	#  - language() does not die
-	#  - the LANG string was not rejected by the untainting regex (a rejection
-	#    would return undef from _what_language, making language() return Unknown)
-	ok(defined $lang, 'language() does not die when LANG is a POSIX locale string');
-	diag("LANG=de_DE.UTF-8 → language()='$lang'") if $ENV{TEST_VERBOSE};
+	# Before 0.88 the raw 'de_DE.UTF-8' was passed on as if it were a language
+	# tag and matched nothing; it is now read as de-DE.
+	is($lang, 'German', 'LANG=de_DE.UTF-8 is read as German');
 };
 
 # ── Croak message locale independence ────────────────────────────────────────

@@ -4,7 +4,10 @@ package DBIO::PostgreSQL::PgSchema;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 my (%_CLASS_ENUM_DEFS, %_CLASS_TYPE_DEFS, %_CLASS_FUNCTION_DEFS);
+
 
 
 sub new {
@@ -92,7 +95,7 @@ DBIO::PostgreSQL::PgSchema - Base class for PostgreSQL schema namespaces
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -103,8 +106,6 @@ namespace.
 
     package MyApp::DB::PgSchema::Auth;
     use base 'DBIO::PostgreSQL::PgSchema';
-
-    __PACKAGE__->pg_schema_name('auth');
 
     __PACKAGE__->pg_enum('role_type' => [qw( admin moderator user guest )]);
 
@@ -120,6 +121,18 @@ namespace.
         $$ LANGUAGE plpgsql
     });
 
+The schema class attaches a PgSchema class to its namespace with
+L<DBIO::PostgreSQL/pg_schema_class>:
+
+    package MyApp::DB;
+    use base 'DBIO::Schema';
+    __PACKAGE__->load_components('PostgreSQL');
+
+    __PACKAGE__->pg_schema_class('auth' => 'MyApp::DB::PgSchema::Auth');
+
+L<DBIO::PostgreSQL::DDL> then emits the class's definitions for the C<auth>
+namespace. It calls the class by name, so the class must be loaded by then.
+
 The class-method forms of C<pg_enum>, C<pg_type>, and C<pg_function> record
 definitions that L<DBIO::PostgreSQL::DDL> reads when generating install DDL.
 The instance-method forms are used at runtime when a C<PgSchema> object is
@@ -129,9 +142,25 @@ instantiated.
 
 =head2 pg_schema_name
 
-The PostgreSQL schema name (e.g. C<auth>, C<public>, C<api>). Required.
+    my $obj = MyApp::DB::PgSchema::Auth->new(pg_schema_name => 'auth');
+    my $name = $obj->pg_schema_name;
+
+The PostgreSQL schema name (e.g. C<auth>, C<public>, C<api>) an instance was
+constructed with. Optional, and a reader on instances only: it takes no value
+and cannot be called on the class. The namespace a class's definitions are
+installed into comes from one source, the binding the schema class makes with
+L<DBIO::PostgreSQL/pg_schema_class>.
 
 =head1 METHODS
+
+=head2 new
+
+    my $obj = MyApp::DB::PgSchema::Auth->new(pg_schema_name => 'auth');
+
+Returns an instance with no enum, type or function definition of its own:
+what the class declared with the class-method forms is not copied into it.
+The instance forms of L</pg_enum>, L</pg_type> and L</pg_function> fill and
+read it; L</pg_schema_name> is the one named argument it has a reader for.
 
 =head2 _pg_enum_defs
 
@@ -214,7 +243,9 @@ Returns a copy of all composite type definitions held by this instance.
 
 Returns a copy of all function definitions held by this instance.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 

@@ -5,7 +5,7 @@ use warnings;
 
 use Validator::LIVR::Rules::Types;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # LIVR 2.5: rules for hashes and lists. The builders of values, keys and split are livr_values,
 # livr_keys and livr_split, as Perl has functions with these names

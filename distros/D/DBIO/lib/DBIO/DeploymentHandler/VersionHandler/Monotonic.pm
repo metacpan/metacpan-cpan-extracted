@@ -4,7 +4,10 @@ package DBIO::DeploymentHandler::VersionHandler::Monotonic;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
+
 
 sub new {
   my ($class, @args) = @_;
@@ -21,6 +24,7 @@ sub new {
   $self;
 }
 
+
 sub schema_version {
   my $self = shift;
   return $self->{schema_version} if exists $self->{schema_version};
@@ -30,12 +34,14 @@ sub schema_version {
   return $self->{schema_version};
 }
 
+
 sub initial_version {
   my $self = shift;
   return $self->{_version_handler_attrs}{initial_version}
     if exists $self->{_version_handler_attrs}{initial_version};
   return $self->{initial_version};
 }
+
 
 sub to_version {
   my $self = shift;
@@ -56,8 +62,6 @@ sub _version {
   return $self->{_version};
 }
 
-sub _inc_version { $_[0]->{_version}($_[0]->_version + 1 ) }
-sub _dec_version { $_[0]->{_version}($_[0]->_version - 1 ) }
 
 sub previous_version_set {
   my $self = shift;
@@ -75,6 +79,7 @@ sub previous_version_set {
     return [$v, $v - 1];
   }
 }
+
 
 sub next_version_set {
   my $self = shift;
@@ -109,7 +114,53 @@ DBIO::DeploymentHandler::VersionHandler::Monotonic - Obvious version progression
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 DESCRIPTION
+
+Version handler for integer versions that move one step at a time. It keeps
+a cursor that starts at L</initial_version> and walks towards
+L</to_version>. Implements L<DBIO::DeploymentHandler::HandlesVersioning>.
+
+=head1 ATTRIBUTES
+
+=head2 schema_version
+
+The version the code declares, as given to L</new>.
+
+=head2 initial_version
+
+The version the cursor starts from.
+
+=head2 to_version
+
+The target version, numified if given as a version object; defaults to
+L</schema_version>.
+
+=head1 METHODS
+
+=head2 new
+
+  my $vh = DBIO::DeploymentHandler::VersionHandler::Monotonic->new({
+    schema_version  => 3,
+    initial_version => 1,   # or database_version => 1
+    to_version      => 3,
+  });
+
+Takes a hashref or a flat list and keeps every key; C<database_version> is
+accepted as an alias for C<initial_version>.
+
+=head2 previous_version_set
+
+Returns C<[$v, $v - 1]> for the current cursor C<$v> and moves the cursor
+down by one, or C<undef> once the cursor has reached L</to_version>. Croaks
+if L</to_version> is above the cursor.
+
+=head2 next_version_set
+
+Returns C<[$v, $v + 1]> for the current cursor C<$v> and moves the cursor up
+by one, or C<undef> once the cursor has reached L</to_version>. Croaks if
+L</to_version> is below the cursor.
 
 =head1 AUTHOR
 

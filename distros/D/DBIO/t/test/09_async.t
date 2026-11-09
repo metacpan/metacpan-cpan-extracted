@@ -64,6 +64,15 @@ use DBIO::Future::Immediate;
   is scalar $f2->get, 'ok', 'catch passes through success value';
 }
 
+{
+  # No callback: the failed future stays as it is, as with then (karr k331).
+  my $f = DBIO::Future::Immediate->fail('db error');
+  my $f2 = $f->catch;
+  ok $f2->is_failed, 'catch without a callback leaves a failed future failed';
+  is $f2, $f, 'catch without a callback returns the same future';
+  is $f2->{error}, 'db error', 'catch without a callback keeps the original error';
+}
+
 # --- needs_all ---
 
 {

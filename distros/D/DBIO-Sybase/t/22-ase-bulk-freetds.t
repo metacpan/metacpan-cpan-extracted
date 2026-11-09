@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-# Offline regression for karr #20: after #16 re-activated the ASE BCP
+# Offline regression for karr k20: after k16 re-activated the ASE BCP
 # _insert_bulk override, bulk/populate over a FreeTDS-backed DBD::Sybase died
 # (server msg 226 "BULK INSERT not allowed within multi-statement transaction"
 # and msg 1622 "Type '7' not implemented" -- the latter is a FreeTDS blk-library
@@ -12,7 +12,7 @@ use Test::More;
 # _bulk_storage. The _insert_bulk eligibility check is
 #   $self->_bulk_storage && $self->_get_dbh->{syb_has_blk}
 # so a missing _bulk_storage makes _insert_bulk fall back to the regular
-# (core) array-insert path -- restoring the pre-#16 behaviour for FreeTDS while
+# (core) array-insert path -- restoring the pre-k16 behaviour for FreeTDS while
 # keeping BCP active for real Sybase OpenClient.
 #
 # The decision is driven purely by ->_using_freetds, so it is checkable without

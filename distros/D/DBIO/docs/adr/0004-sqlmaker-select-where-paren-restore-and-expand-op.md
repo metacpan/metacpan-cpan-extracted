@@ -21,7 +21,7 @@ silently dropped:
 
 ## Decision
 
-In `DBIO::SQLMaker::new` (`lib/DBIO/SQLMaker.pm:20-34`), restore both
+In `DBIO::SQLMaker::new` (`lib/DBIO/SQLMaker.pm`), restore both
 behaviours, deliberately and together:
 
 - Install a `render_clause{'select.where'}` override that routes the SELECT's
@@ -40,8 +40,8 @@ SQLMaker hierarchy `SQL::Abstract` no longer recognises by `isa`.
 ## Rationale
 
 The fork's rename (ADR 0001) is what removed the upstream special-casing — that
-is the direct, evidence-backed cause, recorded in the code comment at
-`SQLMaker.pm:20-27`. Rather than re-introduce an `isa('DBIx::Class::SQLMaker')`
+is the direct, evidence-backed cause, recorded in the code comment on
+`DBIO::SQLMaker::new` (in `lib/DBIO/SQLMaker.pm`). Rather than re-introduce an `isa('DBIx::Class::SQLMaker')`
 ancestry purely to satisfy `SQL::Abstract` (which would reintroduce exactly the
 compatibility coupling ADR 0001 rejected), DBIO re-implements the two
 behaviours it actually wants. Pairing the paren-restore with
@@ -57,14 +57,14 @@ self-inconsistent. Drivers therefore get a single, predictable operator model
 - Every DBIO driver renders operators via `expand_op` and produces canonical
   `WHERE ( cond )`. New driver SQLMakers express operators through `expand_op`,
   not the legacy special-op API.
-- This re-implementation is the seam where a separate defect lives. **karr #26**
+- This re-implementation is the seam where a separate defect lives. **k26**
   — top-level WHERE double-wrapped as `WHERE ( ( ... ) )` — is a *bug* in this
   `select.where` override: installed `SQL::Abstract 2.000001`'s `where()` adds
   one paren layer while the already-expanded top-level `-and` node was already
   wrapped, yielding two. That defect is **distinct from this ADR**: ADR 0004 is
-  the deliberate decision to restore parens + switch to `expand_op`; karr #26
+  the deliberate decision to restore parens + switch to `expand_op`; k26
   is the over-wrapping bug in how the restore is currently implemented. Do not
-  conflate them — fixing #26 must preserve this decision (single canonical
+  conflate them — fixing it must preserve this decision (single canonical
   parens, `expand_op` operators), not revert it.
 - The override is coupled to `SQL::Abstract`'s internal `where()` /
   `render_clause` behaviour (ADR 0002); engine-internal changes upstream can

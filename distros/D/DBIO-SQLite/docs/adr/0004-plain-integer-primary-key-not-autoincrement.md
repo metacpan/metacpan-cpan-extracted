@@ -22,7 +22,7 @@ That extra guarantee is a behavioural change, not a no-op. Tests that delete
 rows and then re-insert expect the rowid to start back at the low end;
 AUTOINCREMENT makes ids keep climbing instead. This broke
 `t/multi_create/in_memory.t`, `t/relationship/custom.t` and
-`t/resultset/update_delete.t` (karr #10, commit `f793d21`). DBIx::Class and
+`t/resultset/update_delete.t` (karr k10, commit `f793d21`). DBIx::Class and
 SQL::Translator's SQLite producer also emit plain `INTEGER PRIMARY KEY`, so
 AUTOINCREMENT was both incorrect for our semantics and a divergence from the
 baseline.
@@ -55,4 +55,4 @@ decision or by external tooling) is preserved faithfully across a rebuild.
 
 - ADR 0001 (native schema management -- the DDL generator)
 - ADR 0003 (rebuild reuses captured DDL, so pre-existing AUTOINCREMENT survives)
-- karr #10 (root-cause diagnosis and fix)
+- karr k10 (root-cause diagnosis and fix)

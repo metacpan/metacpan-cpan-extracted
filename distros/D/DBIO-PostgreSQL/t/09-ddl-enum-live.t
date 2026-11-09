@@ -19,11 +19,23 @@ BEGIN {
     or plan skip_all => 'Moo not installed';
 }
 
-use DBI;
-use lib '../dbio/lib', 'lib';
+use lib 'lib';
 use DBIO::PostgreSQL::DDL;
 use DBIO::PostgreSQL::Deploy;
 use DBIO::PostgreSQL::Introspect;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use PrivatePgDatabase;
+
+# A server that is not there fails the file, with a plan (karr k113).
+LiveServer->require_server;
+
+# The diff below reconciles the WHOLE database against a one-table schema, so
+# it runs in a database of its own: in the shared one it also dropped whatever
+# else was installed there -- pgvector, left by t/48 and t/54 -- and died or
+# passed depending on which files had run before it (karr k81).
+($dsn, $user, $pass) = PrivatePgDatabase->create('t09');
 
 # -----------------------------------------------------------------------
 # Schema: Cake-style enum, no PgSchema declaration
@@ -57,7 +69,7 @@ LiveEnum::Schema->register_class(Task => 'LiveEnum::Schema::Result::Task');
 # Deploy via raw DDL
 # -----------------------------------------------------------------------
 
-my $dbh = DBI->connect($dsn, $user, $pass, { RaiseError => 1, PrintError => 0 });
+my $dbh = LiveServer->control_dbh(login => [ $dsn, $user, $pass ]);
 
 # Cleanup from any previous failed run
 $dbh->do('DROP TABLE IF EXISTS dbio_test_enum_task CASCADE');
@@ -73,7 +85,7 @@ like($ddl, qr/status\s+dbio_test_enum_task_status_enum\s+NOT NULL/s,
   'DDL uses generated enum type name in column');
 
 # Deploy
-$dbh = DBI->connect($dsn, $user, $pass, { RaiseError => 1, PrintError => 0 });
+$dbh = LiveServer->control_dbh(login => [ $dsn, $user, $pass ]);
 for my $stmt (split /;\s*\n/, $ddl) {
   $stmt =~ s/^\s+|\s+$//g;
   next unless $stmt;
@@ -217,7 +229,7 @@ subtest 'diff detects new enum value' => sub {
 # Cleanup
 # -----------------------------------------------------------------------
 
-$dbh = DBI->connect($dsn, $user, $pass, { RaiseError => 1 });
+$dbh = LiveServer->control_dbh(login => [ $dsn, $user, $pass ]);
 $dbh->do('DROP TABLE IF EXISTS dbio_test_enum_task CASCADE');
 $dbh->do('DROP TYPE IF EXISTS dbio_test_enum_task_status_enum CASCADE');
 $dbh->disconnect;
@@ -226,7 +238,7 @@ $dbh->disconnect;
 # the artefacts so they do not pollute later tests' Deploy->diff snapshots.
 END {
     return unless $dsn;
-    my $h = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) };
+    my $h = eval { LiveServer->dbh_or_die(login => [ $dsn, $user, $pass ], attrs => { RaiseError => 0 }) };
     return unless $h;
     eval {
         $h->do('DROP TABLE IF EXISTS dbio_test_enum_task CASCADE');

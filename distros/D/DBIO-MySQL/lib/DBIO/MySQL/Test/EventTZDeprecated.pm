@@ -4,6 +4,8 @@ package DBIO::MySQL::Test::EventTZDeprecated;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
@@ -42,7 +44,7 @@ DBIO::MySQL::Test::EventTZDeprecated - Test result class using deprecated extra 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

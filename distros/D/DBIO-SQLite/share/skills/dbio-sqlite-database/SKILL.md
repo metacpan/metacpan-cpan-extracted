@@ -1,6 +1,6 @@
 ---
 name: dbio-sqlite-database
-description: "SQLite database knowledge for Perl driver development (DBD::SQLite, type affinity, SQLite-specific features)"
+description: Use when you need SQLite specifics for driver work — DBD::SQLite, type affinity, WAL mode, foreign keys, date and time handling.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet

@@ -4,7 +4,7 @@ use Test::More;
 
 use DBIO::PostgreSQL::Diff;
 
-# Default registry contains the 9 standard classes in dependency order
+# Default registry contains the 10 standard classes in dependency order
 {
   my %reg = DBIO::PostgreSQL::Diff->_diff_registry;
   ok exists $reg{extensions}, 'extensions in registry';

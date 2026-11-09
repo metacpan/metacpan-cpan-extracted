@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Year2000CDs;
 # ABSTRACT: Test virtual view result class for 2000 CDs
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::Schema::CD/;
@@ -32,7 +35,7 @@ DBIO::Test::Schema::Year2000CDs - Test virtual view result class for 2000 CDs
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

@@ -4,6 +4,8 @@ package DBIO::Future::Immediate;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use Scalar::Util ();
 
 
@@ -34,9 +36,12 @@ sub get {
 
 
 sub then {
-  my ($self, $cb) = @_;
-  return $self if $self->{failed};
-  my @r = eval { $cb->(@{ $self->{result} }) };
+  my ($self, $on_done, $on_fail) = @_;
+  my $cb = $self->{failed} ? $on_fail : $on_done;
+  return $self unless $cb;
+  my @r = eval {
+    $cb->($self->{failed} ? $self->{error} : @{ $self->{result} });
+  };
   return ref($self)->fail($@) if $@;
   return $r[0]
     if @r == 1 && Scalar::Util::blessed($r[0]) && $r[0]->isa(__PACKAGE__);
@@ -46,7 +51,7 @@ sub then {
 
 sub catch {
   my ($self, $cb) = @_;
-  return $self unless $self->{failed};
+  return $self unless $self->{failed} and $cb;
   my @r = eval { $cb->($self->{error}) };
   return ref($self)->fail($@) if $@;
   return $r[0]
@@ -89,7 +94,7 @@ DBIO::Future::Immediate - Dependency-free immediate Future for DBIO's 'immediate
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -114,7 +119,8 @@ A self-contained Future implementation that requires no CPAN L<Future> and no
 event loop framework: every operation completes synchronously, in-process.
 
 It implements the L<DBIO::Future> contract
-(C<done>/C<fail>/C<get>/C<then>/C<catch>/C<is_ready>/C<is_failed>/C<needs_all>),
+(C<then>/C<catch>/C<get>/C<is_ready>/C<is_failed>) and the constructors core
+calls on a Future class (C<done>/C<fail>/C<needs_all>),
 so C<*_async> methods can return a real Future even when there is no async
 backend wired up. C<then> chains run immediately, C<get> returns instantly,
 and C<is_ready> is always true.
@@ -148,10 +154,24 @@ Returns the resolved values. Dies if the Future failed.
 =head2 then
 
   my $f2 = $f->then(sub { my @result = @_; return $fc->done(@new_result) });
+  my $f3 = $f->then(
+    sub { my @result = @_; ... },
+    sub { my $error  = shift; ... },
+  );
 
-Executes the callback immediately with the resolved values and returns
-a new Future. If the callback dies, returns a failed Future. If this Future
-is failed, returns itself without calling the callback.
+Takes two callbacks, as a real L<Future>'s C<then> does, and runs one of them
+immediately: the first with the resolved values if this Future is done, the
+second with the error if it failed. What that callback comes to is the Future
+returned -- a failed one if it dies, also for the second callback; a done one
+if the second callback returns normally, which is how a failure is recovered
+from. Either callback may be left out or C<undef>: where the one for this
+Future's outcome is missing, the Future is returned as it is, so a failure
+passes a C<then> that has only a first callback untouched.
+
+L<DBIO::Storage::Async> relies on the second callback: it is where a
+transaction sends C<ROLLBACK> and where a connection goes back to the pool
+(L<DBIO::Future/WHAT CORE CALLS ON A FUTURE CLASS>). It used to be ignored
+here.
 
 Like a real L<Future>'s C<then>, a callback that returns a single Future is
 B<sequenced into> (adopted), not wrapped as a value -- so a callback resolves
@@ -166,7 +186,7 @@ as the resolved value(s).
   my $f2 = $f->catch(sub { my $error = shift; ... });
 
 Executes the callback immediately with the error if this Future
-failed. Returns itself unchanged if successful.
+failed. Returns itself unchanged if successful, or if no callback is given.
 
 =head2 and_then
 

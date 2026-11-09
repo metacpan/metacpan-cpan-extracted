@@ -27,7 +27,7 @@ my $s = $composed->new($schema);
 {
   my ($sql, $bind) = $s->_cypher_sql_bind('social', 'MATCH (n) RETURN n', ['node']);
   like   $sql, qr/FROM cypher\('social',/,   'graph name is inlined as a string literal';
-  like   $sql, qr/\$\$\nMATCH \(n\) RETURN n\n\$\$/, 'query is wrapped in dollar-quotes';
+  like   $sql, qr/\$dbio_age\$\nMATCH \(n\) RETURN n\n\$dbio_age\$/, 'query is wrapped in a tagged dollar-quote';
   like   $sql, qr/AS \(node agtype\)\z/,      'single result column declared as agtype';
   unlike $sql, qr/\?/,                        'no bind placeholder without params';
   is_deeply $bind, [],                        'no binds without params';
@@ -45,7 +45,7 @@ my $s = $composed->new($schema);
   my ($sql, $bind) = $s->_cypher_sql_bind(
     'g', 'MATCH (n {name: $name}) RETURN n', ['n'], { name => 'Alice' },
   );
-  like $sql, qr/\$\$, \?\) AS \(/, 'param slot appended as AGE third argument';
+  like $sql, qr/\$dbio_age\$, \?\) AS \(/, 'param slot appended as AGE third argument';
   is   scalar(@$bind), 1,          'one bind value for params';
   like $bind->[0], qr/"name":"Alice"/, 'params are JSON-encoded into the bind';
 }
@@ -68,6 +68,41 @@ my $s = $composed->new($schema);
 
   lives_ok { $s->_cypher_sql_bind('_My_graph2', 'RETURN 1', ['x']) }
     'valid identifier (leading underscore, digits) is accepted';
+}
+
+# --- dollar-quote tag must not occur in the Cypher text (karr k14) ---
+{
+  # A bare $$ in a Cypher string literal used to end the dollar-quoting early
+  # and hand the rest of the Cypher text to PostgreSQL as SQL.
+  my $evil = q{RETURN "a$$b"};
+  my ($sql) = $s->_cypher_sql_bind('g', $evil, ['x']);
+  my ($tag) = $sql =~ /\Aselect \* from cypher\('g', (\$[A-Za-z_0-9]*\$)\n/i;
+  ok defined $tag, 'dollar-quote opening tag found' or diag $sql;
+  isnt $tag, '$$', 'tag is not the bare $$ when the query contains $$';
+  is index($evil, $tag), -1, 'chosen tag does not occur in the Cypher text';
+  like $sql, qr/\Q$tag\E\n\Q$evil\E\n\Q$tag\E\) AS \(x agtype\)\z/,
+    'query is enclosed by the same tag on both sides, verbatim';
+
+  # Tag collision: the preferred tag itself appears in the text.
+  my $evil2 = q{RETURN "$dbio_age$ x $dbio_age1$ y $$"};
+  my ($sql2) = $s->_cypher_sql_bind('g', $evil2, ['x']);
+  my ($tag2) = $sql2 =~ /cypher\('g', (\$[A-Za-z_0-9]*\$)\n/;
+  is index($evil2, $tag2), -1, 'tag colliding with the text is counted up past every collision';
+  like $sql2, qr/\Q$tag2\E\n\Q$evil2\E\n\Q$tag2\E\)/, 'colliding query is enclosed verbatim';
+}
+
+# --- result column names are validated like the graph name (karr k14) ---
+{
+  throws_ok { $s->_cypher_sql_bind('g', 'RETURN 1', ['x agtype); DROP TABLE t; --']) }
+    qr/Invalid AGE column name/, 'injection-shaped column name is rejected';
+  throws_ok { $s->_cypher_sql_bind('g', 'RETURN 1', ['bad name']) }
+    qr/Invalid AGE column name/, 'column name with a space is rejected';
+  throws_ok { $s->_cypher_sql_bind('g', 'RETURN 1', ['1col']) }
+    qr/Invalid AGE column name/, 'column name starting with a digit is rejected';
+  throws_ok { $s->_cypher_sql_bind('g', 'RETURN 1', ['ok', undef]) }
+    qr/Invalid AGE column name/, 'undef column name is rejected';
+  lives_ok { $s->_cypher_sql_bind('g', 'RETURN 1', [qw(a _b c2)]) }
+    'valid identifiers are accepted';
 }
 
 # --- auto_decode option is post-fetch; it must not affect SQL generation ---

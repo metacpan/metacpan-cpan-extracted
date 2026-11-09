@@ -1,5 +1,120 @@
 Revision history for DBIO-DB2
 
+0.900004  2026-11-08
+    * Breaking Changes
+        - Every identifier is double-quoted as the result class spells it,
+          in DDL, Diff and Deploy alike. Objects an earlier release created
+          in upper case are migrated (export, install, load, or RENAME)
+          before an upgrade.
+
+    * Storage
+        - The DSN is built from connection parameters without a DSN
+          (DBIO::AccessBroker::Static, a connect-info hash): dbname alone is
+          the cataloged alias dbi:DB2:<dbname>, dbname with host and port is
+          dbi:DB2:DATABASE=..;HOSTNAME=..;PORT=..;PROTOCOL=TCPIP. host
+          without port, port without host and a missing dbname throw.
+        - A DBIO::Replicated replicant (HostBound view) over an uncataloged
+          DSN connects to the view's host and port. A cataloged alias and a
+          DSN without HOSTNAME= are refused, naming the form.
+        - results_exist and its async twins work (FROM SYSIBM.SYSDUMMY1);
+          $rs->rand() orders by RAND(); all six set operations are the ANSI
+          ones core renders.
+        - $rs->explain runs EXPLAIN PLAN SELECTION FOR and reads the plan
+          back from the EXPLAIN_* tables, found through the new
+          explain_table_schema accessor (SYSTOOLS by default; the name goes
+          through identifier quoting).
+        - A server warning (SQLSTATE class 01, such as SQL0513W for an
+          unrestricted DELETE or UPDATE) is not an exception; the err, state
+          and errstr stay on the handle. See ADR 0007.
+        - The character columns of a result are decoded from UTF-8 for a
+          database whose code set is UTF-8. A character LOB (clob, text) is
+          bound as a CLOB.
+        - An empty string for a blob column and a select or delete comparing
+          a CLOB over 32672 bytes are refused, naming table and column.
+        - create({}) is INSERT ... (col) VALUES (DEFAULT).
+        - transactional_ddl is 0; DBIO::DB2::Deploy documents the
+          statement-at-a-time apply and the way back from a partial one.
+
+    * DDL
+        - A column without an is_nullable key deploys as NOT NULL; a column
+          that means nullable says is_nullable => 1.
+        - String defaults are written as escaped literals, and the default
+          of a character column is always a string literal ('00000' on a
+          CHAR(5) stays text).
+        - unique_constraints are written as named UNIQUE constraints in
+          CREATE TABLE; one over a nullable column is refused (SQL0542N).
+          They are introspected and diffed. See ADR 0009.
+        - Canonical index declarations (Cake idx, ADR 0061) are written like
+          the db2_indexes entries. An index over columns that the primary
+          key, a unique constraint or an earlier index already covers is
+          left out; an SQL0605W the server sends is a warning.
+        - boolean is the native BOOLEAN, binary is BINARY(n) up to 255 bytes
+          and VARBINARY(n) up to 32672; beyond that is refused. A text
+          column without a size is a CLOB. The sizeless types varchar, json,
+          varbinary and interval, and the types enum and bit, are refused
+          naming type and column. DECFLOAT is mapped.
+        - table('schema.table') is the table in that schema; install_ddl
+          writes "schema"."table", the schema is made with its first table,
+          and foreign keys and indexes name it.
+        - Views are written after the views they read (cycles are refused,
+          naming them); a WITH name and a read qualified with another
+          schema are no views of the set. See ADR 0011.
+
+    * Introspect
+        - The columns of the model are the normalized ones of the other
+          drivers (data_type lower case, size, default_value); the catalog
+          form stays internal to the diff. See ADR 0013.
+        - A foreign key onto a UNIQUE constraint has that constraint's
+          columns as to_columns.
+        - Every table of the schema is listed, whatever its name; views
+          carry their definition, and the index behind a primary key is in
+          the model with origin 'pk'.
+
+    * Diff
+        - Views are created and dropped (DBIO::DB2::Diff::View), a changed
+          definition as drop and create, in the order of what they read.
+        - An identity column can be added to an existing table and made or
+          unmade identity; what the server refuses is refused naming table
+          and column. See ADR 0012.
+        - A REORG TABLE follows the column operations that leave a table
+          reorg-pending (DBIO::DB2::Diff::Reorg); see ADR 0008. upgrade
+          reorganises a table already pending before it applies the diff.
+        - The diff renders the catalog shape: no length on INTEGER or DATE,
+          defaults as stored, identity on create. A default the declaration
+          does not carry is dropped.
+        - Tables named schema.table are compared in their schema, and the
+          tables of that schema the declaration does not name are never
+          dropped. A foreign key across schemas is refused before the first
+          statement.
+        - No DROP INDEX or DROP UNIQUE is written for what a dropped column
+          takes along.
+
+    * Deploy
+        - diff and upgrade load their classes themselves.
+        - apply and upgrade are those of DBIO::Deploy::Base: a drop or a
+          lossy column change needs allow_destructive => 1, dry_run => 1
+          executes nothing. Before the first statement the Db2 checks
+          reorganise pending tables and refuse, naming table and column,
+          an identity column added over rows and a NOT NULL column Db2 has
+          no value for (see DBIO::DB2::Deploy).
+        - The compare deploy runs entirely in its throwaway schema: tables,
+          indexes and views are qualified, and view bodies resolve through
+          CURRENT SCHEMA. See ADR 0006.
+
+    * Testing
+        - DBIO::DB2::Test::Conformance answers the shared case table of
+          core (DDL, Diff and Bind cases), each case in a schema of its own
+          against a real Db2.
+
+    * Documentation
+        - The README states the async stance (sync-only; forked and
+          immediate are supported) and lists the query support; ADRs and POD
+          describe the code as it is.
+
+    * Dependencies
+        - Requires DBIO 0.900004. Test::Exception is a test prerequisite.
+        - Every module under lib/ carries a literal $VERSION.
+
 0.900001  2026-07-12
     * Diff
         - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #19).

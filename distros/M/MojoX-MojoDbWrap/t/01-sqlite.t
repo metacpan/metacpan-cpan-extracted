@@ -1,113 +1,36 @@
 use strict;
 use Test::More;
-use Test::Exception;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use MojoX::MojoDbWrap;
-use Data::Dumper;
+use MojoDbWrapTests qw< run_common_tests skip_unless_sqlite_returning >;
+
+skip_unless_sqlite_returning();
 
 subtest sqlite => sub {
-   plan skip_all => 'No Mojo::SQLite available'
-      unless eval {
-         require Mojo::SQLite;
-         Mojo::SQLite->VERSION('2.000');
-      };
-
-   my $wrap = MojoX::MojoDbWrap->new(
-      db_url => ':memory:',
-      migrations_for => {
-         'Mojo::SQLite' => <<'END'
--- 1 up
+   run_common_tests(
+      class           => 'Mojo::SQLite',
+      new_wrap        => sub { MojoX::MojoDbWrap->new(db_url => ':memory:', @_) },
+      duplicate_error => qr{UNIQUE constraint failed},
+      tables          => <<'END',
    CREATE TABLE foo (
       myid INTEGER PRIMARY KEY,
       name TEXT UNIQUE,
       other TEXT
    );
--- 1 down
-   DELETE TABLE foo;
-
-END
-      },
+   CREATE TABLE bar (
+      id INTEGER PRIMARY KEY,
+      name TEXT UNIQUE
    );
-
-   isa_ok $wrap, 'MojoX::MojoDbWrap';
-   isa_ok $wrap->mdb, 'Mojo::SQLite';
-   is $wrap->mdb_class, 'Mojo::SQLite', 'mdb_class';
-   is $wrap->mdb_module, 'Mojo::SQLite', 'mdb_module';
-
-   lives_ok { $wrap->init } 'call to init';
-
-   my $id;
-   lives_ok {
-      $id = $wrap->id_or_insert([qw< foo myid >], { name => 'bar' },
-         { name => 'bar', other => 'baz' });
-   } 'call to id_or_insert';
-   ok defined($id), 'identifier is defined';
-   diag "created record with id <$id>";
-
-   my $id_again;
-   lives_ok {
-      $id_again = $wrap->id_or_insert([qw< foo myid >], { name => 'bar' },
-         { name => 'bar', other => 'baz' });
-   } 'call to id_or_insert, same data as before';
-   ok defined($id_again), 'identifier is defined';
-   is $id_again, $id, 'retrieved the same id for the same name';
-
-   {
-      my $other = $wrap->db->select(foo => undef, { name => 'bar' })->hash->{other};
-      is $other, 'baz', 'initial value for other';
-   }
-
-   # unconditional insert here
-   my $id_new;
-   lives_ok {
-      $id_new = $wrap->insert([qw< foo myid >],
-         { name => 'baz', other => 'galook' });
-   } 'call to insert, got an identifier back';
-   ok defined($id_new), 'identifier of new item is defined';
-
-   $id_again = undef;
-   lives_ok {
-      $id_again = $wrap->id_of([qw< foo myid >], { name => 'baz' });
-   } 'call to id_of, retrieving new item';
-   ok defined($id_again), 'identifier is defined';
-   is $id_again, $id_new, 'retrieved the same id for the same name';
-
-   {
-      my $other = $wrap->db->select(foo => undef, { name => 'baz' })->hash->{other};
-      is $other, 'galook', 'initial value for other (in baz)';
-   }
-
-   throws_ok {
-      my $none_really = $wrap->insert([qw< foo myid >],
-         { name => 'baz', other => 'galook' });
-   } qr{UNIQUE constraint failed}, 'call to insert with conflicting values, got an error';
-
-   $id_again = undef;
-   lives_ok {
-      $id_again = $wrap->insert([qw< foo myid >],
-         { name => 'baz', other => 'fizzbuzz' },
-         { on_conflict => [ name => { other => 'fizzbuzz' } ]});
-   } 'upsert, explicit with on_conflict';
-   ok defined($id_again), 'identifier is defined';
-   is $id_again, $id_new, 'retrieved the same id for the same name';
-
-   {
-      my $other = $wrap->db->select(foo => undef, { name => 'baz' })->hash->{other};
-      is $other, 'fizzbuzz', 'new value for other (in baz)';
-   }
-
-   $id_again = undef;
-   lives_ok {
-      $id_again = $wrap->upsert([qw< foo myid >],
-         { name => 'baz', other => 'buzzmazz' },
-         { conflicting => 'name' });
-   } 'upsert, with upsert method';
-   ok defined($id_again), 'identifier is defined';
-   is $id_again, $id_new, 'retrieved the same id for the same name';
-
-   {
-      my $other = $wrap->db->select(foo => undef, { name => 'baz' })->hash->{other};
-      is $other, 'buzzmazz', 'new value for other (in baz)';
-   }
+   CREATE TABLE pair (
+      id INTEGER PRIMARY KEY,
+      a TEXT,
+      b TEXT,
+      v TEXT,
+      UNIQUE (a, b)
+   );
+END
+   );
 };
 
 done_testing();

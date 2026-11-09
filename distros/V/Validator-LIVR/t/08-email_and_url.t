@@ -5,6 +5,7 @@ use utf8;
 use lib '../lib';
 
 use Test::More;
+use Time::HiRes qw/time/;
 
 use Validator::LIVR;
 
@@ -62,7 +63,6 @@ subtest 'URL' => sub {
     check_values( 'url', 'WRONG_URL',
         'https://example.com'                    => 1,
         'HTTPS://EXAMPLE.COM/PATH'               => 1,
-        'http://example.com.'                    => 1,
         'http://example.com?x=1'                 => 1,
         'http://example.com/#a#b'                => 1,
         'http://example.com/path?q=a%20b&x[]=1'  => 1,
@@ -77,8 +77,6 @@ subtest 'URL' => sub {
         'http://example.c0m'                     => 1,
         'http://приклад.укр/шлях'                => 1,
         'http://xn--80aikifvh.xn--j1amh/'        => 1,
-        'http://example.com:/'                   => 1,
-        'http://example.com:8'                   => 1,
         'http://0.0.0.0'                         => 1,
         'http://010.1.1.1/'                      => 1,
         'http://224.0.0.1'                       => 1,
@@ -93,12 +91,93 @@ subtest 'URL' => sub {
         'http://-example.com'                    => 0,
         'http://example-.com'                    => 0,
         'http://example..com'                    => 0,
-        'http://example.com:123456'              => 0,
         'http://example.com/a b'                 => 0,
         'http://[::1]/'                          => 0,
         '//example.com'                          => 0,
         'mailto:john@example.com'                => 0,
     );
+};
+
+# LIVR 2.5: no dot after the host, labels of up to 63 characters, ports from 0 to 65535
+subtest 'URL: no dot after the host' => sub {
+    check_values( 'url', 'WRONG_URL',
+        'http://example.com/file.'               => 1,
+        'http://example.com/?q=a.'               => 1,
+        'http://example.com/#top.'               => 1,
+        'http://user.name@example.com/'          => 1,
+
+        'http://example.com.'                    => 0,
+        'https://www.google.'                    => 0,
+        'http://example.com./path'               => 0,
+        'http://example.com.:8080'               => 0,
+        'http://example.com.?q=1'                => 0,
+        'http://example.com.#top'                => 0,
+        'http://user@example.com./'              => 0,
+        'http://intranet./'                      => 0,
+        'http://10.0.0.1./'                      => 0,
+    );
+};
+
+subtest 'URL: labels of up to 63 characters' => sub {
+    check_values( 'url', 'WRONG_URL',
+        'http://' . ( 'a' x 63 ) . '.example.com/'      => 1,
+        'http://example.' . ( 'a' x 63 )                => 1,
+        'http://' . ( 'a' x 63 )                        => 1,
+        'http://a' . ( '-' x 61 ) . 'a.com'             => 1,
+        'http://' . ( 'п' x 63 ) . '.укр'               => 1,
+        'http://' . ( ( 'a' x 63 ) . '.' ) x 10 . 'com' => 1,
+
+        'http://' . ( 'a' x 64 ) . '.example.com/'      => 0,
+        'http://example.' . ( 'a' x 64 )                => 0,
+        'http://' . ( 'a' x 64 )                        => 0,
+        'http://a' . ( '-' x 62 ) . 'a.com'             => 0,
+        'http://' . ( 'п' x 64 ) . '.укр'               => 0,
+    );
+};
+
+subtest 'URL: ports from 0 to 65535' => sub {
+    check_values( 'url', 'WRONG_URL',
+        'http://example.com:0'                   => 1,
+        'http://example.com:8'                   => 1,
+        'http://example.com:8/path?q=1#top'      => 1,
+        'http://example.com:00080'               => 1,
+        'http://example.com:65535/'              => 1,
+        'http://10.0.0.1:8/'                     => 1,
+        'http://localhost:65535'                 => 1,
+
+        'http://example.com:65536'               => 0,
+        'http://example.com:99999/'              => 0,
+        'http://example.com:123456'              => 0,
+        'http://example.com:000080'              => 0,
+        'http://example.com:'                    => 0,
+        'http://example.com:/'                   => 0,
+        'http://10.0.0.1:65536/'                 => 0,
+    );
+};
+
+# Values of up to 100 KB with many labels, "@" (each can end the user) and paths
+subtest 'URL: long wrong values are rejected quickly' => sub {
+    my @values = (
+        'http://' . ( 'aaaa.' x 12 ) . '_',
+        'http://' . ( 'aaaa-' x 12 ) . '_',
+        'http://' . ( 'aaaa.' x 12 ) . 'a!',
+        'http://user@' . ( 'aaaa.' x 12 ) . '_',
+        'http://' . ( 'a@' x 12 ) . ( 'aaaa.' x 12 ) . '_',
+        'http://' . ( 'aaaa.' x 20_000 ) . '_',
+        'http://' . ( 'a' x 100_000 ) . '!',
+        'http://' . ( 'a@' x 50_000 ) . '_',
+        'http://' . ( 'a@a.com/' x 12_500 ) . ' ',
+        'http://' . ( 'a@a.com?' x 12_500 ) . ' ',
+        'http://' . ( 'a@10.0.0.1:80/' x 7_000 ) . ' ',
+    );
+
+    my $validator = Validator::LIVR->new({ field => 'url' });
+    my $start = time;
+    my $rejected = grep { !$validator->validate({ field => $_ }) } @values;
+    my $seconds = time - $start;
+
+    is( $rejected, scalar(@values), 'Should reject all values' );
+    ok( $seconds < 1, sprintf( "Should check them in less than a second: %.3f s", $seconds ) );
 };
 
 done_testing();

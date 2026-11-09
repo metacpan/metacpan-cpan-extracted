@@ -44,7 +44,8 @@ for my $method (@contract_methods) {
       ],
       BOOK => [
         { column_name => 'ID',        data_type => 'integer', not_null => 1,
-          default_value => undef, is_pk => 1, pk_position => 1, size => undef },
+          default_value => undef, is_pk => 1, pk_position => 1, size => undef,
+          is_auto_increment => 1 },
         { column_name => 'AUTHOR_ID', data_type => 'integer', not_null => 1,
           default_value => undef, is_pk => 0, pk_position => 0, size => undef },
         { column_name => 'PRICE',     data_type => 'decimal', not_null => 0,
@@ -71,7 +72,7 @@ for my $method (@contract_methods) {
 
     my %fks = (
       BOOK => [
-        { fk_id => 'FK_BOOK_AUTHOR', from_table => 'BOOK',
+        { constraint_name => 'FK_BOOK_AUTHOR', from_table => 'BOOK',
           from_columns => ['AUTHOR_ID'], to_table => 'AUTHOR',
           to_columns => ['ID'], on_update => 'CASCADE', on_delete => 'RESTRICT',
           match => 'FULL' },
@@ -100,6 +101,9 @@ my $book_info = $fixture->table_columns_info('BOOK');
 is($book_info->{ID}{data_type}, 'integer', 'BOOK.ID data_type');
 is($book_info->{ID}{is_nullable}, 0, 'BOOK.ID not nullable (PK, not_null)');
 is($book_info->{TITLE}{is_nullable}, 1, 'BOOK.TITLE nullable');
+is($book_info->{ID}{is_auto_increment}, 1, 'BOOK.ID is_auto_increment reaches the contract (karr k46)');
+ok(!exists $fixture->table_columns_info('AUTHOR')->{ID}{is_auto_increment},
+  'a column whose model has no flag carries none');
 is($book_info->{NAME}{size}, undef, 'BOOK has no NAME column');
 is($book_info->{TITLE}{size}, 256, 'BOOK.TITLE scalar size');
 is_deeply($book_info->{PRICE}{size}, [10, 2], 'BOOK.PRICE composite size');

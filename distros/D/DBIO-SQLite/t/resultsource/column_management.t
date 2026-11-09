@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Storable qw/dclone/;
 use DBIO::SQLite::Test;
 my $schema = DBIO::SQLite::Test->init_schema();
 
@@ -211,11 +212,24 @@ my $schema = DBIO::SQLite::Test->init_schema();
   ok(!$src->has_relationship('nonexistent'), 'has_relationship returns false');
 }
 
-# --- handle ---
+# --- serializable source pointer ---
+# core k91 dropped DBIO::ResultSourceHandle and ->handle; a ResultSource is now
+# its own serializable pointer (STORABLE_freeze/thaw in DBIO::ResultSource),
+# resolving back through $DBIO::ResultSource::thaw_schema.
 {
   my $src = $schema->source('CD');
-  my $handle = $src->handle;
-  isa_ok($handle, 'DBIO::ResultSourceHandle', 'handle returns RSH');
+  my $thawed = do {
+    local $DBIO::ResultSource::thaw_schema = $schema;
+    dclone($src);
+  };
+  isa_ok($thawed, 'DBIO::ResultSource', 'frozen/thawed source');
+  is($thawed->source_name, 'CD', 'thawed source keeps its moniker');
+  is($thawed->schema, $schema, 'thawed source re-attached to the thaw schema');
+  is_deeply(
+    [ sort $thawed->columns ],
+    [ sort $src->columns ],
+    'thawed source carries the same columns'
+  );
 }
 
 done_testing;

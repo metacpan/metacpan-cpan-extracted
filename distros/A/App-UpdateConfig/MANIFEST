@@ -14,6 +14,7 @@ t/210-dir-conf.t
 t/220-base-mirror.t
 t/230-entire-file-state.t
 t/240-symlink.t
+t/250-append.t
 t/300-pack.t
 t/400-config_dir.t
 t/500-version.t

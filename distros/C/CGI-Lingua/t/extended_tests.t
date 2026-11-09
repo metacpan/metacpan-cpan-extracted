@@ -63,6 +63,7 @@ sub _inject_ipcountry {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 }
 
 _block_network();
@@ -781,6 +782,7 @@ subtest 'country: eu from Whois triggers _handle_eu_country' => sub {
 	$l->{_have_ipcountry} = $GEO_ABSENT;
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 
 	# Override the global no-op with one that sets _country = 'eu'
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois',
@@ -801,6 +803,7 @@ subtest 'country: eu from Whois for Baidu subnet maps to cn' => sub {
 	$l->{_have_ipcountry} = $GEO_ABSENT;
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois',
 		sub { $_[0]->{_country} = 'eu' });
@@ -1028,6 +1031,7 @@ subtest 'country: Geo::IPfree branch exercised when IP::Country and Geo::IP abse
 		$l->{_have_ipcountry} = $GEO_ABSENT;
 		$l->{_have_geoip}     = $GEO_ABSENT;
 		$l->{_have_geoipfree} = $GEO_PRESENT;
+		$l->{_have_mmdb} = $GEO_ABSENT;
 		$l->{_geoipfree}      = $mock_geoipfree;
 
 		my $cc = $l->country();

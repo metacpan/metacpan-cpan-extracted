@@ -27,7 +27,7 @@ key is **whether an offset is present**, not anything about the server.
 
 ## Decision
 
-`DBIO::DB2::SQLMaker::apply_limit` (`SQLMaker.pm:16-25`) branches on the
+`DBIO::DB2::SQLMaker::apply_limit` (`lib/DBIO/DB2/SQLMaker.pm`) branches on the
 presence of an offset:
 
     sub apply_limit {
@@ -63,12 +63,14 @@ offset is needed.
 server version — `ROW_NUMBER() OVER` for DB2 5.4+, `FETCH FIRST` for older
 versions." That framing is **inaccurate documentation, not a code bug**: the
 code has never inspected a server version; it has always branched on `$offset`.
-The misleading in-code comments at `SQLMaker.pm:19-20` describe a version story
-the surrounding code does not implement. This ADR records the resolution: the
+The two line comments inside `apply_limit` described a version story the
+surrounding code does not implement. This ADR records the resolution: the
 **offset-based branch is correct as written**, and the version-detection prose
 is the thing to fix. The accompanying doc-drift fix corrects `CLAUDE.md` and the
 `SQLMaker.pm` POD to describe the offset branch; the executable code in
-`apply_limit` is unchanged.
+`apply_limit` is unchanged. The two line comments were not part of that fix;
+they were rewritten on 2026-10-05 (karr k38) and describe the offset branch
+since.
 
 ## Consequences
 
@@ -80,11 +82,11 @@ is the thing to fix. The accompanying doc-drift fix corrects `CLAUDE.md` and the
   old prose. `_RowNumberOver` requires a DB2 that supports `ROW_NUMBER() OVER`
   (DB2 V8 / 5.x-era and later), which is the same broad floor the rest of the
   driver assumes.
-- The in-code comments at `SQLMaker.pm:19-20` still narrate the version story;
-  they are POD-adjacent line comments left untouched here per scope. They are
-  descriptive only and do not affect behaviour, but they are the residual
-  carrier of the inaccurate framing this ADR resolves and should be corrected
-  the next time `SQLMaker.pm` is edited for behaviour.
+- The two line comments inside `apply_limit` went on narrating the version
+  story after this ADR was written: they were left untouched per scope, as the
+  residual carrier of the inaccurate framing it resolves. They were corrected on
+  2026-10-05 (karr k38) — comments only, no executable line changed — so
+  `lib/DBIO/DB2/SQLMaker.pm` no longer tells the version story anywhere.
 - See core ADR 0003 for the cross-driver `apply_limit` mechanism this
   specialises, and mssql ADR 0002 for the sibling single-windowed-path
   precedent.

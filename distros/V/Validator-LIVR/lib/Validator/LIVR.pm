@@ -13,7 +13,7 @@ use Validator::LIVR::Rules::Special;
 use Validator::LIVR::Rules::Meta;
 use Validator::LIVR::Rules::Modifiers;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # Rule builders of new validators. The hash is never changed in place: register_default_rules()
 # makes a new one. So new() does not copy it, and a validator keeps the rules of the time it

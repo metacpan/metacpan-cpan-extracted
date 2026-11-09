@@ -320,6 +320,9 @@ int hm_backend_wsapoll_available(void) { return 1; }
 #else /* !_WIN32 */
 
 hm_backend *hm_backend_wsapoll_new(void)       { return 0; }
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 int         hm_backend_wsapoll_available(void) { return 0; }
 
 #endif

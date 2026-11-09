@@ -40,6 +40,7 @@ TestDBIO::View::Schema->register_class(
   Year2000CDs => 'TestDBIO::View::Schema::Result::Year2000CDs'
 );
 
+TestDBIO::View::Schema->storage_type('+DBIO::Test::Storage');
 my $schema = TestDBIO::View::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 

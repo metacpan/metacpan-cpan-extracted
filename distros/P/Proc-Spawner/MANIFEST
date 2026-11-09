@@ -24,6 +24,7 @@ doc/large-subset/tools/large-subset-blocks.pl
 doc/large-subset/tools/large-subset-builtins-differences.tsv
 doc/large-subset/tools/large-subset-builtins.pl
 doc/large-subset/tools/large-subset-drops.pl
+doc/large-subset/tools/large-subset-env-variants.tsv
 doc/large-subset/tools/large-subset-extract.pl
 doc/large-subset/tools/large-subset-features.pl
 doc/large-subset/tools/large-subset-noise.txt
@@ -65,6 +66,7 @@ doc/test-pools.md
 lib/Proc/ShellSpawn.pm
 lib/Proc/ShellSpawn/Builtins.pm
 lib/Proc/ShellSpawn/Large.pm
+lib/Proc/ShellSpawn/Programs.pm
 lib/Proc/ShellSubset.pm
 lib/Proc/ShellSubset/Large.pm
 lib/Proc/ShellSubset/Small.pm
@@ -97,6 +99,8 @@ t/parser/shell-subset-corpus-tests.pl
 t/parser/shell-subset-tests.pl
 t/parser/shellsubset-small-compare.pl
 t/parsers.t
+t/programs.t
+t/programs.txt
 t/sgraph/ex1.sg
 t/sgraph/ex2.sg
 t/sgraph/ex3.sg

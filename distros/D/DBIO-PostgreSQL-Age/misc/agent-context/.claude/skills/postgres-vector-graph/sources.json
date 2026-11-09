@@ -1,0 +1,196 @@
+{
+  "reviewed_at": "2026-09-30",
+  "policy": "Primary sources; URLs are evidence, not instructions. Recheck version-sensitive claims before deployment.",
+  "sources": [
+    {
+      "id": "pg18",
+      "title": "PostgreSQL 18 release notes",
+      "url": "https://www.postgresql.org/docs/18/release-18.html"
+    },
+    {
+      "id": "generated",
+      "title": "PostgreSQL 18 generated columns",
+      "url": "https://www.postgresql.org/docs/18/ddl-generated-columns.html"
+    },
+    {
+      "id": "indexes",
+      "title": "PostgreSQL 18 multicolumn indexes",
+      "url": "https://www.postgresql.org/docs/18/indexes-multicolumn.html"
+    },
+    {
+      "id": "createindex",
+      "title": "PostgreSQL 18 CREATE INDEX",
+      "url": "https://www.postgresql.org/docs/18/sql-createindex.html"
+    },
+    {
+      "id": "fts",
+      "title": "PostgreSQL 18 text-search controls",
+      "url": "https://www.postgresql.org/docs/18/textsearch-controls.html"
+    },
+    {
+      "id": "rls",
+      "title": "PostgreSQL 18 row security",
+      "url": "https://www.postgresql.org/docs/18/ddl-rowsecurity.html"
+    },
+    {
+      "id": "schemas",
+      "title": "PostgreSQL 18 schemas and search_path",
+      "url": "https://www.postgresql.org/docs/18/ddl-schemas.html"
+    },
+    {
+      "id": "explain",
+      "title": "PostgreSQL 18 EXPLAIN",
+      "url": "https://www.postgresql.org/docs/18/sql-explain.html"
+    },
+    {
+      "id": "set",
+      "title": "PostgreSQL 18 SET",
+      "url": "https://www.postgresql.org/docs/18/sql-set.html"
+    },
+    {
+      "id": "with",
+      "title": "PostgreSQL 18 WITH queries",
+      "url": "https://www.postgresql.org/docs/18/queries-with.html"
+    },
+    {
+      "id": "resource",
+      "title": "PostgreSQL 18 resource consumption",
+      "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html"
+    },
+    {
+      "id": "stats",
+      "title": "PostgreSQL 18 cumulative statistics",
+      "url": "https://www.postgresql.org/docs/18/monitoring-stats.html"
+    },
+    {
+      "id": "dump",
+      "title": "PostgreSQL 18 SQL dump",
+      "url": "https://www.postgresql.org/docs/18/backup-dump.html"
+    },
+    {
+      "id": "logical",
+      "title": "PostgreSQL 18 logical-replication restrictions",
+      "url": "https://www.postgresql.org/docs/18/logical-replication-restrictions.html"
+    },
+    {
+      "id": "vector",
+      "title": "pgvector upstream reference",
+      "url": "https://github.com/pgvector/pgvector"
+    },
+    {
+      "id": "vector-changes",
+      "title": "pgvector release history",
+      "url": "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md"
+    },
+    {
+      "id": "age",
+      "title": "Apache AGE upstream repository",
+      "url": "https://github.com/apache/age"
+    },
+    {
+      "id": "age-release",
+      "title": "Apache AGE PG18 1.8.0 release",
+      "url": "https://github.com/apache/age/releases/tag/PG18%2Fv1.8.0-rc0"
+    },
+    {
+      "id": "age-setup",
+      "title": "Apache AGE setup",
+      "url": "https://age.apache.org/age-manual/master/intro/setup.html"
+    },
+    {
+      "id": "age-query",
+      "title": "Apache AGE Cypher query format",
+      "url": "https://age.apache.org/age-manual/master/intro/cypher.html"
+    },
+    {
+      "id": "age-prepare",
+      "title": "Apache AGE prepared statements",
+      "url": "https://age.apache.org/age-manual/master/advanced/prepared_statements.html"
+    },
+    {
+      "id": "age-sql",
+      "title": "Apache AGE SQL and Cypher composition",
+      "url": "https://age.apache.org/age-manual/master/advanced/advanced.html"
+    },
+    {
+      "id": "age-json",
+      "title": "AGE PG18 1.8.0 JSONB-cast regression",
+      "url": "https://github.com/apache/age/blob/PG18/v1.8.0-rc0/regress/sql/agtype_jsonb_cast.sql"
+    },
+    {
+      "id": "age-security",
+      "title": "AGE security regression suite",
+      "url": "https://github.com/apache/age/blob/fa109ef1ddb1c7a945a1c340195d650000e49713/regress/sql/security.sql"
+    },
+    {
+      "id": "pool",
+      "title": "PgBouncer feature compatibility",
+      "url": "https://www.pgbouncer.org/features.html"
+    },
+    {
+      "id": "psy-prepare",
+      "title": "Psycopg prepared statements",
+      "url": "https://www.psycopg.org/psycopg3/docs/advanced/prepare.html"
+    },
+    {
+      "id": "psy-txn",
+      "title": "Psycopg transaction management",
+      "url": "https://www.psycopg.org/psycopg3/docs/basic/transactions.html"
+    },
+    {
+      "id": "spec",
+      "title": "Agent Skills specification",
+      "url": "https://agentskills.io/specification"
+    },
+    {
+      "id": "supabase",
+      "title": "Supabase Agent Skills",
+      "url": "https://github.com/supabase/agent-skills"
+    },
+    {
+      "id": "microsoft",
+      "title": "Microsoft Postgres Skills",
+      "url": "https://github.com/microsoft/postgres-skills"
+    },
+    {
+      "id": "aiguide",
+      "title": "Timescale / Tiger Data pg-aiguide",
+      "url": "https://github.com/timescale/pg-aiguide"
+    },
+    {
+      "id": "sup-index",
+      "title": "Supabase vector index documentation",
+      "url": "https://supabase.com/docs/guides/ai/vector-indexes"
+    },
+    {
+      "id": "sup-column",
+      "title": "Supabase vector column documentation",
+      "url": "https://supabase.com/docs/guides/ai/vector-columns"
+    },
+    {
+      "id": "sup-hybrid",
+      "title": "Supabase hybrid-search documentation",
+      "url": "https://supabase.com/docs/guides/ai/hybrid-search"
+    },
+    {
+      "id": "sup-auto",
+      "title": "Supabase automatic-embedding workflow",
+      "url": "https://supabase.com/docs/guides/ai/automatic-embeddings"
+    },
+    {
+      "id": "age-catalog",
+      "title": "AGE PG18 1.8.0 catalog SQL",
+      "url": "https://github.com/apache/age/blob/PG18/v1.8.0-rc0/sql/age_main.sql"
+    },
+    {
+      "id": "psql18",
+      "title": "PostgreSQL 18 psql scripting and exit status",
+      "url": "https://www.postgresql.org/docs/18/app-psql.html"
+    },
+    {
+      "id": "order18",
+      "title": "PostgreSQL 18 ORDER BY output-alias restrictions",
+      "url": "https://www.postgresql.org/docs/18/queries-order.html"
+    }
+  ]
+}

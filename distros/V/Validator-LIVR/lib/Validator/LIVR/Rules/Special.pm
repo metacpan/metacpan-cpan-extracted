@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Special;
 use strict;
 use warnings;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # From 0 to 255. Leading zeros are allowed, as Validator::LIVR 2.0 allowed them in URLs
 my $IPV4_OCTET = qr/25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9]/;
@@ -57,26 +57,41 @@ sub equal_to_field {
 }
 
 
-# Letters of any language, digits and hyphens, but not a hyphen at the start or the end
-my $URL_LABEL = qr/[a-z0-9\x{a1}-\x{10ffff}]+ (?: -+[a-z0-9\x{a1}-\x{10ffff}]+ )*/xi;
+# Letters of any language, digits and hyphens, but not a hyphen at the start or the end.
+# Up to 63 characters. "." is not in a label, so labels do not overlap
+my $URL_LABEL = qr/[a-z0-9\x{a1}-\x{10ffff}] (?: [a-z0-9\x{a1}-\x{10ffff}-]{0,61} [a-z0-9\x{a1}-\x{10ffff}] )?/xi;
 
 # The last label starts with a letter, so a host name is never an IP address
-my $URL_LAST_LABEL = qr/[a-z\x{a1}-\x{10ffff}] [a-z0-9\x{a1}-\x{10ffff}]* (?: -+[a-z0-9\x{a1}-\x{10ffff}]+ )*/xi;
+my $URL_LAST_LABEL = qr/[a-z\x{a1}-\x{10ffff}] (?: [a-z0-9\x{a1}-\x{10ffff}-]{0,61} [a-z0-9\x{a1}-\x{10ffff}] )?/xi;
+
+my $URL_HOST = qr/ $IPV4_OCTET (?: \.$IPV4_OCTET ){3} | (?: $URL_LABEL \. )* $URL_LAST_LABEL /x;
+
+# From 0 to 65535, with 1-5 digits
+my $URL_PORT = qr/ [0-9]{1,4} | [0-5][0-9]{4} | 6[0-4][0-9]{3} | 65[0-4][0-9]{2} | 655[0-2][0-9] | 6553[0-5] /x;
 
 # An http or https URL with a host name or an IPv4 address, and an optional user, port,
 # path, query and fragment. As in Validator::LIVR 2.0, and unlike the other LIVR
 # implementations, a host name can be without a TLD, such as "intranet", any IPv4
-# address and a port of up to 5 digits are allowed, and the length is not limited
+# address is allowed, and the length is not limited. As in LIVR 2.5, there is no dot
+# after the host, a label has up to 63 characters and a port is at most 65535.
+#
+# It is "https?:// (?: \S+\@ )? $URL_HOST (?: :$URL_PORT )? (?: [\/?\#] \S* )? \z" in two
+# cases. The user can end at any "@" of the value, and in each case the path is matched
+# once, not again for every "@":
+#  - Without spaces: the path, the query and the fragment are anything after a "/", "?"
+#    or "#" that follows the host
+#  - With spaces, which can only be in the host (labels have the characters from U+00A1
+#    on, and some of them are spaces, such as U+3000): the user ends at the last "@"
+#    before the first space
 my $URL_RE = qr/\A
     https?:\/\/
-    (?: \S+\@ )?
     (?:
-        $IPV4_OCTET (?: \.$IPV4_OCTET ){3}
-      | (?: $URL_LABEL \. )* $URL_LAST_LABEL
-    ) \.?
-    (?: :[0-9]{0,5} )?
-    (?: [\/?\#] \S* )?
-\z/xi;
+        (?= \S* \z )
+        (?: \S+\@ )? $URL_HOST (?: :$URL_PORT )? (?: [\/?\#] | \z )
+      |
+        (?: \S+\@ (?= [^\s\@\/?\#]* \s ) )? $URL_HOST (?: :$URL_PORT )? (?: [\/?\#] \S* )? \z
+    )
+/xi;
 
 sub url {
     return sub {

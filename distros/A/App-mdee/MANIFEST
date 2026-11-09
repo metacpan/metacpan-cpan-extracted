@@ -17,6 +17,7 @@ images/MBP-full.png
 images/manual.png
 lib/App/Greple/md.pm
 lib/App/Greple/md/Blocks.pm
+lib/App/Greple/md/widen.pm
 lib/App/mdee.pm
 minil.toml
 script/mdee
@@ -27,6 +28,7 @@ share/theme/markcell.sh
 share/theme/markwrap.sh
 share/theme/nomark.sh
 share/theme/warm.sh
+share/theme/widen.sh
 t/00_compile.t
 t/01_mdee.t
 t/02_colorize.t
@@ -39,7 +41,10 @@ t/08_refill_join.t
 t/09_refill.t
 t/10_blocks.t
 t/11_quote_fold.t
+t/12_widen.t
+t/13_begin.t
 t/14_escape.t
+t/15_front_matter.t
 t/Util.pm
 t/demo.md
 t/table_wrap.md

@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Exception;
 use Test::More;
-use Sub::Name;
+use Sub::Util qw( set_subname );
 use Try::Tiny;
 use DBIO::Optional::Dependencies ();
 
@@ -75,9 +75,18 @@ DBIO::Test::Schema::CD->load_components('PK::Auto::Oracle');
 DBIO::Test::Schema::Track->load_components('PK::Auto::Oracle');
 
 
+# DBIO::Test::Schema is shared by the driver suites and declares no driver; a
+# schema always has one (core ADR 0067). Each connect here declares Oracle's
+# storage on a clone, so the shared class stays without one.
+sub oracle_schema {
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('+DBIO::Oracle::Storage');
+  return $schema->connect(@_);
+}
+
 # check if we indeed do support stuff
 my $v = do {
-  my $si = DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->_server_info;
+  my $si = oracle_schema($dsn, $user, $pass)->storage->_server_info;
   $si->{normalized_dbms_version}
     or die "Unparseable Oracle server version: $si->{dbms_version}\n";
 };
@@ -89,17 +98,17 @@ my $test_server_supports_only_orajoins = $v < 9;
 my $test_server_supports_insert_returning = $v >= 8.001;
 
 is (
-  DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->_use_insert_returning,
+  oracle_schema($dsn, $user, $pass)->storage->_use_insert_returning,
   $test_server_supports_insert_returning,
   'insert returning capability guessed correctly'
 );
 
-isa_ok (DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->sql_maker, 'DBIO::Oracle::SQLMaker');
+isa_ok (oracle_schema($dsn, $user, $pass)->storage->sql_maker, 'DBIO::Oracle::SQLMaker');
 
 # see if determining a driver with bad credentials throws propely
 # (sql_maker is lazy and never connects -- ensure_connected forces the connect)
 throws_ok {
-  DBIO::Test::Schema->connect($dsn, "BORKED BORKED USER $user", $pass)->storage->ensure_connected;
+  oracle_schema($dsn, "BORKED BORKED USER $user", $pass)->storage->ensure_connected;
 } qr/DBI Connection failed/;
 
 ##########
@@ -121,7 +130,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning ? (1,0) : (
 
     no warnings qw/once redefine/;
     my $old_connection = DBIO::Test::Schema->can('connection');
-    local *DBIO::Test::Schema::connection = subname 'DBIO::Test::Schema::connection' => sub {
+    local *DBIO::Test::Schema::connection = set_subname 'DBIO::Test::Schema::connection' => sub {
       my $s = shift->$old_connection (@_);
       $s->storage->_use_insert_returning ($use_insert_returning);
       $s->storage->sql_maker_class('DBIO::Oracle::SQLMaker::Joins') if $force_ora_joins;
@@ -134,7 +143,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning ? (1,0) : (
         delete $_->{sequence};
       }
 
-      my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, $opt);
+      my $schema = oracle_schema($dsn, $user, $pass, $opt);
 
       $dbh = $schema->storage->dbh;
       my $q = $schema->storage->sql_maker->quote_char || '';
@@ -162,12 +171,12 @@ sub _run_tests {
       if $schema->storage->_use_insert_returning;
 
     is($new_artist->artistid, 1, "Oracle Auto-PK worked for standard sqlt-like trigger");
-    $seq = $new_artist->result_source->column_info('artistid')->{sequence};
+    $seq = $schema->storage->get_autoinc_seq($new_artist->result_source, 'artistid');
     $seq = $$seq if ref $seq;
     like ($seq, qr/\.${q}artist_pk_seq${q}$/, 'Correct PK sequence selected for sqlt-like trigger');
 
     is($new_cd->cdid, 1, 'Oracle Auto-PK worked - using scalar ref as table name/custom weird trigger');
-    $seq = $new_cd->result_source->column_info('cdid')->{sequence};
+    $seq = $schema->storage->get_autoinc_seq($new_cd->result_source, 'cdid');
     $seq = $$seq if ref $seq;
     like ($seq, qr/\.${q}cd_seq${q}$/, 'Correct PK sequence selected for custom trigger');
   }
@@ -200,7 +209,7 @@ sub _run_tests {
     skip 'not detecting sequences when using INSERT ... RETURNING', 1
       if $schema->storage->_use_insert_returning;
 
-    $seq = $new->result_source->column_info('artistid')->{sequence};
+    $seq = $schema->storage->get_autoinc_seq($new->result_source, 'artistid');
     $seq = $$seq if ref $seq;
     like ($seq, qr/\.${q}artist_pk_seq${q}$/, 'Correct PK sequence selected for sqlt-like trigger');
   }
@@ -393,7 +402,7 @@ sub _run_tests {
     { order_by => 'artistid' }
   );
 
-  $art_rs->delete;
+  $art_rs->delete({ all => 1 });
   lives_ok {
     $pop_rs->populate([
       map { +{ name => "pop_art_$_" } }
@@ -428,22 +437,13 @@ sub _run_tests {
     ]);
     1;
   } or $pop_err = $@;
-  like($pop_err, qr/unique constraint.+populate slice/s, 'Partially failed populate throws');
-  SKIP: {
-    # The dumped slice sits between "populate slice:\n" and the confess()
-    # location suffix (" at FILE line N"). Strip the suffix so eval can
-    # re-parse the slice back to a hashref. ADR core/0027: assertion is
-    # about the failing row, not the dump_value quoting form.
-    skip 'could not extract populate slice from exception', 1
-      unless $pop_err
-        && $pop_err =~ /populate slice:\s*\n(\{[^}{]*\})\s*(?:at\s+\S+\.t\s+line\s+\d+)?\s*\z/s;
-    my $slice_src = $1;
-    my $slice = eval $slice_src;
-    skip "could not eval populate slice: $@", 1
-      unless ref $slice eq 'HASH';
-    is_deeply($slice, { artistid => 1, name => "pop_art_1" },
-      'Partially failed populate reports the offending row');
-  }
+  like($pop_err, qr/unique constraint/, 'Partially failed populate throws');
+  # The error names the failing row (1-based; artistid 1 is the second row)
+  # and the columns of the populate data, never a value of the row.
+  like($pop_err, qr/\brow 2 of the populate data \(columns: artistid, name\)/,
+    'Partially failed populate names the offending row and the columns');
+  unlike($pop_err, qr/pop_art_/,
+    'Partially failed populate shows no value of the row');
 
   is_deeply (
     [ $pop_rs->get_column('artistid')->all ],
@@ -505,7 +505,7 @@ sub _run_tests {
       if $schema->storage->_server_info->{normalized_dbms_version} < 9;
 
     my $schema2 = $schema->connect($dsn2, $user2, $pass2, $opt);
-    my $dbh2 = $schema2->storage->dbh;
+    $dbh2 = $schema2->storage->dbh;
 
     # create identically named tables/sequences in the other schema
     do_creates($dbh2, $q);
@@ -550,7 +550,7 @@ sub _run_tests {
       ok $row->artistid;
     } 'used quoted autoinc sequence across schemas';
 
-    is_deeply $rs2->result_source->column_info('artistid')->{sequence},
+    is_deeply $schema2->storage->get_autoinc_seq($rs2->result_source, 'artistid'),
       \( (uc $user) . ".$q_seq"),
       'quoted sequence name correctly extracted';
 
@@ -576,11 +576,23 @@ sub _run_tests {
 # test driver determination issues that led to the diagnosis/fix in 37b5ab51
 # observed side-effect when count-is-first on a fresh env-based connect
   {
-    local $ENV{DBI_DSN};
-    ($ENV{DBI_DSN}, my @user_pass_args) = @{ $schema->storage->connect_info };
-    my $s2 = DBIO::Test::Schema->connect( undef, @user_pass_args );
+    my ($s2_dsn, @user_pass_args) = @{ $schema->storage->connect_info };
+
+    # the storage never reads $ENV{DBI_DSN} (karr dbio k306, karr k49): connect
+    # info without a DSN is refused at connect, even with DBI_DSN naming one
+    {
+      local $ENV{DBI_DSN} = $s2_dsn;
+      throws_ok {
+        oracle_schema( undef, @user_pass_args )
+      } qr/Connect info without a DSN \(the DBI form with an undefined DSN\)/,
+      'connect without a DSN refused, DBI_DSN not read';
+    }
+
+    my $s2 = oracle_schema( $s2_dsn, @user_pass_args );
     ok (! $s2->storage->connected, 'Not connected' );
-    is (ref $s2->storage, 'DBIO::Storage::DBI', 'Undetermined driver' );
+    is (ref $s2->storage, 'DBIO::Oracle::Storage',
+      'not yet connected, the storage is already the declared driver\'s: a '
+    . 'count first has no driver determination to change the class under it' );
 
     ok (
       $s2->resultset('Artist')->search({ 'me.name' => { like => '%' } }, { prefetch => 'cds' })->count,
@@ -714,6 +726,11 @@ sub do_clean {
     );
     eval { $dbh -> do ($_) } for @clean;
   }
+
+  # Table cd is always created unquoted (see do_creates). In a quoted run the
+  # first pass above cannot drop it -- "track" still references it -- and the
+  # second asks for a "cd" that does not exist. Only now is it free to go.
+  eval { $dbh -> do ('DROP TABLE cd') };
 }
 
 END {

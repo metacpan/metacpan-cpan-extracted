@@ -1,5 +1,126 @@
 Revision history for DBIO-MySQL-EV
 
+0.900004  2026-11-08
+    * Async
+        - Statements run concurrently over EV::MariaDB on a pool, chosen per
+          connection with connect(..., { async => 'ev' }). The blocking
+          methods (select, insert, txn_do, deploy ...) wait on the EV loop,
+          also inside a callback of the transport's own connections, and
+          refuse a wait that nothing could end (DBIO::MySQL::EV::Future).
+        - deploy_async writes the same DDL as the sync pipeline, quoting
+          every name with backticks in the drop pre-pass.
+        - The statement trace is core's: one trace line per statement,
+          encoded binds shown as ***, query_end when it is over.
+        - The session of a pooled connection is reset when its borrow ends
+          (COM_RESET_CONNECTION, character set and collation again, connect
+          actions again); a failing or unanswered reset retires the
+          connection (ADR 0011).
+        - ev over TLS is concurrent: every handle's socket is set
+          non-blocking, so a statement leaves the event loop free; the
+          connect and the TLS handshake block.
+        - The ROLLBACK of a pinned connection waits for the statements in
+          flight at most rollback_wait_timeout seconds (default 30, 0 =
+          unlimited); a statement queued behind a prepare or execute in
+          flight waits for it in order.
+        - The transaction context, the connection readiness wiring and the
+          live test harness are core's; txn_mdb stays as an alias of
+          txn_conn.
+
+    * Storage
+        - An error text names keys, columns and options, never a value: the
+          value MySQL and MariaDB write into it ("Duplicate entry '***' for
+          key ...", "Incorrect integer value: '***' for column ...", the
+          quoted part of a syntax error) is taken out before the exception
+          is built, bound or literal. The SQLSTATE stays. The notify
+          statements of the listen connection are masked the same way.
+
+    * LISTEN/NOTIFY
+        - listen and notify are emulated over a notify table, shared with
+          DBIO::MySQL (DBIO::MySQL::NotifyTable; ADRs 0008 and 0010). Latency
+          is notify_poll_interval, a late commit is caught within
+          notify_lookback, old rows go after notify_retention; there is no
+          history. deploy_notify_table creates the table.
+
+    * Pool
+        - A connection whose session is gone (KILL, server restart,
+          wait_timeout) is retired, whether a statement failed on it or it
+          sits idle: the caller gets a live or a new connection, no call
+          fails (ADR 0010).
+        - A forked child that resumes the EV loop finishes its copy of the
+          parent's handles and leaves the parent's sessions alone.
+        - Every bound statement is closed on the server before its
+          connection is released, so the pool stays within
+          max_prepared_stmt_count; a CALL is read to its end.
+        - Cancelling a statement keeps its connection checked out until the
+          answer arrives; a transaction ends with its ROLLBACK queued behind
+          the statement in flight, and a failing ROLLBACK or COMMIT closes
+          the connection.
+        - A connection goes back to the pool it was borrowed from, also
+          after a die before the statement had a Future and after a
+          disconnect. Shutdown finishes the handles, and a statement waiting
+          on a torn-down connection fails with a DBIO::Exception.
+        - A call waiting for the pool is kept alive until it is done.
+
+    * Connect info
+        - Connect info as a DBI DSN is read, including the positional form
+          and the single-hash form; mysql_* and mariadb_* settings that
+          EV::MariaDB has a parameter for are translated and any other is
+          refused naming the key, never the value. mysql_enable_utf8mb4 and
+          mysql_enable_utf8 select the character set, CLIENT_FOUND_ROWS is
+          on (mysql_client_found_rows=0 turns it off), and a false
+          auto_reconnect is let through.
+        - Connect info without host and user is refused naming keys only,
+          by the pool and by the listen connection; connect_info closes a
+          listen-only connection and rotates the ownership token without a
+          pool.
+        - Passwords are masked in every connection message
+          (DBIO::Util::mask_connect_secrets).
+        - pool_size in the fifth element of DBI-form connect info sizes the
+          pool.
+
+    * AccessBroker
+        - Every answer shape of a built-in broker (DBI arrayref, hash,
+          pair) becomes EV::MariaDB named parameters, fresh for every
+          connection; DBIO::AccessBroker::Vault connects. An answer without
+          host and user or with a whole DSN as dbname is refused.
+        - connect($broker, { async => 'ev', pool_size => N }) takes options
+          beside a broker (broker_connect_options). A connection parameter
+          there (charset, connect_timeout, host ...) is refused, naming it,
+          never its value; give it in the broker's answer.
+        - A detached broker opens no connection and leaves no connect info,
+          password included, behind.
+
+    * SQL
+        - An upsert resolves the id of the row it touched on the ON
+          DUPLICATE KEY UPDATE branch, on MariaDB 10.5 and up too, and
+          evaluates the owning storage's whole plan: where the row cannot
+          be named the key is withheld and upsert resolves undef. A supplied
+          autoinc value is kept, and 0 means generate unless the session has
+          NO_AUTO_VALUE_ON_ZERO.
+        - The conflict-target rule of the sync path holds here too: an
+          explicit target on a table with several unique keys is refused.
+        - A server refusal fails its Future with DBIO::Exception::Server
+          carrying the SQLSTATE, as the sync driver throws it.
+        - insert_async resolves with the id of its own statement.
+
+    * Testing
+        - DBIO::MySQL::EV::TestHarness declares the MySQL driver by default
+          and offers count_session_status and session_status for live tests
+          that count Com_* of their own session across the reset.
+
+    * Documentation
+        - This driver has no pipeline mode: $storage->pipeline returns a
+          failed Future without taking a connection, several *_async calls
+          gathered with needs_all are the alternative (ADR 0009).
+        - POD, README, the shipped dbio-mysql-ev skill and the ADRs describe
+          the code as it behaves; SYNOPSIS and README use
+          load_components('MySQL') with { async => 'ev' }, and the ADRs
+          say which parts core owns (ADR 0006 superseded in part).
+
+    * Dependencies
+        - Requires DBIO and DBIO::MySQL 0.900004, EV 4.15 and EV::MariaDB
+          0.08.
+
 0.900001  2026-07-12
 
     * Storage

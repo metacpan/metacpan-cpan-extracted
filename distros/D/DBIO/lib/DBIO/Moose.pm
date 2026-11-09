@@ -4,11 +4,17 @@ package DBIO::Moose;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Util ();
 
 sub import {
   my ($class) = @_;
   my $caller = caller;
+
+  # Enable strict and warnings in caller
+  strict->import;
+  warnings->import;
 
   # Activate Moose + MooseX::NonMoose in the caller package.
   # MooseX::NonMoose provides the constructor bridge plumbing for
@@ -46,7 +52,7 @@ DBIO::Moose - Enable Moose attributes in DBIO result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -87,6 +93,10 @@ columns coexist without conflict.
 When you C<use DBIO::Moose>:
 
 =over 4
+
+=item * C<strict> and C<warnings> are enabled in the calling file, as
+C<use Moose> itself and L<DBIO::Cake> do -- the class needs no
+C<use strict; use warnings;> of its own.
 
 =item * L<Moose> and L<MooseX::NonMoose> are activated in the calling package.
 
@@ -245,7 +255,8 @@ is exactly what C<use DBIO::Moose> does, spelled out explicitly:
 
   package MyApp::Schema::Result::Artist;
 
-  # 1. Activate Moose and MooseX::NonMoose
+  # 1. Activate Moose and MooseX::NonMoose (Moose also enables strict and
+  #    warnings)
   use Moose;
   use MooseX::NonMoose;
 

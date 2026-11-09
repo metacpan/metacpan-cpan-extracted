@@ -4,10 +4,11 @@ package DBIO::Storage::DateTimeFormat;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 use DBIO::Exception;
-use DateTime::Format::Strptime;
 
 __PACKAGE__->mk_group_accessors('inherited' => qw/
   preferred_format_class
@@ -30,6 +31,7 @@ sub _preferred {
   return $preferred_loadable{$preferred} ? $preferred : undef;
 }
 
+
 sub _strptime_for {
   my ($class, $slot, $accessor) = @_;
 
@@ -38,6 +40,22 @@ sub _strptime_for {
       or DBIO::Exception->throw(
         "$class defines no $accessor and no loadable preferred_format_class"
       );
+
+    # Loaded lazily, not at compile time: a bare DBIO install that
+    # never inflates datetimes carries no DateTime stack at all. Only a driver
+    # format class that actually parses/formats via strptime patterns pulls it
+    # in — and only at that point, so the missing-pattern guard above still
+    # fires without DateTime::Format::Strptime present.
+    unless (eval { require DateTime::Format::Strptime; 1 }) {
+      my $err = $@;
+      DBIO::Exception->throw(
+        "$class needs DateTime::Format::Strptime to parse/format datetimes, "
+        . "but it is not installed. Install DateTime::Format::Strptime (part "
+        . "of the optional DBIO::Timestamp/DateTime feature) and retry."
+        . "\n\nUnderlying error: $err"
+      );
+    }
+
     DateTime::Format::Strptime->new(
       pattern  => $pattern,
       on_error => 'croak'
@@ -107,7 +125,7 @@ DBIO::Storage::DateTimeFormat - Strptime-backed datetime format base for driver 
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -137,6 +155,10 @@ class data and may name a preferred CPAN format class: when that class is
 installed it handles all calls, otherwise the declared patterns are used via
 L<DateTime::Format::Strptime>.
 
+That module is only a C<recommends> of the core distribution. It is loaded at
+the first parse or format, which throws when it is missing, so a driver
+distribution using the declared patterns lists it in its own prerequisites.
+
 Patterns are read once per class and the resulting parser objects are cached —
 set the class data at load time, not dynamically.
 
@@ -161,6 +183,23 @@ Strptime patterns backing L</parse_datetime> and L</format_datetime>.
 Optional strptime patterns backing L</parse_date> and L</format_date>.
 
 =head1 METHODS
+
+=head2 _strptime_for
+
+    my $parser = $class->_strptime_for($slot, $accessor);
+
+Internal: builds (and caches) the L<DateTime::Format::Strptime> object that
+backs the public C<parse_*> / C<format_*> helpers.
+
+The strptime dependency is loaded B<lazily>, not at compile time: a bare
+DBIO install that never inflates a DateTime column carries no
+C<DateTime::Format::Strptime> in C<%INC> at all. Only a driver format class
+that actually parses/formats via the strptime patterns pulls it in — and
+only at the point of first use, so the missing-pattern guard above still
+fires without C<DateTime::Format::Strptime> being present. The
+C<requires DateTime::Format::Strptime 1.2> entry in the core C<cpanfile>
+is therefore C<recommends>, not C<requires>: the runtime cost lands
+exactly on the install that pays it.
 
 =head2 parse_datetime
 

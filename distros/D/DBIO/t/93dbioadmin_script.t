@@ -14,5 +14,6 @@ my $rc = $? >> 8;
 is($rc, 0, '--help exits with code 0');
 like($out, qr/Usage: dbioadmin/, 'help output contains usage banner');
 like($out, qr/--mode=MODE/, 'help output mentions upgrade mode');
+like($out, qr/--all\s+Allow update\/delete without --where/, 'help output mentions --all');
 
 done_testing;

@@ -7,7 +7,7 @@ This policy was updated on 2026-06-23.
 If this policy or the release is more than two years old, then you
 should check for a more recent version of
 [DBIO-PostgreSQL-EV on CPAN](https://metacpan.org/dist/DBIO-PostgreSQL-EV) or the main branch of the
-[DBIO-PostgreSQL-EV git repository](https://codeberg.org/dbio/dbio-postgresql-async).
+[DBIO-PostgreSQL-EV git repository](https://codeberg.org/dbio/dbio-postgresql-ev).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.5.0)

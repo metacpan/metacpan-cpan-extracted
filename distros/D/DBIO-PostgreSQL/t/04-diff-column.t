@@ -123,4 +123,92 @@ like($ops[0]->as_sql, qr/ALTER COLUMN id DROP IDENTITY/,
 like($ops[0]->as_sql, qr/ALTER COLUMN id SET GENERATED ALWAYS/,
   'SET GENERATED for identity kind switch');
 
+# Alter column: size-only change (scalar) — same data_type, different size.
+# The canonical introspect shape splits type and length: data_type => 'varchar',
+# size => N (see t/33-introspect-normalize.t). A pure size change must still be
+# detected and rendered with the length.
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [
+    { column_name => 'name', data_type => 'varchar', size => 50, not_null => 0 },
+  ]},
+  { 'public.users' => [
+    { column_name => 'name', data_type => 'varchar', size => 100, not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+is(scalar @ops, 1, 'size-only change detected as one alter op');
+is($ops[0]->action, 'alter', 'action is alter for size-only change');
+like($ops[0]->as_sql, qr/ALTER COLUMN name TYPE varchar\(100\);/,
+  'size-only alter renders varchar(100)');
+
+# Alter column: numeric precision/scale change ([p,s] arrayref size).
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [
+    { column_name => 'balance', data_type => 'numeric', size => [10, 2], not_null => 0 },
+  ]},
+  { 'public.users' => [
+    { column_name => 'balance', data_type => 'numeric', size => [12, 2], not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+is(scalar @ops, 1, 'numeric size change detected as one alter op');
+like($ops[0]->as_sql, qr/ALTER COLUMN balance TYPE numeric\(12,2\);/,
+  'numeric size alter renders numeric(12,2)');
+
+# Add column: new column with a scalar size must render the length, not bare type.
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [] },
+  { 'public.users' => [
+    { column_name => 'code', data_type => 'varchar', size => 24, not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+is(scalar @ops, 1, 'one sized column to add');
+like($ops[0]->as_sql, qr/ADD COLUMN code varchar\(24\)/,
+  'add column renders varchar(24), not bare varchar');
+unlike($ops[0]->as_sql, qr/ADD COLUMN code varchar[^(]/,
+  'add column is not left unbounded');
+
+# Alter column: enum type reassignment. In the test-deploy path both sides are
+# introspected, so both carry data_type => 'enum' with the real type name in
+# pg_enum_type. Reassigning from one enum type to another must be detected and
+# rendered against the actual type name (via a text cast so the ALTER runs).
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [
+    { column_name => 'role', data_type => 'enum', pg_enum_type => 'auth.role_type', not_null => 0 },
+  ]},
+  { 'public.users' => [
+    { column_name => 'role', data_type => 'enum', pg_enum_type => 'auth.status_type', not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+is(scalar @ops, 1, 'enum type reassignment detected as one alter op');
+is($ops[0]->action, 'alter', 'action is alter for enum reassignment');
+like($ops[0]->as_sql,
+  qr/ALTER COLUMN role TYPE auth\.status_type USING role::text::auth\.status_type;/,
+  'enum reassignment renders target type name with text cast');
+
+# Add column: enum column renders the referenced type name, not literal 'enum'.
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [] },
+  { 'public.users' => [
+    { column_name => 'role', data_type => 'enum', pg_enum_type => 'auth.role_type', not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+like($ops[0]->as_sql, qr/ADD COLUMN role auth\.role_type/,
+  'add enum column renders type name, not literal enum');
+
+# No-op: identical enum type on both sides must not produce a diff.
+@ops = DBIO::PostgreSQL::Diff::Column->diff(
+  { 'public.users' => [
+    { column_name => 'role', data_type => 'enum', pg_enum_type => 'auth.role_type', not_null => 0 },
+  ]},
+  { 'public.users' => [
+    { column_name => 'role', data_type => 'enum', pg_enum_type => 'auth.role_type', not_null => 0 },
+  ]},
+  $tables, $tables,
+);
+is(scalar @ops, 0, 'identical enum type produces no diff');
+
 done_testing;

@@ -12,23 +12,30 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
     export DBIO_TEST_KUBECONFIG=~/.kube/config
 
     # Local mode (default): port-forward, run prove on your machine
-    maint/k8s-test                           # run all tests
-    maint/k8s-test t/72pg.t t/71mysql.t      # specific tests
-    maint/k8s-test --keep                    # don't delete namespace after
+    xbin/k8s-test                           # run all tests
+    xbin/k8s-test t/72pg.t t/71mysql.t      # specific tests
+    xbin/k8s-test --keep                    # leave what the run created
+
+    # An account confined to one namespace: work in it, create and delete none
+    xbin/k8s-test --existing-namespace dev-dbio t/kubernetes/smoke.t
 
     # In-cluster mode: build image, run as Job inside the cluster
-    maint/k8s-test --mode cluster
-    maint/k8s-test --mode cluster --image my-registry/dbio-test:v1
+    xbin/k8s-test --mode cluster
+    xbin/k8s-test --mode cluster --image my-registry/dbio-test:v1
 
     # Coverage
-    maint/k8s-test --cover                   # run with Devel::Cover
-    maint/k8s-test --cover t/72pg.t          # coverage for specific tests
+    xbin/k8s-test --cover                   # run with Devel::Cover
+    xbin/k8s-test --cover t/72pg.t          # coverage for specific tests
 
     # Options
     --mode local|cluster    Test execution mode (default: local)
-    --keep                  Don't delete namespace after tests
+    --keep                  Don't delete anything after tests
     --cover                 Run with Devel::Cover and generate report
-    --namespace NAME        Use specific namespace name
+    --namespace NAME        Create a namespace of this name, delete it afterwards
+                            (default: a generated dbio-test-XXXXXXXX)
+    --existing-namespace NAME
+                            Work in a namespace that is already there; it is
+                            neither created nor deleted
     --image IMAGE           Docker image for cluster mode (default: dbio-test:latest)
     --db pg,mysql,pg-ext,duckdb  Which databases to provision (default: pg,mysql)
     --timeout SECS          Readiness timeout in seconds (default: 120)
@@ -38,6 +45,16 @@ k8s-test - Run DBIO tests against Kubernetes-provisioned databases
 Provisions temporary PostgreSQL and MySQL pods in a Kubernetes cluster,
 then runs the DBIO test suite against them. Cleans up automatically unless
 C<--keep> is specified.
+
+By default the run gets a namespace of its own, created at the start and
+deleted at the end. C<--existing-namespace> is for an account that may not
+create namespaces: the pods and services go into the named namespace under
+names and labels that carry the id of the run, and the cleanup deletes exactly
+those objects. C<--namespace> and C<--existing-namespace> exclude each other.
+See L<DBIO::Test::Kubernetes/NAMESPACES>.
+
+With C<--keep> the script prints what it left behind and how to remove it: the
+namespace, or, in an existing namespace, each object by name.
 
 Uses L<Kubernetes::REST> and L<IO::K8s> for all API interactions (no kubectl
 shelling out, except for port-forward in local mode).
@@ -59,6 +76,7 @@ my $mode      = 'local';
 my $keep      = 0;
 my $cover     = 0;
 my $namespace = undef;
+my $existing_namespace = undef;
 my $image     = 'dbio-test:latest';
 my $db_list   = 'pg,mysql';
 my $timeout   = 120;
@@ -68,6 +86,7 @@ GetOptions(
     'keep'        => \$keep,
     'cover'       => \$cover,
     'namespace=s' => \$namespace,
+    'existing-namespace=s' => \$existing_namespace,
     'image=s'     => \$image,
     'db=s'        => \$db_list,
     'timeout=i'   => \$timeout,
@@ -78,6 +97,9 @@ my @prove_args = @ARGV;
 die "Invalid mode: $mode (use: local, cluster)\n"
     unless $mode =~ /^(local|cluster)$/;
 
+die "--namespace and --existing-namespace exclude each other\n"
+    if defined $namespace && defined $existing_namespace;
+
 my @databases = split /,/, $db_list;
 
 # ============================================================================
@@ -86,6 +108,7 @@ my @databases = split /,/, $db_list;
 
 my $k8s = DBIO::Test::Kubernetes->new(
     ($namespace ? (namespace => $namespace) : ()),
+    (defined $existing_namespace ? (existing_namespace => $existing_namespace) : ()),
     databases => \@databases,
 );
 
@@ -93,7 +116,16 @@ my $exit_code = 1;
 
 # Install cleanup handler
 my $cleanup = sub {
-    if ($keep) {
+    if ($keep && $k8s->uses_existing_namespace) {
+        # The namespace is not ours to delete: name what this run put into it.
+        my @objects = map { lc($_->{kind}) . "/$_->{name}" } $k8s->created_objects;
+        print "\n--keep specified, objects of this run left in namespace "
+            . $k8s->namespace . ":\n";
+        print "  $_\n" for @objects;
+        print @objects
+            ? "To delete: kubectl -n " . $k8s->namespace . " delete @objects\n"
+            : "  (none)\n";
+    } elsif ($keep) {
         print "\n--keep specified, namespace preserved: " . $k8s->namespace . "\n";
         print "To delete: kubectl delete namespace " . $k8s->namespace . "\n";
     } else {

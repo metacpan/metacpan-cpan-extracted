@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::Meta;
 use strict;
 use warnings;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # The fields next to an item of list_of: none. Items have no containing object, so
 # equal_to_field and the references of required_if and when see a missing value there

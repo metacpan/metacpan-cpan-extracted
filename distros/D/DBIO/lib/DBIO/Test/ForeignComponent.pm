@@ -2,6 +2,9 @@
 package DBIO::Test::ForeignComponent;
 # ABSTRACT: Test class for foreign component loading
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/ DBIO::Base /;
@@ -22,7 +25,7 @@ DBIO::Test::ForeignComponent - Test class for foreign component loading
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

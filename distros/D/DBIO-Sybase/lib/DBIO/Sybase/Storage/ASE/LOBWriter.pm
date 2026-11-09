@@ -3,7 +3,10 @@ package DBIO::Sybase::Storage::ASE::LOBWriter;
 
 use strict;
 use warnings;
-use DBIO::Util ();
+
+our $VERSION = '0.900004';
+
+use DBIO::Exception ();
 use Try::Tiny;
 use namespace::clean;
 
@@ -17,21 +20,60 @@ sub _is_lob_type {
   return $type =~ /^(?:text|ntext|image|blob|clob)$/;
 }
 
+# FreeTDS cannot write the content of a LOB: ct_data_info fails ("text pointer
+# is not set or is undefined", live on FreeTDS 1.3.17), and it does so after
+# the INSERT went out with its placeholder, so the row stood in the table
+# without the value. Refused before anything is sent (karr k97). Only the
+# content: NULL, '' and literal SQL need no write.
+sub _refuse_lob_content {
+  my ($self, $source, $col) = @_;
+  return unless $self->_using_freetds;
+  DBIO::Exception->throw(sprintf
+    'DBIO::Sybase: table %s, column %s: writing a value into a TEXT or IMAGE '
+    . 'column is refused: FreeTDS cannot write the content of a TEXT or IMAGE '
+    . 'column (ct_data_info fails). Use a DBD::Sybase built against the Sybase '
+    . 'Open Client libraries, or a VARCHAR column',
+    $source->name, $col);
+}
+
 # Make sure blobs are not bound as placeholders, and return any non-empty ones
 # as a hash.
+#
+# A value that already is literal SQL, a SCALAR ref, is neither replaced nor
+# returned: it stays in the statement as it is (\'DEFAULT' of an empty insert,
+# karr k80).
+#
+# What is left in place of a value is literal SQL, a SCALAR ref: NULL for
+# undef, the empty string literal '' for every other value. It has to be the
+# literal and not the two-character string "''": a string is a value, bound or
+# (NoBindVars) quoted into the statement, and it stays the content of every
+# LOB nothing is written to afterwards -- the ones set to '' (karr k72).
+# ASE has no empty value: it stores '' as one space in a TEXT column and as
+# the byte 0x20 in an IMAGE column.
 sub _remove_blob_cols {
   my ($self, $source, $fields) = @_;
+
+  # before anything is taken out of the caller's hash
+  for my $col (sort keys %$fields) {
+    next unless $self->_is_lob_column($source, $col);
+    next if ref $fields->{$col} eq 'SCALAR';
+    $self->_refuse_lob_content($source, $col)
+      if defined $fields->{$col} and $fields->{$col} ne '';
+  }
 
   my %blob_cols;
 
   for my $col (keys %$fields) {
     if ($self->_is_lob_column($source, $col)) {
+      # literal SQL (karr k80): stays as it is, it is no content
+      next if ref $fields->{$col} eq 'SCALAR';
+
       my $blob_val = delete $fields->{$col};
       if (not defined $blob_val) {
         $fields->{$col} = \'NULL';
       }
       else {
-        $fields->{$col} = "\'\'";
+        $fields->{$col} = \"''";
         $blob_cols{$col} = $blob_val unless $blob_val eq '';
       }
     }
@@ -40,23 +82,60 @@ sub _remove_blob_cols {
   return %blob_cols ? \%blob_cols : undef;
 }
 
-# same for _insert_bulk
+# same for _insert_bulk, with the same two literals. Core's _insert_bulk takes
+# a SCALAR ref in the first row as literal SQL for that column: it is no bind
+# of the statement, nothing is read from the rows for it, and every other row
+# has to carry the same literal ("Inconsistent literal SQL value" otherwise).
+#
+# So a column has ONE placeholder for all its rows (karr k81): NULL where no
+# row has a value, the empty literal '' where at least one has. In the second
+# case the rows that were undef are NULL only after the INSERT: they are
+# recorded and set by _null_blobs_array, one UPDATE a row. The alternative,
+# grouping the rows by literal into several _insert_bulk calls, would split
+# the slice and break the assumption _insert_bulk makes to find the identities
+# of the rows (the last one minus the number of rows, consecutive); here the
+# slice stays one INSERT in the order it came in.
+#
+# Returns the content to write, by row and column, or undef for none. In list
+# context the second value is the undef cells to set to NULL afterwards, by
+# row and column (a true value in the cell), or undef for none.
 sub _remove_blob_cols_array {
   my ($self, $source, $cols, $data) = @_;
 
-  my @blob_cols;
+  my (@blob_cols, @null_cols);
+
+  for my $i (0..$#$cols) {
+    next unless $self->_is_lob_column($source, $cols->[$i]);
+    $self->_refuse_lob_content($source, $cols->[$i]) if grep {
+      ref $_->[$i] ne 'SCALAR' and defined $_->[$i] and $_->[$i] ne ''
+    } @$data;
+  }
 
   for my $i (0..$#$cols) {
     my $col = $cols->[$i];
 
     if ($self->_is_lob_column($source, $col)) {
+      # one placeholder for the column: '' as soon as a row has a value
+      my $has_value = grep {
+        ref $_->[$i] ne 'SCALAR' and defined $_->[$i]
+      } @$data;
+
       for my $j (0..$#$data) {
+        # literal SQL (karr k80): the cell stays as it is
+        next if ref $data->[$j][$i] eq 'SCALAR';
+
         my $blob_val = delete $data->[$j][$i];
         if (not defined $blob_val) {
-          $data->[$j][$i] = \'NULL';
+          if ($has_value) {
+            $data->[$j][$i] = \"''";
+            $null_cols[$j][$i] = 1;
+          }
+          else {
+            $data->[$j][$i] = \'NULL';
+          }
         }
         else {
-          $data->[$j][$i] = "\'\'";
+          $data->[$j][$i] = \"''";
           $blob_cols[$j][$i] = $blob_val
             unless $blob_val eq '';
         }
@@ -64,7 +143,32 @@ sub _remove_blob_cols_array {
     }
   }
 
-  return @blob_cols ? \@blob_cols : undef;
+  my @ret = (
+    (@blob_cols ? \@blob_cols : undef),
+    (@null_cols ? \@null_cols : undef),
+  );
+  return wantarray ? @ret : $ret[0];
+}
+
+# The cells _remove_blob_cols_array left the empty literal in where the caller
+# gave undef, set to NULL; $data has the primary key values of the rows.
+sub _null_blobs_array {
+  my ($self, $source, $null_cols, $cols, $data) = @_;
+
+  my @primary_cols = $source->primary_columns;
+
+  for my $j (0..$#$data) {
+    next unless $null_cols->[$j];
+
+    my %row;
+    @row{ @$cols } = @{ $data->[$j] };
+
+    $self->update(
+      $source,
+      { map { ($cols->[$_] => undef) } grep { $null_cols->[$j][$_] } 0..$#$cols },
+      { map { ($_ => $row{$_}) } @primary_cols },
+    );
+  }
 }
 
 sub _update_blobs {
@@ -129,9 +233,10 @@ sub _insert_blobs {
     my $sth = $cursor->sth;
 
     if (not $sth) {
-      $self->throw_exception(
-          "Could not find row in table '$table' for blob update:\n"
-        . DBIO::Util::dump_value(\%where)
+      # the key columns, never their values
+      $self->throw_exception(sprintf
+        "Could not find row in table '%s' for blob update (key columns: %s)",
+        $table, join(', ', @primary_cols),
       );
     }
 
@@ -155,13 +260,17 @@ sub _insert_blobs {
       $sth->func('ct_finish_send') or die $sth->errstr;
     }
     catch {
+      # the key values and the content are the values of this operation
+      my $error = ref $_ ? $_ : $self->_mask_error_values(
+        $_, [ grep { defined and !ref } values %row, $blob ],
+      );
       if ($self->_using_freetds) {
         $self->throw_exception (
-          "TEXT/IMAGE operation failed, probably because you are using FreeTDS: $_"
+          "TEXT/IMAGE operation failed, probably because you are using FreeTDS: $error"
         );
       }
       else {
-        $self->throw_exception($_);
+        $self->throw_exception($error);
       }
     }
     finally {
@@ -204,7 +313,7 @@ DBIO::Sybase::Storage::ASE::LOBWriter - LOB (TEXT/IMAGE) handling mixin for Syba
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

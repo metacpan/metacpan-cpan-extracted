@@ -2,6 +2,9 @@
 package DBIO::Test::FakeComponent;
 # ABSTRACT: Test component for ensure_class_loaded testing
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 1;
@@ -18,7 +21,7 @@ DBIO::Test::FakeComponent - Test component for ensure_class_loaded testing
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

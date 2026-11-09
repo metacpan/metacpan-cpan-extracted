@@ -1,3 +1,88 @@
+0.100  2026-11-08 19:28:07 CET
+   - Add section AI ASSISTANCE to the documentation, describing how AI
+     was used after release 0.006
+   - Add repository and bug tracker (Codeberg) to the distribution
+     metadata, and how to report bugs to the documentation
+   - Release after 53 PASSes in CPANTESTERS (thanks!)
+
+0.099  2026-11-08 17:39:38 CET
+   - INCOMPATIBLE: removed method select, call select on the db (e.g.
+     $wrap->db->select(...)) instead. It could not take part in
+     transactions, unlike the other methods
+   - INCOMPATIBLE: upsert throws when neither conflicting nor on_conflict
+     is provided, instead of doing a plain insert, and when both are
+     provided, instead of conflicting silently winning
+   - INCOMPATIBLE: id_or_insert throws on unknown options (only db, select
+     and insert are accepted), instead of ignoring them
+   - INCOMPATIBLE: id_of, and the select options of id_or_insert, only
+     accept an options hash: a bare sort specification (string, array
+     reference, or hash reference with -asc or -desc), which used to be
+     passed through to select, throws a 400 exception. Pass it as
+     order_by instead, e.g. { order_by => { -desc => 'id' } }
+   - INCOMPATIBLE: id_of and id_or_insert throw a 400 exception when the
+     condition is undefined, is not a reference (a plain value is bound
+     as WHERE ?, so "1" matched every record) or, if the wrapped object
+     has abstract (as Mojo::Pg and Mojo::SQLite do), generates no WHERE
+     clause (e.g. {}, [] or { -or => [] }): it matched every record,
+     giving an arbitrary identifier
+   - Add section SECURITY CONSIDERATIONS to the documentation: SQL
+     injection via untrusted nested hashes in conditions and data,
+     checks on conditions, DB URL and password exposure, database errors
+     holding data values, trusted db_url, migrations_for and wrappers
+   - INCOMPATIBLE: id_or_insert throws with code 409 (instead of 500) and
+     no exception data when it gives up, which in practice means that the
+     default record conflicts with an existing one not matching the
+     condition
+   - INCOMPATIBLE: custom insert subs always receive the resolved db in
+     their options (key db), which must not reach the insert method of
+     the db object (see db_and_opts); objects from custom wrappers must
+     provide a db method, now used by insert too
+   - INCOMPATIBLE: inserting with Mojo::SQLite needs SQLite 3.35+, as
+     identifiers are got via RETURNING (see below)
+   - Accept db in the options of id_of, id_or_insert, insert and upsert,
+     to work inside transactions (pass the db the transaction was begun
+     on); id_or_insert uses the same handle for all its queries. Add
+     public db_and_opts for custom inserters
+   - Throw a 400 exception, naming the called method, when options are
+     not a hash reference (including the select and insert options of
+     id_or_insert) or hold -asc or -desc (old-style sort specification)
+   - Throw a 400 exception when option db is present but undefined,
+     instead of silently using a fresh connection (outside of any
+     transaction)
+   - Get identifiers via RETURNING for both Pg and SQLite. Fixes wrong id
+     from SQLite upserts updating a record, and ignored custom identifier
+     column names in Pg inserts
+   - Add public default_inserter, also used for custom wrappers that do
+     not provide an insert sub (which is now optional)
+   - insert returns undef when nothing is inserted (e.g. on_conflict =>
+     undef), instead of dying (Pg) or returning a meaningless identifier
+     (SQLite)
+   - id_or_insert inserts with DO NOTHING by default, so that concurrent
+     insertions of the same record lead to a retry
+   - id_of selects with limit 1 (only one record is used) when the
+     wrapper declares can_limit, as the Mojo::Pg and Mojo::SQLite ones
+     do; custom wrappers get the caller options unchanged unless they
+     set can_limit
+   - upsert: accept multiple conflicting columns; fix data holding only
+     conflicting columns; reject missing/undef values for conflicting
+     columns, which never conflict and led to a new record every time;
+     with conflicting, throw a 400 exception when data is not a hash
+     reference, instead of dying with a Perl error
+   - Throw a 400 exception on unsupported URLs, with the URL neither in
+     its message nor in its data, as it might hold a password.
+     URLs that Mojo::SQLite cannot parse (e.g. mysql://...) are now
+     unsupported, instead of dying with the Mojo::SQLite error that
+     shows the whole URL
+   - Match postgres:// and postgresql:// in any case
+   - Throw 400 exceptions on non-hash items in wrappers
+   - Recommend Mojo::Pg (with DBD::Pg) and Mojo::SQLite (with
+     DBD::SQLite) as backends, at least one is needed; raise minimum
+     versions of develop dependencies
+   - Add tests against Pg (set TEST_PG to a connection URL) and for
+     wrappers; align tests across engines; drop test dependency
+     Path::Tiny
+   - Fix and update documentation
+
 0.006  2026-08-20 11:06:37 CEST
    - No clue where 0.005001 went, releasing anyway
 

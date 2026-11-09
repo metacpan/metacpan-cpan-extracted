@@ -1,5 +1,134 @@
 Revision history for DBIO-DuckDB
 
+0.900004  2026-11-08
+    * Storage
+        - An error of the engine names no value: DuckDB writes the value into
+          its text, also when it was a bind ("Could not convert string
+          'x' to INT32", "Duplicate key "email: x" violates unique
+          constraint."), and the exception carries *** in its place. The
+          type, column, constraint and table stay, and so do the statement's
+          own text (the LINE excerpt, core's "[for Statement ... with N bind
+          values]"). The excerpt counts only when it is DuckDB's own, a piece
+          of the statement that ends with the caret line; a bound value that
+          looks like an excerpt or like core's appendix is masked like any
+          other. The sentences of the engine are masked by
+          DBIO::DuckDB::Util::mask_error_details, the bound values go out of
+          the text through core's _mask_error_values hook, also in the form
+          in which the engine echoes a value outside ASCII. Statements, the
+          appender and the Arrow path are treated alike; the appender, which
+          binds no values, is masked by the sentences alone (ADR 0012).
+        - Disconnecting gives the database file back: the storage frees the
+          prepared statements of its connection, which DBD::DuckDB never
+          does itself. Every statement is prepared afresh and DBI's statement
+          cache stays off, so repeated create, find, single and populate
+          calls of one shape work. A populate whose first row the engine
+          refuses throws an exception (DBD::DuckDB 0.16, ADR 0006, ADR 0007).
+        - transactional_ddl is 1. A failed txn_do ends DuckDB's stray open
+          transaction, so a failed deploy rolls back whole and the connection
+          stays usable (ADR 0005).
+        - The wide numeric types (BIGINT and beyond, DECIMAL, MONEY) are
+          bound as SQL_BIGINT, so values past 2^53 and decimal fractions are
+          stored exactly. Text, blob and decimal values come back as
+          written, UTF-8 in and out (on DBD::DuckDB 0.16).
+        - results_exist and its async twins work, all six set operations
+          are available, and core's RANDOM() and EXPLAIN suit DuckDB (see
+          DBIO::DuckDB::Storage, RANDOM ORDERING and QUERY PLANS).
+        - dbms_version reads 1.5.3 where libduckdb says v1.5.3; the engine's
+          own spelling stays at $storage->duckdb_version.
+        - Savepoints are not claimed, since DuckDB cannot parse them: the
+          savepoint methods throw core's "doesn't support savepoints".
+        - duckdb_ is the attribute prefix of DBD::DuckDB, so duckdb_*
+          connect attributes pass core's check.
+        - duckdb_arrow_fetch reads a result through libduckdb's Arrow
+          interface, block by block, and returns names, Arrow formats, one
+          array of values per column and the row count. Values equal those
+          of selectall_arrayref, except that DATE, TIME, TIMESTAMP and
+          INTERVAL are DuckDB's own text (CAST(v AS VARCHAR): trailing zeros
+          of the fraction dropped, years up to 0 as 0044-03-15 (BC),
+          infinity / -infinity, INTERVAL with sign and time part) and
+          TIMESTAMPTZ is UTC. Text inside LIST,
+          STRUCT and MAP comes as characters. A type it cannot render
+          (UNION, BIT, BIGNUM, TIME WITH TIME ZONE, a MAP with a nested
+          key) throws, naming column and format (DBIO::DuckDB::Arrow).
+          The storage class loads without libduckdb's Arrow functions;
+          only the method needs them.
+
+    * Quack
+        - quack_attach with a token creates its own secret
+          dbio_quack_<alias>, scoped to the quack address, so several
+          servers with their own tokens attach to one connection. quack_detach
+          drops it, even when the DETACH fails.
+        - The token and an address password are masked in the exceptions of
+          quack_attach.
+        - A quack-attached catalog is a snapshot, and database listings throw
+          while it is attached (DBIO::DuckDB::Storage; ADR 0002 has the token
+          rules).
+
+    * Extensions
+        - duckdb_extensions declares the DuckDB extensions a schema has. Each
+          is INSTALLed and LOADed on every new connection, the diff's
+          throwaway database included; a deploy never drops one (ADR 0009,
+          DBIO::DuckDB::Extension).
+        - Extension names and quack catalog aliases are checked as plain
+          identifiers over their whole length.
+
+    * Deploy
+        - Install DDL keeps the size of varchar, char and text columns and
+          the precision and scale of decimals. A column info without
+          is_nullable is NOT NULL, and every identifier and quoted default
+          is quoted; ENUM columns write their values.
+        - Index declarations are read canonically (Cake idx and indices()
+          work). An expression index is written and introspected as the
+          expression; partial indexes and other options are refused.
+        - A source declared table('other.t') is table t of schema other: the
+          schema is created, introspected and diffed there.
+        - Foreign keys are written in the parent's key order, after the
+          parent (ADR 0001). ON DELETE / ON UPDATE actions, keys to
+          non-keys and circles of keys are refused, naming table and columns.
+        - Adding a NOT NULL column or one with an expression default to an
+          existing table runs in steps; one that cannot be filled is refused
+          before the first statement.
+        - A table is rebuilt for what ALTER cannot do: a column dropped under
+          a later index or UNIQUE, a dropped UNIQUE, a foreign key added or
+          dropped (ADR 0010). Tables with incoming or self foreign keys are
+          refused, naming the tables.
+        - A drop and a possibly lossy type change, in ALTER or in a rebuild,
+          run with allow_destructive => 1; widening an integer or DECIMAL and
+          DATE to TIMESTAMP are lossless (ADR 0011). apply and upgrade are
+          those of DBIO::Deploy::Base.
+
+    * Introspect
+        - Key columns report is_nullable 0, and table_uniq_info lists the
+          UNIQUE constraints of CREATE TABLE.
+        - Foreign keys are read through duckdb_constraints() under the
+          constraint name; composite keys come out with their own columns.
+
+    * Diff
+        - The diff carries UNIQUE constraints: a table it creates keeps them,
+          a UNIQUE added to an existing table becomes a unique index,
+          existing duplicates are refused naming table and columns.
+        - Views are diffed as views (CREATE VIEW, DROP VIEW, drop and
+          create on a changed query).
+
+    * Tests
+        - DBIO::DuckDB::Test::Conformance answers core's shared Bind, DDL,
+          Diff and Names cases for DuckDB (t/90 to t/93); declared deviations
+          are the lost length of VARCHAR(n) and BIT(n).
+        - DBIO::DuckDB::Test passes only connect attributes core knows to
+          the connect, and every test schema declares its driver.
+
+    * Dependencies
+        - Requires DBIO 0.900004, DBD::DuckDB 0.16 and Alien::DuckDB 0.04
+          (libduckdb 1.5.3). DBI, SQL::Abstract, Try::Tiny and
+          namespace::clean are declared with core's floors, FFI::Platypus
+          and FFI::CheckLib with those of DBD::DuckDB.
+
+    * Documentation
+        - POD and README describe the code as built, including the
+          sync-only async stance and forked on a file DSN (only access_mode
+          => 'READ_ONLY' runs children concurrently).
+        - Every module carries a literal $VERSION.
+
 0.900001  2026-07-12
     * Fixes
         - Every croak in DBIO::DuckDB::Storage (17 sites, including the
@@ -81,3 +210,4 @@ Revision history for DBIO-DuckDB
         - TAP suite: 00-load, 08-shortcut, 10-smoke, 20-introspect,
           21-introspect-contract, 30-deploy, 35-ddl-emit, 40-diff,
           50-arrow, 60-quack
+</content>

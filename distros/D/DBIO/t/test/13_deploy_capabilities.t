@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use DBIO::Test;
+use DBIO::Test::Storage;
 use DBIO::Diff::Op ();
 
 # F02 / F10 / F12 regression test: the deploy pipeline must probe
@@ -12,12 +13,26 @@ use DBIO::Diff::Op ();
 # via a fake dbh.
 
 # --- 1. F12: Diff::Op::should_emit_if_exists is storage-driven -----------
+#
+# These cases go through REAL storage subclasses that register the
+# capability the documented way (__PACKAGE__->_use_supports_if_exists(0|1),
+# or _determine_supports_supports_if_exists). Hand-rolled fake storages
+# that define a _use_* sub literally are what let the bug ship: the
+# helper probed _use_if_exists, a name the capability registration never
+# mints, so it was dead against every real driver while the fakes stayed
+# green. Anything asserted below must run against the registered accessor.
+
+# The name the helper probes and the name Capabilities.pm mints must be
+# the same one -- that identity IS the bug.
+can_ok 'DBIO::Test::Storage', '_use_supports_if_exists';
+ok !DBIO::Test::Storage->can('_use_if_exists'),
+  'no _use_if_exists accessor exists: the capability is named supports_if_exists';
 
 # Without a storage: conservative false
 ok !DBIO::Diff::Op::should_emit_if_exists(undef),
   'should_emit_if_exists(undef) is false';
 
-# With a fake storage that does not advertise the capability: false
+# With an object that is not a capability-carrying storage at all: false
 {
   package DBIO::Test::NoIfExists;
   sub new { bless {}, shift }
@@ -25,31 +40,89 @@ ok !DBIO::Diff::Op::should_emit_if_exists(undef),
 {
   my $s = DBIO::Test::NoIfExists->new;
   ok !DBIO::Diff::Op::should_emit_if_exists($s),
-    'should_emit_if_exists returns false when storage lacks the capability';
+    'should_emit_if_exists returns false when storage lacks the capability probe';
 }
 
-# With a fake storage that does advertise it: true
+# An unblessed reference is no storage either: the same conservative false,
+# not "Can't call method on unblessed reference" (karr k228 sweep).
 {
-  package DBIO::Test::HasIfExists;
-  sub new { bless {}, shift }
+  my $emit = eval { DBIO::Diff::Op::should_emit_if_exists({}) };
+  is $@, '', 'should_emit_if_exists does not die on an unblessed reference';
+  is $emit, 0, 'and answers false for it';
+}
+
+# A real storage that registers nothing: false (the conservative default
+# of _determine_supports_supports_if_exists).
+{
+  my $s = DBIO::Test::Storage->new;
+  ok !DBIO::Diff::Op::should_emit_if_exists($s),
+    'should_emit_if_exists is false on a storage that declares nothing';
+}
+
+# A real storage subclass that declares the capability the documented way.
+{
+  package DBIO::Test::Storage::IfExistsYes;
+  use base 'DBIO::Test::Storage';
+  __PACKAGE__->_use_supports_if_exists(1);
+}
+{
+  my $s = DBIO::Test::Storage::IfExistsYes->new;
+  ok DBIO::Diff::Op::should_emit_if_exists($s),
+    'should_emit_if_exists is true for a driver registering _use_supports_if_exists(1)';
+}
+
+# ... and one that explicitly opts out: false (not just "undef").
+{
+  package DBIO::Test::Storage::IfExistsNo;
+  use base 'DBIO::Test::Storage';
+  __PACKAGE__->_use_supports_if_exists(0);
+}
+{
+  my $s = DBIO::Test::Storage::IfExistsNo->new;
+  ok !DBIO::Diff::Op::should_emit_if_exists($s),
+    'should_emit_if_exists is false for a driver registering _use_supports_if_exists(0)';
+}
+
+# The other half of the two-tier contract: a driver may leave _use_* undef
+# and answer through _determine_supports_supports_if_exists (e.g. version-gated).
+# The helper reads _use_supports_if_exists, whose getter falls through to the
+# _supports_ tier, so this must be honoured without extra code in the helper.
+{
+  package DBIO::Test::Storage::IfExistsDetermined;
+  use base 'DBIO::Test::Storage';
+  sub _determine_supports_supports_if_exists { 1 }
+}
+{
+  my $s = DBIO::Test::Storage::IfExistsDetermined->new;
+  ok DBIO::Diff::Op::should_emit_if_exists($s),
+    'should_emit_if_exists honours _determine_supports_supports_if_exists (two-tier fallback)';
+}
+
+# ... and the tiers rank correctly: an explicit _use_* of 0 wins over a
+# _determine_* that would say 1.
+{
+  package DBIO::Test::Storage::IfExistsForcedOff;
+  use base 'DBIO::Test::Storage';
+  __PACKAGE__->_use_supports_if_exists(0);
+  sub _determine_supports_supports_if_exists { 1 }
+}
+{
+  my $s = DBIO::Test::Storage::IfExistsForcedOff->new;
+  ok !DBIO::Diff::Op::should_emit_if_exists($s),
+    'explicit _use_supports_if_exists(0) overrides a _determine_* that says 1';
+}
+
+# The misspelled probe must never come back: a storage that
+# defines only the never-registered _use_if_exists stays false.
+{
+  package DBIO::Test::Storage::IfExistsWrongName;
+  use base 'DBIO::Test::Storage';
   sub _use_if_exists { 1 }
 }
 {
-  my $s = DBIO::Test::HasIfExists->new;
-  ok DBIO::Diff::Op::should_emit_if_exists($s),
-    'should_emit_if_exists returns true when storage has _use_if_exists=1';
-}
-
-# With a fake storage that explicitly opts out: false (not just "undef")
-{
-  package DBIO::Test::OptOutIfExists;
-  sub new { bless {}, shift }
-  sub _use_if_exists { 0 }
-}
-{
-  my $s = DBIO::Test::OptOutIfExists->new;
+  my $s = DBIO::Test::Storage::IfExistsWrongName->new;
   ok !DBIO::Diff::Op::should_emit_if_exists($s),
-    'should_emit_if_exists returns false when _use_if_exists=0';
+    'a bare _use_if_exists sub does not flip the helper: only the registered capability counts';
 }
 
 # --- 2. F02 / F10: Deploy::Base::_execute_ddl wraps in txn_do only when
@@ -94,9 +167,22 @@ sub _make_deploy {
 
 # Case A: transactional_ddl = true. Expect: statements run inside txn_do
 # and emitted once each.
+#
+# The storage carries a _dbh, as every real one does: the bracket only goes
+# round a handle the storage actually owns, because _execute_ddl is also called
+# with a foreign one (DBIO::Deploy::Base::TempDatabase deploys into a
+# connection it opened itself, where a txn_do on the live storage would roll
+# back the caller's work and buy nothing). A mock without a handle would
+# therefore not be bracketed -- and would not be modelling any storage that can
+# reach this code. The foreign-handle half of the rule is covered in
+# t/deploy-base.t.
 {
   package DBIO::Test::TxnStorage;
-  sub new { bless { txn_do_calls => 0, txn_do_seen_stmts => [] }, shift }
+  sub new {
+    my ($class, $dbh) = @_;
+    bless { txn_do_calls => 0, txn_do_seen_stmts => [], dbh => $dbh }, $class;
+  }
+  sub _dbh { $_[0]->{dbh} }
   sub _use_transactional_ddl { 1 }
   sub txn_do {
     my ($self, $code) = @_;
@@ -107,9 +193,9 @@ sub _make_deploy {
 }
 
 {
-  my $storage = DBIO::Test::TxnStorage->new;
-  my $deploy  = _make_deploy($storage);
   my $dbh     = DBIO::Test::FakeDbh->new;
+  my $storage = DBIO::Test::TxnStorage->new($dbh);
+  my $deploy  = _make_deploy($storage);
   my $sql     = "CREATE TABLE t1 (id INT);\nCREATE TABLE t2 (id INT);";
 
   $deploy->_execute_ddl($dbh, $sql);
@@ -183,5 +269,62 @@ sub _make_deploy {
   is scalar @{ $dbh->stmts }, 0,
     'F02: empty / comment-only SQL does not call do()';
 }
+
+# --- 4. why a driver must DECLARE, not inherit ------------------------------
+#
+# Every driver is asked to state its transactional_ddl answer outright rather
+# than let core's default stand in (see DBIO::Deploy::Base, TRANSACTIONAL DDL;
+# DBIO::ClickHouse::Storage is the reference shape). This block pins the
+# machinery that advice rests on, because without it "declare your answer"
+# would be style advice with nothing behind it.
+#
+# Real DBIO::Storage::DBI subclasses, never a hand-rolled fake with a literal
+# _use_* sub -- that shortcut is exactly what let the bug ship.
+{
+  package DBIO::Test::SilentStorage;
+  our @ISA = ('DBIO::Storage::DBI');
+
+  package DBIO::Test::DeclaredStorage;
+  our @ISA = ('DBIO::Storage::DBI');
+  __PACKAGE__->_use_transactional_ddl(1);
+
+  package DBIO::Test::InheritingStorage;
+  our @ISA = ('DBIO::Test::DeclaredStorage');
+}
+
+# Silence is not a quiet 0 at class level -- it is not answerable at all. This
+# is the sharpest form of the rule: core refuses the question rather than
+# handing back a default that would read like a statement by the driver.
+{
+  my $v = eval { DBIO::Test::SilentStorage->_use_transactional_ddl };
+  my $err = $@;
+  ok !defined $v, 'an undeclared capability has no class-level answer';
+  like $err, qr/Cannot determine the capability/,
+    '... core refuses the question instead of returning its default';
+  like $err, qr/_use_transactional_ddl/,
+    '... naming the declaration that would have answered it';
+}
+
+is(DBIO::Test::DeclaredStorage->_use_transactional_ddl, 1,
+  'a declared capability answers as a class method');
+
+# The same storage DOES answer as an instance, from core's _determine_* default
+# -- which is the whole problem the declaration solves. An undeclared driver
+# looks identical to one that considered the question and said 0.
+is(DBIO::Test::SilentStorage->new->_use_transactional_ddl, 0,
+  'an undeclared capability still answers 0 on an instance (core default)');
+
+# get_inherited is what tells the two apart, and it is the check every driver
+# test should carry beside the value.
+is(DBIO::Test::SilentStorage->get_inherited('_use_transactional_ddl'), undef,
+  'get_inherited is undef while nobody declared -- silence is visible');
+is(DBIO::Test::DeclaredStorage->get_inherited('_use_transactional_ddl'), 1,
+  '... and defined once a driver states its answer');
+
+# Inheriting a driver's declaration counts as declared: a storage subclass
+# (MariaDB under MySQL, a driver's NoBindVars variant) inherits an ANSWER,
+# which is categorically different from falling through to core's default.
+is(DBIO::Test::InheritingStorage->get_inherited('_use_transactional_ddl'), 1,
+  'a subclass inherits the declaration -- an answer, not core\'s default');
 
 done_testing;

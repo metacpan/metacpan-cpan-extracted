@@ -30,15 +30,19 @@ my @modules = qw(
   DBIO::PostgreSQL::Diff::Schema
   DBIO::PostgreSQL::Diff::Table
   DBIO::PostgreSQL::Diff::Column
+  DBIO::PostgreSQL::Diff::View
   DBIO::PostgreSQL::Diff::Type
   DBIO::PostgreSQL::Diff::Index
   DBIO::PostgreSQL::Diff::Function
   DBIO::PostgreSQL::Diff::Trigger
   DBIO::PostgreSQL::Diff::Policy
   DBIO::PostgreSQL::Diff::Extension
+  DBIO::PostgreSQL::Diff::CaseOnly
+  DBIO::PostgreSQL::Diff::NoStatement
   DBIO::PostgreSQL::DDL
   DBIO::PostgreSQL::Deploy
   DBIO::PostgreSQL::Storage
+  DBIO::PostgreSQL::Util
   DBIO::PostgreSQL::Test::EventTZPg
   DBIO::PostgreSQL::Test::SequenceTest
 );

@@ -7,6 +7,8 @@ use DBIO::SQLite::Test;
 use DBIO::Test::Schema;
 
 # make sure nothing eats the exceptions (an unchecked eval in Storage::DESTROY used to be a problem)
+# the test channel rides on a private_ DBI attribute: a plain "die" key is not a
+# connect attribute and is refused (karr k76)
 
 {
   package Dying::Storage;
@@ -19,7 +21,7 @@ use DBIO::Test::Schema;
   sub _populate_dbh {
     my $self = shift;
 
-    my $death = $self->_dbi_connect_info->[3]{die};
+    my $death = $self->_dbi_connect_info->[3]{private_die};
 
     die "storage test died: $death" if $death eq 'before_populate';
     my $ret = $self->next::method (@_);
@@ -33,7 +35,7 @@ for (qw/before_populate after_populate/) {
   throws_ok (sub {
     my $schema = DBIO::Test::Schema->clone;
     $schema->storage_type ('Dying::Storage');
-    $schema->connection (DBIO::SQLite::Test->_database, { die => $_ });
+    $schema->connection (DBIO::SQLite::Test->_database, { private_die => $_ });
     $schema->storage->ensure_connected;
   }, qr/$_/, "$_ exception found");
 }

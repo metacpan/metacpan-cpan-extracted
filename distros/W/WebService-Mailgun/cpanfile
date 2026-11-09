@@ -5,8 +5,9 @@ requires 'JSON';
 requires 'URI';
 requires 'Try::Tiny';
 requires 'HTTP::Request::Common';
-requires 'File::Temp'; 
-requires 'perl', '5.010000';
+requires 'File::Temp';
+requires 'Scalar::Util';
+requires 'perl', '5.020000';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
@@ -17,10 +18,9 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-    requires 'Minilla';
+    # v3.2.0: manage_changes in minil.toml (the change log is CHANGELOG.md)
+    requires 'Minilla', 'v3.2.0';
     requires 'Pod::Markdown::Github';
-    requires 'Version::Next';
-    requires 'CPAN::Uploader';
     requires 'Test::CPAN::Meta';
     requires 'Test::MinimumVersion::Fast';
     requires 'Test::PAUSE::Permissions';

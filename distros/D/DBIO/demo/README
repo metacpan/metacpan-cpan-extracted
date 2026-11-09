@@ -44,8 +44,5 @@ The k8s/ directory contains manifests for deploying test databases.
   # Run demo against MySQL
   perl demo/dbio-demo dbi:mysql:dbname=dbio_demo;host=127.0.0.1 dbio dbio
 
-  # Run demo against PostgreSQL (async)
-  perl demo/dbio-demo-async dbi:Pg:dbname=dbio_demo;host=127.0.0.1 dbio dbio
-
   # Cleanup
   kubectl delete -f demo/k8s/

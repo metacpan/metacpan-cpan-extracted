@@ -1,4 +1,4 @@
-# ABSTRACT: karr #70 follow-up -- async transport resolution walks the composition
+# ABSTRACT: async transport resolution walks the composition
 # BASE (the driver), never the sync layers stacked on top of a composed storage.
 use strict;
 use warnings;
@@ -15,8 +15,8 @@ use DBIO::Storage::Composed;
 # The bug this guards against (latent -- no shipping consumer yet, first hit by
 # the AGE/PostGIS future_io+layer case):
 #
-# #70 WP1/WP2 compose SYNC storage layers INTO the storage class, so after
-# driver rebless a composed instance's class is e.g.
+# Storage-layer composition (ADR 0032) folds SYNC layers INTO the storage
+# class, so a composed instance's class over its declared driver is e.g.
 #   DBIO::Storage::Composed::<Layer>__<DriverStorage>
 # and mro::get_linear_isa(ref $self) now CONTAINS the layer package, MORE
 # specific than the driver storage. A sync layer's async mirror <Layer>::Async
@@ -43,6 +43,12 @@ use DBIO::Storage::Composed;
   package T::WF::DriverStorage::Async;      # the driver's real future_io transport
   use base 'DBIO::Storage::Async';
   use mro 'c3';
+  # It stands in for a real pooled transport, so it owns the query path: it
+  # overrides the _query_async seam, as DBIO::Async::Storage and every transport
+  # derived from it do. Without that the capability gate would (rightly) refuse to
+  # compose L::Async over it -- an undeclared layer needs the default seam. The
+  # walk under test never executes a query; the seam only has to exist.
+  sub _query_async { }
 }
 
 # --- a SYNC layer L + its PLAIN async mixin (NOT a transport) -------------
@@ -56,8 +62,8 @@ ok( !T::WF::L::Async->isa('DBIO::Storage::Async'),
   'sanity: the sync layer mixin L::Async is NOT a DBIO::Storage::Async '
   . '(probing it as a transport is exactly what used to croak)' );
 
-# Register the fake driver against a fake DBD name so a synthetic dsn reblesses
-# to it without ever connecting (dsn-only connect info, DBI-style regex parse).
+# Register the fake driver against a fake DBD name, so the synthetic dsn below
+# is the DBD of the declared driver (dsn-only connect info, no connection).
 DBIO::Storage::DBI->register_driver('FakeWFDrv' => 'T::WF::DriverStorage');
 
 # ===========================================================================
@@ -89,20 +95,20 @@ DBIO::Storage::DBI->register_driver('FakeWFDrv' => 'T::WF::DriverStorage');
 }
 
 # ===========================================================================
-# Integration: connect a COMPOSED schema with { async => 'future_io' } and drive
-# the full rebless-through-connect. Resolution must NOT croak on L::Async, must
-# land on the DRIVER's real transport, and the async mirror must compose L::Async
-# ON TOP of that transport.
+# Integration: a COMPOSED storage over the declared driver with
+# { async => 'future_io' }, through driver determination. Resolution must NOT
+# croak on L::Async, must land on the DRIVER's real transport, and the async
+# mirror must compose L::Async ON TOP of that transport.
 # ===========================================================================
 {
   my $schema = DBIO::Test->init_schema;
   $schema->register_storage_layer('T::WF::L');
 
-  # A composed GENERIC storage (base == DBIO::Storage::DBI), bound to the schema,
-  # in future_io mode. connect_info's dsn drives the driver rebless; { async }
-  # sets the mode. No connection is ever opened.
+  # A storage composed over the declared driver (a schema always has one,
+  # ADR 0067), bound to the schema, in future_io mode. { async } sets the
+  # mode. No connection is ever opened.
   my $composed_class =
-    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['T::WF::L']);
+    DBIO::Storage::Composed->compose('T::WF::DriverStorage', ['T::WF::L']);
   my $storage = $composed_class->new($schema);
   $storage->connect_info([ 'dbi:FakeWFDrv:', '', '', { async => 'future_io' } ]);
 
@@ -112,11 +118,11 @@ DBIO::Storage::DBI->register_driver('FakeWFDrv' => 'T::WF::DriverStorage');
   ok !$err, 'future_io resolution does NOT croak on the sync layer mixin L::Async'
     or diag "died with: $err";
 
-  # The sync storage reblessed onto the driver, keeping its layer (bug precondition).
-  isa_ok $storage, 'T::WF::DriverStorage', 'sync storage reblessed onto the driver';
-  isa_ok $storage, 'T::WF::L',             'sync storage kept its layer through rebless';
+  # The sync storage is the driver's, with its layer (bug precondition).
+  isa_ok $storage, 'T::WF::DriverStorage', 'sync storage is the declared driver\'s';
+  isa_ok $storage, 'T::WF::L',             'sync storage kept its layer through determination';
   ok +(grep { $_ eq 'T::WF::L' } @{ mro::get_linear_isa(ref $storage) }),
-    'the sync layer sits in the reblessed storage MRO (more-specific than the driver)';
+    'the sync layer sits in the storage MRO (more-specific than the driver)';
 
   # The resolved transport is the DRIVER's real ::Async, not the layer mixin.
   ok $async, 'an async backend was resolved';

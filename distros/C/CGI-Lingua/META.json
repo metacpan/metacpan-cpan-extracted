@@ -5,6 +5,16 @@
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "keywords" : [
+      "i18n",
+      "l10n",
+      "language",
+      "Accept-Language",
+      "locale",
+      "country",
+      "geolocation",
+      "CGI"
+   ],
    "license" : [
       "gpl_2"
    ],
@@ -41,13 +51,15 @@
          }
       },
       "local_geo_databases" : {
-         "description" : "Look up the country from a local database (fastest, no network): IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree",
+         "description" : "Look up the country from a local database (fastest, no network): a MaxMind GeoIP2 or GeoLite2 .mmdb (read by IP::Geolocation::MMDB or MaxMind::DB::Reader; a City database also gives time zones), IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree",
          "prereqs" : {
             "runtime" : {
                "recommends" : {
                   "Geo::IP" : "0",
                   "Geo::IPfree" : "0",
-                  "IP::Country" : "0"
+                  "IP::Country" : "0",
+                  "IP::Geolocation::MMDB" : "0",
+                  "MaxMind::DB::Reader" : "0"
                }
             }
          }
@@ -112,12 +124,10 @@
             "Log::Abstraction" : "0.33",
             "Net::Whois::IANA" : "0",
             "Net::Whois::IP" : "0",
-            "Object::Configure" : "0.24",
+            "Object::Configure" : "0.25",
             "Params::Get" : "0.17",
             "Readonly" : "0",
             "Scalar::Util" : "0",
-            "Socket" : "0",
-            "autodie" : "0",
             "perl" : "5.010001"
          }
       },
@@ -131,6 +141,7 @@
             "IPC::System::Simple" : "0",
             "JSON::Parse" : "0",
             "LWP::Simple::WithCache" : "0.04",
+            "Socket" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
             "Test::Log::Abstraction" : "0",
@@ -149,6 +160,12 @@
          }
       }
    },
+   "provides" : {
+      "CGI::Lingua" : {
+         "file" : "lib/CGI/Lingua.pm",
+         "version" : "0.88"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -161,6 +178,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.87",
+   "version" : "0.88",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

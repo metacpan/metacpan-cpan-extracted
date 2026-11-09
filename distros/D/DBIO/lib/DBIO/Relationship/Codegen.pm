@@ -3,8 +3,12 @@ package DBIO::Relationship::Codegen;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Carp;
-use DBIO::Util qw(quote_sub perlstring fail_on_internal_wantarray assert_no_internal_wantarray);
+use Scalar::Util 'blessed';
+use DBIO::Util qw(quote_sub perlstring assert_no_list_context);
 use namespace::clean;
 
 our %_pod_inherit_config =
@@ -37,34 +41,49 @@ sub add_relationship_accessor {
 
       if (@_) {
         $self->set_from_related( %1$s => @_ );
+
+        # a plain hashref is column values, reduced to our own columns just
+        # above (ADR 0034) -- not a related object to keep
+        return $_[0] if ref $_[0] eq 'HASH';
+
         return $self->{_relationship_data}{%1$s} = $_[0];
       }
       elsif (exists $self->{_relationship_data}{%1$s}) {
         return $self->{_relationship_data}{%1$s};
       }
       else {
-        my $relcond = $self->result_source->_resolve_relationship_condition(
-          rel_name => %1$s,
-          foreign_alias => %1$s,
-          self_alias => 'me',
-          self_result_object => $self,
-        );
-
-        return undef if (
-          $relcond->{join_free_condition}
-            and
-          $relcond->{join_free_condition} ne DBIO::Util::UNRESOLVABLE_CONDITION()
-            and
-          scalar grep { not defined $_ } values %%{ $relcond->{join_free_condition} || {} }
-            and
-          $self->result_source->relationship_info(%1$s)->{attrs}{undef_on_null_fk}
-        );
+        return undef if $self->_relationship_null_fk_miss(%1$s);
 
         my $val = $self->search_related( %1$s )->single;
         return $val unless $val;  # $val instead of undef so that null-objects can go through
 
         return $self->{_relationship_data}{%1$s} = $val;
       }
+EOC
+
+    quote_sub "${class}::${rel}_async" => sprintf(<<'EOC', perlstring $rel, $rel);
+      my $self = shift;
+      $self->throw_exception("%2$s_async doesn't take arguments -- use ->%2$s(...) to set the relationship")
+        if @_;
+
+      return $self->_row_run_async(%1$s,
+        sub {
+          my ($backend, $fc) = @_;
+
+          return $fc->done($self->{_relationship_data}{%1$s})
+            if exists $self->{_relationship_data}{%1$s};
+
+          return $fc->done(undef)
+            if $self->_relationship_null_fk_miss(%1$s);
+
+          return $self->search_related(%1$s)->single_async->then(sub {
+            my ($val) = @_;
+            return $val unless $val;  # $val instead of undef so that null-objects can go through
+            return $self->{_relationship_data}{%1$s} = $val;
+          });
+        },
+        sub { $self->%2$s },
+      );
 EOC
   }
   elsif ($acc_type eq 'filter') {
@@ -76,11 +95,15 @@ EOC
     $class->inflate_column($rel, {
       inflate => sub {
         my ($val, $self) = @_;
-        return $self->find_or_new_related($rel, {}, {});
+        # the row the foreign key names: found by the key the related
+        # resultset holds, a new row when there is none
+        my $found = $self->find_related($rel, {}, {});
+        return defined $found ? $found : $self->new_related($rel, {}, {});
       },
       deflate => sub {
         my ($val, $self) = @_;
-        $self->throw_exception("'$val' isn't a $f_class") unless $val->isa($f_class);
+        $self->throw_exception("The value given for '$rel' isn't a $f_class")
+          unless blessed $val and $val->isa($f_class);
 
         # MASSIVE FIXME - this code assumes we pointed at the PK, but the belongs_to
         # helper does not check any of this
@@ -104,11 +127,12 @@ EOC
   }
   elsif ($acc_type eq 'multi') {
 
-    quote_sub "${class}::${rel}_rs", "shift->search_related_rs( $rel => \@_ )";
-    quote_sub "${class}::add_to_${rel}", "shift->create_related( $rel => \@_ )";
-    quote_sub "${class}::${rel}", sprintf( <<'EOC', perlstring $rel );
-      DBIO::Util::assert_no_internal_wantarray() and my $sog = DBIO::Util::fail_on_internal_wantarray;
-      shift->search_related( %s => @_ )
+    quote_sub "${class}::${rel}_rs", sprintf('shift->search_related_rs( %s => @_ )', perlstring $rel);
+    quote_sub "${class}::add_to_${rel}", sprintf('shift->create_related( %s => @_ )', perlstring $rel);
+    quote_sub "${class}::${rel}", sprintf( <<'EOC', perlstring $rel, perlstring $rel );
+      my $self = shift;
+      DBIO::Util::assert_no_list_context('relationship accessor %s') if wantarray;
+      $self->search_related_rs( %s => @_ )
 EOC
   }
   else {
@@ -117,19 +141,51 @@ EOC
 
 }
 
+# Shared by the single-type accessor and its _async twin: true when the
+# relationship's join-free condition is fully resolved but every value in it
+# is undef (the FK is definitely NULL) and the relationship is configured to
+# skip the query in that case (undef_on_null_fk -- the belongs_to default).
+# See DBIO::Relationship/belongs_to.
+sub _relationship_null_fk_miss {
+  my ($self, $rel) = @_;
+
+  my $relcond = $self->result_source->_resolve_relationship_condition(
+    rel_name => $rel,
+    foreign_alias => $rel,
+    self_alias => 'me',
+    self_result_object => $self,
+  );
+
+  return !!(
+    $relcond->{join_free_condition}
+      and
+    $relcond->{join_free_condition} ne DBIO::Util::UNRESOLVABLE_CONDITION()
+      and
+    scalar grep { not defined $_ } values %{ $relcond->{join_free_condition} || {} }
+      and
+    $self->result_source->relationship_info($rel)->{attrs}{undef_on_null_fk}
+  );
+}
+
 
 sub proxy_to_related {
   my ($class, $rel, $proxy_args) = @_;
   my %proxy_map = $class->_build_proxy_map_from($proxy_args);
 
-  quote_sub "${class}::$_", sprintf( <<'EOC', $rel, $proxy_map{$_} )
+  for my $col (values %proxy_map) {
+    $class->throw_exception(
+      "proxy column of relationship '$rel' must be a plain column name"
+    ) unless defined $col and !ref $col and $col =~ /\A\w+\z/;
+  }
+
+  quote_sub "${class}::$_", sprintf( <<'EOC', perlstring($rel), perlstring($proxy_map{$_}) )
     my $self = shift;
-    my $relobj = $self->%1$s;
+    my $relobj = $self->${\ %1$s};
     if (@_ && !defined $relobj) {
       $relobj = $self->create_related( %1$s => { %2$s => $_[0] } );
       @_ = ();
     }
-    $relobj ? $relobj->%2$s(@_) : undef;
+    $relobj ? $relobj->${\ %2$s}(@_) : undef;
 EOC
     for keys %proxy_map
 }
@@ -171,7 +227,7 @@ DBIO::Relationship::Codegen - Schema-time relationship method synthesis (accesso
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 

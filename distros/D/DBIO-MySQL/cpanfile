@@ -1,5 +1,5 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900001';
+requires 'DBIO', '0.900004';
 requires 'DateTime::Format::MySQL';
 
 # DBD::MariaDB bundles the MariaDB Connector/C and works with both MySQL 5.7+
@@ -12,10 +12,27 @@ suggests 'DBD::mysql';
 # future_io async transport base: DBIO::MySQL::Storage::Async subclasses
 # DBIO::Async::Storage, resolved at runtime BY CONVENTION
 # (ref($storage).'::Async', ADR 0030) only when a connection asks for
-# { async => 'future_io' } -- the sync-only driver (DBIO::MySQL::Storage) never
-# pulls it in, so it's not declared here. The ev backend (DBIO::MySQL::EV) is
-# a separate dist with its own event loop, resolved at runtime -- not here
-# either.
+# { async => 'future_io' }. A recommends, not a requires: the sync-only driver
+# (DBIO::MySQL::Storage) never loads it, so a sync-only install stays free of
+# the Future::IO stack. The ev backend (DBIO::MySQL::EV) is a separate dist
+# with its own event loop, resolved at runtime -- not declared here.
+recommends 'DBIO::Async', '0.900004';
+
+# The emulated LISTEN/NOTIFY on this transport (karr k54) additionally needs a
+# dbio-async carrying the Future::IO listen seams (dbio-async k22: the watch
+# loop and its timer mode, _listen_drain / _notify_sql) and a core carrying the
+# listen contract (core k219 + k222, and k227's _listen_error for a failed
+# cleanup). Both still report 0.900004, so no version can express it yet; t/62
+# and t/63 skip when the installed copies predate them (only t/62 makes a
+# cleanup fail, so only it checks for k227). DBIO::MySQL::NotifyTable itself
+# needs neither.
+#
+# The broker_connect_options capability this transport declares (karr k64) is
+# kept by dbio-async, not here: its _async_broker_conninfo merges the DBD
+# attributes given beside an AccessBroker into every connection (dbio-async
+# k27), on a core that hands them over (core k243). Same 0.900004 on both, so
+# again no version can express it. t/67 skips on a core that predates k243 and
+# FAILS on a dbio-async that predates k27 -- there the declaration is untrue.
 
 on test => sub {
   requires 'Test::More', '0.98';

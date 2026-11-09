@@ -281,6 +281,11 @@ my $MODEL_FIXTURE = {
         columns         => ['embedding'],
         include_columns => [],
         storage_params  => { lists => '100' },
+        # Pins that a reported operator class reaches the reconstructed
+        # pg_index (karr k39). A live server never reports this pair:
+        # vector_l2_ops is the ivfflat default for vector, so
+        # pg_get_indexdef omits it (t/48-index-opclass-live.t).
+        opclasses       => { embedding => 'vector_l2_ops' },
       },
       users_email_name_idx => {
         index_name      => 'users_email_name_idx',
@@ -401,6 +406,61 @@ is($users->{availability}{data_type}, 'int4range', 'range type retained');
 is($users->{nickname}{extra}{generated}, 's', 'generated marker preserved');
 is($users->{external_id}{is_auto_increment}, 1, 'identity columns count as auto increment');
 
+# karr k49 / core k126: a column the primary key names must never report
+# is_nullable => 1, even when the engine row carries not_null => 0. The
+# override folds the PK set into is_nullable the way the core base now does.
+{
+  my $pk_fixture = {
+    tables => {
+      'public.t' => {
+        schema_name => 'public',
+        table_name  => 't',
+        kind        => 'r',
+        kind_label  => 'table',
+      },
+    },
+    columns => {
+      'public.t' => [
+        {
+          column_name   => 'id',
+          ordinal       => 1,
+          data_type     => 'integer',
+          not_null      => 0,
+          default_value => undef,
+          identity      => '',
+          generated     => '',
+          comment       => undef,
+          type_category => 'b',
+          type_schema   => 'pg_catalog',
+        },
+      ],
+    },
+    indexes => {
+      'public.t' => {
+        t_pkey => {
+          index_name      => 't_pkey',
+          access_method   => 'btree',
+          is_unique       => 1,
+          is_primary      => 1,
+          is_valid        => 1,
+          predicate       => undef,
+          expressions     => undef,
+          columns         => ['id'],
+          include_columns => [],
+          storage_params  => {},
+        },
+      },
+    },
+  };
+  my $pk_intro = DBIO::PostgreSQL::Introspect::Mock->new(
+    model         => $pk_fixture,
+    schema_filter => ['public'],
+    preserve_case => 0,
+  );
+  my $t_info = $pk_intro->table_columns_info('public.t');
+  is($t_info->{id}{is_nullable}, 0, 'PK column folds to NOT NULL even when not_null is 0 (karr k49)');
+}
+
 is_deeply($intro->table_pk_info('auth.users'), ['id'], 'primary key comes from indexes');
 is_deeply(
   $intro->table_uniq_info('auth.users'),
@@ -436,7 +496,7 @@ is_deeply(
   $extra_by_type{pg_index},
   [
     [pg_index => 'users_email_name_idx' => { columns => ['email'], include => ['nickname'] }],
-    [pg_index => 'users_embedding_idx' => { columns => ['embedding'], using => 'ivfflat', with => { lists => '100' } }],
+    [pg_index => 'users_embedding_idx' => { columns => ['embedding'], using => 'ivfflat', opclasses => { embedding => 'vector_l2_ops' }, with => { lists => '100' } }],
     [pg_index => 'users_name_lower_idx' => { expression => 'lower(email)', unique => 1 }],
     [pg_index => 'users_role_partial_idx' => { columns => ['role'], where => q{role <> 'guest'::auth.role_type} }],
   ],

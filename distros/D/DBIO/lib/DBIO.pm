@@ -4,9 +4,11 @@ package DBIO;
 use strict;
 use warnings;
 
-our $VERSION = '0.900002';
+our $VERSION = '0.900004';
 
+use Scalar::Util ();
 use DBIO::Base ();
+use DBIO::Exception ();
 use DBIO::Skills ();
 
 sub import {
@@ -27,6 +29,7 @@ sub import {
   }
 
   my $base = "DBIO::$role";
+  DBIO::Util::assert_class_name($base);
   eval "require $base; 1"
     or die "use DBIO '$role': cannot load $base: $@";
 
@@ -80,7 +83,7 @@ sub skills { shift; DBIO::Skills->skills(@_) }
 # Shortcut resolution is two-tier and core never names a single driver:
 #
 #  1. Explicit stub DBIO::Shortcut::<key> -- a driver ships one for each
-#     curated alias (e.g. -pg, -my). It is lazy-loaded here (so it works even
+#     curated alias (e.g. -pg, -mysql). It is lazy-loaded here (so it works even
 #     "cold") and its apply($caller) decides what to do, usually delegating to
 #     DBIO->apply_driver:
 #         package DBIO::Shortcut::pg;
@@ -137,6 +140,7 @@ sub _loaded_driver_for {
 # Apply a driver to a class by the DBIO::<Name>::{Storage,Result} convention:
 # pin the storage driver on a Schema, load the Result component on a Result
 # class (only if the driver ships one). Driver shortcut stubs delegate here.
+
 sub apply_driver {
   my ($class, $caller, $name) = @_;
   if ($caller->isa('DBIO::Schema')) {
@@ -146,6 +150,74 @@ sub apply_driver {
     $caller->load_components("${name}::Result")
       if eval { require "DBIO/${name}/Result.pm"; 1 };
   }
+}
+
+
+sub driver_for {
+  my ($class, @connect_info) = @_;
+
+  my $info = $connect_info[0];
+  $info = $info->{dbh_maker} // $info->{dsn}
+    if ref $info eq 'HASH';
+
+  my $dbd;
+  if ((Scalar::Util::reftype($info) // '') eq 'CODE') {
+    my $dbh = $info->();
+    $dbd = Scalar::Util::blessed($dbh) && $dbh->{Driver} && $dbh->{Driver}{Name};
+    DBIO::Exception->throw(
+      'DBIO->driver_for: the connection code reference returned no database '
+    . 'handle, so there is no DBD to name the driver.'
+    ) unless $dbd;
+  }
+  elsif (defined $info && !ref $info) {
+    ($dbd) = $info =~ /^dbi:(\w*)/i;
+    DBIO::Exception->throw(
+      'DBIO->driver_for: the DSN names no DBD (dbi:<driver>:...), so there is '
+    . 'no driver to find.'
+    ) unless defined $dbd && length $dbd;
+  }
+  else {
+    DBIO::Exception->throw(
+      'DBIO->driver_for takes connect info with a DSN or a code reference '
+    . 'returning a database handle.'
+    );
+  }
+
+  # The driver registry lives on the storage class. Loaded here, not by
+  # use DBIO: the pragma every result class uses does not load the storage
+  # layer.
+  require DBIO::Storage::DBI;
+  my $storage_class = DBIO::Storage::DBI->driver_storage_class($dbd);
+  my ($name) = defined $storage_class
+    ? $storage_class =~ /\ADBIO::(\w+)::Storage(?:::|\z)/
+    : ();
+
+  DBIO::Exception->throw(
+    "DBIO->driver_for: DBD::$dbd names no DBIO driver, so the connection does "
+  . 'not say which driver to use (ADR 0067). Declare the driver: '
+  . "use DBIO 'Schema', -<driver>, its component, or DBIO->apply_driver."
+  ) unless defined $name;
+
+  return $name;
+}
+
+
+sub schema_for {
+  my ($class, @connect_info) = @_;
+
+  my $driver = $class->driver_for(@connect_info);
+
+  my $schema_class = "DBIO::SchemaFor::$driver";
+  unless ($schema_class->isa('DBIO::Schema')) {
+    require DBIO::Schema;
+    {
+      no strict 'refs';
+      @{"${schema_class}::ISA"} = ('DBIO::Schema');
+    }
+    $class->apply_driver($schema_class, $driver);
+  }
+
+  return $schema_class->connect(@connect_info);
 }
 
 1;
@@ -162,7 +234,7 @@ DBIO - Native relational mapping for Perl, built on DBI
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -172,7 +244,7 @@ L<dbiogen>, powered by L<DBIO::Generate>.
 =head2 Schema class
 
   package MyApp::Schema;
-  use DBIO 'Schema';
+  use DBIO 'Schema', -pg;
 
   __PACKAGE__->load_namespaces();
 
@@ -311,6 +383,66 @@ or C<undef>. The leading C<dbio-> is optional.
 Class-level shortcut for L<DBIO::Skills/skills>: the sorted names of all skills
 available from the currently loaded DBIO distributions.
 
+=head2 apply_driver
+
+    DBIO->apply_driver($caller, 'PostgreSQL');
+
+Applies a driver named C<$name> to C<$caller> by the
+C<DBIO::E<lt>NameE<gt>::{Storage,Result}> convention: on a L<DBIO::Schema>
+subclass it pins C<< $caller->storage_type("+DBIO::${name}::Storage") >>; on
+a L<DBIO::Core> subclass it loads the driver's C<Result> component, but only
+if C<DBIO::${name}::Result> exists. Called by driver shortcut stubs
+(C<DBIO::Shortcut::*>) and by the C<use DBIO '-name'> fallback path; not
+normally called directly.
+
+On a schema this B<declares the driver>, exactly as loading the driver's
+component does: the class pinned is the driver's base storage class, the same
+for every DBD the driver is reached through. The storage adapts itself to the
+access path of a connection from there
+(L<DBIO::Storage::DBI/_adapt_to_access_path>, ADR 0059).
+
+=head2 driver_for
+
+    my $driver = DBIO->driver_for($dsn, $user, $password, \%attrs);  # 'PostgreSQL'
+    my $driver = DBIO->driver_for(sub { DBI->connect(...) });
+
+Returns the name of the driver a connection leads to -- the C<E<lt>NameE<gt>>
+of C<DBIO::E<lt>NameE<gt>>, as L</apply_driver> takes it -- for the cases where
+it is not known in advance, such as loading a schema from an existing
+database (ADR 0067). Takes connect info as L<DBIO::Schema/connect> does: a DSN
+with user, password and attributes, a hash with C<dsn> or C<dbh_maker>, or a
+code reference returning a database handle.
+
+The answer is the B<exact driver> and nothing else: the driver the DBD is
+registered for (L<DBIO::Storage::DBI/register_driver>) -- the DBD named in the
+DSN, read without connecting, or, for a code reference, the DBD of the handle
+it returns (the code reference is called for that). No question is put to the
+server, and no driver is moved to another product.
+
+A DBD that names no driver -- L<DBD::ODBC>, L<DBD::ADO>, a proxy, a DBD
+nothing is registered for -- throws: a connection through it does not say
+which engine is behind it. Declare the driver instead; a driver that runs over
+such an access path knows it and adapts itself to it
+(L<DBIO::Storage::DBI/_adapt_to_access_path>). A driver that registers its DBD
+only when its storage class is loaded is known after that load.
+
+=head2 schema_for
+
+    my $schema = DBIO->schema_for($dsn, $user, $password, \%attrs);
+
+Takes the same connect info as L</driver_for> and returns a B<connected>
+schema object with that driver applied (L</apply_driver>) and no sources --
+the starting point for loading a schema from an existing database. It is an
+ordinary schema with a driver: everything after the connect is the driver's,
+as for any schema that declares it.
+
+The schema class is C<DBIO::SchemaFor::E<lt>DriverE<gt>> (for example
+C<DBIO::SchemaFor::PostgreSQL>), a subclass of L<DBIO::Schema> built on the
+first call for that driver and shared by every later one. It carries no
+sources; register sources on the returned object, which has its own source
+registry, or derive a schema class of your own. For a code reference the
+reference is called twice: once by L</driver_for>, once by the connection.
+
 =head1 USE-AS-PRAGMA
 
 Since C<DBIO.pm> itself is a sugar pragma (analogous to C<Moose.pm>), it can
@@ -324,16 +456,17 @@ auto-detected from the package name, or can be specified explicitly.
   use DBIO;                    # -> @ISA = ('DBIO::ResultSet')
 
   package MyApp::Schema;
-  use DBIO 'Schema';           # -> @ISA = ('DBIO::Schema')
+  use DBIO 'Schema', -pg;      # -> @ISA = ('DBIO::Schema'), driver PostgreSQL
 
   package MyApp::Schema::Result::Photo;
   use DBIO 'Core';             # explicit override
 
 Shortcuts can be combined with role selection, separated by leading dashes.
-A shortcut loads a driver's C<::Result> component:
+A shortcut applies a driver: on a Result class it loads the driver's
+C<::Result> component, on a Schema it pins the driver's storage class:
 
   use DBIO -pg;                # Core + load the PostgreSQL::Result component
-  use DBIO 'Schema', -pg;      # Schema + load the PostgreSQL::Result component
+  use DBIO 'Schema', -pg;      # Schema + storage_type('+DBIO::PostgreSQL::Storage')
 
 Shortcuts are owned by the driver distributions, not by core; core never names a
 single driver. A shortcut resolves in two tiers:
@@ -343,7 +476,7 @@ single driver. A shortcut resolves in two tiers:
 =item 1.
 
 An explicit stub C<DBIO::Shortcut::E<lt>keyE<gt>>, which a driver ships for each
-curated alias (C<-pg>, C<-my>, ...). Core lazy-loads it and calls its
+curated alias (C<-pg>, C<-mysql>, ...). Core lazy-loads it and calls its
 C<apply($caller)>, which usually just delegates to C<DBIO-E<gt>apply_driver>:
 
   package DBIO::Shortcut::pg;
@@ -366,6 +499,23 @@ component is just an extra. A shortcut that resolves to nothing dies with a
 helpful message -- it only works when its driver is installed (and, for the
 bare canonical name, loaded).
 
+On a schema the shortcut B<declares the driver>, and a schema always declares
+its driver -- by a shortcut, or by loading the driver's component
+(C<< __PACKAGE__->load_components('PostgreSQL') >>), which pins the same
+class. The declared storage class stands, whatever DSN the schema is
+connected with: the driver adapts itself to the access path of the connection
+-- the DBD and client library the DSN leads through -- within its own classes
+(L<DBIO::Storage::DBI/_adapt_to_access_path>), and the storage never becomes
+the class of another driver. A DSN that leads through the DBD of another
+driver, or a server the driver notices is not its engine, is reported: a
+warning by default, an error with L<DBIO::Schema/driver_strict>, nothing
+with C<< driver_warnings(0) >> (L<DBIO::Schema/driver_warnings>).
+
+A schema class that declares no driver is refused when it connects
+(L<DBIO::Schema/connection>, ADR 0067). Where the driver is not known in
+advance, L</driver_for> names the driver of a DSN and L</schema_for> returns a
+connected schema with it.
+
 Role auto-detection rules:
 
 =over 4
@@ -381,6 +531,22 @@ Role auto-detection rules:
 C<use DBIO;> additionally enables C<strict> and C<warnings> in the caller,
 matching the behavior of L<DBIO::Candy>, L<DBIO::Cake>, L<DBIO::Moo> and
 L<DBIO::Moose>.
+
+In a class that is a L<DBIO::Schema>, C<use DBIO> also installs two
+declaration keywords for the schema's skill overrides (see
+L<DBIO::Schema/skills>):
+
+  package MyApp::Schema;
+  use DBIO 'Schema', -pg;
+
+  skills { 'mysql-database' => $markdown, core => $more };  # set the whole map
+  skill  'postgresql-database' => $markdown;                # add or replace one entry
+
+C<skills> takes a hashref or a key/value list and replaces the map; C<skill>
+merges a single entry into it. Both keywords are removed from the class once
+it has compiled, so afterwards C<< MyApp::Schema->skills >> and
+C<< MyApp::Schema->skill($name) >> are the methods inherited from
+L<DBIO::Schema>.
 
 =head1 WHERE TO START
 
@@ -404,7 +570,7 @@ string-based dialect dispatch
 deployment are handled by DB-specific native modules
 
 =item * Shared utilities (L<DBIO::SQL::Util>) provide C<_quote_ident> and
-C<_split_statement> for cross-driver use
+C<_split_statements> for cross-driver use
 
 =item * L<DBIx::Class::TimeStamp> and L<DBIx::Class::Helpers> functionality
 integrated into core
@@ -412,7 +578,7 @@ integrated into core
 =item * Native driver distributions for each database (L<DBIO::PostgreSQL>,
 L<DBIO::MySQL>, L<DBIO::SQLite>, L<DBIO::DuckDB>) use desired-state
 deployment via test-and-compare; extracted drivers
-(L<DBIO::DB2>, L<DBIO::Firebird>, L<DBIO::Informix>, L<DBIO::MSSQL>,
+(L<DBIO::DB2>, L<DBIO::Firebird>, L<DBIO::MSSQL>,
 L<DBIO::Oracle>, L<DBIO::Sybase>) follow the same pattern
 
 =item * Meta-infrastructure has been split into L<DBIO::Base> (inherited by

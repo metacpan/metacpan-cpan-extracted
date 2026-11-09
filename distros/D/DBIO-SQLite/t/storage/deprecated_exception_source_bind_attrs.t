@@ -9,8 +9,6 @@ use DBIO::SQLite::Test;
   package DBIO::Test::Legacy::Storage;
   use base 'DBIO::SQLite::Storage';
 
-  use Data::Dumper::Concise;
-
   sub source_bind_attributes { return {} }
 }
 

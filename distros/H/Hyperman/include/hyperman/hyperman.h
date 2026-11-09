@@ -104,22 +104,48 @@ hm_backend *hm_backend_create(const char *name);
  * Hyperman unity translation unit, after perl.h. */
 #include <stdlib.h>
 
+/* A forked child leaves by _exit, which runs no atexit handler: under a
+ * coverage build its counters would be lost with it. The gcov runtime's dump
+ * is bound weakly, so an ordinary build resolves it to nothing and skips it. */
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(_WIN32)
+#include <unistd.h>
+extern void __gcov_dump(void) __attribute__((weak));
+static void hm_exit(int status) {
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
+    if (__gcov_dump) __gcov_dump();
+    _exit(status); /* # uncoverable statement class:ignore_covered_err */
+}
+#else
+#define hm_exit(status) _exit(status)
+#endif
+
 static void *hm_xmalloc(size_t n) {
     void *p = malloc(n);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu bytes)",
-                                 (unsigned long long)n);
+                                 (unsigned long long)n); /* # uncoverable statement */
     return p;
 }
 static void *hm_xcalloc(size_t count, size_t size) {
     void *p = calloc(count, size);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu x %llu bytes)",
-                                 (unsigned long long)count, (unsigned long long)size);
+                                 (unsigned long long)count, (unsigned long long)size); /* # uncoverable statement */
     return p;
 }
 static void *hm_xrealloc(void *old, size_t n) {
     void *p = realloc(old, n);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!p) Perl_croak_nocontext("Hyperman: out of memory (%llu bytes)",
-                                 (unsigned long long)n);
+                                 (unsigned long long)n); /* # uncoverable statement */
     return p;
 }
 

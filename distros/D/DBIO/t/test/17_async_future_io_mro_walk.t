@@ -7,9 +7,9 @@ use DBIO::Storage::Async;
 use DBIO::Storage::DBI;
 use DBIO::Test::Storage;
 
-# karr #67 -- ADR 0030, second future_io refinement.
+# ADR 0030, second future_io refinement.
 #
-# t/test/16_async_future_io_convention.t (karr #65) locked in the SINGLE
+# t/test/16_async_future_io_convention.t locked in the SINGLE
 # candidate rule: future_io's transport adapter is ref($storage) . '::Async',
 # tried exactly once. That works for a driver storage class directly under
 # DBIO::Storage::DBI, but an EXTENSION storage_type subclass (the
@@ -19,12 +19,12 @@ use DBIO::Test::Storage;
 # while the 'ev' registry mode (which already walks the MRO) keeps working on
 # the very same schema. This is a core resolution gap, not a driver bug.
 #
-# The decided fix (see karr #67, ADR 0030 refinement): the future_io
+# The decided fix (ADR 0030 refinement): the future_io
 # convention walks mro::get_linear_isa(ref($self)), most-specific first,
 # exactly like the registry resolver (_resolve_async_mode_class) already does
 # for 'ev'/'forked' -- but STOPS strictly BEFORE the generic
 # DBIO::Storage::DBI base (never probes DBIO::Storage::DBI::Async or
-# anything above it -- that hole is exactly what karr #65 banned). A
+# anything above it -- exactly the hole ADR 0030 banned). A
 # candidate that LOADS but is not a DBIO::Storage::Async croaks immediately,
 # it never silently falls through to a parent's otherwise-valid adapter.
 #

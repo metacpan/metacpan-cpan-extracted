@@ -4,6 +4,8 @@ package DBIO::HashAccessor;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use parent 'DBIO::Row';
 
 sub _install {
@@ -11,6 +13,7 @@ sub _install {
   no strict 'refs';
   *{"${class}::${name}"} = $code;
 }
+
 
 sub add_hash_accessor {
   my ( $class, $accessor, $hash ) = @_;
@@ -149,7 +152,7 @@ DBIO::HashAccessor - Accessor methods for serialized hash columns
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -194,6 +197,22 @@ C<add_hash_accessor> with a prefix and column name, and it installs get/set,
 exists, delete, nested hash, and array manipulation methods.
 
 Based on L<DBIx::Class::HashAccessor> by GETTY.
+
+=head1 METHODS
+
+=head2 add_hash_accessor
+
+    __PACKAGE__->add_hash_accessor( da => 'data' );
+
+Installs a family of convenience methods named after C<$accessor> that
+read/write keys of the serialized hash stored in column C<$hash> (see
+L</SYNOPSIS>): get/set (C<$accessor>), nested-hash get/set/delete
+(C<${accessor}_hash>, C<${accessor}_hash_delete>), array append/shift/
+membership/removal (C<${accessor}_push>, C<${accessor}_shift>,
+C<${accessor}_in>, C<${accessor}_in_delete>), and top-level delete/exists
+(C<${accessor}_delete>, C<${accessor}_exists>). Called once at class-load
+time, typically right after L<DBIO::InflateColumn::Serializer> declares the
+column.
 
 =head1 AUTHOR
 

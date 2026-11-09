@@ -1,0 +1,17 @@
+name = "DBIx-Squirrel"
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+license = "perl_5"
+
+# Minilla always writes README.md from POD. The README is written by hand
+# in README.pod, not in the main module's POD.
+readme_from = "README.pod"
+badges = ["github-actions/test.yml"]
+
+# Changes keeps an "Unreleased" heading, edited by hand at a release,
+# rather than Minilla's {{$NEXT}}.
+manage_changes = false
+
+# Files for the maintainers, not for CPAN.
+[FileGatherer]
+exclude_match = ['^CLAUDE\.md$', '^ROADMAP\.md$', '^TODO\.md$', '^docs/', '^scripts/']

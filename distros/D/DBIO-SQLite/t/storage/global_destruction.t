@@ -7,6 +7,14 @@ use DBIO::Optional::Dependencies ();
 
 use DBIO::SQLite::Test;
 
+# The driver each run declares: DBIO::Test::Schema keeps none in its class,
+# and a schema always has one (core ADR 0067).
+my %storage_type = (
+  PG     => 'DBIO::PostgreSQL::Storage',
+  MYSQL  => 'DBIO::MySQL::Storage',
+  SQLite => 'DBIO::SQLite::Storage',
+);
+
 for my $type (qw/PG MYSQL SQLite/) {
 
   SKIP: {
@@ -28,7 +36,9 @@ for my $type (qw/PG MYSQL SQLite/) {
         unless DBIO::Optional::Dependencies->req_ok_for('test_rdbms_mysql');
     }
 
-    my $schema = DBIO::Test::Schema->connect (@dsn);
+    my $schema = DBIO::Test::Schema->clone;
+    $schema->storage_type($storage_type{$type});
+    $schema = $schema->connect (@dsn);
 
     # emulate a singleton-factory, just cache the object *somewhere in a different package*
     # to induce out-of-order destruction

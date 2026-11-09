@@ -13,7 +13,7 @@ DBIO::Manual::Example - Simple CD database example
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -42,19 +42,18 @@ install sqlite3 (not sqlite) if it's not already intalled.
 
 =head3 The database/tables/data
 
-Your distribution already comes with a pre-filled SQLite database
-F<examples/Schema/db/example.db>. You can see it by e.g.
+The example does not ship a pre-filled database; you build it from the
+schema classes. Enter the example Schema directory and create the SQLite
+database from C<MyApp::Schema>, then fill it with data (this needs the
+L<DBIO::SQLite> driver installed):
 
-  cpanm --look DBIO
-
-If for some reason the file is unreadable on your system, you can
-recreate it as follows:
-
-  cp -a <unpacked-DBIO-tarball>/examples/Schema dbicapp
-  cd dbicapp
-  rm db/example.db
-  sqlite3 db/example.db < db/example.sql
+  cd <unpacked-DBIO-tarball>/examples/Schema
+  mkdir -p db
+  perl -I. -MMyApp::Schema \
+      -e 'MyApp::Schema->connect("dbi:SQLite:db/example.db")->deploy'
   perl insertdb.pl
+
+To start over, remove F<db/example.db> and run the last two commands again.
 
 =head3 Testing the database
 

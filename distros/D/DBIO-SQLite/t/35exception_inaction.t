@@ -37,8 +37,12 @@ sub ok {
   return !!$_[0];
 }
 
-# yes, make it even dirtier
-my $schema = 'DBIO::Schema';
+# yes, make it even dirtier -- a bare schema class, declared as SQLite (ADR 0067)
+{
+  package DBIO::Test::ExceptionInaction::Schema;
+  use DBIO 'Schema', -sqlite;
+}
+my $schema = 'DBIO::Test::ExceptionInaction::Schema';
 
 $schema->connection('dbi:SQLite::memory:');
 

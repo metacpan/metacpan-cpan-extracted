@@ -4,6 +4,8 @@ package DBIO::Firebird::Introspect;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Introspect::Base';
 
 
@@ -52,7 +54,7 @@ DBIO::Firebird::Introspect - Introspect a Firebird database via rdb$ system tabl
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -75,7 +77,7 @@ L<DBIO::Generate> source.
 
 =head1 THE INTROSPECTED MODEL
 
-The model hashref returned by L</model> is the shared substrate of this
+The model hashref returned by C<model> is the shared substrate of this
 distribution: produced here by the C<Introspect::*> helpers, consumed by
 L<DBIO::Firebird::Diff> (table/column/index comparison) and by the
 L</NORMALIZED CONTRACT> methods below (the L<DBIO::Generate> source). It has
@@ -86,7 +88,17 @@ relation names).
 
 =head2 tables
 
-    { $table_name => { table_name => $name, kind => 'table' | 'view' } }
+    { $table_name => { table_name => $name, kind => 'table' | 'view',
+                       view_source => $text, primary_key_name => $name } }
+
+C<view_source> exists for a view only: C<rdb$relations.rdb$view_source>, the
+query after C<AS> as the server stores it (no trailing semicolon). The diff
+compares it with whitespace normalised (L<DBIO::Firebird::Diff/VIEWS>).
+
+C<primary_key_name> exists for a table with a primary key: the name of its
+constraint in C<rdb$relation_constraints>, the server's C<INTEG_E<lt>nE<gt>>
+unless the table was created with a named key. Dropping the key needs it
+(L<DBIO::Firebird::Diff::Constraint>).
 
 =head2 columns
 
@@ -100,8 +112,16 @@ Each column hashref:
 
 =item * C<data_type> — the I<bare> SQL type (e.g. C<'integer'>, C<'decimal'>,
 C<'varchar'>). Size/precision is B<not> folded in here; it lives in C<size>.
+The names are the ones the server reports: C<smallint>, C<integer>,
+C<bigint>, C<numeric>, C<decimal>, C<float>, C<double precision>, C<char>,
+C<varchar>, C<binary>, C<varbinary> (CHAR/VARCHAR in character set OCTETS),
+C<date>, C<time>, C<timestamp>, C<boolean>, C<blob> (binary) and
+C<blob sub_type text>, and for Firebird 4+ C<int128>, C<decfloat>,
+C<time with time zone>, C<timestamp with time zone>. See
+L<DBIO::Firebird::Type/sql_type_from_rdb>.
 
-=item * C<size> — C<undef>, a scalar length (C<varchar>/C<char>), or an
+=item * C<size> — C<undef>, a scalar length (C<char>/C<varchar>/C<binary>/
+C<varbinary>, or the digit count of C<decfloat>), or an
 C<[ precision, scale ]> pair (C<decimal>/C<numeric>). Rendered to SQL via
 L<DBIO::Firebird::Type/render_size>.
 
@@ -109,6 +129,11 @@ L<DBIO::Firebird::Type/render_size>.
 (from C<rdb$null_flag>).
 
 =item * C<default_value> — the column default expression, or C<undef>.
+
+=item * C<is_auto_increment> — C<1> for an identity column
+(C<GENERATED ... AS IDENTITY>, C<rdb$identity_type> not NULL), else C<0>. Both
+kinds, C<ALWAYS> and C<BY DEFAULT>, read as C<1>; this driver writes only
+C<BY DEFAULT>.
 
 =item * C<is_pk> / C<pk_position> — primary-key membership and 0-based position (C<rdb$field_position>).
 
@@ -133,7 +158,7 @@ contract method.
 
     { $table_name => [ \%fk, ... ] }
 
-Each FK hashref: C<fk_id>, C<from_table>, C<from_columns>, C<to_table>,
+Each FK hashref: C<constraint_name>, C<from_table>, C<from_columns>, C<to_table>,
 C<to_columns>, and the referential actions C<on_update>, C<on_delete>,
 C<match> (from C<rdb$ref_constraints>).
 
@@ -142,14 +167,16 @@ C<match> (from C<rdb$ref_constraints>).
 The L<DBIO::Generate> generation contract (C<table_keys>, C<table_columns>,
 C<table_columns_info>, C<table_pk_info>, C<table_uniq_info>, C<table_fk_info>,
 C<table_is_view>) is B<inherited unchanged> from L<DBIO::Introspect::Base>:
-the model built by L</_build_model> follows the canonical single-schema shape
+the model built by C<_build_model> follows the canonical single-schema shape
 (see L<DBIO::Introspect::Base/CANONICAL MODEL>) that those default
 implementations read, so no Firebird-specific override is needed. In
 particular C<unique_constraints> is the authoritative source for
 C<table_uniq_info>, and FK C<remote_schema> is always C<undef> (Firebird has
 no schemas).
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 

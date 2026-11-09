@@ -8,7 +8,7 @@
 
 `DBIO::Sybase::Introspect` is composed of thin fetch helpers
 (`Introspect::{Tables,Columns,Indexes,ForeignKeys}`), and `DBIO::Sybase::Diff`
-of per-artifact helpers (`Diff::{Table,Column,Index}`). Viewed in isolation
+of per-artifact helpers (`Diff::{Table,Column,Index,ForeignKey}`). Viewed in isolation
 several of these modules are **shallow**: their interface
 (`fetch($dbh, $schema, $tables)` → hashref, or `diff($source, $target)` → ops)
 is nearly as simple as their implementation, which is mostly one SQL query or

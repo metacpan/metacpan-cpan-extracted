@@ -1,5 +1,159 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.10  2026-11-08
+      - Since 0.09: Spawner.so loads with perl before 5.34 (X36, RT #182809;
+        thanks to Slaven Rezic for the report); echo, printf, test, [, true
+        and false inside Perl as coreutils 9.4 (X21, partly; IP1, IP2);
+        Windows: win_priority and win_job (W4), SetChildShowWindow, more than
+        64 children, X34 fixed; on_write gets the errno; X27: the run's
+        environment varied, stand-ins and fixed file times (EV1); the run-time
+        comparison redone and its table replaced (A1(b)); the comparison and
+        the snippet library through Run; X33, X35 fixed.  The figures of
+        post4-0.04 hold (the measured files differ only in $VERSION); digest
+        of the code they depend on:
+        4185f0fc85d210c5d14e02c79c998ea586198496e58b4e1caf7a9154c969f11e.
+      - X36 (ours; RT #182809, Slaven Rezic: 'Undefined symbol "av_count"',
+        2026-11-08; thanks to Slaven): since 0.01 Spawner.xs used av_count(),
+        which perl has only since 5.33.1, so with perl 5.30 (and any perl
+        before 5.34, though MIN_PERL_VERSION is 5.020) Spawner.so did not load
+        and every test failed.  Spawner.xs defines it where perl does not, as
+        perl does (AvFILL + 1).  Checked with perl 5.30.3 built here (Linux):
+        0.09 fails to load as reported; now the suite passes; the XS also
+        compiles against perl 5.20.3's headers with no undeclared function
+        (that perl itself did not build here, so the suite was not run on
+        it).  FreeBSD itself not tested here.
+      - X21, partly (the user, 2026-11-08: "echo, printf, test", "inside the
+        Perl process"): Proc::ShellSpawn::Programs does echo, printf, test,
+        [, true and false as GNU coreutils 9.4 does them, in Perl (Perl's
+        sprintf and file tests, Math::BigInt for the 64-bit range checks,
+        test's grammar as a recursive descent), with output and messages in
+        the program's order (glibc's error() flushes stdout first) and its
+        write errors (SIGPIPE, "write error").  Decision IP1 (the user: "when
+        a well-debugged builtin is already present, use it.  (By default;
+        Configurable.)"): Proc::ShellSpawn runs them inside Perl on every
+        platform; PROC_SHELLSPAWN_INPROC=none runs the programs (or names
+        only some), and %Proc::ShellSpawn::INPROC can be changed.  command -v
+        names them where there is no program.  Checked against coreutils 9.4
+        on 12,348 runs (handwritten and generated cases, C and UTF-8
+        locales) and on 3,000 random words for %q; t/programs.t replays 2,284
+        recorded runs (also under Wine with Strawberry Perl: pass) and
+        compares the shell layer with the programs and in-process; the suite
+        passes both ways (t/dash.t: 550 commands of the batteries).
+        Differences: --help and --version texts, printf's floating
+        conversions in double (coreutils: long double), and %q, where
+        coreutils 9.4 has a ❰BUG❱ (gnulib's quotearg keeps a stale state when
+        it starts a word over: an extra '', or a missing $' that makes the
+        shell read the word back wrong); ours follows gnulib's fixed rule
+        (decision IP2, the user: "Use the builtin").
+      - Proc::Spawner::on_write: the callback gets the errno of a failed
+        write (it got nothing); Proc::Spawner::Graph's perl_write passes it
+        in $!.
+      - W4 (the user, 2026-11-08: "(c) and (b); (c) beats (b) if present"):
+        on Windows, win_priority (a priority class) and win_job (job limits
+        by Windows' names: ProcessMemoryLimit, JobMemoryLimit,
+        PerProcessUserTimeLimit, PerJobUserTimeLimit, ActiveProcessLimit),
+        exact, per child; nice and rlimit mapped to them, approximately (nice
+        to the class with the nearest nice value; AS, DATA, CPU, NPROC to job
+        limits; other resources unsupported); win_* win where both are
+        given, and are unsupported elsewhere.  The class is set on the
+        suspended child (Wine ignores it as a creation flag).  Checked under
+        Wine with a child printing its class; Wine stores no job limits, so
+        theirs is not checked; the mapping is tested in t/spawner.t.
+      - Windows (the TODO's work items; checked under Wine with Strawberry
+        Perl 5.38.2): Win32::SetChildShowWindow is honoured as by Perl's own
+        spawn (a child printing its startup info: the same through both
+        primitives); more than 64 children at once work (100 checked: the
+        loop polls each child; Perl's own spawn still stops at 64, its
+        table); Makefile.PL skips the POSIX probes there, and perl
+        Makefile.PL, gmake (no warning) and gmake test of t/windows.t and
+        t/parsers.t pass with Strawberry Perl's own gcc and gmake.  nice and
+        rlimit there are decisions (TODO A.12).
+      - X34 ❰BUG❱ (ours; 0.07 to 0.09, Windows code): the kept process
+        handles were in a fixed table of 1,024, and a child started while it
+        was full lost its status if it ended before it was waited for (76 of
+        1,100 under Wine); the table grows now (the same check: none lost).
+      - TODO: two pending decisions added (a missing Run in M2; keeping
+        Perl's reopen of the graph's own pipes).
+      - X27, the run's environment varied (2026-11-08): the six kinds of
+        workaround (nothing, a second run with the other case, fixtures,
+        chosen values, stand-ins for programs, leaving samples out) listed
+        per code in doc/large-subset/large-subset-environment.md, section 9.
+        large-subset-runcompare.pl -env: posix (POSIXLY_CORRECT=1), utf8,
+        sigpipe (ignored), noproc (/proc hidden), tmp (a fresh tmpfs on /tmp,
+        /var/tmp, /dev/shm per run), random (a fixed file over /dev/urandom),
+        private (empty /home, /root, /mnt, /media, /srv, /var), dev (a
+        private /dev); the mounts in a mount namespace of each run's own.
+        -base (the mounting variants need one outside what they hide),
+        -only @FILE; ours runs from a copy of lib/, blib/, t/try.pl.
+        large-subset-runreport.pl -b BASE (each sample's class against a base
+        run's, and what changed) and -c.  Each variant on its code's samples
+        against two base runs (the noise): POSIXLY_CORRECT turns the
+        program echo from bash's side to dash's (29) and makes ours differ
+        from both for \x (2); C.UTF-8 changes one printf "\u20AC"; SIGPIPE
+        ignored changes only messages and 6 timeouts; /proc hidden makes the
+        3 samples using /dev/stdin, /dev/stderr fail alike; a fresh /tmp
+        makes 6 agree whose shells met each other's files there (or another
+        sample's: /tmp is shared across the whole run); a fixed
+        /dev/urandom makes all 25 agree; private and dev change nothing.
+        Every changed sample: doc/large-subset/tools/
+        large-subset-env-variants.tsv.  The levels are not changed by it
+        (TODO, A1 and A2a).  bash 5.2.21 does not emulate /dev/stdin and the like
+        without /proc (the document said it did; corrected).
+      - X33 (ours, in large-subset-runcompare.pl since post4-0.04): each
+        run's output and error files belonged to root, so /dev/stdout and
+        /dev/stderr, which Linux reopens by path, were not writable for the
+        run's user ("Permission denied" in all three shells; one sample
+        affected in practice, tee /dev/stderr).  Fixed: the files are given
+        to the run's user first.
+      - X27, EV1 (the user, 2026-11-08): the runs with the environment
+        varied are footnotes to the level totals
+        (large-subset-environment.md, section 1; README), not levels.
+      - X27, stand-ins and fixed file times (the user, 2026-11-08: their
+        answers controlled by the environment): large-subset-runcompare.pl
+        -env fail (every program the run only logs exits with
+        STANDIN_STATUS, default 1), output (prints STANDIN_OUTPUT, default
+        "one  two\n*\n\nlast"), mtime (the run's copy of the fixture gets the
+        times FIXTURE_MTIME, default 2020-01-01); the values from the
+        runner's own environment, recorded in OUTDIR/env.txt.  Run on the
+        samples of prog-status (113), prog-output (1,014) and time (223)
+        against two base runs: status 1 changes nothing beyond the messages;
+        the chosen output parts dash and bash in 47 samples, none with ours
+        against both (cd and kill given several words, test ==, all decided
+        or known; and X35); fixed times cut the changes between two runs of
+        those samples from 50 to 32 (the rest: the shells' own clocks,
+        times outside the run's copy).  large-subset-environment.md,
+        section 9 and footnote 2; large-subset-env-variants.tsv.
+      - X35 (ours; fixed as dash, the user, 2026-11-08): unset of a word that
+        is not a name (from an expansion; the parser rejects a literal one)
+        did nothing with status 0.  Now, as dash, it stops the shell with
+        "unset: WORD: bad variable name" and status 2, the names before it
+        already unset; unset -f takes any word.  bash takes such a word for a
+        function's name.  6 strings in t/batteries/largebattery.txt.
+      - large-subset-runcompare.pl -run RUNLIB: ours goes through Run (as
+        where there is neither posix_spawn nor fork: M2, the primitive
+        system1), PROC_SPAWNER_MISSING="posix_spawn fork" for ours alone;
+        t/try.pl takes the names in TRY_HIDE out of the environment once the
+        modules are loaded, so that the samples do not see it.
+      - The whole snippet library through Run (the user, 2026-11-08): run
+        twice in the same environment (-env tmp,random,mtime), ours through
+        posix_spawn and ours through Run 0.07 (-run): the tables agree, and
+        sample by sample ours changed in 53, all by timing, process IDs or
+        clocks (49 of them with the shells changing too); no difference comes
+        from Run, so no Run bug to fix.  Run's tests and Proc-Spawner's suite
+        through Run (also RUN_AS_WIN32=1) pass.  large-subset-state.md,
+        section 7, "Through Run".
+      - A1(b) (the user, 2026-11-08): the run-time comparison redone with a
+        fresh /tmp, a fixed /dev/urandom and fixed file times (-env
+        tmp,random,mtime) replaces post4-0.04's table: same 15,861 (15,751),
+        messages only 23,311 (23,396), ours differs 3 (7), the shells differ
+        1,220 (1,239), timeouts 15 (17).  The 3: printf -v (2, Q2) and echo
+        into a broken pipe in a subshell (1); of post4-0.04's other 4,
+        printf '%0.s-' now agrees (Z0), /dev/urandom agrees, the other 2 were
+        chance.  large-subset-state.md, section 7 (also the external calls),
+        README, large-subset-run-differences.tsv, test-pools.md; the X27
+        cross-check (large-subset-environment.md, section 5) comes out the
+        same.  The atomic-call tables stay those of post4-0.04.
+
 0.09  2026-11-08
       - Since 0.08: what posix_spawn has no option for (rlimit, sigignore,
         nice: M1); no posix_spawn at all (M2): fork and exec, and where there

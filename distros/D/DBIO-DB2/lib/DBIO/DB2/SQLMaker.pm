@@ -4,14 +4,16 @@ package DBIO::DB2::SQLMaker;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::SQLMaker';
 
 
 sub apply_limit {
   my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
 
-  # DB2 5.4+ uses ROW_NUMBER() OVER() for offset support
-  # Older DB2 uses FETCH FIRST n ROWS ONLY (no offset support, requires subquery)
+  # With an offset: ROW_NUMBER() OVER(), the only one of the two that can skip rows
+  # Without one: FETCH FIRST n ROWS ONLY, which cannot express an offset
   if ($offset) {
     return $self->_RowNumberOver($sql, $rs_attrs, $rows, $offset);
   }
@@ -32,7 +34,7 @@ DBIO::DB2::SQLMaker - SQL dialect for IBM DB2
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

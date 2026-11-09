@@ -252,4 +252,294 @@ ok $hybrid_schema->storage->master->storage->isa('DBIO::Storage::DBI::NoBindVars
   is $found->name, 'Replicant F15', 'cursor-holding path read served from replicant';
 }
 
+# ADR 0037: the two engine-fact hooks must be delegated to the master backend
+# like sqlt_type and sql_maker are, or a replicated setup answers them from the
+# generic base class and loses the driver's rendering. except() works on a
+# replicated storage today *because* sqlt_type is delegated, so leaving the
+# hooks out of @writer_methods would make the fix a regression. The statement
+# path results_exist runs on is a read and rides with _select.
+{
+  package DBIO::Test::Storage::ADR0037Backend;
+  our @ISA = ('DBIO::Test::Storage');
+  use mro 'c3';
+  # ADR 0039: one hook for all six set operations, asked with the canonical
+  # operation name. Spelling one of them and refusing another are both
+  # answers a replicated setup has to be able to reach.
+  sub _set_operation_keyword {
+    my ($self, $op) = @_;
+    return 'MINUS' if $op eq 'except';
+    $self->throw_exception('ADR0037Backend has no except_all')
+      if $op eq 'except_all';
+    return $self->next::method($op);
+  }
+  sub _exists_value_sql { "SELECT CASE WHEN EXISTS $_[1] THEN 1 ELSE 0 END FROM DUAL" }
+  # The older member of the same hook family, delegated for the same
+  # reason -- a static class fact the driver owns.
+  sub _random_function  { 'DBMS_RANDOM.VALUE' }
+
+  # ADR 0040: its former companion _explain_sql is now
+  # _explain_query and owns the whole OPERATION, in the shape that forced the
+  # change -- Oracle's EXPLAIN PLAN FOR writes into PLAN_TABLE and returns no
+  # rows, so the plan comes from a second statement. Both go through
+  # _execute_rendered, which the contract requires.
+  sub _explain_query {
+    my ($self, $sql, $bind) = @_;
+    $self->_execute_rendered("EXPLAIN PLAN FOR $sql", $bind);
+    my (undef, $sth) = $self->_execute_rendered(
+      'SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY)', [],
+    );
+    return $sth->fetchall_arrayref;
+  }
+}
+
+{
+  my $adr_schema = DBIO::Test->init_schema(
+    no_deploy => 1,
+    storage_type => {
+      '+DBIO::Replicated::Storage' => {
+        backend_storage_class => 'DBIO::Test::Storage::ADR0037Backend',
+        balancer_type         => 'DBIO::Replicated::Balancer::First',
+      },
+    },
+  );
+
+  my @adr_replicants = $adr_schema->storage->connect_replicants(
+    ['dbi:Test:adr0037_replicant', '', '', { AutoCommit => 1 }],
+  );
+
+  is $adr_schema->storage->_set_operation_keyword('except'), 'MINUS',
+    '_set_operation_keyword is delegated to the master backend (was: the generic EXCEPT)';
+  is $adr_schema->storage->_set_operation_keyword('union'), 'UNION',
+    '... and the operations the master did not override still answer from the base';
+  is $adr_schema->storage->_exists_value_sql('(SELECT 42)'),
+    'SELECT CASE WHEN EXISTS (SELECT 42) THEN 1 ELSE 0 END FROM DUAL',
+    '_exists_value_sql is delegated to the master backend';
+
+  my $adr_rs = $adr_schema->resultset('Artist')
+    ->search(undef, { columns => [qw( artistid name )] });
+
+  like ${ $adr_rs->except($adr_rs)->as_query }->[0], qr/ MINUS /,
+    'except() on a replicated storage still gets the driver keyword';
+
+  # ADR 0039: the delegation carries the REFUSAL too. If it did not, the one
+  # setup that hides the driver behind another storage would be the one that
+  # emits SQL the engine has no operator for.
+  ok !eval { $adr_rs->except_all($adr_rs); 1 },
+    'except_all is refused through a replicated storage as well';
+  like "$@", qr/ADR0037Backend has no except_all/,
+    '... with the master backend\'s own message';
+
+  # Same family, same list. Not a statement path -- it is the
+  # spelling the master's driver dictates -- so it sits with sqlt_type and not
+  # with _select.
+  is $adr_schema->storage->_random_function, 'DBMS_RANDOM.VALUE',
+    '_random_function is delegated to the master backend (was: the base RANDOM())';
+
+  like ${ $adr_schema->resultset('Artist')->rand->as_query }->[0],
+    qr/ORDER BY DBMS_RANDOM\.VALUE/,
+    'rand() on a replicated storage renders the master driver\'s function';
+
+  # ADR 0040: _explain_query is the one member of that family whose
+  # classification FLIPPED. While it only produced a spelling, a writer was
+  # right and the statement still reached the reader through _execute_rendered.
+  # Now that it owns the operation, the same entry would run the EXPLAIN of a
+  # READ query on the master -- undoing that very read routing. It is a reader.
+  #
+  # Two assertions, because there are two ways to get this wrong and each is
+  # invisible to the other:
+  #   * on the writer list, the statements land on the MASTER;
+  #   * on NEITHER list, DBIO::Replicated::Storage answers from the generic
+  #     base class -- one plain "EXPLAIN ..." on the replicant, so the routing
+  #     looks right while the driver's operation is gone.
+  {
+    $adr_replicants[0]->storage->mock_persistent(qr/DBMS_XPLAN/, [ ['Plan hash value'] ]);
+    $adr_schema->storage->master->storage->reset_captured;
+    $adr_replicants[0]->storage->reset_captured;
+
+    my $adr_plan = $adr_schema->resultset('Artist')->search({ name => 'x' })->explain;
+
+    is_deeply $adr_plan, [ ['Plan hash value'] ],
+      'explain() on a replicated storage returns the plan rows';
+
+    is scalar($adr_schema->storage->master->storage->captured_queries), 0,
+      'the EXPLAIN of a read query did NOT go to master (was: _explain_sql was '
+    . 'a writer, and owning the execution would have sent it there)';
+
+    my @adr_plan_stmts = $adr_replicants[0]->storage->captured_queries;
+    is scalar(@adr_plan_stmts), 2,
+      'both statements of the master driver\'s operation ran on the replicant';
+    like $adr_plan_stmts[0]{sql}, qr/^EXPLAIN PLAN FOR SELECT /,
+      '... the driver operation was reached, not the generic base EXPLAIN '
+    . '(which is what an undelegated _explain_query would have produced)';
+    like $adr_plan_stmts[1]{sql}, qr/DBMS_XPLAN/,
+      '... including the second statement core never rendered';
+  }
+
+  # ... and execute_reliably still pins it to the master, like any other read.
+  {
+    $adr_schema->storage->master->storage->mock_persistent(qr/DBMS_XPLAN/, [ ['master plan'] ]);
+    $adr_schema->storage->master->storage->reset_captured;
+    $adr_replicants[0]->storage->reset_captured;
+
+    $adr_schema->storage->execute_reliably(sub {
+      $adr_schema->resultset('Artist')->search({ name => 'x' })->explain;
+    });
+
+    is scalar($adr_schema->storage->master->storage->captured_queries), 2,
+      'execute_reliably routes explain() to the master, like every other read';
+    is scalar($adr_replicants[0]->storage->captured_queries), 0,
+      '... and the replicant saw nothing';
+  }
+
+  # ADR 0040 section 6: _prepare_rendered is the same statement
+  # path stopped one verb short, for an engine whose answer is an attribute of
+  # the PREPARED statement (Firebird's query plan). It rides with the method it
+  # is half of, and -- like _explain_query -- needs its own forwarder on the
+  # Balancer, which is not a storage and has no AUTOLOAD. Both ways of getting
+  # it wrong are quiet: off the Balancer it dies on the read handler, and off
+  # both lists the generic base class answers and the statement goes to
+  # whatever handle that finds, with no error at all.
+  {
+    $adr_schema->storage->master->storage->reset_captured;
+    $adr_replicants[0]->storage->reset_captured;
+
+    my $adr_sth = $adr_schema->storage->_prepare_rendered(
+      'SELECT 1 FROM "artist" WHERE "name" = ?',
+      [ [ { dbic_colname => 'name' }, 'x' ] ],
+    );
+
+    ok $adr_sth, '_prepare_rendered answers through a replicated storage';
+    is scalar($adr_schema->storage->master->storage->captured_queries), 0,
+      '... and the prepare did not go to master outside a transaction';
+
+    my @adr_prepared = $adr_replicants[0]->storage->captured_queries;
+    is scalar(@adr_prepared), 1, '... the replicant received it';
+    is $adr_prepared[0]{op}, 'prepare',
+      '... as a prepare, so nothing was executed on the way to the answer';
+  }
+
+  # Probing a capability on a replicated storage has to ANSWER. The
+  # driver-determination around at the top of DBIO::Storage::DBI guards on the
+  # raw _driver_determined slot, which this class forwarded to its backends and
+  # never set on itself, so every method on that list -- capability probes
+  # included -- span in an unbounded goto loop the moment it was asked.
+  is $adr_schema->storage->_use_supports_upsert, 0,
+    'a capability probe on a replicated storage answers the conservative '
+  . 'default (was: unbounded goto loop)';
+
+  # The capability entry points are delegated now, so this lands on
+  # the master backend -- which is where the answer is read from too. Declare
+  # it here the way an operator would.
+  $adr_schema->storage->_use_supports_exists_query(1);
+
+  $adr_replicants[0]->storage->mock_persistent(qr/CASE WHEN EXISTS/, [ [ 1 ] ]);
+  $adr_schema->storage->master->storage->reset_captured;
+  $adr_replicants[0]->storage->reset_captured;
+
+  is $adr_schema->resultset('Artist')->results_exist, 1,
+    'results_exist runs on a replicated storage (reader delegation of _execute_rendered)';
+
+  my ($replicant_stmt) = $adr_replicants[0]->storage->captured_queries;
+  is scalar($adr_schema->storage->master->storage->captured_queries), 0,
+    'the EXISTS statement did not go to master outside a transaction';
+  is $replicant_stmt->{sql},
+    'SELECT CASE WHEN EXISTS (SELECT 42 FROM "artist" "me") THEN 1 ELSE 0 END FROM DUAL',
+    'the replicant received the master driver\'s rendering, unchanged';
+}
+
+# A capability is a fact about the engine on the other end of a
+# connection. A replicated storage has no driver class and no $dbh of its own,
+# so answering for itself can only ever produce the conservative default -- a
+# plausible-looking lie about the cluster. Both tiers (_use_X declared by the
+# driver, _supports_X probed from the handle) and both directions (get and set)
+# therefore go to the master.
+{
+  package DBIO::Test::Storage::CapBackend;
+  our @ISA = ('DBIO::Test::Storage');
+  # the two ways a driver declares an engine fact
+  __PACKAGE__->_use_supports_upsert(1);
+  sub _determine_supports_supports_upsert_where { 1 }
+}
+
+{
+  my $cap_schema = DBIO::Test->init_schema(
+    no_deploy => 1,
+    storage_type => {
+      '+DBIO::Replicated::Storage' => {
+        backend_storage_class => 'DBIO::Test::Storage::CapBackend',
+        balancer_type         => 'DBIO::Replicated::Balancer::First',
+      },
+    },
+  );
+
+  my @cap_replicants = $cap_schema->storage->connect_replicants(
+    ['dbi:Test:cap_replicant', '', '', { AutoCommit => 1 }],
+  );
+
+  my $cap_storage = $cap_schema->storage;
+
+  # DBIO::Replicated::Storage is not a CapBackend, so its own inherited-accessor
+  # lookup cannot see that class declaration -- a 1 here came from a backend.
+  is $cap_storage->_use_supports_upsert, 1,
+    'a capability declared on the master driver class answers through the '
+  . 'replicated storage (was: the conservative default 0)';
+  is $cap_storage->_supports_supports_upsert_where, 1,
+    'the probed tier is the master\'s too -- _determine_supports_* runs on the '
+  . 'backend that has the handle (was: 0)';
+  is $cap_storage->_use_supports_upsert_where, 1,
+    'the two-tier read falls through to the master as a unit, not half here '
+  . 'and half there (was: 0)';
+
+  # ... and specifically from the MASTER: declared on the master instance only,
+  # so the replicant (same class) still answers the default.
+  $cap_storage->master->storage->_use_supports_if_exists(1);
+  is $cap_replicants[0]->storage->_use_supports_if_exists, 0,
+    'the replicant does not carry this declaration';
+  is $cap_storage->_use_supports_if_exists, 1,
+    'the replicated storage answers with the master\'s value, not the pool\'s '
+  . 'or its own default (was: 0)';
+
+  # A declaration made on the replicated storage has to be readable back from
+  # it. With only the getters delegated it would be written here and read from
+  # the master, and silently lost.
+  $cap_storage->_use_insert_returning(1);
+  is $cap_storage->master->storage->_use_insert_returning, 1,
+    'setting a capability on the replicated storage records it on the master';
+  is $cap_storage->_use_insert_returning, 1,
+    'and reading it back returns what was set (write here / read there closed)';
+
+  # The one entry in the capability group that is NOT an engine fact.
+  # _adjust_select_args_for_complex_prefetch forces join pruning on for the
+  # inner subquery and off again once that {from} is pruned; it used to do so
+  # by local()ising the raw _use_join_optimizer slot, which a delegated read
+  # can no longer see. Assert the decision, not the slot: the second
+  # _prune_unused_joins call of a complex-prefetch rewrite must bail out (empty
+  # aliastype map), because the {from} it is handed was already pruned.
+  is $cap_storage->_use_join_optimizer, 1,
+    'the join-optimizer switch answers through the master like every other '
+  . 'entry in the capability group';
+
+  {
+    my @pruned;
+    no warnings 'redefine';
+    my $orig = \&DBIO::Storage::QueryRewrite::_prune_unused_joins;
+    local *DBIO::Storage::QueryRewrite::_prune_unused_joins = sub {
+      my ($self, @args) = @_;
+      my ($from, $aliastypes) = $orig->($self, @args);
+      push @pruned, ( keys %{ $aliastypes || {} } ) ? 1 : 0;
+      return ($from, $aliastypes);
+    };
+
+    $cap_schema->resultset('CD')->search(
+      { 'artist.name' => 'x' },
+      { join => 'artist', prefetch => 'tracks', rows => 2, order_by => 'me.cdid' },
+    )->as_query;
+
+    is_deeply \@pruned, [ 1, 0 ],
+      'complex prefetch on a replicated storage prunes the inner {from} once '
+    . 'and then leaves it alone (the force-off is dynamically scoped on the '
+    . 'storage doing the rewrite, not borrowed from a delegated capability)';
+  }
+}
+
 done_testing;

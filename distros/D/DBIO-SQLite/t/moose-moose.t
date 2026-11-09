@@ -9,12 +9,15 @@ BEGIN {
     or plan skip_all => 'Moose and MooseX::NonMoose not installed';
 }
 
-use DBIO::Test::Schema::Moose;
+use DBIO::Test::MooseSchema;
 
 # -----------------------------------------------------------------------
 # Connect to in-memory SQLite and deploy
 # -----------------------------------------------------------------------
-my $schema = DBIO::Test::Schema::Moose->connect('dbi:SQLite::memory:', '', '', {
+# the shared schema declares no driver; this use declares SQLite
+my $schema = DBIO::Test::MooseSchema->clone;
+$schema->storage_type('DBIO::SQLite::Storage');
+$schema = $schema->connect('dbi:SQLite::memory:', '', '', {
   quote_names => 0,
 });
 $schema->deploy;
@@ -70,11 +73,11 @@ subtest 'Moose attr does NOT leak into DB columns' => sub {
 
 subtest 'make_immutable is safe' => sub {
   ok(
-    DBIO::Test::Schema::Moose::Result::Artist->meta->is_immutable,
+    DBIO::Test::MooseSchema::Result::Artist->meta->is_immutable,
     'Artist class is immutable'
   );
   ok(
-    DBIO::Test::Schema::Moose::Result::CD->meta->is_immutable,
+    DBIO::Test::MooseSchema::Result::CD->meta->is_immutable,
     'CD class is immutable'
   );
 };

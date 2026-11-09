@@ -9,7 +9,7 @@ use DBIO::SQLite::Test ':DiffSQL';
 
 my $schema = DBIO::SQLite::Test->init_schema();
 
-my @art = $schema->resultset("Artist")->search({ }, { order_by => { -desc => 'name' } });
+my @art = $schema->resultset("Artist")->search({ }, { order_by => { -desc => 'name' } })->all;
 
 is(@art, 3, "Three artists returned");
 
@@ -51,7 +51,7 @@ my $record_fn = $schema->resultset("Artist")->search(undef, { join => 'cds' })->
 
 ok($record_fn, "funny join is okay");
 
-@art = $schema->resultset("Artist")->search({ name => 'We Are In Rehab' });
+@art = $schema->resultset("Artist")->search({ name => 'We Are In Rehab' })->all;
 
 is(@art, 1, "Changed artist returned by search");
 
@@ -59,7 +59,7 @@ is($art[0]->artistid, 3,'Correct artist too');
 
 lives_ok (sub { $art->delete }, 'Cascading delete on Ordered has_many works' );  # real test in ordered.t
 
-@art = $schema->resultset("Artist")->search({ });
+@art = $schema->resultset("Artist")->search({ })->all;
 
 is(@art, 2, 'And then there were two');
 
@@ -75,7 +75,7 @@ $art->insert;
 
 ok($art->in_storage, "Re-created");
 
-@art = $schema->resultset("Artist")->search({ });
+@art = $schema->resultset("Artist")->search({ })->all;
 
 is(@art, 3, 'And now there are three again');
 
@@ -83,7 +83,7 @@ my $new = $schema->resultset("Artist")->create({ artistid => 4 });
 
 is($new->artistid, 4, 'Create produced record ok');
 
-@art = $schema->resultset("Artist")->search({ });
+@art = $schema->resultset("Artist")->search({ })->all;
 
 is(@art, 4, "Oh my god! There's four of them!");
 
@@ -130,11 +130,11 @@ throws_ok {
 
 is($schema->resultset("Artist")->count, 4, 'count ok');
 
-# test find on an unresolvable condition
-is(
-  $schema->resultset('Artist')->find({ artistid => [ -and => 1, 2 ]}),
-  undef
-);
+# test find on an unresolvable condition: no concrete equality covers a
+# unique constraint, so find refuses instead of guessing a row (ADR 0070)
+throws_ok {
+  $schema->resultset('Artist')->find({ artistid => [ -and => 1, 2 ]});
+} qr/find\(\) needs a condition that gives every column of one unique constraint of source 'Artist' a concrete value/;
 
 
 # test find_or_new
@@ -149,7 +149,7 @@ is(
   my $new_obj = $schema->resultset('Artist')->find_or_new({
     artistid => 5,
     name     => 'find_or_new',
-  });
+  }, { key => 'primary' });
 
   is($new_obj->name, 'find_or_new', 'find_or_new: instantiated a new artist');
   is($new_obj->in_storage, 0, 'new artist is not in storage');
@@ -351,7 +351,7 @@ ok($schema->storage(), 'Storage available');
   # test the result source that sets source_name explictly
   ok($schema->source('SourceNameArtists'), 'SourceNameArtists result source exists');
 
-  my @artsn = $schema->resultset('SourceNameArtists')->search({}, { order_by => 'name DESC' });
+  my @artsn = $schema->resultset('SourceNameArtists')->search({}, { order_by => 'name DESC' })->all;
   is(@artsn, 4, "Four artists returned");
 
   # make sure subclasses that don't set source_name are ok
@@ -531,19 +531,22 @@ lives_ok (sub { my $newlink = $newbook->link}, "stringify to false value doesn't
     },
   });
 
-  is($empl_rs->find({name => 'cat1'})->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl1');
-  is($empl_rs->find({name => 'cat2'})->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl2');
-  is($empl_rs->find({name => 'cat3'})->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl3');
+  is($empl_rs->search({name => 'cat1'})->single->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl1');
+  is($empl_rs->search({name => 'cat2'})->single->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl2');
+  is($empl_rs->search({name => 'cat3'})->single->secretkey->encoded, 'REGRUBZEEHC', 'correct secret in database for empl3');
 
 }
 
-# make sure that obsolete handle-based source tracking continues to work for the time being
+# make sure explicit source tracking works: a resultset and a result built
+# straight from a ResultSource object, bypassing $schema->resultset.
+# (core k91 removed the DBIO::ResultSourceHandle indirection and the
+# -source_handle constructor argument; the source itself is now passed around)
 {
-  my $handle = $schema->source('Artist')->handle;
+  my $rsrc = $schema->source('Artist');
 
   my $rowdata = { $schema->resultset('Artist')->next->get_columns };
 
-  my $rs = DBIO::ResultSet->new($handle);
+  my $rs = DBIO::ResultSet->new($rsrc);
   my $rs_result = $rs->next;
   isa_ok( $rs_result, 'DBIO::Test::Artist' );
   is_deeply (
@@ -552,7 +555,7 @@ lives_ok (sub { my $newlink = $newbook->link}, "stringify to false value doesn't
     'Correct columns retrieved (rset/source link healthy)'
   );
 
-  my $row = DBIO::Test::Artist->new({ -source_handle => $handle });
+  my $row = DBIO::Test::Artist->new({ -result_source => $rsrc });
   is_deeply(
     { $row->get_columns },
     {},

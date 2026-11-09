@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.11.0';
+our $VERSION = '3.11.1';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -629,16 +629,31 @@ sub _stream_p {
             error => 'object storage refused the download link with status ' . $res->code,
         }) unless $res->code == 200;
 
-        # A body that stops early reaches Perl as an ordinary end of stream: the
-        # status was 200 and Mojo reports no error, so without this a half
-        # transfer is a short file nobody notices.
-        my $declared = $res->headers->content_length;
-        die VPNDetection::Error->new(
-            kind => 'network',
-            message => "the transfer ended after $received of $declared bytes",
-        ) if defined $declared && length $declared && $declared != $received;
+        # Before Mojolicious 9.54 a body that stops early reaches Perl as an
+        # ordinary end of stream: the status was 200 and Mojo reports no error,
+        # so without this a half transfer is a short file nobody notices.
+        my $short = _short_transfer($res, $received);
+        die $short if $short;
         return $received;
+    }, sub {
+        my $error = shift;
+        # From 9.54 the same body rejects as `Premature connection close`, which
+        # says nothing of how far it got, so the lengths are added to it.
+        my $short = _short_transfer($tx->res, $received, $error);
+        die $short // $error;
     });
+}
+
+# The error for a 200 whose body stopped short of the length it declared, or
+# undef when it did not. $cause is what Mojo rejected it with, when it did.
+sub _short_transfer {
+    my ($res, $received, $cause) = @_;
+    my $declared = $res->headers->content_length;
+    return undef
+        unless ($res->code || 0) == 200 && defined $declared && length $declared && $declared != $received;
+    my $message = "the transfer ended after $received of $declared bytes";
+    $message .= ': ' . (ref $cause ? $cause->message : $cause) if defined $cause;
+    return VPNDetection::Error->new(kind => 'network', message => $message);
 }
 
 # request_timeout bounds the WHOLE response and Mojo::UserAgent has no

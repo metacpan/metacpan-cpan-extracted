@@ -4,14 +4,31 @@ package DBIO::MySQL::EV::TestHarness;
 use strict;
 use warnings;
 
-use Carp 'croak';
+our $VERSION = '0.900004';
+
+use base 'DBIO::Test::AsyncHarness';
+
 use namespace::clean;
 
 
+__PACKAGE__->harness_env_prefix('DBIO_TEST_MYSQL');
+__PACKAGE__->harness_async_mode('ev');
+__PACKAGE__->harness_required_modules([qw( EV EV::MariaDB )]);
+__PACKAGE__->harness_schema_class('DBIO::MySQL::EV::TestHarness::_Schema');
+
 # The default schema class used when the caller supplies none: an ordinary sync
-# MySQL schema. The 'dbi:mysql:'/'dbi:MariaDB:' DSN auto-detects
-# DBIO::MySQL::Storage, which registers the 'ev' async mode; no result sources
-# are needed because the harness exercises connection-level SQL, not the ORM.
+# MySQL schema. Its MySQL component declares DBIO::MySQL::Storage at connect,
+# and that storage registers the 'ev' async mode; no result sources are needed
+# because the harness exercises connection-level SQL, not the ORM.
+#
+# 'MySQL::EV' is loaded ALONGSIDE the driver component deliberately, and is not
+# what makes the connection async -- { async => 'ev' } at connect is (ADR 0030).
+# DBIO::MySQL::EV is an inert marker (ADR 0032 section 7, karr k14): it defines
+# no methods and no connection() hook, so loading it must change nothing. Doing
+# it here is the one place that claim is exercised against a REAL server -- a
+# marker that ever regained a storage_type pin would break these live tests, not
+# just the offline guard in t/00-load.t. Core's DBIO::Test::AsyncHarness has no
+# default schema of its own precisely because this choice is per driver.
 {
   package DBIO::MySQL::EV::TestHarness::_Schema;
   use base 'DBIO::Schema';
@@ -19,167 +36,112 @@ use namespace::clean;
 }
 
 
-sub live_available {
-  return 0 unless $ENV{DBIO_TEST_MYSQL_DSN};
-  return 0 unless eval { require EV; require EV::MariaDB; 1 };
-  return 1;
-}
-
-
-sub skip_all_unless_live {
-  my $class = shift;
-  return if $class->live_available;
-  require Test::More;
-  Test::More::plan(skip_all =>
-    'Set DBIO_TEST_MYSQL_DSN (and install EV::MariaDB) to run the live EV harness tests');
-}
-
-
 sub new {
   my ($class, %opts) = @_;
+  my $schema_class = $opts{schema_class}
+    // $class->_harness_declaration('harness_schema_class');
+  $opts{storage_type} //= 'DBIO::MySQL::Storage'
+    if _declares_no_driver($schema_class);
+  return $class->SUPER::new(%opts);
+}
 
-  croak 'DBIO::MySQL::EV::TestHarness->new called but no live MySQL DSN / EV::MariaDB '
-      . '-- gate with skip_all_unless_live'
-    unless $class->live_available;
-
-  my $dsn  = $opts{dsn}  // $ENV{DBIO_TEST_MYSQL_DSN};
-  my $user = $opts{user} // $ENV{DBIO_TEST_MYSQL_USER} // '';
-  my $pass = $opts{pass} // $ENV{DBIO_TEST_MYSQL_PASS} // '';
-
-  my $schema_class  = $opts{schema_class} // 'DBIO::MySQL::EV::TestHarness::_Schema';
-  my $connect_attrs = $opts{connect_attrs} // {};
-
-  my $self = bless {
-    dsn          => $dsn,
-    user         => $user,
-    pass         => $pass,
-    schema_class => $schema_class,
-    timeout      => $opts{timeout},
-  }, $class;
-
-  # Connect an ordinary sync schema, opting the connection into the native 'ev'
-  # async mode. The connect actions live on the (owning) sync storage; the
-  # embedded EV backend's pool replays them per connection (karr #18).
-  $self->{schema} = $schema_class->connect(
-    $dsn, $user, $pass,
-    { %$connect_attrs, async => 'ev' },
-  );
-
-  return $self;
+# Core's reading of storage_type (DBIO::Schema::connection): a schema class
+# whose storage class resolves to the generic DBIO::Storage::DBI declares no
+# driver (ADR 0067). Inlined because a core before ADR 0067 has no helper for
+# it. A class that is no schema is left to core to refuse.
+sub _declares_no_driver {
+  my ($schema_class) = @_;
+  return 0 unless defined $schema_class && $schema_class->can('storage_type');
+  my $storage_type = $schema_class->storage_type;
+  my ($storage_class) = ref $storage_type
+    ? $schema_class->_normalize_storage_type($storage_type)
+    : ($storage_type);
+  $storage_class =~ s/^\+//;
+  $storage_class =~ s/^::/DBIO::Storage::/;
+  return $storage_class eq 'DBIO::Storage::DBI';
 }
 
 
-sub schema { $_[0]->{schema} }
-
-
-sub sync_storage { $_[0]->{schema}->storage }
-
-
-sub async { $_[0]->{schema}->storage->async }
-
-
-sub pool { $_[0]->async->pool }
-
-
-sub await {
-  my ($self, $f) = @_;
+sub _tick_loop {
   require EV;
-  local $SIG{ALRM} = sub { croak 'TIMEOUT awaiting Future in EV test harness' };
-  alarm($self->{timeout} || 30);
-  EV::run(EV::RUN_ONCE()) until $f->is_ready;
-  alarm 0;
-  return $f->get;
+  EV::run(EV::RUN_ONCE());
 }
 
+my %SESSION_SUM;
+my $COUNTING;
+my @SESSION_COUNTERS = qw( Com_begin Com_commit Com_rollback Com_stmt_prepare Com_stmt_close );
+my $SESSION_SQL = 'SHOW SESSION STATUS WHERE Variable_name IN ('
+  . join(', ', map { "'$_'" } @SESSION_COUNTERS) . ')';
 
-sub warm_pool {
-  my $self = shift;
-  my $pool = $self->pool;
-  my @conns = map { $self->await($pool->acquire) } 1 .. $pool->max_size;
-  $self->_await_connected($_) for @conns;
-  $pool->release($_) for @conns;
-  return;
-}
+sub count_session_status {
+  return if $COUNTING++;
+  require DBIO::MySQL::EV::Storage;
+  no warnings 'redefine';
+  my $orig = \&DBIO::MySQL::EV::Storage::_reset_pool_connection;
+  *DBIO::MySQL::EV::Storage::_reset_pool_connection = sub {
+    my ($self, $conn) = @_;
+    my $tid = eval { $conn->thread_id };
 
-# Drive the EV loop until $conn reports connected. is_connected is the canonical
-# readiness gate for an EV::MariaDB handle -- the same one the pool-connect
-# replay uses in DBIO::MySQL::EV::Storage::_run_pool_connect_statement. Guarded
-# by the same wall-clock alarm as await so a connection that never comes up
-# fails loudly instead of spinning forever.
-sub _await_connected {
-  my ($self, $conn) = @_;
-  require EV;
-  local $SIG{ALRM} = sub { croak 'TIMEOUT awaiting EV::MariaDB connect in EV test harness' };
-  alarm($self->{timeout} || 30);
-  EV::run(EV::RUN_ONCE()) until $conn->is_connected;
-  alarm 0;
-  return $conn;
-}
+    # EV::MariaDB takes no reset behind a query queued on the wire, so the
+    # reading is answered first and the reset follows from an idle watcher
+    # (outside the callback, like every settling of the transport). A handle
+    # with a statement in flight is reset as it is.
+    return $self->$orig($conn) unless defined $tid && !eval { $conn->pending_count };
 
-
-sub query_on {
-  my ($self, $conn, $sql, $bind) = @_;
-  return $self->async->_query_async_pinned($conn, $sql, $bind // []);
-}
-
-
-sub run_on_each_pooled_connection {
-  my ($self, $n, $code) = @_;
-  croak 'run_on_each_pooled_connection($n, $code): $code must be a coderef'
-    unless ref $code eq 'CODE';
-
-  my $pool = $self->pool;
-  croak "pool max_size (@{[ $pool->max_size ]}) is smaller than the requested "
-      . "$n connections -- raise pool_size in connect_attrs"
-    if $pool->max_size < $n;
-
-  # Acquire and HOLD $n connections, forcing $n fresh spawns (idle reuse would
-  # skip the spawn -- and thus the replay). Each acquire's spawn drives the
-  # blocking connect-action replay to completion before the Future resolves.
-  # The pool hands off an EV::MariaDB handle before its async connect handshake
-  # has completed (acquire's Future is done immediately), so drive each held
-  # connection to ready before running an op on it -- a bound query's
-  # prepare/execute needs a connected handle (a bindless query would queue, but
-  # not all ops are bindless). See L</_await_connected>.
-  my @conns;
-  for (1 .. $n) {
-    my $conn = $self->await($pool->acquire);
-    $self->_await_connected($conn);
-    push @conns, $conn;
-  }
-
-  # Distinctness guard: $n held connections must be $n different objects.
-  my %seen;
-  $seen{ $_ }++ for @conns;
-  croak "expected $n distinct pooled connections, got @{[ scalar keys %seen ]} "
-      . '-- a spawn did not happen, so the replay was not exercised per connection'
-    unless keys %seen == $n;
-
-  my @results;
-  my $err;
-  {
-    local $@;
-    eval {
-      # Capture each connection's resolved list as an arrayref so multi-row
-      # results do not flatten together across connections.
-      push @results, [ $self->await($code->($_, $self)) ] for @conns;
+    my $outer = $self->future_class->new;
+    my ($ok, $idle, $held);
+    my $reset = sub {
+      $idle = EV::idle(sub {
+        undef $idle;
+        my $f = $held = eval { $self->$orig($conn) } || $self->future_class->fail($@);
+        $f->on_ready(sub {
+          my ($inner) = @_;
+          undef $held;
+          $inner->is_cancelled ? $outer->cancel
+            : $inner->is_failed ? $outer->fail($inner->failure)
+            : $outer->done($inner->get);
+        });
+      });
+    };
+    $ok = eval {
+      $conn->query($SESSION_SQL, sub {
+        my ($rows, $err) = @_;
+        $SESSION_SUM{$tid}{ $_->[0] } += $_->[1] for $err ? () : @{ $rows || [] };
+        $reset->();
+      });
       1;
-    } or $err = $@;
-  }
-
-  # Always release the held connections back to the pool, even on failure.
-  $pool->release($_) for @conns;
-
-  croak $err if defined $err;
-  return @results;
+    };
+    $reset->() unless $ok;
+    return $outer;
+  };
+  return;
 }
 
+sub session_status {
+  my ($self, $conn) = @_;
+  require Time::HiRes;
+  my $tick = EV::timer(0.02, 0.02, sub {});   # RUN_ONCE never blocks for long
+  my $deadline = Time::HiRes::time() + 10;
+  my $busy = sub {
+    return $self->pool->_connection_is_resetting($conn) || eval { $conn->pending_count };
+  };
+  while ($busy->()) {
+    return if Time::HiRes::time() > $deadline;
+    $self->_tick_loop;
+  }
 
-sub disconnect {
-  my $self = shift;
-  eval { $self->async->disconnect };
-  eval { $self->{schema}->storage->disconnect } if $self->{schema};
-  return;
+  my $tid = eval { $conn->thread_id } // return;
+  my ($rows, $err, $done);
+  eval { $conn->query($SESSION_SQL, sub { ($rows, $err) = @_; $done = 1 }); 1 } or return;
+  until ($done) {
+    return if Time::HiRes::time() > $deadline;
+    $self->_tick_loop;
+  }
+  return if $err || !$rows;
+
+  my %status = map { ($_ => $SESSION_SUM{$tid}{$_} // 0) } @SESSION_COUNTERS;
+  $status{ $_->[0] } += $_->[1] for @$rows;
+  return \%status;
 }
 
 1;
@@ -196,7 +158,7 @@ DBIO::MySQL::EV::TestHarness - Reusable live-MySQL harness for EV async on_conne
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -224,6 +186,18 @@ version 0.900001
       for @tags;
 
   $h->disconnect;
+
+  # A schema class without a driver gets the MySQL driver ...
+  my $shared = DBIO::MySQL::EV::TestHarness->new(
+      schema_class => 'DBIO::Test::Schema',
+  );
+
+  # ... or the storage_type passed here.
+  my $mariadb = DBIO::MySQL::EV::TestHarness->new(
+      schema_class => 'DBIO::Test::Schema',
+      storage_type => 'DBIO::MySQL::Storage::MariaDB',
+  );
+
   done_testing;
 
 =head1 DESCRIPTION
@@ -235,166 +209,88 @@ schema, reach the embedded async backend + its pool, drive the EV loop -- and,
 crucially, provides the one thing an C<on_connect>-replay test needs and cannot
 get from a directly-constructed storage: an EV async backend B<wired to an
 owning sync storage> whose C<on_connect_do> / C<on_connect_call> actually replay
-on every freshly-spawned pool connection (karr #18 / core #68).
+on every freshly-spawned pool connection.
+
+None of that is MySQL-specific, so it is B<not implemented here>:
+the whole surface -- L<DBIO::Test::AsyncHarness/live_available>,
+L<DBIO::Test::AsyncHarness/skip_all_unless_live>, L<DBIO::Test::AsyncHarness/new>,
+C<schema>, C<sync_storage>, C<async>, C<pool>, C<timeout>, C<await>, C<query_on>,
+C<warm_pool>, C<run_on_each_pooled_connection> and C<disconnect> -- is inherited
+from L<DBIO::Test::AsyncHarness>, which grew out of the two
+copies C<dbio-postgresql-ev> and this distribution had each written by hand.
+What is left here is what core cannot know: four declarations, the seam that
+turns the EV loop, a default schema class, and the driver (L</new>).
+
+The harness declares the MySQL driver itself (core ADR 0067 section 4: a
+driver's test helper declares its own driver by default). A schema class that
+declares no driver -- the shared L<DBIO::Test::Schema> -- is connected as a
+clone with C<storage_type> L<DBIO::MySQL::Storage>, and the class itself stays
+undeclared. A C<storage_type> passed to L</new> wins over that default.
 
 It ships under C<lib/> (not C<t/>) on purpose: it is consumed both by this
 distribution's own live tests B<and> by downstream extension distributions,
 which cannot see another dist's C<t/lib>. An extension that carries a
 develop/recommends dependency on L<DBIO::MySQL::EV> reaches this class from its
-own C<t/>.
+own C<t/>; see L<DBIO::Test::AsyncHarness/REUSE BY AN EXTENSION>.
 
 =head1 METHODS
-
-=head2 live_available
-
-  DBIO::MySQL::EV::TestHarness->live_available or ...;
-
-Class method. True when C<DBIO_TEST_MYSQL_DSN> is set B<and> L<EV::MariaDB> (and
-L<EV>) can be loaded -- i.e. the live harness can run.
-
-=head2 skip_all_unless_live
-
-  DBIO::MySQL::EV::TestHarness->skip_all_unless_live;
-
-Class method. When the live harness is unavailable (see L</live_available>),
-calls C<< Test::More->plan(skip_all => ...) >>, which skips and exits the test
-file cleanly. A no-op when live testing is available.
 
 =head2 new
 
   my $h = DBIO::MySQL::EV::TestHarness->new(%opts);
 
-Connect an C<< { async => 'ev' } >> schema and build its embedded async backend.
-Options:
+L<DBIO::Test::AsyncHarness/new>, with the driver declared by default: when
+C<schema_class> (or the default schema class) declares no driver -- its
+C<storage_type> is the generic L<DBIO::Storage::DBI> -- and no C<storage_type>
+is passed, C<storage_type> is L<DBIO::MySQL::Storage>. A passed C<storage_type>
+is handed on as it is. A schema class that declares its driver is left alone:
+its C<storage_type> (a storage subclass, a shortcut) stands. A driver
+component such as L<DBIO::MySQL> sets its own storage class at connect, over
+any C<storage_type> the harness hands on -- also over a passed one.
 
-=over 4
+A core from before ADR 0067 ignores C<storage_type>; there the schema class is
+connected as before.
 
-=item * C<dsn> / C<user> / C<pass> -- connect info; default to
-C<DBIO_TEST_MYSQL_DSN> / C<DBIO_TEST_MYSQL_USER> / C<DBIO_TEST_MYSQL_PASS>.
+=head2 _tick_loop
 
-=item * C<schema_class> -- the schema class to connect (default a generic sync
-MySQL schema). Supply your own to register storage layers / components (this is
-how an extension injects its behaviour).
+Turns the EV loop for one iteration -- the single transport-specific seam
+L<DBIO::Test::AsyncHarness/await> drives until a Future is ready. L<EV> is
+guaranteed loaded by then: it is in
+L<DBIO::Test::AsyncHarness/harness_required_modules>, and
+L<DBIO::Test::AsyncHarness/new> croaks unless every one of those loads.
 
-=item * C<connect_attrs> -- extra connect attributes merged into the
-C<< { async => 'ev', ... } >> attrs hash, e.g. C<on_connect_do>,
-C<on_connect_call>, C<pool_size>. These are exactly the actions replayed on each
-pooled connection.
+=head2 session_status
 
-=item * C<timeout> -- wall-clock seconds L</await> waits before failing loudly
-(default 30).
+  DBIO::MySQL::EV::TestHarness->count_session_status;   # once, before the first borrow
+  my $status = $h->session_status($conn);               # { Com_stmt_prepare => 12, ... }
 
-=back
+The status counters of the one session behind a pooled connection, from its
+spawn on. The pool ends a borrow with C<COM_RESET_CONNECTION>, which sets a
+session's counters back to zero (core ADR 0079), so a plain
+C<SHOW SESSION STATUS> sees the current borrow only.
+L</count_session_status> wraps the transport's
+C<_reset_pool_connection>: it reads C<SHOW SESSION STATUS> on the connection
+itself, right ahead of the reset on the same wire, and adds the reading up
+per C<thread_id>. C<session_status> answers that sum plus the session's current
+reading, for C<Com_begin>, C<Com_commit>, C<Com_rollback>, C<Com_stmt_prepare>
+and C<Com_stmt_close>. Only the session's own statements are counted, so other
+clients of the server do not move the numbers.
 
-Croaks unless L</live_available> (call L</skip_all_unless_live> first).
+It waits (10 seconds at most) until the connection is out of its reset and has
+nothing pending, then asks the handle past the pool. It returns undef when the
+session cannot be asked.
 
-=head2 schema
+=head2 count_session_status
 
-The connected schema instance.
-
-=head2 sync_storage
-
-The sync L<DBIO::MySQL::Storage> the schema connected to (the owner of the async
-backend). Forces driver determination on first call.
-
-=head2 async
-
-The embedded async backend (a L<DBIO::MySQL::EV::Storage>, possibly with composed
-extension async layers). Built lazily on first access via the sync storage's
-C<async> resolver, which also wires the owner back-reference.
-
-=head2 pool
-
-The L<DBIO::MySQL::EV::Pool> of the async backend.
-
-=head2 await
-
-  my @result = $h->await($future);
-
-Drive the EV loop until C<$future> is ready, then return its result (dies on a
-failed Future). Guarded by a wall-clock C<alarm> so a hang fails loudly instead
-of spinning forever.
-
-=head2 warm_pool
-
-  $h->warm_pool;
-
-Drive B<every> pool connection through its EV::MariaDB connect handshake to
-ready, then release them all back to the idle pool. The pool hands off a
-freshly-spawned connection before its async connect has completed
-(L<DBIO::Storage::PoolBase/acquire> resolves immediately), and a bound query's
-C<prepare>/C<execute> needs an already-connected handle. A pooled C<*_async>
-op (e.g. C<< $h->async->select_async(...) >>, or an extension async method that
-rides the inherited C<_query_async>) acquires a connection B<internally>, so the
-harness cannot warm it at the call site -- call C<warm_pool> first to guarantee
-every idle connection an C<acquire> can hand back is already connected. Mirrors
-the manual pool pre-warm the raw live tests do by hand. Returns nothing.
-
-=head2 query_on
-
-  my @rows = $h->await( $h->query_on($conn, $sql, \@bind) );
-
-Run C<$sql> on the specific pooled connection C<$conn> (pinned, not released),
-returning a L<Future> of the raw result rows -- the natural way to assert that a
-connect action replayed on B<that> connection. C<$sql> uses C<?> placeholders
-(MySQL native). Returns a Future; wrap with L</await>.
-
-=head2 run_on_each_pooled_connection
-
-  my @results = $h->run_on_each_pooled_connection($n, sub {
-      my ($conn, $harness) = @_;
-      return $harness->query_on($conn, $sql);   # a Future
-  });
-
-The replay-verification seam. Forces C<$n> B<distinct> pool connections to spawn
-by acquiring (and holding) them -- each spawn replays the owner's C<on_connect>
-actions via L<DBIO::MySQL::EV::Storage/_run_pool_connect_statement>. Then runs
-C<$code-E<gt>($conn, $self)> on each held connection, awaits the returned Future,
-releases every connection, and returns one entry per connection (in spawn
-order). Each entry is an B<arrayref> of whatever that connection's Future
-resolved to -- e.g. for a L</query_on> op it is the arrayref of raw result rows,
-so C<< $results[$i][0] >> is connection C<$i>'s first row. Capturing per
-connection as an arrayref keeps multi-row results from flattening across
-connections.
-
-C<$code> must return a L<Future>. Croaks if the pool's C<max_size> is smaller
-than C<$n> (raise C<pool_size> in C<connect_attrs>), or if the pool ever hands
-back a non-distinct connection (which would mean a spawn did not happen and the
-replay was not exercised on a fresh connection).
-
-=head2 disconnect
-
-Tear down the async backend (shutting the pool, which runs the C<on_disconnect>
-actions on each live connection) and the schema storage.
-
-=head1 REUSE BY AN EXTENSION
-
-An async storage extension composes onto this transport via core's storage-layer
-composition (core karr #70); it does not ship its own transport. To live-test
-that its C<on_connect_call> replays on pooled EV connections, an extension reuses
-this harness by supplying its own schema class (carrying the extension's storage
-layer + component) and its own per-connection assertion:
-
-  my $h = DBIO::MySQL::EV::TestHarness->new(
-      schema_class  => 'MyApp::Ext::Schema',
-      connect_attrs => { on_connect_call => 'load_ext', pool_size => 3 },
-  );
-
-  $h->run_on_each_pooled_connection(3, sub {
-      my ($conn, $harness) = @_;
-      return $harness->query_on($conn, q{SELECT @@session.some_var});
-  });
-
-The harness stays generic: it never mentions any extension, exposes the schema /
-sync storage / async backend / pool, and lets the caller add the layer (via
-C<schema_class>) and assert whatever it needs on each pooled connection.
+Installs the wrapper L</session_status> relies on; idempotent, process wide.
+Call it before the first connection is released.
 
 =head1 CAVEAT
 
 This is a B<live> harness: it opens real connections against
 C<DBIO_TEST_MYSQL_DSN>. It is for driver/extension test suites, not production
 code. It is excluded from the mock-only offline discipline by design -- gate
-every consumer with L</skip_all_unless_live>.
+every consumer with L<DBIO::Test::AsyncHarness/skip_all_unless_live>.
 
 =head1 AUTHOR
 

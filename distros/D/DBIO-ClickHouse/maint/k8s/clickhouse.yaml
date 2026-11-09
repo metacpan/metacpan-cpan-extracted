@@ -1,0 +1,86 @@
+# ClickHouse pod for dbio-clickhouse integration / live tests.
+#
+# ClickHouse speaks the MySQL wire protocol on port 9004; dbio-clickhouse rides
+# it via DBD::mysql (standard) or DBD::MariaDB (see docs/adr/0001). There is no
+# native DBD::ClickHouse. The official server image enables mysql_port 9004 in
+# its default config, so no extra config is mounted -- this is deliberately a
+# STOCK server, because the karr k15 verification (DBD::mysql connects and the
+# full suite passes) was measured against exactly this shape. A DBD::MariaDB
+# user needs custom_settings_prefixes registered server-side instead, which
+# this manifest does not ship; see docs/adr/0001.
+# Ports exposed: 8123 (HTTP), 9000 (native TCP), 9004 (MySQL wire).
+#
+# ClickHouse has NO embedded / in-memory mode — a real server is required for
+# any live test (DBIO::ClickHouse::Test->init_schema is gated on
+# DBIO_TEST_CLICKHOUSE_DSN and dies cleanly when unset).
+#
+# RESOURCE DISCIPLINE -- the pod carries resources.limits so it can never
+# starve the host. One run per database at a time, every suite through
+# ../dbio/maint/capped-test, no prove -j: see the "Live testing" section in
+# .claude/rules/.local.dbio-rules.md (installed by `skilletor sync`).
+#
+# Hand the suite this server through DBIO_TEST_CLICKHOUSE_DSN,
+# DBIO_TEST_CLICKHOUSE_DBUSER and DBIO_TEST_CLICKHOUSE_DBPASS (user "dbio",
+# password "dbio", MySQL wire port 9004); the procedure is in the
+# dbio-clickhouse-database skill.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-clickhouse-db
+  labels:
+    app: dbio-clickhouse-db
+    role: dbio-test-db
+spec:
+  containers:
+    - name: clickhouse
+      image: clickhouse/clickhouse-server:25.3
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 2Gi       # ClickHouse respects the cgroup memory limit
+      ports:
+        - containerPort: 8123   # HTTP
+        - containerPort: 9000   # native TCP
+        - containerPort: 9004   # MySQL wire protocol
+      env:
+        - name: CLICKHOUSE_DB
+          value: dbio_test
+        - name: CLICKHOUSE_USER
+          value: dbio
+        - name: CLICKHOUSE_PASSWORD
+          value: dbio
+        - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+          value: "1"
+      readinessProbe:
+        httpGet:
+          path: /ping
+          port: 8123
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        timeoutSeconds: 2
+        failureThreshold: 40
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-clickhouse-db-svc
+spec:
+  selector:
+    app: dbio-clickhouse-db
+  ports:
+    - name: http
+      port: 8123
+      targetPort: 8123
+      protocol: TCP
+    - name: native
+      port: 9000
+      targetPort: 9000
+      protocol: TCP
+    - name: mysql
+      port: 9004
+      targetPort: 9004
+      protocol: TCP

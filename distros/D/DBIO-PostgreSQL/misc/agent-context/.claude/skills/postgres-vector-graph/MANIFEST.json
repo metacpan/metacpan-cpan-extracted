@@ -1,0 +1,321 @@
+{
+  "package": "postgres-vector-graph",
+  "version": "1.0.0",
+  "language": "en",
+  "reviewed_at": "2026-09-30",
+  "baseline": {
+    "postgresql_major": 18,
+    "pgvector": "0.8.6",
+    "apache_age_extension": "1.8.0",
+    "apache_age_release_tag": "PG18/v1.8.0-rc0"
+  },
+  "validation": {
+    "offline_tests_passed": 57,
+    "database_integration_executed": false,
+    "agent_scenarios_executed": false
+  },
+  "hash_algorithm": "SHA-256",
+  "self_excluded": true,
+  "files": [
+    {
+      "path": "LICENSE",
+      "bytes": 1056,
+      "sha256": "1126322e2cc8d165adc4c792eeb195717de2bcc7b39be1ce77959d78e87ef685"
+    },
+    {
+      "path": "README.md",
+      "bytes": 8477,
+      "sha256": "55b601b75e97e3d11ffd80aafe79c9764ad4afc598173dd0999ad7b4904d07ef"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 7019,
+      "sha256": "207caf6c04681a1133ab833b7c9f9ad05f40bb8d9dbaca7978a28dbda2d7fad5"
+    },
+    {
+      "path": "THIRD_PARTY.md",
+      "bytes": 1412,
+      "sha256": "efc869e14562c0cd207b1731c023f2c5e995e65fb6ad398ab7775000aade0fae"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 2593,
+      "sha256": "9d052a57f507cddf1d024c9e3b577496587d21038359cdaf477c7587606b728f"
+    },
+    {
+      "path": "dependencies.json",
+      "bytes": 2521,
+      "sha256": "af6a379c5e23f5847a41ea5938ca95faf5f68b1da85b79dbab61689021c635c5"
+    },
+    {
+      "path": "examples/metrics-input.json",
+      "bytes": 483,
+      "sha256": "60e663e3e4c4b8bff5f071a728e214b10b6b26c51a5d2afb0b514e464f5b8756"
+    },
+    {
+      "path": "examples/python/vector_first_graph.py",
+      "bytes": 7362,
+      "sha256": "7f434f2c4b314ba048f2b012b5e0d962327c824223080cc4faa312fc73ba4efd"
+    },
+    {
+      "path": "examples/sql/00_preflight.sql",
+      "bytes": 1649,
+      "sha256": "968f50f343695ba08c7c5aaf06fa3abb290b5daec997d2238b1b57cf3e97ad78"
+    },
+    {
+      "path": "examples/sql/01_bootstrap.sql",
+      "bytes": 1770,
+      "sha256": "5d0cf7e200d2d655525402eaf3e439ad195ace892a37552a8301c7bc07ce0943"
+    },
+    {
+      "path": "examples/sql/02_schema_and_seed.sql",
+      "bytes": 2456,
+      "sha256": "de3dc338169ac6f9d7e5b46598dcee8ae3a7f65733e0b32fd947c2a60b544512"
+    },
+    {
+      "path": "examples/sql/03_hybrid_fts_vector.sql",
+      "bytes": 1962,
+      "sha256": "e9f06b57f0577b5228b5c7037013e4382faa120141c033f58c8d4df31bfe4f2d"
+    },
+    {
+      "path": "examples/sql/04_graph_seed.sql",
+      "bytes": 1631,
+      "sha256": "b92b2545393e8c5a25a329e30209ac6331c5f2945ab8b3fee02d69974ccdeade"
+    },
+    {
+      "path": "examples/sql/05_graph_first_vector.sql",
+      "bytes": 1198,
+      "sha256": "a69cefc35825612027bd9eee0bea67f576833b347c3f4cd73671a0366e977be1"
+    },
+    {
+      "path": "examples/sql/06_three_way_fusion.sql",
+      "bytes": 2724,
+      "sha256": "de8519bd4904c01592421d9f50ce7eb177e958beb1791b0277d18a602ea837e2"
+    },
+    {
+      "path": "examples/sql/07_atomic_rollback.sql",
+      "bytes": 1831,
+      "sha256": "23881f5cbc47725ac946bc326d815d73e69af20589c0e8e7f6cf5374fc5614e0"
+    },
+    {
+      "path": "examples/sql/08_rls_setup.sql",
+      "bytes": 2669,
+      "sha256": "e919492227aaba794a41fe93d10fce8ddff0e29e72883cd39550a5d8b31c7423"
+    },
+    {
+      "path": "examples/sql/09_rls_assertions.sql",
+      "bytes": 3760,
+      "sha256": "a29600b13da51ff6f07fe4ca6976b6544ad57ae586a0bc0d4c943bc10b0716f9"
+    },
+    {
+      "path": "examples/sql/10_filtered_ann.sql",
+      "bytes": 1634,
+      "sha256": "3523943b35c868901bb196e0c11d5103c3d0de21982566a7e00a126a15811cee"
+    },
+    {
+      "path": "references/INDEX.md",
+      "bytes": 2993,
+      "sha256": "4adcd3fae9f5ed33cef27f4166ee546795c76b9387c874d7f1f9687842170831"
+    },
+    {
+      "path": "references/age/advanced-capabilities.md",
+      "bytes": 2447,
+      "sha256": "566458aa30a948fc1b8e3dfcced76d7217fadd26f286531e1e92ccc9eec89a07"
+    },
+    {
+      "path": "references/age/modeling-indexes-and-ingestion.md",
+      "bytes": 3001,
+      "sha256": "56ac4d699cd44cbb4f81cbdaaf8f9aebebb636c1d6754bbed27f5ea9434a2142"
+    },
+    {
+      "path": "references/age/security-and-rls.md",
+      "bytes": 3201,
+      "sha256": "797028c63d63980fb25477f99f70b18ffe89d5da5e31a0f3948a1e33af95bfd0"
+    },
+    {
+      "path": "references/age/setup-and-cypher.md",
+      "bytes": 2619,
+      "sha256": "d4796cf4e6ae314a60e18d2f71f79236c462cd89cb3d9e56bcf6a5a4dfa541bd"
+    },
+    {
+      "path": "references/age/types-parameters-and-drivers.md",
+      "bytes": 2767,
+      "sha256": "4788ad037ab0089da70889a038283759631a45150f21a62504a966d78aa0277b"
+    },
+    {
+      "path": "references/combinations/architecture-and-identities.md",
+      "bytes": 3693,
+      "sha256": "812404c2bd427dd518bc690a85078c76da497d1be7b5c331affd91a5d185ddc8"
+    },
+    {
+      "path": "references/combinations/consistency-and-outbox.md",
+      "bytes": 3376,
+      "sha256": "cccec58e06cbaa483d4d7f5de1084cff0f47410dec176bea0113b36518c3b96f"
+    },
+    {
+      "path": "references/combinations/graph-first-vector.md",
+      "bytes": 3473,
+      "sha256": "e54f04164a010986016b7002bb10dfc4fd3bfe6221ce5d48ca2ff0b51cc9f727"
+    },
+    {
+      "path": "references/combinations/hybrid-fts-vector.md",
+      "bytes": 3143,
+      "sha256": "abdc1eb10b6962857967faee4b677067fc4eff91651a5a73b2786c7aca735785"
+    },
+    {
+      "path": "references/combinations/three-way-fusion.md",
+      "bytes": 3070,
+      "sha256": "26e22d8f96ba078cb881f8394a8cfca5e0a1f36a7446c6bc8ca60ad382d44bc7"
+    },
+    {
+      "path": "references/combinations/vector-first-graph.md",
+      "bytes": 3319,
+      "sha256": "e64cc10e21ba7bb6528f4044cc9c36ba6b4edd72df5c64a5fbfd977c4c2b2fc0"
+    },
+    {
+      "path": "references/compatibility/version-matrix.md",
+      "bytes": 2929,
+      "sha256": "afb6171c1295c15bf2d7e0fc519217ce05a53639b4eedce202a58e7227e8f41d"
+    },
+    {
+      "path": "references/integrations/companion-skills.md",
+      "bytes": 3944,
+      "sha256": "20b02f41d351460563d1105b4e87dc7021d4084e8d390922bd24664f64f6c11e"
+    },
+    {
+      "path": "references/operations/backup-recovery-upgrades.md",
+      "bytes": 3275,
+      "sha256": "0cf403435eb6ae397c4bf567057c82821f52eb1dc3310a965ecdd2c9127472b0"
+    },
+    {
+      "path": "references/operations/install-build-deploy.md",
+      "bytes": 3069,
+      "sha256": "9cfc96103a994fc0b4d6998f73815439d5990682249dcb8ec86cea20435c4bbe"
+    },
+    {
+      "path": "references/operations/observability-and-benchmarks.md",
+      "bytes": 3235,
+      "sha256": "4b052936e26ac4fc5b65cb82632c52c420e873daf84513343346bb2c851c33d6"
+    },
+    {
+      "path": "references/operations/pooling-and-resource-budgets.md",
+      "bytes": 3277,
+      "sha256": "a47f76923cf96f5bafe916c41646510b1177c7f402c8ba00be1384d3cdfc4ba6"
+    },
+    {
+      "path": "references/operations/troubleshooting.md",
+      "bytes": 3703,
+      "sha256": "529185f5728221ccb430948ee78140615199377e8a1c6bafc5974f82a06d423b"
+    },
+    {
+      "path": "references/pgvector/filtered-ann.md",
+      "bytes": 2640,
+      "sha256": "8b8762cfc9765e48962c5d351c2e12db06edb75c2879f84ac619d1fb0c56f55c"
+    },
+    {
+      "path": "references/pgvector/hnsw-and-ivfflat.md",
+      "bytes": 2667,
+      "sha256": "61df42750de8ace51d2f4004cc640c7d216d5b0e0ac631de631f3e2a748ba3a4"
+    },
+    {
+      "path": "references/pgvector/quantization-and-model-migrations.md",
+      "bytes": 2554,
+      "sha256": "0958e9c884365452a467c78f4696bb926bfc660a5e413e5fbe2365c4fdb09e0e"
+    },
+    {
+      "path": "references/pgvector/types-and-metrics.md",
+      "bytes": 2428,
+      "sha256": "330b9a396f437c98d3aea2b5d24d720893ead02fb4b36058d296100ab63e2c80"
+    },
+    {
+      "path": "references/postgres/full-text-search.md",
+      "bytes": 2232,
+      "sha256": "44d1398e273aa185533b0f762caf18937d060d2c677061c7f8131a56e40b97cb"
+    },
+    {
+      "path": "references/postgres/pg18-baseline.md",
+      "bytes": 2760,
+      "sha256": "82e7205676bc0d7d88a2edc2c09b2b374bf4475022314cc1cc8284fda4b0a388"
+    },
+    {
+      "path": "references/postgres/planner-and-indexes.md",
+      "bytes": 3121,
+      "sha256": "0042106c7f520be86d0a349ffba5c8d92119a9392c44423476dc669ffb7c6e2f"
+    },
+    {
+      "path": "references/postgres/schema-and-integrity.md",
+      "bytes": 2986,
+      "sha256": "fdf99924366f90ce78e99af0d4b1f829633e2b2b8c95346f32e613470af4d832"
+    },
+    {
+      "path": "references/postgres/security-and-rls.md",
+      "bytes": 2558,
+      "sha256": "935e26cdff81597fc7c8f942aa2907f1c577f93d7643128a23834c0782187c84"
+    },
+    {
+      "path": "references/postgres/transactions-and-locking.md",
+      "bytes": 2604,
+      "sha256": "98528e40acfd1d9ad0383f1276fdbfce1bbf3fd9efc438b2b6be1152ca35cb23"
+    },
+    {
+      "path": "references/testing/acceptance-matrix.md",
+      "bytes": 4042,
+      "sha256": "91c02bdd950e9b316932626c9fb2b53ca9a3507a97171e647daa666416ad83e4"
+    },
+    {
+      "path": "scripts/retrieval_metrics.py",
+      "bytes": 7847,
+      "sha256": "79c77874652d7be2f5ea92339cac0a64bd6cf344e496feb3917422aa24ea0f04"
+    },
+    {
+      "path": "scripts/validate_package.py",
+      "bytes": 6250,
+      "sha256": "a4d4c7206dfc646f87eb5ad0e92a2afe980670ab5f350d9209f93be67e892285"
+    },
+    {
+      "path": "sources.json",
+      "bytes": 6142,
+      "sha256": "23b741090bb8e322d601014d948747c2fde234307b1abc24270a59497c324b19"
+    },
+    {
+      "path": "templates/architecture-decision.md",
+      "bytes": 1954,
+      "sha256": "788c63b9e9632cba8c2456ca63ec23de50657c6611cf94eec0a5d258709e7a0c"
+    },
+    {
+      "path": "templates/benchmark-results.csv",
+      "bytes": 233,
+      "sha256": "e5971d70af293ea7e6914c02065ca8f32a1bc6a0de15084eb65c97de8defe93c"
+    },
+    {
+      "path": "templates/environment-fingerprint.json",
+      "bytes": 1410,
+      "sha256": "230dce800bf610e7faa30509a01b29ea78926459d04cf83c0400b01948febda0"
+    },
+    {
+      "path": "templates/review-checklist.md",
+      "bytes": 1602,
+      "sha256": "ae514ca78edd39b4f6a07361f33326799a450970f255d24fa1ae7c5a3ca237ac"
+    },
+    {
+      "path": "tests/offline-results.txt",
+      "bytes": 5187,
+      "sha256": "dc9870c02a501d7102a8108b1321416dc437805559eeb44134d0a9a7f9e348c7"
+    },
+    {
+      "path": "tests/scenarios.json",
+      "bytes": 7712,
+      "sha256": "960641fe535f30164538bdff99d46ac6f508000cf73d26218c58bff69dc67a8e"
+    },
+    {
+      "path": "tests/test_package.py",
+      "bytes": 3538,
+      "sha256": "7d7a1426e9e461587e20d86026bb5b5e4dea2c7ccae841f6cb539b5afea9a75c"
+    },
+    {
+      "path": "tests/test_retrieval_metrics.py",
+      "bytes": 6207,
+      "sha256": "f428712f8cba38f544eaf33fa529843305233bb4751c5da3fea1701ded428122"
+    }
+  ]
+}

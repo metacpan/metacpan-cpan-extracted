@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
-# Regression for karr #44: the desired-state diff must IGNORE attributes the
+# Regression, ADR 0019: the desired-state diff must IGNORE attributes the
 # target (desired) side leaves undef, instead of treating undef as "set to
 # NULL/empty". A portable DBIO schema does not prescribe server-assigned column
 # attributes (charset/collation/server defaults), so the driver leaves those
@@ -53,7 +53,7 @@ sub modify_ops {
 
 # ---------------------------------------------------------------------------
 # (a) target leaves a server-assigned attr undef, live reports a value
-#     -> NO phantom ALTER. This is the bug from karr #44.
+#     -> NO phantom ALTER. This is the bug ADR 0019 records.
 # ---------------------------------------------------------------------------
 {
   my $live = {
@@ -122,7 +122,7 @@ sub modify_ops {
 # Same three directions at the raw changed_fields level WITHOUT any
 # desired_state flag -- the contract must be the DEFAULT, not opt-in. This is
 # the exact shape a driver (e.g. PostgreSQL) uses when it passes its own field
-# spec and forgets the flag; karr #44 requires it to be safe regardless.
+# spec and forgets the flag; ADR 0019 requires it to be safe regardless.
 # ---------------------------------------------------------------------------
 {
   # (a) target undef -> ignored

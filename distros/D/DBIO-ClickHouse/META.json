@@ -1,0 +1,736 @@
+{
+   "abstract" : "ClickHouse-specific schema management for DBIO",
+   "author" : [
+      "DBIO Authors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIO-ClickHouse",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::MariaDB" : "0",
+            "DBD::mysql" : "0"
+         },
+         "requires" : {
+            "Crypt::URandom" : "0",
+            "DBI" : "1.57",
+            "DBIO" : "0.900004",
+            "SQL::Abstract" : "2.000002",
+            "Try::Tiny" : "0.32",
+            "namespace::clean" : "0.27",
+            "perl" : "5.020"
+         },
+         "suggests" : {
+            "ClickHouse::Encoder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         },
+         "suggests" : {
+            "ClickHouse::Encoder" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::MySQL" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIO::ClickHouse" : {
+         "file" : "lib/DBIO/ClickHouse.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::DDL" : {
+         "file" : "lib/DBIO/ClickHouse/DDL.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::DDL::Emit" : {
+         "file" : "lib/DBIO/ClickHouse/DDL/Emit.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Deploy" : {
+         "file" : "lib/DBIO/ClickHouse/Deploy.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Diff" : {
+         "file" : "lib/DBIO/ClickHouse/Diff.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Diff::Column" : {
+         "file" : "lib/DBIO/ClickHouse/Diff/Column.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Diff::Index" : {
+         "file" : "lib/DBIO/ClickHouse/Diff/Index.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Diff::Table" : {
+         "file" : "lib/DBIO/ClickHouse/Diff/Table.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Diff::View" : {
+         "file" : "lib/DBIO/ClickHouse/Diff/View.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Introspect" : {
+         "file" : "lib/DBIO/ClickHouse/Introspect.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Introspect::Columns" : {
+         "file" : "lib/DBIO/ClickHouse/Introspect/Columns.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Introspect::Indexes" : {
+         "file" : "lib/DBIO/ClickHouse/Introspect/Indexes.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Introspect::Tables" : {
+         "file" : "lib/DBIO/ClickHouse/Introspect/Tables.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Introspect::Util" : {
+         "file" : "lib/DBIO/ClickHouse/Introspect/Util.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Native" : {
+         "file" : "lib/DBIO/ClickHouse/Native.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Result" : {
+         "file" : "lib/DBIO/ClickHouse/Result.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::SQLMaker" : {
+         "file" : "lib/DBIO/ClickHouse/SQLMaker.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Storage" : {
+         "file" : "lib/DBIO/ClickHouse/Storage.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Storage::TxnScopeGuard" : {
+         "file" : "lib/DBIO/ClickHouse/Storage/TxnScopeGuard.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test" : {
+         "file" : "lib/DBIO/ClickHouse/Test.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Conformance" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Conformance.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::Hit" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/Hit.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::HotHit" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/HotHit.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::Probe" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/Probe.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::Reading" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/Reading.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::Snapshot" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/Snapshot.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Test::Schema::Unsorted" : {
+         "file" : "lib/DBIO/ClickHouse/Test/Schema/Unsorted.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::ClickHouse::Util" : {
+         "file" : "lib/DBIO/ClickHouse/Util.pm",
+         "version" : "0.900004"
+      },
+      "DBIO::Shortcut::ch" : {
+         "file" : "lib/DBIO/Shortcut/ch.pm",
+         "version" : "0.900004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/dbio/dbio-clickhouse/issues"
+      },
+      "homepage" : "https://codeberg.org/dbio/dbio-clickhouse",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/dbio/dbio-clickhouse.git",
+         "web" : "https://codeberg.org/dbio/dbio-clickhouse"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dbio"
+   },
+   "version" : "0.900004",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.040001"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::SetMeta",
+            "name" : "@DBIO/DBIO::SetMeta",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     ".karr",
+                     "MANIFEST",
+                     "META.json",
+                     "META.yml",
+                     "README",
+                     "README.md"
+                  ],
+                  "exclude_match" : [],
+                  "include_dotfiles" : 1,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : 0
+               }
+            },
+            "name" : "@DBIO/Git::GatherDir",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::LicenseFile",
+            "name" : "@DBIO/DBIO::LicenseFile",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::GatherSkills",
+            "name" : "@DBIO/DBIO::GatherSkills",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@DBIO/ShareDir",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@DBIO/GatherAgentContext",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@DBIO/MetaJSON",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@DBIO/MetaYAML",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@DBIO/MetaConfig",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.040"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000038",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@DBIO/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
+            "name" : "@DBIO/Prereqs::FromCPANfile",
+            "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/pluginbundle version",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":InstallModules"
+                  ],
+                  "global" : 1,
+                  "skip_version_provider" : 0
+               },
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
+            },
+            "name" : "@DBIO/@Git::VersionManager/RewriteVersion::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Update",
+            "name" : "@DBIO/@Git::VersionManager/MetaProvides::Update",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::CopyFilesFromRelease" : {
+                  "filename" : [
+                     "Changes"
+                  ],
+                  "match" : []
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/CopyFilesFromRelease",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%V%n%n%c",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/release snapshot",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "v0.900004",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/Git::Tag",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               },
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : {}
+            },
+            "name" : "@DBIO/@Git::VersionManager/BumpVersionAfterRelease::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@DBIO/@Git::VersionManager/NextRelease",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "increment $VERSION after %v release",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Build.PL",
+                     "Changes",
+                     "Makefile.PL"
+                  ],
+                  "allow_dirty_match" : [
+                     "(?^:^lib/.*\\.pm$)"
+                  ],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/post-release commit",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugins" : [
+                     "@DBIO"
+                  ],
+                  "finder" : [
+                     ":InstallModules",
+                     ":PerlExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@DBIO/SingleEncoding",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@DBIO/Name",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@DBIO/Version",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@DBIO/Prelude",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@DBIO/Synopsis",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@DBIO/Description",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@DBIO/Overview",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@DBIO/Stability",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@DBIO/Attributes",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@DBIO/Methods",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@DBIO/Leftovers",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@DBIO/Postlude",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@DBIO/SeeAlso",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@DBIO/Authors",
+                        "version" : "4.022"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@DBIO/Legal",
+                        "version" : "4.022"
+                     }
+                  ]
+               }
+            },
+            "name" : "@DBIO/PodWeaver",
+            "version" : "4.010"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
+            "name" : "@DBIO/DBIO::CoverageTest",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::PodCheckerTest",
+            "name" : "@DBIO/DBIO::PodCheckerTest",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@DBIO/ExtraTests",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@DBIO/MakeMaker",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@DBIO/Readme",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@DBIO/ManifestSkip",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@DBIO/Manifest",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CodebergMeta",
+            "name" : "@DBIO/DBIO::CodebergMeta",
+            "version" : "0.900004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@DBIO/MetaResources",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes",
+                     "cpanfile",
+                     "dist.ini"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@DBIO/Git::Check",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@DBIO/Git::CheckFor::CorrectBranch",
+            "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@DBIO/TestRelease",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@DBIO/Test::ChangesHasContent",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallRelease",
+            "name" : "@DBIO/InstallRelease",
+            "version" : "0.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@DBIO/ConfirmRelease",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@DBIO/UploadToCPAN",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@DBIO/Git::Push",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@DBIO/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.040"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "6.040"
+      }
+   },
+   "x_generated_by_perl" : "v5.40.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

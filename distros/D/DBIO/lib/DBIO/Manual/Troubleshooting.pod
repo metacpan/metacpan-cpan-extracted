@@ -13,7 +13,7 @@ DBIO::Manual::Troubleshooting - Troubleshooting common DBIO problems
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head2 "Can't locate storage blabla"
 
@@ -28,17 +28,36 @@ SQL tracing, so to see what is happening try
 
   export DBIO_TRACE=1
 
-Alternatively use the C<< storage->debug >> class method:-
+C<DBIO_TRACE=1> shows the statement. C<DBIO_TRACE=2> adds the bind values, each
+one run through the C<redact_bind_value> hook and cut to 32 characters (C<...>
+marks the cut), C<undef> as C<NULL>:-
 
-  $schema->storage->debug(1);
+  export DBIO_TRACE=2
+
+Alternatively use the C<< storage->debug >> method, which holds the level:-
+
+  $schema->storage->debug(1);   # statement
+  $schema->storage->debug(2);   # statement and binds
 
 To send the output somewhere else set debugfh:-
 
-  $schema->storage->debugfh(IO::File->new('/tmp/trace.out', 'w'));
+  $schema->storage->debugfh(IO::File->new('./dbio-trace.out', 'w'));
 
 Alternatively you can do this with the environment variable, too:-
 
-  export DBIO_TRACE="1=/tmp/trace.out"
+  export DBIO_TRACE="1=./dbio-trace.out"
+
+C<N=/path> keeps the level N, so C<2=./dbio-trace.out> writes the binds too.
+
+=head2 What an error text contains
+
+The text of a failed statement carries the statement and the number of its
+bind values (C<[for Statement "..." with 3 bind values]>), never the values.
+C<ShowErrorStatement> is off on every handle DBIO opens, whatever connect_info
+says. A value the code writes as a literal into the SQL is part of the
+statement text. The text the server writes about the error is the driver's
+business. Exceptions belong in a log; show a client a message of your own,
+not the exception.
 
 =head2 Can't locate method result_source_instance
 
@@ -48,17 +67,13 @@ isolation, then try loading the full schema again.
 
 =head2 Can't get last insert ID under Postgres with serial primary keys
 
-Older L<DBI> and L<DBD::Pg> versions do not handle C<last_insert_id>
-correctly, causing code that uses auto-incrementing primary key
+A L<DBI> or L<DBD::Pg> that does not handle C<last_insert_id>
+correctly causes code that uses auto-incrementing primary key
 columns to fail with a message such as:
 
-  Can't get last insert id at /.../DBIO/Row.pm line 95
+  Can't get last insert id
 
-In particular the RHEL 4 and FC3 Linux distributions both ship with
-combinations of L<DBI> and L<DBD::Pg> modules that do not work
-correctly.
-
-L<DBI> version 1.50 and L<DBD::Pg> 1.43 are known to work.
+Use a current L<DBI> and L<DBD::Pg>.
 
 =head2 Can't locate object method "source_name" via package
 
@@ -125,39 +140,6 @@ The above should be written as:
 
 For more ways to express order clauses refer to
 L<SQL::Abstract/ORDER BY CLAUSES>
-
-=head2 Perl Performance Issues on Red Hat Systems
-
-There is a problem with slow performance of certain DBIO
-operations using the system perl on some Fedora and Red Hat Enterprise
-Linux system (as well as their derivative distributions such as Centos,
-White Box and Scientific Linux).
-
-Distributions affected include Fedora 5 through to Fedora 8 and RHEL5
-up to and including RHEL5 Update 2. Fedora 9 (which uses perl 5.10) has
-never been affected - this is purely a perl 5.8.8 issue.
-
-As of September 2008 the following packages are known to be fixed and so
-free of this performance issue (this means all Fedora and RHEL5 systems
-with full current updates will not be subject to this problem):-
-
-  Fedora 8     - perl-5.8.8-41.fc8
-  RHEL5        - perl-5.8.8-15.el5_2.1
-
-This issue is due to perl doing an exhaustive search of blessed objects
-under certain circumstances.  The problem shows up as performance
-degradation exponential to the number of L<DBIO> result objects in
-memory, so can be unnoticeable with certain data sets, but with huge
-performance impacts on other datasets.
-
-A pair of tests for susceptibility to the issue and performance effects
-of the bless/overload problem can be found in the L<DBIO> test
-suite, in the C<t/99rh_perl_perf_bug.t> file.
-
-Further information on this issue can be found in
-L<https://bugzilla.redhat.com/show_bug.cgi?id=379791>,
-L<https://bugzilla.redhat.com/show_bug.cgi?id=460308> and
-L<http://rhn.redhat.com/errata/RHBA-2008-0876.html>
 
 =head2 Excessive Memory Allocation with TEXT/BLOB/etc. Columns and Large LongReadLen
 

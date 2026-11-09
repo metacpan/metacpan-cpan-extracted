@@ -1,0 +1,4 @@
+Data::TagListMatcher
+-----------------
+
+THis module allows matching a set of rules against a set of tags to calculate properties.

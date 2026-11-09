@@ -3,7 +3,7 @@ package Validator::LIVR::Rules::DateTime;
 use strict;
 use warnings;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # LIVR 2.5: dates with bounds, datetimes and times. Grammars use ASCII digits only and match the
 # whole value: \z, not $, which also matches before a trailing newline

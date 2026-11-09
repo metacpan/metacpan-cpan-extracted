@@ -89,28 +89,69 @@ my $POOL_SIZE = 16;
 my $storage = DBIO::MySQL::EV::Storage->new(undef);
 $storage->connect_info([ { %conninfo, pool_size => $POOL_SIZE }, {} ]);
 
-# The pool returns a done Future IMMEDIATELY from acquire — it hands off the
-# EV::MariaDB handle, but the handle is not yet connected at the protocol
-# level (server_version is 0). We pump EV::run until the connect handshake
-# completes (signalled by server_version becoming non-zero).
-my @warm_conns;
+# The pool returns a PENDING Future from acquire under EV::MariaDB — the
+# EV::MariaDB handle is constructed synchronously by DBIO::MySQL::EV::Pool
+# (EV::MariaDB->new does not block on connect), but its on_connect handshake
+# has not completed yet, and the per-connection readiness Future registered
+# when the pool builds the connection stays PENDING until EV::run drives
+# EV::MariaDB's connect callback. Per PoolBase's _connection_ready_future POD
+# an async transport MUST be gated there; DBIO::MySQL::EV::Pool gets that
+# gate by building its connections through core's _create_ready_connection
+# (karr k33 -- it used to write the same wiring by hand). Calling ->get on a
+# PENDING Future (without ->await support) croaks — the original test
+# asserted the wrong contract, hence this fix.
+#
+# We acquire all $POOL_SIZE slots up front (spawning $POOL_SIZE EV::MariaDB
+# objects in a tight loop with no EV::run between them — the spawn is
+# synchronous), then pump EV::run until every handle has completed its
+# connect handshake, signalled by server_version becoming non-zero. This
+# is the protocol-level proof that the conn is actually usable for
+# queries; ->is_ready alone is not enough — a failed acquire Future is
+# also ->is_ready (true), and ->get on a failed Future re-throws.
+my @warm_futures;
 for my $slot (1 .. $POOL_SIZE) {
   my $warm = $storage->pool->acquire;
-  ok $warm->is_ready, "pool slot $slot: pool->acquire returns a ready Future synchronously (handle handed off)";
-  my $warm_conn = $warm->get;
-  isa_ok $warm_conn, 'EV::MariaDB', "pool slot $slot: acquired handle is an EV::MariaDB";
-  push @warm_conns, $warm_conn;
+  ok !$warm->is_ready,
+    "pool slot $slot: pool->acquire returns a PENDING Future "
+    . '(EV transport readiness gate in effect; see '
+    . 'PoolBase::_connection_ready_future POD)';
+  push @warm_futures, $warm;
 }
 
 # Drive EV::run until ALL warm-up conns complete their connect handshake.
+# As each acquire Future settles, pull the handle out (Future->get on a
+# failed Future re-throws — we trap with eval so a single slot's failure
+# does not abort the whole pump; the gate predicate still catches it via
+# server_version remaining 0).
+my @warm_conns;
 my $pumped = pump_until(sub {
-  scalar(grep { $_->server_version && $_->server_version > 0 } @warm_conns) == $POOL_SIZE
-});
+  for my $i (0 .. $#warm_futures) {
+    next if defined $warm_conns[$i];
+    next unless $warm_futures[$i]->is_ready;
+    my $conn = eval { $warm_futures[$i]->get };
+    if ($conn && Scalar::Util::blessed($conn) && $conn->can('server_version')) {
+      $warm_conns[$i] = $conn;
+    }
+  }
+  return scalar(grep {
+    defined $_ && $_->server_version && $_->server_version > 0
+  } @warm_conns) == $POOL_SIZE;
+}, 5000);
 diag "Pumped $pumped iterations to complete $POOL_SIZE connect handshakes";
 
-unless (scalar(grep { $_->server_version && $_->server_version > 0 } @warm_conns) == $POOL_SIZE) {
+unless (scalar(grep {
+  defined $_ && $_->server_version && $_->server_version > 0
+} @warm_conns) == $POOL_SIZE) {
   $storage->disconnect;
   plan skip_all => "EV::MariaDB connect never completed after $pumped pump iterations";
+}
+
+# Now that every acquire Future has resolved successfully, type-check the
+# handles (this block runs only on a clean connect — the skip_all above
+# already bailed otherwise).
+for my $slot (1 .. $POOL_SIZE) {
+  isa_ok $warm_conns[$slot - 1], 'EV::MariaDB',
+    "pool slot $slot: acquired handle is an EV::MariaDB";
 }
 
 diag "Server version: " . $warm_conns[0]->server_version;

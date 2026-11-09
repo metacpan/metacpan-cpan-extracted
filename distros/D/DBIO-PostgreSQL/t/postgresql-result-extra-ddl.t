@@ -53,6 +53,8 @@ is(scalar @{ TestResult::ExtraDDL2->pg_extra_ddl }, 2, 'arrayref flattens');
     sub columns { 'y' }
     sub column_info { { data_type => 'integer' } }
     sub primary_columns { }
+    # the default of pg_fk_constraints_from_rels is on: a source is asked
+    sub relationships { }
 }
 my $ddl_out = DBIO::PostgreSQL::DDL->install_ddl('MockSchema::ExtraDDL');
 like($ddl_out, qr'ALTER TABLE x ADD COLUMN y int',

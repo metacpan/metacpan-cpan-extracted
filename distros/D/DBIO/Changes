@@ -1,5 +1,399 @@
 Revision history for DBIO
 
+0.900004  2026-11-08
+    * Breaking Changes
+        - The minimum Perl version is 5.020, in step with the driver dists.
+        - A schema always declares its driver (use DBIO 'Schema', -<driver>,
+          the driver's component, or storage_type); connecting the generic
+          DBIO::Storage::DBI throws and no driver is guessed from the DSN (ADR
+          0067).
+        - Static connect info names its DSN, and the DSN names driver and
+          database; a missing or empty DSN, driver part or dbname throws, and
+          $ENV{DBI_DSN} does not stand in (ADR 0057).
+        - A static connect attribute that is neither a DBIO option nor a DBI
+          attribute by its name throws at connect_info, naming the key;
+          sslmode and other client parameters pass to DBI->connect.
+        - connect_info() reconfigures a DBI storage: every storage option not
+          named in the call (on_connect_do, cursor_class, ...) reverts to its
+          default (ADR 0050).
+        - A column value is a value: a scalar, undef, an object, an arrayref
+          or literal SQL (\'...', \[ $sql, @bind ]); any other reference
+          throws, naming column and type, in new, set_column, insert, update
+          and populate.
+        - find looks up exactly the row its condition describes: the condition
+          must give every column of one unique constraint a concrete equality,
+          else it throws; search(...)->single serves any other condition (ADR
+          0070).
+        - find_or_new, find_or_create, update_or_new and update_or_create
+          (also _async and _related) look up by the one covered constraint, or
+          the one named by key, and treat the rest as data.
+        - update and delete on an unrestricted resultset throw unless called
+          with { all => 1 }; {}, undef and -and => [] are true, [], -or => []
+          and -in => [] are false at every node of a condition (ADR 0069).
+        - Mass assignment is checked (ADR 0071): a value contradicting the
+          resultset's condition throws in create, update_or_create,
+          new_related and populate, and is_guarded => 1 on a column or
+          relationship refuses it in a hash.
+        - Multi-create fetches a related row with find only through a
+          belongs_to whose hash gives a complete unique constraint; every
+          other related hash creates its row.
+        - Return types do not depend on context: search and its family, slice,
+          relationship accessors and ResultSetColumn::func throw in list
+          context; fetch with ->all (ADR 0042).
+        - update_or_create finds the row from plain columns plus resolvable
+          belongs_to values and hands the full condition to the row; it writes
+          no second upsert on a related resultset (contributed by John
+          Napiorkowski, Codeberg #6).
+        - Deploy->apply and ->upgrade classify the diff first: a refusal never
+          runs, and a destructive or possibly lossy operation needs
+          allow_destructive => 1; dry_run => 1 returns the diff (ADR 0080).
+        - dbioadmin upgrade lists destructive operations and asks for YES
+          (--dry-run prints summary and SQL).
+        - UUIDColumns generates random version 4 UUIDs from Crypt::URandom;
+          uuid_class('Data::UUID') or ('UUID') selects those backends.
+        - DBIO::EncodedColumn encodes with a key derivation function: Bcrypt
+          (default), Argon2 or Digest; the chosen module must be installed,
+          salts come from Crypt::URandom, and a stored hash is verified with
+          the algorithm it names.
+        - A column with encode_column is not serializable, is left out of the
+          changelog and shows as *** in the trace unless its definition says
+          otherwise.
+        - DBIO::Moo and DBIO::Moose enable strict and warnings in the using
+          file; DBIO::Cake::idx refuses unknown options when the class loads.
+        - DBIO::Generate's allow_extra_m2m_cols follows
+          DBIx::Class::Schema::Loader: it lets a link table carry extra
+          columns and only adds many_to_many bridges.
+        - results_exist and its variants throw on drivers that have not
+          declared supports_exists_query, pointing at $rs->has_rows; the
+          statement is the storage hook _exists_value_sql (ADR 0037).
+        - The storage hook behind ResultSet::explain is _explain_query($sql,
+          \@bind) -> \@rows; an override of _explain_sql is never called (ADR
+          0040).
+        - DBIO::Replicated::Storage answers every capability question with the
+          master's answer, so a replicated PostgreSQL has upsert,
+          transactional DDL and IF EXISTS like the unreplicated driver.
+        - A replicant is named after its DSN without the password part, and
+          force_pool takes that name; loading Replicated before the driver
+          component throws, naming the working order.
+        - Async: a storage layer without async_layer_class or an ::Async
+          sibling is refused when a backend is built; async_layer_class
+          returning undef declares it sync-only (ADR 0032).
+        - Async: a layer without required_transport_capabilities requires
+          _query_async; pool acquire and every spawning *_async call answer a
+          failed Future instead of throwing (ADR 0030).
+        - The coderef handed to pipeline receives a
+          DBIO::Storage::Async::PipelineContext; txn_do_async on a transaction
+          context throws (no async savepoint).
+        - No dbix_class-named runtime identifier remains: the
+          DeploymentHandler version table is dbio_deploymenthandler_versions
+          (see DBIO::DeploymentHandler for the rename); DBIO::Version and
+          DBIO::ResultSourceHandle are gone.
+
+    * Security
+        - Class names are class names: ensure_class_loaded,
+          load_optional_class and the classes core loads itself take Perl
+          identifiers only (DBIO::Util::assert_class_name, assert_class_isa).
+        - DBIO::ResultSet::search_untrusted takes a condition whose structure
+          comes from a request: only column keys and a fixed operator list
+          pass, else it throws with the key path (ADR 0068).
+        - DBIO::SQLMaker checks the operator of { column => { OP => value } }
+          and -op => [ OP, ... ]: a symbol operator or a word from
+          operator_words, which a driver extends.
+        - Function names in select, func and func_rs are identifiers
+          (DBIO::Util::assert_function_name); schema, extension and library
+          names refuse ';', line breaks and NUL (ADR 0077).
+        - NoBindVars skips a ? inside quoted identifiers, literals and
+          comments and checks the bind count.
+        - Error texts carry no bind values: ShowErrorStatement is off and a
+          failed statement ends in [for Statement "..." with N bind values]
+          (ADR 0075).
+        - Passwords stay out of messages and traces:
+          DBIO::Util::mask_connect_secrets masks the password in connect
+          errors, warnings, pool and listen errors and dbiogen output, and
+          drivers call it at their own sites.
+        - mask_statement_secrets masks key, token, secret and password values
+          of a refused connect action; masked_longmess, masked_confess and
+          masked_cluck mask the password in stack traces.
+        - A user or password the connect info does not give is the empty
+          string, so DBI reads no DBI_USER / DBI_PASS; a Vault secret needs
+          both username and password.
+        - dbioadmin and dbiogen take the password by --password-env or
+          --password-stdin; a trace file named by DBIO_TRACE=1=/path is
+          created with mode 0600.
+        - Storable thaw resolves classes against the schema's registered
+          sources, the YAML serializer reads plain data, and DBIO::Ordered,
+          generated accessors and DBIO::Generate quote and escape what they
+          write.
+
+    * Connection and Schema
+        - DBIO->driver_for(@connect_info) names the driver registered for a
+          DSN's DBD; DBIO->schema_for(@connect_info) returns a connected,
+          source-less schema of DBIO::SchemaFor::<Driver>.
+        - Connect key schema names the namespace a connection works in and a
+          deploy installs into; the driver gives it meaning through
+          _set_connection_schema (ADR 0065).
+        - A declared driver storage adapts to the DSN's access path; a foreign
+          DBD warns, and driver_strict / driver_warnings make it an error or
+          silence it (ADR 0059).
+        - A failing driver determination leaves the storage undetermined, and
+          on_connect_do / on_connect_call run once per connection.
+        - A connection from a DBIO::AccessBroker takes its async mode and
+          connect options beside the broker: [ $broker, { async => $mode, ...
+          } ]; only the connection itself stays the broker's answer.
+        - A broker answer that names no database or has no usable shape
+          throws, naming broker class and shape; a storage keeps nothing of
+          the answer and asks on every connection.
+        - set_access_broker and clear_access_broker attach and detach the
+          embedded async backend too; a broker holds its storages weakly, so a
+          dropped storage closes its connections.
+        - A DBI storage refuses client parameters it would not apply (sslmode
+          in a broker's answer, keys beside a dbh_maker answer), naming broker
+          class and keys.
+        - HostBound binds its host through the driver seam _bind_host_into_dsn
+          and refuses DSN forms nobody can bind.
+        - A Replicated master passes its connection keys to no replicant; a
+          replicant from an AccessBroker inherits the master's other connect
+          options.
+
+    * ResultSet and Row
+        - ResultSet::upsert is a single-statement, server-side atomic upsert
+          (ADR 0036), gated by the capability supports_upsert; key or
+          conflict_target names the target, result chooses the return shape.
+        - upsert cascades over nested relationship data as N atomic upserts in
+          dependency order inside one transaction, with targets stated per
+          part under relations.
+        - upsert takes update_where, a condition on the conflict branch ({
+          -attempted => $col } is the incoming value), gated by
+          supports_upsert_where.
+        - The shortcut helpers folded in from DBIx::Class::Helpers work
+          (remove_columns, set-operation column checks, null / like
+          qualification, rows, columns).
+        - order_by walks its arguments in order, and order_by => { -desc =>
+          $col, -nulls => 'last' } runs through every limit dialect and
+          prefetch rewrite.
+        - count(undef, \%attrs) applies its attributes; as_subselect_rs, the
+          set operations and changelog return a ResultSet in every context;
+          result_class => '::HRI' points at ->hri.
+        - get_from_storage and discard_changes work on sources without a
+          primary key (contributed by Tomás Cohen Arazi, Codeberg #13, #14).
+        - A hashref given for a to-one relationship on the write path is
+          reduced to the foreign key or refused, never kept as the related
+          object (ADR 0034).
+        - A row insert opens a transaction only when a related row is written
+          with it.
+        - DBIO::Row has the hooks prepare_insert, prepare_update and
+          prepare_delete, called by the sync and the async write alike;
+          Timestamp, UUIDColumns and FilterColumn use them.
+        - ResultSource->relationships and Schema->sources return sorted names,
+          so generated text is stable.
+        - Index declarations are one list on the result source
+          (add_index_declaration, index_declarations); Cake idx fills it,
+          driver blocks cover pg, sqlite, mysql, oracle, mssql, sybase,
+          firebird, clickhouse, duckdb, db2 and informix (ADR 0061).
+        - canonical_column reads the form of a column size (scalar: width or
+          precision; arrayref: precision, scale) and refuses other references.
+        - DBIO::Timestamp builds timestamps from timestamp_class, default
+          DateTime::Tiny, so a Timestamp-only schema loads no DateTime stack
+          (Codeberg #9).
+        - A thawed ResultSet counts and pages; a ResultSet bound with
+          with_context freezes unbound.
+
+    * Storage
+        - A failed commit or rollback of the outermost transaction ends it:
+          state reset, the server left without an open transaction, the
+          original error thrown, and the next txn_do connects anew.
+        - A txn_do or dbh_do that retries on a new connection disconnects the
+          old handle first, with a warning.
+        - One trace rule for every path: DBIO_TRACE=1 traces statements, 2
+          adds binds through redact_bind_value (cut to 32 characters), N=/path
+          writes to a file; see DBIO::Manual::Troubleshooting.
+        - $storage->_use_X(undef) removes a per-storage capability force so
+          the driver's declaration answers again (ADR 0041).
+        - A DBIO::Carp message names the sub around a Try::Tiny block as its
+          origin.
+        - An error text names keys, columns and options, never the values
+          bound to the statement: the text of the engine passes through
+          $storage->_mask_error_values($text, \@values, $statement), which
+          replaces each value of four characters or more, as written and as
+          the handle quotes it, by *** (DBIO::Util::mask_bound_values); a
+          driver overrides it for the form its engine writes. This holds for
+          every statement, connect action and populate, and for the inflate
+          error of a datetime column.
+        - With NoBindVars the text names the statement in placeholder form and
+          the number of values (VALUES (?, ?) with 2 bind values).
+        - The message of a create on a scoped resultset names the column and
+          whether the condition and the caller give NULL or a value ('artist'
+          is fixed to a value by the condition, got another value), never the
+          value; a bound value that holds the marker of the appendix DBI
+          writes for ShowErrorStatement stays out of the text as well.
+        - A populate error names the row (counted from 1) and the columns
+          instead of dumping the row.
+
+    * Driver Authors
+        - Contract versions: DBIO::Storage::DBI::Capabilities, DBIO::SQLMaker,
+          DBIO::Deploy::Base and DBIO::Diff::Base are 1.3,
+          DBIO::Introspect::Base is 1.2 (ADR 0024).
+        - _adjust_bind_values($sth, $bind, $bind_attrs) is the one place a
+          driver changes bound values; _finish_connect_dsn and
+          _connect_params_dsn shape the DSN.
+        - _exists_value_sql renders the EXISTS statement,
+          _set_operation_keyword spells or refuses the six set operations (ADR
+          0039), _read_pool_for_read_modify_write chooses the pool for lookups
+          that decide a write.
+        - _explain_query issues every statement through _execute_rendered or
+          _prepare_rendered; _prepare_rendered returns the prepared,
+          unexecuted $sth, and _execute_sth collects server messages in
+          _server_messages.
+        - Capabilities supports_upsert, supports_upsert_where,
+          supports_exists_query and supports_if_exists state facts about the
+          driver; _use_X reads all three tiers (see
+          DBIO::Storage::DBI::Capabilities).
+        - SQLMaker insert() takes on_conflict; a driver supplies
+          _upsert_attempted_sql($col) for the update_where marker.
+        - A storage layer never determines the driver, and dbio_deploy_class
+          has one owner, the driver storage.
+        - table_columns_info derives is_nullable from the primary key; the
+          canonical index model carries an optional index_type compared only
+          when both sides have one.
+        - _pool_connect_rows($sql, @bind) lets a connect_call_* read rows on
+          the sync connection and on every async pool connection.
+
+    * Replicated
+        - Lookups that decide a write (find_or_create, update_or_create, the
+          upsert fallback) and selects with a lock attribute run on the
+          master; see DBIO::Replicated for lag semantics and execute_reliably
+          (ADR 0076).
+
+    * Deploy and Diff
+        - Storage->deploy installs through the storage's dbio_deploy_class;
+          add_drop_table drops declared views before tables, and $deploy->diff
+          takes the options its diff class names in diff_options (ADR 0064).
+        - The DDL splitter reads SQL: semicolons in literals, comments,
+          parentheses and trigger bodies do not cut a statement; storages
+          declare _ddl_sql_dialect (postgresql, sqlite, mysql, oracle).
+        - The splitter reads PostgreSQL BEGIN ATOMIC bodies and nested
+          comments, and Oracle PL/SQL units (packages, triggers, COMPOUND
+          TRIGGER, a line of /).
+        - DDL runs per statement safely (ADR 0026):
+          _ddl_statement_is_transactional keeps statements like ALTER TYPE ...
+          ADD VALUE out of the transaction, in the sync and the async deploy.
+        - A DeploymentHandler upgrade on a driver with a temporary database
+          creates and drops it on a connection of its own, and warns when the
+          drop fails.
+        - DBIO::DeploymentHandler forwards initial_version and checks its
+          collaborators with assert_implemented at construction (Codeberg #12
+          adds VersionResultSet).
+        - Diff::Base->classify sorts operations into additive, changing and
+          destructive; Compare reports a dropped default and index_type
+          changes; diff_toplevel orders creates and drops by dependency.
+
+    * Introspect and Generate
+        - dbiogen generates with the installed driver's own introspector (-o
+          introspect_class=CLASS overrides), and the generic introspector
+          finds tables and views on every DBD (reported by DragosTrif,
+          Codeberg #15).
+        - The generic introspector reports data_type as the type name and
+          derives is_nullable from the primary key.
+        - DBIO::Generate warns when it would write nothing, writes sizes and
+          defaults as valid Perl, and emits compiling Cake and Candy classes.
+
+    * Extensions
+        - Database extensions are a declared list the driver runs:
+          DBIO::Extension is the base class, DBIO::Extension::List builds the
+          entries and DBIO::Extension::Protocol merges their claims,
+          annotations and verdicts (ADR 0066).
+        - Deploy::Base runs the protocol around diff and refuses a diff with
+          refused changes; _extension_activation and _activate_extensions
+          apply an extension on every connection.
+
+    * Async
+        - A Future that waits on the pool and goes to a caller holds itself
+          until ready; a ResultSet async call answers with a failed Future for
+          runtime errors and throws for misuse.
+        - A refused statement fails its Future with DBIO::Exception::Server
+          (sqlstate, constraint, table, detail), which stringifies to the
+          message; the sync path raises it too (ADR 0062).
+        - Waiting is bounded (ADR 0078): acquire_timeout, max_waiters and
+          txn_timeout; a Future queued for its own pool fails at once with
+          ROLLBACK.
+        - txn_do_async commits only when every statement it handed out
+          succeeded, and a failed ROLLBACK reports both errors; the
+          transaction context is terminal after COMMIT or ROLLBACK.
+        - A refused COMMIT, a failed ROLLBACK or a cancelled Future retires
+          the connection; a freed schema closes its async connections.
+        - pipeline runs the batch on one connection through a PipelineContext,
+          also inside a transaction, and a failing batch retires the
+          connection.
+        - $rs->with_context($ctx) binds a ResultSet, Row or ResultSetColumn to
+          a transaction or pipeline context; the pin follows every derivation,
+          and a stale or foreign context throws (ADR 0045).
+        - The async surface covers find_async and its composites,
+          Row::update_async / delete_async / copy_async, ResultSetColumn
+          aggregates and ${rel}_async accessors (contributed by John
+          Napiorkowski, Codeberg #8, #10, #11), and upsert_async.
+        - insert_async, update_async and delete_async run the row class's
+          overrides and the prepare_* hooks; an async select carries bind
+          attributes, limit and offset and is prepared like the sync one.
+        - LISTEN/NOTIFY is part of the core async contract (ADR 0056): listen,
+          unlisten, notify, a self-healing listen connection, and nine
+          transport seams (_listen_open ... _notify_send).
+        - Transports implement _query_async($sql, $bind, $bind_attrs) and
+          _query_async_pinned, plus pipeline and reset seams; see
+          DBIO::Manual::AsyncStorage and ADR 0044 for the bind lifetime.
+        - deploy_async holds its pool, runs statements in order and fails with
+          "storage disconnected during deploy" on a disconnect.
+
+    * Async Pool
+        - A pooled connection is reset when its borrow ends, so session state
+          never reaches the next borrower (ADR 0079); idle connections are
+          vetted and dead ones retired (ADR 0047).
+        - The pool hands slots to waiters in order, keeps to its size, shuts
+          down once and for all, and survives callbacks that die.
+        - A forked child opens connections of its own and leaves the parent's
+          connections and waiters alone.
+
+    * Test Modules
+        - DBIO::Test::Conformance runs a driver against the shared DDL, Diff,
+          Bind and Names case tables; a case is answered correctly, by a
+          declared refusal or by a declared deviation (ADR 0060).
+        - DBIO::Test::AsyncParity runs ResultSet operations synchronously and
+          through their *_async twins and compares rows, counts and exception
+          classes.
+        - DBIO::Test::AsyncHarness is the live-harness base for async
+          transports; DBIO::Test::Future is a deterministic Future for offline
+          tests.
+        - DBIO::Test::ExtensionSet checks that extensions commute;
+          DBIO::Test::StorageLayer checks that none determines the driver.
+        - DBIO::Test::Storage has mock_func, mock_affected_rows, a stand-in
+          handle for offline rollback and a FakeSth that captures prepares.
+        - DBIO::Test::Kubernetes and xbin/k8s-test run in an existing
+          namespace, cap every pod and the test Job in cpu and memory, and
+          load no DBI.
+
+    * Documentation
+        - DBIO::Manual::AsyncStorage documents the async backend interface;
+          DBIO::ResultSet has an ASYNC section; README and
+          DBIO::Manual::Heritage name the real transports and the
+          per-connection async mode.
+        - Capability tiers are documented in DBIO::Storage::DBI::Capabilities,
+          transactional DDL per engine in DBIO::Deploy::Base, and every schema
+          example names its driver.
+        - The public surface of every module is documented, including the 67
+          column type functions of DBIO::Cake.
+        - The skills dbio-adr, dbio-codeberg-user-issues,
+          dbio-consolidate-release and dbio-perl-pod ship in the share dir
+          (DBIO->skill).
+
+    * Packaging
+        - New runtime prerequisites: Crypt::URandom, DateTime::Tiny,
+          Carp::Clan, Sub::Quote; DateTime and DateTime::Format::Strptime are
+          recommended and load lazily; minimum versions of third-party modules
+          follow current CPAN.
+        - A bare "use DBIO" loads no DBI and no DBD; JSON goes through
+          JSON::MaybeXS everywhere.
+        - Kubernetes::REST (>= 1.109) and IO::K8s are suggested (group
+          test_kubernetes) for the live test tooling.
+
 0.900002  2026-07-13
 
     * Tests

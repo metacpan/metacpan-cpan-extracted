@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 ## Version
 
-Version 0.41
+Version 0.42
 
 ## Synopsis
 
@@ -288,7 +288,8 @@ This will override any value set for `database.user` in the configuration files.
 
     If `config_file` or `config_files` is set, those files are loaded last.
 
-    If no `config_dirs` is given, try hard to find the files in various places.
+    If no `config_dirs` is given,
+    `Config::Abstraction` tries hard to find the files in various places.
 
     The value of `config_dirs` can be overridden at runtime by the environment variable CONFIG\_DIR
     (note that is just one directory, hence it's CONFIG\_DIR not CONFIG\_DIRS).
@@ -341,6 +342,11 @@ Options:
     since later files override earlier ones.
 
     Considers the files `default` and `$script_name` before looking at `config_file` and `config_files`.
+
+    The running script itself is never read as configuration, even when one of the
+    configuration directories is the directory it is in, and neither is any file
+    that starts with `#!`, since such a file is a program rather than
+    configuration, and the Perl parser would run it.
 
 - `data`
 

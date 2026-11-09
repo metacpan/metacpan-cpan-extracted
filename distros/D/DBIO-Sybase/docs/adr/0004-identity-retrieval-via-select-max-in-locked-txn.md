@@ -58,5 +58,5 @@ trigger-unsafe. It is only honoured when a caller has explicitly set
 - The retrieval depends on the row still being the maximum at read time, which
   the writer-storage transaction guarantees for the row just inserted. Multi-row
   bulk inserts rely on the same transaction boundary.
-- Coverage is live-DB only (`t/20-sybase-core.t`); there is no offline test for
+- Coverage is live-DB only (`t/10-sybase.t`); there is no offline test for
   the identity round-trip.

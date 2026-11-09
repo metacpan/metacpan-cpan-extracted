@@ -7,7 +7,7 @@ This policy was updated on 2026-06-23.
 If this policy or the release is more than two years old, then you
 should check for a more recent version of
 [DBIO-MySQL-EV on CPAN](https://metacpan.org/dist/DBIO-MySQL-EV) or the main branch of the
-[DBIO-MySQL-EV git repository](https://codeberg.org/dbio/dbio-mysql-async).
+[DBIO-MySQL-EV git repository](https://codeberg.org/dbio/dbio-mysql-ev).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.5.0)

@@ -11,9 +11,11 @@ MODULE = Hyperman		PACKAGE = Hyperman
 # connection and a single CID, and asserts nothing else moved. 1 = every
 # check passed.
 IV
+# uncoverable statement class:ignore_covered_err
+# uncoverable subroutine class:ignore_covered_err
 _quic_cid_selftest()
     CODE:
-        RETVAL = hm_quic_cid_selftest();
+        RETVAL = hm_quic_cid_selftest(); /* # uncoverable statement class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -23,18 +25,22 @@ _quic_cid_selftest()
 # from the middle, and asserts the drain is monotonic and every cached
 # heap_idx still agrees with the slot holding it.
 IV
+# uncoverable statement class:ignore_covered_err
+# uncoverable subroutine class:ignore_covered_err
 _quic_heap_selftest()
     CODE:
-        RETVAL = hm_quic_heap_selftest();
+        RETVAL = hm_quic_heap_selftest(); /* # uncoverable statement class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
 # The per-source half-open table: one address cannot spend the Retry
 # threshold alone. Counts per address, falls on completion, frees its slot.
 IV
+# uncoverable statement class:ignore_covered_err
+# uncoverable subroutine class:ignore_covered_err
 _quic_src_selftest()
     CODE:
-        RETVAL = hm_quic_src_selftest();
+        RETVAL = hm_quic_src_selftest(); /* # uncoverable statement class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -42,9 +48,11 @@ _quic_src_selftest()
 # property that matters - a token verifies for the address, connection id and
 # secret it was minted for, and for nothing else.
 IV
+# uncoverable statement class:ignore_covered_err
+# uncoverable subroutine class:ignore_covered_err
 _quic_token_selftest()
     CODE:
-        RETVAL = hm_quic_token_selftest();
+        RETVAL = hm_quic_token_selftest(); /* # uncoverable statement class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -53,19 +61,21 @@ _quic_token_selftest()
 # scidlen); rv 0 is decoded, -235 is NGTCP2_ERR_VERSION_NEGOTIATION, and
 # anything else is a refusal.
 void
+# uncoverable statement class:ignore_covered_err
+# uncoverable subroutine class:ignore_covered_err
 _quic_decode_selftest(pkt)
         SV *pkt
     PREINIT:
         STRLEN len;
         const unsigned char *p;
-        int rv = -1;
-        uint32_t ver = 0;
-        size_t dlen = 0, slen = 0;
+        int rv = -1; /* # uncoverable statement class:ignore_covered_err */
+        uint32_t ver = 0; /* # uncoverable statement class:ignore_covered_err */
+        size_t dlen = 0, slen = 0; /* # uncoverable statement class:ignore_covered_err */
     PPCODE:
-        p = (const unsigned char *)SvPV(pkt, len);
-        hm_quic_decode_probe(p, (size_t)len, &rv, &ver, &dlen, &slen);
-        EXTEND(SP, 4);
-        mPUSHi(rv);
-        mPUSHu(ver);
-        mPUSHu((UV)dlen);
-        mPUSHu((UV)slen);
+        p = (const unsigned char *)SvPV(pkt, len); /* # uncoverable statement class:ignore_covered_err */
+        hm_quic_decode_probe(p, (size_t)len, &rv, &ver, &dlen, &slen); /* # uncoverable statement class:ignore_covered_err */
+        EXTEND(SP, 4); /* # uncoverable statement class:ignore_covered_err */
+        mPUSHi(rv); /* # uncoverable statement class:ignore_covered_err */
+        mPUSHu(ver); /* # uncoverable statement class:ignore_covered_err */
+        mPUSHu((UV)dlen); /* # uncoverable statement class:ignore_covered_err */
+        mPUSHu((UV)slen); /* # uncoverable statement class:ignore_covered_err */

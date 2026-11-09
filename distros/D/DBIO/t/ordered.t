@@ -43,7 +43,7 @@ subtest 'move_next swaps with the next sibling and emits the expected SQL' => su
   is $e1->position, 2, 'the row moved from position 1 to 2';
 
   my @q = $storage->captured_queries;
-  ok((grep { $_->{op} eq 'update' && $_->{sql} =~ /"position"\s*=\s*position\s*-\s*1/ } @q),
+  ok((grep { $_->{op} eq 'update' && $_->{sql} =~ /"position"\s*=\s*"position"\s*-\s*1/ } @q),
     'a sibling-shift UPDATE was emitted');
   ok((grep { $_->{op} eq 'update' && $_->{sql} =~ /SET "position" = \?.*WHERE "employee_id" = \?/ } @q),
     'the row\'s own position UPDATE was emitted');

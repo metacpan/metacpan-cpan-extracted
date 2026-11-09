@@ -1,0 +1,47 @@
+requires 'perl', '5.020';
+requires 'DBIO', '0.900004';
+# Loaded directly, so declared directly rather than left to DBIO's closure.
+requires 'DBI', '1.57';                # Test.pm (use DBI)
+requires 'Try::Tiny', '0.32';          # Storage.pm
+requires 'namespace::clean', '0.27';   # Storage.pm, Storage/TxnScopeGuard.pm
+# Test.pm requires SQL::Abstract::Test lazily (is_same_sql_bind); t/ uses it.
+requires 'SQL::Abstract', '2.000002';  # Test.pm
+
+# ClickHouse speaks the MySQL wire protocol (server port 9004). There is no
+# native DBD::ClickHouse on CPAN, so the driver rides a MySQL-wire DBD.
+# DBD::mysql is the standard: it sends no SQL at all on connect, so it works
+# against a STOCK ClickHouse server (and ClickHouse Cloud) with no server-side
+# accommodation -- verified live (karr k15: 33 files / 1035 tests against
+# 25.3.14.14). DBD::MariaDB is supported but needs custom_settings_prefixes
+# registered on the server (it sends SET character_set_server on every connect,
+# which a stock server rejects), so it is only for servers whose config you
+# control. Connect with mysql_enable_utf8mb4 => 1 or DBD::mysql hands back
+# bytes; DBD::MariaDB decodes unconditionally. See
+# docs/adr/0001-mysql-wire-protocol-transport.md (Addendum 2026-08-17).
+recommends 'DBD::mysql';
+recommends 'DBD::MariaDB';
+# ClickHouse has no identity column and no last_insert_id, so a surrogate
+# primary key is a UUID the client generates and sends. Crypt::URandom supplies
+# the 16 entropy bytes for the RFC 4122 v4 value; DBIO core already recommends
+# it for DBIO::EncodedColumn salts.
+requires 'Crypt::URandom', '0';
+
+# DBIO::ClickHouse::Native produces the column and row structures
+# ClickHouse::Encoder consumes -- and nothing else. It never loads the module:
+# there is no use, no require and no runtime probe for it anywhere in lib/, so
+# a user who does not export to the Native format never pays for it. That is
+# why this is a suggests and not a requires, and it is doubly warranted here --
+# ClickHouse::Encoder is XS and young (0.01 in May 2026, 0.02 on 2026-08-11),
+# so a hard dependency would make this driver unbuildable wherever it is.
+# t/50-native.t asserts the non-dependency structurally, by checking %INC.
+suggests 'ClickHouse::Encoder';
+
+on test => sub {
+  requires 'Test::More', '0.98';
+  requires 'Test::Exception';
+  # t/51-native-encoder.t rounds the exported structures through the real
+  # encoder. Optional on both counts: it plan skip_all's without either.
+  suggests 'ClickHouse::Encoder';
+  suggests 'DateTime';
+  suggests 'DateTime::Format::MySQL';
+};

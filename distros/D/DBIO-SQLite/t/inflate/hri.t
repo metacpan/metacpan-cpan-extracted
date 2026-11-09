@@ -92,7 +92,7 @@ sub check_cols_of {
         }
         # multiple related entries (has_many)
         elsif (ref ($datahashref->{$col}) eq 'ARRAY') {
-            my @dbic_reltable = $dbic_obj->$col;
+            my @dbic_reltable = $dbic_obj->$col->all;
             my @hashref_reltable = @{$datahashref->{$col}};
 
             is (scalar @hashref_reltable, scalar @dbic_reltable, 'number of related entries');

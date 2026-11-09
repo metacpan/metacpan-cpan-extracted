@@ -2,6 +2,9 @@ package DBIO::Test::Schema::OneKey;
 # ABSTRACT: Test result class for the onekey table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw/DBIO::Test::BaseResult/;
@@ -36,7 +39,7 @@ DBIO::Test::Schema::OneKey - Test result class for the onekey table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

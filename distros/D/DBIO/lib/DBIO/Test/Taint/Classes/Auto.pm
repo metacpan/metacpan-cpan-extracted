@@ -2,6 +2,9 @@ package DBIO::Test::Taint::Classes::Auto;
 # ABSTRACT: Test class for taint mode with auto-loading
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Core';
@@ -21,7 +24,7 @@ DBIO::Test::Taint::Classes::Auto - Test class for taint mode with auto-loading
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

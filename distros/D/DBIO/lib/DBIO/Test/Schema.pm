@@ -3,6 +3,9 @@ package DBIO::Test::Schema;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 no warnings 'qw';
 
 use base 'DBIO::Schema';
@@ -79,7 +82,7 @@ sub capture_executed_sql_bind {
 
   local $self->storage->{debugcb};
   local $self->storage->{debugobj} = my $tracer_obj = DBIO::Test::SQLTracerObj->new;
-  local $self->storage->{debug} = 1;
+  local $self->storage->{debug} = 2;
 
   local $Test::Builder::Level = $Test::Builder::Level + 2;
   $cref->();
@@ -171,7 +174,7 @@ DBIO::Test::Schema - Standard test schema for the DBIO ecosystem
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

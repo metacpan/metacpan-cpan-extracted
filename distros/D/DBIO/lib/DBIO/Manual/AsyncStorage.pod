@@ -1,0 +1,1510 @@
+# PODNAME: DBIO::Manual::AsyncStorage
+# ABSTRACT: Writing an async-capable storage backend for DBIO
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIO::Manual::AsyncStorage - Writing an async-capable storage backend for DBIO
+
+=head1 VERSION
+
+version 0.900004
+
+=head1 WHO THIS IS FOR
+
+You are writing a new async transport for DBIO -- an async MySQL storage, an
+EV-based PostgreSQL backend, or anything else that answers C<< { async =>
+'some_mode' } >> at C<connect>. This page is the interface contract: the
+methods you implement, the exact shape each one must resolve, and how your
+class gets discovered. It is not a tutorial on using async DBIO from
+application code -- for that, see L<DBIO::Storage::Async> and ADR 0030's
+worked examples.
+
+The interface already exists and is exercised by a real driver
+(L<DBIO::PostgreSQL::Storage::Async>). Nothing here is aspirational; every
+method name and resolution shape below is drawn from that running code.
+
+=head1 THE BIG PICTURE
+
+L<DBIO::Storage::Async> (core) is concrete, not abstract. It owns the
+B<orchestration> that every async backend shares: connect-info
+normalisation, the pooled and pinned CRUD builder (L<DBIO::Storage::Async/_run_crud>), the
+INSERT returned-columns fold, transaction bracketing
+(L<DBIO::Storage::Async/txn_do_async>), the pipeline scaffold, and the
+self-healing LISTEN/NOTIFY machinery. A backend
+does not reimplement any of that -- it fills in a small set of B<transport
+seams>: how to submit a query, what pool to use, and a handful of
+DB-specific SQL shaping hooks.
+
+The reference stack has three tiers:
+
+=over 4
+
+=item * L<DBIO::Storage::Async> (this dist) -- the abstract orchestration
+described above. Every method is either concrete (the shared machinery) or a
+croaking seam stub waiting for an override.
+
+=item * L<DBIO::Async::Storage> (dist C<dbio-async>) -- the loop-agnostic
+C<future_io> transport base. It drives a driver's own non-blocking DBD
+binding through L<Future::IO>, and fills in the C<future_io>-specific half
+of the seams (the socket-readable watcher, the connection pool). A backend
+built on this tier only has to supply the DB-specific quarter described
+below.
+
+=item * L<DBIO::PostgreSQL::Storage::Async> (dist C<dbio-postgresql>) -- the
+concrete adapter over L<DBD::Pg>'s async binding. This is the worked example
+in L</A REFERENCE IMPLEMENTATION>, below.
+
+=back
+
+A backend does not have to build on the C<dbio-async> tier -- it can
+subclass L<DBIO::Storage::Async> directly and implement every seam itself
+(this is what a native event-loop client, e.g. an C<EV::Pg>-based backend,
+does). What is B<not> optional is the resolution-shape contract in
+L</THE CONTRACT> below: whatever transport tier you build on, core's
+C<_run_crud> and the ResultSet/Row layer above it assume those shapes
+unconditionally.
+
+Two things are explicitly out of scope for a transport author and are
+mentioned here only so you know where they live: the C<forked> mode
+(L<DBIO::Forked::Storage>, dist C<dbio-forked>) is a Model-A special case
+that runs the ordinary sync driver inside a C<fork()> and shares none of
+this orchestration (ADR 0030 Decision 4); and the C<immediate> mode is not a
+backend at all -- see L</The C<immediate> degrade> below.
+
+=head1 THE CONTRACT
+
+=head2 The six entry points
+
+A live backend answers six methods, each building SQL via the storage's
+C<sql_maker> and executing it through your transport seam:
+C<select_async>/C<select_single_async>/C<insert_async>/C<update_async>/
+C<delete_async> (L<DBIO::Storage::Async/select_async> through
+L<DBIO::Storage::Async/delete_async>) and C<txn_do_async>
+(L<DBIO::Storage::Async/txn_do_async>). You do not override any of
+these six -- they are concrete on L<DBIO::Storage::Async> and call into
+L<DBIO::Storage::Async/_run_crud> (or, for C<txn_do_async>, the pool and your C<BEGIN>/C<COMMIT>
+query seam directly).
+
+=head2 What C<_run_crud> builds for you
+
+C<_run_crud> (L<DBIO::Storage::Async/_run_crud>) is the shared,
+driver-agnostic CRUD builder. Given an op name and a runner coderef, it:
+
+=over 4
+
+=item * prepares every SELECT through the B<owning sync storage>'s
+C<_select_args($ident, $select, $where, $attrs)> and removes only its leading
+operation name before passing the prepared arguments to the async backend's
+C<sql_maker>. Sync attribute validation, join pruning and the
+complex-prefetch inner-subquery rewrite therefore all happen before the final
+SELECT is rendered; the values of the C<bind> select attribute stand in front
+of the binds of the SQL maker, as in the sync path;
+
+=item * for C<select> with C<software_limit>, slices the transport's raw row
+arrayrefs by C<offset>/C<rows> before ResultSet inflation or prefetch collapse.
+C<select_single> shares the owning-storage preparation but gains no separate
+post-fetch limit semantics;
+
+=item * unwraps a blessed result source to its plain table name for
+insert/update/delete (in C<_run_crud>'s insert/update/delete branches);
+
+=item * hands your runner raw C<sql_maker> SQL (C<?> placeholders) plus a
+bind arrayref of bare values -- a literal bind of a subquery, which the sync
+convention carries as a C<[ \%attrs =E<gt> $value ]> pair, is taken apart first, by the
+sync path's rule: a two-element arrayref with a HASH or C<undef> in front is a
+pair (a plain value of that exact form is read as one) -- and post-processes what the runner's Future resolves with,
+per-op, into the shape described next. Placeholder transformation remains
+exclusively the transport query seam's responsibility;
+
+=item * hands the runner the bind attributes as a third argument, an arrayref
+of attribute hashes parallel to the binds (C<dbic_colname>, C<sqlt_datatype>,
+and C<redact> for an C<encode_column> column), resolved by the sync path's rule.
+They carry no value; the binds themselves stay bare values. A trace at level 2
+or more is what reads them, so they are built only then. Your transport passes
+them on to L<DBIO::Storage::Async/_debug_query>, which traces the statement and
+the redacted, capped binds by the one rule of the sync storage; a statement
+core did not build (C<BEGIN>, C<COMMIT>) has none;
+
+=item * gives every rendering of an insert, update or delete a flat copy of the
+options hash of the call (C<on_conflict>, C<insert_or>), so the statement on the
+wire and the rendering that resolves the bind attributes each see the complete
+options, and the options of the caller stay as given;
+
+=item * traces the connect and disconnect statements of a pool connection:
+the runner L<DBIO::Storage::Async/_setup_pool_connection> hands the owning
+storage sends each statement through C<_debug_query> in the fingerprint form of
+its text (C<***[sha256:E<lt>8 hexE<gt>]> for a secret) from level 1 on, and
+calls C<query_end> when it succeeded; level 0 traces nothing. The row queries of
+a C<connect_call_*> are not traced. A transport that overrides
+L<DBIO::Storage::Async/_run_pool_connect_statement> gets the trace from core.
+
+=back
+
+Both the pooled path (C<_pool_runner>, used by the five CRUD C<*_async> entry
+points) and the pinned path (C<_pinned_runner>, used inside a transaction --
+see L</THE TRANSACTION SEAM>) route through this same builder, so SQL
+generation and post-processing are written exactly once.
+
+=head2 The seam you implement: C<_query_async> / C<_query_async_pinned>
+
+  sub _query_async {
+    my ($self, $sql, $bind, $bind_attrs) = @_;
+    my $end = $self->_debug_query($sql, $bind, $bind_attrs);
+    ...
+    return $future;   # see the per-op shape below
+  }
+
+  sub _query_async_pinned {
+    my ($self, $conn, $sql, $bind, $bind_attrs) = @_;
+    ...
+  }
+
+These are the only two methods C<_run_crud> actually calls through
+(L<DBIO::Storage::Async/_query_async>, L<DBIO::Storage::Async/_query_async_pinned>).
+C<_query_async> executes on a
+freshly-acquired pooled connection and releases it when the Future is ready;
+C<_query_async_pinned> executes on a caller-supplied connection and does
+B<not> release it. Both croak by default -- a backend must override both.
+
+=head2 The per-operation resolution shape
+
+This is the part every transport author must get exactly right, because
+C<_run_crud> post-processes your Future's resolved value differently per
+op, and the shapes are B<not> interchangeable:
+
+=over 4
+
+=item * C<select> / C<select_single> -- your Future resolves a B<list of raw
+row arrayrefs>, matching the sync cursor's C<< ->all >> shape
+(L<DBIO::Storage::Async/select_async>). For C<select> with
+C<software_limit>, C<_run_crud> applies C<offset>/C<rows> to that raw list;
+otherwise it leaves the list intact. For C<select_single>, C<_run_crud> takes
+the first row and does not apply that post-fetch slicing.
+
+=item * C<insert> -- your Future resolves a list whose first element is the
+C<RETURNING> row, either a C<< column => value >> hashref or a positional
+arrayref (C<_run_crud>). Core folds that first
+row onto the supplied insert data via C<_insert_returned_columns> to
+produce the
+B<returned-columns hashref> that C<< DBIO::Row->insert_async >> consumes
+(ADR 0031 Decision 3) -- a positional arrayref is zipped against the source's
+declared column order (C<_returning_columns>), so a driver whose
+C<RETURNING> emits a different order (or
+that has no C<RETURNING> at all) overrides C<_insert_returned_columns>
+itself.
+
+=item * C<update> / C<delete> -- your Future resolves a B<single scalar>:
+the affected-row count, the same value a synchronous
+C<< $dbh->do($sql, ..., @$bind) >> returns. There is no row data for these
+ops; C<_run_crud> passes the scalar straight through.
+
+=back
+
+B<This is the subtle one.> A transport that naively tries to "fetch rows"
+for a plain UPDATE/DELETE with no C<RETURNING> clause will find none, and
+resolving an empty list here silently breaks the row-count check the row
+layer relies on (L<DBIO::Storage::Async/_query_async>'s own POD warning). Concretely: C<< DBIO::Row->update_async >>
+inspects the resolved count and throws C<"row not found"> on C<0> or
+C<"updated more than one row"> on anything C<> 1> (L<DBIO::Row/update_async>)
+-- exactly like sync C<update>'s own C<_update_body> check. If your
+transport instead resolves an empty list (or C<undef>) here, that check
+silently mis-fires.
+
+One accuracy note, since this is a contract page: as of this writing
+C<< DBIO::Row->delete_async >> resolves the same Future but does not inspect
+the count at all -- it marks the row not-in-storage unconditionally once the
+delete resolves, with no C<0>/C<E<gt>1> check mirroring C<update_async>'s
+(L<DBIO::Row/delete_async>; the C<then> callback there takes no
+arguments). Do not take that as license to skip the count for C<delete> --
+the seam contract is symmetric across C<update> and C<delete> regardless of
+which callers currently inspect the value (see the warning above, which
+names both), and this asymmetry is tracked as a gap, not a design choice.
+
+The C<update_async>/C<delete_async> row-count contract (as distinct from
+the older, already-shipped C<insert_async> hashref shape from ADR 0031
+Decision 3) is new work, first exercised end-to-end by this dist's own
+C<async-parity-helpers> effort -- see F<t/resultset/async_parity_helpers.t>
+for the runnable mock-backend coverage of both C<update_async> and
+C<delete_async>, including the sync/async parity and cascade-punt cases.
+Aligning a real driver's C<insert_async> to the hashref shape is its own
+tracked cross-repo ticket (ADR 0031); the C<update>/C<delete> count shape
+above is this dist's addition to the same seam and is tracked the same
+way for other drivers (C<dbio-postgresql-ev>, C<dbio-mysql-ev>,
+C<dbio-forked>).
+
+=head2 The C<?> placeholder contract
+
+C<$sql> handed to C<_query_async>/C<_query_async_pinned> is always raw
+C<sql_maker> output with C<?> placeholders -- core does not pre-shape it. A
+transport that needs a different placeholder dialect (e.g. PostgreSQL's
+positional C<$N>) must rewrite it B<internally>, inside its own
+implementation of these two seams, typically via a private C<_transform_sql>
+helper (L<DBIO::Storage::Async/_transform_sql> documents this as a
+transport-internal helper, not a general seam any caller outside the
+transport may invoke; ADR 0032 Decision 6). See
+L<DBIO::PostgreSQL::Storage::Async/_transform_sql> for a worked,
+comment-heavy example that also has to dodge the JSONB C<@?> jsonpath
+operator's literal C<?>.
+
+=head2 The bind-lifetime contract: no callback inside the C<then> closure
+
+The pool hands out connections through a Future, so your C<_query_async> body
+almost certainly lives inside a C<< $self->pool->acquire->then(sub { ... }) >>.
+That callback is a B<closure over C<$bind>>. Every anonymous sub you create
+inside it -- the completion callback you give the client library, the
+C<on_ready> that returns the connection to the pool -- holds a strong
+C<CvOUTSIDE> pointer to that closure and so keeps its entire pad alive.
+C<$bind> is in that pad. The bind arrayref therefore survives for the whole
+flight of the query, even though not one of those callbacks mentions it.
+
+The contract is that a bind arrayref's life ends at B<dispatch>. Once
+C<query_params> / C<execute> has returned, the transport has the values in its
+own wire buffer and Perl must not keep the arrayref reachable. So build every
+callback the transport will hold in a B<named> sub:
+
+  # WRONG
+  my $pool = $self->pool;
+  return $pool->acquire->then(sub {
+    my $conn = shift;
+    return $self->_await_query_result($conn, $sql, $bind)
+      ->on_ready(sub { $pool->release($conn) });
+  });
+
+  # RIGHT
+  sub _release_on_ready {
+    my ($self, $conn, $pool) = @_;
+    return sub { $pool->release($conn) };
+  }
+  ...
+  my $pool = $self->pool;
+  return $self->_hold_derived($pool->acquire->then(sub {
+    my $conn = shift;
+    my $f = $self->_seam_future(_await_query_result => $conn, $sql, $bind);
+    $f->on_ready($self->_release_on_ready($conn, $pool));
+    return $f;
+  }));
+
+The Future derived from the wait on the pool holds itself until it is ready:
+C<_hold_derived> retains it, so a caller that does not keep it still gets the
+body run and the connection returned. The same goes for every other seam of
+yours that waits on the pool and hands the derived Future to a caller.
+
+A named sub's pad is not a closure pad, so the callback cloned inside it
+captures only what it actually references. The C<then> closure still closes
+over C<$bind> -- it has to, to issue the query -- but it is freed as soon as it
+has fired.
+
+Dispatching through L<DBIO::Storage::Async/_seam_future> is part of the
+pattern. The release hangs off the query Future, and that Future exists only
+once the dispatch has returned: a dispatch that dies synchronously, or returns
+no Future, never registers the release, the connection stays checked out, and
+a pool of N is wedged after N such calls. C<_seam_future> turns both into a
+failed Future, which takes the same release.
+
+So is the C<$pool> handed to the named sub. The release goes to the pool the
+connection was acquired from, not to C<< $self->pool >> asked again when the
+query settles: see L</What ends work talks to the pool it began on>.
+
+This costs one helper and bounds your peak memory by the B<number> of
+outstanding queries rather than by their payload size, which is the difference
+between a pipeline of a few thousand large inserts holding one copy of its data
+and holding two. It is easy to get wrong invisibly: nothing warns, every query
+succeeds, and the only symptom is memory. Pin it with an offline test that
+weakens a reference to the bind arrayref and asserts it is gone while the query
+is still in flight (see F<t/04-bind-release.t> in L<DBIO::Async>). ADR 0044.
+
+Two corollaries. The caller's bind array is B<not> yours to mutate -- do not
+"free" it by emptying it at settle; it belongs to whoever passed it in. And if
+you genuinely need the values after dispatch (tracing, retry-on-reconnect),
+take your own copy and document that you do.
+
+=head1 CONNECTION AND POOL LIFECYCLE
+
+=head2 What core requires directly
+
+A backend must override L<DBIO::Storage::Async/pool> to return a pool
+object. The abstract shape that pool must answer -- Future-returning C<acquire>
+and C<acquire_txn>, plus C<release>, terminal C<shutdown>, and
+C<size>/C<available>/C<max_size> -- is L<DBIO::Storage::Pool>
+(F<lib/DBIO/Storage/Pool.pm>). In practice you get
+this by subclassing L<DBIO::Storage::PoolBase>
+(F<lib/DBIO/Storage/PoolBase.pm>), which supplies the idle-list /
+waiter-queue / capacity mechanics (C<acquire>, C<acquire_txn>, C<release>)
+and asks you for only two things: C<_create_connection> (build one physical
+connection from conninfo) and C<_shutdown_connection> (tear one down). If your
+connection is not usable the instant its constructor returns -- true of
+every event-loop transport -- you must also gate its readiness: C<acquire>
+chains every connection it hands out through the
+L<DBIO::Storage::PoolBase/_connection_ready_future> seam before resolving, so
+that is the one place readiness-gating lives (same file). A transport whose
+client reports the connect through callbacks builds its connections with
+L<DBIO::Storage::PoolBase/_create_ready_connection>, supplying
+L<DBIO::Storage::PoolBase/_new_connection>: that wires and registers a
+readiness Future the default seam honours, so there is nothing to override.
+Override C<_connection_ready_future> only when readiness is not
+callback-shaped -- asked of the driver and polled for, as in the reference
+C<future_io> pool (L</What the reference Future::IO transport adds>).
+
+Core additionally owns replaying the owning sync storage's
+C<on_connect_do>/C<on_connect_call> (and C<on_disconnect_*>) onto every
+physical pool connection, so a pooled async connection has the same session
+setup as the sync path on the same instance. This happens automatically:
+C<PoolBase::_spawn_connection> calls C<_dbio_run_pool_connect_actions>,
+which -- if your pool was constructed with C<< storage => $async_storage >>, a
+back-reference to B<your> L<DBIO::Storage::Async> (the pool holds it weakly)
+-- calls L<DBIO::Storage::Async/_setup_pool_connection> on it; that method
+resolves the actions on the owning sync storage
+(L<DBIO::Storage::Async/_owner_storage>). A pool built without the
+back-reference, or with the sync storage in its place, replays nothing and
+says nothing. C<shutdown> does the
+symmetric thing via C<_teardown_pool_connection> before closing each
+connection that came up. The default statement runner
+(C<_run_pool_connect_statement>) handles a bare do-capable
+DBI handle or a C<< { dbh => $dbh } >> wrapper; a backend whose connection
+is neither overrides that one method. With the key C<dbio_rows> in its
+attribute hash the runner returns the rows of the statement (an array
+reference of array references); a backend that overrides the runner does the
+same and returns nothing otherwise. A C<connect_call_*> reads through
+C<_pool_connect_rows>, which asks the runner inside the replay and the
+storage's own handle outside it.
+
+=head2 Connections from an AccessBroker
+
+An application may connect with an L<DBIO::AccessBroker> in place of a DSN.
+Core's C<connect_info> then attaches the broker and keeps no conninfo: every
+new connection asks the broker again, so rotated credentials reach the next
+one (L<DBIO::Storage::Async/"ACCESSBROKER CONSUMPTION">). Two things are
+yours:
+
+=over 4
+
+=item * L<DBIO::Storage::Async/_async_broker_conninfo> -- required once a
+broker is attached; the default croaks. Return one fresh conninfo, in your
+pool's shape, for a single new connection. Build it from
+L<DBIO::Storage::Async/_current_async_connect_info>, which asks the broker and
+refuses an answer that is empty.
+
+=item * Feed your pool L<DBIO::Storage::Async/_conninfo_provider> as its
+C<conninfo_provider> when it is defined, and the static conninfo otherwise.
+The pool calls it once per connection it spawns.
+
+=back
+
+A broker comes and goes in one place each.
+L<DBIO::Storage::Async/set_access_broker> attaches it -- under that name or
+as C<_setup_access_broker> -- and forgets what the connect info before left:
+no static conninfo, pool size or option stands beside a broker.
+L<DBIO::Storage::Async/clear_access_broker> detaches it, and what came with it
+goes too. From then on the provider refuses, on the storage and in a pool that
+was built with it: the next spawn fails with C<< <class> has no AccessBroker
+attached to ask for connect info >> -- as a failed Future -- and so does a
+listen connection you open through the provider. Core says that itself; your
+C<_async_broker_conninfo> is not asked without a broker. Open your listen
+connection the way you build a pool connection: from the provider when it is
+defined, from the static conninfo otherwise.
+
+If you override C<connect_info>, call C<_setup_access_broker> or
+C<_clear_access_broker> B<before> you read anything of the new connect info.
+Both forget everything the call before left, so a call of yours that throws
+while reading leaves nothing of it behind (ADR 0050).
+
+When the application detaches the broker on the sync storage that owns your
+backend, core detaches it from the backend too, and a backend not built yet is
+not built from it.
+
+Connect options given beside the broker reach you only if you declare
+C<broker_connect_options> (L</CAPABILITY FLAGS>).
+
+Transactions through a broker that is not transaction-safe -- one whose
+credentials rotate -- are refused by core, not by a seam: C<txn_do_async>
+returns a failed Future before it takes a connection, and so do the
+transactional runs of C<deploy_async>
+(L<DBIO::Storage::Async/txn_do_async>). C<pipeline> carries no such check.
+
+=head2 A forked child gets a pool of its own
+
+The pool's connections belong to the process that opened them. When a forked
+child first uses a pool it inherited -- C<acquire>, C<acquire_txn>, C<release>
+-- C<PoolBase::_verify_pid> drops everything the pool inherited, without
+closing any of it, and makes the child the owner, so the child's C<acquire>
+spawns connections of its own. Queued waiters are dropped
+unsettled: they are the parent's callers. The same holds when the child's
+only use of the pool is to end it: C<shutdown>, and the pool's C<DESTROY> that
+runs it when the child exits, fail none of the parent's waiters and close none
+of its connections.
+
+What core cannot do is keep a dropped handle's destructor away from the
+parent's session. Open pool connections fork-safe (DBD::Pg, DBD::mysql:
+C<< AutoInactiveDestroy => 1 >>), as the listen connection already must be. A
+handle whose destructor ends the session in whatever process it runs in ends
+the parent's session when the child drops its copy; guarding against that is
+the transport's half.
+
+=head2 Shutdown is terminal per pool instance
+
+C<shutdown> is the pool's existing teardown contract, called by
+L<DBIO::Storage::Async/disconnect>. L<DBIO::Storage::PoolBase> makes the
+transition terminal before invoking any settlement callback. Raw queue waiters
+are detached first, then both queued and readiness-pending acquires fail with
+C<Connection pool has been shut down>. A cold handle -- a connection still
+coming up, whether its readiness Future is one the pool registered or one your
+own C<_connection_ready_future> made -- is retired and closed
+exactly once without running disconnect actions; a handle that reached
+readiness keeps the established disconnect-actions-before-close path. Global
+destruction is the exception: there the pool settles no Future and may no
+longer be able to tell the two apart (L<DBIO::Storage::PoolBase/shutdown>).
+
+After that transition, C<acquire> and C<acquire_txn> on the same pool return a
+failed Future with the same diagnostic rather than throwing or starting work.
+A late C<release> is a no-op, and another C<shutdown> is a no-op. The instance
+cannot be restarted. Reconnecting through the higher DBIO storage lifecycle
+detaches the old backend and builds a new backend, ownership generation, and
+pool; it does not revive the terminal pool. Pool restart and public timeout
+APIs are outside this contract. Cancelling an acquire is not: one queued for a
+busy pool, and one waiting for a new connection to come up, are both covered
+below, in L</A queued caller's Future>.
+
+=head2 A freed schema closes its async connections
+
+When a schema is freed, C<DESTROY> of its sync storage (L<DBIO::Storage::DBI>)
+disconnects the embedded async storage, as C<disconnect>
+does: the pool shuts down, a connection that stands in its session reset is
+closed and its reset is cancelled. This happens without the event loop. The
+chain of a running reset holds the async storage while it runs, so without
+this step the connections of a freed schema would stay open until the loop
+runs again.
+
+It applies in the process that owns the connections. A forked child drops what
+it inherited (L</A forked child gets a pool of its own>), and global
+destruction keeps the rules of the pool (L</Shutdown is terminal per pool
+instance>). A schema without an async mode has no async storage and DESTROY
+builds none. A failure of the teardown is reported as a warning and DESTROY
+runs on to release the sync handle.
+
+=head2 What ends work talks to the pool it began on
+
+Your C<pool> most likely builds lazily, in the slot
+L<DBIO::Storage::Async/disconnect> empties:
+
+  sub pool { $_[0]->{pool} ||= My::Pool->new(storage => $_[0], ...) }
+
+That makes C<< $self->pool >> a call for whatever B<begins> work. Ask it once,
+keep what it returns, and let everything that B<ends> the work -- the release,
+a retirement, the report of a dead connection -- talk to that pool, the one
+the connection came from:
+
+  my $pool = $self->pool;                     # begins work
+  return $pool->acquire->then(sub {
+    my $conn = shift;
+    ...
+    $f->on_ready($self->_release_on_ready($conn, $pool));   # ends it
+    return $f;
+  });
+
+A statement can settle after its storage was disconnected. The pool it began
+on is shut down by then, and a release, a retirement or a death report there
+is a no-op. C<< $self->pool >> asked at that moment builds a new pool on the
+disconnected storage, and the release hands it a connection it never
+held. Core's C<txn_do_async>, C<pipeline> and C<deploy_async> keep to the rule
+for the connections they acquire; your C<_query_async> and whatever else in
+your transport acquires one keep to it for theirs.
+
+=head2 Report a dead connection
+
+The pool cannot see a connection die once it has come up: its readiness Future
+resolved then and stays resolved. When your query path meets a
+connection-level error -- the server has gone away, the connection was lost,
+not a query error the session survives -- report it, and release as always,
+to the pool the connection came from
+(L</What ends work talks to the pool it began on>):
+
+  $pool->_mark_connection_dead($conn) if $err_is_fatal;
+  $pool->release($conn);
+
+The release then retires the connection instead of idling it, and a caller
+queued for its slot gets a freshly spawned one -- or that spawn's error, the
+next queued caller then getting the next attempt; a
+connection reported while idle is retired at once. Without the report, the
+dead connection goes back to
+the idle list and the next caller gets it (ADR 0047 addendum).
+Which errors are fatal is yours to decide -- core does not infer it from a
+connection error callback.
+
+A connection that dies while idle is seen by nobody unless your transport
+watches idle sockets, so the report comes only from the next caller's failed
+query -- and after a server restart, from one caller per idle connection. If
+your transport can tell without a round trip -- from local state, or from a
+non-blocking read of what the server already sent -- override
+C<_idle_connection_alive>:
+
+  sub _idle_connection_alive {
+    my ($self, $conn) = @_;
+    return !server_has_closed($conn);   # never blocks, never sends
+  }
+
+C<acquire> asks it about every idle connection it is about to hand out, and
+retires one it does not vouch for in favour of the next, or of a fresh one
+(ADR 0047 addendum). The default does not check.
+
+=head2 A queued caller's Future
+
+With every connection checked out and the pool at C<max_size>, C<acquire>
+queues the caller on a pending Future made by C<PoolBase::_new_waiter> -- by
+default a new C<future_class> -- and the next C<release> settles it with the
+freed connection. Everything the caller chains off it is of the waiter's class,
+down to the Future a blocking call C<< ->get >>s. If your transport's blocking
+path waits on that Future, make it of a class whose C<await> drives your loop:
+
+  sub _new_waiter {
+    my ($self) = @_;
+    return My::Transport::Future->new;   # pending; the pool queues it
+  }
+
+The seam only makes the Future; the pool queues and settles it (ADR 0047
+addendum).
+
+A caller that stops waiting leaves the queue. Cancelling its Future withdraws
+it at once -- L<Future> carries a cancel down the C<< ->then >> chain to the
+waiter. A transport that gives up on a waiter itself withdraws it first, then
+fails it with its reason:
+
+  $waiter->fail("...\n") if $pool->_withdraw_waiter($waiter);
+
+No connection is lost either way: C<release> hands a connection only to a
+waiter still waiting, and returns it to the idle list when there is none.
+
+A caller can also give up before the pool has any connection to queue for --
+while a connection it spawned is still coming up. C<acquire> hands that
+connection over through a Future of the caller's own, not a C<< ->then >> off
+C<_connection_ready_future>, so cancelling it does not cancel the readiness
+Future and strand the connection. When the connection comes up it goes to the
+caller if it still waits, otherwise to the next queued waiter or back to idle.
+If it fails to come up -- its readiness Future fails, or the seam dies -- it
+is retired and the caller, if it still waits, gets that error. Its slot goes
+on to the oldest caller queued behind it: a fresh connection is spawned for
+that caller, or it fails with the spawn's error and the next queued caller
+gets the next attempt, so nobody is left waiting for a release that cannot
+come. C<shutdown> fails a caller still waiting this way and cancels the chain
+the pool held off the readiness Future -- with L<Future>, that cancels a
+readiness Future your own C<_connection_ready_future> returned, which a caller
+giving up no longer does
+(L<DBIO::Storage::PoolBase/_connection_ready_future>). A callback on the
+caller's Future that dies as the connection is handed over is reported through
+the pool's C<on_error>.
+
+=head2 The session of a pooled connection (ADR 0079)
+
+A connection of the pool is lent to one borrow at a time, and the session of
+every borrow is its own. A borrow is a statement, a transaction (to its COMMIT
+or ROLLBACK) or a pipeline; statements pinned to the connection inside one belong
+to that borrow and reset nothing. When a borrow ends, the pool resets the
+connection before anyone else gets it: C<SET ROLE>, C<SET SESSION AUTHORIZATION>,
+C<set_config(..., false)>, C<SET search_path>, session isolation level, temporary
+tables, prepared statements and session advisory locks of one borrow are gone for
+the next. The connection is as freshly spawned, connect actions
+(C<on_connect_do>, C<on_connect_call>, the connection's schema) included. The
+connection of a C<listen> is a connection of its own outside the pool.
+
+Until the reset is answered the connection counts against C<pool_size> and goes
+to nobody; a caller waiting for a connection waits for it. The reset is bounded
+by the connect option C<reset_timeout> (seconds, default 10, C<0> for no bound).
+A connection whose reset fails or runs out of time is closed and the next
+borrower gets a fresh one.
+
+B<The seam.> L<DBIO::Storage::Async/_reset_pool_connection>:
+
+  sub _reset_pool_connection {
+    my ($self, $conn) = @_;
+    # return a Future
+  }
+
+It is called with the connection the pool takes back, once per borrow. The
+Future is done when the connection is the same as one just spawned: the server
+session reset and the connect actions in effect again. It fails when that cannot
+be reached; the pool then closes the connection. A transport implements it with
+the reset its server offers (PostgreSQL C<DISCARD ALL>, MySQL
+C<mysql_reset_connection>) followed by the replay of the connect actions.
+
+A transport without an implementation gets the default, which fails: its
+connection is closed at the end of every borrow and every borrow runs on a
+fresh one. That is correct, and costs a connect per borrow.
+
+=head2 Timeouts and limits (ADR 0078)
+
+A caller waits for a bounded time. These are connect options of the async
+storage, read by the pool through L<DBIO::Storage::Async/async_option>:
+
+=over 4
+
+=item * C<acquire_timeout> -- seconds a caller may wait for a usable
+connection, default 30, C<0> for no timeout. It covers the queue and the time a
+new connection takes to come up, counted from the C<acquire>. At expiry the
+waiter is withdrawn (C<_withdraw_waiter>) and fails with C<no pool connection
+within N seconds>; a connection that frees up or comes up later goes to the next
+queued caller or to the idle list. A caller served at once arms no timer.
+
+=item * C<max_waiters> -- a positive integer, default no limit. With that many
+callers queued, C<acquire> fails at once with C<pool exhausted: N callers
+waiting>.
+
+=item * C<txn_timeout> -- seconds a C<txn_do_async> may take, no default,
+counted from the call. At expiry the transaction takes the cancel path
+(ROLLBACK best-effort, connection retired) and its Future fails with
+C<transaction timed out after N seconds>. It needs a Future class that can be
+cancelled (L<Future>).
+
+=back
+
+The messages name the option and the number and never the SQL or the binds of
+a caller.
+
+B<The timer seam.> The pool and C<txn_timeout> measure time with
+L<DBIO::Storage::Async/_delay>:
+
+  sub _delay {                   # default: $self->_listen_delay($seconds)
+    my ($self, $seconds) = @_;
+    return My::Transport::Future->timer($seconds);   # resolves from the loop
+  }
+
+It returns a Future that resolves after C<$seconds>, from the event loop and
+never synchronously. Core cancels it when the timed wait ends first, if the
+Future can C<cancel>. A transport that implements C<_listen_delay> has it
+already. A transport with neither gives C<< acquire_timeout => 0 >>; otherwise
+an C<acquire> that has to wait fails, naming C<_listen_delay>. A pool built
+with C<< storage => $async_storage >> takes the options from that storage; a
+pool without a storage works with the timeout off and refuses a positive
+C<acquire_timeout>.
+
+B<A transaction or pipeline never waits for its own pool's queue.> A coderef
+that returns the Future of a call on the storage (C<< $storage->insert_async >>,
+an unbound C<< $rs->all_async >>) instead of one on the context queues that call
+for a connection of the pool the transaction holds one of. The pool knows these
+Futures: the storage's C<*_async> methods report the waiters they queued
+(C<PoolBase::_collect_queued>, C<_note_queued_for>), and an aggregate such as
+C<needs_all> is read through C<pending_futures>. The default of
+L<DBIO::Storage::Async/_txn_inner_future> and of
+L<DBIO::Storage::Async/_pipeline_inner_future> asks
+C<< $pool->_refuse_queued_for($future, $message) >>: every such waiter leaves the
+queue and fails, so its statement never runs, and the seam throws C<the coderef
+returned a Future queued for this transaction's own pool; call it on the
+context> (pipeline: C<pipeline's>). The transaction ends with ROLLBACK, the
+pipeline retires its connection. A Future the caller derived with C<< ->then >>
+from a storage Future is not known to the pool; chain on the context's Futures.
+A transport whose pool is not a L<DBIO::Storage::PoolBase> answers
+C<_refuse_queued_for>, C<_collect_queued> and C<_note_queued_for> itself, or
+overrides the two seams.
+
+B<An unbound call in the coderef is not in the transaction.> Under debug
+(C<DBIO_TRACE>) the storage warns when a C<*_async> of the storage itself --
+C<< $storage->delete_async >>, an unbound C<< $rs->all_async >> -- starts while
+the coderef of a C<txn_do_async> runs: it takes a connection of its own and sees
+and changes the state outside the transaction. The warning names the operation
+(C<delete_async on the storage ran while a txn_do_async coderef was running>)
+and never a value or a bind. Without debug there is no warning; the call goes on
+the context.
+
+B<Declared options.> The async options form a declared list: C<pool_size>,
+C<acquire_timeout>, C<max_waiters>, C<txn_timeout> and C<reset_timeout>, and the names a backend
+returns from the class method L<DBIO::Storage::Async/async_option_names>:
+
+  package My::Transport::Storage;
+  use base 'DBIO::Storage::Async';
+  sub async_option_names { qw( statement_timeout max_in_flight ) }
+
+With an C<async> mode set, the sync storage keeps these out of its
+C<< DBI->connect >>; the backend reads them with C<< $self->async_option($name) >>
+in the hash form, the DBI form and beside an AccessBroker, and checks its own
+values. The method is asked of the mode's backend class, before the backend
+exists. A transport that overrides C<connect_info> calls
+C<_strip_private_connect_attrs> on the raw connect info, as core's does, and
+keeps the options that way.
+
+=head2 What the reference Future::IO transport adds
+
+L<DBIO::Async::Storage> and its pool, L<DBIO::Async::Pool> (dist
+C<dbio-async>), build one more convenience layer that is B<not> itself a
+core requirement -- a from-scratch backend is free to implement C<pool> and
+the query seams however it likes. C<DBIO::Async::Pool>'s
+C<_create_connection>/C<_shutdown_connection> simply delegate to the owning
+storage's C<_create_pool_connection>/C<_shutdown_pool_connection>
+(F<dbio-async>'s L<DBIO::Async::Pool>), and it answers C<PoolBase>'s
+per-borrow readiness seam C<_connection_ready_future> with
+C<_await_conn_ready>, which in turn delegates to the storage
+(L<DBIO::Async::Pool/_connection_ready_future>). The storage side supplies the
+actual wait: C<_await_readable> polls a per-connection filehandle through
+L<Future::IO> (F<dbio-async>'s L<DBIO::Async::Storage/_await_readable>),
+cached per connection via C<_conn_poll_fh> because unwatching a fresh dup'd fd
+mid-cycle corrupts the loop's watch table (same file), and
+C<_await_query_result> chains submit -> wait-readable -> collect into one
+Future. A backend built directly on C<DBIO::Storage::Async>
+(not on this Future::IO tier) owns all of this itself.
+
+=head1 THE TRANSACTION SEAM
+
+C<txn_do_async> (L<DBIO::Storage::Async/txn_do_async>) acquires a pinned
+connection
+via C<< pool->acquire_txn >>, issues C<BEGIN>, runs the caller's coderef,
+and issues C<COMMIT> or C<ROLLBACK>. This method is concrete and shared --
+you do not override it. What you do supply are three small seams: two decide
+what the coderef receives and where its pinned connection lives, the third
+reads the server's answer to C<COMMIT>:
+
+=over 4
+
+=item * L<DBIO::Storage::Async/_txn_context_class> -- the class
+C<txn_do_async> instantiates and hands to the coderef. Defaults to
+L<DBIO::Storage::Async::TransactionContext>; override only if you need a
+different pinned-CRUD context.
+
+=item * L<DBIO::Storage::Async/_txn_conn_accessor> -- the name the context
+class knows the pinned connection by: the constructor key it is passed under,
+and the method core calls to get it back (the transactional run of
+C<deploy_async> does). Defaults to C<txn_conn>, the only name the generic
+context class goes by: another name needs a context class of your own.
+
+=item * L<DBIO::Storage::Async/_txn_commit_rolled_back> -- asked once a
+C<COMMIT> has succeeded on the wire: did the server roll back instead?
+Defaults to false. Fill it when your engine answers a C<COMMIT> it cannot
+honour by rolling back without an error -- PostgreSQL does, with the command
+tag C<ROLLBACK> -- and your driver can read that answer.
+
+=back
+
+The generic C<DBIO::Storage::Async::TransactionContext>
+(F<lib/DBIO/Storage/Async/TransactionContext.pm>) is loop-agnostic: its five
+CRUD methods all route through C<< $storage->_run_crud_pinned(...) >> with
+the pinned connection, so a transaction's queries share
+exactly the same SQL-building and per-op post-processing as the pooled path
+-- never a second, hand-duplicated code path. Forwarding to the storage's
+ordinary C<select_async>/etc. instead would silently acquire a B<separate>
+pooled connection and run the query outside the transaction, which is
+precisely what C<_run_crud_pinned> exists to prevent.
+
+The context also keeps the Future of every statement it hands out. Core sends
+C<COMMIT> only once all of them have settled, and not at all when one of them
+failed -- it sends C<ROLLBACK> and fails the transaction with that statement's
+error. A context class of your own inherits this by
+subclassing the generic one; one that does not answers no
+C<_txn_statements>, and its transactions go without the check.
+
+=head2 Terminal transaction lifecycle
+
+The context stays active while the callback's Future is pending. Core ends it
+the moment it sends C<COMMIT> or C<ROLLBACK>: a statement
+issued on it from then on -- from a C<then> callback of a statement still in
+flight, say -- would run after the transaction, outside it, so it is refused
+before it reaches your transport. Once C<BEGIN> has failed, or the callback has
+reached its terminal C<COMMIT> / C<ROLLBACK> path, core converges on a single
+finalizer. That finalizer calls C<_invalidate> B<before> returning the pinned
+connection to the pool and hands the connection back exactly once -- through
+C<< pool->release >>, with one exception: a connection that a pipeline run on
+the transaction left in pipeline mode (its C<_pipeline_exit> died) is sent a
+best-effort C<ROLLBACK> core does not wait for and is retired through
+L<DBIO::Storage::PoolBase/_retire_in_use_connection> instead. If the
+context constructor itself throws after acquire, no context exists to
+invalidate; the same finalizer still
+returns the connection exactly once and reports the constructor throw through
+a failed Future. A release throw on that cleanup stays secondary to the
+constructor error. A failed C<acquire_txn> produced no context or connection to
+return, so it releases nothing.
+
+After invalidation C<< $ctx->in_txn >> is false. Direct raw-query and CRUD calls
+on the context, and a nested C<< $ctx->txn_do_async(...) >>, throw a typed
+C<DBIO::Exception> saying the transaction context is no longer active. A
+ResultSet, Row or ResultSetColumn retained with C<with_context($ctx)> is refused
+by the same active-context boundary; it never falls back to pooled dispatch.
+The pinned connection therefore has exactly one owner before release and no
+route back through a stale context afterwards.
+
+A failed C<BEGIN> Future is reported as C<BEGIN failed: ...>; a failed
+C<COMMIT> Future as C<COMMIT failed: ...> -- for a
+L<DBIO::Exception::Server> that text is carried by a derived copy of the object
+with C<context> set, so its C<sqlstate> stays readable. When the callback fails, or one of
+its statements does, a successful C<ROLLBACK> restores that error. A failed
+C<ROLLBACK> -- its Future failed, or its dispatch threw -- is added to it rather
+than put in its place: the transaction fails with a C<DBIO::Exception> reading
+C<Transaction aborted: $error. Rollback failed: $rollback_error>, the text the
+synchronous C<txn_do> reports. A connection whose C<ROLLBACK>
+was not confirmed is never handed out again: the pool retires it. Synchronous
+throws from the C<BEGIN> or C<COMMIT> query seam after a successful acquire are captured as
+failed Futures with their original diagnostics. Finally, if release throws
+after an otherwise successful terminal path, that cleanup error fails the
+Future; if a transaction error already exists, it remains primary and a release
+throw is secondary.
+
+=head1 THE PIPELINE SEAM
+
+L<DBIO::Storage::Async/pipeline> is the same shape one level over: it
+acquires B<one> connection, brackets the caller's batch with your three
+optional seams C<_pipeline_enter> / C<_pipeline_sync> / C<_pipeline_exit>,
+and releases the connection in the sync completion. A transport whose client
+library cannot pipeline overrides none of them -- declining is the default,
+and the caller gets a L<DBIO::Exception> naming your transport and
+C<pipeline()> before any connection is touched. Overriding C<_pipeline_enter>
+is what opts you in.
+
+What you need to know as a transport author is where the batch's queries go.
+The scaffold hands the batch coderef a
+L<DBIO::Storage::Async::PipelineContext> pinned to the bracketed connection
+(override L<DBIO::Storage::Async/_pipeline_context_class> for a different
+one), and that context routes every CRUD call through C<_run_crud_pinned> ->
+C<_query_async_pinned> with that connection. So B<the pinned query seam you
+already implement for transactions is the one the batch uses> -- pipeline
+mode is per-connection state, and this is what guarantees a batched statement
+is sent on the connection that is actually in that state. You do not record
+the bracketed connection in C<_pipeline_enter>, and you must not make
+C<_query_async> consult pipeline state: core no longer routes in-batch
+queries through the pooled seam at all.
+
+The one obligation left on your side is ordering: C<_pipeline_sync> must not
+resolve before the individual batched result Futures have been resolved off
+the connection, because the scaffold exits pipeline mode and returns the
+connection to the pool in that Future's completion.
+
+A pipeline is over when its sync is answered, every statement Future of its
+batch is decided and the Future the coderef returned is decided; only then does
+the connection go back to the pool. No statement Future of a
+batch is open after that. A pipeline that fails -- the coderef dies, the sync or
+the returned Future fails, the batch Future is cancelled -- is handled once: it
+sends no sync, fails every statement Future still open with the batch's error
+(an answer from the transport arriving later finds them decided and is
+ignored) and retires its connection instead of releasing it. Inside a
+transaction it only marks the connection unusable and the transaction boundary
+decides.
+
+A C<_pipeline_exit> that dies costs the connection. It is still in pipeline
+mode, where the next borrower could not use it, so the scaffold retires it
+through L<DBIO::Storage::PoolBase/_retire_in_use_connection> instead of
+releasing it: its slot is free again, for a caller already queued or for the
+next C<acquire>, on a fresh connection.
+
+=head1 THE LISTEN/NOTIFY SEAMS
+
+C<listen>, C<unlisten>, C<notify>, C<listen_alive> and C<listen_reconnect> are
+core async API (ADR 0056), and the hard part of them is already written in
+L<DBIO::Storage::Async/"LISTEN / NOTIFY">: the channel registry, one dedicated
+listen connection outside the pool, a queue that never puts two channel
+operations in flight on that connection, reconnect with bounded exponential
+backoff that subscribes B<every> registered channel again, the
+C<on_listen_error> / C<on_listen_reconnect> hooks, and the fork guard. Your
+transport fills nine seams and calls three core methods back. Declare C<listen>
+and/or C<notify> in C<transport_capabilities> (L</CAPABILITY FLAGS>), or the
+public methods refuse with C<LISTEN/NOTIFY not supported by this storage driver>.
+
+=head2 What you implement
+
+=over 4
+
+=item * C<_listen_open> -- a Future of a B<new> connection (never a pooled
+one), opened with the current connect info and B<fork-safe>: dropping the
+handle in a forked child must not end the parent's session (DBD::Pg:
+C<< AutoInactiveDestroy => 1 >>). Core treats the connection as opaque.
+
+=item * C<_listen_close($conn)> -- close it; it may already be dead.
+
+=item * C<_listen_subscribe($conn, $channel)> /
+C<_listen_unsubscribe($conn, $channel)> -- Futures. The channel arrives
+exactly as the caller wrote it: quote or validate it here, at the seam
+(ADR 0017 section 3). Core guarantees one at a time per connection, so you need no
+serialiser of your own.
+
+=item * C<_listen_watch($conn)> / C<_listen_unwatch($conn)> -- start and stop
+delivering. While watching, call
+C<< $self->_listen_dispatch($channel, $payload, $sender_pid) >> for each
+notification, in arrival order, and C<< $self->_listen_lost($conn, $error) >>
+the moment you find the connection dead. After C<_listen_unwatch> returns,
+call neither for that connection. The connection counts as watched from the
+moment core B<calls> C<_listen_watch>, so you may already dispatch from inside
+it -- a first drain of what the client library buffered during the subscribe
+-- and if that ends the connection, you get C<_listen_unwatch> before
+C<_listen_close>, while C<_listen_watch> is still on the stack.
+
+An error that does B<not> end the connection -- a failed cleanup next to the
+notifications, say -- goes to C<< $self->_listen_error($error) >>. Core reports
+it the way it reports its own: to C<on_listen_error>, C<warn>ed without a hook,
+C<warn>ed again if the hook dies. It changes nothing else: no reconnect, no
+failed Future, C<listen_alive> unaffected. Call it rather than rebuilding that
+reporting in your transport. Like C<_listen_dispatch>, it is ignored in a
+process that is not listening (a forked child, or after listening has ended).
+
+=item * C<_listen_probe($conn)> -- synchronous: true while the connection is
+usable.
+
+=item * C<_listen_delay($seconds)> -- a Future that resolves after that long,
+B<from the event loop> (Future::IO: C<sleep>). It is the reconnect backoff;
+core has no loop of its own.
+
+=item * C<_notify_send($channel, $payload)> -- send one notification on any
+connection, the payload B<as a bind value> (PostgreSQL:
+C<SELECT pg_notify($1, $2)>).
+
+=back
+
+A seam that is documented as returning a Future may return a plain value when
+its work is already done; core treats that as a resolved Future.
+
+A B<pending> Future you return is also the model for the Futures callers get:
+while a C<listen>, C<unlisten> or C<listen_reconnect> is still in flight, core
+hands out C<< $your_future->new >> and settles it itself, so a caller's C<get>
+runs your loop exactly as a C<get> on your own Future would. That needs C<new>
+to work on an instance and give a pending Future core can C<done> and C<fail>
+-- true of every L<Future> subclass, including L<Future::IO>'s and
+L<IO::Async::Future>, which keeps its loop that way.
+
+=head2 Socket or timer: both are a watch
+
+Watching is yours to shape. A B<socket-driven> transport polls the
+connection's socket for readability, drains every pending notification into
+C<_listen_dispatch>, and polls again -- the PostgreSQL shape over Future::IO.
+A B<timer-driven> transport emulates notifications on an engine that has no
+server push: C<_listen_subscribe> only records the channel and a high-water
+mark, C<_listen_watch> starts a loop that waits a poll interval, queries the
+rows newer than the mark, dispatches them in order and waits again. A failed
+poll query goes to C<_listen_lost>; a failed retention cleanup on a connection
+that still works goes to C<_listen_error>. C<_notify_send> then C<INSERT>s a
+row with bound values. Such an emulation may declare C<listen> and C<notify>,
+provided its POD says what it delivers: latency is the poll interval, and a
+notification becomes visible when its writer commits.
+
+Either way, self-healing needs nothing extra from you: report death, and core
+closes, waits, reopens, re-subscribes and re-arms through your seams.
+
+=head2 If you override C<listen> yourself
+
+A transport may still override C<listen> / C<unlisten> / C<notify> outright;
+the override wins and the core machinery never runs. You then also own
+C<listen_alive> and C<listen_reconnect>, which only know the connection core
+opened. Treat this as a way station while you move onto the seams, not as an
+alternative to them.
+
+=head1 THE RESULTSET/ROW ASYNC LAYER AND PINNED CONTEXTS
+
+The transaction and pipeline seams above pin the B<storage-level> CRUD
+(C<select_async> / C<insert_async> / ...) onto one connection through their
+context object. The ResultSet/Row/ResultSetColumn C<*_async> methods
+(L<DBIO::ResultSet/all_async>, L<DBIO::Row/update_async>, and their siblings)
+sit a layer above that, and they do B<not> compose with C<txn_do_async> /
+C<pipeline> automatically. This is the one thing about the async layer that is
+easy to get wrong, so it is spelled out here (ADR 0045).
+
+By default a ResultSet/Row async method resolves the B<pooled> backend
+(C<< $storage->_async_storage >>) and takes whatever connection the pool hands
+out. Inside a C<txn_do_async> body that means a bare
+
+    $schema->storage->txn_do_async(sub {
+      my ($ctx) = @_;
+      # WRONG: runs on a *sibling* pool connection, OUTSIDE this transaction --
+      # it sees pre-BEGIN state, and at pool_size 1 waits for the txn to finish.
+      return $rs->all_async->then(sub { ... });
+    });
+
+does not run inside the transaction at all. Nothing warns; the query succeeds,
+on the wrong connection.
+
+The fix is explicit and deliberate: B<bind the resultset to the context> with
+L<DBIO::ResultSet/with_context> (mirrored as L<DBIO::Row/with_context> and
+L<DBIO::ResultSetColumn/with_context>):
+
+    $schema->storage->txn_do_async(sub {
+      my ($ctx) = @_;
+      return $rs->with_context($ctx)->all_async->then(sub {
+        my (@artists) = @_;
+        # correct: this SELECT ran on the pinned transaction connection, and
+        # so does the write-back below -- the row inherited the context.
+        return $artists[0]->update_async({ name => 'x' });
+      });
+    });
+
+Once bound, the context wins over the pooled backend for every C<*_async> on
+that resultset, on clones made from it (C<< with_context($ctx)->search({...}) >>),
+on rows produced from it (C<all_async>, C<first_async>, C<create_async>, ...),
+and on column resultsets from C<< ->get_column >>. The binding is B<carried,
+not resolved>: there is deliberately no ambient "current context" on the
+storage to pick up, because an async program can have two transactions in
+flight on one storage at once and a storage attribute would be wrong under
+concurrency. If you do not bind, you get the pool -- by design.
+
+The binding propagates uniformly: B<every> resultset, row or column resultset
+derived from a bound one carries the pin. That includes
+C<< ->page >>, C<< ->as_subselect_rs >>, C<< ->bare >>, C<< ->correlate >>,
+C<< ->count_rs >>, the set operations (C<< ->union >>, C<< ->intersect >>,
+C<< ->except >> and their C<_all> forms -- the result takes the binding of its
+operands, which must be bound alike, see below),
+C<< ->search_related >> /
+C<< ->related_resultset >> at both the resultset and row level (and the
+generated relationship accessors such as C<< $row->${rel}_async >> that route
+through them), the row refetch/copy helpers C<get_from_storage_async> /
+C<discard_changes_async> / the flat C<copy_async>, and B<prefetched children>:
+a child reached off a bound parent -- C<< $artist->cds >> after a
+C<< prefetch => 'cds' >> load -- runs its own C<*_async> on the same pinned
+connection, with no extra query. A bound resultset that already holds a
+pre-filled row cache rebinds those cached rows onto the context too, so
+cache-served rows write back pinned. The rule is simply "derive from a bound
+object, stay bound"; there is nothing further to bind by hand. A C<copy_async>
+whose source has a C<cascade_copy> relationship is a multi-row cascade rather
+than one pinned statement, so under a bound context it B<refuses> (see below)
+instead of copying synchronously outside the pinned scope.
+
+The operands of a set operation must be bound alike: all unbound,
+or all bound to the same context. An unbound resultset with a bound operand, a
+bound one with an unbound operand, and two resultsets bound to two different
+transactions are refused when the operation is built, naming the operation and
+the operands that differ -- operand 0 is the one it is called on. The same
+holds when the result is used synchronously: one statement cannot run partly in
+a transaction and partly outside it, so bind every operand to the context or
+none.
+
+What a bound row or a bound column resultset hands out follows the same rule:
+C<< $row->self_rs >> and C<< $row->clean_rs >>, the row a many-to-many
+C<add_to_$rel> finds or creates, the sibling resultsets and sibling rows of
+L<DBIO::Ordered>, C<< $row->changelog >> of L<DBIO::ChangeLog>, and C<func_rs>
+/ C<min_rs> / C<max_rs> / C<sum_rs> of a column bound with C<with_context>. It
+also holds for the B<synchronous> row helpers: the row C<get_from_storage>
+returns and the copy C<copy> returns are bound, and C<discard_changes> leaves
+the row bound. Those helpers still do their own work through the synchronous
+storage, outside the pinned scope -- it is the object they hand back that
+keeps the pin for the C<*_async> you call on it next. Rows are bound whichever
+C<inflate_result> built them, a result class's own included; only plain data
+(L<DBIO::ResultClass::HashRefInflator>) has nothing to carry it.
+
+One derivation does B<not> carry the pin yet: the related rows a multi-create
+builds from nested data (C<< $rs->new_result({ ..., artist => { name => ... } }) >>
+and the same through C<create>). The row itself is bound, the rows nested in it
+are not. Bind such a row with C<with_context> before calling a C<*_async> on
+it.
+
+=head2 The same pattern in the immediate mode
+
+The pattern above is portable. In the C<immediate> mode
+C<txn_do_async> hands its coderef the storage itself as the context (ADR
+0055), and C<with_context> takes it. A resultset, row or column bound to it
+runs its C<*_async> in-process inside the transaction -- between C<BEGIN> and
+C<COMMIT>, the same statements a real backend sends on its transaction
+connection for the same coderef -- and:
+
+=over 4
+
+=item * a statement of a bound object that fails rolls the transaction back,
+whether the coderef returned it, dropped it or recovered from it;
+
+=item * what a bound object refuses on a real backend ("cannot run on a bound
+async context") it refuses here, although the synchronous fallback would run
+inside the transaction in this mode: code written against one mode must not
+break on the other;
+
+=item * a bound object used when no C<immediate> C<txn_do_async> is running on
+its storage is refused ("no longer active"), as one held past a real
+backend's transaction is.
+
+=back
+
+A storage passes for a context only as the context of its B<own> objects and
+only while its mode is C<immediate>. Another storage, a storage with no async
+mode, and the storage of a real backend are refused as before ("ownership
+cannot be proven").
+
+Two things differ from a real backend, both because the mode has one
+connection and no pool. An B<unbound> C<*_async> inside the coderef runs
+inside the transaction as well -- but its failure is not the transaction's:
+dropped by the coderef, it does not roll anything back. And the context of
+every C<immediate> transaction on a storage is that one storage, so an object
+bound in one transaction and used inside a B<later> one is bound to the later
+one's context too and runs in it; a real backend, with one context object per
+transaction, refuses it. There is no C<pipeline> in this mode -- it is a
+method of an async backend, and the mode has none.
+
+The guard of a finished transaction ("no longer active") belongs to the objects
+bound to the context, not to the context. In this mode the context B<is> the
+storage, and the storage's own C<*_async> methods (C<< $storage->insert_async >>
+and its siblings) are the plain in-process surface of a connection that has
+no pool: called after the transaction has ended they are not refused, they run
+as a statement of their own, outside any transaction, as they do before one.
+A real backend's context object is a separate object that ends with its
+transaction, so what is held past that transaction is refused there. Code that
+must be refused in both modes holds a bound resultset, row or column, never
+the storage as its context.
+
+=head2 Ownership follows the backend/pool generation
+
+A pinned context is accepted only by the concrete sync storage object whose
+B<current> embedded backend created it. Core proves that with an opaque
+reference token, not by comparing class names, schema names, DSNs, context
+shape, or composed C<@ISA>s. The async backend owns the current token and
+L<DBIO::Storage::DBI> mirrors that same reference on the actual sync owner.
+Two independently built storages may have identical synthesised sync and async
+classes and identical connect info; their tokens, and therefore their contexts,
+remain different.
+
+The generic C<TransactionContext> and C<PipelineContext> snapshot the token at
+construction. The snapshot never follows C<< $ctx->storage->pool >> dynamically:
+a direct backend C<disconnect> can leave the backend object alive while a later
+C<pool> call builds a new pool generation. The old context must remain tied to
+the old generation rather than acquiring the new pool's identity by following
+the object.
+
+Generation changes are fail-closed and happen before reuse:
+
+=over 4
+
+=item * A truthy async-backend C<connect_info> setter rotates once. If a pool
+exists, C<disconnect> performs that rotation before shutdown; if no pool has
+been materialised, C<connect_info> rotates directly anyway.
+
+=item * Async-backend C<disconnect> rotates before shutting down and clearing
+its pool, even when no pool currently exists. A later lazy C<pool> therefore
+belongs to the new generation.
+
+=item * DBI C<connect_info> and C<disconnect> clear the sync owner's mirrored
+token before detaching C<_async_storage_obj>. The next lazy backend build
+mirrors its new token. A detached old backend is allowed to finish shutdown,
+but its later rotation is adopted only if that exact backend object is still
+the owner's cached current backend, so it cannot overwrite a newer generation.
+
+=back
+
+C<with_context> checks this ownership before cloning, and the RS/Row/RSC async
+dispatchers check it again immediately before sending work. The second check
+catches both a manually injected C<{_async_context}> slot and a backend rebuild
+that happened after binding. Generic context raw-query/CRUD entry points check
+the same owner generation after checking that the context is active. A
+context-shaped external object without Core's token snapshot cannot prove
+ownership and is not pinning-capable in this increment.
+
+Composed storage needs no exception: the token is mirrored onto the concrete
+sync storage object that owns the composed backend, so the same-owner context
+passes and an identically composed foreign context fails. One implementation
+limit is explicit: the abstract C<pool> method cannot observe arbitrary pool
+slot assignments made inside subclasses. A concrete backend must replace an
+existing pool through its C<connect_info> / C<disconnect> lifecycle paths for
+Core's generation boundary to apply.
+
+Two edges follow from the context lifetimes above, and both are enforced rather
+than left as documentation:
+
+=over 4
+
+=item * A B<pipeline> context is valid only for the synchronous run of its
+batch coderef (dbio-async ADR 0003). The scaffold invalidates it the moment the
+coderef returns; a bound resultset used after that point B<throws> ("no longer
+active") instead of silently falling back to the pool. Issue the async work
+inside the batch, not from a resultset held past it. A B<transaction> context
+stays valid while the callback's Future is pending and through its own
+C<< ->then >> chain, so that work still pins correctly. It is invalidated
+when C<COMMIT> or C<ROLLBACK> goes out, and on a C<BEGIN> failure before the
+single release; a bound result retained past that point throws by the same
+active-context rule.
+
+=item * The context CRUD surface is exactly select / select_single / insert /
+update / delete. A ResultSet/Row operation that cannot be expressed as one such
+pinned statement -- a related-object multi-create, an C<OnColumnChange> /
+C<cascade_update> / C<cascade_delete> row write, an upsert cascade/fallback --
+normally punts to the synchronous method and resolves immediately. Under a
+bound context that punt would run outside the pinned scope, so it B<refuses,
+named> ("cannot run on a bound async context") rather than redirect silently.
+Perform such multi-statement work as explicit steps, or outside the context.
+
+What makes an insert a multi-create is a related row that is written before
+or after it, not anything a row may carry besides plain values. A
+row with an object for a column with an inflator (a C<DateTime>, say), or with
+a C<belongs_to> row that was in storage when the row was built, is one
+C<INSERT>: it goes out through the backend, on the pinned connection when
+bound, with the deflated value and the foreign key the synchronous insert
+writes. The refusal of a real multi-create names the relationship. One caveat
+stands: a C<belongs_to> given as a B<hashref> is looked up while the row is
+built, by a synchronous statement that runs outside the transaction before
+the insert is refused.
+
+=back
+
+=head2 Errors: a failed Future or an exception
+
+A C<*_async> call on a ResultSet, Row or ResultSetColumn answers with a Future
+whenever the call itself is well formed. What goes wrong at runtime reaches the
+caller as a B<failed Future> of the storage's C<future_class>, with the message
+as thrown: the pooled connection cannot be made, the statement cannot be built
+(the synchronous owner cannot connect for its C<sql_maker>), the statement
+fails on the server. A message never quotes credentials.
+
+Misuse is an B<exception> at the call, before any work is issued: a connection
+without an async mode (C<not an async connection>), a resultset or row
+bound to a context that has ended or belongs to another storage (ADR 0045),
+and arguments the call refuses (an unknown option, no data, a capability the
+storage does not declare).
+
+=head1 MODE ADVERTISEMENT
+
+An application chooses your backend by name at C<connect> time:
+C<< connect(..., { async => 'some_mode' }) >> (ADR 0030). There are two ways
+your class gets resolved for that name.
+
+=head2 Explicit registration
+
+L<DBIO::Storage::DBI/register_async_mode> maps a mode name to a backend
+class, on either a generic base (inherited by every driver) or a concrete
+driver storage class (so the same mode name resolves differently per
+driver). The resolver walks the instance's linearised ISA looking for a
+registration, driver-specific entries shadowing generic ones
+(C<_resolve_async_mode_class>). A requested-but-unregistered
+mode croaks loudly naming the mode (in C<_async_storage>) -- there is no
+silent fallback (ADR 0030 Decision 3). The target is validated after its lazy
+load: only the literal C<immediate> registry mode may resolve to something
+other than a L<DBIO::Storage::Async> backend. A loaded wrong-type target for
+any other mode is a contract error and croaks; it never falls through to
+synchronous dispatch. L<DBIO::PostgreSQL::Storage>'s C<ev> registration is a
+concrete example:
+C<< __PACKAGE__->register_async_mode( ev => 'DBIO::PostgreSQL::EV::Storage' ) >>
+(F<dbio-postgresql>'s L<DBIO::PostgreSQL::Storage>).
+
+This backend-target validation is separate from async storage-layer mirroring.
+A registered storage layer says that it is sync-only by defining
+C<async_layer_class> and answering C<undef> for the mode; it is then skipped
+when the resolved backend is composed. A layer that neither defines the method
+nor ships the convention C<< <layer>::Async >> sibling is refused, with an
+exception naming the layer and both ways out. Neither case is an unloaded or
+wrong-type backend target.
+
+=head2 The C<future_io> naming convention
+
+C<future_io> is the one mode B<not> resolved from the registry. Instead,
+core derives your adapter class deterministically from the concrete,
+driver-determined storage class: C<< ref($storage) . '::Async' >> -- e.g.
+L<DBIO::PostgreSQL::Storage> resolves C<DBIO::PostgreSQL::Storage::Async>
+(C<_async_storage>, the resolver behind L<DBIO::Storage::DBI/async>). If
+nothing is registered
+explicitly, core walks the storage's linearised ISA most-specific first,
+probing C<< <pkg>::Async >> at each rung and stopping strictly before the
+generic C<DBIO::Storage::DBI> base (C<_async_storage>) -- so an extension
+storage subclass with no adapter of its own inherits the nearest parent
+driver's. An explicit C<< register_async_mode(future_io => ...) >> on a
+concrete driver class still wins over this walk (C<_async_storage>); a
+candidate that loads but is B<not> a L<DBIO::Storage::Async> croaks at once,
+naming the offending class, rather than silently falling through to a
+parent's adapter (C<_async_storage>; ADR 0030 refinements).
+This is why L<DBIO::PostgreSQL::Storage::Async> needs no
+C<register_async_mode> call at all -- its name B<is> the registration
+(F<dbio-postgresql>).
+
+=head2 The C<immediate> degrade
+
+C<immediate> is registered once, in core, against no real backend:
+C<< __PACKAGE__->register_async_mode( immediate => 'DBIO::Future::Immediate' ) >>
+(L<DBIO::Storage::DBI>). It is the only registry mode permitted to resolve to
+a non-L<DBIO::Storage::Async> target. Because C<DBIO::Future::Immediate>
+(F<lib/DBIO/Future/Immediate.pm>) is not a L<DBIO::Storage::Async> subclass,
+C<_async_storage> builds B<no> embedded backend for it at all -- there is
+nothing for a transport author to implement here. Every C<*_async> call instead
+falls through to the base L<DBIO::Storage>'s C<_run_async>: it runs the
+operation synchronously, in-process,
+in an C<eval> and wraps the result in an immediately-resolved
+C<DBIO::Future::Immediate>, via C<future_class>, which defaults to that same
+class. This path does B<not> go
+through C<_run_crud>. C<_run_immediate> shapes the synchronous return to the
+per-op form described in L</THE CONTRACT> above instead: C<select> resolves the
+rows the sync cursor's C<< ->all >> yields, and C<select_single> one row
+arrayref or C<undef> (ADR 0053); C<insert>/C<update>/C<delete> already return
+that form and pass through; C<txn_do> hands its coderef the storage itself as
+the context and adopts a Future the coderef returns (ADR 0055) -- a context a
+resultset, row or column can be bound to with C<with_context> like any other
+(L</The same pattern in the immediate mode>). So the
+resolved value looks identical to a real backend's from the caller's point of
+view.
+
+If no mode was chosen at all (a plain sync connection), the same
+C<_run_async> croaks instead of degrading -- C<*_async> is universal API
+surface, but it only does async work
+when a mode was explicitly requested.
+
+=head1 CAPABILITY FLAGS
+
+Some async features are optional, not every transport can offer them (e.g.
+C<LISTEN>/C<NOTIFY>, C<COPY>, pipelining), and a storage extension layer may
+need one of them to be present before it composes onto your transport. A
+backend advertises what it supports as a class method:
+
+  sub transport_capabilities { qw(on_connect_replay listen notify) }
+
+L<DBIO::Storage::Async/transport_capabilities> defaults to an empty list; an
+extension layer declares what it needs via C<required_transport_capabilities>,
+and core's C<_async_storage> resolver (L<DBIO::Storage::DBI/async>) checks the
+gap B<before> composing
+the layer onto your transport, croaking and naming the layer, the missing
+capability, and your transport class if anything required is absent
+(ADR 0032 Decision 5). A
+transport gap becomes that transport's own ticket -- never a silently
+dropped feature.
+
+Two names do more than gate layers: C<listen> and C<notify> also gate core's
+own C<listen>/C<unlisten>/C<listen_alive>/C<listen_reconnect> and C<notify>
+methods (L</THE LISTEN/NOTIFY SEAMS>). Declare them only once the matching
+seams are implemented.
+
+A third name is read by core alone, not by layers: C<broker_connect_options>.
+A layer that lists it in C<required_transport_capabilities> is refused on every
+transport, since it is no layer capability.
+A transport that declares it takes the connect options an embedding sync
+storage was given beside an L<DBIO::AccessBroker> -- C<< [ $broker, \%options ] >>
+-- and applies them to every connection it opens: C<pool_size> sizes its pool
+(core's C<connect_info> does that), and the DBD attributes
+(L<DBIO::Storage::Async/_access_broker_call_attributes>) are merged into each
+connection built from the broker's answer, as far as its client library can
+express them. A transport whose client is no DBD (the C<ev> transports)
+cannot: those attributes never reach the client library and stay readable
+through C<_access_broker_call_attributes> only. Without the declaration, core
+refuses a broker-backed connection whose options carry DBD attributes or
+C<pool_size> at first async use, rather than open pooled connections that
+lack them (L<DBIO::Storage::Async/transport_capabilities>).
+
+Silence is not an exemption. A layer that declares no
+C<required_transport_capabilities> at all is taken to require the default query
+seam C<_query_async>, since that is the seam a layer wraps, so a transport that
+does not override it -- one that does not own the query path -- refuses that
+layer as well. If your transport implements C<_query_async> (as every pooled
+transport does), nothing changes for you; if it does not, undeclared layers are
+kept off it instead of composing into silence. A layer that truly needs nothing
+from the transport declares an explicit empty list.
+
+L<DBIO::Async::Storage> declares exactly C<on_connect_replay> (its pool
+replays the owning sync storage's connect actions on every spawned
+connection -- see L</CONNECTION AND POOL LIFECYCLE> above; F<dbio-async>'s
+L<DBIO::Async::Storage/transport_capabilities>). It implements the listen
+seams every L<Future::IO> transport shares -- the backoff timer, the watch
+loop, the pooled C<_notify_send> -- and declares neither C<listen> nor
+C<notify>, because draining notifications is the driver's half
+(L<DBIO::Async::Storage/"LISTEN / NOTIFY">).
+
+L<DBIO::PostgreSQL::Storage::Async> inherits C<on_connect_replay> and adds
+C<listen>, C<notify> and C<broker_connect_options>. For the first two it fills
+the PostgreSQL half of the listen seams --
+a dedicated C<DBD::Pg> connection, quoted C<LISTEN>/C<UNLISTEN>, a
+C<pg_notifies> drain, C<SELECT pg_notify(?, ?)> -- so core's LISTEN/NOTIFY
+machinery (L</THE LISTEN/NOTIFY SEAMS>) runs over this C<future_io>
+transport. C<COPY> and pipelining are B<not> implemented on it -- C<DBD::Pg>'s
+async binding exposes no libpq pipeline mode -- and live on the native C<ev>
+backend instead (F<dbio-postgresql>'s
+L<DBIO::PostgreSQL::Storage::Async/"Transport capabilities">). An async layer
+that requires either of them fails loud, by design, if composed over this
+transport.
+
+Both MySQL transports declare C<listen> and C<notify>, and what they implement
+is an emulation. MySQL/MariaDB has no server push, so each fills the listen
+seams timer-driven, as described in L</"Socket or timer: both are a watch">:
+the listen connection polls a notify table (L<DBIO::MySQL::NotifyTable>,
+F<dbio-mysql>), and a notification arrives with the first poll after its
+transaction committed. L<DBIO::MySQL::Storage::Async> on C<future_io> -- and
+L<DBIO::MySQL::Storage::MariaDB::Async>, which inherits it -- declares
+C<on_connect_replay listen notify broker_connect_options>, the first inherited
+from L<DBIO::Async::Storage>. L<DBIO::MySQL::EV::Storage> on C<ev> declares the
+same four. Neither declares C<copy> (MySQL has no C<COPY>) or C<pipeline>, and
+neither implements the pipeline seams; L<EV::MariaDB> pipelines at the wire
+level with no pipeline mode to bracket (F<dbio-mysql-ev> ADR 0009).
+
+C<pipeline> is not one of the names that gate core's own methods. Core's
+C<pipeline()> runs when the transport overrides C<_pipeline_enter>, whatever
+it declares (L</THE PIPELINE SEAM>); of the transports named here only the
+PostgreSQL C<ev> backend does. On any other, C<pipeline()> returns a failed
+Future naming the transport before it touches a connection
+(L<DBIO::Storage::Async/_pipeline_refusal>); it does not croak. The name
+matters only to a layer that requires it.
+
+=head1 A REFERENCE IMPLEMENTATION
+
+L<DBIO::PostgreSQL::Storage::Async> (dist C<dbio-postgresql>) is the
+concrete, shipped worked example -- read it alongside this page. It
+subclasses L<DBIO::Async::Storage> and fills in only the DB-specific
+seams: C<sql_maker_class>/C<_sql_maker_args> for the PostgreSQL dialect,
+C<_transform_sql> (C<?> to positional C<$N>), C<_post_insert_sql>,
+C<_normalize_conninfo>, C<_create_pool_connection>/
+C<_shutdown_pool_connection>, C<_conn_ready>/C<_conn_fileno>,
+C<_submit_query>/C<_collect_result>, C<_async_broker_conninfo> for a broker's
+answer, C<_conn_error_is_fatal>/C<_idle_connection_alive> to tell the pool
+which connections are dead, and C<_ddl_class> for C<deploy_async>
+(L<DBIO::PostgreSQL::Storage::Async>
+lists the full seam set in its own POD). Of the transaction seams
+from L</THE TRANSACTION SEAM> it names one, C<_txn_commit_rolled_back>, which
+it answers from the C<pg_cmd_status> of the C<COMMIT>'s statement handle;
+C<_txn_context_class> and
+C<_txn_conn_accessor> come from L<DBIO::Async::Storage>, which answers with
+L<DBIO::Async::TransactionContext> under the key C<txn_conn> for every
+C<future_io> adapter. For LISTEN/NOTIFY it adds
+C<_listen_open>/C<_listen_close>, C<_listen_subscribe>/C<_listen_unsubscribe>,
+C<_listen_probe>, the C<_listen_drain> the shared watch loop calls, and
+C<_notify_sql> for the pooled C<_notify_send> -- the socket-driven shape from
+L</"Socket or timer: both are a watch">.
+
+The per-op resolution shape from L</THE CONTRACT> is produced in exactly
+one place, C<_collect_result>
+(L<DBIO::PostgreSQL::Storage::Async/_collect_result>): once
+C<< $dbh->pg_ready >> confirms the async result has fully arrived, it
+finalises with C<< $dbh->pg_result >> and then branches on whether the
+statement produced a result set --
+
+  if (($sth->{NUM_OF_FIELDS} || 0) > 0) {
+    my $rows = $sth->fetchall_arrayref;
+    return $self->future_class->done(@$rows);
+  }
+
+  return $self->future_class->done($rv);
+
+-- C<fetchall_arrayref> for SELECT and any C<RETURNING> INSERT (raw row
+arrayrefs, the C<select>/C<insert> shape), or the bare C<pg_result> return
+value C<$rv> (the affected-row count) for a plain UPDATE/DELETE with no
+result set. C<_submit_query>, just before this, sends the statement
+non-blocking via C<< {pg_async => PG_ASYNC} >> and stashes the statement
+handle on the connection for C<_collect_result> to read back.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<DBIO::Storage::Async>
+
+=item * L<DBIO::Storage::Async::TransactionContext>
+
+=item * L<DBIO::Async::Storage>
+
+=item * L<DBIO::PostgreSQL::Storage::Async>
+
+=item * F<docs/adr/0014-async-storage-interface.md> -- the original
+Future-returning, sync-degrading interface
+
+=item * F<docs/adr/0030-async-explicit-per-connection-mode.md> -- async as
+an explicit per-connection mode; the mode registry and C<future_io>
+convention
+
+=item * F<docs/adr/0031-resultset-row-real-async.md> -- the ResultSet/Row
+layer that consumes these resolution shapes, and the C<insert_async> hashref
+requirement
+
+=item * F<docs/adr/0032-storage-layer-composition-and-async-transport-contract.md>
+-- storage-layer composition and C<transport_capabilities>
+
+=item * F<docs/adr/0045-resultset-async-pinned-context.md> -- how the
+ResultSet/Row/ResultSetColumn async layer binds to a pinned txn/pipeline
+context via C<with_context>, and why the binding is explicit
+
+=item * F<docs/adr/0056-listen-notify-is-a-core-async-contract.md> -- LISTEN/NOTIFY
+as core async API: the public methods and hooks, the machinery core owns, and
+the listen seams a transport fills
+
+=back
+
+=head1 AUTHOR
+
+DBIO & DBIx::Class Authors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 DBIO Authors
+Portions Copyright (C) 2005-2025 DBIx::Class Authors
+Based on DBIx::Class, heavily modified.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

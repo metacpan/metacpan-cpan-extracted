@@ -5,7 +5,10 @@ use Test::More;
 plan tests => 12;
 
 use_ok('DBIO::Test');
-my $schema = DBIO::Test->init_schema(dsn => "dbi:SQLite::memory:");
+my $schema = DBIO::Test->init_schema(
+  dsn          => "dbi:SQLite::memory:",
+  storage_type => 'DBIO::SQLite::Storage',
+);
 
 my $cbworks = 0;
 

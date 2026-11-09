@@ -2,6 +2,9 @@ package DBIO::Test::Schema::ArtistSourceName;
 # ABSTRACT: Test result class for custom source name on the artist table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Test::Schema::Artist';
@@ -22,7 +25,7 @@ DBIO::Test::Schema::ArtistSourceName - Test result class for custom source name 
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

@@ -9,7 +9,10 @@ use DBIO::MySQL::EV::Storage;
 
 my $storage = DBIO::MySQL::EV::Storage->new(undef);
 
-is $storage->future_class, 'Future', 'future_class is Future';
+# Not plain Future since karr k48: the blocking methods ->get the Futures,
+# which only a Future that can run the EV loop survives (ADR 0001 addendum).
+is $storage->future_class, 'DBIO::MySQL::EV::Future', 'future_class is DBIO::MySQL::EV::Future';
+ok $storage->future_class->isa('Future'), 'a Future';
 
 can_ok $storage, qw(
   select_async select_single_async insert_async update_async delete_async

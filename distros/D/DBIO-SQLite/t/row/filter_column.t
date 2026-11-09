@@ -202,7 +202,7 @@ for my $artist_maker (
   sub { $schema->resultset('Artist')->new({ charfield => 42 }) },
   sub { my $art = $schema->resultset('Artist')->new({}); $art->charfield(42); $art },
 ) {
-  $schema->resultset('Artist')->delete;
+  $schema->resultset('Artist')->delete({ all => 1 });
 
   my $expected_from = $from_storage_ran;
   my $expected_to   = $to_storage_ran;
@@ -229,7 +229,7 @@ for my $artist_maker (
 # test literals
 for my $v ( \ '16', \[ '?', '16' ] ) {
   my $rs = $schema->resultset('Artist');
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   my $art = $rs->new({ charfield => 10 });
   $art->charfield($v);

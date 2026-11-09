@@ -46,7 +46,7 @@ extra install, and it forced a Moose runtime that the rest of DBIO does not use.
 Re-implementing the subsystem on `DBIO::Base` + `Class::Accessor::Grouped` makes
 replicated storage a peer of every other core storage and component — same OOP
 substrate, same MRO, no parallel object system — and removes the optional-feature
-gate so any schema can `load_components('DBIO::Replicated')` without dependency
+gate so any schema can `load_components('Replicated')` without dependency
 gymnastics. The de-Moosing is the architecturally significant half: "in core" is
 the headline, but "in core *without* the Moose stack" is the decision that made
 it fit.
@@ -58,7 +58,7 @@ storage backends, not a Storage-layer plugin. The clean separation of
 Routing; the credential side is the AccessBroker seam (ADR 0013) — is the domain
 boundary documented in CONTEXT.md.
 
-Heritage records it (`lib/DBIO/Manual/Heritage.pod:96-115`): "C<DBIx::Class::
+Heritage records it (`lib/DBIO/Manual/Heritage.pod`): "C<DBIx::Class::
 Replicated> was an external distribution. L<DBIO::Replicated> ships in the core
 distribution," loaded as a Schema component; and the migration table
 (Migration.pod) maps `DBIx::Class::Replicated → DBIO::Replicated (in core)`.
@@ -72,7 +72,13 @@ distribution," loaded as a Schema component; and the migration table
   the AccessBroker seam (ADR 0013). A replicant's credential never gates
   transactions; only the master's does (CONTEXT.md). The two concerns meet at the
   `HostBound` view (ADR 0013), which lets one credential identity serve every
-  host in the topology.
+  host in the topology. The application builds the views
+  (`$broker->for_host($host)`) and hands each to its backend — the master's
+  `connect`, a replicant's `connect_replicants` entry; Replicated passes a view
+  through like any broker and builds none.
+  A view binds its host into a DSN through the driver's `_bind_host_into_dsn`
+  seam and refuses what it cannot bind, so a replicant never connects to the
+  master of the answer (ADR 0013, addendum 2026-10-09).
 - **Layout flag:** the karr ticket says "lib/DBIO/Storage Replicated." The real
   shape is a top-level `DBIO::Replicated::*` subsystem (ten modules), not a single
   `Storage/Replicated.pm`. The relocation out of `Storage::` is itself part of the

@@ -4,7 +4,11 @@ package DBIO::PostgreSQL::PostGIS::ResultSet;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::ResultSet';
+use DBIO::Exception ();
+use DBIO::PostgreSQL::Util ();
 
 
 # Render the user-supplied geometry argument into ('SQL fragment', @binds)
@@ -20,7 +24,18 @@ sub _geom_arg {
   }
   if (ref($geom) && $geom->isa('DBIO::PostgreSQL::PostGIS::Geometry')) {
     my $srid = $geom->srid;
-    my $wkt  = $geom->wkt;
+    # A value read from the database goes back as the EWKB hex it arrived
+    # as: its WKT is a rendering, 15 digits per ordinate, and not the
+    # stored geometry (karr k22). The hex carries its own SRID flag; the
+    # object's srid, when it has one, is set over it as before.
+    my $hex = $geom->ewkb_hex;
+    if (defined $hex && length $hex) {
+      return ('ST_SetSRID(?::geometry, ?)', $hex, $srid) if defined $srid;
+      return ('?::geometry', $hex);
+    }
+    my $why = $geom->_unwritable_reason;
+    DBIO::Exception->throw($why) if defined $why;
+    my $wkt = $geom->wkt;
     if (defined $srid) {
       return ('ST_GeomFromText(?, ?)', $wkt, $srid);
     }
@@ -30,12 +45,22 @@ sub _geom_arg {
   return ('ST_GeomFromEWKT(?)', $geom);
 }
 
+# The quoted reference to a column of the source: "alias"."column". The name
+# is an identifier of the source, never SQL.
+sub _col_ref {
+  my ($self, $col) = @_;
+  DBIO::Exception->throw("no column '" . ($col // '') . "' in the source of this resultset")
+    unless defined $col && !ref $col && $self->result_source->has_column($col);
+  return DBIO::PostgreSQL::Util::quote_ident($self->current_source_alias)
+    . '.' . DBIO::PostgreSQL::Util::quote_ident($col);
+}
+
 sub _spatial_search {
   my ($self, $sql_func, $col, $geom, @extra) = @_;
   my ($geom_sql, @binds) = $self->_geom_arg($geom);
-  my $me = $self->current_source_alias;
+  my $ref = $self->_col_ref($col);
   return $self->search({
-    -bool => \[ "$sql_func(${me}.${col}, $geom_sql"
+    -bool => \[ "$sql_func($ref, $geom_sql"
               . (@extra ? ', ' . join(', ', ('?') x scalar @extra) : '')
               . ')',
               @binds, @extra ],
@@ -71,9 +96,9 @@ sub within_distance {
 sub bbox_intersects {
   my ($self, $col, $geom) = @_;
   my ($geom_sql, @binds) = $self->_geom_arg($geom);
-  my $me = $self->current_source_alias;
+  my $ref = $self->_col_ref($col);
   return $self->search({
-    -bool => \[ "${me}.${col} && $geom_sql", @binds ],
+    -bool => \[ "$ref && $geom_sql", @binds ],
   });
 }
 
@@ -81,9 +106,9 @@ sub bbox_intersects {
 sub nearest_to {
   my ($self, $col, $geom, $limit) = @_;
   my ($geom_sql, @binds) = $self->_geom_arg($geom);
-  my $me = $self->current_source_alias;
+  my $ref = $self->_col_ref($col);
   my $rs = $self->search(undef, {
-    order_by => \[ "${me}.${col} <-> $geom_sql", @binds ],
+    order_by => \[ "$ref <-> $geom_sql", @binds ],
     ($limit ? (rows => $limit) : ()),
   });
   return $rs;
@@ -93,9 +118,9 @@ sub nearest_to {
 sub order_by_distance {
   my ($self, $col, $geom) = @_;
   my ($geom_sql, @binds) = $self->_geom_arg($geom);
-  my $me = $self->current_source_alias;
+  my $ref = $self->_col_ref($col);
   return $self->search(undef, {
-    order_by => \[ "ST_Distance(${me}.${col}, $geom_sql)", @binds ],
+    order_by => \[ "ST_Distance($ref, $geom_sql)", @binds ],
   });
 }
 
@@ -104,9 +129,9 @@ sub with_distance {
   my ($self, $col, $geom, $alias) = @_;
   $alias //= 'distance';
   my ($geom_sql, @binds) = $self->_geom_arg($geom);
-  my $me = $self->current_source_alias;
+  my $ref = $self->_col_ref($col);
   return $self->search(undef, {
-    '+select' => [ \[ "ST_Distance(${me}.${col}, $geom_sql)", @binds ] ],
+    '+select' => [ \[ "ST_Distance($ref, $geom_sql)", @binds ] ],
     '+as'     => [ $alias ],
   });
 }
@@ -125,7 +150,7 @@ DBIO::PostgreSQL::PostGIS::ResultSet - Spatial query helpers for PostGIS-aware r
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -156,6 +181,27 @@ resultset, so they compose with regular C<< ->search >> calls.
 The geometry argument can be either a
 L<DBIO::PostgreSQL::PostGIS::Geometry> instance, an EWKT string, or a
 raw scalarref C<\['ST_...']> for fully custom SQL.
+
+A Geometry object that was read from the database, or built with an
+C<ewkb_hex>, is bound as that EWKB hex (C<?::geometry>, with
+C<ST_SetSRID> over it when the object has an SRID): the stored geometry,
+bit for bit, so a predicate that holds only for the exact value --
+C<within_distance> with a distance of 0, C<touches>, C<contains> on an
+edge -- holds for a geometry handed back from a row. An object without
+hex is bound as its WKT (C<ST_GeomFromText>), 15 significant digits per
+ordinate. A hex without an SRID flag is SRID 0, as it is on the server.
+
+The column name every helper takes is an identifier, not an expression: it
+names a column of the resultset's source, and the helper writes it quoted
+together with the source alias (C<me.geom>, C<me."Geom">), so a C<MixedCase> name
+keeps its case. A name the source does not have makes the helper throw a
+L<DBIO::Exception> that names it.
+
+A Geometry object with nothing to bind -- no hex, no WKT and no
+coordinates, or coordinates without a C<geometry_type> -- is not an
+argument: the helper throws a L<DBIO::Exception> that says what is
+missing. It used to bind C<NULL>, and the search found nothing without
+saying why.
 
 =head2 Generated spatial predicate methods
 

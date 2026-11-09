@@ -1,0 +1,64 @@
+Offline unit/static test execution during package creation. No database integration.
+
+test_anchor_normalization (test_package.PackageTests.test_anchor_normalization) ... ok
+test_escape_detected (test_package.PackageTests.test_escape_detected) ... ok
+test_external_links_not_fetched (test_package.PackageTests.test_external_links_not_fetched) ... ok
+test_frontmatter_name (test_package.PackageTests.test_frontmatter_name) ... ok
+test_generated_column_explicit_stored (test_package.PackageTests.test_generated_column_explicit_stored) ... ok
+test_ignored_caches (test_package.PackageTests.test_ignored_caches) ... ok
+test_main_context_budget (test_package.PackageTests.test_main_context_budget) ... ok
+test_missing_link_detected (test_package.PackageTests.test_missing_link_detected) ... ok
+test_no_automatic_destructive_cleanup (test_package.PackageTests.test_no_automatic_destructive_cleanup) ... ok
+test_no_nonportable_quit_exit_argument (test_package.PackageTests.test_no_nonportable_quit_exit_argument) ... ok
+test_optional_dependency_contract (test_package.PackageTests.test_optional_dependency_contract) ... ok
+test_preflight_read_only (test_package.PackageTests.test_preflight_read_only) ... ok
+test_read_role_has_no_bypass (test_package.PackageTests.test_read_role_has_no_bypass) ... ok
+test_references_indexed (test_package.PackageTests.test_references_indexed) ... ok
+test_sql_psql_guards (test_package.PackageTests.test_sql_psql_guards) ... ok
+test_structure (test_package.PackageTests.test_structure) ... ok
+test_bad_smoothing (test_retrieval_metrics.FusionTests.test_bad_smoothing) ... ok
+test_bad_weights (test_retrieval_metrics.FusionTests.test_bad_weights) ... ok
+test_duplicates_removed_before_rank (test_retrieval_metrics.FusionTests.test_duplicates_removed_before_rank) ... ok
+test_empty_channels (test_retrieval_metrics.FusionTests.test_empty_channels) ... ok
+test_invalid_channel_name (test_retrieval_metrics.FusionTests.test_invalid_channel_name) ... ok
+test_invalid_rankings (test_retrieval_metrics.FusionTests.test_invalid_rankings) ... ok
+test_non_mapping_channels (test_retrieval_metrics.FusionTests.test_non_mapping_channels) ... ok
+test_shared_candidate (test_retrieval_metrics.FusionTests.test_shared_candidate) ... ok
+test_single_channel (test_retrieval_metrics.FusionTests.test_single_channel) ... ok
+test_stable_tie (test_retrieval_metrics.FusionTests.test_stable_tie) ... ok
+test_unknown_weight (test_retrieval_metrics.FusionTests.test_unknown_weight) ... ok
+test_weighted_channel (test_retrieval_metrics.FusionTests.test_weighted_channel) ... ok
+test_zero_disables_channel (test_retrieval_metrics.FusionTests.test_zero_disables_channel) ... ok
+test_available_truth_denominator (test_retrieval_metrics.MetricTests.test_available_truth_denominator) ... ok
+test_bad_grades (test_retrieval_metrics.MetricTests.test_bad_grades) ... ok
+test_bad_k (test_retrieval_metrics.MetricTests.test_bad_k) ... ok
+test_duplicate_recall (test_retrieval_metrics.MetricTests.test_duplicate_recall) ... ok
+test_empty_found (test_retrieval_metrics.MetricTests.test_empty_found) ... ok
+test_empty_truth_is_undefined (test_retrieval_metrics.MetricTests.test_empty_truth_is_undefined) ... ok
+test_finite_number (test_retrieval_metrics.MetricTests.test_finite_number) ... ok
+test_inverted_ndcg (test_retrieval_metrics.MetricTests.test_inverted_ndcg) ... ok
+test_no_positive_judgments (test_retrieval_metrics.MetricTests.test_no_positive_judgments) ... ok
+test_partial_recall (test_retrieval_metrics.MetricTests.test_partial_recall) ... ok
+test_perfect_ndcg (test_retrieval_metrics.MetricTests.test_perfect_ndcg) ... ok
+test_perfect_recall (test_retrieval_metrics.MetricTests.test_perfect_recall) ... ok
+test_unjudged_is_zero (test_retrieval_metrics.MetricTests.test_unjudged_is_zero) ... ok
+test_bad_vector_types (test_retrieval_metrics.VectorTests.test_bad_vector_types) ... ok
+test_dimensions_rejected (test_retrieval_metrics.VectorTests.test_dimensions_rejected) ... ok
+test_driver_literal (test_retrieval_metrics.VectorTests.test_driver_literal) ... ok
+test_driver_literal_rejections (test_retrieval_metrics.VectorTests.test_driver_literal_rejections) ... ok
+test_driver_underflow_rejected (test_retrieval_metrics.VectorTests.test_driver_underflow_rejected) ... ok
+test_empty_corpus (test_retrieval_metrics.VectorTests.test_empty_corpus) ... ok
+test_equal (test_retrieval_metrics.VectorTests.test_equal) ... ok
+test_exact_fixture (test_retrieval_metrics.VectorTests.test_exact_fixture) ... ok
+test_large_finite_components (test_retrieval_metrics.VectorTests.test_large_finite_components) ... ok
+test_nonfinite_rejected (test_retrieval_metrics.VectorTests.test_nonfinite_rejected) ... ok
+test_opposite (test_retrieval_metrics.VectorTests.test_opposite) ... ok
+test_orthogonal (test_retrieval_metrics.VectorTests.test_orthogonal) ... ok
+test_scale_invariant (test_retrieval_metrics.VectorTests.test_scale_invariant) ... ok
+test_tied_exact (test_retrieval_metrics.VectorTests.test_tied_exact) ... ok
+test_zero_rejected (test_retrieval_metrics.VectorTests.test_zero_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 57 tests in 0.046s
+
+OK

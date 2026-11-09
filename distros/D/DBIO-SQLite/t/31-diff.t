@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 use_ok 'DBIO::SQLite::Diff::Table';
 use_ok 'DBIO::SQLite::Diff::Column';
@@ -24,9 +25,9 @@ use_ok 'DBIO::SQLite::Diff';
   is($ops[0]->action, 'create', 'action create');
   is($ops[0]->table_name, 'author', 'table_name');
   my $sql = $ops[0]->as_sql;
-  like($sql, qr/CREATE TABLE author/, 'create table');
-  like($sql, qr/id INTEGER/,          'id column inline');
-  like($sql, qr/name TEXT NOT NULL/,  'name column with NOT NULL');
+  like($sql, qr/CREATE TABLE "author"/, 'create table');
+  like($sql, qr/"id" INTEGER/,          'id column inline');
+  like($sql, qr/"name" TEXT NOT NULL/,  'name column with NOT NULL');
 }
 
 # --- Diff::Table create with FK ---
@@ -47,7 +48,7 @@ use_ok 'DBIO::SQLite::Diff';
     },
   );
   my $sql = $ops[0]->as_sql;
-  like($sql, qr/FOREIGN KEY \(author_id\) REFERENCES author\(id\)/, 'inline FK');
+  like($sql, qr/FOREIGN KEY \("author_id"\) REFERENCES "author"\("id"\)/, 'inline FK');
 }
 
 # --- Diff::Table multi-column PK ---
@@ -63,7 +64,7 @@ use_ok 'DBIO::SQLite::Diff';
     },
     {},
   );
-  like($ops[0]->as_sql, qr/PRIMARY KEY \(a, b\)/, 'multi-col PK as constraint');
+  like($ops[0]->as_sql, qr/PRIMARY KEY \("a", "b"\)/, 'multi-col PK as constraint');
 }
 
 # --- Diff::Table drop ---
@@ -73,7 +74,7 @@ use_ok 'DBIO::SQLite::Diff';
     {},
   );
   is($ops[0]->action, 'drop',               'drop op');
-  is($ops[0]->as_sql, 'DROP TABLE gone;',   'drop SQL');
+  is($ops[0]->as_sql, 'DROP TABLE "gone";', 'drop SQL');
 }
 
 # --- Diff::Column add ---
@@ -90,7 +91,7 @@ use_ok 'DBIO::SQLite::Diff';
   );
   is(scalar @ops, 1, 'one add op');
   is($ops[0]->action, 'add', 'action add');
-  is($ops[0]->as_sql, 'ALTER TABLE t ADD COLUMN extra TEXT;', 'add SQL');
+  is($ops[0]->as_sql, 'ALTER TABLE "t" ADD COLUMN "extra" TEXT;', 'add SQL');
 }
 
 # --- Diff::Column add NOT NULL with default ---
@@ -121,7 +122,7 @@ use_ok 'DBIO::SQLite::Diff';
     { t => {} }, { t => {} },
   );
   is($ops[0]->action, 'drop', 'drop op');
-  like($ops[0]->as_sql, qr/DROP COLUMN old/, 'drop column SQL');
+  like($ops[0]->as_sql, qr/ALTER TABLE "t" DROP COLUMN "old";/, 'drop column SQL');
 }
 
 # --- Diff::Column alter (unsupported) ---
@@ -132,7 +133,12 @@ use_ok 'DBIO::SQLite::Diff';
     { t => {} }, { t => {} },
   );
   is($ops[0]->action, 'alter', 'alter op');
-  like($ops[0]->as_sql, qr/not supported/, 'alter renders as comment');
+  # No statement and no comment: the op refuses, naming table, column, change
+  # and reason (karr k73).
+  throws_ok { $ops[0]->as_sql }
+    qr/Cannot change column t\.a \(type INTEGER -> TEXT, NOT NULL no -> yes\): SQLite has no ALTER COLUMN.*no CREATE TABLE statement/,
+    'alter is refused: table, column, change and reason';
+  like($ops[0]->summary, qr/~column: t\.a/, 'and summary still names it');
 }
 
 # --- Diff::Column skips brand-new tables ---
@@ -190,10 +196,10 @@ use_ok 'DBIO::SQLite::Diff';
     { t => { gone_idx => { index_name => 'gone_idx', columns => ['x'], origin => 'c' } } },
     {},
   );
-  is($ops[0]->as_sql, 'DROP INDEX gone_idx;', 'drop index SQL');
+  is($ops[0]->as_sql, 'DROP INDEX "gone_idx";', 'drop index SQL');
 }
 
-# --- Diff::Index: suppress DROP INDEX when the owning table is dropped (karr #14) ---
+# --- Diff::Index: suppress DROP INDEX when the owning table is dropped (karr k14) ---
 # When the owning table is itself being dropped in the same pass (present in
 # source tables, absent from target tables), SQLite's DROP TABLE already removes
 # the table's indexes, so no standalone DROP INDEX must be emitted for them.
@@ -215,7 +221,7 @@ use_ok 'DBIO::SQLite::Diff';
   is(scalar @ops, 0, 'no standalone DROP INDEX when owning table is dropped');
 }
 
-# --- Diff::Index over-suppression guard (karr #14) ---
+# --- Diff::Index over-suppression guard (karr k14) ---
 # If the table stays but one of its indexes is removed, the standalone
 # DROP INDEX is still required.
 {
@@ -235,7 +241,7 @@ use_ok 'DBIO::SQLite::Diff';
   );
   is(scalar @ops, 1, 'index drop still emitted when the table itself survives');
   is($ops[0]->action, 'drop', 'surviving-table index drop is a drop op');
-  like($ops[0]->as_sql, qr/DROP INDEX idx_users_email/, 'surviving-table index still dropped standalone');
+  like($ops[0]->as_sql, qr/DROP INDEX "idx_users_email";/, 'surviving-table index still dropped standalone');
 }
 
 # --- Diff::Index alter (drop+create pair) ---
@@ -267,7 +273,7 @@ use_ok 'DBIO::SQLite::Diff';
   };
   my $diff = DBIO::SQLite::Diff->new(source => $source, target => $target);
   ok($diff->has_changes, 'has_changes');
-  like($diff->as_sql,  qr/CREATE TABLE author/, 'as_sql contains create');
+  like($diff->as_sql,  qr/CREATE TABLE "author"/, 'as_sql contains create');
   like($diff->summary, qr/\+ table: author/,    'summary contains create line');
 }
 

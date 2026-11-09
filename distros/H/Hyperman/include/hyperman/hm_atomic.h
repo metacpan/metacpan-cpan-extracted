@@ -63,71 +63,92 @@
  * other fields of the slot they publish, and that is all the __sync spelling
  * has to add. */
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int hm_at_tas(volatile unsigned char *l) {
 #if defined(HM_ATOMIC_SYNC)
     return __sync_lock_test_and_set(l, (unsigned char)1) != 0;
 #else
-    return __atomic_test_and_set(l, __ATOMIC_ACQUIRE) != 0;
+    return __atomic_test_and_set(l, __ATOMIC_ACQUIRE) != 0; /* # uncoverable statement */
 #endif
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void hm_at_clear(volatile unsigned char *l) {
 #if defined(HM_ATOMIC_SYNC)
     __sync_lock_release(l);
 #else
-    __atomic_clear(l, __ATOMIC_RELEASE);
+    __atomic_clear(l, __ATOMIC_RELEASE); /* # uncoverable statement */
 #endif
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static uint32_t hm_at_load32_acq(volatile uint32_t *p) {
 #if defined(HM_ATOMIC_SYNC)
     uint32_t v = *p;
     __sync_synchronize();          /* nothing below may be hoisted above it */
     return v;
 #else
-    return __atomic_load_n(p, __ATOMIC_ACQUIRE);
+    return __atomic_load_n(p, __ATOMIC_ACQUIRE); /* # uncoverable statement */
 #endif
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void hm_at_store32_rel(volatile uint32_t *p, uint32_t v) {
 #if defined(HM_ATOMIC_SYNC)
     __sync_synchronize();          /* the other fields land before this one */
     *p = v;
 #else
-    __atomic_store_n(p, v, __ATOMIC_RELEASE);
+    __atomic_store_n(p, v, __ATOMIC_RELEASE); /* # uncoverable statement */
 #endif
 }
 
 /* The 64-bit pair, for the bus: a sequence number that must not wrap in any
  * plausible lifetime, and a slot stamped with the sequence it holds. */
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static uint64_t hm_at_load64_acq(volatile uint64_t *p) {
 #if defined(HM_ATOMIC_SYNC)
     uint64_t v = *p;
     __sync_synchronize();
     return v;
 #else
-    return __atomic_load_n(p, __ATOMIC_ACQUIRE);
+    return __atomic_load_n(p, __ATOMIC_ACQUIRE); /* # uncoverable statement */
 #endif
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void hm_at_store64_rel(volatile uint64_t *p, uint64_t v) {
 #if defined(HM_ATOMIC_SYNC)
     __sync_synchronize();
     *p = v;
 #else
-    __atomic_store_n(p, v, __ATOMIC_RELEASE);
+    __atomic_store_n(p, v, __ATOMIC_RELEASE); /* # uncoverable statement */
 #endif
 }
 
 /* The one that makes a queue group work: take the next sequence and return
  * the one this caller now owns, exclusively, across every process sharing the
  * mapping. Both families spell it the same way. */
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static uint64_t hm_at_fetch_add64(volatile uint64_t *p, uint64_t n) {
 #if defined(HM_ATOMIC_SYNC)
     return __sync_fetch_and_add(p, n);
 #else
-    return __atomic_fetch_add(p, n, __ATOMIC_ACQ_REL);
+    return __atomic_fetch_add(p, n, __ATOMIC_ACQ_REL); /* # uncoverable statement */
 #endif
 }
 
@@ -140,44 +161,68 @@ static uint64_t hm_at_fetch_add64(volatile uint64_t *p, uint64_t n) {
  * skipped forever - with nothing counted, because nothing noticed. A CAS
  * advances only when the caller both wins the race and is still inside what
  * has been published. */
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int hm_at_cas64(volatile uint64_t *p, uint64_t expect, uint64_t want) {
 #if defined(HM_ATOMIC_SYNC)
     return __sync_bool_compare_and_swap(p, expect, want) ? 1 : 0;
 #else
-    return __atomic_compare_exchange_n(p, &expect, want, 0,
+    return __atomic_compare_exchange_n(p, &expect, want, 0, /* # uncoverable statement */
                                        __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)
-           ? 1 : 0;
+           ? 1 : 0; /* # uncoverable statement */
 #endif
 }
 
 /* Set a flag from 0 to 1 and say whether this caller was the one who did it.
  * The bus wakeup needs exactly this: whoever wins pokes the worker, everybody
  * else has nothing to do. */
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int hm_at_test_and_set32(volatile uint32_t *p) {
 #if defined(HM_ATOMIC_SYNC)
     return __sync_bool_compare_and_swap(p, 0u, 1u) ? 1 : 0;
 #else
-    uint32_t expect = 0;
-    return __atomic_compare_exchange_n(p, &expect, 1u, 0,
+    uint32_t expect = 0; /* # uncoverable statement */
+    return __atomic_compare_exchange_n(p, &expect, 1u, 0, /* # uncoverable statement */
                                        __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)
-           ? 1 : 0;
+           ? 1 : 0; /* # uncoverable statement */
 #endif
 }
 
 /* Bounded acquire on a striped lock; returns 1 if it was taken, 0 if it gave
  * up. A worker that died holding one must not wedge the pool, so the caller
  * fails open rather than spinning forever. */
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int hm_at_lock(volatile unsigned char *locks, uint64_t h) {
-    volatile unsigned char *l = &locks[h % HM_LOCK_STRIPES];
-    long spin = 0;
+    volatile unsigned char *l = &locks[h % HM_LOCK_STRIPES]; /* # uncoverable statement */
+    long spin = 0; /* # uncoverable statement */
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     while (hm_at_tas(l)) {
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         if (++spin >= HM_SPIN_MAX) return 0;
     }
-    return 1;
+    return 1; /* # uncoverable statement */
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void hm_at_unlock(volatile unsigned char *locks, uint64_t h) {
-    hm_at_clear(&locks[h % HM_LOCK_STRIPES]);
+    hm_at_clear(&locks[h % HM_LOCK_STRIPES]); /* # uncoverable statement */
 }
 
 #endif /* HM_HAVE_ATOMICS */

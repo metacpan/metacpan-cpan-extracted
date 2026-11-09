@@ -12,7 +12,10 @@ BEGIN {
 use DBIO::Test::MooCakeSchema;
 
 # Connect with fake storage — no real database needed
-my $schema = DBIO::Test::MooCakeSchema->connect('DBIO::Test::Storage', '');
+# the shared schema declares no driver; this use declares the fake one
+my $schema = DBIO::Test::MooCakeSchema->clone;
+$schema->storage_type('+DBIO::Test::Storage');
+$schema = $schema->connect('DBIO::Test::Storage', '');
 
 my $artist_rs = $schema->resultset('Artist');
 my $cd_rs     = $schema->resultset('CD');

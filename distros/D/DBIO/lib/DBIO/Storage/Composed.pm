@@ -4,9 +4,11 @@ package DBIO::Storage::Composed;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use mro;
 use B ();
-use Class::C3::Componentised ();
+use DBIO::Componentised ();
 use DBIO::Exception;
 use namespace::clean;
 
@@ -15,6 +17,9 @@ use namespace::clean;
 # Keyed by the synthesised package name so it is idempotent for a given
 # (base, layers) tuple and recoverable from ref($instance) at rebless time.
 our %COMPOSED;
+
+# Method names a layer must not define: the driver storage owns them.
+my %DRIVER_OWNED = map { $_ => 1 } qw(dbio_deploy_class);
 
 
 sub compose {
@@ -29,9 +34,10 @@ sub compose {
 
   return $pkg if $COMPOSED{$pkg};
 
-  Class::C3::Componentised->ensure_class_loaded($base);
-  Class::C3::Componentised->ensure_class_loaded($_) for @layers;
+  DBIO::Componentised->ensure_class_loaded($base);
+  DBIO::Componentised->ensure_class_loaded($_) for @layers;
 
+  $class->_assert_no_driver_owned_methods(\@layers);
   $class->_assert_no_layer_collisions(\@layers);
 
   {
@@ -97,6 +103,26 @@ sub _own_methods {
   return @names;
 }
 
+# A layer that defines a driver-owned method is refused: the rule is stated
+# on its own, not reported as a collision between layers.
+sub _assert_no_driver_owned_methods {
+  my ($class, $layers) = @_;
+
+  for my $method (sort keys %DRIVER_OWNED) {
+    my @offenders = grep {
+      my $layer = $_;
+      grep { $_ eq $method } $class->_own_methods($layer);
+    } @$layers;
+    next unless @offenders;
+
+    DBIO::Exception->throw(
+      'storage layer ' . join(', ', @offenders) . " must not define $method: "
+    . 'the driver storage owns it, and a layer adds to a deploy through the '
+    . 'extension list the driver runs (ADR 0066 section 4)'
+    );
+  }
+}
+
 sub _assert_no_layer_collisions {
   my ($class, $layers) = @_;
 
@@ -105,7 +131,8 @@ sub _assert_no_layer_collisions {
     push @{ $defined_in{$_} }, $layer for $class->_own_methods($layer);
   }
 
-  my @collisions = grep { @{ $defined_in{$_} } > 1 } sort keys %defined_in;
+  my @collisions = grep { @{ $defined_in{$_} } > 1 }
+    sort keys %defined_in;
   return unless @collisions;
 
   my $detail = join '; ', map {
@@ -134,7 +161,7 @@ DBIO::Storage::Composed - Runtime C3 composition of storage extension layers ove
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -169,6 +196,14 @@ overriding a base method is fine (that is ordinary C<next::method> layering);
 two layers overriding the same base method still croak -- the resolution
 between them would be an accident of registration order, never a decision.
 
+=head2 The Deploy class belongs to the driver
+
+C<dbio_deploy_class> names the driver's Deploy class and has one owner, the
+driver storage (ADR 0066 section 4). A layer does not define it: L</compose>
+refuses a layer that does, with a L<DBIO::Exception> naming the layer and the
+rule. What an extension adds to a deploy reaches it through the extension list
+the driver runs (L<DBIO::Extension>), not through a Deploy class of the layer.
+
 =head2 Layer rules
 
 A layer package:
@@ -187,6 +222,43 @@ storage;
 
 =back
 
+=head2 Async mirror: C<async_layer_class>
+
+When a schema with registered layers connects with C<< { async => $mode } >>,
+each sync layer C<L> is mirrored onto an async layer composed over the
+transport. C<L> answers the question with an optional class method:
+
+  sub async_layer_class {
+    my ($class, $mode) = @_;
+    return 'MyExt::Storage::Layer::ForEV' if $mode eq 'ev';
+    return undef;       # deliberately sync-only under every other mode
+  }
+
+=over 4
+
+=item * B<Defined, returns a package> -- that package is the async layer. It
+MUST load; a missing or broken one croaks.
+
+=item * B<Defined, returns undef> -- the B<stated> opt-out: C<L> is
+deliberately sync-only for C<$mode>. It is skipped without any load attempt,
+and a convention sibling C<${L}::Async> is ignored even if one exists.
+Defining the method is the statement, so C<undef> here is an answer, not a
+forgotten return.
+
+=item * B<Not defined> -- silent: the convention sibling C<${L}::Async> is
+loaded if present (a present-but-broken one croaks). If it is absent, the
+async connect B<refuses> with an exception naming C<L> and both ways out:
+declare C<L> sync-only (C<sub async_layer_class { undef }>) or ship the
+C<${L}::Async> mirror. There is no silent skip -- a mistyped mirror package
+and a deliberately sync-only layer are no longer indistinguishable.
+
+=back
+
+The method is resolved with C<can>, so a subclass inherits its parent layer's
+answer. The mode argument lets a layer be sync-only under one mode and
+mirrored under another. See ADR 0032 (amendment 2026-09-25) for the
+reasoning.
+
 =head1 METHODS
 
 =head2 compose
@@ -198,9 +270,10 @@ under the C<c3> MRO. The package name is deterministic --
 C<< DBIO::Storage::Composed::<layers>__<base> >> with C<::> flattened to C<_> --
 so the same C<(base, layers)> tuple always maps to the same class and is built
 at most once. With no layers the C<$base> is returned unchanged (nothing to
-compose). Croaks (naming the method and the defining packages) if two or more
-layers define the same own method. Loads the base and every layer via
-L<Class::C3::Componentised/ensure_class_loaded>; an unloadable one fails loud.
+compose). Throws (naming the method and the defining packages) if two or more
+layers define the same own method, and (naming the layer) if a layer defines
+C<dbio_deploy_class>. Loads the base and every layer via
+L<DBIO::Componentised/ensure_class_loaded>; an unloadable one fails loud.
 
 =head2 composition_of
 
@@ -223,9 +296,10 @@ an empty list when C<$pkg> is not a composed class.
   my $new_class = DBIO::Storage::Composed->recompose($pkg, $new_base);
 
 Re-run L</compose> keeping C<$pkg>'s layer list but swapping in a different
-base. Used when a composed generic storage is reblessed onto its concrete
-driver class (L<DBIO::Storage::DBI/_determine_driver>): the same layers must be
-re-composed over the driver, not dropped. Croaks if C<$pkg> is not a composed
+base. Used when the access-path hook of a declared driver reblesses a composed
+storage into a plain class of its driver
+(L<DBIO::Storage::DBI/_adapt_to_access_path>): the same layers must be
+re-composed over that class, not dropped. Croaks if C<$pkg> is not a composed
 class.
 
 =head1 AUTHOR

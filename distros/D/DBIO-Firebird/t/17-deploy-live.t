@@ -30,7 +30,10 @@ eval { require DBI; require DBD::Firebird; 1 }
 use DBIO::Test;
 use DBIO::Firebird::Deploy;
 
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, {
+# A schema always has a driver (core ADR 0067); the shared test schema keeps
+# none in its class, so it is declared on a clone. The DSN is DBD::Firebird's.
+my $declared = DBIO::Test::Schema->clone(storage_type => '+DBIO::Firebird::Storage');
+my $schema = $declared->connect($dsn, $user, $pass, {
   quote_names => 1,
 }) or plan skip_all => "Cannot connect: $DBI::errstr";
 

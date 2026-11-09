@@ -7,6 +7,7 @@ my @modules = qw(
   DBIO::MySQL::Storage
   DBIO::MySQL::MariaDB
   DBIO::MySQL::Storage::MariaDB
+  DBIO::MySQL::MariaDBForkGuard
   DBIO::MySQL::SQLMaker
   DBIO::MySQL::SQLMaker::MariaDB
   DBIO::MySQL::Result

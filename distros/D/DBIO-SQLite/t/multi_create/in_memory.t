@@ -50,7 +50,7 @@ my $schema = DBIO::SQLite::Test->init_schema();
     ok($new_cd->in_storage, 'new_related_cd inserted');
     ok($new_artist->in_storage, 'artist inserted');
 
-    my $retrieved_cd = $schema->resultset('CD')->find ({ 'title' => 'Leave Loudly While Singing Off Key'});
+    my $retrieved_cd = $schema->resultset('CD')->search ({ 'title' => 'Leave Loudly While Singing Off Key'})->single;
     ok ($retrieved_cd, 'CD found in db');
     is ($retrieved_cd->artist->name, 'Depeche Mode 2: Insertion Boogaloo', 'Correct artist attached to cd');
 }
@@ -65,7 +65,7 @@ my $schema = DBIO::SQLite::Test->init_schema();
     ok($new_cd->in_storage, 'cd inserted');
     ok($new_related_artist->in_storage, 'artist inserted');
 
-    my $retrieved_cd = $schema->resultset('CD')->find ({ 'title' => 'Leave screaming Off Key in the nude'});
+    my $retrieved_cd = $schema->resultset('CD')->search ({ 'title' => 'Leave screaming Off Key in the nude'})->single;
     ok ($retrieved_cd, 'CD found in db');
     is ($retrieved_cd->artist->name, 'Depeche Mode 3: Insertion Boogaloo', 'Correct artist attached to cd');
 }

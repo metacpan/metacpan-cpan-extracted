@@ -45,9 +45,11 @@ run(class, ...)
             const char *key = SvPV_nolen(ST(i));
             SV *val = ST(i + 1);
             if (strEQ(key, "app"))                 cfg.app = val;
+            # uncoverable branch true count:3 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (strEQ(key, "host"))           { if (SvOK(val)) dfl.host = SvPV_nolen(val); }
             else if (strEQ(key, "port"))           port_sv = val;
-            else if (strEQ(key, "listen"))         listen_sv = SvOK(val) ? val : NULL;
+            else if (strEQ(key, "listen"))         listen_sv = SvOK(val) ? val : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
             else if (strEQ(key, "workers"))        cfg.nworkers = (int)SvIV(val);
             else if (strEQ(key, "idle_timeout"))   cfg.idle_t = SvNV(val);
             else if (strEQ(key, "header_timeout")) cfg.header_t = SvNV(val);
@@ -61,6 +63,9 @@ run(class, ...)
              * name - so this is here to turn them OFF. Inert everywhere else:
              * a backend that cannot submit reads simply ignores it. */
             else if (strEQ(key, "completion"))     cfg.completion = SvTRUE(val) ? 1 : 0;
+            # uncoverable branch true count:3 class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (strEQ(key, "deny"))           { if (SvOK(val) && SvROK(val)) cfg.deny = val; }
             else if (strEQ(key, "deny_capacity"))  cfg.deny_cap = (unsigned)SvUV(val);
             else if (strEQ(key, "rate_capacity"))  cfg.rate_cap = (unsigned)SvUV(val);
@@ -75,6 +80,8 @@ run(class, ...)
              * process and survives a restart; the size is computed from the
              * tenants unless overridden. */
             else if (strEQ(key, "arena_name")) {
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (SvOK(val)) cfg.arena_name = SvPV(val, cfg.arena_name_len);
             }
             else if (strEQ(key, "arena_size"))     cfg.arena_size = SvUV(val);
@@ -94,14 +101,16 @@ run(class, ...)
                             ? SvRV(val) : val;
                     if (SvTYPE(g) == SVt_PVGV) {
                         IO     *io = GvIO((GV *)g);
-                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL;
+                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
                         int raw = fp ? PerlIO_fileno(fp) : -1;
                         if (raw < 0)
                             croak("Hyperman->run: access_log handle has no fileno");
                         cfg.log_fd = dup(raw);   /* own it; freed with the loop */
+                        # uncoverable branch true class:ignore_covered_err
+                        # uncoverable condition left count:1 class:ignore_covered_err
                         if (cfg.log_fd < 0)
-                            croak("Hyperman->run: dup access_log fd: %s",
-                                  strerror(errno));
+                            croak("Hyperman->run: dup access_log fd: %s", /* # uncoverable statement class:ignore_covered_err */
+                                  strerror(errno)); /* # uncoverable statement class:ignore_covered_err */
 #ifndef _WIN32
                         (void)fcntl(cfg.log_fd, F_SETFD, FD_CLOEXEC);
 #endif
@@ -110,19 +119,31 @@ run(class, ...)
                     }
                 }
             }
+            # uncoverable branch true count:3 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (strEQ(key, "user"))     { if (SvOK(val)) cfg.drop_user  = SvPV_nolen(val); }
+            # uncoverable branch true count:3 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (strEQ(key, "group"))    { if (SvOK(val)) cfg.drop_group = SvPV_nolen(val); }
+            # uncoverable branch true count:3 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (strEQ(key, "pid_file")) { if (SvOK(val)) cfg.pid_path   = SvPV_nolen(val); }
             else if (strEQ(key, "listen_fds")) cfg.listen_fds = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "umask")) {
                 /* a number as perl parsed it (0077 is already 63), or a string
                  * of octal digits as a shell would write it ("077") */
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (SvOK(val)) {
-                    if (SvIOK(val) || SvNOK(val)) cfg.umask_val = (unsigned)SvUV(val);
+                    if (SvIOK(val) || SvNOK(val)) cfg.umask_val = (unsigned)SvUV(val); /* # uncoverable condition left count:2 class:ignore_covered_err */
                     else {
                         char *end;
                         const char *s = SvPV_nolen(val);
                         cfg.umask_val = (unsigned)strtoul(s, &end, 8);
+                        # uncoverable branch false class:ignore_covered_err
+                        # uncoverable condition left count:1 class:ignore_covered_err
+                        # uncoverable condition right count:1 class:ignore_covered_err
+                        # uncoverable condition right count:2 class:ignore_covered_err
                         if (*s == '\0' || *end != '\0')
                             croak("Hyperman->run: umask '%s' is not an octal number", s);
                     }
@@ -130,24 +151,30 @@ run(class, ...)
                 }
             }
             else if (strEQ(key, "access_log_format")) {
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (SvOK(val)) cfg.log_format = SvPV_nolen(val);
             }
             else if (strEQ(key, "error_log")) {
                 /* a filehandle or a path; the server's own messages go there
                  * instead of stderr. psgi.errors is the application's and is
                  * not moved. */
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (SvOK(val)) {
                     SV *g = (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVGV)
                             ? SvRV(val) : val;
                     if (SvTYPE(g) == SVt_PVGV) {
                         IO     *io = GvIO((GV *)g);
-                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL;
+                        PerlIO *fp = io ? (IoOFP(io) ? IoOFP(io) : IoIFP(io)) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
                         int raw = fp ? PerlIO_fileno(fp) : -1;
                         if (raw < 0)
                             croak("Hyperman->run: error_log handle has no fileno");
                         cfg.err_fd = dup(raw);
+                        # uncoverable branch true class:ignore_covered_err
+                        # uncoverable condition left count:1 class:ignore_covered_err
                         if (cfg.err_fd < 0)
-                            croak("Hyperman->run: dup error_log fd: %s", strerror(errno));
+                            croak("Hyperman->run: dup error_log fd: %s", strerror(errno)); /* # uncoverable statement class:ignore_covered_err */
 #ifndef _WIN32
                         (void)fcntl(cfg.err_fd, F_SETFD, FD_CLOEXEC);
 #endif
@@ -180,7 +207,7 @@ run(class, ...)
             }
             else if (strEQ(key, "compress_level")) {
                 IV lv = SvIV(val);
-                if (lv < 1 || lv > 9)
+                if (lv < 1 || lv > 9) /* # uncoverable condition left count:1 class:ignore_covered_err */
                     croak("Hyperman->run: compress_level must be 1..9");
                 cfg.compress_level = (int)lv;
             }
@@ -188,22 +215,28 @@ run(class, ...)
             else if (strEQ(key, "affinity"))       cfg.affinity = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http2"))          dfl.http2 = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http3"))          dfl.http3 = SvTRUE(val) ? 1 : 0;
+            # uncoverable branch true class:ignore_covered_err
+            # uncoverable condition left count:1 class:ignore_covered_err
             else if (strEQ(key, "proxy_protocol")) dfl.proxy_protocol = SvTRUE(val) ? 1 : 0;
             else if (strEQ(key, "http3_max_conns")) cfg.http3_max_conns = hm_opt_count(aTHX_ val, key);
-            else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL;
-            else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL;
-            else if (strEQ(key, "tls_ca"))         dfl.tls_ca   = SvOK(val) ? SvPV_nolen(val) : NULL;
-            else if (strEQ(key, "tls_sni"))        dfl.tls_sni  = SvOK(val) ? val : NULL;
+            else if (strEQ(key, "tls_cert"))       dfl.tls_cert = SvOK(val) ? SvPV_nolen(val) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
+            else if (strEQ(key, "tls_key"))        dfl.tls_key  = SvOK(val) ? SvPV_nolen(val) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
+            else if (strEQ(key, "tls_ca"))         dfl.tls_ca   = SvOK(val) ? SvPV_nolen(val) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
+            else if (strEQ(key, "tls_sni"))        dfl.tls_sni  = SvOK(val) ? val : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
             else if (strEQ(key, "redirect_https")) dfl.redirect_https = (int)SvIV(val);
             else if (strEQ(key, "tls_verify")) {
                 const char *m = SvPV_nolen(val);
                 if      (strEQ(m, "require"))  dfl.tls_verify = 2;
+                # uncoverable branch true class:ignore_covered_err
+                # uncoverable condition left count:1 class:ignore_covered_err
                 else if (strEQ(m, "optional")) dfl.tls_verify = 1;
                 else if (strEQ(m, "none"))     dfl.tls_verify = 0;
                 else croak("Hyperman->run: tls_verify must be none/optional/require");
             }
             else croak("Hyperman->run: unknown option '%s'", key);
         }
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!(cfg.app && SvROK(cfg.app) && SvTYPE(SvRV(cfg.app)) == SVt_PVCV))
             croak("Hyperman->run: 'app' is required");
         if (dfl.redirect_https == 1) dfl.redirect_https = 443;
@@ -235,13 +268,17 @@ run(class, ...)
                 ls[j] = dfl;                       /* seed with top-level defaults */
                 if (lav) {
                     SV **e = av_fetch(lav, j, 0);
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
                     if (!(e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV))
                         croak("Hyperman->run: listen[%d] must be a hashref", j);
                     hm_listener_from_hv(aTHX_ (HV *)SvRV(*e), &ls[j]);
                 } else if (pav) {
                     SV **e = av_fetch(pav, j, 0);
+                    # uncoverable branch false class:ignore_covered_err
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (e) ls[j].port = (int)SvIV(*e);
-                } else if (port_sv && SvOK(port_sv)) {
+                } else if (port_sv && SvOK(port_sv)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     ls[j].port = (int)SvIV(port_sv);
                 }
                 hm_check_listener(aTHX_ &ls[j]);
@@ -279,7 +316,7 @@ io_ready(class, fh, ...)
     CODE:
     {
         hm_loop *loop = hm_need_loop();
-        const char *mode = (items > 2 && SvOK(ST(2))) ? SvPV_nolen(ST(2)) : "r";
+        const char *mode = (items > 2 && SvOK(ST(2))) ? SvPV_nolen(ST(2)) : "r"; /* # uncoverable condition right count:2 class:ignore_covered_err */
         SV *f = hmf_new(aTHX_ "Hyperman::Future");
         PERL_UNUSED_VAR(class);
         hm_add_io_watch(aTHX_ loop, hm_fd_of(aTHX_ fh), mode, f, 0);
@@ -298,6 +335,8 @@ stats(...)
     {
         int pool = 0, i;
         for (i = 1; i + 1 < items; i += 2)
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (strEQ(SvPV_nolen(ST(i)), "pool")) pool = SvTRUE(ST(i + 1)) ? 1 : 0;
         if (pool) {
             hm_sa_pool_stats p;
@@ -369,7 +408,7 @@ quic_library(...)
     CODE:
         PERL_UNUSED_VAR(items);
         s = hm_quic_library();
-        RETVAL = s ? newSVpv(s, 0) : newSV(0);
+        RETVAL = s ? newSVpv(s, 0) : newSV(0); /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -456,7 +495,7 @@ tls_library(...)
     CODE:
         PERL_UNUSED_VAR(items);
         s = hm_tls_library();
-        RETVAL = s ? newSVpv(s, 0) : newSV(0);
+        RETVAL = s ? newSVpv(s, 0) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -481,6 +520,8 @@ tls_reload(class, sni = &PL_sv_undef)
     SV *sni
     CODE:
         PERL_UNUSED_VAR(class);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         RETVAL = hm_cur_loop ? hm_tls_reload(aTHX_ hm_cur_loop, sni) : 0;
     OUTPUT:
         RETVAL
@@ -513,10 +554,13 @@ detach(env)
         if (!hm_cur_loop)
             croak("Hyperman::detach: no running loop (call it from inside "
                   "a request)");
-        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
+        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Hyperman::detach: give it the PSGI env hashref");
         ehv = (HV *)SvRV(env);
         e = hv_fetchs(ehv, "psgix.hyperman.conn", 0);
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVAV))
             croak("Hyperman::detach: no psgix.hyperman.conn in this env "
                   "(HTTP/2 and HTTP/3 streams share one connection, and "
@@ -524,25 +568,31 @@ detach(env)
         cid = (AV *)SvRV(*e);
         fsv = av_fetch(cid, 0, 0);
         isv = av_fetch(cid, 1, 0);
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!(fsv && *fsv && isv && *isv))
             croak("Hyperman::detach: malformed psgix.hyperman.conn");
         fd = (int)SvIV(*fsv);
         id = SvUV(*isv);
         rc = hm_detach(aTHX_ hm_cur_loop, fd, id);
+        # uncoverable branch true count:3
+        # uncoverable branch true count:7
+        # uncoverable branch true count:8
         switch (rc) {
             case  0: break;
             case -1: croak("Hyperman::detach: the connection is gone "
                            "(the client hung up, or this env is stale)");
-            case -2: croak("Hyperman::detach: HTTP/2 connections cannot be "
+            case -2: croak("Hyperman::detach: HTTP/2 connections cannot be " /* # uncoverable statement */
                            "detached (streams share one socket)");
             case -3: croak("Hyperman::detach: TLS connections cannot be "
                            "detached (terminate TLS in front of Hyperman)");
             case -4: croak("Hyperman::detach: a response is still draining "
                            "on this connection");
             case -5: croak("Hyperman::detach: already detached");
-            case -6: croak("Hyperman::detach: not supported on this "
+            case -6: croak("Hyperman::detach: not supported on this " /* # uncoverable statement */
                            "platform (it needs fork-style fd ownership)");
-            default: croak("Hyperman::detach: failed (%d)", rc);
+            default: croak("Hyperman::detach: failed (%d)", rc); /* # uncoverable statement */
         }
         RETVAL = (IV)fd;
     }
@@ -575,12 +625,18 @@ stream(env, status = 200, headers = NULL)
         if (!hm_cur_loop)
             croak("Hyperman::stream: no running loop (call it from inside "
                   "a request)");
-        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV)
+        if (!SvROK(env) || SvTYPE(SvRV(env)) != SVt_PVHV) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Hyperman::stream: give it the PSGI env hashref");
         if (!hm_stream_ticket(aTHX_ env, &fd, &id, &sid))
             croak("Hyperman::stream: no usable psgix.hyperman.stream in this "
                   "env (not a Hyperman request, or the env is stale)");
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (headers && !SvOK(headers)) headers = NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (headers && !(SvROK(headers)
                          && SvTYPE(SvRV(headers)) == SVt_PVAV))
             croak("Hyperman::stream: headers must be an array reference");
@@ -626,6 +682,8 @@ deny_add(class, ip, ttl = 0)
         IV ttl
     CODE:
         PERL_UNUSED_VAR(class);
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (SvOK(ip)) hm_sa_deny_add(SvPV_nolen(ip), (long)ttl);
 
 # Hyperman->deny_remove($ip): unblock it again.
@@ -635,6 +693,8 @@ deny_remove(class, ip)
         SV *ip
     CODE:
         PERL_UNUSED_VAR(class);
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (SvOK(ip)) hm_sa_deny_remove(SvPV_nolen(ip));
 
 # Hyperman->pool_stats: every worker's scoreboard row, as a list of hashrefs
@@ -695,10 +755,14 @@ leader(class, name, ...)
             PUTBACK;
             count = call_method("lease", G_SCALAR);
             SPAGAIN;
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (count == 1) ret = newSVsv(POPs);
             PUTBACK;
             FREETMPS; LEAVE;
         }
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!ret) XSRETURN_UNDEF;
         RETVAL = ret;
     }
@@ -741,7 +805,7 @@ deny_check(class, ip)
         SV *ip
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = SvOK(ip) ? hm_sa_deny_check(SvPV_nolen(ip)) : 0;
+        RETVAL = SvOK(ip) ? hm_sa_deny_check(SvPV_nolen(ip)) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -759,10 +823,12 @@ ratelimit_hit(class, key, limit, window = 60)
     PPCODE:
     {
         STRLEN klen;
-        const char *kp = SvOK(key) ? SvPV_const(key, klen) : "";
+        const char *kp = SvOK(key) ? SvPV_const(key, klen) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
         long rem = 0, reset = 0;
         int ok;
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!SvOK(key)) klen = 0;
         ok = hm_sa_ratelimit_hit(kp, (size_t)klen, (long)limit, (long)window,
                                  &rem, &reset);

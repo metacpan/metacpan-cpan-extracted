@@ -19,13 +19,13 @@ scale on its own.
 
 In `DBIO::MSSQL::Storage::_prep_for_execute`, for `insert` and `update` ops,
 inspect the result source's column info for each supplied field
-(`Storage.pm:55-85`). When a column's `data_type` matches `/^money\z/i`,
+(`Storage::_prep_for_execute`). When a column's `data_type` matches `/^money\z/i`,
 rewrite its bind to an explicit cast:
 
 - For a lone bind literal value (`is_literal_value` whose first element is
-  `'?'`), wrap as `\[ 'CAST(? AS MONEY)', @binds ]` (`Storage.pm:68-78`).
+  `'?'`), wrap as `\[ 'CAST(? AS MONEY)', @binds ]` (in `_prep_for_execute`).
 - For an ordinary non-literal value, wrap as
-  `\['CAST(? AS MONEY)', [ $col => $value ]]` (`Storage.pm:79-82`).
+  `\['CAST(? AS MONEY)', [ $col => $value ]]` (in `_prep_for_execute`).
 
 This mutates the in-place `$fields` hashref of the args before delegation to
 `next::method`.

@@ -24,7 +24,7 @@ This is not a quoting or dialect problem — DATABASE-level DDL is simply outsid
 what the DSQL prepare path accepts in this driver. So `_create_temp_db` /
 `_drop_temp_db` cannot be expressed as `$dbh->do(...)` the way the rest of the
 DDL is. (Verified live against Firebird 3.0.11 / DBD::Firebird 1.39 under karr
-#12.)
+k12.)
 
 A second, coupled problem is *where* the scratch database lives. Firebird names
 a database with a `host[/port]:/abs/path.fdb` identifier, and
@@ -101,4 +101,4 @@ both local and remote (`host/port:`) servers with no per-deployment tuning.
   drop runs on a disposable handle, not the live one). This ADR owns the
   *mechanism* (`create_database` / `ib_drop_database`) and *placement*; 0007
   owns the *safety* of the drop target.
-- karr #12 — live root-cause analysis and fix (the source of this decision).
+- karr k12 — live root-cause analysis and fix (the source of this decision).

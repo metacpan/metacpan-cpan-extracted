@@ -4,6 +4,10 @@ package DBIO::MySQL::Introspect::Tables;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
+use DBIO::MySQL::Identifier qw(quote_ident);
+
 
 
 sub fetch {
@@ -35,6 +39,22 @@ sub fetch {
       comment         => $row->{comment},
     };
   }
+
+  # The definition of every view, without the name of this database in front
+  # of the names the server qualified (see above).
+  if (grep { $_->{kind} eq 'view' } values %tables) {
+    my ($database) = $dbh->selectrow_array('SELECT DATABASE()');
+    my $qualifier  = defined $database ? quote_ident($database) . '.' : '';
+    my $views = $dbh->selectall_arrayref(
+      q{SELECT table_name, view_definition FROM information_schema.views
+        WHERE table_schema = DATABASE()});
+    for my $view (@$views) {
+      my ($name, $def) = @$view;
+      next unless $tables{$name} && $tables{$name}{kind} eq 'view';
+      $def =~ s/\Q$qualifier\E//g if defined $def && length $qualifier;
+      $tables{$name}{view_definition} = $def;
+    }
+  }
   return \%tables;
 }
 
@@ -52,7 +72,7 @@ DBIO::MySQL::Introspect::Tables - Introspect MySQL/MariaDB tables and views
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -68,6 +88,14 @@ C<information_schema.tables>, scoped to the current C<DATABASE()>.
 Returns a hashref keyed by table name. Each value is a hashref with keys:
 C<table_name>, C<kind> (C<table> or C<view>), C<engine>,
 C<table_collation>, C<row_format>, C<comment>.
+
+A view carries a further key, C<view_definition>: the C<SELECT> the server
+holds for it (C<information_schema.views>), with the name of the current
+database taken out of every qualified name. The server writes
+C<< `db`.`table`.`column` >> into the definition it keeps, so a view made in a
+temporary database -- the target of an upgrade -- would never equal the same
+view in the live one, and the statement the diff creates the view with would
+read from the database it was introspected in.
 
 =head1 AUTHOR
 

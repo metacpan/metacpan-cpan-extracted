@@ -4,6 +4,8 @@ package DBIO::Oracle::Test::SequenceTest;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->table('sequence_test');
@@ -50,7 +52,7 @@ DBIO::Oracle::Test::SequenceTest - Test result class for Oracle sequence tests
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

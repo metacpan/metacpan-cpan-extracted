@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.020;
 use ExtUtils::MakeMaker 6.78;
 
 use File::ShareDir::Install;
@@ -27,75 +27,81 @@ my %WriteMakefileArgs = (
     "bin/dbiogen"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO",
   "PREREQ_PM" => {
-    "Class::Accessor::Grouped" => "0.10012",
-    "Class::C3::Componentised" => "1.0009",
-    "Context::Preserve" => "0.01",
+    "Carp::Clan" => "6.08",
+    "Class::Accessor::Grouped" => "0.10014",
+    "Class::C3::Componentised" => "1.001002",
+    "Context::Preserve" => "0.03",
+    "Crypt::URandom" => 0,
     "DBI" => "1.57",
-    "DateTime" => "0.55",
-    "DateTime::Format::Strptime" => "1.2",
-    "Devel::GlobalDestruction" => "0.09",
+    "DateTime::Tiny" => "1.08",
+    "Devel::GlobalDestruction" => "0.14",
+    "Digest::SHA" => 0,
     "File::ShareDir" => 0,
-    "Hash::Merge" => "0.12",
+    "Hash::Merge" => "0.302",
     "JSON::MaybeXS" => 0,
     "Lingua::EN::Inflect::Phrase" => 0,
     "Lingua::EN::Tagger" => 0,
-    "MRO::Compat" => "0.12",
-    "Module::Find" => "0.07",
-    "SQL::Abstract" => "2.000001",
+    "MRO::Compat" => "0.15",
+    "Module::Find" => "0.17",
+    "SQL::Abstract" => "2.000003",
     "String::ToIdentifier::EN" => 0,
     "String::ToIdentifier::EN::Unicode" => 0,
-    "Sub::Exporter" => "0.982",
-    "Sub::Util" => "1.40",
-    "Try::Tiny" => "0.07",
-    "namespace::clean" => "0.24"
+    "Sub::Exporter" => "0.991",
+    "Sub::Quote" => "2.006009",
+    "Sub::Util" => "1.70",
+    "Try::Tiny" => "0.32",
+    "namespace::clean" => "0.27"
   },
   "TEST_REQUIRES" => {
     "DBD::SQLite" => "1.29",
-    "File::Temp" => "0.22",
-    "Package::Stash" => "0.28",
-    "Test::Deep" => "0.101",
-    "Test::Exception" => "0.31",
-    "Test::More" => "0.94",
-    "Test::Warn" => "0.21"
+    "File::Temp" => "0.2312",
+    "Package::Stash" => "0.40",
+    "Test::Deep" => "1.205",
+    "Test::Exception" => "0.43",
+    "Test::More" => "1.302222",
+    "Test::Warn" => "0.37"
   },
-  "VERSION" => "0.900002",
+  "VERSION" => "0.900004",
   "test" => {
-    "TESTS" => "t/*.t t/access_broker/*.t t/changelog/*.t t/composed/*.t t/count/*.t t/debug/*.t t/generate/*.t t/helpers/*.t t/introspect/*.t t/kubernetes/*.t t/pager/data_page_compat/*.t t/prefetch/*.t t/relationship/*.t t/resultset/*.t t/resultsource/*.t t/schema/*.t t/search/*.t t/serialize/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/test/*.t t/util/*.t"
+    "TESTS" => "t/*.t t/access_broker/*.t t/carp/*.t t/changelog/*.t t/composed/*.t t/count/*.t t/debug/*.t t/exception/*.t t/extension/*.t t/generate/*.t t/helpers/*.t t/introspect/*.t t/kubernetes/*.t t/maint/*.t t/pager/data_page_compat/*.t t/prefetch/*.t t/relationship/*.t t/replicated/*.t t/resultset/*.t t/resultsource/*.t t/row/*.t t/schema/*.t t/search/*.t t/serialize/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/test/*.t t/util/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Class::Accessor::Grouped" => "0.10012",
-  "Class::C3::Componentised" => "1.0009",
-  "Context::Preserve" => "0.01",
+  "Carp::Clan" => "6.08",
+  "Class::Accessor::Grouped" => "0.10014",
+  "Class::C3::Componentised" => "1.001002",
+  "Context::Preserve" => "0.03",
+  "Crypt::URandom" => 0,
   "DBD::SQLite" => "1.29",
   "DBI" => "1.57",
-  "DateTime" => "0.55",
-  "DateTime::Format::Strptime" => "1.2",
-  "Devel::GlobalDestruction" => "0.09",
+  "DateTime::Tiny" => "1.08",
+  "Devel::GlobalDestruction" => "0.14",
+  "Digest::SHA" => 0,
   "File::ShareDir" => 0,
-  "File::Temp" => "0.22",
-  "Hash::Merge" => "0.12",
+  "File::Temp" => "0.2312",
+  "Hash::Merge" => "0.302",
   "JSON::MaybeXS" => 0,
   "Lingua::EN::Inflect::Phrase" => 0,
   "Lingua::EN::Tagger" => 0,
-  "MRO::Compat" => "0.12",
-  "Module::Find" => "0.07",
-  "Package::Stash" => "0.28",
-  "SQL::Abstract" => "2.000001",
+  "MRO::Compat" => "0.15",
+  "Module::Find" => "0.17",
+  "Package::Stash" => "0.40",
+  "SQL::Abstract" => "2.000003",
   "String::ToIdentifier::EN" => 0,
   "String::ToIdentifier::EN::Unicode" => 0,
-  "Sub::Exporter" => "0.982",
-  "Sub::Util" => "1.40",
-  "Test::Deep" => "0.101",
-  "Test::Exception" => "0.31",
-  "Test::More" => "0.94",
-  "Test::Warn" => "0.21",
-  "Try::Tiny" => "0.07",
-  "namespace::clean" => "0.24"
+  "Sub::Exporter" => "0.991",
+  "Sub::Quote" => "2.006009",
+  "Sub::Util" => "1.70",
+  "Test::Deep" => "1.205",
+  "Test::Exception" => "0.43",
+  "Test::More" => "1.302222",
+  "Test::Warn" => "0.37",
+  "Try::Tiny" => "0.32",
+  "namespace::clean" => "0.27"
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

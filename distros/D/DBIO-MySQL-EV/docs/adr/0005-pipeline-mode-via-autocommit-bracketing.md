@@ -1,8 +1,18 @@
 # ADR 0005 — Pipeline mode brackets the batch with `SET autocommit=0` / COMMIT / `SET autocommit=1`
 
-- Status: accepted
+- Status: superseded by [ADR 0009](0009-no-explicit-pipeline-mode-capability-declined.md)
 - Date: 2026-06-21
 - Tags: async, pipeline, ev-mariadb, performance, drivers
+
+> **Do not implement from this ADR.** The `pipeline()` it describes was removed
+> from `DBIO::MySQL::EV::Storage` by the thin-transport refactor (karr k19 /
+> k18, commits 3f975ef and c35eab8) and was deliberately not re-implemented
+> against core's `_pipeline_enter` / `_pipeline_sync` / `_pipeline_exit` seams:
+> this transport declines the `pipeline` capability outright. The `Storage.pm`
+> line references below point at code that no longer exists.
+> [ADR 0009](0009-no-explicit-pipeline-mode-capability-declined.md) records the
+> current decision and why the autocommit bracket is not coming back (it was a
+> transaction, which `txn_do_async` already provides). Kept for the record.
 
 ## Context
 

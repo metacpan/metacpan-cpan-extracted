@@ -3,16 +3,26 @@ requires 'Moo', '2.005005';
 requires 'namespace::clean', '0.27';
 requires 'Ouch', '0.0501';
 
+# optional backends, at least one is needed
+recommends 'Mojo::SQLite', '4.000000';
+recommends 'DBD::SQLite',  '1.78';
+recommends 'Mojo::Pg',     '5.0';
+recommends 'DBD::Pg',      '3.20.2';
+
 on test => sub {
-   requires 'Path::Tiny',      '0.084';
    requires 'Test::Exception', '0.43';
 };
 
 on develop => sub {
-   requires 'Path::Tiny',          '0.084';
-   requires 'Template::Perlish',   '1.52';
-   requires 'Test::Pod::Coverage', '1.04';
-   requires 'Test::Pod',           '1.51';
-   requires 'Mojo::SQLite', '4.000000';
-   requires 'Mojo::Pg', '5.0';
+   requires 'DBD::Pg',             '3.20.2';
+   requires 'DBD::SQLite',         '1.78';
+   requires 'DBI',                 '1.656';
+   requires 'Mojolicious',         '9.48';
+   requires 'Mojo::Pg',            '5.0';
+   requires 'Mojo::SQLite',        '4.000000';
+   requires 'Path::Tiny',          '0.150';
+   requires 'Template::Perlish',   '1.64';
+   requires 'Test::Pod',           '1.52';
+   requires 'Test::Pod::Coverage', '1.10';
+   requires 'URI',                 '5.36';
 };

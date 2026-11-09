@@ -371,6 +371,7 @@ subtest '_clean_country_code: strips carriage returns from whois response' => su
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 	# The \r must be stripped; country must be a clean 2-char code or undef
 	if(defined $cc) {
@@ -394,6 +395,7 @@ subtest '_clean_country_code: strips trailing # comment from whois response' => 
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 	if(defined $cc) {
 		is($cc, 'us', 'Trailing # comment stripped; code is lowercase us');
@@ -417,6 +419,7 @@ subtest '_clean_country_code: CRLF + injected header does not propagate' => sub 
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 	# country() now validates the post-strip result against /^[a-z]{2}$/, so the
 	# CRLF-injected payload "gbx-header: evil" (after strip) is discarded.
@@ -446,6 +449,7 @@ subtest 'geoplugin JSON: XSS payload in countryCode is not returned as-is' => su
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 
 	# The XSS payload would survive lc() and end up as the returned country code.
@@ -508,6 +512,7 @@ subtest 'geoplugin JSON: malformed JSON does not croak' => sub {
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	lives_ok { $l->country() } 'Malformed geoplugin JSON does not croak';
 	Test::Mockingbird::restore_all();
 	_block_network();
@@ -552,6 +557,7 @@ subtest 'Cache: numeric country code is evicted and not returned' => sub {
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 
 	ok((grep { /numeric country/ } @warnings), 'Numeric cache value triggers warning');
@@ -681,6 +687,7 @@ subtest 'country() output: returned value must be exactly 2 lowercase alpha or u
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	my $cc = $l->country();
 	if(defined $cc) {
 		like($cc, qr/^[a-z]{2}$/, 'Clean geo result is 2 lowercase alpha chars');

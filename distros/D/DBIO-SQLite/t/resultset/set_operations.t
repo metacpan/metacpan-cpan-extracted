@@ -8,8 +8,19 @@ my $schema = DBIO::SQLite::Test->init_schema();
 
 my $cd_rs = $schema->resultset('CD');
 
-my $sqlt_type = $schema->storage->sqlt_type;
-my $has_all_ops = ($sqlt_type ne 'SQLite'); # SQLite < 3.39 lacks INTERSECT ALL / EXCEPT ALL
+# intersect_all and except_all used to be SKIPped here, on a
+# $storage->sqlt_type eq 'SQLite' comparison -- the driver-name match ADR 0021
+# records as the anti-pattern this family of seams replaces -- and the skip's
+# comment named a "< 3.39" boundary nobody had sourced. It was wrong: 3.39.0
+# (2022-06-25) added RIGHT and FULL OUTER JOIN, not the ALL variants.
+#
+# The gap is not version-bounded at all. SQLite's compound operators are UNION,
+# UNION ALL, INTERSECT and EXCEPT, with ALL attaching to UNION alone
+# (sqlite.org/lang_select.html, "Compound Select Statements"); all four arrived
+# together on 2000-06-06, before version 1.0, and the changelog through 3.53.4
+# adds no INTERSECT ALL and no EXCEPT ALL. So there is no version on which
+# these two blocks could have run, and the skip can become what it should have
+# been: an assertion that the driver refuses them (karr k30, ADR 0039).
 
 # --- intersect ---
 {
@@ -27,20 +38,29 @@ my $has_all_ops = ($sqlt_type ne 'SQLite'); # SQLite < 3.39 lacks INTERSECT ALL 
   }
 }
 
-# --- intersect_all (not supported by SQLite) ---
-SKIP: {
-  skip 'INTERSECT ALL not supported on SQLite', 2 unless $has_all_ops;
-
+# --- intersect_all (refused: SQLite has no INTERSECT ALL) ---
+{
   my $rs1 = $cd_rs->search({ year => 1999 })->hri;
   my $rs2 = $cd_rs->search({ year => { '>=' => 1997 } })->hri;
 
-  my $inter = $rs1->intersect_all($rs2);
-  isa_ok($inter, 'DBIO::ResultSet', 'intersect_all returns RS');
+  my @sql;
+  $schema->storage->debugcb(sub { push @sql, $_[1] });
+  $schema->storage->debug(1);
 
-  my @rows = $inter->all;
-  for my $row (@rows) {
-    is($row->{year}, 1999, "intersect_all row has year 1999");
-  }
+  throws_ok
+    { $rs1->intersect_all($rs2) }
+    qr/\QSQLite has no INTERSECT ALL operator\E/,
+    'intersect_all is refused by the driver instead of emitting an operator '
+  . 'the engine does not have',
+  ;
+
+  $schema->storage->debug(0);
+  $schema->storage->debugcb(undef);
+
+  is (scalar @sql, 0, '... and it issued no SQL at all: the keyword is '
+  . 'resolved before the first operand is rendered, so the refusal happens at '
+  . 'query-build time (ADR 0039 section 4)')
+    or diag explain \@sql;
 }
 
 # --- except ---
@@ -65,20 +85,28 @@ SKIP: {
   );
 }
 
-# --- except_all (not supported by SQLite) ---
-SKIP: {
-  skip 'EXCEPT ALL not supported on SQLite', 2 unless $has_all_ops;
-
+# --- except_all (refused: SQLite has no EXCEPT ALL) ---
+{
   my $all_hri = $cd_rs->hri;
   my $old = $cd_rs->search({ year => { '<' => 2000 } })->hri;
 
-  my $modern = $all_hri->except_all($old);
-  isa_ok($modern, 'DBIO::ResultSet', 'except_all returns RS');
+  throws_ok
+    { $all_hri->except_all($old) }
+    qr/\QSQLite has no EXCEPT ALL operator\E/,
+    'except_all is refused too -- the same gap, and the same refusal',
+  ;
 
-  my @rows = $modern->all;
-  for my $row (@rows) {
-    ok($row->{year} >= 2000, "except_all row year >= 2000");
-  }
+  my $hint = '$rs->except';
+
+  throws_ok
+    { $all_hri->except_all($old) }
+    qr/\Q$hint\E/,
+    '... and the message names $rs->except as the nearest thing SQLite has '
+  . 'while saying it is not equivalent: except removes duplicates, which is '
+  . 'the whole difference the ALL variant was asked for. The block above '
+  . 'proves except itself still works, so the refusal is about the missing '
+  . 'operator and not about set difference',
+  ;
 }
 
 # --- union ---

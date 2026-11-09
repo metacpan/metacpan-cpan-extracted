@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# LIVE regression for karr #7: the async CRUD facade must translate the SQL
+# LIVE regression for karr k7: the async CRUD facade must translate the SQL
 # maker's '?' placeholders into PostgreSQL positional '$N' before handing SQL
 # to libpq (EV::Pg->query_params).
 #
@@ -25,38 +25,22 @@ use EV;
 use EV::Pg;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (same shape Storage->connect_info wants).
-# Mirrors t/10-integration.t's DSN handling.
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
-
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  # Already a libpq conninfo string — split into the hash.
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
 # --- bring up storage (COLD pool — no pre-warm) ---
 #
-# karr #9: the pool's acquire() used to hand back an EV::Pg handle before its
+# karr k9: the pool's acquire() used to hand back an EV::Pg handle before its
 # async connect had finished, so the very first facade CRUD call on a cold pool
 # threw "not connected". The fix gates acquire on a per-connection readiness
 # Future, so this test deliberately does NOT pre-warm: every query below is the
 # first thing that ever touches the pool, exercising the cold-pool path and
-# making this a live regression for #9 (in addition to the #7 placeholder fix).
+# making this a live regression for k9 (in addition to the k7 placeholder fix).
 
 my $storage = DBIO::PostgreSQL::EV::Storage->new(undef);
 $storage->connect_info([ \%ci, {} ]);

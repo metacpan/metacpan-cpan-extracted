@@ -1,5 +1,168 @@
 Revision history for DBIO-SQLite
 
+0.900004  2026-11-08
+    * Storage
+        - Atomic upsert: $rs->upsert renders ON CONFLICT (columns) DO UPDATE
+          / DO NOTHING, with key => $constraint, update_where and
+          { -attempted => $col } (excluded.<col>). A bare column of the
+          update_where condition is the stored row's. A conflict target 'any'
+          with on_conflict => 'update' is an error. Needs libsqlite 3.35.
+        - insert_returning is declared on libsqlite 3.35 and newer, so
+          autoincrement and retrieve_on_insert values come back on the INSERT
+          itself.
+        - results_exist and its async and as_query forms work
+          (supports_exists_query). $rs->intersect_all and $rs->except_all are
+          refused, SQLite has neither; except, intersect and the unions work
+          as in core.
+        - $rs->explain answers EXPLAIN QUERY PLAN, the plan with its SCAN or
+          SEARCH ... USING INDEX lines, not the VDBE program.
+        - $storage->vacuum runs VACUUM, or VACUUM INTO ? with the target file
+          as a bind (libsqlite 3.27+).
+        - transactional_ddl is declared 0 on purpose: the table rebuild needs
+          PRAGMA foreign_keys switched off, which SQLite ignores inside a
+          transaction.
+        - A bind without a column behind it (\[ 'zip = ?', $v ]) is an
+          integer only for a canonical integer within 64 bits, or when it
+          states its own type (sqlt_datatype, dbd_attrs); anything else is
+          text, so '01234' keeps its zeros. A cached statement is shared only
+          between calls that bind the same types. The two limits of a bind
+          without a column are in the Storage POD.
+        - Under DBD::SQLite before 1.37 an integer beyond 32 bits in a bind
+          without a column is held back as text with a warning.
+        - The storage declares the SQL dialect 'sqlite' (_ddl_sql_dialect),
+          so DDL text with a backslash, a bare "end" or "begin" column in a
+          trigger body or a semicolon in a default is cut correctly.
+        - Connecting without a DSN is refused, and a failed connect never
+          carries the password or the DSN's secrets in its error.
+
+    * SQL
+        - insert_or => 'ignore' | 'replace' in the options of
+          DBIO::SQLite::SQLMaker::insert renders INSERT OR IGNORE / INSERT
+          OR REPLACE; an unknown mode is an error. It is an SQL maker
+          option, not reachable through $rs->create or $row->insert.
+        - DBIO::SQLite::JSON: json($column)->extract($path) is json_extract,
+          get is -> and get_text is ->> (3.38+). The path travels as a bind;
+          eq, ne, lt, le, gt, ge, like, is_null, is_not_null, as_order and
+          as_select build the condition.
+
+    * Extensions
+        - sqlite_extensions('fts5', 'rtree', vec0 => { library => ... })
+          declares the extensions of a schema (ADR 0066 of DBIO core). A
+          library is loaded into every new connection and the loading is
+          switched off again; one that cannot be loaded dies naming it.
+          DBIO::SQLite::Extension::FTS5 and ::RTree claim the shadow tables
+          of their virtual tables, so deploy and diff never see them.
+
+    * Deploy
+        - apply and upgrade come from DBIO::Deploy::Base, with
+          allow_destructive and dry_run. A table rebuild that drops a column
+          or changes one in a way that may alter a stored value needs
+          allow_destructive => 1; a change between type names of one affinity
+          (varchar to text, integer to bigint) is lossless.
+        - Before its first statement the deploy refuses a NOT NULL column
+          without a default added to a table that holds rows, and a column
+          that becomes NOT NULL over a NULL, naming table and column.
+        - An upgrade removes the default of a column the schema gives none.
+          A live DEFAULT NULL counts as none.
+
+    * Introspect
+        - A column's size is read from its declared type: CHARACTER(10) is
+          CHARACTER with size 10, NUMERIC(10, 2) size [10, 2]. A rowid alias
+          (INTEGER PRIMARY KEY) reports is_auto_increment.
+        - A PRIMARY KEY column that can hold NULL (anything but the rowid
+          alias) is reported nullable, and the keys of a WITHOUT ROWID table
+          as the database states them.
+        - The shadow tables of a virtual table (FTS5, R*Tree) are not part of
+          the model, so dropping the virtual table is one DROP TABLE. This
+          needs libsqlite 3.37 (PRAGMA table_list); below it a database that
+          really holds a virtual table is refused.
+        - A handle with an ATTACHed database is refused, naming the attached
+          schemas, instead of modelling main alone.
+        - The triggers of a table are listed in a triggers section of the
+          model (DBIO::SQLite::Introspect::Triggers).
+
+    * Diff
+        - A deployed table does not differ from the schema it came from, for
+          every shape of primary key; the upgrade of such a table is a no-op.
+        - A table the upgrade adds is the table an install creates: primary
+          key, UNIQUE, ON DELETE / ON UPDATE and expression defaults kept,
+          and a new view or virtual table created as that. A model written
+          by hand carries its UNIQUE constraints.
+        - A column the upgrade adds is the column the install declares:
+          REFERENCES, CHECK, COLLATE and generated expressions are carried
+          into ADD COLUMN, in declared order. A column that needs UNIQUE,
+          PRIMARY KEY or a table constraint, or a default SQLite refuses on
+          a populated table (DEFAULT (datetime('now')), CURRENT_TIMESTAMP),
+          rebuilds the table (ADR 0003).
+        - A column change the diff cannot carry out is refused by as_sql and
+          by apply before the first statement, naming table, column and
+          reason. No SQL comment stands in for it.
+        - A table rebuild runs in one SAVEPOINT, recreates the table's
+          triggers, passes views and triggers that name the table
+          (legacy_alter_table), skips generated columns, and leaves
+          foreign_keys and legacy_alter_table as it found them.
+          Diff->statements returns the statements one by one.
+        - The diff compares what a table declares: primary key, UNIQUE
+          constraints, foreign keys with their actions, and where the target
+          states them CHECK, COLLATE, generated expressions, WITHOUT ROWID
+          and STRICT. A database deployed earlier gets the actions; a view
+          the schema does not declare is dropped; a changed view is dropped
+          and created; a changed virtual table is refused.
+        - Replacing an index or a view classifies as changing, not
+          destructive. is_auto_increment is not a column change in a WITHOUT
+          ROWID table.
+
+    * DDL
+        - Every identifier is quoted, in install_ddl and in the diff's
+          statements, so a table named order deploys. An upgrade reads a
+          name the same however it is quoted.
+        - A string default_value is an SQL string literal, apostrophes
+          doubled. A digit string that is not the canonical number ('007',
+          '1.50') keeps its quotes on any column; a canonical number stays
+          bare. The declared order of a composite primary key is kept.
+        - The on_delete / on_update of a belongs_to are written into its
+          foreign key and checked against NO ACTION, RESTRICT, CASCADE, SET
+          NULL and SET DEFAULT in any case; an unknown action dies at deploy
+          and diff, naming the word and the relationship. A key several
+          relationships declare is written once, and the keys of a table
+          come in relationship-name order.
+        - The canonical index declaration (index_declarations, ADR 0061 of
+          DBIO core) is read next to sqlite_index, so a Cake class with idx
+          gets its indexes. An entry with only another driver's block, or an
+          unknown key in the sqlite block, is refused naming the index.
+          sqlite_index { expression => '...' } renders the expression.
+        - An index over exactly the columns of a unique constraint is not
+          written twice.
+        - A column without is_nullable deploys NOT NULL, as the compiled
+          model has it.
+        - A size is written on decimal, numeric and character aliases
+          (NUMERIC(10,2), CHARACTER(24)) and on types such as BIT(8) and
+          TINYINT(1). A size its type cannot read (a hash reference on a
+          timestamp or char) is an error naming the column.
+        - A table name with a dot in a string, table('other.t'), is refused;
+          \'other.t' stays literal SQL.
+
+    * Tests
+        - DBIO::SQLite::Test declares DBIO::SQLite::Storage as the driver of
+          every test schema (replicated => 1 included) and keeps its
+          init_schema arguments out of the connect attributes.
+        - DBIO::SQLite::Test::Conformance answers the shared case tables of
+          DBIO core (DDL, Diff, Bind); t/67-conformance-ddl.t runs the DDL
+          cases against an in-memory database.
+
+    * Documentation
+        - The README states what the code implements: the Introspection list
+          names every PRAGMA, the driver is sync-only (forked and immediate
+          are the async routes), the minimum Perl is 5.20, and the tests run
+          with prove -lr t/ without a DSN.
+        - POD, ADR 0003, ADR 0005 and the dbio-sqlite skill match the code.
+
+    * Dependencies
+        - Requires DBIO 0.900004 and SQL::Abstract 2.000002, which carries
+          the -nulls order_by form DBIO uses.
+        - DBI, Context::Preserve, SQL::Abstract and Try::Tiny are declared
+          as runtime requirements, Test::Deep and Moo for testing.
+
 0.900001  2026-07-12
     * Fixes
         - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr

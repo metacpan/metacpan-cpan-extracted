@@ -33,12 +33,15 @@ and the order is correctness-critical:
    `tinyint(1)`. Boolean must be tested *before* Int, otherwise `tinyint(1)`
    would be swallowed by the integer pattern and a boolean column would
    surface as `Int`.
-2. **Float second** — `float` / `double` / `real` / `money` / `decimal` /
-   `numeric`. Float must be tested *before* the integer catch-all so a
-   `decimal`/`numeric` column is not mis-bucketed as `Int`.
-3. **Int third** — the integer family (`int`, `integer`, `bigint`,
+2. **Exact-value types as String** — `bigint` / `bigserial` / `decimal` /
+   `numeric` / `money`. `Int` is the 32-bit GraphQL integer and `Float` a
+   double, so a 64-bit key or a decimal amount travels as a `String` and
+   keeps its value. These are tested *before* the integer catch-all so
+   `bigint` is not mis-bucketed as `Int`.
+3. **Float third** — `float` / `double` / `real`.
+4. **Int fourth** — the 32-bit integer family (`int`, `integer`,
    `smallint`, `tinyint`, `mediumint`, `serial`).
-4. **String fallback** — anything unrecognised.
+5. **String fallback** — anything unrecognised.
 
 `date` / `datetime` / `json` / `uuid` deliberately fall through to **String**.
 
@@ -56,10 +59,10 @@ compared with the cost of defining and maintaining correct custom-scalar
 serialisation for every driver's `data_type` vocabulary.
 
 The fixed priority order is the load-bearing part. The type families overlap
-textually — `tinyint(1)` is a substring of the integer family, `decimal` and
-`numeric` would also match a loose number pattern — so the only thing keeping
-each column in the right bucket is testing the more specific patterns
-(Boolean, then Float) before the broad integer catch-all. The ordering is
+textually — `tinyint(1)` is a substring of the integer family, `bigint` would also
+match a loose integer pattern — so the only thing keeping each column in the
+right bucket is testing the more specific patterns (Boolean, then the
+exact-value types) before the broad integer catch-all. The ordering is
 not stylistic; reordering it silently mis-types columns.
 
 Centralising in one `for_column` means every consumer agrees on a column's
@@ -74,8 +77,8 @@ across modules.
   it, never re-derive a mapping. A new mapping rule (or a new family) is a
   change to `ScalarMap.pm` alone.
 - **The match order must be preserved.** Any reordering — in particular moving
-  Boolean after Int, or Float after the integer catch-all — is a correctness
-  regression: `tinyint(1)` would become `Int`, and `decimal`/`numeric` would
+  Boolean or the exact-value types after the integer catch-all — is a
+  correctness regression: `tinyint(1)` would become `Int`, and `bigint` would
   become `Int`. New patterns must be inserted respecting the
   specific-before-general invariant.
 - date/datetime/json/uuid are `String` on the wire by design. Clients that

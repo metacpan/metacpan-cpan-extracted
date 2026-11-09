@@ -28,6 +28,13 @@ my $env2optdep = {
   DBIO_TEST_MYSQL => 'test_rdbms_mysql',
 };
 
+# The driver each run declares: DBIO::Test::Schema keeps none in its class,
+# and a schema always has one (core ADR 0067).
+my $env2storage = {
+  DBIO_TEST_PG => 'DBIO::PostgreSQL::Storage',
+  DBIO_TEST_MYSQL => 'DBIO::MySQL::Storage',
+};
+
 my $schema;
 
 for ('', keys %$env2optdep) { SKIP: {
@@ -43,7 +50,9 @@ for ('', keys %$env2optdep) { SKIP: {
     skip ("Testing with ${prefix}_DSN needs " . DBIO::Optional::Dependencies->req_missing_for( $env2optdep->{$prefix} ), 1)
       unless  DBIO::Optional::Dependencies->req_ok_for($env2optdep->{$prefix});
 
-    $schema = DBIO::Test::Schema->connect ($dsn,$user,$pass,{ auto_savepoint => 1 });
+    $schema = DBIO::Test::Schema->clone;
+    $schema->storage_type($env2storage->{$prefix});
+    $schema = $schema->connect ($dsn,$user,$pass,{ auto_savepoint => 1 });
 
     my $create_sql;
     $schema->storage->ensure_connected;

@@ -1,6 +1,6 @@
 # ADR 0001 — Three-layer storage inheritance: Common → InterBase → Storage
 
-- Status: accepted
+- Status: accepted — extended by [ADR 0010](0010-odbc-transport-branches-off-storage-common.md)
 - Date: 2026-06-20
 - Tags: storage, inheritance, drivers, dbd, architecture
 
@@ -17,9 +17,9 @@ storage chain:
 
 The driver name registration confirms two distinct backends:
 `Storage::InterBase` does `register_driver('InterBase' => __PACKAGE__)`
-(`lib/DBIO/Firebird/Storage/InterBase.pm:9`) and `Storage` does
+(`lib/DBIO/Firebird/Storage/InterBase.pm`) and `Storage` does
 `register_driver('Firebird' => __PACKAGE__)`
-(`lib/DBIO/Firebird/Storage.pm:9`). DBD::Firebird is closely modelled on
+(`lib/DBIO/Firebird/Storage.pm`). DBD::Firebird is closely modelled on
 DBD::InterBase, so the two DBD backends share one logic base but reach the
 server through different driver names.
 
@@ -33,7 +33,7 @@ Split Firebird/InterBase storage into three classes:
 - `DBIO::Firebird::Storage::Common` carries all backend-agnostic logic and
   extends `DBIO::Storage::DBI` **directly** — the in-code comment makes the
   intent explicit: "It extends L<DBIO::Storage::DBI> directly to avoid
-  unnecessary inheritance depth" (`Storage/Common.pm:9-13`). It owns the
+  unnecessary inheritance depth" (`Storage/Common.pm`, DESCRIPTION POD). It owns the
   quote char, `sql_maker_class`, `_use_insert_returning`, `sqlt_type`,
   generator/sequence handling, savepoints and the server-version query.
 - `DBIO::Firebird::Storage::InterBase` adds the DBD::InterBase specifics:

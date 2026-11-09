@@ -2,10 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
-# LIVE test for the karr #22 WP3 / karr #68 pool-connect replay: on_connect_do
+# LIVE test for the karr k22 WP3 / core k68 pool-connect replay: on_connect_do
 # AND on_connect_call must run on EVERY freshly-spawned EV pool connection, so a
 # pooled async connection has the same session setup as the sync path. This is
-# facet 1 of core #69 (ev silently dropping the connect-action replay), now
+# facet 1 of core k69 (ev silently dropping the connect-action replay), now
 # structurally impossible at the transport.
 #
 # WHY live: the replay drives real SET statements to completion on real libpq
@@ -20,6 +20,12 @@ use Test::More;
 use DBIO::PostgreSQL::EV::TestHarness;
 
 BEGIN { DBIO::PostgreSQL::EV::TestHarness->skip_all_unless_live }
+
+# A server that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 my $N = 3;
 
@@ -60,6 +66,20 @@ for my $i (0 .. $#per_conn) {
     "connection $i: on_connect_do replayed on this pooled connection";
   is $row->[1], 'call-ran',
     "connection $i: on_connect_call replayed on this pooled connection";
+}
+
+# dbio_rows (core k358, karr k97): the runner returns the rows of the statement,
+# with and without bind, and nothing without the key. Run on a spawned connection.
+{
+  my $async = $h->async;
+  my $conn = $h->await($async->pool->acquire);
+  my $rows = $async->_run_pool_connect_statement($conn, q{SELECT 1::text, 'x'::text}, { dbio_rows => 1 });
+  is_deeply $rows, [ [ '1', 'x' ] ], 'dbio_rows: rows of a SELECT without bind';
+  $rows = $async->_run_pool_connect_statement($conn, q{SELECT ?::text, ?::text}, { dbio_rows => 1 }, 'p', 'q');
+  is_deeply $rows, [ [ 'p', 'q' ] ], 'dbio_rows: rows of a SELECT with bind';
+  my @none = $async->_run_pool_connect_statement($conn, q{SELECT 1}, undef);
+  is scalar(@none), 0, 'without dbio_rows nothing is returned';
+  $async->pool->release($conn);
 }
 
 $h->disconnect;

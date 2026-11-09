@@ -3,9 +3,13 @@ package DBIO::InflateColumn::DateTime;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 use DBIO::Carp;
 use Try::Tiny;
+use DBIO::Util qw(mask_bound_values);
 use namespace::clean;
 
 
@@ -106,7 +110,10 @@ sub _flate_or_fallback
     $parser->$method($value);
   }
   catch {
-    $self->throw_exception ("Error while inflating '$value' for $info->{__dbic_colname} on ${self}: $_")
+    $self->throw_exception (
+      "Error while inflating column '$info->{__dbic_colname}' of class "
+      . (ref($self) || $self) . ': ' . mask_bound_values("$_", [$value])
+    )
       unless $info->{datetime_undef_if_invalid};
     undef;  # rv
   };
@@ -167,7 +174,7 @@ DBIO::InflateColumn::DateTime - Auto-create DateTime objects from date and datet
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -179,7 +186,7 @@ columns to be of the datetime, timestamp or date datatype.
 
   __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
   __PACKAGE__->add_columns(
-    starts_when => { data_type => 'datetime' }
+    starts_when => { data_type => 'datetime' },
     create_date => { data_type => 'date' }
   );
 
@@ -242,6 +249,14 @@ would be called on deflation/inflation. If the storage class does not
 provide a specialized inflator/deflator, C<[parse|format]_datetime> will
 be used as a fallback. See L<DateTime/Formatters And Stringification>
 for more information on date formatting.
+
+L<DateTime> and L<DateTime::Format::Strptime> are only C<recommends> of the
+core distribution, not requirements: a bare DBIO install does not carry them.
+Install L<DateTime> to use this component at all. A driver whose datetime
+format class parses by strptime patterns
+(L<DBIO::Storage::DateTimeFormat>) needs L<DateTime::Format::Strptime> as
+well, and throws at the first parse or format when it is missing; the driver
+distribution should declare it itself.
 
 For more help with using components, see L<DBIO::Manual::Component/USING>.
 

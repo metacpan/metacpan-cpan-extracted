@@ -105,6 +105,13 @@ unless (DBIO::Test->is_plain) {
   require FileHandle;
   require Moo;
 
+  # ...and so does one of our own: DBIO::SQLite::DDL holds a module-level
+  # adapter, and is only pulled in lazily by DBIO::SQLite::Deploy on the first
+  # deploy - which happens below, i.e. inside the recording window. Load it
+  # here so its on-load singleton is cleared with the rest, and an adapter
+  # created *during* the run still has to be collected.
+  require DBIO::SQLite::DDL;
+
   %$weak_registry = ();
 }
 
@@ -237,7 +244,15 @@ unless (DBIO::Test->is_plain) {
 
     result_source => $rs->result_source,
 
-    result_source_handle => $rs->result_source->handle,
+    # core k91 removed DBIO::ResultSourceHandle - the separate serializable
+    # pointer object this slot used to track no longer exists. Its successor is
+    # a source re-attached by STORABLE_thaw, which is a leak candidate of its
+    # own (it holds a live schema ref until DESTROY weakens it).
+    result_source_thawed => do {
+      require Storable;
+      local $DBIO::ResultSource::thaw_schema = $schema;
+      Storable::dclone($rs->result_source);
+    },
 
     pager_explicit_count => $pager_explicit_count,
 
@@ -308,7 +323,9 @@ unless (DBIO::Test->is_plain) {
   if (
     DBIO::Test::Util::LeakTracer::CV_TRACING
       and
-    ! $ENV{DBIO_TEST_SWAPOUT_SQLAC_WITH}
+    ! $ENV{DBIODEVREL_SWAPOUT_SQLAC_WITH}
+      and
+    ! $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH}
   ) {
     visit_refs(
       refs => [ $base_collection ],

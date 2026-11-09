@@ -65,6 +65,21 @@ is_deeply(_norm({ data_type => 'bit varying(64)' }),
 # pgvector
 is_deeply(_norm({ data_type => 'vector(1536)' }),
   { data_type => 'vector', size => 1536 }, 'vector(1536)');
+is_deeply(_norm({ data_type => 'halfvec(3)' }),
+  { data_type => 'halfvec', size => 3 }, 'halfvec(3)');
+is_deeply(_norm({ data_type => 'sparsevec(3)' }),
+  { data_type => 'sparsevec', size => 3 }, 'sparsevec(3)');
+
+# a model read under an empty search_path (Introspect qualified_names, the
+# default) writes the schema of the type in front of it
+is_deeply(_norm({ data_type => 'public.vector(1536)' }),
+  { data_type => 'vector', size => 1536 }, 'public.vector(1536): schema dropped, size kept');
+is_deeply(_norm({ data_type => 'ext.halfvec(3)' }),
+  { data_type => 'halfvec', size => 3 }, 'ext.halfvec(3)');
+is_deeply(_norm({ data_type => '"Ex Schema".sparsevec(3)' }),
+  { data_type => 'sparsevec', size => 3 }, 'a quoted schema');
+is_deeply(_norm({ data_type => 'public.citext' }),
+  { data_type => 'public.citext' }, 'a type without a modifier keeps its schema, as the catalog writes it');
 
 # timestamp with/without tz
 is_deeply(_norm({ data_type => 'timestamp(6) without time zone' }),
@@ -75,9 +90,16 @@ is(_norm({ data_type => 'time without time zone' })->{data_type},
   'time', 'time without tz');
 is_deeply(_norm({ data_type => 'interval(3)' }),
   { data_type => 'interval', size => 3 }, 'interval(3)');
-is_deeply(_norm({ data_type => 'timestamp with time zone(6)' }),
+# format_type writes the precision behind the first word. This case used to
+# hand in 'timestamp with time zone(6)', a text no server returns -- it is a
+# syntax error there -- while the real one came back as a single string
+# without a size (karr k116; t/98 reads the real text off a server).
+is_deeply(_norm({ data_type => 'timestamp(6) with time zone' }),
   { data_type => 'timestamp with time zone', size => 6 },
   'timestamp(6) with tz (keeps full type name)');
+is_deeply(_norm({ data_type => 'time(3) with time zone' }),
+  { data_type => 'time with time zone', size => 3 },
+  'time(3) with tz (keeps full type name)');
 
 # bare character -> char
 is(_norm({ data_type => 'character' })->{data_type}, 'char', 'bare character -> char');

@@ -35,9 +35,12 @@ not depend on SQL::Translator. The four native classes are the single source
 of truth for DDL generation, introspection, diffing and deployment.
 
 The legacy SQLT-driven tests carried over from DBIx::Class
-(`t/86sqlt.t`, `t/99dbic_sqlt_parser.t`) are gated with
+(`t/86sqlt.t`, `t/99dbic_sqlt_parser.t`) were first gated with
 `BEGIN { plan skip_all => ... }` and kept as skip-with-reason markers rather
-than deleted, so the removed contract stays visible.
+than deleted, so the removed contract stayed visible. They have been deleted
+(2026-10-09, maintainer decision, karr k60): neither file ever ran, and what
+still holds is covered by the native tests. This ADR and core's ADR 0006 now
+carry the removed contract.
 
 ## Consequences
 

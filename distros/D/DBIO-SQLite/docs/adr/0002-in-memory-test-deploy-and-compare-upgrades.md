@@ -27,7 +27,7 @@ The shared orchestration (`install`, `diff`, `apply`, `upgrade`) lives in
 `DBIO::Deploy::Base`; only the engine-specific target-model build is the
 driver's concern (`DBIO::Deploy::Base` hooks `_ddl_class`, `_introspect_class`,
 `_diff_class`, `_build_target_model`). This split, and the SQLite adoption of
-the base, are recorded in karr #3.
+the base, are recorded in karr k3.
 
 ## Decision
 
@@ -62,4 +62,4 @@ the diff object is built, for predictable lifetime.
 
 - ADR 0001 (native schema management)
 - ADR 0003 (column ALTER via whole-table rebuild)
-- karr #3 (adoption of `DBIO::Deploy::Base` / `Diff::Op` / introspect defaults)
+- karr k3 (adoption of `DBIO::Deploy::Base` / `Diff::Op` / introspect defaults)

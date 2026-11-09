@@ -132,4 +132,36 @@ use DBIO::Diff::Compare qw(changed_column_fields changed_index_fields);
   ], 'scope=all: new/changed(drop+create)/gone + source-only-table drops; pk index skipped';
 }
 
+# --- diff_nested: an index_type switch is seen through the real walk (ADR 0052) ---
+# A BTREE -> FULLTEXT change on the same columns/uniqueness must reach on_changed
+# (it used to be invisible); and a typeless index (no index_type on either side)
+# must NOT phantom-diff through the same walk.
+{
+  my $source = {
+    docs => {
+      i_switch => { is_unique => 0, columns => ['body'], index_type => 'BTREE' },
+      i_typeless => { is_unique => 0, columns => ['name'] },   # no type on either side
+    },
+  };
+  my $target = {
+    docs => {
+      i_switch => { is_unique => 0, columns => ['body'], index_type => 'FULLTEXT' },
+      i_typeless => { is_unique => 0, columns => ['name'] },
+    },
+  };
+
+  my @ops = Test::IdxOp->diff_nested($source, $target,
+    scope        => 'both',
+    changed_when => sub { scalar changed_index_fields($_[0], $_[1]) },
+    on_changed   => sub {
+      my ($t, $n) = @_;
+      Test::IdxOp->new(action => 'modify', table_name => $t, index_name => $n);
+    },
+  );
+
+  my @got = sort map { join ':', $_->action, $_->table_name, $_->index_name } @ops;
+  is_deeply \@got, ['modify:docs:i_switch'],
+    'diff_nested: BTREE->FULLTEXT reaches on_changed; typeless index does not phantom-diff';
+}
+
 done_testing;

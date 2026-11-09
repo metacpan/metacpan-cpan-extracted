@@ -48,7 +48,7 @@ my @a = $schema->resultset("Artist")->search(
     join => [ qw/ cds /],
     prefetch => [qw/ cds /],
   }
-);
+)->all;
 
 is(scalar @a, 3, 'artist with cds: count parent objects');
 

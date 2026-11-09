@@ -1,5 +1,5 @@
 package Proc::ShellSubset;  # Parser for the Bourne-shell subset of doc/parsers/shell-subset-spec.md
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use strict; use warnings; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::parse($string, %opt) returns a List, or { error => '...', pos => N, last => N, tree => List }:

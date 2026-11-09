@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Hyperman ();
 
-our $VERSION = '0.66';
+our $VERSION = '0.68';
 
 sub new {
     my ($class, %args) = @_;
@@ -154,6 +154,25 @@ allowlist, and it is at least C<compress_min_length> bytes. On a Hyperman
 built without zlib the option is accepted and inert. See
 L<Hyperman/"Response compression"> for the full contract, including the
 C<Content-Encoding: identity> opt-out and the C<ETag> rewrite.
+
+=head1 METHODS
+
+=head2 new
+
+    my $handler = Plack::Handler::Hyperman->new(%options);
+
+Takes the options C<plackup> collected, the C<--port>, C<--workers> and
+every C<< Hyperman->run >> option named above, and keeps them for C<run>.
+
+=head2 run
+
+    $handler->run($app);
+
+Starts L<Hyperman> on the PSGI application with the options given to
+C<new>. The listen specs are parsed (C<host:port>, C<[v6]:port>, a bare
+port or a socket path), the aliases other servers use for the TLS files
+are honoured, and an option Hyperman does not take is warned about rather
+than dropped. Does not return until the server stops.
 
 =head1 SEE ALSO
 

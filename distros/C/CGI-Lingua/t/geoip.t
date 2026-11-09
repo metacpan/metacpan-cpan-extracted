@@ -56,6 +56,7 @@ sub _country {
 	my $l = CGI::Lingua->new(supported => ['en']);
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 	unless($dat eq '/usr/share/GeoIP/GeoIP.dat' || $dat eq '/usr/local/share/GeoIP/GeoIP.dat') {
 		# GEOIP_DAT points elsewhere; _load_geoip() wouldn't find it
 		$l->{_have_geoip} = 1;

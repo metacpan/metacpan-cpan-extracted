@@ -4,7 +4,7 @@ use Test::More;
 
 use DBIO::SQLite::Diff;
 
-# Regression for karr #14.
+# Regression for karr k14.
 #
 # When DBIO::SQLite::Diff reconciles a live schema that contains a table NOT
 # present in the target (a table removed from the app's DBIO classes, or an
@@ -53,9 +53,9 @@ ok $diff->has_changes, 'diff detects the removed table';
 
 my $sql = $diff->as_sql;
 
-like   $sql, qr/DROP TABLE leftover;/,
+like   $sql, qr/DROP TABLE "leftover";/,
   'DROP TABLE is emitted for the removed table';
-unlike $sql, qr/DROP INDEX\s+idx_leftover_name/,
+unlike $sql, qr/DROP INDEX\s+"idx_leftover_name"/,
   'no standalone DROP INDEX for the dropped table (DROP TABLE already covers it)';
 
 # The DROP TABLE must be the only drop statement in the output — the whole
@@ -92,7 +92,7 @@ my $tgt2 = {
 
 my $sql2 = DBIO::SQLite::Diff->new(source => $src2, target => $tgt2)->as_sql;
 unlike $sql2, qr/DROP TABLE/, 'surviving table is not dropped';
-like   $sql2, qr/DROP INDEX\s+idx_users_email/,
+like   $sql2, qr/DROP INDEX\s+"idx_users_email";/,
   'secondary index of a surviving table is still dropped standalone';
 
 done_testing;

@@ -1,5 +1,72 @@
 Revision history for DBIO-Forked
 
+0.900004  2026-11-08
+    * Limits
+        - statement_timeout (seconds) and max_in_flight (calls) are connect
+          options of the forked mode. A call unresolved at its deadline is
+          ended like a cancelled one and fails with "statement_timeout
+          exceeded"; a call beyond max_in_flight fails before it forks.
+          Invalid values are refused naming the option. Each call costs one
+          process and one database connection (see DBIO::Forked::Storage).
+        - DBIO::Forked::Future->new takes timeout, the deadline of a leaf
+          future in seconds.
+
+    * Future
+        - DBIO::Forked::Future has cancel: the child gets SIGTERM, SIGKILL
+          after one second, and is reaped; the future fails as cancelled.
+          On a derived future it cancels the source. A future dropped while
+          its query runs ends its child the same way.
+        - A future belongs to the process that created it. In any other
+          process (a copy inherited through an application fork) get,
+          is_ready, is_failed and cancel fail with "belongs to process N"
+          and the destructor reaps nothing, so the owner gets the result.
+        - A then, catch or and_then callback runs once, however often
+          is_ready or is_failed is polled while its returned future is
+          pending.
+        - Reaping a child leaves $?, $! and $@ alone: a script that ends
+          with a future open keeps the exit code of its die or exit.
+        - A child killed or exiting non-zero without a result fails its
+          future with the signal or status ("child killed by signal N
+          before sending a result"); a result that cannot be thawed stays
+          "corrupt or empty result from child".
+
+    * Storage
+        - update_async and delete_async resolve with the affected-row
+          count against a real DBD handle, so Row::update_async and
+          Row::delete_async work.
+        - The storage declares the broker_connect_options capability: a
+          broker-backed connection can carry DBD attributes and pool_size
+          beside the broker in forked mode (pool_size sizes nothing).
+        - connect_info keeps only its form ({ broker => 0|1, elements =>
+          N }); the storage holds no DSN, user, password, attributes,
+          broker object or options.
+        - deploy_async, and deploy through it, dies at the call with a
+          message naming DBIO::Forked and pointing to $schema->deploy on
+          the owning sync storage.
+
+    * Documentation
+        - Forked advertises no transport capability an async layer could
+          require, on purpose: it overrides the *_async methods directly
+          and has no _query_async seam. Layers compose on _query_async
+          only, and the gate also refuses a layer that declares nothing;
+          only an explicitly empty required_transport_capabilities exempts
+          it.
+        - on_connect_do and on_connect_call re-run in every forked child,
+          which reconnects through the inherited sync storage (ADR 0002).
+          With a rotating broker and an expired lease, every forked query
+          refreshes the broker in its child.
+        - A nested *_async inside a txn_do_async body runs on a connection
+          of its own, outside the transaction.
+        - The PLATFORM SUPPORT section states that DBIO::Forked needs a
+          real Unix fork() and is not recommended on Windows.
+        - ADR 0001 and 0003 carry addenda for the explicit per-connection
+          mode, { async => 'forked' }; README and POD follow it.
+
+    * Packaging
+        - Every module carries $VERSION in step with the distribution.
+        - Requires DBIO 0.900004; the tests recommend DBIO::SQLite
+          0.900004.
+
 0.900001  2026-07-12
     First release. The dependency-free, fork-based async layer for DBIO
     drivers: a generic async-storage backend that makes ANY sync DBIO

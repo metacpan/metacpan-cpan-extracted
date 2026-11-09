@@ -6,7 +6,7 @@ use warnings;
 use Carp ();
 use Punk ();
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 sub fh {
     my ($self) = @_;

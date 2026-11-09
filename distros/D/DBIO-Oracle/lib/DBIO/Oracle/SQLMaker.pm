@@ -2,6 +2,9 @@ package DBIO::Oracle::SQLMaker;
 # ABSTRACT: Oracle-specific SQL generation for DBIO
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base qw( DBIO::SQLMaker );
@@ -26,6 +29,12 @@ sub new {
   };
 
   $self->next::method(\%opts);
+}
+
+
+sub operator_words {
+  my $self = shift;
+  return ($self->next::method(@_), 'prior');
 }
 
 
@@ -237,7 +246,7 @@ DBIO::Oracle::SQLMaker - Oracle-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -263,6 +272,11 @@ L<Math::Base36>).
 Used automatically by L<DBIO::Oracle::Storage>.
 
 =head1 METHODS
+
+=head2 operator_words
+
+The word operators a condition may name: those of L<DBIO::SQLMaker> and
+C<prior> (C<< { parentid => { -prior => 'artistid' } } >>).
 
 =head2 apply_limit
 

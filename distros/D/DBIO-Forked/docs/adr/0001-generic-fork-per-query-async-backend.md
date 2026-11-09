@@ -4,6 +4,41 @@
 - Date: 2026-06-28
 - Tags: async, fork, storage, drivers, generic, new-dist
 
+> **Addendum 2026-09-05 — the activation model below is superseded by core
+> ADR 0030.** Core withdrew ADR 0028 (async as a pluggable embedded backend
+> selected by an `async_backend` accessor) and ADR 0029 (the resolver fallback
+> chain); neither is in core's `docs/adr/` any more. Their successor is core
+> ADR 0030: async is an **explicit, per-connection mode**. An add-on registers
+> its mode on the core base storage —
+> `DBIO::Storage::DBI->register_async_mode( forked => 'DBIO::Forked::Storage' )`,
+> which `DBIO::Forked::Storage` does at load time — and the user opts in at
+> connect time with `connect(..., { async => 'forked' })`. There is no
+> `async_backend` accessor, no silent degrade when the dist is absent, and **no
+> auto-fallback**: a connection opened without `{ async => 'forked' }` stays
+> synchronous and its `*_async` methods croak, and asking for `forked` without
+> `dbio-forked` installed croaks loudly rather than degrading
+> (`_async_storage` in `DBIO::Storage::DBI`).
+>
+> Read as superseded, therefore: the ADR-0028 sentence in *Context*; the
+> "Activation reuses the existing ADR-0028 seam" bullet in *Decision*; the
+> `async_backend` phrasing in the first *Consequences* bullet; and the whole
+> *Future architecture work* section — the core fallback chain proposed there
+> was not built and will not be, because deciding against an automatic fallback
+> is precisely what ADR 0030 did. ADR 0002's citation of "ADR 0028" for the
+> anti-recursion rule is stale in the same way, while the rule it cites is
+> unchanged: the sync CRUD the child calls does not route to the async backend,
+> so it cannot re-fork.
+>
+> The decision itself stands. `DBIO::Forked` is still the generic
+> fork-per-query (Model A) async backend, still a sibling of `dbio-async` on the
+> same `DBIO::Storage::Async` contract, still dependency-free, still bound by
+> the boundary below — and because the mode is registered on the core *base*
+> storage class it is still available to every driver. Only *how a connection
+> reaches it* changed: one explicit mode instead of an accessor plus a fallback
+> chain, so Forked is the backend of every connection that asks for `forked`,
+> not of every driver automatically. Current behaviour is documented under
+> "ACTIVATION" in `DBIO::Forked` and `DBIO::Forked::Storage`.
+
 ## Context
 
 Core ADR 0014 made the `*_async` API universal; core ADR 0028 made async a
@@ -71,6 +106,19 @@ any sync driver, and pull no async-ecosystem deps.
   change, owned by core — see below.
 - Model A's limits (no pool, no multi-query transaction pinning, a pipe-buffer
   size ceiling) are recorded in ADR 0002 and ADR 0003.
+
+## Addendum 2026-10-30: the cost of a call is bounded by connect options
+
+Every `*_async` call is one process and one database connection of its own, so
+the cost per call is fixed by Model A and the number of them is the caller's.
+The backend declares two options through core's `async_option_names` (core ADR
+0078 seam, karr core k397): `statement_timeout` (seconds; a forked call past its
+deadline is ended and its future fails) and `max_in_flight` (the number of
+unresolved calls; one more fails before it forks). Both default to none. The
+count is the storage's own, per process and per connection: it holds the futures
+it forked weakly and counts those not yet resolved, so a resolved, cancelled or
+dropped future frees its slot. The POD of `DBIO::Forked::Storage` names the
+process and connection count per call (karr k27).
 
 ## Future architecture work (tracked cross-repo, not here)
 

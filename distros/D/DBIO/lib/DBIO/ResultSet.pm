@@ -3,14 +3,18 @@ package DBIO::ResultSet;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 use DBIO::Carp;
 use DBIO::ResultSetColumn;
 use Scalar::Util qw/blessed weaken reftype/;
 use DBIO::Util qw(
-  fail_on_internal_wantarray fail_on_internal_call UNRESOLVABLE_CONDITION
-  assert_no_internal_wantarray assert_no_internal_indirect_calls
-  help_url stresstest_utf8_upgrade_generated_collapser_source
+  assert_no_list_context fail_on_internal_call UNRESOLVABLE_CONDITION
+  assert_no_internal_indirect_calls
+  help_url is_literal_value is_plain_value bare_binds assert_column_value
+  stresstest_utf8_upgrade_generated_collapser_source
 );
 use Try::Tiny;
 
@@ -26,7 +30,8 @@ use Hash::Merge ();
 use namespace::clean;
 
 use overload
-        '0+'     => "count",
+        # numification passes (undef, "") - count() must see no arguments
+        '0+'     => sub { $_[0]->count },
         'bool'   => "_bool",
         fallback => 1;
 
@@ -44,8 +49,6 @@ sub new {
   }
 
   my ($source, $attrs) = @_;
-  $source = $source->resolve
-    if $source->isa('DBIO::ResultSourceHandle');
 
   $attrs = { %{$attrs||{}} };
   delete @{$attrs}{qw(_last_sqlmaker_alias_map _simple_passthrough_construction)};
@@ -79,13 +82,16 @@ sub new {
 
 sub search {
   my $self = shift;
+
+  # ADR 0042: DBIO has no wantarray-dependent return types. search() used to
+  # return the rows in list context; it now refuses that outright so that a
+  # later "fix" cannot turn `my @cds = $rs->search(...)` into a silent
+  # one-element list containing the ResultSet.
+  assert_no_list_context('->search') if wantarray;
+
   my $rs = $self->search_rs( @_ );
 
-  if (wantarray) {
-    assert_no_internal_wantarray and my $sog = fail_on_internal_wantarray;
-    return $rs->all;
-  }
-  elsif (defined wantarray) {
+  if (defined wantarray) {
     return $rs;
   }
   else {
@@ -223,8 +229,176 @@ sub search_rs {
 
   $rs->set_cache($cache) if ($cache);
 
+  # A bound async context propagates across search_rs clones, so
+  # $rs->with_context($ctx)->search({...}) keeps routing async ops onto the
+  # pinned connection. Kept OUT of {attrs} on purpose -- attrs are copied,
+  # merged and serialized, and a live connection pin has no business there.
+  $rs->{_async_context} = $self->{_async_context}
+    if $self->{_async_context};
+
   return $rs;
 }
+
+
+my %UNTRUSTED_OPERAND_OPERATORS = (
+  ( map { $_ => 'scalar' } ('=', '!=', '<>', '<', '<=', '>', '>=', '-like', '-not_like') ),
+  ( map { $_ => 'list' } ('-in', '-not_in') ),
+  ( map { $_ => 'pair' } ('-between', '-not_between') ),
+  ( map { $_ => 'null' } ('-is', '-is_not') ),
+);
+
+sub search_untrusted {
+  my $self = shift;
+
+  assert_no_list_context('->search_untrusted') if wantarray;
+
+  $self->throw_exception('->search_untrusted takes exactly one argument, a condition')
+    unless @_ == 1;
+
+  my $cond = $_[0];
+
+  my %aliases;
+  for my $chunk (@{ $self->_resolved_attrs->{from} || [] }) {
+    my $head = ref $chunk eq 'ARRAY' ? $chunk->[0] : $chunk;
+    next unless ref $head eq 'HASH' and $head->{-alias} and $head->{-rsrc};
+    $aliases{ $head->{-alias} } = $head->{-rsrc};
+  }
+
+  $self->_assert_untrusted_node($cond, '', \%aliases, {});
+
+  return $self->search_rs($cond);
+}
+
+sub _untrusted_fail {
+  my ($self, $path, $what) = @_;
+  $self->throw_exception(sprintf '->search_untrusted: %s%s', (length $path ? "$path: " : ''), $what);
+}
+
+sub _assert_untrusted_node {
+  my ($self, $node, $path, $aliases, $seen) = @_;
+
+  my $type = ref $node;
+  $self->_untrusted_fail($path, 'a condition is a hash or array reference, not '
+    . (defined $node ? ($type ? DBIO::Util::refdesc($node) : 'a scalar') : 'undef'))
+    unless $type eq 'HASH' or $type eq 'ARRAY';
+
+  my $addr = Scalar::Util::refaddr($node);
+  $self->_untrusted_fail($path, 'the condition holds a cycle') if $seen->{$addr};
+  local $seen->{$addr} = 1;
+
+  if ($type eq 'ARRAY') {
+    for my $i (0 .. $#$node) {
+      $self->_assert_untrusted_node($node->[$i], "$path\[$i]", $aliases, $seen);
+    }
+    return;
+  }
+
+  for my $key (sort keys %$node) {
+    my $kpath = "$path\{$key}";
+    my $val = $node->{$key};
+
+    if ($key eq '-and' or $key eq '-or') {
+      $self->_untrusted_fail($kpath, "$key takes an array or hash reference of conditions")
+        unless ref $val eq 'HASH' or ref $val eq 'ARRAY';
+      $self->_assert_untrusted_node($val, $kpath, $aliases, $seen);
+      next;
+    }
+
+    $self->_untrusted_fail($kpath, "'$key' is not a column")
+      if $key =~ /\A-/;
+
+    $self->_assert_untrusted_column($key, $kpath, $aliases);
+    $self->_assert_untrusted_operand($val, $kpath);
+  }
+}
+
+sub _assert_untrusted_column {
+  my ($self, $key, $path, $aliases) = @_;
+
+  my ($rsrc, $col) = ($self->result_source, $key);
+  if ($key =~ /\A(.+)\.([^.]+)\z/) {
+    $rsrc = $aliases->{$1};
+    $col = $2;
+    $self->_untrusted_fail($path, "'$1' is not an alias of this resultset")
+      unless $rsrc;
+  }
+
+  $self->_untrusted_fail($path, "'$key' is not a column")
+    unless $rsrc->has_column($col);
+}
+
+sub _assert_untrusted_operand {
+  my ($self, $val, $path) = @_;
+
+  if (! ref $val) {
+    return;
+  }
+  elsif (ref $val eq 'ARRAY') {
+    for my $i (0 .. $#$val) {
+      $self->_untrusted_fail("$path\[$i]", 'a list of values holds scalars only, not '
+        . DBIO::Util::refdesc($val->[$i])) if ref $val->[$i];
+    }
+    return;
+  }
+  elsif (ref $val eq 'HASH') {
+    $self->_untrusted_fail($path, 'an operand holds exactly one operator')
+      unless keys %$val == 1;
+
+    my ($op) = keys %$val;
+    my $opath = "$path\{$op}";
+    my $arg = $val->{$op};
+
+    my $kind = $UNTRUSTED_OPERAND_OPERATORS{$op}
+      or $self->_untrusted_fail($opath, "'$op' is not an allowed operator");
+
+    if ($kind eq 'scalar') {
+      $self->_untrusted_fail($opath, "'$op' takes a scalar") if ref $arg;
+    }
+    elsif ($kind eq 'null') {
+      $self->_untrusted_fail($opath, "'$op' takes undef") if defined $arg;
+    }
+    else {
+      $self->_untrusted_fail($opath, "'$op' takes an array reference of "
+        . ($kind eq 'pair' ? 'two scalars' : 'scalars'))
+        unless ref $arg eq 'ARRAY' and ! grep { ref } @$arg
+          and ($kind ne 'pair' or @$arg == 2);
+    }
+    return;
+  }
+
+  $self->_untrusted_fail($path, 'a value is a scalar, not ' . DBIO::Util::refdesc($val));
+}
+
+
+sub with_context {
+  my ($self, $ctx) = @_;
+  $self->throw_exception(
+    'with_context requires an async context object (the one passed to a '
+  . 'txn_do_async / pipeline coderef)'
+  ) unless defined $ctx and blessed($ctx) and $ctx->can('select_async');
+  my $storage = $self->result_source->storage;
+  $storage->_assert_async_context_owner($ctx);
+  my $clone = $self->search_rs;
+  $clone->{_async_context} = $ctx;
+
+  # A bound clone that already carries a pre-filled row cache (an explicit
+  # set_cache, or a prefetch cache copied by search_rs) returns those rows
+  # directly from the cache -- so all/all_async off it would hand back
+  # context-less rows and a write-back on one would miss the pin. Rebind the
+  # cached rows onto the context in a FRESH cache, leaving the unbound source's
+  # shared rows untouched (karr k195, ADR 0045).
+  if (my $cache = $clone->get_cache) {
+    $clone->set_cache([
+      map { blessed $_ && $_->can('with_context') ? $_->with_context($ctx) : $_ } @$cache
+    ]);
+  }
+
+  return $clone;
+}
+
+# ADR 0045: the pinned async context bound via with_context (undef if unbound).
+# Read on every RS async op before the pooled backend; see _rs_run_async.
+sub _async_context { $_[0]->{_async_context} }
 
 my $dark_sel_dumper;
 sub _normalize_selection {
@@ -345,15 +519,45 @@ sub _stack_cond {
 
 sub search_literal {
   my ($self, $sql, @bind) = @_;
+
+  assert_no_list_context('->search_literal') if wantarray;
+
   my $attr;
   if ( @bind && ref($bind[-1]) eq 'HASH' ) {
     $attr = pop @bind;
   }
-  return $self->search(\[ $sql, map [ {} => $_ ], @bind ], ($attr || () ));
+  return $self->search_rs(\[ $sql, map [ {} => $_ ], @bind ], ($attr || () ));
 }
 
 
 sub find {
+  my $self = shift;
+  my ($final_cond, $attrs, $is_miss) = $self->_resolve_find_query(@_);
+  return undef if $is_miss;
+
+  # Run the query, passing the result_class since it should propagate for find
+  my $rs = $self->search ($final_cond, {result_class => $self->result_class, %$attrs});
+  if ($rs->_resolved_attrs->{collapse}) {
+    my $row = $rs->next;
+    carp "Query returned more than one row" if $rs->next;
+    return $row;
+  }
+  else {
+    return $rs->single;
+  }
+}
+
+# Resolve find()'s arguments down to a (condition, attrs) pair ready to hand to
+# ->search, shared verbatim by find() and find_async() so the two can never
+# drift: same constraint check (key => ... or any covered constraint), same
+# relationship-valued-key resolution (ADR 0034). $is_miss is true only for the
+# non-concrete-relation-condition guard, in which case $final_cond is
+# meaningless and no query should be run at all.
+#
+# Every key of the passed condition goes into the query (ADR 0070); the
+# constraint check decides whether the condition is allowed to run, it never
+# narrows it.
+sub _resolve_find_query {
   my $self = shift;
   my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
 
@@ -391,99 +595,301 @@ sub find {
     @{$call_cond}{@c_cols} = @_;
   }
 
-  # process relationship data if any
-  for my $key (keys %$call_cond) {
-    if (
-      length ref($call_cond->{$key})
-        and
-      $rsrc->relationship_info($key)
-        and
-      # implicitly skip has_many's (likely MC)
-      (ref (my $val = delete $call_cond->{$key}) ne 'ARRAY' )
-    ) {
-      my ($rel_cond, $crosstable) = $self->_resolve_related_cond($rsrc, $key, $val);
-
-      $self->throw_exception("Complex condition via relationship '$key' is unsupported in find()")
-         if $crosstable or ref($rel_cond) ne 'HASH';
-
-      # supplement condition
-      # relationship conditions take precedence (?)
-      @{$call_cond}{keys %$rel_cond} = values %$rel_cond;
-    }
-  }
+  return (undef, $attrs, 1) if $self->_fold_relation_conditions($call_cond);
 
   my $alias = exists $attrs->{alias} ? $attrs->{alias} : $self->{attrs}{alias};
-  my $final_cond;
+  my $merged_values = ($self->_merge_with_rscond($call_cond))[0];
+
   if (defined $constraint_name) {
-    $final_cond = $self->_qualify_cond_columns (
+    # the named constraint must be covered by the condition: a column that is
+    # missing or undef throws (undef is no concrete value, ADR 0070)
+    my $fixed = $rsrc->storage->_extract_fixed_condition_columns($merged_values, 'consider_nulls');
+    my @undef = grep {
+      exists $fixed->{$_} and ! defined $fixed->{$_}
+    } $rsrc->unique_constraint_columns($constraint_name);
 
-      $self->result_source->_minimal_valueset_satisfying_constraint(
-        constraint_name => $constraint_name,
-        values => ($self->_merge_with_rscond($call_cond))[0],
-        carp_on_nulls => 1,
-      ),
+    $self->throw_exception(sprintf(
+      "find() with key '%s': column(s) %s %s undef; a unique constraint is covered by defined values, "
+    . "to look rows up by any other condition use search(...)->single",
+      $constraint_name,
+      join(', ', map { "'$_'" } sort @undef),
+      @undef > 1 ? 'are' : 'is',
+    )) if @undef;
 
-      $alias,
+    $rsrc->_minimal_valueset_satisfying_constraint(
+      constraint_name => $constraint_name,
+      values => $merged_values,
     );
   }
-  elsif ($self->{attrs}{accessor} and $self->{attrs}{accessor} eq 'single') {
-    # This means that we got here after a merger of relationship conditions
-    # in ::Relationship::Base::search_related (the row method), and furthermore
-    # the relationship is of the 'single' type. This means that the condition
-    # provided by the relationship (already attached to $self) is sufficient,
-    # as there can be only one row in the database that would satisfy the
-    # relationship
-  }
   else {
-    my (@unique_queries, %seen_column_combinations, $ci, @fc_exceptions);
+    $self->_assert_covered_constraint($call_cond, $merged_values, 'find');
+  }
 
-    # no key was specified - fall down to heuristics mode:
-    # run through all unique queries registered on the resultset, and
-    # 'OR' all qualifying queries together
-    #
-    # always start from 'primary' if it exists at all
-    for my $c_name ( sort {
-        $a eq 'primary' ? -1
-      : $b eq 'primary' ? 1
-      : $a cmp $b
-    } $rsrc->unique_constraint_names) {
+  return ($self->_qualify_cond_columns($call_cond, $alias), $attrs, 0);
+}
 
-      next if $seen_column_combinations{
-        join "\x00", sort $rsrc->unique_constraint_columns($c_name)
-      }++;
+# Fold the relationship-valued keys of a find() condition into columns of this
+# source, in place (belongs_to given a related row or a condition hashref
+# resolves to its foreign-key columns). An explicitly passed column keeps its
+# value: a relationship resolving to a different value for it is a
+# contradiction and throws. Returns true when a relationship does not reduce to
+# a concrete condition (the find is a miss, ADR 0034).
+sub _fold_relation_conditions {
+  my ($self, $call_cond) = @_;
 
-      try {
-        push @unique_queries, $self->_qualify_cond_columns(
-          $self->result_source->_minimal_valueset_satisfying_constraint(
-            constraint_name => $c_name,
-            values => ($self->_merge_with_rscond($call_cond))[0],
-            columns_info => ($ci ||= $self->result_source->columns_info),
-          ),
-          $alias
-        );
-      }
-      catch {
-        push @fc_exceptions, $_ if $_ =~ /\bFilterColumn\b/;
-      };
+  my $rsrc = $self->result_source;
+  my %explicit = %$call_cond;
+
+  for my $key (sort keys %explicit) {
+    next unless length ref $explicit{$key} and $rsrc->relationship_info($key);
+
+    $self->throw_exception(
+      "A list value for relationship '$key' is unsupported in find()"
+    ) if ref $explicit{$key} eq 'ARRAY';
+
+    my $val = delete $call_cond->{$key};
+    my ($rel_cond, $crosstable) = $self->_resolve_related_cond($rsrc, $key, $val);
+
+    $self->throw_exception("Complex condition via relationship '$key' is unsupported in find()")
+       if $crosstable or ref($rel_cond) ne 'HASH';
+
+    # A relation that reduces to a join-free but NON-concrete condition (e.g. a
+    # might_have searched by a non-key column resolves to { self_pk => undef })
+    # is not crosstable and IS a hashref, so it slips past the guard above --
+    # merging it would clobber a real key column with an undef foreign key.
+    # No row can match a condition that does not resolve to concrete columns,
+    # so this find() is a MISS (ADR 0034).
+    return 1 unless $self->_related_cond_is_concrete($rel_cond, $crosstable);
+
+    for my $col (sort keys %$rel_cond) {
+      next if $col eq $key or ! exists $explicit{$col};
+
+      my $given = ref $explicit{$col} eq 'HASH'
+        && keys %{$explicit{$col}} == 1
+        && exists $explicit{$col}{'='}
+          ? $explicit{$col}{'='}
+          : $explicit{$col};
+
+      my $resolved = $rel_cond->{$col};
+
+      my $same
+        = ( ! defined $given or ! defined $resolved ) ? ( ! defined $given and ! defined $resolved )
+        : ( ref $given or ref $resolved )             ? ( ref $given and ref $resolved and $given == $resolved )
+        :                                               $given eq $resolved;
+
+      $self->throw_exception(
+        "The condition passes '$col' explicitly and relationship '$key' resolves it to a different value"
+      ) unless $same;
     }
 
-    $final_cond =
-        @unique_queries   ? \@unique_queries
-      : @fc_exceptions    ? $self->throw_exception(join "; ", map { $_ =~ /(.*) at .+ line \d+$/s } @fc_exceptions )
-      :                     $self->_non_unique_find_fallback ($call_cond, $attrs)
-    ;
+    @{$call_cond}{keys %$rel_cond} = values %$rel_cond;
   }
 
-  # Run the query, passing the result_class since it should propagate for find
-  my $rs = $self->search ($final_cond, {result_class => $self->result_class, %$attrs});
-  if ($rs->_resolved_attrs->{collapse}) {
-    my $row = $rs->next;
-    carp "Query returned more than one row" if $rs->next;
-    return $row;
+  return 0;
+}
+
+# The unique constraints a condition covers: every column of the constraint is
+# a concrete equality -- a defined scalar, or { '=' => $scalar } -- on the top
+# AND level, after the resultset's own condition and the relationship values
+# are merged in. Operators, value lists, undef and a column that only appears
+# inside an OR branch do not count. Takes the merged values, returns constraint
+# names, 'primary' first, constraints sharing a column set once.
+sub _covered_constraints {
+  my ($self, $merged_values) = @_;
+
+  my $rsrc  = $self->result_source;
+  my $fixed = $rsrc->storage->_extract_fixed_condition_columns($merged_values);
+
+  my (@covered, %seen, @fc_exceptions, $ci);
+
+  for my $c_name ( sort {
+      $a eq 'primary' ? -1
+    : $b eq 'primary' ? 1
+    : $a cmp $b
+  } $rsrc->unique_constraint_names) {
+
+    my @c_cols = $rsrc->unique_constraint_columns($c_name);
+    next unless @c_cols;
+
+    next if $seen{ join "\x00", sort @c_cols }++;
+
+    next unless @c_cols == grep {
+      exists $fixed->{$_}
+        and defined $fixed->{$_}
+        and ( ! ref $fixed->{$_} or is_plain_value $fixed->{$_} )
+        and $fixed->{$_} ne UNRESOLVABLE_CONDITION
+    } @c_cols;
+
+    # FilterColumn values are not usable for a lookup; that throw has to be
+    # seen here
+    try {
+      $rsrc->_minimal_valueset_satisfying_constraint(
+        constraint_name => $c_name,
+        values => $merged_values,
+        columns_info => ($ci ||= $rsrc->columns_info),
+      );
+      push @covered, $c_name;
+    }
+    catch {
+      push @fc_exceptions, $_ if $_ =~ /\bFilterColumn\b/;
+    };
+  }
+
+  $self->throw_exception(join "; ", map { $_ =~ /(.*) at .+ line \d+$/s } @fc_exceptions)
+    if ! @covered and @fc_exceptions;
+
+  return @covered;
+}
+
+# Throws unless the condition covers a unique constraint; returns the covered
+# constraint names. $caller names the public method in the message.
+sub _assert_covered_constraint {
+  my ($self, $call_cond, $merged_values, $caller) = @_;
+
+  my @covered = $self->_covered_constraints($merged_values);
+  return @covered if @covered;
+
+  my $rsrc = $self->result_source;
+  my %constraints = $rsrc->unique_constraints;
+
+  $self->throw_exception(sprintf(
+    "%s() needs a condition that gives every column of one unique constraint "
+  . "of source '%s' a concrete value. Columns given: %s. Unique constraints: %s. "
+  . "To look rows up by any other condition use search(...)->single",
+    $caller,
+    $rsrc->source_name,
+    ( join(', ', sort map { "'$_'" } keys %$call_cond) || '(none)' ),
+    ( join('; ', map { "$_ (" . join(', ', @{$constraints{$_}}) . ')' } sort keys %constraints) || '(none)' ),
+  ));
+}
+
+# The find() a find_or_* / update_or_* method runs: only the columns of the one
+# covered unique constraint (the one named by key => ...) go into the lookup;
+# the remaining values are data for create or update. Several covered
+# constraints without key throw, none covered throws. Returns
+# ($lookup_cond, $lookup_attrs, $is_miss).
+sub _lookup_for_write {
+  my ($self, $cond, $attrs, $caller) = @_;
+
+  my $call_cond = $self->_lookup_data($cond);
+  return (undef, $attrs, 1) if $self->_fold_relation_conditions($call_cond);
+
+  my $c_name;
+  if (exists $attrs->{key}) {
+    $c_name = defined $attrs->{key}
+      ? $attrs->{key}
+      : $self->throw_exception("An undefined 'key' resultset attribute makes no sense")
+    ;
   }
   else {
-    return $rs->single;
+    my @covered = $self->_assert_covered_constraint(
+      $call_cond, ($self->_merge_with_rscond($call_cond))[0], $caller,
+    );
+
+    $self->throw_exception(sprintf(
+      "%s() condition covers the unique constraints %s -- pass key => '...' to name the one to look up",
+      $caller, join(' and ', map { "'$_'" } @covered),
+    )) if @covered > 1;
+
+    $c_name = $covered[0];
   }
+
+  my %lookup = map {
+    exists $call_cond->{$_} ? ( $_ => $call_cond->{$_} ) : ()
+  } $self->result_source->unique_constraint_columns($c_name);
+
+  return (\%lookup, $self->_read_modify_write_attrs({ %$attrs, key => $c_name }), 0);
+}
+
+# The read of a read-then-write call goes where the write goes. The storage
+# names the pool through _read_pool_for_read_modify_write (nothing by default,
+# 'master' for DBIO::Replicated::Storage); a force_pool the caller gave stays.
+sub _read_modify_write_attrs {
+  my ($self, $attrs) = @_;
+
+  my $pool = $self->result_source->storage->_read_pool_for_read_modify_write;
+  $attrs->{force_pool} = $pool if defined $pool and ! exists $attrs->{force_pool};
+
+  return $attrs;
+}
+
+# The part of the data that identifies a row, as a copy: the alias removed from
+# the keys (me.title is title), and without the lists under relationship names,
+# which are the data of rows created along with this one (multi-create).
+sub _lookup_data {
+  my ($self, $data) = @_;
+
+  my $rsrc = $self->result_source;
+  return $self->_remove_alias(
+    { map {
+      ( ref $data->{$_} eq 'ARRAY' and $rsrc->relationship_info($_) ) ? () : ( $_ => $data->{$_} )
+    } keys %$data },
+    $self->{attrs}{alias},
+  );
+}
+
+# The existing row that nested multi-create data identifies, if any: the data
+# is looked up by the columns of the unique constraints it covers (all of them,
+# ANDed); data covering none identifies nothing and finds no row, so the caller
+# creates it. Used by the row layer, which builds related rows from data it
+# does not control.
+sub _find_identified {
+  my ($self, $data) = @_;
+
+  my $call_cond = $self->_lookup_data($data);
+
+  return undef if $self->_fold_relation_conditions($call_cond);
+
+  my @covered = $self->_covered_constraints(($self->_merge_with_rscond($call_cond))[0])
+    or return undef;
+
+  my %lookup = map {
+    exists $call_cond->{$_} ? ( $_ => $call_cond->{$_} ) : ()
+  } map { $self->result_source->unique_constraint_columns($_) } @covered;
+
+  return $self->find(\%lookup);
+}
+
+# find() for the find_or_* / update_or_* family, see _lookup_for_write
+sub _find_for_write {
+  my ($self, $cond, $attrs, $caller, $lookup_cols) = @_;
+
+  my ($lookup, $lattrs, $is_miss) = $self->_lookup_for_write($cond, $attrs, $caller);
+  return undef if $is_miss;
+
+  @$lookup_cols = keys %$lookup if $lookup_cols;
+
+  return $self->find($lookup, $lattrs);
+}
+
+# What update_or_create / update_or_new hand to update() for the row they
+# found (ADR 0071): the caller's data may not contradict the resultset's
+# condition, and the columns of the lookup, which name the row and assign
+# nothing, are left out where they are guarded.
+sub _update_data_for_found_row {
+  my ($self, $cond, $lookup_cols) = @_;
+
+  $self->_merge_with_rscond($cond, 1);
+
+  my $columns = $self->result_source->_columns;
+  my %lookup = map { $_ => 1 } @{ $lookup_cols || [] };
+
+  return { map {
+    ( $lookup{$_} and $columns->{$_} and $columns->{$_}{is_guarded} )
+      ? ()
+      : ( $_ => $cond->{$_} )
+  } keys %$cond };
+}
+
+sub _find_for_write_async {
+  my ($self, $cond, $attrs, $caller, $lookup_cols) = @_;
+
+  my ($lookup, $lattrs, $is_miss) = $self->_lookup_for_write($cond, $attrs, $caller);
+  @$lookup_cols = keys %$lookup if $lookup_cols and ! $is_miss;
+
+  return $is_miss
+    ? $self->_rs_run_async('find', sub { $_[1]->done(undef) }, sub { undef })
+    : $self->find_async($lookup, $lattrs);
 }
 
 # Resolve a related-object sub-condition down to a condition on THIS source's
@@ -494,8 +900,8 @@ sub find {
 # $resolved_cond may be undef/UNRESOLVABLE_CONDITION -- e.g. a has_many searched
 # by its own non-key columns resolves join-free to { self_pk => undef }, which
 # does NOT pin a concrete foreign key. This is the single resolution seam shared
-# by find()'s complex-condition guard and update_or_create()'s relation-
-# splitting DWIM; each caller interprets the result for itself (ADR 0033).
+# by find()'s complex-condition guard and update_or_create()'s _find_lookup_cond
+# lookup builder; each caller interprets the result for itself (ADR 0034).
 sub _resolve_related_cond {
   my ($self, $rsrc, $rel_name, $val) = @_;
 
@@ -505,29 +911,24 @@ sub _resolve_related_cond {
   return $rsrc->_resolve_condition( $relinfo->{cond}, $val, $rel_name, $rel_name );
 }
 
-# This is a stop-gap method as agreed during the discussion on find() cleanup:
-# http://lists.scsys.co.uk/pipermail/dbix-class/2010-October/009535.html
-#
-# It is invoked when find() is called in legacy-mode with insufficiently-unique
-# condition. It is provided for overrides until a saner way forward is devised
-#
-# *NOTE* This is not a public method, and it's *GUARANTEED* to disappear down
-# the road. Please adjust your tests accordingly to catch this situation early
-# DBIO::ResultSet->can('_non_unique_find_fallback') is reasonable
-#
-# The method will not be removed without an adequately complete replacement
-# for strict-mode enforcement
-sub _non_unique_find_fallback {
-  my ($self, $cond, $attrs) = @_;
+# Predicate over ( $resolved_cond, $crosstable ) as returned by
+# _resolve_related_cond: true only when the relation reduces to a concrete,
+# fully-defined condition on THIS source's own columns (a resolvable
+# belongs_to). A crosstable relation, a non-hashref resolution, an empty
+# condition, or any undef / UNRESOLVABLE_CONDITION value counts as non-concrete
+# -- folding such a condition into a lookup would clobber real columns with an
+# undef foreign key. Shared by find()'s guard and update_or_create()'s lookup-
+# condition builder, so the two agree on what "usable in a lookup" means (ADR
+# 0034).
+sub _related_cond_is_concrete {
+  my ($self, $rel_cond, $crosstable) = @_;
 
-  return $self->_qualify_cond_columns(
-    $cond,
-    exists $attrs->{alias}
-      ? $attrs->{alias}
-      : $self->{attrs}{alias}
-  );
+  return
+       ! $crosstable
+    && ref $rel_cond eq 'HASH'
+    && keys %$rel_cond
+    && ! grep { ! defined $_ } values %$rel_cond;
 }
-
 
 sub _qualify_cond_columns {
   my ($self, $cond, $alias) = @_;
@@ -560,7 +961,11 @@ sub _build_unique_cond {
 
 
 sub search_related {
-  return shift->related_resultset(shift)->search(@_);
+  my ($self, $rel, @args) = @_;
+
+  assert_no_list_context('->search_related') if wantarray;
+
+  return $self->related_resultset($rel)->search(@args);
 }
 
 
@@ -634,25 +1039,29 @@ sub get_column {
 
 sub search_like {
   my $class = shift;
+  assert_no_list_context('->search_like') if wantarray;
   carp_unique (
-    'search_like() is deprecated and will be removed in DBIO version 0.09.'
+    'search_like() is deprecated.'
    .' Instead use ->search({ x => { -like => "y%" } })'
    .' (note the outer pair of {}s - they are important!)'
   );
   my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
   my $query = ref $_[0] eq 'HASH' ? { %{shift()} }: {@_};
   $query->{$_} = { 'like' => $query->{$_} } for keys %$query;
-  return $class->search($query, { %$attrs });
+  return $class->search_rs($query, { %$attrs });
 }
 
 
 sub slice {
   my ($self, $min, $max) = @_;
+
+  assert_no_list_context('->slice') if wantarray;
+
   my $attrs = {}; # = { %{ $self->{attrs} || {} } };
   $attrs->{offset} = $self->{attrs}{offset} || 0;
   $attrs->{offset} += $min;
   $attrs->{rows} = ($max ? ($max - $min + 1) : 1);
-  return $self->search(undef, $attrs);
+  return $self->search_rs(undef, $attrs);
 }
 
 
@@ -748,10 +1157,9 @@ sub _construct_results {
 
       # instead of looping over ->next, use ->all in stealth mode
       # *without* calling a ->reset afterwards
-      # FIXME ENCAPSULATION - encapsulation breach, cursor method additions pending
-      if (! $cursor->{_done}) {
+      if (! $cursor->is_exhausted) {
         $rows = [ ($rows ? @$rows : ()), $cursor->all ];
-        $cursor->{_done} = 1;
+        $cursor->mark_exhausted;
       }
     }
   }
@@ -908,7 +1316,7 @@ sub {
   # FIXME SUBOPTIMAL - we can do better, cursor->next/all (well diff. methods) should return a ref
   my @r = $cursor->next or return;
   if (my @violating_idx = grep { ! defined $r[$_] } (%s) ) {
-    $self->throw_exception( $err . join (', ', map { "'$infmap->[$_]'" } @violating_idx ) )
+    $self->throw_exception( $err . CORE::join (', ', map { "'$infmap->[$_]'" } @violating_idx ) )
   }
   \@r
 }
@@ -946,6 +1354,24 @@ EOS
   . 'Consider using ->all() instead'
   ) if ( ! $fetch_all and @$rows > 1 );
 
+  # Rows constructed from a context-bound resultset inherit the pinned
+  # async context, so $rs->with_context($ctx)->first_async->then(sub {
+  # $_[0]->update_async }) writes back on the same pinned connection instead of
+  # the pool. The stamp cascades into eagerly-prefetched children (their related
+  # resultsets and cached child rows) so a prefetched child fetched off a bound
+  # parent stays pinned too (karr k195). Only Row objects can carry it (HRI
+  # hashrefs cannot), and only when a context is actually bound -- otherwise this
+  # loop never runs and the sync/pooled path is bit-for-bit unchanged. A result
+  # class with its own inflate_result still hands back Row objects, so what it
+  # built is asked rather than assumed from the inflator (karr k325).
+  if ( my $ctx = $self->{_async_context} ) {
+    my $is_core_row = $self->{_result_inflator}{is_core_row};
+    for (@$rows) {
+      $_->_bind_async_context($ctx)
+        if $is_core_row or ( blessed $_ and $_->can('_bind_async_context') );
+    }
+  }
+
   return $rows;
 }
 
@@ -955,14 +1381,30 @@ sub result_class {
   if ($result_class) {
 
     # don't fire this for an object
-    $self->ensure_class_loaded($result_class)
-      unless ref($result_class);
+    if (! ref $result_class) {
+
+      # DBIx::Class::Helper::ResultSet::ResultClassDWIM resolved a leading '::'
+      # against the ResultClass namespace. DBIO does not adopt that idiom, but
+      # the string used to travel straight into ensure_class_loaded and die
+      # with "Can't locate /HRI.pm" out of Class::C3::Componentised, which says
+      # nothing about DBIO or about what is supported instead.
+      $self->throw_exception(
+        "result_class '$result_class' uses the '::'-prefixed shorthand of "
+      . "DBIx::Class::Helper::ResultSet::ResultClassDWIM, which DBIO does not "
+      . "implement -- pass the fully qualified class name instead"
+      . ( $result_class eq '::HRI'
+            ? " ('DBIO::ResultClass::HashRefInflator', which \$rs->hri sets for you)"
+            : ''
+        )
+      ) if $result_class =~ /^::/;
+
+      $self->ensure_class_loaded($result_class);
+    }
 
     if ($self->get_cache) {
       carp_unique('Changing the result_class of a ResultSet instance with cached results is a noop - the cache contents will not be altered');
     }
-    # FIXME ENCAPSULATION - encapsulation breach, cursor method additions pending
-    elsif ($self->{cursor} && $self->{cursor}{_pos}) {
+    elsif ($self->{cursor} && $self->{cursor}->position) {
       $self->throw_exception('Changing the result_class of a ResultSet instance with an active cursor is not supported');
     }
 
@@ -976,7 +1418,7 @@ sub result_class {
 
 sub count {
   my $self = shift;
-  return $self->search(@_)->count if @_ and defined $_[0];
+  return $self->search_rs(@_)->count if @_;
   return scalar @{ $self->get_cache } if $self->get_cache;
 
   my $attrs = { %{ $self->_resolved_attrs } };
@@ -1031,11 +1473,17 @@ sub _count_rs {
   delete @{$tmp_attrs}{qw/rows offset order_by record_filter for/};
 
   # overwrite the selector (supplied by the storage)
-  $rsrc->resultset_class->new($rsrc, {
+  my $count_rs = $rsrc->resultset_class->new($rsrc, {
     %$tmp_attrs,
     select => $rsrc->storage->_count_select ($rsrc, $attrs),
     as => 'count',
-  })->get_column ('count');
+  });
+
+  # ADR 0045 / karr k281: the count of a context-bound resultset keeps the pin
+  # (get_column passes it on to the ResultSetColumn).
+  $count_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+  return $count_rs->get_column ('count');
 }
 
 #
@@ -1127,16 +1575,24 @@ sub _count_subq_rs {
     $sub_attrs->{select} = @pcols ? \@pcols : [ 1 ];
   }
 
-  return $rsrc->resultset_class
-               ->new ($rsrc, $sub_attrs)
-                ->as_subselect_rs
-                 ->search ({}, { columns => { count => $rsrc->storage->_count_select ($rsrc, $attrs) } })
-                  ->get_column ('count');
+  my $sub_rs = $rsrc->resultset_class->new ($rsrc, $sub_attrs);
+
+  # ADR 0045 / karr k281: the count of a context-bound resultset keeps the pin
+  # (as_subselect_rs, search and get_column below each pass it on).
+  $sub_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+  return $sub_rs
+          ->as_subselect_rs
+           ->search ({}, { columns => { count => $rsrc->storage->_count_select ($rsrc, $attrs) } })
+            ->get_column ('count');
 }
 
 
 
 sub count_literal { shift->search_literal(@_)->count; }
+
+
+sub count_literal_async { shift->search_literal(@_)->count_async; }
 
 
 sub all {
@@ -1188,16 +1644,67 @@ sub first {
 #     (no async mode chosen)             async mode was selected at connect time
 #
 # $backend_build builds the real-async Future given ($backend, $future_class);
-# $sync_run is the synchronous fallback invoked for the immediate mode. The
-# _async_storage resolver croaks on its own for a chosen-but-unavailable mode.
+# $sync_run is the synchronous fallback invoked for the immediate mode.
+# $validate (optional) checks the arguments of the call; it runs once the
+# backend (or bound context) is known and its return list is passed to
+# $backend_build after ($backend, $fc). In the immediate mode $sync_run validates.
+#
+# Runtime failures arrive as a failed Future, misuse as an exception: on the
+# pooled path whatever fails while the backend is resolved or the statement is
+# built fails the Future (of the storage's future_class) with the message as
+# thrown; misuse throws at the call -- a bound context that is expired or
+# foreign (ADR 0045), a connection without an async mode, and whatever
+# $validate throws (an invalid option, no data, a missing capability).
 sub _rs_run_async {
-  my ($self, $name, $backend_build, $sync_run) = @_;
+  my ($self, $name, $backend_build, $sync_run, $validate) = @_;
 
   my $storage = $self->result_source->storage;
   my $fc = $storage->future_class;
 
-  if (my $backend = $storage->_async_storage) {
-    return $backend_build->($backend, $fc);
+  # An explicitly bound pinned context (from txn_do_async / pipeline)
+  # takes precedence over the pooled backend, so RS async inside a transaction
+  # or pipeline runs on the pinned connection instead of a sibling pool
+  # connection outside it. A carried-but-expired context -- either a pipeline
+  # context after its synchronous batch coderef returned or a transaction
+  # context after its terminal path -- must NOT silently fall back to the pool;
+  # it fails loudly (ADR 0045 / dbio-async ADR 0003). No context bound => the
+  # historical path below, bit-for-bit.
+  if (my $ctx = $self->_async_context) {
+    _assert_async_context_active($self, $ctx, $name);
+    $storage->_assert_async_context_owner($ctx);
+    return $backend_build->($ctx, $fc, $validate ? $validate->() : ());
+  }
+
+  # On the pooled path an exception from getting the backend or building the
+  # statement (the owner cannot connect for its sql_maker, say) is a runtime
+  # failure and arrives as a failed Future, as the message was thrown (k403).
+  # Misuse above and below stays an exception at the call.
+  my ($backend, $error);
+  {
+    local $@;
+    my $ok = eval { $backend = $storage->_async_storage; 1 };
+    $error = $@ unless $ok;
+  }
+  return $fc->fail($error) if defined $error;
+
+  if ($backend) {
+    # What is misuse of the call is checked by $validate, outside the net, and
+    # throws at the call; what it returns goes on to $backend_build.
+    my @validated = $validate ? $validate->() : ();
+    my ($future, $build_error);
+    {
+      local $@;
+      my $ok = eval {
+        # A Future derived from the storage's own is reported to the pool (k397).
+        $future = $backend->can('_note_pooled_derivation')
+          ? $backend->_note_pooled_derivation(sub { $backend_build->($backend, $fc, @validated) })
+          : $backend_build->($backend, $fc, @validated);
+        1;
+      };
+      $build_error = $@ unless $ok;
+    }
+    return $fc->fail($build_error) if defined $build_error;
+    return $future;
   }
 
   $self->throw_exception(
@@ -1205,7 +1712,63 @@ sub _rs_run_async {
   ) unless defined $storage->_async_mode;
 
   my @r = eval { $sync_run->() };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
+  if (my $error = $@) {
+    # Inside an immediate txn_do_async this is a statement of the transaction
+    # like any other: its failure fails it, awaited or not (karr k331).
+    $storage->_note_immediate_failure($error);
+    return $fc->fail($error);
+  }
+  return $fc->done(@r);
+}
+
+# Shared active-context assertion for the RS/Row/RSC async paths. A bound
+# pinned context that has been invalidated -- a pipeline context after its batch
+# coderef or a transaction context after its terminal path -- must refuse loudly
+# rather than route work onto a connection already back in the pool.
+sub _assert_async_context_active {
+  my ($invocant, $ctx, $name) = @_;
+  return if !$ctx->can('_context_active') || $ctx->_context_active;
+  $invocant->throw_exception(
+    "the async context bound to this result is no longer active; ${name}_async "
+  . "cannot be routed onto it. Pipeline contexts stop accepting work when their "
+  . "synchronous batch coderef returns; transaction contexts stop on their "
+  . "terminal BEGIN / COMMIT / ROLLBACK path. Issue the async work while its "
+  . "owning context remains active, not from a resultset held past it."
+  );
+}
+
+# An operation that cannot be expressed as a single pinned async statement
+# (Row multi-create/cascade, upsert cascade/fallback/count) must NOT silently
+# run through the synchronous storage while a pinned context is bound -- that
+# would execute on a pooled sync connection OUTSIDE the pinned
+# transaction/pipeline (consequence 4). Refuse, named. With no context this is
+# the historical "punt to sync and resolve immediately" path, unchanged.
+#
+# In the 'immediate' mode the context is the storage itself (ADR 0055), and
+# the fallback would run inside the transaction. The refusal stands there too,
+# so that a bound resultset behaves the same in every async mode; only the
+# reason given is the one that is true there (karr k282).
+sub _async_ctx_or_sync_punt {
+  my ($self, $fc, $op, $why, $sync_cref) = @_;
+  if (my $ctx = $self->_async_context) {
+    $self->throw_exception(
+      "${op}_async cannot run on a bound async context: it is not expressible "
+    . "as a single pinned statement ($why). In the 'immediate' mode the "
+    . "synchronous fallback would run inside the transaction, but a bound "
+    . "object refuses it in every async mode alike. Restructure so this runs "
+    . "unbound -- in this mode that is still inside the transaction."
+    ) if $ctx == $self->result_source->storage;
+
+    my $where = $ctx->can('in_txn') && $ctx->in_txn ? 'transaction' : 'pipeline';
+    $self->throw_exception(
+      "${op}_async cannot run on a bound async context: it is not expressible "
+    . "as a single pinned statement ($why), and the synchronous fallback would "
+    . "run outside the pinned $where. Restructure so this runs outside the "
+    . "context, or perform the equivalent explicit steps on the context."
+    );
+  }
+  my $r = eval { $sync_cref->() };
+  return $@ ? $fc->fail($@) : $fc->done($r);
 }
 
 # Inflate raw fetched rows (arrayrefs in $attrs->{select} order, exactly what a
@@ -1304,9 +1867,47 @@ sub single_async {
 }
 
 
+sub find_async {
+  my $self = shift;
+  my @args = @_;
+  my ($final_cond, $attrs, $is_miss) = $self->_resolve_find_query(@args);
+
+  return $self->_rs_run_async('find',
+    sub {
+      my ($backend, $fc) = @_;
+      return $fc->done(undef) if $is_miss;
+
+      my $rs = $self->search($final_cond, {result_class => $self->result_class, %$attrs});
+
+      if ($rs->_resolved_attrs->{collapse}) {
+        my $rattrs = $rs->_resolved_attrs;
+        return $backend->select_async(
+          $rattrs->{from}, $rattrs->{select}, $rattrs->{where}, $rattrs,
+        )->then(sub {
+          my @raw = @_;
+          my $objs = $rs->_inflate_fetched_rows(\@raw);
+          carp "Query returned more than one row" if @$objs > 1;
+          return $objs->[0];
+        });
+      }
+      else {
+        my @select_args = $rs->_single_select_args;
+        return $backend->select_single_async(@select_args)->then(sub {
+          my ($raw_row) = @_;
+          return undef unless defined $raw_row;
+          $rs->{_stashed_rows} = [ $raw_row ];
+          return $rs->_construct_results->[0];
+        });
+      }
+    },
+    sub { $self->find(@args) },
+  );
+}
+
+
 sub count_async {
   my $self = shift;
-  return $self->search(@_)->count_async if @_ and defined $_[0];
+  return $self->search_rs(@_)->count_async if @_;
 
   return $self->_rs_run_async('count',
     sub {
@@ -1374,6 +1975,28 @@ sub create_async {
   sub reset { $_[0]->{rows} = []; return $_[0] }
 
   sub next { return () }
+}
+
+# The release for a statement over an unrestricted resultset (condition true):
+# only the call says it, with { all => 1 }. rows/offset restrict.
+sub _assert_restricted_or_all {
+  my ($self, $op, $options) = @_;
+
+  if (defined $options) {
+    $self->throw_exception("$op options must be a hash")
+      unless ref $options eq 'HASH';
+    my @unknown = grep { $_ ne 'all' } sort keys %$options;
+    $self->throw_exception("$op does not know the option(s): " . join(', ', @unknown))
+      if @unknown;
+    return if $options->{all};
+  }
+
+  return if $self->_has_resolved_attr(qw/rows offset/);
+
+  my ($sql) = $self->result_source->storage->sql_maker->_recurse_where($self->{cond});
+  return if defined $sql and length $sql;
+
+  $self->throw_exception("$op on an unrestricted resultset: pass { all => 1 }");
 }
 
 # _rs_update_delete
@@ -1525,18 +2148,23 @@ sub _rs_update_delete {
 
 
 sub update {
-  my ($self, $values) = @_;
+  my ($self, $values, $options) = @_;
   $self->throw_exception('Values for update must be a hash')
     unless ref $values eq 'HASH';
+  $self->_assert_restricted_or_all('update', $options);
+
+  # no row is involved: every value goes to the storage as it is
+  assert_column_value($_, $values->{$_}) for sort keys %$values;
 
   return $self->_rs_update_delete ('update', $values);
 }
 
 
 sub update_all {
-  my ($self, $values) = @_;
+  my ($self, $values, $options) = @_;
   $self->throw_exception('Values for update_all must be a hash')
     unless ref $values eq 'HASH';
+  $self->_assert_restricted_or_all('update_all', $options);
 
   my $guard = $self->result_source->schema->txn_scope_guard;
   $_->update({%$values}) for $self->all;  # shallow copy - update will mangle it
@@ -1546,18 +2174,16 @@ sub update_all {
 
 
 sub delete {
-  my $self = shift;
-  $self->throw_exception('delete does not accept any arguments')
-    if @_;
+  my ($self, $options) = @_;
+  $self->_assert_restricted_or_all('delete', $options);
 
   return $self->_rs_update_delete ('delete');
 }
 
 
 sub delete_all {
-  my $self = shift;
-  $self->throw_exception('delete_all does not accept any arguments')
-    if @_;
+  my ($self, $options) = @_;
+  $self->_assert_restricted_or_all('delete_all', $options);
 
   my $guard = $self->result_source->schema->txn_scope_guard;
   $_->delete for $self->all;
@@ -1760,6 +2386,26 @@ sub populate {
     }
   }
 
+### what the caller assigns (ADR 0071), checked as new_result checks it: no
+### guarded column or relationship, no value against the resultset's condition
+  for my $name (sort keys %{ $colinfo || {} }) {
+    $colinfo->{$name}{is_rel}
+      ? $rsrc->_assert_relationship_not_guarded($name)
+      : $rsrc->_assert_columns_not_guarded($name)
+    ;
+  }
+
+  if ( my %scope = %{ $self->_scope_values } ) {
+    for my $name (grep { exists $scope{$_} } @$colnames) {
+      my $pos = $colinfo->{$name}{pos};
+
+      $rsrc->_assert_scope_agrees(
+        { $name => ref $data->[$_] eq 'ARRAY' ? $data->[$_][$pos] : $data->[$_]{$name} },
+        { $name => $scope{$name} },
+      ) for $data_start .. $#$data;
+    }
+  }
+
 ### inherit the data locked in the conditions of the resultset
   my ($rs_data) = $self->_merge_with_rscond({});
   delete @{$rs_data}{@$colnames};  # passed-in stuff takes precedence
@@ -1779,19 +2425,23 @@ sub populate {
 ### main source data
   # FIXME - need to switch entirely to a coderef-based thing,
   # so that large sets aren't copied several times... I think
-  $rsrc->storage->_insert_bulk(
-    $rsrc,
-    [ @$colnames, sort keys %$rs_data ],
-    [ map {
-      ref $data->[$_] eq 'ARRAY'
-      ? (
-          $slices_with_rels ? [ @{$data->[$_]}[0..$#$colnames], @{$rs_data_vals||[]} ]  # the collist changed
-        : $rs_data_vals     ? [ @{$data->[$_]}, @$rs_data_vals ]
-        :                     $data->[$_]
-      )
-      : [ @{$data->[$_]}{@$colnames}, @{$rs_data_vals||[]} ]
-    } $data_start .. $#$data ],
-  );
+  my $bulk_cols = [ @$colnames, sort keys %$rs_data ];
+  my $bulk_rows = [ map {
+    ref $data->[$_] eq 'ARRAY'
+    ? (
+        $slices_with_rels ? [ @{$data->[$_]}[0..$#$colnames], @{$rs_data_vals||[]} ]  # the collist changed
+      : $rs_data_vals     ? [ @{$data->[$_]}, @$rs_data_vals ]
+      :                     $data->[$_]
+    )
+    : [ @{$data->[$_]}{@$colnames}, @{$rs_data_vals||[]} ]
+  } $data_start .. $#$data ];
+
+  # the bulk path goes to the storage as it is: every value is a storage value
+  for my $row (@$bulk_rows) {
+    assert_column_value($bulk_cols->[$_], $row->[$_]) for 0 .. $#$bulk_cols;
+  }
+
+  $rsrc->storage->_insert_bulk($rsrc, $bulk_cols, $bulk_rows);
 
 ### do the children relationships
   if ( $slices_with_rels ) {
@@ -1862,6 +2512,10 @@ sub pager {
 
   my $total_rs = (ref $self)->new($self->result_source, $count_attrs);
 
+  # a bound resultset counts through its context (karr k331), as the async
+  # recipe in DBIO::ResultSet::Pager does
+  $total_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
   require DBIO::ResultSet::Pager;
   return $self->{pager} = DBIO::ResultSet::Pager->new(
     sub { $total_rs->count },  #lazy-get the total
@@ -1873,7 +2527,11 @@ sub pager {
 
 sub page {
   my ($self, $page) = @_;
-  return (ref $self)->new($self->result_source, { %{$self->{attrs}}, page => $page });
+  my $rs = (ref $self)->new($self->result_source, { %{$self->{attrs}}, page => $page });
+  # ADR 0045 / karr k195: a page derived from a context-bound resultset inherits
+  # the pin so ->page(N)->all_async stays on the pinned connection.
+  $rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+  return $rs;
 }
 
 
@@ -1886,12 +2544,22 @@ sub new_result {
   $self->throw_exception( "Result object instantiation requires a hashref as argument" )
     unless (ref $values eq 'HASH');
 
-  my ($merged_cond, $cols_from_relations) = $self->_merge_with_rscond($values);
+  # ADR 0071: the keys of $values are what the caller assigns (new_related
+  # names its own, its values hold the parent's foreign key as well); what the
+  # condition holds is inherited
+  my ($merged_cond, $cols_from_relations) = $self->_merge_with_rscond($values, 1);
+  my $scope_values = $self->_scope_values;
 
   my $new = $self->result_class->new({
     %$merged_cond,
     ( @$cols_from_relations
       ? (-cols_from_relations => $cols_from_relations)
+      : ()
+    ),
+    -caller_keys => $self->{_caller_keys}
+      || [ keys %{ $self->_remove_alias($values, $self->{attrs}{alias}) } ],
+    ( %$scope_values
+      ? (-scope_values => $scope_values)
       : ()
     ),
     -result_source => $self->result_source, # DO NOT REMOVE THIS, REQUIRED
@@ -1910,6 +2578,12 @@ sub new_result {
     ));
   }
 
+  # A row built from a context-bound resultset (create_async,
+  # find_or_new_async, update_or_new_async, ...) inherits the pinned async
+  # context so its own insert_async/update_async stays on the pinned connection.
+  $new->{_async_context} = $self->{_async_context}
+    if $self->{_async_context} and blessed($new);
+
   $new;
 }
 
@@ -1919,8 +2593,13 @@ sub new_result {
 # condition already present on the resultset. Additionally returns an
 # arrayref of value/condition names, which were inferred from related
 # objects (this is needed for in-memory related objects)
+#
+# A true second argument says $data is what the caller assigns to the new row
+# (ADR 0071): a plain value that contradicts an equality of the condition
+# throws. A relationship value is resolved to columns by the row layer, which
+# checks those the same way.
 sub _merge_with_rscond {
-  my ($self, $data) = @_;
+  my ($self, $data, $assignment) = @_;
 
   my ($implied_data, @cols_from_relations);
 
@@ -1934,10 +2613,21 @@ sub _merge_with_rscond {
     @cols_from_relations = keys %{ $implied_data || {} };
   }
   else {
-    my $eqs = $self->result_source->schema->storage->_extract_fixed_condition_columns($self->{cond}, 'consider_nulls');
-    $implied_data = { map {
-      ( ($eqs->{$_}||'') eq UNRESOLVABLE_CONDITION ) ? () : ( $_ => $eqs->{$_} )
-    } keys %$eqs };
+    $implied_data = $self->_scope_values;
+
+    if ($assignment) {
+      my $rsrc = $self->result_source;
+      my $given = $self->_remove_alias($data, $alias);
+
+      $rsrc->_assert_scope_agrees(
+        { map {
+          ( ref $given->{$_} and ! is_literal_value($given->{$_}) and $rsrc->relationship_info($_) )
+            ? ()
+            : ( $_ => $given->{$_} )
+        } keys %$given },
+        $implied_data,
+      );
+    }
   }
 
   return (
@@ -1948,6 +2638,27 @@ sub _merge_with_rscond {
       ( $implied_data||(), $data)
     },
     \@cols_from_relations
+  );
+}
+
+# _scope_values
+#
+# The equalities the resultset's own condition holds, as { column => value }
+# with the alias removed and undef for IS NULL -- the values a row created
+# through this resultset inherits.
+sub _scope_values {
+  my ($self) = @_;
+
+  return {}
+    if ! defined $self->{cond} or $self->{cond} eq UNRESOLVABLE_CONDITION;
+
+  my $eqs = $self->result_source->schema->storage->_extract_fixed_condition_columns($self->{cond}, 'consider_nulls');
+
+  return $self->_remove_alias(
+    { map {
+      ( ($eqs->{$_}||'') eq UNRESOLVABLE_CONDITION ) ? () : ( $_ => $eqs->{$_} )
+    } keys %$eqs },
+    $self->{attrs}{alias},
   );
 }
 
@@ -2045,10 +2756,31 @@ sub find_or_new {
   my $self     = shift;
   my $attrs    = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
   my $hash     = ref $_[0] eq 'HASH' ? shift : {@_};
-  if (keys %$hash and my $row = $self->find($hash, $attrs) ) {
+  if (keys %$hash and my $row = $self->_find_for_write($hash, $attrs, 'find_or_new') ) {
     return $row;
   }
   return $self->new_result($hash);
+}
+
+
+sub find_or_new_async {
+  my $self  = shift;
+  my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
+  my $hash  = ref $_[0] eq 'HASH' ? shift : {@_};
+
+  return $self->_rs_run_async('find_or_new',
+    sub {
+      my ($backend, $fc) = @_;
+      return $fc->done($self->new_result($hash)) unless keys %$hash;
+
+      return $self->_find_for_write_async($hash, $attrs, 'find_or_new')->then(sub {
+        my ($row) = @_;
+        return $row if $row;
+        return $self->new_result($hash);
+      });
+    },
+    sub { $self->find_or_new($hash, $attrs) },
+  );
 }
 
 
@@ -2063,10 +2795,31 @@ sub find_or_create {
   my $self     = shift;
   my $attrs    = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
   my $hash     = ref $_[0] eq 'HASH' ? shift : {@_};
-  if (keys %$hash and my $row = $self->find($hash, $attrs) ) {
+  if (keys %$hash and my $row = $self->_find_for_write($hash, $attrs, 'find_or_create') ) {
     return $row;
   }
   return $self->new_result($hash)->insert;
+}
+
+
+sub find_or_create_async {
+  my $self  = shift;
+  my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
+  my $hash  = ref $_[0] eq 'HASH' ? shift : {@_};
+
+  return $self->_rs_run_async('find_or_create',
+    sub {
+      my ($backend, $fc) = @_;
+      return $self->create_async($hash) unless keys %$hash;
+
+      return $self->_find_for_write_async($hash, $attrs, 'find_or_create')->then(sub {
+        my ($row) = @_;
+        return $row if $row;
+        return $self->create_async($hash);
+      });
+    },
+    sub { $self->find_or_create($hash, $attrs) },
+  );
 }
 
 
@@ -2075,83 +2828,1036 @@ sub update_or_create {
   my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
   my $cond = ref $_[0] eq 'HASH' ? shift : {@_};
 
-  my ($main_cond, $related_subconds) = $self->_split_related_update_conds($cond);
-
-  # When related sub-structures are peeled off to be applied after the main
-  # row, wrap the whole operation in a transaction so a partially-built graph
-  # never survives a failure -- mirroring the multi-create guarantee in
-  # DBIO::Row::insert. No transaction is opened for the common no-relation case.
-  my $guard = keys %$related_subconds
-    ? $self->result_source->schema->txn_scope_guard
-    : undef;
-
-  my $row = $self->find($main_cond, $attrs);
+  # find() only accepts a condition it can reduce to concrete columns on this
+  # table, so the lookup drops any relation-valued key that does not resolve to
+  # a concrete foreign-key condition. The FULL condition -- relation keys
+  # included -- still reaches the row layer via update()/insert below, which
+  # owns nested-relation semantics.
+  my @lookup_cols;
+  my $row = $self->_find_for_write($self->_find_lookup_cond($cond), $attrs, 'update_or_create', \@lookup_cols);
   if (defined $row) {
-    $row->update($main_cond);
+    $row->update($self->_update_data_for_found_row($cond, \@lookup_cols));
   }
   else {
-    $row = $self->new_result($main_cond)->insert;
+    $row = $self->new_result($cond)->insert;
   }
-
-  # DWIM: apply each peeled-off relation through the (now stored) main row's
-  # related resultset. The main-table 'key' constraint applies only to the main
-  # table, so it is intentionally NOT propagated to these calls.
-  for my $rel_name (keys %$related_subconds) {
-    $row->related_resultset($rel_name)
-        ->update_or_create($related_subconds->{$rel_name});
-  }
-
-  $guard->commit if $guard;
 
   return $row;
 }
 
-# update_or_create() DWIM: split a mixed condition into ( \%main_cond,
-# \%related_subconds ). A top-level key is peeled off into %related_subconds
-# only when it is a relationship name whose value is a plain (unblessed) hashref
-# that does NOT reduce to a *concrete* foreign-key condition on the main table.
-#
-# A resolvable belongs_to (FK-bearing hashref, or a blessed related object)
-# reduces join-free to { self_fk => <defined value> } and STAYS in %main_cond --
-# find()/update() handle it exactly as before. A has_many / has_one / might_have
-# searched by its own non-key columns either is crosstable, or resolves join-free
-# to { self_pk => undef } (which would silently clobber the main key with an
-# undef FK -- the original defect this DWIM fixes). Those are peeled off and
-# applied to their own related resultset after the main row exists.
-#
-# has_many arrayrefs (multi) and blessed/other non-plain-hashref relation values
-# are left untouched in %main_cond: the main create/multi-create or update path
-# already handles or rejects them, unchanged. See ADR 0033.
-sub _split_related_update_conds {
+# Build the find() lookup for update_or_create: the passed condition with every
+# relation-valued key that does NOT reduce to a concrete foreign-key condition
+# on this table removed. A resolvable belongs_to (FK-bearing hashref, or a
+# blessed related object) resolves join-free to { self_fk => <defined value> }
+# and stays, so find() folds it in as before. A has_many / has_one / might_have
+# searched by its own non-key columns is either crosstable, or resolves join-free
+# to { self_pk => undef }; leaving it in the lookup would make find() reject it
+# (before the guard, it silently clobbered the key with an undef FK). Such keys
+# are dropped from the LOOKUP only -- update_or_create still passes the full
+# condition to the row layer, which owns nested-relation semantics. See ADR 0034.
+sub _find_lookup_cond {
   my ($self, $cond) = @_;
 
   my $rsrc = $self->result_source;
-  my %main_cond = %$cond;
-  my %related_subconds;
+  my %lookup = %$cond;
 
-  for my $key (keys %main_cond) {
-    next unless ref $main_cond{$key} eq 'HASH';
+  for my $key (keys %lookup) {
+    next unless ref $lookup{$key} eq 'HASH';
     next unless $rsrc->relationship_info($key);
 
     my ($rel_cond, $crosstable)
-      = $self->_resolve_related_cond($rsrc, $key, $main_cond{$key});
+      = $self->_resolve_related_cond($rsrc, $key, $lookup{$key});
 
-    # Keep in the main search only when the relation reduces to a concrete,
-    # fully-defined foreign-key condition on this table (resolvable belongs_to).
-    my $concrete_fk =
-         ! $crosstable
-      && ref $rel_cond eq 'HASH'
-      && keys %$rel_cond
-      && ! grep {
-           ! defined $_ or ( ! ref($_) && $_ eq UNRESOLVABLE_CONDITION )
-         } values %$rel_cond;
-
-    next if $concrete_fk;
-
-    $related_subconds{$key} = delete $main_cond{$key};
+    delete $lookup{$key}
+      unless $self->_related_cond_is_concrete($rel_cond, $crosstable);
   }
 
-  return (\%main_cond, \%related_subconds);
+  return \%lookup;
+}
+
+
+sub update_or_create_async {
+  my $self  = shift;
+  my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
+  my $cond  = ref $_[0] eq 'HASH' ? shift : {@_};
+
+  return $self->_rs_run_async('update_or_create',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my @lookup_cols;
+      return $self->_find_for_write_async($self->_find_lookup_cond($cond), $attrs, 'update_or_create', \@lookup_cols)->then(sub {
+        my ($row) = @_;
+        return $row->update_async($self->_update_data_for_found_row($cond, \@lookup_cols)) if defined $row;
+        return $self->create_async($cond);
+      });
+    },
+    sub { $self->update_or_create($cond, $attrs) },
+  );
+}
+
+
+my %_upsert_options = map { $_ => 1 } qw(
+  key conflict_target on_conflict update update_where result fallback relations
+);
+
+my %_upsert_result_shapes = map { $_ => 1 } qw(
+  row_or_undef row_or_die count void
+);
+
+# What a single entry of the `relations` structure may say. Deliberately just
+# the conflict target plus its own nesting: on_conflict, update and result are
+# whole-cascade or whole-statement decisions, not per-part ones.
+my %_upsert_relation_options = map { $_ => 1 } qw(
+  key conflict_target relations
+);
+
+
+sub upsert_async {
+  my ($self, $data, $opts) = @_;
+
+  my $rsrc  = $self->result_source;
+  my $sname = $rsrc->source_name || $rsrc->result_class || 'this result source';
+
+  return $self->_rs_run_async('upsert',
+    sub {
+      my ($backend, $fc, $mode, @rest) = @_;
+
+      # Cascade and fallback are each already more than one statement (a
+      # transactional multi-part write, and a racy client-side read-then-write
+      # respectively) -- not expressible as a single insert_async. Run
+      # synchronously and resolve immediately, same precedent as
+      # create_async's related-object multi-create (ADR 0031).
+      if ($mode eq 'cascade') {
+        return $self->_async_ctx_or_sync_punt($fc, 'upsert',
+          'a cascade upsert is a transactional multi-part write',
+          sub { $self->_upsert_cascade($data, $opts, $rest[0]) });
+      }
+      if ($mode eq 'fallback') {
+        return $self->_async_ctx_or_sync_punt($fc, 'upsert',
+          'the fallback upsert is a racy client-side read-then-write',
+          sub { $self->_upsert_fallback($data, $opts, $rest[0]) });
+      }
+
+      my ($storage, $new, $rowdata, $storage_opts, $shape, $action) = @rest;
+
+      # No async transport contract carries an affected-row count for INSERT
+      # SQL (insert_async always resolves the returned-columns hashref) -- see
+      # the POD above. Same sync-and-resolve degrade as cascade/fallback.
+      if ($shape eq 'count') {
+        return $self->_async_ctx_or_sync_punt($fc, 'upsert',
+          'no async transport carries an affected-row count for an upsert',
+          sub { $self->upsert($data, $opts) });
+      }
+
+      return $backend->insert_async($rsrc, { %$rowdata }, $storage_opts)->then(sub {
+        my ($returned) = @_;
+        return $fc->done() if $shape eq 'void';
+        return $fc->done(
+          $self->_upsert_finish($rsrc, $sname, $shape, $opts, $action, $new, $rowdata, $returned)
+        );
+      });
+    },
+    sub { $self->upsert($data, $opts) },
+    sub { $self->_upsert_prepare($data, $opts) },
+  );
+}
+
+# $prebuilt is internal: the cascade has already built the Row (it needed one
+# as the vehicle for set_from_related) and hands it over so that column
+# setters run exactly as often here as they do on a flat call.
+sub upsert {
+  my ($self, $data, $opts, $prebuilt) = @_;
+
+  my $rsrc  = $self->result_source;
+  my $sname = $rsrc->source_name || $rsrc->result_class || 'this result source';
+
+  my ($mode, @rest) = $self->_upsert_prepare($data, $opts, $prebuilt);
+
+  return $self->_upsert_cascade($data, $opts, $rest[0])  if $mode eq 'cascade';
+  return $self->_upsert_fallback($data, $opts, $rest[0]) if $mode eq 'fallback';
+
+  my ($storage, $new, $rowdata, $storage_opts, $shape, $action) = @rest;
+
+  my $returned = $storage->insert($rsrc, { %$rowdata }, $storage_opts);
+
+  return if $shape eq 'void';
+
+  # DBI hands back the string '0E0' -- zero but true -- for a statement that
+  # affected no rows, which is exactly what a conflicting upsert can do.
+  # if (my $n = $rs->upsert(..., { result => 'count' })) must not read
+  # "nothing happened" as true, and upsert throws on failure, so the
+  # zero-but-true signal carries no information here: hand back a number.
+  return 0 + ( $storage_opts->{affected_rows} || 0 ) if $shape eq 'count';
+
+  return $self->_upsert_finish($rsrc, $sname, $shape, $opts, $action, $new, $rowdata, $returned);
+}
+
+# Shared, non-DB-touching preparation for upsert() and upsert_async(): option
+# validation, conflict-target/update-set resolution, the capability gate.
+# Exists so the async twin cannot drift from the sync rules --
+# there is exactly one place that decides what a given call means. Returns a
+# mode plus whatever the caller needs for it; every validation failure and the
+# unsupported-without-fallback capability gate throw here, same as always, and
+# the caller lets that propagate:
+#
+#   ('cascade',  $shape)
+#   ('fallback', $shape)
+#   ('flat', $storage, $new, \%rowdata, \%storage_opts, $shape, $action)
+#
+# $prebuilt is internal: the cascade has already built the Row (it needed one
+# as the vehicle for set_from_related) and hands it over so that column
+# setters run exactly as often here as they do on a flat call.
+sub _upsert_prepare {
+  my ($self, $data, $opts, $prebuilt) = @_;
+
+  my $rsrc  = $self->result_source;
+  my $sname = $rsrc->source_name || $rsrc->result_class || 'this result source';
+
+  $self->throw_exception(
+    'upsert() takes a non-empty hashref of column data as its first argument'
+  ) unless ref $data eq 'HASH' and keys %$data;
+
+  $opts ||= {};
+  $self->throw_exception('upsert() takes a hashref of options as its second argument')
+    unless ref $opts eq 'HASH';
+
+  # ---- option validation. Engine-independent and complete before any SQL is
+  # ---- built, so an invalid call is invalid everywhere (ADR 0036).
+
+  if (my @unknown = sort grep { ! $_upsert_options{$_} } keys %$opts) {
+    $self->throw_exception(
+      "upsert(): unknown option(s) '" . CORE::join("', '", @unknown) . "' -- valid "
+    . 'options are ' . CORE::join(', ', sort keys %_upsert_options)
+    );
+  }
+
+  $self->throw_exception(
+    "upsert(): relations must be a hashref of relationship => "
+  . '{ key => $constraint | conflict_target => \@columns }'
+  ) if exists $opts->{relations} and ref $opts->{relations} ne 'HASH';
+
+  my $action = defined $opts->{on_conflict} ? $opts->{on_conflict} : 'update';
+  $self->throw_exception(
+    "upsert(): on_conflict must be 'update' or 'nothing', not '$action'"
+  ) unless $action eq 'update' or $action eq 'nothing';
+
+  my $shape = defined $opts->{result} ? $opts->{result} : 'row_or_undef';
+  $self->throw_exception(
+    "upsert(): result must be one of " . CORE::join(', ', sort keys %_upsert_result_shapes)
+  . " -- '$shape' is not a return shape upsert can guarantee"
+  ) unless $_upsert_result_shapes{$shape};
+
+  # row_or_die means "never hand back nothing"; DO NOTHING exists in order to
+  # possibly write nothing. The combination is refused before any SQL is built.
+  $self->throw_exception(
+    "upsert(): result => 'row_or_die' cannot be combined with "
+  . "on_conflict => 'nothing' -- DO NOTHING may legitimately write no row"
+  ) if $shape eq 'row_or_die' and $action eq 'nothing';
+
+  # ---- the conditional conflict branch: DO UPDATE ... WHERE
+  #
+  # Core does not look inside the condition, exactly as search() does not look
+  # inside its \%cond: the shape is checked, the content is the driver's and
+  # the engine's. What core does own is the combinations in which a condition
+  # cannot mean anything.
+  my $update_where;
+  if (exists $opts->{update_where}) {
+    $update_where = $opts->{update_where};
+
+    $self->throw_exception(
+      'upsert(): update_where must be a SQL::Abstract condition (a hashref or '
+    . "an arrayref) or a literal (\\'sql' / \\[ 'sql', \@bind ])"
+    ) unless ref $update_where eq 'HASH'
+          or ref $update_where eq 'ARRAY'
+          or is_literal_value($update_where);
+
+    # An empty condition is not "nothing excluded", it is a condition that was
+    # meant to say something -- most likely built from a variable that came out
+    # empty. Silently writing everything is the one outcome the option exists
+    # to prevent.
+    $self->throw_exception(
+      'upsert(): update_where is empty -- an empty condition would make the '
+    . 'conflict branch write unconditionally, which is what leaving the '
+    . 'option out already does'
+    ) if ( ref $update_where eq 'HASH'  and ! keys %$update_where )
+      or ( ref $update_where eq 'ARRAY' and ! @$update_where );
+
+    $self->throw_exception(
+      "upsert(): update_where has no meaning with on_conflict => 'nothing' -- "
+    . 'there is no update branch to put a condition on'
+    ) if $action eq 'nothing';
+
+    # Same class of refusal as row_or_die + DO NOTHING above, and for the same
+    # reason: a conditional update exists in order to possibly write nothing,
+    # so the two promises contradict each other by construction rather than by
+    # data. Refusing it here also keeps the runtime diagnosis honest -- the
+    # row_or_die throw further down blames the table shape ("this follows from
+    # the table shape, not from the data"), which is precisely the wrong
+    # explanation for a condition that did not hold.
+    $self->throw_exception(
+      "upsert(): result => 'row_or_die' cannot be combined with update_where "
+    . '-- a conditional DO UPDATE writes no row when the condition does not '
+    . 'hold, so a row cannot be guaranteed'
+    ) if $shape eq 'row_or_die';
+  }
+
+  if (defined $opts->{fallback}) {
+    $self->throw_exception(
+      "upsert(): the only supported fallback is 'update_or_create', not "
+    . "'$opts->{fallback}'"
+    ) unless $opts->{fallback} eq 'update_or_create';
+
+    # update_or_create always writes, and always writes everything it is
+    # given. Rather than let the fallback path mean something else than the
+    # atomic path, refuse the two combinations where it would.
+    $self->throw_exception(
+      "upsert(): fallback => 'update_or_create' cannot express "
+    . "on_conflict => 'nothing' -- update_or_create always writes. Use "
+    . 'find_or_create() at the call site for that shape'
+    ) if $action eq 'nothing';
+
+    $self->throw_exception(
+      "upsert(): fallback => 'update_or_create' cannot express a restricted "
+    . "'update' set -- update_or_create writes every supplied column"
+    ) if exists $opts->{update};
+
+    # ... and it writes them unconditionally. Dropping the condition on the
+    # fallback path would turn the guard the caller asked for into the
+    # last-write-wins overwrite it exists to prevent, on whichever engine the
+    # fallback happens to engage.
+    $self->throw_exception(
+      "upsert(): fallback => 'update_or_create' cannot express update_where "
+    . '-- update_or_create writes unconditionally, so the fallback path would '
+    . 'overwrite exactly the rows the condition protects'
+    ) if exists $opts->{update_where};
+
+    # update_or_create finds by a *named* unique constraint; there is no way
+    # to hand it a bare column list. Silently dropping the target would aim
+    # the fallback at whatever constraint find()'s heuristics like best --
+    # i.e. at a different row than the atomic path targets.
+    $self->throw_exception(
+      "upsert(): fallback => 'update_or_create' cannot express "
+    . 'conflict_target -- update_or_create looks the row up by a named unique '
+    . 'constraint, so the fallback would target a different constraint than '
+    . 'the atomic statement. Name the constraint with key => $constraint if a '
+    . 'fallback is wanted'
+    ) if defined $opts->{conflict_target};
+  }
+
+  $self->throw_exception(
+    "upsert(): 'key' and 'conflict_target' are mutually exclusive -- name the "
+  . 'unique constraint with key, or its columns with conflict_target'
+  ) if defined $opts->{key} and defined $opts->{conflict_target};
+
+  # Nested relationship data is the cascading upsert: N atomic upserts in
+  # dependency order inside one transaction. Everything above this point is
+  # shared; from here the two are different operations.
+  my $nested = ( $self->_upsert_split_nested($rsrc, $data) )[1];
+
+  if (keys %$nested) {
+    # A count across a cascade has no defined meaning, and void would deny the
+    # cascade the identity it structurally needs to hand a parent's key to its
+    # children. Refused here rather than half-way through the tree.
+    $self->throw_exception(
+      "upsert(): result => '$shape' cannot be used with nested relationship "
+    . 'data -- a cascade is more than one statement, so there is no single '
+    . 'affected-row count, and void would withhold the identity the cascade '
+    . 'needs to link the parts. Use row_or_undef or row_or_die'
+    ) if $shape eq 'count' or $shape eq 'void';
+
+    # update_or_create takes one named constraint for the top-level row and
+    # nothing at all for the parts, so a fallback cascade would look every
+    # part up by find()'s heuristics -- a different row than the atomic path
+    # writes, which is exactly what refusing conflict_target here prevents.
+    $self->throw_exception(
+      "upsert(): fallback => 'update_or_create' cannot express a cascade -- "
+    . 'it has no way to state a conflict target per part, so every nested '
+    . "part would be looked up by find()'s heuristics. Branch on "
+    . '$storage->_use_supports_upsert and call update_or_create() yourself if '
+    . 'the racy client-side cascade is what you want'
+    ) if defined $opts->{fallback};
+
+    return ('cascade', $shape);
+  }
+
+  # A per-relation target with no nested part to apply it to is a typo, not a
+  # no-op -- the caller believes a cascade is happening and none is.
+  if (my @orphan = sort keys %{ $opts->{relations} || {} }) {
+    $self->throw_exception(
+      "upsert(): relations names '" . CORE::join("', '", @orphan) . "', but "
+    . '%col_data has no nested data for '
+    . (@orphan > 1 ? 'those relationships' : 'that relationship')
+    . ' -- a per-relation conflict target with nothing to apply it to would '
+    . 'silently do nothing'
+    );
+  }
+
+  # Route the data through new_result: it validates the column names, folds in
+  # the resultset's own condition exactly as create() does, and deflates
+  # inflated columns. By the check above it cannot carry relationship data.
+  my $new = $prebuilt || $self->new_result($data);
+  my %rowdata = $new->get_columns;
+
+  # ---- conflict target
+
+  my ($target, @target_cols);
+  if (defined $opts->{key}) {
+    # throws on an unknown constraint name -- before any SQL is built
+    @target_cols = $rsrc->unique_constraint_columns($opts->{key});
+
+    # Both halves travel down. The name is what an engine that can name a
+    # constraint wants (PostgreSQL's ON CONSTRAINT); the resolved columns are
+    # what the engines whose grammar knows a column list only can use at all
+    # (SQLite). A SQLMaker is handed ($table, $data, $options) and no
+    # ResultSource, so it cannot resolve the name itself -- passing the name
+    # alone is what made key => $constraint unusable on those engines.
+    $target = { constraint => $opts->{key}, columns => [ @target_cols ] };
+  }
+  elsif (defined( my $ct = $opts->{conflict_target} )) {
+    if (ref $ct eq 'ARRAY') {
+      $self->throw_exception('upsert(): conflict_target is an empty list')
+        unless @$ct;
+      @target_cols = @$ct;
+      $target = [ @$ct ];
+    }
+    elsif (! length ref $ct and $ct eq 'any') {
+      $target = 'any';
+    }
+    elsif (! length ref $ct) {
+      $self->throw_exception(
+        "upsert(): conflict_target '$ct' is not a column of $sname -- pass an "
+      . "arrayref of columns, the string 'any', or name a unique constraint "
+      . "with key => '$ct'"
+      ) unless $rsrc->has_column($ct);
+      @target_cols = ($ct);
+      $target = [ $ct ];
+    }
+    else {
+      $self->throw_exception(
+        'upsert(): conflict_target must be an arrayref of columns, a single '
+      . "column name, or the string 'any'"
+      );
+    }
+
+    for my $col (@target_cols) {
+      $self->throw_exception(
+        "upsert(): conflict_target column '$col' is not a column of $sname"
+      ) unless $rsrc->has_column($col);
+    }
+  }
+  else {
+    my @pk = $rsrc->primary_columns;
+    $self->throw_exception(
+      "upsert(): $sname has no primary key, so there is no conflict target to "
+    . 'default to -- name one with key => $constraint or '
+    . 'conflict_target => \@columns. upsert does not guess among the unique '
+    . 'constraints'
+    ) unless @pk;
+
+    if (my @missing = grep { ! defined $rowdata{$_} } @pk) {
+      $self->throw_exception(
+        "upsert(): no conflict target given and the data does not supply the "
+      . "primary key of $sname (missing: " . CORE::join(', ', @missing) . ') -- the '
+      . 'statement could never collide and would silently degenerate into a '
+      . 'plain INSERT. Name the target with key => $constraint or '
+      . 'conflict_target => \@columns'
+      );
+    }
+
+    @target_cols = @pk;
+    $target = [ @pk ];
+  }
+
+  # ---- the update set
+
+  my $set;
+  if ($action eq 'nothing') {
+    $self->throw_exception(
+      "upsert(): the 'update' option has no meaning with "
+    . "on_conflict => 'nothing'"
+    ) if exists $opts->{update};
+  }
+  else {
+    my %skip = map { $_ => 1 } (@target_cols, $rsrc->primary_columns);
+
+    if (ref $opts->{update} eq 'ARRAY') {
+      for my $col (@{ $opts->{update} }) {
+        $self->throw_exception(
+          "upsert(): update column '$col' is not a column of $sname"
+        ) unless $rsrc->has_column($col);
+
+        $self->throw_exception(
+          "upsert(): update column '$col' is not among the values being "
+        . 'inserted, so there is no attempted value to set it to -- supply it '
+        . 'in the data, or use the update => { col => $expr } form'
+        ) unless exists $rowdata{$col};
+      }
+      $set = { map { $_ => { -attempted => $_ } } @{ $opts->{update} } };
+    }
+    elsif (ref $opts->{update} eq 'HASH') {
+      for my $col (sort keys %{ $opts->{update} }) {
+        $self->throw_exception(
+          "upsert(): update column '$col' is not a column of $sname"
+        ) unless $rsrc->has_column($col);
+      }
+      $set = { %{ $opts->{update} } };
+    }
+    elsif (exists $opts->{update}) {
+      $self->throw_exception(
+        'upsert(): update must be an arrayref of columns or a hashref of '
+      . 'column => expression pairs'
+      );
+    }
+    else {
+      $set = {
+        map  { $_ => { -attempted => $_ } }
+        grep { ! $skip{$_} }
+        sort keys %rowdata
+      };
+    }
+
+    $self->throw_exception(
+      'upsert(): the conflict branch would set no column at all -- every '
+    . "supplied column is part of the conflict target or the primary key of "
+    . "$sname. Use on_conflict => 'nothing' if that is what you mean"
+    ) unless keys %$set;
+  }
+
+  my $on_conflict = {
+    target => $target,
+    action => $action,
+    set    => $set
+  };
+
+  # Only when there is one: a driver that never sees the key renders exactly
+  # the statement it rendered before this option existed.
+  $on_conflict->{where} = $update_where if defined $update_where;
+
+  # ---- capability gate. No silent degradation: an engine without an atomic
+  # ---- upsert throws unless the caller opted into the race for this call.
+
+  my $storage = $rsrc->storage;
+  my $supported = $storage->can('_use_supports_upsert')
+    ? $storage->_use_supports_upsert
+    : 0;
+
+  unless ($supported) {
+    return ('fallback', $shape)
+      if defined $opts->{fallback};
+
+    $self->_upsert_unsupported($storage);
+  }
+
+  # A second gate, for the one part of the structure a driver can ignore
+  # without producing a single symptom. Every other dialect difference is
+  # self-announcing: a driver that drops the conflict target emits invalid SQL
+  # on PostgreSQL, one that ignores action => 'nothing' has no set to write.
+  # A dropped WHERE renders a perfectly valid unconditional UPDATE -- the
+  # last-write-wins overwrite the condition was written to prevent, silently.
+  # So the driver has to say it renders conditions before core sends one.
+  if (defined $update_where) {
+    my $conditional = $storage->can('_use_supports_upsert_where')
+      ? $storage->_use_supports_upsert_where
+      : 0;
+
+    $self->throw_exception(
+      ref($storage) . ' does not declare the supports_upsert_where '
+    . 'capability: this engine has no conditional conflict branch, or its '
+    . 'driver does not render one. MySQL is the engine that cannot -- '
+    . 'ON DUPLICATE KEY UPDATE has no WHERE, and a per-column IF() does not '
+    . 'suppress the write. Drop update_where, or branch on '
+    . '$storage->_use_supports_upsert_where'
+    ) unless $conditional;
+  }
+
+  my %storage_opts = ( on_conflict => $on_conflict );
+  $storage_opts{no_retrieve} = 1 if $shape eq 'void' or $shape eq 'count';
+
+  return ('flat', $storage, $new, \%rowdata, \%storage_opts, $shape, $action);
+}
+
+# Shared tail for the row_or_undef/row_or_die shapes of the flat upsert path
+# (both upsert() and upsert_async(), once each has its own $returned
+# hashref) -- void/count are decided by the caller before this is reached
+# (upsert_async's count degrades to sync entirely, see its POD). $returned is
+# the returned-columns hashref the write produced, same shape sync
+# $storage->insert and async insert_async both resolve.
+sub _upsert_finish {
+  my ($self, $rsrc, $sname, $shape, $opts, $action, $new, $rowdata, $returned) = @_;
+
+  # row_or_undef / row_or_die: the written row can be named only when the
+  # engine handed back every primary key column for it.
+  my @pk = $rsrc->primary_columns;
+  if (@pk and ! grep { ! defined $returned->{$_} } @pk) {
+    return $new->_store_inserted_columns($rowdata, $returned);
+  }
+
+  $self->throw_exception(
+    "upsert(): result => 'row_or_die' asked for the written row, but the "
+  . "engine did not name it (no primary key came back for $sname). This "
+  . 'follows from the table shape, not from the data'
+  ) if $shape eq 'row_or_die';
+
+  # The default is the one value nobody types, so its name cannot teach the
+  # caller who needs teaching -- the runtime has to. Silenceable by passing
+  # result => 'row_or_undef' explicitly.
+  #
+  # Not on the DO NOTHING branch though: a conflicting DO NOTHING writes no
+  # row, so RETURNING yields none and no primary key can come back. That is
+  # the documented, legitimate outcome of what the caller asked for, not an
+  # engine failing to name what it wrote -- warning there would be false.
+  carp_once(
+    "upsert() on $sname could not name the row it wrote -- no primary key "
+  . 'came back for it, so undef is returned. Pass result => "row_or_undef" '
+  . 'explicitly to silence this, or result => "count" / "void" if the row is '
+  . 'not needed'
+  ) unless exists $opts->{result} or $action eq 'nothing';
+
+  return undef;
+}
+
+# No capability, no upsert -- never a silent client-side two-step. Shared by
+# the flat path and the cascade, which asserts it before opening its
+# transaction rather than after (ADR 0036 section 3).
+sub _upsert_unsupported {
+  my ($self, $storage) = @_;
+
+  $self->throw_exception(
+    ref($storage) . ' does not declare the supports_upsert capability: this '
+  . 'engine has no atomic upsert. Branch on '
+  . '$storage->_use_supports_upsert and call update_or_create() (racy, '
+  . "client-side) yourself, or pass fallback => 'update_or_create' to accept "
+  . 'the race for this call'
+  );
+}
+
+# The explicit, per-call fallback for engines without an atomic upsert. The
+# return mapping is pinned so the same call never changes return *type* with
+# the engine (ADR 0036 section 3).
+sub _upsert_fallback {
+  my ($self, $data, $opts, $shape) = @_;
+
+  # The fallback has to look the row up by the constraint the atomic statement
+  # would have conflicted on -- anything else writes a different row than the
+  # engine would have. Option validation refused fallback together with
+  # conflict_target, so only two targets can reach here, and both are
+  # expressible as update_or_create's key: the named constraint, or the
+  # primary-key default (which upsert only takes when the data supplies every
+  # PK column, so the lookup is always satisfiable). Without the explicit key
+  # update_or_create would fall into find()'s heuristics mode, which ORs every
+  # satisfiable unique constraint together.
+  my $row = $self->update_or_create(
+    $data,
+    { key => defined $opts->{key} ? $opts->{key} : 'primary' }
+  );
+
+  return    if $shape eq 'void';
+  return 1  if $shape eq 'count';   # synthetic, not an affected-rows figure
+  return $row;
+}
+
+# ---- the cascading upsert (ADR 0036 section 1) --------------------------
+#
+# What is promised, and it is deliberately not "an atomic upsert": N atomic
+# upserts, in dependency order, inside one transaction -- all-or-nothing, and
+# every part individually free of the read-then-write race. No engine has a
+# multi-table upsert, so a cascade is inherently more than one statement.
+
+# Split \%data into this source's own columns and its nested relationship
+# parts. Same criterion DBIO::Row::new applies when it sorts multicreate data:
+# a non-literal ref under a key that names a relationship is a part; anything
+# else -- an inflated object, a literal \'NOW()', a plain value -- is a column.
+sub _upsert_split_nested {
+  my ($self, $rsrc, $data) = @_;
+
+  my (%cols, %nested);
+
+  for my $key (keys %$data) {
+    my $val = $data->{$key};
+
+    if (
+      length ref $val
+        and
+      ! is_literal_value($val)
+        and
+      ( ref $val eq 'HASH' or ref $val eq 'ARRAY' or blessed $val )
+    ) {
+      if ($rsrc->has_relationship($key)) {
+        $nested{$key} = $val;
+        next;
+      }
+
+      # A many_to_many is an accessor over a bridge table, not a relationship,
+      # so it would fall through to "no such column" and read like a typo.
+      # Out of scope, and it says why: writing bridge rows reopens the very
+      # deletion question has_many is deliberately kept out of.
+      my $rclass = $rsrc->result_class;
+      $self->throw_exception(
+        "upsert(): '$key' is a many_to_many accessor, which the cascading "
+      . 'upsert does not handle -- it would have to write link rows, and what '
+      . 'to do with the link rows you did not list has no safe answer. Nest '
+      . 'the bridge relationship itself instead, or use set_' . $key . '()'
+      ) if $rclass
+        and $rclass->can('_m2m_metadata')
+        and $rclass->_m2m_metadata->{$key};
+    }
+
+    $cols{$key} = $val;
+  }
+
+  return (\%cols, \%nested);
+}
+
+# Build the whole cascade plan before the first statement runs.
+#
+# Everything checked here follows from static schema metadata and the shape of
+# the options -- never from data the server holds -- so a cascade that cannot
+# work fails on the first call in development rather than the day the "other"
+# unique constraint finally collides in production (ADR 0036 section 4).
+#
+# $want is the result shape this node has to deliver: 'row_or_die' whenever
+# something downstream needs the written row's identity, which is what makes
+# the identity preconditions apply.
+sub _upsert_plan {
+  my ($self, $rs, $data, $opts, $want, $filled, $path) = @_;
+
+  my $rsrc  = $rs->result_source;
+  my $sname = $rsrc->source_name || $rsrc->result_class || 'this result source';
+  my $at    = length $path ? " for the nested '$path'" : '';
+  my $hint  = length $path
+    ? "relations => { '$path' => { key => \$constraint } }"
+    : 'key => $constraint or conflict_target => \@columns';
+
+  my ($cols, $nested) = $self->_upsert_split_nested($rsrc, $data);
+
+  # ---- the per-relation targets
+
+  my $relopts = $opts->{relations} || {};
+  $self->throw_exception(
+    "upsert(): relations$at must be a hashref of relationship => "
+  . '{ key => $constraint | conflict_target => \@columns }'
+  ) unless ref $relopts eq 'HASH';
+
+  for my $rel (sort keys %$relopts) {
+    $self->throw_exception(
+      "upsert(): relations$at names '$rel', but there is no nested data for "
+    . 'it -- a per-relation conflict target with nothing to apply it to would '
+    . 'silently do nothing'
+    ) unless exists $nested->{$rel};
+
+    $self->throw_exception(
+      "upsert(): relations$at => { '$rel' => ... } must be a hashref"
+    ) unless ref $relopts->{$rel} eq 'HASH';
+
+    if (
+      my @unknown =
+        sort grep { ! $_upsert_relation_options{$_} } keys %{ $relopts->{$rel} }
+    ) {
+      $self->throw_exception(
+        "upsert(): unknown option(s) '" . CORE::join("', '", @unknown) . "' for the "
+      . "nested '$rel'$at -- a per-relation entry takes "
+      . CORE::join(', ', sort keys %_upsert_relation_options)
+      . '. on_conflict, update, update_where and result are decisions about '
+      . 'the whole call, not about one part'
+      );
+    }
+
+    $self->throw_exception(
+      "upsert(): 'key' and 'conflict_target' are mutually exclusive, also for "
+    . "the nested '$rel'$at"
+    ) if defined $relopts->{$rel}{key}
+     and defined $relopts->{$rel}{conflict_target};
+  }
+
+  # ---- dependency order: whose primary key becomes whose foreign key.
+  #
+  # This is the split DBIO::Row::insert performs for multicreate, applied to
+  # the data instead of to constructed Row objects: _pk_depends_on answers
+  # "must the part be written before us" (belongs_to -- its key becomes our
+  # foreign key) or "does the part need us" (has_many / might_have -- our key
+  # becomes theirs).
+
+  my (@before, @after, @from_before);
+
+  for my $rel (sort keys %$nested) {
+    my $val      = $nested->{$rel};
+    my $info     = $rsrc->relationship_info($rel);
+    my $acc      = $info->{attrs}{accessor} || '';
+    my $rel_rsrc = $rsrc->related_source($rel);
+    my $sub_path = length $path ? "$path.$rel" : $rel;
+    my $sub_opts = $relopts->{$rel} || {};
+
+    my @list = ref $val eq 'ARRAY' ? @$val : ($val);
+
+    for my $part (@list) {
+      # A Row object is already a decision about identity: "link this one" and
+      # "write these values" are different asks, and guessing between them is
+      # the DWIM this API exists to avoid. The cascade upserts data.
+      next if ref $part eq 'HASH';
+
+      $self->throw_exception(
+        "upsert(): the nested '$sub_path' is "
+      . ( blessed $part ? 'a ' . ref($part) . ' object'
+        : ref $part     ? 'a ' . ref($part) . ' reference'
+        :                 'a plain scalar' )
+      . ' -- the cascade upserts column data, so pass the columns '
+      . '({ $row->get_columns }) or set the foreign key yourself. An existing '
+      . 'Result object does not say whether you want it written or only linked'
+      );
+    }
+
+    if (ref $val eq 'ARRAY') {
+      $self->throw_exception(
+        "upsert(): the nested '$sub_path' is a list, but '$rel' is not a "
+      . 'has_many -- pass a single hashref for a single related row'
+      ) unless $acc eq 'multi';
+    }
+    else {
+      $self->throw_exception(
+        "upsert(): the nested '$sub_path' is a single hashref, but '$rel' is "
+      . 'a has_many -- pass an arrayref of hashrefs'
+      ) if $acc eq 'multi';
+    }
+
+    my $cond = $info->{cond};
+
+    # multi is always "after us" -- exactly as multicreate treats it. For a
+    # single/filter accessor the direction is a schema question, and
+    # _pk_depends_on is the one place in the codebase that answers it.
+    my ($flat_part) = $acc eq 'multi'
+      ? ({})
+      : $self->_upsert_split_nested($rel_rsrc, $val);
+
+    if ($acc ne 'multi' and $rsrc->_pk_depends_on($rel, $flat_part)) {
+      # its key becomes our foreign key: written before us, and it must be
+      # able to name what it wrote
+      push @before, {
+        rel  => $rel,
+        node => $self->_upsert_plan(
+          $rel_rsrc->resultset, $val, $sub_opts, 'row_or_die', [], $sub_path,
+        ),
+      };
+
+      push @from_before, map { m/^self\.(.+)\z/ ? $1 : () } values %$cond
+        if ref $cond eq 'HASH';
+
+      next;
+    }
+
+    # our key becomes theirs: written after us. The foreign key is set the way
+    # multicreate sets it, through the reverse relationship -- without one
+    # nothing would link the child to us and the cascade would quietly write
+    # an orphan.
+    my @revs = sort keys %{ $rsrc->reverse_relationship_info($rel) };
+    $self->throw_exception(
+      "upsert(): '$rel'$at has no reverse relationship back to $sname, so "
+    . 'there is no way to derive the foreign key of the nested rows from the '
+    . 'row written for it -- they would be written unlinked. Declare the '
+    . "opposing relationship on @{[ $rel_rsrc->source_name || $rel_rsrc->result_class ]}"
+    ) unless @revs;
+
+    my @child_filled = ref $cond eq 'HASH'
+      ? map { m/^foreign\.(.+)\z/ ? $1 : () } keys %$cond
+      : ();
+
+    push @after, {
+      rel   => $rel,
+      revs  => \@revs,
+      nodes => [
+        map {
+          $self->_upsert_plan(
+            $rel_rsrc->resultset, $_, $sub_opts, 'void', \@child_filled,
+            $sub_path,
+          )
+        } @list
+      ],
+    };
+  }
+
+  # A part may legitimately carry no column of its own -- a might_have whose
+  # only column is the foreign key it is handed. Carrying none and being
+  # handed none is nothing at all.
+  $self->throw_exception(
+    'upsert(): ' . (length $path ? "the nested '$path'" : $sname)
+  . ' supplies no column of its own and is handed none by the rows around it '
+  . '-- there is no row there to upsert'
+  ) unless keys %$cols or @$filled or @from_before;
+
+  # Children need our key, so we have to be able to name the row we wrote --
+  # whatever the caller asked to get back.
+  $want = 'row_or_die' if @after;
+  my $identity = $want eq 'row_or_die';
+
+  # ---- the preconditions, all decided from static metadata
+
+  my @pk = $rsrc->primary_columns;
+
+  if ($identity) {
+    $self->throw_exception(
+      "upsert(): the cascade needs the key of the row written for $sname"
+    . ($at || ' at the top level')
+    . ', but the source has no primary key, so no row it writes can be named'
+    ) unless @pk;
+
+    my $ct = $opts->{conflict_target};
+    $self->throw_exception(
+      "upsert(): conflict_target => 'any'$at cannot take part in a cascade -- "
+    . 'it asks the engine to resolve on whichever unique constraint collides, '
+    . 'which is exactly the shape in which the written row cannot be named. '
+    . 'Name the constraint the parts are linked on'
+    ) if defined $ct and ! length ref $ct and $ct eq 'any';
+
+    $self->throw_exception(
+      "upsert(): on_conflict => 'nothing' cannot take part in a cascade with "
+    . 'nested rows that depend on this one -- DO NOTHING may write no row, '
+    . 'and then there is no key to hand to them'
+    ) if ($opts->{on_conflict} || 'update') eq 'nothing';
+
+    # Same shape, same reason: whether the condition holds is a fact about the
+    # stored data, so a row the children need may or may not exist -- and the
+    # cascade would find that out half-way through, in production, on the day
+    # the condition first fails.
+    $self->throw_exception(
+      'upsert(): update_where cannot take part in a cascade with nested rows '
+    . 'that depend on this one -- a conditional DO UPDATE may write no row, '
+    . 'and then there is no key to hand to them'
+    ) if exists $opts->{update_where};
+  }
+
+  # The three-way primary-key default rule, per part. A foreign key this node
+  # is handed -- by its parent, or by a part written before it -- counts as
+  # supplied even though it is not in the data yet.
+  if (! defined $opts->{key} and ! defined $opts->{conflict_target}) {
+    my %have = map { $_ => 1 } (
+      ( grep { defined $cols->{$_} } keys %$cols ), @$filled, @from_before,
+    );
+
+    $self->throw_exception(
+      "upsert(): $sname$at has no primary key, so there is no conflict target "
+    . "to default to -- name one with $hint. upsert does not guess among the "
+    . 'unique constraints'
+    ) unless @pk;
+
+    if (my @missing = grep { ! $have{$_} } @pk) {
+      $self->throw_exception(
+        "upsert(): no conflict target given for $sname$at and the data does "
+      . 'not supply its primary key (missing: ' . CORE::join(', ', @missing) . ') -- '
+      . 'the statement could never collide and would silently degenerate into '
+      . "a plain INSERT. Name the target with $hint"
+      );
+    }
+  }
+
+  my %flat_opts = ( result => $want );
+  for my $k (qw/ key conflict_target on_conflict update update_where /) {
+    $flat_opts{$k} = $opts->{$k} if exists $opts->{$k};
+  }
+
+  # The columns the conflict branch must not treat as "something to update".
+  # Resolved here so the run can tell an empty update set from a real one --
+  # a bare key resolves through the same unique_constraints as everywhere
+  # else, and an unknown constraint name is caught before any statement.
+  my @target_cols =
+      defined $opts->{key}             ? $rsrc->unique_constraint_columns($opts->{key})
+    : ! defined $opts->{conflict_target} ? @pk
+    : ref $opts->{conflict_target} eq 'ARRAY' ? @{ $opts->{conflict_target} }
+    : ( ! length ref $opts->{conflict_target}
+          and $opts->{conflict_target} ne 'any' ) ? ( $opts->{conflict_target} )
+    : ();
+
+  return {
+    rs          => $rs,
+    cols        => $cols,
+    opts        => \%flat_opts,
+    target_cols => \@target_cols,
+    before      => \@before,
+    after       => \@after,
+  };
+}
+
+# Plan first, then one transaction around the whole tree.
+sub _upsert_cascade {
+  my ($self, $data, $opts, $shape) = @_;
+
+  my $storage = $self->result_source->storage;
+
+  # Ahead of the transaction, so an unsupporting engine does not get a BEGIN
+  # and a ROLLBACK to show for a call that could never have worked.
+  $self->_upsert_unsupported($storage)
+    unless $storage->can('_use_supports_upsert')
+       and $storage->_use_supports_upsert;
+
+  my $plan = $self->_upsert_plan($self, $data, $opts, $shape, [], '');
+
+  # All-or-nothing. Already inside a transaction? Then this JOINS it -- a
+  # failing cascade takes the caller's outer work down with it. Deliberately
+  # no savepoint magic: a caller who wants the cascade isolated from
+  # surrounding work opens their own savepoint.
+  my $guard = $storage->txn_scope_guard;
+  my $row = $self->_upsert_run($plan);
+  $guard->commit;
+
+  return $row;
+}
+
+# A row identified entirely by its own conflict target -- the lookup row that
+# a belongs_to part almost always is, { name => 'Y' } keyed on name -- leaves
+# the conflict branch with nothing to set. Flat, that is a caller mistake and
+# upsert says so, pointing at on_conflict => 'nothing'. In a cascade it is not
+# a choice the caller can make: DO NOTHING writes no row, and a part something
+# hangs off has to be nameable. So the branch re-asserts the target instead --
+# col = <the value that was attempted> -- which is a no-op on the value and
+# keeps the row returned. Exactly the idiom ADR 0036 section 4 blesses for
+# MySQL's identity set, for the same reason.
+sub _upsert_node_opts {
+  my ($self, $node, $row) = @_;
+
+  my %opts = %{ $node->{opts} };
+
+  return \%opts
+    if exists $opts{update}
+    or ( $opts{on_conflict} || 'update' ) eq 'nothing'
+    or ! @{ $node->{target_cols} };
+
+  my %rowdata = $row->get_columns;
+  my %skip = map { $_ => 1 }
+    @{ $node->{target_cols} }, $node->{rs}->result_source->primary_columns;
+
+  return \%opts if grep { ! $skip{$_} } keys %rowdata;
+
+  my @noop = grep { exists $rowdata{$_} } @{ $node->{target_cols} };
+  $opts{update} = \@noop if @noop;
+
+  return \%opts;
+}
+
+# Walk the plan: parts whose key we need first, us, then the parts that need
+# ours. $prebuilt is the Row the caller of this node already had to build in
+# order to set the foreign key on it.
+sub _upsert_run {
+  my ($self, $node, $prebuilt) = @_;
+
+  my $rs  = $node->{rs};
+  my $row = $prebuilt || $rs->new_result($node->{cols});
+
+  $row->set_from_related(
+    $_->{rel}, $self->_upsert_run($_->{node})
+  ) for @{ $node->{before} };
+
+  $row = $rs->upsert(
+    { $row->get_columns }, $self->_upsert_node_opts($node, $row), $row,
+  );
+
+  for my $after (@{ $node->{after} }) {
+    for my $child (@{ $after->{nodes} }) {
+      my $crow = $child->{rs}->new_result($child->{cols});
+      $crow->set_from_related($_, $row) for @{ $after->{revs} };
+      $self->_upsert_run($child, $crow);
+    }
+  }
+
+  return $row;
 }
 
 
@@ -2160,13 +3866,35 @@ sub update_or_new {
     my $attrs = ( @_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {} );
     my $cond  = ref $_[0] eq 'HASH' ? shift : {@_};
 
-    my $row = $self->find( $cond, $attrs );
+    my @lookup_cols;
+    my $row = $self->_find_for_write( $cond, $attrs, 'update_or_new', \@lookup_cols );
     if ( defined $row ) {
-        $row->update($cond);
+        $row->update($self->_update_data_for_found_row($cond, \@lookup_cols));
         return $row;
     }
 
     return $self->new_result($cond);
+}
+
+
+sub update_or_new_async {
+  my $self  = shift;
+  my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
+  my $cond  = ref $_[0] eq 'HASH' ? shift : {@_};
+
+  return $self->_rs_run_async('update_or_new',
+    sub {
+      my ($backend, $fc) = @_;
+
+      my @lookup_cols;
+      return $self->_find_for_write_async($cond, $attrs, 'update_or_new', \@lookup_cols)->then(sub {
+        my ($row) = @_;
+        return $row->update_async($self->_update_data_for_found_row($cond, \@lookup_cols)) if defined $row;
+        return $self->new_result($cond);
+      });
+    },
+    sub { $self->update_or_new($cond, $attrs) },
+  );
 }
 
 
@@ -2211,10 +3939,9 @@ sub is_ordered {
 sub related_resultset {
   my ($self, $rel) = @_;
 
-  return $self->{related_resultsets}{$rel}
-    if defined $self->{related_resultsets}{$rel};
-
-  return $self->{related_resultsets}{$rel} = do {
+  my $rrs = defined $self->{related_resultsets}{$rel}
+    ? $self->{related_resultsets}{$rel}
+    : ( $self->{related_resultsets}{$rel} = do {
     my $rsrc = $self->result_source;
     my $rel_info = $rsrc->relationship_info($rel);
 
@@ -2271,7 +3998,15 @@ sub related_resultset {
     }
 
     $new;
-  };
+  } );
+
+  # ADR 0045 / karr k195: a related resultset derived from a context-bound
+  # resultset inherits the pin, so with_context($ctx)->search_related(...)
+  # routes onto the pinned connection instead of a sibling pool connection.
+  $rrs->{_async_context} = $self->{_async_context}
+    if $self->{_async_context} and blessed $rrs;
+
+  return $rrs;
 }
 
 
@@ -2294,7 +4029,11 @@ sub as_subselect_rs {
   delete $fresh_rs->{cond};
   delete @{$fresh_rs->{attrs}}{qw/where bind/};
 
-  return $fresh_rs->search( {}, {
+  # ADR 0045 / karr k195: a subselect wrapper of a context-bound resultset keeps
+  # the pin (the ->search_rs below propagates it onto the returned clone).
+  $fresh_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+  return $fresh_rs->search_rs( {}, {
     from => [{
       $attrs->{alias} => $self->as_query,
       -alias  => $attrs->{alias},
@@ -2421,6 +4160,17 @@ sub _resolved_attrs {
 
   $self->throw_exception("Specifying distinct => 1 in conjunction with collapse => 1 is unsupported")
     if $attrs->{collapse} and $attrs->{distinct};
+
+  # The engine behind the remove_columns attribute and its shortcut method:
+  # turn "everything except these" into an explicit column list.
+  # Deliberately lazy and resolved here rather than eagerly in the shortcut, so
+  # that an explicit columns/select from anywhere in the chain always wins over
+  # a remove_columns. Guard as upstream: it falls through untouched whenever
+  # remove_columns is not in play.
+  if (!$attrs->{columns} && !$attrs->{select} && $attrs->{remove_columns}) {
+    my %rc = map { $_ => 1 } @{$attrs->{remove_columns}};
+    $attrs->{columns} = [ grep { !$rc{$_} } $source->columns ];
+  }
 
   # default selection list
   $attrs->{columns} = [ $source->columns ]
@@ -2889,8 +4639,8 @@ sub _check_column_rel {
   # correlation *condition*, not "filter the related table by a value".
   # Auto-joining it here would materialise a LOCAL "books" range table
   # inside a subquery and, by SQL lexical scoping, shadow an outer
-  # correlated "books" alias -- silently de-correlating the subquery
-  # (karr #25). Matching upstream, such keys never auto-join; the user
+  # correlated "books" alias -- silently de-correlating the subquery.
+  # Matching upstream, such keys never auto-join; the user
   # declares the join explicitly via { join => ... } when an inner
   # traversal is actually intended. Auto-join stays active for genuine
   # filters ('artist.name' => 'McCrae'), see t/search/auto_join.t.
@@ -2911,14 +4661,14 @@ sub _check_column_rel {
   }
 
   # Record the full relationship path
-  $rels->{join('.', @rel_path)} = 1 if @rel_path;
+  $rels->{CORE::join('.', @rel_path)} = 1 if @rel_path;
 }
 
 # True when a condition RHS is a pure correlation/identifier reference
 # rather than a filter value -- i.e. it carries an -ident anywhere, or is
 # literal SQL (SCALAR/REF). Such a value means the dotted LHS is part of a
 # join/correlation condition, so the LHS must NOT trigger an auto-join (it
-# would shadow an outer correlated alias inside a subquery -- karr #25).
+# would shadow an outer correlated alias inside a subquery).
 sub _cond_value_is_correlation {
   my ($self, $value) = @_;
 
@@ -3087,7 +4837,9 @@ sub STORABLE_freeze {
 
   # A cursor in progress can't be serialized (and would make little sense anyway)
   # the parser can be regenerated (and can't be serialized)
-  delete @{$to_serialize}{qw/cursor _row_parser _result_inflator/};
+  # an async context is a live object (a storage or a transaction
+  # connection), meaningless after thaw: a frozen resultset is unbound
+  delete @{$to_serialize}{qw/cursor _row_parser _result_inflator _async_context/};
 
   # nor is it sensical to store a not-yet-fired-count pager
   if ($to_serialize->{pager} and ref $to_serialize->{pager}{total_entries} eq 'CODE') {
@@ -3097,7 +4849,7 @@ sub STORABLE_freeze {
   Storable::nfreeze($to_serialize);
 }
 
-# need this hook for symmetry
+
 sub STORABLE_thaw {
   my ($self, $cloning, $serialized) = @_;
 
@@ -3125,89 +4877,201 @@ sub throw_exception {
 # ============================================================
 
 
-sub me { join('.', $_[0]->current_source_alias, $_[1] || q{}) }
+sub me { CORE::join('.', $_[0]->current_source_alias, $_[1] || q{}) }
 
 
 sub order_by {
   my ($self, @order) = @_;
 
-  return $self->search(undef, { order_by => $order[0] })
-    if @order && ref($order[0]);
+  # Belt and braces, no longer load bearing: since every top level ref is
+  # handed to SQL::Abstract untouched anyway, this produces the same SQL as
+  # the parser below - it only keeps the attribute value bit-for-bit identical
+  # (the ref itself, not a list holding it) for the documented single ref call.
+  return $self->search_rs(undef, { order_by => $order[0] })
+    if @order == 1 && ref $order[0];
 
+  return $self->search_rs(undef, {
+    order_by => [ $self->_order_by_clauses(\@order) ],
+  });
+}
+
+# Turns a flat order_by() argument list into an ordered list of ORDER BY
+# clauses, preserving the argument order. See the order_by POD for the forms.
+sub _order_by_clauses {
+  my ($self, $args) = @_;
+
+  my @queue = @$args;
   my @clauses;
-  for (@order) {
-    for my $col (split(/\s*,\s*/)) {
-      my $dir = 'asc';
-      if (substr($col, 0, 1) eq '!') {
-        $col = substr($col, 1);
-        $dir = 'desc';
-      }
-      $col = join('.', $self->current_source_alias, $col)
-        if index($col, '.') == -1;
-      push @clauses, { "-$dir" => $col };
+
+  while (@queue) {
+    my $item = shift @queue;
+
+    if (ref $item eq 'ARRAY') {
+      # A ref is native SQL::Abstract - we stay out of it. The list is only
+      # flattened so that following arguments append after it; the elements
+      # themselves are taken over verbatim and never parsed.
+      push @clauses, @$item;
+    }
+    elsif (ref $item) {
+      # hashrefs and literals (\'sql', \['sql', @bind]) pass through untouched
+      push @clauses, $item;
+    }
+    elsif (defined $item and $item =~ /^-(asc|desc)$/i) {
+      $self->throw_exception(
+        "Missing value after '$item' in order_by()"
+      ) unless @queue and defined $queue[0];
+      push @clauses, $self->_order_by_direction_clauses(lc $1, shift @queue);
+    }
+    else {
+      push @clauses, $self->_order_by_magic_clauses($item);
     }
   }
-  return $self->search(undef, { order_by => \@clauses });
+
+  return @clauses;
+}
+
+# The value side of a flat '-asc'/'-desc' pair
+sub _order_by_direction_clauses {
+  my ($self, $dir, $value) = @_;
+
+  return map { $self->_order_by_direction_clauses($dir, $_) } @$value
+    if ref $value eq 'ARRAY';
+
+  # anything else that is a ref goes to the direction untouched
+  return { "-$dir" => $value } if ref $value;
+
+  return map { +{ "-$dir" => $self->_order_by_qualify($_) } }
+    split(/\s*,\s*/, $value);
+}
+
+# The FREW magic string syntax: '!' prefix means DESC, commas split columns
+sub _order_by_magic_clauses {
+  my ($self, $spec) = @_;
+
+  my @clauses;
+  for my $col (split(/\s*,\s*/, $spec)) {
+    my $dir = 'asc';
+    if (substr($col, 0, 1) eq '!') {
+      $col = substr($col, 1);
+      $dir = 'desc';
+    }
+    push @clauses, { "-$dir" => $self->_order_by_qualify($col) };
+  }
+  return @clauses;
+}
+
+sub _order_by_qualify {
+  my ($self, $col) = @_;
+
+  return $col if index($col, '.') != -1;
+  return CORE::join('.', $self->current_source_alias, $col);
 }
 
 
-# Note: DBIO::ResultSet already has a _resolve-time `columns` concept,
-# but no public chainable columns() method. We add one.
-{
-  no warnings 'redefine';
-  # save original if it exists
-  my $orig = __PACKAGE__->can('columns');
-  # The base ResultSet doesn't have a public columns() for chaining,
-  # so we add one. If columns is called with args, it's our shortcut.
-  # If called without args, delegate to result_source->columns via the
-  # existing codepath (which doesn't exist as a method on RS, so this is safe).
-}
-
-sub columns {
-  my $self = shift;
-  return $self->search(undef, { columns => $_[0] }) if @_;
-  return $self->result_source->columns;
-}
+sub columns { $_[0]->search_rs(undef, { columns => $_[1] }) }
 
 
 sub add_columns {
-  return $_[0]->search(undef, { '+columns' => $_[1] });
+  return $_[0]->search_rs(undef, { '+columns' => $_[1] });
 }
 
 
 sub remove_columns {
-  return $_[0]->search(undef, { remove_columns => $_[1] });
+  return $_[0]->search_rs(undef, { remove_columns => $_[1] });
 }
 
 
-sub distinct { $_[0]->search(undef, { distinct => defined $_[1] ? $_[1] : 1 }) }
+sub distinct { $_[0]->search_rs(undef, { distinct => defined $_[1] ? $_[1] : 1 }) }
 
 
-sub group_by { $_[0]->search(undef, { group_by => $_[1] }) }
+sub group_by { $_[0]->search_rs(undef, { group_by => $_[1] }) }
+
+
+sub where {
+  my $self = shift;
+
+  # no args: return a clone without touching the condition
+  return $self->search_rs if !@_;
+
+  # a single ref is a full condition structure, passed through verbatim
+  return $self->search_rs($_[0]) if @_ == 1 && ref $_[0];
+
+  $self->throw_exception('Odd number of elements in where() condition')
+    if @_ % 2;
+
+  for my $i (0 .. $#_) {
+    next if $i % 2;
+    $self->throw_exception('All keys in condition key/value pairs must be plain scalars')
+      if (! defined $_[$i] or ref $_[$i] ne '');
+  }
+
+  return $self->search_rs({ @_ });
+}
+
+
+sub having {
+  my $self = shift;
+
+  return $self->search_rs if !@_;
+
+  return $self->search_rs(undef, { having => $_[0] }) if @_ == 1 && ref $_[0];
+
+  $self->throw_exception('Odd number of elements in having() condition')
+    if @_ % 2;
+
+  for my $i (0 .. $#_) {
+    next if $i % 2;
+    $self->throw_exception('All keys in condition key/value pairs must be plain scalars')
+      if (! defined $_[$i] or ref $_[$i] ne '');
+  }
+
+  return $self->search_rs(undef, { having => { @_ } });
+}
+
+
+sub offset { $_[0]->search_rs(undef, { offset => $_[1] }) }
+
+
+sub join { $_[0]->search_rs(undef, { join => $_[1] }) }
+
+
+sub select {
+  my $self = shift;
+
+  # no args: return a clone without touching the projection
+  return $self->search_rs if !@_;
+
+  my $sel = $_[0];
+  my $as  = $_[1];
+
+  return $self->search_rs(undef, {
+    select => $sel,
+    (defined $as ? (as => $as) : ()),
+  });
+}
+
+
+sub as {
+  my ($self, $as) = @_;
+
+  my $sel = $self->{attrs}{select}
+    or $self->throw_exception(
+      'as() needs a preceding select() - chain ->select(\@cols)->as(\@aliases), '
+      . 'or pass both at once: ->select(\@cols, \@aliases)'
+    );
+
+  return $self->search_rs(undef, { select => $sel, as => $as });
+}
 
 
 sub hri {
-  $_[0]->search(undef, {
+  $_[0]->search_rs(undef, {
     result_class => 'DBIO::ResultClass::HashRefInflator'
   })
 }
 
 
-# Note: rows() already exists in DBIO::ResultSet for getting the rows
-# attribute value. We override to make it chainable when called with args.
-{
-  my $orig_rows = __PACKAGE__->can('rows');
-  no warnings 'redefine';
-  require Sub::Util;
-
-  *rows = Sub::Util::set_subname rows => sub {
-    if (@_ > 1) {
-      return $_[0]->search(undef, { rows => $_[1] });
-    }
-    return $orig_rows->(@_) if $orig_rows;
-    return undef;
-  };
-}
+sub rows { $_[0]->search_rs(undef, { rows => $_[1] }) }
 
 
 sub limit { $_[0]->rows($_[1]) }
@@ -3232,70 +5096,152 @@ sub limited_page {
 }
 
 
-sub prefetch { $_[0]->search(undef, { prefetch => @_ > 2 ? [@_[1..$#_]] : $_[1] }) }
+sub prefetch { $_[0]->search_rs(undef, { prefetch => @_ > 2 ? [@_[1..$#_]] : $_[1] }) }
 
 
 sub null {
   my ($self, @columns) = @_;
-  @columns = @{$columns[0]} if @columns == 1 && ref $columns[0] eq 'ARRAY';
-  my $rs = $self;
-  $rs = $rs->search({ $_ => undef }) for @columns;
-  return $rs;
+  return $self->_helper_apply_search(undef, @columns);
 }
 
 
 sub not_null {
   my ($self, @columns) = @_;
-  @columns = @{$columns[0]} if @columns == 1 && ref $columns[0] eq 'ARRAY';
-  my $rs = $self;
-  $rs = $rs->search({ $_ => { '!=' => undef } }) for @columns;
-  return $rs;
+  return $self->_helper_apply_search({ '!=' => undef }, @columns);
 }
 
 
 sub like {
   my ($self, $columns, $cond) = @_;
-  $columns = [$columns] unless ref $columns;
-  my $rs = $self;
-  $rs = $rs->search({ $_ => { -like => $cond } }) for @$columns;
-  return $rs;
+  $self->throw_exception(
+    'like() expects a column name or an ARRAY reference of column names'
+  ) if ref $columns and ref $columns ne 'ARRAY';
+  return $self->_helper_apply_search({ -like => $cond }, $columns);
 }
 
 
 sub not_like {
   my ($self, $columns, $cond) = @_;
-  $columns = [$columns] unless ref $columns;
+  $self->throw_exception(
+    'not_like() expects a column name or an ARRAY reference of column names'
+  ) if ref $columns and ref $columns ne 'ARRAY';
+  return $self->_helper_apply_search({ -not_like => $cond }, $columns);
+}
+
+# Shared plumbing for null/not_null/like/not_like: unwrap an optional arrayref
+# of columns and chain one search() per column. Stays wordless - the public
+# method above is the one that validates its arguments and throws.
+sub _helper_apply_search {
+  my ($self, $cond, @columns) = @_;
+
+  @columns = @{ $columns[0] } if @columns == 1 && ref $columns[0] eq 'ARRAY';
+
   my $rs = $self;
-  $rs = $rs->search({ $_ => { -not_like => $cond } }) for @$columns;
+  $rs = $rs->search_rs({ $self->_helper_meify($_) => $cond }) for @columns;
   return $rs;
+}
+
+# A leading '.' means "qualify me with this ResultSet's source alias", so that
+# '.title' becomes 'me.title' and stays unambiguous once a join is in play.
+sub _helper_meify {
+  my ($self, $column) = @_;
+
+  return $self->current_source_alias . $column if $column =~ m/^\./;
+  return $column;
 }
 
 
 sub results_exist {
   my ($self, $cond) = @_;
 
-  my $query = $self->results_exist_as_query($cond);
-  $$query->[0] .= ' AS _existence_subq';
+  my $storage = $self->result_source->schema->storage;
+  my ($sql, @bind)
+    = $self->_results_exist_statement($storage, 'results_exist', $cond);
 
-  my (undef, $sth) = $self->result_source
-    ->schema
-    ->storage
-    ->_select($query, \'*', {}, {});
+  my (undef, $sth) = $storage->_execute_rendered($sql, \@bind);
 
-  $sth->fetchall_arrayref->[0][0] ? 1 : 0;
+  my $row = $sth->fetchall_arrayref->[0];
+  return ($row && $row->[0]) ? 1 : 0;
+}
+
+
+sub results_exist_async {
+  my ($self, $cond) = @_;
+
+  my $storage = $self->result_source->schema->storage;
+  my ($sql, @bind)
+    = $self->_results_exist_statement($storage, 'results_exist_async', $cond);
+
+  return $self->_rs_run_async('results_exist',
+    sub {
+      my ($backend, $fc) = @_;
+
+      # The binds of the statement are as_query's, pairs [ \%attrs => $value ].
+      # A transport's runner takes bare values (DBIO::Storage::Async::_query_async,
+      # karr k342), so a context or backend that is not a sync storage gets them
+      # unpacked. The immediate mode runs the statement on the sync storage itself,
+      # which takes pairs and keeps their column attributes: left as they are.
+      my @run_bind = $backend->isa('DBIO::Storage::DBI') ? @bind : bare_binds(@bind);
+
+      return $backend->_query_async($sql, \@run_bind)->then(sub {
+        my ($raw_row) = @_;
+        return ($raw_row && $raw_row->[0]) ? 1 : 0;
+      });
+    },
+    sub { $self->results_exist($cond) },
+  );
 }
 
 
 sub results_exist_as_query {
   my ($self, $cond) = @_;
 
+  my $storage = $self->result_source->schema->storage;
+  my ($sql, @bind)
+    = $self->_results_exist_statement($storage, 'results_exist_as_query', $cond);
+
+  return \[ "( $sql )", @bind ];
+}
+
+# The complete 1/0 statement all three results_exist* methods run on, plus its
+# binds. Core builds the inner subquery and hands it to the storage, which
+# renders the whole fragment (ADR 0037 section 2) -- core adds nothing to what
+# comes back, and holds no dummy-table knowledge.
+sub _results_exist_statement {
+  my ($self, $storage, $method, $cond) = @_;
+
+  $self->_assert_exists_query_supported($storage, $method);
+
   my $reified = $self->search_rs($cond, {
     columns => { _results_existence_check => \ '42' }
   })->as_query;
 
-  $$reified->[0] = "( SELECT EXISTS $$reified->[0] )";
+  my ($inner_sql, @bind) = @{$$reified};
 
-  $reified;
+  return ($storage->_exists_value_sql($inner_sql), @bind);
+}
+
+# No capability, no EXISTS query -- and never a silent degrade to has_rows:
+# the caller asked for the cheap server-side check and would get a different
+# query shape without being told, which is the over-promise ADR 0036 refused
+# for upsert. Rejecting the *silent* fallback is not rejecting the
+# alternative, so the message names it, together with the branch that picks
+# it. Thrown before any SQL is built or executed.
+sub _assert_exists_query_supported {
+  my ($self, $storage, $method) = @_;
+
+  return 1
+    if $storage->can('_use_supports_exists_query')
+       and $storage->_use_supports_exists_query;
+
+  $self->throw_exception(
+    "$method(): " . ref($storage) . ' does not declare the '
+  . 'supports_exists_query capability -- this engine\'s driver has not '
+  . 'declared that it can render a boolean-valued EXISTS query. Use '
+  . '$rs->has_rows, which is portable and works everywhere, or branch on the '
+  . 'capability: '
+  . '$storage->_use_supports_exists_query ? $rs->results_exist : $rs->has_rows'
+  );
 }
 
 
@@ -3304,8 +5250,14 @@ sub correlate {
 
   my $source = $self->result_source;
 
-  return $source->related_source($rel)->resultset
-    ->search(
+  my $fresh_rs = $source->related_source($rel)->resultset;
+
+  # ADR 0045 / karr k281: correlated to a context-bound resultset, it keeps the
+  # pin (the ->search_rs below propagates it onto the returned clone).
+  $fresh_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+  return $fresh_rs
+    ->search_rs(
       $source->_resolve_relationship_condition(
         rel_name      => $rel,
         foreign_alias => "${rel}_alias",
@@ -3324,39 +5276,85 @@ sub search_or {
     'All ResultSets passed to search_or must have the same result_source'
   ) if grep { $self->result_source != $_->result_source } @others;
 
-  $self->search({
+  $self->search_rs({
     -or => [ map $_->_resolved_attrs->{where}, @others ],
   });
 }
 
 
-sub union         { $_[0]->_set_operation('UNION'         => $_[1]) }
-sub union_all     { $_[0]->_set_operation('UNION ALL'     => $_[1]) }
-sub intersect     { $_[0]->_set_operation('INTERSECT'     => $_[1]) }
-sub intersect_all { $_[0]->_set_operation('INTERSECT ALL' => $_[1]) }
+# The canonical operation name IS the method name. It goes to the storage
+# rather than a keyword, so there is exactly one call site asking (ADR 0039)
+# and the driver can refuse an operation as well as spell it. The old
+# driver-name comparison this replaced -- sqlt_type eq 'Oracle' -- reached
+# $dbh->{Driver}{Name} through _get_dbh, so it opened a database connection at
+# query-build time, on every call, purely to choose a word.
+sub union         { $_[0]->_set_operation('union'         => $_[1]) }
+sub union_all     { $_[0]->_set_operation('union_all'     => $_[1]) }
+sub intersect     { $_[0]->_set_operation('intersect'     => $_[1]) }
+sub intersect_all { $_[0]->_set_operation('intersect_all' => $_[1]) }
 
-sub except {
-  my ($self, @args) = @_;
-  my $keyword = $self->result_source->schema->storage->sqlt_type eq 'Oracle'
-    ? 'MINUS' : 'EXCEPT';
-  $self->_set_operation($keyword => @args);
+sub except        { $_[0]->_set_operation('except'        => $_[1]) }
+sub except_all    { $_[0]->_set_operation('except_all'    => $_[1]) }
+
+# cribbed from perlfaq4
+sub _compare_arrays {
+  my ($self, $first, $second) = @_;
+
+  no warnings; # silence spurious -w undef complaints
+  return 0 unless @$first == @$second;
+  for (my $i = 0; $i < @$first; $i++) {
+    return 0 if $first->[$i] ne $second->[$i];
+  }
+  return 1;
 }
 
-sub except_all { $_[0]->_set_operation('EXCEPT ALL' => $_[1]) }
-
 sub _set_operation {
-  my ($self, $operation, $other) = @_;
+  my ($self, $op, $other) = @_;
+
+  my @operands = ($self, ref $other eq 'ARRAY' ? @$other : $other);
+
+  # ADR 0045 / karr k324: the operands must be bound alike -- all unbound, or
+  # all to the one context (identity). Asked first of all, before the engine
+  # and before any operand is rendered, so the refusal depends on nothing the
+  # driver answers and leaves nothing behind.
+  {
+    my @bound = map { $_->_async_context } @operands;
+    my $key   = sub { defined $_[0] ? Scalar::Util::refaddr($_[0]) : '' };
+    my $own   = $key->($bound[0]);
+    my @odd   = grep { $key->($bound[$_]) ne $own } 1 .. $#bound;
+
+    if (@odd) {
+      my $says = sub {
+        defined $bound[$_[0]] ? "bound to $bound[$_[0]]" : 'unbound';
+      };
+      $self->throw_exception(
+        "$op: the operands of a set operation must be bound alike, all "
+      . 'unbound or all to the same async context -- operand 0 (the caller) is '
+      . CORE::join(', ', $says->(0), map { "operand $_ is " . $says->($_) } @odd)
+      );
+    }
+  }
+
+  # Then, before a single operand is rendered: the engine either spells this
+  # operation or refuses it (ADR 0039). Doing it here rather than after the
+  # loop is the contract, not an accident -- a refusing engine must throw at
+  # query-build time and never produce a fragment that could end up embedded
+  # in a larger query.
+  my $operation = $self->result_source->schema->storage
+    ->_set_operation_keyword($op);
 
   my @sql;
   my @params;
   my $as = $self->_resolved_attrs->{as};
-  my @operands = ($self, ref $other eq 'ARRAY' ? @$other : $other);
 
   for (@operands) {
     $self->throw_exception('ResultClass of ResultSets do not match!')
       unless $self->result_class eq $_->result_class;
 
     my $attrs = $_->_resolved_attrs;
+
+    $self->throw_exception('ResultSets do not all have the same selected columns!')
+      unless $self->_compare_arrays($as, $attrs->{as});
 
     my ($sql, @bind) = @{${$_->as_query}};
     $sql =~ s/^\s*\((.*)\)\s*$/$1/;
@@ -3365,32 +5363,50 @@ sub _set_operation {
     push @params, @bind;
   }
 
-  my $query = q<(> . join(" $operation ", @sql) . q<)>;
+  my $query = q<(> . CORE::join(" $operation ", @sql) . q<)>;
   my $attrs = $self->_resolved_attrs;
 
-  return $self->result_source->resultset->search(undef, {
+  my $fresh_rs = $self->result_source->resultset;
+
+  # ADR 0045 / karr k281: the result takes the binding of the operands, which
+  # are all bound alike (karr k324, checked above); the ->search_rs below
+  # propagates it onto the returned clone.
+  $fresh_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+
+  return $fresh_rs->search_rs(undef, {
     alias => $self->current_source_alias,
     from => [{
       $self->current_source_alias => \[ $query, @params ],
       -alias                      => $self->current_source_alias,
-      -source_handle              => $self->result_source->handle,
+      -rsrc                       => $self->result_source,
     }],
     columns      => $attrs->{as},
     result_class => $self->result_class,
   });
 }
 
+
 # --- one_row: safe alternative to first() that exhausts cursor ---
 sub one_row {
   my $self = shift;
-  $self->search(shift, { rows => 1 })->next;
+  $self->search_rs(shift, { rows => 1 })->next;
 }
 
+
 # --- no_columns: clear column selection for custom projections ---
-sub no_columns { $_[0]->search(undef, { columns => [] }) }
+sub no_columns { $_[0]->search_rs(undef, { columns => [] }) }
+
 
 # --- bare: get unsearched ResultSet from a searched one ---
-sub bare { shift->result_source->resultset }
+sub bare {
+  my $self = shift;
+  my $fresh_rs = $self->result_source->resultset;
+  # ADR 0045 / karr k281: the search conditions and attributes go, the pin of a
+  # context-bound resultset stays -- it is neither.
+  $fresh_rs->{_async_context} = $self->{_async_context} if $self->{_async_context};
+  return $fresh_rs;
+}
+
 
 # --- rand: get random rows ---
 sub rand {
@@ -3401,22 +5417,40 @@ sub rand {
   $self->throw_exception('rand can only return an integer amount of rows')
     unless $amount == int $amount;
   my $rand_func = $self->result_source->storage->_random_function;
-  $self->search(undef, { rows => $amount, order_by => \$rand_func });
+  $self->search_rs(undef, { rows => $amount, order_by => \$rand_func });
 }
+
 
 # --- explain: get query plan for debugging ---
 sub explain {
   my $self = shift;
   my $storage = $self->result_source->storage;
-  $storage->ensure_connected;
-  my $dbh = $storage->dbh;
   my ($sql, @bind) = @{${$self->as_query}};
+  # as_query parenthesises its output for use as a subquery; EXPLAIN wants the
+  # statement. Stripped for every engine, not only SQLite (upstream's Helper
+  # did it in the SQLite branch of a DBIx::Introspector dispatch).
   $sql =~ s/^\s*\((.*)\)\s*$/$1/s;
-  my $explain_sql = $storage->_explain_sql($sql);
-  $dbh->selectall_arrayref($explain_sql, undef, @bind);
+
+  # ADR 0040: the storage owns the WHOLE operation, not just the
+  # spelling. Half this family cannot obtain a plan with one statement --
+  # Oracle's EXPLAIN PLAN FOR returns no rows and needs a second query, SQL
+  # Server drives it through a session setting across three round-trips,
+  # Firebird reads it off the prepared statement -- so there is nothing left
+  # here to compose. (Sybase ASE cannot be served at all: its plan arrives as
+  # server messages rather than rows. ADR 0040 section 7.) The bind pairs
+  # travel as they come:
+  # [ \%attrs, $value ] is the native format of the statement path.
+  #
+  # What that path buys is listed here, and _explain_query's contract requires
+  # every driver override to keep it: tracing and therefore redact_bind_value,
+  # dbh_do retry, NoBindVars interpolation, and the read handler rather than
+  # the master's handle on a replicated storage.
+  return $storage->_explain_query($sql, \@bind);
 }
 
 1;
+
+__END__
 
 =pod
 
@@ -3428,7 +5462,7 @@ DBIO::ResultSet - Lazy query object for fetching and manipulating DBIO rows
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -3439,6 +5473,14 @@ version 0.900002
 
   my $registered_users_rs = $schema->resultset('User')->search({ registered => 1 });
   my @cds_in_2005 = $schema->resultset('CD')->search({ year => 2005 })->all();
+
+  # Async: same query, non-blocking on a connection with an async mode chosen
+  # (see L</ASYNC> below)
+  my $schema = MyApp::Schema->connect($dsn, $user, $pass, { async => 'future_io' });
+  $schema->resultset('CD')->search({ year => 2005 })->all_async->then(sub {
+    my @cds_in_2005 = @_;
+    ...
+  });
 
 See F<t/resultset/as_query.t> for a runnable example.
 
@@ -3472,181 +5514,6 @@ However, if it is used in a boolean context it is B<always> true.  So if
 you want to check if a resultset has any results, you must use C<if $rs
 != 0>.
 
-=head1 EXAMPLES
-
-=head2 Chaining resultsets
-
-Let's say you've got a query that needs to be run to return some data
-to the user. But, you have an authorization system in place that
-prevents certain users from seeing certain information. So, you want
-to construct the basic query in one method, but add constraints to it in
-another.
-
-  sub get_data {
-    my $self = shift;
-    my $request = $self->get_request; # Get a request object somehow.
-    my $schema = $self->result_source->schema;
-
-    my $cd_rs = $schema->resultset('CD')->search({
-      title => $request->param('title'),
-      year => $request->param('year'),
-    });
-
-    $cd_rs = $self->apply_security_policy( $cd_rs );
-
-    return $cd_rs->all();
-  }
-
-  sub apply_security_policy {
-    my $self = shift;
-    my ($rs) = @_;
-
-    return $rs->search({
-      subversive => 0,
-    });
-  }
-
-=head3 Resolving conditions and attributes
-
-When a resultset is chained from another resultset (e.g.:
-C<< my $new_rs = $old_rs->search(\%extra_cond, \%attrs) >>), conditions
-and attributes with the same keys need resolving.
-
-If any of L</columns>, L</select>, L</as> are present, they reset the
-original selection, and start the selection "clean".
-
-The L</join>, L</prefetch>, L</+columns>, L</+select>, L</+as> attributes
-are merged into the existing ones from the original resultset.
-
-The L</where> and L</having> attributes, and any search conditions, are
-merged with an SQL C<AND> to the existing condition from the original
-resultset.
-
-All other attributes are overridden by any new ones supplied in the
-search attributes.
-
-=head2 Multiple queries
-
-Since a resultset just defines a query, you can do all sorts of
-things with it with the same object.
-
-  # Don't hit the DB yet.
-  my $cd_rs = $schema->resultset('CD')->search({
-    title => 'something',
-    year => 2009,
-  });
-
-  # Each of these hits the DB individually.
-  my $count = $cd_rs->count;
-  my $most_recent = $cd_rs->get_column('date_released')->max();
-  my @records = $cd_rs->all;
-
-And it's not just limited to SELECT statements.
-
-  $cd_rs->delete();
-
-This is even cooler:
-
-  $cd_rs->create({ artist => 'Fred' });
-
-Which is the same as:
-
-  $schema->resultset('CD')->create({
-    title => 'something',
-    year => 2009,
-    artist => 'Fred'
-  });
-
-See: L</search>, L</count>, L</get_column>, L</all>, L</create>.
-
-=head2 Custom ResultSet classes
-
-To add methods to your resultsets, you can subclass L<DBIO::ResultSet>, similar to:
-
-  package MyApp::Schema::ResultSet::User;
-
-  use strict;
-  use warnings;
-
-  use base 'DBIO::ResultSet';
-
-  sub active {
-    my $self = shift;
-    $self->search({ $self->current_source_alias . '.active' => 1 });
-  }
-
-  sub unverified {
-    my $self = shift;
-    $self->search({ $self->current_source_alias . '.verified' => 0 });
-  }
-
-  sub created_n_days_ago {
-    my ($self, $days_ago) = @_;
-    $self->search({
-      $self->current_source_alias . '.create_date' => {
-        '<=',
-      $self->result_source->schema->storage->datetime_parser->format_datetime(
-        DateTime->now( time_zone => 'UTC' )->subtract( days => $days_ago )
-      )}
-    });
-  }
-
-  sub users_to_warn { shift->active->unverified->created_n_days_ago(7) }
-
-  1;
-
-See L<DBIO::Schema/load_namespaces> on how DBIO can discover and
-automatically attach L<Result|DBIO::Manual::ResultClass>-specific
-L<ResulSet|DBIO::ResultSet> classes.
-
-=head3 ResultSet subclassing with custom constructors
-
-DBIO does not require Moose, Moo, or any other constructor layer for custom
-ResultSet classes. A plain subclass of L<DBIO::ResultSet> is usually enough.
-
-If you do use an external constructor provider, you must adapt its constructor
-to DBIO's C<< ->new($source, \%args) >> calling convention.
-
-In order to write custom ResultSet classes with L<Moo> you need to use the
-following template. The L<BUILDARGS|Moo/BUILDARGS> is necessary due to the
-unusual signature of the L<constructor provided by DBIO
-|DBIO::ResultSet/new> C<< ->new($source, \%args) >>.
-
-  use Moo;
-  extends 'DBIO::ResultSet';
-  sub BUILDARGS { $_[2] || {} } # ::RS::new() expects my ($class, $rsrc, $args) = @_
-
-  ...your code...
-
-  1;
-
-If you want to build your custom ResultSet classes with L<Moose>, you need
-a similar, though a little more elaborate template in order to interface the
-inlining of the L<Moose>-provided
-L<object constructor|Moose::Manual::Construction/WHERE'S THE CONSTRUCTOR?>,
-with the DBIO one.
-
-  package MyApp::Schema::ResultSet::User;
-
-  use Moose;
-  use MooseX::NonMoose;
-  extends 'DBIO::ResultSet';
-
-  sub BUILDARGS { $_[2] || {} } # ::RS::new() expects my ($class, $rsrc, $args) = @_
-
-  ...your code...
-
-  __PACKAGE__->meta->make_immutable;
-
-  1;
-
-The L<MooseX::NonMoose> is necessary so that the L<Moose> constructor does not
-entirely overwrite the DBIO one (in contrast L<Moo> does this automatically).
-Alternatively, you can skip L<MooseX::NonMoose> and get by with just L<Moose>
-instead by doing:
-
-  __PACKAGE__->meta->make_immutable(inline_constructor => 0);
-
 =head1 METHODS
 
 =head2 new
@@ -3667,8 +5534,7 @@ executed as needed by the other methods.
 Generally you never construct a resultset manually. Instead you get one
 from e.g. a
 C<< $schema->L<resultset|DBIO::Schema/resultset>('$source_name') >>
-or C<< $another_resultset->L<search|/search>(...) >> (the later called in
-scalar context):
+or C<< $another_resultset->L<search|/search>(...) >>:
 
   my $rs = $schema->resultset('CD')->search({ title => '100th Window' });
 
@@ -3696,19 +5562,25 @@ creation B<will not work>. See also warning pertaining to L</create>.
 
 =item Arguments: L<$cond|DBIO::SQLMaker> | undef, L<\%attrs?|/ATTRIBUTES>
 
-=item Return Value: $resultset (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|/search>
 
 =back
 
-  my @cds    = $cd_rs->search({ year => 2001 }); # "... WHERE year = 2001"
+  my $cds    = $cd_rs->search({ year => 2001 }); # "... WHERE year = 2001"
   my $new_rs = $cd_rs->search({ year => 2005 });
 
   my $new_rs = $cd_rs->search([ { year => 2005 }, { year => 2004 } ]);
                  # year = 2005 OR year = 2004
 
-In list context, C<< ->all() >> is called implicitly on the resultset, thus
-returning a list of L<result|DBIO::Manual::ResultClass> objects instead.
-To avoid that, use L</search_rs>.
+Search returns a L<DBIO::ResultSet> and throws in list context (ADR 0042);
+called in void context from outside DBIO it throws as well. To get the
+matching rows, call C<< ->all() >> on the result:
+
+  my @cds = $cd_rs->search({ year => 2001 })->all;
+
+Where the call may land in list context -- as a function argument, inside a
+list constructor, as the last statement of a method -- use L</search_rs>, which
+returns the resultset in every context.
 
 If you need to pass in additional attributes but no additional condition,
 call it as C<search(undef, \%attrs)>.
@@ -3716,7 +5588,7 @@ call it as C<search(undef, \%attrs)>.
   # "SELECT name, artistid FROM $artist_table"
   my @all_artists = $schema->resultset('Artist')->search(undef, {
     columns => [qw/name artistid/],
-  });
+  })->all;
 
 For a list of attributes that can be passed to C<search>, see
 L</ATTRIBUTES>. For more examples of using this function, see
@@ -3726,6 +5598,49 @@ L<SQL::Abstract/"WHERE CLAUSES"> and its extension
 L<DBIO::SQLMaker>.
 
 For more help on using joins with search, see L<DBIO::Manual::Joining>.
+
+=head3 Truth value of a condition
+
+Every node of a condition is true, false or SQL, the same for SELECT, UPDATE
+and DELETE:
+
+=over 4
+
+=item true
+
+C<{}>, C<undef>, C<< -and => [] >>, C<< -and => {} >>, C<< -not_in => [] >>,
+and an C<-and> group of nothing but true nodes. A true condition is no
+restriction and renders no WHERE.
+
+=item false
+
+C<[]> as a whole condition, C<< -or => [] >>, C<< -in => [] >>, and an C<-or>
+group of nothing but false nodes. A false condition renders as C<0=1>.
+
+=back
+
+In an C<-and> group a false member makes the group false and true members drop
+out; in an C<-or> group a true member makes the group true and false members
+drop out.
+
+  $rs->search({ name => 'a', -or => [] });   # WHERE ( 0=1 )
+  $rs->search({ name => 'a', -and => [] });  # WHERE ( name = 'a' )
+
+L</update> and L</delete> refuse a resultset whose condition is true.
+
+=head3 Untrusted input
+
+The structure of a condition is code: its keys, its operators and its hashes
+decide what the statement does. Only values come from a request.
+
+  # keys and operator are written in the program, the value comes in
+  $cd_rs->search({ year => { '>=' => $params->{year} } });
+
+The same holds for every attribute (C<order_by>, C<columns>, C<having>,
+C<result_class>, ...): it is written in the program. A condition whose
+structure is not written in the program goes through L</search_untrusted>,
+which accepts columns of the resultset as keys, scalars as values and a fixed
+list of operators.
 
 =head3 CAVEAT
 
@@ -3750,10 +5665,140 @@ L<DBIO::Manual::Cookbook/Formatting DateTime objects in queries>.
 This method does the same exact thing as search() except it will
 always return a resultset, even in list context.
 
+=head2 search_untrusted
+
+=over 4
+
+=item Arguments: \%cond | \@cond
+
+=item Return Value: L<$resultset|/search>
+
+=back
+
+  my $rs = $cd_rs->search_untrusted($decoded_json_body);
+
+Does what L</search> does for a condition whose structure does not come from
+the program (see L</Untrusted input>). The condition is checked first and
+handed to L</search> unchanged; the first form outside the following grammar
+throws, naming the path of its key. The method takes exactly one argument, an
+unblessed hash or array reference.
+
+A B<condition node> is a hash reference (key to operand) or an array reference
+of condition nodes (OR). C<-and> and C<-or> take an array or hash reference of
+condition nodes. A scalar as an element of a condition, a blessed container
+and a cycle throw.
+
+A B<key> is a column of the source of the resultset, or C<alias.column> where
+C<alias> is an alias of the resolved attributes (the resultset itself or one of
+its joins) and the column belongs to the source of that alias.
+
+An B<operand> is
+
+=over 4
+
+=item * a scalar (C<undef> included)
+
+=item * an array reference of scalars (a list of values, an OR of equalities)
+
+=item * a hash reference with exactly one operator of C<=>, C<!=>, C<< <> >>,
+C<< < >>, C<< <= >>, C<< > >>, C<< >= >>, C<-like>, C<-not_like>, C<-in>,
+C<-not_in>, C<-between>, C<-not_between>, C<-is> and C<-is_not>
+
+=back
+
+C<-in> and C<-not_in> take an array reference of scalars, C<-between> and
+C<-not_between> an array reference of exactly two scalars, C<-is> and
+C<-is_not> C<undef>, every other operator a scalar.
+
+Everything else throws: C<-literal>, C<-func>, C<-op>, C<-ident>, C<-value>,
+C<-bool>, C<-not>, and every reference as a value.
+
+The attributes are not part of the method; they are written in the program
+(see L</Untrusted input>).
+
+=head2 with_context
+
+=over 4
+
+=item Arguments: $async_context
+
+=item Return Value: L<$resultset|/search>
+
+=back
+
+  $schema->storage->txn_do_async(sub {
+    my ($ctx) = @_;
+    return $rs->with_context($ctx)->all_async->then(sub { ... });
+  });
+
+Returns a clone of this resultset bound to a pinned async context -- the object
+handed to the coderef of L<DBIO::Storage::Async/txn_do_async> or
+L<DBIO::Storage::Async/pipeline>. Once bound, every C<*_async> method on the
+clone (and on rows and L<DBIO::ResultSetColumn>s derived from it) routes its
+storage read/write onto the context's pinned connection instead of taking a
+fresh connection out of the pool. Inside a transaction that means the async
+read actually runs I<inside> the transaction rather than on a sibling
+connection that sees pre-C<BEGIN> state; inside a pipeline it means the
+statement is batched onto the bracketed connection.
+
+The binding is carried, not resolved: the resultset already knows its source
+and schema, so C<with_context> only threads the context through -- it does not
+reach back into storage for an ambient "current context" (there is none; an
+async program may have two transactions in flight at once). The context
+propagates across L</search> / L</search_rs> clones and is inherited by rows
+(L</all_async>, L</first_async>, L</create_async>, ...) and column resultsets
+(L</get_column>) produced from the bound resultset. The same pin follows these
+derivations too (ADR 0045): L</page>, L</as_subselect_rs>,
+L</related_resultset> / L</search_related> (and the generated relationship
+accessors), every chaining shortcut built on L</search_rs>, prefetched
+children, cache-served rows, and the row refetch/copy helpers. So do the
+derivations that build a fresh resultset: L</bare>, L</correlate>,
+L</count_rs> (the L<DBIO::ResultSetColumn> it returns) and the set operations
+L</union>, L</union_all>, L</intersect>, L</intersect_all>, L</except> and
+L</except_all>. A set operation needs its operands bound alike -- see there.
+
+The rows are bound whichever C<inflate_result> built them, a result class's own
+included; what L<DBIO::ResultClass::HashRefInflator> returns is
+plain data and carries nothing. What a bound row or column resultset hands out
+in turn stays bound as well -- see L<DBIO::Row/with_context> and
+L<DBIO::ResultSetColumn/with_context>. The one exception: the related rows a
+multi-create builds from nested data (L</new_result>, L</create>) are not
+bound, only the row they are nested in is.
+
+A context is only valid while its owning scope remains active. A L<pipeline
+context|DBIO::Storage::Async::PipelineContext> stops accepting work the moment
+its synchronous batch coderef returns. A transaction context remains active
+while its callback Future is pending and ends as its C<COMMIT> or C<ROLLBACK>
+goes out. A bound resultset used after either boundary throws rather than
+silently falling back to the pool (ADR 0045). See L<DBIO::Manual::AsyncStorage>
+for the full picture.
+
+A transaction context keeps track of every statement issued on it, the ones a
+bound resultset or row sends included. If one of them fails, the transaction is
+rolled back and fails with that statement's error -- also when your code
+catches the failure and carries on (L<DBIO::Storage::Async/txn_do_async>). A
+caught failure does not rescue the transaction.
+
+In the C<immediate> mode C<txn_do_async> hands its coderef the storage itself
+(ADR 0055), and C<with_context> takes it, so the pattern above is the same in
+every async mode. A resultset bound that way runs its C<*_async>
+in-process, inside the transaction; a statement of it that fails rolls the
+transaction back, awaited or not; what a bound resultset refuses on a real
+backend it refuses there; and held past the transaction it is refused. A
+storage is taken only as the context of its B<own> resultsets and only in the
+C<immediate> mode.
+
+Two things are particular to that mode. There is one connection and no pool,
+so an unbound resultset runs inside the transaction too -- but its failed
+statements are not the transaction's, only a bound one's are. And every
+C<immediate> transaction on a storage has that one storage for its context:
+a resultset bound in one transaction and used inside a B<later> one runs in
+the later one, where a real backend refuses it.
+
 =head2 search_literal
 
 B<CAVEAT>: C<search_literal> is a legacy convenience method. It is equivalent
-to calling C<< $schema->search(\[]) >>, but if you want to ensure columns are
+to calling C<< $rs->search(\[]) >>, but if you want to ensure columns are
 bound correctly, use L</search>.
 
 See L<DBIO::Manual::Cookbook/SEARCHING> and
@@ -3764,20 +5809,21 @@ require C<search_literal>.
 
 =item Arguments: $sql_fragment, @standalone_bind_values
 
-=item Return Value: L<$resultset|/search> (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|/search>
 
 =back
 
-  my @cds   = $cd_rs->search_literal('year = ? AND title = ?', qw/2001 Reload/);
+  my $cds   = $cd_rs->search_literal('year = ? AND title = ?', qw/2001 Reload/);
   my $newrs = $artist_rs->search_literal('name = ?', 'Metallica');
 
 Pass a literal chunk of SQL to be added to the conditional part of the
-resultset query.
+resultset query. Returns a L<DBIO::ResultSet> and throws in list context
+(ADR 0042).
 
 Example of how to use C<search> instead of C<search_literal>
 
-  my @cds = $cd_rs->search_literal('cdid = ? AND (artist = ? OR artist = ?)', (2, 1, 2));
-  my @cds = $cd_rs->search(\[ 'cdid = ? AND (artist = ? OR artist = ?)', [ 'cdid', 2 ], [ 'artist', 1 ], [ 'artist', 2 ] ]);
+  my @cds = $cd_rs->search_literal('cdid = ? AND (artist = ? OR artist = ?)', (2, 1, 2))->all;
+  my @cds = $cd_rs->search(\[ 'cdid = ? AND (artist = ? OR artist = ?)', [ 'cdid', 2 ], [ 'artist', 1 ], [ 'artist', 2 ] ])->all;
 
 =head2 find
 
@@ -3795,42 +5841,49 @@ keys from related objects), or a list of primary key values in the same
 order as the L<primary columns|DBIO::ResultSource/primary_columns>
 declaration on the L</result_source>.
 
-In either case an attempt is made to combine conditions already existing on
-the resultset with the condition passed to this method.
+The condition of the resultset and the condition passed to this method are
+combined: C<find> looks up exactly the row the condition describes. Every key
+of the passed condition goes into the query as one C<AND>, and a key given as
+C<undef> stays in it as C<IS NULL>.
 
-To aid with preparing the correct query for the storage you may supply the
-C<key> attribute, which is the name of a
-L<unique constraint|DBIO::ResultSource/add_unique_constraint> (the
-unique constraint corresponding to the
+The condition has to cover a L<unique constraint|DBIO::ResultSource/add_unique_constraint>
+(the constraint corresponding to the
 L<primary columns|DBIO::ResultSource/primary_columns> is always named
-C<primary>). If the C<key> attribute has been supplied, and DBIO is unable
-to construct a query that satisfies the named unique constraint fully (
-non-NULL values for each column member of the constraint) an exception is
-thrown.
+C<primary>): every column of the constraint has a concrete equality in the
+condition, that is a defined plain value or C<< { '=' => $value } >>, on the
+top C<AND> level, after the condition of the resultset and the values of
+relationships are merged in. Operators, value lists, C<undef> and a constraint
+that only appears inside an C<OR> branch do not cover it. A condition that
+covers no constraint throws an exception that names the given columns and the
+constraints of the source. To search by any other condition use
+C<< $rs->search(\%cond)->single >>.
 
-If no C<key> is specified, the search is carried over all unique constraints
-which are fully defined by the available condition.
+A relationship value (a related row object or a condition hashref for a
+C<belongs_to>) resolves to the foreign key columns of this source. A foreign
+key column passed explicitly keeps its value; a relationship resolving it to a
+different one throws an exception.
 
-If no such constraint is found, C<find> currently defaults to a simple
-C<< search->(\%column_values) >> which may or may not do what you expect.
-Note that this fallback behavior may be deprecated in further versions. If
-you need to search with arbitrary conditions - use L</search>. If the query
-resulting from this fallback produces more than one row, a warning to the
-effect is issued, though only the first row is constructed and returned as
-C<$result_object>.
+The C<key> attribute names the unique constraint that has to be covered; it is
+the name of a constraint. If a column of the named unique constraint is missing
+from the condition, an exception is thrown, and so it is for a column supplied
+as C<undef>: only defined values cover a constraint. Without C<key>, a column
+given as C<undef> beside a covered constraint stays in the query as C<IS NULL>.
 
 In addition to C<key>, L</find> recognizes and applies standard
 L<resultset attributes|/ATTRIBUTES> in the same way as L</search> does.
 
-Note that if you have extra concerns about the correctness of the resulting
-query you need to specify the C<key> attribute and supply the entire condition
-as an argument to find (since it is not always possible to perform the
-combination of the resultset condition with the supplied one, especially if
-the resultset condition contains literal sql).
+Pass the condition with the columns named, as in C<< find({ id => $id }) >>,
+whenever a value comes from outside the program; a bare C<< find($input) >> is
+for values the program itself controls.
 
 For example, to find a row by its primary key:
 
   my $cd = $schema->resultset('CD')->find(5);
+
+A condition of a unique constraint plus further columns finds the row only if
+it matches all of them, which is how to look up a row of an owner:
+
+  my $cd = $schema->resultset('CD')->find({ cdid => $id, owner_id => $me });
 
 You can also find a row by a specific unique constraint:
 
@@ -3842,7 +5895,7 @@ You can also find a row by a specific unique constraint:
     { key => 'cd_artist_title' }
   );
 
-See also L</find_or_create> and L</update_or_create>.
+See also L</find_or_create>, L</update_or_create> and L</find_async>.
 
 =head2 search_related
 
@@ -3850,7 +5903,7 @@ See also L</find_or_create> and L</update_or_create>.
 
 =item Arguments: $rel_name, $cond?, L<\%attrs?|/ATTRIBUTES>
 
-=item Return Value: L<$resultset|/search> (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|/search>
 
 =back
 
@@ -3861,8 +5914,9 @@ See also L</find_or_create> and L</update_or_create>.
 Searches the specified relationship, optionally specifying a condition and
 attributes for matching records. See L</ATTRIBUTES> for more information.
 
-In list context, C<< ->all() >> is called implicitly on the resultset, thus
-returning a list of result objects instead. To avoid that, use L</search_related_rs>.
+Returns a L<DBIO::ResultSet> and throws in list context (ADR 0042) -- call
+C<< ->all >> on the result to fetch rows, or use L</search_related_rs>, which
+returns the resultset in every context.
 
 See also L</search_related_rs>.
 
@@ -3909,7 +5963,7 @@ L<DBIO::ResultSet> returned.
 
 =item B<Note>
 
-As of 0.08100, this method enforces the assumption that the preceding
+This method enforces the assumption that the preceding
 query returns only one row. If more than one row is returned, you will receive
 a warning:
 
@@ -3929,7 +5983,7 @@ order to assemble the resulting object.
 
 =over 4
 
-=item Arguments: L<$cond?|DBIO::SQLMaker>
+=item Arguments: $column_name
 
 =item Return Value: L<$resultsetcolumn|DBIO::ResultSetColumn>
 
@@ -3945,7 +5999,7 @@ Returns a L<DBIO::ResultSetColumn> instance for a column of the ResultSet.
 
 =item Arguments: L<$cond|DBIO::SQLMaker>, L<\%attrs?|/ATTRIBUTES>
 
-=item Return Value: L<$resultset|/search> (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|/search>
 
 =back
 
@@ -3958,7 +6012,7 @@ You most likely want to use L</search> with specific operators.
 
 For more information, see L<DBIO::Manual::Cookbook>.
 
-This method is deprecated and will be removed in 0.09. Use L<search()|/search>
+This method is deprecated. Use L<search()|/search>
 instead. An example conversion is:
 
   ->search_like({ foo => 'bar' });
@@ -3973,15 +6027,16 @@ instead. An example conversion is:
 
 =item Arguments: $first, $last
 
-=item Return Value: L<$resultset|/search> (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|/search>
 
 =back
 
-Returns a resultset or object list representing a subset of elements from the
-resultset slice is called on. Indexes are from 0, i.e., to get the first
-three records, call:
+Returns a resultset representing a subset of elements from the resultset
+slice is called on. It is a L<DBIO::ResultSet>; in list context slice throws
+(ADR 0042).
+Indexes are from 0, i.e., to get the first three records, call:
 
-  my ($one, $two, $three) = $rs->slice(0, 2);
+  my ($one, $two, $three) = $rs->slice(0, 2)->all;
 
 =head2 next
 
@@ -4038,6 +6093,14 @@ that were originally loaded in the source class via
 L<load_components|Class::C3::Componentised/load_components( @comps )>.
 Any overloaded methods in the original source class will not run.
 
+The C<'::HRI'>-style shorthand of L<DBIx::Class::Helper::ResultSet::ResultClassDWIM>
+is deliberately not supported and throws: pass the fully qualified class name,
+or use L</hri> for L<DBIO::ResultClass::HashRefInflator>.
+
+The value is a class name -- Perl identifiers joined by C<::> -- or an
+object; anything else throws C<'...' is not a class name>
+(L<DBIO::Componentised/ensure_class_loaded>).
+
 =head2 count
 
 =over 4
@@ -4050,7 +6113,8 @@ Any overloaded methods in the original source class will not run.
 
 Performs an SQL C<COUNT> with the same query as the resultset was built
 with to find the number of elements. Passing arguments is equivalent to
-C<< $rs->search ($cond, \%attrs)->count >>
+C<< $rs->search ($cond, \%attrs)->count >>, also with an undefined
+C<$cond>. L</count_async> and L</count_rs> take the same arguments.
 
 =head2 count_rs
 
@@ -4086,6 +6150,16 @@ See L</search_literal> for further info.
 
 Counts the results in a literal query. Equivalent to calling L</search_literal>
 with the passed arguments, then L</count>.
+
+=head2 count_literal_async
+
+  my $future = $rs->count_literal_async($sql_fragment, @standalone_bind_values);
+  $future->then(sub { my $count = shift; ... });
+
+Async variant of L</count_literal>. Equivalent to calling L</search_literal>
+with the passed arguments, then L</count_async>; carries C<count_async>'s own
+backend routing, immediate degrade, and croak-on-sync-instance contract with
+no further wrapping needed here.
 
 =head2 all
 
@@ -4157,6 +6231,30 @@ Async variant of L</single>. Routes the single-row fetch through the backend's
 C<select_single_async> and inflates the row with the same single-row collapse
 assertion as L</single>.
 
+=head2 find_async
+
+  my $future = $rs->find_async(\%cond, \%attrs?);
+  $future->then(sub { my $row = shift; ... });   # $row may be undef
+
+Async variant of L</find>. Shares find()'s own condition resolution -- the
+same covered-constraint check (C<< key => ... >> or any covered constraint) and
+the same relationship-valued-key handling (a belongs_to given a related row
+object or condition hashref resolves to a concrete foreign-key value exactly
+as for sync L</find>; a relation that does not resolve to a concrete
+condition is a safe miss, resolving with C<undef> and issuing no query at
+all -- ADR 0034). Routes the backend fetch through C<select_single_async>
+(the same path L</single_async> uses), or, when the resultset collapses a
+has_many, through the collapse-aware fetch-all path L</all_async> uses,
+carping if more than one row was returned (matching find()'s own "Query
+returned more than one row" duplicate check).
+
+Note this is I<not> the same thing as calling L</single_async> directly:
+C<single_async>, like sync L</single>, takes its condition raw and does no
+relationship-key resolution at all -- handing it a relationship-valued key is
+the caller's own responsibility, exactly as with plain C<single>. Reach for
+C<find_async> when you want find()'s lookup semantics async; reach for
+C<single_async> only where you would also reach for plain C<single>.
+
 =head2 count_async
 
   my $future = $rs->count_async;
@@ -4174,15 +6272,29 @@ software-side C<rows>/C<offset> adjustment as L</count>).
 Async variant of L</create>. For a plain single-row create the row's own insert
 is routed through the backend's C<insert_async> and the resulting result object
 is built in the Future's C<then> (reusing the same column store-back as the
-synchronous L<DBIO::Row/insert>). A create that involves related-object
-multi-create cannot be expressed as a single C<insert_async> and is run
-synchronously, resolving immediately (delegated to L<DBIO::Row/insert_async>).
+synchronous L<DBIO::Row/insert>). Data that carries an object for a column
+with an inflator, or a row already in storage for a C<belongs_to>, is still a
+plain single-row create: the object is deflated and the row lends its key, as
+in L</create>.
+
+A create that involves related-object multi-create -- a C<belongs_to> given as
+a hashref or as a row not yet in storage, a C<has_many> given as an arrayref
+-- does not go out as a single C<insert_async> (delegated to
+L<DBIO::Row/insert_async>, which has the full rule). On an unbound resultset it
+is run synchronously and the Future is returned settled: resolved with the row,
+or failed with what the insert threw. On a resultset bound with
+L</with_context> it throws C<insert_async cannot run on a bound async context>
+instead -- an exception out of C<create_async>, not a failed Future, naming the
+relationship that makes it a cascade -- since the synchronous insert would run
+outside the pinned transaction or pipeline (ADR 0045). A C<belongs_to> hashref
+has by then been looked up with a synchronous statement, outside the
+transaction.
 
 =head2 update
 
 =over 4
 
-=item Arguments: \%values
+=item Arguments: \%values, \%options
 
 =item Return Value: $underlying_storage_rv
 
@@ -4200,6 +6312,18 @@ The return value is a pass through of what the underlying
 storage backend returned, and may vary. See L<DBI/execute> for the most
 common case.
 
+A resultset whose condition is true (see L</search>) is unrestricted, and
+C<update> refuses it: the call must say so with C<< { all => 1 } >>, the one
+key C<\%options> takes; any other key throws. A resultset with C<rows> or
+C<offset> counts as restricted.
+
+  $rs->update({ rank => 1 }, { all => 1 });   # the whole table
+
+A column value is a value: a plain scalar, C<undef>, an object, an arrayref
+(an array data type, always bound) or explicit literal SQL (C<\'NOW()'>,
+C<< \[ 'UPPER(?)', $v ] >>). A hash, code or glob reference, or a reference to
+a reference, is no value and throws, naming the column and the type.
+
 =head3 CAVEAT
 
 Note that L</update> does not process/deflate any of the values passed in.
@@ -4213,7 +6337,7 @@ L<DBIO::Manual::Cookbook/Formatting DateTime objects in queries>.
 
 =over 4
 
-=item Arguments: \%values
+=item Arguments: \%values, \%options
 
 =item Return Value: 1
 
@@ -4221,13 +6345,14 @@ L<DBIO::Manual::Cookbook/Formatting DateTime objects in queries>.
 
 Fetches all objects and updates them one at a time via
 L<DBIO::Row/update>. Note that C<update_all> will run DBIO defined
-triggers, while L</update> will not.
+triggers, while L</update> will not. An unrestricted resultset needs
+C<< { all => 1 } >> as for L</update>.
 
 =head2 delete
 
 =over 4
 
-=item Arguments: none
+=item Arguments: \%options
 
 =item Return Value: $underlying_storage_rv
 
@@ -4244,11 +6369,18 @@ L<result component|DBIO::Manual::Component/WHAT IS A COMPONENT>.
 The return value is a pass through of what the underlying storage backend
 returned, and may vary. See L<DBI/execute> for the most common case.
 
+A resultset whose condition is true (see L</search>) is unrestricted, and
+C<delete> refuses it: the call must say so with C<< { all => 1 } >>, the one
+key C<\%options> takes; any other key throws. A resultset with C<rows> or
+C<offset> counts as restricted.
+
+  $rs->delete({ all => 1 });   # the whole table
+
 =head2 delete_all
 
 =over 4
 
-=item Arguments: none
+=item Arguments: \%options
 
 =item Return Value: 1
 
@@ -4256,7 +6388,8 @@ returned, and may vary. See L<DBI/execute> for the most common case.
 
 Fetches all objects and deletes them one at a time via
 L<DBIO::Row/delete>. Note that C<delete_all> will run DBIO defined
-triggers, while L</delete> will not.
+triggers, while L</delete> will not. An unrestricted resultset needs
+C<< { all => 1 } >> as for L</delete>.
 
 =head2 populate
 
@@ -4270,6 +6403,12 @@ triggers, while L</delete> will not.
 
 Accepts either an arrayref of hashrefs or alternatively an arrayref of
 arrayrefs.
+
+Every column value is a value, in void context as well: a plain scalar,
+C<undef>, an object, an arrayref (an array data type, always bound) or
+explicit literal SQL. A hash, code or glob reference (or a reference to a
+reference) under a column name throws, naming the column and the type; a hash
+or array under a relationship name is related data.
 
 =over
 
@@ -4292,7 +6431,9 @@ those values.
 In non-void (scalar or list) context, this method is simply a wrapper
 for L</create>. Depending on list or scalar context either a list of
 L<Result|DBIO::Manual::ResultClass> objects or an arrayref
-containing these objects is returned.
+containing these objects is returned. C<populate> is in this an exception to
+ADR 0042, under which a DBIO method does not change its return type by call
+context.
 
 When supplying data in "arrayref of arrayrefs" invocation style, the
 first element should be a list of column names and each subsequent
@@ -4347,6 +6488,11 @@ the resultset object, usually via a call to L</page>.
 To get the full count of entries for a paged resultset, call
 L<total_entries|DBIO::ResultSet::Pager/total_entries> on the pager
 object.
+
+A resultset bound with L</with_context> hands its context on to the count
+resultset the pager builds, so the count resultset belongs to the same transaction or pipeline, as the
+hand-built count of the async recipe in L<DBIO::ResultSet::Pager/ASYNC>.
+An unbound resultset counts as before.
 
 =head2 page
 
@@ -4413,20 +6559,37 @@ Find an existing record from this resultset using L</find>. if none exists,
 instantiate a new result object and return it. The object will not be saved
 into your storage until you call L<DBIO::Row/insert> on it.
 
+The lookup identifies the row: it uses the columns of the one unique constraint
+the data covers (see L</find>), or of the constraint named by C<key>; the other
+values are the data of the new object. When the data covers several unique
+constraints, C<key> names the one to look up; when it covers none, the method
+throws.
+
 You most likely want this method when looking for existing rows using a unique
 constraint that is not the primary key, or looking for related rows.
 
 If you want objects to be saved immediately, use L</find_or_create> instead.
 
-B<Note>: Make sure to read the documentation of L</find> and understand the
-significance of the C<key> attribute, as its lack may skew your search, and
-subsequently result in spurious new objects.
+B<Note>: L</find> describes what a condition has to cover and what the C<key>
+attribute names.
 
 B<Note>: Take care when using C<find_or_new> with a table having
 columns with default values that you intend to be automatically
 supplied by the database (e.g. an auto_increment primary key column).
 In normal usage, the value of such columns should NOT be included at
 all in the call to C<find_or_new>, even when set to C<undef>.
+
+=head2 find_or_new_async
+
+  my $future = $rs->find_or_new_async(\%col_data, { key => $unique_constraint, L<%attrs|/ATTRIBUTES> }?);
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</find_or_new>. Composed of L</find_async> (shared
+condition-resolution and lookup semantics, including the ADR 0034
+relationship-valued-key handling) and a plain, synchronous L</new_result> for
+the not-found branch. Carries C<find_async>'s own backend routing, immediate
+degrade, and croak-on-sync-instance contract; a race between the async lookup
+and any concurrent write is the same one documented for the sync method.
 
 =head2 create
 
@@ -4462,7 +6625,47 @@ Instead of hashrefs of plain related data (key/value pairs), you may
 also pass new or inserted objects. New objects (not inserted yet, see
 L</new_result>), will be inserted into their appropriate tables.
 
+A column value is a value: a plain scalar, C<undef>, an object, an arrayref
+(an array data type, always bound), explicit literal SQL (C<\'NOW()'>,
+C<< \[ 'UPPER(?)', $v ] >>), or what an inflated column type deflates. A hash
+under a relationship name is a relationship; a hash, code or glob reference
+(or a reference to a reference) under a column name is no value and throws,
+naming the column and the type.
+
 Effectively a shortcut for C<< ->new_result(\%col_data)->insert >>.
+
+Passing a request hash to C<create> is mass assignment: what ends up in the
+columns is what is checked.
+
+=over
+
+=item *
+
+A value of the hash that contradicts an equality of the resultset's own
+condition throws (C<create on a scoped resultset: 'artist' is fixed to a value
+by the condition, got another value>, naming the column and never a value);
+the same value is allowed. C<undef> is the same value as a condition
+C<IS NULL> and contradicts a defined value. This holds for a relationship
+value as well: what it resolves to is the value that is checked.
+
+=item *
+
+A column marked L<is_guarded|DBIO::ResultSource/is_guarded> takes no value from
+the hash, also when a relationship value of the hash sets it as foreign key; a
+relationship marked C<is_guarded> takes no hash of related data. The values the
+resultset's condition holds, and the foreign keys the rows created along inherit
+from their parent, are no assignment of the hash's.
+
+=item *
+
+A hash of related data is looked up with L</find> only for a C<belongs_to>
+relationship, and only when it gives every column of a unique constraint of the
+related source (see L</find>); any other related data, and every C<has_many>,
+C<might_have> and C<has_one> row, is created. Being unique is no permission to
+link a row: mark the relationship or its foreign key C<is_guarded> where a
+caller may not link existing rows.
+
+=back
 
 Example of creating a new row.
 
@@ -4520,18 +6723,21 @@ L</new>.
   $cd->cd_to_producer->find_or_create({ producer => $producer },
                                       { key => 'primary' });
 
-Tries to find a record based on its primary key or unique constraints; if none
-is found, creates one and returns that instead.
+Tries to find a record based on a unique constraint; if none is found, creates
+one and returns that instead.
+
+The lookup identifies the row: it uses the columns of the one unique constraint
+the data covers (see L</find>), the other values are the data of the row to
+create.
 
   my $cd = $schema->resultset('CD')->find_or_create({
-    cdid   => 5,
     artist => 'Massive Attack',
     title  => 'Mezzanine',
     year   => 2005,
   });
 
-Also takes an optional C<key> attribute, to search by a specific key or unique
-constraint. For example:
+When the data covers several unique constraints, the C<key> attribute names the
+one to look up; when it covers none, the method throws. For example:
 
   my $cd = $schema->resultset('CD')->find_or_create(
     {
@@ -4541,9 +6747,8 @@ constraint. For example:
     { key => 'cd_artist_title' }
   );
 
-B<Note>: Make sure to read the documentation of L</find> and understand the
-significance of the C<key> attribute, as its lack may skew your search, and
-subsequently result in spurious row creation.
+B<Note>: L</find> describes what a condition has to cover and what the C<key>
+attribute names.
 
 B<Note>: Because find_or_create() reads from the database and then
 possibly inserts based on the result, this method is subject to a race
@@ -4566,7 +6771,6 @@ to call L<DBIO::Row/insert> to save the newly created row to the
 database!
 
   my $cd = $schema->resultset('CD')->find_or_new({
-    cdid   => 5,
     artist => 'Massive Attack',
     title  => 'Mezzanine',
     year   => 2005,
@@ -4576,6 +6780,21 @@ database!
       # do some stuff
       $cd->insert;
   }
+
+=head2 find_or_create_async
+
+  my $future = $rs->find_or_create_async(\%col_data, { key => $unique_constraint, L<%attrs|/ATTRIBUTES> }?);
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</find_or_create>. Composed of L</find_async> for the
+lookup and L</create_async> for the not-found branch; carries whichever of
+the two methods' own backend routing, immediate degrade, and
+croak-on-sync-instance contract applies. Subject to the same race as sync
+L</find_or_create> -- another process may insert between the lookup and the
+create -- so use this inside a transaction if that matters: on a resultset
+bound to the transaction's context with L</with_context>. A create that fails
+there fails the whole transaction, also when the failure is caught -- catching
+it and looking the row up again does not save the transaction.
 
 =head2 update_or_create
 
@@ -4591,6 +6810,12 @@ database!
 
 Like L</find_or_create>, but if a row is found it is immediately updated via
 C<< $found_row->update (\%col_data) >>.
+
+The lookup identifies the row: it uses the columns of the one unique constraint
+the data covers (see L</find>), or of the constraint named by C<key>; the other
+values are the data the found row is updated with or the new row is created
+with. When the data covers several unique constraints, C<key> names the one to
+look up; when it covers none, the method throws.
 
 Takes an optional C<key> attribute to search on a specific unique constraint.
 For example:
@@ -4612,25 +6837,33 @@ For example:
     key => 'primary',
   });
 
-If C<%col_data> mixes plain columns of this table with a nested related
-sub-structure keyed on a relationship name (the DWIM shape
-C<< { some_col => $x, some_relation => { ... } } >>), C<update_or_create>
-splits them automatically: the main row is found-or-updated (or created)
-from the plain columns, and each related sub-structure is then applied via
-its own C<update_or_create> on the corresponding related resultset. Only
-relationships that cannot be reduced to a plain foreign-key condition on this
-table are split out this way (a C<has_many> / C<has_one> / C<might_have>, or a
-C<belongs_to> whose value is not a resolvable foreign key); a C<belongs_to>
-supplied as a resolvable foreign key still folds into the main search as
-before. The C<key> attribute constrains only the main-table lookup and is not
-propagated to the related resultsets. When any relation is split out, the whole
-operation runs inside a transaction, mirroring the multi-create behaviour of
-L<DBIO::ResultSet/create>. This removes the need for the manual
-find-then-C<< ->relation->update_or_create >> workaround.
+If C<%col_data> mixes plain columns of this table with a value keyed on a
+relationship name (C<< { some_col => $x, some_relation => \%data } >>), the row
+is looked up using the plain columns plus any C<belongs_to> that reduces to a
+concrete foreign-key condition on this table. A relation that does not so reduce
+(a C<has_many> / C<has_one> / C<might_have> sub-structure, or a C<belongs_to>
+whose value is not a resolvable foreign key) is omitted from the lookup, so that
+find() is never handed a condition that would clobber a key column with an undef
+foreign key. The FULL C<%col_data>, relation keys included, is then passed to
+C<< $found_row->update >> or C<< $new_row->insert >>. How those relation keys
+are treated from there is the row layer's responsibility: a resolvable
+C<belongs_to> is folded into this row's own foreign-key columns, whereas a
+nested C<has_many> / C<might_have> sub-structure is rejected unless the result
+class composes in a component that owns nested-relation semantics. The C<key>
+attribute constrains only the lookup.
 
-B<Note>: Make sure to read the documentation of L</find> and understand the
-significance of the C<key> attribute, as its lack may skew your search, and
-subsequently result in spurious row creation.
+B<Note>: For such a nested C<has_many> / C<might_have> sub-structure the create
+and update branches behave asymmetrically in stock DBIO. When no row is found the
+row is created and the nested rows are multi-created alongside it (the row layer's
+insert-time nested-write path), so the call succeeds; when a row is found it is
+updated via C<< $found_row->update >>, whose C<set_from_related> guard refuses the
+same sub-structure, so the call throws. This is the honest pre-0.900001 contract
+-- there is an insert-time nested-write path but as yet no update-time one -- not a
+designed feature; a row-layer seam for nested update is expected to follow (see the
+C<Changes> entry for this release).
+
+B<Note>: L</find> describes what a condition has to cover and what the C<key>
+attribute names.
 
 B<Note>: Take care when using C<update_or_create> with a table having
 columns with default values that you intend to be automatically
@@ -4646,6 +6879,429 @@ L</update_or_new> and L<DBIO::Row/in_storage> instead. Don't forget
 to call L<DBIO::Row/insert> to save the newly created row to the
 database!
 
+=head2 update_or_create_async
+
+  my $future = $rs->update_or_create_async(\%col_data, { key => $unique_constraint, L<%attrs|/ATTRIBUTES> }?);
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</update_or_create>. Reuses C<_find_lookup_cond> as-is for
+the lookup (the same relation-valued-key dropping ADR 0034 gives sync
+C<update_or_create>), then composes L</find_async> with
+L<update_async|DBIO::Row/update_async> (found)
+or L</create_async> (not found) -- the FULL, unsplit condition reaches the row
+layer via C<update_async>/C<create_async> either way, exactly like sync. No
+transaction is opened, matching current sync behaviour. Carries whichever of
+the composed methods' own backend routing, immediate degrade, and
+croak-on-sync-instance contract applies, and is subject to the same
+find/create race documented for sync L</update_or_create>.
+
+=head2 upsert
+
+=over 4
+
+=item Arguments: \%col_data, \%opts?
+
+=item Return Value: L<$result|DBIO::Manual::ResultClass> | undef | $count | ()
+
+=back
+
+  my $row = $schema->resultset('Artist')->upsert(
+    { artistid => 5, name => 'Aphex Twin', rank => 1 },
+  );
+
+A B<single-statement, server-side atomic upsert>: one C<INSERT> that carries a
+conflict clause, so the engine -- not the client -- resolves the collision.
+Unlike L</find_or_create>, L</update_or_create> and
+L<DBIO::Row/insert_or_update>, which read and then write and are therefore
+subject to a time-of-check/time-of-use race, C<upsert> has no window between
+the two.
+
+C<upsert> is only available on engines whose driver declares the
+C<supports_upsert> capability (PostgreSQL / SQLite C<ON CONFLICT>,
+MySQL C<ON DUPLICATE KEY UPDATE>). On any other engine it B<throws>; it never
+degrades silently to a client-side two-step. See L</Unsupported engines> below.
+
+C<\%col_data> may also carry B<nested relationship data>, in which case
+C<upsert> upserts the parts too -- see L</Cascading upsert>. The batch name
+C<upsert_all> is reserved and not implemented.
+
+=head3 Options
+
+=over 4
+
+=item C<key> / C<conflict_target>
+
+Which unique constraint the statement conflicts on. C<key> names a unique
+constraint declared with L<DBIO::ResultSource/add_unique_constraint>, exactly as
+L</find> uses it. C<conflict_target> names the columns directly: an arrayref, a
+single column name, or the string C<'any'>.
+
+The two are mutually exclusive -- passing both throws.
+
+C<key> works on every supporting engine, including those whose conflict-clause
+grammar knows a column list only: the constraint name I<and> its resolved
+columns are both handed to the driver, which picks whichever its grammar takes.
+
+C<< conflict_target => 'any' >> is the engine-native "whichever unique
+constraint collides" of MySQL's C<ON DUPLICATE KEY UPDATE>. It is a legitimate
+want but not a portable one: PostgreSQL and SQLite require a target for
+C<DO UPDATE> and will reject it (C<< on_conflict => 'nothing' >> works
+everywhere, see below).
+
+When neither option is given the B<primary key> is the target, but only if
+C<\%col_data> supplies every primary key column. If it does not -- or the
+source has no primary key at all -- C<upsert> throws. With an unsupplied
+auto-increment key the statement could never collide, so the upsert would
+silently degenerate into a plain C<INSERT>: a call that does nothing, with no
+error to show for it. C<upsert> deliberately does B<not> fall back to a lone
+unique constraint; with no primary key, name the target.
+
+=item C<on_conflict>
+
+C<'update'> (the default) or C<'nothing'>.
+
+=item C<update>
+
+Which columns the conflict branch writes. By default every supplied column that
+is not part of the conflict target and not a primary key column is set to the
+value that was attempted to be inserted (the engine's C<EXCLUDED.col> /
+C<VALUES(col)> -- core stays abstract, the driver renders the token).
+
+  update => [qw/ score seen_at /]                      # restrict to these
+  update => { count => \'count + 1', seen_at => \'NOW()' }   # expressions
+
+The arrayref form restricts the default set; every listed column must be among
+the inserted values. The hashref form B<replaces> the set: values are used
+verbatim, so a literal C<\'count + 1'> passes straight through to the engine.
+
+=item C<update_where>
+
+A condition on the conflict branch: the engine performs the update only where
+it holds and leaves the stored row untouched otherwise. This is what makes the
+last-write-wins guard -- "insert, or update only if the incoming row is newer"
+-- expressible in a single statement, instead of choosing between overwriting
+newer data and giving up atomicity:
+
+  $rs->upsert(
+    { id => 5, payload => $blob, updated_at => $ts },
+    { update_where => { updated_at => { '<' => { -attempted => 'updated_at' } } } },
+  );
+
+It is the C<WHERE> of the C<DO UPDATE> branch, not a search condition on the
+resultset -- the resultset's own condition is folded into the inserted values
+the way L</create> folds it in, and a second plain C<where> at the call site
+would be indistinguishable from it. Hence the name.
+
+The interesting conditions compare the two rows the statement knows about, and
+both are sayable without engine tokens:
+
+=over 4
+
+=item *
+
+an B<unqualified column> is the B<stored> row -- the row the statement collided
+with.
+
+=item *
+
+C<< { -attempted => $column } >> is the value the statement B<tried to insert>.
+That is the same engine-neutral marker the C<update> set uses; the driver
+renders it as its excluded-row reference (C<EXCLUDED.col> on PostgreSQL and
+SQLite), and it may appear anywhere in the condition.
+
+=back
+
+A literal is the escape hatch for what the abstract form cannot say:
+C<< \'excluded.updated_at > artist.updated_at' >> or C<< \[ $sql, @bind ] >>
+passes through verbatim -- and is engine-specific by construction, which is
+the honest trade for writing engine SQL by hand.
+
+Core validates the shape and nothing else, exactly as L</search> does not look
+inside its C<\%cond>: a column that does not exist is an error from the engine,
+not from C<upsert>.
+
+Needs the C<supports_upsert_where> capability on top of C<supports_upsert>, and
+throws without it. A driver that does not render the condition would emit a
+valid unconditional C<UPDATE> -- the very overwrite the option exists to
+prevent -- so the driver has to declare that it renders one before core sends
+one. MySQL cannot: C<ON DUPLICATE KEY UPDATE> has no C<WHERE>, and a per-column
+C<IF()> does not suppress the write.
+
+Refused up front together with C<< on_conflict => 'nothing' >> (no update
+branch to condition), C<< result => 'row_or_die' >> (a condition that does not
+hold writes no row, so no row can be guaranteed) and C<fallback>
+(L</update_or_create> writes unconditionally).
+
+=item C<result>
+
+What the call returns. See L</Return shapes>.
+
+=item C<fallback>
+
+C<< fallback => 'update_or_create' >> -- explicitly accept the client-side race
+for this one call on an engine that has no atomic upsert. Per call only; there
+is deliberately no schema- or storage-level default, because a global switch is
+exactly the lever that would re-enable the race application-wide, including
+inside libraries that never asked for it.
+
+=item C<relations>
+
+The per-relation conflict targets for a cascade. See L</Cascading upsert>.
+
+=back
+
+=head3 Return shapes
+
+  result => ...   returns
+
+=over 4
+
+=item C<'row_or_undef'> (default)
+
+A stored L<Result|DBIO::Manual::ResultClass> when the written row can be named,
+C<undef> when nothing was written or the engine could not name what it wrote.
+The first time the unnameable case is hit, a warning naming the source is
+emitted; pass C<< result => 'row_or_undef' >> explicitly to silence it.
+
+=item C<'row_or_die'>
+
+Guarantees a Result -- throws rather than hand back nothing. Refused up front in
+combination with C<< on_conflict => 'nothing' >> and with C<update_where>, both
+of which exist in order to possibly write nothing.
+
+=item C<'count'>
+
+The statement's affected-row count, as a plain number -- notably C<0>, not
+DBI's zero-but-true C<'0E0'>, so C<< if (my $n = $rs->upsert(...)) >> reads
+false when nothing was written. (C<upsert> throws on failure, so there is no
+success-versus-failure information for a zero-but-true value to carry.) The
+count itself is engine-specific. MySQL and MariaDB connect with
+C<CLIENT_FOUND_ROWS> by default (both C<DBD::mysql> and C<DBD::MariaDB>), which
+counts matched rows: an insert reports 1, an update that changes the row 2, and
+an update that leaves it unchanged still 1 -- as does C<< on_conflict =>
+'nothing' >>, whether it inserted or skipped. Only a connection with that flag
+switched off reports 0 for the unchanged cases.
+
+=item C<'void'>
+
+Returns nothing and spends nothing obtaining it: no C<RETURNING> tail, no
+C<last_insert_id>, no follow-up C<SELECT> -- one round-trip.
+
+Literally nothing: the empty list, not C<undef>. In list context it therefore
+contributes no element at all, which silently eats an argument --
+C<< is $rs->upsert(\%data, { result => 'void' }), undef, 'name' >> becomes
+C<< is(undef, 'name') >>. Call it in void or scalar context.
+
+=back
+
+There is no plain C<'row'>: not every engine can name the row it just wrote, and
+every value in this set says what happens in that case.
+
+B<Portable code passes C<result> explicitly.> The default is uniform across
+engines in I<type>, but what an engine can prove differs; stating the shape you
+need turns an engine difference into either a Result or a clear exception at the
+call site instead of a silent C<undef>.
+
+The returned Result carries the columns you supplied plus whatever the engine
+handed back (primary key, C<retrieve_on_insert> columns) -- like L</create>, it
+is not a re-read of the stored row, so columns the statement did not touch are
+not populated from the database.
+
+C<< on_conflict => 'nothing' >> with C<row_or_undef> returns C<undef> when the
+row was already there: C<DO NOTHING> makes C<RETURNING> yield zero rows, which
+is the legitimate outcome rather than a failure -- and, unlike the unnameable
+case above, it is not warned about: nothing was written, so no identity is
+missing. On an engine without C<RETURNING> the identity comes from
+C<last_insert_id>, which cannot distinguish "skipped" from "inserted". The
+affected-row count does not reliably either: it tells them apart only where the
+engine counts changed rows (on MySQL and MariaDB, only with C<CLIENT_FOUND_ROWS>
+switched off -- see C<'count'> above).
+
+=head3 Cascading upsert
+
+  my $cd = $schema->resultset('CD')->upsert(
+    {
+      title  => 'Bad',
+      year   => 1987,
+      artist => { name => 'Michael Jackson' },        # belongs_to
+      tracks => [ { position => 1, title => 'Bad' },  # has_many
+                  { position => 2, title => 'Speed Demon' } ],
+    },
+    {
+      conflict_target => [qw/ artist title /],
+      relations => {
+        artist => { key => 'artist_name' },
+        tracks => { conflict_target => [qw/ cd position /] },
+      },
+    },
+  );
+
+When C<\%col_data> nests relationship data, C<upsert> writes the parts as well.
+What that buys you, in exactly these words and not a word more:
+
+B<N atomic upserts, in dependency order, inside one transaction -- all-or-nothing,
+and every part individually free of the read-then-write race.>
+
+No engine has a multi-table upsert, so a cascade is inherently more than one
+statement; this is B<not> "an atomic upsert". It is strictly stronger than the
+L</update_or_create> cascade, which has to guess at every part, and strictly
+weaker than a single statement.
+
+=over 4
+
+=item Order
+
+C<belongs_to> parts are written B<before> the row -- their key becomes its
+foreign key. C<has_many> and C<might_have> parts are written B<after> it -- its
+key becomes theirs. This is the same dependency split
+L<DBIO::Row/insert> performs for multi-create, and the same
+metadata decides it, so a relationship that multi-creates in one order
+cascades in that order too. Parts of the same kind run in relationship-name
+order.
+
+=item Targets, per relation, never inferred
+
+C<relations> mirrors the nested data: one entry per nested relationship,
+holding C<key> or C<conflict_target> (mutually exclusive) and, for data nested
+deeper, its own C<relations>. Naming a relationship that has no nested data
+throws rather than doing nothing.
+
+C<on_conflict>, C<update>, C<update_where> and C<result> are decisions about
+the whole call and have no per-relation form.
+
+The three-way default rule from L</Options> applies B<per part>: a part whose
+data does not supply the related source's primary key, and which has no target
+of its own, throws. A foreign key the part will be I<handed> -- by its parent,
+or by a part written before it -- counts as supplied.
+
+=item Identity is a precondition, not a nicety
+
+Setting a child's foreign key needs the key of the parent part just written, so
+every part something depends on must be nameable in the sense of
+L</Return shapes>: it is upserted as C<row_or_die> whatever you asked to get
+back. A shape in which the written row cannot be named -- a source with no
+primary key, C<< conflict_target => 'any' >>, C<< on_conflict => 'nothing' >>
+or C<update_where> on a row that children hang off -- makes the cascade
+impossible and B<throws>. A conditional update on a row nothing depends on is
+fine: it may write nothing and hand back C<undef>, exactly as it does flat.
+
+All of that follows from schema metadata and the options, so it is checked
+B<before the first statement runs>: an impossible cascade fails on the first
+call in development, not data-dependently in production. What core cannot see
+statically is whether a given engine can name the row for a given table shape
+(MySQL's is the one that cannot always) -- that surfaces as the part's own
+C<row_or_die> exception, inside the rolled-back transaction.
+
+=item C<result> is restricted
+
+Only C<row_or_undef> and C<row_or_die>; C<count> and C<void> throw at
+option-validation time. A count across a cascade has no defined meaning, and
+C<void> would withhold the identity the cascade structurally needs. The return
+value is the B<top-level Result only> -- related rows are not collected, just
+as L</create> with nested data does not hand them back. With C<has_many> or
+C<might_have> parts the top-level row is written as C<row_or_die> regardless,
+because the children need its key.
+
+Leaf parts nobody depends on are written with C<< result => 'void' >>: one
+round-trip, no identity work spent on a row that is not handed back.
+
+=item One transaction
+
+The cascade wraps itself in a L<txn_scope_guard|DBIO::Storage::TxnScopeGuard>.
+If the caller is B<already inside a transaction it joins it>, so a failing
+cascade rolls the caller's outer work back too. There is deliberately no
+savepoint magic here: a caller who wants the cascade isolated from surrounding
+work opens their own savepoint.
+
+=item C<has_many> upserts the listed children and B<never deletes> the others
+
+Children not in the list are left untouched. "Replace the set" is
+C<< set_$rel >> semantics and something else entirely; implicit deletion would
+be the nastiest surprise this API could offer.
+
+=item C<many_to_many> throws
+
+It would mean writing bridge rows, which reopens the deletion question above
+for the link table. Nest the bridge relationship itself, or use
+C<< set_$rel >>.
+
+=item Result objects in the data throw
+
+A nested part is a hashref of columns. An existing Result object does not say
+whether you want it written or only linked, and guessing is the DWIM this API
+exists to avoid -- pass C<< { $row->get_columns } >>, or set the foreign key
+yourself.
+
+=item C<fallback> cannot express a cascade
+
+L</update_or_create> takes one named constraint for the top-level row and
+nothing at all for the parts, so a fallback cascade would look every part up by
+L</find>'s heuristics -- a different row than the atomic path writes. The
+combination throws.
+
+=back
+
+=head3 Unsupported engines
+
+  $rs->result_source->storage->_use_supports_upsert
+    ? $rs->upsert(\%data, \%opts)
+    : $rs->update_or_create(\%data);   # racy, and visible at the call site
+
+is the capability-based branch for portable library code -- no driver-name
+string match anywhere. Alternatively, C<< fallback => 'update_or_create' >>
+folds the same branch into the call. On the fallback path the return mapping is
+kept identical so the same call never changes I<type> per engine:
+C<row_or_undef> / C<row_or_die> hand back the Result C<update_or_create>
+produced, C<void> discards it, and C<'count'> returns a synthetic C<1> --
+B<not> a real affected-rows figure, since no single statement ran. No warning is
+emitted when the fallback engages: it was explicitly requested.
+
+The fallback looks the row up by the same constraint the atomic statement would
+have conflicted on -- C<key> if given, otherwise the primary key.
+C<conflict_target> cannot be expressed that way (L</update_or_create> takes a
+constraint I<name>, never a column list), so combining the two throws and the
+message points at C<< key => $constraint >>.
+
+Because the fallback always writes every supplied column, it likewise cannot
+honour C<< on_conflict => 'nothing' >> or a restricted C<update> set. All three
+combinations throw at option-validation time, on every engine, rather than
+drifting semantically on the one engine where the fallback engages.
+
+See ADR 0036 for the full decision record.
+
+=head2 upsert_async
+
+  my $future = $rs->upsert_async(\%col_data, \%opts?);
+  $future->then(sub { my $row_or_count_or_undef = shift; ... });
+
+Async variant of L</upsert>. Shares every validation rule, conflict-target
+resolution and capability gate with the synchronous method verbatim (both
+route through the private C<_upsert_prepare>, so the two cannot drift) -- an
+invalid call is invalid on both, identically.
+
+The single-statement, C<row_or_undef>/C<row_or_die> case is genuinely
+non-blocking: the write is routed through the backend's C<insert_async> and
+the result is inflated in the Future's C<then>, exactly like L</create_async>.
+Two shapes cannot be: nested relationship data is a multi-statement
+transactional cascade (C<_upsert_cascade>), and C<< fallback =>
+'update_or_create' >> is itself a client-side two-step -- neither is a single
+C<insert_async>. C<< result => 'count' >> also cannot: the affected-row count
+sync reads off a storage-specific side channel that the generic async insert
+path does not populate (see L<DBIO::Storage::Async/insert_async> -- it
+resolves the returned-columns hashref, never a count). On an unbound resultset
+all three run the synchronous L</upsert> -- blocking, on the owning storage's own
+connection, not on a pooled one -- and return a settled Future --
+resolved with its result, or failed with what it threw -- the same precedent
+L</create_async> sets for related-object multi-create (ADR 0030/0031). On a
+resultset bound with L</with_context> all three throw C<upsert_async cannot run
+on a bound async context> instead -- an exception out of C<upsert_async>, not
+a failed Future -- since the synchronous fallback would run outside the pinned
+transaction or pipeline (ADR 0045).
+
+Requires an async connection; on a sync instance it croaks, and in the
+C<immediate> mode it degrades to a synchronous L</upsert> wrapped in an
+immediately-resolved Future. See ADR 0036 for the option contract.
+
 =head2 update_or_new
 
 =over 4
@@ -4660,6 +7316,9 @@ database!
 
 Like L</find_or_new> but if a row is found it is immediately updated via
 C<< $found_row->update (\%col_data) >>.
+
+The lookup identifies the row, as for L</update_or_create>: the columns of the
+one unique constraint the data covers, or of the constraint named by C<key>.
 
 For example:
 
@@ -4681,9 +7340,8 @@ For example:
       $cd->insert;
   }
 
-B<Note>: Make sure to read the documentation of L</find> and understand the
-significance of the C<key> attribute, as its lack may skew your search, and
-subsequently result in spurious new objects.
+B<Note>: L</find> describes what a condition has to cover and what the C<key>
+attribute names.
 
 B<Note>: Take care when using C<update_or_new> with a table having
 columns with default values that you intend to be automatically
@@ -4692,6 +7350,18 @@ In normal usage, the value of such columns should NOT be included at
 all in the call to C<update_or_new>, even when set to C<undef>.
 
 See also L</find>, L</find_or_create> and L</find_or_new>.
+
+=head2 update_or_new_async
+
+  my $future = $rs->update_or_new_async(\%col_data, { key => $unique_constraint, L<%attrs|/ATTRIBUTES> }?);
+  $future->then(sub { my $row = shift; ... });
+
+Async variant of L</update_or_new>. Composed of L</find_async> (looking up by
+the columns of the covered unique constraint, exactly like sync) and
+L<update_async|DBIO::Row/update_async> for the found
+branch, or a plain, synchronous L</new_result> for the not-found branch.
+Carries the composed methods' own backend routing, immediate degrade, and
+croak-on-sync-instance contract.
 
 =head2 get_cache
 
@@ -4833,8 +7503,7 @@ it were simply where-filtered without joins).  For example:
  my $ok_rs = $rs->search({'x.other' => 1});
 
  # But this doesn't: instead of finding a 'Bar' related to two x rows (abc and
- # def) we look for one row with contradictory terms and join in another table
- # (aliased 'x_2') which we never use
+ # def) we look for one row with contradictory terms
  my $broken_rs = $rs->search({'x.name' => 'def'});
 
  my $rs2 = $rs->as_subselect_rs;
@@ -4842,8 +7511,10 @@ it were simply where-filtered without joins).  For example:
  # doesn't work - 'x' is no longer accessible in $rs2, having been sealed away
  my $not_joined_rs = $rs2->search({'x.other' => 1});
 
- # works as expected: finds a 'table' row related to two x rows (abc and def)
- my $correctly_joined_rs = $rs2->search({'x.name' => 'def'});
+ # works as expected: finds a 'Bar' row related to two x rows (abc and def).
+ # The join has to be named: one is not inferred from the condition once the
+ # FROM is a subquery
+ my $correctly_joined_rs = $rs2->search({'x.name' => 'def'}, { join => 'x' });
 
 Another example of when one might use this would be to select a subset of
 columns in a group by clause:
@@ -4856,6 +7527,264 @@ columns in a group by clause:
 
 In the above example normally columns would have to be equal to the group by,
 but because we isolated the group by into a subselect the above works.
+
+=head2 STORABLE_thaw
+
+The L<Storable> hook that restores a frozen resultset. Thaw only data of
+your own, from a source you trust -- Storable creates objects of whatever
+class the data names. The result source inside is resolved and checked by
+L<DBIO::ResultSource/STORABLE_thaw>.
+
+=head1 EXAMPLES
+
+=head2 Chaining resultsets
+
+Let's say you've got a query that needs to be run to return some data
+to the user. But, you have an authorization system in place that
+prevents certain users from seeing certain information. So, you want
+to construct the basic query in one method, but add constraints to it in
+another.
+
+  sub get_data {
+    my $self = shift;
+    my $request = $self->get_request; # Get a request object somehow.
+    my $schema = $self->result_source->schema;
+
+    my $cd_rs = $schema->resultset('CD')->search({
+      title => $request->param('title'),
+      year => $request->param('year'),
+    });
+
+    $cd_rs = $self->apply_security_policy( $cd_rs );
+
+    return $cd_rs->all();
+  }
+
+  sub apply_security_policy {
+    my $self = shift;
+    my ($rs) = @_;
+
+    return $rs->search({
+      subversive => 0,
+    });
+  }
+
+=head3 Resolving conditions and attributes
+
+When a resultset is chained from another resultset (e.g.:
+C<< my $new_rs = $old_rs->search(\%extra_cond, \%attrs) >>), conditions
+and attributes with the same keys need resolving.
+
+If any of L</columns>, L</select>, L</as> are present, they reset the
+original selection, and start the selection "clean".
+
+The L</join>, L</prefetch>, L</+columns>, L</+select>, L</+as> attributes
+are merged into the existing ones from the original resultset.
+
+The L</where> and L</having> attributes, and any search conditions, are
+merged with an SQL C<AND> to the existing condition from the original
+resultset.
+
+All other attributes are overridden by any new ones supplied in the
+search attributes.
+
+=head2 Multiple queries
+
+Since a resultset just defines a query, you can do all sorts of
+things with it with the same object.
+
+  # Don't hit the DB yet.
+  my $cd_rs = $schema->resultset('CD')->search({
+    title => 'something',
+    year => 2009,
+  });
+
+  # Each of these hits the DB individually.
+  my $count = $cd_rs->count;
+  my $most_recent = $cd_rs->get_column('date_released')->max();
+  my @records = $cd_rs->all;
+
+And it's not just limited to SELECT statements.
+
+  $cd_rs->delete();   # "... WHERE title = 'something' AND year = 2009"
+
+This is even cooler:
+
+  $cd_rs->create({ artist => 'Fred' });
+
+Which is the same as:
+
+  $schema->resultset('CD')->create({
+    title => 'something',
+    year => 2009,
+    artist => 'Fred'
+  });
+
+See: L</search>, L</count>, L</get_column>, L</all>, L</create>.
+
+=head2 Custom ResultSet classes
+
+To add methods to your resultsets, you can subclass L<DBIO::ResultSet>, similar to:
+
+  package MyApp::Schema::ResultSet::User;
+
+  use strict;
+  use warnings;
+
+  use base 'DBIO::ResultSet';
+
+  sub active {
+    my $self = shift;
+    $self->search({ $self->current_source_alias . '.active' => 1 });
+  }
+
+  sub unverified {
+    my $self = shift;
+    $self->search({ $self->current_source_alias . '.verified' => 0 });
+  }
+
+  sub created_n_days_ago {
+    my ($self, $days_ago) = @_;
+    $self->search({
+      $self->current_source_alias . '.create_date' => {
+        '<=',
+      $self->result_source->schema->storage->datetime_parser->format_datetime(
+        DateTime->now( time_zone => 'UTC' )->subtract( days => $days_ago )
+      )}
+    });
+  }
+
+  sub users_to_warn { shift->active->unverified->created_n_days_ago(7) }
+
+  1;
+
+A method that ends in L</search> hands its caller's context on to it, and
+L</search> throws in list context (ADR 0042). End the method in L</search_rs>
+if it is to be called there, as in C<< [ $rs->active, $rs->unverified ] >>.
+
+See L<DBIO::Schema/load_namespaces> on how DBIO can discover and
+automatically attach L<Result|DBIO::Manual::ResultClass>-specific
+L<ResulSet|DBIO::ResultSet> classes.
+
+=head3 ResultSet subclassing with custom constructors
+
+DBIO does not require Moose, Moo, or any other constructor layer for custom
+ResultSet classes. A plain subclass of L<DBIO::ResultSet> is usually enough.
+
+If you do use an external constructor provider, you must adapt its constructor
+to DBIO's C<< ->new($source, \%args) >> calling convention.
+
+In order to write custom ResultSet classes with L<Moo> you need to use the
+following template. The L<BUILDARGS|Moo/BUILDARGS> is necessary due to the
+unusual signature of the L<constructor provided by DBIO
+|DBIO::ResultSet/new> C<< ->new($source, \%args) >>.
+
+  use Moo;
+  extends 'DBIO::ResultSet';
+  sub BUILDARGS { $_[2] || {} } # ::RS::new() expects my ($class, $rsrc, $args) = @_
+
+  ...your code...
+
+  1;
+
+If you want to build your custom ResultSet classes with L<Moose>, you need
+a similar, though a little more elaborate template in order to interface the
+inlining of the L<Moose>-provided
+L<object constructor|Moose::Manual::Construction/WHERE'S THE CONSTRUCTOR?>,
+with the DBIO one.
+
+  package MyApp::Schema::ResultSet::User;
+
+  use Moose;
+  use MooseX::NonMoose;
+  extends 'DBIO::ResultSet';
+
+  sub BUILDARGS { $_[2] || {} } # ::RS::new() expects my ($class, $rsrc, $args) = @_
+
+  ...your code...
+
+  __PACKAGE__->meta->make_immutable;
+
+  1;
+
+The L<MooseX::NonMoose> is necessary so that the L<Moose> constructor does not
+entirely overwrite the DBIO one (in contrast L<Moo> does this automatically).
+Alternatively, you can skip L<MooseX::NonMoose> and get by with just L<Moose>
+instead by doing:
+
+  __PACKAGE__->meta->make_immutable(inline_constructor => 0);
+
+=head1 ASYNC
+
+An async mode is chosen B<per connection> (ADR 0030), not by naming a storage
+class -- C<< MyApp::Schema->connect($dsn, $user, $pass, { async => 'future_io' }) >>
+(or C<'ev'>, C<'immediate'>, C<'forked'> -- see L<DBIO::Storage::Async>). With
+a mode that has a backend behind it, the C<*_async> methods below are genuinely
+non-blocking on that connection, not a synchronous call wrapped in a resolved
+Future (ADR 0031). The C<'immediate'> mode has no backend and is that wrapper
+(see the dispatch contract below), and a few operations that do not go out as
+one async statement run synchronously in every mode -- L</create_async> and
+L</upsert_async> name them.
+
+A runtime failure arrives as a failed Future: an error while the pooled
+backend is resolved or the statement is built (the connection cannot be made,
+say) fails the Future the call returns, with the message as thrown. Misuse is
+an exception at the call: a connection without an async mode, a resultset
+bound to a context that is expired or not its own (L</with_context>), and
+arguments the call refuses (an unknown option, no data, a capability the
+storage does not declare, as with L</upsert_async>).
+
+The full C<*_async> surface on a ResultSet is:
+
+=over 4
+
+=item * Reads: L</all_async>, L</first_async>, L</single_async>, L</count_async>, L</count_literal_async>, L</find_async>, L</results_exist_async>
+
+=item * Writes: L</create_async>, L</find_or_create_async>, L</update_or_create_async>, L</upsert_async>
+
+=item * Composite finders (may or may not write): L</find_or_new_async>, L</update_or_new_async>
+
+=back
+
+C<find_async> is worth calling out on its own: it is not simply C<single_async>
+wrapped in a Future. It shares C<find>'s own unique-constraint-narrowed,
+relationship-key-aware condition resolution, so a relationship-valued key
+resolves to a concrete foreign-key value exactly as sync C<find> does, and a
+relation that cannot resolve to one is a safe miss -- C<undef>, no query issued
+at all (ADR 0034). C<single_async>, like sync C<single>, takes its condition raw
+with no such resolution; reach for C<find_async> when you want C<find>'s lookup
+semantics, C<single_async> only where you would also reach for plain C<single>.
+
+ResultSet's other write/helper methods (C<update>, C<update_all>, C<delete>,
+C<delete_all>, C<populate>) have no async twin. Row by row, use
+L<DBIO::Row/update_async> and L<DBIO::Row/delete_async>.
+
+Every C<*_async> method shares one three-way dispatch contract:
+
+=over 4
+
+=item * a live embedded async backend
+
+The read/write is routed through the storage's own C<*_async> operation and
+the raw result is inflated (with full prefetch/collapse parity to the
+synchronous method) in the returned L<DBIO::Future>'s C<then>. Genuinely
+non-blocking.
+
+=item * the C<immediate> mode (an async mode is chosen, but no event-loop backend)
+
+The ordinary synchronous method runs in-process and its result is wrapped in
+an already-resolved Future via L<DBIO::Storage/future_class>.
+
+=item * a plain synchronous connection (no async mode chosen at C<connect>)
+
+Croaks: C<< "not an async connection -- connect with { async => ... } to use
+${name}_async" >>. There is no silent degrade.
+
+=back
+
+See F<t/resultset/async_backend.t> and F<t/resultset/find_async.t> for
+runnable examples of all of the above against a mock async backend (no event
+loop, no real database).
 
 =head2 throw_exception
 
@@ -4872,15 +7801,82 @@ appended to the alias.
 
 =head2 order_by
 
+ $rs->order_by('col1')                    # col1 ASC
+ $rs->order_by('!col1')                   # col1 DESC
+ $rs->order_by('col1,!col2')              # col1 ASC, col2 DESC
+ $rs->order_by(qw(col1 !col2))            # same
+ $rs->order_by(-desc => 'col1')           # col1 DESC
+ $rs->order_by(-asc => 'col1,col2')       # col1 ASC, col2 ASC
+ $rs->order_by(-desc => [qw(col1 col2)])  # col1 DESC, col2 DESC
  $rs->order_by({ -desc => 'col' })
- $rs->order_by('col1')
- $rs->order_by('!col1')          # DESC
- $rs->order_by('col1,!col2')     # col1 ASC, col2 DESC
- $rs->order_by(qw(col1 !col2))   # same
+ $rs->order_by({ -desc => 'col', -nulls => 'last' })  # col DESC NULLS LAST
+ $rs->order_by(\'name DESC')
+ $rs->order_by('col1', -desc => 'col2', { -asc => 'col3' })
 
-Shortcut for C<< ->search(undef, { order_by => ... }) >>. Supports
-"magic string" syntax where C<!> prefix means DESC and commas separate
-multiple columns.
+Shortcut for C<< ->search(undef, { order_by => ... }) >>.
+
+Takes a flat argument list whose elements may appear in any order and in
+any mixture; the resulting order of the C<ORDER BY> clauses always follows
+the order of the arguments. Accepted forms:
+
+=over 4
+
+=item * Magic strings
+
+A bare string is a "magic string": a C<!> prefix means DESC (otherwise
+ASC), and commas separate multiple columns, so C<'a,!b'> means C<a ASC, b
+DESC>.
+
+=item * Flat direction pairs
+
+C<< -asc => $value >> and C<< -desc => $value >> set the direction for
+C<$value> explicitly. C<$value> may be a single column, a comma separated
+list of columns (each of them gets the given direction), or an arrayref of
+either (one clause per element). The direction token is recognised strictly
+as C<-asc> / C<-desc> with a leading dash, so a real column named C<desc>
+is still treated as a column. A direction without a following value (or with
+an undefined one) throws an exception. A C<$value> that is a ref other than
+an arrayref is given the direction but is otherwise left untouched, so
+C<< -desc => \'LENGTH(name)' >> orders by the literal descending.
+
+=item * Refs, at any position
+
+A ref means "the caller speaks native L<SQL::Abstract>" and is passed on
+untouched: hashrefs are taken over as-is, literals (C<< \'name DESC' >> and
+C<< \['name = ? DESC', $bind] >>) are handed through verbatim. An arrayref is
+flattened one level, so that arguments following it append after its
+contents, but its elements are B<not> parsed either - no magic string, no
+qualification, no direction detection inside a ref.
+
+=item * Position of NULLs
+
+A hashref may carry C<-nulls> beside the direction, C<'first'> or C<'last'>,
+and the clause renders as C<col DESC NULLS LAST>. It is kept through every
+limit dialect, so it holds with C<rows>/C<offset> and with prefetch as well:
+
+ $rs->order_by({ -desc => 'me.col', -nulls => 'last' })
+
+=back
+
+B<Qualification rule>: only what this method parses itself gets qualified
+with the current source alias, and that is exactly two things - magic strings
+at the top level, and the column names of top level C<-asc>/C<-desc> pairs
+(in both cases only when they do not already contain a dot, so C<'rel.col'>
+is left alone). Every ref at the top level belongs to L<SQL::Abstract> and is
+never touched, its elements included. Note the deliberate asymmetry: an
+arrayref I<as an argument> is native syntax and stays unqualified, while an
+arrayref as the I<value of a direction pair> is this method's own sugar and
+is qualified:
+
+ $rs->order_by([qw(a b)])       # ORDER BY a, b
+ $rs->order_by(-asc => [qw(a b)])  # ORDER BY me.a ASC, me.b ASC
+
+The pass-through is the escape hatch for ordering by an output alias
+introduced via C<+select>/C<-as>: pass it inside a ref and no C<me.> prefix
+is added.
+
+A single argument that is a ref is handed to the C<order_by> attribute
+verbatim rather than inside a list; the resulting SQL is the same either way.
 
 =head2 columns
 
@@ -4912,6 +7908,83 @@ Shortcut for C<< ->search(undef, { distinct => 1 }) >>.
  $rs->group_by([qw/ col1 col2 /])
 
 Shortcut for C<< ->search(undef, { group_by => ... }) >>.
+
+=head2 where
+
+ $rs->where(col1 => 'value')          # flat list -> { col1 => 'value' }
+ $rs->where({ -or => [ ... ] })       # single ref passed through verbatim
+ $rs->where([ { a => 1 }, { b => 2 } ])
+ $rs->where(\'raw sql')
+ $rs->where()                         # no-op clone
+ $rs->where('a')                      # throws: odd number of elements
+
+Condition-only chaining shortcut for L</search_rs>: always returns a new
+L<DBIO::ResultSet>, in every context. Takes I<either> a flat key/value list
+(which is collapsed into a condition hashref), I<or> a single condition ref
+(hashref/arrayref/literal, handed to the C<where> attribute untouched). A flat
+list with an odd number of elements throws, as does an empty one-element call
+like C<< where('a') >> -- both are unambiguous mistakes. No attributes are
+accepted here: they belong to L</order_by>, L</group_by>, L</columns>,
+L</rows> and L</offset>. Repeated C<< where() >> calls stack (AND semantics),
+exactly like repeated L</search> conditions.
+
+See ADR 0042 for the chaining contract.
+
+=head2 having
+
+ $rs->having(cnt => { '>' => 3 })     # flat list -> { cnt => { '>' => 3 } }
+ $rs->having({ cnt => { '>' => 3 } }) # single ref passed through verbatim
+
+Condition-only chaining shortcut for the C<having> search attribute, with the
+same flat-list-or-single-ref signature as L</where> (odd flat lists throw).
+Always returns a new L<DBIO::ResultSet>; repeated C<< having() >> calls stack
+like L</where>.
+
+=head2 offset
+
+ $rs->offset(20)
+
+Shortcut for C<< ->search(undef, { offset => ... }) >>. Always returns a new
+L<DBIO::ResultSet>.
+
+=head2 join
+
+ $rs->join('artist')
+
+Shortcut for C<< ->search(undef, { join => ... }) >>. Always returns a new
+L<DBIO::ResultSet>. The join type comes from the relationship's
+L<join_type|DBIO::Relationship::Base/join_type> attribute, exactly as it does
+for a plain C<< search(undef, { join => ... }) >>: C<has_many>-style
+relationships default to C<LEFT JOIN>, C<belongs_to> defaults to C<INNER
+JOIN>. There is deliberately no C<left_join> helper: the
+relationship declares the join type, and a C<belongs_to> that should join
+left does so via its own C<join_type> attribute.
+
+=head2 select
+
+ $rs->select(\@cols, [\@as])
+ $rs->select(\@cols)->as(\@aliases)
+ $rs->select('me.cdid')
+ $rs->select()                         # no-op clone
+
+Shortcut for C<< ->search(undef, { select => ..., (as => ...) }) >>. Always
+returns a new L<DBIO::ResultSet>. The select list may be an arrayref, a single
+scalar, or any other C<select> structure SQL::Abstract understands. An optional
+second argument supplies the alias list together with the select list (the
+C<select>/C<as> pair must always be given together in a single search call --
+see L</as>). Calling C<< select() >> with no arguments returns a clone without
+changing the projection -- consistent with L</where> and L</having> (ADR 0042).
+
+=head2 as
+
+ $rs->select(\@cols)->as(\@aliases)
+
+Sets the alias list for a L</select> already applied to the resultset. Always
+returns a new L<DBIO::ResultSet>. Because the C<select>/C<as> pair is
+normalized together (search_rs throws when C<as> is supplied without a
+matching C<select>), C<as()> re-applies the current C<select> alongside the
+new aliases rather than setting C<as> alone; calling it without a preceding
+L</select> throws.
 
 =head2 hri
 
@@ -4957,29 +8030,38 @@ Shortcut for C<< ->search(undef, { prefetch => ... }) >>.
 
  $rs->null('col')
  $rs->null([qw/ col1 col2 /])
+ $rs->null('.col')
 
 Search for rows where the given column(s) are NULL.
+
+A column name starting with C<.> is qualified with the ResultSet's
+L</current_source_alias>, so C<'.col'> becomes C<'me.col'>. Use it to stay
+unambiguous when a join brings in a second column of the same name.
 
 =head2 not_null
 
  $rs->not_null('col')
  $rs->not_null([qw/ col1 col2 /])
 
-Search for rows where the given column(s) are NOT NULL.
+Search for rows where the given column(s) are NOT NULL. The C<.> prefix
+described under L</null> works here too.
 
 =head2 like
 
  $rs->like('col', '%pattern%')
  $rs->like([qw/ col1 col2 /], '%pattern%')
 
-Search for rows where the given column(s) match the LIKE pattern.
+Search for rows where the given column(s) match the LIKE pattern. The C<.>
+prefix described under L</null> works here too. Anything other than a plain
+column name or an ARRAY reference of them throws.
 
 =head2 not_like
 
  $rs->not_like('col', '%pattern%')
  $rs->not_like([qw/ col1 col2 /], '%pattern%')
 
-Search for rows where the given column(s) do NOT match the LIKE pattern.
+Search for rows where the given column(s) do NOT match the LIKE pattern. Same
+C<.> prefix and same argument check as L</like>.
 
 =head2 results_exist
 
@@ -4989,6 +8071,36 @@ Search for rows where the given column(s) do NOT match the LIKE pattern.
 Uses SQL C<EXISTS> to efficiently check if the query would return any rows.
 Much lighter than C<< $rs->count >>.
 
+The statement executed is the one the storage's
+L<DBIO::Storage::DBI/_exists_value_sql> hook renders -- a complete statement
+yielding C<1> or C<0>, in the base rendering
+C<SELECT CASE WHEN EXISTS E<lt>innerE<gt> THEN 1 ELSE 0 END> -- and it is only
+issued when the storage declares the C<supports_exists_query> capability (ADR
+0037). On an engine whose driver has not declared it, this throws instead of
+sending SQL the engine may not parse; it never degrades silently to a
+different query shape. The portable alternative is L</has_rows>, which works
+everywhere:
+
+  $storage->_use_supports_exists_query ? $rs->results_exist : $rs->has_rows
+
+=head2 results_exist_async
+
+  my $future = $rs->results_exist_async
+  my $future = $rs->results_exist_async(\%cond)
+  $future->then(sub { my $bool = shift; ... });
+
+Async variant of L</results_exist>, resolving the B<identical> statement: the
+one L<DBIO::Storage::DBI/_exists_value_sql> renders. That statement is complete
+(its base form has no C<FROM> at all), so it carries no ident / select / where
+to hand to the CRUD entry points; it goes to the transport's raw-SQL seam
+C<_query_async>, the same seam L<DBIO::Storage::Async/_execute_ddl_async> uses
+for statements core has rendered itself.
+
+The capability check is a static precondition, decidable without I/O, so it
+throws B<synchronously> here rather than failing the Future -- exactly as
+C<_rs_run_async> already does for "not an async connection" (ADR 0037
+section 4).
+
 =head2 results_exist_as_query
 
  my $query = $rs->results_exist_as_query
@@ -4996,6 +8108,12 @@ Much lighter than C<< $rs->count >>.
 
 Returns a subquery reference that evaluates to a boolean via SQL C<EXISTS>.
 Useful for correlated subqueries.
+
+The fragment is the storage's own rendering (see L</results_exist>) in a pair
+of parentheses -- a parenthesised scalar subquery is universal, and that is the
+entire decoration core adds. It is gated by the same C<supports_exists_query>
+capability, and throws for the same reason: the fragment would otherwise be
+embedded in a larger query and fail far from its cause.
 
 =head2 correlate
 
@@ -5018,6 +8136,10 @@ current ResultSet, suitable for use in subqueries.
 Combine multiple ResultSet searches with OR logic. All ResultSets must
 share the same result source.
 
+The methods in the arrayref are called in list context. One that ends in
+L</search> throws there (ADR 0042); it has to return its resultset through
+L</search_rs>.
+
 =head2 union
 
  $rs1->union($rs2)
@@ -5035,6 +8157,84 @@ share the same result source.
 
 SQL set operations on ResultSets. All operands must select the same
 columns and use the same result class.
+
+All six take their keyword from the storage's
+L<DBIO::Storage::DBI/_set_operation_keyword> hook, which is asked once per
+call with the canonical operation name -- the method's own name (ADR 0039).
+The base implementation answers with the ANSI spelling of each, so nothing
+changes for an engine that has them all; C<DBIO::Oracle::Storage> answers
+C<MINUS> for L</except>. Building the query therefore needs no database
+connection.
+
+The same hook is where an engine B<refuses> an operation it does not have
+(Oracle has no C<MINUS ALL> before 21c; SQLite and SQL Server have no
+C<EXCEPT ALL> / C<INTERSECT ALL>). The keyword is resolved B<before any
+operand SQL is assembled>, so a refusing engine throws at query-build time
+and never hands back a fragment that could be embedded in a larger query --
+the same argument ADR 0037 section 4 made for
+L</results_exist_as_query>.
+
+The operands must be bound alike (ADR 0045): all of them unbound, or all of
+them bound with L</with_context> to the same context -- the same object, not an
+equal one. The result carries that binding. A mixture is refused when the
+operation is built, before any operand is rendered: an unbound resultset with a
+bound operand, a bound one with an unbound operand, and operands bound to two
+different contexts (two transactions) alike. The exception names the operation
+and the operands that differ from the one the operation is called on, which is
+operand 0:
+
+  union: the operands of a set operation must be bound alike, all unbound or
+  all to the same async context -- operand 0 (the caller) is unbound,
+  operand 2 is bound to DBIO::Storage::Async::...=HASH(0x...)
+
+The rule is about the binding alone and holds for the result's synchronous use
+as well. A statement cannot run partly inside a transaction and partly outside
+it; bind every operand to the context, or none.
+
+=head2 one_row
+
+  my $result = $rs->one_row;
+  my $result = $rs->one_row(\%cond);
+
+Returns a single result object, or C<undef> if there are none. Applies a
+C<< rows => 1 >> limit and returns L</next>, so only one row is requested from
+the database rather than the whole set being pulled into a cursor first. An
+optional search condition is applied before fetching.
+
+=head2 no_columns
+
+  my $rs = $rs->no_columns;
+
+Returns a new resultset with the column selection cleared (C<< columns => [] >>),
+as a starting point for a custom projection built up with C<+columns> or
+C<+select>.
+
+=head2 bare
+
+  my $rs = $rs->bare;
+
+Returns a fresh, unsearched resultset for the same result source, discarding
+any search conditions and attributes accumulated on the current resultset. A
+binding made with L</with_context> is neither and stays.
+
+=head2 rand
+
+  my $rs = $rs->rand;       # one random row
+  my $rs = $rs->rand($n);   # $n random rows
+
+Returns a resultset ordered by the storage's random function
+(L<DBIO::Storage::DBI/_random_function>) and limited to C<$amount> rows
+(default 1). C<$amount> must be a positive integer, otherwise an exception is
+thrown.
+
+=head2 explain
+
+  my $plan = $rs->explain;
+
+Returns the database query plan for this resultset's query. The whole operation
+is delegated to the storage's L<DBIO::Storage::DBI/_explain_query> hook; the
+return value is the plan as an arrayref of row arrayrefs, whose columns are
+engine-specific.
 
 =head1 ATTRIBUTES
 
@@ -5074,6 +8274,10 @@ for connection-agnostic specification of ordering direction:
  For explicit ascending order:
 
   order_by => { -asc => 'col' }
+
+ For a chosen position of the NULLs ('first' or 'last'):
+
+  order_by => { -desc => 'col', -nulls => 'last' }  # col DESC NULLS LAST
 
 The old scalarref syntax (i.e. order_by => \'year DESC') is still
 supported, although you are strongly encouraged to use the hashref
@@ -5121,7 +8325,7 @@ chain such that it matches existing relationships:
 Like elsewhere, literal SQL or literal values can be included by using a
 scalar reference or a literal bind value, and these values will be available
 in the result with C<get_column> (see also
-L<SQL::Abstract>/Literal SQL and value type operators>):
+L<SQL::Abstract/Literal SQL and value type operators>):
 
     # equivalent SQL: SELECT 1, 'a string', IF(my_column,?,?) ...
     # bind values: $true_value, $false_value
@@ -5159,6 +8363,23 @@ would return all CDs and include a 'name' column to the information
 passed to object inflation. Note that the 'artist' is the name of the
 column (or relationship) accessor, and 'name' is the name of the column
 accessor in the related table.
+
+=head2 remove_columns
+
+=over 4
+
+=item Value: \@columns
+
+=back
+
+Selects every column of the result source except the listed ones. The list is
+resolved when the query is built, so a L</columns> or L</select> anywhere in
+the chain wins and the attribute is then ignored; L</+columns> and L</+select>
+add to what is left. A later C<remove_columns> replaces an earlier one, the
+two lists are not combined.
+
+  # every column of 'artist' but 'rank'
+  my $rs = $schema->resultset('Artist')->search(undef, { remove_columns => ['rank'] });
 
 =head2 select
 
@@ -5397,6 +8618,9 @@ first object returned by L</next>.
 Setting this attribute on a resultset that does not join any has_many
 relations is a no-op.
 
+The C<*_async> read methods (see L</ASYNC>) honour C<collapse> with full
+parity to their synchronous counterparts.
+
 For a more in-depth discussion, see L</PREFETCHING>.
 
 =head2 prefetch
@@ -5478,6 +8702,9 @@ Which generates the following SQL:
   WHERE genre.genreid IS NULL
   ORDER BY me.artistid
 
+The C<*_async> read methods (see L</ASYNC>) inflate prefetched relations
+with full parity to their synchronous counterparts.
+
 For a more in-depth discussion, see L</PREFETCHING>.
 
 =head2 alias
@@ -5538,7 +8765,9 @@ C<total_entries> on it.
 =back
 
 Specifies the maximum number of rows for direct retrieval or the number of
-rows per page if the page attribute or method is used.
+rows per page if the L</page> attribute or method is used.
+
+See also L</offset>, L</page> and L</software_limit>.
 
 =head2 offset
 
@@ -5548,8 +8777,10 @@ rows per page if the page attribute or method is used.
 
 =back
 
-Specifies the (zero-based) row number for the  first row to be returned, or the
-of the first row of the first page if paging is used.
+Specifies the (zero-based) row number of the first row to be returned, or of
+the first row of the first page if paging is used.
+
+See also L</rows>, L</page> and L</software_limit>.
 
 =head2 software_limit
 
@@ -5577,9 +8808,12 @@ hack)
 
 =back
 
-A arrayref of columns to group by. Can include columns of joined tables.
+An arrayref of columns to group by. Can include columns of joined tables.
 
   group_by => [qw/ column1 column2 ... /]
+
+See also L</having> for post-grouping constraints, and L</distinct>, which
+generates a C<group_by> automatically from the selection.
 
 =head2 having
 
@@ -5629,19 +8863,30 @@ setting is ignored and an appropriate warning is issued.
 
 =over 4
 
-Adds to the WHERE clause.
+=item Value: $condition
+
+=back
+
+Adds to the WHERE clause, accepting the same
+L<SQL::Abstract syntax|SQL::Abstract/WHERE CLAUSES> as the condition passed
+to L</search>. Most useful as a default set on the result class, so that
+every search from that source carries the restriction:
 
   # only return rows WHERE deleted IS NULL for all searches
   __PACKAGE__->resultset_attributes({ where => { deleted => undef } });
 
-Can be overridden by passing C<< { where => undef } >> as an attribute
-to a resultset.
-
-For more complicated where clauses see L<SQL::Abstract/WHERE CLAUSES>.
-
-=back
+A C<where> set this way cannot be taken off again by a later search: every
+further condition, a C<where> attribute included, is ANDed onto it, and
+C<< { where => undef } >> leaves it in place. See also L</having> for a
+constraint applied after L</group_by>.
 
 =head2 cache
+
+=over 4
+
+=item Value: (0 | 1)
+
+=back
 
 Set to 1 to cache search results. This prevents extra SQL queries if you
 revisit rows in your ResultSet:
@@ -5668,8 +8913,8 @@ L<DBIO::Manual::Cookbook>.
 =back
 
 Set to 'update' for a SELECT ... FOR UPDATE or 'shared' for a SELECT
-... FOR SHARED. If \$scalar is passed, this is taken directly and embedded in the
-query.
+... FOR SHARE. If \$scalar is passed, its content is appended after the keyword
+C<FOR>: C<< for => \'UPDATE SKIP LOCKED' >> renders C<FOR UPDATE SKIP LOCKED>.
 
 =head1 PREFETCHING
 
@@ -5859,8 +9104,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-
-# XXX: FIXME: Attributes docs need clearing up
-

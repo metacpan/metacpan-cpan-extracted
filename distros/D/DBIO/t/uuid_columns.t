@@ -3,14 +3,7 @@ use warnings;
 
 use Test::More;
 
-BEGIN {
-  # UUIDColumns dies at load time if none of Data::UUID / UUID / UUID::Random
-  # is installed (none of them are cpanfile dependencies of core -- see
-  # DBIO::UUIDColumns::_find_uuid_module). Skip cleanly rather than fail.
-  unless (eval { require DBIO::UUIDColumns; 1 }) {
-    plan skip_all => "No UUID backend (Data::UUID / UUID / UUID::Random) installed: $@";
-  }
-}
+use DBIO::UUIDColumns;
 
 use DBIO::Test::Storage;
 
@@ -41,6 +34,7 @@ use DBIO::Test::Storage;
 
 TestDBIO::UUIDCol::Schema->register_class(Artist => 'TestDBIO::UUIDCol::Schema::Result::Artist');
 
+TestDBIO::UUIDCol::Schema->storage_type('+DBIO::Test::Storage');
 my $schema  = TestDBIO::UUIDCol::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 my $storage = $schema->storage;
@@ -75,6 +69,30 @@ subtest 'each row gets its own UUID' => sub {
   my $a = $schema->resultset('Artist')->create({ name => 'A' });
   my $b = $schema->resultset('Artist')->create({ name => 'B' });
   isnt $a->artist_id, $b->artist_id, 'two rows created without an explicit id get different UUIDs';
+};
+
+subtest 'default generator makes version 4 UUIDs in canonical lowercase form' => sub {
+  my $v4_re = qr/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+  my %seen;
+  my $bad = 0;
+  for (1 .. 1000) {
+    my $u = TestDBIO::UUIDCol::Schema::Result::Artist->get_uuid;
+    $bad++ unless $u =~ $v4_re;
+    $seen{$u}++;
+  }
+  is $bad, 0, '1000 values: version nibble 4, variant bits 10xx, lowercase canonical';
+  is scalar(keys %seen), 1000, '1000 values are pairwise distinct';
+  is(TestDBIO::UUIDCol::Schema::Result::Artist->uuid_class, 'DBIO::UUIDColumns',
+    'the built-in generator is the default uuid_class');
+};
+
+subtest 'uuid_class selects Data::UUID explicitly' => sub {
+  plan skip_all => 'Data::UUID not installed' unless eval { require Data::UUID; 1 };
+  my $class = 'TestDBIO::UUIDCol::Schema::Result::Artist';
+  $class->uuid_class('Data::UUID');
+  is $class->uuid_class, 'Data::UUID', 'backend switched';
+  like $class->get_uuid, $uuid_re, 'Data::UUID value is UUID-shaped';
+  $class->uuid_class('DBIO::UUIDColumns');
 };
 
 done_testing;

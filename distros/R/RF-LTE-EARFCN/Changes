@@ -1,0 +1,8 @@
+Revision history for Perl extension RF::LTE::EARFCN.
+
+0.02 2026-11-08
+  - Added meta merge data for CPAN
+
+0.01 2026-11-03
+  - original version; created by h2xs 1.23
+

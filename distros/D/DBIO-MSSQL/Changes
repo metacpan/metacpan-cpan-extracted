@@ -1,5 +1,129 @@
 Revision history for DBIO-MSSQL
 
+0.900004  2026-11-08
+    * Storage
+        - A schema that declares DBIO::MSSQL::Storage gets, on first use,
+          the class for the DBD of its DSN (DBD::ODBC or DBD::Sybase,
+          including the FreeTDS class), without a "Driver mismatch" warning
+          and without asking the server. A private subclass pinned over
+          DBD::Sybase, or an ODBC class pinned over a dbi:Sybase: DSN, is
+          refused with a message that names the class to derive from (ADR
+          0008).
+        - Connection parameters without a DSN ({dbname, host, port}) give a
+          DBD::Sybase DSN; host and port come as a pair. A host bound by a
+          Replicated view goes into a DBD::ODBC DSN as Server=host[,port].
+        - supports_exists_query and transactional_ddl are declared:
+          results_exist works, and a deploy runs in one transaction.
+        - explain drives SET SHOWPLAN_ALL around the query over DBD::Sybase
+          and is refused over DBD::ODBC, which returns no plan.
+        - except_all and intersect_all are refused, SQL Server has neither.
+        - Binary columns carry their bytes over both access paths. Over
+          DBD::Sybase they are read back as bytes, and a bind value of more
+          than 4000 bytes arrives whole.
+        - Over DBD::Sybase a bound string beyond ASCII, a value over the
+          session's TEXTSIZE (LongReadLen) and a SQL_VARIANT result are
+          refused instead of stored padded or cut, and a bound empty string
+          is stored as ''. The POD of DBIO::MSSQL::Storage::Sybase carries
+          the support matrix of DBD::ODBC against DBD::Sybase.
+        - Over DBD::Sybase and FreeTDS the key of a new row is read with
+          SCOPE_IDENTITY(), populate on the NoBindVars class inserts row by
+          row, and populate stops at the first tuple the server refuses.
+        - A transaction with an open cursor over DBD::Sybase and FreeTDS
+          stays on its connection (DBIO::Sybase::Storage::FreeTDS).
+        - The text SQL Server writes into an error carries no values: the
+          value of a failed conversion or overflow, the key values of a
+          duplicate key, the start of a truncated value and the token of a
+          syntax error are replaced by ***, bound values of four characters
+          or more everywhere in the text. Table, column and constraint
+          names, the error position and "with N bind values" stay
+          (DBIO::MSSQL::Util::mask_error_details, ADR 0009).
+        - Placeholders are found with split_at_placeholders, so a ? in a
+          literal or a quoted name is text; error texts carry neither
+          password, DSN nor bind values.
+
+    * ODBC
+        - Text beyond the database code page arrives in NCHAR, NVARCHAR and
+          NTEXT columns (CJK, emoji); a client character set that is not
+          UTF-8 is refused. A text column is read back as characters.
+        - LongReadLen defaults to 1 GiB, so LOB columns are not cut at 80
+          bytes; the POD names the memory price.
+
+    * DDL
+        - install_ddl writes FOREIGN KEY constraints from belongs_to as
+          named ALTER TABLE statements after all tables, named unique
+          constraints (UQ_<table>_<columns>) and PK_<table>. No second
+          index is written over the columns of a key.
+        - Indexes follow the canonical declaration (idx, indices) with an
+          mssql block for the kind, and CREATE [UNIQUE] [CLUSTERED |
+          NONCLUSTERED] INDEX is spelled as the server expects. Filtered
+          indexes (a where key) are introspected, written and diffed.
+        - schema.table is made in its schema, with CREATE SCHEMA; schemas =>
+          [...] reads further schemas.
+        - One function quotes every name (reserved words, [ ] brackets),
+          string defaults are literals, and foreign key columns follow the
+          order of the key they reference.
+        - Decimal precision and scale, character lengths and (max) are kept;
+          a column without is_nullable deploys as NOT NULL.
+        - What SQL Server cannot hold is refused with an exception naming
+          table and column: enum, a sized bit, dotted names, cascade paths
+          (Msg 1785), name clashes, a second clustered index, bad type
+          parameters and string defaults on numeric or date types.
+
+    * Diff
+        - Statements are ordered for the server: foreign key drops first,
+          new tables without inline keys, foreign key adds last, so
+          referencing tables in any order upgrade.
+        - Primary keys are added, replaced and dropped on existing tables,
+          CLUSTERED or NONCLUSTERED included; foreign keys, indexes and
+          unique constraints around a changing key or column are dropped and
+          created again. Unique constraints are constraints, not indexes.
+        - ALTER COLUMN is one statement with type and nullability, and a
+          removed default drops its DEFAULT constraint.
+        - Views are created, replaced and dropped in dependency order;
+          cycles are refused before the first statement. Index kind is
+          compared.
+        - Names follow the collation of the live database, and a missing
+          schema is created.
+
+    * Deploy
+        - apply and upgrade are the base class's: allow_destructive and
+          dry_run hold here, lossy column type changes need
+          allow_destructive, and a NOT NULL column without default over rows
+          or NOT NULL over a NULL is refused before the first statement.
+        - The temporary database takes the collation of the live one and its
+          connection from the connect info; a handle with AutoCommit off is
+          refused, and DBIO::MSSQL::Storage::Sybase deploys with
+          DBIO::MSSQL::Deploy.
+
+    * Introspect
+        - Every catalog column is aliased in lower case, independent of the
+          handle's FetchHashKeyName. Columns carry the DEFAULT constraint
+          name and the primary key's name and kind; views carry their
+          definition.
+
+    * SQLMaker
+        - order_by with -nulls => 'first' | 'last' is emulated with a CASE
+          sort key, also in the ROW_NUMBER limit.
+
+    * Test Modules
+        - DBIO::MSSQL::Test::Conformance answers the shared DDL, Diff and
+          Bind case tables of core, live against a server with a database
+          per case.
+
+    * Documentation
+        - README states the async stance of this sync-only driver and the
+          Perl 5.20 floor; the POD describes limit dialect, ordered
+          subselects and MONEY as the code has them.
+        - ADR 0007 records the storage shape (a transport-neutral base plus
+          one class per DBD); ADR 0036 proposes a MERGE-based upsert, and
+          $rs->upsert throws on SQL Server until it lands.
+
+    * Packaging
+        - Requires DBIO 0.900004. The cpanfile names the modules Storage
+          loads (Context::Preserve, Scope::Guard, Try::Tiny), and DBD::ODBC
+          is recommended.
+        - Every module carries $VERSION in step with the distribution.
+
 0.900001  2026-07-12
     * Diff
         - Fix DROP INDEX / DROP TABLE collision in full-schema sync (karr #15,

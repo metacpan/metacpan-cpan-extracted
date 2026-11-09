@@ -27,55 +27,75 @@ use IO::K8s;
 use Time::HiRes ();
 use POSIX ();
 
-my $kubeconfig_path = $ENV{DBIO_TEST_KUBECONFIG}
-  or die "DBIO_TEST_KUBECONFIG is not set\n";
+# Credentials and resources follow maint/k8s/mariadb.yaml and
+# maint/docker/docker-compose.yml: database dbio_test, user dbio/dbio, root
+# password dbioroot; the pod resources likewise. t/89-k8s-pod-spec.t compares
+# _pod_spec against the manifest.
+use constant {
+  DB_USER => 'dbio',
+  DB_PASS => 'dbio',
+  DB_ROOT => 'dbioroot',
+  DB_NAME => 'dbio_test',
+  DB_PORT => 3306,
+};
 
-# Parse --mariadb / --mysql flag before the command (default: mariadb)
-my $mariadb = 1;
-while (@ARGV && $ARGV[0] =~ /^--(mariadb|mysql)$/) {
-  $mariadb = ($1 eq 'mariadb') ? 1 : 0;
-  shift @ARGV;
+# Loaded by a test (do FILE) only the subs are wanted; run main otherwise.
+main() unless caller;
+
+sub main {
+  my $kubeconfig_path = $ENV{DBIO_TEST_KUBECONFIG}
+    or die "DBIO_TEST_KUBECONFIG is not set\n";
+
+  # Parse --mariadb / --mysql flag before the command (default: mariadb)
+  my $mariadb = 1;
+  while (@ARGV && $ARGV[0] =~ /^--(mariadb|mysql)$/) {
+    $mariadb = ($1 eq 'mariadb') ? 1 : 0;
+    shift @ARGV;
+  }
+
+  my $k8s  = Kubernetes::REST::Kubeconfig->new(kubeconfig_path => $kubeconfig_path)->api;
+  my $io   = IO::K8s->new;
+
+  my $ns       = 'dbio-test';
+  my $flavor   = $mariadb ? 'mariadb' : 'mysql';
+  my $name     = "dbio-$flavor";
+  # PINNED to 8.0.30 — mysql:8.0.31+ is built on Oracle Linux 9 / newer glibc and
+  # requires the x86-64-v2 CPU baseline, which the shared test-cluster node lacks:
+  # floating mysql:8.0 CrashLoops with "Fatal glibc error: CPU does not support
+  # x86-64-v2". 8.0.30 is the last v1-compatible 8.0.x. See core k206 (commit
+  # 69fcbf48). Do NOT float back to mysql:8.
+  my $image    = $mariadb ? 'mariadb:11' : 'mysql:8.0.30';
+
+  _ensure_namespace($k8s, $io, $ns);
+  _create_pod($k8s, $io, $ns, $name, $image);
+  _create_service($k8s, $io, $ns, $name, DB_PORT);
+  my ($host, $port) = _wait_for_ready($k8s, $ns, $name, DB_USER);
+
+  # Always use DBD::MariaDB — it bundles its own connector and works with both
+  $ENV{DBIO_TEST_MYSQL_DSN}  = "dbi:MariaDB:database=@{[ DB_NAME ]};host=$host;port=$port";
+  # The suite runs as root ('root'@'%' in both images): dbio, granted on
+  # dbio_test only, may not create the scratch/temp databases nor, on MySQL's
+  # binlog, triggers (karr k104; cf. maint/k8s/mariadb.yaml).
+  $ENV{DBIO_TEST_MYSQL_USER} = 'root';
+  $ENV{DBIO_TEST_MYSQL_PASS} = DB_ROOT;
+
+  my $exit = 0;
+
+  if (@ARGV) {
+    $exit = system(@ARGV);
+    $exit = $exit >> 8;
+  }
+  else {
+    print STDERR "\u${flavor} ready at $host:$port (namespace $ns)\n";
+    print STDERR "DSN: $ENV{DBIO_TEST_MYSQL_DSN}\n";
+    print STDERR "Press Ctrl-C to stop.\n";
+    local $SIG{INT} = sub { };
+    POSIX::pause();
+  }
+
+  _stop($k8s, $ns, $name);
+  exit $exit;
 }
-
-my $k8s  = Kubernetes::REST::Kubeconfig->new(kubeconfig_path => $kubeconfig_path)->api;
-my $io   = IO::K8s->new;
-
-my $ns       = 'dbio-test';
-my $flavor   = $mariadb ? 'mariadb' : 'mysql';
-my $name     = "dbio-$flavor";
-my $image    = $mariadb ? 'mariadb:11' : 'mysql:8';
-my $db_user  = 'dbio';
-my $db_pass  = 'dbio_test_secret';
-my $db_root  = 'dbio_root_secret';
-my $db_name  = 'dbio_test';
-my $db_port  = 3306;
-
-_ensure_namespace($k8s, $io, $ns);
-_create_pod($k8s, $io, $ns, $name, $image, $db_user, $db_pass, $db_root, $db_name);
-_create_service($k8s, $io, $ns, $name, $db_port);
-my ($host, $port) = _wait_for_ready($k8s, $ns, $name, $db_user);
-
-# Always use DBD::MariaDB — it bundles its own connector and works with both
-$ENV{DBIO_TEST_MYSQL_DSN}  = "dbi:MariaDB:database=$db_name;host=$host;port=$port";
-$ENV{DBIO_TEST_MYSQL_USER} = $db_user;
-$ENV{DBIO_TEST_MYSQL_PASS} = $db_pass;
-
-my $exit = 0;
-
-if (@ARGV) {
-  $exit = system(@ARGV);
-  $exit = $exit >> 8;
-}
-else {
-  print STDERR "\u${flavor} ready at $host:$port (namespace $ns)\n";
-  print STDERR "DSN: $ENV{DBIO_TEST_MYSQL_DSN}\n";
-  print STDERR "Press Ctrl-C to stop.\n";
-  local $SIG{INT} = sub { };
-  POSIX::pause();
-}
-
-_stop($k8s, $ns, $name);
-exit $exit;
 
 sub _stop {
   my ($k8s, $ns, $name) = @_;
@@ -93,7 +113,7 @@ sub _ensure_namespace {
 }
 
 sub _create_pod {
-  my ($k8s, $io, $ns, $name, $image, $user, $pass, $root_pass, $db) = @_;
+  my ($k8s, $io, $ns, $name, $image) = @_;
   if (eval { $k8s->get('Pod', name => $name, namespace => $ns); 1 }) {
     $k8s->delete($k8s->get('Pod', name => $name, namespace => $ns));
     print STDERR "Waiting for old pod to terminate";
@@ -105,17 +125,28 @@ sub _create_pod {
     }
     print STDERR "\n";
   }
-  $k8s->create($io->new_object('Pod',
+  $k8s->create($io->new_object('Pod', %{ _pod_spec($ns, $name, $image) }));
+}
+
+# The Pod as IO::K8s->new_object takes it. Every DB container carries cpu AND
+# memory requests and limits (house rule "Live testing", point 4).
+sub _pod_spec {
+  my ($ns, $name, $image) = @_;
+  return {
     metadata => { name => $name, namespace => $ns, labels => { app => $name } },
     spec     => {
       containers => [{
-        name  => $name,
-        image => $image,
+        name      => $name,
+        image     => $image,
+        resources => {
+          requests => { cpu => '250m', memory => '384Mi' },
+          limits   => { cpu => '1',    memory => '1Gi'   },
+        },
         env   => [
-          { name => 'MYSQL_USER',          value => $user      },
-          { name => 'MYSQL_PASSWORD',      value => $pass      },
-          { name => 'MYSQL_ROOT_PASSWORD', value => $root_pass },
-          { name => 'MYSQL_DATABASE',      value => $db        },
+          { name => 'MYSQL_USER',          value => DB_USER },
+          { name => 'MYSQL_PASSWORD',      value => DB_PASS },
+          { name => 'MYSQL_ROOT_PASSWORD', value => DB_ROOT },
+          { name => 'MYSQL_DATABASE',      value => DB_NAME },
         ],
         ports          => [{ containerPort => 3306 }],
         readinessProbe => {
@@ -125,7 +156,7 @@ sub _create_pod {
         },
       }],
     },
-  ));
+  };
 }
 
 sub _create_service {

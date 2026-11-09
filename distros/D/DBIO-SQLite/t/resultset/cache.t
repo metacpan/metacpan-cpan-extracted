@@ -22,11 +22,11 @@ for my $i (0, 1) {
   # subsequent calls to $cd_rset->related_resultset('artist') reuse the previously generated resultset,
   # instead of returning a resultset with the items from the cache.
 
-  my @tracks = $schema->resultset('Track')->search({ title => 'Apiary' });
+  my @tracks = $schema->resultset('Track')->search({ title => 'Apiary' })->all;
 
   my $cd_rset = $tracks[0]->related_resultset('cd');
 
-  my @cds = $schema->resultset('CD')->search({ cdid => 1 }, { prefetch => 'artist' });
+  my @cds = $schema->resultset('CD')->search({ cdid => 1 }, { prefetch => 'artist' })->all;
 
   my ($artist_rset_before, $artist_rset_after);
 

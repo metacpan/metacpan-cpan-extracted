@@ -1,6 +1,6 @@
 package DBIO::Oracle;
 # ABSTRACT: Oracle-specific schema management for DBIO
-our $VERSION = '0.900001';
+our $VERSION = '0.900004';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ DBIO::Oracle - Oracle-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,9 @@ forms remain supported. Load it into your schema instead of the base L<DBIO>
 class when connecting to Oracle databases.
 
 For Oracle versions prior to 9.0 that do not support ANSI join syntax, the
-storage will automatically use L<DBIO::Oracle::Storage::WhereJoins> instead.
+C<(+)> join dialect is available as L<DBIO::Oracle::Storage::WhereJoins>. It is
+not selected automatically; set C<storage_type> to
+C<+DBIO::Oracle::Storage::WhereJoins> explicitly.
 
 =head1 METHODS
 

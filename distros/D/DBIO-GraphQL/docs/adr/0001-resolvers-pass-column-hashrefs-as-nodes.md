@@ -87,5 +87,9 @@ keeps the relationship resolver self-contained.
   their parent value and must either be satisfiable from columns already in
   the hashref or re-find what they need. There is no live row to lean on.
 - A source with no usable primary key cannot have its relationships traversed
-  through this path: `_pk_find` returns nothing when a PK value is missing,
-  and the relationship resolves to empty/undef.
+  through this path: `_pk_find` returns undef without a query when the source
+  has no primary key columns or a PK value is missing, and the relationship
+  resolves to undef.
+- The singular query is the lookup by the complete primary key: it requires
+  every PK column as an argument and names the missing ones in its error,
+  without running SQL.

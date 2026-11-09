@@ -1,0 +1,96 @@
+# Firebird 5 pod for dbio-firebird live tests.
+#
+# THROWAWAY: one Pod and its Service, no volume. The database file lives in the
+# container's writable layer (/var/lib/firebird/data), so deleting the pod
+# deletes the data.
+#
+# IMAGE -- firebirdsql/firebird:5, the Firebird project's own image. Its
+# entrypoint reads the three variables set below:
+#
+#   FIREBIRD_ROOT_PASSWORD             password of SYSDBA
+#   FIREBIRD_DATABASE                  created on first start, relative to
+#                                      /var/lib/firebird/data
+#   FIREBIRD_DATABASE_DEFAULT_CHARSET  default character set of that database
+#
+# The tag follows the 5.x line. The suite was last run against a pod of exactly
+# this spec on 2026-10-07: Firebird 5.0.4, DBD::Firebird 1.39, 29 files and
+# 1021 tests, all green (the ODBC leg not among them, see NOT COVERED).
+#
+# CREDENTIALS -- the suite connects as SYSDBA, and that is deliberate rather
+# than a shortcut: DBIO::Firebird::Deploy creates and drops a temporary
+# database next to the live one for every diff (t/17, t/19, t/21), and the
+# storage tests create and drop generators, triggers and tables. No
+# FIREBIRD_USER is set, so there is no second account to keep in step. The
+# password and the database name are the family's (dbio_test_secret /
+# dbio_test, as in dbio-postgresql/maint/k8s/pg-pod.yaml).
+#
+# RESOURCE DISCIPLINE -- the pod carries a cpu AND a memory limit (house rule
+# "Live testing", .claude/rules/dbio-rules.md); never run it without. Run the
+# suite serially through core's maint/capped-test, and delete the pod when
+# done.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/firebird.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-firebird --timeout=180s
+#   kubectl port-forward svc/dbio-firebird 3050:3050 &
+#
+#   DBIO_TEST_FIREBIRD_DSN='dbi:Firebird:database=/var/lib/firebird/data/dbio_test.fdb;host=127.0.0.1;port=3050' \
+#   DBIO_TEST_FIREBIRD_USER=sysdba \
+#   DBIO_TEST_FIREBIRD_PASS=dbio_test_secret \
+#     ../dbio/maint/capped-test prove -lr t/
+#
+#   kubectl delete -f maint/k8s/firebird.yaml   # ALWAYS clean up
+#
+# In the HQ cluster the hub's dbio-db tool applies this file as it is (it sets
+# the namespace and turns the Service into a LoadBalancer) and prints the three
+# variables: `dbio-db up firebird`, `eval "$(dbio-db env firebird)"`.
+#
+# NOT COVERED -- this is the DBD::Firebird leg only. The ODBC leg of t/10, t/20
+# and t/30 (DBIO_TEST_FIREBIRD_ODBC_DSN) needs the Firebird ODBC driver on the
+# test host as well as this server; where that driver is missing the ODBC
+# transport stays checked offline only (t/59-odbc-storage.t).
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-firebird
+  labels:
+    app: dbio-firebird
+    role: dbio-test-db
+spec:
+  containers:
+    - name: firebird
+      image: firebirdsql/firebird:5
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: "1"          # at most one core
+          memory: 512Mi
+      ports:
+        - containerPort: 3050
+      env:
+        - name: FIREBIRD_ROOT_PASSWORD
+          value: dbio_test_secret
+        - name: FIREBIRD_DATABASE
+          value: dbio_test.fdb
+        - name: FIREBIRD_DATABASE_DEFAULT_CHARSET
+          value: UTF8
+      readinessProbe:
+        tcpSocket:
+          port: 3050
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        failureThreshold: 40
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-firebird
+spec:
+  selector:
+    app: dbio-firebird
+  ports:
+    - port: 3050
+      targetPort: 3050

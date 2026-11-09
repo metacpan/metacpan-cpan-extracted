@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
+use Scalar::Util ();
 use DBIO::Test;
 use DBIO::Future::Immediate;
 use DBIO::Test::Storage;
@@ -17,16 +18,43 @@ use DBIO::Storage::DBI;
 
 # --- Two in-file mock backends, registered under distinct mode names ----------
 # Each tags its results so the resolved CHOICE is observable. They override new()
-# to dodge base DBIO::Storage construction (no loop, no pool), record the six
-# *_async op names, and resolve to an immediate DBIO::Future::Immediate.
+# to dodge base DBIO::Storage construction (no loop or real pool), record the six
+# *_async op names, and resolve to an immediate DBIO::Future::Immediate. Backend
+# A owns a tiny per-instance fake pool so disconnect/re-resolve can prove both
+# ownership objects are rebuilt.
 
 {
+  package My::Mock::Pool;
+  sub new { bless { shutdown => 0, shutdown_count => 0 }, $_[0] }
+  sub shutdown {
+    my ($self) = @_;
+    return 1 if $self->{shutdown};
+    $self->{shutdown} = 1;
+    $self->{shutdown_count}++;
+    return 1;
+  }
+
   package My::Mock::AsyncA;
   use base 'DBIO::Storage::Async';
-  sub new { my ($c, $s) = @_; bless { schema => $s, calls => [], disconnected => 0 }, $c }
+  sub new {
+    my ($class, $schema) = @_;
+    return bless {
+      schema       => $schema,
+      calls        => [],
+      disconnected => 0,
+      pool         => My::Mock::Pool->new,
+    }, $class;
+  }
   sub future_class { 'DBIO::Future::Immediate' }
+  sub pool { $_[0]{pool} }
   sub connect_info { my $s = shift; $s->{connect_info} = shift if @_; $s->{connect_info} }
-  sub disconnect { $_[0]{disconnected}++ }
+  sub disconnect {
+    my ($self) = @_;
+    $self->{disconnected}++;
+    $self->{pool}->shutdown if $self->{pool};
+    $self->{pool} = undef;
+    return 1;
+  }
   sub select_async        { push @{$_[0]{calls}}, 'select';        DBIO::Future::Immediate->done('A:select') }
   sub select_single_async { push @{$_[0]{calls}}, 'select_single'; DBIO::Future::Immediate->done('A:select_single') }
   sub insert_async        { push @{$_[0]{calls}}, 'insert';        DBIO::Future::Immediate->done('A:insert') }
@@ -41,10 +69,16 @@ use DBIO::Storage::DBI;
   sub connect_info { my $s = shift; $s->{connect_info} = shift if @_; $s->{connect_info} }
   sub disconnect { 1 }
   sub select_async { push @{$_[0]{calls}}, 'select'; DBIO::Future::Immediate->done('B:select') }
+
+  package My::Mock::NotAsyncBackend;
+  sub marker { 'loadable but not async' }
 }
 
 DBIO::Storage::DBI->register_async_mode( mock_a => 'My::Mock::AsyncA' );
 DBIO::Storage::DBI->register_async_mode( mock_b => 'My::Mock::AsyncB' );
+DBIO::Storage::DBI->register_async_mode(
+  not_backend => 'My::Mock::NotAsyncBackend',
+);
 
 # Set the chosen mode on a mock storage exactly as connect would, clearing the
 # resolved-backend cache (the connect_info path clears it; a direct setter must
@@ -71,6 +105,22 @@ sub set_mode {
   # registrations via the MRO walk.
   is( DBIO::Test::Storage->_resolve_async_mode_class('mock_a'), 'My::Mock::AsyncA',
     'driver subclass inherits generic mode registrations through the MRO' );
+}
+
+# -----------------------------------------------------------------------
+# A loadable registry target of the wrong type must not silently degrade
+# -----------------------------------------------------------------------
+{
+  my $storage = DBIO::Test->init_schema->storage;
+  set_mode($storage, 'not_backend');
+
+  throws_ok { $storage->_async_storage }
+    qr/async mode 'not_backend'.*My::Mock::NotAsyncBackend.*DBIO::Storage::Async/,
+    'loaded registry target must satisfy the async backend contract';
+  throws_ok {
+    $storage->select_async('artist', ['artistid'], {}, {});
+  } qr/async mode 'not_backend'.*My::Mock::NotAsyncBackend/,
+    'public async dispatch never degrades a wrong backend to sync';
 }
 
 # -----------------------------------------------------------------------
@@ -227,19 +277,37 @@ sub set_mode {
 }
 
 # -----------------------------------------------------------------------
-# disconnect tears down the embedded async backend
+# disconnect tears down the embedded async generation; resolving again on the
+# same higher-level storage builds both a fresh backend and a fresh pool.
 # -----------------------------------------------------------------------
 {
   my $schema  = DBIO::Test->init_schema;
   my $storage = set_mode($schema->storage, 'mock_a');
 
-  my $async = $storage->_async_storage;     # build + cache the backend
-  isa_ok $async, 'My::Mock::AsyncA', 'backend live before disconnect';
+  my $old_backend = $storage->_async_storage;
+  isa_ok $old_backend, 'My::Mock::AsyncA', 'backend live before disconnect';
+  my $old_pool = $old_backend->pool;
+  isa_ok $old_pool, 'My::Mock::Pool', 'old backend owns its pool instance';
 
   $storage->disconnect;
 
-  is $async->{disconnected}, 1, 'async backend disconnect() was called once';
+  is $old_backend->{disconnected}, 1,
+    'async backend disconnect() was called once';
+  is $old_pool->{shutdown_count}, 1,
+    'disconnect shuts down the old backend pool once';
   ok !$storage->_fake_connected, 'sync mock storage is disconnected too';
+
+  my $new_backend = $storage->_async_storage;
+  isa_ok $new_backend, 'My::Mock::AsyncA',
+    'same storage resolves an async backend again after disconnect';
+  my $new_pool = $new_backend->pool;
+  isa_ok $new_pool, 'My::Mock::Pool', 'new backend owns a pool instance';
+
+  isnt Scalar::Util::refaddr($new_backend),
+    Scalar::Util::refaddr($old_backend),
+    'reconnect resolves a fresh async backend instance';
+  isnt Scalar::Util::refaddr($new_pool), Scalar::Util::refaddr($old_pool),
+    'fresh backend owns a fresh pool instance';
 }
 
 done_testing;

@@ -4,27 +4,31 @@ package DBIO::Sybase::Introspect::Tables;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
   my ($class, $dbh, $schema) = @_;
   $schema //= 'dbo';
 
-  my $sth = $dbh->prepare(q{
-    SELECT table_name, table_type
-    FROM INFORMATION_SCHEMA.TABLES
-    WHERE table_schema = ?
-    ORDER BY table_name
-  });
-  $sth->execute($schema);
+  my $rows = $dbh->selectall_arrayref(q{
+    SELECT o.name AS table_name, o.type AS object_type
+    FROM sysobjects o
+    JOIN sysusers   u ON u.uid = o.uid
+    WHERE o.type IN ('U', 'V')
+      AND u.name = ?
+      AND o.name <> 'sysquerymetrics'
+    ORDER BY o.name
+  }, { Slice => {} }, $schema);
 
   my %tables;
-  while (my $row = $sth->fetchrow_hashref) {
-    my $type = lc($row->{table_type} // '');
-    my $kind = $type =~ /view/ ? 'view' : 'table';
+  for my $row (@$rows) {
+    # sysobjects.type is char(2): 'U ' / 'V '.
+    (my $type = $row->{object_type} // '') =~ s/\s+//g;
     $tables{ $row->{table_name} } = {
       table_name => $row->{table_name},
-      kind       => $kind,
+      kind       => $type eq 'V' ? 'view' : 'table',
       schema     => $schema,
     };
   }
@@ -46,12 +50,15 @@ DBIO::Sybase::Introspect::Tables - Introspect Sybase ASE tables and views
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
-Fetches Sybase ASE table and view metadata via C<INFORMATION_SCHEMA.TABLES>.
-Skips system tables.
+Fetches Sybase ASE table and view metadata from the system catalog
+(C<sysobjects> type C<U> / C<V>, joined to C<sysusers> for the owner). SAP ASE
+has no C<INFORMATION_SCHEMA> views. System tables are type C<S> and
+never match; the one system B<view> ASE installs into every database,
+C<sysquerymetrics> (owned by C<dbo>), is excluded by name.
 
 =head1 METHODS
 
@@ -60,7 +67,8 @@ Skips system tables.
     my $tables = DBIO::Sybase::Introspect::Tables->fetch($dbh, $schema);
 
 Returns a hashref keyed by table name. Each value has: C<table_name>,
-C<kind> (C<table> or C<view>), C<schema>.
+C<kind> (C<table> or C<view>), C<schema>. C<$schema> is the owner name
+(default C<dbo>).
 
 =head1 AUTHOR
 

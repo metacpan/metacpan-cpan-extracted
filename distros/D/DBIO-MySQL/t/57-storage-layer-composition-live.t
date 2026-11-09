@@ -61,8 +61,16 @@ eval { require DBIO::MySQL::Storage::Async; 1 }
   }
 }
 
+# A schema always declares its driver (core ADR 0067), and DBIO::Test::Schema
+# keeps none in its class: declare the storage class the DSN's DBD is
+# registered for -- DBIO::MySQL::Storage::MariaDB for a dbi:MariaDB: DSN.
+my $test_schema = DBIO::Test::Schema->clone;
+$test_schema->storage_type(
+  $dsn =~ /\Adbi:MariaDB:/i ? '+DBIO::MySQL::Storage::MariaDB' : '+DBIO::MySQL::Storage'
+);
+
 # --- Fixture: a fresh artist table, built synchronously -----------------------
-my $setup = DBIO::Test::Schema->connect($dsn, $user, $pass, { quote_names => 1 });
+my $setup = $test_schema->connect($dsn, $user, $pass, { quote_names => 1 });
 $setup->storage->dbh_do(sub {
   my (undef, $dbh) = @_;
   local $dbh->{Warn} = 0;
@@ -82,7 +90,7 @@ SQL
 # variables to the connection. If the replay (karr #68) fires on the pooled async
 # connection, a later SELECT of that variable over the same connection reads it
 # back; otherwise it is NULL.
-my $schema = DBIO::Test::Schema->connect(
+my $schema = $test_schema->connect(
   $dsn, $user, $pass,
   {
     async         => 'future_io',

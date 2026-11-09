@@ -4,6 +4,8 @@ package DBIO::Shortcut::mysql;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 sub apply { DBIO->apply_driver($_[1], 'MySQL') }
 
 1;
@@ -20,7 +22,7 @@ DBIO::Shortcut::mysql - `use DBIO -mysql` shortcut for the MySQL driver
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

@@ -1,5 +1,64 @@
 Revision history for DBIO-PostgreSQL-Age
 
+0.900004  2026-11-08
+    * Deploy
+        - New DBIO::PostgreSQL::Age::Extension: a schema that declares
+          pg_extensions('age') has Apache AGE as an entry of its extension
+          list. The graph schemas created by create_graph belong to the
+          deploy model, so an unrestricted DBIO::PostgreSQL deploy never
+          diffs them into DROP SCHEMA, DROP TABLE or DROP TRIGGER.
+        - The extension names the activation (LOAD 'age', ag_catalog on the
+          search_path) and the storage layer. AGE beside PostGIS on one
+          schema works by the extension protocol.
+        - DBIO::PostgreSQL::Age::Deploy and DBIO::PostgreSQL::Age::Introspect
+          are stubs; their rules live in the extension class.
+
+    * Connection
+        - connect_call_load_age puts ag_catalog in front of the search_path;
+          with a tenant namespace (connect key `schema`) it goes behind the
+          namespace, so unqualified DDL lands there. A path that already
+          holds ag_catalog, quoted or not, stays as it is.
+        - An async pool connection replays LOAD 'age' and the ag_catalog
+          search_path after the pool's session reset (DISCARD ALL), so
+          cypher() runs in every borrow without a schema prefix.
+
+    * agtype
+        - decode_agtype strips every ::vertex, ::edge, ::path and ::numeric
+          annotation outside string literals, also inside lists and maps, so
+          a path or a collect(n) list decodes with auto_decode. A numeric a
+          double cannot hold exactly (over 15 significant digits) stays the
+          exact string.
+        - decode_agtype(undef) returns undef without a warning.
+        - decode_agtype reads a value in linear time, decodes a value with
+          the UTF8 flag as characters and a byte string as UTF-8, and throws
+          a DBIO::Exception naming map or list and the annotation, without
+          the value, for a structure it cannot decode.
+        - Cypher parameters are encoded as a character string, so non-ASCII
+          values reach DBD::Pg once-encoded and read back as written.
+
+    * Storage
+        - cypher() and cypher_async() dollar-quote the Cypher text with a tag
+          that does not occur in it ($dbio_age$, counted up on a collision),
+          so a "$$" in a string literal is safe. Result column names must be
+          plain identifiers, otherwise "Invalid AGE column name" is thrown.
+          Values belong in the $params argument.
+        - The Age component derives from DBIO::Base, like the other extension
+          components.
+
+    * Documentation
+        - cypher_async, create_graph_async and drop_graph_async are
+          documented as pool-only: inside a txn_do_async body they run on a
+          sibling connection, outside the transaction.
+        - SYNOPSIS, README and the ADRs follow the code; Cypher bodies in the
+          POD are written as q{ ... }, and every example schema declares its
+          driver (use DBIO 'Schema', -pg).
+
+    * Dependencies
+        - Requires DBIO 0.900004, DBIO::PostgreSQL 0.900004 and JSON::MaybeXS;
+          develop recommends DBIO::PostgreSQL::EV 0.900004 and
+          DBIO::PostgreSQL::PostGIS 0.900004.
+        - Every module under lib/ carries its own literal $VERSION.
+
 0.900001  2026-07-12
     * Storage
         - AGE now composes onto any schema as a storage LAYER
@@ -102,4 +161,3 @@ Revision history for DBIO-PostgreSQL-Age
         - t/00-load.t module load, t/20-cypher.t offline cypher SQL/bind
           coverage, t/10-age-live.t live graph create/drop and CREATE/MATCH
           queries (skips without a configured AGE-enabled PostgreSQL)
-

@@ -3,6 +3,9 @@ package DBIO::InflateColumn::Serializer::YAML;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use YAML;
 use Carp;
 use namespace::clean;
@@ -28,6 +31,9 @@ sub get_freezer {
 
 sub get_unfreezer {
   return sub {
+    # a stored value is data: no blessed objects, no code
+    local $YAML::LoadBlessed = 0;
+    local $YAML::LoadCode    = 0;
     return YAML::Load(shift);
   };
 }
@@ -47,7 +53,7 @@ DBIO::InflateColumn::Serializer::YAML - YAML Inflator
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -113,7 +119,9 @@ over-long payloads throw.
 
 =head1 DEPENDENCIES
 
-L<YAML>. Not a hard dependency of DBIO; install separately.
+L<YAML> 1.25 or newer. Not a hard dependency of DBIO; install separately.
+The stored value is loaded as plain data: C<$YAML::LoadBlessed> and
+C<$YAML::LoadCode> are 0 while it is read.
 
 =head1 AUTHOR
 

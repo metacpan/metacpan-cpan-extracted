@@ -2,6 +2,9 @@ package DBIO::Test::Taint::Namespaces::Result::Test;
 # ABSTRACT: Test result class for taint mode namespace loading
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Core';
@@ -21,7 +24,7 @@ DBIO::Test::Taint::Namespaces::Result::Test - Test result class for taint mode n
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

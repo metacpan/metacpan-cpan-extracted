@@ -142,6 +142,7 @@ TestPRM::Schema->register_class(Widget => 'TestPRM::Schema::Result::Widget');
 
 sub connect_fake {
   my $schema_class = shift;
+  $schema_class->storage_type('+DBIO::Test::Storage');
   my $schema = $schema_class->connect(sub { });
   $schema->storage(DBIO::Test::Storage->new($schema));
   return $schema;
@@ -277,10 +278,63 @@ subtest 'ProxyResultSetMethod: installs accessor, registers slot' => sub {
   } 'copy with a proxy slot value does not die';
 };
 
+# --- Unblessed reference values (karr k228 sweep) --------------------
+#
+# A keep_storage_value column can legitimately hold an unblessed
+# reference: an arrayref for an array-typed column, a \'NOW()' literal.
+# The snapshot clones only objects that can('clone'), and asking an
+# unblessed reference ->can died -- so such a row died on insert, the
+# first point at which a snapshot is taken. Asserts: insert and update
+# live, and the snapshot holds the value the column had at each point.
+
+subtest 'StorageValues: unblessed reference values are snapshotted' => sub {
+  {
+    package TestSVRef::Schema;
+    use base 'DBIO::Schema';
+  }
+
+  {
+    package TestSVRef::Schema::Result::Tagged;
+    use base 'DBIO::Core';
+
+    __PACKAGE__->table('tagged');
+    __PACKAGE__->add_columns(
+      id    => { data_type => 'integer', is_auto_increment => 1 },
+      tags  => { data_type => 'integer[]', keep_storage_value => 1 },
+      stamp => {
+        data_type          => 'timestamp',
+        is_nullable        => 1,
+        keep_storage_value => 1,
+      },
+    );
+    __PACKAGE__->set_primary_key('id');
+  }
+
+  TestSVRef::Schema->register_class(Tagged => 'TestSVRef::Schema::Result::Tagged');
+
+  my $schema = connect_fake('TestSVRef::Schema');
+  my $row;
+  lives_ok {
+    $row = $schema->resultset('Tagged')
+                  ->new_result({ tags => [ 1, 2, 3 ], stamp => \'NOW()' });
+  } 'a row holding an arrayref and a literal-SQL ref can be built';
+  lives_ok { $row->insert } 'and inserted';
+  is_deeply $row->get_storage_value('tags'), [ 1, 2, 3 ],
+    'after insert, the arrayref is snapshotted';
+  is_deeply $row->get_storage_value('stamp'), \'NOW()',
+    'after insert, the literal-SQL ref is snapshotted';
+
+  $row->tags([ 4, 5 ]);
+  lives_ok { $row->update } 'and updated';
+  is_deeply $row->get_storage_value('tags'), [ 4, 5 ],
+    'after update, the snapshot holds the new arrayref';
+};
+
 # --- DateTime snapshot immutability test -----------------------------
 
 subtest 'StorageValues: DateTime clone prevents snapshot corruption' => sub {
-  eval 'require DateTime; 1' or skip('DateTime not installed', 3);
+  plan skip_all => 'DateTime not installed'
+    unless eval { require DateTime; 1 };
 
   {
     package TestDT::Schema;
@@ -305,6 +359,7 @@ subtest 'StorageValues: DateTime clone prevents snapshot corruption' => sub {
 
   TestDT::Schema->register_class(Event => 'TestDT::Schema::Result::Event');
 
+  TestDT::Schema->storage_type('+DBIO::Test::Storage');
   my $schema = TestDT::Schema->connect(sub { });
   $schema->storage(DBIO::Test::Storage->new($schema));
   my $rs = $schema->resultset('Event');

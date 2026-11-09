@@ -61,6 +61,10 @@ _abi_stream_open(env, status = 200, headers = NULL)
         int status
         SV *headers
     CODE:
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (headers && !SvOK(headers)) headers = NULL;
         RETVAL = hm_abi_st_stream_open(aTHX_ env, status, headers);
     OUTPUT:

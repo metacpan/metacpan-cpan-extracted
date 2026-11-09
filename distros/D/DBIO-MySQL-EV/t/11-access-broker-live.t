@@ -13,6 +13,7 @@ use EV;
 use DBIO::AccessBroker;
 use DBIO::MySQL::EV;
 use DBIO::MySQL::EV::Storage;
+use DBIO::Util ();
 
 # --- Parse DSN into MariaDB conninfo hash ---
 
@@ -20,12 +21,16 @@ my $dsn  = $ENV{DBIO_TEST_MYSQL_DSN};
 my $user = $ENV{DBIO_TEST_MYSQL_USER} || '';
 my $pass = $ENV{DBIO_TEST_MYSQL_PASS} || '';
 
+# The database goes in as dbname: the broker below answers this hash to every
+# storage that asks, and the schema's sync storage refuses an answer naming
+# neither a dsn nor a dbname (core k271). The transport reads dbname as
+# EV::MariaDB's database.
 my %base_conninfo;
 if ($dsn =~ /^dbi:(?:mysql|mysql\.rdbs|mariadb):(.+)/i) {
   my $params = $1;
   for my $pair (split /;/, $params) {
     my ($k, $v) = split /=/, $pair, 2;
-    $k = 'database' if $k eq 'dbname';
+    $k = 'dbname' if $k eq 'database';
     $base_conninfo{$k} = $v if defined $k && defined $v;
   }
   $base_conninfo{user}     = $user if $user;
@@ -123,7 +128,10 @@ my $connected_err;
   my $f_connected = Future->new;
 
   my $mdb;
-  my $conninfo = $live_storage->_conninfo_hash;
+  # What a new connection is opened from: the per-spawn provider's reading of
+  # the broker's answer. Nothing of it is stored (karr k62), so _conninfo_hash
+  # has none to give with a broker attached.
+  my $conninfo = $live_storage->_conninfo_provider->();
   my %ev_args;
 
   if (ref $conninfo eq 'HASH' && %$conninfo) {
@@ -160,14 +168,18 @@ my $connected_err;
     $mdb = EV::MariaDB->new(%ev_args);
   };
   if ($@) {
-    plan skip_all => "EV::MariaDB->new failed: $@";
+    # What the client library says is named without a password it may carry
+    # (karr k76), here and below.
+    plan skip_all => DBIO::Util::mask_connect_secrets("EV::MariaDB->new failed: $@", [ $dsn, $user, $pass ]);
   }
 
   EV::run until $f_connected->is_ready;
   $connected = $f_connected->get;
 
   if (!$connected) {
-    plan skip_all => "Could not connect to MySQL/MariaDB via broker conninfo: $connected_err";
+    plan skip_all => DBIO::Util::mask_connect_secrets(
+      "Could not connect to MySQL/MariaDB via broker conninfo: $connected_err", [ $dsn, $user, $pass ],
+    );
   }
 
   # Quick sanity query

@@ -21,7 +21,9 @@ for my $pass (1,2,3) {
     my $id = (keys %$track_titles)[0];
     my $tit = delete $track_titles->{$id};
 
-    my ($o) = $rs->$meth({ trackid => $id });
+    my ($o) = $meth eq 'search'
+      ? $rs->$meth({ trackid => $id })->all
+      : $rs->$meth({ trackid => $id });
 
     is(
       $rs->count({ trackid => $id }),

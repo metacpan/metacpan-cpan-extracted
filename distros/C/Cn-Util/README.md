@@ -58,7 +58,7 @@ The file tests share one `stat` per path, so asking for four of them costs no mo
 
 With `cpu` greater than 1, `dir` walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  `on_match` still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.
 
-An unknown argument, a letter that is not a file test, a `cpu` that is not a positive integer, and a directory that cannot be opened all die.
+An unknown argument, an undefined `tests`, `dir`, `regex` or `cpu`, a letter that is not a file test, a `cpu` that is not a positive integer, an `on_match` that is not a code reference, and a directory that cannot be opened all die.
 
 ## execute
 
@@ -75,9 +75,9 @@ Runs `$cmd` through the shell with `system`, capturing its standard output and s
 * `stderr`: standard error, chomped
 * `all`: a hash reference with `exit`, `stdout` and `stderr`
 
-The third argument, `$die`, is 1 by default: a command that exits non-zero prints its exit status, standard output and standard error to `STDERR` and dies.  Pass 0 to have the status returned instead.
+The third argument, `$die`, is true by default: a command that exits non-zero prints its exit status, standard output and standard error to `STDERR` and dies.  Pass a false value, such as 0, to have the status returned instead.
 
-The command's standard input is the null device (`/dev/null`, or `nul` on Windows).  A command that would prompt -- `rm` on a write-protected file, `cp -i` -- reads end-of-file and declines rather than waiting, unseen, for an answer.  The caller's `STDIN` is restored afterwards.
+The command's standard input is an empty pipe.  A command that would prompt -- `rm` on a write-protected file, `cp -i` -- reads end-of-file and declines rather than waiting, unseen, for an answer.  The caller's `STDIN` is not touched, so input it has already read ahead is still there afterwards, even when `execute` dies.
 
 ## file2string
 
@@ -93,7 +93,7 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
     format_commas(-0.5);                # '-0.50'
     format_commas(1e20);                # '100,000,000,000,000,000,000.00'
 
-Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the `sprintf` format the hundredths are printed with, `'.%02d'` by default; `'%.0u'` rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (`0.999` is `1.00`), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
+Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the `sprintf` format the hundredths are printed with, `'.%02d'` by default; `'%.0u'` rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (`0.999` is `1.00`), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.  Infinity and NaN are returned as perl prints them.
 
 ## json_file_to_ref
 
@@ -105,7 +105,7 @@ Reads a JSON file and returns the decoded data, through `JSON::MaybeXS`.  Python
 
     ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The file name must be a plain string; a reference dies.
+Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
 
 ## random_key, random_value
 

@@ -1,6 +1,9 @@
 use strict;
 use warnings;
+use DBIO ();
 use DBIO::SQLite::Test;
+use DBIO::Storage::DBI;
+use DBIO::SQLite::Storage;
 use Test::More;
 use Test::Exception;
 use DBIO::Util 'sigwarn_silencer';
@@ -31,92 +34,134 @@ sub count_sheep {
         ->all;
 }
 
-$schema = DBIO::Test::Schema->connect("dbi::$dbname");
-throws_ok { count_sheep($schema) } qr{I can't work out what driver to use},
-    'Driver in DSN empty';
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+# A schema always has a driver (core ADR 0067): DBIO::Test::Schema keeps none
+# in its class, so every connect below declares SQLite on a clone. Which
+# driver a DSN leads to is DBIO->driver_for's question, not the storage's.
+sub declared {
+  my $declared = DBIO::Test::Schema->clone;
+  $declared->storage_type('DBIO::SQLite::Storage');
+  return $declared->connect(@_);
+}
 
-$schema = DBIO::Test::Schema->connect("dbi:Test_NonExistant_DBD:$dbname");
-throws_ok { count_sheep($schema) }
-    qr{No DBIO driver registered for DBD driver 'Test_NonExistant_DBD'},
-    "Driver class doesn't exist";
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+SKIP: {
+  skip 'the refusal of a schema without a driver arrives with core ADR 0067', 1
+    unless DBIO->can('driver_for');
 
-$ENV{DBI_DSN} = "dbi::$dbname";
-$schema = DBIO::Test::Schema->connect;
-throws_ok { count_sheep($schema) } qr{I can't work out what driver to use},
-    "Driver class not defined in DBI_DSN either.";
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+  throws_ok { DBIO::Test::Schema->connect("dbi:SQLite:$dbname") }
+    qr{declares no driver},
+    'a schema without a driver is refused at connect, although the DSN names SQLite';
+}
 
-$ENV{DBI_DSN} = "dbi:Test_NonExistant_DBD2:$dbname";
-$schema = DBIO::Test::Schema->connect;
-throws_ok { count_sheep($schema) }
-    qr{No DBIO driver registered for DBD driver 'Test_NonExistant_DBD2'},
-    "Driver class defined in DBI_DSN doesn't exist";
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+$schema = declared("dbi::$dbname");
+throws_ok { count_sheep($schema) } qr{DSN without a driver part},
+    'Driver in DSN empty is refused (core karr k340)';
+isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
-$ENV{DBI_DSN} = "dbi::$dbname";
-$ENV{DBI_DRIVER} = 'Test_NonExistant_DBD3';
-$schema = DBIO::Test::Schema->connect;
-throws_ok { count_sheep($schema) }
-    qr{No DBIO driver registered for DBD driver 'Test_NonExistant_DBD3'},
-    "Driver class defined in DBI_DRIVER doesn't exist";
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+SKIP: {
+  skip 'DBIO->driver_for arrives with core ADR 0067', 2
+    unless DBIO->can('driver_for');
 
-$ENV{DBI_DSN} = "dbi:Test_NonExistant_DBD4:$dbname";
-$schema = DBIO::Test::Schema->connect;
-throws_ok { count_sheep($schema) }
-qr{No DBIO driver registered for DBD driver 'Test_NonExistant_DBD4'},
-    "Driver class defined in DBI_DSN doesn't exist";
-isa_ok $schema->storage, 'DBIO::Storage::DBI';
+  throws_ok { DBIO->driver_for("dbi:Test_NonExistant_DBD:$dbname") }
+    qr{DBD::Test_NonExistant_DBD names no DBIO driver},
+    'driver_for: a DBD no driver is registered for names no driver';
 
-delete @ENV{qw(DBI_DSN DBI_DRIVER)};
+  throws_ok { DBIO->driver_for("dbi::$dbname") }
+    qr{the DSN names no DBD},
+    'driver_for: a DSN without a driver part names no driver';
+}
 
-$schema = DBIO::Test::Schema->connect("dbi:SQLite:$dbname");
+{
+  local $ENV{DBI_DSN} = "dbi:SQLite:$dbname";
+  $schema = declared("dbi::$dbname");
+  throws_ok { count_sheep($schema) } qr{DSN without a driver part},
+      'Driver in DSN empty, SQLite in DBI_DSN: still refused';
+  isa_ok $schema->storage, 'DBIO::SQLite::Storage';
+}
+
+# connect() without arguments is refused at connect, whatever the DBI
+# environment names
+for my $case (
+  [ 'no DBI environment'                 => {} ],
+  [ 'SQLite in DBI_DSN'                  => { DBI_DSN => "dbi:SQLite:$dbname" } ],
+  [ 'SQLite in DBI_DRIVER'               => { DBI_DRIVER => 'SQLite' } ],
+  [ 'SQLite in DBI_DSN (and DBI_DRIVER)' => { DBI_DSN => "dbi:SQLite:$dbname", DBI_DRIVER => 'SQLite' } ],
+  [ 'SQLite in DBI_DRIVER (not DBI_DSN)' => { DBI_DSN => "dbi::$dbname", DBI_DRIVER => 'SQLite' } ],
+) {
+  my ($name, $env) = @$case;
+  local @ENV{keys %$env} = values %$env;
+
+  throws_ok { declared() }
+    qr/Connect info without a DSN \(no arguments\)/,
+    "connect() without arguments refused, $name";
+}
+
+$schema = declared("dbi:SQLite:$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info';
 isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
-$schema = DBIO::Test::Schema->connect("dbi:SQLite(ReadOnly=1):$dbname");
+$schema = declared("dbi:SQLite(ReadOnly=1):$dbname");
 lives_ok { count_sheep($schema) } 'SQLite passed to connect_info despite extra arguments present';
 isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
-$ENV{DBI_DRIVER} = 'SQLite';
-$schema = DBIO::Test::Schema->connect("dbi::$dbname");
-lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER';
-isa_ok $schema->storage, 'DBIO::SQLite::Storage';
+SKIP: {
+  skip 'DBIO->driver_for arrives with core ADR 0067', 2
+    unless DBIO->can('driver_for');
 
-delete $ENV{DBI_DRIVER};
-$ENV{DBI_DSN} = "dbi:SQLite:$dbname";
-$schema = DBIO::Test::Schema->connect;
-lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN';
-isa_ok $schema->storage, 'DBIO::SQLite::Storage';
+  is( DBIO->driver_for("dbi:SQLite:$dbname"), 'SQLite',
+    'driver_for: a dbi:SQLite DSN names the SQLite driver' );
+  is( DBIO->driver_for("dbi:SQLite(ReadOnly=1):$dbname"), 'SQLite',
+    'driver_for: ... also with DBI attributes in the DSN' );
+}
 
-$ENV{DBI_DRIVER} = 'SQLite';
-$schema = DBIO::Test::Schema->connect;
-lives_ok { count_sheep($schema) } 'SQLite in DBI_DSN (and DBI_DRIVER)';
-isa_ok $schema->storage, 'DBIO::SQLite::Storage';
+# the DSN passed to connect names the driver, whatever the DBI environment names
+for my $env (
+  { DBI_DRIVER => 'Test_NonExistant_DBD3' },
+  { DBI_DSN => "dbi:Test_NonExistant_DBD4:$dbname" },
+) {
+  local @ENV{keys %$env} = values %$env;
+  my ($var) = keys %$env;
 
-$ENV{DBI_DSN} = "dbi::$dbname";
-$ENV{DBI_DRIVER} = 'SQLite';
-$schema = DBIO::Test::Schema->connect;
-lives_ok { count_sheep($schema) } 'SQLite in DBI_DRIVER (not DBI_DSN)';
-isa_ok $schema->storage, 'DBIO::SQLite::Storage';
+  $schema = declared("dbi:SQLite:$dbname");
+  lives_ok { count_sheep($schema) } "SQLite passed to connect_info, another driver in $var";
+  isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
-# make sure that dynamically setting DBI_DSN post-connect works
-{
+  SKIP: {
+    skip 'DBIO->driver_for arrives with core ADR 0067', 1
+      unless DBIO->can('driver_for');
+
+    is( DBIO->driver_for("dbi:SQLite:$dbname"), 'SQLite',
+      "driver_for: the DSN names the driver, another driver in $var does not" );
+  }
+}
+
+# A DSN that names no driver is refused, whatever DBI_DRIVER holds: the DSN
+# names the driver, never $ENV{DBI_DRIVER} (core karr k340).
+for my $driver (qw( SQLite Test_NonExistant_DBD3 )) {
+  local $ENV{DBI_DRIVER} = $driver;
+  $schema = declared("dbi::$dbname");
+  throws_ok { count_sheep($schema) } qr{DSN without a driver part},
+      "DBI_DRIVER=$driver does not fill a DSN without a driver part";
+}
+
+# a storage that never got connect info has nothing to connect from, and
+# setting DBI_DSN gives it nothing
+for my $class (qw( DBIO::Storage::DBI DBIO::SQLite::Storage )) {
   local $ENV{DBI_DSN};
 
-  my $s = DBIO::Test::Schema->connect();
+  my $storage = $class->new(undef);
 
   throws_ok {
-    $s->storage->ensure_connected
+    $storage->ensure_connected
   } qr/You did not provide any connection_info/,
-  'sensible exception on empty conninfo connect';
+  "$class: sensible exception on connect without connect info";
 
   $ENV{DBI_DSN} = 'dbi:SQLite::memory:';
 
-  lives_ok { $s->storage->ensure_connected } 'Second connection attempt worked';
-  isa_ok ( $s->storage, 'DBIO::SQLite::Storage' );
+  throws_ok {
+    $storage->ensure_connected
+  } qr/You did not provide any connection_info/,
+  "$class: the same exception with DBI_DSN set";
+  ok ( ! $storage->connected, "$class: and no connection is opened" );
 }
 
 done_testing;

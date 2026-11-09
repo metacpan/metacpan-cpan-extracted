@@ -7,12 +7,14 @@ use DBIO::Async::Pool;
 use DBIO::Async::Storage;
 
 # OFFLINE unit test for the connection-readiness gating in
-# DBIO::Async::Pool::acquire. No real DB, no event loop.
+# DBIO::Async::Pool::_connection_ready_future -- the seam core's
+# DBIO::Storage::PoolBase::acquire chains around every connection it hands
+# out (karr k75/k12). No real DB, no event loop.
 #
-# The pool delegates readiness checking to the Storage's
-# _await_conn_ready method. We create a test Storage that controls
-# when connections become "ready" and verify the acquire→ready→resolve
-# lifecycle.
+# The seam delegates readiness checking to the Storage's _await_conn_ready
+# method. We create a test Storage that controls when connections become
+# "ready" and assert the observable acquire→ready→resolve lifecycle: the
+# acquire Future must not resolve before the connection really is ready.
 
 # --- Fake connection: tracks ready state ---
 
@@ -32,6 +34,8 @@ use DBIO::Async::Storage;
 {
   package TestStorage3;
   use base 'DBIO::Async::Storage';
+  use lib 't/lib';
+  use AsyncResetStub;
 
   sub sql_maker_class         { 'DBIO::SQLMaker' }
   sub _transform_sql          { $_[1] }

@@ -4,6 +4,8 @@ package DBIO::Oracle::Introspect::Tables;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -26,7 +28,7 @@ sub fetch {
   });
   $sth->execute($schema, $schema);
 
-  while (my $row = $sth->fetchrow_hashref) {
+  while (my $row = $sth->fetchrow_hashref('NAME_lc')) {
     $tables{ $row->{table_name} } = {
       table_name => $row->{table_name},
       kind       => $row->{kind},
@@ -51,7 +53,7 @@ DBIO::Oracle::Introspect::Tables - Introspect Oracle tables and views
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

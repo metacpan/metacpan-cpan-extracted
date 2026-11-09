@@ -49,7 +49,7 @@ plan tests => 11;
 {
   my $cd_rs = $schema->resultset('CD')->search({ 'artist.name' => 'Caterwauler McCrae' }, { join => 'artist' });
 
-  my $cd = $cd_rs->find_or_new({ title => 'Huh?', year => 2006 });
+  my $cd = $cd_rs->find_or_new({ artist => $schema->resultset('Artist')->find({ name => 'Caterwauler McCrae' })->id, title => 'Huh?', year => 2006 });
   is($cd->in_storage, 0, 'new CD not in storage yet');
   is($cd->title, 'Huh?', 'new CD title is correct');
   is($cd->year, 2006, 'new CD year is correct');

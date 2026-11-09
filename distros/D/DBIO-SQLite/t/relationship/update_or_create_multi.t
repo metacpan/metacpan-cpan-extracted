@@ -56,21 +56,19 @@ is_deeply (
   'CD year column updated correctly',
 );
 
-# expect a failing create:
-# the unique constraint is not complete, and there is nothing
-# in the database with such a year yet - insertion will fail due
-# to missing artist fk
+# expect a refusal:
+# the unique constraint is not complete (the artist is missing) and a
+# year is no identity, so there is no row to look up and none is created
+# (ADR 0070)
 throws_ok {
   $genre->update_or_create_related ('cds', {
     year => 2020,
     title => 'the best thing since sliced bread',
   })
-} qr/DBI Exception.+(?x:
-    \QNOT NULL constraint failed: cd.artist\E
-      |
-    \Qcd.artist may not be NULL\E
-)/s, 'ambiguous find + create failed'
+} qr/update_or_create\(\) needs a condition that gives every column of one unique constraint of source 'CD' a concrete value/,
+  'ambiguous find + create refused'
 ;
+is ($genre->search_related( 'cds' )->count, 1, 'Nothing was created by the refused call');
 
 # expect a create, after a failed search using *only* the
 # *current* relationship and the unique column constraints
@@ -92,7 +90,10 @@ $schema->is_executed_sql_bind( sub {
     "the best thing since vertical toasters",
   ],
   [
-    'INSERT INTO cd ( "artist", "genreid", "title", "year") VALUES ( ?, ?, ?, ? )',
+    # on libsqlite 3.35+ the driver declares insert_returning, so the autoinc PK
+    # comes back on the INSERT itself instead of via a later last_insert_id
+    'INSERT INTO cd ( "artist", "genreid", "title", "year") VALUES ( ?, ?, ?, ? )'
+      . ( $schema->storage->_use_insert_returning ? ' RETURNING "cdid"' : '' ),
     1,
     2,
     "the best thing since vertical toasters",

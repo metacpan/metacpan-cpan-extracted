@@ -5,6 +5,8 @@ package # moar hide
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::Statistics';
 use Sub::Util 'set_subname';
 use namespace::clean;
@@ -35,7 +37,7 @@ DBIO::Test::SQLTracerObj - SQL statement tracing object for test diagnostics
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

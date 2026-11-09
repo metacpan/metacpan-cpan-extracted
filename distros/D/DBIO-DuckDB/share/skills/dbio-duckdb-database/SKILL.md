@@ -1,6 +1,6 @@
 ---
 name: dbio-duckdb-database
-description: "DuckDB knowledge for Perl driver development (DBD module, SQL dialect, types, sequences, transactions, pagination)"
+description: Use when you need DuckDB specifics for driver work — DBD module, SQL dialect, types, sequences, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -21,15 +21,18 @@ DBI->connect('dbi:DuckDB:dbname=app.duckdb');   # file-backed
 DBI->connect('dbi:DuckDB:dbname=:memory:');     # in-memory (tests use this)
 ```
 
-No user/pass — pass empty strings. DBD::DuckDB binds via libduckdb's
-strongly-typed prepared params, so the driver returns `undef` from
-`bind_attribute_by_data_type` (no DBI bind-attr overrides).
+No user/pass — pass empty strings. DBD::DuckDB picks the bind function from
+the value (any number-looking scalar binds as DOUBLE), so
+`DBIO::DuckDB::Storage::bind_attribute_by_data_type` returns `SQL_BIGINT` for
+the wide types (bigint, hugeint, decimal, numeric, money, ...) to force the
+exact string-cast route, and `undef` for integer and narrower.
 
 ## Version Notes
 
-`$storage->duckdb_version` → e.g. `v1.0.0`. Alien::DuckDB 0.03 ships
-1.3.0. The Quack client-server RPC extension needs libduckdb >= 1.5.
-FK constraints are not enforced at runtime as of 1.x.
+`$storage->duckdb_version` → e.g. `v1.5.3`. Alien::DuckDB 0.04 bundles
+libduckdb 1.5.3 (0.03 shipped 1.2.2). The Quack client-server RPC extension
+needs libduckdb >= 1.5, so 0.04 provides it out of the box.
+FK constraints are enforced (an insert without a parent fails).
 
 ## Type System
 
@@ -72,8 +75,11 @@ sequence. Introspection detects `nextval(...)` defaults to recover
 ## Transactions & MVCC
 
 DuckDB is ACID with MVCC (single-writer, optimistic). Standard
-`BEGIN/COMMIT/ROLLBACK`. Savepoints supported: `SAVEPOINT` /
-`RELEASE SAVEPOINT` / `ROLLBACK TO SAVEPOINT` (wired in Storage).
+`BEGIN/COMMIT/ROLLBACK`. **No savepoints**: `SAVEPOINT` /
+`RELEASE SAVEPOINT` / `ROLLBACK TO SAVEPOINT` are each a Parser Error
+(libduckdb 1.5.3), so Storage defines no `_exec_svp_*` and core refuses
+`svp_*` itself. With `auto_savepoint => 1` every nested `txn_do` /
+`txn_scope_guard` throws "doesn't support savepoints" — leave it off.
 `SELECT ... FOR UPDATE` is **not** supported — SQLMaker disables
 `_lock_select`. `CHECKPOINT` flushes the WAL.
 
@@ -104,11 +110,12 @@ are **opaque** to these views — use `PRAGMA table_info('remote.tbl')`.
 
 ## FK Handling
 
-FKs are **readable but NOT emitted** in install DDL. DuckDB validates the
-referenced column tuple against the parent PK/unique *in the same column
-order* at CREATE TABLE time; DBIO FK condition hashes are alphabetically
-sorted and often mismatch. Since FKs have no runtime effect in 1.x, install
-DDL skips them; introspect/diff can still round-trip user-added FKs.
+FKs are enforced by DuckDB and written in install DDL: columns in the parent
+PK/unique order (DuckDB validates the referenced tuple in that order), tables
+after their parents. `ON DELETE/UPDATE CASCADE`, `SET NULL` and `SET DEFAULT`
+are refused with table and column; `RESTRICT`/`NO ACTION` pass. A FK added or
+dropped on an existing table rebuilds the table (`Diff::Rebuild`, ADR 0010).
+Introspected FKs carry the live name as `constraint_name` (ADR 0021).
 
 ## Testing Env Vars
 

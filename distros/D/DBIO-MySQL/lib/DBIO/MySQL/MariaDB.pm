@@ -4,6 +4,8 @@ package DBIO::MySQL::MariaDB;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 
 
@@ -28,7 +30,7 @@ DBIO::MySQL::MariaDB - MariaDB-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -40,22 +42,29 @@ version 0.900001
 
 =head1 DESCRIPTION
 
-MariaDB-specific schema component for L<DBIO>. Load this component instead
-of L<DBIO::MySQL> when connecting to a MariaDB server.
+Schema component for L<DBIO> that pins the storage class of the
+L<DBD::MariaDB> driver. It makes no statement about the server: MySQL and
+MariaDB are told apart from the server itself
+(L<DBIO::MySQL::Storage/_is_mariadb>), whether this component or
+L<DBIO::MySQL> is loaded.
 
 When C<connection()> is called, the storage class is set to
-L<DBIO::MySQL::Storage::MariaDB>, which uses the C<mariadb_*> DBD attributes
-provided by L<DBD::MariaDB> rather than the C<mysql_*> attributes used by
-L<DBD::mysql>.
+L<DBIO::MySQL::Storage::MariaDB>, the registration target for the C<MariaDB>
+DBI driver (a C<dbi:MariaDB:> DSN). It overrides no behaviour. The C<mysql_*>
+or C<mariadb_*> attribute names are chosen per connection by the DBD that owns
+the handle (see L<DBIO::MySQL::Storage/_dbd_attribute>), so this component over
+a C<dbi:mysql:> DSN keeps using C<mysql_*>.
 
 =head1 METHODS
 
 =head2 connection
 
-Overrides L<DBIO/connection> to set C<storage_type> to
+Overrides L<DBIO::Schema/connection> to set C<storage_type> to
 C<+DBIO::MySQL::Storage::MariaDB> before delegating to the parent.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over 4
 

@@ -4,7 +4,7 @@ use Test::More;
 
 use DBIO::DB2::Diff;
 
-# Regression for karr #19.
+# Regression for karr k19.
 #
 # When DBIO::DB2::Diff reconciles a live schema that contains a table NOT
 # present in the target (a table removed from the app's DBIO classes, or an
@@ -24,7 +24,7 @@ use DBIO::DB2::Diff;
 my $source = {
   tables  => { leftover => { table_name => 'leftover' } },
   columns => {
-    leftover => [ { column_name => 'id', data_type => 'integer', is_pk => 1 } ],
+    leftover => [ { column_name => 'id', catalog_type => 'integer', is_pk => 1 } ],
   },
   indexes => {
     leftover => {
@@ -43,7 +43,7 @@ ok $diff->has_changes, 'diff detects the removed table';
 
 my $sql = $diff->as_sql;
 
-like   $sql, qr/DROP TABLE leftover;/,
+like   $sql, qr/DROP TABLE "leftover";/,
   'DROP TABLE is emitted for the removed table';
 unlike $sql, qr/DROP INDEX\s+idx_leftover_id/,
   'no standalone DROP INDEX for the dropped table (DROP TABLE already covers it)';
@@ -59,7 +59,7 @@ is scalar(@drop_index), 0, 'zero DROP INDEX statements in the full-schema sync';
 # the fix only suppresses drops for indexes of dropped tables.
 my $src2 = {
   tables  => { users => { table_name => 'users' } },
-  columns => { users => [ { column_name => 'id', data_type => 'integer', is_pk => 1 } ] },
+  columns => { users => [ { column_name => 'id', catalog_type => 'integer', is_pk => 1 } ] },
   indexes => {
     users => {
       idx_users_email => { index_name => 'idx_users_email', is_unique => 0, columns => ['email'] },
@@ -69,14 +69,14 @@ my $src2 = {
 };
 my $tgt2 = {
   tables  => { users => { table_name => 'users' } },
-  columns => { users => [ { column_name => 'id', data_type => 'integer', is_pk => 1 } ] },
+  columns => { users => [ { column_name => 'id', catalog_type => 'integer', is_pk => 1 } ] },
   indexes => { users => {} },
   foreign_keys => {},
 };
 
 my $sql2 = DBIO::DB2::Diff->new(source => $src2, target => $tgt2)->as_sql;
 unlike $sql2, qr/DROP TABLE/, 'surviving table is not dropped';
-like   $sql2, qr/DROP INDEX\s+idx_users_email/,
+like   $sql2, qr/DROP INDEX\s+"idx_users_email"/,
   'index of a surviving table is still dropped standalone';
 
 done_testing;

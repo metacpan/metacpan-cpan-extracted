@@ -4,6 +4,10 @@ package DBIO::PostgreSQL::Introspect::Normalize;
 use strict;
 use warnings;
 
+use Carp ();
+
+our $VERSION = '0.900004';
+
 
 
 sub name {
@@ -58,7 +62,9 @@ sub data_type {
       $info->{data_type} = 'bit';
       $info->{size} = 0 + $1;
     }],
-    [qr/^(vector|halfvec|sparsevec)\((\d+)\)\z/, sub {
+    # A model read under an empty search_path has the schema in front of
+    # the type: public.vector(3).
+    [qr/^(?:(?:"[^"]+"|\w+)\.)?(vector|halfvec|sparsevec)\((\d+)\)\z/, sub {
       $info->{data_type} = $1;
       $info->{size} = 0 + $2;
     }],
@@ -72,9 +78,15 @@ sub data_type {
     [qr/^time without time zone\z/, sub {
       $info->{data_type} = 'time';
     }],
-    [qr/^(interval|timestamp with time zone|time with time zone)\((\d+)\)\z/, sub {
-      $info->{data_type} = $1;
+    # format_type writes the precision behind the first word:
+    # "timestamp(3) with time zone", never "timestamp with time zone(3)".
+    [qr/^(timestamp|time)\((\d+)\) with time zone\z/, sub {
+      $info->{data_type} = "$1 with time zone";
       $info->{size} = 0 + $2;
+    }],
+    [qr/^interval\((\d+)\)\z/, sub {
+      $info->{data_type} = 'interval';
+      $info->{size} = 0 + $1;
     }],
   );
 
@@ -153,8 +165,32 @@ sub array {
   return $value if ref $value eq 'ARRAY';
 
   my $raw = $value;
-  $raw =~ s/^\{|\}$//g;
-  return [ grep { length $_ } split /,/, $raw ];
+  $raw =~ s/\A\s+|\s+\z//g;
+  Carp::croak('not a PostgreSQL array literal')
+    unless $raw =~ /\A\{(.*)\}\z/s;
+  my $body = $1;
+  return [] if $body =~ /\A\s*\z/;
+
+  my @items;
+  pos($body) = 0;
+  while (1) {
+    $body =~ /\G\s*/gc;
+    if ($body =~ /\G"((?:[^"\\]|\\.)*)"\s*/gcs) {
+      (my $item = $1) =~ s/\\(.)/$1/gs;
+      push @items, $item;
+    }
+    elsif ($body =~ /\G((?:[^,"\\{}]|\\.)*)/gcs) {
+      my $item = $1;
+      $item =~ s/\s+\z//;
+      my $was_null = $item =~ /\Anull\z/i;
+      $item =~ s/\\(.)/$1/gs;
+      push @items, $was_null ? undef : $item;
+    }
+    if ($body =~ /\G,/gc) { next }
+    last if (pos($body) // 0) == length $body;
+    Carp::croak('not a PostgreSQL array literal');
+  }
+  return \@items;
 }
 
 1;
@@ -171,7 +207,7 @@ DBIO::PostgreSQL::Introspect::Normalize - Pure normalization helpers for Postgre
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -221,7 +257,15 @@ Mutates C<$info> in place to set C<data_type> and (where appropriate)
 C<size> from the raw C<pg_catalog> row. Handles the size-bearing
 variants (C<varchar(n)>, C<numeric(p,s)>, C<interval(n)>,
 pgvector C<vector(n)>, etc.) and the size-stripped aliases (C<character
-varying> B<-> C<text>). Enum columns are detected via C<type_category>
+varying> B<-> C<text>). The time types are taken apart where C<format_type>
+puts the precision, behind the first word: C<timestamp(3) with time zone> is
+C<timestamp with time zone> with a C<size> of 3, C<time(0) without time zone>
+is C<time> with a C<size> of 0
+(L<DBIO::PostgreSQL::Util/type_with_modifier> puts the two together again).
+A type comes with its schema in a model read under an empty C<search_path>
+(L<DBIO::PostgreSQL::Introspect/qualified_names>, the default):
+C<public.vector(3)> is a C<vector> with a C<size> of 3, as C<vector(3)> is.
+Enum columns are detected via C<type_category>
 and the canonical C<schema.name> reference is recorded under
 C<pg_enum_type> / C<extra/custom_type_name> / C<extra/list>. Pass the
 already-fetched C<values> ArrayRef in C<$enum_values> when normalising a
@@ -246,6 +290,14 @@ auto-increment metadata. Mutates C<$info> in place.
 Decodes the C<{a,b,c}> string DBD::Pg returns for C<text[]> / C<integer[]>
 columns into a Perl ArrayRef. Already-an-ArrayRef values pass through
 unchanged. C<undef> returns C<undef>.
+
+The string is read by the grammar of a PostgreSQL array literal: an element
+is bare or in double quotes, a backslash makes the next character part of the
+element, a quoted element may hold commas, braces, blanks and doubled
+apostrophes, and an unquoted C<NULL> (any case) is C<undef> where C<"NULL">
+is the text. Blanks around a bare element are not part of it; C<{}> is an
+empty array. A string that is no one-dimensional array literal throws, without
+quoting it.
 
 =head1 AUTHOR
 

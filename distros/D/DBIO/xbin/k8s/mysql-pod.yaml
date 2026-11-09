@@ -1,12 +1,26 @@
-# Reference manifest for manual debugging.
-# The actual pods are created programmatically via IO::K8s objects.
+# The MySQL test database of the family.
 #
-# Usage:
-#   kubectl apply -f maint/k8s/mysql-pod.yaml -n dbic-test-xxx
-#   kubectl port-forward -n dbic-test-xxx svc/mysql-svc 3306:3306
-#   DBICTEST_MYSQL_DSN='dbi:mysql:database=dbic_test;host=127.0.0.1;port=3306' \
-#     DBICTEST_MYSQL_USER=root DBICTEST_MYSQL_PASS=dbictest \
-#     prove -l t/71mysql.t
+# It stands in the namespace dev-dbio of the HQ cluster and is started from
+# this file by
+#
+#   <cihq-ocp>/umgebungen/dbio/dbio-db up mysql
+#
+# which applies the file as it is and only sets the namespace and turns the
+# service into a LoadBalancer on the project address. A change to anything
+# below the first `---` is therefore a change to that running database.
+#
+# A suite (dbio-mysql) gets its connection from dbio-db and runs against
+# dbio.dev.cihq:3306 -- no port-forward:
+#
+#   eval "$(<cihq-ocp>/umgebungen/dbio/dbio-db env mysql)"
+#   ../dbio/maint/live-preflight && ../dbio/maint/capped-test prove -lr t/
+#
+# The database stays up after the run, and takes one run at a time. See the
+# "Live testing" section in .claude/rules/dbio-rules.md.
+#
+# DBIO::Test::Kubernetes builds the same pod from IO::K8s objects for the
+# short-lived pods of its own runs -- keep the two in step. Either way the pod
+# carries resources.limits (RESOURCE LIMITS in DBIO::Test::Kubernetes).
 ---
 apiVersion: v1
 kind: Pod
@@ -14,25 +28,39 @@ metadata:
   name: mysql
   labels:
     app: mysql
-    role: dbic-test-db
+    role: dbio-test-db
 spec:
   containers:
     - name: mysql
-      image: mysql:8.0
+      # PINNED: mysql:8.0.31+ requires CPU baseline x86-64-v2, which the test
+      # cluster node lacks (Fatal glibc error: CPU does not support x86-64-v2).
+      # 8.0.30 is the last v1-compatible 8.0.x. Keep in step with the MySQL spec
+      # in DBIO::Test::Kubernetes (k206).
+      image: mysql:8.0.30
+      resources:
+        requests:
+          cpu: 250m
+          memory: 384Mi   # mysqld's baseline RSS; understating it invites overcommit
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 1Gi
       ports:
         - containerPort: 3306
       env:
         - name: MYSQL_ROOT_PASSWORD
-          value: dbictest
+          value: dbiotest
         - name: MYSQL_DATABASE
-          value: dbic_test
+          value: dbio_test
+      # Probe over TCP with a real query, NOT `mysqladmin ping -h localhost`:
+      # the entrypoint's temporary init server is socket-only (port 0), so a
+      # socket probe reports Ready ~5s before 3306 listens and clients get
+      # "connection refused" (k208). Keep in step with DBIO::Test::Kubernetes.
       readinessProbe:
         exec:
           command:
-            - mysqladmin
-            - ping
-            - -h
-            - localhost
+            - sh
+            - -c
+            - MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -P 3306 -u root -e "SELECT 1" dbio_test
         initialDelaySeconds: 10
         periodSeconds: 3
         timeoutSeconds: 2

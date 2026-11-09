@@ -4,7 +4,7 @@ use Test::More;
 
 use DBIO::MSSQL::Diff;
 
-# Regression for karr #15 (from dbio core #77 / originally dbio-postgresql #32).
+# Regression for karr k15 (from dbio core k77 / originally dbio-postgresql k32).
 #
 # When DBIO::MSSQL::Diff reconciles a live schema that contains a table NOT
 # present in the target (removed from the app's DBIO classes, or an unmanaged

@@ -2,15 +2,15 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
-use Scalar::Util ();
 
 use DBIO::Test;
+use DBIO::Test::Future ();
 use DBIO::SQLMaker;
 use DBIO::Storage::Async;
 use DBIO::Storage::DBI;
 use DBIO::Test::Storage;
 
-# ADR 0030 refinement (karr #65): the future_io async mode resolves its
+# ADR 0030 refinement: the future_io async mode resolves its
 # per-driver transport adapter by CONVENTION -- ref($storage) . '::Async' --
 # derived off the concrete, driver-determined storage class (parallel to the
 # sync driver storage DBIO::X::Storage). This drives that resolution entirely
@@ -20,57 +20,13 @@ use DBIO::Test::Storage;
 # transport seams -- the same sync-future/pool pattern used by
 # t/test/15_async_orchestration.t -- so a CRUD op can round-trip in-process.
 
-# --- A synchronous, contract-compliant Future ------------------------------
-# The orchestration relies on real DBIO::Future chaining: ->then flattens a
-# returned Future and (2-arg) routes a failure to on_fail. This shim provides
-# that synchronously (mirrors t/test/15).
-{
-  package AsyncConv::SyncFuture;
-
-  sub done { my $c = shift; bless { failed => 0, result => [@_] }, ref($c) || $c }
-  sub fail { my ($c, $e) = @_; bless { failed => 1, error => $e, result => [] }, ref($c) || $c }
-
-  sub is_ready  { 1 }
-  sub is_failed { $_[0]->{failed} ? 1 : 0 }
-
-  sub get {
-    my $self = shift;
-    die $self->{error} if $self->{failed};
-    return wantarray ? @{ $self->{result} } : $self->{result}[0];
-  }
-
-  sub then {
-    my ($self, $on_done, $on_fail) = @_;
-    if ($self->{failed}) {
-      return $self unless $on_fail;
-      return _dispatch($on_fail, $self->{error});
-    }
-    return _dispatch($on_done, @{ $self->{result} });
-  }
-
-  sub catch {
-    my ($self, $on_fail) = @_;
-    return $self unless $self->{failed};
-    return _dispatch($on_fail, $self->{error});
-  }
-
-  sub _dispatch {
-    my ($cb, @args) = @_;
-    my @r = eval { $cb->(@args) };
-    return __PACKAGE__->fail($@) if $@;
-    return $r[0]
-      if @r == 1 && Scalar::Util::blessed($r[0]) && $r[0]->isa(__PACKAGE__);
-    return __PACKAGE__->done(@r);
-  }
-}
-
 # --- A fake pool -----------------------------------------------------------
 {
   package AsyncConv::SyncPool;
 
   sub new { bless { released => [], available => 1 }, shift }
-  sub acquire     { AsyncConv::SyncFuture->done('CONN') }
-  sub acquire_txn { AsyncConv::SyncFuture->done('CONN') }
+  sub acquire     { DBIO::Test::Future->done('CONN') }
+  sub acquire_txn { DBIO::Test::Future->done('CONN') }
   sub release     { push @{ $_[0]->{released} }, $_[1]; 1 }
   sub available   { $_[0]->{available} }
   sub shutdown    { $_[0]->{available} = 0 }
@@ -92,7 +48,7 @@ use DBIO::Test::Storage;
     return $self;
   }
 
-  sub future_class    { 'AsyncConv::SyncFuture' }
+  sub future_class    { 'DBIO::Test::Future' }
   sub sql_maker_class { 'DBIO::SQLMaker' }
   sub _sql_maker_args { (quote_char => '"', name_sep => '.') }
   sub _transform_sql   { $_[1] }
@@ -179,7 +135,7 @@ sub driver_storage {
 
   $async->{next_rows} = [ [ 1, 'Miles Davis' ], [ 2, 'John Coltrane' ] ];
   my $f = $storage->select_async('artist', [ 'artistid', 'name' ], { name => { -like => '%' } });
-  isa_ok $f, 'AsyncConv::SyncFuture', 'select_async returns the adapter Future';
+  isa_ok $f, 'DBIO::Test::Future', 'select_async returns the adapter Future';
   is_deeply [ $f->get ], [ [ 1, 'Miles Davis' ], [ 2, 'John Coltrane' ] ],
     'select_async round-trips rows through the convention adapter';
   like $async->_last_sql, qr/^SELECT .*FROM "artist"/,

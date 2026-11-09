@@ -66,4 +66,13 @@ throws_ok { json_file_to_ref($empty) } qr/0 size/, 'zero-size file is rejected';
 throws_ok { ref_to_json_file($data, [] ) }
 	qr/isn't a scalar/, 'ref_to_json_file rejects a non-scalar filename';
 
+SKIP: {
+	# An absolute path, against the rule for t/: /dev/full, whose every write
+	# fails with ENOSPC, is the only way to make close() fail here, and it
+	# exists only on Linux, so the test skips everywhere else.
+	skip '/dev/full is Linux-only', 1 unless $^O eq 'linux' && -c '/dev/full' && -w _;
+	throws_ok { capture { ref_to_json_file($data, '/dev/full') } }
+		qr/can't write/, 'ref_to_json_file dies when the write fails at close';
+}
+
 done_testing;

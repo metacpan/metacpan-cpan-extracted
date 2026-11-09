@@ -1,6 +1,6 @@
 ---
 name: dbio-firebird
-description: "DBIO::Firebird driver — Firebird/InterBase storage, rdb$ introspection, test-deploy-and-compare, sequence/generator handling"
+description: Load when working on the DBIO::Firebird driver — storage, rdb$ introspection, deploy-and-compare, generators.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -24,10 +24,13 @@ __PACKAGE__->load_components('Firebird');
 `DBIO::Firebird::Storage` extends `DBIO::Firebird::Storage::InterBase`. Key settings:
 
 ```perl
+# on DBIO::Firebird::Storage::Common (all three transports)
 __PACKAGE__->sql_maker_class('DBIO::Firebird::SQLMaker');
 __PACKAGE__->sql_quote_char ('"');
-__PACKAGE__->datetime_parser_type('DBIO::Firebird::Storage::InterBase::DateTime::Format');
 __PACKAGE__->_use_insert_returning (1);   # RETURNING support
+
+# on each transport class (Storage, Storage::InterBase, Storage::ODBC)
+__PACKAGE__->datetime_parser_type('DBIO::Firebird::DateTime::Format');
 ```
 
 ### Sequences / Generators
@@ -56,31 +59,33 @@ LIMIT/OFFSET via `apply_limit`. SQL dialect 3 is forced on connect.
 `DBIO::Firebird::Introspect` extends `DBIO::Introspect::Base` — reads via `rdb$*`
 system tables.
 
-Model shape: `{ tables, columns, indexes, foreign_keys }`.
+Model shape: `{ tables, columns, indexes, unique_constraints, foreign_keys }`.
 
 Sources:
 - `rdb$relations` — tables and views (kind: table/view)
 - `rdb$relation_fields` + `rdb$fields` — column type, size, default, PK membership
 - `rdb$indices` + `rdb$index_segments` — user indexes (excludes PK/UNIQUE constraints)
+- `rdb$relation_constraints` (UNIQUE) + `rdb$index_segments` — unique constraints
 - `rdb$relation_constraints` + `rdb$indices` — FK constraints (composite, grouped by constraint name)
 
 ## Deploy
 
 `DBIO::Firebird::Deploy` — test-deploy-and-compare via temporary database:
 1. Introspect live DB
-2. CREATE DATABASE temp DB
+2. Create temp DB via `DBD::Firebird->create_database` (DSQL cannot prepare CREATE DATABASE; the file is placed beside the live db file)
 3. Deploy desired schema to temp
 4. Introspect temp DB
 5. Diff the two models
-6. DROP DATABASE temp
+6. Drop temp DB via `func('ib_drop_database')` on a separate handle connected to the temp DB (never the live handle)
 
-Uses `DBIO::Firebird::DDL` for DDL generation (wraps SQL::Translator).
+Uses `DBIO::Firebird::DDL` for DDL generation (hand-rolled emitter built on `DBIO::Firebird::Type`; every identifier is double-quoted via `_firebird_quote_ident`, because Firebird folds bare names to upper case).
 
 ## FK Behavior
 
 Firebird supports `MATCH FULL` / `SIMPLE` and `ON UPDATE/DELETE` actions.
-Introspector groups composite FK columns by constraint name. FK diff ops emit
-`FOREIGN KEY (...) REFERENCES ...(...)` inline within CREATE TABLE.
+Introspector groups composite FK columns by constraint name. `install_ddl` and
+`Diff::Constraint` write FKs and unique constraints as `ALTER TABLE ... ADD
+CONSTRAINT` after all CREATE TABLE statements (not inline; karr k34).
 
 ## Key Modules
 

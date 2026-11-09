@@ -4,6 +4,8 @@ package DBIO::Replicated::Pool;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 use Scalar::Util 'reftype';
 use Try::Tiny;
@@ -18,6 +20,7 @@ __PACKAGE__->mk_group_accessors(simple => qw/
   storage_class
   next_unknown_replicant_id
 /);
+
 
 sub new {
   my ($class, %args) = @_;
@@ -37,17 +40,20 @@ sub new {
   return $self;
 }
 
+
 sub master {
   my $self = shift;
   $self->{master} = $_[0] if @_;
   return $self->{master};
 }
 
+
 sub replicants {
   my $self = shift;
   $self->{replicants} = $_[0] if @_;
   return $self->{replicants};
 }
+
 
 sub set_replicant {
   my ($self, $key, $value) = @_;
@@ -60,6 +66,7 @@ sub get_replicant {
   my ($self, $key) = @_;
   return $self->replicants->{$key};
 }
+
 
 sub has_replicants {
   my $self = shift;
@@ -79,19 +86,23 @@ sub delete_replicant {
   return delete $self->replicants->{$key};
 }
 
+
 sub all_replicants {
   my $self = shift;
   return map { $self->replicants->{$_} } @{ $self->{replicant_order} || [] };
 }
 
+
 sub connected_replicants {
   return scalar grep { $_->connected } shift->all_replicants;
 }
+
 
 sub active_replicants {
   my $self = shift;
   return grep { $_->active } $self->all_replicants;
 }
+
 
 sub connect_replicants {
   my $self = shift;
@@ -136,6 +147,12 @@ sub connect_replicants {
     if ($dsn) {
       $replicant->dsn($dsn);
       ($key) = ($dsn =~ m/^dbi\:.+\:(.+)$/i);
+
+      # the name is a pool key (force_pool), shown in traces and messages:
+      # never a password in it
+      if (defined $key) {
+        $key = join ';', grep { !/^\s*(?:password|passwd|pwd)\s*=/i } split /;/, $key;
+      }
     }
 
     $replicant->id($key);
@@ -146,11 +163,15 @@ sub connect_replicants {
   return @newly_created;
 }
 
+
 sub connect_replicant {
   my ($self, $schema, $connect_info) = @_;
 
   my $storage_class = $self->storage_class;
   $self->ensure_class_loaded($storage_class);
+  DBIO::Util::assert_class_isa(
+    storage_class => $storage_class, 'DBIO::Storage::DBI',
+  );
 
   my $storage = $storage_class->new($schema);
   $storage->connect_info($connect_info);
@@ -158,6 +179,9 @@ sub connect_replicant {
 
   my $replicant_class = $self->replicant_type;
   $self->ensure_class_loaded($replicant_class);
+  DBIO::Util::assert_class_isa(
+    replicant_type => $replicant_class, 'DBIO::Replicated::Backend::Replicant',
+  );
 
   my $replicant = $replicant_class->new(
     storage => $storage,
@@ -185,13 +209,19 @@ sub _safely {
     $code->();
     1;
   } catch {
-    $replicant->debugobj->print(sprintf(
-      "Exception trying to $name for replicant %s, error is %s",
-      $replicant->storage->_dbi_connect_info->[0], $_,
+    # names the replicant by its DSN: never the password in it (karr k297)
+    my $info = $replicant->storage->_dbi_connect_info;
+    $replicant->debugobj->print(DBIO::Util::mask_connect_secrets(
+      sprintf(
+        "Exception trying to $name for replicant %s, error is %s",
+        $info->[0], $_,
+      ),
+      $info,
     ));
     undef;
   };
 }
+
 
 sub validate_replicants {
   my $self = shift;
@@ -247,7 +277,92 @@ DBIO::Replicated::Pool - Manage a pool of replicant backends
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 DESCRIPTION
+
+Holds the replicant backends of a L<DBIO::Replicated::Storage>, in the order
+they were added, and decides which are active. Plain read/write accessors:
+C<maximum_lag> (default 0), C<last_validated> (epoch seconds, default 0),
+C<replicant_type> (default L<DBIO::Replicated::Backend::Replicant>),
+C<storage_class> (default L<DBIO::Storage::DBI>) and
+C<next_unknown_replicant_id> (default 1).
+
+=head1 METHODS
+
+=head2 new
+
+  my $pool = DBIO::Replicated::Pool->new(
+    master      => $master_backend,
+    maximum_lag => 2,
+  );
+
+=head2 master
+
+Getter/setter for the master backend handed to new replicants.
+
+=head2 replicants
+
+Getter/setter for the hashref of replicants, keyed by name.
+
+=head2 set_replicant
+
+=head2 get_replicant
+
+=head2 delete_replicant
+
+  $pool->set_replicant($name => $backend);
+  my $backend = $pool->get_replicant($name);
+  $pool->delete_replicant($name);
+
+Store, fetch and remove one replicant by name, keeping the insertion order
+used by L</all_replicants>.
+
+=head2 has_replicants
+
+=head2 num_replicants
+
+Both return the number of replicants.
+
+=head2 all_replicants
+
+All replicants, in the order they were added.
+
+=head2 connected_replicants
+
+The number of replicants that are currently connected.
+
+=head2 active_replicants
+
+The replicants currently flagged active, in order.
+
+=head2 connect_replicants
+
+  my @new = $pool->connect_replicants($schema, @connect_infos);
+
+Creates one replicant per connect info (via L</connect_replicant>) and adds
+it to the pool. The replicant is named after the part of its DSN following
+C<dbi:Driver:>, without any C<password=>, C<passwd=> or C<pwd=> part, so the
+name -- the value C<force_pool> takes -- never carries a password. Replicants whose DSN is not known up front (a
+coderef or C<dbh_maker> connect, or an AccessBroker) are named C<UNKNOWN_n>.
+Returns the new replicants.
+
+=head2 connect_replicant
+
+  my $replicant = $pool->connect_replicant($schema, $connect_info);
+
+Builds one replicant: a new C<storage_class> storage with this connect info
+(driver resolved right away), wrapped in a C<replicant_type> backend tied to
+the master, with the master's trace object proxied onto it. Does not add it
+to the pool.
+
+=head2 validate_replicants
+
+Checks every replicant and sets its C<active> flag: a replicant that cannot
+connect, or reports it is not replicating, is deactivated; one that is
+replicating is active if its C<lag_behind_master> is at most
+C<maximum_lag>. A replicant whose storage cannot answer C<is_replicating> or
+C<lag_behind_master> is left as it is. Updates C<last_validated>.
 
 =head1 AUTHOR
 

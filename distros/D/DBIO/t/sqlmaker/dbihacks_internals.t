@@ -32,6 +32,25 @@ my $num = bless( \do { my $foo = 69 }, 'DBIO::Test::SillyInt' );
 is($num, 69, 'test overloaded object is "sane"');
 is("$num", 69, 'test overloaded object is "sane"');
 
+# Truth values of the empty pieces, written independently of the SQLMaker.
+# Every piece here is {} or an array of such pieces.
+my ($truth_of_cond, $truth_of_and, $truth_of_or);
+$truth_of_cond = sub {    # a condition: {} true, [] false, a list the or of its members
+  my $c = shift;
+  return 1 if ref $c eq 'HASH';
+  return scalar grep { $truth_of_cond->($_) } @$c;
+};
+$truth_of_and = sub {     # the members of an -and: empty is true, one false member makes it false
+  my $m = shift;
+  return 1 if ref $m eq 'HASH' or ! @$m;
+  return ! grep { ! $truth_of_cond->($_) } @$m;
+};
+$truth_of_or = sub {      # the members of an -or: empty is false, one true member makes it true
+  my $m = shift;
+  return 0 if ref $m eq 'HASH';
+  return scalar grep { $truth_of_cond->($_) } @$m;
+};
+
 my @tests = (
   {
     where => { artistid => 1, charfield => undef },
@@ -297,36 +316,46 @@ my @tests = (
     cc_result => { artistid => [] },
     efcc_result => {},
   },
+  # The empty pieces carry one truth value (ADR 0069): {} is true, [] is false,
+  # a list is the or of its members. _collapse_cond follows the same rule as
+  # the SQLMaker: a false part restricts (it stays in the collapsed condition
+  # as -or => [], which renders 0=1), a true part drops out. The collapsed
+  # condition therefore renders the SQL of the original one.
   (map {
+    my $p = $_;
+    my $bare = $truth_of_cond->($p);           # $p as a condition of its own
+    my $in_and = $truth_of_and->($p);          # $p as the members of an -and
+    my $in_or = $truth_of_or->($p);            # $p as the members of an -or
     {
-      where => { -and => $_ },
-      cc_result => undef,
+      where => { -and => $p },
+      cc_result => ( $in_and ? undef : { -or => [] } ),
       efcc_result => {},
-      sql => '',
+      sql => $in_and ? '' : 'WHERE 0=1',
     },
     {
-      where => { -or => $_ },
-      cc_result => undef,
+      where => { -or => $p },
+      cc_result => ( $in_or ? undef : { -or => [] } ),
       efcc_result => {},
-      sql => '',
+      sql => $in_or ? '' : 'WHERE 0=1',
     },
     {
-      where => { -or => [ foo => 1, $_ ] },
-      cc_result => { foo => 1 },
-      efcc_result => { foo => 1 },
-      sql => 'WHERE "foo" = ?',
+      where => { -or => [ foo => 1, $p ] },
+      cc_result => ( $bare ? undef : { foo => 1 } ),
+      efcc_result => ( $bare ? {} : { foo => 1 } ),
+      sql => $bare ? '' : 'WHERE "foo" = ?',
     },
     {
-      where => { -or => [ $_, foo => 1 ] },
-      cc_result => { foo => 1 },
-      efcc_result => { foo => 1 },
-      sql => 'WHERE "foo" = ?',
+      where => { -or => [ $p, foo => 1 ] },
+      cc_result => ( $bare ? undef : { foo => 1 } ),
+      efcc_result => ( $bare ? {} : { foo => 1 } ),
+      sql => $bare ? '' : 'WHERE "foo" = ?',
     },
     {
-      where => { -and => [ fuu => 2, $_, foo => 1 ] },
-      sql => 'WHERE "fuu" = ? AND "foo" = ?',
-      collapsed_sql => 'WHERE "foo" = ? AND "fuu" = ?',
-      cc_result => { foo => 1, fuu => 2 },
+      where => { -and => [ fuu => 2, $p, foo => 1 ] },
+      sql => $bare ? 'WHERE "fuu" = ? AND "foo" = ?' : 'WHERE 0=1',
+      # the collapsed condition lists its columns sorted
+      collapsed_sql => $bare ? 'WHERE "foo" = ? AND "fuu" = ?' : 'WHERE 0=1',
+      cc_result => ( $bare ? { foo => 1, fuu => 2 } : { foo => 1, fuu => 2, -or => [] } ),
       efcc_result => { foo => 1, fuu => 2 },
     },
   } (
@@ -346,9 +375,8 @@ my @tests = (
   # batshit insanity, just to be thorough
   {
     where => { -and => [ [ 'artistid' ], [ -and => [ artistid => { '!=', 69 }, artistid => undef, artistid => { '=' => 200 } ]], artistid => [], { -or => [] }, { -and => [] }, [ 'charfield' ], { name => [] }, 'rank' ] },
-    cc_result => { artistid => [ -and => [], { '!=', 69 }, undef, 200  ], charfield => undef, name => [], rank => undef },
-    sql => 'WHERE "artistid" IS NULL AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND 0=1 AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
-    collapsed_sql => 'WHERE 0=1 AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
+    cc_result => { -or => [], artistid => [ -and => [], { '!=', 69 }, undef, 200  ], charfield => undef, name => [], rank => undef },
+    sql => 'WHERE 0=1',
     efcc_result => { artistid => UNRESOLVABLE_CONDITION },
     efcc_n_result => { artistid => UNRESOLVABLE_CONDITION, charfield => undef, rank => undef },
   },
@@ -674,7 +702,7 @@ for my $t (@tests) {
 
     is_same_sql(
       $collapsed_cond_as_sql,
-      ( $t->{collapsed_sql} || $t->{sql} || $original_sql ),
+      ( exists $t->{collapsed_sql} ? $t->{collapsed_sql} : ( $t->{sql} // $original_sql ) ),
       "Collapse did not alter *the semantics* of the final SQL based on $name",
     );
 

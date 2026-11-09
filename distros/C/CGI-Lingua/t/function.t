@@ -109,6 +109,7 @@ subtest 'new: sentinel flags initialised to GEO_UNKNOWN' => sub {
 	is($l->{_have_ipcountry}, $GEO_UNKNOWN, '_have_ipcountry starts at -1');
 	is($l->{_have_geoip},     $GEO_UNKNOWN, '_have_geoip starts at -1');
 	is($l->{_have_geoipfree}, $GEO_UNKNOWN, '_have_geoipfree starts at -1');
+	is($l->{_have_mmdb},      $GEO_UNKNOWN, '_have_mmdb starts at -1');
 };
 
 subtest 'new: cloning overlays params onto existing state' => sub {
@@ -332,7 +333,63 @@ subtest '_what_language: falls back to LANG env var' => sub {
 	local %ENV = (LANG => 'de_DE.UTF-8');
 	delete $ENV{HTTP_ACCEPT_LANGUAGE};
 	my $l = _basic_obj();
-	is($l->_what_language(), 'de_DE.UTF-8', 'Falls back to LANG when no HTTP header');
+	is($l->_what_language(), 'de-DE', 'Falls back to LANG when no HTTP header, as a language tag');
+};
+
+subtest '_what_language: a locale becomes the language tag it stands for' => sub {
+	my %tag = (
+		'en_US.UTF-8'    => 'en-US',
+		'en_US'          => 'en-US',
+		'de_DE@euro'     => 'de-DE',
+		'sr_RS.UTF-8@latin' => 'sr-RS',
+		'fr'             => 'fr',
+		'fr.UTF-8'       => 'fr',
+		'es_419'         => 'es-419',
+		'en-GB'          => 'en-GB',
+	);
+	for my $locale (sort keys %tag) {
+		local %ENV = (LANG => $locale);
+		is(_basic_obj()->_what_language(), $tag{$locale}, "LANG=$locale is $tag{$locale}");
+		is(CGI::Lingua->_what_language(), $tag{$locale}, "and so as a class method");
+	}
+	for my $locale ('C', 'POSIX', 'C.UTF-8', 'english') {
+		local %ENV = (LANG => $locale);
+		is(_basic_obj()->_what_language(), undef, "LANG=$locale names no language");
+	}
+};
+
+subtest '_what_language: LC_ALL, then LC_MESSAGES, then LANG' => sub {
+	{
+		local %ENV = (LC_ALL => 'fr_FR.UTF-8', LC_MESSAGES => 'de_DE.UTF-8', LANG => 'en_US.UTF-8');
+		is(_basic_obj()->_what_language(), 'fr-FR', 'LC_ALL first');
+	}
+	{
+		local %ENV = (LC_MESSAGES => 'de_DE.UTF-8', LANG => 'en_US.UTF-8');
+		is(_basic_obj()->_what_language(), 'de-DE', 'then LC_MESSAGES');
+	}
+	{
+		local %ENV = (LC_ALL => '', LC_MESSAGES => '', LANG => 'en_US.UTF-8');
+		is(_basic_obj()->_what_language(), 'en-US', 'an empty one counts as unset');
+	}
+	{
+		local %ENV = (LC_ALL => 'C', LANG => 'en_US.UTF-8');
+		is(_basic_obj()->_what_language(), undef, 'LC_ALL=C decides: no language, LANG is not read');
+	}
+	{
+		local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr', LC_ALL => 'de_DE.UTF-8');
+		is(_basic_obj()->_what_language(), 'fr', 'the header still comes before the locale');
+	}
+};
+
+subtest 'language: the locale chooses a supported variant' => sub {
+	local %ENV = (LANG => 'en_US.UTF-8');
+	my $l = CGI::Lingua->new(supported => ['en', 'en-us'], dont_use_ip => 1);
+	is($l->language_code_alpha2(), 'en', 'en_US.UTF-8 is English');
+	is($l->sublanguage_code_alpha2(), 'us', 'from the United States');
+
+	local %ENV = (LANG => 'de_DE.UTF-8');
+	$l = CGI::Lingua->new(supported => ['en', 'de'], dont_use_ip => 1);
+	is($l->language(), 'German', 'de_DE.UTF-8 is German');
 };
 
 subtest '_what_language: class method reads env directly' => sub {
@@ -577,6 +634,7 @@ subtest 'country: numeric result from geo lookup is discarded' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	# Force skip of LWP/Whois fallbacks for this unit test
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub {});
 	my $result = $l->country();
@@ -592,6 +650,7 @@ subtest 'country: eu result from IP::Country is discarded and falls through' => 
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	# Block the Whois/geoplugin fallbacks to keep test fast and offline
 	Test::Mockingbird::mock('CGI::Lingua', '_resolve_country_via_whois', sub {});
 	my $r = $l->country();
@@ -607,6 +666,7 @@ subtest 'country: hk is mapped to cn' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	is($l->country(), 'cn', 'HK is remapped to CN (legacy Whois behavior)');
 	Test::Mockingbird::restore_all();
 };
@@ -620,6 +680,7 @@ subtest 'country: result is stored in CHI cache' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	$l->country();
 	is($cache->get($CACHE_NS . 'country:8.8.8.8'), 'us', 'Country stored in cache');
 	Test::Mockingbird::restore_all();
@@ -636,6 +697,7 @@ subtest 'country: numeric country in cache triggers removal' => sub {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	# The numeric cache entry must be discarded and the lookup must proceed
 	my $result = $l->country();
 	is($result, 'us', 'Numeric cache entry discarded; real lookup used');
@@ -915,6 +977,25 @@ subtest 'locale: valid GEOIP_COUNTRY_CODE used after validation' => sub {
 	ok($called,                         '_code2country was called for valid GEOIP_COUNTRY_CODE');
 	is($result, $fake_country,          'locale() returns the country object from _code2country');
 	Test::Mockingbird::restore_all();
+};
+
+subtest '_find_locale: searches every time; locale() remembers only a find' => sub {
+	local %ENV = (GEOIP_COUNTRY_CODE => 'GB');
+	my $fake_country = bless {}, 'Locale::Object::Country';
+	my @answers = (undef, $fake_country);
+	my $calls = 0;
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { $calls++; shift @answers });
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	my $l = _basic_obj();
+	is($l->locale(), undef, 'nothing found: undef');
+	ok(!exists($l->{_locale}) || !defined($l->{_locale}), 'and nothing remembered');
+	is($l->locale(), $fake_country, 'a later call searches again and finds it');
+	is($l->{_locale}, $fake_country, 'which is remembered');
+	is($l->locale(), $fake_country, 'and returned without searching');
+	is($calls, 2, '_code2country was asked twice, not three times');
+	is($l->_find_locale(), undef, '_find_locale itself never reads the remembered answer');
+	Test::Mockingbird::restore_all();
+	_block_network();
 };
 
 # -- time_zone() ---------------------------------------------------------------
@@ -1263,6 +1344,8 @@ subtest '_is_ipv4: rejects malformed and hostile addresses' => sub {
 		'negative octet'         => '-1.2.3.4',
 		'empty string'           => '',
 		'IPv6'                   => '::1',
+		'leading zero (octal)'   => '010.8.8.8',
+		'zero-padded octet'      => '1.2.3.04',
 		'Arabic-Indic digits'    => join('.', ("\x{661}") x 4),
 	);
 	my @w = _warnings_from {
@@ -1295,19 +1378,49 @@ subtest '_is_ipv6: rejects malformed and hostile addresses' => sub {
 	ok(!CGI::Lingua::_is_ipv6(undef), 'rejects undef');
 };
 
-subtest '_is_ipv6: structural fallback works without Socket::inet_pton' => sub {
-	# Strategy: hide inet_pton to force the pure-regex branch, which is what
-	# runs on very old Perls.  The branch used tr/::// (a character count),
-	# so it could never return true; these positives guard that fix.
+subtest '_is_ipv6: does not depend on Socket::inet_pton' => sub {
+	# Regression: on Windows inet_pton is Winsock's InetPton, which fails for
+	# every address until WSAStartup has run (the first socket).  The check
+	# used it, so without Data::Validate::IP no IPv6 address had a country.
+	# Make inet_pton fail as it does there; the answers must not change.
+	require Socket;
 	no warnings qw(redefine once);
-	local *Socket::inet_pton;
-	ok(!defined(&Socket::inet_pton), 'inet_pton hidden for this block');
-	ok(CGI::Lingua::_is_ipv6($CFG{public_v6}), "fallback accepts $CFG{public_v6}");
-	ok(CGI::Lingua::_is_ipv6('::1'), 'fallback accepts ::1');
-	ok(CGI::Lingua::_is_ipv6('::ffff:1.2.3.4'), 'fallback accepts mixed notation');
-	ok(!CGI::Lingua::_is_ipv6('1::2::3'), 'fallback rejects two "::"');
-	ok(!CGI::Lingua::_is_ipv6('zz::1'), 'fallback rejects non-hex');
-	ok(!CGI::Lingua::_is_ipv6("::1\n"), 'fallback rejects trailing newline');
+	local *Socket::inet_pton = sub { return undef };
+	ok(CGI::Lingua::_is_ipv6($CFG{public_v6}), "accepts $CFG{public_v6}");
+	ok(CGI::Lingua::_is_ipv6('::1'), 'accepts ::1');
+	ok(CGI::Lingua::_is_ipv6('::ffff:1.2.3.4'), 'accepts mixed notation');
+	ok(!CGI::Lingua::_is_ipv6('1::2::3'), 'rejects two "::"');
+	ok(!CGI::Lingua::_is_ipv6('zz::1'), 'rejects non-hex');
+	ok(!CGI::Lingua::_is_ipv6("::1\n"), 'rejects trailing newline');
+};
+
+subtest '_is_ipv6: group counts and embedded IPv4 boundaries' => sub {
+	my %good = (
+		'all eight groups'          => '1:2:3:4:5:6:7:8',
+		'unspecified address'       => '::',
+		'trailing ::'               => '1::',
+		'seven groups and ::'       => '1:2:3:4:5:6:7::',
+		'six groups and IPv4'       => '1:2:3:4:5:6:1.2.3.4',
+		'four-digit upper-case hex' => 'FFFF::ABCD',
+	);
+	for my $why (sort keys %good) {
+		ok(CGI::Lingua::_is_ipv6($good{$why}), "accepts $why ($good{$why})");
+	}
+	my %bad = (
+		'seven groups, no ::'      => '1:2:3:4:5:6:7',
+		'leading single colon'     => ':1:2:3:4:5:6:7',
+		'trailing single colon'    => '1:2:3:4:5:6:7:',
+		'triple colon'             => '1:::2',
+		'five-digit group'         => '12345::1',
+		'IPv4 octet over 255'      => '::ffff:256.1.1.1',
+		'IPv4 not at the end'      => '::1.2.3.4:1',
+		'seven groups and IPv4'    => '1:2:3:4:5:6:7:1.2.3.4',
+		'zone index'               => 'fe80::1%eth0',
+		'IPv4 with a leading zero' => '::ffff:01.2.3.4',
+	);
+	for my $why (sort keys %bad) {
+		ok(!CGI::Lingua::_is_ipv6($bad{$why}), "rejects $why ($bad{$why})");
+	}
 };
 
 # -- _is_private_ip / _is_loopback_ip ------------------------------------------
@@ -1735,6 +1848,17 @@ subtest '_find_language_from_ip: country from LANG when there is no IP' => sub {
 	_reset_mocks();
 };
 
+subtest '_find_language_from_ip: a header region is not taken as the country' => sub {
+	local %ENV = (HTTP_ACCEPT_LANGUAGE => 'fr-CA');
+	my ($l) = _spied_obj();
+	my @asked;
+	Test::Mockingbird::mock('CGI::Lingua', 'country', sub { undef });
+	Test::Mockingbird::mock('CGI::Lingua', '_code2country', sub { push @asked, $_[1]; _country_speaking('English', 'en') });
+	$l->_find_language_from_ip(undef);
+	is_deeply(\@asked, [], 'fr-CA in Accept-Language says nothing about where the reader is');
+	_reset_mocks();
+};
+
 subtest '_find_language_from_ip: no country and no LANG changes nothing' => sub {
 	local %ENV = ();
 	my ($l) = _spied_obj();
@@ -2141,6 +2265,88 @@ subtest 'time_zone: falls back to LWP::Simple without LWP::Simple::WithCache' =>
 	my $tz = _hide_module_for('LWP/Simple/WithCache.pm', sub { $l->time_zone() });
 	is($tz, 'Asia/Tokyo', 'zone from LWP::Simple');
 	is_deeply(\@urls, ["http://ip-api.com/json/$CFG{public_v4}"], 'ip-api.com asked about the visitor');
+	_reset_mocks();
+};
+
+# -- _load_mmdb / _mmdb_record -------------------------------------------------
+
+# A stand-in for IP::Geolocation::MMDB / MaxMind::DB::Reader: answers from a
+# table, and dies for the key 'die' as the real readers do for bad input.
+{
+	package Fake::MMDB;
+	sub new { my ($c, %a) = @_; return bless { %a, asked => [] }, $c }
+	sub record_for_address {
+		my ($self, $ip) = @_;
+		push @{$self->{asked}}, $ip;
+		die "lookup failed\n" if $ip eq 'die';
+		return $self->{records}{$ip};
+	}
+}
+
+subtest '_load_mmdb: no readable file in @GEOIP2_MMDB is GEO_ABSENT, silently' => sub {
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP2_MMDB = ("$dir/missing.mmdb", $dir);	# missing, then a directory
+	my ($l, $spy) = _spied_obj();
+	$l->_load_mmdb();
+	is($l->{_have_mmdb}, $GEO_ABSENT, 'sentinel set to GEO_ABSENT');
+	ok(!exists($l->{_mmdb}), 'no reader stored');
+	is_deeply([ $spy->messages('warn') ], [], 'no warning');
+
+	local @CGI::Lingua::GEOIP2_MMDB = ();
+	$l->{_have_mmdb} = $GEO_UNKNOWN;
+	$l->_load_mmdb();
+	is($l->{_have_mmdb}, $GEO_ABSENT, 'empty search list is GEO_ABSENT');
+};
+
+subtest '_load_mmdb: a file but no reader module is GEO_ABSENT, silently' => sub {
+	my $dir = File::Temp::tempdir(CLEANUP => 1);
+	my $file = "$dir/GeoLite2-Country.mmdb";
+	open(my $fh, '>', $file) or die "$file: $!";
+	close $fh;
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP2_MMDB = ($file);
+	my ($l, $spy) = _spied_obj();
+	_hide_module_for('IP/Geolocation/MMDB.pm', sub {
+		_hide_module_for('MaxMind/DB/Reader.pm', sub { $l->_load_mmdb() });
+	});
+	is($l->{_have_mmdb}, $GEO_ABSENT, 'sentinel set to GEO_ABSENT');
+	is_deeply([ $spy->messages('warn') ], [], 'no warning: nothing could have read it');
+};
+
+subtest '_mmdb_record: returns only hash records, survives a dying reader' => sub {
+	my $l = _basic_obj();
+	$l->{_have_mmdb} = $GEO_PRESENT;
+	$l->{_mmdb} = Fake::MMDB->new(records => {
+		'81.2.69.160' => { country => { iso_code => 'GB' } },
+		'1.2.3.4'     => 'GB',
+		'5.6.7.8'     => [ 'GB' ],
+	});
+	is_deeply($l->_mmdb_record('81.2.69.160'), { country => { iso_code => 'GB' } }, 'hash record returned');
+	is($l->_mmdb_record('1.2.3.4'), undef, 'string record is undef');
+	is($l->_mmdb_record('5.6.7.8'), undef, 'array record is undef');
+	is($l->_mmdb_record('9.9.9.9'), undef, 'address not in the database is undef');
+
+	my $r;
+	lives_ok { $r = $l->_mmdb_record('die') } 'a dying reader does not propagate';
+	is($r, undef, 'and gives undef');
+};
+
+subtest '_mmdb_record: GEO_ABSENT never asks a reader; GEO_UNKNOWN probes once' => sub {
+	my $l = _basic_obj();
+	my $fake = Fake::MMDB->new(records => {});
+	$l->{_have_mmdb} = $GEO_ABSENT;
+	$l->{_mmdb} = $fake;
+	is($l->_mmdb_record($CFG{public_v4}), undef, 'undef when absent');
+	is_deeply($fake->{asked}, [], 'reader not asked');
+
+	no warnings 'once';
+	local @CGI::Lingua::GEOIP2_MMDB = ();
+	my $probe = Test::Mockingbird::spy('CGI::Lingua', '_load_mmdb');
+	$l->{_have_mmdb} = $GEO_UNKNOWN;
+	$l->_mmdb_record($CFG{public_v4}) for 1 .. 3;
+	is(scalar($probe->()), 1, '_load_mmdb called once');
+	is($l->{_have_mmdb}, $GEO_ABSENT, 'and the answer remembered');
 	_reset_mocks();
 };
 

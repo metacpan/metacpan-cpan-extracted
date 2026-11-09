@@ -7,8 +7,11 @@ use Scalar::Util qw(blessed reftype);
 
 use DBIO::InflateColumn::Serializer;
 use DBIO::InflateColumn::Serializer::JSON;
-use DBIO::InflateColumn::Serializer::YAML;
-use DBIO::InflateColumn::Serializer::MessagePack;
+# The YAML and MessagePack backends pull in optional deps (YAML /
+# Data::MessagePack) that may be absent on a minimal install. Loading them at
+# compile time here would kill the whole file before the per-backend SKIP
+# blocks below can run, so each is loaded lazily inside its own SKIP block --
+# mirroring how the framework itself requires a serializer_class at runtime.
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -106,6 +109,7 @@ subtest 'YAML backend' => sub {
     SKIP: {
         eval { require YAML; 1 }
             or skip "YAML not available: $@", 10;
+        require DBIO::InflateColumn::Serializer::YAML;
 
         my ($freezer, $unfreezer) = backend_pair('DBIO::InflateColumn::Serializer::YAML');
 
@@ -172,6 +176,7 @@ subtest 'MessagePack backend' => sub {
     SKIP: {
         eval { require Data::MessagePack; 1 }
             or skip "Data::MessagePack not available: $@", 7;
+        require DBIO::InflateColumn::Serializer::MessagePack;
 
         my ($freezer, $unfreezer) = backend_pair('DBIO::InflateColumn::Serializer::MessagePack');
 

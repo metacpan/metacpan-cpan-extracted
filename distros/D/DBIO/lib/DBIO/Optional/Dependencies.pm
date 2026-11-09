@@ -2,11 +2,14 @@ package DBIO::Optional::Dependencies;
 # ABSTRACT: Optional dependency declarations for DBIO
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use Carp ();
 
-# NO EXTERNAL NON-5.8.1 CORE DEPENDENCIES EVER (e.g. C::A::G)
+# NO EXTERNAL NON-5.20 CORE DEPENDENCIES EVER (e.g. C::A::G)
 # This module is to be loaded by Makefile.PM on a pristine system
 
 # POD is generated automatically by calling _gen_pod from the
@@ -47,9 +50,30 @@ my $rdbms_mssql_odbc = {
 my $rdbms_mssql_sybase = {
   'DBD::Sybase'                   => '0',
 };
+
+
+sub _module_findable {
+  my $notional_filename = shift;
+
+  return 1 if $INC{$notional_filename};
+
+  # One stat per @INC entry instead of compiling the module and, for a DBD,
+  # initialising XS. Ref entries are hooks -- asking one means running it, which
+  # is the loading this exists to avoid -- so they are skipped.
+  for my $inc (@INC) {
+    next if ref $inc;
+    return 1 if -f "$inc/$notional_filename";
+  }
+
+  return 0;
+}
+
 my $rdbms_mysql = {
-  # Accept either DBD::mysql or DBD::MariaDB (the actively maintained fork)
-  ( eval { require DBD::MariaDB; 1 }
+  # Accept either DBD::mysql or DBD::MariaDB (the actively maintained fork).
+  # Probed, never loaded: DBIO::Base pulls this module in, so a require here
+  # drags DBI and an XS driver into every process that touches anything in this
+  # family -- for a metadata string.
+  ( _module_findable('DBD/MariaDB.pm')
     ? ( 'DBD::MariaDB' => '0' )
     : ( 'DBD::mysql'   => '0' )
   ),
@@ -98,11 +122,12 @@ my $reqs = {
 
   encoded_column => {
     req => {
-      'Crypt::URandom' => '0',
+      'Crypt::Bcrypt'  => '0',
+      'Crypt::Argon2'  => '0',
     },
     pod => {
       title => 'EncodedColumn',
-      desc => 'Recommended stronger RNG backend for L<DBIO::EncodedColumn> salt generation',
+      desc => 'Password hashing of L<DBIO::EncodedColumn>: Crypt::Bcrypt for the default class Bcrypt (and to check bcrypt hashes), Crypt::Argon2 for the class Argon2 (and to check argon2id hashes)',
     },
   },
 
@@ -111,7 +136,18 @@ my $reqs = {
     },
     pod => {
       title => 'Storage::DBI::deploy()',
-      desc => 'Modules required for native Deploy (if no L<DBIO::Storage::DBI/dbio_deploy_class>, throws an exception)',
+      desc => 'Modules required for native Deploy (if the storage provides no C<dbio_deploy_class>, L<DBIO::Schema/deploy> falls back to C<deploy> on the storage, which runs an existing DDL file and throws if there is none)',
+    },
+  },
+
+  test_kubernetes => {
+    req => {
+      'Kubernetes::REST' => '1.109',
+      'IO::K8s'          => '0',
+    },
+    pod => {
+      title => 'DBIO::Test::Kubernetes',
+      desc => 'Modules for the live-test cluster tooling (xbin/k8s-test, L<DBIO::Test::Kubernetes>); 1.109 is the first Kubernetes::REST whose Job delete takes a propagationPolicy',
     },
   },
 
@@ -143,12 +179,15 @@ my $reqs = {
 
   test_strictures => {
     req => {
-      'Test::Strict'              => '0.20',
+      'Test::Strict'              => '0.23',
     },
   },
 
   test_prettydebug => {
-    req => $min_json_any,
+    req => {
+      %$min_json_any,
+      %$config_files,
+    },
   },
 
   test_admin_script => {
@@ -587,6 +626,12 @@ sub _gen_pod {
 
   File::Path::mkpath([$dir]);
 
+  # The deploy group carries no modules in DBIO (native Deploy, no
+  # SQL::Translator), so req_missing_for() is illustrated below with a group
+  # that does declare a versioned requirement.
+  my $example_ver = $class->req_list_for ('admin_script')->{'Text::CSV'}
+    or die "Hrmm? No Text::CSV dep?";
+
   my @chunks = (
     <<"EOC",
 #########################################################################
@@ -705,10 +750,11 @@ This method would normally be used by DBIO core-module author, to
 indicate to the user that he needs to install specific modules before he will
 be able to use a specific feature.
 
-For example if some of the requirements for C<deploy> are not available,
+For example if some of the requirements for C<admin_script> are not available,
 the returned string could look like:
 
- 
+ Text::CSV >= $example_ver (see $class for details)
+
 The author is expected to prepend the necessary text to this message before
 returning the actual error seen by the user.
 EOD
@@ -754,9 +800,14 @@ DBIO::Optional::Dependencies - Optional dependency declarations for DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 METHODS
+
+=head2 _module_findable
+
+Answer whether a module is findable in @INC, given its notional filename,
+without loading it.
 
 =head2 req_list_for
 

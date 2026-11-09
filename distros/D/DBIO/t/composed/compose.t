@@ -1,4 +1,4 @@
-# ABSTRACT: karr #70 WP1 -- DBIO::Storage::Composed C3 class synthesis + collision check
+# ABSTRACT: DBIO::Storage::Composed C3 class synthesis + collision check
 use strict;
 use warnings;
 

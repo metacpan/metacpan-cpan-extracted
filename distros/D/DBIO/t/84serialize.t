@@ -40,7 +40,7 @@ my %stores = (
   dclone_method => sub { $schema->dclone($_[0]) },
 
   dclone_func => sub {
-    local $DBIO::ResultSourceHandle::thaw_schema = $schema;
+    local $DBIO::ResultSource::thaw_schema = $schema;
     dclone($_[0]);
   },
 
@@ -51,7 +51,7 @@ my %stores = (
 
   'nfreeze/thaw_func' => sub {
     my $ice = nfreeze($_[0]);
-    local $DBIO::ResultSourceHandle::thaw_schema = $schema;
+    local $DBIO::ResultSource::thaw_schema = $schema;
     thaw($ice);
   },
 );
@@ -147,6 +147,115 @@ for my $name (sort keys %stores) {
 
   throws_ok { $rs->find(1) }
     $exc, 'detached: correct exception on rs find';
+}
+
+# Direct ResultSource round-trip. Exercises the STORABLE_freeze/STORABLE_thaw
+# hooks on DBIO::ResultSource itself — the serialization vehicle that replaced
+# DBIO::ResultSourceHandle. Each store localizes $thaw_schema to $schema, so a
+# thawed source must re-resolve to the schema's registered, working source.
+for my $name (sort keys %stores) {
+  my $store = $stores{$name};
+
+  my $rsrc = $schema->source('Artist');
+  my $copy;
+
+  lives_ok { $copy = $store->($rsrc) } "serialize result source lives: $name";
+  isa_ok($copy, 'DBIO::ResultSource', "thawed source: $name");
+  is($copy->source_name, 'Artist', "source_name survives round-trip: $name");
+  is($copy->schema, $schema, "thawed source re-attached to schema: $name");
+  is(
+    $copy->resultset->find(1)->name,
+    'Caterwauler McCrae',
+    "thawed source builds a working resultset: $name",
+  );
+}
+
+# count/pager after freeze/thaw.
+#
+# Both paths reach through result_source->storage, which is precisely what a
+# badly resolved thaw leaves unusable - and neither was covered here before,
+# so a thawed resultset could look fine and still die the moment it is counted.
+for my $name (sort keys %stores) {
+  my $store = $stores{$name};
+
+  my $rs = $schema->resultset('CD')->search({}, { rows => 2, page => 2 });
+  $rs->pager;  # lazy pager, must not fire a count
+
+  my $copy;
+  $schema->is_executed_querycount(
+    sub { $copy = $store->($rs) },
+    0, "no query fired by freeze/thaw of a paged rs: $name",
+  );
+
+  isa_ok($copy->result_source, 'DBIO::ResultSource', "thawed rs result_source: $name");
+  is($copy->count, 1, "count on thawed paged rs: $name");
+  is($copy->pager->total_entries, 3, "pager total_entries on thawed rs: $name");
+  is($copy->pager->current_page, 2, "pager current_page on thawed rs: $name");
+  is($copy->pager->entries_on_this_page, 1, "pager entries_on_this_page on thawed rs: $name");
+}
+
+# Detached thaw of a paged resultset: no schema channel at all.
+{
+  my $rs = $schema->resultset('CD')->search({}, { rows => 2, page => 2 });
+  $rs->pager;
+
+  my $copy = dclone($rs);  # no $thaw_schema set
+
+  isa_ok($copy->result_source, 'DBIO::ResultSource',
+    'detached: thawed rs still carries a result source');
+  ok($copy->result_source->{_detached_thaw},
+    'detached: thawed rs source is marked detached');
+  is_deeply(
+    [ sort $copy->result_source->columns ],
+    [ sort $rs->result_source->columns ],
+    'detached: column metadata survives the thaw',
+  );
+
+  my $exc = qr/Unable to perform storage-dependent operations with a detached result source/;
+
+  throws_ok { $copy->count }
+    $exc, 'detached: correct exception on rs count';
+
+  throws_ok { $copy->pager->total_entries }
+    $exc, 'detached: correct exception on pager total_entries';
+}
+
+# compose_namespace + thaw outside the schema channel.
+#
+# compose_namespace parks the schema *class name* on the composed result
+# class' result_source_instance. That is not a schema instance and cannot
+# supply a storage, so a thaw must fall through to a detached source. Taking
+# it for a live schema instead yielded a half-attached source whose ->storage
+# was silently undef, and the count path then died with the useless
+# 'Can't call method "_count_select" on an undefined value'.
+{
+  my $composed = $schema->compose_namespace('DBIO::Test::SerializeNS');
+  $composed->storage($schema->storage);
+
+  is(
+    DBIO::Test::SerializeNS::CD->result_source_instance->{schema},
+    ref $schema,
+    'composed result class carries the schema class name, not an instance',
+  );
+
+  my $rs = $composed->resultset('CD')->search({}, { rows => 2, page => 2 });
+  is($rs->count, 1, 'composed: sanity - live count');
+
+  my $detached = dclone($rs);  # no $thaw_schema set
+  ok($detached->result_source->{_detached_thaw},
+    'composed: schema class name is not mistaken for a live schema');
+
+  my $exc = qr/Unable to perform storage-dependent operations with a detached result source/;
+
+  throws_ok { $detached->count }
+    $exc, 'composed: count throws the detached-source exception';
+  throws_ok { $detached->pager->total_entries }
+    $exc, 'composed: pager throws the detached-source exception';
+
+  my $attached = $composed->dclone($rs);
+  is($attached->count, 1, 'composed: count works when thawed through the schema channel');
+  is($attached->pager->total_entries, 3,
+    'composed: pager works when thawed through the schema channel');
 }
 
 done_testing;

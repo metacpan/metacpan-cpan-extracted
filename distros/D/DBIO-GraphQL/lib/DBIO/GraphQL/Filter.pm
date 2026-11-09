@@ -3,12 +3,16 @@ package DBIO::GraphQL::Filter;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'Class::Accessor::Grouped';
+use DBIO::GraphQL::Error qw(client_error);
 use GraphQL::Type::InputObject;
 use GraphQL::Type::List;
 use GraphQL::Type::Scalar qw($Int $String $Float $Boolean);
 
 use DBIO::GraphQL::ScalarMap;
+use DBIO::GraphQL::Policy;
 
 # Adapter interface — two concrete adapters live in this distribution:
 #
@@ -26,7 +30,7 @@ use DBIO::GraphQL::ScalarMap;
 # Shared scalar InputObjects (IntFilter, StringFilter, ...) are cached
 # at the class level (see %_SCALAR_INPUT) so two filter instances cannot
 # accidentally produce two IntFilter types with the same name.
-__PACKAGE__->mk_group_accessors(simple => qw(schema _type_cache));
+__PACKAGE__->mk_group_accessors(simple => qw(schema policy _type_cache));
 
 sub new {
   my ($class, %args) = @_;
@@ -34,6 +38,8 @@ sub new {
     unless exists $args{schema};
   my $self = bless {}, $class;
   $self->schema($args{schema});
+  $self->policy($args{policy}
+    // DBIO::GraphQL::Policy->new(schema => $args{schema}));
   $self->_type_cache({});
   return $self;
 }
@@ -125,7 +131,7 @@ sub type_for {
   );
 
   my %fields;
-  for my $col ($source->columns) {
+  for my $col ($self->policy->visible_columns($moniker)) {
     my $scalar = DBIO::GraphQL::ScalarMap::for_column($source, $col);
     $fields{$col} = { type => $self->_scalar_input($scalar->name) };
   }
@@ -185,8 +191,9 @@ sub _compile {
 
 sub _compile_column {
   my ($self, $col, $ops, $source) = @_;
-  unless ($source->has_column($col)) {
-    die "DBIO::GraphQL::Filter: unknown column '$col' on source '"
+  unless ($source->has_column($col)
+      && !$self->policy->hidden($source->source_name, $col)) {
+    die client_error "DBIO::GraphQL::Filter: unknown column '$col' on source '"
       . $source->source_name . "'\n";
   }
 
@@ -199,7 +206,7 @@ sub _compile_column {
   for my $op_name (keys %$ops) {
     next unless defined $ops->{$op_name};
     my $spec = $op_map{$op_name}
-      or die "DBIO::GraphQL::Filter: unknown operator '$op_name' on column "
+      or die client_error "DBIO::GraphQL::Filter: unknown operator '$op_name' on column "
            . "'$col' (scalar: $scalar_name)\n";
 
     my $dbio_op = $spec->{op};
@@ -219,6 +226,11 @@ sub _compile_column {
       push @parts, { $col => $val };
     }
     else {
+      if ($dbio_op eq '-in' && ref $val eq 'ARRAY'
+          && @$val > $self->policy->max_in) {
+        die client_error "DBIO::GraphQL::Filter: 'in' on column '$col' has " . scalar(@$val)
+          . " values, more than max_in (" . $self->policy->max_in . ")\n";
+      }
       my $final_val = $spec->{wrap} ? $spec->{wrap}->($val) : $val;
       push @parts, { $col => { $dbio_op => $final_val } };
     }
@@ -243,7 +255,7 @@ DBIO::GraphQL::Filter - Per-source GraphQL filter InputObject with adapter seam
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

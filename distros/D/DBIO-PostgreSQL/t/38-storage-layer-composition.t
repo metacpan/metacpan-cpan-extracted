@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use mro;
 
-# Storage-layer composition, driver side (core karr #70; this dist is the
+# Storage-layer composition, driver side (core karr k70; this dist is the
 # reference transport). A PostgreSQL extension is a plain storage LAYER, not a
 # storage_type subclass: registered via DBIO::Schema::register_storage_layer, it
 # composes (C3) OVER the driver storage for sync, and its async mirror
@@ -14,6 +14,7 @@ use mro;
 # real database. The end-to-end live proof lives in t/39-*-live.t (gated on
 # DBIO_TEST_PG_*). Modelled on core t/composed/async_walk_base.t.
 
+use DBIO ();
 use DBIO::Test;
 use DBIO::Storage::DBI;
 use DBIO::Storage::Composed;
@@ -67,40 +68,40 @@ ok !T::PGExt::Storage::Async->isa('DBIO::Storage::Async'),
     'layers_of records exactly the one composed layer';
 }
 
+
 # ===========================================================================
-# 2. ASYNC composition: a layered schema connected { async => 'future_io' }
-#    resolves the PG future_io transport off the DRIVER (not the layer) and
-#    composes the layer's ::Async mirror ON TOP of that transport.
-#    Structural only -- driver rebless is a dsn-string parse, no DB is opened.
+# 2. ASYNC composition: a layered schema that declares the PostgreSQL driver,
+#    connected { async => 'future_io' }, gets its layer composed over the
+#    DECLARED driver storage by DBIO::Schema::connection, resolves the PG
+#    future_io transport off the DRIVER (not the layer) and composes the
+#    layer's ::Async mirror ON TOP of that transport.
+#    Structural only -- { async } sets the mode, no connection is ever opened.
 # ===========================================================================
 {
-  my $schema = DBIO::Test->init_schema(no_deploy => 1);
+  # DBIO::Test::Schema keeps no driver in its class: this use declares one,
+  # on a clone, the way a shared schema gets its driver (core ADR 0067).
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('+DBIO::PostgreSQL::Storage');
   $schema->register_storage_layer('T::PGExt::Storage');
-
-  # A composed GENERIC storage (base == DBIO::Storage::DBI) bound to the schema,
-  # in future_io mode. The dsn drives the driver rebless to
-  # DBIO::PostgreSQL::Storage (DBI-style parse of 'Pg'); { async } sets the mode.
-  # No connection is ever opened.
-  my $composed_class =
-    DBIO::Storage::Composed->compose('DBIO::Storage::DBI', ['T::PGExt::Storage']);
-  my $storage = $composed_class->new($schema);
-  $storage->connect_info(
-    [ 'dbi:Pg:dbname=dbio_offline_compose', '', '', { async => 'future_io' } ]
+  $schema->connection(
+    'dbi:Pg:dbname=dbio_offline_compose', '', '', { async => 'future_io' }
   );
+  my $storage = $schema->storage;
 
   my $async = eval { $storage->async };
   my $err   = $@;
   ok !$err, 'future_io resolution over a layered PG storage does not croak'
     or diag "died with: $err";
 
-  # The sync storage reblessed onto the PG driver, keeping its layer through the
-  # rebless (the layer is more-specific than the driver in the composed MRO).
+  # The layer sits over the driver the schema declared: the composed class is
+  # the PostgreSQL storage with the layer more-specific than it in the MRO.
   isa_ok $storage, 'DBIO::PostgreSQL::Storage',
-    'sync storage reblessed onto the PostgreSQL driver';
+    'sync storage is the declared PostgreSQL driver';
   isa_ok $storage, 'T::PGExt::Storage',
-    'sync storage kept its layer through the driver rebless';
-  ok +(grep { $_ eq 'T::PGExt::Storage' } @{ mro::get_linear_isa(ref $storage) }),
-    'the layer sits in the reblessed storage MRO';
+    'sync storage carries its layer over the declared driver';
+  is_deeply [ DBIO::Storage::Composed->layers_of(ref $storage) ],
+    [ 'T::PGExt::Storage' ],
+    'the layer sits in the storage MRO, composed over the declared driver';
 
   # The resolved transport is the PG future_io adapter -- found off the driver,
   # NOT the layer's plain ::Async mirror.
@@ -116,6 +117,33 @@ ok !T::PGExt::Storage::Async->isa('DBIO::Storage::Async'),
   is_deeply [ DBIO::Storage::Composed->layers_of(ref $async) ],
     [ 'T::PGExt::Storage::Async' ],
     'exactly the one async mirror layer composed over the PG future_io transport';
+}
+
+# ===========================================================================
+# 3. A layer does not name the driver: the PostgreSQL DSN under a layered
+#    schema that declares none is refused by DBIO::Schema::connection, before
+#    any storage is built -- the driver is never found from the DSN (core
+#    ADR 0067, rule 1). A core without that rule (no DBIO->driver_for, which
+#    came with it) still finds the driver from the DSN; nothing to claim there.
+# ===========================================================================
+SKIP: {
+  skip 'the installed DBIO core predates ADR 0067 (no DBIO->driver_for)', 3
+    unless DBIO->can('driver_for');
+
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('::DBI');
+  $schema->register_storage_layer('T::PGExt::Storage');
+
+  my $ok  = eval {
+    $schema->connection(
+      'dbi:Pg:dbname=dbio_offline_compose', '', '', { async => 'future_io' }
+    );
+    1;
+  };
+  my $err = $@;
+  ok !$ok, 'a layered schema without a driver is refused by connection';
+  like $err, qr/declares no driver/, '... because it declares no driver';
+  ok !$schema->storage, '... and no storage was built';
 }
 
 done_testing;

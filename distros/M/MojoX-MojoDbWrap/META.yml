@@ -3,7 +3,6 @@ abstract: 'Light wrapper around Mojo::Pg/SQLite/...'
 author:
   - 'Flavio Poletti (flavio@polettix.it)'
 build_requires:
-  Path::Tiny: '0.084'
   Test::Exception: '0.43'
 configure_requires:
   Module::Build::Tiny: '0.034'
@@ -22,12 +21,25 @@ no_index:
     - share
     - t
     - xt
+provides:
+  MojoX::MojoDbWrap:
+    file: lib/MojoX/MojoDbWrap.pm
+    version: '0.100'
+recommends:
+  DBD::Pg: v3.20.2
+  DBD::SQLite: '1.78'
+  Mojo::Pg: '5.0'
+  Mojo::SQLite: '4.000000'
 requires:
   Moo: '2.005005'
   Ouch: '0.0501'
   namespace::clean: '0.27'
   perl: '5.024000'
-version: '0.006'
+resources:
+  bugtracker: https://codeberg.org/polettix/MojoX-MojoDbWrap/issues
+  homepage: https://codeberg.org/polettix/MojoX-MojoDbWrap
+  repository: https://codeberg.org/polettix/MojoX-MojoDbWrap.git
+version: '0.100'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.40.1

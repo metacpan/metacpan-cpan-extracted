@@ -32,14 +32,15 @@ longer generates SQL on the fly.
   (`lib/DBIO/DeploymentHandler/DeployMethod/Native.pm`) routes `deploy`/`upgrade`/
   `diff` to the storage's native Deploy class — resolved via
   `$storage->dbio_deploy_class` or the `::Storage` → `::Deploy` naming
-  convention (`Native.pm:57-81`) — and stubs out the old DBIx::Class
-  prepare/initialise contract (`Native.pm:34-40`), which has nothing to prepare
+  convention (in `_driver_deploy`) — and stubs out the old DBIx::Class
+  prepare/initialise contract (`prepare_deploy`, `prepare_upgrade`,
+  `prepare_resultsource_install`, `initialize`), which has nothing to prepare
   under a test-and-compare deploy.
 - `deployment_statements()` no longer translates. On `DBIO::Storage::DBI`
-  (`lib/DBIO/Storage/DBI.pm:3124-3163`) it reads a pre-existing DDL file from the
+  (in `lib/DBIO/Storage/DBI.pm`) it reads a pre-existing DDL file from the
   deploy directory and returns its contents, and **throws** if none exists,
   directing callers to `DBIO::Schema->deploy` (which routes to the native Deploy
-  class). `DBIO::Schema::deployment_statements` (`lib/DBIO/Schema.pm:1258-1265`)
+  class). `DBIO::Schema::deployment_statements` (in `lib/DBIO/Schema.pm`)
   delegates to storage. There is no on-the-fly SQL generation without a Deploy
   class.
 - `SQL::Translator` is not a `requires` in the core `cpanfile`; the only SQL
@@ -56,16 +57,16 @@ the deployer that fills a scratch database must be native too). Demoting SQLT to
 optional drops a hard dependency from every deploying app and stops bounding DDL
 quality by SQLT's producers.
 
-Heritage.pod records the intent (`lib/DBIO/Manual/Heritage.pod:117-126`): "Every
+Heritage.pod records the intent (`lib/DBIO/Manual/Heritage.pod`): "Every
 driver ships its own native Deploy, Introspect, and Diff modules … so
 SQL::Translator is an optional dependency rather than a required one."
 
 **Flag — code is stricter than the prose.** Heritage says `deploy()` "falls back
 to the L<SQL::Translator> path transparently." Core ships no such fallback: the
 `deployment_statements` path on `Storage::DBI` *throws* when no DDL file and no
-native Deploy class is present (`Storage/DBI.pm:3160-3162`), and
+native Deploy class is present (in `deployment_statements`), and
 `DeployMethod::Native` *throws* when it cannot resolve a native Deploy class
-(`Native.pm:73-78`). The "transparent SQLT fallback" is a property a driver may
+(in `_driver_deploy`). The "transparent SQLT fallback" is a property a driver may
 choose to provide, not something core implements. The ADR records what the code
 does: native-or-throw, SQLT optional and unused by core's own deploy path.
 

@@ -4,6 +4,8 @@ package DBIO::PostgreSQL::Introspect::CheckConstraints;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::PostgreSQL::Introspect ();
 
 
@@ -29,6 +31,7 @@ sub fetch {
       AND NOT con.conislocal = false
   };
   $sql .= DBIO::PostgreSQL::Introspect->system_schema_filter('sn');
+  $sql .= DBIO::PostgreSQL::Introspect->extension_member_filter('pg_class', 'cl.oid');
 
   my @bind;
   if ($filter && @$filter) {
@@ -71,12 +74,14 @@ DBIO::PostgreSQL::Introspect::CheckConstraints - Introspect PostgreSQL CHECK con
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Fetches CHECK constraint metadata from C<pg_catalog.pg_constraint> where
 C<contype = 'c'>.
+Tables an installed extension owns are left out by
+L<DBIO::PostgreSQL::Introspect::Tables>, and their CHECK constraints with them.
 
 =head1 METHODS
 

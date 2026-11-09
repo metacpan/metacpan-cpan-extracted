@@ -1,6 +1,6 @@
 package DBIO::MySQL;
 # ABSTRACT: MySQL-specific schema management for DBIO
-our $VERSION = '0.900001';
+our $VERSION = '0.900004';
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ DBIO::MySQL - MySQL-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ L<DBIO::MySQL::Storage::MariaDB>.
 
 =head2 connection
 
-Overrides L<DBIO/connection> to force C<+DBIO::MySQL::Storage> as
+Overrides L<DBIO::Schema/connection> to force C<+DBIO::MySQL::Storage> as
 C<storage_type>.
 
 =head1 MIGRATION NOTES
@@ -138,8 +138,11 @@ New: C<DBIO::MySQL::SQLMaker>
 
 =back
 
-If C<DBIO-MySQL> is installed, core L<DBIO::Storage::DBI> can autodetect MySQL
-DSNs and load the new storage class via the driver registry.
+A schema declares its driver -- this component, L<DBIO::MySQL::MariaDB> or the
+C<-mysql> shortcut. Core picks no storage class from the DSN (core ADR 0067):
+a schema left at the generic L<DBIO::Storage::DBI> is refused at connect. Where
+the driver is not known in advance, L<DBIO/driver_for> names it from the DSN's
+DBD, C<MySQL> for both C<dbi:mysql:> and C<dbi:MariaDB:>.
 
 =head1 TESTING
 

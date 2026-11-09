@@ -1,0 +1,36 @@
+# Docker build context — keep it small and reproducible.
+#
+# Why explicit: the Dockerfile COPYs whole directories (lib/, t/, demo/,
+# maint/) so the build context must NOT contain anything we don't want
+# baked into the image layer. In particular the dzil build dir, .git, and
+# the user's local cpanm work dir must stay out.
+
+# VCS
+.git
+.gitignore
+
+# Dist::Zilla build artefacts (rebuilt inside the image via cpanfile)
+DBIO-PostgreSQL-EV-*
+*.tar.gz
+.build
+.claude
+
+# Perl / CPAN leftovers
+*.swp
+*.bak
+*.orig
+
+# Per-developer cache -- cpanm work dir is huge and never useful inside an image
+.cpanm
+.local
+perl5
+
+# Editor / OS noise
+.DS_Store
+.idea
+.vscode
+
+# maint/docker holds the Dockerfile plus runtime helpers the image needs.
+# We COPY specific files (Dockerfile.test, entrypoint.sh) explicitly, so
+# the rest of the dir (README.md, this discussion) is fine to keep in the
+# build context but is not part of the image.

@@ -3,6 +3,9 @@ package DBIO::MySQL::Adapter;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Carp qw/croak/;
 use base 'DBIO::Adapter::Base';
 
@@ -29,7 +32,11 @@ sub to_native {
   return 'CHAR(' . ($col->{size} // 255) . ')' if $b eq 'char';
   if ($b eq 'numeric') {
     my ($p, $s) = @{$col}{qw/precision scale/};
-    return (defined $p && defined $s) ? "DECIMAL($p,$s)" : 'DECIMAL';
+    return "DECIMAL($p,$s)" if defined $p && defined $s;
+    # precision without scale: DECIMAL(p) -- MySQL's DECIMAL(M) is DECIMAL(M,0),
+    # the same spelling the decimal alias path renders (karr #41, #26).
+    return "DECIMAL($p)"    if defined $p;
+    return 'DECIMAL';
   }
   return $NATIVE{$b} // croak "no MySQL native type for base '$b'";
 }
@@ -61,7 +68,7 @@ DBIO::MySQL::Adapter - MySQL base->native type resolver
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

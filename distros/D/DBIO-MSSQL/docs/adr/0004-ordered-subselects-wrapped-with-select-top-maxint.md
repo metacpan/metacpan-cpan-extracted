@@ -17,17 +17,17 @@ overridden elsewhere in the family.
 ## Decision
 
 `DBIO::MSSQL::Storage` overrides `_select_args_to_query`
-(`Storage.pm:183-204`). After delegating to `next::method`, it detects an
+(`Storage::_select_args_to_query`). After delegating to `next::method`, it detects an
 ordered subquery — one whose generated SQL does **not** already start with
 `(SELECT TOP <n> ...` yet has order criteria
 (`_extract_order_criteria($attrs->{order_by})`):
 
 1. If `$attrs->{unsafe_subselect_ok}` is not set, `throw_exception` with a
-   pointer to the *Ordered Subselects* documentation (`Storage.pm:196-198`).
+   pointer to the *Ordered Subselects* documentation (the `throw_exception` branch).
 2. Otherwise, rewrite the leading `(SELECT` to
    `(SELECT TOP <max_int> ...`, where `<max_int>` is
    `$self->sql_maker->__max_int` = `0x7FFFFFFF` (inherited from core
-   `DBIO::SQLMaker::ClassicExtensions`) (`Storage.pm:200`).
+   `DBIO::SQLMaker::ClassicExtensions`) (the `s///` rewrite).
 
 ## Rationale
 
@@ -48,4 +48,4 @@ have the driver quietly reshape every query.
   `_select_args_to_query` override anywhere but here.
 - The rewrite depends on the SQL beginning with `(SELECT`; a future
   SQLMaker change to that prefix shape would require updating the regexes at
-  `Storage.pm:192,200`.
+  `Storage::_select_args_to_query`.

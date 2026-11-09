@@ -4,11 +4,13 @@ package DBIO::Relationship::Base;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 
 use Scalar::Util qw/weaken blessed/;
 use Try::Tiny;
-use DBIO::Util 'UNRESOLVABLE_CONDITION';
+use DBIO::Util qw(UNRESOLVABLE_CONDITION assert_no_list_context);
 use namespace::clean;
 
 
@@ -23,10 +25,9 @@ sub related_resultset {
 
   my $rel = shift;
 
-  return $self->{related_resultsets}{$rel}
-    if defined $self->{related_resultsets}{$rel};
-
-  return $self->{related_resultsets}{$rel} = do {
+  my $rrs = defined $self->{related_resultsets}{$rel}
+    ? $self->{related_resultsets}{$rel}
+    : ( $self->{related_resultsets}{$rel} = do {
 
     my $rsrc = $self->result_source;
 
@@ -36,7 +37,7 @@ sub related_resultset {
     my $attrs = (@_ > 1 && ref $_[$#_] eq 'HASH' ? pop(@_) : {});
     $attrs = { %{$rel_info->{attrs} || {}}, %$attrs };
 
-    $self->throw_exception( "Invalid query: @_" )
+    $self->throw_exception( "Invalid query: an odd number of arguments" )
       if (@_ > 1 && (@_ % 2 == 1));
     my $query = ((@_ > 1) ? {@_} : shift);
 
@@ -116,12 +117,21 @@ sub related_resultset {
         $query, $attrs
       );
     }
-  };
+  } );
+
+  # ADR 0045 / karr k195: a related resultset derived from a context-bound row
+  # inherits the pin, so $row->search_related(...) and the generated
+  # ${rel}_async accessor route onto the pinned connection instead of the pool.
+  $rrs->{_async_context} = $self->{_async_context}
+    if $self->{_async_context} and blessed $rrs;
+
+  return $rrs;
 }
 
 
 sub search_related {
-  return shift->related_resultset(shift)->search(@_);
+  assert_no_list_context('->search_related') if wantarray;
+  return shift->related_resultset(shift)->search_rs(@_);
 }
 
 
@@ -138,12 +148,31 @@ sub count_related {
 sub new_related {
   my ($self, $rel, $data) = @_;
 
-  return $self->search_related($rel)->new_result( $self->result_source->_resolve_relationship_condition (
-    infer_values_based_on => $data,
+  my $rsrc = $self->result_source;
+  my %resolve = (
     rel_name => $rel,
     self_result_object => $self,
     foreign_alias => $rel,
     self_alias => 'me',
+  );
+
+  # ADR 0071: the foreign key the parent gives is inherited, the keys of $data
+  # are the caller's assignment and may not contradict it
+  if (ref $data eq 'HASH' and %$data and ref( ($rsrc->relationship_info($rel) || {})->{cond} ) eq 'HASH') {
+    $rsrc->related_source($rel)->_assert_scope_agrees(
+      { map { ref $data->{$_} ? () : ( $_ => $data->{$_} ) } keys %$data },
+      $rsrc->_resolve_relationship_condition(infer_values_based_on => {}, %resolve)->{inferred_values} || {},
+    );
+  }
+
+  my $rs = $self->search_related($rel);
+
+  # new_result reads which keys these are from the resultset (a new object)
+  $rs->{_caller_keys} = [ keys %$data ] if ref $data eq 'HASH';
+
+  return $rs->new_result( $rsrc->_resolve_relationship_condition (
+    infer_values_based_on => $data,
+    %resolve,
   )->{inferred_values} );
 }
 
@@ -164,16 +193,19 @@ sub find_related {
 
 
 sub find_or_new_related {
-  my $self = shift;
-  my $obj = $self->find_related(@_);
-  return defined $obj ? $obj : $self->new_related(@_);
+  my ($self, $rel) = (shift, shift);
+
+  return $self->related_resultset($rel)->find_or_new(@_);
 }
 
 
 sub find_or_create_related {
-  my $self = shift;
-  my $obj = $self->find_related(@_);
-  return (defined($obj) ? $obj : $self->create_related(@_));
+  my ($self, $rel) = (shift, shift);
+
+  my $obj = $self->related_resultset($rel)->find_or_create(@_);
+  delete $self->{related_resultsets}{$rel};
+
+  return $obj;
 }
 
 
@@ -186,15 +218,40 @@ sub update_or_create_related {
 sub set_from_related {
   my ($self, $rel, $f_obj) = @_;
 
-  $self->set_columns( $self->result_source->_resolve_relationship_condition (
+  $self->set_columns($self->_inferred_from_related($rel, $f_obj));
+
+  return 1;
+}
+
+# The column values set_from_related sets on this row for a related object (or
+# a hash of its columns, or undef): { column => value }.
+sub _inferred_from_related {
+  my ($self, $rel, $f_obj) = @_;
+
+  my $inferred = $self->result_source->_resolve_relationship_condition (
     infer_values_based_on => {},
     rel_name => $rel,
     foreign_values => $f_obj,
     foreign_alias => $rel,
     self_alias => 'me',
-  )->{inferred_values} );
+  )->{inferred_values};
 
-  return 1;
+  # A plain hashref of the related row's own columns can resolve to a condition
+  # that does not pin this row's columns -- e.g. a might_have searched by a
+  # non-key column infers { self_pk => undef }. Applying that would clobber real
+  # key columns with an undef foreign key. Refuse it rather than corrupt the row
+  # (ADR 0034). A blessed related object or an explicit undef (disassociation)
+  # is left to resolve as before.
+  if (ref $f_obj eq 'HASH') {
+    my @unresolved = sort grep { ! defined $inferred->{$_} } keys %$inferred;
+
+    $self->throw_exception(
+      "Relationship '$rel' does not resolve to a concrete column condition"
+    . " (column(s) '@{[ join q{, }, @unresolved ]}' would be set to undef)"
+    ) if @unresolved;
+  }
+
+  return $inferred || {};
 }
 
 
@@ -227,7 +284,7 @@ DBIO::Relationship::Base - Inter-table relationships
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -549,9 +606,9 @@ Then, assuming MyApp::Schema::LinerNotes has an accessor named notes, you can do
   $cd->notes('Notes go here'); # set notes -- LinerNotes object is
                                # created if it doesn't exist
 
-For a 'belongs_to relationship, note the 'cascade_update':
+For a 'belongs_to' relationship, note the 'cascade_update':
 
-  MyApp::Schema::Track->belongs_to( cd => 'MyApp::Schema::CD', 'cd,
+  MyApp::Schema::Track->belongs_to( cd => 'MyApp::Schema::CD', 'cd',
       { proxy => ['title'], cascade_update => 1 }
   );
   $track->title('New Title');
@@ -591,6 +648,12 @@ If you find that DBIO is creating constraints where it shouldn't, or not
 creating them where it should, set this attribute to a true or false value
 to override the detection of when to create constraints.
 
+C<belongs_to> defaults it to true. When it is given explicitly,
+C<belongs_to> also sets the internal attribute
+C<_explicit_foreign_key_constraint>, so a driver can tell a constraint the
+author asked for from the default, and refuse one it cannot create (a
+foreign key on a view) instead of leaving it out silently.
+
 =item cascade_copy
 
 If C<cascade_copy> is true on a C<has_many> relationship for an
@@ -599,14 +662,17 @@ be copied too. To turn this behaviour off, pass C<< cascade_copy => 0 >>
 in the C<$attr> hashref.
 
 The behaviour defaults to C<< cascade_copy => 1 >> for C<has_many>
-relationships.
+relationships, and to C<< cascade_copy => 0 >> for a C<has_many>
+declared with a coderef condition.
 
 =item cascade_delete
 
 By default, DBIO cascades deletes across C<has_many>,
 C<has_one> and C<might_have> relationships. You can disable this
 behaviour on a per-relationship basis by supplying
-C<< cascade_delete => 0 >> in the relationship attributes.
+C<< cascade_delete => 0 >> in the relationship attributes. A
+relationship declared with a coderef condition does not cascade
+deletes by default.
 
 The cascaded operations are performed after the requested delete,
 so if your database has a constraint on the relationship, it will
@@ -618,7 +684,8 @@ before DBIO gets to perform the cascaded operation.
 By default, DBIO cascades updates across C<has_one> and
 C<might_have> relationships. You can disable this behaviour on a
 per-relationship basis by supplying C<< cascade_update => 0 >> in
-the relationship attributes.
+the relationship attributes. A relationship declared with a coderef
+condition does not cascade updates by default.
 
 The C<belongs_to> relationship does not update across relationships
 by default, so if you have a 'proxy' attribute on a belongs_to and want to
@@ -711,7 +778,7 @@ this instance (like in the case of C<might_have> relationships).
 
 =item Arguments: $rel_name, $cond?, L<\%attrs?|DBIO::ResultSet/ATTRIBUTES>
 
-=item Return Value: L<$resultset|DBIO::ResultSet> (scalar context) | L<@result_objs|DBIO::Manual::ResultClass> (list context)
+=item Return Value: L<$resultset|DBIO::ResultSet>
 
 =back
 
@@ -795,8 +862,11 @@ See L<DBIO::ResultSet/find> for details.
 
 =back
 
-Find a result object of a related class.  See L<DBIO::ResultSet/find_or_new>
-for details.
+Find a result object of a related class.  Runs L<DBIO::ResultSet/find_or_new>
+on the related resultset: the data identifies the row by the columns of the
+one unique constraint it covers (together with the foreign key the resultset
+holds), the other values are the data of the row to create. See
+L<DBIO::ResultSet/find> for what covers a constraint.
 
 =head2 find_or_create_related
 
@@ -808,8 +878,11 @@ for details.
 
 =back
 
-Find or create a result object of a related class. See
-L<DBIO::ResultSet/find_or_create> for details.
+Find or create a result object of a related class. Runs
+L<DBIO::ResultSet/find_or_create> on the related resultset: the data identifies
+the row by the columns of the one unique constraint it covers (together with
+the foreign key the resultset holds), the other values are the data of the row
+to create. See L<DBIO::ResultSet/find> for what covers a constraint.
 
 =head2 update_or_create_related
 
@@ -821,8 +894,8 @@ L<DBIO::ResultSet/find_or_create> for details.
 
 =back
 
-Update or create a result object of a related class. See
-L<DBIO::ResultSet/update_or_create> for details.
+Update or create a result object of a related class. Runs
+L<DBIO::ResultSet/update_or_create> on the related resultset.
 
 =head2 set_from_related
 
@@ -847,6 +920,16 @@ L<DBIO::ResultSet/create>, or pass an object to a belongs_to accessor.
 
 The columns are only set in the local copy of the object, call
 L<update|DBIO::Row/update> to update them in the storage.
+
+Throws an exception, rather than setting anything, if C<$f_obj> is a plain
+hashref (not a blessed related object, and not C<undef>) whose relation
+condition does not resolve to a concrete column condition on this side — for
+example, a C<might_have>/C<has_one> related row searched by one of its own
+non-key columns, which resolves join-free to C<< { self_pk => undef } >>.
+Applying that condition would silently clobber a real key column with an
+undef foreign key, so it is refused instead (ADR 0034). A blessed related
+object and an explicit C<undef> (to disassociate a belongs_to) are
+unaffected and continue to resolve as before.
 
 =head2 update_from_related
 
@@ -941,7 +1024,7 @@ B<Currently only available for C<many_to_many> relationships.>
 
   my $actor = $schema->resultset('Actor')->find(1);
   my @roles = $schema->resultset('Role')->search({ role =>
-     { '-in' => ['Fred', 'Barney'] } } );
+     { '-in' => ['Fred', 'Barney'] } } )->all;
 
   $actor->set_roles(\@roles);
      # Replaces all of $actor's previous roles with the two named

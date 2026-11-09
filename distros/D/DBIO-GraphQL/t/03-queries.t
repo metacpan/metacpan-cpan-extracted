@@ -7,7 +7,6 @@ use lib 't/lib', 'lib';
 use My::Schema;
 use My::Test qw(deploy_schema);
 use DBIO::GraphQL;
-use GraphQL::Execution qw(execute);
 
 my $db = My::Schema->connect('dbi:SQLite:dbname=:memory:');
 deploy_schema($db);
@@ -31,11 +30,11 @@ $db->resultset('Book')->create({ id => 2, title => 'The LOTR',   author_id => 1,
 $db->resultset('Book')->create({ id => 3, title => 'Foundation', author_id => 2, price => 8.99  });
 
 my $result = DBIO::GraphQL->to_graphql($db);
-my ($schema, $ctx) = @{$result}{qw(schema context)};
+my ($exec, $ctx) = @{$result}{qw(execute context)};
 
 sub gql {
   my ($query, $vars) = @_;
-  return execute($schema, $query, undef, $ctx, $vars // {});
+  return $exec->($query, undef, $ctx, $vars // {});
 }
 
 # Singular query
@@ -88,6 +87,16 @@ sub gql {
                 { bid => 1 });
   ok(!$res->{errors}, 'query with variable has no errors');
   is($res->{data}{book}{title}, 'The Hobbit', 'variable passed correctly');
+}
+
+# A connection queried with only `nodes` returns the rows: no scalar sibling
+# (total, hasNextPage, nextCursor) is needed (karr k9).
+{
+  my $res = gql('{ allBooks { nodes { title } } }');
+  ok(!$res->{errors}, 'nodes-only selection: no errors')
+    or diag explain $res->{errors};
+  ok(scalar @{ $res->{data}{allBooks}{nodes} // [] },
+    'nodes-only selection returns the rows');
 }
 
 done_testing;

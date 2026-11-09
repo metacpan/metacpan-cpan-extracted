@@ -4,6 +4,10 @@ package DBIO::SQLite::Introspect::Indexes;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
+use DBIO::SQLite::Util qw(quote_identifier sql_tokens);
+
 
 
 sub fetch {
@@ -19,13 +23,15 @@ sub fetch {
 
   for my $table_name (sort keys %$tables) {
     my $list = $dbh->selectall_arrayref(
-      qq{PRAGMA index_list("$table_name")}, { Slice => {} }
+      sprintf('PRAGMA index_list(%s)', quote_identifier($table_name)),
+      { Slice => {} },
     );
 
     my %t_idx;
     for my $idx (@$list) {
       my $info = $dbh->selectall_arrayref(
-        qq{PRAGMA index_info("$idx->{name}")}, { Slice => {} }
+        sprintf('PRAGMA index_info(%s)', quote_identifier($idx->{name})),
+        { Slice => {} },
       );
       my @cols = map { $_->{name} // '' } sort { $a->{seqno} <=> $b->{seqno} } @$info;
 
@@ -33,7 +39,11 @@ sub fetch {
         ? $sql_lookup->{ $idx->{name} }{sql}
         : undef;
 
-      my $partial = ($sql && $sql =~ /\bWHERE\b/i) ? 1 : 0;
+      # The keyword, not the letters: an index, a table or a column may be
+      # named "where", and stands in the statement between quotes then.
+      my $partial = ($sql && grep {
+        $_->[0] eq 'word' && uc $_->[1] eq 'WHERE'
+      } sql_tokens($sql)) ? 1 : 0;
 
       $t_idx{ $idx->{name} } = {
         index_name => $idx->{name},
@@ -64,14 +74,15 @@ DBIO::SQLite::Introspect::Indexes - Introspect SQLite indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Fetches index metadata via C<PRAGMA index_list()> and C<PRAGMA
 index_info()>, plus the original C<CREATE INDEX> statement from
-C<sqlite_master> for partial / expression indexes. Skips
-auto-generated indexes (PRIMARY KEY, UNIQUE constraint indexes).
+C<sqlite_master> for partial / expression indexes. Auto-generated
+indexes (origin C<u> / C<pk>) are kept in the model with their origin;
+L<DBIO::SQLite::Diff::Index> skips them when diffing.
 
 =head1 METHODS
 
@@ -83,7 +94,13 @@ Returns a hashref keyed by table name. Each value is a hashref keyed by
 index name. Each index entry has: C<index_name>, C<is_unique>,
 C<columns> (arrayref), C<sql> (CREATE statement, may be undef for
 auto-generated UNIQUE indexes), C<origin> (C<c>=CREATE, C<u>=UNIQUE,
-C<pk>=PRIMARY KEY), C<partial> (1 if WHERE clause present).
+C<pk>=PRIMARY KEY), C<partial> (1 if WHERE clause present -- the keyword, as
+L<DBIO::SQLite::Util/sql_tokens> reads the statement; a quoted name C<"where">
+is not one).
+
+A table and an index are named to the C<PRAGMA>s through
+L<DBIO::SQLite::Util/quote_identifier>, so a name that holds a double quote is
+read like any other.
 
 =head1 AUTHOR
 

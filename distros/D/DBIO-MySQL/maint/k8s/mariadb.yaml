@@ -1,0 +1,82 @@
+# MariaDB pod for the dbio-mysql integration tests -- the MariaDB counterpart of
+# the MySQL 8.0 pod (dbio-mysql-ev maint/k8s/mysql-pod.yaml, core
+# xbin/k8s/mysql-pod.yaml). The suite is meant to pass against both servers.
+#
+# Credentials follow maint/docker/docker-compose.yml: database dbio_test, the
+# database-scoped user dbio/dbio, root password dbioroot. Run the FULL suite as
+# root: the diff/upgrade path deploys the desired schema into a scratch database
+# it creates itself (DBIO::MySQL::Deploy), which dbio -- granted on dbio_test
+# only -- may not do.
+#
+# The service port is 3307, so it does not collide with a MySQL service on 3306
+# behind the same address.
+#
+# RESOURCE DISCIPLINE -- the pod carries resources.limits so it can never starve
+# the host. Run ONE live suite against it at a time, through maint/capped-test
+# (core), and DELETE the pod when done. See the "Live testing" section in
+# .claude/rules/.local.dbio-rules.md.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/mariadb.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-mariadb --timeout=180s
+#   kubectl port-forward svc/dbio-mariadb 3307:3307 &
+#
+#   DBIO_TEST_MYSQL_DSN='dbi:MariaDB:database=dbio_test;host=127.0.0.1;port=3307' \
+#   DBIO_TEST_MYSQL_USER=root \
+#   DBIO_TEST_MYSQL_PASS=dbioroot \
+#     ../dbio/maint/capped-test prove -lr t/     # serial
+#
+#   kubectl delete -f maint/k8s/mariadb.yaml     # ALWAYS clean up
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-mariadb
+  labels:
+    app: dbio-mariadb
+    role: dbio-test-db
+spec:
+  containers:
+    - name: mariadb
+      image: mariadb:11
+      resources:
+        requests:
+          cpu: 250m
+          memory: 384Mi
+        limits:
+          cpu: "1"          # at most one core on a shared box
+          memory: 1Gi
+      ports:
+        - containerPort: 3306
+      env:
+        - name: MARIADB_DATABASE
+          value: dbio_test
+        - name: MARIADB_USER
+          value: dbio
+        - name: MARIADB_PASSWORD
+          value: dbio
+        - name: MARIADB_ROOT_PASSWORD
+          value: dbioroot
+      # healthcheck.sh ships with the mariadb image; --connect fails as long as
+      # the server does not accept network connections.
+      readinessProbe:
+        exec:
+          command:
+            - healthcheck.sh
+            - --connect
+            - --innodb_initialized
+        initialDelaySeconds: 5
+        periodSeconds: 3
+        failureThreshold: 40
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-mariadb
+spec:
+  selector:
+    app: dbio-mariadb
+  ports:
+    - port: 3307
+      targetPort: 3306
+      protocol: TCP

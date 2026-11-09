@@ -35,7 +35,7 @@ modelled as a thin subclass layer, not a sibling distribution.
 - Both register in the core driver registry from the **same** distribution:
   `DBIO::MySQL::Storage` registers the `mysql` DBD name, and
   `DBIO::MySQL::Storage::MariaDB` registers the `MariaDB` DBD name
-  (`Storage/MariaDB.pm:9`, `DBIO::Storage::DBI->register_driver('MariaDB' => ...)`).
+  (`Storage/MariaDB.pm`, `DBIO::Storage::DBI->register_driver('MariaDB' => ...)`).
   So `dbi:mysql:` and `dbi:MariaDB:` DSNs both auto-detect into this dist.
 - Users opt into MariaDB explicitly by loading the MariaDB component
   (`load_components('MySQL::MariaDB')`), which pins
@@ -45,6 +45,28 @@ modelled as a thin subclass layer, not a sibling distribution.
   (disable `mariadb_auto_reconnect`), `_replication_status_row`
   (`SHOW REPLICA STATUS` first), and the `share` → `LOCK IN SHARE MODE`
   mapping in the MariaDB SQLMaker.
+
+  **Update (2026-08-05, karr #30): the last two are superseded.** The subclass
+  is the `DBD::MariaDB` binding, not the MariaDB *server*: DBD::MariaDB reaches
+  MySQL servers and `dbi:mysql:` reaches MariaDB ones, so an SQL-dialect delta
+  placed here answers for the wrong engine in two of the four combinations.
+  Only the DBD deltas remain (`_dbh_last_insert_id`,
+  `_run_connection_actions`, the async primitives). The replica-status verb and
+  the locking-read grammar are now decided in `DBIO::MySQL::Storage` from
+  `_is_mariadb` plus the server version — see the amendments to ADR 0003 and
+  ADR 0004, and karr #28 for the first delta that moved (the upsert row alias).
+
+  **Update (2026-09-26, karr k59): the sync DBD deltas left too.** The class
+  does not tell you the DBD either. `load_components('MySQL')` pins
+  `DBIO::MySQL::Storage` over a `dbi:MariaDB:` DSN, so a `mariadb_*` name bound
+  to the subclass never reaches that DBD::MariaDB handle. `_dbh_last_insert_id`
+  and `_run_connection_actions` now live in `DBIO::MySQL::Storage` only, and
+  both name the attribute by the DBD on the handle (see the k59 addendum to
+  ADR 0005). Only the async primitives remain per class (ADR 0007).
+
+  **Update (2026-10-04, karr k60): the async primitives left too.** They are
+  chosen per connection, by its DBD (ADR 0007 addendum). No DBD delta is bound
+  to a class any more.
 
 ## Rationale
 

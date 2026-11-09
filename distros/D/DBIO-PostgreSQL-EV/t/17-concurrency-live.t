@@ -22,9 +22,8 @@ use Test::Exception;
 #      callback landed on the Future that issued the matching query;
 #   3. pool->size stays at exactly 4 (M) — proves we did not spawn one
 #      connection per query;
-#   4. (smoke) parallel wall-time is meaningfully less than sequential
-#      wall-time × 2 — gated behind a TODO block so it can be marked
-#      TODO/flaky on slow CI without invalidating the rest of the test.
+#   4. statements sleeping on the server run side by side: 8 x 0.25 s on 4
+#      connections finish well under the 2 s a serial pool would need.
 
 BEGIN {
   plan skip_all => 'Set DBIO_TEST_PG_DSN to run integration tests'
@@ -33,43 +32,32 @@ BEGIN {
 
 use EV;
 use EV::Pg;
+use Time::HiRes ();
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (mirrors t/12-/t/13-/t/14-/t/15-/t/16-).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
-
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use PoolReset;
+use LiveServer;
+use GuardedWait;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
 # Pool size: 4 handles, 20 concurrent queries (5x oversubscription).
 # Storage.pm:117-119 strips `pool_size` out of the conninfo hash and uses
 # it as the pool's max_size, so this is the documented way to size it.
 $ci{pool_size} = 4;
 
+# The file's backstop: a hang anywhere in it ends the process. A guarded wait
+# has a timeout of its own and leaves this alarm running (karr k88).
+alarm 120;
+
 # Drive a Future to completion on the EV loop under a wall-clock guard.
 sub await_guarded {
   my ($f, $what) = @_;
-  local $SIG{ALRM} = sub { die "TIMEOUT awaiting $what\n" };
-  alarm 30;
-  EV::run(EV::RUN_ONCE) until $f->is_ready;
-  alarm 0;
-  return $f;
+  return GuardedWait->until_ready($f, 30, "TIMEOUT awaiting $what\n");
 }
 
 # Raw statement on a pooled connection (DDL setup/teardown only).
@@ -130,6 +118,7 @@ for my $i (1..4) {
 }
 await_guarded(Future->needs_all(@preheat_futs), 'preheat 4 parallel');
 is $storage->pool->size, 4, '4 parallel preheat acquires spawned 4 connections';
+PoolReset->until_reset($storage);   # a connection is idle once its reset is answered (karr k99)
 
 # Release the preheat connections so they go back to idle before the burst.
 # We cannot truly release them from outside, but the preheat Futures have
@@ -155,12 +144,10 @@ for my $i (1..20) {
 is scalar(@futs), 20, '20 concurrent select_async Futures issued';
 
 # Drain the loop until every Future resolves.
-my $t0 = time;
 await_guarded(
   Future->needs_all(@futs),
   'all 20 concurrent selects',
 );
-my $parallel_time = time - $t0;
 
 # Every Future resolved (no Futures lost, none merged).
 ok !(grep { !$_->is_ready } @futs), 'every concurrent Future resolved';
@@ -182,6 +169,7 @@ for my $i (1..20) {
 is $peak_size, 4, 'pool size never exceeded 4 (no connection-per-query leak)';
 is $storage->pool->size, 4,
   'pool size still 4 after the burst (all 20 connections released back)';
+PoolReset->until_reset($storage);
 is $storage->pool->available, 4,
   'all 4 connections back on the idle stack after the burst (no leak)';
 
@@ -223,7 +211,7 @@ is scalar(keys %burst_pid_set), 4,
 # Then %rot_seen would hold exactly ONE pid, so (B1) distinct-count (1 != 4)
 # and (B2) consecutive-differ (every pair equal) both FAIL, and the (B3)
 # cross-check set {pid} != {4 burst pids} FAILS too. That single-conn
-# starvation ("one conn preferred, the rest starve") is exactly the karr #13
+# starvation ("one conn preferred, the rest starve") is exactly the karr k13
 # bug the shift-fix cured; verified empirically by running this file against
 # the still-installed pop core (RED) vs. the fixed shift core (GREEN).
 #
@@ -240,6 +228,9 @@ for my $iter (1 .. 2 * $slots) {           # 2 full rounds = 8 iterations
   # ORDER, not fan-out, is what is under test.
   my $f = $storage->select_async($table, [ \'pg_backend_pid()' ], { id => 1 });
   await_guarded($f, "FIFO rotation iter $iter");
+  # A connection is idle once its reset is answered (karr k99); waiting for it
+  # is what forces the pool fully idle, in release order, before the next acquire.
+  PoolReset->until_reset($storage);
   my @rows = $f->get;
   is scalar(@rows), 1, "rotation iter $iter: exactly one row";
   push @rot_pids, $rows[0][0];
@@ -284,24 +275,25 @@ is_deeply
 
 # --- sequential wall-time for the smoke comparison ------------------------
 
-$t0 = time;
-for my $i (1..20) {
-  await_guarded(
-    $storage->select_async($table, ['id', 'owner'], { owner => "u$i" }),
-    "sequential $i",
-  );
-}
-my $sequential_time = time - $t0;
-
-# Smoke: parallel must beat 2x sequential to be plausibly faster. Over loopback
-# and with a small query, sequential is already very fast; if this assertion
-# is too flaky on slow CI we just TODO it.
-TODO: {
-  local $TODO = "wall-time is environment-sensitive on slow CI";
-  ok $parallel_time < ($sequential_time * 2),
-    "parallel ($parallel_time s) < 2 * sequential ($sequential_time s)"
-    or diag "parallel=$parallel_time sequential=$sequential_time";
-}
+#
+# The statements wait on the server, so the time is the server's, not the
+# machine's: 8 statements of 0.25 s on 4 connections take two rounds, about
+# 0.5 s; one after another they could not take less than 2 s. The bound of
+# 1.5 s leaves a second of slack on a slow host and still fails for a pool
+# that serialises. (The earlier form compared two whole-second `time`
+# readings of 20 loopback selects -- both 0, so `0 < 0` failed on every run.)
+my $sleepers = 8;
+my $nap      = 0.25;
+my $t_start  = Time::HiRes::time();
+my @sleeping = map {
+  $storage->select_async($table, [ 'id', \"pg_sleep($nap)" ], { id => 1 })
+} 1 .. $sleepers;
+await_guarded(Future->needs_all(@sleeping), 'parallel sleepers');
+my $slept = Time::HiRes::time() - $t_start;
+cmp_ok $slept, '<', $sleepers * $nap * 0.75,
+  sprintf('%d statements of %.2f s on 4 connections took %.2f s, under 75%% of the %.1f s serial floor',
+    $sleepers, $nap, $slept, $sleepers * $nap);
+cmp_ok $slept, '>=', $nap, 'and no faster than one statement (the sleeps really ran)';
 
 # --- cleanup --------------------------------------------------------------
 

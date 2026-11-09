@@ -13,7 +13,7 @@ DBIO::Manual::Heritage - Everything that changed from DBIx::Class to DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 OVERVIEW
 
@@ -64,16 +64,17 @@ classes use L<DBIO::Schema>.
 =head2 SQL::Abstract replaces SQL::Abstract::Classic
 
 DBIx::Class depended on L<SQL::Abstract::Classic>, an older fork.
-DBIO uses the canonical L<SQL::Abstract> (>= 1.99) instead. The query API
+DBIO uses the canonical L<SQL::Abstract> (>= 2.000001) instead. The query API
 is compatible; the internal extensions required small adjustments in the
 SQLMaker layer.
 
 =head2 apply_limit replaces limit_dialect
 
 DBIx::Class used a C<sql_limit_dialect> string and an C<emulate_limit()>
-dispatch table inside the storage layer. DBIO removes both. Each driver's
-SQLMaker subclass provides an C<apply_limit($sql, $rows, $offset)> method
-instead. The default implementation emits C<LIMIT ? OFFSET ?>.
+dispatch table inside the storage layer. DBIO removes both. The SQLMaker's
+C<apply_limit($sql, $rs_attrs, $rows, $offset)> method renders the limit
+instead. The default implementation emits C<LIMIT ? OFFSET ?>; a driver
+whose database needs another syntax overrides it in its SQLMaker subclass.
 
 If you had custom C<emulate_limit()> overrides, override C<apply_limit>
 on your SQLMaker subclass.
@@ -100,14 +101,18 @@ Install only the driver you need. Every driver ships its own native
 introspection, diff, and deploy modules (the test-and-compare strategy) and
 does not require L<SQL::Translator>.
 
-C<DBIO::Informix> is currently unbuildable; see the distribution's README for
-the full status.
+Async is an explicit, per-connection mode whose queries return C<Future>
+objects; each mode's transport is its own distribution. There is also a GraphQL
+projection layer:
 
-Two drivers also have non-blocking async variants whose queries return
-C<Future> objects, and there is a GraphQL projection layer:
-
-  DBIO-PostgreSQL-Async   DBIO::PostgreSQL::Async   (libpq via EV::Pg)
-  DBIO-MySQL-Async        DBIO::MySQL::Async        (MariaDB via EV::MariaDB)
+  DBIO-Forked             DBIO::Forked              (mode 'forked': fork per
+                                                     query, any driver, no loop)
+  DBIO-Async              DBIO::Async               (mode 'future_io': the
+                                                     driver's own async DBD
+                                                     binding via Future::IO)
+  DBIO-PostgreSQL-EV      DBIO::PostgreSQL::EV      (mode 'ev': libpq via EV::Pg)
+  DBIO-MySQL-EV           DBIO::MySQL::EV           (mode 'ev': MariaDB via
+                                                     EV::MariaDB)
   DBIO-GraphQL            DBIO::GraphQL             (Result classes -> GraphQL)
 
 =head2 Replicated storage is now in core
@@ -118,8 +123,8 @@ C<+DBIO::Replicated::Storage> and coordinates a master backend plus optional
 replicants:
 
   package MyApp::Schema;
-  use base 'DBIO::Schema';
-  __PACKAGE__->load_components('DBIO::Replicated');
+  use DBIO 'Schema', -pg;
+  __PACKAGE__->load_components('Replicated');
 
   my $schema = MyApp::Schema->connect($dsn, $user, $pass, {
       balancer_type => 'DBIO::Replicated::Balancer::First',
@@ -275,6 +280,65 @@ These come from C<DBIx::Class::Helper::Row::StorageValues>,
 C<DBIx::Class::Helper::Row::OnColumnChange>, and
 C<DBIx::Class::Helper::ResultSet::ProxyResultSetMethod>.
 
+=head2 ResultSet helpers (was DBIx::Class::Helpers)
+
+The C<DBIx::Class::Helper::ResultSet::*> family is integrated into
+L<DBIO::ResultSet> and likewise needs no C<load_components>. Upstream these
+are components loaded per ResultSet class; in DBIO they are core API.
+
+Attribute shortcuts, each of them a chainable C<< ->search(undef, {...}) >>:
+
+=over 4
+
+=item L<DBIO::ResultSet/order_by> - C<!col> means DESC, C<< -desc => 'col' >> too
+
+=item L<DBIO::ResultSet/columns>, L<DBIO::ResultSet/add_columns>, L<DBIO::ResultSet/remove_columns>, L<DBIO::ResultSet/no_columns>
+
+=item L<DBIO::ResultSet/distinct>, L<DBIO::ResultSet/group_by>, L<DBIO::ResultSet/prefetch>, L<DBIO::ResultSet/hri>
+
+=item L<DBIO::ResultSet/rows>, L<DBIO::ResultSet/limit>, L<DBIO::ResultSet/limited_page>, L<DBIO::ResultSet/has_rows>
+
+=back
+
+Search shortcuts. A leading dot qualifies the column with the current source
+alias, so C<< ->null('.title') >> means C<me.title>:
+
+=over 4
+
+=item L<DBIO::ResultSet/null>, L<DBIO::ResultSet/not_null>, L<DBIO::ResultSet/like>, L<DBIO::ResultSet/not_like>
+
+=item L<DBIO::ResultSet/search_or> - OR together several ResultSets
+
+=item L<DBIO::ResultSet/me> - the current source alias with a dot appended
+
+=back
+
+Set operations, existence and the rest:
+
+=over 4
+
+=item L<DBIO::ResultSet/union>, L<DBIO::ResultSet/union_all>, L<DBIO::ResultSet/intersect>, L<DBIO::ResultSet/intersect_all>, L<DBIO::ResultSet/except>, L<DBIO::ResultSet/except_all>
+
+=item L<DBIO::ResultSet/results_exist>, L<DBIO::ResultSet/results_exist_as_query> - cheaper than C<count>
+
+=item L<DBIO::ResultSet/correlate> - a related ResultSet as a correlated subquery
+
+=item L<DBIO::ResultSet/one_row>, L<DBIO::ResultSet/bare>, L<DBIO::ResultSet/rand>, L<DBIO::ResultSet/explain>
+
+=back
+
+Two divergences worth knowing. C<rand> and C<explain> are built on the storage
+hooks C<_random_function> and C<_explain_query> rather than upstream's
+C<DBIx::Introspector>, so a driver declares its own dialect. And C<page> is
+B<not> the upstream shortcut - DBIO kept the DBIx::Class core method, which
+builds its ResultSet directly instead of routing through C<search>.
+
+C<DBIx::Class::Helper::ResultSet::IgnoreWantarray> was deliberately not taken
+over; DBIO removes C<search>'s context-dependent return type outright instead.
+Also not integrated: C<DateMethods1>, C<Errors>, C<AutoRemoveColumns>,
+C<ResultClassDWIM>, and the upstream-deprecated C<VirtualView> and C<Union>.
+The reasoning for each is recorded in ADR 0011.
+
 =head2 IntrospectableM2M (was DBIx::Class::IntrospectableM2M)
 
 Many-to-many introspection is integrated into
@@ -287,27 +351,37 @@ C<rs_method>, C<add_method>, C<set_method>, C<remove_method>.
 
 =head2 DBIO::UUIDColumns (was DBIx::Class::UUIDColumns)
 
-Auto-generate UUID values on insert. Mark columns with:
+Auto-generate UUID values on insert. Load the component and flag the
+columns with C<uuid_on_create>:
 
-  uuid_columns('id');            # Vanilla/Candy
-  col id => uuid, auto_inc;      # Cake (uses uuid_columns internally)
+  __PACKAGE__->load_components('UUIDColumns');
+  __PACKAGE__->add_columns(
+      id => { data_type => 'varchar', size => 36, uuid_on_create => 1 },
+  );
 
-The UUID class defaults to the first available among C<Data::UUID>,
-C<UUID>, C<UUID::Random>. Override with C<uuid_class()>.
+Cake's C<uuid> type function is a column type only
+(C<< data_type => 'uuid' >>); it does not generate a value.
+
+The default generator makes random version 4 UUIDs from L<Crypt::URandom>.
+C<uuid_class()> selects C<Data::UUID> or C<UUID> explicitly.
 
 See L<DBIO::UUIDColumns>.
 
 =head2 DBIO::EncodedColumn
 
-One-way encoding of column values (passwords, tokens). Mark a column:
+One-way encoding of column values (passwords with Bcrypt or Argon2, tokens
+with Digest). Unlike the other
+components in this chapter it must be loaded:
+
+  __PACKAGE__->load_components('EncodedColumn');
+
+Then mark a column:
 
   __PACKAGE__->add_columns(
       password => {
           data_type       => 'varchar',
           size            => 100,
           encode_column   => 1,
-          encode_class    => 'Digest',
-          encode_args     => { algorithm => 'SHA-256', format => 'hex' },
           encode_check_method => 'check_password',
       },
   );
@@ -316,7 +390,13 @@ The column is encoded transparently on write. The C<check_password>
 (or whatever name you give C<encode_check_method>) method is generated
 automatically on the Result class.
 
-Storage format: C<dbio$E<lt>algoE<gt>$E<lt>salt_b64E<gt>$E<lt>digest_b64E<gt>>.
+The default C<encode_class> is C<Bcrypt> (cost 12, stored as C<$2b$...>);
+C<Argon2> stores C<$argon2id$...>; C<Digest> (SHA-256, SHA-384, SHA-512 or
+SHA3-*) stores C<dbio$E<lt>algoE<gt>$E<lt>salt_b64E<gt>$E<lt>digest_b64E<gt>>.
+An unknown C<encode_class>, an unknown C<encode_args> key of the class or a
+Digest algorithm outside that list is refused when the class is loaded. A
+stored value without hash format matches only with
+C<< accept_unencoded =E<gt> 1 >> in C<encode_args>.
 
 See L<DBIO::EncodedColumn>.
 
@@ -335,15 +415,31 @@ See L<DBIO::HashAccessor>.
 
 Serialize complex Perl structures to a text/blob column. Available via
 C<load_components('InflateColumn::Serializer')>. Serializer options:
-C<JSON>, C<YAML>, C<Sereal>, C<MsgPack>.
+C<JSON>, C<YAML>, C<MessagePack>.
 
-=head2 PopulateMore (was DBIx::Class::PopulateMore)
+=head2 PopulateMore (was DBIx::Class::Schema::PopulateMore)
 
-Enhanced C<populate()> that supports cross-source references, fixture
-data from files, and batch inserts. Integrated into L<DBIO::Schema>.
-The invocation syntax is unchanged:
+L<DBIO::PopulateMore> adds C<populate_more()>, which fills several sources
+in one call and lets a row refer to one created earlier in the same call.
+Load it on the schema class:
 
-  $schema->populate([ Users => ... ]);
+  __PACKAGE__->load_components('PopulateMore');
+
+  $schema->populate_more([
+      { Gender => {
+          fields => 'label',
+          data   => { male => 'male', female => 'female' },
+      } },
+      { Person => {
+          fields => [ 'name', 'gender' ],
+          data   => { john => [ 'john', '!Index:Gender.male' ] },
+      } },
+  ]);
+
+Values starting with C<!> are inflated: C<!Index:Source.key> is the row
+created under that key, C<!Env:NAME> a value from C<%ENV>, and
+C<!Find:Source.[key=val]> an existing row. C<< $schema->populate >> is the
+plain per-source L<DBIO::Schema/populate>.
 
 =head1 NEW CONCEPTS
 
@@ -355,21 +451,36 @@ Automatic row-level change tracking. Add to a Result class:
 
   __PACKAGE__->load_components('ChangeLog');
 
-DBIO creates a companion table C<E<lt>tableE<gt>_changelog> automatically.
+and to the schema class:
+
+  __PACKAGE__->load_components('ChangeLog::Schema');
+
+The schema component registers a companion source
+C<E<lt>SourceE<gt>_ChangeLog> (table C<E<lt>tableE<gt>_changelog>) for every
+tracked source; C<< $schema->deploy_changelog >> deploys those tables.
 By default every column change is recorded (INSERT, UPDATE, DELETE).
-Exclude sensitive columns:
+Exclude sensitive columns with the C<changelog> column flag:
 
-  __PACKAGE__->changelog_exclude_columns(qw/ password_hash session_token /);
+  __PACKAGE__->add_columns(
+      password_hash => { data_type => 'varchar', size => 255, changelog => 0 },
+  );
 
-Changes are stored as JSON. Methods:
+Changes are stored as JSON. Methods on a row of a tracked Result class:
 
-  $row->changelog_entries();          # ResultSet of log rows
-  $schema->changelog_serialize_changes($hashref);
-  $schema->changelog_deserialize_changes($json_str);
+  $row->changelog;                    # ResultSet of this row's log entries
+  $row->changelog_serialize_changes($hashref);
+  $row->changelog_deserialize_changes($json_str);
 
-PostgreSQL storage can use native C<jsonb> for the changes column.
-The version table was renamed from C<dbix_class_schema_versions> to
-C<dbio_schema_versions>.
+The C<changes> column is C<text>. A driver or application component can
+override C<changelog_column_definitions> to use a native type (e.g. C<jsonb>
+on PostgreSQL).
+The DBIx::Class::Schema::Versioned-style standalone versioning (DBIO::Version)
+was dropped in favour of L<DBIO::DeploymentHandler>; there is no
+C<dbio_schema_versions> table. The L<DBIO::DeploymentHandler> version table
+was renamed from its upstream name C<dbix_class_deploymenthandler_versions>
+to C<dbio_deploymenthandler_versions> (fork-rename); databases deployed with
+an older DBIO must be migrated manually (see
+L<DBIO::DeploymentHandler/COMPATIBILITY: VERSION TABLE RENAME>).
 
 See L<DBIO::ChangeLog> and L<DBIO::ChangeLog::Schema>.
 
@@ -384,21 +495,25 @@ and attaches it:
 
   my $schema = MyApp::Schema->connect(
       DBIO::AccessBroker::Static->new(
-          dsn      => $dsn,
+          host     => $host,
+          dbname   => $dbname,
           username => $user,
           password => $pass,
       )
   );
 
 The storage calls C<connect_info_for_storage($storage)> on the broker
-before each connection. One credential can serve many servers via a
-C<< $broker->for_host($host) >> view.
+before each connection. C<Static> answers connection parameters, not a DSN:
+the storage builds the DSN for its driver, so the schema must load its driver
+component. One credential can serve many servers: the application builds a
+C<< $broker->for_host($host) >> view per server and hands each to the
+connection on that host (L<DBIO::Replicated> passes the views through).
 
 Built-in broker classes:
 
 =over 4
 
-=item L<DBIO::AccessBroker::Static> - single DSN, drop-in replacement
+=item L<DBIO::AccessBroker::Static> - one fixed set of connection parameters
 
 =item L<DBIO::AccessBroker::Vault> - rotating credentials with TTL
 
@@ -440,21 +555,31 @@ See L<DBIO::Moo> and L<DBIO::Moose>.
 =head2 Async storage interface
 
 L<DBIO::Storage::Async> defines a storage-agnostic async interface
-(Phase 1 + 2). Queries return C<Future> objects. Two concrete
-implementations bypass DBI entirely:
+(Phase 1 + 2). Queries return C<Future> objects. Async is an explicit,
+per-connection mode -- C<< connect($dsn, $user, $pass, { async => 'forked' |
+'future_io' | 'ev' | 'immediate' }) >> -- and the C<ev> mode bypasses DBI
+entirely through a per-driver native client:
 
 =over 4
 
-=item C<DBIO::PostgreSQL::Async> (C<DBIO-PostgreSQL-Async>) - C<libpq> via
-C<EV::Pg>; adds LISTEN/NOTIFY, COPY IN/OUT, and request pipelining.
+=item C<DBIO::PostgreSQL::EV> (C<DBIO-PostgreSQL-EV>) - C<libpq> via
+C<EV::Pg>; adds COPY IN/OUT and request pipelining.
 
-=item C<DBIO::MySQL::Async> (C<DBIO-MySQL-Async>) - the MariaDB client via
-C<EV::MariaDB>; adds pipelining and connection-pool transaction pinning.
+=item C<DBIO::MySQL::EV> (C<DBIO-MySQL-EV>) - the MariaDB client via
+C<EV::MariaDB>, which pipelines consecutive queries automatically at the
+wire level.
 
 =back
 
-The core async interface is in C<DBIO::Storage::Async>. Application code
-that targets multiple backends should program against that interface.
+The core async interface is in C<DBIO::Storage::Async>. It includes
+transaction pinning: C<txn_do_async> takes one connection from the pool and
+runs the whole transaction on it, and every pooled transport inherits that --
+C<future_io> and both C<ev> backends alike. It also includes
+LISTEN/NOTIFY (ADR 0056): core owns the self-healing listen machinery, and
+PostgreSQL carries it on both the C<future_io> and the C<ev> transport.
+Application code that targets multiple backends should program against that
+interface; the modes and their transports are described in
+L<DBIO::Manual::AsyncStorage>.
 
 =head2 Type registry on Storage
 
@@ -502,13 +627,13 @@ Exported functions include:
   dbiotest     peepeeness       shuffle_unordered_resultsets
   help_url     iv_size          os_name
 
-  sigwarn_silencer   modver_gt_or_eq   fail_on_internal_wantarray
+  sigwarn_silencer   modver_gt_or_eq   assert_no_list_context
   refdesc  refcount  hrefaddr  scope_guard
   quote_sub  qsub  perlstring  serialize  dump_value
   UNRESOLVABLE_CONDITION
 
   dir_path   file_path   parent_dir   slurp_file   write_file
-  mkpath     rmtree      split_name   class_path
+  mkpath     rmtree      class_path
 
   firstidx  uniq  apply  array_eq
   is_plain_value   is_literal_value
@@ -569,12 +694,14 @@ Driver-specific tests (real SQL, real DBI) belong in the driver distributions.
 
 =head2 Shared test schemas
 
-Test schemas shared across the core and driver distributions live in
-C<DBIO::Test::Schema::*> under C<dbio/lib/>:
+The test schema shared across the core and driver distributions is
+L<DBIO::Test::Schema> under C<dbio/lib/>, with its result classes in
+C<DBIO::Test::Schema::*>:
 
-  DBIO::Test::Schema::Vanilla
-  DBIO::Test::Schema::Candy
-  DBIO::Test::Schema::Cake
+  DBIO::Test::Schema::Artist
+  DBIO::Test::Schema::CD
+  DBIO::Test::Schema::Track
+  ...
 
 The optional OO-framework demo schemas are standalone schema classes and
 live as B<siblings> of (not under) C<DBIO::Test::Schema>. Keeping them out
@@ -603,7 +730,12 @@ C<DBIO_TEST_*>:
 
   DBIO_TEST_PG_DSN         PostgreSQL DSN
   DBIO_TEST_MYSQL_DSN      MySQL/MariaDB DSN
-  DBIO_TEST_SQLITE_DSN     SQLite DSN (rarely needed, usually in-memory)
+
+There is no SQLite equivalent. SQLite needs no connection configuration,
+so DBIO defines no C<DBIO_TEST_SQLITE_DSN> and nothing reads one: in
+L<DBIO::Optional::Dependencies> every server engine's live-test group is
+gated on its own C<DBIO_TEST_*_DSN>, while SQLite carries a plain
+C<rdbms_sqlite> group with no gate at all.
 
 =head1 MIGRATION QUICK-REFERENCE
 
@@ -614,16 +746,21 @@ C<DBIO_TEST_*>:
                                     use DBIO::Candy;       (Candy)
                                     use DBIO::Cake;        (Cake)
   sql_limit_dialect / emulate_limit apply_limit on SQLMaker subclass
-  SQL::Abstract::Classic            SQL::Abstract (>= 1.99)
+  SQL::Abstract::Classic            SQL::Abstract (>= 2.000001)
   DBIx::Class::TimeStamp            DBIO::Timestamp (integrated)
-  DBIx::Class::Helpers              DBIO::Row helpers (integrated)
+  DBIx::Class::Helpers              DBIO::Row + DBIO::ResultSet helpers
+                                    (integrated)
   DBIx::Class::IntrospectableM2M    ManyToMany (integrated)
   DBIx::Class::UUIDColumns          DBIO::UUIDColumns (integrated)
   DBIx::Class::Replicated           DBIO::Replicated (in core)
   DBIx::Class::CDBICompat           removed (no replacement)
   DBICTest::*                       DBIO::Test::*
   DBICTEST_* env vars               DBIO_TEST_* env vars
-  dbix_class_schema_versions        dbio_schema_versions
+  dbix_class_schema_versions        removed (Schema::Versioned dropped;
+                                    use DBIO::DeploymentHandler)
+  dbix_class_deploymenthandler_versions
+                                    dbio_deploymenthandler_versions
+                                    (fork-rename; migrate old DBs manually)
   SQL::Translator (DDL/deploy)      native Deploy per driver (SQLT dropped)
 
 =head1 SEE ALSO
@@ -650,7 +787,7 @@ C<DBIO_TEST_*>:
 
 =item L<DBIO::ChangeLog> - row-level audit trail
 
-=item L<DBIO::AccessBroker> - connection routing interface
+=item L<DBIO::AccessBroker> - credential source interface
 
 =item L<DBIO::Moo> - Moo attribute bridge
 

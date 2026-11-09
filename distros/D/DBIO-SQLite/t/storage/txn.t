@@ -422,11 +422,13 @@ warnings_are {
   $dbh->{AutoCommit} = 0;
 
   ok (!$dbh->{AutoCommit}, 'AutoCommit is off on $dbh');
-  my $schema = DBIO::Test::Schema->connect (sub { $dbh });
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('DBIO::SQLite::Storage');
+  $schema = $schema->connect (sub { $dbh });
 
   lives_ok ( sub {
     my $guard = $schema->txn_scope_guard;
-    $schema->resultset('CD')->delete;
+    $schema->resultset('CD')->delete({ all => 1 });
     $guard->commit;
   }, 'No attempt to start a transaction with scope guard');
 
@@ -445,10 +447,12 @@ warnings_are {
   $dbh->{AutoCommit} = 0;
 
   ok (!$dbh->{AutoCommit}, 'AutoCommit is off on $dbh');
-  my $schema = DBIO::Test::Schema->connect (sub { $dbh });
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('DBIO::SQLite::Storage');
+  $schema = $schema->connect (sub { $dbh });
 
   lives_ok ( sub {
-    $schema->txn_do (sub { $schema->resultset ('CD')->delete });
+    $schema->txn_do (sub { $schema->resultset ('CD')->delete({ all => 1 }) });
   }, 'No attempt to start a atransaction with txn_do');
 
   is ($schema->resultset('CD')->count, 0, 'Deletion successful');

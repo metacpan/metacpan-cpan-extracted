@@ -37,7 +37,7 @@ my @cds = $schema->resultset("CD")->search( {},
     { rows => 2,
       offset => 2,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "offset ok" );
 
 # test software-based limiting
@@ -69,7 +69,7 @@ $schema->storage->mock(qr/SELECT.*FROM cd/i, [
       offset => 2,
       software_limit => 1,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "software offset ok" );
 
 throws_ok {
@@ -88,7 +88,7 @@ $schema->storage->mock(qr/SELECT.*FROM cd/i, [
     {
       offset => 2,
       order_by => 'year' }
-);
+)->all;
 is( $cds[0]->title, "Spoonful of bees", "offset with no limit" );
 
 $schema->storage->clear_mocks;

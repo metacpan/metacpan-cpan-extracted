@@ -1,6 +1,6 @@
 ---
 name: dbio-postgresql-postgis
-description: "DBIO::PostgreSQL::PostGIS — spatial (geometry/geography) column support for DBIO::PostgreSQL: inflation to Geometry objects, EWKT/EWKB codecs, spatial resultset helpers. Use when working with PostGIS spatial data in DBIO."
+description: Use when working with PostGIS spatial data in DBIO — geometry and geography columns, Geometry objects, EWKT/EWKB, spatial resultset helpers.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -16,7 +16,7 @@ query helpers into the resultset. Builds on [[dbio-postgresql]]; conventions →
 ```perl
 package MyApp::Schema::Result::Place;
 use base 'DBIO::Core';
-__PACKAGE__->load_components('PostgreSQL::PostGIS');   # the component
+__PACKAGE__->load_components('PostgreSQL::PostGIS');   # inflation + resultset helpers
 __PACKAGE__->table('place');
 __PACKAGE__->add_columns(
   id   => { data_type => 'integer', is_auto_increment => 1 },
@@ -29,7 +29,9 @@ __PACKAGE__->add_columns(
 );
 ```
 
-`geometry`/`geography` columns auto-inflate on read and deflate to EWKT on write.
+`geometry`/`geography` columns auto-inflate on read and deflate on write: a
+Geometry read from the database goes back as the EWKB hex it carries (same type,
+same Z/M, same doubles bit for bit), one built in Perl as EWKT.
 
 ## Geometry objects
 
@@ -40,11 +42,19 @@ my $place = $schema->resultset('Place')->find(1);
 $place->geom->x;              # longitude
 $place->geom->y;              # latitude
 $place->geom->srid;
-$place->geom->geometry_type;  # 'POINT'
+$place->geom->geometry_type;  # 'point' (lower-case when decoded from EWKB/WKT)
 $place->geom->wkt / ->ewkt / ->ewkb_hex;
 ```
 
-Constructors (deflate to EWKT on `update`):
+Only `NULL` reads as `undef`. A type the EWKB decoder names but does not decode
+— `CIRCULARSTRING`, `COMPOUNDCURVE`, `CURVEPOLYGON`, `MULTICURVE`,
+`MULTISURFACE`, `POLYHEDRALSURFACE`, `TIN`, `TRIANGLE`, or a
+`GEOMETRYCOLLECTION` holding one — reads as an object with `ewkb_hex`, `srid`
+and `geometry_type` (`circularstring`, …) and no coordinates: `coordinates`,
+`wkt`, `ewkt`, `bbox`, `to_geojson` are `undef`. It is written back as its hex.
+
+Constructors (deflate to EWKT on `update` — except `from_ewkb_hex`, whose
+objects deflate to that hex):
 
 ```perl
 DBIO::PostgreSQL::PostGIS::Geometry->point($lon, $lat, srid => 4326);
@@ -77,25 +87,34 @@ $rs->search({ -bool => \['ST_DWithin(geom, ST_MakePoint(?,?)::geography, ?)',
 
 ## Driver wiring
 
-Loading the component registers the PostGIS storage **layer** (core storage-layer
-composition); it composes over the resolved driver storage at connect time:
+PostGIS is a database extension; the schema declares it in its list of extensions
+(ADR 0066), not by loading the component:
 
 ```perl
 package MyApp::Schema;
-use DBIO 'Schema';
-__PACKAGE__->load_components('PostgreSQL', 'PostgreSQL::PostGIS');
-# connection() runs register_storage_layer('DBIO::PostgreSQL::PostGIS::Storage')
+use DBIO Schema => -pg;
+__PACKAGE__->pg_extensions('postgis');                      # or
+__PACKAGE__->pg_extensions(postgis => { schema => 'gis' });
 ```
 
-The connected storage then `isa` BOTH the PostGIS layer AND `DBIO::PostgreSQL::Storage`;
-`ensure_postgis` / `postgis_version` / the PostGIS-aware deploy class live on the layer.
+The driver resolves the name to `DBIO::PostgreSQL::PostGIS::Extension`: model rules
+(geometry type and SRID of a column; another SRID is converted with `ST_Transform`,
+another type is refused), the storage layer and the inflation component. The layer
+composes over the resolved driver storage, so the connected storage `isa` BOTH
+`DBIO::PostgreSQL::PostGIS::Storage` AND `DBIO::PostgreSQL::Storage`;
+`ensure_postgis` / `postgis_version` live on the layer. Deploy stays with the driver —
+this distribution defines no `dbio_deploy_class`.
 
 - `DBIO::PostgreSQL::PostGIS::Storage` is a plain storage **layer** — not a
-  `storage_type` subclass, no `use base`, no `register_driver`.
+  `storage_type` subclass, no `use base`, no `register_driver`. The extension never
+  determines the driver.
+- `postgis_topology` is its own extension (`Topology::Extension`).
 - Codecs: `Codec::WKB::Decoder`, `Codec::WKT::Parser`, `Codec::WKT::Builder`
-- `Introspect` + `Deploy` for spatial-aware schema management
+- `::Deploy` and `::Introspect` are stubs.
 
 ## Testing
 
-Needs a real PostGIS-enabled PostgreSQL (not the core fake storage):
-`DBIO_TEST_PG_DSN` / `_USER` / `_PASS` against a DB with the `postgis` extension.
+Offline: `../dbio/maint/capped-test prove -lr t/` (mock storage, no database).
+Live needs a PostGIS-enabled PostgreSQL (this repo's database is `dbio_postgis`):
+`DBIO_TEST_PG_DSN` / `_USER` / `_PASS`. Bring-up and run rules: house rules, *Live
+testing — resource discipline*.

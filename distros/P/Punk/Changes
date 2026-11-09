@@ -1,5 +1,15 @@
 Revision history for Punk
 
+0.69    2026-11-08
+        - t/0310 expects the OS's own reading of a backslash where it is a
+          path separator (Cygwin, Windows).
+        - The async model tests skip, naming the error, where the pool
+          cannot fork (Cygwin).
+        - t/1150 measures its leak gate with a few long values, so an
+          allocator that scatters small chunks (OpenBSD) stays under it.
+        - t/1032 reads the fan-out again after more requests, so a short
+          count says whether a request woke what the pipe did not.
+
 0.68    2026-11-01
         - The file cache's single-flight lock carries its own timestamp, so
           a filesystem with whole-second mtime (GNU/Hurd) no longer steals

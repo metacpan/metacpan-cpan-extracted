@@ -25,6 +25,7 @@ eval { require DBD::SQLite; 1 } or plan skip_all => 'DBD::SQLite required';
   __PACKAGE__->set_primary_key('id');
   package RT::Schema;
   use base 'DBIO::Schema';
+  __PACKAGE__->load_components('SQLite');
   __PACKAGE__->register_class(Thing => 'RT::Result::Thing');
 }
 

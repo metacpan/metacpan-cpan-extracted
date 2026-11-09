@@ -68,7 +68,15 @@ typedef struct { int n, cap; struct win_fa_one *a; } win_file_actions_t;
 #define WIN_SPAWN_SETSCHEDULER  0x20
 #define WIN_SPAWN_SETSID        0x80
 struct win_sched_param { int sched_priority; };
-typedef struct { short flags; win_sigset_t mask, def; pid_t pgroup; int policy; struct win_sched_param sp; } win_spawnattr_t;
+typedef struct {   /* job limits of the child's own job (W4, post-0.09), by the names of JOBOBJECT_*_LIMIT_INFORMATION */
+    DWORD flags;                            /* JOB_OBJECT_LIMIT_PROCESS_MEMORY, ..._JOB_MEMORY, ..._PROCESS_TIME, ..._JOB_TIME, ..._ACTIVE_PROCESS */
+    SIZE_T ProcessMemoryLimit, JobMemoryLimit;   /* bytes of committed memory */
+    LONGLONG PerProcessUserTimeLimit, PerJobUserTimeLimit;   /* user-mode time, 100-ns units */
+    DWORD ActiveProcessLimit;
+} win_job_limits_t;
+typedef struct { short flags; win_sigset_t mask, def; pid_t pgroup; int policy; struct win_sched_param sp;
+                 DWORD priority_class;      /* IDLE_PRIORITY_CLASS ...: a creation flag, or 0 (W4) */
+                 win_job_limits_t job; } win_spawnattr_t;
 
 #define WIN_MAXFD 256   /* the child's fds this table can describe */
 
@@ -352,6 +360,8 @@ static wchar_t *win_search(const wchar_t *name)   /* posix_spawnp: PATH, as give
 #define WIN_OPT_KILL_WITH_PARENT 0x02
 #define WIN_OPT_NEW_CONSOLE      0x04
 static int win_spawn_options = WIN_OPT_NEW_GROUP | WIN_OPT_KILL_WITH_PARENT | WIN_OPT_NEW_CONSOLE;
+static int win_spawn_showwindow = -1;   /* the child's wShowWindow (STARTF_USESHOWWINDOW), or -1: not set (post-0.09: Perl's
+                                           Win32::SetChildShowWindow, as Perl's own spawn uses it) */
 static HANDLE win_job;   /* made at the first child that needs it */
 static HANDLE win_kill_job(void)
 {
@@ -364,17 +374,37 @@ static HANDLE win_kill_job(void)
     return win_job;
 }
 
-/* the process handles of our children, by pid, until the caller has their exit code */
-static struct { pid_t pid; HANDLE h; } win_kids[1024];
-static void win_keep(pid_t pid, HANDLE h)
+/* the process handles of our children, by pid, until the caller has their exit code; the table grows as needed
+   (post-0.09: it was 1024 entries, after which a handle was closed at once and the exit code could be lost) */
+typedef struct { pid_t pid; HANDLE h, job; } win_kid_t;   /* job: the child's own job (limits, W4), or NULL */
+static win_kid_t *win_kids; static int win_nkids;
+static void win_keep(pid_t pid, HANDLE h, HANDLE job)
 {
-    int i; for (i = 0; i < 1024; i++) if (!win_kids[i].h) { win_kids[i].pid = pid; win_kids[i].h = h; return; }
-    CloseHandle(h);   /* the table is full: the exit code may be lost if the child ends before it is waited for */
+    int i, n; win_kid_t *k;
+    for (i = 0; i < win_nkids; i++) if (!win_kids[i].h) { win_kids[i].pid = pid; win_kids[i].h = h; win_kids[i].job = job; return; }
+    n = win_nkids ? 2 * win_nkids : 64;
+    if (!(k = (win_kid_t *)win_realloc(win_kids, n * sizeof *k))) { CloseHandle(h); if (job) CloseHandle(job); return; }   /* no memory */
+    memset(k + win_nkids, 0, (n - win_nkids) * sizeof *k);
+    k[win_nkids].pid = pid; k[win_nkids].h = h; k[win_nkids].job = job; win_kids = k; win_nkids = n;
 }
 static HANDLE win_spawn_handle(pid_t pid)
-{ int i; for (i = 0; i < 1024; i++) if (win_kids[i].h && win_kids[i].pid == pid) return win_kids[i].h; return NULL; }
+{ int i; for (i = 0; i < win_nkids; i++) if (win_kids[i].h && win_kids[i].pid == pid) return win_kids[i].h; return NULL; }
 static void win_spawn_forget(pid_t pid)
-{ int i; for (i = 0; i < 1024; i++) if (win_kids[i].h && win_kids[i].pid == pid) { CloseHandle(win_kids[i].h); win_kids[i].h = NULL; } }
+{ int i; for (i = 0; i < win_nkids; i++) if (win_kids[i].h && win_kids[i].pid == pid) {
+    CloseHandle(win_kids[i].h); win_kids[i].h = NULL; if (win_kids[i].job) { CloseHandle(win_kids[i].job); win_kids[i].job = NULL; } } }
+static HANDLE win_child_job(const win_job_limits_t *l, int kill_on_close)   /* a job with these limits, or NULL */
+{
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION li; HANDLE j = CreateJobObjectW(NULL, NULL);
+    if (!j) return NULL;
+    memset(&li, 0, sizeof li);
+    li.BasicLimitInformation.LimitFlags = l->flags | (kill_on_close ? JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE : 0);
+    li.ProcessMemoryLimit = l->ProcessMemoryLimit; li.JobMemoryLimit = l->JobMemoryLimit;
+    li.BasicLimitInformation.PerProcessUserTimeLimit.QuadPart = l->PerProcessUserTimeLimit;
+    li.BasicLimitInformation.PerJobUserTimeLimit.QuadPart = l->PerJobUserTimeLimit;
+    li.BasicLimitInformation.ActiveProcessLimit = l->ActiveProcessLimit;
+    if (!SetInformationJobObject(j, JobObjectExtendedLimitInformation, &li, sizeof li)) { DWORD e = GetLastError(); CloseHandle(j); SetLastError(e); return NULL; }
+    return j;
+}
 
 /* ------------------------------------------------------------------ the call */
 static int win_spawn(pid_t *pid, const char *file, int search, const win_file_actions_t *fa, const win_spawnattr_t *sa,
@@ -476,6 +506,7 @@ static int win_spawn(pid_t *pid, const char *file, int search, const win_file_ac
     }
     if (!rc) {
         si.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+        if (win_spawn_showwindow >= 0) { si.StartupInfo.dwFlags |= STARTF_USESHOWWINDOW; si.StartupInfo.wShowWindow = (WORD)win_spawn_showwindow; }
         if (!dup[0] && !dup[1] && !dup[2] && (win_spawn_options & WIN_OPT_NEW_CONSOLE)) cf |= CREATE_NEW_CONSOLE;
         si.StartupInfo.hStdInput = dup[0] ? dup[0] : INVALID_HANDLE_VALUE;
         si.StartupInfo.hStdOutput = dup[1] ? dup[1] : INVALID_HANDLE_VALUE;
@@ -504,14 +535,29 @@ static int win_spawn(pid_t *pid, const char *file, int search, const win_file_ac
             rc = win_errno(GetLastError());
     }
     if (!rc) {
-        HANDLE job = (win_spawn_options & WIN_OPT_KILL_WITH_PARENT) ? win_kill_job() : NULL;
-        if (job) cf |= CREATE_SUSPENDED;
-        if (!CreateProcessW(app, cl, NULL, NULL, ndup > 0 || console, cf, env, cwd, &si.StartupInfo, &pi)) rc = win_errno(GetLastError());
-        else {
-            if (job) { AssignProcessToJobObject(job, pi.hProcess); ResumeThread(pi.hThread); }   /* (a job not nestable here,
-                before Windows 8 when we are in a job already: the child runs, outside it) */
-            CloseHandle(pi.hThread); *pid = (pid_t)pi.dwProcessId; win_keep(*pid, pi.hProcess);
+        int kill = (win_spawn_options & WIN_OPT_KILL_WITH_PARENT) != 0;
+        HANDLE job = kill ? win_kill_job() : NULL, own = NULL;
+        if (sa && sa->job.flags && !(own = win_child_job(&sa->job, kill))) rc = win_errno(GetLastError());
+        DWORD prio = sa ? sa->priority_class : 0;   /* (W4: set on the suspended child; Wine ignores the creation flag) */
+        if (!rc && (job || own || prio)) cf |= CREATE_SUSPENDED;
+        if (!rc && !CreateProcessW(app, cl, NULL, NULL, ndup > 0 || console, cf, env, cwd, &si.StartupInfo, &pi)) rc = win_errno(GetLastError());
+        else if (!rc) {
+            if (job) AssignProcessToJobObject(job, pi.hProcess);   /* (a job not nestable here, before Windows 8 when we
+                are in a job already: the child runs outside it) */
+            if (own && !AssignProcessToJobObject(own, pi.hProcess)) {   /* its limits: a job of its own, nested (Windows 8) */
+                rc = win_errno(GetLastError()); TerminateProcess(pi.hProcess, 255); CloseHandle(pi.hProcess); CloseHandle(pi.hThread);
+                CloseHandle(own); own = NULL;
+            }
+            else if (prio && !SetPriorityClass(pi.hProcess, prio)) {
+                rc = win_errno(GetLastError()); TerminateProcess(pi.hProcess, 255); CloseHandle(pi.hProcess); CloseHandle(pi.hThread);
+                if (own) { CloseHandle(own); own = NULL; }
+            }
+            else {
+                if (job || own || prio) ResumeThread(pi.hThread);
+                CloseHandle(pi.hThread); *pid = (pid_t)pi.dwProcessId; win_keep(*pid, pi.hProcess, own); own = NULL;
+            }
         }
+        if (own) CloseHandle(own);
     }
     if (si.lpAttributeList) { DeleteProcThreadAttributeList(si.lpAttributeList); win_free(si.lpAttributeList); }
     for (i = 0; i < ndup; i++) CloseHandle(list[i]);

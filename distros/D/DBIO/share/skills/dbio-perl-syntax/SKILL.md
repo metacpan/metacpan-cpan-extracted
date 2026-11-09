@@ -1,6 +1,6 @@
 ---
 name: dbio-perl-syntax
-description: "The one canonical Perl syntax/style baseline for all DBIO distributions — module loading, file preamble, whitespace, idioms, cpanfile versioning. Use before editing any .pm, .pl, or .t in a DBIO distribution."
+description: Load before editing any .pm, .pl or .t in a DBIO distribution — module loading, file preamble, per-module $VERSION, whitespace, idioms, cpanfile versioning.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -15,7 +15,7 @@ core code in `dbio/lib/DBIO/`.
 This skill covers *pure Perl syntax and conventions only*. For building classes
 (CAG accessor groups, constructors, `load_components`) see
 [[dbio-perl-class-patterns]]. For the optional Moo/Moose bridges and codegen see
-[[dbio-moo-moose]]. For release/dzil see [[dbio-perl-release]].
+[[dbio-moo-moose]] (installed in core only). For release/dzil see [[dbio-perl-release]].
 
 ## File preamble
 
@@ -23,7 +23,7 @@ Every `.pm` looks like this — copy the shape exactly:
 
 ```perl
 package DBIO::AccessBroker::Static;
-# ABSTRACT: Single-DSN AccessBroker drop-in replacement
+# ABSTRACT: One fixed set of connection parameters as an AccessBroker
 
 use strict;
 use warnings;
@@ -32,8 +32,19 @@ use base 'DBIO::AccessBroker';
 ```
 
 - `package` first, then **`# ABSTRACT:`** on the very next line (PodWeaver reads it).
-- **`use strict; use warnings;`** always, right after the abstract.
+- **strict and warnings are always active** — who loads them doesn't matter.
+  Plain Perl: `use strict; use warnings;` right after the abstract. Moo/Moose/Cake
+  load them themselves; that satisfies the rule, it is not an exception.
 - Blank line between logical groups of `use` statements.
+- **`use namespace::clean` wipes every sub defined before it** at the end of compile. A method that must stay callable (`dbio_deploy_class`, a hook, an override) is defined *after* it.
+
+## `$VERSION` in every module
+
+**Every shipped `.pm` under `lib/` carries a literal `our $VERSION = '...'`** — not
+only the main module, and all of them the *same* version. Canonical placement is
+right after `use warnings;`; some main modules carry it directly under `package` /
+`# ABSTRACT:` — both are fine, don't churn existing files just to move the line. Do
+NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
 
 ## Module loading
 
@@ -46,14 +57,17 @@ use base 'DBIO::AccessBroker';
   ...
   Scalar::Util::blessed($class);
   ```
+- **For new code:** existing `require`s in core (some in method bodies) are heritage, not the model.
 - **`require` is forbidden as a "lazy optimization".** Never use it to shave
   startup. If you write `require Foo;` inside a method body, stop — hoist it to a
   top-level `use`.
-- **`require` is allowed ONLY for true runtime plugin loading** — the class is
-  determined from config/DB at runtime (e.g. `ensure_class_loaded($class_from_db)`,
-  `Module::Runtime::use_module($x)`), or the module is a documented **optional**
-  dependency probed at runtime. If the class name is known at write-time and the
-  dep is required, `use` it.
+- **`require` is allowed ONLY when essential** — true runtime plugin loading (the
+  class is determined from config/DB at runtime, e.g.
+  `ensure_class_loaded($class_from_db)`, `Module::Runtime::use_module($x)`), a
+  documented **optional** dependency probed at runtime, or inside a `::Util`
+  class. `::Util` classes are the exception: they wrap the things that are
+  otherwise forbidden (see File I/O). If the class name is known at write-time
+  and the dep is required, `use` it.
 - **`require Foo; Foo->new` inside a controller action** is a red flag. Hoist to `use`.
 
 ## Singletons
@@ -63,8 +77,10 @@ use base 'DBIO::AccessBroker';
 
 ## Whitespace & idioms
 
-- **2-space indentation.** Not 4. Not tabs.
-- **No trailing commas** at the end of a multi-line list.
+- **2-space indentation.** Not 4. Not tabs. Heritage 4-space files stay as-is
+  until they are touched; new code is 2-space.
+- **Trailing commas are the standard** on multi-line lists — preferred, not just
+  allowed. Single-line lists stay comma-free.
 - **`//` defined-or** for argument defaults, not `||`:
   ```perl
   $self->username($args{username} // '');
@@ -73,6 +89,19 @@ use base 'DBIO::AccessBroker';
 - **`$_[0]`** direct argument access is fine in hot/tiny accessors (see core `Base.pm`);
   prefer named `my ($self, ...) = @_;` everywhere else for readability.
 - POD is **inline** next to the code it documents (`=method`, `=attr`), not in a block at EOF.
+- `=encoding` depends on whether the file is valid POD before weaving. PodWeaver
+  (`-SingleEncoding` in `@DBIO`) strips every source `=encoding` and emits exactly one at
+  build time, `.pod` files included, so the build never needs the source line (core k217).
+  - A file using `=method`/`=attr` carries **no `=encoding` line**, even with
+    non-ASCII (em-dashes, `§`) in the POD. It is not valid POD until the weaver runs, and
+    `xt/pod.t` skips it, so the line serves nothing (core k167).
+  - A file with **only plain POD** (`=head1`/`=item`, no weaver directives; every `.pod`
+    manual) **keeps `=encoding UTF-8`** at the head of its first POD block. `xt/pod.t`
+    checks these files raw and fails on "Non-ASCII character seen before =encoding"
+    (core k115). Keep the line even while the file is pure ASCII, so the first em-dash
+    does not break it.
+  - Check woven POD on the `dzil build` output; `podchecker` on a raw directive file
+    measures nothing.
 - End every module with a lone `1;`.
 
 ## File I/O
@@ -86,7 +115,9 @@ use base 'DBIO::AccessBroker';
   my $src = slurp_file_utf8(file_path($tmpdir, 'Result', 'User.pm'));
   ```
 - **`File::Temp`** for temporary files/dirs (mostly tests). Core module, fine as-is.
-- No `Path::Tiny`. No direct `File::Spec`. No bare `open` in new code.
+- No `Path::Tiny`. No direct `File::Spec`. No bare `open` in app code — `::Util`
+  classes are the wrapper for the forbidden things: they may `require` and
+  bare-`open` internally, app code never does.
 
 ## JSON
 
@@ -94,25 +125,19 @@ use base 'DBIO::AccessBroker';
 
 ## cpanfile versioning — DBIO-authored deps
 
-DBIO `dist.ini` uses `[@DBIO]`, which sets `$VERSION` in the repo to the **next,
-unreleased** version. The repo is ALWAYS ahead of CPAN by one.
+The family is developed against the **staged, unreleased** version: every repo's `$VERSION`
+is the number the family is released as, ahead of the last CPAN tag.
 
-1. **NEVER copy a `$VERSION` from a DBIO repo into a `cpanfile`.** It is not
-   released; `cpanm` cannot install it; the build breaks.
-2. **Check `cpanm --info Module::Name`** for the actual released version.
-3. **Every DBIO-authored dep must be pinned to the latest released CPAN version** —
-   not `'0'`, not a stale number.
-4. **Re-check on upgrade** with `cpanm --info` again.
-5. **Family bootstrap exception:** until the DBIO family has had its first CPAN
-   release, `cpanm --info` finds nothing to pin. DBIO-family deps stay
-   **unversioned** in the cpanfile for now and get pinned as part of the first
-   release ticket. Cross-repo development installs happen via `dzil install`
-   in the dependency's repo, not via CPAN.
-
-```bash
-cpanm --info DBIO | tail -1
-# → GETTY/DBIO-1.234.tar.gz  ← pin to 1.234 (once released)
-```
+1. **Pin a DBIO-family dep to the staged family version** — the dep repo's own
+   `$VERSION` (`grep VERSION dbio/lib/DBIO.pm`), the same number in every repo's
+   cpanfile. A pin equal to the dep repo's `$VERSION` is correct, not a defect; do
+   **not** "correct" it back to the last released number.
+2. **Consistency is the check:** `grep "'DBIO'" */cpanfile` shows one number everywhere.
+   A repo still on the previous number was missed by the sweep — bring it forward.
+3. Never `'0'` and never a stale number for a DBIO-authored dep.
+4. A non-DBIO dep pinned to a specific version is checked with `cpanm --info Module::Name`.
+5. Staging pins are set deliberately, as part of a release run, never in passing.
+   Cross-repo development installs happen via `dzil install` in the dependency's repo.
 
 ## Testing
 
@@ -127,15 +152,14 @@ cpanm --info DBIO | tail -1
 
 ## Forbidden / anti-patterns
 
-- ❌ `require Foo` inside a method to "speed up startup"
+- ❌ `require Foo` inside a method to "speed up startup" (exception: `::Util` classes)
 - ❌ Using a `$VERSION` from a DBIO repo as a cpanfile requirement
-- ❌ 4-space indent or tabs in new Perl files
-- ❌ Trailing commas on multi-line lists
-- ❌ `Path::Tiny`, direct `File::Spec`, or bare `open` in new code — use the `DBIO::Util` file helpers
+- ❌ 4-space indent or tabs in new Perl files (heritage 4-space files stay until touched)
+- ❌ `Path::Tiny`, direct `File::Spec`, or bare `open` in app code — use the `DBIO::Util` file helpers (`::Util` classes may wrap them)
 - ❌ `||` where `//` is meant (clobbers legitimate `0`/`''`)
-- ❌ `Data::Dumper` in shipped code (use `DDP`/`Data::Printer` for debug, strip before commit)
+- ❌ `Data::Dumper` in shipped code (use `DDP`/`Data::Printer` for debug, strip before commit; `DBIO::Util::dump_value` is the sanctioned debug helper)
 
 ## When in doubt
 
-Grep real core code: `~/dev/perl/dbio-dev/dbio/lib/DBIO/`. For class-building
+Grep real core code: `../dbio/lib/DBIO/` (the core checkout next to this repo). For class-building
 specifics go to [[dbio-perl-class-patterns]].

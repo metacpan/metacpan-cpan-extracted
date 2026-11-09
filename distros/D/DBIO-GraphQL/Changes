@@ -1,5 +1,66 @@
 Revision history for DBIO-GraphQL
 
+0.900004  2026-11-08
+    * Security
+        - The generated API is full access to what to_graphql releases, and
+          README and POD say so at the top. sources and except choose the
+          exposed sources (a source left out is gone as a relationship
+          target too), hide removes columns, readonly keeps them out of
+          mutations, and mutations is opt-in per schema or per source.
+        - An authorize hook runs before every resolver that touches the
+          database. False answers "not authorized" without SQL; a hashref
+          restricts reads and counts, constrains UPDATE and DELETE, and
+          supplies the column values of a create.
+        - introspection => 0 switches __schema and __type off.
+
+    * Limits
+        - Every result set is bounded: default_rows (100) for plural queries
+          and has_many fields, max_rows (1000) for take, first and skip,
+          max_in (500) for in filters. An excess is an error before any SQL.
+        - to_graphql returns an execute entry point that checks a document
+          before it runs: fragment cycles are refused, max_depth (10) bounds
+          the selection depth and max_cost (10000) its cost. A refused
+          document gets an errors list and no SQL (DBIO::GraphQL::Limits).
+        - The COUNT behind total runs only when total is selected.
+
+    * Errors
+        - Resolvers run inside an error envelope. A database refusal is
+          answered by its SQLSTATE class (UNIQUE_VIOLATION,
+          FOREIGN_KEY_VIOLATION, NOT_NULL_VIOLATION, CHECK_VIOLATION), every
+          other failure is INTERNAL_ERROR with a correlation_id; the original
+          goes to the new on_error option or to warn.
+
+    * Queries
+        - A singular lookup takes every primary key column; a missing one is
+          an error naming the columns, before any SQL.
+        - Cursor pagination over a composite primary key returns every row in
+          primary-key order. A cursor is canonical base64 and fits the
+          source's key; combined with another orderBy it is an error.
+        - hasNextPage is true under page { skip, take } while rows remain.
+          A plural query may select nodes alone.
+        - A relationship field of a source without a primary key is null.
+
+    * Mutations
+        - updateX and deleteX identify a row by its complete primary key or
+          by exactly one complete unique constraint; anything ambiguous is an
+          error. A unique value changes only through the primary key.
+        - deleteX dies on a failing DELETE and returns false when no row
+          matches. A source without a primary key offers createX and the
+          plural query only.
+
+    * Type mapping
+        - bigint, bigserial, decimal, numeric and money columns are String,
+          exact in arguments, filters and output. Int is the 32-bit integer
+          family, Float is float, double and real.
+
+    * Documentation
+        - The POD states that updateX is a sparse update that cannot set
+          NULL, and which String filter operators exist.
+
+    * Packaging
+        - Every module carries $VERSION in step with the distribution.
+          Requires DBIO 0.900004; the tests use DBIO::SQLite 0.900004.
+
 0.900001  2026-07-12
     Security fix.
 

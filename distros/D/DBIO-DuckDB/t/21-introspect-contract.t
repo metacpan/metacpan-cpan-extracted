@@ -22,9 +22,10 @@ package main;
 
 my $MODEL = {
   tables => {
-    artist => { table_name => 'artist', kind => 'table', schema => 'main' },
-    cd     => { table_name => 'cd',     kind => 'table', schema => 'main' },
-    top_cd => { table_name => 'top_cd', kind => 'view',  schema => 'main' },
+    artist     => { table_name => 'artist',     kind => 'table', schema => 'main' },
+    cd         => { table_name => 'cd',         kind => 'table', schema => 'main' },
+    pk_nullable => { table_name => 'pk_nullable', kind => 'table', schema => 'main' },
+    top_cd     => { table_name => 'top_cd',     kind => 'view',  schema => 'main' },
   },
   columns => {
     artist => [
@@ -47,6 +48,13 @@ my $MODEL = {
       { column_name => 'title', data_type => 'VARCHAR', not_null => 1,
         default_value => q{'untitled'}, is_pk => 0, pk_position => 0 },
     ],
+    # A key column the engine reports as not_null=0 (SQLite's PRAGMA
+    # table_info does exactly this) -- the is_pk fold (core #126) must
+    # still report it non-nullable.
+    pk_nullable => [
+      { column_name => 'id', data_type => 'INTEGER', not_null => 0,
+        default_value => undef, is_pk => 1, pk_position => 1 },
+    ],
   },
   indexes => {
     cd => {
@@ -60,7 +68,7 @@ my $MODEL = {
   },
   foreign_keys => {
     cd => [
-      { fk_id => 'cd_artistid_fkey', from_columns => ['artistid'],
+      { constraint_name => 'cd_artistid_fkey', from_columns => ['artistid'],
         to_table => 'artist', to_columns => ['artistid'],
         on_update => 'NO ACTION', on_delete => 'CASCADE', match => 'NONE' },
     ],
@@ -70,7 +78,7 @@ my $MODEL = {
 my $intro = DBIO::DuckDB::Introspect::Mock->new(model => $MODEL);
 
 # table_keys
-is_deeply $intro->table_keys, [qw/artist cd top_cd/], 'table_keys sorted';
+is_deeply $intro->table_keys, [qw/artist cd pk_nullable top_cd/], 'table_keys sorted';
 
 # table_columns
 is_deeply $intro->table_columns('artist'),
@@ -79,6 +87,12 @@ is_deeply $intro->table_columns('artist'),
 # table_pk_info
 is_deeply $intro->table_pk_info('artist'), ['artistid'], 'artist pk';
 is_deeply $intro->table_pk_info('cd'),     ['cdid'],     'cd pk';
+is_deeply $intro->table_pk_info('pk_nullable'), ['id'], 'pk_nullable pk';
+
+# The is_pk fold (core #126): no column table_pk_info names as a key may
+# ever report is_nullable => 1, even when the engine reports not_null=0.
+is $intro->table_columns_info('pk_nullable')->{id}{is_nullable}, 0,
+  'a key column is never nullable, even with not_null=0 (core #126)';
 
 # table_is_view
 ok !$intro->table_is_view('artist'), 'artist is not a view';

@@ -309,7 +309,9 @@ my $keep = sub {
 
 ok $connect->(), 'the server is up';
 
-{
+SKIP: {
+    skip 'Plack::Middleware::BufferedStreaming is not installed', 2
+        unless eval { require Plack::Middleware::BufferedStreaming; 1 };
     my $r = $get->('/bs');
     like $r, qr{^HTTP/1\.1 200 }, 'Plack::Middleware::BufferedStreaming served a 200';
     like $r, qr/streaming=1/, '...having assigned into psgi.streaming without dying';

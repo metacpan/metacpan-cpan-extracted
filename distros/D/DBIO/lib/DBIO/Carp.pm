@@ -4,6 +4,8 @@ package DBIO::Carp;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 # load Carp early to prevent tickling of the ::Internal stash being
 # interpreted as "Carp is already loaded" by some braindead loader
 use Carp ();
@@ -24,8 +26,12 @@ sub __find_caller {
   my (@f, $origin);
   while (@f = caller($fr_num++)) {
 
+    # A finally block runs from the DESTROY of Try::Tiny's guard object: that
+    # frame, like the blocks, is no origin -- the sub around the try is.
     next if
-      ( $f[3] eq '(eval)' or $f[3] =~ /::__ANON__$/ );
+      ( $f[3] eq '(eval)'
+        or $f[3] eq 'Try::Tiny::ScopeGuard::DESTROY'
+        or $f[3] =~ /::(?:__ANON__|(?:try|catch|finally) \{\.\.\.\}\s*)$/ );
 
     $origin ||= (
       $f[3] =~ /^ (.+) :: ([^\:]+) $/x
@@ -36,7 +42,7 @@ sub __find_caller {
 # Need a way to parameterize this for Carp::Skip
       $1 !~ /^(?: DBIO::Storage::BlockRunner | Context::Preserve | Try::Tiny | Class::Accessor::Grouped | Class::C3::Componentised | Module::Runtime )$/x
         and
-      $2 !~ /^(?: throw_exception | carp | carp_unique | carp_once | dbh_do | txn_do | with_deferred_fk_checks)$/x
+      $2 !~ /^(?: throw_exception | _dbi_handle_error | carp | carp_unique | carp_once | dbh_do | txn_do | with_deferred_fk_checks)$/x
 #############################
     ) ? $f[3] : undef;
 
@@ -53,7 +59,13 @@ sub __find_caller {
 
   my $site = @f # if empty - nothing matched - full stack
     ? "at $f[1] line $f[2]"
-    : Carp::longmess()
+    : do {
+        # The full stack comes with the arguments of its frames: no password
+        # among them. DBIO::Util imports from this module while it compiles,
+        # so it cannot be loaded up there.
+        require DBIO::Util;
+        DBIO::Util::masked_longmess();
+      }
   ;
   $origin ||= '{UNKNOWN}';
 
@@ -142,7 +154,7 @@ DBIO::Carp - Error reporting utilities for DBIO
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 

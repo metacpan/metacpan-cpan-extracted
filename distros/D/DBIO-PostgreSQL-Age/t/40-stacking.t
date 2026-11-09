@@ -6,9 +6,12 @@ use mro;
 # WP4b (karr #6) -- the family's canonical MULTI-EXTENSION regression (core #69
 # facet 2). Two storage-layer extensions on ONE schema: AGE (graph) and PostGIS
 # (spatial). Both are plain layers; core composes them (C3) over the resolved
-# driver storage into a single class that isa AND can BOTH. Their method sets are
-# DISJOINT (AGE deliberately does NOT hook dbio_deploy_class, which PostGIS owns),
-# so composition does not trip the layer-collision check.
+# driver storage into a single class that isa AND can BOTH.
+#
+# This file is the runtime half. The model half -- that the two extensions
+# commute in deploy, in either order -- used to be asserted here through a
+# chained dbio_deploy_class (karr k12); with ADR 0066 (karr k20) there is no
+# deploy chain, and it is t/50-extension-set.t (DBIO::Test::ExtensionSet).
 #
 # Pure class/composition assertions -- no event loop, no real database. PostGIS is
 # a develop/recommends dependency (never a hard require); skip cleanly when absent.
@@ -29,14 +32,11 @@ my $AGE_LAYER = 'DBIO::PostgreSQL::Age::Storage';
 my $GIS_LAYER = 'DBIO::PostgreSQL::PostGIS::Storage';
 
 # ===========================================================================
-# 0. Precondition: AGE and PostGIS own DISJOINT method sets. AGE must NOT define
-#    its own dbio_deploy_class (PostGIS's single-owner base override) -- that is
-#    exactly what lets the two compose without a collision croak.
+# 0. Precondition: the AGE layer does not take the deploy class. It is the
+#    driver's (ADR 0066 section 4); the model rules are the extension class's.
 # ===========================================================================
 ok !$AGE_LAYER->can('dbio_deploy_class'),
-  'the AGE layer does NOT define dbio_deploy_class (so it never collides with PostGIS)';
-ok $GIS_LAYER->can('dbio_deploy_class'),
-  'the PostGIS layer DOES own dbio_deploy_class (single-owner base override)';
+  'the AGE layer defines no dbio_deploy_class';
 
 # ===========================================================================
 # 1. Direct compose of both layers over the PG driver: it does NOT croak, and the
@@ -47,7 +47,7 @@ ok $GIS_LAYER->can('dbio_deploy_class'),
     DBIO::Storage::Composed->compose('DBIO::PostgreSQL::Storage', [ $AGE_LAYER, $GIS_LAYER ]);
   };
   my $err = $@;
-  ok !$err, 'composing the AGE and PostGIS layers together does NOT croak (disjoint methods)'
+  ok !$err, 'composing the AGE and PostGIS layers together does NOT croak'
     or diag "died with: $err";
 
   ok $composed_class->isa($AGE_LAYER), 'composed class isa the AGE layer';
@@ -60,22 +60,27 @@ ok $GIS_LAYER->can('dbio_deploy_class'),
   is_deeply [ DBIO::Storage::Composed->layers_of($composed_class) ],
     [ $AGE_LAYER, $GIS_LAYER ],
     'layers_of records both layers in registration order';
+}
 
-  # Single-owner deploy hook: PostGIS owns it, AGE does not touch it, so the
-  # composed class routes deploy through PostGIS's deploy class.
-  is $composed_class->dbio_deploy_class, 'DBIO::PostgreSQL::PostGIS::Deploy',
-    'the composed storage selects the PostGIS deploy class (AGE adds no rival)';
+# Reverse registration order reverses the layer order, nothing else.
+{
+  my $rev = DBIO::Storage::Composed
+    ->compose('DBIO::PostgreSQL::Storage', [ $GIS_LAYER, $AGE_LAYER ]);
+  is_deeply [ DBIO::Storage::Composed->layers_of($rev) ], [ $GIS_LAYER, $AGE_LAYER ],
+    'PostGIS + AGE: reverse registration, reverse layer order';
+  can_ok $rev, qw( cypher create_graph ensure_postgis );
 }
 
 # ===========================================================================
 # 2. REGISTRATION WIRING: a schema that load_components both extensions registers
 #    BOTH layers via their connection() hooks, and an (offline, lazy) connect
-#    composes them over the resolved base storage. No database is opened.
+#    composes them over the driver storage the schema declares (-pg; the
+#    extensions declare no driver, core ADR 0067). No database is opened.
 # ===========================================================================
 {
   package T::AgeGisSchema;
-  use base qw( DBIO::PostgreSQL::Age DBIO::PostgreSQL::PostGIS DBIO::Schema );
-  use mro 'c3';
+  use DBIO 'Schema', -pg;   # the schema declares its driver (core ADR 0067)
+  __PACKAGE__->load_components('PostgreSQL::Age', 'PostgreSQL::PostGIS');
 }
 {
   my $schema = T::AgeGisSchema->connect('dbi:Pg:dbname=dbio_offline_stack', '', '');
@@ -86,7 +91,8 @@ ok $GIS_LAYER->can('dbio_deploy_class'),
   my $storage = $schema->storage;
   isa_ok $storage, $AGE_LAYER, 'the connected (unconnected) storage carries the AGE layer';
   isa_ok $storage, $GIS_LAYER, 'the connected (unconnected) storage carries the PostGIS layer';
-  ok $storage->isa('DBIO::Storage::DBI'), 'composed over the resolved base storage';
+  isa_ok $storage, 'DBIO::PostgreSQL::Storage',
+    'composed over the declared PostgreSQL driver storage';
 
   # The whole point: cypher (AGE) AND ensure_postgis (PostGIS) on ONE storage.
   can_ok $storage, 'cypher';

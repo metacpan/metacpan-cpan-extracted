@@ -8,6 +8,7 @@ my @modules = qw(
   DBIO::MSSQL::Result
   DBIO::MSSQL::Storage
   DBIO::MSSQL::Storage::ODBC
+  DBIO::MSSQL::Storage::StopAtFirstError
   DBIO::MSSQL::Storage::DateTime::Format
   DBIO::MSSQL::Storage::Sybase::DateTime::Format
   DBIO::MSSQL::SQLMaker
@@ -40,8 +41,18 @@ for my $mod (@modules) {
   use_ok($mod);
 }
 
+# The two cases are kept apart on purpose (karr k29). The old form answered
+# both with pass(): a module that failed to load reported
+# "skipped (missing optional deps)" whether or not DBIO::Sybase was actually
+# there, so a syntax error in OUR OWN Sybase storage read as an absent
+# optional dep and this file stayed green on a box that had DBIO::Sybase
+# installed. Dep missing -> a real skip that says the module was not loaded;
+# dep present -> use_ok, which goes red and prints the error it died of.
 for my $mod (@optional) {
-  ($have_sybase && eval "use $mod; 1")
-    ? pass("use $mod")
-    : pass("$mod skipped (missing optional deps)");
+  SKIP: {
+    skip "DBIO::Sybase not installed (optional dep), so $mod was NOT loaded", 1
+      unless $have_sybase;
+
+    use_ok($mod);
+  }
 }

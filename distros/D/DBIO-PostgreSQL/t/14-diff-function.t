@@ -68,12 +68,15 @@ is(scalar @ops, 1, 'one create');
 like($ops[0]->as_sql, qr/;$/, 'trailing semicolon normalized');
 unlike($ops[0]->as_sql, qr/;;/, 'no double semicolons');
 
-# Missing definition falls back to comment
-@ops = DBIO::PostgreSQL::Diff::Function->diff(
+# Missing definition: there is no statement, so there is no operation. It
+# used to be a comment in the place of the statement, which Deploy skipped
+# together with the statement behind it (karr k120, t/100-diff-no-statement.t).
+@ops = eval { DBIO::PostgreSQL::Diff::Function->diff(
   {},
   { 'public.f()' => {} },
-);
-like($ops[0]->as_sql, qr/^-- CREATE OR REPLACE FUNCTION public\.f\(\)/, 'missing definition yields comment');
+) };
+like($@, qr/\Arefusing to diff: function public\.f\(\) /, 'missing definition is refused, naming the function');
+is(scalar @ops, 0, '... and no operation is built for it');
 
 # Multiple functions — sorted
 @ops = DBIO::PostgreSQL::Diff::Function->diff(

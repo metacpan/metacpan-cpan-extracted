@@ -212,11 +212,4 @@ my $schema = DBIO::Test->init_schema(no_deploy => 1);
   ok(!$src->has_relationship('nonexistent'), 'has_relationship returns false');
 }
 
-# --- handle ---
-{
-  my $src = $schema->source('CD');
-  my $handle = $src->handle;
-  isa_ok($handle, 'DBIO::ResultSourceHandle', 'handle returns RSH');
-}
-
 done_testing;

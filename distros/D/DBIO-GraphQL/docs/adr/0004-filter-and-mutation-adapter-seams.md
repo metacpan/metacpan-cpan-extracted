@@ -12,10 +12,10 @@ Two parts of the generated schema are obvious future extension points:
   (ADR 0003), a stricter/looser filter, or no filtering at all. Hard-wiring
   the filter behaviour into `to_graphql` would make any of these a fork of
   the generator.
-- **Mutations.** `createX` / `updateX` / `deleteX` are generated for every
-  source, but real applications often need variants: a soft-delete that flips
+- **Mutations.** `createX` / `updateX` / `deleteX` are generated for every source that opted in (ADR 0008),
+  but real applications often need variants: a soft-delete that flips
   a flag instead of issuing `DELETE`, an audited create that records who/when,
-  a partial update that only writes supplied columns. Inlining all three
+  a variant of the update semantics. Inlining all three
   mutation builders as one monolithic method would make any one variant
   require rewriting the others.
 
@@ -37,7 +37,7 @@ Two concrete adapters ship:
 
 - **`DBIO::GraphQL::Filter::Search`** (default) — inherits the full
   nested-per-column behaviour from the base (`Filter/Search.pm` is a thin
-  subclass; `to_graphql` instantiates it).
+  subclass; `to_graphql` instantiates it, hard-wired).
 - **`DBIO::GraphQL::Filter::Null`** — a real no-op adapter (`Filter/Null.pm`)
   that overrides `type_for` to return an **empty** `${moniker}Filter`
   InputObject (no per-column fields, no `AND`/`OR`) and `to_search` to always
@@ -56,25 +56,27 @@ implementation that demonstrates the contract holds.
 overridable method (`Mutation.pm`): `fields_for` dispatches to `build_create`,
 `build_update`, and `build_delete` separately. A subclass can override exactly
 one kind — e.g. a SoftDelete variant overriding only `build_delete`, an Audit
-variant wrapping `build_create`, a PartialUpdate variant replacing
-`build_update` — without touching or duplicating the other two. The shared
+variant wrapping `build_create`, a variant replacing `build_update` — without touching or duplicating the other two. The shared
 helpers (`_scalar_for`, `_col_is_required`, `_build_lookup_args`,
 `_resolve_row`) are likewise individually overridable.
 
 ## Rationale
 
 Both seams are the cheap, principled way to absorb known-likely variation
-without forking the generator. For filtering, an adapter interface lets a
-caller swap the entire filter strategy by passing a different adapter class,
-with the base class carrying the default so the common case stays
-zero-config. Shipping `Null` alongside `Search` is what keeps the interface
+without forking the generator. For filtering, the adapter interface
+is the class-level seam for swapping the filter strategy, with the base
+class carrying the default so the common case stays zero-config. Today
+`to_graphql` takes no adapter argument and instantiates
+`DBIO::GraphQL::Filter::Search` itself, so handing it another adapter
+needs a change to `to_graphql`. Shipping `Null` alongside `Search` is what keeps the interface
 honest: it forces the contract (`type_for` + `to_search`) to be genuinely
-sufficient to express "no filtering" as well as "full filtering", and it gives
-the test suite a second implementation to assert the seam against. Without a
-second implementation, "it's extensible" would be an unverified claim.
+sufficient to express "no filtering" as well as "full filtering", and it is
+the second implementation of the contract. No test exercises it yet; until
+one does, the seam's claim rests on `Null` compiling and implementing the
+two methods.
 
 For mutations, one-method-per-kind is the minimal structure that makes the
-three anticipated variants (SoftDelete / Audit / PartialUpdate) single-method
+two anticipated variants (SoftDelete / Audit) single-method
 overrides instead of full rewrites. It does not add an abstraction layer or a
 registry — it just declines to fuse three independent builders into one
 method.
@@ -82,12 +84,12 @@ method.
 ## Consequences
 
 - **The `Null` adapter is intentional and must not be removed as "unused".**
-  It is the existence proof for the Filter seam and a fixture the suite relies
-  on to show the contract is real. Deleting it would silently collapse the
+  It is the existence proof for the Filter seam (currently untested and not
+  reachable from `to_graphql`). Deleting it would silently collapse the
   seam back to a single hard-wired strategy.
 - New filter strategies subclass `DBIO::GraphQL::Filter` and implement
-  `type_for` / `to_search`; they need no changes in `to_graphql` beyond being
-  the adapter it is handed.
+  `type_for` / `to_search`; wiring one in
+  requires `to_graphql` to accept it, which it does not yet.
 - New mutation variants subclass `DBIO::GraphQL::Mutation` and override a
   single `build_*` method; the other kinds and all shared helpers are
   inherited unchanged.

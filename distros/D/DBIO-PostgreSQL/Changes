@@ -1,5 +1,214 @@
 Revision history for DBIO-PostgreSQL
 
+0.900004  2026-11-08
+    * Storage
+        - $rs->upsert renders INSERT ... ON CONFLICT ... DO UPDATE|NOTHING
+          with RETURNING. update_where is the last-write-wins guard, with {
+          -attempted => $col } for the value the INSERT tried (core ADR 0036).
+        - key => $constraint in an upsert names the constraint's columns;
+          conflict_target => 'any' is DO NOTHING and throws with DO UPDATE.
+        - FOR UPDATE and FOR SHARE take skip_locked => 1 or nowait => 1.
+        - Session and transaction advisory-lock helpers: pg_advisory_lock,
+          pg_try_advisory_lock, pg_advisory_unlock and their _shared and xact
+          variants.
+        - The jsonpath operator { '@?' => $path } and the JSONB key-existence
+          operators ?, ?| and ?& are written as operators, so a GIN index
+          answers them.
+        - transactional_ddl is declared: install and upgrade DDL runs in one
+          transaction, and ALTER TYPE ... ADD VALUE runs on its own.
+        - explain issues a plain EXPLAIN and returns the planner's estimate; a
+          storage subclass overrides _explain_query for measured runtimes.
+          results_exist and its async twins work.
+        - is_replicating and lag_behind_master let DBIO::Replicated::Pool take
+          out a standby that lost its primary, was promoted or lags.
+        - A refused statement is a DBIO::Exception::Server naming the violated
+          constraint, the table and the detail.
+        - Connection parameters given by value reach libpq as given, on the
+          sync storage and on future_io alike. Parameters or a DSN that name
+          no target (dbname, host, port, service=, hostaddr=) are refused.
+        - Identifier quoting follows the connection: quote_names => 0 or an
+          empty quote_char write unquoted identifiers, an explicit quote_char
+          or name_sep is used as given, nothing given quotes with " and . .
+        - A declared pg_search_path is the search_path of every connection,
+          sync and future_io, ahead of on_connect_do.
+        - The postgresql SQL dialect is declared, so the DDL splitter reads
+          BEGIN ATOMIC bodies, nested comments and backslash-ended literals.
+        - deploy and deployment_statements are core's: they install through
+          dbio_deploy_class, with or without the component, and
+          deployment_statements asks no server.
+        - The error text of a refused statement names types, columns,
+          constraints and tables, never values: the quoted value of the
+          message (invalid input syntax, out of range, enum, array, record,
+          range, tsvector literals, bytes of an invalid encoding), the key and
+          row of the DETAIL, the bound parameters of the CONTEXT and the JSON
+          excerpt read ***; short values, pieces of a value and row values are
+          masked by the form of the server's text, on future_io too. The
+          statement excerpt (LINE n) stays.
+
+    * Async
+        - deploy_async works on future_io and emits the sync install DDL,
+          statement for statement.
+        - Connection pools take the connect options given beside an
+          AccessBroker and merge the fifth element of DBI-form connect info.
+        - LISTEN/NOTIFY on future_io: listen, unlisten, notify, listen_alive,
+          listen_reconnect and the error and reconnect hooks, on a dedicated
+          connection outside the pool.
+        - Pool connections are fork-safe, dead or idle-dead connections are
+          retired, and a borrow starts and ends with its own session (DISCARD
+          ALL, then the connect actions again).
+        - A COMMIT answered with ROLLBACK and a cancelled statement (SQLSTATE
+          57014) fail their Future. Statements on a transaction context run
+          one at a time.
+        - Statements fail with their own text, refusals are DBIO::Exception
+          objects naming the caller, and secrets are masked in traces and
+          connect errors (see ERRORS in DBIO::PostgreSQL::Storage::Async).
+        - The error text of a statement on future_io is netted with its bound
+          values, as on the sync storage: a value of four characters or more
+          is taken out of the text whole, also where the server reads it as a
+          name (relation, type, role, function, configuration parameter),
+          then the forms of the server's text are masked. The values stand at
+          the connection's handle only while the statement is in flight.
+        - Every built-in AccessBroker works on future_io, with connect options
+          (pool_size, DBD attributes) beside it; an empty answer is refused
+          and a parameter value reaches libpq as given.
+        - DBIO::PostgreSQL::Util::number_placeholders numbers a ? only where
+          PostgreSQL reads SQL, not in dollar quoting, comments or E''
+          strings; \? is a literal question mark.
+
+    * DDL
+        - Every name is written as an identifier by the server's rule and
+          every value as a literal (DBIO::PostgreSQL::Util). A mixed-case name
+          is created exactly as written.
+        - A column's size is written for every type that takes a modifier
+          (character, varchar, bit, numeric, time, timestamp, interval and the
+          pgvector types). A size beside a type without one is not written.
+          (varchar and pgvector size contributed by John Napiorkowski,
+          Codeberg #2.)
+        - A missing is_nullable deploys as NOT NULL.
+        - pg_fk_constraints_from_rels is on by default: every plain belongs_to
+          writes a named FOREIGN KEY with its ON DELETE / ON UPDATE actions
+          and DEFERRABLE settings; pg_fk_constraints_from_rels(0) or
+          is_foreign_key_constraint => 0 switches it off. (Opt-in key
+          generation contributed by John Napiorkowski, Codeberg #2.)
+        - pg_index takes per-column opclasses, INCLUDE, using, with, where and
+          expressions; key columns are quoted. UNIQUE constraints take
+          pg_unique_options and get no duplicate index.
+        - pg_search_path entries and pg_settings keys are names by the same
+          rule: MySchema stays MySchema, a key word is quoted, an entry
+          already in double quotes is refused.
+        - pg_rls takes restrictive => 1; a view declared twice or in a cycle
+          of deploy_depends_on is refused.
+        - The install script is a script to its end: every piece is a
+          statement the server takes, pg_settings run as ALTER DATABASE, and
+          no SET search_path ends it.
+        - install_ddl and Deploy work on a schema that does not load the
+          DBIO::PostgreSQL component.
+
+    * PgSchema
+        - pg_schemas answers in declaration order; a pg_schema_class binding
+          never restricts the deploy, only pg_schemas does.
+
+    * Tenant
+        - The connect key schema, connect($dsn, $user, $pass, { schema =>
+          'tenant_a' }), installs and queries one schema class in that
+          namespace; the deploy is restricted to it and the namespace is
+          created only where missing (core ADR 0065).
+
+    * Extensions
+        - Extensions are a declared list, pg_extensions('pgcrypto', vector =>
+          { schema => 'extensions' }), that the driver runs through the
+          protocol of core ADR 0066: claims, USING for column type changes,
+          refusals.
+        - Every connection loads the declared extensions and puts their
+          schemas on the search_path.
+        - CREATE EXTENSION names its schema: the declared one, else the one
+          the control file fixes (age: ag_catalog), else public. A relocatable
+          extension is moved when the declaration names another schema.
+        - A deploy names missing extensions with the CREATE EXTENSION that
+          fixes them. A deploy restricted by pg_schemas drops none;
+          manage_extensions_when_restricted => 1 drops the undeclared ones.
+
+    * Deploy
+        - The temporary database of a diff is made from template0 with the
+          live database's locale, checked to be empty, and refuses an open
+          transaction.
+        - apply and upgrade ask for allow_destructive before the first
+          statement for a drop or a lossy column change, and refuse a NOT NULL
+          column that existing rows cannot fill.
+        - foreign_keys_not_valid adds keys NOT VALID and validates them in
+          transactions of their own.
+
+    * Diff
+        - Statements come in the order of dependency: created objects first,
+          dropped ones in reverse.
+        - Views, materialized views and foreign tables are created and dropped
+          as what they are; a changed view is rebuilt with the views on it.
+        - Partitions, inheritance and UNLOGGED tables are diffed as the model
+          knows them; the copies the server makes for partitions are not part
+          of it.
+        - Drops are RESTRICT; objects outside the model that a drop would meet
+          are named and refused.
+        - What the diff cannot write is refused with the object and the way
+          out, never written as a comment or a stand-in (see Diff, WHAT IS
+          REFUSED).
+        - A column type change converts enum and composite types with USING
+          and rebuilds the views that read the column.
+        - Enum values are added at their declared place; procedure and
+          function swaps, serial sequences, aggregates and window functions
+          are handled (Diff::Sequence, Diff::SequenceOwner).
+        - PRIMARY KEY and UNIQUE are created and repaired as constraints, and
+          a renamed key is renamed rather than rebuilt.
+        - Foreign keys (Diff::ForeignKey) are compared, created, validated and
+          dropped with the install's names; keys into tables outside the
+          deploy are kept and named in the summary.
+        - A name that differs from the one to drop only in case is refused
+          with the RENAME that settles it, instead of creating one object and
+          dropping the other with its data.
+        - A default the declaration does not carry is dropped.
+
+    * Introspect
+        - The model is read under an empty search_path, so every text names
+          its schema (qualified_names, on by default), and the caller's
+          session stays as it was.
+        - The model leaves out what an installed extension owns and what the
+          server makes as part of another object; index entries come from the
+          catalog.
+        - Catalog text is read in linear time.
+        - Aggregates, window functions, empty enums and composite types, and
+          the dependencies between objects are part of the model.
+
+    * pgvector
+        - vector($col)->l2_distance($v) and the other distance operators
+          render a bind-valued expression for as_order, as_select and
+          comparisons; the cast option is checked against the pgvector type
+          names.
+        - nearest_neighbors on DBIO::PostgreSQL::ResultSet orders by distance
+          and selects neighbor_distance; declaring a vector column enables it.
+        - vector and tsvector columns inflate and deflate by default, opt-out
+          with inflate_pgvector => 0 and inflate_tsvector => 0.
+
+    * Security
+        - Values in the DETAIL of a server exception read ***, on the sync
+          storage and on future_io; column names, constraint and table stay.
+        - Sequence names, jsonb paths and savepoint names are binds or
+          checked; identifier, size and option declarations are refused when
+          malformed, naming the option.
+        - sslmode=verify-full with sslrootcert is the documented setting for a
+          connection over a network.
+
+    * Test
+        - DBIO::PostgreSQL::Test::Conformance answers core's shared DDL, Diff,
+          Bind and Names case tables against a server, one schema per case.
+
+    * Documentation
+        - The README describes the implemented state and Perl 5.20+;
+          DBIO::PostgreSQL documents the stacked use base form and a PGVECTOR
+          guide; every public method has a POD entry.
+
+    * Dependencies
+        - Requires DBIO 0.900004, DBD::Pg 3.7.1 and Crypt::URandom. Every
+          module carries a literal $VERSION in step with the distribution.
+
 0.900001  2026-07-12
     * Storage
         - Add DBIO::PostgreSQL::Storage::Async — the first REAL future_io async

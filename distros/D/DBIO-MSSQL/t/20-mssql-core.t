@@ -16,6 +16,11 @@ plan skip_all => 'Set $ENV{DBIO_TEST_MSSQL_DSN}, _USER and _PASS to run this tes
 plan skip_all => 'Test needs ' . DBIO::Optional::Dependencies->req_missing_for ('test_rdbms_mssql_sybase')
   unless DBIO::Optional::Dependencies->req_ok_for ('test_rdbms_mssql_sybase');
 
+# A schema always declares its driver (core ADR 0067): the shared test schema
+# gets it here. At its first use the storage adapts to the access path of the
+# DSN (DBIO::MSSQL::Storage::_adapt_to_access_path).
+DBIO::Test::Schema->storage_type('+DBIO::MSSQL::Storage');
+
 {
   my $srv_ver = DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->_server_info->{dbms_version};
   ok ($srv_ver, 'Got a test server version on fresh schema: ' . ($srv_ver||'???') );
@@ -140,7 +145,7 @@ SQL
   is $rs->find($row->id)->amount,
     undef, 'updated money value to NULL round-trip';
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test simple transaction with commit
   lives_ok {
@@ -152,7 +157,7 @@ SQL
   cmp_ok $rs->first->amount, '==', 300, 'committed';
 
   $rs->reset;
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test rollback
   throws_ok {
@@ -165,7 +170,7 @@ SQL
   is $rs->first, undef, 'rolled back';
 
   $rs->reset;
-  $rs->delete;
+  $rs->delete({ all => 1 });
 
   # test multiple active statements
   #
@@ -201,7 +206,7 @@ SQL
         'multiple active statements';
     }
     $rs->reset;
-    $rs->delete;
+    $rs->delete({ all => 1 });
   }
 
   my $wrappers = {
@@ -213,7 +218,7 @@ SQL
 
   # test transaction handling on a disconnected handle
   for my $wrapper (keys %$wrappers) {
-    $rs->delete;
+    $rs->delete({ all => 1 });
 
     # a reconnect should trigger on next action
     $schema->storage->_get_dbh->disconnect;
@@ -241,7 +246,7 @@ SQL
         1;
 
       $schema->storage->disconnect;
-      $rs->delete;
+      $rs->delete({ all => 1 });
       $rs->reset;
       $rs->create({ amount => 1000 + $_ }) for (1..3);
 
@@ -312,7 +317,7 @@ lives_ok (sub {
 
   my $rs = $schema2->resultset('Money');
 
-  $rs->delete;
+  $rs->delete({ all => 1 });
   $schema2->txn_commit;
 
   is $rs->count, 0, 'initially empty'

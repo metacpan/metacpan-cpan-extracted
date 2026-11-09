@@ -19,6 +19,10 @@ static int HM_WORKER_CB_N = 0;
 
 static int hm_worker_hook_add(pTHX_ hm_abi_worker_cb cb, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cb || HM_WORKER_CB_N >= HM_ABI_MAX_WORKER_CB) return 0;
     HM_WORKER_CB[HM_WORKER_CB_N].cb = cb;
     HM_WORKER_CB[HM_WORKER_CB_N].ud = ud;

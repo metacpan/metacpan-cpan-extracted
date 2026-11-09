@@ -4,6 +4,8 @@ package DBIO::Storage;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 use mro 'c3';
 
@@ -31,7 +33,6 @@ __PACKAGE__->cursor_class('DBIO::Cursor');
 sub cursor { shift->cursor_class(@_); }
 
 
-
 sub new {
   my ($self, $schema) = @_;
 
@@ -43,12 +44,19 @@ sub new {
   }, $self);
 
   $new->set_schema($schema);
-  $new->debug(1)
+  $new->debug($self->_trace_level_of($ENV{DBIO_TRACE}))
     if $ENV{DBIO_TRACE};
 
   $new;
 }
 
+# The trace level a flag stands for: its leading digits (2=/path is level 2),
+# level 1 for any other true value, 0 for a false one.
+sub _trace_level_of {
+  my ($class, $flag) = @_;
+  return 0 unless $flag;
+  return $flag =~ /^(\d+)/ ? $1 + 0 : 1;
+}
 
 
 sub set_schema {
@@ -68,6 +76,12 @@ sub set_access_broker {
     'set_access_broker() requires a DBIO::AccessBroker instance'
   ) unless $broker->isa('DBIO::AccessBroker');
 
+  # A broker that is replaced lets go of this storage first, so it does not
+  # go on answering for a storage that no longer uses it (karr k278).
+  my $old = $self->access_broker;
+  $old->unset_storage($self)
+    if blessed($old) && $old->can('unset_storage');
+
   $self->access_broker($broker);
   $self->access_broker_mode($mode || 'write');
   $broker->set_storage($self);
@@ -78,6 +92,9 @@ sub set_access_broker {
 
 sub clear_access_broker {
   my $self = shift;
+  my $broker = $self->access_broker;
+  $broker->unset_storage($self)
+    if blessed($broker) && $broker->can('unset_storage');
   $self->access_broker(undef);
   $self->access_broker_mode(undef);
   return $self;
@@ -88,7 +105,64 @@ sub current_access_broker_connect_info {
   my ($self, $mode) = @_;
   my $broker = $self->access_broker or return;
   $mode ||= $self->access_broker_mode || 'write';
-  return $broker->current_connect_info_for_storage($self, $mode);
+
+  my $answer  = $broker->current_connect_info_for_storage($self, $mode);
+  my $nothing = !defined $answer         ? 'undef'
+              : ref $answer eq 'HASH'    ? (%$answer ? undef : 'an empty hashref')
+              : ref $answer eq 'ARRAY'   ? (@$answer ? undef : 'an empty arrayref')
+              : !ref $answer && !$answer ? 'a false value'
+              :                            undef;
+
+  return $answer unless defined $nothing;
+
+  # A view (HostBound) answers nothing only when the broker it wraps did.
+  my ($answered, @views) = ($broker);
+  while ($answered->can('underlying_broker')) {
+    my $inner = $answered->underlying_broker or last;
+    push @views, ref $answered;
+    $answered = $inner;
+  }
+
+  $self->throw_exception(
+    'AccessBroker ' . ref($answered) . " answered no connect info ($nothing)"
+  . (@views ? ' through ' . join(' over ', @views) : '') . '. '
+  . "A new connection is opened only with the broker's current answer, never "
+  . 'with the connect info of an earlier one.'
+  );
+}
+
+# One rule for a setting that a connection gets both from the hash beside its
+# AccessBroker ([ $broker, \%options ]) and from the broker's answer (ADR 0030
+# addendum, karr k243): both must name the same value -- the same plain value,
+# both undef, or the very same reference -- or this throws, naming the
+# setting (never its values, which may carry secrets). Returns the merged
+# hashref; neither argument is modified. Shared by the sync storage and by an
+# async transport merging the same settings into each connection it opens.
+sub _merge_access_broker_settings {
+  my ($self, $answer, $beside) = @_;
+
+  my %merged = %{ $answer || {} };
+  for my $key (sort keys %{ $beside || {} }) {
+    my $value = $beside->{$key};
+
+    $self->throw_exception(
+      "Connection setting '$key' is given both beside the AccessBroker and in "
+    . "the broker's answer, with different values. Give it in one place, or "
+    . 'give both the same value.'
+    ) if exists $merged{$key} && !_same_access_broker_setting($merged{$key}, $value);
+
+    $merged{$key} = $value;
+  }
+
+  return \%merged;
+}
+
+sub _same_access_broker_setting {
+  my ($x, $y) = @_;
+  return !defined $y if !defined $x;
+  return 0 if !defined $y;
+  return 0 if !!ref $x != !!ref $y;
+  return ref $x ? Scalar::Util::refaddr($x) == Scalar::Util::refaddr($y) : $x eq $y;
 }
 
 
@@ -101,7 +175,6 @@ sub disconnect { die "Virtual method!" }
 sub ensure_connected { die "Virtual method!" }
 
 
-
 sub throw_exception {
   my $self = shift;
 
@@ -112,7 +185,6 @@ sub throw_exception {
     DBIO::Exception->throw(@_);
   }
 }
-
 
 
 sub txn_do {
@@ -129,7 +201,6 @@ sub txn_do {
     },
   )->run(@_);
 }
-
 
 
 sub txn_begin {
@@ -181,14 +252,19 @@ sub _assert_transaction_safe_access_broker {
 }
 
 
-
 sub txn_commit {
   my $self = shift;
   $self->_throw_deferred_rollback if $self->deferred_rollback;
 
   if ($self->transaction_depth == 1) {
     $self->debugobj->txn_commit() if $self->debug;
-    $self->_exec_txn_commit;
+
+    unless (eval { $self->_exec_txn_commit; 1 }) {
+      my $err = $@;
+      $self->_abandon_after_failed_commit;
+      die $err;
+    }
+
     $self->{transaction_depth}--;
     $self->savepoints([]);
   }
@@ -202,13 +278,20 @@ sub txn_commit {
 }
 
 
-
 sub txn_rollback {
   my $self = shift;
 
   if ($self->transaction_depth == 1) {
     $self->debugobj->txn_rollback() if $self->debug;
-    $self->_exec_txn_rollback;
+
+    # a rollback that fails leaves nothing to rely on: the transaction may
+    # still be open on the server. Do not keep claiming depth 1 on it.
+    unless (eval { $self->_exec_txn_rollback; 1 }) {
+      my $err = $@;
+      $self->_abandon_after_failed_rollback;
+      die $err;
+    }
+
     $self->{transaction_depth}--;
     $self->savepoints([]);
     $self->deferred_rollback(undef);
@@ -233,13 +316,36 @@ sub txn_rollback {
 }
 
 
+sub _abandon_after_failed_rollback {
+  my $self = shift;
+  $self->{transaction_depth} = 0;
+  $self->savepoints([]);
+  $self->deferred_rollback(undef);
+}
+
+
+sub _abandon_after_failed_commit {
+  my $self = shift;
+
+  $self->{transaction_depth} = 0;
+  $self->savepoints([]);
+  $self->deferred_rollback(undef);
+
+  local $@;
+  $self->_abandon_after_failed_rollback
+    unless eval { $self->_exec_txn_rollback; 1 };
+}
+
+
+sub _abandon_handle_before_reconnect { }
+
+
 sub _throw_deferred_rollback {
   DBIO::Storage::NESTED_ROLLBACK_EXCEPTION->throw(
     "You are in the middle of a deferred rollback from a nested transaction."
     ." No further statements can be executed until the rollback is complete."
   );
 }
-
 
 
 sub svp_begin {
@@ -269,7 +375,6 @@ sub _svp_generate_name {
   my ($self) = @_;
   return 'savepoint_'.scalar(@{ $self->{'savepoints'} });
 }
-
 
 
 
@@ -310,7 +415,6 @@ sub svp_release {
 }
 
 
-
 sub svp_rollback {
   my ($self, $name) = @_;
 
@@ -349,14 +453,12 @@ sub svp_rollback {
 }
 
 
-
 sub txn_scope_guard {
   return DBIO::Storage::TxnScopeGuard->new($_[0]);
 }
 
 
 sub sql_maker { die "Virtual method!" }
-
 
 
 sub debugfh {
@@ -366,7 +468,6 @@ sub debugfh {
         return $self->debugobj->debugfh(@_);
     }
 }
-
 
 
 sub debugobj {
@@ -424,7 +525,6 @@ sub debugobj {
 }
 
 
-
 sub debugcb {
     my $self = shift;
 
@@ -440,7 +540,7 @@ sub deploy { die "Virtual method!" }
 
 sub connect_info { die "Virtual method!" }
 
-# --- DBIO-private connect attributes (karr #66) --------------------------
+# --- DBIO-private connect attributes -------------------------------------
 # Single authoritative source for the attribute names a caller may pass in
 # connect_info that are DBIO-private and must NEVER reach DBI->connect. Both
 # connect-info paths consume these lists -- the sync normalizer
@@ -453,11 +553,42 @@ sub connect_info { die "Virtual method!" }
 # Storage-config options: routed to the storage, kept out of DBI->connect.
 # (cursor_class is a storage option too, but carries its own component_class
 # accessor, so it is appended at the split sites rather than listed here.)
+# A driver storage may extend this -- override, return
+# SUPER::_dbio_storage_option_names plus the driver's own names, and register
+# an accessor for each added name in the driver class body
+# (mk_group_accessors 'simple'), because both split sites set the option by
+# calling that accessor -- the one _dbio_storage_option_accessor names.
 sub _dbio_storage_option_names {
   qw/
     on_connect_call on_disconnect_call on_connect_do on_disconnect_do
-    disable_sth_caching unsafe auto_savepoint
+    disable_sth_caching unsafe auto_savepoint schema
   /;
+}
+
+# An option is set through the accessor of its own name, unless it is listed
+# here: 'schema' (the connection's namespace, ADR 0065) shares its name with the
+# accessor holding the back-reference to the DBIO schema class, so it is kept
+# under connection_schema. The map lives once, beside the names; the sync
+# normaliser, the connect_info setter and the accessor registration all ask
+# _dbio_storage_option_accessor.
+sub _dbio_storage_option_accessor_map {
+  schema => 'connection_schema',
+}
+
+sub _dbio_storage_option_accessor {
+  my ($self, $name) = @_;
+  my %map = $self->_dbio_storage_option_accessor_map;
+  return $map{$name} // $name;
+}
+
+# Async options (karr core k397): the connect options an async backend takes.
+# With an async mode set they are kept out of the sync storage's own
+# DBI->connect and handed to the backend. This is the one place the core names
+# are listed; a backend adds its own through
+# DBIO::Storage::Async->async_option_names, and the sync storage asks
+# DBIO::Storage::DBI::_async_option_names for the union.
+sub _core_async_option_names {
+  qw/ pool_size acquire_timeout max_waiters txn_timeout reset_timeout /;
 }
 
 # SQL-maker options: routed to the sql_maker, kept out of DBI->connect.
@@ -480,6 +611,11 @@ sub delete { die "Virtual method!" }
 
 sub select_single { die "Virtual method!" }
 
+# The force_pool value the read of a read-then-write call (find_or_create,
+# find_or_new, update_or_create, update_or_new, the upsert fallback) carries in
+# its attributes. Nothing by default; DBIO::Replicated::Storage answers 'master'.
+sub _read_pool_for_read_modify_write { undef }
+
 # Live async backend (a DBIO::Storage::Async) or undef when none configured.
 # Overridden in DBIO::Storage::DBI to do real discovery. Base = no backend.
 sub _async_storage { undef }
@@ -491,11 +627,13 @@ sub _async_mode { undef }
 
 # Shared dispatch for the six *_async methods (ADR 0030). Three outcomes:
 #   - an embedded backend is live    -> route ${op}_async to it (real async)
-#   - the instance is in 'immediate'  -> run $op synchronously, wrap the result
-#     mode (no backend, mode chosen)     in an immediately-resolved future
+#   - the instance is in 'immediate' -> run $op synchronously, wrap the result
+#     mode (no backend, mode chosen)    in an immediately-resolved future
 #   - the instance is sync            -> croak loudly: *_async was called but no
 #     (no async mode chosen)             async mode was chosen at connect time
-# _async_storage croaks on its own for a chosen-but-unavailable mode.
+# _async_storage croaks on its own for a chosen-but-unavailable or wrong-type
+# mode; the guard below also makes any future undef backend fail closed unless
+# its literal mode is 'immediate'.
 sub _run_async {
   my ($self, $op, @args) = @_;
 
@@ -504,13 +642,124 @@ sub _run_async {
     return $async->$method(@args);
   }
 
+  my $mode = $self->_async_mode;
   $self->throw_exception(
     "not an async connection -- connect with { async => ... } to use ${op}_async"
-  ) unless defined $self->_async_mode;
+  ) unless defined $mode;
+  $self->throw_exception(
+    "async mode '$mode' did not produce a DBIO::Storage::Async backend"
+  ) unless $mode eq 'immediate';
 
   my $fc = $self->future_class;
-  my @r = eval { $self->$op(@args) };
-  return $@ ? $fc->fail($@) : $fc->done(@r);
+  my @r = eval { $self->_run_immediate($op, @args) };
+  return $fc->done(@r) unless $@;
+
+  my $error = $@;
+  # Inside an immediate txn_do_async this failed Future is a statement the
+  # transaction's context handed out: its failure fails the transaction,
+  # awaited or not (_run_immediate_txn, karr k236).
+  $self->_note_immediate_failure($error);
+  return $fc->fail($error);
+}
+
+# The failed-statement ledger of an immediate txn_do_async (karr k236, k331):
+# every failed *_async Future inside the transaction lands here, from the
+# storage's own _run_async and from the unbound Row/ResultSet paths, which
+# build their failed Future themselves. No-op outside such a transaction.
+sub _note_immediate_failure {
+  my ($self, $error) = @_;
+  push @{ $self->{_immediate_txn_failures} }, $error
+    if $self->{_immediate_txn_failures};
+  return;
+}
+
+# Produce the 'immediate'-mode result for one *_async op (ADR 0053). The value
+# a storage-level *_async resolves with is backend-independent: it is the
+# transport form a real DBIO::Storage::Async backend resolves with -- the raw
+# form the ORM inflation consumes -- NOT whatever the synchronous method happens
+# to hand back. In immediate mode there is no backend, so the sync op runs
+# in-process here; its return is then shaped to that canonical form.
+#
+# For most ops the synchronous return already IS the canonical form -- insert
+# gives the returned-columns hashref, update/delete the affected-row count --
+# so they pass through untouched. The two reads are the exceptions the ticket
+# confirmed: sync select returns a cursor and sync select_single a flat row
+# list, whereas the canonical async forms are the raw row arrayrefs a cursor's
+# ->all yields (select_async) and a single such arrayref, or undef (select_
+# single_async). Shape exactly those two, matching a real backend by
+# construction (cf. the delegating backend in t/resultset/async_backend.t).
+#
+# txn_do is the third exception (ADR 0055, karr k207): its callback contract --
+# the context handed in and the adoption of a returned Future -- also has to
+# match a real backend, so it routes through _run_immediate_txn rather than the
+# bare $self->$op pass-through.
+sub _run_immediate {
+  my ($self, $op, @args) = @_;
+
+  if ($op eq 'select') {
+    return $self->select(@args)->all;
+  }
+  elsif ($op eq 'select_single') {
+    my @row = $self->select_single(@args);
+    return @row ? [ @row ] : undef;
+  }
+  elsif ($op eq 'txn_do') {
+    return $self->_run_immediate_txn(@args);
+  }
+  elsif ($op eq '_query') {
+    # The raw-SQL seam (DBIO::Storage::DBI::_query_async, karr k282): a
+    # statement core rendered itself, resolving with its rows.
+    my (undef, $sth) = $self->_execute_rendered(@args);
+    return @{ $sth->fetchall_arrayref };
+  }
+
+  return $self->$op(@args);
+}
+
+# 'immediate'-mode txn_do_async, matching the storage-level txn_do_async
+# callback contract of a real DBIO::Storage::Async backend (ADR 0055, karr
+# k207). Two axes:
+#
+#   1. Context argument. A real backend calls $coderef->($txn_ctx, @args) with a
+#      DBIO::Storage::Async::TransactionContext pinned to the transaction
+#      connection. immediate has no event loop and no pinned connection: the
+#      sync op each *_async runs happens IN-PROCESS, already inside the sync
+#      transaction this wrapper opens -- so the storage itself IS the context,
+#      and $self->*_async are exactly the methods a real backend's context
+#      exposes (the documented portable pattern only ever uses *_async /
+#      txn_do_async, all present on $self). Hand $self in as the first argument.
+#
+#   2. Returned-Future adoption. A real backend's _txn_terminal_chain adopts a
+#      Future the coderef returns: it commits on the Future's success and
+#      resolves with its VALUE(S), or rolls back on its failure. Under immediate
+#      every *_async Future is already resolved, so ->get extracts the value(s)
+#      without blocking -- and re-raising a failed Future's error as a throw is
+#      what makes the enclosing sync txn_do roll back, so the commit-on-success
+#      / rollback-on-failure decision matches too. A plain (non-Future) return
+#      passes straight through, exactly as $fc->done($inner) would carry it.
+#
+#   3. A failed statement fails the transaction (karr k236). A real backend
+#      refuses COMMIT when any statement Future its context handed out failed,
+#      awaited or not, handled by the coderef or not. Here every *_async on the
+#      context goes through _run_async, which notes each failure in
+#      _immediate_txn_failures while this transaction runs; the first one is
+#      rethrown so the enclosing sync txn_do rolls back -- after a failed
+#      returned Future, whose own error comes first, as it does there.
+#
+# The whole body runs in the list context _run_async invokes it under, so
+# ->get resolves the full value list a multi-value Future carries.
+sub _run_immediate_txn {
+  my ($self, $coderef, @args) = @_;
+
+  return $self->txn_do(sub {
+    local $self->{_immediate_txn_failures} = [];
+    my $inner = $coderef->($self, @args);
+    my $adopt = blessed($inner) && $inner->can('then') && $inner->can('get');
+    $inner->get if $adopt && $inner->is_failed;
+    die $self->{_immediate_txn_failures}[0]
+      if @{ $self->{_immediate_txn_failures} };
+    return $adopt ? $inner->get : $inner;
+  });
 }
 
 
@@ -589,7 +838,7 @@ DBIO::Storage - Generic Storage Handler
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -609,66 +858,6 @@ Arguments: $schema
 
 Instantiates the Storage object.
 
-=head2 new
-
-=head2 set_schema
-
-=head2 throw_exception
-
-=head2 txn_do
-
-=head2 txn_begin
-
-=head2 txn_commit
-
-=head2 txn_rollback
-
-=head2 _throw_deferred_rollback
-
-=head2 svp_begin
-
-=head2 _svp_generate_name
-
-=head2 svp_release
-
-=head2 svp_rollback
-
-=head2 txn_scope_guard
-
-=head2 debugfh
-
-=head2 debugobj
-
-=head2 debugcb
-
-=head2 register_type
-
-  DBIO::PostgreSQL::Storage->register_type('jsonb', {
-    cake_options => [qw(inflate_json inflate_jsonb)],
-    components   => ['InflateColumn::Serializer'],
-    col_attrs    => { serializer_class => 'JSON' },
-  });
-
-Registers type metadata for use by L<DBIO::Cake> and other DBIO subsystems.
-Driver distributions call this in their module body to declare how their
-specific types should be handled. Subclass registrations inherit from and
-can override parent class registrations via normal MRO lookup.
-
-=head2 type_info
-
-  my $info = DBIO::PostgreSQL::Storage->type_info('jsonb');
-
-Returns the type metadata for a given type name, walking up the MRO
-so subclasses inherit and can override base type definitions.
-Returns C<undef> if the type is not registered.
-
-=head2 all_type_names
-
-  my @types = DBIO::PostgreSQL::Storage->all_type_names;
-
-Returns all type names registered for this class and its ancestors
-(deduplicated, most-derived class wins).
-
 =head2 set_schema
 
 Used to reset the schema class or object which owns this
@@ -677,15 +866,42 @@ storage object, such as during L<DBIO::Schema/clone>.
 =head2 set_access_broker
 
 Attach an L<DBIO::AccessBroker> instance to this storage and set the
-default broker mode (defaults to C<write>).
+default broker mode (defaults to C<write>). A broker attached before is
+detached from this storage first (L<DBIO::AccessBroker/unset_storage>); other
+storages stay attached to it.
 
 =head2 clear_access_broker
 
-Detach any currently attached broker from this storage.
+Detach any currently attached broker from this storage. The broker is told
+(L<DBIO::AccessBroker/unset_storage>) and no longer answers for this storage;
+the other storages it is attached to are not affected.
+
+This is the broker slot only. A storage that keeps more with a broker extends
+it, and L</set_access_broker> where needed: L<DBIO::Storage::DBI> drops the
+connect info stored from the broker's answer and takes its embedded async
+backend along (L<DBIO::Storage::DBI::AccessBroker/clear_access_broker>), an
+async storage drops what came with the broker and has its connect info
+provider refuse from then on (L<DBIO::Storage::Async/clear_access_broker>).
 
 =head2 current_access_broker_connect_info
 
-Return the current storage-native connect info for the requested mode.
+Return the current storage-native connect info for the requested mode:
+the attached broker's answer as it stands now, asked again on every call.
+Without a broker it returns nothing.
+
+A broker that answers nothing -- C<undef>, an empty hash or array, a false
+value -- throws, naming the broker class and the shape of the answer, never a
+value. Every storage opens a new connection only with the
+broker's current answer: the sync storage's C<_connect>, an async backend's
+C<_current_async_connect_info>, and a transport reading this method directly
+all get the refusal from here, instead of falling back to connect info stored
+from an earlier answer or an earlier connection. A broker that throws is left
+to throw.
+
+A view over another broker -- one that answers C<underlying_broker>, as
+L<DBIO::AccessBroker::HostBound> does -- hands an answer of nothing on as it
+came, so the error names the broker at the bottom that answered nothing, and
+the view(s) it was asked through.
 
 =head2 connected
 
@@ -721,12 +937,12 @@ exception) an exception is thrown that includes a "Rollback failed" message.
 
 For example,
 
-  my $author_rs = $schema->resultset('Author')->find(1);
+  my $author = $schema->resultset('Author')->find(1);
   my @titles = qw/Night Day It/;
 
   my $coderef = sub {
     # If any one of these fails, the entire transaction fails
-    $author_rs->create_related('books', {
+    $author->create_related('books', {
       title => $_
     }) foreach (@titles);
 
@@ -758,6 +974,11 @@ are idempotent (that is, can be re-executed multiple times and get the
 same result), and that you check up on your side-effects in the case of
 transaction failure.
 
+Before it reconnects for that restart, a DBI storage disconnects the old
+handle and warns: the block must not run a second time next to the
+transaction the old handle still holds open. Statement handles of your own
+on the old connection are dead from then on.
+
 =head2 txn_begin
 
 Starts a transaction.
@@ -772,6 +993,17 @@ Issues a commit of the current transaction.
 It does I<not> perform an actual storage commit unless there's a DBIO
 transaction currently in effect (i.e. you called L</txn_begin>).
 
+If the commit of the outermost transaction fails, the transaction is over
+whatever the server says (a deferred constraint is checked at commit time):
+the storage resets its transaction state (depth 0, no savepoints, no deferred
+rollback) exactly as after a failed rollback, so the next statement is not run
+inside a transaction nobody will commit. It then tries a rollback, so that the
+server keeps no open transaction; if that fails as well the handle is discarded
+(L</_abandon_after_failed_rollback>) and the next statement connects anew. The
+error of the commit is rethrown, never that of the rollback. This holds for
+every way to a commit: L<DBIO::Storage::TxnScopeGuard/commit>, L</txn_do>,
+L<DBIO::Storage::BlockRunner> and a direct call.
+
 =head2 txn_rollback
 
 Issues a rollback of the current transaction (or savepoint, if
@@ -785,12 +1017,73 @@ Until the "deferred rollback" condition is resolved,
 the storage engine will throw exceptions on any attempt to begin, commit,
 or rollback a transaction.
 
+If the rollback of the outermost transaction itself fails, the handle is
+unusable (the transaction may still be open on the server): the storage resets
+its transaction state (depth 0, no savepoints, no deferred rollback), a DBI
+storage disconnects the handle without a further rollback and the next
+statement connects anew, and the original error is rethrown.
+
+=head2 _abandon_after_failed_rollback
+
+Called by L</txn_rollback> when the rollback of the outermost transaction
+itself failed. The handle can no longer be trusted, so the storage forgets the
+transaction (depth 0, no savepoints, no deferred rollback); a storage that holds
+a connection (L<DBIO::Storage::DBI>) discards it as well. The original error is
+rethrown by L</txn_rollback> afterwards.
+
+=head2 _abandon_after_failed_commit
+
+Called by L</txn_commit> when the commit of the outermost transaction failed.
+The transaction is over: the state is reset first (depth 0, no savepoints, no
+deferred rollback), then a rollback is tried so the server holds no open
+transaction, and when that fails too the handle is discarded through
+L</_abandon_after_failed_rollback>. Errors of that rollback are swallowed; the
+error of the commit is rethrown by L</txn_commit>.
+
+=head2 _abandon_handle_before_reconnect
+
+Called by the retry path of L<DBIO::Storage::BlockRunner> right before it
+reconnects. A no-op here; L<DBIO::Storage::DBI> disconnects the old handle.
+
+=head2 _throw_deferred_rollback
+
+=head2 _svp_generate_name
+
+=head2 register_type
+
+  DBIO::PostgreSQL::Storage->register_type('jsonb', {
+    cake_options => [qw(inflate_json inflate_jsonb)],
+    components   => ['InflateColumn::Serializer'],
+    col_attrs    => { serializer_class => 'JSON' },
+  });
+
+Registers type metadata for use by L<DBIO::Cake> and other DBIO subsystems.
+Driver distributions call this in their module body to declare how their
+specific types should be handled. Subclass registrations inherit from and
+can override parent class registrations via normal MRO lookup.
+
+=head2 type_info
+
+  my $info = DBIO::PostgreSQL::Storage->type_info('jsonb');
+
+Returns the type metadata for a given type name, walking up the MRO
+so subclasses inherit and can override base type definitions.
+Returns C<undef> if the type is not registered.
+
+=head2 all_type_names
+
+  my @types = DBIO::PostgreSQL::Storage->all_type_names;
+
+Returns all type names registered for this class and its ancestors
+(deduplicated, most-derived class wins).
+
 =head2 svp_begin
 
 Arguments: $savepoint_name?
 
 Created a new savepoint using the name provided as argument. If no name
-is provided, a random name will be used.
+is provided, one is generated from the number of savepoints currently open:
+C<savepoint_0>, C<savepoint_1>, ...
 
 =head2 svp_release
 
@@ -838,8 +1131,9 @@ C<DBIO::SQLMaker>.
 Causes trace information to be emitted on the L</debugobj> object.
 (or C<STDERR> if L</debugobj> has not specifically been set).
 
-This is the equivalent to setting C<DBIO_TRACE> in your
-shell environment.
+The value is the trace level: C<debug(1)> traces the statement, C<debug(2)>
+adds the bind values (see L</DBIO_TRACE>). This is the equivalent to setting
+C<DBIO_TRACE> in your shell environment.
 
 =head2 debugfh
 
@@ -905,14 +1199,20 @@ only.
 
 =head2 select_async
 
-Async variant of L</select>. Returns a L<DBIO::Future> that resolves with
-the query results. Requires an async connection (C<< connect(..., { async =>
-... }) >>); on a sync instance it croaks. In the C<immediate> mode it runs
-synchronously and returns an immediately-resolved Future via L</future_class>.
+Async variant of L</select>. Returns a L<DBIO::Future> that resolves with the
+query result rows as raw arrayrefs -- the same C<< cursor->all >> shape a real
+L<DBIO::Storage::Async> backend resolves with (ADR 0053), so the storage-level
+C<select_async> contract is the same across every async mode. Requires an async
+connection (C<< connect(..., { async => ... }) >>); on a sync instance it
+croaks. In the C<immediate> mode it runs synchronously and returns an
+immediately-resolved Future via L</future_class> carrying that same form.
 
 =head2 select_single_async
 
-Async variant of L</select_single>.
+Async variant of L</select_single>. Resolves with a single raw row arrayref, or
+C<undef> when there is no row -- the same form a real L<DBIO::Storage::Async>
+backend resolves with (ADR 0053), rather than the flat column list synchronous
+L</select_single> returns.
 
 =head2 insert_async
 
@@ -930,6 +1230,31 @@ Async variant of L</delete>.
 
 Async variant of L</txn_do>. Returns a L<DBIO::Future> that resolves
 after COMMIT or rejects after ROLLBACK.
+
+The coderef is called with a transaction context as its first argument,
+followed by any extra C<txn_do_async> arguments:
+C<< $coderef->($ctx, @args) >>. On a real L<DBIO::Storage::Async> backend
+C<$ctx> is a L<DBIO::Storage::Async::TransactionContext> pinned to the
+transaction connection; in the C<immediate> mode it is the storage itself
+(its C<*_async> methods run in-process inside the transaction), so the
+portable pattern C<< sub { my ($ctx) = @_; $ctx->insert_async(...) } >> is
+substitutable across modes (ADR 0055). A L<DBIO::Future> returned by the
+coderef is B<adopted>: the transaction resolves with that Future's value(s)
+on success and rolls back on its failure -- the same across every async mode.
+
+A statement Future the context handed out that failed rolls the transaction
+back as well, and the transaction fails with that statement's error -- also
+when nothing awaited it, and also when the coderef caught the failure and
+returned normally. The same across every async mode (see
+L<DBIO::Storage::Async/txn_do_async>).
+
+C<$ctx> is also what a ResultSet, Row or ResultSetColumn is bound to with
+C<with_context>, in every async mode (L<DBIO::ResultSet/with_context>). In the
+C<immediate> mode that is this storage: a bound object's C<*_async> run
+in-process inside the transaction, its failed statements fail the transaction
+like the context's own, and once the coderef has returned it is refused. The
+storage's own C<*_async> methods are not guarded that way -- called after the
+transaction they simply run outside it.
 
 =head2 future_class
 
@@ -950,8 +1275,19 @@ be specifying the metadata yourself if you need it.
 If C<DBIO_TRACE> is set then trace information
 is produced (as when the L</debug> method is set).
 
-If the value is of the form C<1=/path/name> then the trace output is
-written to the file C</path/name>.
+C<DBIO_TRACE=1> traces the statement. C<DBIO_TRACE=2> adds the bind values:
+each value is run through the C<redact_bind_value> hook
+(L<DBIO::Storage::DBI/redact_bind_value>) and cut to 32 characters, with
+C<...> marking the cut; C<undef> is traced as C<NULL>. The level is the
+leading digits of the value (C<2=/path/name> is level 2); any other true value
+is level 1. The synchronous storage, L<DBIO::Replicated> and the asynchronous
+transports follow this one rule, and L</debug> holds the level.
+
+If the value is of the form C<N=/path/name> (N the level) then the trace output is
+written to the file C</path/name>. The file is opened for append and, when
+the trace creates it, is readable by its owner alone (mode 0600). The
+statements of connect actions are traced with the secrets they carry shown as
+C<***[sha256:E<lt>8 hexE<gt>]>, a fingerprint of the value.
 
 This environment variable is checked when the storage object is first
 created (when you call connect on your schema).  So, run-time changes

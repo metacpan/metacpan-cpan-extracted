@@ -14,6 +14,7 @@ my %PROBE = (
   PIDFD_SPAWN     => 'int fd; return pidfd_spawn(&fd, "/bin/true", 0, 0, 0, 0) + pidfd_getpid(fd);',
 );
 my %without = map +($_ => 1), split ' ', $ENV{PROC_SPAWNER_WITHOUT} // '';
+%PROBE = () if $^O eq 'MSWin32';   # Windows: posix_spawn is win_spawn.h's, on CreateProcessW (Spawner.xs includes it)
 my ($cb, $dir, @have) = (ExtUtils::CBuilder->new(quiet => 1), tempdir(CLEANUP => 1));
 open my $err, '>&', \*STDERR or die; open STDERR, '>', File::Spec->devnull;   # the failing probes' messages
 for my $n (sort grep !$without{$_}, keys %PROBE) {
@@ -26,7 +27,8 @@ for my $n (sort grep !$without{$_}, keys %PROBE) {
                          $Config{gccversion} ? (extra_compiler_flags => '-Werror=implicit-function-declaration') : ());
     $cb->link_executable(objects => [$o], exe_file => "$dir/$n$Config{_exe}") } }
 open STDERR, '>&', $err or die;
-print "posix_spawn and extensions found: ", join(' ', @have) || 'none', "\n";
+print $^O eq 'MSWin32' ? "Windows: posix_spawn from win_spawn.h (CreateProcessW)\n"
+                      : "posix_spawn and extensions found: " . (join(' ', @have) || 'none') . "\n";
 
 WriteMakefile(
   NAME             => 'Proc::Spawner',

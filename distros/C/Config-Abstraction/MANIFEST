@@ -28,6 +28,7 @@ t/logger.t
 t/manifest.t
 t/merge_config.t
 t/mutant_killers.t
+t/noshadow.t
 t/perl.t
 t/pod-cm.t
 t/pod-coverage.t
@@ -39,6 +40,7 @@ t/port.t
 t/prereq.t
 t/rt-59921.t
 t/rt-59922.t
+t/self-load.t
 t/strict.t
 t/unit.t
 t/unused.t

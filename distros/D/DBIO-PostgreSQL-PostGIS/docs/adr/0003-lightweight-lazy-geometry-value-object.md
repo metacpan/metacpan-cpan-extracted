@@ -22,11 +22,16 @@ is a defect generator.
 
 Inflate to a **bespoke lightweight value object**,
 `DBIO::PostgreSQL::PostGIS::Geometry`, that stores SRID plus a wire form (WKT or
-EWKB-hex) and parses **lazily** on demand.
+EWKB-hex) and parses **lazily** on demand where it can (WKT-based objects;
+`from_ewkb_hex` decodes eagerly at construction). A value `from_ewkb_hex` cannot
+decode is an object all the same: it carries the hex and what the EWKB header
+says, and has no coordinates. (The original decision was `undef` for a hex that
+is undecodable or of an unknown type; reversed by karr k15, see Rationale.)
 
 - **Lightweight store, lazy parse.** `new` stores
-  `srid`/`wkt`/`ewkb_hex`/`geometry_type`/`coordinates` as a plain blessed hash
-  (`Geometry.pm:48-58`). `geometry_type`, `wkt`, `coordinates`, `bbox`,
+  `srid`/`wkt`/`ewkb_hex`/`geometry_type`/`coordinates` and the Z/M flags
+  `has_z`/`has_m` as a plain blessed hash (`new` in `Geometry.pm`).
+  `geometry_type`, `wkt`, `coordinates`, `bbox`,
   `to_geojson` derive their values on first access via the codec chain and
   memoise (`Geometry.pm:269-331`), so a row that is fetched but whose geometry is
   never inspected pays no parsing cost.
@@ -57,8 +62,28 @@ than hiding it) is what makes the convention safe. Defaulting SRID 4326 in two
 constructors matches the de-facto standard for GPS/GeoJSON data and removes the
 most common boilerplate.
 
+`from_ewkb_hex` answers every defined, non-empty string with an object
+(karr k15). The original decision had it return `undef` when the decoder failed
+or did not know the type, and the inflate handler in `register_column`
+(`lib/DBIO/PostgreSQL/PostGIS.pm`) passes its answer on. A `geometry` column may
+hold `CIRCULARSTRING`, `COMPOUNDCURVE`, `CURVEPOLYGON`, `MULTICURVE`,
+`MULTISURFACE`, `POLYHEDRALSURFACE`, `TIN` and `TRIANGLE`, none of which the
+hand-rolled decoder decodes (ADR 0002). A row holding one read as `undef`: the
+same as a row holding `NULL`, with the stored value out of reach, and copied to
+another row it stored `NULL`. Two ways out were on the table — an inflater that
+throws, naming the type, or an object without coordinates. The object was
+chosen because a read object is written back as its EWKB hex (karr k14, ADR
+0002): the hex alone keeps the row readable and writable without loss, whether
+or not Perl knows the coordinates, whereas a throwing inflater makes every such
+row unreadable through the ORM. The object has a precedent in itself:
+`from_wkt` with a WKT the parser cannot read returns an object that carries the
+WKT and has no coordinates. `undef` is left to mean `NULL` and nothing else;
+`from_ewkb_hex` still returns it for an empty string and for `undef`, which are
+no value.
+
 The object is the inflation target exercised end-to-end (`t/10-geometry.t`,
-`t/20-inflate.t`, `t/geometry-roundtrip.t`), hence **accepted**.
+`t/20-inflate.t`, `t/geometry-roundtrip.t`, live `t/34-undecoded-live.t`),
+hence **accepted**.
 
 ## Consequences
 
@@ -68,6 +93,14 @@ The object is the inflation target exercised end-to-end (`t/10-geometry.t`,
 - `coordinates`/`x`/`y`/`z`/`bbox`/`to_geojson` are defined for the simple
   geometry types parseable from WKT; the value object returns `undef` for shapes
   too complex to parse from WKT alone, and the documented escape is `to_ogr`.
+- An inflated column value is `undef` only for `NULL`. A value of a type the
+  decoder does not decode is an object with `ewkb_hex`, `srid` and
+  `geometry_type` (`circularstring`, …) whose `coordinates`, `wkt`, `ewkt`,
+  `bbox` and `to_geojson` are `undef` and whose `is_empty` is false whatever it
+  holds; code that took a defined `$row->geom` to have coordinates has to check
+  for them. Such an object is written back as its hex. It has no WKT to offer,
+  so `to_ogr` has nothing to hand to GDAL, and as the argument of a spatial
+  resultset helper, which binds the WKT, it binds `NULL` (karr k22, karr k23).
 - `from_lat_lon` is the *only* constructor that swaps axis order; every other
   constructor (`point`, `from_wkt`, …) takes coordinates in native
   `lon`/`x`-first order. Mixing them up is the one footgun, which is why the swap

@@ -32,6 +32,20 @@ my $num = bless( \do { my $foo = 69 }, 'DBIO::Test::SillyInt' );
 is($num, 69, 'test overloaded object is "sane"');
 is("$num", 69, 'test overloaded object is "sane"');
 
+# ADR 0069: {} is TRUE, [] is FALSE; as a member an arrayref is an -or group
+my $member_true; $member_true = sub {
+  my $c = shift;
+  ref $c eq 'HASH' ? 1 : ( grep { $member_true->($_) } @$c ) ? 1 : 0;
+};
+my $and_true = sub {
+  my $c = shift;
+  ref $c eq 'HASH' ? 1 : ( grep { ! $member_true->($_) } @$c ) ? 0 : 1;
+};
+my $or_true = sub {
+  my $c = shift;
+  ref $c eq 'HASH' ? 0 : $member_true->($c);
+};
+
 my @tests = (
   {
     where => { artistid => 1, charfield => undef },
@@ -300,34 +314,51 @@ my @tests = (
   (map {
     {
       where => { -and => $_ },
-      cc_result => undef,
       efcc_result => {},
-      sql => '',
+      ( $and_true->($_)
+        ? ( cc_result => undef, sql => '' )
+        : ( cc_result => { -or => [] }, sql => 'WHERE 0=1' )
+      ),
     },
     {
       where => { -or => $_ },
-      cc_result => undef,
       efcc_result => {},
-      sql => '',
+      ( $or_true->($_)
+        ? ( cc_result => undef, sql => '' )
+        : ( cc_result => { -or => [] }, sql => 'WHERE 0=1' )
+      ),
     },
     {
       where => { -or => [ foo => 1, $_ ] },
-      cc_result => { foo => 1 },
-      efcc_result => { foo => 1 },
-      sql => 'WHERE "foo" = ?',
+      # a TRUE member makes the -or group TRUE, a FALSE one drops out
+      ( $member_true->($_)
+        ? ( cc_result => undef, efcc_result => {}, sql => '' )
+        : ( cc_result => { foo => 1 }, efcc_result => { foo => 1 }, sql => 'WHERE "foo" = ?' )
+      ),
     },
     {
       where => { -or => [ $_, foo => 1 ] },
-      cc_result => { foo => 1 },
-      efcc_result => { foo => 1 },
-      sql => 'WHERE "foo" = ?',
+      ( $member_true->($_)
+        ? ( cc_result => undef, efcc_result => {}, sql => '' )
+        : ( cc_result => { foo => 1 }, efcc_result => { foo => 1 }, sql => 'WHERE "foo" = ?' )
+      ),
     },
     {
       where => { -and => [ fuu => 2, $_, foo => 1 ] },
-      sql => 'WHERE "fuu" = ? AND "foo" = ?',
-      collapsed_sql => 'WHERE "foo" = ? AND "fuu" = ?',
-      cc_result => { foo => 1, fuu => 2 },
-      efcc_result => { foo => 1, fuu => 2 },
+      # one FALSE member makes the whole -and group FALSE
+      ( $member_true->($_)
+        ? (
+          sql => 'WHERE "fuu" = ? AND "foo" = ?',
+          collapsed_sql => 'WHERE "foo" = ? AND "fuu" = ?',
+          cc_result => { foo => 1, fuu => 2 },
+          efcc_result => { foo => 1, fuu => 2 },
+        )
+        : (
+          sql => 'WHERE 0=1',
+          cc_result => { -or => [], foo => 1, fuu => 2 },
+          efcc_result => { foo => 1, fuu => 2 },
+        )
+      ),
     },
   } (
     # bare
@@ -346,9 +377,9 @@ my @tests = (
   # batshit insanity, just to be thorough
   {
     where => { -and => [ [ 'artistid' ], [ -and => [ artistid => { '!=', 69 }, artistid => undef, artistid => { '=' => 200 } ]], artistid => [], { -or => [] }, { -and => [] }, [ 'charfield' ], { name => [] }, 'rank' ] },
-    cc_result => { artistid => [ -and => [], { '!=', 69 }, undef, 200  ], charfield => undef, name => [], rank => undef },
-    sql => 'WHERE "artistid" IS NULL AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND 0=1 AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
-    collapsed_sql => 'WHERE 0=1 AND "artistid" != ? AND "artistid" IS NULL AND "artistid" = ? AND "charfield" IS NULL AND 0=1 AND "rank" IS NULL',
+    cc_result => { -or => [], artistid => [ -and => [], { '!=', 69 }, undef, 200  ], charfield => undef, name => [], rank => undef },
+    # the group holds FALSE members, so the whole condition is FALSE (ADR 0069)
+    sql => 'WHERE 0=1',
     efcc_result => { artistid => UNRESOLVABLE_CONDITION },
     efcc_n_result => { artistid => UNRESOLVABLE_CONDITION, charfield => undef, rank => undef },
   },

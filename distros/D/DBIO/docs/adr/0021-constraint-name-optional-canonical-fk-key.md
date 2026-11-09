@@ -17,7 +17,7 @@ because it is the natural grouping key for composite (multi-column) foreign keys
 the catalog returns one row per local/remote column pair, and the rows for a
 single composite FK are tied together by their shared name. Core's own grouping
 helper documents exactly this — `_aggregate_by_ordered`
-(`lib/DBIO/Introspect/Base.pm`, ~line 63) uses `'constraint_name'` as its
+(in `lib/DBIO/Introspect/Base.pm`) uses `'constraint_name'` as its
 worked example, and the drivers call it with that field to keep the declared
 local/remote column pairing in order.
 
@@ -25,21 +25,21 @@ What each driver does with the name *after* grouping has diverged, and the
 divergence is purely in the key spelling — not in whether the value exists:
 
 - **MSSQL** keeps it as bare `constraint_name` in the per-FK model hash
-  (`dbio-mssql/lib/DBIO/MSSQL/Introspect/ForeignKeys.pm:62`, POD documents the
+  (`dbio-mssql/lib/DBIO/MSSQL/Introspect/ForeignKeys.pm`, POD documents the
   key). Conformant.
 - **PostgreSQL** keeps bare `constraint_name` in the `foreign_keys` section
-  (`dbio-postgresql/lib/DBIO/PostgreSQL/Introspect/ForeignKeys.pm:115`), but its
+  (`dbio-postgresql/lib/DBIO/PostgreSQL/Introspect/ForeignKeys.pm`), but its
   `table_fk_info` relationship path emits `_constraint_name`
-  (`dbio-postgresql/lib/DBIO/PostgreSQL/Introspect.pm:347`). Mixed.
+  (`dbio-postgresql/lib/DBIO/PostgreSQL/Introspect.pm`). Mixed.
 - **DB2** keeps `_constraint_name`
-  (`dbio-db2/lib/DBIO/DB2/Introspect.pm:85`). Underscore variant.
+  (`dbio-db2/lib/DBIO/DB2/Introspect.pm`). Underscore variant.
 - **Informix** keeps `_constraint_name`
-  (`dbio-informix/lib/DBIO/Informix/Introspect.pm:174`; POD ~line 165).
+  (`dbio-informix/lib/DBIO/Informix/Introspect.pm`; also in its POD).
   Underscore variant.
 - **Sybase** fetches *and* keeps `constraint_name` in the subdir helper
-  (`dbio-sybase/lib/DBIO/Sybase/Introspect/ForeignKeys.pm:61`), then **drops it**
+  (`dbio-sybase/lib/DBIO/Sybase/Introspect/ForeignKeys.pm`), then **drops it**
   in `_group_fks_by_constraint`
-  (`dbio-sybase/lib/DBIO/Sybase/Introspect.pm:79`) — the resulting `foreign_keys`
+  (`dbio-sybase/lib/DBIO/Sybase/Introspect.pm`) — the resulting `foreign_keys`
   entries carry only the five canonical keys, so the name is lost from the model.
   Non-conformant: it loses the name.
 
@@ -65,7 +65,7 @@ the naming call once, here, with authority over the whole family.
    PostgreSQL `table_fk_info` relationship path — are non-conformant and realign
    to `constraint_name`.
 
-3. `table_fk_info` (`lib/DBIO/Introspect/Base.pm:267`), the relationship/generation
+3. `table_fk_info` (in `lib/DBIO/Introspect/Base.pm`), the relationship/generation
    contract method consumed by `DBIO::Generate`, is **not** changed by this
    decision. Nothing on the generation path consumes the FK name today, so
    threading it through there would be speculative. This ADR notes it only as a
@@ -102,13 +102,13 @@ and the Diff layer that spans them — one source for the rule.
 
 ## Consequences
 
-- **Sybase karr #14 is unblocked and becomes purely driver-local.** No core code
+- **dbio-sybase k14 is unblocked and becomes purely driver-local.** No core code
   change is required; the contract blessing is enough. Sybase stops dropping the
   name in `_group_fks_by_constraint`, carries `constraint_name` into
   `model->{foreign_keys}`, and has `DBIO::Sybase::Diff::ForeignKey` prefer the
   real server name for `DROP` (falling back to the deterministically generated
   name only when the name is absent). This is the FK drop/alter fidelity gap that
-  follows the FK diff op shipped in Sybase karr #11.
+  follows the FK diff op shipped in dbio-sybase k11.
 - **Drivers using `_constraint_name` realign to bare `constraint_name`** — DB2,
   Informix, and the PostgreSQL `table_fk_info` relationship path. Each is tracked
   as a per-driver follow-up ticket on that driver's own board (driver-repo work).
@@ -125,5 +125,5 @@ and the Diff layer that spans them — one source for the rule.
   until then it is deliberately left alone.
 
 Relates to ADR 0007 (native diff/deploy layer), ADR 0018 (family-policy ownership
-pattern), and ADR 0019 (FK comparator and desired-state skip); and to Sybase karr
-#11 (FK diff op shipped) and #14 (this follow-up).
+pattern), and ADR 0019 (FK comparator and desired-state skip); and to dbio-sybase
+k11 (FK diff op shipped) and k14 (this follow-up).

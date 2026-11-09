@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use Data::Dumper::Concise;
+use Data::Dumper;
 use DBIO::Test ':DiffSQL';
 
 sub test_order {

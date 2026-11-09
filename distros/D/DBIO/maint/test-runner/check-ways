@@ -1,0 +1,60 @@
+#!/bin/bash
+# check-ways -- which DBD x database ways load, and (with a DSN) connect.
+#
+#   maint/test-runner/check-ways [-d DB]...
+#
+# Part 1: every DBD of the image is loaded (perl -M...) and its client library
+# version reported -- needs no database.
+# Part 2: for every DBIO_TEST_*_DSN in the calling shell (load them with
+# `eval "$(dbio-db env <db>)"`) a DBI->connect + SELECT 1, through the DSN's
+# own DBD and, where the family has a second way to the same server, through
+# that one too (mysql <-> MariaDB; Sybase <-> ODBC for MSSQL via the
+# DBIO_TEST_MSSQL_ODBC_* variables). Db2 and anything else: set
+# DBIO_TEST_DB2_DSN/_USER/_PASS like the others.
+#
+# Capped like run-suite (DBIO_TEST_MEMMAX, DBIO_TEST_CPUS); one container, serial.
+
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+. "$here/env.sh"      # -d DB loads `dbio-db env DB`, -n NAME see there
+export DOCKER_HOST=unix:///var/run/docker.sock
+image=${DBIO_TEST_IMAGE:-dbio-test-runner:local}
+
+envargs=()
+while IFS= read -r name; do envargs+=(-e "$name"); done < <(compgen -e | grep '^DBIO_TEST_' || true)
+
+exec nice -n 19 docker run --rm -i --network host \
+  --memory "${DBIO_TEST_MEMMAX:-1g}" --memory-swap "${DBIO_TEST_MEMMAX:-1g}" --cpus "${DBIO_TEST_CPUS:-1}" \
+  -e HOME=/tmp "${envargs[@]}" "$image" perl - <<'PERL'
+use strict; use warnings; use DBI;
+
+print "== load\n";
+for my $m (qw(DBD::Pg DBD::mysql DBD::MariaDB DBD::SQLite DBD::Oracle DBD::ODBC
+              DBD::Sybase DBD::DB2 DBD::Firebird DBD::DuckDB)) {
+  my $ok = eval "require $m; 1";
+  my $v  = $ok ? ($m->VERSION // '?') : '';
+  (my $err = $@ // '') =~ s/\n.*//s;
+  printf "%-14s %s\n", $m, $ok ? "ok $v" : "FAIL $err";
+}
+printf "%-14s %s\n", 'clickhouse', (`clickhouse client --version 2>&1` =~ /version ([\d.]+)/ ? "ok $1" : 'FAIL');
+
+print "== connect\n";
+my @try;
+for my $k (sort grep { /^DBIO_TEST_(.+)_DSN$/ } keys %ENV) {
+  (my $p = $k) =~ s/_DSN$//;
+  my @c = ($ENV{$k}, $ENV{"${p}_USER"}, $ENV{"${p}_PASS"});
+  push @try, [ $p, @c ];
+  my $alt = $c[0];
+  push @try, [ "$p (MariaDB)", $alt, @c[1,2] ] if $alt =~ s/^dbi:mysql:/dbi:MariaDB:/i;
+}
+for my $t (@try) {
+  my ($name, $dsn, $u, $p) = @$t;
+  my $res = eval {
+    my $dbh = DBI->connect($dsn, $u, $p, { RaiseError => 1, PrintError => 0 });
+    my $sql = $dsn =~ /DB2|Oracle/i ? ($dsn =~ /Oracle/i ? 'SELECT 1 FROM dual' : 'SELECT 1 FROM sysibm.sysdummy1') : 'SELECT 1';
+    my ($x) = $dbh->selectrow_array($sql);
+    $dbh->disconnect; "ok ($x)";
+  } || do { (my $e = $@) =~ s/\s+/ /g; "FAIL $e" };
+  printf "%-26s %-40.40s %s\n", $name, $dsn, $res;
+}
+PERL

@@ -128,6 +128,11 @@ use DBIO::Util qw(old_mro);
   local *{DBIO::Storage::DBI::txn_rollback} = sub { die 'die die my darling' };
   Class::C3->reinitialize() if old_mro;
 
+  # The guard's DESTROY says so on STDERR when the rollback fails while an
+  # exception is in flight; take it, so it is asserted and not left as noise.
+  my @rollback_warnings;
+  local $SIG{__WARN__} = sub { push @rollback_warnings, $_[0] };
+
   throws_ok (sub {
     my $guard = $schema->txn_scope_guard;
     $schema->resultset ('Artist')->create ({ name => 'bohhoo'});
@@ -142,6 +147,14 @@ use DBIO::Util qw(old_mro);
     ? qr/Deliberate exception/s # temporary until we get the generic exception wrapper rolling
     : qr/Deliberate exception.+Rollback failed/s
   );
+
+  is (scalar @rollback_warnings, 1, 'the failed rollback is reported once');
+  like ($rollback_warnings[0], qr/\*+ ROLLBACK FAILED\!\!\! \*+/,
+    'as a ROLLBACK FAILED warning');
+  like ($rollback_warnings[0], qr/die die my darling/,
+    'carrying why the rollback failed');
+  like ($rollback_warnings[0], qr/exception was in flight: Deliberate exception/,
+    'and the exception that was in flight');
 
   # just to mask off warning since we could not disconnect above
   $schema->storage->_dbh->disconnect;
@@ -202,17 +215,12 @@ for my $post_poison (0,1) {
     $schema->resultset ('Artist')->create ({ name => 'bohhoo'});
   }
 
+  # The guard's rollback warnings are not emitted when $@ is poisoned after
+  # guard instantiation -- the assertion below fails for both pre-poison
+  # values. The DBIx::Class-era version windows and is_plain/TRAVIS hedges
+  # are dead on a modern Perl; the condition is simply $post_poison.
   local $TODO = 'Do not know how to deal with trapped exceptions occuring after guard instantiation...'
-    if ( $post_poison and (
-      # take no chances on installation
-      ( DBIO::Test->is_plain and ($ENV{TRAVIS}||'') ne 'true' )
-        or
-      # this always fails
-      ! $pre_poison
-        or
-      # I do not understand why but on <= 5.8.8 and on 5.10.0 "$pre_poison && $post_poison" passes...
-      ($] > 5.008008 and $] < 5.010000 ) or $] > 5.010000
-    ));
+    if $post_poison;
 
   is (@w, 2, "Both expected warnings found - \$\@ pre-poison: $pre_poison, post-poison: $post_poison" );
 
@@ -220,11 +228,11 @@ for my $post_poison (0,1) {
   $schema->storage->_dbh->disconnect;
 }}
 
-# add a TODO to catch when Text::Balanced is finally fixed
+# Text::Balanced used to poison $@ with an exception object whose string
+# overloading was broken (RT#74994), tripping the guard's exception
+# handling. Fixed in the installed Text::Balanced (2.06); the assertion
+# below is now sharp.
 # https://rt.cpan.org/Public/Bug/Display.html?id=74994
-#
-# while it doesn't matter much for DBIO itself, this particular bug
-# is a *BANE*, and DBIO is to bump its dep as soon as possible
 {
 
   require Text::Balanced;
@@ -240,18 +248,21 @@ for my $post_poison (0,1) {
     # this is what poisons $@
     Text::Balanced::extract_bracketed( '(foo', '()' );
 
-    my $s = DBIO::Test::Schema->connect('dbi:SQLite::memory:');
+    my $s = DBIO::Test::Schema->clone;
+    $s->storage_type('DBIO::SQLite::Storage');
+    $s = $s->connect('dbi:SQLite::memory:');
     my $g = $s->txn_scope_guard;
     $g->commit;
   } 'Broken Text::Balanced is not screwing up txn_guard';
 
-  local $TODO = 'RT#74994 *STILL* not fixed';
   is(scalar @w, 0, 'no warnings \o/');
 }
 
 # ensure Devel::StackTrace-refcapture-like effects are countered
 {
-  my $s = DBIO::Test::Schema->connect('dbi:SQLite::memory:');
+  my $s = DBIO::Test::Schema->clone;
+  $s->storage_type('DBIO::SQLite::Storage');
+  $s = $s->connect('dbi:SQLite::memory:');
   my $g = $s->txn_scope_guard;
 
   my @arg_capture;

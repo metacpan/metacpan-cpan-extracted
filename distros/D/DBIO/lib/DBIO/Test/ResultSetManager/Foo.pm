@@ -2,6 +2,9 @@ package DBIO::Test::ResultSetManager::Foo;
 # ABSTRACT: Test result class for ResultSetManager component testing
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Core';
@@ -25,7 +28,7 @@ DBIO::Test::ResultSetManager::Foo - Test result class for ResultSetManager compo
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

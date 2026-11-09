@@ -3,6 +3,46 @@
 - Status: accepted
 - Date: 2026-06-21
 - Tags: sqlmaker, jsonb, reuse, drivers, bugfix
+- Amended: `sql_maker` and the DML methods are core's, built from this dist's
+  `sql_maker_class` / `_sql_maker_args`, and of the identifier quoting only
+  `copy_in`'s still goes through the maker (see the Amendment); the decision
+  itself stands
+
+## Amendment (2026-10-05, karr k69) — the maker is the same; who builds it and what quotes through it is not
+
+The decision this ADR records is in force and unchanged: the async storage
+generates its SQL with `DBIO::PostgreSQL::SQLMaker`, not a fork, a subclass or
+a stripped-down maker. Three statements of the *Decision* no longer describe
+the code.
+
+- **`sql_maker` is core's; this dist names the class and its arguments.** Since
+  the thin-transport refactor (karr k22, commit `f4c527d`; core ADR 0030 §4)
+  `DBIO::Storage::Async::sql_maker` builds and memoises the maker from two
+  seams `DBIO::PostgreSQL::EV::Storage` fills: `sql_maker_class`, a method
+  returning `'DBIO::PostgreSQL::SQLMaker'`, and `_sql_maker_args`, the quoting
+  and limit configuration quoted below. `sql_maker_class` is therefore no
+  longer a per-instance setting with a default: another maker comes only from
+  a subclass overriding the method, and the warning in *Consequences* holds
+  for that override unchanged.
+- **The DML methods are core's.** `select_async`, `insert_async`,
+  `update_async` and `delete_async` are inherited, and core's `_run_crud`
+  builds their SQL with that one maker -- the property this ADR is about, kept
+  by inheritance instead of by four methods here.
+- **Of the identifier quoting, only `copy_in`'s goes through the maker.** It
+  quotes the table and each column with `sql_maker->_quote`. `listen` and
+  `unlisten` are core's (ADR 0003 amendment, core ADR 0056), and the channel
+  their seams send has been quoted by `_pg_quote_channel` since karr k43
+  (commit `ccdef86`): as one identifier, where the maker's `_quote` splits at
+  the name separator and turned a channel with a `.` into a qualified name the
+  server rejects. Since karr k55 (commit `e6d19e1`) that method delegates to
+  `DBIO::PostgreSQL::Util::quote_channel`, the helper of the `DBIO::PostgreSQL`
+  dist. `notify` quotes nothing, and did not when this ADR was written either:
+  it binds the channel to `SELECT pg_notify($1, $2)` (ADR 0003). Naming it
+  among the quoting callers was this ADR's mistake.
+
+The `Storage.pm:NNN` references below were written against the file before
+that refactor. None of them points at its target any more; they are left as
+written.
 
 ## Context
 
@@ -37,7 +77,7 @@ This was a real bug, not a hypothetical. The driver originally wired in the
 *base* `DBIO::SQLMaker`, which has no knowledge of the JSONB operators, so async
 queries silently lost all PostgreSQL-specific SQL generation. Fixed in commit
 `07c6640` ("use DBIO::PostgreSQL::SQLMaker instead of base SQLMaker"), tracked as
-karr #4 (style-audit fixes), which records: "Async driver had DBIO::SQLMaker
+karr k4 (style-audit fixes), which records: "Async driver had DBIO::SQLMaker
 wired in — missing all JSONB operators (@>, <@, @?, @@, ?|&)."
 
 ## Rationale
@@ -48,7 +88,7 @@ synchronously over DBI or asynchronously over EV::Pg. The async-ness lives in
 *how the statement is executed and how its result is delivered* (Futures, the
 pool, pipelining), not in *how the SQL text is built*. Forking the SQLMaker for
 the async driver would mean maintaining two copies of the operator set and
-guaranteeing they never drift — the karr #4 bug is precisely what happens when the
+guaranteeing they never drift — the karr k4 bug is precisely what happens when the
 async path is even one class off from the PostgreSQL maker. Reusing
 `DBIO::PostgreSQL::SQLMaker` verbatim makes the JSONB decision in
 dbio-postgresql ADR 0005 apply unchanged to async queries, with no second
@@ -67,7 +107,7 @@ not proposed.
   generation lands in one place and reaches both drivers.
 - `sql_maker_class` remains configurable (`Storage.pm:48`), so the class can be
   overridden — but overriding it with anything less than the PostgreSQL maker
-  reintroduces exactly the karr #4 defect; the default must stay
+  reintroduces exactly the karr k4 defect; the default must stay
   `DBIO::PostgreSQL::SQLMaker`.
 - The JSONB operator semantics themselves are owned by dbio-postgresql ADR 0005
   (and core ADR 0002 / 0004); a change to how `expand_op` handlers render lands

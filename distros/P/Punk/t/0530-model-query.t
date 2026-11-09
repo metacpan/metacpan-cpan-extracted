@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
+use PunkTest;
 use File::Temp ();
 use Punk::Model;
 
@@ -62,10 +63,17 @@ my $dsn = "dbi:SQLite:dbname=$dir/books.db";
 
 my @backends = ([ 'Punk::Model::DBI', { dsn => $dsn } ]);
 if (eval { require DBIx::Loop; 1 }) {
-    push @backends, [ 'Punk::Model::DBIx::Loop',
-                      { dsn => $dsn, workers => 2,
-                        backend => 'Punk::Model::DBIx::Loop',
-                        attr => { PrintError => 0 } } ];
+    my %loop = ( dsn => $dsn, workers => 2,
+                 backend => 'Punk::Model::DBIx::Loop',
+                 attr => { PrintError => 0 } );
+    # the pool is shared per dsn, so the probe's is the one the tests use
+    if (my $err = loop_pool_error(T::Model::Book->_instantiate({ %loop }))) {
+        note "the async backend's pool could not fork here, so its half "
+           . "is skipped: $err";
+    }
+    else {
+        push @backends, [ 'Punk::Model::DBIx::Loop', { %loop } ];
+    }
 }
 
 # a result, awaited when it is a future
@@ -334,7 +342,7 @@ if (@backends == 2) {
     ok(!$p3->{has_more_data} && !defined $p3->{next}, 'which ends the walk');
 }
 else {
-    note 'DBIx::Loop not installed: the cross-backend token test is skipped';
+    note 'no async backend here: the cross-backend token test is skipped';
 }
 
 done_testing();

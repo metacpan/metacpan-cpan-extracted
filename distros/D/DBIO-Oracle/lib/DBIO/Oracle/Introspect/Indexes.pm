@@ -4,6 +4,8 @@ package DBIO::Oracle::Introspect::Indexes;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
@@ -28,7 +30,7 @@ sub fetch {
   });
   $idx_sth->execute($schema, $schema);
 
-  while (my $row = $idx_sth->fetchrow_hashref) {
+  while (my $row = $idx_sth->fetchrow_hashref('NAME_lc')) {
     my $tbl = $row->{table_name};
     my $idx = $row->{index_name};
 
@@ -62,7 +64,7 @@ DBIO::Oracle::Introspect::Indexes - Introspect Oracle indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

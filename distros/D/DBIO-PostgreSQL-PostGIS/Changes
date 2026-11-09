@@ -1,5 +1,113 @@
 Revision history for DBIO-PostgreSQL-PostGIS
 
+0.900004  2026-11-08
+    * Breaking Changes
+        - DBIO::PostgreSQL::PostGIS::Deploy and ::Introspect are stubs: the
+          deploy runs through DBIO::PostgreSQL and the extension class, and
+          the order of storage layers does not matter.
+        - A Geometry read from the database is written back as the EWKB hex
+          it carries, bit for bit, and unchanged columns stay clean. Objects
+          without hex are written as EWKT (ADR 0002).
+        - geometry_type is upper-case ('POINT') for every constructor and
+          origin. The introspection metadata keeps its lower-case
+          geometry_type.
+        - x, y and z answer for a point and are undef for every other type,
+          for POINT EMPTY and for z of POINT M.
+        - A Geometry with nothing to write (no hex, WKT or coordinates, or
+          coordinates without a type) throws a DBIO::Exception at deflate and
+          in the spatial helpers. An empty ewkb_hex counts as no hex. to_wkt
+          of typeless coordinates is undef.
+        - from_ewkb_hex(undef) throws, as from_wkt does; the empty string is
+          undef.
+        - decode_hex reports is_empty; the coords of an empty geometry are []
+          and the members of a GEOMETRYCOLLECTION are hashes { type, coords,
+          is_empty }.
+
+    * Extension
+        - DBIO::PostgreSQL::PostGIS::Extension is the extension class of
+          postgis for the driver's declared list, pg_extensions('postgis')
+          (ADR 0066). It annotates each spatial column with base_type,
+          geometry_type and srid and judges changes of a spatial column type.
+        - Another SRID converts the column with ALTER COLUMN ... TYPE ...
+          USING ST_Transform(...), so a table with rows is converted. Any
+          other change between spatial types is refused, naming column and
+          both types, before any SQL.
+        - DBIO::PostgreSQL::PostGIS::Topology::Extension handles
+          postgis_topology: the schema of each topology stays out of the
+          deploy model.
+
+    * Storage
+        - ensure_postgis creates the extension WITH SCHEMA: the schema
+          pg_extensions declares, else the schema of its control file, else
+          public. A connection opened with the connect key schema is refused
+          with a DBIO::Exception before any SQL.
+        - The layer declares itself sync-only (async_layer_class answers
+          undef for every async mode); the POD section "No async layer"
+          says so.
+
+    * Geometry
+        - The spatial ResultSet helpers bind such a geometry as its hex, so
+          a geometry read from a row finds that row.
+        - A column holding a type the dist does not decode (CIRCULARSTRING,
+          COMPOUNDCURVE, TIN, ...) inflates to a Geometry carrying ewkb_hex,
+          srid and geometry_type, without coordinates. Only NULL is undef.
+        - from_ewkt reads the SRID prefix in any case with blanks around it.
+        - to_geojson works for objects from from_wkt and from_ewkb_hex and
+          for collections; empty geometries keep their type with empty
+          coordinates.
+        - A Geometry built without WKT and coordinates answers undef from
+          wkt, ewkt, coordinates, bbox, x, y, z and to_geojson, and is_empty
+          is false.
+        - is_empty reports what ST_IsEmpty says for geometries read from
+          EWKB; wkt and ewkt are POINT EMPTY, LINESTRING Z EMPTY and so on.
+          Z and M markers of EWKB are kept (has_z, has_m).
+
+    * Codecs
+        - The EWKB decoder accepts only clean EWKB: hex of odd length or
+          with a non-hex character, trailing bytes and members of mixed
+          dimension throw. Members are read in the byte order of their own
+          header; types it does not know are named from the header
+          (decode_header) and returned without coordinates.
+        - The WKT builder writes POINT Z(...), POINT M(...), POINT ZM(...),
+          TYPE EMPTY for geometries without parts and GEOMETRYCOLLECTION from
+          its members, all of which PostGIS reads as the original geometry.
+        - The WKT parser reads the text PostGIS prints: the marker glued to
+          the type (POINTM) or apart, three or four ordinates without
+          marker, nested GEOMETRYCOLLECTIONs with empty members, empty parts
+          of MULTI* types, and MULTIPOINT(1 2,3 4) as well as
+          MULTIPOINT((1 2),(3 4)).
+        - Both parser and decoder limit collection nesting to 32 levels
+          ("WKT nesting too deep", "decode_hex: nesting too deep").
+        - The WKT parser reads its text once, in time and memory
+          proportional to its length, and takes only numbers: an ordinate is
+          finite, a point has two to four, a coordinate list has no empty
+          entry. Any other text is text it cannot read.
+
+    * Introspect
+        - base_type, geometry_type and srid are set on geometry and
+          geography columns whatever the search_path, for the unqualified
+          and the schema-qualified type name (public.geometry(Point,4326)).
+          A type of another schema that is merely called geometry is not
+          annotated.
+
+    * Spatial ResultSet helpers
+        - The column name of every helper (the six predicates,
+          within_distance, bbox_intersects, nearest_to, order_by_distance,
+          with_distance) is checked against the source's columns; an unknown
+          name throws naming it. Alias and column are written quoted where
+          needed, so MixedCase columns work.
+
+    * Documentation
+        - README states Perl 5.20+ as cpanfile requires. Geometry POD,
+          README and ADRs 0001 and 0003 describe the code.
+
+    * Dependencies
+        - Requires DBIO 0.900004 and DBIO::PostgreSQL 0.900004;
+          Test::Exception 0.43 is a test requirement.
+
+    * Packaging
+        - Every module carries $VERSION in step with the distribution.
+
 0.900001  2026-07-12
 
     * Storage: PostGIS is now a registered storage LAYER
@@ -13,7 +121,7 @@ Revision history for DBIO-PostgreSQL-PostGIS
       PostGIS ships no ::Async layer, so on a composed schema geometry
       CRUD simply flows through whichever transport the schema resolves
       unchanged; core skips async-less layers silently. Zero
-      storage_type writes remain in lib/. karr #4, core #70.
+      storage_type writes remain in lib/. karr k4, core k70.
 
     * Error handling: all driver-internal error throws now flow through
       DBIO::Exception (CurtisPoe review F21). Previously these paths

@@ -155,4 +155,16 @@ SKIP: { skip 'no chdir in this libc', 1 unless has([[chdir => '/']], {});
   ok !eval { Proc::Spawner::spawn($TRUE, ['true'], undef, [], {}, 'drop'); 1 } && $@ =~ /hash reference/,
     'UNSUPPORTED must be a hash reference' }
 
+{ # W4 (post-0.09): nice and rlimit as Windows has them (the mapping is plain Perl, tested here); Windows' own settings
+  # refused elsewhere
+  my ($j, @none) = Proc::Spawner::win_job_for_rlimit([[AS => 1e8, undef], [DATA => 5e7, 9e7], [CPU => undef, 10],
+                                                        [NPROC => 'unlimited', 3], [NOFILE => 10, 10]]);
+  is_deeply $j, { ProcessMemoryLimit => 5e7, PerProcessUserTimeLimit => 1e8, ActiveProcessLimit => 3 }, 'W4: rlimit as job limits';
+  is_deeply \@none, ['NOFILE'], 'W4: a resource with no Windows counterpart';
+  is join(' ', map Proc::Spawner::win_class_for_nice($_), -20, -9, 0, 1, 9, 10), 'high above_normal normal below_normal below_normal idle',
+    'W4: nice as a priority class (from normal)';
+  SKIP: { skip 'Windows: its own settings are used there', 2 if $^O eq 'MSWin32';
+    ok !Proc::Spawner::spawn($TRUE, ['true'], undef, [], { win_priority => 'high' }) && $! == POSIX::ENOTSUP(), 'win_priority elsewhere: unsupported';
+    my $p = Proc::Spawner::spawn($TRUE, ['true'], undef, [], { win_job => { ActiveProcessLimit => 2 } }, { win_job => 'drop' });
+    ok $p, 'win_job elsewhere: dropped on request'; waitpid $p, 0 if $p } }
 done_testing;

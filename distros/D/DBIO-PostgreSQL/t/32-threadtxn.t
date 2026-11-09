@@ -26,9 +26,19 @@ plan skip_all => 'DBIO does not actively support threads before perl 5.8.5'
 use Scalar::Util 'weaken';
 use DBIO::Test;
 
+# DBIO::Test::Schema keeps no driver in its class: this file runs it on
+# PostgreSQL (core ADR 0067).
+DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
+
 my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 plan skip_all => 'Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test'
       . ' (note: creates and drops a table named cd!)' unless ($dsn && $user);
+
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
 
 my $num_children = $ENV{DBIO_TEST_THREAD_STRESS} || 1;
 if($num_children !~ /^[0-9]+$/ || $num_children < 10) {

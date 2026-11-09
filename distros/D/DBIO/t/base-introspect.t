@@ -154,6 +154,87 @@ is_deeply $c->table_fk_info('users'), [
 is $c->table_is_view('users'), 0, 'table is not a view';
 is $c->table_is_view('v_recent'), 1, 'view detected via kind';
 
+# --- is_nullable folds in the primary key ---
+# not_null answers "does the column carry a NOT NULL attribute", which is not
+# the question is_nullable asks. Engines keep the primary-key constraint
+# separate from that attribute -- SQLite's PRAGMA table_info reports notnull=0
+# for a key column -- so deriving is_nullable from not_null alone declared the
+# primary key of every generated result class nullable, and made this class
+# contradict its own table_pk_info about the same column hashref.
+# DBIO::SQLite::Introspect overrides table_columns_info for exactly this.
+
+{
+  package Test::PkNullable;
+  use base 'DBIO::Introspect::Base';
+  sub _build_model {
+    return {
+      columns => {
+        # A key column the model reports as notnull=0 (SQLite's rowid alias),
+        # plus both kinds of non-key column.
+        artists => [
+          { column_name => 'id',   data_type => 'integer', not_null => 0,
+            is_pk => 1, pk_position => 1 },
+          { column_name => 'name', data_type => 'varchar', not_null => 0, is_pk => 0 },
+          { column_name => 'slug', data_type => 'varchar', not_null => 1, is_pk => 0 },
+        ],
+        # Composite key: every member column, not just the first -- and one of
+        # them carries the NOT NULL attribute as well, which must not change
+        # the answer either.
+        artist_cd => [
+          { column_name => 'artist_id', data_type => 'integer', not_null => 0,
+            is_pk => 1, pk_position => 1 },
+          { column_name => 'cd_id',     data_type => 'integer', not_null => 1,
+            is_pk => 1, pk_position => 2 },
+          { column_name => 'note',      data_type => 'text', not_null => 0, is_pk => 0 },
+        ],
+        # A model that carries no is_pk at all answers exactly as before.
+        legacy => [
+          { column_name => 'a', data_type => 'integer', not_null => 0 },
+          { column_name => 'b', data_type => 'integer', not_null => 1 },
+        ],
+      },
+    };
+  }
+}
+
+my $pk = Test::PkNullable->new(dbh => 'fake');
+
+{
+  my $i = $pk->table_columns_info('artists');
+  is $i->{id}{is_nullable}, 0,
+    'a key column the model reports as notnull=0 is not nullable';
+  is $i->{name}{is_nullable}, 1, 'non-key nullable column stays nullable';
+  is $i->{slug}{is_nullable}, 0, 'non-key NOT NULL column stays not-nullable';
+}
+
+{
+  my $i = $pk->table_columns_info('artist_cd');
+  is $i->{artist_id}{is_nullable}, 0,
+    'first composite key column not nullable though the model says notnull=0';
+  is $i->{cd_id}{is_nullable}, 0,
+    'second composite key column, which also carries NOT NULL, agrees';
+  is $i->{note}{is_nullable}, 1, 'non-key column unaffected by the key';
+}
+
+{
+  my $i = $pk->table_columns_info('legacy');
+  is $i->{a}{is_nullable}, 1, 'no is_pk in the model: nullable column unchanged';
+  is $i->{b}{is_nullable}, 0, 'no is_pk in the model: NOT NULL column unchanged';
+}
+
+# The invariant behind the fix, stated once: whatever table_pk_info names,
+# table_columns_info must not call nullable. Both read is_pk off the same
+# column hashref, so an edit to either that reintroduces the disagreement
+# fails here and not only on the cases enumerated above.
+for my $key (qw/artists artist_cd legacy users/) {
+  my $intro = $key eq 'users' ? $c : $pk;
+  my $info  = $intro->table_columns_info($key);
+  is_deeply(
+    [ grep { $info->{$_}{is_nullable} } @{ $intro->table_pk_info($key) } ], [],
+    "$key: no column table_pk_info calls a key is reported nullable",
+  );
+}
+
 # table_uniq_info prefers an explicit unique_constraints section when present
 {
   package Test::UniqConstraints;

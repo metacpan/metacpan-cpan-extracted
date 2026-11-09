@@ -4,7 +4,7 @@ use Test::More;
 use Scalar::Util 'weaken';
 use Future;
 
-# OFFLINE regression test for karr #11 / CurtisPoe review #5 N1:
+# OFFLINE regression test for karr k11 / CurtisPoe review #5 N1:
 # "async bind-value leak". No EV::Pg, no real DB.
 #
 # WHAT THE TICKET FEARED (ported from the sync DBI driver's contract):
@@ -61,6 +61,7 @@ package FakePool;
 sub new { bless { pg => $_[1] }, $_[0] }
 sub acquire { Future->done($_[0]->{pg}) }
 sub release { }   # no-op: the pool stores the connection, never the bind
+sub _lease { 1 }  # the lease of a borrow (core k275, karr k89)
 sub shutdown { }
 
 package main;
@@ -162,7 +163,7 @@ sub new_storage {
 # --- 4. no _prepared_cache slot on the storage hash ------------------------
 #
 # _prepared_cache used to be declared (unused) in the constructor and was
-# removed as dead code (karr #12). Guard against it being silently reintroduced
+# removed as dead code (karr k12). Guard against it being silently reintroduced
 # as a per-query stash: the key must not exist on the storage hash even after an
 # issued+completed query.
 {

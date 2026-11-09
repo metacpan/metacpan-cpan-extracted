@@ -1,6 +1,6 @@
 ---
 name: dbio-mssql-database
-description: "Microsoft SQL Server knowledge for Perl driver development (DBD::ODBC/Sybase, SQL dialect, types, IDENTITY, transactions, pagination)"
+description: Use when you need Microsoft SQL Server specifics for driver work — DBD::ODBC or DBD::Sybase, dialect, types, IDENTITY, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -15,13 +15,14 @@ Two connection paths, both reach MSSQL:
 
 | Path | Storage class | DSN |
 |------|---------------|-----|
-| ODBC | `DBIO::MSSQL::Storage` | `dbi:ODBC:Driver={SQL Server};Server=...;Database=...` |
+| ODBC | `DBIO::MSSQL::Storage::ODBC` (on the transport-neutral base `DBIO::MSSQL::Storage`) | `dbi:ODBC:Driver={SQL Server};Server=...;Database=...` |
 | Sybase/FreeTDS | `DBIO::MSSQL::Storage::Sybase` | `dbi:Sybase:server=...` |
 
-ODBC is the primary path. `DBD::Sybase` (incl. FreeTDS builds) reblesses to
+ODBC is the primary path. `DBD::Sybase` (incl. FreeTDS builds) adapts to
 `...::Sybase::NoBindVars` if placeholders are unsupported. FreeTDS > 0.82 has
-broken stmt caching → driver disables caching, forces `_identity_method` to
-`@@identity`, and sets `_no_scope_identity_query(1)`. Set tds version 8.0/7.0
+broken stmt caching → driver disables caching (the key of a new row is still
+`SCOPE_IDENTITY()`; the old `@@identity` workaround returned a trigger's key,
+k39). Set tds version 8.0/7.0
 in `freetds.conf` to keep placeholders.
 
 ## Version notes
@@ -54,8 +55,8 @@ Datetime flavours: `datetime` (1753+, 3.33ms), `datetime2` (0001+, 100ns),
 `DBIO::MSSQL::Storage::DateTime::Format` (Sybase path:
 `...::Sybase::DateTime::Format`, ISO_strict via `syb_date_fmt`).
 
-`MONEY`/`SMALLMONEY`: Storage `_prep_for_execute` wraps inserts/updates as
-`CAST(? AS MONEY)`. Use `LongReadLen` for MONEY/blob reads.
+`MONEY`: Storage `_prep_for_execute` wraps inserts/updates as
+`CAST(? AS MONEY)`. `SMALLMONEY` is not covered by that cast. Use `LongReadLen` for MONEY/blob reads.
 
 ## Identity / auto-increment
 

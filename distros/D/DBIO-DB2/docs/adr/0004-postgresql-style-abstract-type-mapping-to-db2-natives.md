@@ -48,6 +48,8 @@ The PostgreSQL-flavoured mappings that define the choice:
   `TIMESTAMP` carries no timezone, so the `tz` distinction is dropped.
 - `boolean / bool → SMALLINT` — DB2 (LUW, the targeted versions) has no native
   boolean column; it is stored as a small integer.
+  *(Wrong: Db2 11.1 and later have a native `BOOLEAN`; corrected by the Addendum of
+  2026-10-25, `boolean / bool → BOOLEAN`, `binary → BINARY`.)*
 - `uuid → CHAR(16)` — DB2 has no UUID type; a UUID is stored as a fixed 16-byte
   character column.
 
@@ -79,7 +81,8 @@ verbatim option for the abstract vocabulary in play.
 ## Consequences
 
 - DB2 deliberately loses information PostgreSQL preserves: `timestamptz`'s
-  timezone, `boolean`'s distinctness from a small integer, and `uuid`'s
+  timezone, ~~`boolean`'s distinctness from a small integer~~ (no longer lost, see the
+  Addendum), and `uuid`'s
   type identity (it becomes `CHAR(16)`). This is the accepted cost of having no
   native equivalent; round-tripping a `timestamptz` column through DB2 and back
   will read as `TIMESTAMP`, and a diff comparing the two must account for that
@@ -102,3 +105,22 @@ verbatim option for the abstract vocabulary in play.
   rationale DB2 follows)
 - core ADR 0006 (native deploy owns SQL generation)
 - core ADR 0007 (diff compares introspected models)
+
+## Addendum 2026-10-25 — boolean and binary are native (karr k54, k44)
+
+The mapping above was wrong on two points; this corrects it and leaves the rest as it
+was. Db2 LUW has had a native `BOOLEAN` since 11.1, and `BINARY(n)`/`VARBINARY(n)` before
+that. "DB2 has no native boolean column" (Decision) and "`boolean`'s distinctness from a
+small integer" lost (Consequences) no longer hold. Hub decision of karr k54:
+
+- `boolean`, `bool` → `BOOLEAN`; `binary` → `BINARY` (was `BLOB`); `varbinary` stays
+  `VARBINARY`. The catalog names are read back as the same types, so
+  `introspect → DBIO::Generate → install_ddl` round-trips them (`t/73`).
+- Measured on Db2 12.1.5: `BOOLEAN` takes no length (`BOOLEAN(1)` is SQL0104N; the catalog's
+  `LENGTH` 1 is left out like the other fixed-size types); `BINARY` is valid bare (= `BINARY(1)`)
+  and with a length; `VARBINARY` needs a length (SQL0604N). `BOOLEAN` takes `DEFAULT 1`, `0`,
+  `TRUE`, `FALSE`, `'1'` and `'true'`, so a result class's 0/1 default is written as it is.
+- A `binary` column declared with a size above the `BINARY` maximum of 255 is not mapped to
+  anything else; the documented maximum is 255 (not measured), `varbinary` or `blob` is the type for more.
+- Tests: `t/39-ddl-type-size.t`, `t/38-ddl-default.t`, `t/45-introspect-columns.t`,
+  `t/73-generate-roundtrip-live.t` (the FINDING entries for `BOOLEAN`/`BINARY` are gone).

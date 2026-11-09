@@ -4,6 +4,8 @@ package DBIO::DuckDB::SQLMaker;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw( DBIO::SQLMaker );
 
 
@@ -27,7 +29,7 @@ DBIO::DuckDB::SQLMaker - DuckDB-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -48,7 +50,9 @@ which already defaults to C<LIMIT ? OFFSET ?> pagination.
 This class is set as the C<sql_maker_class> by L<DBIO::DuckDB::Storage> and
 is not normally instantiated directly.
 
-=seealso
+=head1 SEE ALSO
+
+=pod
 
 =over
 

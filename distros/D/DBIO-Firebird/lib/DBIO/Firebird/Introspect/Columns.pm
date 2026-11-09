@@ -4,6 +4,8 @@ package DBIO::Firebird::Introspect::Columns;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Firebird::Type qw(sql_type_from_rdb);
 
 
@@ -17,7 +19,7 @@ sub fetch {
            rf.rdb$null_flag,
            f.rdb$field_type, f.rdb$field_sub_type, f.rdb$field_scale,
            f.rdb$field_precision, f.rdb$character_set_id, f.rdb$character_length,
-           rf.rdb$default_source
+           rf.rdb$default_source, rf.rdb$identity_type
     FROM rdb$relation_fields rf
     JOIN rdb$fields f ON rf.rdb$field_source = f.rdb$field_name
     WHERE rf.rdb$system_flag = 0
@@ -33,12 +35,16 @@ sub fetch {
     my $name = $row->{'rdb$field_name'};
     $name =~ s/\s+$//;
 
-    my $type = sql_type_from_rdb($row->{'rdb$field_type'}, $row->{'rdb$field_sub_type'});
+    my $type = sql_type_from_rdb(
+      $row->{'rdb$field_type'}, $row->{'rdb$field_sub_type'}, $row->{'rdb$character_set_id'},
+    );
 
     my $size;
-    if ($type =~ /^(?:char|varchar)/) {
+    if ($type =~ /^(?:char|varchar|binary|varbinary)$/) {
       $size = $row->{'rdb$character_length'};
-    } elsif ($type =~ /^(?:numeric|decimal)/ && defined $row->{'rdb$field_precision'}) {
+    } elsif ($type eq 'decfloat') {
+      $size = $row->{'rdb$field_precision'};
+    } elsif ($type =~ /^(?:numeric|decimal)$/ && defined $row->{'rdb$field_precision'}) {
       # rdb$field_scale is stored as a negative number of fractional digits.
       $size = [$row->{'rdb$field_precision'}, abs($row->{'rdb$field_scale'} // 0)];
     }
@@ -46,7 +52,8 @@ sub fetch {
     my $default;
     if (my $src = $row->{'rdb$default_source'}) {
       $src =~ s/^\s+|\s+$//g;
-      if (my ($def) = $src =~ /^DEFAULT \s+(\S+)/ix) {
+      # the whole expression: a quoted literal may hold spaces
+      if (my ($def) = $src =~ /^DEFAULT \s+(.+)$/isx) {
         $default = $def;
       }
     }
@@ -56,6 +63,8 @@ sub fetch {
       data_type     => $type,
       not_null      => $row->{'rdb$null_flag'} ? 1 : 0,
       default_value => $default,
+      # rdb$identity_type: 0 ALWAYS, 1 BY DEFAULT, NULL not an identity column
+      is_auto_increment => defined $row->{'rdb$identity_type'} ? 1 : 0,
       is_pk         => 0,
       pk_position   => 0,
       size          => $size,
@@ -107,7 +116,7 @@ DBIO::Firebird::Introspect::Columns - Introspect Firebird columns via rdb$fields
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -125,7 +134,7 @@ Given the tables hashref from L<DBIO::Firebird::Introspect::Tables>,
 returns a hashref keyed by table name. Each value is an arrayref of
 column hashrefs in ordinal position order with keys:
 C<column_name>, C<data_type>, C<not_null>, C<default_value>,
-C<is_pk>, C<pk_position>, C<size>.
+C<is_pk>, C<pk_position>, C<size>, C<is_auto_increment>.
 
 =head1 AUTHOR
 

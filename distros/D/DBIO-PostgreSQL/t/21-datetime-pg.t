@@ -20,12 +20,13 @@ plan skip_all => 'Set $ENV{DBIO_TEST_PG_DSN}, _USER and _PASS to run this test'
 # declared columns, then connect the standard DBIO::Test::Schema (no_deploy
 # avoids the full artists/cds/tracks install which would require a PG-aware
 # test schema). Schema cleaned up in END via a dedicated dbh.
-require DBI;
-my $bootstrap = DBI->connect($dsn, $user, $pass, {
-  AutoCommit => 1,
-  RaiseError => 1,
-  PrintError => 0,
-});
+#
+# A server that is not there fails the file, with a plan (karr k113).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+my $bootstrap = LiveServer->control_dbh;
 
 $bootstrap->do('DROP TABLE IF EXISTS event CASCADE');
 $bootstrap->do(q{
@@ -48,7 +49,7 @@ $bootstrap->disconnect;
 
 END {
   return unless $dsn && $user;
-  my $h = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) };
+  my $h = eval { LiveServer->dbh_or_die(attrs => { RaiseError => 0 }) };
   return unless $h;
   eval { $h->do('DROP TABLE IF EXISTS event CASCADE') };
   $h->disconnect;
@@ -57,10 +58,11 @@ END {
 DBIO::Test::Schema->load_classes({ 'DBIO::PostgreSQL::Test' => ['EventTZPg'] });
 
 my $schema = DBIO::Test->init_schema(
-  dsn       => $dsn,
-  user      => $user,
-  pass      => $pass,
-  no_deploy => 1,
+  dsn          => $dsn,
+  user         => $user,
+  pass         => $pass,
+  storage_type => 'DBIO::PostgreSQL::Storage',
+  no_deploy    => 1,
 );
 
 # this may generate warnings under certain CI flags, hence do it outside of

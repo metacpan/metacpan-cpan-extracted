@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Exception;
 use Test::More;
-use Sub::Name;
+use Sub::Util qw( set_subname );
 use Try::Tiny;
 use DBIO::Optional::Dependencies ();
 
@@ -35,8 +35,17 @@ $ENV{NLS_SORT} = "BINARY";
 $ENV{NLS_COMP} = "BINARY";
 $ENV{NLS_LANG} = "AMERICAN";
 
+# DBIO::Test::Schema is shared by the driver suites and declares no driver; a
+# schema always has one (core ADR 0067). Each connect here declares Oracle's
+# storage on a clone, so the shared class stays without one.
+sub oracle_schema {
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('+DBIO::Oracle::Storage');
+  return $schema->connect(@_);
+}
+
 my $v = do {
-  my $si = DBIO::Test::Schema->connect($dsn, $user, $pass)->storage->_server_info;
+  my $si = oracle_schema($dsn, $user, $pass)->storage->_server_info;
   $si->{normalized_dbms_version}
     or die "Unparseable Oracle server version: $si->{dbms_version}\n";
 };
@@ -56,7 +65,7 @@ my $dbh;
 
 my $schema;
 for my $opt (@tryopt) {
-  my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, $opt);
+  my $schema = oracle_schema($dsn, $user, $pass, $opt);
 
   $dbh = $schema->storage->dbh;
   my $q = $schema->storage->sql_maker->quote_char || '';
@@ -86,9 +95,6 @@ SKIP: {
   }
 
   my $q = $schema->storage->sql_maker->quote_char || '';
-  local $TODO = 'Something is confusing column bindtype assignment when quotes are active'
-              . ': https://rt.cpan.org/Ticket/Display.html?id=64206'
-    if $q;
 
   my $id;
   foreach my $size (qw( small large )) {
@@ -110,10 +116,10 @@ SKIP: {
       'multi-part LOB equality query was not cached',
     ) if $size eq 'large';
     is @objs, 1, 'One row found matching on both LOBs';
-    ok (try { $objs[0]->blob }||'' eq "blob:$str", 'blob inserted/retrieved correctly');
-    ok (try { $objs[0]->clob }||'' eq "clob:$str", 'clob inserted/retrieved correctly');
-    ok (try { $objs[0]->clb2 }||'' eq "clb2:$str", "clb2 inserted correctly");
-    ok (try { $objs[0]->blb2 }||'' eq "blb2:$str", "blb2 inserted correctly");
+    is(try { $objs[0]->blob }, "blob:$str", 'blob inserted/retrieved correctly');
+    is(try { $objs[0]->clob }, "clob:$str", 'clob inserted/retrieved correctly');
+    is(try { $objs[0]->clb2 }, "clb2:$str", "clb2 inserted correctly");
+    is(try { $objs[0]->blb2 }, "blb2:$str", "blb2 inserted correctly");
 
     {
       local $TODO = '-like comparison on blobs not tested before ora 10 (fails on 8i)'
@@ -143,10 +149,10 @@ SKIP: {
 
     @objs = $rs->search({ blob => "updated blob", clob => 'updated clob' })->all;
     is @objs, 1, 'found updated row';
-    ok (try { $objs[0]->blob }||'' eq "updated blob", 'blob updated/retrieved correctly');
-    ok (try { $objs[0]->clob }||'' eq "updated clob", 'clob updated/retrieved correctly');
-    ok (try { $objs[0]->clb2 }||'' eq "updated clb2", "clb2 updated correctly");
-    ok (try { $objs[0]->blb2 }||'' eq "updated blb2", "blb2 updated correctly");
+    is(try { $objs[0]->blob }, "updated blob", 'blob updated/retrieved correctly');
+    is(try { $objs[0]->clob }, "updated clob", 'clob updated/retrieved correctly');
+    is(try { $objs[0]->clb2 }, "updated clb2", "clb2 updated correctly");
+    is(try { $objs[0]->blb2 }, "updated blb2", "blb2 updated correctly");
 
     lives_ok {
       $rs->search({ id => $id  })
@@ -155,8 +161,8 @@ SKIP: {
 
     @objs = $rs->search({ blob => 're-updated blob', clob => 're-updated clob' })->all;
     is @objs, 1, 'found updated row';
-    ok (try { $objs[0]->blob }||'' eq 're-updated blob', 'blob updated/retrieved correctly');
-    ok (try { $objs[0]->clob }||'' eq 're-updated clob', 'clob updated/retrieved correctly');
+    is(try { $objs[0]->blob }, 're-updated blob', 'blob updated/retrieved correctly');
+    is(try { $objs[0]->clob }, 're-updated clob', 'clob updated/retrieved correctly');
 
     lives_ok {
       $rs->search({ blob => "re-updated blob", clob => "re-updated clob" })

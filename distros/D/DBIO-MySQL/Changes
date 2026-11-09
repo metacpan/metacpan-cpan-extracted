@@ -1,5 +1,166 @@
 Revision history for DBIO-MySQL
 
+0.900004  2026-11-08
+    * Storage
+        - The SQL dialect follows the connected server, not the DBD driver:
+          upsert row alias, locking-read clause and replica status. A modifier
+          the server lacks is refused locally.
+        - Capabilities declared: supports_exists_query, insert_returning from
+          MariaDB 10.5, transactional_ddl 0, supports_upsert_where 0;
+          INTERSECT and EXCEPT are refused for an older declared server.
+        - The session runs with STRICT_ALL_TABLES unless a strict mode is set,
+          so an overlong value is refused, not cut.
+        - Binary columns bind as SQL_BINARY; under DBD::mysql with
+          mysql_enable_utf8mb4 text binds as characters, also in populate in
+          void context. Pass characters for text and bytes for binary columns.
+        - mysql_auto_reconnect is off from connect on, named per DBD (mysql_*
+          or mariadb_*); an explicit value is kept. load_components('MySQL')
+          works over dbi:MariaDB: and the other way round.
+        - DBD::MariaDB: a forked child's exit leaves the parent's connections
+          alone (DBIO::MySQL::MariaDBForkGuard).
+        - The storage declares the mysql SQL dialect, so a backslash in a
+          literal is an escape for the DDL splitter. A HostBound view over a
+          positional DSN binds its host and port.
+        - deployment_statements asks no server, and a schema always declares
+          its driver.
+        - An error text carries the type, the column, the key or constraint and
+          the number of binds, never a bound value: the server's own quotes
+          of a value (Duplicate entry, Incorrect ... value, the excerpt after
+          "near") are masked as well as the values themselves, short ones
+          included. Both DBDs, client and server side prepare, and the
+          future_io transport.
+
+    * SQL
+        - $rs->upsert renders INSERT ... ON DUPLICATE KEY UPDATE. A demanded
+          conflict target on a table with further unique keys throws unless
+          conflict_target => 'any'.
+        - order_by with -nulls => 'first' or 'last' is emulated by a leading
+          IS NULL sort, in the PostgreSQL row order.
+
+    * Types
+        - uniqueidentifier is VARCHAR(36), clob is LONGTEXT and money is
+          DECIMAL(19,4); an enum or set column writes its members from extra
+          => { list => [...] } and a bit column keeps its size.
+        - The decimal, character, varchar, varbinary and binary aliases take
+          an explicit size, a precision-only numeric renders DECIMAL(p), and a
+          column without is_nullable deploys as NOT NULL.
+
+    * DDL
+        - Every identifier is written in backticks, so reserved words and
+          names like my-col install and upgrade.
+        - mysql_index renders FULLTEXT and SPATIAL as index classes and BTREE
+          and HASH as USING; invalid values are refused. install_ddl also
+          reads idx and indices.
+        - Tables are written in foreign key order, cycles close with ALTER
+          TABLE ... ADD FOREIGN KEY, and the key of an AUTO_INCREMENT column
+          outside the primary key stands in the CREATE TABLE.
+        - Foreign keys carry ON UPDATE and ON DELETE from the belongs_to
+          attributes; SET DEFAULT and unknown words throw. A relationship to a
+          view writes no foreign key.
+        - A foreign key has the fixed name <table>_<columns>_fk, the same in
+          install and upgrade; duplicates become one constraint and clashing
+          names get a hash suffix.
+        - Views are written after the views they read; a cycle is refused,
+          naming the views.
+        - DEFAULT values come from one helper (DBIO::MySQL::DefaultValue):
+          literals are escaped, expressions from the catalog are not quoted. A
+          refused column declaration reaches the caller.
+        - A table named database.table is made in that database; the driver
+          creates no database. A view or foreign key with a dot is refused.
+
+    * Deploy
+        - DBIO::MySQL::Deploy takes apply and upgrade from DBIO::Deploy::Base:
+          a missing database and rows a new NOT NULL column cannot fill are
+          refused before the first statement; dry_run asks the server nothing.
+        - A column change that can alter stored values (narrower type, signed
+          to unsigned, another character set, enum or set losing a member)
+          needs allow_destructive; lossless type pairs and wider sizes do not.
+        - add_drop_table drops the declared views before the tables, sync and
+          async, so a second deploy over a filled schema runs.
+
+    * Introspect
+        - is_pk is read from the index PRIMARY; defaults are literals or
+          expressions (default_is_expression), and ON UPDATE CURRENT_TIMESTAMP
+          is read as on_update.
+        - A nullable column without a default has none on MariaDB too, and an
+          explicit NO ACTION foreign key of a MariaDB reads as RESTRICT.
+
+    * Diff
+        - An upgrade gives an existing table the primary key the target names,
+          drops the key of a target without one, and handles the foreign keys
+          and AUTO_INCREMENT columns around the change.
+        - Unique indexes are diffed like every other index; an index is
+          dropped before the column changes and created after them, and an
+          index a foreign key needs is replaced before its drop.
+        - Foreign keys stand around everything else: dropped first, added
+          last. The last foreign key of a table is dropped when it leaves the
+          schema.
+        - The foreign key of a new table follows an index the same upgrade
+          creates over its columns, and ADD COLUMN follows the declaration
+          order of the schema (contributed by Olaf Alders).
+        - An upgrade from an empty database creates tables in foreign key
+          order. Tables of other databases (database.table) are created,
+          compared and altered there.
+        - Views are diffed as views (DBIO::MySQL::Diff::View); views that read
+          each other are dropped and created in dependency order, and a
+          changed definition counts as changing, not destructive.
+        - A table whose collation differs is converted with CONVERT TO where
+          the data provably survives; a narrowing, a TEXT, ENUM or SET column
+          of a widening and a foreign key over text are refused.
+        - CREATE TABLE names the collation install_ddl writes, a column off
+          its table's character set or collation is written explicitly, and ON
+          UPDATE CURRENT_TIMESTAMP is compared and written.
+        - DECIMAL(p) compares as decimal(p,0), and the default of a column the
+          schema leaves without one is removed, so an upgraded schema diffs
+          empty.
+        - A FULLTEXT or SPATIAL index added through a diff is rendered as such
+          (DBIO::MySQL::IndexType); the POD names the MariaDB FULLTEXT rebuild
+          behaviour.
+
+    * Async
+        - The future_io transport fills the deploy seam with the generator of
+          the sync pipeline, so deploy_async writes the same DDL;
+          add_drop_table quotes tables with backticks.
+        - LISTEN/NOTIFY is emulated over a notify table (ADR 0008): listen,
+          unlisten and notify work on { async => 'future_io' };
+          deploy_notify_table creates the table.
+        - Pool connections are fork-safe and do not auto-reconnect unless the
+          connect attributes say so.
+        - The DBD binding (mysql_* or mariadb_*) is chosen per connection, so
+          every component and DSN combination connects; a DSN without a driver
+          part is refused.
+        - connect($broker, { ... }) takes DBD attributes and pool_size beside
+          an AccessBroker, and attributes in the fifth element or the
+          single-hash form reach every pool and listen connection.
+        - A dead or idle-expired pool connection is retired before it is
+          handed out, and _collect_result reads the further result sets of a
+          CALL.
+        - insert_async resolves with the id of its own statement, also when
+          inserts overlap.
+        - The connections get the session setup of the sync storage: strict
+          sql_mode, SQL_BINARY binds, text as characters.
+
+    * Security
+        - Connect errors of the future_io transport read *** for the password.
+
+    * Tests
+        - DBIO::MySQL::Test::Conformance answers the shared DDL, Diff and Bind
+          case tables of core against MySQL and MariaDB, each case in a
+          database of its own.
+        - A fresh maint/docker stack runs the whole live suite as dbio with no
+          manual step (contributed by Olaf Alders); the MySQL test image is
+          pinned to 8.0.30.
+        - Live tests skip, naming the missing GRANT, when the account cannot
+          create a diff's temporary database, and a DBD that is not installed
+          is skipped (contributed by Olaf Alders).
+
+    * Documentation
+        - POD, README and ADRs describe the code as it behaves, and the README
+          states Perl 5.20 as the requirement.
+
+    * Dependencies
+        - Requires DBIO 0.900004.
+
 0.900001  2026-07-12
     * Storage
         - Add DBIO::MySQL::Storage::Async and DBIO::MySQL::Storage::MariaDB::Async,

@@ -4,9 +4,12 @@ package DBIO::Deploy::Base::TempDatabase;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Deploy::Base';
 
 use DBI;
+use DBIO::Util ();
 
 
 sub _create_temp_db { die ref(shift) . '::_create_temp_db not implemented' }
@@ -20,17 +23,71 @@ sub temp_db_prefix { $_[0]->{temp_db_prefix} // '_dbio_tmp_' }
 
 sub _build_target_model {
   my ($self) = @_;
-  my $dbh = $self->_dbh;
 
-  my $temp_db = $self->_create_temp_db($dbh);
+  # The connect info is read once before any temp database exists: one the
+  # temp connection cannot be derived from stops the build here.
+  $self->_temp_connect_info('probe');
+
+  my $dbh = $self->_admin_dbh;
+
+  my $temp_db = eval { $self->_create_temp_db($dbh) };
+  my $create_err = $@;
+  unless (defined $temp_db) {
+    $self->_release_admin_dbh;
+    die $create_err;
+  }
 
   my $model = eval { $self->_deploy_and_introspect_temp($temp_db) };
   my $err   = $@;
 
-  eval { $self->_drop_temp_db($dbh, $temp_db) };
+  # Warned about and not raised (karr k316): the model is there, or $err is
+  # what the caller has to hear. With a plain warn, as DBIO::Deploy::Base
+  # does it -- no DBIO::Carp in a deploy class.
+  eval { $self->_drop_temp_db($dbh, $temp_db); 1 } or do {
+    my $drop_err = "$@";
+    # a DBD may repeat the DSN or the password in its error: never the
+    # password (karr k297). _temp_connect_info dies of a coderef DSN, and the
+    # warning is not to fail of what it is masked with.
+    my $info = eval { [ $self->_temp_connect_info($temp_db) ] };
+    ($drop_err = DBIO::Util::mask_connect_secrets($drop_err, $info)) =~ s/\s+\z//;
+    warn ref($self) . ": temporary database '$temp_db' could not be dropped and "
+       . "is still on the server -- drop it by hand: $drop_err\n";
+  };
+
+  $self->_release_admin_dbh;
 
   die $err if $err;
   return $model;
+}
+
+
+sub _admin_dbh {
+  my ($self) = @_;
+  my $storage = $self->schema->storage;
+  my $live = $self->_dbh;
+  return $live
+    unless ($storage->can('transaction_depth') && $storage->transaction_depth)
+        || !$live->{AutoCommit};
+
+  my ($dsn, $user, $pass) = @{ $storage->_dbi_connect_info };
+  my $dbh = eval {
+    DBI->connect($dsn, $user, $pass, {
+      RaiseError => 1, PrintError => 0, AutoCommit => 1,
+    })
+  } or die DBIO::Util::mask_connect_secrets(
+    $@ || "Cannot connect to the database: $DBI::errstr", [ $dsn, $user, $pass ],
+  );
+  $self->{_admin_dbh} = $dbh;
+  return $dbh;
+}
+
+# Closes the connection _admin_dbh opened, if it opened one. A failing
+# disconnect changes nothing about the outcome of the build.
+sub _release_admin_dbh {
+  my ($self) = @_;
+  my $own = delete $self->{_admin_dbh} or return;
+  eval { $own->disconnect; 1 };
+  return;
 }
 
 
@@ -38,9 +95,14 @@ sub _deploy_and_introspect_temp {
   my ($self, $temp_db) = @_;
 
   my ($dsn, $user, $pass) = $self->_temp_connect_info($temp_db);
-  my $temp_dbh = DBI->connect($dsn, $user, $pass, {
-    RaiseError => 1, PrintError => 0, AutoCommit => 1,
-  }) or die "Cannot connect to temp database: $DBI::errstr";
+  # DBI dies quoting the DSN it was given: never the password (karr k297)
+  my $temp_dbh = eval {
+    DBI->connect($dsn, $user, $pass, {
+      RaiseError => 1, PrintError => 0, AutoCommit => 1,
+    })
+  } or die DBIO::Util::mask_connect_secrets(
+    $@ || "Cannot connect to temp database: $DBI::errstr", [ $dsn, $user, $pass ],
+  );
 
   my $err;
   eval { $self->_execute_ddl($temp_dbh, $self->_install_ddl); 1 } or $err = $@;
@@ -51,7 +113,9 @@ sub _deploy_and_introspect_temp {
     $err = $@ unless $model;
   }
 
-  $temp_dbh->disconnect;
+  # a disconnect that fails is raised only when nothing else was: it does not
+  # replace the error of the deploy (karr k316)
+  eval { $temp_dbh->disconnect; 1 } or $err ||= $@;
 
   die $err if $err;
   return $model;
@@ -60,22 +124,14 @@ sub _deploy_and_introspect_temp {
 
 sub _temp_connect_info {
   my ($self, $temp_db) = @_;
-  my $storage = $self->schema->storage;
-  my @info    = @{ $storage->connect_info };
-
-  my ($dsn, $user, $pass);
-  if (ref $info[0] eq 'HASH') {
-    my $h = $info[0];
-    $dsn  = $h->{dsn};
-    $user = $h->{user};
-    $pass = $h->{password} // $h->{pass};
-  }
-  else {
-    ($dsn, $user, $pass) = @info;
-  }
+  my ($dsn, $user, $pass) = @{ $self->schema->storage->_dbi_connect_info };
 
   if (ref $dsn eq 'CODE') {
     die ref($self) . ' does not support coderef DSN for temp database connections';
+  }
+  if (!defined $dsn || ref $dsn || $dsn eq '') {
+    die ref($self) . ' cannot derive a temp database connection: '
+      . 'the storage has no DSN (a plain, non-empty string) to derive it from';
   }
 
   return ($self->_temp_dsn($dsn, $temp_db), $user, $pass);
@@ -109,7 +165,7 @@ DBIO::Deploy::Base::TempDatabase - Deploy base for drivers that diff against a t
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -124,8 +180,9 @@ It provides the shared temp-database orchestration:
 =over 4
 
 =item * L</_build_target_model> -- create a temp db, deploy + introspect into
-it, then B<always> drop it (even if the deploy or introspection dies), and
-re-raise any error afterwards.
+it, then B<always> try to drop it (even if the deploy or introspection dies),
+and re-raise any error of the deploy afterwards. A drop that fails is warned
+about, naming the database that is still on the server.
 
 =item * L</_deploy_and_introspect_temp> -- connect to the temp db, run the
 install DDL, introspect, disconnect.
@@ -150,11 +207,20 @@ Create a uniquely-named temporary database and return its name. Abstract --
 the C<CREATE DATABASE> statement and quoting/transaction handling are
 engine-specific.
 
+The C<$dbh> it is handed has C<AutoCommit> on and holds no transaction of the
+caller's. The method ends no transaction itself -- no C<COMMIT>, no
+C<< local $dbh->{AutoCommit} = 1 >>, which commits the open one inside L<DBI>
+-- and leaves the handle's C<AutoCommit> as it found it.
+
 =head2 _drop_temp_db
 
     $self->_drop_temp_db($dbh, $name);
 
 Drop the temporary database named C<$name>. Abstract.
+
+The C<$dbh> is the one L</_create_temp_db> was handed: C<AutoCommit> on, no
+transaction of the caller's. The method ends no transaction itself and leaves
+the handle's C<AutoCommit> as it found it.
 
 =head2 temp_db_prefix
 
@@ -164,11 +230,31 @@ C<< prefix . $$ . '_' . time() >>.
 
 =head2 _build_target_model
 
-Creates a temp database, deploys + introspects the desired schema into it via
+Reads the temp connection info once (L</_temp_connect_info>) before anything
+is created: a storage it cannot be derived from dies here, with no temp
+database made. Then creates a temp database, deploys + introspects the desired schema into it via
 L</_deploy_and_introspect_temp>, and drops the temp database. The drop runs
-B<unconditionally> (wrapped in its own C<eval>) so a failed deploy or
-introspection never leaks a temp database; the original error is then
-re-raised.
+B<unconditionally> (wrapped in its own C<eval>), so a failed deploy or
+introspection does not by itself leak a temp database; the original error is
+then re-raised.
+
+A drop that fails does not change the outcome: the model is returned, or the
+error of the deploy re-raised, as if it had worked. But the database is then
+still on the server, so the failure is warned about, by the name of the
+database and with the error of the drop -- passwords in it shown as C<***> --
+for it to be dropped by hand. Every database left behind gets its own
+warning.
+
+=head2 _admin_dbh
+
+The handle C<CREATE DATABASE> and C<DROP DATABASE> run on, handed to
+L</_create_temp_db> and L</_drop_temp_db>. It has C<AutoCommit> on, and a
+driver ends no transaction on it, so the transaction of the caller stays as it
+is. Whenever the storage holds a transaction, or the live handle has
+C<AutoCommit> off -- also one the storage does not know of, from C<begin_work>
+on the raw handle or C<< AutoCommit => 0 >> in the connect info -- the
+statements run on a connection of their own to the live database, C<AutoCommit>
+on, closed again when the build is done. Otherwise the live handle is used.
 
 =head2 _deploy_and_introspect_temp
 
@@ -176,17 +262,23 @@ re-raised.
 
 Connects to C<$temp_db> (via L</_temp_connect_info>), runs the install DDL,
 introspects the result, disconnects, and returns the model. Errors during
-deploy or introspection are re-raised I<after> the connection is closed.
+deploy or introspection are re-raised I<after> the connection is closed, and
+are what is raised when closing it fails as well; an error of the disconnect
+is raised when it is the only one. A connection that cannot be opened dies
+with L<DBI>'s error, the password in it shown as C<***>.
 
 =head2 _temp_connect_info
 
     my ($dsn, $user, $pass) = $self->_temp_connect_info($temp_db);
 
 Derives connection info for the temp database from the live storage's
-C<connect_info>, rewriting the C<dbname=> / C<database=> component of the DSN
-to C<$temp_db> (appending it when absent). Handles both the array
-(C<$dsn, $user, $pass>) and single-hashref (C<< { dsn, user, password } >>)
-connect-info shapes. Dies on a coderef DSN.
+normalised C<_dbi_connect_info> (C<[ $dsn, $user, $password, \%attrs ]>),
+rewriting the C<dbname=> / C<database=> component of the DSN to C<$temp_db>
+(appending it when absent). The storage is read as it is at the moment of the
+call, with or without an AccessBroker (then the broker's current answer), and
+nothing of it is kept. The DSN has to be a plain, non-empty string: a coderef
+DSN (also a broker answer that is a C<dbh_maker>), a missing, an empty or a
+non-scalar DSN dies.
 
 =head2 _temp_dsn
 

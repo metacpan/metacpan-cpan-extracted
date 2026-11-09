@@ -1,6 +1,6 @@
 ---
 name: dbio-firebird-database
-description: "Firebird/InterBase knowledge for Perl driver development (DBD module, SQL dialect, types, generators, transactions, pagination)"
+description: Use when you need Firebird or InterBase specifics for driver work — DBD module, dialect, types, generators, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -18,9 +18,12 @@ DBI->connect("dbi:Firebird:db=/path/to/db.fdb;host=localhost;ib_dialect=3", $use
 The driver forces SQL **dialect 3** by appending `ib_dialect=3` to the DSN
 (`_set_sql_dialect`); `DBD::InterBase` otherwise defaults to dialect 1.
 
-Critical flags: `ib_softcommit => 1` (via `on_connect_call => 'use_softcommit'`)
-or `disable_sth_caching => 1` — without one of these you get `no statement
-executing` errors. `ib_time_all => 'ISO'` (via `datetime_setup`) for date/time.
+Flags: `ib_softcommit => 1` (via `on_connect_call => 'use_softcommit'`) keeps a
+cursor open across the commits of other statements; without it the first such
+commit closes it. Statements the DBD destroys after DDL or a rollback are
+replaced by the storage itself (ADR 0011), so `disable_sth_caching` is not
+needed for that. `ib_time_all => 'ISO'` is the default of every native
+connection; `datetime_setup` stays and is harmless.
 
 ## Dialect / Version
 
@@ -42,7 +45,8 @@ Firebird types (driver mapping in `DBIO::Firebird::Type`):
 | Large | BLOB (binary), BLOB SUB_TYPE TEXT (text/CLOB) |
 | Date | DATE (date only), TIME, TIMESTAMP (to 4 decimal places of seconds) |
 
-No native BOOLEAN before FB3; driver deploys `boolean` as `SMALLINT`. No native
+Native BOOLEAN from FB3 (the driver's minimum); `boolean` is a `BOOLEAN` column
+(karr k36). No native
 `TEXT`/`SERIAL` — mapped to `BLOB SUB_TYPE TEXT` / `BIGINT`. DDL emits
 `VARCHAR(255)` for bare `varchar`, `DECIMAL(18,6)` for bare numeric.
 
@@ -112,4 +116,4 @@ FK columns grouped by constraint name during introspection.
 
 `DBIO_TEST_FIREBIRD_DSN`, `DBIO_TEST_FIREBIRD_USER`, `DBIO_TEST_FIREBIRD_PASS`.
 Variants: `DBIO_TEST_FIREBIRD_INTERBASE_DSN` (DBD::InterBase),
-`DBIO_TEST_FIREBIRD_ODBC_DSN` (ODBC driver). Docker: `firebirdsql/firebird`.
+`DBIO_TEST_FIREBIRD_ODBC_DSN` (ODBC driver). Server and run rules: CLAUDE.md "Tests" and the house rules ("Live testing"); a server of your own carries a cpu and memory cap.

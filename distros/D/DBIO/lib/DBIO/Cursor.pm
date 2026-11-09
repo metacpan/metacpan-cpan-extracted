@@ -4,6 +4,8 @@ package DBIO::Cursor;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Base/;
 
 
@@ -34,6 +36,21 @@ sub all {
 }
 
 
+sub is_exhausted {
+  die "Virtual method!";
+}
+
+
+sub position {
+  die "Virtual method!";
+}
+
+
+sub mark_exhausted {
+  die "Virtual method!";
+}
+
+
 1;
 
 __END__
@@ -48,7 +65,7 @@ DBIO::Cursor - Abstract object representing a query cursor on a resultset.
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -91,7 +108,27 @@ Virtual method. Resets the cursor to the beginning.
 
 =head2 all
 
-Virtual method. Returns all rows in the L<DBIO::ResultSet>.
+Returns all rows in the L<DBIO::ResultSet>. Unlike the other methods here,
+C<all> has a working default implementation built on L</reset> and L</next>;
+subclasses may override it with a more efficient version.
+
+=head2 is_exhausted
+
+Virtual method. Returns true once the cursor has been fully consumed via
+L</next> (or explicitly retired via L</mark_exhausted>) without an
+intervening L</reset>; false otherwise.
+
+=head2 position
+
+Virtual method. Returns the number of rows handed out via L</next> since
+the cursor was created or last L</reset>; C<0> if none have been fetched.
+
+=head2 mark_exhausted
+
+Virtual method. Flags the cursor as fully consumed I<without> resetting it,
+so a subsequent L</next> yields nothing until the cursor is L</reset>. Used
+by the collapse fast-path in L<DBIO::ResultSet> to retire a cursor after
+draining it via a stealth L</all>.
 
 =head1 AUTHOR
 

@@ -1,25 +1,13 @@
 package DBIO::MySQL::Storage::MariaDB::Async;
-# ABSTRACT: future_io async adapter for MariaDB-DSN connections (DBD::MariaDB binding)
+# ABSTRACT: future_io async adapter resolved for the MariaDB storage class
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::MySQL::Storage::Async';
 
-
-
-sub _async_prepare_attrs { { mariadb_async => 1 } }
-
-
-sub _conn_socket_fd { $_[1]->mariadb_sockfd }
-
-
-sub _async_ready { $_[1]->mariadb_async_ready }
-
-
-sub _async_result { $_[1]->mariadb_async_result }
-
-
-sub _async_insertid { $_[1]->{mariadb_insertid} }
 
 1;
 
@@ -31,50 +19,37 @@ __END__
 
 =head1 NAME
 
-DBIO::MySQL::Storage::MariaDB::Async - future_io async adapter for MariaDB-DSN connections (DBD::MariaDB binding)
+DBIO::MySQL::Storage::MariaDB::Async - future_io async adapter resolved for the MariaDB storage class
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
-The C<future_io> transport adapter resolved by convention for a C<dbi:MariaDB:>
-connection. DBIO reblesses such a connection into L<DBIO::MySQL::Storage::MariaDB>
-(the MariaDB driver storage subclass), so the core future_io resolver derives
+The C<future_io> transport adapter resolved by convention for
+L<DBIO::MySQL::Storage::MariaDB>: the core future_io resolver derives
 C<ref($storage) . '::Async'> == C<DBIO::MySQL::Storage::MariaDB::Async> (ADR 0030
-refinement, karr #65).
+refinement). A connection lands in that storage class through a
+C<dbi:MariaDB:> DSN, or through C<load_components('MySQL::MariaDB')> with any
+DSN.
 
-It reuses all the shared transport control flow from
-L<DBIO::MySQL::Storage::Async> and overrides B<only> the five DBD-specific async
-primitives, swapping DBD::mysql's binding for L<DBD::MariaDB>'s C<mariadb_*> one.
-This exactly mirrors the sync split, where L<DBIO::MySQL::Storage::MariaDB>
-overrides L<DBIO::MySQL::Storage> to read C<mariadb_insertid>: a C<dbi:MariaDB:>
-future_io connection drives DBD::MariaDB's C<mariadb_async> binding, while a
-C<dbi:mysql:> one drives DBD::mysql's C<async> binding, so whichever DBD the user
-named in the DSN is the one used for async.
+It is L<DBIO::MySQL::Storage::Async> under the name the convention asks for,
+and adds nothing: the transport, the emulated LISTEN/NOTIFY
+(L<DBIO::MySQL::Storage::Async/"LISTEN / NOTIFY (emulated)">) and its
+C<listen> / C<notify> capabilities are all inherited.
 
-=head1 METHODS
-
-=head2 _async_prepare_attrs
-
-DBD::MariaDB arms an async query with C<< { mariadb_async => 1 } >>.
-
-=head2 _conn_socket_fd
-
-DBD::MariaDB exposes the connection socket fd as C<< $dbh->mariadb_sockfd >>.
-
-=head2 _async_ready
-
-DBD::MariaDB C<< $sth->mariadb_async_ready >>.
-
-=head2 _async_result
-
-DBD::MariaDB C<< $sth->mariadb_async_result >>.
-
-=head2 _async_insertid
-
-DBD::MariaDB per-statement C<< $sth->{mariadb_insertid} >>.
+This class does B<not> select the L<DBD::MariaDB> binding, although it used to
+(this dist's ADR 0007). Which DBD's async binding a connection is driven
+through -- C<mariadb_async>, C<mariadb_sockfd>, C<mariadb_async_ready>,
+C<mariadb_async_result>, C<mariadb_insertid>, C<mariadb_auto_reconnect>, or
+L<DBD::mysql>'s C<mysql_*> counterparts -- is decided per connection, by the
+DBD its DSN names (L<DBIO::MySQL::Storage::Async/One dist, two DBD drivers>).
+A choice made by class missed C<load_components('MySQL')> over a
+C<dbi:MariaDB:> DSN, which never reaches this class, and was wrong here for
+C<load_components('MySQL::MariaDB')> over a C<dbi:mysql:> DSN (ADR
+0007 addendum 2026-10-04). An override of one of the DBD-specific primitives
+in this class would bring that mistake back.
 
 =head1 AUTHOR
 

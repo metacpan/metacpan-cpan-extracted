@@ -5,7 +5,7 @@ use warnings;
 
 use Validator::LIVR::Rules::Types;
 
-our $VERSION = '2.21';
+our $VERSION = '2.22';
 
 # LIVR 2.5: formats and checksums. They check the string form of a string or a number and
 # output it. A boolean gets the error code of the rule (true is not a hostname, "true" is), a

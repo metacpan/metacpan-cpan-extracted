@@ -1,4 +1,12 @@
 Revision history for Finance-Tiller2QIF
+1.23      2026-11-08
+ - Fix OS gating for CPANTS, with with the root fix in 1.22 all OS except
+   Cygwin pass, block install on Cygwin only.
+ - Win32::ShellQuote is now required on Windows only, so it no longer has to be installed from CPAN on Linux, macOS and BSD.
+1.22      2026-11-08
+ - Resolve CPAN Testers failures.
+  - Limit supported platforms to Strawberry Perl on Windows, macOS, Linux and
+    BSD; Attempt to use Makefile to force NA on unsupported OS in CPANTS.
 1.21      2026-11-03
   -  Fix tests failing on Windows, issue #7
 1.20      2026-11-02

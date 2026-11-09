@@ -59,7 +59,7 @@ my @page2 = $rs->search(
     { order_by => 'title',
       rows => 3,
       page => 2 }
-);
+)->all;
 
 is( $page2[0]->title, "Generic Manufactured Singles", "second page first title ok" );
 
@@ -196,7 +196,7 @@ $it = $rs->search(
 $pager = $it->pager;
 is ($qcnt, 0, 'No queries on rs/pager creation');
 
-$it = do { local $DBIO::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
+$it = do { local $DBIO::ResultSource::thaw_schema = $schema; dclone ($it) };
 is ($qcnt, 0, 'No queries on rs/pager freeze/thaw');
 
 is( $it->pager->entries_on_this_page, 1, "entries_on_this_page ok for page 2" );
@@ -206,7 +206,7 @@ is ($qcnt, 1, 'Count fired to get pager page entries');
 $rs->create({ title => 'bah', artist => 1, year => 2011 });
 
 $qcnt = 0;
-$it = do { local $DBIO::ResultSourceHandle::thaw_schema = $schema; dclone ($it) };
+$it = do { local $DBIO::ResultSource::thaw_schema = $schema; dclone ($it) };
 is ($qcnt, 0, 'No queries on rs/pager freeze/thaw');
 
 is( $it->pager->entries_on_this_page, 1, "entries_on_this_page ok for page 2, even though underlying count changed" );

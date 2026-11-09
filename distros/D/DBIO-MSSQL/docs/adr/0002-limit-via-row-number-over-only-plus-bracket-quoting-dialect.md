@@ -23,18 +23,18 @@ and SQL::Translator naming from the core default.
 ## Decision
 
 1. **Always `ROW_NUMBER() OVER`, never Top.** `DBIO::MSSQL::SQLMaker`
-   implements `apply_limit` (`SQLMaker.pm:32-35`) to unconditionally call
+   implements `apply_limit` (`SQLMaker::apply_limit`) to unconditionally call
    `_RowNumberOver`. The historical `Top` dialect is deliberately **not**
    implemented in this driver.
 2. **Override the empty `OVER()` order.** `_rno_default_order`
-   (`SQLMaker.pm:40-42`) returns `\ '(SELECT(1))'`, because MSSQL rejects an
+   returns `\ '(SELECT(1))'`, because MSSQL rejects an
    empty `OVER()` clause — the core base leaves the default order undef
    (empty `OVER()`), which is invalid here.
 3. **Bracket quoting (asymmetric).** `DBIO::MSSQL::Storage` sets
-   `sql_quote_char([qw/[ ]/])` (`Storage.pm:27`) so identifiers quote as
+   `sql_quote_char([qw/[ ]/])` (`Storage` class data) so identifiers quote as
    `[name]` rather than the core `"name"`.
 4. **SQL::Translator name.** `sqlt_type` returns `'SQLServer'`
-   (`Storage.pm:224`).
+   (`Storage::sqlt_type`).
 
 ## Rationale
 
@@ -42,7 +42,7 @@ No DBIO driver emits `Top`: the `_Top` rewrite lives only in core for
 backward compatibility, and MSSQL's `apply_limit` has a single
 `_RowNumberOver` code path. Carrying a server-version branch to a dialect the
 driver never selects is dead weight. This was confirmed in the pre-squash
-test sweep (karr `dbio-mssql` #7): the stale `t/sqlmaker/limit_dialects/`
+test sweep (karr `dbio-mssql` k7): the stale `t/sqlmaker/limit_dialects/`
 tests that exercised the removed `limit_dialect` API were ported —
 `rno.t` regenerated against the real `(SELECT(1))` default-order output, and
 `toplimit.t` **deleted as obsolete** because no MSSQL path emits `Top`.

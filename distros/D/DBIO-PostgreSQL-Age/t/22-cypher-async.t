@@ -69,12 +69,12 @@ use DBIO::PostgreSQL::Age::Storage ();
     'cypher_async hands the transport the RAW sync _cypher_sql_bind SQL (no shaping in the layer)';
   is_deeply $a->{cap}[0]{bind}, $sync_bind,
     'cypher_async bind == sync _cypher_sql_bind bind (JSON-encoded params)';
-  like $a->{cap}[0]{sql}, qr/\$\$, \?\) AS \(name agtype\)/,
+  like $a->{cap}[0]{sql}, qr/\$dbio_age\$, \?\) AS \(name agtype\)/,
     'param slot is a raw "?" placeholder ($N shaping is the transport concern); column declared agtype';
 
   # '?'-seam body-survival: the Cypher body ($$...$$) and the $name reference are
   # NOT SQL placeholders and must reach the transport intact.
-  like $a->{cap}[0]{sql}, qr/\$\$\nMATCH \(n \{name: \$name\}\) RETURN n\.name\n\$\$/,
+  like $a->{cap}[0]{sql}, qr/\$dbio_age\$\nMATCH \(n \{name: \$name\}\) RETURN n\.name\n\$dbio_age\$/,
     q{the '$$...$$' cypher body and the '$name' reference survive untouched into the transport};
 }
 

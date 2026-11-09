@@ -4,6 +4,8 @@ package DBIO::Test::SyntaxErrorComponent3;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 I'm a syntax error!
 
 __END__
@@ -18,7 +20,7 @@ DBIO::Test::SyntaxErrorComponent3 - Test component with intentional syntax error
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

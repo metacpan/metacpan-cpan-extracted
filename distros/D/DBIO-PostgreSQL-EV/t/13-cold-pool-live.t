@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# LIVE regression for karr #9: the very FIRST facade call on a COLD pool must
+# LIVE regression for karr k9: the very FIRST facade call on a COLD pool must
 # succeed.
 #
 # WHY this is a live test: EV::Pg->new returns before its async connect has
@@ -28,27 +28,13 @@ use EV;
 use EV::Pg;
 use DBIO::PostgreSQL::EV::Storage;
 
-# Parse DSN into a libpq conninfo hash (mirrors t/12-positional-placeholders-live.t).
-my $dsn  = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
-
-my %ci;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  for my $kv (split /;/, $1) {
-    my ($k, $v) = split /=/, $kv, 2;
-    next unless defined $k && length $k;
-    $k = 'dbname' if $k eq 'database';   # normalize for libpq
-    $ci{$k} = $v;
-  }
-} else {
-  for my $kv (split /\s+/, $dsn) {
-    my ($k, $v) = split /=/, $kv, 2;
-    $ci{$k} = $v if defined $k && length $k;
-  }
-}
-$ci{user}     = $user if length $user;
-$ci{password} = $pass if length $pass;
+# The test login as the libpq parameters the transport reads it as; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+my %ci = LiveServer->conninfo;
 
 # Drive a Future to completion on the EV loop, then return its result.
 sub await {
@@ -90,7 +76,7 @@ lives_ok {
 my $ins;
 lives_ok {
   $ins = await($storage->insert_async($table, { name => 'cold' }));
-} 'karr #9: first facade insert on a COLD pool succeeded (no pre-warm)';
+} 'karr k9: first facade insert on a COLD pool succeeded (no pre-warm)';
 ok $ins && ref $ins eq 'HASH',
   'cold insert resolved with the returned-columns HASHREF (ADR 0031 §3)';
 is $ins->{name}, 'cold', 'cold insert hashref carries the supplied data';
@@ -103,13 +89,13 @@ is $rows[0][1], 'cold', 'cold-pool select returned the right value';
 #     acquire_txn just calls acquire), so a transaction on a fresh pool must
 #     benefit from the same readiness gating. ---
 #
-# We assert the karr #9-relevant property directly: on a COLD pool the FIRST
+# We assert the karr k9-relevant property directly: on a COLD pool the FIRST
 # acquire_txn resolves to an ALREADY-CONNECTED handle, and BEGIN dispatched on
 # it succeeds (pre-fix this threw "not connected", exactly as the CRUD path
 # did). We deliberately do NOT exercise the full txn_do_async BEGIN/COMMIT chain
 # here: that path has a separate, pre-existing "lost a sequence Future" hang
 # (Storage::_query_async_pinned, present before this fix and tracked in its own
-# karr ticket) which is out of scope for #9's connection-readiness concern.
+# karr ticket) which is out of scope for k9's connection-readiness concern.
 
 my $txn_storage = DBIO::PostgreSQL::EV::Storage->new(undef);
 $txn_storage->connect_info([ \%ci, {} ]);
@@ -117,7 +103,7 @@ $txn_storage->connect_info([ \%ci, {} ]);
 my $txn_pg;
 lives_ok {
   $txn_pg = await($txn_storage->pool->acquire_txn);
-} 'karr #9: first acquire_txn on a COLD pool resolved without "not connected"';
+} 'karr k9: first acquire_txn on a COLD pool resolved without "not connected"';
 ok $txn_pg->is_connected, 'cold-pool acquire_txn handed back a CONNECTED handle';
 
 # BEGIN on the cold-acquired handle must succeed — this is the first thing

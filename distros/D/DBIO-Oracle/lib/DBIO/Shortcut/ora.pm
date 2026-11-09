@@ -4,6 +4,8 @@ package DBIO::Shortcut::ora;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 sub apply { DBIO->apply_driver($_[1], 'Oracle') }
 
 1;
@@ -20,7 +22,7 @@ DBIO::Shortcut::ora - `use DBIO -ora` shortcut for the Oracle driver
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

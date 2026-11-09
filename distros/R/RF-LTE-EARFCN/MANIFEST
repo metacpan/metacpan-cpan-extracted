@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README.md
+lib/RF/LTE/EARFCN.pm
+t/001_load.t
+t/002_table.t
+t/003_tests.t
+t/004_exceptions.t
+perl-RF-LTE-EARFCN.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

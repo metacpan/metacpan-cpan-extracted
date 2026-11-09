@@ -4,15 +4,19 @@ package DBIO::DuckDB::Introspect;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Introspect::Base';
 
 use DBIO::DuckDB::Introspect::Tables;
 use DBIO::DuckDB::Introspect::Columns;
 use DBIO::DuckDB::Introspect::Indexes;
 use DBIO::DuckDB::Introspect::ForeignKeys;
+use DBIO::DuckDB::Introspect::Uniques;
 
 
 sub schema  { $_[0]->{schema}  // 'main' }
+sub schemas { $_[0]->{schemas} || [] }
 sub catalog { $_[0]->{catalog} }
 
 
@@ -27,13 +31,35 @@ sub _build_model {
   my $columns = DBIO::DuckDB::Introspect::Columns->fetch($dbh, $schema, $tables, $catalog);
   my $indexes = DBIO::DuckDB::Introspect::Indexes->fetch($dbh, $schema, $tables, $catalog);
   my $fks     = DBIO::DuckDB::Introspect::ForeignKeys->fetch($dbh, $schema, $tables, $catalog);
+  my $uniques = DBIO::DuckDB::Introspect::Uniques->fetch($dbh, $schema, $tables, $catalog);
 
-  return {
+  my %model = (
     tables       => $tables,
     columns      => $columns,
     indexes      => $indexes,
     foreign_keys => $fks,
-  };
+    unique_constraints => $uniques,
+  );
+
+  # the schemas of the qualified sources, their tables keyed schema.table
+  for my $ns (grep { $_ ne $schema } @{ $self->schemas }) {
+    my $t = DBIO::DuckDB::Introspect::Tables->fetch($dbh, $ns, $catalog);
+    my %part = (
+      tables       => $t,
+      columns      => DBIO::DuckDB::Introspect::Columns->fetch($dbh, $ns, $t, $catalog),
+      indexes      => DBIO::DuckDB::Introspect::Indexes->fetch($dbh, $ns, $t, $catalog),
+      foreign_keys => DBIO::DuckDB::Introspect::ForeignKeys->fetch($dbh, $ns, $t, $catalog),
+      unique_constraints => DBIO::DuckDB::Introspect::Uniques->fetch($dbh, $ns, $t, $catalog),
+    );
+    for my $kind (keys %part) {
+      for my $name (keys %{ $part{$kind} }) {
+        $model{$kind}{"$ns.$name"} = $part{$kind}{$name};
+      }
+    }
+    $model{tables}{"$ns.$_"}{table_name} = "$ns.$_" for keys %$t;
+  }
+
+  return \%model;
 }
 
 
@@ -45,7 +71,12 @@ sub table_columns_info {
 
   for my $col (@{ $self->model->{columns}{$key} || [] }) {
     my $name = $col->{column_name};
-    my $i = { is_nullable => $col->{not_null} ? 0 : 1 };
+    # Core k126 (ADR 0038): the base folds is_pk into is_nullable so the
+    # two contract methods cannot disagree about a key column. The DuckDB
+    # model carries is_pk (Introspect/Columns.pm), and table_pk_info is
+    # already consulted here for _normalize_default_value, so the fold is
+    # one term in the same expression.
+    my $i = { is_nullable => (($col->{not_null} || $pk{$name}) ? 0 : 1) };
     $self->_normalize_data_type($i, $col->{data_type});
     $self->_normalize_default_value($i, $col->{default_value}, $pk{$name});
     $info{$name} = $i;
@@ -128,6 +159,27 @@ sub table_uniq_info {
     next unless @{ $idx->{columns} || [] };
     push @uniq, [ $name => $idx->{columns} ];
   }
+
+  # An introspector built from a model alone has no connection to ask.
+  return \@uniq unless $self->dbh;
+
+  my $sql = q{
+    SELECT constraint_name, constraint_column_names
+    FROM duckdb_constraints()
+    WHERE schema_name = ? AND table_name = ? AND constraint_type = 'UNIQUE'
+  };
+  my @bind = ($self->schema, $key);
+  if (defined $self->catalog) {
+    $sql .= q{ AND database_name = ?};
+    push @bind, $self->catalog;
+  }
+  $sql .= q{ ORDER BY constraint_name};
+  my $sth = $self->dbh->prepare($sql);
+  $sth->execute(@bind);
+  while (my ($name, $cols) = $sth->fetchrow_array) {
+    push @uniq, [ $name => [ @$cols ] ];
+  }
+
   return \@uniq;
 }
 
@@ -169,15 +221,15 @@ DBIO::DuckDB::Introspect - Introspect a DuckDB database via information_schema +
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 C<DBIO::DuckDB::Introspect> reads the live state of a DuckDB database
-via the standard SQL C<information_schema> views and DuckDB's system
-views (C<duckdb_tables()>, C<duckdb_columns()>, C<duckdb_indexes()>,
-C<duckdb_constraints()>). It is the source side of the
-test-deploy-and-compare strategy used by L<DBIO::DuckDB::Deploy>.
+via the standard SQL C<information_schema> views (tables, columns,
+constraints, views) plus DuckDB's C<duckdb_indexes()> system function. It
+is the source side of the test-deploy-and-compare strategy used by
+L<DBIO::DuckDB::Deploy>.
 
     my $intro = DBIO::DuckDB::Introspect->new(dbh => $dbh);
     my $model = $intro->model;
@@ -194,6 +246,7 @@ Model shape mirrors L<DBIO::SQLite::Introspect>:
         columns      => { $table => [ { ... }, ... ] },
         indexes      => { $table => { $name => { ... } } },
         foreign_keys => { $table => [ { ... }, ... ] },
+        unique_constraints => { $table => { $name => { columns => [ ... ] } } },
     }
 
 B<Quack RPC catalogs are opaque:> C<information_schema> and
@@ -209,6 +262,13 @@ Only the default C<main> schema is introspected unless C<schema> is overridden.
 =head2 schema
 
 Schema name to introspect. Defaults to C<main>.
+
+=head2 schemas
+
+Further schemas to read besides C<schema>, as an arrayref. A table of one of
+them is keyed C<schema.table> in every part of the model, which is how a source
+declared C<< table('other.t') >> is named. Empty by default: nothing
+but C<schema> is read.
 
 =head2 catalog
 
@@ -230,8 +290,14 @@ is_auto_increment, sequence, ... } }>.
 
 =head2 table_uniq_info
 
-List of C<[ $index_name, \@col_names ]> pairs for non-partial unique
-indexes. PK-backed indexes are already excluded from the model.
+List of C<[ $name, \@col_names ]> pairs for non-partial unique indexes and
+for the C<UNIQUE> constraints of the table. PK-backed indexes are already
+excluded from the model.
+
+A C<UNIQUE> constraint written in C<CREATE TABLE> (what the install DDL emits
+for C<add_unique_constraint>) is no entry of C<duckdb_indexes()>, so it is
+read from C<duckdb_constraints()>. Only this contract method shows it; the
+model, and with it the diff, are unchanged.
 
 =head2 view_definition
 

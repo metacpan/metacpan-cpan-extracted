@@ -4,7 +4,10 @@ package DBIO::Replicated::Backend::Replicant;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Replicated::Backend';
+
 
 sub new {
   my ($class, %args) = @_;
@@ -12,6 +15,7 @@ sub new {
   $args{active} = 1 unless exists $args{active};
   return $class->SUPER::new(%args);
 }
+
 
 sub debugobj {
   my $self = shift;
@@ -33,7 +37,19 @@ DBIO::Replicated::Backend::Replicant - Replicant backend wrapper
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 METHODS
+
+=head2 new
+
+Same as L<DBIO::Replicated::Backend/new>, with C<kind> forced to
+C<replicant> and C<active> defaulting to 1.
+
+=head2 debugobj
+
+Replicants share the master's trace object: forwarded to the master
+backend's C<debugobj> when one is set, else to the wrapped storage's.
 
 =head1 AUTHOR
 

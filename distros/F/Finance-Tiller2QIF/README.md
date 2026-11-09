@@ -45,10 +45,14 @@ suppresses duplicates (card-payment credits), and assigns destination accounts.
     # or
     cpanm Finance::Tiller2QIF
 
+## Supported Platforms
+
+Supported platforms are Strawberry Perl on Windows, macOS, Linux and BSD distributions (FreeBSD, NetBSD, OpenBSD, DragonflyBSD). Cygwin is not supported and installation is refused. Other platforms, such as Haiku, Solaris and AIX, are unsupported but not blocked from installation.
+
 ## Perl Dependencies
 
 Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, DBD::SQLite, DBI,
-Getopt::Long::Descriptive, Path::Tiny, Text::CSV
+Getopt::Long::Descriptive, Path::Tiny, Text::CSV; on Windows also Win32::ShellQuote
 
 Testing: Capture::Tiny, Test2::V0, Test2::Bundle::More, Test2::Tools::Exception
 
@@ -63,7 +67,7 @@ All of Tiller2QIF’s dependencies are available through package management if y
 
 ### On Windows
 
-tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN.
+tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN. tiller2qif cannot be installed to ActivePerl and Cygwin.
 
 # CLI COMMANDS
 

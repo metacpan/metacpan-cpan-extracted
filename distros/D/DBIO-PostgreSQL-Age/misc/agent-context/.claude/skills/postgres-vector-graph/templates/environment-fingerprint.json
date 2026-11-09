@@ -1,0 +1,62 @@
+{
+  "status": "template-not-a-measurement",
+  "recorded_at": null,
+  "postgres": {
+    "server_version": null,
+    "server_version_num": null,
+    "os_architecture": null,
+    "provider": null
+  },
+  "extensions": {
+    "vector": {
+      "extversion": null,
+      "schema": null,
+      "source_commit": null,
+      "artifact_sha256": null
+    },
+    "age": {
+      "extversion": null,
+      "source_commit": null,
+      "artifact_sha256": null,
+      "initialization": null
+    }
+  },
+  "connection": {
+    "role": null,
+    "role_owner_or_bypass": null,
+    "pool_mode": null,
+    "driver_version": null,
+    "prepared_map_live_test": null
+  },
+  "data": {
+    "documents": null,
+    "tenants": null,
+    "vector_dimension": null,
+    "space_id": null,
+    "metric": null,
+    "graph_vertices": null,
+    "graph_edges": null,
+    "degree_percentiles": null
+  },
+  "workload": {
+    "concurrency": null,
+    "latency_target_ms": null,
+    "recall_target": null,
+    "cache_condition": null,
+    "write_rate": null
+  },
+  "limits": {
+    "seed_count": null,
+    "graph_hops": null,
+    "expansion_cap": null,
+    "statement_timeout_ms": null,
+    "work_mem": null
+  },
+  "evidence": {
+    "integration_report": null,
+    "role_report": null,
+    "benchmark_report": null,
+    "restore_report": null
+  },
+  "security": "Do not include passwords, raw customer content, connection secrets, or embedding arrays."
+}

@@ -1,0 +1,70 @@
+{
+  "sources": {
+    "getty": {
+      "git": "https://github.com/Getty/skills.git",
+      "ref": "main"
+    },
+    "karr": {
+      "git": "https://github.com/Getty/karr.git",
+      "ref": "main"
+    },
+    "dbio-core": {
+      "git": "https://codeberg.org/dbio/dbio.git",
+      "ref": "main"
+    },
+    "dbio-postgresql": {
+      "git": "https://codeberg.org/dbio/dbio-postgresql.git",
+      "ref": "main"
+    }
+  },
+  "install": {
+    "skills": [
+      "getty-git-commit-style@getty",
+      "postgres-vector-graph@getty",
+      "kanban-issues-karr-coordination@karr",
+      "kanban-issues-karr-ticket@karr",
+      "dbio-adr@dbio-core",
+      "dbio-codeberg-user-issues@dbio-core",
+      "dbio-consolidate-release@dbio-core",
+      "dbio-coordination@dbio-core",
+      "dbio-core@dbio-core",
+      "dbio-driver-development@dbio-core",
+      "dbio-perl-class-patterns@dbio-core",
+      "dbio-perl-pod@dbio-core",
+      "dbio-perl-release@dbio-core",
+      "dbio-perl-syntax@dbio-core",
+      "dbio-postgresql@dbio-postgresql",
+      "dbio-postgresql-database@dbio-postgresql"
+    ],
+    "agents": [
+      "dbio-adr-auditor@dbio-core",
+      "dbio-release-manager@dbio-core",
+      "karr-coordinator@dbio-core",
+      "dbio-driver-worker@dbio-core"
+    ],
+    "rules": [
+      "dbio-rules@dbio-core"
+    ]
+  },
+  "vars": {
+    "driver": "postgresql-age",
+    "dist_label": "DBIO driver for Apache AGE graph (PostgreSQL extension)",
+    "worker_skills": [
+      "dbio-coordination",
+      "dbio-core",
+      "dbio-driver-development",
+      "dbio-perl-class-patterns",
+      "dbio-perl-syntax",
+      "dbio-perl-pod",
+      "dbio-postgresql",
+      "dbio-postgresql-age",
+      "dbio-postgresql-database",
+      "postgres-vector-graph",
+      "kanban-issues-karr-ticket"
+    ]
+  },
+  "targets": [
+    "claude"
+  ],
+  "gitignore": true
+}

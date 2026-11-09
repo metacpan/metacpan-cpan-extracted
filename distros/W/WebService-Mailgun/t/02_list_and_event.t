@@ -134,4 +134,20 @@ subtest 'get events' => sub {
 };
 =cut
 
+# Event Polling: the URL event() returns gives only the events stored after the first call.
+# This holds whether or not new events came in between, so it does not depend on the data (#25).
+subtest 'event($next) returns no event seen already' => sub {
+    my ($events, $next) = $mailgun->event({
+        begin     => time - 3600,
+        ascending => 'yes',
+        limit     => 300,
+    });
+    # The subtests above made list events; without any, there is nothing to check.
+    plan skip_all => 'no event in the last hour' unless @$events;
+    isa_ok $next, 'URI';
+    my %seen = map { $_->{id} => 1 } @$events;
+    my ($more) = $mailgun->event($next);
+    is scalar(grep { $seen{ $_->{id} } } @$more), 0, 'no event comes again';
+};
+
 done_testing;

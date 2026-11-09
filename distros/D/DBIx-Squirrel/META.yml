@@ -1,56 +1,88 @@
 ---
-abstract: 'The little Perl DBI extension that makes working with databases a lot easier.'
+abstract: 'DBI, minus the boilerplate, plus a pipeline'
 author:
   - 'Iain Campbell <cpanic@cpan.org>'
 build_requires:
-  Cwd: '0'
-  DBD::Mock: '0'
   DBD::SQLite: '0'
-  FindBin: '0'
-  Test::Compile: '0'
-  Test::Exception: '0'
-  Test::More: '0'
-  Test::More::UTF8: '0'
-  Test::Simple: '1.302201'
-  Test::Warn: '0'
-  Test::Warnings: '0'
-  lib: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBIx-Squirrel
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Squirrel:
+    file: lib/DBIx/Squirrel.pm
+    version: v2.0.5
+  DBIx::Squirrel::Context:
+    file: lib/DBIx/Squirrel/Context.pm
+  DBIx::Squirrel::Errors:
+    file: lib/DBIx/Squirrel/Errors.pm
+  DBIx::Squirrel::Gather:
+    file: lib/DBIx/Squirrel/Gather.pm
+  DBIx::Squirrel::Iterator:
+    file: lib/DBIx/Squirrel/Iterator.pm
+  DBIx::Squirrel::Pipeline:
+    file: lib/DBIx/Squirrel/Pipeline.pm
+  DBIx::Squirrel::Pipes:
+    file: lib/DBIx/Squirrel/Pipes.pm
+  DBIx::Squirrel::Placeholders:
+    file: lib/DBIx/Squirrel/Placeholders.pm
+  DBIx::Squirrel::Result:
+    file: lib/DBIx/Squirrel/Result.pm
+  DBIx::Squirrel::Results:
+    file: lib/DBIx/Squirrel/Results.pm
+  DBIx::Squirrel::Stages::Batch:
+    file: lib/DBIx/Squirrel/Stages/Batch.pm
+  DBIx::Squirrel::Stages::Flow:
+    file: lib/DBIx/Squirrel/Stages/Flow.pm
+  DBIx::Squirrel::Stages::Rows:
+    file: lib/DBIx/Squirrel/Stages/Rows.pm
+  DBIx::Squirrel::Stages::Taps:
+    file: lib/DBIx/Squirrel/Stages/Taps.pm
+  DBIx::Squirrel::Stop:
+    file: lib/DBIx/Squirrel/Stop.pm
+  DBIx::Squirrel::Sugar:
+    file: lib/DBIx/Squirrel/Sugar.pm
+  DBIx::Squirrel::Util:
+    file: lib/DBIx/Squirrel/Util.pm
+  DBIx::Squirrel::db:
+    file: lib/DBIx/Squirrel/db.pm
+  DBIx::Squirrel::st:
+    file: lib/DBIx/Squirrel/st.pm
 requires:
   Carp: '0'
-  Compress::Bzip2: '0'
-  Const::Fast: '0'
-  Crypt::CBC: '0'
-  Crypt::Rijndael: '0'
   DBI: '0'
   Data::Dumper: '0'
-  Devel::GlobalDestruction: '0'
   Digest::SHA: '0'
-  Dotenv: '0'
-  Encode: '0'
+  Ekorn::Pipeline: '>= v0.1.1, < v0.2.0'
   Exporter: '0'
-  JSON::Syck: '0'
-  MIME::Base64::URLSafe: '0'
+  List::Util: '0'
+  Ref::Util: '0'
   Scalar::Util: '0'
-  Sub::Name: '0'
-  Try::Tiny: '0'
-  YAML::Syck: '0'
-  bytes: '0'
-  constant: '0'
+  Sub::Util: '0'
+  experimental: '0'
   namespace::clean: '0'
-  overload: '0'
-  perl: 5.010_001
-  strict: '0'
-  warnings: '0'
-version: 1.6.5
-x_generated_by_perl: v5.38.4
-x_serialization_backend: 'YAML::Tiny version 1.76'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  perl: v5.36.0
+resources:
+  bugtracker: https://github.com/nukopian/DBIx-Squirrel/issues
+  homepage: https://github.com/nukopian/DBIx-Squirrel
+  repository: https://github.com/nukopian/DBIx-Squirrel.git
+version: v2.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -4,14 +4,16 @@ package DBIO::Firebird::Diff::Index;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Diff::Op';
 
-use DBIO::SQL::Util qw(_quote_ident);
+use DBIO::Firebird::DDL qw(_firebird_quote_ident);
 use DBIO::Diff::Compare qw(changed_fields);
 
 
 # new() and the action accessor come from DBIO::Diff::Op.
-__PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info/);
+__PACKAGE__->mk_diff_accessors(qw/table_name index_name index_info replaced/);
 
 
 sub diff {
@@ -21,7 +23,7 @@ sub diff {
   # Tables present in the source model but absent from the target are being
   # dropped in this same pass. Their indexes go with the table via DROP TABLE,
   # so a later standalone DROP INDEX for one of them must be suppressed
-  # (karr #14).
+  # (karr k14).
   $source_tables //= {};
   $target_tables //= {};
   my %dropped_table = map { $_ => 1 }
@@ -57,7 +59,7 @@ sub diff {
       if ($changed) {
         push @ops, $class->new(
           action => 'drop', table_name => $table_name,
-          index_name => $name, index_info => $src,
+          index_name => $name, index_info => $src, replaced => 1,
         );
         push @ops, $class->new(
           action => 'create', table_name => $table_name,
@@ -70,7 +72,7 @@ sub diff {
   for my $table_name (sort keys %$source) {
     # Skip the whole table when it is itself being dropped this pass; Firebird's
     # DROP TABLE already removes its indexes, so a standalone DROP INDEX would
-    # fail against the (now absent) table (karr #14).
+    # fail against the (now absent) table (karr k14).
     next if $dropped_table{$table_name};
     my $src_idxs = $source->{$table_name};
     my $tgt_idxs = $target->{$table_name} // {};
@@ -95,14 +97,14 @@ sub as_sql {
   if ($self->action eq 'create') {
     my $unique = $self->index_info->{is_unique} ? 'UNIQUE ' : '';
     my $cols = join ', ',
-      map { _quote_ident($_) } @{ $self->index_info->{columns} // [] };
+      map { _firebird_quote_ident($_) } @{ $self->index_info->{columns} // [] };
     return sprintf 'CREATE %sINDEX %s ON %s (%s);',
       $unique,
-      _quote_ident($self->index_name),
-      _quote_ident($self->table_name),
+      _firebird_quote_ident($self->index_name),
+      _firebird_quote_ident($self->table_name),
       $cols;
   }
-  return sprintf 'DROP INDEX %s;', _quote_ident($self->index_name);
+  return sprintf 'DROP INDEX %s;', _firebird_quote_ident($self->index_name);
 }
 
 
@@ -126,12 +128,21 @@ DBIO::Firebird::Diff::Index - Diff operations for Firebird indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Index-level diff operations for Firebird. Firebird supports C<CREATE INDEX>
-and C<DROP INDEX>. Changed index definitions become a drop-then-create pair.
+and C<DROP INDEX>. Changed index definitions become a drop-then-create pair. The drop of such a
+pair is marked C<replaced>: the index comes back at once, so
+L<DBIO::Diff::Base/classify> counts it as changing, not destructive (core
+ADR 0080). The drop of an index the schema no longer has is destructive.
+
+=head1 ATTRIBUTES
+
+=head2 replaced
+
+True on the C<drop> that is the first half of a drop-then-create pair.
 
 =head1 METHODS
 
@@ -148,7 +159,7 @@ sections of the two models (threaded in by L<DBIO::Firebird::Diff> via its
 aux-section wiring). They are used to detect tables that are being dropped in
 this same diff pass: Firebird's C<DROP TABLE> already removes that table's own
 indexes, so a later standalone C<DROP INDEX> for one of them would fail once
-the table is gone and abort the deploy (karr #14). When these arguments are
+the table is gone and abort the deploy. When these arguments are
 absent (e.g. direct unit-test calls) the dropped-table set is empty and no
 drops are suppressed, preserving the original two-argument behaviour.
 

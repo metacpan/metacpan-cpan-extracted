@@ -5,10 +5,17 @@ use DBIO::Schema::ModelCompiler ();
 use DBIO::PostgreSQL::Adapter ();
 use DBIO::PostgreSQL::Introspect ();
 use DBIO::PostgreSQL::Diff ();
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use PrivatePgDatabase;
 
 unless ($ENV{DBIO_TEST_PG_DSN}) {
-  plan skip_all => 'DBIO_TEST_PG_DSN not set';
+  plan skip_all => 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run this test';
 }
+
+# A server that is not there fails the file, with a plan (karr k113).
+LiveServer->require_server;
 
 # Schema covering all 8 portable base types.
 {
@@ -28,15 +35,16 @@ unless ($ENV{DBIO_TEST_PG_DSN}) {
   __PACKAGE__->set_primary_key('id');
 
   package RT::Schema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
   __PACKAGE__->register_class(Thing => 'RT::Result::Thing');
 }
 
-my $schema = RT::Schema->connect(
-  $ENV{DBIO_TEST_PG_DSN},
-  $ENV{DBIO_TEST_PG_USER},
-  $ENV{DBIO_TEST_PG_PASS},
-);
+# The diff below compares the WHOLE introspected database with the compiled
+# target, so it runs in a database of its own: anything else installed in the
+# shared one -- pgvector, left there by t/48 and t/54 -- is a difference too.
+# Dropping that database at the end also replaces the table cleanup this file
+# used to do in the shared one (karr k81).
+my $schema = RT::Schema->connect(PrivatePgDatabase->create('t28'));
 
 # Drop and recreate the table with PG-native types matching the adapter output.
 # id uses GENERATED ALWAYS AS IDENTITY (bigint) — the canonical DBIO convention
@@ -82,17 +90,5 @@ ok !$diff->has_changes, 'round-trip diff is empty (base-type schema, PG-native d
       Data::Dumper::Dumper($target->{columns}{'public.things'});
     };
   };
-
-# Drop artefacts so they do not leak into later tests' introspect snapshots.
-END {
-  return unless $ENV{DBIO_TEST_PG_DSN};
-  my $h = eval { DBI->connect(
-    $ENV{DBIO_TEST_PG_DSN}, $ENV{DBIO_TEST_PG_USER}, $ENV{DBIO_TEST_PG_PASS},
-    { RaiseError => 0, PrintError => 0 }
-  ) };
-  return unless $h;
-  eval { $h->do('DROP TABLE IF EXISTS things CASCADE') };
-  $h->disconnect;
-}
 
 done_testing;

@@ -4,7 +4,14 @@ requires 'perl', '5.020';
 # IO::Select, POSIX) plus DBIO core. No Future / Future::IO / event-loop deps —
 # a sync driver gets made async without pulling the async ecosystem in. Core
 # modules are not declared here (same as DBIO::Async's cpanfile).
-requires 'DBIO', '0.900001';
+requires 'DBIO', '0.900004';
+
+# The broker_connect_options capability DBIO::Forked::Storage declares (karr
+# k12) is read by core, and only a core that takes connect options beside an
+# AccessBroker asks for it (core k243). Before and after k243 core carries the
+# same 0.900004, so no version can express it. On an older core the
+# declaration is simply never read; t/06-broker-connect-options.t and section
+# 7 of t/05-sqlite-live.t skip there.
 
 on test => sub {
   requires 'Test::More', '0.98';
@@ -14,5 +21,5 @@ on test => sub {
   # of dbio-forked (ADR 0001): installing only dbio-forked + DBIO core must work
   # without any concrete driver or DBD on the system. DBD::SQLite is pulled in
   # transitively as a hard dep of DBIO::SQLite, so it is not listed separately.
-  recommends 'DBIO::SQLite';
+  recommends 'DBIO::SQLite', '0.900004';
 };

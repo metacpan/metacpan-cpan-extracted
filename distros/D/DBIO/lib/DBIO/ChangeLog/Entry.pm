@@ -4,7 +4,10 @@ package DBIO::ChangeLog::Entry;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::ChangeLog::Table;
+
 
 
 sub source_definition {
@@ -63,7 +66,7 @@ DBIO::ChangeLog::Entry - ResultSource definition for per-source changelog tables
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -104,6 +107,19 @@ on the event type (see L<DBIO::ChangeLog> for details).
 =head2 created_at
 
 C<datetime>, NOT NULL. Automatically set when the entry is created.
+
+=head1 METHODS
+
+=head2 source_definition
+
+    my $def = DBIO::ChangeLog::Entry->source_definition(table => 'artist');
+
+Class method. Returns the source definition hashref for the
+C<< <table>_changelog >> table of one tracked source (C<table>, C<columns>,
+C<column_order>, C<primary_key>), built and validated through
+L<DBIO::ChangeLog::Table/build_source>. Croaks unless a non-empty C<table>
+argument is given. Used by L<DBIO::ChangeLog::Schema> once per tracked
+source.
 
 =head1 COLUMN DEFINITIONS
 

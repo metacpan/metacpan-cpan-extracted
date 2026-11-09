@@ -2,6 +2,9 @@ package DBIO::Test::Namespace::RtBug41083::ResultSet_A::A;
 # ABSTRACT: Test fixture for namespace resolution
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::Test::Namespace::RtBug41083::ResultSet';
 
 sub fooBar { 1; }
@@ -19,7 +22,7 @@ DBIO::Test::Namespace::RtBug41083::ResultSet_A::A - Test fixture for namespace r
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

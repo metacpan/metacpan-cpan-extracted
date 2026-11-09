@@ -3,6 +3,9 @@ package DBIO::Async::TransactionContext;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::Async::TransactionContext';
 
 
@@ -20,7 +23,7 @@ DBIO::Async::TransactionContext - Pinned-connection context for dbio-async (futu
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

@@ -51,9 +51,9 @@ Decompose each concern into its own plain package under
   `DBIO::Storage::DBI` in the `use base` list so its override wins and its
   `next::method` chains forward to the base — hence `LOBSupport` and
   `Savepoints` come before `DBIO::Storage::DBI`. The in-code comment
-  (`Storage.pm:7-11`) records this.
+  records this.
 - `DBIO::Oracle::Storage::WhereJoins` extends the composed `Storage` and itself
-  uses `mro 'c3'` (`Storage/WhereJoins.pm:7-8`) — see ADR 0007.
+  uses `mro 'c3'` — see ADR 0007.
 
 ## Rationale
 

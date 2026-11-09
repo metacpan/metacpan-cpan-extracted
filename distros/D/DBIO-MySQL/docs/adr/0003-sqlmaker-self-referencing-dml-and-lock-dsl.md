@@ -1,8 +1,47 @@
 # ADR 0003 — SQLMaker rewrites self-referencing UPDATE/DELETE and owns a lock-clause DSL
 
-- Status: accepted
+- Status: accepted; the lock-clause half amended 2026-08-05 (see below)
 - Date: 2026-06-20
 - Tags: sqlmaker, dml, locking, mariadb, backfill
+
+## Amendment (2026-08-05, karr #30) — the lock clause is decided by the server, not by the subclass
+
+The self-referencing DML half stands unchanged. The lock DSL stands too — same
+surface, same keys. What changed is *who decides what it renders*.
+
+Modelling the MariaDB difference "as a one-table override ... to a single named
+subclass" tied an **engine** question to a **DBD** class, because
+`DBIO::MySQL::Storage::MariaDB` selected `DBIO::MySQL::SQLMaker::MariaDB` as its
+`sql_maker_class`. That is right for two of the four DBD/engine combinations and
+wrong for the other two, and both wrong ones are reachable:
+
+- a MariaDB server through a `dbi:mysql:` DSN never reaches the subclass (no
+  `_rebless`) and was handed `FOR SHARE`, which MariaDB has in no version;
+- a MySQL 8 server through `DBD::MariaDB` did reach it and was handed
+  `LOCK IN SHARE MODE OF `t` NOWAIT`, which MySQL rejects — the legacy spelling
+  is precisely the one that carries neither `OF` nor a modifier.
+
+The context above also understates the split. MariaDB has no `OF` clause at all:
+its `SELECT` grammar is `[FOR UPDATE lock_option | LOCK IN SHARE MODE
+lock_option]` with `lock_option: [WAIT n | NOWAIT | SKIP LOCKED]`. And on MySQL
+all three parts — `FOR SHARE`, `OF tbl_name`, `NOWAIT` / `SKIP LOCKED` — arrived
+together in 8.0.1, so a pre-8.0.1 server has none of them.
+
+So `DBIO::MySQL::Storage::_lock_dialect` now reads the product and version and
+stashes the answer on the maker (`{ share, of, nowait, skip_locked, server }` —
+one `modifiers` flag at first, split per modifier in karr #38 once the MariaDB
+side needed it: NOWAIT is 10.3 there and SKIP LOCKED 10.6), and
+`DBIO::MySQL::SQLMaker::_lock_select` renders it — the same "storage decides,
+maker renders" split ADR 0036's `_insert_row_alias` uses. A part the server does
+not have is refused with a local exception naming the boundary, rather than
+dropped from the statement or sent out to be rejected. A maker built without a
+storage assumes a current MySQL, which is what this class emitted before.
+
+`DBIO::MySQL::SQLMaker::MariaDB` therefore overrides nothing; it survives as a
+deprecated empty subclass so that configuration still naming it inherits the
+server-keyed behaviour. New locking syntax extends `_lock_dialect` and the
+tables in `_lock_select` together — the subclass is no longer a place to put it.
+Pinned offline by `t/30-server-dialect.t` and `t/20-sqlmaker-mysql.t`.
 
 ## Context
 

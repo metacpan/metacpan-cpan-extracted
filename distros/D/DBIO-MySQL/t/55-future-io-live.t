@@ -45,8 +45,16 @@ eval { require DBIO::MySQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
 
+# A schema always declares its driver (core ADR 0067), and DBIO::Test::Schema
+# keeps none in its class: declare the storage class the DSN's DBD is
+# registered for -- DBIO::MySQL::Storage::MariaDB for a dbi:MariaDB: DSN.
+my $test_schema = DBIO::Test::Schema->clone;
+$test_schema->storage_type(
+  $dsn =~ /\Adbi:MariaDB:/i ? '+DBIO::MySQL::Storage::MariaDB' : '+DBIO::MySQL::Storage'
+);
+
 # --- Fixture: a fresh artist table, built synchronously (no async here) ------
-my $setup = DBIO::Test::Schema->connect($dsn, $user, $pass, { quote_names => 1 });
+my $setup = $test_schema->connect($dsn, $user, $pass, { quote_names => 1 });
 $setup->storage->dbh_do(sub {
   my (undef, $dbh) = @_;
   local $dbh->{Warn} = 0;
@@ -62,7 +70,7 @@ SQL
 });
 
 # --- The async connection ----------------------------------------------------
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, { async => 'future_io' });
+my $schema = $test_schema->connect($dsn, $user, $pass, { async => 'future_io' });
 
 my $async = $schema->storage->async;
 isa_ok $async, 'DBIO::MySQL::Storage::Async',
@@ -150,6 +158,31 @@ my $source = $schema->source('Artist');
   ok scalar(@all) >= 4, 'high-level all_async inflated the result objects';
   ok +(grep { $_->name eq 'Thelonious Monk' } @all),
     '... including the async-created row';
+}
+
+# --- Pool connections never auto-reconnect (ADR 0005, karr k55) --------------
+# DBD::mysql switches mysql_auto_reconnect ON by itself when MOD_PERL or
+# GATEWAY_INTERFACE is set, and a pooled session silently rebuilt under a
+# pinned transaction loses that transaction without an error. The pool opens
+# its connections with the attribute off; read back from the live handle, so
+# this is what the DBD made of it. (DBD::MariaDB never switches it on by
+# itself; there the assertion holds on the default as well.)
+{
+  my $fresh = $test_schema->connect($dsn, $user, $pass, { async => 'future_io' })
+    ->storage->async;
+  my $conn;
+  {
+    local $ENV{MOD_PERL} = 'mod_perl/2.0.13';
+    # The pool retires a connection at the end of every borrow (core ADR 0079),
+    # so the connection is held while it is looked at.
+    $conn = $fresh->pool->acquire->get;   # spawns the first pool connection
+  }
+  my @conns = grep { defined } @{ $fresh->pool->{_connections} };
+  is scalar(@conns), 1, 'a pool connection was opened with MOD_PERL set';
+  my $attr = $fresh->_mysql_auto_reconnect_attr($dsn);   # named for the DSN's DBD (karr k60)
+  ok !$conn->{dbh}{$attr}, "... and the DBD reports $attr off on it";
+  $fresh->pool->release($conn);
+  $fresh->disconnect;
 }
 
 # --- Cleanup -----------------------------------------------------------------

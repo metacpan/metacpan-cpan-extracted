@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Money;
 # ABSTRACT: Test result class for the money_test table (MONEY column)
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::Test::BaseResult';
 
 __PACKAGE__->table('money_test');
@@ -31,7 +34,7 @@ DBIO::Test::Schema::Money - Test result class for the money_test table (MONEY co
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

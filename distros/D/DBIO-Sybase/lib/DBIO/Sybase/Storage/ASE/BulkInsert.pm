@@ -3,20 +3,42 @@ package DBIO::Sybase::Storage::ASE::BulkInsert;
 
 use strict;
 use warnings;
-use Sub::Name();
+
+our $VERSION = '0.900004';
+
+use Sub::Util ();
 use Try::Tiny;
 use DBIO::Carp;
 use namespace::clean;
 
 # No requires - these methods expect the consuming class to have:
-# _remove_blob_cols_array, _insert_blobs_array, _fetch_identity_sql,
+# _remove_blob_cols_array, _null_blobs_array, _insert_blobs_array,
+# _fetch_identity_sql,
 # _autoinc_supplied_for_op, _bulk_storage, _get_dbh, _dbi_connect_info,
 # _dbh_execute_for_fetch, sql_maker, txn_scope_guard, debug,
 # _resolve_bindattrs, _query_end
 
 sub _insert_bulk {
   my $self = shift;
+
+  # the writer and bulk storages are made by _init, at the first connect, and
+  # the bulk decision below reads the connection (karr k67)
+  $self->_get_dbh;
+
   my ($source, $cols, $data) = @_;
+
+  # before any row is sent (karr k97, see ASE::_refuse_non_ascii_binds)
+  if ($self->_using_freetds) {
+    for my $j (0..$#$cols) {
+      my $type = $source->has_column($cols->[$j]) ? ($source->column_info($cols->[$j])->{data_type} // '') : '';
+      next if $type =~ $DBIO::Sybase::Storage::ASE::BINARY_TYPE_RE;
+      for my $row (@$data) {
+        my $v = $row->[$j];
+        next unless defined $v and not ref $v and $v =~ /[^\x00-\x7F]/;
+        $self->_throw_non_ascii($source->name, $cols->[$j], $j + 1);
+      }
+    }
+  }
 
   my $columns_info = $source->columns_info;
 
@@ -41,10 +63,20 @@ sub _insert_bulk {
   }
 
   if (not $use_bulk_api) {
-    my $blob_cols = $self->_remove_blob_cols_array($source, $cols, $data);
+    # the rows are the caller's: the placeholders go into copies (karr k83)
+    $data = [ map { [ @$_ ] } @$data ];
+    @_ = ($source, $cols, $data);
+
+    my ($blob_cols, $null_cols)
+      = $self->_remove_blob_cols_array($source, $cols, $data);
 
 # next::method uses a txn anyway, but it ends too early in case we need to
 # select max(col) to get the identity for inserting blobs.
+    # read the flag before $self is the writer storage, which does not have it
+    # (the key of a row was taken from the last identity although the slice
+    # carried it; with the rows NULLed by key that would be the wrong rows)
+    my $autoinc_supplied = $self->_autoinc_supplied_for_op;
+
     ($self, my $guard) = $self->{transaction_depth} == 0 ?
       ($self->_writer_storage, $self->_writer_storage->txn_scope_guard)
       :
@@ -52,9 +84,14 @@ sub _insert_bulk {
 
     $self->next::method(@_);
 
-    if ($blob_cols) {
-      if ($self->_autoinc_supplied_for_op) {
-        $self->_insert_blobs_array ($source, $blob_cols, $cols, $data);
+    # $null_cols: undef cells of a LOB column that has values in other rows;
+    # they went in as the empty literal and are set to NULL here (karr k81)
+    if ($blob_cols or $null_cols) {
+      if ($autoinc_supplied) {
+        $self->_null_blobs_array ($source, $null_cols, $cols, $data)
+          if $null_cols;
+        $self->_insert_blobs_array ($source, $blob_cols, $cols, $data)
+          if $blob_cols;
       }
       else {
         my @cols_with_identities = (@$cols, $identity_col);
@@ -70,9 +107,12 @@ sub _insert_bulk {
 
         my @data_with_identities = map [@$_, shift @identities], @$data;
 
+        $self->_null_blobs_array (
+          $source, $null_cols, \@cols_with_identities, \@data_with_identities
+        ) if $null_cols;
         $self->_insert_blobs_array (
           $source, $blob_cols, \@cols_with_identities, \@data_with_identities
-        );
+        ) if $blob_cols;
       }
     }
 
@@ -117,16 +157,22 @@ sub _insert_bulk {
 # This ignores any data conversion errors detected by the client side libs, as
 # they are usually harmless.
   my $orig_cslib_cb = DBD::Sybase::set_cslib_cb(
-    Sub::Name::subname _insert_bulk_cslib_errhandler => sub {
+    Sub::Util::set_subname _insert_bulk_cslib_errhandler => sub {
       my ($layer, $origin, $severity, $errno, $errmsg, $osmsg, $blkmsg) = @_;
 
       return 1 if $errno == 36;
 
+      # the texts of the client library hold the value it could not convert
+      my $values = [ map { grep { defined and !ref } @$_ } @new_data ];
+      my ($errmsg_m, $osmsg_m, $blkmsg_m) = map {
+        $_ ? $self->_mask_error_values($_, $values) : $_
+      } ($errmsg, $osmsg, $blkmsg);
+
       carp
         "Layer: $layer, Origin: $origin, Severity: $severity, Error: $errno" .
-        ($errmsg ? "\n$errmsg" : '') .
-        ($osmsg  ? "\n$osmsg"  : '')  .
-        ($blkmsg ? "\n$blkmsg" : '');
+        ($errmsg_m ? "\n$errmsg_m" : '') .
+        ($osmsg_m  ? "\n$osmsg_m"  : '')  .
+        ($blkmsg_m ? "\n$blkmsg_m" : '');
 
       return 0;
   });
@@ -181,7 +227,10 @@ sub _insert_bulk {
 
     $bulk->_query_end($sql);
   } catch {
-    $exception = shift;
+    # a text, with the values of the rows taken out; an exception object as it is
+    $exception = $self->_mask_error_values(
+      $_, [ map { grep { defined and !ref } @$_ } @new_data ],
+    );
   };
 
   DBD::Sybase::set_cslib_cb($orig_cslib_cb);
@@ -218,7 +267,7 @@ DBIO::Sybase::Storage::ASE::BulkInsert - Bulk insert API for Sybase ASE
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

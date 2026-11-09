@@ -9,7 +9,11 @@ use DBIO::PostgreSQL::EV::Storage;
 
 my $storage = DBIO::PostgreSQL::EV::Storage->new(undef);
 
-is $storage->future_class, 'Future', 'future_class is Future';
+# Not plain Future since karr k44: the blocking methods ->get the Futures,
+# which only a Future that can run the EV loop survives (ADR 0001 amendment).
+is $storage->future_class, 'DBIO::PostgreSQL::EV::Future',
+  'future_class is the EV-waiting Future';
+ok $storage->future_class->isa('Future'), '... a Future subclass';
 
 can_ok $storage, qw(
   select_async select_single_async insert_async update_async delete_async

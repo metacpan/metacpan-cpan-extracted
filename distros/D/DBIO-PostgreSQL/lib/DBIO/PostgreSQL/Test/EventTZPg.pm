@@ -4,6 +4,8 @@ package DBIO::PostgreSQL::Test::EventTZPg;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Test::BaseResult/;
 
 __PACKAGE__->load_components(qw/InflateColumn::DateTime/);
@@ -41,7 +43,7 @@ DBIO::PostgreSQL::Test::EventTZPg - Test result class for PostgreSQL timezone-aw
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

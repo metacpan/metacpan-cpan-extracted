@@ -11,7 +11,7 @@ use DBIO::GraphQL;
 my $db = My::Schema->connect('dbi:SQLite:dbname=:memory:');
 deploy_schema($db);
 
-my $result = DBIO::GraphQL->to_graphql($db);
+my $result = DBIO::GraphQL->to_graphql($db, mutations => 1);
 
 # Return shape
 ok(ref $result eq 'HASH', 'to_graphql returns a hashref');

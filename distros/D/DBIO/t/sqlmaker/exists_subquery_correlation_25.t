@@ -7,7 +7,7 @@ use DBIO::SQLMaker::ClassicExtensions;
 
 my $ROWS = DBIO::SQLMaker::ClassicExtensions->__rows_bindtype;
 
-# karr #25 regression — MOCK ONLY, no real DB, no DSN.
+# Correlated-EXISTS regression — MOCK ONLY, no real DB, no DSN.
 #
 # A correlated EXISTS subquery built from a resultset:
 #   $owners_rs->search({ 'books.owner' => { -ident => 'owner.id' } }, { alias => 'owner' })
@@ -76,7 +76,7 @@ is_same_sql_bind(
       => 'Library' ],
     [ $ROWS => 1 ],
   ],
-  'karr #25: EXISTS stays correlated to outer "books me" -- no shadow self-join',
+  'EXISTS stays correlated to outer "books me" -- no shadow self-join',
 );
 
 # ---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ is_same_sql_bind(
 unlike(
   $sql,
   qr/\bLEFT \s+ JOIN \s+ books \s+ books\b/xi,
-  'karr #25: no local "LEFT JOIN books books" shadowing the outer correlation',
+  'no local "LEFT JOIN books books" shadowing the outer correlation',
 );
 
 # ---------------------------------------------------------------------------

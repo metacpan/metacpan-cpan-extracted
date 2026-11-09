@@ -20,7 +20,7 @@ my $lfn = tmpnam();
 require DBIO::Storage::Statistics;
 $schema->storage->debugobj(DBIO::Storage::Statistics->new);
 
-ok ( $schema->storage->debug(1), 'debug' );
+ok ( $schema->storage->debug(2), 'debug' );
 open my $logfh, '>', $lfn or die "Cannot open $lfn: $!";
 $schema->storage->debugfh($logfh);
 $schema->storage->debugfh->autoflush(1);
@@ -33,7 +33,7 @@ like($loglines[0], qr/^SELECT COUNT/, 'File log via debugfh success');
 $schema->storage->debugfh(undef);
 
 {
-  local $ENV{DBIO_TRACE} = "=$lfn";
+  local $ENV{DBIO_TRACE} = "2=$lfn";
   unlink $lfn;
 
   $schema->resultset('CD')->count;

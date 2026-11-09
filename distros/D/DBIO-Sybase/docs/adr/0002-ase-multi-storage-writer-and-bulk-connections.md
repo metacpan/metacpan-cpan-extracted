@@ -64,10 +64,10 @@ exists to prevent.
   Bulk is also skipped under FreeTDS, whose blk-library cannot do BCP
   (`Type '7' not implemented`, and `BULK INSERT` is rejected inside the
   permanently-open bulk transaction); `_insert_bulk` then falls back to
-  regular array inserts (karr #20).
+  regular array inserts (karr k20).
 - This is **Sybase-only**. No other DBIO driver should grow a writer/bulk
   storage; if a future engine needs the same, lift the pattern into a shared
   base rather than copying it.
-- Coverage is live-DB only (`t/10-sybase.t`, `t/20-sybase-core.t`, skipped
+- Coverage is live-DB only (`t/10-sybase.t`, skipped
   without a server); there is no offline harness for the three-connection
   dance.

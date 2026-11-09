@@ -1,8 +1,17 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900001';
-requires 'DBIO::MySQL', '0.900001';
-requires 'EV::MariaDB', '0.03';
+# No password in a message (karr k76): connect info goes into a message through
+# DBIO::Util::mask_connect_secrets, so this needs a core carrying k297 -- on an
+# older one such a message dies for want of the function. That core also still
+# reports 0.900004, so no version can express it yet.
+requires 'DBIO', '0.900004';
+# No value in an error text (core ADR 0075): the executor's masker calls
+# DBIO::MySQL::Util::mask_error_details and DBIO::Util::mask_bound_values, so
+# this needs a DBIO::MySQL and a core that carry them; the version numbers do
+# not tell them from older builds yet.
+requires 'DBIO::MySQL', '0.900004';
+requires 'EV', '4.15';
+requires 'EV::MariaDB', '0.08';
 requires 'Future', '0.49';
 
 on test => sub {

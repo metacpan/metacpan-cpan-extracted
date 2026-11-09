@@ -13,7 +13,7 @@ DBIO::Manual::Migration - Step-by-step guide for migrating an existing DBIx::Cla
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 OVERVIEW
 
@@ -27,9 +27,9 @@ is independent and testable. After all steps, your application talks
 to DBIO and the door to DBIx::Class is closed.
 
 The full DBICTest schema set from L<DBIx::Class> 0.082844 has been
-imported under L<MigrationsTest|/F<t/lib/MigrationsTest/>> as a
+imported under F<t/lib/MigrationsTest/> as a
 reference fixture. The conversion below is what was actually applied
-to it; the post-migration shape is the permanent DBIO test schema.
+to it.
 
 For the rationale and full inventory of what changed, see
 L<DBIO::Manual::Heritage>. This document is the I<how>; Heritage is
@@ -76,9 +76,10 @@ DBIO Result classes.
 =item * L<DBIx::Class::Schema::Versioned> - removed; use L<dbioadmin>'s
 native deploy / upgrade (see L<DBIO::Manual::Heritage>).
 
-=item * L<DBIx::Class::SQLMaker::ClassicExtensions> and the
-L<SQL::Abstract::Classic> escape hatch - DBIO uses canonical
-L<SQL::Abstract> only.
+=item * The L<SQL::Abstract::Classic> escape hatch - DBIO uses canonical
+L<SQL::Abstract> only. (C<DBIx::Class::SQLMaker::ClassicExtensions> lives on
+as L<DBIO::SQLMaker::ClassicExtensions>, a mixin inside L<DBIO::SQLMaker>,
+not a component to load.)
 
 =back
 
@@ -94,13 +95,16 @@ anything useful inside DBIO. Switch to the integrated module:
   DBIx::Class::TimeStamp        -> DBIO::Timestamp
   DBIx::Class::UUIDColumns      -> DBIO::UUIDColumns
   DBIx::Class::Helpers          -> integrated into DBIO::Row
-  DBIx::Class::IntrospectableM2M -> DBIO::ManyToMany (always on)
-  DBIx::Class::PassphraseColumn -> DBIO::PassphraseColumn
+  DBIx::Class::IntrospectableM2M -> DBIO::Relationship::ManyToMany (always on)
 
 In C<load_components> these names are unchanged after step 1 except
 for case (DBIO uses C<Timestamp>, not C<TimeStamp>):
 
   __PACKAGE__->load_components(qw/Timestamp UUIDColumns/);
+
+C<DBIx::Class::PassphraseColumn> has no DBIO counterpart. One-way
+encoded columns are L<DBIO::EncodedColumn> (the C<encode_column> column
+flag), which writes its own storage format.
 
 =head1 STEP 4 - SWITCH CLASSDATA APIS TO COLUMN FLAGS
 
@@ -182,20 +186,30 @@ both with a single overridable method on the SQLMaker subclass:
   use base 'DBIO::SQLMaker';
 
   sub apply_limit {
-    my ($self, $sql, $bind, $limit, $offset) = @_;
-    # produce dialect-specific LIMIT clause
-    return ($sql, $bind);
+    my ($self, $sql, $rs_attrs, $rows, $offset) = @_;
+    # append $self->_parse_rs_attrs($rs_attrs) and the dialect-specific
+    # LIMIT clause; push its bind values onto $self->{limit_bind}
+    return $sql;
   }
 
+C<$sql> arrives without its C<GROUP BY>, C<HAVING> and C<ORDER BY>
+clauses: C<apply_limit> renders them from C<$rs_attrs> with
+C<_parse_rs_attrs> and places them itself. The bind values of the limit
+clause go onto C<< $self->{limit_bind} >>, each as
+C<< [ $self->__rows_bindtype => $rows ] >> or
+C<< [ $self->__offset_bindtype => $offset ] >>, and the method returns
+the SQL string only.
+
 If you had C<sql_limit_dialect = 'GenericSubQ'> or similar, port the
-behaviour into C<apply_limit>. The default in core DBIO is the
-ANSI-standard C<LIMIT ? OFFSET ?>; every active driver provides its
-own override.
+behaviour into C<apply_limit>. The default in core DBIO is
+C<LIMIT ? OFFSET ?>, which the PostgreSQL, SQLite and DuckDB drivers use
+as it is; a driver whose database needs another syntax (MySQL, Oracle,
+MSSQL, DB2, Firebird, Sybase) overrides it.
 
 =head1 STEP 6 - REPLACE SQL::Abstract::Classic CALLS
 
 If you reached into C<SQL::Abstract::Classic> directly (rare),
-replace with L<SQL::Abstract> 1.99+. The query DSL is compatible.
+replace with L<SQL::Abstract> 2.000001 or newer. The query DSL is compatible.
 Differences are in internal extension points only.
 
 =head1 STEP 7 - UPDATE TEST INFRASTRUCTURE
@@ -236,7 +250,10 @@ If your application explicitly invoked C<deployment_statements> or
 parsed SQL::Translator output, review whether you still need that
 plumbing. The native deploy classes - L<DBIO::PostgreSQL::Deploy>,
 L<DBIO::MySQL::Deploy>, L<DBIO::SQLite::Deploy> - expose
-C<install>, C<diff>, C<apply> and C<upgrade> directly.
+C<install>, C<diff>, C<apply> and C<upgrade> directly. C<apply> and C<upgrade>
+run a destructive diff (drops, possibly lossy type changes) with
+C<< allow_destructive => 1 >>, and C<< dry_run => 1 >> shows a diff without
+running it; see L<DBIO::Deploy::Base/apply>.
 
 =head1 STEP 9 - PORT CUSTOM COMPONENTS
 
@@ -248,7 +265,33 @@ porting it to the column-info flag pattern: see the four core
 components - L<DBIO::Timestamp>, L<DBIO::Ordered>, L<DBIO::ChangeLog>,
 L<DBIO::UUIDColumns> - for the reference idiom.
 
-=head1 STEP 10 - RUN THE TESTS
+=head1 STEP 10 - DROP CONTEXT-SENSITIVE RETURN TYPES
+
+DBIO methods no longer change their return type based on call context
+(ADR 0042): C<search> and its family, the C<has_many>/C<many_to_many>
+accessors, C<slice> and C<ResultSetColumn::func> always return a
+ResultSet (or a scalar) and I<throw> when called in list context. In
+DBIx::Class these returned the matching rows in list context:
+
+  # DBIx::Class: rows
+  my @cds = $cd_rs->search({ year => 2001 });
+
+  # DBIO: throws - fetch explicitly
+  my @cds = $cd_rs->search({ year => 2001 })->all;
+
+The same applies to C<my @cds = $artist->cds> (has_many accessor; use
+C<< $artist->cds->all >>), C<search_related>, C<search_literal>,
+C<search_like> and C<slice>. The C<*_rs> accessors remain as aliases.
+C<func> lost its list-context (one value per row) shape entirely; per-row
+values come from C<func_rs($fn)->all>.
+
+Replacements for common idioms:
+
+  my @rows = $rs->search($cond, $attrs);          # ->search($cond, $attrs)->all
+  my @rows = $rs->search_related($rel, $cond);    # ->search_related(...)->all
+  my @rows = $obj->cds;                           # $obj->cds->all
+
+=head1 STEP 11 - RUN THE TESTS
 
 After each step, run the full test suite:
 
@@ -262,17 +305,16 @@ cleanly.
 
 =head1 REFERENCE FIXTURE
 
-The file tree under F<t/lib/MigrationsTest/> is a verbatim import of
+The file tree under F<t/lib/MigrationsTest/> is an import of
 L<DBIx::Class>'s F<t/lib/DBICTest/> with the namespace rewritten
-C<DBICTest> -> C<MigrationsTest>. The C<DBIx::Class::*> references
-inside it are I<intentionally> left in place at import time; the
-commits that follow apply each step above to that fixture, in order,
-with one commit per step. Walking the git log is therefore a working
-demo of the migration.
+C<DBICTest> -> C<MigrationsTest> and the steps above applied. It holds
+the converted result only: no C<DBIx::Class::*> reference is left in
+it, and the original DBICTest sources are I<not> retained anywhere in
+the tree.
 
-The final state of F<t/lib/MigrationsTest/> is the permanent DBIO
-test fixture. The original DBICTest sources are I<not> retained
-anywhere in the tree.
+The tree is a reference; no test loads it. The schema the DBIO tests
+run against is L<DBIO::Test::Schema>, with its result classes under
+C<DBIO::Test::Schema::*>.
 
 =head1 SEE ALSO
 

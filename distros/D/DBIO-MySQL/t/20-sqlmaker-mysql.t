@@ -30,7 +30,7 @@ my $schema = DBIO::Test->init_schema(
   # Also we know it will fail - never deployed. All we care about is the
   # SQL to compare, hence the eval
   $schema->is_executed_sql_bind( sub {
-    eval { $schema->resultset ('CD')->update({ genreid => undef }) }
+    eval { $schema->resultset ('CD')->update({ genreid => undef }, { all => 1 }) }
   },[[
     'UPDATE cd SET `genreid` = ? WHERE `cdid` IN ( SELECT * FROM ( SELECT `me`.`cdid` FROM cd `me` ) `_forced_double_subquery` )',
     [ { dbic_colname => "genreid", sqlt_datatype => "integer" }  => undef ],
@@ -38,7 +38,7 @@ my $schema = DBIO::Test->init_schema(
 
   # same comment as above
   $schema->is_executed_sql_bind( sub {
-    eval { $schema->resultset ('CD')->delete }
+    eval { $schema->resultset ('CD')->delete({ all => 1 }) }
   }, [[
     'DELETE FROM cd WHERE `cdid` IN ( SELECT * FROM ( SELECT `me`.`cdid` FROM cd `me` ) `_forced_double_subquery` )',
   ]], 'Correct delete-SQL with double-wrapped subquery' );
@@ -166,6 +166,17 @@ for (
 
 # Test support for locking clauses
 {
+  # karr #30: FOR SHARE, OF tbl_name, NOWAIT and SKIP LOCKED all arrived
+  # together in MySQL 8.0.1 (Reference Manual 17.7.2.4, "Locking Reads"), and
+  # the driver now takes the clause it renders from the SERVER rather than from
+  # the DBD driver name. So the block below has to say which server it is
+  # talking to; it used to run against the mocked MySQL 5 above and assert SQL
+  # that server rejects. The pre-8.0.1 answers are asserted right after it.
+  $schema->storage->_sql_maker(undef);
+  _set_mock_mysql_version('8.000020');
+  $schema->storage->ensure_connected;
+  $schema->storage->sql_maker;
+
   # Test basic locking options
   is_same_sql_bind(
     $schema->resultset('Artist')->search({}, {for => 'update'})->as_query,

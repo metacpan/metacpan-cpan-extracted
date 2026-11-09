@@ -13,7 +13,7 @@ DBIO::Manual::QuickStart - Up and running with DBIO in 10 minutes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -24,8 +24,9 @@ Perl object-oriented programming (calling methods on an object instance).
 It also helps if you already know a little SQL and how to connect to a
 database through DBI.
 
-Follow along with the example database shipped in F<examples/Schema>. The same
-example schema appears throughout the rest of the documentation.
+Follow along with the example schema in F<examples/Schema>; the steps below
+build its SQLite database. The same example schema appears throughout the rest
+of the documentation.
 
 =head2 Preparation
 
@@ -37,6 +38,14 @@ mentioned earlier, the next command will download and unpack it:
 
     $ perl -mCPAN -e'CPAN::Shell->look("DBIO")'
     DBIO$ cd examples/Schema
+
+Create the SQLite database from the schema classes and fill it with data (this
+needs the L<DBIO::SQLite> driver installed):
+
+    DBIO/examples/Schema$ mkdir -p db
+    DBIO/examples/Schema$ perl -I. -MMyApp::Schema \
+        -e 'MyApp::Schema->connect("dbi:SQLite:db/example.db")->deploy'
+    DBIO/examples/Schema$ perl ./insertdb.pl
 
 Inspect the database:
 
@@ -165,8 +174,8 @@ exploratory programming.
 
 From the root to the details:
 
-    $schema->sources;                       # returns qw(Cd Track Artist)
-    $schema->source('Cd')->columns;         # returns qw(cdid artist title year)
+    $schema->sources;                       # returns qw(Artist Cd Track)
+    $schema->source('Cd')->columns;         # returns qw(cdid artistid title year)
     $schema->source('Cd')->relationships;   # returns qw(artist tracks)
 
 From a detail to the root:
@@ -180,8 +189,9 @@ From a detail to the root:
     # delete database file
     DBIO/examples/Schema$ rm -f db/example.db
 
-    # create database and set up tables from definition
-    DBIO/examples/Schema$ sqlite3 db/example.db < db/example.sql
+    # recreate the tables from the schema classes
+    DBIO/examples/Schema$ perl -I. -MMyApp::Schema \
+        -e 'MyApp::Schema->connect("dbi:SQLite:db/example.db")->deploy'
 
     # fill them with data
     DBIO/examples/Schema$ perl ./insertdb.pl

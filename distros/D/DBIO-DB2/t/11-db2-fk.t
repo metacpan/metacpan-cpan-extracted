@@ -3,10 +3,11 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use DBI ();
 use DBIO::Optional::Dependencies ();
 use DBIO::Test;
 
-# Live integration test for the karr #14 FK feature, end-to-end against a REAL
+# Live integration test for the karr k14 FK feature, end-to-end against a REAL
 # DB2 (the orchestrator runs it inside the maint/docker stack). Covers:
 #   * install_ddl emitting a NAMED, deterministic FK constraint
 #   * RI actually enforced by the server
@@ -32,9 +33,12 @@ plan skip_all => 'Set $ENV{DBIO_TEST_DB2_DSN}, _USER and _PASS to run this test'
 # less friction and makes the assertions unambiguous.
 #
 # Deterministic FK name (DBIO::DB2::DDL::_fk_constraint_name) is
-# fk_<table>_<from_cols> => "fk_dbiofk_child_parent_id". DB2 folds unquoted
-# identifiers to UPPERCASE, so the live catalog (and thus every introspected
-# model) carries it as FK_DBIOFK_CHILD_PARENT_ID.
+# fk_<table>_<from_cols> => "fk_dbiofk_child_parent_id". Since karr k28 every
+# identifier the DDL emits is double-quoted, so DB2 does NOT fold it: the live
+# catalog -- and thus every introspected model and every model KEY -- carries
+# the name in the exact lowercase install_ddl wrote. Raw DDL/DML typed in this
+# file has to quote its identifiers the same way, or the unquoted form folds to
+# DBIOFK_CHILD / PARENT_ID and misses the objects entirely (SQL0204N).
 {
   package DBIO::Test::FK::Parent;
   use strict; use warnings;
@@ -67,6 +71,7 @@ plan skip_all => 'Set $ENV{DBIO_TEST_DB2_DSN}, _USER and _PASS to run this test'
   package DBIO::Test::FK::Schema;
   use strict; use warnings;
   use base 'DBIO::Schema';
+  __PACKAGE__->load_components('DB2');
   __PACKAGE__->register_class(Parent => 'DBIO::Test::FK::Parent');
   __PACKAGE__->register_class(Child  => 'DBIO::Test::FK::Child');
 }
@@ -77,23 +82,25 @@ use DBIO::DB2::Diff;
 
 my $PARENT = 'dbiofk_parent';
 my $CHILD  = 'dbiofk_child';
-my $FK_NAME = 'FK_DBIOFK_CHILD_PARENT_ID';   # uppercase: DB2 folds unquoted names
+my $Q_PARENT = qq{"$PARENT"};                # raw SQL below must quote them
+my $Q_CHILD  = qq{"$CHILD"};                 # or DB2 folds and misses
+my $FK_NAME = 'fk_dbiofk_child_parent_id';   # verbatim: the DDL quotes it
 
 my $schema = DBIO::Test::FK::Schema->connect($dsn, $user, $pass)
-  or plan skip_all => "Cannot connect: $DBI::errstr";
+  or plan skip_all => "Cannot connect: " . DBI->errstr;
 
 my $dbh = eval { $schema->storage->dbh }
   or plan skip_all => "Cannot reach DB2: $@";
 
 # The introspector default schema is 'USER', which does not match the connected
 # user's real CURRENT SCHEMA (e.g. DB2INST1). Resolve the live schema so the
-# source side of a diff actually sees our tables. This is also why the FK
-# add/drop/modify/idempotency blocks below drive DBIO::DB2::Introspect +
-# DBIO::DB2::Diff directly rather than $deploy->diff/upgrade: the high-level
-# diff path introspects the live side with the default 'USER' schema and would
-# phantom-create everything instead of producing the targeted FK op we assert.
-# (install, step 1, does NOT introspect the live schema -- it just runs
-# install_ddl -- so it is driven via the public $deploy->install.)
+# hand-driven DBIO::DB2::Introspect models (live_model) see our tables. The
+# FK add/drop/modify blocks drive DBIO::DB2::Diff::ForeignKey on those models
+# to assert one targeted FK op each; the high-level $deploy->diff/upgrade path
+# resolves CURRENT SCHEMA itself (Deploy::_introspect_current, karr k17) and is
+# exercised in blocks 6 and 7 below. (install, step 1, does NOT introspect the
+# live schema -- it just runs install_ddl -- so it is driven via the public
+# $deploy->install.)
 my $live_schema = eval {
   my ($s) = $dbh->selectrow_array('VALUES CURRENT SCHEMA');
   $s =~ s/\s+$// if defined $s;   # CURRENT SCHEMA is CHAR(128), space-padded
@@ -108,16 +115,17 @@ sub live_model { DBIO::DB2::Introspect->new(dbh => $dbh, schema => $live_schema)
 
 # FK list for a table out of an introspected model (canonical shape from
 # DBIO::DB2::Introspect::ForeignKeys: constraint_name, from_columns, to_table,
-# to_columns, on_delete, on_update). Table key is uppercase in the live catalog.
+# to_columns, on_delete, on_update). The model is keyed by the catalog name,
+# which is the quoted lowercase one the DDL created.
 sub fks_for {
   my ($model, $table) = @_;
-  return $model->{foreign_keys}{ uc $table } || [];
+  return $model->{foreign_keys}{ $table } || [];
 }
 
 # --- hygiene: clear leftovers from a previous run (child before parent) ------
 sub drop_test_tables {
-  eval { $dbh->do("DROP TABLE $CHILD") };
-  eval { $dbh->do("DROP TABLE $PARENT") };
+  eval { $dbh->do("DROP TABLE $Q_CHILD") };
+  eval { $dbh->do("DROP TABLE $Q_PARENT") };
 }
 drop_test_tables();
 
@@ -131,40 +139,41 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 {
   my $model = live_model();
 
-  ok exists $model->{tables}{ uc $PARENT }, 'parent table created';
-  ok exists $model->{tables}{ uc $CHILD },  'child table created';
+  ok exists $model->{tables}{ $PARENT }, 'parent table created';
+  ok exists $model->{tables}{ $CHILD },  'child table created';
 
   my $fks = fks_for($model, $CHILD);
   is scalar(@$fks), 1, 'child has exactly one FK after install';
 
   my $fk = $fks->[0];
-  is uc($fk->{constraint_name}), $FK_NAME,
+  is $fk->{constraint_name}, $FK_NAME,
     'FK landed as a NAMED constraint with the deterministic fk_<table>_<cols> name';
-  is_deeply [ map { lc } @{ $fk->{from_columns} } ], ['parent_id'],
+  is_deeply $fk->{from_columns}, ['parent_id'],
     'FK from_columns is the child local column';
-  is uc($fk->{to_table}), uc($PARENT),
+  is $fk->{to_table}, $PARENT,
     'FK references the parent table';
-  is_deeply [ map { lc } @{ $fk->{to_columns} } ], ['id'],
+  is_deeply $fk->{to_columns}, ['id'],
     'FK to_columns is the parent primary key';
 
   # RI enforced: a child row pointing at a non-existent parent must die.
   dies_ok {
-    $dbh->do("INSERT INTO $CHILD (parent_id, label) VALUES (99999, 'orphan')");
+    $dbh->do("INSERT INTO $Q_CHILD (\"parent_id\", \"label\") VALUES (99999, 'orphan')");
   } 'inserting a child with a non-existent parent key violates RI (dies)';
 
   # A valid child (pointing at a real parent) must live.
-  $dbh->do("INSERT INTO $PARENT (name) VALUES ('p1')");
-  my ($pid) = $dbh->selectrow_array("SELECT id FROM $PARENT WHERE name = 'p1'");
+  $dbh->do("INSERT INTO $Q_PARENT (\"name\") VALUES ('p1')");
+  my ($pid) = $dbh->selectrow_array(
+    "SELECT \"id\" FROM $Q_PARENT WHERE \"name\" = 'p1'");
   ok $pid, 'parent row inserted';
   lives_ok {
-    $dbh->do("INSERT INTO $CHILD (parent_id, label) VALUES ($pid, 'ok')");
+    $dbh->do("INSERT INTO $Q_CHILD (\"parent_id\", \"label\") VALUES ($pid, 'ok')");
   } 'inserting a child with a valid parent key satisfies RI (lives)';
 }
 
 # ============================================================================
 # 5. idempotency (asserted right after install, the key round-trip guard):
 #    diff the live model against itself-shaped target -> ZERO FK ops.
-#    Both source and target carry the SAME introspected (uppercase, rule-coded)
+#    Both source and target carry the SAME introspected (rule-coded)
 #    FK, so a name-based, field-based FK diff must produce nothing. This is the
 #    regression guard for the test-deploy-and-compare round-trip: if install_ddl
 #    stopped emitting the FK, or the name/rule did not round-trip, this fails.
@@ -178,13 +187,13 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 }
 
 # ============================================================================
-# 6. HIGH-LEVEL path (karr #17): drive $deploy->diff itself, not the direct
+# 6. HIGH-LEVEL path (karr k17): drive $deploy->diff itself, not the direct
 #    Introspect+Diff bypass the blocks above use. This now works because
 #    DBIO::DB2::Deploy->_introspect_current resolves the connection's CURRENT
-#    SCHEMA for the source model -- before the #17 fix it introspected the
+#    SCHEMA for the source model -- before the k17 fix it introspected the
 #    introspector-default 'USER' schema, came back empty, and phantom-created
 #    the entire freshly-installed schema. _build_target_model deploys the
-#    desired schema into a throwaway _dbio_test_<pid> schema (the FK's
+#    desired schema into a throwaway DBIO_TEST_<pid> schema (the FK's
 #    REFERENCES target is now qualified into that schema too, so the compare
 #    child does not cross-reference the live parent) and introspects it.
 #
@@ -215,7 +224,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 {
   my $source = live_model();
   my $target = live_model();
-  $target->{foreign_keys}{ uc $CHILD } = [];   # desired: child without the FK
+  $target->{foreign_keys}{ $CHILD } = [];   # desired: child without the FK
 
   my @ops = DBIO::DB2::Diff::ForeignKey->diff(
     $source->{foreign_keys}, $target->{foreign_keys},
@@ -224,14 +233,14 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
   is scalar(@ops), 1, 'dropping the only FK yields one op';
   is $ops[0]->action, 'drop', 'op is a DROP';
   like $ops[0]->as_sql,
-    qr/^ALTER TABLE \Q$CHILD\E DROP FOREIGN KEY \Q$FK_NAME\E;$/i,
-    'DROP FOREIGN KEY uses the real server-carried constraint name';
+    qr/^ALTER TABLE \Q$Q_CHILD\E DROP FOREIGN KEY "\Q$FK_NAME\E";$/,
+    'DROP FOREIGN KEY uses the real server-carried constraint name (quoted)';
 
   $dbh->do($_->as_sql) for @ops;
 
   my $after = fks_for(live_model(), $CHILD);
   is scalar(@$after), 0, 'FK is gone after applying the DROP';
-  ok exists live_model()->{tables}{ uc $CHILD }, 'child table still present';
+  ok exists live_model()->{tables}{ $CHILD }, 'child table still present';
 }
 
 # ============================================================================
@@ -247,7 +256,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 
   # Desired FK, in the canonical introspected shape the Diff/DDL clause expects.
   my $desired_fk = {
-    constraint_name => lc $FK_NAME,            # deterministic name from DDL
+    constraint_name => $FK_NAME,               # deterministic name from DDL
     from_columns    => ['parent_id'],
     to_table        => $PARENT,
     to_columns      => ['id'],
@@ -255,7 +264,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
     on_update       => 'NO ACTION',
   };
   my $target = live_model();
-  $target->{foreign_keys}{ uc $CHILD } = [ $desired_fk ];
+  $target->{foreign_keys}{ $CHILD } = [ $desired_fk ];
 
   my @ops = DBIO::DB2::Diff::ForeignKey->diff(
     $source->{foreign_keys}, $target->{foreign_keys},
@@ -264,19 +273,19 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
   is scalar(@ops), 1, 'adding an FK to an existing table yields one op';
   is $ops[0]->action, 'add', 'op is an ADD';
   like $ops[0]->as_sql,
-    qr/^ALTER TABLE \Q$CHILD\E ADD CONSTRAINT \Q$FK_NAME\E FOREIGN KEY \(parent_id\) REFERENCES \Q$PARENT\E\(id\);$/i,
-    'ADD CONSTRAINT ... FOREIGN KEY ... renders the named clause';
+    qr/^ALTER TABLE \Q$Q_CHILD\E ADD CONSTRAINT "\Q$FK_NAME\E" FOREIGN KEY \("parent_id"\) REFERENCES \Q$Q_PARENT\E\("id"\);$/,
+    'ADD CONSTRAINT ... FOREIGN KEY ... renders the named clause (quoted)';
 
   $dbh->do($_->as_sql) for @ops;
 
   my $after = fks_for(live_model(), $CHILD);
   is scalar(@$after), 1, 'FK exists again after applying the ADD';
-  is uc($after->[0]{constraint_name}), $FK_NAME,
+  is $after->[0]{constraint_name}, $FK_NAME,
     're-added FK round-trips with the deterministic name';
 
   # RI is enforced again by the freshly added constraint.
   dies_ok {
-    $dbh->do("INSERT INTO $CHILD (parent_id, label) VALUES (88888, 'orphan2')");
+    $dbh->do("INSERT INTO $Q_CHILD (\"parent_id\", \"label\") VALUES (88888, 'orphan2')");
   } 'RI enforced by the re-added FK (orphan child dies)';
 }
 
@@ -306,7 +315,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
     on_update       => 'NO ACTION',
   };
   my $target = live_model();
-  $target->{foreign_keys}{ uc $CHILD } = [ $modified_fk ];
+  $target->{foreign_keys}{ $CHILD } = [ $modified_fk ];
 
   my @ops = DBIO::DB2::Diff::ForeignKey->diff(
     $source->{foreign_keys}, $target->{foreign_keys},
@@ -330,7 +339,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 }
 
 # ============================================================================
-# 7. HIGH-LEVEL targeted delta (karr #17): prove the high-level $deploy->diff
+# 7. HIGH-LEVEL targeted delta (karr k17): prove the high-level $deploy->diff
 #    sees the LIVE tables and emits only the genuine difference -- it does NOT
 #    full-re-create the schema (the bug this ticket fixes). Add a transient
 #    column to the live child so it now has one column the desired schema lacks;
@@ -346,7 +355,7 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
 # ============================================================================
 {
   my $DELTA_COL = 'dbio_delta_col';
-  $dbh->do("ALTER TABLE $CHILD ADD COLUMN $DELTA_COL integer");
+  $dbh->do("ALTER TABLE $Q_CHILD ADD COLUMN \"$DELTA_COL\" integer");
 
   my @delta_ops = @{ $deploy->diff->operations };
 
@@ -358,12 +367,12 @@ lives_ok { $deploy->install } 'install deploys parent + child schema';
   is scalar(@col_ops), 1, 'targeted delta: exactly one column op';
   is $col_ops[0]->action, 'drop',
     'targeted delta: the op drops the column the live DB has but the schema lacks';
-  is lc($col_ops[0]->column_name), $DELTA_COL,
+  is $col_ops[0]->column_name, $DELTA_COL,
     'targeted delta: the op targets the transient column, not the real ones';
 
   # Best-effort restore (DROP COLUMN -> reorg-pending; tables are dropped in END
   # regardless, so do not fail the run if this cannot complete).
-  eval { $dbh->do("ALTER TABLE $CHILD DROP COLUMN $DELTA_COL") };
+  eval { $dbh->do("ALTER TABLE $Q_CHILD DROP COLUMN \"$DELTA_COL\"") };
 }
 
 done_testing;
@@ -371,30 +380,18 @@ done_testing;
 # clean up our mess (child before parent: FK dependency order)
 END {
   if (my $dbh = eval { $schema->storage->_dbh }) {
-    eval { $dbh->do("DROP TABLE $CHILD") };
-    eval { $dbh->do("DROP TABLE $PARENT") };
+    eval { $dbh->do("DROP TABLE $Q_CHILD") };
+    eval { $dbh->do("DROP TABLE $Q_PARENT") };
     # The high-level $deploy->diff above builds a throwaway DBIO_TEST_<pid>
     # schema and drops it itself; but if that drop was swallowed on a failure
     # path (DBIO::DB2::Deploy::_build_target_model swallows the DROP SCHEMA
     # error when a model was produced), best-effort drop it here so no schema
-    # leaks. ADMIN_DROP_SCHEMA needs the SYSTOOLSPACE tablespace (absent on a
-    # stock DB2), so tear it down with plain DDL + catalog lookups instead: drop
-    # the schema's FK constraints, then its tables, then the empty schema -- each
-    # under eval so a stale/already-clean state never fails the run.
-    my $test_schema = 'DBIO_TEST_' . $$;
-    local $dbh->{FetchHashKeyName} = 'NAME_lc';   # DBD::DB2 upper-cases hashref keys
-    for my $fk (@{ $dbh->selectall_arrayref(
-        q{SELECT tabname, constname FROM syscat.tabconst WHERE tabschema = ? AND type = 'F'},
-        { Slice => {} }, $test_schema) || [] }) {
-      eval { local $dbh->{PrintError} = 0;
-        $dbh->do("ALTER TABLE $test_schema.$fk->{tabname} DROP FOREIGN KEY $fk->{constname}") };
-    }
-    for my $t (@{ $dbh->selectall_arrayref(
-        q{SELECT tabname FROM syscat.tables WHERE tabschema = ? AND type = 'T'},
-        { Slice => {} }, $test_schema) || [] }) {
-      eval { local $dbh->{PrintError} = 0; $dbh->do("DROP TABLE $test_schema.$t->{tabname}") };
-    }
-    eval { local $dbh->{PrintError} = 0; $dbh->do("DROP SCHEMA $test_schema RESTRICT") };
+    # leaks. This used to be a hand-copied second implementation of that
+    # teardown, and the copy is exactly what rotted: it still dropped the
+    # catalog-read names unquoted, which DB2 folds to uppercase, so every DROP
+    # failed silently under its eval and the compare schema leaked (karr k29).
+    # Call the one implementation instead -- it needs no instance state.
+    DBIO::DB2::Deploy->_drop_test_schema($dbh, 'DBIO_TEST_' . $$);
   }
   undef $schema;
 }

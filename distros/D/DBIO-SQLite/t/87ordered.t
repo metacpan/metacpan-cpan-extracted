@@ -9,7 +9,7 @@ use POSIX qw(ceil);
 my $schema = DBIO::SQLite::Test->init_schema();
 
 my $employees = $schema->resultset('Employee');
-$employees->delete();
+$employees->delete({ all => 1 });
 
 foreach (1..5) {
     $employees->create({ name=>'temp' });
@@ -20,7 +20,7 @@ ok( check_rs($employees), "intial positions" );
 hammer_rs( $employees );
 
 set_grouping($schema, 'group_id');
-$employees->delete();
+$employees->delete({ all => 1 });
 foreach my $group_id (1..4) {
     foreach (1..6) {
         $employees->create({ name=>'temp', group_id=>$group_id });
@@ -121,7 +121,7 @@ is_deeply(
 #####
 
 set_grouping($schema, 'group_id_2', 'group_id_3');
-$employees->delete();
+$employees->delete({ all => 1 });
 foreach my $group_id_2 (1..4) {
     foreach my $group_id_3 (1..4) {
         foreach (1..4) {
@@ -164,7 +164,7 @@ foreach my $group_id_2 (1..4) {
     }
 }
 
-$employees->delete();
+$employees->delete({ all => 1 });
 foreach my $group_id_2 (1..4) {
     foreach my $group_id_3 (1..4) {
         foreach (1..4) {
@@ -244,7 +244,7 @@ sub hammer_rs {
             ok( check_rs($rs), "move_to( $position => $to_position )" );
         }
 
-        $row = $rs->find({ position => $position });
+        $row = $rs->search({ position => $position })->single;
         if ($position==1) {
             ok( !$row->previous_sibling(), 'no previous sibling' );
             ok( !$row->first_sibling(), 'no first sibling' );

@@ -72,6 +72,7 @@ sub _inject_ipcountry {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 }
 
 _block_network();
@@ -508,6 +509,7 @@ subtest '_find_language_from_ip: LANG env fallback when country() undef (COND_IN
 	$l->{_have_ipcountry} = $GEO_ABSENT;
 	$l->{_have_geoip}     = $GEO_ABSENT;
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 	my $lang = $l->language();
 	diag("LANG fallback: lang=$lang") if $ENV{TEST_VERBOSE};
 	# country() returns undef for loopback/private/no-REMOTE_ADDR,
@@ -647,6 +649,7 @@ subtest 'country: _have_geoip sentinel checked before loading Geo::IP (NUM_BOUND
 	$l->{_have_ipcountry} = $GEO_ABSENT;
 	$l->{_have_geoip}     = $GEO_ABSENT;    # already determined: absent
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 
 	my $load_called = 0;
 	Test::Mockingbird::mock('CGI::Lingua', '_load_geoip', sub { $load_called++ });
@@ -664,6 +667,7 @@ subtest 'country: _have_geoip=UNKNOWN triggers _load_geoip (NUM_BOUNDARY_1115_27
 	$l->{_have_ipcountry} = $GEO_ABSENT;
 	$l->{_have_geoip}     = $GEO_UNKNOWN;    # not yet probed
 	$l->{_have_geoipfree} = $GEO_ABSENT;
+	$l->{_have_mmdb} = $GEO_ABSENT;
 
 	my $load_called = 0;
 	Test::Mockingbird::mock('CGI::Lingua', '_load_geoip',
@@ -687,6 +691,7 @@ subtest 'country: geoplugin JSON path (COND_INV_1154_3)' => sub {
 		$l->{_have_ipcountry} = $GEO_ABSENT;
 		$l->{_have_geoip}     = $GEO_ABSENT;
 		$l->{_have_geoipfree} = $GEO_ABSENT;
+		$l->{_have_mmdb} = $GEO_ABSENT;
 
 		{
 			local $SIG{__WARN__} = sub {};

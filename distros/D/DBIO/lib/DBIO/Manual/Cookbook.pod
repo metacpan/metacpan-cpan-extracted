@@ -13,7 +13,7 @@ DBIO::Manual::Cookbook - Miscellaneous recipes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SEARCHING
 
@@ -46,7 +46,7 @@ Sometimes you need to formulate a query using specific operators:
   my @albums = $schema->resultset('Album')->search({
     artist => { 'like', '%Lamb%' },
     title  => { 'like', '%Fear of Fours%' },
-  });
+  })->all;
 
 This results in something like the following C<WHERE> clause:
 
@@ -65,7 +65,7 @@ Other queries might require slightly more complex logic:
       ],
       artist => 'Starchildren',
     ],
-  });
+  })->all;
 
 This results in the following C<WHERE> clause:
 
@@ -163,21 +163,6 @@ L<update|DBIO::ResultSet/update> or
 L<delete|DBIO::ResultSet/delete> on it).
 
 Note that you cannot have bind parameters unless is_virtual is set to true.
-
-=over
-
-=item * NOTE
-
-If you're using the old deprecated C<< $rsrc_instance->name(\'( SELECT ...') >>
-method for custom SQL execution, you are highly encouraged to update your code
-to use a virtual view as above. If you do not want to change your code, and just
-want to suppress the deprecation warning when you call
-L<DBIO::Schema/deploy>, add this line to your source definition, so that
-C<deploy> will exclude this "table":
-
-  sub sqlt_deploy_hook { $_[1]->schema->drop_table ($_[1]) }
-
-=back
 
 =head2 Using specific columns
 
@@ -603,7 +588,7 @@ C<LinerNotes>:
   # CD->has_one('liner_notes' => 'LinerNotes', 'cd');
   my $rs = $schema->resultset('CD')->search(
     {
-      'artist.name' => 'Bob Marley'
+      'artist.name' => 'Bob Marley',
       'liner_notes.notes' => { 'like', '%some text%' },
     },
     {
@@ -812,13 +797,13 @@ B<Schema definition>
 
     package My::App::Schema;
 
-    use base 'DBIO::Schema';
+    use DBIO 'Schema', -pg;
 
     # load subclassed classes from My::App::Schema::Result/ResultSet
     __PACKAGE__->load_namespaces;
 
     # load classes from shared model
-    load_classes({
+    __PACKAGE__->load_classes({
         'My::Shared::Model::Result' => [qw/
             Foo
             Bar
@@ -870,7 +855,7 @@ B<Schema Definition>
 
     package My::Schema;
 
-    use base qw/DBIO::Schema/;
+    use DBIO 'Schema', -pg;
 
     __PACKAGE__->load_namespaces;
 
@@ -1002,9 +987,9 @@ wrapped round them.
 
 This is used like so:
 
-  my $cursor = $rs->cursor
+  my $cursor = $rs->cursor;
   while (my @vals = $cursor->next) {
-      # use $val[0..n] here
+      # use $vals[0..n] here
   }
 
 You will need to map the array offsets to particular columns (you can
@@ -1197,6 +1182,7 @@ building a renaming facility, like so:
   use Moose;
 
   extends 'DBIO::Schema';
+  __PACKAGE__->load_components('PostgreSQL');
 
   around connection => sub {
     my ( $inner, $self, $dsn, $username, $pass, $attr ) = ( shift, @_ );
@@ -1444,9 +1430,14 @@ desired schema and applies the diff (test-and-compare). The native Deploy
 classes expose C<install>, C<diff>, C<apply> and C<upgrade> directly for finer
 control, including version-to-version C<ALTER TABLE> upgrades.
 
+C<< $storage->deploy >> takes the same route, so a storage that declares a
+Deploy class installs natively whether you call it on the schema or on the
+storage.
+
 If you keep pre-generated C<.sql> files on disk,
 C<< $schema->deployment_statements >> reads and returns the matching DDL file
-(and throws if none is present); it performs no on-the-fly SQL generation.
+(and throws if none is present) -- for every driver, native Deploy class or not;
+it performs no on-the-fly SQL generation.
 
 =head2 Select from dual
 
@@ -1546,11 +1537,18 @@ C<oracles.heavily(nested(functions_can('take', 'lots'), OF), 'args')>
 =head2 Adding Indexes And Functions To Your SQL
 
 B<Legacy path.> C<sqlt_deploy_hook> is a deprecated, SQL::Translator-era hook
-kept for backwards compatibility. With the native Deploy classes, declare
-indexes through the driver's own facilities instead - C<< __PACKAGE__->indices >>
-(see L<DBIO::ResultSourceProxy/indices>) or the L<DBIO::Cake/idx> DSL, which also
-emit native C<pg_indexes> for the PostgreSQL Deploy class. The hook below still
-fires for code that has not yet been ported.
+kept for backwards compatibility. In core DBIO it is a B<no-op>: the generic
+SQL::Translator deploy path is gone, so L<DBIO::Schema/deploy> reads a
+pre-existing DDL file or throws and never invokes the hook. It fires only if
+your storage's native Deploy class chooses to invoke it. With the native Deploy
+classes, declare indexes through the driver's own facilities instead -
+C<< __PACKAGE__->indices >> (see L<DBIO::ResultSourceProxy/indices>) or the
+L<DBIO::Cake/idx> DSL, which store canonical declarations on the result source
+(L<DBIO::ResultSource/index_declarations>) for the driver's Deploy class to
+read. C<idx> takes a C<pg>, C<sqlite> or C<mysql> block for what only that
+driver expresses; a schema is bound to one driver, and the driver refuses an
+index that only carries another driver's block. The recipe below is retained for reference, but will not run
+unless a native Deploy class calls it.
 
 Often you will want indexes on columns on your table to speed up searching. To
 do this, create a method called C<sqlt_deploy_hook> in the relevant source
@@ -1623,11 +1621,13 @@ B<Create and version a DBIO schema>
 
 Build the schema manually or generate it from an existing database as described
 under L</Creating Schemas From An Existing Database>, and set a C<$VERSION> on
-the schema class so the deployment handler can track it:
+the schema class so the deployment handler can track it. The schema also loads
+the version-storage component, which registers the C<__VERSION> result source:
 
   package My::Schema;
-  use base 'DBIO::Schema';
+  use DBIO 'Schema', -pg;
   our $VERSION = 1;
+  __PACKAGE__->load_components('+DBIO::DeploymentHandler::VersionStorage::Standard::Component');
   __PACKAGE__->load_namespaces;
 
 B<Deploy to customers>
@@ -1660,6 +1660,29 @@ normalisation, and so on) pass C<upgrade_hooks> to
 C<< DBIO::DeploymentHandler->new >>; see L<DBIO::DeploymentHandler> for details.
 The L<dbioadmin> CLI wraps the same deploy and upgrade operations for
 command-line use.
+
+B<Upgrades that remove or alter data>
+
+An upgrade runs what the diff between the live database and the schema class
+says. Additive and changing operations run as they are. An operation that
+drops something the schema class does not declare (a table, schema, type,
+extension, column) or that may alter stored data (a type change whose cast can
+round or truncate) runs when the call is released for it:
+
+  my $diff = $deploy->diff;
+  print $diff->summary;                       # what would happen
+  $deploy->apply($diff, allow_destructive => 1);
+
+  $deploy->upgrade(dry_run => 1);             # the diff, nothing executed
+  $deploy->upgrade(allow_destructive => 1);
+
+Without C<allow_destructive> the call stops before its first statement and its
+L<DBIO::Exception> lists the C<summary> of each operation that needs the
+release. Operations the deploy refuses (an ambiguous change it cannot write
+safely) never run, released or not. Through the L<DBIO::DeploymentHandler> the
+release is C<< $dh->upgrade({ allow_destructive => 1 }) >>; C<dbioadmin
+--upgrade> lists such operations and asks for C<YES>, C<--force> answers it and
+C<--dry-run> prints the summary and the SQL only.
 
 =head2 Setting quoting for the generated SQL
 
@@ -1785,11 +1808,11 @@ The following databases do correctly handle unicode data:-
 =head3 MySQL
 
 MySQL supports unicode, and will correctly flag utf8 data from the
-database if the C<mysql_enable_utf8> is set in the connect options.
+database if the C<mysql_enable_utf8mb4> is set in the connect options.
 
   my $schema = My::Schema->connection('dbi:mysql:dbname=test',
                                       $user, $pass,
-                                      { mysql_enable_utf8 => 1} );
+                                      { mysql_enable_utf8mb4 => 1} );
 
 When set, a data retrieved from a textual column type (char,
 varchar, etc) will have the UTF-8 flag turned on if necessary. This
@@ -1971,7 +1994,7 @@ Next, we'll define the accessor-wrapper subroutine:
       my $description = $self->_description;
 
       # If there's something in the description field, then just return that.
-      return $description if defined $description && length $descripton;
+      return $description if defined $description && length $description;
 
       # Otherwise, generate a description.
       return $self->generate_description;
@@ -2091,10 +2114,6 @@ statement and dig down to see if certain parameters cause aberrant behavior.
 =item *
 
 Install L<Class::XSAccessor> to speed up L<Class::Accessor::Grouped>.
-
-=item *
-
-On Perl 5.8 install L<Class::C3::XS>.
 
 =item *
 

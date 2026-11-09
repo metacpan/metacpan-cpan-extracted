@@ -4,9 +4,12 @@ package DBIO::Replicated::Balancer::Random;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Replicated::Balancer';
 
 __PACKAGE__->mk_group_accessors(simple => 'master_read_weight');
+
 
 sub new {
   my ($class, %args) = @_;
@@ -14,6 +17,7 @@ sub new {
   $self->master_read_weight(exists $args{master_read_weight} ? $args{master_read_weight} : 0);
   return $self;
 }
+
 
 sub next_storage {
   my $self = shift;
@@ -43,7 +47,22 @@ DBIO::Replicated::Balancer::Random - Randomly choose an active replicant
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 METHODS
+
+=head2 new
+
+Same as L<DBIO::Replicated::Balancer/new>, plus C<master_read_weight>
+(default 0), which is also available as a read/write accessor.
+
+=head2 next_storage
+
+Returns nothing if there are no active replicants. Otherwise draws a random
+number in C<< [0, replicants + master_read_weight) >>: values below the
+replicant count pick that replicant, the rest pick the master. With the
+default weight 0 the master is never picked while a replicant is active;
+a weight of 1 gives the master the same share as one replicant.
 
 =head1 AUTHOR
 

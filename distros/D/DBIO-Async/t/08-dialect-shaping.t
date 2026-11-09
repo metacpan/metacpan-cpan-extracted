@@ -3,18 +3,23 @@ use warnings;
 use Test::More;
 use Future;
 
-# OFFLINE test for karr #3 (core #70 share): the future_io transport now
+# OFFLINE test for karr k3 (core k70 share): the future_io transport now
 # internalises '?'-dialect shaping.
 #
 # WHAT THIS PROVES:
 #  1. _query_async / _query_async_pinned RECEIVE sql_maker '?'-placeholder
 #     SQL and shape it into the driver dialect ('$N') INSIDE the transport,
 #     before the query reaches the wire (_submit_query). No caller pre-shape.
-#  2. Transition-window safety: feeding ALREADY-shaped SQL (contains '$N',
-#     no bare '?') back through the same path leaves it UNCHANGED -- the
-#     '?'->'$N' rewrite is idempotent -- including a literal '?' inside a
-#     quoted string literal, which the shaper must never touch. This is why
-#     core can keep shaping at its own call site during the PR train.
+#  2. Idempotency: feeding ALREADY-shaped SQL (contains '$N', no bare '?')
+#     back through the same path leaves it UNCHANGED -- including a literal
+#     '?' inside a quoted string literal, which the shaper must never touch.
+#
+#     The ASSERTION is unchanged; only its reason is (karr k13). It was
+#     written as transition-window safety, "why core can keep shaping at its
+#     own call site during the PR train" -- that sequencing (ADR 0032 §6) is
+#     finished and core's orchestration has no _transform_sql call site left.
+#     Idempotency stands on its own: the seam runs on every query and a
+#     second pass over shaped SQL must be a no-op.
 
 # --- ShapingMock: a concrete driver transport ---
 # Inherits the REAL DBIO::Async::Storage::_query_async / _query_async_pinned
@@ -104,10 +109,10 @@ sub new_storage {
     'pinned _query_async_pinned shapes ?->$N internally too';
 }
 
-# --- 3. transition-window idempotency through the real _query_async path ---
+# --- 3. idempotency through the real _query_async path ---
 # Already-shaped SQL ('$N', no bare '?') fed back through the shaping path is
-# unchanged -- and a literal '?' inside a quoted string literal survives. This
-# is the double-shape safety net for the core #70 PR train.
+# unchanged -- and a literal '?' inside a quoted string literal survives. The
+# seam sits on every query, so a second pass over shaped SQL must be a no-op.
 
 {
   my $storage = new_storage;

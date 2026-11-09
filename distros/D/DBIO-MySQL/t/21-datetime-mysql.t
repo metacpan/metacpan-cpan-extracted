@@ -55,10 +55,14 @@ require DBI;
 # (and survives reconnects). Wire the relaxation through on_connect_call so every
 # (re)connect strips NO_ZERO_DATE / NO_ZERO_IN_DATE -- the session issuing the
 # UPDATE is guaranteed to carry it. See DBIO::MySQL::Storage/connect_call_set_zero_date_permissive.
+# A schema always declares its driver (core ADR 0067): the storage class the
+# DSN's DBD is registered for -- DBIO::MySQL::Storage::MariaDB for dbi:MariaDB:.
 my $schema = DBIO::Test->init_schema(
   dsn          => $dsn,
   user         => $user,
   pass         => $pass,
+  storage_type => $dsn =~ /\Adbi:MariaDB:/i
+    ? 'DBIO::MySQL::Storage::MariaDB' : 'DBIO::MySQL::Storage',
   no_deploy    => 1,
   connect_opts => { on_connect_call => 'set_zero_date_permissive' },
 );

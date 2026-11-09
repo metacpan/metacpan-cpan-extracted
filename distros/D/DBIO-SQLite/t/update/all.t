@@ -12,7 +12,7 @@ my $cds = $schema->resultset('CD');
 my $cds_count = $cds->count;
 cmp_ok($cds_count, '>', 0, 'have some cds');
 
-$cds->update_all({ artist => $new_artist });
+$cds->update_all({ artist => $new_artist }, { all => 1 });
 
 is( $new_artist->cds->count, $cds_count, 'All cds properly relinked');
 

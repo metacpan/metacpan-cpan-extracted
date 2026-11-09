@@ -2,7 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
+BEGIN {
+  eval { require Future; 1 } or plan skip_all => 'Future not installed';
+  eval { require EV; 1 }     or plan skip_all => 'EV not installed';
+}
 
 use DBIO::MySQL::EV::Storage;
 use DBIO::MySQL::EV::QueryExecutor;
@@ -43,6 +46,9 @@ use DBIO::MySQL::EV::QueryExecutor;
     push @{ $self->{log} }, $stmt->{sql};
     return $self->_reply($stmt->{sql}, $cb);
   }
+  # The executor closes every statement it prepared and settles the query
+  # Future from this callback (karr k45).
+  sub close_stmt { my ($self, $stmt, $cb) = @_; $cb->(1) if $cb }
   sub _reply {
     my ($self, $sql, $cb) = @_;
     return unless $cb;
@@ -54,6 +60,24 @@ use DBIO::MySQL::EV::QueryExecutor;
       # INSERT/UPDATE/DELETE: affected-rows shape
       $cb->([], undef);
     }
+  }
+}
+
+# A minimal mock OWNER for k193 ("restore select preparation parity"):
+# production code wires a real DBIO::MySQL::Storage here through
+# DBIO::Storage::DBI::_async_storage; this mock stands in with just the one
+# seam the async SELECT path now demands (op name first, then the select args
+# the SQLMaker consumes). We do NOT mirror _assert_async_context_owner --
+# k196's ownership check is exercised end-to-end in
+# t/with-context-ownership-mock.t, and these facade tests do not run a
+# context-bound CRUD op, so the seam is not exercised here.
+{
+  package FakeOwnerFacade;
+  sub new     { bless {}, $_[0] }
+  sub _select_args {
+    # Canonical (op, $ident, $select, $where, $attrs) shape — the async SELECT
+    # path shifts the op name off and forwards the rest to $self->sql_maker.
+    return ('select', @_[1..$#_]);
   }
 }
 
@@ -89,6 +113,8 @@ use DBIO::MySQL::EV::QueryExecutor;
     return Future->done($conn);
   }
   sub acquire_txn { $_[0]->acquire }
+  sub _mysql_report_if_gone { }   # the transport reports a failed statement's connection here (karr k55)
+  sub _lease      { 1 }   # the lease of a borrow (core k275, karr k91)
   sub release {
     my ($self, $conn) = @_;
     $self->{released}++;
@@ -104,7 +130,24 @@ sub build_storage {
   my $storage = DBIO::MySQL::EV::Storage->new(undef);
   my $pool = FakePool->new;
   $storage->{pool}     = $pool;
-  $storage->{executor} = DBIO::MySQL::EV::QueryExecutor->new(pool => $pool);
+  $storage->{executor} = DBIO::MySQL::EV::QueryExecutor->new;
+
+  # k193 (core "restore select preparation parity"): the async SELECT path now
+  # prepares its arguments through the OWNING sync storage's _select_args, so
+  # join pruning / complex-prefetch rewriting is not duplicated. Production
+  # wires a real DBIO::MySQL::Storage here through DBIO::Storage::DBI::
+  # _async_storage; this mock stands in as FakeOwnerFacade, a stand-in owner
+  # that supplies the minimal _select_args seam (op name first, then the
+  # select args the SQLMaker consumes). Without it, the first select_async
+  # throws "async SELECT requires its owning sync storage".
+  #
+  # The owner must survive the WEAKEN that DBIO::Storage::Async::_owner_storage
+  # applies: a stand-alone `->new` constructed inline has no other references
+  # and weakens to undef. Hold it strongly on the storage itself, then point
+  # the back-ref at that same object.
+  $storage->{_facade_owner} = FakeOwnerFacade->new;
+  $storage->_owner_storage($storage->{_facade_owner});
+
   return ($storage, $pool);
 }
 
@@ -114,6 +157,7 @@ sub build_storage {
   my ($storage, $pool) = build_storage;
   my $f = $storage->select_async('artist', '*', { id => 1 });
   isa_ok $f, 'Future', 'select_async returns a Future';
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, 'select_async resolves (conn was unpacked from acquire Future)';
   my @rows = $f->get;
   is_deeply \@rows, [[ 1, 'row' ]], 'select_async returns the rows from the real conn';
@@ -144,6 +188,7 @@ sub build_storage {
 {
   my ($storage, $pool) = build_storage;
   my $f = $storage->insert_async('artist', { name => 'Tom' });
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, 'insert_async resolves through the acquire Future';
   my $returned = $f->get;
   is ref $returned, 'HASH',
@@ -181,6 +226,7 @@ sub build_storage {
 {
   my ($storage, $pool) = build_storage;
   my $f = $storage->insert_async(FakeSource->new, { name => 'Tom' });
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, 'insert_async (with source) resolves through the acquire Future';
   my $returned = $f->get;
   is ref $returned, 'HASH',
@@ -198,6 +244,7 @@ for my $case (
   my ($name, $call, $re) = @$case;
   my ($storage, $pool) = build_storage;
   my $f = $call->($storage);
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, "$name resolves through the acquire Future";
   $f->get;
   is $pool->{acquired}, 1, "$name acquired one connection";
@@ -241,6 +288,7 @@ for my $case (
     $cb->(bless { sql => $sql }, 'FailStmt') if $cb;
   }
   sub execute { my ($self, $stmt, $bind, $cb) = @_; $cb->(undef, 'boom') if $cb }
+  sub close_stmt { my ($self, $stmt, $cb) = @_; $cb->(1) if $cb }
 }
 {
   my ($storage, $pool) = build_storage;
@@ -252,6 +300,7 @@ for my $case (
     return Future->done(FailConn->new);
   };
   my $f = $storage->select_async('artist', '*', { id => 1 });
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, 'select_async settles even on query error';
   ok $f->is_failed, 'select_async fails when the conn reports an error';
   is $pool->{released}, 1, 'connection released on the failure path (no leak)';
@@ -275,6 +324,7 @@ for my $case (
   push @{ $pool->{conns} }, $conn;
   $pool->{pending}->done($conn);
 
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $f->is_ready, 'result Future resolves once the waiter gets a connection';
   my @rows = $f->get;
   is_deeply \@rows, [[ 1, 'row' ]], 'queued query ran on the handed-over conn';
@@ -287,15 +337,15 @@ for my $case (
 # Every backend Future's ->then must auto-wrap a plain (non-Future) return
 # into a resolved Future, so chained callbacks in
 # DBIO::ResultSet::_rs_run_async / DBIO::Row::_row_run_async can simply
-# `return $value` without wrapping. The EV storage's future_class is plain
-# Future (perl-Future), whose ->then does this natively. This test locks
-# the contract: change the future_class and the test will start failing
-# here, surfacing the regression on whatever a future custom Future class
-# breaks.
+# `return $value` without wrapping. The EV storage's future_class is a
+# Future subclass that only adds await (karr k48), so ->then is perl-Future's
+# own and does this natively. This test locks the contract: change the
+# future_class and the test will start failing here, surfacing the regression
+# on whatever a future custom Future class breaks.
 {
   my ($storage, $pool) = build_storage;
-  is $storage->future_class, 'Future',
-    'EV storage future_class is plain Future (Future then auto-wrap is native)';
+  is $storage->future_class, 'DBIO::MySQL::EV::Future',
+    'EV storage future_class is DBIO::MySQL::EV::Future (Future then auto-wrap is native)';
 
   my $f = $storage->select_async('artist', '*', { id => 1 });
   my $got;
@@ -306,6 +356,7 @@ for my $case (
   });
   isa_ok $chained, 'Future',
     'chained ->then returns a Future even when the callback returns a plain value';
+  EV::run(EV::RUN_NOWAIT());   # Futures settle from the loop's idle watcher (karr k51)
   ok $chained->is_ready, 'chained Future is ready (auto-wrapped)';
   is $chained->get, 'plain value from then callback',
     'chained Future resolves with the plain return value';

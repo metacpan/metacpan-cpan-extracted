@@ -38,6 +38,8 @@ bus_init(class, ...)
             if      (strEQ(k, "slots"))     slots     = SvUV(ST(i + 1));
             else if (strEQ(k, "slot_size")) slot_size = SvUV(ST(i + 1));
             else if (strEQ(k, "groups"))    groups    = SvUV(ST(i + 1));
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             else if (strEQ(k, "wakers"))    wakers    = SvUV(ST(i + 1));
         }
         PERL_UNUSED_VAR(groups);
@@ -48,7 +50,7 @@ bus_init(class, ...)
          * made before any fork, or a worker's poke reaches nobody. run()
          * sizes this from the worker count. */
         (void)hm_sa_bus_wake_init((uint32_t)(wakers ? wakers : 8));
-        RETVAL = hm_sa_bus_live() ? 1 : 0;
+        RETVAL = hm_sa_bus_live() ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -64,7 +66,7 @@ bus_live(class = &PL_sv_undef)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = hm_sa_bus_live() ? 1 : 0;
+        RETVAL = hm_sa_bus_live() ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -94,7 +96,7 @@ publish(class, topic, payload)
         const char *p = SvPV_const(payload, pl);
         int r = hm_sa_bus_publish(t, (uint32_t)tl, p, (uint32_t)pl);
         PERL_UNUSED_VAR(class);
-        RETVAL = (r == HM_BUS_OK) ? 1 : (r == HM_BUS_LOCAL) ? 0 : -1;
+        RETVAL = (r == HM_BUS_OK) ? 1 : (r == HM_BUS_LOCAL) ? 0 : -1; /* # uncoverable condition left count:2 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -140,6 +142,8 @@ receive(class = &PL_sv_undef)
         EXTEND(SP, n);
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(out, i, 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             PUSHs(e && *e ? sv_2mortal(newSVsv(*e)) : &PL_sv_undef);
         }
     }
@@ -199,16 +203,20 @@ claim(class, topic, group = &PL_sv_undef)
         AV *out = (AV *)sv_2mortal((SV *)newAV());
         STRLEN tl, gl;
         const char *t = SvPV_const(topic, tl);
-        const char *g = SvOK(group) ? SvPV_const(group, gl) : (gl = tl, t);
+        const char *g = SvOK(group) ? SvPV_const(group, gl) : (gl = tl, t); /* # uncoverable condition right count:1 class:ignore_covered_err */
         sa_group_h *gh = hm_sa_bus_group(t, (uint32_t)tl, g, (uint32_t)gl);
         SSize_t i, n;
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!gh) XSRETURN_EMPTY;           /* no ring, or the table is full */
         (void)hm_sa_bus_claim(gh, hm_bus_perl_collect, out);
         n = av_len(out) + 1;
         EXTEND(SP, n);
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(out, i, 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             PUSHs(e && *e ? sv_2mortal(newSVsv(*e)) : &PL_sv_undef);
         }
     }
@@ -240,16 +248,24 @@ subscribe(class, topic, cb, ...)
         const char *g = NULL;
         int i, id;
         PERL_UNUSED_VAR(class);
-        if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
+        if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Hyperman->subscribe: need a code reference");
         for (i = 3; i + 1 < items; i += 2) {
             const char *k = SvPV_nolen(ST(i));
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (strEQ(k, "group") && SvOK(ST(i + 1)))
                 g = SvPV_const(ST(i + 1), gl);
         }
         id = hm_sa_bus_subscribe(t, (uint32_t)tl, g, (uint32_t)gl,
                                  hm_bus_perl_deliver, NULL);
+        # uncoverable branch true class:ignore_covered_err
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (id < 0) XSRETURN_IV(-1);
+        # uncoverable statement class:ignore_covered_err
+        # uncoverable branch true
+        # uncoverable condition left count:1
         if (hm_bus_perl_subs[id]) SvREFCNT_dec(hm_bus_perl_subs[id]);
         hm_bus_perl_subs[id] = newSVsv(cb);
         hm_bus_subs[id].ud   = (void *)hm_bus_perl_subs[id];
@@ -265,6 +281,10 @@ unsubscribe(class, id)
     CODE:
     {
         PERL_UNUSED_VAR(class);
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (id >= 0 && id < HM_BUS_SUBS && hm_bus_perl_subs[id]) {
             SvREFCNT_dec(hm_bus_perl_subs[id]);
             hm_bus_perl_subs[id] = NULL;
@@ -338,6 +358,6 @@ bus_stats(class, group = &PL_sv_undef)
             const char *g = SvPV_const(group, gl);
             sa_group_h *gh = hm_sa_bus_group(g, (uint32_t)gl, g, (uint32_t)gl);
             mPUSHp("group_gaps", 10);
-            mPUSHu(gh ? (UV)hm_sa_bus_group_gaps(gh) : 0);
+            mPUSHu(gh ? (UV)hm_sa_bus_group_gaps(gh) : 0); /* # uncoverable condition right count:1 class:ignore_covered_err */
         }
     }

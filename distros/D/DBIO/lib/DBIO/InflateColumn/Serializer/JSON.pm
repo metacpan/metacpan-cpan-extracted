@@ -3,6 +3,9 @@ package DBIO::InflateColumn::Serializer::JSON;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use JSON::MaybeXS;
 use Carp;
 use namespace::clean;
@@ -11,9 +14,7 @@ use namespace::clean;
 sub get_freezer {
   my ($class, $column, $info, $args) = @_;
 
-  my $opts = $info->{serializer_options};
-
-  my $serializer = JSON::MaybeXS->new($opts && %$opts ? %$opts: ());
+  my $serializer = JSON::MaybeXS->new(_json_options($info));
 
   if (defined $info->{'size'}){
       my $size = $info->{'size'};
@@ -34,10 +35,15 @@ sub get_freezer {
 sub get_unfreezer {
   my ($class, $column, $info, $args) = @_;
 
-  my $opts = $info->{serializer_options};
   return sub {
-    JSON::MaybeXS->new($opts && %$opts ? %$opts : ())->decode(shift);
+    JSON::MaybeXS->new(_json_options($info))->decode(shift);
   };
+}
+
+sub _json_options {
+  my ($info) = @_;
+  my $opts = $info->{serializer_options};
+  return ( canonical => 1, convert_blessed => 1, $opts && %$opts ? %$opts : () );
 }
 
 
@@ -55,7 +61,7 @@ DBIO::InflateColumn::Serializer::JSON - JSON Inflator
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -68,7 +74,7 @@ version 0.900002
       'data_type' => 'VARCHAR',
       'size'      => 255,
       'serializer_class'   => 'JSON',
-      'serializer_options' => { allow_blessed => 1, convert_blessed => 1, pretty => 1 },    # optional
+      'serializer_options' => { allow_blessed => 1, convert_blessed => 1, pretty => 1, canonical => 1 },    # optional
     }
   );
 
@@ -118,7 +124,9 @@ Selects this backend.
 
 =item C<< serializer_options => \%opts >>
 
-Passed verbatim to L<JSON::MaybeXS>->new.
+Passed to L<JSON::MaybeXS>->new.  C<canonical> and C<convert_blessed>
+are enabled by default; your options are merged on top and may override
+them.
 
 =item C<< size => $n >>
 

@@ -40,6 +40,7 @@ my $tmpdir = tempdir(CLEANUP => 1);
       ARTIST => { table_name => 'ARTIST', kind => 'table', schema => 'TESTUSER' },
       CD     => { table_name => 'CD',     kind => 'table', schema => 'TESTUSER' },
       MYVIEW => { table_name => 'MYVIEW', kind => 'view',  schema => 'TESTUSER' },
+      PKONLY => { table_name => 'PKONLY', kind => 'table', schema => 'TESTUSER' },
     );
     my %columns = (
       ARTIST => [
@@ -57,25 +58,33 @@ my $tmpdir = tempdir(CLEANUP => 1);
         { column_name => 'ID',   data_type => 'integer', not_null => 1 },
         { column_name => 'NAME', data_type => 'varchar', size => 128, not_null => 0 },
       ],
+      # PK column without a not_null flag: the key fold must still report
+      # is_nullable => 0 (karr k23, core k126).
+      PKONLY => [
+        { column_name => 'ID', data_type => 'integer' },
+      ],
     );
     my %primary_keys = (
       ARTIST => ['ID'],
       CD     => ['ID'],
       MYVIEW => [],
+      PKONLY => ['ID'],
     );
     my %unique_constraints = (
       ARTIST => [ [ 'ARTIST_NAME_UK' => ['NAME'] ] ],
       CD     => [],
       MYVIEW => [],
+      PKONLY => [],
     );
     my %foreign_keys = (
       ARTIST => [],
       CD => [
-        { fk_name => 'CD_ARTIST_FK', from_columns => ['ARTIST_ID'],
+        { constraint_name => 'CD_ARTIST_FK', from_columns => ['ARTIST_ID'],
           to_table => 'ARTIST', to_columns => ['ID'],
           on_delete => 'CASCADE', on_update => 'NO ACTION', is_deferrable => 1 },
       ],
       MYVIEW => [],
+      PKONLY => [],
     );
     return {
       tables             => \%tables,
@@ -104,7 +113,7 @@ my $intro = Test::Oracle::Fixture->new(
 );
 
 # Test 2: contract method returns
-is_deeply($intro->table_keys, [qw/ARTIST CD MYVIEW/], 'table_keys sorted');
+is_deeply($intro->table_keys, [qw/ARTIST CD MYVIEW PKONLY/], 'table_keys sorted');
 
 is_deeply($intro->table_columns('ARTIST'), [qw/ID NAME/], 'artist column order');
 is_deeply($intro->table_columns('CD'), [qw/ID ARTIST_ID TITLE/], 'cd column order');
@@ -122,6 +131,16 @@ ok(!exists $artist_info->{NAME}{is_auto_increment}, 'artist.name no auto_increme
 is_deeply($intro->table_pk_info('ARTIST'), ['ID'], 'artist pk');
 is_deeply($intro->table_pk_info('CD'), ['ID'], 'cd pk');
 is_deeply($intro->table_pk_info('MYVIEW'), [], 'view has no pk');
+is_deeply($intro->table_pk_info('PKONLY'), ['ID'], 'pkonly pk');
+
+# Invariant (karr k23, core k126): a column that table_pk_info names as a
+# key must never report is_nullable => 1 -- even without a not_null flag.
+for my $table (qw/ARTIST CD PKONLY/) {
+  my $info = $intro->table_columns_info($table);
+  for my $col (@{ $intro->table_pk_info($table) }) {
+    is($info->{$col}{is_nullable}, 0, "$table.$col key column not nullable");
+  }
+}
 
 my $artist_uniq = $intro->table_uniq_info('ARTIST');
 is(scalar @$artist_uniq, 1, 'artist one unique constraint');

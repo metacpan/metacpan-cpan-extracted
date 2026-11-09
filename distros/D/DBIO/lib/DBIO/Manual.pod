@@ -13,7 +13,7 @@ DBIO::Manual - Index of the Manual
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -32,6 +32,10 @@ Short answers and doc pointers to questions.
 
 Explanations of terms used in this documentation.
 
+=head2 L<DBIO::Manual::QuickStart>
+
+Up and running with DBIO in 10 minutes.
+
 =head2 L<DBIO::Manual::Intro>
 
 Beginner guide to using DBIO.
@@ -39,6 +43,10 @@ Beginner guide to using DBIO.
 =head2 L<DBIO::Manual::Example>
 
 An example of slightly more complex usage.
+
+=head2 L<DBIO::Manual::Features>
+
+Feature overview with links into the API and manuals.
 
 =head2 L<DBIO::Manual::Joining>
 
@@ -52,6 +60,10 @@ Convenient recipes for DBIO usage.
 
 How to read (and write) the reference documentation.
 
+=head2 L<DBIO::Manual::ResultClass>
+
+Classes representing a single result (row) from a DB query.
+
 =head2 L<DBIO::Manual::DocMap>
 
 Lists of modules by task to help you find the correct document.
@@ -59,6 +71,10 @@ Lists of modules by task to help you find the correct document.
 =head2 L<DBIO::Manual::Troubleshooting>
 
 Got trouble? Let us shoot it for you.
+
+=head2 L<DBIO::Manual::Heritage>
+
+Everything that changed from L<DBIx::Class> to DBIO.
 
 =head2 L<DBIO::Manual::Migration>
 
@@ -68,6 +84,11 @@ Step-by-step guide for migrating an existing L<DBIx::Class> codebase to DBIO.
 
 Existing components, and documentation and example on how to
 develop new ones.
+
+=head2 L<DBIO::Manual::AsyncStorage>
+
+The async-storage backend interface contract, for anyone writing a new
+async transport.
 
 =head1 AUTHOR
 

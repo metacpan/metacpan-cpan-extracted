@@ -4,6 +4,8 @@ package DBIO::Sybase::Storage::ASE::NoBindVars;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base qw/
   DBIO::Storage::DBI::NoBindVars
   DBIO::Sybase::Storage::ASE
@@ -82,7 +84,7 @@ DBIO::Sybase::Storage::ASE::NoBindVars - Support for Sybase ASE via DBD::Sybase 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -90,7 +92,7 @@ Storage driver for Sybase ASE (Adaptive Server Enterprise) accessed via
 L<DBD::Sybase> when your combination of L<DBD::Sybase> and libraries (most
 likely FreeTDS) does not support C<?> style placeholders.
 L<DBIO::Sybase::Storage::ASE> reblesses the storage into this class
-automatically on connect when no placeholder support is detected.
+at its first use when the connection takes no placeholders.
 
 This driver uses L<DBIO::Storage::DBI::NoBindVars> as a base, so bind variables
 are interpolated (properly quoted) into the SQL query itself instead of being

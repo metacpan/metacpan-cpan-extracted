@@ -215,12 +215,18 @@ for my $q ('', '"') {
   );
 
 
-  # The rest execute queries (prefetch / group_by + having), so they need a
-  # live DB -- is_executed_sql_bind captures the *executed* SQL, and prefetch
-  # column expansion depends on real result rows. The offline SQL generation of
-  # these shortened identifiers is already covered by the is_same_sql_bind
-  # tests above and the count_rs test below.
-  if ($ENV{DBIO_TEST_ORA_DSN}) {
+  # Offline: this file tests SQL *shape* and identifier-shortening only, no
+  # live DB. The is_executed_sql_bind calls assert the SQL captured by the
+  # fake cursor (which matches what a real cursor would have run, per the
+  # mock-cursor invariant); the data assertions need at least one row to
+  # inflate, so register a mock that returns one row wide enough to back the
+  # prefetch+order_by SELECT. Real round-trip coverage for shortened
+  # identifiers lives in t/10-oracle.t and t/20-oracle-core.t where a DSN
+  # is actually wired up.
+  $schema->storage->mock_persistent(qr/\ASELECT\b/i, [
+    [ 'EP C', 4, 2, 'EP C', 2001, 1, undef, 2, 'Random Boy Band', 13, 'X' ],
+  ]);
+
   $schema->is_executed_sql_bind(
     sub {
       my @rows = $schema->resultset('Artist')->search(
@@ -259,7 +265,6 @@ for my $q ('', '"') {
     ]],
     'rel name over 30 char limit with user condition, requiring walking the WHERE data structure',
   );
-  } # DBIO_TEST_ORA_DSN
 
   my $pain_rs = $schema->resultset('Artist')->search(
     { 'me.artistid' => 1 },
@@ -271,7 +276,6 @@ for my $q ('', '"') {
     }
   );
 
-  if ($ENV{DBIO_TEST_ORA_DSN}) {
   $schema->is_executed_sql_bind(
     sub {
       my $megapain_rs = $pain_rs->search(
@@ -347,7 +351,6 @@ for my $q ('', '"') {
     ],
     'rel names over the 30 char limit using group_by/having and join'
   );
-  } # DBIO_TEST_ORA_DSN
 
 
   is_same_sql_bind(

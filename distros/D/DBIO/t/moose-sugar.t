@@ -12,7 +12,10 @@ BEGIN {
 use DBIO::Test::MooseSugarSchema;
 
 # Connect with fake storage — no real database needed
-my $schema = DBIO::Test::MooseSugarSchema->connect('DBIO::Test::Storage', '');
+# the shared schema declares no driver; this use declares the fake one
+my $schema = DBIO::Test::MooseSugarSchema->clone;
+$schema->storage_type('+DBIO::Test::Storage');
+$schema = $schema->connect('DBIO::Test::Storage', '');
 
 my $artist_rs = $schema->resultset('Artist');
 my $cd_rs     = $schema->resultset('CD');

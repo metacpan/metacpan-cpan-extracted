@@ -1,6 +1,6 @@
 # ADR 0017 — Native escape-hatch methods on Storage
 
-- Status: accepted
+- Status: accepted — superseded for LISTEN/NOTIFY by [ADR 0056](0056-listen-notify-is-a-core-async-contract.md) (see addendum)
 - Date: 2026-06-20
 - Tags: drivers, storage, native-features, escape-hatch, security, portability, family-policy
 
@@ -19,10 +19,13 @@ through the portable API.
 
 Two drivers have already needed an exit and chose the same shape independently:
 
-- **`dbio-postgresql-async`** (the first instance, async-protocol-driven) puts
+- **`dbio-postgresql-ev`** (the first instance, async-protocol-driven; originally
+  shipped as `dbio-postgresql-async` and since renamed — the old
+  `DBIO::PostgreSQL::Async::*` classes are now die-on-load tombstones in
+  `dbio-deprecated`) puts
   native-protocol operations directly on its Storage object —
-  `DBIO::PostgreSQL::Async::Storage` has `listen`, `unlisten`, `notify`,
-  `copy_in` (`lib/DBIO/PostgreSQL/Async/Storage.pm:492-640`). It abandons DBI
+  `DBIO::PostgreSQL::EV::Storage` has `listen`, `unlisten`, `notify`,
+  `copy_in`. It abandons DBI
   wholesale for protocol reasons (ADR 0014), so native ops live where the rest
   of its storage already lives.
 - **`dbio-duckdb`** (a larger surface, blocking/DBI-based) puts a `duckdb_*`
@@ -30,7 +33,7 @@ Two drivers have already needed an exit and chose the same shape independently:
   `duckdb_read_parquet`, `duckdb_read_json`, `duckdb_version`,
   `duckdb_install_extension`, `duckdb_checkpoint`) and a `quack_*` family
   (`quack_serve`, `quack_attach`, `quack_detach`) directly on
-  `DBIO::DuckDB::Storage` (`lib/DBIO/DuckDB/Storage.pm:96-357`). It keeps the DBI
+  `DBIO::DuckDB::Storage`. It keeps the DBI
   plumbing for all ordinary ORM work and only the columnar/server features take
   the exit. This is documented driver-locally in **dbio-duckdb ADR 0002**.
 
@@ -55,14 +58,14 @@ The convention has four load-bearing parts.
    routed through the portable ORM API and not pushed into a second
    transport layer or a side connection. The schema/Storage object the
    application already holds is the one that answers. Precedent:
-   `DBIO::PostgreSQL::Async::Storage` and `DBIO::DuckDB::Storage`.
+   `DBIO::PostgreSQL::EV::Storage` and `DBIO::DuckDB::Storage`.
 
 2. **Naming: a per-feature-family prefix.** Each family of native methods carries
    a prefix that names its origin, so a reader of calling code sees immediately
    that the call is engine-specific and to which subsystem it belongs:
    `duckdb_*` (the engine itself) and `quack_*` (the Quack RPC extension) in
    dbio-duckdb; the PostgreSQL protocol verbs `listen`/`notify`/`copy_in` in
-   dbio-postgresql-async. The prefix is the signal at the call site that this is
+   dbio-postgresql-ev. The prefix is the signal at the call site that this is
    an exit from the portable contract.
 
 3. **Security obligation — validate-or-escape at the method boundary (load-bearing,
@@ -74,10 +77,10 @@ The convention has four load-bearing parts.
    Both live instances honour it — dbio-duckdb matches identifier-shaped
    arguments against `^[A-Za-z_][A-Za-z0-9_]*$`, doubles `'` in string literals,
    and rejects embedded quotes/newlines in addresses/tokens (dbio-duckdb ADR
-   0002, points 3 and consequences); dbio-postgresql-async routes the `NOTIFY`
+   0002, points 3 and consequences); dbio-postgresql-ev routes the `NOTIFY`
    payload through bind params (`SELECT pg_notify($1, $2)`, never inlined) and
    quotes table/column identifiers for `COPY` via `sql_maker->_quote`
-   (`Async/Storage.pm:568-620`). Any new escape hatch that builds a SQL or
+   (in `DBIO::PostgreSQL::EV::Storage`'s `copy_in`). Any new escape hatch that builds a SQL or
    protocol string follows the same discipline.
 
 4. **Documentation obligation — mark as non-portable in POD.** These methods are
@@ -93,7 +96,7 @@ This core ADR blesses only the **pattern** family-wide. It does not own or
 enumerate any driver's concrete native surface. The specific DuckDB methods,
 their argument shapes, and their per-method escaping rules are owned by
 **dbio-duckdb ADR 0002**, which stays in that driver; the PostgreSQL native ops
-are owned by dbio-postgresql-async. When a driver adds a native method, it
+are owned by dbio-postgresql-ev. When a driver adds a native method, it
 records *that surface* in its own repo's ADR, against this pattern — it does not
 amend this one.
 
@@ -132,5 +135,29 @@ records the existing convergence as the family rule going forward.
   defect against this ADR, reviewable as such.
 - Concrete native surfaces stay repo-owned: each driver documents its own methods
   in its own ADR (dbio-duckdb ADR 0002 for DuckDB; the PostgreSQL native ops in
-  dbio-postgresql-async). This core ADR is amended only if the *pattern* itself
+  dbio-postgresql-ev). This core ADR is amended only if the *pattern* itself
   changes, not when a driver adds a method.
+
+## Addendum 2026-09-26 — LISTEN/NOTIFY leaves this ADR (see ADR 0056)
+
+The maintainer decided on 2026-09-26 (karr core k219) that LISTEN/NOTIFY is part
+of the **core async contract**, standardised in `DBIO::Storage::Async` and
+implemented identically by every async transport. That is recorded in
+[ADR 0056](0056-listen-notify-is-a-core-async-contract.md), and it contradicts
+this ADR for those three methods, so the conflict is stated here rather than
+blended:
+
+- `listen` / `unlisten` / `notify` are **no longer escape hatches**. Decision
+  points 1 (the dbio-postgresql-ev precedent), 2 (the `listen`/`notify` family)
+  and 4 (the non-portable POD mark), and the scope sentence that the
+  PostgreSQL native ops are owned by dbio-postgresql-ev, no longer apply to
+  them. They are portable async API whose contract core owns.
+- **§3 still applies** — carried into the new contract at its seams. Quoting or
+  validating the channel is the transport's obligation in `_listen_subscribe` /
+  `_listen_unsubscribe`, and the notify payload travels only as a bind value
+  through `_notify_send`.
+- Everything else here stands unchanged: `copy_in`, the `duckdb_*` and `quack_*`
+  families, and the pattern for the next native feature.
+
+The body above is left as written; it records how the family stood on
+2026-06-20.

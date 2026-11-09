@@ -2,5 +2,8 @@ name = "WebService-Mailgun"
 badges = ["github-actions"]
 module_maker = "ModuleBuildTiny"
 markdown_maker = "Pod::Markdown::Github"
+# The change log is CHANGELOG.md, written for tagpr (scripts/tagpr/README.md). Without this,
+# minil dist tries to rewrite a `Changes` file that no longer exists.
+manage_changes = false
 [FileGatherer]
-exclude_match = ["Dockerfile", "docker-compose.yml", ".pause", "CLAUDE.md", "^\\.github/"]
+exclude_match = ["Dockerfile", "docker-compose.yml", ".pause", "CLAUDE.md", "^\\.github/", "^scripts/"]

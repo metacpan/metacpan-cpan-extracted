@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::MM_Unix;	# parse_version() for META provides
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -27,42 +28,22 @@ if($ENV{'AUTHOR_TESTING'}) {
 	$online_tests = are_online();
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
-
-	if(!defined($online_tests)) {
-		$online_tests = are_online();
-	}
-	if(!$online_tests) {
-		print "On-line tests have been disabled\n";
-	}
 }
 
-if(eval { require IP::Country; 1 }) {
-	my $v = IP::Country->VERSION;
-	print "You have IP::Country version $v installed, so CGI::Lingua can work fast\n";
+# --no-online-tests is final: a local database must not turn the tests back on
+my $no_online_tests = (!$ENV{'AUTHOR_TESTING'}) && defined($online_tests) && !$online_tests;
+
+if(my $local_db = local_geo_database()) {
+	print "You have $local_db, so CGI::Lingua can work fast\n";
 	# It also shouldn't need to do anything with the Internet,
 	# so we can do all tests
-	$online_tests = 1;
-} elsif(eval { require Geo::IP; 1 }) {
-	my $v = Geo::IP->VERSION;
-	if(($^O ne 'MSWin32') && (! -r '/usr/local/share/GeoIP/GeoIP.dat')) {
-		print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
-		if(!defined($online_tests)) {
-			$online_tests = are_online();
-		}
-	} else {
-		print "You have Geo::IP version $v installed, so CGI::Lingua can work fast\n";
-		# It also shouldn't need to do anything with the Internet,
-		# so we can do all tests
-		$online_tests = 1;
-	}
-} elsif(eval { require Geo::IPfree; 1 }) {
-	my $v = Geo::IPfree->VERSION;
-	print "You have Geo::IPfree version $v installed, so CGI::Lingua can work fast\n";
-	# It also shouldn't need to do anything with the Internet,
-	# so we can do all tests
-	$online_tests = 1;
-} elsif(!defined($online_tests)) {
+	$online_tests = 1 unless($no_online_tests);
+}
+if(!defined($online_tests)) {
 	$online_tests = are_online();
+}
+if(!$online_tests) {
+	print "On-line tests have been disabled\n";
 }
 
 my $test_requires = {
@@ -76,6 +57,7 @@ my $test_requires = {
 	# they are optional at run time (see the web_lookups feature below)
 	'JSON::Parse' => 0,
 	'LWP::Simple::WithCache' => 0.04,
+	'Socket' => 0,	# t/function.t makes inet_pton fail, as on Windows before a socket is opened
 	'Test::Compile' => 0,
 	'Test::DescribeMe' => 0,
 	'Test::Log::Abstraction' => 0,
@@ -120,7 +102,6 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
-		'autodie' => 0,		# used at compile time: use autodie qw(:all)
 		'Carp' => 0,
 		'Class::Autouse' => 0,
 		'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
@@ -134,19 +115,25 @@ WriteMakefile(
 		'Log::Abstraction' => 0.33,	# used by Object::Configure for logger conversion
 		'Net::Whois::IANA' => 0,
 		'Net::Whois::IP' => 0,
-		'Object::Configure' => 0.24,
+		'Object::Configure' => 0.25,	# 0.24 used autodie qw(:all) without requiring IPC::System::Simple
 		'Params::Get' => 0.17,	# 0.15 fast-path: unblessed hashref arg returned directly (not stored under default key)
 		'Readonly' => 0,
 		'Scalar::Util' => 0,
-		'Socket' => 0,	# inet_pton for the pure-Perl IPv6 check
 	}, dist => $dist,
 	clean => { FILES => 'CGI-Lingua-* t/online.enabled' },
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
+		provides => {
+			'CGI::Lingua' => {
+				file => 'lib/CGI/Lingua.pm',
+				version => ExtUtils::MM_Unix->parse_version('lib/CGI/Lingua.pm'),
+			},
+		},
+		keywords => [ qw(i18n l10n language Accept-Language locale country geolocation CGI) ],
 		optional_features => {
 			local_geo_databases => {
-				description => 'Look up the country from a local database (fastest, no network): IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree',
-				prereqs => { runtime => { recommends => { 'IP::Country' => 0, 'Geo::IP' => 0, 'Geo::IPfree' => 0 } } },
+				description => 'Look up the country from a local database (fastest, no network): a MaxMind GeoIP2 or GeoLite2 .mmdb (read by IP::Geolocation::MMDB or MaxMind::DB::Reader; a City database also gives time zones), IP::Country, Geo::IP (needs a GeoIP.dat) or Geo::IPfree',
+				prereqs => { runtime => { recommends => { 'IP::Geolocation::MMDB' => 0, 'MaxMind::DB::Reader' => 0, 'IP::Country' => 0, 'Geo::IP' => 0, 'Geo::IPfree' => 0 } } },
 			},
 			baidu_subnet_detection => {
 				description => 'Detect Baidu crawler IPs that misreport as EU (RT-86809); not available on Windows due to Socket6 build dependency',
@@ -180,8 +167,53 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.10.1'	# autodie bundled into core from 5.10.1; //= and defined-or used throughout
+	MIN_PERL_VERSION	=> '5.10.1'	# //= and defined-or used throughout
 );
+
+# Return a description of the first local geo database that CGI::Lingua
+# can use, or undef.  Keep the file lists in step with @GEOIP2_MMDB and
+# @GEOIP_DAT in lib/CGI/Lingua.pm (the module is not loaded here, because
+# its prerequisites may not be installed yet).
+sub local_geo_database
+{
+	my @dirs = ((($^O eq 'MSWin32') ? ('c:/GeoIP') : ()), '/var/lib/GeoIP', '/usr/share/GeoIP', '/usr/local/share/GeoIP');
+
+	foreach my $reader ('IP::Geolocation::MMDB', 'MaxMind::DB::Reader') {
+		next unless(have_module($reader));
+		foreach my $dir (@dirs) {
+			foreach my $db (qw(GeoIP2-City GeoLite2-City GeoIP2-Country GeoLite2-Country)) {
+				my $file = "$dir/$db.mmdb";
+				if((-f $file) && (-r $file)) {
+					return "$reader version " . $reader->VERSION . " and $file";
+				}
+			}
+		}
+	}
+	if(have_module('IP::Country')) {
+		return 'IP::Country version ' . IP::Country->VERSION . ' installed';
+	}
+	if(have_module('Geo::IP')) {
+		my @dat = ((($^O eq 'MSWin32') ? ('c:/GeoIP/GeoIP.dat') : ()), '/usr/share/GeoIP/GeoIP.dat', '/usr/local/share/GeoIP/GeoIP.dat');
+		foreach my $file (@dat) {
+			if((-f $file) && (-r $file)) {
+				return 'Geo::IP version ' . Geo::IP->VERSION . " and $file";
+			}
+		}
+		print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
+	}
+	if(have_module('Geo::IPfree')) {
+		return 'Geo::IPfree version ' . Geo::IPfree->VERSION . ' installed';
+	}
+	return;
+}
+
+sub have_module
+{
+	my $module = shift;
+
+	(my $file = "$module.pm") =~ s{::}{/}g;
+	return eval { require $file; 1 } ? 1 : 0;
+}
 
 sub are_online
 {

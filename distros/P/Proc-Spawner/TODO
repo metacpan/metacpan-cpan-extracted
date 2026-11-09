@@ -1,7 +1,7 @@
 Proc-Spawner: what is open, in one place
 ========================================
 
-0.09, 2026-11-08.  Every postponed thing, by who has to act.  The full
+0.10, 2026-11-08.  Every postponed thing, by who has to act.  The full
 records behind each line: doc/pspawn-known-issues.md (X..., section "Open"),
 doc/large-subset/large-subset-state.md (sections 4-6),
 doc/large-subset/large-subset-environment.md (X27), doc/pspawn-spawner.md
@@ -13,20 +13,35 @@ A. WAITING FOR THE USER'S DECISION
  1. X27: what to do with each code of the run's environment.
     Read: doc/large-subset/large-subset-environment.md, section 3, "At a
     glance" (every code in one line, how many samples, whether the run could
-    control it); the record per sample: large-subset-provenance.tsv.
-    Act: per code, one of: nothing / fixtures / chosen values / stand-ins
-    for programs / a second run / leave the samples out.  The cheapest:
-    echo (98 samples: one more run with POSIXLY_CORRECT=1), locale (11: a
-    second locale), path-tmp (207: a fresh tmpfs on /tmp per run),
-    path-random (25: a fixed file over /dev/urandom).
+    control it), and section 9 (the six kinds of workaround, and the run's
+    environment varied, 2026-11-08); the record per sample:
+    large-subset-provenance.tsv; the samples that changed:
+    tools/large-subset-env-variants.tsv.
+    Done (no decision taken by it): a second run with the other case for
+    echo, locale, pipeline, devfd; fixed or fresh places for path-tmp,
+    path-random, path-home, path-mnt, path-var, path-dev; stand-ins for
+    prog-status (status 1) and prog-output (a chosen text), their answers
+    from the environment (STANDIN_STATUS, STANDIN_OUTPUT); fixed file times
+    for time (FIXTURE_MTIME) (-env of large-subset-runcompare.pl).
+    Decided (the user, 2026-11-08): such runs are footnotes to the level
+    totals (EV1); the run-time comparison redone with a fresh /tmp, a fixed
+    /dev/urandom and fixed file times replaces the published table (A1(b)).
+    Act, per remaining code: fixtures in the run's directory (files,
+    directory, unquoted), chosen values (vars, args, input, ...), more
+    stand-in answers (other statuses or texts, per program), stand-ins for
+    random (shuf, mktemp, sort -R), leave the samples out (race, pid,
+    path-proc, path-root, listing, status), or nothing.
  2. X27: should "strict" mean "on any platform"?  The subset's own programs
     echo, printf, test, [, true, false (X21) do not exist on Windows; 142
-    strict samples use one.  Act: yes (a code for them) or no.
+    strict samples use one.  Since post-0.09 they run inside Perl, on every
+    platform by default (IP1), as coreutils 9.4 (X21 lists the
+    differences).  Act: yes (a code for them) or no.
+ 2a. X27: with POSIXLY_CORRECT=1 in the environment, the subset's echo
+    (the program) sides with dash for backslashes and -e, and differs from
+    both shells for \x (echo '\x4a': 2 samples; section 9).  Act: run echo
+    with POSIXLY_CORRECT removed from its environment, or accept it.
  3. P2 and P4 (large-subset-state.md, sections 4-5): ${...} forms both
     shells refuse; messages with our name and line, and $-.
- 4. Windows: how the event loop reads pipes (Perl's select takes sockets
-    only): polling with PeekNamedPipe, overlapped I/O, or threads
-    (pspawn-spawner.md, section 8).
  5. X2: $! of a background job that starts no process (design question K4).
  6. X7: run() ignores SIGINT and SIGQUIT while it runs, as Perl's system
     does: say if not wanted.
@@ -35,8 +50,18 @@ A. WAITING FOR THE USER'S DECISION
  8. Run 0.07 (repository ilyaz-ai/run; CPAN has 0.06): to be released
     before a Proc-Spawner that needs it (M2, the primitive system1).  Also
     delete the branch run of this repository on GitHub (the proxy refuses
-    deletions here); its contents are in ilyaz-ai/run.
+    deletions here); its contents are in ilyaz-ai/run.  Checked 2026-11-08:
+    the whole snippet library through Run 0.07 gives the same as through
+    posix_spawn (large-subset-state.md, section 7, "Through Run").
  9. X22 (bash's own bug): report it to bug-bash, if wanted.
+10. M2: where there is neither posix_spawn nor fork, a missing Run makes
+    spawn die (at its first call, not at load).  Act: keep it, or fail
+    with $! as an unsupported setting does.
+11. Perl's own writes into the graph's own pipes reopen /proc/self/fd/N for
+    every write.  Keeping that handle for the pipe's life (closed with the
+    end) is safe for the graph's pipes only (not the caller's fds, which
+    the module never closes); measured: at most 2.5% even for a loop of
+    builtins writing into a pipeline.  Act: do it, or leave it.
 
 B. WORK (no decision needed)
 
@@ -52,10 +77,13 @@ B. WORK (no decision needed)
  - Settings posix_spawn lacks (M1, M2; pspawn-spawner.md, section 8): a
    helper program that sets in the child what cannot be done around the
    call (setsid, pgroup 0, tcsetpgrp, sched, cgroup).
- - Windows: more than 64 children; Win32::SetChildShowWindow;
-   Proc::ShellSpawn there (paths, /bin/sh assumptions, X21's programs);
-   building through Makefile.PL there; a priority class for nice, job
-   limits for rlimit.
+ - W5 (the user, 2026-11-08: "Use the Windows' way"): the event loop on Windows
+   with overlapped I/O (pipes of our own as named pipes; reads, writes and the
+   children's ends through an I/O completion port, the last ones from the
+   kill_with_parent job).
+ - Windows: Proc::ShellSpawn there (paths, /bin/sh assumptions; W5 first:
+   the loop does no reads and writes there).  X21's echo, printf, test, [,
+   true, false are done (post-0.09); kill, time, pwd remain.
  - X10: only Linux is tested (and Windows under Wine).
  - X32: without /proc, Perl's own writes into a pipe the caller gave can
    block if a child fills the pipe between select and the write (possible,

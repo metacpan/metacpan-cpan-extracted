@@ -48,6 +48,7 @@
             "Config::Auto" : "0",
             "Config::IniFiles" : "0",
             "CryptX" : "0.062",
+            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Slurp" : "0",
             "File::Spec" : "0",
@@ -105,6 +106,6 @@
          "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

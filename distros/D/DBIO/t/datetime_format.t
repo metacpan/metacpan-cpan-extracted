@@ -4,6 +4,13 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
+# Exercises the strptime-pattern datetime path, which needs the optional
+# (recommends-only, karr k87) DateTime + DateTime::Format::Strptime stack.
+BEGIN {
+  eval { require DateTime; require DateTime::Format::Strptime; 1 }
+    or plan skip_all => "DateTime / DateTime::Format::Strptime not installed: $@";
+}
+
 use DBIO::Storage::DateTimeFormat;
 use DateTime;
 

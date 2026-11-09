@@ -1,0 +1,328 @@
+#!/usr/bin/env perl
+# maint/live-preflight — look at the project namespace before a live DBIO test
+# run, and say whether a suite started now would run against what it expects.
+#
+# The live databases of the family stand in one namespace of the HQ cluster
+# (dev-dbio) and are reached from the test machine through one LoadBalancer
+# address. This script looks at that namespace with the project account, which
+# sees nothing else: no nodes, no other namespace. It checks four things, each
+# of which has cost a run or a host before:
+#
+#   1. every container in the namespace carries a cpu and a memory limit. An
+#      uncapped database container once OOM-rebooted the host it ran on. In
+#      dev-dbio the LimitRange fills in a missing limit, so the check is for
+#      every other namespace and for the day that LimitRange is gone;
+#   2. every database (label role=dbio-test-db) is Ready. A suite against one
+#      that is not fails with connection errors that read like a driver bug.
+#      The ones that are Ready are listed -- several at once is the normal
+#      state, and a database nobody expected should be seen;
+#   3. no object of a DBIO::Test::Kubernetes run is left over. Such a run puts
+#      its pods into this namespace and removes them at its end; one that was
+#      interrupted leaves them, holding quota until somebody deletes them;
+#   4. the route from this machine to the LoadBalancer address does not go into
+#      a docker bridge. A local docker network whose range covers the address
+#      takes the route, and every database then looks dead from here while it
+#      is fine. Nothing on the database side points at it (dbio-mssql karr k20
+#      was this failure, there on the pod range of a cluster on the same host).
+#
+# The quota of the namespace is printed as used/hard. A used-up quota is a
+# warning, not a failure: it does not touch a suite against a standing
+# database, and a run that starts pods is told by the API at its first create.
+#
+# What it does not check: that nobody else is running a suite against the same
+# database ("one run per database at a time"). It cannot see that.
+#
+# Run it before any live suite:
+#
+#   maint/live-preflight && maint/capped-test prove -lr t/
+#
+# Access: DBIO_TEST_KUBECONFIG, else KUBECONFIG, else ~/.kube/cihq-dev-dbio.yaml
+# if it is there, else whatever kubectl uses by itself. The namespace is the
+# one of that kubeconfig's context.
+#
+# Exit status: 0 all clear, 1 something is wrong (details on stderr), 2 the
+# checks could not be run at all (no kubectl, cluster not reachable, token
+# expired). A 2 is NOT a pass.
+#
+# It reads. It never changes anything — no pod is started, stopped or deleted,
+# no network is removed. Every finding is reported with the command that deals
+# with it, for a human to run.
+#
+# See the "Live testing" section of .claude/rules/dbio-rules.md, which names
+# this script as the step before a live run.
+
+use strict;
+use warnings;
+
+use FindBin ();
+use File::Temp ();
+use JSON::PP ();
+use POSIX ();
+
+# The access of the DBIO project to its namespace, and how its token (valid
+# for seven days) is renewed.
+my $PROJECT_ACCESS = '.kube/cihq-dev-dbio.yaml';
+# The cihq-ocp checkout: CIHQ_OCP, else the one next to the DBIO family
+# directory (maint/ -> repo -> family directory -> its parent).
+my $CIHQ_OCP       = $ENV{CIHQ_OCP} // "$FindBin::Bin/../../../cihq-ocp";
+my $RENEW_TOKEN    = "$CIHQ_OCP/bin/cihq-dev token dbio";
+my $DBIO_DB        = "$CIHQ_OCP/umgebungen/dbio/dbio-db";
+
+my $failures = 0;
+my $warnings = 0;
+my $checks   = 0;
+
+sub fail  { $failures++; print STDERR "FAIL  $_[0]\n" }
+sub warn_ { $warnings++; print STDERR "WARN  $_[0]\n" }
+sub ok    { print STDERR "ok    $_[0]\n" }
+sub note  { print STDERR "      $_[0]\n" }
+
+sub cannot_check {
+  my ($why, @notes) = @_;
+  print STDERR "?     $why -- cannot check anything\n";
+  note $_ for @notes;
+  note 'this is NOT a pass; fix the access or skip the live run';
+  exit 2;
+}
+
+# run(@command): what it wrote to stdout and to stderr, and its exit status --
+# 127 when it could not be started at all.
+sub run {
+  my (@command) = @_;
+  my $stderr = File::Temp->new;
+
+  my $pid = open my $stdout, '-|';
+  die "live-preflight: cannot fork: $!\n" unless defined $pid;
+  if (!$pid) {
+    open STDERR, '>&', $stderr or POSIX::_exit(127);
+    { no warnings 'exec'; exec { $command[0] } @command }
+    POSIX::_exit(127);
+  }
+  my $out = do { local $/; <$stdout> };
+  close $stdout;
+  my $status = $?;
+
+  seek $stderr, 0, 0;
+  my $err = do { local $/; <$stderr> };
+  return ($out // '', $err // '', ($status & 127) ? 128 + ($status & 127) : $status >> 8);
+}
+
+# A Kubernetes quantity as a number: 2600m, 8, 6784Mi, 32Gi.
+sub quantity {
+  my ($text) = @_;
+  my %factor = (
+    m => 1e-3, k => 1e3, M => 1e6, G => 1e9, T => 1e12,
+    Ki => 2**10, Mi => 2**20, Gi => 2**30, Ti => 2**40,
+  );
+  my ($number, $unit) = ($text // '') =~ /^([0-9.]+)([A-Za-z]*)$/ or return;
+  return $number unless length $unit;
+  return exists $factor{$unit} ? $number * $factor{$unit} : undef;
+}
+
+# -------------------------------------------------------------- the access
+
+my ($kubeconfig) = grep { defined and length } @ENV{qw(DBIO_TEST_KUBECONFIG KUBECONFIG)};
+if (!defined $kubeconfig and defined $ENV{HOME} and -f "$ENV{HOME}/$PROJECT_ACCESS") {
+  $kubeconfig = "$ENV{HOME}/$PROJECT_ACCESS";
+}
+$ENV{KUBECONFIG} = $kubeconfig if defined $kubeconfig;
+
+# One request for everything, in the namespace of the context: no -n, no -A.
+# The project account may list nothing outside its namespace, and what is
+# outside is not ours to judge.
+my ($listing, $error, $status) = run(
+  'kubectl', '--request-timeout=15s', 'get', 'pods,services,jobs,resourcequotas', '-o', 'json',
+);
+
+cannot_check('kubectl is not in PATH') if $status == 127;
+
+if ($status != 0) {
+  chomp $error;
+  cannot_check(
+    "kubectl could not list the namespace (exit $status)",
+    ( split /\n/, $error ),
+    'access used: ' . ( $kubeconfig // "kubectl's default" ),
+    ( $error =~ /Unauthorized|provide credentials/i
+      ? "the token is not accepted (it lasts seven days) -- renew it: $RENEW_TOKEN"
+      : () ),
+  );
+}
+
+my $items = eval { JSON::PP->new->utf8->decode($listing)->{items} };
+cannot_check('kubectl answered with something that is not a list of objects')
+  unless ref $items eq 'ARRAY';
+
+my %of_kind;
+push @{ $of_kind{ $_->{kind} } }, $_ for @$items;
+my @pods = @{ $of_kind{Pod} // [] };
+
+my ($namespace) = map { $_->{metadata}{namespace} // () } @$items;
+my $kubectl = 'kubectl' . ( defined $namespace ? " -n $namespace" : '' );
+
+note 'access: ' . ( $kubeconfig // "kubectl's default" )
+   . ', namespace ' . ( $namespace // '(empty -- the one of its context)' );
+
+sub name { $_[0]{metadata}{name} }
+
+# ------------------------------------------------ 1. every container capped
+
+$checks++;
+my @uncapped;
+for my $pod (@pods) {
+  for my $container (@{ $pod->{spec}{containers} // [] }) {
+    my $limits  = $container->{resources}{limits} // {};
+    my @missing = grep { !length( $limits->{$_} // '' ) } qw(cpu memory);
+    push @uncapped, [ name($pod), "$container->{name}: no " . join(' and no ', @missing) . ' limit' ]
+      if @missing;
+  }
+}
+
+if (@uncapped) {
+  my %seen;
+  my @names = grep { !$seen{$_}++ } map { $_->[0] } @uncapped;
+  fail scalar(@names) . ' pod(s) with a container that carries no cpu+memory limit';
+  note "$_->[0]  ($_->[1])" for @uncapped;
+  note 'an uncapped database is what OOM-rebooted a host before. Fix the';
+  note 'manifest it came from, then remove the pod:';
+  note "  $kubectl delete pod $_" for @names;
+}
+else {
+  ok scalar(@pods) . ' pod(s), every container carries a cpu and a memory limit';
+}
+
+# --------------------------------------------------- 2. the databases Ready
+
+$checks++;
+my @databases = grep { ( $_->{metadata}{labels}{role} // '' ) eq 'dbio-test-db' } @pods;
+
+sub is_ready {
+  my ($pod) = @_;
+  return 0 if $pod->{metadata}{deletionTimestamp};
+  return scalar grep { $_->{type} eq 'Ready' and $_->{status} eq 'True' }
+    @{ $pod->{status}{conditions} // [] };
+}
+
+my @ready   = map { name($_) } grep {  is_ready($_) } @databases;
+my @unready = grep { !is_ready($_) } @databases;
+
+if (@unready) {
+  fail scalar(@unready) . ' database(s) not Ready -- a suite against one fails for no reason of its own';
+  note name($_) . '  (' . ( $_->{metadata}{deletionTimestamp} ? 'Terminating' : $_->{status}{phase} // '?' ) . ')'
+    for @unready;
+  note "see why, then bring it back up ($DBIO_DB up <db>):";
+  note "  $kubectl describe pod " . name($_) for @unready;
+}
+
+if (@ready) {
+  my $line = scalar(@ready) . ' database(s) Ready: ' . join(', ', sort @ready);
+  @unready ? note $line : ok $line;
+}
+elsif (!@unready) {
+  warn_ 'no database (label role=dbio-test-db) in this namespace -- nothing here';
+  note "for a suite to run against. Start one: $DBIO_DB up <db>";
+  note 'if they are up in another namespace, this access looks at the wrong one';
+}
+
+# ------------------------------- 3. leftovers of a DBIO::Test::Kubernetes run
+
+$checks++;
+# In an existing namespace every object of such a run is named
+# dbio-test-<run>-..., and carries the label dbio-test-run (pods, services and
+# jobs alike, since k329). The name pattern stays for the leftovers of runs
+# made before the services and jobs were labelled.
+sub of_test_run {
+  my ($object) = @_;
+  return 1 if exists( ( $object->{metadata}{labels} // {} )->{'dbio-test-run'} );
+  return name($object) =~ /^dbio-test-[a-z0-9]{8}-/;
+}
+
+# An object that has an owner goes with it (the pod of a job), so it is not
+# named in the delete.
+my @leftovers = map { lc( $_->{kind} ) . '/' . name($_) }
+  grep { of_test_run($_) and !@{ $_->{metadata}{ownerReferences} // [] } }
+  map { @{ $of_kind{$_} // [] } } qw(Pod Service Job);
+
+if (@leftovers) {
+  fail scalar(@leftovers) . ' object(s) of a DBIO::Test::Kubernetes run in the namespace';
+  note 'if that run is still going (another session), wait for it. If it was';
+  note 'interrupted, these hold quota until they are deleted:';
+  note "  $kubectl delete @leftovers";
+}
+else {
+  ok 'nothing left over from a DBIO::Test::Kubernetes run';
+}
+
+# ----------------------------- 4. the route to the address of the databases
+
+$checks++;
+my %address;
+for my $service (@{ $of_kind{Service} // [] }) {
+  $address{ $_->{ip} } = 1
+    for grep { defined $_->{ip} } @{ $service->{status}{loadBalancer}{ingress} // [] };
+}
+
+warn_ 'no LoadBalancer address in this namespace -- route check skipped'
+  unless %address;
+
+for my $ip (sort keys %address) {
+  my ($route, $route_error, $route_status) = run('ip', 'route', 'get', $ip);
+
+  if ($route_status == 127) {
+    warn_ "ip(8) is not in PATH -- route to $ip not checked";
+  }
+  elsif ($route_status != 0 or $route !~ /\bdev\s+(\S+)/) {
+    chomp $route_error;
+    fail "no route to $ip from this machine";
+    note $_ for split /\n/, $route_error;
+  }
+  elsif ((my $dev = $1) =~ /^(?:br-|docker)/) {
+    fail "route to $ip goes via $dev, a docker bridge, not to the cluster";
+    note 'a local docker network covers the address, so every database behind';
+    note 'it looks dead from here while it is fine.';
+    if ($dev =~ /^br-([0-9a-f]{12})$/) {
+      note "that network: docker network inspect $1";
+      note "remove it:    docker network rm $1";
+      note "and give its stack a subnet that does not cover $ip";
+    }
+    else {
+      note 'it is the default bridge: set "bip" in /etc/docker/daemon.json to a';
+      note "range that does not cover $ip, then restart docker";
+    }
+  }
+  else {
+    ok "route to $ip goes via $dev";
+  }
+}
+
+# ------------------------------------------------------------- the quota
+
+for my $quota (@{ $of_kind{ResourceQuota} // [] }) {
+  my ($hard, $used) = @{ $quota->{status} // {} }{qw(hard used)};
+  my @resources = sort keys %{ $hard // {} };
+  next unless @resources;
+
+  note 'quota ' . name($quota) . ': '
+     . join(', ', map { "$_ " . ( $used->{$_} // '?' ) . "/$hard->{$_}" } @resources);
+
+  for my $resource (@resources) {
+    my ($u, $h) = map { quantity($_) } $used->{$resource}, $hard->{$resource};
+    next unless defined $u and defined $h and $u >= $h;
+    warn_ 'quota ' . name($quota) . ": $resource is used up ($used->{$resource} of $hard->{$resource})";
+    note "nothing that needs it can be started; $DBIO_DB down <db> frees some";
+  }
+}
+
+# ------------------------------------------------------------------- verdict
+
+print STDERR "\n";
+if ($failures) {
+  print STDERR "PREFLIGHT FAILED -- $failures finding(s) in $checks checks. Do NOT start a live run.\n";
+  exit 1;
+}
+if ($warnings) {
+  print STDERR "preflight clear ($checks checks, $warnings warning(s)) -- no finding, but read the\n"
+             . "warnings before starting a live run.\n";
+  exit 0;
+}
+print STDERR "preflight clear ($checks checks) -- live run is safe to start.\n";
+exit 0;

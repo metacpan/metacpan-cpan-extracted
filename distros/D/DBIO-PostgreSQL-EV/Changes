@@ -1,5 +1,131 @@
 Revision history for DBIO-PostgreSQL-EV
 
+0.900004  2026-11-08
+    * Connect info
+        - Connect info is read in one place, in every form the owning sync
+          storage reads: a DBI-form list, a hash with a dsn key, DBI
+          attributes in front of the DSN, a postgresql:// URI in the DSN, an
+          AccessBroker's answer. The pool connects where the dbh does, as
+          the same user.
+        - Every built-in AccessBroker shape is turned into libpq conninfo,
+          fetched fresh for each pool spawn and each listen open, so rotated
+          credentials apply (see ADR 0009). connect($broker, { async =>
+          'ev', pool_size => N }) sizes the pool; no conninfo is kept from a
+          broker's answer.
+        - Connect info the transport cannot connect from is refused naming
+          its form, never a value: a libpq parameter beside a broker or among
+          DBI attributes (also spelled with a capital), an empty broker
+          answer, a static dbi:Pg: DSN that names no target, a NUL byte in a
+          parameter value, a code reference.
+        - Every connection has a connect_timeout of 10 seconds unless the
+          conninfo sets one; the POD recommends sslmode=verify-full.
+        - Passwords are masked as *** in every message about a connection.
+
+    * Pool
+        - A borrow has a session of its own: DISCARD ALL runs when it ends,
+          then the connect actions again, before the connection is lent on.
+          A reset that fails or exceeds reset_timeout retires the connection.
+        - Connections are fork-safe: a forked child never ends or reads the
+          sessions of its parent. Dead connections, also idle ones whose
+          server end closed, are retired and replaced on demand.
+        - A pooled statement, notify or copy_in gives its connection back to
+          its own pool on every path (a refused dispatch, a dying callback,
+          a disconnect in a callback), and a stale release takes nothing
+          from the connection's next holder.
+        - A Future that waits for the pool holds itself until it is ready.
+          A process that ends with statements in flight prints no warnings.
+        - The connect-action runner returns the statement's rows for a true
+          dbio_rows attribute.
+
+    * Blocking calls
+        - select, insert, txn_do, deploy and the other blocking methods work:
+          the Future of this transport waits by running the EV loop. A wait
+          that could never end, or would spin inside a delivering callback,
+          dies with "Blocking wait refused" and leaves the pool usable.
+
+    * Transactions and pipelines
+        - Pinned statements run one at a time per connection, so a coderef
+          that dies mid-statement rolls back cleanly. A COMMIT that
+          PostgreSQL answers with ROLLBACK fails the transaction. A
+          statement cancelled in the queue is not sent.
+        - txn_do refuses a coderef that returns a storage call queued for
+          the transaction's own connection, and rolls back.
+        - pipeline hands the batch a pinned context; a connection lost
+          before the sync point fails with EV::Pg's error, and a transaction
+          ended inside a pipeline rolls back after the sync.
+        - A pinned async context of an earlier connection generation is
+          refused once connect_info or disconnect has run.
+        - TransactionContext is core's, with txn_pg as an alias of txn_conn.
+
+    * Cancel
+        - Cancelling the Future of a statement in flight asks the server to
+          stop it (EV::Pg cancel_async, libpq 17 or later). The connection
+          returns to the pool once the statement and the request are
+          answered.
+
+    * LISTEN/NOTIFY
+        - listen, unlisten and notify are core's, with listen_alive,
+          listen_reconnect and the error and reconnect hooks. The listen
+          connection reconnects with backoff and listens again, takes the
+          broker's current answer, and survives a forked child.
+        - Channel names follow DBIO::PostgreSQL::Util::quote_channel;
+          listen_alive notices a session the server has ended.
+
+    * COPY
+        - copy_in escapes backslash, TAB, LF and CR by the COPY text-format
+          rules, writes table and column names as identifiers, and ends the
+          COPY once. A stream that cannot be ended retires its connection;
+          a row libpq does not take fails the COPY.
+
+    * Errors
+        - A refused statement fails its Future with a
+          DBIO::Exception::Server (sqlstate, constraint, table, detail);
+          BEGIN, COMMIT and ROLLBACK keep it with their context. Values in
+          DETAIL lines are masked, as on the synchronous storage.
+        - An error names no value: every text of the server's that reaches an
+          exception -- a pooled, pinned or pipelined statement, notify,
+          LISTEN, copy_in, the session reset, a connect action -- loses the
+          values bound to the statement (four characters or more, wherever
+          they stand, as in 'relation "..." does not exist') and the values
+          the server quotes in its messages (invalid input syntax, out of
+          range, enum, date/time, array literal, byte sequence, time zone,
+          the bound parameter and COPY line in CONTEXT). A text without a
+          known form stays as it is, also from an EV::Pg without
+          error_fields.
+        - Refusals of the transport are DBIO::Exception objects at the
+          caller's file and line; a dispatch EV::Pg refuses fails with its
+          own text.
+
+    * SQL
+        - A ? is numbered into $N only where PostgreSQL reads SQL, by
+          DBIO::PostgreSQL::Util::number_placeholders, as on the other
+          transport: not in dollar quoting, comments or E'' strings. \? is a
+          literal question mark, mixing $N and ? is refused, and a ? after @
+          is a placeholder.
+        - Identifier quoting follows the owning connection: quote_names => 0
+          and an explicit quote_char or name_sep are used as given.
+        - Upserts with ON CONFLICT ... DO UPDATE and RETURNING work through
+          the transport; SET values arrive as plain values.
+        - deploy_async runs core's generic deploy over the DDL class of the
+          sync storage, and asks the server which schema the control file
+          of an extension fixes.
+
+    * Tracing
+        - The statement trace is core's: query_start and query_end on the
+          storage's debug object, binds from DBIO_TRACE=2 on, encode_column
+          binds shown as ***, redact_bind_value applied, values cut at 32
+          characters.
+
+    * Documentation
+        - DBIO::PostgreSQL::EV carries the overview of the distribution, and
+          its SYNOPSIS uses a plain schema that declares its driver.
+        - Setup instructions, README and ADRs 0001-0010 describe
+          the code; the shipped demo and skill use { async => 'ev' }.
+
+    * Dependencies
+        - Requires DBIO 0.900004, DBIO::PostgreSQL 0.900004, EV 4.11 and
+          Sub::Util 1.70.
+
 0.900001  2026-07-12
     * Documentation
         - DBIO::PostgreSQL::EV POD: replaced the stale async_backend() opt-in

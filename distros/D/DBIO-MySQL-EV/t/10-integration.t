@@ -10,6 +10,7 @@ BEGIN {
 
 use EV;
 use EV::MariaDB;
+use DBIO::Util ();
 
 # Parse DSN into conninfo hash
 my $dsn = $ENV{DBIO_TEST_MYSQL_DSN};
@@ -34,7 +35,12 @@ my $mdb;
 $mdb = EV::MariaDB->new(
   %conninfo,
   on_connect => sub { $connected = 1 },
-  on_error   => sub { diag "EV::MariaDB error: $_[0]"; $connected = -1 },
+  # The client library quotes what it was given: named without a password it
+  # may carry (karr k76).
+  on_error   => sub {
+    diag DBIO::Util::mask_connect_secrets("EV::MariaDB error: $_[0]", [ $dsn, @conninfo{qw( user password )} ]);
+    $connected = -1;
+  },
 );
 
 # Run event loop until connected

@@ -3,6 +3,71 @@
 - Status: accepted
 - Date: 2026-06-21
 - Tags: async, transactions, pool, pinning, connection-affinity, drivers
+- Superseded in part: the driver-owned `TransactionContext` *implementation*
+  described below is superseded by core ADR 0030 §4 (see the Amendment); the
+  pinning policy itself stands
+
+## Amendment (2026-09-06, karr k32) — the context class is core's, this dist keeps only an alias
+
+The decision this ADR records is in force and unchanged: one connection pinned
+for the life of a transaction, every statement in the body routed through a
+non-releasing query path, the connection released exactly once at the
+BEGIN/COMMIT/ROLLBACK boundary. What is superseded is *where the context object
+lives*.
+
+Core ships the generic `DBIO::Storage::Async::TransactionContext` with the
+identical surface, plus `_context_active` / `_invalidate` (core ADR 0045) — core
+ADR 0030 §4, *One core orchestration, pluggable transports*, lifts the shared
+Model-B machinery into `DBIO::Storage::Async` and names "a generic
+TransactionContext" among the pieces that move. Core's `txn_do_async` builds it
+through two seams the transport fills: `_txn_context_class` and
+`_txn_conn_accessor` in `DBIO::PostgreSQL::EV::Storage`.
+`DBIO::PostgreSQL::EV::TransactionContext` is therefore no longer an
+implementation but a **thin subclass** of that core class, contributing exactly
+one method: `txn_pg`, a compatibility alias for the inherited `txn_conn`.
+
+Read as superseded, therefore:
+
+- **The delegation list is core's, not this driver's.** The *Decision* bullet
+  about delegating each public method back to storage, and the *Consequences*
+  bullet about adding every new one to that list, still describe how the context
+  behaves — but the list is maintained in core, and a method missing from it is
+  a core ticket, not one here.
+- **The constructor key is `txn_conn`, not `pg`.** `_txn_conn_accessor` returns
+  core's key now, because the constructor is core's and dies without it. The
+  driver-native name survives only as the `txn_pg` read accessor.
+
+**Why the alias is load bearing here, and where this dist differs from its
+mirror.** `dbio-mysql-ev` made the same move in its karr k31 and found its
+equivalent alias reachable by no live path: core's `deploy_async` gates the
+transactional branch on `_use_transactional_ddl`, and MySQL answers 0 on both
+the ownerless and the owner-probed path, so `$ctx->txn_conn` was unreachable
+there. **PostgreSQL is the opposite case**, measured rather than assumed:
+`DBIO::PostgreSQL::Storage->_use_transactional_ddl` answers **1**, so
+`deploy_async` really does take its `txn_do_async` branch and really does read
+`$ctx->txn_conn`. The k25 fix that added that accessor closed a *live* gap, not
+a latent one — and the subclass now inherits the accessor instead of declaring
+it. In the other direction, `txn_pg` is not decoration either:
+`t/21-deploy-async-live.t` reaches for it to drive `_execute_ddl_async` on the
+pinned connection, so removing it would break a live test that no offline run
+can see.
+
+**Editorial note on the line references below.** They are left as written, but
+they had already drifted from their targets *before* this amendment: in the
+pre-k32 file `TransactionContext.pm:31` and `:47` pointed at blank lines,
+`:56-59` at the `in_txn` POD rather than `_query_async`, and `:63-74` at POD
+rather than the delegations. The house ADR convention is module path plus
+method name for exactly this reason; the drift predates k32 and is recorded
+here rather than silently repaired.
+
+## Footnote (2026-09-05, karr k31) — the sibling driver has since been renamed
+
+The *Decision* section below names the sibling as `dbio-mysql-async` shipping
+`DBIO::MySQL::Async::TransactionContext`. Both names predate the family-wide
+`::Async` → `::EV` rename (this repo's ADR 0008, and its MySQL counterpart
+`dbio-mysql-ev` ADR 0008): the dist is `dbio-mysql-ev` and the class is
+`DBIO::MySQL::EV::TransactionContext`. Only the names moved — the pattern this
+ADR points at is unchanged, and the ADR text is left as written.
 
 ## Context
 

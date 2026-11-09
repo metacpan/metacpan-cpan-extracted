@@ -81,6 +81,7 @@ sub _inject_ipcountry {
 	$l->{_ipcountry}      = bless {}, 'IP::Country::Fast';
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 }
 
 sub _fresh_cache {
@@ -136,6 +137,7 @@ subtest '_country: numeric result is deleted immediately (DD then K)' => sub {
 	$l->{_have_ipcountry} = 0;
 	$l->{_have_geoip}     = 0;
 	$l->{_have_geoipfree} = 0;
+	$l->{_have_mmdb} = 0;
 
 	# Poison the country cache with a numeric value — simulates a bad Whois result.
 	$cache->set('CGI::Lingua:country:' . $IP{PUBLIC}, '12345', '1 hour');
@@ -228,7 +230,7 @@ subtest 'DESTROY: only documented fields are serialised (no D~ for transient fie
 		_country    _rlanguage  _dont_use_ip
 		_have_ipcountry  _have_geoip  _have_geoipfree
 	);
-	Readonly my @FORBIDDEN_FIELDS => qw(logger _cache _info _syslog _ipcountry _geoip);
+	Readonly my @FORBIDDEN_FIELDS => qw(logger _cache _info _syslog _ipcountry _geoip _mmdb);
 
 	local %ENV = (REMOTE_ADDR => $IP{PUBLIC}, HTTP_ACCEPT_LANGUAGE => $LANG{EN});
 	my $cache = _fresh_cache();

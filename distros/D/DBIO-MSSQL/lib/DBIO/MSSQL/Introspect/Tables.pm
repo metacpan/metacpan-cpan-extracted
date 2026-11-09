@@ -4,14 +4,21 @@ package DBIO::MSSQL::Introspect::Tables;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub fetch {
   my ($class, $dbh, $schema) = @_;
   $schema //= 'dbo';
 
+  # Every column is aliased explicitly and in lower case: an alias is echoed
+  # into the result metadata verbatim, which is the one way to be sure of the
+  # hash keys below without depending on the handle's FetchHashKeyName.
+  # INFORMATION_SCHEMA reports its columns UPPERCASE; unaliased, the key case
+  # in the row hash is decided by the transport, not by this code.
   my $sth = $dbh->prepare(q{
-    SELECT table_name, table_type
+    SELECT table_name AS table_name, table_type AS table_type
     FROM INFORMATION_SCHEMA.TABLES
     WHERE table_schema = ?
     ORDER BY table_name
@@ -46,7 +53,7 @@ DBIO::MSSQL::Introspect::Tables - Introspect MSSQL tables and views
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -61,6 +68,8 @@ Skips system tables.
 
 Returns a hashref keyed by table name. Each value has: C<table_name>,
 C<kind> (C<table> or C<view>), C<schema>.
+The stored text of a view (C<definition>) is added by L<DBIO::MSSQL::Introspect>
+from L<DBIO::MSSQL::Introspect::Views>.
 
 =head1 AUTHOR
 

@@ -29,7 +29,7 @@ if ($ENV{DBIO_TEST_MYSQL_DSN}) {
     };
 }
 
-plan skip_all => 'No database DSN env vars set (run via maint/k8s-test)'
+plan skip_all => 'No database DSN env vars set (run via xbin/k8s-test)'
     unless @tests;
 
 plan tests => scalar @tests * 2;

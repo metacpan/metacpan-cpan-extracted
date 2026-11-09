@@ -4,6 +4,8 @@ package DBIO::Base;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Util;
 use mro 'c3';
 
@@ -14,6 +16,7 @@ use Scalar::Util ();
 use DBIO::Exception;
 
 my $successfully_loaded_components;
+
 
 sub get_component_class {
   my $class = $_[0]->get_inherited($_[1]);
@@ -32,6 +35,7 @@ sub get_component_class {
 
   $class;
 }
+
 
 sub set_component_class {
   shift->set_inherited(@_);
@@ -84,7 +88,7 @@ DBIO::Base - Meta-infrastructure base for all DBIO internal classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -114,6 +118,26 @@ Internal DBIO classes (C<DBIO::Core>, C<DBIO::Row>, C<DBIO::ResultSet>,
 C<DBIO::Schema>, C<DBIO::Storage>, and roughly twenty-five others)
 inherit from this class. User-facing result classes transitively
 inherit through their immediate bases.
+
+=head1 METHODS
+
+=head2 get_component_class
+
+    my $class = $self->get_component_class($accessor_name);
+
+The C<component_class> accessor-group getter (see C<mk_group_accessors
+component_class => ...>). Reads the class name via C<get_inherited>, ensures
+it is loaded via L<Class::C3::Componentised/ensure_class_loaded> (once per class,
+cached), and returns the class name -- it does not instantiate or delegate to
+it.
+
+=head2 set_component_class
+
+    $self->set_component_class($accessor_name => $class_name);
+
+The C<component_class> accessor-group setter. Delegates directly to
+C<set_inherited>; the class is not loaded until L</get_component_class>
+reads it back.
 
 =head1 NOT TO BE USED AS A USER-FACING BASE
 

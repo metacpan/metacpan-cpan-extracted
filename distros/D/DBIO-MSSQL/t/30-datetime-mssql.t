@@ -32,6 +32,11 @@ if (not ($dsn || $dsn2)) {
     ." 'track'.";
 }
 
+# A schema always declares its driver (core ADR 0067): the shared test schema
+# gets it here. At its first use the storage adapts to the access path of the
+# DSN (DBIO::MSSQL::Storage::_adapt_to_access_path).
+DBIO::Test::Schema->storage_type('+DBIO::MSSQL::Storage');
+
 DBIO::Test::Schema->load_classes('EventSmallDT');
 
 my @connect_info = (

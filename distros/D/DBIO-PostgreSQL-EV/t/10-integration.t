@@ -10,24 +10,16 @@ BEGIN {
 
 use EV;
 use EV::Pg;
+use DBIO::Util ();
+use DBIO::PostgreSQL::EV::ConnectInfo ();
 
-# Parse DSN into conninfo
-my $dsn = $ENV{DBIO_TEST_PG_DSN};
-my $user = $ENV{DBIO_TEST_PG_USER} || '';
-my $pass = $ENV{DBIO_TEST_PG_PASS} || '';
-
-my $conninfo;
-if ($dsn =~ /^dbi:Pg:(.+)/i) {
-  my $params = $1;
-  $conninfo = $params;
-  $conninfo =~ s/;/ /g;
-  # Normalize database → dbname for libpq
-  $conninfo =~ s/\bdatabase=/dbname=/g;
-  $conninfo .= " user=$user" if $user;
-  $conninfo .= " password=$pass" if $pass;
-} else {
-  $conninfo = $dsn;
-}
+# The test login as the conninfo string the transport hands EV::Pg; a server
+# that is not there fails the file, with a plan (karr k77).
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+LiveServer->require_server;
+my $conninfo = DBIO::PostgreSQL::EV::ConnectInfo::conninfo_string({ LiveServer->conninfo });
 
 # --- Basic connectivity via raw EV::Pg ---
 
@@ -37,17 +29,24 @@ my $pg;
 $pg = EV::Pg->new(
   conninfo   => $conninfo,
   on_connect => sub { $connected = 1 },
-  on_error   => sub { diag "EV::Pg error: $_[0]"; $connected = -1 },
+  on_error   => sub {
+    diag 'EV::Pg error: ' . DBIO::Util::mask_connect_secrets("$_[0]", [ LiveServer->login ]);
+    $connected = -1;
+  },
 );
 
 # Run event loop until connected
 EV::run until $connected;
 
-if ($connected < 0) {
-  plan skip_all => "Could not connect to PostgreSQL: check DBIO_TEST_PG_DSN";
+# The server took a DBI connection a moment ago (require_server): EV::Pg not
+# connecting to it from the same login is a failure, and nothing below can run.
+unless ($connected > 0) {
+  fail 'connected to PostgreSQL';
+  done_testing;
+  exit;
 }
 
-ok $connected > 0, 'connected to PostgreSQL';
+pass 'connected to PostgreSQL';
 diag "Server version: " . $pg->server_version;
 
 # --- Simple query ---

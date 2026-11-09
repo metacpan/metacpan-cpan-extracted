@@ -4,11 +4,15 @@ package DBIO::Forked::Future;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use Carp 'croak';
 use Errno ();
+use POSIX ();
 use IO::Select;
 use Scalar::Util ();
 use Storable ();
+use Time::HiRes ();
 use namespace::clean;
 
 
@@ -28,6 +32,8 @@ sub new {
     mode    => 'leaf',
     read_fh => $args{read_fh},
     pid     => $args{pid},
+    owner   => $$,
+    deadline => defined $args{timeout} ? Time::HiRes::time() + $args{timeout} : undef,
     buffer  => '',
     ready   => 0,
     failed  => 0,
@@ -51,7 +57,7 @@ sub _derived {
   }, $class;
 }
 
-# --- Immediately-settled constructors (Test::Future-compatible surface) ---
+# --- Immediately-settled constructors (Future::Immediate-compatible surface) ---
 #
 # done/fail/needs_all are CLASS methods. Core's ResultSet async helpers build
 # futures via $storage->future_class->done(@rows) / ->fail($err), so this class
@@ -155,13 +161,25 @@ sub _resolve {
 # until EOF. Blocking: read until EOF. On EOF, thaw + reap + cache.
 sub _resolve_leaf {
   my ($self, $blocking) = @_;
+  croak "DBIO::Forked::Future: belongs to process $self->{owner}"
+    if defined $self->{owner} && $self->{owner} != $$;
   my $fh = $self->{read_fh};
   croak 'DBIO::Forked::Future: no read handle to resolve' unless defined $fh;
   my $sel = $self->{_select} ||= IO::Select->new($fh);
 
   while (1) {
-    if (!$blocking) {
-      return 0 unless $sel->can_read(0);
+    # Wait for the pipe no longer than the deadline allows; an unreadable pipe
+    # at the deadline ends the child.
+    my $deadline = $self->{deadline};
+    if (!$blocking or defined $deadline) {
+      my $wait = !$blocking ? 0 : $deadline - Time::HiRes::time();
+      $wait = 0 if defined $wait && $wait < 0;
+      unless ($sel->can_read($wait)) {
+        return 0 if !$blocking && !(defined $deadline && Time::HiRes::time() >= $deadline);
+        next if $blocking && Time::HiRes::time() < $deadline;   # interrupted early
+        $self->_cancel('DBIO::Forked::Future: statement_timeout exceeded');
+        return 1;
+      }
     }
     my $n = sysread($fh, my $chunk, 65536);
     if (!defined $n) {
@@ -191,9 +209,21 @@ sub _finish_leaf {
   my $data;
   $data = eval { Storable::thaw($blob) } if defined $blob && length $blob;
   if (!$data || ref $data ne 'HASH') {
+    my $status = $self->{status};
+    my $nothing = !defined $blob || !length $blob;
     $self->{failed} = 1;
-    $self->{result} = 'DBIO::Forked::Future: corrupt or empty result from child'
-      . ($@ ? ": $@" : '');
+    if ($nothing && defined $status && $status & 127) {
+      $self->{result} = 'DBIO::Forked::Future: child killed by signal '
+        . ($status & 127) . ' before sending a result';
+    }
+    elsif ($nothing && defined $status && $status >> 8) {
+      $self->{result} = 'DBIO::Forked::Future: child exited with status '
+        . ($status >> 8) . ' before sending a result';
+    }
+    else {
+      $self->{result} = 'DBIO::Forked::Future: corrupt or empty result from child'
+        . ($@ ? ": $@" : '');
+    }
   }
   elsif (exists $data->{error}) {
     $self->{failed} = 1;
@@ -209,8 +239,14 @@ sub _finish_leaf {
 # Resolve a derived future: force the source, then apply the callback. Runs the
 # callback synchronously (the source is ready by now). Returns 0 without effect
 # if the source is not ready and we are non-blocking.
+#
+# The callback runs at most once. If it returns a future that is still pending,
+# that future is remembered in {inner} and this returns 0; every later attempt
+# resolves {inner} only and never reaches the callback again.
 sub _resolve_derived {
   my ($self, $blocking) = @_;
+  return $self->_resolve_inner($blocking) if $self->{inner};
+
   my $source = $self->{source};
   return 0 unless $source->_resolve($blocking);
 
@@ -236,16 +272,23 @@ sub _resolve_derived {
 
   # Flatten a single returned future (chaining).
   if (@out == 1 && Scalar::Util::blessed($out[0]) && $out[0]->isa(__PACKAGE__)) {
-    my $inner = $out[0];
-    return 0 unless $inner->_resolve($blocking);
-    $self->{failed} = $inner->{failed} ? 1 : 0;
-    $self->{result} = $inner->{result};
-    $self->{ready}  = 1;
-    return 1;
+    $self->{inner} = $out[0];
+    return $self->_resolve_inner($blocking);
   }
 
   $self->{failed} = 0;
   $self->{result} = \@out;
+  $self->{ready}  = 1;
+  return 1;
+}
+
+# Take over the outcome of the future the callback returned, once it resolves.
+sub _resolve_inner {
+  my ($self, $blocking) = @_;
+  my $inner = $self->{inner};
+  return 0 unless $inner->_resolve($blocking);
+  $self->{failed} = $inner->{failed} ? 1 : 0;
+  $self->{result} = $inner->{result};
   $self->{ready}  = 1;
   return 1;
 }
@@ -258,20 +301,85 @@ sub _settle_failed {
   return 1;
 }
 
+# waitpid writes the child's status into $? (and, if something else reaped the
+# child first, -1 there and ECHILD into $!). Neither is the caller's: its $?
+# is the status of its own last command.
 sub _reap {
   my $self = shift;
   return if $self->{reaped};
-  waitpid($self->{pid}, 0) if defined $self->{pid};
+  local ($?, $!);
+  if (defined $self->{pid}) {
+    my $reaped = waitpid($self->{pid}, 0);
+    $self->{status} = $? if $reaped == $self->{pid};   # kept for the error message
+  }
   $self->{reaped} = 1;
 }
 
-# Reap an un-collected child so it does not become a zombie.
+# End a child that is still running and reap it: SIGTERM, a short grace period
+# polled with WNOHANG, then SIGKILL and a blocking reap. Leaves $? and $! alone.
+sub _terminate_child {
+  my $self = shift;
+  return if $self->{reaped};
+  local ($?, $!);
+  my $pid = $self->{pid};
+  if (defined $pid) {
+    kill 'TERM', $pid;
+    my $deadline = time + 1;
+    my $gone = 0;
+    while (1) {
+      my $r = waitpid($pid, POSIX::WNOHANG());
+      if ($r == $pid || $r == -1) { $gone = 1; last }
+      last if time >= $deadline;
+      select(undef, undef, undef, 0.01);
+    }
+    if (!$gone) {
+      kill 'KILL', $pid;
+      waitpid($pid, 0);
+    }
+  }
+  $self->{reaped} = 1;
+}
+
+
+sub cancel {
+  my $self = shift;
+  return $self if $self->{ready};
+  return $self->_cancel('DBIO::Forked::Future: cancelled');
+}
+
+# End the query and fail with $message. cancel and the deadline are the two
+# ways in.
+sub _cancel {
+  my ($self, $message) = @_;
+  return $self if $self->{ready};
+  if ($self->{mode} eq 'derived') {
+    $self->{source}->cancel;
+    return $self;
+  }
+  croak "DBIO::Forked::Future: belongs to process $self->{owner}"
+    if defined $self->{owner} && $self->{owner} != $$;
+  close $self->{read_fh} if defined $self->{read_fh};
+  $self->{read_fh} = undef;
+  delete $self->{_select};
+  $self->{buffer} = undef;
+  $self->_terminate_child;
+  $self->{failed} = 1;
+  $self->{result} = $message;
+  $self->{ready}  = 1;
+  return $self;
+}
+
+# A destructor runs wherever the last reference goes -- during global
+# destruction $? is the exit code of the process -- so it leaves the status
+# variables as it found them. A future that was never collected ends its child
+# the way cancel does instead of waiting for it.
 sub DESTROY {
   my $self = shift;
   return if $self->{reaped};
+  return if defined $self->{owner} && $self->{owner} != $$;   # not this process's to close or reap
+  local ($?, $!, $@);
   close $self->{read_fh} if defined $self->{read_fh};
-  waitpid($self->{pid}, 0) if defined $self->{pid};
-  $self->{reaped} = 1;
+  $self->_terminate_child;
 }
 
 1;
@@ -288,7 +396,7 @@ DBIO::Forked::Future - Loop-free, pipe-backed Future for DBIO::Forked
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -332,7 +440,9 @@ callbacks and a reference to its source; it resolves (running the callback
 synchronously, since the source is by then ready) the first time it is forced
 via C<get>, or via C<is_ready>/C<is_failed> once the source is ready. No
 callback runs before its source has resolved, and nothing blocks unless C<get>
-is called.
+is called. A callback runs at most once: if it returns a future that is still
+pending, the derived future stays unresolved until that one resolves, and
+polling it in the meantime does not call the callback again.
 
 =item *
 
@@ -348,10 +458,18 @@ same resolution machinery. C<needs_all> blocks on each input via C<get> in turn
 =head2 new
 
   my $future = DBIO::Forked::Future->new(read_fh => $fh, pid => $pid);
+  my $future = DBIO::Forked::Future->new(read_fh => $fh, pid => $pid, timeout => 5);
 
 Construct a leaf future bound to the pipe read handle C<read_fh> and the forked
-child C<pid>. Both are optional so the object can be built before the fork
+child C<pid>, owned by the constructing process (see L</PROCESS OWNERSHIP>). Both are optional so the object can be built before the fork
 wiring is in place.
+
+C<timeout> is a number of seconds above 0, counted from construction. A future
+still unresolved when it runs out is ended the way L</cancel> does and fails with
+C<DBIO::Forked::Future: statement_timeout exceeded>. The deadline is checked by
+whatever asks the future: L</get> waits no longer than the time that is left, and
+L</is_ready> / L</is_failed> look at the clock before they report pending. A
+result that has arrived by then is taken as it is.
 
 =head2 done
 
@@ -425,6 +543,65 @@ read, or the source of a derived future has resolved). Never blocks.
   if ($future->is_failed) { ... }
 
 Non-blocking. True once resolved I<and> the result is an error.
+
+=head2 cancel
+
+  $future->cancel;
+
+End the query. The child gets SIGTERM; if it is still there after one second it
+gets SIGKILL, and it is reaped either way. The future then fails with
+C<DBIO::Forked::Future: cancelled>: L</is_failed> is true and L</get> croaks with
+that message. C<cancel> on a future that has already resolved does nothing. On a
+derived future (C<then> / C<catch> / C<and_then>) it cancels its source.
+
+Only the process that created the future may cancel it; in any other process it
+fails with C<belongs to process N> (see L</PROCESS OWNERSHIP>).
+
+=head1 REAPING THE CHILD
+
+Every child is reaped exactly once, by C<get>/C<is_ready> once the pipe hits
+EOF, or by the destructor of a Future that was never collected.
+
+=over 4
+
+=item *
+
+B<The destructor ends the child.> A dropped Future whose query is still
+running ends its child the way L</cancel> does (SIGTERM, then SIGKILL after one
+second) and reaps it, so letting a Future go out of scope never waits for the
+database. The destructor closes the read end first. The database decides what
+becomes of a statement whose client was ended; a transaction that had not
+committed is rolled back by the server.
+
+=item *
+
+B<C<$?> is the caller's.> Reaping localises C<$?>, C<$!> and (in the destructor)
+C<$@>, so the exit code of a dying script and the status of the caller's last
+command survive. C<${^CHILD_ERROR_NATIVE}> is not so lucky: C<waitpid> sets it
+to the child's status and it cannot be restored, so read it after your own
+C<system> before the next C<get> or C<is_ready>.
+
+=item *
+
+B<How a child that sent nothing is reported.> If the pipe closes without a
+result and the child was killed or exited non-zero, the failure reads
+C<child killed by signal N before sending a result> or C<child exited with
+status N before sending a result> (OOM killer, a crash in the driver, an
+C<exit> in a C<txn_do_async> body). A result that arrives but cannot be thawed,
+or a clean exit with no result, stays C<corrupt or empty result from child>.
+
+=back
+
+=head1 PROCESS OWNERSHIP
+
+A Future belongs to the process that created it. The pipe and the child are that
+process's: it alone reads the result and reaps the child. In any other process
+(a copy inherited through an application C<fork>), C<get>, C<is_ready> and
+C<is_failed> fail with C<belongs to process N>, where N is the owner's pid, and
+the destructor closes nothing and reaps nothing, so the owner still receives the
+whole result. A derived future (C<then> / C<catch> / C<and_then>) follows its
+source. A future that is already resolved holds its values and can be read
+anywhere.
 
 =head1 STATUS
 

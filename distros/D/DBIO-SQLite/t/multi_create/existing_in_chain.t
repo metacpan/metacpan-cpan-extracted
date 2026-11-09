@@ -40,6 +40,7 @@ my $TODO_msg = "See comment at top of @{[ __FILE__ ]} for discussion of the TODO
   $schema->resultset('Track')->create ({
     title => 'Sugar-coated',
     cd => {
+      artist => $existing_nogen_cd->get_column('artist'),
       title => $existing_nogen_cd->title,
       genre => {
         name => 'sugar genre',

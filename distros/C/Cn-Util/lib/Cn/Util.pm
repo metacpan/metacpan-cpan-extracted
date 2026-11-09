@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Cn::Util;
 require 5.010001;
-our $VERSION = 0.023;
+our $VERSION = 0.024;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -162,6 +162,14 @@ sub dir {
 		 . join(', ', sort keys %allowed);
 	}
 	# Added 's' (non-zero size), removed 't' (tty test - meaningless on a path)
+	# Checked here so that an undef gets this message rather than "Use of
+	# uninitialized value" from the first line that reads it.  recursive is
+	# left out: undef is as false there as 0.
+	for my $name (qw(tests dir regex cpu)) {
+		die "$name must be defined" unless defined $args{$name};
+	}
+	die "on_match must be a code reference"
+		if defined $args{on_match} && ref $args{on_match} ne 'CODE';
 	die "Unrecognized characters in tests: $args{tests}"
 	  if $args{tests} =~ /[^rwxoRWXOezsfdlpSbcugkTB]/;
 	die "cpu must be a positive integer, got '$args{cpu}'"
@@ -361,8 +369,10 @@ sub execute {
 	my ($cmd, $return, $die) = @_;
 	$return = 'exit' unless defined $return;
 	$die    = 1      unless defined $die;
-	if ($return !~ m/^(exit|stdout|stderr|all)$/) {
-		die "you gave \$return = \"$return\", while this subroutine only accepts ^(exit|stdout|stderr|all)\$";
+	# \A..\z: "$" also matches before a trailing newline, so "exit\n" passed
+	# here, ran the command, and only then died with "broke pigeonholes".
+	if ($return !~ m/\A(?:exit|stdout|stderr|all)\z/) {
+		die "you gave \$return = \"$return\", while this subroutine only accepts exit, stdout, stderr or all";
 	}
 	require Capture::Tiny; # ~7.5 ms
 	# Capture::Tiny redirects fd 1 and fd 2 and nothing else, so the child still
@@ -373,26 +383,56 @@ sub execute {
 	# (Observed 2026-09-13: `rm -r` on read-only cl.tex hung jobsearch/tex/tar.pl
 	# indefinitely.)  Pointing fd 0 at /dev/null turns the prompt into an instant
 	# EOF, so such a child declines and exits instead of hanging.
-	# Reopening STDIN is the point, not `local *STDIN`: the child inherits the
-	# descriptor, and only reopening the handle perl holds on fd 0 -- which frees
-	# fd 0 and so reclaims it as the lowest available -- puts /dev/null there.
-	require File::Spec;
-	my $saved_stdin;
-	open $saved_stdin, '<&', \*STDIN or die "cannot save STDIN: $!"
-		if defined fileno STDIN;   # a caller may legitimately have closed it
-	open STDIN, '<', File::Spec->devnull or die "cannot reopen STDIN on devnull: $!";
+	#
+	# What goes on fd 0 is the read end of an empty pipe whose write end is
+	# closed, and only the descriptor is swapped, with dup2; the STDIN handle is
+	# left alone.  Before system() forks, perl flushes every handle, and flushing
+	# one it reads from lseek()s its descriptor back to the position perl has
+	# read up to and, if that seek succeeds, discards the read-ahead buffer.  A
+	# pipe cannot seek, so the buffer survives; the null device can, so with it
+	# on fd 0, as in 0.023, the buffered input was lost:
+	# `printf 'a\nb\nc\n' | perl -e 'while (<STDIN>) { print; execute("true") }'`
+	# printed only "a".  Whatever holds fd 0 -- STDIN, or another handle when
+	# STDIN is closed -- is saved and put back, and fd 0 is closed again if it
+	# was closed before.
+	#
+	# fd 0 is saved before the pipe is made: when it is free, pipe() takes it,
+	# and a dup of fd 0 made afterwards saved the pipe, which was then
+	# "restored", leaving fd 0 open on it.
+	require POSIX;
+	my $saved_fd0 = POSIX::dup(0);   # undef = fd 0 was closed
+	pipe my $eof, my $writer or die "cannot make a pipe for the command's input: $!";
+	close $writer;
+	my $eof_on_fd0 = fileno $eof == 0;   # 1 = fd 0 was free and pipe() took it
+	unless ($eof_on_fd0) {
+		defined POSIX::dup2(fileno $eof, 0) or die "cannot point fd 0 at an empty pipe: $!";
+		close $eof;
+	}
 	# An explicit sub{} rather than capture { ... }: the prototype that makes
 	# the block form legal is not visible at compile time under a runtime
 	# require, so perl would try to parse the block as an anonymous hash.
-	my ($stdout, $stderr, $exit) = Capture::Tiny::capture(sub {
-		system( $cmd )
-	});
-	if (defined $saved_stdin) {
-		open STDIN, '<&', $saved_stdin or die "cannot restore STDIN: $!";
+	# The eval is so that fd 0 is restored even when capture() dies; 0.023 left
+	# it on the null device for the rest of the program.
+	my ($stdout, $stderr, $exit);
+	my $ok = eval {
+		($stdout, $stderr, $exit) = Capture::Tiny::capture(sub {
+			system( $cmd )
+		});
+		1;
+	};
+	my $err = $@;
+	if (defined $saved_fd0) {
+		defined POSIX::dup2($saved_fd0, 0) or die "cannot restore fd 0: $!";
+		POSIX::close($saved_fd0);
+	} elsif ($eof_on_fd0) {
+		close $eof;
 	} else {
-		close STDIN;
+		POSIX::close(0);
 	}
-	if (($die == 1) && ($exit != 0)) {
+	die $err unless $ok;
+	# Truthiness, as the documentation describes it.  `$die == 1` made 'yes' die
+	# with "isn't numeric" and made 2 mean "do not die".
+	if ($die && $exit != 0) {
 		say STDERR "exit = $exit";
 		say STDERR "STDOUT = $stdout";
 		say STDERR "STDERR = $stderr";
@@ -434,6 +474,12 @@ sub format_commas { # https://stackoverflow.com/questions/33442240/perl-printf-t
 	# "1,23456".  So '%.0u' is recognised here, rounds half up to a whole
 	# number, and prints no fraction at all.
 	my $whole = $format eq '%.0u';
+	# Infinity and NaN are returned as perl prints them.  Run through the
+	# arithmetic below they came out "Inf.NaN", "-Inf.NaN" and "NaN.NaN".
+	# $n - $n is NaN for exactly these, and NaN is the one value not equal to
+	# itself.
+	my $diff = $n - $n;
+	return "$n" if $diff != $diff;
 	my $neg = $n < 0;
 	my $abs = abs $n;
 	my ($int, $cents);
@@ -528,6 +574,11 @@ sub ref_to_json_file {
 	open my $fh, '>:raw', $json_filename   # Write it unmangled
 		or die "can't write $json_filename: $!"; # was autodie
 	say $fh JSON::MaybeXS::encode_json($ref);
+	# A full disk shows up at close, when the buffer is flushed.  Unchecked,
+	# perl up to 5.20 reported "Wrote" and returned the name of a truncated
+	# file, and later perls died with "unable to close filehandle" from the
+	# implicit close under FATAL warnings.
+	close $fh or die "can't write $json_filename: $!";
 	say 'Wrote ' . Term::ANSIColor::colored(['blue on_red'], $json_filename);
 	return $json_filename;
 }
@@ -752,6 +803,10 @@ sub structure {
 	if (my @bad = grep { !$allowed{$_} } keys %opt) {
 		die "Unrecognized arguments: @bad\nAccepted args: " . join(', ', sort keys %allowed);
 	}
+	# undef as in dir(): this message, not "Use of uninitialized value".
+	for my $name (qw(output color)) {
+		die "$name must be defined" unless defined $opt{$name};
+	}
 	die "output must be one of stdout, stderr, string" if $opt{output} !~ m/\A(stdout|stderr|string)\z/;
 
 	require Scalar::Util; # ~4 ms (List::Util XS bootstrap); see header note
@@ -876,7 +931,7 @@ The file tests share one C<stat> per path, so asking for four of them costs no m
 
 With C<cpu> greater than 1, C<dir> walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  C<on_match> still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.
 
-An unknown argument, a letter that is not a file test, a C<cpu> that is not a positive integer, and a directory that cannot be opened all die.
+An unknown argument, an undefined C<tests>, C<dir>, C<regex> or C<cpu>, a letter that is not a file test, a C<cpu> that is not a positive integer, an C<on_match> that is not a code reference, and a directory that cannot be opened all die.
 
 =head2 execute
 
@@ -900,9 +955,9 @@ Runs C<$cmd> through the shell with C<system>, capturing its standard output and
 
 =back
 
-The third argument, C<$die>, is 1 by default: a command that exits non-zero prints its exit status, standard output and standard error to C<STDERR> and dies.  Pass 0 to have the status returned instead.
+The third argument, C<$die>, is true by default: a command that exits non-zero prints its exit status, standard output and standard error to C<STDERR> and dies.  Pass a false value, such as 0, to have the status returned instead.
 
-The command's standard input is the null device (C</dev/null>, or C<nul> on Windows).  A command that would prompt -- C<rm> on a write-protected file, C<cp -i> -- reads end-of-file and declines rather than waiting, unseen, for an answer.  The caller's C<STDIN> is restored afterwards.
+The command's standard input is an empty pipe.  A command that would prompt -- C<rm> on a write-protected file, C<cp -i> -- reads end-of-file and declines rather than waiting, unseen, for an answer.  The caller's C<STDIN> is not touched, so input it has already read ahead is still there afterwards, even when C<execute> dies.
 
 =head2 file2string
 
@@ -918,7 +973,7 @@ Returns the whole of a file as one string, read without any decoding layer.  A f
  format_commas(-0.5);                # '-0.50'
  format_commas(1e20);                # '100,000,000,000,000,000,000.00'
 
-Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the C<sprintf> format the hundredths are printed with, C<'.%02d'> by default; C<'%.0u'> rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (C<0.999> is C<1.00>), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.
+Puts a comma between each group of three digits of the integer part and appends the hundredths, rounded half up.  The second argument is the C<sprintf> format the hundredths are printed with, C<'.%02d'> by default; C<'%.0u'> rounds half up to a whole number and prints no fraction.  Rounding that carries into the integer part does so (C<0.999> is C<1.00>), a negative number keeps its sign, a number that rounds to zero has none, and a large number is grouped as digits rather than printed in exponent form.  Infinity and NaN are returned as perl prints them.
 
 =head2 json_file_to_ref
 
@@ -930,7 +985,7 @@ Reads a JSON file and returns the decoded data, through C<JSON::MaybeXS>.  Pytho
 
  ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The file name must be a plain string; a reference dies.
+Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
 
 =head2 random_key, random_value
 

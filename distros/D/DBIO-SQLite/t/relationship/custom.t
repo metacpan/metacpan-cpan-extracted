@@ -8,8 +8,8 @@ use DBIO::SQLite::Test ':DiffSQL';
 
 my $schema = DBIO::SQLite::Test->init_schema();
 
-$schema->resultset('Artist')->delete;
-$schema->resultset('CD')->delete;
+$schema->resultset('Artist')->delete({ all => 1 });
+$schema->resultset('CD')->delete({ all => 1 });
 
 my $artist  = $schema->resultset("Artist")->create({ artistid => 21, name => 'Michael Jackson', rank => 20 });
 my $artist2 = $schema->resultset("Artist")->create({ artistid => 22, name => 'Chico Buarque', rank => 1 }) ;
@@ -123,14 +123,14 @@ is(@cds_90s, 6, '6 90s cds found (1990 - 1995) even with non-optimized search');
 map { ok($_->year < 2000 && $_->year > 1989) } @cds_90s;
 
 lives_ok {
-  my @cds_90s_95 = $artist2->cds_90s->search({ 'me.year' => 1995 });
+  my @cds_90s_95 = $artist2->cds_90s->search({ 'me.year' => 1995 })->all;
   is(@cds_90s_95, 1, '1 90s (95) cds found even with non-optimized search');
   map { ok($_->year == 1995) } @cds_90s_95;
 } 'should preserve chain-head "me" alias (API-consistency)';
 
 # search for all artists prefetching published cds in the 80s...
 my @all_artists_with_80_cds = $schema->resultset("Artist")->search
-  ({ 'cds_80s.cdid' => { '!=' => undef } }, { join => 'cds_80s', distinct => 1 });
+  ({ 'cds_80s.cdid' => { '!=' => undef } }, { join => 'cds_80s', distinct => 1 })->all;
 
 is_deeply(
   [ sort ( map { $_->year } map { $_->cds_80s->all } @all_artists_with_80_cds ) ],
@@ -141,7 +141,7 @@ is_deeply(
 lives_ok {
 
 my @all_artists_with_80_cds_pref = $schema->resultset("Artist")->search
-  ({ 'cds_80s.cdid' => { '!=' => undef } }, { prefetch => 'cds_80s' });
+  ({ 'cds_80s.cdid' => { '!=' => undef } }, { prefetch => 'cds_80s' })->all;
 
 is_deeply(
   [ sort ( map { $_->year } map { $_->cds_80s->all } @all_artists_with_80_cds_pref ) ],
@@ -292,7 +292,7 @@ is(
 );
 
 is_deeply
-  { $schema->resultset('Track')->find({ cd_cref_cond => { cdid => $cd_single_track->id } })->get_columns },
+  { $schema->resultset('Track')->find({ cd_cref_cond => { cdid => $cd_single_track->id }, position => $single_track->get_column("position") })->get_columns },
   { $single_track->get_columns },
   'Proper find with related via coderef cond',
 ;

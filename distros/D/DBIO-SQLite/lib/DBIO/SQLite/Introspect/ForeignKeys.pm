@@ -4,7 +4,10 @@ package DBIO::SQLite::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Introspect::Base ();
+use DBIO::SQLite::Util qw(quote_identifier);
 
 
 
@@ -14,7 +17,8 @@ sub fetch {
 
   for my $table_name (sort keys %$tables) {
     my $list = $dbh->selectall_arrayref(
-      qq{PRAGMA foreign_key_list("$table_name")}, { Slice => {} }
+      sprintf('PRAGMA foreign_key_list(%s)', quote_identifier($table_name)),
+      { Slice => {} },
     );
     next unless @$list;
 
@@ -53,7 +57,7 @@ DBIO::SQLite::Introspect::ForeignKeys - Introspect SQLite foreign keys
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

@@ -92,19 +92,19 @@ $rs = $schema->resultset('Tag')->search(
 cmp_ok( $rs->count, '>=', 0, 'nested prefetch does not duplicate joins' );
 
 my ($artist) = $schema->resultset("Artist")->search({ 'cds.year' => 2001 },
-                 { order_by => { -desc => 'artistid' }, join => 'cds' });
+                 { order_by => { -desc => 'artistid' }, join => 'cds' })->all;
 
 is($artist->name, 'Random Boy Band', "Join search by object ok");
 
 my @cds = $schema->resultset("CD")->search({ 'liner_notes.notes' => 'Buy Merch!' },
-                               { join => 'liner_notes' });
+                               { join => 'liner_notes' })->all;
 
 cmp_ok(scalar @cds, '==', 1, "Single CD retrieved via might_have");
 
 is($cds[0]->title, "Generic Manufactured Singles", "Correct CD retrieved");
 
 my @artists = $schema->resultset("Artist")->search({ 'tags.tag' => 'Shiny' },
-                                       { join => { 'cds' => 'tags' } });
+                                       { join => { 'cds' => 'tags' } })->all;
 
 cmp_ok( @artists, '==', 2, "two-join search ok" );
 
@@ -196,14 +196,14 @@ is( $tree_like->name, 'fong', 'Tree with multiple has_many joins ok');
 $rs = $schema->resultset('Artist');
 $rs->create({ artistid => 4, name => 'Unknown singer-songwriter' });
 $rs->create({ artistid => 5, name => 'Emo 4ever' });
-@artists = $rs->search(undef, { prefetch => 'cds', order_by => 'artistid' });
+@artists = $rs->search(undef, { prefetch => 'cds', order_by => 'artistid' })->all;
 is(scalar @artists, 5, 'has_many prefetch with adjacent empty rows ok');
 
 lives_ok { @artists = $rs->search(undef, {
         join => ['cds'],
         prefetch => [],
         rows => 20,
-    });
+    })->all;
 } 'join and empty prefetch ok';
 
 # -------------
@@ -238,8 +238,8 @@ sub make_hash_struc {
     #foreach my $art ( $rs->search({}, {})->all ) {
     #foreach my $art ( $rs->search()->all ) {
     foreach my $art ( $rs->all ) {
-        foreach my $cd ( $art->cds ) {
-            foreach my $track ( $cd->tracks ) {
+        foreach my $cd ( $art->cds->all ) {
+            foreach my $track ( $cd->tracks->all ) {
                 $struc->{ $art->name }{ $cd->title }{ $track->title }++;
             }
         }

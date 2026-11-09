@@ -41,6 +41,7 @@ requires:
   Config::Auto: '0'
   Config::IniFiles: '0'
   CryptX: '0.062'
+  Cwd: '0'
   File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
@@ -63,5 +64,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

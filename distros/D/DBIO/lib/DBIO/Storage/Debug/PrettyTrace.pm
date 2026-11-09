@@ -4,6 +4,8 @@ package DBIO::Storage::Debug::PrettyTrace;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::Statistics';
 
 use SQL::Abstract::Tree;
@@ -109,11 +111,11 @@ DBIO::Storage::Debug::PrettyTrace - Pretty Tracing DebugObj
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
- DBIO_TRACE_PROFILE=~/dbio.json perl -Ilib ./foo.pl
+ DBIO_TRACE=1 DBIO_TRACE_PROFILE=~/dbio.json perl -Ilib ./foo.pl
 
 Where dbio.json contains:
 
@@ -129,6 +131,8 @@ See F<t/debug/pretty.t> for a runnable example.
 
 =head2 new
 
+Constructs a pretty-trace statistics/debug object.
+
  my $pp = DBIO::Storage::Debug::PrettyTrace->new({
    show_progress  => 1,             # tries it's best to make it clear that a SQL
                                     # statement is still running
@@ -143,10 +147,6 @@ See F<t/debug/pretty.t> for a runnable example.
                                     # be ellided and only show the new bind params
    # any other args are passed through directly to SQL::Abstract::Tree
  });
-
-=head2 new
-
-Constructs a pretty-trace statistics/debug object.
 
 =head2 print
 

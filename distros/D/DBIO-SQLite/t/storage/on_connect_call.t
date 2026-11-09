@@ -9,11 +9,12 @@ use DBIO::Storage::DBI;
 
 # !!! do not replace this with done_testing - tests reside in the callbacks
 # !!! number of calls is important
-use Test::More tests => 17;
+use Test::More tests => 18;
 # !!!
 use Test::Warn;
 
 my $schema = DBIO::Test::Schema->clone;
+$schema->storage_type('DBIO::SQLite::Storage');
 
 {
   *DBIO::Storage::DBI::connect_call_foo = sub {
@@ -91,11 +92,17 @@ my $schema = DBIO::Test::Schema->clone;
 
   ok (! $schema->storage->connected, 'start disconnected');
 
-  # this should connect due to the coderef, and also warn due to the false autocommit above
+  # The schema declares its driver (core ADR 0067): determining it needs no
+  # DBD from a live handle, so it does not run the coderef.
+  $schema->storage->_determine_driver;
+  ok (! $schema->storage->connected,
+    'determining the declared driver does not connect, not even for a connection coderef');
+
+  # the first connection runs the coderef, and warns due to the false autocommit above
   warnings_exist {
-    $schema->storage->_determine_driver
+    $schema->storage->ensure_connected
   } qr/The 'RaiseError' of the externally supplied DBI handle is set to false/, 'Warning on clobbered AutoCommit => 0 fired';
 
-  ok ($schema->storage->connected, 'determine driver connects');
+  ok ($schema->storage->connected, 'the first connection runs the coderef');
   $schema->storage->disconnect;
 }

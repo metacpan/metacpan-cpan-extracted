@@ -4,6 +4,8 @@ package DBIO::Shortcut::db2;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 sub apply { DBIO->apply_driver($_[1], 'DB2') }
 
 1;
@@ -20,7 +22,7 @@ DBIO::Shortcut::db2 - `use DBIO -db2` shortcut for the DB2 driver
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 AUTHOR
 

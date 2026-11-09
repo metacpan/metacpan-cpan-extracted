@@ -7,7 +7,6 @@ use lib 't/lib', 'lib';
 use My::Schema;
 use My::Test qw(deploy_schema);
 use DBIO::GraphQL;
-use GraphQL::Execution qw(execute);
 
 # Regression test for CWE-89 (CPANSec disclosure, ticket #2):
 # orderBy.field is a free client-supplied string. Under default DBIO storage,
@@ -31,11 +30,11 @@ for my $i (1..5) {
 }
 
 my $r = DBIO::GraphQL->to_graphql($db);
-my ($schema, $ctx) = @{$r}{qw(schema context)};
+my ($exec, $ctx) = @{$r}{qw(execute context)};
 
 sub gql {
   my ($q, $v) = @_;
-  return execute($schema, $q, undef, $ctx, $v // {});
+  return $exec->($q, undef, $ctx, $v // {});
 }
 
 # 1. A valid orderBy.field (a real column) still works - guards against

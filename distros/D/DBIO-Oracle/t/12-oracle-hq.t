@@ -40,7 +40,16 @@ BEGIN {
 use DBIO::Test;
 use DBIO::Test::Schema;
 
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+# DBIO::Test::Schema is shared by the driver suites and declares no driver; a
+# schema always has one (core ADR 0067). Each connect here declares Oracle's
+# storage on a clone, so the shared class stays without one.
+sub oracle_schema {
+  my $schema = DBIO::Test::Schema->clone;
+  $schema->storage_type('+DBIO::Oracle::Storage');
+  return $schema->connect(@_);
+}
+
+my $schema = oracle_schema($dsn, $user, $pass);
 
 note "Oracle Version: " . $schema->storage->_server_info->{dbms_version};
 
@@ -104,7 +113,7 @@ do_creates($dbh, $q);
   });
 
   $schema->resultset('Artist')->find({ name => 'cycle-root' })
-    ->update({ parentid => { -ident => 'artistid' } });
+    ->update({ parentid => \'"artistid"' });
 
   # select the whole tree
   {
@@ -302,10 +311,10 @@ sub do_creates {
     $dbh->do("DROP SEQUENCE ${q}artist_pk_seq${q}");
     $dbh->do("DROP SEQUENCE ${q}cd_seq${q}");
     $dbh->do("DROP SEQUENCE ${q}track_seq${q}");
-    $dbh->do("DROP TABLE ${q}artist${q}");
-    $dbh->do("DROP TABLE ${q}track${q}");
+    $dbh->do("DROP TABLE ${q}artist${q} PURGE");
+    $dbh->do("DROP TABLE ${q}track${q} PURGE");
     # table cd is created unquoted (see below) => Oracle folds it to CD
-    $dbh->do("DROP TABLE cd");
+    $dbh->do("DROP TABLE cd PURGE");
   };
 
   $dbh->do("CREATE SEQUENCE ${q}artist_pk_seq${q} START WITH 1 MAXVALUE 999999 MINVALUE 0");
@@ -378,11 +387,16 @@ END {
         "DROP SEQUENCE ${q}artist_pk_seq${q}",
         "DROP SEQUENCE ${q}cd_seq${q}",
         "DROP SEQUENCE ${q}track_seq${q}",
-        "DROP TABLE ${q}artist${q}",
-        "DROP TABLE ${q}track${q}",
-        "DROP TABLE ${q}cd${q}",
+        "DROP TABLE ${q}artist${q} PURGE",
+        "DROP TABLE ${q}track${q} PURGE",
+        "DROP TABLE ${q}cd${q} PURGE",
       );
     }
+
+    # Table cd is created unquoted (see do_creates). The first pass above
+    # cannot drop it -- "track" still references it -- and the second asks
+    # for a "cd" that does not exist. Only now is it free to go.
+    eval { $dbh->do('DROP TABLE cd PURGE') };
   };
   undef $schema;
 }

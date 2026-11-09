@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use lib '../dbio/lib', 'lib';
+use lib 'lib';
 
 BEGIN {
   eval { require Moo; 1 }

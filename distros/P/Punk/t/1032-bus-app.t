@@ -157,6 +157,15 @@ for (1 .. 30) {
     $gaps{$1} = $2 if $b =~ /(\d+)\s+(\d+)\s*\z/;
 }
 
+# The fan-out log read once more, AFTER those thirty requests. A worker whose
+# wakeup fired was complete before them. One that was short then and is
+# complete now was deaf to its pipe but not to its socket: the request woke
+# its poll, and only then did it find the byte and drain the ring. That is a
+# kernel reporting the socket and not the pipe, which is what the Haiku
+# counts against 0.68 looked like (every worker short by a clean prefix).
+my %after;
+$after{ (split ' ', $_)[0] }++ for lines_of($fan);
+
 # The probe itself, asserted rather than assumed. A diagnostic that is only
 # exercised on the run where it is needed is a diagnostic that turns out to be
 # broken on the run where it is needed - and this one exists to answer a
@@ -187,11 +196,14 @@ note "workers answering: $workers";
         is_deeply(\@short, [],
             'FANOUT: every worker that subscribed saw every message')
             or diag sprintf
-                "%s\ngaps: %s\n%s\nworkers' stderr:\n%s",
+                "%s\ngaps: %s\nafter thirty more requests: %s\n%s\n"
+              . "workers' stderr:\n%s",
                 join(', ', map { "$_ saw $by_worker{$_} of $N" }
                            sort keys %by_worker),
                 (%gaps ? join(', ', map { "$_=$gaps{$_}" } sort keys %gaps)
                        : 'not collected'),
+                join(', ', map { "$_ saw $after{$_} of $N" }
+                           sort keys %after),
                 (grep { $gaps{$_} } @short)
                     ? 'the ring DROPPED messages for a short worker, which is '
                     . 'a real loss - it fell far enough behind to be lapped'

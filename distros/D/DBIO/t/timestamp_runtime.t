@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use DateTime;
+use DateTime::Tiny;
 
 use DBIO::Test::Storage;
 
@@ -40,12 +40,16 @@ use DBIO::Test::Storage;
 
 TestDBIO::TS::Schema->register_class(Article => 'TestDBIO::TS::Schema::Result::Article');
 
+TestDBIO::TS::Schema->storage_type('+DBIO::Test::Storage');
 my $schema  = TestDBIO::TS::Schema->connect(sub { });
 $schema->storage(DBIO::Test::Storage->new($schema));
 my $storage = $schema->storage;
 
-my $created = DateTime->new(year => 2020, month => 1, day => 1);
-my $updated = DateTime->new(year => 2021, month => 6, day => 15);
+# DateTime::Tiny (the hard-dep default timestamp_class), not DateTime: the
+# auto-population asserted here does not depend on the value class, and
+# DateTime is only a `recommends` (karr k212).
+my $created = DateTime::Tiny->new(year => 2020, month => 1, day => 1);
+my $updated = DateTime::Tiny->new(year => 2021, month => 6, day => 15);
 
 subtest 'insert auto-populates both create timestamps' => sub {
   local $TestDBIO::TS::Schema::Result::Article::NOW = $created;
@@ -53,8 +57,8 @@ subtest 'insert auto-populates both create timestamps' => sub {
 
   my $article = $schema->resultset('Article')->create({ title => 'Hello' });
 
-  isa_ok $article->created_at, 'DateTime', 'created_at was set to a DateTime';
-  isa_ok $article->updated_at, 'DateTime', 'updated_at was set to a DateTime';
+  isa_ok $article->created_at, 'DateTime::Tiny', 'created_at was set to a DateTime::Tiny';
+  isa_ok $article->updated_at, 'DateTime::Tiny', 'updated_at was set to a DateTime::Tiny';
   is $article->created_at->year, 2020, 'created_at holds the create-time value';
   is $article->updated_at->year, 2020, 'updated_at seeded at create time too';
 
@@ -65,8 +69,8 @@ subtest 'insert auto-populates both create timestamps' => sub {
 
   # The timestamp column values were bound (not left null).
   my %bound = map { ($_->[0]{dbic_colname} // '') => $_->[1] } @{ $insert->{bind} };
-  isa_ok $bound{created_at}, 'DateTime', 'the created_at bind value';
-  isa_ok $bound{updated_at}, 'DateTime', 'the updated_at bind value';
+  isa_ok $bound{created_at}, 'DateTime::Tiny', 'the created_at bind value';
+  isa_ok $bound{updated_at}, 'DateTime::Tiny', 'the updated_at bind value';
 };
 
 subtest 'update bumps updated_at only, leaving created_at intact' => sub {

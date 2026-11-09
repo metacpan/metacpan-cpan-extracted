@@ -25,23 +25,23 @@ conditions:
 
 - **Clause assembly** — `_parse_rs_attrs` is overridden to build the CONNECT BY
   block via `_connect_by` and prepend it to the base-rendered tail
-  (`SQLMaker.pm:73-83`). `_connect_by` renders `START WITH` / `CONNECT BY` /
+ . `_connect_by` renders `START WITH` / `CONNECT BY` /
   `CONNECT BY NOCYCLE` / `ORDER SIBLINGS BY` from the attrs, reusing
   `_recurse_where` for the conditions and `_order_by_chunks` for the siblings
-  ordering (`SQLMaker.pm:85-134`).
+  ordering.
 - **Bind ordering** — a dedicated `oracle_connect_by` bind bucket is threaded
   into `_assemble_binds` between `from` and `group`/`having`
-  (`SQLMaker.pm:68-71`, `78`) so CONNECT BY placeholders bind in statement order.
+  so CONNECT BY placeholders bind in statement order.
 - **PRIOR operator** — registered as an old-style `special_op`
-  (`regex => qr/^prior$/i`, handler `_where_field_PRIOR`, `SQLMaker.pm:47-50`,
+  (`regex => qr/^prior$/i`, handler `_where_field_PRIOR`,
   `136-147`). It is *deliberately* kept old-style because it is consumed inside
   CONNECT BY / START WITH via `_recurse_where` (the SQL::Abstract v1 engine),
   which does not route through the new `expand_op` mechanism — and the base's
   `disable_old_special_ops` does not reach that path either, so it keeps working
-  (`SQLMaker.pm:40-46`).
+ .
 
 The user-facing attribute contract and worked examples are documented in
-`DBIO::Oracle::Storage` POD (`Storage.pm:186-265`).
+`DBIO::Oracle::Storage` POD.
 
 ## Rationale
 
@@ -58,7 +58,7 @@ post-rename `expand_op` migration, not legacy debt: the CONNECT BY conditions ar
 rendered through the v1 `_recurse_where` path on purpose, and that path is
 exactly where the old-style special-op mechanism still fires. Migrating `PRIOR`
 to `expand_op` would route it through a path that the CONNECT BY renderer does
-not use, breaking it. The in-code comment (`SQLMaker.pm:40-46`) records this so a
+not use, breaking it. The in-code comment records this so a
 future "modernise all special_ops" pass does not regress it.
 
 ## Consequences
@@ -72,7 +72,7 @@ future "modernise all special_ops" pass does not regress it.
   intact.
 - The canonical parenthesised WHERE renderer is now provided centrally by
   `DBIO::SQLMaker` (core ADR 0004), so the previous local `render_clause`
-  override was removed (`SQLMaker.pm:43-46`) — the paren behaviour CONNECT BY
+  override was removed — the paren behaviour CONNECT BY
   queries rely on comes from core, not from this class.
 
 ## Related
@@ -80,7 +80,7 @@ future "modernise all special_ops" pass does not regress it.
 - core ADR 0004 (SQLMaker select.where paren-restore + expand_op — provides the
   central paren renderer this class no longer overrides)
 - core ADR 0003 (`apply_limit` replaces `limit_dialect` — the mechanism Oracle's
-  ROWNUM dialect plugs into; `apply_limit` → `_RowNum`, `SQLMaker.pm:63-66`)
+  ROWNUM dialect plugs into; `apply_limit` → `_RowNum`)
 - ADR 0003 (identifier shortening — the arrayref `_quote` path,
   `SQLMaker.pm:149-170`, that had to be taught to shorten WHERE/HAVING
   qualifiers in these queries)

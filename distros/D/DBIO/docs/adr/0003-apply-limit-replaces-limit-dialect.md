@@ -23,7 +23,7 @@ Replace the `sql_limit_dialect` string and the `emulate_limit()` /
 the SQLMaker subclass.
 
 - The default implementation lives in `DBIO::SQLMaker::ClassicExtensions`
-  (`apply_limit`, `lib/DBIO/SQLMaker/ClassicExtensions.pm:617`) and emits the
+  (`apply_limit`, `lib/DBIO/SQLMaker/ClassicExtensions.pm`) and emits the
   SQL-standard `LIMIT ? OFFSET ?` supported by PostgreSQL, SQLite and most
   modern databases.
 - A driver that needs different syntax (MySQL `LIMIT ?, ?` offset-first,
@@ -61,5 +61,5 @@ storage layer. DBIO removes both. Each driver's SQLMaker subclass provides an
   4-argument form in the code.
 - Cross-repo fallout, **not owned here**: driver dists may still carry stale
   `limit_dialect`-era tests that assert the old matrix (e.g. dbio-informix
-  karr #12). Each driver retires its own; this ADR records only the core
+  k12). Each driver retires its own; this ADR records only the core
   decision.

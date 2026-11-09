@@ -4,7 +4,9 @@ package DBIO::Oracle::Storage::FKDeferral;
 use strict;
 use warnings;
 
-use Scope::Guard ();
+our $VERSION = '0.900004';
+
+use DBIO::Util qw( scope_guard );
 use Context::Preserve 'preserve_context';
 
 
@@ -16,9 +18,9 @@ sub with_deferred_fk_checks {
 
   $self->_do_query('alter session set constraints = deferred');
 
-  my $sg = Scope::Guard->new(sub {
+  my $sg = scope_guard {
     $self->_do_query('alter session set constraints = immediate');
-  });
+  };
 
   return preserve_context { $sub->() } after => sub { $txn_scope_guard->commit };
 }
@@ -37,7 +39,7 @@ DBIO::Oracle::Storage::FKDeferral - FK constraint deferral for Oracle
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

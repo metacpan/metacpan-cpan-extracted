@@ -3,14 +3,15 @@ package DBIO::Firebird::Storage;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base qw/DBIO::Firebird::Storage::InterBase/;
 use mro 'c3';
 
 DBIO::Storage::DBI->register_driver('Firebird' => __PACKAGE__);
 
 __PACKAGE__->datetime_parser_type('DBIO::Firebird::DateTime::Format');
-
-sub dbio_deploy_class { 'DBIO::Firebird::Deploy' }
 
 
 1;
@@ -27,7 +28,7 @@ DBIO::Firebird::Storage - Driver for the Firebird RDBMS via L<DBD::Firebird>
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -35,7 +36,11 @@ Storage driver for the Firebird RDBMS using L<DBD::Firebird>. DBD::Firebird is
 closely modeled on L<DBD::InterBase>, so this is a subclass of
 L<DBIO::Firebird::Storage::InterBase>: it inherits SQL dialect 3 forcing and the
 C<connect_call_use_softcommit> / C<connect_call_datetime_setup> connect-calls,
-and registers itself for the C<Firebird> DBD driver name.
+and registers itself for the C<Firebird> DBD driver name. It also inherits the
+declaration that the attributes of L<DBD::Firebird> start with C<ib_>, which
+is what lets one through from an L<DBIO::AccessBroker>
+(L<DBIO::Firebird::Storage::InterBase/ib_ attributes through an AccessBroker>).
+The Deploy class (C<dbio_deploy_class>) is inherited from there too.
 
 =head1 SEE ALSO
 

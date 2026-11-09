@@ -2,14 +2,14 @@ use strict;
 use warnings;
 use Test::More;
 
-# karr #75: connection-readiness-before-handoff, hoisted into the shared pool.
+# Connection-readiness-before-handoff, hoisted into the shared pool.
 #
-# The bug this guards against (production: dbio-mysql-ev karr #20): an async
+# The bug this guards against (seen in production in dbio-mysql-ev): an async
 # pool must not resolve acquire()'s Future until the connection has actually
 # finished connecting -- an event-loop transport (EV::Pg, EV::MariaDB) returns
 # a handle before its background connect completes, and the first bound query
 # on that cold handle dies "not connected". dbio-postgresql-ev fixed this for
-# itself (karr #9); this ticket hoists the mechanism into DBIO::Storage::PoolBase
+# itself; core hoists the mechanism into DBIO::Storage::PoolBase
 # so every async transport gets it by overriding ONE seam
 # (_connection_ready_future) instead of re-inventing acquire() + a refaddr side
 # table per driver.
@@ -20,9 +20,8 @@ use Test::More;
 # a path through the readiness seam, or if the base ever stops clearing the
 # readiness side table at shutdown.
 
-BEGIN { eval { require Future; 1 } or plan skip_all => 'Future not installed' }
-
 use DBIO::Storage::PoolBase;
+use DBIO::Test::Future ();
 
 # --- a synchronous pool: never overrides the readiness seam -----------------
 {
@@ -57,14 +56,19 @@ use DBIO::Storage::PoolBase;
     return bless {
       on_connect => $args{on_connect},
       on_error   => $args{on_error},
-      connected  => 0,
-      finished   => 0,
+      connected   => 0,
+      finished    => 0,
+      close_count => 0,
     }, $class;
   }
   sub is_connected { $_[0]->{connected} }
   sub fire_connect { my $s = shift; $s->{connected} = 1; $s->{on_connect}->() }
   sub fire_error   { my $s = shift; $s->{on_error}->($_[0]) }
-  sub finish       { $_[0]->{finished} = 1 }
+  sub finish       { $_[0]->{finished} = 1; $_[0]->{close_count}++ }
+
+  package ReadinessDisconnectRecorder;
+  sub new { bless { actions => [] }, $_[0] }
+  sub _teardown_pool_connection { push @{ $_[0]->{actions} }, $_[1] }
 
   package AsyncPool;
   use base 'DBIO::Storage::PoolBase';
@@ -88,6 +92,7 @@ use DBIO::Storage::PoolBase;
         $on_error->(@_);
       },
     );
+    push @{ $self->{_built} }, $conn;
     $self->_register_connection_ready($conn, $ready);
     return $conn;
   }
@@ -95,20 +100,67 @@ use DBIO::Storage::PoolBase;
   # Deliberately does NOT delete from the readiness table -- proving the base
   # clears it for us at shutdown.
   sub _shutdown_connection { $_[1]->finish }
+
+  package ThrowingReadyPool;
+  use base 'AsyncPool';
+  sub _connection_ready_future {
+    my ($self, $conn) = @_;
+    die 'readiness seam threw synchronously' if $self->{throw_ready};
+    return $self->SUPER::_connection_ready_future($conn);
+  }
+
+  package ReentrantAsyncConn;
+  sub new {
+    my ($class, %args) = @_;
+    return bless {
+      on_error       => $args{on_error},
+      close_count    => 0,
+      callback_count => 0,
+      error_fired    => 0,
+    }, $class;
+  }
+  sub is_connected { 0 }
+  sub finish {
+    my $self = shift;
+    $self->{close_count}++;
+    return if $self->{error_fired}++;
+    $self->{callback_count}++;
+    $self->{on_error}->('connection closed while waiting for readiness');
+  }
+
+  package ReentrantAsyncPool;
+  use base 'AsyncPool';
+  sub _create_connection {
+    my ($self, $conninfo) = @_;
+    my $ready = $self->future_class->new;
+    my $conn;
+    $conn = ReentrantAsyncConn->new(
+      on_error => sub {
+        $ready->fail($_[0]) unless $ready->is_ready;
+        $self->_retire_connection($conn);
+      },
+    );
+    push @{ $self->{_built} }, $conn;
+    $self->_register_connection_ready($conn, $ready);
+    return $conn;
+  }
 }
 
 # ---------------------------------------------------------------------------
 # 1. Bookkeeping primitives round-trip by refaddr (register / lookup / clear).
 # ---------------------------------------------------------------------------
 {
-  my $pool = SyncPool->new(conninfo => 'x');
+  my $pool = SyncPool->new(
+    conninfo     => 'x',
+    future_class => 'DBIO::Test::Future',
+  );
   my $ca = bless {}, 'Dummy';
   my $cb = bless {}, 'Dummy';
 
   is $pool->_connection_ready_lookup($ca), undef,
     'lookup before any register is undef (no side table yet)';
 
-  my $fa = Future->done($ca);
+  my $fa = DBIO::Test::Future->done($ca);
   is $pool->_register_connection_ready($ca, $fa), $fa,
     '_register_connection_ready returns the future it stored';
   is $pool->_connection_ready_lookup($ca), $fa,
@@ -123,10 +175,14 @@ use DBIO::Storage::PoolBase;
 
 # ---------------------------------------------------------------------------
 # 2. acquire ALWAYS routes through the seam -- fresh spawn, idle reuse, AND
-#    the queued-waiter path (karr #75, scope point 2).
+#    the queued-waiter path.
 # ---------------------------------------------------------------------------
 {
-  my $cp = CountPool->new(conninfo => 'x', size => 1);
+  my $cp = CountPool->new(
+    conninfo     => 'x',
+    size         => 1,
+    future_class => 'DBIO::Test::Future',
+  );
 
   my $c1 = $cp->acquire->get;                      # fresh-spawn path
   is $cp->{ready_calls}, 1, 'seam runs on the fresh-spawn path';
@@ -152,7 +208,11 @@ use DBIO::Storage::PoolBase;
 #    the Future; shutdown clears the readiness table via the BASE hook.
 # ---------------------------------------------------------------------------
 {
-  my $pool = AsyncPool->new(conninfo => 'dummy', size => 2);
+  my $pool = AsyncPool->new(
+    conninfo     => 'dummy',
+    size         => 2,
+    future_class => 'DBIO::Test::Future',
+  );
 
   my $f = $pool->acquire;
   ok !$f->is_ready, 'acquire Future is pending while the connection is cold';
@@ -181,39 +241,208 @@ use DBIO::Storage::PoolBase;
 }
 
 # ---------------------------------------------------------------------------
-# 4. A connect ERROR fails the acquire Future (does not hang), and a later
-#    reacquire of the broken connection fails fast rather than hanging on a
-#    stale pending readiness future.
+# 4. Shutdown is terminal even while readiness is pending: the acquire fails,
+#    all internal bookkeeping is empty before a late connect callback can run,
+#    and the never-ready handle is retired without disconnect actions.
 # ---------------------------------------------------------------------------
 {
+  my $disconnects = ReadinessDisconnectRecorder->new;
   my $pool = AsyncPool->new(
-    conninfo => 'dummy',
-    size     => 2,
-    on_error => sub { },   # swallow the failing-connect warning
+    conninfo     => 'dummy',
+    size         => 1,
+    storage      => $disconnects,
+    future_class => 'DBIO::Test::Future',
   );
 
-  my $ef = $pool->acquire;
-  ok !$ef->is_ready, 'acquire pending before the connect attempt resolves';
+  my $acquire = $pool->acquire;
+  ok !$acquire->is_ready,
+    'readiness-pending acquire is cold before shutdown';
+  my $conn = $pool->{_built}[0];
+  isa_ok $conn, 'FakeAsyncConn',
+    'shutdown test has the cold fake connection';
 
-  my $bad = $pool->{_connections}[0];
-  $bad->fire_error('could not connect to server');
+  $pool->shutdown;
+  ok $acquire->is_ready && $acquire->is_failed,
+    'readiness-pending acquire fails during shutdown';
+  eval { $acquire->get };
+  like $@, qr/Connection pool has been shut down/,
+    'readiness-pending acquire receives the stable shutdown diagnostic';
+  is_deeply $pool->{_waiters}, [], 'no queue waiter remains after shutdown';
+  is_deeply $pool->{_ready}, {}, 'readiness bookkeeping is empty after shutdown';
+  is_deeply $pool->{_connections}, [],
+    'cold connection is no longer registered after shutdown';
+  is_deeply $disconnects->{actions}, [],
+    'cold connection runs no disconnect action';
 
-  ok $ef->is_ready, 'acquire Future becomes ready after a connect error';
-  ok $ef->failure,  'acquire Future FAILED (rather than hanging) on connect error';
-  like $ef->failure, qr/could not connect/, 'failure carries the connect error';
-
-  $pool->release($bad);
-  my $ef2 = $pool->acquire;
-  ok $ef2->is_ready && $ef2->failure,
-    'reacquiring a failed connection fails fast (no hang on a stale future)';
+  if ($conn) {
+    is $conn->{close_count}, 1, 'cold handle closes exactly once';
+    $conn->fire_connect;
+    ok $acquire->is_ready && $acquire->is_failed,
+      'late connect callback cannot revive the failed acquire';
+    is $conn->{close_count}, 1, 'late callback cannot close the handle twice';
+  }
+  else {
+    fail 'cold handle closes exactly once';
+    fail 'late connect callback cannot revive the failed acquire';
+    fail 'late callback cannot close the handle twice';
+  }
 }
 
 # ---------------------------------------------------------------------------
-# 5. The DEFAULT seam is a pure no-op for synchronous pools: acquire is ready
+# 5. A readiness ERROR preserves the failed Future while retiring its counted
+#    slot exactly once, so the next acquire can spawn immediately.
+# ---------------------------------------------------------------------------
+{
+  my $pool = AsyncPool->new(
+    conninfo     => 'dummy',
+    size         => 1,
+    on_error     => sub { },   # swallow the failing-connect warning
+    future_class => 'DBIO::Test::Future',
+  );
+
+  my $failed = $pool->acquire;
+  ok !$failed->is_ready, 'acquire pending before the connect attempt resolves';
+
+  my $bad = $pool->{_built}[0];
+  $bad->fire_error('could not connect to server');
+  ok $failed->is_ready && $failed->is_failed,
+    'readiness failure settles acquire as a failed Future';
+  is $pool->size, 0, 'failed readiness retires the occupied slot';
+  is $pool->_connection_ready_lookup($bad), undef,
+    'failed readiness bookkeeping was cleared';
+  is_deeply $pool->{_ready}, {}, 'the readiness bookkeeping is empty after retirement';
+  is $bad->{close_count}, 1, 'bad handle was closed exactly once';
+
+  $pool->_retire_connection($bad);
+  is $bad->{close_count}, 1,
+    'second retirement does not close the same handle again';
+  eval { $failed->get };
+  like $@, qr/could not connect to server/,
+    'acquire Future preserves the readiness error';
+
+  my $replacement = $pool->acquire;
+  my $good = $pool->{_built}[1];
+  ok $good, 'the next acquire immediately spawns a replacement connection';
+  $good->fire_connect if $good;
+  ok $replacement->is_ready && !$replacement->is_failed,
+    'next acquire immediately uses replacement capacity';
+}
+
+# ---------------------------------------------------------------------------
+# 6. A synchronous readiness-seam throw stays inside acquire's Future contract:
+#    it retires the one occupied slot, and a later healthy seam can replace it.
+# ---------------------------------------------------------------------------
+{
+  my $pool = ThrowingReadyPool->new(
+    conninfo     => 'dummy',
+    size         => 1,
+    future_class => 'DBIO::Test::Future',
+  );
+  $pool->{throw_ready} = 1;
+
+  my $failed;
+  my $acquired = eval {
+    $failed = $pool->acquire;
+    1;
+  };
+  ok $acquired, 'a synchronous readiness-seam throw does not escape acquire';
+  isa_ok $failed, 'DBIO::Test::Future',
+    'acquire still returns a DBIO::Test::Future after a synchronous throw';
+  ok $failed->is_ready && $failed->is_failed,
+    'the synchronous readiness-seam throw becomes a failed Future';
+  eval { $failed->get };
+  like $@, qr/readiness seam threw synchronously/,
+    'the failed Future preserves the original readiness-seam diagnostic';
+
+  my $bad = $pool->{_built}[0];
+  is $pool->size, 0, 'the synchronous readiness failure retires the one slot';
+  is $pool->_connection_ready_lookup($bad), undef,
+    'the synchronous readiness failure clears its readiness bookkeeping';
+  is_deeply $pool->{_ready}, {},
+    'the synchronous readiness failure leaves no readiness bookkeeping';
+  is $bad->{close_count}, 1,
+    'the synchronous readiness failure closes its handle exactly once';
+
+  $pool->{throw_ready} = 0;
+  my $replacement = $pool->acquire;
+  my $good = $pool->{_built}[1];
+  ok $good,
+    'disabling the throw lets the next acquire immediately spawn a replacement';
+  if ($good) {
+    $good->fire_connect;
+    ok $replacement->is_ready && !$replacement->is_failed,
+      'the replacement succeeds once its readiness callback fires';
+  }
+  else {
+    fail 'the replacement succeeds once its readiness callback fires';
+  }
+}
+
+# ---------------------------------------------------------------------------
+# 7. shutdown can reenter retirement from a cold handle's synchronous close
+#    callback. The reentrant path must not close that same handle twice.
+# ---------------------------------------------------------------------------
+{
+  my $pool = ReentrantAsyncPool->new(
+    conninfo     => 'dummy',
+    size         => 1,
+    future_class => 'DBIO::Test::Future',
+  );
+
+  my $failed = $pool->acquire;
+  ok !$failed->is_ready, 'cold reentrant handle leaves acquire pending';
+  my $conn = $pool->{_built}[0];
+
+  $pool->shutdown;
+  ok $failed->is_ready && $failed->is_failed,
+    'shutdown-time readiness callback fails the pending acquire Future';
+  eval { $failed->get };
+  like $@, qr/Connection pool has been shut down/,
+    'terminal shutdown diagnostic wins before the synchronous close callback';
+  is $conn->{callback_count}, 1,
+    'finish synchronously invokes its reentrant retirement callback once';
+  is $conn->{close_count}, 1,
+    'reentrant retirement closes the cold handle exactly once';
+  is_deeply $pool->{_connections}, [],
+    'reentrant shutdown leaves no connection registered';
+  is_deeply $pool->{_ready}, {},
+    'reentrant shutdown leaves no readiness bookkeeping';
+}
+
+# ---------------------------------------------------------------------------
+# 8. Direct retirement of an idle, ready connection removes it from both pool
+#    registries and closes it once.
+# ---------------------------------------------------------------------------
+{
+  my $pool = AsyncPool->new(
+    conninfo     => 'dummy',
+    size         => 1,
+    future_class => 'DBIO::Test::Future',
+  );
+
+  my $acquired = $pool->acquire;
+  my $conn = $pool->{_built}[0];
+  $conn->fire_connect;
+  is $acquired->get, $conn, 'ready connection was acquired before retirement';
+
+  $pool->release($conn);
+  is $pool->available, 1, 'released ready connection is idle before retirement';
+  $pool->_retire_connection($conn);
+  is $pool->available, 0, 'retirement removes the ready connection from idle';
+  is $pool->size, 0, 'retirement removes the ready connection from the pool';
+  is $conn->{close_count}, 1, 'retirement closes the ready idle handle once';
+}
+
+# ---------------------------------------------------------------------------
+# 9. The DEFAULT seam is a pure no-op for synchronous pools: acquire is ready
 #    immediately AND the default never touches the readiness bookkeeping.
 # ---------------------------------------------------------------------------
 {
-  my $pool = SyncPool->new(conninfo => 'x', size => 2);
+  my $pool = SyncPool->new(
+    conninfo     => 'x',
+    size         => 2,
+    future_class => 'DBIO::Test::Future',
+  );
 
   my $f = $pool->acquire;
   ok $f->is_ready, 'synchronous pool acquire resolves immediately (default no-op seam)';

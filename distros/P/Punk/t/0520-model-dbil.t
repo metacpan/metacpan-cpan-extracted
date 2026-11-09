@@ -5,6 +5,7 @@ use warnings;
 use FindBin ();
 use lib "$FindBin::Bin/lib";
 use Test::More;
+use PunkTest;
 use File::Temp ();
 use Punk::Model;
 
@@ -45,8 +46,6 @@ my %DB = (
 );
 
 my $model = T::Model::Book->_instantiate({ %DB });
-isa_ok($model->backend, 'Punk::Model::DBIx::Loop', 'the selected backend');
-ok(Punk::Model::DBIx::Loop->_abi_ok, 'DBIx::Loop C ABI resolved');
 
 # schema through the parent handle - boot-style, synchronous on purpose
 $model->backend->dbh->do(q{
@@ -57,6 +56,13 @@ $model->backend->dbh->do(q{
         created TEXT DEFAULT CURRENT_TIMESTAMP
     )
 });
+
+if (my $err = loop_pool_error($model)) {
+    plan skip_all => "the async backend's pool could not fork here: $err";
+}
+
+isa_ok($model->backend, 'Punk::Model::DBIx::Loop', 'the selected backend');
+ok(Punk::Model::DBIx::Loop->_abi_ok, 'DBIx::Loop C ABI resolved');
 
 # ---- everything returns a Punk::Future --------------------------------------
 my $f = $model->create({ title => 'Neuromancer', author => 'Gibson' });

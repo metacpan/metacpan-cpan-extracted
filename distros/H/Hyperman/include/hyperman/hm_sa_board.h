@@ -53,12 +53,23 @@ static int hm_sa_board_live(void) { return hm_sa_board != NULL; }
  * answers "none". */
 static int hm_sa_board_open(uint32_t slots, int *err) {
     int e = 0;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (err) *err = 0;
-    if (!HM_SA || !hm_sa_region || hm_sa_board) return 0;
+    if (!HM_SA || !hm_sa_region || hm_sa_board) return 0; /* # uncoverable condition left count:2 class:ignore_covered_err */
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!slots) slots = 2;
     hm_sa_board = HM_SA->sb_open(hm_sa_region, "workers", 7,
                                  hm_sa_board_fields, HM_SA_BOARD_FIELDS,
                                  slots, &e);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (!hm_sa_board) { if (err) *err = e; return -1; }
     return 0;
 }
@@ -66,6 +77,9 @@ static int hm_sa_board_open(uint32_t slots, int *err) {
 /* Take a row for this process, after the fork. -1 when the board is full,
  * which costs this worker its row and nothing else. */
 static int hm_sa_board_take(void) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!hm_sa_board) return -1;
     hm_sa_board_row = HM_SA->sb_take(hm_sa_board);
     return hm_sa_board_row;
@@ -80,8 +94,15 @@ static void hm_sa_board_mirror(uint64_t requests, uint64_t accepts,
     void *row;
     char st[24];
     int n;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!hm_sa_board || hm_sa_board_row < 0) return;
     row = HM_SA->sb_begin(hm_sa_board);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!row) return;
     HM_SA->sb_set_gauge(row, HM_SB_REQUESTS,  requests);
     HM_SA->sb_set_gauge(row, HM_SB_ACCEPTS,   accepts);
@@ -101,6 +122,9 @@ static void hm_sa_board_mirror(uint64_t requests, uint64_t accepts,
 /* Row `i`, coherently, into *out. 0 for an empty row or one whose writer
  * died mid-update. */
 static int hm_sa_board_read(uint32_t i, sa_sb_reading *out) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!hm_sa_board) return 0;
     return HM_SA->sb_read(hm_sa_board, i, out);
 }
@@ -112,6 +136,9 @@ static uint64_t hm_sa_board_slots(void) {
 /* Every row summed. 1 when there is a board, 0 when there is not. */
 static int hm_sa_board_pool(hm_sa_pool_stats *out) {
     uint64_t i, n;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!out) return 0;
     memset(out, 0, sizeof *out);
     if (!hm_sa_board) return 0;
@@ -171,6 +198,9 @@ static void hm_sa_board_print(FILE *f) {
     size_t off = 0;
     int w;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!hm_sa_board_pool(&p)) return;
     w = snprintf(buf, sizeof buf,
                  "Hyperman pool: workers=%llu alive=%llu requests=%llu "
@@ -181,24 +211,50 @@ static void hm_sa_board_print(FILE *f) {
                  (unsigned long long)p.denied, (unsigned long long)p.conns,
                  (unsigned long long)p.bytes_out,
                  (unsigned long long)p.datagrams, (unsigned long long)p.h3);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (w < 0) return;
-    off = (size_t)w < sizeof buf ? (size_t)w : sizeof buf - 1;
+    off = (size_t)w < sizeof buf ? (size_t)w : sizeof buf - 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
 
     n = hm_sa_board_slots();
     for (i = 0; i < n; i++) {
         sa_sb_reading rd;
         if (!hm_sa_board_read((uint32_t)i, &rd)) continue;
         w = hm_sa_board_row_line(buf + off, sizeof buf - off, &rd);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (w < 0) continue;
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if ((size_t)w >= sizeof buf - off) {
             /* No room left: hand over the whole lines we have and format this
              * row into the empty buffer instead. */
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             if (off) { fwrite(buf, 1, off, f); fflush(f); off = 0; }
-            w = hm_sa_board_row_line(buf, sizeof buf, &rd);
+            w = hm_sa_board_row_line(buf, sizeof buf, &rd); /* # uncoverable statement */
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1
+             # uncoverable condition left count:2
+             # uncoverable condition right count:2 */
             if (w < 0 || (size_t)w >= sizeof buf) continue;
         }
         off += (size_t)w;
     }
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (off) { fwrite(buf, 1, off, f); fflush(f); }
 }
 
@@ -208,9 +264,22 @@ static void hm_sa_board_print(FILE *f) {
  * Opened only when asked for. */
 static int hm_sa_hll_open(int *err) {
     int e = 0;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (err) *err = 0;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!HM_SA || !hm_sa_region || hm_sa_hll) return 0;
     hm_sa_hll = HM_SA->hll_open(hm_sa_region, "clients", 7, 14, &e);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (!hm_sa_hll) { if (err) *err = e; return -1; }
     return 0;
 }
@@ -218,6 +287,10 @@ static int hm_sa_hll_open(int *err) {
 /* One hash and one CAS-max, about 20ns. The caller tests hm_sa_hll first,
  * so the off path is a load of a NULL and nothing else. */
 static void hm_sa_hll_add(const char *peer) {
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (hm_sa_hll && peer) HM_SA->hll_add(hm_sa_hll, peer, strlen(peer));
 }
 

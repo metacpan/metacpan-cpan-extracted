@@ -4,6 +4,8 @@ package DBIO::Test::BaseResult;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Core';
 
 __PACKAGE__->table('bogus');
@@ -23,7 +25,7 @@ DBIO::Test::BaseResult - Base class for DBIO test Result classes
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

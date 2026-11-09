@@ -4,6 +4,8 @@ package DBIO::MySQL::Introspect::Util;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 
 
 sub keep_table {
@@ -35,7 +37,7 @@ DBIO::MySQL::Introspect::Util - Shared helpers for the MySQL/MariaDB introspect 
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 

@@ -28,11 +28,16 @@ use DBIO::MySQL::EV::Storage;
     my ($self, $storage, $mode) = @_;
     $self->{calls}++;
 
+    # dbname, not database: one answer for both storages that ask this broker.
+    # The transport reads it as EV::MariaDB's database; the schema's sync
+    # storage builds its DSN from it, and refuses an answer naming no database
+    # (core k271) -- it connects with a broker's credentials only to the
+    # DSN the broker answers.
     return [
       {
-        host     => 'localhost',
-        database => 'dbio_async',
-        user     => 'broker_user_' . $self->{calls},
+        host   => 'localhost',
+        dbname => 'dbio_async',
+        user   => 'broker_user_' . $self->{calls},
       },
       {},
     ];
@@ -76,33 +81,47 @@ subtest 'driver consumes inherited async AccessBroker hook' => sub {
 };
 
 {
-  # karr #14 (ADR 0030): loading the MySQL::EV component is an INERT
-  # marker — it no longer hijacks `connection()` to force
-  # storage_type('+DBIO::MySQL::EV::Storage'). The async EV storage is
-  # reached via the new opt-in at connect time:
-  #
-  #   MyApp::Schema->connect($dsn, $u, $p, { async => 'ev' })
-  #
-  # That `async => 'ev'` resolution is registered in DBIO::MySQL::Storage
-  # (the sync driver) — its own karr ticket on the dbio-mysql board. Until
-  # that lands, the schema->connect($broker) path here can no longer be
-  # exercised through TestSchema (no async mode resolves to EV::Storage on
-  # a schema that only loaded MySQL::EV). Construct the EV::Storage
-  # directly to keep the broker-wiring assertions honest; the
-  # schema->connect($broker, { async => 'ev' }) contract is covered by
-  # the dbio-mysql board's karr ticket.
   package TestSchema;
   use base 'DBIO::Schema';
-  __PACKAGE__->load_components('MySQL::EV');
+  # The driver component declares the driver (core ADR 0059): a broker answers
+  # connection parameters, not a DSN, and only a driver's own storage can build
+  # the DSN from them -- the generic DBIO::Storage::DBI refuses. The marker
+  # rides along, and is what this file asks about.
+  __PACKAGE__->load_components('MySQL', 'MySQL::EV');
 }
 
+# karr k14 (ADR 0030 / ADR 0032 §7): loading the MySQL::EV component must NOT
+# hijack storage_type to the async class — that hijack is exactly what k14 was.
+# The component is a no-op marker; async is reached per connection with
+# { async => 'ev' } at connect, and that mode is registered on the SYNC driver
+# (DBIO::MySQL::Storage->register_async_mode(ev => ...), shipped in dbio-mysql
+# since commit 8515206) — never here. Without the opt-in the schema therefore
+# gets the driver's sync storage, while the broker still flows through
+# connect_info. This mirrors dbio-postgresql-ev's t/02.
+#
+# The marker comes after the driver component in the schema's MRO, so a
+# connection() hook on it would run after the driver's and its storage_type
+# would win: the NEGATIVE assertion below — 'is not the EV storage' — still
+# fails on a marker that pins one. (The marker loaded alone, with no driver,
+# is held by t/00-load.t's storage_layer_contract_ok.) There is no database
+# here: connect() only configures the storage, nothing is opened.
+my $schema = TestSchema->connect($broker);
+isa_ok $schema->storage, 'DBIO::MySQL::Storage';
+ok !$schema->storage->isa('DBIO::MySQL::EV::Storage'),
+  'loading MySQL::EV marker does not hijack storage_type to async';
+is $schema->storage->access_broker, $broker, 'schema connect keeps broker';
+is $schema->storage->access_broker_mode, 'write',
+  'schema connect defaults broker mode to write';
+
+# The EV transport also takes a broker directly (the form the README documents
+# alongside the schema-level connect above).
 my $ev_storage = DBIO::MySQL::EV::Storage->new(undef);
 $ev_storage->connect_info([$broker]);
 is $ev_storage->access_broker, $broker, 'async storage keeps broker';
 is $ev_storage->access_broker_mode, 'write', 'async storage defaults broker mode to write';
 
 subtest 'Static broker hashref works with EV::MariaDB conninfo' => sub {
-  plan tests => 5;
+  plan tests => 6;
 
   my $broker = DBIO::AccessBroker::Static->new(
     host     => '127.0.0.1',
@@ -116,7 +135,14 @@ subtest 'Static broker hashref works with EV::MariaDB conninfo' => sub {
   $storage->connect_info([$broker]);
 
   ok($storage->access_broker, 'broker attached');
-  my $conninfo = $storage->_conninfo_hash;
+
+  # The conninfo a connection is opened from is what the per-spawn provider
+  # makes of the broker's answer at that moment. The storage keeps none of it
+  # (karr k62): _conninfo_hash, the STORED conninfo, has nothing to return with
+  # a broker attached -- a stored copy could only be the first answer, password
+  # included, and is what a detached broker would otherwise fall back to.
+  is($storage->_conninfo_hash, undef, 'no conninfo is stored from the broker\'s answer');
+  my $conninfo = $storage->_conninfo_provider->();
   is($conninfo->{host}, '127.0.0.1', 'host present in conninfo');
   is($conninfo->{port}, 3306, 'port present in conninfo');
   is($conninfo->{database}, 'mydb', 'database present in conninfo');

@@ -4,7 +4,10 @@ package DBIO::ChangeLog::Set;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::ChangeLog::Table;
+
 
 
 sub source_definition {
@@ -49,7 +52,7 @@ DBIO::ChangeLog::Set - ResultSource definition for the changelog_set table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 
@@ -77,6 +80,17 @@ Optional C<varchar(255)>. Set from L<DBIO::ChangeLog::Schema/changelog_session>.
 =head2 created_at
 
 C<datetime>, NOT NULL. Automatically set when the changeset is created.
+
+=head1 METHODS
+
+=head2 source_definition
+
+    my $def = DBIO::ChangeLog::Set->source_definition;
+
+Class method. Returns the source definition hashref for the C<changelog_set>
+table (C<table>, C<columns>, C<column_order>, C<primary_key>), built and
+validated through L<DBIO::ChangeLog::Table/build_source>. Used by
+L<DBIO::ChangeLog::Schema> when it registers the changeset source.
 
 =head1 COLUMN DEFINITIONS
 

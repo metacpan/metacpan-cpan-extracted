@@ -4,8 +4,11 @@ package DBIO::Replicated::Balancer;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use base 'DBIO::Base';
 use Scalar::Util 'blessed';
+use DBIO::Util ();
 use namespace::clean;
 
 __PACKAGE__->mk_group_accessors(simple => qw/
@@ -13,6 +16,7 @@ __PACKAGE__->mk_group_accessors(simple => qw/
   current_replicant
   _on_master
 /);
+
 
 sub new {
   my ($class, %args) = @_;
@@ -29,11 +33,13 @@ sub new {
   return $self;
 }
 
+
 sub master {
   my $self = shift;
   $self->{master} = $_[0] if @_;
   return $self->{master};
 }
+
 
 sub pool {
   my $self = shift;
@@ -41,9 +47,11 @@ sub pool {
   return $self->{pool};
 }
 
+
 sub next_storage {
   die ref($_[0]) . ' must implement next_storage()';
 }
+
 
 sub next_storage_with_fallback {
   my ($self, @args) = @_;
@@ -69,9 +77,18 @@ sub next_storage_with_fallback {
   return $self->master;
 }
 
+
 sub increment_storage {
   my $self = shift;
   $self->current_replicant($self->next_storage_with_fallback);
+}
+
+
+# A select with a lock attribute (for => 'update', 'shared', any defined value)
+# takes its lock where the write goes: the master.
+sub _has_lock_attribute {
+  my ($args) = @_;
+  return ref($args->[-1]) eq 'HASH' && defined $args->[-1]{for};
 }
 
 sub select {
@@ -82,7 +99,7 @@ sub select {
     delete $args[-1]->{force_pool};
     return $self->_get_forced_pool($forced_pool)->select(@args);
   }
-  elsif ($self->master->transaction_depth) {
+  elsif ($self->master->transaction_depth || _has_lock_attribute(\@args)) {
     return $self->master->select(@args);
   }
 
@@ -98,13 +115,14 @@ sub select_single {
     delete $args[-1]->{force_pool};
     return $self->_get_forced_pool($forced_pool)->select_single(@args);
   }
-  elsif ($self->master->transaction_depth) {
+  elsif ($self->master->transaction_depth || _has_lock_attribute(\@args)) {
     return $self->master->select_single(@args);
   }
 
   $self->increment_storage;
   return $self->current_replicant->select_single(@args);
 }
+
 
 sub columns_info_for {
   my $self = shift;
@@ -120,12 +138,59 @@ sub _select {
     delete $args[-1]->{force_pool};
     return $self->_get_forced_pool($forced_pool)->_select(@args);
   }
-  elsif ($self->master->transaction_depth) {
+  elsif ($self->master->transaction_depth || _has_lock_attribute(\@args)) {
     return $self->master->_select(@args);
   }
 
   $self->increment_storage;
   return $self->current_replicant->_select(@args);
+}
+
+# The pre-rendered statement path (DBIO::Storage::DBI/_execute_rendered), which
+# ResultSet::results_exist runs its EXISTS statement on. A read, so it routes
+# like _select: master inside a transaction, a replicant otherwise. The
+# statement carries no attrs hashref, so there is no force_pool key to honour.
+sub _execute_rendered {
+  my $self = shift;
+
+  return $self->master->_execute_rendered(@_)
+    if $self->master->transaction_depth;
+
+  $self->increment_storage;
+  return $self->current_replicant->_execute_rendered(@_);
+}
+
+# ADR 0040 section 6: the same statement path stopped one verb
+# short (DBIO::Storage::DBI/_prepare_rendered), for an engine whose answer is
+# an attribute of the PREPARED statement. It routes like the method it is half
+# of. Not optional bookkeeping, for the reason spelled out under
+# _explain_query below: a Balancer is not a storage and has no AUTOLOAD.
+sub _prepare_rendered {
+  my $self = shift;
+
+  return $self->master->_prepare_rendered(@_)
+    if $self->master->transaction_depth;
+
+  $self->increment_storage;
+  return $self->current_replicant->_prepare_rendered(@_);
+}
+
+# ADR 0040: DBIO::ResultSet::explain's whole operation, which the
+# driver storage owns (DBIO::Storage::DBI/_explain_query). A read -- it plans a
+# read query, and every statement it issues goes down _execute_rendered anyway
+# -- so it routes like _select: master inside a transaction, a replicant
+# otherwise. This forwarder is not optional bookkeeping: a Balancer is not a
+# storage and has no AUTOLOAD, so a method listed in
+# DBIO::Replicated::Storage's @reader_methods and missing here dies on the
+# read handler.
+sub _explain_query {
+  my $self = shift;
+
+  return $self->master->_explain_query(@_)
+    if $self->master->transaction_depth;
+
+  $self->increment_storage;
+  return $self->current_replicant->_explain_query(@_);
 }
 
 sub _dbh_columns_info_for {
@@ -158,7 +223,10 @@ sub _get_forced_pool {
     return $replicant;
   }
 
-  $self->master->throw_exception("'$forced_pool' is not a named replicant.");
+  # a replicant is named after its DSN: never a password in it (karr k297)
+  $self->master->throw_exception(
+    "'" . DBIO::Util::mask_connect_secrets($forced_pool) . "' is not a named replicant."
+  );
 }
 
 1;
@@ -175,7 +243,70 @@ DBIO::Replicated::Balancer - Base class for replicated read balancing
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 DESCRIPTION
+
+Base class for the read balancers of L<DBIO::Replicated::Storage>. A
+balancer answers every read: it picks a replicant from the
+L<DBIO::Replicated::Pool> (via the subclass's L</next_storage>), falls back
+to the master when no replicant is usable, and sends reads to the master
+while a transaction is open there. C<auto_validate_every> (seconds) and
+C<current_replicant> are plain read/write accessors.
+
+=head1 METHODS
+
+=head2 new
+
+  my $balancer = $class->new(
+    master              => $master_backend,
+    pool                => $pool,
+    auto_validate_every => 60,     # optional
+  );
+
+When a pool is given, picks the first C<current_replicant> right away.
+
+=head2 master
+
+Getter/setter for the master backend.
+
+=head2 pool
+
+Getter/setter for the L<DBIO::Replicated::Pool>.
+
+=head2 next_storage
+
+Returns the next replicant to read from, or nothing if none is usable. The
+base class dies; every balancer subclass implements this.
+
+=head2 next_storage_with_fallback
+
+Re-validates the pool first if C<auto_validate_every> seconds have passed
+since its last validation. Returns L</next_storage> if that yields a
+replicant, else the master; each switch between replicant and master reads
+is noted once on the master's trace object.
+
+=head2 increment_storage
+
+Sets C<current_replicant> to the result of L</next_storage_with_fallback>.
+
+=head2 select
+
+=head2 select_single
+
+Route a read: with a C<force_pool> key in the trailing attributes hashref
+(removed before the call) to that target -- a backend object, C<'master'>,
+or the name of a replicant -- its DSN after C<dbi:Driver:> without the
+C<password=> part (throws for an unknown name); inside a master
+transaction, or when the attributes carry a lock (C<for> with any defined
+value, C<'update'> and C<'shared'> among them), to the master; otherwise to
+the next replicant (see
+L</increment_storage>).
+
+=head2 columns_info_for
+
+Moves to the next replicant and asks it; unlike L</select> it neither honours
+C<force_pool> nor routes to the master during a transaction.
 
 =head1 AUTHOR
 

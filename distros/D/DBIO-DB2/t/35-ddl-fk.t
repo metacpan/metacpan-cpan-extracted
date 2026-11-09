@@ -70,21 +70,24 @@ my $ddl = DBIO::DB2::DDL->install_ddl('My::FK::Schema');
 ok length $ddl, 'DDL generated';
 
 # Topo-sort: author before book before review (FK dependency order).
-like $ddl, qr/CREATE TABLE author.*CREATE TABLE book.*CREATE TABLE review/s,
-  'tables created in FK-dependency order';
+# Identifiers are quoted: the driver is a quote-everything driver (sql_quote_char
+# '"', pinned in t/50-results-exist.t), and DBIO::DB2::DDL must emit the same
+# shape -- unquoted would upper-fold on the server (karr k28).
+like $ddl, qr/CREATE TABLE "author".*CREATE TABLE "book".*CREATE TABLE "review"/s,
+  'tables created in FK-dependency order (identifiers quoted)';
 
 # book FK to author: named, deterministic, no ON DELETE/UPDATE (NO ACTION).
 like $ddl,
-  qr/CONSTRAINT fk_book_author_id FOREIGN KEY \(author_id\) REFERENCES author\(id\)/,
+  qr/CONSTRAINT "fk_book_author_id" FOREIGN KEY \("author_id"\) REFERENCES "author"\("id"\)/,
   'book FK emitted as named inline constraint with deterministic name';
 
 # Default belongs_to carries no rules -> no ON DELETE / ON UPDATE on the book FK.
-unlike $ddl, qr/fk_book_author_id FOREIGN KEY[^;]*ON DELETE/,
+unlike $ddl, qr/"fk_book_author_id" FOREIGN KEY[^;]*ON DELETE/,
   'default belongs_to FK has no ON DELETE clause';
 
 # review FK to book: ON DELETE CASCADE rendered.
 like $ddl,
-  qr/CONSTRAINT fk_review_book_id FOREIGN KEY \(book_id\) REFERENCES book\(id\) ON DELETE CASCADE/,
+  qr/CONSTRAINT "fk_review_book_id" FOREIGN KEY \("book_id"\) REFERENCES "book"\("id"\) ON DELETE CASCADE/,
   'review FK renders ON DELETE CASCADE';
 
 done_testing;

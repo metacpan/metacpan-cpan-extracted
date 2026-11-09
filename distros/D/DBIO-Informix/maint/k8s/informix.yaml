@@ -1,0 +1,87 @@
+# Informix 15 pod for dbio-informix live tests.
+#
+# THROWAWAY: one Pod and its Service, no volume. The dbspaces live in the
+# container's writable layer, so deleting the pod deletes the data.
+#
+# IMAGE -- icr.io/informix/informix-developer-database, IBM's Informix
+# Developer Edition. LICENSE=accept is required to start it; SIZE=small sizes
+# the instance for a test box. The server is named `informix` and listens with
+# onsoctcp on 9088; the instance user is `informix`, password `in4mix`.
+#
+# CLIENT SIDE -- DBD::Informix needs the Informix Client SDK on the test host
+# ($INFORMIXDIR) and an sqlhosts entry that names this server:
+#
+#   informix onsoctcp <host> 9088
+#
+# in the file $INFORMIXSQLHOSTS points at, with INFORMIXSERVER=informix.
+#
+# DATABASE -- the suite connects to `dbio_test`, a logged database. The image
+# does not create it; create it once after the pod is ready:
+#
+#   kubectl exec dbio-informix -- bash -lc \
+#     'echo "CREATE DATABASE dbio_test WITH LOG;" | dbaccess sysmaster -'
+#
+# RESOURCE DISCIPLINE -- the pod carries a cpu AND a memory limit (house rule
+# "Live testing", .claude/rules/dbio-rules.md); never run it without. Run the
+# suite serially through core's maint/capped-test, and delete the pod when
+# done.
+#
+# Usage:
+#   kubectl apply -f maint/k8s/informix.yaml
+#   kubectl wait --for=condition=Ready pod/dbio-informix --timeout=900s
+#   (create dbio_test as above)
+#
+#   DBIO_TEST_INFORMIX_DSN='dbi:Informix:dbio_test@informix' \
+#   DBIO_TEST_INFORMIX_USER=informix \
+#   DBIO_TEST_INFORMIX_PASS=in4mix \
+#     ../dbio/maint/capped-test prove -lr t/
+#
+#   kubectl delete -f maint/k8s/informix.yaml   # ALWAYS clean up
+#
+# In the HQ cluster the hub's dbio-db tool applies this file as it is (it sets
+# the namespace and turns the Service into a LoadBalancer) and prints the
+# variables: `dbio-db up informix`, `eval "$(dbio-db env informix)"`.
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-informix
+  labels:
+    app: dbio-informix
+    role: dbio-test-db
+spec:
+  hostname: informix
+  containers:
+    - name: informix
+      image: icr.io/informix/informix-developer-database:latest
+      resources:
+        requests:
+          cpu: 250m
+          memory: 1Gi
+        limits:
+          cpu: "2"          # at most two cores
+          memory: 3Gi
+      ports:
+        - containerPort: 9088
+      env:
+        - name: LICENSE
+          value: accept
+        - name: SIZE
+          value: small
+      readinessProbe:
+        exec:
+          command: ["bash", "-lc", "onstat - | grep -q 'On-Line'"]
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        failureThreshold: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-informix
+spec:
+  selector:
+    app: dbio-informix
+  ports:
+    - port: 9088
+      targetPort: 9088

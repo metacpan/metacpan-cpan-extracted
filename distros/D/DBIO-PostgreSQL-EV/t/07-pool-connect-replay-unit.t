@@ -3,14 +3,14 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-# OFFLINE unit test for the karr #22 WP3 / karr #68 pool-connect replay WIRING.
+# OFFLINE unit test for the karr k22 WP3 / core k68 pool-connect replay WIRING.
 # No real DB. The live end-to-end assertion is t/23; here we lock down the pure
 # structure that makes replay possible, so a regression that unwires it fails
 # offline immediately:
 #
 #   1. the EV pool is created with a `storage => $self` back-reference, so the
 #      core PoolBase spawn path can reach _setup_pool_connection (without this
-#      back-ref the replay silently never fires -- the #69 facet-1 bug);
+#      back-ref the replay silently never fires -- the core k69 facet-1 bug);
 #   2. _run_pool_connect_statement drives a statement on the EV::Pg connection
 #      shape (query for bindless, query_params with '?'->'$N' shaping for bound),
 #      and fails loud on a statement error;
@@ -31,18 +31,18 @@ use DBIO::PostgreSQL::EV::Storage;
 # the error path.
 {
   package FakeConn07;
-  sub new { bless { queries => [], params => [], fail => undef }, shift }
+  sub new { bless { queries => [], params => [], fail => undef, rows => undef }, shift }
   sub is_connected { 1 }
   sub query {
     my ($self, $sql, $cb) = @_;
     push @{ $self->{queries} }, $sql;
-    $cb->(undef, $self->{fail}) if $cb;
+    $cb->($self->{fail} ? undef : $self->{rows}, $self->{fail}) if $cb;
   }
   sub query_params {
     my ($self, $sql, $bind, $cb) = @_;
     push @{ $self->{queries} }, $sql;
     push @{ $self->{params} }, $bind;
-    $cb->(undef, $self->{fail}) if $cb;
+    $cb->($self->{fail} ? undef : $self->{rows}, $self->{fail}) if $cb;
   }
 }
 
@@ -64,7 +64,7 @@ use DBIO::PostgreSQL::EV::Storage;
   my $pool = $storage->pool;
   isa_ok $pool, 'DBIO::PostgreSQL::EV::Pool', 'pool is the EV pool';
   is $pool->{storage}, $storage,
-    'pool carries the storage back-reference (karr #68 replay can reach _setup_pool_connection)';
+    'pool carries the storage back-reference (core k68 replay can reach _setup_pool_connection)';
 }
 
 # --- 2. _run_pool_connect_statement drives the EV::Pg connection --------------
@@ -99,6 +99,32 @@ use DBIO::PostgreSQL::EV::Storage;
     $storage->_run_pool_connect_statement($conn, q{SET search_path = nope}, undef)
   } qr/pool connect statement failed: permission denied/,
     'a statement error croaks (fail loud, no silent drop)';
+}
+
+# --- 2c. dbio_rows: the rows of the statement come back (core k358, karr k97) --
+
+{
+  my $storage = DBIO::PostgreSQL::EV::Storage->new(undef);
+  $storage->{pool} = FakePool07->new;
+  my $conn = FakeConn07->new;
+  $conn->{rows} = [ [ 'a', 1 ], [ 'b', undef ] ];
+
+  is_deeply $storage->_run_pool_connect_statement($conn, q{SELECT x, y FROM t}, { dbio_rows => 1 }),
+    [ [ 'a', 1 ], [ 'b', undef ] ],
+    'dbio_rows without bind: array reference of row array references';
+  is_deeply $storage->_run_pool_connect_statement($conn, q{SELECT x, y FROM t WHERE x = ?}, { dbio_rows => 1 }, 'a'),
+    [ [ 'a', 1 ], [ 'b', undef ] ],
+    'dbio_rows with bind: the rows of query_params';
+  is $conn->{queries}[-1], q{SELECT x, y FROM t WHERE x = $1}, 'bound dbio_rows statement shaped ? -> $1';
+
+  my @none = $storage->_run_pool_connect_statement($conn, q{SELECT x, y FROM t}, undef);
+  is scalar(@none), 0, 'without dbio_rows nothing is returned (attrs undef)';
+  @none = $storage->_run_pool_connect_statement($conn, q{SELECT x, y FROM t}, {});
+  is scalar(@none), 0, 'without dbio_rows nothing is returned (attrs empty hash)';
+
+  $conn->{rows} = undef;   # a SET answers no rows
+  is_deeply $storage->_run_pool_connect_statement($conn, q{SET a.b = 1}, { dbio_rows => 1 }), [],
+    'dbio_rows on a statement without rows: empty array reference';
 }
 
 # --- 3. full replay dispatch reaches the seam ---------------------------------

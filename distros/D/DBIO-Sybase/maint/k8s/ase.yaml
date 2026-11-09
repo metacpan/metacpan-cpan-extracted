@@ -1,0 +1,226 @@
+# SAP ASE 16.0 for dbio-sybase live tests (k3s, single node). THROWAWAY:
+# namespace + Pod + Service, no volume -- apply, run the suite once, delete the
+# namespace. Nothing here is meant to survive a session.
+#
+# IMAGE -- provenance and licence (checked 2026-09-25, karr k44)
+#
+#   docker.io/datagrip/sybase:16.0
+#   digest sha256:eaebcdaf257cb929943a7da1b4bcbe663f48eceadb06c742ea3a88dc0b8f57dd
+#   (single-arch linux/amd64 manifest, ~3.3 GB, last pushed 2024-01-11; digest
+#   from hub.docker.com/v2/repositories/datagrip/sybase/tags/16.0, config read
+#   from the registry API -- the image was not pulled to check this)
+#
+#   Belegt (from the image's own layer history):
+#   - The lower layers ARE nguoianphu/docker-sybase (GitHub, MIT-licensed
+#     Dockerfile, last pushed 2019): CentOS 7, SAP ASE 16.0 SP02 *Developer
+#     Edition* installed silently from SAP's CloudFront download with
+#     -DAGREE_TO_SAP_LICENSE=true, SYSAM_LICENSE_SOURCE=proceed_without_license,
+#     server built as MYSYBASE (interfaces: 0.0.0.0:5000), sa/myPassword.
+#   - datagrip (JetBrains' DataGrip test images) added on top, 2024-01-11: its
+#     own /entrypoint.sh, "allow sql server async i/o = 0" in MYSYBASE.cfg,
+#     and trace flag -T11889 in RUN_MYSYBASE.
+#   - The MIT licence covers the Dockerfile only. The ASE binaries inside are
+#     SAP's, under SAP's Developer Edition licence (development/test use, not
+#     production) -- which is exactly this use.
+#
+#   Belegt later (read from the running pod, 2026-09-25, karr k44):
+#   - /entrypoint.sh (3009 bytes, 2024-01-11) starts RUN_MYSYBASE, waits for
+#     "Finished initialization.", then as sa: creates database $SYBASE_DB
+#     (default testdb, 48m on master) and login $SYBASE_USER/$SYBASE_PASSWORD
+#     (default tester/guest1234), and sets on that database the dboptions
+#     'abort tran on log full', 'allow nulls by default', 'ddl in tran',
+#     'trunc log on chkpt', 'full logging for select into', 'full logging for
+#     alter table' and 'select into'. A database created later (from model --
+#     the deploy's temp database, a probe database) has none of them; see
+#     DBIO::Sybase::Deploy, "Data-copying ALTER TABLE" (karr k50). The one
+#     exception is 'abort tran on log full', which DBIO::Sybase::Deploy sets
+#     on its temp database itself (karr k69). The log prints "SYBASE
+#     INITIALIZED" once.
+#   - The readiness probe below works as written: isql is on PATH after
+#     SYBASE.sh, and the pod went Ready under k3s (SysV shm included).
+#
+#   Unbelegt:
+#   - Whether the Developer Edition licence text permits redistribution as a
+#     public image was not checked; we only consume the image.
+#   - The Docker Hub description says "Sybase 16.2"; the server reports
+#     16.0 SP02 PL02 (EBF 25320). Trust the server.
+#
+# DEFAULT DEVICE -- room for CREATE DATABASE (karr k73, measured 2026-10-07)
+#
+#   The image leaves no room for a database of one's own. The server has 16K
+#   pages, so `model` -- the least a new database takes -- is 24 MB; `master`
+#   (444 MB) is the only default device, and once /entrypoint.sh has put
+#   testdb on it (48m, device named) 20 MB are left:
+#
+#     Msg 1805: CREATE DATABASE: allocating 1280 logical pages (20.0
+#       megabytes) on disk 'master' (1536 logical pages requested).
+#     Msg 1810: CREATE DATABASE failed because of incorrectly specified or
+#       unavailable space. Total number of megabytes specified and available
+#       must be at least 24 megabytes so Model Database can be copied to the
+#       new database.
+#
+#   The live suite makes databases: the temporary one of
+#   DBIO::Sybase::Deploy->diff, and those of t/09, t/31, t/32, t/63, t/66 and
+#   t/71 (48 MB at a time at most). So the container's `command` below makes a device of its
+#   own, dbiotestdev (384M, /opt/sybase/data/dbiotestdev.dat, in the
+#   container's writable layer like master.dat -- there is no volume), makes
+#   it the default device and takes `master` out of the defaults.
+#
+#   How: /entrypoint.sh is fixed in the image and stays PID 1 -- its trap is
+#   what answers SIGTERM. So `command` starts a background job and then execs
+#   /entrypoint.sh unchanged. The job waits, 300 s at most, until the
+#   entrypoint's last statement in `master` has run ('select into' set on
+#   testdb), then runs disk init and the two sp_diskdefault. There is no
+#   ConfigMap and no init container: the pod spec is all there is, and
+#   deleting the pod leaves nothing behind.
+#
+#   When it fails, it says so in the container log ("dbio-ase default device:
+#   FAILED", after the server's own messages) and the pod never becomes Ready:
+#   the readiness probe asks for the device as well as for testdb, and its
+#   message is in the pod's events. The server is left running to be looked
+#   at. (Tried with a physname that cannot be made: Msg 5123 and the FAILED
+#   line in the log, the pod 0/1 for as long as it was watched.)
+#
+#   Measured on a fresh pod, image already on the node: the device was there
+#   64 s after the container started and the pod Ready after about 80 s; the
+#   whole live suite then ran green with nothing done by hand (36 files).
+#   cgroup memory.peak after it: 1.51 GiB, no more than before (below).
+#
+#   t/09-create-database-live.t asks the server for exactly this room, so a
+#   server started any other way names the reason in the suite's first live
+#   file.
+#
+# RESOURCE DISCIPLINE -- small SHARED box (house rule "Live testing"). The pod
+# carries cpu AND memory limits. Measured 2026-09-25 (karr k44) over ~95 min
+# with several full live suites and probes: cgroup memory.peak 1.60 GiB, of it
+# ~1.55 GiB page cache (320 MiB shmem) and only ~5 MiB anon; working set
+# (`kubectl top pod`) 365Mi; CPU 73 s in total, never throttled. So 3Gi holds
+# the peak with room, and 2 CPUs are far above need but only a ceiling.
+#
+# ACCESS -- pod IPs are not routable from the dev host; the Service is a
+# NodePort, reached through node pichu (10.5.10.5). The port is assigned by
+# k8s; read it back after apply (see below).
+#
+# Usage (full walk-through: README.md, "Live tests"):
+#   ../dbio/maint/live-preflight
+#   kubectl --context cihq apply -f maint/k8s/ase.yaml
+#   kubectl --context cihq -n dbio-sybase-test wait --for=condition=Ready \
+#     pod/dbio-ase --timeout=600s
+#   PORT=$(kubectl --context cihq -n dbio-sybase-test get svc dbio-ase-svc \
+#     -o jsonpath='{.spec.ports[0].nodePort}')
+#   TDSVER=5.0 \
+#   DBIO_TEST_SYBASE_DSN="dbi:Sybase:host=10.5.10.5;port=$PORT;database=testdb" \
+#   DBIO_TEST_SYBASE_USER=sa DBIO_TEST_SYBASE_PASS=myPassword \
+#     ../dbio/maint/capped-test prove -lr t/
+#   kubectl --context cihq delete namespace dbio-sybase-test   # ALWAYS
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dbio-sybase-test
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dbio-ase
+  namespace: dbio-sybase-test
+  labels:
+    app: dbio-ase
+    role: dbio-test-db
+spec:
+  restartPolicy: Never          # a crashed server is a finding, not something to retry
+  containers:
+    - name: ase
+      image: docker.io/datagrip/sybase:16.0@sha256:eaebcdaf257cb929943a7da1b4bcbe663f48eceadb06c742ea3a88dc0b8f57dd
+      # A default device with room for the databases of the live suite, made
+      # beside the image's own start (karr k73; head of this file, "DEFAULT
+      # DEVICE"). The job polls with isql until testdb carries 'select into'
+      # (sysdatabases.status & 4), the last thing /entrypoint.sh does in
+      # master. --retserverror makes isql stop at the first server error and
+      # exit non-zero; its output goes to the container log either way.
+      command:
+        - bash
+        - -c
+        - |
+          (
+            . /opt/sybase/SYBASE.sh
+            say() { echo "dbio-ase default device: $*"; }
+            sql() { isql -U sa -P myPassword -S MYSYBASE -l 10 --retserverror; }
+            until printf '%s\ngo\n' \
+                "select 'dbio_'+'init' from master..sysdatabases where name = 'testdb' and status & 4 = 4" \
+                | sql 2>&1 | grep -q dbio_init
+            do
+              if [ "$SECONDS" -ge 300 ]; then
+                say "FAILED -- testdb was not there after 300 s; nothing was made, the pod stays not Ready"
+                exit 1
+              fi
+              sleep 2
+            done
+            if printf '%s\ngo\n' \
+                "disk init name = 'dbiotestdev', physname = '/opt/sybase/data/dbiotestdev.dat', size = '384M'" \
+                "exec sp_diskdefault dbiotestdev, defaulton" \
+                "exec sp_diskdefault master, defaultoff" \
+                | sql
+            then
+              say "dbiotestdev (384M) made after $SECONDS s; master is no default device any more"
+            else
+              say "FAILED -- the server's messages are above; the pod stays not Ready"
+              exit 1
+            fi
+          ) &
+          exec /entrypoint.sh
+      ports:
+        - name: tds
+          containerPort: 5000
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: "2"              # never more than two cores on a shared box
+          memory: 3Gi           # measured peak 1.60 GiB, mostly page cache (k44)
+      # Ready means "ASE runs SQL, testdb exists and the default device for
+      # new databases is there", not "something listens on 5000" (same lesson
+      # as core k208 in DBIO::Test::Kubernetes). The image
+      # ships Open Client isql: SYBASE.sh (upstream path /opt/sybase/SYBASE.sh)
+      # puts it on PATH, and the interfaces file resolves MYSYBASE to
+      # 127.0.0.1:5000 -- the upstream README's own isql check.
+      # The marker is built by concatenation and only returned while testdb
+      # exists, dbiotestdev is a default device (sysdevices.status & 1) and
+      # master is none any more -- the last step of `command` above (karr
+      # k73) -- so neither a login failure nor echoed input can match it; the
+      # test does not depend on isql's exit status. What a failing probe
+      # prints is in the pod's events.
+      readinessProbe:
+        exec:
+          command:
+            - bash
+            - -c
+            - >-
+              . /opt/sybase/SYBASE.sh &&
+              printf '%s\n'
+              "select 'dbio_'+'ready' where db_id('testdb') is not null"
+              "and exists (select 1 from master..sysdevices where name = 'dbiotestdev' and status & 1 = 1)"
+              "and not exists (select 1 from master..sysdevices where name = 'master' and status & 1 = 1)"
+              go
+              | isql -U sa -P myPassword -S MYSYBASE
+              | grep -q dbio_ready
+              || { echo "not ready: testdb, or the default device dbiotestdev, is not there; the container log says whether making the device failed"; exit 1; }
+        initialDelaySeconds: 20   # Hub description: ~30s to initialise
+        periodSeconds: 10
+        timeoutSeconds: 10        # isql login on a loaded shared box
+        failureThreshold: 3       # readiness never restarts; wait bounds the time
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbio-ase-svc
+  namespace: dbio-sybase-test
+spec:
+  type: NodePort
+  selector:
+    app: dbio-ase
+  ports:
+    - name: tds
+      port: 5000
+      targetPort: 5000

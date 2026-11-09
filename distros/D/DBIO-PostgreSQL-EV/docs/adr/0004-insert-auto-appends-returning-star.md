@@ -3,6 +3,42 @@
 - Status: accepted
 - Date: 2026-06-21
 - Tags: async, insert, returning, dml, drivers
+- Superseded in part: the *place* of the append -- an `insert_async` in this
+  dist's `Storage.pm` -- is superseded by core ADR 0030 §4 (see the Amendment);
+  the append itself and its guard stand
+
+## Amendment (2026-10-05, karr k69) — the append is core's, this dist declares the suffix
+
+The decision this ADR records is in force and unchanged: an `INSERT` gets
+` RETURNING *` appended unless the statement already carries a `RETURNING`
+clause, and the sync `insert` has it too, being `insert_async(...)->get`. What
+is superseded is *where the append happens*.
+
+With the thin-transport refactor (karr k22, commit `f4c527d`; core ADR 0030 §4)
+`insert_async` and the CRUD runner behind it became core's.
+`DBIO::Storage::Async::_run_crud` appends what the transport's
+`_post_insert_sql` returns, under the same case-insensitive `RETURNING` match,
+and `DBIO::PostgreSQL::EV::Storage` declares exactly that suffix:
+`_post_insert_sql` returns `' RETURNING *'`. The pooled path and the pinned one
+(a transaction's or a pipeline's context) share that one builder, so the append
+is the same on both.
+
+Read as superseded, therefore:
+
+- **The two quoted lines are no longer in this dist.** There is no
+  `insert_async` in `Storage.pm`, and `Storage.pm:249-252` no longer points at
+  an append; the reference is left as written.
+- **What `insert_async` resolves with is the returned-columns hashref**, not
+  the `RETURNING` row as it comes off the wire (karr k18, core ADR 0031 §3):
+  the supplied data overlaid with the first returned row, mapped by core's
+  `_insert_returned_columns`. `RETURNING *` is still what supplies the
+  server-assigned columns.
+- **The append is not a divergence from the base async storage any more, and a
+  transport does not keep it by copying it.** It is the base's seam: core's
+  `_post_insert_sql` croaks until a transport overrides it, and a transport
+  whose engine has no `RETURNING` answers with an empty suffix. The last
+  *Consequences* bullet reads accordingly -- what a driver author must keep is
+  the declaration, not the append.
 
 ## Context
 

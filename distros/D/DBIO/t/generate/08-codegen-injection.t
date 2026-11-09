@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+
+# A generated word such as `exit` must not end this process if it ever runs.
+BEGIN { *CORE::GLOBAL::exit = sub { die "exit called\n" } }
 use File::Temp qw/tempdir/;
 use File::Spec;
 
@@ -25,6 +28,7 @@ use File::Spec;
 # ---------------------------------------------------------------------------
 
 use DBIO::Generate::Util ();
+use DBIO::Cake ();    # the real one: its type_function_names is the allowlist
 use DBIO::Generate::Style::Vanilla;
 use DBIO::Generate::Style::Cake;
 use DBIO::Generate::Style::Candy;
@@ -116,9 +120,10 @@ sub hostile_spec {
 my @DSL_FUNCS = qw(
   table table_class view_definition
   load_components
-  column primary_column nullable_column has_column
+  col column primary_column nullable_column has_column
+  null auto_inc
   primary_key set_primary_key
-  unique_constraint add_unique_constraint
+  unique unique_constraint add_unique_constraint
   add_columns result_source_instance
   belongs_to has_many has_one might_have many_to_many
   integer varchar text bigint smallint
@@ -127,6 +132,7 @@ my @DSL_FUNCS = qw(
 
 {
   no strict 'refs';
+  no warnings 'redefine';
 
   # A stub package whose import() installs no-op DSL subs into its caller.
   my $make_dsl_stub = sub {
@@ -277,6 +283,143 @@ for my $name (sort keys %style) {
 
   eval { DBIO::Generate::Util::assert_pkg('My::Schema::Result::User') };
   is $@, '', 'assert_pkg accepts a well-formed package name';
+}
+
+# --- Type words: a data_type is data, never a Perl word ---------------------
+# Perl quote-like operators (qx q qq s y tr m), __END__ and exit are plain
+# identifiers; as a bareword type they would be code. Only the type functions
+# DBIO::Cake exports may appear as a bareword; every other type is a string.
+{
+  my @words = qw(qx q qq qw s y tr m __END__ __DATA__ exit die);
+
+  for my $name (sort keys %style) {
+    for my $word (@words) {
+      my $class = "Word::Test::" . ucfirst($name) . (++$i);
+      my $spec  = {
+        moniker      => 'W',
+        class        => $class,
+        table        => 'w',
+        column_order => [qw/a b/],
+        columns      => {
+          a => { data_type => $word, is_nullable => 0 },
+          b => { data_type => 'integer', is_nullable => 0 },
+        },
+        pk => [qw/a/], uniq => [], relationships => [], extra_statements => [],
+        is_view => 0, view_definition => undef,
+        result_base_class => 'DBIO::Core', components => [], additional_classes => [],
+      };
+      my $code = $style{$name}->emit($spec);
+      my ($ok, $err) = require_generated($code, "word-$name-$word");
+      ok $ok, "$name: type word '$word' compiles" or diag $err;
+      ok !-e $sentinel, "$name: type word '$word' runs no code";
+      unlink $sentinel if -e $sentinel;
+      unlike $code, qr/(?:=>|\s)\Q$word\E\s*(?:[;,(]|$)/m,
+        "$name: type word '$word' is not emitted as a bareword"
+        if $name eq 'cake';
+    }
+  }
+
+  # The allowlist is DBIO::Cake's own list of type functions.
+  ok( DBIO::Cake->can('type_function_names'), 'DBIO::Cake lists its type functions' );
+  my %bare_ok = map { $_ => 1 } eval { DBIO::Cake->type_function_names };
+  ok $bare_ok{varchar} && $bare_ok{integer}, 'type_function_names has the column types';
+  ok !$bare_ok{$_}, "type_function_names does not list '$_'" for qw(qx q s y exit col table null);
+
+  # A listed type keeps the DSL word form, any other type is a string.
+  my $spec = {
+    moniker => 'W', class => 'Word::Test::CakeWord', table => 'w',
+    column_order => [qw/a/],
+    columns => { a => { data_type => 'varchar', size => 20 } },
+    pk => [], uniq => [], relationships => [], extra_statements => [],
+    is_view => 0, result_base_class => 'DBIO::Core', components => [],
+  };
+  my $cake = 'DBIO::Generate::Style::Cake';
+  like $cake->emit($spec), qr/col "a" => varchar\(20\);/,
+    'cake: an exported type function keeps the word form';
+  $spec->{columns}{a} = { data_type => 'qx', size => 20 };
+  like $cake->emit($spec), qr/col "a" => data_type => "qx", size => 20;/,
+    'cake: any other type is a string literal';
+}
+
+# --- Method names: a method is an identifier, nothing else ------------------
+{
+  my @bad = (
+    q{foo; BEGIN { $ENV{X} } bar},
+    q{a b}, q{1abc}, q{foo-bar}, q{foo(}, qq{foo\nbar}, '', q{Foo::bar},
+  );
+  my $base = sub {
+    return {
+      moniker => 'M', class => 'Method::Test', table => 'm',
+      column_order => [qw/a/],
+      columns => { a => { data_type => 'integer', is_nullable => 0 } },
+      pk => [qw/a/], uniq => [], relationships => [], extra_statements => [],
+      is_view => 0, view_definition => undef,
+      result_base_class => 'DBIO::Core', components => [], additional_classes => [],
+    };
+  };
+  for my $name (sort keys %style) {
+    for my $bad (@bad) {
+      my $spec = $base->();
+      $spec->{extra_statements} = [ [ $bad, 'x' ] ];
+      my $code = eval { $style{$name}->emit($spec) };
+      my $err  = $@;
+      ok !defined($code) && $err, "$name: extra_statements method is checked";
+      like $err, qr/extra_statements method/, "$name: the message names the key";
+      unlike $err, qr/BEGIN|\$ENV/, "$name: the message carries no value";
+
+      $spec = $base->();
+      $spec->{relationships} = [ { method => $bad, args => [ 'r', 'X', { 'foreign.a' => 'self.a' }, {} ] } ];
+      $code = eval { $style{$name}->emit($spec) };
+      $err  = $@;
+      ok !defined($code) && $err, "$name: relationship method is checked";
+      like $err, qr/relationship method/, "$name: the message names the key";
+      unlike $err, qr/BEGIN|\$ENV/, "$name: the message carries no value";
+    }
+
+    # An identifier that is no relationship method is refused for a relation.
+    my $spec = $base->();
+    $spec->{relationships} = [ { method => 'unlink', args => [ 'r', 'X', { 'foreign.a' => 'self.a' }, {} ] } ];
+    ok !defined(eval { $style{$name}->emit($spec) }) && $@,
+      "$name: a relationship method must be a known relationship method";
+
+    # The known ones and a driver's identifier-shaped statement go through.
+    for my $m (qw/belongs_to has_many has_one might_have many_to_many/) {
+      $spec = $base->();
+      $spec->{relationships} = [ { method => $m, args => [ 'r', 'X', { 'foreign.a' => 'self.a' }, {} ] } ];
+      ok defined(eval { $style{$name}->emit($spec) }), "$name: $m is emitted";
+    }
+    $spec = $base->();
+    $spec->{extra_statements} = [ [ pg_index => 'i', { columns => ['a'] } ] ];
+    ok defined(eval { $style{$name}->emit($spec) }), "$name: an identifier method is emitted";
+  }
+}
+
+# --- Vanilla extra_statements: a string is a string, code is a scalar ref ----
+{
+  my $hostile = qq{x'); BEGIN { $PAYLOAD } ('};
+  my $spec = {
+    moniker => 'V', class => 'Verbatim::Test', table => 'v',
+    column_order => [qw/a/],
+    columns => { a => { data_type => 'integer', is_nullable => 0 } },
+    pk => [qw/a/], uniq => [], relationships => [],
+    extra_statements => [ [ add_columns => $hostile, 'my-name', 'plain' ] ],
+    is_view => 0, view_definition => undef,
+    result_base_class => 'DBIO::Core', components => [], additional_classes => [],
+  };
+  my $code = DBIO::Generate::Style::Vanilla->emit($spec);
+  my ($ok, $err) = require_generated($code, 'vanilla-verbatim');
+  ok $ok, 'vanilla: plain-string arguments compile' or diag $err;
+  ok !-e $sentinel, 'vanilla: a plain-string argument runs no code';
+  unlink $sentinel if -e $sentinel;
+  like $code, qr/"my-name", "plain"\);/,
+    'vanilla: every plain string is a string literal';
+
+  $spec->{extra_statements} = [ [ add_columns => \'1 + 1', \'[ 1, 2 ]' ] ];
+  $code = DBIO::Generate::Style::Vanilla->emit($spec);
+  like $code, qr/\Q__PACKAGE__->add_columns(1 + 1, [ 1, 2 ]);\E/,
+    'vanilla: a scalar ref is Perl code, written as it is';
+  ($ok, $err) = require_generated($code, 'vanilla-code-ref');
+  ok $ok, 'vanilla: a scalar-ref argument compiles' or diag $err;
 }
 
 ok !-e $sentinel, 'final: sentinel was never created across the whole test';

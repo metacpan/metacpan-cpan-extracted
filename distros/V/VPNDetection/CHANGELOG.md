@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.11.1 - 2026-11-09
+
+### Fixes
+
+- Say how far a short transfer got under Mojolicious 9.54 too ([`9a51c6f`](https://github.com/vpndetection-io/sdk-perl/commit/9a51c6f5e0f6c1a31f7360ca4a640633596f90c6))
+- Re-pin the spec to 2026.11.08: plainer endpoint descriptions ([`253acfc`](https://github.com/vpndetection-io/sdk-perl/commit/253acfc71d022152565f04054591c37da77f3aeb))
+
 ## 3.11.0 - 2026-11-07
 
 ### Features

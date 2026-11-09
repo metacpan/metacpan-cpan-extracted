@@ -27,7 +27,7 @@ into `changed_fields` for it to fire. `changed_column_fields` set it, but driver
 that passed their own field spec to `changed_fields` directly (e.g. PostgreSQL)
 and the sibling comparators `changed_index_fields` / `changed_fk_fields` did not
 — so phantom ALTERs still escaped through the comparators that forgot the flag,
-despite the mechanism being present. (karr core#44.)
+despite the mechanism being present. (k44.)
 
 ## Decision
 
@@ -86,4 +86,4 @@ columns.
   meaningful value (rather than "unspecified") must be declared `bool` (or a new
   group with matching semantics), not `scalar`, or the skip will wrongly hide it.
 - Pins the desired-state half of the diff layer introduced in ADR 0007. Relates
-  to the `changed_*_fields` comparator naming settled in karr #21/#22.
+  to the `changed_*_fields` comparator naming settled in k21/k22.

@@ -113,3 +113,19 @@ relationship is enough to inherit the signal.
 Relates to ADR 0021 (the spelling drift that motivated the version), ADR 0023
 (same ownership principle — bless-the-method's-own-class), and ADR 0026 (the
 1.0 → 1.1 bump recorded there).
+
+## Addendum 2026-10-19 (karr k348)
+
+**The contract version lives on the base classes.** The five base classes carry
+`$CONTRACT_VERSION` and `contract_version()`, and `t/test/12_contract_version.t`
+guards the number. No driver of the family declares the version it was written
+against (`$TESTED_AGAINST_CONTRACT`) or checks it at load time; that declaration
+is not part of the first release.
+
+## Addendum 2026-10-26 (karr k373)
+
+**`DBIO::Storage::DBI::Capabilities` is at `1.3`.** `1.3` adds
+`_adjust_bind_values`, the one seam for adjusting values before they are bound,
+on both bind paths. The other four base classes stay at `1.2`; the shared
+number of the five classes is a convenience (see Consequences), not a
+requirement, and `t/test/12_contract_version.t` holds the number per class.

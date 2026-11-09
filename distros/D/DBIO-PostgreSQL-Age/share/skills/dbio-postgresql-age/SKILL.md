@@ -1,6 +1,6 @@
 ---
 name: dbio-postgresql-age
-description: "DBIO::PostgreSQL::Age driver — Apache AGE graph database, vertices/edges, Cypher queries via cypher(), agtype results"
+description: Load when working on the DBIO::PostgreSQL::Age driver — Apache AGE graph data, vertices and edges, Cypher via cypher(), agtype results.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -10,12 +10,13 @@ model: sonnet
 
 ## Setup
 
-Load component, connect with `load_age` callback so each session runs `LOAD 'age'` and adds `ag_catalog` to `search_path`.
+The schema declares its driver (`-pg`); the Age component is a storage layer and declares none, so a schema with only the component is refused at connect (core ADR 0067). AGE is a database extension of the declared list (core ADR 0066): declare it with `pg_extensions('age')` — loading the component does not. The driver then runs `Age::Extension` in deploy (graph schemas are kept in the model and never dropped); deploy installs the declared extension. Load component, connect with `load_age` callback so each session runs `LOAD 'age'` and adds `ag_catalog` to `search_path`.
 
 ```perl
 package MyApp::Schema;
-use base 'DBIO::Schema';
+use DBIO 'Schema', -pg;
 
+__PACKAGE__->pg_extensions('age');
 __PACKAGE__->load_components('PostgreSQL::Age');
 
 my $schema = MyApp::Schema->connect($dsn, $user, $pass, {
@@ -26,12 +27,6 @@ my $schema = MyApp::Schema->connect($dsn, $user, $pass, {
 });
 
 my $storage = $schema->storage;
-```
-
-If extension not installed:
-
-```perl
-$storage->dbh->do('CREATE EXTENSION IF NOT EXISTS age');
 ```
 
 ## Graph Lifecycle
@@ -118,7 +113,23 @@ my $rows = $storage->cypher(
 
 ## agtype Results
 
-`cypher()` returns `agtype` as strings via DBI. Scalar strings often come back quoted.
+`cypher()` returns `agtype` as strings via DBI. Let it decode them: pass `{ auto_decode => 1 }` as the 5th argument.
+
+```perl
+my $rows = $storage->cypher(
+  'social',
+  q{ MATCH (p:Person {name: $name}) RETURN p, p.age },
+  [qw(person age)],
+  { name => 'Alice' },
+  { auto_decode => 1 },
+);
+# $rows->[0]{person} = { id => ..., label => 'Person', properties => { ... } }
+# $rows->[0]{age}    = 30
+```
+
+Or decode a single cell: `$storage->decode_agtype($cell)`. Vertices and edges come back as `{ id, label, properties }`.
+
+Fallback without auto_decode: scalar strings come back quoted.
 
 ```perl
 sub ag_string {
@@ -156,11 +167,15 @@ $storage->cypher('social', q{
 
 ## Checklist
 
-- `load_components('PostgreSQL::Age')` on schema
+- `use DBIO 'Schema', -pg` (or `load_components('PostgreSQL')`) — the schema names the driver
+- `pg_extensions('age')` and `load_components('PostgreSQL::Age')` on schema
 - `on_connect_call => 'load_age'` in connect attrs
-- `CREATE EXTENSION IF NOT EXISTS age` if needed
 - `$storage->create_graph($name)` before use
 - Always provide `\@columns` matching RETURN exprs
 - Always parameterise; never interpolate
 - Return properties or projected maps for clean agtype parsing
 - `$storage->drop_graph($name, 1)` for test cleanup
+
+## Async
+
+`cypher_async`, `create_graph_async` and `drop_graph_async` (on `$schema->storage->async`, or `cypher_async` on the sync storage) return Futures and take the same arguments, including `{ auto_decode => 1 }`. They run on a **pooled** connection only: inside `txn_do_async` or `pipeline` they execute outside that transaction. For transactional graph work use `$schema->txn_do(sub { $schema->storage->cypher(...) })`.

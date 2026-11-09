@@ -2,12 +2,36 @@ use strict;
 use warnings;
 
 use Test::More;
-BEGIN {
-  plan skip_all => 'Disable test entirely until multicreate is rewritten in terms of subqueries';
-}
-
 use Test::Exception;
 use DBIO::SQLite::Test;
+
+# How many statements a multicreate takes.
+#
+# The INSERT counts say that rows a create converges on -- the same new genre
+# under two cds, the same new artist at both ends of a chain -- are written
+# once, and that a row object handed in is not written again.
+#
+# The SELECT counts say that a multicreate reads nothing. That holds where it
+# has nothing to look up: children of the row being created, and related rows
+# handed in as objects. It does not hold where a related row is given as data:
+# DBIO::Row looks for it with find() before it decides to create it, once
+# when the row is built (__new_related_find_or_new_helper) and once more when
+# it is inserted (insert). Those counts are TODO -- the claim stays, and it
+# was the reason this whole file used to be switched off.
+#
+# Each count covers the create alone: what a case needs from the database
+# beforehand is read before the counters are cleared.
+
+my $TODO_selects =
+  'multicreate looks up a related row given as data with find() before '
+  . 'creating it, in DBIO::Row::__new_related_find_or_new_helper and again '
+  . 'in DBIO::Row::insert; no SELECTs needs a multicreate written in terms '
+  . 'of subqueries';
+
+my $TODO_nested =
+  'data nested under a related row that already exists is dropped -- the '
+  . 'same case as the TODO in t/multi_create/existing_in_chain.t';
+
 my $schema = DBIO::SQLite::Test->init_schema();
 
 my $query_stats;
@@ -55,8 +79,11 @@ lives_ok (sub {
   });
 
   is ( @{$query_stats->{INSERT} || []}, 4, 'number of inserts during creation of artist with 2 cds, converging on the same genre' );
-  is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of artist with 2 cds, converging on the same genre' )
-    || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  {
+    local $TODO = $TODO_selects;
+    is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of artist with 2 cds, converging on the same genre' )
+      || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  }
 });
 
 
@@ -116,13 +143,17 @@ lives_ok (sub {
   });
 
   is ( @{$query_stats->{INSERT} || []}, 6, 'number of inserts during creation of artist->cd->producer->cd->same_artist' );
-  is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of artist->cd->producer->cd->same_artist' )
-    || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  {
+    local $TODO = $TODO_selects;
+    is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of artist->cd->producer->cd->same_artist' )
+      || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  }
 });
 
 lives_ok (sub {
+  my $artist = $schema->resultset ('Artist')->find(1);
   undef $query_stats;
-  $schema->resultset ('Artist')->find(1)->create_related (cds => {
+  $artist->create_related (cds => {
     title => 'cd9',
     year => 2009,
     cd_to_producer => [
@@ -145,16 +176,24 @@ lives_ok (sub {
     ],
   });
 
-  is ( @{$query_stats->{INSERT} || []}, 4, 'number of inserts during creation of existing_artist->cd->existing_producer->cd->existing_artist2' );
-  is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of existing_artist->cd->existing_producer->cd->existing_artist2' )
-    || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  # cd9 and its link are written; cd10 and its link, nested under the producer
+  # the case before this one created, are not
+  {
+    local $TODO = $TODO_nested;
+    is ( @{$query_stats->{INSERT} || []}, 4, 'number of inserts during creation of existing_artist->cd->existing_producer->cd->existing_artist2' );
+  }
+  {
+    local $TODO = $TODO_selects;
+    is ( @{$query_stats->{SELECT} || []}, 0, 'number of selects during creation of existing_artist->cd->existing_producer->cd->existing_artist2' )
+      || $ENV{DBIO_MULTICREATE_DEBUG} && diag join "\n", @{$query_stats->{SELECT} || []};
+  }
 });
 
 lives_ok (sub {
-  undef $query_stats;
-
   my $artist = $schema->resultset ('Artist')->first;
   my $producer = $schema->resultset ('Producer')->first;
+
+  undef $query_stats;
 
   $schema->resultset ('CD')->create ({
     title => 'cd11',

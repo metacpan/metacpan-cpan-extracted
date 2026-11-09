@@ -24,12 +24,12 @@ name is not declared, *discover* which generator feeds a given column.
 Map DBIO's generator/auto-nextval surface onto Firebird's generator model in
 `DBIO::Firebird::Storage::Common`:
 
-- **Fetch next value** — `_sequence_fetch` (`Storage/Common.pm:30-44`) accepts
+- **Fetch next value** — `_sequence_fetch` (in `Storage/Common.pm`) accepts
   only `nextval` (throws otherwise) and a sequence name (throws if missing),
   then runs
   `SELECT GEN_ID(<quoted seq>, 1) FROM rdb$database` and returns the value.
 - **Discover the generator name** — `_dbh_get_autoinc_seq`
-  (`Storage/Common.pm:46-85`) recovers the generator backing an `auto_nextval`
+  (in `Storage/Common.pm`) recovers the generator backing an `auto_nextval`
   column by parsing trigger source. It queries `rdb$triggers` for the table's
   user-defined (`rdb$system_flag = 0`) `BEFORE INSERT`
   (`rdb$trigger_type = 1`) triggers, then on each trigger source:

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.21';
+$Finance::Tiller2QIF::VERSION = '1.23';
 use 5.036;
 use strict;
 use warnings;
@@ -78,10 +78,14 @@ suppresses duplicates (card-payment credits), and assigns destination accounts.
   # or
   cpanm Finance::Tiller2QIF
 
+=head2 Supported Platforms
+
+Supported platforms are Strawberry Perl on Windows, macOS, Linux and BSD distributions (FreeBSD, NetBSD, OpenBSD, DragonflyBSD). Cygwin is not supported and installation is refused. Other platforms, such as Haiku, Solaris and AIX, are unsupported but not blocked from installation.
+
 =head2 Perl Dependencies
 
 Runtime: Cpanel::JSON::XS, DateTime::Format::Flexible, DBD::SQLite, DBI,
-Getopt::Long::Descriptive, Path::Tiny, Text::CSV
+Getopt::Long::Descriptive, Path::Tiny, Text::CSV; on Windows also Win32::ShellQuote
 
 Testing: Capture::Tiny, Test2::V0, Test2::Bundle::More, Test2::Tools::Exception
 
@@ -96,7 +100,7 @@ All of Tiller2QIF’s dependencies are available through package management if y
 
 =head3 On Windows
 
-tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN.
+tiller2qif works with Strawberry Perl, after installing Strawberry Perl, install from CPAN. tiller2qif cannot be installed to ActivePerl and Cygwin.
 
 =head1 CLI COMMANDS
 

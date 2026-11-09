@@ -3,9 +3,13 @@ package DBIO::Schema::ModelCompiler;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use Carp qw/croak/;
 use DBIO::Schema::Type ();
 use namespace::clean;
+
 
 sub new {
   my ($class, %args) = @_;
@@ -13,7 +17,9 @@ sub new {
   bless { %args }, $class;
 }
 
+
 sub adapter { $_[0]->{adapter} }
+
 
 sub compile {
   my ($self, $schema) = @_;
@@ -65,7 +71,42 @@ DBIO::Schema::ModelCompiler - compile a base-type schema into one engine's nativ
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
+
+=head1 SYNOPSIS
+
+    my $compiler = DBIO::Schema::ModelCompiler->new(adapter => $adapter);
+    my $model    = $compiler->compile($schema);
+
+=head1 DESCRIPTION
+
+Walks every source of a DBIO schema, normalises each column to its base type
+through L<DBIO::Schema::Type/canonical_column>, and asks an adapter (see
+L<DBIO::Adapter::Base>) for the engine-native type. The result is a plain
+target model for one engine.
+
+=head1 METHODS
+
+=head2 new
+
+    my $compiler = DBIO::Schema::ModelCompiler->new(adapter => $adapter);
+
+Croaks unless C<adapter> is given. All arguments are kept on the object.
+
+=head2 adapter
+
+Returns the adapter passed to L</new>.
+
+=head2 compile
+
+    my $model = $compiler->compile($schema);
+
+Returns C<< { tables => { $table_name => $table, ... } } >>, one entry per
+source whose C<name> is a plain string (virtual views with a scalar-ref name
+are skipped). Each C<$table> is C<< { table_name, columns => [...],
+primary_key => [...] } >>, and each column is C<< { column_name, native_type,
+not_null, default, is_pk, auto_increment } >>, with C<native_type> coming from
+the adapter's C<to_native>.
 
 =head1 AUTHOR
 

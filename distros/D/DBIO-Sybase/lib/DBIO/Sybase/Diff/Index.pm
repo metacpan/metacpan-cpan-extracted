@@ -4,7 +4,12 @@ package DBIO::Sybase::Diff::Index;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::Diff::Compare qw(changed_index_fields);
+use DBIO::Sybase::Quote ();
+
+my $q = \&DBIO::Sybase::Quote::quote_ident;
 
 
 sub diff {
@@ -14,8 +19,8 @@ sub diff {
   my @ops;
 
   for my $table (sort keys %$target) {
-    my $s_idx = $source->{$table} // {};
-    my $t_idx = $target->{$table} // {};
+    my $s_idx = _without_pk($source->{$table});
+    my $t_idx = _without_pk($target->{$table});
 
     for my $name (sort keys %$t_idx) {
       if (exists $s_idx->{$name}) {
@@ -47,6 +52,13 @@ sub diff {
   return @ops;
 }
 
+sub _without_pk {
+  my ($set) = @_;
+  $set //= {};
+  return { map { $_ => $set->{$_} }
+    grep { ($set->{$_}{origin} // '') ne 'pk' } keys %$set };
+}
+
 package DBIO::Sybase::Diff::Index::Create;
 use base 'DBIO::Diff::Op';
 
@@ -54,9 +66,10 @@ __PACKAGE__->mk_diff_accessors(qw(table idx));
 
 sub as_sql {
   my $self = shift;
-  my $cols = join(', ', @{$self->idx->{columns}});
+  my $cols = join(', ', map { $q->($_) } @{$self->idx->{columns}});
   my $unique = $self->idx->{is_unique} ? 'UNIQUE ' : '';
-  "CREATE ${unique}INDEX $self->{idx}{index_name} ON $self->{table} ($cols)";
+  sprintf 'CREATE %sINDEX %s ON %s (%s);',
+    $unique, $q->($self->idx->{index_name}), $q->($self->table), $cols;
 }
 sub summary {
   my $self = shift;
@@ -70,11 +83,12 @@ __PACKAGE__->mk_diff_accessors(qw(table from to));
 
 sub as_sql {
   my $self = shift;
-  my $tbl     = $self->table;
-  my $cols    = join(', ', @{$self->to->{columns}});
+  my $tbl     = $q->($self->table);
+  my $cols    = join(', ', map { $q->($_) } @{$self->to->{columns}});
   my $unique  = $self->to->{is_unique} ? 'UNIQUE ' : '';
   # DROP and CREATE since Sybase ASE does not support ALTER INDEX
-  "DROP INDEX $tbl.$self->{from}{index_name}; CREATE ${unique}INDEX $self->{to}{index_name} ON $tbl ($cols)";
+  sprintf 'DROP INDEX %s.%s; CREATE %sINDEX %s ON %s (%s);',
+    $tbl, $q->($self->from->{index_name}), $unique, $q->($self->to->{index_name}), $tbl, $cols;
 }
 sub summary {
   my $self = shift;
@@ -88,7 +102,7 @@ __PACKAGE__->mk_diff_accessors(qw(table idx));
 
 sub as_sql {
   my $self = shift;
-  "DROP INDEX $self->{table}.$self->{idx}{index_name}";
+  sprintf 'DROP INDEX %s.%s;', $q->($self->table), $q->($self->idx->{index_name});
 }
 sub summary {
   my $self = shift;
@@ -109,11 +123,19 @@ DBIO::Sybase::Diff::Index - Diff Sybase ASE indexes
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Compares two index sets and generates index-level diff operations.
+
+An index marked C<< origin => 'pk' >> -- the one ASE builds for a C<PRIMARY
+KEY> constraint -- is left out on both sides. It is named by the server
+(C<artist_5760020521>, the object id appended), so two deployments of the same
+C<CREATE TABLE> never agree on its name and a name-keyed comparison would
+drop and re-create it on every diff; ASE also refuses C<DROP INDEX> on it
+("drop the constraint instead"). The primary key belongs to the table
+definition, not to this module.
 
 =head1 AUTHOR
 

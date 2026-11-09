@@ -54,4 +54,12 @@ is( format_commas(-0.001), '0.00', 'rounds to zero, so no sign' );
 is( format_commas(1e20), '100,000,000,000,000,000,000.00', '1e20 groups as digits' );
 is( format_commas(1e15), '1,000,000,000,000,000.00',       '1e15 groups as digits' );
 
+# --- Infinity and NaN are returned as perl prints them, which differs between
+# --- perls ("Inf" from 5.22, "inf" on 5.10.1); 0.023 gave "Inf.NaN".
+my $inf = 9**9**9;
+my $nan = -sin($inf);
+is( format_commas($inf),  "$inf",     'Inf is returned unchanged' );
+is( format_commas(-$inf), "${\-$inf}", '-Inf is returned unchanged' );
+is( format_commas($nan),  "$nan",     'NaN is returned unchanged' );
+
 done_testing;

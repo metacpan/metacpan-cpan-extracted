@@ -4,7 +4,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 ## Version
 
-Version 0.55
+Version 0.56
 
 ## Description
 
@@ -542,6 +542,11 @@ string which is taken to be `directory`.
     Field separator for CSV/PSV files.
     Default is `!` - pass `sep_char => ','`
     for standard comma-separated files.
+
+    A quote inside a quoted field may be written as two quotes
+    (`"a ""b"" c"`, as RFC 4180 and spreadsheets write it) or with a backslash
+    (`"a \"b\" c"`).  Each file is read with the one it uses: a backslash when
+    the file holds a backslash before a quote anywhere, otherwise the quote.
 
 - `max_slurp_size`
 

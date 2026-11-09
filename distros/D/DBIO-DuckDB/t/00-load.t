@@ -8,11 +8,15 @@ use Test::More;
 my @modules = qw(
   DBIO::DuckDB
   DBIO::DuckDB::Test
+  DBIO::DuckDB::Test::Conformance
   DBIO::DuckDB::Storage
+  DBIO::DuckDB::Arrow
   DBIO::DuckDB::SQLMaker
   DBIO::DuckDB::DDL
   DBIO::DuckDB::DDL::Emit
   DBIO::DuckDB::Deploy
+  DBIO::DuckDB::Extension
+  DBIO::DuckDB::Util
   DBIO::DuckDB::Introspect
   DBIO::DuckDB::Introspect::Tables
   DBIO::DuckDB::Introspect::Columns
@@ -22,6 +26,7 @@ my @modules = qw(
   DBIO::DuckDB::Diff::Table
   DBIO::DuckDB::Diff::Column
   DBIO::DuckDB::Diff::Index
+  DBIO::DuckDB::Diff::Rebuild
   DBIO::Shortcut::du
 );
 

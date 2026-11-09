@@ -1,5 +1,9 @@
 Revision history for Perl extension Monoceros
 
+0.30 2026-11-09T04:28:20Z
+
+  - Limit sysread size
+
 0.29 2023-11-09T09:55:36Z
 
   - Failsafes for stale process trees after reloads #9

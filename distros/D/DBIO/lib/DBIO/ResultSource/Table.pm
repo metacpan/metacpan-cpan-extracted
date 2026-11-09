@@ -4,6 +4,8 @@ package DBIO::ResultSource::Table;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::ResultSet;
 
 use base qw/DBIO::Base/;
@@ -27,7 +29,7 @@ DBIO::ResultSource::Table - Table object
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 

@@ -281,19 +281,19 @@ $schema->is_executed_querycount( sub {
       elsif ($cd->year == 1976) {
         is( scalar $cd->tracks, 2, 'Two tracks on 1976 cd' );
         like( $_->title, qr/^o\d/, "correct title" )
-          for $cd->tracks;
+          for $cd->tracks->all;
         is( $cd->single_track, undef, 'no single_track on 1976 cd' );
       }
       elsif ($cd->year == 1981) {
         is( scalar $cd->tracks, 4, 'Four tracks on 1981 cd' );
         like( $_->title, qr/^m\d/, "correct title" )
-          for $cd->tracks;
+          for $cd->tracks->all;
         is( $cd->single_track, undef, 'no single_track on 1981 cd' );
       }
       elsif ($cd->year == 1978) {
         is( scalar $cd->tracks, 3, 'Three tracks on 1978 cd' );
         like( $_->title, qr/^e\d/, "correct title" )
-          for $cd->tracks;
+          for $cd->tracks->all;
         ok( defined $cd->single_track, 'single track prefetched on 1987 cd' );
         is( $cd->single_track->cd->artist->id, 1, 'Single_track->cd->artist prefetched on 1978 cd' );
         is( scalar $cd->single_track->cd->artist->cds, 6, '6 cds prefetched on artist' );

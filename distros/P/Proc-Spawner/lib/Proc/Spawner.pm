@@ -40,8 +40,8 @@ package Proc::Spawner;
 #        too, to the posix_spawn extensions this build's libc lacks (chdir, fchdir, closefrom, tcsetpgrp,
 #        pidfd, cgroup; Makefile.PL compiles a call to each): 'fail' fails with ENOTSUP.  EXPERIMENTAL
 #   on_read(FD, N, CODE)       one read of at most N bytes when FD is readable: CODE->(BYTES), undef at end of file
-#   on_write(FD, BYTES, CODE)  writes BYTES as the reader takes them; CODE->() when all is written or the
-#                              reader is gone.  FD: a handle (made non-blocking) or an fd number (left as it is)
+#   on_write(FD, BYTES, CODE)  writes BYTES as the reader takes them; CODE->() when all is written, or
+#                              CODE->(ERRNO) when a write failed (the reader is gone: EPIPE).  FD: a handle (made non-blocking) or an fd number (left as it is)
 #   defer(CODE, ARGS)          queues CODE->(ARGS)
 #   poll()                     runs what is ready now (queued calls, ended children, ready fds) without
 #                              waiting; does nothing inside wait_until or a callback (EXPERIMENTAL, post-0.04)
@@ -63,7 +63,7 @@ use strict; use warnings;
 use POSIX (); use File::Spec ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
 
@@ -120,10 +120,28 @@ for (grep !/^(?:posix_spawn|fork)\z/, @ASKED) {
   $MISSING |= $BIT{$_} }
 sub missing { my $m = @_ ? shift : $MISSING; grep $m & $BIT{$_}, @FEATURES }   # the names in a bitmap
 
+our %WINJOB = (AS => 'ProcessMemoryLimit', DATA => 'ProcessMemoryLimit', CPU => 'PerProcessUserTimeLimit',
+               NPROC => 'ActiveProcessLimit');   # W4's mapping of rlimit (approximate: see the POD)
+my %CLASS_NICE = (idle => 19, below_normal => 5, normal => 0, above_normal => -5, high => -10, realtime => -20);
+sub win_job_for_rlimit {   # W4: rlimit entries as win_job limits (approximate); also the resources with no counterpart
+  my (%job, @none);
+  for (@{+shift}) {
+    my ($res, $soft, $hard) = @$_; (my $k = uc($res // '')) =~ s/^RLIMIT_//;
+    my ($lim) = grep defined && $_ ne 'unlimited' && $_ ne 'infinity', $soft, $hard;   # the one that acts first
+    my $w = $WINJOB{$k} or do { push @none, $k; next };
+    next unless defined $lim;
+    $lim *= 10_000_000 if $k eq 'CPU';   # seconds -> 100-ns units
+    $job{$w} = defined $job{$w} && $job{$w} < $lim ? $job{$w} : $lim }
+  (\%job, @none) }
+sub win_class_for_nice {   # W4: a nice increment as a priority class, from ours (approximate; never realtime)
+  my $n = ($CLASS_NICE{defined &__win_priority_class ? __win_priority_class() : 'normal'} // 0) + shift;
+  $n >= 10 ? 'idle' : $n >= 1 ? 'below_normal' : $n == 0 ? 'normal' : $n > -10 ? 'above_normal' : 'high' }
+
 sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), with what it lacks done around it
   my ($file, $argv, $envp, $acts, $attr, $uns) = @_;
   if (!$FALLBACK) {
-    return __posix_spawn(@_) unless $MISSING && (!defined $uns || ref $uns eq 'HASH');   # (its errors)
+    my $winonly = !$WIN && ref $attr eq 'HASH' && grep defined $attr->{$_}, qw(win_priority win_job);   # (W4: refused here)
+    return __posix_spawn(@_) unless ($MISSING || $winonly) && (!defined $uns || ref $uns eq 'HASH');   # (its errors)
     ref $acts eq 'ARRAY' && (!defined $attr || ref $attr eq 'HASH') or return __posix_spawn(@_) }   # its errors
   else {   # the same errors as __posix_spawn's
     !defined $uns || ref $uns eq 'HASH' or die "Proc::Spawner::spawn: unsupported must be a hash reference\n";
@@ -135,6 +153,16 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
   my $refuse = sub {   # an unsupported setting: true (and $! = ENOTSUP) to fail, false to drop it
     my $n = shift; my $v = ($uns && $uns->{$n}) // $UNSUPPORTED{$n} // $UNSUPPORTED{'*'} // 'fail';
     $v eq 'drop' ? 0 : do { $! = POSIX::ENOTSUP(); 1 } };
+  if ($WIN) {   # W4 (the user, 2026-11-08: "(c) and (b); (c) beats (b) if present"): nice and rlimit mapped to what Windows
+    # has per child, approximately; win_priority and win_job, Windows' own settings, exact, win over the mapping
+    if ($at{nice}) { $at{win_priority} //= win_class_for_nice($at{nice}) } delete $at{nice};
+    if (ref $at{rlimit} eq 'ARRAY' && @{$at{rlimit}}) {
+      my ($job, @none) = win_job_for_rlimit($at{rlimit});
+      for (@none) { return if $refuse->('rlimit') }   # (no Windows counterpart; drop: the rest still mapped)
+      $at{win_job} = { %$job, %{$at{win_job} // {}} } if %$job }
+    delete $at{rlimit} }
+  elsif (grep defined $at{$_}, qw(win_priority win_job)) {   # Windows' own settings elsewhere
+    for (qw(win_priority win_job)) { next unless defined $at{$_}; return if $refuse->($_); delete $at{$_} } }
   if ($WIN && ref $at{sigignore} eq 'ARRAY') {   # what a Windows child does anyway (post-0.08): there is no SIGPIPE, and
     # Ctrl-C is off in a new process group (Perl's kill INT, GenerateConsoleCtrlEvent, does not reach it either)
     my $group = $PRIMITIVE eq 'system1' || $WINDOWS{new_group} || defined $at{pgroup} && !$at{pgroup};
@@ -318,14 +346,14 @@ my %RLIMIT = defined &__rlimits ? __rlimits() : ();
 sub rlimits {   # { NAME => SOFT | [SOFT, HARD] } as spawn's [[RESOURCE, SOFT, HARD], ...]; NAME: NOFILE, RLIMIT_NOFILE or a number
   my $h = shift;
   map { my ($n, $v) = ($_, $h->{$_}); (my $k = uc $n) =~ s/^RLIMIT_//;
-        my $r = $RLIMIT{$k} // ($n =~ /^[0-9]+\z/ ? $n : die "Proc::Spawner: unknown resource '$n'\n");
+        my $r = $WIN ? $k : $RLIMIT{$k} // ($n =~ /^[0-9]+\z/ ? $n : die "Proc::Spawner: unknown resource '$n'\n");   # (Windows: the name, W4)
         [$r, ref $v ? @$v[0, 1] : ($v, undef)] } sort keys %$h }
 sub start {
   my ($path, $argv, $envp, $fds, %o) = @_;
   my @a = ((map [$_ => $o{$_}], grep defined $o{$_}, qw(chdir fchdir)), actions($fds),
            defined $o{tcsetpgrp} ? [tcsetpgrp => $o{tcsetpgrp}] : ());
   my %attr = (sigmask => [signums($o{sigmask})], sigdefault => [signums($o{sigdefault})],
-              map +($_ => $o{$_}), grep exists $o{$_}, qw(pgroup setsid resetids sched cgroup search pidfd nice));
+              map +($_ => $o{$_}), grep exists $o{$_}, qw(pgroup setsid resetids sched cgroup search pidfd nice win_priority win_job));
   $attr{sigignore} = [signums($o{sigignore})] if $o{sigignore};
   $attr{rlimit} = [rlimits($o{rlimit})] if $o{rlimit};
   my $um = defined $o{umask} && umask $o{umask};
@@ -387,8 +415,9 @@ sub turn {   # one queued call, or one round of waiting (at most $timeout second
     my $w = $WR{$id}; next unless vec($wout, $w->[0], 1);
     my $did = POSIX::write($w->[0], $w->[1], $w->[3] && $w->[3] < length $w->[1] ? $w->[3] : length $w->[1]);
     next if !defined $did && $! == POSIX::EAGAIN();
-    substr($w->[1], 0, $did // length $w->[1]) = '';   # an error (the reader is gone) ends the write
-    defer((delete $WR{$id})->[2]) if $w->[1] eq '' }
+    $w->[4] = $! + 0 unless defined $did;              # an error (the reader is gone) ends the write: the callback gets it
+    substr($w->[1], 0, $did // length $w->[1]) = '';
+    defer((delete $WR{$id})->[2], $w->[4]) if $w->[1] eq '' }
   1 }
 sub poll {   # between waits (K3, the user's choice B, post-0.04): what is ready now, without waiting
   return if $REACTING || $DEPTH;
@@ -455,9 +484,27 @@ not be put back is unsupported (C<\%UNSUPPORTED> below): a hard limit lower
 than ours without C<CAP_SYS_RESOURCE>; a higher nice value unless
 C<CAP_SYS_NICE> or C<RLIMIT_NICE> allows lowering it back; a CPU limit this
 process has used up; ignoring C<SIGCHLD>.  A signal both ignored and set to
-the default fails with C<EINVAL>.  On Windows C<rlimit> and C<nice> are
-unsupported, and C<sigignore> is too, but for C<PIPE> (no SIGPIPE there) and
-C<INT> in a new process group (Ctrl-C is off there), which need nothing.
+the default fails with C<EINVAL>.  On Windows C<sigignore> is unsupported
+but for C<PIPE> (no SIGPIPE there) and C<INT> in a new process group (Ctrl-C
+is off there), which need nothing.
+
+On Windows (post-0.09, decision W4) two settings of Windows' own, exact:
+C<< win_priority => 'idle' | 'below_normal' | 'normal' | 'above_normal' |
+'high' | 'realtime' >> (the child's priority class) and C<< win_job =>
+{ ProcessMemoryLimit => BYTES, JobMemoryLimit => BYTES,
+PerProcessUserTimeLimit => TICKS, PerJobUserTimeLimit => TICKS,
+ActiveProcessLimit => N } >> (limits of a job of the child's own, by
+Windows' names and units: committed memory, user time in 100-ns ticks;
+nested in the job of C<kill_with_parent>, which needs Windows 8).
+C<nice> and C<rlimit> are mapped to them, approximately: C<nice> from this
+process's class to the class whose nice value is nearest (10 and up
+C<idle>, 1 to 9 C<below_normal>, -1 to -9 C<above_normal>, -10 and below
+C<high>, never C<realtime>); C<rlimit> C<AS> and C<DATA> to
+C<ProcessMemoryLimit>, C<CPU> to C<PerProcessUserTimeLimit>, C<NPROC> to
+C<ActiveProcessLimit> (the soft value if set, else the hard one: Windows has
+one limit, and ends the child at it); the other resources have no
+counterpart and are unsupported.  Where both are given, C<win_priority> and
+C<win_job> win.  Elsewhere C<win_priority> and C<win_job> are unsupported.
 
 Without posix_spawn (F<Makefile.PL> found none, or
 C<PROC_SPAWNER_MISSING=posix_spawn>), C<spawn> forks and execs, in C, with

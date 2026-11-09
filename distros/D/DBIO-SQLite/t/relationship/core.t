@@ -9,16 +9,16 @@ my $schema = DBIO::SQLite::Test->init_schema();
 
 # has_a test
 my $cd = $schema->resultset("CD")->find(4);
-my ($artist) = $cd->search_related('artist');
+my ($artist) = $cd->search_related('artist')->all;
 is($artist->name, 'Random Boy Band', 'has_a search_related ok');
 
 # has_many test with an order_by clause defined
 $artist = $schema->resultset("Artist")->find(1);
-my @cds = $artist->search_related('cds');
+my @cds = $artist->search_related('cds')->all;
 is( $cds[1]->title, 'Spoonful of bees', 'has_many search_related with order_by ok' );
 
 # search_related with additional abstract query
-@cds = $artist->search_related('cds', { title => { like => '%of%' } } );
+@cds = $artist->search_related('cds', { title => { like => '%of%' } } )->all;
 is( $cds[1]->title, 'Forkful of bees', 'search_related with abstract query ok' );
 
 # creating a related object
@@ -27,7 +27,7 @@ $artist->create_related( 'cds', {
   year => 2005,
 } );
 
-my $big_flop_cd = ($artist->search_related('cds'))[3];
+my $big_flop_cd = ($artist->search_related('cds')->all)[3];
 is( $big_flop_cd->title, 'Big Flop', 'create_related ok' );
 
 # make sure we are not making pointless select queries when a FK IS NULL
@@ -80,7 +80,7 @@ $track = $schema->resultset("Track")->create( {
 } );
 $track->update_from_related( cd => $cd );
 
-my $t_cd = ($schema->resultset("Track")->search({ cd => 4, title => 'Hidden Track 2' }))[0]->cd;
+my $t_cd = ($schema->resultset("Track")->search({ cd => 4, title => 'Hidden Track 2' })->all)[0]->cd;
 
 is( $t_cd->cdid, 4, 'update_from_related ok' );
 
@@ -95,8 +95,8 @@ $cd = $artist->find_or_create_related( 'cds', {
 } );
 is( $cd->title, 'Greatest Hits', 'find_or_create_related new record ok' );
 
-@cds = $artist->search_related('cds');
-is( ($artist->search_related('cds'))[4]->title, 'Greatest Hits', 'find_or_create_related new record search ok' );
+@cds = $artist->search_related('cds')->all;
+is( ($artist->search_related('cds')->all)[4]->title, 'Greatest Hits', 'find_or_create_related new record search ok' );
 
 $artist->delete_related( cds => { title => 'Greatest Hits' });
 cmp_ok( $schema->resultset("CD")->search({ title => 'Greatest Hits' }), '==', 0, 'delete_related ok' );
@@ -115,12 +115,23 @@ is( $cd->title, 'Greatest Hits 2: Louder Than Ever', 'find_or_new_related new re
 is( $cd->in_storage, 0, 'find_or_new_related on a new record: not in_storage' );
 
 $cd->artist(undef);
+
+# the artist of the cd is NULL: the related resultset holds IS NULL for the key
+# of the artist, a defined key of the caller's contradicts it (ADR 0071)
+throws_ok {
+  $cd->find_or_new_related( 'artist', {
+    name => 'Random Boy Band Two',
+    artistid => 200,
+  }, { key => 'primary' } );
+} qr/create on a scoped resultset: 'artistid' is fixed to NULL by the condition, got a value/,
+  'find_or_new_related new artist record with a key contradicting the NULL foreign key throws';
+unlike $@, qr/\b200\b/, 'the contradicting value is not in the message';
+
 my $newartist = $cd->find_or_new_related( 'artist', {
   name => 'Random Boy Band Two',
-  artistid => 200,
 } );
-is($newartist->name, 'Random Boy Band Two', 'find_or_new_related new artist record with id');
-is($newartist->id, 200, 'find_or_new_related new artist id set');
+is($newartist->name, 'Random Boy Band Two', 'find_or_new_related new artist record');
+is($newartist->in_storage, 0, 'find_or_new_related new artist is not in storage');
 
 lives_ok(
     sub {
@@ -153,7 +164,7 @@ throws_ok {
 
 # many_to_many helper tests
 $cd = $schema->resultset("CD")->find(1);
-my @producers = $cd->producers(undef, { order_by => 'producerid'} );
+my @producers = $cd->producers(undef, { order_by => 'producerid'} )->all;
 is( $producers[0]->name, 'Matt S Trout', 'many_to_many ok' );
 is( $cd->producers_sorted->next->name, 'Bob The Builder',
     'sorted many_to_many ok' );

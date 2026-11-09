@@ -11,10 +11,16 @@ my $last_obj = $rs->search ({}, { order_by => { -desc => 'artistid' }, rows => 1
 my $last_id = $last_obj ? $last_obj->artistid : 0;
 
 my $obj;
+
+# On libsqlite 3.35+ the driver declares insert_returning, so the autoinc PK is
+# fetched straight off the INSERT instead of via last_insert_id afterwards.
+my $expected_insert_sql = 'INSERT INTO "artist" DEFAULT VALUES'
+  . ( $schema->storage->_use_insert_returning ? ' RETURNING "artistid"' : '' );
+
 $schema->is_executed_sql_bind( sub {
   $obj = $rs->create ({})
 }, [[
-  'INSERT INTO "artist" DEFAULT VALUES'
+  $expected_insert_sql
 ]], 'Default-value insert correct SQL' );
 
 ok ($obj, 'Insert defaults ( $rs->create ({}) )' );

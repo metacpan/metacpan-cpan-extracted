@@ -28,7 +28,7 @@ plan tests => 4;
 my $item = $schema->resultset("SelfRef")->find( 1 );
 is( $item->name, 'First', 'proper start item' );
 
-my @aliases = $item->aliases;
+my @aliases = $item->aliases->all;
 
 is( scalar @aliases, 1, 'proper number of aliases' );
 

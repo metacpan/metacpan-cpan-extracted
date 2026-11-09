@@ -28,6 +28,8 @@ Arguments:
   --schema=CLASS        Alias for --schema-class
   --connect=JSON        connect_info as JSON, e.g. ["dsn","user","pass",{}]
   --connect-info        connect_info as key=value pairs (dsn=... user=...)
+  --password-env=VAR    password from the environment variable VAR
+  --password-stdin      password from one line of STDIN (no echo on a terminal)
   --config=FILE         Config file parsable by Config::Any
   --config-stanza=PATH  Stanza path for connect_info (e.g. Model::DB)
   --resultset=CLASS     Resultset to operate on for select/insert/update/delete
@@ -38,7 +40,10 @@ Arguments:
   --attrs=JSON          JSON attrs hash for search
   --where=JSON          JSON where hash for search
   --format=FMT          select output format: tsv|csv (default: tsv)
+  --all                 Allow update/delete without --where (the whole resultset)
   --force               Skip confirmation prompts for destructive actions
+                        (for --upgrade: release a diff that drops or alters data)
+  --dry-run             With --upgrade: print the summary and the SQL, run nothing
   --trace               Enable DBIO SQL trace output
   --quiet               Reduce output
   -I PATH               Prepend PATH to \@INC (repeatable)
@@ -62,6 +67,8 @@ GetOptions(
   'schema-class|schema=s' => \$opts{schema_class},
   'connect=s'       => \$opts{connect},
   'connect-info=s%' => \$opts{connect_info_hash},
+  'password-env=s'  => \$opts{password_env},
+  'password-stdin'  => \$opts{password_stdin},
   'config|config-file=s' => \$opts{config_file},
   'config-stanza=s' => \$opts{config_stanza},
   'resultset|resultset-class|class=s' => \$opts{resultset},
@@ -71,7 +78,9 @@ GetOptions(
   'attrs=s'         => \$opts{attrs},
   'where=s'         => \$opts{where},
   'format=s'        => \$opts{format},
+  'all'             => \$opts{all},
   'force'           => \$opts{force},
+  'dry-run'         => \$opts{dry_run},
   'trace'           => \$opts{trace},
   'quiet'           => \$opts{quiet},
   'I=s@'            => \@include_paths,
@@ -113,11 +122,25 @@ elsif ($opts{connect_info_hash}) {
 }
 
 for my $key (qw(config_file config_stanza resultset sql_dir
-                mode set attrs where force trace quiet)) {
+                mode set attrs where all force dry_run trace quiet)) {
   $admin_args{$key} = $opts{$key} if defined $opts{$key};
 }
 
 my $admin = DBIO::Admin->new(%admin_args);
+
+# The password is not an argument of this command (ps and the shell history
+# show those): it comes from the environment or STDIN and is set in the
+# connect info, wherever that came from.
+require DBIO::Util;
+my $password = DBIO::Util::password_from_source(
+  env => $opts{password_env}, stdin => $opts{password_stdin},
+);
+if (defined $password) {
+  my $info = $admin->connect_info;
+  if (ref $info eq 'ARRAY' and ref $info->[0] eq 'HASH') { $info->[0]{password} = $password }
+  elsif (ref $info eq 'ARRAY') { $info->[2] = $password }
+  elsif (ref $info eq 'HASH')  { $info->{password} = $password }
+}
 print "Performing action $action...\n" if !$opts{quiet};
 
 my $res = eval { $admin->$action(); };
@@ -161,7 +184,7 @@ dbioadmin - CLI for DBIO schema administration
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -209,7 +232,9 @@ result sources defined in the schema class.
 =item B<--upgrade>
 
 Upgrade the database to the current schema version. The upgrade strategy is
-controlled by C<--mode>.
+controlled by C<--mode>. A diff that drops or may alter stored data is listed
+and runs after the confirmation C<YES> (or with C<--force>); operations the
+deploy refuses never run. C<--dry-run> shows the diff without running it.
 
 =item B<--select>
 
@@ -258,6 +283,19 @@ Connection info as a JSON array, e.g.
 C<'["dbi:Pg:dbname=myapp","user","pass",{}]'>. The four elements are DSN,
 username, password, and DBI attributes.
 
+=item B<--password-env=VAR>
+
+The password is the value of the environment variable C<VAR>. It is set in the
+connection info, whether that came from C<--connect>, C<--connect-info> or the
+config file. A password in C<--connect> or C<--connect-info> stands in the
+argument list, which C<ps> and the shell history show: give it by
+C<--password-env> or C<--password-stdin>.
+
+=item B<--password-stdin>
+
+The password is the first line of C<STDIN>; on a terminal it is asked for
+without echo. Not together with C<--password-env>.
+
 =item B<--connect-info key=value>
 
 Connection info as individual key-value pairs. Pass multiple times:
@@ -266,7 +304,9 @@ C<--connect-info dsn=dbi:Pg:dbname=myapp --connect-info user=me>.
 =item B<--config=FILE>
 
 Config file parseable by L<Config::Any> (YAML, JSON, etc.). Used together
-with C<--config-stanza> to locate connection info.
+with C<--config-stanza> to locate connection info. Config::Any reads the
+file by its extension, and a C<.pl> file is run as Perl: name only files of
+your own.
 
 =item B<--config-stanza=PATH>
 
@@ -331,10 +371,22 @@ schema/driver provides no native upgrader.
 Output format for C<--select>: C<tsv> (tab-separated, default) or C<csv>
 (requires L<Text::CSV>).
 
+=item B<--all>
+
+Allow C<--update> and C<--delete> without a condition, over every row of the
+resultset (ADR 0069). Without C<--all>, such a statement fails; give
+C<--where> to restrict it.
+
 =item B<--force>
 
 Skip confirmation prompts for destructive operations (C<--update>,
-C<--delete>).
+C<--delete>). With C<--upgrade> it releases a diff that drops or may alter
+stored data; without it C<dbioadmin> lists those operations and asks for
+C<YES>.
+
+=item B<--dry-run>
+
+With C<--upgrade>: print the summary and the SQL of the diff and run nothing.
 
 =item B<--trace>
 

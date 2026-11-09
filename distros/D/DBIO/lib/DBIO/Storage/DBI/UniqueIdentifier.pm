@@ -3,6 +3,9 @@ package DBIO::Storage::DBI::UniqueIdentifier;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::Storage::DBI';
 use mro 'c3';
 
@@ -82,7 +85,7 @@ DBIO::Storage::DBI::UniqueIdentifier - Storage component for RDBMSes supporting 
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 DESCRIPTION
 

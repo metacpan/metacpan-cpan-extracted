@@ -9,7 +9,8 @@
 Core ADR 0030 defines the async mode registry on `DBIO::Storage::DBI`: a
 schema connected with `connect(..., { async => $mode })` resolves `$mode`
 through the registry to an embedded async backend class. `dbio-postgresql`
-already wires its native `ev` mode at `Storage.pm:75-85`. MySQL currently
+already wires its native `ev` mode with a `register_async_mode( ev => ... )`
+call in `DBIO::PostgreSQL::Storage`. MySQL currently
 has no driver-side registration, so `connect(..., { async => 'ev' })`
 cannot resolve on a MySQL schema even when the `dbio-mysql-ev` dist is
 installed — the resolver walks an empty MRO arm and croaks.
@@ -41,5 +42,5 @@ registration: MRO inheritance resolves `ev` through the parent class.
 ## References
 
 - Core ADR 0030: `../dbio/docs/adr/0030-async-explicit-per-connection-mode.md`
-- PostgreSQL mirror: `../dbio-postgresql/lib/DBIO/PostgreSQL/Storage.pm:75-85`
+- PostgreSQL mirror: the `register_async_mode( ev => ... )` call in `../dbio-postgresql/lib/DBIO/PostgreSQL/Storage.pm`
 - Backend: `../dbio-mysql-ev/lib/DBIO/MySQL/EV/Storage.pm` (optional dist)

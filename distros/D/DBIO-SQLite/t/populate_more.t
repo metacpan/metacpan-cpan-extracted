@@ -6,7 +6,7 @@ use Test::Exception;
 {
   package PopulateMoreTest::Schema;
   use base 'DBIO::Schema';
-  __PACKAGE__->load_components(qw/PopulateMore/);
+  __PACKAGE__->load_components(qw/SQLite PopulateMore/);
   __PACKAGE__->register_class('Artist' => 'DBIO::Test::Schema::Artist');
   __PACKAGE__->register_class('CD' => 'DBIO::Test::Schema::CD');
   __PACKAGE__->register_class('Genre' => 'DBIO::Test::Schema::Genre');
@@ -31,25 +31,28 @@ $schema->storage->dbh_do(sub {
   }
 });
 
+# populate_more writes each row with update_or_create: the fields of a row give
+# every column of exactly one unique constraint (ADR 0070), here the one on
+# name (Genre, Artist) and on artist and title (CD); the keys are autoincrement.
 # Test basic populate_more with cross-source references
 lives_ok {
   $schema->populate_more([
     { Genre => {
-        fields => [qw/genreid name/],
+        fields => [qw/name/],
         data => {
-          emo => [1, 'emo'],
+          emo => ['emo'],
         }}},
     { Artist => {
-        fields => [qw/artistid name/],
+        fields => [qw/name/],
         data => {
-          caterwauler => [1, 'Caterwauler McCrae'],
-          random      => [2, 'Random Boy Band'],
+          caterwauler => ['Caterwauler McCrae'],
+          random      => ['Random Boy Band'],
         }}},
     { CD => {
-        fields => [qw/cdid artist title year genreid/],
+        fields => [qw/artist title year genreid/],
         data => {
-          spoonful => [1, '!Index:Artist.caterwauler', 'Spoonful of bees', 1999, '!Index:Genre.emo'],
-          forkful  => [2, '!Index:Artist.caterwauler', 'Forkful of bees', 2001],
+          spoonful => ['!Index:Artist.caterwauler', 'Spoonful of bees', 1999, '!Index:Genre.emo'],
+          forkful  => ['!Index:Artist.caterwauler', 'Forkful of bees', 2001],
         }}},
   ]);
 } 'populate_more with Index references succeeds';
@@ -58,7 +61,7 @@ lives_ok {
 is($schema->resultset('Artist')->count, 2, 'Two artists inserted');
 is($schema->resultset('CD')->count, 2, 'Two CDs inserted');
 
-my $cd = $schema->resultset('CD')->find(1);
+my $cd = $schema->resultset('CD')->search({ title => 'Spoonful of bees' })->single;
 is($cd->title, 'Spoonful of bees', 'CD title correct');
 is($cd->artist->name, 'Caterwauler McCrae', 'CD artist relationship resolved via Index');
 
@@ -66,9 +69,9 @@ is($cd->artist->name, 'Caterwauler McCrae', 'CD artist relationship resolved via
 lives_ok {
   $schema->populate_more(
     Artist => {
-      fields => [qw/artistid name/],
+      fields => [qw/name/],
       data => {
-        goth => [3, 'We Are Goth'],
+        goth => ['We Are Goth'],
       }},
   );
 } 'populate_more with flat hash syntax works';
@@ -94,37 +97,37 @@ $ENV{TEST_POPULATE_MORE_NAME} = 'Env Artist';
 lives_ok {
   $schema->populate_more([
     { Artist => {
-        fields => [qw/artistid name/],
+        fields => [qw/name/],
         data => {
-          env_artist => [4, '!Env:TEST_POPULATE_MORE_NAME'],
+          env_artist => ['!Env:TEST_POPULATE_MORE_NAME'],
         }}},
   ]);
 } 'populate_more with Env inflator works';
 
-my $env_artist = $schema->resultset('Artist')->find(4);
+my $env_artist = $schema->resultset('Artist')->find({ name => 'Env Artist' });
 is($env_artist->name, 'Env Artist', 'Env inflator substituted correctly');
 
 # Test !Find inflator
 lives_ok {
   $schema->populate_more([
     { CD => {
-        fields => [qw/cdid artist title year/],
+        fields => [qw/artist title year/],
         data => {
-          found_cd => [3, '!Find:Artist.[artistid=2]', 'Found CD', 2020],
+          found_cd => ['!Find:Artist.[name=Random Boy Band]', 'Found CD', 2020],
         }}},
   ]);
 } 'populate_more with Find inflator works';
 
-my $found_cd = $schema->resultset('CD')->find(3);
+my $found_cd = $schema->resultset('CD')->find({ title => 'Found CD', artist => $schema->resultset('Artist')->find({ name => 'Random Boy Band' })->id });
 is($found_cd->artist->name, 'Random Boy Band', 'Find inflator resolved correctly');
 
 # Test bad Index throws
 throws_ok {
   $schema->populate_more([
     { CD => {
-        fields => [qw/cdid artist title year/],
+        fields => [qw/artist title year/],
         data => {
-          bad => [99, '!Index:Artist.nonexistent', 'Bad', 2020],
+          bad => ['!Index:Artist.nonexistent', 'Bad', 2020],
         }}},
   ]);
 } qr/Bad Index/, 'Bad Index reference throws exception';
@@ -133,9 +136,9 @@ throws_ok {
 throws_ok {
   $schema->populate_more([
     { Artist => {
-        fields => [qw/artistid name/],
+        fields => [qw/name/],
         data => {
-          bad => [99, '!Bogus:whatever'],
+          bad => ['!Bogus:whatever'],
         }}},
   ]);
 } qr/Unknown inflator/, 'Unknown inflator throws exception';

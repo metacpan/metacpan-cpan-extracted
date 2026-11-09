@@ -6814,7 +6814,18 @@ A quoted field is written a run at a time between the quotes it doubles
 rather than one PerlIO_putc() per byte.  Writing each record into one buffer
 and that with a single PerlIO_write() was tried, and was no faster on a
 200000 x 20 table (0.158s against 0.153s): PerlIO's own buffer already
-gathers these writes.*/
+gathers these writes.
+
+The handle is opened binary, so a field's bytes reach the file as they are, and
+the row end is written here: CR LF where perl is a CRLF shop (PERLIO_USING_CRLF,
+Windows), as the :crlf layer used to make it, LF elsewhere.  Up to 0.3417 the
+handle was text-mode, and :crlf also turned an LF inside a quoted field into
+CR LF, so "1\r\n2" reached a Windows file as "1\r\r\n2".*/
+#ifdef PERLIO_USING_CRLF
+#  define WT_EOL "\r\n"
+#else
+#  define WT_EOL "\n"
+#endif
 static void print_string_row(pTHX_ WtSink *restrict S, const WtRow *restrict R){
 	const size_t n = R->n;
 	if (S->xlsx) { wt_xlsx_row(aTHX_ S->xlsx, R); return; }
@@ -6859,7 +6870,7 @@ no flag, and invalid or Latin-1 bytes stay bytes.*/
 		PerlIO_write(fh, f + start, len - start);
 		PerlIO_putc(fh, '"');
 	}
-	PerlIO_putc(fh, '\n');
+	PerlIO_write(fh, WT_EOL, sizeof(WT_EOL) - 1);
 }
 
 static void wt_row_init(pTHX_ WtRow *restrict R, size_t width) {
@@ -28698,7 +28709,7 @@ PPCODE:
 		collect_av = (AV*)sv_2mortal((SV*)newAV());
 		S.collect = collect_av;
 	} else {
-		fh = PerlIO_open(file, "w");
+		fh = PerlIO_open(file, "wb");	// binary: print_string_row() writes the row end itself
 		if (!fh) wt_open_failed(aTHX_ file);
 		*fhp = fh;
 		S.fh = fh;
@@ -28708,25 +28719,17 @@ PPCODE:
   PerlIO_apply_layers() is binmode($fh, ...) and is in perlapio, so this is
   the documented API; the layers are undone again at the end, below.
 
-  The :raw that clears the way for the compressor also drops the newline
-  translation PerlIO_open() gave the handle where perl is a CRLF shop
-  (PERLIO_USING_CRLF in perl.h, which is also what makes :crlf perl's default
-  layer there), so on Windows the text went in with LF while the same call to
-  a plain file wrote CRLF. The top buffer is :crlf there instead of :perlio --
-  it buffers just as :perlio does -- so the compressed file holds exactly the
+  The handle is binary on every platform and print_string_row() writes the
+  platform's row end itself (WT_EOL), so the compressed file holds exactly the
   bytes the plain one would. 0.321 failed t/write_table.compressed.pandas.t on
-  MSWin32 for this.*/
+  MSWin32 when only the plain file was text-mode; 0.321 to 0.3417 put a :crlf
+  buffer on top there to match it, which 0.3418 no longer needs.*/
 	if (fh && compress) {
 		SV *err = get_sv("Stats::LikeR::_Compress::error", GV_ADD);
 		sv_setpvs(err, "");
-#ifdef PERLIO_USING_CRLF
-#  define WT_COMPRESS_TOP ":crlf"
-#else
-#  define WT_COMPRESS_TOP ":perlio"
-#endif
 		if (PerlIO_apply_layers(aTHX_ fh, "w", compress == 1
-				? ":raw:via(Stats::LikeR::_Gzip)" WT_COMPRESS_TOP
-				: ":raw:via(Stats::LikeR::_Bzip2)" WT_COMPRESS_TOP) != 0)
+				? ":raw:via(Stats::LikeR::_Gzip):perlio"
+				: ":raw:via(Stats::LikeR::_Bzip2):perlio") != 0)
 			croak("write_table: could not write '%s' compressed: %" SVf "\n",
 				file, SVfARG(err));
 	}
@@ -28741,7 +28744,7 @@ PPCODE:
 		if (xlsx) wt_xlsx_sheet_end(aTHX_ &X, fhp);
 		FREETMPS; LEAVE;
 	}
-/* A compressed file is finished by popping the buffer (:perlio, or :crlf) and
+/* A compressed file is finished by popping the :perlio buffer and
   then the via layer while the file is still open: the layer's POPPED writes
   the end of the stream, which PerlIO::via gives no later chance to do (the
   reason is at Stats::LikeR::_Compress). A croak above closes the handle without
@@ -28888,7 +28891,11 @@ caller's to close.*/
 			croak("_parse_csv_file: fh is not an open handle");
 		ENTER;
 	} else {
-		fp = PerlIO_open(file, "r");
+/*Binary, as the compressed path's handle is: a text-mode open is :crlf on
+Windows, which turned a CR LF inside a quoted field into LF there and only there,
+so the same file read differently plain and gzipped.  The parser takes CR LF and
+LF line ends itself.*/
+		fp = PerlIO_open(file, "rb");
 		if (!fp)
 			croak("Could not open file '%s'", file);
 		ENTER;

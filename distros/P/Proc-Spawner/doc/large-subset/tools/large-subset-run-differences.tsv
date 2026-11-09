@@ -39,49 +39,33 @@ NB:4623	neither	rec	-	ps -p $$ | awk '$1 == PP {print $4}' PP=$$
 NB:4624	neither	rec	-	ps | grep `echo $$` | awk '{ print $4 }'
 NB:4727	neither	status+out	-	cd -
 NB:4774	neither	rec	-	ps -o pid= --ppid $PPID | xargs kill -9
-NB:4909	msg-own		-	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
 NB:5137	neither	out	-	env | sed 's/;/\\;/g'
 NB:5293	neither	out	-	ls -l /proc/self/fd/
 NB:5298	neither	status	X	bind -f ~/.inputrc
-NB:5390	neither	rec+files	-	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs mkdir
-NB:5391	neither	rec+files	-	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 NB:552	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
 NB:557	msg-own		-	kill -0 1
 NB:562	msg-own		-	[ $(find your/dir -prune -empty) = your/dir ]
 NB:571	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
 NB:5763	msg-own		-	cat somedata.txt | "$outfile"
-NB:5776	OURS	files	-	{ echo foo; cat bar; } | tee bar > /dev/null
-NB:5841	neither	out	-	od -A n -t d -N 1 /dev/urandom
-NB:5874	neither	out	-	od -An -N2 -i /dev/random
-NB:5904	OURS	status+out	-	printf '%0.s-' $(seq 1 $variable)
-NB:5908	neither	out	-	cat /dev/urandom | tr -dc '. ' | fold -w 100 | head -1
 NB:5939	neither	out	-	seq 2000 65000 | sort -R | head -n 1
 NB:6081	neither	rec	-	ps -ef | grep $$ | grep -v grep
 NB:6082	neither	rec	-	ps -p $$
-NB:6161	neither	status+out	-	cat -v /dev/urandom
 NB:6188	neither	rec	-	ps -ef | grep $0 | grep $(whoami)
 NB:6247	neither	rec	-	ps -o user= -p $$ | awk '{print $1}'
 NB:6259	neither	out	-	seq 10 | xargs -P4 -I'{}' echo '{}'
-NB:6276	neither	out	-	cat /dev/urandom | tr -dc 'a-zA-Z0-9'
-NB:6286	neither	out	-	cat /dev/urandom | tr -dC '[:graph:]'
 NB:6343	neither	rec	-	dirname "$(readlink -f "$0")"
 NB:6361	neither	out+rec	-	echo $(basename $(readlink -nf $0))
 NB:6436	neither	rec	-	ps -p $$ | tail -1 | awk '{print $NF}'
 NB:6453	neither	rec	-	echo "dirname/readlink: $(dirname $(readlink -f $0))"
 NB:6484	neither	out	-	tree --help 2>&1 | head -n2
-NB:6487	neither	out	-	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
-NB:6488	neither	out	-	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
-NB:6489	neither	out	-	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
 NB:6627	neither	rec	-	echo `pwd`/`dirname $0`
 NB:6664	neither	out+rec	-	echo $(cat /proc/$$/cmdline)
 NB:6669	neither	out	-	seq -f 'some line %g' 500 | nl | sort -R | cut -f2- | head -3
-NB:6731	OURS	out	-	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
 NB:6758	neither	rec	-	$(dirname $0)
 NB:6759	neither	rec	-	`dirname $0`
 NB:6765	neither	rec	-	echo "dirname: `dirname "$0"`"
 NB:6766	neither	rec	-	echo "dirname: `dirname $0`"
-NB:6799	OURS	out	-	ls -l -- "$dir/$file"
-NB:680	neither	files	-	yes > backingfile &
+NB:6799	neither	out	-	ls -l -- "$dir/$file"
 NB:6800	neither	out+rec	-	ls -l ${0}
 NB:6818	neither	out+files	-	ls -lR / | tee -a output.file
 NB:6819	neither	out+files	-	ls -lR / | tee output.file
@@ -98,11 +82,8 @@ NB:6920	neither	status+out	X	bind -q complete
 NB:6925	neither	rec	-	head -c 10 "$0" | tr '\000-\377' '#'
 NB:7016	neither	status	X	history -r "$HISTFILE" #Alternative: exec bash
 NB:7017	neither	status	X	history -r
-NB:7019	neither	out	-	od -A n -N 2 -t u2 /dev/urandom
-NB:7218	neither	out	-	stat --printf="%y %n\n" $(ls -tr $(find * -type f))
 NB:7296	neither	status+rec+files	X	{ time find / 2>/dev/null; } 2>time.txt
-NB:739	neither	out	-	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
-NB:7781	msg-own		-	sed s/STRING_TO_REPLACE/STRING_TO_REPLACE_IT/g index.html | tee index.html
+NB:7564	msg-own		-	find . -type f -print0 | xargs -0 -n1 echo rm | sh -x
 NB:7890	neither	status+rec+files	X	{ time sleep 1 ; } 2> time.txt
 NB:7891	neither	status+rec+files	X	{ time sleep 1 2> sleep.stderr ; } 2> time.txt
 NB:8075	neither	rec	-	MY_PATH=$(readlink -f "$0")
@@ -128,9 +109,9 @@ NB:9215	neither	status	-	shift [n]
 NB:9459	neither	rec	-	basedir=$(cygpath -am "$(dirname "$0")")
 NB:9460	neither	rec	-	basedir=$(cygpath -m "$(dirname "$0")")
 NB:9461	neither	rec	-	basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+NB:9501	msg-own		-	cat dbdump.sql.gz | gzip -cd | mysql
 NB:9582	neither	status+files	X	history -w
 NB:9583	neither	rec	-	touch -t `date +%m%d0000` /tmp/$$
-NB:9680	msg-own		-	echo "fifo forever" | cat - fifo | tee fifo
 NB:9682	neither	out	-	echo foo | readlink /proc/self/fd/0
 NB:9704	neither	out+files	-	ant 2>&1|tee build.log
 NB:9707	neither	out+files	-	update-client 2>&1 | tee my.log
@@ -211,6 +192,7 @@ SC:Checks/ShellSupport.hs:prop_checkBashisms6c	msg-own		X	[ foo =~ bar ]
 SC:Checks/ShellSupport.hs:prop_checkBashisms6d	msg-own		X	test foo =~ bar
 SC:Checks/ShellSupport.hs:prop_checkBashisms90	neither	status+out	-	#!/bin/sh set -o "$opt"
 TL:common/[.md:18	msg-own		-	[ "$variable" -eq|ne|gt|lt|ge|le integer ]
+TL:common/arthas-trace.md:17	msg-own		-	trace -E class_pattern1|class_pattern2 method_pattern1|method_pattern2|method_pattern3
 TL:common/arthas.md:17	msg-own		X	exit|quit|logout|q
 TL:common/bind.md:12	neither	status	X	bind -q command
 TL:common/bind.md:24	neither	status+out	X	help bind
@@ -220,9 +202,11 @@ TL:common/cd.md:24	neither	status+out	-	cd -
 TL:common/compopt.md:10	neither	status	X	compopt command
 TL:common/compopt.md:14	msg-own		X	compopt -o|+o option1 -o|+o option2 command
 TL:common/compopt.md:18	neither	status	X	compopt
+TL:common/conda-export.md:16	msg-own		-	conda export --format environment-json|environment-yaml|explicit|json|reqs|requirements|txt|yaml|yml
 TL:common/cppcheck.md:9	neither	files	-	cppcheck . 2>cppcheck.log
-TL:common/diffoscope.md:16	msg-own		-	diffoscope --html path/to/outfile|- path/to/file1 path/to/file2
 TL:common/dmd.md:20	msg-own		X	dmd -check=h|help|?
+TL:common/dnsx.md:18	msg-own		-	echo example.com | dnsx -re -a|aaaa|cname|ns|txt|srv|ptr|mx|soa|any|axfr|caa
+TL:common/dotnet-restore.md:28	msg-own		-	dotnet restore -v quiet|minimal|normal|detailed|diagnostic
 TL:common/enable.md:24	neither	status+out	X	help enable
 TL:common/env.md:8	neither	out	-	env
 TL:common/exec.md:8	msg-own		-	exec command -with -flags
@@ -239,31 +223,26 @@ TL:common/help.md:8	neither	status+out	X	help
 TL:common/history.md:16	msg-own		X	history -d|f|i|E
 TL:common/history.md:24	neither	status+files	X	history -w
 TL:common/history.md:28	neither	status	X	history -d offset
-TL:common/jc.json.md:8	msg-own		-	ifconfig | jc --ifconfig
-TL:common/katana.md:21	msg-own		-	katana -s depth-first|breadth-first -d value -rl value -u https://example.com
 TL:common/kill.md:13	neither	out	-	kill -l
 TL:common/logout.md:12	neither	status	X	logout exit_code
 TL:common/logout.md:8	neither	status	X	logout
-TL:common/maigret.md:18	msg-own		-	maigret username -p socks5://127.0.0.1:9050|http://127.0.0.1:8080
+TL:common/mpg321.md:25	msg-own		-	mpg321 -z path/to/file1|url1 path/to/file2|url2
+TL:common/phpmd.md:24	msg-own		-	phpmd path/to/file_or_directory1,path/to/file_or_directory2,... xml|text|html ruleset1,ruleset2,... --exclude directory_
 TL:common/printenv.md:8	neither	out	-	printenv
 TL:common/printf.md:29	neither	status	X	printf -v myvar "This is %s = %d\n" "a year" 2016
-TL:common/pydocstyle.md:12	msg-own		-	pydocstyle -e file.py|path/to/directory
 TL:common/readarray.md:32	neither	status+out	X	help mapfile
 TL:common/shopt.md:25	neither	status+out	X	help shopt
 TL:common/test.md:34	neither	status+out	X	help test
 TL:common/times.md:10	neither	out	-	times
 TL:common/ulimit.md:29	neither	status+out	X	help ulimit
-TL:common/vboxmanage-showvminfo.md:28	msg-own		-	VBoxManage showvminfo --log vm_name|uuid
-TL:common/vboxmanage.md:26	msg-own		-	VBoxManage controlvm name|uuid savestate
+TL:common/vboxmanage-modifyvm.md:12	msg-own		-	VBoxManage modifyvm uuid|vm_name --memory 2048 --cpus 2
 TL:common/volta.md:28	neither	status+out	X	volta help fetch|install|uninstall|pin|list|completions|which|setup|run|help
 TL:linux/dialog.md:13	neither	files	-	dialog --inputbox "Enter text:" 8 40 2>output.txt
-TL:linux/grdctl.md:12	msg-own		-	grdctl rdp|vnc enable
-TL:linux/grdctl.md:24	msg-own		-	grdctl rdp|vnc disable-view-only
-TL:linux/grim.md:22	msg-own		-	grim - | clipboard_manager
-TL:linux/sqfstar.md:20	msg-own		-	zstdcat archive.tar.zst | sqfstar filesystem.squashfs "*.gz"
+TL:linux/nixos-option.md:16	msg-own		-	nixos-option users.users.username.openssh.authorizedKeys.keyFiles|keys
+TL:linux/setterm.md:21	msg-own		-	setterm --foreground default|black|blue|red|...
+TL:linux/steamosctl.md:24	msg-own		-	steamosctl set-cpu-scheduler none|lavd|...
 TL:linux/trap.md:36	neither	status+out	X	help trap
 TL:linux/whiptail.md:21	msg-own		X	result_variable_name="$(whiptail --title "title" --inputbox "message" height_in_chars width_in_chars default_text 3>&1 1
 TL:linux/whiptail.md:25	msg-own		X	result_variable_name="$(whiptail --title "title" --passwordbox "message" height_in_chars width_in_chars 3>&1 1>&2 2>&3)"
 TL:linux/whiptail.md:29	msg-own		X	result_variable_name=$(whiptail --title "title" --menu "message" height_in_chars width_in_chars menu_display_height "val
-TL:linux/xclip.md:14	msg-own		-	echo 123 | xclip -se primary|secondary|clipboard
 TL:linux/zenity.md:25	OURS	rec	-	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress

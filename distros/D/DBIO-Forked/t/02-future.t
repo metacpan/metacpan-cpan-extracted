@@ -83,4 +83,62 @@ sub make_future {
   is_deeply([ $g->get ], [ ['flattened'] ], 'then flattens a returned future');
 }
 
+# The three blocks below pin one property: a callback is a side effect (in real
+# use it fires the next *_async, i.e. forks the next query), so it runs exactly
+# once -- however often the derived future is polled while the future the
+# callback returned is still pending. Polling must only wait, never re-fire.
+
+# --- then: polling a pending returned future does not re-run the callback ----
+{
+  my ($f) = make_future({ rows => [ ['src'] ] });
+  my ($inner, $wh) = make_future(undef, leave_open => 1);   # write end open => pending
+  my $calls = 0;
+  my $g = $f->then(sub { $calls++; return $inner });
+
+  ok(!$g->is_ready,  "then: not ready while the returned future is pending (poll $_)") for 1 .. 3;
+  ok(!$g->is_failed, 'then: not failed while the returned future is pending');
+  is($calls, 1, 'then: callback ran once across four polls of a pending returned future');
+
+  syswrite($wh, Storable::freeze({ rows => [ ['inner'] ] }));
+  close $wh;
+  ok($g->is_ready, 'then: ready once the returned future resolves');
+  is_deeply([ $g->get ], [ ['inner'] ], 'then: get returns the returned future\'s rows');
+  is($calls, 1, 'then: callback still ran exactly once after resolution');
+}
+
+# --- catch: same for the failure handler, and a blocking get after polls -----
+{
+  my ($f) = make_future({ error => "bad\n" });
+  my ($inner, $wh) = make_future(undef, leave_open => 1);
+  my $calls = 0;
+  my $g = $f->catch(sub { $calls++; return $inner });
+
+  ok(!$g->is_ready,  "catch: not ready while the returned future is pending (poll $_)") for 1 .. 3;
+  ok(!$g->is_failed, 'catch: not failed while the returned future is pending');
+  is($calls, 1, 'catch: handler ran once across four polls of a pending returned future');
+
+  syswrite($wh, Storable::freeze({ rows => [ ['recovered'] ] }));
+  close $wh;
+  # straight to the blocking get, no is_ready in between
+  is_deeply([ $g->get ], [ ['recovered'] ], 'catch: get after polls returns the returned future\'s rows');
+  is($calls, 1, 'catch: handler still ran exactly once after get');
+}
+
+# --- a polled returned future that then FAILS fails the derived one, once ----
+{
+  my ($f) = make_future({ rows => [ ['src'] ] });
+  my ($inner, $wh) = make_future(undef, leave_open => 1);
+  my $calls = 0;
+  my $g = $f->then(sub { $calls++; return $inner });
+
+  ok(!$g->is_ready, 'failing inner: not ready while the returned future is pending') for 1 .. 2;
+
+  syswrite($wh, Storable::freeze({ error => "inner boom\n" }));
+  close $wh;
+  ok($g->is_failed, 'failing inner: derived future is failed once the returned future fails');
+  eval { $g->get };
+  like($@, qr/inner boom/, 'failing inner: get re-throws the returned future\'s error');
+  is($calls, 1, 'failing inner: callback ran exactly once');
+}
+
 done_testing;

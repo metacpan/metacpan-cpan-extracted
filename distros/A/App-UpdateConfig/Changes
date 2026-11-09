@@ -1,5 +1,9 @@
 Revision history for Perl distribution App-UpdateConfig
 
+1.07 - 2026-11-08
+ - Add an APPEND directive to append the content of a fragment to the ENTIRE
+   FILE fragment with the same target.
+
 1.06 - 2026-11-03
  - Include all the tests in the distribution (some were missing in 1.04 and
    1.05). There are no changes to the program.

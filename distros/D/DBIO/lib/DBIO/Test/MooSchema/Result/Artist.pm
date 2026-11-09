@@ -1,6 +1,11 @@
 package DBIO::Test::MooSchema::Result::Artist;
 # ABSTRACT: Moo-enabled test result class for the artist table
 
+use strict;
+use warnings;
+
+our $VERSION = '0.900004';
+
 use DBIO::Moo;
 
 __PACKAGE__->table('artist');
@@ -36,7 +41,7 @@ DBIO::Test::MooSchema::Result::Artist - Moo-enabled test result class for the ar
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

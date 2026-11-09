@@ -110,10 +110,10 @@ for my $s (qw/a2a artw cd artw_back/) {
 
   # check that we are not testing for deprecated slotnames
   ok ($fresh->{cursor}, 'Cursor at expected slot after fire');
-  TODO: {
-    local $TODO = 'Fake storage does not populate _last_sqlmaker_alias_map';
-    ok (exists $fresh->{_attrs}{_last_sqlmaker_alias_map}, 'aliasmap at expected slot after fire' );
-  }
+
+  # The map is written by _select_args, and the mock cursor routes through it
+  # exactly like the real one -- so this holds offline too.
+  ok (exists $fresh->{_attrs}{_last_sqlmaker_alias_map}, 'aliasmap at expected slot after fire' );
 }
 
 done_testing;

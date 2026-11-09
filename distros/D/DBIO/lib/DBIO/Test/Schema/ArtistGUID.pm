@@ -2,6 +2,9 @@ package DBIO::Test::Schema::ArtistGUID;
 # ABSTRACT: Test result class for the artist_guid table (UNIQUEIDENTIFIER PK)
 use strict;
 use warnings;
+
+our $VERSION = '0.900004';
+
 use base 'DBIO::Test::BaseResult';
 
 __PACKAGE__->table('artist_guid');
@@ -46,7 +49,7 @@ DBIO::Test::Schema::ArtistGUID - Test result class for the artist_guid table (UN
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

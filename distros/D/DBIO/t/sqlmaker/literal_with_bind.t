@@ -17,7 +17,7 @@ my $ref3 = \['?', [name => 'baz']];
 
 # do it twice, make sure the args are untouched
 for (1,2) {
-  $ars->delete;
+  $ars->delete({ all => 1 });
 
   lives_ok {
     $ars->create({ artistid => 666, name => $ref1, rank => $rank });

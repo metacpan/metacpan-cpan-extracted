@@ -1,14 +1,63 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900001';
-requires 'DBD::Pg';
+# 0.900004 for the two halves of the transactional_ddl declaration in
+# DBIO::PostgreSQL::Storage: DBIO::Deploy::Base::_execute_ddl only brackets a
+# handle the storage owns (core k131) and groups a batch by
+# _ddl_statement_is_transactional (core k132). Against an older core the
+# declaration is actively harmful -- it would open a transaction on the live
+# connection around the DDL the diff runs on the temp database's own handle.
+requires 'DBIO', '0.900004';
+# 3.7.1 for the placeholder escape '\?' (a literal question mark): added in
+# 3.5.0, but it modified the caller's statement until 3.6.0 and recopied a
+# statement unterminated until 3.7.1 (karr k120; DBD::Pg Changes).
+requires 'DBD::Pg', '3.7.1';
 requires 'DateTime::Format::Pg';
+# The random part of the temporary database's name (DBIO::PostgreSQL::Deploy)
+requires 'Crypt::URandom', '0';
 
 # future_io async transport (DBIO::PostgreSQL::Storage::Async): the shared
 # Future::IO backend base lives in dbio-async, resolved at runtime BY
 # CONVENTION (ref($storage).'::Async', ADR 0030) only when a connection asks
-# for { async => 'future_io' } -- the sync-only driver (DBIO::PostgreSQL::Storage)
-# never pulls it in, so it's not declared here.
+# for { async => 'future_io' }. A recommends, not a requires: the sync-only
+# driver (DBIO::PostgreSQL::Storage) never loads it, so a sync-only install
+# stays free of the Future::IO stack.
+#
+# 0.900004 because the adapter relies on that release's _collect_result($conn)
+# seam signature (ADR 0044, dbio-async k11) and on its concrete
+# _txn_context_class / _txn_conn_accessor defaults (dbio-async k13), which it
+# no longer repeats.
+recommends 'DBIO::Async', '0.900004';
+
+# LISTEN/NOTIFY on this transport (karr k77) additionally needs a dbio-async
+# carrying the Future::IO listen seams (dbio-async k22: the watch loop,
+# _listen_drain / _notify_sql) and a core carrying the listen contract (core
+# k219 + k222). Both still report 0.900004, so no version can express it yet;
+# t/62 and t/63 skip when the installed copies predate them.
+#
+# Failing a transaction whose COMMIT was answered with ROLLBACK (karr k86)
+# needs a core carrying the _txn_commit_rolled_back seam (core k236 + k237),
+# also still 0.900004; t/71 skips on an older core, where the seam is never
+# asked.
+#
+# Retiring a pool connection a failed statement left dead (karr k79) now rides
+# dbio-async's _conn_error_is_fatal seam (dbio-async k26, karr k92): an older
+# dbio-async never asks it, and a dead connection goes back to the idle list.
+# dbio-async still reports 0.900004 as well; t/64, t/65 and t/74 skip when the
+# installed copy predates the seam.
+#
+# Retiring an idle pool connection whose backend died before it is handed out
+# (karr k90) needs a dbio-async whose pool asks _idle_connection_alive
+# (dbio-async k28, over core k241); an older one never asks, and the first
+# statement on such a connection fails as before. Also still 0.900004; t/75
+# and t/76 skip when the installed copy predates the seam.
+#
+# Two statements issued on a transaction context without awaiting the first
+# (karr k94) need a dbio-async whose _query_async_pinned queues statements per
+# pinned connection (dbio-async k33): _submit_query has room for one statement
+# per connection, and an older dbio-async puts the second onto it while the
+# first is in flight -- the transaction never ends. Also still 0.900004. There
+# is no seam to ask for the queue, so t/80 does not skip on an older copy: it
+# fails.
 
 on test => sub {
   recommends 'Kubernetes::REST';

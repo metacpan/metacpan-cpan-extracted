@@ -1,11 +1,45 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900001';
+requires 'DBIO', '0.900004';
 
+# Loaded at compile time by DBIO::MSSQL::Storage itself (karr k26). Three of the
+# four are also dependencies of DBIO core today and arrive through its chain in
+# practice -- that is a coincidence of the current core cpanfile, not a contract,
+# so this dist declares what it loads. The floors are core's own floors for the
+# same modules; nothing here uses anything newer.
+requires 'Context::Preserve', '0.01';   # preserve_context
+requires 'Try::Tiny', '0.07';
+requires 'namespace::clean', '0.24';
+
+# The fourth is NOT in core's chain -- no cpanfile in the DBIO family requires
+# it, so a bare install can end up without it and DBIO::MSSQL::Storage then fails
+# to compile. Only Scope::Guard->new(sub { ... }) is used, present in every
+# released version, hence no floor.
+requires 'Scope::Guard';
+
+# Transports. Neither is a hard dependency: no module here loads a DBD, the DSN
+# picks the transport at connect time.
+#
+# DBD::ODBC is the default connection path (DBIO::MSSQL::Storage::ODBC).
+recommends 'DBD::ODBC';
 # Only the DBD::Sybase/FreeTDS connection path (DBIO::MSSQL::Storage::Sybase)
 # needs this; the default ODBC path does not. Keep it optional so ODBC-only
-# users are not forced to build DBD::Sybase.
-recommends 'DBIO::Sybase', '0.900001';
+# users are not forced to build DBD::Sybase. DBD::Sybase itself is a hard
+# requirement of DBIO::Sybase and is not repeated here.
+recommends 'DBIO::Sybase', '0.900004';
 
 on test => sub {
   requires 'Test::More', '0.98';
+  requires 'Test::Exception';   # t/10, t/11, t/20, t/21, t/30, t/42, t/54, t/55, t/59, t/60, t/62, t/63, t/64, t/65
+  requires 'Test::Warn';        # t/11, t/21
+
+  # t/31-datetime-format.t drives both DateTime format classes through a real
+  # parse/format round-trip and asserts on DateTime objects:
+  # DBIO::Storage::DateTimeFormat loads DateTime::Format::Strptime lazily at the
+  # first parse. Core only recommends the DateTime stack, so the test declares
+  # it. Left open deliberately -- the patterns used are plain strptime.
+  requires 'DateTime';
+  requires 'DateTime::Format::Strptime';
+
+  # Try::Tiny (t/11, t/21, t/30) and Scope::Guard (t/30) are runtime
+  # requirements above and are not repeated here.
 };

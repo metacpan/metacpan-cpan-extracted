@@ -69,12 +69,19 @@ ok 'MyTest::PgSchema::Result::CD'->pg_indexes->{'idx_cd_dbio_test_title'},
 
 # --- Live tests (require DBIO_TEST_PG_DSN) ---
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+
 my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_$_" } qw(DSN USER PASS)};
 
 SKIP: {
     skip 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run live tests'
         . ' (NOTE: creates and drops tables artist, cd_dbio_test)', 5
         unless $dsn;
+
+    # A server that is not there fails the file, with a plan (karr k113).
+    LiveServer->require_server;
 
     my $schema = MyTest::PgSchema->connect($dsn, $user, $pass);
     isa_ok $schema->storage, 'DBIO::PostgreSQL::Storage',
@@ -99,7 +106,7 @@ SKIP: {
 # own dbh may already be disconnected at process exit.
 END {
     return unless $dsn;
-    my $h = eval { DBI->connect($dsn, $user, $pass, { RaiseError => 0, PrintError => 0 }) };
+    my $h = eval { LiveServer->dbh_or_die(attrs => { RaiseError => 0 }) };
     return unless $h;
     eval {
         $h->do('DROP TABLE IF EXISTS cd_dbio_test CASCADE');

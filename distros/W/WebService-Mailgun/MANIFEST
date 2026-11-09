@@ -1,10 +1,10 @@
 Build.PL
-Changes
+CHANGELOG.md
 LICENSE
 META.json
 README.md
+SECURITY.md
 cpanfile
-cpanfile.snapshot
 lib/WebService/Mailgun.pm
 minil.toml
 t/00_compile.t
@@ -12,6 +12,7 @@ t/01_message.t
 t/02_list_and_event.t
 t/03_error.t
 t/04_mime.t
+t/05_event_url.t
 t/corpus/msg1.mime
 META.yml
 MANIFEST

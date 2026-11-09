@@ -1,0 +1,36 @@
+{
+  "note": "Synthetic arithmetic fixture, not measured database retrieval.",
+  "k": 3,
+  "smoothing": 60,
+  "channels": {
+    "lexical": [
+      "101",
+      "103",
+      "102"
+    ],
+    "vector": [
+      "101",
+      "102",
+      "103"
+    ],
+    "graph": [
+      "102",
+      "103"
+    ]
+  },
+  "weights": {
+    "lexical": 1,
+    "vector": 1,
+    "graph": 0.5
+  },
+  "exact": [
+    "101",
+    "102",
+    "103"
+  ],
+  "relevance": {
+    "101": 3,
+    "102": 2,
+    "103": 1
+  }
+}

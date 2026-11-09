@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Track;
 # ABSTRACT: Test result class for the track table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Test::BaseResult';
@@ -152,7 +155,7 @@ DBIO::Test::Schema::Track - Test result class for the track table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

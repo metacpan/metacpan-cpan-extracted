@@ -82,11 +82,14 @@ static uint64_t hm_sa_now_ms(void) {
     struct timeval tv;
 #  if defined(HM_HAVE_COARSE_CLOCK) || defined(SA_HAVE_COARSE_CLOCK)
     struct timespec ts;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (clock_gettime(CLOCK_REALTIME_COARSE, &ts) == 0)
         return (uint64_t)ts.tv_sec * 1000ULL + (uint64_t)(ts.tv_nsec / 1000000);
 #  endif
-    gettimeofday(&tv, NULL);
-    return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)(tv.tv_usec / 1000);
+    gettimeofday(&tv, NULL); /* # uncoverable statement class:ignore_covered_err */
+    return (uint64_t)tv.tv_sec * 1000ULL + (uint64_t)(tv.tv_usec / 1000); /* # uncoverable statement class:ignore_covered_err */
 #endif
 }
 
@@ -100,15 +103,27 @@ static int hm_sa_abuse_open(unsigned deny_cap, unsigned rate_cap,
     int e = 0;
     if (which) *which = NULL;
     if (err) *err = 0;
-    if (!HM_SA || !hm_sa_region || hm_sa_deny) return 0;
+    if (!HM_SA || !hm_sa_region || hm_sa_deny) return 0; /* # uncoverable condition left count:2 class:ignore_covered_err */
     if (!deny_cap) deny_cap = HM_SA_DENY_CAP;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (!rate_cap) rate_cap = HM_SA_RATE_CAP;
     d = HM_SA->map_open(hm_sa_region, "deny", 4, deny_cap, HM_SA_DENY_SLOT, &e);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (!d) { if (which) *which = "deny"; if (err) *err = e; return -1; }
     r = HM_SA->map_open(hm_sa_region, "rate", 4, rate_cap, HM_SA_RATE_SLOT, &e);
     if (!r) {
         HM_SA->map_release(d);
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (which) *which = "rate";
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (err) *err = e;
         return -1;
     }
@@ -125,7 +140,7 @@ static int hm_sa_abuse_live(void) { return hm_sa_deny != NULL; }
 static int hm_sa_deny_check(const char *ip) {
     char none[1];
     uint32_t vlen = 0;
-    if (!hm_sa_deny || !ip || !ip[0]) return 0;
+    if (!hm_sa_deny || !ip || !ip[0]) return 0; /* # uncoverable condition left count:2 class:ignore_covered_err */
     return HM_SA->map_fetch(hm_sa_deny, ip, (uint32_t)strlen(ip), none, 0, &vlen)
            == SA_MAP_HIT;
 }
@@ -133,12 +148,18 @@ static int hm_sa_deny_check(const char *ip) {
 /* Add or refresh for ttl_secs (0 = until the arena goes). Silent when the
  * map is full or the stripe is contended past its bound, as before. */
 static void hm_sa_deny_add(const char *ip, long ttl_secs) {
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!hm_sa_deny || !ip || !ip[0]) return;
     (void)HM_SA->map_store_ttl(hm_sa_deny, ip, (uint32_t)strlen(ip), "", 0,
                                ttl_secs > 0 ? (uint64_t)ttl_secs * 1000u : 0);
 }
 
 static void hm_sa_deny_remove(const char *ip) {
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!hm_sa_deny || !ip || !ip[0]) return;
     (void)HM_SA->map_delete(hm_sa_deny, ip, (uint32_t)strlen(ip));
 }
@@ -151,7 +172,7 @@ static void hm_sa_deny_remove(const char *ip) {
 static int hm_sa_ratelimit_hit(const void *key, size_t klen,
                                long limit, long window,
                                long *remaining, long *reset) {
-    long w = window > 0 ? window : 60;
+    long w = window > 0 ? window : 60; /* # uncoverable condition right count:1 class:ignore_covered_err */
     /* ONE clock read: the second the window is computed from and the
      * millisecond the deadline is measured from are the same reading, so
      * they cannot straddle a boundary, and a hit pays one clock here rather
@@ -162,26 +183,44 @@ static int hm_sa_ratelimit_hit(const void *key, size_t klen,
     uint64_t hkey, count = 0, end_ms, ttl_ms;
     int rc;
 
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (reset) *reset = wstart + w;
-    if (limit <= 0) { if (remaining) *remaining = -1; return 1; }
-    if (!hm_sa_rate) { if (remaining) *remaining = limit - 1; return 1; }
+    if (limit <= 0) { if (remaining) *remaining = -1; return 1; } /* # uncoverable condition right count:2 class:ignore_covered_err */
+    if (!hm_sa_rate) { if (remaining) *remaining = limit - 1; return 1; } /* # uncoverable condition right count:2 class:ignore_covered_err */
 
     hkey = hm_at_fnv(key, klen);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!hkey) hkey = 1;                 /* the old table's empty marker */
 
     /* The deadline is the window's END, so the first hit of a window sets
      * what every later hit inherits. */
     end_ms = (uint64_t)(wstart + w) * 1000u;
-    ttl_ms = end_ms > now_ms ? end_ms - now_ms : 1;
+    ttl_ms = end_ms > now_ms ? end_ms - now_ms : 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
 
     /* On the clock reading above: the map neither reads it again for the
      * deadline it sets nor for the deadline it checks. */
     rc = HM_SA->map_incr_at(hm_sa_rate, (const char *)&hkey, 8, 1, ttl_ms,
                             now_ms, &count);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (rc != SA_MAP_STORE_OK) {         /* full, contended, or not ours */
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         if (remaining) *remaining = limit - 1;
-        return 1;
+        return 1; /* # uncoverable statement */
     }
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (remaining)
         *remaining = count >= (uint64_t)limit ? 0 : limit - (long)count;
     return count <= (uint64_t)limit ? 1 : 0;

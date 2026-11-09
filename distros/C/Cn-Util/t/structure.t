@@ -44,4 +44,8 @@ HASH{1}
         [*]: number
 END
 
+# 0.023 died with "Use of uninitialized value" from the line that read it.
+ok( !eval { structure({}, output => 'string', color => undef); 1 }, 'color => undef dies' );
+like( $@, qr/color must be defined/, '...with its own message' );
+
 done_testing;

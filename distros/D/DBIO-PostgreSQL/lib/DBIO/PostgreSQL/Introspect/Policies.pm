@@ -4,6 +4,8 @@ package DBIO::PostgreSQL::Introspect::Policies;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 use DBIO::PostgreSQL::Introspect ();
 
 
@@ -34,6 +36,7 @@ sub fetch {
     WHERE 1=1
   };
   $sql .= DBIO::PostgreSQL::Introspect->system_schema_filter('n');
+  $sql .= DBIO::PostgreSQL::Introspect->extension_member_filter('pg_class', 'c.oid');
 
   my @bind;
   if ($filter && @$filter) {
@@ -50,16 +53,23 @@ sub fetch {
   my $sth = $dbh->prepare($sql);
   $sth->execute(@bind);
 
+  my $reads = DBIO::PostgreSQL::Introspect->column_reads(
+    $dbh, $filter, 'pg_policy', 'polrelid', 'polname',
+  );
+
   my %policies;
   while (my $row = $sth->fetchrow_hashref) {
     my $table_key = DBIO::PostgreSQL::Introspect->qualified_key($row);
     $policies{$table_key}{ $row->{policy_name} } = {
+      schema_name => $row->{schema_name},
+      table_name  => $row->{table_name},
       policy_name => $row->{policy_name},
       command     => $row->{command},
       permissive  => $row->{permissive} ? 1 : 0,
       using_expr  => $row->{using_expr},
       check_expr  => $row->{check_expr},
       roles       => $row->{roles},
+      depends_on_columns => $reads->{$table_key}{ $row->{policy_name} } // {},
     };
   }
 
@@ -80,13 +90,15 @@ DBIO::PostgreSQL::Introspect::Policies - Introspect PostgreSQL Row Level Securit
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 DESCRIPTION
 
 Fetches Row Level Security policy metadata from C<pg_catalog.pg_policy>.
 Policy command types and USING/WITH CHECK expressions are decoded from
 PostgreSQL's internal representation.
+Tables an installed extension owns are left out by
+L<DBIO::PostgreSQL::Introspect::Tables>, and their policies with them.
 
 =head1 METHODS
 
@@ -95,9 +107,20 @@ PostgreSQL's internal representation.
     my $policies = DBIO::PostgreSQL::Introspect::Policies->fetch($dbh, $filter);
 
 Returns a hashref keyed by C<schema.table>. Each value is a hashref keyed by
-policy name. Each policy entry has: C<policy_name>, C<command> (C<SELECT>,
+policy name. Each policy entry has: C<schema_name> and C<table_name> (the
+table it is on, each name for itself -- the key cannot be taken apart again),
+C<policy_name>, C<command> (C<SELECT>,
 C<INSERT>, C<UPDATE>, C<DELETE>, or C<ALL>), C<permissive>, C<using_expr>,
-C<check_expr>, C<roles> (ArrayRef of role names, or undef for all roles).
+C<check_expr>, C<roles> (ArrayRef of role names, or undef for all roles),
+C<depends_on_columns>.
+
+C<depends_on_columns> is the columns the policy's expressions read: a HashRef
+from the key of a relation to an ArrayRef of column names, sorted, from the
+C<pg_depend> rows of the policy (L<DBIO::PostgreSQL::Introspect/column_reads>).
+It is empty for a policy that reads no column (C<USING (true)>). PostgreSQL
+does not alter the type of a column such a policy reads (C<cannot alter type of
+a column used in a policy definition>); L<DBIO::PostgreSQL::Diff::Column> asks
+it before it changes one.
 
 =head1 AUTHOR
 

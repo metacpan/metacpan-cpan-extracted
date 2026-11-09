@@ -1,5 +1,5 @@
 package DBIO::Sybase;
-our $VERSION = '0.900001';
+our $VERSION = '0.900004';
 # ABSTRACT: Sybase-specific schema management for DBIO
 
 use strict;
@@ -30,7 +30,7 @@ DBIO::Sybase - Sybase-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900001
+version 0.900004
 
 =head1 SYNOPSIS
 
@@ -39,14 +39,14 @@ version 0.900001
 
     # ... later ...
     my $schema = MySchema->connect($dsn, $user, $pass);
-    # Storage is automatically set to DBIO::Sybase::Storage
+    # Storage is DBIO::Sybase::Storage, and at its first use
+    # DBIO::Sybase::Storage::ASE
 
 =head1 DESCRIPTION
 
-This class is a thin L<DBIO> subclass that automatically sets the storage
-class to L<DBIO::Sybase::Storage> when a connection is established. Load it
-into your schema instead of the base L<DBIO> class when connecting to Sybase
-databases.
+This class is a schema component that declares the Sybase ASE driver: it sets
+the storage class to L<DBIO::Sybase::Storage> when a connection is
+established. Load it into your schema when connecting to Sybase ASE.
 
 The recommended way to load the driver is the C<-syb> shortcut
 (L<DBIO::Shortcut::syb>):
@@ -55,10 +55,19 @@ The recommended way to load the driver is the C<-syb> shortcut
 
 which pins L<DBIO::Sybase::Storage> as the schema's C<storage_type>.
 
-The storage will introspect the connected server type and rebless itself into
-the appropriate subclass: L<DBIO::Sybase::Storage::ASE> for Sybase ASE
-servers, or L<DBIO::MSSQL::Storage::Sybase> for Microsoft SQL Server accessed
-via L<DBD::Sybase>.
+A schema that declares the driver either way has said what its server is. At
+the first use that needs the driver -- not at C<connect> -- the storage becomes
+L<DBIO::Sybase::Storage::ASE>, without asking the server what it is, and then
+adapts to the client library L<DBD::Sybase> was built against: placeholders or
+L<DBIO::Sybase::Storage::ASE::NoBindVars>, and the FreeTDS fixups of
+L<DBIO::Sybase::Storage::FreeTDS>
+(L<DBIO::Sybase::Storage/_adapt_to_access_path>, core ADR 0059).
+
+It never becomes the storage of another product. A server that
+L<DBD::Sybase> found to be Microsoft SQL Server is reported as a driver
+mismatch -- a warning by default, an error with
+L<DBIO::Schema/driver_strict>, nothing with L<DBIO::Schema/driver_warnings>
+off; declare L<DBIO::MSSQL> for such a server.
 
 =head1 METHODS
 
@@ -73,7 +82,7 @@ parent C<connection> method.
 
 =over
 
-=item * L<DBIO::Sybase::Storage> - Sybase storage dispatcher
+=item * L<DBIO::Sybase::Storage> - the storage class this component declares
 
 =item * L<DBIO::Sybase::Storage::ASE> - Sybase ASE storage
 

@@ -2,6 +2,9 @@ package DBIO::Test::Schema::Artist;
 # ABSTRACT: Test result class for the artist table
 
 use warnings;
+
+our $VERSION = '0.900004';
+
 use strict;
 
 use base 'DBIO::Test::BaseResult';
@@ -35,7 +38,7 @@ __PACKAGE__->add_columns(
 );
 __PACKAGE__->set_primary_key('artistid');
 __PACKAGE__->add_unique_constraint(['name']);
-__PACKAGE__->add_unique_constraint(artist => ['artistid']); # do not remove, part of a test
+__PACKAGE__->add_unique_constraint(artist_artistid => ['artistid']); # do not remove, part of a test
 __PACKAGE__->add_unique_constraint(u_nullable => [qw/charfield rank/]);
 
 
@@ -199,7 +202,7 @@ DBIO::Test::Schema::Artist - Test result class for the artist table
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

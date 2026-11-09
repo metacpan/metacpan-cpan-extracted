@@ -4,6 +4,8 @@ package DBIO::Test::Util::UmaskGuard;
 use strict;
 use warnings;
 
+our $VERSION = '0.900004';
+
 sub DESTROY {
   local ($@, $!);
   eval { defined(umask ${ $_[0] }) or die };
@@ -25,7 +27,7 @@ DBIO::Test::Util::UmaskGuard - RAII guard that restores the umask on scope exit
 
 =head1 VERSION
 
-version 0.900002
+version 0.900004
 
 =head1 AUTHOR
 

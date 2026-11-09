@@ -5,7 +5,12 @@ use Test::More;
 use Test::Warn;
 use Test::Exception;
 use DBIO::SQLite::Test;
-plan skip_all => 'Lazy cursor behavior changed in DBIO; test needs rewrite for new cursor semantics';
+
+# A collapsing (prefetching) resultset ordered by its own primary key reads
+# the cursor lazily: ->next pulls rows only until the main row changes and
+# keeps the one row it read too far. Everything behind that row stays on the
+# cursor. Without a stable order of the main source it has to slurp the
+# whole cursor at once, and says so.
 
 my $schema = DBIO::SQLite::Test->init_schema();
 
@@ -46,9 +51,15 @@ for (undef, undef, 'me.artistid') {
     is ($row->artistid, $artist_id, 'Default fixture artists in order') || exit;
   }
 
-  my $foo_artist = $schema->resultset('Artist')->find({ name => 'foo' });
-  ok($foo_artist, 'Foo artist is present');
-  my $foo_cd = $foo_artist && $foo_artist->cds->next;
+  # the foo artist has to come off this very resultset: reading it is what
+  # makes the resultset look one row ahead, at bar, and leaves baz behind
+  my $foo_artist = $rs->next;
+  is (
+    ($foo_artist ? $foo_artist->artistid : undef),
+    $foo_row->artistid,
+    'Foo artist follows the fixture artists',
+  ) || exit;
+  my $foo_cd = $foo_artist->cds->next;
   my $foo_track = $foo_cd && $foo_cd->tracks->next;
   is(($foo_track ? $foo_track->title : undef), 'footrack', 'Right track');
 

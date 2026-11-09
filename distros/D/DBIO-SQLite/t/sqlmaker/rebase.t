@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
-# test relies on the original default
-BEGIN { delete @ENV{qw( DBIO_TEST_SWAPOUT_SQLAC_WITH )} }
+# test relies on the original default: under a dev release core rebases the
+# SQL maker of every connection when one of these is set
+BEGIN { delete @ENV{qw( DBIODEVREL_SWAPOUT_SQLAC_WITH DBICDEVREL_SWAPOUT_SQLAC_WITH )} }
 
 use Test::More;
 
