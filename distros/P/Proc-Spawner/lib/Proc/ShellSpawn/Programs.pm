@@ -13,7 +13,7 @@ package Proc::ShellSpawn::Programs;
 # Integers go through Perl's own sprintf, so a perl with 64-bit integers is assumed (ivsize 8: Strawberry, Linux).
 use strict; use warnings;
 use POSIX (); use File::Spec (); use Math::BigInt ();
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $IMAX = Math::BigInt->new('9223372036854775807'); my $IMIN = -$IMAX - 1;
 my $UMAX = Math::BigInt->new('18446744073709551615');
@@ -34,36 +34,71 @@ sub q_ { my ($env, $s) = @_;   # coreutils' quote(): 'x' in the C locale, curly 
   $u ? "\xe2\x80\x98$t\xe2\x80\x99" : "'$t'" }
 
 # ------------------------------------------------------------------ echo
+# OPT's echo (Proc::ShellSpawn: PROC_SHELLSPAWN_ECHO; decision EC1, the user, 2026-11-09) picks whose echo this is:
+#   coreutils (the default): coreutils 9.4's; POSIXLY_CORRECT in ENV changes it (escapes always, options only a first -n)
+#   dash: dash 0.5.12's builtin: escapes always (not \x), options only a first -n; POSIXLY_CORRECT changes nothing
+#   bash: bash 5.2's builtin (xpg_echo off, as bash --posix starts): options -n -e -E, escapes with -e (also \E, \u, \U)
+our @ECHO = qw(coreutils dash bash);
 sub echo {
-  my ($argv, $env) = @_; $env //= {};
+  my ($argv, $env, $opt) = @_; $env //= {}; my $style = ($opt && $opt->{echo}) || 'coreutils';
   my @a = @$argv[1 .. $#$argv];
-  my $posix = defined $env->{POSIXLY_CORRECT};
-  my ($nl, $esc) = (1, $posix);   # POSIXLY_CORRECT: escapes always, options only for a first -n
-  if (!$posix || (@a && $a[0] eq '-n')) {
-    return ($1 eq 'help' ? help('echo') : version('echo'), '', 0) if @a == 1 && $a[0] =~ /^--(help|version)\z/;
-    while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a; for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e' || $posix) } } }
+  my ($nl, $esc, $mode) = (1, 0, $style eq 'coreutils' ? 'echo' : $style);
+  if ($style eq 'dash') { $esc = 1; if (@a && $a[0] eq '-n') { shift @a; $nl = 0 } }
+  elsif ($style eq 'bash') { while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a; for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e') } } }
+  elsif ($style eq 'coreutils') {
+    my $posix = defined $env->{POSIXLY_CORRECT};
+    $esc = $posix;   # POSIXLY_CORRECT: escapes always, options only for a first -n
+    if (!$posix || (@a && $a[0] eq '-n')) {
+      return ($1 eq 'help' ? help('echo') : version('echo'), '', 0) if @a == 1 && $a[0] =~ /^--(help|version)\z/;
+      while (@a && $a[0] =~ /^-([eEn]+)\z/) { shift @a; for (split //, $1) { $_ eq 'n' ? ($nl = 0) : ($esc = $_ eq 'e' || $posix) } } } }
+  else { die "PROC_SHELLSPAWN_ECHO: '$style' is none of @ECHO\n" }
   my $out = join ' ', @a;
-  if ($esc) { ($out, my $stop) = esc($out, 'echo'); return ($out, '', 0) if $stop }   # \c: nothing more, not the newline
+  if ($esc) { ($out, my $stop) = esc($out, $mode, $env); return ($out, '', 0) if $stop }   # \c: nothing more, not the newline
   ($out . ($nl ? "\n" : ''), '', 0) }
 
-# The backslash escapes of echo -e and printf's %b (MODE 'echo' or 'b'), or of printf's format ('fmt').  Returns
-# (TEXT, STOP, ERROR): STOP after \c, ERROR for printf's "missing hexadecimal number".
+# The backslash escapes of echo -e and printf's %b (MODE 'echo' or 'b'), or of printf's format ('fmt'); of dash's and
+# bash's builtin echo (MODE 'dash', 'bash').  Returns (TEXT, STOP, ERROR): STOP after \c, ERROR for printf's "missing
+# hexadecimal number" and "invalid universal character name".  ENV: the command's environment, for \u and \U (the locale).
 my %SIMPLE = (a => "\a", b => "\b", e => "\e", f => "\f", n => "\n", r => "\r", t => "\t", v => "\013", '\\' => '\\');
 sub esc {
-  my ($s, $mode) = @_; my $o = '';
-  my $oct = $mode eq 'fmt' ? qr/([0-7]{1,3})/ : qr/0([0-7]{0,3})|([1-7][0-7]{0,2})/;   # echo and %b: \0NNN or \NNN
+  my ($s, $mode, $env) = @_; my $o = ''; my $printf = $mode eq 'b' || $mode eq 'fmt';
+  my $oct = $mode eq 'fmt' ? qr/([0-7]{1,3})/ : $mode eq 'bash' ? qr/0([0-7]{0,3})/   # bash: \1 stays as it is
+          : qr/0([0-7]{0,3})|([1-7][0-7]{0,2})/;   # echo, dash and %b: \0NNN or \NNN
   while ($s =~ /\G(?:([^\\]+)|\\)/gc) {
     if (defined $1) { $o .= $1; next }
     if ($s =~ /\G$oct/gc) { $o .= chr(oct('0' . ($1 // $2)) & 255) }
     elsif ($s =~ /\G([abefnrtv\\])/gc) { $o .= $SIMPLE{$1} }
     elsif ($s =~ /\Gc/gc) { return ($o, 1) }
-    elsif ($s =~ /\Gx([0-9A-Fa-f]{1,2})/gc) { $o .= chr hex $1 }
-    elsif ($mode ne 'echo' && $s =~ /\G(?:u([0-9A-Fa-f]{4})|U([0-9A-Fa-f]{8}))/gc) { my $c = chr hex($1 // $2); utf8::encode($c); $o .= $c }
-    elsif ($mode ne 'echo' && $s =~ /\G[xuU]/gc) { return ($o, 0, 'missing hexadecimal number in escape') }
+    elsif ($mode eq 'bash' && $s =~ /\GE/gc) { $o .= "\e" }
+    elsif ($mode ne 'dash' && $s =~ /\Gx([0-9A-Fa-f]{1,2})/gc) { $o .= chr hex $1 }
+    elsif ($mode eq 'bash' && $s =~ /\G(?:u([0-9A-Fa-f]{1,4})|U([0-9A-Fa-f]{1,8}))/gc) { $o .= bash_unichar(hex($1 // $2), $env) }
+    elsif ($printf && $s =~ /\G(?:(u)([0-9A-Fa-f]{4})|(U)([0-9A-Fa-f]{8}))/gc) {
+      my ($k, $h) = defined $1 ? ($1, $2) : ($3, $4); my $v = hex $h;
+      return ($o, 0, "invalid universal character name \\$k\L$h") if $v >= 0xd800 && $v <= 0xdfff;   # (coreutils: \%c%0*x)
+      $o .= unichar($v, $env) }
+    elsif ($printf && $s =~ /\G[xuU]/gc) { return ($o, 0, 'missing hexadecimal number in escape') }
     elsif ($mode eq 'fmt' && $s =~ /\G"/gc) { $o .= '"' }
     else { $o .= '\\' }   # anything else (and a final backslash): the backslash as it is
   }
   ($o, 0) }
+
+sub bash_unichar {   # bash 5.2's \u and \U in echo -e (u32cconv): ASCII as it is; in a UTF-8 locale (LC_CTYPE) the
+  # character in UTF-8's old form up to 6 bytes (surrogates too), else the escape \uXXXX or \UXXXXXXXX; above 0x7FFFFFFF
+  # nothing (checked against bash 5.2.21 in C and C.UTF-8)
+  my ($v, $env) = @_;
+  return '' if $v > 0x7fffffff; return chr $v if $v < 0x80;
+  return sprintf($v <= 0xffff ? '\\u%04X' : '\\U%08X', $v) unless is_utf8($env, 'LC_CTYPE');
+  my ($n, $lead) = $v < 0x800 ? (2, 0xc0) : $v < 0x10000 ? (3, 0xe0) : $v < 0x200000 ? (4, 0xf0) : $v < 0x4000000 ? (5, 0xf8) : (6, 0xfc);
+  my @b; for (2 .. $n) { unshift @b, 0x80 | ($v & 0x3f); $v >>= 6 }
+  pack 'C*', $lead | $v, @b }
+
+sub unichar {   # gnulib's print_unicode_char, as coreutils 9.4's printf uses it (X37): ASCII as it is; another character
+  # encoded where the locale can (here: a UTF-8 locale), else (the C locale) the escape \uXXXX or \UXXXXXXXX, as above
+  # U+10FFFF everywhere.  (A legacy locale such as ISO-8859-1, which coreutils would convert to by iconv, gets the escape.)
+  my ($v, $env) = @_;
+  return chr $v if $v < 0x80;
+  if ($v <= 0x10ffff && is_utf8($env // {}, 'LC_CTYPE')) { my $c = chr $v; utf8::encode($c); return $c }
+  sprintf $v < 0x10000 ? '\u%04X' : '\U%08X', $v }
 
 # ------------------------------------------------------------------ printf
 # coreutils' printf.c: the flags each conversion takes (' and I not with a A c e E o s x X, # not with c d i s u, 0 not
@@ -108,7 +143,7 @@ sub printf {
       if (defined $text) { $out .= $text; next }
       if (defined $pct) { $out .= '%'; next }
       if (defined $e) {
-        my ($t, $stop, $error) = esc("\\$e", 'fmt'); $out .= $t;
+        my ($t, $stop, $error) = esc("\\$e", 'fmt', $env); $out .= $t;
         if ($error) { $msg->($error); return $done->(1) }
         return $done->() if $stop; next }
       $cv = $bq, $fl = $w = '' if defined $bq;
@@ -122,8 +157,8 @@ sub printf {
       my $spec = "%$fl$w" . (defined $p ? ".$p" : '');
       if ($cv eq 'q') { $out .= shell_quote($arg, $env) if defined $arg }   # (no argument: nothing)
       elsif ($cv eq 'b') {
-        my ($t, $stop, $error) = esc($arg // '', 'b');
-        if ($error) { $msg->($error); return $done->(1) }
+        my ($t, $stop, $error) = esc($arg // '', 'b', $env);
+        if ($error) { $out .= $t; $msg->($error); return $done->(1) }   # what came before the bad escape, as coreutils
         $out .= sprintf "${spec}s", $t; return $done->() if $stop }
       elsif ($cv eq 's') { $out .= sprintf "${spec}s", $arg // '' }
       elsif ($cv eq 'c') { my $c = substr $arg // '', 0, 1; $out .= sprintf "${spec}s", length $c ? $c : "\0" }   # (none: a NUL)
@@ -256,6 +291,42 @@ sub unary {
            -k => -k _, -s => $s[7] > 0, -O => $s[4] == $>, -G => $s[5] == (split ' ', $))[0], -N => $s[9] > $s[8],
            -r => -r $f, -w => -w $f, -x => -x $f }->{$op} }
 
+# ------------------------------------------------------------------ pwd
+# As coreutils 9.4: -L, -P, --logical, --physical (abbreviated too), the last counts; options also after operands,
+# unless POSIXLY_CORRECT (which also makes -L the default); operands only draw a warning.  -L prints PWD from ENV if
+# it is absolute, has no . or .. component and is the directory (same device and inode); else, and for -P, the
+# directory with symbolic links resolved.  OPT: { cwd => DIR }, the directory (default: Perl's).
+my @PWDLONG = qw(logical physical help version);   # (coreutils' order, for its messages)
+my %PWDLONG = (logical => 'L', physical => 'P', help => 'help', version => 'version');
+sub pwd {
+  my ($argv, $env, $opt) = @_; $env //= {}; $opt //= {};
+  my ($name, @a) = @$argv; my $posix = defined $env->{POSIXLY_CORRECT};
+  my ($logical, @ops, $err) = ($posix); my $try = "Try '$name --help' for more information.\n";
+  while (@a) {
+    my $w = shift @a;
+    if ($w eq '--') { push @ops, @a; last }
+    if ($w =~ /^--([^=]*)(=?)/) {
+      my $arg = $2; my @m = grep /^\Q$1\E/, @PWDLONG;
+      return ('', "$name: option '$w' is ambiguous; possibilities:" . join('', map " '--$_'", @m) . "\n$try", 1) if @m > 1;
+      @m == 1 or return ('', "$name: unrecognized option '$w'\n$try", 1);
+      return ('', "$name: option '--$m[0]' doesn't allow an argument\n$try", 1) if $arg;
+      my $o = $PWDLONG{$m[0]};
+      return ($o eq 'help' ? help('pwd') : version('pwd'), '', 0) if length $o > 1;
+      $logical = $o eq 'L'; next }
+    if ($w =~ /^-(.+)/s) {
+      for my $l (split //, $1) {
+        $l =~ /^[LP]\z/ or return ('', "$name: invalid option -- '$l'\n$try", 1);
+        $logical = $l eq 'L' } next }
+    push @ops, $w; if ($posix) { push @ops, @a; last } }
+  $err = "$name: ignoring non-option arguments\n" if @ops;
+  my $dir = $opt->{cwd} // '.';
+  my $wd = $env->{PWD};
+  my $ok = $logical && defined $wd && File::Spec->file_name_is_absolute($wd)
+    && ($^O eq 'MSWin32' ? $wd =~ s{^[/\\]{2}[^/\\]+}{}r : $wd) !~ m{[/\\]\.\.?(?:[/\\]|\z)}   # (a UNC server, as '.', is no . or ..)
+    && do { my @a = stat $wd; my @b = stat $dir; @a && @b && $a[0] == $b[0] && $a[1] == $b[1] };
+  require Cwd;
+  (($ok ? $wd : Cwd::abs_path($dir)) . "\n", $err // '', 0) }
+
 sub help { my $n = shift; "Usage: $n ...\n(in the Perl process: Proc::ShellSpawn::Programs, after GNU coreutils 9.4's $n)\n" }
 sub version { my $n = shift; "$n (Proc::ShellSpawn::Programs $VERSION, after GNU coreutils 9.4)\n" }
 sub true { ('', '', 0) }
@@ -282,10 +353,13 @@ coreutils writes them.  C<ARGV-E<gt>[0]> is the name as written (messages use
 it).  C<ENV> gives C<POSIXLY_CORRECT> (echo) and the locale (C<LC_ALL>,
 C<LC_CTYPE>, C<LC_MESSAGES>, C<LANG>: UTF-8 or not, for quotes and C<%q>).
 C<OPT>: C<cwd> (test's relative file names), C<isatty> (a code ref for
-C<test -t FD>).
+C<test -t FD>), C<echo> (whose C<echo>: C<coreutils>, the default, which heeds
+C<POSIXLY_CORRECT>; C<dash> or C<bash>, their builtins as dash 0.5.12 and
+bash 5.2.21 do them, which do not).
 
 L<Proc::ShellSpawn> runs them in place of the programs (by default; see
-C<PROC_SHELLSPAWN_INPROC> there).  The known differences from coreutils 9.4
+C<PROC_SHELLSPAWN_INPROC> there; C<PROC_SHELLSPAWN_ECHO> gives C<OPT>'s
+C<echo>, and C<> holds it).  The known differences from coreutils 9.4
 are listed as X21 in F<doc/pspawn-known-issues.md>.
 
 =cut

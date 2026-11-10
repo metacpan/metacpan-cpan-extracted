@@ -1,16 +1,16 @@
 
                             Compress-Raw-Zlib
 
-                              Version 2.225
+                              Version 2.226
 
-                              9 October 2026
+                              9 November 2026
 
         Copyright (c) 2005-2026 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
               The directory zlib-src contains a subset of the
-             source files copied directly from zlib version 1.3.2.
+             source files copied directly from zlib version 1.4.
                   These files are Copyright(C) 1995-2026
                      Jean-loup Gailly and Mark Adler.
              Full source for the zlib library is available at
@@ -101,16 +101,16 @@ before running
 
   For option 2, fetch a copy of the zlib source distribution from
   http://www.zlib.org and unpack it into the Compress-Raw-Zlib source
-  directory. Assuming you have fetched zlib 1.3.2,
-  it will create a directory called zlib-1.3.2.
+  directory. Assuming you have fetched zlib 1.4,
+  it will create a directory called zlib-1.4.
 
   Now set the configuration variables as follows (if the version you have
-  fetched isn't 1.3.2, change the ZLIB_INCLUDE and ZLIB_LIB
+  fetched isn't 1.4, change the ZLIB_INCLUDE and ZLIB_LIB
   variables appropriately):
 
       BUILD_ZLIB=True
-      ZLIB_INCLUDE=./zlib-1.3.2
-      ZLIB_LIB=./zlib-1.3.2
+      ZLIB_INCLUDE=./zlib-1.4
+      ZLIB_LIB=./zlib-1.4
       OLD_ZLIB=False
       GZIP_OS_CODE=AUTO_DETECT
       USE_ZLIB_NG=False

@@ -6,6 +6,7 @@ package Net::UPnP::AV::MediaServer;
 
 use strict;
 use warnings;
+use Carp qw(croak);
 
 use Net::UPnP::HTTP;
 use Net::UPnP::Device;
@@ -84,7 +85,7 @@ sub browse {
 			'SortCriteria' => $args{SortCriteria},
 		);
 	
-	$condir_service->postaction("Browse", \%req_arg);
+	$condir_service->postaction("Browse", \%req_arg, $args{http_options});
 }
 
 sub browsedirectchildren {
@@ -103,7 +104,8 @@ sub browsedirectchildren {
 			Filter => $args{Filter},
 			StartingIndex => $args{StartingIndex},
 			RequestedCount => $args{RequestedCount},
-			SortCriteria => $args{SortCriteria}
+			SortCriteria => $args{SortCriteria},
+			http_options => $args{http_options}
 			);
 }
 
@@ -123,7 +125,8 @@ sub browsemetadata {
 			Filter => $args{Filter},
 			StartingIndex => $args{StartingIndex},
 			RequestedCount => $args{RequestedCount},
-			SortCriteria => $args{SortCriteria}
+			SortCriteria => $args{SortCriteria},
+			http_options => $args{http_options}
 			);
 }
 
@@ -133,6 +136,7 @@ sub browsemetadata {
 
 sub getcontentlist {
 	my($this) = shift;
+	$this->{content_error} = '';
 	my %args = (
 		ObjectID => 0,	
 		Filter => '*',
@@ -141,6 +145,10 @@ sub getcontentlist {
 		SortCriteria => '',
 		@_,
 	);
+	if (defined $args{max_items}) {
+		croak 'Invalid content item limit' unless $args{max_items} =~ /\A\d+\z/
+			&& POSIX::isfinite(0 + $args{max_items}) && $args{max_items} > 0;
+	}
 	my (
 		@content_list,
 		$action_res,
@@ -160,7 +168,8 @@ sub getcontentlist {
 			Filter => $args{Filter},
 			StartingIndex => $args{StartingIndex},
 			RequestedCount => $args{RequestedCount},
-			SortCriteria => $args{SortCriteria}
+			SortCriteria => $args{SortCriteria},
+			http_options => $args{http_options}
 			);
 	$numberReturned = 0;
 	if ($action_res->getstatuscode() == 200) {
@@ -173,7 +182,8 @@ sub getcontentlist {
 				Filter => $args{Filter},
 				StartingIndex => $args{StartingIndex},
 				RequestedCount => $args{RequestedCount},
-				SortCriteria => $args{SortCriteria}
+				SortCriteria => $args{SortCriteria},
+			http_options => $args{http_options}
 			);
 		$requestedCount = 999;
 		if ($action_res->getstatuscode() == 200) {
@@ -188,9 +198,11 @@ sub getcontentlist {
 				Filter => $args{Filter},
 				StartingIndex => $args{StartingIndex},
 				RequestedCount => $requestedCount,
-				SortCriteria => $args{SortCriteria}
+				SortCriteria => $args{SortCriteria},
+			http_options => $args{http_options}
 			);
 		if ($action_res->getstatuscode() != 200) {
+			$this->{content_error} = 'Content browse failed (HTTP ' . $action_res->getstatuscode() . ')';
 			return @content_list;
 		}
 	}
@@ -212,6 +224,8 @@ sub getcontentlist {
 		if ($content =~ m/<dc:date>(.*)<\/dc:date>/si) {
 			$container->setdate($1);
 		}
+		die "Content item limit exceeded\n"
+			if defined($args{max_items}) && @content_list >= $args{max_items};
 		push (@content_list, $container);
 		#print "container(" . $container->getid() . ") = " . $container->gettitle() . "\n";
 		#print $1;
@@ -238,11 +252,93 @@ sub getcontentlist {
 		elsif ($content =~ m/protocolInfo=\"[^:]*:[^:]:([^:]*):.*\"/si) {
 			$item->setcontenttype($1);
 		}
+		die "Content item limit exceeded\n"
+			if defined($args{max_items}) && @content_list >= $args{max_items};
 		push (@content_list, $item);
 	}
 
 	@content_list;
 }
+
+
+# Depth-first traversal without recursive Perl calls. getcontentlist remains
+# repeatable and one-level; state and budgets belong to this walk only.
+sub walkcontent {
+    my ($this, %args) = @_;
+    my %options = (ObjectID => '0', max_depth => 32, max_nodes => 4096,
+        timeout => 30, %args);
+    croak 'A content callback is required' unless ref($options{callback}) eq 'CODE';
+    foreach my $key (qw(max_depth max_nodes timeout)) {
+        my $pattern = $key eq 'timeout' ? qr/\A\d+(?:\.\d+)?\z/ : qr/\A\d+\z/;
+        croak "Invalid walk $key" unless defined($options{$key})
+            && $options{$key} =~ $pattern && POSIX::isfinite(0 + $options{$key})
+            && $options{$key} > 0;
+    }
+    $this->{walk_error} = '';
+    my $deadline = Net::UPnP::HTTP::_now() + $options{timeout};
+    my ($parsed, $visited) = (0, 0);
+    my %seen = ($options{ObjectID} => 1);
+    my $fetch = sub {
+        my ($id) = @_;
+        if (Net::UPnP::HTTP::_now() >= $deadline) {
+            $this->{walk_error} = 'Content walk deadline exceeded';
+            return undef;
+        }
+        if ($parsed >= $options{max_nodes}) {
+            $this->{walk_error} = 'Content walk node limit reached';
+            return undef;
+        }
+        my @list;
+        my $ok = eval {
+            @list = $this->getcontentlist(ObjectID => $id,
+                max_items => $options{max_nodes} - $parsed,
+                http_options => {deadline => $deadline});
+            1;
+        };
+        unless ($ok) {
+            $this->{walk_error} = $@ || 'Content browse failed';
+            return undef;
+        }
+        if ($this->{content_error}) {
+            $this->{walk_error} = $this->{content_error};
+            return undef;
+        }
+        if (Net::UPnP::HTTP::_now() >= $deadline) {
+            $this->{walk_error} = 'Content walk deadline exceeded';
+            return undef;
+        }
+        $parsed += @list;
+        return \@list;
+    };
+    my $root = $fetch->($options{ObjectID});
+    return 0 unless defined $root;
+    my @stack = ({list => $root, index => 0, depth => 1});
+    while (@stack) {
+        my $frame = $stack[-1];
+        if ($frame->{index} >= @{$frame->{list}}) { pop @stack; next; }
+        if (Net::UPnP::HTTP::_now() >= $deadline) {
+            $this->{walk_error} = 'Content walk deadline exceeded'; last;
+        }
+        my $content = $frame->{list}[$frame->{index}++];
+        my $id = $content->getid();
+        next if $content->iscontainer() && $seen{$id}++;
+        ++$visited;
+        my $start = Net::UPnP::HTTP::_now();
+        $options{callback}->($content, $frame->{depth});
+        # Account for browsing, not caller-owned media conversion/processing.
+        $deadline += Net::UPnP::HTTP::_now() - $start;
+        next unless $content->iscontainer();
+        if ($frame->{depth} >= $options{max_depth}) {
+            $this->{walk_error} = 'Content walk depth limit reached'; last;
+        }
+        my $children = $fetch->($id);
+        last unless defined $children;
+        push @stack, {list => $children, index => 0, depth => $frame->{depth} + 1};
+    }
+    return $visited;
+}
+
+sub getwalkerror { $_[0]->{walk_error} || '' }
 
 #------------------------------
 # getsystemupdateid
@@ -298,10 +394,8 @@ Net::UPnP::AV::MediaServer - Perl extension for UPnP.
         }
         $mediaServer = Net::UPnP::AV::MediaServer->new();
         $mediaServer->setdevice($dev);
-        @content_list = $mediaServer->getcontentlist(ObjectID => 0);
-        foreach $content (@content_list) {
-            print_content($mediaServer, $content, 1);
-        }
+        $mediaServer->walkcontent(callback => sub { print_content($mediaServer, @_); });
+        die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
         $devNum++;
     }
 
@@ -321,22 +415,12 @@ Net::UPnP::AV::MediaServer - Perl extension for UPnP.
             print " - " . $content->getcontenttype() . ")";
         }
         print "\n";
-        unless ($content->iscontainer()) {
-            return;
-        }
-        @child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
-        if (@child_content_list <= 0) {
-            return;
-        }
-        $indent++;
-        foreach my $child_content (@child_content_list) {
-            print_content($mediaServer, $child_content, $indent);
-        }
+
     }
 
 =head1 DESCRIPTION
 
-The package is a extention UPnP/AV media server.
+The package is an extension UPnP/AV media server.
 
 =head1 METHODS
 
@@ -380,6 +464,22 @@ Browse the content directory and return the action response, L<Net::UPnP::Action
                                         );
 
 Browse the content directory and return the content list. Please see L<Net::UPnP::AV::Content>, L<Net::UPnP::AV::Item> and L<Net::UPnP::AV::Container>.
+
+=item B<walkcontent> - walk a bounded content tree.
+
+    $visited = $mediaServer->walkcontent(
+        ObjectID => '0', max_depth => 32, max_nodes => 4096, timeout => 30,
+        callback => sub { my ($content, $depth) = @_; }
+    );
+    die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
+
+Visits content in depth-first order without recursive calls. Container IDs are
+visited once per walk; root children have depth 1. All parsed items, including
+pending siblings, consume the node budget. The timeout covers traversal and
+Browse requests, excluding caller callback time. Callback exceptions propagate.
+The return value counts visited objects; inspect C<getwalkerror()> for a limit
+or Browse failure that stopped the walk. C<getcontentlist()> remains one-level
+and repeatable.
 
 =back
 

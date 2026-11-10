@@ -1,16 +1,17 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## REST API Framework - ~/lib/m
-## Version v1.2.6
+## REST API Framework - ~/lib/Net/API/REST.pm
+## Version v1.2.7
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2026/08/05
+## Modified 2026/11/09
+##
 ## All rights reserved
-## 
+##
 ## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.##
-##----------------------------------------------------------------------------##
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 package Net::API::REST;
 BEGIN
 {
@@ -39,7 +40,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.6';
+    $VERSION = 'v1.2.7';
 };
 
 use strict;
@@ -939,10 +940,11 @@ sub route
                     !exists( $ref->{_delete} ) &&
                     !exists( $ref->{_get} ) && 
                     !exists( $ref->{_head} ) &&
+                    !exists( $ref->{_patch} ) &&
                     !exists( $ref->{_post} ) &&
                     !exists( $ref->{_put} ) )
                 {
-                    return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_post\", or \"_put\" inside it." }) );
+                    return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_patch\", \"_post\", or \"_put\" inside it." }) );
                 }
                 my $methods = {};
                 foreach my $h ( qw( _delete _get _head _patch _post _put ) )
@@ -1637,7 +1639,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.6
+    v1.2.7
 
 =head1 DESCRIPTION
 

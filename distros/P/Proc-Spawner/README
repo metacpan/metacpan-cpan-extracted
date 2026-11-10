@@ -1,4 +1,4 @@
-Proc-Spawner version 0.10 (EXPERIMENTAL)
+Proc-Spawner version 0.11 (EXPERIMENTAL)
 ========================================
 
 Compiles and runs shell one-liners (or portable shell scripts) from Perl
@@ -9,7 +9,8 @@ subshells, $( ) and pipelines of compound commands inside the Perl process.
 (All the started programs are children of the initial Perl process, as opposed
 to descendants.)
 
-  Proc::Spawner          start children (every posix_spawn setting); the event loop
+  Proc::Spawner          start children (every posix_spawn setting)
+  Proc::Spawner::Loop    the event loop, one interface on POSIX and on Windows
   Proc::Spawner::Graph   the executable graph of children, pipes and files
   Proc::ShellSpawn       the shell layer
   Proc::ShellSubset, Proc::ShellSubset::Small, Proc::ShellSubset::Large
@@ -19,7 +20,7 @@ WHAT IS OPEN: the file TODO lists every postponed thing in one place, first
 the decisions waiting for the author (with where to read and how to act),
 then the work, then what to watch.
 
-HOW CLOSE TO DASH AND BASH (0.10; doc/large-subset/large-subset-state.md)
+HOW CLOSE TO DASH AND BASH (0.11; doc/large-subset/large-subset-state.md)
 
 Of 41,952 shell strings from six public collections (tldr, NL2Bash,
 ShellCheck's tests, the bash Cookbook, the pure sh and bash bibles), the
@@ -29,7 +30,10 @@ subset rejects on purpose; 44 are forms both shells run alike, the work list
 by Proc::ShellSpawn, isolated, with every program but the plain text tools
 replaced by a recorder of its arguments, each run with a fresh /tmp, a
 fixed /dev/urandom and fixed file times (section 7; the limits: known issue
-X27):
+X27).  That run predates IP1: ours ran echo, printf, test, [, true and false
+as the coreutils programs, as PROC_SHELLSPAWN_INPROC=none does now.  With the
+default (inside Perl, 0.10) 2 samples come out otherwise: printf "\u20AC"
+(known issue X37, fixed since) and a race (section 7):
 
                        run   same   only the    dash and bash  dash and bash
                                     messages    agree, ours    differ

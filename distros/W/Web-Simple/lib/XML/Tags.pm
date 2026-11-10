@@ -28,7 +28,7 @@ sub to_xml_string {
       ? (ref $_ eq 'SCALAR' ? $$_ : $_)
       : do { local $_ = $_; # copy
           if (defined) {
-            s/&/&amp;/g; s/"/&quot;/g; s/</&lt;/g; s/>/&gt;/g; $_;
+            s/&/&amp;/g; s/"/&quot;/g; s/</&lt;/g; s/>/&gt;/g; s/'/&#39;/g; $_;
           } else {
             ''
           }

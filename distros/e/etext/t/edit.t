@@ -9,10 +9,12 @@ BEGIN {
   eval { require Tk; 1 } or plan skip_all => "Tk not available: $@";
 }
 use Tk::eText;
+use Data::Dumper;
+$Data::Dumper::Indent = 0; $Data::Dumper::Terse = 1;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 115;
+plan tests => 144;
 $mw->geometry('+10+10');
 binmode(Test::More->builder->$_, ':utf8') for qw(output failure_output);
 
@@ -363,6 +365,207 @@ $t->editUndo;
 $mw->update;
 is(snapshot_emb(), $with, 'and again after a redo');
 is_deeply(\@bgerrors, [], 'no background errors with images and windows') or diag(@bgerrors);
+
+# Undo re-creates the tags of the deleted text exactly: text put back
+# inside what became one range of a tag does not take the tag where the
+# deleted text did not have it.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->insert('end', "abcdefghij\nklm\n");
+  $u->tagAdd('b', '1.0', '1.3');
+  $u->tagAdd('b', '1.6', '1.9');
+  $u->editReset;
+  $u->delete('1.2', '1.7');
+  is(join(' ', $u->tagRanges('b')), '1.0 1.4', 'the deletion joined the two ranges');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('b')), '1.0 1.3 1.6 1.9', 'undo separates them again');
+  $u->editRedo;
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('b')), '1.0 1.3 1.6 1.9', 'after a redo too');
+  # The gap is exactly the deleted range, and spans a line end.
+  $u->tagRemove('b', '1.0', 'end');
+  $u->tagAdd('b', '1.0', '1.4');
+  $u->tagAdd('b', '2.1', '2.3');
+  $u->tagAdd('c', '1.6', '1.8');
+  $u->editReset;
+  $u->delete('1.4', '2.1');
+  is(join(' ', $u->tagRanges('b')), '1.0 1.6', 'joined over the line end');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('b')), '1.0 1.4 2.1 2.3', 'undo restores the gap over the line end');
+  is(join(' ', $u->tagRanges('c')), '1.6 1.8', 'and the other tag in it');
+  $u->destroy;
+}
+
+# The redo of an insertion re-inserts exactly what the insertion left:
+# the tags it was inserted with, the leaves it made in a block (recorded
+# in block-list form when the insertion is undone).
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('F');
+  $u->debug(1);
+  $u->insert('end', "abcdef\nghi\n");
+  $u->tagAdd('b', '1.0', '1.6');
+  $u->editReset;
+  my $state = sub { join '|', $u->get('1.0', 'end'), map { "$_:" . join(' ', $u->tagRanges($_)) } qw(b c) };
+  $u->insert('1.3', 'XY', 'c', 'Z', '');		# cuts the run of b
+  my $after = $state->();
+  is($after, "abcXYZdef\nghi\n\n|b:1.0 1.3 1.6 1.9|c:1.3 1.5",
+     'insert with tag lists: XY tagged c only, Z untagged');
+  $u->editUndo;
+  is($state->(), "abcdef\nghi\n\n|b:1.0 1.6|c:", 'undo takes it out');
+  $u->editRedo;
+  is($state->(), $after, 'redo puts it back with its tags (not with b, as plain text would get)');
+  $u->editUndo; $u->editRedo; $u->editUndo; $u->editRedo;
+  is($state->(), $after, 'again and again');
+
+  # In a block: the leaves the insertion made come back.
+  $u->delete('1.0', 'end');
+  $u->insert('end', "num\nden\n");
+  $u->blockInsert('F', '1.0', '2.3');
+  $u->editReset;
+  my $tree = sub { my @b = $u->blockAt('1.0'); join ' ', $u->get('1.0', '1.end'), Dumper($b[4]) };
+  $u->insert('1.2', "a\nb");
+  my $split = $tree->();
+  $u->editUndo;
+  isnt($tree->(), $split, 'undo of an insertion with a newline in a block');
+  $u->editRedo;
+  is($tree->(), $split, 'redo makes the same leaves again');
+
+  # A mark set in the inserted text after the insertion: the undo moves
+  # it to where the text was, the redo back to its place.
+  $u->delete('1.0', 'end');
+  $u->editReset;
+  $u->insert('1.0', 'hello');
+  $u->markSet('m', '1.2');
+  $u->markGravity('m', 'left');
+  $u->editUndo;
+  is($u->index('m'), '1.0', 'undo of the insertion moves the mark out');
+  $u->editRedo;
+  is($u->index('m'), '1.2', 'redo puts it back in place');
+  $u->destroy;
+}
+
+# A range starting exactly where a tag ends, the tag on again after it:
+# the undo of its deletion, and the redo of its insertion, re-create the
+# text without the tag (the off-toggle at the start of the range is not
+# in the range's block list; the undo now records it).
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->insert('end', "abcdefgh\n");
+  $u->tagAdd('c', '1.0', '1.2', '1.5', '1.8');
+  $u->editReset;
+  $u->delete('1.2', '1.5');
+  is(join(' ', $u->tagRanges('c')), '1.0 1.5', 'the deletion joined the ranges');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('c')), '1.0 1.2 1.5 1.8', 'undo: the gap is untagged again');
+  $u->delete('1.0', 'end');
+  $u->insert('end', "ab\ncd\nef\n");
+  $u->tagAdd('c', '1.1', '3.1');
+  $u->editReset;
+  $u->insert('2.0', "z\nw", 'b');
+  my @r = map { join ' ', $u->tagRanges($_) } qw(b c);
+  is_deeply(\@r, ['2.0 3.1', '1.1 2.0 3.1 4.1'], 'an insertion with its own tags in a run of c');
+  $u->editUndo;
+  $u->editRedo;
+  is_deeply([map { join ' ', $u->tagRanges($_) } qw(b c)], \@r, 'its redo does not give it c');
+  $u->destroy;
+}
+
+# A deletion that the final newline makes empty (only the newline was
+# named, and it stays) records nothing and does not modify, unless
+# the newline had tags, which it takes off (as Tk does) and records.
+{
+  my $u = $mw->eText(-undo => 1, -autoseparators => 0)->pack;
+  $u->insert('1.0', "\n\n");
+  $u->editReset;
+  my $start = $u->get('1.0', 'end');
+  $u->delete('1.1', '3.0'); $u->editSeparator;
+  is($u->index('end'), '2.0', 'a deletion leaves a single empty line');
+  $u->editModified(0);
+  $u->delete('1.1', '2.0');
+  ok(!$u->editModified, 'deleting what is left (nothing) does not modify');
+  $u->editUndo;
+  is($u->get('1.0', 'end'), $start, 'nor is it an undo step: the undo takes back the deletion before');
+  $u->delete('1.0', 'end');
+  $u->insert('1.0', "ab");
+  $u->tagAdd('c', '1.0', 'end');
+  $u->editReset;
+  $u->delete('1.2', 'end');
+  is(join(' ', $u->tagRanges('c')), '1.0 1.2', 'deleting nothing but the final newline takes its tags off');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('c')), '1.0 2.0', 'and the undo puts them back');
+  # Only the selection on the final newline: not content.
+  $u->tagRemove('c', '1.0', 'end');
+  $u->insert('1.0', 'X');
+  $u->editSeparator;
+  $u->tagAdd('sel', '1.0', 'end');
+  $u->editModified(0);
+  $u->delete('1.3', 'end');
+  ok(!$u->editModified, 'deleting nothing but a selected final newline does not modify');
+  $u->editUndo;
+  is($u->get('1.0', '1.end'), 'ab', 'nor makes an undo step');
+  $u->destroy;
+}
+
+# The undo of a deletion re-creates tags from the list: a tag starting
+# inside a block and going on after it lost its start when another tag
+# was switched on and off later in the list (the mark of the first
+# tag's start was reused for the second and unset with it).
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('F');
+  $u->insert('1.0', "abcdefgh\n");
+  $u->blockInsert('F', '1.0', '1.3');		# {abc}defgh
+  $u->tagAdd('b', '1.3', '1.9');
+  $u->tagAdd('c', '1.6', '1.7');
+  $u->editReset;
+  $u->delete('1.0', '1.8');
+  $u->editUndo;
+  is(join(' ', map { join ' ', $u->tagRanges($_) } qw(b c)), '1.3 1.9 1.6 1.7',
+     'undo of a deletion: a tag starting inside a block, another after it');
+  $u->destroy;
+}
+
+# A deletion of a whole block between two runs of a tag joins them; the
+# undo made the block where the joined run is, and the block's head and
+# tail kept the tag.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('F');
+  $u->blockConfigure('E', -empty => 1);
+  $u->insert('1.0', "abcdefgh\n");
+  $u->blockInsert('F', '1.2', '1.4');		# ab{cd}efgh
+  $u->tagAdd('c', '1.0', '1.2', '1.7', '1.8');
+  $u->editReset;
+  $u->delete('1.1', '1.7');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('c')), '1.0 1.2 1.7 1.8', 'undo of a deletion of a block between two runs');
+  $u->delete('1.0', 'end');
+  $u->insert('1.0', "abcd\n");
+  $u->blockInsert('E', '1.2');			# ab.cd
+  $u->tagAdd('c', '1.0', '1.1', '1.4', '1.5');
+  $u->editReset;
+  $u->delete('1.1', '1.4');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('c')), '1.0 1.1 1.4 1.5', 'the same with an -empty block');
+  $u->destroy;
+}
+
+# A block re-created in a run of a tag that the list switches off
+# inside the block: its tail kept the tag.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('F');
+  $u->insert('1.0', "abcdef\nghijkl\nmnopqr\nstu\n");
+  $u->tagAdd('b', '1.2', '2.5', '4.0', '5.0');
+  $u->blockInsert('F', '2.2', '3.3');		# gh{ijkl|mno}pqr
+  $u->editReset;
+  my $before = join ' ', $u->tagRanges('b');
+  $u->delete('1.5', '3.3');
+  $u->editUndo;
+  is(join(' ', $u->tagRanges('b')), $before, 'undo: a tag switched off inside a re-created block is off on its tail');
+  $u->destroy;
+}
 
 # The <<Undo>> and <<Redo>> virtual events (Control-z and friends).
 $t->editReset;

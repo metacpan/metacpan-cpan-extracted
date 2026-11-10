@@ -101,22 +101,23 @@ Ekorn::Pipeline::Stages::Flow - stages taking or dropping values: take, drop, ta
 
 =head1 DESCRIPTION
 
-Stages that decide which values go on, by their place or by a test,
-whatever the values are. Each function returns a stage, and checks
-what it's given when it's called, not on each value. Those that keep
-state, C<take>, C<drop> and C<drop_while>, are made with
-L<Ekorn::Pipeline::Gather>, so they start afresh on each run: each call
-of a pipeline with values, and each iterator made from it.
+Stages that decide which values go on, by their position or by a
+test, whatever the values are. Each function returns a stage. It
+checks its arguments when it's called, not on each value.
+
+C<take>, C<drop> and C<drop_while> keep state, so they're made with
+L<Ekorn::Pipeline::Gather> and start afresh on each run. A run is a
+call of a pipeline with values, or an iterator made from it.
 
 C<take> and C<take_while> end the pipeline with
-L<Ekorn::Pipeline::Stop> once they have passed on all they will, so an
-iterator calls its source no more.
+L<Ekorn::Pipeline::Stop> once they've passed on all they will, so an
+iterator stops calling its source.
 
 =head1 FUNCTIONS
 
-C<take> and C<drop> are exported by default; C<take_while> and
-C<drop_while> on request, or all four with C<:all>. To have the
-defaults and one more, name C<:DEFAULT> too:
+C<take> and C<drop> are exported by default. C<take_while> and
+C<drop_while> are exported on request, and C<:all> gives all four. To
+get the defaults and one more, name C<:DEFAULT> too:
 
     use Ekorn::Pipeline::Stages::Flow qw(:DEFAULT take_while);
 
@@ -124,9 +125,10 @@ defaults and one more, name C<:DEFAULT> too:
 
     take($count)
 
-Passes on the first C<$count> values, then stops the pipeline. With
-fewer values, passes them all on. C<take(0)> passes on none, but still
-sees the first value, as a stage isn't called until there is one.
+Passes on the first C<$count> values, then stops the pipeline. If there
+are fewer, it passes them all on. C<take(0)> passes on none, but it
+still sees the first value, because a stage isn't called until there
+is one.
 
 =head2 drop
 
@@ -141,17 +143,18 @@ C<take>, it gives a page:
 
     take_while { ... }
 
-Passes on values while the block is true of them, given each in C<$_>
-and as its argument, then stops the pipeline at the first it's false
-of, which isn't passed on.
+Passes on values while the block returns true for them, then stops the
+pipeline at the first value it returns false for. That value isn't
+passed on. The block gets each value in C<$_> and as its argument.
 
 =head2 drop_while
 
     drop_while { ... }
 
-Drops values while the block is true of them, given each in C<$_> and
-as its argument, and passes on the rest, from the first it's false of.
-Once it's false, the block isn't called again on that run.
+Drops values while the block returns true for them, then passes on the
+rest, starting with the first value it returns false for. After that,
+the block isn't called again on that run. The block gets each value in
+C<$_> and as its argument.
 
 =head1 DIAGNOSTICS
 

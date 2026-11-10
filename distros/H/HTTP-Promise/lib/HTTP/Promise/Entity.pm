@@ -20,7 +20,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS $BOUNDARY_DELIMITER $BOM2ENC $ENC2BOM $BOM_RE 
                  $BOM_MAX_LENGTH $DEFAULT_MIME_TYPE );
-    use Data::UUID;
+    use Crypt::Misc ();
     use HTTP::Promise::Exception;
     use HTTP::Promise::Headers;
     use HTTP::Promise::Body;
@@ -1376,15 +1376,7 @@ sub is_multipart
 
 sub is_text { return( !shift->is_binary( @_ ) ); }
 
-sub make_boundary { return( Data::UUID->new->create_str ); }
-# sub make_boundary
-# {
-#     my $self = shift( @_ );
-#     # my $uuid = $self->_uuid;
-#     my $uuid = Data::UUID->new;
-#     my $boundary = $uuid->create_str;
-#     return( $boundary );
-# }
+sub make_boundary { return( Crypt::Misc::random_v4uuid() ); }
 
 sub make_multipart
 {
@@ -2186,7 +2178,7 @@ The filepath to the content to be used as the entity body. This is useful if the
 
 String. The entity mime-type. This defaults to C<text/plain>
 
-If the type is set to C<multipart/form-data> or C<multipart/mixed>, or any other multipart type, this will automatically create a boundary, which is basically a UUID generated with the XS module L<Data::UUID>
+If the type is set to C<multipart/form-data> or C<multipart/mixed>, or any other multipart type, this will automatically create a boundary, which is basically a UUID generated with the XS module L<Crypt::Misc> and dits function L<Crypt::Misc/random_v4uuid>
 
 =back
 
@@ -2420,7 +2412,7 @@ For example:
 
 =head2 make_boundary
 
-Returns a uniquely generated multipart boundary created using L<Data::UUID>
+Returns a uniquely generated multipart boundary created using L<Crypt::Misc/random_v4uuid>
 
 =head2 make_multipart
 

@@ -69,7 +69,7 @@ subtest 'every page can reach it and loads the theme first' => sub {
 		my $body = $res->body;
 		my $dom  = $res->dom;
 
-		ok $dom->at('nav.site-nav a[href="/preferences"]'), "$page links to the preferences";
+		ok $dom->at('nav.site-nav a[href^="/preferences"]'), "$page links to the preferences";
 
 		my $script = index $body, 'bi-pref:theme';
 		my $body_at = index $body, '<body';

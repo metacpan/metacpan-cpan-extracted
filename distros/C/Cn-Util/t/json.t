@@ -25,6 +25,21 @@ capture { $returned = ref_to_json_file($data, $out) };   # prints "Wrote ..."
 is( $returned, $out, 'ref_to_json_file returns the filename it wrote' );
 ok( -s $out, 'ref_to_json_file created a non-empty file' );
 
+# Captured output is not a terminal, so the name is not colored unless
+# CLICOLOR_FORCE asks for it.  Up to 0.024 it always was.
+{
+	local $ENV{NO_COLOR};
+	local $ENV{CLICOLOR_FORCE};
+	my ($said) = capture { ref_to_json_file($data, $out) };
+	is( $said, "Wrote $out\n", 'ref_to_json_file prints no color codes into a pipe' );
+	$ENV{CLICOLOR_FORCE} = 1;
+	($said) = capture { ref_to_json_file($data, $out) };
+	like( $said, qr/\AWrote \e\[/, '...unless CLICOLOR_FORCE is set' );
+	$ENV{NO_COLOR} = 1;
+	($said) = capture { ref_to_json_file($data, $out) };
+	is( $said, "Wrote $out\n", '...and NO_COLOR outranks CLICOLOR_FORCE' );
+}
+
 my $back = json_file_to_ref($out);
 is_deeply( $back, $data, 'data survives a write/read round trip' );
 

@@ -1,16 +1,15 @@
 package Smart::Options;
 use strict;
 use warnings;
-use 5.010001;
-our $VERSION = '0.061';
+use 5.020;
+our $VERSION = '1.0.1';
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(argv);
 
-use List::MoreUtils qw(uniq);
+use List::Util 1.45 qw(uniq);
 use Text::Table;
-use File::Slurp;
 
 sub new {
     my $pkg = shift;
@@ -214,7 +213,12 @@ sub _get_real_name {
 sub _load_config {
     my ($self, $argv, $file) = @_;
 
-    for my $line (read_file($file)) {
+    # :raw reads the bytes as they are, with no decoding and no CRLF translation
+    open my $fh, '<:raw', $file or die "cannot open config file '$file': $!\n";
+    my @lines = <$fh>;
+    close $fh;
+
+    for my $line (@lines) {
         next if $line =~ /^\[/; # section
         next if $line =~ /^;/;  # comment
         next if $line !~ /=/;   # bad format;
@@ -390,7 +394,7 @@ sub parse {
             }
         } elsif ($type eq 'Num') {
             if ($argv->{$opt}) {
-                $check = ($argv->{$opt} =~ /^\-?\d+(\.\d+)$/) ? 1 : 0;
+                $check = ($argv->{$opt} =~ /^\-?\d+(\.\d+)?$/) ? 1 : 0;
             } else {
                 $check = 1;
             }
@@ -403,7 +407,7 @@ sub parse {
         } elsif ($type eq 'HashRef') {
             $argv->{$opt} //= {};
             $check = (ref($argv->{$opt}) eq 'HASH') ? 1 : 0;
-        } elsif ('Config') {
+        } elsif ($type eq 'Config') {
             if ($argv->{$opt} && !(-f $argv->{$opt})) {
                 die "cannot load config file '@{[$argv->{$opt}]}\n";
             }
@@ -430,15 +434,18 @@ __END__
 
 =encoding utf8
 
+=for stopwords env subcmd cmd
+
 =head1 NAME
 
 Smart::Options - smart command line options processor
 
 =head1 SYNOPSIS
 
+  use 5.010;
   use Smart::Options;
 
-  my $argv = Smart::Options->new->argv;
+  my $argv = Smart::Options->new->parse;    # parses @ARGV
 
   if ($argv->{rif} - 5 * $argv->{xup} > 7.138) {
       say 'Buy more fiffiwobbles';
@@ -460,7 +467,7 @@ This module is analyzed as people interpret an option intuitively.
 
 =head1 METHOD
 
-=head2 new()
+=head2 new(%args)
 
 Create a parser object.
 
@@ -468,14 +475,20 @@ Create a parser object.
 
   my $argv = Smart::Options->new->parse(qw(-x 10 -y 2));
 
+By default the parser has a C<-h, --help> option, which prints the help and dies.
+Pass C<< add_help => 0 >> to leave it out.
+
+  my $opt = Smart::Options->new(add_help => 0);
+
 =head2 parse(@args)
 
 parse @args. return hashref of option values.
-if @args is empty Smart::Options use @ARGV
+if @args is empty Smart::Options use @ARGV.
+The arguments that are not options are in C<< $argv->{_} >> (an arrayref).
 
 =head2 argv(@args)
 
-shortcut method. this method auto export.
+shortcut function, exported by default. Call it as a function, not as a method.
 
   use Smart::Options;
   say argv(qw(-x 10))->{x};
@@ -508,13 +521,14 @@ set default value for option.
 set option help message.
 
   use Smart::Options;
-  my $opt = Smart::Options->new()->alias(f => 'file')->describe('Load a file');
-  say $opt->help;
+  my $opt = Smart::Options->new()->alias(f => 'file')->describe(f => 'Load a file');
+  print $opt->help;
 
   # Usage: ./example.pl
   #
   # Options:
-  #    -f, --file  Load a file
+  #   -f, --file  Load a file
+  #   -h, --help  Show help
   #
 
 =head2 boolean($option, $option2, ...)
@@ -531,19 +545,22 @@ interpret 'option' as a boolean.
 
 =head2 demand($option, $option2, ...)
 
-show usage (showHelp()) and exit if $option wasn't specified in args.
+show usage (C<showHelp()>) and die if $option wasn't specified in args.
 
   use Smart::Options;
   my $opt = Smart::Options->new()->alias(f => 'file')
                                  ->demand('file')
-                                 ->describe('Load a file');
-  $opt->argv(); # => exit
+                                 ->describe(file => 'Load a file');
+  $opt->parse(); # => die
 
   # Usage: ./example.pl
   #
   # Options:
-  #    -f, --file  Load a file [required]
+  #   -f, --file  Load a file    [required]
+  #   -h, --help  Show help
   #
+  #
+  # Missing required arguments: file
 
 =head2 options($key => $settings, ...)
 
@@ -588,7 +605,8 @@ The contents will be read into each option if a file name is specified as a Conf
   my $opt = Smart::Options->new()->type(conf => 'Config');
   $opt->parse(qw(--conf=.optrc));
 
-config file format is simple. see http://en.wikipedia.org/wiki/INI_file
+config file format is simple. see L<https://en.wikipedia.org/wiki/INI_file>.
+Sections are ignored, so every key is read as a top-level option.
 
   ; this is comment
   [section]
@@ -603,11 +621,26 @@ define new type and convert logic.
   use Path::Class; # export 'file'
   my $opt = Smart::Options->new()->coerce(File => 'Str', sub { file($_[0]) })
                                  ->type(file => 'File');
-  
-  $opt->parse('--foo=/etc/passwd');
+
+  my $argv = $opt->parse('--file=/etc/passwd');
   $argv->{file} # => Path::Class::File instance
 
-=head2 usage
+=head2 env($option, $option2, ...)
+
+read the value of $option from an environment variable, when it is not given in args.
+The name of the variable is C<uc("${prefix}_$option")>, where $prefix is set by
+L</env_prefix($prefix)>.
+
+  use Smart::Options;
+  # $ MYAPP_PORT=8080 ./example.pl
+  my $argv = Smart::Options->new->env_prefix('myapp')->env('port')->parse;
+  $argv->{port} # => 8080
+
+=head2 env_prefix($prefix)
+
+set the prefix of the environment variables read by L</env($option, $option2, ...)>.
+
+=head2 usage($message)
 
 set a usage message to show which command to use. default is "Usage: $0".
 
@@ -621,12 +654,18 @@ print usage message. default output STDERR.
 
 =head2 subcmd($cmd => $parser)
 
-set a sub command. $parser is another Smart::Option object.
+set a sub command. $parser is another Smart::Options object.
+The name of the sub command is in C<< $argv->{command} >>, and the options after it,
+parsed by $parser, are in C<< $argv->{cmd_option} >>.
 
   use Smart::Options;
   my $opt = Smart::Options->new()
               ->subcmd(add => Smart::Options->new())
               ->subcmd(minus => Smart::Options->new());
+
+  my $argv = $opt->parse(qw(add -x 1));
+  $argv->{command}         # => 'add'
+  $argv->{cmd_option}{x}   # => 1
 
 =head1 DSL
 
@@ -671,7 +710,7 @@ If set flag multiple times it will get arrayref.
 
 =head2 dot notation
 
-  use Smart::Optuions;
+  use Smart::Options;
   argv(qw(--foo.x 1 --foo.y 2)); # => { foo => { x => 1, y => 2 } }
 
 =head1 AUTHOR
@@ -680,9 +719,9 @@ Kan Fushihara E<lt>kan.fushihara@gmail.comE<gt>
 
 =head1 SEE ALSO
 
-https://www.npmjs.com/package/minimist
+L<https://www.npmjs.com/package/minimist>
 
-L<GetOpt::Casual>, L<opts>, L<GetOpt::Compat::WithCmd>
+L<Getopt::Casual>, L<opts>, L<Getopt::Compact::WithCmd>
 
 =head1 LICENSE
 

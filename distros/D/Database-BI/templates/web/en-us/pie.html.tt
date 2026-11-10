@@ -1,0 +1,317 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  /* Center the pie chart and legend inside the page */
+  .pie-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .chart-source {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: var(--muted, #666);
+    word-break: break-all;
+  }
+  .chart-source a { color: inherit; }
+  /* A slice and its legend entry are controls: both open the matching rows. */
+  #pie_chart path:focus-visible {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+    outline: none;
+  }
+  #pie_chart_legend .bi-pie-legend-entry:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+</style>
+
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
+
+<h2 class="graph-title">[% title | html %]</h2>
+
+<div class="graph-export-bar">
+  <button class="btn-graph-export" data-export="biPieExportSVG">Export SVG</button>
+  <button class="btn-graph-export" data-export="biPieExportPNG">Export PNG</button>
+  <button class="btn-graph-export" data-export="biPieExportPDF">Export PDF</button>
+  <button class="btn-graph-export" id="btn-copy-chart-link">&#x1F517; Copy link</button>
+  <span class="graph-point-count">
+    [% slice_count %] slice[% IF slice_count != 1 %]s[% END %]
+    [% IF slice_count > 12 %](top 12 shown)[% END %]
+  </span>
+</div>
+
+<p class="sr-only" id="pie-drill-help">Drill into a slice: press Tab until the slice or its
+legend entry has focus, then press Enter or Space to open the matching rows in the table.</p>
+
+<div class="pie-container">
+  <script nonce="[% csp_nonce | html %]" src="[% d3_url | html %]"></script>
+  [% chart_html %]
+</div>
+
+<!-- Metadata read by the drill-down click handler below. -->
+<div id="pie-meta" data-back-url="[% drill_back_url | html %]" data-cat-col="[% cat_col | html %]" data-currency="[% currency_symbol | html %]" hidden></div>
+
+<script nonce="[% csp_nonce | html %]">
+// Clicking a slice or legend entry filters the source table to that category.
+(function () {
+  var meta     = document.getElementById('pie-meta');
+  var backUrl  = meta ? meta.getAttribute('data-back-url') : '';
+  var catCol   = meta ? meta.getAttribute('data-cat-col')  : '';
+  var currency = meta ? (meta.getAttribute('data-currency') || '') : '';
+  if (!backUrl || !catCol) return;
+
+  function drillDown(label) {
+    var pieUrl = window.location.href;
+    var sep    = backUrl.indexOf('?') >= 0 ? '&' : '?';
+    var target = backUrl + sep + 'f=' + encodeURIComponent(catCol + ':eq:' + label);
+    target    += '&back2='       + encodeURIComponent(pieUrl);
+    target    += '&back2_label=' + encodeURIComponent('Back to pie chart');
+    window.location.href = target;
+  }
+
+  // A slice and its legend entry are the same control: both open the matching
+  // rows.  A keyboard reader gets the same thing a pointer reader does - the
+  // element is in the tab order, carries the category's name, and answers
+  // Enter and Space - rather than a title that is only read on hover.
+  function makeDrillable(el, label) {
+    el.style.cursor = 'pointer';
+    el.setAttribute('title', 'Filter table to: ' + label);
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', 'Filter table to ' + label);
+    el.setAttribute('aria-describedby', 'pie-drill-help');
+    el.addEventListener('click', function () { drillDown(label); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        drillDown(label);
+      }
+    });
+  }
+
+  // D3 creates the path elements synchronously; only the transition is deferred.
+  // A short delay ensures the elements are in the DOM before we query them.
+  setTimeout(function () {
+    // Wire pie slices: D3 v7 stores the datum on element.__data__.
+    document.querySelectorAll('#pie_chart path').forEach(function (path) {
+      var d = path.__data__;
+      if (!d || !d.data || !d.data.label) return;
+      makeDrillable(path, d.data.label);
+    });
+
+    // Wire legend entries: capture label text BEFORE any currency post-processing
+    // so the drill-down navigates to the raw category name, not the display string.
+    document.querySelectorAll('#pie_chart_legend .bi-pie-legend-entry').forEach(function (el) {
+      var text  = el.textContent.trim();
+      var slash = text.indexOf(' / ');
+      var label = slash >= 0 ? text.substring(0, slash).trim() : text;
+      if (!label) return;
+      makeDrillable(el, label);
+    });
+
+    // Prepend the currency symbol to each legend amount after the ' / ' separator.
+    // Text nodes are modified directly to leave the .bi-pie-swatch span untouched.
+    // getLegendEntries() reads textContent after this runs, so exports include it.
+    if (currency) {
+      document.querySelectorAll('#pie_chart_legend .bi-pie-legend-entry').forEach(function (el) {
+        Array.from(el.childNodes).forEach(function (node) {
+          if (node.nodeType !== 3) return;
+          node.textContent = node.textContent.replace(
+            /(\/\s*)([\d,])/,
+            function (m, sep, digit) { return sep + currency + digit; }
+          );
+        });
+      });
+    }
+  }, 50);
+}());
+</script>
+
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  function _getAttribution() {
+    var el = document.getElementById('chart-attribution');
+    return el ? { url: el.dataset.url, date: el.dataset.date } : null;
+  }
+  var ATTR_H = 38;
+  function _addAttrToSVG(svgEl, attr) {
+    if (!attr) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var h  = parseFloat(svgEl.getAttribute('height')) || 500;
+    svgEl.setAttribute('height', h + ATTR_H);
+    var maxLen = 90;
+    var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+    var style = 'font-family:sans-serif;font-size:11px;fill:#666;';
+    var t1 = document.createElementNS(ns, 'text');
+    t1.setAttribute('x', 10); t1.setAttribute('y', h + 16); t1.setAttribute('style', style);
+    t1.textContent = 'Source: ' + urlText;
+    var t2 = document.createElementNS(ns, 'text');
+    t2.setAttribute('x', 10); t2.setAttribute('y', h + 30); t2.setAttribute('style', style);
+    t2.textContent = 'Accessed on ' + attr.date;
+    svgEl.appendChild(t1);
+    svgEl.appendChild(t2);
+  }
+
+  // Read legend entries from the HTML legend panel that HTML::D3 renders beside
+  // the SVG.  Each entry is a .bi-pie-legend-entry div containing a colored
+  // .bi-pie-swatch span and a text node with the label / value (pct%) string.
+  function getLegendEntries() {
+    var entries = [];
+    document.querySelectorAll('#pie_chart_legend .bi-pie-legend-entry').forEach(function (el) {
+      var sw = el.querySelector('.bi-pie-swatch');
+      // getComputedStyle gives a consistent rgb(...) string regardless of how
+      // the inline `background` shorthand was written by D3.
+      var color = sw ? window.getComputedStyle(sw).backgroundColor : '#999';
+      entries.push({ color: color, text: el.textContent.trim() });
+    });
+    return entries;
+  }
+
+  // Measure the pixel width needed for the legend column by rendering each
+  // label into an off-screen canvas.  Returns 0 when there are no entries.
+  var SWATCH = 14, GAP = 20, ROW_H = 22, LEG_PAD = 10;
+  function _measureLegendWidth(entries) {
+    if (!entries.length) return 0;
+    var tmp = document.createElement('canvas');
+    var tc  = tmp.getContext('2d');
+    tc.font = '12px sans-serif';
+    var maxW = 0;
+    entries.forEach(function (e) {
+      var w = tc.measureText(e.text).width;
+      if (w > maxW) maxW = w;
+    });
+    return Math.ceil(SWATCH + 5 + maxW + LEG_PAD);
+  }
+
+  // Build a composite SVG that contains the pie chart plus SVG-rendered legend
+  // items (colored rect + text per entry) placed to the right of the chart.
+  function biPieExportSVG() {
+    var svg = document.getElementById('pie_chart');
+    if (!svg) return;
+    var entries = getLegendEntries();
+    var svgW   = parseFloat(svg.getAttribute('width'))  || 600;
+    var svgH   = parseFloat(svg.getAttribute('height')) || 500;
+    var legW   = _measureLegendWidth(entries);
+    var totalW = svgW + (entries.length ? GAP + legW : 0);
+    // Vertically center the legend relative to the pie SVG.
+    var legTotalH = entries.length * ROW_H;
+    var legStartY = Math.max(0, (svgH - legTotalH) / 2);
+    var ns = 'http://www.w3.org/2000/svg';
+    var root = document.createElementNS(ns, 'svg');
+    root.setAttribute('xmlns', ns);
+    root.setAttribute('width', totalW);
+    root.setAttribute('height', svgH);
+    // Clone the original pie SVG content into the composite root.
+    Array.from(biChartExportClone(svg).childNodes).forEach(function (n) { root.appendChild(n.cloneNode(true)); });
+    // Append legend as SVG elements.
+    if (entries.length) {
+      var legG = document.createElementNS(ns, 'g');
+      legG.setAttribute('transform', 'translate(' + (svgW + GAP) + ',' + legStartY + ')');
+      entries.forEach(function (e, i) {
+        var y = i * ROW_H;
+        var rect = document.createElementNS(ns, 'rect');
+        rect.setAttribute('x', 0); rect.setAttribute('y', y);
+        rect.setAttribute('width', SWATCH); rect.setAttribute('height', SWATCH);
+        rect.setAttribute('fill', e.color); rect.setAttribute('rx', 2);
+        legG.appendChild(rect);
+        var txt = document.createElementNS(ns, 'text');
+        txt.setAttribute('x', SWATCH + 5); txt.setAttribute('y', y + SWATCH - 2);
+        txt.setAttribute('font-size', '12'); txt.setAttribute('fill', '#333');
+        txt.setAttribute('font-family', 'sans-serif');
+        txt.textContent = e.text;
+        legG.appendChild(txt);
+      });
+      root.appendChild(legG);
+    }
+    _addAttrToSVG(root, _getAttribution());
+    biBrandSvg(root);
+    var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
+            + new XMLSerializer().serializeToString(root);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    a.download = 'pie.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // Render the SVG to a canvas, then draw the legend items using 2D canvas ops.
+  function drawExportCanvas(scale, done) {
+    var svg = document.getElementById('pie_chart');
+    if (!svg) return;
+    var attr   = _getAttribution();
+    var entries = getLegendEntries();
+    var svgW   = parseInt(svg.getAttribute('width'),  10) || 600;
+    var svgH   = parseInt(svg.getAttribute('height'), 10) || 500;
+    var legW   = _measureLegendWidth(entries);
+    var totalW  = svgW + (entries.length ? GAP + legW : 0);
+    var extraH  = attr ? ATTR_H : 0;
+    // Vertically center the legend relative to the pie SVG.
+    var legTotalH = entries.length * ROW_H;
+    var legStartY = Math.max(0, (svgH - legTotalH) / 2);
+    var canvas = document.createElement('canvas');
+    canvas.width = totalW * scale; canvas.height = (svgH + extraH) * scale;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, totalW, svgH + extraH);
+    var src = new XMLSerializer().serializeToString(biChartExportClone(svg));
+    var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      // Draw legend entries to the right of the chart, centered vertically.
+      ctx.font = '12px sans-serif';
+      ctx.textBaseline = 'middle';
+      entries.forEach(function (e, i) {
+        var x = svgW + GAP;
+        var y = legStartY + i * ROW_H;
+        ctx.fillStyle = e.color;
+        ctx.fillRect(x, y, SWATCH, SWATCH);
+        ctx.fillStyle = '#333';
+        ctx.fillText(e.text, x + SWATCH + 5, y + SWATCH / 2);
+      });
+      if (attr) {
+        var maxLen  = 90;
+        var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+        ctx.font         = '11px sans-serif';
+        ctx.fillStyle    = '#666';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('Source: ' + urlText,       10, svgH + 16);
+        ctx.fillText('Accessed on ' + attr.date,  10, svgH + 30);
+      }
+      done(canvas);
+    };
+    img.src = url;
+  }
+  function biPieExportPNG() {
+    drawExportCanvas(1, function (canvas) {
+      var a = document.createElement('a');
+      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
+      a.download = 'pie.png';
+      a.click();
+    });
+  }
+  function biPieExportPDF() {
+    biSaveChartPDF(drawExportCanvas, 'pie.pdf');
+  }
+
+  window.biPieExportSVG = biPieExportSVG;
+  window.biPieExportPNG = biPieExportPNG;
+  window.biPieExportPDF = biPieExportPDF;
+}());
+</script>
+[% PROCESS "web/en/layouts/chart_export.html.tt" %]
+
+[% IF source_url %]
+<div id="chart-attribution" data-url="[% source_url | html %]" data-date="[% source_accessed | html %]" hidden></div>
+<p class="chart-source">Source: <a href="[% source_url | html %]" rel="noopener noreferrer">[% source_url | html %]</a></p>
+<p class="chart-source">Accessed on [% source_accessed %]</p>
+[% END %]
+
+[%- END -%]

@@ -27,7 +27,7 @@
  * character, like in Tk.
  */
 
-static char sccsid[] = "@(#) tkTextIndex.c 1.9 95/01/03 17:06:20";
+/* @(#) tkTextIndex.c 1.9 95/01/03 17:06:20 */
 
 #include "pperl.h"
 #include "default.h"
@@ -35,7 +35,7 @@ static char sccsid[] = "@(#) tkTextIndex.c 1.9 95/01/03 17:06:20";
 #include "tkInt.h"
 #include "tkText.h"
 
-static char rcsid[] = "$Id: tkTextIndex.c,v 1.4 1995/09/16 00:28:59 ilya Exp $";
+/* $Id: tkTextIndex.c,v 1.4 1995/09/16 00:28:59 ilya Exp $ */
 
 /*
  * Index to use to select last character in line (very large integer):
@@ -47,6 +47,9 @@ static char rcsid[] = "$Id: tkTextIndex.c,v 1.4 1995/09/16 00:28:59 ilya Exp $";
  * Forward declarations for procedures defined later in this file:
  */
 
+static int		GetIndex _ANSI_ARGS_((Tcl_Interp *interp,
+			    TkText *textPtr, char *string,
+			    TkTextIndex *indexPtr));
 static char *		ForwBack _ANSI_ARGS_((TkText *textPtr, char *string,
 			    TkTextIndex *indexPtr));
 static int		ParseModifier _ANSI_ARGS_((char **unitsPtr,
@@ -560,6 +563,32 @@ TkTextGetIndex(interp, textPtr, string, indexPtr)
     Tcl_Interp *interp;		/* Use this for error reporting. */
     TkText *textPtr;		/* Information about text widget. */
     char *string;		/* Textual description of position. */
+    TkTextIndex *indexPtr;	/* Index structure to fill in. */
+{
+    Tcl_DString copy;
+    int result;
+
+    /*
+     * The parsing below cuts the string in place for a while (a null
+     * byte after the base, after a tag name, ...).  The string is the
+     * buffer of a Perl scalar: it may be shared or read-only (undef
+     * gives a constant "", and writing even its null byte faults), so
+     * the parsing works on a copy, as Perl/Tk's own text widget does.
+     */
+
+    Tcl_DStringInit(&copy);
+    Tcl_DStringAppend(&copy, string, -1);
+    result = GetIndex(interp, textPtr, Tcl_DStringValue(&copy), indexPtr);
+    Tcl_DStringFree(&copy);
+    return result;
+}
+
+static int
+GetIndex(interp, textPtr, string, indexPtr)
+    Tcl_Interp *interp;		/* Use this for error reporting. */
+    TkText *textPtr;		/* Information about text widget. */
+    char *string;		/* Textual description of position;
+				 * modified temporarily. */
     TkTextIndex *indexPtr;	/* Index structure to fill in. */
 {
     register char *p;

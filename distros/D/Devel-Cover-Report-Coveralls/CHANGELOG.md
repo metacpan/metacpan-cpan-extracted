@@ -7,6 +7,19 @@ Versions up to 0.32.1 were released from `Changes`, before this file existed.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-10
+
+- Rewrite the description, `COVERALLS_ENDPOINT` and the links in the documentation, and add a Coveralls badge to the README (#67)
+- Leave the bots (tagpr's release pull requests and Dependabot) out of the contributors in the distribution's metadata (#71)
+- Work outside a git repository: git is not run there, so it prints no errors, and values that are not known are left out instead of sent empty. The commit, its author and the branch can be given there as `GIT_ID`, `GIT_BRANCH`, `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, `GIT_COMMITTER_EMAIL` and `GIT_MESSAGE`, the names of the official coverage-reporter (#35)
+- Override what the CI service gives with `COVERALLS_SERVICE_NAME`, `COVERALLS_SERVICE_NUMBER`, `COVERALLS_SERVICE_JOB_ID`, `COVERALLS_SERVICE_JOB_NUMBER`, `COVERALLS_PULL_REQUEST`, `COVERALLS_GIT_BRANCH` and `COVERALLS_GIT_COMMIT`, as in the official coverage-reporter (#35)
+- Send the job in the form the Coveralls jobs API documents: a JSON file in the multipart field `json_file`, in place of the form field `json`, with the MD5 digest of each source file as `source_digest` (#55)
+- Send the branch coverage that Devel::Cover collected, leaving out the branches marked uncoverable (#31)
+- Send source files written in UTF-8 as their characters, so that the non-ASCII text in them is not garbled on Coveralls. Files that are not valid UTF-8 are sent as their bytes, as before (#81)
+- On a CI service that is not detected, do not send the build as a manual upload when `COVERALLS_SERVICE_NAME`, `COVERALLS_PERL_SERVICE_NAME`, `COVERALLS_SERVICE_NUMBER`, `COVERALLS_SERVICE_JOB_ID` or `COVERALLS_SERVICE_JOB_NUMBER` is set, and send `COVERALLS_EVENT_TYPE` as the event type, as the official coverage-reporter does (#86)
+- On Azure Pipelines, send the branch (`BUILD_SOURCEBRANCHNAME`) also as `service_branch`. Outside Azure Pipelines, `BUILD_SOURCEBRANCHNAME` is no longer read (#88)
+- Read the commit from one `git log` instead of one for each of its six fields, which is faster on Windows (#87)
+- Make the JSON with Cpanel::JSON::XS when it is installed, which is several times faster than JSON::PP on a large distribution (#98)
 ## [1.0.0] - 2026-11-07
 
 - Update the usage examples for GitHub Actions (with parallel builds), Travis CI and the other CI services, and document `COVERALLS_NO_FAIL` and `COVERALLS_PERL_SERVICE_NAME` (#58)
@@ -106,6 +119,7 @@ Versions up to 0.32.1 were released from `Changes`, before this file existed.
 
 - Original version
 
+[1.1.0]: https://github.com/kan/coveralls-perl/releases/tag/v1.1.0
 [1.0.0]: https://github.com/kan/coveralls-perl/releases/tag/v1.0.0
 [0.32.1]: https://metacpan.org/release/KAN/Devel-Cover-Report-Coveralls-0.32.1
 [0.32]: https://metacpan.org/release/KAN/Devel-Cover-Report-Coveralls-0.32

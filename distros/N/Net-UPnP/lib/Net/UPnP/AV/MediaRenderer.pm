@@ -205,7 +205,7 @@ Net::UPnP::AV::MediaRenderer - Perl extension for UPnP.
  
 =head1 DESCRIPTION
 
-The package is a extention UPnP/AV media server.
+The package is an extension UPnP/AV media server.
 
 =head1 METHODS
 

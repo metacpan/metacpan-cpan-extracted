@@ -37,10 +37,8 @@ foreach $dev (@dev_list) {
 	
 	print "\tSystemUpdateID = " . $mediaServer->getsystemupdateid() . "\n";
 	
-	my @content_list = $mediaServer->getcontentlist(ObjectID => 0);
-	foreach my $content (@content_list) {
-		print_content($mediaServer, $content, 1);
-	}
+	$mediaServer->walkcontent(callback => sub { print_content($mediaServer, @_); });
+	die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
 
 	$devNum++;
 }
@@ -63,20 +61,6 @@ sub print_content {
 	}
 	print "\n";
 
-	unless ($content->iscontainer()) {
-		return;
-	}
-
-	my @child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
-	
-	if (@child_content_list <= 0) {
-		return;
-	}
-	
-	$indent++;
-	foreach my $child_content (@child_content_list) {
-		print_content($mediaServer, $child_content, $indent);
-	}
 }
 
 exit 0;

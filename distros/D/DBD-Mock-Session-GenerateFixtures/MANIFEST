@@ -1,14 +1,7 @@
 Changes
-DBD-Mock-Session-GenerateFixtures-0.11.tar.gz
-DBD-Mock-Session-GenerateFixtures-1.01.tar.gz
-DBD-Mock-Session-GenerateFixtures-1.16.tar.gz
-DBD-Mock-Session-GenerateFixtures-1.tar.gz
-foo
-hist
 lib/DBD/Mock/Session/GenerateFixtures.pm
 Makefile.PL
 MANIFEST			This list of files
-Modelfile
 README.md
 t/01_fetchrow_hashref.t
 t/02_use_mock_data_fetchrow_hashref.t
@@ -32,6 +25,5 @@ t/19_use_test_data__for_transactions_with_mysql.t
 t/20_mock_pl_sql_proc.t
 t/DB.pm
 t/MyDatabase.pm
-vim
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,6 +10,7 @@ use warnings;
 use Net::UPnP::HTTP;
 use Net::UPnP::Device;
 use Net::UPnP::Service;
+use Carp qw(croak);
 
 use vars qw($_DEVICE $DEVICE_TYPE $WANIPCONNECTION_SERVICE_TYPE $WANCOMMONINTERFACECONFIG_SERVICE_TYPE);
 
@@ -116,6 +117,13 @@ sub getportmappingnumberofentries {
 
 sub getportmappingentries {
 	my($this) = shift;
+	my %args = (max_entries => 1024, timeout => 30, @_);
+	croak 'Invalid mapping entry limit' unless defined($args{max_entries})
+		&& $args{max_entries} =~ /\A\d+\z/ && POSIX::isfinite(0 + $args{max_entries}) && $args{max_entries} > 0;
+	croak 'Invalid mapping timeout' unless defined($args{timeout})
+		&& $args{timeout} =~ /\A\d+(?:\.\d+)?\z/ && POSIX::isfinite(0 + $args{timeout}) && $args{timeout} > 0;
+	$this->{error} = '';
+	my $deadline = Net::UPnP::HTTP::_now() + $args{timeout};
 	
 	my (
 		@port_mapping,
@@ -136,23 +144,35 @@ sub getportmappingentries {
 	}
 	
         $n = 0;
-        while( 1 ) {
+        while ($n < $args{max_entries}) {
+		if (Net::UPnP::HTTP::_now() >= $deadline) {
+			$this->{error} = 'Port mapping deadline exceeded';
+			last;
+		}
 		%req_arg = (
 				'NewPortMappingIndex' => $n,
 			);
 	
-		$action_res = $wanipcon_service->postaction("GetGenericPortMappingEntry", \%req_arg);
+		$action_res = $wanipcon_service->postaction("GetGenericPortMappingEntry", \%req_arg, {deadline => $deadline});
 		#print "[$n]" .$action_res->getstatuscode()  . "\n";
 		#print %req_arg;
-                last if ($action_res->getstatuscode() != 200);
+		if ($action_res->getstatuscode() != 200) {
+			$this->{error} = 'Port mapping request failed' if !$action_res->getstatuscode();
+			last;
+		}
 		$arg_list = $action_res->getargumentlist();
 		#print $arg_list;
 		push(@port_mapping, $arg_list);
                 ++$n;
 	}
+	if ($n == $args{max_entries}) {
+		$this->{error} = 'Port mapping entry limit reached';
+	}
 	
 	return @port_mapping;
 }
+
+sub geterror { $_[0]->{error} || '' }
 
 # deprecated method - mapped to new name
 sub getportmappingentry { getportmappingentries(@_); }
@@ -251,10 +271,10 @@ sub deleteportmapping {
 }
 
 #------------------------------
-# gettotalbytesrecieved
+# gettotalbytesreceived
 #------------------------------
 
-sub gettotalbytesrecieved {
+sub gettotalbytesreceived {
 	my($this) = shift;
 	
 	my (
@@ -279,6 +299,9 @@ sub gettotalbytesrecieved {
 	
 	return $totalBytes;
 }
+
+# Backward-compatible alias for the historical misspelling (RT #123509).
+*gettotalbytesrecieved = \&gettotalbytesreceived;
 
 #------------------------------
 # gettotalbytessent
@@ -363,7 +386,7 @@ Net::UPnP::GW::Gateway - Perl extension for UPnP.
 
 =head1 DESCRIPTION
 
-The package is a extention UPnP/GW.
+The package is an extension UPnP/GW.
 
 =head1 METHODS
 
@@ -424,11 +447,12 @@ Add a new specified port mapping.
 
 Delete the specified port mapping.
 
-=item B<gettotalbytesrecieved> - Total recieved bytes.
+=item B<gettotalbytesreceived> - Total received bytes.
 
-    $gw->gettotalbytesrecieved();
+    $gw->gettotalbytesreceived();
 
-Get the total recieved bytes.
+Get the total received bytes. The misspelled name C<gettotalbytesrecieved>
+is kept as an alias for backward compatibility.
 
 =back
 

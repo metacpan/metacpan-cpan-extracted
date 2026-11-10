@@ -85,7 +85,10 @@ sub rows_for {
 # chain would otherwise ask OpenStreetMap about every place the catalogues do
 # not know, the unknown place above among them.  t/geocode-online.t covers that
 # half with a Nominatim that is not on the network.
-my $geocode = Database::BI::Model::Geocode->new(online => 0);
+# In this process's memory, not CACHEDIR or the like: a run must not leave
+# answers in the user's cache, nor read the last run's.
+delete @ENV{qw(CACHEDIR CACHE_DIR Database__BI__Model__Geocode__cache_dir)};
+my $geocode = Database::BI::Model::Geocode->new(online => 0, config => {});
 
 my ($available, $reason) = $geocode->geocoder_available();
 plan skip_all => "no usable geocoder: $reason" unless $available;

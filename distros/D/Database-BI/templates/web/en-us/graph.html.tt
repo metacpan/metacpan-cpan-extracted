@@ -1,0 +1,516 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  /* Allow rotated X-axis labels on the leftmost tick to render without clipping.
+     D3 rotates labels -45 deg with text-anchor:end; the leftmost label can
+     extend to a negative SVG x-coordinate.  The viewBox-widening code below
+     extends the SVG viewport 80 units to the left, keeping labels inside the
+     SVG's own coordinate space so no container padding is needed. */
+  #chart { overflow: visible; }
+
+  /* Reference-line checkboxes in the export bar */
+  .graph-refline-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--border, #ccc);
+  }
+  .refline-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .refline-label input[type="checkbox"] { cursor: pointer; }
+
+  /* Style the HTML::D3-generated Reset zoom button to match .btn-graph-export */
+  #reset-btn {
+    padding: 0.28rem 0.75rem;
+    border: 1px solid var(--border-strong, #888);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary, #444);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.12s;
+    margin-bottom: 0;
+  }
+  #reset-btn:hover { background: var(--hover-bg, #f0f0f0); }
+  .chart-source {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: var(--muted, #666);
+    word-break: break-all;
+  }
+  .chart-source a { color: inherit; }
+  /* A multi-series legend entry is a switch, not a caption.  A <g> has no box
+     of its own, so the focus ring is drawn on the swatch it toggles. */
+  #chart .msl-leg-item:focus-visible { outline: none; }
+  #chart .msl-leg-item:focus-visible rect {
+    stroke: #0d6efd;
+    stroke-width: 2px;
+  }
+</style>
+
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
+
+<h2 class="graph-title">[% title | html %]</h2>
+
+<div class="graph-export-bar">
+  <button class="btn-graph-export" data-export="biExportSVG">Export SVG</button>
+  <button class="btn-graph-export" data-export="biExportPNG">Export PNG</button>
+  <button class="btn-graph-export" data-export="biExportPDF">Export PDF</button>
+  <button class="btn-graph-export" id="btn-copy-chart-link">&#x1F517; Copy link</button>
+  <span class="graph-point-count">Plotting [% point_count %] point[% IF point_count != 1 %]s[% END %]</span>
+  [% IF ref_min_y.defined %]
+  <span class="graph-refline-controls">
+    <label class="refline-label"><input type="checkbox" id="rl-min"> Min ([% ref_min_y %])</label>
+    <label class="refline-label"><input type="checkbox" id="rl-avg"> Avg ([% ref_avg_y %])</label>
+    <label class="refline-label"><input type="checkbox" id="rl-max"> Max ([% ref_max_y %])</label>
+    [%- IF trend_slope.length %]
+    <label class="refline-label" title="The straight line closest to the points (least squares): how much Y changes from one point to the next, and how well the line fits (R&sup2;, 0 to 1)"><input type="checkbox" id="rl-trend"> <span>Trend (<span id="rl-trend-text">[% trend_slope | html %] per point, R&sup2; [% trend_r2 | html %]</span>)</span></label>
+    [%- END %]
+  </span>
+  [% END %]
+</div>
+
+[% IF chart && chart.encode && chart.encode.series %]
+<p class="sr-only" id="line-legend-help">Show or hide a series: press Tab until a legend entry
+has focus, then press Enter or Space to toggle it.</p>
+<p class="sr-only" id="line-live" role="status" aria-live="polite"></p>
+[% END %]
+
+<div class="graph-container">
+  <script nonce="[% csp_nonce | html %]" src="[% d3_url | html %]"></script>
+  [% chart_html %]
+</div>
+
+<script nonce="[% csp_nonce | html %]">
+// D3 draws the multi-series legend as clickable entries: each hides or shows
+// its line.  A click is not something a keyboard reader can make, so each entry
+// is made a switch - in the tab order, named for the series it toggles,
+// aria-pressed saying whether that line is drawn, and Enter or Space sending
+// the same click the pointer sends.  A single-series chart has no legend, and
+// this finds nothing.
+(function () {
+  var live = document.getElementById('line-live');
+
+  // The pressed state is announced by a screen reader that is on the entry;
+  // the line coming and going is not, so it is said here as well.
+  function say(name, pressed) {
+    if (!live) return;
+    live.textContent = '';
+    setTimeout(function () {
+      live.textContent = name + (pressed ? ' shown' : ' hidden');
+    }, 30);
+  }
+
+  function wireLegend() {
+    document.querySelectorAll('#chart .msl-leg-item').forEach(function (item) {
+      var textEl = item.querySelector('text');
+      var name   = textEl ? textEl.textContent.trim() : '';
+      if (!name) return;
+
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', 'Toggle ' + name);
+      item.setAttribute('aria-pressed', 'true');
+      if (document.getElementById('line-legend-help')) {
+        item.setAttribute('aria-describedby', 'line-legend-help');
+      }
+
+      item.addEventListener('click', function () {
+        var pressed = item.getAttribute('aria-pressed') !== 'true';
+        item.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+        say(name, pressed);
+      });
+      item.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }
+      });
+    });
+  }
+
+  setTimeout(wireLegend, 50);
+}());
+</script>
+
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  // Widen the SVG viewport so the rotated X-axis labels are not cropped.
+  // D3 rotates labels -45 deg with text-anchor:end; the leftmost label extends
+  // to a negative SVG x-coordinate.  Shifting the viewBox origin to -pad makes
+  // that region part of the SVG viewport, bypassing all container overflow rules.
+  // The labels also hang below the chart's bottom margin, by however long they
+  // are, so the viewport grows by what was actually drawn there.  An exported
+  // image is cut off at the viewport, whatever the page's overflow says.
+  //
+  // Two cases depending on whether the SVG is responsive (width="100%") or
+  // fixed-width (width="1100"):
+  //   Fixed-width: extend both width and viewBox so the SVG grows by _pad px
+  //     (original behavior -- pixel-perfect rendering at full scale).
+  //   Responsive:  extend viewBox only -- changing width would replace "100%"
+  //     with a small number (parseFloat("100%") = 100) and break fluid layout.
+  //
+  // Run inside setTimeout(0) so D3's transitions have completed and axis text
+  // elements are in the DOM before we adjust the viewport.
+  setTimeout(function () {
+    var _svg = document.getElementById('chart');
+    if (!_svg) return;
+    var _pad  = 80;
+    var _drawn = _svg.getBBox();
+    var wAttr = _svg.getAttribute('width') || '';
+    if (/^\d+$/.test(wAttr)) {
+      // Fixed-width SVG: extend both width and viewBox.
+      var _w = parseFloat(wAttr);
+      var _h = parseFloat(_svg.getAttribute('height')) || 580;
+      _pad = Math.max(_pad, Math.ceil(-_drawn.x));
+      _h   = Math.max(_h, Math.ceil(_drawn.y + _drawn.height) + 2);
+      _svg.setAttribute('width',   _w + _pad);
+      _svg.setAttribute('height',  _h);
+      _svg.setAttribute('viewBox', (-_pad) + ' 0 ' + (_w + _pad) + ' ' + _h);
+    } else {
+      // Responsive SVG: extend viewBox only.
+      var vb = (_svg.getAttribute('viewBox') || '0 0 1100 580').trim().split(/\s+/);
+      if (vb.length === 4) {
+        _svg.setAttribute('viewBox',
+          (parseFloat(vb[0]) - _pad) + ' ' + vb[1] + ' ' +
+          (parseFloat(vb[2]) + _pad) + ' ' +
+          Math.max(parseFloat(vb[3]), Math.ceil(_drawn.y + _drawn.height) + 2));
+      }
+    }
+  }, 0);
+
+  // Read source attribution from the hidden data div (present only for
+  // URL-imported data).  Reading at call time means DOM order does not matter.
+  function _getAttribution() {
+    var el = document.getElementById('chart-attribution');
+    return el ? { url: el.dataset.url, date: el.dataset.date } : null;
+  }
+
+  // Append two attribution <text> nodes to an SVG element, extending its
+  // height and viewBox to make room.  Mutates the element in place.
+  var ATTR_H = 38;
+  function _addAttrToSVG(svgEl, attr) {
+    if (!attr) return;
+    var ns = 'http://www.w3.org/2000/svg';
+    var h  = parseFloat(svgEl.getAttribute('height')) || 600;
+    svgEl.setAttribute('height', h + ATTR_H);
+    var vb = svgEl.getAttribute('viewBox');
+    if (vb) {
+      var p = vb.trim().split(/\s+/);
+      if (p.length === 4) { p[3] = parseFloat(p[3]) + ATTR_H; svgEl.setAttribute('viewBox', p.join(' ')); }
+    }
+    var maxLen = 90;
+    var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+    var style = 'font-family:sans-serif;font-size:11px;fill:#666;';
+    var t1 = document.createElementNS(ns, 'text');
+    t1.setAttribute('x', 10); t1.setAttribute('y', h + 16); t1.setAttribute('style', style);
+    t1.textContent = 'Source: ' + urlText;
+    var t2 = document.createElementNS(ns, 'text');
+    t2.setAttribute('x', 10); t2.setAttribute('y', h + 30); t2.setAttribute('style', style);
+    t2.textContent = 'Accessed on ' + attr.date;
+    svgEl.appendChild(t1);
+    svgEl.appendChild(t2);
+  }
+
+  function biExportSVG() {
+    var svg = document.getElementById('chart');
+    if (!svg) return;
+    var clone = biChartExportClone(svg);
+    clone.style.removeProperty('border');
+    if (!/^\d+$/.test(clone.getAttribute('width') || '')) {
+      var rect = svg.getBoundingClientRect();
+      clone.setAttribute('width',  Math.round(rect.width)  || 1100);
+      clone.setAttribute('height', Math.round(rect.height) || 580);
+    }
+    _addAttrToSVG(clone, _getAttribution());
+    biBrandSvg(clone);
+    var src = '<?xml version="1.0" encoding="UTF-8"?>\n'
+            + new XMLSerializer().serializeToString(clone);
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    a.download = 'chart.svg';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function drawExportCanvas(scale, done) {
+    var svg = document.getElementById('chart');
+    if (!svg) return;
+    var attr   = _getAttribution();
+    var w = /^\d+$/.test(svg.getAttribute('width')  || '') ? parseInt(svg.getAttribute('width'),  10) : 0;
+    var h = /^\d+$/.test(svg.getAttribute('height') || '') ? parseInt(svg.getAttribute('height'), 10) : 0;
+    if (!w || !h) {
+      var rect = svg.getBoundingClientRect();
+      w = Math.round(rect.width)  || 800;
+      h = Math.round(rect.height) || 600;
+    }
+    var extraH = attr ? ATTR_H : 0;
+    var canvas = document.createElement('canvas');
+    canvas.width = w * scale; canvas.height = (h + extraH) * scale;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    var clone = biChartExportClone(svg);
+    clone.style.removeProperty('border');
+    var src = new XMLSerializer().serializeToString(clone);
+    var url = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml;charset=utf-8' }));
+    var img = new Image();
+    img.onload = function () {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, w, h + extraH);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      if (attr) {
+        var maxLen  = 90;
+        var urlText = attr.url.length > maxLen ? attr.url.slice(0, maxLen - 3) + '...' : attr.url;
+        ctx.font         = '11px sans-serif';
+        ctx.fillStyle    = '#666';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('Source: ' + urlText,      10, h + 16);
+        ctx.fillText('Accessed on ' + attr.date, 10, h + 30);
+      }
+      done(canvas);
+    };
+    img.src = url;
+  }
+  function biExportPNG() {
+    drawExportCanvas(1, function (canvas) {
+      var a = document.createElement('a');
+      a.href = biBrandCanvas(canvas, 1).toDataURL('image/png');
+      a.download = 'chart.png';
+      a.click();
+    });
+  }
+  function biExportPDF() {
+    biSaveChartPDF(drawExportCanvas, 'chart.pdf');
+  }
+  window.biExportSVG = biExportSVG;
+  window.biExportPNG = biExportPNG;
+  window.biExportPDF = biExportPDF;
+}());
+</script>
+[% PROCESS "web/en/layouts/chart_export.html.tt" %]
+
+[% IF ref_min_y.defined %]
+<script nonce="[% csp_nonce | html %]">
+// Reference lines -- drawn using the D3 `y` scale and `chart` group that
+// render_zoomable_line_chart_snippet declares at the top level of its <script>
+// block (not inside an IIFE), so they are accessible here.
+(function () {
+  var REF = {
+    min: [% ref_min_y %],
+    avg: [% ref_avg_y %],
+    max: [% ref_max_y %]
+  };
+  // The trend line: Y = intercept + slope * i, where i is the point's place
+  // (0, 1, 2, ...) among the points drawn -- the x axis is a scalePoint, so
+  // the places are evenly spaced and the line is straight.  The server fits
+  // the whole chart (Statistics::LineFit); after a zoom the points in view are
+  // refitted here with the same least squares.
+  var TREND_COLOR = '#8b5cf6';
+  var TREND = {
+    slope:     [% trend_slope.length ? trend_slope : 'null' %],
+    intercept: [% trend_intercept.length ? trend_intercept : 'null' %],
+    r2:        [% trend_r2.length ? trend_r2 : 'null' %],
+    data:      (typeof allData !== 'undefined') ? allData : []
+  };
+
+  function fitTrend(points) {
+    var n = points.length;
+    if (n < 2) { TREND.slope = null; return; }
+    var sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0;
+    points.forEach(function (d, i) {
+      sx += i; sy += d.value; sxx += i * i; sxy += i * d.value; syy += d.value * d.value;
+    });
+    var dx = n * sxx - sx * sx;
+    var slope = (n * sxy - sx * sy) / dx;
+    var intercept = (sy - slope * sx) / n;
+    var dy = n * syy - sy * sy;
+    // A flat series lies on its line: R squared 1, as Statistics::LineFit says.
+    var r = dy > 0 ? (n * sxy - sx * sy) / Math.sqrt(dx * dy) : 1;
+    TREND.slope = slope;
+    TREND.intercept = intercept;
+    TREND.r2 = r * r;
+  }
+
+  function showTrendText() {
+    var el = document.getElementById('rl-trend-text');
+    if (!el) return;
+    el.textContent = TREND.slope === null
+      ? 'needs two points'
+      : parseFloat(TREND.slope.toPrecision(4)) + ' per point, R\u00B2 ' + TREND.r2.toFixed(2);
+  }
+
+  // The line across the points drawn, cut to the y axis's range so it never
+  // runs over the axis or out of the chart.
+  function drawTrend() {
+    var cb = document.getElementById('rl-trend');
+    if (!cb || !cb.checked || TREND.slope === null) return;
+    var pts = TREND.data;
+    if (!pts || pts.length < 2) return;
+    var n  = pts.length;
+    var x0 = x(pts[0].label), x1 = x(pts[n - 1].label);
+    var v0 = TREND.intercept, v1 = TREND.intercept + TREND.slope * (n - 1);
+    if (x0 === undefined || x1 === undefined) return;
+    var dom = y.domain(), lo = Math.min(dom[0], dom[1]), hi = Math.max(dom[0], dom[1]);
+    var t0 = 0, t1 = 1;
+    if (v1 !== v0) {
+      var ta = (lo - v0) / (v1 - v0), tb = (hi - v0) / (v1 - v0);
+      t0 = Math.max(0, Math.min(ta, tb));
+      t1 = Math.min(1, Math.max(ta, tb));
+      if (t0 > t1) return;
+    } else if (v0 < lo || v0 > hi) {
+      return;
+    }
+    function at(t) { return { px: x0 + (x1 - x0) * t, v: v0 + (v1 - v0) * t }; }
+    var a = at(t0), b = at(t1);
+    chart.append('line')
+      .attr('class', 'bi-ref-line bi-trend-line')
+      .attr('x1', a.px).attr('x2', b.px)
+      .attr('y1', y(a.v)).attr('y2', y(b.v))
+      .attr('stroke', TREND_COLOR)
+      .attr('stroke-width', 2)
+      .attr('pointer-events', 'none');
+    chart.append('text')
+      .attr('class', 'bi-ref-label')
+      .attr('x', b.px + 5)
+      .attr('y', y(b.v) + 4)
+      .attr('fill', TREND_COLOR)
+      .attr('font-size', '11px')
+      .attr('pointer-events', 'none')
+      .text('Trend');
+  }
+
+  var LINE_DEFS = [
+    { id: 'rl-min', key: 'min', color: '#f59e0b', label: 'Min' },
+    { id: 'rl-avg', key: 'avg', color: '#10b981', label: 'Avg' },
+    { id: 'rl-max', key: 'max', color: '#ef4444', label: 'Max' }
+  ];
+
+  function colorDots() {
+    // Recolor circle.pt dots whose Y value matches an active reference line.
+    // Dots at REF.min get the Min color, dots at REF.max get the Max color,
+    // all others revert to steelblue.  Only recolors when the corresponding
+    // checkbox is checked so unchecking a line also resets the dot colors.
+    if (typeof chart === 'undefined') return;
+    var minCb = document.getElementById('rl-min');
+    var maxCb = document.getElementById('rl-max');
+    var showMin = minCb && minCb.checked;
+    var showMax = maxCb && maxCb.checked;
+    chart.selectAll('circle.pt').attr('fill', function (d) {
+      if (showMin && d.value === REF.min) return '#f59e0b';
+      if (showMax && d.value === REF.max) return '#ef4444';
+      return 'steelblue';
+    });
+  }
+
+  function drawRefLines() {
+    // `chart` and `y` and `width` are declared by HTML::D3's snippet at the
+    // top level of its <script> block -- they are visible in this scope.
+    if (typeof chart === 'undefined' || typeof y === 'undefined') return;
+    chart.selectAll('.bi-ref-line').remove();
+    chart.selectAll('.bi-ref-label').remove();
+    LINE_DEFS.forEach(function (def) {
+      var cb = document.getElementById(def.id);
+      if (!cb || !cb.checked) return;
+      var val  = REF[def.key];
+      var yPos = y(val);
+      chart.append('line')
+        .attr('class', 'bi-ref-line')
+        .attr('x1', 0).attr('x2', width)
+        .attr('y1', yPos).attr('y2', yPos)
+        .attr('stroke', def.color)
+        .attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '5 3')
+        .attr('pointer-events', 'none');
+      chart.append('text')
+        .attr('class', 'bi-ref-label')
+        .attr('x', width + 5)
+        .attr('y', yPos + 4)
+        .attr('fill', def.color)
+        .attr('font-size', '11px')
+        .attr('pointer-events', 'none')
+        .text(def.label);
+    });
+    drawTrend();
+    colorDots();
+  }
+
+  // Patch `redraw` (a function declaration -- globally patchable) so that
+  // reference lines recalculate whenever the chart updates.
+  //
+  // Why recalculate REF from newData?  HTML::D3 uses
+  //   y.domain([0, d3.max(newData, d => d.value)]).nice()
+  // so the y-domain minimum is always 0.  When the user zooms into a region
+  // whose maximum is smaller than the full-dataset REF values, those values
+  // fall above the visible domain and their pixel position is negative -- i.e.
+  // off-screen above the chart.  Recalculating from newData keeps the lines
+  // inside the visible domain after every zoom or reset.
+  //
+  // Why setTimeout?  The `redraw` transition runs for `ms` ms (500 on zoom /
+  // reset, 0 on initial render).  We must wait until the transition ends
+  // before appending the reference lines; otherwise the y-axis is still
+  // animating from its old position when we compute y(val), producing a
+  // brief positional mismatch.
+  if (typeof redraw === 'function') {
+    var _origRedraw = redraw;
+    redraw = function (newData, ms) {
+      // Recalculate REF from the data currently being drawn so lines stay
+      // within the visible y-domain even after a zoom or reset.
+      if (newData && newData.length) {
+        TREND.data = newData;
+        fitTrend(newData);
+        showTrendText();
+        var yVals = newData.map(function (d) { return d.value; })
+                          .filter(function (v) { return isFinite(v); });
+        if (yVals.length) {
+          REF.min = Math.min.apply(null, yVals);
+          REF.max = Math.max.apply(null, yVals);
+          REF.avg = yVals.reduce(function (a, b) { return a + b; }, 0) / yVals.length;
+          // Update the checkbox label text to show the new recalculated value.
+          // Each label is <label><input id="rl-*"> Min (X)</label>; the number
+          // lives in the text node immediately after the <input>.
+          LINE_DEFS.forEach(function (def) {
+            var cb = document.getElementById(def.id);
+            if (!cb || !cb.parentNode) return;
+            var nodes = cb.parentNode.childNodes;
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].nodeType === 3) {
+                // 4 significant figures, stripping trailing zeros (like %.4g in Perl)
+                var fmtVal = parseFloat(REF[def.key].toPrecision(4));
+                nodes[i].textContent = nodes[i].textContent.replace(/\([^)]*\)/, '(' + fmtVal + ')');
+              }
+            }
+          });
+        }
+      }
+      // Remove stale lines before the transition starts.
+      chart.selectAll('.bi-ref-line, .bi-ref-label').remove();
+      _origRedraw(newData, ms);
+      setTimeout(drawRefLines, (ms || 0) + 20);
+    };
+  }
+
+  // Wire up checkboxes.
+  LINE_DEFS.concat([{ id: 'rl-trend' }]).forEach(function (def) {
+    var cb = document.getElementById(def.id);
+    if (cb) cb.addEventListener('change', drawRefLines);
+  });
+}());
+</script>
+[% END %]
+
+[% IF source_url %]
+<div id="chart-attribution" data-url="[% source_url | html %]" data-date="[% source_accessed | html %]" hidden></div>
+<p class="chart-source">Source: <a href="[% source_url | html %]" rel="noopener noreferrer">[% source_url | html %]</a></p>
+<p class="chart-source">Accessed on [% source_accessed %]</p>
+[% END %]
+
+[%- END -%]

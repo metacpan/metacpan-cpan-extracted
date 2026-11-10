@@ -2,6 +2,7 @@
 
 use Net::UPnP::ControlPoint;
 use Net::UPnP::AV::MediaServer;
+use Net::UPnP::AV::RSS;
 
 use Shell qw(curl ffmpeg);
 
@@ -168,12 +169,8 @@ foreach $dev (@dev_list) {
 	print "[$devNum] : " . $dev->getfriendlyname() . "\n";
 	$mediaServer = Net::UPnP::AV::MediaServer->new();
 	$mediaServer->setdevice($dev);
-	#@content_list = $mediaServer->getcontentlist(ObjectID => 0, RequestedCount => $requested_count);
-	@content_list = $mediaServer->getcontentlist(ObjectID => 0);
-	#print "content_list = @content_list\n";
-	foreach $content (@content_list) {
-		parse_content_directory($mediaServer, $content);
-	}
+	$mediaServer->walkcontent(callback => sub { parse_content_directory($mediaServer, $_[0]); });
+	die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
 	$devNum++;
 }
 
@@ -188,17 +185,11 @@ if (@dms_content_list <= 0) {
 
 $output_rss_filename = $base_directory . $rss_file_name;
 
-open(RSS_FILE, ">$output_rss_filename") || die "Couldn't open the specifed output file($output_rss_filename)\n";
+open(RSS_FILE, '>:encoding(UTF-8)', $output_rss_filename) || die "Couldn't open the specifed output file($output_rss_filename)\n";
 
-$rss_header = <<"RSS_HEADER";
-<?xml version="1.0" encoding="utf-8"?>
-<rss xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd" version="2.0">
-<channel>
-<title>$rss_title</title>
-<language>$rss_language</language>
-<description>$rss_description</description>
-<link>$rss_link</link>
-RSS_HEADER
+$rss_header = Net::UPnP::AV::RSS::header(
+    title => $rss_title, language => $rss_language,
+    description => $rss_description, link => $rss_link);
 print RSS_FILE $rss_header;
 
 foreach $content (@dms_content_list){
@@ -207,13 +198,8 @@ foreach $content (@dms_content_list){
 	$fsize = $content->{'file_size'};
 
 $mp4_link = $rss_base_url . $fname;
-$mp4_item = <<"RSS_MP4_ITEM";
-<item>
-<title>$title</title>
-<guid isPermalink="false">$mp4_link</guid>
-<enclosure url="$mp4_link" length="$fsize" type="video/mp4" />
-</item>
-RSS_MP4_ITEM
+$mp4_item = Net::UPnP::AV::RSS::item(
+    title => $title, link => $mp4_link, size => $fsize);
 	print RSS_FILE $mp4_item;
 }
 
@@ -250,19 +236,6 @@ sub parse_content_directory {
 		}
 	}
 	
-	unless ($content->iscontainer()) {
-		return;
-	}
-
-	my @child_content_list = $mediaServer->getcontentlist(ObjectID => $objid );
-	
-	if (@child_content_list <= 0) {
-		return;
-	}
-	
-	foreach my $child_content (@child_content_list) {
-		parse_content_directory($mediaServer, $child_content);
-	}
 }
 
 #------------------------------

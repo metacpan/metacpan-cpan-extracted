@@ -13,6 +13,12 @@
 #   without: a table of each sample's class in BASEDIR against its class in OUTDIR, and every sample whose class changed
 #   or whose result changed (status, out, err, rec, files, in any of the three shells: "same class, other result").
 #   -c FILE: every sample's class, one line each (id, class).
+#   -ours-from DIR (post-0.10): take ours' results from DIR (large-subset-runcompare.pl -shells ours, best with
+#   -workers-from OUTDIR and the same -env), for the samples DIR has; dash's and bash's stay OUTDIR's.  So after a change
+#   of ours only ours runs again.  Join runs of the same day: ls -l shows the date of what -env mtime does not fix.
+#   -ours-vs DIR (post-0.10): ours in OUTDIR (after -ours-from) against ours in DIR, sample by sample, compared as above
+#   (rec sorted, err a multiset without the prefix): every sample whose ours changed, with the parts, and "shells too"
+#   where DIR has dash or bash and theirs changed as well (then the change is likely noise: process IDs, times, races).
 # Before comparing, each shell's own prefix is taken off its messages ("dash: 1: ", "bash: line 1: ", "bash: ",
 # "sh: 1: ", "sh: ", also after a path, and for dash and bash also inside a line): the wording after it is still
 # compared, but as a multiset of characters, because the shells write a message of a pipeline element in several
@@ -28,8 +34,14 @@
 #                     with neither (messages ignored here)
 #           timeout   a shell ran out of time (5 s); not compared
 use strict; use warnings; use JSON::PP; use Getopt::Long; binmode STDOUT, ':utf8';
-my ($LIST, $QD, $X, $BD, $CF); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF) && @ARGV == 1
-  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR] [-c CLASSES.tsv] OUTDIR\n";
+my ($LIST, $QD, $X, $BD, $CF, $OF, $OV); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF,
+  'ours-from=s' => \$OF, 'ours-vs=s' => \$OV) && @ARGV == 1
+  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR] [-c CLASSES.tsv] [-ours-from DIR] [-ours-vs DIR] OUTDIR\n";
+my %OURS;   # -ours-from: sample id => ours' result from that run
+if ($OF) { for my $f (glob "$OF/run-*.jsonl") { open my $in, '<', $f or die;
+    while (<$in>) { my $s = eval { decode_json($_) } or next; $OURS{$s->{id}} = $s->{ours} if $s->{ours} } }
+  %OURS or die "-ours-from $OF: no results of ours there\n" }
+sub sample { my $s = eval { decode_json($_[0]) } or return; $s->{ours} = $OURS{$s->{id}} if $OURS{$s->{id}}; $s }   # a line of OUTDIR
 my %TOOL = map +($_ => 1), qw(echo printf test [ kill pwd);
 my $CMD = qr/(?:^|[;&|({!`]\s*|\$\(\s*|\b(?:then|do|else|elif|command|exec|time|xargs|env)\s+|&&\s*|\|\|\s*)(?:echo|printf|test|\[|kill|pwd)(?=[\s;&|)`]|\z)/m;
 my %INV;   # sample id => 1 if a coreutils tool is involved
@@ -59,7 +71,7 @@ my (%t, %parts, %srcs, @list, $total, %cls, %res);
 for my $f (glob "$ARGV[0]/run-*.jsonl") {
   open my $in, '<', $f or die;
   while (<$in>) {
-    my $s = eval { decode_json($_) } or next; $total++;
+    my $s = sample($_) or next; $total++;
     my ($cls, @dp) = classify($s); $cls{$s->{id}} = $cls; $res{$s->{id}} = $s if $BD;
     $t{$s->{src}}{$cls}++; $t{ALL}{$cls}++; $srcs{$s->{src}} = 1;
     if ($QD) { my $g = $INV{$s->{id}} || ($s->{text} // '') =~ $CMD ? 'coreutils involved' : 'no coreutils'; $t{"$g:$s->{src}"}{$cls}++; $t{"$g:ALL"}{$cls}++ }
@@ -79,7 +91,7 @@ for my $c (qw(OURS neither)) { print "\n$c, by the parts that differ", $c eq 'OU
 if ($X) {   # the external calls (not the coreutils ones), as the main table: by sample, in the same classes, with their calls
   my %Q = map +($_ => 1), qw(echo printf test [ kill pwd true false); my (%n, %calls, @odd);
   for my $f (glob "$ARGV[0]/run-*.jsonl") { open my $in, '<', $f or die;
-    while (<$in>) { my $s = eval { decode_json($_) } or next;
+    while (<$in>) { my $s = sample($_) or next;
       my %L = map { my $sh = $_; ($sh => [sort grep { length && !$Q{(split /\037/)[0]} } split /\n/, $s->{$sh}{rec} // '']) } qw(dash bash ours);
       next unless grep @{$L{$_}}, qw(dash bash ours);
       my ($d, $b, $o) = map "@{$L{$_}}", qw(dash bash ours);
@@ -98,6 +110,18 @@ if ($X) {   # the external calls (not the coreutils ones), as the main table: by
   printf "%-20s %7s %s\n", "dash's calls in them", '', join ' ', map sprintf('%8d', $calls{$_} // 0), @X;
   print "Where dash and bash agree and ours differs, call by call:\n", map "  $_\n", @odd }
 if ($LIST) { open my $o, '>', $LIST or die; print $o "id\tclass\tparts\tverdict\ttext\n", map "$_\n", sort @list }
+if ($OV) {   # ours here against ours in another run
+  my %V; for my $f (glob "$OV/run-*.jsonl") { open my $in, '<', $f or die; while (<$in>) { my $s = eval { decode_json($_) } or next; $V{$s->{id}} = $s } }
+  my ($n, @ch, $shells) = (0);
+  for my $f (glob "$ARGV[0]/run-*.jsonl") { open my $in, '<', $f or die;
+    while (<$in>) { my $s = sample($_) or next; my $v = $V{$s->{id}} or next; next unless $v->{ours} && $s->{ours}; $n++;
+      my ($x, $y) = (norm($s->{ours}, 'ours'), norm($v->{ours}, 'ours'));
+      my @d = grep $x->{$_} ne $y->{$_}, @P, 'err'; next unless @d;
+      my $sh = grep { my $h = $_; $v->{$h} && $s->{$h} && grep { norm($s->{$h}, $h)->{$_} ne norm($v->{$h}, $h)->{$_} } @P, 'err' } qw(dash bash);
+      $shells++ if $sh; (my $t = $s->{text} // '') =~ s/\s+/ /g;
+      push @ch, join "\t", $s->{id}, join('+', @d), "$v->{ours}{status}->$s->{ours}{status}", $sh ? 'shells too' : '', substr($t, 0, 110) } }
+  printf "\nOurs against ours in %s: %d samples in both, ours changed in %d (dash or bash changed too in %d)\n", $OV, $n, scalar @ch, $shells // 0;
+  print "  (id, parts, ours' status there->here, shells too, text)\n", map "  $_\n", sort @ch }
 if ($CF) { open my $o, '>', $CF or die; print $o "id\tclass\n", map "$_\t$cls{$_}\n", sort keys %cls }
 if ($BD) {   # base run against this (-env) run, sample by sample
   my (%tr, @chg, $nb); my @C2 = (@C, 'not in base');

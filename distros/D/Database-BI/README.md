@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.021.0
+0.022.0
 
 ## Description
 
@@ -33,7 +33,13 @@ every supported file.  Recently opened filesystem files appear in a
 filesystem and open any supported data file, not just files in `data_dir`.
 - **Column sort and reorder** -- clicking a header sorts the table; headers
 are draggable to reorder.  Both settings are persisted in `localStorage`
-by column name and survive page reloads.
+by column name and survive page reloads.  A table too long for one page is
+sorted by the server (`sort=` and `dir=` in the address), every row of it,
+so page 1 is the start of the sorted table and Next goes on from there.
+A column sorts as dates when every cell is one, as numbers when every cell
+is one (`$1,234`, `(5)` and `45%` are numbers; `T27` is not), and
+otherwise as text, with case and accents ignored and the digits in it
+compared as numbers, so `T3` comes before `T27`.
 - **Left join** -- the "Merge data" panel on any table view lets the user
 join one or more additional tables on a shared key via [Database::Join](https://metacpan.org/pod/Database%3A%3AJoin).
 Every left row is kept; right-table columns are appended for matching rows.
@@ -57,7 +63,7 @@ the exception: one on a column its dataset no longer has is ignored.
 second (or further) file beneath the current rows, using a unified column
 set and leaving blanks where a source file lacks a column.
 - **Charts** -- nine [HTML::D3](https://metacpan.org/pod/HTML%3A%3AD3) D3.js v7 chart types are accessible from
-the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max,
+the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max and a trend line,
 multi-series interactive legend), pie chart (click-a-slice to filter,
 top-N, donut mode, configurable colour scheme), heatmap (two categorical
 axes, count or sum mode), bar chart (horizontal or vertical, sort,
@@ -74,7 +80,8 @@ from latitude and longitude columns or from a place column geocoded by a
 OpenStreetMap's Nominatim service ([Geo::Coder::OSM](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AOSM), at most one request a
 second) for the places the local data does not know.  Nominatim is asked over
 https, and what it finds is also kept for a month in
-`<model_dir>/geocode-cache/`.  Each distinct place is
+`<model_dir>/geocode-cache/`, or the `cache_dir` set (see
+["Where caches are kept"](#where-caches-are-kept)).  Each distinct place is
 looked up once, remembered in the model store and shared by every dataset that
 names it.  Rows sharing a position become one marker.
 - **Pivot table** -- the "Pivot table" panel builds a crosstab from any
@@ -244,6 +251,10 @@ otherwise.  It takes no database on its command line: use
 # Then create templates/web/fr/ and put your French .html.tt files there.
 ```
 
+**American spelling:** a browser that asks for English (United States) gets the
+pages from `templates/web/en-us/`; set `language => 'en-us'` to make that
+the default for every browser that names no other English.
+
 **Run the test suite to verify everything is working:**
 
 ```
@@ -282,15 +293,27 @@ perl Makefile.PL
 - `GET /preferences`
 
     Sets the reader's preferences: the theme, one of light, dark or the same as the
-    device (the default).  They are kept in the browser's `localStorage`, not on
-    the server, and apply to every page.  Saved charts, printed pages and embedded
-    canvases stay light.
+    device (the default), and the rows a table or pivot shows on a page (25, 50,
+    100, 200 -- the default -- or All).  The theme is kept in the browser's
+    `localStorage` and the page size in its cookie `bi_per_page`, because the
+    server reads it (a value other than 25, 50, 100, 200 or 0 is ignored, and the
+    page is 200 rows); neither is stored on the server, and both apply to every page.
+    Saved charts, printed pages and embedded canvases stay light.  The Preferences
+    link at the top of each page passes `back=` (that page), so the breadcrumb
+    here leads back to it.
 
 - `GET /view/:table`
 
     Opens the named table from `data_dir`.  Accepts `?f=col:op:val`
     (repeatable) to pre-filter results, and `?range=name&rcol=column` to keep
     only a relative window of rows (see ["Relative time ranges"](#relative-time-ranges)).
+
+    A long table is shown a page at a time: `?page=` is the page, and
+    `?per_page=` its size (else the reader's preference, else 200; up to 2000;
+    `0` is every row on one page, and then `page=` is ignored).  The page says
+    "Page 2 of 7", and its Rows per page list (25, 50, 100, 200, All) changes the
+    size, keeping the first row on screen.  A pivot pages its row groups the same
+    way.
 
     `?f=col:between:lo:hi` keeps the rows whose `col` lies from `lo` to `hi`,
     both included, whichever bound is written first.  Two numbers (a range of
@@ -442,6 +465,16 @@ perl Makefile.PL
     back2_label=<text> Label for the back2 link (optional; default "Back")
     j=, f=, d=         pipeline params (same as /join)
     ```
+
+    A one-line chart offers check boxes above it for reference lines: Min, Avg,
+    Max, and Trend, the straight line closest to the points (least squares, by
+    [Statistics::LineFit](https://metacpan.org/pod/Statistics%3A%3ALineFit)), labelled with its slope per point and its R squared
+    (a flat series is slope 0 and R squared 1: the line passes through every
+    point).
+    The points are evenly spaced along the axis, so the fit is of Y against each
+    point's place, not its label.  After a zoom, every line is worked out again
+    from the points in view.  None is offered on a chart with `series=`, and Trend
+    needs two points.
 
 - `GET /pie`
 
@@ -1230,7 +1263,8 @@ use Merge.
 A large CSV, TSV, PSV, XLSX or XML file can be read from a SQLite copy of
 itself, an _extract_, which is faster to page through and lets totals be
 worked out in SQL.  `script/bi-extract --spec table:sales` marks the dataset
-accelerated and builds the extract under `<model_dir>/extracts/`.
+accelerated and builds the extract under `<model_dir>/extracts/`, or in
+the cache directory set (see ["Where caches are kept"](#where-caches-are-kept)).
 
 An extract is used only while it matches the file: its name is a fingerprint
 of the spec and the file's modification time and size.  Once the file changes,
@@ -1238,7 +1272,7 @@ the file itself is read, and the table page says the extract is stale and how
 to rebuild it.  Stale numbers are never shown.  The table page also says when
 a dataset is read from its extract, and when that was built.
 
-An extract is a cache.  Deleting `extracts/` loses nothing: each accelerated
+An extract is a cache.  Deleting its folder loses nothing: each accelerated
 dataset reads its file until the next build.  Nothing is written under
 `data_dir`, and a `model_dir` inside it is refused.  Only a `table:` or
 `path:` spec naming a local file can be accelerated; a SQLite file is one
@@ -1308,6 +1342,42 @@ application directory is read-only can stage uploads somewhere writable:
 ```perl
 { uploads_dir => '/var/tmp/database-bi-uploads' }
 ```
+
+### Where Caches Are Kept
+
+The places OpenStreetMap found for maps, the extracts of accelerated datasets
+(see ["Accelerated datasets"](#accelerated-datasets)), the page cache when `page_cache_dir` turns it
+on, and the table cache when `cache => { driver => 'File' }` (or
+`FastMmap`) asks for one, are kept on disc.  Each object that keeps one
+chooses its directory when it is made ([Database::BI::CacheDir](https://metacpan.org/pod/Database%3A%3ABI%3A%3ACacheDir)), from the
+first of these that is set:
+
+- 1. `cache_dir` through [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure), for the class making the
+cache: its config files, then the environment variable
+`<Class>__cache_dir` (`Database__BI__Model__Geocode__cache_dir` for
+the places, `Database__BI__Extract__cache_dir` for the extracts,
+`Database__BI__cache_dir` for the page and table caches);
+- 2. `$ENV{CACHEDIR}`;
+- 3. `$ENV{CACHE_DIR}`;
+- 4. `cache_dir` here (relative: under the application home):
+
+    ```perl
+    { cache_dir => '/var/cache/database-bi' }
+    ```
+
+- 5. `<model_dir>/geocode-cache` for the places,
+`<model_dir>/extracts` for the extracts, `page_cache_dir` for the
+page cache, `<model_dir>/cache` for the table cache.
+
+Caches sharing a directory each keep to their own namespace in it; the
+extracts go in its `database-bi-extracts/` folder.  A cache directory inside
+`data_dir` is not used for the extracts, which then stay in `model_dir`: each
+is a `.db` file the home page would list.  `page_cache_dir` still decides
+whether pages are cached at all (see ["Compression and the page cache"](#compression-and-the-page-cache)): a
+cache directory set only says where.  A `cache => { root_dir }` names the
+table cache's directory outright.  `script/bi-geocode` and
+`script/bi-extract` read the same settings, and `database_bi.conf` from
+`MOJO_CONFIG` or the current folder (`bi-extract` through the application).
 
 ### Who Can Reach the Server
 
@@ -1566,7 +1636,8 @@ Two optional keys keep finished pages on disc:
 ```
 
 When `page_cache_dir` is set, `/catalog` and `/tutorial` are stored in a
-[CHI](https://metacpan.org/pod/CHI) File cache there, one copy per `Accept-Language`, and served from it
+[CHI](https://metacpan.org/pod/CHI) File cache there (or in the cache directory set: see
+["Where caches are kept"](#where-caches-are-kept)), one copy per `Accept-Language`, and served from it
 until they expire.  No other page is cached, because the rest read data files
 that can change between requests.  Without the key nothing is cached.
 
@@ -1797,7 +1868,8 @@ was unset, and `hypnotoad => { listen }` defaulted to `http://127.0.0.1:8080`
 - Template Toolkit registered as handler `tt`, and the Buffer plugin
 (see ["Compression and the page cache"](#compression-and-the-page-cache));
 - the CHI cache for tables (the `Memory` driver unless `cache => { driver }`
-names another), and the page cache when `page_cache_dir` is set;
+names another; a `File` or `FastMmap` one is kept where ["Where caches are kept"](#where-caches-are-kept)
+says), and the page cache when `page_cache_dir` is set;
 - the `before_dispatch` hooks for relative time ranges, cross-row plans and
 the view context, and the `before_render` hook that sets the breadcrumb, the help link
 and the HTML 404 page;
@@ -2015,6 +2087,26 @@ the same and shows that database, with a command word it runs that command, and 
     serves.  To add German support: (1) create `templates/web/de/`, (2) copy and
     translate the `.html.tt` files from `templates/web/en/`, then (3) set the
     config.
+
+    A directory may also name a region, as `templates/web/en-us/` does: a browser
+    whose Accept-Language asks for that region (`en-US`) gets it, and every other
+    request for the language (`en-GB`, `en-CA`, plain `en`) gets
+    `templates/web/en/`.  `language => 'en-us'` makes it the default.
+
+    The distribution ships `en` (British English) and `en-us` (American
+    English).  `en-us` is not edited by hand: it is made from `en` by
+    `author/make-en-us`, which respells the prose (colour, centre, summarise) and
+    leaves the names the code reads alone.  Run it after changing an `en`
+    template; `t/en-us.t` fails until the two agree.
+
+    The server's messages (errors, warnings, refusals) follow the same choice.
+    [CGI::Lingua](https://metacpan.org/pod/CGI%3A%3ALingua) picks the language from the request's `Accept-Language`, or,
+    for the command-line scripts, from the locale (`LANG=en_US.UTF-8`), and
+    [Database::BI::I18N](https://metacpan.org/pod/Database%3A%3ABI%3A%3AI18N) gives each message in it.  A translation is a module,
+    [Database::BI::I18N::en\_us](https://metacpan.org/pod/Database%3A%3ABI%3A%3AI18N%3A%3Aen_us) for American English, listing only the messages
+    that read differently; `t/i18n.t` fails when a British message needs an
+    American spelling it does not list.  The tutorial's text is still in British
+    English.
 
 - **Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json**
 

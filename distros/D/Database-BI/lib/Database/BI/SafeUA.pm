@@ -3,7 +3,7 @@ package Database::BI::SafeUA;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use parent 'LWP::UserAgent';
 
@@ -236,7 +236,7 @@ Database::BI::SafeUA - Fetch a URL only if it leads to the public internet
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 

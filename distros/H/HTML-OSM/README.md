@@ -4,7 +4,7 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 ## Version
 
-Version 0.14
+Version 0.17
 
 ## Synopsis
 
@@ -96,7 +96,8 @@ my ($head, $body) = $map->onload_render();
 Leaflet.js library.  Give it points as latitude and longitude, as place
 names, or as geocoder result objects.  It can also draw GeoJSON shapes,
 heatmaps, GPX tracks and choropleth (colour-filled region) layers, and can
-group nearby markers into clusters.
+group nearby markers into clusters.  A named GeoJSON layer gets a checkbox on
+the map, so the reader can turn it on and off.
 
 Place names are turned into coordinates by an injected geocoder or, without
 one, by the Nominatim service.  The answers are cached, and requests can be
@@ -389,16 +390,25 @@ $map->add_geojson(\%data, style => { color => '#ff0000' }, popup => 'name');
 ```
 
 The first argument may be a hashref/arrayref (GeoJSON structure) or a JSON string.
+Give it a `name` and the reader can hide and show it (see ["LAYER CONTROL"](#layer-control)).
 Returns 1 on success.
 
 #### Api Specification
 
 ##### Input
 
-```
+```perl
 data  : hashref | arrayref | string (JSON)
 style : hashref   Leaflet path-style options (color, weight, fillColor, fillOpacity)
 popup : string    Feature property name whose value becomes the popup text
+name  : string    Label of the layer's checkbox in the map's layer control
+show  : boolean   Whether a named layer is drawn when the map opens (default 1)
+key   : hashref   A key to the layer's colours, shown while the layer is
+                  (see L</LAYER KEY>):
+                  { entries => [ { label, colour }, ... ], title?, position? }
+bands : string    Feature property holding a list of colours, each drawn
+                  as a line of its own just inside the outline, side by side
+                  (see L</BANDS>)
 ```
 
 ##### Output
@@ -410,10 +420,96 @@ popup : string    Feature property name whose value becomes the popup text
 #### Messages
 
 ```
-| Message              | Meaning / Resolution            |
-|----------------------|---------------------------------|
-| (JSON parse error)   | data string is not valid JSON   |
+| Message                                   | Meaning / Resolution            |
+|-------------------------------------------|---------------------------------|
+| (JSON parse error)                        | data string is not valid JSON   |
+| add_geojson: name must be a string        | name is a reference or empty    |
+| add_geojson: show must not be a reference | show is a reference             |
+| add_geojson: key ...                      | key is unusable; the message    |
+|                                           | says which part                 |
+| add_geojson: bands must be a string       | bands is a reference or empty   |
 ```
+
+#### Layer Control
+
+Give a layer a `name` and the map gains Leaflet's layer control, a box of
+checkboxes in its top right corner, one for each name, so the reader can hide
+and show that layer.  `show => 0` starts it hidden: the reader turns it
+on.  As with `search`, the strings `false`, `no` and `off` are false.
+
+Layers given the same name share one checkbox, which is ticked when any of
+them has `show` on.  A layer with no name is always drawn, whatever `show`
+says, because nothing could turn it on.  The control is written once, after
+the last GeoJSON layer, and is left open (not collapsed into an icon), so the
+reader can see what can be turned on.
+
+The name is shown as text: Leaflet writes it into the page as HTML, so it is
+escaped first, and `<b>` is shown as written.
+
+#### Layer Key
+
+```perl
+$map->add_geojson(\%busy,  style => { color => '#d73027' }, name => 'Counties',
+    key => {
+        title   => 'Population',
+        entries => [
+            { label => '100,000 or more', colour => '#d73027' },
+            { label => 'under 100,000',   colour => '#1a9850' },
+        ],
+    });
+$map->add_geojson(\%quiet, style => { color => '#1a9850' }, name => 'Counties');
+```
+
+`key` draws a key to a layer's colours in a corner of the map: a short line
+of each colour, as an outline is drawn, beside its label.  It is shown while
+the layer is: unticking the layer's checkbox hides the key too, and ticking it
+shows it again.  A layer with no name is always drawn, so its key always
+shows.
+
+- `entries`
+
+    Required, at least one: hashrefs of `label` (text, required) and `colour`
+    (`#rgb` or `#rrggbb`, required), listed in the order given.
+
+- `title`
+
+    Text printed above the entries.
+
+- `position`
+
+    `bottomright` (the default), `bottomleft`, `topright` or `topleft`.  The
+    marker key (`legend`) and the layer control are top right by default.
+
+Layers that share a name share one key: the first `key` given for that name.
+Every text reaches the page as text, never as HTML.
+
+#### Bands
+
+```perl
+# Kent's outline is red with blue inside it; Surrey's is all green
+$kent->{properties}{colours}   = [ '#d73027', '#4575b4' ];
+$surrey->{properties}{colours} = [ '#1a9850' ];
+$map->add_geojson({ type => 'FeatureCollection', features => [ $kent, $surrey ] },
+    style => { weight => 2, fill => 0 }, bands => 'colours');
+```
+
+`bands` names a feature property that holds a list of colours (`#rrggbb`).
+A polygon's outline is then drawn just inside its edge, not along the middle
+of it, in a line of the width `style` gives.  So where two polygons share a
+border, each one's colour is on its own side: the border reads as a line twice
+as wide, a different colour either side, and neither hides the other.
+
+A polygon with several colours, for an area that belongs to more than one
+group, gets a line of each, side by side: the first against the edge, each
+further one further inside.  A feature without the property, or with no colour
+that can be used, is drawn as `style` says.  Only polygons are banded; a line
+or point takes the first colour.
+
+The lines are cut to the inside of the polygon, which needs Leaflet's default
+SVG drawing.  A map drawn on a canvas shows them uncut, along the middle of the
+edge, the first colour on top.  A popup opens from the outline as before.
+Neighbours' lines meet exactly only where their shared border is the same in
+both polygons; outlines simplified one at a time leave small gaps or overlaps.
 
 #### Examples
 
@@ -431,6 +527,15 @@ $map->add_geojson('{"type":"FeatureCollection","features":[]}');
 # Multiple GeoJSON layers with different styles on the same map
 $map->add_geojson(\%country_borders, style => { color => '#333333', fillOpacity => 0 });
 $map->add_geojson(\%river_data,      style => { color => '#0099ff', weight => 1    });
+
+# County outlines the reader can turn on: hidden at first
+$map->add_geojson(
+    { type => 'FeatureCollection', features => \@counties },
+    style => { color => '#555555', weight => 1, fill => 0 },
+    popup => 'name',
+    name  => 'County boundaries',
+    show  => 0,
+);
 ```
 
 ### Add\_Heatmap
@@ -940,8 +1045,13 @@ AddGeoJSON
   data?  : GeoJSONStruct ∪ S
   style? : StyleMap ∪ {∅}
   popup? : S ∪ {∅}
+  name?  : S ∪ {∅}
+  show?  : 𝔹 ∪ {∅}
+  key?   : LayerKey ∪ {∅}
 -----------------------------------------
-  geojson' = geojson ⌢ ⟨{data, style, popup}⟩
+  name? ≠ ∅ ⇒ name? ≠ ""
+  key? ≠ ∅ ⇒ #key?.entries ≥ 1 ∧ key?.position ∈ Corner
+  geojson' = geojson ⌢ ⟨{data, style, popup, name, show, key}⟩
 ```
 
 ### Add\_Heatmap

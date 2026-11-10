@@ -25,6 +25,9 @@ t/extended_tests.t
 t/function.t
 t/fuzz.t
 t/integration.t
+t/layer-bands.t
+t/layer-control.t
+t/layer-key.t
 t/legend.t
 t/limiting.t
 t/locales.t

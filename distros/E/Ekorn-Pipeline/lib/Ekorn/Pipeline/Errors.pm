@@ -51,42 +51,41 @@ Ekorn::Pipeline::Errors - report Ekorn::Pipeline's errors at the caller's line
 
 =head1 DESCRIPTION
 
-The errors Ekorn::Pipeline raises are reported at the first line
-outside it, so its user sees the line of their own that caused them.
-Nothing is exported by default.
+Ekorn::Pipeline reports its errors at the first line outside it, so
+its user sees the line of their own code that caused them. Nothing is
+exported by default.
 
 C<croakf> is for modules of stages outside Ekorn::Pipeline too, such
 as C<DBIx::Squirrel::Stages::Rows>. Called from a function that makes
-a stage, in a package of its own, it reports a mistake at the line that
-called the function, with no more set up. A C<%> in the message is
-written C<%%>.
+a stage, it reports a mistake at the line that called the function,
+with nothing more to set up. A C<%> in the message is written C<%%>.
 
 A module of functions that take stages from their callers can put
-C<@INTERNAL> in its own C<@CARP_NOT>, as in the synopsis, so that a
-stage that dies is reported at its caller's line, where the stage was
-written, rather than at the module's own line that ran the pipeline.
+C<@INTERNAL> in its own C<@CARP_NOT>, as in the synopsis. Then a stage
+that dies is reported at the caller's line, where the stage was
+written, not at the line in the module that ran the pipeline.
 
 =head1 FUNCTIONS
 
 =head2 croakf
 
-    croakf 'Expected stage #%d to be a code reference', $n;
+    croakf 'Expected stage #%d to be a code reference or a pipeline', $n;
 
 Croaks with a message made by C<sprintf> from a format and its
-arguments, reporting it at the same line as L<Carp/croak> would.
+arguments, at the same line L<Carp/croak> would report.
 
-The format is a literal, written in the code: values go in as
-arguments, through C<%s> and the like, never as the format. A format
-made from data does whatever its C<%> directives say, such as
-C<%999999999s>, which makes a string of a gigabyte.
+Write the format as a literal in the code. Values go in as arguments,
+through C<%s> and the like, never in the format. A format made from
+data does whatever its C<%> directives say: C<%999999999s> makes a
+string of a gigabyte.
 
 =head1 VARIABLES
 
 =head2 @INTERNAL
 
-The packages of Ekorn::Pipeline. Each of its modules that croaks takes
-this list as its C<@CARP_NOT>, so that Carp looks past all of them to
-the caller's line.
+The packages of Ekorn::Pipeline. Each of its modules that croaks uses
+this list as its C<@CARP_NOT>, so Carp looks past all of them to the
+caller's line.
 
 =head1 SEE ALSO
 

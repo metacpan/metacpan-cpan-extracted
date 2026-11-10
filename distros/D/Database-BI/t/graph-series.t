@@ -52,6 +52,8 @@ sub without_data {
 	$body =~ s/^\s*(?:const allData|var series)\s*=.*$//mg;
 	# Each request has its own Content-Security-Policy nonce.
 	$body =~ s/\bnonce="[^"]*"/nonce=""/g;
+	# The Preferences link names the page it is on, URL and all.
+	$body =~ s{(id="site-nav-preferences" href=")[^"]*"}{$1"};
 	return $body;
 }
 

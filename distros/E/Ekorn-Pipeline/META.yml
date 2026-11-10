@@ -27,7 +27,7 @@ no_index:
 provides:
   Ekorn::Pipeline:
     file: lib/Ekorn/Pipeline.pm
-    version: v0.1.2
+    version: v0.2.0
   Ekorn::Pipeline::Errors:
     file: lib/Ekorn/Pipeline/Errors.pm
   Ekorn::Pipeline::Gather:
@@ -55,6 +55,6 @@ resources:
   bugtracker: https://github.com/nukopian/Ekorn-Pipeline/issues
   homepage: https://github.com/nukopian/Ekorn-Pipeline
   repository: https://github.com/nukopian/Ekorn-Pipeline.git
-version: v0.1.2
+version: v0.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

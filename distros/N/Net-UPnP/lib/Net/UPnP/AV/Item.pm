@@ -97,10 +97,8 @@ Net::UPnP::AV::Item - Perl extension for UPnP.
         }
         $mediaServer = Net::UPnP::AV::MediaServer->new();
         $mediaServer->setdevice($dev);
-        @content_list = $mediaServer->getcontentlist(ObjectID => 0);
-        foreach $content (@content_list) {
-            print_content($mediaServer, $content, 1);
-        }
+        $mediaServer->walkcontent(callback => sub { print_content($mediaServer, @_); });
+        die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
         $devNum++;
     }
 
@@ -120,22 +118,12 @@ Net::UPnP::AV::Item - Perl extension for UPnP.
             print " - " . $content->getcontenttype() . ")";
         }
         print "\n";
-        unless ($content->iscontainer()) {
-            return;
-        }
-        @child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
-        if (@child_content_list <= 0) {
-            return;
-        }
-        $indent++;
-        foreach my $child_content (@child_content_list) {
-            print_content($mediaServer, $child_content, $indent);
-        }
+
     }
 
 =head1 DESCRIPTION
 
-The package is a extention UPnP/AV media server, and a sub class of L<Net::UPnP::AV::Content>.
+The package is an extension UPnP/AV media server, and a sub class of L<Net::UPnP::AV::Content>.
 
 =head1 METHODS
 

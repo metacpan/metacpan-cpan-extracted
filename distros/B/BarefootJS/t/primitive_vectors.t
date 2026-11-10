@@ -7,8 +7,9 @@ use JSON::PP ();
 use POSIX ();
 use Scalar::Util qw(looks_like_number);
 
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/lib";
 use BarefootJS;
+use VectorUndefined ();
 use BarefootJS::Evaluator ();
 
 binmode Test::More->builder->$_, ':encoding(UTF-8)'
@@ -43,12 +44,6 @@ sub _numify_big {
     $v->{$_} = _numify_big($v->{$_}) for keys %$v;
     return $v;
 }
-
-# The step-0 expected-failure ledger: the cases that fail on Perl today, each
-# naming the rollout step that removes it. It may only shrink: an unlisted
-# failure fails, and so does a listed case that now passes.
-my $ledger = _read_json(File::Spec->catfile($vectors_dir, 'primitives-expected-failures.json'));
-my %expected = %{ $ledger->{runtimes}{perl} // die "ledger has no \"perl\" runtime" };
 
 my $bf = bless { c => undef, config => {}, backend => undef }, 'BarefootJS';
 
@@ -117,6 +112,7 @@ my %SENTINEL = (
 # delegate to read them as JS booleans. `$num` sentinels become doubles.
 sub decode_arg {
     my ($v) = @_;
+    return VectorUndefined::arg() if VectorUndefined::is_sentinel($v);
     return [ map { decode_arg($_) } @$v ] if ref $v eq 'ARRAY';
     if (ref $v eq 'HASH') {
         return $SENTINEL{ $v->{'$num'} }->() if keys %$v == 1 && exists $v->{'$num'};
@@ -125,29 +121,18 @@ sub decode_arg {
     return $v;
 }
 
-my ($total, $passed, %seen) = (0, 0);
+my ($total, $passed) = (0, 0);
 for my $file (@files) {
     for my $case (@{ _read_json($file)->{cases} }) {
         my $key = "$case->{fn}/$case->{note}";
-        $seen{$key} = 1;
         $total++;
         my ($ok, $detail) = run_case($case);
         $passed++ if $ok;
-        if ($ok && $expected{$key}) {
-            fail("ledger entry '$key' now passes; remove it from the ledger (step $expected{$key}{step})");
-        } elsif (!$ok && !$expected{$key}) {
-            fail("UNEXPECTED-FAIL $key: $detail");
-        } else {
-            pass($key . ($ok ? '' : " (expected failure, step $expected{$key}{step})"));
-        }
+        ok($ok, $key) or diag("FAIL $key: $detail");
     }
 }
-for my $key (sort keys %expected) {
-    fail("ledger entry '$key' matches no primitives case — renamed note?") unless $seen{$key};
-}
 
-# Every native claim must give the JS answer on every case it covers; no
-# ledger applies.
+# Every native claim must give the JS answer on every case it covers.
 my $claims = _read_json(File::Spec->catfile($vectors_dir, 'primitives-native-safe.json'))->{runtimes}{perl}
     // die 'primitives-native-safe.json has no "perl" runtime';
 my $native_ran = 0;
@@ -165,8 +150,7 @@ for my $fn (sort keys %$claims) {
         ok($ok, "native $case->{fn}/$case->{note} (domain $case->{domain})") or diag("NATIVE-FAIL: $detail");
     }
 }
-diag(sprintf('primitives: %d cases, %d pass, %d in the expected-failure ledger; %d native claimed cases',
-    $total, $passed, scalar keys %expected, $native_ran));
+diag(sprintf('primitives: %d cases, %d pass; %d native claimed cases', $total, $passed, $native_ran));
 done_testing;
 
 sub run_case {
@@ -186,6 +170,7 @@ sub run_case {
 # the same sign; a string expect needs a string.
 sub match {
     my ($got, $expect) = @_;
+    return VectorUndefined::runtime_undefined($got) if VectorUndefined::is_sentinel($expect);
     return !defined $got if !defined $expect;
     return 0 if !defined $got;
     if (ref $expect eq 'HASH' && keys %$expect == 1 && exists $expect->{'$num'}) {

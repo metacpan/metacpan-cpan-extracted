@@ -12,7 +12,7 @@ use Tk::eText;
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
 my $have_lt = eval { require Test::LeakTrace; 1 };
-plan tests => 6;
+plan tests => 7;
 $mw->geometry('+10+10');
 
 {
@@ -117,6 +117,34 @@ SKIP: {
     sub { relayouts($t, 20) },
     '<', 5, 'relayout with a Perl layout callback does not leak SVs');
 
+  $t->destroy;
+}
+
+# 5. Deleting an -empty block unlinked its segment from the line and
+#    never freed it (72 bytes per block, since 1997).  No count of the
+#    segments alive is kept, so the process's resident size is watched
+#    over many deletions: the leak grew it by about 80 bytes each.
+SKIP: {
+  my $statm = '/proc/self/statm';
+  skip "no $statm to measure the process size", 1 unless -r $statm;
+  my $rss = sub {
+    open my $fh, '<', $statm or return 0;
+    my @f = split ' ', scalar <$fh>;
+    return $f[1] * 4096;
+  };
+  my $t = $mw->eText->pack;
+  $t->blockConfigure('E', -empty => 1);
+  $t->insert('1.0', "abc\n");
+  my $loop = sub {
+    for (1 .. $_[0]) { $t->blockInsert('E', '1.1'); $t->delete('1.1') }
+  };
+  $loop->(2000);			# let Perl's own pools settle
+  my $n = 50000;
+  my $before = $rss->();
+  $loop->($n);
+  my $grown = $rss->() - $before;
+  cmp_ok($grown / $n, '<', 8,
+	 "deleting an -empty block frees it ($grown bytes for $n deletions)");
   $t->destroy;
 }
 $mw->destroy;

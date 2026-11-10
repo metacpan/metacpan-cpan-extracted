@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Large;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 # EXPERIMENTAL, awaiting approval: what Proc::ShellSpawn needs to run Proc::ShellSubset::Large trees
 # (doc/large-subset/large-subset-spec.md, sections 4 and 5), as handlers named in Proc::ShellSpawn's tables:
 #   x_NAME(CONTEXT, NODE, TAIL, K)         command nodes { func | export | readonly | local | exec => ... }
@@ -117,22 +117,25 @@ sub b_set {
 sub b_eval { my ($c, $argv, $env, $k) = @_; run_text($c, join(' ', @$argv[1 .. $#$argv]), "'eval' text", $k) }
 sub b_dot {
   my ($c, $argv, $env, $k) = @_; my $f = $argv->[1] // '';
-  my ($p) = $f =~ m{/} ? $f : grep -f, map +($_ eq '' ? '.' : $_) . "/$f", split /:/, var($c, 'PATH'), -1;
-  $p = "$c->{sh}{cwd}/$p" if defined $p && $p !~ m{^/};
+  my ($p) = Proc::ShellSpawn::has_dir($f) ? $f : grep -f Proc::ShellSpawn::path_in($c, $_), map +($_ eq '' ? '.' : $_) . "/$f",
+    Proc::ShellSpawn::path_list(var($c, 'PATH'));
+  $p = Proc::ShellSpawn::path_in($c, $p) if defined $p;
   open my $fh, '<', $p // '' or return fail($c, 2, ".: cannot open $f: No such file");
   run_text($c, do { local $/; <$fh> }, "the text of '. $f'", $k) }
 
 my %SIGNAME; { my @n = split ' ', $Config::Config{sig_name}; @SIGNAME{split ' ', $Config::Config{sig_num}} = @n; $SIGNAME{0} = 'EXIT' }
+my %SIGNUM; @SIGNUM{split ' ', $Config::Config{sig_name}} = split ' ', $Config::Config{sig_num};
 sub b_trap {   # names in any case, or numbers (P6); KILL and STOP cannot be caught: nothing to do, status 0, as both shells
   my ($c, $argv, $env, $k) = @_; my ($act, @sigs) = @$argv[1 .. $#$argv]; my $sh = $c->{sh};
   for my $s (map /^[0-9]+\z/ ? $SIGNAME{$_} // $_ : uc, @sigs) {
     next if $s eq 'KILL' || $s eq 'STOP';
     if ($act eq '-') { delete $sh->{trap}{$s} } else { $sh->{trap}{$s} = $act }
     next if $s eq 'EXIT';
-    $Proc::ShellSpawn::TRAPSAVE{$s} //= $SIG{$s} // 'DEFAULT';
     my $w = $c; weaken $w;
-    $SIG{$s} = $act eq '-' ? $Proc::ShellSpawn::TRAPSAVE{$s} : $act eq '' ? 'IGNORE'
-      : sub { return unless $w; push @{$w->{sh}{pend}}, $s; defer(\&run_pending, $w) } }   # deferred: the action runs between
+    my $h = $sh->{tsub}{$s} = sub { return unless $w; push @{$w->{sh}{pend}}, $s; defer(\&run_pending, $w) };
+    next unless exists $SIGNUM{$s};   # a signal Perl does not have here (Windows: USR1, ...): only kill ... $$ sends it
+    $Proc::ShellSpawn::TRAPSAVE{$s} //= $SIG{$s} // 'DEFAULT';
+    $SIG{$s} = $act eq '-' ? $Proc::ShellSpawn::TRAPSAVE{$s} : $act eq '' ? 'IGNORE' : $h }   # deferred: the action runs between
   # two reactions, and at the latest before the next command of a list (X19: as dash, before what follows the command)
   defer($k, 0) }
 sub run_pending {   # the actions of the signals caught since the last time, in order; then $k (and every other waiter)
@@ -246,7 +249,6 @@ sub b_unset {
     delete $sh->{vars}{$_}; delete $sh->{exp}{$_} }
   defer($k, 0) }
 
-my %SIGNUM; @SIGNUM{split ' ', $Config::Config{sig_name}} = split ' ', $Config::Config{sig_num};
 sub b_kill {   # kill ... $$: the shell takes the signal itself (F9); other process IDs go to the program kill
   my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv; my $sh = $c->{sh};
   my @o = @a;   # K0 (the user, 2026-11-05): a signal (-N, -NAME, -s NAME), maybe '--', and no process ID: as both shells,
@@ -268,7 +270,7 @@ sub b_kill {   # kill ... $$: the shell takes the signal itself (F9); other proc
     return defer($k, 0) if $s eq 'EXIT' || $harmless && !defined $t;   # kill -0 $$ only tests; as both shells, status 0
     return defer($k, 0) if defined $t && $t eq '';            # ignored
     return run_trap($c, $s, sub { defer($k, 0) }) if defined $t && $m == $sh;
-    if (defined $t) { $SIG{$s}->($s) if ref $SIG{$s} eq 'CODE'; return defer($k, 0) }   # as a real signal: the trap runs in the main shell
+    if (defined $t) { my $h = $m->{tsub}{$s}; $h->($s) if $h; return defer($k, 0) }   # as a real signal: the trap runs in the main shell
     $m->{trap}{EXIT} = '' if exists $m->{trap}{EXIT};         # a death by the signal runs no EXIT trap
     $Proc::ShellSpawn::SIGNALLED = $s;                                 # the caller may die by it too (try.pl does)
     $sh->{die}->(128 + ($SIGNUM{$s} // 15)) };                 # the whole string ends, as sh -c would

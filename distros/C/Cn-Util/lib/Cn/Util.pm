@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Cn::Util;
 require 5.010001;
-our $VERSION = 0.024;
+our $VERSION = 0.0241;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -139,7 +139,10 @@ sub _load_ddp {
 	local $SIG{__WARN__} = sub {
 		warn @_ unless $_[0] =~ m{\ASubroutine \Q$pkg\E::n?p redefined};
 	};
-	my $ok = eval qq{package $pkg;\nDDP->import({output => 'STDOUT', array_max => 10, show_memsize => 1, show_dualvar => 'off'}); 1};
+	# show_memsize needs Devel::Size, which is not a prerequisite; asked for
+	# without it, DDP warned "Devel::Size not found" on every first p() or np().
+	my $memsize = eval { require Devel::Size; 1 } ? 1 : 0;
+	my $ok = eval qq{package $pkg;\nDDP->import({output => 'STDOUT', array_max => 10, show_memsize => $memsize, show_dualvar => 'off'}); 1};
 	die "Cn::Util: could not load DDP into $pkg: $@" unless $ok;
 	$DDP_LOADED{$pkg} = 1;
 	return;
@@ -197,15 +200,13 @@ sub dir {
 	  : sub { 1 };   # empty tests string now means "no filtering", not "nothing matches"
 
 	my $target_dir = $args{dir};
-	# On Windows, File::Find turns every "\" in its starting path into "/"
-	# (the "canonicalize directory separators" step of _find_opt in 1.44, the
-	# version on the Strawberry Perl 5.42 smoker that failed t/dir.t; 1.14, in
-	# perl 5.10.1, does not), so a recursive listing of "C:\x" reported paths under
-	# "C:/x", while the non-recursive listing and the parallel walk's top
-	# levels joined onto "C:\x"; and since "C:/x" ne "C:\x", the walk's check
-	# that leaves the root itself out never matched.  Doing the same here first
-	# gives every mode the same paths.  Only on MSWin32, as in File::Find:
-	# elsewhere "\" is an ordinary character in a file name.
+	# On Windows every "\" in dir becomes "/", so that every path dir() returns
+	# there uses "/" alone.  This began as matching File::Find, which did the
+	# same to its starting path (the "canonicalize directory separators" step
+	# of _find_opt in 1.44, on the Strawberry Perl 5.42 smoker) while the
+	# recursive walk used it, and mixed separators made that walk report its
+	# own root.  Only on MSWin32: elsewhere "\" is an ordinary character in a
+	# file name.
 	my $is_win32 = $^O eq 'MSWin32';
 	$target_dir =~ tr{\\}{/} if $is_win32;
 	# Strip trailing slashes, but keep a root intact: "/", and on Windows "C:/",
@@ -227,39 +228,23 @@ sub dir {
 	my $emit = $cb // sub { push @items, $_[0] };
 
 	if ($args{recursive}) {
-		require File::Find; # ~1.6 ms, and only the recursive branch needs it
-		# Walk everything strictly below $start, handing each match to $sink.
+		# Walk everything strictly below $start, depth first, handing each
+		# match to $sink.  _dir_level returns a directory's subdirectories
+		# without the symlinks among them, so the walk does not follow links;
+		# but opendir follows $start itself, so a dir that is a symlink to a
+		# directory is listed through the link.
+		#
+		# File::Find did this walk up to 0.024.  Over ~/perl5 (279,000
+		# entries, warm cache, 2026-11-09) it took 1.06 s of user CPU to this
+		# loop's 0.43 s, for the same system time: the two make the same stat
+		# and lstat calls.  It also lstat()ed its starting path, so a symlinked
+		# dir needed listing by hand before it, and on Windows it rewrote the
+		# separators of that path, which the "\" conversion above is for.
 		my $find = sub {
 			my ($start, $sink) = @_;
-			my $strip = $start eq '.';
-			# File::Find lstat()s its starting path, so a $start that is a
-			# symlink to a directory was taken for a file and nothing was
-			# found under it -- although opendir, which the non-recursive
-			# listing and the parallel walk's top levels use, follows it.  So
-			# that level is listed here with opendir, and File::Find starts
-			# from its subdirectories instead.  Passing "$start/" made POSIX
-			# lstat resolve the link, but not win32_lstat (perl 5.42
-			# win32/win32.c), which asks GetFileAttributes, and Windows drops a
-			# trailing separator; Strawberry Perl 5.42 still found nothing.
-			my @top = -l $start && -d $start
-				? _dir_level($start, $re, $tester, $join, $sink)
-				: ($start);
-			return unless @top;
-			my %top = map { $_ => 1 } @top;
-			File::Find::find({
-				no_chdir => 1,
-				wanted   => sub {
-					 # A starting point is not "below" $start, or, under a
-					 # symlinked $start, _dir_level has already reported it.
-					 return if $top{$_};
-					 my ($file) = m{([^/]+)\z}s;         # basename, much cheaper than File::Spec
-					 if ($file =~ $re && $tester->($_)) {
-					     my $path = $_;
-					     $path =~ s{^\./}{} if $strip;
-					     $sink->($path);
-					 }
-				},
-			}, @top);
+			my @todo = ($start);
+			push @todo, _dir_level(pop @todo, $re, $tester, $join, $sink) while @todo;
+			return;
 		};
 		if ($args{cpu} == 1) {
 			$find->($target_dir, $emit);
@@ -299,9 +284,10 @@ sub dir {
 my $DIR_JOBS_PER_CPU = 4;
 
 # Hand each entry of directory $d that matches $re and $tester to $emit, and
-# return its subdirectories, leaving out symlinks to directories as File::Find
-# does.  One level of a recursive dir(), for the parallel walk's breadth-first
-# levels and for a starting directory that is itself a symlink.
+# return its subdirectories, leaving out symlinks to directories so that a
+# recursive walk does not follow them.  One level of a recursive dir(): the
+# serial walk is a loop over it, and so are the parallel walk's breadth-first
+# levels and each of its workers.
 sub _dir_level {
 	my ($d, $re, $tester, $join, $emit) = @_;
 	opendir my $dh, $d or die "Cannot open directory $d: $!";
@@ -340,13 +326,30 @@ sub _dir_parallel {
 	my @jobs;
 	push @{ $jobs[$_ % $want] }, $level[$_] for 0 .. $#level;
 
+	# A worker hands its results back in a Storable file of its own, named by
+	# its pid, and leaves with POSIX::_exit, rather than through
+	# Parallel::ForkManager's finish(), whose CORE::exit ran the caller's END
+	# blocks and destructors in every worker: an END that removed a lock file
+	# or printed a summary did it a dozen times, and a database handle was
+	# closed from under the parent.  On Windows a worker is a thread of this
+	# process, and _exit would end the whole of it, so there it still calls
+	# finish().  newdir() removes the directory only in this process, by pid.
+	require POSIX;
+	require Storable;
+	require File::Temp;
+	my $is_win32 = $^O eq 'MSWin32';
+	my $tmp = File::Temp->newdir;
+
 	my @errors;
 	my $pm = Parallel::ForkManager->new($cpu);
 	# The default 1 s poll in wait_all_children added a flat 1.01 s to every
 	# call, measured; 0 makes it block in waitpid instead.
 	$pm->set_waitpid_blocking_sleep(0);
 	$pm->run_on_finish(sub {
-		my ($pid, $exit, $id, $signal, $core, $data) = @_;
+		my ($pid, $exit, undef, $signal) = @_;
+		my $file = "$tmp/$pid";
+		my $data = -e $file ? eval { Storable::retrieve($file) } : undef;
+		unlink $file if -e $file;
 		if ($signal || $exit || !$data) {
 			push @errors, "dir: worker $pid died (exit $exit, signal $signal)";
 			return;
@@ -358,7 +361,11 @@ sub _dir_parallel {
 		$pm->start and next;
 		my @found;
 		my $ok = eval { $find->($_, sub { push @found, $_[0] }) for @$job; 1 };
-		$pm->finish(0, { paths => \@found, error => $ok ? undef : "$@" });
+		my $error = $ok ? undef : "$@";   # taken now: the eval below clears $@ as it starts
+		my $stored = eval { Storable::store({ paths => \@found, error => $error }, "$tmp/$$") };
+		my $code = $stored ? 0 : 1;   # 1 = the results could not be written
+		$pm->finish($code) if $is_win32;
+		POSIX::_exit($code);
 	}
 	$pm->wait_all_children;
 	die join "\n", @errors if @errors;
@@ -438,32 +445,24 @@ sub execute {
 		say STDERR "STDERR = $stderr";
 		die "$cmd\n failed";
 	}
-	if ($return eq 'exit') {
-		return $exit
-	} elsif ($return eq 'stderr') {
-		chomp $stderr;
-		return $stderr
-	} elsif ($return eq 'stdout') {
-		chomp $stdout;
-		return $stdout
-	} elsif ($return eq 'all') {
-		chomp $stdout;
-		chomp $stderr;
-		return {
-			exit   => $exit,
-			stdout => $stdout,
-			stderr => $stderr
-		}
-	} else {
-		die "$return broke pigeonholes"
-	}
-	return $stdout
+	return $exit if $return eq 'exit';
+	chomp $stdout;
+	chomp $stderr;
+	return $stdout if $return eq 'stdout';
+	return $stderr if $return eq 'stderr';
+	return { exit => $exit, stdout => $stdout, stderr => $stderr };   # 'all', the only mode left
 }
 
 sub file2string {
 	my ($file) = @_;
 	open my $fh, '<', $file or die "can't read $file: $!"; # was autodie
-	return do { local $/; <$fh> };
+	# readline returns undef only on an error -- an empty file reads as '' --
+	# and open() succeeds on a directory on POSIX systems, so file2string('lib')
+	# used to return undef without a word.  Tested with // rather than through
+	# a lexical, which on perl 5.10.1 took a third copy of the file at return:
+	# a 200 MB file peaked at 575 MB, against 384 MB this way (5.44 is 195 MB
+	# either way, through copy-on-write).
+	return do { local $/; <$fh> } // die "can't read $file: $!";
 }
 
 sub format_commas { # https://stackoverflow.com/questions/33442240/perl-printf-to-use-commas-as-thousands-separator
@@ -525,7 +524,13 @@ sub json_file_to_ref {
 	# inside a string -- "values: [1, NaN, 2]" became "values: [1, null, 2]"
 	# -- so the first alternative matches each whole string literal and
 	# (*SKIP)(*FAIL) resumes the scan after its closing quote.
-	$json =~ s/"(?:[^"\\]++|\\.)*+"(*SKIP)(*FAIL)|[\[,:]\s*\K-?(?:NaN|Infinity)(?=\s*[,\]}])/null/gs;
+	#
+	# That scan is slow: on a 43 MB file of 300,000 records it took 2.1 s, to
+	# decode_json's 0.30 s (Cpanel::JSON::XS), measured 2026-11-09.  The two
+	# index() calls that rule it out took 4.5 ms there, so a file with neither
+	# word, which is most of them, is not scanned at all.
+	$json =~ s/"(?:[^"\\]++|\\.)*+"(*SKIP)(*FAIL)|[\[,:]\s*\K-?(?:NaN|Infinity)(?=\s*[,\]}])/null/gs
+		if index($json, 'NaN') >= 0 || index($json, 'Infinity') >= 0;
 	require JSON::MaybeXS; # ~4.3 ms
 	return JSON::MaybeXS::decode_json($json);
 }
@@ -570,7 +575,6 @@ sub ref_to_json_file {
 		die "$json_filename isn't a scalar/string";
 	}
 	require JSON::MaybeXS;
-	require Term::ANSIColor;
 	open my $fh, '>:raw', $json_filename   # Write it unmangled
 		or die "can't write $json_filename: $!"; # was autodie
 	say $fh JSON::MaybeXS::encode_json($ref);
@@ -579,7 +583,15 @@ sub ref_to_json_file {
 	# file, and later perls died with "unable to close filehandle" from the
 	# implicit close under FATAL warnings.
 	close $fh or die "can't write $json_filename: $!";
-	say 'Wrote ' . Term::ANSIColor::colored(['blue on_red'], $json_filename);
+	# Colored by the rule structure()'s color => 'auto' follows.  Up to 0.024
+	# it always was, so a log or a pipe that STDOUT went to got the escape
+	# codes too.
+	my $shown = $json_filename;
+	if (($ENV{CLICOLOR_FORCE} || -t STDOUT) && !$ENV{NO_COLOR}) {
+		require Term::ANSIColor;
+		$shown = Term::ANSIColor::colored(['blue on_red'], $shown);
+	}
+	say "Wrote $shown";
 	return $json_filename;
 }
 
@@ -651,16 +663,36 @@ sub _structure_kind {
 #   { kind => 'union', alts => { kindname => node } }
 # $stack holds the refaddrs of the containers we are currently inside, so a
 # self-referential structure terminates instead of recursing forever.
+#
+# The values arrive as $chunks, a list of array references whose elements,
+# taken together, are the values.  The elements of the arrays being merged are
+# then described where they lie -- the arrays themselves are the chunks --
+# rather than copied into one list, and values are copied only to split a
+# union by kind.  Copying at every level, as up to 0.024 did, took 413 MB on
+# top of a 362 MB array of 300,000 five-key records, and 2.0 s; this takes
+# 237 MB and 1.4 s (perl 5.44, 2026-11-09).  Most of what is left is the
+# copies of hash values, one list per key, and the cycle guard's $stack.
 sub _structure_describe {
-	my ($values, $opt, $depth, $stack) = @_;
-	my %by_kind;
-	push @{ $by_kind{ _structure_kind($_) } }, $_ for @{ $values };
-	my @kinds = sort keys %by_kind;
+	my ($chunks, $opt, $depth, $stack) = @_;
+	my %count;   # kind => how many values are of that kind
+	for my $chunk (@{ $chunks }) {
+		# A plain scalar, the commonest value, is classified here rather than
+		# by a call to _structure_kind, which cost 0.3 s of the 1.7 s that
+		# 300,000 five-key records took.  The answers are the same.
+		$count{ !defined $_ ? 'null'
+		      : ref $_      ? _structure_kind($_)
+		      : Scalar::Util::looks_like_number($_) ? 'number' : 'string' }++ for @{ $chunk };
+	}
+	my @kinds = sort keys %count;
 
 	if (@kinds > 1) {
+		my %by_kind;
+		for my $chunk (@{ $chunks }) {
+			push @{ $by_kind{ _structure_kind($_) } }, $_ for @{ $chunk };
+		}
 		return {
 			kind => 'union',
-			alts => { map { $_ => _structure_describe($by_kind{$_}, $opt, $depth, $stack) } @kinds },
+			alts => { map { $_ => _structure_describe([$by_kind{$_}], $opt, $depth, $stack) } @kinds },
 		};
 	}
 	my $k = $kinds[0] // 'null';
@@ -668,64 +700,62 @@ sub _structure_describe {
 	$reftype //= $k;
 
 	if ($reftype eq 'HASH' || $reftype eq 'ARRAY' || $reftype eq 'SCALAR' || $reftype eq 'REF') {
+		my $all = @{ $chunks } == 1 ? $chunks->[0] : [ map { @{ $_ } } @{ $chunks } ];
 		# Drop anything we're already inside: its shape is an ancestor's shape.
-		my @fresh = grep { !$stack->{ Scalar::Util::refaddr($_) } } @{ $values };
-		return { kind => 'leaf', types => { '(cycle)' => 1 } } unless @fresh;
+		# Copied only when there is something to drop.
+		my $fresh = (grep { $stack->{ Scalar::Util::refaddr($_) } } @{ $all })
+			? [ grep { !$stack->{ Scalar::Util::refaddr($_) } } @{ $all } ]
+			: $all;
+		return { kind => 'leaf', types => { '(cycle)' => 1 } } unless @{ $fresh };
 		if ($opt->{max_depth} && $depth >= $opt->{max_depth}) {
 			return { kind => 'leaf', types => { '(...)' => 1 } };
 		}
-		local @{ $stack }{ map { Scalar::Util::refaddr($_) } @fresh } = (1) x @fresh;
+		local @{ $stack }{ map { Scalar::Util::refaddr($_) } @{ $fresh } } = (1) x @{ $fresh };
 
 		if ($reftype eq 'HASH') {
-			my %keys; # key => { vals => [...], seen => n }
-			for my $h (@fresh) {
-				for my $key (keys %{ $h }) {
-					push @{ $keys{$key}{vals} }, $h->{$key};
-					$keys{$key}{seen}++;
-				}
+			# Each hash puts one value under each of its keys, so a key whose
+			# list is shorter than @$fresh is missing from some of them.
+			my %vals;   # key => [ its value in each hash that has it ]
+			for my $h (@{ $fresh }) {
+				push @{ $vals{$_} }, $h->{$_} for keys %{ $h };
 			}
 			# A wide hash used as a dictionary has no interesting key names:
 			# merge every value into one representative entry instead.
-			if ($opt->{hash_max} && keys %keys > $opt->{hash_max}) {
-				my @all = map { @{ $keys{$_}{vals} } } keys %keys;
+			if ($opt->{hash_max} && keys %vals > $opt->{hash_max}) {
 				return {
 					kind  => 'hash',
 					class => $class,
-					n     => scalar @fresh,
-					wide  => scalar keys %keys,
+					n     => scalar @{ $fresh },
+					wide  => scalar keys %vals,
 					keys  => { '*' => {
-						node     => _structure_describe(\@all, $opt, $depth + 1, $stack),
+						node     => _structure_describe([values %vals], $opt, $depth + 1, $stack),
 						optional => 0,
 					}},
 				};
 			}
 			my %out;
-			for my $key (keys %keys) {
+			for my $key (keys %vals) {
 				$out{$key} = {
-					node     => _structure_describe($keys{$key}{vals}, $opt, $depth + 1, $stack),
-					optional => ($keys{$key}{seen} < @fresh ? 1 : 0),
+					node     => _structure_describe([$vals{$key}], $opt, $depth + 1, $stack),
+					optional => (@{ $vals{$key} } < @{ $fresh } ? 1 : 0),
 				};
 			}
-			return { kind => 'hash', class => $class, n => scalar @fresh, keys => \%out };
+			return { kind => 'hash', class => $class, n => scalar @{ $fresh }, keys => \%out };
 		}
 		elsif ($reftype eq 'ARRAY') {
-			my (@elems, @lens);
-			for my $a (@fresh) {
-				push @lens,  scalar @{ $a };
-				push @elems, @{ $a };
-			}
+			my @lens = map { scalar @{ $_ } } @{ $fresh };
 			return {
 				kind  => 'array',
 				class => $class,
-				node  => (@elems ? _structure_describe(\@elems, $opt, $depth + 1, $stack) : undef),
-				n     => scalar @fresh,
+				node  => ((grep { $_ } @lens) ? _structure_describe($fresh, $opt, $depth + 1, $stack) : undef),
+				n     => scalar @{ $fresh },
 				lens  => \@lens,
 			};
 		}
 		return { # SCALAR / REF
 			kind  => 'sref',
 			class => $class,
-			node  => _structure_describe([map { ${ $_ } } @fresh], $opt, $depth + 1, $stack),
+			node  => _structure_describe([[ map { ${ $_ } } @{ $fresh } ]], $opt, $depth + 1, $stack),
 		};
 	}
 	return { kind => 'leaf', types => { $k => 1 } };
@@ -820,7 +850,7 @@ sub structure {
 
 	my @lines;
 	push @lines, $c->('key', $opt{as}) if defined $opt{as};
-	_structure_render(undef, _structure_describe([$ref], \%opt, 0, {}), 0, \%opt, $c, \@lines);
+	_structure_render(undef, _structure_describe([[$ref]], \%opt, 0, {}), 0, \%opt, $c, \@lines);
 	my $out = join("\n", @lines) . "\n";
 	print {$fh} $out unless $opt{output} eq 'string';
 	return $out;
@@ -919,7 +949,7 @@ It takes these named arguments:
 
 =item * C<tests> (default C<f>): One or more of perl's file tests, as letters: C<rwxoRWXOezsfdlpSbcugkTB>.  Every one must pass.  C<'d'> lists directories; C<''> applies no test at all.
 
-=item * C<recursive> (default C<0>): C<1> descends into subdirectories, through C<File::Find>, without following symbolic links.
+=item * C<recursive> (default C<0>): C<1> descends into subdirectories, without following symbolic links.
 
 =item * C<cpu> (default C<1>): For a recursive listing, the number of worker processes (through C<Parallel::ForkManager>).  Ignored when C<recursive> is C<0>.
 
@@ -929,9 +959,9 @@ It takes these named arguments:
 
 The file tests share one C<stat> per path, so asking for four of them costs no more than asking for one.  C<-l> is checked first, with C<lstat>.
 
-With C<cpu> greater than 1, C<dir> walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  C<on_match> still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.
+With C<cpu> greater than 1, C<dir> walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  C<on_match> still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.  A worker leaves without running the program's C<END> blocks or destructors, except on Windows, where it is a thread of the calling process.
 
-An unknown argument, an undefined C<tests>, C<dir>, C<regex> or C<cpu>, a letter that is not a file test, a C<cpu> that is not a positive integer, an C<on_match> that is not a code reference, and a directory that cannot be opened all die.
+An unknown argument, an undefined C<tests>, C<dir>, C<regex> or C<cpu>, a letter that is not a file test, a C<cpu> that is not a positive integer, an C<on_match> that is not a code reference, and a directory that cannot be opened, whether C<dir> itself or one a recursive listing meets, all die.
 
 =head2 execute
 
@@ -963,7 +993,7 @@ The command's standard input is an empty pipe.  A command that would prompt -- C
 
  my $text = file2string('notes.txt');
 
-Returns the whole of a file as one string, read without any decoding layer.  A file that cannot be opened dies, naming it.
+Returns the whole of a file as one string, read without any decoding layer.  A file that cannot be opened or read, such as a directory, dies, naming it.
 
 =head2 format_commas
 
@@ -985,7 +1015,7 @@ Reads a JSON file and returns the decoded data, through C<JSON::MaybeXS>.  Pytho
 
  ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
+Writes a data structure to a file as JSON, through C<JSON::MaybeXS>, prints C<Wrote> and the file name, and returns the file name.  The name is colored by the rule C<structure>'s C<< color =E<gt> 'auto' >> follows: when C<STDOUT> is a terminal, or C<CLICOLOR_FORCE> is set, and C<NO_COLOR> is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
 
 =head2 random_key, random_value
 

@@ -1,5 +1,5 @@
 package Proc::Spawner::Graph;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 # EXPERIMENTAL.  The companion of Proc::Spawner: the spawn graph, which is what gets executed.  It says,
 # for the current moment, which of our children and which of our own reads and writes use which open
 # file, and carries on each process what to do when it ends.  That reaction may start new processes,
@@ -50,7 +50,7 @@ sub call { my ($h, @a) = @_; ref $h eq 'CODE' ? $h->(@a) : handler($h->[0])->(@a
 # ------------------------------------------------------------------ ends
 sub adopt {   # end $e gets the handle $fh, with one hold
   my ($g, $e, $fh, $what) = @_;
-  fcntl($fh, F_SETFD, FD_CLOEXEC);   # also when Perl gave it an fd <= $^F
+  Proc::Spawner::__set_cloexec(fileno $fh, 1);   # also when Perl gave it an fd <= $^F (Windows: not inherited)
   @$e{qw(fd fh n what)} = (fileno $fh, $fh, 1, $what); delete $e->{forgotten}; weaken($e->{g} = $g); $e }
 sub peers { my @e = @_; $e[0]{peer} = $e[1]; $e[1]{peer} = $e[0]; weaken($_->{peer}) for @e; @e }
 # Where /proc/self/fd cannot open a pipe end anew (no /proc: FreeBSD; RT #182479), a pipe of ours is a named FIFO,
@@ -67,7 +67,8 @@ sub fifo_pipe {   # (read handle, write handle, Perl's own non-blocking write ha
   fcntl($nb, F_SETFD, FD_CLOEXEC); ($r, $w, $nb) }
 sub new_pipe {   # (read end, write end)
   my $g = shift; my ($r, $w, $nb); my $n = ++$g->{pipes};
-  if ($REOPEN) { pipe $r, $w or return } else { ($r, $w, $nb) = fifo_pipe() or return }
+  if ($REOPEN || $Proc::Spawner::WIN) { pipe $r, $w or return } else { ($r, $w, $nb) = fifo_pipe() or return }   # (Windows: the loop
+                                                     # writes without a non-blocking flag, W5; Wine's /proc is Linux's, not Windows')
   my @e = peers(map +{ kind => $_, pipe => $n }, qw(r w));
   adopt($g, $e[0], $r, "pipe $n read end"); adopt($g, $e[1], $w, "pipe $n write end"); $e[1]{nbw} = $nb if $nb;
   tr_("pipe $n: read end fd $e[0]{fd}, write end fd $e[1]{fd}"); @e }
@@ -78,7 +79,8 @@ sub file_end {   # the end for a file the caller opened as $fh
 sub parent_end {   # the parent's own fd N
   my ($g, $n) = @_;
   $g->{own}{$n} //= { kind => 'parent', fd => $n, n => 0, what => "our fd $n", mode => access($n) } }
-sub access {   # '<', '>' or '<>': how fd N was opened (read through a copy, so N stays untouched)
+sub access {   # '<', '>' or '<>': how fd N was opened (read through a copy, so N stays untouched); Windows: '<>',
+  return '<>' if $Proc::Spawner::WIN;   # unknown (no F_GETFL; the mode is used only in traces and pictures)
   my $d = POSIX::dup(shift) // return '<>';
   open my $h, '<&=', $d or return POSIX::close($d), '<>';
   (qw(< > <>))[fcntl($h, F_GETFL, 0) & 3] // '<>' }
@@ -111,7 +113,7 @@ sub start {
 sub exited {
   my ($g, $n, $w) = @_;
   $n->{wait} = $w;
-  $n->{st} = !defined $w ? 'lost' : POSIX::WIFSIGNALED($w) ? 'signal ' . POSIX::WTERMSIG($w) : 'exited ' . POSIX::WEXITSTATUS($w);
+  $n->{st} = !defined $w ? 'lost' : $w & 127 ? 'signal ' . ($w & 127) : 'exited ' . ($w >> 8);   # (Windows: no WIFSIGNALED)
   $g->event("exit $n->{argv} ($n->{st})"); $g->prune;
   local $Proc::Spawner::CAUSE = [$n, $n->{st}];   # processes started by the reaction are drawn after this one
   call($_, $g, $n, $w) for delete $n->{on_exit} // () }
@@ -126,7 +128,8 @@ sub perl_write {   # to a pipe or FIFO through an open file of our own, made non
   # ours without /proc: the FIFO's handle opened for this (fifo_pipe).  Otherwise (a pipe we were given, without
   # /proc) the shared one stays blocking and takes PIPE_BUF bytes per write, which a writable pipe takes at once.
   my ($g, $e, $bytes, $h) = @_; my ($id, $nb);
-  my ($to, $chunk) = !S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0) ? $e->{fd} : $e->{nbw} ? $e->{nbw}
+  # Windows: the fd as it is (the loop writes a synchronous handle from a helper thread, W5).
+  my ($to, $chunk) = $Proc::Spawner::WIN || !S_ISFIFO((POSIX::fstat($e->{fd}))[2] // 0) ? $e->{fd} : $e->{nbw} ? $e->{nbw}
     : sysopen($nb, "/proc/self/fd/$e->{fd}", O_WRONLY|O_NONBLOCK) ? $nb : ($e->{fd}, POSIX::PIPE_BUF());
   $id = Proc::Spawner::on_write($to, $bytes, sub { my $err = shift; undef $nb; delete $g->{io}{$id}; local $! = $err // 0; call($h, $g) }, $chunk);
   $g->{io}{$id} = [$e, '>']; $id }

@@ -1,3 +1,378 @@
+2.05 (2026-11-10):
+	The values the widget keeps for Perl (on the nodes and leaves of
+	blocks, marks, runs of tags, and as the instance data of blocks)
+	live in data containers (tkTextData.h): the Perl value is to
+	become one part of what is attached there, the rest holding, for
+	example, switches for the operations that now follow one fixed
+	rule (how the data of two merged tag runs is combined).  All code
+	goes through the operations of the header; the merge policy (N5,
+	the first container present wins) is one function,
+	TkTextDataMerge.  Two representations, chosen when building: A
+	(the default) is the Perl value itself and compiles to what the
+	code did before; B ("ETEXT_DATA_ARRAYS=1 perl Makefile.PL", adds
+	-DTK_TEXT_DATA_ARRAYS=1) is one pointer to a block of typed slots
+	(a size, a capacity, an array of slots and an array of unsigned
+	char type codes), of which the Perl value is the slot of type
+	TK_TEXT_DATA_LANG.  In both the field is one pointer wide.  Undo
+	records, undo atoms and the list of values to free carry whole
+	containers.  The Perl interface (block nodedata, mark data, tag
+	data, block data, the [name, value] elements of block list, dump
+	-values) reads and writes only the Perl value, as before: setting
+	undef removes only that part.  Limits of B, documented in the
+	header: block list carries only the Perl values, so the other
+	slots do not follow text re-inserted from a list, and the instance
+	data of a block deleted and brought back by undo comes back from
+	the list.  A widget built with B has a hidden subcommand for the
+	tests (_dataslot), and t/data-slots.t (skipped with A) checks that
+	a slot survives drop, undo, redo and merges and that each
+	container is freed once.  Nothing changes for Perl code: the test
+	suite gives the same results with A as 2.04, and passes with B.
+	BUGS 22 and 23, found on the way: the instance data of a block is
+	freed at once, not when the widget command ends, when "block data"
+	replaces it and when an undo step that listed it is discarded.
+	demo/etext.pl starts with its "#!/usr/bin/perl" line again: two
+	stray lines, a copy of two lines of its body, came before it.
+	Fixed: deleting a block of a type with -empty => 1 unlinked its
+	segment and never freed it (72 bytes per block, since the 1997
+	code): t/stress.t lost 349 such pieces under valgrind, now none.
+	t/leak.t watches the process size over 50000 such deletions.
+	Fixed (BUGS 22): the instance data that "block data" replaces, or
+	removes with undef, is freed when the widget command ends, as every
+	other value, and no longer at once inside it: its DESTROY runs under
+	the stopgap (commands that would modify the widget are refused),
+	still before blockData returns.
+	Fixed (BUGS 23): the undo of a deletion keeps the instance data of
+	the blocks it deletes or dissolves as a record of its own (addressed
+	by the block's head), as it keeps node and run values, and no longer
+	as a copy in its block list, which now leaves instance data out.  The
+	undo gives the whole container back to the block it re-creates (with
+	representation B, its other slots too), the redo takes it again, and
+	a discarded step (edit reset, -maxundo, a new change after an undo)
+	frees it when the widget command ends, under the stopgap.  The same
+	for the redo of an insertion, which re-inserts a block list.
+	Setting block data now counts as setting a value for the snapshot
+	an undoable deletion takes (BUGS 13).
+	Fixed (BUGS 20): "tag names" at the head of a block reports the tags
+	in effect there, as "tag ranges", "dump" and the searches do; it
+	left out a tag that switches off inside the block.  The display, the
+	elide test and the mouse bindings keep the rule of 1997: such a tag
+	does not style the block as a whole.  The manual's "the behaviour of
+	tags on the start of block is undefined" says so instead.
+	Fixed: a tag with -elide on that started before a block and ended
+	inside it hid the whole block and the rest of the line, text it does
+	not cover included; the two loops of the display that skip hidden
+	text now stop at a block inside which such a tag switches, and the
+	block draws what the tag does not cover (BUGS 24).
+	The manual ("Node values and editing") says what a deletion does to
+	the last of a block's nodes directly above the leaves (and to its
+	ancestors below the root): they hold the block's tail, so they are
+	never deleted whole; when all their leaves are deleted they are
+	joined to the node before them, and their values follow the rule for
+	joined nodes (moved if that node has none, dropped otherwise).  It
+	said that such a node was deleted with its value.  t/values.t pins it.
+	Fixed (BUGS 18): the undo of a block insert whose range crossed
+	nodes of an enclosing block gives the nodes back exactly, with their
+	values.  The block insert flattens the separators of its range (the
+	leaves become children of the new block's single node), and the undo
+	dissolved the block at level 0; the undo step now records the level
+	of each separator in the range and of the one after it, and the undo
+	sets each back to its level after dissolving the block (splitting or
+	joining nodes; no text moves), before the values come back to the
+	nodes at their addresses.  The redo stays exact.  The review's random
+	undo/redo exactness check, which failed on 11 of 300 runs (all this
+	bug), passes on all of them.
+	t/demo.t hides its probe MainWindow instead of destroying it, and
+	destroys it last: Perl/Tk's option-lookup cache goes stale when a
+	MainWindow is destroyed, and the demo's MainWindow, created after
+	it, crashed now and then (BUGS 21, under Wine).
+	Fixed (BUGS 25): an -empty block that had moved to another line (a
+	newline or a block split before it, block insert nesting it) kept
+	pointing to its old line; "block at" on its head crashed.  The
+	B-tree check under "debug" looks for it.
+	Fixed (BUGS 26): the undo of a deletion that dissolved a block freed
+	a value set after the deletion on a leaf made of what was left of
+	the block; it waits in the undo step now, and the redo gives it
+	back.
+	New option -valuecommand (BUGS 17): a callback told, before a
+	command changes anything, which values the change will detach and
+	where they are, while the widget is unchanged: $cb->($widget,
+	$event, $kind, $where, $value, $cause).  This first step covers
+	setting and unsetting values (block nodedata, tag data, mark data,
+	block data, mark unset), the runs that tag add, tag remove and tag
+	delete drop or merge, the values an undo or a redo gives back
+	("restore") or moves aside, and those of undo steps thrown away
+	("discard", at the end of the command).  A detach that was not
+	foreseen is reported "late" after the change, and under "debug" the
+	command fails.  While the callback runs, the widget refuses the
+	commands that would change it.  t/valuecommand.t.
+	The look-ahead of -valuecommand covers the structural changes too:
+	deletions (leaves and nodes deleted or joined, as the manual's
+	rules say, blocks deleted or dissolved with all their values and
+	instance data, runs gone or merged, also around the heads and tails
+	of dissolved blocks), block insert (the two parts of the cut leaves
+	joined, nodes left without leaves), block trim, and the joins of
+	nodes by which the undo of a block insert sets the separator levels
+	back.
+	t/valuecommand-random.t runs random commands (undo and redo
+	included) on widgets with nested blocks and values everywhere,
+	with "debug" on, and checks that every value detached was told
+	before, at a place that names it during the call, that every value
+	freed was told drop or discard, and that no late event occurs.  The
+	manual documents the option ("Telling the program: -valuecommand").
+	The stopgap of 2.04 is gone (BUGS 17): a DESTROY method run while
+	the values a command dropped are freed may change the widget again.
+	Such a change is an undo step of its own; the values it drops are
+	freed in the same pass; a chain of such changes is refused 10 deep.
+	Only the -valuecommand callback is refused changes (same list of
+	commands as the stopgap had).
+	A ready-made -valuecommand: -valuecommand => 'DETACH' calls the
+	method DETACH of the widget (in eText.pm), which calls
+	$value->DETACH($widget, $event, $kind, $where, $cause) for a value
+	that is an object with such a method, and skips the others.
+	The 10 rounds of values freed in which DESTROY methods may change
+	the widget are a limit that the program can raise (the owner's
+	design): when a change from a DESTROY method is about to be made
+	at the limit, the widget calls $object->DESTROYmult($n, $limit)
+	on the object whose DESTROY method makes it ($n counts the
+	requests of the freeing pass from 1, $limit is the current limit,
+	10 at first), and a positive integer $more raises the limit to
+	$limit + $more; anything else, no such method, a non-object, or a
+	method that dies (a background error) and the change is refused
+	as before, the error naming the limit.  Asked is the innermost
+	DESTROY running, so an object held inside a value answers for its
+	own change.  The limit and the count reset with each outermost
+	command.  t/destroymult.t.
+	The manual says what happens when Perl code the widget calls dies
+	("When Perl code called by the widget dies"), and t/dying.t checks
+	it: a DESTROY method that dies, or that lets a refused change
+	leave it, gives Perl's "(in cleanup)" warning (only where warnings
+	are on: the refusal comes from a Perl/Tk method compiled without
+	"use warnings", so it is warned only under perl -w, and an eval in
+	DESTROY catches it), and the values and the command go on; a
+	-valuecommand callback, a DETACH method or DESTROYmult that dies
+	is a background error and the command goes on.  Each value is
+	freed once in every case, and nothing the callback got is kept.
+	Postponed (BUGS 27): -valuecommand tells before the command
+	changes anything only for commands that make one change; those
+	that make several (edit undo and redo, insert with tag lists, tag
+	add and remove over several ranges, a deletion through the end of
+	the text) tell before each of their changes, and a value an undo
+	or a redo displaces is told just before it moves.  The manual's
+	-valuecommand section says so in a note marked "Postponed".
+
+2.04 (2026-11-09):
+	Undo records block insert, block split, block trim, tag add and
+	tag remove (BUGS 12 and 16), each reversed exactly: the undo of a
+	split deletes its separator (and takes away the levels it added
+	above the root), that of a block insert dissolves the block by
+	deleting its head (the leaves it moved whole get their values
+	back, its instance data and own values wait in the step for the
+	redo), that of a trim adds the root again, those of tag add and
+	remove give the tag in the range exactly the ranges it had; the
+	redo does the change again.  What they drop (merge losers, emptied
+	nodes, a trimmed root's value, removed runs) goes into the undo
+	step, as for deletions.  Each is an edit kind of its own for
+	-autoseparators (Tk's rule: a change of kind starts a step).
+	"sel" is not recorded, nor a tag change that changes nothing.
+	These changes now count for "edit modified".  Not exact: the undo
+	of a block insert whose range crossed nodes of an enclosing block
+	does not re-create the node boundaries (BUGS 18).  A deletion
+	through the end of the text now records the tags it takes off the
+	final newline, and its undo puts them back.  "block split" on the
+	last (dummy) line splits at the end of the line before it.  New
+	test: t/undo-block.t; t/stress.t runs all of it at random.
+	dump -values: every entry gets a fourth field, the value of a mark
+	(mark data) or of the run a tagon starts (tag data), undef for the
+	other entries and for marks and runs without a value, so that the
+	list stays one of entries of one length; a -command callback gets
+	it as a fourth argument.  Not part of -all; alone it means -all
+	-values.  Node values and block instance data are not dumped
+	(block list shows them).  Without -values, dump is unchanged.
+	Fixed: the undo of a deletion gave the value of a run starting
+	where the deletion started to a run of the same tag re-created
+	inside the restored text (the text is re-inserted piece by piece,
+	and the piece joined the run for a moment), and the redo then
+	lost the value; release 2.03 too.
+	A stopgap: while the values a command dropped are being freed (a
+	DESTROY method runs), the commands that would modify the widget
+	fail with "cannot modify .t while its values are being freed";
+	reading commands and those that only change the view work.  The
+	manual lists the commands refused (section "When values are
+	freed"); BUGS 17 says what the real fix is to be.  New test:
+	t/freeing.t.
+	The manual describes block insert exactly: the ranges accepted,
+	a range in a block crossing leaves and nodes, the leaves moved
+	becoming children of the new block's single node (the structure
+	above them flattened, their separators of depth 0), and what is
+	left in the enclosing block.
+	block list: a mark with a value (mark data) is listed as
+	MarkLeft or MarkRight holding [name, value], as a valued run is
+	listed as TagOn [name, value]; a mark without a value is listed as
+	before.  Inserting a list back (the undo's path) gives a mark the
+	value of such an element; the undo's own lists leave mark values
+	out, as they leave node and run values out.  The demo reads mark
+	elements in both forms (Tk::Text::MarkLeft::name, MarkRight::name).
+	The redo of an insertion re-inserts it exactly: undoing an
+	insertion records the inserted range in block-list form (as a
+	deletion records what it deletes), and the redo inserts that list
+	instead of the plain string (Tk 8.4's way).  The text comes back
+	with the tags it was inserted with, the separators it made in a
+	block and the marks in it, and its runs get their values back,
+	which the redo used to free (BUGS 11).
+	Fixed: a backward tag search inside a block whose root has nodes
+	two levels deep (tag prevrange, finding the run of a tag value,
+	and through these an undo) walked off the end of a list of nodes
+	and crashed (FindTagEnd); release 2.03 too.
+	Fixed: "block list" of a block whose only leaf is empty left out
+	the marks and tag toggles in that leaf, so the undo of a deletion
+	over such a block did not put them back (a mark stayed where the
+	deletion had moved it, a tag ended on the wrong side of the
+	block); release 2.03 too.
+	Fixed: the redo of a block insert re-created the block even when
+	its type had been made -empty since the undo, over contents (the
+	command refuses that), and the display then crashed; such a redo
+	does nothing now, as one whose block type was deleted.
+	Fixed: the redo of a block trim did not look again whether the
+	root had a value, so a root value set or unset between the undo
+	and the redo put the values on the wrong nodes after redo and
+	undo.
+	Fixed: "tag add b end" (an empty range) made an undo step that
+	did nothing, and set the modified flag; it records nothing now.
+	Fixed: with -undo off, tag add and tag remove did not set the
+	modified flag (insertions and block changes do, and the manual
+	says they count); they do now, but for "sel" and changes that
+	change nothing.
+	While values are being freed, the rule is now the same for tags
+	and block types: a query of tag configure, tag bind or block
+	configure works if the tag or type exists, and is refused if it
+	would create one (tag configure and tag bind queries used to
+	create the tag, while every block configure was refused).
+	Fixed: a block insert over several lines whose second or later
+	line was the first one on display left the view pointing into a
+	line moved into the block, and the next redisplay crashed; the
+	undo and redo of block changes reached it through "see".  The
+	view now goes to the first line of the range; release 2.03 too.
+	The same stale view made the undo of a deletion abort ("got index
+	in internal BTree") and a redisplay abort ("SplitSeg reached end
+	of line!") after other block inserts; gone with it.
+	Fixed: in a block whose tree has inner nodes, a tag search did
+	not stop at its end when that end was in a node of the block
+	without a toggle of the tag, and the first toggle of a tag in
+	a block was placed one position (or a skipped node) too far
+	left; so "tag remove" over a range crossing a node boundary
+	removed the tag far beyond the range, and the undo of a tag add
+	lost the ranges the tag had (release 2.03 too).
+	Fixed: a deletion that the rule of the final newline makes empty
+	(only that newline was named) was recorded as an undo step that
+	did nothing, and set the modified flag; it records and modifies
+	nothing now, unless the newline had tags, which it takes off as
+	before (that is recorded); release 2.03 too.
+	Fixed: a block insert over lines in different nodes of the text's
+	B-tree (from about a dozen lines on) left the tree inconsistent
+	(lines linked into the wrong node, line counts taken off the wrong
+	node, a node left with too few lines); the B-tree check (debug 1)
+	aborted; release 2.03 too.
+	Fixed: a block insert that emptied the B-tree node of its last
+	line left that node's parent with too few children (the B-tree
+	check aborted); the first ancestor left is rebalanced now.
+	Fixed: the undo of a deletion lost the start of a tag that began
+	inside a block of the deleted text and went on after it, when
+	another tag was switched on and off later in the text (a
+	temporary mark name was used twice); release 2.03 too.
+	Fixed: the undo of a deletion of a block between two runs of a tag
+	(which the deletion joined) gave the re-created block's head and
+	tail the tag; release 2.03 too.
+	Fixed: the undo of a deletion that dissolved a block and joined a
+	run with a value in it to a later run of the tag put the value on
+	the later run; release 2.03 too.
+	Fixed: a deletion of nothing but the final newline that has only
+	the selection on it set the modified flag (sel is not content).
+	With -undo off, tag add and tag remove decide whether they modify
+	from the state at the start of the range and the first toggle in
+	it (no list of ranges is made any more).
+	Fixed: the undo of a deletion re-created a block whose contents
+	switch a tag off with its tail still carrying the tag (as at the
+	place the block was made); release 2.03 too.
+
+2.03 (2026-11-08):
+	Values: a Perl scalar can be kept with every node of the tree of
+	a block, the leaves included ("block nodedata index level
+	?value?", blockNodedata), with every mark ("mark data name
+	?value?", markData) and with every run of a tag ("tag data
+	tagName index ?value?", tagData).  The widget keeps a copy, and
+	the values move with the text: where an edit joins nodes or
+	merges runs the first value present wins, block split and a run
+	cut in two leave the new part without one, a mark keeps its value
+	through every move.  A value is freed only when it is replaced,
+	when its node, mark or run goes (or loses a join or a merge) and
+	when the widget is destroyed, and then only when the widget
+	command returns, the change finished, so that a DESTROY method may
+	use the widget; the instance data of a block (block data) is now
+	freed the same way.  With -undo, a deletion keeps the values it
+	drops in its undo step and the undo gives them back; edit reset,
+	-maxundo, a new edit dropping the redo history and the widget's
+	destruction free them.  "block list" writes the node values of a
+	block as a fourth element of its header, and the start of a run
+	with a value as a TagOn holding [name, value] instead of a
+	reference to the name (a program that reads TagOn as a scalar
+	reference has to accept both; the demo's TeX export now does).
+	The manual has a section "Values"; the known limits are in BUGS.
+	New tests: t/values.t, t/values-marks.t, t/values-runs.t.
+	Fixes found on the way: block insert inside a block, over a range
+	spanning nodes of the block's tree, corrupted the tree (negative
+	line counts, lines linked across nodes), and "get" then crashed;
+	undo re-created the tags of a deletion inexactly (text put back
+	inside a tagged range took the tag, as inserted text does, though
+	it had not had it); undo re-created a block whose root has a
+	single child one level too shallow (the depth in the header was
+	ignored); a block dissolved by a deletion of its head or tail
+	leaked its first internal line and its dummy line (about 140 bytes
+	each time); eTextSyms.h was stale and left four symbols without
+	the prefix; the manual gave 1 as the depth of a separator between
+	leaves of the same parent, where it is 0; the message for a wrong
+	block subcommand did not name "data".
+	Crashes of block editing, found by random sequences of block
+	editing and undo (all of them in 2.02 too; t/stress.t has a
+	minimal script for each and a bounded random run): block split
+	did not tell the display about its newline, which then read past
+	the end of the line it had cut short (a segfault, typically in
+	the undo that followed); block insert of an -empty block at the
+	start of a line dereferenced NULL; block insert with its end
+	before its start cut the text apart (now an error); deleting an
+	-empty block inside a block took it off the block's length twice
+	(the block lost its last character, and later panicked); a
+	deletion inside a block that joined leaves of different nodes
+	lost the tag counts of the lines it moved, and in the deletions
+	that dissolve a block left a node without children (a segfault);
+	a node merge while a block's line was changing counted the block's
+	tags twice and left the tag's root on a freed node (a segfault);
+	"block list", and so the undo record of a deletion, from just after
+	a block reported an empty piece of it (the undo put a stray block
+	in); the undo of a deletion could re-create a block on the last,
+	dummy, line; an undefined index segfaulted (the parser wrote into
+	the argument's string; it works on a copy now, as Perl/Tk's text
+	does); with the B-tree check on, a deletion from the tail of a
+	nested block panicked ("segment has size <= 0").
+	Undo: after "edit undo", "edit redo" or "edit reset" the next edit
+	starts an undo step of its own; a deletion after the undo of a
+	deletion used to join the step of the insertion before it, so a
+	second undo took that insertion back as well (in 2.02 too).
+2.02 (2026-11-07):
+	Scrolling copies the visible lines with TkScrollWindow and redraws
+	the damaged region, as Tk 8.4 does on every platform.  The tk4.0
+	code used XCopyArea and then waited with XWindowEvent for
+	GraphicsExpose/NoExpose; on Windows XWindowEvent is an empty stub in
+	Perl/Tk, so the first scroll would have read an event that was
+	never filled in (seen under Wine: 2.01 stops at the first scroll
+	with "DisplayText received unknown exposure event").  Makefile.PL
+	links -lX11 only outside Windows, and compiles with -Wall under gcc
+	and clang (what it found unused is gone).  Windows: built and
+	tested under Wine with Strawberry Perl 5.38.2.2 and Perl/Tk 804.036
+	built there; all tests pass, given the Perl/Tk fixes in the
+	repository's upstream/ (without them Perl/Tk 804.036 does not build
+	with current mingw-w64, or crashes at its first update).  The
+	display line tests name a monospaced font (Courier) instead of
+	relying on the default, which is Courier New on Windows.
 2.01 (2026-11-07):
 	The first release of the modernized distribution (the 2.00 entry
 	below, the development history of the port, was never released

@@ -33,13 +33,14 @@ use strict;
 use warnings;
 
 use Carp			qw(croak carp);
+use Database::BI::I18N ();
 use Readonly;
 use Scalar::Util		qw(blessed);
 use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-use version; our $VERSION = version->declare('0.021.0');
+our $VERSION = '0.022.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -144,7 +145,7 @@ Readonly our %MESSAGES => (
 sub _fmt {
 	my ($key, @args) = @_;
 
-	my $tmpl = (defined($key) ? $MESSAGES{$key} : undef)
+	my $tmpl = Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $key)
 	         // "Internal error: unknown message key '" . ($key // 'undef') . "'";
 
 	return @args ? sprintf($tmpl, @args) : $tmpl;
@@ -179,7 +180,7 @@ Database::BI::Model::Geocode - Resolve a location column to coordinates, once pe
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 
@@ -391,7 +392,36 @@ are handled by C<Params::Get>.
     i18n                 => object,   # optional; must implement maketext($key, @args)
     online               => boolean,  # optional; ask Nominatim about places the local data does not know (default: 1)
     online_max           => positive integer, # optional; places asked of Nominatim per call (default: no limit)
-    cache                => hashref|object, # optional; Geo::Coder::List's cache (a hashref, or an object with get() and set(), such as file_cache()); default: one CHI Memory cache per process
+    cache                => hashref|object, # optional; Geo::Coder::List's cache (a hashref, or an object with get() and set(), such as file_cache()); default: files under cache_dir (below)
+    cache_dir            => string,   # optional; the directory for that cache, read through Object::Configure (below)
+    model_dir            => string,   # optional; the default cache_dir is <model_dir>/geocode-cache
+    config               => hashref,  # optional; the application's config, for its cache_dir (default: database_bi.conf is read)
+    home                 => string,   # optional; the folder a relative cache_dir in config is under
+
+Without C<cache>, the answers are kept as files (a L<CHI> C<File> cache, with
+a copy in memory) in the first directory that is set of:
+
+=over 4
+
+=item 1. C<cache_dir> from L<Object::Configure>: its config files, then the
+environment variable C<Database__BI__Model__Geocode__cache_dir>; the
+C<cache_dir> argument is what those fall back on;
+
+=item 2. C<$ENV{CACHEDIR}>;
+
+=item 3. C<$ENV{CACHE_DIR}>;
+
+=item 4. C<cache_dir> in F<database_bi.conf> (C<config>, or the file itself
+when C<config> is not given);
+
+=item 5. F<E<lt>model_dirE<gt>/geocode-cache>, when C<model_dir> is given.
+
+=back
+
+With none of them, the answers are kept in one CHI C<Memory> cache per process.
+L<Database::BI::CacheDir> makes the choice; the directory chosen is
+C<< $geocode->{cache_dir} >>.  Several caches may share a directory: each keeps
+its own namespace in it.
 
 C<geocoder> is the injection seam for tests.  An injected geocoder is used
 exactly as given: it is not version-checked, so any object that responds to
@@ -582,6 +612,10 @@ sub new {
 			online               => { type => 'scalar',  optional => 1, default => 1 },
 			online_max           => { type => 'scalar',  optional => 1, default => undef },
 			cache                => { type => 'object|hashref', optional => 1, default => undef },
+			cache_dir            => { type => 'string',  optional => 1, default => undef },
+			model_dir            => { type => 'string',  optional => 1, default => undef },
+			config               => { type => 'hashref', optional => 1, default => undef },
+			home                 => { type => 'string',  optional => 1, default => undef },
 		},
 		input => $raw,
 	);
@@ -592,6 +626,23 @@ sub new {
 	my $cache = $args->{'cache'};
 	croak(_fmt('error_cache_interface', ref($cache)))
 		if blessed($cache) && !($cache->can('get') && $cache->can('set'));
+
+	# Without a cache object, the answers are kept on disc in the directory
+	# Database::BI::CacheDir chooses (Object::Configure, CACHEDIR, CACHE_DIR,
+	# database_bi.conf, then <model_dir>/geocode-cache).  With none of those,
+	# they are kept in this process's memory, as before.
+	my $cache_dir;
+	unless (defined $cache) {
+		require Database::BI::CacheDir;
+		$cache_dir = Database::BI::CacheDir::resolve(
+			class   => $class,
+			params  => $args,
+			(defined($args->{'config'}) ? (config => $args->{'config'}, home => $args->{'home'}) : ()),
+			default => (defined($args->{'model_dir'}) && length($args->{'model_dir'})
+				? _catdir($args->{'model_dir'}, $CACHE_DIR) : undef),
+		);
+		$cache = _file_cache_at($cache_dir) if defined $cache_dir;
+	}
 
 	# A cap that is not a positive integer is refused, as max is in _options:
 	# defaulting it would quietly lift the limit a caller set to keep a page quick.
@@ -606,6 +657,7 @@ sub new {
 		'online'      => $args->{'online'} ? 1 : 0,
 		'online_max'  => $online_max,
 		'cache'       => $cache,
+		'cache_dir'   => $cache_dir,
 	}, $class;
 
 	if (my $geocoder = $args->{'geocoder'}) {
@@ -1528,15 +1580,29 @@ sub file_cache {
 	croak(_fmt('error_cache_dir', defined($dir) ? $dir : 'undef'))
 		unless defined($dir) && !ref($dir) && -d $dir;
 
+	return _file_cache_at(_catdir($dir, $CACHE_DIR));
+}
+
+# _file_cache_at($root) -> CHI cache
+#
+# Geo::Coder::List's cache as files under $root, with a copy of each answer in
+# this process's memory.  CHI makes $root when it first stores an answer.
+sub _file_cache_at {
+	my $root = shift;
+
 	require CHI;
-	require File::Spec;
 
 	return CHI->new(
 		driver    => 'File',
-		root_dir  => File::Spec->catdir($dir, $CACHE_DIR),
+		root_dir  => $root,
 		namespace => $CACHE_NAMESPACE,
 		l1_cache  => { driver => 'RawMemory', global => 1, max_size => $CACHE_MAX_SIZE },
 	);
+}
+
+sub _catdir {
+	require File::Spec;
+	return File::Spec->catdir(@_);
 }
 
 =head2 place_rows

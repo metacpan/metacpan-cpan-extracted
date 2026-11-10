@@ -72,6 +72,9 @@
     <label class="refline-label"><input type="checkbox" id="rl-min"> Min ([% ref_min_y %])</label>
     <label class="refline-label"><input type="checkbox" id="rl-avg"> Avg ([% ref_avg_y %])</label>
     <label class="refline-label"><input type="checkbox" id="rl-max"> Max ([% ref_max_y %])</label>
+    [%- IF trend_slope.length %]
+    <label class="refline-label" title="The straight line closest to the points (least squares): how much Y changes from one point to the next, and how well the line fits (R&sup2;, 0 to 1)"><input type="checkbox" id="rl-trend"> <span>Trend (<span id="rl-trend-text">[% trend_slope | html %] per point, R&sup2; [% trend_r2 | html %]</span>)</span></label>
+    [%- END %]
   </span>
   [% END %]
 </div>
@@ -306,6 +309,85 @@ has focus, then press Enter or Space to toggle it.</p>
     avg: [% ref_avg_y %],
     max: [% ref_max_y %]
   };
+  // The trend line: Y = intercept + slope * i, where i is the point's place
+  // (0, 1, 2, ...) among the points drawn -- the x axis is a scalePoint, so
+  // the places are evenly spaced and the line is straight.  The server fits
+  // the whole chart (Statistics::LineFit); after a zoom the points in view are
+  // refitted here with the same least squares.
+  var TREND_COLOR = '#8b5cf6';
+  var TREND = {
+    slope:     [% trend_slope.length ? trend_slope : 'null' %],
+    intercept: [% trend_intercept.length ? trend_intercept : 'null' %],
+    r2:        [% trend_r2.length ? trend_r2 : 'null' %],
+    data:      (typeof allData !== 'undefined') ? allData : []
+  };
+
+  function fitTrend(points) {
+    var n = points.length;
+    if (n < 2) { TREND.slope = null; return; }
+    var sx = 0, sy = 0, sxx = 0, sxy = 0, syy = 0;
+    points.forEach(function (d, i) {
+      sx += i; sy += d.value; sxx += i * i; sxy += i * d.value; syy += d.value * d.value;
+    });
+    var dx = n * sxx - sx * sx;
+    var slope = (n * sxy - sx * sy) / dx;
+    var intercept = (sy - slope * sx) / n;
+    var dy = n * syy - sy * sy;
+    // A flat series lies on its line: R squared 1, as Statistics::LineFit says.
+    var r = dy > 0 ? (n * sxy - sx * sy) / Math.sqrt(dx * dy) : 1;
+    TREND.slope = slope;
+    TREND.intercept = intercept;
+    TREND.r2 = r * r;
+  }
+
+  function showTrendText() {
+    var el = document.getElementById('rl-trend-text');
+    if (!el) return;
+    el.textContent = TREND.slope === null
+      ? 'needs two points'
+      : parseFloat(TREND.slope.toPrecision(4)) + ' per point, R\u00B2 ' + TREND.r2.toFixed(2);
+  }
+
+  // The line across the points drawn, cut to the y axis's range so it never
+  // runs over the axis or out of the chart.
+  function drawTrend() {
+    var cb = document.getElementById('rl-trend');
+    if (!cb || !cb.checked || TREND.slope === null) return;
+    var pts = TREND.data;
+    if (!pts || pts.length < 2) return;
+    var n  = pts.length;
+    var x0 = x(pts[0].label), x1 = x(pts[n - 1].label);
+    var v0 = TREND.intercept, v1 = TREND.intercept + TREND.slope * (n - 1);
+    if (x0 === undefined || x1 === undefined) return;
+    var dom = y.domain(), lo = Math.min(dom[0], dom[1]), hi = Math.max(dom[0], dom[1]);
+    var t0 = 0, t1 = 1;
+    if (v1 !== v0) {
+      var ta = (lo - v0) / (v1 - v0), tb = (hi - v0) / (v1 - v0);
+      t0 = Math.max(0, Math.min(ta, tb));
+      t1 = Math.min(1, Math.max(ta, tb));
+      if (t0 > t1) return;
+    } else if (v0 < lo || v0 > hi) {
+      return;
+    }
+    function at(t) { return { px: x0 + (x1 - x0) * t, v: v0 + (v1 - v0) * t }; }
+    var a = at(t0), b = at(t1);
+    chart.append('line')
+      .attr('class', 'bi-ref-line bi-trend-line')
+      .attr('x1', a.px).attr('x2', b.px)
+      .attr('y1', y(a.v)).attr('y2', y(b.v))
+      .attr('stroke', TREND_COLOR)
+      .attr('stroke-width', 2)
+      .attr('pointer-events', 'none');
+    chart.append('text')
+      .attr('class', 'bi-ref-label')
+      .attr('x', b.px + 5)
+      .attr('y', y(b.v) + 4)
+      .attr('fill', TREND_COLOR)
+      .attr('font-size', '11px')
+      .attr('pointer-events', 'none')
+      .text('Trend');
+  }
+
   var LINE_DEFS = [
     { id: 'rl-min', key: 'min', color: '#f59e0b', label: 'Min' },
     { id: 'rl-avg', key: 'avg', color: '#10b981', label: 'Avg' },
@@ -357,6 +439,7 @@ has focus, then press Enter or Space to toggle it.</p>
         .attr('pointer-events', 'none')
         .text(def.label);
     });
+    drawTrend();
     colorDots();
   }
 
@@ -382,6 +465,9 @@ has focus, then press Enter or Space to toggle it.</p>
       // Recalculate REF from the data currently being drawn so lines stay
       // within the visible y-domain even after a zoom or reset.
       if (newData && newData.length) {
+        TREND.data = newData;
+        fitTrend(newData);
+        showTrendText();
         var yVals = newData.map(function (d) { return d.value; })
                           .filter(function (v) { return isFinite(v); });
         if (yVals.length) {
@@ -413,7 +499,7 @@ has focus, then press Enter or Space to toggle it.</p>
   }
 
   // Wire up checkboxes.
-  LINE_DEFS.forEach(function (def) {
+  LINE_DEFS.concat([{ id: 'rl-trend' }]).forEach(function (def) {
     var cb = document.getElementById(def.id);
     if (cb) cb.addEventListener('change', drawRefLines);
   });

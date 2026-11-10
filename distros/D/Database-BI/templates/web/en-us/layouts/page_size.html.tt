@@ -1,0 +1,47 @@
+[%# The rows-per-page list: under a table or a pivot, and on /preferences.
+
+    PROCESS with ps_id (the select's id) and ps_mode: 'view' changes this page
+    at once (a reload with per_page=, keeping the first row shown on screen);
+    anything else draws the list alone, for the page's own script.
+    page_size is the size in force (0 = every row) and page_size_choices the
+    sizes offered (Dashboard's @PAGE_SIZES); a size from the URL that is not
+    one of them is listed too, so the list shows what the page shows. -%]
+[%- SET ps_found = 0 -%]
+[%- FOREACH n IN page_size_choices; IF n == page_size; SET ps_found = 1; END; END -%]
+<span class="page-size">
+  <label for="[% ps_id | html %]">Rows per page</label>
+  <select id="[% ps_id | html %]" class="page-size-select"
+    [%- IF ps_mode == 'view' %] data-page-size-view="1" data-page="[% page | html %]" data-size="[% page_size | html %]"[% END %]>
+    [%- UNLESS ps_found %]
+    <option value="[% page_size | html %]" selected>[% page_size | html %]</option>
+    [%- END %]
+    [%- FOREACH n IN page_size_choices %]
+    <option value="[% n %]"[% IF ps_found AND n == page_size %] selected[% END %]>[% n ? n : 'All' %]</option>
+    [%- END %]
+  </select>
+</span>
+[%- IF ps_mode == 'view' %]
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var sel = document.getElementById('[% ps_id | html %]');
+  if (!sel || sel.getAttribute('data-bound')) { return; }
+  sel.setAttribute('data-bound', '1');
+  sel.addEventListener('change', function () {
+    var size = parseInt(sel.value, 10);
+    var oldSize = parseInt(sel.getAttribute('data-size'), 10) || 0;
+    var page = parseInt(sel.getAttribute('data-page'), 10) || 1;
+    var url = new URL(window.location.href);
+    url.searchParams.set('per_page', String(size));
+    /* Keep the first row on screen: the page that holds it at the new size. */
+    var first = oldSize > 0 ? (page - 1) * oldSize : 0;
+    var newPage = size > 0 ? Math.floor(first / size) + 1 : 1;
+    if (newPage > 1) {
+      url.searchParams.set('page', String(newPage));
+    } else {
+      url.searchParams['delete']('page');
+    }
+    window.location.assign(url.toString());
+  });
+}());
+</script>
+[%- END %]

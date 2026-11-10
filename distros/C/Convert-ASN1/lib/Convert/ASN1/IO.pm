@@ -3,7 +3,7 @@
 # modify it under the same terms as Perl itself.
 
 package Convert::ASN1;
-$Convert::ASN1::VERSION = '0.34';
+$Convert::ASN1::VERSION = '0.36';
 use strict;
 use Socket;
 

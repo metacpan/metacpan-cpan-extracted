@@ -3,12 +3,13 @@ package Database::BI::Command::password;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Mojo::Base 'Mojolicious::Command';
 
 use Carp qw(croak);
 use Database::BI::Password qw(hash_password);
+use Database::BI::I18N ();
 use Readonly;
 
 # What the command stops with.  Each ends in a newline, so croak prints it as
@@ -17,6 +18,9 @@ Readonly our %MESSAGES => (
 	error_no_password => "password: no password given\n",
 	error_mismatch    => "password: the two did not match\n",
 );
+
+# _text($key) -> the template for $key in the language the locale names.
+sub _text { return Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $_[0]) }
 
 has description => 'Make the password_hash line that turns on the login';
 has usage       => sub { shift->extract_usage };
@@ -54,13 +58,15 @@ sub _read_secret {
 
 sub run {
 	my ($self, @args) = @_;
+	# A person at a shell: messages in the language their locale names.
+	local $Database::BI::I18N::LANGUAGE = $Database::BI::I18N::LANGUAGE // Database::BI::I18N::from_locale();
 	croak $self->usage if @args;
 
 	my $password = _read_secret('Password: ');
-	croak $MESSAGES{error_no_password} unless defined $password && length $password;
+	croak _text('error_no_password') unless defined $password && length $password;
 	if (_interactive()) {
 		my $again = _read_secret('Again: ');
-		croak $MESSAGES{error_mismatch} unless defined $again && $again eq $password;
+		croak _text('error_mismatch') unless defined $again && $again eq $password;
 	}
 
 	my $hash = hash_password($password);
@@ -79,7 +85,7 @@ Database::BI::Command::password - Make the password_hash for the login
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 

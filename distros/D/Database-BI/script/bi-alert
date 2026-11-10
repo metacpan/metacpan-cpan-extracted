@@ -67,6 +67,11 @@ use Mojo::JSON qw(decode_json encode_json);
 use Mojo::File;
 use List::Util qw(sum);
 use Scalar::Util qw(looks_like_number);
+use Database::BI::I18N ();
+
+# Messages in the language the locale names: LANG=en_US.UTF-8 is American
+# English, anything else British (CGI::Lingua chooses).
+$Database::BI::I18N::LANGUAGE = Database::BI::I18N::from_locale();
 
 # ---------------------------------------------------------------------------
 # Parse arguments

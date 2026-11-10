@@ -20,7 +20,7 @@
 #include "tkInt.h"
 #include "tkText.h"
 
-static char rcsid[] = "$Id: tkTextDisp.c,v 1.34 1996/03/12 00:09:28 ilya Exp $";
+/* $Id: tkTextDisp.c,v 1.34 1996/03/12 00:09:28 ilya Exp $ */
 
 /*
  * The following structure describes how to display a range of characters.
@@ -996,7 +996,14 @@ LayoutDLine(textPtr, indexPtr, internal, maxX)
 
 	for (segPtr = indexPtr->linePtr->segPtr; elide && (segPtr != NULL);
 		segPtr = segPtr->nextPtr) {
-	    if ((elidesize = segPtr->size) > 0) {
+	    if (TkIBTreeTogglesElide(segPtr)) {
+		/*
+		 * A block inside which the elision may end: lay the line
+		 * out the slow way, which lets the block decide.
+		 */
+
+		elide = 0;
+	    } else if ((elidesize = segPtr->size) > 0) {
 		maxBytes += elidesize;
 	    } else if ((segPtr->typePtr == &tkTextToggleOffType)
 		    || (segPtr->typePtr == &tkTextToggleOnType)) {
@@ -1063,11 +1070,16 @@ LayoutDLine(textPtr, indexPtr, internal, maxX)
     while (segPtr != NULL) {
 	/*
 	 * Elided text: skip it quickly, extending the zero-size chunk that
-	 * stands for it (a tag toggle may end the elision).
+	 * stands for it (a tag toggle may end the elision).  Not a block
+	 * inside which a tag with -elide switches: that one is laid out
+	 * as any segment, with the style of its head (which leaves out
+	 * the tags that switch inside it, see TkIBTreeFixTags), and the
+	 * block draws or hides what is inside it.
 	 */
 
 	if (elide && (lastChunkPtr != NULL)
-		&& (lastChunkPtr->displayProc == ElideDisplayProc)) {
+		&& (lastChunkPtr->displayProc == ElideDisplayProc)
+		&& !((offset == 0) && TkIBTreeTogglesElide(segPtr))) {
 	    if ((elidesize = segPtr->size - offset) > 0) {
 		curIndex.byteIndex += elidesize;
 		lastChunkPtr->numChars += elidesize;
@@ -2460,16 +2472,7 @@ DisplayText(clientData)
 	if ((y + height) > dInfoPtr->maxY) {
 	    height = dInfoPtr->maxY -y;
 	}
-#ifndef NEW_TK
-	XCopyArea(Tk_Display(textPtr->tkwin), Tk_WindowId(textPtr->tkwin),
-		  Tk_WindowId(textPtr->tkwin), dInfoPtr->scrollGC,
-		  dInfoPtr->x - textPtr->padX, dlPtr->oldY,
-		  (unsigned) (dInfoPtr->maxX - (dInfoPtr->x - textPtr->padX)),
-		  (unsigned) height, dInfoPtr->x - textPtr->padX, y);
-	numCopies++;
-#else
 	oldY = dlPtr->oldY;
-#endif 
 
 	/*
 	 * Update the lines we are going to scroll to show that they
@@ -2504,44 +2507,14 @@ DisplayText(clientData)
 	 * blocks as stale.
 	 */
 
-#ifndef NEW_TK
-	while (1) {
-	    XEvent event;
+	/*
+	 * Scroll as Tk 8.4 does on every platform: TkScrollWindow copies
+	 * the area and returns the damaged parts as a region.  (The tk4.0
+	 * code here used XCopyArea and waited with XWindowEvent for
+	 * GraphicsExpose/NoExpose; on Win32 XWindowEvent is an empty stub
+	 * that returns no event, see TK_BUGS.md.)
+	 */
 
-	    XWindowEvent(Tk_Display(textPtr->tkwin),
-		    Tk_WindowId(textPtr->tkwin), ExposureMask, &event);
-	    if (event.type == NoExpose) {
-		break;
-	    } else if (event.type == GraphicsExpose) {
-		TkTextRedrawRegion(textPtr, event.xgraphicsexpose.x,
-			event.xgraphicsexpose.y, event.xgraphicsexpose.width,
-			event.xgraphicsexpose.height);
-		if (event.xgraphicsexpose.count == 0) {
-/*		    damagedCopies++; */
-		    break;
-		}
-	    } else if (event.type == Expose) {
-		/*
-		 * A tricky situation.  This event must already have been
-		 * queued up before the XCopyArea was issued.  If the area
-		 * in this event overlaps the area copied, then some of the
-		 * bits that were copied were bogus.  The easiest way to
-		 * handle this is to issue two redisplays:  one for the
-		 * original area and one for the area shifted as if it was
-		 * in the copied area.
-		 */
-
-		TkTextRedrawRegion(textPtr, event.xexpose.x,
-			event.xexpose.y, event.xexpose.width,
-			event.xexpose.height);
-		TkTextRedrawRegion(textPtr, event.xexpose.x,
-			event.xexpose.y + offset, event.xexpose.width,
-			event.xexpose.height);
-	    } else {
-		panic("DisplayText received unknown exposure event");
-	    }
-	}
-#else
 	damageRgn = TkCreateRegion();
 	if (TkScrollWindow(textPtr->tkwin, dInfoPtr->scrollGC,
 		dInfoPtr->x - textPtr->padX, oldY,
@@ -2551,7 +2524,6 @@ DisplayText(clientData)
 	}
 	numCopies++;
 	TkDestroyRegion(damageRgn);
-#endif 
     }
 
     /*
@@ -4098,7 +4070,6 @@ GetXView(interp, textPtr, report)
 					 * scrollbar if it has changed. */
 {
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
-    char buffer[200];
     double first, last;
     int code;
 
@@ -4166,7 +4137,6 @@ GetYView(interp, textPtr, report)
 					 * scrollbar if it has changed. */
 {
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
-    char buffer[200];
     double first, last;
     DLine *dlPtr;
     int totalLines, code, count;
@@ -4372,7 +4342,6 @@ TkTextPixelIndex(textPtr, x, y, indexPtr)
 {
     TextDInfo *dInfoPtr = textPtr->dInfoPtr;
     register DLine *dlPtr;
-    register TkTextDispChunk *chunkPtr;
 
     /*
      * Make sure that all of the layout information about what's
@@ -5468,7 +5437,7 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 					 * character, in pixels. */
 {
     IBTreeInfo *biPtr = (IBTreeInfo *) chunkPtr->clientData;
-    int charCount, line;
+    int line;
     DLine *dlPtr = NULL;
 
     if (index) {
@@ -5668,8 +5637,9 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       ListFactoryAppendCopy(listFactoryPtr, widget);
       LangFreeArg(widget, LANG_DYNAMIC);
       widget = NULL;
-      if (segPtr->body.itree.data) {
-	ListFactoryAppendCopy(listFactoryPtr, segPtr->body.itree.data);
+      if (TkTextDataGetLang(segPtr->body.itree.data) != NULL) {
+	ListFactoryAppendCopy(listFactoryPtr,
+		TkTextDataGetLang(segPtr->body.itree.data));
       }
       listFactoryPtr = ListFactoryEndLevel(listFactoryPtr);
       LangSetInt(&arg, chunkPtr->x);
@@ -5979,7 +5949,6 @@ AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr)
 {
     int x, desired, delta, width, decimal, i, gotDigit;
     TkTextDispChunk *chunkPtr2, *decimalChunkPtr;
-    TkTextTab *tabPtr;
     CharInfo *ciPtr = NULL;		/* Initialization needed only to
 					 * prevent compiler warnings. */
     int tabX, prev, spaceWidth;
@@ -6030,7 +5999,6 @@ AdjustForTab(textPtr, tabArrayPtr, index, chunkPtr)
 		* (tabArrayPtr->tabs[tabArrayPtr->numTabs-1].location - prev);
     }
 
-    tabPtr = &tabArrayPtr->tabs[index];
     if (alignment == LEFT) {
 	desired = tabX;
 	goto update;

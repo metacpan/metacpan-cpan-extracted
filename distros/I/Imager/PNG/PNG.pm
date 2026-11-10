@@ -4,7 +4,7 @@ use strict;
 use Imager;
 
 BEGIN {
-  our $VERSION = "1.005";
+  our $VERSION = "1.006";
 
   require XSLoader;
   XSLoader::load('Imager::File::PNG', $VERSION);
@@ -105,7 +105,7 @@ Returns a true value on success.
 
 =head1 AUTHOR
 
-Tony Cook <tonyc@cpan.org>
+Tony Cook <tony@develop-help.com>
 
 =head1 SEE ALSO
 

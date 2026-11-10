@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
-our $VERSION = '0.002.4';
+our $VERSION = '0.003.0';
 
 use Carp qw(croak carp);
 use POSIX qw(floor);
@@ -35,6 +35,11 @@ Readonly::Scalar my $DEFAULT_DIVISIONS => 24;
 
 # Maximum number of simultaneous open slurs per staff
 Readonly::Scalar my $MAX_SLUR_NUMBER => 6;
+
+Readonly::Scalar my $QUARTERS_PER_WHOLE => 4;
+
+# Event types that occupy time in a measure.
+Readonly::Hash my %SOUNDING_TYPES => map { $_ => 1 } qw(Note Rest Chord);
 
 # ---------------------------------------------------------------------------
 # Clef mappings: NWC clef name -> { sign, line, [clef-octave-change] }
@@ -163,7 +168,7 @@ Music::NWC2MusicXML::MusicXML - Convert an internal Score object to a MusicXML 4
 
 =head1 VERSION
 
-0.002.4
+0.003.0
 
 =head1 SYNOPSIS
 
@@ -1064,6 +1069,8 @@ sub _emit_part {
 	my $key_start   = ($staff->initial_key  // {})->{fifths} // 0;
 	my $clef_now    = $clef_start;
 	my $key_now     = $key_start;
+	my $ts_start    = $staff->initial_timesig;
+	my $ts_now      = $ts_start;
 
 	# Expose per-staff DynVel map for _emit_dynamic to use during this part.
 	$self->{_dyn_vel} = $staff->{_dyn_vel};
@@ -1082,13 +1089,19 @@ sub _emit_part {
 			my $bar_style = $event->data->{style} // 'normal';
 			push @out, $self->_emit_measure(
 				$measure_no++, \@pending, $staff, $divisions,
-				$first, $clef_start, $key_start, $prev_bar, $bar_style, $ann
+				$first, $clef_start, $key_start, $prev_bar, $bar_style, $ann,
+				$ts_start
 			);
 			@pending    = ();
 			$first      = 0;
 			$prev_bar   = $bar_style;
 			$clef_start = $clef_now;   # carry updated state to next measure
 			$key_start  = $key_now;
+			$ts_start   = $ts_now;
+
+		} elsif ($type eq 'TimeSig') {
+			$ts_now = $event->data // $ts_now;
+			push @pending, $event;
 
 		} elsif ($type eq 'Clef') {
 			$clef_now = $event->data->{nwc_clef} // $clef_now;
@@ -1107,7 +1120,7 @@ sub _emit_part {
 		push @out, $self->_emit_measure(
 			$measure_no, \@pending, $staff, $divisions,
 			$first, $clef_start, $key_start, $prev_bar,
-			$staff->{_ending_bar} // 'normal', $ann
+			$staff->{_ending_bar} // 'normal', $ann, $ts_start
 		);
 	}
 
@@ -1118,9 +1131,10 @@ sub _emit_part {
 
 sub _emit_measure {
 	my ($self, $number, $events, $staff, $divisions, $is_first,
-	    $clef, $key_fifths, $prev_bar, $bar_style, $ann) = @_;
+	    $clef, $key_fifths, $prev_bar, $bar_style, $ann, $ts) = @_;
 	my $curr_clef  = $clef       // 'Treble';
 	my $curr_key   = $key_fifths // 0;
+	my $curr_ts    = $ts // $staff->initial_timesig;
 	$prev_bar  //= 'normal';
 	$bar_style //= 'normal';
 	$ann       //= {};
@@ -1129,6 +1143,11 @@ sub _emit_measure {
 	my $i   = $self->{_indent};
 	my $pad = $i;
 	my $bar_accidentals = {};   # pitch_key -> alter; reset each measure
+
+	# NWC writes a whole rest for a silent bar whatever the time signature,
+	# so a whole rest that is alone in its measure lasts the full measure.
+	my @sounding = grep { $SOUNDING_TYPES{ $_->type } } @$events;
+	my $bar_rest = (@sounding == 1 && _is_whole_rest($sounding[0])) ? $sounding[0] : undef;
 
 	push @out, "${pad}<measure number=\"$number\">";
 
@@ -1156,6 +1175,7 @@ sub _emit_measure {
 		my $ev_ann = $ann->{"$event"} // {};
 
 		if ($type eq 'TimeSig') {
+			$curr_ts = $event->data // $curr_ts;
 			push @out, $self->_emit_time_change($event->data // {}, $pad . $i);
 
 		} elsif ($type eq 'Clef') {
@@ -1212,7 +1232,10 @@ sub _emit_measure {
 		} elsif ($type eq 'Rest') {
 			push @out, $self->_emit_wedge($ev_ann->{wedge_start}, undef, $pad . $i)
 				if $ev_ann->{wedge_start};
-			push @out, $self->_emit_rest_event($event, $divisions, $pad . $i, $ev_ann);
+			my $measure_ticks = (defined $bar_rest && $event == $bar_rest)
+				? _measure_ticks($curr_ts, $divisions) : undef;
+			push @out, $self->_emit_rest_event(
+				$event, $divisions, $pad . $i, $ev_ann, $measure_ticks);
 			push @out, $self->_emit_wedge('crescOff', undef, $pad . $i)
 				if $ev_ann->{wedge_stop_after};
 		} elsif ($type eq 'Chord') {
@@ -1529,7 +1552,7 @@ sub _emit_note_event {
 }
 
 sub _emit_rest_event {
-	my ($self, $event, $divisions, $pad, $ev_ann) = @_;
+	my ($self, $event, $divisions, $pad, $ev_ann, $measure_ticks) = @_;
 	$ev_ann //= {};
 	my $d   = $event->data;
 	my @out;
@@ -1539,11 +1562,17 @@ sub _emit_rest_event {
 	my $type  = $NWC_TYPE_MAP{ $d->{base_dur} // '4th' } // 'quarter';
 
 	push @out, "${pad}<note>";
-	push @out, "${pad}${i}<rest/>";
-	push @out, "${pad}${i}<duration>$ticks</duration>";
-	push @out, "${pad}${i}<voice>1</voice>";
-	push @out, "${pad}${i}<type>$type</type>";
-	push @out, "${pad}${i}<dot/>" for 1 .. ($d->{dots} // 0);
+	if (defined $measure_ticks) {
+		push @out, "${pad}${i}<rest measure=\"yes\"/>";
+		push @out, "${pad}${i}<duration>$measure_ticks</duration>";
+		push @out, "${pad}${i}<voice>1</voice>";
+	} else {
+		push @out, "${pad}${i}<rest/>";
+		push @out, "${pad}${i}<duration>$ticks</duration>";
+		push @out, "${pad}${i}<voice>1</voice>";
+		push @out, "${pad}${i}<type>$type</type>";
+		push @out, "${pad}${i}<dot/>" for 1 .. ($d->{dots} // 0);
+	}
 	if ($ev_ann->{fermata}) {
 		push @out, "${pad}${i}<notations>";
 		push @out, "${pad}${i}${i}<fermata/>";
@@ -1661,6 +1690,23 @@ sub _key_alter_for_step {
 		return $sign if $steps->[$k] == $step_i;
 	}
 	return 0;
+}
+
+sub _is_whole_rest {
+	my ($event) = @_;
+	return 0 unless $event->type eq 'Rest';
+	my $d = $event->data // {};
+	return (($d->{base_dur} // '') eq 'Whole' && !($d->{dots} // 0)) ? 1 : 0;
+}
+
+# Length of one measure in ticks, or undef when the time signature is
+# unknown or the length is not a whole number of ticks.
+sub _measure_ticks {
+	my ($ts, $divisions) = @_;
+	return undef unless $ts && $ts->{beats} && $ts->{beat_type};
+	my $num = $ts->{beats} * $QUARTERS_PER_WHOLE * $divisions;
+	return undef if $num % $ts->{beat_type};
+	return $num / $ts->{beat_type};
 }
 
 sub _rational_to_ticks {
@@ -1970,6 +2016,18 @@ sub _calculate_divisions {
 		for my $event (@{ $staff->events }) {
 			my $d = $event->duration->[1];
 			$seen_denoms{$d} = 1 if $d > 0;
+		}
+
+		# A bar rest lasts a full measure, so the measure length of every
+		# time signature in force must also be a whole number of ticks.
+		next unless grep { _is_whole_rest($_) } @{ $staff->events };
+		my @timesigs = grep { defined } $staff->initial_timesig,
+			map { $_->data } grep { $_->type eq 'TimeSig' } @{ $staff->events };
+		for my $ts (@timesigs) {
+			next unless $ts->{beats} && $ts->{beat_type};
+			my $d = $ts->{beat_type}
+				/ _gcd($ts->{beats} * $QUARTERS_PER_WHOLE, $ts->{beat_type});
+			$seen_denoms{$d} = 1;
 		}
 	}
 

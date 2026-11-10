@@ -3,7 +3,7 @@ package Database::BI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Carp                qw(croak);
 use Database::BI::Util  qw(urlencode);

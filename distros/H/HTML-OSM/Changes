@@ -1,5 +1,28 @@
 Revision history for HTML-OSM
 
+0.17	Mon Nov  9 09:22:11 PM EST 2026
+	[ Enhancements ]
+	- add_geojson() takes bands: a feature property holding a list of
+	  colours.  Each polygon's line is drawn just inside its edge, so where
+	  two share a border each colour is on its own side.  A polygon with
+	  several colours gets a line of each, side by side.
+	  t/layer-bands.t
+
+0.16	Mon Nov  9 03:45:08 PM EST 2026
+	[ Enhancements ]
+	- add_geojson() takes key: a key to a layer's colours, a line of each
+	  colour beside its label, in a corner of the map (bottom right by
+	  default).  It is shown while the layer is, so unticking the layer's
+	  checkbox hides it too.  t/layer-key.t
+
+0.15	Mon Nov  9 01:01:45 PM EST 2026
+	[ Enhancements ]
+	- add_geojson() takes name and show.  A named layer gets a checkbox in
+	  Leaflet's layer control, so the reader can hide and show it; show => 0
+	  starts it hidden.  Layers that share a name share one checkbox.  The
+	  name is escaped, because Leaflet writes it into the page as HTML.
+	  t/layer-control.t
+
 0.14	Thu Nov  5 10:55:00 AM EST 2026
 	[ Enhancements ]
 	- new(nonce => ...) puts nonce="..." on every <script> onload_render()

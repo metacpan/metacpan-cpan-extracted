@@ -2,6 +2,7 @@ package Smart::Options::Declare;
 use strict;
 use warnings;
 
+use Carp ();
 use Exporter 'import';
 use Smart::Options;
 use PadWalker qw/var_name/;
@@ -125,12 +126,15 @@ __END__
 
 =encoding utf8
 
+=for stopwords isa coderef
+
 =head1 NAME
 
 Smart::Options::Declare - DSL for Smart::Options
 
 =head1 SYNOPSIS
 
+  use 5.010;
   use Smart::Options::Declare;
 
   opts my $rif => 'Int', my $xup => 'Num';
@@ -162,7 +166,7 @@ set option value to variable.
   
   opts my $var => 'Str', my $value => { isa => 'Int', default => 4 };
 
-=head2 opts_coerce ( NewType, Source, Generater )
+=head2 opts_coerce ( NewType, Source, Generator )
 
 define new type and convert logic.
 
@@ -175,19 +179,24 @@ define new type and convert logic.
 =head1 RULE
 
 =head2 isa
+
 define option value type. see L</TYPES>.
 
 =head2 required
+
 define option value is required.
 
 =head2 default
+
 define options default value. If passed a coderef, it
 will be executed if no value is provided on the command line.
 
 =head2 alias
+
 define option param's alias.
 
 =head2 comment
+
 this comment is used to generate help. help can show --help
 
 =head1 TYPES

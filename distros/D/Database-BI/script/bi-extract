@@ -6,7 +6,8 @@
 # marks a dataset accelerated and builds its extract, rebuilds every accelerated
 # dataset's extract, or stops accelerating one.  It prints what it did.
 #
-# An extract is a cache under <model_dir>/extracts/.  Deleting that directory
+# An extract is a cache under <model_dir>/extracts/, or database-bi-extracts/
+# in the cache directory when one is set (Database::BI::CacheDir).  Deleting it
 # loses nothing: the application reads each file again until this is rerun.
 # Nothing is ever written under data_dir.
 #
@@ -32,6 +33,11 @@ use lib "$Bin/../lib";
 
 use Getopt::Long qw(GetOptions :config no_ignore_case);
 use Database::BI::Util qw(minute_stamp);
+use Database::BI::I18N ();
+
+# Messages in the language the locale names: LANG=en_US.UTF-8 is American
+# English, anything else British (CGI::Lingua chooses).
+$Database::BI::I18N::LANGUAGE = Database::BI::I18N::from_locale();
 
 my (@opt_spec, $opt_all, $opt_remove, $opt_list, $opt_data_dir, $opt_model_dir, $opt_help);
 
@@ -152,7 +158,11 @@ long as the extract still matches the file it was built from.  This marks a
 dataset accelerated and builds its extract, rebuilds every accelerated
 dataset's extract, or stops accelerating one, and prints what it did.
 
-An extract is a cache under F<< <model_dir>/extracts/ >>.  Deleting that folder
+An extract is a cache under F<< <model_dir>/extracts/ >>, or under
+F<database-bi-extracts/> in the cache directory when one is set: C<cache_dir>
+through L<Object::Configure> (or C<Database__BI__Extract__cache_dir>), then
+C<$ENV{CACHEDIR}>, then C<$ENV{CACHE_DIR}>, then C<cache_dir> in
+F<database_bi.conf>.  Deleting that folder
 loses nothing: the application reads each file again until this is rerun.
 Nothing is ever written under C<data_dir>.  Run it from the application's
 folder, or give C<--data-dir> and C<--model-dir>.

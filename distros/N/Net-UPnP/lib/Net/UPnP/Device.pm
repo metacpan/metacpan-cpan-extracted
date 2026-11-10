@@ -44,6 +44,19 @@ sub getssdp() {
 	$this->{$Net::UPnP::Device::_SSDP};
  }
 
+# Undefined means a manually constructed, caller-trusted device. Discovery
+# always stores an explicit policy, including an empty (deny-all) list.
+sub setallowedaddresses {
+	my ($this, $addresses) = @_;
+	$this->{allowed_addresses} = Net::UPnP::HTTP::_address_list($addresses);
+}
+
+sub getallowedaddresses {
+	my ($this) = @_;
+	return undef unless exists $this->{allowed_addresses};
+	return [@{$this->{allowed_addresses}}];
+}
+
 #------------------------------
 # description
 #------------------------------
@@ -280,7 +293,7 @@ Net::UPnP::Device - Perl extension for UPnP.
             next;
         }
         $condir_service = $dev->getservicebyname('urn:schemas-upnp-org:service:ContentDirectory:1');
-        unless (defined(condir_service)) {
+        unless (defined($condir_service)) {
             next;
         }
         %action_in_arg = (
@@ -295,11 +308,11 @@ Net::UPnP::Device - Perl extension for UPnP.
         unless ($action_res->getstatuscode() == 200) {
         	next;
         }
-        $actrion_out_arg = $action_res->getargumentlist();
-        unless ($actrion_out_arg->{'Result'}) {
+        $action_out_arg = $action_res->getargumentlist();
+        unless ($action_out_arg->{'Result'}) {
             next;
         }
-        $result = $actrion_out_arg->{'Result'};
+        $result = $action_out_arg->{'Result'};
         while ($result =~ m/<dc:title>(.*?)<\/dc:title>/sgi) {
             print "\t$1\n";
         }

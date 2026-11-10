@@ -1,23 +1,21 @@
+requires 'perl', '5.020000';
 requires 'Exporter';
-requires 'File::Slurp';
+# 1.45: uniq (the List::Util in the core has it from 5.26)
+requires 'List::Util', '1.45';
 requires 'Text::Table';
-requires 'List::MoreUtils';
 requires 'PadWalker';
 
 on 'test' => sub {
-    requires 'Test::More' => '0.98';
-    requires 'Test::Requires' =>  0;
-    requires 'Test::TCP';
-    requires 'Capture::Tiny'   => '0.12';
+    requires 'Test::More', '0.98';
+    requires 'Capture::Tiny', '0.12';
     requires 'Try::Tiny';
     requires 'Test::Exception';
     requires 'File::Spec';
-    requires 'Devel::Cover';
+    requires 'File::Temp';
 };
 
 on 'develop' => sub {
-    requires 'Minilla';
+    # v3.2.0: manage_changes in minil.toml (the change log is CHANGELOG.md)
+    requires 'Minilla', 'v3.2.0';
     requires 'Pod::Markdown::Github';
-    requires 'Version::Next';
-    requires 'CPAN::Uploader';
 };

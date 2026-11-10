@@ -14,6 +14,7 @@
 /* Windows (EXPERIMENTAL, post-0.06, not yet built): posix_spawn on CreateProcessW, in win_spawn.h; these names make the
    XSUB below one source for both.  What Windows does natively: doc/pspawn-spawner.md, section 8. */
 #  include "win_spawn.h"
+#  include "win_loop.h"
 #  define posix_spawn_file_actions_t win_file_actions_t
 #  define posix_spawnattr_t win_spawnattr_t
 #  define posix_spawn win_posix_spawn
@@ -853,6 +854,117 @@ __win_spawn_forget(pid)
     IV pid
   CODE:
     win_spawn_forget((pid_t)pid);
+
+int
+__wl_io(id, kind, fd, data)
+    IV id
+    char kind
+    int fd
+    SV *data
+  CODE:
+    /* W5 (win_loop.h): start a read ('r', at most SvIV(data) bytes) or a write ('w', the bytes of data) on fd; its
+       event comes from __wl_wait.  1, or 0 with $!. */
+    {
+        STRLEN len = 0; const char *p = NULL;
+        if (kind == 'w') p = SvPVbyte(data, len); else len = (STRLEN)SvIV(data);
+        RETVAL = wl_io(id, kind, fd, p, (DWORD)len);
+    }
+  OUTPUT:
+    RETVAL
+
+int
+__wl_child(id, pid)
+    IV id
+    IV pid
+  CODE:
+    /* W5: watch the process pid for its end (its status then comes from waitpid).  1, or 0 with $!. */
+    RETVAL = wl_child(id, (DWORD)pid);
+  OUTPUT:
+    RETVAL
+
+void
+__wl_cancel(id)
+    IV id
+  CODE:
+    wl_cancel(id);
+
+void
+__wl_wait(ms)
+    int ms
+  PPCODE:
+    /* W5: the events of one wait of at most ms milliseconds (-1: no limit): [ID, KIND, BYTES, ERRNO] each; for a read,
+       BYTES undef at end of file (ERRNO 0) or on an error.  While an alarm is set (Perl's alarm is a WM_TIMER message,
+       which only win32_async_check reads), the wait is cut into slices of 50 ms, each followed by that check.  After a
+       console control event, it returns once Perl's own handler has marked the signal (200 ms at most): Perl then
+       dispatches it. */
+    {
+        OVERLAPPED_ENTRY e[64]; ULONG n = 0, i; DWORD t = ms < 0 ? INFINITE : (DWORD)ms; BOOL got;
+        int timer = w32_timerid != 0;
+        if (timer && (t == INFINITE || t > 50)) t = 50;
+        got = wl_init() && GetQueuedCompletionStatusEx(wl_port, e, 64, &n, t, FALSE);
+        if (InterlockedExchange(&wl_woken, 0)) { int k; for (k = 0; k < 200 && !PL_sig_pending; k++) Sleep(1); }
+        if (timer) win32_async_check(aTHX);
+        if (got) {
+            for (i = 0; i < n; i++) {
+                wl_op *op = (wl_op *)e[i].lpOverlapped; AV *av; int err;
+                if (e[i].lpCompletionKey == WL_KEY_WAKE) continue;
+                if (!op || !wl_complete(op, e[i].dwNumberOfBytesTransferred, e[i].lpCompletionKey)) continue;
+                err = op->err ? wl_errno(op->err) : 0;
+                if (op->kind == 'r' && (op->err == ERROR_BROKEN_PIPE || op->err == ERROR_HANDLE_EOF
+                                        || op->err == ERROR_PIPE_NOT_CONNECTED || (!op->err && op->done == 0))) err = 0;
+                av = newAV();
+                av_push(av, newSViv(op->id));
+                av_push(av, newSVpvn(&op->kind, 1));
+                av_push(av, op->kind == 'r' && op->done && !op->err ? newSVpvn(op->buf, op->done) : newSV(0));
+                av_push(av, newSViv(err));
+                mXPUSHs(newRV_noinc((SV *)av));
+                wl_free(op);
+            }
+        }
+    }
+
+IV
+__win_ppid()
+  CODE:
+    /* The parent's process ID (Perl's getppid is unimplemented on Windows): NtQueryInformationProcess's
+       ProcessBasicInformation, InheritedFromUniqueProcessId; 0 if unknown. */
+    {
+        typedef LONG (NTAPI *nqip_t)(HANDLE, int, PVOID, ULONG, PULONG);
+        struct { LONG_PTR status; PVOID peb; ULONG_PTR affinity; LONG_PTR priority; ULONG_PTR pid, ppid; } pbi;
+        nqip_t f = (nqip_t)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtQueryInformationProcess");
+        RETVAL = f && f(GetCurrentProcess(), 0, &pbi, sizeof pbi, NULL) == 0 ? (IV)pbi.ppid : 0;
+    }
+  OUTPUT:
+    RETVAL
+
+int
+__wl_ctrl(on)
+    int on
+  CODE:
+    /* W5: install (1) or remove (0) the console control handler that wakes the loop; 1 if done */
+    RETVAL = wl_ctrl_watch(on);
+  OUTPUT:
+    RETVAL
+
+int
+__wl_is_async(fd)
+    int fd
+  CODE:
+    /* W5: 1 if fd's handle was opened for overlapped I/O (the loop then needs no helper thread), 0 if not, -1 if no handle */
+    { intptr_t h = _get_osfhandle(fd); RETVAL = h == -1 || h == -2 ? -1 : wl_is_async((HANDLE)h); }
+  OUTPUT:
+    RETVAL
+
+void
+__wl_pipe(async_r, async_w)
+    int async_r
+    int async_w
+  PPCODE:
+    /* W5: a pipe whose ends are opened for overlapped I/O where asked: (READ_FD, WRITE_FD), or nothing with $!. */
+    {
+        int r, w;
+        if (wl_pipe(async_r, async_w, &r, &w) == 0) { mXPUSHi(r); mXPUSHi(w); }
+    }
 
 const char *
 __win_priority_class()

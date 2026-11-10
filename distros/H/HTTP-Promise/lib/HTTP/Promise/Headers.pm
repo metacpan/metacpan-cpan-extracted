@@ -19,6 +19,7 @@ BEGIN
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::XSHeaders );
     use vars qw( $VERSION $EXCEPTION_CLASS $MOD_PERL $SUPPORTED $MOD_PATH );
+    use Crypt::Misc ();
     use Cwd ();
     use Encode;
     use HTTP::Promise::Exception;
@@ -305,8 +306,11 @@ sub charset
     unless( length( $self->{charset} ) )
     {
         my $ct = $self->content_type;
-        my $f = $self->new_field( content_type => $ct );
-        $self->{charset} = $f->charset;
+        if( defined( $ct ) && length( $ct // '' ) )
+        {
+            my $f = $self->new_field( content_type => $ct );
+            $self->{charset} = $f->charset;
+        }
     }
     return( $self->{charset} );
 }
@@ -860,12 +864,7 @@ sub link { return( shift->_set_get_multi( 'Link', @_ ) ); }
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Location>
 sub location { return( shift->_set_get_one( 'Location', @_ ) ); }
 
-sub make_boundary
-{
-    my $self = shift( @_ );
-    $self->_load_class( 'Data::UUID' ) || return( $self->pass_error );
-    return( Data::UUID->new->create_str );
-}
+sub make_boundary { return( Crypt::Misc::random_v4uuid() ); }
 
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age>
 sub max_age { return( shift->_set_get_number( 'Access-Control-Max-Age', @_ ) ); }
@@ -2489,7 +2488,7 @@ The $value argument may be a scalar or a reference to a list of scalars.
 
 =head2 make_boundary
 
-Returns a new boundary using L<Data::UUID>
+Returns a new boundary using L<Crypt::Misc> and its function L<Crypt::Misc/random_v4uuid>
 
 =for Pod::Coverage message
 

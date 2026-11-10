@@ -3,17 +3,20 @@ package Database::BI::Extract;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Carp		qw(croak carp);
 use Digest::MD5		qw(md5_hex);
 use Encode		qw(encode_utf8);
 use File::Path		qw(make_path remove_tree);
 use Mojo::File;
+use Readonly;
 
 # ---------------------------------------------------------------------------
 # An extract is a SQLite materialisation of one dataset, stored at:
 #   <model_dir>/extracts/<fingerprint>.db
+# or, when a cache directory is set (see new), at:
+#   <cache_dir>/database-bi-extracts/<fingerprint>.db
 #
 # The fingerprint is md5_hex(spec . "\0" . mtime . "\0" . size).
 # It is a pure cache: deleting the extracts/ directory at any time leaves
@@ -25,11 +28,48 @@ use Mojo::File;
 # bytes.
 # ---------------------------------------------------------------------------
 
-# new( model_dir => $dir ) -> $self
+# The folder extracts are kept in under a cache directory that was set, rather
+# than in it: evict() removes every .db file it finds, and a CACHEDIR such as
+# ~/.cache holds other programs' files.
+Readonly my $CACHE_SUBDIR => 'database-bi-extracts';
+
+# new( model_dir => $dir, cache_dir => $dir, config => \%conf, home => $dir, dir => $dir ) -> $self
+#
+# Database::BI::CacheDir chooses the cache directory (Object::Configure,
+# CACHEDIR, CACHE_DIR, cache_dir in database_bi.conf); the extracts go in its
+# database-bi-extracts folder.  With none of those set they stay in
+# <model_dir>/extracts, where they always were.
 sub new {
 	my ($class, %args) = @_;
-	croak 'model_dir is required' unless defined $args{model_dir} && length $args{model_dir};
-	return bless { model_dir => $args{model_dir} }, $class;
+
+	# dir names the folder outright, choosing nothing.
+	return bless { model_dir => $args{model_dir}, dir => $args{dir} }, $class
+		if defined($args{dir}) && length($args{dir});
+
+	require Database::BI::CacheDir;
+	my $cache_dir = Database::BI::CacheDir::resolve(
+		class  => $class,
+		params => \%args,
+		(exists($args{config}) ? (config => $args{config}, home => $args{home}) : ()),
+	);
+
+	my $dir;
+	if (defined $cache_dir) {
+		$dir = Mojo::File->new($cache_dir)->child($CACHE_SUBDIR)->to_string;
+	} else {
+		croak 'model_dir is required' unless defined $args{model_dir} && length $args{model_dir};
+		$dir = Mojo::File->new($args{model_dir})->child('extracts')->to_string;
+	}
+
+	return bless { model_dir => $args{model_dir}, dir => $dir }, $class;
+}
+
+# dir( $self ) -> $path_string
+#
+# The folder the extracts are kept in.  It need not exist yet.
+sub dir {
+	my $self = shift;
+	return $self->{dir};
 }
 
 # _fingerprint( $spec, $mtime, $size ) -> $hex_string
@@ -43,7 +83,7 @@ sub _fingerprint {
 # _extract_dir( $self ) -> $path_string
 sub _extract_dir {
 	my $self = shift;
-	return Mojo::File->new($self->{model_dir})->child('extracts')->to_string;
+	return $self->{dir};
 }
 
 # path( $spec, $mtime, $size ) -> $path_string
@@ -138,7 +178,9 @@ Database::BI::Extract -- SQLite materialisation cache for Database::BI
 
 =head1 DESCRIPTION
 
-Stores SQLite materialisation files (extracts) under C<model_dir/extracts/>.
+Stores SQLite materialisation files (extracts) under C<model_dir/extracts/>,
+or under F<database-bi-extracts/> in the cache directory when one is set (see
+L</new>).
 The cache key is an MD5 of the dataset spec, its source mtime, and its size.
 Deleting the extracts directory leaves the application fully functional.
 
@@ -155,12 +197,39 @@ extract, and the class only stores and finds the bytes.
 
 =head4 INPUT
 
-	{ model_dir => 'string' }   # required; extracts live in <model_dir>/extracts/
+	{
+		model_dir => 'string',   # extracts live in <model_dir>/extracts/ when no cache directory is set
+		dir       => 'string',   # optional; the folder itself, used as given: nothing below is read
+		cache_dir => 'string',   # optional; read through Object::Configure (below)
+		config    => 'hashref',  # optional; the application's config (default: database_bi.conf is read)
+		home      => 'string',   # optional; the folder a relative cache_dir in config is under
+	}
+
+The cache directory is the first of these that is set (see
+L<Database::BI::CacheDir>): C<cache_dir> through L<Object::Configure> (its
+config files, then C<Database__BI__Extract__cache_dir>; the C<cache_dir>
+argument is what those fall back on), C<$ENV{CACHEDIR}>, C<$ENV{CACHE_DIR}>,
+C<cache_dir> in F<database_bi.conf>.  The extracts are then kept in its
+F<database-bi-extracts/> folder, never in it directly, because C<evict> removes
+every C<.db> file in the folder it uses.
 
 =head4 OUTPUT
 
-A C<Database::BI::Extract> object.  Croaks C<model_dir is required> without
-C<model_dir>.  Nothing is created on disc until C<put>.
+A C<Database::BI::Extract> object.  Croaks C<model_dir is required> when
+neither C<model_dir> nor a cache directory is set.  Nothing is created on disc
+until C<put>.
+
+=head2 dir
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+	'string'   # the folder the extracts are kept in; it need not exist
 
 =head2 path
 
@@ -174,7 +243,7 @@ C<model_dir>.  Nothing is created on disc until C<put>.
 
 =head4 OUTPUT
 
-	'string'   # <model_dir>/extracts/<md5 of spec, mtime and size>.db
+	'string'   # <dir>/<md5 of spec, mtime and size>.db
 
 The path is computed, not checked: the file need not exist.
 
@@ -205,7 +274,7 @@ A changed mtime or size gives a different path, so a stale extract is a miss.
 
 	'string'   # the path written
 
-Creates C<extracts/> when it is missing.  Croaks C<sqlite_bytes are required>
+Creates C<dir> when it is missing.  Croaks C<sqlite_bytes are required>
 when C<$bytes> is undefined or empty, and croaks naming the path when the
 directory or file cannot be written.
 
@@ -219,10 +288,10 @@ directory or file cannot be written.
 
 =head4 OUTPUT
 
-	'integer'   # the number of files removed (0 when there is no extracts/)
+	'integer'   # the number of files removed (0 when there is no dir)
 
 A fingerprint cannot be traced back to its spec, so C<evict> removes every
-C<.db> file in C<extracts/>, not only C<$spec>'s.
+C<.db> file in C<dir>, not only C<$spec>'s.
 
 =head1 AUTHOR
 

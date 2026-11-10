@@ -2,29 +2,43 @@ package Devel::Cover::Report::Coveralls;
 use strict;
 use warnings;
 use 5.020;
-our $VERSION = "1.0.0";
+our $VERSION = "1.1.0";
 
 our $CONFIG_FILE = '.coveralls.yml';
 our $API_ENDPOINT_STEM = '/api/v1/jobs';
 our $API_ENDPOINT = 'https://coveralls.io';
 our $SERVICE_NAME = 'coveralls-perl';
+our @JSON_ENCODERS = ('Cpanel::JSON::XS');
 
 use Devel::Cover::DB;
+use Digest::MD5;
+use Encode ();
 use HTTP::Tiny;
 use JSON::PP;
 use YAML;
 use Data::Dumper;
 
+# The source file to send: its name, its text, the MD5 digest of the file and the coverage of each
+# line. The digest is of the bytes of the file as they are, which is what the jobs API asks for;
+# the text has each line ended with "\n", also where the file uses "\r\n". The text is decoded
+# from UTF-8, so that the JSON holds the characters and not each byte of them. A file that the
+# strict UTF-8 of Encode does not decode is sent as its bytes: an old Latin-1 source, and also one
+# with a noncharacter such as U+FFFF.
+#
+# A file under blib/ is sent by the name of the file it was copied from, so the digest is of that
+# file when it exists: the build may change the copy (the #! line of a script).
 sub get_source {
     my ($file, $callback) = @_;
 
     my $source = '';
     my @coverage;
+    my $digest = Digest::MD5->new;
 
-    open my $fh, '<', $file or warn("Unable to open $file: $!\n"), return;
+    open my $fh, '<:raw', $file or warn("Unable to open $file: $!\n"), return;
 
     while (defined(my $l = <$fh>)) {
-        chomp $l;
+        $digest->add($l);
+        $l =~ s/(?:\r?\n|\r)\z//;
         my $n = $.;
 
         $source .= "$l\n";
@@ -33,13 +47,67 @@ sub get_source {
 
     close($fh);
 
-    $file =~ s!^blib/!!;
+    if ($source =~ /[^\x00-\x7f]/) {
+        local $@;
+        my $text = eval { Encode::decode('UTF-8', $source, Encode::FB_CROAK | Encode::LEAVE_SRC) };
+        if (defined $text) {
+            $text =~ s/\A\x{FEFF}//;    # a byte order mark is not part of line 1
+            $source = $text;
+        }
+    }
+
+    if ($file =~ s!^blib/!!) {
+        if (open my $orig, '<:raw', $file) {
+            $digest = Digest::MD5->new->addfile($orig);
+        }
+    }
 
     return +{
         name => $file,
         source => $source,
+        source_digest => $digest->hexdigest,
         coverage => \@coverage,
     };
+}
+
+# The encoder of the job's JSON: the first of @JSON_ENCODERS that is installed, else JSON::PP. On a
+# large distribution most of the time of report goes into the encoding, which Cpanel::JSON::XS
+# (recommended in cpanfile) does in a fraction of the time of JSON::PP. With ascii it gives the
+# same JSON as JSON::PP, which t/01_basic.t checks: a character out of ASCII as \uXXXX, one out of
+# the BMP as a surrogate pair.
+sub json_encoder {
+    for my $class (@JSON_ENCODERS) {
+        (my $file = "$class.pm") =~ s!::!/!g;
+        return $class->new->ascii if eval { require $file; 1 };
+        # Installed but not loadable, e.g. built for another version of Perl.
+        warn "$class is not used: $@" if $@ !~ /^Can't locate \Q$file\E in \@INC/;
+    }
+    return JSON::PP->new->ascii;
+}
+
+# The body of a request to the jobs API: the job as a JSON file in the multipart field json_file,
+# the form the API documents (https://docs.coveralls.io/api-jobs-endpoint). Returns the content
+# type and the body. The boundary is not quoted in the content type, as the official
+# coverage-reporter does for the nginx of coveralls.io, and is made so that it does not occur in
+# the JSON (which holds the source files, this module's own among them).
+sub json_file_request {
+    my $json = shift;
+
+    my $boundary;
+    do {
+        $boundary = 'CoverallsPerl' . join '', map { sprintf '%04x', int rand 0x10000 } 1 .. 8;
+    } while index($json, $boundary) >= 0;
+
+    my $body = join "\r\n",
+        "--$boundary",
+        'Content-Disposition: form-data; name="json_file"; filename="json_file"',
+        'Content-Type: application/json',
+        '',
+        $json,
+        "--$boundary--",
+        '';
+
+    return ("multipart/form-data; boundary=$boundary", $body);
 }
 
 sub git_log {
@@ -48,7 +116,8 @@ sub git_log {
     my $text = '';
 
     # No quotes around the format: cmd.exe on Windows does not take single quotes as quotes, so git
-    # would print them. The formats used here have no spaces and no characters a shell changes.
+    # would print them. A format given here has no spaces and one % at most: cmd.exe expands
+    # %name% when a variable of that name is set.
     my $command = "git log -1 --encoding=UTF-8 --pretty=format:$format";
     if (open(my $fh, '-|:encoding(UTF-8)', $command)) {
         $text = do { local $/; <$fh> };
@@ -56,6 +125,28 @@ sub git_log {
     }
 
     return $text;
+}
+
+# The values of the git log formats, from one git log. The formats are joined by NUL and git is
+# run without a shell, so that cmd.exe on Windows does not expand the %...% between them. Perl
+# before 5.22 on Windows has no list form of a piped open; there each format gets a git log of
+# its own (git_log).
+sub git_log_fields {
+    my @formats = @_;
+
+    my $fh;
+    my $opened = eval {
+        open $fh, '-|:encoding(UTF-8)',
+            'git', 'log', '-1', '--encoding=UTF-8', '--pretty=format:' . join('%x00', @formats);
+    };
+    return map { git_log($_) } @formats if !defined $opened && $@;
+    return ('') x @formats if !$opened;
+
+    my $text = do { local $/; <$fh> };
+    close $fh;
+    # A NUL in the last field (the subject) only cuts it short.
+    my @values = split /\0/, $text // '', -1;
+    return map { $values[$_] // '' } 0 .. $#formats;
 }
 
 # Turn the output of `git remote -v` into the list of remotes to send.
@@ -83,25 +174,61 @@ sub strip_url_credentials {
     return $url;
 }
 
-sub get_git_info {
-    my $git = {
-        head => {
-            id              => git_log('%H'),
-            author_name     => git_log('%aN'),
-            author_email    => git_log('%ae'),
-            committer_name  => git_log('%cN'),
-            committer_email => git_log('%ce'),
-            message         => git_log('%s')
-        },
-        remotes => parse_git_remotes(scalar `git remote -v`),
-    };
-    my ($branch,) = grep { /^\* / } split( "\n", `git branch` );
-    $branch =~ s/^\* //;
-    $git->{branch} = $branch;
+# The value of an environment variable, or undef when it is unset or empty.
+sub env_value {
+    my $value = $ENV{ shift() };
+    return defined $value && $value ne '' ? $value : undef;
+}
 
-    if ($ENV{BUILD_SOURCEBRANCHNAME}) {
-        $git->{branch} = $ENV{BUILD_SOURCEBRANCHNAME};
+# Whether the current directory is in a git work tree. False also when git is not installed.
+# Outside a repository nothing is printed; any other error of git (e.g. a repository that
+# safe.directory does not allow) is shown as a warning.
+sub in_git_work_tree {
+    my $out = `git rev-parse --is-inside-work-tree 2>&1`;
+    return 1 if $? == 0 && defined $out && $out =~ /^true/;
+    warn "git: $out" if defined $out && $out =~ /^fatal:/m && $out !~ /not a git repository/;
+    return 0;
+}
+
+# The fields of git.head: the environment variable used where git does not give the value (the
+# names of the official coverage-reporter), and the git log format of the value.
+my @GIT_HEAD_FIELDS = (
+    [ id              => GIT_ID              => '%H'  ],
+    [ author_name     => GIT_AUTHOR_NAME     => '%aN' ],
+    [ author_email    => GIT_AUTHOR_EMAIL    => '%ae' ],
+    [ committer_name  => GIT_COMMITTER_NAME  => '%cN' ],
+    [ committer_email => GIT_COMMITTER_EMAIL => '%ce' ],
+    [ message         => GIT_MESSAGE         => '%s'  ],
+);
+
+# The git information to send. In a git work tree each value comes from git, and the environment
+# only fills in what git does not give; outside one, git is not run and the values come from the
+# environment. Git comes first because GIT_AUTHOR_NAME and the like are git's own variables, which
+# CI jobs set for the commits they make, and Jenkins sets GIT_BRANCH to "origin/<branch>".
+# Values that are not known are left out.
+sub get_git_info {
+    my $in_repo = in_git_work_tree();
+
+    my @from_git = $in_repo ? git_log_fields(map { $_->[2] } @GIT_HEAD_FIELDS) : ();
+    my %head;
+    for my $i (0 .. $#GIT_HEAD_FIELDS) {
+        my ($key, $name) = @{ $GIT_HEAD_FIELDS[$i] };
+        my $value = $from_git[$i] // '';
+        $value = env_value($name) // '' if $value eq '';
+        $head{$key} = $value if $value ne '';
     }
+    my $git = {
+        head    => \%head,
+        remotes => $in_repo ? parse_git_remotes(scalar `git remote -v`) : [],
+    };
+
+    my $branch;
+    if ($in_repo) {
+        ($branch) = grep { /^\* / } split /\n/, `git branch`;
+        $branch =~ s/^\* // if defined $branch;
+    }
+    $branch = env_value('GIT_BRANCH') if !defined $branch || $branch eq '';
+    $git->{branch} = $branch if defined $branch && $branch ne '';
 
     return $git;
 }
@@ -210,6 +337,7 @@ sub get_config {
         $json->{service_number} = $ENV{BUILD_BUILDID};
         $json->{service_pull_request} = $ENV{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}
             if $ENV{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER};
+        $json->{service_branch} = $ENV{BUILD_SOURCEBRANCHNAME} if $ENV{BUILD_SOURCEBRANCHNAME};
         $json->{commit_sha} = $ENV{BUILD_SOURCEVERSION} if $ENV{BUILD_SOURCEVERSION};
     } elsif ($ENV{GITHUB_ACTIONS}) {
         # The values of the official coverage-reporter (src/coverage_reporter/ci/github.cr).
@@ -239,15 +367,42 @@ sub get_config {
         $json->{commit_sha} = $ENV{GITHUB_SHA} if $ENV{GITHUB_SHA};
     } else {
         $json->{service_name} = $config->{service_name} || $SERVICE_NAME;
-        $json->{service_event_type} = 'manual';
+        # A build that the environment gives the values of a CI service (the overrides below) is
+        # one of a CI service that is not detected, not an upload by hand. The official
+        # coverage-reporter sends manual only when COVERALLS_RUN_LOCALLY is set.
+        $json->{service_event_type} = 'manual'
+            unless grep { defined env_value($_) } qw(
+                COVERALLS_SERVICE_NAME COVERALLS_PERL_SERVICE_NAME COVERALLS_SERVICE_NUMBER
+                COVERALLS_SERVICE_JOB_ID COVERALLS_SERVICE_JOB_NUMBER
+            );
     }
 
     # Coveralls requires the token on every CI service, Travis CI included.
     die "required repo_token in $CONFIG_FILE, make sure the environment var \"COVERALLS_REPO_TOKEN\" is set" if !$json->{repo_token};
 
-    if (exists $ENV{COVERALLS_PERL_SERVICE_NAME} && $ENV{COVERALLS_PERL_SERVICE_NAME}) {
-        $json->{service_name} = $ENV{COVERALLS_PERL_SERVICE_NAME};
+    # Overrides over what the CI service gives, under the names of the official coverage-reporter
+    # (src/coverage_reporter/config.cr). They also let a build that no CI service is detected for
+    # send these values.
+    my @overrides = (
+        [ service_name         => 'COVERALLS_SERVICE_NAME' ],
+        [ service_number       => 'COVERALLS_SERVICE_NUMBER' ],
+        [ service_job_id       => 'COVERALLS_SERVICE_JOB_ID' ],
+        [ service_job_number   => 'COVERALLS_SERVICE_JOB_NUMBER' ],
+        [ service_pull_request => 'COVERALLS_PULL_REQUEST' ],
+        [ service_branch       => 'COVERALLS_GIT_BRANCH' ],
+        [ commit_sha           => 'COVERALLS_GIT_COMMIT' ],
+        # The older name of COVERALLS_SERVICE_NAME. It comes after it, so it wins when both are set.
+        [ service_name         => 'COVERALLS_PERL_SERVICE_NAME' ],
+        [ service_event_type   => 'COVERALLS_EVENT_TYPE' ],
+    );
+    for my $override (@overrides) {
+        my ($key, $name) = @$override;
+        my $value = env_value($name);
+        $json->{$key} = $value if defined $value;
     }
+    # "false" is what Travis CI gives on a push, which a CI template may pass on as it is.
+    delete $json->{service_pull_request}
+        if defined $ENV{COVERALLS_PULL_REQUEST} && $ENV{COVERALLS_PULL_REQUEST} eq 'false';
 
     return ($json, $endpoint);
 }
@@ -268,6 +423,30 @@ sub _parse_line ($) {
     };
 }
 
+# The branch coverage of a file, in the form of the jobs API: a flat list of four numbers for each
+# branch, its line, its block (the decision on that line, from 0), its branch (0 for the true side
+# of the decision, 1 for the false side) and the times it was taken, as the official
+# coverage-reporter sends LCOV's BRDA. Branches marked uncoverable are left out. $criterion is
+# undef when the branch coverage was not collected (cover -coverage statement).
+sub get_branches {
+    my ($criterion, $lines) = @_;
+
+    my @branches;
+    return \@branches unless $criterion;
+    for my $line (1 .. $lines) {
+        my $decisions = $criterion->location($line) or next;
+        for my $block (0 .. $#$decisions) {
+            my $decision = $decisions->[$block];
+            for my $branch (0 .. $decision->total - 1) {
+                next if $decision->uncoverable($branch);
+                push @branches, $line, $block, $branch, $decision->value($branch) // 0;
+            }
+        }
+    }
+
+    return \@branches;
+}
+
 sub report {
     my ($pkg, $db, $options) = @_;
 
@@ -279,7 +458,10 @@ sub report {
         my $f = $cover->file($file);
         my $c = $f->statement();
 
-        push @sfs, get_source( $file, _parse_line $c );
+        my $sf = get_source( $file, _parse_line $c ) or next;
+        my $branches = get_branches($f->branch, scalar @{ $sf->{coverage} });
+        $sf->{branches} = $branches if @$branches;
+        push @sfs, $sf;
     }
 
     my ($json, $endpoint) = eval { get_config() };
@@ -292,10 +474,13 @@ sub report {
     $json->{git} = apply_ci_git_info($json, eval { get_git_info() } || {});
     $json->{source_files} = \@sfs;
 
-    my $coder = JSON::PP->new->ascii;
+    my $coder = json_encoder();
 
-    my $response = HTTP::Tiny->new( verify_SSL => 1 )
-        ->post_form( $endpoint, { json => $coder->encode($json) } );
+    my ($content_type, $body) = json_file_request($coder->encode($json));
+    my $response = HTTP::Tiny->new( verify_SSL => 1 )->request('POST', $endpoint, {
+        headers => { 'Content-Type' => $content_type },
+        content => $body,
+    });
 
     my ($url, $error) = parse_response($response);
 
@@ -326,7 +511,7 @@ __END__
 
 =head1 NAME
 
-Devel::Cover::Report::Coveralls - coveralls backend for Devel::Cover
+Devel::Cover::Report::Coveralls - Coveralls backend for Devel::Cover
 
 =head1 USAGE
 
@@ -430,13 +615,28 @@ L</COVERALLS_NO_FAIL>.
 
 =head1 DESCRIPTION
 
-L<https://coveralls.io/> is service to publish your coverage stats online with a lot of nice features. This module provides seamless integration with L<Devel::Cover> in your perl projects.
+This module is a report of L<Devel::Cover> that sends the coverage of your Perl project to
+L<Coveralls|https://coveralls.io/>. Run it as C<cover -report coveralls> after the tests, or
+as C<cover -test -report coveralls> to run them too.
+
+It sends the coverage of each line of each source file, with the git commit, branch and
+remotes of the working tree. On the CI services listed in L</USAGE>, it also sends the
+build number, job, branch and pull request the CI service gives.
+
+When L<Devel::Cover> collected the branch coverage (it does by default), it is sent too: how
+many times each side of each decision (C<if>, C<unless>, C<elsif>, the ternary operator and so
+on) was taken. Branches marked C<uncoverable> are left out. The condition coverage of
+Devel::Cover (C<&&>, C<||> and C<//>) is not sent. Whether Coveralls counts branches
+in the coverage of the repository is a setting of the repository on Coveralls.
+
+The report holds the text of every source file. On a large project, install
+L<Cpanel::JSON::XS>: it is used when installed, and makes the report several times faster than
+the pure-Perl L<JSON::PP> used otherwise.
 
 =head1 ENVIRONMENT
 
-Set these environment variables to control the behaviour. Various other
-variables, set by particular CI environments, will be interpreted silently
-and correctly.
+These environment variables change what is sent. The variables that the CI services set are
+read as well; you do not need to set them.
 
 =head2 COVERALLS_REPO_TOKEN
 
@@ -445,9 +645,9 @@ in F<.coveralls.yml>. On GitHub Actions, C<GITHUB_TOKEN> is used when neither is
 
 =head2 COVERALLS_ENDPOINT
 
-If you have an enterprise installation, set this to change from the
-default of C<https://coveralls.io>. The rest of the URL (C</api>, etc)
-won't change, and will be correct.
+The URL of the Coveralls server, for Coveralls Enterprise. The default is
+C<https://coveralls.io>. The report is sent to this URL followed by C</api/v1/jobs>, so give
+it without a path.
 
 =head2 COVERALLS_FLAG_NAME
 
@@ -472,20 +672,57 @@ job fails. Set this to C<true> to exit 0 instead, e.g. when coverage is optional
 pull requests from forks get no repo token. When C<cover> makes several reports, the ones after
 C<coveralls> are not made after a failure, so put C<coveralls> last. Any value other than empty, C<false> and C<0> turns it on.
 
+=head2 COVERALLS_SERVICE_NAME, COVERALLS_SERVICE_NUMBER, COVERALLS_SERVICE_JOB_ID, COVERALLS_SERVICE_JOB_NUMBER, COVERALLS_PULL_REQUEST
+
+Send these as the name of the CI service, the build number, the job ID, the job number and the
+number of the pull request, in place of what is detected from the CI service. On a CI service
+not listed in L</USAGE>, set them to send what the CI service knows. C<COVERALLS_PULL_REQUEST>
+set to C<false> means that the build is not for a pull request.
+
+When no CI service is detected, the build is sent as a manual upload (C<service_event_type>
+C<manual>), unless one of these variables other than C<COVERALLS_PULL_REQUEST> is set, or
+C<COVERALLS_PERL_SERVICE_NAME>: then it is sent as a CI build, without an event type.
+
+=head2 COVERALLS_EVENT_TYPE
+
+Send this as the event type of the build (C<service_event_type>), as the official
+coverage-reporter does.
+
 =head2 COVERALLS_PERL_SERVICE_NAME
 
-Sends this as the name of the CI service, in place of the one detected (e.g. C<github>).
+Another name of C<COVERALLS_SERVICE_NAME>, which wins when both are set.
+
+=head2 COVERALLS_GIT_BRANCH, COVERALLS_GIT_COMMIT
+
+Send these as the branch and the commit ID, in place of the ones detected from the CI service
+and from git.
+
+=head2 GIT_ID, GIT_BRANCH, GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL, GIT_MESSAGE
+
+The commit ID, the branch, the author, the committer and the message of the commit, for a build
+outside a git repository (e.g. from another version control system, or from a tarball). There
+git is not run, and what is not set is not sent. In a git repository, what git says comes first,
+and these only fill in what git does not give: CI jobs often set C<GIT_AUTHOR_NAME> and the
+like for the commits they make, and Jenkins sets C<GIT_BRANCH> to C<origin/E<lt>branchE<gt>>.
+To give the branch or the commit ID in a git repository, use C<COVERALLS_GIT_BRANCH> and
+C<COVERALLS_GIT_COMMIT>.
 
 =head1 SEE ALSO
 
-L<https://coveralls.io/>
-L<https://docs.coveralls.io/>
-L<https://github.com/coagulant/coveralls-python>
-L<Devel::Cover>
+=over
+
+=item * L<Devel::Cover>
+
+=item * L<https://coveralls.io/> and its documentation, L<https://docs.coveralls.io/>
+
+=item * L<https://github.com/coverallsapp/coverage-reporter>, the official reporter of Coveralls.
+This module sends the values it sends on each CI service.
+
+=back
 
 =head2 EXAMPLE
 
-L<https://coveralls.io/github/kan/coveralls-perl>
+The coverage of this module: L<https://coveralls.io/github/kan/coveralls-perl>
 
 =head1 LICENSE
 

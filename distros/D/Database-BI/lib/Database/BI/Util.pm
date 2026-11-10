@@ -3,16 +3,22 @@ package Database::BI::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Exporter qw(import);
 use Readonly;
+use POSIX ();
 
 our @EXPORT_OK = qw( urlencode parse_number iso_datetime minute_stamp iso8601_utc );
 
 # A list rather than any three capitals, or 'SKU 100' would be read as 100.
 Readonly my $CURRENCY_CODES => join '|', qw(AUD BRL CAD CHF CNY DKK EUR GBP HKD INR JPY MXN NOK NZD SEK SGD USD ZAR);
-Readonly my $INFINITY       => 9**9**9;
+# The largest number a chart can use: a C double's, which is what the browser
+# has (parseAccounting refuses what is not isFinite there).  Not perl's own
+# infinity: a perl built with -Duselongdouble or -Dusequadmath holds 1e999 as
+# a finite number, so comparing with infinity let it through on those perls
+# alone (GitHub issue 6).
+Readonly my $LARGEST_NUMBER => POSIX::DBL_MAX();
 
 # A date, or a date and a time with T or a space between them; the time may
 # carry seconds, a fraction of a second, and a zone (Z, or an offset such as
@@ -51,6 +57,9 @@ sub urlencode {
 # separators, a percent sign, currency symbols and a known currency code.  Any
 # other letter stays and fails the match, so 'SKU123' and 'AB-100' are text
 # rather than 123 and -100.  The bracket is read before it is removed.
+# The browser's parseAccounting (layouts/parse_accounting.html.tt) is a copy,
+# so a table sorts the same on the server as on the page: change one, change
+# the other.
 sub parse_number {
 	my $value = $_[0];
 
@@ -64,8 +73,9 @@ sub parse_number {
 
 	my $number = $text + 0;
 
-	# 1e999 spells a number, but infinity is no use to a total or an axis.
-	return undef if abs($number) == $INFINITY;
+	# 1e999 spells a number, but one past a double's range is infinity in the
+	# browser, which is no use to a total or an axis -- on every perl.
+	return undef unless abs($number) <= $LARGEST_NUMBER;
 	return $number;
 }
 
@@ -163,8 +173,9 @@ Read a table cell as a number, or say it is not one.
 =head4 OUTPUT
 
 A number, or C<undef> if the value is missing, empty, holds anything other
-than a number and its currency or thousands formatting, or is too large to be
-finite.
+than a number and its currency or thousands formatting, or lies beyond the
+range of a C double (C<POSIX::DBL_MAX>, about 1.8e308) -- the browser's
+numbers -- whatever kind of number this perl was built with.
 
 =head2 iso_datetime
 

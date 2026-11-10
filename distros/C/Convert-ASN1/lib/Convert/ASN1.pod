@@ -4,7 +4,7 @@ Convert::ASN1 - ASN.1 Encode/Decode library
 
 =head1 VERSION
 
-version 0.34
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,9 @@ is C<utctime>.
 =item utctime
 
 The value returned will be a time value as returned by the C<time> function.
+
+A UTCTime carries a two digit year only, which is interpreted as 19YY for
+values 50 - 99 and as 20YY for values 00 - 49 (RFC 5280 4.1.2.5.1).
 
 =item withzone
 

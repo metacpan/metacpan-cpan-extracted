@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.7.4
+## Version v0.7.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2026/04/24
+## Modified 2026/10/19
 ## All rights reserved.
-## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -60,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.7.4';
+    our $VERSION = 'v0.7.5';
 };
 
 use strict;
@@ -1851,8 +1850,16 @@ sub _make_request_data
     # $content is not a reference and is not empty
     elsif( defined( $content ) && length( $content ) )
     {
-        my $charset = lc( $req->headers->charset // '' );
-        my $ctype   = lc( $type                  // '' );
+        my $charset = $req->headers->charset;
+        if( !defined( $charset ) && $req->headers->error )
+        {
+            warn( "Error getting charset: ", $req->headers->error ) if( $self->_is_warnings_enabled( 'HTTP::Promise' ) );
+        }
+        else
+        {
+            $charset = lc( $charset // '' );
+        }
+        my $ctype = lc( $type // '' );
         my( $ctype_major, $ctype_minor ) = split( /\//, $ctype, 2 ) if( $ctype );
         if( ( substr( $charset, 0, 4 ) eq 'utf8' ||
               substr( $charset, 0, 5 ) eq 'utf-8' ||
@@ -2203,7 +2210,18 @@ sub _read_body_chunked
     my $mime_type = $headers->mime_type( $default_mime );
     $self->_load_class( 'HTTP::Promise::MIME' ) || return( $self->pass_error );
     my $mime = HTTP::Promise::MIME->new;
-    my $ext = $mime->suffix( $mime_type );
+    my $ext;
+    # rfc6839 <https://www.rfc-editor.org/info/rfc6839/>
+    if( index( $mime_type, '+' ) != -1 )
+    {
+        my( $actual_mime, $file_extension ) = split( /\+/, $mime_type, 2 );
+        $ext = $mime->suffix( $actual_mime );
+        $ext = $file_extension unless( defined( $ext ) );
+    }
+    else
+    {
+        $ext = $mime->suffix( $mime_type );
+    }
     return( $self->pass_error( $mime->error ) ) if( !defined( $ext ) );
     $ext ||= 'dat';
     my $enc;
@@ -2380,7 +2398,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.7.4
+    v0.7.5
 
 =head1 DESCRIPTION
 

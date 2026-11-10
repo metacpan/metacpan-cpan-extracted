@@ -50,15 +50,15 @@ It takes these named arguments:
 * `dir` (default `.`): The directory to list.  Trailing slashes are removed, but `/` stays `/`.  A `dir` that is a symbolic link to a directory is listed through the link, recursively or not.
 * `regex` (default `.`): A pattern the base name must match, given as a string or a `qr//`.  An invalid pattern dies, naming it.
 * `tests` (default `f`): One or more of perl's file tests, as letters: `rwxoRWXOezsfdlpSbcugkTB`.  Every one must pass.  `'d'` lists directories; `''` applies no test at all.
-* `recursive` (default `0`): `1` descends into subdirectories, through `File::Find`, without following symbolic links.
+* `recursive` (default `0`): `1` descends into subdirectories, without following symbolic links.
 * `cpu` (default `1`): For a recursive listing, the number of worker processes (through `Parallel::ForkManager`).  Ignored when `recursive` is `0`.
 * `on_match` (no default): A code reference called with each path as it is found; `dir` then returns an empty list, so a very large tree is never held in memory.
 
 The file tests share one `stat` per path, so asking for four of them costs no more than asking for one.  `-l` is checked first, with `lstat`.
 
-With `cpu` greater than 1, `dir` walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  `on_match` still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.
+With `cpu` greater than 1, `dir` walks the tree breadth-first until one level holds four directories per worker, then shares those directories out.  The results are the same as a serial walk, in a different order.  `on_match` still runs in the calling process, so it can change the caller's variables, but it is called once a worker's whole batch arrives rather than as each file is found.  A worker leaves without running the program's `END` blocks or destructors, except on Windows, where it is a thread of the calling process.
 
-An unknown argument, an undefined `tests`, `dir`, `regex` or `cpu`, a letter that is not a file test, a `cpu` that is not a positive integer, an `on_match` that is not a code reference, and a directory that cannot be opened all die.
+An unknown argument, an undefined `tests`, `dir`, `regex` or `cpu`, a letter that is not a file test, a `cpu` that is not a positive integer, an `on_match` that is not a code reference, and a directory that cannot be opened, whether `dir` itself or one a recursive listing meets, all die.
 
 ## execute
 
@@ -83,7 +83,7 @@ The command's standard input is an empty pipe.  A command that would prompt -- `
 
     my $text = file2string('notes.txt');
 
-Returns the whole of a file as one string, read without any decoding layer.  A file that cannot be opened dies, naming it.
+Returns the whole of a file as one string, read without any decoding layer.  A file that cannot be opened or read, such as a directory, dies, naming it.
 
 ## format_commas
 
@@ -105,7 +105,7 @@ Reads a JSON file and returns the decoded data, through `JSON::MaybeXS`.  Python
 
     ref_to_json_file($data, 'results.json');   # prints "Wrote results.json"
 
-Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
+Writes a data structure to a file as JSON, through `JSON::MaybeXS`, prints `Wrote` and the file name, and returns the file name.  The name is colored by the rule `structure`'s `color => 'auto'` follows: when `STDOUT` is a terminal, or `CLICOLOR_FORCE` is set, and `NO_COLOR` is not.  The file name must be a plain string; a reference dies, and so does a write that fails, such as on a full disk, before anything is printed.
 
 ## random_key, random_value
 

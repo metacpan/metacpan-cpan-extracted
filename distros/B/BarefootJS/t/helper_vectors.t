@@ -6,8 +6,9 @@ use File::Spec;
 use JSON::PP ();
 use Scalar::Util qw(looks_like_number);
 
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/lib";
 use BarefootJS;
+use VectorUndefined ();
 
 # vectors.json is UTF-8 (string args like "café"; `≡` in some notes). Decode it
 # as UTF-8 (below) and route TAP through a UTF-8 layer so wide test names don't
@@ -118,9 +119,9 @@ my %bindings = (
     index_of      => sub { $bf->index_of(@_) },
     last_index_of => sub { $bf->last_index_of(@_) },
     concat        => sub { $bf->concat(@_) },
-    # The Mojo emit always passes three value args (`undef` for an
-    # absent end) — mirror that exact shape.
-    slice   => sub { $bf->slice($_[0], $_[1], $_[2]) },
+    # The adapters pass an omitted end as `bf->undefined`, which the helper
+    # reads as omitted; an omitted argument here is omitted too.
+    slice   => sub { $bf->slice(@_) },
     reverse => sub { $bf->reverse($_[0]) },
     flat    => sub { $bf->flat(@_) },
     flat_dynamic => sub { $bf->flat_dynamic(@_) },
@@ -132,7 +133,7 @@ my %bindings = (
     filter_truthy => sub { [grep { $bf->truthy($_) } @{ $_[0] }] },
 
     # searchParams().get(key) (#1922) via the lazy factory consumers use.
-    # No divergence entry: get() returns undef for an absent key (~ JS null)
+    # No divergence entry: get() returns undef for an absent key (JS null)
     # and '' for present-but-empty, so the Perl backend matches JS exactly.
     search_params_get => sub { BarefootJS->search_params($_[0])->get($_[1]) },
 
@@ -274,6 +275,7 @@ done_testing;
 # branch is exercised, not just its ISO-string branch.
 sub normalize_arg {
     my ($v) = @_;
+    return VectorUndefined::arg() if VectorUndefined::is_sentinel($v);
     return [ map { normalize_arg($_) } @$v ] if ref $v eq 'ARRAY';
     if (ref $v eq 'HASH') {
         my @keys = keys %$v;
@@ -289,6 +291,7 @@ sub normalize_arg {
 # numbers numerically, arrays/hashes recursively.
 sub _match {
     my ($got, $expect) = @_;
+    return VectorUndefined::runtime_undefined($got) if VectorUndefined::is_sentinel($expect);
     return !defined $got if !defined $expect;
     if (ref $expect eq 'HASH' && exists $expect->{'$num'}) {
         my $kind = $expect->{'$num'};

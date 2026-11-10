@@ -46,11 +46,11 @@ Ekorn::Pipeline::Stop - end a pipeline early
 =head1 DESCRIPTION
 
 A stop is the exception that ends a pipeline early and quietly. The
-rest of the stage that throws it doesn't run. The values already out of
-the pipeline are kept, the values the stop carries go on through the
-stages after it, and nothing else is processed. Stages after the one
-that stopped, made with L<Ekorn::Pipeline::Gather>, still have their
-end functions called.
+rest of the stage that throws it doesn't run. The values already out
+of the pipeline are kept, and the values the stop carries go on
+through the stages after it. Nothing else is processed. Stages after
+the one that stopped still have their end functions called, if they
+were made with L<Ekorn::Pipeline::Gather>.
 
 =head1 FUNCTIONS
 
@@ -61,7 +61,7 @@ end functions called.
 
 Throws a stop carrying C<@values>, the last values of the stage that
 throws it. It's the same as
-C<< Ekorn::Pipeline::Stop->throw(@values) >>, and is exported by
+C<< Ekorn::Pipeline::Stop->throw(@values) >>. It's exported by
 default.
 
 To keep it out of your namespace:
@@ -76,8 +76,9 @@ To keep it out of your namespace:
     Ekorn::Pipeline::Stop->throw(@values);
     My::Stop->throw(@values);
 
-Throws a stop carrying C<@values>, blessed into the class it was called
-on, so a subclass of Ekorn::Pipeline::Stop throws one of its own.
+Throws a stop carrying C<@values>, blessed into the class it was
+called on. A subclass of Ekorn::Pipeline::Stop throws a stop of its
+own class.
 
 =head1 THE STOP
 
@@ -87,20 +88,20 @@ is that class, and the rest are the values it was thrown with:
     eval { Ekorn::Pipeline::Stop->throw(1, 2) };
     my $stop = $@;    # bless ['Ekorn::Pipeline::Stop', 1, 2], 'Ekorn::Pipeline::Stop'
 
-A pipeline sends the values on through the stages after the one that
+A pipeline sends those values on through the stages after the one that
 threw it, as that stage's last values.
 
-As a string, a stop is "Stop used outside a pipeline", with a newline,
-which is what a user sees if one is thrown with nothing to catch it.
+As a string, a stop is "Stop used outside a pipeline", with a newline.
+That's what a user sees if one is thrown with nothing to catch it.
 
-A stop that isn't an array, made without C<throw>, as by blessing a
-hash into the class, still stops the pipeline, but carries nothing.
+A stop that isn't an array, made without C<throw> (by blessing a hash
+into the class, say), still stops the pipeline, but carries nothing.
 
 =head2 Catching errors in a stage
 
 A pipeline recognises a stop with C<isa>, so a subclass of
 Ekorn::Pipeline::Stop stops it too. A stage that catches errors
-itself, with C<eval> or C<try>, should throw a stop on again:
+itself, with C<eval> or C<try>, should throw a stop again:
 
     sub ($value) {
         try { ... }

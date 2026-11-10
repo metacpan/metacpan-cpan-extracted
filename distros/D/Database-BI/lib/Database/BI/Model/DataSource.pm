@@ -6,13 +6,14 @@ use autodie qw(:all);
 
 use Carp		qw(croak carp);
 use File::Spec		();
+use Database::BI::I18N ();
 use Readonly;
 use Scalar::Util	qw(blessed);
 use Sub::Protected;
 use Params::Validate::Strict qw(validate_strict);
 use Params::Get		();
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 =head1 NAME
 
@@ -20,7 +21,7 @@ Database::BI::Model::DataSource - Table-agnostic adapter around Database::Abstra
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 
@@ -304,6 +305,13 @@ Readonly my $MARIADB_CONNECT_TIMEOUT => 5;
 # Text::CSV's error_diag code for the plain end of a file.
 Readonly my $CSV_EOF => 2012;
 
+# count() remembers each file table's row count until the file changes (see
+# _count_key): a SQLite table paged in SQL shows its number of pages, and a
+# COUNT(*) on every page of a big file would cost what the N+1 paging saves.
+# Emptied when it reaches $COUNT_MEMO_MAX entries.
+my %COUNT_MEMO;
+Readonly my $COUNT_MEMO_MAX => 256;
+
 # The extensions D::A looks for before .json; a file with one of them is the
 # table, and a .json beside it is not read.
 Readonly my @NON_JSON_EXT => qw(sql sqlite sqlite3 db psv tsv xls xlsx csv xml);
@@ -358,7 +366,7 @@ sub _url_label {
 # so that a caller-supplied i18n object can override the built-in strings.
 sub _fmt :Protected {
 	my ($key, @args) = @_;
-	my $tmpl = $MESSAGES{$key} // "Internal error: unknown message key '$key'";
+	my $tmpl = Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $key) // "Internal error: unknown message key '$key'";
 	return @args ? sprintf($tmpl, @args) : $tmpl;
 }
 
@@ -842,7 +850,35 @@ sub _new_from_mariadb :Protected {
 # Protected initialisation
 # ---------------------------------------------------------------------------
 
-# _best_id_column($fh, $sep, \@header_fields) -> $column_name | undef
+# _csv_escape_char($path) -> '"' | '\\'
+#
+# Purpose: The escape character a delimited file is written with, chosen as
+#          Database::Abstraction (>= 0.56) chooses it, so this module parses a
+#          file as D::A will.
+# Entry:   $path names a CSV, TSV or PSV file.
+# Exit:    '\\' when the file holds a backslash before a quote anywhere (or
+#          will not open); else '"' when it holds two quotes in a row (RFC
+#          4180's "Adeste ""Overture"""); else '\\'.
+sub _csv_escape_char {
+	my ($path) = @_;
+	local ($@, $!);
+	local $/ = "\n";
+
+	my $fh;
+	{ no autodie 'open'; open($fh, '<:raw', $path) or return '\\' }
+	my $doubled = 0;
+	while (my $line = <$fh>) {
+		if ($line =~ /\\"/) {
+			close $fh;
+			return '\\';
+		}
+		$doubled ||= ($line =~ /""/);
+	}
+	close $fh;
+	return $doubled ? '"' : '\\';
+}
+
+# _best_id_column($fh, $sep, \@header_fields, $escape) -> $column_name | undef
 #
 # Purpose: The column Database::Abstraction should key rows on.
 # Entry:   $fh is open just after the header line; @header_fields is the header
@@ -852,17 +888,18 @@ sub _new_from_mariadb :Protected {
 #          (an empty cell, or one starting with '#', which D::A reads as a
 #          comment), the earliest on a tie; undef when no header name is safe.
 #          Reads $fh to its end.  The file is parsed as D::A's slurp parses it
-#          (escape_char '\\'), or a row like "Joe\"s Bar" would end the count
-#          there; a line that still will not parse is skipped, not the end.
+#          (with $escape, from _csv_escape_char), or a row like "Joe\"s Bar"
+#          would end the count there; a line that still will not parse is
+#          skipped, not the end.
 sub _best_id_column {
-	my ($fh, $sep, $fields) = @_;
+	my ($fh, $sep, $fields, $escape) = @_;
 
 	my @safe = grep { defined($fields->[$_]) && $fields->[$_] =~ $TABLE_NAME_RE } 0 .. $#{$fields};
 	return undef unless @safe;
 
 	require Text::CSV;
 	my $csv = Text::CSV->new({
-		binary => 1, sep_char => $sep, escape_char => '\\',
+		binary => 1, sep_char => $sep, escape_char => $escape // '\\',
 		allow_loose_quotes => 1, allow_whitespace => 1,
 	});
 	my %dropped = map { $_ => 0 } @safe;
@@ -1028,7 +1065,7 @@ sub _detect_file_info :Protected {
 		# rows that had none.  D::A reads the whole file anyway (max_slurp_size
 		# is the file's size), so one more pass costs no more than that.  With
 		# no data rows, the first safe column in the header.
-		my $safe_id = _best_id_column($fh, $sep, \@fields);
+		my $safe_id = _best_id_column($fh, $sep, \@fields, _csv_escape_char($path));
 
 		# If no safe identifier was found in the header, check whether the first
 		# row looks like data values rather than column names.  A CSV exported
@@ -1489,17 +1526,19 @@ sub _synthesize_col_names {
 #          last value, so an unquoted comma in a description is not lost.
 #          D::A drops a row whose id is empty or starts with '#', so the id is
 #          the column with the fewest such values, and normally has none.
-#          The reader takes RFC 4180 quoting; the writer escapes as D::A's
-#          reader expects, which is with a backslash.
+#          The copy is read and written with the escape the file uses
+#          (_csv_escape_char), so D::A, which chooses the same way, reads the
+#          copy with it too.
 sub _copy_with_header :Protected {
 	my ($self, $headerless, $names, $sep, $stem) = @_;
 	require File::Temp;
 	require Text::CSV;
 
-	my $tmp  = File::Temp->newdir(CLEANUP => 1);
-	my $copy = File::Spec->catfile("$tmp", "$stem.$headerless->{ext}");
-	my $in   = Text::CSV->new({ binary => 1, sep_char => $sep, allow_loose_quotes => 1 });
-	my $out  = Text::CSV->new({ binary => 1, sep_char => $sep, eol => "\n", escape_char => '\\' });
+	my $tmp    = File::Temp->newdir(CLEANUP => 1);
+	my $copy   = File::Spec->catfile("$tmp", "$stem.$headerless->{ext}");
+	my $escape = _csv_escape_char($headerless->{path});
+	my $in     = Text::CSV->new({ binary => 1, sep_char => $sep, allow_loose_quotes => 1, escape_char => $escape });
+	my $out    = Text::CSV->new({ binary => 1, sep_char => $sep, eol => "\n", escape_char => $escape });
 
 	open my $ifh, '<:raw', $headerless->{path};
 	open my $ofh, '>:raw', $copy;
@@ -2703,11 +2742,11 @@ sources (SQLite, large CSV via DBD::CSV) it delegates to
 C<Database::Abstraction::count()>, which issues a
 C<SELECT COUNT(*) FROM E<lt>tableE<gt>> query against the file.
 
-B<Warning: do not call C<count()> on a very large SQLite file> if you
-only need to know whether a next page exists.  The pagination controller
-uses the N+1 trick (fetch C<per_page + 1> rows via C<limit/offset>)
-specifically to avoid a C<COUNT(*)> on multi-gigabyte databases, which
-can block the server for minutes.
+The count of a file's table is remembered for the life of the process, keyed
+by the file, the table, and the file's modification time and size, so asking
+again costs nothing until the file changes.  A URL or MariaDB source is counted
+on every call.  The first count of a very large SQLite file still reads the
+whole table.
 
 =head3 API SPECIFICATION
 
@@ -2730,7 +2769,31 @@ sub count {
 	local ($@, $!);	# the backend opens lazily, and uses both on the way
 	local $/ = "\n";	# a caller's slurp mode (undef $/) read the file as one line: 0 rows
 	return 0 if $self->{_file_is_empty};
-	return $self->{_db}->count();
+
+	my $key = $self->_count_key;
+	return $COUNT_MEMO{$key} if defined $key && exists $COUNT_MEMO{$key};
+
+	my $n = $self->{_db}->count();
+	if (defined $key) {
+		%COUNT_MEMO = () if keys(%COUNT_MEMO) >= $COUNT_MEMO_MAX;
+		$COUNT_MEMO{$key} = $n;
+	}
+	return $n;
+}
+
+# _count_key( $self ) -> $key | undef
+#
+# What count() remembers its answer under: the file, the table in it, and the
+# file's mtime and size, so a changed file is counted again.  undef (count every
+# time) for a URL or a database server, which have no file to stat.
+sub _count_key {
+	my $self = shift;
+	return undef if defined $self->{_url} || defined $self->{_mariadb};
+	my $file = $self->{_file_path};
+	return undef unless defined $file;
+	my @st = stat $file;
+	return undef unless @st;
+	return join "\0", $file, $self->{_table} // '', $self->{_internal_table} // '', $st[9], $st[7];
 }
 
 1;

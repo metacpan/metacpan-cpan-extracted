@@ -11,4 +11,5 @@ cpanfile
 dist.ini
 lib/Data/TagListMatcher.pm
 t/01_load.t
+t/02_basic.t
 xt/author/pod-syntax.t

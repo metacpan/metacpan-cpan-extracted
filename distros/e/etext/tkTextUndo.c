@@ -25,8 +25,10 @@ static void		PushAtom _ANSI_ARGS_((TkTextUndoAtom **stackPtr,
 			    TkTextUndoAtom *atomPtr));
 static TkTextUndoAtom *	PopAtom _ANSI_ARGS_((TkTextUndoAtom **stackPtr));
 static int		InsertSeparator _ANSI_ARGS_((TkTextUndoAtom **stackPtr));
-static void		FreeAtom _ANSI_ARGS_((TkTextUndoAtom *atomPtr));
-static void		ClearStack _ANSI_ARGS_((TkTextUndoAtom **stackPtr));
+static void		FreeAtom _ANSI_ARGS_((TkTextUndoStack *undoPtr,
+			    TkTextUndoAtom *atomPtr));
+static void		ClearStack _ANSI_ARGS_((TkTextUndoStack *undoPtr,
+			    TkTextUndoAtom **stackPtr));
 
 /*
  *----------------------------------------------------------------------
@@ -34,7 +36,9 @@ static void		ClearStack _ANSI_ARGS_((TkTextUndoAtom **stackPtr));
  * PushAtom, PopAtom, InsertSeparator, FreeAtom, ClearStack --
  *
  *	The elementary operations on one stack (a linked list whose
- *	head is the top).
+ *	head is the top).  The values an atom holds (see TkTextValue)
+ *	go to the widget's list of values to free when the widget
+ *	command ends: an atom is discarded in the middle of a command.
  *
  *----------------------------------------------------------------------
  */
@@ -74,12 +78,22 @@ InsertSeparator(stackPtr)
     atomPtr->string = NULL;
     atomPtr->list = NULL;
     atomPtr->remains = 0;
+    atomPtr->cuts = NULL;
+    atomPtr->numHeads = atomPtr->numTails = 0;
+    atomPtr->levels = NULL;
+    atomPtr->numLevels = 0;
+    atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
+    atomPtr->ranges = NULL;
+    TkTextDataInit(atomPtr->data);
+    atomPtr->values = NULL;
+    atomPtr->displaced = NULL;
     PushAtom(stackPtr, atomPtr);
     return 1;
 }
 
 static void
-FreeAtom(atomPtr)
+FreeAtom(undoPtr, atomPtr)
+    TkTextUndoStack *undoPtr;		/* The stacks the atom was on. */
     TkTextUndoAtom *atomPtr;		/* Atom to release. */
 {
     if (atomPtr->string != NULL) {
@@ -88,17 +102,49 @@ FreeAtom(atomPtr)
     if (atomPtr->list != NULL) {
 	Tcl_DecrRefCount(atomPtr->list);
     }
+    if (atomPtr->cuts != NULL) {
+	ckfree((char *) atomPtr->cuts);
+    }
+    if (atomPtr->levels != NULL) {
+	ckfree((char *) atomPtr->levels);
+    }
+    if (atomPtr->ranges != NULL) {
+	ckfree(atomPtr->ranges);
+    }
+    if (!TkTextDataIsEmpty(atomPtr->data)) {
+	/*
+	 * The instance data of a block insert's block (its head is at
+	 * index1), kept by the undo for the redo.
+	 */
+
+	Tcl_Obj *where = NULL;
+
+	if (TkTextVcOn(undoPtr->textPtr)) {
+	    where = Tcl_NewListObj(0, NULL);
+	    Tcl_ListObjAppendElement(NULL, where,
+		    Tcl_NewStringObj(atomPtr->index1, -1));
+	}
+	TkTextDiscardValueAt(undoPtr->textPtr, atomPtr->data,
+		TK_TEXT_VC_BLOCK, where);
+    }
+    if (atomPtr->values != NULL) {
+	TkTextDiscardValueList(undoPtr->textPtr, atomPtr->values);
+    }
+    if (atomPtr->displaced != NULL) {
+	TkTextDiscardValueList(undoPtr->textPtr, atomPtr->displaced);
+    }
     ckfree((char *) atomPtr);
 }
 
 static void
-ClearStack(stackPtr)
-    TkTextUndoAtom **stackPtr;		/* The stack. */
+ClearStack(undoPtr, stackPtr)
+    TkTextUndoStack *undoPtr;		/* The stacks. */
+    TkTextUndoAtom **stackPtr;		/* The stack to empty. */
 {
     TkTextUndoAtom *atomPtr;
 
     while ((atomPtr = PopAtom(stackPtr)) != NULL) {
-	FreeAtom(atomPtr);
+	FreeAtom(undoPtr, atomPtr);
     }
 }
 
@@ -124,6 +170,7 @@ TkTextUndoInitStack(maxdepth)
     stackPtr->redoStack = NULL;
     stackPtr->maxdepth = maxdepth;
     stackPtr->depth = 0;
+    stackPtr->textPtr = NULL;
     return stackPtr;
 }
 
@@ -131,8 +178,8 @@ void
 TkTextUndoClearStacks(stackPtr)
     TkTextUndoStack *stackPtr;		/* The stacks. */
 {
-    ClearStack(&stackPtr->undoStack);
-    ClearStack(&stackPtr->redoStack);
+    ClearStack(stackPtr, &stackPtr->undoStack);
+    ClearStack(stackPtr, &stackPtr->redoStack);
     stackPtr->depth = 0;
 }
 
@@ -198,7 +245,7 @@ TkTextUndoSetDepth(stackPtr, maxdepth)
     } else {
 	prevPtr->nextPtr = NULL;
     }
-    ClearStack(&atomPtr);
+    ClearStack(stackPtr, &atomPtr);
     stackPtr->depth = maxdepth;
 }
 
@@ -238,7 +285,8 @@ TkTextUndoInsertUndoSeparator(stackPtr)
  *	stack is emptied: there is nothing to redo after a new change.
  *
  * Results:
- *	None.
+ *	The new atom (where the caller records the values the change
+ *	drops, see TkTextValue).
  *
  * Side effects:
  *	Memory is allocated; the atom owns the string from now on.
@@ -246,7 +294,7 @@ TkTextUndoInsertUndoSeparator(stackPtr)
  *----------------------------------------------------------------------
  */
 
-void
+TkTextUndoAtom *
 TkTextUndoPushAction(stackPtr, type, index1, index2, string, list, listIndex,
 	remains)
     TkTextUndoStack *stackPtr;		/* The stacks. */
@@ -279,8 +327,18 @@ TkTextUndoPushAction(stackPtr, type, index1, index2, string, list, listIndex,
     atomPtr->string = string;
     atomPtr->list = list;
     atomPtr->remains = remains;
+    atomPtr->cuts = NULL;
+    atomPtr->numHeads = atomPtr->numTails = 0;
+    atomPtr->levels = NULL;
+    atomPtr->numLevels = 0;
+    atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
+    atomPtr->ranges = NULL;
+    TkTextDataInit(atomPtr->data);
+    atomPtr->values = NULL;
+    atomPtr->displaced = NULL;
     PushAtom(&stackPtr->undoStack, atomPtr);
-    ClearStack(&stackPtr->redoStack);
+    ClearStack(stackPtr, &stackPtr->redoStack);
+    return atomPtr;
 }
 
 /*
@@ -314,7 +372,7 @@ TkTextUndoRevert(textPtr)
 	return TCL_ERROR;
     }
     if (atomPtr->type == TK_TEXT_UNDO_SEPARATOR) {
-	FreeAtom(atomPtr);
+	FreeAtom(stackPtr, atomPtr);
 	atomPtr = PopAtom(&stackPtr->undoStack);
     }
     while ((atomPtr != NULL) && (atomPtr->type != TK_TEXT_UNDO_SEPARATOR)) {
@@ -323,7 +381,7 @@ TkTextUndoRevert(textPtr)
 	atomPtr = PopAtom(&stackPtr->undoStack);
     }
     if (atomPtr != NULL) {
-	FreeAtom(atomPtr);		/* The separator just passed. */
+	FreeAtom(stackPtr, atomPtr);		/* The separator just passed. */
     }
     InsertSeparator(&stackPtr->redoStack);
     stackPtr->depth--;
@@ -343,7 +401,7 @@ TkTextUndoApply(textPtr)
 	return TCL_ERROR;
     }
     if (atomPtr->type == TK_TEXT_UNDO_SEPARATOR) {
-	FreeAtom(atomPtr);
+	FreeAtom(stackPtr, atomPtr);
 	atomPtr = PopAtom(&stackPtr->redoStack);
     }
     while ((atomPtr != NULL) && (atomPtr->type != TK_TEXT_UNDO_SEPARATOR)) {
@@ -352,7 +410,7 @@ TkTextUndoApply(textPtr)
 	atomPtr = PopAtom(&stackPtr->redoStack);
     }
     if (atomPtr != NULL) {
-	FreeAtom(atomPtr);
+	FreeAtom(stackPtr, atomPtr);
     }
     InsertSeparator(&stackPtr->undoStack);
     stackPtr->depth++;

@@ -11,7 +11,7 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
-static char sccsid[] = "@(#) tkTextMark.c 1.11 95/06/28 10:42:39";
+/* @(#) tkTextMark.c 1.11 95/06/28 10:42:39 */
 
 #include "pperl.h"
 #include "tkInt.h"
@@ -119,7 +119,53 @@ TkTextMarkCmd(textPtr, interp, argc, args)
     }
     c = LangString(args[2])[0];
     length = strlen(LangString(args[2]));
-    if ((c == 'g') && (strncmp(LangString(args[2]), "gravity", length) == 0)) {
+    if ((c == 'd') && (strncmp(LangString(args[2]), "data", length) == 0)) {
+	/*
+	 * The mark's value, the Lang part of its data: a copy of the
+	 * scalar, kept until it is replaced, the mark is unset or the
+	 * widget goes; the old value is freed when the widget command
+	 * ends (see TkTextValue).  Undef removes only the Lang part.
+	 */
+
+	if ((argc != 4) && (argc != 5)) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " mark data markName ?value?\"",
+		    NULL);
+	    return TCL_ERROR;
+	}
+	hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
+	if (hPtr == NULL) {
+	    Tcl_AppendResult(interp, "there is no mark named \"",
+		    LangString(args[3]), "\"", NULL);
+	    return TCL_ERROR;
+	}
+	markPtr = (TkTextSegment *) Tcl_GetHashValue(hPtr);
+	if (argc == 4) {
+	    Arg copy = TkTextDataCopyLang(markPtr->body.mark.value);
+
+	    if (copy != NULL) {
+		Tcl_SetObjResult(interp, copy);
+	    }
+	} else {
+	    Arg old;
+
+	    if (TkTextVcOn(textPtr)
+		    && (TkTextDataGetLang(markPtr->body.mark.value) != NULL)) {
+		TkTextIndex index;
+
+		TkTextMarkSegToIndex(textPtr, markPtr, &index);
+		TkTextVcPredict(textPtr, markPtr->body.mark.value,
+			TK_TEXT_VC_DROP, TK_TEXT_VC_MARK,
+			TkTextVcMarkPlace(textPtr, LangString(args[3]),
+				&index), NULL);
+		TkTextVcNotify(textPtr);
+	    }
+	    old = TkTextDataPutLang(&markPtr->body.mark.value,
+		    SvOK((SV *) args[4]) ? LangCopyArg(args[4]) : NULL);
+
+	    TkTextFreeValueLater(textPtr, TkTextDataFromLang(old));
+	}
+    } else if ((c == 'g') && (strncmp(LangString(args[2]), "gravity", length) == 0)) {
 	if (argc > 5) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
 		    LangString(args[0]), " mark gravity markName ?gravity?",
@@ -201,15 +247,28 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 			|| (markPtr == textPtr->currentMarkPtr)) {
 		    continue;
 		}
+		if (TkTextVcOn(textPtr)
+			&& (TkTextDataGetLang(markPtr->body.mark.value)
+				!= NULL)) {
+		    TkTextIndex index;
+
+		    TkTextMarkSegToIndex(textPtr, markPtr, &index);
+		    TkTextVcPredict(textPtr, markPtr->body.mark.value,
+			    TK_TEXT_VC_DROP, TK_TEXT_VC_MARK,
+			    TkTextVcMarkPlace(textPtr, LangString(args[i]),
+				    &index), NULL);
+		    TkTextVcNotify(textPtr);
+		}
 		TkBTreeUnlinkSegment(textPtr->tree, markPtr,
 			markPtr->body.mark.linePtr);
 		Tcl_DeleteHashEntry(hPtr);
+		TkTextFreeValueLater(textPtr, markPtr->body.mark.value);
 		ckfree((char *) markPtr);
 	    }
 	}
     } else {
 	Tcl_AppendResult(interp, "bad mark option \"", LangString(args[2]),
-		"\": must be gravity, names, next, previous, set, or unset",
+		"\": must be data, gravity, names, next, previous, set, or unset",
 		         NULL);
 	return TCL_ERROR;
     }
@@ -274,6 +333,8 @@ TkTextSetMark(textPtr, name, indexPtr)
 	markPtr->body.mark.textPtr = textPtr;
 	markPtr->body.mark.linePtr = indexPtr->linePtr;
 	markPtr->body.mark.hPtr = hPtr;
+	TkTextDataInit(markPtr->body.mark.value);	/* A new mark starts
+							 * without data. */
 	Tcl_SetHashValue(hPtr, markPtr);
     }
     TkBTreeLinkSegment(markPtr, indexPtr);
@@ -687,7 +748,6 @@ MarkFindNext(interp, textPtr, string)
 	for ( ; segPtr != NULL ; segPtr = segPtr->nextPtr) {
 	    if (segPtr->typePtr == &tkTextRightMarkType ||
 		    segPtr->typePtr == &tkTextLeftMarkType) {
-		      found:
 		Tcl_SetResult(interp, Tcl_GetHashKey(&textPtr->markTable, segPtr->body.mark.hPtr), TCL_STATIC);
 
 
@@ -739,7 +799,7 @@ MarkFindPrev(interp, textPtr, string)
     TkTextIndex index;
     Tcl_HashEntry *hPtr;
     register TkTextSegment *segPtr, *seg2Ptr, *prevPtr, *prevPtr2 = NULL;
-    int offset, reached = 0;
+    int offset;
 
 
     hPtr = Tcl_FindHashEntry(&textPtr->markTable, string);

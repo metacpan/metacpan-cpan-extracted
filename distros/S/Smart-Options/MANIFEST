@@ -1,8 +1,9 @@
 Build.PL
-Changes
+CHANGELOG.md
 LICENSE
 META.json
 README.md
+SECURITY.md
 cpanfile
 lib/Smart/Options.pm
 lib/Smart/Options/Declare.pm
@@ -17,7 +18,6 @@ t/06_type.t
 t/07_coerce.t
 t/08_config.t
 t/09_env.t
-t/Utils.pm
 t/declare/01_basic.t
 t/declare/02_type.t
 t/declare/03_required.t
@@ -29,6 +29,5 @@ t/declare/08_alias.t
 t/declare/09_names_with_underscore.t
 t/declare/10_help.t
 t/declare/11_coerce.t
-xt/02_perlcritic.t
 META.yml
 MANIFEST

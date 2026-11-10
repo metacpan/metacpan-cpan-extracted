@@ -4,6 +4,10 @@ use utf8;
 use Test::More;
 
 use FindBin;
+use Cwd ();
+use Digest::MD5 ();
+use JSON::PP qw(decode_json);
+use File::Basename ();
 use File::Temp ();
 use Devel::Cover::Report::Coveralls;
 
@@ -26,6 +30,11 @@ my @CI_VARS = qw(
     GITHUB_REF GITHUB_REF_NAME GITHUB_HEAD_REF GITHUB_EVENT_PATH
     COVERALLS_REPO_TOKEN COVERALLS_ENDPOINT COVERALLS_FLAG_NAME COVERALLS_PARALLEL
     COVERALLS_PERL_SERVICE_NAME COVERALLS_NO_FAIL
+    COVERALLS_SERVICE_NAME COVERALLS_SERVICE_NUMBER COVERALLS_SERVICE_JOB_ID
+    COVERALLS_SERVICE_JOB_NUMBER COVERALLS_PULL_REQUEST COVERALLS_GIT_BRANCH COVERALLS_GIT_COMMIT
+    COVERALLS_EVENT_TYPE
+    GIT_ID GIT_BRANCH GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+    GIT_MESSAGE
 );
 
 subtest 'get_config (travis)' => sub {
@@ -154,10 +163,16 @@ subtest 'get_config azure' => sub {
 
     is $got->{service_name}, 'azure-pipelines', 'config service_name';
     is $got->{service_number}, '123456789', 'config service_number';
+    is $got->{service_branch}, 'feature', 'config service_branch';
     is $endpoint, $normal_endpoint;
 
-    $got = Devel::Cover::Report::Coveralls::get_git_info();
-    is $got->{branch}, 'feature', 'git branch';
+    my $git = Devel::Cover::Report::Coveralls::apply_ci_git_info($got,
+        Devel::Cover::Report::Coveralls::get_git_info());
+    is $git->{branch}, 'feature', 'the branch of Azure Pipelines over the one of git';
+
+    local $ENV{COVERALLS_GIT_BRANCH} = 'from-env';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_branch}, 'from-env', 'COVERALLS_GIT_BRANCH over BUILD_SOURCEBRANCHNAME';
 };
 
 subtest 'get_config drone' => sub {
@@ -184,6 +199,169 @@ subtest 'get_config local' => sub {
     is $got->{service_name}, 'coveralls-perl', 'config service_name';
     is $got->{service_event_type}, 'manual', 'config service_event_type';
     is $endpoint, $normal_endpoint;
+
+    for my $name (qw(
+        COVERALLS_SERVICE_NAME COVERALLS_PERL_SERVICE_NAME COVERALLS_SERVICE_NUMBER
+        COVERALLS_SERVICE_JOB_ID COVERALLS_SERVICE_JOB_NUMBER
+    )) {
+        local $ENV{$name} = 'buildkite';
+        ($got) = Devel::Cover::Report::Coveralls::get_config();
+        ok !exists $got->{service_event_type}, "not manual with $name";
+    }
+    {
+        local $ENV{COVERALLS_SERVICE_NAME} = '';
+        ($got) = Devel::Cover::Report::Coveralls::get_config();
+        is $got->{service_event_type}, 'manual', 'still manual with an empty COVERALLS_SERVICE_NAME';
+    }
+    {
+        local $ENV{COVERALLS_EVENT_TYPE} = '';
+        ($got) = Devel::Cover::Report::Coveralls::get_config();
+        is $got->{service_event_type}, 'manual', 'an empty COVERALLS_EVENT_TYPE is not an override';
+    }
+    {
+        local $ENV{GITHUB_ACTIONS} = 'true';
+        local $ENV{COVERALLS_EVENT_TYPE} = 'push';
+        ($got) = Devel::Cover::Report::Coveralls::get_config();
+        is $got->{service_name}, 'github', 'a detected CI service';
+        is $got->{service_event_type}, 'push', 'COVERALLS_EVENT_TYPE on a detected CI service';
+    }
+
+    local $ENV{COVERALLS_EVENT_TYPE} = 'push';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_event_type}, 'push', 'COVERALLS_EVENT_TYPE';
+    local $ENV{COVERALLS_SERVICE_NAME} = 'buildkite';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_event_type}, 'push', 'COVERALLS_EVENT_TYPE with a service name';
+};
+
+subtest 'get_config overrides from the environment' => sub {
+    local @ENV{@CI_VARS};
+    local $ENV{COVERALLS_REPO_TOKEN} = 'abcdef';
+    local $ENV{GITHUB_ACTIONS} = 'true';
+    local $ENV{GITHUB_RUN_ID} = '111';
+    local $ENV{GITHUB_JOB} = 'test';
+    local $ENV{GITHUB_SHA} = 'from-github';
+    local $ENV{COVERALLS_SERVICE_NAME} = 'my-ci';
+    local $ENV{COVERALLS_SERVICE_NUMBER} = '42';
+    local $ENV{COVERALLS_SERVICE_JOB_ID} = 'job-1';
+    local $ENV{COVERALLS_SERVICE_JOB_NUMBER} = '42.1';
+    local $ENV{COVERALLS_PULL_REQUEST} = '7';
+    local $ENV{COVERALLS_GIT_BRANCH} = 'topic';
+    local $ENV{COVERALLS_GIT_COMMIT} = 'from-env';
+
+    my ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_name}, 'my-ci', 'COVERALLS_SERVICE_NAME';
+    is $got->{service_number}, '42', 'COVERALLS_SERVICE_NUMBER over GITHUB_RUN_ID';
+    is $got->{service_job_id}, 'job-1', 'COVERALLS_SERVICE_JOB_ID over GITHUB_JOB';
+    is $got->{service_job_number}, '42.1', 'COVERALLS_SERVICE_JOB_NUMBER';
+    is $got->{service_pull_request}, '7', 'COVERALLS_PULL_REQUEST';
+    is $got->{service_branch}, 'topic', 'COVERALLS_GIT_BRANCH';
+    is $got->{commit_sha}, 'from-env', 'COVERALLS_GIT_COMMIT over GITHUB_SHA';
+
+    local $ENV{COVERALLS_PERL_SERVICE_NAME} = 'perl-ci';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_name}, 'perl-ci', 'COVERALLS_PERL_SERVICE_NAME wins over COVERALLS_SERVICE_NAME';
+
+    local $ENV{COVERALLS_SERVICE_NAME} = '';
+    local $ENV{COVERALLS_PERL_SERVICE_NAME} = '';
+    local $ENV{COVERALLS_SERVICE_NUMBER} = '';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    is $got->{service_name}, 'github', 'an empty value is not an override';
+    is $got->{service_number}, '111', 'an empty value keeps what the CI service gives';
+
+    local $ENV{COVERALLS_PULL_REQUEST} = 'false';
+    ($got) = Devel::Cover::Report::Coveralls::get_config();
+    ok !exists $got->{service_pull_request}, 'COVERALLS_PULL_REQUEST=false is not a pull request';
+};
+
+# The GIT_* variables that get_git_info reads, with a value for each.
+my %GIT_ENV = (
+    GIT_ID              => 'abc123',
+    GIT_BRANCH          => 'origin/env-branch',
+    GIT_AUTHOR_NAME     => 'Author',
+    GIT_AUTHOR_EMAIL    => 'author@example.com',
+    GIT_COMMITTER_NAME  => 'Committer',
+    GIT_COMMITTER_EMAIL => 'committer@example.com',
+    GIT_MESSAGE         => 'the message',
+);
+
+subtest 'get_git_info prefers git to the environment' => sub {
+    my $inside = `git rev-parse --is-inside-work-tree 2>&1`;
+    plan skip_all => 'not in a git work tree' unless defined $inside && $inside =~ /^true/;
+
+    local @ENV{@CI_VARS};
+    my $from_git = Devel::Cover::Report::Coveralls::get_git_info();
+    local @ENV{ keys %GIT_ENV } = values %GIT_ENV;
+    my $got = Devel::Cover::Report::Coveralls::get_git_info();
+    is_deeply $got->{head}, $from_git->{head}, 'the head from git, not from GIT_AUTHOR_NAME and the like';
+    is $got->{branch}, $from_git->{branch}, 'the branch from git, not from GIT_BRANCH';
+};
+
+subtest 'get_git_info reads the head with one git log' => sub {
+    my $inside = `git rev-parse --is-inside-work-tree 2>&1`;
+    plan skip_all => 'not in a git work tree' unless defined $inside && $inside =~ /^true/;
+
+    local @ENV{@CI_VARS};
+    my %one_by_one = (
+        id              => '%H',
+        author_name     => '%aN',
+        author_email    => '%ae',
+        committer_name  => '%cN',
+        committer_email => '%ce',
+        message         => '%s',
+    );
+    $_ = Devel::Cover::Report::Coveralls::git_log($_) for values %one_by_one;
+    delete @one_by_one{ grep { $one_by_one{$_} eq '' } keys %one_by_one };
+    # cmd.exe would expand %H%, %x00% and the like of the joined format with these set.
+    local @ENV{qw(H X00 AN AE CN CE)} = ('expanded') x 6;
+    is_deeply Devel::Cover::Report::Coveralls::get_git_info()->{head}, \%one_by_one,
+        'the same values as a git log for each field';
+};
+
+subtest 'get_git_info outside a git work tree' => sub {
+    local @ENV{@CI_VARS};
+    local @ENV{qw(GIT_DIR GIT_WORK_TREE)};
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    # Keep git from finding a repository in a directory above the temporary one.
+    local $ENV{GIT_CEILING_DIRECTORIES} = File::Basename::dirname($dir);
+
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    my $stderr = File::Temp->new;
+    my $cwd = Cwd::getcwd();
+    open my $saved, '>&', \*STDERR or die "dup STDERR: $!";
+
+    # Put STDERR and the directory back even when get_git_info dies, so that the later subtests
+    # still run where they should and show their diagnostics.
+    my ($got, $with_env);
+    my $ok = eval {
+        chdir $dir or die "chdir $dir: $!";
+        open STDERR, '>&', $stderr or die "redirect STDERR: $!";
+        $got = Devel::Cover::Report::Coveralls::get_git_info();
+        local @ENV{ keys %GIT_ENV } = values %GIT_ENV;
+        $with_env = Devel::Cover::Report::Coveralls::get_git_info();
+        1;
+    };
+    my $error = $@;
+    open STDERR, '>&', $saved or die "restore STDERR: $!";
+    chdir $cwd or die "chdir $cwd: $!";
+    die $error unless $ok;
+
+    is_deeply $got, { head => {}, remotes => [] }, 'nothing is known';
+    is_deeply $with_env, {
+        head => {
+            id              => 'abc123',
+            author_name     => 'Author',
+            author_email    => 'author@example.com',
+            committer_name  => 'Committer',
+            committer_email => 'committer@example.com',
+            message         => 'the message',
+        },
+        remotes => [],
+        branch  => 'origin/env-branch',
+    }, 'what the environment gives';
+    is_deeply \@warnings, [], 'no warnings';
+    is do { local $/; open my $fh, '<', $stderr->filename or die $!; <$fh> }, '', 'git prints nothing';
 };
 
 subtest 'get_config travis requires repo_token' => sub {
@@ -331,8 +509,8 @@ subtest 'report exits non-zero when the upload fails' => sub {
     no warnings 'once', 'redefine';
     local *Local::FakeDB::cover = sub { bless {}, 'Local::FakeCover' };
     # Never reach Coveralls from the tests.
-    my $response;
-    local *HTTP::Tiny::post_form = sub { $response };
+    my ($response, @request);
+    local *HTTP::Tiny::request = sub { (undef, @request) = @_; $response };
     my $run = sub {
         my $out = '';
         open my $fh, '>', \$out or die $!;
@@ -379,6 +557,148 @@ subtest 'report exits non-zero when the upload fails' => sub {
     ($ok, $err, $out) = $run->();
     ok $ok, 'returns on success';
     like $out, qr{^register: https://coveralls.io/jobs/1$}m, 'prints the job';
+
+    my ($method, $url, $args) = @request;
+    is $method, 'POST', 'POST';
+    is $url, $normal_endpoint, 'to the jobs API';
+    my ($boundary) = $args->{headers}{'Content-Type'} =~ m{^multipart/form-data; boundary=(\S+)$};
+    ok defined $boundary, 'as multipart/form-data, with an unquoted boundary';
+    my ($json) = $args->{content}
+        =~ m{\A--\Q$boundary\E\r\nContent-Disposition: form-data; name="json_file"; filename="json_file"\r\nContent-Type: application/json\r\n\r\n(.*)\r\n--\Q$boundary\E--\r\n\z}s;
+    ok defined $json, 'the job is the one field json_file';
+    is decode_json($json)->{repo_token}, 'abcdef', 'which holds the job';
+
+    # With a source file: a statement on line 6 that ran twice.
+    local *Local::FakeCover::file = sub { bless {}, 'Local::FakeFile' };
+    local *Local::FakeFile::statement = sub { bless {}, 'Local::FakeStatements' };
+    local *Local::FakeStatements::location = sub {
+        $_[1] == 6 ? [ bless {}, 'Local::FakeStatement' ] : undef;
+    };
+    local *Local::FakeStatement::uncoverable = sub { 0 };
+    local *Local::FakeStatement::covered = sub { 2 };
+    # One decision on line 6, whose true side ran twice and false side never.
+    local *Local::FakeFile::branch = sub { bless {}, 'Local::FakeBranches' };
+    local *Local::FakeBranches::location = sub {
+        $_[1] == 6 ? [ bless { values => [2, 0] }, 'Local::FakeBranch' ] : undef;
+    };
+    local *Local::FakeBranch::total = sub { scalar @{ $_[0]{values} } };
+    local *Local::FakeBranch::value = sub { $_[0]{values}[ $_[1] ] };
+    local *Local::FakeBranch::uncoverable = sub { 0 };
+    my $file = "$FindBin::Bin/example.pl";
+    {
+        my $out = '';
+        open my $fh, '>', \$out or die $!;
+        my $old = select $fh;
+        Devel::Cover::Report::Coveralls->report($db, { file => [$file] });
+        select $old;
+    }
+    ($boundary) = $request[2]{headers}{'Content-Type'} =~ /boundary=(\S+)$/;
+    ($json) = $request[2]{content} =~ m{\r\n\r\n(.*)\r\n--\Q$boundary\E--\r\n\z}s;
+    my ($sent) = @{ decode_json($json)->{source_files} };
+    is $sent->{name}, $file, 'the source file is sent';
+    is $sent->{source_digest}, do {
+        open my $fh, '<:raw', $file or die $!;
+        Digest::MD5->new->addfile($fh)->hexdigest;
+    }, 'with its digest';
+    is_deeply $sent->{coverage}, [undef, undef, undef, undef, undef, 2], 'and its coverage';
+    is_deeply $sent->{branches}, [6, 0, 0, 2, 6, 0, 1, 0], 'and its branches';
+
+    # The branch coverage was not collected.
+    local *Local::FakeFile::branch = sub { undef };
+    {
+        my $out = '';
+        open my $fh, '>', \$out or die $!;
+        my $old = select $fh;
+        Devel::Cover::Report::Coveralls->report($db, { file => [$file] });
+        select $old;
+    }
+    ($boundary) = $request[2]{headers}{'Content-Type'} =~ /boundary=(\S+)$/;
+    ($json) = $request[2]{content} =~ m{\r\n\r\n(.*)\r\n--\Q$boundary\E--\r\n\z}s;
+    ($sent) = @{ decode_json($json)->{source_files} };
+    ok !exists $sent->{branches}, 'no branches without the branch coverage';
+};
+
+subtest 'get_branches' => sub {
+    my %lines = (
+        # Two decisions on one line; the false side of the second never ran.
+        2 => [ { values => [3, 1] }, { values => [4, undef] } ],
+        # The true side is marked uncoverable.
+        5 => [ { values => [0, 7], uncoverable => [1, 0] } ],
+    );
+    no warnings 'once';
+    local *Local::FakeBranches::location = sub {
+        my $l = $lines{ $_[1] } or return undef;
+        [ map { bless $_, 'Local::FakeBranch' } @$l ];
+    };
+    local *Local::FakeBranch::total = sub { scalar @{ $_[0]{values} } };
+    local *Local::FakeBranch::value = sub { $_[0]{values}[ $_[1] ] };
+    local *Local::FakeBranch::uncoverable = sub { ($_[0]{uncoverable} || [])->[ $_[1] ] };
+
+    my $criterion = bless {}, 'Local::FakeBranches';
+    is_deeply Devel::Cover::Report::Coveralls::get_branches($criterion, 6),
+        [ 2, 0, 0, 3,  2, 0, 1, 1,  2, 1, 0, 4,  2, 1, 1, 0,  5, 0, 1, 7 ],
+        'line, block, branch and hits for each branch, without the uncoverable one';
+    is_deeply Devel::Cover::Report::Coveralls::get_branches($criterion, 4),
+        [ 2, 0, 0, 3,  2, 0, 1, 1,  2, 1, 0, 4,  2, 1, 1, 0 ], 'only the lines of the file';
+    is_deeply Devel::Cover::Report::Coveralls::get_branches(undef, 6), [],
+        'nothing when the branch coverage was not collected';
+};
+
+subtest 'json_encoder' => sub {
+    {
+        local @Devel::Cover::Report::Coveralls::JSON_ENCODERS = ('No::Such::Module');
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        is ref Devel::Cover::Report::Coveralls::json_encoder(), 'JSON::PP',
+            'JSON::PP when no candidate is installed';
+        is_deeply \@warnings, [], 'without a warning';
+    }
+    {
+        # A module that is there but does not load.
+        my $dir = File::Temp::tempdir(CLEANUP => 1);
+        mkdir "$dir/Local";
+        open my $fh, '>', "$dir/Local/BrokenEncoder.pm" or die $!;
+        print $fh "die qq{built for another perl\\n};\n";
+        close $fh;
+        local @INC = ($dir, @INC);
+        local @Devel::Cover::Report::Coveralls::JSON_ENCODERS = ('Local::BrokenEncoder');
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        is ref Devel::Cover::Report::Coveralls::json_encoder(), 'JSON::PP',
+            'JSON::PP when the candidate does not load';
+        like "@warnings", qr/Local::BrokenEncoder is not used: built for another perl/, 'with a warning';
+    }
+
+    my @installed = grep { eval { (my $f = "$_.pm") =~ s!::!/!g; require $f } }
+        @Devel::Cover::Report::Coveralls::JSON_ENCODERS;
+    note 'installed: ' . (join(', ', @installed) || 'none');
+
+    # What a job holds: text decoded from UTF-8 (#81) with a character out of the BMP, the bytes of a
+    # Latin-1 file, control characters, a boolean, numbers and null in the coverage.
+    my $job = {
+        parallel     => \1,
+        service_name => 'github',
+        source_files => [
+            { name => 'a.pm', source => "# \x{3042} \x{1F600}\n\t\"q\" \\ /\x01\x7f\n", coverage => [undef, 0, 12] },
+            { name => 'b.pm', source => "# caf\xe9\n", coverage => [1], branches => [2, 0, 1, 3] },
+        ],
+    };
+    my $want = JSON::PP->new->ascii->canonical->encode($job);
+    like $want, qr/\\u3042 \\ud83d\\ude00/, 'JSON::PP: \\uXXXX, and a surrogate pair out of the BMP';
+    for my $class (@installed) {
+        local @Devel::Cover::Report::Coveralls::JSON_ENCODERS = ($class);
+        my $got = Devel::Cover::Report::Coveralls::json_encoder()->canonical->encode($job);
+        is $got, $want, "$class gives the same JSON as JSON::PP";
+    }
+};
+
+subtest 'json_file_request' => sub {
+    my $json = '{"source_files":[{"source":"CoverallsPerl"}]}';
+    my ($type, $body) = Devel::Cover::Report::Coveralls::json_file_request($json);
+    my ($boundary) = $type =~ /boundary=(\S+)$/;
+    like $boundary, qr/^CoverallsPerl[0-9a-f]{32}$/, 'a random boundary';
+    is index($json, $boundary), -1, 'which is not in the JSON';
+    like $body, qr/\r\n\Q$json\E\r\n--\Q$boundary\E--\r\n\z/, 'the JSON as it is';
 };
 
 subtest 'strip_url_credentials' => sub {
@@ -421,6 +741,7 @@ subtest 'get_git_info remotes' => sub {
     my $inside = `git rev-parse --is-inside-work-tree 2>&1`;
     plan skip_all => 'not in a git work tree' unless defined $inside && $inside =~ /^true/;
 
+    local @ENV{@CI_VARS};
     my @names = split /\n/, `git remote`;
     my $got = Devel::Cover::Report::Coveralls::get_git_info();
     is_deeply [ map { $_->{name} } @{ $got->{remotes} } ], \@names, 'every remote, once each';
@@ -448,9 +769,88 @@ print "hello, world";
 EOS
         coverage => [undef, undef, undef, undef, undef, 0]
     };
+    $source->{source_digest} = do {
+        open my $fh, '<:raw', "$FindBin::Bin/example.pl" or die $!;
+        Digest::MD5->new->addfile($fh)->hexdigest;
+    };
 
     is_deeply Devel::Cover::Report::Coveralls::get_source("$FindBin::Bin/example.pl",
         sub { $_[0] == 6 ? 0 : undef } ), $source, 'source';
+};
+
+subtest 'get_source (CRLF, no newline at the end)' => sub {
+    my $tmp = File::Temp->new;
+    binmode $tmp;
+    print $tmp "a\r\nb";
+    close $tmp;
+
+    my $got = Devel::Cover::Report::Coveralls::get_source($tmp->filename, sub { 1 });
+    is $got->{source}, "a\nb\n", 'lines end with "\n"';
+    is $got->{source_digest}, Digest::MD5::md5_hex("a\r\nb"), 'the digest of the bytes of the file';
+    is_deeply $got->{coverage}, [1, 1], 'a line each';
+};
+
+subtest 'get_source (UTF-8)' => sub {
+    my $bytes = "# \xe3\x81\x82\nprint 1;\n";    # "あ" in UTF-8
+    my $tmp = File::Temp->new;
+    binmode $tmp;
+    print $tmp $bytes;
+    close $tmp;
+
+    my $got = Devel::Cover::Report::Coveralls::get_source($tmp->filename, sub { 1 });
+    is $got->{source}, "# あ\nprint 1;\n", 'the text is decoded';
+    is $got->{source_digest}, Digest::MD5::md5_hex($bytes), 'the digest of the bytes of the file';
+    like(JSON::PP->new->ascii->encode($got), qr/"# \\u3042\\nprint 1;\\n"/,
+        'one character in the JSON, not one for each byte');
+};
+
+subtest 'get_source (not UTF-8)' => sub {
+    my $bytes = "# caf\xe9\nprint 1;\n";    # "café" in Latin-1
+    my $tmp = File::Temp->new;
+    binmode $tmp;
+    print $tmp $bytes;
+    close $tmp;
+
+    my $got = Devel::Cover::Report::Coveralls::get_source($tmp->filename, sub { 1 });
+    is $got->{source}, $bytes, 'the bytes as they are';
+    is $got->{source_digest}, Digest::MD5::md5_hex($bytes), 'the digest of the bytes of the file';
+    like(JSON::PP->new->ascii->encode($got), qr/"# caf\\u00e9\\nprint 1;\\n"/,
+        'one character in the JSON for each byte');
+};
+
+subtest 'get_source (UTF-8 with a byte order mark)' => sub {
+    my $bytes = "\xef\xbb\xbf# \xe3\x81\x82\n";
+    my $tmp = File::Temp->new;
+    binmode $tmp;
+    print $tmp $bytes;
+    close $tmp;
+
+    my $got = Devel::Cover::Report::Coveralls::get_source($tmp->filename, sub { 1 });
+    is $got->{source}, "# あ\n", 'the byte order mark is left out of the text';
+    is $got->{source_digest}, Digest::MD5::md5_hex($bytes), 'but not out of the digest';
+};
+
+subtest 'get_source (a copy under blib/)' => sub {
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $cwd = Cwd::getcwd();
+    chdir $dir or die "chdir $dir: $!";
+    my $got = eval {
+        mkdir 'script';
+        mkdir 'blib';
+        mkdir 'blib/script';
+        for (['script/foo', "#!perl\nprint 1;\n"], ['blib/script/foo', "#!/usr/bin/perl\nprint 1;\n"]) {
+            open my $fh, '>:raw', $_->[0] or die $!;
+            print $fh $_->[1];
+        }
+        Devel::Cover::Report::Coveralls::get_source('blib/script/foo', sub { undef });
+    };
+    my $error = $@;
+    chdir $cwd or die "chdir $cwd: $!";
+    die $error unless $got;
+
+    is $got->{name}, 'script/foo', 'sent by the name of the original';
+    is $got->{source}, "#!/usr/bin/perl\nprint 1;\n", 'the text of the copy that ran';
+    is $got->{source_digest}, Digest::MD5::md5_hex("#!perl\nprint 1;\n"), 'the digest of the original';
 };
 
 done_testing;

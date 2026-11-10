@@ -23,7 +23,7 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
 our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and Proc::ShellSubset::Large
   # (empty, post4-0.04: a string with no command, or only comments, runs as nothing, status 0, as in both shells; also eval '')
@@ -78,9 +78,32 @@ sub visible {   # open and not close-on-exec: an fd sh would have inherited (not
   Proc::Spawner::__fd_cloexec(shift) == 0 }   # fcntl F_GETFD (until 0.05: /proc/self/fdinfo, Linux only; RT #182479)
 sub new_pipe { $G->new_pipe }
 
+# ------------------------------------------------------------------ paths
+# POSIX, and Windows (post-0.10): there a path is absolute with a drive (C:/x, C:\x) or as a UNC name (//server/share);
+# /x is the current drive's root; \ separates as / does; PATH is split at $Config{path_sep} (;, Proc::Spawner::path_split)
+# and a command is looked up with the extensions of PATHEXT first; /dev/null is NUL.  The shell's own directory keeps
+# Perl's form (C:/x/y).
+our $WIN = $Proc::Spawner::WIN;
+my $SEP = $WIN ? qr{[/\\]+} : qr{/+};
+sub is_abs { $WIN ? $_[0] =~ m{^(?:[A-Za-z]:)?[/\\]} : $_[0] =~ m{^/} }
+sub has_dir { $WIN ? $_[0] =~ m{[/\\]} : $_[0] =~ m{/} }   # a command name with a directory: no PATH lookup
+sub path_in {   # PATH from the shell's directory
+  my ($c, $p) = @_;
+  return $p if $WIN ? $p =~ m{^[A-Za-z]:[/\\]|^[/\\]{2}} : $p =~ m{^/};
+  return ($c->{sh}{cwd} =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)} ? $1 : '') . $p if $WIN && $p =~ m{^[/\\]};   # (the drive, or the UNC share)
+  "$c->{sh}{cwd}/$p" }
+sub path_list { Proc::Spawner::path_split(@_) }   # a PATH value's directories (an empty one: the current directory, POSIX)
+sub win_home {   # ~user on Windows (post-0.10, the user's follow-up (b) to WS1): one's own name is %USERPROFILE%; another
+  # is its sibling of that name, if that is a directory (profiles are usually siblings; not always: the registry's
+  # ProfileList has the real ones, a domain profile may be user.DOMAIN); else undef (~user stays as written)
+  my $n = shift; my $up = $ENV{USERPROFILE} // return; return if $n =~ /^\.\.?\z/;
+  return $up if lc $n eq lc($ENV{USERNAME} // '');
+  my $d = ($up =~ s{[^/\\]+[/\\]*\z}{}r) . $n; -d $d ? $d : undef }
+sub os_path { my $p = shift; $WIN && $p eq '/dev/null' ? 'NUL' : $p }   # a redirection's file name, as the system has it
+
 sub open_end {  # an end on a file, or undef with $!
   my ($c, $name, $op) = @_;
-  my $path = $name =~ m{^/} ? $name : "$c->{sh}{cwd}/$name";
+  my $path = path_in($c, os_path($name));
   return $! = POSIX::EEXIST(), undef if $op eq '>' && $c->{sh}{opt}{C} && -f $path;   # set -C
   my $um = umask $c->{sh}{umask};
   my $ok = sysopen my $fh, $path, $Proc::Spawner::Graph::OPEN{$op}, 0666; my $err = $!; umask $um;
@@ -137,7 +160,7 @@ sub on_write { my ($e, $bytes, $cb) = @_; $G->perl_write($e, $bytes, $cb) }   # 
 
 sub status_of {   # a wait status as sh's $?
   my $w = shift;
-  POSIX::WIFSIGNALED($w) ? 128 + POSIX::WTERMSIG($w) : POSIX::WEXITSTATUS($w) }
+  $w & 127 ? 128 + ($w & 127) : $w >> 8 }   # (by hand: Windows' POSIX has no WIFSIGNALED; Perl's $? is the same there)
 
 # Background jobs left running when run() returns go on between calls too (idle, below); at exit we finish them.
 my %JOBS;
@@ -158,6 +181,7 @@ sub idle_pass {
   idle(0) unless %JOBS }
 sub idle {   # 1: install the handler (if jobs remain), 0: put the previous one back
   my $on = shift;
+  return if $WIN;   # (no SIGCHLD there: background jobs move on at the next run, wait or poll)
   if ($on && %JOBS && !$IDLE_ON) {
     $IDLE_OLD = POSIX::SigAction->new;
     my $a = POSIX::SigAction->new(sub { idle_pass(); my $h = $IDLE_OLD && $IDLE_OLD->{HANDLER}; $h->(@_) if ref $h eq 'CODE' },
@@ -186,41 +210,106 @@ sub write_fd {   # as put, then $k->(ERRNO or undef): EBADF when the fd is close
 
 # Programs run inside this process (Proc::ShellSpawn::Programs, after coreutils 9.4), by name (X21).  Decision IP1 (the
 # user, 2026-11-08: "when a well-debugged builtin is already present, use it.  (By default; Configurable.)"): echo
-# printf test [ true false, on every platform; PROC_SHELLSPAWN_INPROC changes the default (none: the programs; names:
+# printf test [ true false, and since post-0.10 pwd (b_pwd runs it as 'pwd -L', X23), on every platform; PROC_SHELLSPAWN_INPROC changes the default (none: the programs; names:
 # only these; all), and %INPROC can be changed at run time.  A name with a '/' is always a program.
-our @INPROC = qw(echo printf test [ true false);
+our @INPROC = qw(echo printf test [ true false pwd);
 our %INPROC = map +($_ => 1), map $_ eq 'all' ? @INPROC : $_ eq 'none' ? () : $_,
   split ' ', $ENV{PROC_SHELLSPAWN_INPROC} // 'all';
+# Whose echo the in-process echo is (decision EC1, the user, 2026-11-09): coreutils (the default; it heeds POSIXLY_CORRECT),
+# dash or bash (their builtins, which do not); $ECHO can be changed at run time.  The program echo (not in %INPROC) is not
+# affected.
+our $ECHO = $ENV{PROC_SHELLSPAWN_ECHO} || 'coreutils';
+die "PROC_SHELLSPAWN_ECHO: '$ECHO' is none of coreutils, dash, bash\n" unless $ECHO =~ /\A(?:coreutils|dash|bash)\z/;
 
-sub find_cmd {   # the path to run for $name, or undef and the status (127, 126)
+# sh as Perl with this module (post-0.10, SH1, the user's follow-up (c) to WS1: "Windows has no sh"): a command named sh
+# (no directory) runs as $^X -MPARSER -MProc::ShellSpawn=sh -e0 -- ARGS, PARSER the largest parser loaded here (as
+# default_parser), with this Perl's @INC; then sh_main below reads ARGS as sh does.  PROC_SHELLSPAWN_SH (or $SH at run
+# time): auto (the default: so when the command's PATH has no sh), perl (always), program (never).  The text after -c is
+# an argument: through the primitive system1 on Windows, Perl's own spawn drops a " from it, and splits it at blanks too if it has one (❰BUG❱ in
+# Perl, doc/perl-win32-system-bugs.md, 1); not worked around.
+our $SH = $ENV{PROC_SHELLSPAWN_SH} || 'auto';
+die "PROC_SHELLSPAWN_SH: '$SH' is none of auto, perl, program\n" unless $SH =~ /\A(?:auto|perl|program)\z/;
+sub sh_argv {   # the argv of sh as Perl, or undef: run the program sh
+  my ($c, $argv, $path) = @_;
+  return if $argv->[0] ne 'sh' or $SH eq 'program' or $SH eq 'auto' && defined((find_cmd($c, 'sh', $path))[0]);
+  my ($parser) = grep { no strict 'refs'; defined &{"${_}::parse"} } qw(Proc::ShellSubset::Large Proc::ShellSubset Proc::ShellSubset::Small);
+  [$^X, (map "-I$_", grep !ref, @INC), '-M' . ($parser // 'Proc::ShellSubset'), '-MProc::ShellSpawn=sh', '-e0', '--', @$argv[1 .. $#$argv]] }
+sub import {   # use Proc::ShellSpawn 'sh': run as sh with @ARGV, then exit (SH1); with no list, nothing
+  my ($pkg, @w) = @_; return unless @w;
+  die "Proc::ShellSpawn: only 'sh' can be imported\n" unless @w == 1 && $w[0] eq 'sh';
+  exit sh_main(@ARGV) }
+sub sh_main {   # sh -c TEXT [NAME [ARGS]], sh FILE [ARGS], sh [-s] [ARGS] (the text from stdin): the exit status
+  my @a = @_; my ($opt_c, $opt_s, $text, $name, %opt);
+  my $bad = sub { print STDERR "sh: $_[0]\n"; 2 };
+  while (@a && $a[0] =~ /\A-(.+)\z/s) {
+    shift @a; last if $1 eq '-';
+    for my $l (split //, $1) {   # -c, -s; other letters as set takes them (-e, -u, -x, ...)
+      $l eq 'c' ? ($opt_c = 1) : $l eq 's' ? ($opt_s = 1) : $l =~ /\A[a-zA-Z]\z/ && $l ne 'o' && $l ne 'i' ? ($opt{$l} = 1)
+        : return $bad->("-$l: option not supported here (SH1)") } }
+  if ($opt_c) { @a or return $bad->('-c requires an argument'); $text = shift @a; $name = shift @a }
+  elsif (!$opt_s && @a) {
+    $name = shift @a; open my $f, '<', $name or return $bad->("0: cannot open $name: $!"); binmode $f; local $/; $text = <$f> }
+  else { binmode STDIN; local $/; $text = <STDIN> // '' }
+  local $NAME = $name // 'sh';
+  my ($st, $err) = run($text, args => \@a, arg0 => $NAME, opt => \%opt);
+  defined $st or print(STDERR "$NAME: outside the subset: $err->{error} at $err->{pos}\n"), return 255;   # (as t/try.pl)
+  if (my $s = $SIGNALLED) { local $SIG{$s} = 'DEFAULT'; kill $s, $$; sleep 1 }   # die by it, as sh would
+  $st }
+
+# TEMPORARY WORKAROUND (post-0.10, BIN1; the user's follow-up (d) to WS1, "Replace them from %ENV (inventing suitable
+# fallbacks)", marked temporary by the user, 2026-11-10): where cat, sort, grep and the like come from.  The directories
+# in PROC_SHELLSPAWN_BIN (split as PATH; 'none': none, since Windows has no empty variables) are searched before PATH, on
+# any platform.  Unset, on Windows: the first of Git for Windows' usr\bin (beside git.exe on PATH, or under
+# %ProgramFiles%, %ProgramW6432%, %LOCALAPPDATA%\Programs), MSYS2's (%SystemDrive%\msys64\usr\bin) and Cygwin's
+# (%SystemDrive%\cygwin64\bin) that has cat.exe; elsewhere none.  Also on Windows, a program of the system's own (under
+# %SystemRoot%) named sort, find, timeout or expand is never taken for the POSIX one: they differ.  @BIN at run time.
+our @BIN = !defined $ENV{PROC_SHELLSPAWN_BIN} ? ($WIN ? win_posix_bin() : ())
+         : $ENV{PROC_SHELLSPAWN_BIN} eq 'none' ? () : Proc::Spawner::path_split($ENV{PROC_SHELLSPAWN_BIN});
+sub win_posix_bin {
+  my $sd = $ENV{SystemDrive} // 'C:';
+  my $up = sub { $_[0] =~ s{[/\\][^/\\]+\z}{}r };   # the parent directory
+  my @git = map { ($up->($_), $up->($up->($_))) } grep -f "$_\\git.exe", Proc::Spawner::path_split($ENV{PATH});   # Git\cmd, Git\mingw64\bin
+  for my $d ((map "$_\\usr\\bin", @git), (map "$_\\Git\\usr\\bin", grep defined, @ENV{qw(ProgramFiles ProgramW6432)}),
+             (defined $ENV{LOCALAPPDATA} ? "$ENV{LOCALAPPDATA}\\Programs\\Git\\usr\\bin" : ()), "$sd\\msys64\\usr\\bin", "$sd\\cygwin64\\bin") {
+    return $d if -f "$d\\cat.exe" } () }
+my %WINCLASH = map +($_ => 1), qw(sort find timeout expand);   # Windows' own programs of these names are others (BIN1)
+sub win_clash { my ($name, $p) = @_; my $r = $ENV{SystemRoot} // return 0;
+  $WINCLASH{lc $name} && lc(substr($p, 0, length $r) =~ tr{/}{\\}r) eq lc($r =~ tr{/}{\\}r) }
+
+sub find_cmd {   # the path to run for $name, or undef and the status (127, 126); Windows: PATHEXT's extensions first
   my ($c, $name, $path) = @_;
-  my $abs = sub { $_[0] =~ m{^/} ? $_[0] : "$c->{sh}{cwd}/$_[0]" };
-  return $name if $name =~ m{/};
+  my @ext = ($WIN ? (grep length, split /;/, $c->{sh}{vars}{PATHEXT} // '.COM;.EXE;.BAT;.CMD') : (), '');
+  if (has_dir($name)) { -f path_in($c, "$name$_") and return "$name$_" for @ext; return $name }
   my $denied;
-  for my $d (split /:/, $path // '', -1) {
-    my $p = ($d eq '' ? '.' : $d) . "/$name";
-    next unless -f $abs->($p);
+  for my $d (@BIN, path_list($path)) { for my $e (@ext) {   # (@BIN: BIN1, a temporary workaround)
+    my $p = ($d eq '' ? '.' : $d) . ($WIN && $d =~ /\\/ && $d !~ m{/} ? '\\' : '/') . "$name$e";   # (Windows: as PATH writes it)
+    next unless -f path_in($c, $p);
+    next if $WIN && win_clash($name, $p);
     return $p if -x _;
-    $denied //= $p }
+    $denied //= $p } }
   defined $denied ? (undef, 126, $denied) : (undef, 127) }
 
 sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns its process node or undef
   my ($c, $map, $argv, $env, $k, $search) = @_;   # $search: the PATH to look in, if not the command's own (command -p)
   my %e = (%{$c->{sh}{vars}}{grep $c->{sh}{exp}{$_} && /^[A-Za-z_][A-Za-z_0-9]*\z/, keys %{$c->{sh}{vars}}}, %$env);   # as dash: names only
   return inproc($c, $map, $argv, \%e, $k) if $INPROC{$argv->[0]};
+  if (my $a = sh_argv($c, $argv, $search // $e{PATH})) { $argv = $a; undef $search }   # sh as Perl (SH1)
   my ($path, $st, $what) = find_cmd($c, $argv->[0], $search // $e{PATH});
-  $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && $argv->[0] !~ m{/};   # remembered, as dash (hash, type)
+  $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && !has_dir($argv->[0]);   # remembered, as dash (hash, type)
   if (!defined $path) {
     $ONBUILTIN->($st == 127 ? 'not found' : 'denied', $argv, {%$env}) if $ONBUILTIN;   # (measurement: no program runs)
     return msg($c, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: Permission denied", sub { $k->($st) }) }
+  if ($WIN && -e path_in($c, $path) && (-d _ || !-x _)) {   # Windows runs neither: as sh says it (CreateProcess: not found,
+    $ONBUILTIN->('denied', $argv, {%$env}) if $ONBUILTIN;   # or "Exec format error")
+    return msg($c, "$argv->[0]: Permission denied", sub { $k->(126) }) }
   my @envp = map "$_=$e{$_}", sort keys %e;
   my %def = map +($_ => 1), grep !$IGN0{$_} && ($SIG{$_} // '') eq 'IGNORE' && ($c->{sh}{trap}{$_} // 1) ne '',   # trap '' SIG: stays ignored
     keys %SIG, $FPE ? () : 'FPE';
   delete @def{qw(INT QUIT)} if $c->{sh}{job};   # in the background: left ignored
-  my @o = (sigdefault => [sort keys %def], umask => $c->{sh}{umask}, on_exit => ['Proc::ShellSpawn::resume', $k],
+  my @o = (sigdefault => [sort keys %def], $WIN ? () : (umask => $c->{sh}{umask}), on_exit => ['Proc::ShellSpawn::resume', $k],   # (Windows: no umask)
            $c->{sh}{cwd} ne Cwd::getcwd() ? (chdir => $c->{sh}{cwd}) : ());
   my $node = $G->start($path, $argv, \@envp, $map, @o);
-  if (!$node && $! == POSIX::ENOEXEC()) {   # a script without #!: sh runs it with sh
+  if (!$node && !$WIN && $! == POSIX::ENOEXEC()) {   # a script without #!: sh runs it with sh
     $node = $G->start('/bin/sh', ['sh', $path, @$argv[1 .. $#$argv]], \@envp, $map, @o) }
   return $node if $node;
   my $err = "$!";   # an fd of ours that is not open: the first one the child should have got
@@ -235,10 +324,10 @@ sub inproc {   # a program of %INPROC, run here: its output and messages in the 
   my $d = { %$c, map => $map }; hold($_) for values %$map;   # (the caller releases its holds when spawn returns)
   $ONBUILTIN->('Proc::ShellSpawn::inproc', $argv, {%$env}) if $ONBUILTIN;   # (measurement: no program runs)
   tr_("in-process: @$argv");
-  my %opt = (cwd => $c->{sh}{cwd}, isatty => sub { my $e = $map->{$_[0]}; $e && POSIX::isatty($e->{fd}) });
+  my %opt = (cwd => $c->{sh}{cwd}, echo => $ECHO, isatty => sub { my $e = $map->{$_[0]}; $e && POSIX::isatty($e->{fd}) });
   my ($out, $err, $st, $seq) = Proc::ShellSpawn::Programs->can($argv->[0] eq '[' ? 'test' : $argv->[0])->($argv, $env, \%opt);
   my @seq = grep length $_->[1], @{$seq // [[2, $err], [1, $out]]};
-  my $pipe_dfl = !$IGN0{PIPE} && ($c->{sh}{trap}{PIPE} // 1) ne '' && $^O ne 'MSWin32';
+  my $pipe_dfl = !$IGN0{PIPE} && ($c->{sh}{trap}{PIPE} // 1) ne '';   # (Windows: as POSIX, though it has no SIGPIPE)
   my $werr;
   sub {
     my $next = __SUB__;
@@ -250,7 +339,7 @@ sub inproc {   # a program of %INPROC, run here: its output and messages in the 
     write_fd($d, $p->[0], $p->[1], sub {
       my $e = shift;
       if ($e && $p->[0] == 1) {
-        if ($e == POSIX::EPIPE() && $pipe_dfl) { release($_) for values %$map; return $k->(128 + POSIX::SIGPIPE()) }
+        if ($e == POSIX::EPIPE() && $pipe_dfl) { release($_) for values %$map; return $k->(128 + 13) }   # (SIGPIPE: 13)
         # the reason only when it failed in the final flush (close_stream: errno 0 after an earlier failure): the last
         # piece for stdout, short enough for one write of the buffer (glibc's: st_blksize, 4096 for a pipe)
         $werr = !grep($_->[0] == 1, @seq) && length $p->[1] <= 4096 ? $e : -1 }
@@ -300,7 +389,7 @@ sub with_redirs {
 # ------------------------------------------------------------------ expansion
 sub var {   # also $0-$9 ${10}..., $#, $$, $@ and $* (joined by the first character of IFS)
   my ($c, $n) = @_; my $sh = $c->{sh};
-  return $n ? $sh->{args}[$n - 1] // '' : 'sh' if $n =~ /^[0-9]+\z/;
+  return $n ? $sh->{args}[$n - 1] // '' : $sh->{arg0} // 'sh' if $n =~ /^[0-9]+\z/;
   $n eq '?' ? $sh->{q} : $n eq '!' ? ($sh->{bang} // {})->{first} // '' : $n eq '#' ? scalar @{$sh->{args}}
     : $n eq '$' ? $sh->{pid} : $n eq '@' || $n eq '*' ? join(ifs1($c), @{$sh->{args}}) : $sh->{vars}{$n} // '' }
 sub ifs1 { my $i = $_[0]{sh}{vars}{IFS}; defined $i ? substr($i, 0, 1) : ' ' }
@@ -353,7 +442,7 @@ sub expand {
       return $k->([map $_->[0], @f]) if $how ne 'argv';
       return $k->([map {   # a pattern that matches nothing stays as it is
         my ($t, $p, undef, $g) = @$_;
-        my $base = !$g || $p =~ m{^/} || $c->{sh}{cwd} eq Cwd::getcwd() ? '' : glob_quote($c->{sh}{cwd}) . '/';
+        my $base = !$g || is_abs($p) || $c->{sh}{cwd} eq Cwd::getcwd() ? '' : glob_quote($c->{sh}{cwd}) . '/';
         my @m = $g && !$c->{sh}{opt}{f} ? sort { $a cmp $b } grep !m{(?:^|/)\.\.?\z}, File::Glob::bsd_glob($base . slash_brackets($p), File::Glob::GLOB_QUOTE()) : ();   # never . or .. (rule E, as bash)
         s{^\Q$c->{sh}{cwd}\E/}{} for $base ? @m : ();
         @m ? @m : $t } @f]) }
@@ -361,8 +450,9 @@ sub expand {
     return $add->($x, 0), $next->() unless ref $x;
     my ($kind, @a) = @$x; (my $q = $kind) =~ s/^"//; my $split = $kind !~ /^"/;
     if    ($kind eq '*')   { $add->($a[0], 1) }
-    elsif ($kind eq '~')   { $add->($a[0] ne '' ? (getpwnam $a[0])[7] // "~$a[0]"   # ~ without HOME: from the password
-                                    : exists $c->{sh}{vars}{HOME} ? var($c, 'HOME') : (getpwuid $<)[7] // '~', 0) }   #   file (G16)
+    elsif ($kind eq '~')   { $add->($a[0] ne '' ? ($WIN ? win_home($a[0]) : (getpwnam $a[0])[7]) // "~$a[0]"   # ~ without HOME: from the password
+                                    : exists $c->{sh}{vars}{HOME} ? var($c, 'HOME')   #   file (G16); Windows: no user database,
+                                    : ($WIN ? $ENV{USERPROFILE} : (getpwuid $<)[7]) // '~', 0) }   #   USERPROFILE
     elsif ($kind eq '"$' && $a[0] eq '@' && $how eq 'argv') {   # "$@": one field per parameter
       my @p = @{$c->{sh}{args}}; $cur->[4] = 1 unless @p;   # none: the field goes, quotes or not (L1)
       for my $j (0 .. $#p) { if ($j) { push @f, $cur; $cur = ['', '', 0, 0] } $add->($p[$j], 0) } }
@@ -636,10 +726,12 @@ sub x_cd {
     return msg($c, "cd: too many arguments", sub { $k->(1) }) if $x->{cd_extra};   # as bash (rule E)
     return msg($c, "cd: HOME not set", sub { $k->(1) }) if !@f && ($d // '') eq '';   # as bash (rule E; N4)
     if (@f > 1 or $d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", sub { $k->(2) }) }
-    my $new = $d =~ m{^/} ? $d : "$c->{sh}{cwd}/$d";
+    my $new = path_in($c, $d);
     if ($x->{cd_p}) { $new = -d $new && Cwd::realpath($new) }   # cd -P: symbolic links resolved, '..' physical (P6)
-    else { my @p; for (split m{/+}, $new) { next if $_ eq '' or $_ eq '.'; $_ eq '..' ? pop @p : push @p, $_ }
-      $new = '/' . join '/', @p }
+    else {   # (Windows: the drive or the //server/share stays in front)
+      my ($pre, $rest) = $WIN && $new =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)(.*)}s ? ($1 =~ tr{\\}{/}r, $2) : ('', $new);
+      my @p; for (split $SEP, $rest) { next if $_ eq '' or $_ eq '.'; $_ eq '..' ? pop @p : push @p, $_ }
+      $new = $pre . '/' . join '/', @p }
     $new && -d $new or return msg($c, "cd: can't cd to $d", sub { $k->(2) });
     setvar($c, OLDPWD => $c->{sh}{cwd}) && setvar($c, PWD => $new) or return; $c->{sh}{cwd} = $new;
     $dash ? put($c, 1, "$new\n", sub { $k->(0) }) : defer($k, 0) };
@@ -742,10 +834,11 @@ sub read_line {
 sub start_pwd {
   my $phys = Cwd::getcwd();
   my $p = $ENV{PWD};
-  return $p if defined $p && $p =~ m{^/} && (stat $p)[1] && join(':', (stat $p)[0, 1]) eq join(':', (stat '.')[0, 1]);
+  return $p if defined $p && is_abs($p) && (stat $p)[1] && join(':', (stat $p)[0, 1]) eq join(':', (stat '.')[0, 1]);
   $phys }
 
-# run(STRING or TREE, parser => CODE, interactive => 'nop' or 'dash'): sh's status, or (undef, ERROR) if STRING is
+# run(STRING or TREE, parser => CODE, interactive => 'nop' or 'dash', args => [$1 ...], arg0 => $0, opt => {e => 1, ...}):
+# sh's status, or (undef, ERROR) if STRING is
 # outside the subset.  The parser also reads the text of eval, . and trap actions (with the aliases defined so far:
 # parser->(TEXT, aliases => {NAME => VALUE})).  interactive: what history, fc, bind, help, compopt, logout and
 # set -o history do (B2): nothing (nop, the default; give the parser the same option) or as in dash (not found).
@@ -756,8 +849,8 @@ sub run {
   return (undef, $tree) if ref $tree eq 'HASH';
   my $cwd = start_pwd();
   # dash sets OPTIND and IFS when it starts (L3)
-  my $sh = { vars => { %ENV, PWD => $cwd, OPTIND => 1, IFS => " \t\n", PPID => getppid() }, exp => { map +($_ => 1), keys %ENV, 'PWD' }, cwd => $cwd, q => 0,
-             parse => $parse, args => [], pid => $$, opt => {}, cmd => {}, ro => {}, trap => {}, jobl => [], umask => umask,
+  my $sh = { vars => { %ENV, PWD => $cwd, OPTIND => 1, IFS => " \t\n", PPID => $Proc::Spawner::WIN ? Proc::Spawner::__win_ppid() : getppid() }, exp => { map +($_ => 1), keys %ENV, 'PWD' }, cwd => $cwd, q => 0,
+             parse => $parse, args => [@{$o{args} // []}], arg0 => $o{arg0}, pid => $$, opt => {%{$o{opt} // {}}}, cmd => {}, ro => {}, trap => {}, jobl => [], umask => umask,
              alias => {}, hash => {}, intext => 0, interactive => $o{interactive} // 'nop' };
   my $st;
   my $c = { sh => $sh, loops => [], map => { map +($_ => is_open($_) ? own_fd($_) : undef), 0 .. 2 } };

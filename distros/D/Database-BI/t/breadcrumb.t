@@ -148,4 +148,31 @@ subtest 'a long chain of back links is cut short' => sub {
 	is($c->[-1][0], 'Bar chart: amount by region', 'the current page is still last');
 };
 
+subtest 'Preferences leads back to the page it was opened from' => sub {
+	my $view = '/view/sales?f=' . url_escape('region:eq:North');
+	$t->get_ok($view);
+	my $href = $t->tx->res->dom->at('#site-nav-preferences')->attr('href');
+	is($href, '/preferences?back=' . url_escape($view), "the nav link names the table with back=");
+
+	my $c = crumbs($href);
+	is_deeply(names($c), ["\x{2190} Home", 'sales (region = North)', 'Preferences'],
+		'Home > sales (region = North) > Preferences');
+	is($c->[1][1], $view, 'the table crumb goes back to the same view');
+
+	# A chart's trail comes along too.
+	$t->get_ok($bar);
+	$c = crumbs($t->tx->res->dom->at('#site-nav-preferences')->attr('href'));
+	is_deeply(names($c), ["\x{2190} Home", 'sales', 'Bar chart: amount by region', 'Preferences'],
+		'from a chart: the whole way back');
+
+	$t->get_ok($href);
+	is($t->tx->res->dom->at('#site-nav-preferences')->attr('href'), '/preferences',
+		'on the preferences page itself the link is plain');
+	$t->get_ok('/');
+	is($t->tx->res->dom->at('#site-nav-preferences')->attr('href'), '/preferences', 'and from Home');
+
+	is_deeply(names(crumbs('/preferences?back=' . url_escape('https://evil.example/x'))),
+		["\x{2190} Home", 'Preferences'], 'a back= to another site is not followed');
+};
+
 done_testing();

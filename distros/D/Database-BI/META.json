@@ -42,13 +42,13 @@
          },
          "requires" : {
             "CGI::Info" : "0",
-            "CGI::Lingua" : "0.85",
+            "CGI::Lingua" : "0.88",
             "CHI" : "0",
             "Carp" : "0",
             "Crypt::URandom" : "0",
             "Cwd" : "0",
             "DB_File" : "0",
-            "Database::Abstraction" : "0.55",
+            "Database::Abstraction" : "0.56",
             "Database::Join" : "v0.11.1",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
@@ -70,6 +70,7 @@
             "Mojolicious::Plugin::Buffer" : "v0.1.1",
             "Mojolicious::Plugin::TemplateToolkit" : "0",
             "Net::SFTP::Foreign" : "0",
+            "Object::Configure" : "0.25",
             "POSIX" : "0",
             "Params::Get" : "0.17",
             "Params::Validate::Strict" : "0.41",
@@ -77,9 +78,12 @@
             "Scalar::Util" : "0",
             "Socket" : "2.010",
             "Spreadsheet::ParseXLSX" : "0",
+            "Statistics::LineFit" : "0.06",
+            "Statistics::Lite" : "3.62",
             "Sub::Protected" : "0.03",
             "Text::CSV" : "0",
             "URI" : "0",
+            "Unicode::Normalize" : "0",
             "perl" : "5.028000",
             "version" : "0.77"
          }
@@ -110,7 +114,9 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/Database-BI/issues"
+         "mailto" : "bug-Database-BI@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-BI",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Database-BI"
       },
       "repository" : {
          "type" : "git",
@@ -118,6 +124,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.021.0",
+   "version" : "0.022.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

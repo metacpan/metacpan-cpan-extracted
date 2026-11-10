@@ -147,6 +147,12 @@ sub with_chain {
 	require Database::BI::Model::Geocode;
 	Database::BI::Model::Geocode::_default_cache()->clear();
 
+	# A geocoder made without a cache keeps one on disc when CACHEDIR (or
+	# CACHE_DIR, or Object::Configure's variable) is set, as it is on many
+	# machines: a place found there would outlive this block and the run, and
+	# land in the user's own cache.  The block sees none of them.
+	delete local @ENV{qw(CACHEDIR CACHE_DIR Database__BI__Model__Geocode__cache_dir)};
+
 	$code->(\%seen);
 
 	return \%seen;

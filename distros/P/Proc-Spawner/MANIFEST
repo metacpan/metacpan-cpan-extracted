@@ -61,6 +61,8 @@ doc/pspawn-design.md
 doc/pspawn-extensions.md
 doc/pspawn-graph.md
 doc/pspawn-known-issues.md
+doc/pspawn-loop.md
+doc/pspawn-shell-windows.md
 doc/pspawn-spawner.md
 doc/test-pools.md
 lib/Proc/ShellSpawn.pm
@@ -73,7 +75,11 @@ lib/Proc/ShellSubset/Small.pm
 lib/Proc/Spawner.pm
 lib/Proc/Spawner/Docs.pod
 lib/Proc/Spawner/Graph.pm
+lib/Proc/Spawner/Loop.pm
+lib/Proc/Spawner/Loop/POSIX.pm
+lib/Proc/Spawner/Loop/Win32.pm
 t/batteries/battery.txt
+t/batteries/echo.txt
 t/batteries/fdbattery.txt
 t/batteries/large-subset-b13.txt
 t/batteries/large-subset-e.txt
@@ -82,6 +88,7 @@ t/batteries/large-subset-post04.txt
 t/batteries/largebattery.txt
 t/batteries/pspawn-d2.txt
 t/batteries/pspawn-l10.txt
+t/batteries/portable.txt
 t/batteries/sigenv.txt
 t/batteries/t1.txt
 t/batteries/t2.txt
@@ -89,8 +96,10 @@ t/batteries/t3.txt
 t/between.t
 t/dash-known.txt
 t/dash.t
+t/echo-shells.txt
 t/fds
 t/graph.t
+t/loop.t
 t/missing-matrix.pl
 t/parser/large-subset-crosscheck.pl
 t/parser/large-subset-shells.tsv
@@ -99,6 +108,7 @@ t/parser/shell-subset-corpus-tests.pl
 t/parser/shell-subset-tests.pl
 t/parser/shellsubset-small-compare.pl
 t/parsers.t
+t/portable.t
 t/programs.t
 t/programs.txt
 t/sgraph/ex1.sg
@@ -114,3 +124,4 @@ t/spawner.t
 t/try.pl
 t/windows.t
 win_spawn.h
+win_loop.h

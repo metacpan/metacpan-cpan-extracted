@@ -6,7 +6,7 @@ license = "perl_5"
 # Minilla always writes README.md from POD. The README is written by hand
 # in README.pod, not in the main module's POD.
 readme_from = "README.pod"
-badges = ["github-actions/test.yml"]
+badges = ["github-actions/test.yml", "metacpan"]
 
 # Changes keeps an "Unreleased" heading, edited by hand at a release,
 # rather than Minilla's {{$NEXT}}.

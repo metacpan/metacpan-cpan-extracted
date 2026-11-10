@@ -46,6 +46,10 @@ _%args_ might be:
 - agent :Str = "Furl/$VERSION"
 - timeout :Int = 10
 - max\_redirects :Int = 7
+- max\_decompressed\_size :Int
+
+    Maximum size of a gzip/deflate-decoded response body; `0` disables the limit. Defaults to 100 MiB for responses held in memory, and to no limit for responses streamed with `write_file` or `write_code`. See ["new" in Furl::HTTP](https://metacpan.org/pod/Furl%3A%3AHTTP#new).
+
 - capture\_request :Bool = false
 
     If this parameter is true, [Furl::HTTP](https://metacpan.org/pod/Furl%3A%3AHTTP) captures raw request string.
@@ -159,7 +163,7 @@ Loads proxy settings from `$ENV{HTTP_PROXY}` and `$ENV{NO_PROXY}`.
 
 # FAQ
 
-- Does Furl depends on XS modules?
+- Does Furl depend on XS modules?
 
     No. Although some optional features require XS modules, basic features are
     available without XS modules.

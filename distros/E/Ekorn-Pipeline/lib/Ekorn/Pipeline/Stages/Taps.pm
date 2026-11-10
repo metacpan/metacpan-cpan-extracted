@@ -84,22 +84,22 @@ Ekorn::Pipeline::Stages::Taps - stages run for their side effects: peek, count_i
 
 =head1 DESCRIPTION
 
-Stages that look at each value as it goes by, and pass it on as it is,
+Stages that look at each value as it goes by and pass it on unchanged,
 for logging, counting or debugging. A stage passes on what it returns,
-so a stage of your own run for its side effects has to return its
-value; these do that for you. Each function returns a stage, and checks
-what it's given when it's called, not on each value.
+so a stage of your own that runs for its side effects has to return
+its value. These do that for you. Each function returns a stage, and
+checks its arguments when it's called, not on each value.
 
-They're stages, so they work wherever stages do: in any pipeline, or on
-an object with C<pipe> and C<tap>, from L<Ekorn::Pipeline::Pipes>, whose
-first value is the object:
+They work wherever stages do: in any pipeline, or on an object with
+C<pipe> and C<tap>, from L<Ekorn::Pipeline::Pipes>, where the first
+value is the object:
 
     $client->tap(peek { say "connected to $_->{host}" })->run;
 
 =head1 FUNCTIONS
 
-C<peek> and C<count_into> are exported by default; C<dump_to> on
-request, or all three with C<:all>.
+C<peek> and C<count_into> are exported by default. C<dump_to> is
+exported on request, and C<:all> gives all three.
 
 =head2 peek
 
@@ -112,19 +112,19 @@ passes the value on, whatever the block returns.
 
     count_into(\$count)
 
-Counts the values into C<$count>, setting it to 0 at the start of each
-run, so after a run it holds how many values went by, even when that's
-none.
+Counts the values into C<$count>. It sets C<$count> to 0 at the start
+of each run, so after a run it holds how many values went by, even if
+none did.
 
 =head2 dump_to
 
     dump_to($fh)
     dump_to
 
-Writes each value to C<$fh>, or to STDERR, with Data::Dumper, its keys
-in order, and passes it on.
+Writes each value to C<$fh>, or to STDERR, with Data::Dumper, keys
+sorted, and passes it on.
 
-It's for debugging. It writes each value in full, secrets and all, and
+It's for debugging. It writes each value in full, secrets and all. It
 doesn't escape control characters in strings, so a value from outside
 can send escape sequences to a terminal.
 

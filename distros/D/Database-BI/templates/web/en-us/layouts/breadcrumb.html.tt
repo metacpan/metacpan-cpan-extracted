@@ -1,0 +1,24 @@
+[%- # The breadcrumb: Home, then every page between Home and this one, then this
+    # page, which is not a link.  The trail comes from the before_render hook in
+    # Database::BI (Dashboard::_breadcrumb_trail), so every page shows the same
+    # names for the same pages.  A page that has steps of its own below itself
+    # -- the folder view's prefixes -- passes them as trail_tail, a list of
+    # { name, href }; this page is then a link and the last of those is not.
+    #
+    # Callers wrap this in <nav class="back-link" aria-label="Breadcrumb">, so a
+    # page can put something of its own beside it (the table's record count).
+-%]
+<span class="crumbs"><a href="/">&larr; Home</a>
+[%- FOREACH crumb IN trail -%]
+ &rsaquo;
+  [%- IF loop.last && !trail_tail.size %] <span aria-current="page">[% crumb.label | html %]</span>
+  [%- ELSE %] <a href="[% crumb.url | html %]">[% crumb.label | html %]</a>
+  [%- END -%]
+[%- END -%]
+[%- FOREACH t IN trail_tail -%]
+ &rsaquo;
+  [%- IF t.href && !loop.last %] <a href="[% t.href | html %]">[% t.name | html %]</a>
+  [%- ELSE %] <span aria-current="page">[% t.name | html %]</span>
+  [%- END -%]
+[%- END -%]
+</span>

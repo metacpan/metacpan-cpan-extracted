@@ -21,7 +21,7 @@
 #include "tk.h"
 #include "tkText.h"
 
-static char rcsid[] = "$Id: tkTextTag.c,v 1.7 1996/03/12 00:09:47 ilya Exp $";
+/* $Id: tkTextTag.c,v 1.7 1996/03/12 00:09:47 ilya Exp $ */
 
 /*
  * Information used for parsing tag configuration information:
@@ -163,17 +163,13 @@ TkTextTagCmd(textPtr, interp, argc, args)
 		TkTextIndexForwChars(&index2, 1, &index2);
 	    }
     
-	    if (tagPtr->affectsDisplay) {
-		TkTextRedrawTag(textPtr, &index1, &index2, tagPtr, !addTag);
-	    } else {
-		/*
-		 * Still need to trigger enter/leave events on tags that
-		 * have changed.
-		 */
-    
-		TkTextEventuallyRepick(textPtr);
-	    }
-	    TkBTreeTag(&index1, &index2, tagPtr, addTag);
+	    /*
+	     * Redraws (or, for a tag that does not affect the display,
+	     * triggers the enter/leave events of the tags that changed)
+	     * and records the change for undo (but for "sel").
+	     */
+
+	    TkTextTagChange(textPtr, &index1, &index2, tagPtr, addTag);
     
 	    /*
 	     * If the tag is "sel" then grab the selection if we're supposed
@@ -458,6 +454,52 @@ TkTextTagCmd(textPtr, interp, argc, args)
 		    (TkTextIndex *) NULL, tagPtr, 1);
 	    return result;
 	}
+    } else if ((c == 'd') && (strncmp(LangString(args[2]), "data", length) == 0)
+	    && (length >= 2)) {
+	TkTextData *dataPtr;
+
+	/*
+	 * The value of the run of the tag containing the character at
+	 * the index (see TkBTreeRunValue).
+	 */
+
+	if ((argc != 5) && (argc != 6)) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " tag data tagName index ?value?\"",
+		    NULL);
+	    return TCL_ERROR;
+	}
+	tagPtr = FindTag(interp, textPtr, LangString(args[3]));
+	if (tagPtr == NULL) {
+	    return TCL_ERROR;
+	}
+	if (TkTextGetIndex(interp, textPtr, LangString(args[4]), &index1)
+		!= TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (TkBTreeRunValue(textPtr, tagPtr, &index1, LangString(args[4]),
+		&dataPtr) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (argc == 5) {
+	    Arg copy = TkTextDataCopyLang(*dataPtr);
+
+	    if (copy != NULL) {
+		Tcl_SetObjResult(interp, copy);
+	    }
+	} else {
+	    if (TkTextVcOn(textPtr)
+		    && (TkTextDataGetLang(*dataPtr) != NULL)) {
+		TkTextVcPredict(textPtr, *dataPtr, TK_TEXT_VC_DROP,
+			TK_TEXT_VC_RUN,
+			TkBTreeVcRunPlace(textPtr, tagPtr, &index1), NULL);
+		TkTextVcNotify(textPtr);
+	    }
+	    TkBTreeSetValue(textPtr, dataPtr, args[5]);
+	    if (!TkTextDataIsEmpty(*dataPtr)) {
+		tagPtr->hasRunValues = 1;
+	    }
+	}
     } else if ((c == 'd') && (strncmp(LangString(args[2]), "delete", length) == 0)) {
 	Tcl_HashEntry *hPtr;
 
@@ -476,14 +518,22 @@ TkTextTagCmd(textPtr, interp, argc, args)
 	    if (tagPtr == textPtr->selTagPtr) {
 		continue;
 	    }
+	    TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
+	    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree),
+		    0, &last);
+	    if (TkTextVcOn(textPtr) && tagPtr->hasRunValues) {
+		/*
+		 * The values of its runs are told before the redisplay.
+		 */
+
+		TkBTreeVcPredictTag(textPtr, &first, &last, tagPtr, 0);
+		textPtr->vcTagDone = 1;
+	    }
 	    if (tagPtr->affectsDisplay) {
 		TkTextRedrawTag(textPtr, (TkTextIndex *) NULL,
 			(TkTextIndex *) NULL, tagPtr, 1);
 	    }
-	    TkBTreeTag(TkTextMakeByteIndex(textPtr->tree, 0, 0, &first),
-		    TkTextMakeByteIndex(textPtr->tree,
-			    TkBTreeNumLines(textPtr->tree), 0, &last),
-		    tagPtr, 0);
+	    TkBTreeTag(&first, &last, tagPtr, 0);
 	    Tcl_DeleteHashEntry(hPtr);
 	    if (textPtr->bindingTable != NULL) {
 		Tk_DeleteAllBindings(textPtr->bindingTable,
@@ -555,7 +605,7 @@ TkTextTagCmd(textPtr, interp, argc, args)
 		    != TCL_OK) {
 		return TCL_ERROR;
 	    }
-	    arrayPtr = TkBTreeGetTags(&index1, &arraySize);
+	    arrayPtr = TkBTreeGetTagsInEffect(&index1, &arraySize);
 	    if (arrayPtr == NULL) {
 		return TCL_OK;
 	    }
@@ -778,7 +828,7 @@ TkTextTagCmd(textPtr, interp, argc, args)
 	goto addAndRemove;
     } else {
 	Tcl_AppendResult(interp, "bad tag option \"", LangString(args[2]),
-		"\": must be add, bind, cget, configure, delete, lower, ",
+		"\": must be add, bind, cget, configure, data, delete, lower, ",
 		"names, nextrange, raise, ranges, or remove",
 		         NULL);
 	return TCL_ERROR;
@@ -826,6 +876,8 @@ TkTextCreateTag(textPtr, tagName)
     tagPtr = (TkTextTag *) ckalloc(sizeof(TkTextTag));
     tagPtr->name = Tcl_GetHashKey(&textPtr->tagTable, hPtr);
     tagPtr->toggleCount = 0;
+    tagPtr->textPtr = textPtr;
+    tagPtr->hasRunValues = 0;
     tagPtr->tagRootPtr = NULL;
     tagPtr->priority = textPtr->numTags;
     tagPtr->border = NULL;

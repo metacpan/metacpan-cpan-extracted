@@ -167,4 +167,35 @@ subtest '_snake_case mirrors the Mojo adapter toTemplateName' => sub {
     is BarefootJS::_snake_case('InputOTP'),      'input_o_t_p',    'acronym splits per capital';
 };
 
+# `extractSsrDefaults` writes no `value` for a prop without a default
+# (spec/js-undefined-value.md, rollout step U1): such an entry seeds JS
+# `undefined` (`$BarefootJS::UNDEF`) for an absent or `UNDEF` prop, and its key
+# still exists (decision 6). An explicit `value => undef` default is `null`. A
+# present prop keeps its value, `undef` (`null`) included.
+subtest '_derive_stash_from_defaults seeds undefined for a prop without a default' => sub {
+    my $U = $BarefootJS::UNDEF;
+    my $is_u = sub { BarefootJS::Undefined::is_undefined($_[0]) };
+    my $missing = { n => { propName => 'n' }, rest => { isRestProps => 1 } };
+    my %seed = BarefootJS::_derive_stash_from_defaults($missing, {});
+    ok exists $seed{n},       'the template variable still exists';
+    ok $is_u->($seed{n}),     'and is undefined';
+    ok $is_u->($seed{rest}),  'a rest entry without a value is undefined too';
+    %seed = BarefootJS::_derive_stash_from_defaults($missing, { n => $U });
+    ok $is_u->($seed{n}),     'a present undefined prop seeds undefined';
+    %seed = BarefootJS::_derive_stash_from_defaults($missing, { n => undef, rest => { a => 1 } });
+    ok exists $seed{n} && !defined $seed{n}, 'an explicit undef (null) is kept';
+    is $seed{rest}, { a => 1 }, 'a passed rest bag is kept';
+    %seed = BarefootJS::_derive_stash_from_defaults($missing, { n => 3 });
+    is $seed{n}, 3, 'a present value is kept';
+
+    my $defaulted = { n => { propName => 'n', value => 'D' }, m => { propName => 'm', value => undef } };
+    %seed = BarefootJS::_derive_stash_from_defaults($defaulted, {});
+    is $seed{n}, 'D', 'an absent prop takes its default';
+    ok exists $seed{m} && !defined $seed{m}, 'a null default seeds null';
+    %seed = BarefootJS::_derive_stash_from_defaults($defaulted, { n => $U });
+    is $seed{n}, 'D', 'an undefined prop takes its default';
+    %seed = BarefootJS::_derive_stash_from_defaults($defaulted, { n => undef });
+    ok exists $seed{n} && !defined $seed{n}, 'an explicit null keeps null, not the default';
+};
+
 done_testing;

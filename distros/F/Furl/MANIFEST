@@ -64,6 +64,7 @@ t/300_high/04_http_request.t
 t/300_high/05_suppress_dup_host_header.t
 t/300_high/06_keep_request.t
 t/300_high/07_cookie.t
+t/300_high/41_max_decompressed_size.t
 t/300_high/99_error.t
 t/400_components/001_response-coding/01-file.t
 t/400_components/001_response-coding/t-euc-jp.html

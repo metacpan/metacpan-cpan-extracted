@@ -1424,6 +1424,9 @@
     .bi-map-popup-rows { margin-top: 0.3em; }
     .bi-map-popup-rows table { border-collapse: collapse; font-size: 90%; }
     .bi-map-popup-rows th, .bi-map-popup-rows td { padding: 0.1em 0.6em 0.1em 0; text-align: left; vertical-align: top; white-space: nowrap; }
+    /* Rows per page (layouts/page_size.html.tt): at the end of a pagination bar. */
+    .page-size { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; margin-left: auto; }
+    .page-size-select { font-size: 0.85rem; padding: 0.15rem 0.3rem; }
   </style>
   [%- IF extra_head %]
   [% extra_head %]
@@ -1437,7 +1440,7 @@
       <a id="site-nav-canvases" href="/canvases" title="Your saved canvases">Canvases</a>
       <a id="site-nav-catalog" href="/catalog" title="Every data file, and the canvases that use it">Catalog</a>
       <a id="site-nav-open" href="/browse" title="Open a data file from anywhere on the server">Open file&hellip;</a>
-      <a id="site-nav-preferences" href="/preferences" title="Choose light or dark, and other settings">Preferences</a>
+      <a id="site-nav-preferences" href="[% (preferences_url.length ? preferences_url : '/preferences') | html %]" title="Choose light or dark, and other settings">Preferences</a>
       <a id="site-nav-tutorial" href="/tutorial" target="_blank" rel="noopener"
          title="Open the tutorial in a new tab (F1)">Tutorial</a>
       [%- IF tutorial_chapter %]

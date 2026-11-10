@@ -10,49 +10,49 @@ decided or done, remove it here and record it where it belongs.
 
 A. WAITING FOR THE USER'S DECISION
 
- 1. X27: what to do with each code of the run's environment.
-    Read: doc/large-subset/large-subset-environment.md, section 3, "At a
-    glance" (every code in one line, how many samples, whether the run could
-    control it), and section 9 (the six kinds of workaround, and the run's
-    environment varied, 2026-11-08); the record per sample:
-    large-subset-provenance.tsv; the samples that changed:
-    tools/large-subset-env-variants.tsv.
-    Done (no decision taken by it): a second run with the other case for
-    echo, locale, pipeline, devfd; fixed or fresh places for path-tmp,
-    path-random, path-home, path-mnt, path-var, path-dev; stand-ins for
-    prog-status (status 1) and prog-output (a chosen text), their answers
-    from the environment (STANDIN_STATUS, STANDIN_OUTPUT); fixed file times
-    for time (FIXTURE_MTIME) (-env of large-subset-runcompare.pl).
-    Decided (the user, 2026-11-08): such runs are footnotes to the level
-    totals (EV1); the run-time comparison redone with a fresh /tmp, a fixed
-    /dev/urandom and fixed file times replaces the published table (A1(b)).
-    Act, per remaining code: fixtures in the run's directory (files,
-    directory, unquoted), chosen values (vars, args, input, ...), more
-    stand-in answers (other statuses or texts, per program), stand-ins for
-    random (shuf, mktemp, sort -R), leave the samples out (race, pid,
-    path-proc, path-root, listing, status), or nothing.
- 2. X27: should "strict" mean "on any platform"?  The subset's own programs
-    echo, printf, test, [, true, false (X21) do not exist on Windows; 142
-    strict samples use one.  Since post-0.09 they run inside Perl, on every
-    platform by default (IP1), as coreutils 9.4 (X21 lists the
-    differences).  Act: yes (a code for them) or no.
- 2a. X27: with POSIXLY_CORRECT=1 in the environment, the subset's echo
-    (the program) sides with dash for backslashes and -e, and differs from
-    both shells for \x (echo '\x4a': 2 samples; section 9).  Act: run echo
-    with POSIXLY_CORRECT removed from its environment, or accept it.
+ 1. X27: which samples of the behaviour run (large-subset-state.md,
+    section 7) compare meaningfully, in the user's four steps (2026-11-10):
+    (1) find the samples the environment cannot affect; (2) for the
+    others, describe exactly how they are affected, and run them in a few
+    example environments (where only one command of a snippet is
+    affected); (3) recognize more such samples by simple programmatic
+    tests; (4) leave the rest to deep AI analysis.
+    Step 1, done (2026-11-07): the levels from the parse trees alone
+    (doc/large-subset/large-subset-environment.md, sections 1-4): strict
+    365, held 2, almost strict 34,291 (if programs behave alike in each
+    run), undecided 5,752.  Record per sample: large-subset-provenance.tsv.
+    Step 2, done in part (2026-11-08; section 9): each undecided sample has
+    codes naming what kind of thing it depends on (files, vars, path-tmp,
+    ...: section 3, "At a glance"), not exactly how (files does not say
+    which file).  Example environments were run where one switch of the
+    whole environment flips the case (-env of large-subset-runcompare.pl):
+    POSIXLY_CORRECT, locale, SIGPIPE, /proc, a fresh /tmp, a fixed
+    /dev/urandom, empty /home, /mnt, /var, a private /dev, every logged
+    program failing (STANDIN_STATUS) or printing a chosen text
+    (STANDIN_OUTPUT), fixed file times (FIXTURE_MTIME); each on every
+    sample with its code, not only those with one affected command.  The
+    samples that changed: tools/large-subset-env-variants.tsv.  Decided:
+    such runs are footnotes to the level totals (EV1); the published table
+    is the run with a fresh /tmp, a fixed /dev/urandom and fixed file
+    times (A1(b)).
+    Not started: step 2 for the codes inside the run itself: files (2,285
+    samples), vars (1,038), unquoted, directory, args, input, tilde, ...;
+    steps 3 and 4.
+    Act: whether to go on, and how far.  The natural next piece: for files
+    and vars, record the exact file and variable names each sample uses,
+    and run the samples where only one command depends on them with a few
+    chosen setups (the file absent, empty, with content; the variable
+    unset, empty, set).
  3. P2 and P4 (large-subset-state.md, sections 4-5): ${...} forms both
     shells refuse; messages with our name and line, and $-.
  5. X2: $! of a background job that starts no process (design question K4).
  6. X7: run() ignores SIGINT and SIGQUIT while it runs, as Perl's system
     does: say if not wanted.
  7. Perl's Windows bugs drafted in doc/perl-win32-system-bugs.md (argv
-    quoting, the cmd.exe retry, batch files): file them, or ask.
- 8. Run 0.07 (repository ilyaz-ai/run; CPAN has 0.06): to be released
-    before a Proc-Spawner that needs it (M2, the primitive system1).  Also
-    delete the branch run of this repository on GitHub (the proxy refuses
-    deletions here); its contents are in ilyaz-ai/run.  Checked 2026-11-08:
-    the whole snippet library through Run 0.07 gives the same as through
-    posix_spawn (large-subset-state.md, section 7, "Through Run").
+    quoting, the cmd.exe retry, batch files, inherited handles): file them, or ask.
+ 8. Delete the branch run of this repository on GitHub (the proxy refuses
+    deletions here); its contents are in ilyaz-ai/run, whose 0.07 is on
+    CPAN (the user, 2026-11-10).
  9. X22 (bash's own bug): report it to bug-bash, if wanted.
 10. M2: where there is neither posix_spawn nor fork, a missing Run makes
     spawn die (at its first call, not at load).  Act: keep it, or fail
@@ -77,14 +77,21 @@ B. WORK (no decision needed)
  - Settings posix_spawn lacks (M1, M2; pspawn-spawner.md, section 8): a
    helper program that sets in the child what cannot be done around the
    call (setsid, pgroup 0, tcsetpgrp, sched, cgroup).
- - W5 (the user, 2026-11-08: "Use the Windows' way"): the event loop on Windows
-   with overlapped I/O (pipes of our own as named pipes; reads, writes and the
-   children's ends through an I/O completion port, the last ones from the
-   kill_with_parent job).
- - Windows: Proc::ShellSpawn there (paths, /bin/sh assumptions; W5 first:
-   the loop does no reads and writes there).  X21's echo, printf, test, [,
-   true, false are done (post-0.09); kill, time, pwd remain.
+ - Windows (doc/pspawn-shell-windows.md): kill of another process and time
+   (X21's rest); ulimit; a test on real Windows.  The snippet library under
+   Wine, now that the shell layer runs there: ours alone on the samples
+   where it calls no program but those done inside Perl (23,898 by the
+   logging run of post-0.09), against ours on Linux (large-subset-state.md,
+   section 7, "W5": the driver was a scratch script, not kept).  Of the
+   user's follow-ups to WS1 (2026-11-09) one remains: cat, sort, grep and
+   the like have so far only BIN1, a temporary workaround (the user,
+   2026-11-10; PROC_SHELLSPAWN_BIN, else Git for Windows' or MSYS2's
+   programs; doc/pspawn-shell-windows.md): what replaces it is open.
  - X10: only Linux is tested (and Windows under Wine).
+ - "Through Run" (large-subset-state.md, section 7) was run before IP1,
+   with the coreutils programs; the table itself is rebuilt for 0.10's
+   in-process default, and W5 checked over it on Linux (2026-11-09: no
+   change).
  - X32: without /proc, Perl's own writes into a pipe the caller gave can
    block if a child fills the pipe between select and the write (possible,
    not observed; no test yet).

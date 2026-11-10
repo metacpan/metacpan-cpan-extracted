@@ -11,7 +11,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 48;
+plan tests => 81;
 $mw->geometry('+10+10');
 
 # Collect background errors (Tk::Error) instead of printing them.
@@ -244,6 +244,357 @@ for my $case (['x ', '1.2', '1.4', '1.3', '1.9', 'all but the head'],
 ok($t->editModified, 'editModified reports the changes made so far');
 $t->editModified(0);
 is($t->editModified, 0, 'editModified(0) clears the flag');
+
+# Scrolling copies the lines still visible and redraws the rest
+# (TkScrollWindow, as in Tk 8.4).  The tk4.0 code waited for
+# GraphicsExpose/NoExpose with XWindowEvent, an empty stub on Win32.
+# Compare the pixels of a widget scrolled twice with those of one drawn
+# from scratch at the same place.
+SKIP: {
+  skip 'no Tk::WinPhoto to capture the window', 4
+    unless eval { require Tk::WinPhoto; 1 };
+  my $text = join '', map { "line $_ " . ('x' x ($_ % 17)) . "\n" } 1..60;
+  my @w = map { $mw->eText(-width => 30, -height => 8, -bd => 2, -padx => 3,
+			   -pady => 1, -highlightthickness => 0)->pack } 1..2;
+  $w[0]->insert('end', $text);
+  $mw->update;
+  $w[0]->yviewScroll(3, 'units');	# copies most lines up
+  $mw->update;
+  $w[0]->yviewScroll(-1, 'units');	# and down
+  $mw->update;
+  $w[1]->insert('end', $text);		# never displayed elsewhere:
+  $w[1]->yview(2);			# no copy (line 0-based here)
+  $mw->update;
+  is($w[0]->index('@0,0'), '3.0', 'scrolled by one unit, three, back one');
+  is($w[1]->index('@0,0'), '3.0', 'the reference shows the same line first');
+  my ($d0, $d1) = map { $mw->Photo(-format => 'Window', -data => oct($_->id))->data } @w;
+  ok(length($d0) > 1000, 'the window could be captured');
+  ok($d0 eq $d1, 'the scrolled pixels equal those drawn from scratch');
+  $_->destroy for @w;
+}
+
+# A wrong block subcommand: the error lists every valid one.
+ok(!eval { $t->block('nosuch'); 1 }, 'a wrong block subcommand is an error');
+like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, data, delete, deletelines, insert, list, names, nodedata, of, split or trim/,
+     'which lists all the subcommands, data included');
+
+# After an undo, the next edit starts an undo step of its own: a second
+# deletion used to join the step of the insertion before the first one,
+# and its undo then took the insertion back as well.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->insert('end', "one two three\n");
+  $u->editSeparator;
+  $u->delete('1.0', '1.4'); $u->editUndo;
+  $u->delete('1.4', '1.8'); $u->editUndo;
+  is($u->get('1.0', 'end'), "one two three\n\n", 'delete, undo, delete, undo restores the text');
+  $u->delete('1.0', '1.4'); $u->editUndo; $u->editRedo;
+  $u->delete('1.0', '1.4'); $u->editUndo;
+  is($u->get('1.0', 'end'), "two three\n\n", 'and a deletion after a redo is a step of its own');
+  $u->destroy;
+}
+
+# A backward tag search in a block with two levels of nodes under its
+# root (tag prevrange, the run of a value, the undo of a block split)
+# walked off a list of nodes in FindTagEnd: a segfault.
+{
+  my $u = $mw->eText->pack;
+  $u->blockConfigure('F');
+  $u->insert('end', "ab\ncd\nef\n");
+  $u->blockInsert('F', '1.0', '3.2');
+  $u->blockSplit('1.4', 1);
+  $u->blockSplit('1.4', 2);
+  $u->tagAdd('c', '1.9', '1.10');
+  is(join(' ', $u->tagPrevrange('c', 'end')), '1.9 1.10',
+     'tag prevrange in a block with nested nodes');
+  $u->tagAdd('c', '1.1', '1.2');
+  is(join(' ', $u->tagPrevrange('c', '1.9')), '1.1 1.2', 'from inside the block too');
+  $u->tagData('c', '1.9', 'v');
+  is($u->tagData('c', '1.9'), 'v', 'and the run of a value there');
+  $u->destroy;
+}
+
+# block list of a block whose only leaf is empty left out what is in
+# that leaf (marks, tag toggles), and the undo of a deletion, which
+# re-creates the text from that list, did not put them back.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('F');
+  $u->insert('end', "ab\ncd\n");
+  $u->blockInsert('F', '1.1');
+  $u->markSet('m', '1.2');
+  $u->markGravity('m', 'left');
+  $u->tagAdd('c', '1.0', '1.2');
+  my ($b) = grep { ref $_ eq 'Tk::Text::Block' } $u->blockList('1.0', 'end');
+  is(join(' ', map { ref($_) =~ /Mark|Tag/ ? ref($_) . "($$_)" : ref $_ } @$b[1 .. $#$b]),
+     'Tk::Text::MarkLeft(m) Tk::Text::TagOff(c)', 'the empty leaf of a block is listed');
+  $u->editReset;
+  $u->delete('1.0', '2.0');
+  $u->editUndo;
+  is($u->index('m'), '1.2', 'the undo of a deletion puts the mark in it back');
+  is(join(' ', $u->tagRanges('c')), '1.0 1.2', 'and the end of the tag');
+  $u->destroy;
+}
+
+# A block insert over several lines moves the lines after the first
+# into the block: if the first line on display was one of them, the
+# next redisplay crashed (the view now goes to the first line).  The
+# undo and redo of block changes show the insert mark (see), so they
+# reached it too.
+{
+  my $u = $mw->eText(-undo => 1, -autoseparators => 0)->pack;
+  $u->blockConfigure($_) for qw(F G);
+  $u->insert('1.0', "ab\ncdef\n");
+  $u->blockInsert('F', '2.2', '2.4');
+  $u->see('2.3');
+  $u->blockInsert('G', '1.1', '2.0');
+  $mw->update;
+  is($u->get('1.0', '1.end'), 'a{b|}cd{ef}', 'redisplay after block insert over the first line shown');
+  $u->delete('1.0', 'end');
+  $u->insert('1.0', "abcdef\nghijkl\nmnopqr\nstu\n");
+  $u->blockInsert('F', '1.4', '1.6');
+  $u->editReset;
+  $u->blockSplit('1.2', 1); $u->editSeparator;
+  $u->insert('2.3', "x\ny", 'c'); $u->editSeparator;
+  $u->blockInsert('G', '1.1', '2.0'); $u->editSeparator;
+  $mw->update;
+  $u->editUndo for 1 .. 2;
+  $mw->update;
+  $u->editRedo for 1 .. 2;
+  $mw->update;
+  is($u->get('1.0', '1.end'), 'a{b|}cd{x|yef}', 'undo and redo of it, with redisplays');
+  $u->destroy;
+}
+
+# Tag searches in a block whose tree has inner nodes: a node of the
+# block skipped for having no toggle of the tag was not checked for the
+# end of the search, which went on past it (tag remove removed the tag
+# far beyond the range, the undo of tag add lost the ranges before).
+# Every tag remove range against a model, and tag nextrange/prevrange.
+{
+  my $u = $mw->eText->pack;
+  $u->blockConfigure('F');
+  $u->insert('1.0', "abc\ndef\nghi\n");
+  $u->blockInsert('F', '1.0', '3.3');
+  $u->blockSplit('1.4', 1);			# {abc||def|ghi}: two nodes
+  my $n = length $u->get('1.0', '1.end');
+  my $model = sub {
+    my @on = @_; my @r;
+    for my $i (0 .. $n - 1) {
+      if ($on[$i] && !($i && $on[$i - 1])) { push @r, "1.$i" }
+      if ($on[$i] && ($i == $n - 1 || !$on[$i + 1])) { push @r, '1.' . ($i + 1) }
+    }
+    join ' ', @r;
+  };
+  my ($bad, $badn, $badp, $badv) = (0, 0, 0, 0);
+  for my $add ([1, $n - 1], [2, 9], [6, 13]) {
+    for my $a (0 .. $n - 1) {
+      for my $b ($a + 1 .. $n) {
+	$u->tagRemove($_, '1.0', 'end') for qw(b v);
+	$u->tagAdd($_, "1.$add->[0]", "1.$add->[1]") for qw(b v);
+	$u->tagData('v', "1.$add->[0]", 'val');		# runs with values
+	$u->tagRemove($_, "1.$a", "1.$b") for qw(b v);
+	$badv++ if join(' ', $u->tagRanges('v')) ne join(' ', $u->tagRanges('b'));
+	my @on = map { $_ >= $add->[0] && $_ < $add->[1] && !($_ >= $a && $_ < $b) } 0 .. $n - 1;
+	my $want = $model->(@on);
+	if (join(' ', $u->tagRanges('b')) ne $want) {
+	  diag("add @$add, remove $a $b: got " . join(' ', $u->tagRanges('b')) . ", want $want") unless $bad++;
+	}
+	my ($first) = grep { $on[$_] && !($_ && $on[$_ - 1]) && $_ >= $a } 0 .. $n - 1;
+	my @nr = $u->tagNextrange('b', "1.$a", "1.$b");
+	$badn++ if (defined $first && $first < $b) ? !@nr || $nr[0] ne "1.$first" : scalar @nr;
+	my ($last) = reverse grep { $on[$_] && !($_ && $on[$_ - 1]) && $_ < $b } 0 .. $n - 1;
+	my @pr = $u->tagPrevrange('b', "1.$b", "1.$a");
+	my $endlast = defined $last ? (grep { $_ > $last && !$on[$_] } $last .. $n - 1)[0] // $n : undef;
+	$badp++ if (defined $last && $endlast > $a) ? !@pr || $pr[0] ne "1.$last" : scalar @pr;
+      }
+    }
+  }
+  is($bad, 0, 'tag remove in a block with inner nodes removes the range only');
+  is($badn, 0, 'tag nextrange stops at its end there');
+  is($badp, 0, 'tag prevrange too');
+  is($badv, 0, 'the same for a tag with run values');
+
+  # Searches starting inside a tagged range (the loop above emptied the
+  # range searched first): nextrange gives the first range starting at
+  # or after the start, prevrange the last starting before the end and
+  # not before the start (as in Tk).
+  my ($badin, $cases) = (0, 0);
+  for my $add ([[1, 4], [6, 9], [11, 13]], [[2, 12]], [[0, 5], [8, 14]]) {
+    $u->tagRemove('b', '1.0', 'end');
+    $u->tagAdd('b', map { ("1.$_->[0]", "1.$_->[1]") } @$add);
+    my @r = map { [$_->[0], $_->[1]] } @$add;
+    for my $a (0 .. $n - 1) {
+      for my $b ($a + 1 .. $n) {
+	my ($nx) = grep { $_->[0] >= $a && $_->[0] < $b } @r;
+	my @want = $nx ? ("1.$nx->[0]", "1.$nx->[1]") : ();
+	my @got = $u->tagNextrange('b', "1.$a", "1.$b");
+	$badin++, diag("nextrange 1.$a 1.$b: @got, want @want") if "@got" ne "@want" && !$badin;
+	my ($pv) = reverse grep { $_->[0] < $b && $_->[0] >= $a } @r;
+	@want = $pv ? ("1.$pv->[0]", "1.$pv->[1]") : ();
+	@got = $u->tagPrevrange('b', "1.$b", "1.$a");
+	$badin++, diag("prevrange 1.$b 1.$a: @got, want @want") if "@got" ne "@want" && !$badin;
+	$cases++;
+      }
+    }
+  }
+  is($badin, 0, "tag nextrange/prevrange from inside ranges in such a block ($cases cases)");
+  $u->destroy;
+}
+
+# Block insert over lines in different nodes of the text's tree (more
+# than a dozen lines): the lines after the last one were linked into
+# the first one's node, the counts went to the wrong nodes, and the
+# node of the last line was not rebalanced (the B-tree check, debug 1,
+# aborted).  Each range here crosses nodes; undo and redo too.
+{
+  my $u = $mw->eText(-undo => 1)->pack;
+  $u->blockConfigure('G');
+  $u->debug(1);
+  my $text = join('', map { "l$_\n" } 1 .. 60);
+  my $ok = 0;
+  for my $r (['12.1', '13.0'], ['12.1', '20.0'], ['42.0', '61.0'], ['5.1', '50.1'], ['2.0', '59.0']) {
+    $u->delete('1.0', 'end');
+    $u->insert('1.0', $text);
+    $u->tagAdd('b', '3.0', '45.1');
+    $u->editReset;
+    my $before = $u->get('1.0', 'end');
+    $u->blockInsert('G', @$r);
+    $u->see('end'); $mw->update;
+    $u->editUndo;
+    $ok++ if $u->get('1.0', 'end') eq $before;
+    $u->editRedo;
+    $u->see('1.0'); $mw->update;
+  }
+  is($ok, 5, 'block insert over lines of several nodes, with the B-tree check');
+  # The node of the last line emptied and freed: its parent was not
+  # rebalanced (bad child count).
+  $u->delete('1.0', 'end');
+  $u->insert('1.0', join('', map { "l$_\n" } 1 .. 100));
+  $u->blockInsert('G', '36.0', '66.0');
+  $u->blockInsert('G', '2.3', '30.1');
+  $mw->update;
+  $u->editUndo; $u->editUndo; $u->editRedo; $u->editRedo;
+  is($u->index('end'), '44.0', 'block insert emptying the node of its last line');
+  $u->destroy;
+}
+
+# The same fault reached through the undo of a deletion inside a block
+# (the review's fuzzer, crash-823: "TkBTreeStartSearch got index in
+# internal BTree", an abort): a redisplay after each change.
+{
+  my $u = $mw->eText(-undo => 1, -autoseparators => 0, -width => 40, -height => 8)->pack;
+  $u->blockConfigure($_) for qw(F G);
+  $u->debug(1);
+  my $step = sub { $_[0]->(); $u->editSeparator; $mw->update };
+  $step->(sub { $u->insert('1.0', "abcdef\nghijkl\nmnopqr\nstu\n") });
+  $step->(sub { $u->blockSplit('4.1', 0) });
+  $step->(sub { $u->blockInsert('G', '1.6', '7.0') });
+  $u->editReset;
+  $step->(sub { $u->blockSplit('1.24', 1) });
+  $step->(sub { $u->insert('1.0', "x\ny") });
+  $step->(sub { $u->tagAdd('b', '1.1', '2.27') });
+  $step->(sub { $u->blockSplit('2.28', 0) });
+  $step->(sub { $u->insert('2.21', "\n") });
+  $step->(sub { $u->insert('1.1', 'ab', 'c') });
+  $step->(sub { $u->insert('1.3', "rs\n", 'b') });
+  $step->(sub { $u->delete('2.2', '3.20') });
+  $step->(sub { $u->editUndo });
+  $step->(sub { $u->blockInsert('F', '1.1', '3.4') });
+  my $before = $u->get('1.0', 'end');
+  $step->(sub { $u->delete('1.25', '1.40') });
+  $step->(sub { $u->editUndo });
+  is($u->get('1.0', 'end'), $before, 'undo of a deletion in a block after a block insert over lines');
+  $u->destroy;
+}
+
+# And crash831 ("SplitSeg reached end of line!", an abort): a separator
+# deleted and made again, then two block inserts, no undo.
+{
+  my $u = $mw->eText(-undo => 0, -width => 40, -height => 8)->pack;
+  $u->blockConfigure($_) for qw(F G);
+  $u->debug(1);
+  $u->insert('1.0', "abcdef\nghijkl\nmnopqr\nstu\n");
+  $u->blockSplit('2.5', 2); $u->blockSplit('2.2', 2);
+  $u->blockInsert('F', '6.0', '7.0'); $u->blockSplit('6.3', 0); $u->blockInsert('F', '1.5', '5.1');
+  $mw->update;
+  $u->blockSplit('2.6', 1); $mw->update;
+  $u->delete('2.6'); $mw->update;
+  $u->blockSplit('2.6', 1); $mw->update;
+  $u->markSet('insert', '2.7'); $u->see('insert'); $mw->update;
+  $u->blockInsert('G', '1.2', '2.8'); $mw->update;
+  $u->blockInsert('F', '1.22', '1.26'); $mw->update;
+  is($u->get('1.0', '1.end'), 'ab{cde{f|gh|ijk|l|m}no{pqr|}{st|u||}}', 'block inserts after a separator deleted and made again');
+  $u->destroy;
+}
+
+# tag names at the head of a block left out a tag that switches off
+# inside the block, although tag ranges covers the head (BUGS 20).  At
+# every position, tag names must agree with tag ranges, for ranges that
+# start before, at or inside a block and end inside or after it.
+{
+  my $w = $mw->eText(-width => 40, -height => 6)->pack;
+  $w->blockConfigure('Std');
+  $w->blockConfigure('E', -empty => 1);
+  my @ranges = (['1.0', '1.6'], ['1.1', '1.6'], ['1.3', '1.6'], ['1.4', '1.6'],
+		['1.5', '1.12'], ['1.0', '1.12'], ['1.3', '1.11'], ['1.3', '1.10'],
+		['1.6', '2.5'], ['1.2', '1.4'], ['1.7', '1.8'], ['1.0', '3.1'],
+		['2.0', '2.6'], ['1.11', '2.4']);
+  my ($bad, $badheads, $heads) = (0, 0, 0);
+  my %heads = map { $_ => 1 } qw(1.3 1.6 2.2 2.5);	# the -empty block too
+  for my $r (@ranges) {
+    $w->delete('1.0', 'end');
+    $w->tagRemove('y', '1.0', 'end');
+    $w->insert('end', "ab cdefgh ij\nkl mnop qr\nst\n");
+    $w->blockInsert('Std', '1.3', '1.9');	# ab {cdefgh} ij
+    $w->blockInsert('Std', '1.6', '1.8');	# ab {cd{ef}gh} ij
+    $w->blockInsert('E', '2.4');		# kl m.nop qr
+    $w->blockInsert('Std', '2.2', '2.6');	# kl{ m.n}op qr
+    is($w->get('1.0', '2.end'), "ab {cd{ef}gh} ij\nkl{ m.n}op qr", 'blocks') if $r == $ranges[0];
+    $w->tagAdd('y', @$r);
+    my @r = $w->tagRanges('y');
+    my $lines = $w->index('end'); $lines =~ s/\..*//;
+    for my $l (1 .. $lines - 1) {
+      (my $n = $w->index("$l.0 lineend")) =~ s/.*\.//;
+      for my $i (map { "$l.$_" } 0 .. $n) {
+	my $in = 0;
+	for (my $k = 0; $k < @r; $k += 2) {
+	  $in ||= $w->compare($i, '>=', $r[$k]) && $w->compare($i, '<', $r[$k + 1]);
+	}
+	my $named = grep { $_ eq 'y' } $w->tagNames($i);
+	my $head = $heads{$i};
+	$heads++ if $head;
+	next if !$named == !$in;
+	$bad++;
+	$badheads++ if $head;
+	diag("y on @$r: tag names $i says " . ($named ? 'on' : 'off'));
+      }
+    }
+  }
+  ok($heads > 0, "block heads among the positions checked ($heads)");
+  is($badheads, 0, 'tag names agrees with tag ranges at the heads of blocks');
+  is($bad, 0, 'and at every other position');
+  $w->destroy;
+}
+
+# An -empty block whose line changed (a newline or a block split before
+# it) did not know its new line, nor one nested in a block when the
+# block insert moved it there: "block at" on its head crashed, and the
+# B-tree check now looks for it (BUGS 25).
+{
+  my $w = $mw->eText;
+  $w->debug(1);
+  $w->blockConfigure('E', -empty => 1);
+  $w->blockConfigure('F');
+  $w->insert('end', "abcde\n");
+  $w->blockInsert('E', '1.2');
+  $w->blockInsert('F', '1.1', '1.4');		# a{b.c}de: E nested in F
+  is(($w->blockAt('1.3'))[2], 'E', 'block at on an -empty block nested in a block');
+  ok(eval { $w->insert('1.1', "x\n"); 1 }, 'a newline before it') or diag $@;
+  is(($w->blockAt('2.2'))[2], 'E', 'block at, after');
+  ok(eval { $w->blockSplit('2.1', 0); 1 }, 'a split before it') or diag $@;
+  $w->destroy;
+}
 
 $t->destroy;
 $mw->destroy;

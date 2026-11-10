@@ -23,7 +23,7 @@
 	"applicationCategory": "DeveloperApplication",
 	"operatingSystem": "Linux, macOS, Windows",
 	"programmingLanguage": "Perl",
-	"softwareVersion": "0.021.0",
+	"softwareVersion": "0.022.0",
 	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
 	"url": "https://metacpan.org/dist/Database-BI",
 	"sameAs": [
@@ -100,7 +100,9 @@
 		<h3>Sort, reorder, filter</h3>
 		<p>
 			Click a header to sort, drag headers to reorder &mdash; both remembered by
-			column name in the browser. The quick-filter bar builds server-side
+			column name in the browser. Dates sort as dates, numbers as numbers and
+			text as text, so <code>T3</code> comes before <code>T27</code>; a table
+			of many pages is sorted whole. The quick-filter bar builds server-side
 			conditions with <code>eq</code>, <code>ne</code>, <code>contains</code>,
 			<code>starts</code>, <code>lt</code>, <code>le</code>, <code>gt</code>,
 			<code>ge</code>, <code>empty</code> and <code>notempty</code>.
@@ -248,9 +250,10 @@ hypnotoad script/database-bi   # preforking server for real use</code></pre>
 <h2 id="preferences">Preferences</h2>
 <p>
 	The Preferences link at the top of every page opens <code>/preferences</code>,
-	where a reader chooses how the application looks to them. It has one setting
-	so far, the theme:
+	where a reader chooses how the application looks to them: the theme, and
+	the rows a table shows on a page.
 </p>
+<h3>Theme</h3>
 <dl class="spec">
 	<dt>Same as this device</dt>
 	<dd>The default. Light or dark, following the setting on the computer or phone, even if that changes while a page is open.</dd>
@@ -266,13 +269,24 @@ hypnotoad script/database-bi   # preforking server for real use</code></pre>
 	in another page, whose colours it cannot know.
 </p>
 
+<h3>Rows per page</h3>
+<p>
+	A long table, and a pivot with many rows, is shown a page at a time, 200 rows
+	to a page unless the reader chooses 25, 50, 100 or All here. All puts every
+	row on one page, which can be slow for a big file. The same list is at the
+	foot of a long table, where it changes that table only, keeping the first row
+	on screen. The page says how many pages there are (&ldquo;Page 2 of 7&rdquo;).
+</p>
+
 <div class="note">
 	<p>
-		<strong>Preferences belong to the browser.</strong> They are kept in its
-		<code>localStorage</code> and never reach the server, so there is nothing to
-		configure and no account to sign in to, and another browser or computer keeps
-		its own. If the browser refuses to store a choice, the page says so and the
-		choice lasts only until the next page.
+		<strong>Preferences belong to the browser.</strong> The theme is kept in its
+		<code>localStorage</code>, and the rows per page in a cookie
+		(<code>bi_per_page</code>), which the server reads to cut the page. Nothing
+		is stored on the server, so there is nothing to configure and no account to
+		sign in to, and another browser or computer keeps its own. If the browser
+		refuses to store a choice, the page says so and the choice lasts only until
+		the next page.
 	</p>
 </div>
 

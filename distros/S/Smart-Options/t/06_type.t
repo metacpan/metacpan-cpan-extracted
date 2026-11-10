@@ -19,8 +19,20 @@ subtest 'type check Num' => sub {
     $opt->type( foo => 'Num' );
 
     is $opt->parse(qw/--foo=3.14/)->{foo}, 3.14;
+    is $opt->parse(qw/--foo=3/)->{foo}, 3;
+    is $opt->parse(qw/--foo=-1/)->{foo}, -1;
     throws_ok { $opt->parse(qw/--foo=xxx/) }
         qr/Value 'xxx' invalid for option foo\(Num\)/;
+    throws_ok { $opt->parse(qw/--foo=3./) }
+        qr/Value '3\.' invalid for option foo\(Num\)/;
+};
+
+subtest 'unknown type' => sub {
+    my $opt = Smart::Options->new();
+    $opt->type( foo => 'Nmu' );
+
+    throws_ok { $opt->parse(qw/--foo=3/) }
+        qr/cannot find type constraint 'Nmu'/;
 };
 
 subtest 'type check ArrayRef' => sub {

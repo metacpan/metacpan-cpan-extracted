@@ -13,7 +13,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 17;
+plan tests => 31;
 $mw->geometry('+10+10');
 
 my $w = $mw->eText(-width => 30, -height => 8)->pack;
@@ -71,4 +71,53 @@ is_deeply([$w->dump('-image', '1.0', 'end')], ['image', $img, '1.7'], 'dump -ima
 my @e = $w->dump('-all', '2.0', 'end');
 is(join(' ', map { $e[3 * $_] . '@' . $e[3 * $_ + 2] } 0 .. $#e / 3), 'text@2.0 mark@3.0 text@3.0', 'the end of the text, as Tk::Text reports it');
 $w->destroy;
+# dump -values: a fourth field in every entry, the value of a mark or of
+# the run a tagon starts (a copy), undef for everything else.
+{
+  my $v = $mw->eText(-width => 30, -height => 4)->pack;
+  $v->blockConfigure('Std');
+  $v->insert('end', "abcdef\nxy\n");
+  $v->tagAdd('t', '1.1', '1.3', '1.4', '1.5');
+  $v->tagData('t', '1.4', {run => 2});
+  $v->markSet('m', '1.2');
+  $v->markData('m', 'mv');
+  $v->markSet('n', '1.3');
+  my @plain = $v->dump('-all', '1.0', '1.end');
+  sub quads { my @d = @_; my @q; push @q, [splice @d, 0, 4] while @d; @q }
+  my @q = quads($v->dump('-all', '-values', '1.0', '1.end'));
+  is(scalar(@q) * 3, scalar(@plain), 'dump -values: as many entries as without it');
+  is_deeply([map { [@$_[0 .. 2]] } @q], [triples(@plain)], 'the same first three fields');
+  my %val = map { ("$_->[0] $_->[1] $_->[2]" => $_->[3]) } @q;
+  is($val{'mark m 1.2'}, 'mv', 'a mark with a value has it as the fourth field');
+  ok(exists $val{'mark n 1.3'} && !defined $val{'mark n 1.3'}, 'a mark without one has undef');
+  is_deeply($val{'tagon t 1.4'}, {run => 2}, 'the tagon of a run with a value has it');
+  ok(!defined $val{'tagon t 1.1'}, 'a run without one has undef');
+  ok(!defined $val{'tagoff t 1.3'} && !defined $val{'text a 1.0'}, 'tagoff and text entries have undef');
+  is_deeply([$v->dump('-values', '1.0', '1.end')], [$v->dump('-all', '-values', '1.0', '1.end')],
+	    '-values alone means -all -values');
+  is_deeply([$v->dump('-mark', '-values', '1.2', '1.4')], ['mark', 'm', '1.2', 'mv', 'mark', 'n', '1.3', undef],
+	    'dump -mark -values');
+  my @cb;
+  $v->dump('-tag', '-mark', '-values', -command => sub { push @cb, [@_] }, '1.0', '1.end');
+  is_deeply([map { [$_->[0], $_->[1], $_->[2], (ref $_->[3] ? $_->[3]{run} : $_->[3])] } @cb],
+	    [['tagon', 't', '1.1', undef], ['mark', 'm', '1.2', 'mv'], ['tagoff', 't', '1.3', undef],
+	     ['mark', 'n', '1.3', undef], ['tagon', 't', '1.4', 2], ['tagoff', 't', '1.5', undef]],
+	    'dump -values -command: the callback gets the value as a fourth argument');
+  @cb = ();
+  $v->dump('-tag', -command => sub { push @cb, scalar @_ }, '1.0', '1.end');
+  is_deeply(\@cb, [3, 3, 3, 3], 'without -values, three arguments as before');
+  # Inside a block, and a node value is not reported.
+  $v->blockInsert('Std', '2.0', '2.2');
+  $v->blockNodedata('2.1', 0, 'leaf');
+  $v->markSet('in', '2.2');
+  $v->markData('in', 'iv');
+  my @b = quads($v->dump('-values', '2.0', '2.end'));
+  is_deeply([map { "$_->[0]:" . ($_->[3] // '-') } @b],
+	    ['block:-', 'text:-', 'mark:iv', 'text:-', 'blockend:-'],
+	    'a mark inside a block has its value; the block entries have none');
+  ok(!eval { $v->dump('-x', '1.0'); 1 }, 'an unknown option is an error');
+  like($@, qr/-values\?/, 'the usage names -values');
+  $v->destroy;
+}
+
 $mw->destroy;

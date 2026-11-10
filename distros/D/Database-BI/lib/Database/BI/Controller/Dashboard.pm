@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -12,6 +12,8 @@ use Cwd			qw(realpath);
 use List::Util		qw(min max sum);
 use CGI::Info;
 use CGI::Lingua;
+use Database::BI::I18N ();
+use Unicode::Normalize ();
 use Database::BI::Tutorial;
 use Database::BI::Util;
 use Mojo::File;
@@ -305,6 +307,15 @@ Readonly my %NAMED_COLORS          => map { $_ => 1 } qw(
 Readonly my $MAX_PREFIX_LEN        => 20;
 Readonly my $DEFAULT_PER_PAGE      => 200;
 Readonly my $MAX_PER_PAGE          => 2_000;
+# The page sizes offered under a table or pivot and on /preferences; 0 is every
+# row on one page.  The preference is the cookie $PAGE_SIZE_COOKIE (the server
+# must see it before it reads the page), and only these values are taken from it.
+Readonly my @PAGE_SIZES       => (25, 50, 100, 200, 0);
+Readonly my %PAGE_SIZE_OK     => map { $_ => 1 } @PAGE_SIZES;
+Readonly my $PAGE_SIZE_COOKIE => 'bi_per_page';
+# per_page=0 (all rows) as a page size the arithmetic can use: one page that
+# holds any table this application can read.
+Readonly my $ALL_ROWS         => 2_000_000_000;
 Readonly my %SCATTER_SCHEMES       => map { $_ => 1 } qw(tableau10 category10 set2 set3 paired);
 
 # Categorical palettes for map series colouring, matching the D3 schemes the
@@ -513,18 +524,60 @@ sub _scatter_radii {
 #
 # Reads ?page= and ?per_page= from the current request, clamps them to sane
 # ranges, and returns the 1-based page number, the page size, and the
-# 0-based row offset.  Pagination is optional: when neither param is present
-# per_page defaults to DEFAULT_PER_PAGE.
+# 0-based row offset.  Without per_page= the size is the reader's preference
+# (_page_size_preference), else DEFAULT_PER_PAGE.  0 is every row: one page of
+# $ALL_ROWS, so it bypasses MAX_PER_PAGE, which bounds only a number typed in
+# the URL.
+#
+# Also stashes, for layouts/page_size.html.tt: page_size (0 for every row),
+# page_size_asked (the URL named one) and page_size_choices.
 sub _pagination {
 	my $self = $_[0];
 
-	my $per_page = _whole_number($self->param('per_page')) || $DEFAULT_PER_PAGE;
-	$per_page = 1         if $per_page < 1;
-	$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
-	my $page = _whole_number($self->param('page')) || 1;
-	$page = 1 if $page < 1;
+	my $asked_in_url = defined $self->param('per_page') && length $self->param('per_page');
+	my $asked = _whole_number($self->param('per_page'));
+	$asked = _page_size_preference($self) unless defined $asked;
+
+	my ($per_page, $page);
+	if (defined $asked && $asked == 0) {
+		($per_page, $page) = ($ALL_ROWS, 1);
+	} else {
+		$per_page = $asked || $DEFAULT_PER_PAGE;
+		$per_page = 1         if $per_page < 1;
+		$per_page = $MAX_PER_PAGE if $per_page > $MAX_PER_PAGE;
+		$page = _whole_number($self->param('page')) || 1;
+		$page = 1 if $page < 1;
+	}
 	my $offset = ($page - 1) * $per_page;
+
+	$self->stash(
+		page_size         => ($per_page == $ALL_ROWS ? 0 : $per_page),
+		page_size_asked   => ($asked_in_url ? 1 : 0),
+		page_size_choices => [ @PAGE_SIZES ],
+	);
 	return ($page, $per_page, $offset);
+}
+
+# _page_size_preference($self) -> $size | undef
+#
+# The page size set on /preferences, from the bi_per_page cookie: one of
+# @PAGE_SIZES (0 = every row), or undef when there is none or it is anything
+# else.
+sub _page_size_preference {
+	my $self = $_[0];
+	my $value = $self->cookie($PAGE_SIZE_COOKIE);
+	return undef unless defined $value && $value =~ /\A\d{1,4}\z/;
+	$value += 0;
+	return $PAGE_SIZE_OK{$value} ? $value : undef;
+}
+
+# _message_text($key) -> $template | undef
+#
+# The %MESSAGES template for $key in the reader's language (Database::BI::I18N,
+# which CGI::Lingua chose from the request's Accept-Language).  A plain function:
+# the package-level checks (request_refusal, _outside_roots) have no $self.
+sub _message_text ($key) {
+	return Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $key);
 }
 
 # _i18n($self, $key, @sprintf_args) -> $string
@@ -535,7 +588,7 @@ sub _pagination {
 # Entry:   $key must be a key in %MESSAGES; @args are sprintf positionals.
 # Exit:    Returns the formatted string, or a fallback containing $key.
 sub _i18n :Protected ($self, $key, @args) {
-	my $tmpl = $MESSAGES{$key} // return "Internal error: unknown message key '$key'";
+	my $tmpl = _message_text($key) // return "Internal error: unknown message key '$key'";
 	return @args ? sprintf($tmpl, @args) : $tmpl;
 }
 
@@ -621,7 +674,7 @@ sub _path_key {
 sub _outside_export_dirs :Protected ($self, $path) {
 	my @dirs = _export_dirs($self) or return undef;
 	return undef if _inside_any($path, @dirs);
-	return sprintf($MESSAGES{error_outside_export_dirs}, $path // '');
+	return sprintf(_message_text('error_outside_export_dirs'), $path // '');
 }
 
 # _resolved_path($path) -> $absolute | undef
@@ -668,7 +721,7 @@ sub _resolved_path {
 sub _outside_roots :Protected ($self, $path) {
 	my @roots = _file_roots($self) or return undef;
 	return undef if _inside_any($path, @roots);
-	return sprintf($MESSAGES{error_outside_roots}, $path // '');
+	return sprintf(_message_text('error_outside_roots'), $path // '');
 }
 
 # _first_root($self) -> $folder
@@ -717,7 +770,7 @@ sub request_refusal {
 	my $hash = $c->app->config('password_hash');
 	unless (defined $hash && length $hash) {
 		my $from = $c->tx->remote_address // '';
-		return $MESSAGES{error_remote_needs_password}
+		return _message_text('error_remote_needs_password')
 			unless $from eq '' || $from =~ /\A(?:::ffff:)?127\./i || $from eq '::1';
 	}
 
@@ -729,7 +782,7 @@ sub request_refusal {
 		my $local   = $host eq 'localhost' || $host =~ /\.localhost\z/
 			|| $host =~ /\A\d{1,3}(?:\.\d{1,3}){3}\z/ || $host =~ /[:\[]/;
 		my $ok = $req->reverse_proxy ? (!@allowed || $listed) : ($local || $listed);
-		return sprintf($MESSAGES{error_host_refused}, $host) unless $ok;
+		return sprintf(_message_text('error_host_refused'), $host) unless $ok;
 	}
 
 	return if $req->method =~ /\A(?:GET|HEAD|OPTIONS)\z/;
@@ -738,7 +791,7 @@ sub request_refusal {
 	my $site    = lc($headers->header('Sec-Fetch-Site') // '');
 	if (length $site) {
 		return if $site eq 'same-origin' || $site eq 'none';
-		return sprintf($MESSAGES{error_cross_site}, $site);
+		return sprintf(_message_text('error_cross_site'), $site);
 	}
 	my $origin = $headers->origin;
 	return unless defined $origin;
@@ -746,7 +799,7 @@ sub request_refusal {
 	my $to   = lc($req->url->to_abs->host_port // '');
 	my $fwd  = $req->reverse_proxy ? lc($headers->header('X-Forwarded-Host') // '') : '';
 	return if length($from) && ($from eq $to || (length($fwd) && $from eq $fwd));
-	return sprintf($MESSAGES{error_cross_site}, $origin);
+	return sprintf(_message_text('error_cross_site'), $origin);
 }
 
 # _is_safe_url($url) -> bool
@@ -871,6 +924,24 @@ sub _breadcrumb_trail {
 	return \@trail;
 }
 
+# _preferences_url($c) -> $href
+#
+# Where the nav's Preferences link goes: /preferences?back=<this page>, so
+# the preferences page's trail ends with a way back here.  This page is the
+# last crumb of its trail; a page with no trail (Home, an error page) gets the
+# plain link, and so does the preferences page, which keeps its own back=.
+# A plain function, called from the before_render hook in Database::BI.
+sub _preferences_url {
+	my ($c) = @_;
+	my $plain = '/preferences';
+	return $plain unless ref $c && $c->isa(__PACKAGE__);
+	my $trail = $c->stash('trail');
+	return $plain unless ref $trail eq 'ARRAY' && @$trail;
+	my $here = $trail->[-1]{url} // '';
+	return $plain if !length($here) || Mojo::URL->new($here)->path->to_string eq $plain;
+	return "$plain?back=" . url_escape(encode('UTF-8', $here));
+}
+
 # _crumb_local($self, $raw) -> Mojo::URL | undef
 #
 # A parent link as a URL on this site, or undef when there is none to follow:
@@ -923,6 +994,10 @@ sub _crumb_parent :Protected ($self, $url) {
 		return undef unless $spec =~ /\Apath:(.+)\z/;
 		my ($file) = _split_path($1);
 		return Mojo::URL->new('/browse?path=' . url_escape(Mojo::File->new($file)->dirname->to_string));
+	}
+	# Preferences came from the page whose nav link opened it (_preferences_url).
+	if ($path eq '/preferences') {
+		return $self->_crumb_local($q->param('back'));
 	}
 	# A canvas came from where its back= says, else from the list of canvases.
 	if ($path =~ m{\A/a/}) {
@@ -1146,7 +1221,9 @@ sub _detect_platform ($user_agent, $fallback) {
 #          what was asked for.
 # Entry:   $platform is the resolved VWF platform string.
 #          $default  is a non-empty fallback language code (e.g. 'en').
-# Exit:    Returns a two-letter ISO 639-1 language code string.
+# Exit:    Returns a two-letter ISO 639-1 language code string, or a code
+#          and region (en-us) when the browser names that region and
+#          templates/<platform>/<code>-<region>/ exists.
 # Side Effects: filesystem stats for template directories;
 #               temporarily sets $ENV{HTTP_ACCEPT_LANGUAGE} with local().
 sub _resolve_language :Protected ($self, $platform, $default) {
@@ -1161,11 +1238,11 @@ sub _resolve_language :Protected ($self, $platform, $default) {
 		my @supported = _template_languages($self->app->home, $platform);
 		push @supported, $default unless grep { $_ eq $default } @supported;
 
-		my $chosen = eval {
-			local $ENV{HTTP_ACCEPT_LANGUAGE} = $accept;
-			my $lingua = CGI::Lingua->new(supported => \@supported);
-			$lingua->language_code_alpha2();
-		};
+		# A regional variant (templates/web/en-us/ for a browser asking for
+		# en-US) is chosen when it has a directory, otherwise the language
+		# itself: en-GB, en-CA and plain en get en.  Database::BI::I18N makes
+		# the same CGI::Lingua call for the messages, so the two agree.
+		my $chosen = Database::BI::I18N::lingua_choice($accept, \@supported);
 		$language = $chosen if defined $chosen;
 	}
 
@@ -1318,7 +1395,7 @@ sub _tidy_error {
 #          but was an array or a scalar, and otherwise ends in a library's path.
 sub _analysis_json_error {
 	my $reason = _tidy_error($_[0]);
-	return sprintf($MESSAGES{error_analysis_json}, length($reason) ? $reason : 'expected a JSON object');
+	return sprintf(_message_text('error_analysis_json'), length($reason) ? $reason : 'expected a JSON object');
 }
 
 # ---------------------------------------------------------------------------
@@ -1343,6 +1420,23 @@ sub _model_dir_of {
 	return $cfg->is_abs ? $cfg : $app->home->child($cfg->to_string);
 }
 
+# _table_stem($data_dir, $name, @exts) -> $stem | undef
+#
+# Purpose: The file stem table:<name> means in data_dir: the name as written
+#          when a file has it, else in lower case, which is what every reader
+#          once looked for (so table:Orders still opens orders.csv); undef
+#          when neither has a file with one of @exts (default @SUPPORTED_EXT).
+#          Reading only the lower case made a file named with a capital,
+#          BandMusic.csv, open on its own page (/view/BandMusic) and nowhere
+#          else: a pivot, chart or merge of table:BandMusic was a 404.
+sub _table_stem ($data_dir, $name, @exts) {
+	@exts = @SUPPORTED_EXT unless @exts;
+	for my $stem ($name, lc $name) {
+		return $stem if grep { -f $data_dir->child("$stem.$_") } @exts;
+	}
+	return undef;	## no critic (ProhibitExplicitReturnUndef)
+}
+
 # _accel_file($self, $spec) -> $path | undef
 #
 # Purpose: The local file a spec can be accelerated from: table:<name> in
@@ -1352,7 +1446,8 @@ sub _accel_file :Protected ($self, $spec) {
 	$spec //= '';
 	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)\z}) {
 		my $data_dir = _data_dir_for($self->app);
-		my ($file) = grep { -f } map { $data_dir->child(lc($1) . ".$_")->to_string } @SUPPORTED_EXT;
+		my $stem     = _table_stem($data_dir, $1) // return undef;
+		my ($file) = grep { -f } map { $data_dir->child("$stem.$_")->to_string } @SUPPORTED_EXT;
 		return $file;
 	}
 	if ($spec =~ m{\Apath:(?!/\.\./)(.+)\z}) {
@@ -1383,8 +1478,7 @@ sub _accelerated_source :Protected ($self, $spec) {
 	my $file = $self->_accel_file($spec) // return undef;
 
 	my @st = stat $file;
-	require Database::BI::Extract;
-	my $cache = Database::BI::Extract->new(model_dir => _model_dir_of($self->app)->to_string);
+	my $cache = _extract_store($self->app);
 	my $path  = $cache->get($spec, $st[9], $st[7]);
 	my $src;
 	if (defined $path) {
@@ -1403,6 +1497,31 @@ sub _accelerated_source :Protected ($self, $spec) {
 	return $src;
 }
 
+# _extract_store($app) -> Database::BI::Extract
+#
+# Purpose: The extract store, in the cache directory Database::BI::CacheDir
+#          chooses (Object::Configure, CACHEDIR, CACHE_DIR, cache_dir in the
+#          config), else in <model_dir>/extracts as before.  A cache directory
+#          inside data_dir is not used for them: each extract is a .db file,
+#          which the home page would list as a table of the user's own, and
+#          nothing is written under data_dir.  They then go in model_dir, whose
+#          own check (_calc_models_path) stops a store inside data_dir.
+sub _extract_store {
+	my ($app) = @_;
+	require Database::BI::Extract;
+	my $model_dir = _model_dir_of($app);
+	my $store = Database::BI::Extract->new(
+		model_dir => $model_dir->to_string,
+		config    => $app->config,
+		home      => $app->home->to_string,
+	);
+	if (_inside_dir(_canonical_path(Mojo::File->new($store->dir)), _canonical_path(_data_dir_for($app)))) {
+		carp 'The cache directory is inside data_dir; extracts are kept in model_dir instead';
+		$store = Database::BI::Extract->new(dir => $model_dir->child('extracts')->to_string);
+	}
+	return $store;
+}
+
 # _is_sqlite_file($path) -> $bool
 #
 # Purpose: True for a SQLite database, whatever its extension (a .db may be one).
@@ -1417,7 +1536,7 @@ sub _is_sqlite_file {
 # accelerate($c, $spec) -> \%built
 #
 # Purpose: Mark a dataset accelerated and build its extract: the rows its file
-#          gives, in a SQLite file under <model_dir>/extracts/.  Called by
+#          gives, in a SQLite file in the extract store (_extract_store).  Called by
 #          script/bi-extract; not a route.
 # Entry:   $c is a controller of the application (Mojolicious build_controller);
 #          $spec is a table: or path: spec naming a local, non-SQLite file.
@@ -1453,8 +1572,7 @@ sub accelerate {
 	my $bytes = eval { $c->_write_sqlite_db($records, \@columns, 'extract') };
 	croak $c->_i18n('error_accel_build', $spec, _tidy_error($@)) unless defined $bytes;
 
-	require Database::BI::Extract;
-	my $cache = Database::BI::Extract->new(model_dir => _model_dir_of($c->app)->to_string);
+	my $cache = _extract_store($c->app);
 	my $path  = eval { $cache->put($key, $st[9], $st[7], $bytes) };
 	croak $c->_i18n('error_accel_build', $spec, _tidy_error($@)) unless defined $path;
 
@@ -1483,7 +1601,7 @@ sub unaccelerate {
 	my $entry  = delete $models->{accelerated}{$spec};
 	return 0 unless ref $entry eq 'HASH';
 	if (defined $entry->{file} && $entry->{file} =~ /\A[0-9a-f]{32}\.db\z/) {
-		unlink _model_dir_of($c->app)->child('extracts', $entry->{file})->to_string;
+		unlink Mojo::File->new(_extract_store($c->app)->dir)->child($entry->{file})->to_string;
 	}
 	$c->_write_models($models);
 	return 1;
@@ -1512,15 +1630,14 @@ sub _open_spec :Protected ($self, $spec) {
 	# An accelerated dataset whose extract still matches its file is read from
 	# the extract, under the file's own label.
 	if (my $fast = _accelerated_source($self, $spec)) {
-		my $label = $spec =~ m{\Atable:(.+)\z} ? lc $1
+		my $label = $spec =~ m{\Atable:(.+)\z} ? (_table_stem(_data_dir_for($self->app), $1) // $1)
 			: do { my ($f, $i) = _split_path($spec =~ s/\Apath://r); $i // Mojo::File->new($f)->basename };
 		return ($fast, $label);
 	}
 	if ($spec =~ m{\Atable:([A-Za-z0-9_]+)(?:/([A-Za-z0-9_]+))?\z}) {
-		my ($table, $internal) = ($1, $2);
-		$table = lc $table;
+		my ($name, $internal) = ($1, $2);
 		my $data_dir = _data_dir_for($self->app);
-		return () unless grep { -f $data_dir->child("$table.$_") } @SUPPORTED_EXT;
+		my $table    = _table_stem($data_dir, $name) // return ();
 		my $src = eval {
 			$self->open_table($table, directory => $data_dir->to_string,
 				defined $internal ? (internal_table => $internal) : ())
@@ -1997,14 +2114,14 @@ sub _time_range_request ($c) {
 	my $preset = $TIME_RANGE{$name};
 	unless ($preset) {
 		$c->render(
-			text   => sprintf($MESSAGES{error_range_name}, $name,
+			text   => sprintf(_message_text('error_range_name'), $name,
 				join(', ', map { $_->{name} } @TIME_RANGES)),
 			status => 400,
 		);
 		return 0;
 	}
 	unless (defined $col && length $col && $col !~ /:/) {
-		$c->render(text => $MESSAGES{error_range_column}, status => 400);
+		$c->render(text => _message_text('error_range_column'), status => 400);
 		return 0;
 	}
 
@@ -2046,7 +2163,7 @@ sub _filter_request ($c) {
 		next unless length($col // '') && defined $op && length $op;
 		next if $FILTER_OP{$op};
 		$c->render(
-			text   => sprintf($MESSAGES{error_filter_op}, $op, $spec, join(', ', @FILTER_OPS)),
+			text   => sprintf(_message_text('error_filter_op'), $op, $spec, join(', ', @FILTER_OPS)),
 			status => 400,
 		);
 		return 0;
@@ -2082,11 +2199,11 @@ sub _unknown_filter_column {
 		my ($col, $op) = split /:/, $spec, 3;
 		next unless length($col // '') && defined $op && length $op;
 		next if $known{$col};
-		return sprintf($MESSAGES{error_filter_column}, $col, $spec, $listed->());
+		return sprintf(_message_text('error_filter_column'), $col, $spec, $listed->());
 	}
 	my $range = $self->stash('time_range');
 	if (ref $range eq 'HASH' && !$known{ $range->{col} // '' }) {
-		return sprintf($MESSAGES{error_range_column_unknown}, $range->{col}, $range->{col}, $listed->());
+		return sprintf(_message_text('error_range_column_unknown'), $range->{col}, $range->{col}, $listed->());
 	}
 	return undef;
 }
@@ -3364,12 +3481,116 @@ sub _rows_of_page {
 	return [ @{$rows}[$offset .. $last] ];
 }
 
+# _page_count($total, $per_page) -> $pages
+#
+# How many pages $total rows make, for the table's "Page N of M".  No rows is
+# still one page, the empty one the table shows.
+sub _page_count {
+	my ($total, $per_page) = @_;
+	return 1 unless $total && $per_page && $per_page > 0;
+	return int(($total + $per_page - 1) / $per_page);
+}
+
+# Where a cell with no date or number sorts: first, ascending, as -Infinity
+# does in the browser.
+Readonly my $NO_NUMBER => -9**9**9;
+
+# _sort_records(\@rows, $column, $dir) -> \@sorted
+#
+# Every row, in the order the table's own header sort gives a page of them
+# (biValueComparator in dashboard.html.tt), so the first page of a table too
+# long for one page is the first page of the sorted rows rather than the first
+# rows sorted.  The column sorts as dates when every non-empty cell is one
+# (YYYY-MM-DD, or M/D/YYYY unless a cell shows the day comes first), else as
+# numbers when every non-empty cell holds one (Util::parse_number, which the
+# browser's parseAccounting copies: "$1,000" and "(5)" are numbers, "T27" is
+# text), else as text the way localeCompare(..., { numeric: true, sensitivity:
+# 'base' }) does: case and accents ignored, a run of digits compared as a
+# number.  An empty cell sorts first, ascending.  Rows that compare equal keep
+# their order, in either direction.  A new array: the rows may be read-only.
+sub _sort_records ($rows, $column, $dir) {
+	my @text = map {
+		my $v = $_->{$column} // '';
+		$v =~ s/\A\s+|\s+\z//g;
+		$v;
+	} @$rows;
+	my @filled = grep { length } @text;
+
+	my $key_of;	# cell text -> number; text sorts when there is none
+	if (@filled && !(grep { !m{\A(?:\d{4}-\d{2}-\d{2}|\d{1,2}/\d{1,2}/\d{4})\z} } @filled)) {
+		my $month_first = 1;
+		for (@filled) {
+			my ($p1, $p2) = m{\A(\d{1,2})/(\d{1,2})/} or next;
+			if ($p1 > 12) { $month_first = 0; last }
+			if ($p2 > 12) { last }
+		}
+		$key_of = sub ($v) {
+			return $1 * 10_000 + $2 * 100 + $3 if $v =~ /\A(\d{4})-(\d{2})-(\d{2})\z/;
+			if ($v =~ m{\A(\d{1,2})/(\d{1,2})/(\d{4})\z}) {
+				return $month_first ? $3 * 10_000 + $1 * 100 + $2 : $3 * 10_000 + $2 * 100 + $1;
+			}
+			return $NO_NUMBER;
+		};
+	} elsif (@filled && !(grep { !defined Database::BI::Util::parse_number($_) } @filled)) {
+		$key_of = sub ($v) { Database::BI::Util::parse_number($v) // $NO_NUMBER };
+	}
+
+	# Equal rows keep their order in either direction, as the browser's stable
+	# sort of -cmp does: the direction turns the comparison, not the result.
+	my $sign = $dir eq 'desc' ? -1 : 1;
+	my @order;
+	if ($key_of) {
+		my @key = map { $key_of->($_) } @text;
+		@order = sort { $sign * ($key[$a] <=> $key[$b]) || $a <=> $b } 0 .. $#$rows;
+	} else {
+		my @key = map { _collation_key($_) } @text;
+		@order = sort { $sign * _collate($key[$a], $key[$b]) || $a <=> $b } 0 .. $#$rows;
+	}
+	return [ @{$rows}[@order] ];
+}
+
+# _collation_key($text) -> \@tokens
+#
+# The text as localeCompare with sensitivity 'base' and numeric sees it: case
+# and accents folded away, each run of digits one number, every other
+# character ranked as ICU's root collation does -- spaces, then punctuation and
+# symbols, then digits, then letters.
+sub _collation_key ($text) {
+	my $folded = CORE::fc(Unicode::Normalize::NFD($text));
+	$folded =~ s/\p{Mn}+//g;
+	my @tokens;
+	while ($folded =~ /(\d+)|(.)/gs) {
+		if (defined $1) {
+			push @tokens, [2, $1 + 0];
+		} else {
+			my $c = $2;
+			push @tokens, [ $c =~ /\s/ ? 0 : $c =~ /\p{L}/ ? 3 : 1, $c ];
+		}
+	}
+	return \@tokens;
+}
+
+# _collate(\@a, \@b) -> -1 | 0 | 1
+sub _collate ($x, $y) {
+	my $n = @$x < @$y ? @$x : @$y;
+	for my $i (0 .. $n - 1) {
+		my ($p, $q) = ($x->[$i], $y->[$i]);
+		my $c = $p->[0] <=> $q->[0]
+			|| ($p->[0] == 2 ? $p->[1] <=> $q->[1] : $p->[1] cmp $q->[1]);
+		return $c if $c;
+	}
+	return @$x <=> @$y;
+}
+
 # _fetch_page( $self, $source, \%params ) -> ( $records, $has_next )
+#   (also stashes page_count, the number of pages: from the rows read, or on
+#   the SQL fast path, which reads one page and a row, from the source's count)
 #   params: per_page  -- page size (required)
 #           offset    -- 0-based row offset (required)
 #           dedup     -- truthy when ?d=1 dedup is requested
-#           sort_col  -- column name to sort by (optional)
-#           sort_dir  -- 'asc' or 'desc' (default 'asc'; ignored unless sort_col set)
+#           sort_col  -- column name to sort by (optional; default the request's
+#                        sort= parameter)
+#           sort_dir  -- 'asc' or 'desc' (default the request's dir=, else 'asc')
 #
 # Purpose: Fetch and reduce one page of records from $source, honouring the
 #          reduce-before-paginate ordering contract.  Two modes:
@@ -3384,9 +3605,15 @@ sub _rows_of_page {
 #     the Nth page contains the Nth page of the *reduced* set, not the Nth page
 #     of the raw set reduced to fewer rows.  Memory cost: the full reduced set.
 #
-# Sort: sort_col/sort_dir are forwarded to selectall_arrayref as
-#   sort_by => [$sort_col, $sort_dir].  Both Database::Abstraction 0.49+
-#   and Database::Join 0.009.0 honour this parameter natively.
+# Sort: a sort column takes the reduction path, and every row is sorted by
+#   _sort_records -- after the fields, filters and cross-row columns, so any
+#   column the table shows can be sorted on -- before the page is cut.  The
+#   table's header sort works on the rows it was given, so on a table longer
+#   than a page it sorted only those, and the page was not the first of the
+#   sorted table; the page asks for sort= instead whenever there is more than
+#   one page.  The backend's sort_by is not used: it compares as text, and
+#   ignores a column whose name is not a safe identifier.  When the sort is
+#   applied, stash sorted_by => { col, dir } tells the page what it shows.
 #
 # Returns (undef, 0) when the underlying fetch throws; the caller must handle
 # $records being undef.
@@ -3394,12 +3621,9 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	my $per_page = $params->{per_page};
 	my $offset   = $params->{offset};
 	my $dedup    = $params->{dedup};
-	my $sort_col = $params->{sort_col};
-	my $sort_dir = ($params->{sort_dir} // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
-
-	# sort_by args forwarded to the backend when a sort column is requested.
-	# D::A 0.49+ and D::J 0.009.0 both support sort_by => [$col, $dir].
-	my @sort_args = $sort_col ? (sort_by => [$sort_col, $sort_dir]) : ();
+	my $sort_col = $params->{sort_col} // $self->param('sort');
+	$sort_col = undef unless defined $sort_col && length $sort_col;
+	my $sort_dir = ($params->{sort_dir} // $self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
 
 	# Collect and validate the filters, the range's bounds included.
 	my @f_specs = grep {
@@ -3421,20 +3645,33 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# restart every running total on page 2.
 	my $cross = length($self->param('cs') // '') ? 1 : 0;
 
-	unless (@f_specs || $dedup || $cross) {
+	unless (@f_specs || $dedup || $cross || defined $sort_col) {
 		if ($is_sql) {
 			# Fast path (SQL-backed): delegate LIMIT/OFFSET to the backend N+1 trick.
 			# Copy before pop: D::A may return a read-only ref to its internal cache.
 			my @records = @{ $source->selectall_arrayref(
-				limit => $per_page + 1, offset => $offset, @sort_args,
+				limit => $per_page + 1, offset => $offset,
 			) // [] };
 			my $has_next = (@records > $per_page) ? 1 : 0;
 			pop @records if $has_next;
+			# The number of pages needs the number of rows.  count() remembers a
+			# file's until it changes, so only the first page of a big SQLite
+			# file pays for the COUNT(*).  Only when there is more than one page:
+			# a short table shows no pagination.  A count that fails costs the
+			# page its "of M", never the page.
+			if ($has_next || $offset > 0) {
+				my $total;
+				my $ok = eval { $total = $source->count; 1 };
+				$self->stash(page_count => _page_count($total, $per_page))
+					if $ok && defined $total && $total =~ /\A\d+\z/;
+			}
 			return (\@records, $has_next);
 		}
-		# Non-SQL fast path: fetch all, sort in Perl, then paginate.
-		my $all = $source->selectall_arrayref(@sort_args) // [];
+		# Non-SQL fast path: fetch all, then paginate.  Every row is in hand, so
+		# the number of pages costs nothing.
+		my $all = $source->selectall_arrayref() // [];
 		my $has_next = (@$all > $offset + $per_page) ? 1 : 0;
+		$self->stash(page_count => _page_count(scalar(@$all), $per_page));
 		return (_rows_of_page($all, $offset, $per_page), $has_next);
 	}
 
@@ -3444,7 +3681,7 @@ sub _fetch_page :Protected ($self, $source, $params) {
 	# clause is silently dropped, returning the full unfiltered set.  The Perl
 	# path is correct on every supported version.  Memory cost: bounded by the
 	# source file size (the same as the dedup path already accepted).
-	my $all = $source->selectall_arrayref(@sort_args) // [];
+	my $all = $source->selectall_arrayref() // [];
 
 	# A stored date or time pattern is what makes a patterned column comparable
 	# with the ISO bounds a relative time range carries, and it belongs to stage 2
@@ -3525,9 +3762,22 @@ sub _fetch_page :Protected ($self, $source, $params) {
 		$all = _apply_filter_spec($all, $_) for @late;
 	}
 
+	# The whole reduced set, sorted, before the page is cut.  A column the view
+	# does not have is left alone (the order is the file's), as the header sort
+	# ignores one it cannot find.
+	if (defined $sort_col) {
+		my %known = map { $_ => 1 } (@cols_so_far ? @cols_so_far : _get_columns($source, $all)), keys %written;
+		$known{$sort_col} = 1 if $cross && @$all && exists $all->[0]{$sort_col};
+		if ($known{$sort_col}) {
+			$all = _sort_records($all, $sort_col, $sort_dir);
+			$self->stash(sorted_by => { col => $sort_col, dir => $sort_dir });
+		}
+	}
+
 	my $total    = scalar @$all;
 	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
 	my @page     = @{ _rows_of_page($all, $offset, $per_page) };
+	$self->stash(page_count => _page_count($total, $per_page));
 
 	return (\@page, $has_next);
 }
@@ -4931,7 +5181,7 @@ Readonly my $MAX_ROW_SPAN => 6;
 sub _save_analyses_or_503 :Protected ($self, $analyses) {
 	return 1 if $self->_write_analyses($analyses);
 
-	$self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+	$self->render(json => { error => _message_text('error_analysis_storage') }, status => 503);
 	return 0;
 }
 
@@ -5025,7 +5275,7 @@ sub _validate_analysis_parts :Protected ($self, $doc) {
 		}
 	}
 	if (defined $doc->{version}) {
-		return sprintf($MESSAGES{error_analysis_version}, $doc->{version})
+		return sprintf(_message_text('error_analysis_version'), $doc->{version})
 			unless !ref $doc->{version} && $doc->{version} =~ /\A\d+\z/ && $doc->{version} <= 1;
 	}
 	for my $key (qw( visuals joins measures combines bookmarks layout hierarchies )) {
@@ -5107,12 +5357,12 @@ sub analyses_create ($self) {
 		unless ref $body eq 'HASH';
 
 	my $err = $self->_validate_analysis($body);
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_invalid'), $err) }, status => 400)
 		if $err;
 
 	my $analyses = $self->_read_analyses;
 	unless ($self->_analyses_path) {
-		return $self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+		return $self->render(json => { error => _message_text('error_analysis_storage') }, status => 503);
 	}
 
 	my $id;
@@ -5138,11 +5388,11 @@ sub analyses_create ($self) {
 # GET /api/analyses/:id
 sub analyses_get ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	$self->render(json => $analyses->{$id});
@@ -5151,11 +5401,11 @@ sub analyses_get ($self) {
 # PUT /api/analyses/:id  (full replace)
 sub analyses_update ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	my $body = eval { decode_json($self->req->body) };
@@ -5163,7 +5413,7 @@ sub analyses_update ($self) {
 		unless ref $body eq 'HASH';
 
 	my $err = $self->_validate_analysis($body);
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_invalid'), $err) }, status => 400)
 		if $err;
 
 	_drop_unknown_keys($body);
@@ -5181,11 +5431,11 @@ sub analyses_update ($self) {
 # PATCH /api/analyses/:id  (partial update -- merges supplied keys)
 sub analyses_patch ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	my $body = eval { decode_json($self->req->body) };
@@ -5196,7 +5446,7 @@ sub analyses_patch ($self) {
 	# nothing but the layout (a drag) or the bookmarks, and a document that
 	# fails on some other field it never mentioned is not this request's fault.
 	my $perr = $self->_validate_analysis_parts($body);
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $perr) }, status => 400)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_invalid'), $perr) }, status => 400)
 		if $perr;
 
 	_drop_unknown_keys($body);
@@ -5216,11 +5466,11 @@ sub analyses_patch ($self) {
 # DELETE /api/analyses/:id
 sub analyses_delete ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	delete $analyses->{$id};
@@ -5243,11 +5493,11 @@ sub analyses_delete ($self) {
 # entry once the reader moves or resizes it.
 sub analyses_add_visual ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
@@ -5378,11 +5628,11 @@ sub analyses_add_visual ($self) {
 # runs one, and leaving the key out is no request to change it at all.
 sub analyses_update_visual ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
@@ -5399,9 +5649,9 @@ sub analyses_update_visual ($self) {
 
 	# A text card's only settings are its options, and it reads no data.
 	if (($a->{visuals}[$index]{kind} // '') eq 'text') {
-		return $self->render(json => { error => $MESSAGES{error_text_card_columns} }, status => 400)
+		return $self->render(json => { error => _message_text('error_text_card_columns') }, status => 400)
 			if exists $body->{encode} || exists $body->{cross_row};
-		return $self->render(json => { error => $MESSAGES{error_text_card_options} }, status => 400)
+		return $self->render(json => { error => _message_text('error_text_card_options') }, status => 400)
 			unless ref $body->{options} eq 'HASH';
 
 		my ($options, $errors) = _text_card_options($body->{options});
@@ -5492,11 +5742,11 @@ sub analyses_update_visual ($self) {
 # afterwards, because the cards on screen carry the old numbers.
 sub analyses_delete_visual ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
@@ -5506,7 +5756,7 @@ sub analyses_delete_visual ($self) {
 	$index += 0;
 	return $self->render(json => { error => "No visual at index $index" }, status => 404)
 		unless $index < scalar @{ $a->{visuals} // [] };
-	return $self->render(json => { error => $MESSAGES{error_visual_not_text} }, status => 400)
+	return $self->render(json => { error => _message_text('error_visual_not_text') }, status => 400)
 		unless ($a->{visuals}[$index]{kind} // '') eq 'text';
 
 	$a->{visuals} = [ @{ $a->{visuals} }[ grep { $_ != $index } 0 .. $#{ $a->{visuals} } ] ];
@@ -5573,16 +5823,16 @@ sub _text_card_options {
 	my $text = (defined $raw->{text} && !ref $raw->{text}) ? $raw->{text} : '';
 	$text =~ s/\r\n?/\n/g;
 	if ($text !~ /\S/) {
-		push @errors, $MESSAGES{error_text_card_empty};
+		push @errors, _message_text('error_text_card_empty');
 	}
 	elsif (length($text) > $MAX_TEXT_CHARS) {
-		push @errors, sprintf($MESSAGES{error_text_card_long}, $MAX_TEXT_CHARS);
+		push @errors, sprintf(_message_text('error_text_card_long'), $MAX_TEXT_CHARS);
 	}
 	$clean{text} = $text;
 
 	if (length(my $font = $raw->{font} // '')) {
 		if (!ref $font && exists $TEXT_FONT_CSS{$font}) { $clean{font} = $font }
-		else { push @errors, $MESSAGES{error_text_card_font} }
+		else { push @errors, _message_text('error_text_card_font') }
 	}
 
 	if (length(my $size = $raw->{size} // '')) {
@@ -5590,7 +5840,7 @@ sub _text_card_options {
 			$clean{size} = $size + 0;
 		}
 		else {
-			push @errors, sprintf($MESSAGES{error_text_card_size}, $MIN_TEXT_POINTS, $MAX_TEXT_POINTS);
+			push @errors, sprintf(_message_text('error_text_card_size'), $MIN_TEXT_POINTS, $MAX_TEXT_POINTS);
 		}
 	}
 
@@ -5598,12 +5848,12 @@ sub _text_card_options {
 		my $value = $raw->{$key} // '';
 		next unless length $value;
 		if (!ref $value && $value =~ /\A#[0-9a-fA-F]{6}\z/) { $clean{$key} = lc $value }
-		else { push @errors, $MESSAGES{error_text_card_colour} }
+		else { push @errors, _message_text('error_text_card_colour') }
 	}
 
 	if (length(my $align = $raw->{align} // '')) {
 		if (!ref $align && $TEXT_ALIGNS{$align}) { $clean{align} = $align }
-		else { push @errors, $MESSAGES{error_text_card_align} }
+		else { push @errors, _message_text('error_text_card_align') }
 	}
 
 	for my $key (qw(bold italic plain)) {
@@ -5683,11 +5933,11 @@ sub _text_card_reply {
 # GET /api/analyses/:id/export
 sub analyses_export ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	my $json = encode_json($analyses->{$id});
@@ -5709,11 +5959,11 @@ sub analyses_import ($self) {
 	_drop_unknown_keys($body);
 
 	my $err = $self->_validate_analysis($body);
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_invalid}, $err) }, status => 400)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_invalid'), $err) }, status => 400)
 		if $err;
 
 	unless ($self->_analyses_path) {
-		return $self->render(json => { error => $MESSAGES{error_analysis_storage} }, status => 503);
+		return $self->render(json => { error => _message_text('error_analysis_storage') }, status => 503);
 	}
 
 	my $analyses = $self->_read_analyses;
@@ -6798,18 +7048,18 @@ sub _bound_canvas_params :Protected ($self, $a, $lookup) {
 			# looks_like_number accepts these, and every comparison with NaN is
 			# false, so it would walk straight past min and max below.
 			unless (Scalar::Util::looks_like_number($val) && $val !~ /\A\s*[-+]?(?:nan|inf)/i) {
-				push @errors, sprintf($MESSAGES{error_param_type}, $pname);
+				push @errors, sprintf(_message_text('error_param_type'), $pname);
 				next;
 			}
 			$val = $val + 0;
 			my ($lo, $hi) = ($def->{min}, $def->{max});
 			if (defined $lo && $val < $lo) {
-				push @errors, sprintf($MESSAGES{error_param_range},
+				push @errors, sprintf(_message_text('error_param_range'),
 					$pname, $lo, defined $hi ? $hi : '+inf');
 				next;
 			}
 			if (defined $hi && $val > $hi) {
-				push @errors, sprintf($MESSAGES{error_param_range},
+				push @errors, sprintf(_message_text('error_param_range'),
 					$pname, defined $lo ? $lo : '-inf', $hi);
 				next;
 			}
@@ -6822,7 +7072,7 @@ sub _bound_canvas_params :Protected ($self, $a, $lookup) {
 
 sub canvas_render ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+	return $self->render(text => _message_text('error_analysis_id_invalid'), status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
@@ -6837,7 +7087,7 @@ sub canvas_render ($self) {
 			status      => 404,
 			title       => 'Canvas not found',
 			canvas_name => $id,
-			error_msg   => sprintf($MESSAGES{error_analysis_not_found}, $id),
+			error_msg   => sprintf(_message_text('error_analysis_not_found'), $id),
 			error_specs => [],
 			language    => $language,
 		);
@@ -6872,7 +7122,7 @@ sub canvas_render ($self) {
 		}
 		if ($newest_src_mtime && $analysis_updated && $newest_src_mtime > $analysis_updated) {
 			$freshness_stale = 1;
-			$freshness_msg   = $MESSAGES{freshness_stale_msg};
+			$freshness_msg   = _message_text('freshness_stale_msg');
 			require POSIX;
 			$freshness_source_mtime = Database::BI::Util::minute_stamp(gmtime($newest_src_mtime)) . ' UTC';
 		}
@@ -7289,9 +7539,10 @@ sub _run_export_pipeline :Protected ($self) {
 	my $sort = $self->param('sort');
 	my $dir  = ($self->param('dir') // 'asc') =~ /\Adesc\z/i ? 'desc' : 'asc';
 	if (defined $sort && grep { $_ eq $sort } @columns) {
-		# A new array: the backend's own can be read-only, as a SQLite one is.
-		$records = [ sort { ($a->{$sort} // '') cmp ($b->{$sort} // '') } @$records ];
-		$records = [ reverse @$records ] if $dir eq 'desc';
+		# By the same rule as the table pages (_sort_records returns a new
+		# array: the backend's own can be read-only, as a SQLite one is).
+		$records = _sort_records($records, $sort, $dir);
+		$self->stash(sorted_by => { col => $sort, dir => $dir });
 	} elsif (defined $sort) {
 		carp $self->_i18n('error_sort_column', $sort);
 	}
@@ -7596,7 +7847,7 @@ sub require_login ($self) {
 		$self->redirect_to($url);
 		return undef;
 	}
-	$self->render(json => { error => $MESSAGES{error_login_required} }, status => 401);
+	$self->render(json => { error => _message_text('error_login_required') }, status => 401);
 	return undef;
 }
 
@@ -7638,13 +7889,13 @@ sub login ($self) {
 	my $seen = $failures->{$who} // [];
 	if (@{$seen} >= $LOGIN_ATTEMPTS) {
 		my $minutes = int(($seen->[0] + $LOGIN_WINDOW - $now + 59) / 60) || 1;
-		return $self->_render_login(error => sprintf($MESSAGES{error_login_locked}, $minutes), status => 429);
+		return $self->_render_login(error => sprintf(_message_text('error_login_locked'), $minutes), status => 429);
 	}
 
 	unless (Database::BI::Password::verify_password(scalar($self->param('password')) // '', $hash)) {
 		push @{ $failures->{$who} //= [] }, $now;
 		$self->app->log->warn("Wrong password from $who");
-		return $self->_render_login(error => $MESSAGES{error_login_failed}, status => 401);
+		return $self->_render_login(error => _message_text('error_login_failed'), status => 401);
 	}
 
 	delete $failures->{$who};
@@ -7660,17 +7911,20 @@ sub logout ($self) {
 =head2 preferences
 
 C<GET /preferences> -- Render the page where a reader sets their preferences:
-for now, the light or dark theme.
+the light or dark theme, and how many rows a table shows on a page.
 
-Preferences belong to the browser, in C<localStorage>, not to the server, so
-this action only renders the form.  The script that stores and applies them is
-in C<layouts/theme.html.tt>, which every page loads.
+Preferences belong to the browser, not to the server, so this action only
+renders the form.  The theme is kept in C<localStorage>; the script that
+stores and applies it is in C<layouts/theme.html.tt>, which every page loads.
+The page size is kept in the cookie C<bi_per_page> (25, 50, 100, 200, or 0 for
+every row), because the server needs it before it reads the page; this action
+reads it to show the current choice.
 
 =head3 API SPECIFICATION
 
 =head4 INPUT
 
-None.
+  cookie bi_per_page   optional; the saved page size, shown as chosen
 
 =head4 OUTPUT
 
@@ -7689,11 +7943,14 @@ sub preferences ($self) {
 	my ($platform, $language) = $self->_resolve_template;
 
 	$self->render(
-		template => "$platform/$language/preferences",
-		handler  => 'tt',
-		format   => 'html',
-		title    => 'Preferences',
-		language => $language,
+		template          => "$platform/$language/preferences",
+		handler           => 'tt',
+		format            => 'html',
+		title             => 'Preferences',
+		language          => $language,
+		page_size         => _page_size_preference($self) // $DEFAULT_PER_PAGE,
+		page_size_choices => [ @PAGE_SIZES ],
+		page_size_cookie  => $PAGE_SIZE_COOKIE,
 	);
 }
 
@@ -8557,10 +8814,11 @@ sub columns_api ($self) {
 	elsif (defined $table_name && $table_name =~ m{\A([A-Za-z_][A-Za-z0-9_]*)(?:/([A-Za-z_][A-Za-z0-9_]*))?\z}) {
 		my ($table, $internal) = ($1, $2);
 		my $data_dir = _data_dir_for($self->app);
+		my $stem     = _table_stem($data_dir, $table);
 		return $self->render(json => { error => 'not found' }, status => 404)
-			unless grep { -f $data_dir->child(lc($table) . ".$_") } @SUPPORTED_EXT;
+			unless defined $stem;
 		$source = eval {
-			$self->open_table(lc $table, directory => $data_dir->to_string,
+			$self->open_table($stem, directory => $data_dir->to_string,
 				defined $internal ? (internal_table => $internal) : ())
 		};
 	}
@@ -8959,6 +9217,7 @@ sub combine_tables ($self) {
 	my $has_next = ($total > $offset + $per_page) ? 1 : 0;
 	my @page_recs = @{ _rows_of_page($records, $offset, $per_page) };
 	$records = \@page_recs;
+	$self->stash(page_count => _page_count($total, $per_page));
 
 	my (undef, $filter_specs, $filters_json) = $self->_apply_filters($records, { chips_only => 1 });
 
@@ -9236,7 +9495,7 @@ sub export_write ($self) {
 	# through, a link inside the folders would put the export wherever it
 	# points, outside file_roots or export_dirs, or into a dot-file.
 	if (-l $dest || (-e $dest && !-f $dest)) {
-		return $self->render(json => { error => sprintf($MESSAGES{error_export_not_file}, $asked->child($filename)->to_string) }, status => 403);
+		return $self->render(json => { error => sprintf(_message_text('error_export_not_file'), $asked->child($filename)->to_string) }, status => 403);
 	}
 	my $tmp;
 	my $ok = eval {
@@ -9856,10 +10115,18 @@ sub graph_view ($self) {
 	}
 	# Perl fallback: compute from the already-stripped @y_vals.
 	unless (defined $min_y) {
-		$min_y = min(@y_vals);
-		$max_y = max(@y_vals);
-		$avg_y = sum(@y_vals) / scalar(@y_vals);
+		require Statistics::Lite;
+		$min_y = Statistics::Lite::min(@y_vals);
+		$max_y = Statistics::Lite::max(@y_vals);
+		$avg_y = Statistics::Lite::mean(@y_vals);
 	}
+
+	# The trend line: a least-squares fit of Y against the point's place on the
+	# axis.  The axis is a d3.scalePoint, which spaces the points evenly whatever
+	# their labels say, so the place (0, 1, 2, ...) is what makes the fit a
+	# straight line on this chart.  The page refits the points in view after a
+	# zoom, the same way; this is the whole chart's.
+	my $trend = _trend_line(\@y_vals);
 
 	my ($source_url, $source_accessed) = $self->_url_attribution;
 
@@ -9892,10 +10159,33 @@ sub graph_view ($self) {
 		ref_min_y        => $min_y,
 		ref_max_y        => $max_y,
 		ref_avg_y        => sprintf('%.4g', $avg_y),
+		($trend ? (
+			trend_slope     => sprintf('%.4g', $trend->{slope}),
+			trend_intercept => sprintf('%.6g', $trend->{intercept}),
+			trend_r2        => sprintf('%.2f', $trend->{r_squared}),
+		) : ()),
 		source_url       => $source_url,
 		source_accessed  => $source_accessed,
 		language         => $language,
 	);
+}
+
+# _trend_line(\@y) -> { slope, intercept, r_squared } | undef
+#
+# The least-squares line through the values, each at its place 0, 1, 2, ...
+# (Statistics::LineFit).  undef for fewer than two values, or when the fit
+# fails.  A flat series has slope 0 and an R squared of 1 (LineFit's answer:
+# the line passes through every point).
+sub _trend_line {
+	my ($ys) = @_;
+	return undef unless ref $ys eq 'ARRAY' && @$ys >= 2;
+	require Statistics::LineFit;
+	my $fit = Statistics::LineFit->new;
+	return undef unless $fit->setData([ 0 .. $#$ys ], $ys);
+	my ($intercept, $slope) = $fit->coefficients;
+	return undef unless defined $slope && defined $intercept;
+	my $r2 = $fit->rSquared;
+	return { slope => $slope, intercept => $intercept, r_squared => $r2 // 0 };
 }
 
 sub pie_view ($self) {
@@ -10651,9 +10941,10 @@ sub tables_view ($self) {
 	my @tables;
 
 	if ($spec =~ /\Atable:([A-Za-z0-9_]+)\z/) {
-		my $table_name = lc $1;
 		my $data_dir   = _data_dir_for($self->app);
-		for my $ext (qw(sql sqlite sqlite3 db json)) {
+		my @exts       = qw(sql sqlite sqlite3 db json);
+		my $table_name = _table_stem($data_dir, $1, @exts) // lc $1;
+		for my $ext (@exts) {
 			my $p = $data_dir->child("$table_name.$ext");
 			if (-f $p) {
 				$file_path = $p->to_string;
@@ -11247,6 +11538,7 @@ sub pivot_view ($self) {
 		page              => $page,
 		per_page          => $per_page,
 		has_next          => $piv_has_next,
+		page_count        => _page_count($total_row_groups, $per_page),
 		page_base_url     => $piv_page_url->to_string,
 		total_row_groups  => $total_row_groups,
 		language      => $language,
@@ -12807,10 +13099,12 @@ sub _map_region {
 # map_geocode_online => 0 keeps every lookup on this machine: a place the local
 # data does not know is then not sent to OpenStreetMap.  A false $online does
 # the same for one request (the progress run, once Nominatim has failed).
-# Geo::Coder::List keeps its answers in files beside models.json, so a place
-# Nominatim found is not asked again by another request, worker or restart.  A
-# model_dir that is refused (inside data_dir) gets none, and the module falls
-# back on a cache in this process's memory.
+# Geo::Coder::List keeps its answers in files, so a place Nominatim found is not
+# asked again by another request, worker or restart.  Geocode->new chooses the
+# directory (Object::Configure, CACHEDIR, CACHE_DIR, cache_dir in this config,
+# then <model_dir>/geocode-cache).  A model_dir that is refused (inside
+# data_dir) gives no default, and with nothing else set the module falls back
+# on a cache in this process's memory.
 sub _map_geocoder :Protected ($self, $online) {
 	require Database::BI::Model::Geocode;
 
@@ -12820,8 +13114,10 @@ sub _map_geocoder :Protected ($self, $online) {
 
 	return Database::BI::Model::Geocode->new(
 		(defined($models_path)
-			? (cache => Database::BI::Model::Geocode->file_cache(Mojo::File->new($models_path)->dirname->to_string))
+			? (model_dir => Mojo::File->new($models_path)->dirname->to_string)
 			: ()),
+		config => $cfg,
+		home   => $self->app->home->to_string,
 		(defined($injected) && ref($injected) && $injected->can('geocode_many')
 			? (geocoder => $injected) : ()),
 		(defined($cfg->{openaddr}) && length($cfg->{openaddr})
@@ -14216,11 +14512,11 @@ sub _verify_share_token :Protected ($self, $id, $token) {
 # POST /api/analyses/:id/share
 sub analyses_share ($self) {
 	my $id = $self->stash('id') // '';
-	return $self->render(json => { error => $MESSAGES{error_analysis_id_invalid} }, status => 400)
+	return $self->render(json => { error => _message_text('error_analysis_id_invalid') }, status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(json => { error => sprintf($MESSAGES{error_analysis_not_found}, $id) }, status => 404)
+	return $self->render(json => { error => sprintf(_message_text('error_analysis_not_found'), $id) }, status => 404)
 		unless exists $analyses->{$id};
 
 	my $expires = time() + $SHARE_TOKEN_TTL;
@@ -14237,16 +14533,16 @@ sub analyses_share ($self) {
 sub share_view ($self) {
 	my $id    = $self->stash('id') // '';
 	my $token = $self->param('token') // '';
-	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+	return $self->render(text => _message_text('error_analysis_id_invalid'), status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
-	return $self->render(text => $MESSAGES{error_token_missing}, status => 401)
+	return $self->render(text => _message_text('error_token_missing'), status => 401)
 		unless length $token;
 	unless ($self->_verify_share_token($id, $token)) {
-		return $self->render(text => $MESSAGES{error_token_invalid}, status => 403);
+		return $self->render(text => _message_text('error_token_invalid'), status => 403);
 	}
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+	return $self->render(text => sprintf(_message_text('error_analysis_not_found'), $id), status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
@@ -14266,16 +14562,16 @@ sub share_view ($self) {
 sub embed_view ($self) {
 	my $id    = $self->stash('id') // '';
 	my $token = $self->param('token') // '';
-	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+	return $self->render(text => _message_text('error_analysis_id_invalid'), status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
-	return $self->render(text => $MESSAGES{error_token_missing}, status => 401)
+	return $self->render(text => _message_text('error_token_missing'), status => 401)
 		unless length $token;
 	unless ($self->_verify_share_token($id, $token)) {
-		return $self->render(text => $MESSAGES{error_token_invalid}, status => 403);
+		return $self->render(text => _message_text('error_token_invalid'), status => 403);
 	}
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+	return $self->render(text => sprintf(_message_text('error_analysis_not_found'), $id), status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
@@ -14339,7 +14635,7 @@ sub visual_download ($self) {
 	my $n      = $self->stash('n')      // 0;
 	my $format = $self->stash('fmt') // '';
 
-	return $self->render(text => $MESSAGES{error_analysis_id_invalid}, status => 400)
+	return $self->render(text => _message_text('error_analysis_id_invalid'), status => 400)
 		unless $id =~ /\A[A-Za-z0-9]+\z/;
 	return $self->render(text => 'Format must be csv or png', status => 400)
 		unless $format =~ /\A(?:csv|png)\z/;
@@ -14347,14 +14643,14 @@ sub visual_download ($self) {
 		unless $n =~ /\A\d+\z/;
 
 	my $analyses = $self->_read_analyses;
-	return $self->render(text => sprintf($MESSAGES{error_analysis_not_found}, $id), status => 404)
+	return $self->render(text => sprintf(_message_text('error_analysis_not_found'), $id), status => 404)
 		unless exists $analyses->{$id};
 	my $a = $analyses->{$id};
 
 	my @visuals = @{ $a->{visuals} // [] };
 	return $self->render(text => "Visual $n not found", status => 404)
 		unless $n < scalar @visuals;
-	return $self->render(text => $MESSAGES{error_text_card_no_data}, status => 404)
+	return $self->render(text => _message_text('error_text_card_no_data'), status => 404)
 		if ($visuals[$n]{kind} // '') eq 'text';
 
 	if ($format eq 'csv') {
@@ -14398,7 +14694,7 @@ sub visual_download ($self) {
 # On error:     { error } with 400, 503, or 502 status
 sub ask_api ($self) {
 	my $api_key = $self->app->config('ai_api_key') // '';
-	return $self->render(json => { error => $MESSAGES{ask_unavailable} }, status => 503)
+	return $self->render(json => { error => _message_text('ask_unavailable') }, status => 503)
 		unless length $api_key;
 
 	my $left_spec = $self->param('l') // '';
@@ -14406,9 +14702,9 @@ sub ask_api ($self) {
 		unless length $left_spec;
 
 	my $question = $self->param('q') // '';
-	return $self->render(json => { error => $MESSAGES{ask_no_question} }, status => 400)
+	return $self->render(json => { error => _message_text('ask_no_question') }, status => 400)
 		unless length $question;
-	return $self->render(json => { error => sprintf($MESSAGES{ask_question_too_long}, $ASK_MAX_QUESTION) }, status => 400)
+	return $self->render(json => { error => sprintf(_message_text('ask_question_too_long'), $ASK_MAX_QUESTION) }, status => 400)
 		if length($question) > $ASK_MAX_QUESTION;
 
 	my ($src, $records, $columns, $left_label) = $self->_run_pipeline_source;
@@ -14429,7 +14725,7 @@ sub ask_api ($self) {
 		model    => $self->app->config('ai_model')    // 'claude-haiku-5-5',
 	};
 
-	return $self->render(json => { error => sprintf($MESSAGES{ai_limit_reached}, _ai_calls_per_hour($self)) }, status => 429)
+	return $self->render(json => { error => sprintf(_message_text('ai_limit_reached'), _ai_calls_per_hour($self)) }, status => 429)
 		unless _ai_call_allowed($self);
 
 	my $result = Database::BI::Ask::ask(
@@ -14442,11 +14738,11 @@ sub ask_api ($self) {
 
 	if (my $err = $result->{error}) {
 		my ($status, $msg) =
-			$err eq 'ask_unavailable'              ? (503, $MESSAGES{ask_unavailable})
-		  : $err eq 'ask_no_question'              ? (400, $MESSAGES{ask_no_question})
-		  : $err eq 'ask_provider_error'           ? (502, $MESSAGES{ask_provider_error})
-		  : $err eq 'ask_unparseable'              ? (422, $MESSAGES{ask_unparseable})
-		  : $err =~ /\Aask_invalid_spec:(.+)\z/   ? (422, sprintf($MESSAGES{ask_invalid_spec}, $1))
+			$err eq 'ask_unavailable'              ? (503, _message_text('ask_unavailable'))
+		  : $err eq 'ask_no_question'              ? (400, _message_text('ask_no_question'))
+		  : $err eq 'ask_provider_error'           ? (502, _message_text('ask_provider_error'))
+		  : $err eq 'ask_unparseable'              ? (422, _message_text('ask_unparseable'))
+		  : $err =~ /\Aask_invalid_spec:(.+)\z/   ? (422, sprintf(_message_text('ask_invalid_spec'), $1))
 		  :                                          (500, $err);
 		return $self->render(json => { error => $msg }, status => $status);
 	}

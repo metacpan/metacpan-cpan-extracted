@@ -24,13 +24,16 @@ WriteMakefile(
 		'Cwd'		=> 0,		# For realpath() in the data_dir guard (Dashboard.pm)
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
-		'CGI::Lingua'		=> '0.85',
-		'Database::Abstraction'	=> '0.55',	# 0.55 requires the CSV and XML readers it loads (DBD::CSV, Text::xSV::Slurp, XML::Simple); 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
+		'CGI::Lingua'		=> '0.88',	# 0.88 reads the locale (LC_ALL, then LC_MESSAGES, then LANG), which the scripts' messages follow
+		'Database::Abstraction'	=> '0.56',	# 0.56 reads "" inside a quoted field as one quote; 0.55 requires the CSV and XML readers it loads (DBD::CSV, Text::xSV::Slurp, XML::Simple); 0.54 reads a table named data (Export > SQLite); 0.50 added redis_key + standalone-key support; 0.49 added aggregate(); 0.48 added limit/offset support in selectall_arrayref
 		'Database::Join' => '0.011.1',	# 0.011.1: a driver failure always has a message; 0.011.0 added Database::Join::Catalog, through which every table list, column list and SQLite write goes; 0.009.0 added aggregate(), limit/offset/sort_by, dbi_source(); 0.004.0 added backend=>'auto' SQLite spill
 		'Net::SFTP::Foreign' => 0,
+		'Object::Configure'	=> '0.25',	# cache_dir for each object that keeps a cache (Database::BI::CacheDir); 0.25: configure($class, \%params), and logger => [] keeps a syslog universal.yml from opening
 		'File::Path'	=> '2.07',	# For remove_tree in Dashboard.pm at runtime
 		'File::Spec'	=> '3.40',
 		'List::Util'	=> '1.40',
+		'Statistics::LineFit'	=> '0.06',	# the line graph's trend line
+		'Statistics::Lite'	=> '3.62',	# the line graph's min, max and mean when not pushed to SQL
 		'IPC::System::Simple' => 0,	# For autodie (:all) in DataSource.pm at runtime
 		'HTML::D3' => '0.30',	# 0.30 puts a Content-Security-Policy nonce on its scripts; 0.29 colours treemap tiles by a measure, takes a combo scheme and escapes tooltip text; 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 		'HTML::TagCloud' => '0.38',	# word cloud page (/wordcloud)
@@ -39,6 +42,7 @@ WriteMakefile(
 		'HTTP::Message'			=> 0,		# HTTP::Response, for SafeUA's refusals (the dist HTTP::Request comes from)
 		'URI'				=> 0,		# _is_safe_url's early check of an import URL
 		'Encode'			=> 0,		# Extract.pm and Summary.pm (core, listed for completeness)
+		'Unicode::Normalize'	=> 0,		# Dashboard.pm's table sort folds accents (core)
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
@@ -85,9 +89,12 @@ WriteMakefile(
 				url  => 'https://github.com/nigelhorne/Database-BI.git',
 				web => 'https://github.com/nigelhorne/Database-BI',
 			}, bugtracker => {
-				web => 'https://github.com/nigelhorne/Database-BI/issues',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-BI',
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Database-BI',
+				# web => 'https://github.com/nigelhorne/Database-BI/issues',
+				mailto => 'bug-Database-BI@rt.cpan.org'
 			}
-		},		prereqs => {
+		}, prereqs => {
 			runtime => {
 				recommends => {
 					# Geocoding a dataset's location column (Phase 6.2).  Loaded with a

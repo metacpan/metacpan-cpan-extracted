@@ -19,7 +19,7 @@ BEGIN
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( HTTP::Promise::Body::Form );
     use vars qw( $VERSION $CRLF $DEBUG );
-    use Data::UUID;
+    use Crypt::Misc ();
     our $CRLF = "\015\012";
     our $VERSION = 'v0.2.1';
     our $DEBUG = 0; # REMOVE ME
@@ -42,7 +42,7 @@ sub as_string
 {
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    my $boundary = $opts->{boundary} || $self->boundary || Data::UUID->new->create_str;
+    my $boundary = $opts->{boundary} || $self->boundary || Crypt::Misc::random_v4uuid();
     my $eol  = $opts->{eol} || $CRLF;
     my $parts = $self->make_parts( $opts );
     return( $self->pass_error ) if( !defined( $parts ) );
@@ -113,7 +113,7 @@ sub length
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $eol  = $opts->{eol} || $CRLF;
-    my $boundary = $opts->{boundary} || $self->boundary || Data::UUID->new->create_str;
+    my $boundary = $opts->{boundary} || $self->boundary || Crypt::Misc::random_v4uuid();
 
     my $total = 0;
     my $sep   = '--' . $boundary . $eol;
@@ -424,7 +424,7 @@ Supported options are:
 
 A string used as a part delimiter. Note, however, that even if you provide this value, it will not replace the C<boundary> value of a C<HTTP::Promise::Body::Form::Field> C<Content-Disposition> field if it is set.
 
-If this is not provided, it will use the value set with L</boundary>, or in the last resort, a new one will be automatically generated using L<Data::UUID/create_str>
+If this is not provided, it will use the value set with L</boundary>, or in the last resort, a new one will be automatically generated using L<Crypt::Misc/random_v4uuid>
 
 =item * C<eol>
 
@@ -466,7 +466,7 @@ Supported options are:
 
 A string used as a part delimiter. Note, however, that even if you provide this value, it will not replace the C<boundary> value of a C<HTTP::Promise::Body::Form::Field> C<Content-Disposition> field if it is set.
 
-If this is not provided, a new one will be automatically generated using L<Data::UUID/create_str>
+If this is not provided, a new one will be automatically generated using L<Crypt::Misc/random_v4uuid>
 
 =item * C<fields>
 

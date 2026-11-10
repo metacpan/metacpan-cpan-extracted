@@ -192,9 +192,11 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
 </div>
 
 [%- SET pnum = page ? page : 0 -%]
-[%- IF pnum > 1 OR has_next -%]
+[%- SET show_pages = (pnum > 1 OR has_next) ? 1 : 0 -%]
+[%- IF show_pages OR page_size_asked OR (page_size.length AND page_size == 0) -%]
 [%- SET sep = page_base_url.search('\?') ? '&amp;' : '?' -%]
 <nav class="piv-pagination" aria-label="Pivot page navigation">
+  [%- IF show_pages -%]
   [%- IF pnum > 1 -%]
   <a class="piv-page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>
   [%- ELSE -%]
@@ -206,11 +208,15 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
   [%- ELSE -%]
   <span class="piv-page-btn piv-page-btn-dis">Next &raquo;</span>
   [%- END -%]
-  <span class="piv-page-info">Page [% page %] &mdash; [% per_page %] row groups/page</span>
+  <span class="piv-page-info">Page [% page %][% IF page_count %] of [% page_count %][% END %] &mdash; [% per_page %] row groups/page</span>
+  [%- END %]
+  [% PROCESS "web/en/layouts/page_size.html.tt" ps_id = 'page-size' ps_mode = 'view' %]
 </nav>
 [%- END -%]
 
 <script nonce="[% csp_nonce | html %]">
+[% PROCESS "web/en/layouts/parse_accounting.html.tt" %]
+
 // ---------------------------------------------------------------------------
 // Pivot table: click-to-sort and (flat header only) drag-to-reorder columns
 // ---------------------------------------------------------------------------
@@ -265,8 +271,7 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
       .filter(Boolean);
 
     var numeric = nonEmpty.length > 0 && nonEmpty.every(function (v) {
-      var s = v.replace(/[^\d.\-]/g, '');
-      return s.length > 0 && !isNaN(parseFloat(s));
+      return !isNaN(parseAccounting(v));
     });
 
     rows.sort(function (a, b) {
@@ -274,9 +279,8 @@ single header row.  Clicking a header sorts it, and dragging it moves it.</p>
       var bv = b.cells[dIdx] ? b.cells[dIdx].textContent.trim() : '';
       var cmp;
       if (numeric) {
-        var an = parseFloat(av.replace(/[^\d.\-]/g, '') || '0');
-        var bn = parseFloat(bv.replace(/[^\d.\-]/g, '') || '0');
-        cmp = an - bn;
+        var an = parseAccounting(av), bn = parseAccounting(bv);
+        cmp = (isNaN(an) ? 0 : an) - (isNaN(bn) ? 0 : bn);
       } else {
         cmp = av.localeCompare(bv, undefined, { numeric: true, sensitivity: 'base' });
       }

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.039-5-g4db4bbc
+package Test::JSON::Schema::Acceptance; # git description: v1.040-2-g938041b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators
 
-our $VERSION = '1.040';
+our $VERSION = '1.041';
 
 use 5.020;
 use Moo;
@@ -576,7 +576,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.040
+version 1.041
 
 =head1 SYNOPSIS
 

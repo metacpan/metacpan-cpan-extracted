@@ -106,18 +106,18 @@ subtest 'a stage that dies is reported where pipe or tap was called' => sub {
         'tap';
 };
 
-subtest 'a stage that is not a code reference' => sub {
+subtest 'a stage that is neither a code reference nor a pipeline' => sub {
     my @stages = (sub { $_ }, 'x');
     my $line   = __LINE__ + 1;
     my $err    = dies { $thing->pipe(@stages) };
     is $err,
-        "Expected stage #2 to be a code reference at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
         'pipe';
 
     $line = __LINE__ + 1;
     $err  = dies { $thing->tap(@stages) };
     is $err,
-        "Expected stage #2 to be a code reference at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
         'tap';
 };
 

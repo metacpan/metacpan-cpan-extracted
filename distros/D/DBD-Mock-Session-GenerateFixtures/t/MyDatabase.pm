@@ -6,7 +6,7 @@ use warnings;
 
 use DBI;
 use Carp 'croak';
-use Exporter::NoWork;
+use Exporter::Shiny qw(db_handle build_tests_db populate_test_db build_mysql_db);
 
 use DB;
 use autodie;

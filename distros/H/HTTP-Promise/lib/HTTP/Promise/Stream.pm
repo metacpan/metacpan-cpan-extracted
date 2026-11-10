@@ -2115,6 +2115,8 @@ For example:
 
 See also L</supported>, which will tell you if L<HTTP::Promise::Stream> even supports the specified encoding.
 
+=for Pod::Coverage mime2encoding
+
 =head2 read
 
     $stream->read( $buffer );

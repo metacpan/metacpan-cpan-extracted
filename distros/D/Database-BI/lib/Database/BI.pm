@@ -8,6 +8,7 @@ use Mojo::Base 'Mojolicious', -strict, -signatures;
 use Carp qw(croak);
 use Mojo::File ();
 use Mojo::URL;
+use Database::BI::I18N ();
 use Database::BI::Sessions;
 use CHI	();
 use File::Spec ();
@@ -16,7 +17,9 @@ use Readonly;
 use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
-use version; our $VERSION = version->declare('0.021.0');
+# version->declare here alone: this is VERSION_FROM, and with it MakeMaker
+# writes 0.022.0 into META; a plain dotted string becomes v0.022.0 there.
+use version; our $VERSION = version->declare('0.022.0');
 
 # The roadmap after 0.021.0, from its gap analysis (2026-11-06).
 #
@@ -138,13 +141,16 @@ Readonly my $HSTS_RE      => qr{\Amax-age=\d{1,10}(?:\s*;\s*includeSubDomains)?(
 Readonly my $MAX_REQUEST_SIZE  => 50 * 1_048_576;	# 50 MiB
 Readonly my $UPLOAD_MAX_AGE_S  => 24 * 3600;		# evict uploads older than 24 h
 
+# CHI drivers that keep the table cache on disc, and so need a directory.
+Readonly my %DISC_CACHE_DRIVER => map { ($_ => 1) } qw(File FastMmap);
+
 =head1 NAME
 
 Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 DESCRIPTION
 
@@ -183,7 +189,13 @@ filesystem and open any supported data file, not just files in C<data_dir>.
 
 B<Column sort and reorder> -- clicking a header sorts the table; headers
 are draggable to reorder.  Both settings are persisted in C<localStorage>
-by column name and survive page reloads.
+by column name and survive page reloads.  A table too long for one page is
+sorted by the server (C<sort=> and C<dir=> in the address), every row of it,
+so page 1 is the start of the sorted table and Next goes on from there.
+A column sorts as dates when every cell is one, as numbers when every cell
+is one (C<$1,234>, C<(5)> and C<45%> are numbers; C<T27> is not), and
+otherwise as text, with case and accents ignored and the digits in it
+compared as numbers, so C<T3> comes before C<T27>.
 
 =item *
 
@@ -219,7 +231,7 @@ set and leaving blanks where a source file lacks a column.
 =item *
 
 B<Charts> -- nine L<HTML::D3> D3.js v7 chart types are accessible from
-the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max,
+the toolbar: line chart (brush-to-zoom, reference lines for min/avg/max and a trend line,
 multi-series interactive legend), pie chart (click-a-slice to filter,
 top-N, donut mode, configurable colour scheme), heatmap (two categorical
 axes, count or sum mode), bar chart (horizontal or vertical, sort,
@@ -239,7 +251,8 @@ L<Geo::Coder::List> chain: L<Geo::Coder::Free>'s local data first, then
 OpenStreetMap's Nominatim service (L<Geo::Coder::OSM>, at most one request a
 second) for the places the local data does not know.  Nominatim is asked over
 https, and what it finds is also kept for a month in
-C<E<lt>model_dirE<gt>/geocode-cache/>.  Each distinct place is
+C<E<lt>model_dirE<gt>/geocode-cache/>, or the C<cache_dir> set (see
+L</Where caches are kept>).  Each distinct place is
 looked up once, remembered in the model store and shared by every dataset that
 names it.  Rows sharing a position become one marker.
 
@@ -431,6 +444,10 @@ B<Change the language used for templates:>
     { data_dir => 'data', language => 'fr', platform => 'web' }
     # Then create templates/web/fr/ and put your French .html.tt files there.
 
+B<American spelling:> a browser that asks for English (United States) gets the
+pages from C<templates/web/en-us/>; set C<< language => 'en-us' >> to make that
+the default for every browser that names no other English.
+
 B<Run the test suite to verify everything is working:>
 
     make test
@@ -467,15 +484,27 @@ session.  With no password set, C</login> says there is nothing to log in to.
 =item C<GET /preferences>
 
 Sets the reader's preferences: the theme, one of light, dark or the same as the
-device (the default).  They are kept in the browser's C<localStorage>, not on
-the server, and apply to every page.  Saved charts, printed pages and embedded
-canvases stay light.
+device (the default), and the rows a table or pivot shows on a page (25, 50,
+100, 200 -- the default -- or All).  The theme is kept in the browser's
+C<localStorage> and the page size in its cookie C<bi_per_page>, because the
+server reads it (a value other than 25, 50, 100, 200 or 0 is ignored, and the
+page is 200 rows); neither is stored on the server, and both apply to every page.
+Saved charts, printed pages and embedded canvases stay light.  The Preferences
+link at the top of each page passes C<back=> (that page), so the breadcrumb
+here leads back to it.
 
 =item C<GET /view/:table>
 
 Opens the named table from C<data_dir>.  Accepts C<?f=col:op:val>
 (repeatable) to pre-filter results, and C<?range=name&rcol=column> to keep
 only a relative window of rows (see L</Relative time ranges>).
+
+A long table is shown a page at a time: C<?page=> is the page, and
+C<?per_page=> its size (else the reader's preference, else 200; up to 2000;
+C<0> is every row on one page, and then C<page=> is ignored).  The page says
+"Page 2 of 7", and its Rows per page list (25, 50, 100, 200, All) changes the
+size, keeping the first row on screen.  A pivot pages its row groups the same
+way.
 
 C<?f=col:between:lo:hi> keeps the rows whose C<col> lies from C<lo> to C<hi>,
 both included, whichever bound is written first.  Two numbers (a range of
@@ -617,6 +646,16 @@ Renders a D3.js v7 zoomable line chart of any two columns.  Parameters:
                      needed (optional; e.g. /tables?l=... for the schema browser)
   back2_label=<text> Label for the back2 link (optional; default "Back")
   j=, f=, d=         pipeline params (same as /join)
+
+A one-line chart offers check boxes above it for reference lines: Min, Avg,
+Max, and Trend, the straight line closest to the points (least squares, by
+L<Statistics::LineFit>), labelled with its slope per point and its R squared
+(a flat series is slope 0 and R squared 1: the line passes through every
+point).
+The points are evenly spaced along the axis, so the fit is of Y against each
+point's place, not its label.  After a zoom, every line is worked out again
+from the points in view.  None is offered on a chart with C<series=>, and Trend
+needs two points.
 
 =item C<GET /pie>
 
@@ -1373,7 +1412,8 @@ use Merge.
 A large CSV, TSV, PSV, XLSX or XML file can be read from a SQLite copy of
 itself, an I<extract>, which is faster to page through and lets totals be
 worked out in SQL.  C<script/bi-extract --spec table:sales> marks the dataset
-accelerated and builds the extract under C<E<lt>model_dirE<gt>/extracts/>.
+accelerated and builds the extract under C<E<lt>model_dirE<gt>/extracts/>, or in
+the cache directory set (see L</Where caches are kept>).
 
 An extract is used only while it matches the file: its name is a fingerprint
 of the spec and the file's modification time and size.  Once the file changes,
@@ -1381,7 +1421,7 @@ the file itself is read, and the table page says the extract is stale and how
 to rebuild it.  Stale numbers are never shown.  The table page also says when
 a dataset is read from its extract, and when that was built.
 
-An extract is a cache.  Deleting C<extracts/> loses nothing: each accelerated
+An extract is a cache.  Deleting its folder loses nothing: each accelerated
 dataset reads its file until the next build.  Nothing is written under
 C<data_dir>, and a C<model_dir> inside it is refused.  Only a C<table:> or
 C<path:> spec naming a local file can be accelerated; a SQLite file is one
@@ -1443,6 +1483,47 @@ application home, an absolute one is used as given, so a deployment whose
 application directory is read-only can stage uploads somewhere writable:
 
     { uploads_dir => '/var/tmp/database-bi-uploads' }
+
+=head2 Where caches are kept
+
+The places OpenStreetMap found for maps, the extracts of accelerated datasets
+(see L</Accelerated datasets>), the page cache when C<page_cache_dir> turns it
+on, and the table cache when C<< cache => { driver => 'File' } >> (or
+C<FastMmap>) asks for one, are kept on disc.  Each object that keeps one
+chooses its directory when it is made (L<Database::BI::CacheDir>), from the
+first of these that is set:
+
+=over 4
+
+=item 1. C<cache_dir> through L<Object::Configure>, for the class making the
+cache: its config files, then the environment variable
+C<E<lt>ClassE<gt>__cache_dir> (C<Database__BI__Model__Geocode__cache_dir> for
+the places, C<Database__BI__Extract__cache_dir> for the extracts,
+C<Database__BI__cache_dir> for the page and table caches);
+
+=item 2. C<$ENV{CACHEDIR}>;
+
+=item 3. C<$ENV{CACHE_DIR}>;
+
+=item 4. C<cache_dir> here (relative: under the application home):
+
+    { cache_dir => '/var/cache/database-bi' }
+
+=item 5. F<E<lt>model_dirE<gt>/geocode-cache> for the places,
+F<E<lt>model_dirE<gt>/extracts> for the extracts, C<page_cache_dir> for the
+page cache, F<E<lt>model_dirE<gt>/cache> for the table cache.
+
+=back
+
+Caches sharing a directory each keep to their own namespace in it; the
+extracts go in its F<database-bi-extracts/> folder.  A cache directory inside
+C<data_dir> is not used for the extracts, which then stay in C<model_dir>: each
+is a C<.db> file the home page would list.  C<page_cache_dir> still decides
+whether pages are cached at all (see L</Compression and the page cache>): a
+cache directory set only says where.  A C<< cache => { root_dir } >> names the
+table cache's directory outright.  C<script/bi-geocode> and
+C<script/bi-extract> read the same settings, and F<database_bi.conf> from
+C<MOJO_CONFIG> or the current folder (C<bi-extract> through the application).
 
 =head2 Who can reach the server
 
@@ -1684,7 +1765,8 @@ Two optional keys keep finished pages on disc:
     }
 
 When C<page_cache_dir> is set, C</catalog> and C</tutorial> are stored in a
-L<CHI> File cache there, one copy per C<Accept-Language>, and served from it
+L<CHI> File cache there (or in the cache directory set: see
+L</Where caches are kept>), one copy per C<Accept-Language>, and served from it
 until they expire.  No other page is cached, because the rest read data files
 that can change between requests.  Without the key nothing is cached.
 
@@ -1911,7 +1993,8 @@ was unset, and C<< hypnotoad => { listen } >> defaulted to C<http://127.0.0.1:80
 (see L</Compression and the page cache>);
 
 =item * the CHI cache for tables (the C<Memory> driver unless C<cache =E<gt> { driver }>
-names another), and the page cache when C<page_cache_dir> is set;
+names another; a C<File> or C<FastMmap> one is kept where L</Where caches are kept>
+says), and the page cache when C<page_cache_dir> is set;
 
 =item * the C<before_dispatch> hooks for relative time ranges, cross-row plans and
 the view context, and the C<before_render> hook that sets the breadcrumb, the help link
@@ -2119,6 +2202,26 @@ the same fallback applies when a browser asks for a language no directory
 serves.  To add German support: (1) create C<templates/web/de/>, (2) copy and
 translate the C<.html.tt> files from C<templates/web/en/>, then (3) set the
 config.
+
+A directory may also name a region, as C<templates/web/en-us/> does: a browser
+whose Accept-Language asks for that region (C<en-US>) gets it, and every other
+request for the language (C<en-GB>, C<en-CA>, plain C<en>) gets
+C<templates/web/en/>.  C<< language => 'en-us' >> makes it the default.
+
+The distribution ships C<en> (British English) and C<en-us> (American
+English).  C<en-us> is not edited by hand: it is made from C<en> by
+C<author/make-en-us>, which respells the prose (colour, centre, summarise) and
+leaves the names the code reads alone.  Run it after changing an C<en>
+template; C<t/en-us.t> fails until the two agree.
+
+The server's messages (errors, warnings, refusals) follow the same choice.
+L<CGI::Lingua> picks the language from the request's C<Accept-Language>, or,
+for the command-line scripts, from the locale (C<LANG=en_US.UTF-8>), and
+L<Database::BI::I18N> gives each message in it.  A translation is a module,
+L<Database::BI::I18N::en_us> for American English, listing only the messages
+that read differently; C<t/i18n.t> fails when a British message needs an
+American spelling it does not list.  The tutorial's text is still in British
+English.
 
 =item B<Supported data file extensions are: csv, db, sql, sqlite, sqlite3, xml, psv, tsv, xlsx, json>
 
@@ -2346,6 +2449,33 @@ data is shipped or downloaded.
 #    collision_prefix => { 1 => $prefix } when constructing Database::Join.
 # =============================================================================
 
+# _table_cache_root($app, \%cache_conf) -> (root_dir => $dir) | ()
+#
+# A driver that keeps the table cache on disc (File, FastMmap) is given a
+# directory: cache => { root_dir } when the config names one, else the one
+# Database::BI::CacheDir chooses for this class (Object::Configure, CACHEDIR,
+# CACHE_DIR, cache_dir in this config, then <model_dir>/cache).  CHI's own
+# default would be a folder under the system temp directory.  The Memory
+# driver keeps nothing on disc and takes no directory.
+sub _table_cache_root ($app, $cache_conf) {
+	my $driver = $cache_conf->{driver} // 'Memory';
+
+	return () unless $DISC_CACHE_DRIVER{$driver};
+	return (root_dir => $cache_conf->{root_dir}) if defined $cache_conf->{root_dir};
+
+	require Database::BI::CacheDir;
+
+	my $model_dir = Mojo::File->new($app->config('model_dir') // '.bi');
+	$model_dir = $app->home->child($model_dir->to_string) unless $model_dir->is_abs;
+
+	return (root_dir => Database::BI::CacheDir::resolve(
+		class   => __PACKAGE__,
+		config  => $app->config,
+		home    => $app->home->to_string,
+		default => $model_dir->child('cache')->to_string,
+	));
+}
+
 sub startup ($self) {
 	$self->plugin('Config', {
 		default => {
@@ -2452,8 +2582,19 @@ sub startup ($self) {
 	my $page_cache_dir = $self->config->{page_cache_dir};
 	my $page_chi;
 	if ($page_cache_dir) {
-		my $dir = Mojo::File->new($page_cache_dir);
-		$dir = $self->home->child($page_cache_dir) unless $dir->is_abs;
+		# page_cache_dir turns the page cache on, and is where it goes when no
+		# cache directory is set (Object::Configure, CACHEDIR, CACHE_DIR,
+		# cache_dir in this config).  The pages keep to their own namespace,
+		# so they can share that directory with the other caches.
+		my $default = Mojo::File->new($page_cache_dir);
+		$default = $self->home->child($page_cache_dir) unless $default->is_abs;
+		require Database::BI::CacheDir;
+		my $dir = Mojo::File->new(Database::BI::CacheDir::resolve(
+			class   => __PACKAGE__,
+			config  => $self->config,
+			home    => $self->home->to_string,
+			default => $default->to_string,
+		));
 		$dir->make_path;
 		$page_chi = CHI->new(
 			driver    => 'File',
@@ -2483,6 +2624,23 @@ sub startup ($self) {
 	# request: markup that reached a page through its data cannot know it.
 	$self->hook(before_dispatch => sub {
 		shift->stash(csp_nonce => _new_nonce());
+	});
+
+	# The language this request's messages are given in, chosen by CGI::Lingua
+	# from its Accept-Language (Database::BI::I18N::choose), with the
+	# configured language when it names none we have.  It is set with local
+	# around the whole dispatch, so a message raised anywhere while the request
+	# is answered - a refusal in the hook below, a model's croak - is in the
+	# reader's language, and the next request starts afresh.  Every action
+	# answers before it returns; one that answered later, from the event loop,
+	# would need to set it again there.
+	$self->hook(around_dispatch => sub {
+		my ($next, $c) = @_;
+		local $Database::BI::I18N::LANGUAGE = Database::BI::I18N::choose(
+			accept  => scalar $c->req->headers->accept_language,
+			default => $c->app->config->{language},
+		);
+		return $next->();
 	});
 	# Refuse what another site's page asks of this one through the reader's
 	# browser: a form posted from there, or a page whose name was made to
@@ -2746,6 +2904,13 @@ sub startup ($self) {
 			$c->stash(trail => Database::BI::Controller::Dashboard::_breadcrumb_trail($c));
 		}
 
+		# The nav's Preferences link names this page with back=, so the
+		# preferences page's trail leads back to it (Dashboard::_crumb_parent).
+		if (!defined $c->stash('preferences_url')) {
+			require Database::BI::Controller::Dashboard;
+			$c->stash(preferences_url => Database::BI::Controller::Dashboard::_preferences_url($c));
+		}
+
 		return if defined $c->stash('tutorial_chapter');
 
 		my $chapter = Database::BI::Tutorial->chapter_for_action($c->stash('action'));
@@ -2785,6 +2950,7 @@ sub startup ($self) {
 		driver    => $cache_conf->{driver} // 'Memory',
 		global    => 1,
 		namespace => 'Database::BI',
+		_table_cache_root($self, $cache_conf),
 	);
 
 	$self->helper(open_table => sub($c, $table, %opts) {

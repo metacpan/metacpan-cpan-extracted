@@ -99,7 +99,8 @@
 	<strong>Geo::Coder::OSM</strong> (0.03 or later) for the places the local data does
 	not know. <strong>LWP::UserAgent::Throttled</strong> (0.14 or later) keeps those
 	requests to Nominatim's limit of one a second. Nominatim is asked over https, and
-	what it finds is kept for a month in <code>&lt;model_dir&gt;/geocode-cache/</code>. Without Geo::Coder::OSM, or with
+	what it finds is kept for a month in <code>&lt;model_dir&gt;/geocode-cache/</code>, or in
+	<code>CACHEDIR</code> (or <code>CACHE_DIR</code>, or <code>cache_dir</code>) when one is set. Without Geo::Coder::OSM, or with
 	<code>map_geocode_online =&gt; 0</code>, every lookup stays on this machine.
 	Without HTML::OSM the map pages are hidden, and the rest of the application is
 	unaffected. <strong>Redis</strong> (or
@@ -397,13 +398,32 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td>
 				Template language. Adding one means adding
 				<code>templates/web/&lt;lang&gt;/</code>, not just changing the key.
+				<code>en</code> (British) and <code>en-us</code> (American) are
+				supplied; a browser asking for English (United States) gets
+				<code>en-us</code> whatever this says, and its messages in American
+				English too.
+			</td>
+		</tr>
+		<tr>
+			<td><code>cache_dir</code></td>
+			<td><code>&lt;model_dir&gt;/geocode-cache</code></td>
+			<td>
+				Where the places found for maps, the extracts of accelerated datasets
+				(in its <code>database-bi-extracts</code> folder), the page cache (still
+				turned on by <code>page_cache_dir</code>) and a table cache on disc
+				(<code>cache =&gt; { driver =&gt; 'File' }</code>) are kept. Object::Configure's
+				<code>cache_dir</code> (for example the variable
+				<code>Database__BI__Model__Geocode__cache_dir</code>),
+				<code>CACHEDIR</code> and <code>CACHE_DIR</code> come first, in that
+				order. A relative value is under the application folder.
 			</td>
 		</tr>
 		<tr>
 			<td><code>page_cache_dir</code></td>
 			<td>unset</td>
 			<td>
-				Keeps <code>/catalog</code> and <code>/tutorial</code> on disc. Data
+				Keeps <code>/catalog</code> and <code>/tutorial</code> on disc, here
+				unless a <code>cache_dir</code> is set. Data
 				pages are never cached, because the files behind them change.
 			</td>
 		</tr>
@@ -691,8 +711,9 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 ./script/bi-extract --list
                     [--data-dir DIR] [--model-dir DIR]</code></pre>
 <p>
-	Extracts live in <code>&lt;model_dir&gt;/extracts/</code>, never under
-	<code>data_dir</code>, and deleting that directory loses nothing. Exit status
+	Extracts live in <code>&lt;model_dir&gt;/extracts/</code>, or in
+	<code>database-bi-extracts/</code> under the <code>cache_dir</code> set, never
+	under <code>data_dir</code>, and deleting that directory loses nothing. Exit status
 	is 0 on success, 1 when an extract could not be built, and 2 on bad
 	arguments. Run <code>--all</code> from cron after the files are refreshed.
 </p>

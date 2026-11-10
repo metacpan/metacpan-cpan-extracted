@@ -27,4 +27,10 @@ my $missing = File::Spec->catfile(tempdir(CLEANUP => 1), 'missing.txt');
 throws_ok { file2string($missing) }
 	qr/can't read \Q$missing\E/, 'missing file is fatal, and named';
 
+# open() succeeds on a directory on POSIX systems, and the read then fails;
+# 0.024 returned undef for it.  On Windows the open itself fails.
+my $adir = tempdir(CLEANUP => 1);
+throws_ok { file2string($adir) }
+	qr/can't read \Q$adir\E/, 'a directory is fatal, and named';
+
 done_testing;

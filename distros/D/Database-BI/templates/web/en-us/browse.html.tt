@@ -1,0 +1,43 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+
+<nav class="breadcrumb" aria-label="Path">
+  [%- FOREACH crumb IN crumbs -%]
+    [%- IF loop.last -%]
+  <span class="breadcrumb-current">[% crumb.name | html %]</span>
+    [%- ELSE -%]
+  <a class="breadcrumb-link" href="[% crumb.href | html %]">[% crumb.name | html %]</a>
+  <span class="breadcrumb-sep">/</span>
+    [%- END -%]
+  [%- END %]
+</nav>
+
+<div class="browser-list">
+  [%- IF parent_href %]
+  <a class="browser-entry browser-dir" href="[% parent_href | html %]">
+    <span class="browser-icon">&#x1F4C2;</span>
+    <span class="browser-name">..</span>
+  </a>
+  [%- END %]
+
+  [%- FOREACH d IN dirs %]
+  <a class="browser-entry browser-dir" href="[% d.href | html %]">
+    <span class="browser-icon">&#x1F4C1;</span>
+    <span class="browser-name">[% d.name | html %]</span>
+  </a>
+  [%- END %]
+
+  [%- FOREACH f IN files %]
+  <a class="browser-entry browser-file" href="[% f.href | html %]">
+    <span class="browser-icon">&#x1F4CA;</span>
+    <span class="browser-name">[% f.name | html %]</span>
+  </a>
+  [%- END %]
+
+  [%- UNLESS dirs.size || files.size %]
+  <p class="empty-state">No folders or supported data files here.</p>
+  [%- END %]
+</div>
+
+[%- END -%]

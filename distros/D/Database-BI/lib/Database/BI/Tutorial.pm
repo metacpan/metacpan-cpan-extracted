@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -133,8 +133,13 @@ my @CHAPTERS = (
 		lead  => 'A table has rows and columns. A row is one record. A column is one kind of value.',
 		steps => [
 			'Click a column heading to sort by that column. Click it again to reverse the order.',
+			'When the table has more than one page, sorting goes back to page 1. The whole table is sorted, not only the page you see.',
 			'Drag a column heading to move that column to a new place.',
-			'Use the page links below the table to see more rows.',
+			'A long table shows 200 rows at a time. Use Prev and Next below the table to see more rows.',
+			'Beside them, the page says where you are, for example Page 2 of 7.',
+			'Choose 25, 50, 100, 200 or All in Rows per page to change how many rows each page shows.',
+			'The first row you were looking at stays on screen. All puts every row on one page, which can be slow for a big file.',
+			'To change the number for every table, use the Preferences page.',
 			'Click Totals to add a row of sums at the bottom.',
 			'Click the box at the start of a row to select it. Click Delete selected to remove it from the view.',
 		],
@@ -422,6 +427,10 @@ my @CHAPTERS = (
 			'Optional: choose Lines by to draw one line for each value of a column, such as one per region.',
 			'For a total per period, set Time bucket and then set Aggregate to Sum.',
 			'Click Plot.',
+			'Tick Min, Avg or Max above the chart to draw a line at that value.',
+			'Tick Trend to draw the straight line closest to the points. It shows whether the numbers go up or down overall.',
+			'Next to Trend, per point is how much the line rises from one point to the next. R squared near 1 means the points lie close to the line.',
+			'Drag across part of the chart to zoom in. The lines are worked out again for the points you can see.',
 		],
 		tip   => 'Use Copy link to share the chart. Use Export SVG, Export PNG or Export PDF to save the picture.',
 		routes => [ '/graph', '/line' ],
@@ -663,6 +672,7 @@ my @CHAPTERS = (
 			'Set Time bucket to group a row group by hour, day, month or year.',
 			'Click Build pivot.',
 			'Click Show subtotals and grand total if you want totals.',
+			'A pivot with many rows is shown a page at a time. Rows per page below it changes how many, as on a table.',
 		],
 		tip   => 'Start with one row group and one measure. Add more only when you need them.',
 		walkthrough => {
@@ -925,7 +935,7 @@ my @CHAPTERS = (
 		id    => 'preferences',
 		part  => 'Help',
 		title => 'Set your preferences',
-		lead  => 'The Preferences page chooses how the program looks to you. It has one setting: the theme.',
+		lead  => 'The Preferences page chooses how the program looks to you: the theme, and how many rows a table shows on a page.',
 		steps => [
 			'Click Preferences at the top of any page.',
 			'Under Theme, choose Same as this device, Light or Dark.',
@@ -933,6 +943,9 @@ my @CHAPTERS = (
 			'The page changes as soon as you choose. There is no Save button.',
 			'Every other page follows, including pages that are open in other tabs.',
 			'Tables and charts change with the page. A map keeps its usual colours.',
+			'Under Tables, choose how many rows a table or pivot shows on each page: 25, 50, 100, 200 or All.',
+			'The number takes effect from the next table you open. All can be slow for a big file.',
+			'The Rows per page list under a long table changes that table only.',
 		],
 		tip   => 'The choice is saved in this browser, so another browser or computer keeps its own. Saved charts and printed pages always use the light colours.',
 		try   => { href => '/preferences', label => 'Open your preferences' },
@@ -1011,6 +1024,7 @@ my @CHAPTERS = (
 			'uploads_dir is where dropped files are kept. Set it when the application folder cannot be written.',
 			'model_dir holds the saved canvases and settings. It must not be inside data_dir.',
 			'Set page_cache_dir to keep a copy of the Catalog and Tutorial pages on disc. page_cache_duration says for how long.',
+			'cache_dir is where the places found for maps, the extracts and the page cache are kept. CACHEDIR or CACHE_DIR in the environment wins over it.',
 			'Set ai_api_key to show the Ask button and the AI choice on the insights page.',
 			'Restart the program after you change the file.',
 		],
@@ -1172,6 +1186,10 @@ my @FAQ = (
 	{
 		question => 'The page says Page not found.',
 		answer   => 'The address names a table, a canvas or a page that is not there. Use the breadcrumb or Go to Home to find it again.',
+	},
+	{
+		question => 'Some words are not spelled the way I expected.',
+		answer   => 'The pages follow the language your browser asks for. English (United States) gets American spelling, such as color. Any other English gets British spelling, such as colour.',
 	},
 );
 

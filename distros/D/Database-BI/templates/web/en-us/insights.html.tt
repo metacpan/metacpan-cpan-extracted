@@ -1,0 +1,185 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+<style>
+  .insights-meta { font-size: 0.82rem; color: var(--muted, #666); margin-bottom: 1rem; }
+  .insights-list { list-style: none; margin: 0; padding: 0; }
+  .insight-card {
+    border: 1px solid var(--border, #d0d4de);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.65rem;
+    background: var(--card-bg, #fff);
+  }
+  .insight-kind {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .kind-outlier    { background: var(--danger-bg, #fde8e8); color: var(--danger-fg, #b92020); }
+  .kind-top_mover  { background: var(--info-bg, #e8f4fd); color: var(--info-fg, #1a6fa0); }
+  .kind-period_delta { background: var(--success-bg, #e8fde8); color: var(--success-fg, #1a7a30); }
+  .kind-seasonality  { background: var(--warning-bg, #fdf5e8); color: var(--warning-fg, #8a5a00); }
+  .insight-headline { font-weight: 600; font-size: 0.95rem; vertical-align: middle; }
+  .insight-detail   { font-size: 0.82rem; color: var(--text-secondary, #555); margin-top: 0.25rem; }
+  .insight-view-link {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--info-fg, #0066aa);
+    text-decoration: none;
+  }
+  .insight-view-link:hover { text-decoration: underline; }
+  .insight-drill-link {
+    display: inline-block;
+    margin-top: 0.35rem;
+    margin-left: 0.8rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #555);
+    text-decoration: none;
+  }
+  .insight-drill-link:hover { text-decoration: underline; color: var(--body-color, #222); }
+  .insight-method {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: var(--text-faint, #999);
+    margin-left: 0.6rem;
+    vertical-align: middle;
+    cursor: help;
+  }
+  .insights-empty {
+    color: var(--muted, #666);
+    font-style: italic;
+    margin-top: 1.5rem;
+  }
+  .summary-toolbar {
+    margin-top: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .btn-summarize {
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--border-strong, #bbb);
+    border-radius: 4px;
+    background: var(--row-alt, #f5f5f5);
+    cursor: pointer;
+    font-size: 0.88rem;
+  }
+  .btn-summarize:hover { background: var(--hover-bg, #e8e8e8); }
+  .btn-summarize:disabled { opacity: 0.55; cursor: not-allowed; }
+  .summary-ai-label { font-size: 0.82rem; color: var(--muted, #666); cursor: pointer; }
+  #summary-box {
+    display: none;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--border, #c8d0e0);
+    border-radius: 6px;
+    background: var(--hover-bg, #f0f4fc);
+  }
+  .summary-text { margin: 0 0 0.4rem; font-size: 0.93rem; line-height: 1.5; }
+  .summary-source { font-size: 0.72rem; color: var(--muted, #888); }
+</style>
+
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+[% PROCESS "web/en/layouts/view_context.html.tt" %]
+
+<h2 style="margin-bottom:0.5rem">[% title | html %]</h2>
+<p class="insights-meta">Source: [% left_label | html %] &mdash; [% row_count %] row[% IF row_count != 1 %]s[% END %] analyzed</p>
+
+[%- SET method_labels = {
+    iqr_fence  = 'Outlier detected using the interquartile range (IQR) fence rule',
+    pop_delta  = 'Period-over-period change between consecutive time periods',
+    autocorr   = 'Repeating seasonal pattern detected by lag autocorrelation',
+    top_mover  = 'Category with the largest change between time periods',
+} -%]
+[%- IF insights.size == 0 -%]
+<p class="insights-empty">No insights detected for this dataset. Try a dataset with a date column and numeric columns to see period-over-period changes and outliers.</p>
+[%- ELSE -%]
+<ul class="insights-list" aria-label="Automatic insights">
+[%- FOREACH ins IN insights -%]
+  <li class="insight-card">
+    <span class="insight-kind kind-[% ins.kind | html %]">[% ins.kind | html %]</span><span class="insight-headline">[% ins.headline | html %]</span>
+    <span class="insight-method" title="[% method_labels.${ins.method} || ins.method | html %]">&#x2139;</span>
+    [%- IF ins.detail -%]
+    <div class="insight-detail">[% ins.detail | html %]</div>
+    [%- END -%]
+    <a class="insight-view-link" href="[% ins.view_url | html %]">&#x1F50D; View in chart &rarr;</a>[%- IF ins.drill_url.length -%]<a class="insight-drill-link" href="[% ins.drill_url | html %]">&#x1F4CB; See rows &rarr;</a>[%- END -%]
+  </li>
+[%- END -%]
+</ul>
+[%- END -%]
+
+<div class="summary-toolbar">
+  <button class="btn-summarize" id="btn-summarize">&#x2728; Summarize</button>
+  [%- IF ai_available -%]
+  <label class="summary-ai-label"><input type="checkbox" id="summary-ai-chk"> Use AI for better prose</label>
+  [%- END -%]
+</div>
+<div id="summary-box" role="region" aria-live="polite"></div>
+
+<script nonce="[% csp_nonce | html %]">
+(function() {
+	var btn = document.getElementById('btn-summarize');
+	if (!btn) return;
+	var box = document.getElementById('summary-box');
+	var aiChk = document.getElementById('summary-ai-chk');
+
+	btn.addEventListener('click', function() {
+		btn.disabled = true;
+		btn.textContent = 'Generating\u2026';
+		box.style.display = 'none';
+		box.innerHTML = '';
+
+		var sp = new URLSearchParams(window.location.search);
+		var parts = ['l=' + encodeURIComponent(sp.get('l') || '')];
+		sp.getAll('f').forEach(function(f) {
+			parts.push('f=' + encodeURIComponent(f));
+		});
+		if (aiChk && aiChk.checked) {
+			parts.push('ai=1');
+		}
+
+		fetch('/api/summary', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: parts.join('&')
+		})
+		.then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (data.error) {
+				box.textContent = 'Error: ' + data.error;
+			} else {
+				var p = document.createElement('p');
+				p.className = 'summary-text';
+				p.textContent = data.text || '';
+				box.appendChild(p);
+				var sm = document.createElement('small');
+				sm.className = 'summary-source';
+				sm.textContent = 'Source: ' + (data.source === 'template_limited'
+				               ? 'template (the AI provider was asked as often as this server allows this hour)'
+				               : (data.source || 'template'))
+				               + (data.cached ? ' (cached)' : '');
+				box.appendChild(sm);
+			}
+			box.style.display = 'block';
+		})
+		.catch(function() {
+			box.textContent = 'Could not generate summary.';
+			box.style.display = 'block';
+		})
+		.finally(function() {
+			btn.disabled = false;
+			btn.textContent = '\u2728 Summarize';
+		});
+	});
+}());
+</script>
+
+[%- END -%]

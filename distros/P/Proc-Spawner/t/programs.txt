@@ -568,6 +568,34 @@ LC_ALL=C	--	printf	%q|%q|%q\\n	\xc3\xa9	\xff	{a,b}
 0	''$'\\303\\251'|''$'\\377'|{a,b}\x0a	
 LC_ALL=C.UTF-8	--	printf	%q|%q|%q\\n	\xc3\xa9	\xff	{a,b}
 0	\xc3\xa9|''$'\\377'|{a,b}\x0a	
+LC_ALL=C	--	printf	\\u20AC|\\U0001F600|\\u00e9|\\u0041|\\u0024|\\U0010FFFF|\\U00110000\\n
+0	\\u20AC|\\U0001F600|\\u00E9|A|$|\\U0010FFFF|\\U00110000\x0a	
+LC_ALL=C.UTF-8	--	printf	\\u20AC|\\U0001F600|\\u00e9|\\u0041|\\u0024|\\U0010FFFF|\\U00110000\\n
+0	\xe2\x82\xac|\xf0\x9f\x98\x80|\xc3\xa9|A|$|\xf4\x8f\xbf\xbf|\\U00110000\x0a	
+LC_ALL=C	--	printf	a\\ud800b
+1	a	printf: invalid universal character name \\ud800\x0a
+LC_ALL=C.UTF-8	--	printf	a\\ud800b
+1	a	printf: invalid universal character name \\ud800\x0a
+LC_ALL=C	--	printf	a\\U0000DFFFb
+1	a	printf: invalid universal character name \\U0000dfff\x0a
+LC_ALL=C.UTF-8	--	printf	a\\U0000DFFFb
+1	a	printf: invalid universal character name \\U0000dfff\x0a
+LC_ALL=C	--	printf	%b|	x\\u20ACy	\\u007F\\u00A0
+0	x\\u20ACy|\x7f\\u00A0|	
+LC_ALL=C.UTF-8	--	printf	%b|	x\\u20ACy	\\u007F\\u00A0
+0	x\xe2\x82\xacy|\x7f\xc2\xa0|	
+LC_ALL=C	--	printf	%b|	a\\uDFFFb	z
+1	a	printf: invalid universal character name \\udfff\x0a
+LC_ALL=C.UTF-8	--	printf	%b|	a\\uDFFFb	z
+1	a	printf: invalid universal character name \\udfff\x0a
+LC_ALL=C	--	printf	%b|	a\\u20A
+1	a	printf: missing hexadecimal number in escape\x0a
+LC_ALL=C.UTF-8	--	printf	%b|	a\\u20A
+1	a	printf: missing hexadecimal number in escape\x0a
+LC_ALL=C	--	printf	\\u20A
+1		printf: missing hexadecimal number in escape\x0a
+LC_ALL=C.UTF-8	--	printf	\\u20A
+1		printf: missing hexadecimal number in escape\x0a
 LC_ALL=C	--	printf	x%-0X% 10e|%+10c\\n	-inf	\xc3\xa9	255	-2.25
 1	x0 0.000000e+00|         2\x0axFFFFFFFFFFFFFFFE 0.000000e+00|         \x00\x0a	printf: '-inf': expected a numeric value\x0aprintf: '\\303\\251': expected a numeric value\x0aprintf: '-2.25': value not completely converted\x0a
 LC_ALL=C.UTF-8	--	printf	x%-0X% 10e|%+10c\\n	-inf	\xc3\xa9	255	-2.25

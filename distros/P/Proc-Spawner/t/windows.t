@@ -35,6 +35,8 @@ is_deeply [run([$perl, $ENVP], envp => ['FOO=bar', map "$_=$ENV{$_}", grep /^(?:
   [0, 'bar'], 'envp'; ok !defined $ENV{FOO}, 'our environment unchanged';
 { (my $bin = $perl) =~ s{[\\/][^\\/]*\z}{}; local $ENV{PATH} = "$bin;$ENV{PATH}";
   is_deeply [run(['perl', $RAN], file => 'perl', search => 1)], [0, 'ran'], 'search (PATH and PATHEXT)' }
+{ (my $bin = $perl) =~ s{[\\/][^\\/]*\z}{}; local $ENV{PATH} = qq{C:\\nonexistent;;"$bin"};   # (post-0.10: path_split)
+  is_deeply [run(['perl', $RAN], file => 'perl', search => 1)], [0, 'ran'], 'search: a quoted PATH entry, an empty one' }
 is_deeply [run([$perl, $IN], fds => { 0 => undef })], [0, 'closed'], 'fd 0 closed';
 is_deeply [run([$perl, $IN], fds => { 0 => ['/dev/null', POSIX::O_RDONLY(), 0], 2 => ['/DEV/NULL', $W, 0] })], [0, 'open'],
   '/dev/null, in any case, is NUL (X31)';

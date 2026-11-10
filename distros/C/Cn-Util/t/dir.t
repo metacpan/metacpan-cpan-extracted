@@ -67,9 +67,19 @@ is( scalar @ret, 0, 'on_match makes dir() return an empty list' );
 is( scalar @collected, 2, 'on_match received both top-level .txt files' );
 
 # --- "/" does not become "//" ---
-ok( !(grep { m{\A//} } dir(dir => '/', tests => 'd')), 'dir => "/" yields "/x", not "//x"' );
-# "///" used to be left as it was, and joined as "////x".
-ok( !(grep { m{\A//} } dir(dir => '///', tests => 'd')), 'dir => "///" yields "/x", not "////x"' );
+# Android's SELinux policy denies opendir("/") to apps, and 0.024 failed here
+# under Termux (CPAN Testers, perl 5.44.0 aarch64-android), so the check is
+# skipped where the root cannot be listed.  dir() itself is the probe: a bare
+# opendir here would throw rather than return false, because `use Cn::Util`
+# gives this file autodie.
+SKIP: {
+	my @slash = eval { dir(dir => '/', tests => 'd') };
+	skip 'cannot list "/" here', 2 if $@ =~ /\ACannot open directory \//;
+	die $@ if $@;
+	ok( !(grep { m{\A//} } @slash), 'dir => "/" yields "/x", not "//x"' );
+	# "///" used to be left as it was, and joined as "////x".
+	ok( !(grep { m{\A//} } dir(dir => '///', tests => 'd')), 'dir => "///" yields "/x", not "////x"' );
+}
 
 # --- cpu => N: forked recursive walk ---
 # dir() walks breadth-first in the parent until a level holds cpu * 4
@@ -84,6 +94,20 @@ for my $i (1 .. 12) {
 		close $fh;
 	}
 }
+# A worker leaves without running the caller's END blocks.  Up to 0.024 it
+# left through Parallel::ForkManager's finish(), whose exit ran the END block
+# below in every worker of every cpu => N call in this file.  $parent is undef
+# until this line runs, so a worker forked before it (none is) logs nothing.
+my $parent  = $$;
+my $end_log = File::Spec->catfile(tempdir( CLEANUP => 1 ), 'end.log');
+END {
+	if (defined $parent && $$ != $parent) {
+		open my $fh, '>>', $end_log;
+		print $fh "$$\n";
+		close $fh;
+	}
+}
+
 # symlink() dies where it is unimplemented and, on Windows, fails for a user
 # without the privilege to create one, so the check that needs it is skipped
 # there rather than failed.
@@ -151,6 +175,36 @@ SKIP: {
 	}
 }
 
+SKIP: {
+	# On Windows a worker is a thread of this process and still leaves
+	# through finish(); see _dir_parallel.
+	skip 'a worker on Windows runs END blocks', 1 if $^O eq 'MSWin32';
+	ok( !-e $end_log, 'no worker of a cpu => N walk ran the caller\'s END block' );
+}
+
+# A subdirectory that cannot be read is fatal in every mode, with the same
+# message.  The serial walk used to die only because File::Find's warning was
+# made fatal by the module's FATAL warnings, as "Can't opendir(...)".  13
+# top-level directories are more than cpu => 2 needs before it forks, so the
+# locked one is read in a worker.
+{
+	my $lroot = tempdir( CLEANUP => 1 );
+	mkdir File::Spec->catdir($lroot, "open$_") for 1 .. 12;
+	my $locked = File::Spec->catdir($lroot, 'locked');
+	mkdir $locked;
+	chmod 0, $locked;
+	# In an eval: this file has autodie, from `use Cn::Util`.
+	my $denied = !eval { opendir(my $probe, $locked); closedir $probe; 1 };
+	SKIP: {
+		skip 'chmod 0 does not stop this user reading a directory', 2 unless $denied;
+		for my $cpu (1, 2) {
+			throws_ok { dir(dir => $lroot, recursive => 1, cpu => $cpu) }
+				qr/\ACannot open directory \Q$locked\E: /, "an unreadable subdirectory is fatal (cpu => $cpu)";
+		}
+	}
+	chmod 0755, $locked;   # or File::Temp cannot remove it
+}
+
 # on_match runs in the parent, so a closure over a lexical still works.
 my %seen;
 my @none = dir(dir => $wide, recursive => 1, cpu => 3, on_match => sub { $seen{$_[0]}++ });
@@ -194,5 +248,11 @@ throws_ok { dir(dir => $root, on_match => 1) }
 # cares about: that dir() dies.
 throws_ok { dir(dir => File::Spec->catdir($root, 'no', 'such', 'dir'), regex => '.') }
 	qr/(opendir|Cannot open directory)/, 'dies on a missing directory';
+# A dir that is a file dies recursively too.  0.024's serial walk, through
+# File::Find, returned the file itself.
+for my $cpu (1, 2) {
+	throws_ok { dir(dir => File::Spec->catfile($root, 'a.txt'), recursive => 1, cpu => $cpu) }
+		qr/\ACannot open directory /, "a dir that is a file is fatal recursively (cpu => $cpu)";
+}
 
 done_testing;

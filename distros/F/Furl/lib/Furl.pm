@@ -6,7 +6,7 @@ use Furl::HTTP;
 use Furl::Request;
 use Furl::Response;
 use Carp ();
-our $VERSION = '3.15';
+our $VERSION = '3.16';
 
 use 5.008001;
 
@@ -125,6 +125,8 @@ __END__
 
 =encoding utf8
 
+=for stopwords MiB
+
 =head1 NAME
 
 Furl - Lightning-fast URL fetcher
@@ -177,6 +179,10 @@ I<%args> might be:
 =item timeout :Int = 10
 
 =item max_redirects :Int = 7
+
+=item max_decompressed_size :Int
+
+Maximum size of a gzip/deflate-decoded response body; C<0> disables the limit. Defaults to 100 MiB for responses held in memory, and to no limit for responses streamed with C<write_file> or C<write_code>. See L<Furl::HTTP/new>.
 
 =item capture_request :Bool = false
 
@@ -313,7 +319,7 @@ The time spent for loading the SSL module may become an issue in case you want t
 
 =over 4
 
-=item Does Furl depends on XS modules?
+=item Does Furl depend on XS modules?
 
 No. Although some optional features require XS modules, basic features are
 available without XS modules.

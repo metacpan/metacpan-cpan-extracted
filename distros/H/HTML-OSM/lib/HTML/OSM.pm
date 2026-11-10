@@ -24,11 +24,11 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 =head1 VERSION
 
-Version 0.14
+Version 0.17
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 # CDN URLs pinned to tested versions.  Override via constructor params to use
 # a self-hosted copy or a different version.
@@ -79,6 +79,9 @@ Readonly::Array  my @LEGEND_POSITIONS        => qw(topright topleft bottomright 
 Readonly::Scalar my $DEFAULT_LEGEND_POSITION => 'topright';
 Readonly::Scalar my $DEFAULT_LEGEND_EMPTY    => 'Nothing in this view';
 Readonly::Scalar my $LEGEND_SWATCH_MAX       => 25;
+# Where a GeoJSON layer's key goes: away from the marker key and the layer
+# control, which are top right.
+Readonly::Scalar my $DEFAULT_KEY_POSITION    => 'bottomright';
 
 =head1 SYNOPSIS
 
@@ -172,7 +175,8 @@ C<HTML::OSM> builds an interactive map from OpenStreetMap tiles and the
 Leaflet.js library.  Give it points as latitude and longitude, as place
 names, or as geocoder result objects.  It can also draw GeoJSON shapes,
 heatmaps, GPX tracks and choropleth (colour-filled region) layers, and can
-group nearby markers into clusters.
+group nearby markers into clusters.  A named GeoJSON layer gets a checkbox on
+the map, so the reader can turn it on and off.
 
 Place names are turned into coordinates by an injected geocoder or, without
 one, by the Nominatim service.  The answers are cached, and requests can be
@@ -590,6 +594,7 @@ Add a GeoJSON layer to the map.
     $map->add_geojson(\%data, style => { color => '#ff0000' }, popup => 'name');
 
 The first argument may be a hashref/arrayref (GeoJSON structure) or a JSON string.
+Give it a C<name> and the reader can hide and show it (see L</LAYER CONTROL>).
 Returns 1 on success.
 
 =head3 API SPECIFICATION
@@ -599,6 +604,14 @@ Returns 1 on success.
   data  : hashref | arrayref | string (JSON)
   style : hashref   Leaflet path-style options (color, weight, fillColor, fillOpacity)
   popup : string    Feature property name whose value becomes the popup text
+  name  : string    Label of the layer's checkbox in the map's layer control
+  show  : boolean   Whether a named layer is drawn when the map opens (default 1)
+  key   : hashref   A key to the layer's colours, shown while the layer is
+                    (see L</LAYER KEY>):
+                    { entries => [ { label, colour }, ... ], title?, position? }
+  bands : string    Feature property holding a list of colours, each drawn
+                    as a line of its own just inside the outline, side by side
+                    (see L</BANDS>)
 
 =head4 OUTPUT
 
@@ -606,9 +619,95 @@ Returns 1 on success.
 
 =head3 MESSAGES
 
-  | Message              | Meaning / Resolution            |
-  |----------------------|---------------------------------|
-  | (JSON parse error)   | data string is not valid JSON   |
+  | Message                                   | Meaning / Resolution            |
+  |-------------------------------------------|---------------------------------|
+  | (JSON parse error)                        | data string is not valid JSON   |
+  | add_geojson: name must be a string        | name is a reference or empty    |
+  | add_geojson: show must not be a reference | show is a reference             |
+  | add_geojson: key ...                      | key is unusable; the message    |
+  |                                           | says which part                 |
+  | add_geojson: bands must be a string       | bands is a reference or empty   |
+
+=head3 LAYER CONTROL
+
+Give a layer a C<name> and the map gains Leaflet's layer control, a box of
+checkboxes in its top right corner, one for each name, so the reader can hide
+and show that layer.  C<< show => 0 >> starts it hidden: the reader turns it
+on.  As with C<search>, the strings C<false>, C<no> and C<off> are false.
+
+Layers given the same name share one checkbox, which is ticked when any of
+them has C<show> on.  A layer with no name is always drawn, whatever C<show>
+says, because nothing could turn it on.  The control is written once, after
+the last GeoJSON layer, and is left open (not collapsed into an icon), so the
+reader can see what can be turned on.
+
+The name is shown as text: Leaflet writes it into the page as HTML, so it is
+escaped first, and C<< <b> >> is shown as written.
+
+=head3 LAYER KEY
+
+    $map->add_geojson(\%busy,  style => { color => '#d73027' }, name => 'Counties',
+        key => {
+            title   => 'Population',
+            entries => [
+                { label => '100,000 or more', colour => '#d73027' },
+                { label => 'under 100,000',   colour => '#1a9850' },
+            ],
+        });
+    $map->add_geojson(\%quiet, style => { color => '#1a9850' }, name => 'Counties');
+
+C<key> draws a key to a layer's colours in a corner of the map: a short line
+of each colour, as an outline is drawn, beside its label.  It is shown while
+the layer is: unticking the layer's checkbox hides the key too, and ticking it
+shows it again.  A layer with no name is always drawn, so its key always
+shows.
+
+=over 4
+
+=item C<entries>
+
+Required, at least one: hashrefs of C<label> (text, required) and C<colour>
+(C<#rgb> or C<#rrggbb>, required), listed in the order given.
+
+=item C<title>
+
+Text printed above the entries.
+
+=item C<position>
+
+C<bottomright> (the default), C<bottomleft>, C<topright> or C<topleft>.  The
+marker key (C<legend>) and the layer control are top right by default.
+
+=back
+
+Layers that share a name share one key: the first C<key> given for that name.
+Every text reaches the page as text, never as HTML.
+
+=head3 BANDS
+
+    # Kent's outline is red with blue inside it; Surrey's is all green
+    $kent->{properties}{colours}   = [ '#d73027', '#4575b4' ];
+    $surrey->{properties}{colours} = [ '#1a9850' ];
+    $map->add_geojson({ type => 'FeatureCollection', features => [ $kent, $surrey ] },
+        style => { weight => 2, fill => 0 }, bands => 'colours');
+
+C<bands> names a feature property that holds a list of colours (C<#rrggbb>).
+A polygon's outline is then drawn just inside its edge, not along the middle
+of it, in a line of the width C<style> gives.  So where two polygons share a
+border, each one's colour is on its own side: the border reads as a line twice
+as wide, a different colour either side, and neither hides the other.
+
+A polygon with several colours, for an area that belongs to more than one
+group, gets a line of each, side by side: the first against the edge, each
+further one further inside.  A feature without the property, or with no colour
+that can be used, is drawn as C<style> says.  Only polygons are banded; a line
+or point takes the first colour.
+
+The lines are cut to the inside of the polygon, which needs Leaflet's default
+SVG drawing.  A map drawn on a canvas shows them uncut, along the middle of the
+edge, the first colour on top.  A popup opens from the outline as before.
+Neighbours' lines meet exactly only where their shared border is the same in
+both polygons; outlines simplified one at a time leave small gaps or overlaps.
 
 =head3 EXAMPLES
 
@@ -626,6 +725,15 @@ Returns 1 on success.
     $map->add_geojson(\%country_borders, style => { color => '#333333', fillOpacity => 0 });
     $map->add_geojson(\%river_data,      style => { color => '#0099ff', weight => 1    });
 
+    # County outlines the reader can turn on: hidden at first
+    $map->add_geojson(
+        { type => 'FeatureCollection', features => \@counties },
+        style => { color => '#555555', weight => 1, fill => 0 },
+        popup => 'name',
+        name  => 'County boundaries',
+        show  => 0,
+    );
+
 =cut
 
 sub add_geojson
@@ -636,6 +744,17 @@ sub add_geojson
 
 	# Accept either a pre-parsed structure or a raw JSON string
 	$data = decode_json($data) if !ref($data);
+
+	# The name labels a checkbox, so it must be text; show is a flag.
+	if(defined(my $name = $params->{name})) {
+		croak 'add_geojson: name must be a string' if ref($name) || !length($name);
+	}
+	croak 'add_geojson: show must not be a reference' if ref($params->{show});
+	# bands names a feature property, as popup does
+	if(defined(my $bands = $params->{bands})) {
+		croak 'add_geojson: bands must be a string' if ref($bands) || !length($bands);
+	}
+	$params = { %{$params}, key => _layer_key($params->{key}) } if defined($params->{key});
 
 	push @{$self->{geojson}}, { data => $data, opts => $params };
 	return 1;
@@ -1336,20 +1455,7 @@ sub onload_render
 	}
 
 	# GeoJSON layers.
-	for my $layer (@$geojson_layers) {
-		my $json     = _html_json($layer->{data});
-		my $opts     = $layer->{opts} || {};
-		my $style_js = '';
-		my $popup_js = '';
-		if(my $style = $opts->{style}) {
-			$style_js = 'style: ' . _html_json($style) . ',';
-		}
-		if(my $prop = $opts->{popup}) {
-			my $js_prop = _js_string($prop);
-			$popup_js = "onEachFeature: function(f,l){ if(f.properties && f.properties['$js_prop']){ l.bindPopup(String(f.properties['$js_prop'])); } },";
-		}
-		$body .= "\t\t\tL.geoJSON($json, { $style_js $popup_js }).addTo(map);\n";
-	}
+	$body .= _geojson_js($geojson_layers);
 
 	# Heatmap layers.
 	for my $layer (@$heatmap_layers) {
@@ -1813,6 +1919,244 @@ sub _html_json
 	return $j;
 }
 
+# The JavaScript function that draws a layer's key and shows it while the
+# layer is shown: layerKey(layer, key), key as _layer_key returns it.  Every
+# text goes in through textContent.  It is written into a function's scope,
+# never the page's.
+Readonly::Scalar my $LAYER_KEY_JS => <<'JS';
+				function layerKey(layer, k) {
+					var key = L.control({ position: k.position });
+					key.onAdd = function() {
+						var div = L.DomUtil.create('div', 'html-osm-legend html-osm-layer-key');
+						div.style.cssText = 'background: rgba(255,255,255,0.9); color: #222; padding: 6px 8px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.3); font: 12px/1.5 sans-serif; max-height: 40vh; overflow-y: auto;';
+						L.DomEvent.disableClickPropagation(div);
+						L.DomEvent.disableScrollPropagation(div);
+						if(k.title) {
+							var title = document.createElement('strong');
+							title.style.display = 'block';
+							title.textContent = k.title;
+							div.appendChild(title);
+						}
+						k.entries.forEach(function(e) {
+							var row = document.createElement('div');
+							row.className = 'html-osm-legend-entry';
+							var swatch = document.createElement('span');
+							swatch.style.cssText = 'display: inline-block; vertical-align: middle; margin-right: 6px; width: 18px; height: 0;';
+							swatch.style.borderTop = '3px solid ' + e.colour;
+							row.appendChild(swatch);
+							row.appendChild(document.createTextNode(e.label));
+							div.appendChild(row);
+						});
+						return div;
+					};
+					if(map.hasLayer(layer)) { key.addTo(map); }
+					map.on('overlayadd', function(e) { if(e.layer === layer) { key.addTo(map); } });
+					map.on('overlayremove', function(e) { if(e.layer === layer) { key.remove(); } });
+				}
+JS
+
+# The JavaScript functions that draw a banded layer: bandLayer(data, style,
+# each, prop) is L.geoJSON(data, ...) with every polygon's outline drawn once
+# for each colour in its property prop, every line inside the polygon.  The
+# polygon's own line is made invisible: it stays to take clicks and to be the
+# shape the others are cut to.  Each colour is a second polygon over it, cut to
+# the inside of the first by an SVG clip path, so a line 2*j widths wide shows
+# j widths inside the edge; the widest is added first, so each narrower one
+# covers all but the innermost width of the one before, and the first colour
+# ends up against the edge.  The clip path refers to the first polygon's own
+# path element, so it follows the map as it is zoomed.  Leaflet makes a new
+# path element each time a layer is put back on the map, hence the 'add'
+# handlers.  A colour reaches the page only when it is #rrggbb.  It is written
+# into a function's scope, never the page's.
+Readonly::Scalar my $BAND_JS => <<'JS';
+				function bandInside(base, style, colour, weight) {
+					var opts = {};
+					for(var k in style) { opts[k] = style[k]; }
+					opts.color = colour;
+					opts.weight = weight;
+					opts.fill = false;
+					opts.interactive = false;
+					var inner = L.polygon(base.getLatLngs(), opts);
+					var id = 'html-osm-band-' + L.stamp(base);
+					base.on('add', function() {
+						var under = base.getElement && base.getElement();
+						if(under && under.ownerSVGElement) {
+							under.setAttribute('id', id);
+							under.setAttribute('clip-rule', 'evenodd');
+						}
+					});
+					inner.on('add', function() {
+						var path = inner.getElement && inner.getElement();
+						var svg = path && path.ownerSVGElement;
+						if(!svg) { return; }
+						var ns = 'http://www.w3.org/2000/svg';
+						if(!svg.querySelector('#' + id + '-clip')) {
+							var defs = svg.querySelector('defs');
+							if(!defs) {
+								defs = document.createElementNS(ns, 'defs');
+								svg.insertBefore(defs, svg.firstChild);
+							}
+							var clip = document.createElementNS(ns, 'clipPath');
+							clip.setAttribute('id', id + '-clip');
+							var use = document.createElementNS(ns, 'use');
+							use.setAttribute('href', '#' + id);
+							clip.appendChild(use);
+							defs.appendChild(clip);
+						}
+						path.setAttribute('clip-path', 'url(#' + id + '-clip)');
+					});
+					return inner;
+				}
+				function bandLayer(data, style, each, prop) {
+					var inside = [];
+					var width = (style && style.weight) || 3;
+					var layer = L.geoJSON(data, { style: style, onEachFeature: function(f, base) {
+						if(each) { each(f, base); }
+						var list = f.properties && f.properties[prop];
+						var cols = Array.isArray(list)
+							? list.filter(function(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{6}$/.test(c); }) : [];
+						if(!cols.length || !base.setStyle) { return; }
+						if(!(base instanceof L.Polygon)) {
+							base.setStyle({ color: cols[0] });
+							return;
+						}
+						base.setStyle({ color: cols[0], opacity: 0, weight: 2 * cols.length * width });
+						for(var j = cols.length - 1; j >= 0; j--) {
+							inside.push(bandInside(base, style || {}, cols[j], 2 * (j + 1) * width));
+						}
+					} });
+					inside.forEach(function(l) { layer.addLayer(l); });
+					return layer;
+				}
+JS
+
+# _geojson_js: The JavaScript that draws the GeoJSON layers, and the layer
+#          control when any of them has a name.
+# Purpose: Unnamed layers are drawn as before, one statement each.  Named
+#          layers are gathered by name into one L.layerGroup per name, in the
+#          order the names first appear, so one checkbox shows or hides every
+#          layer of that name; a group is on the map at first when any of its
+#          layers has show on.
+# Entry:   Arrayref of { data, opts } from add_geojson.
+# Exit:    JavaScript text ('' when there are no layers).  Named layers are
+#          wrapped in a function so their variables stay out of the page's
+#          global scope; only 'map' is read from it.
+# Notes:   Leaflet sets a control's label with innerHTML, so the name is
+#          HTML-escaped before it is made a JavaScript string.  Values from a
+#          config file or a clone skip add_geojson's checks, so a name that is
+#          not a non-empty string is dropped here, and the layer drawn unnamed.
+sub _geojson_js
+{
+	my $layers = shift;
+
+	my $out = '';
+	my (@names, %group_of, %shown, %key_of);
+	my $named_bands = 0;	# whether a named layer is banded
+	for my $layer (@$layers) {
+		my $json     = _html_json($layer->{data});
+		my $opts     = $layer->{opts} || {};
+		my $style_js = '';
+		my $popup_js = '';
+		my $each_js  = '';
+		if(my $style = $opts->{style}) {
+			$style_js = 'style: ' . _html_json($style) . ',';
+		}
+		if(my $prop = $opts->{popup}) {
+			my $js_prop = _js_string($prop);
+			$each_js  = "function(f,l){ if(f.properties && f.properties['$js_prop']){ l.bindPopup(String(f.properties['$js_prop'])); } }";
+			$popup_js = "onEachFeature: $each_js,";
+		}
+		my $js = "L.geoJSON($json, { $style_js $popup_js })";
+		# A banded layer is drawn by bandLayer, which needs the style and
+		# the popup function apart, to give them to its inner lines too
+		my $bands = $opts->{bands};
+		$bands = undef if ref($bands) || !length($bands // '');
+		if(defined $bands) {
+			$js = "bandLayer($json, " . ($opts->{style} ? _html_json($opts->{style}) : 'null')
+				. ', ' . ($each_js || 'null') . ", '" . _js_string($bands) . "')";
+		}
+
+		my $name = $opts->{name};
+		my $key  = ref($opts->{key}) eq 'HASH' ? $opts->{key} : undef;
+		if(!defined($name) || ref($name) || !length($name)) {
+			if($key) {
+				# Always drawn, so its key always shows
+				$out .= "\t\t\t(function() {\n$LAYER_KEY_JS" . (defined($bands) ? $BAND_JS : '')
+					. "\t\t\t\tlayerKey($js.addTo(map), " . _html_json($key) . ");\n\t\t\t})();\n";
+			} elsif(defined $bands) {
+				# Its functions are kept out of the page's scope
+				$out .= "\t\t\t(function() {\n$BAND_JS\t\t\t\t$js.addTo(map);\n\t\t\t})();\n";
+			} else {
+				$out .= "\t\t\t$js.addTo(map);\n";
+			}
+			next;
+		}
+		$key_of{$name} //= $key if $key;
+		$named_bands = 1 if defined $bands;
+		unless(exists $group_of{$name}) {
+			push @names, $name;
+			$group_of{$name} = [];
+			$shown{$name} = 0;
+		}
+		push @{$group_of{$name}}, $js;
+		my $show = $opts->{show};
+		$shown{$name} = 1 if !defined($show) || ($show && $show !~ /\A(?:false|no|off)\z/i);
+	}
+	return $out unless @names;
+
+	$out .= "\t\t\t(function() {\n\t\t\t\tvar overlays = {};\n\t\t\t\tvar group;\n";
+	$out .= $LAYER_KEY_JS if %key_of;
+	$out .= $BAND_JS if $named_bands;
+	for my $name (@names) {
+		my $label = _js_string(_html_attr($name));
+		$out .= "\t\t\t\tgroup = L.layerGroup([" . join(', ', @{$group_of{$name}}) . "]);\n";
+		$out .= "\t\t\t\tgroup.addTo(map);\n" if $shown{$name};
+		$out .= "\t\t\t\toverlays['$label'] = group;\n";
+		$out .= "\t\t\t\tlayerKey(group, " . _html_json($key_of{$name}) . ");\n" if $key_of{$name};
+	}
+	$out .= "\t\t\t\tL.control.layers(null, overlays, { collapsed: false }).addTo(map);\n\t\t\t})();\n";
+	return $out;
+}
+
+# _layer_key: Check add_geojson's key.
+# Purpose: A key is written into the page's script, so only checked text,
+#          colours and a known corner may reach it.
+# Entry:   The key option.
+# Exit:    { entries => [ { label, colour } ], position, title? }, colours in
+#          lower case; croaks naming what is wrong.
+sub _layer_key
+{
+	my $key = shift;
+
+	croak 'add_geojson: key must be a hashref' unless ref($key) eq 'HASH';
+	my $entries = $key->{entries};
+	croak 'add_geojson: key entries must be a non-empty arrayref'
+		unless ref($entries) eq 'ARRAY' && @{$entries};
+
+	my @checked;
+	for my $n (1 .. scalar(@{$entries})) {
+		my $entry = $entries->[$n - 1];
+		croak "add_geojson: key entry $n is not a hashref" unless ref($entry) eq 'HASH';
+		my ($label, $colour) = @{$entry}{qw(label colour)};
+		croak "add_geojson: key entry $n: label is required"
+			if !defined($label) || ref($label) || !length($label);
+		croak "add_geojson: key entry $n: invalid colour: " . ($colour // 'undef')
+			if !defined($colour) || ref($colour) || $colour !~ $HEX_COLOUR;
+		push @checked, { label => "$label", colour => lc($colour) };
+	}
+
+	my $position = $key->{position} // $DEFAULT_KEY_POSITION;
+	croak 'add_geojson: key position must be one of ' . join(', ', @LEGEND_POSITIONS)
+		unless !ref($position) && grep { $_ eq $position } @LEGEND_POSITIONS;
+
+	my %out = (entries => \@checked, position => $position);
+	if(defined(my $title = $key->{title})) {
+		croak 'add_geojson: key title must be text' if ref($title);
+		$out{title} = "$title" if length($title);
+	}
+	return \%out;
+}
+
 # _js_string: Escape a Perl string for safe embedding in a JS single-quoted literal.
 # Purpose: Prevent JS injection via user-supplied labels, URLs, or property names.
 # Entry:   Any scalar (undef becomes '').
@@ -2059,8 +2403,13 @@ Allow per-marker removal via clicking on a marker.
     data?  : GeoJSONStruct ∪ S
     style? : StyleMap ∪ {∅}
     popup? : S ∪ {∅}
+    name?  : S ∪ {∅}
+    show?  : 𝔹 ∪ {∅}
+    key?   : LayerKey ∪ {∅}
   -----------------------------------------
-    geojson' = geojson ⌢ ⟨{data, style, popup}⟩
+    name? ≠ ∅ ⇒ name? ≠ ""
+    key? ≠ ∅ ⇒ #key?.entries ≥ 1 ∧ key?.position ∈ Corner
+    geojson' = geojson ⌢ ⟨{data, style, popup, name, show, key}⟩
 
 =head2 add_heatmap
 

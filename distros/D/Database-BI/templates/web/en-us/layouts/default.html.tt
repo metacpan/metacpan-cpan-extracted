@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html lang="[% language | html %]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[% title | html %] &#x2014; Database::BI</title>
+  [% PROCESS "web/en/layouts/theme.html.tt" %]
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--page-bg, #f4f6f9);
+      color: var(--body-color, #1a1a2e);
+      padding: 2rem;
+    }
+
+    /* One look for every dropdown and text field on every page.  :where()
+       keeps this at zero specificity, so a component's own rule still sets
+       its size and spacing; components take their colors from these two
+       variables rather than naming their own, and a field with no rule of its
+       own gets this instead of the browser's default gray. */
+    :root {
+      --field-bg: #fff;
+      --field-border: #c0c8e0;
+    }
+    /* The :not() chain must stay on one line: a space inside it would make it
+       a descendant selector. */
+    :where(select, textarea, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"])) {
+      background-color: var(--field-bg);
+      border: 1px solid var(--field-border);
+      border-radius: 4px;
+      color: inherit;
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--accent-text, #2c3e7a);
+    }
+
+    /* The tutorial is part of the application, so every page can reach it. */
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      margin-left: auto;
+      font-size: 0.9rem;
+    }
+
+    .site-nav a {
+      color: var(--accent-text, #2c3e7a);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .site-nav a:hover { text-decoration: underline; }
+    .site-nav-logout { display: inline; margin: 0; }
+    .site-nav-logout button {
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      font-weight: 600;
+      color: var(--accent-text, #2c3e7a);
+      cursor: pointer;
+    }
+    .site-nav-logout button:hover { text-decoration: underline; }
+
+    /* The chapter that helps with the page that is open. */
+    .site-nav-help {
+      border-left: 1px solid var(--border, #cfd6e6);
+      padding-left: 1rem;
+    }
+
+    main {
+      background: var(--card-bg, #ffffff);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    /* Standard table header: white text on dark blue.
+       All templates must inherit this; never override background/color here. */
+    thead tr {
+      background: #2c3e7a;
+      color: #ffffff;
+    }
+
+    thead th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      cursor: grab;
+      user-select: none;
+    }
+
+    /* A column header is a control: it sorts, selects and moves its column from
+       the keyboard, so a focused one has to be findable on the dark header. */
+    thead th:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: -3px;
+    }
+
+    thead th.dragging {
+      opacity: 0.4;
+    }
+
+    thead th.drag-over {
+      background: #1a2558;
+      box-shadow: inset 3px 0 0 #fff;
+    }
+
+    thead th[aria-sort]::after {
+      content: '';
+      display: inline-block;
+      width: 0.9em;
+      margin-left: 0.35em;
+      vertical-align: middle;
+      opacity: 0.4;
+    }
+    thead th[aria-sort="ascending"]::after  { content: '\25B2'; opacity: 1; }
+    thead th[aria-sort="descending"]::after { content: '\25BC'; opacity: 1; }
+
+    tbody tr:nth-child(even) { background: var(--row-alt, #f8f9fc); }
+    tbody tr:hover           { background: var(--hover-bg, #eef1fb); }
+
+    tbody td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border, #e4e8f0);
+    }
+
+    tfoot tr {
+      background: #1e3060;
+      color: #fff;
+    }
+    tfoot td {
+      padding: 0.6rem 1rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .totals-sum { font-variant-numeric: tabular-nums; }
+
+    .lbl-totals {
+      flex-shrink: 0;
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--border-strong, #888);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary, #444);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .lbl-totals:hover { background: var(--hover-bg, #f0f0f0); }
+    .lbl-totals input[type="checkbox"] { cursor: pointer; accent-color: #2c3e7a; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted, #888);
+      padding: 3rem 1rem;
+      font-style: italic;
+    }
+
+    .error {
+      background: var(--danger-bg, #fdecea);
+      border-left: 4px solid var(--danger-border, #c0392b);
+      color: var(--danger-fg, #922b21);
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      margin-bottom: 1.25rem;
+    }
+    .hint {
+      background: var(--info-bg, #eaf4fb);
+      border-left: 4px solid var(--info-border, #2980b9);
+      color: var(--info-fg, #1a5276);
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      margin-top: -0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.93em;
+    }
+
+    .back-link {
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .back-link a { color: var(--accent-text, #2c3e7a); text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
+    .back-link .record-count {
+      margin-left: auto;
+      flex: 0 0 auto;
+      color: var(--muted, #666);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    /* Toolbar row: record count + "Add database" button */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+    /* Every control on a toolbar row is the same height, so tops and bottoms
+       line up whatever its font size, padding or icon glyph (an emoji line box
+       is taller than text).  The filter bar below the toolbar uses the same
+       height in dashboard.html.tt. */
+    .toolbar > button,
+    .toolbar > .lbl-totals {
+      box-sizing: border-box;
+      height: 1.75rem;
+    }
+    .toolbar-sep {
+      width: 1px;
+      height: 1.4em;
+      background: var(--border, #dee2e6);
+      align-self: center;
+      flex-shrink: 0;
+      margin: 0 0.25rem;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .record-count {
+      font-size: 0.8rem;
+      color: var(--muted, #666);
+      flex: 1;
+    }
+
+    /* Chips that summarize active joins */
+    .join-chip {
+      display: inline-block;
+      background: var(--hover-bg, #e8edf8);
+      border-radius: 10px;
+      padding: 0.15em 0.55em;
+      font-size: 0.75rem;
+      color: var(--accent-text, #2c3e7a);
+      margin-left: 0.35em;
+    }
+    .join-chip-key { color: var(--muted, #888); font-size: 0.7rem; }
+
+    /* "Merge data" button */
+    .btn-add-db {
+      flex-shrink: 0;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--accent-border, #2c3e7a);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--accent-text, #2c3e7a);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-add-db:hover:not(:disabled) { background: var(--hover-bg, #eef1fb); }
+    .btn-add-db:disabled { opacity: 0.4; cursor: default; }
+
+    /* "Hide / Show duplicates" toggle button */
+    .btn-dedup {
+      flex-shrink: 0;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--border-strong, #888);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary, #444);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-dedup:hover { background: var(--hover-bg, #f0f0f0); }
+    .btn-dedup--active {
+      background: #2c3e7a;
+      border-color: var(--accent-border, #2c3e7a);
+      color: #fff;
+    }
+    .btn-dedup--active:hover { background: #3a50a0; }
+
+    /* Row/column selection checkbox column */
+    .sel-th, .sel-td {
+      width: 2.2rem;
+      min-width: 2.2rem;
+      padding: 0.4rem 0.5rem;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+    }
+    .sel-th { background: #2c3e7a; }
+    .sel-td { border-bottom: 1px solid var(--border, #e4e8f0); }
+    .sel-th input[type="checkbox"],
+    .sel-td input[type="checkbox"] {
+      cursor: pointer;
+      accent-color: #c0392b;
+      width: 1rem;
+      height: 1rem;
+      vertical-align: middle;
+    }
+
+    /* Selected row highlight */
+    tbody tr.row-selected > td,
+    tbody tr.row-selected > .sel-td {
+      background: var(--danger-bg, #fdf0f0) !important;
+      outline: 1px solid #e07070;
+      outline-offset: -1px;
+    }
+
+    /* Selected column highlight -- body cells */
+    tbody td.col-selected,
+    tfoot td.col-selected {
+      background: rgba(192, 57, 43, 0.08) !important;
+      outline: 1px solid #e07070;
+      outline-offset: -1px;
+    }
+
+    /* Delete-selected toolbar button -- destructive red accent */
+    .btn-delete-sel {
+      flex-shrink: 0;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--danger-border, #c0392b);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--danger-fg, #c0392b);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-delete-sel:hover { background: var(--danger-bg, #fdecea); }
+
+    /* "Combine data" button -- same shape as Merge, teal accent */
+    .btn-combine {
+      flex-shrink: 0;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--success-border, #2a6a5a);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--body-color, #1a4a3a);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-combine:hover:not(:disabled) { background: var(--success-bg, #e6f4f0); }
+    .btn-combine:disabled { opacity: 0.4; cursor: default; }
+
+    /* Combine-data panel -- teal-tinted background to distinguish from merge */
+    .combine-panel {
+      background: var(--success-bg, #f0f8f5);
+      border: 1px solid var(--success-border, #a8d0c0);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .combine-panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--body-color, #1a4a3a);
+      margin-bottom: 0.6rem;
+    }
+
+    .combine-desc-static {
+      font-size: 0.85rem;
+      color: var(--success-fg, #2a4a3a);
+      margin-bottom: 1rem;
+      line-height: 1.45;
+    }
+
+    /* Join configuration panel */
+    .join-panel {
+      background: var(--hover-bg, #f0f3fb);
+      border: 1px solid var(--border, #c8d0e8);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .join-panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-text, #2c3e7a);
+      margin-bottom: 1rem;
+    }
+
+    .join-fields {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.75rem 1rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 680px) {
+      .join-fields { grid-template-columns: 1fr; }
+      .join-or { display: none; }
+    }
+
+    .join-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    /* A flex display would otherwise beat the hidden attribute, leaving a
+       field the page has hidden on screen. */
+    .join-field[hidden] { display: none; }
+
+    .join-field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary, #444);
+    }
+
+    .join-field select,
+    .join-field input[type="text"],
+    .join-field input[type="number"] {
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--field-border);
+      border-radius: 5px;
+      font-size: 0.875rem;
+      background: var(--field-bg);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .join-or {
+      font-size: 0.8rem;
+      color: var(--muted, #888);
+      text-align: center;
+      padding-bottom: 0.4rem;
+    }
+
+    .join-desc {
+      font-size: 0.85rem;
+      color: var(--body-color, #1a3a2a);
+      background: var(--success-bg, #e8f5e9);
+      border-left: 3px solid var(--success-border, #4caf50);
+      padding: 0.6rem 0.9rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .join-actions {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    .btn-primary, .btn-secondary {
+      padding: 0.4rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.15s;
+    }
+    .btn-primary {
+      background: #2c3e7a;
+      color: #fff;
+      border-color: var(--accent-border, #2c3e7a);
+    }
+    .btn-primary:hover:not(:disabled) { background: #1a2558; }
+    .btn-primary:disabled { opacity: 0.4; cursor: default; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary, #555);
+      border-color: var(--border-strong, #bbb);
+    }
+    .btn-secondary:hover { background: var(--hover-bg, #eee); }
+
+    /* Path-field tooltip
+       Usage: wrap <input> in <div class="with-tooltip"> and add a sibling
+       <div class="tip-box" role="tooltip"> with the help text inside it.
+       Pure CSS -- no JavaScript required. */
+    .with-tooltip { position: relative; }
+    .tip-box {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: #1a2040;
+      color: #e8ecf8;
+      border: 1px solid var(--accent-border, #3a50a0);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      box-shadow: 0 4px 14px rgba(0,0,0,.28);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(3px);
+      transition: opacity 0.13s, transform 0.13s;
+      white-space: normal;
+    }
+    /* Arrow pointing down to the input */
+    .tip-box::before {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 1rem;
+      width: 10px;
+      height: 10px;
+      background: #1a2040;
+      border-right: 1px solid var(--accent-border, #3a50a0);
+      border-bottom: 1px solid var(--accent-border, #3a50a0);
+      transform: rotate(45deg);
+    }
+    .tip-box code {
+      font-family: ui-monospace, 'Cascadia Code', monospace;
+      color: #7dd3fc;
+      background: rgba(255,255,255,.08);
+      padding: .05em .3em;
+      border-radius: 3px;
+      font-size: .9em;
+    }
+    .with-tooltip:hover .tip-box,
+    .with-tooltip:focus-within .tip-box {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Database picker */
+    .db-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .db-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 1.25rem 1rem;
+      border: 1px solid var(--border, #dde2f0);
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--body-color, #1a1a2e);
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .db-card:hover {
+      background: var(--hover-bg, #eef1fb);
+      box-shadow: 0 2px 6px rgba(44,62,122,.12);
+    }
+    .db-card--missing {
+      opacity: 0.45;
+      filter: grayscale(1);
+      cursor: not-allowed;
+    }
+    .db-card--missing:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .db-card--unavailable {
+      opacity: 0.5;
+      filter: grayscale(0.8);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .db-card--unavailable:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+    /* The delete button on an unavailable card must remain clickable even
+       though the card itself has pointer-events: none -- the button is a
+       sibling of the card inside the <li>, so it is unaffected. */
+    .db-unavail-badge {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--warning-fg, #b04000);
+      margin-top: 0.2rem;
+      font-weight: bold;
+    }
+
+    .db-icon { font-size: 2rem; }
+
+    .db-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--accent-text, #2c3e7a);
+    }
+
+    .db-file {
+      font-size: 0.75rem;
+      color: var(--muted, #888);
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--text-faint, #999);
+      text-align: right;
+    }
+
+    /* Section headings (recently opened, etc.) */
+    .recent-section {
+      margin-top: 2rem;
+    }
+
+    .section-heading {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted, #888);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Per-card remove button (trash can) in recent sections */
+    .recent-remove {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.3rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--muted, #888);
+      opacity: 0;
+      padding: 0.15rem 0.3rem;
+      border-radius: 4px;
+      line-height: 1;
+      z-index: 2;
+      transition: opacity 0.1s, background 0.1s, color 0.1s;
+    }
+    /* Hover and focus are the same reveal.  The button is in the tab order as
+       soon as it exists, so it must not be focusable while it is invisible. */
+    .db-list li:hover .recent-remove,
+    .db-list li:focus-within .recent-remove {
+      opacity: 0.5;
+    }
+    .recent-remove:focus-visible {
+      opacity: 1;
+      background: rgba(192, 57, 43, 0.12);
+      color: var(--danger-fg, #c0392b);
+      outline: 2px solid #c0392b;
+      outline-offset: 1px;
+    }
+    .recent-remove:hover {
+      opacity: 1 !important;
+      background: rgba(192, 57, 43, 0.12);
+      color: var(--danger-fg, #c0392b);
+    }
+
+    /* ---- canvas multi-select ---- */
+
+    /* selected card li */
+    li.cv-sel > a.db-card {
+      outline: 2px solid #3a6eca;
+      outline-offset: 2px;
+      background: rgba(58, 110, 202, 0.07);
+    }
+    /* card hovered during rubber-band drag */
+    li.cv-drag-over > a.db-card {
+      outline: 2px dashed #3a6eca;
+      outline-offset: 2px;
+      background: rgba(58, 110, 202, 0.04);
+    }
+
+    /* selection hint beside the "Saved canvases" heading */
+    .cv-sel-hint {
+      font-size: 0.7rem;
+      font-weight: normal;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--text-faint, #aaa);
+    }
+
+    /* rubber-band selection rectangle */
+    .cv-rubber {
+      position: fixed;
+      border: 1.5px solid var(--accent-border, #3a6eca);
+      background: rgba(58, 110, 202, 0.08);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9000;
+    }
+
+    /* floating action bar shown when >= 1 canvas selected */
+    .cv-sel-bar {
+      position: fixed;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      background: #2c3e7a;
+      color: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .cv-sel-count { opacity: 0.85; }
+    .cv-sel-del, .cv-sel-clr {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      border-radius: 1rem;
+      padding: 0.2rem 0.7rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.12s;
+    }
+    .cv-sel-del:hover { background: rgba(192, 57, 43, 0.7); border-color: transparent; }
+    .cv-sel-clr:hover { background: rgba(255,255,255,0.15); }
+
+
+    /* Export button in the toolbar */
+    .btn-export-open {
+      flex-shrink: 0;
+      padding: 0.28rem 0.75rem;
+      border: 1px solid var(--success-border, #5a7a3a);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--success-fg, #3a5a1a);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-export-open:hover:not(:disabled) { background: var(--success-bg, #eef5e8); }
+    .btn-export-open:disabled { opacity: 0.4; cursor: default; }
+
+    /* Refresh button in the toolbar */
+    .btn-refresh {
+      flex-shrink: 0;
+      padding: 0.28rem 0.75rem;
+      border: 1px solid var(--border-strong, #888);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary, #444);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-refresh:hover { background: var(--hover-bg, #f0f0f0); }
+    .btn-refresh:disabled { opacity: 0.5; cursor: progress; }
+    .print-status:empty { display: none; }
+    .print-status { font-size: 0.8rem; color: var(--text-secondary, #444); }
+
+    /* Print button: the view's rows in a table only the printed page shows.
+       While it prints, nothing else on the page is printed. */
+    @media screen {
+      #bi-print { display: none; }
+    }
+    @media print {
+      body.bi-printing > *:not(#bi-print) { display: none !important; }
+      body.bi-printing { margin: 0; padding: 0; }
+      #bi-print table { border-collapse: collapse; width: 100%; font-size: 9pt; }
+      #bi-print th, #bi-print td {
+        border: 1px solid var(--border-strong, #888);
+        padding: 2pt 4pt;
+        text-align: left;
+        vertical-align: top;
+      }
+      #bi-print thead { display: table-header-group; }
+      #bi-print tr { break-inside: avoid; }
+    }
+
+    /* Graph page layout */
+    .graph-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--accent-text, #1a2a5a);
+      margin: 0.75rem 0 0.5rem;
+    }
+    .graph-export-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .btn-graph-export {
+      padding: 0.28rem 0.75rem;
+      border: 1px solid var(--border-strong, #888);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary, #444);
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-graph-export:hover { background: var(--hover-bg, #f0f0f0); }
+    .graph-point-count {
+      font-size: 0.82rem;
+      color: var(--muted, #666);
+      margin-left: 0.25rem;
+    }
+    .graph-container {
+      overflow-x: auto;
+      text-align: center;
+    }
+    .graph-container svg { display: block; margin: 0 auto; }
+
+    /* The chart, analysis and model buttons in the table toolbar.  One class
+       (btn-tool) so a new button looks like its neighbors without being
+       added to a selector list. */
+    .btn-tool {
+      flex-shrink: 0;
+      padding: 0.28rem 0.75rem;
+      border: 1px solid var(--border-strong, #888);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary, #444);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.12s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-tool:hover:not(:disabled) { background: var(--hover-bg, #f0f0f0); }
+    .btn-tool:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+
+    /* Row highlight: used by dashboard.html.tt when ?hl_col=&hl_op=&hl_val= is set */
+    tr.hl-row > td {
+      background-color: var(--warning-bg, #fffde0);
+      border-top: 1px solid var(--warning-border, #f0d060);
+      border-bottom: 1px solid var(--warning-border, #f0d060);
+    }
+    tr.hl-row > td:first-child { border-left: 3px solid var(--warning-border, #f59e0b); }
+
+    /* Graph panel: selects + buttons on one row */
+    .graph-fields-row {
+      display: flex;
+      gap: 0.75rem 1rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+    .graph-fields-row .join-field {
+      flex: 1;
+      min-width: 160px;
+    }
+    .graph-btn-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+    .graph-btn-spacer {
+      font-size: 0.8rem;
+      line-height: 1;
+      visibility: hidden;
+      display: block;
+    }
+    .graph-btn-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Export save-to-disc panel */
+    .export-panel {
+      background: var(--success-bg, #f5f8f0);
+      border: 1px solid var(--success-border, #b8d0a0);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .export-panel-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--body-color, #2a4a1a);
+      margin-bottom: 1rem;
+    }
+
+    .export-dir-bar {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .export-dir-bar input[type="text"] {
+      flex: 1;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--success-border, #b0c8a0);
+      border-radius: 5px;
+      font-size: 0.875rem;
+      background: var(--card-bg, #fff);
+      font-family: monospace;
+    }
+
+    .btn-dir-up {
+      padding: 0.35rem 0.7rem;
+      border: 1px solid var(--success-border, #b0c8a0);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--success-fg, #3a5a1a);
+      font-size: 0.82rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-dir-up:hover:not(:disabled) { background: var(--success-bg, #e4f0d8); }
+    .btn-dir-up:disabled { opacity: 0.35; cursor: default; }
+
+    .export-dir-browser {
+      max-height: 9rem;
+      overflow-y: auto;
+      border: 1px solid var(--success-border, #c8dab8);
+      border-radius: 5px;
+      background: var(--card-bg, #fff);
+      padding: 0.35rem;
+      margin-bottom: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-content: flex-start;
+    }
+
+    .export-dir-entry {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--success-border, #c8dab8);
+      border-radius: 5px;
+      background: transparent;
+      font-size: 0.8rem;
+      color: var(--body-color, #2a4a1a);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .export-dir-entry:hover { background: var(--success-bg, #e4f0d8); border-color: var(--success-border, #8ab87a); }
+
+    .export-dir-msg {
+      font-size: 0.8rem;
+      color: var(--muted, #888);
+      padding: 0.3rem;
+    }
+
+    .export-filename-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .export-filename-row label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary, #444);
+      white-space: nowrap;
+    }
+
+    .export-filename-row input[type="text"] {
+      flex: 1;
+      min-width: 12rem;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--success-border, #b0c8a0);
+      border-radius: 5px;
+      font-size: 0.875rem;
+      background: var(--card-bg, #fff);
+      font-family: monospace;
+    }
+
+    .export-format-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15em 0.5em;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .export-format-badge.csv     { background: var(--success-bg, #dff5d0); color: var(--success-fg, #2a5a10); }
+    .export-format-badge.sqlite  { background: var(--info-bg, #d0e8f5); color: var(--info-fg, #103a5a); }
+    .export-format-badge.unknown { background: var(--warning-bg, #f0e8d0); color: var(--warning-fg, #6a4a10); }
+
+    .export-result {
+      margin-top: 0.75rem;
+      padding: 0.5rem 0.8rem;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      font-family: monospace;
+      word-break: break-all;
+    }
+    .export-result.success {
+      background: var(--success-bg, #e4f5d8);
+      border-left: 3px solid var(--success-border, #5a9a2a);
+      color: var(--body-color, #2a5a0a);
+    }
+    .export-result.error {
+      background: var(--danger-bg, #fdecea);
+      border-left: 3px solid var(--danger-border, #c0392b);
+      color: var(--danger-fg, #922b21);
+    }
+
+    /* Filter section inside the join panel */
+    .filter-section {
+      margin-top: 1rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--border, #d0d8f0);
+    }
+
+    .filter-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .filter-section-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary, #555);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-add-filter {
+      padding: 0.18rem 0.65rem;
+      border: 1px dashed var(--accent-border, #2c3e7a);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--accent-text, #2c3e7a);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .btn-add-filter:hover { background: var(--hover-bg, #eef1fb); }
+
+    .filter-row {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-col-sel  { min-width: 9rem; }
+    .filter-op-sel   { min-width: 8rem; }
+    .filter-val-inp  { min-width: 9rem; }
+
+    .filter-row select,
+    .filter-row input[type="text"] {
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--field-border);
+      border-radius: 5px;
+      font-size: 0.85rem;
+      background: var(--field-bg);
+    }
+
+    .btn-remove-filter {
+      background: none;
+      border: none;
+      color: var(--text-faint, #aaa);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+    }
+    .btn-remove-filter:hover { background: var(--danger-bg, #fde8e8); color: var(--danger-fg, #c00); }
+
+    /* Filter chips in the toolbar */
+    .filter-chips {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .filter-chip {
+      display: inline-block;
+      background: var(--warning-bg, #fff8e1);
+      border: 1px solid var(--warning-border, #f0c040);
+      border-radius: 10px;
+      padding: 0.1em 0.55em;
+      font-size: 0.75rem;
+      color: var(--warning-fg, #7a5800);
+      font-family: monospace;
+    }
+
+    /* "Drawn from:" strip under a chart page's breadcrumb
+       (layouts/view_context.html.tt). */
+    .view-context {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+      margin: -0.5rem 0 1rem;
+      font-size: 0.8rem;
+      color: var(--muted, #666);
+    }
+    .view-context-change { color: var(--accent-text, #2c3e7a); font-size: 0.75rem; }
+
+    .btn-clear-filters {
+      font-size: 0.75rem;
+      color: var(--muted, #888);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-clear-filters:hover { color: var(--danger-fg, #c00); text-decoration: underline; }
+
+    .btn-copy-link {
+      flex-shrink: 0;
+      padding: 0.28rem 0.75rem;
+      border: 1px solid var(--accent-border, #aac);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--accent-text, #446);
+      font-size: 0.82rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+    .btn-copy-link:hover { background: var(--hover-bg, #eef); }
+    .btn-copy-link--copied { background: var(--success-bg, #d4edda); color: var(--success-fg, #155724); border-color: var(--success-border, #6aaf80); }
+
+    /* Recently-opened file tooltip */
+    .file-tooltip {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: #e4e4f0;
+      border-radius: 7px;
+      padding: 0.65rem 0.8rem;
+      font-size: 0.78rem;
+      min-width: 230px;
+      max-width: min(380px, calc(100vw - 2rem));
+      z-index: 200;
+      box-shadow: 0 4px 14px rgba(0,0,0,.28);
+      pointer-events: none;
+      white-space: nowrap;
+      line-height: 1.55;
+    }
+    .file-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1a1a2e;
+    }
+    .file-tooltip.tip-below {
+      bottom: auto;
+      top: calc(100% + 7px);
+    }
+    .file-tooltip.tip-below::after {
+      top: auto;
+      bottom: 100%;
+      border-top-color: transparent;
+      border-bottom-color: #1a1a2e;
+    }
+    .tip-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #3a3a5e;
+      margin-bottom: 0.35rem;
+      padding-bottom: 0.3rem;
+    }
+    .tip-path {
+      color: var(--text-faint, #9a9ab8);
+      font-family: monospace;
+      font-size: 0.75rem;
+      white-space: normal;
+      word-break: break-all;
+      max-width: 340px;
+    }
+    .tip-muted { color: var(--muted, #6a6a88); font-size: 0.74rem; }
+
+    /* Full-window drop overlay */
+    #drop-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(44, 62, 122, .88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+    }
+    #drop-overlay.active {
+      pointer-events: auto;
+      opacity: 1;
+    }
+    #drop-overlay.loading .drop-overlay-box {
+      border-style: solid;
+      opacity: .7;
+    }
+    .drop-overlay-box {
+      border: 3px dashed rgba(255,255,255,.7);
+      border-radius: 16px;
+      padding: 3rem 5rem;
+      text-align: center;
+      color: #fff;
+    }
+    .drop-overlay-icon { font-size: 3rem; margin-bottom: .5rem; }
+    .drop-overlay-text { font-size: 1.5rem; font-weight: 600; }
+    .drop-overlay-hint { font-size: .85rem; opacity: .65; margin-top: .4rem; }
+
+    /* Visible drop-zone on the home page */
+    .home-drop-zone {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      border: 2px dashed var(--border, #d0d8f0);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0 .5rem;
+      color: var(--text-faint, #aab);
+      font-size: .9rem;
+      background: var(--row-alt, #fafbfd);
+      transition: border-color .12s, background .12s, color .12s;
+      user-select: none;
+    }
+    .home-drop-zone.drag-active {
+      border-color: var(--accent-border, #2c3e7a);
+      background: var(--hover-bg, #eef1fb);
+      color: var(--accent-text, #2c3e7a);
+    }
+    .home-drop-zone-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .home-drop-hint { font-size: .78rem; color: var(--text-faint, #bbc); }
+    .home-drop-zone.drag-active .home-drop-hint { color: var(--accent-text, #5a7ab8); }
+
+    /* Home-page action cards: Browse + URL import */
+    .home-action-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .action-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1.25rem 1.4rem;
+      border: 1px solid var(--border, #d6daf0);
+      border-radius: 10px;
+      background: var(--row-alt, #fafbfd);
+    }
+
+    .action-card-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+
+    .action-card-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent-text, #1a2550);
+    }
+
+    .action-card-desc {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted, #666);
+      line-height: 1.45;
+      flex: 1;
+    }
+
+    .btn-action {
+      display: inline-block;
+      align-self: flex-start;
+      margin-top: 0.25rem;
+      padding: 0.45rem 1.1rem;
+      border: 1px solid var(--accent-border, #2c3e7a);
+      border-radius: 6px;
+      color: var(--accent-text, #2c3e7a);
+      text-decoration: none;
+      font-size: 0.88rem;
+      cursor: pointer;
+      background: transparent;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-action:hover { background: var(--hover-bg, #eef1fb); }
+
+    /* URL import form inside card */
+    .action-url-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .action-url-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.45rem 0.6rem;
+      border: 1px solid var(--field-border);
+      border-radius: 5px;
+      font-size: 0.88rem;
+    }
+    .action-url-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    /* Cancel the card-level flex-start/margin-top when the button sits in the row */
+    .action-url-row .btn-action {
+      align-self: auto;
+      margin-top: 0;
+      box-sizing: border-box;
+    }
+    .action-idx-label {
+      font-size: 0.82rem;
+      color: var(--muted, #666);
+      white-space: nowrap;
+    }
+    .action-idx-input {
+      width: 3.5rem;
+      padding: 0.45rem 0.4rem;
+      border: 1px solid var(--field-border);
+      border-radius: 5px;
+      font-size: 0.88rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    /* Filesystem browser */
+    .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.2rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary, #555);
+      overflow-x: auto;
+    }
+
+    .breadcrumb-link {
+      color: var(--accent-text, #2c3e7a);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .breadcrumb-link:hover { text-decoration: underline; }
+
+    .breadcrumb-sep { color: var(--text-faint, #999); }
+
+    .breadcrumb-current {
+      font-weight: 600;
+      color: var(--body-color, #1a1a2e);
+      white-space: nowrap;
+    }
+
+    .browser-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .browser-entry {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--body-color, #1a1a2e);
+      transition: background 0.12s;
+    }
+    .browser-entry:hover { background: var(--hover-bg, #eef1fb); }
+
+    .browser-dir  { color: var(--accent-text, #2c3e7a); }
+    .browser-file { color: var(--body-color, #1a3a2a); }
+
+    .browser-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    .browser-name {
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+    /* A map marker's rows (_map_popup): the box scrolls, set inline. */
+    .bi-map-popup-rows { margin-top: 0.3em; }
+    .bi-map-popup-rows table { border-collapse: collapse; font-size: 90%; }
+    .bi-map-popup-rows th, .bi-map-popup-rows td { padding: 0.1em 0.6em 0.1em 0; text-align: left; vertical-align: top; white-space: nowrap; }
+    /* Rows per page (layouts/page_size.html.tt): at the end of a pagination bar. */
+    .page-size { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; margin-left: auto; }
+    .page-size-select { font-size: 0.85rem; padding: 0.15rem 0.3rem; }
+  </style>
+  [%- IF extra_head %]
+  [% extra_head %]
+  [%- END %]
+</head>
+<body>
+  <header>
+    <h1>[% title | html %]</h1>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a id="site-nav-canvases" href="/canvases" title="Your saved canvases">Canvases</a>
+      <a id="site-nav-catalog" href="/catalog" title="Every data file, and the canvases that use it">Catalog</a>
+      <a id="site-nav-open" href="/browse" title="Open a data file from anywhere on the server">Open file&hellip;</a>
+      <a id="site-nav-preferences" href="[% (preferences_url.length ? preferences_url : '/preferences') | html %]" title="Choose light or dark, and other settings">Preferences</a>
+      <a id="site-nav-tutorial" href="/tutorial" target="_blank" rel="noopener"
+         title="Open the tutorial in a new tab (F1)">Tutorial</a>
+      [%- IF tutorial_chapter %]
+      <a id="site-nav-help" class="site-nav-help"
+         href="/tutorial#[% tutorial_chapter | html %]" target="_blank" rel="noopener"
+         title="Open this page's chapter in a new tab (F1)"
+         aria-label="Help for this page: [% tutorial_chapter_title | html %]">Help: [% tutorial_chapter_title | html %]</a>
+      [%- END %]
+      [%- IF logged_in %]
+      <form class="site-nav-logout" method="post" action="/logout">
+        <button id="site-nav-logout" type="submit" title="End this session; the next page asks for the password">Log out</button>
+      </form>
+      [%- END %]
+    </nav>
+  </header>
+  <main>
+    [% content %]
+  </main>
+  <footer><a href="https://github.com/nigelhorne/Database-BI" target="_blank" rel="noopener">Database::BI</a></footer>
+
+    <!-- F1 is the standard Help key.  It follows the header's Help link, or
+       the tutorial top when this page has no chapter.  Both links carry
+       target="_blank", so the current table or chart view is not lost. -->
+  <script nonce="[% csp_nonce | html %]">
+  (function () {
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'F1' || e.repeat) return;
+      if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+      var help = document.getElementById('site-nav-help');
+      var top  = document.getElementById('site-nav-tutorial');
+      var link = help || top;
+      if (!link) return;
+
+      e.preventDefault();
+      link.click();
+    });
+  }());
+  </script>
+
+<!-- Full-window drop overlay: shown whenever files are dragged over the page -->
+  <div id="drop-overlay" aria-live="polite">
+    <div class="drop-overlay-box">
+      <div class="drop-overlay-icon" aria-hidden="true">&#x1F4C2;</div>
+      <div class="drop-overlay-text" id="drop-overlay-text">Drop to open database</div>
+      <div class="drop-overlay-hint">CSV &middot; TSV &middot; PSV &middot; XML &middot; SQLite</div>
+    </div>
+  </div>
+
+  <script nonce="[% csp_nonce | html %]">
+  (function () {
+    var overlay   = document.getElementById('drop-overlay');
+    var overlayTxt = document.getElementById('drop-overlay-text');
+    var homeZone  = document.getElementById('home-drop-zone');
+    var dragDepth = 0;
+    var errorTimer = null;
+
+    // Max upload size in bytes -- must match $MAX_UPLOAD_MIB in Dashboard.pm
+    var MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+
+    function hasFiles(dt) {
+      if (!dt || !dt.types) return false;
+      return dt.types.includes
+        ? dt.types.includes('Files')
+        : Array.prototype.indexOf.call(dt.types, 'Files') !== -1;
+    }
+
+    function showOverlay() {
+      var label = (typeof window.__biDropLabel === 'function')
+        ? window.__biDropLabel() : 'Drop to open database';
+      overlayTxt.textContent = label;
+      overlay.classList.add('active');
+      if (homeZone) homeZone.classList.add('drag-active');
+    }
+
+    function hideOverlay() {
+      clearTimeout(errorTimer);
+      errorTimer = null;
+      overlay.classList.remove('active', 'loading');
+      if (homeZone) homeZone.classList.remove('drag-active');
+    }
+
+    // Show an error in the overlay for 3 seconds, then hide it.
+    // Uses a cancelable timer so stale dragleave events cannot dismiss it early.
+    function showError(msg) {
+      clearTimeout(errorTimer);
+      overlay.classList.remove('loading');
+      overlayTxt.textContent = msg;
+      overlay.classList.add('active');
+      errorTimer = setTimeout(hideOverlay, 3000);
+    }
+
+    document.addEventListener('dragenter', function (e) {
+      if (!hasFiles(e.dataTransfer)) return;
+      if (++dragDepth === 1) showOverlay();
+    });
+
+    document.addEventListener('dragleave', function (e) {
+      if (!hasFiles(e.dataTransfer)) return;
+      // Ignore stale dragleave events that fire after a drop while an
+      // error message is being displayed (errorTimer is set in that case).
+      if (errorTimer) return;
+      if (--dragDepth <= 0) { dragDepth = 0; hideOverlay(); }
+    });
+
+    document.addEventListener('drop', function () {
+      dragDepth = 0;
+    });
+
+    overlay.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+    });
+
+    overlay.addEventListener('drop', function (e) {
+      e.preventDefault();
+      dragDepth = 0;
+      var file = e.dataTransfer.files[0];
+      if (!file) { hideOverlay(); return; }
+
+      // When the file comes from a local file manager (Nautilus, Finder, etc.)
+      // the DataTransfer includes a file:// URI in text/uri-list.  Stash the
+      // decoded local path so the dashboard page can record the original
+      // location in bi:recent instead of the temporary .uploads/ copy.
+      try {
+        var uriList = (e.dataTransfer.getData('text/uri-list') || '').trim();
+        var fileUri = uriList.split(/\r?\n/).filter(function (l) {
+          return l && l[0] !== '#' && l.indexOf('file://') === 0;
+        })[0];
+        if (fileUri) {
+          sessionStorage.setItem('bi:pending-original-path',
+            decodeURIComponent(fileUri.replace(/^file:\/\//, '')));
+        } else {
+          sessionStorage.removeItem('bi:pending-original-path');
+        }
+      } catch (ex) {
+        try { sessionStorage.removeItem('bi:pending-original-path'); } catch (ex2) {}
+      }
+
+      overlay.classList.add('loading');
+      overlayTxt.textContent = 'Opening...';
+
+      var fd = new FormData();
+      fd.append('file', file);
+      // Capture size before fetch so the catch handler can use it even when
+      // the server closes the connection before sending a response (TypeError).
+      var fileSize = file.size;
+
+      fetch('/upload', { method: 'POST', body: fd })
+        .then(function (r) {
+          if (!r.ok) {
+            // Try to extract the server's JSON error message.  If the response
+            // is not JSON (e.g. a proxy returned an HTML 413 page), the parse
+            // fails -- fall back to a human-readable message based on the HTTP
+            // status so the user sees something more useful than "Could not
+            // open file."
+            return r.json().then(function (d) {
+              return Promise.reject(d.error || ('HTTP ' + r.status));
+            }, function () {
+              var msg = r.status === 413
+                ? 'File too large to upload (limit: 50 MB)'
+                : 'Upload failed (HTTP ' + r.status + ')';
+              return Promise.reject(msg);
+            });
+          }
+          return r.json();
+        })
+        .then(function (data) {
+          hideOverlay();
+          if (typeof window.__biDropCallback === 'function') {
+            window.__biDropCallback(data);
+          } else if (data.url) {
+            window.location = data.url;
+          }
+        })
+        .catch(function (err) {
+          // err is a string when we rejected with a message above.
+          // When fetch itself fails (e.g. the server closed the TCP connection
+          // mid-upload because the body was too large), err is a TypeError and
+          // r.status is never available.  Detect that case via the captured
+          // fileSize and show a useful message instead of the generic fallback.
+          var msg;
+          if (typeof err === 'string') {
+            msg = err;
+          } else if (fileSize > MAX_UPLOAD_BYTES) {
+            msg = 'File too large to upload (limit: 50 MB)';
+          } else {
+            msg = 'Could not open file.';
+          }
+          showError(msg);
+        });
+    });
+  }());
+  </script>
+[% IF chart %]
+<style>
+#canvas-actions {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 900;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  max-width: calc(100vw - 2.5rem);
+}
+#canvas-actions button {
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#canvas-actions button:hover { background: #0b5ed7; }
+#add-to-canvas-btn { display: none; }
+#add-to-canvas-panel, #new-canvas-panel {
+  position: fixed;
+  bottom: 4rem;
+  right: 1.25rem;
+  z-index: 901;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #dee2e6);
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 260px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  display: none;
+}
+#add-to-canvas-panel h4, #new-canvas-panel h4 { margin: 0 0 0.75rem; font-size: 0.95rem; }
+#atc-analysis-sel, #new-canvas-name { width: 100%; margin-bottom: 0.6rem; }
+#atc-status, #new-canvas-status { font-size: 0.8rem; color: var(--muted, #6c757d); margin-top: 0.4rem; min-height: 1.2em; }
+#new-canvas-link { font-size: 0.85rem; margin-left: 0.5rem; }
+/* Resize handle for chart SVGs */
+.chart-svg-wrap {
+  position: relative;
+  display: inline-block;
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.chart-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  opacity: 0.35;
+  transition: opacity 0.15s;
+}
+.chart-resize-handle::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  border-style: solid;
+  border-width: 0 0 14px 14px;
+  border-color: transparent transparent var(--border-strong, #666) transparent;
+}
+.chart-resize-handle:hover,
+.chart-svg-wrap:hover .chart-resize-handle { opacity: 0.85; }
+/* Keyboard focus.  The grip is the only way to resize a chart without a
+   pointer, so once it has focus it has to be findable, and the chart it
+   belongs to has to be obvious: the arrow keys resize the focused chart.
+   :focus-visible rather than :focus, so a pointer drag does not leave a ring
+   behind. */
+.chart-resize-handle:focus-visible {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+  border-radius: 3px;
+  /* The grip rests at 35% so it does not compete with the data; a focused
+     control has to be the opposite of that. */
+  opacity: 1;
+}
+.chart-resize-handle:focus-visible::after { opacity: 1; }
+.chart-svg-wrap:focus-within { outline: 2px solid #0d6efd; outline-offset: 4px; }
+</style>
+<div id="canvas-actions">
+  <button id="new-canvas-btn" title="Create a new canvas starting with this chart">+ New Canvas</button>
+  <button id="add-to-canvas-btn" title="Add this chart to an existing canvas">+ Add to Existing Canvas</button>
+</div>
+<div id="new-canvas-panel" data-chart="[% chart_json | html %]">
+  <h4>New canvas</h4>
+  <input type="text" id="new-canvas-name" placeholder="Canvas name"
+         autocomplete="off" maxlength="120">
+  <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+    <button class="btn-primary" id="new-canvas-save" style="flex:1">Create</button>
+    <button class="btn-secondary" id="new-canvas-cancel">Cancel</button>
+    <a id="new-canvas-link" href="#" hidden>Open canvas</a>
+  </div>
+  <div id="new-canvas-status"></div>
+</div>
+<div id="add-to-canvas-panel">
+  <h4>Add chart to existing canvas</h4>
+  <select id="atc-analysis-sel"><option value="">Loading...</option></select>
+  <div style="display:flex;gap:0.5rem;margin-top:0.25rem">
+    <button class="btn-primary" id="atc-save-btn" style="flex:1">Add</button>
+    <button class="btn-secondary" id="atc-cancel-btn">Cancel</button>
+  </div>
+  <div id="atc-status"></div>
+</div>
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  'use strict';
+  var btn    = document.getElementById('add-to-canvas-btn');
+  var panel  = document.getElementById('add-to-canvas-panel');
+  var sel    = document.getElementById('atc-analysis-sel');
+  var save   = document.getElementById('atc-save-btn');
+  var cancel = document.getElementById('atc-cancel-btn');
+  var status = document.getElementById('atc-status');
+  var loaded = false;
+
+  var newBtn    = document.getElementById('new-canvas-btn');
+  var newPanel  = document.getElementById('new-canvas-panel');
+  var newName   = document.getElementById('new-canvas-name');
+  var newSave   = document.getElementById('new-canvas-save');
+  var newCancel = document.getElementById('new-canvas-cancel');
+  var newLink   = document.getElementById('new-canvas-link');
+  var newStatus = document.getElementById('new-canvas-status');
+
+  /* Show the button only when at least one saved analysis exists. */
+  fetch('/api/analyses').then(function (r) { return r.json(); }).then(function (data) {
+    var list = (data && data.analyses) ? data.analyses : [];
+    if (list.length) btn.style.display = '';
+  }).catch(function () {});
+
+  /* The server rendered the exact chart spec for this page.  Using it keeps
+     options and encode keys (value rather than val, for example) correct; the
+     URL fallback is only for a page that somehow has no chart block. */
+  function chartFromServer() {
+    var el = document.getElementById('new-canvas-panel');
+    if (!el) return null;
+    try { return JSON.parse(el.getAttribute('data-chart') || 'null'); } catch (e) { return null; }
+  }
+
+  function buildVisualSpec() {
+    var p   = new URLSearchParams(window.location.search);
+    var spec = chartFromServer();
+    var vis;
+
+    if (spec && spec.kind) {
+      vis = { kind: spec.kind, encode: spec.encode || {}, title: spec.title || spec.kind };
+      if (spec.options) vis.options = spec.options;
+    } else {
+      var kind = (function () {
+        var path = window.location.pathname;
+        if (/\/graph$|\/line$/.test(path)) return 'line';
+        if (/\/pie$/.test(path))           return 'pie';
+        if (/\/bar$/.test(path))           return 'bar';
+        if (/\/scatter$/.test(path))       return 'scatter';
+        if (/\/heatmap$/.test(path))       return 'heatmap';
+        if (/\/stacked$/.test(path))       return 'stacked';
+        if (/\/combo$/.test(path))         return 'combo';
+        if (/\/treemap$/.test(path))       return 'treemap';
+        if (/\/histogram$/.test(path))     return 'histogram';
+        if (/\/wordcloud$/.test(path))     return 'wordcloud';
+        if (/\/map$/.test(path))           return 'map';
+        return 'table';
+      }());
+      var encode = {};
+      ['x','y','cat','val','series','size','bar_val','line_val','group','col','lat','lon','loc'].forEach(function (k) {
+        if (p.get(k)) encode[k] = p.get(k);
+      });
+      // A place spread over columns (loc= repeated) is kept as their list.
+      var locs = p.getAll('loc').filter(Boolean);
+      if (locs.length > 1) encode.loc = locs;
+      vis = { kind: kind, encode: encode, title: document.title || kind };
+    }
+
+    var filters = p.getAll('f');
+    if (filters.length) vis.filters = filters;
+    return vis;
+  }
+
+  /* A new canvas starts with this chart and the same datasets and joins as the
+     page it was made from. */
+  function buildNewAnalysis(name) {
+    var p = new URLSearchParams(window.location.search);
+    var l = p.get('l') || '';
+    if (!l) return null;
+
+    var datasets = [{ spec: l, alias: 'left', filters: p.getAll('f') }];
+    var joins = [];
+    p.getAll('j').forEach(function (jspec) {
+      var parts = jspec.split('|');
+      if (parts.length >= 3) {
+        datasets.push({ spec: parts[0], alias: 'right' + joins.length });
+        joins.push({
+          left: 'left', right: 'right' + joins.length,
+          left_key: parts[1], right_key: parts[2],
+        });
+      }
+    });
+
+    return { name: name, datasets: datasets, joins: joins, visuals: [buildVisualSpec()] };
+  }
+
+  function loadAnalyses() {
+    if (loaded) return;
+    loaded = true;
+    sel.innerHTML = '<option value="">Loading...</option>';
+    fetch('/api/analyses').then(function (r) { return r.json(); }).then(function (data) {
+      var list = (data && data.analyses) ? data.analyses : [];
+      if (!list.length) {
+        sel.innerHTML = '<option value="">No saved analyses</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- choose an analysis --</option>';
+      list.forEach(function (a) {
+        var o = document.createElement('option');
+        o.value = a.id;
+        o.textContent = a.name;
+        sel.appendChild(o);
+      });
+    }).catch(function () {
+      sel.innerHTML = '<option value="">Could not load analyses</option>';
+    });
+  }
+
+  newBtn.addEventListener('click', function () {
+    var open = newPanel.style.display === 'block';
+    panel.style.display = 'none';
+    newPanel.style.display = open ? 'none' : 'block';
+    if (!open) {
+      newName.focus();
+      newLink.hidden = true;
+      newStatus.textContent = '';
+      newSave.disabled = !newName.value.trim();
+    }
+  });
+
+  newCancel.addEventListener('click', function () {
+    newPanel.style.display = 'none';
+  });
+
+  newSave.addEventListener('click', function () {
+    var name = newName.value.trim();
+    if (!name) { newStatus.textContent = 'Please type a canvas name.'; return; }
+
+    var spec = buildNewAnalysis(name);
+    if (!spec) {
+      newStatus.textContent = 'Cannot save: no data source in the current URL.';
+      return;
+    }
+
+    newSave.disabled = true;
+    newStatus.textContent = 'Saving...';
+    fetch('/api/analyses', {
+      method  : 'POST',
+      headers : { 'Content-Type': 'application/json' },
+      body    : JSON.stringify(spec),
+    })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (res.ok && res.j.id) {
+          newLink.href    = '/a/' + res.j.id;
+          newLink.hidden  = false;
+          newStatus.textContent = 'Saved. ';
+          newStatus.appendChild(newLink);
+        } else {
+          newStatus.textContent = 'Error: ' + ((res.j && res.j.error) || 'unknown error');
+          newSave.disabled = false;
+        }
+      })
+      .catch(function () {
+        newStatus.textContent = 'Could not save the canvas -- check the server log.';
+        newSave.disabled = false;
+      });
+  });
+
+  newName.addEventListener('input', function () {
+    newSave.disabled = !newName.value.trim();
+  });
+
+  btn.addEventListener('click', function () {
+    var open = panel.style.display === 'block';
+    newPanel.style.display = 'none';
+    panel.style.display = open ? 'none' : 'block';
+    if (!open) { status.textContent = ''; loadAnalyses(); }
+  });
+
+  cancel.addEventListener('click', function () {
+    panel.style.display = 'none';
+  });
+
+  save.addEventListener('click', function () {
+    var id = sel.value;
+    if (!id) { status.textContent = 'Please choose an analysis.'; return; }
+    status.textContent = 'Saving...';
+    fetch('/api/analyses/' + encodeURIComponent(id))
+      .then(function (r) { return r.json(); })
+      .then(function (a) {
+        var vis     = buildVisualSpec();
+        var visuals = a.visuals || [];
+        visuals.push(vis);
+        return fetch('/api/analyses/' + encodeURIComponent(id), {
+          method  : 'PATCH',
+          headers : { 'Content-Type': 'application/json' },
+          body    : JSON.stringify({ visuals: visuals }),
+        });
+      })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.updated) {
+          status.textContent = 'Added! ';
+          var lk = document.createElement('a');
+          lk.href = '/a/' + sel.value;
+          lk.textContent = 'View canvas';
+          status.appendChild(lk);
+        } else {
+          status.textContent = 'Could not add visual.';
+        }
+      })
+      .catch(function () { status.textContent = 'Network error.'; });
+  });
+}());
+</script>
+<p class="sr-only" id="chart-resize-help">Resize a chart: focus its handle at the bottom right
+of the chart, then use the left and right arrow keys to change its width and the up and down
+arrow keys to change its height.  Hold Shift for bigger steps, and Home and End to go to the
+narrowest and widest the chart can be.  The new size is announced as it changes, and it is
+remembered: the next chart page of the same kind opens at the size this one was left at.  To
+forget it, use the Reset size button in the page's export bar, which puts the chart back at the
+size the server sent.</p>
+<p class="sr-only" id="chart-resize-status" role="status" aria-live="polite"></p>
+<script nonce="[% csp_nonce | html %]">
+/* Chart resize handle -- injected after D3 and the viewBox-widening JS
+   (graph.html.tt setTimeout 0) have both run.  Wraps each chart SVG in a
+   relative-positioned div and appends a draggable triangle grip at the
+   bottom-right corner.  Dragging updates the SVG width/height while keeping
+   the viewBox fixed so D3 content scales proportionally.
+
+   The grip is a control as well as a grab area, the same as the canvas card
+   handles: it takes focus, the arrow keys resize the chart, and the size is
+   announced.  A 2-D resize has no ARIA role of its own, so it carries slider
+   semantics -- the value is the width in pixels, the axis left and right move --
+   and the height goes into aria-valuetext ("640 pixels wide, 480 pixels
+   high"), which is what a screen reader announces when either dimension
+   changes.  The keys themselves are described by #chart-resize-help. */
+(function () {
+  var MIN_W = 200, MIN_H = 120, STEP = 10, BIG_STEP = 50;
+
+  /* Where the size a chart page was left at is kept.  One key per kind of
+     chart - its path - rather than per URL: the size is how this reader wants
+     to look at a bar chart, not a property of one dataset, so changing a
+     filter does not lose it. */
+  var SIZE_KEY = 'bi:chart-size:';
+
+  /* The boxes a chart is drawn in.  Kept in one place: the resize controls
+     use it to find the chart, and maxWidth() uses it to find the box whose
+     edges the grip has to stay inside. */
+  var CONTAINERS = '.graph-container, .pie-container, .bar-container, .heatmap-container, .scatter-container, .stacked-container, .combo-container, .treemap-container, .histogram-container';
+
+  /* Every chart on the page, with the size the server sent it at, so the
+     Reset size control can put each one back.  Filled in by
+     initChartResize(). */
+  var charts = [];
+
+  function sizeKey() { return SIZE_KEY + location.pathname; }
+
+  /* The saved size, if there is one and it is still usable.  It is clamped to
+     what this window allows, so a size kept on a larger screen opens within
+     the one the chart is read on now. */
+  function savedChartSize(wrap) {
+    var raw;
+    try { raw = window.localStorage.getItem(sizeKey()); }
+    catch (e) { return null; }
+    if (!raw) return null;
+    var size = null;
+    try { size = JSON.parse(raw); } catch (e) { size = null; }
+    if (!size || typeof size.w !== 'number' || typeof size.h !== 'number') return null;
+    return { w: clampWidth(size.w, wrap), h: clampHeight(size.h) };
+  }
+
+  function saveChartSize(w, h) {
+    try {
+      window.localStorage.setItem(sizeKey(), JSON.stringify({ w: w, h: h }));
+    } catch (e) { /* a browser that cannot store it still resizes */ }
+  }
+
+  function ensureViewBox(svg) {
+    if (svg.getAttribute('viewBox')) return;
+    var w = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+    var h = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+    if (w && h) svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  }
+
+  /* The chart's name, for the handle's label: the page's visible title, which
+     is what tells a reader which chart this handle sizes. */
+  function chartTitle() {
+    var heading = document.querySelector('.graph-title');
+    var text = heading && heading.textContent ? heading.textContent.replace(/\s+/g, ' ').trim() : '';
+    return text || 'this chart';
+  }
+
+  function chartSize(svg, wrap) {
+    var w = parseFloat(svg.getAttribute('width'))  || wrap.getBoundingClientRect().width  || MIN_W;
+    var h = parseFloat(svg.getAttribute('height')) || wrap.getBoundingClientRect().height || MIN_H;
+    return { w: clampWidth(w, wrap), h: clampHeight(h) };
+  }
+
+  /* The widest the chart can be with its own grip still on screen: from where
+     the chart starts to the right edge of the box that holds it.  A chart
+     page's container can indent its chart (the bar, heatmap, scatter, stacked,
+     combo and histogram pages pad 3rem) or center it (pie, line), and the page
+     around it has padding of its own, so the width of the window would put the
+     grip past the right edge - clipped by the page's scroll container and out
+     of reach of a pointer.  The container's content box is the space the chart
+     is drawn in, and its left edge is the chart's own left offset. */
+  function maxWidth(wrap) {
+    var viewport = Math.max(MIN_W, Math.round(document.documentElement.clientWidth));
+    var container = wrap && wrap.closest ? wrap.closest(CONTAINERS) : null;
+    var left = 0;
+    var right = viewport;
+
+    if (container) {
+      var rect = container.getBoundingClientRect();
+      var style = window.getComputedStyle(container);
+      left  = rect.left  + (parseFloat(style.paddingLeft)  || 0);
+      right = rect.right - (parseFloat(style.paddingRight) || 0);
+    }
+
+    if (!isFinite(left) || left < 0) left = 0;
+    if (!isFinite(right) || right > viewport) right = viewport;
+
+    return Math.max(MIN_W, Math.floor(right - left));
+  }
+
+  function clampWidth(w, wrap) { return Math.max(MIN_W, Math.min(Math.round(w), maxWidth(wrap))); }
+  function clampHeight(h) { return Math.max(MIN_H, Math.round(h)); }
+
+  /* The handle's value attributes, from the size the SVG is drawn at.  They
+     cannot be written in the markup: the handle is created here, once the
+     chart exists and its size is known. */
+  function updateChartAria(handle, svg, wrap, size) {
+    var st = size || chartSize(svg, wrap);
+    handle.setAttribute('aria-valuenow', String(st.w));
+    handle.setAttribute('aria-valuemax', String(maxWidth(wrap)));
+    handle.setAttribute('aria-valuetext',
+      st.w + ' pixels wide, ' + st.h + ' pixels high');
+  }
+
+  /* The one write both the drag and the keyboard make. */
+  function applyChartSize(svg, wrap, w, h, handle) {
+    w = clampWidth(w, wrap);
+    h = clampHeight(h);
+    svg.setAttribute('width',  w);
+    svg.setAttribute('height', h);
+    wrap.style.width  = w + 'px';
+    wrap.style.height = h + 'px';
+    if (handle) updateChartAria(handle, svg, wrap, { w: w, h: h });
+    return { w: w, h: h };
+  }
+
+  /* The forgotten size is removed rather than overwritten with the default:
+     the next visit has to open at what the server sends, not at a remembered
+     size that happens to equal it today. */
+  function resetChartSizes() {
+    try { window.localStorage.removeItem(sizeKey()); }
+    catch (e) { /* a browser that cannot store it has nothing to forget */ }
+
+    var applied = null;
+    for (var i = 0; i < charts.length; i++) {
+      var chart = charts[i];
+      var size = applyChartSize(chart.svg, chart.wrap, chart.defaults.w, chart.defaults.h, chart.handle);
+      if (!applied) applied = size;
+    }
+
+    var status = document.getElementById('chart-resize-status');
+    if (status && applied) {
+      status.textContent = 'Chart size reset to ' + applied.w + ' by ' + applied.h + ' pixels.';
+    }
+  }
+
+  /* The control that forgets the remembered size.  A visible button, not
+     another key on the grip: the size outlives the visit, so the way to get
+     rid of it has to be findable on the page rather than something a reader
+     has to be told about.  It sits with the export controls, which every
+     chart page already has. */
+  function addChartResetButton() {
+    var bar = document.querySelector('.graph-export-bar');
+    if (!bar || bar.querySelector('.chart-reset-size')) return;
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn-graph-export chart-reset-size';
+    button.textContent = 'Reset size';
+    button.title = 'Forget the size this chart was left at and use the size the page was served at';
+    button.addEventListener('click', resetChartSizes);
+    bar.appendChild(button);
+  }
+
+  function initChartResize() {
+    var containers = document.querySelectorAll(CONTAINERS);
+    var title = chartTitle();
+    for (var ci = 0; ci < containers.length; ci++) {
+      var container = containers[ci];
+      var svg = container.querySelector('svg');
+      if (!svg || container.querySelector('.chart-resize-handle')) continue;
+      ensureViewBox(svg);
+      var svgW = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+      var svgH = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+      var wrap = document.createElement('div');
+      wrap.className = 'chart-svg-wrap';
+      if (svgW) wrap.style.width  = svgW + 'px';
+      if (svgH) wrap.style.height = svgH + 'px';
+      /* The SVG is not always a child of the container - HTML::D3 puts the
+         pie inside #pie_chart_wrap - so the wrap goes where the SVG actually
+         is.  insertBefore() on the container would throw for a grandchild,
+         and that page would have no grip and no Reset size control. */
+      svg.parentNode.insertBefore(wrap, svg);
+      wrap.appendChild(svg);
+
+      /* The size the server sent, before a remembered one is applied: it is
+         what Reset size goes back to.  Kept unclamped, so the reset asks for
+         the server's size and applyChartSize() clamps it to this window the
+         same way it clamps a remembered one. */
+      var defaults = {
+        w: svgW || wrap.getBoundingClientRect().width || MIN_W,
+        h: svgH || wrap.getBoundingClientRect().height || MIN_H
+      };
+
+      /* The size this kind of chart was last left at, applied before the grip
+         exists so the grip opens saying the size the chart is drawn at. */
+      var saved = savedChartSize(wrap);
+      if (saved) applyChartSize(svg, wrap, saved.w, saved.h);
+
+      var handle = document.createElement('div');
+      handle.className = 'chart-resize-handle';
+      handle.setAttribute('role', 'slider');
+      handle.setAttribute('tabindex', '0');
+      handle.setAttribute('aria-label', 'Resize ' + title);
+      handle.setAttribute('aria-describedby', 'chart-resize-help');
+      handle.setAttribute('aria-orientation', 'horizontal');
+      handle.setAttribute('aria-valuemin', String(MIN_W));
+      handle.setAttribute('title', 'Drag, or focus and use the arrow keys, to resize this chart');
+      wrap.appendChild(handle);
+      updateChartAria(handle, svg, wrap);
+      charts.push({ svg: svg, wrap: wrap, handle: handle, defaults: defaults });
+      (function (svg, handle, wrap) {
+        var startX, startY, startW, startH;
+        function onDown(e) {
+          e.preventDefault();
+          var touch = e.touches && e.touches[0];
+          startX = touch ? touch.clientX : e.clientX;
+          startY = touch ? touch.clientY : e.clientY;
+          startW = parseFloat(svg.getAttribute('width'))  || svg.getBoundingClientRect().width;
+          startH = parseFloat(svg.getAttribute('height')) || svg.getBoundingClientRect().height;
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup',   onUp);
+          document.addEventListener('touchmove', onMove, { passive: false });
+          document.addEventListener('touchend',  onUp);
+        }
+        function onMove(e) {
+          e.preventDefault();
+          var touch = e.touches && e.touches[0];
+          var cx = touch ? touch.clientX : e.clientX;
+          var cy = touch ? touch.clientY : e.clientY;
+          applyChartSize(svg, wrap, startW + cx - startX, startH + cy - startY);
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup',   onUp);
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend',  onUp);
+          /* A drag changes the same value the keyboard does, and the same size
+             is kept: written once, when the grip is let go, rather than on
+             every pointer move. */
+          var st = chartSize(svg, wrap);
+          saveChartSize(st.w, st.h);
+          updateChartAria(handle, svg, wrap);
+        }
+        /* The keyboard equivalent of the drag: the same write, the same limits,
+           one step at a time.  preventDefault() runs even at a limit, so an
+           arrow key on the handle never scrolls the page out from under the
+           chart being resized. */
+        function onChartResizeKey(e) {
+          var st   = chartSize(svg, wrap);
+          var step = e.shiftKey ? BIG_STEP : STEP;
+          var w    = st.w;
+          var h    = st.h;
+
+          if      (e.key === 'ArrowRight') w = clampWidth(w + step, wrap);
+          else if (e.key === 'ArrowLeft')  w = clampWidth(w - step, wrap);
+          else if (e.key === 'ArrowDown')  h = clampHeight(h + step);
+          else if (e.key === 'ArrowUp')    h = clampHeight(h - step);
+          else if (e.key === 'Home')       w = MIN_W;
+          else if (e.key === 'End')        w = maxWidth(wrap);
+          else return;
+
+          e.preventDefault();
+          if (w === st.w && h === st.h) return;
+          var applied = applyChartSize(svg, wrap, w, h, handle);
+          saveChartSize(applied.w, applied.h);
+        }
+        handle.addEventListener('mousedown',  onDown);
+        handle.addEventListener('touchstart', onDown, { passive: false });
+        handle.addEventListener('keydown',     onChartResizeKey);
+      }(svg, handle, wrap));
+    }
+
+    if (charts.length) addChartResetButton();
+  }
+
+  setTimeout(initChartResize, 100);
+}());
+</script>
+[% END %]
+<script nonce="[% csp_nonce | html %]">
+/* Buttons that once carried an onclick attribute.  The Content-Security-Policy
+   runs only scripts that carry this page's nonce, which an attribute cannot,
+   so each is bound here instead. */
+(function () {
+  var copy = document.getElementById('btn-copy-chart-link');
+  if (copy) {
+    copy.addEventListener('click', function () {
+      navigator.clipboard.writeText(window.location.href).then(function () {
+        var t = copy.textContent;
+        copy.textContent = 'Copied!';
+        setTimeout(function () { copy.textContent = t; }, 1500);
+      }).catch(function () {});
+    });
+  }
+  var back = document.getElementById('btn-error-back');
+  if (back) back.addEventListener('click', function () { history.back(); });
+}());
+</script>
+</body>
+</html>

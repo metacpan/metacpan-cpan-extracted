@@ -3,6 +3,7 @@ abstract: 'Small everyday helpers: directory listing, shell commands, JSON files
 author:
   - 'David E. Condon <dec986@gmail.com>'
 build_requires:
+  File::Find: '0'
   File::Spec: '0'
   File::Temp: '0'
   Test::Exception: '0'
@@ -19,17 +20,20 @@ name: Cn-Util
 provides:
   Cn::Util:
     file: lib/Cn/Util.pm
-    version: '0.024'
+    version: '0.0241'
+recommends:
+  Devel::Size: '0'
 requires:
   Capture::Tiny: '0'
   Data::Printer: '1.000'
   Devel::Confess: '0'
   Exporter: '0'
-  File::Find: '0'
-  File::Spec: '0'
+  File::Temp: '0'
   JSON::MaybeXS: '0'
+  POSIX: '0'
   Parallel::ForkManager: '1.12'
   Scalar::Util: '0'
+  Storable: '0'
   Term::ANSIColor: '3.00'
   autodie: '0'
   perl: '5.010001'
@@ -37,7 +41,7 @@ resources:
   bugtracker: https://github.com/hhg7/util/issues
   homepage: https://metacpan.org/dist/Cn-Util
   repository: git://github.com/hhg7/util
-version: '0.024'
+version: '0.0241'
 x_generated_by_perl: v5.44.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

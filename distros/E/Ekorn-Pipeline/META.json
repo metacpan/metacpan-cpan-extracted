@@ -76,7 +76,7 @@
    "provides" : {
       "Ekorn::Pipeline" : {
          "file" : "lib/Ekorn/Pipeline.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.2.0"
       },
       "Ekorn::Pipeline::Errors" : {
          "file" : "lib/Ekorn/Pipeline/Errors.pm"
@@ -112,7 +112,7 @@
          "web" : "https://github.com/nukopian/Ekorn-Pipeline"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

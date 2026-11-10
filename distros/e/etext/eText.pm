@@ -7,12 +7,13 @@ package Tk::eText;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '2.01';
+$VERSION = '2.05';
 
 use Tk qw(Ev);
 use Tk::Text;
 use base qw(Tk::Text);
 use XSLoader;
+use Scalar::Util ();
 
 Construct Tk::Widget 'eText';
 
@@ -73,13 +74,27 @@ sub ClassInit {
 sub undoFromKey { my $w = shift; eval { $w->editUndo }; return }
 sub redoFromKey { my $w = shift; eval { $w->editRedo }; return }
 
+# The ready-made -valuecommand: "-valuecommand => 'DETACH'" makes the
+# widget call this method (a callback given as a string is a method of
+# the widget), which passes the notification on to the value if it is
+# an object with a DETACH method: $value->DETACH($widget, $event, $kind,
+# $where, $cause).  Other values are skipped.
+sub DETACH {
+  my ($w, $event, $kind, $where, $value, $cause) = @_;
+  $value->DETACH($w, $event, $kind, $where, $cause)
+    if Scalar::Util::blessed($value) && $value->can('DETACH');
+  return;
+}
+
 # The editXxx and imageXxx spellings are generated in this package too
 # (Tk::Text's versions call Tk::Text::edit and Tk::Text::image directly,
-# which would bypass an override here).
+# which would bypass an override here); markData and tagData are new.
 use Tk::Submethods ( 'block' => [qw(at addline cget configure data delete
-				    deletelines insert list names of
+				    deletelines insert list names nodedata of
 				    split trim)],
 		     'edit'  => [qw(modified redo reset separator undo)],
+		     'mark'  => [qw(data)],
+		     'tag'   => [qw(data)],
 		     'image' => [qw(cget configure create names)],
 		   );
 
@@ -123,6 +138,23 @@ The widget command additionally supports the C<block> subcommand
 strings and blessed objects (C<Tk::Text::Block>, C<Tk::Text::TagOn>,
 ...).
 
+A Perl scalar (a I<value>) can be kept with every node of the tree of
+a block, the leaves included (C<blockNodedata>, the C<block nodedata>
+subcommand), with every mark (C<markData>, C<mark data>) and with every
+run of a tag (C<tagData>, C<tag data>).  The widget keeps a copy; the
+values move with the text, edits that join nodes or merge runs keep
+the first value present, C<editUndo> gives back the values a deletion
+dropped, and a value is freed only at documented moments, never in the
+middle of a change: when the widget command that drops it returns, so
+that a C<DESTROY> method may read the widget (as a stopgap, the
+commands that would modify it fail meanwhile).  C<blockList> shows them:
+a fourth element of a block's header holds its node values, the
+start of a run with a value is a C<Tk::Text::TagOn> holding
+C<[name, value]> instead of a reference to the name, and a mark with a
+value is a C<Tk::Text::MarkLeft> or C<Tk::Text::MarkRight> holding
+C<[name, value]>.  See "Values" in
+F<doc/etext.pod>.
+
 The complete documentation of the widget, of blocks and of the
 C<-layoutcmd> protocol is in F<doc/etext.pod> of this distribution
 (source repository: L<https://github.com/ilyaz-ai/etext>); a large demo
@@ -135,7 +167,14 @@ Zakharevich in 1995-1997 (I<etext> 0.4 ... 1.6.2 on CPAN), which was
 written against the Perl/Tk b9 "portable Tk" layer.  Version 2.00 (2026,
 never released) is the same widget code ported to the API of Perl/Tk 804
 and Perl 5.38, built as an ordinary standalone extension; 2.01 is the
-first release of the modernized distribution.
+first release of the modernized distribution, and 2.02 makes it work on
+Windows (tested under Wine, with fixes to Perl/Tk itself; see README.md);
+2.03 lets block nodes, marks and tag runs keep Perl values (see the manual,
+"Values"); 2.04 makes block insert, split and trim and tag add and remove
+undoable, with their values, and redo re-inserts exactly what was inserted;
+2.05 keeps the values in data containers, tells the program before a value
+is detached (C<-valuecommand>), lets DESTROY methods change the widget again,
+and fixes the bugs listed in F<Changes>.
 
 The features that the Tk text widget acquired after tk4.0 were added in
 version 2.00: indices count characters (the text is UTF-8), the C<edit>

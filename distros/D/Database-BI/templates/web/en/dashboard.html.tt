@@ -1833,11 +1833,16 @@ or right: Shift+Left or Shift+Right.  Clicking a header sorts it, Ctrl+click sel
 dragging it moves it.</p>
 <p class="sr-only" id="table-live" role="status"></p>
 <div class="table-scroll">
-<table id="bi-table" data-table="[% table | html %]">
+[%# data-paged: the rows are one page of several, so a header sort asks the
+    server (sort=, dir=) rather than sorting the rows on this page; data-sort-*:
+    the sort the server applied to every row before cutting this page. -%]
+<table id="bi-table" data-table="[% table | html %]"
+  [%- IF (page AND page > 1) OR has_next %] data-paged="1"[% END %]
+  [%- IF sorted_by AND sorted_by.col.length %] data-sort-col="[% sorted_by.col | html %]" data-sort-dir="[% sorted_by.dir | html %]"[% END %]>
   <thead>
     <tr>
       [% FOREACH col IN columns -%]
-      <th draggable="true" aria-sort="none" tabindex="0"
+      <th draggable="true" aria-sort="none" tabindex="0" data-col="[% col | html %]"
           aria-describedby="table-head-help">[% col | html %]</th>
       [%- END %]
     </tr>
@@ -1855,9 +1860,13 @@ dragging it moves it.</p>
 </div>
 
 [% SET pnum = page ? page : 0 %]
-[% IF pnum > 1 OR has_next %]
+[% SET show_pages = (pnum > 1 OR has_next) ? 1 : 0 %]
+[%# The rows-per-page list comes with the page buttons, and also without them
+    when the URL chose a size or every row is shown: there must be a way back. %]
+[% IF show_pages OR page_size_asked OR (page_size.length AND page_size == 0) %]
 [% SET sep = page_base_url.search('\?') ? '&amp;' : '?' %]
 <nav class="pagination" aria-label="Page navigation">
+  [% IF show_pages %]
   [% IF pnum > 1 %]
   <a class="page-btn" href="[% page_base_url | html %][% sep %]page=[% pnum - 1 %]&amp;per_page=[% per_page %]">&laquo; Prev</a>
   [% ELSE %]
@@ -1872,7 +1881,10 @@ dragging it moves it.</p>
   <span class="page-btn page-btn-dis">Next &raquo;</span>
   [% END %]
 
-  <span class="page-info">Page [% page %][% IF per_page %] &mdash; [% per_page %] rows/page[% END %]</span>
+  [%# page_count is missing only when a SQL table's count failed (see _fetch_page). %]
+  <span class="page-info">Page [% page %][% IF page_count %] of [% page_count %][% END %][% IF per_page %] &mdash; [% per_page %] rows/page[% END %]</span>
+  [% END %]
+  [% PROCESS "web/en/layouts/page_size.html.tt" ps_id = 'page-size' ps_mode = 'view' %]
 </nav>
 [% END %]
 
@@ -1911,14 +1923,7 @@ function biClosePanels(keep) {
 // parseAccounting is defined at module scope (outside any IIFE) so it is
 // accessible from all script blocks on this page -- the sort block uses it for
 // numeric column detection, and the graph panel's isNumericVal delegates to it.
-function parseAccounting(v) {
-  if (v === '') return NaN;
-  var s   = v.trim();
-  var neg = /^\(.*\)$/.test(s);      // (value) means negative
-  s = s.replace(/[^\d.\-]/g, '');    // strip $, commas, parens, spaces, etc.
-  var n = parseFloat(s);
-  return isNaN(n) ? NaN : (neg ? -Math.abs(n) : n);
-}
+[% PROCESS "web/en/layouts/parse_accounting.html.tt" %]
 
 // Returns a YYYYMMDD integer sort key for recognised date strings, else null.
 // Handles YYYY-MM-DD (ISO) and M/D/YYYY or D/M/YYYY slash formats.
@@ -2265,10 +2270,41 @@ function biDetectColType(colName) {
     if (live) live.textContent = message;
   }
 
+  // The rows on this page are one page of several: sorting them would show the
+  // page's rows in order, not the first rows of the sorted table.  So the
+  // server sorts every row and the page is drawn again, from page 1.
+  var PAGED = table.dataset.paged === '1';
+
+  function headerName(idx) {
+    var h = headers[idx];
+    if (!h) return '';
+    return h.dataset.col !== undefined ? h.dataset.col : h.textContent.trim();
+  }
+
+  function serverSort(idx, asc) {
+    var url = new URL(location.href);
+    url.searchParams.set('sort', headerName(idx));
+    url.searchParams.set('dir', asc ? 'asc' : 'desc');
+    url.searchParams.delete('page');
+    return url.toString();
+  }
+
+  function showSort(idx, asc) {
+    headers.forEach(function (h, i) {
+      h.setAttribute('aria-sort', i === idx ? (asc ? 'ascending' : 'descending') : 'none');
+    });
+  }
+
   function sortColumn(th) {
     var idx = colIndex(th);
     if (sortColIdx === idx) { sortAsc = !sortAsc; }
     else { sortColIdx = idx; sortAsc = true; }
+    if (PAGED) {
+      saveState();
+      announceTable('Sorting by ' + columnName(idx) + (sortAsc ? ' ascending' : ' descending'));
+      location.assign(serverSort(sortColIdx, sortAsc));
+      return;
+    }
     sortByCol(sortColIdx, sortAsc);
     saveState();
     announceTable('Sorted by ' + columnName(idx) + (sortAsc ? ' ascending' : ' descending'));
@@ -2379,9 +2415,7 @@ function biDetectColType(colName) {
     var cmp = biValueComparator(rows.map(text), asc);
     rows.sort(function (a, b) { return cmp(text(a), text(b)); });
     rows.forEach(function (r) { tbody.appendChild(r); });
-    headers.forEach(function (h, i) {
-      h.setAttribute('aria-sort', i === idx ? (asc ? 'ascending' : 'descending') : 'none');
-    });
+    showSort(idx, asc);
   }
 
   // What Print needs to lay its rows out as the table shows them: the columns
@@ -2418,7 +2452,17 @@ function biDetectColType(colName) {
       }
     }
 
-    if (state.sortCol) {
+    var serverCol = table.dataset.sortCol;
+    if (serverCol !== undefined) {
+      // The server sorted every row before cutting this page: show that sort,
+      // and remember it, but leave the rows in the order they came.
+      headers.forEach(function (h, i) { if (headerName(i) === serverCol) sortColIdx = i; });
+      if (sortColIdx !== -1) {
+        sortAsc = table.dataset.sortDir !== 'desc';
+        showSort(sortColIdx, sortAsc);
+        saveState();
+      }
+    } else if (state.sortCol) {
       var idx = -1;
       headers.forEach(function (h, i) {
         if (h.textContent.trim() === state.sortCol) idx = i;
@@ -2426,7 +2470,18 @@ function biDetectColType(colName) {
       if (idx !== -1) {
         sortColIdx = idx;
         sortAsc    = state.sortAsc !== false;
-        sortByCol(sortColIdx, sortAsc);
+        // A remembered sort on a table of several pages is asked of the server,
+        // once: a URL that already names a sort it did not apply (a column it
+        // does not have) is left as it is.
+        if (PAGED) {
+          if (!new URLSearchParams(location.search).has('sort')) {
+            location.replace(serverSort(sortColIdx, sortAsc));
+            return;
+          }
+          sortColIdx = -1;
+        } else {
+          sortByCol(sortColIdx, sortAsc);
+        }
       }
     }
 

@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.3.2",
    "license" : [
       "perl_5"
    ],
@@ -110,14 +110,14 @@
    "provides" : {
       "Furl" : {
          "file" : "lib/Furl.pm",
-         "version" : "3.15"
+         "version" : "3.16"
       },
       "Furl::ConnectionCache" : {
          "file" : "lib/Furl/ConnectionCache.pm"
       },
       "Furl::HTTP" : {
          "file" : "lib/Furl/HTTP.pm",
-         "version" : "3.15"
+         "version" : "3.16"
       },
       "Furl::Headers" : {
          "file" : "lib/Furl/Headers.pm"
@@ -144,11 +144,13 @@
          "web" : "https://github.com/tokuhirom/Furl"
       }
    },
-   "version" : "3.15",
+   "version" : "3.16",
    "x_contributors" : [
       "Audrey Tang <audreyt@audreyt.org>",
       "Breno G. de Oliveira <garu@cpan.org>",
+      "Claude <noreply@anthropic.com>",
       "Debabrata Deka <60925700+ddeka2910@users.noreply.github.com>",
+      "Ed Sabol <esabol@users.noreply.github.com>",
       "Fuji Goro <fuji.goro@dena.jp>",
       "Fuji, Goro <g.psy.va@gmail.com>",
       "Fuji, Goro <gfuji@cpan.org>",
@@ -160,6 +162,7 @@
       "Keiji, Yoshimi <walf443@gmail.com>",
       "Masahiro Nagano <kazeburo@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
+      "Robert Rothenberg <rrwo@cpansec.org>",
       "Shohei YOSHIDA <syohex@gmail.com>",
       "Shoichi Kaji <skaji@cpan.org>",
       "Slaven Rezic <slaven@rezic.de>",

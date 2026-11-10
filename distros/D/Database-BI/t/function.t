@@ -14,6 +14,12 @@ use Scalar::Util qw(blessed);
 use Test::Mojo;
 use Readonly;
 
+# A geocoder keeps its places in CACHEDIR (or CACHE_DIR, or the Object::Configure
+# variable) before <model_dir>/geocode-cache, so a map drawn with the real
+# geocoder would write into the user's own cache.  Each app here has a temp
+# model_dir, which is where they belong.
+delete @ENV{qw(CACHEDIR CACHE_DIR Database__BI__cache_dir Database__BI__Extract__cache_dir Database__BI__Model__Geocode__cache_dir)};
+
 # ---------------------------------------------------------------------------
 # Constants -- no magic strings/numbers in assertions
 # ---------------------------------------------------------------------------
@@ -5578,6 +5584,13 @@ sub croak_rethrow {
 		is $number->('1e999'), undef, 'nor is what would be infinity';
 		is $number->('-1e999'), undef, 'in either direction';
 		is $number->('9' x 400), undef, 'however it is spelled';
+		# The limit is a double's, which is the browser's, on every perl.  A perl
+		# built with -Duselongdouble or -Dusequadmath holds these as finite
+		# numbers, and passed them through until GitHub issue 6.
+		ok defined $number->('1.79e308'), 'the largest a double holds is a number';
+		is $number->('1.8e308'), undef, 'one past it is not, whatever this perl holds';
+		is $number->('-1.8e308'), undef, '... nor below';
+		is $number->('1e4000'), undef, '... nor far past it';
 		keeps_globals_ok('parse_number', sub { $number->('$5') });
 	};
 }

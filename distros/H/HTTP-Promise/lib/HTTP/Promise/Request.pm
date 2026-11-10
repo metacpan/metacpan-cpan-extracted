@@ -607,6 +607,8 @@ C<absolute-form>:
 
 See L<rfc7230, section 5.3|https://tools.ietf.org/html/rfc7230#section-5.3>
 
+=for Pod::Coverage authorization_basic
+
 =head2 boundary
 
 This is inherited from L<HTTP::Promise::Message> and returns the multipart boundary currently set in the C<Content-Type> header.

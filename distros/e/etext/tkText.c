@@ -18,7 +18,7 @@
  */
 #define NO_COREXT
 
-static char sccsid[] = "@(#) tkText.c 1.82 95/08/21 11:46:27";
+/* @(#) tkText.c 1.82 95/08/21 11:46:27 */
 
 #include "pperl.h"
 #include "default.h"
@@ -32,7 +32,12 @@ static char sccsid[] = "@(#) tkText.c 1.82 95/08/21 11:46:27";
 
 #include "tkText.h"
 
-static char rcsid[] = "$Id: tkText.c,v 1.24 1996/03/20 21:27:06 ilya Exp $";
+/* $Id: tkText.c,v 1.24 1996/03/20 21:27:06 ilya Exp $ */
+
+#if TK_TEXT_DATA_ARRAYS
+long eText_TkTextDataLive = 0;	/* Data blocks not yet freed (see
+				 * tkTextData.h). */
+#endif
 
 /*
  * Information used to parse text configuration options:
@@ -134,6 +139,8 @@ static Tk_ConfigSpec configSpecs[] = {
 	TK_CONFIG_NULL_OK},
     {TK_CONFIG_BOOLEAN, "-undo", "undo", "Undo",
 	"0", Tk_Offset(TkText, undo), 0},
+    {TK_CONFIG_CALLBACK, "-valuecommand", "valueCommand", "ValueCommand",
+	"", Tk_Offset(TkText, valueCmd), TK_CONFIG_NULL_OK},
     {TK_CONFIG_INT, "-width", "width", "Width",
 	DEF_TEXT_WIDTH, Tk_Offset(TkText, width), 0},
     {TK_CONFIG_UID, "-wrap", "wrap", "Wrap",
@@ -194,6 +201,11 @@ typedef struct InsertState {
 					 * all) and their own at the end. */
     int numRight;			/* How many of them. */
     int maxRight;			/* Room in the array. */
+    TkTextTag **tags;			/* The tags the list switches on or
+					 * off somewhere (see ScanListTags). */
+    char *tagOn;			/* For each: whether it is on at the
+					 * point of the list reached. */
+    int numTags;			/* How many of them. */
 } InsertState;
 
 /*
@@ -207,6 +219,8 @@ static int		DeleteChars _ANSI_ARGS_((TkText *textPtr,
 static void		DestroyText _ANSI_ARGS_((char *memPtr));
 static void		InsertChars _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *indexPtr, char *string));
+static int		SplitChars _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int level));
 static void		TextBlinkProc _ANSI_ARGS_((ClientData clientData));
 static void		TextCmdDeletedProc _ANSI_ARGS_((
 			    ClientData clientData));
@@ -231,13 +245,58 @@ static void		InsertList _ANSI_ARGS_((TkText *textPtr,
 static void		InsertListElements _ANSI_ARGS_((TkText *textPtr,
 			    char *markName, char *startMark, AV *av, int first,
 			    InsertState *statePtr));
+static void		ScanListTags _ANSI_ARGS_((TkText *textPtr, AV *av,
+			    int first, InsertState *statePtr));
+static void		InsertListText _ANSI_ARGS_((TkText *textPtr,
+			    char *markName, TkTextIndex *indexPtr, char *string,
+			    InsertState *statePtr));
+static char *		ListTagName _ANSI_ARGS_((SV *inner));
 static void		InsertEmbedded _ANSI_ARGS_((TkText *textPtr,
 			    char *markName, AV *av, int isImage));
 static int		MarkOp _ANSI_ARGS_((TkText *textPtr, char *op,
 			    char *name, char *extra));
 static void		UpdateDirtyFlag _ANSI_ARGS_((TkText *textPtr));
+static int		Abbrev _ANSI_ARGS_((Arg arg, char *word, size_t min));
+static void		NotOnDummyLine _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr));
+static TkTextUndoAtom *	PushEdit _ANSI_ARGS_((TkText *textPtr, int mode,
+			    int type, char *index1, char *index2,
+			    Tcl_Obj *string));
+static void		EditOther _ANSI_ARGS_((TkText *textPtr,
+			    TkTextUndoAtom *atomPtr, int revert));
+static void		EditFinish _ANSI_ARGS_((TkText *textPtr,
+			    char *markIndex));
+static void		RecordTagChange _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    TkTextTag *tagPtr, int add, int mode));
+static void		TagWithRedraw _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    TkTextTag *tagPtr, int add));
+static int		KeepViewForBlock _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int *lineOffsetPtr));
+static void		ResetViewForBlock _ANSI_ARGS_((TkText *textPtr,
+			    int line, int offset));
+static void		DeletionSeparator _ANSI_ARGS_((TkText *textPtr));
+static void		VcBegin _ANSI_ARGS_((TkText *textPtr, int argc,
+			    Arg *args));
+static int		VcFinish _ANSI_ARGS_((TkText *textPtr));
+static int		ModifyingCommand _ANSI_ARGS_((TkText *textPtr,
+			    int argc, Arg *args));
 static int		TextWidgetCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, Arg *args));
+static void		FlushValues _ANSI_ARGS_((TkText *textPtr));
+static int		MoreFreeRounds _ANSI_ARGS_((TkText *textPtr));
+#if TK_TEXT_DATA_ARRAYS
+static int		DataSlotCmd _ANSI_ARGS_((TkText *textPtr,
+			    Tcl_Interp *interp, int argc, Arg *args));
+#endif
+static int		BlockDataParse _ANSI_ARGS_((ClientData clientData,
+			    Tcl_Interp *interp, Tk_Window tkwin, Arg value,
+			    char *widgRec, int offset));
+static Arg		BlockDataPrint _ANSI_ARGS_((ClientData clientData,
+			    Tk_Window tkwin, char *widgRec, int offset,
+			    Tcl_FreeProc **freeProcPtr));
 static void		DeleteBlock _ANSI_ARGS_((TkText *textPtr,
 			    TkTextBlock *blockPtr));
 static int		TextDumpCmd _ANSI_ARGS_((TkText *textPtr,
@@ -248,7 +307,7 @@ static void		DumpLine _ANSI_ARGS_((Tcl_Interp *interp,
 			    LangCallback *command));
 static int		DumpSegment _ANSI_ARGS_((Tcl_Interp *interp, char *key,
 			    char *value, LangCallback *command,
-			    TkTextIndex *indexPtr, int what));
+			    TkTextIndex *indexPtr, int what, Arg data));
 
 
 /*
@@ -267,6 +326,54 @@ static int		DumpSegment _ANSI_ARGS_((Tcl_Interp *interp, char *key,
  *
  *--------------------------------------------------------------
  */
+
+/*
+ * While a change that can be undone runs, the values it drops go to
+ * the list of its undo atom (see TkTextValue): textPtr->valueCapture,
+ * with the addresses of the nodes as they are before the change
+ * (textPtr->valueAddresses, from TkBTreeSnapshotValues).
+ */
+
+typedef struct CaptureState {
+    TkTextValue **oldCapture;
+    Tcl_HashTable *oldAddresses;
+    Tcl_HashTable addresses;
+    int snapshot;
+} CaptureState;
+
+static void
+CaptureStart(textPtr, csPtr, listPtr, index1Ptr, index2Ptr)
+    TkText *textPtr;
+    CaptureState *csPtr;
+    TkTextValue **listPtr;		/* Where the values go. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range whose blocks' nodes
+					 * may lose values, or NULL (runs
+					 * only). */
+{
+    csPtr->oldCapture = textPtr->valueCapture;
+    csPtr->oldAddresses = textPtr->valueAddresses;
+    csPtr->snapshot = 0;
+    textPtr->valueCapture = listPtr;
+    textPtr->valueAddresses = NULL;
+    if ((index1Ptr != NULL) && textPtr->haveValues) {
+	TkBTreeSnapshotValues(textPtr, index1Ptr, index2Ptr,
+		&csPtr->addresses);
+	textPtr->valueAddresses = &csPtr->addresses;
+	csPtr->snapshot = 1;
+    }
+}
+
+static void
+CaptureEnd(textPtr, csPtr)
+    TkText *textPtr;
+    CaptureState *csPtr;
+{
+    if (csPtr->snapshot) {
+	TkBTreeFreeSnapshot(&csPtr->addresses);
+    }
+    textPtr->valueCapture = csPtr->oldCapture;
+    textPtr->valueAddresses = csPtr->oldAddresses;
+}
 
 int
 Tk_eTextCmd(clientData, interp, argc, args)
@@ -377,6 +484,22 @@ Tk_eTextCmd(clientData, interp, argc, args)
     textPtr->getFlags = 0;
     textPtr->flags = 0;
     textPtr->undoStack = TkTextUndoInitStack(0);
+    textPtr->undoStack->textPtr = textPtr;
+    textPtr->cmdDepth = 0;
+    textPtr->haveValues = 0;
+    textPtr->freeValues = NULL;
+    textPtr->lastFreeValue = NULL;
+    textPtr->valueCapture = NULL;
+    textPtr->valueAddresses = NULL;
+    textPtr->editValues = NULL;
+    textPtr->freeingValues = 0;
+    textPtr->freeLimit = TK_TEXT_FREE_DEPTH;
+    textPtr->freeAsks = 0;
+    textPtr->freeAsking = 0;
+    textPtr->valueCmd = NULL;
+    textPtr->vcPtr = NULL;
+    textPtr->vcInCallback = 0;
+    textPtr->vcTagDone = 0;
     textPtr->undo = 0;
     textPtr->maxUndo = 0;
     textPtr->autoSeparators = 1;
@@ -443,7 +566,7 @@ TextWidgetCmd(clientData, interp, argc, args)
     register TkText *textPtr = (TkText *) clientData;
     int result = TCL_OK;
     size_t length;
-    int c;
+    int c, ownStep = 0;
     TkTextIndex index1, index2;
 
     if (argc < 2) {
@@ -451,7 +574,43 @@ TextWidgetCmd(clientData, interp, argc, args)
 		LangString(args[0]), " option ?arg arg ...?\"",          NULL);
 	return TCL_ERROR;
     }
+    if (textPtr->vcInCallback && ModifyingCommand(textPtr, argc, args)) {
+	Tcl_AppendResult(interp, "cannot modify ", LangString(args[0]),
+		" while its -valuecommand runs", NULL);
+	return TCL_ERROR;
+    }
     Tcl_Preserve((ClientData) textPtr);
+    if (textPtr->freeingValues && ModifyingCommand(textPtr, argc, args)) {
+	/*
+	 * A DESTROY method changes the widget while the values a command
+	 * dropped are being freed (FlushValues): allowed, as a change of
+	 * its own for the undo, unless the chain of such changes has
+	 * reached the limit of this freeing pass (TK_TEXT_FREE_DEPTH, or
+	 * more if DESTROYmult raised it) and DESTROYmult does not raise
+	 * it now.
+	 */
+
+	if ((textPtr->freeingValues >= textPtr->freeLimit)
+		&& !MoreFreeRounds(textPtr)) {
+	    char buffer[TCL_INTEGER_SPACE];
+
+	    sprintf(buffer, "%d", textPtr->freeLimit);
+	    Tcl_AppendResult(interp, "cannot modify ", LangString(args[0]),
+		    " while its values are being freed, ", buffer,
+		    " changes deep", NULL);
+	    Tcl_Release((ClientData) textPtr);
+	    return TCL_ERROR;
+	}
+	ownStep = 1;
+    }
+    if (ownStep && textPtr->undo) {
+	TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+    }
+    if ((textPtr->cmdDepth == 0) && (textPtr->valueCmd != NULL)
+	    && (textPtr->vcPtr == NULL)) {
+	VcBegin(textPtr, argc, args);
+    }
+    textPtr->cmdDepth++;
     c = LangString(args[1])[0];
     length = strlen(LangString(args[1]));
     if ((c == 'b') && (strncmp(LangString(args[1]), "bbox", length) == 0) 
@@ -596,7 +755,7 @@ TextWidgetCmd(clientData, interp, argc, args)
     } else if ((c == 'g') && (strncmp(LangString(args[1]), "get", length) == 0)) {
         Tcl_DString dstring;
 	TkTextLine *linePtr;
-	int offset, dummy;
+	int offset;
 
 	if ((argc != 3) && (argc != 4)) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -721,6 +880,10 @@ TextWidgetCmd(clientData, interp, argc, args)
     } else if ((c == 'y') && (strncmp(LangString(args[1]), "yview", length) == 0)
 	    && (length >= 2)) {
 	result = TkTextYviewCmd(textPtr, interp, argc, args);
+#if TK_TEXT_DATA_ARRAYS
+    } else if (strcmp(LangString(args[1]), "_dataslot") == 0) {
+	result = DataSlotCmd(textPtr, interp, argc, args);
+#endif
     } else {
 	Tcl_AppendResult(interp, "bad option \"", LangString(args[1]),
 		"\": must be bbox, block, cget, compare, configure, debug, delete, ",
@@ -731,10 +894,1067 @@ TextWidgetCmd(clientData, interp, argc, args)
     }
 
     done:
+    /*
+     * What the -valuecommand is told at the end of the command (values
+     * of discarded undo steps, detaches not foreseen); then the values
+     * the command dropped are freed now that the text is consistent
+     * again (a value's DESTROY method may use the widget).
+     */
+
+    if ((textPtr->cmdDepth == 1) && (textPtr->vcPtr != NULL)
+	    && (VcFinish(textPtr) != TCL_OK)) {
+	result = TCL_ERROR;
+    }
+    if (ownStep && textPtr->undo) {
+	TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+	textPtr->lastEditMode = TK_TEXT_EDIT_OTHER;
+    }
+
+    /*
+     * Not while values are being freed: those this command dropped (a
+     * DESTROY method changed the widget) join the list being freed.
+     */
+
+    if ((--textPtr->cmdDepth == 0) && (textPtr->freeValues != NULL)
+	    && !textPtr->freeingValues) {
+	FlushValues(textPtr);
+    }
     Tcl_Release((ClientData) textPtr);
     return result;
 }
+
+/*
+ *--------------------------------------------------------------
+ *
+ * ModifyingCommand --
+ *
+ *	Whether a widget command would modify the widget: its text,
+ *	tags, marks, blocks, embedded images and windows, values, the
+ *	configuration of the widget, its tags, blocks, images and
+ *	windows, the undo history or the modified flag, or would create
+ *	a tag or a block type (a query of tag configure, tag bind or
+ *	block configure of one that does not exist).  Commands that
+ *	only read, or only change the view (see, xview, yview, scan) or
+ *	the B-tree check (debug), do not.
+ *
+ *	Such commands are refused while the -valuecommand runs (the
+ *	command that called it has not made its change yet).  While the
+ *	values a command dropped are being freed (FlushValues), they are
+ *	allowed, each as a change of its own for the undo, up to
+ *	TK_TEXT_FREE_DEPTH rounds deep unless DESTROYmult allows more
+ *	(MoreFreeRounds; in 2.04 they were refused there
+ *	too, a stopgap until -valuecommand told the program where a
+ *	value was before it was detached).
+ *
+ * Results:
+ *	Non-zero if the command modifies the widget.
+ *
+ * Side effects:
+ *	None.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+Abbrev(arg, word, min)
+    Arg arg;			/* The word given. */
+    char *word;			/* The full name of the subcommand. */
+    size_t min;			/* The shortest abbreviation accepted. */
+{
+    char *s = LangString(arg);
+    size_t length = strlen(s);
+
+    if (min < 1) {
+	min = 1;
+    }
+    return (length >= min) && (strncmp(s, word, length) == 0);
+}
+
+static int
+ModifyingCommand(textPtr, argc, args)
+    TkText *textPtr;		/* The widget. */
+    int argc;			/* Number of arguments. */
+    Arg *args;			/* Argument strings. */
+{
+    Arg *sub = args + 2;
+
+    if (Abbrev(args[1], "delete", 3) || Abbrev(args[1], "insert", 3)) {
+	return 1;
+    }
+    if (Abbrev(args[1], "configure", 3)) {
+	return argc > 3;
+    }
+    if (argc < 3) {
+	return 0;
+    }
+    if (Abbrev(args[1], "block", 2)) {
+	if (Abbrev(*sub, "configure", 2)) {
+	    /*
+	     * A query is allowed if the type exists (it would create it
+	     * otherwise).
+	     */
+
+	    return (argc > 5) || ((argc >= 4)
+		    && (Tcl_FindHashEntry(&textPtr->blockTable,
+			    LangString(args[3])) == NULL));
+	}
+	if (Abbrev(*sub, "data", 2)) {
+	    return argc == 5;
+	}
+	if (Abbrev(*sub, "nodedata", 2)) {
+	    return argc == 6;
+	}
+	if (strcmp(LangString(*sub), "delete") == 0) {
+	    return 1;
+	}
+	return Abbrev(*sub, "trim", 1) || Abbrev(*sub, "insert", 1)
+		|| Abbrev(*sub, "split", 1) || Abbrev(*sub, "addline", 2)
+		|| ((strlen(LangString(*sub)) > 6)
+			&& Abbrev(*sub, "deletelines", 7));
+    }
+    if (Abbrev(args[1], "edit", 1)) {
+	if (Abbrev(*sub, "modified", 1)) {
+	    return argc > 3;
+	}
+	return Abbrev(*sub, "redo", 3) || Abbrev(*sub, "reset", 3)
+		|| Abbrev(*sub, "separator", 1) || Abbrev(*sub, "undo", 1);
+    }
+    if (Abbrev(args[1], "image", 2) || Abbrev(args[1], "window", 1)) {
+	if (Abbrev(*sub, "configure", 2)) {
+	    return argc > 5;
+	}
+	return Abbrev(*sub, "create", 2);
+    }
+    if (Abbrev(args[1], "mark", 1)) {
+	if (Abbrev(*sub, "data", 1) || Abbrev(*sub, "gravity", 1)) {
+	    return argc > 4;
+	}
+	return Abbrev(*sub, "set", 1) || Abbrev(*sub, "unset", 1);
+    }
+    if (strcmp(LangString(args[1]), "tag") == 0) {
+	if (Abbrev(*sub, "configure", 2) || Abbrev(*sub, "bind", 1)) {
+	    /*
+	     * A query is allowed if the tag exists (it would create it
+	     * otherwise).
+	     */
+
+	    return (argc > 5) || ((argc >= 4)
+		    && (Tcl_FindHashEntry(&textPtr->tagTable,
+			    LangString(args[3])) == NULL));
+	}
+	if (Abbrev(*sub, "data", 2)) {
+	    return argc > 5;
+	}
+	return Abbrev(*sub, "add", 1) || Abbrev(*sub, "remove", 2)
+		|| Abbrev(*sub, "delete", 1) || Abbrev(*sub, "raise", 3)
+		|| Abbrev(*sub, "lower", 1);
+    }
+    return 0;
+}
+
+/*
+ *======================================================================
+ *
+ * -valuecommand: telling the program which values a change detaches.
+ *
+ *	A value (of a node, a run, a mark, a block: see "Values" in the
+ *	manual) leaves its place by a change: it is dropped (freed when
+ *	the widget command ends), stashed in an undo step, or moved to
+ *	another owner by a merge.  With a -valuecommand, every widget
+ *	command keeps a table of what it was told and what happened
+ *	(TkTextVcState, from VcBegin to VcFinish, keyed by the value's
+ *	Lang part, which keeps its identity while the containers move):
+ *
+ *	- before each change that may detach values, its look-ahead
+ *	  (TkBTreeVcPredict... in tkTextBTree.c, or the command itself
+ *	  for setting and unsetting) records each value it will detach
+ *	  (TkTextVcPredict), with the place it has, and TkTextVcNotify
+ *	  calls the callback for each while the text is unchanged;
+ *	- the change reports what it does (TkTextVcSeen: from the free
+ *	  list, the undo records, the merges); an undo or a redo that
+ *	  gives a value back calls the callback ("restore",
+ *	  TkTextVcRestored) once the value is back; values of discarded
+ *	  undo steps are reported at the end ("discard",
+ *	  TkTextVcDiscarded);
+ *	- at the end, a value that was detached without having been
+ *	  foreseen is reported "late", with the place it had if the
+ *	  look-ahead saw it (TkTextVcCandidate), and under "debug" the
+ *	  command fails (as for a foreseen detach that did not happen),
+ *	  so that tests catch the look-ahead's mistakes.
+ *
+ *	The callback runs with the widget readable but not modifiable
+ *	(vcInCallback, see TextWidgetCmd); an error in it is reported as
+ *	a background error.  Without the option nothing of this runs.
+ *
+ *======================================================================
+ */
+
+typedef struct TkTextVcEntry {
+    Arg id;				/* The value (its Lang part). */
+    int kind;				/* TK_TEXT_VC_NODE... */
+    int predicted;			/* The event the callback was told
+					 * before the change, or 0. */
+    int actual;				/* What happened last, or 0. */
+    int pending;			/* Told nothing yet. */
+    Tcl_Obj *where;			/* Its place, before the change (and,
+					 * for a move, the new one), or NULL. */
+    struct TkTextVcEntry *nextPtr;	/* All entries, in order. */
+} TkTextVcEntry;
+
+typedef struct TkTextVcPost {
+    int event, kind;
+    Tcl_Obj *where;			/* Owned, or NULL. */
+    Arg value;				/* A reference of its own. */
+    struct TkTextVcPost *nextPtr;
+} TkTextVcPost;
+
+typedef struct TkTextVcState {
+    Tcl_HashTable table;		/* Arg -> TkTextVcEntry. */
+    TkTextVcEntry *first, *last;
+    TkTextVcEntry **pending;		/* To tell (TkTextVcNotify). */
+    int numPending, maxPending;
+    TkTextVcPost *post, *lastPost;	/* To tell at the end. */
+    char *cause;			/* The command. */
+} TkTextVcState;
+
+static char *vcEvents[] = {
+    "", "drop", "stash", "move", "restore", "discard", "late"
+};
+static char *vcKinds[] = {
+    "", "node", "run", "mark", "block"
+};
+
+/*
+ * The cause given to the callback: the command, or "set" for the
+ * commands that set a value (block nodedata, block data, tag data, mark
+ * data) and "unset" for mark unset.
+ */
+
+static char *
+VcCause(argc, args)
+    int argc;
+    Arg *args;
+{
+    if (Abbrev(args[1], "delete", 3)) {
+	return "delete";
+    }
+    if (Abbrev(args[1], "insert", 3)) {
+	return "insert";
+    }
+    if ((strcmp(LangString(args[1]), "tag") == 0) && (argc > 2)) {
+	if (Abbrev(args[2], "add", 1)) {
+	    return "tag add";
+	}
+	if (Abbrev(args[2], "remove", 2)) {
+	    return "tag remove";
+	}
+	if (Abbrev(args[2], "delete", 1)) {
+	    return "tag delete";
+	}
+	return Abbrev(args[2], "data", 2) ? "set" : "tag";
+    }
+    if (Abbrev(args[1], "mark", 1) && (argc > 2)) {
+	if (Abbrev(args[2], "unset", 1)) {
+	    return "unset";
+	}
+	return Abbrev(args[2], "data", 1) ? "set" : "mark";
+    }
+    if (Abbrev(args[1], "block", 2) && (argc > 2)) {
+	if (Abbrev(args[2], "insert", 1)) {
+	    return "block insert";
+	}
+	if (Abbrev(args[2], "trim", 1)) {
+	    return "block trim";
+	}
+	if (Abbrev(args[2], "split", 1)) {
+	    return "block split";
+	}
+	if (Abbrev(args[2], "data", 2) || Abbrev(args[2], "nodedata", 2)) {
+	    return "set";
+	}
+	return "block";
+    }
+    if (Abbrev(args[1], "edit", 1) && (argc > 2)) {
+	if (Abbrev(args[2], "undo", 1)) {
+	    return "undo";
+	}
+	if (Abbrev(args[2], "redo", 3)) {
+	    return "redo";
+	}
+	if (Abbrev(args[2], "reset", 3)) {
+	    return "reset";
+	}
+	if (Abbrev(args[2], "separator", 1)) {
+	    return "separator";
+	}
+	return "edit";
+    }
+    if (Abbrev(args[1], "configure", 3)) {
+	return "configure";
+    }
+    return LangString(args[1]);
+}
+
+static void
+VcBegin(textPtr, argc, args)
+    TkText *textPtr;
+    int argc;
+    Arg *args;
+{
+    TkTextVcState *vcPtr = (TkTextVcState *) ckalloc(sizeof(TkTextVcState));
+    char *cause = VcCause(argc, args);
+
+    Tcl_InitHashTable(&vcPtr->table, TCL_ONE_WORD_KEYS);
+    vcPtr->first = vcPtr->last = NULL;
+    vcPtr->pending = NULL;
+    vcPtr->numPending = vcPtr->maxPending = 0;
+    vcPtr->post = vcPtr->lastPost = NULL;
+    vcPtr->cause = ckalloc((unsigned) (strlen(cause) + 1));
+    strcpy(vcPtr->cause, cause);
+    textPtr->vcPtr = vcPtr;
+}
+
+static TkTextVcEntry *
+VcEntry(vcPtr, id, kind)
+    TkTextVcState *vcPtr;
+    Arg id;
+    int kind;
+{
+    int new;
+    Tcl_HashEntry *hPtr = Tcl_CreateHashEntry(&vcPtr->table, (char *) id,
+	    &new);
+    TkTextVcEntry *entryPtr;
+
+    if (!new) {
+	entryPtr = (TkTextVcEntry *) Tcl_GetHashValue(hPtr);
+	if (kind != 0) {
+	    entryPtr->kind = kind;
+	}
+	return entryPtr;
+    }
+    entryPtr = (TkTextVcEntry *) ckalloc(sizeof(TkTextVcEntry));
+    entryPtr->id = id;
+    entryPtr->kind = kind;
+    entryPtr->predicted = entryPtr->actual = entryPtr->pending = 0;
+    entryPtr->where = NULL;
+    entryPtr->nextPtr = NULL;
+    if (vcPtr->last == NULL) {
+	vcPtr->first = entryPtr;
+    } else {
+	vcPtr->last->nextPtr = entryPtr;
+    }
+    vcPtr->last = entryPtr;
+    Tcl_SetHashValue(hPtr, entryPtr);
+    return entryPtr;
+}
+
+/*
+ * Call the callback: ($widget, $event, $kind, $where, $value, $cause).
+ * The interpreter's result is kept; an error is a background error.
+ */
+
+static void
+VcCall(textPtr, event, kind, where, value)
+    TkText *textPtr;
+    int event, kind;
+    Tcl_Obj *where;
+    Arg value;
+{
+    Tcl_Interp *interp = textPtr->interp;
+    Tcl_Obj *resultPtr;
+    Arg widget;
+    int code;
+
+    if ((textPtr->valueCmd == NULL) || (textPtr->tkwin == NULL)
+	    || (textPtr->vcPtr == NULL)) {
+	return;
+    }
+    resultPtr = Tcl_GetObjResult(interp);
+    resultPtr = (resultPtr != NULL) ? newSVsv(resultPtr) : NULL;
+    widget = LangWidgetObj(interp, textPtr->tkwin);
+    textPtr->vcInCallback++;
+    code = LangDoCallback(interp, textPtr->valueCmd, 0, 6,
+	    "%_ %s %s %_ %_ %s", widget, vcEvents[event], vcKinds[kind],
+	    where, value, textPtr->vcPtr->cause);
+    textPtr->vcInCallback--;
+    if (code != TCL_OK) {
+	Tcl_AddErrorInfo(interp, "\n    (-valuecommand of text widget)");
+	Tcl_BackgroundError(interp);
+    }
+    Tcl_DecrRefCount(widget);
+    if (resultPtr != NULL) {
+	Tcl_SetObjResult(interp, resultPtr);
+    } else {
+	Tcl_ResetResult(interp);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextVcNodePlace, TkTextVcRunPlace, TkTextVcMarkPlace,
+ * TkTextVcBlockPlace --
+ *
+ *	The places given to the callback ($where): [index, level] for a
+ *	node (the position where its first leaf starts, as "line.char",
+ *	and its level, 0 for a leaf), [tag, start, end] for a run
+ *	([tag, start] if the end is not known), [name, index] for a mark,
+ *	[index] for a block (of its head).  A position is converted with
+ *	the text as it is now; a line that does not exist any more (a
+ *	discarded undo step) gives "line.byte" as recorded.
+ *
+ * Results:
+ *	A new list (owned by the caller).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static Tcl_Obj *
+VcPosition(textPtr, line, byteIndex)
+    TkText *textPtr;
+    int line, byteIndex;
+{
+    TkTextIndex index;
+    char buffer[TK_POS_CHARS + 2 * TCL_INTEGER_SPACE];
+
+    if ((line >= 0) && (byteIndex >= 0)
+	    && (line < TkBTreeNumLines(textPtr->tree))) {
+	TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index);
+	TkTextPrintIndex(&index, buffer);
+    } else {
+	sprintf(buffer, "%d.%d", line + 1, byteIndex);
+    }
+    return Tcl_NewStringObj(buffer, -1);
+}
+
+static Tcl_Obj *
+VcIndex(indexPtr)
+    TkTextIndex *indexPtr;
+{
+    char buffer[TK_POS_CHARS];
+
+    TkTextPrintIndex(indexPtr, buffer);
+    return Tcl_NewStringObj(buffer, -1);
+}
+
+Tcl_Obj *
+TkTextVcNodePlace(textPtr, line, byteIndex, level)
+    TkText *textPtr;
+    int line, byteIndex, level;
+{
+    Tcl_Obj *listPtr = Tcl_NewListObj(0, NULL);
+
+    Tcl_ListObjAppendElement(NULL, listPtr,
+	    VcPosition(textPtr, line, byteIndex));
+    Tcl_ListObjAppendElement(NULL, listPtr, Tcl_NewIntObj(level));
+    return listPtr;
+}
+
+Tcl_Obj *
+TkTextVcRunPlace(textPtr, tagName, startPtr, endPtr)
+    TkText *textPtr;
+    char *tagName;
+    TkTextIndex *startPtr, *endPtr;	/* endPtr may be NULL. */
+{
+    Tcl_Obj *listPtr = Tcl_NewListObj(0, NULL);
+
+    Tcl_ListObjAppendElement(NULL, listPtr, Tcl_NewStringObj(tagName, -1));
+    Tcl_ListObjAppendElement(NULL, listPtr, VcIndex(startPtr));
+    if (endPtr != NULL) {
+	Tcl_ListObjAppendElement(NULL, listPtr, VcIndex(endPtr));
+    }
+    return listPtr;
+}
+
+Tcl_Obj *
+TkTextVcMarkPlace(textPtr, markName, indexPtr)
+    TkText *textPtr;
+    char *markName;
+    TkTextIndex *indexPtr;
+{
+    Tcl_Obj *listPtr = Tcl_NewListObj(0, NULL);
+
+    Tcl_ListObjAppendElement(NULL, listPtr, Tcl_NewStringObj(markName, -1));
+    Tcl_ListObjAppendElement(NULL, listPtr, VcIndex(indexPtr));
+    return listPtr;
+}
+
+Tcl_Obj *
+TkTextVcBlockPlace(textPtr, line, byteIndex)
+    TkText *textPtr;
+    int line, byteIndex;
+{
+    Tcl_Obj *listPtr = Tcl_NewListObj(0, NULL);
+
+    Tcl_ListObjAppendElement(NULL, listPtr,
+	    VcPosition(textPtr, line, byteIndex));
+    return listPtr;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextVcPredict, TkTextVcCandidate, TkTextVcNotify --
+ *
+ *	The look-ahead's results: a value the change will detach (the
+ *	event: TK_TEXT_VC_DROP, _STASH or _MOVE, with the new place for
+ *	a move, which goes at the end of $where); a value it looked at
+ *	and that stays (only its place is kept, for a late report); then
+ *	the calls of the callback for the values predicted, in order.
+ *
+ * Side effects:
+ *	where and to are consumed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextVcPredict(textPtr, value, event, kind, where, to)
+    TkText *textPtr;
+    TkTextData value;
+    int event, kind;
+    Tcl_Obj *where, *to;
+{
+    TkTextVcState *vcPtr = TkTextVcOn(textPtr) ? textPtr->vcPtr : NULL;
+    TkTextVcEntry *entryPtr;
+    Arg id = TkTextDataGetLang(value);
+
+    if ((vcPtr == NULL) || (id == NULL)) {
+	if (where != NULL) {
+	    Tcl_DecrRefCount(where);
+	}
+	if (to != NULL) {
+	    Tcl_DecrRefCount(to);
+	}
+	return;
+    }
+    entryPtr = VcEntry(vcPtr, id, kind);
+    if ((to != NULL) && (where != NULL)) {
+	Tcl_ListObjAppendElement(NULL, where, to);
+    } else if (to != NULL) {
+	Tcl_DecrRefCount(to);
+    }
+    if (entryPtr->where != NULL) {
+	Tcl_DecrRefCount(entryPtr->where);
+    }
+    entryPtr->where = where;
+    entryPtr->predicted = event;
+    entryPtr->actual = 0;
+    if (!entryPtr->pending) {
+	if (vcPtr->numPending >= vcPtr->maxPending) {
+	    TkTextVcEntry **grown;
+
+	    vcPtr->maxPending = 2 * vcPtr->maxPending + 16;
+	    grown = (TkTextVcEntry **) ckalloc((unsigned)
+		    (vcPtr->maxPending * sizeof(TkTextVcEntry *)));
+	    if (vcPtr->numPending > 0) {
+		memcpy(grown, vcPtr->pending,
+			vcPtr->numPending * sizeof(TkTextVcEntry *));
+	    }
+	    if (vcPtr->pending != NULL) {
+		ckfree((char *) vcPtr->pending);
+	    }
+	    vcPtr->pending = grown;
+	}
+	vcPtr->pending[vcPtr->numPending++] = entryPtr;
+	entryPtr->pending = 1;
+    }
+}
+
+void
+TkTextVcCandidate(textPtr, value, kind, where)
+    TkText *textPtr;
+    TkTextData value;
+    int kind;
+    Tcl_Obj *where;
+{
+    TkTextVcState *vcPtr = TkTextVcOn(textPtr) ? textPtr->vcPtr : NULL;
+    TkTextVcEntry *entryPtr;
+    Arg id = TkTextDataGetLang(value);
+
+    if ((vcPtr == NULL) || (id == NULL)) {
+	if (where != NULL) {
+	    Tcl_DecrRefCount(where);
+	}
+	return;
+    }
+    entryPtr = VcEntry(vcPtr, id, kind);
+    if (entryPtr->where == NULL) {
+	entryPtr->where = where;
+    } else if (where != NULL) {
+	Tcl_DecrRefCount(where);
+    }
+}
+
+void
+TkTextVcNotify(textPtr)
+    TkText *textPtr;
+{
+    TkTextVcState *vcPtr = TkTextVcOn(textPtr) ? textPtr->vcPtr : NULL;
+    int i, num;
+
+    if (vcPtr == NULL) {
+	return;
+    }
+    num = vcPtr->numPending;
+    vcPtr->numPending = 0;
+    for (i = 0; i < num; i++) {
+	TkTextVcEntry *entryPtr = vcPtr->pending[i];
+
+	entryPtr->pending = 0;
+	VcCall(textPtr, entryPtr->predicted, entryPtr->kind, entryPtr->where,
+		entryPtr->id);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextVcSeen, TkTextVcRestored, TkTextVcDiscarded --
+ *
+ *	What a change does to a value: detaches it (TK_TEXT_VC_DROP: to
+ *	the list of values to free, _STASH: into an undo record, _MOVE:
+ *	to another owner by a merge), gives it back from an undo step
+ *	(the callback is called at once, with its place now), or frees it
+ *	with a discarded undo step (told at the end of the command).
+ *
+ * Side effects:
+ *	where is consumed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextVcSeen(textPtr, value, event)
+    TkText *textPtr;
+    TkTextData value;
+    int event;
+{
+    Arg id;
+
+    if (!TkTextVcOn(textPtr) || ((id = TkTextDataGetLang(value)) == NULL)) {
+	return;
+    }
+    VcEntry(textPtr->vcPtr, id, 0)->actual = event;
+}
+
+void
+TkTextVcRestored(textPtr, value, kind, where)
+    TkText *textPtr;
+    TkTextData value;
+    int kind;
+    Tcl_Obj *where;
+{
+    Arg id;
+
+    if (!TkTextVcOn(textPtr) || ((id = TkTextDataGetLang(value)) == NULL)) {
+	if (where != NULL) {
+	    Tcl_DecrRefCount(where);
+	}
+	return;
+    }
+    VcEntry(textPtr->vcPtr, id, kind)->actual = TK_TEXT_VC_RESTORE;
+    VcCall(textPtr, TK_TEXT_VC_RESTORE, kind, where, id);
+    if (where != NULL) {
+	Tcl_DecrRefCount(where);
+    }
+}
+
+static void
+VcPostLater(vcPtr, event, kind, where, value)
+    TkTextVcState *vcPtr;
+    int event, kind;
+    Tcl_Obj *where;			/* Consumed. */
+    Arg value;
+{
+    TkTextVcPost *postPtr = (TkTextVcPost *) ckalloc(sizeof(TkTextVcPost));
+
+    postPtr->event = event;
+    postPtr->kind = kind;
+    postPtr->where = where;
+    postPtr->value = value;
+    Tcl_IncrRefCount(value);
+    postPtr->nextPtr = NULL;
+    if (vcPtr->lastPost == NULL) {
+	vcPtr->post = postPtr;
+    } else {
+	vcPtr->lastPost->nextPtr = postPtr;
+    }
+    vcPtr->lastPost = postPtr;
+}
+
+void
+TkTextVcDiscarded(textPtr, value, kind, where)
+    TkText *textPtr;
+    TkTextData value;
+    int kind;
+    Tcl_Obj *where;
+{
+    Arg id;
+
+    if (!TkTextVcOn(textPtr) || ((id = TkTextDataGetLang(value)) == NULL)) {
+	if (where != NULL) {
+	    Tcl_DecrRefCount(where);
+	}
+	return;
+    }
+    VcEntry(textPtr->vcPtr, id, kind)->actual = TK_TEXT_VC_DISCARD;
+    VcPostLater(textPtr->vcPtr, TK_TEXT_VC_DISCARD, kind, where, id);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * VcFinish --
+ *
+ *	The end of a widget command run with a -valuecommand: check what
+ *	happened against what the callback was told, report the detaches
+ *	not foreseen ("late"), tell the discards and the late ones, and
+ *	forget the command's table.
+ *
+ * Results:
+ *	TCL_OK; under "debug", TCL_ERROR (with a message in the
+ *	interpreter) if a detach was not foreseen or one foreseen did
+ *	not happen as told.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+VcFinish(textPtr)
+    TkText *textPtr;
+{
+    TkTextVcState *vcPtr = textPtr->vcPtr;
+    TkTextVcEntry *entryPtr, *nextPtr;
+    TkTextVcPost *postPtr, *nextPostPtr;
+    Tcl_DString message;
+    int wrong = 0;
+
+    Tcl_DStringInit(&message);
+    for (entryPtr = vcPtr->first; entryPtr != NULL;
+	 entryPtr = entryPtr->nextPtr) {
+	int actual = entryPtr->actual, predicted = entryPtr->predicted;
+	char *problem = NULL;
+
+	if ((actual == TK_TEXT_VC_DROP) || (actual == TK_TEXT_VC_STASH)
+		|| (actual == TK_TEXT_VC_MOVE)) {
+	    if (predicted == 0) {
+		problem = "not foreseen";
+		VcPostLater(vcPtr, TK_TEXT_VC_LATE, entryPtr->kind,
+			entryPtr->where, entryPtr->id);
+		entryPtr->where = NULL;
+	    } else if (predicted != actual) {
+		problem = "foreseen as another event";
+	    }
+	} else if ((predicted != 0) && (actual == 0)) {
+	    problem = "foreseen, did not happen";
+	}
+	if ((problem != NULL) && (wrong++ == 0)) {
+	    Tcl_DStringAppend(&message, "-valuecommand: ", -1);
+	    Tcl_DStringAppend(&message, vcKinds[entryPtr->kind], -1);
+	    Tcl_DStringAppend(&message, " value ", -1);
+	    Tcl_DStringAppend(&message, vcEvents[actual ? actual : predicted],
+		    -1);
+	    Tcl_DStringAppend(&message, " ", -1);
+	    Tcl_DStringAppend(&message, problem, -1);
+	    if (predicted != 0) {
+		Tcl_DStringAppend(&message, " (told ", -1);
+		Tcl_DStringAppend(&message, vcEvents[predicted], -1);
+		Tcl_DStringAppend(&message, ")", -1);
+	    }
+	    Tcl_DStringAppend(&message, " in ", -1);
+	    Tcl_DStringAppend(&message, vcPtr->cause, -1);
+	}
+    }
+    for (postPtr = vcPtr->post; postPtr != NULL; postPtr = postPtr->nextPtr) {
+	VcCall(textPtr, postPtr->event, postPtr->kind, postPtr->where,
+		postPtr->value);
+    }
+    for (postPtr = vcPtr->post; postPtr != NULL; postPtr = nextPostPtr) {
+	nextPostPtr = postPtr->nextPtr;
+	if (postPtr->where != NULL) {
+	    Tcl_DecrRefCount(postPtr->where);
+	}
+	Tcl_DecrRefCount(postPtr->value);
+	ckfree((char *) postPtr);
+    }
+    for (entryPtr = vcPtr->first; entryPtr != NULL; entryPtr = nextPtr) {
+	nextPtr = entryPtr->nextPtr;
+	if (entryPtr->where != NULL) {
+	    Tcl_DecrRefCount(entryPtr->where);
+	}
+	ckfree((char *) entryPtr);
+    }
+    Tcl_DeleteHashTable(&vcPtr->table);
+    if (vcPtr->pending != NULL) {
+	ckfree((char *) vcPtr->pending);
+    }
+    ckfree(vcPtr->cause);
+    ckfree((char *) vcPtr);
+    textPtr->vcPtr = NULL;
+    if (wrong && tkBTreeDebug) {
+	Tcl_ResetResult(textPtr->interp);
+	Tcl_AppendResult(textPtr->interp, Tcl_DStringValue(&message), NULL);
+	Tcl_DStringFree(&message);
+	return TCL_ERROR;
+    }
+    Tcl_DStringFree(&message);
+    return TCL_OK;
+}
+
+#if TK_TEXT_DATA_ARRAYS
+/*
+ *--------------------------------------------------------------
+ *
+ * DataSlotCmd --
+ *
+ *	A hook for the tests of representation B (t/data-slots.t), not
+ *	an interface: it exists only in a widget built with
+ *	TK_TEXT_DATA_ARRAYS, and is not documented in the manual.  It
+ *	reads and sets the TK_TEXT_DATA_INT slot of the data of a node,
+ *	a mark, a run or a block, which the Perl interface cannot reach:
+ *
+ *	    .t _dataslot node index level ?int?
+ *	    .t _dataslot mark markName ?int?
+ *	    .t _dataslot run tagName index ?int?
+ *	    .t _dataslot block index ?int?
+ *	    .t _dataslot live
+ *
+ *	Without an int: the slot's value, or nothing (undef) if there
+ *	is none.  An int sets the slot; undef or an empty string
+ *	removes it (the container goes with its last slot).  Setting a
+ *	slot counts as setting a value (haveValues, hasRunValues), as
+ *	it must for the changes to look after it.  "live" gives the
+ *	number of data blocks allocated and not yet freed, in the whole
+ *	process.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+DataSlotCmd(textPtr, interp, argc, args)
+    TkText *textPtr;		/* The widget. */
+    Tcl_Interp *interp;		/* For the result. */
+    int argc;			/* Number of arguments. */
+    Arg *args;			/* Argument strings. */
+{
+    TkTextData *dataPtr = NULL;
+    TkTextTag *tagPtr = NULL;
+    TkTextIndex index;
+    TkTextDataSlot slot;
+    Tcl_HashEntry *hPtr;
+    char *what = (argc > 2) ? LangString(args[2]) : "";
+    int nargs;			/* Arguments that name the place. */
+    char buffer[TCL_INTEGER_SPACE * 2];
+
+    if (strcmp(what, "live") == 0) {
+	sprintf(buffer, "%ld", eText_TkTextDataLive);
+	Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+	return TCL_OK;
+    }
+    if (strcmp(what, "node") == 0) {
+	nargs = 2;
+    } else if (strcmp(what, "mark") == 0) {
+	nargs = 1;
+    } else if (strcmp(what, "run") == 0) {
+	nargs = 2;
+    } else if (strcmp(what, "block") == 0) {
+	nargs = 1;
+    } else {
+	Tcl_AppendResult(interp, "bad _dataslot kind \"", what,
+		"\": must be node, mark, run, block or live", NULL);
+	return TCL_ERROR;
+    }
+    if ((argc != 3 + nargs) && (argc != 4 + nargs)) {
+	Tcl_AppendResult(interp, "wrong # args: should be \"",
+		LangString(args[0]), " _dataslot ", what, " place... ?int?\"",
+		NULL);
+	return TCL_ERROR;
+    }
+    if (what[0] == 'n') {
+	if ((TkTextGetIndex(interp, textPtr, LangString(args[3]), &index)
+		!= TCL_OK)
+		|| (TkBTreeNodeValue(textPtr, &index, LangString(args[3]),
+			args[4], &dataPtr) != TCL_OK)) {
+	    return TCL_ERROR;
+	}
+    } else if (what[0] == 'm') {
+	hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
+	if (hPtr == NULL) {
+	    Tcl_AppendResult(interp, "there is no mark named \"",
+		    LangString(args[3]), "\"", NULL);
+	    return TCL_ERROR;
+	}
+	dataPtr = &((TkTextSegment *) Tcl_GetHashValue(hPtr))
+		->body.mark.value;
+    } else if (what[0] == 'r') {
+	hPtr = Tcl_FindHashEntry(&textPtr->tagTable, LangString(args[3]));
+	if (hPtr == NULL) {
+	    Tcl_AppendResult(interp, "tag \"", LangString(args[3]),
+		    "\" isn't defined in text widget", NULL);
+	    return TCL_ERROR;
+	}
+	tagPtr = (TkTextTag *) Tcl_GetHashValue(hPtr);
+	if ((TkTextGetIndex(interp, textPtr, LangString(args[4]), &index)
+		!= TCL_OK)
+		|| (TkBTreeRunValue(textPtr, tagPtr, &index,
+			LangString(args[4]), &dataPtr) != TCL_OK)) {
+	    return TCL_ERROR;
+	}
+    } else {
+	TkTextSegment *segPtr, *startPtr;
+
+	if (TkTextGetIndex(interp, textPtr, LangString(args[3]), &index)
+		!= TCL_OK) {
+	    return TCL_ERROR;
+	}
+	segPtr = TkIBTreeAt(&index, 1);	/* As "block data" finds it. */
+	startPtr = TkIBTreeAt(&index, 0);
+	if ((startPtr != NULL)
+		&& ((segPtr == NULL) || (startPtr->body.itree.tree == NULL))) {
+	    segPtr = startPtr;
+	}
+	if (segPtr == NULL) {
+	    Tcl_AppendResult(interp, "not inside a block", NULL);
+	    return TCL_ERROR;
+	}
+	dataPtr = &segPtr->body.itree.data;
+    }
+    if (argc == 3 + nargs) {
+	if (TkTextDataGet(*dataPtr, TK_TEXT_DATA_INT, &slot)) {
+	    sprintf(buffer, "%ld", slot.i);
+	    Tcl_SetResult(interp, buffer, TCL_VOLATILE);
+	}
+	return TCL_OK;
+    }
+    if (LangNull(args[3 + nargs])) {
+	TkTextDataRemove(dataPtr, TK_TEXT_DATA_INT);
+	return TCL_OK;
+    }
+    if (Tcl_GetLongFromObj(interp, args[3 + nargs], &slot.i) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    TkTextDataSet(dataPtr, TK_TEXT_DATA_INT, slot);
+    textPtr->haveValues = 1;
+    if (tagPtr != NULL) {
+	tagPtr->hasRunValues = 1;
+    }
+    return TCL_OK;
+}
+#endif /* TK_TEXT_DATA_ARRAYS */
+
+/*
+ *--------------------------------------------------------------
+ *
+ * FlushValues --
+ *
+ *	Free the values (see TkTextValue) the widget command just
+ *	finished has dropped, in the order they were dropped.  A DESTROY
+ *	method may change the widget meanwhile (see TextWidgetCmd): the
+ *	values that change drops join the list, and are freed in the
+ *	next round of the same loop.  freeingValues is the round: the
+ *	values the command dropped are freed in round 1, those dropped
+ *	by a change made from their DESTROY methods in round 2, and so
+ *	on; changes are refused in round freeLimit, which ends chains
+ *	of DESTROY methods that change the widget forever.  The limit
+ *	starts at TK_TEXT_FREE_DEPTH; when a change is about to be made
+ *	at the limit, the object whose DESTROY method makes it may raise
+ *	it (MoreFreeRounds).  The limit and the count of such requests
+ *	belong to this pass and are reset with it.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Perl code may run; the interpreter's result is preserved.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+FlushValues(textPtr)
+    TkText *textPtr;		/* Information about text widget. */
+{
+    Tcl_Interp *interp = textPtr->interp;
+    Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
+    TkTextValue *listPtr;
+
+    resultPtr = (resultPtr != NULL) ? newSVsv(resultPtr) : NULL;
+    textPtr->freeingValues = 0;
+    textPtr->freeLimit = TK_TEXT_FREE_DEPTH;
+    textPtr->freeAsks = 0;
+    while (textPtr->freeValues != NULL) {
+	listPtr = textPtr->freeValues;
+	textPtr->freeValues = textPtr->lastFreeValue = NULL;
+	textPtr->freeingValues++;
+	TkTextReleaseValues(listPtr);
+    }
+    textPtr->freeingValues = 0;
+    textPtr->freeLimit = TK_TEXT_FREE_DEPTH;
+    textPtr->freeAsks = 0;
+    if (resultPtr != NULL) {
+	Tcl_SetObjResult(interp, resultPtr);
+    }
+}
 
+/*
+ *--------------------------------------------------------------
+ *
+ * MoreFreeRounds --
+ *
+ *	A DESTROY method run by FlushValues is about to change the
+ *	widget in round freeLimit.  Ask the object whose DESTROY method
+ *	is the innermost one running (the value being freed, or an
+ *	object nested in it whose DESTROY runs meanwhile) for more
+ *	rounds: $object->DESTROYmult($n, $limit), $n counting the
+ *	requests of this freeing pass from 1, $limit the current limit
+ *	(see LangDestroyMult in pperlGlue.c).  A positive integer
+ *	$more raises the limit by $more; anything else, no such object
+ *	or method, or a method that dies (a background error, as for
+ *	-valuecommand) leaves it, and the change is refused.  While
+ *	DESTROYmult runs, a change it attempts is refused without asking
+ *	again.
+ *
+ * Results:
+ *	Non-zero if the limit was raised (the change may be made).
+ *
+ * Side effects:
+ *	Perl code may run.  The interpreter's result is reset.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+MoreFreeRounds(textPtr)
+    TkText *textPtr;		/* Information about text widget. */
+{
+    Tcl_Interp *interp = textPtr->interp;
+    int more = 0;
+
+    if (textPtr->freeAsking) {
+	return 0;
+    }
+    textPtr->freeAsking = 1;
+    textPtr->freeAsks++;
+    if (LangDestroyMult(interp, textPtr->freeAsks, textPtr->freeLimit,
+	    &more) != TCL_OK) {
+	Tcl_AddErrorInfo(interp,
+		"\n    (DESTROYmult of a value freed by a text widget)");
+	Tcl_BackgroundError(interp);
+	more = 0;
+    }
+    textPtr->freeAsking = 0;
+    Tcl_ResetResult(interp);
+    if ((more <= 0) || (textPtr->tkwin == NULL)) {	/* Destroyed. */
+	return 0;
+    }
+    textPtr->freeLimit += more;
+    return 1;
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -761,7 +1981,7 @@ DestroyText(memPtr)
     Tcl_HashSearch search;
     Tcl_HashEntry *hPtr;
     TkTextTag *tagPtr;
-    TkTextBlock *blockPtr;
+    TkTextValue *valuesPtr;
 
     /*
      * Free up all the stuff that requires special handling, then
@@ -800,7 +2020,10 @@ DestroyText(memPtr)
     Tcl_DeleteHashTable(&textPtr->tagTable);
     for (hPtr = Tcl_FirstHashEntry(&textPtr->markTable, &search);
 	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
-	ckfree((char *) Tcl_GetHashValue(hPtr));
+	TkTextSegment *markPtr = (TkTextSegment *) Tcl_GetHashValue(hPtr);
+
+	TkTextFreeValueLater(textPtr, markPtr->body.mark.value);
+	ckfree((char *) markPtr);
     }
     Tcl_DeleteHashTable(&textPtr->markTable);
     if (textPtr->tabArrayPtr != NULL) {
@@ -824,7 +2047,15 @@ DestroyText(memPtr)
     TkTextUndoFreeStack(textPtr->undoStack);
     textPtr->selFgColorPtr = NULL;
     Tk_FreeOptions(configSpecs, (char *) textPtr, textPtr->display, 0);
+
+    /*
+     * The values of the nodes and of the undo atoms are freed once the
+     * widget is gone.
+     */
+
+    valuesPtr = textPtr->freeValues;
     ckfree((char *) textPtr);
+    TkTextReleaseValues(valuesPtr);
 }
 
 /*
@@ -1232,6 +2463,76 @@ InsertChars(textPtr, indexPtr, string)
 /*
  *----------------------------------------------------------------------
  *
+ * SplitChars --
+ *
+ *	This procedure implements the "block split" widget command: a
+ *	newline (or an interleaf separator) goes in at the index, and
+ *	inside a block the tree may change (TkIBTreeSplit).
+ *
+ * Results:
+ *	What TkIBTreeSplit returns.
+ *
+ * Side effects:
+ *	As for InsertChars: the display forgets the lines it had laid
+ *	out there and, if the split is on the top line, the view is
+ *	set again.  Without that, the display lines and the top index
+ *	kept byte offsets into a line the newline had cut short, and the
+ *	next redisplay walked off its end (a crash, typically in the
+ *	"see" of an undo that followed).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+SplitChars(textPtr, indexPtr, level)
+    TkText *textPtr;		/* Overall information about text widget. */
+    TkTextIndex *indexPtr;	/* Where to split.  May be modified and/or
+				 * invalidated. */
+    int level;			/* As for "block split". */
+{
+    int lineIndex, resetView = 0, offset = 0;
+    TkTextIndex newTop;
+
+    lineIndex = TkBTreeLineIndex(indexPtr->linePtr);
+    if (indexPtr->linePtr == textPtr->topIndex.linePtr) {
+	resetView = 1;
+	offset = textPtr->topIndex.byteIndex;
+	if (offset > indexPtr->byteIndex) {
+	    offset++;
+	}
+    }
+    TkTextChanged(textPtr, indexPtr, indexPtr);
+    level = TkIBTreeSplit(indexPtr, level);
+    if (resetView) {
+	TkTextMakeByteIndex(textPtr->tree, lineIndex, 0, &newTop);
+	TkTextIndexForwBytes(&newTop, offset, &newTop);
+	TkTextSetYView(textPtr, &newTop, 0);
+    }
+    textPtr->abortSelections = 1;
+    return level;
+}
+
+/*
+ * A deletion is an edit of its own kind (-autoseparators): the separator
+ * goes before everything it records.
+ */
+
+static void
+DeletionSeparator(textPtr)
+    TkText *textPtr;
+{
+    if (textPtr->undo) {
+	if (textPtr->autoSeparators
+		&& (textPtr->lastEditMode != TK_TEXT_EDIT_DELETE)) {
+	    TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+	}
+	textPtr->lastEditMode = TK_TEXT_EDIT_DELETE;
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * DeleteChars --
  *
  *	This procedure implements most of the functionality of the
@@ -1259,6 +2560,8 @@ DeleteChars(textPtr, index1String, index2String)
 {
     int line1, line2, line, byteIndex, resetView;
     TkTextIndex index1, index2;
+    TkTextValue **captureList = NULL, **oldCapture;
+    Tcl_HashTable addresses, *oldAddresses;
 
     /*
      * Parse the starting and stopping indices.
@@ -1302,7 +2605,7 @@ DeleteChars(textPtr, index1String, index2String)
     line2 = TkBTreeLineIndex(index2.linePtr);
     if (line2 == TkBTreeNumLines(textPtr->tree)) {
 	TkTextTag **arrayPtr;
-	int arraySize, i;
+	int arraySize = 0, i, content, empty;
 	TkTextIndex oldIndex2;
 
 	oldIndex2 = index2;
@@ -1312,13 +2615,59 @@ DeleteChars(textPtr, index1String, index2String)
 	    TkTextIndexBackChars(&index1, 1, &index1);
 	    line1--;
 	}
+
+	/*
+	 * The tags taken off the final newline are recorded for undo
+	 * (in the same step, before the deletion), so that the undo
+	 * puts them back on it.  If they are all there is to change
+	 * (the range is empty now: the final newline alone), and there
+	 * are none, nothing is done, nor recorded.
+	 */
+
 	arrayPtr = TkBTreeGetTags(&index2, &arraySize);
+	content = 0;			/* A tag other than sel? */
+	for (i = 0; i < arraySize; i++) {
+	    if (arrayPtr[i] != textPtr->selTagPtr) {
+		content = 1;
+	    }
+	}
+	empty = (TkTextIndexCmp(&index1, &index2) >= 0);
+	if (!empty || content) {
+	    DeletionSeparator(textPtr);
+	}
 	if (arrayPtr != NULL) {
 	    for (i = 0; i < arraySize; i++) {
-		TkBTreeTag(&index2, &oldIndex2, arrayPtr[i], 0);
+		RecordTagChange(textPtr, &index2, &oldIndex2, arrayPtr[i], 0,
+			-1);
 	    }
 	    ckfree((char *) arrayPtr);
 	}
+	if (empty) {
+	    /*
+	     * Only tags changed, if any: recorded, and counted for the
+	     * modified flag, unless only the selection (not content).
+	     */
+
+	    if (content) {
+		UpdateDirtyFlag(textPtr);
+	    }
+	    return TCL_OK;
+	}
+    } else {
+	DeletionSeparator(textPtr);
+    }
+
+    /*
+     * With a -valuecommand: the values the deletion will detach, while
+     * the text is unchanged (they go to the undo step if it can be
+     * undone, see below).
+     */
+
+    if (TkTextVcOn(textPtr)) {
+	TkBTreeVcPredictDelete(textPtr, &index1, &index2,
+		((textPtr->undo || (textPtr->editValues != NULL))
+			&& textPtr->haveValues)
+		? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP);
     }
 
     /*
@@ -1380,12 +2729,8 @@ DeleteChars(textPtr, index1String, index2String)
 	TkTextIndex ext1, ext2;
 	int remains;
 	char i1[TK_POS_CHARS], i2[TK_POS_CHARS], i3[TK_POS_CHARS];
+	TkTextUndoAtom *atomPtr;
 
-	if (textPtr->autoSeparators
-		&& (textPtr->lastEditMode != TK_TEXT_EDIT_DELETE)) {
-	    TkTextUndoInsertUndoSeparator(textPtr->undoStack);
-	}
-	textPtr->lastEditMode = TK_TEXT_EDIT_DELETE;
 	TkTextPrintIndex(&index1, i1);
 	TkTextPrintIndex(&index2, i2);
 	TextGetText(textPtr, &index1, &index2, &ds);
@@ -1408,14 +2753,46 @@ DeleteChars(textPtr, index1String, index2String)
 	}
 	list = TextGetList(textPtr, &ext1, &ext2);
 	TkTextPrintIndex(&ext1, i3);
-	TkTextUndoPushAction(textPtr->undoStack, TK_TEXT_UNDO_DELETE, i1, i2,
+	atomPtr = TkTextUndoPushAction(textPtr->undoStack, TK_TEXT_UNDO_DELETE,
+		i1, i2,
 		Tcl_NewStringObj(Tcl_DStringValue(&ds), Tcl_DStringLength(&ds)),
 		list, i3, remains);
+	if (remains > 0) {
+	    atomPtr->cuts = TkIBTreeCutPositions(&index1, &index2, &ext1,
+		    &atomPtr->numHeads, &atomPtr->numTails);
+	}
+	captureList = &atomPtr->values;
 	Tcl_DStringFree(&ds);
+    } else if (textPtr->editValues != NULL) {
+	/*
+	 * An undo or a redo is deleting text: the atom it applies keeps
+	 * the values the deletion drops.
+	 */
+
+	captureList = textPtr->editValues;
+	textPtr->editValues = NULL;
     }
     UpdateDirtyFlag(textPtr);
 
+    /*
+     * The values the deletion drops from nodes of blocks go to its undo
+     * atom, with the addresses of their nodes as they are now, which
+     * are their addresses again once the deletion is undone.
+     */
+
+    oldCapture = textPtr->valueCapture;
+    oldAddresses = textPtr->valueAddresses;
+    if ((captureList != NULL) && textPtr->haveValues) {
+	TkBTreeSnapshotValues(textPtr, &index1, &index2, &addresses);
+	textPtr->valueCapture = captureList;
+	textPtr->valueAddresses = &addresses;
+    }
     TkBTreeDeleteChars(&index1, &index2, 1, 1);
+    if (textPtr->valueAddresses == &addresses) {
+	TkBTreeFreeSnapshot(&addresses);
+    }
+    textPtr->valueCapture = oldCapture;
+    textPtr->valueAddresses = oldAddresses;
     if (resetView) {
 	TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index1);
 	TkTextSetYView(textPtr, &index1, 0);
@@ -1464,9 +2841,8 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 {
     register TkText *textPtr = (TkText *) clientData;
     TkTextIndex eof;
-    int count, chunkSize, offsetInSeg, startOff, endOff;
+    int count, startOff, endOff;
     TkTextSearch search;
-    TkTextSegment *segPtr;
     TkTextLine *linePtr;
 
     if (!textPtr->exportSelection) {
@@ -1730,7 +3106,7 @@ TextSearchCmd(textPtr, interp, argc, args)
     int argc;			/* Number of arguments. */
     Arg *args;		/* Argument strings. */
 {
-    int backwards, exact, c, i, argsLeft, noCase, leftToScan;
+    int backwards, exact, c, i, argsLeft, noCase;
     int searchElide, elideFlag, matchStrLength;
     size_t length;
     int numLines, startingLine, startingChar, lineNum, firstChar, lastChar;
@@ -1742,7 +3118,6 @@ TextSearchCmd(textPtr, interp, argc, args)
     TkTextIndex index, stopIndex;
     Tcl_DString line;
     Tcl_DString patDString;
-    TkTextSegment *segPtr;
     TkTextLine *linePtr;
     Tcl_RegExp regExp = NULL;		/* Initialization needed only to
 					 * prevent compiler warning. */
@@ -2111,13 +3486,94 @@ static Tk_ConfigSpec blockConfigSpecs[] = {
     {TK_CONFIG_END,          NULL,          NULL,          NULL,
 	         NULL, 0, 0}
 };
+/*
+ * The instance data of a block ("block data") is the Lang part of the
+ * container TkTextITree.data: a custom option that does to the Lang
+ * part what TK_CONFIG_LANGARG did to a bare Arg (TK_CONFIG_NULL_OK:
+ * undef or an empty string removes it).
+ */
+
+static Tk_CustomOption blockDataOption = {
+    BlockDataParse, BlockDataPrint, (ClientData) NULL
+};
+
 static Tk_ConfigSpec blockInstanceConfigSpecs[] = {
-    {TK_CONFIG_LANGARG, "-instancedata",          NULL,          NULL,
+    {TK_CONFIG_CUSTOM, "-instancedata",          NULL,          NULL,
 	         NULL, Tk_Offset(TkTextITree, data),
-		TK_CONFIG_NULL_OK},
+		TK_CONFIG_NULL_OK, &blockDataOption},
     {TK_CONFIG_END,          NULL,          NULL,          NULL,
 	         NULL, 0, 0}
 };
+
+/*
+ *--------------------------------------------------------------
+ *
+ * BlockDataParse, BlockDataPrint --
+ *
+ *	Set and read the Lang part of the instance data of a block,
+ *	leaving the other slots of the container alone.
+ *
+ *	The value replaced goes to the widget's list of values to free
+ *	when the widget command ends, as every other value (it was
+ *	freed at once, as Tk_ConfigureWidget freed a TK_CONFIG_LANGARG
+ *	option, so that its DESTROY ran inside the command: BUGS 22).  Both callers (block data, and the
+ *	instance data of a block list being inserted) run inside the
+ *	widget command, which flushes the list.  The read gives the
+ *	stored scalar itself with one more reference, as
+ *	Tk_ConfigureValue did.
+ *
+ *--------------------------------------------------------------
+ */
+
+static int
+BlockDataParse(clientData, interp, tkwin, value, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    Arg value;			/* The new value. */
+    char *widgRec;		/* The TkTextITree. */
+    int offset;			/* Where its data is. */
+{
+    TkTextData *dataPtr = (TkTextData *) (widgRec + offset);
+    TkTextBlock *blockPtr = ((TkTextITree *) widgRec)->blockPtr;
+    Arg old;
+
+    if (LangNull(value)) {
+	old = TkTextDataTakeLang(dataPtr);
+    } else {
+	old = TkTextDataPutLang(dataPtr, LangCopyArg(value));
+	if ((blockPtr != NULL) && (blockPtr->textPtr != NULL)) {
+	    /*
+	     * The deletions that can be undone record it (it is a value
+	     * like the others: TK_TEXT_VALUE_BLOCK).
+	     */
+
+	    blockPtr->textPtr->haveValues = 1;
+	}
+    }
+    TkTextFreeValueLater((blockPtr != NULL) ? blockPtr->textPtr : NULL,
+	    TkTextDataFromLang(old));
+    return TCL_OK;
+}
+
+static Arg
+BlockDataPrint(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* The TkTextITree. */
+    int offset;			/* Where its data is. */
+    Tcl_FreeProc **freeProcPtr;	/* Not used: the result is a new
+				 * reference. */
+{
+    Arg data = TkTextDataGetLang(*(TkTextData *) (widgRec + offset));
+    Arg result = NULL;
+
+    if (data != NULL) {
+	Tcl_IncrRefCount(data);
+    }
+    LangSetObj(&result, data);
+    return result;
+}
 
 
 /*
@@ -2148,7 +3604,6 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 				 * LangString(args[1]) is "mark". */
 {
     TkTextIndex index1, index2;
-    int result = TCL_OK;
     int length, i;
     char c;
     TkTextBlock *blockPtr;
@@ -2201,6 +3656,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	  blockPtr->leafDeleteCallBack = NULL;
 	  blockPtr->leafAddCallBack = NULL;
 	  blockPtr->leafEmptyCallBack = NULL;
+	  blockPtr->textPtr = textPtr;
 	  blockPtr->count = 0;
 	  blockPtr->depth = -1;		/* As documented: no simulated depth. */
 	  blockPtr->empty = 0;
@@ -2226,7 +3682,6 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	    blockPtr->widthsNum = 0;
 	    if (blockPtr->widthsStr) {
               int argc, code, count;
-              char *string;
 	      Arg *args;
 	      LangFreeProc *freeProc = NULL;
 	      
@@ -2325,6 +3780,18 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 				       (char *) &segPtr->body.itree,
 				       LangString(arga[0]), 0);
 	} else {
+	    if (TkTextVcOn(textPtr)
+		    && (TkTextDataGetLang(segPtr->body.itree.data) != NULL)) {
+		TkTextIndex head;
+
+		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+		TkTextVcPredict(textPtr, segPtr->body.itree.data,
+			TK_TEXT_VC_DROP, TK_TEXT_VC_BLOCK,
+			TkTextVcBlockPlace(textPtr,
+				TkBTreeLineIndex(head.linePtr), head.byteIndex),
+			NULL);
+		TkTextVcNotify(textPtr);
+	    }
 	    arga[1] = args[4];		/* Should work with TCL and Perl. */
 	    result = Tk_ConfigureWidget(interp, textPtr->tkwin, 
 					blockInstanceConfigSpecs, 2, arga, 
@@ -2347,7 +3814,46 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	}
 	segPtr = TkIBTreeAt(&index1, 1);
 	if (segPtr) {
-	    return TkIBTreeTrim(textPtr, segPtr);
+	    TkTextIndex head, end;
+	    TkTextValue *captured = NULL;
+	    CaptureState cs;
+	    int result, rootValue;
+	    char i1[TK_POS_CHARS];
+
+	    /*
+	     * Recorded for undo (TK_TEXT_UNDO_TRIM): the block by the
+	     * position of its head, and whether the root had a value
+	     * (which the trim gives to the new root).
+	     */
+
+	    TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	    TkTextPrintIndex(&head, i1);
+	    rootValue = TkIBTreeRootHasValue(segPtr);
+	    TkBTreeVcPredictTrim(textPtr, segPtr, textPtr->undo
+		    ? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP);
+	    if (textPtr->undo) {
+		CaptureStart(textPtr, &cs, &captured, &head, &head);
+	    }
+	    result = TkIBTreeTrim(textPtr, segPtr);
+	    if (textPtr->undo) {
+		CaptureEnd(textPtr, &cs);
+		if (result == TCL_OK) {
+		    TkTextUndoAtom *atomPtr = PushEdit(textPtr,
+			    TK_TEXT_EDIT_TRIM, TK_TEXT_UNDO_TRIM, i1, i1,
+			    (Tcl_Obj *) NULL);
+
+		    atomPtr->added = rootValue;
+		    atomPtr->values = captured;
+		} else {
+		    TkTextFreeValueList(textPtr, captured);
+		}
+	    }
+	    if (result == TCL_OK) {
+		TkTextIndexForwBytes(&head, segPtr->size, &end);
+		TkTextChanged(textPtr, &head, &end);
+		UpdateDirtyFlag(textPtr);
+	    }
+	    return result;
 	} else {
 	    Tcl_AppendResult(interp, "Cannot trim outside of block",
 			              NULL);
@@ -2497,6 +4003,12 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 		}
 	}
 
+	if (TkTextIndexCmp(&index1, &index2) > 0) {
+	    Tcl_AppendResult(interp, "block insert: index \"",
+		    LangString(args[5]), "\" is before \"",
+		    LangString(args[4]), "\"", NULL);
+	    return TCL_ERROR;
+	}
 	hPtr = Tcl_FindHashEntry(&textPtr->blockTable, LangString(args[3]));
 	if (hPtr == NULL) {
 	    Tcl_AppendResult(interp, "there is no block named \"",
@@ -2510,15 +4022,96 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 		    LangString(args[3]), "\" with contents",          NULL);
 	    return TCL_ERROR;
 	}
-	TkTextChanged(textPtr, &index1, &index2);
+	{
+	    TkTextValue *captured = NULL;
+	    CaptureState cs;
+	    int result, topLine, topOffset, *levels = NULL, numLevels = 0;
+	    char i1[TK_POS_CHARS], i2[TK_POS_CHARS];
 
-	/*
-	 *  Invalidate any selection retrievals in progress.
-	 */
+	    /*
+	     * Recorded for undo (TK_TEXT_UNDO_BLOCK) with the range as
+	     * given; the values it drops (merge losers, emptied nodes) go
+	     * to the atom with their addresses before the change, and,
+	     * inside a block, the levels of the separators it flattens.
+	     */
 
-	textPtr->selOffset = -1;
+	    TkTextPrintIndex(&index1, i1);
+	    TkTextPrintIndex(&index2, i2);
+	    TkBTreeVcPredictBlock(textPtr, &index1, &index2, textPtr->undo
+		    ? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP);
+	    if (textPtr->undo) {
+		levels = TkIBTreeSeparatorLevels(&index1, &index2,
+			&numLevels);
+		CaptureStart(textPtr, &cs, &captured, &index1, &index2);
+	    }
+	    TkTextChanged(textPtr, &index1, &index2);
 
-	return TkBTreeMakeBlock(textPtr, &index1, &index2, blockPtr);
+	    /*
+	     *  Invalidate any selection retrievals in progress.
+	     */
+
+	    textPtr->selOffset = -1;
+
+	    topLine = KeepViewForBlock(textPtr, &index1, &index2, &topOffset);
+	    result = TkBTreeMakeBlock(textPtr, &index1, &index2, blockPtr);
+	    if (topLine >= 0) {
+		ResetViewForBlock(textPtr, topLine, topOffset);
+	    }
+	    if (textPtr->undo) {
+		CaptureEnd(textPtr, &cs);
+		if (result == TCL_OK) {
+		    TkTextUndoAtom *atomPtr = PushEdit(textPtr,
+			    TK_TEXT_EDIT_BLOCK, TK_TEXT_UNDO_BLOCK, i1, i2,
+			    Tcl_NewStringObj(blockPtr->name, -1));
+
+		    atomPtr->values = captured;
+		    atomPtr->levels = levels;
+		    atomPtr->numLevels = numLevels;
+		} else {
+		    TkTextFreeValueList(textPtr, captured);
+		    if (levels != NULL) {
+			ckfree((char *) levels);
+		    }
+		}
+	    }
+	    if (result == TCL_OK) {
+		UpdateDirtyFlag(textPtr);
+	    }
+	    return result;
+	}
+    } else if ((c == 'n') && (strncmp(LangString(args[2]), "nodedata", length) == 0)
+	    && (length >= 2)) {
+	TkTextData *dataPtr;
+
+	if ((argc != 5) && (argc != 6)) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " block nodedata index level ?value?\"",
+		    NULL);
+	    return TCL_ERROR;
+	}
+	if (TkTextGetIndex(interp, textPtr, LangString(args[3]), &index1) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (TkBTreeNodeValue(textPtr, &index1, LangString(args[3]), args[4],
+		&dataPtr) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (argc == 5) {
+	    Arg copy = TkTextDataCopyLang(*dataPtr);
+
+	    if (copy != NULL) {
+		Tcl_SetObjResult(interp, copy);
+	    }
+	} else {
+	    if (TkTextVcOn(textPtr)
+		    && (TkTextDataGetLang(*dataPtr) != NULL)) {
+		TkTextVcPredict(textPtr, *dataPtr, TK_TEXT_VC_DROP,
+			TK_TEXT_VC_NODE,
+			TkBTreeVcNodePlace(textPtr, &index1, args[4]), NULL);
+		TkTextVcNotify(textPtr);
+	    }
+	    TkBTreeSetValue(textPtr, dataPtr, args[5]);
+	}
     } else if ((c == 'n') && (strncmp(LangString(args[2]), "names", length) == 0)) {
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -2533,7 +4126,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
     } else if ((c == 'l') && (strncmp(LangString(args[2]), "list", length) == 0)) {
         ListFactory listFactory;
 	TkTextLine *linePtr;
-	int offset, dummy;
+	int offset;
 	Arg arg = NULL;
 
 	if (argc != 5) {
@@ -2570,7 +4163,6 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	LangFreeArg(arg, LANG_DYNAMIC);
     } else if ((c == 's') && (strncmp(LangString(args[2]), "split", length) == 0)) {
         int level = 0;
-	char *end;
 
 	if (argc != 4 && argc != 5) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -2583,12 +4175,38 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	if (argc == 5) {
 	  level = LangInt(args[4]);
 	}
-	level = TkIBTreeSplit(&index1, level);
+	{
+	    char i1[TK_POS_CHARS], i2[TK_POS_CHARS];
+	    int asked = level;
+
+	    NotOnDummyLine(textPtr, &index1);
+	    TkTextPrintIndex(&index1, i1);
+	    level = SplitChars(textPtr, &index1, level);
+
+	    /*
+	     * Recorded for undo (TK_TEXT_UNDO_SPLIT): the separator at i1,
+	     * the level asked for, the levels added above the root.  It
+	     * drops no values (new nodes start without one).
+	     */
+
+	    if (textPtr->undo
+		    && (TkTextGetIndex(interp, textPtr, i1, &index1) == TCL_OK)) {
+		TkTextUndoAtom *atomPtr;
+
+		TkTextIndexForwChars(&index1, 1, &index2);
+		TkTextPrintIndex(&index2, i2);
+		atomPtr = PushEdit(textPtr, TK_TEXT_EDIT_SPLIT,
+			TK_TEXT_UNDO_SPLIT, i1, i2, (Tcl_Obj *) NULL);
+		atomPtr->level = asked;
+		atomPtr->added = (level > 0) ? level : 0;
+	    }
+	    UpdateDirtyFlag(textPtr);
+	}
 	Tcl_SetObjResult(interp, Tcl_NewIntObj(level));
     } else {
 	Tcl_AppendResult(interp, "bad block option \"", LangString(args[2]),
-		"\":  must be at, addline, cget, configure, delete, ",
-		"deletelines, insert, list, names, of, split or trim",
+		"\":  must be at, addline, cget, configure, data, delete, ",
+		"deletelines, insert, list, names, nodedata, of, split or trim",
 		         NULL);
 	return TCL_ERROR;
     }
@@ -2779,6 +4397,9 @@ TextDumpCmd(textPtr, interp, argc, args)
 #define TK_DUMP_IMG	0x10
 #define TK_DUMP_BLOCK	0x20
 #define TK_DUMP_ALL	(TK_DUMP_TEXT|TK_DUMP_MARK|TK_DUMP_TAG|TK_DUMP_WIN|TK_DUMP_IMG|TK_DUMP_BLOCK)
+#define TK_DUMP_VALUES	0x40	/* -values: a fourth field, the value of a
+				 * mark or of the run a tagon starts (see
+				 * DumpSegment); not part of -all. */
 
     for (arg = 2; arg < argc; arg++) {
 	size_t len;
@@ -2800,24 +4421,27 @@ TextDumpCmd(textPtr, interp, argc, args)
 	    what |= TK_DUMP_IMG;
 	} else if (strncmp("-block", LangString(args[arg]), len) == 0) {
 	    what |= TK_DUMP_BLOCK;
+	} else if ((len >= 2)
+		&& (strncmp("-values", LangString(args[arg]), len) == 0)) {
+	    what |= TK_DUMP_VALUES;
 	} else if (strncmp("-command", LangString(args[arg]), len) == 0) {
 	    arg++;
 	    if (arg >= argc || command != (LangCallback *) NULL) {
-		Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block? ?-command script? index ?index2?", NULL);
+		Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block -values? ?-command script? index ?index2?", NULL);
 		goto error;
 	    }
 	    command = LangMakeCallback(args[arg]);
 	} else {
-	    Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block? ?-command script? index ?index2?", NULL);
+	    Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block -values? ?-command script? index ?index2?", NULL);
 	    goto error;
 	}
     }
     if (arg >= argc) {
-	Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block? ?-command script? index ?index2?", NULL);
+	Tcl_AppendResult(interp, "Usage: ", LangString(args[0]), " dump ?-all -text -mark -tag -window -image -block -values? ?-command script? index ?index2?", NULL);
 	goto error;
     }
-    if (what == 0) {
-	what = TK_DUMP_ALL;
+    if ((what & ~TK_DUMP_VALUES) == 0) {
+	what |= TK_DUMP_ALL;
     }
     if (TkTextGetIndex(interp, textPtr, LangString(args[arg]), &index1) != TCL_OK) {
 	goto error;
@@ -2915,7 +4539,6 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
     for (offset = 0, segPtr = linePtr->segPtr ;
 	    (offset < end) && (segPtr != (TkTextSegment *)NULL) ;
 	    offset += segPtr->size, segPtr = segPtr->nextPtr) {
-	int result = TCL_OK;
 
 	index.byteIndex = base + offset;
 	if ((what & TK_DUMP_TEXT) && (segPtr->typePtr == &tkTextCharType) &&
@@ -2932,8 +4555,8 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
 	    savedChar = segPtr->body.chars[last];
 	    segPtr->body.chars[last] = '\0';
 	    index.byteIndex = base + offset + first;
-	    result = DumpSegment(interp, "text", segPtr->body.chars + first,
-		    command, &index, what);
+	    DumpSegment(interp, "text", segPtr->body.chars + first,
+		    command, &index, what, (Arg) NULL);
 	    segPtr->body.chars[last] = savedChar;
 	} else if ((segPtr->typePtr == &tkTextIBTreeType)
 		&& (offset + segPtr->size > start)) {
@@ -2942,8 +4565,8 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
 	    char *name = segPtr->body.itree.blockPtr->name;
 
 	    if ((what & TK_DUMP_BLOCK) && (offset >= start)) {
-		result = DumpSegment(interp, "block", name, command, &index,
-			what);
+		DumpSegment(interp, "block", name, command, &index,
+			what, (Arg) NULL);
 	    }
 
 	    /*
@@ -2974,25 +4597,27 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
 	    }
 	    if ((what & TK_DUMP_BLOCK) && (offset + segPtr->size <= end)) {
 		index.byteIndex = base + offset + segPtr->size;
-		result = DumpSegment(interp, "blockend", name, command,
-			&index, what);
+		DumpSegment(interp, "blockend", name, command,
+			&index, what, (Arg) NULL);
 	    }
 	} else if ((offset >= start)) {
 	    if ((what & TK_DUMP_MARK) && (segPtr->typePtr->name[0] == 'm')) {
 		TkTextMark *markPtr = (TkTextMark *)&segPtr->body;
 		char *name = Tcl_GetHashKey(&textPtr->markTable, markPtr->hPtr);
-		result = DumpSegment(interp, "mark", name,
-			command, &index, what);
+		DumpSegment(interp, "mark", name,
+			command, &index, what,
+			TkTextDataGetLang(markPtr->value));
 	    } else if ((what & TK_DUMP_TAG) &&
 			(segPtr->typePtr == &tkTextToggleOnType)) {
-		result = DumpSegment(interp, "tagon",
+		DumpSegment(interp, "tagon",
 			segPtr->body.toggle.tagPtr->name,
-			command, &index, what);
+			command, &index, what,
+			TkTextDataGetLang(segPtr->body.toggle.value));
 	    } else if ((what & TK_DUMP_TAG) && 
 			(segPtr->typePtr == &tkTextToggleOffType)) {
-		result = DumpSegment(interp, "tagoff",
+		DumpSegment(interp, "tagoff",
 			segPtr->body.toggle.tagPtr->name,
-			command, &index, what);
+			command, &index, what, (Arg) NULL);
 	    } else if ((what & TK_DUMP_WIN) && 
 			(segPtr->typePtr->name[0] == 'w')) {
 		TkTextEmbWindow *ewPtr = (TkTextEmbWindow *)&segPtr->body;
@@ -3002,14 +4627,14 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
 		} else {
 		    pathname = Tk_PathName(ewPtr->tkwin);
 		}
-		result = DumpSegment(interp, "window", pathname,
-			command, &index, what);
+		DumpSegment(interp, "window", pathname,
+			command, &index, what, (Arg) NULL);
 	    } else if ((what & TK_DUMP_IMG) &&
 			(strcmp(segPtr->typePtr->name, "image") == 0)) {
 		TkTextEmbImage *eiPtr = (TkTextEmbImage *)&segPtr->body;
 		char *name = (eiPtr->name == NULL) ? "" : eiPtr->name;
-		result = DumpSegment(interp, "image", name,
-			command, &index, what);
+		DumpSegment(interp, "image", name,
+			command, &index, what, (Arg) NULL);
 	    }
 	}
     }
@@ -3027,13 +4652,16 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
  *	Either evals the callback or appends elements to the result string.
  */
 static int
-DumpSegment(interp, key, value, command, indexPtr, what)
+DumpSegment(interp, key, value, command, indexPtr, what, data)
     Tcl_Interp *interp;
     char *key;			/* Segment type key */
     char *value;		/* Segment value */
     LangCallback *command;	/* Script callback */
     TkTextIndex *indexPtr;	/* Position of the segment */
-    int what;			/* Look for TK_DUMP_INDEX bit */
+    int what;			/* Look for the TK_DUMP_VALUES bit */
+    Arg data;			/* With -values: the value of the mark or of
+				 * the run (NULL if none, and for the other
+				 * kinds of entries). */
 {
     char buffer[TK_POS_CHARS];
 
@@ -3042,24 +4670,24 @@ DumpSegment(interp, key, value, command, indexPtr, what)
 	Tcl_AppendElement(interp, key);
 	Tcl_AppendElement(interp, value);
 	Tcl_AppendElement(interp, buffer);
+	if (what & TK_DUMP_VALUES) {
+	    /*
+	     * Every entry has a fourth field, so that the list stays a
+	     * list of entries of one length: a copy of the value, or
+	     * undef (an empty string in Tcl).
+	     */
+
+	    Tcl_ListObjAppendElement(interp, Tcl_GetObjResult(interp),
+		    (data != NULL) ? (Tcl_Obj *) newSVsv((SV *) data)
+		    : (Tcl_Obj *) newSV(0));
+	}
 	return TCL_OK;
+    } else if (what & TK_DUMP_VALUES) {
+	return LangDoCallback(interp, command, 1, 4, "%s %s %s %_", key,
+		value, buffer, (SV *) data);
     } else {
-	int result;
-#if 0
-        /* Tcl/Tk passes list of three strings */
-	Arg *args = LangAllocVec(4);
-	char *list;
-	LangSetString(args+0, key);
-	LangSetString(args+1, value);
-	LangSetString(args+2, buffer);
-	LangSetString(args+3,          NULL);
-	list = Tcl_Merge(3, args);
-	result = Tcl_VarEval(interp, command, " ", list,          NULL);
-	ckfree(list);
-#else
-	result = LangDoCallback(interp, command, 1, 3, "%s %s %s", key, value, buffer);    
-#endif
-	return result;
+	return LangDoCallback(interp, command, 1, 3, "%s %s %s", key, value,
+		buffer);
     }
 }
 
@@ -3191,9 +4819,12 @@ TkTextEditAction(textPtr, atomPtr, revert)
     TkTextIndex index;
     char *markIndex;
     int doInsert, increment, ok = 1;
-    Arg argv[3];
 
     if (textPtr->state != tkTextNormalUid) {
+	return;
+    }
+    if (atomPtr->type >= TK_TEXT_UNDO_SPLIT) {
+	EditOther(textPtr, atomPtr, revert);
 	return;
     }
 
@@ -3206,11 +4837,21 @@ TkTextEditAction(textPtr, atomPtr, revert)
     textPtr->isDirtyIncrement = 0;
     doInsert = (atomPtr->type == TK_TEXT_UNDO_INSERT) ? !revert : revert;
     if (doInsert) {
+	TkTextValue *remainsValues = NULL;
+	TkTextRemainsMap map;
+
+	map.atomPtr = atomPtr;
+	map.starts = NULL;
+
 	if (atomPtr->list != NULL) {
 	    /*
 	     * A deletion that cut blocks left their remains where the
 	     * list goes back (see TkTextUndoAtom): take them out first,
-	     * the list has everything.
+	     * the list has everything.  The values that takes out of the
+	     * remains (of blocks nested there) go back to the same nodes
+	     * once the list is in (TkBTreeRestoreValues finds them
+	     * there); a value set on the remains after the deletion finds
+	     * no node there, and waits in the atom for the redo.
 	     */
 
 	    if ((atomPtr->remains > 0)
@@ -3221,13 +4862,35 @@ TkTextEditAction(textPtr, atomPtr, revert)
 
 		TkTextIndexForwBytes(&index, atomPtr->remains, &end);
 		TkTextPrintIndex(&end, endString);
+		if (textPtr->haveValues) {
+		    TkTextLine *linePtr = index.linePtr;
+		    int k;
+
+		    map.line = TkBTreeLineIndex(index.linePtr);
+		    map.numLines = TkBTreeLineIndex(end.linePtr) - map.line;
+		    map.starts = (int *) ckalloc((unsigned)
+			    ((map.numLines + 1) * sizeof(int)));
+		    map.starts[0] = -index.byteIndex;
+		    for (k = 1; k <= map.numLines; k++) {
+			map.starts[k] = map.starts[k - 1]
+				+ TkBTreeCharsInLine(linePtr);
+			linePtr = TkBTreeNextLine(linePtr);
+		    }
+		}
+		remainsValues = TkBTreeTakeCrossingRunValues(textPtr, &index,
+			&end);
+		textPtr->editValues = &remainsValues;
 		DeleteChars(textPtr, atomPtr->listIndex, endString);
+		textPtr->editValues = NULL;
 	    }
 	    if (TkTextGetIndex(interp, textPtr, atomPtr->listIndex, &index)
 		    != TCL_OK) {
 		ok = 0;
 	    } else {
+		void *held = TkBTreeHoldRunValues(textPtr, &index);
+
 		InsertList(textPtr, &index, atomPtr->list);
+		TkBTreeReleaseRunValues(textPtr, held);
 	    }
 	} else if (TkTextGetIndex(interp, textPtr, atomPtr->index1, &index)
 		!= TCL_OK) {
@@ -3235,10 +4898,92 @@ TkTextEditAction(textPtr, atomPtr, revert)
 	} else {
 	    InsertChars(textPtr, &index, Tcl_GetString(atomPtr->string));
 	}
+
+	/*
+	 * The text is back: so are the values the change dropped, at
+	 * their addresses (the most recent change undone first).
+	 */
+
+	if (ok) {
+	    /*
+	     * A value found at an address (set there after the change)
+	     * is displaced into the atom, to come back when the change
+	     * is applied again.
+	     */
+
+	    TkTextDiscardValueList(textPtr, atomPtr->displaced);
+	    atomPtr->displaced = NULL;
+	    TkBTreeRestoreValues(textPtr, remainsValues,
+		    (map.starts != NULL) ? &map : NULL, &atomPtr->displaced, 2);
+	    TkBTreeRestoreValues(textPtr, atomPtr->values, NULL,
+		    &atomPtr->displaced, 1);
+	} else {
+	    TkTextFreeValueList(textPtr, remainsValues);
+	    TkTextDiscardValueList(textPtr, atomPtr->values);
+	}
+	atomPtr->values = NULL;
+	if (map.starts != NULL) {
+	    ckfree((char *) map.starts);
+	}
 	markIndex = atomPtr->index2;
     } else {
+	/*
+	 * Undoing an insertion: record what is there in block-list form,
+	 * as a deletion records what it deletes, so that the redo puts it
+	 * back exactly (tags, the separators of a block, marks, and, once
+	 * the list is in, the values; see TkTextUndoAtom).  The range is
+	 * exactly as the insertion left it: the later changes recorded
+	 * have been undone before.  If it cuts blocks (indices made
+	 * stale by changes not recorded) the redo inserts the string.
+	 */
+
+	if (atomPtr->type == TK_TEXT_UNDO_INSERT) {
+	    TkTextIndex i1, i2, ext1, ext2;
+	    int remains;
+
+	    if (atomPtr->list != NULL) {
+		Tcl_DecrRefCount(atomPtr->list);
+		atomPtr->list = NULL;
+	    }
+	    if ((TkTextGetIndex(interp, textPtr, atomPtr->index1, &i1)
+		    == TCL_OK)
+		    && (TkTextGetIndex(interp, textPtr, atomPtr->index2, &i2)
+			== TCL_OK)
+		    && (TkTextIndexCmp(&i1, &i2) < 0)
+		    && (TkIBTreeCutRange(&i1, &i2, &ext1, &ext2, &remains)
+			== 0)) {
+		atomPtr->list = TextGetList(textPtr, &i1, &i2);
+	    }
+	    Tcl_ResetResult(interp);
+	    strcpy(atomPtr->listIndex, atomPtr->index1);
+	    atomPtr->remains = 0;
+	}
+
+	/*
+	 * The values this deletion drops go to the atom.
+	 */
+
+	TkTextDiscardValueList(textPtr, atomPtr->values);
+	atomPtr->values = NULL;
+	textPtr->editValues = &atomPtr->values;
 	if (DeleteChars(textPtr, atomPtr->index1, atomPtr->index2) != TCL_OK) {
 	    ok = 0;
+	}
+	textPtr->editValues = NULL;
+
+	/*
+	 * The values the last undo (or redo) displaced come back; what
+	 * they find at their addresses goes to the atom, as values this
+	 * change drops (their addresses are before the change, so the
+	 * same in the text with and without it).
+	 */
+
+	if (ok) {
+	    TkTextValue *displaced = atomPtr->displaced;
+
+	    atomPtr->displaced = NULL;
+	    TkBTreeRestoreValues(textPtr, displaced, NULL, &atomPtr->values,
+		    1);
 	}
 	markIndex = atomPtr->index1;
     }
@@ -3248,6 +4993,33 @@ TkTextEditAction(textPtr, atomPtr, revert)
 	return;
     }
     UpdateDirtyFlag(textPtr);
+    EditFinish(textPtr, markIndex);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * EditFinish --
+ *
+ *	After an undo or a redo: the insertion cursor goes to the given
+ *	index (if any), and is made visible.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+EditFinish(textPtr, markIndex)
+    TkText *textPtr;		/* Information about text widget. */
+    char *markIndex;		/* Where the cursor goes, or NULL. */
+{
+    Tcl_Interp *interp = textPtr->interp;
+    TkTextIndex index;
+    Arg argv[3];
+
+    if (markIndex == NULL) {
+	Tcl_ResetResult(interp);
+	return;
+    }
     if (TkTextGetIndex(interp, textPtr, markIndex, &index) == TCL_OK) {
 	TkTextSetMark(textPtr, "insert", &index);
     }
@@ -3260,6 +5032,611 @@ TkTextEditAction(textPtr, atomPtr, revert)
     LangFreeArg(argv[1], LANG_DYNAMIC);
     LangFreeArg(argv[2], LANG_DYNAMIC);
     Tcl_ResetResult(interp);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * EditOther --
+ *
+ *	Apply (redo) or revert (undo) a recorded block insert, block
+ *	split, block trim, tag add or tag remove (see TkTextUndoAtom):
+ *
+ *	block split	undone by deleting its separator (the deletion
+ *			joins the leaves, and the nodes the split cut up
+ *			to their common ancestor), then removing the
+ *			levels it added above the root (block trim);
+ *	block insert	undone by dissolving the block (deleting its
+ *			head); the values of the leaves it had moved
+ *			whole go back to them first, its instance data
+ *			is kept for the redo;
+ *	block trim	undone by adding the root again (TkIBTreeAddRoot);
+ *	tag add		undone by removing the tag from the gaps
+ *			between the ranges it had in the range;
+ *	tag remove	undone by adding it again on those ranges.
+ *
+ *	A redo does the change again.  Values travel as for insertions
+ *	and deletions: what either direction drops goes to the atom,
+ *	with addresses valid before it; once the other direction has
+ *	been applied, they are given back (TkBTreeRestoreValues), and
+ *	what they find at their addresses waits in the atom's displaced
+ *	list for the next application.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The text changes; the modified flag is updated.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+EditOther(textPtr, atomPtr, revert)
+    TkText *textPtr;		/* Information about text widget. */
+    TkTextUndoAtom *atomPtr;	/* The change. */
+    int revert;			/* Non-zero means undo it, zero means
+				 * do it again. */
+{
+    Tcl_Interp *interp = textPtr->interp;
+    TkTextValue *restore = atomPtr->values, *displaced = atomPtr->displaced;
+    TkTextValue *moved = NULL;
+    TkTextIndex index1, index2, end;
+    TkTextSegment *segPtr;
+    CaptureState cs;
+    char markIndex[TK_POS_CHARS], *mark = NULL;
+    int increment, ok = 1, i, topOffset;
+
+    increment = textPtr->isDirtyIncrement;
+    textPtr->isDirtyIncrement = 0;
+    atomPtr->values = NULL;
+    atomPtr->displaced = NULL;
+    if ((TkTextGetIndex(interp, textPtr, atomPtr->index1, &index1) != TCL_OK)
+	    || (TkTextGetIndex(interp, textPtr, atomPtr->index2, &index2)
+		!= TCL_OK)) {
+	ok = 0;
+	goto done;
+    }
+    switch (atomPtr->type) {
+    case TK_TEXT_UNDO_SPLIT:
+	if (revert) {
+	    textPtr->editValues = &atomPtr->values;
+	    DeleteChars(textPtr, atomPtr->index1, (char *) NULL);
+	    textPtr->editValues = NULL;
+	    if ((atomPtr->added > 0) && (TkTextGetIndex(interp, textPtr,
+		    atomPtr->index1, &index1) == TCL_OK)
+		    && ((segPtr = TkIBTreeAt(&index1, 1)) != NULL)) {
+		TkTextIndex head;
+
+		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+		CaptureStart(textPtr, &cs, &atomPtr->values, &head, &head);
+		for (i = 0; i < atomPtr->added; i++) {
+		    TkBTreeVcPredictTrim(textPtr, segPtr, TK_TEXT_VC_STASH);
+		    if (TkIBTreeTrim(textPtr, segPtr) != TCL_OK) {
+			break;
+		    }
+		}
+		CaptureEnd(textPtr, &cs);
+		TkTextIndexForwBytes(&head, segPtr->size, &end);
+		TkTextChanged(textPtr, &head, &end);
+	    }
+	    mark = atomPtr->index1;
+	} else {
+	    NotOnDummyLine(textPtr, &index1);
+	    SplitChars(textPtr, &index1, atomPtr->level);
+	    mark = atomPtr->index2;
+	}
+	break;
+    case TK_TEXT_UNDO_BLOCK:
+	if (revert) {
+	    segPtr = TkIBTreeAt(&index1, 0);
+	    if ((segPtr == NULL) || (strcmp(segPtr->body.itree.blockPtr->name,
+		    Tcl_GetString(atomPtr->string)) != 0)) {
+		ok = 0;			/* Not there: stale indices. */
+		break;
+	    }
+	    if (!TkTextDataIsEmpty(atomPtr->data)) {
+		TkTextDiscardValue(textPtr, atomPtr->data, TK_TEXT_VALUE_BLOCK,
+			TkBTreeLineIndex(index1.linePtr), index1.byteIndex, -1,
+			NULL);
+		TkTextDataInit(atomPtr->data);
+	    }
+
+	    /*
+	     * The block's instance data goes into the atom, for the redo.
+	     */
+
+	    if (TkTextVcOn(textPtr)
+		    && (TkTextDataGetLang(segPtr->body.itree.data) != NULL)) {
+		TkTextVcPredict(textPtr, segPtr->body.itree.data,
+			TK_TEXT_VC_STASH, TK_TEXT_VC_BLOCK,
+			TkTextVcBlockPlace(textPtr,
+				TkBTreeLineIndex(index1.linePtr),
+				index1.byteIndex), NULL);
+		TkTextVcNotify(textPtr);
+		TkTextVcSeen(textPtr, segPtr->body.itree.data,
+			TK_TEXT_VC_STASH);
+	    }
+	    TkTextDataMove(&atomPtr->data, &segPtr->body.itree.data);
+	    moved = TkBTreeTakeMovedLeafValues(textPtr, segPtr, &index1);
+	    textPtr->editValues = &atomPtr->values;
+	    DeleteChars(textPtr, atomPtr->index1, (char *) NULL);
+	    textPtr->editValues = NULL;
+
+	    /*
+	     * Inside a block, the dissolution spliced the leaves back with
+	     * separators of level 0: they get their levels back, so that
+	     * the nodes are those before the block insert, before the
+	     * values come back to them (BUGS 18).
+	     */
+
+	    if ((atomPtr->levels != NULL) && (TkTextGetIndex(interp, textPtr,
+		    atomPtr->index1, &index1) == TCL_OK)
+		    && ((segPtr = TkIBTreeAt(&index1, 1)) != NULL)) {
+		TkTextIndex head;
+
+		TkIBTreeSetSeparatorLevels(textPtr, &index1, atomPtr->levels,
+			atomPtr->numLevels);
+		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+		TkTextIndexForwBytes(&head, segPtr->size, &end);
+		TkTextChanged(textPtr, &head, &end);
+	    }
+	    mark = atomPtr->index1;
+	} else {
+	    Tcl_HashEntry *hPtr = Tcl_FindHashEntry(&textPtr->blockTable,
+		    Tcl_GetString(atomPtr->string));
+	    TkTextBlock *blockPtr;
+
+	    if (hPtr == NULL) {
+		ok = 0;			/* The block type was deleted. */
+		break;
+	    }
+	    blockPtr = (TkTextBlock *) Tcl_GetHashValue(hPtr);
+	    if (TkTextIndexCmp(&index1, &index2) > 0) {
+		ok = 0;
+		break;
+	    }
+
+	    /*
+	     * What the command checks, the redo checks again: the type
+	     * may have been made -empty since (TkBTreeMakeBlock does not
+	     * check it, and a block of such a type with contents crashes
+	     * the display).  The redo then does nothing.
+	     */
+
+	    if (blockPtr->empty && (TkTextIndexCmp(&index1, &index2) != 0)) {
+		ok = 0;
+		break;
+	    }
+	    NotOnDummyLine(textPtr, &index1);
+	    NotOnDummyLine(textPtr, &index2);
+	    if (atomPtr->levels != NULL) {
+		ckfree((char *) atomPtr->levels);
+	    }
+	    atomPtr->levels = TkIBTreeSeparatorLevels(&index1, &index2,
+		    &atomPtr->numLevels);
+	    TkBTreeVcPredictBlock(textPtr, &index1, &index2,
+		    TK_TEXT_VC_STASH);
+	    CaptureStart(textPtr, &cs, &atomPtr->values, &index1, &index2);
+	    TkTextChanged(textPtr, &index1, &index2);
+	    textPtr->selOffset = -1;
+	    i = KeepViewForBlock(textPtr, &index1, &index2, &topOffset);
+	    if (TkBTreeMakeBlock(textPtr, &index1, &index2, blockPtr)
+		    != TCL_OK) {
+		ok = 0;
+	    }
+	    if (i >= 0) {
+		ResetViewForBlock(textPtr, i, topOffset);
+	    }
+	    CaptureEnd(textPtr, &cs);
+	    if (ok && (TkTextGetIndex(interp, textPtr, atomPtr->index1,
+		    &index1) == TCL_OK)
+		    && ((segPtr = TkIBTreeAt(&index1, 0)) != NULL)) {
+		TkTextDataMove(&segPtr->body.itree.data, &atomPtr->data);
+		TkTextVcRestored(textPtr, segPtr->body.itree.data,
+			TK_TEXT_VC_BLOCK, TkTextVcBlockPlace(textPtr,
+				TkBTreeLineIndex(index1.linePtr),
+				index1.byteIndex));
+		TkTextIndexForwBytes(&index1, segPtr->size, &end);
+		TkTextPrintIndex(&end, markIndex);
+		mark = markIndex;
+	    }
+	}
+	break;
+    case TK_TEXT_UNDO_TRIM:
+	segPtr = TkIBTreeAt(&index1, 0);
+	if ((segPtr == NULL) || (segPtr->body.itree.tree == NULL)) {
+	    ok = 0;
+	    break;
+	}
+	if (revert) {
+	    TkIBTreeAddRoot(segPtr, atomPtr->added);
+	} else {
+	    /*
+	     * Whether the root has a value now: it may have been set or
+	     * unset since the trim was first done.
+	     */
+
+	    atomPtr->added = TkIBTreeRootHasValue(segPtr);
+	    TkBTreeVcPredictTrim(textPtr, segPtr, TK_TEXT_VC_STASH);
+	    CaptureStart(textPtr, &cs, &atomPtr->values, &index1, &index1);
+	    if (TkIBTreeTrim(textPtr, segPtr) != TCL_OK) {
+		ok = 0;
+	    }
+	    CaptureEnd(textPtr, &cs);
+	}
+	TkTextIndexForwBytes(&index1, segPtr->size, &end);
+	TkTextChanged(textPtr, &index1, &end);
+	mark = atomPtr->index1;
+	break;
+    case TK_TEXT_UNDO_TAG: {
+	TkTextTag *tagPtr = TkTextCreateTag(textPtr,
+		Tcl_GetString(atomPtr->string));
+
+	CaptureStart(textPtr, &cs, &atomPtr->values, (TkTextIndex *) NULL,
+		(TkTextIndex *) NULL);
+	if (revert && atomPtr->added) {
+	    /*
+	     * The undo of tag add: the tag comes off the gaps between the
+	     * ranges it had (not off the whole range: a run that tag add
+	     * extended keeps its value on the part that remains).
+	     */
+
+	    TkTextIndex from = index1, to;
+
+	    for (i = 0; i <= atomPtr->numRanges; i++) {
+		char *r = atomPtr->ranges + 2 * i * TK_POS_CHARS;
+
+		to = index2;
+		if ((i < atomPtr->numRanges) && (TkTextGetIndex(interp,
+			textPtr, r, &to) != TCL_OK)) {
+		    break;
+		}
+		if (TkTextIndexCmp(&from, &to) < 0) {
+		    TagWithRedraw(textPtr, &from, &to, tagPtr, 0);
+		}
+		if ((i < atomPtr->numRanges) && (TkTextGetIndex(interp,
+			textPtr, r + TK_POS_CHARS, &from) != TCL_OK)) {
+		    break;
+		}
+	    }
+	} else if (revert) {
+	    /*
+	     * The undo of tag remove: the tag goes back on the ranges it
+	     * had.
+	     */
+
+	    for (i = 0; i < atomPtr->numRanges; i++) {
+		char *r = atomPtr->ranges + 2 * i * TK_POS_CHARS;
+
+		if ((TkTextGetIndex(interp, textPtr, r, &index1) == TCL_OK)
+			&& (TkTextGetIndex(interp, textPtr, r + TK_POS_CHARS,
+				&index2) == TCL_OK)
+			&& (TkTextIndexCmp(&index1, &index2) < 0)) {
+		    TagWithRedraw(textPtr, &index1, &index2, tagPtr, 1);
+		}
+	    }
+	} else {
+	    TagWithRedraw(textPtr, &index1, &index2, tagPtr, atomPtr->added);
+	}
+	CaptureEnd(textPtr, &cs);
+	break;
+    }
+    }
+
+    /*
+     * The values the other direction dropped come back, then (for the
+     * undo of block insert) those of the leaves it had moved whole;
+     * the values displaced last time come back too, and what they
+     * find goes to the atom as values this change drops.
+     */
+
+    done:
+    if (ok) {
+	TkBTreeRestoreValues(textPtr, restore, NULL, &atomPtr->displaced, 1);
+	TkBTreeRestoreValues(textPtr, moved, NULL, &atomPtr->displaced, 0);
+	TkBTreeRestoreValues(textPtr, displaced, NULL, &atomPtr->values, 1);
+    } else {
+	TkTextDiscardValueList(textPtr, restore);
+	TkTextFreeValueList(textPtr, moved);
+	TkTextDiscardValueList(textPtr, displaced);
+    }
+    textPtr->isDirtyIncrement = increment;
+    if (!ok) {
+	Tcl_ResetResult(interp);
+	return;
+    }
+    UpdateDirtyFlag(textPtr);
+    EditFinish(textPtr, mark);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * KeepViewForBlock, ResetViewForBlock --
+ *
+ *	A block insert over several lines moves the lines after the
+ *	first into the new block, out of the text's tree.  If the first
+ *	line on display (textPtr->topIndex) is one of them, or the first
+ *	line after the start of the range, topIndex would point into a
+ *	line that is no longer there (the next redisplay crashed).
+ *	KeepViewForBlock, called before, says whether that is the case
+ *	and gives the line and the offset to show first afterwards: the
+ *	same place if it is before the range, else the start of the
+ *	first line; ResetViewForBlock, called after, sets it, as
+ *	insertions and deletions do.
+ *
+ * Results:
+ *	KeepViewForBlock: -1 if the view need not change, else the line
+ *	index to show first (*lineOffsetPtr: the byte offset in it).
+ *
+ * Side effects:
+ *	ResetViewForBlock changes the view.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+KeepViewForBlock(textPtr, index1Ptr, index2Ptr, lineOffsetPtr)
+    TkText *textPtr;
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range of block insert. */
+    int *lineOffsetPtr;
+{
+    int top, line1, line2;
+
+    if (textPtr->topIndex.linePtr == NULL) {
+	return -1;
+    }
+    top = TkBTreeLineIndex(textPtr->topIndex.linePtr);
+    line1 = TkBTreeLineIndex(index1Ptr->linePtr);
+    line2 = TkBTreeLineIndex(index2Ptr->linePtr);
+    if ((top < line1) || (top > line2)) {
+	return -1;
+    }
+    if ((top == line1)
+	    && (textPtr->topIndex.byteIndex <= index1Ptr->byteIndex)) {
+	*lineOffsetPtr = textPtr->topIndex.byteIndex;
+    } else {
+	*lineOffsetPtr = 0;
+    }
+    return line1;
+}
+
+static void
+ResetViewForBlock(textPtr, line, offset)
+    TkText *textPtr;
+    int line, offset;
+{
+    TkTextIndex newTop;
+
+    TkTextMakeByteIndex(textPtr->tree, line, offset, &newTop);
+    TkTextSetYView(textPtr, &newTop, 0);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * NotOnDummyLine, PushEdit, TagWithRedraw --
+ *
+ *	NotOnDummyLine moves an index on the last (dummy) line, which
+ *	must stay empty, to the end of the line before it, as "insert"
+ *	does.  PushEdit records a change (see TkTextUndoAtom) after a
+ *	separator if -autoseparators is on and the last change was of
+ *	another kind (Tk's rule).  TagWithRedraw adds or removes a tag
+ *	and has the display follow, as "tag add" and "tag remove" do.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+NotOnDummyLine(textPtr, indexPtr)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;
+{
+    int lineIndex = TkBTreeLineIndex(indexPtr->linePtr);
+
+    if (lineIndex == TkBTreeNumLines(textPtr->tree)) {
+	TkTextMakeByteIndex(textPtr->tree, lineIndex - 1, 1000000, indexPtr);
+    }
+}
+
+static TkTextUndoAtom *
+PushEdit(textPtr, mode, type, index1, index2, string)
+    TkText *textPtr;
+    int mode;				/* TK_TEXT_EDIT_... */
+    int type;				/* TK_TEXT_UNDO_... */
+    char *index1, *index2;
+    Tcl_Obj *string;			/* Consumed; or NULL. */
+{
+    if (textPtr->autoSeparators && (textPtr->lastEditMode != mode)) {
+	TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+    }
+    textPtr->lastEditMode = mode;
+    return TkTextUndoPushAction(textPtr->undoStack, type, index1, index2,
+	    string, (Tcl_Obj *) NULL, (char *) NULL, 0);
+}
+
+static void
+TagWithRedraw(textPtr, index1Ptr, index2Ptr, tagPtr, add)
+    TkText *textPtr;
+    TkTextIndex *index1Ptr, *index2Ptr;
+    TkTextTag *tagPtr;
+    int add;
+{
+    if (TkTextVcOn(textPtr) && tagPtr->hasRunValues) {
+	/*
+	 * The look-ahead before the redisplay is told (the callback may
+	 * use the display); TkBTreeTag does not do it again.
+	 */
+
+	TkBTreeVcPredictTag(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+	textPtr->vcTagDone = 1;
+    }
+    if (tagPtr->affectsDisplay) {
+	TkTextRedrawTag(textPtr, index1Ptr, index2Ptr, tagPtr, !add);
+    } else {
+	TkTextEventuallyRepick(textPtr);
+    }
+    TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextTagChange --
+ *
+ *	"tag add" and "tag remove" over one range: TkBTreeTag, recorded
+ *	for undo (TK_TEXT_UNDO_TAG) with the ranges the tag had in the
+ *	range before, unless the tag is "sel" (the selection is not part
+ *	of the text's content) or the change changes nothing (an empty
+ *	range included).  Without -undo, a change that changes something
+ *	(and is not of "sel") is not recorded but counts for the
+ *	modified flag.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The tag changes; values of runs may be dropped (into the atom).
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextTagChange(textPtr, index1Ptr, index2Ptr, tagPtr, add)
+    TkText *textPtr;		/* Information about text widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range. */
+    TkTextTag *tagPtr;		/* The tag. */
+    int add;			/* 1 to add the tag, 0 to remove it. */
+{
+    RecordTagChange(textPtr, index1Ptr, index2Ptr, tagPtr, add,
+	    add ? TK_TEXT_EDIT_TAGADD : TK_TEXT_EDIT_TAGREMOVE);
+}
+
+static void
+RecordTagChange(textPtr, index1Ptr, index2Ptr, tagPtr, add, mode)
+    TkText *textPtr;		/* Information about text widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range. */
+    TkTextTag *tagPtr;		/* The tag. */
+    int add;			/* 1 to add the tag, 0 to remove it. */
+    int mode;			/* The kind of edit (TK_TEXT_EDIT_...) for
+				 * -autoseparators, or -1 for part of a
+				 * deletion (no separator, mode unchanged). */
+{
+    TkTextSearch search;
+    TkTextIndex start;
+    TkTextValue *captured = NULL;
+    TkTextUndoAtom *atomPtr;
+    CaptureState cs;
+    char i1[TK_POS_CHARS], i2[TK_POS_CHARS], *ranges = NULL;
+    int on, num = 0, max = 0, whole;
+
+    if (TkTextIndexCmp(index1Ptr, index2Ptr) >= 0) {
+	return;				/* An empty range: nothing changes. */
+    }
+    if (tagPtr == textPtr->selTagPtr) {
+	TagWithRedraw(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+	return;
+    }
+
+    /*
+     * Without -undo, nothing is recorded, but a change that changes
+     * something counts for the modified flag, as insertions do.  Kept
+     * cheap (programs that highlight add tags a lot): the tag changes
+     * the range unless its state at the start is the one wanted and
+     * it toggles nowhere before the end.
+     */
+
+    if (!textPtr->undo) {
+	on = TkBTreeCharTagged(index1Ptr, tagPtr);
+	whole = (add != 0) == (on != 0);
+	if (whole) {
+	    TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, &search);
+	    if (TkBTreeNextTag(&search)
+		    && (TkTextIndexCmp(&search.extIndex, index2Ptr) < 0)) {
+		whole = 0;
+	    }
+	}
+	TagWithRedraw(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+	if (!whole && (mode >= 0)) {
+	    UpdateDirtyFlag(textPtr);
+	}
+	return;
+    }
+
+    /*
+     * The ranges the tag has in the range now.
+     */
+
+    TkTextPrintIndex(index1Ptr, i1);
+    TkTextPrintIndex(index2Ptr, i2);
+    on = TkBTreeCharTagged(index1Ptr, tagPtr);
+    start = *index1Ptr;
+    TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, &search);
+    while (1) {
+	int more = TkBTreeNextTag(&search);
+	TkTextIndex *atPtr = more ? &search.extIndex : index2Ptr;
+
+	if (more && (search.segPtr->typePtr == &tkTextToggleOnType)) {
+	    if (!on) {
+		start = search.extIndex;
+		on = 1;
+	    }
+	    continue;
+	}
+	if (on && (TkTextIndexCmp(&start, atPtr) < 0)) {
+	    if (num >= max) {
+		char *grown;
+
+		max = 2 * max + 4;
+		grown = ckalloc((unsigned) (2 * max * TK_POS_CHARS));
+		if (num > 0) {
+		    memcpy(grown, ranges, (size_t) (2 * num * TK_POS_CHARS));
+		    ckfree(ranges);
+		}
+		ranges = grown;
+	    }
+	    TkTextPrintIndex(&start, ranges + 2 * num * TK_POS_CHARS);
+	    TkTextPrintIndex(atPtr, ranges + (2 * num + 1) * TK_POS_CHARS);
+	    num++;
+	}
+	on = 0;
+	if (!more) {
+	    break;
+	}
+    }
+
+    /*
+     * Nothing to change: not recorded.
+     */
+
+    whole = (num == 1) && (strcmp(ranges, i1) == 0)
+	    && (strcmp(ranges + TK_POS_CHARS, i2) == 0);
+    if ((add && whole) || (!add && (num == 0))) {
+	if (ranges != NULL) {
+	    ckfree(ranges);
+	}
+	TagWithRedraw(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+	return;
+    }
+
+    CaptureStart(textPtr, &cs, &captured, (TkTextIndex *) NULL,
+	    (TkTextIndex *) NULL);
+    TagWithRedraw(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+    CaptureEnd(textPtr, &cs);
+    if (mode >= 0) {
+	atomPtr = PushEdit(textPtr, mode, TK_TEXT_UNDO_TAG, i1, i2,
+		Tcl_NewStringObj(tagPtr->name, -1));
+    } else {
+	atomPtr = TkTextUndoPushAction(textPtr->undoStack, TK_TEXT_UNDO_TAG,
+		i1, i2, Tcl_NewStringObj(tagPtr->name, -1), (Tcl_Obj *) NULL,
+		(char *) NULL, 0);
+    }
+    atomPtr->added = add;
+    atomPtr->numRanges = num;
+    atomPtr->ranges = ranges;
+    atomPtr->values = captured;
+    UpdateDirtyFlag(textPtr);
 }
 
 /*
@@ -3381,6 +5758,8 @@ TextEditCmd(textPtr, interp, argc, args)
 	    Tcl_AppendResult(interp, "nothing to redo", NULL);
 	    return TCL_ERROR;
 	}
+	/* The next edit starts a step of its own (see "edit undo"). */
+	textPtr->lastEditMode = TK_TEXT_EDIT_OTHER;
     } else if ((c == 'r') && (strncmp(LangString(args[2]), "reset", length) == 0)
 	    && (length >= 3)) {
 	if (argc != 3) {
@@ -3389,6 +5768,7 @@ TextEditCmd(textPtr, interp, argc, args)
 	    return TCL_ERROR;
 	}
 	TkTextUndoClearStacks(textPtr->undoStack);
+	textPtr->lastEditMode = TK_TEXT_EDIT_OTHER;
     } else if ((c == 's') && (strncmp(LangString(args[2]), "separator", length) == 0)) {
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -3406,6 +5786,14 @@ TextEditCmd(textPtr, interp, argc, args)
 	    Tcl_AppendResult(interp, "nothing to undo", NULL);
 	    return TCL_ERROR;
 	}
+	/*
+	 * The next edit starts a step of its own.  Otherwise a deletion
+	 * after the undo of a deletion would see "the same kind as the
+	 * last edit", insert no separator, and join whatever step is now
+	 * on top of the undo stack (an earlier insertion, say), which a
+	 * second undo would then take back as well.
+	 */
+	textPtr->lastEditMode = TK_TEXT_EDIT_OTHER;
     } else {
 	Tcl_AppendResult(interp, "bad edit option \"", LangString(args[2]),
 		"\": must be modified, redo, reset, separator or undo", NULL);
@@ -3421,7 +5809,10 @@ TextEditCmd(textPtr, interp, argc, args)
  *
  *	Collect the contents of a range the way "block list" reports
  *	them: strings, tag toggles, marks, blocks with their structure,
- *	windows and images, as a list of blessed objects.
+ *	windows and images, as a list of blessed objects; for the undo,
+ *	so without the node values (which the undo atom records with
+ *	their addresses, see TkTextValue: a copy in the list would keep
+ *	a value alive after its node has let it go).
  *
  * Results:
  *	A new reference to the list (to be released by the caller).
@@ -3446,15 +5837,48 @@ TextGetList(textPtr, index1Ptr, index2Ptr)
 
     ListFactoryInit(&listFactory);
     LangSetString(&arg, "");
+
+    /*
+     * A tag that ends exactly at the start of the range has its
+     * off-toggle there, which belongs to the text on its left and is
+     * not listed: the list would not mention the tag, and the undo
+     * would let the text it re-inserts take the tag if the tag is on
+     * again after the range (Tk's insertion rule).  An off-toggle at
+     * the start of the list says that the text has it off.
+     */
+
+    {
+	TkTextIndex intIndex;
+	TkTextSegment *segPtr;
+	int count = 0;
+
+	TkTextIndexToInternalSeg(index1Ptr, &intIndex, (int *) NULL);
+	for (segPtr = intIndex.linePtr->segPtr;
+		(segPtr != NULL) && (count <= intIndex.byteIndex);
+		count += segPtr->size, segPtr = segPtr->nextPtr) {
+	    if ((count == intIndex.byteIndex) && (segPtr->size > 0)) {
+		break;
+	    }
+	    if ((count == intIndex.byteIndex)
+		    && (segPtr->typePtr == &tkTextToggleOffType)) {
+		LangSetString(&arg, segPtr->body.toggle.tagPtr->name);
+		ListFactoryAppendCopyWithType(&listFactory, arg,
+			"Tk::Text::TagOff");
+	    }
+	}
+	LangSetString(&arg, "");
+    }
     while (linePtr != index2Ptr->linePtr) {
 	TkBTreeLineTextAppend(textPtr, linePtr, offset, -1,
-		(void *) &listFactory, textPtr->getFlags | TKT_GET_LIST, NULL);
+		(void *) &listFactory,
+		textPtr->getFlags | TKT_GET_LIST | TKT_GET_NOVALUES, NULL);
 	offset = -1;
 	ListFactoryAppendCopyWithType(&listFactory, arg, "Tk::Text::NewLine");
 	linePtr = TkBTreeNextLine(linePtr);
     }
     TkBTreeLineTextAppend(textPtr, linePtr, offset, index2Ptr->byteIndex,
-	    (void *) &listFactory, textPtr->getFlags | TKT_GET_LIST, NULL);
+	    (void *) &listFactory,
+	    textPtr->getFlags | TKT_GET_LIST | TKT_GET_NOVALUES, NULL);
     LangFreeArg(arg, LANG_DYNAMIC);
     result = newRV_inc((SV *) ListFactoryArg(&listFactory));
     ListFactoryFree(&listFactory);
@@ -3512,9 +5936,10 @@ MarkOp(textPtr, op, name, extra)
  *	Re-create at a position the contents of a range as "block list"
  *	reported them (see TextGetList): the text with its tags, the
  *	marks (except "insert" and "current"), the blocks with their
- *	structure and instance data, and the embedded images and
- *	windows (see InsertEmbedded; Tk's text widget does not restore
- *	those).
+ *	structure and instance data (the lists of the undo have none:
+ *	TK_TEXT_VALUE_BLOCK records give it back), and the embedded
+ *	images and windows (see InsertEmbedded; Tk's text widget does
+ *	not restore those).
  *	The insertion point is a right-gravity mark, so that it stays
  *	after everything inserted; a block is created empty and filled
  *	through a mark just inside it, the way the demo loads documents.
@@ -3548,6 +5973,10 @@ InsertList(textPtr, indexPtr, listObj)
     state.numPending = state.maxPending = 0;
     state.rightMarks = NULL;
     state.numRight = state.maxRight = 0;
+    state.tags = NULL;
+    state.tagOn = NULL;
+    state.numTags = 0;
+    ScanListTags(textPtr, (AV *) SvRV((SV *) listObj), 0, &state);
 
     /*
      * Two marks: a right-gravity one that stays after everything
@@ -3593,6 +6022,125 @@ InsertList(textPtr, indexPtr, listObj)
     if (state.rightMarks != NULL) {
 	ckfree((char *) state.rightMarks);
     }
+    if (state.tags != NULL) {
+	ckfree((char *) state.tags);
+	ckfree(state.tagOn);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ScanListTags, ListTagName, InsertListText --
+ *
+ *	Text inserted inside a tagged range takes the tag (Tk's rule for
+ *	insertion), but text re-created from a list must have the tags
+ *	the list gives it, no more: the undo of a deletion that joined
+ *	two ranges of a tag must bring back the untagged text between
+ *	them.  ScanListTags finds the tags the list switches on or off
+ *	somewhere and whether each is on at its start (its first toggle
+ *	is an off-toggle); InsertListText inserts a piece of text and
+ *	takes from it those of these tags that are off at that point of
+ *	the list.  A tag the list does not mention was the same all over
+ *	the range; the insertion rule gives it as it was.  ListTagName
+ *	is the name in a TagOn or TagOff element (a TagOn of a run with
+ *	a value is a list [name, value], see "tag data").
+ *
+ *----------------------------------------------------------------------
+ */
+
+static char *
+ListTagName(inner)
+    SV *inner;			/* The referent of the element. */
+{
+    if (SvTYPE(inner) == SVt_PVAV) {
+	SV **svp = av_fetch((AV *) inner, 0, 0);
+
+	return (svp != NULL) ? SvPV_nolen(*svp) : "";
+    }
+    return SvPV_nolen(inner);
+}
+
+static void
+ScanListTags(textPtr, av, first, statePtr)
+    TkText *textPtr;		/* Overall information about text widget. */
+    AV *av;			/* The elements. */
+    int first;			/* Index of the first element to use. */
+    InsertState *statePtr;	/* Where the tags go. */
+{
+    int i, j, n = av_len(av) + 1, on;
+    SV **svp, *elt;
+    TkTextTag *tagPtr;
+
+    for (i = first; i < n; i++) {
+	svp = av_fetch(av, i, 0);
+	if ((svp == NULL) || !SvROK(*svp) || !sv_isobject(*svp)) {
+	    continue;
+	}
+	elt = *svp;
+	if (sv_derived_from(elt, "Tk::Text::Block")
+		&& (SvTYPE(SvRV(elt)) == SVt_PVAV)) {
+	    ScanListTags(textPtr, (AV *) SvRV(elt), 1, statePtr);
+	    continue;
+	}
+	if (sv_derived_from(elt, "Tk::Text::TagOn")) {
+	    on = 1;
+	} else if (sv_derived_from(elt, "Tk::Text::TagOff")) {
+	    on = 0;
+	} else {
+	    continue;
+	}
+	tagPtr = TkTextCreateTag(textPtr, ListTagName(SvRV(elt)));
+	for (j = 0; j < statePtr->numTags; j++) {
+	    if (statePtr->tags[j] == tagPtr) {
+		break;
+	    }
+	}
+	if (j == statePtr->numTags) {
+	    /*
+	     * First seen: on at the start of the list if this is an
+	     * off-toggle.
+	     */
+
+	    TkTextTag **tags = (TkTextTag **) ckalloc((unsigned)
+		    ((j + 1) * sizeof(TkTextTag *)));
+	    char *tagOn = ckalloc((unsigned) (j + 1));
+
+	    if (j > 0) {
+		memcpy(tags, statePtr->tags, j * sizeof(TkTextTag *));
+		memcpy(tagOn, statePtr->tagOn, (size_t) j);
+		ckfree((char *) statePtr->tags);
+		ckfree(statePtr->tagOn);
+	    }
+	    statePtr->tags = tags;
+	    statePtr->tagOn = tagOn;
+	    statePtr->tags[j] = tagPtr;
+	    statePtr->tagOn[j] = !on;
+	    statePtr->numTags++;
+	}
+    }
+}
+
+static void
+InsertListText(textPtr, markName, indexPtr, string, statePtr)
+    TkText *textPtr;		/* Overall information about text widget. */
+    char *markName;		/* The mark after the insertion point. */
+    TkTextIndex *indexPtr;	/* Where to insert. */
+    char *string;		/* What. */
+    InsertState *statePtr;	/* The tags of the list and their state. */
+{
+    TkTextIndex start = *indexPtr, end;
+    int j;
+
+    InsertChars(textPtr, indexPtr, string);
+    if (TkTextMarkNameToIndex(textPtr, markName, &end) != TCL_OK) {
+	return;
+    }
+    for (j = 0; j < statePtr->numTags; j++) {
+	if (!statePtr->tagOn[j] && (TkTextIndexCmp(&start, &end) < 0)) {
+	    TkBTreeTag(&start, &end, statePtr->tags[j], 0);
+	}
+    }
 }
 
 static void
@@ -3625,14 +6173,19 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 	    str = SvPVutf8_nolen(inner);
 	    len = (int) strlen(str);
 	    if (len > 0) {
-		InsertChars(textPtr, &index, str);
+		InsertListText(textPtr, markName, &index, str, statePtr);
 	    }
 	} else if (sv_derived_from(elt, "Tk::Text::NewLine")) {
 	    /* A marker only: the newline is part of the string before. */
 	} else if (sv_derived_from(elt, "Tk::Text::TagOn")) {
-	    TkTextTag *tagPtr = TkTextCreateTag(textPtr, SvPV_nolen(inner));
+	    TkTextTag *tagPtr = TkTextCreateTag(textPtr, ListTagName(inner));
 	    PendingTag *pPtr;
 
+	    for (j = 0; j < statePtr->numTags; j++) {
+		if (statePtr->tags[j] == tagPtr) {
+		    statePtr->tagOn[j] = 1;
+		}
+	    }
 	    for (j = 0; j < statePtr->numPending; j++) {
 		if (statePtr->pending[j].tagPtr == tagPtr) {
 		    break;
@@ -3661,9 +6214,14 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 	    TkTextSetMark(textPtr, pPtr->mark, &index);
 	    MarkOp(textPtr, "gravity", pPtr->mark, "left");
 	} else if (sv_derived_from(elt, "Tk::Text::TagOff")) {
-	    TkTextTag *tagPtr = TkTextCreateTag(textPtr, SvPV_nolen(inner));
+	    TkTextTag *tagPtr = TkTextCreateTag(textPtr, ListTagName(inner));
 	    char *from = startMark;
 
+	    for (j = 0; j < statePtr->numTags; j++) {
+		if (statePtr->tags[j] == tagPtr) {
+		    statePtr->tagOn[j] = 0;
+		}
+	    }
 	    for (j = 0; j < statePtr->numPending; j++) {
 		if (statePtr->pending[j].tagPtr == tagPtr) {
 		    from = statePtr->pending[j].mark;
@@ -3681,10 +6239,25 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 	    }
 	} else if (sv_derived_from(elt, "Tk::Text::MarkLeft")
 		|| sv_derived_from(elt, "Tk::Text::MarkRight")) {
-	    str = SvPV_nolen(inner);
+	    /*
+	     * A reference to the name, or [name, value] for a mark with
+	     * a value ("mark data"), which the mark gets as the Lang part
+	     * of its data (the Lang part it had is freed when the widget
+	     * command returns; the other slots stay).
+	     */
+
+	    str = ListTagName(inner);
 	    if ((strcmp(str, "insert") != 0) && (strcmp(str, "current") != 0)
 		    && (str[0] != '#')) {
-		TkTextSetMark(textPtr, str, &index);
+		TkTextSegment *markPtr = TkTextSetMark(textPtr, str, &index);
+
+		if (SvTYPE(inner) == SVt_PVAV) {
+		    SV **vp = av_fetch((AV *) inner, 1, 0);
+		    Arg old = TkTextDataPutLang(&markPtr->body.mark.value,
+			    ((vp != NULL) && SvOK(*vp)) ? LangCopyArg(*vp) : NULL);
+
+		    TkTextFreeValueLater(textPtr, TkTextDataFromLang(old));
+		}
 		MarkOp(textPtr, "gravity", str, "left");
 		if (sv_derived_from(elt, "Tk::Text::MarkRight")) {
 		    /*
@@ -3718,7 +6291,7 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 		TkTextChanged(textPtr, &index, &index);
 		TkIBTreeSplit(&index, level);
 	    } else {
-		InsertChars(textPtr, &index, "\n");
+		InsertListText(textPtr, markName, &index, "\n", statePtr);
 	    }
 	} else if (sv_derived_from(elt, "Tk::Text::Block")
 		|| sv_derived_from(elt, "Tk::Text::Empty")) {
@@ -3729,6 +6302,7 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 	    Tcl_HashEntry *hPtr;
 	    TkTextBlock *blockPtr = NULL;
 	    TkTextSegment *segPtr;
+	    TkTextIndex tailEnd;
 	    char innerMark[40];
 
 	    if (SvTYPE((SV *) bav) != SVt_PVAV) {
@@ -3768,10 +6342,37 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 		}
 		continue;
 	    }
+	    if (TkBTreeLineIndex(index.linePtr)
+		    == TkBTreeNumLines(textPtr->tree)) {
+		/*
+		 * Never on the last (dummy) line, which must stay empty:
+		 * at the end of the line before it, as "insert" and
+		 * "block insert" do.  (The undo of a change can come here
+		 * at "end" when the indices it recorded are stale.)
+		 */
+
+		TkTextMakeByteIndex(textPtr->tree,
+			TkBTreeLineIndex(index.linePtr) - 1, 1000000, &index);
+	    }
 	    TkTextChanged(textPtr, &index, &index);
 	    if (TkBTreeMakeBlock(textPtr, &index, &index, blockPtr) != TCL_OK) {
 		Tcl_ResetResult(textPtr->interp);
 		continue;
+	    }
+
+	    /*
+	     * The new block (its head and tail, and so what goes in it)
+	     * has the tags of the place it was made in, by the insertion
+	     * rule: the tags the list has off at this point come off it,
+	     * as off text (InsertListText).  A deletion that joined two
+	     * runs of a tag around a block gave the block the tag back.
+	     */
+
+	    TkTextIndexForwBytes(&index, isEmpty ? 1 : 2, &index2);
+	    for (j = 0; j < statePtr->numTags; j++) {
+		if (!statePtr->tagOn[j]) {
+		    TkBTreeTag(&index, &index2, statePtr->tags[j], 0);
+		}
 	    }
 	    segPtr = TkIBTreeAt(&index, 0);
 	    if (!isEmpty && (segPtr != NULL)) {
@@ -3785,7 +6386,39 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 		InsertListElements(textPtr, innerMark, startMark, bav, 1,
 			statePtr);
 		MarkOp(textPtr, "unset", innerMark, (char *) NULL);
-		undoMarkCount--;
+
+		/*
+		 * The count is not taken back: a pending tag's mark made
+		 * inside the block has a later number, which the next
+		 * mark would get again (and move, then unset).
+		 */
+
+		/*
+		 * The separators make the tree only as deep as the level
+		 * where all the leaves meet: a root with a single child
+		 * that is not a leaf needs the depth of the header.
+		 */
+
+		if (head != NULL) {
+		    hp = av_fetch(head, 1, 0);
+		    if ((hp != NULL) && SvOK(*hp)) {
+			TkIBTreeDeepen(segPtr, (int) SvIV(*hp));
+		    }
+		}
+
+		/*
+		 * The tail kept the tags the block was made with: those
+		 * the list has switched off inside it come off the tail
+		 * too (it belongs to the end of the contents).
+		 */
+
+		TkTextIndexForwBytes(&index, segPtr->size - 1, &index2);
+		TkTextIndexForwBytes(&index2, 1, &tailEnd);
+		for (j = 0; j < statePtr->numTags; j++) {
+		    if (!statePtr->tagOn[j]) {
+			TkBTreeTag(&index2, &tailEnd, statePtr->tags[j], 0);
+		    }
+		}
 	    }
 	    if ((segPtr != NULL) && (dataSv != NULL) && SvOK(dataSv)) {
 		Arg arga[2];

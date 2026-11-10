@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Builtins;   # builtins run by the large subset: one function per builtin (B1-B3 of "Shell Corpus Gaps")
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use strict; use warnings; use feature 'current_sub';
 use Proc::ShellSpawn;
 BEGIN { no strict 'refs'; *$_ = \&{"Proc::ShellSpawn::$_"} for qw(defer fail msg put var spawn find_cmd) }
@@ -67,7 +67,7 @@ sub b_hash {
   if ($a[0] eq '-r') { %$h = (); return defer($k, 0) }
   my @bad;
   for (@a) { next if $DASHBI{$_} || $c->{sh}{cmd}{$_}; my ($p) = find_cmd($c, $_, var($c, 'PATH'));
-    if (defined $p) { $h->{$_} = $p unless m{/} } else { push @bad, $_ } }
+    if (defined $p) { $h->{$_} = $p unless Proc::ShellSpawn::has_dir($_) } else { push @bad, $_ } }
   my $st = @bad ? 1 : 0;   # one message per name not found, each after the one before
   sub { my $next = __SUB__; @bad ? msg($c, "hash: " . shift(@bad) . ": not found", $next) : $k->($st) }->() }
 sub b_type {
@@ -78,8 +78,8 @@ sub b_type {
     elsif ($sh->{cmd}{$n}) { $t .= "$n is a shell function\n" }
     elsif ($Proc::ShellSpawn::SPECIAL{$n}) { $t .= "$n is a special shell builtin\n" }
     elsif ($DASHBI{$n}) { $t .= "$n is a shell builtin\n" }
-    elsif ($n !~ m{/} && $sh->{hash}{$n}) { $t .= "$n is a tracked alias for $sh->{hash}{$n}\n" }
-    else { my ($p) = $n =~ m{/} ? (-x ($n =~ m{^/} ? $n : "$sh->{cwd}/$n") && !-d _ ? $n : undef) : find_cmd($c, $n, var($c, 'PATH'));
+    elsif (!Proc::ShellSpawn::has_dir($n) && $sh->{hash}{$n}) { $t .= "$n is a tracked alias for $sh->{hash}{$n}\n" }
+    else { my ($p) = Proc::ShellSpawn::has_dir($n) ? (-x Proc::ShellSpawn::path_in($c, $n) && !-d _ ? $n : undef) : find_cmd($c, $n, var($c, 'PATH'));
       if (defined $p) { $t .= "$n is $p\n" } else { $t .= "$n: not found\n"; $st = 127 } } }
   put($c, 1, $t, done($k, $st)) }
 sub b_times {   # the shell's own and its children's user and system time

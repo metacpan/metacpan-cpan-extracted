@@ -33,8 +33,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "1.50",
-            "Cpanel::JSON::XS" : "4.37",
-            "DBD::Mock" : "1.59",
+            "Cpanel::JSON::XS" : "4.80",
+            "DBD::Mock" : "1.60",
             "Data::Walk" : "2.01",
             "English" : "1.11",
             "File::Path" : "2.18",
@@ -42,6 +42,7 @@
             "File::Spec" : "3.75",
             "File::Which" : "1.27",
             "Readonly" : "2.05",
+            "Sub::Exporter" : "0.992",
             "Sub::Override" : "0.12",
             "Try::Tiny" : "0.32",
             "perl" : "5.014004"
@@ -51,9 +52,9 @@
          "requires" : {
             "DBD::SQLite" : "1.74",
             "DBD::mysql" : "5.012",
-            "DBI" : "1.643",
-            "Exporter::NoWork" : "0.03",
-            "Rose::DB" : "0.786",
+            "DBI" : "1.656",
+            "Exporter::Shiny" : "1.006003",
+            "Rose::DB" : "0.788",
             "Rose::DB::MySQL" : "0.774",
             "Rose::DB::Object" : "0.822",
             "Rose::DB::Object::Loader" : "0.799",
@@ -72,6 +73,6 @@
          "url" : "https://github.com/DragosTrif/DBD-Fixtures"
       }
    },
-   "version" : 1.16,
+   "version" : 1.17,
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -5,6 +5,8 @@ textblocks - additional text widget subcommand for Tk distribution.
 =head1 SYNOPSIS
 
   .widgetName block subcommand ?opt opt ...?
+  .widgetName mark data markName ?value?
+  .widgetName tag data tagName index ?value?
   .widgetName configure -getFlags integer
 
 =head2 What else is in the widget?
@@ -33,13 +35,25 @@ C<Tk::Text::String>, I<class id> is C<S>.
 
 The contents is the name of the mark, the classes are
 C<Tk::Text::MarkLeft> with I<id> C<L>, and C<Tk::Text::MarkRight> with
-I<id> C<R>.
+I<id> C<R>.  A mark that has a value (see L<Values>) is listed as a
+list of the name and a copy of the value, C<[name, value]>, instead of
+a reference to the name, as for tags.  When a list is inserted back
+(the undo does this with its own lists), a mark element of this form
+gives the mark that value (the value the mark had is freed when the
+widget command returns); a reference to a name leaves the value of an
+existing mark as it is.  The marks C<insert> and C<current> are not
+set from a list, nor are their values.
 
 =item Tags
 
 The contents is the name of the tag, the classes are
 C<Tk::Text::TagOn> with I<id> C<T>, and C<Tk::Text::TagOff> with
-I<id> C<t>.
+I<id> C<t>.  The start of a run of a tag that has a value (see
+L<Values>) is a C<Tk::Text::TagOn> holding a list of the name and a
+copy of the value, C<[name, value]>, instead of a reference to the
+name; code that reads the name should accept both forms:
+
+  my $name = UNIVERSAL::isa($elt, 'ARRAY') ? $elt->[0] : $$elt;
 
 =item Window
 
@@ -67,7 +81,15 @@ A block is dumped as a list of
 =item type
 
 The first element is a list of I<block name>, I<depth> and (optionally)
-I<instance data>.
+I<instance data> and I<node values>.  The node values are there when
+a node of the block has a value (see L<Values>) and the whole block is
+in the listed range; the third element is then C<undef> if the block
+has no instance data.  They are written as the tree: a node as a list
+of its value followed by its children, a leaf as a list of its value,
+with C<undef> for a node without a value.  For a fraction with value
+C<R> on the root and C<N> on the numerator the first element is
+
+  ['Fraction', 0, undef, ['R', ['N'], [undef]]]
 
 =item contents
 
@@ -76,8 +98,9 @@ form as the top-level dump, with exception for inter-leaf separators.
 
 The inter-leaf separators are dumped as on object of class
 C<Tk::Text::BlockSeparator>, with I<id> C<|>, the contents being the
-"depth" of the separator. Note that the minimal possible depth is 1
-for separators between leaves of the same parent.
+"depth" of the separator. Note that the minimal possible depth is 0,
+for separators between leaves of the same parent; 1 is a separator
+between leaves whose parents are siblings, and so on.
 
 =back
 
@@ -233,7 +256,9 @@ implemented)>.
 
 Characters inside leaves can be tagged in the usual way. Interleaf
 separators and tail of the block behave like end-of-lines when
-tagged. The behaviour of tags on the start of block is undefined.
+tagged. C<tag names> at the start of a block reports the tags in
+effect there; for drawing, a tag that switches off inside the block
+does not style the block as a whole.
 
 =head2 Bounding boxes
 
@@ -551,7 +576,33 @@ In the latter case I<index1> and I<index2> should be outside of any
 block, or properly inside the same block. The newlines (or,
 correspondingly, interleaf separators of enclosing block) are
 converted into interleaf separators of newly created block.  This is
-prohibited for I<empty> blocks.
+prohibited for I<empty> blocks.  An I<index2> before I<index1> is an
+error.
+
+More precisely: both indices outside of any block, or both inside the
+same block (the innermost block around each is the same) are
+accepted; ends in different blocks are an error.  A range inside a
+block may cross leaves of that block, and nodes of its tree too.  The
+leaves moved (whole, or the part of the first one after I<index1> and
+the part of the last one before I<index2>) become immediate children
+of the single node of the new block, in their order: whatever
+structure they had in the enclosing block (the nodes above them) is
+flattened, and the separators between them, whatever their depth,
+become separators of depth 0 of the new block.  Blocks nested in the
+range move into the new block unchanged.  In the enclosing block, the
+parts of the first and the last leaf left outside the range (with the
+new block between them) are one leaf, which stays where the first
+leaf was; nodes left without leaves disappear, but the other nodes
+are not joined.  With C<{ab|cd|ef|gh}> on line 1, whose root has two
+nodes, one with the leaves C<ab> and C<cd>, the other with C<ef> and
+C<gh>, C<block insert G 1.2 1.9> (over C<b|cd|ef>) gives
+C<{a{b|cd|ef}|gh}>: the leaves C<b>, C<cd> and C<ef> of the new block
+are children of its single node, and the root of the outer block
+still has two nodes, one with the leaf C<a{b|cd|ef}>, the other with
+C<gh>.  (What happens to the values of the nodes involved is in
+L<Node values and editing>.)
+
+Recorded for undo; see L<Undo and redo of block and tag changes>.
 
 =item B<names>
 
@@ -605,17 +656,33 @@ extended to the left first. The added nodes have one child each.
 
 =back
 
+Returns the number of levels added above the root (-1 outside of
+blocks).  Recorded for undo; see L<Undo and redo of block and tag
+changes>.  An I<index> on the last (dummy) line is taken as the end
+of the line before it, as for C<insert>.
+
 
 =item B<trim> I<index>
 
 If the block at index has only one edge coming from the root, and this
 edge does not end in a leaf, deletes the root. The resulting tree will
 be 1 level more shallow. Returns error if out of block or the above
-conditions are not met.
+conditions are not met.  Recorded for undo; see L<Undo and redo of
+block and tag changes>.
 
 =item B<data> I<index ?data?>
 
 Returns or sets I<instance data> information for the block at C<index>.
+
+=item B<nodedata> I<index level ?value?>
+
+Returns or sets the value kept with a node of the tree of the block
+containing I<index>: the leaf I<index> names if I<level> is 0, its
+parent if it is 1, and so on; the root if I<level> is -1, a child of
+the root on the way to the leaf if it is -2, and so on.  Returns the
+value (an empty result, C<undef> in Perl, if the node has none); with
+I<value>, sets it and returns nothing, C<undef> removing the value.
+See L<Values>, which tells which leaf a position names.
 
 =item B<addline> I<index>
 
@@ -636,9 +703,809 @@ See L<What else is in the widget?>.
 
 =back
 
+=head1 Mark and tag subcommands
+
+The C<mark> and C<tag> subcommands are those of the Tk text widget,
+with one more each:
+
+=over 7
+
+=item B<mark data> I<markName ?value?>
+
+Returns or sets the value kept with the mark I<markName>.  Returns the
+value (an empty result, C<undef> in Perl, if the mark has none); with
+I<value>, sets it and returns nothing, C<undef> removing the value.  A
+mark that does not exist is an error (C<there is no mark named
+"m">).  See L<Values>.
+
+=item B<tag data> I<tagName index ?value?>
+
+Returns or sets the value kept with the run of the tag I<tagName> that
+contains the character at I<index>.  Returns the value (an empty
+result, C<undef> in Perl, if the run has none); with I<value>, sets
+it and returns nothing, C<undef> removing the value.  A character
+without the tag is an error (C<no run of tag "b" at 1.6>), as is a
+tag that does not exist.  See L<Values>.
+
+=back
+
+=head1 The dump subcommand
+
+  .t dump ?-all -text -mark -tag -window -image -block -values? ?-command script? index ?index2?
+
+C<dump> is Tk's, and looks into blocks: the text, marks, tag toggles,
+windows and images inside a block are reported with their (external)
+indices; with C<-block> (part of C<-all>) a C<block> entry (the block
+type, at the block's head) and a C<blockend> entry (after its tail)
+surround them.
+
+With C<-values> (not part of C<-all>; alone it means C<-all
+-values>), every entry gets a fourth field: for a C<mark> entry, the
+value of the mark (C<mark data>), for a C<tagon> entry, the value of
+the run the toggle starts (C<tag data>), a copy in either case; for
+every other entry, and for marks and runs without a value, C<undef>
+(an empty string in Tcl).  So the result stays a list of entries of
+one length, four elements each instead of three.  A C<-command>
+callback gets the fourth field as a fourth argument (without
+C<-values> it gets three, as before).  The values of block nodes
+(C<block nodedata>) and the instance data of blocks (C<block data>)
+are not in the dump: a block carries a tree of them, which C<block
+list> shows (the header of a C<Tk::Text::Block>); the C<block>,
+C<blockend>, C<tagoff>, C<text>, C<window> and C<image> entries have
+C<undef>.  Without C<-values> the dump is as before.
+
+  .t dump -mark -values 1.0 end
+  ;# mark m 1.2 mv  mark insert 3.0 {}  ...
+
+=head1 Undo and redo of block and tag changes
+
+With C<-undo> on, C<block insert>, C<block split>, C<block trim>,
+C<tag add> and C<tag remove> are recorded for C<edit undo>, as
+insertions and deletions are (Tk's text widget records neither tags
+nor, of course, blocks).  The undo reverses each of them, the redo
+does it again:
+
+=over 5
+
+=item *
+
+C<block split>: the undo deletes the separator the split put in; the
+deletion joins the two leaves, and the nodes the split cut, up to
+their common ancestor (see L<Deletion of text in blocks>); levels the
+split added above the root are taken away again (as C<block trim>
+would).  Outside blocks the split put in a newline, which the undo
+deletes.
+
+=item *
+
+C<block insert>: the undo dissolves the new block by deleting its head
+(see L<Destruction of blocks>): its contents come back where they
+were, with their tags, marks and nested blocks.  The values of the
+leaves the block insert moved whole into the block go back to those
+leaves, the joins and merges it made are undone (see L<Node values and
+editing>), and its instance data (C<block data>) and the values of its
+own nodes are kept in the undo step for the redo.  If the range of the
+block insert crossed nodes of an enclosing block (see C<block insert>
+in L<Block subcommands>), the undo also gives every separator of the
+range, and the one after it, the level it had, so that the nodes of
+the enclosing block are those before the block insert, and the values
+of the nodes block insert emptied, or left on the end side, come back
+to them.  No text moves for that, and the undo is one step, as
+always.
+
+=item *
+
+C<block trim>: the undo adds the root again, with the value it had.
+
+=item *
+
+C<tag add> and C<tag remove> over a range: the undo gives the tag in
+that range exactly the ranges it had there before, the run values
+included (a run that tag add extended keeps its value on the part that
+remains, the values of the runs it merged come back).  Changes of the
+tag C<sel> (the selection) are not recorded, nor are those that change
+nothing (adding a tag where it is all over the range, removing it
+where it is nowhere).
+
+=back
+
+A redo checks again what the command checks: if the change cannot be
+made again (the block type of a C<block insert> was deleted, or made
+C<-empty> while the range is not empty; the block a C<block trim>
+worked on is gone or cannot be trimmed), the redo does nothing, and
+the values its undo step keeps are freed when the step is discarded.
+
+What these changes drop goes into their undo step as for deletions
+(see L<Undo and redo>): the losers of joins and merges, the nodes
+block insert empties, a root block trim drops, the runs tag remove
+removes; the undo gives them back, the redo takes them again.
+
+Each of these changes is a kind of edit of its own for
+C<-autoseparators>, as insertions and deletions are: following Tk's
+rule, a separator goes into the undo history when a change is of
+another kind than the last one, so that a run of changes of the same
+kind (several C<tag add> in a row, as typing is a run of insertions)
+is one undo step, and a change of another kind starts a new one
+(C<tag add> and C<tag remove> are two kinds, as insertion and deletion
+are).  To make one step of several changes of different kinds, switch
+C<-autoseparators> off and put in C<edit separator> yourself.  A
+program that uses tags for display only (highlighting found text, say)
+can switch C<-undo> off around those calls: tags do not move text, so
+the history stays valid.  These changes also count for C<edit
+modified>, as insertions and deletions do, with C<-undo> off too
+(but for those of C<sel> and those that change nothing); a program
+that highlights can keep the flag with C<edit modified> around the
+calls.
+
+Not recorded (so not undone, and what they drop is freed when they
+return): C<tag delete>, C<tag configure>, C<mark set>, C<mark unset>,
+C<block delete>, C<block configure>, and the setting of values
+(C<block data>, C<block nodedata>, C<mark data>, C<tag data>).
+
+=head1 Values
+
+A Perl scalar can be kept with every node of the tree of a block (the
+leaves included), with every mark and with every run of a tag:
+
+  .t block nodedata index level ?value?
+  .t mark data markName ?value?
+  .t tag data tagName index ?value?
+
+In Perl these are C<< $t->blockNodedata($index, $level, ?$value?) >>,
+C<< $t->markData($name, ?$value?) >> and C<< $t->tagData($tag, $index,
+?$value?) >>.  Without a value they return the value, or C<undef> if
+there is none; with a value they set it, and setting C<undef> removes
+the value.  The values are data only: the display does not depend on
+them (setting a node value does not redisplay the block, and the
+layout callback does not receive node values), and C<dump> reports
+those of marks and runs only with C<-values> (see L<The dump
+subcommand>).  They stay with their node, mark or run through edits,
+come back with undo, and are freed at the moments listed in L<When
+values are freed>.
+
+=head2 Which node, which run
+
+The position given to C<block nodedata> names a leaf of the innermost
+block it is inside:
+
+=over 5
+
+=item *
+
+a character of a leaf (or a block nested in it, or an I<empty> block,
+which occupies one index unit of the leaf) names that leaf;
+
+=item *
+
+an interleaf separator, and the tail of the block, name the leaf
+before them;
+
+=item *
+
+the head of a block belongs to the enclosing structure, as for
+insertion (see L<Insertion in blocks>): it names a leaf of the
+enclosing block, and is an error outside of blocks.
+
+=back
+
+An empty block has no leaves, hence no node values.  A position
+outside of every block is an error (C<bad index "2.0": not inside a
+block>).
+
+The I<level> picks the leaf (0) or one of its ancestors: 1 is the
+parent of the leaf, 2 the parent of that node, and so on.  A negative
+level counts down from the root: -1 is the root, -2 the child of the
+root on the way to the leaf, and so on.  A node is reached from every
+position in it, the root from every position in the block.  A level
+beyond the root, or a negative level below the leaf, is an error.
+With a fraction C<{num|den}> on line 2 (head 2.0, C<num> 2.1-2.3, the
+separator 2.4, C<den> 2.5-2.7, the tail 2.8):
+
+  .t block nodedata 2.2 0 N	;# the leaf num
+  .t block nodedata 2.4 0	;# N: the separator names num
+  .t block nodedata 2.8 0	;# the tail names den: nothing
+  .t block nodedata 2.6 -1 R	;# the root (level 1 here)
+  .t block nodedata 2.2 -2	;# N: down from the root, the leaf
+  .t block nodedata 2.0 0	;# bad index "2.0": not inside a block
+  .t block nodedata 2.2 2	;# bad level "2": the block containing
+				;#   2.2 has 1 level above its leaves
+
+A I<run> of a tag is a maximal stretch of characters carrying it.  It
+continues over line ends, interleaf separators, and heads and tails
+of blocks: a run that covers a block contains it.  C<tag data> names
+the run of the character at the position; every character of the run
+names the same run.
+
+=head2 Copies
+
+The widget keeps a copy of the scalar it is given, as C<block data>
+does, and reading returns a copy; the elements of C<block list> hold
+copies too.  A reference is copied as a reference: an object given as
+a value stays alive as long as the widget keeps the value.  So
+I<freeing> a value below means that the widget drops its copy; an
+object is destroyed (and its C<DESTROY> method runs) when its last
+reference goes.
+
+=head2 Node values and editing
+
+The values live in the tree, so they move with the text.
+
+=over 5
+
+=item *
+
+Insertion inside a leaf does not change values.  A newline inserted in
+a leaf (or C<block split> at level 0) splits it: the first part keeps
+the value, the new leaf starts without one.  C<block split> at a
+higher level does the same on each level: the node before the cut
+keeps its value, the new node after it starts without one.  Nodes it
+adds above the root start without values, except that the value of
+the root moves to the new root, so that level -1 keeps naming it.
+
+=item *
+
+A leaf whose text becomes empty keeps its value.
+
+=item *
+
+A deletion deletes a leaf, value and all, if the range holds all of
+its text together with the separator before it (the separator or tail
+after it need not be in the range), and a node if it holds all of its
+leaves in this way.  Otherwise the leaf where the range starts and the
+leaf where it ends are joined, and if they have different parents,
+their ancestors are joined on each level up to the common ancestor
+(see L<Deletion of text in blocks>).  On each level the joined node
+keeps the value of the node on the start side if it has one, else it
+takes the value of the node on the end side; the other value is freed.
+The starting leaf always survives a join, even when all of its text is
+in the range: in C<{num|mid|den}>, deleting C<mid|> keeps the value of
+C<mid> on the joined leaf (the inverse of inserting C<mid> and a
+newline at the start of C<den>), while deleting C<|mid> deletes the
+leaf C<mid> with its value.  The last of a block's nodes directly
+above the leaves also holds the block's tail, so a deletion never
+removes it whole (nor its ancestors below the root, which hold the
+tail too): when all its leaves are deleted, it is joined to the node
+before it, and its value follows the rule for joined nodes: it moves
+to that node if that node has no value, and is dropped otherwise.
+
+=item *
+
+A deletion that deletes a block deletes all of its node values; one
+that dissolves it (it holds its head or tail, see L<Destruction of
+blocks>) frees all of its node values too, the values of the leaves
+whose contents join the enclosing structure included.  The values in
+blocks nested in what is left stay with those blocks.
+
+=item *
+
+C<block trim> removes the root: the new root (its only child) keeps
+the value of the old root if it had one, else its own; the other value
+is freed.
+
+=item *
+
+C<block insert> inside a block moves leaves into the new block.  A
+leaf moved whole keeps its value as a leaf of the new block (a first
+leaf with nothing before I<index1>, and a last leaf with nothing after
+I<index2> but its separator, move whole).  Where I<index1> or
+I<index2> cuts a leaf, the part left in the enclosing block keeps the
+value and the moved part starts without one; the two parts left on
+both sides of the new block are one leaf, which keeps the value of the
+first if it has one, else takes the value of the second, the other
+being freed.  Nodes of the enclosing block left without leaves
+disappear, with their values.
+
+=back
+
+The I<instance data> of a block (C<block data>) is freed with the
+block, under the same rule as the values (L<When values are freed>).
+
+=head2 Run values and editing
+
+=over 5
+
+=item *
+
+When runs become one (C<tag add> over the gap between them, a deletion
+of the gap, a deletion of the head of a block between them), the run
+keeps the value of the leftmost of them that has one; the other values
+are freed.  A run whose text is all deleted takes no part.
+
+=item *
+
+A run shortened at either end (by C<tag remove> or a deletion)
+keeps its value.  A run cut in two (by C<tag remove> in its middle, or
+by text inserted with a list of tags that lacks the tag) leaves the
+value on the left part; the right part starts without one.  A run
+extended by C<tag add> keeps its value.
+
+=item *
+
+Text inserted inside a run without a list of tags, a newline included,
+is in the run (the inserted text takes the tags present on both sides,
+as in Tk); text inserted at the start or the end of a run is not.
+C<block split> and C<block insert> inside a run do not cut it;
+C<block insert> at the start of a run puts the start of the run, value
+and all, inside the new block.
+
+=item *
+
+A run whose text is all deleted, or which C<tag remove> covers
+entirely, is gone with its value.  C<tag delete> frees the values of
+all the runs of the tag.
+
+=back
+
+=head2 Mark values
+
+The value stays with the mark when it moves: C<mark set> on an
+existing mark, C<mark gravity>, edits (a deletion moves the marks of
+its range to its start), undo putting the mark back.  Edits never
+remove a mark, so they never free its value.  A mark set anew after
+C<mark unset>, also one re-created by an undo, starts without a value.
+The marks C<insert> and C<current> can have values too (C<mark unset>
+ignores them, as before).  C<block list> shows a mark with a value as
+C<[name, value]> (see L<What else is in the widget?>).
+
+=head2 When values are freed
+
+A node value is freed when it is replaced (or set to C<undef>), when
+its node is deleted, when its block is deleted or dissolved, when it
+loses a join (deletion, C<block insert>), when C<block trim> drops it,
+when C<block insert> empties its node, and when the widget is
+destroyed.  A mark value is freed when it is replaced (or set to
+C<undef>), when C<mark unset> removes the mark, and when the widget is
+destroyed.  A run value is freed when it is replaced (or set to
+C<undef>), when all the text of the run is deleted, when C<tag remove>
+covers the whole run, when C<tag delete> removes the tag, when it
+loses a merge, and when the widget is destroyed.  With C<-undo> on,
+the edits that can be undone (insertions, deletions, C<block insert>,
+C<block split>, C<block trim>, C<tag add>, C<tag remove>) do not free
+what they drop: it is kept by their undo step (L<Undo and redo>), and
+freed when the step is discarded.  Nothing
+else frees a value: in particular, setting other values, tag
+configuration, moves of marks and unrelated edits do not.
+
+Freeing a value can run Perl code (a C<DESTROY> method), so a value is
+never freed in the middle of a change: the values that a widget
+command drops are freed, in order, when that command returns (a Perl
+method or a binding that makes several widget calls frees after each
+of them).  A C<DESTROY> method may thus read the widget, and sees it
+as it is after the change: when a deletion of line 2 frees a value,
+the C<DESTROY> method sees the index C<end> one line up already.  It
+may change the widget too (see below); to know where the value was
+attached before it was detached, use C<-valuecommand> (see L<Telling
+the program: -valuecommand>).  When the widget is destroyed,
+its remaining values (those in the undo history included) are freed
+after it is gone, and a C<DESTROY> method that calls it gets the
+usual error for a destroyed widget.
+
+B<Changes made from a C<DESTROY> method.>  While the values a command
+dropped are being freed, a C<DESTROY> method may change the widget.
+Such a change is an undo step of its own: it does not merge into the
+step of the command that dropped the value, nor into the next change.
+The values it drops join the values being freed and are freed in the
+same pass, after those already waiting (so still before the Perl
+method that made the first command returns).  The values are freed in
+rounds: those the command dropped in round 1, those dropped by changes
+made from their C<DESTROY> methods in round 2, and so on.  A chain of
+such changes (a value freed by a change made from a C<DESTROY> method,
+whose own C<DESTROY> method changes the widget, and so on) has a
+limit, 10 to begin with: a change in the round of the limit is refused
+with the error C<cannot modify .t while its values are being freed, 10
+changes deep>, unless the object making it asks for more rounds (see
+below).  So a chain of 9 changes, in rounds 1 to 9, is always made.
+(2.04 refused every change while values were being freed, a stopgap
+until the program could learn where a value was before it was
+detached.)
+
+B<More rounds: DESTROYmult.>  When a change from a C<DESTROY> method
+is about to be made in the round of the limit, the widget asks the
+object whose C<DESTROY> method is attempting it, calling, in scalar
+context,
+
+  $more = $object->DESTROYmult($n, $limit);
+
+C<$n> is 1 for the first such request of this freeing pass, 2 for the
+next, and so on; C<$limit> is the current limit.  If C<$more> is a
+positive integer, the limit becomes C<$limit + $more> and the change
+is made; the next time the chain reaches the new limit, the widget
+calls C<DESTROYmult($n + 1, $limit + $more)>.  A method that always
+answers 5 is thus called with (1, 10), (2, 15), (3, 20) and so on.
+Other changes in a round below the raised limit are made without
+asking.  The change is refused as above, with the error naming the
+current limit (C<cannot modify .t while its values are being freed, 15
+changes deep> once it was raised by 5), if
+
+=over 5
+
+=item *
+
+the answer is 0, C<undef>, negative, not a number, or not an integer;
+
+=item *
+
+there is no object to ask (see below), or it is not a blessed object;
+
+=item *
+
+the object cannot C<DESTROYmult> (C<< !$object->can('DESTROYmult') >>;
+an inherited method, or one that C<can> reports, will do);
+
+=item *
+
+C<DESTROYmult> (or C<can>) dies: its error is reported as a background
+error (C<Tk::Error>), as those of the C<-valuecommand> callback are,
+and the answer counts as 0.
+
+=back
+
+A change that C<DESTROYmult> itself attempts is refused, without
+asking again.  The limit and the count of requests belong to one
+freeing pass, that is to one outermost widget command (a command made
+by Perl code that the freeing runs is part of the pass): the next
+command starts again with the limit 10 and request 1.  The call leaves
+C<$@> as it was; C<DESTROYmult> should not keep a reference to its
+object (it is being destroyed).
+
+B<Which object is asked.>  The object whose C<DESTROY> method is the
+innermost one running when the change is attempted, that is the
+C<DESTROY> method that makes the change, itself or through the
+subroutines it calls.  When a value is an object whose own C<DESTROY>
+makes the change, that is the value.  When the change is made by the
+C<DESTROY> method of an object held inside the value being freed (in
+an unblessed array or hash that is the value, or in a field of an
+object that is the value), that inner object is asked, not the value:
+its method is the one that knows what its change needs, and an
+unblessed value could not be asked at all.  Perl calls an object's
+C<DESTROY> method before it frees what the object holds, so an object
+held by the value is usually destroyed after the value's C<DESTROY>
+has returned; if the value's C<DESTROY> frees it itself (C<< delete
+$self->{child} >>), both are running, and the inner one is asked.  The
+object is found as C<caller> finds the arguments of a call (in
+C<@DB::args>): the first argument of the innermost C<DESTROY> method
+written in Perl, also when the method has shifted it.  A C<DESTROY>
+method that has replaced its C<@_> leaves nothing to ask.
+
+B<Commands refused while the -valuecommand runs.>  While the callback
+of C<-valuecommand> runs, the widget refuses the commands that would
+modify it, with the error C<cannot modify .t while its -valuecommand
+runs>: the command that called it has not made its change yet.
+Reading commands, and those that only change the view, work as usual.
+The rule: a command that would change something, or create a tag or a
+block type, is refused; a query of an existing one is not.  The
+commands refused are:
+
+=over 5
+
+=item *
+
+C<insert>, C<delete>, and C<configure> with options to set;
+
+=item *
+
+C<tag add>, C<tag remove>, C<tag delete>, C<tag raise>, C<tag
+lower>, C<tag data> when it sets something, and C<tag configure> and
+C<tag bind> when they set something or name a tag that does not exist
+(a query would create it);
+
+=item *
+
+C<mark set>, C<mark unset>, and C<mark gravity> and C<mark data> when
+they set something;
+
+=item *
+
+C<block insert>, C<block split>, C<block trim>, C<block delete>,
+C<block configure> when it sets something or names a block type that
+does not exist (a query would create it),
+C<block addline>, C<block deletelines>, and C<block data> and C<block
+nodedata> when they set something;
+
+=item *
+
+C<image create>, C<window create>, and C<image configure> and C<window
+configure> with options to set;
+
+=item *
+
+C<edit undo>, C<edit redo>, C<edit reset>, C<edit separator>, and
+C<edit modified> with a value.
+
+=back
+
+Everything else works: C<get>, C<index>, C<compare>, C<dump>,
+C<search>, C<bbox>, C<dlineinfo>, the queries of C<tag>, C<mark>,
+C<block>, C<image>, C<window>, C<edit> and C<configure>, C<cget>,
+C<see>, C<xview>, C<yview>, C<scan> and C<debug>.
+
+=head2 Undo and redo
+
+With C<-undo> on, a deletion does not free the values it drops (of
+deleted nodes and runs, of the blocks it deletes or dissolves, their
+instance data included, the losers of joins and merges): they go into
+its undo step, each with an address that is valid again once the
+deletion is undone (where the node's first leaf or the run starts,
+the node's level, the tag's name; where a block's head is, for its
+instance data).  C<edit undo> re-creates the text (the blocks with
+their depth, and the runs as separate runs again), then gives every
+value back to the node, run or block at its address, and moves back
+the values a join moved.  C<edit redo> takes them into the step again.  The undo of
+an insertion and its redo do the same.  A value the undo finds on the
+node or run it gives a value back to (one set after the edit, or of a
+run made since and merged with the restored one) is not freed either:
+it waits in the step, and the redo gives it back.  If the undo finds
+no node at an address, the value is freed.
+
+The values in an undo step are freed when the step is discarded: by
+C<edit reset>, when the history grows beyond C<-maxundo> steps, when
+a new edit after an undo drops the steps that could have been redone,
+and when the widget is destroyed.
+
+Marks need no records: the undo moves an existing mark back with its
+value.  C<block insert>, C<block split>, C<block trim>, C<tag add> and
+C<tag remove> keep what they drop in their undo steps in the same way
+(see L<Undo and redo of block and tag changes>).  C<tag delete>,
+C<mark unset> and the setting of values are not undoable, so the
+values they drop are freed when they return.
+
+The redo of an insertion re-inserts it exactly: when the insertion is
+undone, the inserted range is recorded in block-list form, as a
+deletion records what it deletes (at that moment the range is as the
+insertion left it, the later recorded changes having been undone),
+and the redo inserts that list (Tk 8.4 re-inserts the plain string).
+So the text comes back with the tags it was inserted with (not those
+of the text around it), with the separators it made in a block, and
+with the marks that were in it when it was undone; then the values
+come back to its runs and nodes.  If the recorded indices have become
+stale (changes made with C<-undo> off) and the range cuts blocks, the
+redo inserts the plain string.
+
+The undo keeps its own records of the values; its own block list of
+the deleted text leaves them out (the instance data of blocks
+included, and those of marks, which the undo never needs: it moves an
+existing mark back with its value), so that it holds no extra
+reference to them.  A program re-creating text from the elements of C<block
+list> sets no values unless it does so itself.
+
+=head2 Telling the program: -valuecommand
+
+With the option C<-valuecommand>, the widget tells the program, before
+a change is made, which values the change will detach and where they
+are, while the widget is not changed yet; and afterwards which values
+an undo or a redo gave back and which a discarded undo step frees.
+For most commands this is before the command changes anything; the
+commands that make several changes in a row tell before each of them
+(see the note "Postponed" below).  The callback is called as
+
+  $cb->($widget, $event, $kind, $where, $value, $cause)
+
+with C<$value> the value (as C<block nodedata> and the others return
+it), and:
+
+=over 5
+
+=item C<$kind> and C<$where>
+
+The owner of the value and its place, an array reference:
+
+  node    [index, level]       blockNodedata(@$where) returns the value
+  run     [tag, start, end]    tagData(tag, start) returns it
+  mark    [name, index]        markData(name) returns it
+  block   [index]              the head of the block (block data)
+
+A node (the leaves included) is named by the position where its first
+leaf starts and its level counted from the leaves (0 for a leaf), as
+in L<Undo and redo>.  A block is named by its head; C<block data> at
+the head returns the value for an I<empty> block, and for another
+block at a position inside it that is not inside a block nested in it
+(its tail, for one).
+
+=item C<$event>
+
+=over 5
+
+=item C<drop>
+
+before the change: the value is detached and freed when the command
+ends;
+
+=item C<stash>
+
+before the change: the value goes into the undo step of the change
+(C<-undo> on), or, for a value that an undo or a redo finds where it
+gives another back, into the step it applies;
+
+=item C<move>
+
+before the change: a merge (of two leaves, nodes or runs that become
+one) gives the value to another owner.  The last element of C<$where>
+is an array reference naming the new owner, in the same form, as it
+is before the change: C<[index, level]> or C<[tag, start, end]>;
+
+=item C<restore>
+
+an undo or a redo gave the value back: called once it is back (before
+the rest of the command), with its place then;
+
+=item C<discard>
+
+an undo step that held the value was thrown away (C<edit reset>,
+C<-maxundo>, a new change dropping the steps that could be redone), or
+an undo or a redo found no place for it: called at the end of the
+command, just before the value is freed, with the place the step
+recorded, which may not exist any more (a run's is C<[tag, start]>, a
+position on a line that is gone is given as recorded);
+
+=item C<late>
+
+a value was detached that the widget did not foresee: called at the
+end of the command, after the change, with the place the value had
+before it if the widget knows it, else C<$where> is C<undef>.  This
+should not happen.  With C<debug> on, the command fails then (as when
+a detach was foreseen but did not happen as told), so that tests catch
+it.
+
+=back
+
+=item C<$cause>
+
+The command: C<delete>, C<insert>, C<tag add>, C<tag remove>, C<tag
+delete>, C<block insert>, C<block trim>, C<block split>, C<undo>,
+C<redo>, C<reset> (C<edit reset>), C<separator> (C<edit separator>),
+C<configure> (C<-maxundo>); C<set> for the commands that set a value
+(C<block nodedata>, C<tag data>, C<mark data>, C<block data>, undef
+included) and C<unset> for C<mark unset>.
+
+=back
+
+The calls before a change are made once the command has checked its
+arguments, before it changes anything, for a command that makes one
+change.
+
+B<Postponed: telling everything before a command that makes several
+changes starts; today these commands tell before each of their
+changes.>  The approved design said that the program is told before
+the command changes anything.  For the commands that make several
+changes in a row, the widget tells before I<each> change instead, the
+widget being as the previous change left it (so a C<$where> names the
+place at that moment, not before the command).  These commands are:
+
+=over 5
+
+=item *
+
+C<edit undo> and C<edit redo>, which apply the recorded changes of a
+step one by one: each is told just before it is applied;
+
+=item *
+
+C<insert> with lists of tags (C<insert index chars tagList ?chars
+tagList ...?>): each piece is inserted, then the tags it got from the
+text around it are taken off and those of its list put on, one tag
+after the other, and each of these is told just before it is made;
+
+=item *
+
+C<tag add> and C<tag remove> with several ranges: each range is told
+before it is tagged or untagged;
+
+=item *
+
+a deletion through the end of the text, which first takes the tags
+off the final newline (told then), and then deletes (told then).
+
+=back
+
+Also, a value that an undo or a redo displaces (one it finds where it
+gives another back, L<Undo and redo>) is told (C<stash>) just before
+it moves, and C<restore> comes as soon as a value is back, not at the
+end of the command.  The owner postponed the question whether to tell
+everything at the start of such commands (which would need the
+look-ahead of all their changes from the widget as it is before the
+first); see F<BUGS> 27.
+
+While the callback runs, the widget can be read but not changed: the
+commands listed in L<When values are freed> are refused, with the
+error C<cannot modify .t while its -valuecommand runs>.  (A
+C<DESTROY> method, which runs once the change is made, may change the
+widget.)  The callback
+cannot refuse the change.  An error in the callback is reported as a
+background error (C<Tk::Error>) and the command goes on (see L<When
+Perl code called by the widget dies>).  The callback should not
+destroy the widget.
+
+Nothing is told when the widget is destroyed (its values are freed
+then, see L<When values are freed>), nor about values that have no
+Perl part (in a widget built with representation B, a container that
+holds only other slots).  Without the option nothing of this runs: no
+look-ahead, no table.
+
+B<The ready-made callback.>  With
+
+  $t->configure(-valuecommand => 'DETACH');
+
+the widget calls its method C<DETACH> (a callback given as a string is
+a method of the widget), which passes the notification on to values
+that are objects with a C<DETACH> method of their own:
+
+  $value->DETACH($widget, $event, $kind, $where, $cause)
+
+at the same moments as above; other values (plain scalars, objects
+without such a method) are skipped.  A subclass of Tk::eText may
+define its own C<DETACH> (and call C<< $w->SUPER::DETACH(...) >> to
+pass the values on).  As with any C<-valuecommand>, the commands then
+do the look-ahead; an error in a C<DETACH> method is a background
+error.
+
+=head2 When Perl code called by the widget dies
+
+The widget runs Perl code at three places that may die: the
+C<DESTROY> methods of the values it frees, the C<-valuecommand>
+callback (or, with C<< -valuecommand => 'DETACH' >>, the C<DETACH>
+methods of the values) and C<DESTROYmult>.  None of these errors
+stops the widget command that ran the code, and none of them makes a
+value freed twice or kept for ever:
+
+=over 5
+
+=item A C<DESTROY> method dies
+
+Perl does not let an error leave a C<DESTROY> method: it makes it the
+warning C<(in cleanup)> I<message>, with a tab before it (category
+C<misc>), given only if warnings are on where the error is raised
+(C<use warnings> there, or C<perl -w>); otherwise the error is lost.
+The value is freed all the
+same, the other values waiting are freed after it, and the widget
+command that dropped them returns normally, with its usual result.  A
+change the method made before it died stays made, as an undo step of
+its own.
+
+=item A change refused inside a C<DESTROY> method
+
+The refusal (C<cannot modify .t while its values are being freed, 10
+changes deep>, see L<When values are freed>) is an error raised inside
+the C<DESTROY> method, so it is the case above: unless it is caught,
+it becomes an "(in cleanup)" warning, and the values and the command
+go on.  It is raised by the widget method, which Perl/Tk compiles in
+F<Tk.pm> without C<use warnings>: if it leaves C<DESTROY> as it is,
+the warning is given only under C<perl -w> (C<$^W>), and is lost
+otherwise.  To know, catch it with C<eval> inside C<DESTROY>:
+
+  sub DESTROY {
+    my $self = shift;
+    eval { $self->{widget}->insert('end', "gone\n"); 1 }
+      or warn "not made: $@";
+  }
+
+=item The C<-valuecommand> callback dies, or a C<DETACH> method
+
+The error is reported as a background error (C<Tk::Error>, called
+when Tk is next idle), and the command goes on as if the callback had
+returned: the change is made, and the values are freed, kept or given
+back as usual, each once; nothing the callback was given is kept.
+Each call that dies is one background error.  (Perl/Tk itself keeps
+about half a kilobyte for each background error, whatever reported
+it, a binding included; that memory is not the widget's.)
+
+=item C<DESTROYmult> dies
+
+A background error, and the answer counts as 0: the change is refused
+(L<When values are freed>), and that refusal, raised inside a
+C<DESTROY> method, is the case above.
+
+=back
+
 =head1 Additional text widget options
 
 =over 10
+
+=item C<-valuecommand>
+
+A callback told before a command detaches values, see L<Telling the
+program: -valuecommand>; C<'DETACH'> passes the notification on to
+values that are objects with a C<DETACH> method.  Empty (or undef) by
+default.
 
 =item C<-getFlags>
 

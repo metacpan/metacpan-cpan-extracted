@@ -6,7 +6,7 @@ use File::Temp 'tempfile';
 
 use Smart::Options;
 
-my($fh, $file) = tempfile();
+my($fh, $file) = tempfile(UNLINK => 1);
 
 print $fh <<'EOS';
 [section]
@@ -36,6 +36,18 @@ subtest 'load option from config file(use default file name)' => sub {
     is $argv->{hello}, 'world';
 };
 
+subtest 'config values are bytes, and the last line needs no newline' => sub {
+    my($fh2, $file2) = tempfile(UNLINK => 1);
+    binmode $fh2;
+    print $fh2 "name=\xe3\x81\x82\nlast=end";
+    close($fh2);
+
+    my $argv = Smart::Options->new()->type(conf => 'Config')->parse('--conf', $file2);
+
+    is $argv->{name}, "\xe3\x81\x82";
+    ok !utf8::is_utf8($argv->{name});
+    is $argv->{last}, 'end';
+};
 
 done_testing;
 

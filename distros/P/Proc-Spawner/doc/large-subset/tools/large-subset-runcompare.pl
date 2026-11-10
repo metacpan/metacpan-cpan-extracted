@@ -31,12 +31,18 @@
 # -run DIR (post-0.09): ours goes through Run (DIR: Run's blib/lib, or the directory of Run.pm), as where there is neither
 # posix_spawn nor fork (M2, Proc::Spawner's primitive 'system1'): PROC_SPAWNER_MISSING="posix_spawn fork", which t/try.pl
 # takes out of the environment once the modules are loaded (TRY_HIDE), so that the samples do not see it.
+# -shells LIST (post-0.10): run only these of dash, bash, ours (for instance ours alone, after a change of ours, to be
+# joined with an earlier run's dash and bash; unlike -q, nothing more is logged).
+# -workers-from DIR (post-0.10): each sample runs in the worker K (directory BASE/wK, user rcK) that ran it in the earlier
+# run DIR (its run-K.jsonl), so that paths, $PWD and $USER are those of that run; samples not there are spread as usual.
 use strict; use warnings; use JSON::PP; use File::Path qw(make_path remove_tree); use Cwd 'abs_path'; use Getopt::Long;
-my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB) = (4, 0, '', 0, '', '/var/tmp/runcompare', '');   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
+my ($J, $MAX, $ONLY, $Q, $ENVL, $BASE, $RUNLIB, $SHELLS, $WFROM) = (4, 0, '', 0, '', '/var/tmp/runcompare', '', 'dash,bash,ours', '');   # -q: run ours only, and log the programs of %QUIET too, each line headed by its caller's name and \035 (for large-subset-threeway.pl),
 #     and every builtin call (t/try.pl, RECBUILTIN; for large-subset-builtins.pl)
-GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB) && @ARGV == 3
-  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] samples.jsonl samples.tsv OUTDIR\n";
+GetOptions('j=i' => \$J, 'n=i' => \$MAX, 'only=s' => \$ONLY, 'q' => \$Q, 'env=s' => \$ENVL, 'base=s' => \$BASE, 'run=s' => \$RUNLIB, 'shells=s' => \$SHELLS, 'workers-from=s' => \$WFROM) && @ARGV == 3
+  or die "usage: $0 [-j N] [-n MAX] [-only IDS|\@FILE] [-q] [-env V,...] [-base DIR] [-run RUNLIB] [-shells LIST] [-workers-from DIR] samples.jsonl samples.tsv OUTDIR\n";
 !length $RUNLIB or -e "$RUNLIB/Run.pm" or die "-run $RUNLIB: no Run.pm there\n";
+my %SH = map +($_ => 1), split /,/, $SHELLS; /^(?:dash|bash|ours)\z/ or die "-shells: dash, bash, ours\n" for keys %SH;
+%SH or die "-shells: none\n"; %SH = (ours => 1) if $Q;
 # The variants of -env: what each does, and the code of large-subset-provenance.tsv it is for.
 my %ENVV = (
   posix   => 'POSIXLY_CORRECT=1 in the environment (code echo: the other case)',
@@ -108,11 +114,12 @@ my %FIXTURE = ('a.txt' => "alpha\nbeta\n", 'b.txt' => "one two\n", 'file.txt' =>
   '.hidden' => "h\n", 'dir/x.txt' => "in dir\n", 'dir/sub/y.sh' => "echo y\n", 'home/.profile' => '', 'empty' => '');
 
 my %done;   # restart: samples already in a run-K.jsonl
-for my $f (glob "$OUT/run-*.jsonl") { open my $in, '<', $f or die; while (<$in>) { $done{$1} = 1 if /^\{"id":"((?:[^"\\]|\\.)*)"/ } }
+for my $f (glob "$OUT/run-*.jsonl") { open my $in, '<', $f or die; while (<$in>) { my $r = eval { decode_json($_) } or next; $done{$r->{id}} = 1 } }   # (post-0.10: the keys are sorted, "id" is not first)
 my %acc; { open my $in, '<', $ST or die "$ST: $!"; my $h = <$in>; chomp $h; my @h = split /\t/, $h; my %c; @c{@h} = 0 .. $#h;
   while (<$in>) { chomp; my @f = split /\t/, $_, -1; $acc{$f[$c{id}]} = [$f[$c{verdict}], $f[$c{features}]] if $f[$c{large}] } }
 my %only = map +($_ => 1), grep length, $ONLY =~ /^\@(.*)/s ? do { open my $in, '<', $1 or die "$1: $!"; map { /^([^#\t\n][^\t\n]*)/ ? $1 : () } <$in> }
                                                          : split /,/, $ONLY;
+length $ONLY && !%only and die "-only $ONLY: no snippet IDs (an empty list would mean every sample)\n";
 my @todo; { open my $in, '<', $SJ or die "$SJ: $!";
   while (<$in>) { my $s = decode_json($_); next unless $acc{$s->{id}} && !$done{$s->{id}} && (!%only || $only{$s->{id}});
     push @todo, $s; last if $MAX && @todo >= $MAX } }
@@ -123,11 +130,16 @@ if (%ENV_ON) { open my $e, '>', "$OUT/env.txt" or die; print $e map "$_: $ENVV{$
   my %used = (fail => 'STANDIN_STATUS', output => 'STANDIN_OUTPUT', mtime => 'FIXTURE_MTIME');
   print $e map { my $v = $used{$_}; $v ? "$v=" . JSON::PP->new->allow_nonref->encode("$STANDIN{$v}") . "\n" : () } sort keys %ENV_ON; close $e }
 
+my %WK;   # -workers-from: sample id => its worker in that run
+if (length $WFROM) { for my $f (glob "$WFROM/run-*.jsonl") { my ($k) = $f =~ /run-(\d+)\.jsonl\z/ or next;
+    $k < $J or die "-workers-from $WFROM: it has run-$k.jsonl, more workers than -j $J\n";
+    open my $in, '<', $f or die; while (<$in>) { my $r = eval { decode_json($_) } or next; $WK{$r->{id}} = $k } }
+  %WK or die "-workers-from $WFROM: no run-K.jsonl there\n" }
 my @kids;
 for my $k (0 .. $J - 1) {
   my $u = "rc$k"; system("id $u >/dev/null 2>&1 || useradd -M -s /usr/sbin/nologin -d /nonexistent $u") == 0 or die "useradd $u\n";
   my $pid = fork // die; if ($pid) { push @kids, $pid; next }
-  worker($k, $u, [@todo[grep $_ % $J == $k, 0 .. $#todo]]); exit 0 }
+  worker($k, $u, [@todo[grep { defined $WK{$todo[$_]{id}} ? $WK{$todo[$_]{id}} == $k : $_ % $J == $k } 0 .. $#todo]]); exit 0 }
 waitpid $_, 0 for @kids;
 print STDERR "finished\n";
 
@@ -139,7 +151,7 @@ sub worker {
     for my $sh (($Q ? () : ([dash => {}, '/usr/bin/dash', '-c'], [bash => {}, '/usr/bin/bash', '--posix', '-c'])),
                 [ours => (length $RUNLIB ? {PROC_SPAWNER_MISSING => 'posix_spawn fork', TRY_HIDE => 'PROC_SPAWNER_MISSING'} : {}),
                  $^X, "-I$COPY/blib/lib", "-I$COPY/blib/arch", (length $RUNLIB ? "-I$COPY/run" : ()), "$COPY/t/try.pl"]) {
-      my ($name, $xenv, @cmd) = @$sh; $rec{$name} = run1($W, $u, $s->{text}, $xenv, @cmd) }
+      my ($name, $xenv, @cmd) = @$sh; next unless $SH{$name}; $rec{$name} = run1($W, $u, $s->{text}, $xenv, @cmd) }
     print $out $j->encode(\%rec), "\n"; $n++ }
   close $out }
 
@@ -153,6 +165,7 @@ sub run1 {   # one shell, one sample, in a fresh copy of the fixture
     for (my $i = 0; $i < @all; $i++) { next if -l $all[$i] || !-d _; opendir my $dh, $all[$i] or die; push @all, map "$all[$i]/$_", grep !/^\.\.?\z/, readdir $dh }
     utime $t, $t, @all or die "utime: $!" }
   for my $lf ("$W/log", "$W/blog", "$W/out", "$W/err") { open my $l, '>', $lf or die; close $l; system('chown', "$u:$u", $lf) } # out, err: the run's own, so that /dev/stdout, /dev/stderr (reopened by path on Linux) are writable
+  utime $STANDIN{FIXTURE_MTIME}, $STANDIN{FIXTURE_MTIME}, $W if $ENV_ON{mtime};   # also the worker's directory, the run's ".." (post-0.10: ls -la showed the day of the run)
   my %env = (($Q ? (RECPARENT => 1, RECBUILTIN => "$W/blog") : ()), PATH => $Q ? $REC : "$QDIR:$REC", HOME => "$W/run/home", LANG => 'C', LC_ALL => 'C', USER => $u, LOGNAME => $u, TERM => 'dumb',
              SHELL => '/bin/sh', RECLOG => "$W/log", REALDIR => $REALDIR, REALNAMES => join(' ', sort keys %REAL), TMPDIR => "$W/run",
              ($ENV_ON{posix} ? (POSIXLY_CORRECT => 1) : ()), ($ENV_ON{utf8} ? (LANG => 'C.UTF-8', LC_ALL => 'C.UTF-8') : ()),

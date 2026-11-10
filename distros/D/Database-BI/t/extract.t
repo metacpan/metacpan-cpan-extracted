@@ -4,6 +4,10 @@
 use strict;
 use warnings;
 
+# Caches go where CACHEDIR, CACHE_DIR or Object::Configure say before model_dir
+# (Database::BI::CacheDir): without this, a run writes into the user's own cache.
+delete @ENV{qw(CACHEDIR CACHE_DIR Database__BI__cache_dir Database__BI__Extract__cache_dir Database__BI__Model__Geocode__cache_dir)};
+
 use lib 'lib';
 
 use File::Path	qw(remove_tree make_path);

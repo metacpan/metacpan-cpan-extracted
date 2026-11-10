@@ -50,5 +50,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/Net-API-REST/issues
   repository: https://gitlab.com/deguest/Net-API-REST
-version: v1.2.6
+version: v1.2.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

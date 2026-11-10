@@ -27,6 +27,12 @@ BEGIN { $globbery = join(', ', <t/globbery/o* t/globbery/t*>) }
     <html>, <body id="spoon">, "YAY", </body>, </html>;
   }
 
+  sub squux {
+    use HTML::Tags;
+    my $i = "spoon's";
+    <html>, <body id='$i'>, "don't", </body>, </html>;
+  }
+
   sub xquux {
     use HTML::Tags;
     <link href="#self" rel="me" />,
@@ -83,6 +89,12 @@ is(
 is(
   join('', HTML::Tags::to_html_string Foo::quux),
   '<html><body id="spoon">YAY</body></html>',
+  'HTML tags ok'
+);
+
+is(
+  join('', HTML::Tags::to_html_string Foo::squux),
+  '<html><body id=\'spoon&#39;s\'>don&#39;t</body></html>',
   'HTML tags ok'
 );
 

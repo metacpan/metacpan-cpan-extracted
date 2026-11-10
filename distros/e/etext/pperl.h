@@ -168,5 +168,7 @@ typedef struct ListFactory {
 
 int LangArgEval _ANSI_ARGS_ ((Tcl_Interp *interp, Arg av));
 void LangDumpArg _ANSI_ARGS_ ((Arg arg, I32 count));
+int LangDestroyMult _ANSI_ARGS_ ((Tcl_Interp *interp, int n, int limit,
+				 int *morePtr));
 
 #endif /* _ETEXT_PPERL_H */

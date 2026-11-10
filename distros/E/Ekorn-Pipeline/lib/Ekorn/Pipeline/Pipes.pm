@@ -48,10 +48,10 @@ Ekorn::Pipeline::Pipes - pipe and tap methods, running an object through stages
 
 =head1 DESCRIPTION
 
-A parent class giving its children two methods, C<pipe> and C<tap>,
-which run the object they're called on through a pipeline of stages,
-as L<Ekorn::Pipeline> describes. The first stage is called with the
-object, in C<$_> and as its argument.
+A parent class that gives its children two methods, C<pipe> and
+C<tap>. Each runs the object it's called on through a pipeline of
+stages, as described in L<Ekorn::Pipeline>. The first stage is called
+with the object, in C<$_> and as its argument.
 
 L<DBIx::Squirrel>'s database and statement handles have the same two
 methods, and are where they began.
@@ -64,8 +64,8 @@ methods, and are where they began.
     $first   = $object->pipe(@stages);
 
 Runs the invocant through a pipeline of C<@stages>, and returns what
-comes out of the last one. In scalar context, it returns the first of
-them, or C<undef> if there are none. With no stages, it returns the
+comes out of the last stage. In scalar context, it returns the first
+result, or C<undef> if there are none. With no stages, it returns the
 invocant.
 
 =head2 tap
@@ -73,8 +73,8 @@ invocant.
     $object = $object->tap(@stages);
 
 Runs the invocant through a pipeline of C<@stages> for their side
-effects, and returns the invocant, whatever comes out of the stages,
-so a chain of method calls can carry on after it.
+effects, and returns the invocant, whatever the stages return. A chain
+of method calls can carry on after it.
 
 =head1 SEE ALSO
 

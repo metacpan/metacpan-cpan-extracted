@@ -1,0 +1,22 @@
+[%#
+  parseAccounting(text) -> number | NaN, for PROCESS inside a <script>.
+  The number a cell holds, by the server's rule (Database::BI::Util's
+  parse_number; change one, change the other): only what dresses a number up
+  is removed -- spaces, brackets, thousands separators, a percent sign,
+  currency symbols and a known currency code -- and any other letter stays and
+  fails the match, so "T27" and "CT4" are text, not 27 and 4.  "(1,234.56)"
+  is -1234.56: the bracket is read before it is removed.
+-%]
+var BI_CURRENCY_CODES = 'AUD|BRL|CAD|CHF|CNY|DKK|EUR|GBP|HKD|INR|JPY|MXN|NOK|NZD|SEK|SGD|USD|ZAR';
+var BI_CURRENCY_RE = new RegExp('(?:^|(?<=[\\s(]))(?:' + BI_CURRENCY_CODES + ')(?=[\\s\\d.])'
+  + '|(?<=[\\s\\d])(?:' + BI_CURRENCY_CODES + ')(?=[\\s)]|$)', 'g');
+function parseAccounting(v) {
+  if (v === null || v === undefined || v === '') return NaN;
+  var s = String(v);
+  var accounting = /^\s*\(/.test(s);
+  var t = s.replace(BI_CURRENCY_RE, '').replace(/[\s(),$%]|[^\x00-\x7F]/g, '');
+  if (accounting && /^\d/.test(t)) t = '-' + t;
+  if (!/^-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?$/.test(t)) return NaN;
+  var n = Number(t);
+  return isFinite(n) ? n : NaN;
+}

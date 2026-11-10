@@ -39,21 +39,12 @@ package Proc::Spawner;
 #        options not listed there take %UNSUPPORTED's value, and '*' there covers the rest.  It applies here
 #        too, to the posix_spawn extensions this build's libc lacks (chdir, fchdir, closefrom, tcsetpgrp,
 #        pidfd, cgroup; Makefile.PL compiles a call to each): 'fail' fails with ENOTSUP.  EXPERIMENTAL
-#   on_read(FD, N, CODE)       one read of at most N bytes when FD is readable: CODE->(BYTES), undef at end of file
-#   on_write(FD, BYTES, CODE)  writes BYTES as the reader takes them; CODE->() when all is written, or
-#                              CODE->(ERRNO) when a write failed (the reader is gone: EPIPE).  FD: a handle (made non-blocking) or an fd number (left as it is)
-#   defer(CODE, ARGS)          queues CODE->(ARGS)
-#   poll()                     runs what is ready now (queued calls, ended children, ready fds) without
-#                              waiting; does nothing inside wait_until or a callback (EXPERIMENTAL, post-0.04)
-#   wait_until(CODE)           runs the queue and waits for events until CODE->() is true
-#
-# The rules (decisions R1, D1-D3 of the page "Child Exit Wake-up"; EXPERIMENTAL, awaiting approval):
-# every callback runs from the queue, one at a time, never inside a signal or inside another callback
-# (R1).  A callback never waits: wait_until called from one dies (D2).  SIGCHLD is ours only while
-# wait_until runs (D3); its handler is a C function (Proc::Spawner::chld_to_fd) that writes one byte into a
-# pipe the loop selects on (D1), so no Perl code runs inside the signal and no wake-up is lost.  Without
-# it, a deferred Perl handler, and select wakes up every $TICK seconds (B1).  Background: the document
-# perl-signals-findings.md.
+#   on_read(FD, N, CODE), on_write(FD, BYTES, CODE), defer(CODE, ARGS), poll(), wait_until(CODE), loop()
+#        the one event loop, Proc::Spawner::Loop (W5, post-0.10: one interface on POSIX and on Windows), under its
+#        old names; loop() is the loop object (read, write, child, after, pipe, ...: its POD).  The rules
+#        (decisions R1, D1-D3 of the page "Child Exit Wake-up"): every callback runs from the queue, one at a time,
+#        never inside a signal or inside another callback; a callback never waits; SIGCHLD is ours only while
+#        wait_until runs.  Background: the document perl-signals-findings.md.
 #
 # Process-wide state flipped for a while, so bullet-proof only in non-threaded execution: the umask,
 # around start's call (umask => N); the SIGCHLD action, while wait_until runs (D3).  Between waits a
@@ -63,7 +54,7 @@ use strict; use warnings;
 use POSIX (); use File::Spec ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
 
@@ -108,8 +99,8 @@ our %WINDOWS = (   # Windows only (EXPERIMENTAL, post-0.07): how every child is 
   new_group => 1,          # in a process group of its own: Ctrl-C at the console reaches the parent, not the children
   kill_with_parent => 1,   # in a job object that Windows ends when this process ends, however it ends
   new_console => 1);       # a child with none of fds 0-2 gets a console of its own (as Perl's own spawn does)
-our $WIN = $^O eq 'MSWin32';   # EXPERIMENTAL (post-0.07): no SIGCHLD, no fcntl, and select only on sockets: the loop polls
-                               # for ended children every $TICK; on_read and on_write of pipes are not done there yet
+our $WIN = $^O eq 'MSWin32';   # EXPERIMENTAL (post-0.07): no SIGCHLD, no fcntl; the loop's Windows backend (W5, post-0.10):
+                               # Proc::Spawner::Loop::Win32
 my %SIGNUM; @SIGNUM{split ' ', $Config{sig_name}} = split ' ', $Config{sig_num};
 our $DOSISH = $^O =~ /^(?:MSWin32|os2|VMS)\z/;
 our $PRIMITIVE = !$FALLBACK ? 'posix_spawn' : defined &__spawn_nowait && !$DOSISH && !$NOFORK ? 'fork' : 'system1';
@@ -207,7 +198,7 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
   my $pidfd = $m{pidfd} && delete $at{pidfd};
   my $search = $m{search} && delete $at{search};
   if ($search && !$WIN and $file !~ m{/}) {
-    my ($p) = grep -x && !-d, map +(length ? $_ : '.') . "/$file", split /:/, $ENV{PATH} // '', -1;
+    my ($p) = grep -x && !-d, map +(length ? $_ : '.') . "/$file", path_split($ENV{PATH});
     defined $p or do { $! = POSIX::ENOENT(); return }; $file = $p }
   my @undo; my $err; my @r;
   my $ok = eval {
@@ -239,11 +230,18 @@ sub spawn {   # the raw call: the primitive (__posix_spawn, or __spawn_nowait), 
   die $died if $died;
   $! = $err; $ok && @r or return; wantarray ? @r : $r[0] }   # (scalar context: the pid, as the XSUB gives it)
 
-sub win_find {   # posix_spawnp's lookup on Windows, as win_spawn.h's: a name with no directory through PATH (";", a
-  # "quoted;entry" whole), PATHEXT's extensions before the bare name; a path as it is (relative: to the directory now)
+our $PATH_SEP = $Config{path_sep};
+sub path_split {   # a PATH value's entries, split at $PATH_SEP (post-0.10: $Config{path_sep}, ';' on Windows).  POSIX: an empty
+  # entry is the current directory.  Windows (as Perl's own win32.c reads PATH): a "quoted" part is taken whole, its quotes
+  # dropped (an unclosed one runs to the end); empty entries are dropped
+  my $p = shift // ''; my $s = quotemeta $PATH_SEP;
+  $WIN ? grep(length, map tr/"//dr, $p =~ /((?:"[^"]*(?:"|$)|[^"$s])*)/g) : split /$s/, $p, -1 }
+
+sub win_find {   # posix_spawnp's lookup on Windows, as win_spawn.h's: a name with no directory through PATH (path_split),
+  # PATHEXT's extensions before the bare name; a path as it is (relative: to the directory now)
   my ($file, $search) = @_;
-  my @ext = ((grep length, split /;/, $ENV{PATHEXT} // '.COM;.EXE;.BAT;.CMD'), '');
-  my @dirs = $search && $file !~ m{[/\\:]} ? map { (my $d = $_) =~ tr/"//d; length $d ? $d : () } ($ENV{PATH} // '') =~ /((?:"[^"]*"|[^;])*)/g : ('');
+  my @ext = ((grep length, split /;/, $ENV{PATHEXT} // '.COM;.EXE;.BAT;.CMD'), '');   # (PATHEXT: Windows' own, always ';')
+  my @dirs = $search && $file !~ m{[/\\:]} ? path_split($ENV{PATH}) : ('');
   for my $d (@dirs) { for my $e (@ext) {
     my $p = length $d ? "$d\\$file$e" : "$file$e"; return File::Spec->rel2abs($p) if -f $p && -x _ } }
   return }
@@ -255,7 +253,12 @@ sub system1 {   # the primitive without posix_spawn and fork (M2): Run::start ar
   if ($WIN) {   # posix_spawn's meaning of FILE (with search: PATH and PATHEXT), not Perl's
     $file = win_find($file, $search) // do { $! = -e $file && !-d _ ? POSIX::EACCES() : POSIX::ENOENT(); return } }
   local %ENV = map { /^([^=]+)=(.*)\z/s ? ($1, $2) : () } @$envp if $envp;
-  my @errs; my $pid = Run::start(1, $argv, $redirs, \@errs, $file);
+  # X38 (post-0.10): Perl's spawn on Windows passes the child every inheritable handle, and Perl makes its handles
+  # inheritable (no close-on-exec by $^F there): our fds from 3 up are made not inheritable for the call, then put back,
+  # as POSIX has it.  Not thread-safe: another thread's spawn meanwhile does not pass these fds either.
+  my @off = $WIN ? grep(__fd_cloexec($_) == 0, 3 .. __fd_limit() - 1) : (); __set_cloexec($_, 1) for @off;
+  my @errs; my $pid = eval { Run::start(1, $argv, $redirs, \@errs, $file) }; my ($died, $err) = ($@, $!);
+  __set_cloexec($_, 0) for @off; die $died if $died; $! = $err;
   $pid or return; $pid }
 
 sub run_redirs {   # system1 (M2): the fd actions as Run's redirections (Run::start applies them around the call and puts
@@ -318,17 +321,15 @@ sub emulate_actions {   # the file actions, done on this process's own fds in or
       if ($o == $fd) { __set_cloexec($fd, 0) } else { my $r = POSIX::dup2($o, $fd); my $e = $!; POSIX::close($o); defined $r or do { $! = $e; $die->() } } }
     else { $! = POSIX::EINVAL(); $die->() } } }
 
-our $TRACE;    # undef, or a code ref given one line per operation
-our $CAUSE;    # the caller's: a call queued keeps the value current when it was queued, and runs with it
-our $REACTING = 0;   # true while a queued call runs
-my $CHLD_C = defined &Proc::Spawner::chld_to_fd;
-our $TICK = $CHLD_C && !$WIN ? undef : 0.05;
+# The loop is Proc::Spawner::Loop (W5, post-0.10); these are its variables, and the functions below its old names.
+use Proc::Spawner::Loop ();
+our ($TRACE, $CAUSE, $REACTING, $DEPTH);   # undef or a code ref given one line per operation; the caller's cause (Graph)
+*TRACE = \$Proc::Spawner::Loop::TRACE; *CAUSE = \$Proc::Spawner::Loop::CAUSE;
+*REACTING = \$Proc::Spawner::Loop::REACTING; *DEPTH = \$Proc::Spawner::Loop::DEPTH;
 
 sub tr_ { $TRACE->(join '', @_) if $TRACE }
 
 # ------------------------------------------------------------------ spawning
-my (@Q, %KID, %RD, %WR, $SELF_R, $SELF_W);
-
 sub actions {   # the file actions giving a child exactly %$fds, whatever the parent's own fd numbers
   my $fds = shift; my @t = sort { $a <=> $b } keys %$fds;
   my @src = grep defined && !ref, values %$fds;
@@ -362,75 +363,18 @@ sub start {
   my $how = join ', ', map "$$_[0] " . join('->', @$_[1 .. $#$_]), @a;
   $pid or return tr_("spawn failed: @$argv: $!"), undef;
   tr_("spawn $pid: $path [@$argv]", @a ? "; $how" : '');
-  $KID{$pid} = $o{on_exit} // sub {}; $o{pidfd} && wantarray ? ($pid, $pidfd) : $pid }
+  my $cb = $o{on_exit};   # (Windows: the kept process handle is released once the status is taken, post-0.08)
+  loop()->child($pid, sub { __win_spawn_forget($pid) if $WIN; $cb->(@_) if $cb });
+  $o{pidfd} && wantarray ? ($pid, $pidfd) : $pid }
 
-# ------------------------------------------------------------------ the loop
-sub defer { push @Q, [$CAUSE, @_] }
-pipe $SELF_R, $SELF_W or die "pipe: $!";
-unless ($WIN) { for ($SELF_R, $SELF_W) { fcntl($_, F_SETFD, FD_CLOEXEC); fcntl($_, F_SETFL, fcntl($_, F_GETFL, 0) | O_NONBLOCK) } }
-my $CHLD = $WIN ? undef : POSIX::SigAction->new(sub { syswrite $SELF_W, 'x' }, POSIX::SigSet->new, POSIX::SA_RESTART());
-$CHLD->safe(1) if $CHLD;   # the fallback: deferred; POSIX::sigaction's immediate default corrupts the heap (S2)
-
-sub reap {   # our children only: waitpid(-1) would take statuses that are not ours (C2)
-  for my $p (keys %KID) {
-    my $r = waitpid $p, POSIX::WNOHANG(); next unless $r;
-    my $w = $r > 0 ? $? : undef; reaped($p);
-    tr_("reaped $p: ", defined $w ? "wait status $w" : 'status taken by other code');
-    defer(delete $KID{$p}, $w) } }
-
-sub reaped {   # after waiting for a child of spawn: on Windows the kept process handle is released (post-0.08); else nothing
-  __win_spawn_forget($_[0]) if $WIN }
-
-our $DEPTH = 0;   # nesting of wait_until (outside reactions)
-sub wait_until {
-  my $done = shift;
-  die "Proc::Spawner: wait inside a reaction\n" if $REACTING;   # D2
-  my $old = POSIX::SigAction->new;
-  ($CHLD_C ? Proc::Spawner::chld_to_fd(fileno $SELF_W) : POSIX::sigaction(POSIX::SIGCHLD(), $CHLD, $old)) unless $DEPTH || $WIN;
-  my $ok = eval { local $DEPTH = $DEPTH + 1; turn() until $done->(); 1 };
-  ($CHLD_C ? Proc::Spawner::chld_restore() : POSIX::sigaction(POSIX::SIGCHLD(), $old)) unless $DEPTH || $WIN;
-  die $@ unless $ok }
-
-sub turn {   # one queued call, or one round of waiting (at most $timeout seconds; default $TICK): false if nothing happened
-  my $timeout = @_ ? shift : $TICK;
-  if (@Q) { my ($cause, $k, @a) = @{shift @Q}; local ($CAUSE, $REACTING) = ($cause, 1); $k->(@a); return 1 }
-  reap(); return 1 if @Q;
-  die "Proc::Spawner: nothing left to wait for\n" unless %KID || %RD || %WR;
-  if ($WIN) { select undef, undef, undef, $timeout // $TICK; return 0 }   # (no select on pipes there: polling only)
-  my $rin = ''; vec($rin, $_, 1) = 1 for fileno $SELF_R, map $_->[0], values %RD;
-  my $win = ''; vec($win, $_->[0], 1) = 1 for values %WR;
-  my $n = select my $rout = $rin, my $wout = $win, undef, $timeout;
-  1 while sysread $SELF_R, my $buf, 512;
-  return 0 if $n <= 0;                  # timeout, or EINTR: the sets say nothing
-  my %served;                           # one reader per fd and round, the oldest first
-  for my $id (sort { $a <=> $b } keys %RD) {
-    my ($fd, $len, $cb) = @{$RD{$id}};
-    next if $served{$fd}++ or !vec($rout, $fd, 1);
-    my $got = POSIX::read($fd, my $b, $len);
-    next if !defined $got && $! == POSIX::EAGAIN();
-    $got = 0 + ($got // 0);             # "0 but true" at end of file; an error ends it too
-    delete $RD{$id};
-    defer($cb, $got ? $b : undef) }
-  for my $id (sort { $a <=> $b } keys %WR) {
-    my $w = $WR{$id}; next unless vec($wout, $w->[0], 1);
-    my $did = POSIX::write($w->[0], $w->[1], $w->[3] && $w->[3] < length $w->[1] ? $w->[3] : length $w->[1]);
-    next if !defined $did && $! == POSIX::EAGAIN();
-    $w->[4] = $! + 0 unless defined $did;              # an error (the reader is gone) ends the write: the callback gets it
-    substr($w->[1], 0, $did // length $w->[1]) = '';
-    defer((delete $WR{$id})->[2], $w->[4]) if $w->[1] eq '' }
-  1 }
-sub poll {   # between waits (K3, the user's choice B, post-0.04): what is ready now, without waiting
-  return if $REACTING || $DEPTH;
-  local $DEPTH = $DEPTH + 1;            # a callback's own wait_until still dies (D2)
-  1 while (@Q || %KID || %RD || %WR) && turn(0) }
-
-my $ID = 0;
-sub fd_of { ref $_[0] ? fileno $_[0] : $_[0] }
-sub on_read { my ($fd, $n, $cb) = @_; $RD{++$ID} = [fd_of($fd), $n, $cb]; $ID }
-sub on_write {   # $chunk: at most so many bytes per write (a blocking pipe: PIPE_BUF, which a writable pipe takes at once)
-  my ($fd, $bytes, $cb, $chunk) = @_;
-  fcntl($fd, F_SETFL, fcntl($fd, F_GETFL, 0) | O_NONBLOCK) if ref $fd && !$WIN;
-  $WR{++$ID} = [fd_of($fd), $bytes, $cb, $chunk]; $ID }
+# ------------------------------------------------------------------ the loop: Proc::Spawner::Loop under its old names
+sub loop { Proc::Spawner::Loop->new }
+sub defer { loop()->defer(@_) }
+sub wait_until { loop()->wait_until(@_) }
+sub poll { loop()->poll }
+sub turn { loop()->turn(@_) }
+sub on_read { my ($fd, $n, $cb) = @_; loop()->read($fd, $n, $cb) }
+sub on_write { my ($fd, $bytes, $cb, $chunk) = @_; loop()->write($fd, $bytes, $cb, chunk => $chunk) }
 
 1;
 
@@ -454,7 +398,9 @@ Proc::Spawner - start children with posix_spawn(3) and run the one event loop (E
 
 =head1 DESCRIPTION
 
-The comments at the top of the module describe C<start> and the loop.
+The comments at the top of the module describe C<start>.  The loop is
+L<Proc::Spawner::Loop> (since post-0.10); C<on_read>, C<on_write>, C<defer>,
+C<poll> and C<wait_until> here are its old names, and C<loop()> is the loop.
 
 C<spawn(FILE, \@ARGV, \@ENV_OR_UNDEF, \@ACTIONS, \%ATTR, \%UNSUPPORTED)>
 (here an alias of the XSUB C<__posix_spawn>) calls

@@ -1,7 +1,7 @@
-[![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=master) [![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=windows) [![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/mac.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=mac)
+[![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/master.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=master) [![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=windows) [![Actions Status](https://github.com/kan/coveralls-perl/actions/workflows/mac.yml/badge.svg?branch=master)](https://github.com/kan/coveralls-perl/actions?workflow=mac) [![Coverage Status](https://img.shields.io/coveralls/kan/coveralls-perl/master.svg?style=flat)](https://coveralls.io/r/kan/coveralls-perl?branch=master)
 # NAME
 
-Devel::Cover::Report::Coveralls - coveralls backend for Devel::Cover
+Devel::Cover::Report::Coveralls - Coveralls backend for Devel::Cover
 
 # USAGE
 
@@ -113,13 +113,28 @@ To keep the job green, e.g. on pull requests from forks, which get no secrets, s
 
 # DESCRIPTION
 
-[https://coveralls.io/](https://coveralls.io/) is service to publish your coverage stats online with a lot of nice features. This module provides seamless integration with [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover) in your perl projects.
+This module is a report of [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover) that sends the coverage of your Perl project to
+[Coveralls](https://coveralls.io/). Run it as `cover -report coveralls` after the tests, or
+as `cover -test -report coveralls` to run them too.
+
+It sends the coverage of each line of each source file, with the git commit, branch and
+remotes of the working tree. On the CI services listed in ["USAGE"](#usage), it also sends the
+build number, job, branch and pull request the CI service gives.
+
+When [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover) collected the branch coverage (it does by default), it is sent too: how
+many times each side of each decision (`if`, `unless`, `elsif`, the ternary operator and so
+on) was taken. Branches marked `uncoverable` are left out. The condition coverage of
+Devel::Cover (`&&`, `||` and `//`) is not sent. Whether Coveralls counts branches
+in the coverage of the repository is a setting of the repository on Coveralls.
+
+The report holds the text of every source file. On a large project, install
+[Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS): it is used when installed, and makes the report several times faster than
+the pure-Perl [JSON::PP](https://metacpan.org/pod/JSON%3A%3APP) used otherwise.
 
 # ENVIRONMENT
 
-Set these environment variables to control the behaviour. Various other
-variables, set by particular CI environments, will be interpreted silently
-and correctly.
+These environment variables change what is sent. The variables that the CI services set are
+read as well; you do not need to set them.
 
 ## COVERALLS\_REPO\_TOKEN
 
@@ -128,9 +143,9 @@ in `.coveralls.yml`. On GitHub Actions, `GITHUB_TOKEN` is used when neither is s
 
 ## COVERALLS\_ENDPOINT
 
-If you have an enterprise installation, set this to change from the
-default of `https://coveralls.io`. The rest of the URL (`/api`, etc)
-won't change, and will be correct.
+The URL of the Coveralls server, for Coveralls Enterprise. The default is
+`https://coveralls.io`. The report is sent to this URL followed by `/api/v1/jobs`, so give
+it without a path.
 
 ## COVERALLS\_FLAG\_NAME
 
@@ -155,20 +170,51 @@ job fails. Set this to `true` to exit 0 instead, e.g. when coverage is optional 
 pull requests from forks get no repo token. When `cover` makes several reports, the ones after
 `coveralls` are not made after a failure, so put `coveralls` last. Any value other than empty, `false` and `0` turns it on.
 
+## COVERALLS\_SERVICE\_NAME, COVERALLS\_SERVICE\_NUMBER, COVERALLS\_SERVICE\_JOB\_ID, COVERALLS\_SERVICE\_JOB\_NUMBER, COVERALLS\_PULL\_REQUEST
+
+Send these as the name of the CI service, the build number, the job ID, the job number and the
+number of the pull request, in place of what is detected from the CI service. On a CI service
+not listed in ["USAGE"](#usage), set them to send what the CI service knows. `COVERALLS_PULL_REQUEST`
+set to `false` means that the build is not for a pull request.
+
+When no CI service is detected, the build is sent as a manual upload (`service_event_type`
+`manual`), unless one of these variables other than `COVERALLS_PULL_REQUEST` is set, or
+`COVERALLS_PERL_SERVICE_NAME`: then it is sent as a CI build, without an event type.
+
+## COVERALLS\_EVENT\_TYPE
+
+Send this as the event type of the build (`service_event_type`), as the official
+coverage-reporter does.
+
 ## COVERALLS\_PERL\_SERVICE\_NAME
 
-Sends this as the name of the CI service, in place of the one detected (e.g. `github`).
+Another name of `COVERALLS_SERVICE_NAME`, which wins when both are set.
+
+## COVERALLS\_GIT\_BRANCH, COVERALLS\_GIT\_COMMIT
+
+Send these as the branch and the commit ID, in place of the ones detected from the CI service
+and from git.
+
+## GIT\_ID, GIT\_BRANCH, GIT\_AUTHOR\_NAME, GIT\_AUTHOR\_EMAIL, GIT\_COMMITTER\_NAME, GIT\_COMMITTER\_EMAIL, GIT\_MESSAGE
+
+The commit ID, the branch, the author, the committer and the message of the commit, for a build
+outside a git repository (e.g. from another version control system, or from a tarball). There
+git is not run, and what is not set is not sent. In a git repository, what git says comes first,
+and these only fill in what git does not give: CI jobs often set `GIT_AUTHOR_NAME` and the
+like for the commits they make, and Jenkins sets `GIT_BRANCH` to `origin/<branch>`.
+To give the branch or the commit ID in a git repository, use `COVERALLS_GIT_BRANCH` and
+`COVERALLS_GIT_COMMIT`.
 
 # SEE ALSO
 
-[https://coveralls.io/](https://coveralls.io/)
-[https://docs.coveralls.io/](https://docs.coveralls.io/)
-[https://github.com/coagulant/coveralls-python](https://github.com/coagulant/coveralls-python)
-[Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover)
+- [Devel::Cover](https://metacpan.org/pod/Devel%3A%3ACover)
+- [https://coveralls.io/](https://coveralls.io/) and its documentation, [https://docs.coveralls.io/](https://docs.coveralls.io/)
+- [https://github.com/coverallsapp/coverage-reporter](https://github.com/coverallsapp/coverage-reporter), the official reporter of Coveralls.
+This module sends the values it sends on each CI service.
 
 ## EXAMPLE
 
-[https://coveralls.io/github/kan/coveralls-perl](https://coveralls.io/github/kan/coveralls-perl)
+The coverage of this module: [https://coveralls.io/github/kan/coveralls-perl](https://coveralls.io/github/kan/coveralls-perl)
 
 # LICENSE
 

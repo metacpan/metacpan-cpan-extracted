@@ -1368,4 +1368,60 @@ subtest 'Parser + MusicXML -- EndingBar:Section Close produces light-heavy barli
 		'Section Close ending bar emits light-heavy barline in XML';
 };
 
+# ---------------------------------------------------------------------------
+# Whole rest as a full-measure rest
+# ---------------------------------------------------------------------------
+
+sub _bar_rest_xml {
+	my ($sig, @records) = @_;
+	my $nwc = "!NoteWorthyComposer(2.75)\n"
+		. "|AddStaff|Name:\"S\"\n"
+		. "|Clef|Type:Treble\n"
+		. "|TimeSig|Signature:$sig\n"
+		. join('', map { "$_\n" } @records);
+	return Music::NWC2MusicXML::MusicXML->new->generate(
+		Music::NWC2MusicXML::Parser->new->parse($nwc)
+	);
+}
+
+subtest 'MusicXML -- lone whole rest fills a 7/8 measure' => sub {
+	my $xml = _bar_rest_xml('7/8',
+		'|Rest|Dur:Whole', '|Bar',
+		'|Note|Dur:Half|Pos:0', '|Note|Dur:4th|Pos:0', '|Note|Dur:8th|Pos:0');
+	like $xml, qr/<divisions>2<\/divisions>/, 'divisions unchanged';
+	like $xml, qr/<rest measure="yes"\/>\s*<duration>7<\/duration>\s*<voice>1<\/voice>\s*<\/note>/,
+		'bar rest lasts 7 eighths and carries no <type>';
+	unlike $xml, qr/<type>whole<\/type>/, 'no whole-note type on the bar rest';
+};
+
+subtest 'MusicXML -- bar rest forces divisions fine enough for the measure' => sub {
+	my $xml = _bar_rest_xml('7/8', '|Rest|Dur:Whole', '|Bar', '|Note|Dur:4th|Pos:0');
+	like $xml, qr/<divisions>2<\/divisions>/, 'divisions raised so 7/8 is a whole number of ticks';
+	like $xml, qr/<rest measure="yes"\/>\s*<duration>7<\/duration>/, 'bar rest is 7 ticks';
+};
+
+subtest 'MusicXML -- bar rest follows a mid-staff time signature change' => sub {
+	my $xml = _bar_rest_xml('4/4',
+		'|Rest|Dur:Whole', '|Bar',
+		'|TimeSig|Signature:3/4', '|Rest|Dur:Whole', '|Bar',
+		'|Rest|Dur:Whole');
+	my @durs = $xml =~ /<rest measure="yes"\/>\s*<duration>(\d+)<\/duration>/g;
+	is_deeply \@durs, [4, 3, 3], 'each bar rest matches the time signature in force';
+};
+
+subtest 'MusicXML -- whole rest sharing a measure is not a bar rest' => sub {
+	my $xml = _bar_rest_xml('6/4', '|Rest|Dur:Whole', '|Note|Dur:Half|Pos:0');
+	unlike $xml, qr/measure="yes"/, 'no measure attribute';
+	like $xml, qr/<rest\/>\s*<duration>4<\/duration>\s*<voice>1<\/voice>\s*<type>whole<\/type>/,
+		'ordinary whole rest keeps its own duration and type';
+};
+
+subtest '_measure_ticks' => sub {
+	my $mt = \&Music::NWC2MusicXML::MusicXML::_measure_ticks;
+	is $mt->({ beats => 7, beat_type => 8 }, 2), 7, '7/8 at 2 divisions';
+	is $mt->({ beats => 4, beat_type => 4 }, 24), 96, '4/4 at 24 divisions';
+	is $mt->({ beats => 7, beat_type => 8 }, 1), undef, 'non-integral length is undef';
+	is $mt->(undef, 2), undef, 'missing time signature is undef';
+};
+
 done_testing();

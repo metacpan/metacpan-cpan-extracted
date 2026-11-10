@@ -31,31 +31,10 @@ foreach $dev (@dev_list) {
 	}
 	my $mediaServer = Net::UPnP::AV::MediaServer->new();
 	$mediaServer->setdevice($dev);
-	my @content_list = $mediaServer->getcontentlist(ObjectID => 0);
-	foreach my $content (@content_list) {
-		get_contentlist($mediaServer, $content);
-	}
+	$mediaServer->walkcontent(callback => sub {});
+	die $mediaServer->getwalkerror() if $mediaServer->getwalkerror();
 }
 
-sub get_contentlist {
-	my ($mediaServer, $content) = @_;
-	my $id = $content->getid();
-	my $title = $content->gettitle();
-
-	unless ($content->iscontainer()) {
-		return;
-	}
-
-	my @child_content_list = $mediaServer->getcontentlist(ObjectID => $id );
-	
-	if (@child_content_list <= 0) {
-		return;
-	}
-	
-	foreach my $child_content (@child_content_list) {
-		get_contentlist($mediaServer, $child_content);
-	}
-}
 
 exit 0;
 

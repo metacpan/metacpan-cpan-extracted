@@ -1,6 +1,7 @@
 [%- WRAPPER 'web/en/layouts/default.html.tt' -%]
 <style>
   .pref-section { max-width: 40rem; }
+  .pref-section + .pref-section { margin-top: 2.5rem; }
   .pref-section h2 {
     font-size: 1.1rem;
     margin-bottom: 0.75rem;
@@ -69,6 +70,39 @@
   browser or computer keeps its own.  Saved charts and printed pages always use the light colours,
   so that they look the same to whoever receives them.</p>
 </section>
+
+<section class="pref-section" aria-labelledby="pref-tables">
+  <h2 id="pref-tables">Tables</h2>
+  <noscript><p class="hint">Changing the number of rows needs JavaScript, which is turned off in this browser.</p></noscript>
+  <p>[% PROCESS "web/en/layouts/page_size.html.tt" ps_id = 'pref-page-size' ps_mode = 'pref' %]</p>
+  <p class="pref-status" id="pref-page-size-status" role="status"></p>
+  <p class="pref-note">How many rows a table shows on each page, and how many rows a pivot shows.
+  All puts every row on one page, which can be slow for a big file.  The Rows per page list under
+  a table changes that page only.  Your choice is saved in this browser, in a cookie, from the next
+  page you open.</p>
+</section>
+
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var COOKIE = '[% page_size_cookie | html %]';
+  var sel    = document.getElementById('pref-page-size');
+  var status = document.getElementById('pref-page-size-status');
+  if (!sel) { return; }
+
+  /* A year; Lax, so a link from another site still sends it; Secure over https. */
+  function save(value) {
+    document.cookie = COOKIE + '=' + encodeURIComponent(value) + '; path=/; max-age=31536000; SameSite=Lax'
+      + (window.location.protocol === 'https:' ? '; Secure' : '');
+    return document.cookie.split(/;\s*/).indexOf(COOKIE + '=' + value) >= 0;
+  }
+
+  sel.addEventListener('change', function () {
+    status.textContent = save(sel.value)
+      ? ''
+      : 'This browser would not save your choice.';
+  });
+}());
+</script>
 
 <script nonce="[% csp_nonce | html %]">
 (function () {

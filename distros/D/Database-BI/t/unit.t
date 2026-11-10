@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 
+# Caches go where CACHEDIR, CACHE_DIR or Object::Configure say before model_dir
+# (Database::BI::CacheDir): without this, a run writes into the user's own cache.
+delete @ENV{qw(CACHEDIR CACHE_DIR Database__BI__cache_dir Database__BI__Extract__cache_dir Database__BI__Model__Geocode__cache_dir)};
+
 use Test::Most;
 use Test::Mojo;
 use Test::Mockingbird qw(mock restore_all);
@@ -2864,6 +2868,7 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 			[ 'Summary::generate'    => sub { Database::BI::Summary::generate(insights => [], label => 'x') } ],
 			[ 'Tutorial::chapters'   => sub { Database::BI::Tutorial->chapters } ],
 			[ 'Geocode::cache_from_models' => sub { Database::BI::Model::Geocode->cache_from_models({}, $SPEC) } ],
+			[ 'CacheDir::resolve'    => sub { require Database::BI::CacheDir; Database::BI::CacheDir::resolve(class => 'Unit::Cached', config => {}) } ],
 			[ 'Geocode::resolve_values' => sub { Database::BI::Model::Geocode->new(geocoder => Unit::Geocoder->new)->resolve_values(['Paris']) } ],
 			[ 'DataSource::new'       => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE) } ],
 			[ 'DataSource::fetch_all' => sub { Database::BI::Model::DataSource->new(directory => $DATA_DIR, table => $SALES_TABLE)->fetch_all } ],

@@ -13,6 +13,7 @@ pperl.h
 pperlGlue.c
 tkText.c
 tkText.h
+tkTextData.h
 tkTextBTree.c
 tkTextDisp.c
 tkTextIndex.c
@@ -33,7 +34,18 @@ t/elide.t
 t/image.t
 t/edit.t
 t/dump.t
+t/stress.t
+t/values.t
+t/values-marks.t
+t/values-runs.t
 utils/FreezeThaw.pm
 utils/Text/TeX.pm
+t/freeing.t
+t/destroymult.t
+t/dying.t
+t/undo-block.t
+t/data-slots.t
+t/valuecommand.t
+t/valuecommand-random.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

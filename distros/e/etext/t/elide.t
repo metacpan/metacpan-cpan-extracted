@@ -12,7 +12,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 46;
+plan tests => 48;
 $mw->geometry('+10+10');
 
 my @bgerrors;
@@ -24,7 +24,10 @@ my @bgerrors;
 my @lines = ("hello world again\n", "a hidden line\n", "the end of this\n", "last\n");
 sub make {
   my ($class) = @_;
-  my $w = $mw->$class(-width => 30, -height => 8, -wrap => 'none')->pack;
+  # Courier -12 is the default on X11; named here because the display line
+  # tests need a monospaced font, and Windows' default (Courier New) may be
+  # missing and replaced by a proportional one (as under Wine).
+  my $w = $mw->$class(-width => 30, -height => 8, -wrap => 'none', -font => ['Courier', -12])->pack;
   $w->insert('end', $_) for @lines;
   $w->tagConfigure('h', -elide => 1);
   $w->tagAdd('h', '1.4', '1.7');		# "o w"
@@ -122,19 +125,24 @@ is($w->search('-elide', 'hidden', '1.0'), '2.2', 'search -elide finds it');
     }
   }
   is($sbad, 0, "search with elided text like Tk::Text ($sq queries)");
+  # Compared with the answers of Tk::Text on X11, written out: on Windows
+  # Tk::Text includes hidden characters when the selection starts inside
+  # hidden text (TK_BUGS.md W5).
   my $selbad = 0;
+  my %selexp = ('1.0 1.end' => "hellorld again", '1.5 3.9' => "orld again\nthe end",
+		'2.0 4.0' => "the end\n", '1.0 end' => "hellorld again\nthe end\nlast\n\n");
   for my $range (['1.0', '1.end'], ['1.5', '3.9'], ['2.0', '4.0'], ['1.0', 'end']) {
-    my %got;
-    for my $x ($ref, $w) {
-      $x->tagRemove('sel', '1.0', 'end');
-      $x->tagAdd('sel', @$range);
-      $got{$x} = eval { $x->SelectionGet } // "undef: $@";
-      $x->tagRemove('sel', '1.0', 'end');
-      $mw->update;
+    $w->tagRemove('sel', '1.0', 'end');
+    $w->tagAdd('sel', @$range);
+    my $got = eval { $w->SelectionGet } // "undef: $@";
+    $w->tagRemove('sel', '1.0', 'end');
+    $mw->update;
+    if ($got ne $selexp{"@$range"}) {
+      $selbad++;
+      diag("selection @$range: got '$got'");
     }
-    $selbad++ if $got{$ref} ne $got{$w};
   }
-  is($selbad, 0, 'the selection leaves elided text out like Tk::Text');
+  is($selbad, 0, 'the selection leaves elided text out (as Tk::Text does on X11)');
 }
 $w->tagConfigure('h', -elide => 0);
 $mw->update;
@@ -173,6 +181,53 @@ $w->tagAdd('h', '1.4', '1.11');
 $mw->update;
 ok(!defined($w->search('dg', '1.0')) && $w->search('c  i', '1.0') eq '1.2', 'a hidden block is skipped by search');
 $w->tagRemove('h', '1.0', 'end');
+# Elided text that runs into a block or out of it: what the tag does not
+# cover is drawn.  The display used to skip the whole block, and the rest
+# of the line, when the hidden range started before the block and ended
+# inside it (the block is laid out with the style of its head, which a
+# tag switching inside it does not set; the block hides what it covers).
+# Every character is compared with the tag's ranges: on the screen (a
+# bounding box of some width) if and only if not tagged; and the line
+# has a height if and only if something of it is on the screen.
+{
+  my $u = $mw->eText(-width => 40, -height => 4, -wrap => 'none', -font => ['Courier', -12])->pack;
+  $u->blockConfigure('Std');
+  $u->tagConfigure('h', -elide => 1);
+  $u->insert('end', "ab cdefgh ij\nsecond\n");
+  $u->blockInsert('Std', '1.3', '1.9');		# ab {cdefgh} ij
+  $u->blockInsert('Std', '1.5', '1.8');		# ab {c{def}gh} ij
+  is($u->get('1.0', '1.end'), 'ab {c{def}gh} ij', 'a block in a block');
+  my %ends = map { $_ => 1 } 3, 5, 9, 12;	# heads and tails
+  my @chars = grep { !$ends{$_} } 0 .. 15;
+  my @bad;
+  for my $r (['1.0', '1.6'], ['1.1', '1.7'], ['1.0', '1.11'], ['1.0', '1.12'],
+	     ['1.0', '1.14'], ['1.3', '1.7'], ['1.3', '1.11'], ['1.3', '1.13'],
+	     ['1.4', '1.7'], ['1.4', '1.10'], ['1.4', '1.14'], ['1.6', '1.8'],
+	     ['1.6', '1.11'], ['1.6', '1.15'], ['1.10', '1.14'], ['1.0', '2.0']) {
+    $u->tagRemove('h', '1.0', 'end');
+    $u->tagAdd('h', @$r);
+    $mw->update;
+    my @ranges = $u->tagRanges('h');
+    my $any = 0;
+    for my $c (@chars) {
+      my $i = "1.$c";
+      my $tagged = 0;
+      for (my $k = 0; $k < @ranges; $k += 2) {
+	$tagged ||= $u->compare($i, '>=', $ranges[$k]) && $u->compare($i, '<', $ranges[$k + 1]);
+      }
+      my @b = $u->bbox($i);
+      my $shown = (@b && $b[2] > 0) ? 1 : 0;
+      $any ||= $shown;
+      push @bad, "h on @$r: $i " . ($shown ? 'drawn' : 'hidden') if $shown == $tagged;
+    }
+    my @d = $u->dlineinfo('1.0');
+    my $high = (@d && $d[3] > 0) ? 1 : 0;
+    push @bad, "h on @$r: line height $high, characters drawn $any" if $high != $any;
+  }
+  is(scalar @bad, 0, 'drawn exactly what the hiding tag does not cover')
+    or diag(join "\n", @bad);
+  $u->destroy;
+}
 # 4. Many elided lines: scrolling and "see" must not get stuck.
 $w->delete('1.0', 'end');
 $w->insert('end', "line $_\n") for 1 .. 300;
@@ -233,7 +288,7 @@ is("@bad", '', scalar(keys %exp) . ' queries with display linestart, lineend and
 # In and around blocks: positions inside a block are hidden by a tag
 # inside it; a wholly hidden block is stepped over.
 {
-  my $b = $mw->eText(-width => 30, -height => 4)->pack;
+  my $b = $mw->eText(-width => 30, -height => 4, -font => ['Courier', -12])->pack;
   $b->blockConfigure('Std');
   $b->insert('end', "ab cdefgh ij\npqrstuvw\n");
   $b->blockInsert('Std', '1.3', '1.9');		# ab {cdefgh} ij

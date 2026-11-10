@@ -1,5 +1,43 @@
 Revision history for Cn-Util
 
+0.0241 2026-11-09 CST (Claude Opus 5.5 helped)
+
+ [`dir`]
+
+ - With `cpu` above 1, a worker process no longer runs the program's `END` blocks and destructors as it finishes. Each worker left through `Parallel::ForkManager`'s `finish`, which calls `exit`, so an `END` block ran once in every worker as well as once at the end, and so did the destructor of every object the program held, such as a database handle's. On Windows, where a worker is a thread of the calling process, nothing has changed.
+
+ - A recursive listing no longer goes through `File::Find`, and takes less than half the CPU time in perl: 0.43 s of user time against 1.06 s over 279,000 entries. It returns the same paths.
+
+ - A recursive listing dies with "Cannot open directory" and the path, as a non-recursive one does, when `dir` is a file, when it does not exist, and when a subdirectory cannot be read. A file used to be returned as the only result, and the other two died with `File::Find`'s "Can't stat" or "Can't opendir".
+
+ [`structure`]
+
+ - `structure` and `st` take 43% less memory and 30% less time on a large array of records: 237 MB and 1.4 s, down from 413 MB and 2.0 s, for 300,000 five-key records. They no longer copy every value they merge at each level. The output is unchanged.
+
+ [`json_file_to_ref`]
+
+ - A file with neither `NaN` nor `Infinity` in it is no longer scanned for them before decoding. The scan took seven times as long as the decoding: 2.1 s for a 43 MB file that decodes in 0.3 s.
+
+ [`file2string`]
+
+ - A directory, or a file whose read fails, dies with "can't read" and the name. It used to return `undef`.
+
+ [`ref_to_json_file`]
+
+ - The file name after "Wrote" is colored only when `STDOUT` is a terminal, or `CLICOLOR_FORCE` is set, and `NO_COLOR` is not, as `structure` already decided. Output sent to a file or a pipe used to carry the escape codes.
+
+ [`p` and `np`]
+
+ - The first `p` or `np` no longer warns "Devel::Size not found, show_memsize will be ignored" when `Devel::Size` is not installed. The memory size is shown when it is.
+
+ [Tests]
+
+ - `t/dir.t` skips its two checks that list `/` when `/` cannot be opened, as on Android, where 0.024 failed under Termux with "Cannot open directory /: Permission denied".
+
+ [Prerequisites]
+
+ - `POSIX`, `Storable` and `File::Temp`, which the module loads, are listed as prerequisites, and `File::Find` and `File::Spec`, which it no longer loads or never did, are not. `Devel::Size` is recommended. All but `Devel::Size` are core.
+
 0.024 2026-11-08 CST (Claude Opus 5.5 helped)
 
  [`execute`]

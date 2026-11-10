@@ -1,5 +1,225 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.11  2026-11-10
+      - Since 0.10: Proc::ShellSpawn on Windows (WS1: paths with drives,
+        UNC names and \, PATH and PATHEXT, NUL, USERPROFILE and ~user, $PPID;
+        t/portable.t: 223 battery lines as on Linux, and Windows' own
+        cases); the event loop in its own module with a Windows backend on
+        an I/O completion port, Ctrl-C included (W5, Proc::Spawner::Loop);
+        sh as Perl with this module where PATH has no sh (SH1); cat, sort,
+        grep from PROC_SHELLSPAWN_BIN or Git for Windows (BIN1, a temporary
+        workaround); pwd inside Perl too (IP1 extended); whose echo the
+        in-process echo is (EC1); PATH's separator from $Config{path_sep};
+        X37 and X38 fixed; t/spawner.t runs on Windows; Perl's Windows bugs
+        drafted, with every workaround of ours listed
+        (doc/perl-win32-system-bugs.md).  Checked on Linux and under Wine
+        (Strawberry Perl 5.38.2), not on real Windows.  The figures of
+        post4-0.04 hold (the measured files differ only in $VERSION); digest
+        of the code they depend on:
+        144cd2b89d7d5655b5bd2bd84a861e13eb1df9d295e6045bfc620f5be1d755ef.
+      - Perl's argv bug on Windows described exactly where SH1 and the
+        tests mention it: every " of an argument is dropped, and one with
+        blanks is split too (checked under Wine: 'echo"$0"' arrives as
+        'echo$0'); before: "blanks and quotes".
+      - TODO A1 (X27) rewritten in the user's four steps (2026-11-10): what
+        is done (step 1; step 2 for the codes an environment switch
+        covers), what is not (step 2 for files, vars and the other codes
+        inside the run; steps 3 and 4), and the natural next piece.
+      - BIN1, a temporary workaround (the user's follow-up (d) to WS1:
+        "Replace them from %ENV (inventing suitable fallbacks)"; marked
+        temporary by the user, 2026-11-10): the directories in
+        PROC_SHELLSPAWN_BIN ('none': none) are searched before PATH; unset,
+        on Windows: Git for Windows' usr\bin (beside git.exe on PATH, or
+        under %ProgramFiles%, %ProgramW6432%, %LOCALAPPDATA%\Programs),
+        else MSYS2's, else Cygwin's; Windows' own sort, find, timeout and
+        expand are never taken for the POSIX ones.  t/portable.t: 5
+        Windows-only lines; under Wine all pass, both primitives
+        (%ProgramFiles% untested: Wine sets it afresh in every process).
+      - SP1 (the user, 2026-11-10; TODO A2 closed): "strict" needs no code
+        for the 142 strict samples that run echo, printf, test, [, true or
+        false: since IP1 these run inside Perl on every platform
+        (large-subset-environment.md, section 3).
+      - t/programs.t: the shell-layer checks of PROC_SHELLSPAWN_ECHO pass
+        the string to t/try.pl in a file (TRY_FILE, as t/portable.t), so
+        they run on Windows too; under Wine all 18 pass (2 skipped: no
+        symbolic links, no coreutils), and t/portable.t passes.
+      - sh as Perl with this module (SH1; the user's follow-up (c) to WS1:
+        "Should not sh -c just call Perl with our module, then?
+        (Configurable)"): a command sh runs as $^X -MPARSER
+        -MProc::ShellSpawn=sh -e0 -- ARGS (sh_main: -c TEXT [NAME [ARGS]],
+        a file, -s or stdin; other option letters as set takes them).
+        PROC_SHELLSPAWN_SH: auto (the default: when PATH has no sh),
+        perl, program.  run() takes args, arg0 and opt.  Tests:
+        t/programs.t (10 strings the same with dash and as Perl, apart from
+        dash's line numbers), t/portable.t (4 Windows-only lines; under Wine
+        all pass with win_spawn.h, through system1 the one with blanks and
+        quotes in an argument is TODO: Perl's argv bug, not worked around).
+      - doc/perl-win32-system-bugs.md: 4, a draft report of X38's cause in
+        Perl (on Windows $^F is not honoured: Perl's close-on-exec is fcntl,
+        a no-op there, and its spawn passes every inheritable handle; read
+        in perl 5.38.2's doio.c and win32/win32.c, reproduced under Wine
+        with a 6-line script, and its control); 5, every workaround of ours
+        for these bugs (module and tests) and what to do when Perl is fixed.
+      - ~user on Windows (the user's follow-up (b) to WS1: "%USERPROFILE%/
+        ../user"): USERPROFILE for one's own name (USERNAME), else the
+        sibling of USERPROFILE of that name if it is a directory, else as
+        written (it was always as written).  t/portable.t: 3 Windows-only
+        lines (one's own, ~Public, none and ~..); under Wine: pass, both
+        primitives.
+      - EC1 (the user, 2026-11-09; TODO A2a): whose echo the in-process echo
+        is: PROC_SHELLSPAWN_ECHO=coreutils (the default, as before; it
+        heeds POSIXLY_CORRECT), dash or bash (their builtins: dash 0.5.12,
+        escapes always but not \x, options only a first -n; bash 5.2.21 as
+        bash --posix, escapes with -e, also \E, \u, \U); neither builtin
+        changes with POSIXLY_CORRECT, so with dash or bash ours keeps
+        matching that shell where X27's run found the program differing
+        (large-subset-environment.md, section 9).  $Proc::ShellSpawn::ECHO
+        holds it; an unknown value dies at load.  The program echo (outside
+        %INPROC) is not affected.  Checked against the shells on 24,000
+        random calls (C and C.UTF-8, with and without POSIXLY_CORRECT).
+        Tests: t/programs.t, 732 runs against t/echo-shells.txt (recorded
+        from dash and bash: perl t/programs.t --record-shells) and the
+        shell layer; t/dash.t runs ours with PROC_SHELLSPAWN_ECHO=dash,
+        with a new battery t/batteries/echo.txt (12 strings; 11 of them
+        differ from dash with the default echo).
+      - UNC names with backslashes tested (the user's follow-up (e) to WS1):
+        t/portable.t has 7 Windows-only lines (cd to \\.\C:\windows and
+        //./C:/windows, .. stopping at the share, a relative cd and test -d,
+        \x, a child started there); Wine has no server shares, its device
+        names are UNC names in form.  Under Wine: pass, both primitives.
+        Found by them, ❰BUG❱ (ours, post-0.10 only): \x from a UNC directory
+        was taken from the process's own drive, not the share (path_in);
+        pwd at the root of \\.\C: printed nothing (the server '.' taken for
+        a . component, Programs.pm).  t/portable.t: PATH's separator from
+        %Config.
+      - t/spawner.t runs on Windows too (the user, 2026-11-09: "Sure do!"):
+        the programs it starts are Perl itself (true, cat, wc, pwd and the
+        simple sh -c lines replaced; the Perl code from files, since Perl's
+        own spawn on Windows splits an argument with blanks and a quote);
+        what only POSIX has is skipped there (27 of 52).  Under Wine all
+        pass through both primitives.  Found by it: X38 (ours: through
+        system1 a child inherits every inheritable handle of ours; Perl's
+        pipes on Windows are such, so a child can hold the write end of its
+        own input; fixed: our fds from 3 up made not inheritable around the
+        call and put back, as POSIX has it, not thread-safe; the user: "do
+        as on POSIX"); and on Windows another waitpid does not
+        take a status from the loop (the kept process handle):
+        pspawn-spawner.md, G2.
+      - The W5 check's text said the shell layer is not ported to Windows;
+        it was ported later the same day (doc/pspawn-shell-windows.md): the
+        text now says what held when it was checked (pspawn-spawner.md,
+        section 8; pspawn-loop.md; large-subset-state.md, section 7), and
+        TODO has the library under Wine as work.
+      - PATH's separator from $Config{path_sep} (the user's follow-up (a) to
+        WS1, 2026-11-09), no longer hard-coded, in one place:
+        Proc::Spawner::path_split (the user, after a detour without it: "a
+        helper makes sense"), used by the search emulation, win_find and the
+        shell's lookups (of commands, and of . files).  On Windows it reads
+        PATH as win_spawn.h and Perl's win32.c do (WS1: a "quoted;entry"
+        whole; an unclosed quote runs to the end, where the shell cut the
+        entry before).  Tests: t/spawner.t (both forms, a search through two
+        entries), t/windows.t (a quoted entry and an empty one).
+      - The user's decisions on the shell on Windows (2026-11-09): WS1, the
+        rules of doc/pspawn-shell-windows.md, section 1, confirmed; pwd
+        inside Perl on every platform (IP1 extended) confirmed; follow-ups
+        in TODO (PATH's separator from %Config, ~user, sh -c through Perl,
+        programs from %ENV, UNC names with backslashes untested).
+      - Proc::ShellSpawn on Windows (the user, 2026-11-09: "Proceed with the
+        shell layer on Windows"; doc/pspawn-shell-windows.md): paths with
+        drives and \, PATH with ; and PATHEXT, NUL for /dev/null, $PPID from
+        NtQueryInformationProcess (__win_ppid), exit statuses decoded by
+        hand (no WIFSIGNALED there), no umask, no SIGCHLD handler between
+        runs, ~ from USERPROFILE, traps on signals Perl lacks there,
+        Permission denied (126) for what Windows cannot run; Graph: plain
+        pipes, close-on-exec by __set_cloexec, no F_GETFL.  pwd runs inside
+        Perl too (IP1 extended, in TODO; as coreutils 9.4, 352 runs
+        checked).  A program inside Perl writing into a closed pipe gets
+        SIGPIPE's 141 on Windows too.  t/portable.t: 223 battery lines with
+        their output recorded on Linux (t/batteries/portable.txt); under
+        Wine all the same, through both primitives, also in a Windows-way
+        gmake build.  t/try.pl: TRY_FILE (the string from a file: Perl's
+        own spawn mangles arguments on Windows), and status 255 for a
+        string outside the subset on every platform.
+      - Findability (the user, 2026-11-09): section 7 of large-subset-state.md
+        opens with a list of its parts, each with the code and day it was
+        measured on; IP1 and W5 are subsections of their own.  The index
+        doc/large-subset/README.md names section 7's parts, section 9 of
+        large-subset-environment.md, the two .tsv records and the runner's
+        options.  pspawn-spawner.md, section 8: Proc::ShellSpawn on Windows,
+        not ported, with what blocks it and what passes under Wine;
+        pspawn-loop.md: the library under Wine.  test-pools.md: how to rerun
+        ours alone after a change, the environment varied, and through Run.
+        large-subset-runreport.pl -ours-from DIR (join ours of a later run
+        with dash and bash of an earlier one) and -ours-vs DIR (ours of two
+        runs, sample by sample), which the IP1 and W5 checks had done by
+        hand; checked to give the same results.
+      - doc/pspawn-loop.md: the event loop (W5) on its own page: how it works
+        on each platform (the completion port, Ctrl-C, alarm), what was
+        checked (a table), the known limits; linked from doc/README.md, the
+        POD of Proc::Spawner::Loop and pspawn-spawner.md, section 8.
+      - W5 checked over the library (2026-11-09): on Linux, ours alone at
+        main against the rebuilt table, sample by sample: no change from W5
+        (55 changed, all timing, process IDs, inode numbers, or X37's fix).
+        Under Wine the library cannot run: Proc::ShellSpawn is not ported
+        (run() dies at getppid, then at fcntl F_GETFL in Graph; in TODO);
+        the Windows build's tests pass there, and all 45,501 parse trees
+        are the same as on Linux.  large-subset-state.md, section 7.
+      - large-subset-runcompare.pl -env mtime fixes the worker's directory
+        too (the run's ".."): joining runs of different days made ls -la
+        differ.
+      - Section 7 of large-subset-state.md with the in-process programs
+        (IP1, the code of 0.10), rebuilt from the run of post-0.09 rather
+        than run again: dash and bash unchanged; ours run again on the 1,055
+        samples where it ran echo, printf, test, [, true or false itself
+        (and on 300 others as a check: the same, all 300), in the same
+        workers.  2 samples change class: printf "\u20AC" (X37, fixed) and a
+        race.  README and TODO say so.
+      - X37 (ours; 0.10): the in-process printf printed \u and \U escapes as
+        UTF-8 even in the C locale, where coreutils 9.4 prints the escape
+        (\u20AC, \U0001F600; also above U+10FFFF), took a surrogate (\ud800)
+        where coreutils stops with "invalid universal character name" and
+        status 1, and %b dropped the text before a bad escape.  Now as
+        coreutils; 14 runs added to t/programs.txt.  Found by the behaviour
+        run with the in-process programs.
+      - large-subset-runcompare.pl: -shells (run only some of dash, bash,
+        ours), -workers-from DIR (each sample in the worker, so the
+        directory and user, of an earlier run), and a restart that works:
+        the samples already done were never found (the records' keys are
+        sorted, "id" is not first).
+      - W5 (the user, 2026-11-08: "Use the Windows' way"; 2026-11-09: "in a
+        separate module, with an \"elegant\" API which may be shared between
+        your POSIX approach and Win32"): Proc::Spawner::Loop, the one event
+        loop: read, write, child, after (a timer), defer, wait_until, poll,
+        pipe; each watch can be cancelled.  Backends: POSIX (select and
+        SIGCHLD, the code moved from Proc::Spawner) and Win32 (win_loop.h:
+        one I/O completion port; overlapped I/O where the handle allows it,
+        a helper thread where not; RegisterWaitForSingleObject for children).
+        Proc::Spawner's on_read, on_write, defer, wait_until, poll remain as
+        its old names; a read's callback now also gets the errno of an
+        error.  On Windows, Proc::Spawner::Graph writes into a pipe directly
+        (no /proc).  t/loop.t: 12 tests on Linux, 17 under Wine with
+        Strawberry Perl (through both Windows primitives), also in a
+        Windows-way build (perl Makefile.PL, gmake, gmake test).
+      - W5 on Windows (the user, 2026-11-09: "Can a handler for Ctrl-C
+        report to the loop instead?"): the wait has no time limit of its
+        own; while wait_until runs, a console control handler of ours posts
+        Ctrl-C (and Ctrl-Break, close, shutdown) to the completion port, and
+        the wait gives Perl's own handler up to 200 ms to mark the signal;
+        while an alarm is set, 50 ms slices with Perl's message check.
+        Checked under Wine with a console: the %SIG{INT} handler ran 0.04 s
+        after Ctrl-C (without ours: at the next event, 3 s later); alarm on
+        time; default and IGNORE as before.  t/loop.t: a test of it (skipped
+        without a console).
+      - large-subset-runcompare.pl -only with an empty list (or an empty
+        @FILE) is an error: it meant every sample.
+      - large-subset-state.md, section 7, and README: the behaviour table and
+        "Through Run" were run before IP1, with the coreutils programs (what
+        PROC_SHELLSPAWN_INPROC=none gives now), which they now say; the re-run
+        with the in-process default is in TODO (not re-measured).
+      - large-subset-state.md, section 7: Run's commit is a2be65e (was
+        42988a4: repository ilyaz-ai/run's history rewritten with GitHub's
+        no-reply address, 2026-11-08; the same Run.pm).
+
 0.10  2026-11-08
       - Since 0.09: Spawner.so loads with perl before 5.34 (X36, RT #182809;
         thanks to Slaven Rezic for the report); echo, printf, test, [, true

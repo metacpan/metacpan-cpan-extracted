@@ -1,5 +1,41 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.041 - 10 November 2026
+============
+
+ - TGA: small memory leak for images with a non-zero idstring length,
+   but not enough file length to satisfy it.
+   This could also leak that memory if the image was larger than the
+   image file limits.
+   https://github.com/tonycoz/imager/security/advisories/GHSA-259f-62p5-33rg
+
+ - PNG:
+   - ensure file limit checks match the files created, using the new APIs
+     https://github.com/tonycoz/imager/security/advisories/GHSA-q682-9rc3-fm5f
+   - cleanup old cpan.org email addresses
+
+ - PNM:
+   - ensure file limit checks match the files created, using the new APIs
+     https://github.com/tonycoz/imager/security/advisories/GHSA-4574-vr7j-8jwm
+
+ - TIFF:
+   - fix a build warning from the library check probe
+     https://github.com/tonycoz/imager/issues/571
+   - cleanup old cpan.org email addresses
+
+ - API:
+   - eliminate double documentation of im_data in the i_img type
+   - eliminate the in-place image construction API i_img_empty_ch()
+     and variants
+   - both pulled from an old topic branch, with some updates
+
+   - added alternative C API image creation APIs (i_img_8_file_new,
+     etc) that check the file limits before creating the image.  These
+     help ensure the limit checked matches the image created.
+     https://github.com/tonycoz/imager/security/advisories/GHSA-4574-vr7j-8jwm
+     https://github.com/tonycoz/imager/security/advisories/GHSA-q682-9rc3-fm5f
+
+
 Imager 1.040 - 20 October 2026
 ============
 

@@ -1,5 +1,9 @@
 Revision history for Web-Simple
 
+0.037 - 2026-11-09
+  [Security]
+  - escape single quotes in entities (CVE-2026-120212)
+
 0.036 - 2026-11-03
   [Security]
   - Properly escape interpolated strings (CVE-2026-114627)

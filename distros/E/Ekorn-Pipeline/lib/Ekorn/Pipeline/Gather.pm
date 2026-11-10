@@ -51,51 +51,75 @@ Ekorn::Pipeline::Gather - a stage made afresh for each run, told when the values
 
 =head1 DESCRIPTION
 
-A stage is a code reference, called with each value in turn. It can't
-tell when the last value has gone by, and whatever it keeps in a
-closure stays there from one run of its pipeline to the next. A stage
-that gathers values, to give them in batches or all together, needs
-both: state of its own on each run, and a call at the end.
+A plain stage, a code reference, is called with each value in turn.
+It can't tell when the last value has gone by. Whatever it keeps in a
+closure stays there from one run of its pipeline to the next. A stage that
+gathers values, to give them in batches or all together, needs both:
+fresh state on each run, and a call at the end.
 
 C<gather> makes such a stage. Its block is called at the start of each
-run of a pipeline, so whatever the block declares is fresh on each run:
-each call of a pipeline with values, and each iterator made from it.
-The block returns:
+run, so whatever the block declares is fresh each time. A run is a
+call of a pipeline with values, or an iterator made from it. The block
+returns:
 
 =over
 
-=item * the stage, called with each value as any stage is;
+=item * the stage: a code reference, called with each value as any
+stage is, or a pipeline;
 
 =item * optionally, a function called with no arguments, and C<$_>
 undefined, once the values have run out.
 
 =back
 
-What the end function returns goes through the rest of the stages, as
-what a stage returns does: nothing, one value, or several. It's called
-even when there were no values, so an end can give an empty result,
-such as C<[]>. The ends are called in order, first stage first, and
-what one returns goes through the stages after it before the next end
-is called, so an end later in the pipeline gets everything sent to it.
+What the end function returns goes through the rest of the stages,
+just like what a stage returns: nothing, one value, or several. It's
+called even when there were no values, so an end can give an empty
+result, such as C<[]>.
 
-A stage that keeps state of any kind, such as a count, should be made
-with C<gather>, even without an end function, so that it starts afresh
-on each run.
+The ends are called in order, first stage first. What one end returns
+goes through the stages after it before the next end is called, so an
+end later in the pipeline gets everything sent to it.
+
+Make any stage that keeps state, such as a count, with C<gather>, even
+without an end function, so that it starts afresh on each run.
+
+=head2 A pipeline as the stage
+
+A pipeline returned as the stage has its stages made for the run in
+its place, as if they had been given to the pipeline there. A
+C<gather> stage inside it is made afresh too, and a stop inside it
+ends the whole run. So the block can build a pipeline for each run,
+or choose one:
+
+    # The first $n values of each run, numbered from 1
+    sub first_numbered ($n) {
+        return gather {
+            my $i = 0;    # this run's
+            Ekorn::Pipeline->new(sub { ++$i . ". $_" }, take($n));
+        };
+    }
+
+The block's end function, if it returns one, is called after the ends
+of the pipeline's own stages. A stage inside the pipeline is named in
+messages by its position in each, as C<#2.3> for the third stage of
+the pipeline returned by stage #2.
 
 =head2 Stopping
 
 After a L<Ekorn::Pipeline::Stop>, the ends of the stages after the one
-that stopped are called, so they get the values before the stop, and
-any it carries; those of the stage that stopped, and the stages before
-it, are not, as nothing else is processed. An end can stop the pipeline
-too: the values its stop carries go on, and the ends after it are
-still called.
+that stopped are called. They get the values from before the stop, and
+any it carries. The ends of the stage that stopped, and of the stages
+before it, aren't called, as nothing else is processed.
+
+An end can stop the pipeline too. The values its stop carries go on,
+and the ends after it are still called.
 
 =head2 Context
 
 Inside an end function, and the stages it sends values to,
-L<Ekorn::Pipeline/ending> is true, so code that tells its stages about
-the value they're given can say that the value comes from many, not
+L<Ekorn::Pipeline/ending> is true. Code that tells its stages where a
+value came from can use it to say the value comes from many, not
 one.
 
 =head1 FUNCTIONS
@@ -104,10 +128,10 @@ one.
 
     my $stage = gather { ...; return ($stage, $end) };
 
-Returns a stage that a pipeline makes for each run by calling the
-block. It's a code reference, blessed into Ekorn::Pipeline::Gather, so
-it can be given wherever a stage can. C<gather> is exported by default;
-to keep it out of your namespace:
+Returns a stage that a pipeline makes afresh for each run, by calling
+the block. It's a code reference, blessed into Ekorn::Pipeline::Gather,
+so it can go wherever a stage can. C<gather> is exported by default.
+To keep it out of your namespace:
 
     use Ekorn::Pipeline::Gather ();
 
@@ -119,11 +143,13 @@ to keep it out of your namespace:
 
 C<gather> was given something other than a block or code reference.
 
-=item Expected stage #%d, made with gather, to return one or two code references
+=item Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally an end function
 
-A block given to C<gather> returned something other than a stage, or a
-stage and an end function. Reported when a run starts: when the
-pipeline is called with values, or an iterator is made from it.
+A block given to C<gather> returned something else. It's reported
+when a run starts: when the
+pipeline is called with values, or an iterator is made from it. The
+stage is named by its position, as L<Ekorn::Pipeline/DIAGNOSTICS>
+describes.
 
 =back
 

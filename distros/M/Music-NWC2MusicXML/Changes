@@ -1,5 +1,18 @@
 Revision history for Music-NWC2MusicXML
 
+0.003.0	Mon Nov  9 08:17:51 PM EST 2026
+	[ Bug Fixes ]
+	- MusicXML: a whole rest standing alone in a bar was emitted as a
+	  four-crotchet rest whatever the time signature, so bars in 7/8, 3/4,
+	  2/4 etc. were the wrong length and importers re-barred or padded the
+	  music.  NWC uses a whole rest to mean "rest for the whole bar"; it is
+	  now emitted as <rest measure="yes"/> with the duration of the bar.
+	  <divisions> is raised where needed so the bar length is a whole
+	  number of ticks.
+
+	[ Enhancements ]
+	- Added website
+
 0.002.4	Tue Nov  3 04:12:32 PM EST 2026
 	[ Bug Fixes ]
 	- MusicXML: DynVariance events (Style:Crescendo / Style:Diminuendo) were

@@ -1,6 +1,6 @@
 use 5.014;
 
-package Plack::Middleware::CSP 0.02 {
+package Plack::Middleware::CSP 0.04 {
     use utf8;
     use strict;
     use warnings;
@@ -39,7 +39,7 @@ package Plack::Middleware::CSP 0.02 {
                 # Content type?!? Restrict to… sane values? text, html…?
                 s/\Q$token/$nonce/g for @{ $res->[2] };
             }
-            $h->set("content-security-protocol" => $self->_csp->header );
+            $h->set("Content-Security-Policy" => $self->_csp->header );
          });
     }
     1;

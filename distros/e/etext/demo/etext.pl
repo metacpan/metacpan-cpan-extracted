@@ -1,5 +1,4 @@
-  @chars = map { $state->{by_table}->[-1]->{$_} || '\unknown' } @chars
-    if @{$state->{by_table}};#!/usr/bin/perl
+#!/usr/bin/perl
 # 	$rcs = ' $Id: etext.t,v 1.8 1996/10/30 20:04:30 ilya Exp ilya $ ';
 #
 # Interactive demonstration of Tk::eText: editable fractions, radicals,
@@ -1643,8 +1642,23 @@ sub Tk::Text::BlockSeparator::insertSelfTeX {
   );
 }
 
+# A TagOn element of "block list" is a reference to the tag's name, or,
+# for a run that has a value (tag data), a list [name, value].
+sub Tk::Text::TagOn::name {
+  my $self = shift;
+  UNIVERSAL::isa($self, 'ARRAY') ? $self->[0] : $$self;
+}
+
+# The same for marks: a MarkLeft or MarkRight element is a reference to
+# the mark's name, or, for a mark that has a value (mark data), a list
+# [name, value].  (Export and paste leave marks out, values included.)
+sub Tk::Text::MarkLeft::name { Tk::Text::TagOn::name(@_) }
+sub Tk::Text::MarkRight::name { Tk::Text::TagOn::name(@_) }
+
 sub Tk::Text::TagOn::insertSelfTeX {
-  my ($self, $state) = (shift, shift);
+  my ($obj, $state) = (shift, shift);
+  my $name = $obj->name;
+  my $self = \$name;
   my $out = $state->{tag2TeX}[-1]{$$self};
   my @out;
   $state->{char_by_char}++ if $char_by_char{$$self};
@@ -1756,7 +1770,7 @@ sub Tk::Text::TagOn::insertSelf {
   my $self = shift;
   my $widget = shift;
   my $pos = shift || 'insert';
-  $widget->{tags}{$$self} = $widget->index($pos);
+  $widget->{tags}{$self->name} = $widget->index($pos);
 }
 
 sub Tk::Text::TagOff::insertSelf {

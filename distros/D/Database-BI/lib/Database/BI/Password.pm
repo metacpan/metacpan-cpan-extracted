@@ -3,12 +3,13 @@ package Database::BI::Password;
 use strict;
 use warnings;
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 use Carp qw(croak);
 use Digest::SHA qw(hmac_sha256);
 use Exporter qw(import);
 use MIME::Base64 qw(encode_base64 decode_base64);
+use Database::BI::I18N ();
 use Readonly;
 
 our @EXPORT_OK = qw( hash_password verify_password is_password_hash );
@@ -26,14 +27,17 @@ Readonly my $KEY_BYTES      => 32;
 Readonly my $SCHEME         => 'pbkdf2-sha256';
 Readonly my $HASH_RE        => qr{\A\Q$SCHEME\E\$(\d{5,9})\$([A-Za-z0-9+/]{22})\$([A-Za-z0-9+/]{43})\z};
 
-# What hash_password croaks with.  They are for whoever calls it (the
-# password command, a test), so they are English only.
+# What hash_password croaks with, for whoever calls it (the password command, a
+# test), in the language Database::BI::I18N chooses from the locale.
 Readonly our %MESSAGES => (
 	error_password_required => 'hash_password: a password is required',
 	error_password_rounds   => 'hash_password: rounds must be a whole number from %d to %d',
 	error_password_salt     => 'hash_password: a salt is %d bytes',
 	error_password_random   => 'hash_password: Crypt::URandom gave %d random bytes, not %d',
 );
+
+# _text($key) -> the template for $key in the current language.
+sub _text { return Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $_[0]) }
 
 # _pbkdf2($password, $salt, $rounds, $bytes) -> $key
 #
@@ -62,7 +66,7 @@ sub _random_bytes {
 	my ($n) = @_;
 	require Crypt::URandom;
 	my $bytes = Crypt::URandom::urandom($n);
-	croak sprintf($MESSAGES{error_password_random}, length($bytes // ''), $n)
+	croak sprintf(_text('error_password_random'), length($bytes // ''), $n)
 		unless defined $bytes && length($bytes) == $n;
 	return $bytes;
 }
@@ -86,12 +90,12 @@ sub _octets {
 
 sub hash_password {
 	my ($password, %opts) = @_;
-	croak $MESSAGES{error_password_required} unless defined $password && length $password;
+	croak _text('error_password_required') unless defined $password && length $password;
 	my $rounds = $opts{rounds} // $DEFAULT_ROUNDS;
-	croak sprintf($MESSAGES{error_password_rounds}, $MIN_ROUNDS, $MAX_ROUNDS)
+	croak sprintf(_text('error_password_rounds'), $MIN_ROUNDS, $MAX_ROUNDS)
 		unless $rounds =~ /\A\d+\z/ && $rounds >= $MIN_ROUNDS && $rounds <= $MAX_ROUNDS;
 	my $salt = $opts{salt} // _random_bytes($SALT_BYTES);
-	croak sprintf($MESSAGES{error_password_salt}, $SALT_BYTES) unless length($salt) == $SALT_BYTES;
+	croak sprintf(_text('error_password_salt'), $SALT_BYTES) unless length($salt) == $SALT_BYTES;
 	my $key = _pbkdf2(_octets($password), $salt, $rounds, $KEY_BYTES);
 	return join '$', $SCHEME, $rounds, _b64($salt), _b64($key);
 }
@@ -126,7 +130,7 @@ Database::BI::Password - Hash and check the login password
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 

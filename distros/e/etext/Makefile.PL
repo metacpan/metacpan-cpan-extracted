@@ -5,6 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Tk::MMutil;
 use Tk::Config ();
+use Config;
 
 # The eText widget is a self-contained (tk4.0b3-derived, block-enabled)
 # text widget compiled against the headers of the installed Perl/Tk.
@@ -13,6 +14,17 @@ use Tk::Config ();
 
 my $tk  = Tk::MMutil::installed_tk();
 my $ptk = Tk::MMutil::findpTk($tk);
+
+# The representation of the values kept on nodes, marks, runs and blocks
+# (tkTextData.h): A, the Perl value itself (the default), or B, a block
+# of typed slots of which the Perl value is one, built with
+#   ETEXT_DATA_ARRAYS=1 perl Makefile.PL
+# (for the development of the slots; the widget behaves the same).
+my $define = '-DLangIsPerl';
+if ($ENV{ETEXT_DATA_ARRAYS}) {
+    $define .= ' -DTK_TEXT_DATA_ARRAYS=1';
+    print "Building representation B of the value containers (TK_TEXT_DATA_ARRAYS=1)\n";
+}
 
 my @c = map { "$_.c" } qw(tkText tkTextBTree tkTextDisp tkTextIndex
 			  tkTextMark tkTextTag tkTextWind tkTextImage tkTextUndo
@@ -52,16 +64,23 @@ my %args = (
 	no_index       => { directory => [qw(utils demo)] },
     },
     C		  => [ @c, 'eText.c' ],
-    H		  => [ qw(tkText.h pperl.h eTextSyms.h) ],
+    H		  => [ qw(tkText.h tkTextData.h pperl.h eTextSyms.h) ],
     OBJECT	  => '$(O_FILES)',
     INC		  => "-I. -I$tk -I$ptk $Tk::Config::xinc",
-    DEFINE	  => '-DLangIsPerl',
-    LIBS	  => [ "$Tk::Config::xlib -lX11" ],
+    DEFINE	  => $define,
+    # gcc and clang (both set gccversion): warn about our own code where
+    # Perl's flags do not already ask for it.  CCFLAGS replaces
+    # $Config{ccflags}, so they are passed on.
+    ($Config{gccversion} && $Config{ccflags} !~ /(?:^|\s)-Wall\b/
+     ? (CCFLAGS => "$Config{ccflags} -Wall") : ()),
+    # Everything X goes through Tk's vtables; on Windows there is no
+    # libX11 (Tk's Xlib emulation lives in Tk itself).
+    LIBS	  => [ $^O eq 'MSWin32' ? '' : "$Tk::Config::xlib -lX11" ],
     DIR		  => [],
     # eTextSyms.PL regenerates the (committed) symbol-prefix header; it
     # must only be run by hand, never by MakeMaker's default *.PL rule.
     PL_FILES	  => {},
-    depend	  => { '$(O_FILES)' => 'tkText.h pperl.h eTextSyms.h' },
+    depend	  => { '$(O_FILES)' => 'tkText.h tkTextData.h pperl.h eTextSyms.h' },
     dist	  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
     clean	  => { FILES => 'etext-* MANIFEST.bak' },
 );

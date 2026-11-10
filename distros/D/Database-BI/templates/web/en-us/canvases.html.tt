@@ -1,0 +1,14 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt'
+    page_title = title
+-%]
+[%- # GET /canvases: the main navigation's Canvases link.  The list and the
+    # Import canvas button are the home page's (layouts/canvas_list.html.tt).
+-%]
+<nav class="back-link" aria-label="Breadcrumb">[% PROCESS "web/en/layouts/breadcrumb.html.tt" %]</nav>
+<p class="canvases-intro">A canvas is a page of charts and tables that you arrange yourself. Click one to open it.</p>
+<style>
+.canvases-intro { margin: 0.5rem 0 0.75rem; }
+.cv-empty { margin: 0.5rem 0; color: var(--muted, #6c757d); }
+</style>
+[% PROCESS "web/en/layouts/canvas_list.html.tt" show_import = 1 %]
+[%- END -%]

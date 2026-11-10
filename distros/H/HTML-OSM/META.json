@@ -81,6 +81,6 @@
          "web" : "https://github.com/nigelhorne/HTML-OSM"
       }
    },
-   "version" : "0.14",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

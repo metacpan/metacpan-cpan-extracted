@@ -32,21 +32,23 @@ my %WriteMakefileArgs = (
     "Data::Printer" => "1.000",
     "Devel::Confess" => 0,
     "Exporter" => 0,
-    "File::Find" => 0,
-    "File::Spec" => 0,
+    "File::Temp" => 0,
     "JSON::MaybeXS" => 0,
+    "POSIX" => 0,
     "Parallel::ForkManager" => "1.12",
     "Scalar::Util" => 0,
+    "Storable" => 0,
     "Term::ANSIColor" => "3.00",
     "autodie" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Find" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.024",
+  "VERSION" => "0.0241",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,8 +68,10 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "JSON::MaybeXS" => 0,
+  "POSIX" => 0,
   "Parallel::ForkManager" => "1.12",
   "Scalar::Util" => 0,
+  "Storable" => 0,
   "Term::ANSIColor" => "3.00",
   "Test::Exception" => 0,
   "Test::More" => "0.88",

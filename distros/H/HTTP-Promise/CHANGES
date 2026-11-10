@@ -1,10 +1,14 @@
 Revision history for Perl module HTTP::Promise
 
+v0.7.5 2026-11-10T17:04:36+0900
+    - Better handling of rfc6839 mime types extension
+    - Updated dependencies
+
 v0.7.4 2026-04-24T19:01:29+0900
     - Correcting a missing error catch in send() in HTTP::Promise
     - Improved HTTP::Promise::MIME by using Module::Generic::File::Magic
     - Extended from 767 to 825 mime-types and their extensions.
-    - Updated dependencies fro DateTime::Lite
+    - Updated dependencies for DateTime::Lite
 
 v0.7.3 2026-03-09T13:13:37+0900
     - HTTP::Promise::Body::Form::Data: When building a multipart/form-data request

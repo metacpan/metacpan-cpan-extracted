@@ -1,11 +1,11 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Response.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2022/03/21
-## All rights reserved
+## Modified 2026/10/19
+## All rights reserved.
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $DEFAULT_PROTOCOL $VERSION );
     use HTTP::Promise::Status;
     our $DEFAULT_PROTOCOL = 'HTTP/1.0';
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -40,7 +40,7 @@ sub init
         elsif( @_ >= 2 && 
                defined( $_[0] ) && 
                $_[0] =~ /^\d{3}$/ &&
-               ( ( defined( $_[1] ) && $_[1] =~ /\S/ ) || !defined( $_[1] ) ) )
+               ( ( defined( $_[1] ) && $_[1] =~ /\S/ ) || !CORE::length( $_[1] // '' ) ) )
         {
             ( $code, $status ) = splice( @_, 0, 2 );
         }
@@ -382,7 +382,7 @@ HTTP::Promise::Response - HTTP Response Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

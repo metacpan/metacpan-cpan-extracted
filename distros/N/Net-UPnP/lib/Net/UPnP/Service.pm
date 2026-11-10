@@ -175,7 +175,7 @@ sub getposturl() {
 
 sub postaction() {
 	my($this) = shift;
-	my ($action_name, $action_arg) = @_;
+	my ($action_name, $action_arg, $http_options) = @_;
 	my (
 		$dev,
 		$ctrl_url,
@@ -241,8 +241,12 @@ $soap_content .= <<"SOAP_CONTENT";
 </s:Envelope>
 SOAP_CONTENT
 
-	$http_req = Net::UPnP::HTTP->new();
+	my %options = %{$http_options || {}};
+	my $allowed = $dev->getallowedaddresses();
+	$options{allowed_addresses} = $allowed if defined $allowed;
+	$http_req = Net::UPnP::HTTP->new(%options);
 	$post_res = $http_req->postsoap($post_addr, $post_port, $post_path, $soap_action, $soap_content);
+	$post_res ||= Net::UPnP::HTTPResponse->new();
 
 	$action_res->sethttpresponse($post_res);
 	
@@ -255,8 +259,7 @@ SOAP_CONTENT
 
 sub postcontrol() {
 	my($this) = shift;
-	my ($action_name, $action_arg) = @_;
-	return $this->postaction($action_name, $action_arg);
+	return $this->postaction(@_);
 }
 
 #------------------------------
@@ -315,8 +318,10 @@ $soap_content = <<"SOAP_CONTENT";
 </s:Envelope>
 SOAP_CONTENT
 
-	$http_req = Net::UPnP::HTTP->new();
+	my $allowed = $dev->getallowedaddresses();
+	$http_req = Net::UPnP::HTTP->new(defined($allowed) ? (allowed_addresses => $allowed) : ());
 	$post_res = $http_req->postsoap($post_addr, $post_port, $post_path, $soap_action, $soap_content);
+	$post_res ||= Net::UPnP::HTTPResponse->new();
 
 	$query_res->sethttpresponse($post_res);
 	
@@ -350,7 +355,7 @@ Net::UPnP::Service - Perl extension for UPnP.
             next;
         }
         $condir_service = $dev->getservicebyname('urn:schemas-upnp-org:service:ContentDirectory:1');
-        unless (defined(condir_service)) {
+        unless (defined($condir_service)) {
             next;
         }
         %action_in_arg = (
@@ -365,11 +370,11 @@ Net::UPnP::Service - Perl extension for UPnP.
         unless ($action_res->getstatuscode() == 200) {
         	next;
         }
-        $actrion_out_arg = $action_res->getargumentlist();
-        unless ($actrion_out_arg->{'Result'}) {
+        $action_out_arg = $action_res->getargumentlist();
+        unless ($action_out_arg->{'Result'}) {
             next;
         }
-        $result = $actrion_out_arg->{'Result'};
+        $result = $action_out_arg->{'Result'};
         while ($result =~ m/<dc:title>(.*?)<\/dc:title>/sgi) {
             print "\t$1\n";
         }

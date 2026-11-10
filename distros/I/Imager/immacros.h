@@ -137,6 +137,15 @@ returns -1 and pushes an error.
 #define i_img_double_new(xsize, ysize, channels) im_img_double_new(aIMCTX, (xsize), (ysize), (channels))
 #define i_img_pal_new(xsize, ysize, channels, maxpal) im_img_pal_new(aIMCTX, (xsize), (ysize), (channels), (maxpal))
 
+#define i_img_8_file_new(xsize, ysize, channels) \
+  im_img_8_file_new(aIMCTX, (xsize), (ysize), (channels))
+#define i_img_16_file_new(xsize, ysize, channels) \
+  im_img_16_file_new(aIMCTX, (xsize), (ysize), (channels))
+#define i_img_double_file_new(xsize, ysize, channels) \
+  im_img_double_file_new(aIMCTX, (xsize), (ysize), (channels))
+#define i_img_pal_file_new(xsize, ysize, channels) \
+  im_img_pal_file_new(aIMCTX, (xsize), (ysize), (channels))
+
 #define i_img_alloc() im_img_alloc(aIMCTX)
 #define i_img_init(im) im_img_init(aIMCTX, im)
 
@@ -170,6 +179,37 @@ returns -1 and pushes an error.
 
 #define im_size_t_max (~(size_t)0)
 #define im_ssize_t_max ((ssize_t)((~(size_t)0) >> 1))
+
+/*
+=item IM_DEPRECATED(name)
+
+Expands to an attribute on supported compilers that causes the
+compiler to produce a deprecation warning when the given function is
+called.
+
+  int foo(void) IM_DEPRECATED(foo);
+
+=item IM_DEPRECATED_MACRO(name)
+
+Intended for use in macros to warn that the given macro is deprecated.
+
+  #define foo() (IM_DEPRECATED_MACRO(foo), code for foo)
+
+=cut
+*/
+
+#if defined(__GNUC__) || defined(__clang__)
+
+#define IM_DEPRECATED(name) __attribute__((deprecated))
+#define IM_DO_PRAGMA(x)     (_Pragma #x)
+#define IM_DEPRECATED_MACRO(name)    IM_DO_PRAGMA(GCC warning (#name " is deprecated"))
+
+#else
+
+#define IM_DEPRECATED(name)
+#define IM_DEPRECATED_MACRO(name)    ((void)0)
+
+#endif
 
 #ifdef __cplusplus
 }

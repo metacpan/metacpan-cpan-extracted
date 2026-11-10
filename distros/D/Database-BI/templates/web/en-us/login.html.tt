@@ -1,0 +1,42 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+<style>
+  .login-section { max-width: 24rem; }
+  .login-section label { display: block; font-weight: 600; margin-bottom: 0.4rem; }
+  .login-section input[type="password"] { width: 100%; box-sizing: border-box; padding: 0.45rem 0.6rem; }
+  .login-section button { margin-top: 0.75rem; }
+  .login-error {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--danger-fg, #c0392b);
+  }
+  .login-note {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted, #666);
+  }
+</style>
+
+<section class="login-section">
+  [%- IF login_off %]
+  <p id="login-off">
+    This server does not ask for a password, so there is nothing to log in to.
+    <a href="/">Go to the home page</a>.
+  </p>
+  [%- ELSE %]
+  <form id="login-form" method="post" action="/login">
+    <input type="hidden" name="return" value="[% return_to | html %]">
+    <label for="login-password">Password</label>
+    <input id="login-password" type="password" name="password"
+           autocomplete="current-password" required autofocus>
+    <button type="submit">Log in</button>
+  </form>
+  [%- IF login_error.length %]
+  <p id="login-error" class="login-error" role="alert">[% login_error | html %]</p>
+  [%- END %]
+  <p class="login-note">
+    This server asks for a password. Whoever runs it set one, and can tell you
+    what it is.
+  </p>
+  [%- END %]
+</section>
+[%- END -%]

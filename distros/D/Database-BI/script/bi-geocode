@@ -41,6 +41,11 @@ use File::Spec;
 use Mojo::JSON qw(decode_json encode_json);
 use Mojo::File;
 use Database::BI::Util qw(iso8601_utc);
+use Database::BI::I18N ();
+
+# Messages in the language the locale names: LANG=en_US.UTF-8 is American
+# English, anything else British (CGI::Lingua chooses).
+$Database::BI::I18N::LANGUAGE = Database::BI::I18N::from_locale();
 
 # ---------------------------------------------------------------------------
 # Parse arguments
@@ -175,11 +180,15 @@ my %cache   = (%$legacy, %$shared);
 
 my %args;
 $args{openaddr}   = $opt_openaddr if defined $opt_openaddr && length $opt_openaddr;
-# The same Geo::Coder::List cache the map page uses, under the model directory.
-# With --dry-run nothing is kept, the chain's cache included.
-if (!$opt_dry_run) {
+# The same Geo::Coder::List cache the map page uses: Geocode->new chooses its
+# directory (Object::Configure, CACHEDIR, CACHE_DIR, cache_dir in
+# database_bi.conf, then <model-dir>/geocode-cache).  With --dry-run nothing is
+# kept, the chain's cache included.
+if ($opt_dry_run) {
+	$args{cache} = {};
+} else {
 	Mojo::File->new($model_dir)->make_path;
-	$args{cache} = Database::BI::Model::Geocode->file_cache($model_dir);
+	$args{model_dir} = $model_dir;
 }
 $args{online}     = $opt_offline ? 0 : 1;
 $args{online_max} = $opt_online_max if defined $opt_online_max;
@@ -342,7 +351,12 @@ The data folder (default: F<data>).
 
 =item B<--model-dir>, B<-m> I<dir>
 
-The model store folder (default: F<.bi>).
+The model store folder (default: F<.bi>).  Places OpenStreetMap found are
+kept in F<E<lt>model-dirE<gt>/geocode-cache> unless another cache directory is
+set: C<cache_dir> through L<Object::Configure> (or the environment variable
+C<Database__BI__Model__Geocode__cache_dir>), then C<$ENV{CACHEDIR}>, then
+C<$ENV{CACHE_DIR}>, then C<cache_dir> in F<database_bi.conf> (the file
+C<MOJO_CONFIG> names, else the one in the current folder).
 
 =item B<--openaddr>, B<-o> I<path>
 

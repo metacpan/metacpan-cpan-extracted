@@ -103,6 +103,32 @@ perl $T/large-subset-runreport.pl -x -q qdir rundir                             
 perl -Ilib $T/large-subset-blocks.pl -batch -e doc/large-subset/large-subset-provenance.tsv samples.jsonl samples.tsv   # X27: large-subset-environment.md (8 s; -batch: 2 min more)
 ```
 
+**After a change of ours** (post-0.10; how section 7's "With the programs inside Perl" and "W5" were made): run ours alone, each sample in the worker (so the directory and user) it had in `rundir`, and join it with `rundir`'s dash and bash. Do it on the day of `rundir` if you can: `ls -l` shows the date of what `-env mtime` does not fix (`/tmp`, `/`), and a joined run of another day differs there.
+
+```sh
+unshare -n perl $T/large-subset-runcompare.pl -j 4 $E -shells ours -workers-from rundir samples.jsonl samples.tsv ours-new   # (-only @IDS for some)
+perl $T/large-subset-runreport.pl -q qdir -x -ours-from ours-new rundir      # the tables with the new ours
+perl $T/large-subset-runreport.pl -ours-from ours-new -ours-vs rundir rundir # ours, sample by sample: what changed
+```
+
+What changes between two runs of the same code is noise (process IDs, times, `sort -R`, races, inode numbers): run ours alone twice and compare the two with `-ours-vs` to see it.
+
+**The environment varied** (X27; [`doc/large-subset/large-subset-environment.md`](large-subset/large-subset-environment.md), section 9): the samples of a code, a base run, a second base run (the noise) and the variant's run, compared:
+
+```sh
+grep -v '^#' doc/large-subset/large-subset-provenance.tsv | awk -F'\t' -v c=path-tmp '{ n = split($2, a, /[:,\/]/); for (i = 2; i <= n; i++) if (a[i] == c) { print $1; break } }' > ids.txt
+B='-base /runcompare'
+unshare -n perl $T/large-subset-runcompare.pl -j 4 $B -only @ids.txt samples.jsonl samples.tsv base
+unshare -n perl $T/large-subset-runcompare.pl -j 4 $B -only @ids.txt samples.jsonl samples.tsv base2
+unshare -n perl $T/large-subset-runcompare.pl -j 4 $B -env tmp -only @ids.txt samples.jsonl samples.tsv v-tmp
+perl $T/large-subset-runreport.pl -b base v-tmp     # classes against the base run, and every sample that changed
+perl $T/large-subset-runreport.pl -b base base2     # the noise
+```
+
+The variants (`-env`, several with commas): `posix`, `utf8`, `sigpipe`, `noproc`, `tmp`, `random`, `private`, `dev`, `fail`, `output`, `mtime`; the script's header says what each does and for which code. The stand-ins' answers and the fixed time come from the environment: `STANDIN_STATUS=2 … -env fail`, `STANDIN_OUTPUT=… -env output`, `FIXTURE_MTIME=… -env mtime`; the values used are in `OUTDIR/env.txt`.
+
+**Through Run** (section 7, "Through Run"): `-run RUNLIB` (Run's `blib/lib`, or the directory of `Run.pm`) makes ours start every process through Run, as where there is neither posix_spawn nor fork; compare with a run without it, as above.
+
 ## 4. Record C: the shells' verdict on every parser test
 
 ```sh

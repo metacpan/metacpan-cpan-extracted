@@ -1,0 +1,161 @@
+[%# Shared by the chart pages' export buttons.
+
+    biChartExportClone: a saved SVG leaves the page's stylesheet behind, so a
+    copy of the chart carries each text's computed font and color on the text.
+    It reads them as they are in the light theme, whichever one is showing.
+
+    biSaveChartPDF: the chart is painted onto a canvas by the page's own draw
+    function, then wrapped as a one-page PDF the size of the chart.  A picture
+    keeps every glyph as it is on screen, and needs no PDF library; PDF_SCALE
+    keeps it sharp when printed or zoomed.
+
+    biBrandSvg, biBrandCanvas: put the name the page footer shows in the bottom
+    right of a saved chart, in a strip of its own below everything else, so it
+    cannot land on an axis label.  The PDF's copy is a link.
+
+    The export buttons name their function in data-export (biBarExportPNG,
+    say) rather than in an onclick attribute, which the Content-Security-Policy
+    would not run.  Only a name of that shape is called, so markup that reached
+    the page cannot use the attribute to call anything else. -%]
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var EXPORT_NAME = /^bi[A-Za-z]*Export(?:SVG|PNG|PDF)$/;
+  function bindExports() {
+    Array.prototype.forEach.call(document.querySelectorAll('button[data-export]'), function (b) {
+      var name = b.getAttribute('data-export');
+      if (!EXPORT_NAME.test(name)) return;
+      b.addEventListener('click', function () {
+        if (typeof window[name] === 'function') window[name]();
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindExports);
+  else bindExports();
+}());
+</script>
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var PDF_SCALE = 3;
+  var PX_TO_PT  = 0.75;
+
+  var BRAND_TEXT     = 'Database::BI';
+  var BRAND_URL      = 'https://metacpan.org/dist/Database-BI';
+  var BRAND_FONT     = '11px sans-serif';
+  var BRAND_COLOUR   = '#666';
+  var BRAND_H        = 20;
+  var BRAND_MARGIN   = 10;
+  var BRAND_BASELINE = 14;
+
+  /* The link covers the name in the strip at the foot of the page.  PDF measures
+   * up from the bottom of the page, so the strip starts at 0. */
+  function brandLinkRect(pageW) {
+    var measure = document.createElement('canvas').getContext('2d');
+    measure.font = BRAND_FONT;
+    var right = pageW - BRAND_MARGIN * PX_TO_PT;
+    var left  = right - measure.measureText(BRAND_TEXT).width * PX_TO_PT;
+    return [left, 0, right, BRAND_H * PX_TO_PT].map(function (n) { return n.toFixed(2); }).join(' ');
+  }
+
+  function buildPDF(canvas) {
+    var jpeg = atob(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
+    var pageW = (canvas.width  / PDF_SCALE * PX_TO_PT).toFixed(2);
+    var pageH = (canvas.height / PDF_SCALE * PX_TO_PT).toFixed(2);
+    var draw  = 'q ' + pageW + ' 0 0 ' + pageH + ' 0 0 cm /Im0 Do Q';
+    var objects = [
+      '<< /Type /Catalog /Pages 2 0 R >>',
+      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pageW + ' ' + pageH + ']'
+        + ' /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R /Annots [6 0 R] >>',
+      '<< /Type /XObject /Subtype /Image /Width ' + canvas.width + ' /Height ' + canvas.height
+        + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpeg.length
+        + ' >>\nstream\n' + jpeg + '\nendstream',
+      '<< /Length ' + draw.length + ' >>\nstream\n' + draw + '\nendstream',
+      '<< /Type /Annot /Subtype /Link /Rect [' + brandLinkRect(parseFloat(pageW)) + '] /Border [0 0 0]'
+        + ' /A << /Type /Action /S /URI /URI (' + BRAND_URL + ') >> >>'
+    ];
+    var pdf = '%PDF-1.4\n';
+    var offsets = objects.map(function (body, i) {
+      var at = pdf.length;
+      pdf += (i + 1) + ' 0 obj\n' + body + '\nendobj\n';
+      return at;
+    });
+    var xref = pdf.length;
+    pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+    offsets.forEach(function (at) {
+      pdf += ('0000000000' + at).slice(-10) + ' 00000 n \n';
+    });
+    pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\n'
+         + 'startxref\n' + xref + '\n%%EOF\n';
+    /* pdf is a binary string, one character to a byte, so its offsets are bytes. */
+    var bytes = new Uint8Array(pdf.length);
+    for (var i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i);
+    return new Blob([bytes], { type: 'application/pdf' });
+  }
+
+  var TEXT_STYLES = ['font-family', 'font-size', 'font-style', 'font-weight', 'fill'];
+
+  /* A saved chart is the same in either theme: it goes on a white background,
+   * where text in the dark theme's pale colors could not be read. */
+  window.biChartExportClone = function (svg) {
+    return window.biTheme.asLight(function () {
+      var clone  = svg.cloneNode(true);
+      var copies = clone.querySelectorAll('text');
+      svg.querySelectorAll('text').forEach(function (text, i) {
+        var style = window.getComputedStyle(text);
+        TEXT_STYLES.forEach(function (name) {
+          copies[i].style.setProperty(name, style.getPropertyValue(name));
+        });
+      });
+      return clone;
+    });
+  };
+
+  /* Call this last on a copy being saved: it reads the size the copy has ended
+   * up with.  One viewBox unit may be several pixels (a canvas card is saved at
+   * the size it is shown), so the height grows in proportion. */
+  window.biBrandSvg = function (svg) {
+    var vb  = (svg.getAttribute('viewBox') || '').trim().split(/[\s,]+/).map(parseFloat);
+    var has = vb.length === 4;
+    var box = has ? vb : [0, 0, parseFloat(svg.getAttribute('width')) || 800, parseFloat(svg.getAttribute('height')) || 480];
+    var h   = parseFloat(svg.getAttribute('height')) || box[3];
+    var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', box[0] + box[2] - BRAND_MARGIN);
+    text.setAttribute('y', box[1] + box[3] + BRAND_BASELINE);
+    text.setAttribute('text-anchor', 'end');
+    text.setAttribute('style', 'font:' + BRAND_FONT + ';fill:' + BRAND_COLOUR + ';');
+    text.textContent = BRAND_TEXT;
+    svg.appendChild(text);
+    svg.setAttribute('height', Math.round(h + BRAND_H * h / box[3]));
+    if (has) svg.setAttribute('viewBox', [box[0], box[1], box[2], box[3] + BRAND_H].join(' '));
+    return svg;
+  };
+
+  /* A taller copy of the canvas with the name in the strip added at the foot. */
+  window.biBrandCanvas = function (canvas, scale) {
+    var out = document.createElement('canvas');
+    out.width  = canvas.width;
+    out.height = canvas.height + BRAND_H * scale;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.drawImage(canvas, 0, 0);
+    ctx.scale(scale, scale);
+    ctx.font         = BRAND_FONT;
+    ctx.fillStyle    = BRAND_COLOUR;
+    ctx.textAlign    = 'right';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(BRAND_TEXT, canvas.width / scale - BRAND_MARGIN, canvas.height / scale + BRAND_BASELINE);
+    return out;
+  };
+
+  window.biSaveChartPDF = function (drawCanvas, filename) {
+    drawCanvas(PDF_SCALE, function (canvas) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(buildPDF(window.biBrandCanvas(canvas, PDF_SCALE)));
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  };
+}());
+</script>

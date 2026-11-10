@@ -5,11 +5,12 @@ use warnings;
 
 use Carp	qw(croak);
 use POSIX	qw(floor ceil);
+use Database::BI::I18N ();
 use Readonly;
 use Database::BI::Util ();
 use Scalar::Util	qw(looks_like_number);
 
-our $VERSION = '0.021.0';
+our $VERSION = '0.022.0';
 
 Readonly my $MAX_EXPR_LEN => 512;
 Readonly my $MAX_DEPTH    => 20;
@@ -76,7 +77,7 @@ our %MESSAGES = (
 
 sub _fmt {
 	my ($key, @args) = @_;
-	return sprintf $MESSAGES{$key}, @args;
+	return sprintf Database::BI::I18N::text(__PACKAGE__, \%MESSAGES, $key), @args;
 }
 
 # --- built-in function dispatch table ---
@@ -1256,7 +1257,7 @@ Database::BI::Calc - Safe recursive-descent expression evaluator for Database::B
 
 =head1 VERSION
 
-0.021.0
+0.022.0
 
 =head1 SYNOPSIS
 

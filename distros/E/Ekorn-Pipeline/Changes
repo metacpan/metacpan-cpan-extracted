@@ -2,6 +2,71 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.2.0 2026-11-09
+
+    Messages say a stage can be a code reference or a pipeline.
+
+    It ships one roadmap item, 2026-0008. Two messages change, so it's
+    v0.2.0: code that matches the old wording, as a string or an
+    anchored pattern, needs updating. Nothing else changes in
+    behaviour. DBIx::Squirrel signed this release off before it went
+    out.
+
+    - "Expected stage #%d to be a code reference" is now "Expected
+      stage #%d to be a code reference or a pipeline". (roadmap
+      2026-0008)
+    - "Expected stage #%s, made with gather, to return one or two code
+      references" is now "Expected stage #%s, made with gather, to
+      return a code reference or a pipeline, and optionally an end
+      function". (roadmap 2026-0008)
+    - The DIAGNOSTICS, the reference, the how-to and the README say the
+      same, and no longer explain the old wording. (roadmap 2026-0008)
+
+v0.1.3 2026-11-09
+
+    A pipeline can be used as a stage, and the docs are plainer.
+
+    Pipelines can be built from other pipelines without ->stages, and a
+    gather block can return one. The documentation is rewritten in
+    plainer English.
+
+    It ships three roadmap items, 2026-0004, 2026-0006 and 2026-0007.
+    Existing code runs as before, and every message a pipeline gives
+    today reads as before. The one exception is a subclass of
+    Ekorn::Pipeline used with an import list, which now croaks, as
+    below. DBIx::Squirrel signed this release off before it went out.
+
+    - Ekorn::Pipeline->new accepts a pipeline as a stage, and splices
+      its stages in where it stands. They run in the new pipeline's
+      run, so a take inside limits the whole run. The stages come from
+      the pipeline's stages method, so a subclass can override it.
+      (roadmap 2026-0004)
+    - In error messages, a stage inside a pipeline used as a stage is
+      named by its position in each pipeline: "Pipeline stage #2.3
+      failed", or "#1.2.3" three levels down. DIAGNOSTICS shows "#%s"
+      for these messages. Other stages are named as before.
+      (roadmap 2026-0004)
+    - is_stage, exported by Ekorn::Pipeline on request, is true for
+      anything new accepts as a stage: a code reference or a pipeline.
+      Use it in a function that takes its stages from the end of its
+      arguments, so it accepts pipelines too. Ask for v0.1.3 on the use
+      line, as v0.1.2 lets "use Ekorn::Pipeline qw(is_stage)" compile.
+      (roadmap 2026-0004)
+    - Ekorn::Pipeline now has an import method, from Exporter, for
+      is_stage. A subclass inherits it, so "use My::Subclass qw(name)"
+      croaks unless My::Subclass exports that name; before, the list
+      was ignored. (roadmap 2026-0004)
+    - A gather block can return a pipeline as its stage. Its stages are
+      made for each run in its place, gather stages inside it afresh,
+      and the block's end function, if any, is called after theirs. A
+      stage inside it is named as "#2.3" in messages. The message for a
+      bad gather block is unchanged. (roadmap 2026-0007)
+    - The README, the POD, the reference and the how-to are rewritten
+      in shorter sentences, saying the same. Two out-of-date claims in
+      the README are fixed: Ekorn::Pipeline is on CPAN, and
+      DBIx::Squirrel uses it. (roadmap 2026-0006)
+    - The README has MetaCPAN and Kwalitee badges.
+
 v0.1.2 2026-11-08
 
     The reference and the how-to on MetaCPAN, as POD manuals.

@@ -79,38 +79,39 @@ Ekorn::Pipeline::Stages::Batch - stages gathering values: batch and collect
 
 =head1 DESCRIPTION
 
-Stages that gather values, and pass them on together. Both are made
-with L<Ekorn::Pipeline::Gather>, so what they hold starts afresh on each
-run, and both pass on what they still hold once the values run out.
-Each function returns a stage, and checks what it's given when it's
+Stages that gather values and pass them on together. Both are made
+with L<Ekorn::Pipeline::Gather>, so what they hold starts afresh on
+each run. Both pass on what they still hold once the values run out.
+Each function returns a stage, and checks its arguments when it's
 called, not on each value.
 
 =head1 FUNCTIONS
 
-Both are exported by default, and with C<:all>.
+Both are exported by default, and by C<:all>.
 
 =head2 batch
 
     batch($size)
 
 Passes values on in batches of C<$size>, each an array reference. Once
-the values run out, the last batch, which may be shorter, goes on.
-There's no empty batch: without values, there's no batch at all.
+the values run out, the last batch goes on, which may be shorter.
+There's never an empty batch: with no values, there's no batch at
+all.
 
 =head2 collect
 
     collect
     collect { ... }
 
-Holds every value, and once they run out, passes on an array reference
-of them, or, given a block, what the block returns, called once with
-the values as its arguments. What it returns goes through the stages
-after it, as what a stage returns does: nothing, one value, or several.
-It's called even without values, so C<collect> still gives a result:
-an empty array, or what the block makes of none.
+Holds every value. Once they run out, it passes on an array reference
+of them. Given a block, it calls the block once, with the values as
+its arguments, and passes on what the block returns: nothing, one
+value, or several, just like a stage. The block is called even with no
+values, so C<collect> always gives a result: an empty array, or what
+the block makes of none.
 
 C<collect> holds every value until the end, so the whole result is in
-memory at once; C<batch> holds no more than one batch.
+memory at once. C<batch> holds no more than one batch.
 
 =head1 DIAGNOSTICS
 

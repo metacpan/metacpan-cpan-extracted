@@ -142,7 +142,7 @@ sub _parse_file
 }
 
 # The data herein is the result of creating a new instance and dumping its data, like:
-# say json_encode( HTTP::Promise::MIME->new( '/some/where/mime.types' )->types );
+# perl -MHTTP::Promise::MIME -MModule::Generic -lE 'say Module::Generic->new->new_json_safe->encode( HTTP::Promise::MIME->new( "dev/mime-apache-trunk.types" )->types );'
 sub _data
 {
     my $data = <<'EOT';

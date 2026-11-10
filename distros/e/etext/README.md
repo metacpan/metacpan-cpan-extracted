@@ -16,7 +16,7 @@ tk4.0b3 text widget and the Perl/Tk b9 glue.  The first commit of the Git
 repository (https://github.com/ilyaz-ai/etext) is that release, untouched.
 Everything after it is the modernization described below.
 
-## Status (version 2.01, 2026)
+## Status (version 2.05, 2026)
 
 * **The Perl extension `Tk::eText` builds and works with Perl 5.38 and
   Perl/Tk 804.036**, as a standalone module.  The widget is the
@@ -48,9 +48,32 @@ Everything after it is the modernization described below.
 (In the Git repository the distribution lives in `eText/`: `cd eText`
 first.)
 
-Requirements: Perl 5.8+, Perl/Tk 804.027+ (with its headers installed, as
+Requirements: Perl 5.10+, Perl/Tk 804.027+ (with its headers installed, as
 every Perl/Tk installation does), a C compiler.  `Test::LeakTrace` is
 optional (the leak test skips part of itself without it).
+
+The values the widget keeps for Perl (`block nodedata`, `mark data`,
+`tag data`, `block data`) live in *data containers* (`tkTextData.h`),
+which have two representations chosen when the module is built.  The
+default, A, is the Perl value itself, as before.  The other, B, is a
+small block of typed slots of which the Perl value is one; it is for
+the development of the slots (switches that will control, say, how the
+data of two merged tag runs is combined), and the widget behaves the
+same from Perl.  To build B:
+
+    ETEXT_DATA_ARRAYS=1 perl Makefile.PL     # adds -DTK_TEXT_DATA_ARRAYS=1
+    make
+    make test            # t/data-slots.t runs only with B
+
+A plain `perl Makefile.PL` (or `ETEXT_DATA_ARRAYS=0`) builds A; run `make
+clean` when switching, as the Makefile records the choice.
+
+Windows: built and tested only under Wine so far, with Strawberry Perl
+5.38.2.2 (`gmake` instead of `make`).  Perl/Tk 804.036 itself needs
+fixes there: as released it does not build with current mingw-w64
+headers, and built with gcc for 64 bits it may crash at its first
+update.  The fixes are in the Git repository (`upstream/perltk-W*.patch`,
+described in `upstream/reports/10-...` to `13-...`).
 
 The interactive demo:
 
@@ -104,6 +127,7 @@ round trip with the server.
     README.md, Changes, BUGS       this file, the change log, known problems
     doc/etext.pod  the documentation of the widget, blocks and -layoutcmd
     eText.pm, eText.xs, Makefile.PL, tkText*.c, tkText.h, pperl.h, ...
+    tkTextData.h   the data containers of the values (representations A, B)
     eTextSyms.PL, eTextSyms.h      the symbol-prefix header (committed)
     t/             tests
     demo/          the Perl demo and a sample document
@@ -127,6 +151,12 @@ entries of `TK_BUGS.md`.
   comes back empty, a window given with `-window` was destroyed with the
   deletion and comes back as an empty window segment, one with `-create`
   is created again when displayed.
+* `block insert`, `block split`, `block trim`, `tag add` and `tag remove`
+  are undoable (Tk records no tag changes); the selection (`sel`) is
+  not recorded.
+* The redo of an insertion re-inserts what the insertion left, with its
+  tags, the separators it made in a block and the marks in it (recorded
+  when the insertion is undone); Tk re-inserts the plain string.
 * `edit undo` undoes.  In Perl/Tk's own `Tk::Text` the recording of
   changes is compiled out and `edit undo` always says "nothing to
   undo" (undo there is `Tk::TextUndo`, written in Perl).
@@ -134,6 +164,8 @@ entries of `TK_BUGS.md`.
   `block` element at a block's start and a `blockend` element after it;
   `dump -image` reports the name of the image in the widget, as
   documented (Perl/Tk's `Tk::Text` reports the `-image` argument).
+  `dump -values` adds a fourth field to every entry: the value of a
+  mark, or of the run a `tagon` starts (`undef` otherwise).
 * `+N lines` keeps the character position; Tk keeps the byte offset
   (TK_BUGS.md A5).
 * `search -nocase` leaves alone the few characters whose lower-case form

@@ -20,7 +20,7 @@
 #include "tkPort.h"
 #include "tkText.h"
 
-static char rcsid[] = "@(#) $Id: tkTextBTree.c,v 1.43 1996/05/21 00:55:36 ilya Exp $";
+/* @(#) $Id: tkTextBTree.c,v 1.43 1996/05/21 00:55:36 ilya Exp $ */
 
 /*
  * The data structure below keeps summary information about one tag as part
@@ -77,7 +77,23 @@ typedef struct Node {
 					 * outermost tree, otherwise
 					 * the text segment of type IBTree that
 					 * contains the tree. */
+    TkTextData value;			/* The data of the node (its Lang
+					 * part: "block nodedata"), owned by
+					 * the node; empty if none.  Always
+					 * empty in the outermost tree. */
 } Node;
+
+/*
+ * The address of a node before a deletion that can be undone, as
+ * TkBTreeSnapshotValues records it (see TkTextValue in tkText.h):
+ */
+
+typedef struct ValueAddress {
+    int line;				/* Line number in the outermost tree. */
+    int byteIndex;			/* Byte offset there of the start of
+					 * the node's first leaf. */
+    int level;				/* 0 for a leaf, 1 for its parent... */
+} ValueAddress;
 
 /*
  * Upper and lower bounds on how many children a node may have:
@@ -172,8 +188,6 @@ static int		iBTreeDeleteProc _ANSI_ARGS_((TkTextSegment *segPtr,
 			    TkTextLine *linePtr, int treeGone));
 static TkTextSegment *	iBTreeCleanupProc _ANSI_ARGS_((TkTextSegment *segPtr,
 			    TkTextLine *linePtr));
-static TkTextSegment *	iBTreeSplitProc _ANSI_ARGS_((TkTextSegment *segPtr,
-			    int index));
 static void		iBTreeLineChangeProc _ANSI_ARGS_((TkTextSegment *segPtr,
 			    TkTextLine *linePtr));
 void			TkBTreeKillBlockProc _ANSI_ARGS_((
@@ -184,8 +198,6 @@ void			NodeReport _ANSI_ARGS_((
 static TkTextSegment *	FindTagStart _ANSI_ARGS_((TkTextBTree tree,
 			    TkTextTag *tagPtr, TkTextIndex *indexPtr, 
 			    TkTextIndex *intIndexPtr));
-static int		CharsInNode(Node *nodePtr);
-static int		LastTagInNode(Node *nodePtr, TkTextTag *tagPtr);
 static void		GlueLines(TkTextSegment *seg1Ptr,
 				  TkTextSegment *seg2Ptr, TkTextLine
 				  *linePtr, TkTextSegment *prevPtr);
@@ -195,6 +207,39 @@ static void		NodePrint(Node *nodePtr,
 				  int linesLeft, int levels, int *widthsMin,
 				  int *widthsMax, int widthsNum);
 TkTextLine *		TkIBTreeLastLine(TkTextSegment *segPtr);
+static TkText *		NodeText _ANSI_ARGS_((Node *nodePtr));
+static void		DropValue _ANSI_ARGS_((TkText *textPtr, void *objPtr,
+			    TkTextData *valuePtr));
+static void		DropBlockData _ANSI_ARGS_((TkTextSegment *segPtr));
+static void		DropTreeValues _ANSI_ARGS_((TkText *textPtr,
+			    Node *nodePtr));
+static void		MergeValues _ANSI_ARGS_((TkText *textPtr,
+			    void *keepObjPtr, TkTextData *keepPtr,
+			    void *loseObjPtr, TkTextData *losePtr));
+static int		IsLastLine _ANSI_ARGS_((TkTextLine *linePtr));
+static TkTextValue *	NewValueRecord _ANSI_ARGS_((int kind,
+			    TkTextData value));
+static void		UnlinkLine _ANSI_ARGS_((TkText *textPtr,
+			    TkTextLine *linePtr, TkTextLine *prevHintPtr));
+static int		NodeHasValues _ANSI_ARGS_((Node *nodePtr));
+static void		TagRange _ANSI_ARGS_((TkTextIndex *index1Ptr,
+			    TkTextIndex *index2Ptr, TkTextTag *tagPtr,
+			    int add));
+static void		DeleteRange _ANSI_ARGS_((TkTextIndex *index1Ptr,
+			    TkTextIndex *index2Ptr, int rebalance,
+			    int check4trees));
+static void		DeleteKeepingRuns _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
+static void		DropToggleValue _ANSI_ARGS_((TkTextSegment *segPtr));
+static char *		CopyName _ANSI_ARGS_((char *name));
+static TkTextSegment *	RunAtAddress _ANSI_ARGS_((TkText *textPtr,
+			    TkTextTag *tagPtr, int line, int byteIndex,
+			    TkTextIndex *startPtr));
+static void		TagKeepingRuns _ANSI_ARGS_((TkTextIndex *index1Ptr,
+			    TkTextIndex *index2Ptr, TkTextTag *tagPtr,
+			    int add));
+static void		NodeValuesList _ANSI_ARGS_((Node *nodePtr,
+			    ListFactory *lfPtr));
 
 /*
  * Type record for character segments:
@@ -303,9 +348,12 @@ TkBTreeCreate(textPtr)
     rootPtr->numChildren = 2;
     rootPtr->numLines = 2;
     rootPtr->segPtr = NULL;
+    TkTextDataInit(rootPtr->value);
 
     linePtr->parentPtr = rootPtr;
     linePtr->nextPtr = linePtr2;
+    TkTextDataInit(linePtr->value);
+    TkTextDataInit(linePtr2->value);
     segPtr = (TkTextSegment *) ckalloc(CSEG_SIZE(1));
     linePtr->segPtr = segPtr;
     segPtr->typePtr = &tkTextCharType;
@@ -379,6 +427,9 @@ static void
 DestroyNode(nodePtr)
     register Node *nodePtr;
 {
+    if (!TkTextDataIsEmpty(nodePtr->value)) {
+	DropValue(NodeText(nodePtr), (void *) nodePtr, &nodePtr->value);
+    }
     if (nodePtr->level == 0) {
 	TkTextLine *linePtr;
 	TkTextSegment *segPtr;
@@ -386,6 +437,9 @@ DestroyNode(nodePtr)
 	while (nodePtr->children.linePtr != NULL) {
 	    linePtr = nodePtr->children.linePtr;
 	    nodePtr->children.linePtr = linePtr->nextPtr;
+	    if (!TkTextDataIsEmpty(linePtr->value)) {
+		DropValue(NodeText(nodePtr), (void *) linePtr, &linePtr->value);
+	    }
 	    while (linePtr->segPtr != NULL) {
 		segPtr = linePtr->segPtr;
 		linePtr->segPtr = segPtr->nextPtr;
@@ -636,6 +690,8 @@ TkBTreeInsertChars(indexPtr, string)
 	 */
 
 	newLinePtr = (TkTextLine *) ckalloc(sizeof(TkTextLine));
+	TkTextDataInit(newLinePtr->value);	/* The part after the cut starts
+					 * without a value. */
 	newLinePtr->parentPtr = linePtr->parentPtr;
 	newLinePtr->nextPtr = linePtr->nextPtr;
 	linePtr->nextPtr = newLinePtr;
@@ -744,34 +800,6 @@ IBtreeUpdateLength(segPtr,incr)
 /*
  *--------------------------------------------------------------
  *
- * TkTextOutermostLine --
- *
- *	This function takes a segment of type IBTree and returns
- * outermost line that contains this segment.
- *
- * Results:
- *      Pointer to the line.
- * 
- * Side effects:
- *      None
- *
- *--------------------------------------------------------------
- */
-
-static TkTextLine *
-TkTextOutermostLine(segPtr)
-     TkTextSegment *segPtr;		/* Pointer to segment of type IBTree */
-{
-    TkTextSegment *outPtr;
-    while ( (outPtr = segPtr->body.itree.linePtr->parentPtr->segPtr) ) {
-      segPtr = outPtr;
-    }
-    return segPtr->body.itree.linePtr;
-}
-
-/*
- *--------------------------------------------------------------
- *
  * SplitSeg --
  *
  *	This procedure is called before adding or deleting
@@ -859,8 +887,6 @@ SplitSeg(indexPtr)
     return pSegment;
 }
 
-static TkTextSegment fakeSeg;
-
 /*
  *--------------------------------------------------------------
  *
@@ -919,11 +945,13 @@ CleanupLine(linePtr)
 /*
  *----------------------------------------------------------------------
  *
- * TkBTreeDeleteChars --
+ * TkBTreeDeleteChars, DeleteRange --
  *
  *	Delete a range of characters from a B-tree.  The caller
  *	must make sure that the final newline of the B-tree is
- *	never deleted.
+ *	never deleted.  DeleteRange does the work; TkBTreeDeleteChars,
+ *	called on the outermost tree, also keeps the values of the runs
+ *	of tags with the runs the deletion leaves (DeleteKeepingRuns).
  *
  * Results:
  *	None.
@@ -940,6 +968,29 @@ CleanupLine(linePtr)
 
 void
 TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
+    TkTextIndex *index1Ptr;		/* First character to delete. */
+    TkTextIndex *index2Ptr;		/* Character just after the last one
+					 * to delete. */
+    int rebalance;			/* As for DeleteRange. */
+    int check4trees;			/* As for DeleteRange. */
+{
+    TkText *textPtr = NULL;
+
+    if (rebalance && check4trees && (index1Ptr->tree != NULL)) {
+	/* (Recursive calls may have no tree in their indices.) */
+	textPtr = ((BTree *) index1Ptr->tree)->textPtr;
+    }
+    if ((textPtr != NULL) && textPtr->haveValues
+	    && (index1Ptr->linePtr->parentPtr->segPtr == NULL)
+	    && (textPtr->tree == index1Ptr->tree)) {
+	DeleteKeepingRuns(textPtr, index1Ptr, index2Ptr);
+	return;
+    }
+    DeleteRange(index1Ptr, index2Ptr, rebalance, check4trees);
+}
+
+static void
+DeleteRange(index1Ptr, index2Ptr, rebalance, check4trees)
     register TkTextIndex *index1Ptr;	/* Indicates first character that is
 					 * to be deleted. */
     register TkTextIndex *index2Ptr;	/* Indicates character just after the
@@ -967,16 +1018,10 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 					 * region is in. */
     SegLine pSegment1, pSegment2;	/* The segment and line of the
 					 * previous segments for index?Ptr. */
-    int notCounted = 0;			/* We do not automatically
-					 * update length of 
-					 * blocks we are going to
-					 * delete anyway to avoid
-					 * double update in recursive
-					 * calls. However, the 
-					 * length should be updated
-					 * since it is used later to
-					 * calculate new indices.  */
     int distance = INT_MAX, code, size;
+    int endGone;			/* Whether all of the last line but
+					 * its final newline is in the range
+					 * (with the separator before it). */
     TkTextIndex index1 = *index1Ptr, index2 = *index2Ptr, index3;
     TkTextSegment *startChain = NULL, *endChain = NULL;
 
@@ -1079,7 +1124,6 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
       /* If off<=distance, then index2 is outside of the parent segment, so
        * we should kill this parent. */
       if (off <= distance) {
-	int deleted;
 
 	/* We cannot just delete the block now, since it will mess up
 	 * the index of the end, as well as the lines. In fact we
@@ -1095,6 +1139,17 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 	if (off > 1) {
 	  TkBTreeDeleteChars(index1Ptr, &index3, 0, 0); /* The
 							 * internal part.*/
+	} else {
+	  /*
+	   * Nothing inside is deleted (the range starts at the block's
+	   * tail): undo what SplitSeg did to the line above (an empty
+	   * segment, or a character segment split in two), as the
+	   * deletion would have.  Until the block is killed, the line
+	   * is checked as it is, with the enclosing tree, by the
+	   * deletions that follow.
+	   */
+
+	  CleanupLine(curLinePtr);
 	}
 	/* Update the coordinate of the end. */
 	if (index1Ptr->linePtr == index2Ptr->linePtr) {
@@ -1138,6 +1193,22 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
     /* At this moment we finished with all the internal BTrees. What
      * follows is a plain delete in the same BTree. */
 
+    /*
+     * Values (N5): when the last line is joined to the starting line,
+     * the starting line survives (whatever of its text is deleted: an
+     * insertion splitting a leaf leaves the value on the first part,
+     * and this is its inverse) and keeps its value if it has one, else
+     * takes that of the last line; but if all of the last line except
+     * its final newline is in the range, with the separator before it,
+     * the last line is deleted as a whole, value and all.
+     */
+
+    size = 0;
+    for (segPtr = lastPtr; segPtr != NULL; segPtr = segPtr->nextPtr) {
+	size += segPtr->size;
+    }
+    endGone = (startLinePtr != lastLinePtr) && (size <= 1);
+    segPtr = prevPtr->nextPtr;
     prevPtr->nextPtr = lastPtr;
 
     while (segPtr != lastPtr) {
@@ -1162,6 +1233,10 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 		    nodePtr->numLines--;
 		}
 		curNodePtr->numChildren--;
+		if (!TkTextDataIsEmpty(curLinePtr->value)) {
+		    DropValue(NodeText(curNodePtr), (void *) curLinePtr,
+			    &curLinePtr->value);
+		}
 		ckfree((char *) curLinePtr);
 	    }
 	    curLinePtr = nextLinePtr;
@@ -1186,6 +1261,10 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 		    prevNodePtr->nextPtr = curNodePtr->nextPtr;
 		}
 		parentPtr->numChildren--;
+		if (!TkTextDataIsEmpty(curNodePtr->value)) {
+		    DropValue(NodeText(curNodePtr), (void *) curNodePtr,
+			    &curNodePtr->value);
+		}
 		DeleteSummaries(curNodePtr->summaryPtr);
 		ckfree((char *) curNodePtr);
 		curNodePtr = parentPtr;
@@ -1283,15 +1362,53 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 	    }
 	    prevLinePtr->nextPtr = lastLinePtr->nextPtr;
 	}
+
+	/*
+	 * The two lines are now one leaf: it keeps the value of the
+	 * first if it has one, else takes that of the second, unless the
+	 * second is deleted as a whole.
+	 */
+
+	if (endGone) {
+	    DropValue(NodeText(curNodePtr), (void *) lastLinePtr,
+		    &lastLinePtr->value);
+	} else {
+	    MergeValues(NodeText(curNodePtr), (void *) startLinePtr,
+		    &startLinePtr->value, (void *) lastLinePtr,
+		    &lastLinePtr->value);
+	}
 	ckfree((char *) lastLinePtr);
-	if (rebalance) {
-	  if ( !curNodePtr->segPtr ) {
+
+	/*
+	 * Outside blocks, rebalance (unless the caller does).  Inside a
+	 * block, if the two lines were in different nodes, glue the
+	 * nodes whatever "rebalance" says: this is not balancing, the
+	 * end side's node lost its line, and left alone it stays in the
+	 * tree with no children (or fewer than it counts).  The
+	 * recursive deletions that dissolve or empty a block (rebalance
+	 * 0) left it so when the deletion joined leaves of different
+	 * nodes, and the next walk over the lines crashed.
+	 */
+
+	if (!curNodePtr->segPtr) {
+	  if (rebalance) {
 	    Rebalance((BTree *) tree, curNodePtr);
-	  } else if (startLinePtr->parentPtr != curNodePtr) {
+	  }
+	} else {
+	  if (startLinePtr->parentPtr != curNodePtr) {
 	    /* Now we need to glue the entire node stalks. */
 	    Node *firstNodePtr = startLinePtr->parentPtr;
 	    Node *parentPtr, *childPtr = firstNodePtr;
 	    TkTextLine *linePtr = curNodePtr->children.linePtr;
+	    /*
+	     * Whether the end side's node is entirely in the range (with
+	     * the separator before it): it is deleted as a whole, value
+	     * and all, instead of being merged.  Its leaves before the
+	     * last line are deleted already, so: the last line is gone
+	     * and no leaf follows it in the node; and upwards, no node
+	     * follows the end side's node in its parent.
+	     */
+	    int gone = endGone && (linePtr == NULL);
 
 	    /* Move the following lines where they belong. */
 	    startLinePtr->nextPtr = linePtr;
@@ -1302,6 +1419,15 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 	    /* Glue the (grand)parents of the last line to the
 	     * corresponding (grand)parents of the first line. */
 	    while (firstNodePtr != curNodePtr) {
+	      /* The merged node keeps the first value present. */
+	      if (gone) {
+		DropValue(NodeText(curNodePtr), (void *) curNodePtr,
+			&curNodePtr->value);
+	      } else {
+		MergeValues(NodeText(curNodePtr), (void *) firstNodePtr,
+			&firstNodePtr->value, (void *) curNodePtr,
+			&curNodePtr->value);
+	      }
 	      firstNodePtr->numLines += curNodePtr->numLines;
 	      firstNodePtr->numChildren += curNodePtr->numChildren;
 	      firstNodePtr->nextPtr = curNodePtr->nextPtr;
@@ -1315,6 +1441,7 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 	      /* Now we can delete *curNodePtr. */
 	      parentPtr = curNodePtr->parentPtr;
 	      parentPtr->numChildren--;
+	      gone = gone && (curNodePtr->nextPtr == NULL);
 	      firstNodePtr = firstNodePtr->parentPtr;
 	      if (firstNodePtr != parentPtr) {
 		parentPtr->children.nodePtr = curNodePtr->nextPtr;
@@ -1325,6 +1452,20 @@ TkBTreeDeleteChars(index1Ptr, index2Ptr, rebalance, check4trees)
 	    }
 	    if (firstNodePtr->level > 1) {	/* Did some glueing. */
 	      /* Need to correct structure one level below. */
+	    }
+
+	    /*
+	     * The glued nodes have the children of the nodes they took
+	     * in, but only their own tag summaries (those of the nodes
+	     * taken in were freed): count again, from the leaves up to
+	     * the node where the two sides met (whose total does not
+	     * change).  Inside a block a summary keeps any non-zero
+	     * count, so this never moves a tag's root.
+	     */
+
+	    for (nodePtr = startLinePtr->parentPtr; nodePtr != firstNodePtr;
+		 nodePtr = nodePtr->parentPtr) {
+	      RecomputeNodeCounts(nodePtr);
 	    }
 	  }
 	}
@@ -1693,10 +1834,12 @@ TkBTreeUnlinkSegment(tree, segPtr, linePtr)
 /*
  *----------------------------------------------------------------------
  *
- * TkBTreeTag --
+ * TkBTreeTag, TagRange --
  *
  *	Turn a given tag on or off for a given range of characters in
- *	a B-tree of text.
+ *	a B-tree of text.  TagRange does the work; TkBTreeTag also keeps
+ *	the values of the runs of the tag with the runs that are left
+ *	(TagKeepingRuns).
  *
  * Results:
  *	None.
@@ -1714,6 +1857,30 @@ TkBTreeUnlinkSegment(tree, segPtr, linePtr)
 
 void
 TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add)
+    TkTextIndex *index1Ptr;		/* First character of the range. */
+    TkTextIndex *index2Ptr;		/* Character just after the last one
+					 * in the range. */
+    TkTextTag *tagPtr;			/* Tag to add or remove. */
+    int add;				/* One means add tag to the given
+					 * range of characters;  zero means
+					 * remove the tag from the range. */
+{
+    if (tagPtr->hasRunValues) {
+	TkText *textPtr = tagPtr->textPtr;
+
+	if (textPtr->vcTagDone) {
+	    textPtr->vcTagDone = 0;	/* Done before the redisplay. */
+	} else {
+	    TkBTreeVcPredictTag(textPtr, index1Ptr, index2Ptr, tagPtr, add);
+	}
+	TagKeepingRuns(index1Ptr, index2Ptr, tagPtr, add);
+    } else {
+	TagRange(index1Ptr, index2Ptr, tagPtr, add);
+    }
+}
+
+static void
+TagRange(index1Ptr, index2Ptr, tagPtr, add)
     register TkTextIndex *index1Ptr;	/* Indicates first character in
 					 * range. */
     register TkTextIndex *index2Ptr;	/* Indicates character just after the
@@ -1754,6 +1921,7 @@ TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add)
 	segPtr->size = 0;
 	segPtr->body.toggle.tagPtr = tagPtr;
 	segPtr->body.toggle.inNodeCounts = 0;
+	TkTextDataInit(segPtr->body.toggle.value);
     } else {
       TkTextIndex index;
       pSegment.segPtr = TkTextIndexToInternalSeg(index1Ptr, &index, NULL);
@@ -1789,6 +1957,7 @@ TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add)
 	} else {
 	    changed = 0;
 	}
+	DropToggleValue(segPtr);
 	ckfree((char *) segPtr);
 
 	/*
@@ -1824,6 +1993,7 @@ TkBTreeTag(index1Ptr, index2Ptr, tagPtr, add)
 	segPtr->size = 0;
 	segPtr->body.toggle.tagPtr = tagPtr;
 	segPtr->body.toggle.inNodeCounts = 0;
+	TkTextDataInit(segPtr->body.toggle.value);
     }
 
     /*
@@ -2066,10 +2236,10 @@ FindTagStart(tree, tagPtr, indexPtr, intIndexPtr)
 					   information. */
 {
     register Node *nodePtr;
-    register TkTextLine *linePtr, *extLinePtr = NULL;
+    register TkTextLine *linePtr;
     register TkTextSegment *segPtr;
     register Summary *summaryPtr;
-    int offset = 0, extOffset = 0, internal = 0;
+    int offset = 0;
     TkTextBTree intTree = tree;
 
     nodePtr = tagPtr->tagRootPtr;
@@ -2092,9 +2262,8 @@ FindTagStart(tree, tagPtr, indexPtr, intIndexPtr)
 		}
 	    }
 	}
-	if (internal) {
-	    extOffset += CharsInNode(nodePtr);
-	}
+	return NULL;			/* Not expected: no child has it. */
+
 	gotNodeWithTag:
 	continue;
     }
@@ -2114,12 +2283,19 @@ FindTagStart(tree, tagPtr, indexPtr, intIndexPtr)
 		 * It is possible that this is a tagoff tag, but that
 		 * gets cleaned up later.
 		 */
-		indexPtr->tree = tree;
-		indexPtr->linePtr = extLinePtr ? extLinePtr : linePtr;
-		indexPtr->byteIndex = extOffset + offset;
 		intIndexPtr->tree = intTree;
 		intIndexPtr->linePtr = linePtr;
 		intIndexPtr->byteIndex = offset;
+
+		/*
+		 * The external index from the internal one.  (Offsets
+		 * added up on the way down left out the head of each
+		 * block entered and the nodes of a block skipped: the
+		 * toggle was reported too far left, and a search from
+		 * before it did not stop where it should.)
+		 */
+
+		TkTextIndexToExternalIndex(tree, intIndexPtr, indexPtr);
 		return segPtr;
 	    } else if ((segPtr->typePtr == &tkTextIBTreeType)
 		       && segPtr->body.itree.tree
@@ -2130,19 +2306,11 @@ FindTagStart(tree, tagPtr, indexPtr, intIndexPtr)
 		     summaryPtr; summaryPtr = summaryPtr->nextPtr) {
 		    if (summaryPtr->tagPtr == tagPtr) {
 			nodePtr = ((BTree *)segPtr->body.itree.tree)->rootPtr;
-			if (!internal) {
-			    extLinePtr = linePtr;
-			    internal = 1;
-			}
-			extOffset += offset;
 			intTree = segPtr->body.itree.tree;
 			goto haveNodeWithTag;
 		    }
 		}
 	    }
-	}
-	if (internal) {
-	    extOffset += offset;
 	}
     }
     return NULL;
@@ -2178,11 +2346,10 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
 					   information */
 {
     register Node *nodePtr, *lastNodePtr;
-    register TkTextLine *linePtr, *lastLinePtr, *extLinePtr = NULL;
+    register TkTextLine *linePtr, *lastLinePtr;
     register TkTextSegment *segPtr, *lastSegPtr = NULL, *last2SegPtr;
-    register Summary *summaryPtr, *lastSummaryPtr;
-    int lastoffset, lastoffset2, offset = 0, internal = 0;
-    int extOffset = 0, lastExtOffset = 0;
+    register Summary *summaryPtr;
+    int lastoffset, lastoffset2, offset = 0;
     TkTextBTree intTree = tree;
 
     nodePtr = tagPtr->tagRootPtr;
@@ -2197,7 +2364,9 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
 
   haveNodeWithTag:
     while (nodePtr->level > 0) {
-	for (lastNodePtr = NULL, nodePtr = nodePtr->children.nodePtr ;
+	Node *parentPtr = nodePtr;
+
+	for (lastNodePtr = NULL, nodePtr = parentPtr->children.nodePtr ;
 		nodePtr != (Node *) NULL; nodePtr = nodePtr->nextPtr) {
 	    for (summaryPtr = nodePtr->summaryPtr ; summaryPtr != NULL;
 		    summaryPtr = summaryPtr->nextPtr) {
@@ -2207,13 +2376,10 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
 		}
 	    }
 	}
-	nodePtr = lastNodePtr;
-	if (internal) {
-	    for (nodePtr = nodePtr->children.nodePtr ;
-		 nodePtr != (Node *) lastNodePtr; nodePtr = nodePtr->nextPtr) {
-		extOffset += CharsInNode(nodePtr);
-	    }
+	if (lastNodePtr == NULL) {
+	    return NULL;		/* Not expected: no child has it. */
 	}
+	nodePtr = lastNodePtr;
     }
 
     /*
@@ -2222,7 +2388,6 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
     last2SegPtr = NULL;
     lastoffset2 = 0;
     lastoffset = 0;
-					/* XXXX Last external offset???? */
     for (lastLinePtr = NULL, linePtr = nodePtr->children.linePtr;
 	    linePtr != (TkTextLine *) NULL; linePtr = linePtr->nextPtr) {
 	for (offset = 0, lastSegPtr = NULL, segPtr = linePtr->segPtr ;
@@ -2243,7 +2408,6 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
 		    if (summaryPtr->tagPtr == tagPtr) {
 			lastSegPtr = segPtr;
 			lastoffset = offset;
-			lastSummaryPtr = summaryPtr;
 			break;
 		    }
 		}
@@ -2253,11 +2417,6 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
 	    lastLinePtr = linePtr;
 	    last2SegPtr = lastSegPtr;
 	    lastoffset2 = lastoffset;
-	    lastExtOffset = extOffset;
-	}
-	if (internal) {
-	    /* Lines of a block share the index space of the outer line. */
-	    extOffset += offset;
 	}
     }
     if (last2SegPtr == NULL) {
@@ -2265,24 +2424,60 @@ FindTagEnd(tree, tagPtr, indexPtr, intIndexPtr)
     }
     if (last2SegPtr->typePtr == &tkTextIBTreeType) {
 	nodePtr = ((BTree *)last2SegPtr->body.itree.tree)->rootPtr;
-	if (!internal) {
-	    extLinePtr = lastLinePtr;
-	    internal = 1;
-	}
-	extOffset = lastExtOffset + lastoffset2;
 	intTree = last2SegPtr->body.itree.tree;
 	goto haveNodeWithTag;
     } else {
-	indexPtr->tree = tree;
-	indexPtr->linePtr = extLinePtr ? extLinePtr : lastLinePtr;
-	indexPtr->byteIndex = lastExtOffset + lastoffset2;
 	intIndexPtr->tree = intTree;
 	intIndexPtr->linePtr = lastLinePtr;
 	intIndexPtr->byteIndex = lastoffset2;
+
+	/*
+	 * The external index from the internal one (adding offsets up on
+	 * the way down left out the heads of the blocks entered).
+	 */
+
+	TkTextIndexToExternalIndex(tree, intIndexPtr, indexPtr);
 	return last2SegPtr;
     }
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * NodeHoldsLine --
+ *
+ *	Whether a line is under a node, the trees of blocks counted: a
+ *	line of a block's tree is under the nodes above the line that
+ *	holds the block.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+NodeHoldsLine(nodePtr, linePtr)
+    Node *nodePtr;
+    TkTextLine *linePtr;
+{
+    Node *n;
+
+    if (linePtr == NULL) {
+	return 0;
+    }
+    for (n = linePtr->parentPtr; n != NULL; ) {
+	if (n == nodePtr) {
+	    return 1;
+	}
+	if (n->parentPtr != NULL) {
+	    n = n->parentPtr;
+	} else if (n->segPtr != NULL) {
+	    n = n->segPtr->body.itree.linePtr->parentPtr;
+	} else {
+	    break;
+	}
+    }
+    return 0;
+}
+
 /*
  *----------------------------------------------------------------------
  *
@@ -2369,8 +2564,13 @@ TkBTreeStartSearch(index1Ptr, index2Ptr, tagPtr, searchPtr)
 						&offset);
 	searchPtr->curIndex.byteIndex -= offset;
     }
-    searchPtr->lastPtr = TkTextIndexToInternalSeg(index2Ptr, (TkTextIndex *) NULL,
-					    (int *) NULL);
+    {
+	TkTextIndex lastIndex;
+
+	searchPtr->lastPtr = TkTextIndexToInternalSeg(index2Ptr, &lastIndex,
+		(int *) NULL);
+	searchPtr->lastLinePtr = lastIndex.linePtr;
+    }
     searchPtr->lastOffset = index2Ptr->byteIndex;
     searchPtr->tagPtr = tagPtr;
     searchPtr->tree = index1Ptr->tree;
@@ -2500,10 +2700,15 @@ TkBTreeStartSearchBack(index1Ptr, index2Ptr, tagPtr, searchPtr)
 	    (index2Ptr->byteIndex == 0)) {
 	backOne = *index2Ptr;
 	searchPtr->lastPtr = NULL;	/* Signals special case for 1.0 */
+	searchPtr->lastLinePtr = NULL;
 	searchPtr->lastOffset = 0;
     } else {
+	TkTextIndex lastIndex;
+
 	TkTextIndexBackChars(index2Ptr, 1, &backOne);
-	searchPtr->lastPtr = TkTextIndexToInternalSeg(&backOne, NULL, (int *) NULL);
+	searchPtr->lastPtr = TkTextIndexToInternalSeg(&backOne, &lastIndex,
+		(int *) NULL);
+	searchPtr->lastLinePtr = lastIndex.linePtr;
 	searchPtr->lastOffset = backOne.byteIndex;
     }
     searchPtr->tagPtr = tagPtr;
@@ -2661,7 +2866,6 @@ TkBTreeNextTag(searchPtr)
 		    if (nodePtr->segPtr) {
 			/* Cannot happen if nodePtr->parentPtr != NULL. */
 		      TkTextSegment *segPtr1;
-		      TkTextLine *linePtr;
 
 		      /* Get up one level. */
 		      segPtr = nodePtr->segPtr;
@@ -2702,6 +2906,9 @@ TkBTreeNextTag(searchPtr)
 		    goto gotNodeWithTag;
 		}
 	    }
+	    if (NodeHoldsLine(nodePtr, searchPtr->lastLinePtr)) {
+		goto searchOver;	/* The stop is in the node skipped. */
+	    }
 	    if (!nodePtr->segPtr) {
 	      searchPtr->linesLeft -= nodePtr->numLines;
 	    }
@@ -2723,6 +2930,9 @@ TkBTreeNextTag(searchPtr)
 			    || (summaryPtr->tagPtr == searchPtr->tagPtr)) {
 			goto nextChild;
 		    }
+		}
+		if (NodeHoldsLine(nodePtr, searchPtr->lastLinePtr)) {
+		    goto searchOver;	/* The stop is in the node skipped. */
 		}
 		if (!nodePtr->segPtr) {
 		  searchPtr->linesLeft -= nodePtr->numLines;
@@ -2798,7 +3008,7 @@ TkBTreePrevTag(searchPtr)
 					 * line being scanned (0 unless the
 					 * line is inside a block). */
     int pastLast;			/* Saw last marker during scan */
-    int linesSkipped;
+    int linesSkipped, stopSkipped;
 
     if (searchPtr->linesLeft <= 0) {
 	goto searchOver;
@@ -2951,7 +3161,7 @@ TkBTreePrevTag(searchPtr)
 		}
 		goto searchOver;
 	    }
-	    for (prevNodePtr = NULL, linesSkipped = 0,
+	    for (prevNodePtr = NULL, linesSkipped = 0, stopSkipped = 0,
 		    node2Ptr = nodePtr->parentPtr->children.nodePtr ;
 		    node2Ptr != nodePtr;  node2Ptr = node2Ptr->nextPtr) {
 		for (summaryPtr = node2Ptr->summaryPtr; summaryPtr != NULL;
@@ -2960,13 +3170,20 @@ TkBTreePrevTag(searchPtr)
 			    (summaryPtr->tagPtr == searchPtr->tagPtr)) {
 			prevNodePtr = node2Ptr;
 			linesSkipped = 0;
+			stopSkipped = 0;
 			goto keepLooking;
 		    }
 		}
 		linesSkipped += node2Ptr->numLines;
+		if (NodeHoldsLine(node2Ptr, searchPtr->lastLinePtr)) {
+		    stopSkipped = 1;
+		}
 
 		keepLooking:
 		continue;
+	    }
+	    if (stopSkipped) {
+		goto searchOver;	/* The stop is in a node skipped. */
 	    }
 	    if (prevNodePtr != NULL) {
 		nodePtr = prevNodePtr;
@@ -2989,7 +3206,7 @@ TkBTreePrevTag(searchPtr)
     
 	gotNodeWithTag:
 	while (nodePtr->level > 0) {
-	    for (linesSkipped = 0, prevNodePtr = NULL,
+	    for (linesSkipped = 0, prevNodePtr = NULL, stopSkipped = 0,
 		    nodePtr = nodePtr->children.nodePtr; nodePtr != NULL ;
 		    nodePtr = nodePtr->nextPtr) {
 		for (summaryPtr = nodePtr->summaryPtr; summaryPtr != NULL;
@@ -2998,16 +3215,23 @@ TkBTreePrevTag(searchPtr)
 			    || (summaryPtr->tagPtr == searchPtr->tagPtr)) {
 			prevNodePtr = nodePtr;
 			linesSkipped = 0;
+			stopSkipped = 0;
 			goto keepLooking2;
 		    }
 		}
 		linesSkipped += nodePtr->numLines;
+		if (NodeHoldsLine(nodePtr, searchPtr->lastLinePtr)) {
+		    stopSkipped = 1;
+		}
 
 		keepLooking2:
 		continue;
 	    }
 	    if (prevNodePtr == NULL) {
 		panic("TkBTreePrevTag found incorrect tag summary info.");
+	    }
+	    if (stopSkipped) {
+		goto searchOver;	/* The stop is in a node skipped. */
 	    }
 	    if (!prevNodePtr->segPtr) {
 		searchPtr->linesLeft -= linesSkipped;
@@ -3038,74 +3262,6 @@ TkBTreePrevTag(searchPtr)
 /*
  *----------------------------------------------------------------------
  *
- * LastTagInNode --
- *
- *	Determine whether a particular node has a particular tag.
- *
- * Results:
- *	The return value is 1 if the last toggle transition of the
- *	node is to `on' position, 0 if to `off' position,  -1 if the node
- *	does not have given tag, 
- *
- * Side effects:
- *	None.
- *
- *----------------------------------------------------------------------
- */
-int
-LastTagInNode(nodePtr, tagPtr)
-    Node *nodePtr;
-    TkTextTag *tagPtr;			/* Tag of interest. */
-{
-    register TkTextLine *linePtr;
-    register TkTextSegment *segPtr, *lastSegPtr = NULL;
-    register Summary *summaryPtr;
-    int retVal = -1;
-    int countAfter;
-
-  restart:
-    countAfter = 0;
-    for (linePtr = nodePtr->children.linePtr;
-	    linePtr != NULL;
-	    linePtr = linePtr->nextPtr) {
-	for (segPtr = linePtr->segPtr; segPtr != NULL;
-		segPtr = segPtr->nextPtr) {
-	    if (((segPtr->typePtr == &tkTextToggleOnType)
-		    || (segPtr->typePtr == &tkTextToggleOffType))
-		    && (segPtr->body.toggle.tagPtr == tagPtr)) {
-		retVal = segPtr->typePtr == &tkTextToggleOnType ? 1 : 0;
-		countAfter = 0;
-	    } else if ((segPtr->typePtr == &tkTextIBTreeType)
-		       && segPtr->body.itree.tree
-		       && (summaryPtr = 
-			   ((BTree *)segPtr->body.itree.tree)
-			     ->rootPtr->summaryPtr)) {
-		/* Look for tag transitions inside */
-		for ( ; summaryPtr; summaryPtr = summaryPtr->nextPtr ) {
-		    if ( summaryPtr->tagPtr == tagPtr ) {
-			countAfter += summaryPtr->toggleCount;
-			lastSegPtr = segPtr;
-			break;
-		    }
-		}
-	    } 
-	}
-    }
-
-    if (retVal != -1) {			/* Have seen toplevel toggles. */
-	return retVal ^ (countAfter & 1);
-    } else if (countAfter) {		/* There are tag transitions
-					   inside internal Trees. */
-	nodePtr = ((BTree *)lastSegPtr->body.itree.tree)->rootPtr;
-	goto restart;
-    } else {
-	return -1;
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- *
  * TkBTreeCharTagged --
  *
  *	Determine whether a particular character has a particular tag.
@@ -3130,7 +3286,7 @@ TkBTreeCharTagged(oldIndexPtr, tagPtr)
     register TkTextLine *siblingLinePtr;
     register TkTextSegment *segPtr;
     TkTextIndex index;
-    TkTextSegment *toggleSegPtr, *treeSegPtr = NULL;
+    TkTextSegment *toggleSegPtr;
     int toggles, offset, countAfter = 0, countAfter1 = 0;
     register Summary *summaryPtr;
 
@@ -3159,7 +3315,6 @@ TkBTreeCharTagged(oldIndexPtr, tagPtr)
 	  for ( ; summaryPtr; summaryPtr = summaryPtr->nextPtr ) {
 	    if ( summaryPtr->tagPtr == tagPtr ) {
 	      countAfter += summaryPtr->toggleCount; 
-	      treeSegPtr = segPtr;
 	      break;
 	    }
 	  }
@@ -3170,12 +3325,6 @@ TkBTreeCharTagged(oldIndexPtr, tagPtr)
 	return ((toggleSegPtr->typePtr == &tkTextToggleOnType)
 		^ (countAfter & 1));
     }
-#if 0
- else if (treeSegPtr) {		/* We saw internal transition. */
-	return LastTagInNode(((BTree *)treeSegPtr->body.itree.tree)->rootPtr,
-			     tagPtr);	/* Never -1. */
-    }
-#endif 
 
     /*
      * No toggle in this line.  Look for toggles for the tag in lines
@@ -3263,10 +3412,18 @@ TkBTreeCharTagged(oldIndexPtr, tagPtr)
 /*
  *----------------------------------------------------------------------
  *
- * TkBTreeGetTags --
+ * TkBTreeGetTags, TkBTreeGetTagsInEffect --
  *
  *	Return information about all of the tags that are associated
  *	with a particular character in a B-tree of text.
+ *
+ *	They differ at the head of a block only.  TkBTreeGetTagsInEffect
+ *	("tag names") gives the tags in effect there, as "tag ranges",
+ *	"dump" and the searches count them.  TkBTreeGetTags (the
+ *	display, the elide test, the mouse bindings) answers another
+ *	question, which tags style the block as a whole: it leaves out
+ *	a tag that switches off inside the block (TkIBTreeFixTags, the
+ *	1997 design).
  *
  * Results:
  *	The return value is a malloc-ed array containing pointers to
@@ -3283,13 +3440,39 @@ TkBTreeCharTagged(oldIndexPtr, tagPtr)
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
+static TkTextTag **	GetTags _ANSI_ARGS_((TkTextIndex *oldIndexPtr,
+			    int *numTagsPtr, int wholeBlock));
+
 TkTextTag **
 TkBTreeGetTags(oldIndexPtr, numTagsPtr)
     TkTextIndex *oldIndexPtr;	/* Indicates a particular position in
 				 * the B-tree. */
     int *numTagsPtr;		/* Store number of tags found at this
 				 * location. */
+{
+    return GetTags(oldIndexPtr, numTagsPtr, 1);
+}
+
+TkTextTag **
+TkBTreeGetTagsInEffect(oldIndexPtr, numTagsPtr)
+    TkTextIndex *oldIndexPtr;	/* Indicates a particular position in
+				 * the B-tree. */
+    int *numTagsPtr;		/* Store number of tags found at this
+				 * location. */
+{
+    return GetTags(oldIndexPtr, numTagsPtr, 0);
+}
+
+	/* ARGSUSED */
+static TkTextTag **
+GetTags(oldIndexPtr, numTagsPtr, wholeBlock)
+    TkTextIndex *oldIndexPtr;	/* Indicates a particular position in
+				 * the B-tree. */
+    int *numTagsPtr;		/* Store number of tags found at this
+				 * location. */
+    int wholeBlock;		/* At the head of a block: non-zero for
+				 * the tags constant over the whole
+				 * block only. */
 {
     TkTextIndex tIndex;		/* Indicates a particular position in
 				 * the B-tree. */
@@ -3424,7 +3607,7 @@ TkBTreeGetTags(oldIndexPtr, numTagsPtr)
     }
     *numTagsPtr = dst;
     ckfree((char *) tagInfo.counts);
-    if (iBTreeSegPtr) {
+    if (iBTreeSegPtr && wholeBlock) {
       TkIBTreeFixTags(iBTreeSegPtr, tagInfo.tagPtrs, numTagsPtr);
     }
     if (*numTagsPtr == 0) {
@@ -3439,7 +3622,7 @@ TkBTreeGetTags(oldIndexPtr, numTagsPtr)
  *
  * IncCount --
  *
- *	This is a utility procedure used by TkBTreeGetTags.  It
+ *	This is a utility procedure used by GetTags.  It
  *	increments the count for a particular tag, adding a new
  *	entry for that tag if there wasn't one previously.
  *
@@ -3908,6 +4091,7 @@ Rebalance(treePtr, nodePtr)
 		    newPtr->numChildren = 1;
 		    newPtr->numLines = nodePtr->numLines;
 		    newPtr->segPtr = NULL;
+		    TkTextDataInit(newPtr->value);
 		    RecomputeNodeCounts(newPtr);
 		    treePtr->rootPtr = newPtr;
 		}
@@ -3919,6 +4103,7 @@ Rebalance(treePtr, nodePtr)
 		newPtr->level = nodePtr->level;
 		newPtr->numChildren = nodePtr->numChildren - MIN_CHILDREN;
 		newPtr->segPtr = NULL;
+		TkTextDataInit(newPtr->value);
 		if (nodePtr->level == 0) {
 		    for (i = MIN_CHILDREN-1,
 			    linePtr = nodePtr->children.linePtr;
@@ -4138,6 +4323,22 @@ RecomputeNodeCounts(nodePtr)
 		    segPtr = segPtr->nextPtr) {
 		if ((segPtr->typePtr == &tkTextIBTreeType
 		     && segPtr->body.itree.tree)) {
+		    /*
+		     * A block whose line changed is not counted until its
+		     * new line is cleaned up (iBTreeLineChangeProc took
+		     * its toggles off the old nodes and the tags' totals,
+		     * iBTreeCleanupProc adds them back): leave it out here
+		     * too.  Counting it made the node's count exceed the
+		     * tag's total, so that a rebalance in between (a
+		     * deletion joining the block's line to the line before
+		     * rebalances before it cleans up) did not move the
+		     * tag's root to the node that kept the toggles, and
+		     * freed the node the root was on.
+		     */
+
+		    if (!segPtr->body.itree.counted) {
+			continue;
+		    }
 		    childNodePtr = 
 		      ((BTree*)segPtr->body.itree.tree)->rootPtr;
 		    for (summaryPtr2 = childNodePtr->summaryPtr;
@@ -4487,6 +4688,7 @@ ToggleDeleteProc(segPtr, linePtr, treeGone)
 					 * get cleaned up. */
 {
     if (treeGone) {
+	DropToggleValue(segPtr);	/* The widget is destroyed. */
 	ckfree((char *) segPtr);
 	return 0;
     }
@@ -4562,6 +4764,7 @@ ToggleCleanupProc(segPtr, linePtr)
 			segPtr->body.toggle.tagPtr, -counts);
 	    }
 	    prevPtr->nextPtr = segPtr2->nextPtr;
+	    DropToggleValue(segPtr2);
 	    ckfree((char *) segPtr2);
 	    segPtr2 = segPtr->nextPtr;
 	    ckfree((char *) segPtr);
@@ -4712,11 +4915,19 @@ iBTreeCleanupProc(segPtr, linePtr)
     TkTextSegment *segPtr;		/* Pointer to segment to cleanup. */
     TkTextLine *linePtr;		/* Line containing segments. */
 {
+    if (!segPtr->body.itree.counted) {
+      /*
+       * The block moved to this line (iBTreeLineChangeProc): an -empty
+       * block too, which has no tree and no toggles to count, but whose
+       * line has to be known (TkIBTreeStartIndex, "block at").
+       */
+
+      segPtr->body.itree.linePtr = linePtr;
+    }
     if (!segPtr->body.itree.counted && segPtr->body.itree.tree) {
       Summary *summaryPtr 
 	= ((BTree *)segPtr->body.itree.tree)->rootPtr->summaryPtr;
 
-      segPtr->body.itree.linePtr = linePtr;
       while (summaryPtr) {
 	ChangeNodeToggleCount(linePtr->parentPtr, 
 			      summaryPtr->tagPtr, summaryPtr->toggleCount);
@@ -4762,14 +4973,22 @@ iBTreeDeleteProc(segPtr, linePtr, treeGone)
 					 * updated. */
     int dummy = 2;
 
+    /*
+     * The block goes, with its nodes and leaves: their values are
+     * dropped, before the leaves' contents move anywhere.
+     */
+
+    if (segPtr->body.itree.tree) {
+      BTree *treePtr = (BTree *) segPtr->body.itree.tree;
+
+      DropTreeValues(treePtr->textPtr, treePtr->rootPtr);
+    }
     if (treeGone) {
       segPtr->body.itree.blockPtr->count--;
       if (segPtr->body.itree.tree) {
 	TkBTreeDestroy(segPtr->body.itree.tree);
       }
-      if (segPtr->body.itree.data) {
-	LangFreeArg(segPtr->body.itree.data, TCL_DYNAMIC);
-      }
+      DropBlockData(segPtr);
       ckfree((char*)segPtr);
       return 0;
     }
@@ -4782,6 +5001,7 @@ iBTreeDeleteProc(segPtr, linePtr, treeGone)
     
       line.segPtr = segPtr;
       line.nextPtr = NULL;
+      TkTextDataInit(line.value);
       line.parentPtr = linePtr->parentPtr; /* For LineChange to work. */
       segPtr->nextPtr = NULL;
       index1.linePtr = &line;
@@ -4817,16 +5037,29 @@ iBTreeDeleteProc(segPtr, linePtr, treeGone)
       }
       TkBTreeDestroy(segPtr->body.itree.tree);
     } else {
-      dummy = 1;
+      /*
+       * An empty block is deleted like any segment (result 0): the
+       * caller takes its size (1) off the enclosing blocks' lengths.
+       * Doing it here as well counted it twice, and the enclosing
+       * block lost a character of its length (its last character
+       * disappeared from "get", and deleting it later panicked).
+       */
+      dummy = 0;
       result = 0;
     }
 
     segPtr->body.itree.blockPtr->count--;
-    if (segPtr->body.itree.data) {
-      LangFreeArg(segPtr->body.itree.data, TCL_DYNAMIC);
-    }
-    if (linePtr->parentPtr->segPtr) {
+    DropBlockData(segPtr);
+    if (dummy && linePtr->parentPtr->segPtr) {
       IBtreeUpdateLength(linePtr->parentPtr->segPtr, -dummy);
+    }
+    if (result == 0) {
+      /*
+       * An empty block: the caller (TkBTreeDeleteChars) only unlinks
+       * a segment deleted with result 0, as for the other segment
+       * types, whose delete procedures free it themselves.
+       */
+      ckfree((char *) segPtr);
     }
     return result;
 }
@@ -4853,7 +5086,7 @@ iBTreeDeleteProc(segPtr, linePtr, treeGone)
 static void
 iBTreeCheckProc(segPtr, linePtr)
     TkTextSegment *segPtr;		/* Segment to check. */
-    TkTextLine *linePtr;		/* Line containing segment, ignored. */
+    TkTextLine *linePtr;		/* Line containing segment. */
 {
   int size = 0;
   Node *nodePtr;
@@ -4864,6 +5097,9 @@ iBTreeCheckProc(segPtr, linePtr)
 
   if (segPtr->body.itree.counted == 0) {
     panic("IBTree segment is not counted.");
+  }
+  if (segPtr->body.itree.linePtr != linePtr) {
+    panic("IBTree segment does not know its line.");
   }
 
   if (segPtr->body.itree.tree) {
@@ -4962,9 +5198,13 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 					 * of the deletion range. */
     TkTextSegment *lastPtr;		/* The segment just after the end
 					 * of the deletion range. */
-    TkTextSegment *segPtr, *nextPtr, *curPrevPtr, *newSegPtr;
+    TkTextSegment *segPtr, *nextPtr, *newSegPtr;
     TkTextLine *curLinePtr;
     Node *curNodePtr, *nodePtr;
+    Node *lastNodePtr = NULL;		/* The node of the last line, if
+					 * not the first's, or its first
+					 * ancestor left: to rebalance
+					 * too. */
     SegLine pSegment1, pSegment2;	/* The segment and line of the
 					 * previous segments for index?Ptr. */
     int count = 0;			/* Total size of internal tree. */
@@ -4984,9 +5224,25 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
      * inside this segment.
      */
 
-    pSegment2 = SplitSeg(index2Ptr);
-    lastPtr = pSegment2.segPtr->nextPtr;
-    pSegment1 = SplitSeg(index1Ptr);
+    if ((index1Ptr->linePtr == index2Ptr->linePtr)
+	    && (index1Ptr->byteIndex == index2Ptr->byteIndex)) {
+	/*
+	 * An empty range (a block with nothing in it): one split will
+	 * do.  Two would not, at the start of a line: each SplitSeg
+	 * there puts a new empty segment in front of the line, so the
+	 * second one would leave the first one between the two
+	 * "previous" segments, as if it were the range, and that would
+	 * be moved into the block's tree (which an -empty block does
+	 * not have: a NULL dereference).
+	 */
+
+	pSegment1 = pSegment2 = SplitSeg(index1Ptr);
+	lastPtr = pSegment1.segPtr->nextPtr;
+    } else {
+	pSegment2 = SplitSeg(index2Ptr);
+	lastPtr = pSegment2.segPtr->nextPtr;
+	pSegment1 = SplitSeg(index1Ptr);
+    }
 
     if (pSegment1.linePtr->parentPtr->segPtr 
 	!= pSegment2.linePtr->parentPtr->segPtr) {
@@ -4999,7 +5255,7 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
     }
 
     
-    curPrevPtr = prevPtr = pSegment1.segPtr;
+    prevPtr = pSegment1.segPtr;
     segPtr = prevPtr->nextPtr;
 
     /* Check whether the split at index1 invalidated
@@ -5037,7 +5293,7 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
     newSegPtr->body.itree.linePtr = curLinePtr;
     newSegPtr->body.itree.counted = 1;
     newSegPtr->body.itree.next2delete = NULL;
-    newSegPtr->body.itree.data = NULL;
+    TkTextDataInit(newSegPtr->body.itree.data);
     newSegPtr->typePtr = &tkTextIBTreeType;
     blockPtr->count++;
 
@@ -5072,7 +5328,103 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
        *      * segments only *after* deletion range, since others remain in
        *      * the same line, but this line changes nodes. */
 
-      if (curLinePtr != pSegment2.linePtr) {
+      if ((curLinePtr != pSegment2.linePtr) && curNodePtr->segPtr) {
+	/*
+	 * Inside a block (whose tree is never rebalanced) the lines may
+	 * belong to different nodes: move them one by one from their
+	 * nodes to the new tree; a node left without children
+	 * disappears, with its value (the nodes of the starting line
+	 * keep it).  The part of the last line before index2 moves with
+	 * the line, the rest joins the starting line: the moved part
+	 * starts without a value, the joined leaf keeps the first value
+	 * present (as for a deletion); but if nothing of the last line
+	 * is after index2 except its newline, the whole leaf moves, with
+	 * its value (as for the starting line, below).
+	 */
+
+	Node *newRootPtr = ((BTree *)newSegPtr->body.itree.tree)->rootPtr;
+	TkTextLine *prevLinePtr = newRootPtr->children.linePtr;
+	TkTextLine *endLinePtr = prevLinePtr->nextPtr;
+	TkTextLine *nextLinePtr;
+	int addLines = 0, last, lastWhole, rest = 0;
+
+	lines = 1;
+	for (nextPtr = lastPtr; nextPtr != NULL; nextPtr = nextPtr->nextPtr) {
+	  rest += nextPtr->size;
+	}
+	lastWhole = (rest <= 1);
+	for (nextPtr = lastPtr; nextPtr != NULL;
+	     nextPtr = nextPtr->nextPtr) {
+	  if (nextPtr->typePtr->lineChangeProc != NULL) {
+	    (*nextPtr->typePtr->lineChangeProc)(nextPtr, pSegment2.linePtr);
+	  }
+	}
+
+	/*
+	 * If nothing of the starting line is before index1, the whole
+	 * leaf moves: its value goes with it, to the first leaf of the
+	 * new block.
+	 */
+
+	for (nextPtr = pSegment1.linePtr->segPtr;
+	     (nextPtr != newSegPtr) && (nextPtr->size == 0);
+	     nextPtr = nextPtr->nextPtr) {
+	  /* Empty. */
+	}
+	if (nextPtr == newSegPtr) {
+	  TkTextDataMove(&prevLinePtr->value, &pSegment1.linePtr->value);
+	}
+	curLinePtr = TkBTreeNextLine(pSegment1.linePtr);
+	while (1) {
+	  last = (curLinePtr == pSegment2.linePtr);
+	  nextLinePtr = last ? NULL : TkBTreeNextLine(curLinePtr);
+	  for (segPtr = curLinePtr->segPtr; segPtr != NULL && segPtr != lastPtr;
+	       segPtr = segPtr->nextPtr) {
+	    if (segPtr->typePtr->lineChangeProc != NULL) {
+	      (*segPtr->typePtr->lineChangeProc)(segPtr, curLinePtr);
+	    }
+	  }
+	  UnlinkLine(textPtr, curLinePtr, pSegment1.linePtr);
+	  if (last && !lastWhole) {
+	    MergeValues(textPtr, (void *) pSegment1.linePtr,
+		    &pSegment1.linePtr->value, (void *) curLinePtr,
+		    &curLinePtr->value);
+	  }
+	  prevLinePtr->nextPtr = curLinePtr;
+	  curLinePtr->parentPtr = newRootPtr;
+	  prevLinePtr = curLinePtr;
+	  addLines++;
+	  CleanupLine(curLinePtr);
+	  if (last) {
+	    break;
+	  }
+	  curLinePtr = nextLinePtr;
+	}
+	prevLinePtr->nextPtr = endLinePtr;
+	newRootPtr->numLines += addLines;
+	newRootPtr->numChildren += addLines;
+
+	/*
+	 * If the last line moved was the last leaf, the node of the
+	 * dummy line may have no leaves left: the dummy line joins the
+	 * node of the starting line, and that node disappears.
+	 */
+
+	nextLinePtr = TkBTreeNextLine(pSegment1.linePtr);
+	if ((nextLinePtr != NULL) && IsLastLine(nextLinePtr)
+		&& (nextLinePtr->parentPtr != pSegment1.linePtr->parentPtr)
+		&& (nextLinePtr->parentPtr->numChildren == 1)
+		&& (pSegment1.linePtr->nextPtr == NULL)) {
+	  UnlinkLine(textPtr, nextLinePtr, NULL);
+	  pSegment1.linePtr->nextPtr = nextLinePtr;
+	  nextLinePtr->parentPtr = pSegment1.linePtr->parentPtr;
+	  nextLinePtr->parentPtr->numChildren++;
+	  for (nodePtr = nextLinePtr->parentPtr; nodePtr != NULL;
+	       nodePtr = nodePtr->parentPtr) {
+	    nodePtr->numLines++;
+	  }
+	}
+      } else if (curLinePtr != pSegment2.linePtr) {
 	TkTextLine *nextLinePtr = TkBTreeNextLine(curLinePtr);
 	TkTextLine *prevLinePtr 
 	  = ((BTree *)newSegPtr->body.itree.tree)->rootPtr->children.linePtr;
@@ -5098,6 +5450,18 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 	 *        * we cached the next line */
 
 	curLinePtr = nextLinePtr;
+
+	/*
+	 * The lines moved are counted off their own nodes: the first one
+	 * may already be in the node after the starting line's.  A node
+	 * other than the starting line's that all its lines leave goes.
+	 * The moved lines are chained in the new tree across the nodes
+	 * they came from (the last line of a node had no next).
+	 */
+
+	if (curLinePtr != NULL) {
+	  curNodePtr = curLinePtr->parentPtr;
+	}
 	while (curLinePtr) {
 	  /* Even if it is the last line of range, we should send
 	   * 	 * LineChange signal to the segments before the *lastPtr.  */
@@ -5124,6 +5488,7 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 	  }
 
 	  addLines++;
+	  deletedInNode++;
 	  nextLinePtr = TkBTreeNextLine(curLinePtr);
 	  if (curLinePtr->nextPtr != nextLinePtr) {
 	    /* Are in different nodes */
@@ -5134,9 +5499,7 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 	    }
 	    curNodePtr->numChildren -= deletedInNode;
 	    deletedInNode = 0;
-
-	    /* Delete the old node if it is not the old one. ???? Should
-	     * 	   * probably check if old one is in IBTree.  */
+	    curLinePtr->nextPtr = nextLinePtr;
 
 	    if (curNodePtr != oldNodePtr) {
 	      if (curNodePtr->numChildren) {
@@ -5160,10 +5523,9 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 		ckfree((char *) curNodePtr);
 		curNodePtr = parentPtr;
 	      }
-	      curNodePtr = nextLinePtr->parentPtr;
 	    }
+	    curNodePtr = nextLinePtr->parentPtr;
 	  }
-	  deletedInNode++;		/* Not now???? */
 	  curLinePtr->parentPtr = ((BTree *)newSegPtr->body.itree.tree)->rootPtr;
 	  CleanupLine(curLinePtr);
 	  curLinePtr = nextLinePtr;
@@ -5171,8 +5533,46 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 	if (!curLinePtr) {
 	  panic("Ran out of lines in TkBTreeMakeBlock.");
 	}
-	/* Now correct structure in the ambient tree. */
-	pSegment1.linePtr->nextPtr = pSegment2.linePtr->nextPtr;
+	/*
+	 * Now correct structure in the ambient tree.  If the last line
+	 * was in another node than the first, the lines after it stay
+	 * in their node (they were linked after the first line, in its
+	 * node, with a child count that did not match), and that node
+	 * goes if it has no lines left; the first line is the last of
+	 * its node then (all after it moved).
+	 */
+
+	if (curNodePtr == oldNodePtr) {
+	  pSegment1.linePtr->nextPtr = pSegment2.linePtr->nextPtr;
+	} else {
+	  pSegment1.linePtr->nextPtr = NULL;
+	  curNodePtr->children.linePtr = pSegment2.linePtr->nextPtr;
+	  while ((curNodePtr != NULL) && (curNodePtr->numChildren == 0)) {
+	    Node *parentPtr = curNodePtr->parentPtr;
+
+	    if (parentPtr->children.nodePtr == curNodePtr) {
+	      parentPtr->children.nodePtr = curNodePtr->nextPtr;
+	    } else {
+	      Node *prevNodePtr = parentPtr->children.nodePtr;
+
+	      while (prevNodePtr->nextPtr != curNodePtr) {
+		prevNodePtr = prevNodePtr->nextPtr;
+	      }
+	      prevNodePtr->nextPtr = curNodePtr->nextPtr;
+	    }
+	    parentPtr->numChildren--;
+	    DeleteSummaries(curNodePtr->summaryPtr);
+	    ckfree((char *) curNodePtr);
+	    curNodePtr = parentPtr;
+	  }
+
+	  /*
+	   * The node of the last line, or the first of its ancestors left
+	   * when it went: it may have too few children now.
+	   */
+
+	  lastNodePtr = curNodePtr;
+	}
 	pSegment2.linePtr->nextPtr = endLinePtr;
 	((BTree *)newSegPtr->body.itree.tree)->rootPtr->numLines += addLines;
 	((BTree *)newSegPtr->body.itree.tree)->rootPtr->numChildren += addLines;
@@ -5218,6 +5618,16 @@ TkBTreeMakeBlock(textPtr, index1Ptr, index2Ptr, blockPtr)
 
     if (!pSegment1.linePtr->parentPtr->segPtr) {
       if (lines) {
+	/*
+	 * The node of the last line first, if it is another one (it
+	 * may lose all but a few lines); its merge with a neighbour
+	 * may free it, but not the node of the first line, which is
+	 * looked up again.
+	 */
+
+	if (lastNodePtr != NULL) {
+	  Rebalance((BTree *) index1Ptr->tree, lastNodePtr);
+	}
 	Rebalance((BTree *) index1Ptr->tree, pSegment1.linePtr->parentPtr);
       }
     } else {
@@ -5346,16 +5756,12 @@ void
 TkBTreeKillBlockProc(segPtr)
     register TkTextSegment *segPtr;	/* Segment to remove. */
 {
-    TkTextSegment *prevPtr;		/* The segment just before segPtr. */
     TkTextSegment *lastPtr = NULL;	/* The last surviving segment
 					 * in the internal tree. Can
 					 * be NULL to denote start of line. */
     TkTextSegment *nextPtr, *afterPtr, *headPtr;
     TkTextLine *outLinePtr, *intLinePtr, *nextLinePtr, *prevLinePtr = NULL;
-    TkTextLine *firstLinePtr;
-    Node *curNodePtr;
-    SegLine pSegment1, pSegment2;	/* The segment and line of the
-					 * previous segments for index?Ptr. */
+    TkTextLine *firstLinePtr = NULL;
     int lines = -1;			/* Total lines added to outer
 					 * tree. */
     int dummy = 2;			/* Number of dummy chars deleted. */
@@ -5366,6 +5772,15 @@ TkBTreeKillBlockProc(segPtr)
       dummy = 1;
       outLinePtr = NULL;
     } else {
+      BTree *treePtr = (BTree *) segPtr->body.itree.tree;
+
+      /*
+       * The block is dissolved: its contents join the enclosing
+       * structure without its nodes and without the values of its
+       * leaves, which are dropped before the lines move.
+       */
+
+      DropTreeValues(treePtr->textPtr, treePtr->rootPtr);
       intLinePtr = TkBTreeFindLine(segPtr->body.itree.tree,0);
       headPtr = intLinePtr->segPtr;
       afterPtr = segPtr->nextPtr;
@@ -5502,6 +5917,21 @@ TkBTreeKillBlockProc(segPtr)
       GlueLines((TkTextSegment*)NULL, afterPtr,
 		(lines > 0) ? prevLinePtr: outLinePtr,
 		lastPtr);
+
+      /*
+       * The dummy line is in no node's list of children any more (the
+       * lines moved out cut those lists, see "Protect of deletion"),
+       * so TkBTreeDestroy would not free it: free it here, with its
+       * newline.  The first internal line, whose segments joined the
+       * outer line, is freed at the end.
+       */
+
+      intLinePtr->parentPtr->children.linePtr = NULL;
+      while ((nextPtr = intLinePtr->segPtr) != NULL) {
+	intLinePtr->segPtr = nextPtr->nextPtr;
+	(*nextPtr->typePtr->deleteProc)(nextPtr, intLinePtr, 1);
+      }
+      ckfree((char *) intLinePtr);
       
       TkBTreeDestroy(segPtr->body.itree.tree);
     }
@@ -5509,9 +5939,7 @@ TkBTreeKillBlockProc(segPtr)
     /* Now delete the segment itself. */
 
     segPtr->body.itree.blockPtr->count--;
-    if (segPtr->body.itree.data) {
-      LangFreeArg(segPtr->body.itree.data, TCL_DYNAMIC);
-    }
+    DropBlockData(segPtr);
     ckfree((char *)segPtr);
 
     /* Now all the segments got the signals, the lines are joined to the
@@ -5525,6 +5953,7 @@ TkBTreeKillBlockProc(segPtr)
 	if (outLinePtr->parentPtr->segPtr) {
 	    IBtreeUpdateLength(outLinePtr->parentPtr->segPtr, -dummy);
 	}
+	ckfree((char *) firstLinePtr);	/* (See above.) */
     }
 }
 
@@ -5585,6 +6014,12 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
     ListFactory *lfPtr = (ListFactory *) targetPtr; /* Where to append. */
     char *buffer = (char *) targetPtr;	/* Where to append. */
     Arg arg = NULL;
+    Arg instData = (flags & TKT_GET_NOVALUES) ? NULL
+	    : TkTextDataGetLang(segPtr->body.itree.data);
+					/* The Lang part of the instance
+					 * data, or NULL (always for the
+					 * undo, which records the whole
+					 * container: TK_TEXT_VALUE_BLOCK). */
 
     if (!(flags & (TKT_GET_DSTRING | TKT_GET_LIST)) && *offsetPtr <= 0) {
       return res;
@@ -5595,8 +6030,8 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
 	    lfPtr = ListFactoryNewLevelWithType(lfPtr, IdType("E","Tk::Text::Empty"));
 	    LangSetString(&arg, segPtr->body.itree.blockPtr->name);
 	    ListFactoryAppendCopy(lfPtr,arg);
-	    if (segPtr->body.itree.data) {
-	        ListFactoryAppendCopy(lfPtr, segPtr->body.itree.data);
+	    if (instData != NULL) {
+	        ListFactoryAppendCopy(lfPtr, instData);
 	    }
 	    lfPtr = ListFactoryEndLevelWithType(lfPtr);
 	    LangFreeArg(arg, LANG_DYNAMIC);
@@ -5628,8 +6063,20 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
 	ListFactoryAppendCopy(lfPtr,arg);
 	LangSetInt(&arg, ((BTree*)segPtr->body.itree.tree)->rootPtr->level);
 	ListFactoryAppendCopy(lfPtr,arg);
-	if (segPtr->body.itree.data) {
-	    ListFactoryAppendCopy(lfPtr,segPtr->body.itree.data);
+	if (instData != NULL) {
+	    ListFactoryAppendCopy(lfPtr, instData);
+	}
+	if (!(flags & TKT_GET_NOVALUES) && (start == 0) && doend
+		&& NodeHasValues(((BTree*)segPtr->body.itree.tree)->rootPtr)) {
+	    /*
+	     * [name, level, data or undef, node values]: only when the
+	     * whole block is listed (the values follow the whole tree,
+	     * which a partial listing does not show).
+	     */
+	    if (instData == NULL) {
+		ListFactoryAppendPure(lfPtr, newSV(0));
+	    }
+	    NodeValuesList(((BTree*)segPtr->body.itree.tree)->rootPtr, lfPtr);
 	}
 	lfPtr = ListFactoryEndLevel(lfPtr);
 	targetPtr = (void *) lfPtr;
@@ -5651,7 +6098,11 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
     endline = length - 1;
     while ((start < end) 
 	   /* Conditions if end is at beginning of a line: */
-	   || (dostart && start == end && end == endline + 1)) {
+	   || (dostart && start == end && end == endline + 1)
+	   /* The whole block, and its only leaf is empty: the marks and
+	    * toggles in that leaf are in the range too. */
+	   || (dostart && doend && start == end
+	       && end == endline - length + 1)) {
 	int old, new;
 
 	while (start > endline) {
@@ -5786,7 +6237,6 @@ TkBTreeLineTextAppend(textPtr, linePtr, start, end, targetPtr, flags, offsetPtr)
   TkTextSegment *segPtr = linePtr->segPtr;
   int size, last, res = start, dostart = 0, doend = 0;
   int segOffset = 0;			/* Offset of segPtr in the line. */
-  char savedChar;
   Tcl_DString *dstringPtr = (Tcl_DString *) targetPtr; /* Where to append. */
   ListFactory *lfPtr = (ListFactory *) targetPtr; /* Where to append. */
   char *buffer = (char *) targetPtr;	/* Where to append. */
@@ -5887,6 +6337,19 @@ TkBTreeLineTextAppend(textPtr, linePtr, start, end, targetPtr, flags, offsetPtr)
       } else if (segPtr->typePtr == &tkTextIBTreeType) {
 	  int new;
 
+	  if (start >= last) {
+	      /*
+	       * Nothing of the block is in the range: the range starts
+	       * where the block ends (the skipping above stops at a
+	       * segment the start is at the end of) or is empty.  Asking
+	       * for the block from its end on reported an empty block
+	       * and its last newline, which "block list" returned and
+	       * the undo of a deletion starting just after a block
+	       * re-inserted (a stray block, and a broken tree).
+	       */
+
+	      goto nextSegment;
+	  }
 	  if (flags & TKT_GET_BUFFER) targetPtr = (void*) buffer;
 	  new = TkIBTreeTextAppend(textPtr, segPtr, start, last, 
 				   targetPtr, flags, offsetPtr);
@@ -5894,7 +6357,18 @@ TkBTreeLineTextAppend(textPtr, linePtr, start, end, targetPtr, flags, offsetPtr)
 	  if (flags & TKT_GET_BUFFER) buffer += new - start;
       } else if (flags & TKT_GET_LIST) { /* Appending to a list,
 					  * should process anyway. */
-	  if (segPtr->typePtr == &tkTextToggleOnType) {
+	  if ((segPtr->typePtr == &tkTextToggleOnType)
+		  && (TkTextDataGetLang(segPtr->body.toggle.value) != NULL)
+		  && !(flags & TKT_GET_NOVALUES)) {
+	      /* A run with a value ("tag data"): [name, value]. */
+	      lfPtr = ListFactoryNewLevelWithType(lfPtr,
+				IdType("T","Tk::Text::TagOn"));
+	      LangSetString(&arg, segPtr->body.toggle.tagPtr->name);
+	      ListFactoryAppendCopy(lfPtr, arg);
+	      ListFactoryAppendPure(lfPtr,
+		      TkTextDataLangSV(segPtr->body.toggle.value));
+	      lfPtr = ListFactoryEndLevelWithType(lfPtr);
+	  } else if (segPtr->typePtr == &tkTextToggleOnType) {
 	      LangSetString(&arg, segPtr->body.toggle.tagPtr->name);
 	      ListFactoryAppendCopyWithType(lfPtr, arg,
 					    IdType("T","Tk::Text::TagOn"));
@@ -5902,6 +6376,21 @@ TkBTreeLineTextAppend(textPtr, linePtr, start, end, targetPtr, flags, offsetPtr)
 	      LangSetString(&arg, segPtr->body.toggle.tagPtr->name);
 	      ListFactoryAppendCopyWithType(lfPtr, arg,
 					    IdType("t","Tk::Text::TagOff"));
+	  } else if (((segPtr->typePtr == &tkTextLeftMarkType)
+		      || (segPtr->typePtr == &tkTextRightMarkType))
+		  && (TkTextDataGetLang(segPtr->body.mark.value) != NULL)
+		  && !(flags & TKT_GET_NOVALUES)) {
+	      /* A mark with a value ("mark data"): [name, value]. */
+	      lfPtr = ListFactoryNewLevelWithType(lfPtr,
+		      (segPtr->typePtr == &tkTextLeftMarkType)
+		      ? IdType("L","Tk::Text::MarkLeft")
+		      : IdType("R","Tk::Text::MarkRight"));
+	      LangSetString(&arg, Tcl_GetHashKey(&textPtr->markTable,
+						 segPtr->body.mark.hPtr));
+	      ListFactoryAppendCopy(lfPtr, arg);
+	      ListFactoryAppendPure(lfPtr,
+		      TkTextDataLangSV(segPtr->body.mark.value));
+	      lfPtr = ListFactoryEndLevelWithType(lfPtr);
 	  } else if (segPtr->typePtr == &tkTextLeftMarkType) {
 	      LangSetString(&arg, Tcl_GetHashKey(&textPtr->markTable,
 						 segPtr->body.mark.hPtr));
@@ -6018,6 +6507,332 @@ TkIBTreeFixTags(segPtr, tagPtrPtr, nPtr)
       done++;
     }
   }
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeTogglesElide
+ * 	Whether a segment is a block inside which a tag with an -elide
+ *	option switches on or off (a tag of the summary of its root,
+ *	which TkIBTreeFixTags drops at the head).  The display does not
+ *	skip such a block as elided text: whether it is drawn, and what
+ *	of it, depends on what is inside.
+ *
+ * Returns:
+ * 	1 if so, 0 otherwise (other segments, -empty blocks).
+ *
+ * Side effects:
+ * 	None.
+ *
+ *------------------------------------------------------------------
+ */
+int
+TkIBTreeTogglesElide(segPtr)
+     TkTextSegment *segPtr;	/* Any segment. */
+{
+  Summary *sumPtr;
+
+  if ((segPtr->typePtr != &tkTextIBTreeType) || !segPtr->body.itree.tree) {
+    return 0;
+  }
+  for (sumPtr = ((BTree*)segPtr->body.itree.tree)->rootPtr->summaryPtr;
+       sumPtr != NULL; sumPtr = sumPtr->nextPtr) {
+    if (sumPtr->tagPtr->elideString != NULL) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeSeparatorLevels, TkIBTreeSetSeparatorLevels --
+ *
+ *	"block insert" inside a block moves the leaves of its range into
+ *	the new block, whose separators are all of level 0, and the
+ *	undo dissolves that block, which splices them back at level 0:
+ *	the grouping of the leaves into the nodes of the enclosing
+ *	block is lost (BUGS 18).  The first records, before the block
+ *	insert, the level of the separator after each leaf from the one
+ *	holding index1 to the one holding index2 (the separators in the
+ *	range, and the one just after it, whose level the moves change
+ *	too); the second, after the dissolution, sets each of them back
+ *	to its level, from left to right.  No text moves: raising a
+ *	level splits the ancestors of the separator's two leaves from
+ *	the level where they meet up to the level asked for (as
+ *	TkIBTreeSplit does, without inserting a newline), the nodes
+ *	after the cut starting without values; lowering it joins them
+ *	down to that level, the joined node keeping the data the merge
+ *	policy gives it (TkTextDataMerge: here the nodes made by a raise
+ *	have none, so a node the block insert left on the end side gives
+ *	its value back to the node that starts at its old first leaf).
+ *	The values of the nodes the block insert emptied then find
+ *	their nodes again at their addresses (TkBTreeRestoreValues).
+ *
+ *	A separator's level is the level (Node.level) of the lowest
+ *	common ancestor of the leaves on its two sides: 0 if they have
+ *	the same parent.
+ *
+ * Returns:
+ *	TkIBTreeSeparatorLevels: a malloc-ed array of *numPtr levels,
+ *	or NULL if the range is not inside a block.
+ *
+ * Side effects:
+ *	TkIBTreeSetSeparatorLevels changes the tree of the block holding
+ *	indexPtr; a value that loses a join is freed at the end of the
+ *	widget command.
+ *
+ *------------------------------------------------------------------
+ */
+
+static Node *
+AncestorAt(linePtr, level)
+    TkTextLine *linePtr;		/* A leaf of a block. */
+    int level;				/* A Node.level. */
+{
+    Node *nodePtr = linePtr->parentPtr;
+
+    while ((nodePtr != NULL) && (nodePtr->level < level)) {
+	nodePtr = nodePtr->parentPtr;
+    }
+    return nodePtr;
+}
+
+/*
+ * The level of the separator after a leaf, or -1 if the leaf is the
+ * last one (the next line is the dummy line of the tree).
+ */
+
+static int
+SeparatorLevel(linePtr, nextPtrPtr)
+    TkTextLine *linePtr;		/* The leaf. */
+    TkTextLine **nextPtrPtr;		/* Filled with the next leaf. */
+{
+    TkTextLine *nextPtr = TkBTreeNextLine(linePtr);
+    Node *aPtr, *bPtr;
+
+    *nextPtrPtr = nextPtr;
+    if ((nextPtr == NULL) || IsLastLine(nextPtr)) {
+	return -1;
+    }
+    for (aPtr = linePtr->parentPtr, bPtr = nextPtr->parentPtr;
+	 (aPtr != bPtr) && (aPtr != NULL) && (bPtr != NULL);
+	 aPtr = aPtr->parentPtr, bPtr = bPtr->parentPtr) {
+	/* Empty: the leaves of a block are all at the same depth. */
+    }
+    return ((aPtr != NULL) && (aPtr == bPtr)) ? aPtr->level : -1;
+}
+
+int *
+TkIBTreeSeparatorLevels(index1Ptr, index2Ptr, numPtr)
+    TkTextIndex *index1Ptr;		/* Start of the range (outermost
+					 * tree). */
+    TkTextIndex *index2Ptr;		/* Its end. */
+    int *numPtr;			/* Filled with the number of
+					 * levels. */
+{
+    TkTextIndex i1, i2;
+    TkTextLine *linePtr, *nextPtr;
+    int *levels, n = 0, size = 1, level;
+
+    *numPtr = 0;
+    TkTextIndexToInternalSeg(index1Ptr, &i1, NULL);
+    TkTextIndexToInternalSeg(index2Ptr, &i2, NULL);
+    if ((i1.linePtr->parentPtr->segPtr == NULL)
+	    || (i1.linePtr->parentPtr->segPtr
+		    != i2.linePtr->parentPtr->segPtr)) {
+	return NULL;
+    }
+    for (linePtr = i1.linePtr; ; linePtr = nextPtr) {
+	if ((SeparatorLevel(linePtr, &nextPtr) < 0)
+		|| (linePtr == i2.linePtr)) {
+	    break;
+	}
+	size++;
+    }
+    levels = (int *) ckalloc((unsigned) (size * sizeof(int)));
+    for (linePtr = i1.linePtr; n < size; linePtr = nextPtr) {
+	level = SeparatorLevel(linePtr, &nextPtr);
+	if (level < 0) {
+	    break;			/* The last leaf. */
+	}
+	levels[n++] = level;
+	if (linePtr == i2.linePtr) {
+	    break;			/* The separator just after. */
+	}
+    }
+    if (n == 0) {
+	ckfree((char *) levels);
+	return NULL;
+    }
+    *numPtr = n;
+    return levels;
+}
+
+/*
+ * Before two nodes of a block are joined (aPtr surviving): tell the
+ * -valuecommand what the merge does to bPtr's value (the tree is
+ * consistent here).
+ */
+
+static Tcl_Obj *
+VcNodeAt(textPtr, nodePtr)
+    TkText *textPtr;
+    Node *nodePtr;
+{
+    TkTextIndex index, ext;
+    Node *firstPtr = nodePtr;
+
+    while (firstPtr->level > 0) {
+	firstPtr = firstPtr->children.nodePtr;
+    }
+    index.tree = NULL;
+    index.linePtr = firstPtr->children.linePtr;
+    index.byteIndex = 0;
+    TkTextIndexToExternalIndex(textPtr->tree, &index, &ext);
+    return TkTextVcNodePlace(textPtr, TkBTreeLineIndex(ext.linePtr),
+	    ext.byteIndex, nodePtr->level + 1);
+}
+
+static void
+VcJoinNodes(textPtr, aPtr, bPtr)
+    TkText *textPtr;
+    Node *aPtr, *bPtr;			/* bPtr joins aPtr. */
+{
+    int event;
+
+    if (TkTextDataGetLang(bPtr->value) == NULL) {
+	return;
+    }
+    if (TkTextDataIsEmpty(aPtr->value)) {
+	TkTextVcPredict(textPtr, bPtr->value, TK_TEXT_VC_MOVE,
+		TK_TEXT_VC_NODE, VcNodeAt(textPtr, bPtr),
+		VcNodeAt(textPtr, aPtr));
+    } else {
+	event = ((textPtr->valueCapture != NULL)
+		&& (textPtr->valueAddresses != NULL)
+		&& (Tcl_FindHashEntry(textPtr->valueAddresses, (char *) bPtr)
+			!= NULL)) ? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP;
+	TkTextVcPredict(textPtr, bPtr->value, event, TK_TEXT_VC_NODE,
+		VcNodeAt(textPtr, bPtr), NULL);
+    }
+    TkTextVcNotify(textPtr);
+}
+
+static void
+SetSeparatorLevel(textPtr, linePtr, level)
+    TkText *textPtr;			/* The widget. */
+    TkTextLine *linePtr;		/* The leaf before the separator. */
+    int level;				/* The level to give it. */
+{
+    TkTextLine *nextPtr;
+    Node *xPtr, *newPtr, *aPtr, *bPtr, *parentPtr;
+    int cur = SeparatorLevel(linePtr, &nextPtr), lev;
+
+    if ((cur < 0) || (level < 0)) {
+	return;
+    }
+
+    /*
+     * Raise: split the node where the two leaves meet, between them,
+     * and then its parent between the two halves, and so on.
+     */
+
+    for (lev = cur; lev < level; lev++) {
+	xPtr = AncestorAt(linePtr, lev);
+	if ((xPtr == NULL) || (xPtr->parentPtr == NULL)) {
+	    break;			/* The root: no level above it. */
+	}
+	newPtr = (Node *) ckalloc(sizeof(Node));
+	newPtr->parentPtr = xPtr->parentPtr;
+	newPtr->nextPtr = xPtr->nextPtr;
+	xPtr->nextPtr = newPtr;
+	newPtr->summaryPtr = NULL;
+	newPtr->level = xPtr->level;
+	newPtr->segPtr = xPtr->segPtr;
+	TkTextDataInit(newPtr->value);	/* The part after the cut starts
+					 * without a value. */
+	if (lev == 0) {
+	    newPtr->children.linePtr = nextPtr;
+	    linePtr->nextPtr = NULL;
+	} else {
+	    aPtr = AncestorAt(linePtr, lev - 1);
+	    newPtr->children.nodePtr = aPtr->nextPtr;
+	    aPtr->nextPtr = NULL;
+	}
+	RecomputeNodeCounts(xPtr);
+	RecomputeNodeCounts(newPtr);
+	xPtr->parentPtr->numChildren++;
+    }
+
+    /*
+     * Lower: join the two children of the node where the leaves meet
+     * that lead to them, then the two children of the joined node
+     * that lead to them, and so on down to the level asked for.
+     */
+
+    for (lev = cur - 1; lev >= level; lev--) {
+	aPtr = AncestorAt(linePtr, lev);
+	bPtr = AncestorAt(nextPtr, lev);
+	if ((aPtr == NULL) || (aPtr == bPtr) || (aPtr->nextPtr != bPtr)) {
+	    break;
+	}
+	parentPtr = aPtr->parentPtr;
+	if (TkTextVcOn(textPtr)) {
+	    VcJoinNodes(textPtr, aPtr, bPtr);
+	}
+	if (lev == 0) {
+	    TkTextLine *lastPtr = aPtr->children.linePtr;
+
+	    while (lastPtr->nextPtr != NULL) {
+		lastPtr = lastPtr->nextPtr;
+	    }
+	    lastPtr->nextPtr = bPtr->children.linePtr;
+	} else {
+	    Node *lastPtr = aPtr->children.nodePtr;
+
+	    while (lastPtr->nextPtr != NULL) {
+		lastPtr = lastPtr->nextPtr;
+	    }
+	    lastPtr->nextPtr = bPtr->children.nodePtr;
+	}
+	aPtr->nextPtr = bPtr->nextPtr;
+	MergeValues(textPtr, (void *) aPtr, &aPtr->value, (void *) bPtr,
+		&bPtr->value);
+	DeleteSummaries(bPtr->summaryPtr);
+	ckfree((char *) bPtr);
+	RecomputeNodeCounts(aPtr);
+	parentPtr->numChildren--;
+    }
+}
+
+void
+TkIBTreeSetSeparatorLevels(textPtr, indexPtr, levels, num)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *indexPtr;		/* In the first leaf (outermost
+					 * tree). */
+    int *levels;			/* As TkIBTreeSeparatorLevels gave
+					 * them. */
+    int num;				/* How many. */
+{
+    TkTextIndex index;
+    TkTextLine *linePtr, *nextPtr;
+    int k;
+
+    TkTextIndexToInternalSeg(indexPtr, &index, NULL);
+    linePtr = index.linePtr;
+    if (linePtr->parentPtr->segPtr == NULL) {
+	return;
+    }
+    for (k = 0; (k < num) && (linePtr != NULL); k++) {
+	SetSeparatorLevel(textPtr, linePtr, levels[k]);
+	if (SeparatorLevel(linePtr, &nextPtr) < 0) {
+	    break;
+	}
+	linePtr = nextPtr;
+    }
 }
 
 /*
@@ -6431,8 +7246,9 @@ TkIBTreeInfo(segPtr, listFactoryPtr)
   ListFactoryAppendCopy(listFactoryPtr, arg);
   LangSetString(&arg, segPtr->body.itree.blockPtr->name);
   ListFactoryAppendCopy(listFactoryPtr, arg);
-  if (segPtr->body.itree.data) {
-    ListFactoryAppendCopy(listFactoryPtr, segPtr->body.itree.data);
+  if (TkTextDataGetLang(segPtr->body.itree.data) != NULL) {
+    ListFactoryAppendCopy(listFactoryPtr,
+	    TkTextDataGetLang(segPtr->body.itree.data));
   } else {
     LangSetDefault(&arg, "");
     ListFactoryAppendCopy(listFactoryPtr, arg);
@@ -6469,8 +7285,8 @@ TkIBTreeSplit(indexPtr, level)
   TkTextIndex index;
   register Node *newPtr, *childPtr = NULL;
   register TkTextLine *linePtr;
-  Node *nodePtr, *newNodePtr;
-  int depth = 0, lineNumber;
+  Node *nodePtr;
+  int depth = 0;
 
   TkBTreeInsertChars(indexPtr, "\n");
   if (!segPtr) {
@@ -6482,8 +7298,6 @@ TkIBTreeSplit(indexPtr, level)
   TkTextIndexToInternalSeg(indexPtr, &index, NULL);
   linePtr = index.linePtr;
   nodePtr = linePtr->parentPtr;
-  lineNumber = TkBTreeLineIndex(linePtr) + 1; /* Line umber of the
-					       * *next* line. */
 
   while (level--) {
     /*
@@ -6501,6 +7315,12 @@ TkIBTreeSplit(indexPtr, level)
       newPtr->numChildren = 1;
       newPtr->numLines = nodePtr->numLines;
       newPtr->segPtr = nodePtr->segPtr;
+      /*
+       * The root's value moves to the new root, so that level -1
+       * keeps naming it.
+       */
+      TkTextDataInit(newPtr->value);
+      TkTextDataMove(&newPtr->value, &nodePtr->value);
       RecomputeNodeCounts(newPtr);
       ((BTree*)index.tree)->rootPtr = newPtr;
       depth++;
@@ -6512,6 +7332,8 @@ TkIBTreeSplit(indexPtr, level)
     newPtr->summaryPtr = NULL;
     newPtr->level = nodePtr->level;
     newPtr->segPtr = nodePtr->segPtr;
+    TkTextDataInit(newPtr->value);	/* The part after the cut starts
+					 * without a value. */
     if (nodePtr->level == 0) {
       newPtr->children.linePtr = linePtr->nextPtr;
       linePtr->nextPtr = NULL;
@@ -6528,6 +7350,188 @@ TkIBTreeSplit(indexPtr, level)
   return depth;
 }
 
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeDeepen --
+ *	Add nodes above the root of a block's tree, each with one child
+ *	(the old root), until the root is at a given level.  Re-creating
+ *	a block from its list needs this: the separators give the shape
+ *	of the tree below the level where all the leaves meet, but not a
+ *	root with a single child; the depth in the header does.
+ *
+ * Returns:
+ * 	None.
+ *
+ * Side effects:
+ * 	The tree changes; the root's value moves to the new root (as in
+ *	TkIBTreeSplit), so that level -1 keeps naming it.
+ *
+ *------------------------------------------------------------------
+ */
+
+void
+TkIBTreeDeepen(segPtr, depth)
+     TkTextSegment *segPtr;		/* The block. */
+     int depth;				/* The level its root should have. */
+{
+  BTree *treePtr = (BTree *) segPtr->body.itree.tree;
+  Node *nodePtr, *newPtr;
+
+  if (treePtr == NULL) {
+    return;
+  }
+  while ((nodePtr = treePtr->rootPtr)->level < depth) {
+    newPtr = (Node *) ckalloc(sizeof(Node));
+    newPtr->parentPtr = NULL;
+    newPtr->nextPtr = NULL;
+    newPtr->summaryPtr = NULL;
+    newPtr->level = nodePtr->level + 1;
+    newPtr->children.nodePtr = nodePtr;
+    newPtr->numChildren = 1;
+    newPtr->numLines = nodePtr->numLines;
+    newPtr->segPtr = nodePtr->segPtr;
+    TkTextDataInit(newPtr->value);
+    TkTextDataMove(&newPtr->value, &nodePtr->value);
+    RecomputeNodeCounts(newPtr);
+    treePtr->rootPtr = newPtr;
+  }
+}
+
+/*
+ * Whether the root of a block's tree has a value (block trim records
+ * it for its undo).
+ */
+
+int
+TkIBTreeRootHasValue(segPtr)
+     TkTextSegment *segPtr;		/* The block. */
+{
+  BTree *treePtr = (BTree *) segPtr->body.itree.tree;
+
+  return (treePtr != NULL) && !TkTextDataIsEmpty(treePtr->rootPtr->value);
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeAddRoot --
+ *	Add a node above the root of a block's tree, with the old root
+ *	as its only child: the inverse of TkIBTreeTrim, for its undo.
+ *	The old root's value moves up to the new root if moveValue is
+ *	set (the root had a value before the trim, which the trim gave
+ *	to the node that became the root); else the new root starts
+ *	without one.
+ *
+ * Returns:
+ * 	None.
+ *
+ * Side effects:
+ * 	The tree is one level deeper.
+ *
+ *------------------------------------------------------------------
+ */
+
+void
+TkIBTreeAddRoot(segPtr, moveValue)
+     TkTextSegment *segPtr;		/* The block. */
+     int moveValue;			/* See above. */
+{
+  BTree *treePtr = (BTree *) segPtr->body.itree.tree;
+  Node *nodePtr, *newPtr;
+
+  if (treePtr == NULL) {
+    return;
+  }
+  nodePtr = treePtr->rootPtr;
+  newPtr = (Node *) ckalloc(sizeof(Node));
+  newPtr->parentPtr = NULL;
+  newPtr->nextPtr = NULL;
+  newPtr->summaryPtr = NULL;
+  newPtr->level = nodePtr->level + 1;
+  newPtr->children.nodePtr = nodePtr;
+  newPtr->numChildren = 1;
+  newPtr->numLines = nodePtr->numLines;
+  newPtr->segPtr = nodePtr->segPtr;
+  TkTextDataInit(newPtr->value);
+  if (moveValue) {
+    TkTextDataMove(&newPtr->value, &nodePtr->value);
+  }
+  nodePtr->parentPtr = newPtr;
+  RecomputeNodeCounts(newPtr);
+  treePtr->rootPtr = newPtr;
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkBTreeTakeMovedLeafValues --
+ *	Before the undo of "block insert" dissolves the block it made:
+ *	take off the values of the leaves that block insert moved whole
+ *	into the block from the enclosing block (the leaves between the
+ *	first and the last; the first if nothing is before the block in
+ *	its line, the last if nothing but the newline is after it), and
+ *	return them as records (TK_TEXT_VALUE_NODE) with the addresses
+ *	of the same leaves once the block is dissolved: their start less
+ *	the head.  The dissolution would drop them as values of the
+ *	block's leaves; they are values of the enclosing block's.
+ *	Nothing is taken from a block outside blocks (lines there have
+ *	no values) or with a single leaf (block insert moved part of one
+ *	leaf).
+ *
+ * Returns:
+ * 	The records (most recent first), or NULL.
+ *
+ * Side effects:
+ * 	The values are taken off the leaves.
+ *
+ *------------------------------------------------------------------
+ */
+
+TkTextValue *
+TkBTreeTakeMovedLeafValues(textPtr, segPtr, headPtr)
+     TkText *textPtr;			/* The widget. */
+     TkTextSegment *segPtr;		/* The block. */
+     TkTextIndex *headPtr;		/* The (external) index of its head. */
+{
+  TkTextLine *outLinePtr = segPtr->body.itree.linePtr, *linePtr, *nextPtr;
+  TkTextSegment *p;
+  TkTextValue *listPtr = NULL, *recPtr;
+  int before = 0, after = 0, k, line, pos;
+
+  if ((segPtr->body.itree.tree == NULL)
+      || (outLinePtr->parentPtr->segPtr == NULL)) {
+    return NULL;
+  }
+  for (p = outLinePtr->segPtr; p != segPtr; p = p->nextPtr) {
+    before += p->size;
+  }
+  for (p = segPtr->nextPtr; p != NULL; p = p->nextPtr) {
+    after += p->size;
+  }
+  line = TkBTreeLineIndex(headPtr->linePtr);
+  pos = headPtr->byteIndex + 1;		/* The first leaf, inside. */
+  linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
+  for (k = 0; (linePtr != NULL) && !IsLastLine(linePtr); k++) {
+    nextPtr = TkBTreeNextLine(linePtr);
+    if (!TkTextDataIsEmpty(linePtr->value)
+	&& ((nextPtr == NULL) || !IsLastLine(nextPtr) || (k > 0))
+	&& ((k > 0) || (before == 0))
+	&& ((nextPtr == NULL) || !IsLastLine(nextPtr) || (after <= 1))) {
+      recPtr = NewValueRecord(TK_TEXT_VALUE_NODE, linePtr->value);
+      TkTextDataInit(linePtr->value);	/* The record took it. */
+      recPtr->line = line;
+      recPtr->byteIndex = pos - 1;
+      recPtr->level = 0;
+      recPtr->nextPtr = listPtr;
+      listPtr = recPtr;
+    }
+    pos += TkBTreeCharsInLine(linePtr);
+    linePtr = nextPtr;
+  }
+  return listPtr;
+}
+
 /*
  *----------------------------------------
  *
@@ -6565,6 +7569,21 @@ TkIBTreeTrim(textPtr, segPtr)
     goto error;
   }
 
+  /*
+   * The root and its only child become one node (the merge policy,
+   * TkTextDataMerge: the root's data, if any, wins, so that level -1
+   * keeps naming it), which is the child.
+   */
+
+  {
+    Node *childPtr = rootPtr->children.nodePtr;
+
+    if (TkTextDataMerge(&rootPtr->value, &childPtr->value)
+	    == TK_TEXT_DATA_MERGE_DROP) {
+      DropValue(textPtr, (void *) childPtr, &childPtr->value);
+    }
+    TkTextDataMove(&childPtr->value, &rootPtr->value);
+  }
   ((BTree*)segPtr->body.itree.tree)->rootPtr = rootPtr->children.nodePtr;
   rootPtr->children.nodePtr->parentPtr = NULL;
   DeleteSummaries(rootPtr->summaryPtr);
@@ -6574,34 +7593,6 @@ TkIBTreeTrim(textPtr, segPtr)
  error:
   Tcl_AppendResult(textPtr->interp, errString,          NULL);
   return TCL_ERROR;
-}
-
-/*
- *------------------------------------------------------------------
- *
- *------------------------------------------------------------------
- */
-static int		
-CharsInNode(nodePtr)
-    Node *nodePtr;			/* Node to count chars in. */
-{
-    int total = 0;
-    
-    if (nodePtr->level > 0) {
-	Node *intNodePtr;
-	for (intNodePtr = nodePtr->children.nodePtr; 
-	     intNodePtr; intNodePtr = intNodePtr->nextPtr) {
-	    total += CharsInNode(intNodePtr);
-	}
-    } else {
-	TkTextLine *linePtr;
-	
-	for (linePtr = nodePtr->children.linePtr; 
-	     linePtr; linePtr = linePtr->nextPtr) {
-	    total += TkBTreeCharsInLine(linePtr);
-	}
-    }
-    return total;
 }
 
 TkTextSegment *		
@@ -6638,6 +7629,3260 @@ TkIBTreeLastLine(segPtr)
 }
 
 
+/*
+ *======================================================================
+ *
+ * Values of block nodes ("block nodedata").
+ *
+ *	Every node of a block's tree, the leaves (lines) included, can
+ *	hold a value: a copy of a Perl scalar.  A value leaves its node
+ *	when the node disappears, when two nodes are merged (the merged
+ *	node keeps the first value present), when it is replaced, and
+ *	when the widget goes.  Such a value is never freed here: it is
+ *	handed to DropValue, which records it in the undo atom of the
+ *	deletion going on (if the deletion can be undone) or puts it on
+ *	the widget's list of values to free when the widget command is
+ *	finished (see TkTextValue in tkText.h).
+ *
+ *======================================================================
+ */
+
+/*
+ * The widget a node of a block belongs to (NULL in the outermost
+ * tree, whose nodes and lines never have values).
+ */
+
+static TkText *
+NodeText(nodePtr)
+    Node *nodePtr;
+{
+    if ((nodePtr == NULL) || (nodePtr->segPtr == NULL)
+	    || (nodePtr->segPtr->body.itree.tree == NULL)) {
+	return NULL;
+    }
+    return ((BTree *) nodePtr->segPtr->body.itree.tree)->textPtr;
+}
+
+static TkTextValue *
+NewValueRecord(kind, value)
+    int kind;
+    TkTextData value;			/* Consumed (may be empty). */
+{
+    TkTextValue *recPtr = (TkTextValue *) ckalloc(sizeof(TkTextValue));
+
+    recPtr->kind = kind;
+    recPtr->line = recPtr->byteIndex = recPtr->level = -1;
+    recPtr->srcLine = recPtr->srcByteIndex = recPtr->srcLevel = -1;
+    recPtr->name = NULL;
+    recPtr->value = value;
+    recPtr->nextPtr = NULL;
+    return recPtr;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextFreeValueLater, TkTextFreeValueList, TkTextReleaseValues --
+ *
+ *	Put a container, or the containers of a list of records (which
+ *	are consumed), on the widget's list of values to free at the end
+ *	of the widget command; free a list of records and their
+ *	containers now (the caller has taken it from the widget): the
+ *	only place, with the teardown of the widget, where values are
+ *	freed (TkTextDataFree).
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	TkTextReleaseValues may run Perl code (DESTROY methods).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void		FreeLater _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value));
+
+void
+TkTextFreeValueLater(textPtr, value)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextData value;			/* The container; owned by the list
+					 * from now on (nothing if empty). */
+{
+    TkTextVcSeen(textPtr, value, TK_TEXT_VC_DROP);
+    FreeLater(textPtr, value);
+}
+
+static void
+FreeLater(textPtr, value)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextData value;			/* The container; owned by the list
+					 * from now on (nothing if empty). */
+{
+    TkTextValue *recPtr;
+
+    if (TkTextDataIsEmpty(value)) {
+	return;
+    }
+    recPtr = NewValueRecord(0, value);
+    if (textPtr == NULL) {
+	TkTextReleaseValues(recPtr);
+	return;
+    }
+    if (textPtr->freeValues == NULL) {
+	textPtr->freeValues = recPtr;
+    } else {
+	textPtr->lastFreeValue->nextPtr = recPtr;
+    }
+    textPtr->lastFreeValue = recPtr;
+}
+
+void
+TkTextFreeValueList(textPtr, listPtr)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextValue *listPtr;		/* The records. */
+{
+    TkTextValue *nextPtr;
+
+    for ( ; listPtr != NULL; listPtr = nextPtr) {
+	nextPtr = listPtr->nextPtr;
+	TkTextFreeValueLater(textPtr, listPtr->value);
+	if (listPtr->name != NULL) {
+	    ckfree(listPtr->name);
+	}
+	ckfree((char *) listPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextDiscardValue, TkTextDiscardValueList --
+ *
+ *	TkTextFreeValueLater, TkTextFreeValueList for values that an undo
+ *	step held and that leave it without going back into the text:
+ *	the step is discarded (edit reset, -maxundo, a new change
+ *	dropping the steps that could be redone), or the undo or the redo
+ *	finds no place for them.  With a -valuecommand, each is reported
+ *	("discard") at the end of the widget command, with the place
+ *	recorded in the step.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextDiscardValue(textPtr, value, kind, line, byteIndex, level, name)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextData value;			/* The container (consumed). */
+    int kind;				/* TK_TEXT_VALUE_NODE, _RUN or _BLOCK
+					 * (the record's kind). */
+    int line, byteIndex, level;		/* The recorded place. */
+    char *name;				/* For a run: the tag's name. */
+{
+    if (TkTextVcOn(textPtr) && (TkTextDataGetLang(value) != NULL)) {
+	Tcl_Obj *where = NULL;
+	int vcKind = 0;
+
+	if (kind == TK_TEXT_VALUE_NODE) {
+	    vcKind = TK_TEXT_VC_NODE;
+	    where = TkTextVcNodePlace(textPtr, line, byteIndex, level);
+	} else if (kind == TK_TEXT_VALUE_BLOCK) {
+	    vcKind = TK_TEXT_VC_BLOCK;
+	    where = TkTextVcBlockPlace(textPtr, line, byteIndex);
+	} else if (kind == TK_TEXT_VALUE_RUN) {
+	    TkTextIndex start;
+
+	    vcKind = TK_TEXT_VC_RUN;
+	    if ((line >= 0) && (line < TkBTreeNumLines(textPtr->tree))) {
+		TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &start);
+		where = TkTextVcRunPlace(textPtr, name, &start,
+			(TkTextIndex *) NULL);
+	    }
+	}
+	TkTextVcDiscarded(textPtr, value, vcKind, where);
+    }
+    FreeLater(textPtr, value);
+}
+
+void
+TkTextDiscardValueAt(textPtr, value, vcKind, where)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextData value;			/* The container (consumed). */
+    int vcKind;				/* TK_TEXT_VC_NODE... */
+    Tcl_Obj *where;			/* The place as the callback gets it
+					 * (consumed), or NULL. */
+{
+    TkTextVcDiscarded(textPtr, value, vcKind, where);
+    FreeLater(textPtr, value);
+}
+
+void
+TkTextDiscardValueList(textPtr, listPtr)
+    TkText *textPtr;			/* The widget, or NULL. */
+    TkTextValue *listPtr;		/* The records (consumed). */
+{
+    TkTextValue *nextPtr;
+
+    for ( ; listPtr != NULL; listPtr = nextPtr) {
+	nextPtr = listPtr->nextPtr;
+	TkTextDiscardValue(textPtr, listPtr->value, listPtr->kind,
+		listPtr->line, listPtr->byteIndex, listPtr->level,
+		listPtr->name);
+	if (listPtr->name != NULL) {
+	    ckfree(listPtr->name);
+	}
+	ckfree((char *) listPtr);
+    }
+}
+
+void
+TkTextReleaseValues(listPtr)
+    TkTextValue *listPtr;		/* The records. */
+{
+    TkTextValue *nextPtr;
+
+    for ( ; listPtr != NULL; listPtr = nextPtr) {
+	nextPtr = listPtr->nextPtr;
+	TkTextDataFree(listPtr->value);
+	if (listPtr->name != NULL) {
+	    ckfree(listPtr->name);
+	}
+	ckfree((char *) listPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DropValue --
+ *
+ *	A node (or a line) loses its value: record it in the undo atom
+ *	of the deletion going on, with the node's address as the
+ *	deletion found it, or else have it freed at the end of the
+ *	widget command.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	*valuePtr is set to NULL.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+DropValue(textPtr, objPtr, valuePtr)
+    TkText *textPtr;			/* The widget. */
+    void *objPtr;			/* The Node or the TkTextLine. */
+    TkTextData *valuePtr;		/* Where its data is. */
+{
+    TkTextData value;
+    Tcl_HashEntry *hPtr;
+
+    if (TkTextDataIsEmpty(*valuePtr)) {
+	return;
+    }
+    TkTextDataInit(value);
+    TkTextDataMove(&value, valuePtr);
+    if ((textPtr != NULL) && (textPtr->valueCapture != NULL)
+	    && (textPtr->valueAddresses != NULL)
+	    && ((hPtr = Tcl_FindHashEntry(textPtr->valueAddresses,
+		    (char *) objPtr)) != NULL)) {
+	ValueAddress *addrPtr = (ValueAddress *) Tcl_GetHashValue(hPtr);
+	TkTextValue *recPtr;
+
+	TkTextVcSeen(textPtr, value, TK_TEXT_VC_STASH);
+	recPtr = NewValueRecord(TK_TEXT_VALUE_NODE, value);
+	recPtr->line = addrPtr->line;
+	recPtr->byteIndex = addrPtr->byteIndex;
+	recPtr->level = addrPtr->level;
+	recPtr->nextPtr = *textPtr->valueCapture;
+	*textPtr->valueCapture = recPtr;
+	return;
+    }
+    TkTextFreeValueLater(textPtr, value);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DropBlockData --
+ *
+ *	A block that a deletion deletes or dissolves loses its instance
+ *	data: record the whole container in the undo atom of the
+ *	deletion going on (TK_TEXT_VALUE_BLOCK), with the address of
+ *	the block's head as the deletion found it, or else have it freed
+ *	at the end of the widget command.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The segment's data is emptied.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+DropBlockData(segPtr)
+    TkTextSegment *segPtr;		/* The block. */
+{
+    TkText *textPtr = segPtr->body.itree.blockPtr->textPtr;
+    TkTextData value;
+    Tcl_HashEntry *hPtr;
+
+    if (TkTextDataIsEmpty(segPtr->body.itree.data)) {
+	return;
+    }
+    TkTextDataInit(value);
+    TkTextDataMove(&value, &segPtr->body.itree.data);
+    if ((textPtr != NULL) && (textPtr->valueCapture != NULL)
+	    && (textPtr->valueAddresses != NULL)
+	    && ((hPtr = Tcl_FindHashEntry(textPtr->valueAddresses,
+		    (char *) segPtr)) != NULL)) {
+	ValueAddress *addrPtr = (ValueAddress *) Tcl_GetHashValue(hPtr);
+	TkTextValue *recPtr;
+
+	TkTextVcSeen(textPtr, value, TK_TEXT_VC_STASH);
+	recPtr = NewValueRecord(TK_TEXT_VALUE_BLOCK, value);
+
+	recPtr->line = addrPtr->line;
+	recPtr->byteIndex = addrPtr->byteIndex;
+	recPtr->nextPtr = *textPtr->valueCapture;
+	*textPtr->valueCapture = recPtr;
+	return;
+    }
+    TkTextFreeValueLater(textPtr, value);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * MergeValues --
+ *
+ *	Two nodes (or lines) become one, the first one surviving.  The
+ *	merge policy (TkTextDataMerge) decides: today it keeps the data
+ *	of the first if it has any, else it takes the data of the
+ *	second; the other is dropped (N5).  Data that moves is recorded
+ *	as moving in the undo atom of the deletion going on.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	*losePtr is set to NULL.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+MergeValues(textPtr, keepObjPtr, keepPtr, loseObjPtr, losePtr)
+    TkText *textPtr;			/* The widget. */
+    void *keepObjPtr;			/* The surviving node. */
+    TkTextData *keepPtr;		/* Where its data is. */
+    void *loseObjPtr;			/* The node that disappears. */
+    TkTextData *losePtr;		/* Where its data is. */
+{
+    Tcl_HashEntry *keepEntry, *loseEntry;
+
+    switch (TkTextDataMerge(keepPtr, losePtr)) {
+    case TK_TEXT_DATA_MERGE_NONE:
+	return;
+    case TK_TEXT_DATA_MERGE_DROP:
+	DropValue(textPtr, loseObjPtr, losePtr);
+	return;
+    }
+    TkTextVcSeen(textPtr, *keepPtr, TK_TEXT_VC_MOVE);
+    if ((textPtr != NULL) && (textPtr->valueCapture != NULL)
+	    && (textPtr->valueAddresses != NULL)
+	    && ((keepEntry = Tcl_FindHashEntry(textPtr->valueAddresses,
+		    (char *) keepObjPtr)) != NULL)
+	    && ((loseEntry = Tcl_FindHashEntry(textPtr->valueAddresses,
+		    (char *) loseObjPtr)) != NULL)) {
+	ValueAddress *keepAddr = (ValueAddress *) Tcl_GetHashValue(keepEntry);
+	ValueAddress *loseAddr = (ValueAddress *) Tcl_GetHashValue(loseEntry);
+	TkTextData none;
+	TkTextValue *recPtr;
+
+	TkTextDataInit(none);
+	recPtr = NewValueRecord(TK_TEXT_VALUE_MOVE, none);
+
+	recPtr->line = loseAddr->line;
+	recPtr->byteIndex = loseAddr->byteIndex;
+	recPtr->level = loseAddr->level;
+	recPtr->srcLine = keepAddr->line;
+	recPtr->srcByteIndex = keepAddr->byteIndex;
+	recPtr->srcLevel = keepAddr->level;
+	recPtr->nextPtr = *textPtr->valueCapture;
+	*textPtr->valueCapture = recPtr;
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DropTreeValues --
+ *
+ *	Drop the values of a node and of everything below it.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	See DropValue.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+DropTreeValues(textPtr, nodePtr)
+    TkText *textPtr;			/* The widget. */
+    Node *nodePtr;			/* The (sub)tree. */
+{
+    DropValue(textPtr, (void *) nodePtr, &nodePtr->value);
+    if (nodePtr->level == 0) {
+	TkTextLine *linePtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    DropValue(textPtr, (void *) linePtr, &linePtr->value);
+	}
+    } else {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    DropTreeValues(textPtr, childPtr);
+	}
+    }
+}
+
+/*
+ * Whether a line is the last one of its tree (the dummy line of a
+ * block's tree, which is not a leaf for the user).
+ */
+
+static int
+IsLastLine(linePtr)
+    TkTextLine *linePtr;
+{
+    Node *nodePtr;
+
+    if (linePtr->nextPtr != NULL) {
+	return 0;
+    }
+    for (nodePtr = linePtr->parentPtr; nodePtr != NULL;
+	 nodePtr = nodePtr->parentPtr) {
+	if (nodePtr->nextPtr != NULL) {
+	    return 0;
+	}
+    }
+    return 1;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * UnlinkLine --
+ *
+ *	Take a line out of its node in a block's tree (TkBTreeMakeBlock
+ *	moves it elsewhere).  A node left without children disappears,
+ *	with its value, and so on upwards.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Line and child counts change; nodes may be freed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+UnlinkLine(textPtr, linePtr, prevHintPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextLine *linePtr;		/* The line. */
+    TkTextLine *prevHintPtr;		/* The line likely to be before it
+					 * in its node (block insert moves
+					 * the lines after one line, in
+					 * order: then no scan is needed),
+					 * or NULL. */
+{
+    Node *nodePtr = linePtr->parentPtr, *parentPtr, *prevNodePtr;
+
+    if (nodePtr->children.linePtr == linePtr) {
+	nodePtr->children.linePtr = linePtr->nextPtr;
+    } else if ((prevHintPtr != NULL) && (prevHintPtr->nextPtr == linePtr)) {
+	prevHintPtr->nextPtr = linePtr->nextPtr;
+    } else {
+	TkTextLine *prevPtr = nodePtr->children.linePtr;
+
+	while (prevPtr->nextPtr != linePtr) {
+	    prevPtr = prevPtr->nextPtr;
+	}
+	prevPtr->nextPtr = linePtr->nextPtr;
+    }
+    linePtr->nextPtr = NULL;
+    nodePtr->numChildren--;
+    for (parentPtr = nodePtr; parentPtr != NULL;
+	 parentPtr = parentPtr->parentPtr) {
+	parentPtr->numLines--;
+    }
+    while ((nodePtr->numChildren == 0) && (nodePtr->parentPtr != NULL)) {
+	parentPtr = nodePtr->parentPtr;
+	if (parentPtr->children.nodePtr == nodePtr) {
+	    parentPtr->children.nodePtr = nodePtr->nextPtr;
+	} else {
+	    prevNodePtr = parentPtr->children.nodePtr;
+	    while (prevNodePtr->nextPtr != nodePtr) {
+		prevNodePtr = prevNodePtr->nextPtr;
+	    }
+	    prevNodePtr->nextPtr = nodePtr->nextPtr;
+	}
+	parentPtr->numChildren--;
+	DropValue(textPtr, (void *) nodePtr, &nodePtr->value);
+	DeleteSummaries(nodePtr->summaryPtr);
+	ckfree((char *) nodePtr);
+	nodePtr = parentPtr;
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeSnapshotValues --
+ *
+ *	Before a deletion that can be undone, record the addresses (see
+ *	TkTextValue) of the nodes and leaves it may take values from:
+ *	in every block the range overlaps (and the blocks nested in
+ *	them that it overlaps), the nodes that have a value or whose
+ *	text overlaps the range (the nodes a merge keeps); and the
+ *	heads of those blocks (empty ones included) that have instance
+ *	data, which the deletion drops if it deletes or dissolves them.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The table is initialized and filled (keys: the Node, the
+ *	TkTextLine or, for a block's head, the TkTextSegment; values:
+ *	malloc-ed ValueAddress records, of level -1 for a head), to be
+ *	released with TkBTreeFreeSnapshot.
+ *
+ *----------------------------------------------------------------------
+ */
+
+#define OVERLAPS(start, end, lo, hi) (((end) > (lo)) && ((start) <= (hi)))
+
+static void		SnapshotBlock _ANSI_ARGS_((Tcl_HashTable *tablePtr,
+			    TkTextSegment *segPtr, int line, int start, int lo,
+			    int hi));
+
+static void
+SnapshotRecord(tablePtr, objPtr, line, byteIndex, level)
+    Tcl_HashTable *tablePtr;
+    void *objPtr;
+    int line, byteIndex, level;
+{
+    int new;
+    Tcl_HashEntry *hPtr = Tcl_CreateHashEntry(tablePtr, (char *) objPtr, &new);
+    ValueAddress *addrPtr;
+
+    if (new) {
+	addrPtr = (ValueAddress *) ckalloc(sizeof(ValueAddress));
+	Tcl_SetHashValue(hPtr, addrPtr);
+    } else {
+	addrPtr = (ValueAddress *) Tcl_GetHashValue(hPtr);
+    }
+    addrPtr->line = line;
+    addrPtr->byteIndex = byteIndex;
+    addrPtr->level = level;
+}
+
+static int
+SnapshotNode(tablePtr, nodePtr, line, pos, lo, hi)
+    Tcl_HashTable *tablePtr;		/* The snapshot. */
+    Node *nodePtr;			/* The node. */
+    int line;				/* Its outer line. */
+    int pos;				/* Where it starts in that line. */
+    int lo, hi;				/* The deletion range in that line. */
+{
+    int start = pos, lineStart;
+
+    if (nodePtr->level > 0) {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    pos = SnapshotNode(tablePtr, childPtr, line, pos, lo, hi);
+	}
+    } else {
+	TkTextLine *linePtr;
+	TkTextSegment *segPtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    lineStart = pos;
+	    if (IsLastLine(linePtr)) {
+		continue;		/* The dummy line, accounted for by
+					 * the head of the block. */
+	    }
+	    for (segPtr = linePtr->segPtr; segPtr != NULL;
+		 segPtr = segPtr->nextPtr) {
+		if ((segPtr->typePtr == &tkTextIBTreeType)
+			&& OVERLAPS(pos, pos + segPtr->size, lo, hi)) {
+		    SnapshotBlock(tablePtr, segPtr, line, pos, lo, hi);
+		}
+		pos += segPtr->size;
+	    }
+	    if (!TkTextDataIsEmpty(linePtr->value)
+		    || OVERLAPS(lineStart, pos, lo, hi)) {
+		SnapshotRecord(tablePtr, (void *) linePtr, line, lineStart, 0);
+	    }
+	}
+    }
+    if (!TkTextDataIsEmpty(nodePtr->value) || OVERLAPS(start, pos, lo, hi)) {
+	SnapshotRecord(tablePtr, (void *) nodePtr, line, start,
+		nodePtr->level + 1);
+    }
+    return pos;
+}
+
+static void
+SnapshotBlock(tablePtr, segPtr, line, start, lo, hi)
+    Tcl_HashTable *tablePtr;		/* The snapshot. */
+    TkTextSegment *segPtr;		/* The block (maybe an empty one). */
+    int line;				/* Its outer line. */
+    int start;				/* Its position (of its head). */
+    int lo, hi;				/* The deletion range in that line. */
+{
+    if (!TkTextDataIsEmpty(segPtr->body.itree.data)) {
+	SnapshotRecord(tablePtr, (void *) segPtr, line, start, -1);
+    }
+    if (segPtr->body.itree.tree != NULL) {
+	SnapshotNode(tablePtr, ((BTree *) segPtr->body.itree.tree)->rootPtr,
+		line, start + 1, lo, hi);
+    }
+}
+
+void
+TkBTreeSnapshotValues(textPtr, index1Ptr, index2Ptr, tablePtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr;		/* Start of the deletion (in the
+					 * outermost tree). */
+    TkTextIndex *index2Ptr;		/* Its end. */
+    Tcl_HashTable *tablePtr;		/* The table to fill. */
+{
+    TkTextLine *linePtr;
+    TkTextSegment *segPtr;
+    int line, pos, lo, hi;
+
+    Tcl_InitHashTable(tablePtr, TCL_ONE_WORD_KEYS);
+    line = TkBTreeLineIndex(index1Ptr->linePtr);
+    for (linePtr = index1Ptr->linePtr; linePtr != NULL;
+	 linePtr = TkBTreeNextLine(linePtr), line++) {
+	lo = (linePtr == index1Ptr->linePtr) ? index1Ptr->byteIndex : 0;
+	hi = (linePtr == index2Ptr->linePtr) ? index2Ptr->byteIndex : INT_MAX;
+	pos = 0;
+	for (segPtr = linePtr->segPtr; segPtr != NULL;
+	     segPtr = segPtr->nextPtr) {
+	    if ((segPtr->typePtr == &tkTextIBTreeType)
+		    && OVERLAPS(pos, pos + segPtr->size, lo, hi)) {
+		SnapshotBlock(tablePtr, segPtr, line, pos, lo, hi);
+	    }
+	    pos += segPtr->size;
+	}
+	if (linePtr == index2Ptr->linePtr) {
+	    break;
+	}
+    }
+}
+
+void
+TkBTreeFreeSnapshot(tablePtr)
+    Tcl_HashTable *tablePtr;		/* The table. */
+{
+    Tcl_HashEntry *hPtr;
+    Tcl_HashSearch search;
+
+    for (hPtr = Tcl_FirstHashEntry(tablePtr, &search); hPtr != NULL;
+	 hPtr = Tcl_NextHashEntry(&search)) {
+	ckfree((char *) Tcl_GetHashValue(hPtr));
+    }
+    Tcl_DeleteHashTable(tablePtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * AddressValue --
+ *
+ *	Find the node at an address (see TkTextValue).
+ *
+ * Results:
+ *	Where the node's data is kept, or NULL if there is no such
+ *	node.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static TkTextData *
+AddressValue(textPtr, line, byteIndex, level)
+    TkText *textPtr;			/* The widget. */
+    int line, byteIndex, level;		/* The address. */
+{
+    TkTextIndex index, intIndex;
+    TkTextLine *linePtr;
+    Node *nodePtr;
+
+    if ((line < 0) || (byteIndex < 0) || (level < 0)
+	    || (line >= TkBTreeNumLines(textPtr->tree))) {
+	return NULL;
+    }
+    TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index);
+    if (index.byteIndex != byteIndex) {
+	return NULL;
+    }
+    TkTextIndexToInternalSeg(&index, &intIndex, NULL);
+    linePtr = intIndex.linePtr;
+    if ((intIndex.byteIndex != 0) || (linePtr->parentPtr->segPtr == NULL)) {
+	return NULL;
+    }
+    if (level == 0) {
+	return &linePtr->value;
+    }
+
+    /*
+     * The node must start with this leaf and be at this level: never
+     * give a value to another node (a tree re-created differently).
+     */
+
+    nodePtr = linePtr->parentPtr;
+    if (nodePtr->children.linePtr != linePtr) {
+	return NULL;
+    }
+    for ( ; level > 1; level--) {
+	Node *parentPtr = nodePtr->parentPtr;
+
+	if ((parentPtr == NULL) || (parentPtr->children.nodePtr != nodePtr)) {
+	    return NULL;
+	}
+	nodePtr = parentPtr;
+    }
+    return &nodePtr->value;
+}
+
+/*
+ * The block whose head is at an address (TK_TEXT_VALUE_BLOCK), or
+ * NULL if there is none.
+ */
+
+static TkTextSegment *
+AddressBlock(textPtr, line, byteIndex)
+    TkText *textPtr;			/* The widget. */
+    int line, byteIndex;		/* The address. */
+{
+    TkTextIndex index;
+
+    if ((line < 0) || (byteIndex < 0)
+	    || (line >= TkBTreeNumLines(textPtr->tree))) {
+	return NULL;
+    }
+    TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index);
+    if (index.byteIndex != byteIndex) {
+	return NULL;
+    }
+    return TkIBTreeAt(&index, 0);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * MapRemains --
+ *
+ *	An address in the text as the deletion of an undo atom left it,
+ *	around the remains of the blocks the deletion cut (see
+ *	TkTextUndoAtom), becomes the address of the same place in the
+ *	text as the undo restores it: the heads and tails of the cut
+ *	blocks and the deleted range come back.  The remains may reach
+ *	over several lines (the leaves of a dissolved block become
+ *	lines); in the restored text they are on the line of listIndex
+ *	(before index1) and on the line of index2 (after it).
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	*linePtr and *bytePtr are changed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+MapRemains(textPtr, mapPtr, linePtr, bytePtr)
+    TkText *textPtr;			/* The widget (in the restored
+					 * state). */
+    TkTextRemainsMap *mapPtr;		/* The atom being undone, and the
+					 * lines of the remains. */
+    int *linePtr, *bytePtr;		/* The address to map. */
+{
+    TkTextUndoAtom *atomPtr = mapPtr->atomPtr;
+    TkTextIndex ext1, index1, index2;
+    int a, b, r, s, pos, i;
+
+    if ((*linePtr < mapPtr->line)
+	    || (*linePtr > mapPtr->line + mapPtr->numLines)) {
+	return;
+    }
+    if ((TkTextGetIndex(textPtr->interp, textPtr, atomPtr->listIndex, &ext1)
+	    != TCL_OK)
+	    || (TkTextGetIndex(textPtr->interp, textPtr, atomPtr->index1, &index1)
+		    != TCL_OK)
+	    || (TkTextGetIndex(textPtr->interp, textPtr, atomPtr->index2, &index2)
+		    != TCL_OK)) {
+	Tcl_ResetResult(textPtr->interp);
+	return;
+    }
+    r = mapPtr->starts[*linePtr - mapPtr->line] + *bytePtr;
+    if (r < 0) {
+	return;				/* Before the remains. */
+    }
+    a = index1.byteIndex - ext1.byteIndex - atomPtr->numHeads;
+    b = atomPtr->remains - a;
+    if (r < a) {
+	pos = r;
+	for (i = 0; i < atomPtr->numHeads; i++) {
+	    if (atomPtr->cuts[i] <= pos) {
+		pos++;
+	    }
+	}
+	*linePtr = TkBTreeLineIndex(ext1.linePtr);
+	*bytePtr = ext1.byteIndex + pos;
+	return;
+    }
+    s = r - a;
+    if (s < b) {
+	pos = s;
+	for (i = 0; i < atomPtr->numTails; i++) {
+	    if (atomPtr->cuts[atomPtr->numHeads + i] <= pos) {
+		pos++;
+	    }
+	}
+    } else {
+	pos = s + atomPtr->numTails;	/* After the remains. */
+    }
+    *linePtr = TkBTreeLineIndex(index2.linePtr);
+    *bytePtr = index2.byteIndex + pos;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeRestoreValues --
+ *
+ *	Give the values recorded by a change back to the nodes at their
+ *	addresses, the most recent first, once the change is undone (or,
+ *	for an insertion, redone).  A value whose node cannot be found
+ *	is freed at the end of the widget command.  A value found at the
+ *	address (set there after the change) is not freed: it goes, with
+ *	the address, to *displacedPtr, which the atom keeps and gives
+ *	back once the change is applied again (see TkTextEditAction);
+ *	with displacedPtr NULL it is freed at the end of the command.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The records are consumed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+Displace(textPtr, displacedPtr, kind, line, byteIndex, level, name, value)
+    TkText *textPtr;
+    TkTextValue **displacedPtr;		/* Where it goes, or NULL to free it
+					 * at the end of the command. */
+    int kind, line, byteIndex, level;	/* The record to make. */
+    char *name;				/* The tag's name, or NULL. */
+    TkTextData value;			/* The data moved aside; consumed. */
+{
+    TkTextValue *recPtr;
+
+    if (TkTextDataIsEmpty(value)) {
+	return;
+    }
+
+    /*
+     * The value is still in place (and the text consistent): tell the
+     * -valuecommand now.
+     */
+
+    if (TkTextVcOn(textPtr) && (TkTextDataGetLang(value) != NULL)) {
+	Tcl_Obj *where = NULL;
+	int vcKind = TK_TEXT_VC_NODE;
+
+	if (kind == TK_TEXT_VALUE_NODE) {
+	    where = TkTextVcNodePlace(textPtr, line, byteIndex, level);
+	} else if (kind == TK_TEXT_VALUE_BLOCK) {
+	    vcKind = TK_TEXT_VC_BLOCK;
+	    where = TkTextVcBlockPlace(textPtr, line, byteIndex);
+	} else {
+	    Tcl_HashEntry *hPtr = Tcl_FindHashEntry(&textPtr->tagTable, name);
+	    TkTextIndex index;
+
+	    vcKind = TK_TEXT_VC_RUN;
+	    if (hPtr != NULL) {
+		TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index);
+		where = TkBTreeVcRunPlace(textPtr,
+			(TkTextTag *) Tcl_GetHashValue(hPtr), &index);
+	    }
+	}
+	TkTextVcPredict(textPtr, value, (displacedPtr == NULL)
+		? TK_TEXT_VC_DROP : TK_TEXT_VC_STASH, vcKind, where, NULL);
+	TkTextVcNotify(textPtr);
+    }
+    if (displacedPtr == NULL) {
+	TkTextFreeValueLater(textPtr, value);
+	return;
+    }
+    TkTextVcSeen(textPtr, value, TK_TEXT_VC_STASH);
+    recPtr = NewValueRecord(kind, value);
+    recPtr->line = line;
+    recPtr->byteIndex = byteIndex;
+    recPtr->level = level;
+    if (name != NULL) {
+	recPtr->name = CopyName(name);
+    }
+    recPtr->nextPtr = *displacedPtr;
+    *displacedPtr = recPtr;
+}
+
+/*
+ * A value that the undo of a deletion took out with the remains of the
+ * blocks the deletion had cut, and that finds no place in the text the
+ * undo restores (it was set on the remains after the deletion): it
+ * waits in the atom, with its address in the text without the deleted
+ * range, for the redo to give it back (see TkTextEditAction).
+ */
+
+static void
+KeepRecord(listPtr, kind, line, byteIndex, level, name, value)
+    TkTextValue **listPtr;		/* Where it goes. */
+    int kind, line, byteIndex, level;	/* The record to make. */
+    char *name;				/* The tag's name, or NULL. */
+    TkTextData value;			/* Consumed. */
+{
+    TkTextValue *recPtr;
+
+    if (TkTextDataIsEmpty(value)) {
+	return;
+    }
+    recPtr = NewValueRecord(kind, value);
+    recPtr->line = line;
+    recPtr->byteIndex = byteIndex;
+    recPtr->level = level;
+    if (name != NULL) {
+	recPtr->name = CopyName(name);
+    }
+    recPtr->nextPtr = *listPtr;
+    *listPtr = recPtr;
+}
+
+/*
+ * A record of a run value (TK_TEXT_VALUE_RUN or _RUNMOVE), its address
+ * mapped: the value goes back to the run at the address if that run
+ * starts there or has no value (a value there is displaced, see
+ * Displace); a move takes the value of the run at the source address
+ * back to the run at the address.  The record's value is consumed.
+ */
+
+static void
+RestoreRunValue(textPtr, recPtr, line, byteIndex, mapPtr, displacedPtr,
+	fromAtom)
+    TkText *textPtr;
+    TkTextValue *recPtr;
+    int line, byteIndex;		/* The address, mapped. */
+    TkTextRemainsMap *mapPtr;		/* For the source address. */
+    TkTextValue **displacedPtr;		/* See TkBTreeRestoreValues. */
+    int fromAtom;			/* See TkBTreeRestoreValues. */
+{
+    int recLine = recPtr->line, recByteIndex = recPtr->byteIndex;
+
+    Tcl_HashEntry *hPtr = Tcl_FindHashEntry(&textPtr->tagTable, recPtr->name);
+    TkTextTag *tagPtr = (hPtr != NULL)
+	    ? (TkTextTag *) Tcl_GetHashValue(hPtr) : NULL;
+    TkTextSegment *onPtr, *srcPtr;
+    TkTextIndex start, srcStart;
+    TkTextData value;
+
+    TkTextDataInit(value);
+    TkTextDataMove(&value, &recPtr->value);
+    onPtr = RunAtAddress(textPtr, tagPtr, line, byteIndex, &start);
+    if (recPtr->kind == TK_TEXT_VALUE_RUNMOVE) {
+	int srcLine = recPtr->srcLine, srcByteIndex = recPtr->srcByteIndex;
+
+	if (mapPtr != NULL) {
+	    MapRemains(textPtr, mapPtr, &srcLine, &srcByteIndex);
+	}
+	srcPtr = RunAtAddress(textPtr, tagPtr, srcLine, srcByteIndex,
+		&srcStart);
+	if ((onPtr != NULL) && (srcPtr != NULL) && (srcPtr != onPtr)
+		&& !TkTextDataIsEmpty(srcPtr->body.toggle.value)) {
+	    Displace(textPtr, displacedPtr, TK_TEXT_VALUE_RUN,
+		    TkBTreeLineIndex(start.linePtr), start.byteIndex, -1,
+		    recPtr->name, onPtr->body.toggle.value);
+	    TkTextDataInit(onPtr->body.toggle.value);	/* Displaced. */
+	    TkTextDataMove(&onPtr->body.toggle.value,
+		    &srcPtr->body.toggle.value);
+	    if (fromAtom) {
+		TkTextVcRestored(textPtr, onPtr->body.toggle.value,
+			TK_TEXT_VC_RUN, TkBTreeVcRunPlace(textPtr, tagPtr,
+				&start));
+	    }
+	}
+	return;
+    }
+    if (TkTextDataIsEmpty(value)) {
+	return;
+    }
+    if ((onPtr != NULL) && (TkTextDataIsEmpty(onPtr->body.toggle.value)
+	    || ((TkBTreeLineIndex(start.linePtr) == line)
+		    && (start.byteIndex == byteIndex)))) {
+	Displace(textPtr, displacedPtr, TK_TEXT_VALUE_RUN,
+		TkBTreeLineIndex(start.linePtr), start.byteIndex, -1,
+		recPtr->name, onPtr->body.toggle.value);
+	TkTextDataInit(onPtr->body.toggle.value);	/* Displaced. */
+	TkTextDataMove(&onPtr->body.toggle.value, &value);
+	tagPtr->hasRunValues = 1;
+	textPtr->haveValues = 1;
+	if (fromAtom) {
+	    TkTextVcRestored(textPtr, onPtr->body.toggle.value,
+		    TK_TEXT_VC_RUN, TkBTreeVcRunPlace(textPtr, tagPtr, &start));
+	}
+    } else if ((fromAtom == 2) && (displacedPtr != NULL)) {
+	KeepRecord(displacedPtr, TK_TEXT_VALUE_RUN, recLine, recByteIndex, -1,
+		recPtr->name, value);
+    } else if (fromAtom) {
+	TkTextDiscardValue(textPtr, value, TK_TEXT_VALUE_RUN, line,
+		byteIndex, -1, recPtr->name);
+    } else {
+	TkTextFreeValueLater(textPtr, value);
+    }
+}
+
+void
+TkBTreeRestoreValues(textPtr, listPtr, mapPtr, displacedPtr, fromAtom)
+    TkText *textPtr;			/* The widget. */
+    TkTextValue *listPtr;		/* The records, most recent first. */
+    TkTextRemainsMap *mapPtr;		/* If not NULL: the addresses are in
+					 * the text before the remains of
+					 * the blocks an atom's deletion cut
+					 * were taken out (MapRemains). */
+    TkTextValue **displacedPtr;		/* Where values found at the
+					 * addresses go, or NULL. */
+    int fromAtom;			/* 1 if the records come from an undo
+					 * atom: a value given back is reported
+					 * to the -valuecommand ("restore"),
+					 * one that finds no place is
+					 * discarded; 2 for the values the
+					 * undo of a deletion took out with
+					 * the remains of the blocks it had
+					 * cut: the same, but one that finds
+					 * no place (set on the remains after
+					 * the deletion) goes to *displacedPtr
+					 * with its address before the undo,
+					 * where the redo gives it back; 0 for
+					 * values taken off and given back
+					 * within the same change (not
+					 * reported, freed if they find no
+					 * place). */
+{
+    TkTextValue *nextPtr;
+    TkTextData *slotPtr, *srcPtr;
+    int line, byteIndex, addrLine, addrByteIndex;
+
+    for ( ; listPtr != NULL; listPtr = nextPtr) {
+	nextPtr = listPtr->nextPtr;
+	line = listPtr->line;
+	byteIndex = listPtr->byteIndex;
+	if (mapPtr != NULL) {
+	    MapRemains(textPtr, mapPtr, &line, &byteIndex);
+	}
+	if ((listPtr->kind == TK_TEXT_VALUE_RUN)
+		|| (listPtr->kind == TK_TEXT_VALUE_RUNMOVE)) {
+	    RestoreRunValue(textPtr, listPtr, line, byteIndex, mapPtr,
+		    displacedPtr, fromAtom);
+	    if (listPtr->name != NULL) {
+		ckfree(listPtr->name);
+	    }
+	    ckfree((char *) listPtr);
+	    continue;
+	}
+	if (listPtr->kind == TK_TEXT_VALUE_BLOCK) {
+	    TkTextSegment *segPtr = AddressBlock(textPtr, line, byteIndex);
+
+	    if (segPtr != NULL) {
+		Displace(textPtr, displacedPtr, TK_TEXT_VALUE_BLOCK, line,
+			byteIndex, -1, NULL, segPtr->body.itree.data);
+		TkTextDataInit(segPtr->body.itree.data);	/* Displaced. */
+		TkTextDataMove(&segPtr->body.itree.data, &listPtr->value);
+		textPtr->haveValues = 1;
+		if (fromAtom) {
+		    TkTextVcRestored(textPtr, segPtr->body.itree.data,
+			    TK_TEXT_VC_BLOCK, TkTextVcBlockPlace(textPtr, line,
+				    byteIndex));
+		}
+	    } else if ((fromAtom == 2) && (displacedPtr != NULL)) {
+		KeepRecord(displacedPtr, TK_TEXT_VALUE_BLOCK, listPtr->line,
+			listPtr->byteIndex, -1, NULL, listPtr->value);
+	    } else if (fromAtom) {
+		TkTextDiscardValue(textPtr, listPtr->value,
+			TK_TEXT_VALUE_BLOCK, line, byteIndex, -1, NULL);
+	    } else {
+		TkTextFreeValueLater(textPtr, listPtr->value);
+	    }
+	    ckfree((char *) listPtr);
+	    continue;
+	}
+	slotPtr = AddressValue(textPtr, line, byteIndex, listPtr->level);
+	addrLine = line;
+	addrByteIndex = byteIndex;
+	if (listPtr->kind == TK_TEXT_VALUE_MOVE) {
+	    line = listPtr->srcLine;
+	    byteIndex = listPtr->srcByteIndex;
+	    if (mapPtr != NULL) {
+		MapRemains(textPtr, mapPtr, &line, &byteIndex);
+	    }
+	    srcPtr = AddressValue(textPtr, line, byteIndex, listPtr->srcLevel);
+	    if ((slotPtr != NULL) && (srcPtr != NULL) && (srcPtr != slotPtr)
+		    && !TkTextDataIsEmpty(*srcPtr)) {
+		Displace(textPtr, displacedPtr, TK_TEXT_VALUE_NODE,
+			addrLine, addrByteIndex, listPtr->level, NULL,
+			*slotPtr);
+		TkTextDataInit(*slotPtr);	/* Displaced. */
+		TkTextDataMove(slotPtr, srcPtr);
+		if (fromAtom) {
+		    TkTextVcRestored(textPtr, *slotPtr, TK_TEXT_VC_NODE,
+			    TkTextVcNodePlace(textPtr, addrLine, addrByteIndex,
+				    listPtr->level));
+		}
+	    }
+	} else if (!TkTextDataIsEmpty(listPtr->value)) {
+	    if (slotPtr != NULL) {
+		Displace(textPtr, displacedPtr, TK_TEXT_VALUE_NODE, line,
+			byteIndex, listPtr->level, NULL, *slotPtr);
+		TkTextDataInit(*slotPtr);	/* Displaced. */
+		TkTextDataMove(slotPtr, &listPtr->value);
+		textPtr->haveValues = 1;
+		if (fromAtom) {
+		    TkTextVcRestored(textPtr, *slotPtr, TK_TEXT_VC_NODE,
+			    TkTextVcNodePlace(textPtr, line, byteIndex,
+				    listPtr->level));
+		}
+	    } else if ((fromAtom == 2) && (displacedPtr != NULL)) {
+		KeepRecord(displacedPtr, TK_TEXT_VALUE_NODE, listPtr->line,
+			listPtr->byteIndex, listPtr->level, NULL,
+			listPtr->value);
+	    } else if (fromAtom) {
+		TkTextDiscardValue(textPtr, listPtr->value,
+			TK_TEXT_VALUE_NODE, line, byteIndex, listPtr->level,
+			NULL);
+	    } else {
+		TkTextFreeValueLater(textPtr, listPtr->value);
+	    }
+	}
+	if (listPtr->name != NULL) {
+	    ckfree(listPtr->name);
+	}
+	ckfree((char *) listPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeNodeValue --
+ *
+ *	Find the node of "block nodedata index level": the leaf the
+ *	index is in (in the innermost block containing it) or one of
+ *	its ancestors, level 0 being the leaf, 1 its parent..., -1 the
+ *	root, -2 a child of the root...
+ *
+ * Results:
+ *	A standard Tcl result; on success *dataPtrPtr is where the
+ *	node's data is kept.
+ *
+ * Side effects:
+ *	An error message is left in the interpreter.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkBTreeNodeValue(textPtr, indexPtr, indexString, levelArg, dataPtrPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *indexPtr;		/* The position. */
+    char *indexString;			/* As given, for error messages. */
+    Arg levelArg;			/* The level. */
+    TkTextData **dataPtrPtr;		/* Filled in. */
+{
+    TkTextIndex intIndex;
+    TkTextLine *linePtr;
+    Node *nodePtr;
+    int level, above;
+    char buffer[TCL_INTEGER_SPACE * 2];
+
+    TkTextIndexToInternalSeg(indexPtr, &intIndex, NULL);
+    linePtr = intIndex.linePtr;
+    if (linePtr->parentPtr->segPtr == NULL) {
+	Tcl_AppendResult(textPtr->interp, "bad index \"", indexString,
+		"\": not inside a block", NULL);
+	return TCL_ERROR;
+    }
+    if (Tcl_GetIntFromObj(textPtr->interp, levelArg, &level) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    above = ((BTree *) linePtr->parentPtr->segPtr->body.itree.tree)
+	    ->rootPtr->level + 1;
+    if (level < 0) {
+	level += above + 1;
+    }
+    if ((level < 0) || (level > above)) {
+	sprintf(buffer, "%d level%s", above, (above == 1) ? "" : "s");
+	Tcl_AppendResult(textPtr->interp, "bad level \"",
+		LangString(levelArg), "\": the block containing ", indexString,
+		" has ", buffer, " above its leaves", NULL);
+	return TCL_ERROR;
+    }
+    if (level == 0) {
+	*dataPtrPtr = &linePtr->value;
+	return TCL_OK;
+    }
+    for (nodePtr = linePtr->parentPtr; level > 1; level--) {
+	nodePtr = nodePtr->parentPtr;
+    }
+    *dataPtrPtr = &nodePtr->value;
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeSetValue --
+ *
+ *	Set the Lang part of the data of a node or a run to a copy of a
+ *	scalar (none if it is undefined: only the Lang part goes); the
+ *	old Lang part is freed at the end of the widget command.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	See above.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkBTreeSetValue(textPtr, dataPtr, value)
+    TkText *textPtr;			/* The widget. */
+    TkTextData *dataPtr;		/* Where the node's data is. */
+    Arg value;				/* The new value. */
+{
+    Arg old;
+
+    if ((value == NULL) || !SvOK((SV *) value)) {
+	old = TkTextDataTakeLang(dataPtr);
+    } else {
+	old = TkTextDataPutLang(dataPtr, LangCopyArg(value));
+	textPtr->haveValues = 1;
+    }
+    TkTextFreeValueLater(textPtr, TkTextDataFromLang(old));
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * NodeHasValues, NodeValuesList --
+ *
+ *	The node values of a block for its header in a "block list":
+ *	[value, child, child...] for a node, [value] for a leaf, undef
+ *	where there is no value.  Only the Lang parts are listed (and a
+ *	node whose data has no Lang part counts as without a value).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+NodeHasValues(nodePtr)
+    Node *nodePtr;
+{
+    if (TkTextDataGetLang(nodePtr->value) != NULL) {
+	return 1;
+    }
+    if (nodePtr->level == 0) {
+	TkTextLine *linePtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (TkTextDataGetLang(linePtr->value) != NULL) {
+		return 1;
+	    }
+	}
+    } else {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    if (NodeHasValues(childPtr)) {
+		return 1;
+	    }
+	}
+    }
+    return 0;
+}
+
+static void
+NodeValuesList(nodePtr, lfPtr)
+    Node *nodePtr;
+    ListFactory *lfPtr;
+{
+    lfPtr = ListFactoryNewLevel(lfPtr);
+    ListFactoryAppendPure(lfPtr, TkTextDataLangSV(nodePtr->value));
+    if (nodePtr->level == 0) {
+	TkTextLine *linePtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (IsLastLine(linePtr)) {
+		break;
+	    }
+	    lfPtr = ListFactoryNewLevel(lfPtr);
+	    ListFactoryAppendPure(lfPtr, TkTextDataLangSV(linePtr->value));
+	    lfPtr = ListFactoryEndLevel(lfPtr);
+	}
+    } else {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    NodeValuesList(childPtr, lfPtr);
+	}
+    }
+    lfPtr = ListFactoryEndLevel(lfPtr);
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeCutPositions
+ * 	For a deletion that cuts blocks (TkIBTreeCutRange), find the
+ *	heads of the cut blocks before index1 and the tails of those
+ *	after index2, which the dissolution of the blocks removes.
+ *
+ * Returns:
+ *	A malloc-ed array (NULL if there are none): *numHeadsPtr byte
+ *	offsets of heads from ext1, in increasing order, then
+ *	*numTailsPtr byte offsets of tails from index2, increasing.
+ *
+ * Side effects:
+ *	None.
+ *
+ *------------------------------------------------------------------
+ */
+
+int *
+TkIBTreeCutPositions(index1Ptr, index2Ptr, ext1Ptr, numHeadsPtr, numTailsPtr)
+     TkTextIndex *index1Ptr;		/* Start of the deletion. */
+     TkTextIndex *index2Ptr;		/* Its end. */
+     TkTextIndex *ext1Ptr;		/* The start of the uncut range. */
+     int *numHeadsPtr, *numTailsPtr;	/* Filled in. */
+{
+  TkTextSegment *segPtr, *otherPtr;
+  TkTextIndex start;
+  int *heads, *tails, nh = 0, nt = 0, i, n1 = 0, n2 = 0, *cuts;
+
+  /*
+   * At most as many heads (tails) as blocks around index1 (index2).
+   */
+
+  for (segPtr = TkIBTreeAt(index1Ptr, 1); segPtr != NULL;
+       segPtr = segPtr->body.itree.linePtr->parentPtr->segPtr) {
+    n1++;
+  }
+  for (segPtr = TkIBTreeAt(index2Ptr, 1); segPtr != NULL;
+       segPtr = segPtr->body.itree.linePtr->parentPtr->segPtr) {
+    n2++;
+  }
+  if (n1 + n2 == 0) {
+    *numHeadsPtr = *numTailsPtr = 0;
+    return NULL;
+  }
+  heads = (int *) ckalloc((unsigned) ((n1 + n2) * sizeof(int)));
+  tails = heads + n1;
+  for (segPtr = TkIBTreeAt(index1Ptr, 1); segPtr != NULL;
+       segPtr = segPtr->body.itree.linePtr->parentPtr->segPtr) {
+    for (otherPtr = TkIBTreeAt(index2Ptr, 1); otherPtr != NULL;
+	 otherPtr = otherPtr->body.itree.linePtr->parentPtr->segPtr) {
+      if (otherPtr == segPtr) {
+	break;
+      }
+    }
+    if (otherPtr != NULL) {
+      break;
+    }
+    TkIBTreeStartIndex(index1Ptr->tree, segPtr, &start);
+    heads[nh++] = start.byteIndex - ext1Ptr->byteIndex;
+  }
+  for (segPtr = TkIBTreeAt(index2Ptr, 1); segPtr != NULL;
+       segPtr = segPtr->body.itree.linePtr->parentPtr->segPtr) {
+    for (otherPtr = TkIBTreeAt(index1Ptr, 1); otherPtr != NULL;
+	 otherPtr = otherPtr->body.itree.linePtr->parentPtr->segPtr) {
+      if (otherPtr == segPtr) {
+	break;
+      }
+    }
+    if (otherPtr != NULL) {
+      break;
+    }
+    TkIBTreeStartIndex(index2Ptr->tree, segPtr, &start);
+    tails[nt++] = start.byteIndex + segPtr->size - 1 - index2Ptr->byteIndex;
+  }
+  *numHeadsPtr = nh;
+  *numTailsPtr = nt;
+  if (nh + nt == 0) {
+    ckfree((char *) heads);
+    return NULL;
+  }
+  cuts = (int *) ckalloc((unsigned) ((nh + nt) * sizeof(int)));
+  for (i = 0; i < nh; i++) {
+    cuts[i] = heads[nh - 1 - i];	/* The outermost (first) first. */
+  }
+  for (i = 0; i < nt; i++) {
+    cuts[nh + i] = tails[i];		/* The innermost (first) first. */
+  }
+  ckfree((char *) heads);
+  return cuts;
+}
+
+
+/*
+ *======================================================================
+ *
+ * Values of tag runs ("tag data").
+ *
+ *	A run of a tag is a maximal stretch of characters carrying the
+ *	tag (it may cross line ends, leaf separators and block heads and
+ *	tails, which take tags like characters).  Its value is kept in
+ *	the toggle-on segment that starts it.  Toggle-ons are not
+ *	identities a change keeps, though: a deletion moves the toggles
+ *	of the range to its start (the off-toggles first, see
+ *	DeleteRange), the cleanup of a line then cancels an off-toggle
+ *	followed by an on-toggle (two runs merge), and the toggle-on
+ *	left may be that of a run that is gone; adding or removing a tag
+ *	removes the toggles inside the range.  So a change that can do
+ *	such things (TkBTreeTag, TkBTreeDeleteChars on a widget with
+ *	values) first takes the values off the runs it touches, noting
+ *	where each run is (RunSave), makes the change, then gives each
+ *	value to the run that is left of its run, if any
+ *	(ReattachRuns): of the runs that are now one, the leftmost one
+ *	with a value keeps it (a run whose text is all gone takes no
+ *	part); the other values, and those of runs that are gone, are
+ *	dropped (DropRunValue: into the undo atom of the deletion going
+ *	on, else freed at the end of the widget command).
+ *
+ *======================================================================
+ */
+
+typedef struct RunSave {
+    TkTextTag *tagPtr;			/* The tag. */
+    TkTextData value;			/* The run's data, taken off its
+					 * toggle-on; empty if none. */
+    TkTextIndex start, end;		/* The run before the change. */
+    int line, byteIndex;		/* Its start as an address (see
+					 * TkTextValue). */
+    TkTextSegment *startMark, *endMark;	/* For a deletion: marks at its start
+					 * and end, which the deletion moves
+					 * as it moves the text. */
+    TkTextIndex dest;			/* After the change: a character of
+					 * what is left of the run, */
+    int gone;				/* or non-zero if nothing is. */
+    TkTextSegment *onPtr;		/* The toggle-on of the run that
+					 * character is in. */
+} RunSave;
+
+typedef struct RunList {
+    RunSave *runs;			/* Malloc-ed; in the order of the
+					 * text, tag by tag. */
+    int num, max;
+} RunList;
+
+/*
+ * The index of the end of the text (the dummy last line).
+ */
+
+static void
+TextEnd(textPtr, indexPtr)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;
+{
+    TkTextMakeByteIndex(textPtr->tree, TkBTreeNumLines(textPtr->tree), 0,
+	    indexPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * RunStart --
+ *
+ *	Find the toggle-on of the run of a tag that contains a character
+ *	(which the caller knows to carry the tag).
+ *
+ * Results:
+ *	The toggle-on segment (NULL if there is none, which would be an
+ *	inconsistency); *startPtr is set to its (external) index.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static TkTextSegment *
+RunStart(textPtr, tagPtr, indexPtr, startPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextTag *tagPtr;			/* The tag. */
+    TkTextIndex *indexPtr;		/* The character (external index). */
+    TkTextIndex *startPtr;		/* Filled in. */
+{
+    TkTextSearch search;
+    TkTextIndex after, first, last, index0, intIndex0;
+    TkTextSegment *onPtr = NULL;
+
+    /*
+     * The last toggle before the character's end is its run's
+     * toggle-on.
+     */
+
+    TkTextIndexForwBytes(indexPtr, 1, &after);
+    TkTextMakeByteIndex(textPtr->tree, 0, 0, &first);
+    TkBTreeStartSearchBack(&after, &first, tagPtr, &search);
+    while (TkBTreePrevTag(&search)) {
+	if (TkTextIndexCmp(&search.extIndex, indexPtr) > 0) {
+	    continue;			/* At the character's end (the search
+					 * may return toggles there). */
+	}
+	if (search.segPtr->typePtr == &tkTextToggleOnType) {
+	    *startPtr = search.extIndex;
+	    return search.segPtr;
+	}
+	break;
+    }
+
+    /*
+     * Not expected: then scan forward from the first toggle.
+     */
+
+    onPtr = FindTagStart(textPtr->tree, tagPtr, &index0, &intIndex0);
+    if ((onPtr == NULL) || (TkTextIndexCmp(&index0, indexPtr) > 0)) {
+	return NULL;
+    }
+    if (onPtr->typePtr != &tkTextToggleOnType) {
+	onPtr = NULL;
+    }
+    *startPtr = index0;
+    TextEnd(textPtr, &last);
+    TkBTreeStartSearch(&index0, &last, tagPtr, &search);
+    while (TkBTreeNextTag(&search)
+	    && (TkTextIndexCmp(&search.extIndex, indexPtr) <= 0)) {
+	if (search.segPtr->typePtr == &tkTextToggleOnType) {
+	    onPtr = search.segPtr;
+	    *startPtr = search.extIndex;
+	} else {
+	    onPtr = NULL;
+	}
+    }
+    return onPtr;
+}
+
+/*
+ * The run of a tag containing a character, if the character has the
+ * tag: its toggle-on, or NULL.
+ */
+
+static TkTextSegment *
+RunAt(textPtr, tagPtr, indexPtr, startPtr)
+    TkText *textPtr;
+    TkTextTag *tagPtr;
+    TkTextIndex *indexPtr;
+    TkTextIndex *startPtr;		/* Filled in with its start. */
+{
+    if (!TkBTreeCharTagged(indexPtr, tagPtr)) {
+	return NULL;
+    }
+    return RunStart(textPtr, tagPtr, indexPtr, startPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * CollectRuns --
+ *
+ *	Add to a list the runs of a tag that a change of the range
+ *	between two indices may touch: those that have a character in
+ *	it or right next to it (a run ending at index1 or starting at
+ *	index2 may merge with another).
+ *
+ * Results:
+ *	The number of these runs that have a value.
+ *
+ * Side effects:
+ *	The list grows.  The values stay where they are.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+AddRun(listPtr, tagPtr, onPtr, startPtr, endPtr)
+    RunList *listPtr;
+    TkTextTag *tagPtr;
+    TkTextSegment *onPtr;
+    TkTextIndex *startPtr, *endPtr;
+{
+    RunSave *runPtr;
+
+    if (listPtr->num >= listPtr->max) {
+	RunSave *grown;
+
+	listPtr->max = 2 * listPtr->max + 8;
+	grown = (RunSave *) ckalloc((unsigned)
+		(listPtr->max * sizeof(RunSave)));
+	if (listPtr->num > 0) {
+	    memcpy(grown, listPtr->runs, listPtr->num * sizeof(RunSave));
+	}
+	if (listPtr->runs != NULL) {
+	    ckfree((char *) listPtr->runs);
+	}
+	listPtr->runs = grown;
+    }
+    runPtr = &listPtr->runs[listPtr->num++];
+    runPtr->tagPtr = tagPtr;
+    TkTextDataInit(runPtr->value);
+    runPtr->onPtr = onPtr;		/* Before the change. */
+    runPtr->start = *startPtr;
+    runPtr->end = *endPtr;
+    runPtr->line = TkBTreeLineIndex(startPtr->linePtr);
+    runPtr->byteIndex = startPtr->byteIndex;
+    runPtr->startMark = runPtr->endMark = NULL;
+    runPtr->dest = *startPtr;
+    runPtr->gone = 0;
+}
+
+static int
+CollectRuns(textPtr, tagPtr, index1Ptr, index2Ptr, listPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextTag *tagPtr;			/* The tag. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range (external indices). */
+    RunList *listPtr;			/* The list to add to. */
+{
+    TkTextIndex before, from, start, last;
+    TkTextSearch search;
+    TkTextSegment *onPtr = NULL;
+    int valued = 0;
+
+    TextEnd(textPtr, &last);
+    TkTextIndexBackBytes(index1Ptr, 1, &before);
+    from = before;
+    if (TkBTreeCharTagged(&before, tagPtr)) {
+	onPtr = RunStart(textPtr, tagPtr, &before, &start);
+	if (onPtr != NULL) {
+	    from = start;
+	}
+    }
+    TkBTreeStartSearch(&from, &last, tagPtr, &search);
+    while (TkBTreeNextTag(&search)) {
+	if (search.segPtr->typePtr == &tkTextToggleOnType) {
+	    if (onPtr != NULL) {
+		continue;
+	    }
+	    if (TkTextIndexCmp(&search.extIndex, index2Ptr) > 0) {
+		break;
+	    }
+	    onPtr = search.segPtr;
+	    start = search.extIndex;
+	} else if (onPtr != NULL) {
+	    AddRun(listPtr, tagPtr, onPtr, &start, &search.extIndex);
+	    valued += !TkTextDataIsEmpty(onPtr->body.toggle.value);
+	    onPtr = NULL;
+	}
+    }
+    if (onPtr != NULL) {
+	AddRun(listPtr, tagPtr, onPtr, &start, &last);
+	valued += !TkTextDataIsEmpty(onPtr->body.toggle.value);
+    }
+    return valued;
+}
+
+/*
+ * Take the values off the toggle-ons of the runs of a list.
+ */
+
+static void
+DetachRuns(listPtr)
+    RunList *listPtr;
+{
+    int i;
+
+    for (i = 0; i < listPtr->num; i++) {
+	RunSave *runPtr = &listPtr->runs[i];
+
+	TkTextDataMove(&runPtr->value, &runPtr->onPtr->body.toggle.value);
+	runPtr->onPtr = NULL;
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DropRunValue, DropToggleValue --
+ *
+ *	A run loses its value: record it in the undo atom of the
+ *	deletion going on, with the run's address and tag, or else have
+ *	it freed at the end of the widget command.  DropToggleValue is
+ *	for a toggle-on that is freed with a value still on it (only
+ *	when the widget is destroyed; the changes that free toggles take
+ *	the values off first).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static char *
+CopyName(name)
+    char *name;
+{
+    char *copy = ckalloc((unsigned) (strlen(name) + 1));
+
+    strcpy(copy, name);
+    return copy;
+}
+
+static void
+DropRunValue(textPtr, runPtr)
+    TkText *textPtr;			/* The widget. */
+    RunSave *runPtr;			/* The run; its data is consumed. */
+{
+    TkTextData value;
+
+    if (TkTextDataIsEmpty(runPtr->value)) {
+	return;
+    }
+    TkTextDataInit(value);
+    TkTextDataMove(&value, &runPtr->value);
+    if (textPtr->valueCapture != NULL) {
+	TkTextValue *recPtr;
+
+	TkTextVcSeen(textPtr, value, TK_TEXT_VC_STASH);
+	recPtr = NewValueRecord(TK_TEXT_VALUE_RUN, value);
+	recPtr->line = runPtr->line;
+	recPtr->byteIndex = runPtr->byteIndex;
+	recPtr->name = CopyName(runPtr->tagPtr->name);
+	recPtr->nextPtr = *textPtr->valueCapture;
+	*textPtr->valueCapture = recPtr;
+	return;
+    }
+    TkTextFreeValueLater(textPtr, value);
+}
+
+static void
+DropToggleValue(segPtr)
+    TkTextSegment *segPtr;		/* A toggle being freed. */
+{
+    if (!TkTextDataIsEmpty(segPtr->body.toggle.value)) {
+	TkTextFreeValueLater(segPtr->body.toggle.tagPtr->textPtr,
+		segPtr->body.toggle.value);
+	TkTextDataInit(segPtr->body.toggle.value);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ReattachRuns --
+ *
+ *	After a change, give the values taken off the runs of a list
+ *	(whose dest, gone and onPtr fields are set) to the runs left of
+ *	them, merges following the merge policy (TkTextDataMerge, today
+ *	the leftmost data present wins, each in turn merged into the
+ *	run); drop the others.  A merge that gives the merged run the
+ *	data of a run other than its first one is recorded in the undo
+ *	atom of the deletion going on, so that the undo moves it back.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	The list is freed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+ReattachRuns(textPtr, listPtr)
+    TkText *textPtr;			/* The widget. */
+    RunList *listPtr;			/* The runs, in order, tag by tag. */
+{
+    int i, k;
+    RunSave *runs = listPtr->runs, *winnerPtr, *firstPtr;
+    TkTextSegment *onPtr;
+
+    for (i = 0; i < listPtr->num; ) {
+	if (runs[i].gone) {
+	    DropRunValue(textPtr, &runs[i]);
+	    i++;
+	    continue;
+	}
+
+	/*
+	 * The runs that are now in the same run as runs[i] follow it
+	 * (runs of the same tag merge only with their neighbours),
+	 * possibly with runs that are gone among them.
+	 */
+
+	onPtr = runs[i].onPtr;
+	firstPtr = &runs[i];
+	winnerPtr = NULL;
+	for (k = i; (k < listPtr->num) && (runs[k].tagPtr == firstPtr->tagPtr);
+	     k++) {
+	    if (runs[k].gone) {
+		DropRunValue(textPtr, &runs[k]);
+		continue;
+	    }
+	    if (runs[k].onPtr != onPtr) {
+		break;
+	    }
+	    switch (TkTextDataMerge(&onPtr->body.toggle.value,
+		    &runs[k].value)) {
+	    case TK_TEXT_DATA_MERGE_DROP:
+		DropRunValue(textPtr, &runs[k]);
+		break;
+	    case TK_TEXT_DATA_MERGE_MOVED:
+		winnerPtr = &runs[k];
+		break;
+	    }
+	}
+	if ((winnerPtr != NULL) && (winnerPtr != firstPtr)) {
+	    TkTextVcSeen(textPtr, onPtr->body.toggle.value, TK_TEXT_VC_MOVE);
+	}
+	if (winnerPtr != NULL) {
+	    if ((winnerPtr != firstPtr) && (textPtr->valueCapture != NULL)) {
+		TkTextData none;
+		TkTextValue *recPtr;
+
+		TkTextDataInit(none);
+		recPtr = NewValueRecord(TK_TEXT_VALUE_RUNMOVE, none);
+
+		recPtr->line = winnerPtr->line;
+		recPtr->byteIndex = winnerPtr->byteIndex;
+		recPtr->srcLine = firstPtr->line;
+		recPtr->srcByteIndex = firstPtr->byteIndex;
+		recPtr->name = CopyName(winnerPtr->tagPtr->name);
+		recPtr->nextPtr = *textPtr->valueCapture;
+		*textPtr->valueCapture = recPtr;
+	    }
+	}
+	i = k;
+    }
+    if (listPtr->runs != NULL) {
+	ckfree((char *) listPtr->runs);
+    }
+    listPtr->runs = NULL;
+    listPtr->num = listPtr->max = 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TagKeepingRuns --
+ *
+ *	TkBTreeTag for a tag whose runs may have values.  Adding the tag
+ *	merges the runs it touches (each run is all there afterwards);
+ *	removing it from a range leaves of a run the part before the
+ *	range, which keeps the value, and the part after it, which
+ *	keeps the value if there is no part before (a run shortened at
+ *	its start) and else starts without one (a run cut in two).
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	As TagRange; values may be dropped.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+TagKeepingRuns(index1Ptr, index2Ptr, tagPtr, add)
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range. */
+    TkTextTag *tagPtr;			/* The tag. */
+    int add;				/* 1 to add the tag, 0 to remove it. */
+{
+    TkText *textPtr = tagPtr->textPtr;
+    TkTextIndex index1 = *index1Ptr, index2 = *index2Ptr, start;
+    RunList list;
+    int i;
+
+    list.runs = NULL;
+    list.num = list.max = 0;
+    if (CollectRuns(textPtr, tagPtr, &index1, &index2, &list) == 0) {
+	if (list.runs != NULL) {
+	    ckfree((char *) list.runs);
+	}
+	TagRange(index1Ptr, index2Ptr, tagPtr, add);
+	return;
+    }
+    for (i = 0; i < list.num; i++) {
+	RunSave *runPtr = &list.runs[i];
+
+	if (add || (TkTextIndexCmp(&runPtr->start, &index1) < 0)) {
+	    runPtr->dest = runPtr->start;
+	} else if (TkTextIndexCmp(&runPtr->end, &index2) > 0) {
+	    runPtr->dest = index2;
+	} else {
+	    runPtr->gone = 1;
+	}
+    }
+    DetachRuns(&list);
+    TagRange(index1Ptr, index2Ptr, tagPtr, add);
+    for (i = 0; i < list.num; i++) {
+	RunSave *runPtr = &list.runs[i];
+
+	if (!runPtr->gone) {
+	    runPtr->onPtr = RunAt(textPtr, tagPtr, &runPtr->dest, &start);
+	    runPtr->gone = (runPtr->onPtr == NULL);
+	}
+    }
+    ReattachRuns(textPtr, &list);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DeleteKeepingRuns --
+ *
+ *	TkBTreeDeleteChars on a widget whose runs may have values.  The
+ *	runs that the deletion may touch are those near the range, or
+ *	near the heads and tails of the blocks the deletion cuts (which
+ *	the widget dissolves): a mark at the start and one at the end of
+ *	each move with the text, so that afterwards the first character
+ *	between them that has the tag is in what is left of the run; if
+ *	the marks meet, the run's text is all gone.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	As DeleteRange; values may be dropped.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int tempMarkCount = 0;
+
+static TkTextSegment *
+TempMark(textPtr, indexPtr)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;
+{
+    char name[40];
+    TkTextIndex index = *indexPtr;
+
+    sprintf(name, "#run%d", tempMarkCount++);
+    return TkTextSetMark(textPtr, name, &index);
+}
+
+static void
+UnsetTempMark(textPtr, markPtr, indexPtr)
+    TkText *textPtr;
+    TkTextSegment *markPtr;
+    TkTextIndex *indexPtr;		/* Filled in with its position. */
+{
+    TkTextMarkSegToIndex(textPtr, markPtr, indexPtr);
+    TkBTreeUnlinkSegment(textPtr->tree, markPtr, markPtr->body.mark.linePtr);
+    Tcl_DeleteHashEntry(markPtr->body.mark.hPtr);
+    ckfree((char *) markPtr);
+}
+
+static void
+DeleteKeepingRuns(textPtr, index1Ptr, index2Ptr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range to delete. */
+{
+    TkTextIndex ext1, ext2, s, e;
+    Tcl_HashEntry *hPtr;
+    Tcl_HashSearch search;
+    TkTextSearch tSearch;
+    RunList list;
+    int i, remains, valued = 0;
+
+    if (TkIBTreeCutRange(index1Ptr, index2Ptr, &ext1, &ext2, &remains) == 0) {
+	ext1 = *index1Ptr;
+	ext2 = *index2Ptr;
+    }
+    list.runs = NULL;
+    list.num = list.max = 0;
+    for (hPtr = Tcl_FirstHashEntry(&textPtr->tagTable, &search);
+	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
+	TkTextTag *tagPtr = (TkTextTag *) Tcl_GetHashValue(hPtr);
+	int num = list.num, n;
+
+	if (!tagPtr->hasRunValues) {
+	    continue;
+	}
+	n = CollectRuns(textPtr, tagPtr, &ext1, &ext2, &list);
+	if (n == 0) {
+	    list.num = num;		/* Nothing to keep for this tag. */
+	}
+	valued += n;
+    }
+    if (valued == 0) {
+	if (list.runs != NULL) {
+	    ckfree((char *) list.runs);
+	}
+	DeleteRange(index1Ptr, index2Ptr, 1, 1);
+	return;
+    }
+    DetachRuns(&list);
+    for (i = 0; i < list.num; i++) {
+	list.runs[i].startMark = TempMark(textPtr, &list.runs[i].start);
+	list.runs[i].endMark = TempMark(textPtr, &list.runs[i].end);
+    }
+    DeleteRange(index1Ptr, index2Ptr, 1, 1);
+    for (i = 0; i < list.num; i++) {
+	RunSave *runPtr = &list.runs[i];
+
+	UnsetTempMark(textPtr, runPtr->startMark, &s);
+	UnsetTempMark(textPtr, runPtr->endMark, &e);
+	runPtr->gone = 1;
+	if (TkTextIndexCmp(&s, &e) >= 0) {
+	    continue;
+	}
+	if (!TkBTreeCharTagged(&s, runPtr->tagPtr)) {
+	    TkBTreeStartSearch(&s, &e, runPtr->tagPtr, &tSearch);
+	    while (TkBTreeNextTag(&tSearch)
+		    && (tSearch.segPtr->typePtr != &tkTextToggleOnType)) {
+		/* Empty. */
+	    }
+	    if ((tSearch.segPtr == NULL)
+		    || (tSearch.segPtr->typePtr != &tkTextToggleOnType)
+		    || (TkTextIndexCmp(&tSearch.extIndex, &e) >= 0)) {
+		continue;
+	    }
+	    s = tSearch.extIndex;
+	}
+	runPtr->dest = s;
+	runPtr->onPtr = RunAt(textPtr, runPtr->tagPtr, &s, &e);
+	runPtr->gone = (runPtr->onPtr == NULL);
+    }
+    tempMarkCount -= 2 * list.num;
+    ReattachRuns(textPtr, &list);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeHoldRunValues, TkBTreeReleaseRunValues --
+ *
+ *	The undo of a deletion re-inserts the deleted text piece by piece
+ *	(InsertList) at the place of the deletion.  A run of a tag that
+ *	starts there, after the deletion, may meet a piece of the text
+ *	that has the same tag: for a moment they are one run, whose
+ *	value (the leftmost present) is then on the piece's toggle, and
+ *	stays with the piece when the rest of the text cuts them apart.
+ *	So the values of the runs starting at the place are taken off
+ *	before (Hold), with a mark after which the run will be, and given
+ *	back after (Release) to the run at the mark.
+ *
+ * Results:
+ *	Hold returns what Release needs (or NULL).
+ *
+ * Side effects:
+ *	Values move; temporary marks come and go.
+ *
+ *----------------------------------------------------------------------
+ */
+
+typedef struct HeldRun {
+    TkTextTag *tagPtr;
+    TkTextSegment *markPtr;
+    TkTextData value;
+    struct HeldRun *nextPtr;
+} HeldRun;
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeTakeCrossingRunValues --
+ *
+ *	Before the undo of a deletion takes out the remains of the blocks
+ *	the deletion dissolved: a run that starts in the remains and goes
+ *	on after them (the deletion joined it to a later run) would lose
+ *	its start, and its value would stay on the rest, the later run.
+ *	The value is taken off it instead, as a record with the address
+ *	of the run's start, to go back there once the text is re-created
+ *	(through the map of the remains, see TkBTreeRestoreValues).
+ *
+ * Results:
+ *	The records (TK_TEXT_VALUE_RUN), or NULL.
+ *
+ * Side effects:
+ *	The values are taken off their runs.
+ *
+ *----------------------------------------------------------------------
+ */
+
+TkTextValue *
+TkBTreeTakeCrossingRunValues(textPtr, index1Ptr, index2Ptr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The remains (external). */
+{
+    Tcl_HashEntry *hPtr;
+    Tcl_HashSearch search;
+    TkTextValue *listPtr = NULL, *recPtr;
+    TkTextIndex start;
+    TkTextSegment *onPtr;
+
+    for (hPtr = Tcl_FirstHashEntry(&textPtr->tagTable, &search);
+	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
+	TkTextTag *tagPtr = (TkTextTag *) Tcl_GetHashValue(hPtr);
+
+	if (!tagPtr->hasRunValues) {
+	    continue;
+	}
+	onPtr = RunAt(textPtr, tagPtr, index2Ptr, &start);
+	if ((onPtr == NULL) || TkTextDataIsEmpty(onPtr->body.toggle.value)
+		|| (TkTextIndexCmp(&start, index1Ptr) < 0)
+		|| (TkTextIndexCmp(&start, index2Ptr) >= 0)) {
+	    continue;
+	}
+	if (TkTextVcOn(textPtr)) {
+	    TkTextVcPredict(textPtr, onPtr->body.toggle.value,
+		    TK_TEXT_VC_STASH, TK_TEXT_VC_RUN,
+		    TkBTreeVcRunPlace(textPtr, tagPtr, &start), NULL);
+	    TkTextVcNotify(textPtr);
+	    TkTextVcSeen(textPtr, onPtr->body.toggle.value, TK_TEXT_VC_STASH);
+	}
+	recPtr = NewValueRecord(TK_TEXT_VALUE_RUN, onPtr->body.toggle.value);
+	TkTextDataInit(onPtr->body.toggle.value);	/* The record took it. */
+	recPtr->line = TkBTreeLineIndex(start.linePtr);
+	recPtr->byteIndex = start.byteIndex;
+	recPtr->name = CopyName(tagPtr->name);
+	recPtr->nextPtr = listPtr;
+	listPtr = recPtr;
+    }
+    return listPtr;
+}
+
+void *
+TkBTreeHoldRunValues(textPtr, indexPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *indexPtr;		/* The place (external index). */
+{
+    Tcl_HashEntry *hPtr;
+    Tcl_HashSearch search;
+    HeldRun *listPtr = NULL, *heldPtr;
+    TkTextIndex start;
+    TkTextSegment *onPtr;
+
+    for (hPtr = Tcl_FirstHashEntry(&textPtr->tagTable, &search);
+	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
+	TkTextTag *tagPtr = (TkTextTag *) Tcl_GetHashValue(hPtr);
+
+	if (!tagPtr->hasRunValues) {
+	    continue;
+	}
+	onPtr = RunAt(textPtr, tagPtr, indexPtr, &start);
+	if ((onPtr == NULL) || TkTextDataIsEmpty(onPtr->body.toggle.value)
+		|| (TkTextIndexCmp(&start, indexPtr) != 0)) {
+	    continue;
+	}
+	heldPtr = (HeldRun *) ckalloc(sizeof(HeldRun));
+	heldPtr->tagPtr = tagPtr;
+	TkTextDataInit(heldPtr->value);
+	TkTextDataMove(&heldPtr->value, &onPtr->body.toggle.value);
+	heldPtr->markPtr = TempMark(textPtr, indexPtr);
+	heldPtr->nextPtr = listPtr;
+	listPtr = heldPtr;
+    }
+    return (void *) listPtr;
+}
+
+void
+TkBTreeReleaseRunValues(textPtr, held)
+    TkText *textPtr;			/* The widget. */
+    void *held;				/* What Hold returned. */
+{
+    HeldRun *heldPtr = (HeldRun *) held, *nextPtr;
+    TkTextIndex index, start;
+    TkTextSegment *onPtr;
+
+    for ( ; heldPtr != NULL; heldPtr = nextPtr) {
+	nextPtr = heldPtr->nextPtr;
+	UnsetTempMark(textPtr, heldPtr->markPtr, &index);
+	tempMarkCount--;
+	onPtr = RunAt(textPtr, heldPtr->tagPtr, &index, &start);
+	if ((onPtr != NULL) && TkTextDataIsEmpty(onPtr->body.toggle.value)) {
+	    TkTextDataMove(&onPtr->body.toggle.value, &heldPtr->value);
+	} else {
+	    TkTextFreeValueLater(textPtr, heldPtr->value);
+	}
+	ckfree((char *) heldPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeRunValue --
+ *
+ *	Find the run of "tag data tagName index": the run of the tag
+ *	containing the character at the index.
+ *
+ * Results:
+ *	A standard Tcl result; on success *dataPtrPtr is where the
+ *	run's data is kept (in its toggle-on).
+ *
+ * Side effects:
+ *	An error message is left in the interpreter.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkBTreeRunValue(textPtr, tagPtr, indexPtr, indexString, dataPtrPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextTag *tagPtr;			/* The tag. */
+    TkTextIndex *indexPtr;		/* The character. */
+    char *indexString;			/* As given, for error messages. */
+    TkTextData **dataPtrPtr;		/* Filled in. */
+{
+    TkTextIndex start;
+    TkTextSegment *onPtr = RunAt(textPtr, tagPtr, indexPtr, &start);
+
+    if (onPtr == NULL) {
+	Tcl_AppendResult(textPtr->interp, "no run of tag \"", tagPtr->name,
+		"\" at ", indexString, NULL);
+	return TCL_ERROR;
+    }
+    *dataPtrPtr = &onPtr->body.toggle.value;
+    return TCL_OK;
+}
+
+/*
+ * The run of a tag at an address (see TkTextValue): its toggle-on,
+ * or NULL if the character there does not have the tag; *startPtr is
+ * set to its start.
+ */
+
+static TkTextSegment *
+RunAtAddress(textPtr, tagPtr, line, byteIndex, startPtr)
+    TkText *textPtr;
+    TkTextTag *tagPtr;
+    int line, byteIndex;
+    TkTextIndex *startPtr;
+{
+    TkTextIndex index;
+
+    if ((tagPtr == NULL) || (line < 0) || (byteIndex < 0)
+	    || (line >= TkBTreeNumLines(textPtr->tree))) {
+	return NULL;
+    }
+    TkTextMakeByteIndex(textPtr->tree, line, byteIndex, &index);
+    if (index.byteIndex != byteIndex) {
+	return NULL;
+    }
+    return RunAt(textPtr, tagPtr, &index, startPtr);
+}
+
+
+/*
+ *======================================================================
+ *
+ * The look-ahead of -valuecommand (TkBTreeVcPredict...).
+ *
+ *	Before a change that may detach values, while the text is still
+ *	as it was, these work out which values the change will detach
+ *	and how (dropped, into the undo step, or moved to another owner
+ *	by a merge), with the places they have now, and hand them to
+ *	TkTextVcPredict (tkText.c), which tells the callback before the
+ *	change is made.  They follow the rules of the code that makes
+ *	the change (DeleteRange, TkBTreeKillBlockProc, iBTreeDeleteProc,
+ *	TkBTreeMakeBlock, TkIBTreeTrim, TagKeepingRuns, DeleteKeepingRuns)
+ *	without changing anything; the change itself reports what it
+ *	actually detaches (TkTextVcSeen), and a detach not foreseen here
+ *	is reported "late".  They do nothing unless the widget command
+ *	runs with a -valuecommand (TkTextVcOn).
+ *
+ *	Places: a node or a leaf by the position where its first leaf
+ *	starts and its level (0 for a leaf), as the undo records address
+ *	it; a run by its tag and range; a block's instance data by the
+ *	position of its head.
+ *
+ *======================================================================
+ */
+
+#define STRICTLY_OVERLAPS(start, end, lo, hi) (((end) > (lo)) && ((start) < (hi)))
+
+static void
+VcNode(textPtr, valuePtr, event, line, pos, level, to)
+    TkText *textPtr;
+    TkTextData *valuePtr;		/* The node's data. */
+    int event;				/* 0: a candidate only. */
+    int line, pos, level;		/* Its place. */
+    Tcl_Obj *to;			/* For a move: the new place. */
+{
+    if (TkTextDataGetLang(*valuePtr) == NULL) {
+	if (to != NULL) {
+	    Tcl_DecrRefCount(to);
+	}
+	return;
+    }
+    if (event == 0) {
+	TkTextVcCandidate(textPtr, *valuePtr, TK_TEXT_VC_NODE,
+		TkTextVcNodePlace(textPtr, line, pos, level));
+    } else {
+	TkTextVcPredict(textPtr, *valuePtr, event, TK_TEXT_VC_NODE,
+		TkTextVcNodePlace(textPtr, line, pos, level), to);
+    }
+}
+
+/*
+ * The leaves of a block (the dummy last line left out), with where
+ * each starts and where its newline (its separator, or the block's
+ * tail) is, in the outer line.
+ */
+
+typedef struct VcLeaf {
+    TkTextLine *linePtr;
+    int ls, nl;
+} VcLeaf;
+
+typedef struct VcState {
+    TkText *textPtr;
+    int line;				/* The outer line (from 0). */
+    int lo, hi;				/* The range there, in bytes (hi may
+					 * be INT_MAX: to the end of it). */
+    int event;				/* TK_TEXT_VC_DROP or _STASH. */
+    VcLeaf *leaves;			/* Of the block being looked at. */
+    int num, max;
+} VcState;
+
+static int		VcDoomedNode _ANSI_ARGS_((VcState *sPtr,
+			    Node *nodePtr, int pos));
+
+/*
+ * A block that the deletion deletes or dissolves (it holds its head or
+ * its tail): all its values go, its instance data included, and those
+ * of the blocks nested in it that the range overlaps; the blocks
+ * nested in it outside the range keep theirs.
+ */
+
+static void
+VcDoomedBlock(sPtr, segPtr, pos)
+    VcState *sPtr;
+    TkTextSegment *segPtr;		/* The block. */
+    int pos;				/* Its head. */
+{
+    if (TkTextDataGetLang(segPtr->body.itree.data) != NULL) {
+	TkTextVcPredict(sPtr->textPtr, segPtr->body.itree.data, sPtr->event,
+		TK_TEXT_VC_BLOCK, TkTextVcBlockPlace(sPtr->textPtr, sPtr->line,
+			pos), NULL);
+    }
+    if (segPtr->body.itree.tree != NULL) {
+	VcDoomedNode(sPtr, ((BTree *) segPtr->body.itree.tree)->rootPtr,
+		pos + 1);
+    }
+}
+
+static int
+VcDoomedNode(sPtr, nodePtr, pos)
+    VcState *sPtr;
+    Node *nodePtr;
+    int pos;				/* Where the node starts. */
+{
+    int start = pos, ls;
+
+    if (nodePtr->level > 0) {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    pos = VcDoomedNode(sPtr, childPtr, pos);
+	}
+    } else {
+	TkTextLine *linePtr;
+	TkTextSegment *segPtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (IsLastLine(linePtr)) {
+		continue;
+	    }
+	    ls = pos;
+	    for (segPtr = linePtr->segPtr; segPtr != NULL;
+		 segPtr = segPtr->nextPtr) {
+		if ((segPtr->typePtr == &tkTextIBTreeType)
+			&& STRICTLY_OVERLAPS(pos, pos + segPtr->size,
+				sPtr->lo, sPtr->hi)) {
+		    VcDoomedBlock(sPtr, segPtr, pos);
+		}
+		pos += segPtr->size;
+	    }
+	    VcNode(sPtr->textPtr, &linePtr->value, sPtr->event, sPtr->line,
+		    ls, 0, (Tcl_Obj *) NULL);
+	}
+    }
+    VcNode(sPtr->textPtr, &nodePtr->value, sPtr->event, sPtr->line, start,
+	    nodePtr->level + 1, (Tcl_Obj *) NULL);
+    return pos;
+}
+
+/*
+ * Collect the leaves of a block; the blocks nested in them that the
+ * range overlaps are doomed, unless one holds the whole range inside
+ * (then the change happens in there: *innerPtr).
+ */
+
+static int
+VcLeaves(sPtr, nodePtr, pos, innerPtr, innerPosPtr)
+    VcState *sPtr;
+    Node *nodePtr;
+    int pos;
+    TkTextSegment **innerPtr;
+    int *innerPosPtr;
+{
+    if (nodePtr->level > 0) {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    pos = VcLeaves(sPtr, childPtr, pos, innerPtr, innerPosPtr);
+	}
+    } else {
+	TkTextLine *linePtr;
+	TkTextSegment *segPtr;
+	int ls;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (IsLastLine(linePtr)) {
+		continue;
+	    }
+	    ls = pos;
+	    for (segPtr = linePtr->segPtr; segPtr != NULL;
+		 segPtr = segPtr->nextPtr) {
+		if ((segPtr->typePtr == &tkTextIBTreeType)
+			&& STRICTLY_OVERLAPS(pos, pos + segPtr->size,
+				sPtr->lo, sPtr->hi)) {
+		    if ((segPtr->body.itree.tree != NULL) && (pos < sPtr->lo)
+			    && (sPtr->hi <= pos + segPtr->size - 1)) {
+			*innerPtr = segPtr;
+			*innerPosPtr = pos;
+		    } else {
+			VcDoomedBlock(sPtr, segPtr, pos);
+		    }
+		}
+		pos += segPtr->size;
+	    }
+	    if (sPtr->num >= sPtr->max) {
+		VcLeaf *grown;
+
+		sPtr->max = 2 * sPtr->max + 16;
+		grown = (VcLeaf *) ckalloc((unsigned)
+			(sPtr->max * sizeof(VcLeaf)));
+		if (sPtr->num > 0) {
+		    memcpy(grown, sPtr->leaves, sPtr->num * sizeof(VcLeaf));
+		}
+		if (sPtr->leaves != NULL) {
+		    ckfree((char *) sPtr->leaves);
+		}
+		sPtr->leaves = grown;
+	    }
+	    sPtr->leaves[sPtr->num].linePtr = linePtr;
+	    sPtr->leaves[sPtr->num].ls = ls;
+	    sPtr->leaves[sPtr->num].nl = pos - 1;
+	    sPtr->num++;
+	}
+    }
+    return pos;
+}
+
+static int
+VcLeafNumber(sPtr, linePtr)
+    VcState *sPtr;
+    TkTextLine *linePtr;
+{
+    int k;
+
+    for (k = 0; k < sPtr->num; k++) {
+	if (sPtr->leaves[k].linePtr == linePtr) {
+	    return k;
+	}
+    }
+    return -1;
+}
+
+/*
+ * Where a node starts (its first leaf), or -1.
+ */
+
+static int
+VcNodeStart(sPtr, nodePtr)
+    VcState *sPtr;
+    Node *nodePtr;
+{
+    int k;
+
+    while (nodePtr->level > 0) {
+	nodePtr = nodePtr->children.nodePtr;
+    }
+    k = VcLeafNumber(sPtr, nodePtr->children.linePtr);
+    return (k < 0) ? -1 : sPtr->leaves[k].ls;
+}
+
+/*
+ * The nodes of a block (above the leaves) all of whose leaves are
+ * after leaf number "after" and up to leaf number "upTo" (or before it
+ * if "upTo" is negative: -(number + 1)): they disappear, with their
+ * values.  Returns the number of the next leaf.  Values of the other
+ * nodes are candidates (for the place of a late report).
+ */
+
+static int
+VcDeadNodes(sPtr, nodePtr, k, after, upTo)
+    VcState *sPtr;
+    Node *nodePtr;
+    int k;				/* Number of its first leaf. */
+    int after, upTo;
+{
+    int first = k, last, start = (k < sPtr->num) ? sPtr->leaves[k].ls : 0;
+    int dead;
+
+    if (nodePtr->level > 0) {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    k = VcDeadNodes(sPtr, childPtr, k, after, upTo);
+	}
+    } else {
+	TkTextLine *linePtr;
+
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (!IsLastLine(linePtr)) {
+		k++;
+	    }
+	}
+    }
+    last = k - 1;
+    if (last < first) {
+	return k;
+    }
+    dead = (first > after) && ((upTo >= 0) ? (last <= upTo)
+	    : (last < -(upTo + 1)));
+    VcNode(sPtr->textPtr, &nodePtr->value, dead ? sPtr->event : 0,
+	    sPtr->line, start, nodePtr->level + 1, (Tcl_Obj *) NULL);
+    return k;
+}
+
+/*
+ * What is left after the end of a deletion in its last leaf, once the
+ * blocks it cuts there are dissolved (see VcContainer): content (the
+ * leaf is not deleted whole), the leaf's own newline (it is, if the
+ * deletion started in another leaf), or a separator of a dissolved
+ * block (it is too, and new leaves follow it in its node); inside a
+ * block, its tail, which the dissolution removes.
+ */
+
+#define VC_CONTENT	0
+#define VC_NEWLINE	1
+#define VC_SEPARATOR	2
+#define VC_TAILGONE	3
+
+static int		VcEndScanBlock _ANSI_ARGS_((TkTextSegment *segPtr,
+			    int pos, int p));
+
+static int
+VcEndScanLine(linePtr, ls, p)
+    TkTextLine *linePtr;		/* The leaf. */
+    int ls;				/* Where it starts. */
+    int p;				/* The end of the deletion. */
+{
+    TkTextSegment *segPtr;
+    int pos = ls, r;
+
+    for (segPtr = linePtr->segPtr; segPtr != NULL; segPtr = segPtr->nextPtr) {
+	if ((segPtr->typePtr == &tkTextIBTreeType)
+		&& (segPtr->body.itree.tree != NULL) && (pos < p)
+		&& (p <= pos + segPtr->size - 1)) {
+	    r = VcEndScanBlock(segPtr, pos, p);
+	    if (r != VC_TAILGONE) {
+		return r;
+	    }
+	    p = pos + segPtr->size;
+	}
+	pos += segPtr->size;
+    }
+    return (p == pos - 1) ? VC_NEWLINE : VC_CONTENT;
+}
+
+static int
+VcEndScanBlock(segPtr, pos, p)
+    TkTextSegment *segPtr;		/* A block cut by the end. */
+    int pos;				/* Its head. */
+    int p;				/* The end of the deletion. */
+{
+    TkTextLine *linePtr, *nextPtr;
+    int ls = pos + 1, len, r;
+
+    for (linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
+	 (linePtr != NULL) && !IsLastLine(linePtr); linePtr = nextPtr) {
+	len = TkBTreeCharsInLine(linePtr);
+	nextPtr = TkBTreeNextLine(linePtr);
+	if (p <= ls + len - 1) {
+	    r = VcEndScanLine(linePtr, ls, p);
+	    if (r == VC_NEWLINE) {
+		return ((nextPtr == NULL) || IsLastLine(nextPtr))
+			? VC_TAILGONE : VC_SEPARATOR;
+	    }
+	    return r;
+	}
+	ls += len;
+    }
+    return VC_CONTENT;
+}
+
+/*
+ * The block holding the range inside (neither its head nor its tail
+ * in it): look deeper, or else the deletion joins its leaves.
+ */
+
+static void
+VcContainer(sPtr, segPtr, pos)
+    VcState *sPtr;
+    TkTextSegment *segPtr;		/* The block. */
+    int pos;				/* Its head. */
+{
+    TkTextSegment *innerPtr = NULL;
+    TkTextLine *sLinePtr, *eLinePtr;
+    Node *nPtr, *mPtr;
+    int innerPos = 0, k, s = -1, e = -1, r, endGone, spliced, gone;
+
+    sPtr->num = 0;
+    VcLeaves(sPtr, ((BTree *) segPtr->body.itree.tree)->rootPtr, pos + 1,
+	    &innerPtr, &innerPos);
+    if (innerPtr != NULL) {
+	VcContainer(sPtr, innerPtr, innerPos);
+	return;
+    }
+    for (k = 0; k < sPtr->num; k++) {
+	if ((sPtr->leaves[k].ls <= sPtr->lo) && (sPtr->lo <= sPtr->leaves[k].nl)) {
+	    s = k;
+	}
+	if ((sPtr->leaves[k].ls <= sPtr->hi) && (sPtr->hi <= sPtr->leaves[k].nl)) {
+	    e = k;
+	}
+    }
+    if ((s < 0) || (e < 0) || (s >= e)) {
+	return;				/* Inside one leaf: nothing joins. */
+    }
+    sLinePtr = sPtr->leaves[s].linePtr;
+    eLinePtr = sPtr->leaves[e].linePtr;
+
+    /*
+     * The end side's blocks are dissolved first; then, if all that is
+     * left of the last leaf after the end is its newline, the last
+     * leaf goes whole, else it is joined to the first.
+     */
+
+    r = VcEndScanLine(eLinePtr, sPtr->leaves[e].ls, sPtr->hi);
+    endGone = (r != VC_CONTENT);
+    spliced = (r == VC_SEPARATOR);
+    for (k = s + 1; k < e; k++) {
+	VcNode(sPtr->textPtr, &sPtr->leaves[k].linePtr->value, sPtr->event,
+		sPtr->line, sPtr->leaves[k].ls, 0, (Tcl_Obj *) NULL);
+    }
+    VcNode(sPtr->textPtr, &sLinePtr->value, 0, sPtr->line,
+	    sPtr->leaves[s].ls, 0, (Tcl_Obj *) NULL);
+    if (endGone) {
+	VcNode(sPtr->textPtr, &eLinePtr->value, sPtr->event, sPtr->line,
+		sPtr->leaves[e].ls, 0, (Tcl_Obj *) NULL);
+    } else if (!TkTextDataIsEmpty(eLinePtr->value)) {
+	if (TkTextDataIsEmpty(sLinePtr->value)) {
+	    VcNode(sPtr->textPtr, &eLinePtr->value, TK_TEXT_VC_MOVE,
+		    sPtr->line, sPtr->leaves[e].ls, 0,
+		    TkTextVcNodePlace(sPtr->textPtr, sPtr->line,
+			    sPtr->leaves[s].ls, 0));
+	} else {
+	    VcNode(sPtr->textPtr, &eLinePtr->value, sPtr->event, sPtr->line,
+		    sPtr->leaves[e].ls, 0, (Tcl_Obj *) NULL);
+	}
+    }
+
+    /*
+     * The nodes between the two leaves go; the ancestors of the last
+     * leaf below the common ancestor are joined to those of the first
+     * on each level, or go whole if all their leaves are in the range
+     * (never those that hold the dummy last line: the block's tail).
+     */
+
+    VcDeadNodes(sPtr, ((BTree *) segPtr->body.itree.tree)->rootPtr, 0, s,
+	    -(e + 1));
+    gone = endGone && !spliced && (eLinePtr->nextPtr == NULL);
+    for (nPtr = eLinePtr->parentPtr, mPtr = sLinePtr->parentPtr;
+	 (nPtr != NULL) && (mPtr != NULL) && (nPtr != mPtr);
+	 nPtr = nPtr->parentPtr, mPtr = mPtr->parentPtr) {
+	int nStart = VcNodeStart(sPtr, nPtr), mStart = VcNodeStart(sPtr, mPtr);
+
+	if (gone || (!TkTextDataIsEmpty(mPtr->value)
+		&& !TkTextDataIsEmpty(nPtr->value))) {
+	    VcNode(sPtr->textPtr, &nPtr->value, sPtr->event, sPtr->line,
+		    nStart, nPtr->level + 1, (Tcl_Obj *) NULL);
+	} else if (!TkTextDataIsEmpty(nPtr->value)) {
+	    VcNode(sPtr->textPtr, &nPtr->value, TK_TEXT_VC_MOVE, sPtr->line,
+		    nStart, nPtr->level + 1, TkTextVcNodePlace(sPtr->textPtr,
+			    sPtr->line, mStart, mPtr->level + 1));
+	}
+	gone = gone && (nPtr->nextPtr == NULL);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeVcPredictDelete --
+ *
+ *	The look-ahead of a deletion (TkBTreeDeleteChars of the range in
+ *	the outermost tree): node values, instance data of blocks, run
+ *	values.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void		VcDeleteRuns _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int event));
+
+void
+TkBTreeVcPredictDelete(textPtr, index1Ptr, index2Ptr, event)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range (external indices). */
+    int event;				/* TK_TEXT_VC_DROP or _STASH. */
+{
+    VcState s;
+    TkTextLine *linePtr;
+    TkTextSegment *segPtr;
+    int pos, tail;
+
+    if (!TkTextVcOn(textPtr) || !textPtr->haveValues
+	    || (TkTextIndexCmp(index1Ptr, index2Ptr) >= 0)) {
+	return;
+    }
+    s.textPtr = textPtr;
+    s.event = event;
+    s.leaves = NULL;
+    s.num = s.max = 0;
+    s.line = TkBTreeLineIndex(index1Ptr->linePtr);
+    for (linePtr = index1Ptr->linePtr; linePtr != NULL;
+	 linePtr = TkBTreeNextLine(linePtr), s.line++) {
+	s.lo = (linePtr == index1Ptr->linePtr) ? index1Ptr->byteIndex : 0;
+	s.hi = (linePtr == index2Ptr->linePtr) ? index2Ptr->byteIndex : INT_MAX;
+	pos = 0;
+	for (segPtr = linePtr->segPtr; segPtr != NULL;
+	     segPtr = segPtr->nextPtr) {
+	    if ((segPtr->typePtr == &tkTextIBTreeType)
+		    && STRICTLY_OVERLAPS(pos, pos + segPtr->size, s.lo, s.hi)) {
+		tail = pos + segPtr->size - 1;
+		if ((segPtr->body.itree.tree != NULL) && (pos < s.lo)
+			&& (s.hi <= tail)) {
+		    VcContainer(&s, segPtr, pos);
+		} else {
+		    VcDoomedBlock(&s, segPtr, pos);
+		}
+	    }
+	    pos += segPtr->size;
+	}
+	if (linePtr == index2Ptr->linePtr) {
+	    break;
+	}
+    }
+    if (s.leaves != NULL) {
+	ckfree((char *) s.leaves);
+    }
+    VcDeleteRuns(textPtr, index1Ptr, index2Ptr, event);
+    TkTextVcNotify(textPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeVcPredictBlock --
+ *
+ *	The look-ahead of "block insert" (TkBTreeMakeBlock) inside a
+ *	block over several leaves: the leaves between the first and the
+ *	last move whole into the new block with their values; the part
+ *	of the last leaf after index2 joins the first leaf (the merge
+ *	policy, unless nothing but its newline is there: then all of it
+ *	moves); the nodes all of whose leaves move go.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkBTreeVcPredictBlock(textPtr, index1Ptr, index2Ptr, event)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range (external indices). */
+    int event;				/* TK_TEXT_VC_DROP or _STASH. */
+{
+    TkTextIndex int1, int2, head;
+    TkTextLine *sLinePtr, *eLinePtr;
+    TkTextSegment *segPtr;
+    TkTextSegment *innerPtr = NULL;
+    VcState s;
+    int k1, k2, innerPos, wholeFirst, lastWhole;
+
+    if (!TkTextVcOn(textPtr) || !textPtr->haveValues
+	    || (TkTextIndexCmp(index1Ptr, index2Ptr) >= 0)) {
+	return;
+    }
+    TkTextIndexToInternalSeg(index1Ptr, &int1, NULL);
+    TkTextIndexToInternalSeg(index2Ptr, &int2, NULL);
+    sLinePtr = int1.linePtr;
+    eLinePtr = int2.linePtr;
+    segPtr = sLinePtr->parentPtr->segPtr;
+    if ((segPtr == NULL) || (segPtr != eLinePtr->parentPtr->segPtr)
+	    || (sLinePtr == eLinePtr)) {
+	return;				/* Outside blocks, an error, or
+					 * inside one leaf: nothing goes. */
+    }
+    TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+    s.textPtr = textPtr;
+    s.event = event;
+    s.leaves = NULL;
+    s.num = s.max = 0;
+    s.line = TkBTreeLineIndex(head.linePtr);
+    s.lo = s.hi = -1;			/* No nested block is touched. */
+    VcLeaves(&s, ((BTree *) segPtr->body.itree.tree)->rootPtr,
+	    head.byteIndex + 1, &innerPtr, &innerPos);
+    k1 = VcLeafNumber(&s, sLinePtr);
+    k2 = VcLeafNumber(&s, eLinePtr);
+    if ((k1 >= 0) && (k2 > k1)) {
+	wholeFirst = (int1.byteIndex == 0);
+	lastWhole = (int2.byteIndex >= TkBTreeCharsInLine(eLinePtr) - 1);
+	if (!lastWhole && !TkTextDataIsEmpty(eLinePtr->value)) {
+	    if (wholeFirst || TkTextDataIsEmpty(sLinePtr->value)) {
+		VcNode(textPtr, &eLinePtr->value, TK_TEXT_VC_MOVE, s.line,
+			s.leaves[k2].ls, 0, TkTextVcNodePlace(textPtr, s.line,
+				s.leaves[k1].ls, 0));
+	    } else {
+		VcNode(textPtr, &eLinePtr->value, event, s.line,
+			s.leaves[k2].ls, 0, (Tcl_Obj *) NULL);
+	    }
+	}
+	VcDeadNodes(&s, ((BTree *) segPtr->body.itree.tree)->rootPtr, 0, k1,
+		k2);
+    }
+    if (s.leaves != NULL) {
+	ckfree((char *) s.leaves);
+    }
+    TkTextVcNotify(textPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeVcPredictTrim --
+ *
+ *	The look-ahead of "block trim" (TkIBTreeTrim): the root and its
+ *	only child become one node, which keeps the root's data if it
+ *	has any; the child's is then dropped.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkBTreeVcPredictTrim(textPtr, segPtr, event)
+    TkText *textPtr;			/* The widget. */
+    TkTextSegment *segPtr;		/* The block. */
+    int event;				/* TK_TEXT_VC_DROP or _STASH. */
+{
+    Node *rootPtr, *childPtr;
+    TkTextIndex head;
+
+    if (!TkTextVcOn(textPtr) || (segPtr->typePtr != &tkTextIBTreeType)
+	    || (segPtr->body.itree.tree == NULL)) {
+	return;
+    }
+    rootPtr = ((BTree *) segPtr->body.itree.tree)->rootPtr;
+    if ((rootPtr->level < 1) || (rootPtr->numChildren > 1)) {
+	return;				/* An error: nothing changes. */
+    }
+    childPtr = rootPtr->children.nodePtr;
+    if (!TkTextDataIsEmpty(rootPtr->value)
+	    && !TkTextDataIsEmpty(childPtr->value)) {
+	TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	VcNode(textPtr, &childPtr->value, event,
+		TkBTreeLineIndex(head.linePtr), head.byteIndex + 1,
+		childPtr->level + 1, (Tcl_Obj *) NULL);
+    }
+    TkTextVcNotify(textPtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * The runs: where a run ends; the place of the run of a tag at an
+ * index; the look-ahead of "tag add" and "tag remove" (TagKeepingRuns)
+ * and of a deletion (DeleteKeepingRuns).
+ *
+ *----------------------------------------------------------------------
+ */
+
+static void
+VcRunEnd(textPtr, tagPtr, startPtr, endPtr)
+    TkText *textPtr;
+    TkTextTag *tagPtr;
+    TkTextIndex *startPtr;		/* The toggle-on of the run. */
+    TkTextIndex *endPtr;		/* Filled in. */
+{
+    TkTextIndex last;
+    TkTextSearch search;
+
+    TextEnd(textPtr, &last);
+    *endPtr = last;
+    TkBTreeStartSearch(startPtr, &last, tagPtr, &search);
+    while (TkBTreeNextTag(&search)) {
+	if ((search.segPtr->typePtr == &tkTextToggleOffType)
+		&& (TkTextIndexCmp(&search.extIndex, startPtr) > 0)) {
+	    *endPtr = search.extIndex;
+	    return;
+	}
+    }
+}
+
+Tcl_Obj *
+TkBTreeVcRunPlace(textPtr, tagPtr, indexPtr)
+    TkText *textPtr;
+    TkTextTag *tagPtr;
+    TkTextIndex *indexPtr;		/* A character of the run. */
+{
+    TkTextIndex start, end;
+
+    if (RunAt(textPtr, tagPtr, indexPtr, &start) == NULL) {
+	return NULL;
+    }
+    VcRunEnd(textPtr, tagPtr, &start, &end);
+    return TkTextVcRunPlace(textPtr, tagPtr->name, &start, &end);
+}
+
+static void
+VcRun(textPtr, runPtr, event, toPtr)
+    TkText *textPtr;
+    RunSave *runPtr;			/* The run (before the change). */
+    int event;				/* 0: a candidate. */
+    RunSave *toPtr;			/* For a move: the run it joins. */
+{
+    TkTextData value = runPtr->onPtr->body.toggle.value;
+
+    if (TkTextDataGetLang(value) == NULL) {
+	return;
+    }
+    if (event == 0) {
+	TkTextVcCandidate(textPtr, value, TK_TEXT_VC_RUN,
+		TkTextVcRunPlace(textPtr, runPtr->tagPtr->name,
+			&runPtr->start, &runPtr->end));
+    } else {
+	TkTextVcPredict(textPtr, value, event, TK_TEXT_VC_RUN,
+		TkTextVcRunPlace(textPtr, runPtr->tagPtr->name,
+			&runPtr->start, &runPtr->end),
+		(toPtr == NULL) ? NULL : TkTextVcRunPlace(textPtr,
+			toPtr->tagPtr->name, &toPtr->start, &toPtr->end));
+    }
+}
+
+/*
+ * Runs that become one (a list in order, survivors only): the first
+ * keeps its value; else the first value present moves to it; the
+ * values after that one are dropped.
+ */
+
+static void
+VcRunGroup(textPtr, runs, num, event)
+    TkText *textPtr;
+    RunSave **runs;
+    int num;
+    int event;
+{
+    int k, winner = -1;
+
+    for (k = 0; k < num; k++) {
+	if (TkTextDataIsEmpty(runs[k]->onPtr->body.toggle.value)) {
+	    continue;
+	}
+	if (winner >= 0) {
+	    VcRun(textPtr, runs[k], event, (RunSave *) NULL);
+	} else {
+	    winner = k;
+	    if (k > 0) {
+		VcRun(textPtr, runs[k], TK_TEXT_VC_MOVE, runs[0]);
+	    } else {
+		VcRun(textPtr, runs[k], 0, (RunSave *) NULL);
+	    }
+	}
+    }
+}
+
+void
+TkBTreeVcPredictTag(textPtr, index1Ptr, index2Ptr, tagPtr, add)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *index1Ptr, *index2Ptr;	/* The range. */
+    TkTextTag *tagPtr;			/* The tag. */
+    int add;				/* 1 for tag add, 0 for tag remove. */
+{
+    RunList list;
+    RunSave **group;
+    int i, event;
+
+    if (!TkTextVcOn(textPtr) || !tagPtr->hasRunValues
+	    || (TkTextIndexCmp(index1Ptr, index2Ptr) >= 0)) {
+	return;
+    }
+    event = (textPtr->valueCapture != NULL) ? TK_TEXT_VC_STASH
+	    : TK_TEXT_VC_DROP;
+    list.runs = NULL;
+    list.num = list.max = 0;
+    CollectRuns(textPtr, tagPtr, index1Ptr, index2Ptr, &list);
+    if (add) {
+	/*
+	 * Every run collected touches the range: all become one.
+	 */
+
+	group = (RunSave **) ckalloc((unsigned)
+		((list.num + 1) * sizeof(RunSave *)));
+	for (i = 0; i < list.num; i++) {
+	    group[i] = &list.runs[i];
+	}
+	VcRunGroup(textPtr, group, list.num, event);
+	ckfree((char *) group);
+    } else {
+	for (i = 0; i < list.num; i++) {
+	    RunSave *runPtr = &list.runs[i];
+
+	    VcRun(textPtr, runPtr,
+		    ((TkTextIndexCmp(&runPtr->start, index1Ptr) >= 0)
+			    && (TkTextIndexCmp(&runPtr->end, index2Ptr) <= 0))
+		    ? event : 0, (RunSave *) NULL);
+	}
+    }
+    if (list.runs != NULL) {
+	ckfree((char *) list.runs);
+    }
+    TkTextVcNotify(textPtr);
+}
+
+/*
+ * For a deletion: what disappears is the range and, of the blocks it
+ * cuts, their heads before it and their tails after it.  A position
+ * as (line, byte).
+ */
+
+typedef struct VcCut {
+    int l1, b1, l2, b2;			/* The range. */
+    int e1;				/* Byte of ext1 (on line l1). */
+    int *cuts, numHeads, numTails;	/* TkIBTreeCutPositions. */
+} VcCut;
+
+#define VC_CMP(la, ba, lb, bb) \
+	(((la) != (lb)) ? (((la) < (lb)) ? -1 : 1) \
+	 : (((ba) < (bb)) ? -1 : (((ba) > (bb)) ? 1 : 0)))
+
+static int
+VcCutPoint(cPtr, line, byte)
+    VcCut *cPtr;
+    int line, byte;
+{
+    int i;
+
+    if ((line == cPtr->l1) && (VC_CMP(line, byte, cPtr->l1, cPtr->b1) < 0)) {
+	for (i = 0; i < cPtr->numHeads; i++) {
+	    if (cPtr->e1 + cPtr->cuts[i] == byte) {
+		return 1;
+	    }
+	}
+    }
+    if ((line == cPtr->l2) && (VC_CMP(line, byte, cPtr->l2, cPtr->b2) >= 0)) {
+	for (i = 0; i < cPtr->numTails; i++) {
+	    if (cPtr->b2 + cPtr->cuts[cPtr->numHeads + i] == byte) {
+		return 1;
+	    }
+	}
+    }
+    return 0;
+}
+
+/*
+ * Whether everything from a to b disappears.
+ */
+
+static int
+VcAllGone(cPtr, aPtr, bPtr)
+    VcCut *cPtr;
+    TkTextIndex *aPtr, *bPtr;
+{
+    int line = TkBTreeLineIndex(aPtr->linePtr), byte = aPtr->byteIndex;
+    int lb = TkBTreeLineIndex(bPtr->linePtr), bb = bPtr->byteIndex;
+
+    while (VC_CMP(line, byte, lb, bb) < 0) {
+	if ((VC_CMP(line, byte, cPtr->l1, cPtr->b1) >= 0)
+		&& (VC_CMP(line, byte, cPtr->l2, cPtr->b2) < 0)) {
+	    line = cPtr->l2;
+	    byte = cPtr->b2;
+	} else if (VcCutPoint(cPtr, line, byte)) {
+	    byte++;
+	} else {
+	    return 0;
+	}
+    }
+    return 1;
+}
+
+static void
+VcDeleteRuns(textPtr, index1Ptr, index2Ptr, event)
+    TkText *textPtr;
+    TkTextIndex *index1Ptr, *index2Ptr;
+    int event;
+{
+    TkTextIndex ext1, ext2;
+    Tcl_HashEntry *hPtr;
+    Tcl_HashSearch search;
+    RunList list;
+    RunSave **group;
+    VcCut cut;
+    int i, num, remains, prev;
+
+    if (TkIBTreeCutRange(index1Ptr, index2Ptr, &ext1, &ext2, &remains) == 0) {
+	ext1 = *index1Ptr;
+	ext2 = *index2Ptr;
+	cut.cuts = NULL;
+	cut.numHeads = cut.numTails = 0;
+    } else {
+	cut.cuts = TkIBTreeCutPositions(index1Ptr, index2Ptr, &ext1,
+		&cut.numHeads, &cut.numTails);
+    }
+    cut.l1 = TkBTreeLineIndex(index1Ptr->linePtr);
+    cut.b1 = index1Ptr->byteIndex;
+    cut.l2 = TkBTreeLineIndex(index2Ptr->linePtr);
+    cut.b2 = index2Ptr->byteIndex;
+    cut.e1 = ext1.byteIndex;
+    list.runs = NULL;
+    list.num = list.max = 0;
+    for (hPtr = Tcl_FirstHashEntry(&textPtr->tagTable, &search);
+	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
+	TkTextTag *tagPtr = (TkTextTag *) Tcl_GetHashValue(hPtr);
+
+	if (!tagPtr->hasRunValues) {
+	    continue;
+	}
+	list.num = 0;
+	CollectRuns(textPtr, tagPtr, &ext1, &ext2, &list);
+	group = (RunSave **) ckalloc((unsigned)
+		((list.num + 1) * sizeof(RunSave *)));
+	num = 0;
+	prev = -1;
+	for (i = 0; i < list.num; i++) {
+	    RunSave *runPtr = &list.runs[i];
+
+	    if (VcAllGone(&cut, &runPtr->start, &runPtr->end)) {
+		VcRun(textPtr, runPtr, event, (RunSave *) NULL);
+		continue;
+	    }
+	    if ((prev >= 0) && !VcAllGone(&cut, &list.runs[prev].end,
+		    &runPtr->start)) {
+		VcRunGroup(textPtr, group, num, event);
+		num = 0;
+	    }
+	    group[num++] = runPtr;
+	    prev = i;
+	}
+	VcRunGroup(textPtr, group, num, event);
+	ckfree((char *) group);
+    }
+    if (list.runs != NULL) {
+	ckfree((char *) list.runs);
+    }
+    if (cut.cuts != NULL) {
+	ckfree((char *) cut.cuts);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkBTreeVcNodePlace --
+ *
+ *	The place of the node of "block nodedata index level" (as the
+ *	notification gives it: where its first leaf starts, and its level
+ *	counted from the leaves), or NULL on an error.
+ *
+ *----------------------------------------------------------------------
+ */
+
+Tcl_Obj *
+TkBTreeVcNodePlace(textPtr, indexPtr, levelArg)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;
+    Arg levelArg;
+{
+    TkTextIndex intIndex, ext;
+    TkTextLine *linePtr;
+    Node *nodePtr;
+    int level, above, i;
+
+    TkTextIndexToInternalSeg(indexPtr, &intIndex, NULL);
+    linePtr = intIndex.linePtr;
+    if ((linePtr->parentPtr->segPtr == NULL)
+	    || (Tcl_GetIntFromObj(NULL, levelArg, &level) != TCL_OK)) {
+	return NULL;
+    }
+    above = ((BTree *) linePtr->parentPtr->segPtr->body.itree.tree)
+	    ->rootPtr->level + 1;
+    if (level < 0) {
+	level += above + 1;
+    }
+    if ((level < 0) || (level > above)) {
+	return NULL;
+    }
+    if (level > 0) {
+	for (nodePtr = linePtr->parentPtr, i = level; i > 1; i--) {
+	    nodePtr = nodePtr->parentPtr;
+	}
+	while (nodePtr->level > 0) {
+	    nodePtr = nodePtr->children.nodePtr;
+	}
+	linePtr = nodePtr->children.linePtr;
+    }
+    intIndex.linePtr = linePtr;
+    intIndex.byteIndex = 0;
+    TkTextIndexToExternalIndex(textPtr->tree, &intIndex, &ext);
+    return TkTextVcNodePlace(textPtr, TkBTreeLineIndex(ext.linePtr),
+	    ext.byteIndex, level);
+}
+
+
 /* Dumping routines */
 void DumpTree _ANSI_ARGS_((TkTextBTree tree));
 void DumpSegment _ANSI_ARGS_((TkTextSegment *segPtr));

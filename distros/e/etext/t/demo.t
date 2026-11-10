@@ -15,8 +15,15 @@ use Tk::eText;
 
 my $probe = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $probe;
-$probe->destroy;
-plan tests => 17;
+# The probe is hidden, not destroyed, until the demo's own MainWindow is
+# gone (the last step).  Perl/Tk 804.036 keeps a stale option-lookup
+# cache across a destroyed MainWindow (TK_BUGS W7, BUGS 21): a MainWindow
+# created after one was destroyed may get wrong cget results or crash
+# (under Wine, about one run in eight of this test did).  MainLoop
+# returns only once the probe is gone too, so the last step destroys it,
+# after $top.
+$probe->withdraw;
+plan tests => 21;
 binmode(Test::More->builder->$_, ':utf8') for qw(output failure_output);
 
 # The demo finds its helpers relative to $0 (FindBin), creates its own
@@ -48,6 +55,20 @@ my @steps = (
     like($tex, qr/\\leq/, 'export gives \leq back');
     like($tex, qr/\\beta/, 'export gives \beta back');
     unlike($tex, qr/unknown/, 'no symbol is unknown to the export');
+    # A run with a value is listed as TagOn [name, value]: same export.
+    $text->tagData('math', $text->search("\x{3b1}", '1.0'), {any => 'value'});
+    ok(scalar(grep { ref $_ eq 'Tk::Text::TagOn' && UNIVERSAL::isa($_, 'ARRAY') && $_->[0] eq 'math' }
+	      $text->blockList('1.0', 'end')), 'the math run is listed with its value');
+    is($text->range2TeX, $tex, 'and exported as without one');
+    # A mark with a value is listed as MarkRight [name, value]: the same.
+    $text->markSet('valued', $text->search("\x{3b1}", '1.0'));
+    $text->markData('valued', {any => 'mark value'});
+    my ($m) = grep { ref $_ eq 'Tk::Text::MarkRight' && $_->name eq 'valued' }
+		   $text->blockList('1.0', 'end');
+    ok($m && UNIVERSAL::isa($m, 'ARRAY') && $m->[1]{any} eq 'mark value',
+       'a mark with a value is listed as [name, value], name() reads it');
+    is($text->range2TeX, $tex, 'and the export is as without one');
+    $text->markUnset('valued');
     $text->tagRemove('sel', '1.0', 'end');
   },
   sub {
@@ -91,6 +112,7 @@ my @steps = (
     is($after, $before, 'Save and Load round-trip the Unicode document');
     is_deeply(\@bgerrors, [], 'no errors during save/load') or diag(@bgerrors);
     $top->destroy;
+    $probe->destroy;		# last: see the comment at its creation
   },
 );
 my $i = 0;

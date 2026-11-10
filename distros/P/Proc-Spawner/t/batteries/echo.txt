@@ -1,0 +1,12 @@
+echo 'a\tb' "c\nd"
+echo -n 'x\c'; echo y
+echo -e 'a\nb'
+echo -n -n a; echo
+echo -- -n
+echo '\0101\101\1\08' | od -An -c
+echo 'a\cb' c; echo next
+echo '\x41 \e \E A \q' | od -An -c
+x='a\tb\\'; echo $x "$x"
+echo 'end\' '\\' '\'
+printf '%s\n' 'echo "a\\tb"' > e.sh; . ./e.sh
+f() { echo "$@"; }; f -n 'q\tr'; echo

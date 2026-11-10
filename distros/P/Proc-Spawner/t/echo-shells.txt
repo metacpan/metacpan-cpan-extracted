@@ -1,0 +1,1466 @@
+# t/echo-shells.txt: the echo builtins of dash 0.5.12 and bash 5.2.21 (bash --posix), written by perl t/programs.t
+# --record-shells; as t/programs.txt (PROC_SHELLSPAWN_ECHO in the key says whose)
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	b
+0	a b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	b
+0	a b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	b
+0	a b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	b
+0	a b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a
+0	a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a
+0	a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a
+0	a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a
+0	a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\tb
+0	-e a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\tb
+0	-e a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\x41\\0101\\101\\cZ
+0	-e a\\x41AA	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\x41\\0101\\101\\cZ
+0	-e a\\x41AA	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\x41\\0101\\101\\cZ
+0	aAA\\101	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\x41\\0101\\101\\cZ
+0	aAA\\101	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-n
+0	-- -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-n
+0	-- -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-n
+0	-- -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-n
+0	-- -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-neE	a\\tb
+0	-neE a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-neE	a\\tb
+0	-neE a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-neE	a\\tb
+0	a\\tb	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-neE	a\\tb
+0	a\\tb	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	-x	q\\tr
+0	-e -x q\x09r	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	-x	q\\tr
+0	-e -x q\x09r	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	-x	q\\tr
+0	-x q\x09r	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	-x	q\\tr
+0	-x q\x09r	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-
+0	-\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-
+0	-\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-
+0	-\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-
+0	-\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nn	x
+0	-nn x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nn	x
+0	-nn x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nn	x
+0	x	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nn	x
+0	x	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-enx	y
+0	-enx y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-enx	y
+0	-enx y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-enx	y
+0	-enx y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-enx	y
+0	-enx y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	x\\
+0	-e x\\\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	x\\
+0	-e x\\\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	x\\
+0	x\\\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	x\\
+0	x\\\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\x
+0	-e \\x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\x
+0	-e \\x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\x
+0	\\x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\x
+0	\\x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\xg1
+0	-e \\xg1\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\xg1
+0	-e \\xg1\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\xg1
+0	\\xg1\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\xg1
+0	\\xg1\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\e\\f\\v\\q
+0	-e \x1b\x0c\x0b\\q\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\e\\f\\v\\q
+0	-e \x1b\x0c\x0b\\q\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\e\\f\\v\\q
+0	\x1b\x0c\x0b\\q\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\e\\f\\v\\q
+0	\x1b\x0c\x0b\\q\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--help	x
+0	--help x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--help	x
+0	--help x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--help	x
+0	--help x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--help	x
+0	--help x\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	x\\ty
+0	x\x09y	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	x\\ty
+0	x\x09y	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	x\\ty
+0	x\\ty	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	x\\ty
+0	x\\ty	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	x\\ty
+0	-e x\x09y\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	x\\ty
+0	-e x\x09y\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	x\\ty
+0	x\x09y\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	x\\ty
+0	x\x09y\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\cb	c
+0	a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\cb	c
+0	a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\cb	c
+0	a\\cb c\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\cb	c
+0	a\\cb c\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	a"b	%%
+0	% a"b %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	a"b	%%
+0	% a"b %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	a"b	%%
+0	% a"b %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	a"b	%%
+0	% a"b %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x
+0	-x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x
+0	-x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x
+0	-x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x
+0	-x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	q\\cz
+0	hello world q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	q\\cz
+0	hello world q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	q\\cz
+0	hello world q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	q\\cz
+0	hello world q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x		x\\101y
+0	-x  xAy\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x		x\\101y
+0	-x  xAy\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x		x\\101y
+0	-x  x\\101y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x		x\\101y
+0	-x  x\\101y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-x	-en	-en
+0	-E -x -en -en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-x	-en	-en
+0	-E -x -en -en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-x	-en	-en
+0	-x -en -en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-x	-en	-en
+0	-x -en -en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	tab\x09here
+0	\\x41\\x4 tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	tab\x09here
+0	\\x41\\x4 tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	tab\x09here
+0	\\x41\\x4 tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	tab\x09here
+0	\\x41\\x4 tab\x09here\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	a\\tb
+0	-E a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	a\\tb
+0	-E a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a"b	q\\cz
+0	a"b q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a"b	q\\cz
+0	a"b q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a"b	q\\cz
+0	a"b q\\cz	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a"b	q\\cz
+0	a"b q\\cz	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y
+0	xAy\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y
+0	xAy\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y
+0	x\\101y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y
+0	x\\101y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-e	a\\tb	a
+0	-en -e a\x09b a\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-e	a\\tb	a
+0	-en -e a\x09b a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-e	a\\tb	a
+0	a\x09b a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-e	a\\tb	a
+0	a\x09b a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	tab\x09here	-n
+0	back\\slash tab\x09here -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	tab\x09here	-n
+0	back\\slash tab\x09here -n\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	tab\x09here	-n
+0	back\\slash tab\x09here -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	tab\x09here	-n
+0	back\\slash tab\x09here -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-E
+0	-E -E\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-E
+0	-E -E\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-E
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-E
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a"b
+0	-e a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a"b
+0	-e a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a"b
+0	a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a"b
+0	a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a"b	it's	a
+0	-- a"b it's a\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a"b	it's	a
+0	-- a"b it's a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a"b	it's	a
+0	-- a"b it's a\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a"b	it's	a
+0	-- a"b it's a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101
+0	A\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101
+0	A\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101
+0	\\0101\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101
+0	\\0101\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	-ne	-n	a
+0	-x -ne -n a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	-ne	-n	a
+0	-x -ne -n a\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	-ne	-n	a
+0	-x -ne -n a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	-ne	-n	a
+0	-x -ne -n a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E	back\\slash	\\x41\\x4	-n
+0	-E back\\slash \\x41\\x4 -n	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E	back\\slash	\\x41\\x4	-n
+0	-E back\\slash \\x41\\x4 -n	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E	back\\slash	\\x41\\x4	-n
+0	back\\slash \\x41\\x4 -n	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E	back\\slash	\\x41\\x4	-n
+0	back\\slash \\x41\\x4 -n	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	it's
+0	-en it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	it's
+0	-en it's\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	it's
+0	it's	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	it's
+0	it's	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	\xc3\xa9	-n
+0	\xc3\xa9 -n	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	\xc3\xa9	-n
+0	\xc3\xa9 -n	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	\xc3\xa9	-n
+0	\xc3\xa9 -n	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	\xc3\xa9	-n
+0	\xc3\xa9 -n	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo		-n	a\\tb
+0	 -n a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo		-n	a\\tb
+0	 -n a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo		-n	a\\tb
+0	 -n a\\tb\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo		-n	a\\tb
+0	 -n a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	a	a"b	%%
+0	-nE a a"b %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	a	a"b	%%
+0	-nE a a"b %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	a	a"b	%%
+0	a a"b %%	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	a	a"b	%%
+0	a a"b %%	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	%	q\\cz
+0	-e % q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	%	q\\cz
+0	-e % q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	%	q\\cz
+0	% q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	%	q\\cz
+0	% q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101	a	hello world
+0	A a hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101	a	hello world
+0	A a hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101	a	hello world
+0	\\0101 a hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101	a	hello world
+0	\\0101 a hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-en	q\\cz	\\x41\\x4	q\\cz
+0	-- -en q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-en	q\\cz	\\x41\\x4	q\\cz
+0	-- -en q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-en	q\\cz	\\x41\\x4	q\\cz
+0	-- -en q\\cz \\x41\\x4 q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-en	q\\cz	\\x41\\x4	q\\cz
+0	-- -en q\\cz \\x41\\x4 q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-n	hello world
+0	-n hello world	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-n	hello world
+0	-n hello world	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-n	hello world
+0	hello world	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-n	hello world
+0	hello world	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	it's	%
+0	%% it's %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	it's	%
+0	%% it's %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	it's	%
+0	%% it's %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	it's	%
+0	%% it's %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	q\\cz
+0	tab\x09here q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	q\\cz
+0	tab\x09here q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	q\\cz
+0	tab\x09here q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	q\\cz
+0	tab\x09here q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	a\\tb	hello world
+0	%% a\x09b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	a\\tb	hello world
+0	%% a\x09b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	a\\tb	hello world
+0	%% a\\tb hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	a\\tb	hello world
+0	%% a\\tb hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	x\\101y
+0	\\x41\\x4 xAy\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	x\\101y
+0	\\x41\\x4 xAy\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	x\\101y
+0	\\x41\\x4 x\\101y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	x\\101y
+0	\\x41\\x4 x\\101y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\\0101	
+0	it's A \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\\0101	
+0	it's A \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\\0101	
+0	it's \\0101 \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\\0101	
+0	it's \\0101 \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E	-e	back\\slash	hello world
+0	-E -e back\\slash hello world	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E	-e	back\\slash	hello world
+0	-E -e back\\slash hello world	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E	-e	back\\slash	hello world
+0	back\\slash hello world	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E	-e	back\\slash	hello world
+0	back\\slash hello world	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	-x	-en	-en
+0	-ne -x -en -en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	-x	-en	-en
+0	-ne -x -en -en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	-x	-en	-en
+0	-x -en -en	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	-x	-en	-en
+0	-x -en -en	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y	a	tab\x09here
+0	xAy a tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y	a	tab\x09here
+0	xAy a tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y	a	tab\x09here
+0	x\\101y a tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y	a	tab\x09here
+0	x\\101y a tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	\xc3\xa9	%%
+0	%% \xc3\xa9 %%\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	\xc3\xa9	%%
+0	%% \xc3\xa9 %%\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	\xc3\xa9	%%
+0	%% \xc3\xa9 %%\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	\xc3\xa9	%%
+0	%% \xc3\xa9 %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	it's	back\\slash	q\\cz
+0	-nE it's back\\slash q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	it's	back\\slash	q\\cz
+0	-nE it's back\\slash q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	it's	back\\slash	q\\cz
+0	it's back\\slash q\\cz	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	it's	back\\slash	q\\cz
+0	it's back\\slash q\\cz	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\\x41\\x4	tab\x09here
+0	it's \\x41\\x4 tab\x09here\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\\x41\\x4	tab\x09here
+0	it's \\x41\\x4 tab\x09here\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\\x41\\x4	tab\x09here
+0	it's \\x41\\x4 tab\x09here\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\\x41\\x4	tab\x09here
+0	it's \\x41\\x4 tab\x09here\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a
+0	a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a
+0	a\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a
+0	a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a
+0	a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	
+0	\\x41\\x4 \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\x41\\x4	
+0	\\x41\\x4 \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	
+0	\\x41\\x4 \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\x41\\x4	
+0	\\x41\\x4 \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-e	a	-n
+0	-E -e a -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E	-e	a	-n
+0	-E -e a -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-e	a	-n
+0	a -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E	-e	a	-n
+0	a -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	hello world
+0	back\\slash hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	hello world
+0	back\\slash hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	hello world
+0	back\\slash hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	hello world
+0	back\\slash hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	\xc3\xa9
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	\xc3\xa9
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	\xc3\xa9
+0	q\\cz it's \xc3\xa9\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	\xc3\xa9
+0	q\\cz it's \xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-E
+0	-nE -E\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-E
+0	-nE -E\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-E
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-E
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	
+0	-nE \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	
+0	-nE \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	a"b	\xc3\xa9
+0	-nE a"b \xc3\xa9\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	a"b	\xc3\xa9
+0	-nE a"b \xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	a"b	\xc3\xa9
+0	a"b \xc3\xa9	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	a"b	\xc3\xa9
+0	a"b \xc3\xa9	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a"b	back\\slash
+0	a"b back\\slash	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a"b	back\\slash
+0	a"b back\\slash	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a"b	back\\slash
+0	a"b back\\slash	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a"b	back\\slash
+0	a"b back\\slash	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	a\\tb
+0	it's a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	a\\tb
+0	it's a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	a\\tb
+0	it's a\\tb\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	a\\tb
+0	it's a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y	a\\tb	back\\slash
+0	xAy a\x09b back\\slash\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	x\\101y	a\\tb	back\\slash
+0	xAy a\x09b back\\slash\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y	a\\tb	back\\slash
+0	x\\101y a\\tb back\\slash\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	x\\101y	a\\tb	back\\slash
+0	x\\101y a\\tb back\\slash\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	q\\cz
+0	hello world q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	q\\cz
+0	hello world q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	q\\cz
+0	hello world q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	q\\cz
+0	hello world q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here
+0	tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here
+0	tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here
+0	tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here
+0	tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E
+0	-E\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-E
+0	-E\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-E
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9	\\0101	\\x41\\x4
+0	\xc3\xa9 A \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9	\\0101	\\x41\\x4
+0	\xc3\xa9 A \\x41\\x4\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9	\\0101	\\x41\\x4
+0	\xc3\xa9 \\0101 \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9	\\0101	\\x41\\x4
+0	\xc3\xa9 \\0101 \\x41\\x4\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	a"b
+0	% a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	a"b
+0	% a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	a"b
+0	% a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	a"b
+0	% a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	q\\cz
+0	a q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	q\\cz
+0	a q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	q\\cz
+0	a q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	q\\cz
+0	a q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	%
+0	tab\x09here %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	%
+0	tab\x09here %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	%
+0	tab\x09here %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	%
+0	tab\x09here %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo		tab\x09here
+0	 tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo		tab\x09here
+0	 tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo		tab\x09here
+0	 tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo		tab\x09here
+0	 tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	q\\cz	x\\101y
+0	% q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	q\\cz	x\\101y
+0	% q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	q\\cz	x\\101y
+0	% q\\cz x\\101y\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	q\\cz	x\\101y
+0	% q\\cz x\\101y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	back\\slash	a\\tb
+0	-e back\\slash a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	back\\slash	a\\tb
+0	-e back\\slash a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	back\\slash	a\\tb
+0	back\\slash a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	back\\slash	a\\tb
+0	back\\slash a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	%	tab\x09here
+0	-nE % tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	%	tab\x09here
+0	-nE % tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	%	tab\x09here
+0	% tab\x09here	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	%	tab\x09here
+0	% tab\x09here	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	back\\slash	\\0101
+0	%% back\\slash A\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	back\\slash	\\0101
+0	%% back\\slash A\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	back\\slash	\\0101
+0	%% back\\slash \\0101\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	back\\slash	\\0101
+0	%% back\\slash \\0101\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	\xc3\xa9
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	\xc3\xa9
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	\xc3\xa9
+0	q\\cz it's \xc3\xa9\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	\xc3\xa9
+0	q\\cz it's \xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo		
+0	 \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo		
+0	 \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo		
+0	 \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo		
+0	 \x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	%%
+0	-e %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	%%
+0	-e %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	%%
+0	%%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	%%
+0	%%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	%%
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	it's	%%
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	%%
+0	q\\cz it's %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	it's	%%
+0	q\\cz it's %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-n	it's
+0	-nE -n it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-n	it's
+0	-nE -n it's\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-n	it's
+0	it's	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-n	it's
+0	it's	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	%
+0	%\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	%
+0	%\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	%
+0	%\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	%
+0	%\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	q\\cz
+0	-x q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	q\\cz
+0	-x q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	q\\cz
+0	-x q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	q\\cz
+0	-x q\\cz\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-x	-x	-ne	x\\101y		
+0	-- -x -x -ne xAy  \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-x	-x	-ne	x\\101y		
+0	-- -x -x -ne xAy  \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-x	-x	-ne	x\\101y		
+0	-- -x -x -ne x\\101y  \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-x	-x	-ne	x\\101y		
+0	-- -x -x -ne x\\101y  \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	hello world	%%
+0	hello world hello world %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	hello world	%%
+0	hello world hello world %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	hello world	%%
+0	hello world hello world %%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	hello world	%%
+0	hello world hello world %%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	-en	\\x41\\x4	\\0101
+0	-e -en \\x41\\x4 A	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	-en	\\x41\\x4	\\0101
+0	-e -en \\x41\\x4 A	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	-en	\\x41\\x4	\\0101
+0	A\x04 A	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	-en	\\x41\\x4	\\0101
+0	A\x04 A	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a\\tb	hello world
+0	-- a\x09b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a\\tb	hello world
+0	-- a\x09b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a\\tb	hello world
+0	-- a\\tb hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a\\tb	hello world
+0	-- a\\tb hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	a\\tb
+0	tab\x09here a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	a\\tb
+0	tab\x09here a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	a\\tb
+0	tab\x09here a\\tb\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	a\\tb
+0	tab\x09here a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	it's	a\\tb
+0	-ne it's a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	it's	a\\tb
+0	-ne it's a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	it's	a\\tb
+0	it's a\x09b	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	it's	a\\tb
+0	it's a\x09b	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\xc3\xa9	q\\cz
+0	it's \xc3\xa9 q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	\xc3\xa9	q\\cz
+0	it's \xc3\xa9 q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\xc3\xa9	q\\cz
+0	it's \xc3\xa9 q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	\xc3\xa9	q\\cz
+0	it's \xc3\xa9 q\\cz\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-ne	tab\x09here	q\\cz	back\\slash
+0	-- -ne tab\x09here q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-ne	tab\x09here	q\\cz	back\\slash
+0	-- -ne tab\x09here q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-ne	tab\x09here	q\\cz	back\\slash
+0	-- -ne tab\x09here q\\cz back\\slash\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-ne	tab\x09here	q\\cz	back\\slash
+0	-- -ne tab\x09here q\\cz back\\slash\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b
+0	a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b
+0	a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b
+0	a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b
+0	a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz
+0	q\\cz\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	-n	tab\x09here
+0	%% -n tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%	-n	tab\x09here
+0	%% -n tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	-n	tab\x09here
+0	%% -n tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%	-n	tab\x09here
+0	%% -n tab\x09here\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9	a\\tb
+0	\xc3\xa9 a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9	a\\tb
+0	\xc3\xa9 a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9	a\\tb
+0	\xc3\xa9 a\\tb\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9	a\\tb
+0	\xc3\xa9 a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-E	a	%%	tab\x09here
+0	-en -E a %% tab\x09here\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-E	a	%%	tab\x09here
+0	-en -E a %% tab\x09here\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-E	a	%%	tab\x09here
+0	a %% tab\x09here	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-E	a	%%	tab\x09here
+0	a %% tab\x09here	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	%
+0	-x %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-x	%
+0	-x %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	%
+0	-x %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-x	%
+0	-x %\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101	a"b	x\\101y
+0	A a"b xAy\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\0101	a"b	x\\101y
+0	A a"b xAy\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101	a"b	x\\101y
+0	\\0101 a"b x\\101y\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\0101	a"b	x\\101y
+0	\\0101 a"b x\\101y\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	x\\101y	\\x41\\x4
+0	% xAy \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%	x\\101y	\\x41\\x4
+0	% xAy \\x41\\x4\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	x\\101y	\\x41\\x4
+0	% x\\101y \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%	x\\101y	\\x41\\x4
+0	% x\\101y \\x41\\x4\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-x	a"b
+0	-nE -x a"b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-x	a"b
+0	-nE -x a"b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-x	a"b
+0	-x a"b	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-x	a"b
+0	-x a"b	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E
+0	-E	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-E
+0	-E	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E
+0		
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-E
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world
+0	hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world
+0	hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world
+0	hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world
+0	hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%
+0	%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%
+0	%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%
+0	%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%
+0	%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	a"b	-n
+0	back\\slash a"b -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	back\\slash	a"b	-n
+0	back\\slash a"b -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	a"b	-n
+0	back\\slash a"b -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	back\\slash	a"b	-n
+0	back\\slash a"b -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	-x	-n
+0	-ne -x -n\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne	-x	-n
+0	-ne -x -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	-x	-n
+0	-x -n	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne	-x	-n
+0	-x -n	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	\\x41\\x4
+0	tab\x09here \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	tab\x09here	\\x41\\x4
+0	tab\x09here \\x41\\x4\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	\\x41\\x4
+0	tab\x09here \\x41\\x4\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	tab\x09here	\\x41\\x4
+0	tab\x09here \\x41\\x4\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-en	%
+0	-en -en %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en	-en	%
+0	-en -en %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-en	%
+0	%	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en	-en	%
+0	%	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	a"b	a\\tb
+0	a\x09b a"b a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	a"b	a\\tb
+0	a\x09b a"b a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	a"b	a\\tb
+0	a\\tb a"b a\\tb\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	a"b	a\\tb
+0	a\\tb a"b a\\tb\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-ne
+0	-- -ne\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-ne
+0	-- -ne\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-ne
+0	-- -ne\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-ne
+0	-- -ne\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\xc3\xa9	tab\x09here	-n
+0	-e \xc3\xa9 tab\x09here -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\xc3\xa9	tab\x09here	-n
+0	-e \xc3\xa9 tab\x09here -n\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\xc3\xa9	tab\x09here	-n
+0	\xc3\xa9 tab\x09here -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\xc3\xa9	tab\x09here	-n
+0	\xc3\xa9 tab\x09here -n\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	q\\cz	%
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	q\\cz	%
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	q\\cz	%
+0	q\\cz q\\cz %\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	q\\cz	%
+0	q\\cz q\\cz %\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	%%	it's
+0	it's %% it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	it's	%%	it's
+0	it's %% it's\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	%%	it's
+0	it's %% it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	it's	%%	it's
+0	it's %% it's\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	q\\cz
+0	-e q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	q\\cz
+0	-e q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	q\\cz
+0	q	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	q\\cz
+0	q	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a\\tb
+0	a\x09b	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a\\tb
+0	a\x09b	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a\\tb
+0	a\\tb	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a\\tb
+0	a\\tb	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	hello world	hello world
+0	q	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	q\\cz	hello world	hello world
+0	q	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	hello world	hello world
+0	q\\cz hello world hello world\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	q\\cz	hello world	hello world
+0	q\\cz hello world hello world\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-E
+0	-nE -E\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-nE	-E
+0	-nE -E\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-E
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-nE	-E
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	hello world
+0	a"b hello world\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	it's
+0	it's	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	it's
+0	it's	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	it's
+0	it's	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	it's
+0	it's	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-x
+0	-- -x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	-x
+0	-- -x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-x
+0	-- -x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	-x
+0	-- -x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	%%	hello world	\\0101
+0	%% hello world A	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	%%	hello world	\\0101
+0	%% hello world A	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	%%	hello world	\\0101
+0	%% hello world \\0101	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	%%	hello world	\\0101
+0	%% hello world \\0101	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-en
+0	-en\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-en
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	
+0	a\x09b \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	
+0	a\x09b \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	
+0	a\\tb \x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	
+0	a\\tb \x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	%%
+0	%%\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	back\\slash	a"b
+0	a back\\slash a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a	back\\slash	a"b
+0	a back\\slash a"b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	back\\slash	a"b
+0	a back\\slash a"b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a	back\\slash	a"b
+0	a back\\slash a"b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	hello world	a
+0	hello world a\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	-n
+0	a"b -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a"b	-n
+0	a"b -n\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	-n
+0	a"b -n\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a"b	-n
+0	a"b -n\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\xc3\xa9
+0	\xc3\xa9\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne
+0	-ne\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-ne
+0	-ne\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne
+0		
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-ne
+0		
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	it's
+0	a\x09b it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb	it's
+0	a\x09b it's\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	it's
+0	a\\tb it's\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb	it's
+0	a\\tb it's\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo
+0	\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo
+0	\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\1|\\101|\\0101|\\01011|\\08|\\E|\\x41|\\x|\\xg
+0	-e \x01|A|A|A1|\x008|\\E|\\x41|\\x|\\xg\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\\1|\\101|\\0101|\\01011|\\08|\\E|\\x41|\\x|\\xg
+0	-e \x01|A|A|A1|\x008|\\E|\\x41|\\x|\\xg\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\1|\\101|\\0101|\\01011|\\08|\\E|\\x41|\\x|\\xg
+0	\\1|\\101|A|A1|\x008|\x1b|A|\\x|\\xg\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\\1|\\101|\\0101|\\01011|\\08|\\E|\\x41|\\x|\\xg
+0	\\1|\\101|A|A1|\x008|\x1b|A|\\x|\\xg\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\1|\\101|\\0101|\\E|\\e|\\x41
+0	\x01|A|A|\\E|\x1b|\\x41\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	\\1|\\101|\\0101|\\E|\\e|\\x41
+0	\x01|A|A|\\E|\x1b|\\x41\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\1|\\101|\\0101|\\E|\\e|\\x41
+0	\\1|\\101|\\0101|\\E|\\e|\\x41\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	\\1|\\101|\\0101|\\E|\\e|\\x41
+0	\\1|\\101|\\0101|\\E|\\e|\\x41\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x
+0	-e \xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	\xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x
+0	-e \xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x
+0	\xe2\x82\xac|A|\\u|\\uG|\xe1\x88\xb45|\\U0001F600|\\uD800|\\uDFFF|\\u0080|\xef\xbf\xbf|\\U0010FFFF|\\U00110000|\\U7FFFFFFF||\\U123456789|\x00x\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	\xe2\x82\xac|\\u41|\\u|\\uG|\xe1\x88\xb45|\\U1F600|\\Ud800|\\uDFFF|\\u80|\xef\xbf\xbf|\\U10FFFF|\\U110000|\\U7FFFFFFF|\\U80000000|\\U123456789|\\u0x
+0	\xe2\x82\xac|A|\\u|\\uG|\xe1\x88\xb45|\xf0\x9f\x98\x80|\xed\xa0\x80|\xed\xbf\xbf|\xc2\x80|\xef\xbf\xbf|\xf4\x8f\xbf\xbf|\xf4\x90\x80\x80|\xfd\xbf\xbf\xbf\xbf\xbf||\xfc\x92\x8d\x85\x99\xb89|\x00x\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	-n	-E	a\\tb
+0	-e -n -E a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	-n	-E	a\\tb
+0	-e -n -E a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	-n	-E	a\\tb
+0	a\\tb	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	-n	-E	a\\tb
+0	a\\tb	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	a\\tb
+0	-e a\x09b	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-e	a\\tb
+0	-e a\x09b	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	a\\tb
+0	a\x09b	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-e	a\\tb
+0	a\x09b	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-n	a
+0	-n a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	-n	a
+0	-n a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-n	a
+0	a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	-n	a
+0	a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a
+0	-- a\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	--	a
+0	-- a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a
+0	-- a\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	--	a
+0	-- a\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	-x	a\\tb
+0	-e -x a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	-x	a\\tb
+0	-e -x a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	-x	a\\tb
+0	-x a\x09b\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	-x	a\\tb
+0	-x a\x09b\x0a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\cb	c
+0	-e a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\cb	c
+0	-e a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\cb	c
+0	a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\cb	c
+0	a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\cb	c
+0	a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\cb	c
+0	a	
+LC_ALL=C	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\cb	c
+0	a\\cb c\x0a	
+LC_ALL=C.UTF-8	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\cb	c
+0	a\\cb c\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\tb
+0	-e a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-e	a\\tb
+0	-e a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-e	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	a\\tb
+0	a\x09b\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	a\\tb
+0	a\\tb\x0a	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a\\tb
+0	a\x09b	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=dash	--	echo	-n	a\\tb
+0	a\x09b	
+LC_ALL=C	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a\\tb
+0	a\\tb	
+LC_ALL=C.UTF-8	POSIXLY_CORRECT=1	PROC_SHELLSPAWN_ECHO=bash	--	echo	-n	a\\tb
+0	a\\tb	

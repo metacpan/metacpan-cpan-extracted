@@ -1,5 +1,41 @@
 Revision history for Database-BI
 
+0.022.0	Mon Nov  9 10:33:59 AM EST 2026
+	[ Enhancements ]
+	- American English: a browser asking for en-US gets the pages in American
+	  spelling (templates/web/en-us/); language => 'en-us' makes it the
+	  default.
+	- Messages from the server follow the same language: the browser's for
+	  pages and replies, the locale (LANG) for the scripts.
+	- A table or pivot of more than one page says how many there are
+	  ("Page 2 of 7").  A SQLite table is counted once, and again only
+	  when the file changes.
+	- Rows per page: a list under a long table or pivot (25, 50, 100, 200,
+	  All), and a default for it on the Preferences page.  per_page=0 is
+	  every row.
+	- The line graph can draw a trend line (least squares), with its slope
+	  and R squared, beside Min, Avg and Max.
+	- The Preferences page's breadcrumb leads back to the page it was
+	  opened from.
+	- Map places found online, extracts, the page cache and a table cache on
+	  disc are kept where Object::Configure's cache_dir, CACHEDIR, CACHE_DIR
+	  or cache_dir in database_bi.conf says, else where they were.
+	[ Bug fixes ]
+	- A number too large for the browser (1e999) is not a number on a perl
+	  built with long doubles either (GitHub #6).
+	- Sorting a table of more than one page sorts every row, so page 1 is the
+	  start of the sorted table; it sorted only the rows on the page.
+	- A code with digits in it (T27, CT4) sorts as text, not as its digits;
+	  totals and charts on the page read numbers the same strict way.
+	- A quote inside a quoted CSV field written as two quotes
+	  ("Adeste ""Overture""") shows as one quote, not two.
+	- A table whose file name has a capital letter (BandMusic.csv) can be
+	  pivoted, charted and merged; only its own page opened.
+	[ Other ]
+	- Database::Abstraction 0.56; CGI::Lingua 0.88, which reads the locale
+	  for the scripts' messages; Object::Configure 0.25; Statistics::LineFit
+	  and Statistics::Lite.
+
 0.021.0	Sat Nov  7 03:26:25 PM EST 2026
 	[ Security ]
 	- Optional login (password_hash, made by script/database-bi password),

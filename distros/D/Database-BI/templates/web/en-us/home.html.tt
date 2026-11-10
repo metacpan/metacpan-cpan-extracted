@@ -1,0 +1,444 @@
+[%- WRAPPER 'web/en/layouts/default.html.tt' -%]
+
+[% IF error %]
+<p class="error">[% error | html %]</p>
+[% IF hint %]<p class="hint">[% hint | html %]</p>[% END %]
+[% END %]
+
+[%- IF back_url %]
+<p class="back-link"><a href="[% back_url | html %]">&larr; [% back_label || 'Back' | html %]</a></p>
+[%- END %]
+
+[% IF tables.size %]
+<ul class="db-list">
+  [% FOREACH t IN tables %]
+  <li>
+    <a href="/view/[% t.name | uri %]" class="db-card"[% IF t.path %] data-path="[% t.path | html %]"[% END %]>
+      <span class="db-icon">&#128452;</span>
+      <span class="db-name">[% t.name | html %]</span>
+      <span class="db-file">[% t.file | html %]</span>
+    </a>
+  </li>
+  [% END %]
+</ul>
+[% ELSE %]
+<p class="empty-state">
+  No data files found in the <code>data/</code> directory.<br>
+  Add a <code>.csv</code>, <code>.tsv</code>, <code>.psv</code>, <code>.xml</code>, <code>.json</code>, <code>.sql</code>, <code>.db</code> or <code>.xlsx</code> file there and restart, or drop a file below.
+</p>
+[% END %]
+
+<script nonce="[% csp_nonce | html %]">
+// Hover tooltips for db-cards in the "choose a database" list.
+// Shows file type (with table count for SQLite), modified date, and size.
+(function () {
+  function fmtDate(iso) {
+    try {
+      return new Date(iso).toLocaleString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+    } catch (e) { return iso; }
+  }
+  function fmtSize(bytes) {
+    if (bytes == null) return '';
+    if (bytes < 1024)        return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+  function txt(s) {
+    var d = document.createElement('span');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  function fileTypeLabel(path, tableCount) {
+    var ext = (path || '').split('.').pop().toLowerCase();
+    if (ext === 'csv')  return 'CSV file';
+    if (ext === 'tsv')  return 'TSV file';
+    if (ext === 'psv')  return 'PSV file';
+    if (ext === 'xlsx' || ext === 'xls') return 'Excel spreadsheet';
+    if (ext === 'xml')  return 'XML file';
+    if (ext === 'sql' || ext === 'sqlite' || ext === 'sqlite3' || ext === 'db') {
+      return 'SQLite database'
+        + (tableCount != null ? ' - ' + tableCount + ' table' + (tableCount !== 1 ? 's' : '') : '');
+    }
+    return 'Data file';
+  }
+
+  document.querySelectorAll('.db-card[data-path]').forEach(function (card, i) {
+    var path = card.getAttribute('data-path');
+    var li   = card.parentNode;
+    li.style.position = 'relative';
+
+    var tip = document.createElement('div');
+    // Always display below the card: the file-list sits near the page top so
+    // the default above-positioning would be clipped by the viewport edge.
+    tip.className    = 'file-tooltip tip-below';
+    tip.id           = 'db-tip-' + i;
+    tip.setAttribute('role', 'tooltip');
+    // The size and date are fetched once the tip is shown, so what is said
+    // about the file arrives after the card has been focused.
+    tip.setAttribute('aria-live', 'polite');
+    tip.style.display = 'none';
+    li.appendChild(tip);
+
+    // Focus and hover ask the same question, so they get the same answer: a
+    // keyboard reader who tabs onto the card is shown what a pointer reader is.
+    card.setAttribute('aria-describedby', tip.id);
+
+    var statDone = false;
+
+    function showTip() {
+      tip.style.display = 'block';
+
+      if (statDone) return;
+      statDone = true;
+      tip.innerHTML = '<span class="tip-muted">Loading...</span>';
+
+      fetch('/api/stat?path=' + encodeURIComponent(path))
+        .then(function (res) { return res.json(); })
+        .then(function (d) {
+          if (!d.exists) {
+            tip.innerHTML = '<span class="tip-muted">&#x26A0; File not found on disc</span>';
+            return;
+          }
+          var typeStr = fileTypeLabel(path, d.table_count);
+          tip.innerHTML = '<div class="tip-name">' + txt(typeStr) + '</div>'
+            + '<div>&#x1F4C5; Modified: ' + txt(fmtDate(new Date(d.mtime * 1000).toISOString())) + '</div>'
+            + '<div class="tip-muted">' + txt(fmtSize(d.size)) + '</div>';
+        })
+        .catch(function () { tip.innerHTML = ''; });
+    }
+
+    function hideTip() { tip.style.display = 'none'; }
+
+    card.addEventListener('mouseenter', showTip);
+    card.addEventListener('focus',      showTip);
+    card.addEventListener('mouseleave', hideTip);
+    card.addEventListener('blur',       hideTip);
+  });
+}());
+</script>
+
+[% PROCESS "web/en/layouts/canvas_list.html.tt" %]
+<div id="bi-recent"></div>
+<div id="bi-saved"></div>
+
+<div class="home-drop-zone" id="home-drop-zone" aria-label="Drop a database file here to open it">
+  <span class="home-drop-zone-icon" aria-hidden="true">&#x1F4C2;</span>
+  <span>Drop a database file to open it</span>
+  <span class="home-drop-hint">CSV &middot; TSV &middot; PSV &middot; XML &middot; JSON &middot; SQLite (.sql) &middot; Berkeley DB (.db) &middot; XLSX</span>
+</div>
+
+<div class="home-action-cards">
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#128269;</span>
+    <h2 class="action-card-title">Browse your files</h2>
+    <p class="action-card-desc">Type a path directly, or navigate your folders to find a data file.</p>
+    <form action="/open" method="GET" class="action-url-form" novalidate>
+      <div class="with-tooltip">
+        <input type="text" name="path" id="bi-path-input"
+               placeholder="/path/to/file.csv"
+               autocomplete="off" class="action-url-input"
+               aria-label="File path">
+        <div class="tip-box" role="tooltip">
+          Enter an absolute path to a local file, or use the remote
+          syntax to open a file via SSH:<br><br>
+          <code>/../hostname/dir/file.csv</code><br>
+          <code>/../user@hostname/dir/file.csv</code><br><br>
+          To open a Redis table (optional Redis module required):<br>
+          <code>redis:tablename|redis://host:port</code><br>
+          Or enter a bare URL to browse available keys:<br>
+          <code>redis://host:port</code><br><br>
+          For a table on a configured MariaDB server:<br>
+          <code>mariadb:server/table</code><br><br>
+          Accepted: CSV, TSV, PSV, XLSX, SQLite (.sql / .sqlite /
+          .sqlite3), Berkeley DB (.db), XML, JSON, Redis, MariaDB.
+        </div>
+      </div>
+      <div class="action-url-row">
+        <button type="submit" class="btn-action">Open</button>
+        <a href="/browse" class="btn-action">Browse filesystem&hellip;</a>
+      </div>
+    </form>
+  </div>
+
+  [%- IF mariadb_server_names.size %]
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#128451;</span>
+    <h2 class="action-card-title">Database servers</h2>
+    <p class="action-card-desc">Browse the tables on a MariaDB server set up for this site.</p>
+    <div class="action-url-row">
+      [%- FOREACH server IN mariadb_server_names %]
+      <a href="/tables?l=mariadb:[% server | uri %]" class="btn-action">[% server | html %]</a>
+      [%- END %]
+    </div>
+  </div>
+  [%- END %]
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#128218;</span>
+    <h2 class="action-card-title">New here? Read the tutorial</h2>
+    <p class="action-card-desc">A short guide in plain English, from opening a file to saving a chart.</p>
+    <a href="/tutorial" class="btn-action" target="_blank" rel="noopener"
+       title="Open the tutorial in a new tab (F1)">Open the tutorial</a>
+  </div>
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#127760;</span>
+    <h2 class="action-card-title">Import from a web page</h2>
+    <p class="action-card-desc">Paste the address of any web page that contains a data table and we&rsquo;ll pull it in.</p>
+    <form action="/import" method="GET" class="action-url-form" novalidate>
+      <input type="url" name="url" id="bi-url-input"
+             placeholder="https://&hellip;"
+             required autocomplete="off" class="action-url-input"
+             aria-label="Web page URL">
+      <div class="action-url-row">
+        <label for="bi-table-idx" class="action-idx-label"
+               title="If the page has more than one table, enter its position (0 = first)">
+          Table # <input type="number" name="table_index" id="bi-table-idx"
+                             min="0" value="0" class="action-idx-input">
+        </label>
+        <button type="submit" class="btn-action">Import</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#x1F4CB;</span>
+    <h2 class="action-card-title">Dataset catalog</h2>
+    <p class="action-card-desc">Browse all data files in the data directory with file type, size, last-modified date, and row count.</p>
+    <a href="/catalog" class="btn-action">View catalog</a>
+  </div>
+
+  <div class="action-card">
+    <span class="action-card-icon" aria-hidden="true">&#x1F9F9;</span>
+    <h2 class="action-card-title">Clear upload cache</h2>
+    <p class="action-card-desc">Remove files that were temporarily uploaded to this application and free up disc space.</p>
+    <button type="button" class="btn-action" id="btn-clear-uploads">Clear upload cache</button>
+  </div>
+
+</div>
+
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  try {
+    function fmtDate(iso) {
+      try {
+        return new Date(iso).toLocaleString(undefined, {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit',
+        });
+      } catch (e) { return iso; }
+    }
+
+    function fmtSize(bytes) {
+      if (bytes == null) return '';
+      if (bytes < 1024)        return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function txt(s) {
+      var d = document.createElement('span');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // Build a recent-files section and inject it into containerId.
+    // eagerStat=true: fetch /api/stat on page load (for saved files); gray out missing ones.
+    // fromTag: when set, appended as &from=<fromTag> so the destination page
+    // knows the navigation originated from this section and can suppress
+    // duplicate tracking (e.g. saved files not re-added to recently-opened).
+    function makeSection(containerId, heading, icon, entries, eagerStat, fromTag) {
+      if (!entries.length) return;
+      var storageKey = containerId === 'bi-recent' ? 'bi:recent' : 'bi:saved';
+      var section = document.createElement('section');
+      section.className = 'recent-section';
+      var h2 = document.createElement('h2');
+      h2.className = 'section-heading';
+      h2.textContent = heading;
+      section.appendChild(h2);
+
+      var ul = document.createElement('ul');
+      ul.className = 'db-list';
+
+      entries.forEach(function (r, i) {
+        var path = r.path || (function () {
+          var m = r.href ? r.href.match(/[?&]path=([^&]+)/) : null;
+          return m ? decodeURIComponent(m[1]) : null;
+        }());
+        var href = r.href || (path ? '/open?path=' + encodeURIComponent(path) : '#');
+        if (fromTag && href !== '#') {
+          href += (href.indexOf('?') === -1 ? '?' : '&') + 'from=' + encodeURIComponent(fromTag);
+        }
+
+        var li = document.createElement('li');
+        li.style.position = 'relative';
+
+        var card = document.createElement('a');
+        card.href = href;
+        card.className = 'db-card';
+        card.innerHTML = '<span class="db-icon" aria-hidden="true">' + icon + '</span>'
+                       + '<span class="db-name">' + txt(r.name) + '</span>';
+        li.appendChild(card);
+
+        var tip = document.createElement('div');
+        tip.className = 'file-tooltip';
+        tip.id        = containerId + '-tip-' + i;
+        tip.setAttribute('role', 'tooltip');
+        tip.setAttribute('aria-live', 'polite');
+        tip.style.display = 'none';
+
+        // The card names the tip it is described by, so tabbing to it says what
+        // hovering it shows - including the size and date a fetch adds later.
+        card.setAttribute('aria-describedby', tip.id);
+
+        var timeLabel = r.lastSaved ? 'Saved: ' : 'Opened: ';
+        var timeVal   = r.lastSaved || r.lastOpened;
+        tip.innerHTML = '<div class="tip-name">' + txt(r.name) + '</div>'
+          + (path ? '<div class="tip-path">&#x1F4C1; ' + txt(path) + '</div>' : '')
+          + (!path && r.url ? '<div class="tip-path">&#x1F30D; ' + txt(r.url) + '</div>' : '')
+          + (timeVal ? '<div>\u{1F55B} ' + timeLabel + txt(fmtDate(timeVal)) + '</div>' : '');
+
+        var mtimeEl = document.createElement('div');
+        var sizeEl  = document.createElement('div');
+        sizeEl.className = 'tip-muted';
+        tip.appendChild(mtimeEl);
+        tip.appendChild(sizeEl);
+        li.appendChild(tip);
+
+        var statDone = false;
+
+        // For saved entries: eagerly check existence on page load so the icon
+        // goes gray immediately rather than only after the first hover.
+        if (eagerStat && path) {
+          fetch('/api/stat?path=' + encodeURIComponent(path))
+            .then(function (res) { return res.json(); })
+            .then(function (d) {
+              statDone = true;
+              if (d.exists) {
+                mtimeEl.innerHTML = '&#x1F4C5; Modified: '
+                  + txt(fmtDate(new Date(d.mtime * 1000).toISOString()));
+                sizeEl.textContent = fmtSize(d.size);
+              } else {
+                card.classList.add('db-card--missing');
+                card.title = 'File no longer exists on disc';
+                card.addEventListener('click', function (e) { e.preventDefault(); });
+                mtimeEl.innerHTML = '<span class="tip-muted">\u26A0 File not found on disc</span>';
+                sizeEl.textContent = '';
+              }
+            })
+            .catch(function () { statDone = true; });
+        }
+
+        // Focus and hover ask the same question, so they get the same answer.
+        function showTip() {
+          tip.style.display = 'block';
+          var rect = tip.getBoundingClientRect();
+          tip.classList.toggle('tip-below', rect.top < 0);
+
+          // For opened entries: lazy stat fetch on first hover (saved entries pre-fetch on load).
+          if (statDone || !path || eagerStat) return;
+          statDone = true;
+          mtimeEl.innerHTML = '<span class="tip-muted">Loading...</span>';
+
+          fetch('/api/stat?path=' + encodeURIComponent(path))
+            .then(function (res) { return res.json(); })
+            .then(function (d) {
+              if (d.exists) {
+                mtimeEl.innerHTML = '&#x1F4C5; Modified: '
+                  + txt(fmtDate(new Date(d.mtime * 1000).toISOString()));
+                sizeEl.textContent = fmtSize(d.size);
+              } else {
+                mtimeEl.innerHTML = '<span class="tip-muted">\u26A0 File not found on disc</span>';
+                sizeEl.textContent = '';
+              }
+            })
+            .catch(function () { mtimeEl.textContent = ''; });
+        }
+
+        function hideTip() { tip.style.display = 'none'; }
+
+        card.addEventListener('mouseenter', showTip);
+        card.addEventListener('focus',      showTip);
+        card.addEventListener('mouseleave', hideTip);
+        card.addEventListener('blur',       hideTip);
+
+        // Trash-can remove button -- hidden until the card is hovered (CSS).
+        var removeBtn = document.createElement('button');
+        removeBtn.type      = 'button';
+        removeBtn.className = 'recent-remove';
+        removeBtn.title     = 'Remove from ' + heading + ' list';
+        removeBtn.setAttribute('aria-label',
+          'Remove ' + r.name + ' from ' + heading + ' list');
+        removeBtn.innerHTML = '&#x1F5D1;';
+        removeBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          if (!confirm('Remove "' + r.name + '" from the ' + heading + ' list?')) return;
+          try {
+            var items = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            items = items.filter(function (x) { return x.href !== r.href; });
+            localStorage.setItem(storageKey, JSON.stringify(items));
+          } catch (ex) {}
+          li.remove();
+          if (!ul.querySelector('li')) section.remove();
+        });
+        li.appendChild(removeBtn);
+
+        ul.appendChild(li);
+      });
+
+      section.appendChild(ul);
+      document.getElementById(containerId).appendChild(section);
+    }
+
+    makeSection('bi-recent', 'Recently opened', '&#128202;',
+      JSON.parse(localStorage.getItem('bi:recent') || '[]'), false);
+
+    makeSection('bi-saved', 'Recently saved', '&#128190;',
+      JSON.parse(localStorage.getItem('bi:saved') || '[]'), true, 'saved');  // eagerStat=true; fromTag='saved'
+
+  } catch (e) {}
+}());
+</script>
+
+
+<script nonce="[% csp_nonce | html %]">
+(function () {
+  var btn = document.getElementById('btn-clear-uploads');
+  if (!btn) return;
+
+  function fmtSize(bytes) {
+    if (bytes < 1024)        return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  btn.addEventListener('click', function () {
+    btn.disabled    = true;
+    btn.textContent = 'Clearing...';
+    fetch('/uploads/clear', { method: 'POST' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        btn.disabled    = false;
+        btn.textContent = 'Clear upload cache';
+        if (d.count === 0) {
+          alert('The upload cache is already empty.');
+        } else {
+          alert(d.count + ' file' + (d.count === 1 ? '' : 's') + ' removed.\n'
+            + fmtSize(d.freed) + ' of disc space recovered.');
+        }
+      })
+      .catch(function () {
+        btn.disabled    = false;
+        btn.textContent = 'Clear upload cache';
+        alert('Failed to clear upload cache - check the server log.');
+      });
+  });
+}());
+</script>
+
+[%- END -%]

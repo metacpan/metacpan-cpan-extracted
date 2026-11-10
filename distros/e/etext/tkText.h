@@ -40,6 +40,9 @@
 #include "tk.h"
 #endif
 
+#include "tkTextData.h"		/* The containers of values (TkTextData);
+				 * their operations are at the end. */
+
 
 /*
  * Opaque types for structures whose guts are only needed by a single
@@ -61,6 +64,11 @@ typedef struct TkTextLine {
 					 * means end of list. */
     struct TkTextSegment *segPtr;	/* First in ordered list of segments
 					 * that make up the line. */
+    TkTextData value;			/* The data of the line as a leaf of
+					 * a block (its Lang part: "block
+					 * nodedata"), owned by the line;
+					 * empty if none.  Always empty
+					 * outside blocks. */
 } TkTextLine;
 
 /*
@@ -83,6 +91,11 @@ typedef struct TkTextToggle {
     int inNodeCounts;			/* 1 means this toggle has been
 					 * accounted for in node toggle
 					 * counts; 0 means it hasn't, yet. */
+    TkTextData value;			/* For a toggle-on: the data of the
+					 * run of the tag it starts (its Lang
+					 * part: "tag data"), owned by the
+					 * segment; empty if none (always for
+					 * a toggle-off). */
 } TkTextToggle;
 
 /*
@@ -97,6 +110,9 @@ typedef struct TkTextMark {
 					 * segment. */
     Tcl_HashEntry *hPtr;		/* Pointer to hash table entry for mark
 					 * (in textPtr->markTable). */
+    TkTextData value;			/* The mark's data (its Lang part:
+					 * "mark data"), owned by the mark;
+					 * empty if none. */
 } TkTextMark;
 
 /*
@@ -177,7 +193,9 @@ typedef struct TkTextITree {
     int counted;			/* Whether the tags inside are
 					 * counted in the ambient node. */
     struct TkTextSegment *next2delete;	/* Used during deletion. */
-    Arg data;				/* Instance data. */
+    TkTextData data;			/* Instance data (its Lang part:
+					 * "block data"), owned by the
+					 * segment; empty if none. */
 } TkTextITree;
 
 /*
@@ -332,6 +350,10 @@ typedef struct TkTextTag {
 				 * tag.  One or more children of the node
 				 * do contain information about the tag. */
     int toggleCount;		/* Total number of tag toggles */
+    struct TkText *textPtr;	/* The widget the tag belongs to. */
+    int hasRunValues;		/* Non-zero once a run of the tag has been
+				 * given a value ("tag data"): only then do
+				 * changes have to look after run values. */
 
     /*
      * Information for displaying text with this tag.  The information
@@ -464,6 +486,13 @@ typedef struct TkTextSearch {
 					 * considering this segment. */
     int lastOffset;			/* Offset of lastPtr in the
 					 * outermos line. */
+    TkTextLine *lastLinePtr;		/* The (maybe internal) line of
+					 * lastPtr, or NULL: a node of a
+					 * block's tree skipped for having
+					 * no relevant toggle ends the
+					 * search if it holds this line
+					 * (linesLeft only counts lines of
+					 * the outermost tree). */
     TkTextTag *tagPtr;			/* Tag to search for (or tag found, if
 					 * allTags is non-zero). */
     TkTextBTree tree;			/* The BTree to search in. */
@@ -513,6 +542,84 @@ typedef struct TkTextTabArray {
 #define TK_TEXT_UNDO_SEPARATOR	0
 #define TK_TEXT_UNDO_INSERT	1
 #define TK_TEXT_UNDO_DELETE	2
+#define TK_TEXT_UNDO_SPLIT	3	/* block split: the separator at
+					 * index1 (level, added). */
+#define TK_TEXT_UNDO_BLOCK	4	/* block insert of the block type
+					 * "string" over index1-index2 (as
+					 * given); undone by dissolving it. */
+#define TK_TEXT_UNDO_TRIM	5	/* block trim of the block whose head
+					 * is at index1 (added: whether its
+					 * root had a value). */
+#define TK_TEXT_UNDO_TAG	6	/* tag add (added 1) or tag remove
+					 * (added 0) of the tag "string" over
+					 * index1-index2; ranges: the ranges
+					 * the tag had there. */
+
+/*
+ * Values ("block nodedata") that leave the text.  Freeing a value can
+ * run Perl code (a DESTROY method), so a value is never freed in the
+ * middle of a change to the B-tree: it goes, as a record of the type
+ * below, either to the widget's list of values to free when the widget
+ * command finishes (TkTextFreeValueLater, TkTextFlushValues), or, when
+ * the change can be undone, to the undo atom of the change, with an
+ * address that is valid in the text as the undo restores it.  Undoing
+ * the change gives the values back to the nodes at their addresses
+ * (TkBTreeRestoreValues); discarding the atom frees them.
+ *
+ * An address is a position in the outermost tree (a line number and a
+ * byte offset in that line, which are the same in the restored text
+ * as they were before the change) and a level: for a node of a block,
+ * the position where its first leaf starts and its distance from the
+ * leaves (0 for a leaf); for a run of a tag, the position of its first
+ * character, with the tag's name; for the instance data of a block,
+ * the position of the block's head.  (Marks need no records: edits
+ * never remove a mark.)
+ */
+
+#define TK_TEXT_VALUE_NODE	1	/* A value dropped from the node at
+					 * the address. */
+#define TK_TEXT_VALUE_MOVE	2	/* A merge gave the value of the node
+					 * at the address to the node at the
+					 * source address, which had none:
+					 * undoing it moves the value back.
+					 * value is empty. */
+
+#define TK_TEXT_VALUE_RUN	3	/* A value dropped from the run of the
+					 * tag "name" that starts at the
+					 * address (level unused). */
+#define TK_TEXT_VALUE_RUNMOVE	4	/* A merge of runs of the tag "name"
+					 * gave the value of the run starting
+					 * at the address to the merged run,
+					 * whose first part (the run that had
+					 * no value) starts at the source
+					 * address: undoing it moves the value
+					 * back.  value is empty. */
+#define TK_TEXT_VALUE_BLOCK	5	/* The instance data ("block data") of
+					 * the block whose head is at the
+					 * address (level unused), dropped when
+					 * a deletion deleted or dissolved the
+					 * block.  The block lists of the undo
+					 * leave instance data out: the block
+					 * they re-create gets the whole
+					 * container back from this record. */
+
+typedef struct TkTextValue {
+    int kind;				/* TK_TEXT_VALUE_NODE, _MOVE, _RUN,
+					 * _RUNMOVE or _BLOCK; 0 for a value
+					 * that is only to be freed. */
+    int line;				/* Address: line number (from 0) in the
+					 * outermost tree, */
+    int byteIndex;			/* byte offset in that line, */
+    int level;				/* and level (0 for a leaf). */
+    int srcLine, srcByteIndex, srcLevel;
+					/* For _MOVE: where the value went. */
+    char *name;				/* For _RUN and _RUNMOVE: the name of
+					 * the tag, malloc-ed; else NULL. */
+    TkTextData value;			/* The whole container (owned by the
+					 * record: all its slots travel), or
+					 * empty. */
+    struct TkTextValue *nextPtr;	/* Next record in the list. */
+} TkTextValue;
 
 typedef struct TkTextUndoAtom {
     int type;				/* TK_TEXT_UNDO_SEPARATOR, _INSERT or
@@ -525,7 +632,9 @@ typedef struct TkTextUndoAtom {
     Tcl_Obj *list;			/* For a deletion: the contents of the
 					 * range as "block list" reports them,
 					 * to re-create blocks, tags and marks
-					 * on undo; else NULL. */
+					 * on undo; for an insertion, the same,
+					 * recorded when it is undone, for the
+					 * redo; else NULL. */
     char listIndex[TK_POS_CHARS];	/* Where the list goes back: the start
 					 * of the deletion or, if it cut
 					 * blocks, the start of the smallest
@@ -537,8 +646,69 @@ typedef struct TkTextUndoAtom {
 					 * widget dissolves a cut block); undo
 					 * takes that out before re-inserting
 					 * the list.  0 otherwise. */
+    int *cuts;				/* For a deletion that cut blocks: the
+					 * positions of the heads and the tails
+					 * of the cut blocks that were not in
+					 * the range, which the dissolution
+					 * removed (byte offsets: the heads from
+					 * listIndex, the tails from index2;
+					 * numHeads heads in increasing order,
+					 * then the tails).  Lets the undo find
+					 * where values in the remains belong.
+					 * Malloc-ed; NULL if none. */
+    int numHeads, numTails;		/* How many of each. */
+    int *levels;			/* _BLOCK inside a block: the levels
+					 * of the separators after the leaves
+					 * from the one of index1 to the one
+					 * of index2 (those in the range and
+					 * the one just after it), as they
+					 * were before the block insert, which
+					 * flattens them; its undo sets them
+					 * back (TkIBTreeSetSeparatorLevels).
+					 * Malloc-ed; NULL otherwise. */
+    int numLevels;			/* How many. */
+    int level;				/* _SPLIT: the level asked for. */
+    int added;				/* _SPLIT: the levels the split added
+					 * above the root; _TRIM: non-zero if
+					 * the root had a value; _TAG: 1 for
+					 * add, 0 for remove. */
+    int numRanges;			/* _TAG: the number of ranges, */
+    char *ranges;			/* and their ends, 2 * numRanges index
+					 * strings of TK_POS_CHARS each
+					 * (malloc-ed, or NULL). */
+    TkTextData data;			/* _BLOCK: the instance data of the
+					 * block (the whole container), kept
+					 * from the undo, which dissolves the
+					 * block, for the redo; empty
+					 * otherwise. */
+    TkTextValue *values;		/* The values the change dropped when
+					 * it was last done or undone, the most
+					 * recent first (see TkTextValue). */
+    TkTextValue *displaced;		/* Values that giving those back found
+					 * at their addresses (set there after
+					 * the change): given back when the
+					 * change is applied again. */
     struct TkTextUndoAtom *nextPtr;	/* Next atom down the stack. */
 } TkTextUndoAtom;
+
+/*
+ * While an undo puts back the text a deletion that cut blocks took out
+ * (see TkTextUndoAtom), the values in the remains of those blocks are
+ * taken out with the remains, at addresses in the text as it was then,
+ * and given back at the same places in the restored text.  This is what
+ * TkBTreeRestoreValues needs to find those places:
+ */
+
+typedef struct TkTextRemainsMap {
+    struct TkTextUndoAtom *atomPtr;	/* The atom undone. */
+    int line;				/* The line (from 0) of its listIndex. */
+    int numLines;			/* How many lines the remains reached
+					 * beyond it. */
+    int *starts;			/* numLines + 1 offsets: where each of
+					 * these lines started, in bytes from
+					 * listIndex (the first is minus the
+					 * byte offset of listIndex). */
+} TkTextRemainsMap;
 
 typedef struct TkTextUndoStack {
     TkTextUndoAtom *undoStack;		/* Actions that can be undone. */
@@ -546,7 +716,44 @@ typedef struct TkTextUndoStack {
     int maxdepth;			/* -maxundo: compound actions kept;
 					 * <= 0 means no limit. */
     int depth;				/* Compound actions on the undo stack. */
+    struct TkText *textPtr;		/* The widget, which frees the values
+					 * of the atoms discarded. */
 } TkTextUndoStack;
+
+/*
+ * The notification of detached values (-valuecommand): before a change
+ * detaches values, the look-ahead (TkBTreeVcPredict... in
+ * tkTextBTree.c) tells the callback which values it will detach and
+ * where they are; what the change then does is checked against it (a
+ * detach that was not foreseen is reported "late").  The events and
+ * the kinds of places:
+ */
+
+#define TK_TEXT_VC_DROP		1	/* Freed when the command ends. */
+#define TK_TEXT_VC_STASH	2	/* Goes into an undo step. */
+#define TK_TEXT_VC_MOVE		3	/* A merge gives it to another owner. */
+#define TK_TEXT_VC_RESTORE	4	/* An undo or a redo gave it back. */
+#define TK_TEXT_VC_DISCARD	5	/* A discarded undo step held it. */
+#define TK_TEXT_VC_LATE		6	/* Detached, not foreseen. */
+
+#define TK_TEXT_VC_NODE		1	/* [index, level] */
+#define TK_TEXT_VC_RUN		2	/* [tag, start, end] */
+#define TK_TEXT_VC_MARK		3	/* [name, index] */
+#define TK_TEXT_VC_BLOCK	4	/* [head index] */
+
+/*
+ * How deep DESTROY methods may change the widget while values are being
+ * freed, each change dropping values whose DESTROY methods change it
+ * again (see FlushValues in tkText.c): the limit a freeing pass starts
+ * with; the object whose DESTROY method makes a change at the limit is
+ * asked whether to raise it (its method DESTROYmult, see
+ * MoreFreeRounds in tkText.c).
+ */
+
+#define TK_TEXT_FREE_DEPTH	10
+
+#define TkTextVcOn(textPtr) \
+	(((textPtr) != NULL) && ((textPtr)->vcPtr != NULL))
 
 /*
  * What the last recorded edit was, for -autoseparators:
@@ -555,6 +762,11 @@ typedef struct TkTextUndoStack {
 #define TK_TEXT_EDIT_INSERT	0
 #define TK_TEXT_EDIT_DELETE	1
 #define TK_TEXT_EDIT_OTHER	2
+#define TK_TEXT_EDIT_SPLIT	3	/* Each recorded block or tag change */
+#define TK_TEXT_EDIT_BLOCK	4	/* is a kind of edit of its own: */
+#define TK_TEXT_EDIT_TRIM	5	/* with -autoseparators, a change of */
+#define TK_TEXT_EDIT_TAGADD	6	/* kind starts a new undo step. */
+#define TK_TEXT_EDIT_TAGREMOVE	7
 
 /*
  * A data structure of the following type is kept for each text widget that
@@ -756,6 +968,63 @@ typedef struct TkText {
 				 * ("edit modified"). */
     int isDirtyIncrement;	/* +1, or -1 while undoing. */
     int lastEditMode;		/* TK_TEXT_EDIT_INSERT, _DELETE or _OTHER. */
+
+    /*
+     * Values of block nodes (see TkTextValue):
+     */
+
+    int cmdDepth;		/* Nesting depth of widget commands; the
+				 * values dropped are freed when it comes
+				 * back to 0. */
+    int haveValues;		/* Non-zero once a value has been set: until
+				 * then, no change needs to look for any. */
+    TkTextValue *freeValues;	/* Values to free when the command ends, in
+				 * the order they were dropped. */
+    TkTextValue *lastFreeValue;	/* The last of them. */
+    TkTextValue **valueCapture;	/* During a deletion that can be undone:
+				 * where the values it drops go (the list
+				 * of its undo atom); else NULL. */
+    Tcl_HashTable *valueAddresses;
+				/* With valueCapture: the addresses, before
+				 * the deletion, of the nodes it may drop
+				 * values from (TkBTreeSnapshotValues). */
+    TkTextValue **editValues;	/* While an undo or a redo deletes text: the
+				 * list of the atom it applies, for the
+				 * values that deletion drops; else NULL. */
+    int freeingValues;		/* Non-zero while FlushValues frees values
+				 * (a DESTROY method may be running): the
+				 * round (see FlushValues); a command that
+				 * modifies the widget meanwhile is a change
+				 * of its own for the undo, and is refused
+				 * in round freeLimit unless DESTROYmult
+				 * raises it. */
+    int freeLimit;		/* The round in which changes are refused
+				 * during this freeing pass: starts at
+				 * TK_TEXT_FREE_DEPTH, raised by the answers
+				 * of DESTROYmult (MoreFreeRounds). */
+    int freeAsks;		/* How many times DESTROYmult was called
+				 * during this freeing pass. */
+    int freeAsking;		/* Non-zero while DESTROYmult runs: a change
+				 * then is refused without asking again. */
+
+    /*
+     * The notification of detached values (-valuecommand, see
+     * TkTextVcPredict in tkText.c):
+     */
+
+    LangCallback *valueCmd;	/* -valuecommand, or NULL. */
+    struct TkTextVcState *vcPtr;
+				/* While a widget command runs and valueCmd
+				 * was set when it started: what it predicted
+				 * and what happened; else NULL (then nothing
+				 * of the notification runs). */
+    int vcInCallback;		/* Non-zero while valueCmd runs: the
+				 * commands that modify the widget are
+				 * refused meanwhile. */
+    int vcTagDone;		/* Set when the look-ahead of a tag change
+				 * was done before its redisplay: the
+				 * TkBTreeTag that follows does not do it
+				 * again. */
     int flags;			/* Miscellaneous flags;  see below for
 				 * definitions. */
 } TkText;
@@ -793,6 +1062,10 @@ typedef struct TkText {
 #define TKT_GET_LIST		0x800
 #define TKT_GET_NOELIDE		0x400	/* Skip elided text (search, the
 					 * selection). */
+#define TKT_GET_NOVALUES	0x200	/* Leave the node values and the
+					 * instance data out of the block
+					 * headers of a list (the undo
+					 * records them on its own). */
 
 /*
  * Records of the following type define segment types in terms of
@@ -897,6 +1170,10 @@ typedef struct TkTextBlock {
 					 * leaf in a block. */
     LangCallback *leafEmptyCallBack;	/* Callback for emptying of a
 					 * leaf in a block. */
+    struct TkText *textPtr;		/* The widget (which frees the
+					 * instance data of the blocks the
+					 * B-tree code deletes, see
+					 * TkTextFreeValueLater). */
 } TkTextBlock;
 
 /*
@@ -943,6 +1220,8 @@ extern TkTextLine *	TkBTreeFindLine _ANSI_ARGS_((TkTextBTree tree,
 			    int line));
 extern TkTextTag **	TkBTreeGetTags _ANSI_ARGS_((TkTextIndex *indexPtr,
 			    int *numTagsPtr));
+extern TkTextTag **	TkBTreeGetTagsInEffect _ANSI_ARGS_((
+			    TkTextIndex *indexPtr, int *numTagsPtr));
 extern void		TkBTreeInsertChars _ANSI_ARGS_((TkTextIndex *indexPtr,
 			    char *string));
 extern int		TkBTreeLineIndex _ANSI_ARGS_((TkTextLine *linePtr));
@@ -1015,9 +1294,74 @@ extern void		TkTextUndoSetDepth _ANSI_ARGS_((TkTextUndoStack *stackPtr,
 			    int maxdepth));
 extern void		TkTextUndoInsertUndoSeparator _ANSI_ARGS_((
 			    TkTextUndoStack *stackPtr));
-extern void		TkTextUndoPushAction _ANSI_ARGS_((TkTextUndoStack *stackPtr,
+extern TkTextUndoAtom *	TkTextUndoPushAction _ANSI_ARGS_((
+			    TkTextUndoStack *stackPtr,
 			    int type, char *index1, char *index2, Tcl_Obj *string,
 			    Tcl_Obj *list, char *listIndex, int remains));
+extern void		TkTextFreeValueLater _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value));
+extern void		TkTextFreeValueList _ANSI_ARGS_((TkText *textPtr,
+			    TkTextValue *listPtr));
+extern void		TkTextReleaseValues _ANSI_ARGS_((TkTextValue *listPtr));
+extern void		TkTextDiscardValue _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int kind, int line,
+			    int byteIndex, int level, char *name));
+extern void		TkTextDiscardValueList _ANSI_ARGS_((TkText *textPtr,
+			    TkTextValue *listPtr));
+extern void		TkTextDiscardValueAt _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int vcKind, Tcl_Obj *where));
+extern Tcl_Obj *	TkTextVcNodePlace _ANSI_ARGS_((TkText *textPtr,
+			    int line, int byteIndex, int level));
+extern Tcl_Obj *	TkTextVcRunPlace _ANSI_ARGS_((TkText *textPtr,
+			    char *tagName, TkTextIndex *startPtr,
+			    TkTextIndex *endPtr));
+extern Tcl_Obj *	TkTextVcMarkPlace _ANSI_ARGS_((TkText *textPtr,
+			    char *markName, TkTextIndex *indexPtr));
+extern Tcl_Obj *	TkTextVcBlockPlace _ANSI_ARGS_((TkText *textPtr,
+			    int line, int byteIndex));
+extern void		TkTextVcPredict _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int event, int kind,
+			    Tcl_Obj *where, Tcl_Obj *to));
+extern void		TkTextVcCandidate _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int kind, Tcl_Obj *where));
+extern void		TkTextVcNotify _ANSI_ARGS_((TkText *textPtr));
+extern void		TkTextVcSeen _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int event));
+extern void		TkTextVcRestored _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int kind, Tcl_Obj *where));
+extern void		TkTextVcDiscarded _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData value, int kind, Tcl_Obj *where));
+extern void		TkBTreeVcPredictTag _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    TkTextTag *tagPtr, int add));
+extern void		TkBTreeVcPredictDelete _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int event));
+extern void		TkBTreeVcPredictBlock _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int event));
+extern void		TkBTreeVcPredictTrim _ANSI_ARGS_((TkText *textPtr,
+			    TkTextSegment *segPtr, int event));
+extern Tcl_Obj *	TkBTreeVcNodePlace _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, Arg levelArg));
+extern Tcl_Obj *	TkBTreeVcRunPlace _ANSI_ARGS_((TkText *textPtr,
+			    TkTextTag *tagPtr, TkTextIndex *indexPtr));
+extern void		TkBTreeSnapshotValues _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    Tcl_HashTable *tablePtr));
+extern void		TkBTreeFreeSnapshot _ANSI_ARGS_((
+			    Tcl_HashTable *tablePtr));
+extern void		TkBTreeRestoreValues _ANSI_ARGS_((TkText *textPtr,
+			    TkTextValue *listPtr, TkTextRemainsMap *mapPtr,
+			    TkTextValue **displacedPtr, int fromAtom));
+extern int		TkBTreeNodeValue _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, char *indexString,
+			    Arg levelArg, TkTextData **dataPtrPtr));
+extern void		TkBTreeSetValue _ANSI_ARGS_((TkText *textPtr,
+			    TkTextData *dataPtr, Arg value));
+extern int		TkBTreeRunValue _ANSI_ARGS_((TkText *textPtr,
+			    TkTextTag *tagPtr, TkTextIndex *indexPtr,
+			    char *indexString, TkTextData **dataPtrPtr));
 extern int		TkTextUndoRevert _ANSI_ARGS_((TkText *textPtr));
 extern int		TkTextUndoApply _ANSI_ARGS_((TkText *textPtr));
 extern void		TkTextIndexForwChars _ANSI_ARGS_((TkTextIndex *srcPtr,
@@ -1124,6 +1468,14 @@ void			TkTextWindowOptionList _ANSI_ARGS_((
 void			TkIBTreeFixTags _ANSI_ARGS_((
 			    TkTextSegment *segPtr, TkTextTag **tagPtrPtr,
 		            int *nPtr));
+int			TkIBTreeTogglesElide _ANSI_ARGS_((
+			    TkTextSegment *segPtr));
+int *			TkIBTreeSeparatorLevels _ANSI_ARGS_((
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int *numPtr));
+void			TkIBTreeSetSeparatorLevels _ANSI_ARGS_((
+			    TkText *textPtr, TkTextIndex *indexPtr,
+			    int *levels, int num));
 void			TkIBTreePrint _ANSI_ARGS_((
 			    TkTextSegment *segPtr, ListFactory *listFactoryPtr,
 			    void **linePtrs));
@@ -1138,8 +1490,31 @@ void			TkIBTreeStartIndex _ANSI_ARGS_((TkTextBTree tree,
 int			TkIBTreeCutRange _ANSI_ARGS_((TkTextIndex *index1Ptr,
 			    TkTextIndex *index2Ptr, TkTextIndex *ext1Ptr,
 			    TkTextIndex *ext2Ptr, int *remainsPtr));
+int *			TkIBTreeCutPositions _ANSI_ARGS_((
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    TkTextIndex *ext1Ptr, int *numHeadsPtr,
+			    int *numTailsPtr));
 int			TkIBTreeSplit _ANSI_ARGS_((TkTextIndex *indexPtr, 
 			    int level));
+TkTextValue *		TkBTreeTakeCrossingRunValues _ANSI_ARGS_((
+			    TkText *textPtr, TkTextIndex *index1Ptr,
+			    TkTextIndex *index2Ptr));
+void *			TkBTreeHoldRunValues _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr));
+void			TkBTreeReleaseRunValues _ANSI_ARGS_((TkText *textPtr,
+			    void *held));
+int			TkIBTreeRootHasValue _ANSI_ARGS_((
+			    TkTextSegment *segPtr));
+void			TkIBTreeAddRoot _ANSI_ARGS_((TkTextSegment *segPtr,
+			    int moveValue));
+TkTextValue *		TkBTreeTakeMovedLeafValues _ANSI_ARGS_((
+			    TkText *textPtr, TkTextSegment *segPtr,
+			    TkTextIndex *headPtr));
+extern void		TkTextTagChange _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    TkTextTag *tagPtr, int add));
+void			TkIBTreeDeepen _ANSI_ARGS_((TkTextSegment *segPtr,
+			    int depth));
 void			TkTextFreeDLine _ANSI_ARGS_((TkText *textPtr,
                             struct DLine *dlPtr));
 struct DLine *		TkTextGetDLine _ANSI_ARGS_((TkText *textPtr,
@@ -1157,5 +1532,13 @@ TkTextSegment *		TkTextIndexToInternalSeg _ANSI_ARGS_((TkTextIndex *indexPtr,
 #include "tkPort.h"
 #include "tkVMacro.h"
 #endif
+
+/*
+ * The operations on the containers of values, which call the language
+ * through its function table (tkVMacro.h).
+ */
+
+#define TK_TEXT_DATA_FUNCTIONS
+#include "tkTextData.h"
 
 #endif /* _TKTEXT */

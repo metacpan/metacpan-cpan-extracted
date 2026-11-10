@@ -7,8 +7,9 @@ use JSON::PP ();
 use B ();
 use Scalar::Util qw(looks_like_number);
 
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib", "$FindBin::Bin/lib";
 use BarefootJS::Evaluator;
+use VectorUndefined ();
 
 # eval-vectors.json is UTF-8 (non-ASCII `.length` cases, #2196). Route TAP
 # through a UTF-8 layer so a wide test name/diagnostic doesn't trigger
@@ -47,16 +48,18 @@ die "eval-vectors.json contains no cases" unless @{ $doc->{cases} || [] };
 for my $case (@{ $doc->{cases} }) {
     my $note   = $case->{note};
     my $expr   = $case->{expr};
-    my $env    = $case->{env};
+    my $env    = VectorUndefined::to_arg($case->{env});
     my $expect = $case->{expect};
 
+    my ($ok, $detail);
     my $got = eval { BarefootJS::Evaluator::evaluate($expr, $env) };
     if (my $err = $@) {
-        fail("$note died: $err");
-        next;
+        ($ok, $detail) = (0, "died: $err");
+    } else {
+        $ok = _match($got, $expect) ? 1 : 0;
+        $detail = 'got ' . explain_value($got) . ', want ' . explain_value($expect);
     }
-    ok(_match($got, $expect), $note)
-        or diag('got ' . explain_value($got) . ', want ' . explain_value($expect));
+    ok($ok, $note) or diag("FAIL $note: $detail");
 }
 
 done_testing;
@@ -77,6 +80,7 @@ sub _is_real_number {
 # numbers numerically, arrays/hashes recursively, strings by eq.
 sub _match {
     my ($got, $expect) = @_;
+    return VectorUndefined::runtime_undefined($got) if VectorUndefined::is_sentinel($expect);
     return !defined $got if !defined $expect;
     if (ref $expect eq 'HASH' && exists $expect->{'$num'}) {
         my $kind = $expect->{'$num'};

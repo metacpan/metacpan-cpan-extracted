@@ -6,7 +6,8 @@ use strict; use warnings; no warnings "qw";   # (printf formats with # in qw lis
 use Test::More; use File::Temp 'tempdir'; use Cwd 'abs_path';
 use lib 'lib'; use Proc::ShellSpawn::Programs;
 my $record = @ARGV && $ARGV[0] eq '--record';
-my $data = abs_path('t') . '/programs.txt'; my $try = abs_path('t/try.pl');
+my $record_sh = @ARGV && $ARGV[0] eq '--record-shells';
+my $data = abs_path('t') . '/programs.txt'; my $data_sh = abs_path('t') . '/echo-shells.txt'; my $try = abs_path('t/try.pl');
 my $WIN = $^O eq 'MSWin32';
 
 my @c = (
@@ -35,6 +36,9 @@ my @c = (
    '[ ( a ]', '[ ( a b ]', '[ a -a ]', '[ ! ]', '[ -f ]', '[ ( x -o ]', 'test ( x -o', '[ x -eq ]',
    '[ ( ( ( x ) ) ]', '[ a b ]', '[ ( ( = x ]', '[ ( ( ( ( ( x ]', 'test ( ( ( ( ( x'), ['[', '(', '(', '=', '', ']'], ['[', '(', '', ']'],
  ['printf', '%q\n', "a'b\n"], ['printf', '%q\n', "\x1b'\f"], ['printf', '%q|%q|%q\n', "\xc3\xa9", "\xff", '{a,b}'],
+ # X37: \u and \U as coreutils (the escape where the locale cannot encode the character; a surrogate is an error)
+ ['printf', '\u20AC|\U0001F600|\u00e9|\u0041|\u0024|\U0010FFFF|\U00110000\n'], ['printf', 'a\ud800b'], ['printf', 'a\U0000DFFFb'],
+ ['printf', '%b|', 'x\u20ACy', '\u007F\u00A0'], ['printf', '%b|', 'a\uDFFFb', 'z'], ['printf', '%b|', 'a\u20A'], ['printf', '\u20A'],
 );
 # Where we differ from coreutils 9.4 on purpose (X21): its %q of a word with a ' and a character it escapes keeps a stale
 # state of gnulib's quotearg when it starts over (fixed in gnulib since): an extra '' at the start, or, when the word
@@ -73,6 +77,19 @@ sub key { my ($argv, $env) = @_; join "\t", map esc($_), (map "$_=$env->{$_}", s
 my @runs = map { my ($argv, $env) = ref $_->[0] ? @$_ : ($_, {}); my $c = $_;
   map +[$argv, { %$env, LC_ALL => $_ }], 'C', 'C.UTF-8' } @c;
 
+# EC1 (the user, 2026-11-09): echo as dash's and bash's builtins (PROC_SHELLSPAWN_ECHO=dash, bash; OPT's echo), against
+# what dash 0.5.12 and bash 5.2.21 (bash --posix) did with the same words: t/echo-shells.txt, recorded by
+# 'perl t/programs.t --record-shells' where those are installed (Ubuntu 24.04).  The echo cases above (some with
+# POSIXLY_CORRECT, which changes neither builtin), and these for the escapes where the two differ; each in both locales.
+my @runs_sh = do {
+  my @e = ((grep { (ref $_->[0] ? $_->[0][0] : $_->[0]) eq 'echo' } @c),
+    ['echo', '-e', '\1|\101|\0101|\01011|\08|\E|\x41|\x|\xg'], ['echo', '\1|\101|\0101|\E|\e|\x41'],
+    ['echo', '-e', '€|\u41|\u|\uG|ሴ5|\U1F600|\Ud800|\uDFFF|\u80|￿|\U10FFFF|\U110000|\U7FFFFFFF|\U80000000|\U123456789|\u0x'],
+    [qw(echo -e -n -E a\tb)], [qw(echo -n -e a\tb)], [qw(echo -n -n a)], [qw(echo -- a)], [qw(echo -e -x a\tb)], ['echo', '-e', 'a\cb', 'c'], ['echo', 'a\cb', 'c'],
+    [['echo', '-e', 'a\tb'], { POSIXLY_CORRECT => 1 }], [['echo', 'a\tb'], { POSIXLY_CORRECT => 1 }], [['echo', '-n', 'a\tb'], { POSIXLY_CORRECT => 1 }]);
+  map { my ($argv, $env) = ref $_->[0] ? @$_ : ($_, {});
+        map { my $st = $_; map +[$argv, { %$env, PROC_SHELLSPAWN_ECHO => $st, LC_ALL => $_ }], 'C', 'C.UTF-8' } 'dash', 'bash' } @e };
+
 if ($record) {   # the real programs, with the same argv[0]
   require IPC::Open3; require Symbol;
   my %PROG = map +($_ => "/usr/bin/$_"), qw(echo printf test [);
@@ -87,6 +104,20 @@ if ($record) {   # the real programs, with the same argv[0]
     print $o key($argv, $env), "\n", join("\t", $? >> 8, esc($so), esc($se)), "\n" }
   close $o; print "recorded ", scalar @runs, " runs in $data\n"; exit }
 
+if ($record_sh) {   # the shells' builtins: dash -c 'echo "$@"', bash --posix -c 'echo "$@"'
+  require IPC::Open3; require Symbol;
+  `bash --version` =~ /version 5\.2\.21\b/ or die "not bash 5.2.21\n";
+  open my $o, '>', $data_sh or die "$data_sh: $!";
+  print $o "# t/echo-shells.txt: the echo builtins of dash 0.5.12 and bash 5.2.21 (bash --posix), written by perl t/programs.t\n",
+           "# --record-shells; as t/programs.txt (PROC_SHELLSPAWN_ECHO in the key says whose)\n";
+  for (@runs_sh) {
+    my ($argv, $env) = @$_; my %e = %$env; my $st = delete $e{PROC_SHELLSPAWN_ECHO}; local %ENV = (PATH => '/usr/bin:/bin', %e);
+    my @sh = $st eq 'dash' ? ('dash', '-c', 'echo "$@"', 'sh') : ('bash', '--posix', '-c', 'echo "$@"', 'bash');
+    my $err = Symbol::gensym(); my $pid = IPC::Open3::open3(my $in, my $out, $err, @sh, @$argv[1 .. $#$argv]);
+    close $in; my $so = do { local $/; <$out> } // ''; my $se = do { local $/; <$err> } // ''; waitpid $pid, 0;
+    print $o key($argv, $env), "\n", join("\t", $? >> 8, esc($so), esc($se)), "\n" }
+  close $o; print "recorded ", scalar @runs_sh, " runs in $data_sh\n"; exit }
+
 open my $in, '<', $data or die "$data: $!";
 my %want; while (my $k = <$in>) { next if $k =~ /^#/; chomp $k; chomp(my $r = <$in>); $want{$k} = [map unesc($_), split /\t/, $r, -1] }
 my (@bad, $n);
@@ -100,6 +131,17 @@ for (@runs) {
     unless $st == $w->[0] && $so eq $w->[1] && $se eq $w->[2] }
 ok !@bad, "$n runs as GNU coreutils 9.4 (" . keys(%KNOWN) . " as its fixed %q)" or diag join "\n", @bad[0 .. ($#bad < 30 ? $#bad : 29)];
 
+{ open my $in, '<', $data_sh or die "$data_sh: $!";
+  my %w; while (my $k = <$in>) { next if $k =~ /^#/; chomp $k; chomp(my $r = <$in>); $w{$k} = [map unesc($_), split /\t/, $r, -1] }
+  my (@bad, $n);
+  for (@runs_sh) {
+    my ($argv, $env) = @$_;
+    my $w = $w{key($argv, $env)} or do { push @bad, "not recorded: " . key($argv, $env); next };
+    my ($so, $se, $st) = Proc::ShellSpawn::Programs::echo($argv, $env, { echo => $env->{PROC_SHELLSPAWN_ECHO} }); $n++;
+    push @bad, key($argv, $env) . "\n  want: " . esc(join '|', @$w) . "\n  got:  " . esc(join '|', $st, $so, $se)
+      unless $st == $w->[0] && $so eq $w->[1] && $se eq $w->[2] }
+  ok !@bad, "$n runs of echo as dash's and bash's builtins (EC1)" or diag join "\n", @bad[0 .. ($#bad < 30 ? $#bad : 29)] }
+
 # The order of output and messages (glibc's error() flushes stdout first), as the shell layer writes them
 my @o = Proc::ShellSpawn::Programs::printf(['printf', 'a%db%dc', 1, 'x', 2, 'y'], { LC_ALL => 'C' });
 is_deeply [grep length $_->[1], @{$o[3]}], [[1, 'a1b'], [2, "printf: 'x': expected a numeric value\n"], [1, '0ca2b'],
@@ -109,6 +151,28 @@ is_deeply [grep length $_->[1], @{$o[3]}], [[1, 'a1b'], [2, "printf: 'x': expect
 chdir 'dir' or die;
 is((Proc::ShellSpawn::Programs::test(['test', '-f', 'file'], {}, { cwd => $dir }))[2], 0, 'test -f: relative to cwd');
 chdir $dir;
+
+# pwd (post-0.10, in-process by IP1): as coreutils 9.4 (checked against it on 352 runs: PWD valid, invalid, unset;
+# options, operands, POSIXLY_CORRECT); here the main cases, in the fixtures' directory
+{ my $P = \&Proc::ShellSpawn::Programs::pwd; require Cwd; my $phys = Cwd::abs_path($dir);
+  is_deeply [$P->(['pwd', '-x'], {})], ['', "pwd: invalid option -- 'x'\nTry 'pwd --help' for more information.\n", 1], 'pwd -x';
+  is_deeply [$P->(['pwd', '--log=x'], {})], ['', "pwd: option '--logical' doesn't allow an argument\nTry 'pwd --help' for more information.\n", 1], 'pwd --log=x';
+  is_deeply [$P->(['pwd', '-L'], { PWD => "$dir/dir/.." }, { cwd => $dir })], ["$phys\n", '', 0], 'pwd -L: a PWD with .. is not used';
+  is_deeply [$P->(['pwd', '-L', 'x'], { PWD => $dir }, { cwd => $dir })], ["$dir\n", "pwd: ignoring non-option arguments\n", 0], 'pwd -L: PWD, and the operand ignored';
+  SKIP: { skip 'no symbolic links here', 2 unless $links;
+    is_deeply [$P->(['pwd', '-L'], { PWD => "$dir/link" }, { cwd => "$dir/link" })], ["$dir/link\n", '', 0], 'pwd -L through a link';
+    is_deeply [$P->(['pwd', '-LP'], { PWD => "$dir/link" }, { cwd => "$dir/link" })], [Cwd::abs_path("$dir/dir") . "\n", '', 0], 'pwd -LP: the last counts' } }
+
+# PROC_SHELLSPAWN_ECHO reaches the shell layer's in-process echo; POSIXLY_CORRECT changes only coreutils' (EC1).  The
+# string goes to t/try.pl in a file (TRY_FILE), as t/portable.t does, so that this runs on Windows too.
+{ my $try_sh = sub { my $f = "$dir/try-cmd"; open my $h, '>', $f or die "$f: $!"; binmode $h; print $h shift; close $h;
+                     local $ENV{TRY_FILE} = $f; scalar `"$^X" "$try" 2>&1` };
+  my %want = (coreutils => ["a\tb c\td\n", "-e a\tb c\td\n"], dash => ["-e a\tb c\td\n", "-e a\tb c\td\n"], bash => ["a\tb c\td\n", "a\tb c\td\n"]);
+  for my $v (sort keys %want) { for my $p (0, 1) {   # (the subset refuses POSIXLY_CORRECT=1 as an assignment: the environment's)
+    local $ENV{PROC_SHELLSPAWN_ECHO} = $v; local $ENV{POSIXLY_CORRECT} = 1 if $p; delete local $ENV{POSIXLY_CORRECT} unless $p;
+    is $try_sh->('echo -e "a\tb" "c\td"'), $want{$v}[$p], "PROC_SHELLSPAWN_ECHO=$v" . ($p ? ', POSIXLY_CORRECT=1' : '') . ": the shell layer's echo" } }
+  local $ENV{PROC_SHELLSPAWN_ECHO} = 'zsh';
+  like $try_sh->('echo x'), qr/^PROC_SHELLSPAWN_ECHO: 'zsh' is none of coreutils, dash, bash$/m, 'PROC_SHELLSPAWN_ECHO: an unknown value dies' }
 
 # The shell layer: the same strings with the programs (PROC_SHELLSPAWN_INPROC=none) and with these (all, the default), where
 # the programs exist
@@ -126,4 +190,24 @@ SKIP: {
       $r{$v} = `$^X $try "\$CMD" 2>&1; echo "<\$?>"` }
     push @bad, "$s\n  programs:   $r{none}\n  in-process: $r{all}" if $r{none} ne $r{all} }
   ok !@bad, scalar(@s) . ' shell strings: the same with the programs and in-process' or diag join "\n", @bad }
+
+# sh as Perl with Proc::ShellSpawn (SH1, post-0.10): the same strings with the program sh (PROC_SHELLSPAWN_SH=program)
+# and as Perl (perl); dash's line number in its messages ("NAME: 1: ...") left out, as the shell layer has none (P2)
+SKIP: {
+  skip 'no /bin/sh to compare with (Windows: t/portable.t)', 2 if $WIN or !-x '/bin/sh';
+  my @s = (q{sh -c 'echo "$0|$1|$#"; exit 3' nm a b; echo st=$?}, q{echo 'echo from-stdin $1' | sh -s x},
+           q{sh -ec 'false; echo not-here'; echo st=$?}, q{sh -c 'nosuch-cmd-x' myname; echo st=$?},
+           q{printf 'echo file $1\n' > f.sh; sh f.sh z; rm f.sh}, q{sh -c "sh -c 'echo nested'"},
+           q{sh -c 'kill -TERM $$'; echo st=$?}, q{sh -c 'echo $((1+2)) "$@"' x y z},
+           q{sh -u -c 'echo $nosuchvar; echo after'; echo st=$?}, q{sh -c 'cd dir && pwd' | sed 's,.*/,,'; pwd | sed 's,.*/,,'});
+  my @bad;
+  for my $s (@s) {
+    local $ENV{CMD} = $s; my %r;
+    for my $v ('program', 'perl') {
+      local $ENV{PROC_SHELLSPAWN_SH} = $v;
+      ($r{$v} = `$^X $try "\$CMD" 2>&1; echo "<\$?>"`) =~ s/^(\S+: )[0-9]+: /$1/mg }
+    push @bad, "$s\n  program: $r{program}\n  perl:    $r{perl}" if $r{program} ne $r{perl} }
+  ok !@bad, scalar(@s) . ' strings with sh: the same with the program and as Perl (SH1)' or diag join "\n", @bad;
+  local $ENV{PROC_SHELLSPAWN_SH} = 'zsh'; local $ENV{CMD} = 'true';
+  like scalar(`$^X $try "\$CMD" 2>&1`), qr/^PROC_SHELLSPAWN_SH: 'zsh' is none of auto, perl, program$/m, 'PROC_SHELLSPAWN_SH: an unknown value dies' }
 done_testing;

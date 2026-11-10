@@ -14,7 +14,8 @@ use Ekorn::Pipeline::Stop          ();
 # Imported functions are cleaned out of each package, so they can't be
 # called as methods.
 my %imported = (
-    'Ekorn::Pipeline'                => [qw(croak  croakf is_coderef is_ref)],
+    'Ekorn::Pipeline' =>
+        [qw(croak croakf is_arrayref is_coderef is_ref refaddr)],
     'Ekorn::Pipeline::Gather'        => [qw(croakf is_coderef)],
     'Ekorn::Pipeline::Stages::Batch' => [qw(croakf gather is_coderef)],
     'Ekorn::Pipeline::Stages::Flow'  => [qw(croakf gather is_coderef)],
@@ -30,6 +31,8 @@ for my $pkg (sort keys %imported) {
 }
 
 subtest 'what the packages need is kept' => sub {
+    ok +Ekorn::Pipeline->can('import'),         'Pipeline can export';
+    ok +Ekorn::Pipeline->can('is_stage'),       'and keeps is_stage';
     ok +Ekorn::Pipeline::Errors->can('import'), 'Errors can export';
     ok +Ekorn::Pipeline::Errors->can('croakf'), 'and keeps croakf';
     ok +Ekorn::Pipeline::Gather->can('import'), 'Gather can export';

@@ -158,7 +158,7 @@ TkTextWindowCmd(textPtr, interp, argc, args)
 				 * parsed this command enough to know that
 				 * LangString(args[1]) is "window". */
 {
-    int c, length;
+    int length;
     register TkTextSegment *ewPtr;
 
     if (argc < 3) {
@@ -166,7 +166,6 @@ TkTextWindowCmd(textPtr, interp, argc, args)
 		LangString(args[0]), " window option ?arg arg ...?\"",          NULL);
 	return TCL_ERROR;
     }
-    c = LangString(args[2])[0];
     length = strlen(LangString(args[2]));
     if ((strncmp(LangString(args[2]), "cget", length) == 0) && (length >= 2)) {
 	TkTextIndex index;

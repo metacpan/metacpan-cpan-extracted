@@ -3,7 +3,7 @@
 Thank you for considering contributing to this distribution.
 I welcome any contribution to HTTP::Promise, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/HTTP-Promise> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/deguest/HTTP-Promise> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on bug tracker](https://gitlab.com/jackdeguest/HTTP-Promise/issues) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://gitlab.com/deguest/HTTP-Promise/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,7 +39,7 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackdeguest/HTTP-Promise/issues)
+Issues are currently reported using CPAN [bug tracker](https://gitlab.com/deguest/HTTP-Promise/issues)
 
 ## More information
 

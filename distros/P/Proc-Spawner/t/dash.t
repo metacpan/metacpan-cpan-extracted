@@ -8,12 +8,13 @@ grep -x "$_/dash", split /:/, $ENV{PATH} // '' or plan skip_all => 'no dash in P
 use Proc::Spawner;   # the shell layer needs chdir in the child: posix_spawn's extension, or done around the call (0.07)
 my $p = Proc::Spawner::spawn('/bin/true', ['true'], undef, [[chdir => '/']], {}) or plan skip_all => "no posix_spawn chdir in this libc: $!";
 waitpid $p, 0;
+$ENV{PROC_SHELLSPAWN_ECHO} = 'dash';   # ours with dash's echo (EC1; the default is coreutils' echo, checked by t/programs.t)
 my $top = abs_path('.'); my %known;
 open my $k, '<', 't/dash-known.txt' or die "t/dash-known.txt: $!";
 while (<$k>) { next if /^#/; chomp; my ($f, $why, $c) = split /\t/, $_, 3; $known{"$f\t$c"} = $why }
 my $proc = -d '/proc/self/fd' && -r '/proc/self/status';   # fdbattery (t/fds) and sigenv read Linux's /proc (RT #182479)
 my @files = map "$_.txt", qw(largebattery battery), $proc ? qw(fdbattery sigenv) : (),
-  qw(t1 t2 t3 pspawn-d2 pspawn-l10 large-subset-b13 large-subset-p6 large-subset-e large-subset-post04);
+  qw(t1 t2 t3 pspawn-d2 pspawn-l10 large-subset-b13 large-subset-p6 large-subset-e large-subset-post04 echo);
 diag 'no Linux /proc: fdbattery.txt and sigenv.txt left out' unless $proc;
 my @lines = map { my $f = $_; open my $in, '<', "t/batteries/$f" or die "$f: $!"; [$f, grep length, map { chomp; $_ } <$in>] } @files;
 my $dir = tempdir(CLEANUP => 1); mkdir "$dir/tmp" or die "$dir/tmp: $!"; copy('t/fds', "$dir/fds") && chmod 0755, "$dir/fds"; chdir $dir or die;

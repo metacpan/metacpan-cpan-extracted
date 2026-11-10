@@ -5,8 +5,7 @@ name "Plack-Middleware-CSP";
 license "perl";
 all_from "lib/Plack/Middleware/CSP.pm";
 
-makemaker_args( PREREQ_FATAL => 1,
-                dist => { PREOP => 'pod2text lib/Plack/Middleware/CSP.pm > README' } );
+makemaker_args( dist => { PREOP => 'pod2text lib/Plack/Middleware/CSP.pm > README' } );
 
 requires "HTTP::CSPHeader";
 requires "Plack";

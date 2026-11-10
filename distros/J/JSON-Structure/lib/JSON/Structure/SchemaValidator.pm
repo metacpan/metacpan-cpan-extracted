@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.20;
 
-our $VERSION = '0.8.0';
+our $VERSION = '0.8.2';
 
 use JSON::MaybeXS;
 use Scalar::Util qw(blessed looks_like_number);

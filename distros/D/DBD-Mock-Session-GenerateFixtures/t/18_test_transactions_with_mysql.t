@@ -8,13 +8,6 @@ use Rose::DB::Object::Loader;
 
 use lib qw(lib t);
 
-use DBI;
-use Data::Dumper;
-use DBD::Mock::Session::GenerateFixtures;
-use Sub::Override;
-use File::Path qw(rmtree);
-use Test::mysqld;
-
 use MyDatabase qw(build_mysql_db populate_test_db);
 
 BEGIN {
@@ -25,6 +18,13 @@ BEGIN {
     }
 
 }
+
+use DBI;
+use Data::Dumper;
+use DBD::Mock::Session::GenerateFixtures;
+use Sub::Override;
+use File::Path qw(rmtree);
+use Test::mysqld;
 
 my $db = DB->new(
     domain => 'mysql_test',

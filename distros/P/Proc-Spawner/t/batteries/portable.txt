@@ -1,0 +1,224 @@
+# t/batteries/portable.txt: written by perl t/portable.t --record (on Linux); LINE TAB OUTPUT|...<STATUS>
+echo hello	hello|<0>
+false || echo or; true && echo and	or|and|<0>
+{ echo x; false; } || echo y	x|y|<0>
+x=$(exit 4); echo st=$?	st=4|<0>
+echo $(exit 3); echo st=$?	|st=0|<0>
+nosuch; echo st=$?	sh: nosuch: not found|st=127|<0>
+echo a >&7; echo st=$?	sh: 7: Bad file descriptor|st=2|<0>
+f=; echo x >$f; echo st=$?	sh: cannot create : Directory nonexistent|st=2|<0>
+i=0; while [ $i -lt 3 ]; do echo $i; i=$((i + 1)); done	0|1|2|<0>
+for i in 1 2 3 4; do [ $i = 3 ] && break; echo $i; done	1|2|<0>
+for i in 1 2 3 4; do [ $i = 2 ] && continue; echo $i; done	1|3|4|<0>
+case abc in a*c) echo yes;; *) echo no;; esac	yes|<0>
+case "x*" in 'x*') echo quoted;; x*) echo glob;; esac	quoted|<0>
+if false; then echo t; elif true; then echo e; else echo f; fi	e|<0>
+(exit 7); echo st=$?	st=7|<0>
+x=1; (x=2); echo $x	1|<0>
+x=1; echo a | x=2; echo $x	1|<0>
+v='a  b'; echo $v "$v"	a b a  b|<0>
+y=; echo [$y] ["$y"] ['']	[] [] []|<0>
+exec echo replaced	replaced|<0>
+exit 3; echo not here	<3>
+! true; echo st=$?	st=1|<0>
+echo $((1/0)); echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+./fds	sh: ./fds: not found|<127>
+echo $(./fds)	sh: ./fds: not found||<0>
+alias ll="echo L"@Nll x	L x|<0>
+alias e="echo " x=X@Ne x	X|<0>
+alias ll="echo L"@Nf() { ll; }; f	L|<0>
+alias ll="echo L"@Neval "ll e"	L e|<0>
+alias ll="echo L"@Necho $(ll s)	L s|<0>
+alias a=b c="d e"; alias; echo st=$?	a='b'|c='d e'|st=0|<0>
+alias a=b; alias a; alias zz; echo st=$?	a='b'|alias: zz not found|st=1|<0>
+alias a=b; unalias a; alias; echo st=$?	st=0|<0>
+unalias zz; echo st=$?	unalias: zz not found|st=1|<0>
+alias ll="echo L"@Nunalias ll@Nll; echo st=$?	sh: ll: not found|st=127|<0>
+alias q="echo 'x y'"@Nq; alias q	x y|q='echo '"'"'x y'"'"|<0>
+jobs; echo st=$?	st=0|<0>
+bg; echo st=$?	sh: bg: No current job|st=2|<0>
+fg; echo st=$?	sh: fg: No current job|st=2|<0>
+hash nosuch; echo st=$?	sh: hash: nosuch: not found|st=1|<0>
+hash; echo st=$?	st=0|<0>
+hash -r; hash; echo st=$?	st=0|<0>
+f(){ :; }; type f	f is a shell function|<0>
+alias ll=ls@Ntype ll	ll is an alias for ls|<0>
+type ./x; echo st=$?	./x: not found|st=127|<0>
+set -o vi; set -o emacs; echo st=$?	st=0|<0>
+command -v alias; command -v jobs	alias|jobs|<0>
+alias q="'a''b'"; alias q	q=''"'"'a'"''"'b'"'"|<0>
+echo a\	a\|<0>
+[ "<" = "<" ]; echo st=$?	st=0|<0>
+echo a; return; echo b	a|sh: return: can only `return' from a function or sourced script|<2>
+case b in [^a]) echo neg;; *) echo lit;; esac	neg|<0>
+n=HOME; unset $n; cd; echo st=$?	sh: cd: HOME not set|st=1|<0>
+echo hi | { read -p 'P> ' x; echo "[$x] $?"; }	[hi] 0|<0>
+printf 'a b\n' | { read -r -p q x y; echo "[$x][$y]"; }	[a][b]|<0>
+set -o nounset; echo ${zz-ok}	ok|<0>
+set -o ignoreeof; set -o notify; set -o nolog; set -b; set +m; echo ok	ok|<0>
+trap 'echo e' exit; echo body	body|e|<0>
+trap 'echo x' 9; trap 'echo x' stop; echo st=$?	st=0|<0>
+read() { echo R "$@"; }; read -z q	R -z q|<0>
+echo() { printf "<%s>\n" "$@"; }; echo a b	<a>|<b>|<0>
+kill() { echo K "$@"; }; kill -SIGHUP 1	K -SIGHUP 1|<0>
+jobs() { echo J; }; jobs -x	J|<0>
+pwd() { echo P; }; pwd -Q	P|<0>
+for v in 1 2; do (echo a; break; echo b); echo "st=$? $v"; done	a|st=0 1|a|st=0 2|<0>
+for v in 1; do x=$(continue; echo y); echo "[$x] $?"; done	[] 0|<0>
+for v in 1; do echo a | { continue; echo b; }; echo "st=$?"; done	st=0|<0>
+for v in 1; do (false; continue 1); echo "st=$?"; done	st=0|<0>
+set -- ab ac bc; echo ${@#a}; for x in "${@#a}"; do echo "[$x]"; done; echo "${*%c}"	b c bc|[b]|[c]|[bc]|ab a b|<0>
+set -- "a b" c; IFS=:; echo "${*#a}"	 b:c|<0>
+echo $LINENO@Necho $LINENO; f() {@Necho $LINENO@N}@Nf; echo $((LINENO + 10)) ${LINENO}	1|2|3|15 5|<0>
+v=x; read $v <<E@Nhi@NE@Necho "[$x]"	[hi]|<0>
+v=1x; read "$v" <<E@Nhi@NE@Necho "st=$?"	sh: read: 1x: bad variable name|st=2|<0>
+readonly r=1; read r <<E@N2@NE@Necho "st=$? $r"	sh: read: r: is read only|st=2 1|<0>
+set -- a b c; echo ${##} ${#?}	1 1|<0>
+v=X; alias a="echo $v"@Na	X|<0>
+f() { alias z="echo Z"; }; f@Nz	Z|<0>
+[ a \< b ]; echo $?; [ b \< a ]; echo $?; test b \> a; echo $?; [ ! a \< b ]; echo $?	0|1|0|1|<0>
+x=a.b; echo ${x%["."]*} "${x#*[.]}"; set --; echo "${1:-sure? [y/N]}"; v=b; x=ab; echo "${x%[$v]}"	a b|sure? [y/N]|a|<0>
+case "^" in ["^"a]) echo m1;; esac; case "]" in [\]]) echo m2;; esac; case - in [a\-c]) echo m3;; esac; case b in [!"b"]) echo no;; *) echo m4;; esac	m1|m2|m3|m4|<0>
+eval ""; eval '# c'; set --; eval $@; echo "st=$?"	st=0|<0>
+@N# only comments@N	<0>
+kill; echo "st=$?"; kill -9; kill -s HUP; kill --; set --; kill $(echo); echo "st=$?"	sh: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or|kill -l [exitstatus]|st=2|sh: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or|kill -l [exitstatus]|sh: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or|kill -l [exitstatus]|sh: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or|kill -l [exitstatus]|sh: kill: Usage: kill [-s sigspec | -signum | -sigspec] [pid | job]... or|kill -l [exitstatus]|st=2|<0>
+printf '%0.s-' 1 2 3; echo; printf '[%05s][%0c][%-05s][%0b][%05d]' x y z w 7; echo; printf '%%0s %s' a; echo; printf '%0*s|' 4 a; echo	---|[    x][y][z    ][w][00007]|%0s a|   a||<0>
+f() { echo "in:$x"; }; x=1 f; echo "out:[$x]"	in:1|out:[]|<0>
+x=1 :; echo "[$x]"	[1]|<0>
+x=1 true; echo "[$x]"	[]|<0>
+f() { return 3; }; f; echo $?	3|<0>
+f() { echo $1 $#; }; f a b; echo $1 $#	a 2|0|<0>
+f() { local x=2; echo $x; }; x=1; f; echo $x	2|1|<0>
+f() { for a; do echo "[$a]"; done; }; f "a b" "" c	[a b]|[]|[c]|<0>
+f() { echo "${*}|$@|$#"; }; f "a b" "" c	a b  c|a b  c|3|<0>
+f() { if [ "$1" -gt 0 ]; then echo $1; f $(($1 - 1)); fi; }; f 3	3|2|1|<0>
+f() { while :; do return 4; done; }; f; echo $?	4|<0>
+g() { echo g; }; f() { g; g() { echo new; }; g; }; f; g	g|new|new|<0>
+unset -f nosuch; f() { :; }; unset -f f; f; echo $?	sh: f: not found|127|<0>
+set -e; false; echo no	<1>
+set -e; if false; then :; fi; false || true; ! true; echo yes	yes|<0>
+set -e; f() { false; echo inf; }; f || echo caught	inf|<0>
+set -e; x=$(false); echo no	<1>
+set -e; (false); echo no	<1>
+readonly x=1; x=2; echo after	sh: x: is read only|<2>
+readonly x=1; unset x; echo after $?	sh: unset: x: is read only|<2>
+readonly x=1; echo $((x=2)); echo after	sh: x: is read only|<2>
+shift 5; echo after	sh: shift: can't shift that many|<2>
+set -- a b c; echo $# "$@"; shift; echo "$*"; shift 2; echo "[$*]" $#	3 a b c|b c|[] 0|<0>
+set -- "a b" c; echo "[${1}]" "[$*]"; IFS=:; echo "$*"	[a b] [a b c]|a b:c|<0>
+set -- a b; set --; echo $#	0|<0>
+set -u; echo $nope; echo after	sh: nope: parameter not set|<2>
+set -u; echo ${nope-ok} ${nope:+no}; echo after	ok|after|<0>
+x=; echo ${x:=d} ${y=e} $x $y	d e d e|<0>
+echo ${nope?gone}; echo after	sh: nope: gone|<2>
+echo ${x:?}	sh: x: parameter not set or null|<2>
+x=; echo ${x:?}	sh: x: parameter not set or null|<2>
+echo ${x:?oops here}	sh: x: oops here|<2>
+v=abcabc; echo ${v%b*} ${v%%b*} ${v#*b} ${v##*b} ${#v}	abca a cabc c 6|<0>
+v='a*b'; echo ${v%'*b'} ${v#"a"}	a *b|<0>
+set -- one two; echo ${1%e} ${2#t} ${#1}	on wo 3|<0>
+echo ${x:-a  b} "${x:-a  b}" ${x:-"a  b"}	a b a  b a  b|<0>
+echo $((x=3+4)) $x $((x+=1)) $((x*=2)) $((x<<=1)) $x	7 7 8 16 32 32|<0>
+set -- 5 6; echo $(($1 * $2)) $(($# + 1))	30 3|<0>
+echo $(( y = 2, 3 ))	outside the subset: bad arithmetic expression at 5|<255>
+eval "x=5; echo \$x"; echo $x	5|5|<0>
+eval 'f() { echo ev; }'; f	ev|<0>
+read a b <<E; echo "[$a][$b]"@N1 2 3@NE	[1][2 3]|<0>
+while read l; do echo "<$l>"; done <<E@Nx@Ny@NE	<x>|<y>|<0>
+command -v cd; command -v nosuchcmd; echo $?	cd|127|<0>
+f() { echo func; }; command echo plain; f	plain|func|<0>
+(exec echo in sub; echo not); echo out	in sub|out|<0>
+exec echo bye; echo never	bye|<0>
+x=1 export y=2; echo $x $y; sh -c 'echo $y'	outside the subset: settings or redirections on 'export' at 4|<255>
+trap "echo T" EXIT; echo a	a|T|<0>
+(trap "echo S" EXIT; echo in); echo out	in|S|out|<0>
+trap "echo T" EXIT; exit 3	T|<3>
+trap 'echo T; exit 5' EXIT; echo a	a|T|<5>
+trap - EXIT; trap "echo x" 0; trap - 0; echo a	a|<0>
+wait; echo st $?	st 0|<0>
+while getopts ab:c o -ac -b x -c y; do echo "$o ${OPTARG-u} $OPTIND"; done; echo "end $OPTIND"	a u 2|c u 2|b x 4|c u 5|end 5|<0>
+getopts a o -x; echo "$o ${OPTARG-u} $?"	sh: Illegal option -x|? u 0|<0>
+getopts :a o -x; echo "$o ${OPTARG-u} $?"	? x 0|<0>
+getopts :b: o -b; echo "$o ${OPTARG-u} $?"	: b 0|<0>
+getopts b: o -b; echo "$o ${OPTARG-u} $?"	sh: No arg for -b option|? u 0|<0>
+getopts b: o -bval; echo "$o $OPTARG $OPTIND"	b val 2|<0>
+set -- -a z; getopts a o; echo $o $OPTIND; getopts a o; echo $? $o $OPTIND	a 2|1 ? 2|<0>
+x=echo; $x hi; c='echo  two'; $c words	hi|two words|<0>
+x=ali; ${x}as ll=ls 2>&1; echo $?	0|<0>
+echo $0 $# "[$*]"	sh 0 []|<0>
+for i in "$@"; do echo "<$i>"; done; echo end	end|<0>
+set --; echo "[$@]" "$@" x	[] x|<0>
+x=a:b; IFS=:; for i in $x; do echo $i; done	a|b|<0>
+IFS=; x="a b"; set -- $x; echo $#	1|<0>
+x=":a::b:"; IFS=:; set -- $x; echo $# "[$1]" "[$3]"	4 [] []|<0>
+x=" a  b "; set -- $x; echo $#	2|<0>
+echo "$OPTIND"	1|<0>
+set -u; echo ${x%a}; echo after	sh: x: parameter not set|<2>
+{ trap "echo T" EXIT; true; } & wait	T|<0>
+f() { for a; do echo "[$a]"; done; }; f "a b" "" c	[a b]|[]|[c]|<0>
+while getopts ab: o -a -b v; do :; done; getopts ab: o -b v; echo $? $o $OPTIND	0 b 3|<0>
+getopts ab: o -b v; getopts ab: o -b v; echo "[$o] [$OPTARG] $OPTIND"	[?] [] 3|<0>
+getopts :a o -x; echo "[$o] [$OPTARG]"; getopts a o -x; echo "[$o] [${OPTARG-unset}]"	[?] [x]|[?] [unset]|<0>
+x=$(printf "a\0b\n\0\n"); echo ${#x}	2|<0>
+n=a.b; unset $n; echo after	sh: unset: a.b: bad variable name|<2>
+x=1; y=2; n="x a.b y"; (unset $n; echo in); echo "st=$? x=$x y=$y"	sh: unset: a.b: bad variable name|st=2 x=1 y=2|<0>
+f() { n=a.b; unset $n; echo in; }; f; echo after	sh: unset: a.b: bad variable name|<2>
+n=a.b; unset -f $n; echo "after $?"	after 0|<0>
+n=''; unset "$n"; echo after	sh: unset: : bad variable name|<2>
+x=1; n=x; unset $n; echo "ok [$x] $?"	ok [] 0|<0>
+ec\@Nho joined	joined|<0>
+x=5 >f 2>&1; echo $x	5|<0>
+echo "[${!-unset}]"	[unset]|<0>
+echo $((0 && 1/0)) $((1 || 1/0)) $((1 ? 2 : 1/0))	0 1 2|<0>
+printf 'a\\ b c\n' | { read x y; echo "[$x][$y]"; }	[a b][c]|<0>
+printf 'a\\\\\nb\n' | { read x; echo "[$x]"; }	[a\]|<0>
+printf 'a : b\n' | { IFS=': ' read x y z; echo "[$x][$y][$z]"; }	[a][b][]|<0>
+printf 'x:y:\n' | { IFS=: read a b; echo "[$a][$b]"; }	[x][y]|<0>
+printf 'x:y:z\n' | { IFS=: read a b; echo "[$a][$b]"; }	[x][y:z]|<0>
+printf '  a  b  \n' | { read a; echo "[$a]"; }	[a  b]|<0>
+printf 'a\n' | { IFS= read -r a b; echo "[$a][$b]"; }	[a][]|<0>
+case a in [[:alpha:]]) echo y;; *) echo n;; esac	y|<0>
+case b in [!a]) echo y;; *) echo n;; esac	y|<0>
+for i in 1 2; do [ $i = 2 ] && continue; false; done; echo $?	0|<0>
+for i in 1 2; do false; [ $i = 1 ] || break; done; echo $?	0|<0>
+./nosuch; echo $?	sh: ./nosuch: not found|127|<0>
+echo x >&5; echo st=$?	sh: 5: Bad file descriptor|st=2|<0>
+cat <&4; echo st=$?	sh: 4: Bad file descriptor|st=2|<0>
+x='a  b'; for w in $x "$x" ''; do echo "[$w]"; done	[a]|[b]|[a  b]|[]|<0>
+x=' a '; echo "[$x]" [$x] [${x}x]	[ a ] [ a ] [ a x]|<0>
+echo ${x:-a  b} "${x:-a  b}"	a b a  b|<0>
+i=0; until [ $i -ge 2 ]; do i=$((i+1)); echo $i; done; echo $?	1|2|0|<0>
+while false; do :; done; echo $?	0|<0>
+if false; then :; fi; echo $?	0|<0>
+echo $((08))	outside the subset: bad arithmetic expression at 5|<255>
+echo $((1-$x))	sh: arithmetic expression: syntax error: "1-$x"|<2>
+x=-3; echo $((1-$x))	4|<0>
+x=' 5'; echo $((x+1))	6|<0>
+echo $(( 2 ** 3 ))	outside the subset: bad arithmetic expression at 5|<255>
+echo $((1<<63)) $((9223372036854775807+1))	-9223372036854775808 -9223372036854775808|<0>
+v=$(printf 'a\n\n\n'); echo "[$v]"	[a]|<0>
+v=$(printf '\n\na'); echo "[$v]"	[||a]|<0>
+for i in 1 2; do for j in a b; do echo $i$j; [ $j = a ] && continue 2; done; done	1a|2a|<0>
+for i in 1 2; do for j in a b; do echo $i$j; break 2; done; echo no; done; echo $?	1a|0|<0>
+for i in 1 2; do while :; do echo $i; continue 2; done; done	1|2|<0>
+{ echo a; echo b; } | { read x; exit 5; }; echo st=$?	st=5|<0>
+x=$(exit 4; echo no); echo "[$x] st=$?"	[] st=4|<0>
+x=$(for i in 1 2; do echo $i; exit 6; done); echo "[$x] st=$?"	[1] st=6|<0>
+x=$(echo $((1/0)); echo after); echo "[$x] st=$?"	sh: arithmetic expression: division by zero: "1/0"|[] st=2|<0>
+(echo $((1/0)); echo after); echo st=$?	sh: arithmetic expression: division by zero: "1/0"|st=2|<0>
+echo a | (echo $((1/0)) ; echo after); echo st=$?	sh: arithmetic expression: division by zero: "1/0"|st=2|<0>
+for i in $((1/0)); do echo $i; done; echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+case $((1/0)) in *) echo x;; esac; echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+cd $((1/0)); echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+x=$((1/0)); echo after	sh: arithmetic expression: division by zero: "1/0"|<2>
+(exit 3) && echo no || echo st=$?	st=3|<0>
+while read l; do echo "<$l>"; cat; done <<<x	outside the subset: here-string (bash) at 40|<255>
+read a <&-; echo st=$?	st=1|<0>
+read a; echo "st=$? [$a]"	st=1 []|<0>
+x=a; case ab in "$x"*) echo y;; esac	y|<0>
+x='a*'; case ab in $x) echo y;; "$x") echo q;; esac	y|<0>
+x='a*'; case 'a*' in "$x") echo q;; esac	q|<0>
+case '\' in \\) echo bs;; esac	bs|<0>
+case 'x]' in [x]]) echo y;; *) echo n;; esac	y|<0>
+case '-' in [a-]) echo y;; *) echo n;; esac	y|<0>
+case '.' in ?) echo y;; esac	y|<0>

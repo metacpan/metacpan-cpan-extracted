@@ -1,5 +1,20 @@
 Revision history for Perl extension UPnP.
 
+2026-11-09 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.7
+	* Security hardening (see docs/network-limits.md and docs/device-and-media-safety.md):
+	  - HTTP requests now have a total timeout and limits on header, line and body sizes.
+	  - SSDP discovery and gateway port-mapping enumeration are bounded.
+	  - Description and SOAP requests may only connect to the address that sent the
+	    SSDP response, unless search(allowed_addresses => [...]) permits others.
+	  - Media content traversal is protected against cyclic and deep trees, and
+	    generated RSS escapes XML.
+	* Thanks for Damyan Ivanov (Debian Perl Group), Slaven Rezic and Olivier Mengue
+	* Add GW::Gateway::gettotalbytesreceived(); keep gettotalbytesrecieved() as an alias (RT #123509).
+	* Fix spelling mistakes in POD (RT #123508).
+	* Fix missing "$" before condir_service in SYNOPSIS (RT #82192).
+	* Fix actrion_out_arg typo in SYNOPSIS (RT #96398).
+
 2018-12-23 Satoshi Konno <skonno@cybergarage.org>
 	* v1.4.6
         * Thank you Florian Schlichting

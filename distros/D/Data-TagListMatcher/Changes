@@ -1,2 +1,9 @@
+v0.02   2026-11-10Z
+    - Improved documentation
+    - Added default_converter(), and default_type() to autogenerate objects as needed
+    - Added clear_cache() as basic cache control
+    - Added register() to provide speedups via identifier registration
+    - Added more tests
+
 v0.01   2026-11-08Z
     - Initial release

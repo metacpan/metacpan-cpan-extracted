@@ -19,6 +19,7 @@ BEGIN
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $QV_ELEMENT $QV_VALUE );
+    use Crypt::Misc ();
     use Encode ();
     use URI::Escape::XS ();
     use Wanted;
@@ -97,7 +98,7 @@ sub _get_header_value_object
     return( $hv );
 }
 
-sub _make_boundary { return( Data::UUID->new->create_str ); }
+sub _make_boundary { return( Crypt::Misc::random_v4uuid() ); }
 
 sub _new_hv
 {
@@ -758,7 +759,7 @@ This instantiates a new L<header value object|Module::Generic::HeaderValue>, pas
 
 =head2 _make_boundary
 
-Returns a new boundary using L<Data::UUID>
+Returns a new boundary using L<Crypt::Misc> and its function L<Crypt::Misc/random_v4uuid>
 
 =head2 _new_hv
 

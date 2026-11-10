@@ -42,15 +42,15 @@ subtest "Test first synopsis: baseline setup" => sub {
           my $cb  = shift;
           my $res = $cb->(GET "/");
 
-          like $res->header("content-security-protocol"), qr/script-src 'self'/,
+          like $res->header("Content-Security-Policy"), qr/script-src 'self'/,
               q{Header contains "script-src 'self'"};
 
-          like $res->header("content-security-protocol"), qr/default-src 'self'/,
+          like $res->header("Content-Security-Policy"), qr/default-src 'self'/,
               q{Header contains "default-src 'self'"};
 
-          my ( $nonce ) = $res->header("content-security-protocol") =~ /nonce-([a-f0-9]+)/;
+          my ( $nonce ) = $res->header("Content-Security-Policy") =~ /'nonce-([^']+)'/;
 
-          ok $nonce, "Got nonce out of the content-security-protocol header";
+          ok $nonce, "Got nonce out of the Content-Security-Policy header";
 
           is $res->content, "OHAI $nonce", "App delivers page with proper nonce";
       };
@@ -68,15 +68,15 @@ subtest "Test second synopsis: nonce_template_token" => sub {
           my $cb  = shift;
           my $res = $cb->(GET "/");
 
-          like $res->header("content-security-protocol"), qr/script-src 'self'/,
+          like $res->header("Content-Security-Policy"), qr/script-src 'self'/,
               q{Header contains "script-src 'self'"};
 
-          like $res->header("content-security-protocol"), qr/default-src 'self'/,
+          like $res->header("Content-Security-Policy"), qr/default-src 'self'/,
               q{Header contains "default-src 'self'"};
 
-          my ( $nonce ) = $res->header("content-security-protocol") =~ /nonce-([a-f0-9]+)/;
+          my ( $nonce ) = $res->header("Content-Security-Policy") =~ /'nonce-([^']+)'/;
 
-          ok $nonce, "Got nonce out of the content-security-protocol header";
+          ok $nonce, "Got nonce out of the Content-Security-Policy header";
 
           is $res->content, "DIS IZ MAI NONCE: $nonce!", "App delivers page with templated nonce";
       };
